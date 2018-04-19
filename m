@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41216)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1f94JN-0002wY-UF
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 03:48:58 -0400
+	(envelope-from <stefanha@redhat.com>) id 1f94N8-0004nO-LM
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 03:52:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1f94JJ-0000Iq-V0
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 03:48:57 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54036 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1f94JJ-0000IZ-PN
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 03:48:53 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180417224054.26363-1-lersek@redhat.com>
-	<87po2wzysh.fsf@dusky.pond.sub.org>
-	<8a52bb49-4194-3b91-8b67-a0e5700fd6ed@redhat.com>
-Date: Thu, 19 Apr 2018 09:48:36 +0200
-In-Reply-To: <8a52bb49-4194-3b91-8b67-a0e5700fd6ed@redhat.com> (Laszlo Ersek's
-	message of "Wed, 18 Apr 2018 13:35:17 +0200")
-Message-ID: <87in8nvdpn.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [qemu RFC v2] qapi: add "firmware.json"
+	(envelope-from <stefanha@redhat.com>) id 1f94N7-0002oj-Ki
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 03:52:50 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Thu, 19 Apr 2018 15:52:30 +0800
+Message-Id: <20180419075232.31407-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [RFC 0/2] block/file-posix: allow -drive
+ cache.direct=off live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +18,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, libvir-list@redhat.com, Michal Privoznik <mprivozn@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Gary Ching-Pang Lin <glin@suse.com>, Gerd Hoffmann <kraxel@redhat.com>, David Gibson <dgibson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Laszlo Ersek <lersek@redhat.com> writes:
+file-posix.c only supports shared storage live migration with -drive
+cache.direct=off due to cache consistency issues.  There are two main shared
+storage configurations: files on NFS and host block devices on SAN LUNs.
 
-> On 04/18/18 10:47, Markus Armbruster wrote:
->> Laszlo Ersek <lersek@redhat.com> writes:
->
->>> +##
->>> +# @FirmwareArchitecture:
->>> +#
->>> +# Defines the target architectures (emulator binaries) that firmware may
->>> +# execute on.
->>> +#
->>> +# @aarch64: The firmware can be executed by the qemu-system-aarch64 emulator.
->>> +#
->>> +# @arm: The firmware can be executed by the qemu-system-arm emulator.
->>> +#
->>> +# @i386: The firmware can be executed by the qemu-system-i386 emulator.
->>> +#
->>> +# @x86_64: The firmware can be executed by the qemu-system-x86_64 emulator.
->>> +#
->>> +# Since: 2.13
->>> +##
->>> +{ 'enum' : 'FirmwareArchitecture',
->>> +  'data' : [ 'aarch64', 'arm', 'i386', 'x86_64' ] }
->> 
->> Partial dupe of CpuInfoArch from misc.json.  Neither covers all our
->> target architectures.  Should we have one that does in common.json
->> instead?
->
-> If we had one there, I'd use it here :)
->
-> For collecting the arch identifiers, is it OK to run "./configure
-> --help", and look for the "*-softmmu" options under
-> "--target-list=LIST"? Because that's what I need here; the qemu-system-*
-> emulators.
+The problem is that QEMU starts on the destination host before the source host
+has written everything out to the disk.  The page cache on the destination host
+may contain stale data read when QEMU opened the image file (before migration
+handover).  Using O_DIRECT avoids this problem but prevents users from taking
+advantage of the host page cache.
 
-configure gets its list like this:
+Although cache=none is the recommended setting for virtualization use cases,
+there are scenarios where cache=writeback makes sense.  If the guest has much
+less RAM than the host or many guests share the same backing file, then the
+host page cache can significantly improve disk I/O performance.
 
-    default_target_list=""
+This patch series implements .bdrv_co_invalidate_cache() for block/file-posix.c
+on Linux so that shared storage live migration works.  I have sent it as an RFC
+because cache consistency is not binary, there are corner cases which I've
+described in the actual patch, and this may require more discussion.
 
-    mak_wilds=""
+Regarding NFS, QEMU relies on O_DIRECT rather than the close-to-open
+consistency model (see nfs(5)), which is the basic guarantee provided by NFS.
+After this patch cache consistency is no longer provided by O_DIRECT.
 
-    if [ "$softmmu" = "yes" ]; then
-        mak_wilds="${mak_wilds} $source_path/default-configs/*-softmmu.mak"
-    fi
-    if [ "$linux_user" = "yes" ]; then
-        mak_wilds="${mak_wilds} $source_path/default-configs/*-linux-user.mak"
-    fi
-    if [ "$bsd_user" = "yes" ]; then
-        mak_wilds="${mak_wilds} $source_path/default-configs/*-bsd-user.mak"
-    fi
+This patch series relies on fdatasync(2) (source) +
+posix_fadvise(POSIX_FADV_DONTNEED) (destination) instead.  I believe it is safe
+for both NFS and SAN LUNs.  Maybe we should use fsync(2) instead of
+fdatasync(2) so that NFS has up-to-date inode metadata?
 
-    for config in $mak_wilds; do
-        default_target_list="${default_target_list} $(basename "$config" .mak)"
-    done
+Stefan Hajnoczi (2):
+  block/file-posix: implement bdrv_co_invalidate_cache() on Linux
+  block/file-posix: verify page cache is not used
 
-Since we use QMP only in system emulation, a QAPI enum limited to the
-system emulation targets makes sense.
+ block/file-posix.c | 110 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 110 insertions(+)
 
-Replacing CpuInfoArch by such an enum will change the discriminator
-value from "other" to the real architecture, with the obvious
-compatibility concerns.  But we've accepted similar changes twice
-already: commit 9d0306dfdfb and commit 25fa194b7b1, both v2.12.0-rc0.
-
-"other" was a bad idea.  Hindsight 20/20.
-
-Getting rid of it in one go rather than piecemeal seems like the least
-bad way out.  Too late for 2.12, though.  Eric, what do you think?
-
-[...]
+-- 
+2.14.3
