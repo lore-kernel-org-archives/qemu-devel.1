@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60633)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=6403088e3=Ian.Jackson@citrix.com>)
-	id 1f9Ch0-0002Hp-R7
+	id 1f9Ch0-0002Ht-Va
 	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:45:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=6403088e3=Ian.Jackson@citrix.com>)
-	id 1f9Cgz-0006HC-7q
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:45:54 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:53463)
+	id 1f9Cgz-0006I4-Qe
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:45:55 -0400
+Received: from smtp03.citrix.com ([162.221.156.55]:53489)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <prvs=6403088e3=Ian.Jackson@citrix.com>)
-	id 1f9Cgy-00069l-RB
+	id 1f9Cgz-0006EO-Cr
 	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:45:53 -0400
 From: Ian Jackson <ian.jackson@eu.citrix.com>
-Date: Thu, 19 Apr 2018 17:45:10 +0100
-Message-ID: <1524156319-11465-8-git-send-email-ian.jackson@eu.citrix.com>
+Date: Thu, 19 Apr 2018 17:45:12 +0100
+Message-ID: <1524156319-11465-10-git-send-email-ian.jackson@eu.citrix.com>
 In-Reply-To: <1524156319-11465-1-git-send-email-ian.jackson@eu.citrix.com>
 References: <1524156319-11465-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 07/16] xen: move xc_interface compatibility
- fallback further up the file
+Subject: [Qemu-devel] [PATCH 09/16] os-posix: cleanup: Replace fprintfs with
+ error_report in change_process_uid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,70 +30,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>
+Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
 
-We are going to want to use the dummy xendevicemodel_handle type in
-new stub functions in the CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
-section.  So we need to provide that definition, or (as applicable)
-include the appropriate header, earlier in the file.
-
-(Ideally the newer compatibility layers would be at the bottom of the
-file, so that they can naturally benefit from the compatibility layers
-for earlier version.  But that's rather too much for this series.)
-
-No functional change.
+I'm going to be editing this function and it makes sense to clean up
+this style problem in advance.
 
 Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
-Acked-by: Stefano Stabellini <sstabellini@kernel.org>
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Markus Armbruster <armbru@redhat.com>
+CC: Daniel P. Berrange <berrange@redhat.com>
+CC: Michael Tokarev <mjt@tls.msk.ru>
 ---
-v2: New patch in v2 of the series
----
- include/hw/xen/xen_common.h | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+ os-posix.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
-index 1766bb9..60c4ebb 100644
---- a/include/hw/xen/xen_common.h
-+++ b/include/hw/xen/xen_common.h
-@@ -78,6 +78,17 @@ static inline void *xenforeignmemory_map(xc_interface *h, uint32_t dom,
- 
- extern xenforeignmemory_handle *xen_fmem;
- 
-+#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
-+
-+typedef xc_interface xendevicemodel_handle;
-+
-+#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
-+
-+#undef XC_WANT_COMPAT_DEVICEMODEL_API
-+#include <xendevicemodel.h>
-+
-+#endif
-+
- #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
- 
- #define XEN_COMPAT_PHYSMAP
-@@ -105,8 +116,6 @@ static inline int xentoolcore_restrict_all(domid_t domid)
- 
- #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
- 
--typedef xc_interface xendevicemodel_handle;
--
- static inline xendevicemodel_handle *xendevicemodel_open(
-     struct xentoollog_logger *logger, unsigned int open_flags)
+diff --git a/os-posix.c b/os-posix.c
+index b9c2343..560db95 100644
+--- a/os-posix.c
++++ b/os-posix.c
+@@ -167,20 +167,20 @@ static void change_process_uid(void)
  {
-@@ -228,11 +237,6 @@ static inline int xendevicemodel_set_mem_type(
-     return xc_hvm_set_mem_type(dmod, domid, mem_type, first_pfn, nr);
- }
- 
--#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
--
--#undef XC_WANT_COMPAT_DEVICEMODEL_API
--#include <xendevicemodel.h>
--
- #endif
- 
- extern xendevicemodel_handle *xen_dmod;
+     if (user_pwd) {
+         if (setgid(user_pwd->pw_gid) < 0) {
+-            fprintf(stderr, "Failed to setgid(%d)\n", user_pwd->pw_gid);
++            error_report("Failed to setgid(%d)", user_pwd->pw_gid);
+             exit(1);
+         }
+         if (initgroups(user_pwd->pw_name, user_pwd->pw_gid) < 0) {
+-            fprintf(stderr, "Failed to initgroups(\"%s\", %d)\n",
+-                    user_pwd->pw_name, user_pwd->pw_gid);
++            error_report("Failed to initgroups(\"%s\", %d)",
++                         user_pwd->pw_name, user_pwd->pw_gid);
+             exit(1);
+         }
+         if (setuid(user_pwd->pw_uid) < 0) {
+-            fprintf(stderr, "Failed to setuid(%d)\n", user_pwd->pw_uid);
++            error_report("Failed to setuid(%d)", user_pwd->pw_uid);
+             exit(1);
+         }
+         if (setuid(0) != -1) {
+-            fprintf(stderr, "Dropping privileges failed\n");
++            error_report("Dropping privileges failed");
+             exit(1);
+         }
+     }
 -- 
 2.1.4
