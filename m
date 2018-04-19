@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1f9G1G-0002BA-VK
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 16:19:04 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1f9G30-0003Vv-Bx
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 16:20:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1f9G1F-0007MN-NK
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 16:19:02 -0400
-References: <20180323164254.26487-1-pbonzini@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <36e1f0e4-4245-4cfe-9018-e37ebad3c8ec@redhat.com>
-Date: Thu, 19 Apr 2018 16:18:39 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1f9G2x-0001Ia-0l
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 16:20:50 -0400
+Received: from mail-pg0-x235.google.com ([2607:f8b0:400e:c05::235]:39277)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1f9G2w-0001He-Rm
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 16:20:46 -0400
+Received: by mail-pg0-x235.google.com with SMTP id b9so3018418pgf.6
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 13:20:46 -0700 (PDT)
+References: <20180419135901.30035-1-alex.bennee@linaro.org>
+	<20180419135901.30035-4-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <3dd9c647-210c-981b-9876-ecd53ad058fd@linaro.org>
+Date: Thu, 19 Apr 2018 10:20:39 -1000
 MIME-Version: 1.0
-In-Reply-To: <20180323164254.26487-1-pbonzini@redhat.com>
+In-Reply-To: <20180419135901.30035-4-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: remove
- bdrv_dirty_bitmap_make_anon
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 03/43] configure: add support for
+ --cross-cc-FOO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,77 +32,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org
+
+On 04/19/2018 03:58 AM, Alex Bennée wrote:
+> @@ -6805,6 +6823,7 @@ case "$target_name" in
+>      bflt="yes"
+>      mttcg="yes"
+>      gdb_xml_files="arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
+> +    target_compiler=$cross_cc_arm
+>    ;;
+>    aarch64|aarch64_be)
+>      TARGET_ARCH=aarch64
+> @@ -6812,6 +6831,7 @@ case "$target_name" in
+>      bflt="yes"
+>      mttcg="yes"
+>      gdb_xml_files="aarch64-core.xml aarch64-fpu.xml arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
+> +    target_compiler=$cross_cc_aarch64
+>    ;;
+>    cris)
+>    ;;
+
+Is there any reason not to fill in the reset of the cases within the switch at
+the same time?
 
 
-
-On 03/23/2018 12:42 PM, Paolo Bonzini wrote:
-> All this function is doing will be repeated by
-> bdrv_do_release_matching_dirty_bitmap_locked, except
-> resetting bm->persistent.  But even that does not matter
-> because the bitmap will be freed.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  block/dirty-bitmap.c         | 9 ---------
->  blockdev.c                   | 1 -
->  include/block/dirty-bitmap.h | 1 -
->  3 files changed, 11 deletions(-)
-> 
-> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-> index e27b3096dd..13bb5066a4 100644
-> --- a/block/dirty-bitmap.c
-> +++ b/block/dirty-bitmap.c
-> @@ -97,15 +97,6 @@ BdrvDirtyBitmap *bdrv_find_dirty_bitmap(BlockDriverState *bs, const char *name)
->      return NULL;
->  }
->  
-> -/* Called with BQL taken.  */
-> -void bdrv_dirty_bitmap_make_anon(BdrvDirtyBitmap *bitmap)
-> -{
-> -    assert(!bdrv_dirty_bitmap_frozen(bitmap));
-> -    g_free(bitmap->name);
-> -    bitmap->name = NULL;
-> -    bitmap->persistent = false;
-> -}
-> -
->  /* Called with BQL taken.  */
->  BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriverState *bs,
->                                            uint32_t granularity,
-> diff --git a/blockdev.c b/blockdev.c
-> index c31bf3d98d..6eb18c4ef1 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -2881,7 +2881,6 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
->          }
->      }
->  
-> -    bdrv_dirty_bitmap_make_anon(bitmap);
->      bdrv_release_dirty_bitmap(bs, bitmap);
->  }
->  
-> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-> index 1ff8949b1b..5a51a78b63 100644
-> --- a/include/block/dirty-bitmap.h
-> +++ b/include/block/dirty-bitmap.h
-> @@ -24,7 +24,6 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BlockDriverState *bs,
->  void bdrv_dirty_bitmap_enable_successor(BdrvDirtyBitmap *bitmap);
->  BdrvDirtyBitmap *bdrv_find_dirty_bitmap(BlockDriverState *bs,
->                                          const char *name);
-> -void bdrv_dirty_bitmap_make_anon(BdrvDirtyBitmap *bitmap);
->  void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap);
->  void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs);
->  void bdrv_release_persistent_dirty_bitmaps(BlockDriverState *bs);
-> 
-
-Just a weird artifact of the way in which we used to think this
-subsystem would work; that maybe we'd want to return named bitmaps to
-being anonymous.
-
-Thanks, applied to my bitmaps tree:
-
-https://github.com/jnsnow/qemu/commits/bitmaps
-https://github.com/jnsnow/qemu.git
-
---js
+r~
