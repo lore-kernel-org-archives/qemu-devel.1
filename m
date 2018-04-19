@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f9ADm-0004NM-0O
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 10:07:38 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f9ADm-0004Od-UI
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 10:07:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f9ADk-0004rB-T4
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 10:07:33 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:42305)
+	(envelope-from <alex.bennee@linaro.org>) id 1f9ADh-0004iU-1Y
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 10:07:34 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:39029)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f9ADk-0004nC-If
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 10:07:32 -0400
-Received: by mail-wr0-x242.google.com with SMTP id s18-v6so14410189wrg.9
-	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 07:07:32 -0700 (PDT)
+	id 1f9ADg-0004hN-QW
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 10:07:28 -0400
+Received: by mail-wr0-x243.google.com with SMTP id q3-v6so4396080wrj.6
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 07:07:28 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 19 Apr 2018 14:58:45 +0100
-Message-Id: <20180419135901.30035-28-alex.bennee@linaro.org>
+Date: Thu, 19 Apr 2018 14:58:38 +0100
+Message-Id: <20180419135901.30035-21-alex.bennee@linaro.org>
 In-Reply-To: <20180419135901.30035-1-alex.bennee@linaro.org>
 References: <20180419135901.30035-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 27/43] tests/tcg/aarch64: add Makefile.target
+Subject: [Qemu-devel] [PATCH v2 20/43] tests/tcg/i386: fix test-i386-fprem
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,24 +32,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Nothing much here yet.
+Remove dependencies on QEMU's source tree and build directly.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/tcg/aarch64/Makefile.target | 5 +++++
- 1 file changed, 5 insertions(+)
- create mode 100644 tests/tcg/aarch64/Makefile.target
+ tests/tcg/i386/test-i386-fprem.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefile.target
-new file mode 100644
-index 0000000000..4ac8fbe73f
---- /dev/null
-+++ b/tests/tcg/aarch64/Makefile.target
-@@ -0,0 +1,5 @@
-+# -*- Mode: makefile -*-
-+#
-+# AArch64 specific tweaks
+diff --git a/tests/tcg/i386/test-i386-fprem.c b/tests/tcg/i386/test-i386-fprem.c
+index 1a71623204..66f5a9657d 100644
+--- a/tests/tcg/i386/test-i386-fprem.c
++++ b/tests/tcg/i386/test-i386-fprem.c
+@@ -23,7 +23,10 @@
+  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+ 
+-#include "qemu/osdep.h"
++#include <stdio.h>
++#include <stdint.h>
 +
-+fcvt: LDFLAGS+=-lm
++#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+ 
+ /*
+  * Inspired by <ieee754.h>'s union ieee854_long_double, but with single
+@@ -39,7 +42,7 @@ union float80u {
+         unsigned int exponent:15;
+         unsigned int negative:1;
+         unsigned int empty:16;
+-    } QEMU_PACKED ieee;
++    } __attribute__((packed)) ieee;
+ 
+     /* This is for NaNs in the IEEE 854 double-extended-precision format.  */
+     struct {
+@@ -49,7 +52,7 @@ union float80u {
+         unsigned int exponent:15;
+         unsigned int negative:1;
+         unsigned int empty:16;
+-    } QEMU_PACKED ieee_nan;
++    } __attribute__((packed)) ieee_nan;
+ };
+ 
+ #define IEEE854_LONG_DOUBLE_BIAS 0x3fff
+@@ -229,6 +232,7 @@ static void test_fprem_cases(void)
+     do_fprem_stack_underflow();
+ 
+     printf("= invalid operation =\n");
++    do_fprem(q_nan.d, 1.0);
+     do_fprem(s_nan.d, 1.0);
+     do_fprem(1.0, 0.0);
+     do_fprem(pos_inf.d, 1.0);
+@@ -238,6 +242,8 @@ static void test_fprem_cases(void)
+     do_fprem(pos_denorm.d, 1.0);
+     do_fprem(1.0, pos_denorm.d);
+ 
++    do_fprem(smallest_positive_norm.d, smallest_positive_norm.d);
++
+     /* printf("= underflow =\n"); */
+     /* TODO: Is there a case where FPREM raises underflow? */
+ }
 -- 
 2.17.0
