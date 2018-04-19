@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1f9Fef-0008Mo-Bm
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 15:55:42 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1f9FfG-0000KB-1K
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 15:56:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1f9Fee-0008Qp-HQ
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 15:55:41 -0400
-References: <20180328133845.20632-1-berto@igalia.com>
-	<6e396823-f99c-2917-ccc5-04dda4a48f39@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <c0ab098c-cc61-ed0e-ff9d-711a91ceafcf@redhat.com>
-Date: Thu, 19 Apr 2018 15:55:16 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1f9FfC-0000OV-2j
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 15:56:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56962)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f9FfB-0000MA-S8
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 15:56:13 -0400
+Date: Thu, 19 Apr 2018 16:56:10 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180419195610.GA29865@localhost.localdomain>
+References: <1523953455-28053-1-git-send-email-wanpengli@tencent.com>
+	<20180417205913.GC29865@localhost.localdomain>
+	<02887fa6-d7c8-bc39-6e65-3c3caec5b903@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <6e396823-f99c-2917-ccc5-04dda4a48f39@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] scripts/dump-qcow2.pl: Script to dump
- qcow2 metadata
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <02887fa6-d7c8-bc39-6e65-3c3caec5b903@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RESEND v2] i386/kvm: add support for
+ KVM_CAP_X86_DISABLE_EXITS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Wanpeng Li <kernellwp@gmail.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
 
-
-
-On 04/13/2018 10:45 AM, Max Reitz wrote:
-> On 2018-03-28 15:38, Alberto Garcia wrote:
->> This script takes a qcow2 image and dumps its metadata: header,
->> snapshot table and some extensions (although not all qcow2 features
->> are supported yet).
->>
->> It can also display a list of all host clusters and the guest -> host
->> address mappings, so it's useful to debug allocations.
->>
->> The image is assumed not to be corrupted, and this script does not do
->> consistency checks (yet).
->>
->> Signed-off-by: Alberto Garcia <berto@igalia.com>
->> ---
->>  scripts/dump-qcow2.pl | 425 ++++++++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 425 insertions(+)
->>  create mode 100755 scripts/dump-qcow2.pl
+On Thu, Apr 19, 2018 at 05:48:57PM +0200, Paolo Bonzini wrote:
+> On 17/04/2018 22:59, Eduardo Habkost wrote:
+> >> +        if (disable_exits) {
+> >> +            disable_exits &= (KVM_X86_DISABLE_EXITS_MWAIT |
+> >> +                              KVM_X86_DISABLE_EXITS_HLT |
+> >> +                              KVM_X86_DISABLE_EXITS_PAUSE);
+> >> +            if (env->user_features[FEAT_KVM] & KVM_PV_UNHALT) {
+> >> +                disable_exits &= ~KVM_X86_DISABLE_EXITS_HLT;
+> >> +            }
+> >
+> > In the future, if we decide to enable kvm-pv-unhalt by default,
+> > should "-cpu ...,kvm-hint-dedicated=on" disable kvm-pv-unhalt
+> > automatically, or should we require an explicit
+> > "kvm-hint-dedicated=on,kvm-pv-unhalt=off" option?
 > 
-> First of all: The main reason I haven't reviewed this so far is because
-> I don't like Perl.
+> It should be automatic.
 > 
-
-You know, I hadn't realized it was perl... I sat down to review it just
-now and I'm probably not qualified to review anything in perl.
-
-> OK, now that that's out of the way...  I'm wondering why you want to add
-> this to the qemu tree?  If you'd written an iotest that would make use
-> of it, sure.  But if it's just for debugging, then I'd personally think
-> it would be better to just add it to a private repository.  That would
-> give you more freedom to extend it, too.
+> > For today's defaults, this patch solves the problem, only one
+> > thing is missing before I give my R-b: we need to clearly
+> > document what exactly are the consequences and requirements of
+> > setting kvm-hint-dedicated=on (I'm not sure if the best place for
+> > this is qemu-options.hx, x86_cpu_list(), or somewhere else).
 > 
-> (I know John has an own script for debugging qcow2 images.)
-> 
+> I don't think we have a good place for this kind of documentation,
+> unfortunately.  Right now it is mentioned in
+> Documentation/virtual/kvm/cpuid.txt.
 
-(Very famously broken when trying to read compressed clusters!)
+With this patch, the QEMU option will do more than just setting
+the CPUID bit, that's why I miss more detailed documentation on
+the QEMU side.  But I agree we have no obvious place for that
+documentation.
 
-> Of course the nice thing about putting it into the qemu repository would
-> be that people would be able to find it.  But then again, we could
-> probably achieve the same with a Wiki page.
-> 
+In the worst case we can just add a code comment on top of
+feature_word_info[FEAT_KVM_HINTS].feat_names warning that
+kvm-hint-dedicated won't just enable the flag on CPUID and has
+other side-effects.
 
-Yeah, having debug tools in the tree is nice sometimes; but perhaps a
-document with lists of pointers to tools we use to debug these things
-would be as good for now.
-
-> Max
-> 
+-- 
+Eduardo
