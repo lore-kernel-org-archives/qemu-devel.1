@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1f98xA-0001Lh-SV
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:46:24 -0400
+	(envelope-from <clg@kaod.org>) id 1f98xG-0001RU-Ng
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:46:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1f98x6-00011i-Vt
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:46:20 -0400
-Received: from 20.mo5.mail-out.ovh.net ([91.121.55.239]:39103)
+	(envelope-from <clg@kaod.org>) id 1f98xC-00014x-QA
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:46:26 -0400
+Received: from 10.mo6.mail-out.ovh.net ([87.98.157.236]:60639)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1f98x6-00010Q-NR
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:46:16 -0400
-Received: from player792.ha.ovh.net (unknown [10.109.105.64])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 319181A2DB5
-	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 14:46:15 +0200 (CEST)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1f98xC-000140-H3
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:46:22 -0400
+Received: from player792.ha.ovh.net (unknown [10.109.108.5])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id AF825156321
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 14:46:20 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu, 19 Apr 2018 14:43:22 +0200
-Message-Id: <20180419124331.3915-27-clg@kaod.org>
+Date: Thu, 19 Apr 2018 14:43:23 +0200
+Message-Id: <20180419124331.3915-28-clg@kaod.org>
 In-Reply-To: <20180419124331.3915-1-clg@kaod.org>
 References: <20180419124331.3915-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 26/35] spapr/xive: add a XIVE KVM device to
- the machine
+Subject: [Qemu-devel] [PATCH v3 27/35] migration: discard non-migratable
+ RAMBlocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,156 +33,246 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Cc: David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-As the VM is connected to the KVM interrupt device at the init of the
-machine, KVM support is added for XICS or for XIVE but not both at the
-same time. This should change later on when KVM resets are supported.
+On the POWER9 processor, the XIVE interrupt controller can control
+interrupt sources using MMIO to trigger events, to EOI or to turn off
+the sources. Priority management and interrupt acknowledgment is also
+controlled by MMIO in the presenter sub-engine.
+
+These MMIO regions are exposed to guests in QEMU with a set of 'ram
+device' memory mappings, similarly to VFIO, and the VMAs are populated
+dynamically with the appropriate pages using a fault handler.
+
+But, these regions are an issue for migration. We need to discard the
+associated RAMBlocks from the RAM state on the source VM and let the
+destination VM rebuild the memory mappings on the new host in the
+post_load() operation just before resuming the system.
+
+To achieve this goal, the following introduces a new RAMBlock flag
+RAM_MIGRATABLE which is updated in the vmstate_register_ram() and
+vmstate_unregister_ram() routines. This flag is then used by the
+migration to identify RAMBlocks to discard on the source. Some checks
+are also performed on the destination to make sure nothing invalid was
+sent.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/intc/xics_kvm.c | 22 +++++++++++++++++++++-
- hw/ppc/spapr.c     | 34 +++++++++++++++++++++++-----------
- 2 files changed, 44 insertions(+), 12 deletions(-)
+ exec.c                    | 10 ++++++++++
+ include/exec/cpu-common.h |  1 +
+ migration/ram.c           | 42 ++++++++++++++++++++++++++++++++---------=
+-
+ 3 files changed, 43 insertions(+), 10 deletions(-)
 
-diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index 89fb20e2c55c..e727397c4a4d 100644
---- a/hw/intc/xics_kvm.c
-+++ b/hw/intc/xics_kvm.c
-@@ -62,6 +62,11 @@ static void icp_get_kvm_state(ICPState *icp)
-     };
-     int ret;
-=20
-+    /* A change of the interrupt mode can disable XICS */
-+    if (kernel_xics_fd =3D=3D -1) {
-+        return;
-+    }
+diff --git a/exec.c b/exec.c
+index 02b1efebb7c3..e9432c06294e 100644
+--- a/exec.c
++++ b/exec.c
+@@ -104,6 +104,9 @@ static MemoryRegion io_mem_unassigned;
+  * (Set during postcopy)
+  */
+ #define RAM_UF_ZEROPAGE (1 << 3)
 +
-     /* ICP for this CPU thread is not in use, exiting */
-     if (!icp->cs) {
-         return;
-@@ -102,6 +107,11 @@ static int icp_set_kvm_state(ICPState *icp, int vers=
-ion_id)
-     };
-     int ret;
++/* RAM can be migrated */
++#define RAM_MIGRATABLE (1 << 4)
+ #endif
 =20
-+    /* Protect resets. A change of the interrupt mode can disable XICS *=
-/
-+    if (kernel_xics_fd =3D=3D -1) {
-+        return 0;
-+    }
+ #ifdef TARGET_PAGE_BITS_VARY
+@@ -1807,6 +1810,11 @@ void qemu_ram_set_uf_zeroable(RAMBlock *rb)
+     rb->flags |=3D RAM_UF_ZEROPAGE;
+ }
+=20
++bool qemu_ram_is_migratable(RAMBlock *rb)
++{
++    return rb->flags & RAM_MIGRATABLE;
++}
 +
-     /* ICP for this CPU thread is not in use, exiting */
-     if (!icp->cs) {
-         return 0;
-@@ -135,7 +145,7 @@ static void icp_kvm_realize(ICPState *icp, Error **er=
-rp)
-     int ret;
-=20
-     if (kernel_xics_fd =3D=3D -1) {
--        abort();
-+        return;
-     }
-=20
-     /*
-@@ -192,6 +202,11 @@ static void ics_get_kvm_state(ICSState *ics)
-     };
-     int i;
-=20
-+    /* A change of the interrupt mode can disable XICS */
-+    if (kernel_xics_fd =3D=3D -1) {
-+        return;
-+    }
-+
-     for (i =3D 0; i < ics->nr_irqs; i++) {
-         ICSIRQState *irq =3D &ics->irqs[i];
-         int ret;
-@@ -262,6 +277,11 @@ static int ics_set_kvm_state(ICSState *ics, int vers=
-ion_id)
-     };
-     int i;
-=20
-+    /* Protect resets. A change of the interrupt mode can disable XICS *=
-/
-+    if (kernel_xics_fd =3D=3D -1) {
-+        return 0;
-+    }
-+
-     for (i =3D 0; i < ics->nr_irqs; i++) {
-         ICSIRQState *irq =3D &ics->irqs[i];
-         int ret;
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index d05c83cdb322..c98ceeed9d6f 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -189,8 +189,7 @@ static void xics_system_init(MachineState *machine, i=
-nt nr_irqs, Error **errp)
-     sPAPRMachineState *spapr =3D SPAPR_MACHINE(machine);
-=20
-     if (kvm_enabled()) {
--        if (machine_kernel_irqchip_allowed(machine) &&
--            !xics_kvm_init(spapr, errp)) {
-+        if (machine_kernel_irqchip_allowed(machine)) {
-             spapr->icp_type =3D TYPE_KVM_ICP;
-             spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_KVM, nr_irqs=
-, errp);
-         }
-@@ -239,10 +238,16 @@ static void xive_system_init(MachineState *machine,=
- int nr_irqs, Error **errp)
+ /* Called with iothread lock held.  */
+ void qemu_ram_set_idstr(RAMBlock *new_block, const char *name, DeviceSta=
+te *dev)
  {
-     sPAPRMachineState *spapr =3D SPAPR_MACHINE(machine);
-=20
--    /* We don't have KVM support yet, so check for irqchip=3Don */
--    if (kvm_enabled() && machine_kernel_irqchip_required(machine)) {
--        error_report("kernel_irqchip requested. no XIVE support");
--        exit(1);
-+    if (kvm_enabled()) {
-+        if (machine_kernel_irqchip_allowed(machine)) {
-+            spapr->nvt_type =3D TYPE_XIVE_NVT_KVM;
-+            spapr->xive =3D spapr_xive_create(spapr, TYPE_SPAPR_XIVE_KVM=
-,
-+                                            nr_irqs, errp);
-+        }
-+        if (machine_kernel_irqchip_required(machine) && !spapr->xive) {
-+            error_prepend(errp, "kernel_irqchip requested but unavailabl=
-e: ");
-+            return;
-+        }
+@@ -1823,6 +1831,7 @@ void qemu_ram_set_idstr(RAMBlock *new_block, const =
+char *name, DeviceState *dev)
+         }
      }
+     pstrcat(new_block->idstr, sizeof(new_block->idstr), name);
++    new_block->flags |=3D RAM_MIGRATABLE;
 =20
-     if (spapr->xive) {
-@@ -1043,11 +1048,9 @@ static void spapr_dt_ov5_platform_support(sPAPRMac=
-hineState *spapr, void *fdt,
-         } else {
-             val[3] =3D 0x00; /* Hash */
-         }
--        /* TODO: introduce a kvmppc_has_cap_xive() ? Works with
--         * irqchip=3Doff for now
--         */
--        if (spapr->xive_exploitation) {
--            val[1] =3D 0x80; /* OV5_XIVE_BOTH */
-+        /* TODO: when under KVM, only advertise XIVE but not both mode *=
-/
-+        if (spapr->xive_exploitation && kvmppc_has_cap_xive()) {
-+            val[1] =3D 0x40; /* OV5_XIVE_EXPLOIT */
-         }
-     } else {
-         if (spapr->xive_exploitation) {
-@@ -2580,6 +2583,15 @@ static void spapr_machine_init(MachineState *machi=
-ne)
-         /* XIVE uses the full range of IRQ numbers. */
-         xive_system_init(machine, XICS_IRQ_BASE + XICS_IRQS_SPAPR,
-                          &error_fatal);
+     rcu_read_lock();
+     RAMBLOCK_FOREACH(block) {
+@@ -1845,6 +1854,7 @@ void qemu_ram_unset_idstr(RAMBlock *block)
+      */
+     if (block) {
+         memset(block->idstr, 0, sizeof(block->idstr));
++        block->flags &=3D ~RAM_MIGRATABLE;
+     }
+ }
+=20
+diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+index 24d335f95d45..96854519b514 100644
+--- a/include/exec/cpu-common.h
++++ b/include/exec/cpu-common.h
+@@ -75,6 +75,7 @@ const char *qemu_ram_get_idstr(RAMBlock *rb);
+ bool qemu_ram_is_shared(RAMBlock *rb);
+ bool qemu_ram_is_uf_zeroable(RAMBlock *rb);
+ void qemu_ram_set_uf_zeroable(RAMBlock *rb);
++bool qemu_ram_is_migratable(RAMBlock *rb);
+=20
+ size_t qemu_ram_pagesize(RAMBlock *block);
+ size_t qemu_ram_pagesize_largest(void);
+diff --git a/migration/ram.c b/migration/ram.c
+index 0e90efa09236..89c3accc4e26 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -187,6 +187,11 @@ void ramblock_recv_bitmap_set_range(RAMBlock *rb, vo=
+id *host_addr,
+                       nr);
+ }
+=20
++/* Should be holding either ram_list.mutex, or the RCU lock. */
++#define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
++    RAMBLOCK_FOREACH(block)                            \
++        if (!qemu_ram_is_migratable(block)) {} else
 +
-+        /* TODO: initialize KVM for XIVE or for XICS but not for both */
-+        if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
-+            xive_kvm_init(spapr->xive, &error_fatal);
-+        }
-+    } else {
-+        if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
-+            xics_kvm_init(spapr, &error_fatal);
-+        }
+ /*
+  * An outstanding page request, on the source, having been received
+  * and queued
+@@ -780,6 +785,10 @@ unsigned long migration_bitmap_find_dirty(RAMState *=
+rs, RAMBlock *rb,
+     unsigned long *bitmap =3D rb->bmap;
+     unsigned long next;
+=20
++    if (!qemu_ram_is_migratable(rb)) {
++        return size;
++    }
++
+     if (rs->ram_bulk_stage && start > 0) {
+         next =3D start + 1;
+     } else {
+@@ -825,7 +834,7 @@ uint64_t ram_pagesize_summary(void)
+     RAMBlock *block;
+     uint64_t summary =3D 0;
+=20
+-    RAMBLOCK_FOREACH(block) {
++    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+         summary |=3D block->page_size;
      }
 =20
-     /* Set up containers for ibm,client-architecture-support negotiated =
-options
+@@ -849,7 +858,7 @@ static void migration_bitmap_sync(RAMState *rs)
+=20
+     qemu_mutex_lock(&rs->bitmap_mutex);
+     rcu_read_lock();
+-    RAMBLOCK_FOREACH(block) {
++    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+         migration_bitmap_sync_range(rs, block, 0, block->used_length);
+     }
+     rcu_read_unlock();
+@@ -1499,6 +1508,10 @@ static int ram_save_host_page(RAMState *rs, PageSe=
+archStatus *pss,
+     size_t pagesize_bits =3D
+         qemu_ram_pagesize(pss->block) >> TARGET_PAGE_BITS;
+=20
++    if (!qemu_ram_is_migratable(pss->block)) {
++        return 0;
++    }
++
+     do {
+         tmppages =3D ram_save_target_page(rs, pss, last_stage);
+         if (tmppages < 0) {
+@@ -1587,7 +1600,7 @@ uint64_t ram_bytes_total(void)
+     uint64_t total =3D 0;
+=20
+     rcu_read_lock();
+-    RAMBLOCK_FOREACH(block) {
++    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+         total +=3D block->used_length;
+     }
+     rcu_read_unlock();
+@@ -1642,7 +1655,7 @@ static void ram_save_cleanup(void *opaque)
+      */
+     memory_global_dirty_log_stop();
+=20
+-    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
++    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+         g_free(block->bmap);
+         block->bmap =3D NULL;
+         g_free(block->unsentmap);
+@@ -1705,7 +1718,7 @@ void ram_postcopy_migrated_memory_release(Migration=
+State *ms)
+ {
+     struct RAMBlock *block;
+=20
+-    RAMBLOCK_FOREACH(block) {
++    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+         unsigned long *bitmap =3D block->bmap;
+         unsigned long range =3D block->used_length >> TARGET_PAGE_BITS;
+         unsigned long run_start =3D find_next_zero_bit(bitmap, range, 0)=
+;
+@@ -1783,7 +1796,7 @@ static int postcopy_each_ram_send_discard(Migration=
+State *ms)
+     struct RAMBlock *block;
+     int ret;
+=20
+-    RAMBLOCK_FOREACH(block) {
++    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+         PostcopyDiscardState *pds =3D
+             postcopy_discard_send_init(ms, block->idstr);
+=20
+@@ -1991,7 +2004,7 @@ int ram_postcopy_send_discard_bitmap(MigrationState=
+ *ms)
+     rs->last_sent_block =3D NULL;
+     rs->last_page =3D 0;
+=20
+-    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
++    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+         unsigned long pages =3D block->used_length >> TARGET_PAGE_BITS;
+         unsigned long *bitmap =3D block->bmap;
+         unsigned long *unsentmap =3D block->unsentmap;
+@@ -2150,7 +2163,7 @@ static void ram_list_init_bitmaps(void)
+=20
+     /* Skip setting bitmap if there is no RAM */
+     if (ram_bytes_total()) {
+-        QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
++        RAMBLOCK_FOREACH_MIGRATABLE(block) {
+             pages =3D block->max_length >> TARGET_PAGE_BITS;
+             block->bmap =3D bitmap_new(pages);
+             bitmap_set(block->bmap, 0, pages);
+@@ -2226,7 +2239,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque=
+)
+=20
+     qemu_put_be64(f, ram_bytes_total() | RAM_SAVE_FLAG_MEM_SIZE);
+=20
+-    RAMBLOCK_FOREACH(block) {
++    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+         qemu_put_byte(f, strlen(block->idstr));
+         qemu_put_buffer(f, (uint8_t *)block->idstr, strlen(block->idstr)=
+);
+         qemu_put_be64(f, block->used_length);
+@@ -2471,6 +2484,11 @@ static inline RAMBlock *ram_block_from_stream(QEMU=
+File *f, int flags)
+         return NULL;
+     }
+=20
++    if (!qemu_ram_is_migratable(block)) {
++        error_report("block %s should not be migrated !", id);
++        return NULL;
++    }
++
+     return block;
+ }
+=20
+@@ -2921,7 +2939,11 @@ static int ram_load(QEMUFile *f, void *opaque, int=
+ version_id)
+                 length =3D qemu_get_be64(f);
+=20
+                 block =3D qemu_ram_block_by_name(id);
+-                if (block) {
++                if (block && !qemu_ram_is_migratable(block)) {
++                    error_report("block %s should not be migrated !", id=
+);
++                    ret =3D -EINVAL;
++
++                } else if (block) {
+                     if (length !=3D block->used_length) {
+                         Error *local_err =3D NULL;
+=20
 --=20
 2.13.6
