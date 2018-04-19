@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56825)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56911)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1f98vU-00082K-B5
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:44:40 -0400
+	(envelope-from <clg@kaod.org>) id 1f98va-00089T-Oq
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:44:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1f98vQ-00089u-D5
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:44:36 -0400
-Received: from 3.mo69.mail-out.ovh.net ([188.165.52.203]:40085)
+	(envelope-from <clg@kaod.org>) id 1f98vW-0008Eu-Gd
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:44:42 -0400
+Received: from 7.mo178.mail-out.ovh.net ([46.105.58.91]:59938)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1f98vQ-000897-5B
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:44:32 -0400
-Received: from player792.ha.ovh.net (unknown [10.109.122.11])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id B0EE413BB6
-	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 14:44:30 +0200 (CEST)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1f98vW-0008DR-6y
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:44:38 -0400
+Received: from player792.ha.ovh.net (unknown [10.109.105.75])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id D8BA51424A
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 14:44:36 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu, 19 Apr 2018 14:43:04 +0200
-Message-Id: <20180419124331.3915-9-clg@kaod.org>
+Date: Thu, 19 Apr 2018 14:43:05 +0200
+Message-Id: <20180419124331.3915-10-clg@kaod.org>
 In-Reply-To: <20180419124331.3915-1-clg@kaod.org>
 References: <20180419124331.3915-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 08/35] spapr: push the XIVE EQ data in OS
- event queue
+Subject: [Qemu-devel] [PATCH v3 09/35] spapr: notify the CPU when the XIVE
+ interrupt priority is more privileged
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,117 +33,169 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Cc: David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-When a notification is let through by the routing engine, the Event
-Queue data defined in the associated IVE is pushed in the in-memory
-event queue. The latter is a circular buffer provided by the OS, one
-per server and priority couple. Each Event Queue entry is 4 bytes
-long, the first bit being a 'generation' bit and the 31 following bits
-the EQ Data field.
+After the event was pushed in the Xive EQ, the presenter engine raises
+the bit corresponding to the priority of the pending interrupt in the
+register IBP (Interrupt Pending Buffer) to indicate there is an event
+pending in one of the 8 priority queues. The Pending Interrupt
+Priority Register (PIPR) is also updated using the IPB. This register
+represent the priority of the most favored pending notification.
 
-The EQ Data field is a way to set an invariant logical event source
-number for an IRQ. It is set with the H_INT_SET_SOURCE_CONFIG hcall
-when the EISN flag is used.
+The PIPR is then compared to the the Current Processor Priority
+Register (CPPR). If it is more favored (numerically less than), the
+CPU interrupt line is raised and the EO bit of the Notification Source
+Register (NSR) is updated to notify the presence of an exception for
+the O/S. The check needs to be done whenever the PIPR or the CPPR are
+changed.
+
+The O/S acknowledges the interrupt with a special load in the Thread
+Interrupt Management Area. If the EO bit of the NSR is set, the CPPR
+takes the value of PIPR. The bit number in the IBP corresponding to
+the priority of the pending interrupt is reseted and so is the EO bit
+of the NSR.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
 
  Changes since v2 :
 
- - used dma_memory_write() to push EQ data
- - introduced the XiveFabric interface, to generalize the routing algo.
+ - introduced the XiveFabric interface
 
- hw/intc/xive.c | 65 ++++++++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
- 1 file changed, 65 insertions(+)
+ hw/intc/xive.c | 78 ++++++++++++++++++++++++++++++++++++++++++++++++++++=
++++++-
+ 1 file changed, 77 insertions(+), 1 deletion(-)
 
 diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index 2ab37fde80e8..420cc6703b88 100644
+index 420cc6703b88..8d0e77cac12a 100644
 --- a/hw/intc/xive.c
 +++ b/hw/intc/xive.c
-@@ -59,6 +59,31 @@ void xive_eq_pic_print_info(XiveEQ *eq, Monitor *mon)
-                    priority, server, qaddr_base, qindex, qentries, qgen)=
-;
- }
-=20
-+static void xive_eq_push(XiveEQ *eq, uint32_t data)
-+{
-+    uint64_t qaddr_base =3D (((uint64_t)(eq->w2 & 0x0fffffff)) << 32) | =
-eq->w3;
-+    uint32_t qsize =3D GETFIELD(EQ_W0_QSIZE, eq->w0);
-+    uint32_t qindex =3D GETFIELD(EQ_W1_PAGE_OFF, eq->w1);
-+    uint32_t qgen =3D GETFIELD(EQ_W1_GENERATION, eq->w1);
-+
-+    uint64_t qaddr =3D qaddr_base + (qindex << 2);
-+    uint32_t qdata =3D cpu_to_be32((qgen << 31) | (data & 0x7fffffff));
-+    uint32_t qentries =3D 1 << (qsize + 10);
-+
-+    if (dma_memory_write(&address_space_memory, qaddr, &qdata, sizeof(qd=
-ata))) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: failed to write EQ data @0=
-x%"
-+                      HWADDR_PRIx "\n", qaddr);
-+        return;
-+    }
-+
-+    qindex =3D (qindex + 1) % qentries;
-+    if (qindex =3D=3D 0) {
-+        qgen ^=3D 1;
-+        eq->w1 =3D SETFIELD(EQ_W1_GENERATION, eq->w1, qgen);
-+    }
-+    eq->w1 =3D SETFIELD(EQ_W1_PAGE_OFF, eq->w1, qindex);
-+}
-+
- /*
+@@ -88,9 +88,63 @@ static void xive_eq_push(XiveEQ *eq, uint32_t data)
   * XIVE Interrupt Presenter
   */
-@@ -378,7 +403,47 @@ XiveEQ *xive_fabric_get_eq(XiveFabric *xf, uint32_t =
-eq_idx)
 =20
- static void xive_fabric_route(XiveFabric *xf, int lisn)
++/* Convert a priority number to an Interrupt Pending Buffer (IPB)
++ * register, which indicates a pending interrupt at the priority
++ * corresponding to the bit number
++ */
++static uint8_t priority_to_ipb(uint8_t priority)
++{
++    return priority > XIVE_PRIORITY_MAX ?
++        0 : 1 << (XIVE_PRIORITY_MAX - priority);
++}
++
++/* Convert an Interrupt Pending Buffer (IPB) register to a Pending
++ * Interrupt Priority Register (PIPR), which contains the priority of
++ * the most favored pending notification.
++ */
++static uint8_t ipb_to_pipr(uint8_t ibp)
++{
++    return ibp ? clz32((uint32_t)ibp << 24) : 0xff;
++}
++
++/* Update the IPB (Interrupt Pending Buffer) with the priority
++ * of the new notification and inform the NVT, which will
++ * decide to raise the exception, or not, depending the CPPR.
++ */
++static void xive_nvt_ipb_update(XiveNVT *nvt, uint8_t priority)
++{
++    nvt->ring_os[TM_IPB] |=3D priority_to_ipb(priority);
++    nvt->ring_os[TM_PIPR] =3D ipb_to_pipr(nvt->ring_os[TM_IPB]);
++}
++
+ static uint64_t xive_nvt_accept(XiveNVT *nvt)
  {
-+    XiveIVE *ive;
-+    XiveEQ *eq;
-+    uint32_t eq_idx;
-+    uint8_t priority;
+-    return 0;
++    uint8_t nsr =3D nvt->ring_os[TM_NSR];
++
++    qemu_irq_lower(nvt->output);
++
++    if (nvt->ring_os[TM_NSR] & TM_QW1_NSR_EO) {
++        uint8_t cppr =3D nvt->ring_os[TM_PIPR];
++
++        nvt->ring_os[TM_CPPR] =3D cppr;
++
++        /* Reset the pending buffer bit */
++        nvt->ring_os[TM_IPB] &=3D ~priority_to_ipb(cppr);
++        nvt->ring_os[TM_PIPR] =3D ipb_to_pipr(nvt->ring_os[TM_IPB]);
++
++        /* Drop Exception bit for OS */
++        nvt->ring_os[TM_NSR] &=3D ~TM_QW1_NSR_EO;
++    }
++
++    return (nsr << 8) | nvt->ring_os[TM_CPPR];
++}
++
++static void xive_nvt_notify(XiveNVT *nvt)
++{
++    if (nvt->ring_os[TM_PIPR] < nvt->ring_os[TM_CPPR]) {
++        nvt->ring_os[TM_NSR] |=3D TM_QW1_NSR_EO;
++        qemu_irq_raise(nvt->output);
++    }
+ }
 =20
-+    ive =3D xive_fabric_get_ive(xf, lisn);
-+    if (!ive || !(ive->w & IVE_VALID)) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid LISN %d\n", lisn);
-+        return;
-+    }
+ static void xive_nvt_set_cppr(XiveNVT *nvt, uint8_t cppr)
+@@ -100,6 +154,10 @@ static void xive_nvt_set_cppr(XiveNVT *nvt, uint8_t =
+cppr)
+     }
+=20
+     nvt->ring_os[TM_CPPR] =3D cppr;
 +
-+    if (ive->w & IVE_MASKED) {
-+        return;
-+    }
++    /* CPPR has changed, check if we need to redistribute a pending
++     * exception */
++    xive_nvt_notify(nvt);
+ }
+=20
+ /*
+@@ -279,6 +337,12 @@ static void xive_nvt_reset(void *dev)
+     int i;
+=20
+     memset(nvt->regs, 0, sizeof(nvt->regs));
++    /*
++     * Initialize PIPR to 0xFF to avoid phantom interrupts when the
++     * CPPR is first set.
++     */
++    nvt->ring_os[TM_PIPR] =3D ipb_to_pipr(nvt->ring_os[TM_IPB]);
 +
-+    /* Find our XiveEQ */
-+    eq_idx =3D GETFIELD(IVE_EQ_INDEX, ive->w);
-+    eq =3D xive_fabric_get_eq(xf, eq_idx);
-+    if (!eq || !(eq->w0 & EQ_W0_VALID)) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: No EQ for LISN %d\n", lisn=
+     for (i =3D 0; i < ARRAY_SIZE(nvt->eqt); i++) {
+         xive_eq_reset(&nvt->eqt[i]);
+     }
+@@ -407,6 +471,8 @@ static void xive_fabric_route(XiveFabric *xf, int lis=
+n)
+     XiveEQ *eq;
+     uint32_t eq_idx;
+     uint8_t priority;
++    XiveNVT *nvt;
++    uint32_t nvt_idx;
+=20
+     ive =3D xive_fabric_get_ive(xf, lisn);
+     if (!ive || !(ive->w & IVE_VALID)) {
+@@ -434,6 +500,13 @@ static void xive_fabric_route(XiveFabric *xf, int li=
+sn)
+         qemu_log_mask(LOG_UNIMP, "XIVE: !UCOND_NOTIFY not implemented\n"=
 );
+     }
+=20
++    nvt_idx =3D GETFIELD(EQ_W6_NVT_INDEX, eq->w6);
++    nvt =3D xive_fabric_get_nvt(xf, nvt_idx);
++    if (!nvt) {
++        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: No NVT for idx %d\n", nvt_=
+idx);
 +        return;
 +    }
 +
-+    if (eq->w0 & EQ_W0_ENQUEUE) {
-+        xive_eq_push(eq, GETFIELD(IVE_EQ_DATA, ive->w));
-+    }
+     if (GETFIELD(EQ_W6_FORMAT_BIT, eq->w6) =3D=3D 0) {
+         priority =3D GETFIELD(EQ_W7_F0_PRIORITY, eq->w7);
+=20
+@@ -441,9 +514,12 @@ static void xive_fabric_route(XiveFabric *xf, int li=
+sn)
+         if (priority =3D=3D 0xff) {
+             g_assert_not_reached();
+         }
++        xive_nvt_ipb_update(nvt, priority);
+     } else {
+         qemu_log_mask(LOG_UNIMP, "XIVE: w7 format1 not implemented\n");
+     }
 +
-+    if (!(eq->w0 & EQ_W0_UCOND_NOTIFY)) {
-+        qemu_log_mask(LOG_UNIMP, "XIVE: !UCOND_NOTIFY not implemented\n"=
-);
-+    }
-+
-+    if (GETFIELD(EQ_W6_FORMAT_BIT, eq->w6) =3D=3D 0) {
-+        priority =3D GETFIELD(EQ_W7_F0_PRIORITY, eq->w7);
-+
-+        /* The EQ is masked. Can this happen ?  */
-+        if (priority =3D=3D 0xff) {
-+            g_assert_not_reached();
-+        }
-+    } else {
-+        qemu_log_mask(LOG_UNIMP, "XIVE: w7 format1 not implemented\n");
-+    }
++    xive_nvt_notify(nvt);
  }
 =20
  static const TypeInfo xive_fabric_info =3D {
