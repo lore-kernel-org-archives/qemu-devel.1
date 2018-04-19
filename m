@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43297)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1f94NJ-0004wI-DP
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 03:53:02 -0400
+	(envelope-from <berrange@redhat.com>) id 1f94Qs-0007Yh-Ra
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 03:56:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1f94NG-0002x0-9d
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 03:53:01 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Thu, 19 Apr 2018 15:52:32 +0800
-Message-Id: <20180419075232.31407-3-stefanha@redhat.com>
-In-Reply-To: <20180419075232.31407-1-stefanha@redhat.com>
-References: <20180419075232.31407-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [RFC 2/2] block/file-posix: verify page cache is not
- used
+	(envelope-from <berrange@redhat.com>) id 1f94Qp-0005k2-Oa
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 03:56:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42264 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1f94Qp-0005jj-JE
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 03:56:39 -0400
+Date: Thu, 19 Apr 2018 08:56:29 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180419075629.GC10259@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180417224054.26363-1-lersek@redhat.com>
+	<87po2wzysh.fsf@dusky.pond.sub.org>
+	<8a52bb49-4194-3b91-8b67-a0e5700fd6ed@redhat.com>
+	<87in8nvdpn.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87in8nvdpn.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [libvirt] [qemu RFC v2] qapi: add "firmware.json"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,112 +30,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, libvir-list@redhat.com, Michal Privoznik <mprivozn@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Gary Ching-Pang Lin <glin@suse.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <dgibson@redhat.com>
 
-This commit is for debugging only.  Do not merge it.
+On Thu, Apr 19, 2018 at 09:48:36AM +0200, Markus Armbruster wrote:
+> Laszlo Ersek <lersek@redhat.com> writes:
+> 
+> > On 04/18/18 10:47, Markus Armbruster wrote:
+> >> Laszlo Ersek <lersek@redhat.com> writes:
+> >
+> >>> +##
+> >>> +# @FirmwareArchitecture:
+> >>> +#
+> >>> +# Defines the target architectures (emulator binaries) that firmware may
+> >>> +# execute on.
+> >>> +#
+> >>> +# @aarch64: The firmware can be executed by the qemu-system-aarch64 emulator.
+> >>> +#
+> >>> +# @arm: The firmware can be executed by the qemu-system-arm emulator.
+> >>> +#
+> >>> +# @i386: The firmware can be executed by the qemu-system-i386 emulator.
+> >>> +#
+> >>> +# @x86_64: The firmware can be executed by the qemu-system-x86_64 emulator.
+> >>> +#
+> >>> +# Since: 2.13
+> >>> +##
+> >>> +{ 'enum' : 'FirmwareArchitecture',
+> >>> +  'data' : [ 'aarch64', 'arm', 'i386', 'x86_64' ] }
+> >> 
+> >> Partial dupe of CpuInfoArch from misc.json.  Neither covers all our
+> >> target architectures.  Should we have one that does in common.json
+> >> instead?
+> >
+> > If we had one there, I'd use it here :)
+> >
+> > For collecting the arch identifiers, is it OK to run "./configure
+> > --help", and look for the "*-softmmu" options under
+> > "--target-list=LIST"? Because that's what I need here; the qemu-system-*
+> > emulators.
+> 
+> configure gets its list like this:
+> 
+>     default_target_list=""
+> 
+>     mak_wilds=""
+> 
+>     if [ "$softmmu" = "yes" ]; then
+>         mak_wilds="${mak_wilds} $source_path/default-configs/*-softmmu.mak"
+>     fi
+>     if [ "$linux_user" = "yes" ]; then
+>         mak_wilds="${mak_wilds} $source_path/default-configs/*-linux-user.mak"
+>     fi
+>     if [ "$bsd_user" = "yes" ]; then
+>         mak_wilds="${mak_wilds} $source_path/default-configs/*-bsd-user.mak"
+>     fi
+> 
+>     for config in $mak_wilds; do
+>         default_target_list="${default_target_list} $(basename "$config" .mak)"
+>     done
+> 
+> Since we use QMP only in system emulation, a QAPI enum limited to the
+> system emulation targets makes sense.
+> 
+> Replacing CpuInfoArch by such an enum will change the discriminator
+> value from "other" to the real architecture, with the obvious
+> compatibility concerns.  But we've accepted similar changes twice
+> already: commit 9d0306dfdfb and commit 25fa194b7b1, both v2.12.0-rc0.
+> 
+> "other" was a bad idea.  Hindsight 20/20.
+> 
+> Getting rid of it in one go rather than piecemeal seems like the least
+> bad way out.  Too late for 2.12, though.  Eric, what do you think?
 
-mincore(2) checks whether pages are resident.  Use it to verify that
-page cache has been dropped.
+Given the context in which this "other" value is used, I think it is
+reasonable to kill it and put a full arch list in there.
 
-You can trigger a verification failure by mmapping the image file from
-another process and loading a byte from a page so that it becomes
-resident.  bdrv_co_invalidate_cache() will fail while the process is
-alive.
+No app is likely to be accessing the struct under "other" because it
+is just an empty placeholder.
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- block/file-posix.c | 71 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 71 insertions(+)
-
-diff --git a/block/file-posix.c b/block/file-posix.c
-index df4f52919f..d3105269c6 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -2236,6 +2236,75 @@ static int coroutine_fn raw_co_block_status(BlockDriverState *bs,
-     return ret | BDRV_BLOCK_OFFSET_VALID;
- }
- 
-+static bool is_mincore(void *addr, size_t length)
-+{
-+    size_t vec_len = DIV_ROUND_UP(length, sysconf(_SC_PAGESIZE));
-+    unsigned char *vec;
-+    size_t i;
-+    int ret;
-+    bool incore = false;
-+
-+    vec = g_malloc(vec_len);
-+    ret = mincore(addr, length, vec);
-+    if (ret < 0) {
-+        incore = true;
-+        goto out;
-+    }
-+
-+    for (i = 0; i < vec_len; i++) {
-+        if (vec[i] & 0x1) {
-+            incore = true;
-+            break;
-+        }
-+    }
-+
-+out:
-+    g_free(vec);
-+    return incore;
-+}
-+
-+static void check_not_in_page_cache(BlockDriverState *bs, Error **errp)
-+{
-+    const size_t WINDOW_SIZE = 128 * 1024 * 1024;
-+    BDRVRawState *s = bs->opaque;
-+    void *window = NULL;
-+    size_t length = 0;
-+    off_t end;
-+    off_t offset;
-+
-+    end = raw_getlength(bs);
-+
-+    for (offset = 0; offset < end; offset += WINDOW_SIZE) {
-+        void *new_window;
-+        size_t new_length = MIN(end - offset, WINDOW_SIZE);
-+
-+        if (new_length != length) {
-+            munmap(window, length);
-+            window = NULL;
-+            length = 0;
-+        }
-+
-+        new_window = mmap(window, new_length, PROT_NONE, MAP_PRIVATE,
-+                          s->fd, offset);
-+        if (new_window == MAP_FAILED) {
-+            error_setg_errno(errp, errno, "mmap failed");
-+            break;
-+        }
-+
-+        window = new_window;
-+        length = new_length;
-+
-+        if (is_mincore(window, length)) {
-+            error_setg(errp, "page cache still in use!");
-+            break;
-+        }
-+    }
-+
-+    if (window) {
-+        munmap(window, length);
-+    }
-+}
-+
- static void coroutine_fn raw_co_invalidate_cache(BlockDriverState *bs,
-                                                  Error **errp)
- {
-@@ -2270,6 +2339,8 @@ static void coroutine_fn raw_co_invalidate_cache(BlockDriverState *bs,
-         return;
-     }
- #endif /* __linux__ */
-+
-+    check_not_in_page_cache(bs, errp);
- }
- 
- static coroutine_fn BlockAIOCB *raw_aio_pdiscard(BlockDriverState *bs,
+Regards,
+Daniel
 -- 
-2.14.3
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
