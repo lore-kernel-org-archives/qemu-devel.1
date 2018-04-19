@@ -1,41 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1f99hi-0000Jk-ET
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:34:30 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1f99kM-0002nO-7H
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:37:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1f99he-0005Ib-CU
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:34:26 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58458)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1f99he-0005I7-45
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:34:22 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w3JDVBj6119878
-	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 09:34:20 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2heuv0gw8c-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 09:34:20 -0400
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 19 Apr 2018 14:34:15 +0100
-References: <20180419072123.682-1-david@gibson.dropbear.id.au>
-	<20180419143318.4e24edaf@redhat.com>
-	<20180419145840.324602ff.cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 19 Apr 2018 15:34:10 +0200
+	(envelope-from <marcandre.lureau@gmail.com>) id 1f99kK-00011r-VF
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:37:10 -0400
+Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:46613)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1f99kK-000118-OV
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:37:08 -0400
+Received: by mail-wr0-x229.google.com with SMTP id d1-v6so14136556wrj.13
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 06:37:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180419145840.324602ff.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <77d0717b-6eba-8b20-6691-c3085937604b@de.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH for-2.13] Clear mem_path if we
- fall back to anonymous RAM allocation
+In-Reply-To: <8736zryb03.fsf@dusky.pond.sub.org>
+References: <20180417133602.23832-1-marcandre.lureau@redhat.com>
+	<20180417133602.23832-6-marcandre.lureau@redhat.com>
+	<8736zryb03.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 19 Apr 2018 15:37:06 +0200
+Message-ID: <CAJ+F1C+dGBWRaZ5GjtkLTm9SAWK9FZ=MByVicJ9WFxfPQU_q3Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 5/5] qobject: modify qobject_ref() to
+ assert on NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,77 +32,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, ehabkost@redhat.com, David Hildenbrand <david@redhat.com>, groug@kaod.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, pbonzini@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
 
+Hi
 
-
-On 04/19/2018 02:58 PM, Cornelia Huck wrote:
-> On Thu, 19 Apr 2018 14:33:18 +0200
-> Igor Mammedov <imammedo@redhat.com> wrote:
-> 
->> On Thu, 19 Apr 2018 17:21:23 +1000
->> David Gibson <david@gibson.dropbear.id.au> wrote:
+On Thu, Apr 19, 2018 at 8:18 AM, Markus Armbruster <armbru@redhat.com> wrot=
+e:
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>
+>> While it may be convenient to accept NULL value in
+>> qobject_unref() (for similar reasons as free() accepts NULL), it is
+>> not such a good idea for qobject_ref(), assert() on NULL. One place
+>> relied on that behaviour (the monitor request id), and it's best to be
+>> explicit that NULL is accepted there.
 >>
->>> If the -mem-path option is set, we attempt to map the guest's RAM from a
->>> file in the given path; it's usually used to back guest RAM with hugepages.
->>> If we're unable to (e.g. not enough free hugepages) then we fall back to
->>> allocating normal anonymous pages.  This behaviour can be surprising, but a
->>> comment in allocate_system_memory_nonnuma() suggests it's legacy behaviour
->>> we can't change.
->>>
->>> What really isn't ok, though, is that in this case we leave mem_path set.
->>> That means functions which attempt to determine the pagesize of main RAM
->>> can erroneously think it is hugepage based on the requested path, even
->>> though it's not.
->>>
->>> This is particular bad for the pseries machine type.  KVM HV limitations
->>> mean the guest can't use pagesizes larger than the host page size used to
->>> back RAM.  That means that such a fallback, rather than merely giving
->>> poorer performance that expected will cause the guest to freeze up early in
->>> boot as it attempts to use large page mappings that can't work.
->>>
->>> This patch addresses the problem by clearing the mem_path variable when we
->>> fall back to anonymous pages, meaning that subsequent attempts to
->>> determine the RAM page size will get an accurate result.
->>>
->>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->>> ---
->>>  numa.c | 1 +
->>>  1 file changed, 1 insertion(+)
->>>
->>> Paolo et al, as with my earlier patches adding some extensions to the
->>> helpers for determining backing page sizes, if there are no objections
->>> can I get an ack to merge this via my ppc tree?
->>>
->>> diff --git a/numa.c b/numa.c
->>> index 1116c90af9..78a869e598 100644
->>> --- a/numa.c
->>> +++ b/numa.c
->>> @@ -469,6 +469,7 @@ static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
->>>              /* Legacy behavior: if allocation failed, fall back to
->>>               * regular RAM allocation.
->>>               */
->>> +            mem_path = NULL;
->>>              memory_region_init_ram_nomigrate(mr, owner, name, ram_size, &error_fatal);
->>>          }
->>>  #else  
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> ---
+>>  include/qapi/qmp/qobject.h | 7 ++++---
+>>  monitor.c                  | 2 +-
+>>  2 files changed, 5 insertions(+), 4 deletions(-)
 >>
->> mem_path is also used by kvm_s390_apply_cpu_model(),
->> and in ccw_init() memory is initialized before CPUs are
->> so if QEM was started with -mem-path, then before patch
->> created CPU won't have CMM enabled and print warning:
->>   
->>  "CMM will not be enabled because it is not compatible with hugetlbfs."
+>> diff --git a/include/qapi/qmp/qobject.h b/include/qapi/qmp/qobject.h
+>> index befc945504..a0b2affb2c 100644
+>> --- a/include/qapi/qmp/qobject.h
+>> +++ b/include/qapi/qmp/qobject.h
+>> @@ -73,9 +73,8 @@ static inline void qobject_init(QObject *obj, QType ty=
+pe)
 >>
->> and after patch it might enable CMM if we clear mem_path.
->> So question is do we care about this?
-> 
-> I don't quite remember the cmm semantics here -- Christian?
+>>  static inline void *qobject_ref_impl(QObject *obj)
+>>  {
+>> -    if (obj) {
+>> -        obj->base.refcnt++;
+>> -    }
+>> +    assert(obj);
+>> +    obj->base.refcnt++;
+>>      return obj;
+>>  }
+>>
+>> @@ -103,6 +102,7 @@ static inline void qobject_unref_impl(QObject *obj)
+>>
+>>  /**
+>>   * qobject_ref(): Increment QObject's reference count
+>> + * @obj: a #QObject or child type instance (must not be NULL)
+>>   *
+>>   * Returns: the same @obj. The type of @obj will be propagated to the
+>>   * return type.
+>> @@ -112,6 +112,7 @@ static inline void qobject_unref_impl(QObject *obj)
+>>  /**
+>>   * qobject_unref(): Decrement QObject's reference count, deallocate
+>>   * when it reaches zero
+>> + * @obj: a #QObject or children type instance (can be NULL)
+>>   */
+>>  #define qobject_unref(obj) qobject_unref_impl(QOBJECT(obj))
+>>
+>> diff --git a/monitor.c b/monitor.c
+>> index 7dbc1f74b8..3a750208fd 100644
+>> --- a/monitor.c
+>> +++ b/monitor.c
+>> @@ -4188,7 +4188,7 @@ static void handle_qmp_command(JSONMessageParser *=
+parser, GQueue *tokens)
+>>
+>>      req_obj =3D g_new0(QMPRequest, 1);
+>>      req_obj->mon =3D mon;
+>> -    req_obj->id =3D qobject_ref(id);
+>> +    req_obj->id =3D id ? qobject_ref(id) : NULL;
+>>      req_obj->req =3D req;
+>>      req_obj->need_resume =3D false;
+>
+> What's your argument that this is the only use of qobject_ref() that
+> needs to be guarded now?
 
-The CMMA interface does not work on large pages. I think the kernel will react
-with EFAULT in some cases (cmma migration and others) so qemu will probably fail
-unexpectedly. 
+Right, that's the only one that is obvious, as it fails in test, and
+the code is pretty obvious about id being optional.
 
-But this patch seems to only clear mem-path if we do not allocate at all from
-hugetlbfs. So things should be ok, no?
+For the rest, we have to rely on testing, and manual inspection of
+qobject_ref() usage:
+
+- block.c: guarded in bdrv_refresh_filename(), more tricky for
+append_open_options(), as it depends if qdict values could be NULL
+- block/blkdebug.c: depends if qdict values could be NULL,
+full_open_options could NULL apparently, so should probably be handled
+FIXED
+- block/blkverify.c: guarded
+- block/{null,nvme}.c: guaded, previous qdict_del() (actually
+qdict_find()) guarantee non-NULL)
+- block/quorum.c: if full_open_options can be NULL, we should handle it. FI=
+XED
+- monitor: optional "id" case must be handled, done in 2 places
+  monitor_json_emitter(): only called with data !=3D NULL, we could add
+an earlier assert
+  monitor_qapi_event_queue(): called from func_emit, by qapi events,
+assert earlier during construction in qobject_output_complete()
+- qapi/qmp-dispatch.c: if "arguments" exists, it can't be NULL during
+json parsing
+- qapi/qobject-input-visitor.c: guarded by assert in visit_type_any()
+- qapi/qobject-output-visitor.c: guarded by assert in visit_type_any()
+for qobject_output_type_any, guarded by assert() in
+qobject_output_complete
+- qmp.c: guarded, error out before if NULL
+- qobject/q{list,dict}.c: can accept NULL values apparently, what's
+the reason? how are you supposed to handle that?
+- tests/*: let's consider this is covered by make check
+- util/keyval.c: guarded, if (!elt[i]) before the ref
+
+Except a very few corner cases, it looks quite safe to me. But, if
+necessary, we can add if obj ? obj_ref(obj) : NULL for the dubious
+cases.
+
+--=20
+Marc-Andr=C3=A9 Lureau
