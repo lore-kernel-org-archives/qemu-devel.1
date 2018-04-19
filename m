@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54947)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@redhat.com>) id 1f8x8h-0007KU-Kh
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 20:09:28 -0400
+	(envelope-from <zhenwei.pi@youruncloud.com>) id 1f8xye-0006G3-5S
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 21:03:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@redhat.com>) id 1f8x8e-000229-Ez
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 20:09:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52168 helo=mx1.redhat.com)
+	(envelope-from <zhenwei.pi@youruncloud.com>) id 1f8xya-0006Ob-8x
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 21:03:08 -0400
+Received: from mail139-27.mail.alibaba.com ([198.11.139.27]:55928)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@redhat.com>) id 1f8x8e-000205-9a
-	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 20:09:24 -0400
-Date: Thu, 19 Apr 2018 10:09:00 +1000
-From: David Gibson <dgibson@redhat.com>
-Message-ID: <20180419100900.7b66fde0@umbus.fritz.box>
-In-Reply-To: <b9c7d767-39c4-065f-f487-34c0c682bd85@redhat.com>
-References: <20180417224054.26363-1-lersek@redhat.com>
-	<20180418060243.iafg4wj5gwsruop5@sirius.home.kraxel.org>
-	<b9c7d767-39c4-065f-f487-34c0c682bd85@redhat.com>
+	(Exim 4.71) (envelope-from <zhenwei.pi@youruncloud.com>)
+	id 1f8xyZ-0006Mv-Rc
+	for qemu-devel@nongnu.org; Wed, 18 Apr 2018 21:03:04 -0400
+References: <1523864788-15800-1-git-send-email-zhenwei.pi@youruncloud.com>
+	<0e4da059-da4c-64ff-65f0-068fdd68fdcd@redhat.com>
+From: "Zhenwei.Pi" <zhenwei.pi@youruncloud.com>
+Message-ID: <77d9f683-72c6-8c68-bdd9-463aa5eb8f0e@youruncloud.com>
+Date: Thu, 19 Apr 2018 09:00:37 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	boundary="Sig_/5pdJ4rE1wTuNzrgjberFAlL";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [qemu RFC v2] qapi: add "firmware.json"
+In-Reply-To: <0e4da059-da4c-64ff-65f0-068fdd68fdcd@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH] qemu-progress: redirct qemu progress
+ message to another file stream
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +30,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: pbonzini@redhat.com, kwolf@redhat.com, qemu-devel@nongnu.org
 
---Sig_/5pdJ4rE1wTuNzrgjberFAlL
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 04/18/2018 09:06 PM, Max Reitz wrote:
 
-On Wed, 18 Apr 2018 10:32:06 +0200
-Laszlo Ersek <lersek@redhat.com> wrote:
+> On 2018-04-16 09:46, zhenwei pi wrote:
+>> currently qemu progress message only print into stdout, and other thread may
+>> print some log into stdout at the same time.
+>> add a new api qemu_progress_set_output to redirect progress message to
+>> another file stream.
+>>
+>> Signed-off-by: zhenwei pi <zhenwei.pi@youruncloud.com>
+>> ---
+>>   include/qemu-common.h |  1 +
+>>   util/qemu-progress.c  | 22 +++++++++++++++++++---
+>>   2 files changed, 20 insertions(+), 3 deletions(-)
+> Well, but after this patch, qemu will still only print progress to
+> stdout because qemu_progress_set_output() isn't used anywhere...
+>
+this patch only provides the basic redirection function. if this patch
+is approved, another patch (Ex, qemu convert progress in qemu-img.c)
+will be send.
 
-> On 04/18/18 08:02, Gerd Hoffmann wrote:
->  [...] =20
->  [...] =20
-> >
-> > Looks good to me overall.
-> > =20
-> >> +{ 'enum' : 'FirmwareType',
-> >> +  'data' : [ 'bios', 'slof', 'uboot', 'uefi' ] } =20
-> >
-> > openbios missing.
-> > =20
-> >> +{ 'enum' : 'FirmwareArchitecture',
-> >> +  'data' : [ 'aarch64', 'arm', 'i386', 'x86_64' ] } =20
-> >
-> > ppc(64) missing (but you have slof above ;) ...
-> > s390 too. =20
->=20
-> I figured those would be contributed by people that actually use them,
-> as separate patches :) In fact I would rather prefer removing "slof" and
-> "uboot" from this initial version, because I have zero clue about them.
+>> diff --git a/include/qemu-common.h b/include/qemu-common.h
+>> index 8a4f63c..511e7e0 100644
+>> --- a/include/qemu-common.h
+>> +++ b/include/qemu-common.h
+>> @@ -128,6 +128,7 @@ ssize_t qemu_co_send_recv(int sockfd, void *buf, size_t bytes, bool do_send);
+>>   void qemu_progress_init(int enabled, float min_skip);
+>>   void qemu_progress_end(void);
+>>   void qemu_progress_print(float delta, int max);
+>> +int qemu_progress_set_output(FILE *output);
+>>   const char *qemu_get_vm_name(void);
+>>   
+>>   #define QEMU_FILE_TYPE_BIOS   0
+>> diff --git a/util/qemu-progress.c b/util/qemu-progress.c
+>> index 3c2223c..dd7aa52 100644
+>> --- a/util/qemu-progress.c
+>> +++ b/util/qemu-progress.c
+>> @@ -31,6 +31,7 @@ struct progress_state {
+>>       float min_skip;
+>>       void (*print)(void);
+>>       void (*end)(void);
+>> +    FILE *output;
+>>   };
+>>   
+>>   static struct progress_state state;
+>> @@ -43,17 +44,18 @@ static volatile sig_atomic_t print_pending;
+>>    */
+>>   static void progress_simple_print(void)
+>>   {
+>> -    printf("    (%3.2f/100%%)\r", state.current);
+>> -    fflush(stdout);
+>> +    fprintf(state.output, "    (%3.2f/100%%)\r", state.current);
+>> +    fflush(state.output);
+> Also, I'm not sure we should use \r when printing to anything but stdout.
+>
+> Max
 
-I've only been able to skim this discussion, so apologies if I've
-missed things.  I'm pretty unclear on the overall purpose of this, but
-in particular this FirmwareType field seems pretty weird.
+qemu redirects progress message into a file, other process reads the file
+and uses '\r' to split the string, and we can get the progress exactly.
 
-Specifically the things in the list don't really seem comparable to
-each other: UEFI is a specified interface, BIOS is a de-facto
-interface.  So far so good.  But SLOF is a specific implementation of
-Open Firmware (of which we have a couple of other partial
-implementations used for other qemu platforms).  U-Boot is somewhere in
-between the two, a specific implementation that defines a fair bunch of
-its own interfaces.
-
---=20
-David Gibson <dgibson@redhat.com>
-Principal Software Engineer, Virtualization, Red Hat
-
---Sig_/5pdJ4rE1wTuNzrgjberFAlL
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrX3hwACgkQbDjKyiDZ
-s5IiTQ//e3mpRPNLJ3LIdGLL3FtkNpdv1vm/kI9dUOQksQoYR7CNtyR4VOvY/3aY
-0X+S3v7phVlGhs9MxBiAYVIpwwkW/qRX1nnzCWrzabNCQXkBgA4/TSWYrmRJF9yY
-Fc7BFdDKGWq2A+zMRUWIIHIeG7biJdLoffpmt36wER6FhvQiR5/PMoXut97dvelH
-h11rk7jfzHmvo8Ss54p1okymlKQlGIj9kLysx05Cfs4sMweANiCqSdVgFMma48Rx
-i2Ia2t6IXti0q2X06+IsjG71+UESI9/n3Wp1ScEsfwKrl9LX+q4pcIsdwesobP1D
-PymJmCYZxdPKP/7F2S8wKlAMfMN/Eq0sBs+I86NDMgIdQLxs+7SdWtRgWKHSHipb
-OBuMiVcS7zf06rC3OKIAO3elRPfldVmX5n8V8MkuO33rh7Hqcq+qZ5wKvpo60NXV
-U4JZ53c51qPpn0WKgxJb3CR2XbBIEu2esI4J8ZNMg16eHCOSlnRzv0gVFdQbGR86
-czRUbcn77NrgTo+FOQU/KF3UOxYTpzVyNEKcbODFgZevCNWp9s+nbgGW0+8q/kw1
-8n9FB0b2wrUYFf3kDgcXV6QFfghIBdTpJRwYJolCJrqxW7QW93tusdFjzB7nn10v
-UGjtcbpyFRcOFflHMmmSt9PLn65HfM3OVZHaC9xqEa/bllOnjtM=
-=IIrK
------END PGP SIGNATURE-----
-
---Sig_/5pdJ4rE1wTuNzrgjberFAlL--
+>>   }
+>>   
+>>   static void progress_simple_end(void)
+>>   {
+>> -    printf("\n");
+>> +    fprintf(state.output, "\n");
+>>   }
+>>   
+>>   static void progress_simple_init(void)
+>>   {
+>> +    state.output = stdout;
+>>       state.print = progress_simple_print;
+>>       state.end = progress_simple_end;
+>>   }
+>> @@ -129,6 +131,20 @@ void qemu_progress_end(void)
+>>   }
+>>   
+>>   /*
+>> + * Redirect progress into another file stream.
+>> + * @output is the new file stream.
+>> + */
+>> +int qemu_progress_set_output(FILE *output)
+>> +{
+>> +    if (!output) {
+>> +        return -EINVAL;
+>> +    }
+>> +
+>> +    state.output = output;
+>> +    return 0;
+>> +}
+>> +
+>> +/*
+>>    * Report progress.
+>>    * @delta is how much progress we made.
+>>    * If @max is zero, @delta is an absolut value of the total job done.
+>>
+>
