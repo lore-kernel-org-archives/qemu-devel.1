@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60627)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f934S-0005Z8-U3
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 02:29:30 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f934S-0005Z4-Sw
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 02:29:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f934O-0005Qf-8j
+	(envelope-from <dgibson@ozlabs.org>) id 1f934O-0005Qc-8J
 	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 02:29:28 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 19 Apr 2018 16:29:11 +1000
-Message-Id: <20180419062917.31486-2-david@gibson.dropbear.id.au>
+Date: Thu, 19 Apr 2018 16:29:14 +1000
+Message-Id: <20180419062917.31486-5-david@gibson.dropbear.id.au>
 In-Reply-To: <20180419062917.31486-1-david@gibson.dropbear.id.au>
 References: <20180419062917.31486-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [RFC for-2.13 1/7] spapr: Maximum (HPT) pagesize
- property
+Subject: [Qemu-devel] [RFC for-2.13 4/7] spapr: Add cpu_apply hook to
+ capabilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,141 +23,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: groug@kaod.org, abologna@redhat.com
 Cc: aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
-The way the POWER Hash Page Table (HPT) MMU is virtualized by KVM HV means
-that every page that the guest puts in the pagetables must be truly
-physically contiguous, not just GPA-contiguous.  In effect this means that
-an HPT guest can't use any pagesizes greater than the host page size used
-to back its memory.
-
-At present we handle this by changing what we advertise to the guest based
-on the backing pagesizes.  This is pretty bad, because it means the guest
-sees a different environment depending on what should be host configuration
-details.
-
-As a start on fixing this, we add a new capability parameter to the pseries
-machine type which gives the maximum allowed pagesizes for an HPT guest (as
-a shift).  For now we just create and validate the parameter without making
-it do anything.
+spapr capabilities have an apply hook to actually activate (or deactivate)
+the feature in the system at reset time.  However, a number of capabilities
+affect the setup of cpus, and need to be applied to each of them -
+including hotplugged cpus for extra complication.  To make this simpler,
+add an optional cpu_apply hook that is called from spapr_cpu_reset().
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c         |  1 +
- hw/ppc/spapr_caps.c    | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++
- include/hw/ppc/spapr.h |  4 +++-
- 3 files changed, 57 insertions(+), 1 deletion(-)
+ hw/ppc/spapr_caps.c     | 19 +++++++++++++++++++
+ hw/ppc/spapr_cpu_core.c |  2 ++
+ include/hw/ppc/spapr.h  |  1 +
+ 3 files changed, 22 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index bdf72e1e89..36e41aff71 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3876,6 +3876,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-     smc->default_caps.caps[SPAPR_CAP_CFPC] = SPAPR_CAP_BROKEN;
-     smc->default_caps.caps[SPAPR_CAP_SBBC] = SPAPR_CAP_BROKEN;
-     smc->default_caps.caps[SPAPR_CAP_IBS] = SPAPR_CAP_BROKEN;
-+    smc->default_caps.caps[SPAPR_CAP_HPT_MPS] = 16; /* Allow 64kiB pages */
-     spapr_caps_add_properties(smc, &error_abort);
- }
- 
 diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 531e145114..cbc41f5b20 100644
+index 5762b88689..e71de14ffb 100644
 --- a/hw/ppc/spapr_caps.c
 +++ b/hw/ppc/spapr_caps.c
-@@ -27,6 +27,7 @@
- #include "qapi/visitor.h"
- #include "sysemu/hw_accel.h"
- #include "target/ppc/cpu.h"
-+#include "target/ppc/mmu-hash64.h"
- #include "cpu-models.h"
- #include "kvm_ppc.h"
+@@ -61,6 +61,8 @@ typedef struct sPAPRCapabilityInfo {
+     sPAPRCapPossible *possible;
+     /* Make sure the virtual hardware can support this capability */
+     void (*apply)(sPAPRMachineState *spapr, uint8_t val, Error **errp);
++    void (*cpu_apply)(sPAPRMachineState *spapr, PowerPCCPU *cpu,
++                      uint8_t val, Error **errp);
+ } sPAPRCapabilityInfo;
  
-@@ -142,6 +143,39 @@ out:
-     g_free(val);
+ static void spapr_cap_get_bool(Object *obj, Visitor *v, const char *name,
+@@ -547,6 +549,23 @@ void spapr_caps_reset(sPAPRMachineState *spapr)
+     }
  }
  
-+static void spapr_cap_get_int(Object *obj, Visitor *v, const char *name,
-+                               void *opaque, Error **errp)
++void spapr_caps_cpu_reset(sPAPRMachineState *spapr, PowerPCCPU *cpu)
 +{
-+    sPAPRCapabilityInfo *cap = opaque;
-+    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
-+    int64_t value = spapr_get_cap(spapr, cap->index);
++    int i;
 +
-+    visit_type_int(v, name, &value, errp);
++    for (i = 0; i < SPAPR_CAP_NUM; i++) {
++        sPAPRCapabilityInfo *info = &capability_table[i];
++
++        /*
++         * If the apply function can't set the desired level and thinks it's
++         * fatal, it should cause that.
++         */
++        if (info->cpu_apply) {
++            info->cpu_apply(spapr, cpu, spapr->eff.caps[i], &error_fatal);
++        }
++    }
 +}
 +
-+static void spapr_cap_set_int(Object *obj, Visitor *v, const char *name,
-+                               void *opaque, Error **errp)
-+{
-+    sPAPRCapabilityInfo *cap = opaque;
-+    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
-+    int64_t value;
-+    Error *local_err = NULL;
-+
-+    visit_type_int(v, name, &value, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+    if ((value < 0) || (value > 255)) {
-+        error_setg(errp, "Value for %s out of range (0..255)", name);
-+        return;
-+    }
-+
-+    spapr->cmd_line_caps[cap->index] = true;
-+    spapr->eff.caps[cap->index] = value;
-+}
-+
- static void cap_htm_apply(sPAPRMachineState *spapr, uint8_t val, Error **errp)
+ void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp)
  {
-     if (!val) {
-@@ -265,6 +299,16 @@ static void cap_safe_indirect_branch_apply(sPAPRMachineState *spapr,
+     Error *local_err = NULL;
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index 0a668b8954..f041182593 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -67,6 +67,8 @@ static void spapr_cpu_reset(void *opaque)
  
- #define VALUE_DESC_TRISTATE     " (broken, workaround, fixed)"
- 
-+static void cap_hpt_mps_apply(sPAPRMachineState *spapr,
-+                              uint8_t val, Error **errp)
-+{
-+    if (val < 12) {
-+        error_setg(errp, "Require at least 4kiB pages (cap-hpt-mps >= 12)");
-+    } else if (val < 16) {
-+        warn_report("Many PAPR guests require 64kiB pages (cap-hpt-mps >= 16)");
-+    }
-+}
+     /* Set a full AMOR so guest can use the AMR as it sees fit */
+     env->spr[SPR_AMOR] = 0xffffffffffffffffull;
 +
- sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
-     [SPAPR_CAP_HTM] = {
-         .name = "htm",
-@@ -324,6 +368,15 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
-         .possible = &cap_ibs_possible,
-         .apply = cap_safe_indirect_branch_apply,
-     },
-+    [SPAPR_CAP_HPT_MPS] = {
-+        .name = "hpt-mps",
-+        .description = "Maximum page shift for Hash Page Table guests (12, 16, 24, 34)",
-+        .index = SPAPR_CAP_HPT_MPS,
-+        .get = spapr_cap_get_int,
-+        .set = spapr_cap_set_int,
-+        .type = "int",
-+        .apply = cap_hpt_mps_apply,
-+    },
- };
++    spapr_caps_cpu_reset(SPAPR_MACHINE(qdev_get_machine()), cpu);
+ }
  
- static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
+ void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, target_ulong r3)
 diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index d60b7c6d7a..60ed3a5657 100644
+index a3d616c612..ced3246d0e 100644
 --- a/include/hw/ppc/spapr.h
 +++ b/include/hw/ppc/spapr.h
-@@ -66,8 +66,10 @@ typedef enum {
- #define SPAPR_CAP_SBBC                  0x04
- /* Indirect Branch Serialisation */
- #define SPAPR_CAP_IBS                   0x05
-+/* HPT Maximum Page Shift */
-+#define SPAPR_CAP_HPT_MPS               0x06
- /* Num Caps */
--#define SPAPR_CAP_NUM                   (SPAPR_CAP_IBS + 1)
-+#define SPAPR_CAP_NUM                   (SPAPR_CAP_HPT_MPS + 1)
+@@ -802,6 +802,7 @@ static inline uint8_t spapr_get_cap(sPAPRMachineState *spapr, int cap)
+ }
  
- /*
-  * Capability Values
+ void spapr_caps_reset(sPAPRMachineState *spapr);
++void spapr_caps_cpu_reset(sPAPRMachineState *spapr, PowerPCCPU *cpu);
+ void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp);
+ int spapr_caps_post_migration(sPAPRMachineState *spapr);
+ 
 -- 
 2.14.3
