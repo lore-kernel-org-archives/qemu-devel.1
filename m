@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56255)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56309)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cunming.liang@intel.com>) id 1f98uq-0007Ne-H4
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:43:59 -0400
+	(envelope-from <clg@kaod.org>) id 1f98us-0007PU-LP
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:44:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cunming.liang@intel.com>) id 1f98uj-0007Yn-Uc
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:43:56 -0400
-Received: from mga03.intel.com ([134.134.136.65]:36493)
+	(envelope-from <clg@kaod.org>) id 1f98uo-0007bq-Iv
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:43:58 -0400
+Received: from 2.mo4.mail-out.ovh.net ([46.105.72.36]:41342)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cunming.liang@intel.com>)
-	id 1f98uj-0007Xl-Fn
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:43:49 -0400
-From: "Liang, Cunming" <cunming.liang@intel.com>
-Date: Thu, 19 Apr 2018 12:43:42 +0000
-Message-ID: <D0158A423229094DA7ABF71CF2FA0DA34E94E895@SHSMSX104.ccr.corp.intel.com>
-References: <20180412151232.17506-1-tiwei.bie@intel.com>
-	<20180412151232.17506-7-tiwei.bie@intel.com>
-	<20180418192154-mutt-send-email-mst@kernel.org>
-	<20180419111439.i6gfhnept6wy7uzp@debian>
-In-Reply-To: <20180419111439.i6gfhnept6wy7uzp@debian>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1f98uo-0007Vn-9k
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:43:54 -0400
+Received: from player792.ha.ovh.net (unknown [10.109.105.37])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id BEFCB167CC8
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 14:43:44 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Thu, 19 Apr 2018 14:42:56 +0200
+Message-Id: <20180419124331.3915-1-clg@kaod.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 6/6] vhost-user: support registering
- external host notifiers
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 00/35] ppc: support for the XIVE interrupt
+ controller (POWER9)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,261 +28,252 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Bie, Tiwei" <tiwei.bie@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "jasowang@redhat.com" <jasowang@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Daly, Dan" <dan.daly@intel.com>, "Tan,
-	Jianfeng" <jianfeng.tan@intel.com>, "Wang,
-	Zhihong" <zhihong.wang@intel.com>, "Wang, Xiao W" <xiao.w.wang@intel.com>
+To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQmllLCBUaXdlaQ0KPiBT
-ZW50OiBUaHVyc2RheSwgQXByaWwgMTksIDIwMTggNzoxNSBQTQ0KPiBUbzogTWljaGFlbCBTLiBU
-c2lya2luIDxtc3RAcmVkaGF0LmNvbT4NCj4gQ2M6IGphc293YW5nQHJlZGhhdC5jb207IGFsZXgu
-d2lsbGlhbXNvbkByZWRoYXQuY29tOyBwYm9uemluaUByZWRoYXQuY29tOw0KPiBzdGVmYW5oYUBy
-ZWRoYXQuY29tOyBxZW11LWRldmVsQG5vbmdudS5vcmc7IHZpcnRpby1kZXZAbGlzdHMub2FzaXMt
-DQo+IG9wZW4ub3JnOyBMaWFuZywgQ3VubWluZyA8Y3VubWluZy5saWFuZ0BpbnRlbC5jb20+OyBE
-YWx5LCBEYW4NCj4gPGRhbi5kYWx5QGludGVsLmNvbT47IFRhbiwgSmlhbmZlbmcgPGppYW5mZW5n
-LnRhbkBpbnRlbC5jb20+OyBXYW5nLCBaaGlob25nDQo+IDx6aGlob25nLndhbmdAaW50ZWwuY29t
-PjsgV2FuZywgWGlhbyBXIDx4aWFvLncud2FuZ0BpbnRlbC5jb20+DQo+IFN1YmplY3Q6IFJlOiBb
-UEFUQ0ggdjMgNi82XSB2aG9zdC11c2VyOiBzdXBwb3J0IHJlZ2lzdGVyaW5nIGV4dGVybmFsIGhv
-c3QNCj4gbm90aWZpZXJzDQo+IA0KPiBPbiBXZWQsIEFwciAxOCwgMjAxOCBhdCAwNzozNDowNlBN
-ICswMzAwLCBNaWNoYWVsIFMuIFRzaXJraW4gd3JvdGU6DQo+ID4gT24gVGh1LCBBcHIgMTIsIDIw
-MTggYXQgMTE6MTI6MzJQTSArMDgwMCwgVGl3ZWkgQmllIHdyb3RlOg0KPiA+ID4gVGhpcyBwYXRj
-aCBpbnRyb2R1Y2VzIFZIT1NUX1VTRVJfUFJPVE9DT0xfRl9IT1NUX05PVElGSUVSLg0KPiA+ID4g
-V2l0aCB0aGlzIGZlYXR1cmUgbmVnb3RpYXRlZCwgdmhvc3QtdXNlciBiYWNrZW5kIGNhbiByZWdp
-c3RlciBtZW1vcnkNCj4gPiA+IHJlZ2lvbiBiYXNlZCBob3N0IG5vdGlmaWVycy4gQW5kIGl0IHdp
-bGwgYWxsb3cgdGhlIGd1ZXN0IGRyaXZlciBpbg0KPiA+ID4gdGhlIFZNIHRvIG5vdGlmeSB0aGUg
-aGFyZHdhcmUgYWNjZWxlcmF0b3IgYXQgdGhlIHZob3N0LXVzZXIgYmFja2VuZA0KPiA+ID4gZGly
-ZWN0bHkuDQo+ID4gPg0KPiA+ID4gU2lnbmVkLW9mZi1ieTogVGl3ZWkgQmllIDx0aXdlaS5iaWVA
-aW50ZWwuY29tPg0KPiA+DQo+ID4gT3ZlcmFsbCBJIHRoaW5rIHdlIGNhbiBtZXJnZSB0aGlzIGFw
-cHJvYWNoLCBidXQgSSBoYXZlIHR3byBtYWluDQo+ID4gY29uY2VybnMgYWJvdXQgdGhpczoNCj4g
-Pg0KPiA+IDEuIFRlc3RpbmcuIE1vc3QgcGVvcGxlIGRvIG5vdCBoYXZlIHRoZSB2aXJ0aW8gaGFy
-ZHdhcmUNCj4gPiAgICBzbyBob3cgdG8gbWFrZSBzdXJlIHRoaXMgZG9lcyBub3QgYml0IHJvdD8N
-Cj4gPg0KPiA+ICAgIEkgaGF2ZSBhbiBpZGVhOiBhZGQgYW4gb3B0aW9uIGxpa2UgdGhpcyB0byBs
-aWJ2aG9zdC11c2VyLg0KPiA+ICAgIE5hdHVyYWxseSBsaWJ2aG9zdC11c2VyIGNhbiBub3QgZ2V0
-IG5vdGlmaWVkIGFib3V0IGEgd3JpdGUNCj4gPiAgICB0byBhbiBtbWFwcGVkIGFyZWEsIGJ1dCBp
-dCBjYW4gd3JpdGUgYSBzcGVjaWFsIHZhbHVlIHRoZXJlDQo+ID4gICAgKGUuZy4gYWxsLW9uZXM/
-KSBhbmQgdGhlbiBwb2xsIGl0IHRvIGRldGVjdCBWUSAjIHdyaXRlcy4NCj4gPg0KPiA+ICAgIFRo
-ZW4gaW5jbHVkZSBhIHZob3N0IHVzZXIgYnJpZGdlIHRlc3Qgd2l0aCBhbiBvcHRpb24gbGlrZSB0
-aGlzLg0KPiA+DQo+ID4gICAgSSdkIGxpa2UgdG8gc2VlIGEgcGF0Y2ggZG9pbmcgdGhpcy4NCj4g
-DQo+IFN1cmUsIEknbGwgZG8gaXQuIFRoYW5rcyBmb3IgdGhlIHN1Z2dlc3Rpb24hDQo+IA0KPiA+
-DQo+ID4gMi4gTWVtb3J5IGJhcnJpZXJzLiBSaWdodCBub3cgYWZ0ZXIgdXBkYXRpbmcgdGhlIGF2
-YWlsIGlkeCwNCj4gPiAgICB2aXJ0aW8gZG9lcyBzbXBfd21iKCkgYW5kIHRoZW4gdGhlIE1NSU8g
-d3JpdGUuDQo+ID4gICAgTm9ybWFsIGhhcmR3YXJlIGRyaXZlcnMgZG8gd21iKCkgd2hpY2ggaXMg
-YW4gc2ZlbmNlLg0KPiA+ICAgIENhbiBhIFBDSSBkZXZpY2UgcmVhZCBieXBhc3MgaW5kZXggd3Jp
-dGUgYW5kIHNlZSBhIHN0YWxlDQo+ID4gICAgaW5kZXggdmFsdWU/DQpBIGNvbXBpbGVyIGJhcnJp
-ZXIgaXMgZW5vdWdoIG9uIHN0cm9uZ2x5LW9yZGVyZWQgbWVtb3J5IHBsYXRmb3JtLiBBcyBpdCBk
-b2Vzbid0IHJlLW9yZGVyIHN0b3JlLCBQQ0kgZGV2aWNlIHdvbid0IHNlZSBhIHN0YWxlIGluZGV4
-IHZhbHVlLiBCdXQgYSB3ZWFrbHktb3JkZXJlZCBtZW1vcnkgbmVlZHMgc2ZlbmNlLg0KDQo+IA0K
-PiBJdCBkZXBlbmRzIG9uIGFyY2gncyBtZW1vcnkgbW9kZWwuIEN1bm1pbmcgd2lsbCBwcm92aWRl
-IG1vcmUgZGV0YWlscyBhYm91dA0KPiB0aGlzIGxhdGVyLg0KPiANCj4gPiAgICBUbyBtYWtlIHZp
-cnRpbyBwY2kgZG8gd21iKCkgd2Ugd291bGQgbmVlZCBhIG5ldyBmZWF0dXJlIGJpdC4NCj4gPiAg
-ICBBbHRlcm5hdGl2ZWx5IEkgZ3Vlc3Mgd2UgY291bGQgbWF5YmUgbG9vayBhdCBzdWJzeXN0ZW0g
-dmVuZG9yL2RldmljZSBpZC4NCj4gPg0KPiA+ICAgIEknZCBsaWtlIHRvIHNlZSBhIHBhdGNoIGRv
-aW5nIG9uZSBvZiB0aGVzZSB0aGluZ3MuDQo+IA0KPiBXZSBwcmVmZXIgdG8gYWRkIGEgbmV3IGZl
-YXR1cmUgYml0IGFzIGl0J3MgYSBtb3JlIHJvYnVzdCB3YXkgdG8gZG8gdGhpcy4gSSdsbCBzZW5k
-DQo+IG91dCBzb21lIHBhdGNoZXMgc29vbi4NCj4gDQo+IFRoYW5rIHlvdSB2ZXJ5IG11Y2ghIDop
-DQo+IA0KPiBCZXN0IHJlZ2FyZHMsDQo+IFRpd2VpIEJpZQ0KPiANCj4gPg0KPiA+IFRoYW5rcyEN
-Cj4gPg0KPiA+ID4gLS0tDQo+ID4gPiAgZG9jcy9pbnRlcm9wL3Zob3N0LXVzZXIudHh0ICAgIHwg
-IDMzICsrKysrKysrKysrDQo+ID4gPiAgaHcvdmlydGlvL3Zob3N0LXVzZXIuYyAgICAgICAgIHwg
-MTIzDQo+ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+ID4gPiAg
-aW5jbHVkZS9ody92aXJ0aW8vdmhvc3QtdXNlci5oIHwgICA4ICsrKw0KPiA+ID4gIDMgZmlsZXMg
-Y2hhbmdlZCwgMTY0IGluc2VydGlvbnMoKykNCj4gPiA+DQo+ID4gPiBkaWZmIC0tZ2l0IGEvZG9j
-cy9pbnRlcm9wL3Zob3N0LXVzZXIudHh0DQo+ID4gPiBiL2RvY3MvaW50ZXJvcC92aG9zdC11c2Vy
-LnR4dCBpbmRleCA1MzRjYWFiMThhLi45ZTU3YjM2YjIwIDEwMDY0NA0KPiA+ID4gLS0tIGEvZG9j
-cy9pbnRlcm9wL3Zob3N0LXVzZXIudHh0DQo+ID4gPiArKysgYi9kb2NzL2ludGVyb3Avdmhvc3Qt
-dXNlci50eHQNCj4gPiA+IEBAIC0xMzIsNiArMTMyLDE2IEBAIERlcGVuZGluZyBvbiB0aGUgcmVx
-dWVzdCB0eXBlLCBwYXlsb2FkIGNhbiBiZToNCj4gPiA+ICAgICBQYXlsb2FkOiBTaXplIGJ5dGVz
-IGFycmF5IGhvbGRpbmcgdGhlIGNvbnRlbnRzIG9mIHRoZSB2aXJ0aW8NCj4gPiA+ICAgICAgICAg
-ZGV2aWNlJ3MgY29uZmlndXJhdGlvbiBzcGFjZQ0KPiA+ID4NCj4gPiA+ICsgKiBWcmluZyBhcmVh
-IGRlc2NyaXB0aW9uDQo+ID4gPiArICAgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4gPiA+ICsg
-ICB8IHU2NCB8IHNpemUgfCBvZmZzZXQgfA0KPiA+ID4gKyAgIC0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tDQo+ID4gPiArDQo+ID4gPiArICAgdTY0OiBhIDY0LWJpdCBpbnRlZ2VyIGNvbnRhaW5zIHZy
-aW5nIGluZGV4IGFuZCBmbGFncw0KPiA+ID4gKyAgIFNpemU6IGEgNjQtYml0IHNpemUgb2YgdGhp
-cyBhcmVhDQo+ID4gPiArICAgT2Zmc2V0OiBhIDY0LWJpdCBvZmZzZXQgb2YgdGhpcyBhcmVhIGZy
-b20gdGhlIHN0YXJ0IG9mIHRoZQ0KPiA+ID4gKyAgICAgICBzdXBwbGllZCBmaWxlIGRlc2NyaXB0
-b3INCj4gPiA+ICsNCj4gPiA+ICBJbiBRRU1VIHRoZSB2aG9zdC11c2VyIG1lc3NhZ2UgaXMgaW1w
-bGVtZW50ZWQgd2l0aCB0aGUgZm9sbG93aW5nIHN0cnVjdDoNCj4gPiA+DQo+ID4gPiAgdHlwZWRl
-ZiBzdHJ1Y3QgVmhvc3RVc2VyTXNnIHsNCj4gPiA+IEBAIC0xNDYsNiArMTU2LDcgQEAgdHlwZWRl
-ZiBzdHJ1Y3QgVmhvc3RVc2VyTXNnIHsNCj4gPiA+ICAgICAgICAgIFZob3N0VXNlckxvZyBsb2c7
-DQo+ID4gPiAgICAgICAgICBzdHJ1Y3Qgdmhvc3RfaW90bGJfbXNnIGlvdGxiOw0KPiA+ID4gICAg
-ICAgICAgVmhvc3RVc2VyQ29uZmlnIGNvbmZpZzsNCj4gPiA+ICsgICAgICAgIFZob3N0VXNlclZy
-aW5nQXJlYSBhcmVhOw0KPiA+ID4gICAgICB9Ow0KPiA+ID4gIH0gUUVNVV9QQUNLRUQgVmhvc3RV
-c2VyTXNnOw0KPiA+ID4NCj4gPiA+IEBAIC0zODAsNiArMzkxLDcgQEAgUHJvdG9jb2wgZmVhdHVy
-ZXMgICNkZWZpbmUNCj4gPiA+IFZIT1NUX1VTRVJfUFJPVE9DT0xfRl9DUllQVE9fU0VTU0lPTiA3
-DQo+ID4gPiAgI2RlZmluZSBWSE9TVF9VU0VSX1BST1RPQ09MX0ZfUEFHRUZBVUxUICAgICAgOA0K
-PiA+ID4gICNkZWZpbmUgVkhPU1RfVVNFUl9QUk9UT0NPTF9GX0NPTkZJRyAgICAgICAgIDkNCj4g
-PiA+ICsjZGVmaW5lIFZIT1NUX1VTRVJfUFJPVE9DT0xfRl9IT1NUX05PVElGSUVSICAxMA0KPiA+
-ID4NCj4gPiA+ICBNYXN0ZXIgbWVzc2FnZSB0eXBlcw0KPiA+ID4gIC0tLS0tLS0tLS0tLS0tLS0t
-LS0tDQo+ID4gPiBAQCAtNzc3LDYgKzc4OSwyNyBAQCBTbGF2ZSBtZXNzYWdlIHR5cGVzDQo+ID4g
-PiAgICAgICB0aGUgVkhPU1RfVVNFUl9ORUVEX1JFUExZIGZsYWcsIG1hc3RlciBtdXN0IHJlc3Bv
-bmQgd2l0aCB6ZXJvIHdoZW4NCj4gPiA+ICAgICAgIG9wZXJhdGlvbiBpcyBzdWNjZXNzZnVsbHkg
-Y29tcGxldGVkLCBvciBub24temVybyBvdGhlcndpc2UuDQo+ID4gPg0KPiA+ID4gKyAqIFZIT1NU
-X1VTRVJfU0xBVkVfVlJJTkdfSE9TVF9OT1RJRklFUl9NU0cNCj4gPiA+ICsNCj4gPiA+ICsgICAg
-ICBJZDogMw0KPiA+ID4gKyAgICAgIEVxdWl2YWxlbnQgaW9jdGw6IE4vQQ0KPiA+ID4gKyAgICAg
-IFNsYXZlIHBheWxvYWQ6IHZyaW5nIGFyZWEgZGVzY3JpcHRpb24NCj4gPiA+ICsgICAgICBNYXN0
-ZXIgcGF5bG9hZDogTi9BDQo+ID4gPiArDQo+ID4gPiArICAgICAgU2V0cyBob3N0IG5vdGlmaWVy
-IGZvciBhIHNwZWNpZmllZCBxdWV1ZS4gVGhlIHF1ZXVlIGluZGV4IGlzIGNvbnRhaW5lZA0KPiA+
-ID4gKyAgICAgIGluIHRoZSB1NjQgZmllbGQgb2YgdGhlIHZyaW5nIGFyZWEgZGVzY3JpcHRpb24u
-IFRoZSBob3N0IG5vdGlmaWVyIGlzDQo+ID4gPiArICAgICAgZGVzY3JpYmVkIGJ5IHRoZSBmaWxl
-IGRlc2NyaXB0b3IgKHR5cGljYWxseSBpdCdzIGEgVkZJTyBkZXZpY2UgZmQpIHdoaWNoDQo+ID4g
-PiArICAgICAgaXMgcGFzc2VkIGFzIGFuY2lsbGFyeSBkYXRhIGFuZCB0aGUgc2l6ZSAod2hpY2gg
-aXMgbW1hcCBzaXplIGFuZCBzaG91bGQNCj4gPiA+ICsgICAgICBiZSB0aGUgc2FtZSBhcyBob3N0
-IHBhZ2Ugc2l6ZSkgYW5kIG9mZnNldCAod2hpY2ggaXMgbW1hcCBvZmZzZXQpIGNhcnJpZWQNCj4g
-PiA+ICsgICAgICBpbiB0aGUgdnJpbmcgYXJlYSBkZXNjcmlwdGlvbi4gUUVNVSBjYW4gbW1hcCB0
-aGUgZmlsZSBkZXNjcmlwdG9yIGJhc2VkDQo+ID4gPiArICAgICAgb24gdGhlIHNpemUgYW5kIG9m
-ZnNldCB0byBnZXQgYSBtZW1vcnkgcmFuZ2UuIFJlZ2lzdGVyaW5nIGEgaG9zdCBub3RpZmllcg0K
-PiA+ID4gKyAgICAgIG1lYW5zIG1hcHBpbmcgdGhpcyBtZW1vcnkgcmFuZ2UgdG8gdGhlIFZNIGFz
-IHRoZSBzcGVjaWZpZWQgcXVldWUncw0KPiBub3RpZnkNCj4gPiA+ICsgICAgICBNTUlPIHJlZ2lv
-bi4gU2xhdmUgc2VuZHMgdGhpcyByZXF1ZXN0IHRvIHRlbGwgUUVNVSB0byBkZS1yZWdpc3RlciB0
-aGUNCj4gPiA+ICsgICAgICBleGlzdGluZyBub3RpZmllciBpZiBhbnkgYW5kIHJlZ2lzdGVyIHRo
-ZSBuZXcgbm90aWZpZXIgaWYgdGhlIHJlcXVlc3QgaXMNCj4gPiA+ICsgICAgICBzZW50IHdpdGgg
-YSBmaWxlIGRlc2NyaXB0b3IuDQo+ID4gPiArICAgICAgVGhpcyByZXF1ZXN0IHNob3VsZCBiZSBz
-ZW50IG9ubHkgd2hlbg0KPiBWSE9TVF9VU0VSX1BST1RPQ09MX0ZfSE9TVF9OT1RJRklFUg0KPiA+
-ID4gKyAgICAgIHByb3RvY29sIGZlYXR1cmUgaGFzIGJlZW4gc3VjY2Vzc2Z1bGx5IG5lZ290aWF0
-ZWQuDQo+ID4gPiArDQo+ID4gPiAgVkhPU1RfVVNFUl9QUk9UT0NPTF9GX1JFUExZX0FDSzoNCj4g
-PiA+ICAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+ID4gPiAgVGhlIG9yaWdpbmFs
-IHZob3N0LXVzZXIgc3BlY2lmaWNhdGlvbiBvbmx5IGRlbWFuZHMgcmVwbGllcyBmb3INCj4gPiA+
-IGNlcnRhaW4gZGlmZiAtLWdpdCBhL2h3L3ZpcnRpby92aG9zdC11c2VyLmMgYi9ody92aXJ0aW8v
-dmhvc3QtdXNlci5jDQo+ID4gPiBpbmRleCA3OTFlMGE0NzYzLi4xY2Q5YzcyNzZiIDEwMDY0NA0K
-PiA+ID4gLS0tIGEvaHcvdmlydGlvL3Zob3N0LXVzZXIuYw0KPiA+ID4gKysrIGIvaHcvdmlydGlv
-L3Zob3N0LXVzZXIuYw0KPiA+ID4gQEAgLTEzLDYgKzEzLDcgQEANCj4gPiA+ICAjaW5jbHVkZSAi
-aHcvdmlydGlvL3Zob3N0LmgiDQo+ID4gPiAgI2luY2x1ZGUgImh3L3ZpcnRpby92aG9zdC11c2Vy
-LmgiDQo+ID4gPiAgI2luY2x1ZGUgImh3L3ZpcnRpby92aG9zdC1iYWNrZW5kLmgiDQo+ID4gPiAr
-I2luY2x1ZGUgImh3L3ZpcnRpby92aXJ0aW8uaCINCj4gPiA+ICAjaW5jbHVkZSAiaHcvdmlydGlv
-L3ZpcnRpby1uZXQuaCINCj4gPiA+ICAjaW5jbHVkZSAiY2hhcmRldi9jaGFyLWZlLmgiDQo+ID4g
-PiAgI2luY2x1ZGUgInN5c2VtdS9rdm0uaCINCj4gPiA+IEBAIC00OCw2ICs0OSw3IEBAIGVudW0g
-Vmhvc3RVc2VyUHJvdG9jb2xGZWF0dXJlIHsNCj4gPiA+ICAgICAgVkhPU1RfVVNFUl9QUk9UT0NP
-TF9GX0NSWVBUT19TRVNTSU9OID0gNywNCj4gPiA+ICAgICAgVkhPU1RfVVNFUl9QUk9UT0NPTF9G
-X1BBR0VGQVVMVCA9IDgsDQo+ID4gPiAgICAgIFZIT1NUX1VTRVJfUFJPVE9DT0xfRl9DT05GSUcg
-PSA5LA0KPiA+ID4gKyAgICBWSE9TVF9VU0VSX1BST1RPQ09MX0ZfSE9TVF9OT1RJRklFUiA9IDEw
-LA0KPiA+ID4gICAgICBWSE9TVF9VU0VSX1BST1RPQ09MX0ZfTUFYDQo+ID4gPiAgfTsNCj4gPiA+
-DQo+ID4gPiBAQCAtOTIsNiArOTQsNyBAQCB0eXBlZGVmIGVudW0gVmhvc3RVc2VyU2xhdmVSZXF1
-ZXN0IHsNCj4gPiA+ICAgICAgVkhPU1RfVVNFUl9TTEFWRV9OT05FID0gMCwNCj4gPiA+ICAgICAg
-VkhPU1RfVVNFUl9TTEFWRV9JT1RMQl9NU0cgPSAxLA0KPiA+ID4gICAgICBWSE9TVF9VU0VSX1NM
-QVZFX0NPTkZJR19DSEFOR0VfTVNHID0gMiwNCj4gPiA+ICsgICAgVkhPU1RfVVNFUl9TTEFWRV9W
-UklOR19IT1NUX05PVElGSUVSX01TRyA9IDMsDQo+ID4gPiAgICAgIFZIT1NUX1VTRVJfU0xBVkVf
-TUFYDQo+ID4gPiAgfSAgVmhvc3RVc2VyU2xhdmVSZXF1ZXN0Ow0KPiA+ID4NCj4gPiA+IEBAIC0x
-MzYsNiArMTM5LDEyIEBAIHN0YXRpYyBWaG9zdFVzZXJDb25maWcgYyBfX2F0dHJpYnV0ZV9fICgo
-dW51c2VkKSk7DQo+ID4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICArIHNp
-emVvZihjLnNpemUpIFwNCj4gPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICsgc2l6ZW9mKGMuZmxhZ3MpKQ0KPiA+ID4NCj4gPiA+ICt0eXBlZGVmIHN0cnVjdCBWaG9zdFVz
-ZXJWcmluZ0FyZWEgew0KPiA+ID4gKyAgICB1aW50NjRfdCB1NjQ7DQo+ID4gPiArICAgIHVpbnQ2
-NF90IHNpemU7DQo+ID4gPiArICAgIHVpbnQ2NF90IG9mZnNldDsNCj4gPiA+ICt9IFZob3N0VXNl
-clZyaW5nQXJlYTsNCj4gPiA+ICsNCj4gPiA+ICB0eXBlZGVmIHN0cnVjdCB7DQo+ID4gPiAgICAg
-IFZob3N0VXNlclJlcXVlc3QgcmVxdWVzdDsNCj4gPiA+DQo+ID4gPiBAQCAtMTU3LDYgKzE2Niw3
-IEBAIHR5cGVkZWYgdW5pb24gew0KPiA+ID4gICAgICAgICAgc3RydWN0IHZob3N0X2lvdGxiX21z
-ZyBpb3RsYjsNCj4gPiA+ICAgICAgICAgIFZob3N0VXNlckNvbmZpZyBjb25maWc7DQo+ID4gPiAg
-ICAgICAgICBWaG9zdFVzZXJDcnlwdG9TZXNzaW9uIHNlc3Npb247DQo+ID4gPiArICAgICAgICBW
-aG9zdFVzZXJWcmluZ0FyZWEgYXJlYTsNCj4gPiA+ICB9IFZob3N0VXNlclBheWxvYWQ7DQo+ID4g
-Pg0KPiA+ID4gIHR5cGVkZWYgc3RydWN0IFZob3N0VXNlck1zZyB7DQo+ID4gPiBAQCAtNjM4LDkg
-KzY0OCwzNyBAQCBzdGF0aWMgaW50IHZob3N0X3VzZXJfc2V0X3ZyaW5nX251bShzdHJ1Y3QNCj4g
-dmhvc3RfZGV2ICpkZXYsDQo+ID4gPiAgICAgIHJldHVybiB2aG9zdF9zZXRfdnJpbmcoZGV2LCBW
-SE9TVF9VU0VSX1NFVF9WUklOR19OVU0sIHJpbmcpOyAgfQ0KPiA+ID4NCj4gPiA+ICtzdGF0aWMg
-dm9pZCB2aG9zdF91c2VyX2hvc3Rfbm90aWZpZXJfcmVzdG9yZShzdHJ1Y3Qgdmhvc3RfZGV2ICpk
-ZXYsDQo+ID4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-aW50IHF1ZXVlX2lkeCkgew0KPiA+ID4gKyAgICBzdHJ1Y3Qgdmhvc3RfdXNlciAqdSA9IGRldi0+
-b3BhcXVlOw0KPiA+ID4gKyAgICBWaG9zdFVzZXJIb3N0Tm90aWZpZXIgKm4gPSAmdS0+dXNlci0+
-bm90aWZpZXJbcXVldWVfaWR4XTsNCj4gPiA+ICsgICAgVmlydElPRGV2aWNlICp2ZGV2ID0gZGV2
-LT52ZGV2Ow0KPiA+ID4gKw0KPiA+ID4gKyAgICBpZiAobi0+YWRkciAmJiAhbi0+c2V0KSB7DQo+
-ID4gPiArICAgICAgICB2aXJ0aW9fcXVldWVfc2V0X2hvc3Rfbm90aWZpZXJfbXIodmRldiwgcXVl
-dWVfaWR4LCAmbi0+bXIsIHRydWUpOw0KPiA+ID4gKyAgICAgICAgbi0+c2V0ID0gdHJ1ZTsNCj4g
-PiA+ICsgICAgfQ0KPiA+ID4gK30NCj4gPiA+ICsNCj4gPiA+ICtzdGF0aWMgdm9pZCB2aG9zdF91
-c2VyX2hvc3Rfbm90aWZpZXJfcmVtb3ZlKHN0cnVjdCB2aG9zdF9kZXYgKmRldiwNCj4gPiA+ICsg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGludCBxdWV1ZV9pZHgp
-IHsNCj4gPiA+ICsgICAgc3RydWN0IHZob3N0X3VzZXIgKnUgPSBkZXYtPm9wYXF1ZTsNCj4gPiA+
-ICsgICAgVmhvc3RVc2VySG9zdE5vdGlmaWVyICpuID0gJnUtPnVzZXItPm5vdGlmaWVyW3F1ZXVl
-X2lkeF07DQo+ID4gPiArICAgIFZpcnRJT0RldmljZSAqdmRldiA9IGRldi0+dmRldjsNCj4gPiA+
-ICsNCj4gPiA+ICsgICAgaWYgKG4tPmFkZHIgJiYgbi0+c2V0KSB7DQo+ID4gPiArICAgICAgICB2
-aXJ0aW9fcXVldWVfc2V0X2hvc3Rfbm90aWZpZXJfbXIodmRldiwgcXVldWVfaWR4LCAmbi0+bXIs
-IGZhbHNlKTsNCj4gPiA+ICsgICAgICAgIG4tPnNldCA9IGZhbHNlOw0KPiA+ID4gKyAgICB9DQo+
-ID4gPiArfQ0KPiA+ID4gKw0KPiA+ID4gIHN0YXRpYyBpbnQgdmhvc3RfdXNlcl9zZXRfdnJpbmdf
-YmFzZShzdHJ1Y3Qgdmhvc3RfZGV2ICpkZXYsDQo+ID4gPiAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIHN0cnVjdCB2aG9zdF92cmluZ19zdGF0ZQ0KPiA+ID4gKnJpbmcpICB7
-DQo+ID4gPiArICAgIHZob3N0X3VzZXJfaG9zdF9ub3RpZmllcl9yZXN0b3JlKGRldiwgcmluZy0+
-aW5kZXgpOw0KPiA+ID4gKw0KPiA+ID4gICAgICByZXR1cm4gdmhvc3Rfc2V0X3ZyaW5nKGRldiwg
-VkhPU1RfVVNFUl9TRVRfVlJJTkdfQkFTRSwgcmluZyk7DQo+ID4gPiB9DQo+ID4gPg0KPiA+ID4g
-QEAgLTY3NCw2ICs3MTIsOCBAQCBzdGF0aWMgaW50IHZob3N0X3VzZXJfZ2V0X3ZyaW5nX2Jhc2Uo
-c3RydWN0DQo+IHZob3N0X2RldiAqZGV2LA0KPiA+ID4gICAgICAgICAgLmhkci5zaXplID0gc2l6
-ZW9mKG1zZy5wYXlsb2FkLnN0YXRlKSwNCj4gPiA+ICAgICAgfTsNCj4gPiA+DQo+ID4gPiArICAg
-IHZob3N0X3VzZXJfaG9zdF9ub3RpZmllcl9yZW1vdmUoZGV2LCByaW5nLT5pbmRleCk7DQo+ID4g
-PiArDQo+ID4gPiAgICAgIGlmICh2aG9zdF91c2VyX3dyaXRlKGRldiwgJm1zZywgTlVMTCwgMCkg
-PCAwKSB7DQo+ID4gPiAgICAgICAgICByZXR1cm4gLTE7DQo+ID4gPiAgICAgIH0NCj4gPiA+IEBA
-IC04NDcsNiArODg3LDc2IEBAIHN0YXRpYyBpbnQNCj4gdmhvc3RfdXNlcl9zbGF2ZV9oYW5kbGVf
-Y29uZmlnX2NoYW5nZShzdHJ1Y3Qgdmhvc3RfZGV2ICpkZXYpDQo+ID4gPiAgICAgIHJldHVybiBy
-ZXQ7DQo+ID4gPiAgfQ0KPiA+ID4NCj4gPiA+ICtzdGF0aWMgaW50IHZob3N0X3VzZXJfc2xhdmVf
-aGFuZGxlX3ZyaW5nX2hvc3Rfbm90aWZpZXIoc3RydWN0IHZob3N0X2Rldg0KPiAqZGV2LA0KPiA+
-ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBWaG9zdFVzZXJWcmluZ0FyZWEgKmFyZWEsDQo+ID4gPiArICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGludCBmZCkgew0KPiA+ID4gKyAgICBp
-bnQgcXVldWVfaWR4ID0gYXJlYS0+dTY0ICYgVkhPU1RfVVNFUl9WUklOR19JRFhfTUFTSzsNCj4g
-PiA+ICsgICAgc2l6ZV90IHBhZ2Vfc2l6ZSA9IHFlbXVfcmVhbF9ob3N0X3BhZ2Vfc2l6ZTsNCj4g
-PiA+ICsgICAgc3RydWN0IHZob3N0X3VzZXIgKnUgPSBkZXYtPm9wYXF1ZTsNCj4gPiA+ICsgICAg
-Vmhvc3RVc2VyU3RhdGUgKnVzZXIgPSB1LT51c2VyOw0KPiA+ID4gKyAgICBWaXJ0SU9EZXZpY2Ug
-KnZkZXYgPSBkZXYtPnZkZXY7DQo+ID4gPiArICAgIFZob3N0VXNlckhvc3ROb3RpZmllciAqbjsN
-Cj4gPiA+ICsgICAgaW50IHJldCA9IDA7DQo+ID4gPiArICAgIHZvaWQgKmFkZHI7DQo+ID4gPiAr
-ICAgIGNoYXIgKm5hbWU7DQo+ID4gPiArDQo+ID4gPiArICAgIGlmICghdmlydGlvX2hhc19mZWF0
-dXJlKGRldi0+cHJvdG9jb2xfZmVhdHVyZXMsDQo+ID4gPiArICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIFZIT1NUX1VTRVJfUFJPVE9DT0xfRl9IT1NUX05PVElGSUVSKSB8fA0KPiA+ID4gKyAg
-ICAgICAgdmRldiA9PSBOVUxMIHx8IHF1ZXVlX2lkeCA+PSB2aXJ0aW9fZ2V0X251bV9xdWV1ZXMo
-dmRldikpIHsNCj4gPiA+ICsgICAgICAgIHJldCA9IC0xOw0KPiA+ID4gKyAgICAgICAgZ290byBv
-dXQ7DQo+ID4gPiArICAgIH0NCj4gPiA+ICsNCj4gPiA+ICsgICAgbiA9ICZ1c2VyLT5ub3RpZmll
-cltxdWV1ZV9pZHhdOw0KPiA+ID4gKw0KPiA+ID4gKyAgICBpZiAobi0+YWRkcikgew0KPiA+ID4g
-KyAgICAgICAgdmlydGlvX3F1ZXVlX3NldF9ob3N0X25vdGlmaWVyX21yKHZkZXYsIHF1ZXVlX2lk
-eCwgJm4tPm1yLCBmYWxzZSk7DQo+ID4gPiArICAgICAgICBvYmplY3RfdW5wYXJlbnQoT0JKRUNU
-KCZuLT5tcikpOw0KPiA+ID4gKyAgICAgICAgbXVubWFwKG4tPmFkZHIsIHBhZ2Vfc2l6ZSk7DQo+
-ID4gPiArICAgICAgICBuLT5hZGRyID0gTlVMTDsNCj4gPiA+ICsgICAgfQ0KPiA+ID4gKw0KPiA+
-ID4gKyAgICBpZiAoYXJlYS0+dTY0ICYgVkhPU1RfVVNFUl9WUklOR19OT0ZEX01BU0spIHsNCj4g
-PiA+ICsgICAgICAgIGdvdG8gb3V0Ow0KPiA+ID4gKyAgICB9DQo+ID4gPiArDQo+ID4gPiArICAg
-IC8qIFNhbml0eSBjaGVjay4gKi8NCj4gPiA+ICsgICAgaWYgKGFyZWEtPnNpemUgIT0gcGFnZV9z
-aXplKSB7DQo+ID4gPiArICAgICAgICByZXQgPSAtMTsNCj4gPiA+ICsgICAgICAgIGdvdG8gb3V0
-Ow0KPiA+ID4gKyAgICB9DQo+ID4gPiArDQo+ID4gPiArICAgIGFkZHIgPSBtbWFwKE5VTEwsIHBh
-Z2Vfc2l6ZSwgUFJPVF9SRUFEIHwgUFJPVF9XUklURSwgTUFQX1NIQVJFRCwNCj4gPiA+ICsgICAg
-ICAgICAgICAgICAgZmQsIGFyZWEtPm9mZnNldCk7DQo+ID4gPiArICAgIGlmIChhZGRyID09IE1B
-UF9GQUlMRUQpIHsNCj4gPiA+ICsgICAgICAgIHJldCA9IC0xOw0KPiA+ID4gKyAgICAgICAgZ290
-byBvdXQ7DQo+ID4gPiArICAgIH0NCj4gPiA+ICsNCj4gPiA+ICsgICAgbmFtZSA9IGdfc3RyZHVw
-X3ByaW50Zigidmhvc3QtdXNlci9ob3N0LW5vdGlmaWVyQCVwIG1tYXBzWyVkXSIsDQo+ID4gPiAr
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgdXNlciwgcXVldWVfaWR4KTsNCj4gPiA+ICsgICAg
-bWVtb3J5X3JlZ2lvbl9pbml0X3JhbV9kZXZpY2VfcHRyKCZuLT5tciwgT0JKRUNUKHZkZXYpLCBu
-YW1lLA0KPiA+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcGFnZV9z
-aXplLCBhZGRyKTsNCj4gPiA+ICsgICAgZ19mcmVlKG5hbWUpOw0KPiA+ID4gKw0KPiA+ID4gKyAg
-ICBpZiAodmlydGlvX3F1ZXVlX3NldF9ob3N0X25vdGlmaWVyX21yKHZkZXYsIHF1ZXVlX2lkeCwg
-Jm4tPm1yLCB0cnVlKSkgew0KPiA+ID4gKyAgICAgICAgbXVubWFwKGFkZHIsIHBhZ2Vfc2l6ZSk7
-DQo+ID4gPiArICAgICAgICByZXQgPSAtMTsNCj4gPiA+ICsgICAgICAgIGdvdG8gb3V0Ow0KPiA+
-ID4gKyAgICB9DQo+ID4gPiArDQo+ID4gPiArICAgIG4tPmFkZHIgPSBhZGRyOw0KPiA+ID4gKyAg
-ICBuLT5zZXQgPSB0cnVlOw0KPiA+ID4gKw0KPiA+ID4gK291dDoNCj4gPiA+ICsgICAgLyogQWx3
-YXlzIGNsb3NlIHRoZSBmZC4gKi8NCj4gPiA+ICsgICAgaWYgKGZkICE9IC0xKSB7DQo+ID4gPiAr
-ICAgICAgICBjbG9zZShmZCk7DQo+ID4gPiArICAgIH0NCj4gPiA+ICsgICAgcmV0dXJuIHJldDsN
-Cj4gPiA+ICt9DQo+ID4gPiArDQo+ID4gPiAgc3RhdGljIHZvaWQgc2xhdmVfcmVhZCh2b2lkICpv
-cGFxdWUpICB7DQo+ID4gPiAgICAgIHN0cnVjdCB2aG9zdF9kZXYgKmRldiA9IG9wYXF1ZTsgQEAg
-LTkxMyw2ICsxMDIzLDEwIEBAIHN0YXRpYw0KPiA+ID4gdm9pZCBzbGF2ZV9yZWFkKHZvaWQgKm9w
-YXF1ZSkNCj4gPiA+ICAgICAgY2FzZSBWSE9TVF9VU0VSX1NMQVZFX0NPTkZJR19DSEFOR0VfTVNH
-IDoNCj4gPiA+ICAgICAgICAgIHJldCA9IHZob3N0X3VzZXJfc2xhdmVfaGFuZGxlX2NvbmZpZ19j
-aGFuZ2UoZGV2KTsNCj4gPiA+ICAgICAgICAgIGJyZWFrOw0KPiA+ID4gKyAgICBjYXNlIFZIT1NU
-X1VTRVJfU0xBVkVfVlJJTkdfSE9TVF9OT1RJRklFUl9NU0c6DQo+ID4gPiArICAgICAgICByZXQg
-PSB2aG9zdF91c2VyX3NsYXZlX2hhbmRsZV92cmluZ19ob3N0X25vdGlmaWVyKGRldiwgJnBheWxv
-YWQuYXJlYSwNCj4gPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgZmQpOw0KPiA+ID4gKyAgICAgICAgYnJlYWs7DQo+ID4gPiAgICAg
-IGRlZmF1bHQ6DQo+ID4gPiAgICAgICAgICBlcnJvcl9yZXBvcnQoIlJlY2VpdmVkIHVuZXhwZWN0
-ZWQgbXNnIHR5cGUuIik7DQo+ID4gPiAgICAgICAgICBpZiAoZmQgIT0gLTEpIHsNCj4gPiA+IEBA
-IC0xNjQxLDYgKzE3NTUsMTUgQEAgVmhvc3RVc2VyU3RhdGUgKnZob3N0X3VzZXJfaW5pdCh2b2lk
-KQ0KPiA+ID4NCj4gPiA+ICB2b2lkIHZob3N0X3VzZXJfY2xlYW51cChWaG9zdFVzZXJTdGF0ZSAq
-dXNlcikgIHsNCj4gPiA+ICsgICAgaW50IGk7DQo+ID4gPiArDQo+ID4gPiArICAgIGZvciAoaSA9
-IDA7IGkgPCBWSVJUSU9fUVVFVUVfTUFYOyBpKyspIHsNCj4gPiA+ICsgICAgICAgIGlmICh1c2Vy
-LT5ub3RpZmllcltpXS5hZGRyKSB7DQo+ID4gPiArICAgICAgICAgICAgb2JqZWN0X3VucGFyZW50
-KE9CSkVDVCgmdXNlci0+bm90aWZpZXJbaV0ubXIpKTsNCj4gPiA+ICsgICAgICAgICAgICBtdW5t
-YXAodXNlci0+bm90aWZpZXJbaV0uYWRkciwgcWVtdV9yZWFsX2hvc3RfcGFnZV9zaXplKTsNCj4g
-PiA+ICsgICAgICAgICAgICB1c2VyLT5ub3RpZmllcltpXS5hZGRyID0gTlVMTDsNCj4gPiA+ICsg
-ICAgICAgIH0NCj4gPiA+ICsgICAgfQ0KPiA+ID4gIH0NCj4gPiA+DQo+ID4gPiAgY29uc3QgVmhv
-c3RPcHMgdXNlcl9vcHMgPSB7DQo+ID4gPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9ody92aXJ0aW8v
-dmhvc3QtdXNlci5oDQo+ID4gPiBiL2luY2x1ZGUvaHcvdmlydGlvL3Zob3N0LXVzZXIuaCBpbmRl
-eCBlYjhiYzBkOTBkLi5mZDY2MDM5M2EwIDEwMDY0NA0KPiA+ID4gLS0tIGEvaW5jbHVkZS9ody92
-aXJ0aW8vdmhvc3QtdXNlci5oDQo+ID4gPiArKysgYi9pbmNsdWRlL2h3L3ZpcnRpby92aG9zdC11
-c2VyLmgNCj4gPiA+IEBAIC05LDkgKzksMTcgQEANCj4gPiA+ICAjZGVmaW5lIEhXX1ZJUlRJT19W
-SE9TVF9VU0VSX0gNCj4gPiA+DQo+ID4gPiAgI2luY2x1ZGUgImNoYXJkZXYvY2hhci1mZS5oIg0K
-PiA+ID4gKyNpbmNsdWRlICJody92aXJ0aW8vdmlydGlvLmgiDQo+ID4gPiArDQo+ID4gPiArdHlw
-ZWRlZiBzdHJ1Y3QgVmhvc3RVc2VySG9zdE5vdGlmaWVyIHsNCj4gPiA+ICsgICAgTWVtb3J5UmVn
-aW9uIG1yOw0KPiA+ID4gKyAgICB2b2lkICphZGRyOw0KPiA+ID4gKyAgICBib29sIHNldDsNCj4g
-PiA+ICt9IFZob3N0VXNlckhvc3ROb3RpZmllcjsNCj4gPiA+DQo+ID4gPiAgdHlwZWRlZiBzdHJ1
-Y3QgVmhvc3RVc2VyU3RhdGUgew0KPiA+ID4gICAgICBDaGFyQmFja2VuZCAqY2hyOw0KPiA+ID4g
-KyAgICBWaG9zdFVzZXJIb3N0Tm90aWZpZXIgbm90aWZpZXJbVklSVElPX1FVRVVFX01BWF07DQo+
-ID4gPiAgfSBWaG9zdFVzZXJTdGF0ZTsNCj4gPiA+DQo+ID4gPiAgVmhvc3RVc2VyU3RhdGUgKnZo
-b3N0X3VzZXJfaW5pdCh2b2lkKTsNCj4gPiA+IC0tDQo+ID4gPiAyLjExLjANCg==
+Hello,
+
+The POWER9 processor comes with a new interrupt controller, called
+XIVE, which introduces a large number of new features, for
+virtualization in particular.
+
+* XIVE interrupt controller
+
+It is composed of three sub-engines :
+
+  - Interrupt Virtualization Source Engine (IVSE). These are in PHBs,
+    in the main controller for the IPIS and in the PSI host
+    bridge. They are configured to feed the IVRE with events.
+
+  - Interrupt Virtualization Routing Engine (IVRE). Its job is to
+    match an event source with a Notification Virtualization Target
+    (NVT), a priority and an Event Queue (EQ) to determine if a
+    Virtual Processor can handle the event.
+
+  - Interrupt Virtualization Presentation Engine (IVPE). It maintains
+    the interrupt state of each hardware thread and present the
+    notification as an external exception.
+
+Each of the engines uses a set of internal tables to redirect
+exceptions from event sources to CPU threads. Interrupt sources have a
+2-bit state machine, the Event State Buffer (ESB), that allows events
+to be triggered. If the event is let through, the IVRE looks up in the
+Interrupt Virtualization Entry (IVE) table for the Event Queue
+Descriptor configured for the source. Each Event Queue Descriptor
+defines a notification path to a CPU and an in-memory queue in which
+will be recorded an event identifier for the OS to pull.
+
+On a POWER9 sPAPR machine, the Client Architecture Support (CAS)
+negotiation process determines whether the guest operates with a
+interrupt controller using the XICS legacy model, as found on POWER8,
+or in XIVE exploitation mode. On a POWER9 PowerNV machine, the XIVE
+interrupt controller is a must have.
+
+
+* XIVE for sPAPR
+
+Here are the high level ideas of the current design to add support for
+XIVE :
+
+ - introduce a persistent sPAPRXive object under the sPAPR machine for
+   newer machines and let the CAS negotiation process decide whether
+   it should be used or not. Use the 'ov5_cas' attribute for this
+   purpose.
+
+ - introduce a persistent XIVE interrupt presenter under the sPAPR
+   core and switch ICP after CAS. Each core has now two ICPs, one
+   active through the 'intc' pointer and another one among its
+   children ready to be used if the guest requires it.
+
+ - move the XIVE EQs under the cores to simplify the XIVE model
+
+ - allocate the CPU IPIs at the beginning of the IRQ number space to
+   be compatible with XICS (which starts at 4096) and also to simplify
+   the model. This means that the XIVE model covers the whole IRQ
+   number space. There are no offset like in XICS splitting the IRQ
+   number space.
+
+
+* sPAPR patchset layout=20
+
+It first defines new models for XIVE, which will be shared between the
+machines or with KVM for sPAPR :
+
+ - XiveSource holding the PQ bits and the ESB MMIO region used to
+   control them.
+
+ - XiveNVT holding the CPU interrupt state and the EQ state. it models
+   the XIVE interrupt presenter engine.
+
+ - sPAPRXive modeling the XIVE interrupt controller for sPAPR
+   machines, holding the internal routing table, a single XIVE source
+   for the IPIs and other interrupts and the TIMA MMIO regions used by
+   the XiveNVT to do interrupt management.=20
+
+We do not model the IVRE, but this is not a problem to introduce it if
+needed. Maybe for migration. To be discussed.
+  =20
+Then, the notification process and the interrupt delivery to the CPU
+is described. Support for sPAPR is completed with the integration of
+the sPAPRXive object in the machine, the definition of the new XIVE
+hcalls, the device tree layout, and the necessary adjustments to
+support the CAS negotiation.
+
+Follows the support for KVM with a set of specific XIVE models, very
+much like XICS does.  But, the interrupt mode is still chosen at the
+init of the machine and the reset does change the KVM interrupt
+device. A couple of patches try to fix this limitation with a proposal
+to support resets of KVM devices. Some issues in the MMU migration
+which still need to be addressed.
+
+
+* PowerNV extension
+
+It seemed interesting to include the models for PowerNV as a way to
+validate that the concept are valid.
+
+The patchset finishes with RFCs of models for the XIVE interrupt
+controller and for the PSI bridge device for the POWER9 PowerNV. PSI
+provides a good example of the usage of the notify() handler of the
+XiveFabric interface, linking the PSI XiveSource to its owning device.
+
+
+* Coverage
+
+At this stage, XIVE support in QEMU covers :
+
+ - TCG & KVM kernel_irqchip=3Doff/on
+ - CPU hotplug
+ - support for older machines
+ - migration under TCG
+ - migration under KVM, including kernel_irqchip=3Doff <-> kernel_irqchip=
+=3Don
+
+
+* Caveats
+
+Migration still needs some care to make sure all HW states are
+captured correctly. Extra quiescence points are possibly needed,
+to turn off/on the XIVE configuration under KVM.
+
+KVM device reset works well enough but has consequences on MMU
+migration. Probably an ordering problem.
+
+
+* Github
+=20
+QEMU:
+
+  https://github.com/legoater/qemu/commits/xive
+
+Linux/KVM (to be sent later on):
+
+  https://github.com/legoater/linux/commits/xive
+
+Thanks,
+
+C.
+
+ Changes since v2 :
+
+ - added support for Store EOI
+ - added support for two page ESB MMIO setting like on KVM
+ - introduced the XiveFabric interface
+ - introduced spapr_xive_mmio_unmap()
+ - KVM support
+
+C=C3=A9dric Le Goater (35):
+  ppc/xive: introduce a XIVE interrupt source model
+  ppc/xive: add support for the LSI interrupt sources
+  ppc/xive: introduce the XiveFabric interface
+  spapr/xive: introduce a XIVE interrupt controller for sPAPR
+  spapr/xive: add a single source block to the sPAPR XIVE model
+  spapr/xive: introduce a XIVE interrupt presenter model
+  spapr/xive: introduce the XIVE Event Queues
+  spapr: push the XIVE EQ data in OS event queue
+  spapr: notify the CPU when the XIVE interrupt priority is more
+    privileged
+  spapr: add support for the SET_OS_PENDING command (XIVE)
+  spapr: introduce a 'xive_exploitation' option to enable XIVE
+  spapr: add a sPAPRXive object to the machine
+  spapr: add hcalls support for the XIVE exploitation interrupt mode
+  spapr: add device tree support for the XIVE exploitation mode
+  sysbus: add a sysbus_mmio_unmap() helper
+  spapr: introduce a helper to map the XIVE memory regions
+  spapr: add XIVE support to spapr_qirq()
+  spapr: introduce a spapr_icp_create() helper
+  spapr: toggle the ICP depending on the selected interrupt mode
+  spapr: add support to dump XIVE information
+  spapr: advertise XIVE exploitation mode in CAS
+  spapr: add classes for the XIVE models
+  target/ppc/kvm: add Linux KVM definitions for XIVE
+  spapr/xive: add common realize routine for KVM
+  spapr/xive: add KVM support
+  spapr/xive: add a XIVE KVM device to the machine
+  migration: discard non-migratable RAMBlocks
+  intc: introduce a CPUIntc interface
+  spapr/xive,xics: use the CPU_INTC handlers to reset KVM
+  spapr/xive,xics: reset KVM at machine reset
+  spapr/xive: raise migration priority of the machine
+  ppc/pnv: introduce a pnv_icp_create() helper
+  ppc: externalize ppc_get_vcpu_by_pir()
+  ppc/pnv: add XIVE support
+  ppc/pnv: add a PSI bridge model for POWER9 processor
+
+ default-configs/ppc64-softmmu.mak |    3 +
+ exec.c                            |   10 +
+ hw/core/sysbus.c                  |   10 +
+ hw/intc/Makefile.objs             |    5 +-
+ hw/intc/intc.c                    |   26 +
+ hw/intc/pnv_xive.c                | 1234 +++++++++++++++++++++++++++++++=
+++++++
+ hw/intc/pnv_xive_regs.h           |  314 ++++++++++
+ hw/intc/spapr_xive.c              |  324 ++++++++++
+ hw/intc/spapr_xive_hcall.c        |  923 +++++++++++++++++++++++++++
+ hw/intc/spapr_xive_kvm.c          |  655 ++++++++++++++++++++
+ hw/intc/xics.c                    |    4 +
+ hw/intc/xics_kvm.c                |  108 +++-
+ hw/intc/xive.c                    | 1200 +++++++++++++++++++++++++++++++=
++++++
+ hw/ppc/pnv.c                      |   93 +--
+ hw/ppc/pnv_core.c                 |    2 +-
+ hw/ppc/pnv_psi.c                  |  399 +++++++++++-
+ hw/ppc/ppc.c                      |   16 +
+ hw/ppc/spapr.c                    |  264 +++++++-
+ hw/ppc/spapr_cpu_core.c           |   55 +-
+ hw/ppc/spapr_hcall.c              |    6 +
+ hw/ppc/spapr_rtas.c               |    2 -
+ include/exec/cpu-common.h         |    1 +
+ include/hw/intc/intc.h            |   21 +
+ include/hw/ppc/pnv.h              |   37 +-
+ include/hw/ppc/pnv_psi.h          |   50 +-
+ include/hw/ppc/pnv_xive.h         |   89 +++
+ include/hw/ppc/pnv_xscom.h        |    5 +
+ include/hw/ppc/ppc.h              |    1 +
+ include/hw/ppc/spapr.h            |   21 +-
+ include/hw/ppc/spapr_cpu_core.h   |    2 +
+ include/hw/ppc/spapr_xive.h       |   93 +++
+ include/hw/ppc/xics.h             |    1 +
+ include/hw/ppc/xive.h             |  269 ++++++++
+ include/hw/ppc/xive_regs.h        |  187 ++++++
+ include/hw/sysbus.h               |    1 +
+ include/migration/vmstate.h       |    2 +
+ linux-headers/asm-powerpc/kvm.h   |   18 +
+ linux-headers/linux/kvm.h         |    5 +
+ migration/ram.c                   |   42 +-
+ target/ppc/kvm.c                  |    7 +
+ target/ppc/kvm_ppc.h              |    6 +
+ 41 files changed, 6414 insertions(+), 97 deletions(-)
+ create mode 100644 hw/intc/pnv_xive.c
+ create mode 100644 hw/intc/pnv_xive_regs.h
+ create mode 100644 hw/intc/spapr_xive.c
+ create mode 100644 hw/intc/spapr_xive_hcall.c
+ create mode 100644 hw/intc/spapr_xive_kvm.c
+ create mode 100644 hw/intc/xive.c
+ create mode 100644 include/hw/ppc/pnv_xive.h
+ create mode 100644 include/hw/ppc/spapr_xive.h
+ create mode 100644 include/hw/ppc/xive.h
+ create mode 100644 include/hw/ppc/xive_regs.h
+
+--=20
+2.13.6
