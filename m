@@ -1,21 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36003)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1f999P-0003F5-07
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:58:59 -0400
+	(envelope-from <clg@kaod.org>) id 1f99CG-0005eH-8u
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:02:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1f999L-0001YH-TH
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:58:59 -0400
-Date: Thu, 19 Apr 2018 14:58:40 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180419145840.324602ff.cohuck@redhat.com>
-In-Reply-To: <20180419143318.4e24edaf@redhat.com>
-References: <20180419072123.682-1-david@gibson.dropbear.id.au>
-	<20180419143318.4e24edaf@redhat.com>
+	(envelope-from <clg@kaod.org>) id 1f99C5-0002sO-Vq
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:01:56 -0400
+Received: from 10.mo69.mail-out.ovh.net ([46.105.73.241]:58264)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1f99Bm-0002hx-3Y
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:01:45 -0400
+Received: from player792.ha.ovh.net (unknown [10.109.105.122])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 6701113AF3
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 15:01:24 +0200 (CEST)
+References: <6768575f-27e0-1277-3e7e-56ec44298e6a@kaod.org>
+	<1513896817.2743.63.camel@kernel.crashing.org>
+	<683d0912-ad48-927c-8235-5358417be44c@kaod.org>
+	<1516187433.31850.189.camel@kernel.crashing.org>
+	<2226ed5e-f666-8060-2edd-998d2f5107ed@kaod.org>
+	<1516224472.31850.193.camel@kernel.crashing.org>
+	<20180211080831.GC11634@umbus.fritz.box>
+	<1518389717.2312.245.camel@kernel.crashing.org>
+	<20180412051653.GO9425@umbus.fritz.box>
+	<d5ed04f5-6b8e-6844-eadb-badfb7c6bd73@kaod.org>
+	<20180416042914.GD20551@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <a5c8b965-779e-cc4a-5545-1e1b649f880e@kaod.org>
+Date: Thu, 19 Apr 2018 15:01:18 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH for-2.13] Clear mem_path if we
- fall back to anonymous RAM allocation
+In-Reply-To: <20180416042914.GD20551@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 02/19] spapr: introduce a skeleton for
+ the XIVE interrupt controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,67 +41,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, ehabkost@redhat.com, David Hildenbrand <david@redhat.com>, groug@kaod.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, pbonzini@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 
-On Thu, 19 Apr 2018 14:33:18 +0200
-Igor Mammedov <imammedo@redhat.com> wrote:
+On 04/16/2018 06:29 AM, David Gibson wrote:
+> On Thu, Apr 12, 2018 at 10:36:10AM +0200, C=E9dric Le Goater wrote:
+>> On 04/12/2018 07:16 AM, David Gibson wrote:
+>>> On Mon, Feb 12, 2018 at 09:55:17AM +1100, Benjamin Herrenschmidt wrot=
+e:
+>>>> On Sun, 2018-02-11 at 19:08 +1100, David Gibson wrote:
+>>>>> On Thu, Jan 18, 2018 at 08:27:52AM +1100, Benjamin Herrenschmidt wr=
+ote:
+>>>>>> On Wed, 2018-01-17 at 15:39 +0100, C=E9dric Le Goater wrote:
+>>>>>>> Migration is a problem. We will need both backend QEMU objects to=
+ be=20
+>>>>>>> available anyhow if we want to migrate. So we are back to the cur=
+rent=20
+>>>>>>> solution creating both QEMU objects but we can try to defer some =
+of the=20
+>>>>>>> KVM inits and create the KVM device on demand at CAS time.
+>>>>>>
+>>>>>> Do we have a way to migrate a piece of info from the machine *firs=
+t*
+>>>>>> that indicate what type of XICS/XIVE to instanciate ?
+>>>>>
+>>>>> Nope.  qemu migration doesn't work like that.  Yes, it should, and
+>>>>> everyone knows it, but changing it is a really long term project.
+>>>>
+>>>> Well, we have a problem then. It looks like Qemu broken migration is
+>>>> fundamentally incompatible with PAPR and CAS design...
+>>>
+>>> Hrm, the fit is very clunky certainly, but i think we can make it wor=
+k.
+>>>
+>>>> I know we don't migrate the configuration, that's not exactly what I
+>>>> had in mind tho... Can we have some piece of *data* from the machine=
+ be
+>>>> migrated first, and use it on the target to reconfigure the interrup=
+t
+>>>> controller before the stream arrives ?
+>>>
+>>> Sorta.. maybe.. but it would probably get really ugly if we don't
+>>> preserve the usual way object lifetimes work.
+>>>
+>>>> Otherwise, we have indeed no much choice but the horrible wart of
+>>>> creating both interrupt controllers with only one "active".
+>>>
+>>> I really think this is the way to go, warts and all.
+>>>
+>>
+>> Yes ... KVM makes it a little uglier.=20
+>>
+>> A KVM_DEVICE_DESTROY device is needed to cleanup the VM and a=20
+>> DISABLE_CAP to disconnect the vpcu from the current KVM XIVE/XICS=20
+>> device. I have used an extra arg on ENABLE_CAP for the moment.   =20
+>>
+>> At the QEMU level, we need to connect/reconnect at reset time to
+>> handle possible changes in CAS, and at post_load.
+>=20
+> Right.
 
-> On Thu, 19 Apr 2018 17:21:23 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
-> 
-> > If the -mem-path option is set, we attempt to map the guest's RAM from a
-> > file in the given path; it's usually used to back guest RAM with hugepages.
-> > If we're unable to (e.g. not enough free hugepages) then we fall back to
-> > allocating normal anonymous pages.  This behaviour can be surprising, but a
-> > comment in allocate_system_memory_nonnuma() suggests it's legacy behaviour
-> > we can't change.
-> > 
-> > What really isn't ok, though, is that in this case we leave mem_path set.
-> > That means functions which attempt to determine the pagesize of main RAM
-> > can erroneously think it is hugepage based on the requested path, even
-> > though it's not.
-> > 
-> > This is particular bad for the pseries machine type.  KVM HV limitations
-> > mean the guest can't use pagesizes larger than the host page size used to
-> > back RAM.  That means that such a fallback, rather than merely giving
-> > poorer performance that expected will cause the guest to freeze up early in
-> > boot as it attempts to use large page mappings that can't work.
-> > 
-> > This patch addresses the problem by clearing the mem_path variable when we
-> > fall back to anonymous pages, meaning that subsequent attempts to
-> > determine the RAM page size will get an accurate result.
-> > 
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
-> >  numa.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > Paolo et al, as with my earlier patches adding some extensions to the
-> > helpers for determining backing page sizes, if there are no objections
-> > can I get an ack to merge this via my ppc tree?
-> > 
-> > diff --git a/numa.c b/numa.c
-> > index 1116c90af9..78a869e598 100644
-> > --- a/numa.c
-> > +++ b/numa.c
-> > @@ -469,6 +469,7 @@ static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
-> >              /* Legacy behavior: if allocation failed, fall back to
-> >               * regular RAM allocation.
-> >               */
-> > +            mem_path = NULL;
-> >              memory_region_init_ram_nomigrate(mr, owner, name, ram_size, &error_fatal);
-> >          }
-> >  #else  
-> 
-> mem_path is also used by kvm_s390_apply_cpu_model(),
-> and in ccw_init() memory is initialized before CPUs are
-> so if QEM was started with -mem-path, then before patch
-> created CPU won't have CMM enabled and print warning:
->   
->  "CMM will not be enabled because it is not compatible with hugetlbfs."
-> 
-> and after patch it might enable CMM if we clear mem_path.
-> So question is do we care about this?
+v3 uses the same 'reset' function to setup the interrupts at machine=20
+reset time and at post_load. Keep that in mind. May be we should have=20
+distinct routines.
+=20
+>=20
+>> Destroying the MemoryRegion is a bit problematic, I have not
+>> found a common layout compatible with both the emulated mode=20
+>> (std IO regions) and the KVM mode (ram device regions)
+>=20
+> That sounds awkward, I guess we'll discuss the details of this later.
 
-I don't quite remember the cmm semantics here -- Christian?
+I have fixed that in v3.
+
+> Btw, a secondary advantage of starting off with XIVE only under a
+> different machine type is that we can declare that one not to be
+> migration stable until we're ready.  So we can merge something that's
+> ok to experiment with, but reserve the right to incompatibly change
+> the migration format until we're confident we're ready and can merge
+> it into the "stable" machine type.
+
+Reseting KVM devices is not the most complex feature to support but=20
+it seems to have an impact on migration. So we might need the=20
+non-migratable machine type to fix that. Let's see how v3 is welcomed
+or not.
+ =20
+=20
+Thanks,
+
+C.
