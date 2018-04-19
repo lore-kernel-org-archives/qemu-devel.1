@@ -1,26 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39401)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zongbox@gmail.com>) id 1f95rg-0007SR-2c
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 05:28:29 -0400
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1f98rt-0006BF-El
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:40:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zongbox@gmail.com>) id 1f95re-0008U9-J9
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 05:28:28 -0400
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:34212)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zongbox@gmail.com>) id 1f95re-0008To-9U
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 05:28:26 -0400
-Received: by mail-io0-x244.google.com with SMTP id d6-v6so5838030iog.1
-	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 02:28:26 -0700 (PDT)
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1f98rp-0005SW-AQ
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:40:53 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59194
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
+	id 1f98rp-0005SB-4f
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:40:49 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w3JCaQOa034500
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 08:40:48 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2hetqwt05q-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 08:40:48 -0400
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
+	Thu, 19 Apr 2018 13:40:46 +0100
+References: <1524054707-20663-1-git-send-email-thuth@redhat.com>
+	<1524054707-20663-4-git-send-email-thuth@redhat.com>
+	<bc5533dc-9471-7dac-6aba-9014e9961376@linux.vnet.ibm.com>
+	<b0bb6918-0047-9a53-b03f-bff5669daaaa@redhat.com>
+From: Viktor VM Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Date: Thu, 19 Apr 2018 14:40:42 +0200
 MIME-Version: 1.0
-In-Reply-To: <3EFD5845-5CE7-45F5-AE4C-0C86CAFAA200@sifive.com>
-References: <CA+ZOyaj_4my=u4-MkAbyoee5ORnRq6nyaU+HhX1K6t2+Cn5RHg@mail.gmail.com>
-	<3EFD5845-5CE7-45F5-AE4C-0C86CAFAA200@sifive.com>
-From: Zong Li <zongbox@gmail.com>
-Date: Thu, 19 Apr 2018 17:28:24 +0800
-Message-ID: <CA+ZOyajL25Gfz_NdcG+MxDAZb9qstjNo2sD_ExzX0fATaDg7HQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [sw-dev] The problem of write misa on QEMU and BBL
+In-Reply-To: <b0bb6918-0047-9a53-b03f-bff5669daaaa@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Message-Id: <2d59a139-3bdd-4b4e-882c-5cf845488eda@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v1 for-2.13 3/4] pc-bios/s390-ccw/net: Add
+ support for pxelinux-style config files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,97 +46,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: Zong Li <zong@andestech.com>, Andrew Waterman <andrew@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, RISC-V SW Dev <sw-dev@groups.riscv.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>
+To: Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
+Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>
 
-2018-04-19 12:43 GMT+08:00 Michael Clark <mjc@sifive.com>:
-> Hi Zong,
->
->> On 19/04/2018, at 2:40 PM, Zong Li <zongbox@gmail.com> wrote:
->>
->> Hi all,
->>
->> For BBL part, in fp_init at machine/minit.c,
->> it will clear the D and F bits of misa register, and assertion that
->> the bits is cleared.
->> But the misa is WARL register, so there is no effect for writing it,
->> and the assertion not be true.
->> So is there has necessary to do that if toolchain not support D and F ex=
-tension?
->>
->> For QEMU part, when writing misa, it will trigger the illegal
->> instruction exception, but I think that the WARL allow write behavior?
->
-> QEMU in the riscv-all branch should have WARL behavior.
->
-> - https://github.com/riscv/riscv-qemu/commits/riscv-all
->
-> There is a bug in upstream. We have submitted patches to fix the issue fo=
-r review on the qemu-devel mailing list. The patch series will be submitted=
- for upstream review again shortly. We were holding off on the series as we=
- didn=E2=80=99t classify it as a =E2=80=9Ccritical bug=E2=80=9D as QEMU was=
- in soft-freeze for 2.12 and we weren=E2=80=99t able to get review in time =
-to include this fix in the 2.12 release.
->
-> See =E2=80=9CNo traps on writes to misa,minstret,mcycle"
->
-> - https://github.com/riscv/riscv-qemu/commits/qemu-2.13-for-upstream
->
-> The history is that there were several unimplemented CSRs that had printf=
- followed by exit. Richard Henderson said we should fix this. I changed sev=
-eral CSRs to cause illegal instruction traps instead of calling exit. That =
-was a mistake as CSRs that don=E2=80=99t support write are WARL (Write Any =
-Read Legal). It was certainly better than having the simulation exit as a c=
-pu doesn=E2=80=99t typically have a way to =E2=80=9Dexit=E2=80=9D like a C =
-program, nevertheless trapping was wrong. My mistake. See here for the hist=
-ory:
->
-> - https://github.com/riscv/riscv-qemu/blob/ff36f2f77ec3e6a6211c63bfe1707e=
-c057b12f7d/target-riscv/op_helper.c
->
-> The implementation in the current tree is quite different. We have recent=
-ly made the CSR system more modular so that with minor changes, custom CPUs=
- will be able to hook their own control and status registers.
->
-> - https://github.com/riscv/riscv-qemu/blob/qemu-2.13-for-upstream/target/=
-riscv/csr.c#L780-L867
->
-> See these changes:
->
-> - https://github.com/riscv/riscv-qemu/commit/9d9c1bfef911c520a35bd3f8c0ed=
-2e14cc96bbb7
-> - https://github.com/riscv/riscv-qemu/commit/b5a4cd79ce6c7fbb65fdcf078fb9=
-a8391da1d6b1
->
-> We know have a flexible system that will allow implementations to hook pe=
-r-cpu control and status registers, and we have predicates that make CSRs a=
-ppear on some processor but not on others. i.e. if misa.S is not present, t=
-hen S-mode s* CSRs will trap. Sometimes WARL is the correct behaviour, but =
-sometimes trapping is the correct behaviour i.e. if the processor does not =
-implement S-mode.
->
-> misa traps on write should only affect bootloaders as Supervisor=E2=80=99=
-s like Linux don=E2=80=99t yet have access to the isa register. It=E2=80=99=
-s not a major issuse.
->
-> Michael.
+On 19.04.2018 10:17, Thomas Huth wrote:
+> On 19.04.2018 09:41, Viktor VM Mihajlovski wrote:
+>> On 18.04.2018 14:31, Thomas Huth wrote:
+>>> Since it is quite cumbersome to manually create a combined kernel with
+>>> initrd image for network booting, we now support loading via pxelinux
+>>> configuration files, too. In these files, the kernel, initrd and command
+>>> line parameters can be specified seperately, and the firmware then takes
+>>> care of glueing everything together in memory after the files have been
+>>> downloaded.
+[...]
+>>> +static int net_try_direct_tftp_load(filename_ip_t *fn_ip)
+>>> +{
+>>> +    int rc;
+>>> +    void *baseaddr = (void *)0x2000;  /* Load right after the low-core */
+>>> +
+>>> +    rc = tftp_load(fn_ip, baseaddr, KERNEL_MAX_SIZE - (long)baseaddr);
+>>> +
+>>> +    if (rc > 0 && rc < sizeof(cfgbuf) - 1) {
+>>> +        /* Check whether it is a configuration file instead of a kernel */
+>> That's interesting because treating the bootfile as pxe-ish config is
+>> what DPM does. Which means that with this change the processor
+>> architecture type 0x1f (Basic) will turn into a superset of 0x20
+>> (Extended).
+> 
+> Is there any reference available what "basic" and "extended" exactly
+> mean? I just know that there are these two values registered by you at
+> the IANA:
+> 
+> https://www.iana.org/assignments/dhcpv6-parameters/dhcpv6-parameters.xhtml#processor-architecture
+> 
+> ... but I haven't seen a description of the differences of these two
+> values yet.
+> 
+Yep, the IANA stuff is pretty terse for all architectures. In a
+nutshell: 0x1f is standard DHCP-based boot (bootfile is a single
+executable binary) and 0x20 serves a pxe-style config file instead.
+In fact, "processor architecture identifier" is a misnomer, as it
+describes a pair of processor architecture and firmware.
+Since the QEMU firmware has two significant extensions now (insfile and
+direct config file loading), it might be worthwhile to add a new
+identifier value (say s390 QEMU PC-BIOS or similar) announcing the new
+capabilities, so that a boot server admin can setup her system accordingly.
+>> I guess this should be documented somewhere(TM) to avoid
+>> confusion.
+> 
+> I plan to update https://wiki.qemu.org/Features/S390xNetworkBoot once
+> the patches have been merged upstream.
+> 
+sounds good.
+[...]
 
-Hi Michael,
-
-Thanks for the information. The new CSR system is helpful for custom
-CPU such as ours. Thanks.
-
-In the future, maybe we can do something like this in BBL for flexible
-custom platform which has own device to control the timer, ipi and so
-on.
-
-Back to the misa problem in BBL, at fp_init in BBL initial phrase, the
-assertion will has problem because the bits of misa will not be
-cleared.
-
-the code piece like below:
-    uintptr_t fd_mask =3D (1 << ('F' - 'A')) | (1 << ('D' - 'A'));
-    clear_csr(misa, fd_mask);
-    assert(!(read_csr(misa) & fd_mask));
-
-I think that the assertion is not necessary even the clear misa.
+-- 
+Regards,
+  Viktor Mihajlovski
