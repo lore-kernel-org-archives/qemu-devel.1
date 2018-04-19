@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44494)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <saipava@xilinx.com>) id 1f92Zy-0001Ws-Ns
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 01:58:00 -0400
+	(envelope-from <armbru@redhat.com>) id 1f92je-0004Pt-1Z
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 02:07:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <saipava@xilinx.com>) id 1f92Zv-00037Q-Il
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 01:57:58 -0400
-Received: from mail-sn1nam02on0066.outbound.protection.outlook.com
-	([104.47.36.66]:51664
-	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <saipava@xilinx.com>) id 1f92Zv-000375-4g
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 01:57:55 -0400
-From: Sai Pavan Boddu <saipava@xilinx.com>
-Date: Thu, 19 Apr 2018 05:57:51 +0000
-Message-ID: <MWHPR02MB24780E443FB1196FED822416CAB50@MWHPR02MB2478.namprd02.prod.outlook.com>
-References: <1524037298-23401-1-git-send-email-saipava@xilinx.com>
-	<1524037298-23401-2-git-send-email-saipava@xilinx.com>
-	<CAAYMZQt0-7=mj1m6nH74cZjmG3QtafiKp9bOXGFM=QuAawDVDA@mail.gmail.com>
-In-Reply-To: <CAAYMZQt0-7=mj1m6nH74cZjmG3QtafiKp9bOXGFM=QuAawDVDA@mail.gmail.com>
-Content-Language: en-US
+	(envelope-from <armbru@redhat.com>) id 1f92ja-0001NY-TA
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 02:07:58 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48898 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1f92ja-0001N4-Nw
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 02:07:54 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 07460EAEAB
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 06:07:43 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180417133602.23832-1-marcandre.lureau@redhat.com>
+	<20180417133602.23832-2-marcandre.lureau@redhat.com>
+	<ea5c5be8-2e0f-ed00-8ce1-aee6d6e117d4@redhat.com>
+	<87po2wsbu6.fsf@dusky.pond.sub.org>
+	<444fc8f7-b86a-6b5b-f49d-34b9608164e6@redhat.com>
+Date: Thu, 19 Apr 2018 08:07:37 +0200
+In-Reply-To: <444fc8f7-b86a-6b5b-f49d-34b9608164e6@redhat.com> (Eric Blake's
+	message of "Wed, 18 Apr 2018 12:04:01 -0500")
+Message-ID: <87fu3rybiu.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] xilinx_spips: send dummy cycles
- only if cmd requires it
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 1/5] qobject: ensure base is at offset 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,67 +36,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: francisco iglesias <frasse.iglesias@gmail.com>
-Cc: "alistair@alistair23.me" <alistair@alistair23.me>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Edde <edgar.iglesias@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com
 
-SEkgRnJhbmNpc28sDQoNCkZyb206IGZyYW5jaXNjbyBpZ2xlc2lhcyBbbWFpbHRvOmZyYXNzZS5p
-Z2xlc2lhc0BnbWFpbC5jb21dDQpTZW50OiBUaHVyc2RheSwgQXByaWwgMTksIDIwMTggMzozOSBB
-TQ0KVG86IFNhaSBQYXZhbiBCb2RkdSA8c2FpcGF2YUB4aWxpbnguY29tPg0KQ2M6IGFsaXN0YWly
-QGFsaXN0YWlyMjMubWU7IFBldGVyIENyb3N0aHdhaXRlIDxjcm9zdGh3YWl0ZS5wZXRlckBnbWFp
-bC5jb20+OyBQZXRlciBNYXlkZWxsIDxwZXRlci5tYXlkZWxsQGxpbmFyby5vcmc+OyBFZGRlIDxl
-ZGdhci5pZ2xlc2lhc0BnbWFpbC5jb20+OyBxZW11LWRldmVsQG5vbmdudS5vcmcgRGV2ZWxvcGVy
-cyA8cWVtdS1kZXZlbEBub25nbnUub3JnPg0KU3ViamVjdDogUmU6IFtRZW11LWRldmVsXSBbUEFU
-Q0ggdjIgMS8xXSB4aWxpbnhfc3BpcHM6IHNlbmQgZHVtbXkgY3ljbGVzIG9ubHkgaWYgY21kIHJl
-cXVpcmVzIGl0DQoNCkhpIFNhaSwNCg0KQWJvdXQgdGhlIHN1YmplY3QsIHdoYXQgZG8geW91IHRo
-aW5rIGFib3V0IGNoYW5naW5nIGl0IHRvIGJlbG93Pw0KeGlsaW54X3NwaXBzOiBDb3JyZWN0IFNO
-T09QX05PTkUgc3RhdGUgd2hlbiBmbHVzaGluZyB0aGUgdHhmaWZvDQoNCk9uIDE4IEFwcmlsIDIw
-MTggYXQgMDk6NDEsIFNhaSBQYXZhbiBCb2RkdSA8c2FpLnBhdmFuLmJvZGR1QHhpbGlueC5jb208
-bWFpbHRvOnNhaS5wYXZhbi5ib2RkdUB4aWxpbnguY29tPj4gd3JvdGU6DQpGb3IgYWxsIHRoZSBj
-b21tYW5kcywgd2hpY2ggZG8gbm90IGhhdmUgYW4gZW50cnkgaW4NCnhpbGlueF9zcGlwc19udW1f
-ZHVtbWllcywgcHJlc2VudCBsb2dpYyBzZW5kcyBkdW1teSBjeWNsZXMgd2hlbiBldmVyIHdlDQph
-cmUgaW4gU05PT1BfTk9ORSBzdGF0ZSwgZml4IGl0IHRvIG9ubHkgc2VuZCBkdW1teSBjeWNsZXMg
-aWYgdGhlIGNtZA0KcmVxdWlyZXMgdGhlbS4NCkl0IGZlZWxzIGxpa2UgYmVsb3cgc2VudGVuY2Ug
-Z29lcyB0b2dldGhlciB3aXRoIHRoZSAnZml4JyBhYm92ZSBzbyBtYXliZSBpdCBjb3VsZCBjb21l
-IGRpcmVjdGx5IGFmdGVyPyAoaS5lLiBubyBuZXcgc2VjdGlvbiBidXQgbWF5YmUgd2l0aCBhbiAn
-YWxzbycgYWZ0ZXIgJ2hhbmRsZSBpcycpDQpTTk9PUF9OT05FIHN0YXRlIGhhbmRsZSBpcyBtb3Zl
-ZCBhYm92ZSAocHJldmlvdXNseSBpdHMgcGFydCBvZiBkZWZhdWx0IGVsc2UNCnMvYWJvdmUvYWJv
-dmUgaW4gdGhlIGlmIGxhZGRlci8NCnMvaXRzIHBhcnQgb2YgZGVmYXVsdC9pdCB3YXMgcGFydCBv
-ZiB0aGUgZGVmYXVsdC8NCmNhc2UpLCBhcyBpdHMgc2FtZSBhcyBTTk9PUF9TVFJJUFBJTkcgZHVy
-aW5nIGRhdGEgY3ljbGVzLg0Kcy9pdHMvaXQncy8NCg0KU2lnbmVkLW9mZi1ieTogU2FpIFBhdmFu
-IEJvZGR1IDxzYWlwYXZhQHhpbGlueC5jb208bWFpbHRvOnNhaXBhdmFAeGlsaW54LmNvbT4+DQot
-LS0NClRPRE86IE1heWJlIHdlIGNvdWxkIGRlbGV0ZSB0aGUgU05PT1BfTk9ORSBzdGF0ZSBhcyBp
-dCBzZWVtcyB0byBiZQ0Kc2FtZSBhcyBTTk9PUF9TVFJJUFBJTkcNCkkgYWdyZWUgdGhhdCBhIGNs
-ZWFudXAgY29tbWl0IGxhdGVyIG9uIGNvdWxkIGJlIGNvbnNpZGVyZWQsIGJ1dCBJIHRoaW5rIGl0
-J3MgYmV0dGVyIG5vdCB0byBpbmNsdWRlIHRoZSB0b2RvIGluIHRoZSBjb21taXQgbWVzc2FnZSBv
-ZiB0aGlzIG9uZSBzbyBjb3VsZCB3ZSByZW1vdmUgaXQ/DQoNCg0KIGh3L3NzaS94aWxpbnhfc3Bp
-cHMuYyB8IDYgKysrKy0tDQogMSBmaWxlIGNoYW5nZWQsIDQgaW5zZXJ0aW9ucygrKSwgMiBkZWxl
-dGlvbnMoLSkNCg0KZGlmZiAtLWdpdCBhL2h3L3NzaS94aWxpbnhfc3BpcHMuYyBiL2h3L3NzaS94
-aWxpbnhfc3BpcHMuYw0KaW5kZXggNDI2Zjk3MS4uNGY2NzYwZCAxMDA2NDQNCi0tLSBhL2h3L3Nz
-aS94aWxpbnhfc3BpcHMuYw0KKysrIGIvaHcvc3NpL3hpbGlueF9zcGlwcy5jDQpAQCAtNjE2LDcg
-KzYxNiw4IEBAIHN0YXRpYyB2b2lkIHhpbGlueF9zcGlwc19mbHVzaF90eGZpZm8oWGlsaW54U1BJ
-UFMgKnMpDQogICAgICAgICBpZiAoZmlmbzhfaXNfZW1wdHkoJnMtPnR4X2ZpZm8pKSB7DQogICAg
-ICAgICAgICAgeGlsaW54X3NwaXBzX3VwZGF0ZV9peHIocyk7DQogICAgICAgICAgICAgcmV0dXJu
-Ow0KLSAgICAgICAgfSBlbHNlIGlmIChzLT5zbm9vcF9zdGF0ZSA9PSBTTk9PUF9TVFJJUElORykg
-ew0KKyAgICAgICAgfSBlbHNlIGlmIChzLT5zbm9vcF9zdGF0ZSA9PSBTTk9PUF9TVFJJUElORyB8
-fA0KKyAgICAgICAgICAgICAgICAgICBzLT5zbm9vcF9zdGF0ZSA9PSBTTk9PUF9OT05FKSB7DQog
-ICAgICAgICAgICAgZm9yIChpID0gMDsgaSA8IG51bV9lZmZlY3RpdmVfYnVzc2VzKHMpOyArK2kp
-IHsNCiAgICAgICAgICAgICAgICAgdHhfcnhbaV0gPSBmaWZvOF9wb3AoJnMtPnR4X2ZpZm8pOw0K
-ICAgICAgICAgICAgIH0NCkBAIC02MjYsMTEgKzYyNywxMiBAQCBzdGF0aWMgdm9pZCB4aWxpbnhf
-c3BpcHNfZmx1c2hfdHhmaWZvKFhpbGlueFNQSVBTICpzKQ0KICAgICAgICAgICAgIGZvciAoaSA9
-IDA7IGkgPCBudW1fZWZmZWN0aXZlX2J1c3NlcyhzKTsgKytpKSB7DQogICAgICAgICAgICAgICAg
-IHR4X3J4W2ldID0gdHg7DQogICAgICAgICAgICAgfQ0KLSAgICAgICAgfSBlbHNlIHsNCisgICAg
-ICAgIH0gZWxzZSBpZiAocy0+Y21kX2R1bW1pZXMgPiAwKSB7DQpUaGUgdmFyaWFibGUgc25vb3Bf
-c3RhdGUgYWxyZWFkeSBrZWVwcyB0cmFjayBvZiB0aGUgZHVtbXkgY3ljbGVzLCB0aGUgc2FtZSB0
-aGUgJ2Vsc2UnIHRvICdlbHNlIGlmJyBjaGFuZ2UgYWJvdmUgdG9nZXRoZXIgd2l0aCB0aGUgJ2Nt
-ZF9kdW1taWVzJyBkZWNyZW1lbnRhdGlvbiBiZWxvdyBkb2VzLCBjb3VsZCB3ZSB1bmRvIHRoZXNl
-IHR3byBjaGFuZ2VzIHNpbmNlIGl0IGlzIGFscmVhZHkgaGFuZGxlZD8NCltTYWkgUGF2YW4gQm9k
-ZHVdIFllcywgeW91IGFyZSByaWdodC4gQWZ0ZXIgd2UgbW92ZWQgU05PT1BfTk9ORSBhYm92ZS4g
-V2UgZG9u4oCZdCBuZWVkIGFuIG9mIHRoZXNlIGNoYW5nZXMgaGVyZS4gV29uZGVyZnVsIHRoYXQg
-aXQgcGF0Y2ggZ290IG1pbmltaXplZCB0byBzaW5nbGUgbGluZSBub3cuDQoNClJlZ2FyZHMsDQpT
-YWkgUGF2YW4NCg0KVGhhbmsgeW91IQ0KDQpCZXN0IHJlZ2FyZHMsDQpGcmFuY2lzY28gSWdsZXNp
-YXMNCg0KICAgICAgICAgICAgIC8qIEV4dHJhY3QgYSBkdW1teSBieXRlIGFuZCBnZW5lcmF0ZSBk
-dW1teSBjeWNsZXMgYWNjb3JkaW5nIHRvIHRoZQ0KICAgICAgICAgICAgICAqIGxpbmsgc3RhdGUg
-Ki8NCiAgICAgICAgICAgICB0eCA9IGZpZm84X3BvcCgmcy0+dHhfZmlmbyk7DQogICAgICAgICAg
-ICAgZHVtbXlfY3ljbGVzID0gOCAvIHMtPmxpbmtfc3RhdGU7DQorICAgICAgICAgICAgcy0+Y21k
-X2R1bW1pZXMtLTsNCiAgICAgICAgIH0NCg0KICAgICAgICAgZm9yIChpID0gMDsgaSA8IG51bV9l
-ZmZlY3RpdmVfYnVzc2VzKHMpOyArK2kpIHsNCi0tDQoyLjcuNA0KDQoNCg==
+Eric Blake <eblake@redhat.com> writes:
+
+> On 04/18/2018 11:45 AM, Markus Armbruster wrote:
+>
+>>> Might also be worth mentioning that this explicitly guarantees that
+>>> existing casts work correctly (even though we'd prefer to get rid of
+>>> such casts in any location except the qobject.h macros); Markus pointed out:
+>>>
+>>>>> Uh, there's another reason: existing type casts from QObject * to
+>>>>> subtypes.  I just spotted one in tests/check-qdict.c:
+>>>>>
+>>>>>     dst = (QDict *)qdict_crumple(src, &error_abort);
+>> 
+>> As far as I'm concerned, that's the real reason.  The simplification
+>> plus the check to make it safe seems like a wash.
+>> 
+>> The cast I spotted appears to be the only one, though:
+>> 
+>>     $ git-grep '(Q[A-Z][a-z]* \*)'
+>>     hmp.c:    qmp_device_add((QDict *)qdict, NULL, &err);
+>>     include/qapi/qmp/qobject.h:        return (QObject *)obj;
+>>     qobject/qobject.c:static void (*qdestroy[QTYPE__MAX])(QObject *) = {
+>>     tests/check-qdict.c:    dst = (QDict *)qdict_crumple(src, &error_abort);
+>> 
+>> The first two cast away const, the third isn't a type cast.  The fourth
+>> one should use qobject_to() instead, regardless of this patch.
+>> 
+>> Do we want to force base to come first anyway?
+>> 
+>> Where does PATCH 2 exploit "base first"?
+>
+> It doesn't, but PATCH 4 does:
+>
+>>  /**
+>>   * qobject_ref(): Increment QObject's reference count
+>> + *
+>> + * Returns: the same @obj. The type of @obj will be propagated to the
+>> + * return type.
+>>   */
+>> -#define qobject_ref(obj) qobject_ref_impl(QOBJECT(obj))
+>> +#define qobject_ref(obj) ((typeof(obj)) qobject_ref_impl(QOBJECT(obj)))
+
+Easy enough to fix:
+
+    #define qobject_ref(obj) ({                     \
+        typeof(obj) _obj = obj;                     \
+        qobject_ref_impl(QOBJECT(_obj));            \
+        _obj;                                       \
+    })
+
+Look ma, no type casts!
