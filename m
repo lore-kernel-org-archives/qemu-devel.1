@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33273)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f9CiM-0003SO-Hd
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:47:19 -0400
+	id 1f9CiN-0003TI-7a
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:47:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f9CiI-0007Uu-OH
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:47:18 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:40308)
+	id 1f9CiM-0007WH-2i
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:47:19 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:41458)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f9CiI-0007Ud-Ji
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:47:14 -0400
-Received: by mail-qk0-x243.google.com with SMTP id o64so5953555qkl.7
-	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 09:47:14 -0700 (PDT)
+	id 1f9CiL-0007WB-U9
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:47:18 -0400
+Received: by mail-qt0-x243.google.com with SMTP id d3-v6so6478408qth.8
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 09:47:17 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 19 Apr 2018 13:46:40 -0300
-Message-Id: <20180419164642.9536-6-f4bug@amsat.org>
+Date: Thu, 19 Apr 2018 13:46:41 -0300
+Message-Id: <20180419164642.9536-7-f4bug@amsat.org>
 In-Reply-To: <20180419164642.9536-1-f4bug@amsat.org>
 References: <20180419164642.9536-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH 5/7] avocado: Add an optional flag 'login'
- to get_console()
+Subject: [Qemu-devel] [RFC PATCH 6/7] avocado: Add a test parsing Linux
+ kernel booting console
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,62 +35,120 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>, Cleber Rosa <crosa@redhat.com>, Amador Pahim <apahim@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Zheng Xiang <xiang.zheng@linaro.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Alistair Francis <alistair23@gmail.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Alistair Francis <alistair23@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-Not all consoles require users to log in :/
+Booting an Alpha DP264 machine.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- tests/avocado/avocado_qemu/test.py | 23 ++++++++++++-----------
- 1 file changed, 12 insertions(+), 11 deletions(-)
+ tests/avocado/test_linux-boot-console.py      | 88 +++++++++++++++++++
+ .../parameters.yaml                           |  3 +
+ 2 files changed, 91 insertions(+)
+ create mode 100644 tests/avocado/test_linux-boot-console.py
+ create mode 100644 tests/avocado/test_linux-boot-console.py.data/parameters.yaml
 
-diff --git a/tests/avocado/avocado_qemu/test.py b/tests/avocado/avocado_qemu/test.py
-index 1ead917014..ac8ee6d250 100644
---- a/tests/avocado/avocado_qemu/test.py
-+++ b/tests/avocado/avocado_qemu/test.py
-@@ -244,7 +244,7 @@ class _VM(qemu.QEMUMachine):
-         super(_VM, self).__init__(qemu_bin, name=self.name, arch=arch)
-         logging.getLogger('QMP').setLevel(logging.INFO)
- 
--    def get_console(self, console_address=None, prompt=r"[\#\$] "):
-+    def get_console(self, console_address=None, prompt=r"[\#\$] ", login=True):
-         """
-         :param address: Socket address, can be either a unix socket path
-                         (string) or a tuple in the form (address, port)
-@@ -252,9 +252,6 @@ class _VM(qemu.QEMUMachine):
-         :param prompt: The regex to identify we reached the prompt.
-         """
- 
--        if not all((self.username, self.password)):
--            raise QEMULoginError('Username or password not set.')
--
-         if not self.is_running():
-             raise QEMULoginError('VM is not running.')
- 
-@@ -272,13 +269,17 @@ class _VM(qemu.QEMUMachine):
-             nc_cmd += ' -U %s' % console_address
- 
-         console = aexpect.ShellSession(nc_cmd)
--        try:
--            logging.info('Console: Waiting login prompt...')
--            _handle_prompts(console, self.username, self.password, prompt)
--            logging.info('Console: Ready!')
--        except:
--            console.close()
--            raise
-+        if login:
-+            if not all((self.username, self.password)):
-+                raise QEMULoginError('Username or password not set.')
+diff --git a/tests/avocado/test_linux-boot-console.py b/tests/avocado/test_linux-boot-console.py
+new file mode 100644
+index 0000000000..f54d10dd79
+--- /dev/null
++++ b/tests/avocado/test_linux-boot-console.py
+@@ -0,0 +1,88 @@
++# -*- coding: utf-8 -*-
++#
++# Boot a Linux kernel on the Malta board and check the serial console output
++#
++# Copyright (C) 2018 Philippe Mathieu-Daudé
++#
++# SPDX-License-Identifier: GPL-2.0-or-later
++#
++# Run with:
++#
++#   avocado run test_linux-boot-console.py \
++#     --mux-yaml test_linux-boot-console.py.data/parameters.yaml
++#     [--filter-by-tags arch_alpha ...]
 +
-+            try:
-+                logging.info('Console: Waiting login prompt...')
-+                _handle_prompts(console, self.username, self.password, prompt)
-+            except:
-+                console.close()
-+                raise
-+        logging.info('Console: Ready!')
- 
-         return console
- 
++import os
++import tempfile
++import hashlib
++import urllib2
++import gzip
++import shutil
++
++from avocado import skipUnless
++from avocado_qemu import test
++
++# XXX Use a cleaner CacheStorage or avocado.utils.[archive|kernel]?
++def cachedfile(url, cachedir='/tmp/mycachedir', gzip_compressed=False):
++    if not os.path.isdir(cachedir):
++        os.mkdir(cachedir)
++    key = hashlib.md5(url).hexdigest()
++    fbin = cachedir + "/" + key + ".bin"
++    if not os.path.isfile(fbin):
++        with open(cachedir + "/" + key + ".url", "w") as f:
++            f.write(url + '\n')
++        with open(fbin, "wb") as f:
++            content = urllib2.urlopen(url).read()
++            f.write(content)
++        if gzip_compressed:
++            fgz = cachedir + "/" + key + ".gz"
++            shutil.move(fbin, fgz)
++            with gzip.open(fgz, 'rb') as f_in, open(fbin, 'wb') as f_out:
++                shutil.copyfileobj(f_in, f_out)
++    return fbin
++
++
++class TestAlphaClipperBoot2_6(test.QemuTest):
++    """
++    :avocado: enable
++    :avocado: tags=arch_alpha
++    """
++    ARCH = "alpha"
++
++    def kernel_url(self):
++        return 'http://archive.debian.org/debian/dists/lenny/main/installer-alpha/current/images/cdrom/vmlinuz'
++
++    def setUp(self):
++        self.console_path = tempfile.mkstemp()[1]
++        kernel_path = cachedfile(self.kernel_url(), gzip_compressed=True)
++        self.vm._args.extend(['-machine', 'clipper'])
++        self.vm._args.extend(['-m', '64'])
++        self.vm._args.extend(['-kernel', kernel_path])
++        self.vm._args.extend(['-append', '"console=ttyS0 printk.time=0"'])
++        self.vm._args.extend(['-chardev', 'socket,id=srm,server,nowait,path=' + self.console_path])
++        self.vm._args.extend(['-serial', 'chardev:srm'])
++        # This kernel crashes without VGA display
++        self.vm._args.extend(['-vga', 'std'])
++
++    def test_boot_console(self):
++        """
++        :avocado: tags=uart,printk
++        """
++        # TODO use skipUnless()
++        if self.params.get('arch') != self.ARCH:
++            return
++
++        self.vm.launch(self.console_path)
++        console = self.vm.get_console(console_address=self.console_path, login=False)
++        # no filesystem provided on purpose, wait for the Kernel panic
++        bootlog = console.read_until_any_line_matches(["Kernel panic - not syncing: VFS: Unable to mount root fs"], timeout=30.0)[1]
++        console.close()
++        # check Super I/O
++        self.assertIn(u'ttyS0 at I/O 0x3f8 (irq = 4) is a 16550A', bootlog)
++        self.assertIn(u'ttyS1 at I/O 0x2f8 (irq = 3) is a 16550A', bootlog)
++        self.assertIn(u'i8042 KBD port at 0x60,0x64 irq 1', bootlog)
++        self.assertIn(u'i8042 AUX port at 0x60,0x64 irq 12', bootlog)
++        self.vm.shutdown()
++
++    def tearDown(self):
++        os.remove(self.console_path)
+diff --git a/tests/avocado/test_linux-boot-console.py.data/parameters.yaml b/tests/avocado/test_linux-boot-console.py.data/parameters.yaml
+new file mode 100644
+index 0000000000..ed8c08058c
+--- /dev/null
++++ b/tests/avocado/test_linux-boot-console.py.data/parameters.yaml
+@@ -0,0 +1,3 @@
++architecture: !mux
++    alpha:
++        arch: alpha
 -- 
 2.17.0
