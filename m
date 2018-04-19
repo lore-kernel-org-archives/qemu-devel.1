@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1f94n2-0001GF-JH
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:19:41 -0400
+	(envelope-from <thuth@redhat.com>) id 1f94oF-00028G-7e
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:20:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1f94n0-00020n-OK
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:19:36 -0400
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu, 19 Apr 2018 10:18:26 +0200
-Message-Id: <1524125906-146232-1-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1524061685-83305-5-git-send-email-imammedo@redhat.com>
-References: <1524061685-83305-5-git-send-email-imammedo@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1f94oD-0002rA-US
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:20:51 -0400
+References: <1524054707-20663-1-git-send-email-thuth@redhat.com>
+	<1524054707-20663-5-git-send-email-thuth@redhat.com>
+	<ac1ab286-38ab-66b0-612a-a487f7a314a0@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <10286787-1089-ffc4-d56a-616333bbf832@redhat.com>
+Date: Thu, 19 Apr 2018 10:20:46 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-2.13 v3 4/5] platform-bus-device: use
- device plug callback instead of machine_done notifier
+In-Reply-To: <ac1ab286-38ab-66b0-612a-a487f7a314a0@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 for-2.13 4/4] pc-bios/s390-ccw/net: Add
+ support for .INS config files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,440 +26,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: agraf@suse.de, david@gibson.dropbear.id.au, qemu-ppc@nongnu.org, peter.maydell@linaro.org, eric.auger@redhat.com, qemu-arm@nongnu.org
+To: Viktor VM Mihajlovski <mihajlov@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
+Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>
 
-platform-bus were using machine_done notifier to get and map
-(assign irq/mmio resources) dynamically added sysbus devices
-after all '-device' options had been processed.
-That however creates non obvious dependencies on ordering of
-machine_done notifiers and requires carefull line juggling
-to keep it working. For example see comment above
-create_platform_bus() and 'straitforward' arm_load_kernel()
-had to converted to machine_done notifier and that lead to
-yet another machine_done notifier to keep it working
-arm_register_platform_bus_fdt_creator().
+On 19.04.2018 10:02, Viktor VM Mihajlovski wrote:
+> On 18.04.2018 14:31, Thomas Huth wrote:
+>> The .INS config files can normally be found on CD-ROM ISO images,
+>> so by supporting these files, it is now possible to boot directly
+>> when the TFTP server is set up with the contents of such an CD-ROM
+>> image.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  pc-bios/s390-ccw/netmain.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 51 insertions(+)
+>>
+>> diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
+>> index fa62bfe..e52e17d 100644
+>> --- a/pc-bios/s390-ccw/netmain.c
+>> +++ b/pc-bios/s390-ccw/netmain.c
+>> @@ -441,6 +441,55 @@ static int net_try_pxelinux_cfgs(filename_ip_t *fn_ip)
+>>      return -1;
+>>  }
+>>
+>> +/**
+>> + * Load via information from a .INS file (which can be found on CD-ROMs
+>> + * for example)
+>> + */
+>> +static int handle_ins_cfg(filename_ip_t *fn_ip, char *cfg, int cfgsize)
+>> +{
+>> +    char *ptr;
+>> +    int rc = -1, llen;
+>> +    void *destaddr;
+>> +    char *insbuf = cfg;
+>> +
+>> +    ptr = strchr(insbuf, '\n');
+>> +    if (!ptr) {
+>> +        puts("Does not seem to be a valid .INS file");
+>> +        return -1;
+>> +    }
+>> +
+>> +    *ptr = 0;
+>> +    printf("\nParsing .INS file:\n %s\n", &insbuf[2]);
+>> +
+>> +    insbuf = ptr + 1;
+>> +    while (*insbuf && insbuf < cfg + cfgsize) {
+>> +        ptr = strchr(insbuf, '\n');
+>> +        if (ptr) {
+>> +            *ptr = 0;
+>> +        }
+>> +        llen = strlen(insbuf);
+>> +        if (!llen) {
+>> +            insbuf = ptr + 1;
+>> +            continue;
+>> +        }
+>> +        ptr = strchr(insbuf, ' ');
+>> +        if (!ptr) {
+>> +            puts("Missing space separator in .INS file");
+>> +            return -1;
+>> +        }
+>> +        *ptr = 0;
+>> +        strncpy((char *)fn_ip->filename, insbuf, sizeof(fn_ip->filename));
+>> +        destaddr = (char *)atol(ptr + 1);
+>> +        rc = tftp_load(fn_ip, destaddr, (long)_start - (long)destaddr);
+>> +        if (rc <= 0) {
+>> +            break;
+>> +        }
+>> +        insbuf += llen + 1;
+>> +    }
+>> +
+>> +    return rc;
+>> +}
+>> +
+>>  static int net_try_direct_tftp_load(filename_ip_t *fn_ip)
+>>  {
+>>      int rc;
+>> @@ -455,6 +504,8 @@ static int net_try_direct_tftp_load(filename_ip_t *fn_ip)
+>>          if (!strncasecmp("default", cfgbuf, 7) || !strncmp("# ", cfgbuf, 2)) {
+>>              /* Looks like it is a pxelinux.cfg */
+>>              return handle_pxelinux_cfg(fn_ip, cfgbuf, rc);
+>> +        } else if (!strncmp("* ", cfgbuf, 2)) {
+>> +            return handle_ins_cfg(fn_ip, cfgbuf, rc);
+>>          }
+>>      }
+>>
+> You could consider to move the magic matching code into a helper
+> function, I could imagine that the detection might grow more complex
+> over time and then could clutter the try-load code.
+> I.e. something like
+> 
+> typedef enum {
+> 	FT_UNKOWN,
+> 	FT_PXECFG,
+> 	FT_INSFILE,
+> } FileType;
+> 
+> static FileType probe_file_type(const char * cfgbuf, size_t cfgbuflen)
+> {
+>         ...
+>         if (!strncasecmp("default", cfgbuf, 7) || !strncmp("# ",
+>                           cfgbuf, 2)) {
+>             /* Looks like it is a pxelinux.cfg */
+>             return FT_PXECFG;
+>         } else if (!strncmp("* ", cfgbuf, 2)) {
+>             return FT_INSFILE;
+>         } else {
+> 	    return FT_UNKOWN;
+>         }
+> }
+> 
+> ...
+>   FileType ft = probe_file_type(cfgbuf, ...);
+>   switch (ft)
+>   {
+>      case FT_PXECFG:
+>        return handle_pxelinux_cfg(fn_ip, cfgbuf, rc);
+>        break;
+>      ...
+>      case FT_UNKNOWN:
+>        /* got to be a kernel */
+>        memmove(...);
+>        return rc;
+>   }
+> ...
 
-Instead of hiding resource assignment in platform-bus-device
-to magically initialize sysbus devices, use device plug
-callback and assign resources explicitly at board level
-at the moment each -device option is being processed.
+I agree that this might be a good refactoring if the list grows bigger,
+but as long as we only have these few entries here, it looks a little
+bit over-engineered to me, so I'd rather prefer to keep the code in its
+current shape right now.
 
-That adds a bunch of machine declaration boiler plate to
-e500plat board, similar to ARM/x86 but gets rid of hidden
-machine_done notifier and would allow to remove the dependent
-notifiers in ARM code simplifying it and making code flow
-easier to follow.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
----
-CC: agraf@suse.de
-CC: david@gibson.dropbear.id.au
-CC: qemu-ppc@nongnu.org
-CC: peter.maydell@linaro.org
-CC: eric.auger@redhat.com
-CC: qemu-arm@nongnu.org
-
-v2:
-  - don't save original MachineClass::get_hotplug_handler, just overwrite=
- it.
-    (there isn't any use case for chaining get_hotplug_handler() yet,
-     so keep things simple for now) (David Gibson <david@gibson.dropbear.=
-id.au>)
-  - s/hotpug/hotplug/ (Peter Maydell <peter.maydell@linaro.org>)
-  - ppc: rebase on top (ppc: e500: switch E500 based machines to full  ma=
-chine definition)
-v3:
-  - in virt_machine_device_plug_cb() check for vms->platform_bus_dev !=3D=
- NULL first
-    before doing more expensive cast check to SYS_BUS_DEVICE
-    (Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>)
----
- hw/ppc/e500.h             |  5 +++++
- include/hw/arm/virt.h     |  1 +
- include/hw/platform-bus.h |  4 ++--
- hw/arm/sysbus-fdt.c       |  3 ---
- hw/arm/virt.c             | 31 +++++++++++++++++++++++++++++++
- hw/core/platform-bus.c    | 29 +++++------------------------
- hw/ppc/e500.c             | 38 +++++++++++++++++---------------------
- hw/ppc/e500plat.c         | 31 +++++++++++++++++++++++++++++++
- 8 files changed, 92 insertions(+), 50 deletions(-)
-
-diff --git a/hw/ppc/e500.h b/hw/ppc/e500.h
-index 621403b..3fd9f82 100644
---- a/hw/ppc/e500.h
-+++ b/hw/ppc/e500.h
-@@ -2,11 +2,16 @@
- #define PPCE500_H
-=20
- #include "hw/boards.h"
-+#include "hw/platform-bus.h"
-=20
- typedef struct PPCE500MachineState {
-     /*< private >*/
-     MachineState parent_obj;
-=20
-+    /* points to instance of TYPE_PLATFORM_BUS_DEVICE if
-+     * board supports dynamic sysbus devices
-+     */
-+    PlatformBusDevice *pbus_dev;
- } PPCE500MachineState;
-=20
- typedef struct PPCE500MachineClass {
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index ba0c1a4..e4e3e46 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -91,6 +91,7 @@ typedef struct {
- typedef struct {
-     MachineState parent;
-     Notifier machine_done;
-+    DeviceState *platform_bus_dev;
-     FWCfgState *fw_cfg;
-     bool secure;
-     bool highmem;
-diff --git a/include/hw/platform-bus.h b/include/hw/platform-bus.h
-index a00775c..19e20c5 100644
---- a/include/hw/platform-bus.h
-+++ b/include/hw/platform-bus.h
-@@ -37,8 +37,6 @@ typedef struct PlatformBusDevice PlatformBusDevice;
- struct PlatformBusDevice {
-     /*< private >*/
-     SysBusDevice parent_obj;
--    Notifier notifier;
--    bool done_gathering;
-=20
-     /*< public >*/
-     uint32_t mmio_size;
-@@ -54,4 +52,6 @@ int platform_bus_get_irqn(PlatformBusDevice *platform_b=
-us, SysBusDevice *sbdev,
- hwaddr platform_bus_get_mmio_addr(PlatformBusDevice *pbus, SysBusDevice =
-*sbdev,
-                                   int n);
-=20
-+void platform_bus_link_device(PlatformBusDevice *pbus, SysBusDevice *sbd=
-ev);
-+
- #endif /* HW_PLATFORM_BUS_H */
-diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
-index d68e3dc..80ff70e 100644
---- a/hw/arm/sysbus-fdt.c
-+++ b/hw/arm/sysbus-fdt.c
-@@ -506,9 +506,6 @@ static void add_all_platform_bus_fdt_nodes(ARMPlatfor=
-mBusFDTParams *fdt_params)
-     dev =3D qdev_find_recursive(sysbus_get_default(), TYPE_PLATFORM_BUS_=
-DEVICE);
-     pbus =3D PLATFORM_BUS_DEVICE(dev);
-=20
--    /* We can only create dt nodes for dynamic devices when they're read=
-y */
--    assert(pbus->done_gathering);
--
-     PlatformBusFDTData data =3D {
-         .fdt =3D fdt,
-         .irq_start =3D irq_start,
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 94dcb12..9d761b5 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1087,6 +1087,7 @@ static void create_platform_bus(VirtMachineState *v=
-ms, qemu_irq *pic)
-     qdev_prop_set_uint32(dev, "mmio_size",
-         platform_bus_params.platform_bus_size);
-     qdev_init_nofail(dev);
-+    vms->platform_bus_dev =3D dev;
-     s =3D SYS_BUS_DEVICE(dev);
-=20
-     for (i =3D 0; i < platform_bus_params.platform_bus_num_irqs; i++) {
-@@ -1536,9 +1537,33 @@ static const CPUArchIdList *virt_possible_cpu_arch=
-_ids(MachineState *ms)
-     return ms->possible_cpus;
- }
-=20
-+static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
-+                                        DeviceState *dev, Error **errp)
-+{
-+    VirtMachineState *vms =3D VIRT_MACHINE(hotplug_dev);
-+
-+    if (vms->platform_bus_dev) {
-+        if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
-+            platform_bus_link_device(PLATFORM_BUS_DEVICE(vms->platform_b=
-us_dev),
-+                                     SYS_BUS_DEVICE(dev));
-+        }
-+    }
-+}
-+
-+static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *ma=
-chine,
-+                                                        DeviceState *dev=
-)
-+{
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
-+        return HOTPLUG_HANDLER(machine);
-+    }
-+
-+    return NULL;
-+}
-+
- static void virt_machine_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc =3D MACHINE_CLASS(oc);
-+    HotplugHandlerClass *hc =3D HOTPLUG_HANDLER_CLASS(oc);
-=20
-     mc->init =3D machvirt_init;
-     /* Start max_cpus at the maximum QEMU supports. We'll further restri=
-ct
-@@ -1557,6 +1582,8 @@ static void virt_machine_class_init(ObjectClass *oc=
-, void *data)
-     mc->cpu_index_to_instance_props =3D virt_cpu_index_to_props;
-     mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a15");
-     mc->get_default_cpu_node_id =3D virt_get_default_cpu_node_id;
-+    mc->get_hotplug_handler =3D virt_machine_get_hotplug_handler;
-+    hc->plug =3D virt_machine_device_plug_cb;
- }
-=20
- static const TypeInfo virt_machine_info =3D {
-@@ -1566,6 +1593,10 @@ static const TypeInfo virt_machine_info =3D {
-     .instance_size =3D sizeof(VirtMachineState),
-     .class_size    =3D sizeof(VirtMachineClass),
-     .class_init    =3D virt_machine_class_init,
-+    .interfaces =3D (InterfaceInfo[]) {
-+         { TYPE_HOTPLUG_HANDLER },
-+         { }
-+    },
- };
-=20
- static void machvirt_machine_init(void)
-diff --git a/hw/core/platform-bus.c b/hw/core/platform-bus.c
-index 33d32fb..807cb5c 100644
---- a/hw/core/platform-bus.c
-+++ b/hw/core/platform-bus.c
-@@ -103,7 +103,6 @@ static void plaform_bus_refresh_irqs(PlatformBusDevic=
-e *pbus)
- {
-     bitmap_zero(pbus->used_irqs, pbus->num_irqs);
-     foreach_dynamic_sysbus_device(platform_bus_count_irqs, pbus);
--    pbus->done_gathering =3D true;
- }
-=20
- static void platform_bus_map_irq(PlatformBusDevice *pbus, SysBusDevice *=
-sbdev,
-@@ -163,12 +162,11 @@ static void platform_bus_map_mmio(PlatformBusDevice=
- *pbus, SysBusDevice *sbdev,
- }
-=20
- /*
-- * For each sysbus device, look for unassigned IRQ lines as well as
-- * unassociated MMIO regions. Connect them to the platform bus if availa=
-ble.
-+ * Look for unassigned IRQ lines as well as unassociated MMIO regions.
-+ * Connect them to the platform bus if available.
-  */
--static void link_sysbus_device(SysBusDevice *sbdev, void *opaque)
-+void platform_bus_link_device(PlatformBusDevice *pbus, SysBusDevice *sbd=
-ev)
- {
--    PlatformBusDevice *pbus =3D opaque;
-     int i;
-=20
-     for (i =3D 0; sysbus_has_irq(sbdev, i); i++) {
-@@ -180,19 +178,6 @@ static void link_sysbus_device(SysBusDevice *sbdev, =
-void *opaque)
-     }
- }
-=20
--static void platform_bus_init_notify(Notifier *notifier, void *data)
--{
--    PlatformBusDevice *pb =3D container_of(notifier, PlatformBusDevice, =
-notifier);
--
--    /*
--     * Generate a bitmap of used IRQ lines, as the user might have speci=
-fied
--     * them on the command line.
--     */
--    plaform_bus_refresh_irqs(pb);
--
--    foreach_dynamic_sysbus_device(link_sysbus_device, pb);
--}
--
- static void platform_bus_realize(DeviceState *dev, Error **errp)
- {
-     PlatformBusDevice *pbus;
-@@ -211,12 +196,8 @@ static void platform_bus_realize(DeviceState *dev, E=
-rror **errp)
-         sysbus_init_irq(d, &pbus->irqs[i]);
-     }
-=20
--    /*
--     * Register notifier that allows us to gather dangling devices once =
-the
--     * machine is completely assembled
--     */
--    pbus->notifier.notify =3D platform_bus_init_notify;
--    qemu_add_machine_init_done_notifier(&pbus->notifier);
-+    /* some devices might be initialized before so update used IRQs map =
-*/
-+    plaform_bus_refresh_irqs(pbus);
- }
-=20
- static Property platform_bus_properties[] =3D {
-diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-index 30b42a8..e91a5f6 100644
---- a/hw/ppc/e500.c
-+++ b/hw/ppc/e500.c
-@@ -221,16 +221,15 @@ static void sysbus_device_create_devtree(SysBusDevi=
-ce *sbdev, void *opaque)
-     }
- }
-=20
--static void platform_bus_create_devtree(const PPCE500MachineClass *pmc,
-+static void platform_bus_create_devtree(PPCE500MachineState *pms,
-                                         void *fdt, const char *mpic)
- {
-+    const PPCE500MachineClass *pmc =3D PPCE500_MACHINE_GET_CLASS(pms);
-     gchar *node =3D g_strdup_printf("/platform@%"PRIx64, pmc->platform_b=
-us_base);
-     const char platcomp[] =3D "qemu,platform\0simple-bus";
-     uint64_t addr =3D pmc->platform_bus_base;
-     uint64_t size =3D pmc->platform_bus_size;
-     int irq_start =3D pmc->platform_bus_first_irq;
--    PlatformBusDevice *pbus;
--    DeviceState *dev;
-=20
-     /* Create a /platform node that we can put all devices into */
-=20
-@@ -245,22 +244,17 @@ static void platform_bus_create_devtree(const PPCE5=
-00MachineClass *pmc,
-=20
-     qemu_fdt_setprop_phandle(fdt, node, "interrupt-parent", mpic);
-=20
--    dev =3D qdev_find_recursive(sysbus_get_default(), TYPE_PLATFORM_BUS_=
-DEVICE);
--    pbus =3D PLATFORM_BUS_DEVICE(dev);
--
--    /* We can only create dt nodes for dynamic devices when they're read=
-y */
--    if (pbus->done_gathering) {
--        PlatformDevtreeData data =3D {
--            .fdt =3D fdt,
--            .mpic =3D mpic,
--            .irq_start =3D irq_start,
--            .node =3D node,
--            .pbus =3D pbus,
--        };
-+    /* Create dt nodes for dynamic devices */
-+    PlatformDevtreeData data =3D {
-+        .fdt =3D fdt,
-+        .mpic =3D mpic,
-+        .irq_start =3D irq_start,
-+        .node =3D node,
-+        .pbus =3D pms->pbus_dev,
-+    };
-=20
--        /* Loop through all dynamic sysbus devices and create nodes for =
-them */
--        foreach_dynamic_sysbus_device(sysbus_device_create_devtree, &dat=
-a);
--    }
-+    /* Loop through all dynamic sysbus devices and create nodes for them=
- */
-+    foreach_dynamic_sysbus_device(sysbus_device_create_devtree, &data);
-=20
-     g_free(node);
- }
-@@ -527,8 +521,8 @@ static int ppce500_load_device_tree(PPCE500MachineSta=
-te *pms,
-         create_dt_mpc8xxx_gpio(fdt, soc, mpic);
-     }
-=20
--    if (pmc->has_platform_bus) {
--        platform_bus_create_devtree(pmc, fdt, mpic);
-+    if (pms->pbus_dev) {
-+        platform_bus_create_devtree(pms, fdt, mpic);
-     }
-=20
-     pmc->fixup_devtree(fdt);
-@@ -946,8 +940,9 @@ void ppce500_init(MachineState *machine)
-         qdev_prop_set_uint32(dev, "num_irqs", pmc->platform_bus_num_irqs=
-);
-         qdev_prop_set_uint32(dev, "mmio_size", pmc->platform_bus_size);
-         qdev_init_nofail(dev);
--        s =3D SYS_BUS_DEVICE(dev);
-+        pms->pbus_dev =3D PLATFORM_BUS_DEVICE(dev);
-=20
-+        s =3D SYS_BUS_DEVICE(pms->pbus_dev);
-         for (i =3D 0; i < pmc->platform_bus_num_irqs; i++) {
-             int irqn =3D pmc->platform_bus_first_irq + i;
-             sysbus_connect_irq(s, i, qdev_get_gpio_in(mpicdev, irqn));
-@@ -1090,6 +1085,7 @@ static const TypeInfo ppce500_info =3D {
-     .name          =3D TYPE_PPCE500_MACHINE,
-     .parent        =3D TYPE_MACHINE,
-     .abstract      =3D true,
-+    .instance_size =3D sizeof(PPCE500MachineState),
-     .class_size    =3D sizeof(PPCE500MachineClass),
- };
-=20
-diff --git a/hw/ppc/e500plat.c b/hw/ppc/e500plat.c
-index f69aadb..1a469ba 100644
---- a/hw/ppc/e500plat.c
-+++ b/hw/ppc/e500plat.c
-@@ -43,13 +43,40 @@ static void e500plat_init(MachineState *machine)
-     ppce500_init(machine);
- }
-=20
-+static void e500plat_machine_device_plug_cb(HotplugHandler *hotplug_dev,
-+                                            DeviceState *dev, Error **er=
-rp)
-+{
-+    PPCE500MachineState *pms =3D PPCE500_MACHINE(hotplug_dev);
-+
-+    if (pms->pbus_dev) {
-+        if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
-+            platform_bus_link_device(pms->pbus_dev, SYS_BUS_DEVICE(dev))=
-;
-+        }
-+    }
-+}
-+
-+static
-+HotplugHandler *e500plat_machine_get_hotpug_handler(MachineState *machin=
-e,
-+                                                    DeviceState *dev)
-+{
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
-+        return HOTPLUG_HANDLER(machine);
-+    }
-+
-+    return NULL;
-+}
-+
- #define TYPE_E500PLAT_MACHINE  MACHINE_TYPE_NAME("ppce500")
-=20
- static void e500plat_machine_class_init(ObjectClass *oc, void *data)
- {
-     PPCE500MachineClass *pmc =3D PPCE500_MACHINE_CLASS(oc);
-+    HotplugHandlerClass *hc =3D HOTPLUG_HANDLER_CLASS(oc);
-     MachineClass *mc =3D MACHINE_CLASS(oc);
-=20
-+    mc->get_hotplug_handler =3D e500plat_machine_get_hotpug_handler;
-+    hc->plug =3D e500plat_machine_device_plug_cb;
-+
-     pmc->pci_first_slot =3D 0x1;
-     pmc->pci_nr_slots =3D PCI_SLOT_MAX - 1;
-     pmc->fixup_devtree =3D e500plat_fixup_devtree;
-@@ -77,6 +104,10 @@ static const TypeInfo e500plat_info =3D {
-     .name          =3D TYPE_E500PLAT_MACHINE,
-     .parent        =3D TYPE_PPCE500_MACHINE,
-     .class_init    =3D e500plat_machine_class_init,
-+    .interfaces    =3D (InterfaceInfo[]) {
-+         { TYPE_HOTPLUG_HANDLER },
-+         { }
-+    }
- };
-=20
- static void e500plat_register_types(void)
---=20
-2.7.4
+ Thomas
