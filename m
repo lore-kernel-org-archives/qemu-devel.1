@@ -1,26 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1f9CaL-00068g-RE
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:39:04 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1f9CbM-0006u6-DL
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:40:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1f9CaI-00083q-4y
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:39:01 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58448 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1f9CaH-00083D-TW
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:38:58 -0400
-Date: Thu, 19 Apr 2018 17:38:52 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180419163852.GE2730@work-vm>
-References: <CAJhGHyAMGjZe+QR3BQtA1cVxkz=isQbx6kWjNR6fa5LmW3rQUg@mail.gmail.com>
-	<20180416150011.55916-1-jiangshanlai@gmail.com>
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1f9CbI-0000GI-BK
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:40:04 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45544)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1f9CbI-0000Ds-2F
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:40:00 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w3JGbrXj066222
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 12:39:58 -0400
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2hevpyxu2p-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 12:39:57 -0400
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Thu, 19 Apr 2018 10:39:57 -0600
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Thu, 19 Apr 2018 12:39:43 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180416150011.55916-1-jiangshanlai@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <1524155983-16705-1-git-send-email-stefanb@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V5] migration: add capability to bypass the
- shared memory
+Subject: [Qemu-devel] [PATCH] test: Add test cases that use the external
+ swtpm with CRB interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,358 +39,572 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lai Jiangshan <jiangshanlai@gmail.com>
-Cc: Juan Quintela <quintela@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Sebastien Boeuf <sebastien.boeuf@intel.com>, "James O . D . Hunt" <james.o.hunt@intel.com>, Xu Wang <gnawux@gmail.com>, Peng Tao <bergwolf@gmail.com>, Xiao Guangrong <xiaoguangrong@tencent.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-devel@nongnu.org
+To: marcandre.lureau@gmail.com, qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-* Lai Jiangshan (jiangshanlai@gmail.com) wrote:
-> 1) What's this
->=20
-> When the migration capability 'bypass-shared-memory'
-> is set, the shared memory will be bypassed when migration.
->=20
-> It is the key feature to enable several excellent features for
-> the qemu, such as qemu-local-migration, qemu-live-update,
-> extremely-fast-save-restore, vm-template, vm-fast-live-clone,
-> yet-another-post-copy-migration, etc..
->=20
-> The philosophy behind this key feature, including the resulting
-> advanced key features, is that a part of the memory management
-> is separated out from the qemu, and let the other toolkits
-> such as libvirt, kata-containers (https://github.com/kata-containers)
-> runv(https://github.com/hyperhq/runv/) or some multiple cooperative
-> qemu commands directly access to it, manage it, provide features on it.
->=20
-> 2) Status in real world
->=20
-> The hyperhq(http://hyper.sh  http://hypercontainer.io/)
-> introduced the feature vm-template(vm-fast-live-clone)
-> to the hyper container for several years, it works perfect.
-> (see https://github.com/hyperhq/runv/pull/297).
->=20
-> The feature vm-template makes the containers(VMs) can
-> be started in 130ms and save 80M memory for every
-> container(VM). So that the hyper containers are fast
-> and high-density as normal containers.
->=20
-> kata-containers project (https://github.com/kata-containers)
-> which was launched by hyper, intel and friends and which descended
-> from runv (and clear-container) should have this feature enabled.
-> Unfortunately, due to the code confliction between runv&cc,
-> this feature was temporary disabled and it is being brought
-> back by hyper and intel team.
-> 3) How to use and bring up advanced features.
->=20
-> In current qemu command line, shared memory has
-> to be configured via memory-object.
->=20
-> a) feature: qemu-local-migration, qemu-live-update
-> Set the mem-path on the tmpfs and set share=3Don for it when
-> start the vm. example:
-> -object \
-> memory-backend-file,id=3Dmem,size=3D128M,mem-path=3D/dev/shm/memory,sha=
-re=3Don \
-> -numa node,nodeid=3D0,cpus=3D0-7,memdev=3Dmem
->=20
-> when you want to migrate the vm locally (after fixed a security bug
-> of the qemu-binary, or other reason), you can start a new qemu with
-> the same command line and -incoming, then you can migrate the
-> vm from the old qemu to the new qemu with the migration capability
-> 'bypass-shared-memory' set. The migration will migrate the device-state
-> *ONLY*, the memory is the origin memory backed by tmpfs file.
->=20
-> b) feature: extremely-fast-save-restore
-> the same above, but the mem-path is on the persistent file system.
->=20
-> c)  feature: vm-template, vm-fast-live-clone
-> the template vm is started as 1), and paused when the guest reaches
-> the template point(example: the guest app is ready), then the template
-> vm is saved. (the qemu process of the template can be killed now, becau=
-se
-> we need only the memory and the device state files (in tmpfs)).
->=20
-> Then we can launch one or multiple VMs base on the template vm states,
-> the new VMs are started without the =E2=80=9Cshare=3Don=E2=80=9D, all t=
-he new VMs share
-> the initial memory from the memory file, they save a lot of memory.
-> all the new VMs start from the template point, the guest app can go to
-> work quickly.
->=20
-> The new VM booted from template vm can=E2=80=99t become template again,
-> if you need this unusual chained-template feature, you can write
-> a cloneable-tmpfs kernel module for it.
->=20
+Add a test program for testing the CRB with the external swtpm.
 
-I've just tried doing something similar with this patch; it's really
-interesting. I used LVM snapshotting for the RAM:
+The 1st test case extends a PCR and reads back the value and compares
+it against an expected return packet.
 
-cd /dev/shm
-fallocate -l 20G backingfile
-losetup -f ./backingfile
-pvcreate /dev/loop0
-vgcreate ram /dev/loop0
-lvcreate -L4G -nram1 ram /dev/loop0
+The 2nd test case repeats the 1st test case and then migrates the
+external swtpm's state along with the VM state to a destination
+QEMU and swtpm and checks that the PCR has the expected value now.
 
-qemu -M pc,accel=3Dkvm -m 4G -object memory-backend-file,id=3Dmem,size=3D=
-4G,mem-path=3D/dev/ram/ram1,share=3Don -numa node,memdev=3Dmem -vnc :0 -d=
-rive file=3Dmy.qcow2,id=3Dd,cache=3Dnone -monitor stdio
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+---
+ tests/Makefile.include     |   3 +
+ tests/tpm-crb-swtpm-test.c | 247 +++++++++++++++++++++++++++++++++++++++=
+++++++
+ tests/tpm-util.c           | 186 ++++++++++++++++++++++++++++++++++
+ tests/tpm-util.h           |  36 +++++++
+ 4 files changed, 472 insertions(+)
+ create mode 100644 tests/tpm-crb-swtpm-test.c
+ create mode 100644 tests/tpm-util.c
+ create mode 100644 tests/tpm-util.h
 
-boot the VM, and do a :
-migrate_set_capability bypass-shared-memory on
-migrate_set_speed 10G
-migrate "exec:cat > migstream1"
-q
-
-then:
-lvcreate -n ramsnap1 -s ram/ram1 -L4G
-qemu -M pc,accel=3Dkvm -m 4G -object memory-backend-file,id=3Dmem,size=3D=
-4G,mem-path=3D/dev/ram/ramsnap1,share=3Don -numa node,memdev=3Dmem -vnc :=
-0 -drive file=3Dmy.qcow2,id=3Dd,cache=3Dnone -monitor stdio -snapshot -in=
-coming "exec:cat migstream1"
-
-
-lvcreate -n ramsnap2 -s ram/ram1 -L4G
-qemu -M pc,accel=3Dkvm -m 4G -object memory-backend-file,id=3Dmem,size=3D=
-4G,mem-path=3D/dev/ram/ramsnap2,share=3Don -numa node,memdev=3Dmem -vnc :=
-1 -drive file=3Dmy.qcow2,id=3Dd,cache=3Dnone -monitor stdio -snapshot -in=
-coming "exec:cat migstream1"
-
-and I've got two separate instances of qemu restored from that stream.
-
-It seems to work;  I wonder if we ever need things like msync() or
-similar?
-
-I've not tried creating a 2nd template with this.
-
-> The libvirt toolkit can=E2=80=99t manage vm-template currently, in the
-> hyperhq/runv, we use qemu wrapper script to do it. I hope someone add
-> =E2=80=9Clibvrit managed template=E2=80=9D feature to libvirt.
->=20
-> d) feature: yet-another-post-copy-migration
-> It is a possible feature, no toolkit can do it well now.
-> Using nbd server/client on the memory file is reluctantly Ok but
-> inconvenient. A special feature for tmpfs might be needed to
-> fully complete this feature.
-> No one need yet another post copy migration method,
-> but it is possible when some crazy man need it.
->=20
-> Cc: Juan Quintela <quintela@redhat.com>
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Cc: Eric Blake <eblake@redhat.com>
-> Cc: Markus Armbruster <armbru@redhat.com>
-> Cc: Samuel Ortiz <sameo@linux.intel.com>
-> Cc: Sebastien Boeuf <sebastien.boeuf@intel.com>
-> Cc: James O. D. Hunt <james.o.hunt@intel.com>
-> Cc: Xu Wang <gnawux@gmail.com>
-> Cc: Peng Tao <bergwolf@gmail.com>
-> Cc: Xiao Guangrong <xiaoguangrong@tencent.com>
-> Cc: Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-> Signed-off-by: Lai Jiangshan <jiangshanlai@gmail.com>
-> ---
->=20
-> Changes in V5:
->  check cappability conflict in migrate_caps_check()
->=20
-> Changes in V4:
->  fixes checkpatch.pl errors
->=20
-> Changes in V3:
->  rebased on upstream master
->  update the available version of the capability to
->  v2.13
->=20
-> Changes in V2:
->  rebased on 2.11.1
->=20
->  migration/migration.c | 22 ++++++++++++++++++++++
->  migration/migration.h |  1 +
->  migration/ram.c       | 27 ++++++++++++++++++---------
->  qapi/migration.json   |  6 +++++-
->  4 files changed, 46 insertions(+), 10 deletions(-)
->=20
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 52a5092add..110b40f6d4 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -736,6 +736,19 @@ static bool migrate_caps_check(bool *cap_list,
->              return false;
->          }
-> =20
-> +        if (cap_list[MIGRATION_CAPABILITY_BYPASS_SHARED_MEMORY]) {
-> +            /* Bypass and postcopy are quite conflicting ways
-> +             * to get memory in the destination.  And there
-> +             * is not code to discriminate the differences and
-> +             * handle the conflicts currently.  It should be possible
-> +             * to fix, but it is generally useless when both ways
-> +             * are used together.
-> +             */
-> +            error_setg(errp, "Bypass is not currently compatible "
-> +                       "with postcopy");
-> +            return false;
-> +        }
-> +
-
-Good.
-
->          /* This check is reasonably expensive, so only when it's being
->           * set the first time, also it's only the destination that nee=
-ds
->           * special support.
-> @@ -1509,6 +1522,15 @@ bool migrate_release_ram(void)
->      return s->enabled_capabilities[MIGRATION_CAPABILITY_RELEASE_RAM];
->  }
-> =20
-> +bool migrate_bypass_shared_memory(void)
-> +{
-> +    MigrationState *s;
-> +
-> +    s =3D migrate_get_current();
-> +
-> +    return s->enabled_capabilities[MIGRATION_CAPABILITY_BYPASS_SHARED_=
-MEMORY];
-> +}
-> +
->  bool migrate_postcopy_ram(void)
->  {
->      MigrationState *s;
-> diff --git a/migration/migration.h b/migration/migration.h
-> index 8d2f320c48..cfd2513ef0 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -206,6 +206,7 @@ MigrationState *migrate_get_current(void);
-> =20
->  bool migrate_postcopy(void);
-> =20
-> +bool migrate_bypass_shared_memory(void);
->  bool migrate_release_ram(void);
->  bool migrate_postcopy_ram(void);
->  bool migrate_zero_blocks(void);
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 0e90efa092..bca170c386 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -780,6 +780,11 @@ unsigned long migration_bitmap_find_dirty(RAMState=
- *rs, RAMBlock *rb,
->      unsigned long *bitmap =3D rb->bmap;
->      unsigned long next;
-> =20
-> +    /* when this ramblock is requested bypassing */
-> +    if (!bitmap) {
-> +        return size;
-> +    }
-> +
->      if (rs->ram_bulk_stage && start > 0) {
->          next =3D start + 1;
->      } else {
-> @@ -850,7 +855,9 @@ static void migration_bitmap_sync(RAMState *rs)
->      qemu_mutex_lock(&rs->bitmap_mutex);
->      rcu_read_lock();
->      RAMBLOCK_FOREACH(block) {
-> -        migration_bitmap_sync_range(rs, block, 0, block->used_length);
-> +        if (!migrate_bypass_shared_memory() || !qemu_ram_is_shared(blo=
-ck)) {
-> +            migration_bitmap_sync_range(rs, block, 0, block->used_leng=
-th);
-> +        }
->      }
->      rcu_read_unlock();
->      qemu_mutex_unlock(&rs->bitmap_mutex);
-> @@ -2132,18 +2139,12 @@ static int ram_state_init(RAMState **rsp)
->      qemu_mutex_init(&(*rsp)->src_page_req_mutex);
->      QSIMPLEQ_INIT(&(*rsp)->src_page_requests);
-> =20
-> -    /*
-> -     * Count the total number of pages used by ram blocks not includin=
-g any
-> -     * gaps due to alignment or unplugs.
-> -     */
-> -    (*rsp)->migration_dirty_pages =3D ram_bytes_total() >> TARGET_PAGE=
-_BITS;
-> -
->      ram_state_reset(*rsp);
-> =20
->      return 0;
->  }
-> =20
-> -static void ram_list_init_bitmaps(void)
-> +static void ram_list_init_bitmaps(RAMState *rs)
->  {
->      RAMBlock *block;
->      unsigned long pages;
-> @@ -2151,9 +2152,17 @@ static void ram_list_init_bitmaps(void)
->      /* Skip setting bitmap if there is no RAM */
->      if (ram_bytes_total()) {
->          QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +            if (migrate_bypass_shared_memory() && qemu_ram_is_shared(b=
-lock)) {
-> +                continue;
-> +            }
->              pages =3D block->max_length >> TARGET_PAGE_BITS;
->              block->bmap =3D bitmap_new(pages);
->              bitmap_set(block->bmap, 0, pages);
-> +            /*
-> +             * Count the total number of pages used by ram blocks not
-> +             * including any gaps due to alignment or unplugs.
-> +             */
-> +            rs->migration_dirty_pages +=3D pages;
->              if (migrate_postcopy_ram()) {
->                  block->unsentmap =3D bitmap_new(pages);
->                  bitmap_set(block->unsentmap, 0, pages);
-
-Can you please rework this to combine with C=C3=A9dric Le Goater's=20
-'discard non-migratable RAMBlocks' - it's quite similar to what you're
-trying to do but for a different reason;  If you look at the v2 from
-April 13, I think you can  just find somewhere to clear the
-RAM_MIGRATABLE flag.
-
-One thing I noticed; in my world I've got some code that checks if we
-ever do a RAM iteration, don't find any dirty blocks but then still have=20
-migration_dirty_pages being none-0; and with this patch I'm seeing that
-check trigger:
-
-   ram_find_and_save_block: no page found, yet dirty_pages=3D480
-
-it doesn't seem to trigger without the patch.
-
-Dave
-
-> @@ -2169,7 +2178,7 @@ static void ram_init_bitmaps(RAMState *rs)
->      qemu_mutex_lock_ramlist();
->      rcu_read_lock();
-> =20
-> -    ram_list_init_bitmaps();
-> +    ram_list_init_bitmaps(rs);
->      memory_global_dirty_log_start();
->      migration_bitmap_sync(rs);
-> =20
-> diff --git a/qapi/migration.json b/qapi/migration.json
-> index 9d0bf82cf4..45326480bd 100644
-> --- a/qapi/migration.json
-> +++ b/qapi/migration.json
-> @@ -357,13 +357,17 @@
->  # @dirty-bitmaps: If enabled, QEMU will migrate named dirty bitmaps.
->  #                 (since 2.12)
->  #
-> +# @bypass-shared-memory: the shared memory region will be bypassed on =
-migration.
-> +#          This feature allows the memory region to be reused by new q=
-emu(s)
-> +#          or be migrated separately. (since 2.13)
-> +#
->  # Since: 1.2
->  ##
->  { 'enum': 'MigrationCapability',
->    'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
->             'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ra=
-m',
->             'block', 'return-path', 'pause-before-switchover', 'x-multi=
-fd',
-> -           'dirty-bitmaps' ] }
-> +           'dirty-bitmaps', 'bypass-shared-memory' ] }
-> =20
->  ##
->  # @MigrationCapabilityStatus:
-> --=20
-> 2.15.1 (Apple Git-101)
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 3b9a5e3..b499ba1 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -297,6 +297,7 @@ check-qtest-i386-$(CONFIG_VHOST_USER_NET_TEST_i386) +=
+=3D tests/vhost-user-test$(EX
+ ifeq ($(CONFIG_VHOST_USER_NET_TEST_i386),)
+ check-qtest-x86_64-$(CONFIG_VHOST_USER_NET_TEST_x86_64) +=3D tests/vhost=
+-user-test$(EXESUF)
+ endif
++check-qtest-i386-$(CONFIG_TPM) +=3D tests/tpm-crb-swtpm-test$(EXESUF)
+ check-qtest-i386-$(CONFIG_TPM) +=3D tests/tpm-crb-test$(EXESUF)
+ check-qtest-i386-$(CONFIG_TPM) +=3D tests/tpm-tis-test$(EXESUF)
+ check-qtest-i386-$(CONFIG_SLIRP) +=3D tests/test-netfilter$(EXESUF)
+@@ -721,6 +722,8 @@ tests/test-util-sockets$(EXESUF): tests/test-util-soc=
+kets.o \
+ tests/test-io-task$(EXESUF): tests/test-io-task.o $(test-io-obj-y)
+ tests/test-io-channel-socket$(EXESUF): tests/test-io-channel-socket.o \
+         tests/io-channel-helpers.o tests/socket-helpers.o $(test-io-obj-=
+y)
++tests/tpm-crb-swtpm-test$(EXESUF): tests/tpm-crb-swtpm-test.o tests/tpm-=
+emu.o \
++	tests/tpm-util.o $(test-io-obj-y)
+ tests/tpm-crb-test$(EXESUF): tests/tpm-crb-test.o tests/tpm-emu.o $(test=
+-io-obj-y)
+ tests/tpm-tis-test$(EXESUF): tests/tpm-tis-test.o tests/tpm-emu.o $(test=
+-io-obj-y)
+ tests/test-io-channel-file$(EXESUF): tests/test-io-channel-file.o \
+diff --git a/tests/tpm-crb-swtpm-test.c b/tests/tpm-crb-swtpm-test.c
+new file mode 100644
+index 0000000..505a927
+--- /dev/null
++++ b/tests/tpm-crb-swtpm-test.c
+@@ -0,0 +1,247 @@
++/*
++ * QTest testcase for TPM CRB talking to external swtpm and swtpm migrat=
+ion
++ *
++ * Copyright (c) 2018 IBM Corporation
++ *  with parts borrowed from migration-test.c that is:
++ *     Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
++ *
++ * Authors:
++ *   Stefan Berger <stefanb@linux.vnet.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include <glib/gstdio.h>
++
++#include "hw/acpi/tpm.h"
++#include "io/channel-socket.h"
++#include "libqtest.h"
++#include "tpm-util.h"
++#include "sysemu/tpm.h"
++#include "qapi/qmp/qdict.h"
++
++typedef struct TestState {
++    char *src_tpm_path;
++    char *dst_tpm_path;
++    char *uri;
++} TestState;
++
++bool got_stop;
++
++static void migrate(QTestState *who, const char *uri)
++{
++    QDict *rsp;
++    gchar *cmd;
++
++    cmd =3D g_strdup_printf("{ 'execute': 'migrate',"
++                          "'arguments': { 'uri': '%s' } }",
++                          uri);
++    rsp =3D qtest_qmp(who, cmd);
++    g_free(cmd);
++    g_assert(qdict_haskey(rsp, "return"));
++    QDECREF(rsp);
++}
++
++/*
++ * Events can get in the way of responses we are actually waiting for.
++ */
++static QDict *wait_command(QTestState *who, const char *command)
++{
++    const char *event_string;
++    QDict *response;
++
++    response =3D qtest_qmp(who, command);
++
++    while (qdict_haskey(response, "event")) {
++        /* OK, it was an event */
++        event_string =3D qdict_get_str(response, "event");
++        if (!strcmp(event_string, "STOP")) {
++            got_stop =3D true;
++        }
++        QDECREF(response);
++        response =3D qtest_qmp_receive(who);
++    }
++    return response;
++}
++
++static void wait_for_migration_complete(QTestState *who)
++{
++    while (true) {
++        QDict *rsp, *rsp_return;
++        bool completed;
++        const char *status;
++
++        rsp =3D wait_command(who, "{ 'execute': 'query-migrate' }");
++        rsp_return =3D qdict_get_qdict(rsp, "return");
++        status =3D qdict_get_str(rsp_return, "status");
++        completed =3D strcmp(status, "completed") =3D=3D 0;
++        g_assert_cmpstr(status, !=3D,  "failed");
++        QDECREF(rsp);
++        if (completed) {
++            return;
++        }
++        usleep(1000);
++    }
++}
++
++static void migration_start_qemu(QTestState **src_qemu, QTestState **dst=
+_qemu,
++                                 SocketAddress *src_tpm_addr,
++                                 SocketAddress *dst_tpm_addr,
++                                 const char *miguri)
++{
++    char *src_qemu_args, *dst_qemu_args;
++
++    src_qemu_args =3D g_strdup_printf(
++        "-chardev socket,id=3Dchr,path=3D%s "
++        "-tpmdev emulator,id=3Ddev,chardev=3Dchr "
++        "-device tpm-crb,tpmdev=3Ddev ",
++        src_tpm_addr->u.q_unix.path);
++
++    *src_qemu =3D qtest_init(src_qemu_args);
++
++    dst_qemu_args =3D g_strdup_printf(
++        "-chardev socket,id=3Dchr,path=3D%s "
++        "-tpmdev emulator,id=3Ddev,chardev=3Dchr "
++        "-device tpm-crb,tpmdev=3Ddev "
++        "-incoming %s",
++        dst_tpm_addr->u.q_unix.path,
++        miguri);
++
++    *dst_qemu =3D qtest_init(dst_qemu_args);
++
++    free(src_qemu_args);
++    free(dst_qemu_args);
++}
++
++static void tpm_crb_swtpm_test(const void *data)
++{
++    char *args =3D NULL;
++    QTestState *s;
++    SocketAddress *addr =3D NULL;
++    gboolean succ;
++    GPid swtpm_pid;
++    GError *error =3D NULL;
++    const TestState *ts =3D data;
++
++    succ =3D tpm_util_swtpm_start(ts->src_tpm_path, &swtpm_pid, &addr, &=
+error);
++    /* succ may be false if swtpm is not available */
++    if (!succ) {
++        return;
++    }
++
++    args =3D g_strdup_printf(
++        "-chardev socket,id=3Dchr,path=3D%s "
++        "-tpmdev emulator,id=3Ddev,chardev=3Dchr "
++        "-device tpm-crb,tpmdev=3Ddev",
++        addr->u.q_unix.path);
++
++    s =3D qtest_start(args);
++    g_free(args);
++
++    tpm_util_startup(s, tpm_util_crb_transfer);
++    tpm_util_pcrextend(s, tpm_util_crb_transfer);
++
++    unsigned char tpm_pcrread_resp[] =3D
++        "\x80\x01\x00\x00\x00\x3e\x00\x00\x00\x00\x00\x00\x00\x16\x00\x0=
+0"
++        "\x00\x01\x00\x0b\x03\x00\x04\x00\x00\x00\x00\x01\x00\x20\xf6\x8=
+5"
++        "\x98\xe5\x86\x8d\xe6\x8b\x97\x29\x99\x60\xf2\x71\x7d\x17\x67\x8=
+9"
++        "\xa4\x2f\x9a\xae\xa8\xc7\xb7\xaa\x79\xa8\x62\x56\xc1\xde";
++    tpm_util_pcrread(s, tpm_util_crb_transfer, tpm_pcrread_resp,
++                     sizeof(tpm_pcrread_resp));
++
++    qtest_end();
++    tpm_util_swtpm_kill(swtpm_pid);
++
++    if (addr) {
++        g_unlink(addr->u.q_unix.path);
++        qapi_free_SocketAddress(addr);
++    }
++}
++
++static void tpm_crb_swtpm_migration_test(const void *data)
++{
++    const TestState *ts =3D data;
++    gboolean succ;
++    GPid src_tpm_pid, dst_tpm_pid;
++    SocketAddress *src_tpm_addr =3D NULL, *dst_tpm_addr =3D NULL;
++    GError *error =3D NULL;
++    QTestState *src_qemu, *dst_qemu;
++
++    succ =3D tpm_util_swtpm_start(ts->src_tpm_path, &src_tpm_pid,
++                                &src_tpm_addr, &error);
++    /* succ may be false if swtpm is not available */
++    if (!succ) {
++        return;
++    }
++
++    succ =3D tpm_util_swtpm_start(ts->dst_tpm_path, &dst_tpm_pid,
++                                &dst_tpm_addr, &error);
++    /* succ may be false if swtpm is not available */
++    if (!succ) {
++        goto err_src_tpm_kill;
++    }
++
++    migration_start_qemu(&src_qemu, &dst_qemu, src_tpm_addr, dst_tpm_add=
+r,
++                         ts->uri);
++
++    tpm_util_startup(src_qemu, tpm_util_crb_transfer);
++    tpm_util_pcrextend(src_qemu, tpm_util_crb_transfer);
++
++    unsigned char tpm_pcrread_resp[] =3D
++        "\x80\x01\x00\x00\x00\x3e\x00\x00\x00\x00\x00\x00\x00\x16\x00\x0=
+0"
++        "\x00\x01\x00\x0b\x03\x00\x04\x00\x00\x00\x00\x01\x00\x20\xf6\x8=
+5"
++        "\x98\xe5\x86\x8d\xe6\x8b\x97\x29\x99\x60\xf2\x71\x7d\x17\x67\x8=
+9"
++        "\xa4\x2f\x9a\xae\xa8\xc7\xb7\xaa\x79\xa8\x62\x56\xc1\xde";
++    tpm_util_pcrread(src_qemu, tpm_util_crb_transfer, tpm_pcrread_resp,
++                     sizeof(tpm_pcrread_resp));
++
++    migrate(src_qemu, ts->uri);
++    wait_for_migration_complete(src_qemu);
++
++    tpm_util_pcrread(dst_qemu, tpm_util_crb_transfer, tpm_pcrread_resp,
++                     sizeof(tpm_pcrread_resp));
++
++    qtest_quit(dst_qemu);
++    qtest_quit(src_qemu);
++
++    tpm_util_swtpm_kill(dst_tpm_pid);
++    if (dst_tpm_addr) {
++        g_unlink(dst_tpm_addr->u.q_unix.path);
++        qapi_free_SocketAddress(dst_tpm_addr);
++    }
++
++err_src_tpm_kill:
++    tpm_util_swtpm_kill(src_tpm_pid);
++    if (src_tpm_addr) {
++        g_unlink(src_tpm_addr->u.q_unix.path);
++        qapi_free_SocketAddress(src_tpm_addr);
++    }
++}
++
++int main(int argc, char **argv)
++{
++    int ret;
++    TestState ts =3D { 0 };
++
++    ts.src_tpm_path =3D g_dir_make_tmp("qemu-tpm-crb-swtpm-test.XXXXXX",=
+ NULL);
++    ts.dst_tpm_path =3D g_dir_make_tmp("qemu-tpm-crb-swtpm-test.XXXXXX",=
+ NULL);
++    ts.uri =3D g_strdup_printf("unix:%s/migsocket", ts.src_tpm_path);
++
++    module_call_init(MODULE_INIT_QOM);
++    g_test_init(&argc, &argv, NULL);
++
++    qtest_add_data_func("/tpm/crb-swtpm/test", &ts, tpm_crb_swtpm_test);
++    qtest_add_data_func("/tpm/crb-swtpm-migration/test", &ts,
++                        tpm_crb_swtpm_migration_test);
++    ret =3D g_test_run();
++
++    g_rmdir(ts.dst_tpm_path);
++    g_free(ts.dst_tpm_path);
++    g_rmdir(ts.src_tpm_path);
++    g_free(ts.src_tpm_path);
++    g_free(ts.uri);
++
++    return ret;
++}
+diff --git a/tests/tpm-util.c b/tests/tpm-util.c
+new file mode 100644
+index 0000000..9072b6e
+--- /dev/null
++++ b/tests/tpm-util.c
+@@ -0,0 +1,186 @@
++/*
++ * QTest TPM utilities
++ *
++ * Copyright (c) 2018 IBM Corporation
++ * Copyright (c) 2018 Red Hat, Inc.
++ *
++ * Authors:
++ *   Stefan Berger <stefanb@linux.vnet.ibm.com>
++ *   Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++
++#include "hw/acpi/tpm.h"
++#include "libqtest.h"
++#include "tpm-util.h"
++
++void tpm_util_crb_transfer(QTestState *s,
++                           const unsigned char *req, size_t req_size,
++                           unsigned char *rsp, size_t rsp_size)
++{
++    uint64_t caddr =3D qtest_readq(s, TPM_CRB_ADDR_BASE + A_CRB_CTRL_CMD=
+_LADDR);
++    uint64_t raddr =3D qtest_readq(s, TPM_CRB_ADDR_BASE + A_CRB_CTRL_RSP=
+_ADDR);
++
++    qtest_writeb(s, TPM_CRB_ADDR_BASE + A_CRB_LOC_CTRL, 1);
++
++    qtest_memwrite(s, caddr, req, req_size);
++
++    uint32_t sts, start =3D 1;
++    uint64_t end_time =3D g_get_monotonic_time() + 5 * G_TIME_SPAN_SECON=
+D;
++    qtest_writel(s, TPM_CRB_ADDR_BASE + A_CRB_CTRL_START, start);
++    while (true) {
++        start =3D qtest_readl(s, TPM_CRB_ADDR_BASE + A_CRB_CTRL_START);
++        if ((start & 1) =3D=3D 0) {
++            break;
++        }
++        if (g_get_monotonic_time() >=3D end_time) {
++            break;
++        }
++    };
++    start =3D qtest_readl(s, TPM_CRB_ADDR_BASE + A_CRB_CTRL_START);
++    g_assert_cmpint(start & 1, =3D=3D, 0);
++    sts =3D qtest_readl(s, TPM_CRB_ADDR_BASE + A_CRB_CTRL_STS);
++    g_assert_cmpint(sts & 1, =3D=3D, 0);
++
++    qtest_memread(s, raddr, rsp, rsp_size);
++}
++
++void tpm_util_startup(QTestState *s, tx_func *tx)
++{
++    unsigned char buffer[1024];
++    unsigned char tpm_startup[] =3D
++        "\x80\x01\x00\x00\x00\x0c\x00\x00\x01\x44\x00\x00";
++    unsigned char tpm_startup_resp[] =3D
++        "\x80\x01\x00\x00\x00\x0a\x00\x00\x00\x00";
++
++    tx(s, tpm_startup, sizeof(tpm_startup), buffer, sizeof(buffer));
++
++    g_assert_cmpmem(buffer, sizeof(tpm_startup_resp),
++                    tpm_startup_resp, sizeof(tpm_startup_resp));
++}
++
++void tpm_util_pcrextend(QTestState *s, tx_func *tx)
++{
++    unsigned char buffer[1024];
++    unsigned char tpm_pcrextend[] =3D
++        "\x80\x02\x00\x00\x00\x41\x00\x00\x01\x82\x00\x00\x00\x0a\x00\x0=
+0"
++        "\x00\x09\x40\x00\x00\x09\x00\x00\x00\x00\x00\x00\x00\x00\x01\x0=
+0"
++        "\x0b\x74\x65\x73\x74\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0=
+0"
++        "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0=
+0"
++        "\x00";
++
++    unsigned char tpm_pcrextend_resp[] =3D
++        "\x80\x02\x00\x00\x00\x13\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0=
+0"
++        "\x01\x00\x00";
++
++    tx(s, tpm_pcrextend, sizeof(tpm_pcrextend), buffer, sizeof(buffer));
++
++    g_assert_cmpmem(buffer, sizeof(tpm_pcrextend_resp),
++                    tpm_pcrextend_resp, sizeof(tpm_pcrextend_resp));
++}
++
++void tpm_util_pcrread(QTestState *s, tx_func *tx,
++                      const unsigned char *exp_resp, size_t exp_resp_siz=
+e)
++{
++    unsigned char buffer[1024];
++    unsigned char tpm_pcrread[] =3D
++        "\x80\x01\x00\x00\x00\x14\x00\x00\x01\x7e\x00\x00\x00\x01\x00\x0=
+b"
++        "\x03\x00\x04\x00";
++
++    tx(s, tpm_pcrread, sizeof(tpm_pcrread), buffer, sizeof(buffer));
++
++    g_assert_cmpmem(buffer, exp_resp_size, exp_resp, exp_resp_size);
++}
++
++static gboolean tpm_util_swtpm_has_tpm2(void)
++{
++    gint stdout;
++    gboolean succ;
++    unsigned i;
++    char buffer[10240];
++    ssize_t n;
++    gchar *swtpm_argv[] =3D {
++        g_strdup("swtpm"), g_strdup("socket"), g_strdup("--help"), NULL
++    };
++
++    succ =3D g_spawn_async_with_pipes(NULL, swtpm_argv, NULL,
++                                    G_SPAWN_SEARCH_PATH, NULL, NULL, NUL=
+L,
++                                    NULL, &stdout, NULL, NULL);
++    if (!succ) {
++        goto cleanup;
++    }
++
++    n =3D read(stdout, buffer, sizeof(buffer) - 1);
++    if (n < 0) {
++        goto cleanup;
++    }
++    buffer[n] =3D 0;
++    if (!strstr(buffer, "--tpm2")) {
++        succ =3D false;
++    }
++
++ cleanup:
++    for (i =3D 0; swtpm_argv[i]; i++) {
++        g_free(swtpm_argv[i]);
++    }
++
++    return succ;
++}
++
++gboolean tpm_util_swtpm_start(const char *path, GPid *pid,
++                              SocketAddress **addr, GError **error)
++{
++    char *swtpm_argv_tpmstate =3D g_strdup_printf("dir=3D%s", path);
++    char *swtpm_argv_ctrl =3D g_strdup_printf("type=3Dunixio,path=3D%s/s=
+ock",
++                                            path);
++    gchar *swtpm_argv[] =3D {
++        g_strdup("swtpm"), g_strdup("socket"),
++        g_strdup("--tpmstate"), swtpm_argv_tpmstate,
++        g_strdup("--ctrl"), swtpm_argv_ctrl,
++        g_strdup("--tpm2"),
++        NULL
++    };
++    gboolean succ;
++    unsigned i;
++
++    succ =3D tpm_util_swtpm_has_tpm2();
++    if (!succ) {
++        goto cleanup;
++    }
++
++    *addr =3D g_new0(SocketAddress, 1);
++    (*addr)->type =3D SOCKET_ADDRESS_TYPE_UNIX;
++    (*addr)->u.q_unix.path =3D g_build_filename(path, "sock", NULL);
++
++    succ =3D g_spawn_async(NULL, swtpm_argv, NULL, G_SPAWN_SEARCH_PATH,
++                         NULL, NULL, pid, error);
++
++cleanup:
++    for (i =3D 0; swtpm_argv[i]; i++) {
++        g_free(swtpm_argv[i]);
++    }
++
++    return succ;
++}
++
++void tpm_util_swtpm_kill(GPid pid)
++{
++    int n;
++
++    if (!pid) {
++        return;
++    }
++
++    g_spawn_close_pid(pid);
++
++    n =3D kill(pid, 0);
++    if (n < 0) {
++        return;
++    }
++
++    kill(pid, SIGKILL);
++}
+diff --git a/tests/tpm-util.h b/tests/tpm-util.h
+new file mode 100644
+index 0000000..d155d99
+--- /dev/null
++++ b/tests/tpm-util.h
+@@ -0,0 +1,36 @@
++/*
++ * QTest TPM utilities
++ *
++ * Copyright (c) 2018 IBM Corporation
++ *
++ * Authors:
++ *   Stefan Berger <stefanb@linux.vnet.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef TESTS_TPM_UTIL_H
++#define TESTS_TPM_UTIL_H
++
++#include "qemu/osdep.h"
++#include "io/channel-socket.h"
++
++typedef void (tx_func)(QTestState *s,
++                       const unsigned char *req, size_t req_size,
++                       unsigned char *rsp, size_t rsp_size);
++
++void tpm_util_crb_transfer(QTestState *s,
++                           const unsigned char *req, size_t req_size,
++                           unsigned char *rsp, size_t rsp_size);
++
++void tpm_util_startup(QTestState *s, tx_func *tx);
++void tpm_util_pcrextend(QTestState *s, tx_func *tx);
++void tpm_util_pcrread(QTestState *s, tx_func *tx,
++                      const unsigned char *exp_resp, size_t exp_resp_siz=
+e);
++
++gboolean tpm_util_swtpm_start(const char *path, GPid *pid,
++                              SocketAddress **addr, GError **error);
++void tpm_util_swtpm_kill(GPid pid);
++
++#endif /* TESTS_TPM_UTIL_H */
+--=20
+2.5.5
