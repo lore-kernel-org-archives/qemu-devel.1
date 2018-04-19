@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58746)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f9Bxu-0006am-C3
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 11:59:19 -0400
+	(envelope-from <mst@redhat.com>) id 1f9ByR-00075N-4w
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 11:59:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f9Bxt-0007uS-EW
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 11:59:18 -0400
-References: <20180413143156.11409-1-vsementsov@virtuozzo.com>
-	<461d56f3-4381-4cd6-f66d-1dd510c35fa8@redhat.com>
-	<7c4c3551-6235-d8a0-db64-83c7952d8284@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0113b912-8e43-4ae3-460d-9433787975fa@redhat.com>
-Date: Thu, 19 Apr 2018 10:59:09 -0500
+	(envelope-from <mst@redhat.com>) id 1f9ByM-0008LX-7Q
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 11:59:51 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46062 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1f9ByM-0008KW-3M
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 11:59:46 -0400
+Date: Thu, 19 Apr 2018 18:59:40 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180419185630-mutt-send-email-mst@kernel.org>
+References: <20180412151232.17506-1-tiwei.bie@intel.com>
+	<20180412151232.17506-7-tiwei.bie@intel.com>
+	<20180418192154-mutt-send-email-mst@kernel.org>
+	<20180419111439.i6gfhnept6wy7uzp@debian>
+	<D0158A423229094DA7ABF71CF2FA0DA34E94E895@SHSMSX104.ccr.corp.intel.com>
+	<c41439d6-69b7-474a-530f-07ffb5f1b9e6@redhat.com>
+	<20180419180912-mutt-send-email-mst@kernel.org>
+	<174b5e48-dfde-cb5f-e664-39d43a20a629@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <7c4c3551-6235-d8a0-db64-83c7952d8284@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="wovlJq2Invg0WBz8mLAdzYtocwvpwaGme"
-Subject: Re: [Qemu-devel] [PATCH] nbd/server: introduce NBD_CMD_CACHE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <174b5e48-dfde-cb5f-e664-39d43a20a629@redhat.com>
+Subject: Re: [Qemu-devel] [virtio-dev] RE: [PATCH v3 6/6] vhost-user:
+ support registering external host notifiers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,91 +34,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, pbonzini@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Liang, Cunming" <cunming.liang@intel.com>, "Bie, Tiwei" <tiwei.bie@intel.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Daly, Dan" <dan.daly@intel.com>, "Tan, Jianfeng" <jianfeng.tan@intel.com>, "Wang, Zhihong" <zhihong.wang@intel.com>, "Wang, Xiao W" <xiao.w.wang@intel.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wovlJq2Invg0WBz8mLAdzYtocwvpwaGme
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, pbonzini@redhat.com
-Message-ID: <0113b912-8e43-4ae3-460d-9433787975fa@redhat.com>
-Subject: Re: [PATCH] nbd/server: introduce NBD_CMD_CACHE
-References: <20180413143156.11409-1-vsementsov@virtuozzo.com>
- <461d56f3-4381-4cd6-f66d-1dd510c35fa8@redhat.com>
- <7c4c3551-6235-d8a0-db64-83c7952d8284@virtuozzo.com>
-In-Reply-To: <7c4c3551-6235-d8a0-db64-83c7952d8284@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, Apr 19, 2018 at 05:51:51PM +0200, Paolo Bonzini wrote:
+> On 19/04/2018 17:19, Michael S. Tsirkin wrote:
+> >> - if we make it 1 when weak barriers are needed, the device also needs
+> >> to nack feature negotiation (not allow setting the FEATURES_OK) if the
+> >> bit is not set by the driver.
+> >>  However, that is not enough.  Live
+> >> migration assumes that it is okay to migrate a virtual machine from a
+> >> source that doesn't support a feature to a destination that supports it.
+> >>  In this case, it would assume that it is okay to migrate from software
+> >> virtio to hardware virtio.  This is wrong because the destination would
+> >> use weak barriers
+> > 
+> > You can't migrate between systems with different sets of device features
+> > right now.
+> 
+> Yes, you can, exactly because some features are defined not by the
+> machine type but rather by the host kernel.  See virtio_net_get_features
+> in QEMU's hw/virtio/virtio-net.c, and virtio_set_features_nocheck in
+> QEMU's hw/virtio/virtio.c.
+> 
+> Thanks,
+> 
+> Paolo
 
-On 04/19/2018 03:36 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 18.04.2018 19:37, Eric Blake wrote:
->> On 04/13/2018 09:31 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> Handle nbd CACHE command. Just do read, without sending read data bac=
-k.
->>> Cache mechanism should be done by exported node driver chain.
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
->
->>> ---
->>> =C2=A0 include/block/nbd.h |=C2=A0 3 ++-
->>> =C2=A0 nbd/server.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 10 ++=
-++++----
->>> =C2=A0 2 files changed, 8 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/include/block/nbd.h b/include/block/nbd.h
->>> index fcdcd54502..b4793d0a29 100644
->>> --- a/include/block/nbd.h
->>> +++ b/include/block/nbd.h
->>> @@ -135,6 +135,7 @@ typedef struct NBDExtent {
->>> =C2=A0 #define NBD_FLAG_SEND_TRIM=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 (1 << 5) /* Send TRIM (discard) */
->>> =C2=A0 #define NBD_FLAG_SEND_WRITE_ZEROES (1 << 6) /* Send WRITE_ZERO=
-ES */
->>> =C2=A0 #define NBD_FLAG_SEND_DF=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 (1 << 7) /* Send DF (Do not
->>> Fragment) */
->>> +#define NBD_FLAG_SEND_CACHE=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- (1 << 8) /* Send CACHE (prefetch) */
->> Hmm, this flag is not documented in the upstream NBD protocol yet; are=
+Oh you are right. Well we can just special-case that one :)
 
->> we sure it matches the xNBD implementation?=C2=A0 We'll want at least =
-a
->> documentation patch proposed for the NBD list before taking this.
->>
->=20
-> The discussion already on list:
-> https://lists.debian.org/nbd/2018/03/msg00040.html
-
-Indeed, and that made me realize that we may want to add NBD_CMD_FLAG_*
-values corresponding to other useful posix_fadvise() modes before
-finalizing the NBD protocol addition of this feature, in which case we'd
-want to make sure the qemu implementation is in line with that.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---wovlJq2Invg0WBz8mLAdzYtocwvpwaGme
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrYvM0ACgkQp6FrSiUn
-Q2o7QAf/UWNAThgWrSfCY3yzchBY71MUQdLpIFHepoCliNjlvH+cN2vMFEgNpHsk
-J2Z9sSnjlJw3ZIG81/MFW6iZGLvdHUvKIMRkXSsNEN1Y3e/+vzDbp7IaNH/8yD1k
-pPg2ovZ5XPWIuKJ/Su/baolpcHR7eHCFFsQdixpHGcG3o2/DQRd0WDJZJcWSuoGE
-KqoEtoH7LVt7+2Cqn7cIdKq2k+Q5JQebaehHDB+dM96MtnSe0mgzCSLFBbwA2+Fz
-cOLX4bApE1N/R/98odex4r73nK9r/e2jB60kbQvMHLdzrjv14fUbQ2SoC9AKdnxq
-05Z5yHDGzjAYhBvHfT4FedD9b+4htg==
-=mWTb
------END PGP SIGNATURE-----
-
---wovlJq2Invg0WBz8mLAdzYtocwvpwaGme--
+-- 
+MST
