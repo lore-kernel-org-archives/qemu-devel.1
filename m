@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1f96Z1-000799-RN
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 06:13:17 -0400
+	(envelope-from <thuth@redhat.com>) id 1f96a2-0007vV-UI
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 06:14:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1f96Z0-00067o-LO
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 06:13:15 -0400
-Received: from mail-io0-x235.google.com ([2607:f8b0:4001:c06::235]:46670)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a175818323@gmail.com>)
-	id 1f96Z0-00067A-EC
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 06:13:14 -0400
-Received: by mail-io0-x235.google.com with SMTP id f3-v6so5939518iob.13
-	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 03:13:14 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1f96Zy-0006iS-Vs
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 06:14:18 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43732 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1f96Zy-0006iG-P8
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 06:14:14 -0400
+References: <20180419091105.3943-1-stefanha@redhat.com>
+	<20180419091105.3943-4-stefanha@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <c4900618-11b0-909c-e9fb-6c43810b276a@redhat.com>
+Date: Thu, 19 Apr 2018 12:14:10 +0200
 MIME-Version: 1.0
-From: Bob Chen <a175818323@gmail.com>
-Date: Thu, 19 Apr 2018 18:13:12 +0800
-Message-ID: <CAMxP3BTEzHjfxr=nnYDCL2v1djYJt5t5_hZ8rWo_S=qcbhQYVQ@mail.gmail.com>
-Content-Type: multipart/mixed; boundary="000000000000bdda3f056a30d1f6"
-Subject: [Qemu-devel] [SPDK] qemu process hung at boot-up,
- no explicit errors or warnings
+In-Reply-To: <20180419091105.3943-4-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/5] checkpatch: ignore email headers better
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,122 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>
 
---000000000000bdda3f056a30d1f6
-Content-Type: text/plain; charset="UTF-8"
+On 19.04.2018 11:11, Stefan Hajnoczi wrote:
+> From: Joe Perches <joe@perches.com>
+> 
+> There are some patches created by git format-patch that when scanned by
+> checkpatch report errors on lines like
+> 
+> To:	address.tld
+> 
+> This is a checkpatch false positive.
+> 
+> Improve the logic a bit to ignore folded email headers to avoid emitting
+> these messages.
+> 
+> Signed-off-by: Joe Perches <joe@perches.com>
+> Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+> Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+> (cherry picked from commit 29ee1b0c67e0dd7dea8dd718e8326076bce5b6fe)
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  scripts/checkpatch.pl | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 
-Hi,
-
-I was trying to run qemu with spdk, referring to
-http://www.spdk.io/doc/vhost.html#vhost_qemu_config
-
-Everything went well since I had already set up hugepages, vfio, vhost
-targets, vhost-scsi device(vhost-block was also tested), etc, without
-errors or warnings reported.
-
-But at the last step to run qemu, the process would somehow hang. And its
-cpu busy remained 100%.
-
-I used `perf top -p` to monitor the process activity,
-  18.28%  [kernel]                      [k] vmx_vcpu_run
-   3.06%  [kernel]                      [k] vcpu_enter_guest
-   3.05%  [kernel]                      [k] system_call_after_swapgs
-
-Do you have any ideas about what happened here?
-
-Test environment: latest CentOS 7 kernel, nvme ssd, spdk v18.01.x,
-dpdk 17.11.1, qemu 2.12.0-rc2. Detail log is attached within this mail.
-
-
-
-Thanks,
-Bob
-
---000000000000bdda3f056a30d1f6
-Content-Type: application/octet-stream; name="qemu-spdk.log"
-Content-Disposition: attachment; filename="qemu-spdk.log"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_jg6d43sg0
-
-IyAuL2FwcC92aG9zdC92aG9zdCAtUyAvdmFyL3RtcCAtcyA0MDk2IC1tIDB4MyAmClsxXSAxMjY0
-NwpTdGFydGluZyBEUERLIDE3LjExLjEgaW5pdGlhbGl6YXRpb24uLi4KWyBEUERLIEVBTCBwYXJh
-bWV0ZXJzOiB2aG9zdCAtYyAweDMgLW0gNDA5NiAtLWZpbGUtcHJlZml4PXNwZGtfcGlkMTI2NDcg
-XQpFQUw6IERldGVjdGVkIDMyIGxjb3JlKHMpCkVBTDogUHJvYmluZyBWRklPIHN1cHBvcnQuLi4K
-RUFMOiBWRklPIHN1cHBvcnQgaW5pdGlhbGl6ZWQKYXBwLmM6IDM3NzpzcGRrX2FwcF9zdGFydDog
-Kk5PVElDRSo6IFRvdGFsIGNvcmVzIGF2YWlsYWJsZTogMgpyZWFjdG9yLmM6IDY1NDpzcGRrX3Jl
-YWN0b3JzX2luaXQ6ICpOT1RJQ0UqOiBPY2N1cGllZCBjcHUgc29ja2V0IG1hc2sgaXMgMHgzCnJl
-YWN0b3IuYzogNDI2Ol9zcGRrX3JlYWN0b3JfcnVuOiAqTk9USUNFKjogUmVhY3RvciBzdGFydGVk
-IG9uIGNvcmUgMSBvbiBzb2NrZXQgMQpyZWFjdG9yLmM6IDQyNjpfc3Bka19yZWFjdG9yX3J1bjog
-Kk5PVElDRSo6IFJlYWN0b3Igc3RhcnRlZCBvbiBjb3JlIDAgb24gc29ja2V0IDAKY29weV9lbmdp
-bmVfaW9hdC5jOiAzMDY6Y29weV9lbmdpbmVfaW9hdF9pbml0OiAqTk9USUNFKjogSW9hdCBDb3B5
-IEVuZ2luZSBPZmZsb2FkIEVuYWJsZWQKCgojIC4vc2NyaXB0cy9ycGMucHkgY29uc3RydWN0X252
-bWVfYmRldiAtYiBOdm1lMCAtdCBwY2llIC1hIDAwMDA6MDM6MDAuMApFQUw6IFBDSSBkZXZpY2Ug
-MDAwMDowMzowMC4wIG9uIE5VTUEgc29ja2V0IDAKRUFMOiAgIHByb2JlIGRyaXZlcjogMWM1Zjo1
-NDAgc3Bka19udm1lCkVBTDogICB1c2luZyBJT01NVSB0eXBlIDEgKFR5cGUgMSkKCgojIC4vc2Ny
-aXB0cy9ycGMucHkgY29uc3RydWN0X21hbGxvY19iZGV2IDEyOCA0MDk2ICAtYiBNYWxsb2MwCk1h
-bGxvYzAKCgojIC4vc2NyaXB0cy9ycGMucHkgY29uc3RydWN0X3Zob3N0X3Njc2lfY29udHJvbGxl
-ciAtLWNwdW1hc2sgMHgxIHZob3N0LjAKVkhPU1RfQ09ORklHOiB2aG9zdC11c2VyIHNlcnZlcjog
-c29ja2V0IGNyZWF0ZWQsIGZkOiAyNgpWSE9TVF9DT05GSUc6IGJpbmQgdG8gL3Zhci90bXAvdmhv
-c3QuMAp2aG9zdC5jOiA3Mjg6c3Bka192aG9zdF9kZXZfY29uc3RydWN0OiAqTk9USUNFKjogQ29u
-dHJvbGxlciB2aG9zdC4wOiBuZXcgY29udHJvbGxlciBhZGRlZAoKCiMgLi9zY3JpcHRzL3JwYy5w
-eSBhZGRfdmhvc3Rfc2NzaV9sdW4gdmhvc3QuMCAwIE52bWUwbjEKdmhvc3Rfc2NzaS5jOiA4NDE6
-c3Bka192aG9zdF9zY3NpX2Rldl9hZGRfdGd0OiAqTk9USUNFKjogQ29udHJvbGxlciB2aG9zdC4w
-OiBkZWZpbmVkIHRhcmdldCAnVGFyZ2V0IDAnIHVzaW5nIGJkZXYgJ052bWUwbjEnCgoKIyAuL3Nj
-cmlwdHMvcnBjLnB5IGFkZF92aG9zdF9zY3NpX2x1biB2aG9zdC4wIDEgTWFsbG9jMAp2aG9zdF9z
-Y3NpLmM6IDg0MTpzcGRrX3Zob3N0X3Njc2lfZGV2X2FkZF90Z3Q6ICpOT1RJQ0UqOiBDb250cm9s
-bGVyIHZob3N0LjA6IGRlZmluZWQgdGFyZ2V0ICdUYXJnZXQgMScgdXNpbmcgYmRldiAnTWFsbG9j
-MCcKCgoKIyBxZW11LXN5c3RlbS14ODZfNjQgXAogIC0tZW5hYmxlLWt2bSBcCiAgLWNwdSBob3N0
-IC1zbXAgMiBcCiAgLW0gMkcgLW9iamVjdCBtZW1vcnktYmFja2VuZC1maWxlLGlkPW1lbTAsc2l6
-ZT0yRyxtZW0tcGF0aD0vZGV2L2h1Z2VwYWdlcyxzaGFyZT1vbiAtbnVtYSBub2RlLG1lbWRldj1t
-ZW0wIFwKICAuLi4KICAtY2hhcmRldiBzb2NrZXQsaWQ9c3Bka192aG9zdF9zY3NpMCxwYXRoPS92
-YXIvdG1wL3Zob3N0LjAgXAogIC1kZXZpY2Ugdmhvc3QtdXNlci1zY3NpLXBjaSxpZD1zY3NpMCxj
-aGFyZGV2PXNwZGtfdmhvc3Rfc2NzaTAsbnVtX3F1ZXVlcz00IAogIC4uLgoKCiMgdmhvc3QgbG9n
-CgpWSE9TVF9DT05GSUc6IG5ldyB2aG9zdCB1c2VyIGNvbm5lY3Rpb24gaXMgMjAKVkhPU1RfQ09O
-RklHOiBuZXcgZGV2aWNlLCBoYW5kbGUgaXMgMApWSE9TVF9DT05GSUc6IC92YXIvdG1wL3Zob3N0
-LjA6IHJlYWQgbWVzc2FnZSBWSE9TVF9VU0VSX0dFVF9GRUFUVVJFUwpWSE9TVF9DT05GSUc6IC92
-YXIvdG1wL3Zob3N0LjA6IHJlYWQgbWVzc2FnZSBWSE9TVF9VU0VSX0dFVF9QUk9UT0NPTF9GRUFU
-VVJFUwpWSE9TVF9DT05GSUc6IC92YXIvdG1wL3Zob3N0LjA6IHJlYWQgbWVzc2FnZSBWSE9TVF9V
-U0VSX1NFVF9QUk9UT0NPTF9GRUFUVVJFUwpWSE9TVF9DT05GSUc6IC92YXIvdG1wL3Zob3N0LjA6
-IHJlYWQgbWVzc2FnZSBWSE9TVF9VU0VSX0dFVF9RVUVVRV9OVU0KVkhPU1RfQ09ORklHOiAvdmFy
-L3RtcC92aG9zdC4wOiByZWFkIG1lc3NhZ2UgVkhPU1RfVVNFUl9TRVRfT1dORVIKVkhPU1RfQ09O
-RklHOiAvdmFyL3RtcC92aG9zdC4wOiByZWFkIG1lc3NhZ2UgVkhPU1RfVVNFUl9HRVRfRkVBVFVS
-RVMKVkhPU1RfQ09ORklHOiAvdmFyL3RtcC92aG9zdC4wOiByZWFkIG1lc3NhZ2UgVkhPU1RfVVNF
-Ul9TRVRfVlJJTkdfQ0FMTApWSE9TVF9DT05GSUc6IHZyaW5nIGNhbGwgaWR4OjAgZmlsZToyNwpW
-SE9TVF9DT05GSUc6IC92YXIvdG1wL3Zob3N0LjA6IHJlYWQgbWVzc2FnZSBWSE9TVF9VU0VSX1NF
-VF9WUklOR19DQUxMClZIT1NUX0NPTkZJRzogdnJpbmcgY2FsbCBpZHg6MSBmaWxlOjI4ClZIT1NU
-X0NPTkZJRzogL3Zhci90bXAvdmhvc3QuMDogcmVhZCBtZXNzYWdlIFZIT1NUX1VTRVJfU0VUX1ZS
-SU5HX0NBTEwKVkhPU1RfQ09ORklHOiB2cmluZyBjYWxsIGlkeDoyIGZpbGU6MjkKVkhPU1RfQ09O
-RklHOiAvdmFyL3RtcC92aG9zdC4wOiByZWFkIG1lc3NhZ2UgVkhPU1RfVVNFUl9TRVRfVlJJTkdf
-Q0FMTApWSE9TVF9DT05GSUc6IHZyaW5nIGNhbGwgaWR4OjMgZmlsZTozMApWSE9TVF9DT05GSUc6
-IC92YXIvdG1wL3Zob3N0LjA6IHJlYWQgbWVzc2FnZSBWSE9TVF9VU0VSX1NFVF9WUklOR19DQUxM
-ClZIT1NUX0NPTkZJRzogdnJpbmcgY2FsbCBpZHg6NCBmaWxlOjMxClZIT1NUX0NPTkZJRzogL3Zh
-ci90bXAvdmhvc3QuMDogcmVhZCBtZXNzYWdlIFZIT1NUX1VTRVJfU0VUX1ZSSU5HX0NBTEwKVkhP
-U1RfQ09ORklHOiB2cmluZyBjYWxsIGlkeDo1IGZpbGU6MzIKVkhPU1RfQ09ORklHOiAvdmFyL3Rt
-cC92aG9zdC4wOiByZWFkIG1lc3NhZ2UgVkhPU1RfVVNFUl9TRVRfRkVBVFVSRVMKVkhPU1RfQ09O
-RklHOiAvdmFyL3RtcC92aG9zdC4wOiByZWFkIG1lc3NhZ2UgVkhPU1RfVVNFUl9TRVRfTUVNX1RB
-QkxFClZIT1NUX0NPTkZJRzogL3Zhci90bXAvdmhvc3QuMDogcmVhZCBtZXNzYWdlIFZIT1NUX1VT
-RVJfU0VUX1ZSSU5HX05VTQpWSE9TVF9DT05GSUc6IC92YXIvdG1wL3Zob3N0LjA6IHJlYWQgbWVz
-c2FnZSBWSE9TVF9VU0VSX1NFVF9WUklOR19CQVNFClZIT1NUX0NPTkZJRzogL3Zhci90bXAvdmhv
-c3QuMDogcmVhZCBtZXNzYWdlIFZIT1NUX1VTRVJfU0VUX1ZSSU5HX0FERFIKVkhPU1RfQ09ORklH
-OiBndWVzdCBtZW1vcnkgcmVnaW9uIDAsIHNpemU6IDB4NDAwMDAwMDAKCSBndWVzdCBwaHlzaWNh
-bCBhZGRyOiAweDAKCSBndWVzdCB2aXJ0dWFsICBhZGRyOiAweDdmY2ZjMDAwMDAwMAoJIGhvc3Qg
-IHZpcnR1YWwgIGFkZHI6IDB4MmFhYWMwMDAwMDAwCgkgbW1hcCBhZGRyIDogMHgyYWFhYzAwMDAw
-MDAKCSBtbWFwIHNpemUgOiAweDQwMDAwMDAwCgkgbW1hcCBhbGlnbjogMHg0MDAwMDAwMAoJIG1t
-YXAgb2ZmICA6IDB4MApWSE9TVF9DT05GSUc6IHJlYWxsb2NhdGUgdnEgZnJvbSAwIHRvIDEgbm9k
-ZQpWSE9TVF9DT05GSUc6IHJlYWxsb2NhdGUgZGV2IGZyb20gMCB0byAxIG5vZGUKVkhPU1RfQ09O
-RklHOiAvdmFyL3RtcC92aG9zdC4wOiByZWFkIG1lc3NhZ2UgVkhPU1RfVVNFUl9TRVRfVlJJTkdf
-S0lDSwpWSE9TVF9DT05GSUc6IHZyaW5nIGtpY2sgaWR4OjIgZmlsZTozNApWSE9TVF9DT05GSUc6
-IC92YXIvdG1wL3Zob3N0LjA6IHJlYWQgbWVzc2FnZSBWSE9TVF9VU0VSX1NFVF9WUklOR19DQUxM
-ClZIT1NUX0NPTkZJRzogdnJpbmcgY2FsbCBpZHg6MCBmaWxlOjM1ClZIT1NUX0NPTkZJRzogL3Zh
-ci90bXAvdmhvc3QuMDogcmVhZCBtZXNzYWdlIFZIT1NUX1VTRVJfU0VUX1ZSSU5HX0NBTEwKVkhP
-U1RfQ09ORklHOiB2cmluZyBjYWxsIGlkeDoxIGZpbGU6MjcKVkhPU1RfQ09ORklHOiAvdmFyL3Rt
-cC92aG9zdC4wOiByZWFkIG1lc3NhZ2UgVkhPU1RfVVNFUl9TRVRfVlJJTkdfQ0FMTApWSE9TVF9D
-T05GSUc6IHZyaW5nIGNhbGwgaWR4OjIgZmlsZToyOApWSE9TVF9DT05GSUc6IC92YXIvdG1wL3Zo
-b3N0LjA6IHJlYWQgbWVzc2FnZSBWSE9TVF9VU0VSX1NFVF9WUklOR19DQUxMClZIT1NUX0NPTkZJ
-RzogdnJpbmcgY2FsbCBpZHg6MyBmaWxlOjI5ClZIT1NUX0NPTkZJRzogL3Zhci90bXAvdmhvc3Qu
-MDogcmVhZCBtZXNzYWdlIFZIT1NUX1VTRVJfU0VUX1ZSSU5HX0NBTEwKVkhPU1RfQ09ORklHOiB2
-cmluZyBjYWxsIGlkeDo0IGZpbGU6MzAKVkhPU1RfQ09ORklHOiAvdmFyL3RtcC92aG9zdC4wOiBy
-ZWFkIG1lc3NhZ2UgVkhPU1RfVVNFUl9TRVRfVlJJTkdfQ0FMTApWSE9TVF9DT05GSUc6IHZyaW5n
-IGNhbGwgaWR4OjUgZmlsZTozMSAKCgo=
---000000000000bdda3f056a30d1f6--
+Reviewed-by: Thomas Huth <thuth@redhat.com>
