@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59030)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1f95bT-0004KK-S6
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 05:11:44 -0400
+	(envelope-from <stefanha@redhat.com>) id 1f95bR-0004IZ-Dc
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 05:11:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1f95bS-0004yu-MN
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 05:11:43 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57038 helo=mx1.redhat.com)
+	(envelope-from <stefanha@redhat.com>) id 1f95bN-0004vy-GM
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 05:11:41 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57032 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1f95bS-0004yi-Hz
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 05:11:42 -0400
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1f95bN-0004vl-BX
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 05:11:37 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Thu, 19 Apr 2018 17:11:05 +0800
-Message-Id: <20180419091105.3943-6-stefanha@redhat.com>
+Date: Thu, 19 Apr 2018 17:11:04 +0800
+Message-Id: <20180419091105.3943-5-stefanha@redhat.com>
 In-Reply-To: <20180419091105.3943-1-stefanha@redhat.com>
 References: <20180419091105.3943-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH 5/5] checkpatch: reduce MAINTAINERS update
- message frequency
+Subject: [Qemu-devel] [PATCH 4/5] checkpatch: emit a warning on file
+ add/move/delete
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +29,52 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>, Peter May
 
 From: Joe Perches <joe@perches.com>
 
-When files are being added/moved/deleted and a patch contains an update to
-the MAINTAINERS file, assume it's to update the MAINTAINERS file correctly
-and do not emit the "does MAINTAINERS need updating?" message.
+Whenever files are added, moved, or deleted, the MAINTAINERS file
+patterns can be out of sync or outdated.
 
-Reported by many people.
+To try to keep MAINTAINERS more up-to-date, add a one-time warning
+whenever a patch does any of those.
 
 Signed-off-by: Joe Perches <joe@perches.com>
+Acked-by: Andy Whitcroft <apw@canonical.com>
 Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
 Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
-(cherry picked from e0d975b1b439c4fef58fbc306c542c94f48bb849)
+(cherry picked from commit 13f1937ef33950b1112049972249e6191b82e6c9)
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- scripts/checkpatch.pl | 6 ++++++
- 1 file changed, 6 insertions(+)
+ scripts/checkpatch.pl | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
 diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index 95ba64f3a5..1c20c683e8 100755
+index f3b166d5e2..95ba64f3a5 100755
 --- a/scripts/checkpatch.pl
 +++ b/scripts/checkpatch.pl
-@@ -1389,6 +1389,12 @@ sub process {
+@@ -1184,7 +1184,7 @@ sub process {
+ 
+ 	my $in_header_lines = $file ? 0 : 1;
+ 	my $in_commit_log = 0;		#Scanning lines before patch
+-
++	my $reported_maintainer_file = 0;
+ 	my $non_utf8_charset = 0;
+ 
+ 	our @report = ();
+@@ -1389,6 +1389,17 @@ sub process {
  			}
  		}
  
-+# Check if MAINTAINERS is being updated.  If so, there's probably no need to
-+# emit the "does MAINTAINERS need updating?" message on file add/move/delete
-+		if ($line =~ /^\s*MAINTAINERS\s*\|/) {
++# Check for added, moved or deleted files
++		if (!$reported_maintainer_file && !$in_commit_log &&
++		    ($line =~ /^(?:new|deleted) file mode\s*\d+\s*$/ ||
++		     $line =~ /^rename (?:from|to) [\w\/\.\-]+\s*$/ ||
++		     ($line =~ /\{\s*([\w\/\.\-]*)\s*\=\>\s*([\w\/\.\-]*)\s*\}/ &&
++		      (defined($1) || defined($2))))) {
 +			$reported_maintainer_file = 1;
++			WARN("FILE_PATH_CHANGES",
++			     "added, moved or deleted file(s), does MAINTAINERS need updating?\n" . $herecurr);
 +		}
 +
- # Check for added, moved or deleted files
- 		if (!$reported_maintainer_file && !$in_commit_log &&
- 		    ($line =~ /^(?:new|deleted) file mode\s*\d+\s*$/ ||
+ # Check for wrappage within a valid hunk of the file
+ 		if ($realcnt != 0 && $line !~ m{^(?:\+|-| |\\ No newline|$)}) {
+ 			ERROR("patch seems to be corrupt (line wrapped?)\n" .
 -- 
 2.14.3
