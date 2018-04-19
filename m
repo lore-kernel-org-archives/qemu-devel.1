@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58076)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1f98wt-00017y-FS
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:46:04 -0400
+	(envelope-from <clg@kaod.org>) id 1f98wz-0001Dh-BO
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:46:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1f98wp-0000lR-JN
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:46:03 -0400
-Received: from 8.mo173.mail-out.ovh.net ([46.105.46.122]:52756)
+	(envelope-from <clg@kaod.org>) id 1f98wv-0000sa-CK
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:46:09 -0400
+Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:54955)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1f98wp-0000jc-AT
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:45:59 -0400
-Received: from player792.ha.ovh.net (unknown [10.109.122.116])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 18854BCA88
-	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 14:45:58 +0200 (CEST)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1f98wv-0000rA-21
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:46:05 -0400
+Received: from player792.ha.ovh.net (unknown [10.109.122.71])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id C7E2912E61E
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 14:46:03 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu, 19 Apr 2018 14:43:19 +0200
-Message-Id: <20180419124331.3915-24-clg@kaod.org>
+Date: Thu, 19 Apr 2018 14:43:20 +0200
+Message-Id: <20180419124331.3915-25-clg@kaod.org>
 In-Reply-To: <20180419124331.3915-1-clg@kaod.org>
 References: <20180419124331.3915-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 23/35] target/ppc/kvm: add Linux KVM
- definitions for XIVE
+Subject: [Qemu-devel] [PATCH v3 24/35] spapr/xive: add common realize
+ routine for KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,132 +33,147 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Cc: David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-These define a new capability and a new KVM device for the XIVE native
-exploitation interrupt mode. New ioctls are also introduced to
-initialize the KVM device and handle VM migration.
+The XiveSource and sPAPRXive device models will be shared between the
+emulated and the KVM mode. The difference will reside in the way the
+memory regions are initialized and in the qemu_irq handler. Introduce
+common realize routines to share some code.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- linux-headers/asm-powerpc/kvm.h | 18 ++++++++++++++++++
- linux-headers/linux/kvm.h       |  3 +++
- target/ppc/kvm.c                |  7 +++++++
- target/ppc/kvm_ppc.h            |  6 ++++++
- 4 files changed, 34 insertions(+)
+ hw/intc/spapr_xive.c        | 17 +++++++++++++++--
+ hw/intc/xive.c              | 21 ++++++++++++++++-----
+ include/hw/ppc/spapr_xive.h |  1 +
+ include/hw/ppc/xive.h       |  3 +++
+ 4 files changed, 35 insertions(+), 7 deletions(-)
 
-diff --git a/linux-headers/asm-powerpc/kvm.h b/linux-headers/asm-powerpc/=
-kvm.h
-index 833ed9a16adf..530c068fd850 100644
---- a/linux-headers/asm-powerpc/kvm.h
-+++ b/linux-headers/asm-powerpc/kvm.h
-@@ -480,6 +480,16 @@ struct kvm_ppc_cpu_char {
- #define  KVM_REG_PPC_ICP_PPRI_SHIFT	16	/* pending irq priority */
- #define  KVM_REG_PPC_ICP_PPRI_MASK	0xff
-=20
-+#define KVM_REG_PPC_VP_STATE	(KVM_REG_PPC | KVM_REG_SIZE_U128 | 0x8d)
-+#define KVM_REG_PPC_VP_EQ0	(KVM_REG_PPC | KVM_REG_SIZE_U256 | 0x8e)
-+#define KVM_REG_PPC_VP_EQ1	(KVM_REG_PPC | KVM_REG_SIZE_U256 | 0x8f)
-+#define KVM_REG_PPC_VP_EQ2	(KVM_REG_PPC | KVM_REG_SIZE_U256 | 0x90)
-+#define KVM_REG_PPC_VP_EQ3	(KVM_REG_PPC | KVM_REG_SIZE_U256 | 0x91)
-+#define KVM_REG_PPC_VP_EQ4	(KVM_REG_PPC | KVM_REG_SIZE_U256 | 0x92)
-+#define KVM_REG_PPC_VP_EQ5	(KVM_REG_PPC | KVM_REG_SIZE_U256 | 0x93)
-+#define KVM_REG_PPC_VP_EQ6	(KVM_REG_PPC | KVM_REG_SIZE_U256 | 0x94)
-+#define KVM_REG_PPC_VP_EQ7	(KVM_REG_PPC | KVM_REG_SIZE_U256 | 0x95)
-+
- /* Device control API: PPC-specific devices */
- #define KVM_DEV_MPIC_GRP_MISC		1
- #define   KVM_DEV_MPIC_BASE_ADDR	0	/* 64-bit */
-@@ -673,4 +683,12 @@ struct kvm_ppc_cpu_char {
- #define  KVM_XICS_PRESENTED		(1ULL << 43)
- #define  KVM_XICS_QUEUED		(1ULL << 44)
-=20
-+/* POWER9 XIVE Interrupt Controller */
-+#define KVM_DEV_XIVE_GRP_SOURCES	1	/* 64-bit source attributes */
-+#define KVM_DEV_XIVE_GRP_CTRL		2
-+#define   KVM_DEV_XIVE_GET_ESB_FD	1
-+#define   KVM_DEV_XIVE_GET_TIMA_FD	2
-+#define   KVM_DEV_XIVE_VC_BASE		3
-+#define KVM_DEV_XIVE_GRP_IVE		3	/* 64-bit source attributes */
-+
- #endif /* __LINUX_KVM_POWERPC_H */
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index a167be89d1ec..2c20d34f194b 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -936,6 +936,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_PPC_GET_CPU_CHAR 151
- #define KVM_CAP_S390_BPB 152
- #define KVM_CAP_GET_MSR_FEATURES 153
-+#define KVM_CAP_PPC_IRQ_XIVE 154
-=20
- #ifdef KVM_CAP_IRQ_ROUTING
-=20
-@@ -1159,6 +1160,8 @@ enum kvm_device_type {
- #define KVM_DEV_TYPE_ARM_VGIC_V3	KVM_DEV_TYPE_ARM_VGIC_V3
- 	KVM_DEV_TYPE_ARM_VGIC_ITS,
- #define KVM_DEV_TYPE_ARM_VGIC_ITS	KVM_DEV_TYPE_ARM_VGIC_ITS
-+	KVM_DEV_TYPE_XIVE,
-+#define KVM_DEV_TYPE_XIVE		KVM_DEV_TYPE_XIVE
- 	KVM_DEV_TYPE_MAX,
- };
-=20
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 79a436a38457..f5d770a77651 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -87,6 +87,7 @@ static int cap_fixup_hcalls;
- static int cap_htm;             /* Hardware transactional memory support=
- */
- static int cap_mmu_radix;
- static int cap_mmu_hash_v3;
-+static int cap_xive;
- static int cap_resize_hpt;
- static int cap_ppc_pvr_compat;
- static int cap_ppc_safe_cache;
-@@ -150,6 +151,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-     cap_htm =3D kvm_vm_check_extension(s, KVM_CAP_PPC_HTM);
-     cap_mmu_radix =3D kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_RADIX);
-     cap_mmu_hash_v3 =3D kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_HASH_V=
-3);
-+    cap_xive =3D kvm_vm_check_extension(s, KVM_CAP_PPC_IRQ_XIVE);
-     cap_resize_hpt =3D kvm_vm_check_extension(s, KVM_CAP_SPAPR_RESIZE_HP=
-T);
-     kvmppc_get_cpu_characteristics(s);
-     /*
-@@ -2461,6 +2463,11 @@ bool kvmppc_has_cap_mmu_hash_v3(void)
-     return cap_mmu_hash_v3;
+diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+index f0c2fe52b3c6..bd604089ad49 100644
+--- a/hw/intc/spapr_xive.c
++++ b/hw/intc/spapr_xive.c
+@@ -84,9 +84,8 @@ static void spapr_xive_init(Object *obj)
+     object_property_add_child(obj, "source", OBJECT(&xive->source), NULL=
+);
  }
 =20
-+bool kvmppc_has_cap_xive(void)
-+{
-+    return cap_xive;
+-static void spapr_xive_realize(DeviceState *dev, Error **errp)
++void spapr_xive_common_realize(sPAPRXive *xive, int esb_shift, Error **e=
+rrp)
+ {
+-    sPAPRXive *xive =3D SPAPR_XIVE(dev);
+     XiveSource *xsrc =3D &xive->source;
+     Error *local_err =3D NULL;
+=20
+@@ -105,6 +104,8 @@ static void spapr_xive_realize(DeviceState *dev, Erro=
+r **errp)
+                             &error_fatal);
+     object_property_set_int(OBJECT(xsrc), xive->nr_irqs, "nr-irqs",
+                             &error_fatal);
++    object_property_set_int(OBJECT(xsrc), esb_shift, "shift",
++                            &error_fatal);
+     object_property_add_const_link(OBJECT(xsrc), "xive", OBJECT(xive),
+                                    &error_fatal);
+     object_property_set_bool(OBJECT(xsrc), true, "realized", &local_err)=
+;
+@@ -122,6 +123,18 @@ static void spapr_xive_realize(DeviceState *dev, Err=
+or **errp)
+      * level views of the TIMA.
+      */
+     xive->tm_base =3D XIVE_TM_BASE;
 +}
 +
- static void kvmppc_get_cpu_characteristics(KVMState *s)
- {
-     struct kvm_ppc_cpu_char c;
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index 4d2789eef6ef..fef6b5d9ce9f 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -60,6 +60,7 @@ bool kvmppc_has_cap_fixup_hcalls(void);
- bool kvmppc_has_cap_htm(void);
- bool kvmppc_has_cap_mmu_radix(void);
- bool kvmppc_has_cap_mmu_hash_v3(void);
-+bool kvmppc_has_cap_xive(void);
- int kvmppc_get_cap_safe_cache(void);
- int kvmppc_get_cap_safe_bounds_check(void);
- int kvmppc_get_cap_safe_indirect_branch(void);
-@@ -299,6 +300,11 @@ static inline bool kvmppc_has_cap_mmu_hash_v3(void)
-     return false;
++static void spapr_xive_realize(DeviceState *dev, Error **errp)
++{
++    sPAPRXive *xive =3D SPAPR_XIVE(dev);
++    Error *local_err =3D NULL;
++
++    spapr_xive_common_realize(xive, XIVE_ESB_64K_2PAGE, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
+=20
+     memory_region_init_io(&xive->tm_mmio_user, OBJECT(xive),
+                           &xive_tm_user_ops, xive, "xive.tima.user",
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index 11af3bf1184a..520b532dbf09 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -903,13 +903,13 @@ static void xive_source_reset(DeviceState *dev)
+     }
  }
 =20
-+static inline bool kvmppc_has_cap_xive(void)
-+{
-+    return false;
+-static void xive_source_realize(DeviceState *dev, Error **errp)
++void xive_source_common_realize(XiveSource *xsrc, qemu_irq_handler handl=
+er,
++                                Error **errp)
+ {
+-    XiveSource *xsrc =3D XIVE_SOURCE(dev);
+     Object *obj;
+     Error *local_err =3D NULL;
+=20
+-    obj =3D object_property_get_link(OBJECT(dev), "xive", &local_err);
++    obj =3D object_property_get_link(OBJECT(xsrc), "xive", &local_err);
+     if (!obj) {
+         error_propagate(errp, local_err);
+         error_prepend(errp, "required link 'xive' not found: ");
+@@ -931,13 +931,24 @@ static void xive_source_realize(DeviceState *dev, E=
+rror **errp)
+         return;
+     }
+=20
+-    xsrc->qirqs =3D qemu_allocate_irqs(xive_source_set_irq, xsrc,
+-                                     xsrc->nr_irqs);
++    xsrc->qirqs =3D qemu_allocate_irqs(handler, xsrc, xsrc->nr_irqs);
+     xsrc->status =3D g_malloc0(xsrc->nr_irqs);
+=20
+     /* Allocate the SBEs (State Bit Entry). 2 bits, so 4 entries per byt=
+e */
+     xsrc->sbe_size =3D DIV_ROUND_UP(xsrc->nr_irqs, 4);
+     xsrc->sbe =3D g_malloc0(xsrc->sbe_size);
 +}
 +
- static inline int kvmppc_get_cap_safe_cache(void)
- {
-     return 0;
++static void xive_source_realize(DeviceState *dev, Error **errp)
++{
++    XiveSource *xsrc =3D XIVE_SOURCE(dev);
++    Error *local_err =3D NULL;
++
++    xive_source_common_realize(xsrc, xive_source_set_irq, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
+=20
+     /* TODO: H_INT_ESB support, which removing the ESB MMIOs */
+=20
+diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+index 41e2784403b2..f3ac084a71be 100644
+--- a/include/hw/ppc/spapr_xive.h
++++ b/include/hw/ppc/spapr_xive.h
+@@ -51,6 +51,7 @@ void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor=
+ *mon);
+ void spapr_xive_mmio_map(sPAPRXive *xive);
+ void spapr_xive_mmio_unmap(sPAPRXive *xive);
+ qemu_irq spapr_xive_qirq(sPAPRXive *xive, int lisn);
++void spapr_xive_common_realize(sPAPRXive *xive, int esb_shift, Error **e=
+rrp);
+=20
+ /*
+  * sPAPR encoding of EQ indexes
+diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+index 36de10af0109..b040cf580fc9 100644
+--- a/include/hw/ppc/xive.h
++++ b/include/hw/ppc/xive.h
+@@ -175,6 +175,9 @@ static inline qemu_irq xive_source_qirq(XiveSource *x=
+src, uint32_t srcno)
+     return xsrc->qirqs[srcno];
+ }
+=20
++void xive_source_common_realize(XiveSource *xsrc, qemu_irq_handler handl=
+er,
++                                Error **errp);
++
+ /*
+  * XIVE Interrupt Presenter
+  */
 --=20
 2.13.6
