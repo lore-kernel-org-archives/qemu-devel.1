@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f95C9-0002Ke-Ld
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:45:34 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f95LX-0005rx-RO
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:55:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f95C4-0004Hd-Q5
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:45:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40156 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1f95C4-0004H6-LE
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:45:28 -0400
-References: <20180417224054.26363-1-lersek@redhat.com>
-	<20180418060243.iafg4wj5gwsruop5@sirius.home.kraxel.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <cc95d6cc-97ca-f428-0b53-a0e92b64e6f8@redhat.com>
-Date: Thu, 19 Apr 2018 10:45:05 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1f95LQ-0002RG-U4
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:55:15 -0400
+Received: from mail-ot0-x22a.google.com ([2607:f8b0:4003:c0f::22a]:40740)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f95LQ-0002Pl-NL
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:55:08 -0400
+Received: by mail-ot0-x22a.google.com with SMTP id h8-v6so5019112otj.7
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 01:55:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180418060243.iafg4wj5gwsruop5@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu RFC v2] qapi: add "firmware.json"
+In-Reply-To: <20180419075958.GD10259@redhat.com>
+References: <20180418123838.3511-1-olaf@aepfle.de>
+	<20180418144538.4aa2f492.cohuck@redhat.com>
+	<20180418125545.GN27579@redhat.com> <87sh7rvf27.fsf@dusky.pond.sub.org>
+	<20180419093024.27c77433.olaf@aepfle.de>
+	<20180419075958.GD10259@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 19 Apr 2018 09:54:47 +0100
+Message-ID: <CAFEAcA9UYM3hifEbs_sp9jcFkwu5sSSXaLq9CLWuhNbV67+MBQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1] configure: require glib-2.24
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +33,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>
-Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Olaf Hering <olaf@aepfle.de>, Markus Armbruster <armbru@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Fam Zheng <famz@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 18.04.2018 08:02, Gerd Hoffmann wrote:
-> On Wed, Apr 18, 2018 at 12:40:54AM +0200, Laszlo Ersek wrote:
->> Add a schema that describes the different uses and properties of virtual
->> machine firmware.
-> 
-> Looks good to me overall.
-> 
->> +{ 'enum' : 'FirmwareType',
->> +  'data' : [ 'bios', 'slof', 'uboot', 'uefi' ] }
-> 
-> openbios missing.
+On 19 April 2018 at 08:59, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wr=
+ote:
+> I wouldn't say people don't care about SLE11 (or other similarly old dist=
+ros
+> like RHEL-6). Rather the view in libvirt was that if a user is stuck on s=
+uch
+> an old distro, they are likely doing that because they want the stability
+> inherant in running fixed software versions for years. IOW it is unlikely
+> that they want the stability of an old distro, combined with cutting edge
+> libvirt and/or QEMU.
 
-As mentioned somewhere else in this thread, I think it's best to just
-use "openfirmware" here instead of "slof" and "openbios"
+Well, it depends. You might be stuck with an old distro because
+some software you want to run depends on it, but also want to run
+newer versions of some programs like QEMU. If you're in that
+boat you can probably live with having to also compile a newer
+version of glib to go with your newer QEMU, though. I think the
+policy as outlined in that libvirt page seems a good one (it's
+basically a codification of what we've been doing already), with
+a few tweaks -- I think we still believe we support some older
+OSX releases, and would want to mention NetBSD/OpenBSD I guess.
 
->> +{ 'enum' : 'FirmwareArchitecture',
->> +  'data' : [ 'aarch64', 'arm', 'i386', 'x86_64' ] }
-> 
-> ppc(64) missing (but you have slof above ;) ...
-
-Since you distinguish between 32-bit and 64-bit, we need both "ppc"
-(32-bit) and "ppc64" (64-bit) here.
-
-> s390 too.
-
-Please name that "s390x". "s390" without x means the old 31-bit
-architecture which is hardly used anymore today. "s390x" is the modern
-64-bit architecture.
-
- Thomas
+thanks
+-- PMM
