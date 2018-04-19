@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1f98vO-0007wF-W2
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:44:32 -0400
+	(envelope-from <clg@kaod.org>) id 1f98vU-00082K-B5
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:44:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1f98vL-00087M-0a
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:44:31 -0400
-Received: from 6.mo2.mail-out.ovh.net ([87.98.165.38]:44218)
+	(envelope-from <clg@kaod.org>) id 1f98vQ-00089u-D5
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:44:36 -0400
+Received: from 3.mo69.mail-out.ovh.net ([188.165.52.203]:40085)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1f98vK-00085g-Nk
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:44:26 -0400
-Received: from player792.ha.ovh.net (unknown [10.109.105.125])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 2B46712DC59
-	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 14:44:24 +0200 (CEST)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1f98vQ-000897-5B
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 08:44:32 -0400
+Received: from player792.ha.ovh.net (unknown [10.109.122.11])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id B0EE413BB6
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 14:44:30 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu, 19 Apr 2018 14:43:03 +0200
-Message-Id: <20180419124331.3915-8-clg@kaod.org>
+Date: Thu, 19 Apr 2018 14:43:04 +0200
+Message-Id: <20180419124331.3915-9-clg@kaod.org>
 In-Reply-To: <20180419124331.3915-1-clg@kaod.org>
 References: <20180419124331.3915-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 07/35] spapr/xive: introduce the XIVE Event
- Queues
+Subject: [Qemu-devel] [PATCH v3 08/35] spapr: push the XIVE EQ data in OS
+ event queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,329 +33,119 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Cc: David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-The Event Queue Descriptor (EQD) table is an internal table of the
-XIVE routing sub-engine. It specifies on which Event Queue the event
-data should be posted when an exception occurs (later on pulled by the
-OS) and which Virtual Processor to notify. The Event Queue is a much
-more complex structure but we start with a simple model for the sPAPR
-machine.
+When a notification is let through by the routing engine, the Event
+Queue data defined in the associated IVE is pushed in the in-memory
+event queue. The latter is a circular buffer provided by the OS, one
+per server and priority couple. Each Event Queue entry is 4 bytes
+long, the first bit being a 'generation' bit and the 31 following bits
+the EQ Data field.
 
-There is one XiveEQ per priority and these are stored under the XIVE
-virtualization presenter (sPAPRXiveNVT). EQs are simply indexed with :
-
-       (server << 3) | (priority & 0x7)
-
-This is not in the XIVE architecture but as the EQ index is never
-exposed to the guest, in the hcalls nor in the device tree, we are
-free to use what fits best the current model.
+The EQ Data field is a way to set an invariant logical event source
+number for an IRQ. It is set with the H_INT_SET_SOURCE_CONFIG hcall
+when the EISN flag is used.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
 
  Changes since v2 :
 
- - introduced the XiveFabric interface
+ - used dma_memory_write() to push EQ data
+ - introduced the XiveFabric interface, to generalize the routing algo.
 
- hw/intc/spapr_xive.c        | 31 +++++++++++++++++---
- hw/intc/xive.c              | 71 +++++++++++++++++++++++++++++++++++++++=
+ hw/intc/xive.c | 65 ++++++++++++++++++++++++++++++++++++++++++++++++++++=
 ++++++
- include/hw/ppc/spapr_xive.h |  7 +++++
- include/hw/ppc/xive.h       |  8 +++++
- include/hw/ppc/xive_regs.h  | 48 ++++++++++++++++++++++++++++++
- 5 files changed, 161 insertions(+), 4 deletions(-)
+ 1 file changed, 65 insertions(+)
 
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index f07832bf0a00..d0d5a7d7f969 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -27,15 +27,30 @@ void spapr_xive_pic_print_info(sPAPRXive *xive, Monit=
-or *mon)
-     monitor_printf(mon, "IVE Table\n");
-     for (i =3D 0; i < xive->nr_irqs; i++) {
-         XiveIVE *ive =3D &xive->ivt[i];
-+        uint32_t eq_idx;
-=20
-         if (!(ive->w & IVE_VALID)) {
-             continue;
-         }
-=20
--        monitor_printf(mon, "  %4x %s %08x %08x\n", i,
--                       ive->w & IVE_MASKED ? "M" : " ",
--                       (int) GETFIELD(IVE_EQ_INDEX, ive->w),
--                       (int) GETFIELD(IVE_EQ_DATA, ive->w));
-+        eq_idx =3D GETFIELD(IVE_EQ_INDEX, ive->w);
-+
-+        monitor_printf(mon, "  %6x %s eqidx:%03d ", i,
-+                       ive->w & IVE_MASKED ? "M" : " ", eq_idx);
-+
-+        if (!(ive->w & IVE_MASKED)) {
-+            XiveEQ *eq;
-+
-+            eq =3D xive_fabric_get_eq(XIVE_FABRIC(xive), eq_idx);
-+            if (eq && (eq->w0 & EQ_W0_VALID)) {
-+                xive_eq_pic_print_info(eq, mon);
-+                monitor_printf(mon, " data:%08x",
-+                               (int) GETFIELD(IVE_EQ_DATA, ive->w));
-+            } else {
-+                monitor_printf(mon, "no eq ?!");
-+            }
-+        }
-+        monitor_printf(mon, "\n");
-     }
- }
-=20
-@@ -128,6 +143,13 @@ static XiveNVT *spapr_xive_get_nvt(XiveFabric *xf, u=
-int32_t server)
-     return cpu ? XIVE_NVT(cpu->intc) : NULL;
- }
-=20
-+static XiveEQ *spapr_xive_get_eq(XiveFabric *xf, uint32_t eq_idx)
-+{
-+    XiveNVT *nvt =3D xive_fabric_get_nvt(xf, SPAPR_XIVE_EQ_SERVER(eq_idx=
-));
-+
-+    return xive_nvt_eq_get(nvt, SPAPR_XIVE_EQ_PRIO(eq_idx));
-+}
-+
- static const VMStateDescription vmstate_spapr_xive_ive =3D {
-     .name =3D TYPE_SPAPR_XIVE "/ive",
-     .version_id =3D 1,
-@@ -168,6 +190,7 @@ static void spapr_xive_class_init(ObjectClass *klass,=
- void *data)
-=20
-     xfc->get_ive =3D spapr_xive_get_ive;
-     xfc->get_nvt =3D spapr_xive_get_nvt;
-+    xfc->get_eq =3D spapr_xive_get_eq;
- }
-=20
- static const TypeInfo spapr_xive_info =3D {
 diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index 5691bb9474e4..2ab37fde80e8 100644
+index 2ab37fde80e8..420cc6703b88 100644
 --- a/hw/intc/xive.c
 +++ b/hw/intc/xive.c
-@@ -19,6 +19,47 @@
- #include "hw/ppc/xive_regs.h"
+@@ -59,6 +59,31 @@ void xive_eq_pic_print_info(XiveEQ *eq, Monitor *mon)
+                    priority, server, qaddr_base, qindex, qentries, qgen)=
+;
+ }
 =20
- /*
-+ * XiveEQ helpers
-+ */
-+
-+XiveEQ *xive_nvt_eq_get(XiveNVT *nvt, uint8_t priority)
-+{
-+    if (!nvt || priority > XIVE_PRIORITY_MAX) {
-+        return NULL;
-+    }
-+    return &nvt->eqt[priority];
-+}
-+
-+void xive_eq_reset(XiveEQ *eq)
-+{
-+    memset(eq, 0, sizeof(*eq));
-+
-+    /* switch off the escalation and notification ESBs */
-+    eq->w1 =3D EQ_W1_ESe_Q | EQ_W1_ESn_Q;
-+}
-+
-+void xive_eq_pic_print_info(XiveEQ *eq, Monitor *mon)
++static void xive_eq_push(XiveEQ *eq, uint32_t data)
 +{
 +    uint64_t qaddr_base =3D (((uint64_t)(eq->w2 & 0x0fffffff)) << 32) | =
 eq->w3;
++    uint32_t qsize =3D GETFIELD(EQ_W0_QSIZE, eq->w0);
 +    uint32_t qindex =3D GETFIELD(EQ_W1_PAGE_OFF, eq->w1);
 +    uint32_t qgen =3D GETFIELD(EQ_W1_GENERATION, eq->w1);
-+    uint32_t qsize =3D GETFIELD(EQ_W0_QSIZE, eq->w0);
++
++    uint64_t qaddr =3D qaddr_base + (qindex << 2);
++    uint32_t qdata =3D cpu_to_be32((qgen << 31) | (data & 0x7fffffff));
 +    uint32_t qentries =3D 1 << (qsize + 10);
 +
-+    uint32_t server =3D GETFIELD(EQ_W6_NVT_INDEX, eq->w6);
-+    uint8_t priority =3D GETFIELD(EQ_W7_F0_PRIORITY, eq->w7);
++    if (dma_memory_write(&address_space_memory, qaddr, &qdata, sizeof(qd=
+ata))) {
++        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: failed to write EQ data @0=
+x%"
++                      HWADDR_PRIx "\n", qaddr);
++        return;
++    }
 +
-+    monitor_printf(mon, "%c%c%c%c%c prio:%d server:%03d eq:@%08"PRIx64
-+                   "% 6d/%5d ^%d",
-+                   eq->w0 & EQ_W0_VALID ? 'v' : '-',
-+                   eq->w0 & EQ_W0_ENQUEUE ? 'q' : '-',
-+                   eq->w0 & EQ_W0_UCOND_NOTIFY ? 'n' : '-',
-+                   eq->w0 & EQ_W0_BACKLOG ? 'b' : '-',
-+                   eq->w0 & EQ_W0_ESCALATE_CTL ? 'e' : '-',
-+                   priority, server, qaddr_base, qindex, qentries, qgen)=
-;
++    qindex =3D (qindex + 1) % qentries;
++    if (qindex =3D=3D 0) {
++        qgen ^=3D 1;
++        eq->w1 =3D SETFIELD(EQ_W1_GENERATION, eq->w1, qgen);
++    }
++    eq->w1 =3D SETFIELD(EQ_W1_PAGE_OFF, eq->w1, qindex);
 +}
 +
-+/*
+ /*
   * XIVE Interrupt Presenter
   */
+@@ -378,7 +403,47 @@ XiveEQ *xive_fabric_get_eq(XiveFabric *xf, uint32_t =
+eq_idx)
 =20
-@@ -210,8 +251,12 @@ void xive_nvt_pic_print_info(XiveNVT *nvt, Monitor *=
-mon)
- static void xive_nvt_reset(void *dev)
+ static void xive_fabric_route(XiveFabric *xf, int lisn)
  {
-     XiveNVT *nvt =3D XIVE_NVT(dev);
-+    int i;
++    XiveIVE *ive;
++    XiveEQ *eq;
++    uint32_t eq_idx;
++    uint8_t priority;
 =20
-     memset(nvt->regs, 0, sizeof(nvt->regs));
-+    for (i =3D 0; i < ARRAY_SIZE(nvt->eqt); i++) {
-+        xive_eq_reset(&nvt->eqt[i]);
++    ive =3D xive_fabric_get_ive(xf, lisn);
++    if (!ive || !(ive->w & IVE_VALID)) {
++        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid LISN %d\n", lisn);
++        return;
++    }
++
++    if (ive->w & IVE_MASKED) {
++        return;
++    }
++
++    /* Find our XiveEQ */
++    eq_idx =3D GETFIELD(IVE_EQ_INDEX, ive->w);
++    eq =3D xive_fabric_get_eq(xf, eq_idx);
++    if (!eq || !(eq->w0 & EQ_W0_VALID)) {
++        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: No EQ for LISN %d\n", lisn=
+);
++        return;
++    }
++
++    if (eq->w0 & EQ_W0_ENQUEUE) {
++        xive_eq_push(eq, GETFIELD(IVE_EQ_DATA, ive->w));
++    }
++
++    if (!(eq->w0 & EQ_W0_UCOND_NOTIFY)) {
++        qemu_log_mask(LOG_UNIMP, "XIVE: !UCOND_NOTIFY not implemented\n"=
+);
++    }
++
++    if (GETFIELD(EQ_W6_FORMAT_BIT, eq->w6) =3D=3D 0) {
++        priority =3D GETFIELD(EQ_W7_F0_PRIORITY, eq->w7);
++
++        /* The EQ is masked. Can this happen ?  */
++        if (priority =3D=3D 0xff) {
++            g_assert_not_reached();
++        }
++    } else {
++        qemu_log_mask(LOG_UNIMP, "XIVE: w7 format1 not implemented\n");
 +    }
  }
 =20
- static void xive_nvt_realize(DeviceState *dev, Error **errp)
-@@ -259,12 +304,31 @@ static void xive_nvt_init(Object *obj)
-     nvt->ring_os =3D &nvt->regs[TM_QW1_OS];
- }
-=20
-+static const VMStateDescription vmstate_xive_nvt_eq =3D {
-+    .name =3D TYPE_XIVE_NVT "/eq",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .fields =3D (VMStateField []) {
-+        VMSTATE_UINT32(w0, XiveEQ),
-+        VMSTATE_UINT32(w1, XiveEQ),
-+        VMSTATE_UINT32(w2, XiveEQ),
-+        VMSTATE_UINT32(w3, XiveEQ),
-+        VMSTATE_UINT32(w4, XiveEQ),
-+        VMSTATE_UINT32(w5, XiveEQ),
-+        VMSTATE_UINT32(w6, XiveEQ),
-+        VMSTATE_UINT32(w7, XiveEQ),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
- static const VMStateDescription vmstate_xive_nvt =3D {
-     .name =3D TYPE_XIVE_NVT,
-     .version_id =3D 1,
-     .minimum_version_id =3D 1,
-     .fields =3D (VMStateField[]) {
-         VMSTATE_BUFFER(regs, XiveNVT),
-+        VMSTATE_STRUCT_ARRAY(eqt, XiveNVT, (XIVE_PRIORITY_MAX + 1), 1,
-+                             vmstate_xive_nvt_eq, XiveEQ),
-         VMSTATE_END_OF_LIST()
-     },
- };
-@@ -305,6 +369,13 @@ XiveNVT *xive_fabric_get_nvt(XiveFabric *xf, uint32_=
-t server)
-     return xfc->get_nvt(xf, server);
- }
-=20
-+XiveEQ *xive_fabric_get_eq(XiveFabric *xf, uint32_t eq_idx)
-+{
-+   XiveFabricClass *xfc =3D XIVE_FABRIC_GET_CLASS(xf);
-+
-+   return xfc->get_eq(xf, eq_idx);
-+}
-+
- static void xive_fabric_route(XiveFabric *xf, int lisn)
- {
-=20
-diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-index 25d78eec884d..7cb3561aa3d3 100644
---- a/include/hw/ppc/spapr_xive.h
-+++ b/include/hw/ppc/spapr_xive.h
-@@ -36,4 +36,11 @@ bool spapr_xive_irq_enable(sPAPRXive *xive, uint32_t l=
-isn, bool lsi);
- bool spapr_xive_irq_disable(sPAPRXive *xive, uint32_t lisn);
- void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
-=20
-+/*
-+ * sPAPR encoding of EQ indexes
-+ */
-+#define SPAPR_XIVE_EQ_INDEX(server, prio)  (((server) << 3) | ((prio) & =
-0x7))
-+#define SPAPR_XIVE_EQ_SERVER(eq_idx) ((eq_idx) >> 3)
-+#define SPAPR_XIVE_EQ_PRIO(eq_idx)   ((eq_idx) & 0x7)
-+
- #endif /* PPC_SPAPR_XIVE_H */
-diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-index 1a2da610d91c..6cc02638c677 100644
---- a/include/hw/ppc/xive.h
-+++ b/include/hw/ppc/xive.h
-@@ -176,12 +176,18 @@ typedef struct XiveNVT {
-=20
-     /* Shortcuts to rings */
-     uint8_t   *ring_os;
-+
-+    XiveEQ    eqt[XIVE_PRIORITY_MAX + 1];
- } XiveNVT;
-=20
- extern const MemoryRegionOps xive_tm_user_ops;
- extern const MemoryRegionOps xive_tm_os_ops;
-=20
- void xive_nvt_pic_print_info(XiveNVT *nvt, Monitor *mon);
-+XiveEQ *xive_nvt_eq_get(XiveNVT *nvt, uint8_t priority);
-+
-+void xive_eq_reset(XiveEQ *eq);
-+void xive_eq_pic_print_info(XiveEQ *eq, Monitor *mon);
-=20
- /*
-  * XIVE Fabric
-@@ -205,9 +211,11 @@ typedef struct XiveFabricClass {
-=20
-     XiveIVE *(*get_ive)(XiveFabric *xf, uint32_t lisn);
-     XiveNVT *(*get_nvt)(XiveFabric *xf, uint32_t server);
-+    XiveEQ  *(*get_eq)(XiveFabric *xf, uint32_t eq_idx);
- } XiveFabricClass;
-=20
- XiveIVE *xive_fabric_get_ive(XiveFabric *xf, uint32_t lisn);
- XiveNVT *xive_fabric_get_nvt(XiveFabric *xf, uint32_t server);
-+XiveEQ  *xive_fabric_get_eq(XiveFabric *xf, uint32_t eq_idx);
-=20
- #endif /* PPC_XIVE_H */
-diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
-index f2e2a1ac8f6e..bcc44e766db9 100644
---- a/include/hw/ppc/xive_regs.h
-+++ b/include/hw/ppc/xive_regs.h
-@@ -112,6 +112,54 @@ typedef struct XiveIVE {
- #define IVE_EQ_DATA     PPC_BITMASK(33, 63)      /* Data written to the =
-EQ */
- } XiveIVE;
-=20
-+/* EQ */
-+typedef struct XiveEQ {
-+        uint32_t        w0;
-+#define EQ_W0_VALID             PPC_BIT32(0) /* "v" bit */
-+#define EQ_W0_ENQUEUE           PPC_BIT32(1) /* "q" bit */
-+#define EQ_W0_UCOND_NOTIFY      PPC_BIT32(2) /* "n" bit */
-+#define EQ_W0_BACKLOG           PPC_BIT32(3) /* "b" bit */
-+#define EQ_W0_PRECL_ESC_CTL     PPC_BIT32(4) /* "p" bit */
-+#define EQ_W0_ESCALATE_CTL      PPC_BIT32(5) /* "e" bit */
-+#define EQ_W0_UNCOND_ESCALATE   PPC_BIT32(6) /* "u" bit - DD2.0 */
-+#define EQ_W0_SILENT_ESCALATE   PPC_BIT32(7) /* "s" bit - DD2.0 */
-+#define EQ_W0_QSIZE             PPC_BITMASK32(12, 15)
-+#define EQ_W0_SW0               PPC_BIT32(16)
-+#define EQ_W0_FIRMWARE          EQ_W0_SW0 /* Owned by FW */
-+#define EQ_QSIZE_4K             0
-+#define EQ_QSIZE_64K            4
-+#define EQ_W0_HWDEP             PPC_BITMASK32(24, 31)
-+        uint32_t        w1;
-+#define EQ_W1_ESn               PPC_BITMASK32(0, 1)
-+#define EQ_W1_ESn_P             PPC_BIT32(0)
-+#define EQ_W1_ESn_Q             PPC_BIT32(1)
-+#define EQ_W1_ESe               PPC_BITMASK32(2, 3)
-+#define EQ_W1_ESe_P             PPC_BIT32(2)
-+#define EQ_W1_ESe_Q             PPC_BIT32(3)
-+#define EQ_W1_GENERATION        PPC_BIT32(9)
-+#define EQ_W1_PAGE_OFF          PPC_BITMASK32(10, 31)
-+        uint32_t        w2;
-+#define EQ_W2_MIGRATION_REG     PPC_BITMASK32(0, 3)
-+#define EQ_W2_OP_DESC_HI        PPC_BITMASK32(4, 31)
-+        uint32_t        w3;
-+#define EQ_W3_OP_DESC_LO        PPC_BITMASK32(0, 31)
-+        uint32_t        w4;
-+#define EQ_W4_ESC_EQ_BLOCK      PPC_BITMASK32(4, 7)
-+#define EQ_W4_ESC_EQ_INDEX      PPC_BITMASK32(8, 31)
-+        uint32_t        w5;
-+#define EQ_W5_ESC_EQ_DATA       PPC_BITMASK32(1, 31)
-+        uint32_t        w6;
-+#define EQ_W6_FORMAT_BIT        PPC_BIT32(8)
-+#define EQ_W6_NVT_BLOCK         PPC_BITMASK32(9, 12)
-+#define EQ_W6_NVT_INDEX         PPC_BITMASK32(13, 31)
-+        uint32_t        w7;
-+#define EQ_W7_F0_IGNORE         PPC_BIT32(0)
-+#define EQ_W7_F0_BLK_GROUPING   PPC_BIT32(1)
-+#define EQ_W7_F0_PRIORITY       PPC_BITMASK32(8, 15)
-+#define EQ_W7_F1_WAKEZ          PPC_BIT32(0)
-+#define EQ_W7_F1_LOG_SERVER_ID  PPC_BITMASK32(1, 31)
-+} XiveEQ;
-+
- #define XIVE_PRIORITY_MAX  7
-=20
- #endif /* _INTC_XIVE_INTERNAL_H */
+ static const TypeInfo xive_fabric_info =3D {
 --=20
 2.13.6
