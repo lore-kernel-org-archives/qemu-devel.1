@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f94hi-0007LC-PV
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:14:07 -0400
+	(envelope-from <thuth@redhat.com>) id 1f94l0-0000Ga-Fl
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:17:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1f94hh-0007Mz-KW
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:14:06 -0400
-Date: Thu, 19 Apr 2018 16:13:44 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180419081344.GA14514@lemon.usersys.redhat.com>
-References: <20180419075232.31407-1-stefanha@redhat.com>
-	<20180419075232.31407-2-stefanha@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1f94kx-0000sb-77
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:17:30 -0400
+References: <1524054707-20663-1-git-send-email-thuth@redhat.com>
+	<1524054707-20663-4-git-send-email-thuth@redhat.com>
+	<bc5533dc-9471-7dac-6aba-9014e9961376@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <b0bb6918-0047-9a53-b03f-bff5669daaaa@redhat.com>
+Date: Thu, 19 Apr 2018 10:17:15 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180419075232.31407-2-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 1/2] block/file-posix: implement
- bdrv_co_invalidate_cache() on Linux
+In-Reply-To: <bc5533dc-9471-7dac-6aba-9014e9961376@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 for-2.13 3/4] pc-bios/s390-ccw/net: Add
+ support for pxelinux-style config files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,107 +26,289 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Viktor VM Mihajlovski <mihajlov@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
+Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>
 
-On Thu, 04/19 15:52, Stefan Hajnoczi wrote:
-> On Linux posix_fadvise(POSIX_FADV_DONTNEED) invalidates pages*.  Use
-> this to drop page cache on the destination host during shared storage
-> migration.  This way the destination host will read the latest copy of
-> the data and will not use stale data from the page cache.
-> 
-> The flow is as follows:
-> 
-> 1. Source host writes out all dirty pages and inactivates drives.
-> 2. QEMU_VM_EOF is sent on migration stream.
-> 3. Destination host invalidates caches before accessing drives.
-> 
-> This patch enables live migration even with -drive cache.direct=off.
-> 
-> * Terms and conditions may apply, please see patch for details.
-> 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  block/file-posix.c | 39 +++++++++++++++++++++++++++++++++++++++
->  1 file changed, 39 insertions(+)
-> 
-> diff --git a/block/file-posix.c b/block/file-posix.c
-> index 3794c0007a..df4f52919f 100644
-> --- a/block/file-posix.c
-> +++ b/block/file-posix.c
-> @@ -2236,6 +2236,42 @@ static int coroutine_fn raw_co_block_status(BlockDriverState *bs,
->      return ret | BDRV_BLOCK_OFFSET_VALID;
->  }
->  
-> +static void coroutine_fn raw_co_invalidate_cache(BlockDriverState *bs,
-> +                                                 Error **errp)
-> +{
-> +    BDRVRawState *s = bs->opaque;
-> +    int ret;
-> +
-> +    ret = fd_open(bs);
-> +    if (ret < 0) {
-> +        error_setg_errno(errp, -ret, "The file descriptor is not open");
-> +        return;
-> +    }
-> +
-> +    if (s->open_flags & O_DIRECT) {
-> +        return; /* No host kernel page cache */
-> +    }
-> +
-> +#if defined(__linux__)
-> +    /* This sets the scene for the next syscall... */
-> +    ret = bdrv_co_flush(bs);
-> +    if (ret < 0) {
-> +        error_setg_errno(errp, -ret, "flush failed");
-> +        return;
-> +    }
-> +
-> +    /* Linux does not invalidate pages that are dirty, locked, or mmapped by a
-> +     * process.  These limitations are okay because we just fsynced the file,
-> +     * we don't use mmap, and the file should not be in use by other processes.
-> +     */
-> +    ret = posix_fadvise(s->fd, 0, 0, POSIX_FADV_DONTNEED);
-> +    if (ret != 0) { /* the return value is a positive errno */
-> +        error_setg_errno(errp, ret, "fadvise failed");
-> +        return;
-> +    }
-> +#endif /* __linux__ */
+On 19.04.2018 09:41, Viktor VM Mihajlovski wrote:
+> On 18.04.2018 14:31, Thomas Huth wrote:
+>> Since it is quite cumbersome to manually create a combined kernel with
+>> initrd image for network booting, we now support loading via pxelinux
+>> configuration files, too. In these files, the kernel, initrd and command
+>> line parameters can be specified seperately, and the firmware then takes
+>> care of glueing everything together in memory after the files have been
+>> downloaded.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  pc-bios/s390-ccw/netboot.mak |   5 +-
+>>  pc-bios/s390-ccw/netmain.c   | 203 +++++++++++++++++++++++++++++++++++++++++--
+>>  2 files changed, 201 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/pc-bios/s390-ccw/netboot.mak b/pc-bios/s390-ccw/netboot.mak
+>> index a25d238..8db9573 100644
+>> --- a/pc-bios/s390-ccw/netboot.mak
+>> +++ b/pc-bios/s390-ccw/netboot.mak
+>> @@ -24,8 +24,9 @@ CTYPE_OBJS = isdigit.o isxdigit.o toupper.o
+>>  %.o : $(SLOF_DIR)/lib/libc/ctype/%.c
+>>  	$(call quiet-command,$(CC) $(LIBC_CFLAGS) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
+>>
+>> -STRING_OBJS = strcat.o strchr.o strcmp.o strcpy.o strlen.o strncmp.o strncpy.o \
+>> -	      strstr.o memset.o memcpy.o memmove.o memcmp.o
+>> +STRING_OBJS = strcasecmp.o strcat.o strchr.o strcmp.o strcpy.o strlen.o \
+>> +	      strncasecmp.o strncmp.o strncpy.o strstr.o \
+>> +	      memset.o memcpy.o memmove.o memcmp.o
+>>  %.o : $(SLOF_DIR)/lib/libc/string/%.c
+>>  	$(call quiet-command,$(CC) $(LIBC_CFLAGS) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
+>>
+>> diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
+>> index e11ed4e..fa62bfe 100644
+>> --- a/pc-bios/s390-ccw/netmain.c
+>> +++ b/pc-bios/s390-ccw/netmain.c
+>> @@ -39,11 +39,17 @@
+>>
+>>  extern char _start[];
+>>
+>> +#define KERNEL_ADDR             ((void *)0L)
+>> +#define KERNEL_MAX_SIZE         ((long)_start)
+>> +#define ARCH_COMMAND_LINE_SIZE  896              /* Taken from Linux kernel */
+>> +
+>>  char stack[PAGE_SIZE * 8] __attribute__((aligned(PAGE_SIZE)));
+>>  IplParameterBlock iplb __attribute__((aligned(PAGE_SIZE)));
+>> +static char cfgbuf[2048];
+>>
+>>  static SubChannelId net_schid = { .one = 1 };
+>>  static int ip_version = 4;
+>> +static uint8_t mac[6];
+>>  static uint64_t dest_timer;
+>>
+>>  static uint64_t get_timer_ms(void)
+>> @@ -136,9 +142,15 @@ static int tftp_load(filename_ip_t *fnip, void *buffer, int len)
+>>      rc = tftp(fnip, buffer, len, DEFAULT_TFTP_RETRIES, &tftp_err, 1, 1428,
+>>                ip_version);
+>>
+>> -    if (rc > 0) {
+>> -        printf("  TFTP: Received %s (%d KBytes)\n", fnip->filename,
+>> -               rc / 1024);
+>> +    if (rc < 0) {
+>> +        /* Make sure that error messages are put into a new line */
+>> +        printf("\n  ");
+>> +    }
+>> +
+>> +    if (rc > 1024) {
+>> +        printf("  TFTP: Received %s (%d KBytes)\n", fnip->filename, rc / 1024);
+>> +    } else if (rc > 0) {
+>> +        printf("  TFTP: Received %s (%d Bytes)\n", fnip->filename, rc);
+>>      } else if (rc == -1) {
+>>          puts("unknown TFTP error");
+>>      } else if (rc == -2) {
+>> @@ -201,7 +213,6 @@ static int tftp_load(filename_ip_t *fnip, void *buffer, int len)
+>>
+>>  static int net_init(filename_ip_t *fn_ip)
+>>  {
+>> -    uint8_t mac[6];
+>>      int rc;
+>>
+>>      memset(fn_ip, 0, sizeof(filename_ip_t));
+>> @@ -276,6 +287,183 @@ static void net_uninit(filename_ip_t *fn_ip)
+>>      virtio_net_uninit();
+>>  }
+>>
+>> +/* This structure holds the data from one pxelinux.cfg file entry */
+>> +struct lkia {
+>> +    const char *label;
+>> +    const char *kernel;
+>> +    const char *initrd;
+>> +    const char *append;
+>> +};
+>> +
+>> +static int load_kernel_with_initrd(filename_ip_t *fn_ip, struct lkia *kia)
+>> +{
+>> +    int rc;
+>> +
+>> +    printf("Loading pxelinux.cfg entry '%s'\n", kia->label);
+>> +
+>> +    if (!kia->kernel) {
+>> +        printf("Kernel entry is missing!\n");
+>> +        return -1;
+>> +    }
+>> +
+>> +    strncpy((char *)&fn_ip->filename, kia->kernel, sizeof(fn_ip->filename));
+>> +    rc = tftp_load(fn_ip, KERNEL_ADDR, KERNEL_MAX_SIZE);
+>> +    if (rc < 0) {
+>> +        return rc;
+>> +    }
+>> +
+>> +    if (kia->initrd) {
+>> +        uint64_t iaddr = (rc + 0xfff) & ~0xfffUL;
+>> +
+>> +        strncpy((char *)&fn_ip->filename, kia->initrd, sizeof(fn_ip->filename));
+>> +        rc = tftp_load(fn_ip, (void *)iaddr, KERNEL_MAX_SIZE - iaddr);
+>> +        if (rc < 0) {
+>> +            return rc;
+>> +        }
+>> +        /* Patch location and size: */
+>> +        *(uint64_t *)0x10408 = iaddr;
+>> +        *(uint64_t *)0x10410 = rc;
+>> +        rc += iaddr;
+>> +    }
+>> +
+>> +    if (kia->append) {
+>> +        strncpy((char *)0x10480, kia->append, ARCH_COMMAND_LINE_SIZE);
+>> +    }
+>> +
+>> +    return rc;
+>> +}
+>> +
+>> +#define MAX_PXELINUX_ENTRIES 16
+>> +
+>> +/**
+>> + * Parse a pxelinux-style configuration file.
+>> + * See the following URL for more inforation about the config file syntax:
+>> + * https://www.syslinux.org/wiki/index.php?title=PXELINUX
+>> + */
+>> +static int handle_pxelinux_cfg(filename_ip_t *fn_ip, char *cfg, int cfgsize)
+>> +{
+>> +    struct lkia entries[MAX_PXELINUX_ENTRIES];
+>> +    int num_entries = 0;
+>> +    char *ptr = cfg, *eol, *arg;
+>> +    char *defaultlabel = NULL;
+>> +    int def_ent = 0;
+>> +
+>> +    while (ptr < cfg + cfgsize && num_entries < MAX_PXELINUX_ENTRIES) {
+>> +        eol = strchr(ptr, '\n');
+>> +        if (!eol) {
+>> +            eol = cfg + cfgsize;
+>> +        }
+>> +        if (eol > ptr && *(eol - 1) == '\r') {
+>> +            *(eol - 1) = 0;
+>> +        }
+>> +        *eol = '\0';
+>> +        while (*ptr == ' ' || *ptr == '\t') {
+>> +            ptr++;
+>> +        }
+>> +        if (*ptr == 0 || *ptr == '#') {   /* Ignore comments and empty lines */
+>> +            goto nextline;
+>> +        }
+>> +        arg = strchr(ptr, ' ');    /* Look for space between command and arg */
+>> +        if (!arg) {
+>> +            arg = strchr(ptr, '\t');
+>> +        }
+>> +        if (!arg) {
+>> +            printf("Failed to parse the following line:\n %s\n", ptr);
+>> +            goto nextline;
+>> +        }
+>> +        *arg++ = 0;
+>> +        while (*arg == ' ' || *arg == '\t') {
+>> +            arg++;
+>> +        }
+>> +        if (!strcasecmp("default", ptr)) {
+>> +            defaultlabel = arg;
+>> +        } else if (!strcasecmp("label", ptr)) {
+>> +            entries[num_entries].label = arg;
+>> +            if (defaultlabel && !strcmp(arg, defaultlabel)) {
+>> +                def_ent = num_entries;
+>> +            }
+>> +            num_entries++;
+>> +        } else if (!strcasecmp("kernel", ptr)) {
+>> +            entries[num_entries - 1].kernel = arg;
+>> +        } else if (!strcasecmp("initrd", ptr)) {
+>> +            entries[num_entries - 1].initrd = arg;
+>> +        } else if (!strcasecmp("append", ptr)) {
+>> +            entries[num_entries - 1].append = arg;
+>> +        } else {
+>> +            printf("Command '%s' is not supported.\n", ptr);
+>> +        }
+>> +nextline:
+>> +        ptr = eol + 1;
+>> +    }
+>> +
+>> +    return load_kernel_with_initrd(fn_ip, &entries[def_ent]);
+>> +}
+>> +
+>> +static int net_try_pxelinux_cfgs(filename_ip_t *fn_ip)
+>> +{
+>> +    int rc, idx;
+>> +
+>> +    cfgbuf[sizeof(cfgbuf) - 1] = 0;   /* Make sure that it is NUL-terminated */
+>> +
+>> +    printf("Trying pxelinux.cfg files...\n");
+>> +
+>> +    /* Look for config file with MAC address in its name */
+>> +    sprintf((char *)fn_ip->filename,
+>> +            "pxelinux.cfg/%02x-%02x-%02x-%02x-%02x-%02x",
+>> +            mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+>> +    rc = tftp_load(fn_ip, cfgbuf, sizeof(cfgbuf) - 1);
+>> +    if (rc > 0) {
+>> +        return handle_pxelinux_cfg(fn_ip, cfgbuf, sizeof(cfgbuf));
+>> +    }
+>> +
+>> +    /* Look for config file with IP address in its name */
+>> +    if (ip_version == 4) {
+>> +        for (idx = 0; idx <= 7; idx++) {
+>> +            sprintf((char *)fn_ip->filename,
+>> +                    "pxelinux.cfg/%02X%02X%02X%02X",
+>> +                    (fn_ip->own_ip >> 24) & 0xff, (fn_ip->own_ip >> 16) & 0xff,
+>> +                    (fn_ip->own_ip >> 8) & 0xff, fn_ip->own_ip & 0xff);
+>> +            fn_ip->filename[strlen((char *)fn_ip->filename) - idx] = 0;
+>> +            rc = tftp_load(fn_ip, cfgbuf, sizeof(cfgbuf) - 1);
+>> +            if (rc > 0) {
+>> +                return handle_pxelinux_cfg(fn_ip, cfgbuf, sizeof(cfgbuf));
+>> +            }
+>> +        }
+>> +    }
+>> +
+>> +    /* Try "default" config file */
+>> +    strcpy((char *)fn_ip->filename, "pxelinux.cfg/default");
+>> +    rc = tftp_load(fn_ip, cfgbuf, sizeof(cfgbuf) - 1);
+>> +    if (rc > 0) {
+>> +        return handle_pxelinux_cfg(fn_ip, cfgbuf, sizeof(cfgbuf));
+>> +    }
+>> +
+>> +    return -1;
+>> +}
+>> +
+>> +static int net_try_direct_tftp_load(filename_ip_t *fn_ip)
+>> +{
+>> +    int rc;
+>> +    void *baseaddr = (void *)0x2000;  /* Load right after the low-core */
+>> +
+>> +    rc = tftp_load(fn_ip, baseaddr, KERNEL_MAX_SIZE - (long)baseaddr);
+>> +
+>> +    if (rc > 0 && rc < sizeof(cfgbuf) - 1) {
+>> +        /* Check whether it is a configuration file instead of a kernel */
+> That's interesting because treating the bootfile as pxe-ish config is
+> what DPM does. Which means that with this change the processor
+> architecture type 0x1f (Basic) will turn into a superset of 0x20
+> (Extended).
 
-What about the #else branch? It doesn't automatically work, I guess?
+Is there any reference available what "basic" and "extended" exactly
+mean? I just know that there are these two values registered by you at
+the IANA:
 
-Fam
+https://www.iana.org/assignments/dhcpv6-parameters/dhcpv6-parameters.xhtml#processor-architecture
 
-> +}
-> +
->  static coroutine_fn BlockAIOCB *raw_aio_pdiscard(BlockDriverState *bs,
->      int64_t offset, int bytes,
->      BlockCompletionFunc *cb, void *opaque)
-> @@ -2328,6 +2364,7 @@ BlockDriver bdrv_file = {
->      .bdrv_co_create_opts = raw_co_create_opts,
->      .bdrv_has_zero_init = bdrv_has_zero_init_1,
->      .bdrv_co_block_status = raw_co_block_status,
-> +    .bdrv_co_invalidate_cache = raw_co_invalidate_cache,
->      .bdrv_co_pwrite_zeroes = raw_co_pwrite_zeroes,
->  
->      .bdrv_co_preadv         = raw_co_preadv,
-> @@ -2805,6 +2842,7 @@ static BlockDriver bdrv_host_device = {
->      .bdrv_reopen_abort   = raw_reopen_abort,
->      .bdrv_co_create_opts = hdev_co_create_opts,
->      .create_opts         = &raw_create_opts,
-> +    .bdrv_co_invalidate_cache = raw_co_invalidate_cache,
->      .bdrv_co_pwrite_zeroes = hdev_co_pwrite_zeroes,
->  
->      .bdrv_co_preadv         = raw_co_preadv,
-> @@ -2927,6 +2965,7 @@ static BlockDriver bdrv_host_cdrom = {
->      .bdrv_reopen_abort   = raw_reopen_abort,
->      .bdrv_co_create_opts = hdev_co_create_opts,
->      .create_opts         = &raw_create_opts,
-> +    .bdrv_co_invalidate_cache = raw_co_invalidate_cache,
->  
->  
->      .bdrv_co_preadv         = raw_co_preadv,
-> -- 
-> 2.14.3
-> 
-> 
+... but I haven't seen a description of the differences of these two
+values yet.
+
+> I guess this should be documented somewhere(TM) to avoid
+> confusion.
+
+I plan to update https://wiki.qemu.org/Features/S390xNetworkBoot once
+the patches have been merged upstream.
+
+>> +        memcpy(cfgbuf, baseaddr, rc);
+>> +        cfgbuf[rc] = 0;    /* Make sure that it is NUL-terminated */
+>> +        if (!strncasecmp("default", cfgbuf, 7) || !strncmp("# ", cfgbuf, 2)) {
+>> +            /* Looks like it is a pxelinux.cfg */
+>> +            return handle_pxelinux_cfg(fn_ip, cfgbuf, rc);> +        }
+>> +    }
+>> +
+>> +    /* Move kernel to right location */
+>> +    memmove(KERNEL_ADDR, baseaddr, rc);
+> Move this into the if block above. If the tftp_load fails with rc < 0
+> bad things will happen...
+
+Oops, good catch, this should of course only be done if rc > 0 ... will
+fix it in v2.
+
+ Thomas
