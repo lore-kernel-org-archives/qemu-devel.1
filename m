@@ -1,20 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1f99f4-0006bc-RR
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:31:43 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1f99hi-0000Jk-ET
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:34:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1f99ez-0001vB-AQ
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:31:42 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20180411185425.2461-2-mreitz@redhat.com>
-References: <20180411185425.2461-1-mreitz@redhat.com>
-	<20180411185425.2461-2-mreitz@redhat.com>
-Date: Thu, 19 Apr 2018 15:31:18 +0200
-Message-ID: <w51r2nbcogp.fsf@maestria.local.igalia.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1f99he-0005Ib-CU
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:34:26 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58458)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1f99he-0005I7-45
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:34:22 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w3JDVBj6119878
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 09:34:20 -0400
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2heuv0gw8c-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 09:34:20 -0400
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Thu, 19 Apr 2018 14:34:15 +0100
+References: <20180419072123.682-1-david@gibson.dropbear.id.au>
+	<20180419143318.4e24edaf@redhat.com>
+	<20180419145840.324602ff.cohuck@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Thu, 19 Apr 2018 15:34:10 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v4 01/13] block/mirror: Pull
- out mirror_perform()
+In-Reply-To: <20180419145840.324602ff.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <77d0717b-6eba-8b20-6691-c3085937604b@de.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH for-2.13] Clear mem_path if we
+ fall back to anonymous RAM allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,19 +44,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, ehabkost@redhat.com, David Hildenbrand <david@redhat.com>, groug@kaod.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, pbonzini@redhat.com
 
-On Wed 11 Apr 2018 08:54:13 PM CEST, Max Reitz wrote:
-> When converting mirror's I/O to coroutines, we are going to need a point
-> where these coroutines are created.  mirror_perform() is going to be
-> that point.
->
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> Reviewed-by: Fam Zheng <famz@redhat.com>
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Jeff Cody <jcody@redhat.com>
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
 
-Berto
+On 04/19/2018 02:58 PM, Cornelia Huck wrote:
+> On Thu, 19 Apr 2018 14:33:18 +0200
+> Igor Mammedov <imammedo@redhat.com> wrote:
+> 
+>> On Thu, 19 Apr 2018 17:21:23 +1000
+>> David Gibson <david@gibson.dropbear.id.au> wrote:
+>>
+>>> If the -mem-path option is set, we attempt to map the guest's RAM from a
+>>> file in the given path; it's usually used to back guest RAM with hugepages.
+>>> If we're unable to (e.g. not enough free hugepages) then we fall back to
+>>> allocating normal anonymous pages.  This behaviour can be surprising, but a
+>>> comment in allocate_system_memory_nonnuma() suggests it's legacy behaviour
+>>> we can't change.
+>>>
+>>> What really isn't ok, though, is that in this case we leave mem_path set.
+>>> That means functions which attempt to determine the pagesize of main RAM
+>>> can erroneously think it is hugepage based on the requested path, even
+>>> though it's not.
+>>>
+>>> This is particular bad for the pseries machine type.  KVM HV limitations
+>>> mean the guest can't use pagesizes larger than the host page size used to
+>>> back RAM.  That means that such a fallback, rather than merely giving
+>>> poorer performance that expected will cause the guest to freeze up early in
+>>> boot as it attempts to use large page mappings that can't work.
+>>>
+>>> This patch addresses the problem by clearing the mem_path variable when we
+>>> fall back to anonymous pages, meaning that subsequent attempts to
+>>> determine the RAM page size will get an accurate result.
+>>>
+>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>>> ---
+>>>  numa.c | 1 +
+>>>  1 file changed, 1 insertion(+)
+>>>
+>>> Paolo et al, as with my earlier patches adding some extensions to the
+>>> helpers for determining backing page sizes, if there are no objections
+>>> can I get an ack to merge this via my ppc tree?
+>>>
+>>> diff --git a/numa.c b/numa.c
+>>> index 1116c90af9..78a869e598 100644
+>>> --- a/numa.c
+>>> +++ b/numa.c
+>>> @@ -469,6 +469,7 @@ static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
+>>>              /* Legacy behavior: if allocation failed, fall back to
+>>>               * regular RAM allocation.
+>>>               */
+>>> +            mem_path = NULL;
+>>>              memory_region_init_ram_nomigrate(mr, owner, name, ram_size, &error_fatal);
+>>>          }
+>>>  #else  
+>>
+>> mem_path is also used by kvm_s390_apply_cpu_model(),
+>> and in ccw_init() memory is initialized before CPUs are
+>> so if QEM was started with -mem-path, then before patch
+>> created CPU won't have CMM enabled and print warning:
+>>   
+>>  "CMM will not be enabled because it is not compatible with hugetlbfs."
+>>
+>> and after patch it might enable CMM if we clear mem_path.
+>> So question is do we care about this?
+> 
+> I don't quite remember the cmm semantics here -- Christian?
+
+The CMMA interface does not work on large pages. I think the kernel will react
+with EFAULT in some cases (cmma migration and others) so qemu will probably fail
+unexpectedly. 
+
+But this patch seems to only clear mem-path if we do not allocate at all from
+hugetlbfs. So things should be ok, no?
