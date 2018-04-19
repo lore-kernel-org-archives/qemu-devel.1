@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58477)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1f99kM-0002nO-7H
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:37:11 -0400
+	(envelope-from <groug@kaod.org>) id 1f99vT-0001PP-2u
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:48:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1f99kK-00011r-VF
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:37:10 -0400
-Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:46613)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1f99kK-000118-OV
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:37:08 -0400
-Received: by mail-wr0-x229.google.com with SMTP id d1-v6so14136556wrj.13
-	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 06:37:08 -0700 (PDT)
+	(envelope-from <groug@kaod.org>) id 1f99vO-0001JW-GR
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:48:38 -0400
+Received: from 6.mo173.mail-out.ovh.net ([46.105.43.93]:39594)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1f99vO-0000ra-73
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 09:48:34 -0400
+Received: from player168.ha.ovh.net (unknown [10.109.122.16])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 6ABA9BF026
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 15:48:31 +0200 (CEST)
+Date: Thu, 19 Apr 2018 15:48:23 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180419154823.0e937610@bahia.lan>
+In-Reply-To: <20180417071722.9399-2-david@gibson.dropbear.id.au>
+References: <20180417071722.9399-1-david@gibson.dropbear.id.au>
+	<20180417071722.9399-2-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <8736zryb03.fsf@dusky.pond.sub.org>
-References: <20180417133602.23832-1-marcandre.lureau@redhat.com>
-	<20180417133602.23832-6-marcandre.lureau@redhat.com>
-	<8736zryb03.fsf@dusky.pond.sub.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 19 Apr 2018 15:37:06 +0200
-Message-ID: <CAJ+F1C+dGBWRaZ5GjtkLTm9SAWK9FZ=MByVicJ9WFxfPQU_q3Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 5/5] qobject: modify qobject_ref() to
- assert on NULL
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.13 01/10] spapr: Avoid redundant
+ calls to spapr_cpu_reset()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,113 +31,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: benh@kernel.crashing.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Hi
+On Tue, 17 Apr 2018 17:17:13 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-On Thu, Apr 19, 2018 at 8:18 AM, Markus Armbruster <armbru@redhat.com> wrot=
-e:
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->
->> While it may be convenient to accept NULL value in
->> qobject_unref() (for similar reasons as free() accepts NULL), it is
->> not such a good idea for qobject_ref(), assert() on NULL. One place
->> relied on that behaviour (the monitor request id), and it's best to be
->> explicit that NULL is accepted there.
->>
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> ---
->>  include/qapi/qmp/qobject.h | 7 ++++---
->>  monitor.c                  | 2 +-
->>  2 files changed, 5 insertions(+), 4 deletions(-)
->>
->> diff --git a/include/qapi/qmp/qobject.h b/include/qapi/qmp/qobject.h
->> index befc945504..a0b2affb2c 100644
->> --- a/include/qapi/qmp/qobject.h
->> +++ b/include/qapi/qmp/qobject.h
->> @@ -73,9 +73,8 @@ static inline void qobject_init(QObject *obj, QType ty=
-pe)
->>
->>  static inline void *qobject_ref_impl(QObject *obj)
->>  {
->> -    if (obj) {
->> -        obj->base.refcnt++;
->> -    }
->> +    assert(obj);
->> +    obj->base.refcnt++;
->>      return obj;
->>  }
->>
->> @@ -103,6 +102,7 @@ static inline void qobject_unref_impl(QObject *obj)
->>
->>  /**
->>   * qobject_ref(): Increment QObject's reference count
->> + * @obj: a #QObject or child type instance (must not be NULL)
->>   *
->>   * Returns: the same @obj. The type of @obj will be propagated to the
->>   * return type.
->> @@ -112,6 +112,7 @@ static inline void qobject_unref_impl(QObject *obj)
->>  /**
->>   * qobject_unref(): Decrement QObject's reference count, deallocate
->>   * when it reaches zero
->> + * @obj: a #QObject or children type instance (can be NULL)
->>   */
->>  #define qobject_unref(obj) qobject_unref_impl(QOBJECT(obj))
->>
->> diff --git a/monitor.c b/monitor.c
->> index 7dbc1f74b8..3a750208fd 100644
->> --- a/monitor.c
->> +++ b/monitor.c
->> @@ -4188,7 +4188,7 @@ static void handle_qmp_command(JSONMessageParser *=
-parser, GQueue *tokens)
->>
->>      req_obj =3D g_new0(QMPRequest, 1);
->>      req_obj->mon =3D mon;
->> -    req_obj->id =3D qobject_ref(id);
->> +    req_obj->id =3D id ? qobject_ref(id) : NULL;
->>      req_obj->req =3D req;
->>      req_obj->need_resume =3D false;
->
-> What's your argument that this is the only use of qobject_ref() that
-> needs to be guarded now?
+> af81cf323c1 "spapr: CPU hotplug support" added a direct call to
+> spapr_cpu_reset() in spapr_cpu_init(), as well as registering it as a
+> reset callback.  That was in order to make sure that the reset function
+> got called for a newly hotplugged cpu, which would miss the global machine
+> reset.
+> 
+> However, this change means that spapr_cpu_reset() gets called twice for
+> normal cold-plugged cpus: once from spapr_cpu_init(), then again during
+> the system reset.  As well as being ugly in its redundancy, the first call
+> happens before the machine reset calls have happened, which will cause
+> problems for some things we're going to want to add.
+> 
+> So, we remove the reset call from spapr_cpu_init().  We instead put an
+> explicit reset call in the hotplug specific path.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
 
-Right, that's the only one that is obvious, as it fails in test, and
-the code is pretty obvious about id being optional.
+I had sent a tentative patch to do something similar earlier this year:
 
-For the rest, we have to rely on testing, and manual inspection of
-qobject_ref() usage:
+https://patchwork.ozlabs.org/patch/862116/
 
-- block.c: guarded in bdrv_refresh_filename(), more tricky for
-append_open_options(), as it depends if qdict values could be NULL
-- block/blkdebug.c: depends if qdict values could be NULL,
-full_open_options could NULL apparently, so should probably be handled
-FIXED
-- block/blkverify.c: guarded
-- block/{null,nvme}.c: guaded, previous qdict_del() (actually
-qdict_find()) guarantee non-NULL)
-- block/quorum.c: if full_open_options can be NULL, we should handle it. FI=
-XED
-- monitor: optional "id" case must be handled, done in 2 places
-  monitor_json_emitter(): only called with data !=3D NULL, we could add
-an earlier assert
-  monitor_qapi_event_queue(): called from func_emit, by qapi events,
-assert earlier during construction in qobject_output_complete()
-- qapi/qmp-dispatch.c: if "arguments" exists, it can't be NULL during
-json parsing
-- qapi/qobject-input-visitor.c: guarded by assert in visit_type_any()
-- qapi/qobject-output-visitor.c: guarded by assert in visit_type_any()
-for qobject_output_type_any, guarded by assert() in
-qobject_output_complete
-- qmp.c: guarded, error out before if NULL
-- qobject/q{list,dict}.c: can accept NULL values apparently, what's
-the reason? how are you supposed to handle that?
-- tests/*: let's consider this is covered by make check
-- util/keyval.c: guarded, if (!elt[i]) before the ref
+but it got nacked for several reasons, one of them being you were
+"always wary of using the hotplugged parameter, because what qemu
+means by it often doesn't line up with what PAPR means by it."
 
-Except a very few corner cases, it looks quite safe to me. But, if
-necessary, we can add if obj ? obj_ref(obj) : NULL for the dubious
-cases.
+>  hw/ppc/spapr.c                  |  6 ++++--
+>  hw/ppc/spapr_cpu_core.c         | 13 ++++++++++++-
+>  include/hw/ppc/spapr_cpu_core.h |  2 ++
+>  3 files changed, 18 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 7b2bc4e25d..81b50af3b5 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3370,9 +3370,11 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>  
+>          if (hotplugged) {
 
---=20
-Marc-Andr=C3=A9 Lureau
+... but you rely on it here. Can you explain why it is
+okay now ?
+
+Also, if QEMU is started with -incoming and the CPU core
+is hotplugged before migration begins, the following will
+return false:
+
+static inline bool spapr_drc_hotplugged(DeviceState *dev)
+{
+    return dev->hotplugged && !runstate_check(RUN_STATE_INMIGRATE);
+}
+
+and the CPU core won't be reset.
+
+>              /*
+> -             * Send hotplug notification interrupt to the guest only
+> -             * in case of hotplugged CPUs.
+> +             * For hotplugged CPUs, we need to reset them (they missed
+> +             * out on the system reset), and send the guest a
+> +             * notification
+>               */
+> +            spapr_cpu_core_reset(core);
+
+spapr_cpu_reset() also sets the compat mode, which is used
+to set some properties in the DT, ie, this should be called
+before spapr_populate_hotplug_cpu_dt().
+
+>              spapr_hotplug_req_add_by_index(drc);
+>          } else {
+>              spapr_drc_reset(drc);
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index 94afeb399e..aa17626cda 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -70,7 +70,6 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, PowerPCCPU *cpu,
+>      cpu_ppc_set_papr(cpu, PPC_VIRTUAL_HYPERVISOR(spapr));
+>  
+>      qemu_register_reset(spapr_cpu_reset, cpu);
+> -    spapr_cpu_reset(cpu);
+
+spapr_cpu_reset() also sets cs->halted to 1, to let the guest start
+non-boot CPUs with an RTAS call. With this change, a hotplugged CPU
+is started right away and may run in the guest before the hotplug
+path could even reset it.
+
+Not sure how to handle that other than setting halted to 1 in
+spapr_cpu_init() as well, but you already nacked that approach
+because it would mean "poking specifics in a CPU that hasn't
+already been set to a known state by a reset"... 
+
+>  }
+>  
+>  /*
+> @@ -208,6 +207,18 @@ err:
+>      error_propagate(errp, local_err);
+>  }
+>  
+> +void spapr_cpu_core_reset(sPAPRCPUCore *sc)
+> +{
+> +    CPUCore *cc = CPU_CORE(sc);
+> +    int i;
+> +
+> +    for (i = 0; i < cc->nr_threads; i++) {
+> +        PowerPCCPU *cpu = sc->threads[i];
+> +
+> +        spapr_cpu_reset(cpu);
+> +    }
+> +}
+> +
+>  static Property spapr_cpu_core_properties[] = {
+>      DEFINE_PROP_INT32("node-id", sPAPRCPUCore, node_id, CPU_UNSET_NUMA_NODE_ID),
+>      DEFINE_PROP_END_OF_LIST()
+> diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
+> index 1129f344aa..1a38544706 100644
+> --- a/include/hw/ppc/spapr_cpu_core.h
+> +++ b/include/hw/ppc/spapr_cpu_core.h
+> @@ -38,4 +38,6 @@ typedef struct sPAPRCPUCoreClass {
+>  } sPAPRCPUCoreClass;
+>  
+>  const char *spapr_get_cpu_core_type(const char *cpu_type);
+> +void spapr_cpu_core_reset(sPAPRCPUCore *sc);
+> +
+>  #endif
