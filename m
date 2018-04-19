@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42333)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f9HUd-0002SL-Ra
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 17:53:28 -0400
+	(envelope-from <jsnow@redhat.com>) id 1f9HWH-0003Uz-PT
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 17:55:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f9HUa-00038Z-Nn
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 17:53:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38940)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f9HUa-00037b-H7
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 17:53:24 -0400
-Date: Thu, 19 Apr 2018 18:53:20 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180419215320.GC29865@localhost.localdomain>
-References: <1523953455-28053-1-git-send-email-wanpengli@tencent.com>
-	<20180417205913.GC29865@localhost.localdomain>
-	<02887fa6-d7c8-bc39-6e65-3c3caec5b903@redhat.com>
-	<20180419195610.GA29865@localhost.localdomain>
-	<98f48c44-e55a-2bd2-0d41-5643f35bce68@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1f9HWG-0005L7-MK
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 17:55:09 -0400
+References: <20180416114414.18406-1-vsementsov@virtuozzo.com>
+	<20180416114414.18406-5-vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <5b5bfec8-ed19-dd0f-4d76-ee3513276dc2@redhat.com>
+Date: Thu, 19 Apr 2018 17:54:53 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <98f48c44-e55a-2bd2-0d41-5643f35bce68@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RESEND v2] i386/kvm: add support for
- KVM_CAP_X86_DISABLE_EXITS
+In-Reply-To: <20180416114414.18406-5-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 4/7] dirty-bitmap: separate unused
+ meta-bitmap related functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,53 +25,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Wanpeng Li <kernellwp@gmail.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-On Thu, Apr 19, 2018 at 11:32:16PM +0200, Paolo Bonzini wrote:
-> On 19/04/2018 21:56, Eduardo Habkost wrote:
-> > On Thu, Apr 19, 2018 at 05:48:57PM +0200, Paolo Bonzini wrote:
-> >> On 17/04/2018 22:59, Eduardo Habkost wrote:
-> >>>> +        if (disable_exits) {
-> >>>> +            disable_exits &= (KVM_X86_DISABLE_EXITS_MWAIT |
-> >>>> +                              KVM_X86_DISABLE_EXITS_HLT |
-> >>>> +                              KVM_X86_DISABLE_EXITS_PAUSE);
-> >>>> +            if (env->user_features[FEAT_KVM] & KVM_PV_UNHALT) {
-> >>>> +                disable_exits &= ~KVM_X86_DISABLE_EXITS_HLT;
-> >>>> +            }
-> >>>
-> >>> In the future, if we decide to enable kvm-pv-unhalt by default,
-> >>> should "-cpu ...,kvm-hint-dedicated=on" disable kvm-pv-unhalt
-> >>> automatically, or should we require an explicit
-> >>> "kvm-hint-dedicated=on,kvm-pv-unhalt=off" option?
-> >>
-> >> It should be automatic.
-> >>
-> >>> For today's defaults, this patch solves the problem, only one
-> >>> thing is missing before I give my R-b: we need to clearly
-> >>> document what exactly are the consequences and requirements of
-> >>> setting kvm-hint-dedicated=on (I'm not sure if the best place for
-> >>> this is qemu-options.hx, x86_cpu_list(), or somewhere else).
-> >>
-> >> I don't think we have a good place for this kind of documentation,
-> >> unfortunately.  Right now it is mentioned in
-> >> Documentation/virtual/kvm/cpuid.txt.
-> > 
-> > With this patch, the QEMU option will do more than just setting
-> > the CPUID bit, that's why I miss more detailed documentation on
-> > the QEMU side.  But I agree we have no obvious place for that
-> > documentation.
-> > 
-> > In the worst case we can just add a code comment on top of
-> > feature_word_info[FEAT_KVM_HINTS].feat_names warning that
-> > kvm-hint-dedicated won't just enable the flag on CPUID and has
-> > other side-effects.
+On 04/16/2018 07:44 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Separate them in the header and clarify needed locking in comments.
 > 
-> Maybe we should use "-realtime dedicated=on" instead of, or in addition
-> to kvm-hint-dedicated=on?
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  include/block/dirty-bitmap.h | 14 +++++++++-----
+>  block/dirty-bitmap.c         |  5 +++++
+>  2 files changed, 14 insertions(+), 5 deletions(-)
+> 
+> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+> index c7e910016d..b7ccfd1363 100644
+> --- a/include/block/dirty-bitmap.h
+> +++ b/include/block/dirty-bitmap.h
+> @@ -9,9 +9,6 @@ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriverState *bs,
+>                                            uint32_t granularity,
+>                                            const char *name,
+>                                            Error **errp);
+> -void bdrv_create_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap,
+> -                                   int chunk_size);
+> -void bdrv_release_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap);
+>  int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
+>                                         BdrvDirtyBitmap *bitmap,
+>                                         Error **errp);
+> @@ -45,7 +42,6 @@ void bdrv_set_dirty_bitmap(BdrvDirtyBitmap *bitmap,
+>                             int64_t offset, int64_t bytes);
+>  void bdrv_reset_dirty_bitmap(BdrvDirtyBitmap *bitmap,
+>                               int64_t offset, int64_t bytes);
+> -BdrvDirtyBitmapIter *bdrv_dirty_meta_iter_new(BdrvDirtyBitmap *bitmap);
+>  BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBitmap *bitmap);
+>  void bdrv_dirty_iter_free(BdrvDirtyBitmapIter *iter);
+>  
+> @@ -84,7 +80,6 @@ void bdrv_reset_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
+>  int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter);
+>  void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t offset);
+>  int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap);
+> -int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
+>  void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes);
+>  bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
+>  bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
+> @@ -99,4 +94,13 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
+>                                                    BdrvDirtyBitmap *bitmap,
+>                                                    Error **errp);
+>  
+> +/*
+> + * Unused for now meta-bitmaps related functions
+> + */
+> +
 
-Maybe it's a better idea than overloading an option that is only
-expected to control a CPUID bit.
+I assume you have plans to use them still? I thought these were useful
+for storage migration -- but I guess we don't use these for the postcopy
+mechanism?
 
--- 
-Eduardo
+> +void bdrv_create_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap, int chunk_size);
+> +void bdrv_release_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap);
+> +BdrvDirtyBitmapIter *bdrv_dirty_meta_iter_new(BdrvDirtyBitmap *bitmap);
+> +int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
+> +
+>  #endif
+> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+> index 6c00288fd7..1812e17549 100644
+> --- a/block/dirty-bitmap.c
+> +++ b/block/dirty-bitmap.c
+> @@ -149,6 +149,8 @@ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriverState *bs,
+>   * @bitmap: the block dirty bitmap for which to create a meta dirty bitmap.
+>   * @chunk_size: how many bytes of bitmap data does each bit in the meta bitmap
+>   * track.
+> + *
+> + * Called with BQL taken.
+>   */
+>  void bdrv_create_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap,
+>                                     int chunk_size)
+> @@ -160,6 +162,7 @@ void bdrv_create_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap,
+>      qemu_mutex_unlock(bitmap->mutex);
+>  }
+>  
+> +/* Called with BQL taken. */
+>  void bdrv_release_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap)
+>  {
+>      assert(bitmap->meta);
+> @@ -529,6 +532,7 @@ BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBitmap *bitmap)
+>      return iter;
+>  }
+>  
+> +/* Called with BQL and dirty_bitmap_mutex locked. */
+>  BdrvDirtyBitmapIter *bdrv_dirty_meta_iter_new(BdrvDirtyBitmap *bitmap)
+>  {
+>      BdrvDirtyBitmapIter *iter = g_new(BdrvDirtyBitmapIter, 1);
+> @@ -688,6 +692,7 @@ int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap)
+>      return hbitmap_count(bitmap->bitmap);
+>  }
+>  
+> +/* Called with BQL or dirty_bitmap_mutex locked */
+>  int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap)
+>  {
+>      return hbitmap_count(bitmap->meta);
+> 
