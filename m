@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f9CiR-0003Wj-0e
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:47:24 -0400
+	(envelope-from <mst@redhat.com>) id 1f9CkE-00054C-At
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:49:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f9CiP-0007Y4-Ij
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:47:23 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:45483)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f9CiP-0007Y0-Cp
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:47:21 -0400
-Received: by mail-qt0-x241.google.com with SMTP id b13-v6so6486280qtp.12
-	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 09:47:21 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 19 Apr 2018 13:46:42 -0300
-Message-Id: <20180419164642.9536-8-f4bug@amsat.org>
-In-Reply-To: <20180419164642.9536-1-f4bug@amsat.org>
-References: <20180419164642.9536-1-f4bug@amsat.org>
+	(envelope-from <mst@redhat.com>) id 1f9CkA-0000RX-BW
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:49:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53442 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1f9CkA-0000Qe-6d
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 12:49:10 -0400
+Date: Thu, 19 Apr 2018 19:48:55 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180419194500-mutt-send-email-mst@kernel.org>
+References: <20180412151232.17506-1-tiwei.bie@intel.com>
+	<20180412151232.17506-7-tiwei.bie@intel.com>
+	<20180418192154-mutt-send-email-mst@kernel.org>
+	<20180419111439.i6gfhnept6wy7uzp@debian>
+	<D0158A423229094DA7ABF71CF2FA0DA34E94E895@SHSMSX104.ccr.corp.intel.com>
+	<c41439d6-69b7-474a-530f-07ffb5f1b9e6@redhat.com>
+	<20180419180912-mutt-send-email-mst@kernel.org>
+	<174b5e48-dfde-cb5f-e664-39d43a20a629@redhat.com>
+	<20180419185630-mutt-send-email-mst@kernel.org>
+	<380b6838-7249-fec1-8ebb-1b899830a9a0@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH 7/7] avocado: Add tests booting the Malta
- machine
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <380b6838-7249-fec1-8ebb-1b899830a9a0@redhat.com>
+Subject: Re: [Qemu-devel] [virtio-dev] RE: [PATCH v3 6/6] vhost-user:
+ support registering external host notifiers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,124 +36,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>, Cleber Rosa <crosa@redhat.com>, Amador Pahim <apahim@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Zheng Xiang <xiang.zheng@linaro.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Alistair Francis <alistair23@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Liang, Cunming" <cunming.liang@intel.com>, "Bie, Tiwei" <tiwei.bie@intel.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Daly, Dan" <dan.daly@intel.com>, "Tan, Jianfeng" <jianfeng.tan@intel.com>, "Wang, Zhihong" <zhihong.wang@intel.com>, "Wang, Xiao W" <xiao.w.wang@intel.com>
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- tests/avocado/test_linux-boot-console.py      | 92 +++++++++++++++++++
- .../parameters.yaml                           |  2 +
- 2 files changed, 94 insertions(+)
+On Thu, Apr 19, 2018 at 06:07:07PM +0200, Paolo Bonzini wrote:
+> On 19/04/2018 17:59, Michael S. Tsirkin wrote:
+> > On Thu, Apr 19, 2018 at 05:51:51PM +0200, Paolo Bonzini wrote:
+> >> On 19/04/2018 17:19, Michael S. Tsirkin wrote:
+> >>>> - if we make it 1 when weak barriers are needed, the device also needs
+> >>>> to nack feature negotiation (not allow setting the FEATURES_OK) if the
+> >>>> bit is not set by the driver.
+> >>>>  However, that is not enough.  Live
+> >>>> migration assumes that it is okay to migrate a virtual machine from a
+> >>>> source that doesn't support a feature to a destination that supports it.
+> >>>>  In this case, it would assume that it is okay to migrate from software
+> >>>> virtio to hardware virtio.  This is wrong because the destination would
+> >>>> use weak barriers
+> >>>
+> >>> You can't migrate between systems with different sets of device features
+> >>> right now.
+> >>
+> >> Yes, you can, exactly because some features are defined not by the
+> >> machine type but rather by the host kernel.  See virtio_net_get_features
+> >> in QEMU's hw/virtio/virtio-net.c, and virtio_set_features_nocheck in
+> >> QEMU's hw/virtio/virtio.c.
+> > 
+> > Oh you are right. Well we can just special-case that one :)
+> 
+> Anything wrong with bumping the PCI revision?
+> 
+> Paolo
 
-diff --git a/tests/avocado/test_linux-boot-console.py b/tests/avocado/test_linux-boot-console.py
-index f54d10dd79..4ae1e3bf37 100644
---- a/tests/avocado/test_linux-boot-console.py
-+++ b/tests/avocado/test_linux-boot-console.py
-@@ -86,3 +86,95 @@ class TestAlphaClipperBoot2_6(test.QemuTest):
- 
-     def tearDown(self):
-         os.remove(self.console_path)
-+
-+
-+class TestMips4kcMaltaBoot2_6(test.QemuTest):
-+    """
-+    :avocado: enable
-+    :avocado: tags=arch_mips
-+    """
-+    ARCH = "mips"
-+
-+    def kernel_url(self):
-+        return 'http://people.debian.org/~aurel32/qemu/mips/vmlinux-2.6.32-5-4kc-malta'
-+
-+    def setUp(self):
-+        self.console_path = tempfile.mkstemp()[1]
-+        kernel_path = cachedfile(self.kernel_url())
-+        self.vm._args.extend(['-machine', 'malta'])
-+        self.vm._args.extend(['-m', '64'])
-+        self.vm._args.extend(['-kernel', kernel_path])
-+        self.vm._args.extend(['-append', '"console=ttyS0 printk.time=0"'])
-+        self.vm._args.extend(['-chardev', 'socket,id=uart0,server,nowait,path=' + self.console_path])
-+        self.vm._args.extend(['-serial', 'chardev:uart0'])
-+        self.vm._args.extend(['-nographic'])
-+
-+    def test_boot_console(self):
-+        """
-+        :avocado: tags=uart,printk
-+        """
-+        if self.params.get('arch') != self.ARCH:
-+            return
-+
-+        self.vm.launch(self.console_path)
-+        console = self.vm.get_console(console_address=self.console_path, login=False)
-+        # no filesystem provided on purpose, wait for the Kernel panic
-+        bootlog = console.read_until_any_line_matches(["Kernel panic - not syncing: VFS: Unable to mount root fs"], timeout=6.0)[1]
-+        console.close()
-+        # check Super I/O
-+        self.assertIn(u'ttyS0 at I/O 0x3f8 (irq = 4) is a 16550A', bootlog)
-+        self.assertIn(u'ttyS1 at I/O 0x2f8 (irq = 3) is a 16550A', bootlog)
-+        self.assertIn(u'i8042 KBD port at 0x60,0x64 irq 1', bootlog)
-+        self.assertIn(u'i8042 AUX port at 0x60,0x64 irq 12', bootlog)
-+        # check PCI (network interface)
-+        self.assertIn(u'registered as PCnet/PCI II 79C970A', bootlog)
-+        self.vm.shutdown()
-+
-+    def tearDown(self):
-+        os.remove(self.console_path)
-+
-+# FIXME this is a copy of TestMips4kcMaltaBoot2_6 with a different the kernel url
-+class TestMips4kcMaltaBoot3_2(test.QemuTest):
-+    """
-+    :avocado: enable
-+    :avocado: tags=arch_mips
-+    """
-+    ARCH = "mips"
-+
-+    def kernel_url(self):
-+        return 'http://people.debian.org/~aurel32/qemu/mips/vmlinux-3.2.0-4-4kc-malta'
-+
-+    def setUp(self):
-+        self.console_path = tempfile.mkstemp()[1]
-+        kernel_path = cachedfile(self.kernel_url())
-+        self.vm._args.extend(['-machine', 'malta'])
-+        self.vm._args.extend(['-m', '64'])
-+        self.vm._args.extend(['-kernel', kernel_path])
-+        self.vm._args.extend(['-append', '"console=ttyS0 printk.time=0"'])
-+        self.vm._args.extend(['-chardev', 'socket,id=uart0,server,nowait,path=' + self.console_path])
-+        self.vm._args.extend(['-serial', 'chardev:uart0'])
-+        self.vm._args.extend(['-nographic'])
-+
-+    def test_boot_console(self):
-+        """
-+        :avocado: tags=uart,printk
-+        """
-+        if self.params.get('arch') != self.ARCH:
-+            return
-+
-+        self.vm.launch(self.console_path)
-+        console = self.vm.get_console(console_address=self.console_path, login=False)
-+        # no filesystem provided on purpose, wait for the Kernel panic
-+        bootlog = console.read_until_any_line_matches(["Kernel panic - not syncing: VFS: Unable to mount root fs"], timeout=6.0)[1]
-+        console.close()
-+        # check Super I/O
-+        self.assertIn(u'ttyS0 at I/O 0x3f8 (irq = 4) is a 16550A', bootlog)
-+        self.assertIn(u'ttyS1 at I/O 0x2f8 (irq = 3) is a 16550A', bootlog)
-+        self.assertIn(u'i8042 KBD port at 0x60,0x64 irq 1', bootlog)
-+        self.assertIn(u'i8042 AUX port at 0x60,0x64 irq 12', bootlog)
-+        # check PCI (network interface)
-+        self.assertIn(u'registered as PCnet/PCI II 79C970A', bootlog)
-+        self.vm.shutdown()
-+
-+    def tearDown(self):
-+        os.remove(self.console_path)
-diff --git a/tests/avocado/test_linux-boot-console.py.data/parameters.yaml b/tests/avocado/test_linux-boot-console.py.data/parameters.yaml
-index ed8c08058c..156f271a73 100644
---- a/tests/avocado/test_linux-boot-console.py.data/parameters.yaml
-+++ b/tests/avocado/test_linux-boot-console.py.data/parameters.yaml
-@@ -1,3 +1,5 @@
- architecture: !mux
-     alpha:
-         arch: alpha
-+    mips:
-+        arch: mips
+Nothing except in virtio 1 bumping the revision does not prevent
+loading the old driver.
+
 -- 
-2.17.0
+MST
