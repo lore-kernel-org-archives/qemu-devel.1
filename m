@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1f9AYn-0001CZ-8O
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 10:29:22 -0400
+	(envelope-from <berto@igalia.com>) id 1f9ArG-0007rH-97
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 10:48:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1f9AYm-0000K4-6f
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 10:29:17 -0400
-Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:58192
-	helo=smtp.eu.adacore.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
-	id 1f9AYl-0000Hs-W8
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 10:29:16 -0400
-References: <1524135103-30477-1-git-send-email-frederic.konrad@adacore.com>
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <a615d677-5c2f-831b-8b09-1b1abafa5159@adacore.com>
-Date: Thu, 19 Apr 2018 16:29:11 +0200
+	(envelope-from <berto@igalia.com>) id 1f9ArF-0003r7-MQ
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 10:48:22 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20180411185425.2461-6-mreitz@redhat.com>
+References: <20180411185425.2461-1-mreitz@redhat.com>
+	<20180411185425.2461-6-mreitz@redhat.com>
+Date: Thu, 19 Apr 2018 16:48:14 +0200
+Message-ID: <w51o9ifckwh.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <1524135103-30477-1-git-send-email-frederic.konrad@adacore.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] riscv: requires libfdt
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v4 05/13] block/mirror: Use
+ source as a BdrvChild
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +23,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, mjc@sifive.com, palmer@sifive.com, sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
+On Wed 11 Apr 2018 08:54:17 PM CEST, Max Reitz wrote:
+> With this, the mirror_top_bs is no longer just a technically required
+> node in the BDS graph but actually represents the block job operation.
+>
+> Also, drop MirrorBlockJob.source, as we can reach it through
+> mirror_top_bs->backing.
+>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> Reviewed-by: Fam Zheng <famz@redhat.com>
 
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
-On 04/19/2018 12:51 PM, KONRAD Frederic wrote:
-> When compiling on a machine without libfdt installed the configure script
-> should try to get libfdt from the git or should die because otherwise
-> CONFIG_LIBFDT is not set and the build process end in an error in the link
-> phase.. eg:
-> 
-> hw/riscv/virt.o: In function `riscv_virt_board_init':
-> qemu/src/hw/riscv/virt.c:317: undefined reference to `qemu_fdt_setprop_cell'
-> qemu/src/hw/riscv/virt.c:319: undefined reference to `qemu_fdt_setprop_cell'
-> qemu/src/hw/riscv/virt.c:345: undefined reference to `qemu_fdt_dumpdtb'
-> collect2: error: ld returned 1 exit status
-> make[1]: *** [qemu-system-riscv64] Error 1
-> make: *** [subdir-riscv64-softmmu] Error 2
-> 
-> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
-> ---
->   configure | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/configure b/configure
-> index 0a19b03..1587f08 100755
-> --- a/configure
-> +++ b/configure
-> @@ -3732,7 +3732,7 @@ fi
->   fdt_required=no
->   for target in $target_list; do
->     case $target in
-> -    aarch64*-softmmu|arm*-softmmu|ppc*-softmmu|microblaze*-softmmu|mips64el-softmmu)
-> +    aarch64*-softmmu|arm*-softmmu|ppc*-softmmu|microblaze*-softmmu|mips64el-softmmu|riscv64-softmmu)
-
-I just realized that riscv32 use it too so I'll correct with
-riscv*-softmmu.
-
-Cheers,
-Fred
-
->         fdt_required=yes
->       ;;
->     esac
-> 
+Berto
