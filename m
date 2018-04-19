@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1f94de-0005nc-IK
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:09:55 -0400
+	(envelope-from <famz@redhat.com>) id 1f94hi-0007LC-PV
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:14:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1f94dY-0005K4-N7
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:09:54 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54702 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1f94dY-0005GI-IB
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:09:48 -0400
-References: <20180417224054.26363-1-lersek@redhat.com>
-	<20180418060243.iafg4wj5gwsruop5@sirius.home.kraxel.org>
-	<b9c7d767-39c4-065f-f487-34c0c682bd85@redhat.com>
-	<20180419100900.7b66fde0@umbus.fritz.box>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <d032dfe2-bfab-5a12-c867-a5229f303f5f@redhat.com>
-Date: Thu, 19 Apr 2018 10:09:30 +0200
+	(envelope-from <famz@redhat.com>) id 1f94hh-0007Mz-KW
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 04:14:06 -0400
+Date: Thu, 19 Apr 2018 16:13:44 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180419081344.GA14514@lemon.usersys.redhat.com>
+References: <20180419075232.31407-1-stefanha@redhat.com>
+	<20180419075232.31407-2-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180419100900.7b66fde0@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu RFC v2] qapi: add "firmware.json"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180419075232.31407-2-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 1/2] block/file-posix: implement
+ bdrv_co_invalidate_cache() on Linux
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +24,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <dgibson@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 04/19/18 02:09, David Gibson wrote:
-> On Wed, 18 Apr 2018 10:32:06 +0200
-> Laszlo Ersek <lersek@redhat.com> wrote:
+On Thu, 04/19 15:52, Stefan Hajnoczi wrote:
+> On Linux posix_fadvise(POSIX_FADV_DONTNEED) invalidates pages*.  Use
+> this to drop page cache on the destination host during shared storage
+> migration.  This way the destination host will read the latest copy of
+> the data and will not use stale data from the page cache.
 > 
->> On 04/18/18 08:02, Gerd Hoffmann wrote:
->>  [...]  
->>  [...]  
->>>
->>> Looks good to me overall.
->>>  
->>>> +{ 'enum' : 'FirmwareType',
->>>> +  'data' : [ 'bios', 'slof', 'uboot', 'uefi' ] }  
->>>
->>> openbios missing.
->>>  
->>>> +{ 'enum' : 'FirmwareArchitecture',
->>>> +  'data' : [ 'aarch64', 'arm', 'i386', 'x86_64' ] }  
->>>
->>> ppc(64) missing (but you have slof above ;) ...
->>> s390 too.  
->>
->> I figured those would be contributed by people that actually use them,
->> as separate patches :) In fact I would rather prefer removing "slof" and
->> "uboot" from this initial version, because I have zero clue about them.
+> The flow is as follows:
 > 
-> I've only been able to skim this discussion, so apologies if I've
-> missed things.  I'm pretty unclear on the overall purpose of this, but
-> in particular this FirmwareType field seems pretty weird.
+> 1. Source host writes out all dirty pages and inactivates drives.
+> 2. QEMU_VM_EOF is sent on migration stream.
+> 3. Destination host invalidates caches before accessing drives.
 > 
-> Specifically the things in the list don't really seem comparable to
-> each other: UEFI is a specified interface, BIOS is a de-facto
-> interface.  So far so good.  But SLOF is a specific implementation of
-> Open Firmware (of which we have a couple of other partial
-> implementations used for other qemu platforms).
+> This patch enables live migration even with -drive cache.direct=off.
+> 
+> * Terms and conditions may apply, please see patch for details.
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  block/file-posix.c | 39 +++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 39 insertions(+)
+> 
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 3794c0007a..df4f52919f 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -2236,6 +2236,42 @@ static int coroutine_fn raw_co_block_status(BlockDriverState *bs,
+>      return ret | BDRV_BLOCK_OFFSET_VALID;
+>  }
+>  
+> +static void coroutine_fn raw_co_invalidate_cache(BlockDriverState *bs,
+> +                                                 Error **errp)
+> +{
+> +    BDRVRawState *s = bs->opaque;
+> +    int ret;
+> +
+> +    ret = fd_open(bs);
+> +    if (ret < 0) {
+> +        error_setg_errno(errp, -ret, "The file descriptor is not open");
+> +        return;
+> +    }
+> +
+> +    if (s->open_flags & O_DIRECT) {
+> +        return; /* No host kernel page cache */
+> +    }
+> +
+> +#if defined(__linux__)
+> +    /* This sets the scene for the next syscall... */
+> +    ret = bdrv_co_flush(bs);
+> +    if (ret < 0) {
+> +        error_setg_errno(errp, -ret, "flush failed");
+> +        return;
+> +    }
+> +
+> +    /* Linux does not invalidate pages that are dirty, locked, or mmapped by a
+> +     * process.  These limitations are okay because we just fsynced the file,
+> +     * we don't use mmap, and the file should not be in use by other processes.
+> +     */
+> +    ret = posix_fadvise(s->fd, 0, 0, POSIX_FADV_DONTNEED);
+> +    if (ret != 0) { /* the return value is a positive errno */
+> +        error_setg_errno(errp, ret, "fadvise failed");
+> +        return;
+> +    }
+> +#endif /* __linux__ */
 
-Thank you -- I will replace SLOF with "openfirmware".
+What about the #else branch? It doesn't automatically work, I guess?
 
-This also implies I shouldn't add "openbios" separately, which was
-suggested earlier by Gerd -- according to
-<https://en.wikipedia.org/wiki/OpenBIOS>, OpenBIOS is another
-implementation of OFW.
+Fam
 
-> U-Boot is somewhere in
-> between the two, a specific implementation that defines a fair bunch of
-> its own interfaces.
-
-Right, this is about interfaces, so I'll keep "uboot".
-
-Thank you!
-Laszlo
+> +}
+> +
+>  static coroutine_fn BlockAIOCB *raw_aio_pdiscard(BlockDriverState *bs,
+>      int64_t offset, int bytes,
+>      BlockCompletionFunc *cb, void *opaque)
+> @@ -2328,6 +2364,7 @@ BlockDriver bdrv_file = {
+>      .bdrv_co_create_opts = raw_co_create_opts,
+>      .bdrv_has_zero_init = bdrv_has_zero_init_1,
+>      .bdrv_co_block_status = raw_co_block_status,
+> +    .bdrv_co_invalidate_cache = raw_co_invalidate_cache,
+>      .bdrv_co_pwrite_zeroes = raw_co_pwrite_zeroes,
+>  
+>      .bdrv_co_preadv         = raw_co_preadv,
+> @@ -2805,6 +2842,7 @@ static BlockDriver bdrv_host_device = {
+>      .bdrv_reopen_abort   = raw_reopen_abort,
+>      .bdrv_co_create_opts = hdev_co_create_opts,
+>      .create_opts         = &raw_create_opts,
+> +    .bdrv_co_invalidate_cache = raw_co_invalidate_cache,
+>      .bdrv_co_pwrite_zeroes = hdev_co_pwrite_zeroes,
+>  
+>      .bdrv_co_preadv         = raw_co_preadv,
+> @@ -2927,6 +2965,7 @@ static BlockDriver bdrv_host_cdrom = {
+>      .bdrv_reopen_abort   = raw_reopen_abort,
+>      .bdrv_co_create_opts = hdev_co_create_opts,
+>      .create_opts         = &raw_create_opts,
+> +    .bdrv_co_invalidate_cache = raw_co_invalidate_cache,
+>  
+>  
+>      .bdrv_co_preadv         = raw_co_preadv,
+> -- 
+> 2.14.3
+> 
+> 
