@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60256)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f926y-0002Ss-3O
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 01:28:01 -0400
+	(envelope-from <saipava@xilinx.com>) id 1f92Zy-0001Ws-Ns
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 01:58:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f926u-0001ek-VG
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 01:28:00 -0400
-References: <1524054707-20663-1-git-send-email-thuth@redhat.com>
-	<307f8b80-fca2-d55f-6bc6-85b794afa15e@linux.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <842dc876-dd3e-18d9-bfff-128b357b6281@redhat.com>
-Date: Thu, 19 Apr 2018 07:27:38 +0200
-MIME-Version: 1.0
-In-Reply-To: <307f8b80-fca2-d55f-6bc6-85b794afa15e@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <saipava@xilinx.com>) id 1f92Zv-00037Q-Il
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 01:57:58 -0400
+Received: from mail-sn1nam02on0066.outbound.protection.outlook.com
+	([104.47.36.66]:51664
+	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <saipava@xilinx.com>) id 1f92Zv-000375-4g
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 01:57:55 -0400
+From: Sai Pavan Boddu <saipava@xilinx.com>
+Date: Thu, 19 Apr 2018 05:57:51 +0000
+Message-ID: <MWHPR02MB24780E443FB1196FED822416CAB50@MWHPR02MB2478.namprd02.prod.outlook.com>
+References: <1524037298-23401-1-git-send-email-saipava@xilinx.com>
+	<1524037298-23401-2-git-send-email-saipava@xilinx.com>
+	<CAAYMZQt0-7=mj1m6nH74cZjmG3QtafiKp9bOXGFM=QuAawDVDA@mail.gmail.com>
+In-Reply-To: <CAAYMZQt0-7=mj1m6nH74cZjmG3QtafiKp9bOXGFM=QuAawDVDA@mail.gmail.com>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 for-2.13 0/4]
- pc-bios/s390-ccw: Network boot improvements
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] xilinx_spips: send dummy cycles
+ only if cmd requires it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,70 +32,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Farhan Ali <alifm@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Cc: Collin Walling <walling@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+To: francisco iglesias <frasse.iglesias@gmail.com>
+Cc: "alistair@alistair23.me" <alistair@alistair23.me>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Edde <edgar.iglesias@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-On 18.04.2018 20:21, Farhan Ali wrote:
-> On 04/18/2018 08:31 AM, Thomas Huth wrote:
->> Some patches to improve the network boot experience on s390x:
->>
->> First, make sure that we shut down the virtio-net device before jumpin=
-g
->> into the kernel. Otherwise some incoming packets might destroy some of
->> the kernel's data if it has not taken over the device yet.
->>
->> Then the last two patches add support for loading kernels via
->> configuration files - pxelinux-style and .INS-file style. This way
->> you don't have to manually glue your ramdisk to your kernel anymore,
->> so this should be quite a relieve for all users who want to boot
->> Linux via the network.
->>
->> The config file parsers have been completely written by myself from
->> scratch and only tested with some config files that I came up with
->> on my own. So if anybody has some pre-existing pxelinux config files
->> already for booting a s390x, I'd appreciate some testing to see whethe=
-r
->> this works as expected for you, too!
-[...]
->
-> I have tried with pxelinux default config file I had and it worked fine=
-.
-> I will try a couple more tests.
-
-Thanks!
-
-> Also while going through the code again, I noticed a memory leak in the
-> function virtio_net_init, and fixed it. I could send a formal patch for
-> it, if you want to queue it as part of this series as I think we might
-> have missed 2.12 window?
->=20
-> diff --git a/pc-bios/s390-ccw/virtio-net.c b/pc-bios/s390-ccw/virtio-ne=
-t.c
-> index ff7f4da..e83ba08 100644
-> --- a/pc-bios/s390-ccw/virtio-net.c
-> +++ b/pc-bios/s390-ccw/virtio-net.c
-> @@ -61,6 +61,7 @@ int virtio_net_init(void *mac_addr)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 IPL_assert(buf !=3D NU=
-LL, "Can not allocate memory for receive
-> buffers");
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vring_send_buf(rxvq, b=
-uf, ETH_MTU_SIZE + sizeof(VirtioNetHdr),
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 VRING_=
-DESC_F_WRITE);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 free(buf);
-> =C2=A0=C2=A0=C2=A0=C2=A0 }
-> =C2=A0=C2=A0=C2=A0=C2=A0 vring_notify(rxvq);
-
-Ah, that's not a memory leak, though it might look like one if you don't
-know what the vring_send_buf function is doing: vring_send_buf adds a
-buffer to a virtio ring for later use. So the buffer is not unused after
-this function, but gets filled in later by the virtio-net device. Thus
-we must not free the buffer here.
-
-We could free it in the "uninit" function after shutting down the
-device, but OTOH we are then leaving the firmware code anyway by jumping
-into the OS kernel, so it does not really matter whether we free()ed the
-buffers or not.
-
- Thomas
+SEkgRnJhbmNpc28sDQoNCkZyb206IGZyYW5jaXNjbyBpZ2xlc2lhcyBbbWFpbHRvOmZyYXNzZS5p
+Z2xlc2lhc0BnbWFpbC5jb21dDQpTZW50OiBUaHVyc2RheSwgQXByaWwgMTksIDIwMTggMzozOSBB
+TQ0KVG86IFNhaSBQYXZhbiBCb2RkdSA8c2FpcGF2YUB4aWxpbnguY29tPg0KQ2M6IGFsaXN0YWly
+QGFsaXN0YWlyMjMubWU7IFBldGVyIENyb3N0aHdhaXRlIDxjcm9zdGh3YWl0ZS5wZXRlckBnbWFp
+bC5jb20+OyBQZXRlciBNYXlkZWxsIDxwZXRlci5tYXlkZWxsQGxpbmFyby5vcmc+OyBFZGRlIDxl
+ZGdhci5pZ2xlc2lhc0BnbWFpbC5jb20+OyBxZW11LWRldmVsQG5vbmdudS5vcmcgRGV2ZWxvcGVy
+cyA8cWVtdS1kZXZlbEBub25nbnUub3JnPg0KU3ViamVjdDogUmU6IFtRZW11LWRldmVsXSBbUEFU
+Q0ggdjIgMS8xXSB4aWxpbnhfc3BpcHM6IHNlbmQgZHVtbXkgY3ljbGVzIG9ubHkgaWYgY21kIHJl
+cXVpcmVzIGl0DQoNCkhpIFNhaSwNCg0KQWJvdXQgdGhlIHN1YmplY3QsIHdoYXQgZG8geW91IHRo
+aW5rIGFib3V0IGNoYW5naW5nIGl0IHRvIGJlbG93Pw0KeGlsaW54X3NwaXBzOiBDb3JyZWN0IFNO
+T09QX05PTkUgc3RhdGUgd2hlbiBmbHVzaGluZyB0aGUgdHhmaWZvDQoNCk9uIDE4IEFwcmlsIDIw
+MTggYXQgMDk6NDEsIFNhaSBQYXZhbiBCb2RkdSA8c2FpLnBhdmFuLmJvZGR1QHhpbGlueC5jb208
+bWFpbHRvOnNhaS5wYXZhbi5ib2RkdUB4aWxpbnguY29tPj4gd3JvdGU6DQpGb3IgYWxsIHRoZSBj
+b21tYW5kcywgd2hpY2ggZG8gbm90IGhhdmUgYW4gZW50cnkgaW4NCnhpbGlueF9zcGlwc19udW1f
+ZHVtbWllcywgcHJlc2VudCBsb2dpYyBzZW5kcyBkdW1teSBjeWNsZXMgd2hlbiBldmVyIHdlDQph
+cmUgaW4gU05PT1BfTk9ORSBzdGF0ZSwgZml4IGl0IHRvIG9ubHkgc2VuZCBkdW1teSBjeWNsZXMg
+aWYgdGhlIGNtZA0KcmVxdWlyZXMgdGhlbS4NCkl0IGZlZWxzIGxpa2UgYmVsb3cgc2VudGVuY2Ug
+Z29lcyB0b2dldGhlciB3aXRoIHRoZSAnZml4JyBhYm92ZSBzbyBtYXliZSBpdCBjb3VsZCBjb21l
+IGRpcmVjdGx5IGFmdGVyPyAoaS5lLiBubyBuZXcgc2VjdGlvbiBidXQgbWF5YmUgd2l0aCBhbiAn
+YWxzbycgYWZ0ZXIgJ2hhbmRsZSBpcycpDQpTTk9PUF9OT05FIHN0YXRlIGhhbmRsZSBpcyBtb3Zl
+ZCBhYm92ZSAocHJldmlvdXNseSBpdHMgcGFydCBvZiBkZWZhdWx0IGVsc2UNCnMvYWJvdmUvYWJv
+dmUgaW4gdGhlIGlmIGxhZGRlci8NCnMvaXRzIHBhcnQgb2YgZGVmYXVsdC9pdCB3YXMgcGFydCBv
+ZiB0aGUgZGVmYXVsdC8NCmNhc2UpLCBhcyBpdHMgc2FtZSBhcyBTTk9PUF9TVFJJUFBJTkcgZHVy
+aW5nIGRhdGEgY3ljbGVzLg0Kcy9pdHMvaXQncy8NCg0KU2lnbmVkLW9mZi1ieTogU2FpIFBhdmFu
+IEJvZGR1IDxzYWlwYXZhQHhpbGlueC5jb208bWFpbHRvOnNhaXBhdmFAeGlsaW54LmNvbT4+DQot
+LS0NClRPRE86IE1heWJlIHdlIGNvdWxkIGRlbGV0ZSB0aGUgU05PT1BfTk9ORSBzdGF0ZSBhcyBp
+dCBzZWVtcyB0byBiZQ0Kc2FtZSBhcyBTTk9PUF9TVFJJUFBJTkcNCkkgYWdyZWUgdGhhdCBhIGNs
+ZWFudXAgY29tbWl0IGxhdGVyIG9uIGNvdWxkIGJlIGNvbnNpZGVyZWQsIGJ1dCBJIHRoaW5rIGl0
+J3MgYmV0dGVyIG5vdCB0byBpbmNsdWRlIHRoZSB0b2RvIGluIHRoZSBjb21taXQgbWVzc2FnZSBv
+ZiB0aGlzIG9uZSBzbyBjb3VsZCB3ZSByZW1vdmUgaXQ/DQoNCg0KIGh3L3NzaS94aWxpbnhfc3Bp
+cHMuYyB8IDYgKysrKy0tDQogMSBmaWxlIGNoYW5nZWQsIDQgaW5zZXJ0aW9ucygrKSwgMiBkZWxl
+dGlvbnMoLSkNCg0KZGlmZiAtLWdpdCBhL2h3L3NzaS94aWxpbnhfc3BpcHMuYyBiL2h3L3NzaS94
+aWxpbnhfc3BpcHMuYw0KaW5kZXggNDI2Zjk3MS4uNGY2NzYwZCAxMDA2NDQNCi0tLSBhL2h3L3Nz
+aS94aWxpbnhfc3BpcHMuYw0KKysrIGIvaHcvc3NpL3hpbGlueF9zcGlwcy5jDQpAQCAtNjE2LDcg
+KzYxNiw4IEBAIHN0YXRpYyB2b2lkIHhpbGlueF9zcGlwc19mbHVzaF90eGZpZm8oWGlsaW54U1BJ
+UFMgKnMpDQogICAgICAgICBpZiAoZmlmbzhfaXNfZW1wdHkoJnMtPnR4X2ZpZm8pKSB7DQogICAg
+ICAgICAgICAgeGlsaW54X3NwaXBzX3VwZGF0ZV9peHIocyk7DQogICAgICAgICAgICAgcmV0dXJu
+Ow0KLSAgICAgICAgfSBlbHNlIGlmIChzLT5zbm9vcF9zdGF0ZSA9PSBTTk9PUF9TVFJJUElORykg
+ew0KKyAgICAgICAgfSBlbHNlIGlmIChzLT5zbm9vcF9zdGF0ZSA9PSBTTk9PUF9TVFJJUElORyB8
+fA0KKyAgICAgICAgICAgICAgICAgICBzLT5zbm9vcF9zdGF0ZSA9PSBTTk9PUF9OT05FKSB7DQog
+ICAgICAgICAgICAgZm9yIChpID0gMDsgaSA8IG51bV9lZmZlY3RpdmVfYnVzc2VzKHMpOyArK2kp
+IHsNCiAgICAgICAgICAgICAgICAgdHhfcnhbaV0gPSBmaWZvOF9wb3AoJnMtPnR4X2ZpZm8pOw0K
+ICAgICAgICAgICAgIH0NCkBAIC02MjYsMTEgKzYyNywxMiBAQCBzdGF0aWMgdm9pZCB4aWxpbnhf
+c3BpcHNfZmx1c2hfdHhmaWZvKFhpbGlueFNQSVBTICpzKQ0KICAgICAgICAgICAgIGZvciAoaSA9
+IDA7IGkgPCBudW1fZWZmZWN0aXZlX2J1c3NlcyhzKTsgKytpKSB7DQogICAgICAgICAgICAgICAg
+IHR4X3J4W2ldID0gdHg7DQogICAgICAgICAgICAgfQ0KLSAgICAgICAgfSBlbHNlIHsNCisgICAg
+ICAgIH0gZWxzZSBpZiAocy0+Y21kX2R1bW1pZXMgPiAwKSB7DQpUaGUgdmFyaWFibGUgc25vb3Bf
+c3RhdGUgYWxyZWFkeSBrZWVwcyB0cmFjayBvZiB0aGUgZHVtbXkgY3ljbGVzLCB0aGUgc2FtZSB0
+aGUgJ2Vsc2UnIHRvICdlbHNlIGlmJyBjaGFuZ2UgYWJvdmUgdG9nZXRoZXIgd2l0aCB0aGUgJ2Nt
+ZF9kdW1taWVzJyBkZWNyZW1lbnRhdGlvbiBiZWxvdyBkb2VzLCBjb3VsZCB3ZSB1bmRvIHRoZXNl
+IHR3byBjaGFuZ2VzIHNpbmNlIGl0IGlzIGFscmVhZHkgaGFuZGxlZD8NCltTYWkgUGF2YW4gQm9k
+ZHVdIFllcywgeW91IGFyZSByaWdodC4gQWZ0ZXIgd2UgbW92ZWQgU05PT1BfTk9ORSBhYm92ZS4g
+V2UgZG9u4oCZdCBuZWVkIGFuIG9mIHRoZXNlIGNoYW5nZXMgaGVyZS4gV29uZGVyZnVsIHRoYXQg
+aXQgcGF0Y2ggZ290IG1pbmltaXplZCB0byBzaW5nbGUgbGluZSBub3cuDQoNClJlZ2FyZHMsDQpT
+YWkgUGF2YW4NCg0KVGhhbmsgeW91IQ0KDQpCZXN0IHJlZ2FyZHMsDQpGcmFuY2lzY28gSWdsZXNp
+YXMNCg0KICAgICAgICAgICAgIC8qIEV4dHJhY3QgYSBkdW1teSBieXRlIGFuZCBnZW5lcmF0ZSBk
+dW1teSBjeWNsZXMgYWNjb3JkaW5nIHRvIHRoZQ0KICAgICAgICAgICAgICAqIGxpbmsgc3RhdGUg
+Ki8NCiAgICAgICAgICAgICB0eCA9IGZpZm84X3BvcCgmcy0+dHhfZmlmbyk7DQogICAgICAgICAg
+ICAgZHVtbXlfY3ljbGVzID0gOCAvIHMtPmxpbmtfc3RhdGU7DQorICAgICAgICAgICAgcy0+Y21k
+X2R1bW1pZXMtLTsNCiAgICAgICAgIH0NCg0KICAgICAgICAgZm9yIChpID0gMDsgaSA8IG51bV9l
+ZmZlY3RpdmVfYnVzc2VzKHMpOyArK2kpIHsNCi0tDQoyLjcuNA0KDQoNCg==
