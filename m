@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35746)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f95lE-0002ug-Rd
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 05:21:49 -0400
+	(envelope-from <berrange@redhat.com>) id 1f95n0-0004ET-Kv
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 05:23:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f95lA-0003bk-Q5
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 05:21:48 -0400
-Resent-Message-Id: <E1f95lA-0003bk-Q5@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21041)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1f95lA-0003bH-I1
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 05:21:44 -0400
-In-Reply-To: <20180419091105.3943-1-stefanha@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152412968004.1989.18095638970816402683@71c20359a636>
+	(envelope-from <berrange@redhat.com>) id 1f95mw-0005AA-N1
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 05:23:38 -0400
+Date: Thu, 19 Apr 2018 10:23:20 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180419092320.GJ10259@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180418123838.3511-1-olaf@aepfle.de>
+	<20180418144538.4aa2f492.cohuck@redhat.com>
+	<20180418125545.GN27579@redhat.com>
+	<87sh7rvf27.fsf@dusky.pond.sub.org>
+	<20180419093024.27c77433.olaf@aepfle.de>
+	<20180419075958.GD10259@redhat.com>
+	<CAFEAcA9UYM3hifEbs_sp9jcFkwu5sSSXaLq9CLWuhNbV67+MBQ@mail.gmail.com>
+	<20180419092017.olujzxzlwvjlt6en@sirius.home.kraxel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 19 Apr 2018 02:21:21 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/5] checkpatch: backport UTF-8 fixes and
- MAINTAINERS check
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180419092017.olujzxzlwvjlt6en@sirius.home.kraxel.org>
+Subject: Re: [Qemu-devel] [PATCH v1] configure: require glib-2.24
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +30,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: stefanha@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.orgfamz@redhat.com, peter.maydell@linaro.org, thuth@redhat.com, marcandre.lureau@gmail.com, armbru@redhat.com
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Olaf Hering <olaf@aepfle.de>, Markus Armbruster <armbru@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Fam Zheng <famz@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNDE5MDkxMTA1LjM5NDMtMS1zdGVmYW5oYUByZWRoYXQuY29tClN1Ympl
-Y3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC81XSBjaGVja3BhdGNoOiBiYWNrcG9ydCBVVEYtOCBm
-aXhlcyBhbmQgTUFJTlRBSU5FUlMgY2hlY2sKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEv
-YmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4u
-IHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAw
-CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUgg
-LS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNr
-aW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgog
-ICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNo
-LnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAg
-ZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQg
-PT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZy
-b20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAg
-ICAgICAgICAgICAgIHBhdGNoZXcvMjAxODA0MTkwOTExMDUuMzk0My0xLXN0ZWZhbmhhQHJlZGhh
-dC5jb20gLT4gcGF0Y2hldy8yMDE4MDQxOTA5MTEwNS4zOTQzLTEtc3RlZmFuaGFAcmVkaGF0LmNv
-bQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjc3ZjI5MjJjZDcgY2hlY2twYXRjaDog
-cmVkdWNlIE1BSU5UQUlORVJTIHVwZGF0ZSBtZXNzYWdlIGZyZXF1ZW5jeQpjNTY2MGVmZmNiIGNo
-ZWNrcGF0Y2g6IGVtaXQgYSB3YXJuaW5nIG9uIGZpbGUgYWRkL21vdmUvZGVsZXRlCjRmMjI0YmE1
-NjkgY2hlY2twYXRjaDogaWdub3JlIGVtYWlsIGhlYWRlcnMgYmV0dGVyCjg1MjQyMDJhYmUgY2hl
-Y2twYXRjaDogY2hlY2sgdXRmLTggY29udGVudCBmcm9tIGEgY29tbWl0IGxvZyB3aGVuIGl0J3Mg
-bWlzc2luZyBmcm9tIGNoYXJzZXQKZGFiNDJiMmYwZCBjaGVja3BhdGNoOiBhZGQgYSAtLXN0cmlj
-dCBjaGVjayBmb3IgdXRmLTggaW4gY29tbWl0IGxvZ3MKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNo
-ZWNraW5nIFBBVENIIDEvNTogY2hlY2twYXRjaDogYWRkIGEgLS1zdHJpY3QgY2hlY2sgZm9yIHV0
-Zi04IGluIGNvbW1pdCBsb2dzLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM5
-NjogRklMRTogc2NyaXB0cy9jaGVja3BhdGNoLnBsOjE0MjA6CisJCQkgICAgIjgtYml0IFVURi04
-IHVzZWQgaW4gcG9zc2libGUgY29tbWl0IGxvZ1xuIiAuICRoZXJlY3Vycik7Cgp0b3RhbDogMCBl
-cnJvcnMsIDEgd2FybmluZ3MsIDY3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxl
-IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
-c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
-SCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMi81OiBjaGVja3BhdGNoOiBjaGVjayB1
-dGYtOCBjb250ZW50IGZyb20gYSBjb21taXQgbG9nIHdoZW4gaXQncyBtaXNzaW5nIGZyb20gY2hh
-cnNldC4uLgpDaGVja2luZyBQQVRDSCAzLzU6IGNoZWNrcGF0Y2g6IGlnbm9yZSBlbWFpbCBoZWFk
-ZXJzIGJldHRlci4uLgpDaGVja2luZyBQQVRDSCA0LzU6IGNoZWNrcGF0Y2g6IGVtaXQgYSB3YXJu
-aW5nIG9uIGZpbGUgYWRkL21vdmUvZGVsZXRlLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
-YWN0ZXJzCiM0MTogRklMRTogc2NyaXB0cy9jaGVja3BhdGNoLnBsOjEzOTY6CisJCSAgICAgKCRs
-aW5lID1+IC9ce1xzKihbXHdcL1wuXC1dKilccypcPVw+XHMqKFtcd1wvXC5cLV0qKVxzKlx9LyAm
-JgoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM0NTogRklMRTogc2NyaXB0cy9jaGVj
-a3BhdGNoLnBsOjE0MDA6CisJCQkgICAgICJhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMp
-LCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/XG4iIC4gJGhlcmVjdXJyKTsKCnRvdGFs
-OiAxIGVycm9ycywgMSB3YXJuaW5ncywgMjUgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
-ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNS81OiBjaGVja3BhdGNoOiBy
-ZWR1Y2UgTUFJTlRBSU5FUlMgdXBkYXRlIG1lc3NhZ2UgZnJlcXVlbmN5Li4uCj09PSBPVVRQVVQg
-RU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2Vu
-ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBs
-ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Thu, Apr 19, 2018 at 11:20:17AM +0200, Gerd Hoffmann wrote:
+>   Hi,
+> 
+> > Well, it depends. You might be stuck with an old distro because
+> > some software you want to run depends on it, but also want to run
+> > newer versions of some programs like QEMU. If you're in that
+> > boat you can probably live with having to also compile a newer
+> > version of glib to go with your newer QEMU, though.
+> 
+> Core libraries like glib might not be that easy, I've seen updating glib
+> breaking apps in the past.
+
+You would likely just have to build it all into /opt/qemu so it is
+isolated from whatever the distro included. 
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
