@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f9XGD-0002H2-11
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 10:43:37 -0400
+	(envelope-from <armbru@redhat.com>) id 1f9XNG-0005Bu-K3
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 10:50:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f9XGC-0002p3-16
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 10:43:37 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:44734)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f9XGB-0002ol-K1
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 10:43:35 -0400
-Received: by mail-oi0-x244.google.com with SMTP id e80-v6so793077oig.11
-	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 07:43:35 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1f9XNF-0006ev-NP
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 10:50:54 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180405170619.20480-1-kwolf@redhat.com>
+	<87d0ywv9j0.fsf@dusky.pond.sub.org>
+	<20180418162823.GH4971@localhost.localdomain>
+	<20180418163458.GB27579@redhat.com>
+	<20180418165208.GI4971@localhost.localdomain>
+	<20180418170457.GC27579@redhat.com>
+	<87y3hixaql.fsf@dusky.pond.sub.org>
+	<20180420135529.GL21035@redhat.com>
+Date: Fri, 20 Apr 2018 16:50:38 +0200
+In-Reply-To: <20180420135529.GL21035@redhat.com> ("Daniel P. =?utf-8?Q?Ber?=
+	=?utf-8?Q?rang=C3=A9=22's?=
+	message of "Fri, 20 Apr 2018 14:55:29 +0100")
+Message-ID: <877ep2szi9.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <ab476982-0aee-7471-daa2-99f774f43089@amsat.org>
-References: <20180419220914.959-1-f4bug@amsat.org>
-	<20180419220914.959-2-f4bug@amsat.org>
-	<CAFEAcA-LYpqaYfdmjzXwMDau8bZH_zxXaRCCL5dRT1p6spjUxQ@mail.gmail.com>
-	<f89278ba-b805-e47d-7e5e-d103ab9c4294@amsat.org>
-	<CAFEAcA9zuoVDJqZ88jBG0fEpC2imDuj2OAAMpgqiQ=MbtE3QSg@mail.gmail.com>
-	<ad37af41-feda-0a6a-89a2-38abd452401c@amsat.org>
-	<ab476982-0aee-7471-daa2-99f774f43089@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Apr 2018 15:43:14 +0100
-Message-ID: <CAFEAcA828qK5DJy8yqO=d8LyaPthVb_qj3VQBZh_rY40TeZotg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] hw/isa/superio: Fix inconsistent use
- of Chardev->be
+Subject: Re: [Qemu-devel] [RFC][BROKEN] rbd: Allow configuration of
+ authentication scheme
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,37 +32,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, jdurgin@redhat.com, qemu-block@nongnu.org, jcody@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
-On 20 April 2018 at 15:29, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wr=
-ote:
->>>> On 04/20/2018 05:43 AM, Peter Maydell wrote:
->>>> Since we can now safely call serial_mm_init(..., chr=3DNULL, ...), I'l=
-l
->>>> work on simplifying and fixing this.
->>>
->>> Correct. There are a bunch of dubious workarounds in the
->>> codebase which try to handle the problem at different levels,
->>> but we've decided that the right thing is for the NULL pointer
->>> to be dealt with in one place at the bottom (in the qemu_chr_fe_*
->>> functions).
->>
->> OK, I'll happily clean that :)
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+
+> On Fri, Apr 20, 2018 at 03:34:26PM +0200, Markus Armbruster wrote:
+>> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+>>=20
+>> > Yeah this is a mess - I wish we had never allowed users to pass a conf=
+ig
+>> > file, and had used /dev/null all the time. Unfortunately changing eith=
+er
+>> > of these aspects would cause backcompat problems for existing deployme=
+nts
+>> > now :-( So we just have to accept that the global config file is always
+>> > in present, but none the less libvirt should try to specify things as
+>> > fully as possible.
+>>=20
+>> I'm afraid you get backward compatibility problems no matter what.
+>> Whenever you extend libvirt to pass configuration C "via normal per-disk
+>> setup for blockdev", it breaks user config files containing C, doesn't
+>> it?
 >
-> Hmmm removing the "if (serial_hds[0])" check I reach:
->
-> void serial_realize_core(SerialState *s, Error **errp)
-> {
->     if (!qemu_chr_fe_backend_connected(&s->chr)) {
->         error_setg(errp, "Can't create serial device, empty char device")=
-;
->         return;
->     }
+> That's not actually a problem here. We are only passing things to QEMU
+> that the user already provided us in the XML file. If we gain support
+> for passing a new item via the blockdev schema, then we'd only be
+> passing that to QEMU if the user actually provided that item in the
+> XML too.  We're not likely to pass a new config field without the
+> user having asked us to first.
 
-Yeah. That check is unnecessary; nothing fails to work if it is
-removed. I've got a patch deleting it in my "drop MAX_SERIAL_PORTS"
-series.
+What made me guess otherwise: "to properly protect against compromised
+QEMU, ideally every QEMU would use a completely separate RBD
+user+password, so that compromised QEMU can't then access RBD disks
+belonging to a different user" led me to assume libvirt would do this
+automatically.
 
-thanks
--- PMM
+[...]
