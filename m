@@ -1,36 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f9MEm-0006cg-Kr
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 22:57:25 -0400
+	(envelope-from <famz@redhat.com>) id 1f9MFa-00076J-9r
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 22:58:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f9MEj-0001cu-Im
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 22:57:24 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:46365)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f9MEj-0001ci-DZ
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 22:57:21 -0400
-Received: by mail-qk0-x241.google.com with SMTP id s70so7533278qks.13
-	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 19:57:21 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180419135901.30035-1-alex.bennee@linaro.org>
-	<20180419135901.30035-32-alex.bennee@linaro.org>
-	<8ccf1143-5895-ca8b-eea5-c7d96c992455@amsat.org>
-	<87vacn9jd5.fsf@linaro.org>
-	<CAFEAcA8u5sfzcoqGhAagoUj6cE014hdyRgdm6=LBDfE9rV+cjw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <60b519a7-f49b-95e7-b9db-3e74133cf8c0@amsat.org>
-Date: Thu, 19 Apr 2018 23:57:14 -0300
+	(envelope-from <famz@redhat.com>) id 1f9MFX-0002HR-96
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 22:58:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50738 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1f9MFX-0002Gp-3P
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 22:58:11 -0400
+Date: Fri, 20 Apr 2018 10:57:59 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180420025759.GD17690@lemon.usersys.redhat.com>
+References: <20180420024005.30245-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8u5sfzcoqGhAagoUj6cE014hdyRgdm6=LBDfE9rV+cjw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 31/43] tests/tcg: enable building for
- MIPS
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180420024005.30245-1-f4bug@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] docker: Rename the amd64 image as
+ amd64-cross
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,46 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: "Emilio G. Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, andrzej zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, Yongbok Kim <yongbok.kim@mips.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 
-On 04/19/2018 02:58 PM, Peter Maydell wrote:
-> On 19 April 2018 at 18:49, Alex Bennée <alex.bennee@linaro.org> wrote:
->> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
->>> On 04/19/2018 10:58 AM, Alex Bennée wrote:
->>>> This doesn't add any additional tests but enables building the
->>>> multiarch tests for MIPS using docker cross compilers. We don't have a
->>>> cross compiler for mips64 big endian though.
->>>
->>> Oh we have one, using CFLAGS+=-EB
->>>
->>> we don't have cross libraries although.
->>
->> Yeah I thought the same with the ARM compilers (-mbig-endian) but it's
->> the libraries that let us down. If, as you say, newlib gets this right I
->> suspect we should use that to build the compilers not supported out of
->> the box by Debian.
-> 
-> I don't think we really want to get into the business of
-> building our own cross compilers if we can avoid it...it's harder
-> than it looks and we would be essentially reinventing the wheel.
+On Thu, 04/19 23:40, Philippe Mathieu-Daud=E9 wrote:
+> Like the other images, this one is also used to cross-compile.
+> Name it accordingly, matching directory pattern.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> ---
+>  tests/docker/Makefile.include                                   | 2 +-
+>  .../{debian-amd64.docker =3D> debian-amd64-cross.docker}          | 0
+>  2 files changed, 1 insertion(+), 1 deletion(-)
+>  rename tests/docker/dockerfiles/{debian-amd64.docker =3D> debian-amd64=
+-cross.docker} (100%)
+>=20
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.incl=
+ude
+> index de87341528..a113a15f77 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -49,7 +49,7 @@ docker-image-debian-powerpc-cross: EXTRA_FILES:=3D$(S=
+RC_PATH)/tests/docker/dockerf
+>  # Enforce dependancies for composite images
+>  docker-image-debian: docker-image-debian9
+>  docker-image-debian8-mxe: docker-image-debian8
+> -docker-image-debian-amd64: docker-image-debian9
+> +docker-image-debian-amd64-cross: docker-image-debian9
+>  docker-image-debian-armel-cross: docker-image-debian9
+>  docker-image-debian-armhf-cross: docker-image-debian9
+>  docker-image-debian-arm64-cross: docker-image-debian9
+> diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docke=
+r/dockerfiles/debian-amd64-cross.docker
+> similarity index 100%
+> rename from tests/docker/dockerfiles/debian-amd64.docker
+> rename to tests/docker/dockerfiles/debian-amd64-cross.docker
 
-I totally agree.
+But the dockerfile is written differently: it doesn't use the --cross-pre=
+fix
+configure option, plus, amd64 is usually the "native" arch making it non-=
+cross
+build.
 
-I'v been looking at existing maintained images we can use to
-cross-build, so we only have to pull (download) and image and use it,
-not wasting cpu time building it.
+What do you need this patch for beside the consistency?
 
-However some images might be huge, full of things we don't need. But I
-prefer that rather than having to maintain cross toolchains.
-
-An example I like to use is the coreboot-sdk, designed to build
-i386/amd64 binaries, it fulfills our needs. But takes 2GB...
-
-$ docker pull coreboot/coreboot-sdk:1.47
-1.47: Pulling from coreboot/coreboot-sdk
-3d6aedfc3e47: Downloading [>              ]  538.2kB/1.201GB
-d23c9a72f1e5: Waiting
-
-Another candidate is crossbuild, ~1GB
-$ docker pull multiarch/crossbuild
+Fam
