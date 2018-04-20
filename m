@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f9QZc-0004Rd-IQ
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 03:35:16 -0400
+	(envelope-from <thuth@redhat.com>) id 1f9Qb5-0005QN-40
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 03:36:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f9QZb-0000Xr-RD
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 03:35:12 -0400
-Date: Fri, 20 Apr 2018 15:35:03 +0800
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180420073503.GH15181@stefanha-x1.localdomain>
-References: <20180411163940.2523-1-kwolf@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1f9Qb2-0001ap-02
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 03:36:43 -0400
+References: <1524054707-20663-1-git-send-email-thuth@redhat.com>
+	<1524054707-20663-4-git-send-email-thuth@redhat.com>
+	<bc5533dc-9471-7dac-6aba-9014e9961376@linux.vnet.ibm.com>
+	<b0bb6918-0047-9a53-b03f-bff5669daaaa@redhat.com>
+	<2d59a139-3bdd-4b4e-882c-5cf845488eda@linux.vnet.ibm.com>
+	<475ea222-cc03-16e4-0f50-f89cf2bfae6f@redhat.com>
+	<0b6af02e-6e5b-76bb-a0d0-30038ad5a265@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <a001b146-7091-63e6-a845-e276494cc518@redhat.com>
+Date: Fri, 20 Apr 2018 09:36:33 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="8/pVXlBMPtxfSuJG"
-Content-Disposition: inline
-In-Reply-To: <20180411163940.2523-1-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 00/19] Drain fixes and cleanups, part 3
+In-Reply-To: <0b6af02e-6e5b-76bb-a0d0-30038ad5a265@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 for-2.13 3/4]
+ pc-bios/s390-ccw/net: Add support for pxelinux-style config files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,38 +30,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
+To: Viktor VM Mihajlovski <mihajlov@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
+Cc: Collin Walling <walling@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
 
+On 20.04.2018 08:53, Viktor VM Mihajlovski wrote:
+> On 19.04.2018 18:55, Thomas Huth wrote:
+>> On 19.04.2018 14:40, Viktor VM Mihajlovski wrote:
+[...]
+>>>>> That's interesting because treating the bootfile as pxe-ish config =
+is
+>>>>> what DPM does. Which means that with this change the processor
+>>>>> architecture type 0x1f (Basic) will turn into a superset of 0x20
+>>>>> (Extended).
+>>>>
+>>>> Is there any reference available what "basic" and "extended" exactly
+>>>> mean? I just know that there are these two values registered by you =
+at
+>>>> the IANA:
+>>>>
+>>>> https://www.iana.org/assignments/dhcpv6-parameters/dhcpv6-parameters=
+.xhtml#processor-architecture
+>>>>
+>>>> ... but I haven't seen a description of the differences of these two
+>>>> values yet.
+>>>>
+>>> Yep, the IANA stuff is pretty terse for all architectures. In a
+>>> nutshell: 0x1f is standard DHCP-based boot (bootfile is a single
+>>> executable binary) and 0x20 serves a pxe-style config file instead.
+>>
+>> Can 0x20 also still handle binary files, or only pxe-style config file=
+s?
+>>
+> Unfortunately, DPM has no support for binaries which was the reason we
+> ended up with two different identifiers
 
---8/pVXlBMPtxfSuJG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Ok, so switching to 0x20 is not an option for us here.
 
-On Wed, Apr 11, 2018 at 06:39:21PM +0200, Kevin Wolf wrote:
-> This is the third and hopefully for now last part of my work to fix
-> drain. The main goal of this series is to make drain robust against
-> graph changes that happen in any callbacks of in-flight requests while
-> we drain a block node.
+>>> In fact, "processor architecture identifier" is a misnomer, as it
+>>> describes a pair of processor architecture and firmware.
+>>
+>> Yeah, I know ... it's even worse nowadays, it's processor + firmware +
+>> TCP/IP protocol (HTTP vs. TFTP) ... we should have properly untangled
+>> that when doing RFC 5970, but it was already hard enough to get that
+>> accepted in the current shape, so we missed to clean up the mess from
+>> RFC 4578 / PXE :-(
+>>
+>>> Since the QEMU firmware has two significant extensions now (insfile a=
+nd
+>>> direct config file loading), it might be worthwhile to add a new
+>>> identifier value (say s390 QEMU PC-BIOS or similar) announcing the ne=
+w
+>>> capabilities, so that a boot server admin can setup her system accord=
+ingly.
+>>
+>> Not sure ... too many processory-architecture-type entries might also
+>> rather be too confusing for the users? ... so if 0x20 can also handle
+>> binary files like 0x1f, I'd maybe simply go with 0x20 and mainly promo=
+te
+>> pxelinux config files in the documentation?
+>>
+> Well, if we don't add another identifier, and I feel reluctant about it
+> as well for the reasons you wrote, we may stick with 0x1f and consider
+> the additional capabilities as being optional (for special needs only).
 
-I have reviewed the first half of this series and will review the rest
-when v2 is posted since I want to see how the changes suggested by Paolo
-play out first.
+I tend to stay with 0x1f, since booting binaries is still the "primary"
+interface (the first check for the "default" or "# " magic keywords is
+not 100% reliable, since the config file could also start with another
+command, and the probing of pxelinux.cfg/* files is only tried afterwards=
+).
 
-Stefan
-
---8/pVXlBMPtxfSuJG
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJa2ZgnAAoJEJykq7OBq3PI4UAH/30rtTJ7PIp5tcMnSrJRBFeQ
-XJBQMTRnpr6JXoHBxvs5Vu6gDqpeLf3/32oaNMgshUYqMHvDrH7HIKalwPp14pQN
-Ql3Tl3I9w0iW4a1NAau0ZMynmWhujmXwZgdYLVXoFzJxD4H7s8U4PhTF1wgehONt
-TmnoD5JlBf+mUt4sRtIzBiPN8xbnMVsbZbsYxdvBkvr7LXUcAPBiHqdVgl2uIUU0
-2u975svYvsYR2xx5mReDnGpo/QC1tMxc0pmQF4ikXpDppQYVTFBAcAbbe49ZdSFs
-7EXXZHI6SZv1F3w8lormc/shr4jbimbfnHBc9krbmffN/qUwFunnG6qbyBd8kx8=
-=BuLD
------END PGP SIGNATURE-----
-
---8/pVXlBMPtxfSuJG--
+ Thomas
