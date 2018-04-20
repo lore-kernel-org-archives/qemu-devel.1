@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46234)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f9bX6-0007kw-CD
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 15:17:21 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f9boY-0007Ej-PV
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 15:35:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f9bX2-00059t-Aw
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 15:17:20 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:44994)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f9bX2-00058V-3b
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 15:17:16 -0400
-Received: by mail-wr0-x231.google.com with SMTP id o15-v6so25580562wro.11
-	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 12:17:16 -0700 (PDT)
-References: <20180420155045.18862-1-alex.bennee@linaro.org>
-	<20180420183557.GA29359@flamenco>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180420183557.GA29359@flamenco>
-Date: Fri, 20 Apr 2018 20:17:12 +0100
-Message-ID: <87fu3pads7.fsf@linaro.org>
+	(envelope-from <mreitz@redhat.com>) id 1f9boX-0000oB-Vo
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 15:35:22 -0400
+References: <20180406151731.4285-1-mreitz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <73e2d9e7-270c-4f7b-284f-7b65cf842fd0@redhat.com>
+Date: Fri, 20 Apr 2018 21:35:06 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 0/6] Convert softmmu-template into
- normal code
+In-Reply-To: <20180406151731.4285-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="UZsoqzs1aMp8QChoWzR0lJZDSdFBiEW9e"
+Subject: Re: [Qemu-devel] [PATCH 0/2] iotests: Skip 181 and 201 without
+ userfaultfd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,79 +24,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, richard.henderson@linaro.org, pbonzini@redhat.com
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--UZsoqzs1aMp8QChoWzR0lJZDSdFBiEW9e
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <73e2d9e7-270c-4f7b-284f-7b65cf842fd0@redhat.com>
+Subject: Re: [PATCH 0/2] iotests: Skip 181 and 201 without userfaultfd
+References: <20180406151731.4285-1-mreitz@redhat.com>
+In-Reply-To: <20180406151731.4285-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2018-04-06 17:17, Max Reitz wrote:
+> My non-Fedora testing system does not have a kernel with userfaultfd
+> support which causes 181 and 201 to fail.  That is annoying.  This
+> series makes those tests recognize the issue and convert it into a
+> _notrun.
+>=20
+>=20
+> Max Reitz (2):
+>   iotests: Add failure matching to common.qemu
+>   iotests: Skip 181 and 201 without userfaultfd
+>=20
+>  tests/qemu-iotests/181         | 13 ++++++++++
+>  tests/qemu-iotests/201         | 13 ++++++++++
+>  tests/qemu-iotests/common.qemu | 58 ++++++++++++++++++++++++++++++++++=
++++-----
+>  3 files changed, 77 insertions(+), 7 deletions(-)
+
+Applied to my block-next branch.
+
+Max
 
 
-Emilio G. Cota <cota@braap.org> writes:
+--UZsoqzs1aMp8QChoWzR0lJZDSdFBiEW9e
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> On Fri, Apr 20, 2018 at 16:50:39 +0100, Alex Benn=C3=A9e wrote:
->> Any questions/thoughts/comments?
->
-> Very nice!
->
-> I modified the style a little bit, namely to pass checkpatch and to
-> improve grepability by having
->   foo __attribute__((flatten))
->   function(arg1, arg2, ...)
-> as opposed to
->   foo __attribute__((flatten)) function(arg1,
->                                         arg2,
->                                         ...)
->
-> I also changed the patches to make the series simpler: one patch
-> to add softmmu.c (without compiling it yet), one patch to
-> actually use softmmu.c, and a final patch to remove the template
-> file.
->
-> You can get my modifications from:
->   https://github.com/cota/qemu/tree/softmmu
->
-> Note that there are two stray references to softmmu_template
-> in comments:
-> $ git grep -i 'softmmu_template'
-> accel/tcg/translate-all.c: * Called via softmmu_template.h when code area=
-s are written to with
-> accel/tcg/translate-all.c: * Called by softmmu_template.h, with iothread =
-mutex not held.
->
-> I don't have time right now to test performance, but at least
-> the only function I checked (helper_ret_ldub_mmu) has only grown
-> in size by a little bit, from 584 bytes to 614.
+-----BEGIN PGP SIGNATURE-----
 
-Hmm in theory it should be the same but I guess I should have a look at
-the disassembler dumps next time around.
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlraQOoACgkQ9AfbAGHV
+z0AgzggAuPz6owl8M6qPlzI//EIXoF+CHpKLUf7Yyknqux8vRhvKuneyrxSwKLAF
+DULdgnFcGDm5u3EYhXmNmbf6SERwtAYo790+QCDTJKAku2190GQza/i5xDHBRmEB
+fYmzQY9mwVkGGd/vxbfb752fRCrzaHL1LuU0XrwOB/8LW4g194fqlDsaRgO1JRmQ
+qGAWtU0PlFA3ScZnuN0Jz9GxLNQUjbVxKBFw0vEHk/8G4tGrNS/q8fWuS7R4F1Ld
+KLXUOPdw+0HyWM/K8yLde1UThhGSltCvkPlAzZ1hzadYN9S+z9MLlc97muRcEwfX
+OHpL3a8GdcmjVIPAAl0gRPAy8jJ0CQ==
+=3roE
+-----END PGP SIGNATURE-----
 
->
-> The executable is now larger:
->
-> - before:
->    text    data     bss     dec     hex filename
-> 9864951 2944592 4371560 17181103        10629af aarch64-softmmu/qemu-syst=
-em-aarch64
->
-> - after:
->    text    data     bss     dec     hex filename
-> 9892095 2944592 4371560 17208247        10693b7 aarch64-softmmu/qemu-syst=
-em-aarch64
->
-> By removing flatten we can decrease the overall size, but this might affe=
-ct perf:
->    text    data     bss     dec     hex filename
-> 9849967 2944592 4371560 17166119        105ef27 aarch64-softmmu/qemu-syst=
-em-aarch64
->
-> This is a slow path though so it might be worth looking into.
->
-> BTW I haven't done any testing, just compile-tested for all targets.
->
-> So overall I think this should be upgraded from RFC to a proper patch
-> series; hopefully we can get this done for 2.13!
->
-> Thanks,
->
-> 		Emilio
-
-
---
-Alex Benn=C3=A9e
+--UZsoqzs1aMp8QChoWzR0lJZDSdFBiEW9e--
