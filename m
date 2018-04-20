@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f9bER-00080g-Vy
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 14:58:05 -0400
+	(envelope-from <cota@braap.org>) id 1f9bLO-0005Yo-Sq
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 15:05:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f9bEO-0003wA-Vd
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 14:58:04 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:49657)
+	(envelope-from <cota@braap.org>) id 1f9bLL-0001EZ-CH
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 15:05:14 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:56719)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f9bEO-0003vq-Rm
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 14:58:00 -0400
-Date: Fri, 20 Apr 2018 14:57:59 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f9bLL-0001E2-68
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 15:05:11 -0400
+Date: Fri, 20 Apr 2018 15:05:09 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180420185759.GA28290@flamenco>
-References: <CA+ZOyaj_4my=u4-MkAbyoee5ORnRq6nyaU+HhX1K6t2+Cn5RHg@mail.gmail.com>
-	<3EFD5845-5CE7-45F5-AE4C-0C86CAFAA200@sifive.com>
-	<CA+ZOyajL25Gfz_NdcG+MxDAZb9qstjNo2sD_ExzX0fATaDg7HQ@mail.gmail.com>
-	<CAHNT7NtJd1ZtYqdVfuiqxe60rOjyc48qyGKrQ99xY0UVH4arHQ@mail.gmail.com>
-	<CAHNT7NtBzUUv4dGjLwxnMi9cOwoS5+7KVnKbrUynXkgX2C477Q@mail.gmail.com>
-	<CA++6G0CNH5mzZFnsE-d6wS5jGr1YmVRc6VUhhBQYeMXKSQrqjQ@mail.gmail.com>
-	<CAHNT7NshWPN-8pFzF9+PR9rcNOKmBDn5zpzvF0n6rfyzRg93tQ@mail.gmail.com>
+Message-ID: <20180420190509.GA29671@flamenco>
+References: <20180419135901.30035-1-alex.bennee@linaro.org>
+	<0b1a0dd5-4b79-5e60-5b45-8ee8f2de07c8@linaro.org>
+	<87tvs69y61.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <CAHNT7NshWPN-8pFzF9+PR9rcNOKmBDn5zpzvF0n6rfyzRg93tQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [sw-dev] The problem of write misa on QEMU and BBL
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87tvs69y61.fsf@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v2 00/43] fix building of tests/tcg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,34 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: Andrew Waterman <andrew@sifive.com>, Zong Li <zongbox@gmail.com>, Zong Li <zong@andestech.com>, Palmer Dabbelt <palmer@sifive.com>, RISC-V SW Dev <sw-dev@groups.riscv.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Alistair Francis <Alistair.Francis@wdc.com>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, peter.maydell@linaro.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, qemu-devel@nongnu.org
 
-On Fri, Apr 20, 2018 at 12:31:42 +1200, Michael Clark wrote:
+On Fri, Apr 20, 2018 at 07:42:14 +0100, Alex Bennée wrote:
+> 
+> Richard Henderson <richard.henderson@linaro.org> writes:
 (snip)
-> In any case it seems we need some pretty major changes to translate.c
-> before we can make misa writable in qemu-riscv. Almost every gen routine
-> with the exception of RVI will need predication based on extensions. It
-> makes one pause and think whether adding if statements is a good approach
-> or whether having exension metadata available in the decoder so that it can
-> be done generically. Adding lots of riscv_has_ext checks would be nasty.
+> >> Finally the end of the series has me adding Emilio's fp-test to the
+> >> per-target builds. Unfortunately although some osdep.h and softfloat.c
+> >> fiddling allows us to build in most cases I still can't build for
+> >> example an i386 fp-test on an x86_64 host using the cross compiler as
+> >> it triggers incompatibilities with config-host.h - in this case Int128
+> >> support. Currently I just hackily disable fp-test for non-64 bit
+> >> platforms.
+> >
+> > It seems I can't even build fp-test for x86_64.
+> >
+> >   CROSS-BUILD x86_64 guest-tests with cc
+> > In file included from /home/rth/work/qemu/qemu/tests/fp/fp-test.c:14:0:
+> > /home/rth/work/qemu/qemu/include/qemu/osdep.h:30:10: fatal error:
+> > config-host.h: No such file or directory
+> >  #include "config-host.h"
+> >           ^~~~~~~~~~~~~~~
+> > compilation terminated.
 > 
-> We will need to add misa to DisasContext so that we can
-> remove CPURISCVState *env from gen methods.
-> 
-> It also doesn't make sense to start this until we have merged Emilio's
-> DisasContextBase changes.
-> 
-> It would be nice if Emilio's changes can be merged early in the 2.13 cycle
-> so that folk are able to make progress on extension checking to
-> target/riscv/translate.c
+> Weird as that works for me. Has configure been run? Are you in a
+> external build dir?
 
-Most of those changes have been reviewed, so I'm confident they'll be
-merged early in the 2.13 cycle. That said, you might want to already
-work on the changes you need on top of the v3 series I just sent,
-which is available at:
-  https://github.com/cota/qemu/tree/trloop-conv-v3
+config-host.h is generated when running "make" (to build whatever
+targets were configured), so the recipe in tests/fp expects that
+to have happened. I think this is commonly expected when building
+tests/, but if I'm mistaken we could fix it by adding a rule
+for config-host.h as a prerequisite.
 
-Cheers,
-
-		Emilio
+		E.
