@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f9cD4-0008Ha-O8
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 16:00:43 -0400
+	(envelope-from <cota@braap.org>) id 1f9cEk-0000sm-2Y
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 16:02:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f9cD1-0007ia-L0
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 16:00:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51230)
+	(envelope-from <cota@braap.org>) id 1f9cEh-0003Cw-1j
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 16:02:26 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:33763)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f9cD1-0007hy-CP
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 16:00:39 -0400
-Date: Fri, 20 Apr 2018 16:59:33 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180420195933.GG29865@localhost.localdomain>
-References: <20180420181951.7252-1-ehabkost@redhat.com>
-	<20180420181951.7252-3-ehabkost@redhat.com>
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f9cEg-00038M-SM
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 16:02:22 -0400
+Date: Fri, 20 Apr 2018 16:02:20 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180420200220.GA517@flamenco>
+References: <20180420155045.18862-1-alex.bennee@linaro.org>
+	<20180420183557.GA29359@flamenco>
+	<9b39de2c-5682-bbbc-43f9-cc3397ea6e93@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20180420181951.7252-3-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 02/24] Introduce the basic framework to run
- Avocado tests
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <9b39de2c-5682-bbbc-43f9-cc3397ea6e93@amsat.org>
+Subject: Re: [Qemu-devel] [RFC PATCH 0/6] Convert softmmu-template into
+ normal code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,98 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Amador Pahim <apahim@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Alistair Francis <alistair23@gmail.com>, Cleber Rosa <crosa@redhat.com>, Fam Zheng <famz@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, richard.henderson@linaro.org, qemu-devel@nongnu.org, pbonzini@redhat.com
 
-On Fri, Apr 20, 2018 at 03:19:29PM -0300, Eduardo Habkost wrote:
-> From: Amador Pahim <apahim@redhat.com>
+On Fri, Apr 20, 2018 at 16:11:35 -0300, Philippe Mathieu-Daudé wrote:
+> On 04/20/2018 03:35 PM, Emilio G. Cota wrote:
+> > I also changed the patches to make the series simpler: one patch
+> > to add softmmu.c (without compiling it yet), one patch to
+> > actually use softmmu.c, and a final patch to remove the template
+> > file.
 > 
-> Avocado Testing Framework can help with functional tests in
-> qemu development process. This patch creates the basic infrastructure
-> to use with Avocado tests. It contains:
+> By "without compiling" you mean it is not compilable?
+> That would mean not script-bisectable.
+
+I mean it's committed but not yet buildable, i.e. makefiles
+don't know anything about it. (So no, the build isn't broken.)
+
+The point is to make the diff's as easy to review as possible.
+
+> > The executable is now larger:
 > 
-> - A README file with the initial documentation.
-> - The test module which inherits from avocado.Test and adds a VM object,
->   created from scripts/qemu.py module. The QemuTest class is the test
->   API for the actual Qemu tests to inherit from.
-> - A parameters yaml file with the supported keys.
-> - A variants yaml file with the Qemu supported architectures.
-> 
-> After this commit, you can expect a series of real-world tests, written
-> using this new framework.
-> 
-> Signed-off-by: Amador Pahim <apahim@redhat.com>
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  scripts/qemu.py                        |  12 +-
->  tests/avocado/README.rst               | 111 ++++++++++
->  tests/avocado/avocado_qemu/__init__.py |   0
->  tests/avocado/avocado_qemu/test.py     | 365 +++++++++++++++++++++++++++++++++
->  tests/avocado/parameters.yaml          |  28 +++
->  tests/avocado/variants.yaml            |  62 ++++++
->  tests/qemu-iotests/iotests.py          |  28 +--
->  7 files changed, 586 insertions(+), 20 deletions(-)
->  create mode 100644 tests/avocado/README.rst
->  create mode 100644 tests/avocado/avocado_qemu/__init__.py
->  create mode 100644 tests/avocado/avocado_qemu/test.py
->  create mode 100644 tests/avocado/parameters.yaml
->  create mode 100644 tests/avocado/variants.yaml
-> 
-> diff --git a/scripts/qemu.py b/scripts/qemu.py
-> index 9e9d502543..bd66620f45 100644
-> --- a/scripts/qemu.py
-> +++ b/scripts/qemu.py
-> @@ -81,7 +81,7 @@ class QEMUMachine(object):
->          self._qemu_log_file = None
->          self._popen = None
->          self._binary = binary
-> -        self._args = list(args)     # Force copy args in case we modify them
-> +        self.args = list(args)     # Force copy args in case we modify them
+> This is odd, I was expecting some shrinking...
+>
+> What kind of build are doing? More such -ggdb or such -O3?
 
-This should go to a separate patch.
+I'm using the defaults.
 
-Also, I would prefer a self.add_args(...) interface, instead of
-exposing self.args to the outside directly.  I remember some past
-discussions about this, but I don't remember what was the
-conclusion.
+Why would you expect a size reduction? With flatten we tell the
+compiler to expand everything it can, so it makes sense that
+it leads to larger code size vs. letting the compiler decide
+what (or not) to inline.
 
-I will review tests/avocado/* later.
+Cheers,
 
->          self._wrapper = wrapper
->          self._events = []
->          self._iolog = None
-> @@ -109,8 +109,8 @@ class QEMUMachine(object):
->      # This can be used to add an unused monitor instance.
->      def add_monitor_telnet(self, ip, port):
->          args = 'tcp:%s:%d,server,nowait,telnet' % (ip, port)
-> -        self._args.append('-monitor')
-> -        self._args.append(args)
-> +        self.args.append('-monitor')
-> +        self.args.append(args)
->  
->      def add_fd(self, fd, fdset, opaque, opts=''):
->          '''Pass a file descriptor to the VM'''
-> @@ -120,8 +120,8 @@ class QEMUMachine(object):
->          if opts:
->              options.append(opts)
->  
-> -        self._args.append('-add-fd')
-> -        self._args.append(','.join(options))
-> +        self.args.append('-add-fd')
-> +        self.args.append(','.join(options))
->          return self
->  
->      def send_fd_scm(self, fd_file_path):
-> @@ -184,7 +184,7 @@ class QEMUMachine(object):
->                  '-display', 'none', '-vga', 'none']
->  
->      def _create_console(self, console_address):
-> -        for item in self._args:
-> +        for item in self.args:
->              for option in ['isa-serial', 'spapr-vty', 'sclpconsole']:
->                  if option in item:
->                      return []
-[...]
-
--- 
-Eduardo
+		Emilio
