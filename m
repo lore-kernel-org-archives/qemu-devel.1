@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55072)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f9QIK-0002mK-Ew
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 03:17:21 -0400
+	(envelope-from <stefanha@gmail.com>) id 1f9QLW-0004Ob-Uy
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 03:20:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f9QIJ-0004KE-LA
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 03:17:20 -0400
-Date: Fri, 20 Apr 2018 15:17:11 +0800
+	(envelope-from <stefanha@gmail.com>) id 1f9QLW-0007ZN-BQ
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 03:20:38 -0400
+Date: Fri, 20 Apr 2018 15:20:31 +0800
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180420071711.GE15181@stefanha-x1.localdomain>
+Message-ID: <20180420072031.GF15181@stefanha-x1.localdomain>
 References: <20180411163940.2523-1-kwolf@redhat.com>
-	<20180411163940.2523-7-kwolf@redhat.com>
+	<20180411163940.2523-9-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="WBsA/oQW3eTA3LlM"
+	protocol="application/pgp-signature"; boundary="65ImJOski3p8EhYV"
 Content-Disposition: inline
-In-Reply-To: <20180411163940.2523-7-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 06/19] block: Avoid
- unnecessary aio_poll() in AIO_WAIT_WHILE()
+In-Reply-To: <20180411163940.2523-9-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 08/19] block: Remove
+ bdrv_drain_recurse()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,47 +29,42 @@ To: Kevin Wolf <kwolf@redhat.com>
 Cc: qemu-block@nongnu.org, famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
 
 
---WBsA/oQW3eTA3LlM
+--65ImJOski3p8EhYV
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 11, 2018 at 06:39:27PM +0200, Kevin Wolf wrote:
-> Commit 91af091f923 added an additional aio_poll() to BDRV_POLL_WHILE()
-> in order to make sure that all pending BHs are executed on drain. This
-> was the wrong place to make the fix, as it is useless overhead for all
-> other users of the macro and unnecessarily complicates the mechanism.
+On Wed, Apr 11, 2018 at 06:39:29PM +0200, Kevin Wolf wrote:
+> For bdrv_drain(), recursively waiting for child node requests is
+> pointless because we didn't quiesce their parents, so new requests could
+> come in anyway. Letting the function work only on a single node makes it
+> more consistent.
 >=20
-> This patch effectively reverts said commit (the context has changed a
-> bit and the code has moved to AIO_WAIT_WHILE()) and instead polls in the
-> loop condition for drain.
+> For subtree drains and drain_all, we already have the recursion in
+> bdrv_do_drained_begin(), so the extra recursion doesn't add anything
+> either.
 >=20
-> The effect is probably hard to measure in any real-world use case
-> because actual I/O will dominate, but if I run only the initialisation
-> part of 'qemu-img convert' where it calls bdrv_block_status() for the
-> whole image to find out how much data there is copy, this phase actually
-> needs only roughly half the time after this patch.
+> Remove the useless code.
 >=20
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  include/block/aio-wait.h | 22 ++++++++--------------
->  block/io.c               | 11 ++++++++++-
->  2 files changed, 18 insertions(+), 15 deletions(-)
+>  block/io.c | 36 +++---------------------------------
+>  1 file changed, 3 insertions(+), 33 deletions(-)
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---WBsA/oQW3eTA3LlM
+--65ImJOski3p8EhYV
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJa2ZP3AAoJEJykq7OBq3PIdJEH/1SoIZSrfsNkrauahf+eQJvn
-jsDY33IGDQ1QogYoHOftXSPgoTMvV0vTYvHvNx4yVwKoWw3fQEuDJVj5cp5UJECQ
-q3W3bSlmyX9KqTWJLqPitQC2CKLpTV3NgD8O7WtVRMNtOmDwzBGNZdVC0VUPhpGD
-26AQ1rTmviNCGDyZIp9omrEnmpjIoHWinekfxqLPYG5u+DblVzPuFvB0UiutlIF0
-FfnkL36i21CO/33anaSEv+cRqSE7CvPqim3r1azv5sKUdKLqWyU9+mwnjco9WMGb
-HflfbJaV7FMYhWgyk8wX0MTh7RsXSuR7MSRDUve7M+5ZHiPxXgdzvAVtN6YpLi4=
-=lj02
+iQEcBAEBAgAGBQJa2ZS/AAoJEJykq7OBq3PIqTAH/AtLRQK/KiDTfd9zg89gW+N+
+N23ILQgUAzHOfmU9YRQC5N9CF2yCoHSE2IhRAd4CtZ1XzUkRrRnwdu4GM+crnMOT
+lMK8Ynsew60wu/9eh75hdX0ICr/8tpn7y4T4gZjYMmsSj92QKJ9brEDTZaO6jHqw
+JrhylP1i20HJtZ2lf11jzoW80g8X05KcCfSJl3qYASAU65od9LtV4lVmircUE9g4
+Ulj746rt6DQKdubbQILkmYh1l++nqHOTOyn0t7ZK0xobRUrYC1yk5NNzRietjIaX
+9YCLP8ifsb2pDMCkT5SOzybScQRq1fi4Mt5+3HiQYc7EQKg0xWJ9TrIZp/TrwxE=
+=0KYB
 -----END PGP SIGNATURE-----
 
---WBsA/oQW3eTA3LlM--
+--65ImJOski3p8EhYV--
