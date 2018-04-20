@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f9Qb5-0005QN-40
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 03:36:44 -0400
+	(envelope-from <stefanha@gmail.com>) id 1f9Qdw-0006nG-J2
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 03:39:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f9Qb2-0001ap-02
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 03:36:43 -0400
-References: <1524054707-20663-1-git-send-email-thuth@redhat.com>
-	<1524054707-20663-4-git-send-email-thuth@redhat.com>
-	<bc5533dc-9471-7dac-6aba-9014e9961376@linux.vnet.ibm.com>
-	<b0bb6918-0047-9a53-b03f-bff5669daaaa@redhat.com>
-	<2d59a139-3bdd-4b4e-882c-5cf845488eda@linux.vnet.ibm.com>
-	<475ea222-cc03-16e4-0f50-f89cf2bfae6f@redhat.com>
-	<0b6af02e-6e5b-76bb-a0d0-30038ad5a265@linux.vnet.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <a001b146-7091-63e6-a845-e276494cc518@redhat.com>
-Date: Fri, 20 Apr 2018 09:36:33 +0200
+	(envelope-from <stefanha@gmail.com>) id 1f9Qdt-0000WI-GN
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 03:39:40 -0400
+Received: from mail-pl0-x22f.google.com ([2607:f8b0:400e:c01::22f]:34480)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1f9Qdt-0000U3-9T
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 03:39:37 -0400
+Received: by mail-pl0-x22f.google.com with SMTP id z12-v6so4797835plo.1
+	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 00:39:37 -0700 (PDT)
+Date: Fri, 20 Apr 2018 15:39:32 +0800
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180420073932.GI15181@stefanha-x1.localdomain>
+References: <CAG0V3WRdK+p-qo9NmnKkKT6kMNBJBxj9vNuYBSzX7zrZU8FGiA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <0b6af02e-6e5b-76bb-a0d0-30038ad5a265@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 for-2.13 3/4]
- pc-bios/s390-ccw/net: Add support for pxelinux-style config files
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="G3juXO9GfR42w+sw"
+Content-Disposition: inline
+In-Reply-To: <CAG0V3WRdK+p-qo9NmnKkKT6kMNBJBxj9vNuYBSzX7zrZU8FGiA@mail.gmail.com>
+Subject: Re: [Qemu-devel] Let event loop use non-default GMainContext
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,73 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Viktor VM Mihajlovski <mihajlov@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
-Cc: Collin Walling <walling@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+To: Eva Chen <debby83729@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-On 20.04.2018 08:53, Viktor VM Mihajlovski wrote:
-> On 19.04.2018 18:55, Thomas Huth wrote:
->> On 19.04.2018 14:40, Viktor VM Mihajlovski wrote:
-[...]
->>>>> That's interesting because treating the bootfile as pxe-ish config =
-is
->>>>> what DPM does. Which means that with this change the processor
->>>>> architecture type 0x1f (Basic) will turn into a superset of 0x20
->>>>> (Extended).
->>>>
->>>> Is there any reference available what "basic" and "extended" exactly
->>>> mean? I just know that there are these two values registered by you =
-at
->>>> the IANA:
->>>>
->>>> https://www.iana.org/assignments/dhcpv6-parameters/dhcpv6-parameters=
-.xhtml#processor-architecture
->>>>
->>>> ... but I haven't seen a description of the differences of these two
->>>> values yet.
->>>>
->>> Yep, the IANA stuff is pretty terse for all architectures. In a
->>> nutshell: 0x1f is standard DHCP-based boot (bootfile is a single
->>> executable binary) and 0x20 serves a pxe-style config file instead.
->>
->> Can 0x20 also still handle binary files, or only pxe-style config file=
-s?
->>
-> Unfortunately, DPM has no support for binaries which was the reason we
-> ended up with two different identifiers
 
-Ok, so switching to 0x20 is not an option for us here.
+--G3juXO9GfR42w+sw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
->>> In fact, "processor architecture identifier" is a misnomer, as it
->>> describes a pair of processor architecture and firmware.
->>
->> Yeah, I know ... it's even worse nowadays, it's processor + firmware +
->> TCP/IP protocol (HTTP vs. TFTP) ... we should have properly untangled
->> that when doing RFC 5970, but it was already hard enough to get that
->> accepted in the current shape, so we missed to clean up the mess from
->> RFC 4578 / PXE :-(
->>
->>> Since the QEMU firmware has two significant extensions now (insfile a=
-nd
->>> direct config file loading), it might be worthwhile to add a new
->>> identifier value (say s390 QEMU PC-BIOS or similar) announcing the ne=
-w
->>> capabilities, so that a boot server admin can setup her system accord=
-ingly.
->>
->> Not sure ... too many processory-architecture-type entries might also
->> rather be too confusing for the users? ... so if 0x20 can also handle
->> binary files like 0x1f, I'd maybe simply go with 0x20 and mainly promo=
-te
->> pxelinux config files in the documentation?
->>
-> Well, if we don't add another identifier, and I feel reluctant about it
-> as well for the reasons you wrote, we may stick with 0x1f and consider
-> the additional capabilities as being optional (for special needs only).
+On Mon, Apr 16, 2018 at 04:52:34PM +0800, Eva Chen wrote:
+> The reason for replacing default GMainContext is that I simultaneously run
+> two qemu, called A and B, in threads. However, these two QEMU using the
+> same default GMainContext causes A QEMU to handle the event from B QEMU,
+> and run B's handler instead of A's handler.
 
-I tend to stay with 0x1f, since booting binaries is still the "primary"
-interface (the first check for the "default" or "# " magic keywords is
-not 100% reliable, since the config file could also start with another
-command, and the probing of pxelinux.cfg/* files is only tried afterwards=
-).
+I think you will hit many other issues if you try to run two instances
+of QEMU within a single process.  There have been several efforts to
+simulate heterogenous systems (e.g. different CPUs as part of one
+computer).  Some of them run multiple QEMU instances and communicate
+between the processes.
 
- Thomas
+Before going further, have you looked into existing work on emulating
+heterogenous systems under QEMU?
+
+Stefan
+
+--G3juXO9GfR42w+sw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJa2Zk0AAoJEJykq7OBq3PIxpkH/1q3xHxi9BR0kDmQ4Y2lyFd9
+2sZnhHxkbGGDzvSQL+n2EgBGTiWmunpV6MzRiY5aKjVoEuYdD9/Vlku+G74jTI6l
+R8IeT4/8TVlYOzZBLPr1RKck3XSGviV+yeCkuVSKzUI1yJUiQwgmLT518eBdZTGV
+X3tv+kZ9MljVJHdg2AzdkKqlGjRxpOLnKYftFc4zK3P9OkH6A+9thBJniey023pX
+4zffC/0MkPPlamu0131ynS/HjjUjBy6rL8IOfW4YlfSYH98YVgI+29lLykzKi5XE
+r38y1FfNV7IzPGYlQW8fch8BY8me+0whfJ+3TncNMq8jOV3LHDO6EJ+Vo+iTutg=
+=Ev2D
+-----END PGP SIGNATURE-----
+
+--G3juXO9GfR42w+sw--
