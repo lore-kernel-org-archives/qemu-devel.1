@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42379)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1f9RQB-0000g1-6U
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:29:32 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1f9RQa-000120-CA
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:29:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1f9RQ8-0007P2-32
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:29:31 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54588 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1f9RQ7-0007Od-Ty
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:29:28 -0400
-References: <20180418045121.14233-1-peterx@redhat.com>
-	<d550eb50-c9e3-838a-ac9a-4a998375572b@redhat.com>
-	<20180420051106.GC873@xz-mi>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <eebb050f-eeee-cbd4-e7bc-646734510901@redhat.com>
-Date: Fri, 20 Apr 2018 16:29:13 +0800
+	(envelope-from <alex.bennee@linaro.org>) id 1f9RQX-0007e5-8O
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:29:56 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:36176)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1f9RQX-0007dU-0l
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:29:53 -0400
+Received: by mail-wr0-x244.google.com with SMTP id m26-v6so2822473wrb.3
+	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 01:29:52 -0700 (PDT)
+References: <20180419135901.30035-1-alex.bennee@linaro.org>
+	<20180419135901.30035-32-alex.bennee@linaro.org>
+	<8ccf1143-5895-ca8b-eea5-c7d96c992455@amsat.org>
+	<87vacn9jd5.fsf@linaro.org>
+	<CAFEAcA8u5sfzcoqGhAagoUj6cE014hdyRgdm6=LBDfE9rV+cjw@mail.gmail.com>
+	<60b519a7-f49b-95e7-b9db-3e74133cf8c0@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <60b519a7-f49b-95e7-b9db-3e74133cf8c0@amsat.org>
+Date: Fri, 20 Apr 2018 09:29:50 +0100
+Message-ID: <87o9ie9t6p.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180420051106.GC873@xz-mi>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] intel-iommu: send PSI always when
- notify_unmap set
+Subject: Re: [Qemu-devel] [PATCH v2 31/43] tests/tcg: enable building for
+ MIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +35,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Eric Auger <eric.auger@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Alexander Witte <alexander.witte@baicanada.com>, Jintack Lim <jintack@cs.columbia.edu>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Emilio G. Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, andrzej zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, Yongbok Kim <yongbok.kim@mips.com>
 
 
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-On 2018=E5=B9=B404=E6=9C=8820=E6=97=A5 13:11, Peter Xu wrote:
-> On Fri, Apr 20, 2018 at 12:57:13PM +0800, Jason Wang wrote:
->> On 2018=E5=B9=B404=E6=9C=8818=E6=97=A5 12:51, Peter Xu wrote:
->>> During IOVA page table walk, there is a special case when:
+> On 04/19/2018 02:58 PM, Peter Maydell wrote:
+>> On 19 April 2018 at 18:49, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>>> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+>>>> On 04/19/2018 10:58 AM, Alex Benn=C3=A9e wrote:
+>>>>> This doesn't add any additional tests but enables building the
+>>>>> multiarch tests for MIPS using docker cross compilers. We don't have a
+>>>>> cross compiler for mips64 big endian though.
+>>>>
+>>>> Oh we have one, using CFLAGS+=3D-EB
+>>>>
+>>>> we don't have cross libraries although.
 >>>
->>> - notify_unmap is set, meanwhile
->>> - entry is invalid
->>>
->>> In the past, we skip the entry always.  This is not correct.  We shou=
-ld
->>> send UNMAP notification to registered notifiers in this case.  Otherw=
-ise
->>> some stall pages will still be mapped in the host even if L1 guest
->> You mean 'stale' here?
-> Ah, yes.
+>>> Yeah I thought the same with the ARM compilers (-mbig-endian) but it's
+>>> the libraries that let us down. If, as you say, newlib gets this right I
+>>> suspect we should use that to build the compilers not supported out of
+>>> the box by Debian.
+>>
+>> I don't think we really want to get into the business of
+>> building our own cross compilers if we can avoid it...it's harder
+>> than it looks and we would be essentially reinventing the wheel.
 >
->>> unmapped them already.
->> It looks like some IOTLB invalidation were missed? If not, the page sh=
-ould
->> be unmaped during invalidation.
-> I'm afraid it's not the same problem, and that's why I think we need
-> two fixes.
+> I totally agree.
 >
-> Even if the guest sends the correct invalidations, it's still possible
-> that QEMU skips the PSI with current code.
+> I'v been looking at existing maintained images we can use to
+> cross-build, so we only have to pull (download) and image and use it,
+> not wasting cpu time building it.
 >
->>> Without this patch, nested device assignment to L2 guests might dump
->>> some errors like:
->>>
->>> qemu-system-x86_64: VFIO_MAP_DMA: -17
->>> qemu-system-x86_64: vfio_dma_map(0x557305420c30, 0xad000, 0x1000,
->>>                       0x7f89a920d000) =3D -17 (File exists)
->>>
->>> To fix this, we need to apply this patch to L1 QEMU (L2 QEMU is not
->>> affected by this problem).
->>>
->>> Signed-off-by: Peter Xu<peterx@redhat.com>
->>> ---
->>>
->>> To test nested assignment, one also needs to apply below patchset:
->>> https://lkml.org/lkml/2018/4/18/5
->> Have a quick glance at it, looks like there's no need for this patch i=
-s we
->> had that kernel patch applied.
-> Even if guest kernel applies above fix, QEMU might still drop some of
-> the PSIs.  Above error messages were captured with kernel patches
-> applied already (otherwise we see no error messages, we directly miss
-> them from guest).
+> However some images might be huge, full of things we don't need. But I
+> prefer that rather than having to maintain cross toolchains.
 >
-> Thanks,
+> An example I like to use is the coreboot-sdk, designed to build
+> i386/amd64 binaries, it fulfills our needs. But takes 2GB...
+>
+> $ docker pull coreboot/coreboot-sdk:1.47
+> 1.47: Pulling from coreboot/coreboot-sdk
+> 3d6aedfc3e47: Downloading [>              ]  538.2kB/1.201GB
+> d23c9a72f1e5: Waiting
+>
+> Another candidate is crossbuild, ~1GB
+> $ docker pull multiarch/crossbuild
 
-I see so this actually try to trigger unmap notifier for non last level=20
-slpte.
+I agree to a point. Our current images are all based off "official"
+docker hub images. I'm probably giving the state of officialness too
+much credit but I'm at least reasonably certain the Debian images can be
+re-created ourselves if we wanted to and have publicly available
+recipes.
 
-Thanks
+As a bonus, being Debian based, we meet our GPL compliance because
+everything on the image can have its source pulled with apt.
+
+I'm unsure about how the coreboot image was built or indeed if it is an
+official image. From my point of view it is just a bunch of binaries in
+a set of docker layers.
+
+So personally I would put "build our own compiler from source inside
+docker" slightly above "unpack a random binary tarball into docker".
+That said with some of our funkier supported guests we may end up having
+to do just that :-/
+
+--
+Alex Benn=C3=A9e
