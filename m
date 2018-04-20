@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41995)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f9Ufj-0005lM-A1
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 07:57:48 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f9UjY-0008JC-Mc
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:01:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f9Ufd-0003K5-I0
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 07:57:47 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:36622)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f9Ufd-0003Jm-B7
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 07:57:41 -0400
-Received: by mail-wr0-x241.google.com with SMTP id m26-v6so4432658wrb.3
-	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 04:57:41 -0700 (PDT)
-References: <20180419135901.30035-1-alex.bennee@linaro.org>
-	<20180419135901.30035-32-alex.bennee@linaro.org>
-	<8ccf1143-5895-ca8b-eea5-c7d96c992455@amsat.org>
-	<87vacn9jd5.fsf@linaro.org>
-	<CAFEAcA8u5sfzcoqGhAagoUj6cE014hdyRgdm6=LBDfE9rV+cjw@mail.gmail.com>
-	<60b519a7-f49b-95e7-b9db-3e74133cf8c0@amsat.org>
-	<CAFEAcA_O_ihi0wp_J08nBuz=sFVLOZcbR31gHDgajWyda-24Cg@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA_O_ihi0wp_J08nBuz=sFVLOZcbR31gHDgajWyda-24Cg@mail.gmail.com>
-Date: Fri, 20 Apr 2018 12:57:31 +0100
-Message-ID: <87lgdi9jkk.fsf@linaro.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f9UjX-0006iM-Ro
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:01:44 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180420084820.3873-1-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <fdcbfea9-04d7-b994-829e-59b40f9cf018@amsat.org>
+Date: Fri, 20 Apr 2018 09:01:25 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 31/43] tests/tcg: enable building for
- MIPS
+In-Reply-To: <20180420084820.3873-1-kraxel@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="D58aLwfQos2zCSP3PcuCtpnN1c1IHoEKI"
+Subject: Re: [Qemu-devel] [PATCH] vnc: fix use-after-free
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,56 +27,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, "Emilio G.
-	Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, andrzej zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, Yongbok Kim <yongbok.kim@mips.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: berrange@redhat.com, qemu-stable <qemu-stable@nongnu.org>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--D58aLwfQos2zCSP3PcuCtpnN1c1IHoEKI
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: berrange@redhat.com, qemu-stable <qemu-stable@nongnu.org>
+Message-ID: <fdcbfea9-04d7-b994-829e-59b40f9cf018@amsat.org>
+Subject: Re: [PATCH] vnc: fix use-after-free
+References: <20180420084820.3873-1-kraxel@redhat.com>
+In-Reply-To: <20180420084820.3873-1-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+Cc'ing qemu-stable
+
+On 04/20/2018 05:48 AM, Gerd Hoffmann wrote:
+> When vnc_client_read() return value is -1
+> vs is not valid any more.
+>=20
+> Fixes: d49b87f0d1e0520443a990fc610d0f02bc63c556
+> Reported-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+
+> ---
+>  ui/vnc.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/ui/vnc.c b/ui/vnc.c
+> index e164eb798c..5526e54f48 100644
+> --- a/ui/vnc.c
+> +++ b/ui/vnc.c
+> @@ -1539,13 +1539,14 @@ gboolean vnc_client_io(QIOChannel *ioc G_GNUC_U=
+NUSED,
+>      VncState *vs =3D opaque;
+>      if (condition & G_IO_IN) {
+>          if (vnc_client_read(vs) < 0) {
+> -            goto end;
+> +            /* vs is free()ed here */
+> +            return TRUE;
+>          }
+>      }
+>      if (condition & G_IO_OUT) {
+>          vnc_client_write(vs);
+>      }
+> -end:
+> +
+>      if (vs->disconnecting) {
+>          if (vs->ioc_tag !=3D 0) {
+>              g_source_remove(vs->ioc_tag);
+>=20
 
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+--D58aLwfQos2zCSP3PcuCtpnN1c1IHoEKI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> On 20 April 2018 at 03:57, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
->> On 04/19/2018 02:58 PM, Peter Maydell wrote:
->>> I don't think we really want to get into the business of
->>> building our own cross compilers if we can avoid it...it's harder
->>> than it looks and we would be essentially reinventing the wheel.
->>
->> I totally agree.
->>
->> I'v been looking at existing maintained images we can use to
->> cross-build, so we only have to pull (download) and image and use it,
->> not wasting cpu time building it.
->
-> Projects that are in the "maintain cross toolchains" business:
->  * buildroot
->  * https://github.com/richfelker/musl-cross-make
+-----BEGIN PGP SIGNATURE-----
 
-I'll have a look at those. My previous attempts were using:
+iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlrZ1pUACgkQ4+MsLN6t
+wN5CtRAAvzx04W4snvmNlK7vnzyH+dKZi56LXe2POnovk75WTYmbv0Insv2jXB3I
+zBsp4r0IJc9SL/n/iuGhJ7BVlMxOTAGw88cN4ZFU9gwrmKkKSDdqNc+0I25G/EAE
+886S/I1WW8N68TVMiqDO4GPmby3+X2WxKxlolLC2rYF9Zu8IyVCT3gbHrfxhpF4w
+kGcvM02OrwBPULGfZg6N8M6C9KKRQJz+LWwcY8kYP3fwkuyu2qOjFHXqNVBOkRau
+QFsFLbuQhWOLEXMR/CnugY2bD04ZXwuzqmfHwpmvKx/9kmYM6F6MyZ4yKH/+PVIm
+8hRSQPQMcRTBhe0vxfbG6DJ5NblQdhICea+h3wjNgNx0I+AypkoT5KPxGlWLqk7D
+W2GIAanyIYY0JjlEilVfscndgylD5mtxzRzTnuaXx+1c+lpCT7yEo4b9O25OUyOu
+PThHCcroM1BesXvnN2TGDGdBqwpYUdKSk2j2pHROL7op/JapG6VqiSLO7NxYevSE
+jRxudu+70ZG66LiEvDsveXbyvLO6VHXSnhA8IVtqORHc/G+COTpyd45XQgvyysXO
+83sPtQwt7RHFSMaV45acV0jyBN3fG/RckbInSUlhGAHJtDWqopBF9k5FLTyLzL9P
+UxFh+HYomeV/SlpgbQ+/F/a/XI1JS2lbre3VLZHVyBUz2G/Wzk4=
+=ji/g
+-----END PGP SIGNATURE-----
 
-  https://wiki.linaro.org/ABE
-  https://crosstool-ng.github.io/
-
-I certainly don't want to be in the business of inventing yet another
-set of scripts to build cross compilers!
-
->
-> But really my feeling is that we should for the moment stick
-> to getting a reliable test setup for the architectures that
-> Debian does provide cross toolchains for. That will give us:
->  * much more coverage than we have at the moment
->  * coverage for the guests that people actually care about
->
-> We can always come back and think about filling in the gaps later.
-
-Don't worry - not having every single architecture done isn't going to
-stop the eventual submission. However it would be nice to have at least
-one non-Debian cross-compiler setup as an example and to validate the
-compiler-in-docker approach.
-
->
-> thanks
-> -- PMM
-
-
---
-Alex Benn=C3=A9e
+--D58aLwfQos2zCSP3PcuCtpnN1c1IHoEKI--
