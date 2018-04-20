@@ -1,44 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42896)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1f9Pvi-00069L-Bh
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 02:53:59 -0400
+	(envelope-from <clg@kaod.org>) id 1f9Q1Q-0000wM-TZ
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 02:59:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1f9Pvd-0004E9-BN
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 02:53:58 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56308)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
-	id 1f9Pvd-0004Ck-0f
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 02:53:53 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w3K6qgDs054479
-	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 02:53:51 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2hfasc1ecg-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 02:53:51 -0400
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
-	Fri, 20 Apr 2018 07:53:48 +0100
-References: <1524054707-20663-1-git-send-email-thuth@redhat.com>
-	<1524054707-20663-4-git-send-email-thuth@redhat.com>
-	<bc5533dc-9471-7dac-6aba-9014e9961376@linux.vnet.ibm.com>
-	<b0bb6918-0047-9a53-b03f-bff5669daaaa@redhat.com>
-	<2d59a139-3bdd-4b4e-882c-5cf845488eda@linux.vnet.ibm.com>
-	<475ea222-cc03-16e4-0f50-f89cf2bfae6f@redhat.com>
-From: Viktor VM Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Date: Fri, 20 Apr 2018 08:53:45 +0200
+	(envelope-from <clg@kaod.org>) id 1f9Q1M-0001Sv-RO
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 02:59:52 -0400
+Received: from 18.mo3.mail-out.ovh.net ([87.98.172.162]:55496)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1f9Q1M-0001R6-Gg
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 02:59:48 -0400
+Received: from player792.ha.ovh.net (unknown [10.109.108.105])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 641A31B1023
+	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 08:59:46 +0200 (CEST)
+References: <20180413075200.15217-1-clg@kaod.org>
+	<20180419165800.GA2731@work-vm>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <e5447136-8de7-73f3-ca6d-0c7a1fe11abe@kaod.org>
+Date: Fri, 20 Apr 2018 08:59:28 +0200
 MIME-Version: 1.0
-In-Reply-To: <475ea222-cc03-16e4-0f50-f89cf2bfae6f@redhat.com>
+In-Reply-To: <20180419165800.GA2731@work-vm>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Message-Id: <0b6af02e-6e5b-76bb-a0d0-30038ad5a265@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 for-2.13 3/4]
- pc-bios/s390-ccw/net: Add support for pxelinux-style config files
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] migration: discard non-migratable
+ RAMBlocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,88 +32,299 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
-Cc: Collin Walling <walling@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>, Yulei Zhang <yulei.zhang@intel.com>, kevin.tian@intel.com, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, kwankhede@nvidia.com, zhi.a.wang@intel.com, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 19.04.2018 18:55, Thomas Huth wrote:
-> On 19.04.2018 14:40, Viktor VM Mihajlovski wrote:
->> On 19.04.2018 10:17, Thomas Huth wrote:
->>> On 19.04.2018 09:41, Viktor VM Mihajlovski wrote:
->>>> On 18.04.2018 14:31, Thomas Huth wrote:
->>>>> Since it is quite cumbersome to manually create a combined kernel with
->>>>> initrd image for network booting, we now support loading via pxelinux
->>>>> configuration files, too. In these files, the kernel, initrd and command
->>>>> line parameters can be specified seperately, and the firmware then takes
->>>>> care of glueing everything together in memory after the files have been
->>>>> downloaded.
->> [...]
->>>>> +static int net_try_direct_tftp_load(filename_ip_t *fn_ip)
->>>>> +{
->>>>> +    int rc;
->>>>> +    void *baseaddr = (void *)0x2000;  /* Load right after the low-core */
->>>>> +
->>>>> +    rc = tftp_load(fn_ip, baseaddr, KERNEL_MAX_SIZE - (long)baseaddr);
->>>>> +
->>>>> +    if (rc > 0 && rc < sizeof(cfgbuf) - 1) {
->>>>> +        /* Check whether it is a configuration file instead of a kernel */
->>>> That's interesting because treating the bootfile as pxe-ish config is
->>>> what DPM does. Which means that with this change the processor
->>>> architecture type 0x1f (Basic) will turn into a superset of 0x20
->>>> (Extended).
->>>
->>> Is there any reference available what "basic" and "extended" exactly
->>> mean? I just know that there are these two values registered by you at
->>> the IANA:
->>>
->>> https://www.iana.org/assignments/dhcpv6-parameters/dhcpv6-parameters.xhtml#processor-architecture
->>>
->>> ... but I haven't seen a description of the differences of these two
->>> values yet.
->>>
->> Yep, the IANA stuff is pretty terse for all architectures. In a
->> nutshell: 0x1f is standard DHCP-based boot (bootfile is a single
->> executable binary) and 0x20 serves a pxe-style config file instead.
-> 
-> Can 0x20 also still handle binary files, or only pxe-style config files?
-> 
-Unfortunately, DPM has no support for binaries which was the reason we
-ended up with two different identifiers
->> In fact, "processor architecture identifier" is a misnomer, as it
->> describes a pair of processor architecture and firmware.
-> 
-> Yeah, I know ... it's even worse nowadays, it's processor + firmware +
-> TCP/IP protocol (HTTP vs. TFTP) ... we should have properly untangled
-> that when doing RFC 5970, but it was already hard enough to get that
-> accepted in the current shape, so we missed to clean up the mess from
-> RFC 4578 / PXE :-(
-> 
->> Since the QEMU firmware has two significant extensions now (insfile and
->> direct config file loading), it might be worthwhile to add a new
->> identifier value (say s390 QEMU PC-BIOS or similar) announcing the new
->> capabilities, so that a boot server admin can setup her system accordingly.
-> 
-> Not sure ... too many processory-architecture-type entries might also
-> rather be too confusing for the users? ... so if 0x20 can also handle
-> binary files like 0x1f, I'd maybe simply go with 0x20 and mainly promote
-> pxelinux config files in the documentation?
-> 
-Well, if we don't add another identifier, and I feel reluctant about it
-as well for the reasons you wrote, we may stick with 0x1f and consider
-the additional capabilities as being optional (for special needs only).
-Remember that a client-specific pxe-style config or insfile have to be
-tied to a client identifier that can be referenced in the DHCP server
-configuration (usually the MAC address). I.e., if MAC equals so-and-so
-send back bootfile name xyz.
-But this is exactly what the pxelinux config file probing offers: having
-client (or client-group) specific configs without the need to
-reconfigure the DHCP server for every new (virtual) machine. My
-assumption is that server admins will go with the pxelinux config
-approach they're used from other architectures (which becomes now even
-easier with your changes).
->  Thomas
-> 
+Hello David,
 
+On 04/19/2018 06:58 PM, Dr. David Alan Gilbert wrote:
+> * C=C3=A9dric Le Goater (clg@kaod.org) wrote:
+>> On the POWER9 processor, the XIVE interrupt controller can control
+>> interrupt sources using MMIO to trigger events, to EOI or to turn off
+>> the sources. Priority management and interrupt acknowledgment is also
+>> controlled by MMIO in the presenter sub-engine.
+>>
+>> These MMIO regions are exposed to guests in QEMU with a set of 'ram
+>> device' memory mappings, similarly to VFIO, and the VMAs are populated
+>> dynamically with the appropriate pages using a fault handler.
+>>
+>> But, these regions are an issue for migration. We need to discard the
+>> associated RAMBlocks from the RAM state on the source VM and let the
+>> destination VM rebuild the memory mappings on the new host in the
+>> post_load() operation just before resuming the system.
+>>
+>> To achieve this goal, the following introduces a new RAMBlock flag
+>> RAM_MIGRATABLE which is updated in the vmstate_register_ram() and
+>> vmstate_unregister_ram() routines. This flag is then used by the
+>> migration to identify RAMBlocks to discard on the source. Some checks
+>> are also performed on the destination to make sure nothing invalid was
+>> sent.
+>>
+>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>=20
+> Hi C=C3=A9dric,
+>   Yes, this is looking nicer; the macro makes the changes quite small.
+> A couple of questions:
+>=20
+>> ---
+>>
+>>  Changes since v1:
+>>
+>>  - introduced a new RAMBlock flag RAM_MIGRATABLE
+>>  - fixed RAMBLOCK_FOREACH_MIGRATABLE() macro to handle code that
+>>    omitted {}.=20
+>>
+>>  exec.c                    | 10 ++++++++++
+>>  include/exec/cpu-common.h |  1 +
+>>  migration/ram.c           | 42 ++++++++++++++++++++++++++++++++------=
+----
+>>  3 files changed, 43 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/exec.c b/exec.c
+>> index 02b1efebb7c3..e9432c06294e 100644
+>> --- a/exec.c
+>> +++ b/exec.c
+>> @@ -104,6 +104,9 @@ static MemoryRegion io_mem_unassigned;
+>>   * (Set during postcopy)
+>>   */
+>>  #define RAM_UF_ZEROPAGE (1 << 3)
+>> +
+>> +/* RAM can be migrated */
+>> +#define RAM_MIGRATABLE (1 << 4)
+>>  #endif
+>> =20
+>>  #ifdef TARGET_PAGE_BITS_VARY
+>> @@ -1807,6 +1810,11 @@ void qemu_ram_set_uf_zeroable(RAMBlock *rb)
+>>      rb->flags |=3D RAM_UF_ZEROPAGE;
+>>  }
+>> =20
+>> +bool qemu_ram_is_migratable(RAMBlock *rb)
+>> +{
+>> +    return rb->flags & RAM_MIGRATABLE;
+>> +}
+>> +
+>>  /* Called with iothread lock held.  */
+>>  void qemu_ram_set_idstr(RAMBlock *new_block, const char *name, Device=
+State *dev)
+>>  {
+>> @@ -1823,6 +1831,7 @@ void qemu_ram_set_idstr(RAMBlock *new_block, con=
+st char *name, DeviceState *dev)
+>>          }
+>>      }
+>>      pstrcat(new_block->idstr, sizeof(new_block->idstr), name);
+>> +    new_block->flags |=3D RAM_MIGRATABLE;
+>> =20
+>>      rcu_read_lock();
+>>      RAMBLOCK_FOREACH(block) {
+>> @@ -1845,6 +1854,7 @@ void qemu_ram_unset_idstr(RAMBlock *block)
+>>       */
+>>      if (block) {
+>>          memset(block->idstr, 0, sizeof(block->idstr));
+>> +        block->flags &=3D ~RAM_MIGRATABLE;
+>>      }
+>>  }
+>=20
+> Why in qemu_ram_set_idstr and qemu_ram_(un)set_idstr ?  It seems an
+> odd place to put them.
 
--- 
-Regards,
-  Viktor Mihajlovski
+The only place where this routines are called is from vmstate_un/register=
+_ram()
+It seemed unnecessary to add an extra interface qemu_ram_un/set_migratabl=
+e().
+
+May be should just rename qemu_ram_un/set_idstr() ?
+
+>=20
+>> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+>> index 24d335f95d45..96854519b514 100644
+>> --- a/include/exec/cpu-common.h
+>> +++ b/include/exec/cpu-common.h
+>> @@ -75,6 +75,7 @@ const char *qemu_ram_get_idstr(RAMBlock *rb);
+>>  bool qemu_ram_is_shared(RAMBlock *rb);
+>>  bool qemu_ram_is_uf_zeroable(RAMBlock *rb);
+>>  void qemu_ram_set_uf_zeroable(RAMBlock *rb);
+>> +bool qemu_ram_is_migratable(RAMBlock *rb);
+>> =20
+>>  size_t qemu_ram_pagesize(RAMBlock *block);
+>>  size_t qemu_ram_pagesize_largest(void);
+>> diff --git a/migration/ram.c b/migration/ram.c
+>> index 0e90efa09236..89c3accc4e26 100644
+>> --- a/migration/ram.c
+>> +++ b/migration/ram.c
+>> @@ -187,6 +187,11 @@ void ramblock_recv_bitmap_set_range(RAMBlock *rb,=
+ void *host_addr,
+>>                        nr);
+>>  }
+>> =20
+>> +/* Should be holding either ram_list.mutex, or the RCU lock. */
+>> +#define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
+>> +    RAMBLOCK_FOREACH(block)                            \
+>> +        if (!qemu_ram_is_migratable(block)) {} else
+>> +
+>>  /*
+>>   * An outstanding page request, on the source, having been received
+>>   * and queued
+>> @@ -780,6 +785,10 @@ unsigned long migration_bitmap_find_dirty(RAMStat=
+e *rs, RAMBlock *rb,
+>>      unsigned long *bitmap =3D rb->bmap;
+>>      unsigned long next;
+>> =20
+>> +    if (!qemu_ram_is_migratable(rb)) {
+>> +        return size;
+>> +    }
+>> +
+>>      if (rs->ram_bulk_stage && start > 0) {
+>>          next =3D start + 1;
+>>      } else {
+>> @@ -825,7 +834,7 @@ uint64_t ram_pagesize_summary(void)
+>>      RAMBlock *block;
+>>      uint64_t summary =3D 0;
+>> =20
+>> -    RAMBLOCK_FOREACH(block) {
+>> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>>          summary |=3D block->page_size;
+>>      }
+>> =20
+>> @@ -849,7 +858,7 @@ static void migration_bitmap_sync(RAMState *rs)
+>> =20
+>>      qemu_mutex_lock(&rs->bitmap_mutex);
+>>      rcu_read_lock();
+>> -    RAMBLOCK_FOREACH(block) {
+>> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>>          migration_bitmap_sync_range(rs, block, 0, block->used_length)=
+;
+>>      }
+>>      rcu_read_unlock();
+>> @@ -1499,6 +1508,10 @@ static int ram_save_host_page(RAMState *rs, Pag=
+eSearchStatus *pss,
+>>      size_t pagesize_bits =3D
+>>          qemu_ram_pagesize(pss->block) >> TARGET_PAGE_BITS;
+>> =20
+>> +    if (!qemu_ram_is_migratable(pss->block)) {
+>> +        return 0;
+>> +    }
+>> +
+>=20
+> We might want to print a diagnostic there - it shouldn't happen right?
+
+yes it should not. it should even be fatal.=20
+
+>>      do {
+>>          tmppages =3D ram_save_target_page(rs, pss, last_stage);
+>>          if (tmppages < 0) {
+>> @@ -1587,7 +1600,7 @@ uint64_t ram_bytes_total(void)
+>>      uint64_t total =3D 0;
+>> =20
+>>      rcu_read_lock();
+>> -    RAMBLOCK_FOREACH(block) {
+>> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>>          total +=3D block->used_length;
+>>      }
+>>      rcu_read_unlock();
+>> @@ -1642,7 +1655,7 @@ static void ram_save_cleanup(void *opaque)
+>>       */
+>>      memory_global_dirty_log_stop();
+>> =20
+>> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+>> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>>          g_free(block->bmap);
+>>          block->bmap =3D NULL;
+>>          g_free(block->unsentmap);
+>> @@ -1705,7 +1718,7 @@ void ram_postcopy_migrated_memory_release(Migrat=
+ionState *ms)
+>>  {
+>>      struct RAMBlock *block;
+>> =20
+>> -    RAMBLOCK_FOREACH(block) {
+>> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>>          unsigned long *bitmap =3D block->bmap;
+>>          unsigned long range =3D block->used_length >> TARGET_PAGE_BIT=
+S;
+>>          unsigned long run_start =3D find_next_zero_bit(bitmap, range,=
+ 0);
+>> @@ -1783,7 +1796,7 @@ static int postcopy_each_ram_send_discard(Migrat=
+ionState *ms)
+>>      struct RAMBlock *block;
+>>      int ret;
+>> =20
+>> -    RAMBLOCK_FOREACH(block) {
+>> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>>          PostcopyDiscardState *pds =3D
+>>              postcopy_discard_send_init(ms, block->idstr);
+>> =20
+>> @@ -1991,7 +2004,7 @@ int ram_postcopy_send_discard_bitmap(MigrationSt=
+ate *ms)
+>>      rs->last_sent_block =3D NULL;
+>>      rs->last_page =3D 0;
+>> =20
+>> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+>> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>>          unsigned long pages =3D block->used_length >> TARGET_PAGE_BIT=
+S;
+>>          unsigned long *bitmap =3D block->bmap;
+>>          unsigned long *unsentmap =3D block->unsentmap;
+>> @@ -2150,7 +2163,7 @@ static void ram_list_init_bitmaps(void)
+>> =20
+>>      /* Skip setting bitmap if there is no RAM */
+>>      if (ram_bytes_total()) {
+>> -        QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+>> +        RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>>              pages =3D block->max_length >> TARGET_PAGE_BITS;
+>>              block->bmap =3D bitmap_new(pages);
+>>              bitmap_set(block->bmap, 0, pages);
+>> @@ -2226,7 +2239,7 @@ static int ram_save_setup(QEMUFile *f, void *opa=
+que)
+>> =20
+>>      qemu_put_be64(f, ram_bytes_total() | RAM_SAVE_FLAG_MEM_SIZE);
+>> =20
+>> -    RAMBLOCK_FOREACH(block) {
+>> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>>          qemu_put_byte(f, strlen(block->idstr));
+>>          qemu_put_buffer(f, (uint8_t *)block->idstr, strlen(block->ids=
+tr));
+>>          qemu_put_be64(f, block->used_length);
+>=20
+> Good, that's all quite neat;  we've just got to watch out we don't
+> accidentally add any RAMBLOCK_FOREACH's back.
+
+Thank,
+
+C.
+
+>> @@ -2471,6 +2484,11 @@ static inline RAMBlock *ram_block_from_stream(Q=
+EMUFile *f, int flags)
+>>          return NULL;
+>>      }
+>> =20
+>> +    if (!qemu_ram_is_migratable(block)) {
+>> +        error_report("block %s should not be migrated !", id);
+>> +        return NULL;
+>> +    }
+>> +
+>>      return block;
+>>  }
+>> =20
+>> @@ -2921,7 +2939,11 @@ static int ram_load(QEMUFile *f, void *opaque, =
+int version_id)
+>>                  length =3D qemu_get_be64(f);
+>> =20
+>>                  block =3D qemu_ram_block_by_name(id);
+>> -                if (block) {
+>> +                if (block && !qemu_ram_is_migratable(block)) {
+>> +                    error_report("block %s should not be migrated !",=
+ id);
+>> +                    ret =3D -EINVAL;
+>> +
+>> +                } else if (block) {
+>>                      if (length !=3D block->used_length) {
+>>                          Error *local_err =3D NULL;
+>> =20
+>> --=20
+>> 2.13.6
+>=20
+> Dave
+>=20
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>=20
