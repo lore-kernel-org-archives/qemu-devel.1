@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f9RVr-0005Kh-0B
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:35:26 -0400
+	(envelope-from <armbru@redhat.com>) id 1f9RVv-0005Or-DV
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:35:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f9RVn-0002Qw-Sp
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:35:20 -0400
-Date: Fri, 20 Apr 2018 16:35:12 +0800
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180420083512.GO15181@stefanha-x1.localdomain>
-References: <20180416165849.28864-1-mreitz@redhat.com>
-	<20180416165849.28864-7-mreitz@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1f9RVs-0002US-9B
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:35:27 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37532 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1f9RVs-0002U1-4f
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:35:24 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180419223151.623174-1-eblake@redhat.com>
+	<20180419223151.623174-3-eblake@redhat.com>
+Date: Fri, 20 Apr 2018 10:35:14 +0200
+In-Reply-To: <20180419223151.623174-3-eblake@redhat.com> (Eric Blake's message
+	of "Thu, 19 Apr 2018 17:31:51 -0500")
+Message-ID: <87d0yu1dj1.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="MmQIYbZiCoQ2kDro"
-Content-Disposition: inline
-In-Reply-To: <20180416165849.28864-7-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 6/9] block: Support
- BDRV_REQ_WRITE_UNCHANGED in filters
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] qapi: Rename .json to .qapi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +27,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr.
+	David Alan Gilbert" <dgilbert@redhat.com>
 
+Eric Blake <eblake@redhat.com> writes:
 
---MmQIYbZiCoQ2kDro
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Our QAPI input files aren't quite true JSON (comments being one obvious
+> difference); naming things .json doesn't make that obvious.  Use a new
+> suffix .qapi that makes it easy to identify our files.
 
-On Mon, Apr 16, 2018 at 06:58:46PM +0200, Max Reitz wrote:
-> Update the rest of the filter drivers to support
-> BDRV_REQ_WRITE_UNCHANGED.  They already forward write request flags to
-> their children, so we just have to announce support for it.
->=20
-> This patch does not cover the replication driver because that currently
-> does not support flags at all, and because it just grabs the WRITE
-> permission for its children when it can, so we should be fine just
-> submitting the incoming WRITE_UNCHANGED requests as normal writes.
->=20
-> It also does not cover format drivers for similar reasons.  They all use
-> bdrv_format_default_perms() as their .bdrv_child_perm() implementation
-> so they just always grab the WRITE permission for their file children
-> whenever possible.  In addition, it often would be difficult to
-> ascertain whether incoming unchanging writes end up as unchanging writes
-> in their files.  So we just leave them as normal potentially changing
-> writes.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  block/blkdebug.c   |  9 +++++----
->  block/blkreplay.c  |  3 +++
->  block/blkverify.c  |  3 +++
->  block/cor.c        | 10 ++++++----
->  block/mirror.c     |  2 ++
->  block/raw-format.c |  9 +++++----
->  block/throttle.c   |  6 ++++--
->  7 files changed, 28 insertions(+), 14 deletions(-)
+I agree that .json is sub-optimal.  Evidence: we add Emacs file
+variables to get Python mode, because that's less wrong than JavaScript
+mode.  Except for "trivial" files, where we can't be bothered.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+The rename lessens the human confusion, but increases the Editor
+confusion somewhat: we get Fundamental mode for "trivial" files, which
+is more wrong than JavaScript mode.
 
---MmQIYbZiCoQ2kDro
-Content-Type: application/pgp-signature; name="signature.asc"
+One way to avoid that would be adding file variables to all files.
 
------BEGIN PGP SIGNATURE-----
+Permit me to digress.  I figure the (sane part of the) rationale for
+picking JSON as programming language syntax was "do not invent syntax,
+do profit from existing tooling".  Except JSON is unfit for the purpose
+as is; you need at least comments.  Our "fixes" for "unfit" turned the
+thing into an original work, destroying the "profit" part.  To
+paraphrase a German saying, what we built with our hands we upset with
+the ass.  Too late to correct, I guess, but I'm open to different
+opinions.
 
-iQEcBAEBAgAGBQJa2aZAAAoJEJykq7OBq3PIS5oH/3pSlWaSC3LYlG87hvX/dFge
-P2qbmrfIbJhQybHeh8DflAN31r3ESQJpE+Unq/vwvt5ZgpMXXWY7ojZJi/+t+/C6
-OaRN6eB2xtcisuTuyOsUnaEHB7q4t8EQ/mepJ3Yd23Ah0w/kulGdMBIiUwzOyroy
-yKbNq7zyyOO3MbpGz11xjauRdXFLQFTo8bscdyvKk63phcak01L0Z4vvoJT6O2qz
-+XdEphVqj50Qrq7BgTmTatpZVLOVRvHDnfEx7v3Kw9ceCNFtZ6rNbaAG56xZoNvY
-3/8gphiiP8ya7paN0utvUbfwjrNpEAxwlfXKSXvDhOH58Rm3wlkGbCywtYKdZHI=
-=YCSE
------END PGP SIGNATURE-----
-
---MmQIYbZiCoQ2kDro--
+[...]
