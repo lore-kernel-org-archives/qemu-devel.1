@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54436)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1f9YOa-0002B3-Bw
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:56:21 -0400
+	(envelope-from <groug@kaod.org>) id 1f9YRD-0004jK-Qr
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:59:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1f9YOX-0001Jy-57
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:56:20 -0400
-Received: from 3.mo69.mail-out.ovh.net ([188.165.52.203]:55321)
+	(envelope-from <groug@kaod.org>) id 1f9YRB-0004mf-8p
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:59:03 -0400
+Received: from 9.mo179.mail-out.ovh.net ([46.105.76.148]:49743)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1f9YOW-0001Ig-UC
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:56:17 -0400
-Received: from player791.ha.ovh.net (unknown [10.109.122.75])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 53FEC13DA0
-	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 17:56:15 +0200 (CEST)
-Date: Fri, 20 Apr 2018 17:56:10 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1f9YRB-0004lH-30
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:59:01 -0400
+Received: from player696.ha.ovh.net (unknown [10.109.105.86])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 85041B9BF9
+	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 17:58:59 +0200 (CEST)
+Date: Fri, 20 Apr 2018 17:58:55 +0200
 From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180420175610.79dd9a9a@bahia.lan>
-In-Reply-To: <20180417071722.9399-9-david@gibson.dropbear.id.au>
+Message-ID: <20180420175855.58f548a6@bahia.lan>
+In-Reply-To: <20180417071722.9399-11-david@gibson.dropbear.id.au>
 References: <20180417071722.9399-1-david@gibson.dropbear.id.au>
-	<20180417071722.9399-9-david@gibson.dropbear.id.au>
+	<20180417071722.9399-11-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.13 08/10] spapr: Clean up handling of
- LPCR power-saving exit bits
+Subject: Re: [Qemu-devel] [PATCH for-2.13 10/10] spapr: Move PAPR specific
+ cpu logic to pseries machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,106 +34,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: benh@kernel.crashing.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Tue, 17 Apr 2018 17:17:20 +1000
+On Tue, 17 Apr 2018 17:17:22 +1000
 David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> To prevent spurious wakeups on cpus that are supposed to be disabled, we
-> need to clear the LPCR bits which control certain wakeup events.
-> spapr_cpu_reset() has separate cases here for boot and non-boot (initially
-> inactive) cpus.  rtas_start_cpu() then turns the LPCR bits on when the
-> non-boot cpus are activated.
+> cpu_ppc_set_papr() does three things: 1) it sets up the virtual hypervisor
+> interface, 2) it prevents the cpu from ever entering hypervisor mode and
+> 3) it tells KVM that we're emulating a cpu in PAPR mode.
 > 
-> But explicit checks against first_cpu are not how we usually do things:
-> instead spapr_cpu_reset() generally sets things up for non-boot (inactive)
-> cpus, then spapr_machine_reset() and/or rtas_start_cpu() override as
-> necessary.
+> (1) & (2) make sense for any virtual hypervisor (if one ever exists).  (3)
+> belongs more properly in the machine type specific to a PAPR guest.
 > 
-> So, do that instead.  Because the LPCR activation is identical for boot
-> cpus and non-boot cpus just activated with rtas_start_cpu() we can put the
-> code common in spapr_cpu_set_entry_state().
+> While we're at it, remove an unnecessary test on kvm_enabled() by making
+> kvmppc_set_papr() a safe no-op on non-KVM.
 > 
 > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
 
-Ok, ok, I hadn't seen this patch yet when I commented on patch 5 :)
-
 Reviewed-by: Greg Kurz <groug@kaod.org>
 
->  hw/ppc/spapr_cpu_core.c | 22 +++++++---------------
->  hw/ppc/spapr_rtas.c     |  4 ----
->  2 files changed, 7 insertions(+), 19 deletions(-)
+>  hw/ppc/spapr_cpu_core.c     | 4 ++--
+>  target/ppc/cpu.h            | 2 +-
+>  target/ppc/kvm.c            | 4 ++++
+>  target/ppc/translate_init.c | 7 +------
+>  4 files changed, 8 insertions(+), 9 deletions(-)
 > 
 > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index ecd40dbf03..8be0265d04 100644
+> index 8be0265d04..0a668b8954 100644
 > --- a/hw/ppc/spapr_cpu_core.c
 > +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -52,28 +52,17 @@ static void spapr_cpu_reset(void *opaque)
->       * Clearing VPM0 will also cause us to use RMOR in mmu-hash64.c for
->       * real mode accesses, which thankfully defaults to 0 and isn't
->       * accessible in guest mode.
-> +     *
-> +     * Disable Power-saving mode Exit Cause exceptions for the CPU, so
-> +     * we don't get spurious wakups before an RTAS start-cpu call.
->       */
-> -    lpcr &= ~(LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_KBV);
-> +    lpcr &= ~(LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_KBV | pcc->lpcr_pm);
->      lpcr |= LPCR_LPES0 | LPCR_LPES1;
+> @@ -94,8 +94,8 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, PowerPCCPU *cpu,
+>      /* Set time-base frequency to 512 MHz */
+>      cpu_ppc_tb_init(env, SPAPR_TIMEBASE_FREQ);
 >  
->      /* Set RMLS to the max (ie, 16G) */
->      lpcr &= ~LPCR_RMLS;
->      lpcr |= 1ull << LPCR_RMLS_SHIFT;
+> -    /* Enable PAPR mode in TCG or KVM */
+> -    cpu_ppc_set_papr(cpu, PPC_VIRTUAL_HYPERVISOR(spapr));
+> +    cpu_ppc_set_vhyp(cpu, PPC_VIRTUAL_HYPERVISOR(spapr));
+> +    kvmppc_set_papr(cpu);
 >  
-> -    /* Only enable Power-saving mode Exit Cause exceptions on the boot
-> -     * CPU. The RTAS command start-cpu will enable them on secondaries.
-> -     */
-> -    if (cs == first_cpu) {
-> -        lpcr |= pcc->lpcr_pm;
-> -    }
-> -
-> -    /* Disable Power-saving mode Exit Cause exceptions for the CPU.
-> -     * This can cause issues when rebooting the guest if a secondary
-> -     * is awaken */
-> -    if (cs != first_cpu) {
-> -        lpcr &= ~pcc->lpcr_pm;
-> -    }
-> -
->      ppc_store_lpcr(cpu, lpcr);
+>      qemu_register_reset(spapr_cpu_reset, cpu);
+>  }
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 8c9e03f54d..740939a085 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1331,7 +1331,7 @@ void store_booke_tcr (CPUPPCState *env, target_ulong val);
+>  void store_booke_tsr (CPUPPCState *env, target_ulong val);
+>  void ppc_tlb_invalidate_all (CPUPPCState *env);
+>  void ppc_tlb_invalidate_one (CPUPPCState *env, target_ulong addr);
+> -void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp);
+> +void cpu_ppc_set_vhyp(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp);
+>  #endif
+>  #endif
 >  
->      /* Set a full AMOR so guest can use the AMR as it sees fit */
-> @@ -82,11 +71,14 @@ static void spapr_cpu_reset(void *opaque)
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 51177a8e00..e4341d6ff7 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -2090,6 +2090,10 @@ void kvmppc_set_papr(PowerPCCPU *cpu)
+>      CPUState *cs = CPU(cpu);
+>      int ret;
 >  
->  void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, target_ulong r3)
->  {
-> +    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
->      CPUPPCState *env = &cpu->env;
->  
->      env->nip = SPAPR_ENTRY_POINT;
->      env->gpr[3] = r3;
->      CPU(cpu)->halted = 0;
-> +    /* Enable Power-saving mode Exit Cause exceptions */
-> +    ppc_store_lpcr(cpu, env->spr[SPR_LPCR] | pcc->lpcr_pm);
+> +    if (!kvm_enabled()) {
+> +        return;
+> +    }
+> +
+>      ret = kvm_vcpu_enable_cap(cs, KVM_CAP_PPC_PAPR, 0);
+>      if (ret) {
+>          error_report("This vCPU type or KVM version does not support PAPR");
+> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> index bb5559d799..95e8dba97a 100644
+> --- a/target/ppc/translate_init.c
+> +++ b/target/ppc/translate_init.c
+> @@ -8864,7 +8864,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
 >  }
 >  
->  static void spapr_cpu_destroy(PowerPCCPU *cpu)
-> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-> index d79aa44467..e720d54eb5 100644
-> --- a/hw/ppc/spapr_rtas.c
-> +++ b/hw/ppc/spapr_rtas.c
-> @@ -162,7 +162,6 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPAPRMachineState *spapr,
->      if (cpu != NULL) {
->          CPUState *cs = CPU(cpu);
->          CPUPPCState *env = &cpu->env;
-> -        PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
+>  #if !defined(CONFIG_USER_ONLY)
+> -void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp)
+> +void cpu_ppc_set_vhyp(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp)
+>  {
+>      CPUPPCState *env = &cpu->env;
 >  
->          if (!cs->halted) {
->              rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
-> @@ -178,9 +177,6 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPAPRMachineState *spapr,
->  
->          env->msr = (1ULL << MSR_SF) | (1ULL << MSR_ME);
->  
-> -        /* Enable Power-saving mode Exit Cause exceptions for the new CPU */
-> -        env->spr[SPR_LPCR] |= pcc->lpcr_pm;
+> @@ -8875,11 +8875,6 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp)
+>       * hypervisor mode itself
+>       */
+>      env->msr_mask &= ~MSR_HVB;
 > -
->          spapr_cpu_set_endianness(cpu);
->          spapr_cpu_update_tb_offset(cpu);
+> -    /* Tell KVM that we're in PAPR mode */
+> -    if (kvm_enabled()) {
+> -        kvmppc_set_papr(cpu);
+> -    }
+>  }
 >  
+>  #endif /* !defined(CONFIG_USER_ONLY) */
