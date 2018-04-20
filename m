@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f9Xip-0006MW-Dt
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:13:12 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1f9Xuu-0001zd-Lq
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:25:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f9Xio-0005ht-Bc
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:13:11 -0400
-Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:33660)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f9Xio-0005gd-6u
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:13:10 -0400
-Received: by mail-ot0-x230.google.com with SMTP id w2-v6so9978020otj.0
-	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 08:13:10 -0700 (PDT)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1f9Xup-00039T-Km
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:25:40 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36404 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1f9Xup-00034n-GL
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:25:35 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Fri, 20 Apr 2018 17:25:11 +0200
+Message-Id: <20180420152511.18878-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <152423701463.2118.8532788783924003585@71c20359a636>
-References: <20180420145249.32435-1-peter.maydell@linaro.org>
-	<152423701463.2118.8532788783924003585@71c20359a636>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Apr 2018 16:12:49 +0100
-Message-ID: <CAFEAcA_O5nnd2NLHOuJocy4vh0StaK_Z_p3yn8Q4vvdAUUwuNQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 00/13] Drop compile time limit on number of
- serial ports
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] qemu-ga: make get-fsinfo work over pci bridges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,36 +25,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, "patches@linaro.org" <patches@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: lersek@redhat.com, mdroth@linux.vnet.ibm.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On 20 April 2018 at 16:10,  <no-reply@patchew.org> wrote:
+Iterate over the PCI bridges to lookup the PCI device associated with
+the block device.
 
-> Checking PATCH 7/13: Change references to serial_hds[] to serial_hd()...
-> WARNING: line over 80 characters
-> #581: FILE: hw/cris/axis_dev88.c:340:
-> +        etraxfs_ser_create(0x30026000 + i * 0x2000, irq[0x14 + i], serial_hd(i));
->
-> ERROR: spaces required around that '/' (ctx:VxV)
-> #824: FILE: hw/moxie/moxiesim.c:146:
-> +                       8000000/16, serial_hd(0), DEVICE_LITTLE_ENDIAN);
->                                ^
->
-> total: 1 errors, 1 warnings, 852 lines checked
+Fixes:
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1567041
 
-These are in the "mechanical change only" patch, so I didn't
-want to change anything else there.
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ qga/commands-posix.c | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
 
-> Checking PATCH 12/13: vl.c: Remove compile time limit on number of serial ports...
-> ERROR: do not initialise statics to 0 or NULL
-> #35: FILE: vl.c:157:
-> +static int num_serial_hds = 0;
->
-> ERROR: do not initialise statics to 0 or NULL
-> #36: FILE: vl.c:158:
-> +static Chardev **serial_hds = NULL;
-
-I'd forgotten checkpatch had this requirement; easy to fix.
-
-thanks
--- PMM
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index 0dc219dbcf..5d4e5f627f 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -879,9 +879,24 @@ static void build_guest_fsinfo_for_real_device(char =
+const *syspath,
+         return;
+     }
+=20
+-    driver =3D get_pci_driver(syspath, (p + 12 + pcilen) - syspath, errp=
+);
+-    if (!driver) {
+-        goto cleanup;
++    p +=3D 12 + pcilen;
++    while (true) {
++        driver =3D get_pci_driver(syspath, p - syspath, errp);
++        if (!driver) {
++            goto cleanup;
++        }
++
++        if (g_str_equal(driver, "pcieport")) {
++            if (sscanf(p, "/%x:%x:%x.%x%n",
++                       pci, pci + 1, pci + 2, pci + 3, &pcilen) < 4) {
++                g_debug("only pci device is supported: sysfs path \"%s\"=
+",
++                        syspath);
++                return;
++            }
++            p +=3D pcilen;
++            continue;
++        }
++        break;
+     }
+=20
+     p =3D strstr(syspath, "/target");
+--=20
+2.17.0.253.g3dd125b46d
