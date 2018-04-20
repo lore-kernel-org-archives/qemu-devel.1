@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f9OKW-0007G1-Lg
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 01:11:29 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f9OWr-0002Wf-RF
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 01:24:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1f9OKR-0004UU-MZ
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 01:11:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54498 helo=mx1.redhat.com)
+	(envelope-from <dgibson@ozlabs.org>) id 1f9OWo-0003xw-1X
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 01:24:13 -0400
+Received: from ozlabs.org ([203.11.71.1]:42125)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1f9OKR-0004Tk-IS
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 01:11:23 -0400
-Date: Fri, 20 Apr 2018 13:11:06 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180420051106.GC873@xz-mi>
-References: <20180418045121.14233-1-peterx@redhat.com>
-	<d550eb50-c9e3-838a-ac9a-4a998375572b@redhat.com>
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1f9OWn-0003w1-4s
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 01:24:09 -0400
+Date: Fri, 20 Apr 2018 15:23:57 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180420052357.GE2434@umbus.fritz.box>
+References: <1520860275-101576-1-git-send-email-imammedo@redhat.com>
+	<87zi21apkh.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="Rgf3q3z9SdmXC6oT"
 Content-Disposition: inline
-In-Reply-To: <d550eb50-c9e3-838a-ac9a-4a998375572b@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] intel-iommu: send PSI always when
- notify_unmap set
+In-Reply-To: <87zi21apkh.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v4 0/9] enable numa configuration before
+ machine_init() from QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,69 +29,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Eric Auger <eric.auger@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Alexander Witte <alexander.witte@baicanada.com>, Jintack Lim <jintack@cs.columbia.edu>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, pkrempa@redhat.com, ehabkost@redhat.com, cohuck@redhat.com, pbonzini@redhat.com
 
-On Fri, Apr 20, 2018 at 12:57:13PM +0800, Jason Wang wrote:
+
+--Rgf3q3z9SdmXC6oT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Apr 17, 2018 at 04:13:34PM +0200, Markus Armbruster wrote:
+> Igor Mammedov <imammedo@redhat.com> writes:
 >=20
+> [...]
+> > Series allows to configure NUMA mapping at runtime using QMP
+> > interface. For that to happen it introduces a new '-preconfig' CLI opti=
+on
+> > which allows to pause QEMU before machine_init() is run and
+> > adds new set-numa-node QMP command which in conjunction with
+> > query-hotpluggable-cpus allows to configure NUMA mapping for cpus.
+> >
+> > Later we can modify other commands to run early, for example device_add.
+> > I recall SPAPR had problem when libvirt started QEMU with -S and, while=
+ it's
+> > paused, added CPUs with device_add. Intent was to coldplug CPUs (but at=
+ that
+> > stage it's considered hotplug already), so SPAPR had to work around the=
+ issue.
 >=20
-> On 2018=E5=B9=B404=E6=9C=8818=E6=97=A5 12:51, Peter Xu wrote:
-> > During IOVA page table walk, there is a special case when:
-> >=20
-> > - notify_unmap is set, meanwhile
-> > - entry is invalid
-> >=20
-> > In the past, we skip the entry always.  This is not correct.  We shou=
-ld
-> > send UNMAP notification to registered notifiers in this case.  Otherw=
-ise
-> > some stall pages will still be mapped in the host even if L1 guest
+> That instance is just stupidity / laziness, I think: we consider any
+> plug after machine creation a hot plug.  Real machines remain cold until
+> you press the power button.  Our virtual machines should remain cold
+> until they start running, i.e. with -S until the first "cont".
+
+Makes sense to me.  As I recall, the chief problem I had here with
+PAPR hotplug was that -S stopped *after* the machine_reset, which
+meant the only mechanisms we really had to inform the guest of the
+hardware were the hotplug mechanisms.  Sort of.  It got complicated
+because of the feature negotiation system that PAPR guests have.
+
+At present -S doesn't really operate like a "stop before hitting the
+power", it instead acts more like a breakpoint on the first
+instruction of the firmware.
+
+If we were to move the -S stop to before the machine_reset, I believe
+that might simplify several things in our hotplug handling code for
+papr.
+
+> I vaguely remember me asking this before, but your answer didn't make it
+> into this cover letter, which gives me a pretext to ask again instead of
+> looking it up in the archives: what exactly prevents us from keeping the
+> machine cold enough for numa configuration until the first "cont"?
 >=20
-> You mean 'stale' here?
-
-Ah, yes.
-
+> >
+> > Example of configuration session:
+> > $QEMU -smp 2 -preconfig ...
+> >
+> > QMP:
+> > # get CPUs layout for current target/machine/CLI
+> > -> {'execute': 'query-hotpluggable-cpus' } =20
+> > <- {'return': [
+> >        {'props': {'core-id': 0, 'thread-id': 0, 'socket-id': 1}, ... },
+> >        {'props': {'core-id': 0, 'thread-id': 0, 'socket-id': 0}, ... }
+> >    ]}
+> >
+> > # configure 1st node
+> > -> {'execute': 'set-numa-node', 'arguments': { 'type': 'node', 'nodeid'=
+: 0 } } =20
+> > <- {'return': {}}
+> > -> {'execute': 'set-numa-node', 'arguments': { 'type': 'cpu',  =20
+> >        'node-id': 0, 'core-id': 0, 'thread-id': 0, 'socket-id': 1, }
+> >    }
+> > <- {'return': {}}
+> >
+> > # configure 2nd node
+> > -> {'execute': 'set-numa-node', 'arguments': { 'type': 'node', 'nodeid'=
+: 1 } }
+> > -> {'execute': 'set-numa-node', 'arguments': { 'type': 'cpu', =20
+> >        'node-id': 1, 'core-id': 0, 'thread-id': 0, 'socket-id': 0 }
+> >    }
+> > <- {'return': {}}
+> >
+> > # [optional] verify configuration
+> > -> {'execute': 'query-hotpluggable-cpus' } =20
+> > <- {'return': [
+> >        {'props': {'core-id': 0, 'thread-id': 0, 'node-id': 0, 'socket-i=
+d': 1}, ... },
+> >        {'props': {'core-id': 0, 'thread-id': 0, 'node-id': 1, 'socket-i=
+d': 0}, ... }
+> >    ]}
+> >
+> >
+> > Git tree:
+> >     https://github.com/imammedo/qemu.git qmp_preconfig_v3
+> >
+> > Ref to v1:
+> >     https://lists.gnu.org/archive/html/qemu-devel/2017-10/msg03583.html
+> >     Message-Id: <1508170976-96869-1-git-send-email-imammedo@redhat.com>
 >=20
-> > unmapped them already.
->=20
-> It looks like some IOTLB invalidation were missed? If not, the page sho=
-uld
-> be unmaped during invalidation.
-
-I'm afraid it's not the same problem, and that's why I think we need
-two fixes.
-
-Even if the guest sends the correct invalidations, it's still possible
-that QEMU skips the PSI with current code.
-
->=20
-> >=20
-> > Without this patch, nested device assignment to L2 guests might dump
-> > some errors like:
-> >=20
-> > qemu-system-x86_64: VFIO_MAP_DMA: -17
-> > qemu-system-x86_64: vfio_dma_map(0x557305420c30, 0xad000, 0x1000,
-> >                      0x7f89a920d000) =3D -17 (File exists)
-> >=20
-> > To fix this, we need to apply this patch to L1 QEMU (L2 QEMU is not
-> > affected by this problem).
-> >=20
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >=20
-> > To test nested assignment, one also needs to apply below patchset:
-> > https://lkml.org/lkml/2018/4/18/5
->=20
-> Have a quick glance at it, looks like there's no need for this patch is=
- we
-> had that kernel patch applied.
-
-Even if guest kernel applies above fix, QEMU might still drop some of
-the PSIs.  Above error messages were captured with kernel patches
-applied already (otherwise we see no error messages, we directly miss
-them from guest).
-
-Thanks,
 
 --=20
-Peter Xu
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--Rgf3q3z9SdmXC6oT
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrZeWgACgkQbDjKyiDZ
+s5Ly8hAA1WGJqfxEm5Ara6giAVPYPXN/DwIBLG3vhl3v6KFxETHYBP2Ui8kCLrjw
+iFpDMap+y7p5QD8SDP3Q71gBGqX1vxQ4GmTuyQVftLaTcUlihoUAR54GjSklJwNa
+TjX301wTDx58/2J9ZAR7jdrjlgXcb+y+eE6wyYDOkkIdCcogDOaYs0DIwIVLJfwH
+CQHKdBRHBTV4cQpzbF6vRhpqku7j8uLXOuQnzQRmI+zcn+i8Qrupb76swyuWyl2q
+vRHnNWTcdtUY+fFaRRRsTFDh2SaGI09BBQUUfZji//eCYxlhA7XzZzy07w8QbnjP
+oyPPGHZ14lA82ca8BF6BKCf8XEKY0kI+Jc3VNK36DBb36BAgecfcnxCPW1BuePji
+zXhX3dEOc7wfJfbTuQFlgOLn/dJX6nTQT/psTMCYB2XelrmFiioHVfI2Pc7ydSX0
+PES/EBx4N2YjjzXFpSxdmgS6VyQ98L9pSsVMGF4ryi3SH8c0WjgULC5H8WoU03JK
+Pf94At/k9wviqWno+VhNaLRbJyRKiO1vetHDH7TRkHGNyiMYaZVwBzNb7VefHj8P
+m2Nf5jLzTGYKEwH7I8zviqyxCtJzsOX3ARGzbtXaqWf+B7JhXdBLtZuhX+i07m5g
+f8z74mbnhl7zGx7yIz4VvEWe45Ez9UVF52Rgx0nA1ZZZAC8F1wc=
+=wGqQ
+-----END PGP SIGNATURE-----
+
+--Rgf3q3z9SdmXC6oT--
