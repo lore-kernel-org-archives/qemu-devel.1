@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1f9V1s-0000d6-O6
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:20:41 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1f9V5H-0002cU-4g
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:24:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1f9V1r-0004XH-Tv
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:20:40 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20180416165849.28864-8-mreitz@redhat.com>
-References: <20180416165849.28864-1-mreitz@redhat.com>
-	<20180416165849.28864-8-mreitz@redhat.com>
-Date: Fri, 20 Apr 2018 14:20:32 +0200
-Message-ID: <w51k1t2vzlb.fsf@maestria.local.igalia.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1f9V5G-0007v7-4E
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:24:11 -0400
+References: <20180416114414.18406-1-vsementsov@virtuozzo.com>
+	<20180416114414.18406-5-vsementsov@virtuozzo.com>
+	<5b5bfec8-ed19-dd0f-4d76-ee3513276dc2@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <e8f7437c-15b2-2ac5-aa45-312976414324@virtuozzo.com>
+Date: Fri, 20 Apr 2018 15:23:56 +0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 7/9] iotests: Clean up wrap
- image in 197
+In-Reply-To: <5b5bfec8-ed19-dd0f-4d76-ee3513276dc2@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2 4/7] dirty-bitmap: separate unused
+ meta-bitmap related functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,12 +26,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-On Mon 16 Apr 2018 06:58:47 PM CEST, Max Reitz wrote:
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+20.04.2018 00:54, John Snow wrote:
+> On 04/16/2018 07:44 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Separate them in the header and clarify needed locking in comments.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   include/block/dirty-bitmap.h | 14 +++++++++-----
+>>   block/dirty-bitmap.c         |  5 +++++
+>>   2 files changed, 14 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+>> index c7e910016d..b7ccfd1363 100644
+>> --- a/include/block/dirty-bitmap.h
+>> +++ b/include/block/dirty-bitmap.h
+>> @@ -9,9 +9,6 @@ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriverState *bs,
+>>                                             uint32_t granularity,
+>>                                             const char *name,
+>>                                             Error **errp);
+>> -void bdrv_create_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap,
+>> -                                   int chunk_size);
+>> -void bdrv_release_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap);
+>>   int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
+>>                                          BdrvDirtyBitmap *bitmap,
+>>                                          Error **errp);
+>> @@ -45,7 +42,6 @@ void bdrv_set_dirty_bitmap(BdrvDirtyBitmap *bitmap,
+>>                              int64_t offset, int64_t bytes);
+>>   void bdrv_reset_dirty_bitmap(BdrvDirtyBitmap *bitmap,
+>>                                int64_t offset, int64_t bytes);
+>> -BdrvDirtyBitmapIter *bdrv_dirty_meta_iter_new(BdrvDirtyBitmap *bitmap);
+>>   BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBitmap *bitmap);
+>>   void bdrv_dirty_iter_free(BdrvDirtyBitmapIter *iter);
+>>   
+>> @@ -84,7 +80,6 @@ void bdrv_reset_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
+>>   int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter);
+>>   void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t offset);
+>>   int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap);
+>> -int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
+>>   void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes);
+>>   bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
+>>   bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
+>> @@ -99,4 +94,13 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
+>>                                                     BdrvDirtyBitmap *bitmap,
+>>                                                     Error **errp);
+>>   
+>> +/*
+>> + * Unused for now meta-bitmaps related functions
+>> + */
+>> +
+> I assume you have plans to use them still? I thought these were useful
+> for storage migration -- but I guess we don't use these for the postcopy
+> mechanism?
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+I don't have plans for near future, so for me it's ok to drop them.
 
-Berto
+Theoretical usage is partial storing (if we know, which portions of 
+bitmaps are changed, we can save to file only these portions, not the 
+whole bitmaps), but it don't look like near future. May be, Fam has some 
+plans?
+
+>
+>> +void bdrv_create_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap, int chunk_size);
+>> +void bdrv_release_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap);
+>> +BdrvDirtyBitmapIter *bdrv_dirty_meta_iter_new(BdrvDirtyBitmap *bitmap);
+>> +int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
+>> +
+>>   #endif
+>> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+>> index 6c00288fd7..1812e17549 100644
+>> --- a/block/dirty-bitmap.c
+>> +++ b/block/dirty-bitmap.c
+>> @@ -149,6 +149,8 @@ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriverState *bs,
+>>    * @bitmap: the block dirty bitmap for which to create a meta dirty bitmap.
+>>    * @chunk_size: how many bytes of bitmap data does each bit in the meta bitmap
+>>    * track.
+>> + *
+>> + * Called with BQL taken.
+>>    */
+>>   void bdrv_create_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap,
+>>                                      int chunk_size)
+>> @@ -160,6 +162,7 @@ void bdrv_create_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap,
+>>       qemu_mutex_unlock(bitmap->mutex);
+>>   }
+>>   
+>> +/* Called with BQL taken. */
+>>   void bdrv_release_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap)
+>>   {
+>>       assert(bitmap->meta);
+>> @@ -529,6 +532,7 @@ BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBitmap *bitmap)
+>>       return iter;
+>>   }
+>>   
+>> +/* Called with BQL and dirty_bitmap_mutex locked. */
+>>   BdrvDirtyBitmapIter *bdrv_dirty_meta_iter_new(BdrvDirtyBitmap *bitmap)
+>>   {
+>>       BdrvDirtyBitmapIter *iter = g_new(BdrvDirtyBitmapIter, 1);
+>> @@ -688,6 +692,7 @@ int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap)
+>>       return hbitmap_count(bitmap->bitmap);
+>>   }
+>>   
+>> +/* Called with BQL or dirty_bitmap_mutex locked */
+>>   int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap)
+>>   {
+>>       return hbitmap_count(bitmap->meta);
+>>
+
+
+-- 
+Best regards,
+Vladimir
