@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f9ZD8-0006Es-QS
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:48:35 -0400
+	(envelope-from <cota@braap.org>) id 1f9ZFQ-0007Tq-Ou
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:50:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f9ZD4-000474-37
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:48:34 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:44112)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f9ZD3-00046W-U1
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:48:29 -0400
-Received: by mail-qk0-x243.google.com with SMTP id h200so8696711qke.11
-	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 09:48:29 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180420145249.32435-1-peter.maydell@linaro.org>
-	<20180420145249.32435-3-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <8dcce14b-5daa-2f7b-7f37-8673afcafdea@amsat.org>
-Date: Fri, 20 Apr 2018 13:48:25 -0300
+	(envelope-from <cota@braap.org>) id 1f9ZFL-0005jq-V5
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:50:56 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:49841)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f9ZFL-0005jZ-NP
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:50:51 -0400
+Date: Fri, 20 Apr 2018 12:50:50 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180420165050.GA24836@flamenco>
+References: <1522980788-1252-1-git-send-email-cota@braap.org>
+	<87in8lam44.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180420145249.32435-3-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 02/13] hw/arm/fsl-imx*: Don't create "null"
- chardevs for serial devices
+In-Reply-To: <87in8lam44.fsf@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v2 00/17] tcg: tb_lock_removal redux v2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,94 +28,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: patches@linaro.org, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 04/20/2018 11:52 AM, Peter Maydell wrote:
-> Following commit 12051d82f004024, UART devices should handle
-> being passed a NULL pointer chardev, so we don't need to
-> create "null" backends in board code. Remove the code that
-> does this and updates serial_hds[].
+On Fri, Apr 20, 2018 at 17:17:15 +0100, Alex BennÈe wrote:
 > 
-> (fsl-imx7.c was already written this way.)
+> Emilio G. Cota <cota@braap.org> writes:
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/arm/fsl-imx25.c | 12 +-----------
->  hw/arm/fsl-imx31.c | 12 +-----------
->  hw/arm/fsl-imx6.c  | 13 +------------
->  3 files changed, 3 insertions(+), 34 deletions(-)
+> > v1: http://lists.gnu.org/archive/html/qemu-devel/2018-02/msg06499.html
+> >
+> > Changes since v1:
+> >
+> <snip>
 > 
-> diff --git a/hw/arm/fsl-imx25.c b/hw/arm/fsl-imx25.c
-> index cb988a6c25..d7d064e5ce 100644
-> --- a/hw/arm/fsl-imx25.c
-> +++ b/hw/arm/fsl-imx25.c
-> @@ -118,17 +118,7 @@ static void fsl_imx25_realize(DeviceState *dev, Error **errp)
->          };
->  
->          if (i < MAX_SERIAL_PORTS) {
-> -            Chardev *chr;
-> -
-> -            chr = serial_hds[i];
-> -
-> -            if (!chr) {
-> -                char label[20];
-> -                snprintf(label, sizeof(label), "imx31.uart%d", i);
-> -                chr = qemu_chr_new(label, "null");
-> -            }
-> -
-> -            qdev_prop_set_chr(DEVICE(&s->uart[i]), "chardev", chr);
-> +            qdev_prop_set_chr(DEVICE(&s->uart[i]), "chardev", serial_hds[i]);
->          }
->  
->          object_property_set_bool(OBJECT(&s->uart[i]), true, "realized", &err);
-> diff --git a/hw/arm/fsl-imx31.c b/hw/arm/fsl-imx31.c
-> index 3eee83d547..e6c788049d 100644
-> --- a/hw/arm/fsl-imx31.c
-> +++ b/hw/arm/fsl-imx31.c
-> @@ -107,17 +107,7 @@ static void fsl_imx31_realize(DeviceState *dev, Error **errp)
->          };
->  
->          if (i < MAX_SERIAL_PORTS) {
-> -            Chardev *chr;
-> -
-> -            chr = serial_hds[i];
-> -
-> -            if (!chr) {
-> -                char label[20];
-> -                snprintf(label, sizeof(label), "imx31.uart%d", i);
-> -                chr = qemu_chr_new(label, "null");
-> -            }
-> -
-> -            qdev_prop_set_chr(DEVICE(&s->uart[i]), "chardev", chr);
-> +            qdev_prop_set_chr(DEVICE(&s->uart[i]), "chardev", serial_hds[i]);
->          }
->  
->          object_property_set_bool(OBJECT(&s->uart[i]), true, "realized", &err);
-> diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
-> index 9dfbc9a8c4..ea14de33c6 100644
-> --- a/hw/arm/fsl-imx6.c
-> +++ b/hw/arm/fsl-imx6.c
-> @@ -189,18 +189,7 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
->          };
->  
->          if (i < MAX_SERIAL_PORTS) {
-> -            Chardev *chr;
-> -
-> -            chr = serial_hds[i];
-> -
-> -            if (!chr) {
-> -                char *label = g_strdup_printf("imx6.uart%d", i + 1);
-> -                chr = qemu_chr_new(label, "null");
-> -                g_free(label);
-> -                serial_hds[i] = chr;
-> -            }
-> -
-> -            qdev_prop_set_chr(DEVICE(&s->uart[i]), "chardev", chr);
-> +            qdev_prop_set_chr(DEVICE(&s->uart[i]), "chardev", serial_hds[i]);
->          }
->  
->          object_property_set_bool(OBJECT(&s->uart[i]), true, "realized", &err);
+> I was just catching up on reviews but there are a fair few conflicts in
+> the later patches. I also note you have some comments from Richard to
+> address. Should I wait until v3?
 
-Removing the now unneeded #include "chardev/char.h" from the 3 files:
-Reviewed-by: Philippe Mathieu-Daud√© <f4bug@amsat.org>
+Yes, please.
+
+Thanks,
+
+		Emilio
