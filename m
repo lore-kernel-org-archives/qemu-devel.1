@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56077)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f9TTr-0007u3-QK
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:41:28 -0400
+	(envelope-from <kraxel@redhat.com>) id 1f9TUZ-0008Og-4V
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:42:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f9TTr-00084X-43
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:41:27 -0400
-Received: from mail-ot0-x231.google.com ([2607:f8b0:4003:c0f::231]:45127)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f9TTq-00083t-WF
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:41:27 -0400
-Received: by mail-ot0-x231.google.com with SMTP id w4-v6so9093517ote.12
-	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 03:41:26 -0700 (PDT)
+	(envelope-from <kraxel@redhat.com>) id 1f9TUV-0008UL-7V
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:42:11 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51316 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1f9TUV-0008UC-3n
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:42:07 -0400
+Date: Fri, 20 Apr 2018 12:41:54 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180420104154.gmqb26t4olj3mbcw@sirius.home.kraxel.org>
+References: <87po2wzysh.fsf@dusky.pond.sub.org>
+	<8a52bb49-4194-3b91-8b67-a0e5700fd6ed@redhat.com>
+	<87in8nvdpn.fsf@dusky.pond.sub.org>
+	<20180419075629.GC10259@redhat.com>
+	<5ed8b01f-7faa-b23d-5fd2-f4715294e061@redhat.com>
+	<20180419091201.GI10259@redhat.com>
+	<a9006770-b4e3-cf57-3efa-c967740f7a94@redhat.com>
+	<20180420093457.GE21035@redhat.com>
+	<20180420094624.ltkg2jbugvgi4de5@sirius.home.kraxel.org>
+	<20180420095053.GG21035@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1523997485-1905-4-git-send-email-alindsay@codeaurora.org>
-References: <1523997485-1905-1-git-send-email-alindsay@codeaurora.org>
-	<1523997485-1905-4-git-send-email-alindsay@codeaurora.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Apr 2018 11:41:05 +0100
-Message-ID: <CAFEAcA-zeQ8T7_ngYm_q+MBJKk6ueMtg5ekLTBJS94tzqTyGkw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 03/21] target/arm: Reorganize PMCCNTR
- accesses
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180420095053.GG21035@redhat.com>
+Subject: Re: [Qemu-devel] [libvirt] [qemu RFC v2] qapi: add "firmware.json"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +35,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aaron Lindsay <alindsay@codeaurora.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
+To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, libvir-list@redhat.com, Michal Privoznik <mprivozn@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Gary Ching-Pang Lin <glin@suse.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <dgibson@redhat.com>
 
-On 17 April 2018 at 21:37, Aaron Lindsay <alindsay@codeaurora.org> wrote:
-> pmccntr_read and pmccntr_write contained duplicate code that was already
-> being handled by pmccntr_sync. Consolidate the duplicated code into two
-> functions: pmccntr_op_start and pmccntr_op_finish. Add a companion to
-> c15_ccnt in CPUARMState so that we can simultaneously save both the
-> architectural register value and the last underlying cycle count - this
-> ensure time isn't lost and will also allow us to access the 'old'
-> architectural register value in order to detect overflows in later
-> patches.
+> > > Since your schema is likely to end up just being a file in docs/specs,
 
-Can we handle the overflow case by setting up a timer that will
-expire when the counter would overflow? We'll want that anyway
-to be able to signal an interrupt on overflows. That would avoid
-the need to have an extra field in the CPU state structure, I think.
-Since PMCCNTR_EL0 is 64 bits it's not going to overflow very often
-so the slight overhead of a timer firing is not going to be a
-problem...
+> > I think it would be useful to have this as part of the schema.  Should
+> > be easy then to write up a small utility then which takes a json file as
+> > input and translates that into qemu command line options.
+> 
+> Currently we have two distinct QAPI schemas, one covering the system
+> emulator for QMP and subset of CLI args, and one covering the guest
+> agent.
 
-thanks
--- PMM
+Yep, we can make it a third one, fine with me.
+But it likewise wouldn't end up in docs/ then.
+
+cheers,
+  Gerd
