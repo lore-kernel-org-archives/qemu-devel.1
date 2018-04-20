@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1f9XPW-0006Ug-3w
+	(envelope-from <pm215@archaic.org.uk>) id 1f9XPW-0006VJ-QY
 	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 10:53:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1f9XPV-0007wb-2C
+	(envelope-from <pm215@archaic.org.uk>) id 1f9XPW-0007xa-0t
 	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 10:53:14 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:40996)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1f9XPU-0007mN-Q3
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 10:53:12 -0400
+	id 1f9XPV-0007mN-PT
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 10:53:13 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Apr 2018 15:52:38 +0100
-Message-Id: <20180420145249.32435-3-peter.maydell@linaro.org>
+Date: Fri, 20 Apr 2018 15:52:37 +0100
+Message-Id: <20180420145249.32435-2-peter.maydell@linaro.org>
 In-Reply-To: <20180420145249.32435-1-peter.maydell@linaro.org>
 References: <20180420145249.32435-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 02/13] hw/arm/fsl-imx*: Don't create "null"
- chardevs for serial devices
+Subject: [Qemu-devel] [PATCH 01/13] hw/char/serial: Allow disconnected
+ chardevs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,89 +28,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@linaro.org, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Following commit 12051d82f004024, UART devices should handle
-being passed a NULL pointer chardev, so we don't need to
-create "null" backends in board code. Remove the code that
-does this and updates serial_hds[].
-
-(fsl-imx7.c was already written this way.)
+Currently the serial.c realize code has an explicit check that it is not
+connected to a disconnected backend (ie one with a NULL chardev).
+This isn't what we want -- you should be able to create a serial device
+even if it isn't attached to anything. Remove the check.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/fsl-imx25.c | 12 +-----------
- hw/arm/fsl-imx31.c | 12 +-----------
- hw/arm/fsl-imx6.c  | 13 +------------
- 3 files changed, 3 insertions(+), 34 deletions(-)
+ hw/char/serial.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/hw/arm/fsl-imx25.c b/hw/arm/fsl-imx25.c
-index cb988a6c25..d7d064e5ce 100644
---- a/hw/arm/fsl-imx25.c
-+++ b/hw/arm/fsl-imx25.c
-@@ -118,17 +118,7 @@ static void fsl_imx25_realize(DeviceState *dev, Error **errp)
-         };
+diff --git a/hw/char/serial.c b/hw/char/serial.c
+index eb72191ee7..2c080c9862 100644
+--- a/hw/char/serial.c
++++ b/hw/char/serial.c
+@@ -923,11 +923,6 @@ static int serial_be_change(void *opaque)
  
-         if (i < MAX_SERIAL_PORTS) {
--            Chardev *chr;
+ void serial_realize_core(SerialState *s, Error **errp)
+ {
+-    if (!qemu_chr_fe_backend_connected(&s->chr)) {
+-        error_setg(errp, "Can't create serial device, empty char device");
+-        return;
+-    }
 -
--            chr = serial_hds[i];
--
--            if (!chr) {
--                char label[20];
--                snprintf(label, sizeof(label), "imx31.uart%d", i);
--                chr = qemu_chr_new(label, "null");
--            }
--
--            qdev_prop_set_chr(DEVICE(&s->uart[i]), "chardev", chr);
-+            qdev_prop_set_chr(DEVICE(&s->uart[i]), "chardev", serial_hds[i]);
-         }
+     s->modem_status_poll = timer_new_ns(QEMU_CLOCK_VIRTUAL, (QEMUTimerCB *) serial_update_msl, s);
  
-         object_property_set_bool(OBJECT(&s->uart[i]), true, "realized", &err);
-diff --git a/hw/arm/fsl-imx31.c b/hw/arm/fsl-imx31.c
-index 3eee83d547..e6c788049d 100644
---- a/hw/arm/fsl-imx31.c
-+++ b/hw/arm/fsl-imx31.c
-@@ -107,17 +107,7 @@ static void fsl_imx31_realize(DeviceState *dev, Error **errp)
-         };
- 
-         if (i < MAX_SERIAL_PORTS) {
--            Chardev *chr;
--
--            chr = serial_hds[i];
--
--            if (!chr) {
--                char label[20];
--                snprintf(label, sizeof(label), "imx31.uart%d", i);
--                chr = qemu_chr_new(label, "null");
--            }
--
--            qdev_prop_set_chr(DEVICE(&s->uart[i]), "chardev", chr);
-+            qdev_prop_set_chr(DEVICE(&s->uart[i]), "chardev", serial_hds[i]);
-         }
- 
-         object_property_set_bool(OBJECT(&s->uart[i]), true, "realized", &err);
-diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
-index 9dfbc9a8c4..ea14de33c6 100644
---- a/hw/arm/fsl-imx6.c
-+++ b/hw/arm/fsl-imx6.c
-@@ -189,18 +189,7 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
-         };
- 
-         if (i < MAX_SERIAL_PORTS) {
--            Chardev *chr;
--
--            chr = serial_hds[i];
--
--            if (!chr) {
--                char *label = g_strdup_printf("imx6.uart%d", i + 1);
--                chr = qemu_chr_new(label, "null");
--                g_free(label);
--                serial_hds[i] = chr;
--            }
--
--            qdev_prop_set_chr(DEVICE(&s->uart[i]), "chardev", chr);
-+            qdev_prop_set_chr(DEVICE(&s->uart[i]), "chardev", serial_hds[i]);
-         }
- 
-         object_property_set_bool(OBJECT(&s->uart[i]), true, "realized", &err);
+     s->fifo_timeout_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, (QEMUTimerCB *) fifo_timeout_int, s);
 -- 
 2.17.0
