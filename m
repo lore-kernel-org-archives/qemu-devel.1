@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f9ahW-0007lR-K7
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 14:24:03 -0400
+	(envelope-from <cota@braap.org>) id 1f9at9-0001Ao-5z
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 14:36:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f9ahU-0007xp-4U
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 14:24:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37704)
+	(envelope-from <cota@braap.org>) id 1f9at5-000739-9H
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 14:36:03 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:60561)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f9ahT-0007vx-Sy
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 14:24:00 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri, 20 Apr 2018 15:19:51 -0300
-Message-Id: <20180420181951.7252-25-ehabkost@redhat.com>
-In-Reply-To: <20180420181951.7252-1-ehabkost@redhat.com>
-References: <20180420181951.7252-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [RFC 24/24] avocado_qemu: Add a few VNC related tests
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f9at5-00072G-27
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 14:35:59 -0400
+Date: Fri, 20 Apr 2018 14:35:57 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180420183557.GA29359@flamenco>
+References: <20180420155045.18862-1-alex.bennee@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20180420155045.18862-1-alex.bennee@linaro.org>
+Subject: Re: [Qemu-devel] [RFC PATCH 0/6] Convert softmmu-template into
+ normal code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,85 +28,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Amador Pahim <apahim@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>, Alistair Francis <alistair23@gmail.com>, Cleber Rosa <crosa@redhat.com>, Fam Zheng <famz@redhat.com>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, richard.henderson@linaro.org, pbonzini@redhat.com
 
-From: Cleber Rosa <crosa@redhat.com>
+On Fri, Apr 20, 2018 at 16:50:39 +0100, Alex Bennée wrote:
+> Any questions/thoughts/comments?
 
-These exercise the basics of firing up QEMU with and without
-a VNC device, and attempting to set the password when a VNC
-device and password is given (or not).
+Very nice!
 
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- tests/avocado/test_vnc.py | 58 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 58 insertions(+)
- create mode 100644 tests/avocado/test_vnc.py
+I modified the style a little bit, namely to pass checkpatch and to
+improve grepability by having
+  foo __attribute__((flatten))
+  function(arg1, arg2, ...)
+as opposed to
+  foo __attribute__((flatten)) function(arg1,
+                                        arg2,
+                                        ...)
 
-diff --git a/tests/avocado/test_vnc.py b/tests/avocado/test_vnc.py
-new file mode 100644
-index 0000000000..f5fe26ead6
---- /dev/null
-+++ b/tests/avocado/test_vnc.py
-@@ -0,0 +1,58 @@
-+from avocado import main
-+from avocado_qemu import test
-+
-+
-+class Vnc(test.QemuTest):
-+    """
-+    :avocado: enable
-+    :avocado: tags=vnc,quick
-+    """
-+    def test_no_vnc(self):
-+        self.vm.args = ['-nodefaults', '-S']
-+        self.vm.launch()
-+        self.assertFalse(self.vm.qmp('query-vnc')['return']['enabled'])
-+
-+    def test_no_vnc_change_password(self):
-+        self.vm.args = ['-nodefaults', '-S']
-+        self.vm.launch()
-+        self.assertFalse(self.vm.qmp('query-vnc')['return']['enabled'])
-+        set_password_response = self.vm.qmp('change',
-+                                            device='vnc',
-+                                            target='password',
-+                                            arg='new_password')
-+        self.assertIn('error', set_password_response)
-+        self.assertEqual(set_password_response['error']['class'],
-+                         'GenericError')
-+        self.assertEqual(set_password_response['error']['desc'],
-+                         'Could not set password')
-+
-+    def test_vnc_change_password_requires_a_password(self):
-+        self.vm.args = ['-nodefaults', '-S', '-vnc', ':0']
-+        self.vm.launch()
-+        self.assertTrue(self.vm.qmp('query-vnc')['return']['enabled'])
-+        set_password_response = self.vm.qmp('change',
-+                                            device='vnc',
-+                                            target='password',
-+                                            arg='new_password')
-+        self.assertIn('error', set_password_response)
-+        self.assertEqual(set_password_response['error']['class'],
-+                         'GenericError')
-+        self.assertEqual(set_password_response['error']['desc'],
-+                         'Could not set password')
-+
-+    def test_vnc_change_password(self):
-+        self.vm.args = ['-nodefaults', '-S', '-vnc', ':0,password']
-+        self.vm.launch()
-+        self.assertTrue(self.vm.qmp('query-vnc')['return']['enabled'])
-+        set_password_response = self.vm.qmp('change',
-+                                            device='vnc',
-+                                            target='password',
-+                                            arg='new_password')
-+        self.assertEqual(set_password_response['return'], {})
-+
-+    def tearDown(self):
-+        self.vm.shutdown()
-+
-+
-+if __name__ == '__main__':
-+    main()
--- 
-2.14.3
+I also changed the patches to make the series simpler: one patch
+to add softmmu.c (without compiling it yet), one patch to
+actually use softmmu.c, and a final patch to remove the template
+file.
+
+You can get my modifications from:
+  https://github.com/cota/qemu/tree/softmmu
+
+Note that there are two stray references to softmmu_template
+in comments:
+$ git grep -i 'softmmu_template'
+accel/tcg/translate-all.c: * Called via softmmu_template.h when code areas are written to with
+accel/tcg/translate-all.c: * Called by softmmu_template.h, with iothread mutex not held.
+
+I don't have time right now to test performance, but at least
+the only function I checked (helper_ret_ldub_mmu) has only grown
+in size by a little bit, from 584 bytes to 614.
+
+The executable is now larger:
+
+- before:
+   text    data     bss     dec     hex filename
+9864951 2944592 4371560 17181103        10629af aarch64-softmmu/qemu-system-aarch64
+
+- after:
+   text    data     bss     dec     hex filename
+9892095 2944592 4371560 17208247        10693b7 aarch64-softmmu/qemu-system-aarch64
+
+By removing flatten we can decrease the overall size, but this might affect perf:
+   text    data     bss     dec     hex filename
+9849967 2944592 4371560 17166119        105ef27 aarch64-softmmu/qemu-system-aarch64
+
+This is a slow path though so it might be worth looking into.
+
+BTW I haven't done any testing, just compile-tested for all targets.
+
+So overall I think this should be upgraded from RFC to a proper patch
+series; hopefully we can get this done for 2.13!
+
+Thanks,
+
+		Emilio
