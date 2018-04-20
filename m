@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f9aeU-00051N-Vs
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 14:20:56 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1f9aef-00059W-T9
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 14:21:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1f9aeQ-00069W-2j
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 14:20:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39520)
+	(envelope-from <ehabkost@redhat.com>) id 1f9aeb-0006oE-03
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 14:21:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38200)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f9aeP-000677-So
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 14:20:50 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1f9aea-0006lQ-Qb
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 14:21:00 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri, 20 Apr 2018 15:19:30 -0300
-Message-Id: <20180420181951.7252-4-ehabkost@redhat.com>
+Date: Fri, 20 Apr 2018 15:19:31 -0300
+Message-Id: <20180420181951.7252-5-ehabkost@redhat.com>
 In-Reply-To: <20180420181951.7252-1-ehabkost@redhat.com>
 References: <20180420181951.7252-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC 03/24] avocado_qemu: Improve handle_prompts to
- allow login after booted vm
+Subject: [Qemu-devel] [RFC 04/24] avocado_qemu: Be lenient towards poluted
+ serial console
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,34 +32,44 @@ Cc: Amador Pahim <apahim@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, =?UT
 
 From: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
 
-When the VM is booted before calling "vm.get_console" this command fails
-to login as there is no new output in the console. Let's just press
-enter (which should be relatively harmless as login asks for the user
-again and when already logged in we might "only" execute what's already
-written.
+The serial console is frequently spammed kernel messages, let's not be
+so strict and match lines also containing other parts.
+
+There is still possibility of failure in case kernel injects message on
+a new line after the expected output producing non-matching last_line.
+Anyway checking for any-line would be a bit too prone to false-positives
+so let's just go with this at this point.
 
 Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- tests/avocado/avocado_qemu/test.py | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ tests/avocado/avocado_qemu/test.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/tests/avocado/avocado_qemu/test.py b/tests/avocado/avocado_q=
 emu/test.py
-index e74de97a3e..9cc163b3a8 100644
+index 9cc163b3a8..fb16785a20 100644
 --- a/tests/avocado/avocado_qemu/test.py
 +++ b/tests/avocado/avocado_qemu/test.py
-@@ -123,7 +123,8 @@ def _handle_prompts(session, username, password, prom=
+@@ -131,9 +131,9 @@ def _handle_prompts(session, username, password, prom=
 pt, timeout=3D10,
-     password_prompt_count =3D 0
-     login_prompt_count =3D 0
-     last_chance =3D False
--
-+    # Send enter to refresh output (in case session was attached after b=
-oot)
-+    session.sendline()
-     output =3D ""
-     while True:
-         try:
+             match, text =3D session.read_until_last_line_matches(
+                 [r"[Aa]re you sure", r"[Pp]assword:\s*",
+                  # Prompt of rescue mode for Red Hat.
+-                 r"\(or (press|type) Control-D to continue\):\s*$",
+-                 r"[Gg]ive.*[Ll]ogin:\s*$",  # Prompt of rescue mode for=
+ SUSE.
+-                 r"(?<![Ll]ast )[Ll]ogin:\s*$",  # Don't match "Last Log=
+in:"
++                 r"\(or (press|type) Control-D to continue\):\s*",
++                 r"[Gg]ive.*[Ll]ogin:\s*",  # Prompt of rescue mode for =
+SUSE.
++                 r"(?<![Ll]ast )[Ll]ogin:\s*",  # Don't match "Last Logi=
+n:"
+                  r"[Cc]onnection.*closed", r"[Cc]onnection.*refused",
+                  r"[Pp]lease wait", r"[Ww]arning", r"[Ee]nter.*username"=
+,
+                  r"[Ee]nter.*password", r"[Cc]onnection timed out", prom=
+pt,
 --=20
 2.14.3
