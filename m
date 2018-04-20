@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f9aFx-0001BC-J4
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 13:55:34 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f9aGT-0001W5-9b
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 13:56:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f9aFw-0007Ld-L0
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 13:55:33 -0400
-Received: from mail-ot0-x22f.google.com ([2607:f8b0:4003:c0f::22f]:37028)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f9aFw-0007KZ-20
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 13:55:32 -0400
-Received: by mail-ot0-x22f.google.com with SMTP id 77-v6so4412225otd.4
-	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 10:55:31 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1f9aGP-0007ow-9b
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 13:56:05 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37472 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f9aGP-0007o0-3w
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 13:56:01 -0400
+References: <20180420145249.32435-1-peter.maydell@linaro.org>
+	<20180420145249.32435-13-peter.maydell@linaro.org>
+	<7c7d48b8-dc72-9c22-85e5-4dead88c991e@redhat.com>
+	<CAFEAcA9E4K=EUxPGHALp4reqSL3AYojBre97N+zsUfPdFCTdng@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4fed0635-d757-ca96-6d71-9daa8fab7e14@redhat.com>
+Date: Fri, 20 Apr 2018 19:55:48 +0200
 MIME-Version: 1.0
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Apr 2018 18:55:10 +0100
-Message-ID: <CAFEAcA_1J-39JgtTabVYad_B1zYV-pq8agvzpmHyRY98RwoiFw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] race between tb_gen_code() and qemu_ram_free()
+In-Reply-To: <CAFEAcA9E4K=EUxPGHALp4reqSL3AYojBre97N+zsUfPdFCTdng@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 12/13] vl.c: Remove compile time limit on
+ number of serial ports
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,36 +31,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Francisco Iglesias <frasse.iglesias@gmail.com>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, KONRAD Frederic <frederic.konrad@adacore.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, "Emilio G. Cota" <cota@braap.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, "Michael S . Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-There seems to be a race between tb_gen_code() and qemu_ram_free(),
-which results in an abort() in Edgar's test case that exercises the
-xilinx-spips mmio-exec functionality.
+On 20/04/2018 19:06, Peter Maydell wrote:
+> On 20 April 2018 at 17:58, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>> On 20/04/2018 16:52, Peter Maydell wrote:
+>>> Instead of having a fixed sized global serial_hds[] array,
+>>> use a local dynamically reallocated one, so we don't have
+>>> a compile time limit on how many serial ports a system has.
+>>>
+>>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>>
+>> Just one question, would it make sense to use a GPtrArray instead?
+> 
+> Hmm. Looking at the GPtrArray API there's no API for
+> "tell me the length of this pointer array", so we'd still
+> have to do the manual bookkeeping for that. And we don't
+> need most of the functionality it provides. So it doesn't
+> really seem like it gains us much over g_renew() to me.
 
-Here's what happens:
- (1) memory_region_invalidate_mmio_ptr() is called, and it deletes
- the temporary ram MemoryRegion. This doesn't immediately result in
- deletion of the RAMBlock (which is done from the RCU thread later)
- (2) we try to execute from this physaddr, so tb_gen_code() is called.
- This calls get_page_addr_code(). Since the RAMBlock hasn't yet
- really been deleted, get_page_addr_code() finds it, and returns a
- ram_addr in the about-to-go-away memory...
- (3) while the CPU thread is busy doing codegen, the RCU thread runs.
- It does a flatview_destroy() which ends up doing an object_unref on the
- memory region, whose destructor calls qemu_ram_free(), removing the
- RAMBlock from the ram list
- (4) when the CPU thread has done its codegen, it calls tb_link_page,
- which calls tb_alloc_page, which calls tlb_protect_code(), with the
- ram_addr that it got in step 2. We end up in tlb_reset_dirty_range_all(),
- which calls qemu_get_ram_block() on that ram_addr.
- (5) qemu_get_ram_block() aborts, because it can't find the RAMBlock
- corresponding to the ram_addr (because we removed it in step 3).
+GPtrArray is a public struct, so you can use array->pdata and
+array->len.  There is a disadvantage, which is that you lose type-safety
+on dereference.
 
-How should we resolve this race ?
-
-(PS: rr is really useful for identifying what's actually happening
-in multi-thread races like this...)
-
-thanks
--- PMM
+Paolo
