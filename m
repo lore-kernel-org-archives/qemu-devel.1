@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f9PdA-0002yL-6K
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 02:34:49 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f9PjP-0005ti-PK
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 02:41:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f9Pd8-00029S-Qd
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 02:34:48 -0400
-Date: Fri, 20 Apr 2018 16:34:37 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1f9PjL-0007re-NT
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 02:41:15 -0400
+Date: Fri, 20 Apr 2018 16:40:57 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180420063437.GM2434@umbus.fritz.box>
+Message-ID: <20180420064057.GN2434@umbus.fritz.box>
 References: <20180417071722.9399-1-david@gibson.dropbear.id.au>
-	<20180417071722.9399-2-david@gibson.dropbear.id.au>
-	<20180419154823.0e937610@bahia.lan>
+	<20180417071722.9399-3-david@gibson.dropbear.id.au>
+	<20180419192105.7eb51b26@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="n1iI6MeELQa9IOaF"
+	protocol="application/pgp-signature"; boundary="fz0LNKsoEivY4NpG"
 Content-Disposition: inline
-In-Reply-To: <20180419154823.0e937610@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH for-2.13 01/10] spapr: Avoid redundant
- calls to spapr_cpu_reset()
+In-Reply-To: <20180419192105.7eb51b26@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH for-2.13 02/10] spapr: Remove support for
+ PowerPC 970 with pseries machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,130 +30,279 @@ To: Greg Kurz <groug@kaod.org>
 Cc: benh@kernel.crashing.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---n1iI6MeELQa9IOaF
+--fz0LNKsoEivY4NpG
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 19, 2018 at 03:48:23PM +0200, Greg Kurz wrote:
-> On Tue, 17 Apr 2018 17:17:13 +1000
+On Thu, Apr 19, 2018 at 07:21:05PM +0200, Greg Kurz wrote:
+> On Tue, 17 Apr 2018 17:17:14 +1000
 > David Gibson <david@gibson.dropbear.id.au> wrote:
 >=20
-> > af81cf323c1 "spapr: CPU hotplug support" added a direct call to
-> > spapr_cpu_reset() in spapr_cpu_init(), as well as registering it as a
-> > reset callback.  That was in order to make sure that the reset function
-> > got called for a newly hotplugged cpu, which would miss the global mach=
-ine
-> > reset.
+> > Current POWER cpus allow for a VRMA, a special mapping which describes a
+> > guest's view of memory when in real mode (MMU off, from the guest's poi=
+nt
+> > of view).  Older cpus didn't have that which meant that to support a gu=
+est
+> > a special host-contiguous region of memory was needed to give the guest=
+ its
+> > Real Mode Area (RMA).
 > >=20
-> > However, this change means that spapr_cpu_reset() gets called twice for
-> > normal cold-plugged cpus: once from spapr_cpu_init(), then again during
-> > the system reset.  As well as being ugly in its redundancy, the first c=
-all
-> > happens before the machine reset calls have happened, which will cause
-> > problems for some things we're going to want to add.
+> > This was useful in the early days of KVM on Power to allow it to be tes=
+ted
+> > on PowerPC 970 chips as used in Macintosh G5 machines.  Now, however, t=
+hose
+> > machines are so old as to be irrelevant, and the host kernel has long s=
+ince
+> > dropped support for this mode.  It hasn't been tested in ages either.
 > >=20
-> > So, we remove the reset call from spapr_cpu_init().  We instead put an
-> > explicit reset call in the hotplug specific path.
+> > So, to simplify the code, drop the support from qemu as well.
+> >=20
+>=20
+> So this could possibly break TCG guests with 970, which happens to be
+> bootable with the current code ?
+
+Hm.. so that's actually a good question.  In theory the HIOR change
+could break TCG.. except that AFAICT we don't do anything with the
+HIOR register except pass it to KVM.
+
+The allocated RMA changes are only relevant with 970 *and* KVM HV.
+And allocate RMA mode was always kind of broken because there was no
+real way to ensure a consistent guest environment between HV and TCG.
+
+The KVM side support for this has been gone for some time.
+
+> $ cat /etc/redhat-release
+> Red Hat Enterprise Linux Server release 6.9 (Santiago)
+> $ cat /proc/cpuinfo=20
+> processor       : 0
+> cpu             : PPC970, altivec supported
+> clock           : 1000.000000MHz
+> revision        : 2.2 (pvr 0039 0202)
+>=20
+> timebase        : 512000000
+> platform        : pSeries
+> model           : IBM pSeries (emulated by qemu)
+> machine         : CHRP IBM pSeries (emulated by qemu)
+>=20
+> I guess nobody uses this setup, but my understanding is that some
+> rules must be followed when it comes to removing something that
+> works.
+>=20
+> https://wiki.qemu.org/Features/LegacyRemoval#Rules_for_removing_an_interf=
+ace
+
+Well, that's for "interfaces" and I'm not really sure if this qualifies.
+
+> Maybe add a warning if 970 is used, and turn it into an error in two rele=
+ases
+> along with this patch ?
+
+I really don't want to wait on that for the rma allocation stuff.
+It's a hideous wart that makes it really, really hard to make other
+changes to the init path (because testing if we broke it means finding
+a real 970 host).
+
+>=20
+> > As well as the code for handling contiguous RMAs, we can remove some
+> > code to set the HIOR register, which existed on 970 but not on the
+> > current and supported CPUs.
 > >=20
 > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > > ---
->=20
-> I had sent a tentative patch to do something similar earlier this year:
->=20
-> https://patchwork.ozlabs.org/patch/862116/
->=20
-> but it got nacked for several reasons, one of them being you were
-> "always wary of using the hotplugged parameter, because what qemu
-> means by it often doesn't line up with what PAPR means by it."
-
-Yeah, I was and am wary of that, but convinced myself it was correct
-in this case (which doesn't really interact with the PAPR meaning of
-hotplug).
-
-> >  hw/ppc/spapr.c                  |  6 ++++--
-> >  hw/ppc/spapr_cpu_core.c         | 13 ++++++++++++-
-> >  include/hw/ppc/spapr_cpu_core.h |  2 ++
-> >  3 files changed, 18 insertions(+), 3 deletions(-)
+> >  hw/ppc/spapr.c          | 61 +++++++++++++++--------------------------=
+--------
+> >  hw/ppc/spapr_cpu_core.c |  2 --
+> >  target/ppc/kvm.c        | 36 -----------------------------
+> >  target/ppc/kvm_ppc.h    |  6 -----
+> >  4 files changed, 19 insertions(+), 86 deletions(-)
 > >=20
 > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 7b2bc4e25d..81b50af3b5 100644
+> > index 81b50af3b5..fbb2c6752c 100644
 > > --- a/hw/ppc/spapr.c
 > > +++ b/hw/ppc/spapr.c
-> > @@ -3370,9 +3370,11 @@ static void spapr_core_plug(HotplugHandler *hotp=
-lug_dev, DeviceState *dev,
+> > @@ -2376,9 +2376,6 @@ static void spapr_machine_init(MachineState *mach=
+ine)
+> >      int i;
+> >      MemoryRegion *sysmem =3D get_system_memory();
+> >      MemoryRegion *ram =3D g_new(MemoryRegion, 1);
+> > -    MemoryRegion *rma_region;
+> > -    void *rma =3D NULL;
+> > -    hwaddr rma_alloc_size;
+> >      hwaddr node0_size =3D spapr_node0_size(machine);
+> >      long load_limit, fw_size;
+> >      char *filename;
+> > @@ -2417,40 +2414,28 @@ static void spapr_machine_init(MachineState *ma=
+chine)
+> >          exit(1);
+> >      }
 > > =20
-> >          if (hotplugged) {
->=20
-> ... but you rely on it here. Can you explain why it is
-> okay now ?
-
-So the value I actually need here is "wasn't present at the last
-system reset" (with false positives being mostly harmless, but not
-false negatives).
-
-> Also, if QEMU is started with -incoming and the CPU core
-> is hotplugged before migration begins, the following will
-> return false:
->=20
-> static inline bool spapr_drc_hotplugged(DeviceState *dev)
-> {
->     return dev->hotplugged && !runstate_check(RUN_STATE_INMIGRATE);
-> }
->=20
-> and the CPU core won't be reset.
-
-Uh... spapr_dtc_hotplugged() would definitely be wrong here, which is
-why I'm not using it.
-
->=20
-> >              /*
-> > -             * Send hotplug notification interrupt to the guest only
-> > -             * in case of hotplugged CPUs.
-> > +             * For hotplugged CPUs, we need to reset them (they missed
-> > +             * out on the system reset), and send the guest a
-> > +             * notification
-> >               */
-> > +            spapr_cpu_core_reset(core);
->=20
-> spapr_cpu_reset() also sets the compat mode, which is used
-> to set some properties in the DT, ie, this should be called
-> before spapr_populate_hotplug_cpu_dt().
-
-Good point.  I've moved the reset to fix that.
-
->=20
-> >              spapr_hotplug_req_add_by_index(drc);
-> >          } else {
-> >              spapr_drc_reset(drc);
+> > -    /* Allocate RMA if necessary */
+> > -    rma_alloc_size =3D kvmppc_alloc_rma(&rma);
+> > +    spapr->rma_size =3D node0_size;
+> > =20
+> > -    if (rma_alloc_size =3D=3D -1) {
+> > -        error_report("Unable to create RMA");
+> > -        exit(1);
+> > +    /* With KVM, we don't actually know whether KVM supports an
+> > +     * unbounded RMA (PR KVM) or is limited by the hash table size (HV
+> > +     * KVM using VRMA), so we always assume the latter
+> > +     *
+> > +     * In that case, we also limit the initial allocations for RTAS
+> > +     * etc... to 256M since we have no way to know what the VRMA size
+> > +     * is going to be as it depends on the size of the hash table
+> > +     * isn't determined yet.
+> > +     */
+> > +    if (kvm_enabled()) {
+> > +        spapr->vrma_adjust =3D 1;
+> > +        spapr->rma_size =3D MIN(spapr->rma_size, 0x10000000);
+> >      }
+> > =20
+> > -    if (rma_alloc_size && (rma_alloc_size < node0_size)) {
+> > -        spapr->rma_size =3D rma_alloc_size;
+> > -    } else {
+> > -        spapr->rma_size =3D node0_size;
+> > -
+> > -        /* With KVM, we don't actually know whether KVM supports an
+> > -         * unbounded RMA (PR KVM) or is limited by the hash table size
+> > -         * (HV KVM using VRMA), so we always assume the latter
+> > -         *
+> > -         * In that case, we also limit the initial allocations for RTAS
+> > -         * etc... to 256M since we have no way to know what the VRMA s=
+ize
+> > -         * is going to be as it depends on the size of the hash table
+> > -         * isn't determined yet.
+> > -         */
+> > -        if (kvm_enabled()) {
+> > -            spapr->vrma_adjust =3D 1;
+> > -            spapr->rma_size =3D MIN(spapr->rma_size, 0x10000000);
+> > -        }
+> > -
+> > -        /* Actually we don't support unbounded RMA anymore since we
+> > -         * added proper emulation of HV mode. The max we can get is
+> > -         * 16G which also happens to be what we configure for PAPR
+> > -         * mode so make sure we don't do anything bigger than that
+> > -         */
+> > -        spapr->rma_size =3D MIN(spapr->rma_size, 0x400000000ull);
+> > -    }
+> > +    /* Actually we don't support unbounded RMA anymore since we
+> > +     * added proper emulation of HV mode. The max we can get is
+> > +     * 16G which also happens to be what we configure for PAPR
+> > +     * mode so make sure we don't do anything bigger than that
+> > +     */
+> > +    spapr->rma_size =3D MIN(spapr->rma_size, 0x400000000ull);
+> > =20
+> >      if (spapr->rma_size > node0_size) {
+> >          error_report("Numa node 0 has to span the RMA (%#08"HWADDR_PRI=
+x")",
+> > @@ -2508,14 +2493,6 @@ static void spapr_machine_init(MachineState *mac=
+hine)
+> >                                           machine->ram_size);
+> >      memory_region_add_subregion(sysmem, 0, ram);
+> > =20
+> > -    if (rma_alloc_size && rma) {
+> > -        rma_region =3D g_new(MemoryRegion, 1);
+> > -        memory_region_init_ram_ptr(rma_region, NULL, "ppc_spapr.rma",
+> > -                                   rma_alloc_size, rma);
+> > -        vmstate_register_ram_global(rma_region);
+> > -        memory_region_add_subregion(sysmem, 0, rma_region);
+> > -    }
+> > -
+> >      /* initialize hotplug memory address space */
+> >      if (machine->ram_size < machine->maxram_size) {
+> >          ram_addr_t hotplug_mem_size =3D machine->maxram_size - machine=
+->ram_size;
 > > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> > index 94afeb399e..aa17626cda 100644
+> > index aa17626cda..f39d99a8da 100644
 > > --- a/hw/ppc/spapr_cpu_core.c
 > > +++ b/hw/ppc/spapr_cpu_core.c
-> > @@ -70,7 +70,6 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, =
-PowerPCCPU *cpu,
-> >      cpu_ppc_set_papr(cpu, PPC_VIRTUAL_HYPERVISOR(spapr));
+> > @@ -36,8 +36,6 @@ static void spapr_cpu_reset(void *opaque)
+> >       * using an RTAS call */
+> >      cs->halted =3D 1;
 > > =20
-> >      qemu_register_reset(spapr_cpu_reset, cpu);
-> > -    spapr_cpu_reset(cpu);
+> > -    env->spr[SPR_HIOR] =3D 0;
+> > -
+> >      /* Disable Power-saving mode Exit Cause exceptions for the CPU.
+> >       * This can cause issues when rebooting the guest if a secondary
+> >       * is awaken */
+> > diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> > index 6de59c5b21..51177a8e00 100644
+> > --- a/target/ppc/kvm.c
+> > +++ b/target/ppc/kvm.c
+> > @@ -2159,42 +2159,6 @@ void kvmppc_hint_smt_possible(Error **errp)
+> > =20
+> > =20
+> >  #ifdef TARGET_PPC64
+> > -off_t kvmppc_alloc_rma(void **rma)
+> > -{
+> > -    off_t size;
+> > -    int fd;
+> > -    struct kvm_allocate_rma ret;
+> > -
+> > -    /* If cap_ppc_rma =3D=3D 0, contiguous RMA allocation is not suppo=
+rted
+> > -     * if cap_ppc_rma =3D=3D 1, contiguous RMA allocation is supported=
+, but
+> > -     *                      not necessary on this hardware
+> > -     * if cap_ppc_rma =3D=3D 2, contiguous RMA allocation is needed on=
+ this hardware
+> > -     *
+> > -     * FIXME: We should allow the user to force contiguous RMA
+> > -     * allocation in the cap_ppc_rma=3D=3D1 case.
+> > -     */
+> > -    if (cap_ppc_rma < 2) {
+> > -        return 0;
+> > -    }
+> > -
+> > -    fd =3D kvm_vm_ioctl(kvm_state, KVM_ALLOCATE_RMA, &ret);
+> > -    if (fd < 0) {
+> > -        fprintf(stderr, "KVM: Error on KVM_ALLOCATE_RMA: %s\n",
+> > -                strerror(errno));
+> > -        return -1;
+> > -    }
+> > -
+> > -    size =3D MIN(ret.rma_size, 256ul << 20);
+> > -
+> > -    *rma =3D mmap(NULL, size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+> > -    if (*rma =3D=3D MAP_FAILED) {
+> > -        fprintf(stderr, "KVM: Error mapping RMA: %s\n", strerror(errno=
+));
+> > -        return -1;
+> > -    };
+> > -
+> > -    return size;
+> > -}
+> > -
+> >  uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shif=
+t)
+> >  {
+> >      struct kvm_ppc_smmu_info info;
+> > diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+> > index 4d2789eef6..e2840e1d33 100644
+> > --- a/target/ppc/kvm_ppc.h
+> > +++ b/target/ppc/kvm_ppc.h
+> > @@ -37,7 +37,6 @@ target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu,
+> >                                       bool radix, bool gtse,
+> >                                       uint64_t proc_tbl);
+> >  #ifndef CONFIG_USER_ONLY
+> > -off_t kvmppc_alloc_rma(void **rma);
+> >  bool kvmppc_spapr_use_multitce(void);
+> >  int kvmppc_spapr_enable_inkernel_multitce(void);
+> >  void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
+> > @@ -188,11 +187,6 @@ static inline target_ulong kvmppc_configure_v3_mmu=
+(PowerPCCPU *cpu,
+> >  }
+> > =20
+> >  #ifndef CONFIG_USER_ONLY
+> > -static inline off_t kvmppc_alloc_rma(void **rma)
+> > -{
+> > -    return 0;
+> > -}
+> > -
+> >  static inline bool kvmppc_spapr_use_multitce(void)
+> >  {
+> >      return false;
 >=20
-> spapr_cpu_reset() also sets cs->halted to 1, to let the guest start
-> non-boot CPUs with an RTAS call. With this change, a hotplugged CPU
-> is started right away and may run in the guest before the hotplug
-> path could even reset it.
-
-Uh.. I was assuming the plug path (the qemu side, obviously, not the
-guest side) would be completed before the cpu could execute.  If
-that's not the case I'll definitely have to rethink this.
-
-> Not sure how to handle that other than setting halted to 1 in
-> spapr_cpu_init() as well, but you already nacked that approach
-> because it would mean "poking specifics in a CPU that hasn't
-> already been set to a known state by a reset"...
-
-Yeah.. I may have been off base with that comment.  Bear in mind that
-at the time I didn't see a specific reason to avoid the double reset -
-now I do.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -161,24 +310,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---n1iI6MeELQa9IOaF
+--fz0LNKsoEivY4NpG
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrZifsACgkQbDjKyiDZ
-s5JfrxAAym+zveqMdPjmG77HlPAEFZBf0b22OtvgQ65IOtXBavcxxHkjEQrjrFFz
-U2LkYdkbH8aF3P5e+as0OYR2FWC89uWB7BhZHVa1kxovxm7B39goLT4IJWoaqz0v
-ftuEY8FkDlwLToxWAdFvkyUBO9ze0qYc4sQhAHD+rizKxfxtKKotaj4Wb03wHb2B
-qHCSFsJ9nnOaU5oLJE3WttLg+Lw7WNxKZQzGTYdwydtbu0EHhNb84bdi2nUvrc+0
-3gaPIluygnQKMRGg8PHBxpJsX3QnR9XU2bQRx4yVatdjXshiGlOB0i1pHv1eWTjW
-3PaKhbx01tHJGINPZWjfe9716hKbBLc53brDmgldPyv4EuNK9b1ic3lfV/z50nDD
-Hh3+iMVrJhaakat92CtTeciG6NKfmsQGO4ejTAC8B4YEFtev9pAtKPeaJ6d4KRWo
-sVDjtVGsFMdp8+sYb+FPxMsnUo/78NdGHP5KfJ/YSH+hENfxXpkivSM6a70UnTvX
-kj4dlKrgHOv9kQiu0NCB9MaVDa8BaG/s9NwdkHDs2v8xpG1MwBbpX0ReUf+PqSRq
-gP2VN2ZqsegU/nUKU/+xzTi2TZR6b4HCkOlldMuOnivcPUm2WfewLDu1jy/yRzd5
-yck5EiLzYAm4al9bIXszzAxBBxzUWmuvw8To6VEKeYaxEhgk/44=
-=V527
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrZi3kACgkQbDjKyiDZ
+s5Lz7w//bUHZyXH+NI78+Gtneh3L5U8K3pqFw+eW5wjqPcO8AG72EU2fEWyul0aT
+mGyOlI4qZerqx2RPh/I9mbctiWZ+ADfifg0TGPmM/wkOLz4fzDqqmDefw+tmHFo1
+wOaPfp78sCg7634FPASD8A9K9TBKg/VxEBWMFjHQ3JWKbd2pmxYI9vrw/NYvOZpF
+Zec8oLWggkQ6CwqWrTO1nh38b9P/apBUdnmQ1lXMXMxsr6g3IoKG5XetSKXXnSyQ
+SNwWWZ4I6xExRl0t+4JMeaZ+g4VIOKdz9iO3m61P2DD7A3zaQvwpm0a5X+c9GMq0
+TquwAmi1dvxo5GmIBGO8chBG7zGWvmhlKczUk9PKDWGn/SLgejfNeun/xa9doWEm
+qekWCq90PPtEMoDT8kFg9EqBWWH7/rI5x6/Lrjvaftg3iDh3byOSgyQQjCi4wD0h
+wHVj2XDHZ9AgvSxiLbjmQPfAiv9/tsT1KU0Ix0pAtq6pwD8+mc7ns5gQwkKZFVZI
+Ng2fyM2l5jsEOPDYQkaeMBXKAibf58wtyd1YPBvxZV27XjCdWQ5G2c2Dt6BSahjr
+UUNZLkSPevID2lo3SMs4wyM/+DKtyKCfKvwjxvZlp3idJruULHqQJAvs+fiBieqz
+HDtmWOyQrBf96/SerE0557kpVR6i0LU0A3d/4WEXhzh7W5sycFY=
+=v2cn
 -----END PGP SIGNATURE-----
 
---n1iI6MeELQa9IOaF--
+--fz0LNKsoEivY4NpG--
