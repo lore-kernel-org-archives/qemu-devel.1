@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43445)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43468)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1f9XPS-0006Ql-Rd
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 10:53:11 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1f9XPT-0006Rn-SJ
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 10:53:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1f9XPS-0007tw-6W
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 10:53:10 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1f9XPT-0007un-4e
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 10:53:11 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:40996)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1f9XPS-0007mN-08
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 10:53:10 -0400
+	id 1f9XPS-0007mN-Ue
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 10:53:11 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Apr 2018 15:52:41 +0100
-Message-Id: <20180420145249.32435-6-peter.maydell@linaro.org>
+Date: Fri, 20 Apr 2018 15:52:40 +0100
+Message-Id: <20180420145249.32435-5-peter.maydell@linaro.org>
 In-Reply-To: <20180420145249.32435-1-peter.maydell@linaro.org>
 References: <20180420145249.32435-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 05/13] hw/xtensa/xtfpga.c: Don't create "null"
+Subject: [Qemu-devel] [PATCH 04/13] hw/mips/mips_malta: Don't create "null"
  chardevs for serial devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -35,23 +35,24 @@ does this and updates serial_hds[].
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/xtensa/xtfpga.c | 4 ----
- 1 file changed, 4 deletions(-)
+ hw/mips/mips_malta.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-index 70686a2eb1..9db99e1f7e 100644
---- a/hw/xtensa/xtfpga.c
-+++ b/hw/xtensa/xtfpga.c
-@@ -278,10 +278,6 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
-                 xtensa_get_extint(env, 1), nd_table);
-     }
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index f6513a4fd5..49fe7a0a72 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -1056,11 +1056,6 @@ void mips_malta_init(MachineState *machine)
  
--    if (!serial_hds[0]) {
--        serial_hds[0] = qemu_chr_new("serial0", "null");
+     /* FPGA */
+ 
+-    /* Make sure the second serial port is associated with a device. */
+-    if (!serial_hds[2]) {
+-        serial_hds[2] = qemu_chr_new("fpga-uart", "null");
 -    }
 -
-     serial_mm_init(system_io, 0x0d050020, 2, xtensa_get_extint(env, 0),
-             115200, serial_hds[0], DEVICE_NATIVE_ENDIAN);
+     /* The CBUS UART is attached to the MIPS CPU INT2 pin, ie interrupt 4 */
+     malta_fpga_init(system_memory, FPGA_ADDRESS, cbus_irq, serial_hds[2]);
  
 -- 
 2.17.0
