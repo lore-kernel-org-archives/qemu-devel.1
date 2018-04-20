@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37128)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f9Yer-000725-Kl
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:13:10 -0400
+	(envelope-from <ctlaltlaltc@gmail.com>) id 1f9Yg0-0007l9-VJ
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:14:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f9Yeo-0007zI-Gp
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:13:09 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:41406)
+	(envelope-from <ctlaltlaltc@gmail.com>) id 1f9Yfx-0000cE-S5
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:14:20 -0400
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:38825)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f9Yeo-0007yx-9u
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:13:06 -0400
-Received: by mail-wr0-x242.google.com with SMTP id v24-v6so24356506wra.8
-	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 09:13:06 -0700 (PDT)
-References: <1522980788-1252-1-git-send-email-cota@braap.org>
-	<1522980788-1252-15-git-send-email-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1522980788-1252-15-git-send-email-cota@braap.org>
-Date: Fri, 20 Apr 2018 17:13:03 +0100
-Message-ID: <87k1t1amb4.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <ctlaltlaltc@gmail.com>)
+	id 1f9Yfx-0000bi-M0
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:14:17 -0400
+Received: by mail-pf0-f193.google.com with SMTP id y69so4506219pfb.5
+	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 09:14:17 -0700 (PDT)
+Received: from lijunpengdembp (li991-244.members.linode.com. [45.33.41.244])
+	by smtp.gmail.com with ESMTPSA id
+	t80sm9244720pgb.36.2018.04.20.09.14.15 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Fri, 20 Apr 2018 09:14:16 -0700 (PDT)
+From: Junpeng.Li <ctlaltlaltc@gmail.com>
+Date: Sat, 21 Apr 2018 00:14:13 +0800
+Message-ID: <m2efj9q2i2.fsf@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 14/17] translate-all: protect TB jumps
- with a per-destination-TB lock
+Content-Type: text/plain
+Subject: [Qemu-devel] qemu-io read do not dump buffer when in quiet mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,55 +31,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
 
 
-Emilio G. Cota <cota@braap.org> writes:
+Hi, everyone. I found a question or maybe a bug during use qemu-io to read
+a range file and take the params -vq to dump buffer and do not show
+I/O statistics. I use the params -vq what i want is just dump buffer
+but do not show I/O statistics, but as the result show it is not.
 
-> This applies to both user-mode and !user-mode emulation.
->
-> Instead of relying on a global lock, protect the list of incoming
-> jumps with tb->jmp_lock. This lock also protects tb->cflags,
-> so update all tb->cflags readers outside tb->jmp_lock to use
-> atomic reads via tb_cflags().
->
-> In order to find the destination TB (and therefore its jmp_lock)
-> from the origin TB, we introduce tb->jmp_dest[].
->
-> I considered not using a linked list of jumps, which simplifies
-> code and makes the struct smaller. However, it unnecessarily increases
-> memory usage, which results in a performance decrease. See for
-> instance these numbers booting+shutting down debian-arm:
->                       Time (s)  Rel. err (%)  Abs. err (s)  Rel. slowdown=
- (%)
-> -------------------------------------------------------------------------=
------
->  before                  20.88          0.74      0.154512               =
-  0.
->  after                   20.81          0.38      0.079078        -0.3352=
-4904
->  GTree                   21.02          0.28      0.058856         0.6704=
-9808
->  GHashTable + xxhash     21.63          1.08      0.233604          3.591=
-9540
->
-> Using a hash table or a binary tree to keep track of the jumps
-> doesn't really pay off, not only due to the increased memory usage,
-> but also because most TBs have only 0 or 1 jumps to them. The maximum
-> number of jumps when booting debian-arm that I measured is 35, but
-> as we can see in the histogram below a TB with that many incoming jumps
-> is extremely rare; the average TB has 0.80 incoming jumps.
->
-> n_jumps: 379208; avg jumps/tb: 0.801099
-> dist: [0.0,1.0)|=E2=96=84=E2=96=88=E2=96=81=E2=96=81=E2=96=81=E2=96=81=E2=
-=96=81=E2=96=81=E2=96=81=E2=96=81=E2=96=81=E2=96=81=E2=96=81 =E2=96=81=E2=
-=96=81=E2=96=81=E2=96=81=E2=96=81=E2=96=81 =E2=96=81=E2=96=81=E2=96=81  =E2=
-=96=81=E2=96=81=E2=96=81     =E2=96=81|[34.0,35.0]
->
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
+Like below command, it do not dump buffer to standard output.
 
-This now conflicts with master
+qemu-io -r -c "read -vq 0 1024" /tmp/test.qcow2
+
+I saw the source code, when has qflag value it just goto out and do
+not dump buffer when qflag and vflag has value at the same time.
+
+    if (qflag) {
+        goto out;
+    }
+
+    if (vflag) {
+        dump_buffer(buf, offset, qiov.size);
+    }
+
+quiet mode here, it mean do not show I/O statistics or mean complete quiet?
 
 --
-Alex Benn=C3=A9e
+BestRegard,
+JPL
