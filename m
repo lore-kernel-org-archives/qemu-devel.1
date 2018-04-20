@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1f9RXY-0006ok-L8
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:37:09 -0400
+	(envelope-from <stefanha@gmail.com>) id 1f9RYk-0007ov-R4
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:38:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1f9RXY-0005G1-15
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:37:08 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20180411185425.2461-7-mreitz@redhat.com>
-References: <20180411185425.2461-1-mreitz@redhat.com>
-	<20180411185425.2461-7-mreitz@redhat.com>
-Date: Fri, 20 Apr 2018 10:36:26 +0200
-Message-ID: <w5136zqxoj9.fsf@maestria.local.igalia.com>
+	(envelope-from <stefanha@gmail.com>) id 1f9RYk-0006gv-4O
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:38:22 -0400
+Date: Fri, 20 Apr 2018 16:38:13 +0800
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180420083813.GP15181@stefanha-x1.localdomain>
+References: <20180416165849.28864-1-mreitz@redhat.com>
+	<20180416165849.28864-8-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v4 06/13] block: Generalize
- should_update_child() rule
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="qSHHer9gQ0dtepKr"
+Content-Disposition: inline
+In-Reply-To: <20180416165849.28864-8-mreitz@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 7/9] iotests: Clean up wrap
+ image in 197
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,20 +25,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Wed 11 Apr 2018 08:54:18 PM CEST, Max Reitz wrote:
-> index c4dd1d4bb8..8d63a1b0c1 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -616,6 +616,8 @@ struct BdrvChild {
->      QLIST_ENTRY(BdrvChild) next_parent;
->  };
->  
-> +typedef QLIST_HEAD(BdrvChildList, BdrvChild) BdrvChildList;
-> +
 
-I forgot to mention this in a previous e-mail, but what's this used for?
+--qSHHer9gQ0dtepKr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Berto
+On Mon, Apr 16, 2018 at 06:58:47PM +0200, Max Reitz wrote:
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/qemu-iotests/197 | 1 +
+>  1 file changed, 1 insertion(+)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--qSHHer9gQ0dtepKr
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJa2ab1AAoJEJykq7OBq3PIcDMH/0OChT1kaBXvufWCcbvSSdeD
++32IwOGLmiLkg4yaCqhYAlEfvrr3zeMiTNk59zrB7trqtX39X7ZciyjGjAba0GuB
+DJ/K/Ts8U33C0tn0vjVwEV9XzHu6aYJlLfbb9Jn/N8RazuCXrvLWIDAAsi3BvN0J
+FteJ/CQ1NMHTnumEpWXZ7jvdFJRX8VAt/CkbgUuHELSv3wdjtodNAfYfvrtDckvr
+fPWDZf43Qi2TD0bIpKPdFBxJrhD/EIlXz4pQ7gAnjPO0+eAqQE4UbKLv2F/oqzMn
+jzhO14MEzg1Hcwv/IvSsnB6jXzgpyFPnNQ8YDCRT7bRA+nfFFkIJnoXfNuWur2I=
+=93ds
+-----END PGP SIGNATURE-----
+
+--qSHHer9gQ0dtepKr--
