@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1f9Xuu-0001zd-Lq
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:25:41 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f9Y42-0004yz-Lr
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:35:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1f9Xup-00039T-Km
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:25:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36404 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1f9Xup-00034n-GL
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:25:35 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri, 20 Apr 2018 17:25:11 +0200
-Message-Id: <20180420152511.18878-1-marcandre.lureau@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1f9Y3y-00022X-Ku
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:35:06 -0400
+References: <20180419072123.682-1-david@gibson.dropbear.id.au>
+	<20180419183037.21826f8a@bahia.lan>
+	<20180420021803.GC2434@umbus.fritz.box>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <53e6af87-5f29-95d9-a921-bdad5a8e1ed2@redhat.com>
+Date: Fri, 20 Apr 2018 17:34:38 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] qemu-ga: make get-fsinfo work over pci bridges
+In-Reply-To: <20180420021803.GC2434@umbus.fritz.box>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="It2e6Ar9q4KNJiwh1oaXlsTKWzKtjt0nz"
+Subject: Re: [Qemu-devel] [PATCH for-2.13] Clear mem_path if we fall back to
+ anonymous RAM allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,54 +26,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: lersek@redhat.com, mdroth@linux.vnet.ibm.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
+Cc: imammedo@redhat.com, ehabkost@redhat.com, clg@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Iterate over the PCI bridges to lookup the PCI device associated with
-the block device.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--It2e6Ar9q4KNJiwh1oaXlsTKWzKtjt0nz
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
+Cc: imammedo@redhat.com, ehabkost@redhat.com, clg@kaod.org,
+ qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Message-ID: <53e6af87-5f29-95d9-a921-bdad5a8e1ed2@redhat.com>
+Subject: Re: [PATCH for-2.13] Clear mem_path if we fall back to anonymous RAM
+ allocation
+References: <20180419072123.682-1-david@gibson.dropbear.id.au>
+ <20180419183037.21826f8a@bahia.lan> <20180420021803.GC2434@umbus.fritz.box>
+In-Reply-To: <20180420021803.GC2434@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-Fixes:
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1567041
+On 20/04/2018 04:18, David Gibson wrote:
+> Paolo et al, as with my earlier patches adding some extensions to the
+> helpers for determining backing page sizes, if there are no objections
+> can I get an ack to merge this via my ppc tree?
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- qga/commands-posix.c | 21 ++++++++++++++++++---
- 1 file changed, 18 insertions(+), 3 deletions(-)
+Yes, go ahead!
 
-diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index 0dc219dbcf..5d4e5f627f 100644
---- a/qga/commands-posix.c
-+++ b/qga/commands-posix.c
-@@ -879,9 +879,24 @@ static void build_guest_fsinfo_for_real_device(char =
-const *syspath,
-         return;
-     }
-=20
--    driver =3D get_pci_driver(syspath, (p + 12 + pcilen) - syspath, errp=
-);
--    if (!driver) {
--        goto cleanup;
-+    p +=3D 12 + pcilen;
-+    while (true) {
-+        driver =3D get_pci_driver(syspath, p - syspath, errp);
-+        if (!driver) {
-+            goto cleanup;
-+        }
-+
-+        if (g_str_equal(driver, "pcieport")) {
-+            if (sscanf(p, "/%x:%x:%x.%x%n",
-+                       pci, pci + 1, pci + 2, pci + 3, &pcilen) < 4) {
-+                g_debug("only pci device is supported: sysfs path \"%s\"=
-",
-+                        syspath);
-+                return;
-+            }
-+            p +=3D pcilen;
-+            continue;
-+        }
-+        break;
-     }
-=20
-     p =3D strstr(syspath, "/target");
---=20
-2.17.0.253.g3dd125b46d
+Thanks,
+
+Paolo
+
+
+--It2e6Ar9q4KNJiwh1oaXlsTKWzKtjt0nz
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAlraCI8ACgkQv/vSX3jH
+roMdngf/XkPWjL7RZOulhe4fDtYQlnMxF899KThDOUV2kFkxgHtNH6t0aoVrLpR7
+2qM5o3iSdyZc5dJZRkNpYfcY9uT95pYrJ+4YANEwGinR1B90jz1UAfQOyIjPg4m/
+nuWf4q8ywPMnv0JJ/nrkrdsi01WXxpj0AxHkKn749MgSOu4CUOK5+Dwh26xM6PmH
+XfFhr7GKujGm02etzISObY2VJ1wi+27lcKPftrQcubYXAewmntwOP06QBDf4uqgF
+KHRdcJfdy1l38GDIfczWLhuh14F++Hmb6RkF/eeyt16jwJVOqJfnTzLD3lDxzfXn
+NCYOTe2ZGMdmwSACgzH5lRfO9oX96g==
+=F0Ps
+-----END PGP SIGNATURE-----
+
+--It2e6Ar9q4KNJiwh1oaXlsTKWzKtjt0nz--
