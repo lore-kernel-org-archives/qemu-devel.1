@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36503)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f9ThZ-0000TX-2j
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:55:38 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f9Tmo-0003yw-8n
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 07:01:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f9ThY-00031E-9q
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:55:37 -0400
-Received: from mail-oi0-x229.google.com ([2607:f8b0:4003:c06::229]:35647)
+	(envelope-from <peter.maydell@linaro.org>) id 1f9Tmn-0000Tp-Ds
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 07:01:02 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:35408)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f9ThY-00030w-51
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:55:36 -0400
-Received: by mail-oi0-x229.google.com with SMTP id c15-v6so7651322oic.2
-	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 03:55:35 -0700 (PDT)
+	id 1f9Tmn-0000TW-9V
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 07:01:01 -0400
+Received: by mail-oi0-x244.google.com with SMTP id c15-v6so7662590oic.2
+	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 04:01:01 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1523997485-1905-1-git-send-email-alindsay@codeaurora.org>
-References: <1523997485-1905-1-git-send-email-alindsay@codeaurora.org>
+In-Reply-To: <60b519a7-f49b-95e7-b9db-3e74133cf8c0@amsat.org>
+References: <20180419135901.30035-1-alex.bennee@linaro.org>
+	<20180419135901.30035-32-alex.bennee@linaro.org>
+	<8ccf1143-5895-ca8b-eea5-c7d96c992455@amsat.org>
+	<87vacn9jd5.fsf@linaro.org>
+	<CAFEAcA8u5sfzcoqGhAagoUj6cE014hdyRgdm6=LBDfE9rV+cjw@mail.gmail.com>
+	<60b519a7-f49b-95e7-b9db-3e74133cf8c0@amsat.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Apr 2018 11:55:14 +0100
-Message-ID: <CAFEAcA847b02nswyaUipGNnJUYRyMt5GyA3mgX_NbaUtqQWyBw@mail.gmail.com>
+Date: Fri, 20 Apr 2018 12:00:38 +0100
+Message-ID: <CAFEAcA_O_ihi0wp_J08nBuz=sFVLOZcbR31gHDgajWyda-24Cg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 00/21] More fully implement ARM PMUv3
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 31/43] tests/tcg: enable building for
+ MIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +35,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aaron Lindsay <alindsay@codeaurora.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, "Emilio G. Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, andrzej zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, Yongbok Kim <yongbok.kim@mips.com>
 
-On 17 April 2018 at 21:37, Aaron Lindsay <alindsay@codeaurora.org> wrote:
-> The ARM PMU implementation currently contains a basic cycle counter, but it is
-> often useful to gather counts of other events and filter them based on
-> execution mode. These patches flesh out the implementations of various PMU
-> registers including PM[X]EVCNTR and PM[X]EVTYPER, add a struct definition to
-> represent arbitrary counter types, implement mode filtering, send interrupts on
-> counter overflow, and add instruction, cycle, and software increment events.
+On 20 April 2018 at 03:57, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wr=
+ote:
+> On 04/19/2018 02:58 PM, Peter Maydell wrote:
+>> I don't think we really want to get into the business of
+>> building our own cross compilers if we can avoid it...it's harder
+>> than it looks and we would be essentially reinventing the wheel.
 >
-> Notable changes since v3:
+> I totally agree.
 >
-> * Detect counter overflow and send interrupts accordingly (adds a 'shadow' copy
->   of both PMCCNTR and general-purpose counters, possibly/probably Doing It
->   Wrong)
-> * Update counter filtering code to more closely resemble the ARM documentation
->   in form and functionality
-> * Don't mix EL change hooks and KVM
-> * Don't call gen_io_start/end if not actually using icount
-> * Reorganized a few of the patches to more logically group changes
-> * Clarify and otherwise improve a few comments
-> * There are also a number of less significant changes scattered around
+> I'v been looking at existing maintained images we can use to
+> cross-build, so we only have to pull (download) and image and use it,
+> not wasting cpu time building it.
 
-In the interests of cutting down the size of this patchset for
-future rounds, I'm going to apply these patches to target-arm.next:
+Projects that are in the "maintain cross toolchains" business:
+ * buildroot
+ * https://github.com/richfelker/musl-cross-make
 
-> 1  target/arm: Check PMCNTEN for whether PMCCNTR is enabled
-> 2  target/arm: Treat PMCCNTR as alias of PMCCNTR_EL0
-> 4  target/arm: Mask PMU register writes based on PMCR_EL0.N
-> 5  target/arm: Fetch GICv3 state directly from CPUARMState
-> 6  target/arm: Support multiple EL change hooks
-> 7  target/arm: Add pre-EL change hooks
-> 8  target/arm: Allow EL change hooks to do IO
-> 9  target/arm: Fix bitmask for PMCCFILTR writes
-> 12 target/arm: Make PMOVSCLR and PMUSERENR 64 bits wide
+But really my feeling is that we should for the moment stick
+to getting a reliable test setup for the architectures that
+Debian does provide cross toolchains for. That will give us:
+ * much more coverage than we have at the moment
+ * coverage for the guests that people actually care about
+
+We can always come back and think about filling in the gaps later.
 
 thanks
 -- PMM
