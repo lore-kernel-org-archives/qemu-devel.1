@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1f9XPL-0006Jh-Hu
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 10:53:04 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1f9XPO-0006MD-LY
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 10:53:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1f9XPK-0007pY-Ps
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 10:53:03 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1f9XPN-0007ro-SK
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 10:53:06 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:40996)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1f9XPK-0007mN-Iy
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 10:53:02 -0400
+	id 1f9XPN-0007mN-KP
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 10:53:05 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Apr 2018 15:52:49 +0100
-Message-Id: <20180420145249.32435-14-peter.maydell@linaro.org>
+Date: Fri, 20 Apr 2018 15:52:45 +0100
+Message-Id: <20180420145249.32435-10-peter.maydell@linaro.org>
 In-Reply-To: <20180420145249.32435-1-peter.maydell@linaro.org>
 References: <20180420145249.32435-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 13/13] vl.c: new function max_serial_hds()
+Subject: [Qemu-devel] [PATCH 09/13] hw/char/exynos4210_uart.c: Remove
+ unneeded handling of NULL chardev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,65 +28,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@linaro.org, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Create a new function max_serial_hds() which returns the number of
-serial ports defined by the user. This is needed only by spapr.
-
-This allows us to remove the MAX_SERIAL_PORTS define.
+The handling of NULL chardevs in exynos4210_uart_create() is now
+all unnecessary: we don't need to create 'null' chardevs, and we
+don't need to enforce a bounds check on serial_hd().
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/sysemu/sysemu.h | 6 ++++--
- hw/ppc/spapr.c          | 2 +-
- vl.c                    | 5 +++++
- 3 files changed, 10 insertions(+), 3 deletions(-)
+ hw/char/exynos4210_uart.c | 20 --------------------
+ 1 file changed, 20 deletions(-)
 
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 989cbc2b7b..612659a718 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -159,10 +159,12 @@ void hmp_pcie_aer_inject_error(Monitor *mon, const QDict *qdict);
+diff --git a/hw/char/exynos4210_uart.c b/hw/char/exynos4210_uart.c
+index c2bba03362..a5a285655f 100644
+--- a/hw/char/exynos4210_uart.c
++++ b/hw/char/exynos4210_uart.c
+@@ -589,28 +589,8 @@ DeviceState *exynos4210_uart_create(hwaddr addr,
+     DeviceState  *dev;
+     SysBusDevice *bus;
  
- /* serial ports */
- 
--#define MAX_SERIAL_PORTS 4
+-    const char chr_name[] = "serial";
+-    char label[ARRAY_SIZE(chr_name) + 1];
 -
- /* Return the Chardev for serial port i, or NULL if none */
- Chardev *serial_hd(int i);
-+/* return the number of serial ports defined by the user. serial_hd(i)
-+ * will always return NULL for any i which is greater than or equal to this.
-+ */
-+int max_serial_hds(void);
+     dev = qdev_create(NULL, TYPE_EXYNOS4210_UART);
  
- /* parallel ports */
- 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index b0ecfaca9e..8d2d36a606 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2589,7 +2589,7 @@ static void spapr_machine_init(MachineState *machine)
-     /* Set up VIO bus */
-     spapr->vio_bus = spapr_vio_bus_init();
- 
--    for (i = 0; i < MAX_SERIAL_PORTS; i++) {
-+    for (i = 0; i < max_serial_hds(); i++) {
-         if (serial_hd(i)) {
-             spapr_vty_create(spapr->vio_bus, serial_hd(i));
-         }
-diff --git a/vl.c b/vl.c
-index a8a98c5a37..b587187052 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2524,6 +2524,11 @@ Chardev *serial_hd(int i)
-     return NULL;
- }
- 
-+int max_serial_hds(void)
-+{
-+    return num_serial_hds;
-+}
-+
- static int parallel_parse(const char *devname)
- {
-     static int index = 0;
+-    if (!chr) {
+-        if (channel >= MAX_SERIAL_PORTS) {
+-            error_report("Only %d serial ports are supported by QEMU",
+-                         MAX_SERIAL_PORTS);
+-            exit(1);
+-        }
+-        chr = serial_hd(channel);
+-        if (!chr) {
+-            snprintf(label, ARRAY_SIZE(label), "%s%d", chr_name, channel);
+-            chr = qemu_chr_new(label, "null");
+-            if (!(chr)) {
+-                error_report("Can't assign serial port to UART%d", channel);
+-                exit(1);
+-            }
+-        }
+-    }
+-
+     qdev_prop_set_chr(dev, "chardev", chr);
+     qdev_prop_set_uint32(dev, "channel", channel);
+     qdev_prop_set_uint32(dev, "rx-size", fifo_size);
 -- 
 2.17.0
