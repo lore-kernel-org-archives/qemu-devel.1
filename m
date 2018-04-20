@@ -1,23 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34946)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f9VDo-0006Ll-9O
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:33:01 -0400
+	(envelope-from <david@redhat.com>) id 1f9VFv-0007YB-Ra
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:35:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f9VDm-0006zt-UL
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:33:00 -0400
-References: <20180416114414.18406-1-vsementsov@virtuozzo.com>
-	<20180416114414.18406-6-vsementsov@virtuozzo.com>
-	<3cd7df2d-f741-4283-2612-87d98151c6a4@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <8708d935-a7bc-eefe-8ff0-0538bf37afa2@virtuozzo.com>
-Date: Fri, 20 Apr 2018 15:32:45 +0300
-MIME-Version: 1.0
-In-Reply-To: <3cd7df2d-f741-4283-2612-87d98151c6a4@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 5/7] blockdev: refactor
- block-dirty-bitmap-clear transaction
+	(envelope-from <david@redhat.com>) id 1f9VFs-0000Xy-VL
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:35:11 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Fri, 20 Apr 2018 14:34:55 +0200
+Message-Id: <20180420123456.22196-3-david@redhat.com>
+In-Reply-To: <20180420123456.22196-1-david@redhat.com>
+References: <20180420123456.22196-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 2/3] machine: make MemoryHotplugState
+ accessible via the machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,136 +20,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, den@openvz.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, David Hildenbrand <david@redhat.com>
 
-20.04.2018 01:47, John Snow wrote:
->
-> On 04/16/2018 07:44 AM, Vladimir Sementsov-Ogievskiy wrote:
->> bdrv_clear_dirty_bitmap do not fail, so we can call it in transaction
->> commit, avoiding any rollback.
->>
->> After this, bdrv_undo_clear_dirty_bitmap() becomes unused, so, drop it.
->>
-> I'm trying to remember why we ever bothered doing it the other way. Is
-> it because of timings with respect to other operations and we wanted the
-> "clear" to take effect sooner rather than later to co-operate with other
-> commands?
->
-> (You and Nikolay hinted about similar problems in the Libvirt PULL api
-> thread, too. It continues to be an issue.)
->
-> Hopping in my time machine:
->
-> https://lists.gnu.org/archive/html/qemu-devel/2015-05/msg01229.html
->
-> (Oh, I wrote it...)
->
-> Looks like it was a conscious decision to avoid ordering conflicts with
-> other block jobs.
+Let's allow to query the MemoryHotplugState from the machine.
 
-ohh, interesting.. so, transactions are tricky.
+This allows us to generically detect if a certain machine has support
+for memory devices, and to generically manage it (find free address
+range, plug/unplug a memory region).
 
-Don't you think, that this letter shows, that backup transaction is wrong,
-rather than clear?
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ hw/i386/pc.c             | 12 ++++++++++++
+ hw/ppc/spapr.c           | 12 ++++++++++++
+ include/hw/boards.h      | 16 ++++++++++++++++
+ include/hw/mem/pc-dimm.h | 12 +-----------
+ 4 files changed, 41 insertions(+), 11 deletions(-)
 
-I think, when we write a transaction, we should understand, that full 
-effect of the
-operation will be achieved only after corresponding .commit. So, backup 
-should not do in
-.prepare something dependent on other operations.
-
->
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   include/block/block_int.h |  1 -
->>   block/dirty-bitmap.c      |  9 ---------
->>   blockdev.c                | 16 +---------------
->>   3 files changed, 1 insertion(+), 25 deletions(-)
->>
->> diff --git a/include/block/block_int.h b/include/block/block_int.h
->> index 189666efa5..22059c8119 100644
->> --- a/include/block/block_int.h
->> +++ b/include/block/block_int.h
->> @@ -1087,7 +1087,6 @@ bool blk_dev_is_medium_locked(BlockBackend *blk);
->>   void bdrv_set_dirty(BlockDriverState *bs, int64_t offset, int64_t bytes);
->>   
->>   void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out);
->> -void bdrv_undo_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap *in);
->>   
->>   void bdrv_inc_in_flight(BlockDriverState *bs);
->>   void bdrv_dec_in_flight(BlockDriverState *bs);
->> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
->> index 1812e17549..3c69a8eed9 100644
->> --- a/block/dirty-bitmap.c
->> +++ b/block/dirty-bitmap.c
->> @@ -607,15 +607,6 @@ void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out)
->>       bdrv_dirty_bitmap_unlock(bitmap);
->>   }
->>   
->> -void bdrv_undo_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap *in)
->> -{
->> -    HBitmap *tmp = bitmap->bitmap;
->> -    assert(bdrv_dirty_bitmap_enabled(bitmap));
->> -    assert(!bdrv_dirty_bitmap_readonly(bitmap));
->> -    bitmap->bitmap = in;
->> -    hbitmap_free(tmp);
->> -}
->> -
->>   uint64_t bdrv_dirty_bitmap_serialization_size(const BdrvDirtyBitmap *bitmap,
->>                                                 uint64_t offset, uint64_t bytes)
->>   {
->> diff --git a/blockdev.c b/blockdev.c
->> index c31bf3d98d..88eae60c1c 100644
->> --- a/blockdev.c
->> +++ b/blockdev.c
->> @@ -2050,7 +2050,6 @@ typedef struct BlockDirtyBitmapState {
->>       BlkActionState common;
->>       BdrvDirtyBitmap *bitmap;
->>       BlockDriverState *bs;
->> -    HBitmap *backup;
->>       bool prepared;
->>   } BlockDirtyBitmapState;
->>   
->> @@ -2129,18 +2128,6 @@ static void block_dirty_bitmap_clear_prepare(BlkActionState *common,
->>           error_setg(errp, "Cannot clear a readonly bitmap");
->>           return;
->>       }
->> -
->> -    bdrv_clear_dirty_bitmap(state->bitmap, &state->backup);
->> -}
->> -
->> -static void block_dirty_bitmap_clear_abort(BlkActionState *common)
->> -{
->> -    BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
->> -                                             common, common);
->> -
->> -    if (state->backup) {
->> -        bdrv_undo_clear_dirty_bitmap(state->bitmap, state->backup);
->> -    }
->>   }
->>   
->>   static void block_dirty_bitmap_clear_commit(BlkActionState *common)
->> @@ -2148,7 +2135,7 @@ static void block_dirty_bitmap_clear_commit(BlkActionState *common)
->>       BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
->>                                                common, common);
->>   
->> -    hbitmap_free(state->backup);
->> +    bdrv_clear_dirty_bitmap(state->bitmap, NULL);
->>   }
->>   
->>   static void abort_prepare(BlkActionState *common, Error **errp)
->> @@ -2210,7 +2197,6 @@ static const BlkActionOps actions[] = {
->>           .instance_size = sizeof(BlockDirtyBitmapState),
->>           .prepare = block_dirty_bitmap_clear_prepare,
->>           .commit = block_dirty_bitmap_clear_commit,
->> -        .abort = block_dirty_bitmap_clear_abort,
->>       }
->>   };
->>   
->>
-
-
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index d36bac8c89..fa8862af33 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -2337,6 +2337,17 @@ static void x86_nmi(NMIState *n, int cpu_index, Error **errp)
+     }
+ }
+ 
++static MemoryHotplugState *pc_machine_get_memory_hotplug_state(MachineState *ms)
++{
++    PCMachineState *pcms = PC_MACHINE(ms);
++
++    if (!pcms->hotplug_memory.base) {
++        /* hotplug not supported */
++        return NULL;
++    }
++    return &pcms->hotplug_memory;
++}
++
+ static void pc_machine_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc = MACHINE_CLASS(oc);
+@@ -2376,6 +2387,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+     hc->unplug = pc_machine_device_unplug_cb;
+     nc->nmi_monitor_handler = x86_nmi;
+     mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
++    mc->get_memory_hotplug_state = pc_machine_get_memory_hotplug_state;
+ 
+     object_class_property_add(oc, PC_MACHINE_MEMHP_REGION_SIZE, "int",
+         pc_machine_get_hotplug_memory_region_size, NULL,
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index a7428f7da7..7ccdb705b3 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3868,6 +3868,17 @@ PowerPCCPU *spapr_find_cpu(int vcpu_id)
+     return NULL;
+ }
+ 
++static MemoryHotplugState *spapr_get_memory_hotplug_state(MachineState *ms)
++{
++    sPAPRMachineState *spapr = SPAPR_MACHINE(ms);
++
++    if (!spapr->hotplug_memory.base) {
++        /* hotplug not supported */
++        return NULL;
++    }
++    return &spapr->hotplug_memory;
++}
++
+ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc = MACHINE_CLASS(oc);
+@@ -3927,6 +3938,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+      * in which LMBs are represented and hot-added
+      */
+     mc->numa_mem_align_shift = 28;
++    mc->get_memory_hotplug_state = spapr_get_memory_hotplug_state;
+ 
+     smc->default_caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
+     smc->default_caps.caps[SPAPR_CAP_VSX] = SPAPR_CAP_ON;
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index a609239112..447bdc7219 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -105,6 +105,17 @@ typedef struct {
+     CPUArchId cpus[0];
+ } CPUArchIdList;
+ 
++/**
++ * MemoryHotplugState:
++ * @base: address in guest physical address space where hotplug memory
++ * address space begins.
++ * @mr: hotplug memory address space container
++ */
++typedef struct MemoryHotplugState {
++    hwaddr base;
++    MemoryRegion mr;
++} MemoryHotplugState;
++
+ /**
+  * MachineClass:
+  * @max_cpus: maximum number of CPUs supported. Default: 1
+@@ -156,6 +167,10 @@ typedef struct {
+  *    should instead use "unimplemented-device" for all memory ranges where
+  *    the guest will attempt to probe for a device that QEMU doesn't
+  *    implement and a stub device is required.
++ * @get_memory_hotplug_state:
++ *    If a machine support memory hotplug, the returned data ontains
++ *    information about the portion of guest physical address space
++ *    where memory devices can be mapped to (e.g. to hotplug a pc-dimm).
+  */
+ struct MachineClass {
+     /*< private >*/
+@@ -212,6 +227,7 @@ struct MachineClass {
+                                                          unsigned cpu_index);
+     const CPUArchIdList *(*possible_cpu_arch_ids)(MachineState *machine);
+     int64_t (*get_default_cpu_node_id)(const MachineState *ms, int idx);
++    MemoryHotplugState *(*get_memory_hotplug_state)(MachineState *ms);
+ };
+ 
+ /**
+diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
+index e88073321f..8bda37adab 100644
+--- a/include/hw/mem/pc-dimm.h
++++ b/include/hw/mem/pc-dimm.h
+@@ -19,6 +19,7 @@
+ #include "exec/memory.h"
+ #include "sysemu/hostmem.h"
+ #include "hw/qdev.h"
++#include "hw/boards.h"
+ 
+ #define TYPE_PC_DIMM "pc-dimm"
+ #define PC_DIMM(obj) \
+@@ -75,17 +76,6 @@ typedef struct PCDIMMDeviceClass {
+     MemoryRegion *(*get_vmstate_memory_region)(PCDIMMDevice *dimm);
+ } PCDIMMDeviceClass;
+ 
+-/**
+- * MemoryHotplugState:
+- * @base: address in guest physical address space where hotplug memory
+- * address space begins.
+- * @mr: hotplug memory address space container
+- */
+-typedef struct MemoryHotplugState {
+-    hwaddr base;
+-    MemoryRegion mr;
+-} MemoryHotplugState;
+-
+ uint64_t pc_dimm_get_free_addr(uint64_t address_space_start,
+                                uint64_t address_space_size,
+                                uint64_t *hint, uint64_t align, uint64_t size,
 -- 
-Best regards,
-Vladimir
+2.14.3
