@@ -1,36 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew@sifive.com>) id 1f9Jfg-00057B-Bb
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 20:13:02 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f9NUB-0004w6-DP
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 00:17:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew@sifive.com>) id 1f9Jfd-0001rd-07
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 20:13:00 -0400
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:34624)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f9NU8-0005KD-61
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 00:17:23 -0400
+Received: from mail-qk0-x22f.google.com ([2607:f8b0:400d:c09::22f]:46693)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <andrew@sifive.com>) id 1f9Jfc-0001qi-K1
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 20:12:56 -0400
-Received: by mail-wr0-x230.google.com with SMTP id d19-v6so18401063wre.1
-	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 17:12:56 -0700 (PDT)
-Received: from mail-wr0-f173.google.com (mail-wr0-f173.google.com.
-	[209.85.128.173]) by smtp.gmail.com with ESMTPSA id
-	a16sm2983829edd.28.2018.04.19.17.12.54 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 19 Apr 2018 17:12:54 -0700 (PDT)
-Received: by mail-wr0-f173.google.com with SMTP id f14-v6so18382119wre.4
-	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 17:12:54 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f9NU7-0005Iq-Ti
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 00:17:20 -0400
+Received: by mail-qk0-x22f.google.com with SMTP id s70so7663432qks.13
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 21:17:19 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180419164642.9536-1-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <585ca5e3-8477-49d0-7132-981a95435a75@amsat.org>
+Date: Fri, 20 Apr 2018 01:17:08 -0300
 MIME-Version: 1.0
-In-Reply-To: <CAHNT7NtBzUUv4dGjLwxnMi9cOwoS5+7KVnKbrUynXkgX2C477Q@mail.gmail.com>
-References: <CA+ZOyaj_4my=u4-MkAbyoee5ORnRq6nyaU+HhX1K6t2+Cn5RHg@mail.gmail.com>
-	<3EFD5845-5CE7-45F5-AE4C-0C86CAFAA200@sifive.com>
-	<CA+ZOyajL25Gfz_NdcG+MxDAZb9qstjNo2sD_ExzX0fATaDg7HQ@mail.gmail.com>
-	<CAHNT7NtJd1ZtYqdVfuiqxe60rOjyc48qyGKrQ99xY0UVH4arHQ@mail.gmail.com>
-	<CAHNT7NtBzUUv4dGjLwxnMi9cOwoS5+7KVnKbrUynXkgX2C477Q@mail.gmail.com>
-From: Andrew Waterman <andrew@sifive.com>
-Date: Thu, 19 Apr 2018 17:12:33 -0700
-Message-ID: <CA++6G0CNH5mzZFnsE-d6wS5jGr1YmVRc6VUhhBQYeMXKSQrqjQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [sw-dev] The problem of write misa on QEMU and BBL
+In-Reply-To: <20180419164642.9536-1-f4bug@amsat.org>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="QonWoDzHDd6sh5l4PgFL8QTEjAMmEBFiI"
+Subject: Re: [Qemu-devel] [RFC PATCH 0/7] avocado: Add acceptance tests
+ parsing the Linux boot console
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,241 +35,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: Zong Li <zongbox@gmail.com>, Zong Li <zong@andestech.com>, Palmer Dabbelt <palmer@sifive.com>, RISC-V SW Dev <sw-dev@groups.riscv.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>
+To: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, Cleber Rosa <crosa@redhat.com>, Amador Pahim <apahim@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Zheng Xiang <xiang.zheng@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Alistair Francis <alistair23@gmail.com>, avocado-devel@redhat.com, Peter Maydell <peter.maydell@linaro.org>
 
-On Thu, Apr 19, 2018 at 5:11 PM, Michael Clark <mjc@sifive.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--QonWoDzHDd6sh5l4PgFL8QTEjAMmEBFiI
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, Amador Pahim <apahim@redhat.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>, Zheng Xiang <xiang.zheng@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>,
+ Alistair Francis <alistair23@gmail.com>, avocado-devel@redhat.com,
+ Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <585ca5e3-8477-49d0-7132-981a95435a75@amsat.org>
+Subject: Re: [RFC PATCH 0/7] avocado: Add acceptance tests parsing the Linux
+ boot console
+References: <20180419164642.9536-1-f4bug@amsat.org>
+In-Reply-To: <20180419164642.9536-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
->
->
-> On Fri, Apr 20, 2018 at 12:05 PM, Michael Clark <mjc@sifive.com> wrote:
->
->>
->>
->> On Thu, Apr 19, 2018 at 9:28 PM, Zong Li <zongbox@gmail.com> wrote:
->>
->>> 2018-04-19 12:43 GMT+08:00 Michael Clark <mjc@sifive.com>:
->>> > Hi Zong,
->>> >
->>> >> On 19/04/2018, at 2:40 PM, Zong Li <zongbox@gmail.com> wrote:
->>> >>
->>> >> Hi all,
->>> >>
->>> >> For BBL part, in fp_init at machine/minit.c,
->>> >> it will clear the D and F bits of misa register, and assertion that
->>> >> the bits is cleared.
->>> >> But the misa is WARL register, so there is no effect for writing it,
->>> >> and the assertion not be true.
->>> >> So is there has necessary to do that if toolchain not support D and =
-F
->>> extension?
->>> >>
->>> >> For QEMU part, when writing misa, it will trigger the illegal
->>> >> instruction exception, but I think that the WARL allow write behavio=
-r?
->>> >
->>> > QEMU in the riscv-all branch should have WARL behavior.
->>> >
->>> > - https://github.com/riscv/riscv-qemu/commits/riscv-all
->>> >
->>> > There is a bug in upstream. We have submitted patches to fix the issu=
-e
->>> for review on the qemu-devel mailing list. The patch series will be
->>> submitted for upstream review again shortly. We were holding off on the
->>> series as we didn=E2=80=99t classify it as a =E2=80=9Ccritical bug=E2=
-=80=9D as QEMU was in
->>> soft-freeze for 2.12 and we weren=E2=80=99t able to get review in time =
-to include
->>> this fix in the 2.12 release.
->>> >
->>> > See =E2=80=9CNo traps on writes to misa,minstret,mcycle"
->>> >
->>> > - https://github.com/riscv/riscv-qemu/commits/qemu-2.13-for-upstream
->>> >
->>> > The history is that there were several unimplemented CSRs that had
->>> printf followed by exit. Richard Henderson said we should fix this. I
->>> changed several CSRs to cause illegal instruction traps instead of call=
-ing
->>> exit. That was a mistake as CSRs that don=E2=80=99t support write are W=
-ARL (Write
->>> Any Read Legal). It was certainly better than having the simulation exi=
-t as
->>> a cpu doesn=E2=80=99t typically have a way to =E2=80=9Dexit=E2=80=9D li=
-ke a C program, nevertheless
->>> trapping was wrong. My mistake. See here for the history:
->>> >
->>> > - https://github.com/riscv/riscv-qemu/blob/ff36f2f77ec3e6a6211
->>> c63bfe1707ec057b12f7d/target-riscv/op_helper.c
->>> >
->>> > The implementation in the current tree is quite different. We have
->>> recently made the CSR system more modular so that with minor changes,
->>> custom CPUs will be able to hook their own control and status registers=
-.
->>> >
->>> > - https://github.com/riscv/riscv-qemu/blob/qemu-2.13-for-upstr
->>> eam/target/riscv/csr.c#L780-L867
->>> >
->>> > See these changes:
->>> >
->>> > - https://github.com/riscv/riscv-qemu/commit/9d9c1bfef911c520a
->>> 35bd3f8c0ed2e14cc96bbb7
->>> > - https://github.com/riscv/riscv-qemu/commit/b5a4cd79ce6c7fbb6
->>> 5fdcf078fb9a8391da1d6b1
->>> >
->>> > We know have a flexible system that will allow implementations to hoo=
-k
->>> per-cpu control and status registers, and we have predicates that make =
-CSRs
->>> appear on some processor but not on others. i.e. if misa.S is not prese=
-nt,
->>> then S-mode s* CSRs will trap. Sometimes WARL is the correct behaviour,=
- but
->>> sometimes trapping is the correct behaviour i.e. if the processor does =
-not
->>> implement S-mode.
->>> >
->>> > misa traps on write should only affect bootloaders as Supervisor=E2=
-=80=99s
->>> like Linux don=E2=80=99t yet have access to the isa register. It=E2=80=
-=99s not a major
->>> issuse.
->>> >
->>> > Michael.
->>>
->>> Hi Michael,
->>>
->>> Thanks for the information. The new CSR system is helpful for custom
->>> CPU such as ours. Thanks.
->>>
->>> In the future, maybe we can do something like this in BBL for flexible
->>> custom platform which has own device to control the timer, ipi and so
->>> on.
->>>
->>> Back to the misa problem in BBL, at fp_init in BBL initial phrase, the
->>> assertion will has problem because the bits of misa will not be
->>> cleared.
->>>
->>> the code piece like below:
->>>     uintptr_t fd_mask =3D (1 << ('F' - 'A')) | (1 << ('D' - 'A'));
->>>     clear_csr(misa, fd_mask);
->>>     assert(!(read_csr(misa) & fd_mask));
->>>
->>> I think that the assertion is not necessary even the clear misa.
->>>
->>
->> I agree. The specification makes no guarantee that misa writes are not
->> ignored so it is legal for a processor that supports FD to drop misa wri=
-tes
->> and the assertion will trigger on legal RISC-V implementations. That cod=
-e
->> piece does not support legal RISC-V implementations that can't disable F
->> and D. Disabling F and D should not be asserted because it is harmless i=
-f
->> an unused extension is present.
->>
->> This assertion will always trigger in QEMU until we support the
->> 'optional' feature to allow changes to 'misa'.
->>
->> Just noting this is not QEMU specifc so we should drop qemu-devel if we
->> continue to discuss misa on RISC-V in bbl.
->>
->> Nevertheless, we do plan to support 'misa' writes however we need to do
->> some work in translate.c to make sure that cached translations match the
->> current state of misa. We may want to perform a tb_flush when we impleme=
-nt
->> writable misa. We also want writable misa to be a CPU feature so we can
->> emulate CPUs that don't support writable misa. eg add this to the CPU mo=
-del.
->>
->>     set_feature(env, RISCV_FEATURE_MISA_WRITABLE)
->>
->> Thanks for raising this because the new modular CSR implementation only
->> implemented 'existential' predicates for CSRs. We should add a write fla=
-g
->> to the predicate. Or we can just return -1 in the write_misa function. e=
-.g.
->>
->>     static int write_misa(CPURISCVState *env, int csrno, target_ulong va=
-l)
->>     {
->>         if (!riscv_feature(env, RISCV_FEATURE_MISA_WRITABLE)) {
->>             return -1;
->>         }
->>         /* validate misa - must contain 'I' or 'E' */
->>         env->misa =3D val;
->>         tb_flush(CPU(riscv_env_get_cpu(env)));
->>     }
->>
->> tb_flush is pessimistic but conservative. Currently its not common to
->> write misa so it would be acceptable.
->>
->> There is a similar but somewhat more complex issue for disabling misa.C.
->> The behaviour has been discussed on the isa-dev mailing list. Iirc, we h=
-ave
->> to ignore bit 1 in mepc/sepc in MRET/SRET if misa.C has been cleared and=
- a
->> 2-byte aligned address is present in mepc/sepc, so that MRET/SRET can on=
-ly
->> jump to 4-byte aligned code. So we drop bit 1 on writes to mepc/sepc whi=
-le
->> misa.C is clear and we ignore bit 1 on reads from mepc/sepc while misa.C=
- is
->> cleared. So the change needs slightly more work than just making 'misa'
->> writable. We also have to enforce that 'I' or 'E' are set, and we curren=
-tly
->> don't have support for RVE emulation in RISC-V QEMU. This will require
->> changes to validate registers in translate.c and cause illegal instructi=
-ons
->> if regno >=3D 16 is used.
->>
->> I'm also not sure exactly how we add misa to the translation cache index=
-,
->> but tb_flush seems like the conservative way to ensure the translation
->> cache matches the currently set bits in misa.
->>
->> We also have to audit translate.c to make sure that misa is checked for
->> all allowable extensions. MAFDC. Currently it only checks 'C' so we will
->> need to add checks for 'M' in mul/mulw/div/divw/divu/divuw/rem/remw/remu=
-/remuw
->> and 'A' for amos, 'F' and 'D' in floating point operations, etc. It's a
->> fair amount of work...
->>
->> $ grep -r has_ext target/riscv/
->> target/riscv//csr.c:    return -!riscv_has_ext(env, RVS);
->> target/riscv//csr.c:        (!riscv_has_ext(env, RVS) && mpp =3D=3D PRV_=
-S) ||
->> target/riscv//csr.c:        (!riscv_has_ext(env, RVU) && mpp =3D=3D PRV_=
-U)) {
->> target/riscv//cpu.h:static inline int riscv_has_ext(CPURISCVState *env,
->> target_ulong ext)
->> target/riscv//op_helper.c:    if (!riscv_has_ext(env, RVC) && (retpc &
->> 0x3)) {
->> target/riscv//op_helper.c:    if (!riscv_has_ext(env, RVC) && (retpc &
->> 0x3)) {
->> target/riscv//translate.c:    if (!riscv_has_ext(env, RVC)) {
->> target/riscv//translate.c:        if (!riscv_has_ext(env, RVC)) {
->> target/riscv//translate.c:    if (!riscv_has_ext(env, RVC) && ((ctx->pc =
-+
->> bimm) & 0x3)) {
->> target/riscv//translate.c:            if (riscv_has_ext(env, RVS)) {
->> target/riscv//translate.c:        if (!riscv_has_ext(env, RVC)) {
->>
->> So it seems like writable misa is a fair amount of work
->>
->> - RISCV_FEATURE_MISA_WRITABLE (easy)
->> - ISA extension validation rules in write_misa (easy)
->> - Extension checks in translate.c (time-consuming but easy)
->> - RVC instruction pointer alignment checking rules (needs some care)
->> - Make sure we have CPU models with and without writable 'misa' so we ca=
-n
->> test code to handle typical legal processor variants.
->>
->
-> - Check regno >=3D 16 && riscv_has_ext(env, RVE) then illegal instruction
-> trap (time-consuming - needs care to not miss any register)
->
-> Are F & D legal with E? 16 register FPU? I guess not. We may need to mask
-> and drop some extension writes in the validate misa logic (WARL).
->
+Cross-posting qemu-devel + avocado-devel.
 
-No, the manual forbids this case.  E should preclude FD.
+> While previously working on a Super I/O refactor, I encountered some pr=
+oblems
+> at runtime, after building the codebase successfully and running qtests=
+=2E
+> I had to manually start to boot different guests and check the bootlog.=
+
+>=20
+> I wanted to give a try at Avocado which seems designed to simplify that=
+ kind
+> of functional tests.
+>=20
+> I applied Amador Pahim work following Cleber Rosa documentation from
+> http://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg03891.html,
+> however I had to modify few things to parse the boot console.
+> Since his work is not merged, I included it in this series.
+>=20
+> The tests simply expect to find a string reported by Linux printk when =
+a
+> device is detected/initialized, such "ttyS0 at I/O 0x3f8 (irq =3D 4) is=
+ a 16550A"
+> and "i8042 KBD port at 0x60,0x64 irq 1" for the Super I/O chip, or such=
+
+> "registered as PCnet/PCI II 79C970A" to confirms the PCI subsystem and =
+network
+> device are correctly detected:
+>=20
+>=20
+>     self.assertIn(u'ttyS0 at I/O 0x3f8 (irq =3D 4) is a 16550A', bootlo=
+g)
+>     self.assertIn(u'ttyS1 at I/O 0x2f8 (irq =3D 3) is a 16550A', bootlo=
+g)
+>     self.assertIn(u'i8042 KBD port at 0x60,0x64 irq 1', bootlog)
+>     self.assertIn(u'i8042 AUX port at 0x60,0x64 irq 12', bootlog)
+>=20
+> Example of the tests output:
+>=20
+>     $ avocado run test_linux-boot-console.py -m test_linux-boot-console=
+=2Epy.data/parameters.yaml=20
+>     JOB ID     : 695094c9bbe8f6011226da7c2031c2c53e949910
+>     JOB LOG    : /home/phil/avocado/job-results/job-2018-04-19T13.36-69=
+5094c/job.log
+>      (1/6) test_linux-boot-console.py:TestAlphaClipperBoot2_6.test_boot=
+_console;alpha-2582: PASS (4.76 s)
+>      (2/6) test_linux-boot-console.py:TestAlphaClipperBoot2_6.test_boot=
+_console;mips-4a72: PASS (0.00 s)
+>      (3/6) test_linux-boot-console.py:TestMips4kcMaltaBoot2_6.test_boot=
+_console;alpha-2582: PASS (0.00 s)
+>      (4/6) test_linux-boot-console.py:TestMips4kcMaltaBoot2_6.test_boot=
+_console;mips-4a72: PASS (3.92 s)
+>      (5/6) test_linux-boot-console.py:TestMips4kcMaltaBoot3_2.test_boot=
+_console;alpha-2582: PASS (0.00 s)
+>      (6/6) test_linux-boot-console.py:TestMips4kcMaltaBoot3_2.test_boot=
+_console;mips-4a72: PASS (4.08 s)
+>     RESULTS    : PASS 6 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUP=
+T 0 | CANCEL 0
+>     JOB TIME   : 13.31 s
+>=20
+> Please apologize my ugly Python, this series is just a proof-of-concept=
+ :)
+> I couldn't figure out how to use the @skipUnless(correct arch) decorato=
+r.
+
+Eduardo asked me to share my first impressions after trying this
+framework with QEMU.
+
+So far it seems more designed to run tests _inside_ a qemu instance
+(think user-space), eventually testing packages/scripts.
+
+My tests are targeting the machine model itself, if the devices are
+correctly instantiated and so.
+The fastest approach was to check the Linux kernel bootlog, but if you
+look at the TestAlphaClipperBoot console you'll see a boot "firmware" is
+executed before the kernel. Casually this firmware also send information
+on the console, but what if the console is not accessible?
+We can use a chardev for the ioport80 POST, but some firmwares post boot
+events via I2C, SPI, CAN...
+
+To improve the testing, my idea is to use the Tracing framework.
+The machine trace events would be logged in a db and avogado would
+verify some of the trace events, did they occur? in the correct sequence
+order? with the correct arguments? We can also check relative
+timestamps, is this sequence timing fast enough?
+
+I plan to use the gdb API to insert breakpoints and follow part
+execution flow, eventually injecting (faulty) events.
+
+The multi-arch/machines support is a bit weak yet.
+
+I'm personally more interested in automatically testing [real world]
+firmware or full machine boot process, the kind of integration testing I
+can not do with qtests.
+
+I liked the possibility to generate coredumps, or the replay function.
+
+I also liked to be able to write a test on how a machine boots, in ~20
+LOC (see TestAlphaClipperBoot2_6).
+
+The storage API is OK to fetch a full VM image, but not a single file
+like a kernel or a flash image.
+
+Enough for my second try, good work :)
+
+I hope this was helpful.
+
+Regards,
+
+Phil.
+
+
+--QonWoDzHDd6sh5l4PgFL8QTEjAMmEBFiI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlrZacYACgkQ4+MsLN6t
+wN7m/Q/+Lw2KzOBx0bo/GqJU68fJ2qCH95qUPyNQAIUp4W3qXKb+s2tZlnKoqx11
+pYZFMlhaxTzroJ5Tfg+xqliLdpKIvt2tiQcMIskbSUQ2DvAPOtaCEwQg7j/yX1JH
+XmnIuZ21f1ez6ABL8oGeBpI07V8MXgFU9LjIXEbVE9E8qUYtTH933N5HSY13JaLg
+j9pw73dFbngLIMIGjOtSUgIx4t0wz9VDWcB6bSBhTNyPXUOloEXWJCK8K+A/0SiP
+d0JeaG40LQmS0vZj+PnTjnN0AEwW96Im9JAUr6ebRCFiqAsUmsG/fc0NZOqwcVWj
+2zjasOOaSlt6TfWy2nD6HJlbvMCszc9eQy5OQTL61BGSNif1RUZuAaRuuDfKZzk7
+JpDKTwTwxKwjuka5oazmaBrJdRthoGaUq59xFMwaENb5g6Fd6pxbOo6Z4u3mFSX2
+uMNw8ORHfCcqVkOK0d2DJyoSBvLrv0oQBU/+iLUgWjX979S1p2Q8vXQnZdzmWLVD
+whxgUTUgJQ+x1GDRcF3aWTCmNKP2U0XZTWck947NLd3OqcOOlGbeutXl4FpWFXNq
+cwiNrqJ2NSIYkVXIMv/l4fuv/HsVIEKHX9qf09v1VVmHEig+didr+f3916aCLi2Q
+MmwrY9WXoKFOol7cvzn2CfKGpWdUlTkWIn8kpUmDnEMG6qqrjDU=
+=2SIQ
+-----END PGP SIGNATURE-----
+
+--QonWoDzHDd6sh5l4PgFL8QTEjAMmEBFiI--
