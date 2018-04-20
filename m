@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f9Urf-0004Ky-M2
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:10:12 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1f9UuS-0006F2-MY
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:13:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f9Urb-0003ih-5k
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:10:07 -0400
-Received: from mail-ot0-x231.google.com ([2607:f8b0:4003:c0f::231]:37731)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f9Ura-0003hW-VN
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:10:03 -0400
-Received: by mail-ot0-x231.google.com with SMTP id 77-v6so3247443otd.4
-	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 05:10:02 -0700 (PDT)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1f9UuQ-00062G-W5
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:13:00 -0400
+References: <20180319080705.10310-1-vsementsov@virtuozzo.com>
+	<8416e4e1-da91-8631-164f-cca680cb8d20@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <534fe1b0-b9b3-d4d8-63cb-913f98d607a5@virtuozzo.com>
+Date: Fri, 20 Apr 2018 15:12:44 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180413075200.15217-1-clg@kaod.org>
-References: <20180413075200.15217-1-clg@kaod.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Apr 2018 13:09:41 +0100
-Message-ID: <CAFEAcA9SKjBV-eKcSbNXPZexWnLMGT0n-xxOphfo47o1d7hxFA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] migration: discard non-migratable
- RAMBlocks
+In-Reply-To: <8416e4e1-da91-8631-164f-cca680cb8d20@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2] qcow2: add overlap check for bitmap
+ directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,127 +25,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>, Yulei Zhang <yulei.zhang@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, Kirti Wankhede <kwankhede@nvidia.com>, zhi.a.wang@intel.com, Paolo Bonzini <pbonzini@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com
 
-On 13 April 2018 at 08:52, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-> On the POWER9 processor, the XIVE interrupt controller can control
-> interrupt sources using MMIO to trigger events, to EOI or to turn off
-> the sources. Priority management and interrupt acknowledgment is also
-> controlled by MMIO in the presenter sub-engine.
+19.04.2018 23:57, John Snow wrote:
 >
-> These MMIO regions are exposed to guests in QEMU with a set of 'ram
-> device' memory mappings, similarly to VFIO, and the VMAs are populated
-> dynamically with the appropriate pages using a fault handler.
+> On 03/19/2018 04:07 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>
+>> If it appropriate for 2.12, let's push it. If not - then for 2.13.
+>>
+> I wonder if I can make the case that this should be in 2.12.1; arguably
+> it is important to prevent corruption no matter how unlikely it is to
+> ever happen.
 >
-> But, these regions are an issue for migration. We need to discard the
-> associated RAMBlocks from the RAM state on the source VM and let the
-> destination VM rebuild the memory mappings on the new host in the
-> post_load() operation just before resuming the system.
+> Moving it into stable increases the likelihood it shows up in
+> downstreams, so maybe let's see what we can get away with.
 >
-> To achieve this goal, the following introduces a new RAMBlock flag
-> RAM_MIGRATABLE which is updated in the vmstate_register_ram() and
-> vmstate_unregister_ram() routines. This flag is then used by the
-> migration to identify RAMBlocks to discard on the source. Some checks
-> are also performed on the destination to make sure nothing invalid was
-> sent.
+>> v2: - squash 02 (indentation fix) to 01
+>>      - drop comment from qcow2_check_metadata_overlap()
+>>      - set @ign to QCOW2_OL_BITMAP_DIRECTORY for in-place case in
+>>        bitmap_list_store. I don't think non-inplace case should be changed,
+>>        as it don't touch active bitmap directory.
+>>
+>>   block/qcow2.h          | 45 ++++++++++++++++++++++++---------------------
+>>   block/qcow2-bitmap.c   |  7 ++++++-
+>>   block/qcow2-refcount.c | 10 ++++++++++
+>>   block/qcow2.c          | 22 ++++++++++++++--------
+>>   4 files changed, 54 insertions(+), 30 deletions(-)
+>>
+>> diff --git a/block/qcow2.h b/block/qcow2.h
+>> index 6f0ff15dd0..896ad08e5b 100644
+>> --- a/block/qcow2.h
+>> +++ b/block/qcow2.h
+>> @@ -98,6 +98,7 @@
+>>   #define QCOW2_OPT_OVERLAP_SNAPSHOT_TABLE "overlap-check.snapshot-table"
+>>   #define QCOW2_OPT_OVERLAP_INACTIVE_L1 "overlap-check.inactive-l1"
+>>   #define QCOW2_OPT_OVERLAP_INACTIVE_L2 "overlap-check.inactive-l2"
+>> +#define QCOW2_OPT_OVERLAP_BITMAP_DIRECTORY "overlap-check.bitmap-directory"
+>>   #define QCOW2_OPT_CACHE_SIZE "cache-size"
+>>   #define QCOW2_OPT_L2_CACHE_SIZE "l2-cache-size"
+>>   #define QCOW2_OPT_REFCOUNT_CACHE_SIZE "refcount-cache-size"
+>> @@ -398,34 +399,36 @@ typedef enum QCow2ClusterType {
+>>   } QCow2ClusterType;
+>>   
+>>   typedef enum QCow2MetadataOverlap {
+>> -    QCOW2_OL_MAIN_HEADER_BITNR    = 0,
+>> -    QCOW2_OL_ACTIVE_L1_BITNR      = 1,
+>> -    QCOW2_OL_ACTIVE_L2_BITNR      = 2,
+>> -    QCOW2_OL_REFCOUNT_TABLE_BITNR = 3,
+>> -    QCOW2_OL_REFCOUNT_BLOCK_BITNR = 4,
+>> -    QCOW2_OL_SNAPSHOT_TABLE_BITNR = 5,
+>> -    QCOW2_OL_INACTIVE_L1_BITNR    = 6,
+>> -    QCOW2_OL_INACTIVE_L2_BITNR    = 7,
+>> -
+>> -    QCOW2_OL_MAX_BITNR            = 8,
+>> -
+>> -    QCOW2_OL_NONE           = 0,
+>> -    QCOW2_OL_MAIN_HEADER    = (1 << QCOW2_OL_MAIN_HEADER_BITNR),
+>> -    QCOW2_OL_ACTIVE_L1      = (1 << QCOW2_OL_ACTIVE_L1_BITNR),
+>> -    QCOW2_OL_ACTIVE_L2      = (1 << QCOW2_OL_ACTIVE_L2_BITNR),
+>> -    QCOW2_OL_REFCOUNT_TABLE = (1 << QCOW2_OL_REFCOUNT_TABLE_BITNR),
+>> -    QCOW2_OL_REFCOUNT_BLOCK = (1 << QCOW2_OL_REFCOUNT_BLOCK_BITNR),
+>> -    QCOW2_OL_SNAPSHOT_TABLE = (1 << QCOW2_OL_SNAPSHOT_TABLE_BITNR),
+>> -    QCOW2_OL_INACTIVE_L1    = (1 << QCOW2_OL_INACTIVE_L1_BITNR),
+>> +    QCOW2_OL_MAIN_HEADER_BITNR      = 0,
+>> +    QCOW2_OL_ACTIVE_L1_BITNR        = 1,
+>> +    QCOW2_OL_ACTIVE_L2_BITNR        = 2,
+>> +    QCOW2_OL_REFCOUNT_TABLE_BITNR   = 3,
+>> +    QCOW2_OL_REFCOUNT_BLOCK_BITNR   = 4,
+>> +    QCOW2_OL_SNAPSHOT_TABLE_BITNR   = 5,
+>> +    QCOW2_OL_INACTIVE_L1_BITNR      = 6,
+>> +    QCOW2_OL_INACTIVE_L2_BITNR      = 7,
+>> +    QCOW2_OL_BITMAP_DIRECTORY_BITNR = 8,
+>> +
+> A bit hard to read due to the formatting, but you've added #8 here, and
 >
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>> +    QCOW2_OL_MAX_BITNR              = 9,
+>> +> +    QCOW2_OL_NONE             = 0,
+>> +    QCOW2_OL_MAIN_HEADER      = (1 << QCOW2_OL_MAIN_HEADER_BITNR),
+>> +    QCOW2_OL_ACTIVE_L1        = (1 << QCOW2_OL_ACTIVE_L1_BITNR),
+>> +    QCOW2_OL_ACTIVE_L2        = (1 << QCOW2_OL_ACTIVE_L2_BITNR),
+>> +    QCOW2_OL_REFCOUNT_TABLE   = (1 << QCOW2_OL_REFCOUNT_TABLE_BITNR),
+>> +    QCOW2_OL_REFCOUNT_BLOCK   = (1 << QCOW2_OL_REFCOUNT_BLOCK_BITNR),
+>> +    QCOW2_OL_SNAPSHOT_TABLE   = (1 << QCOW2_OL_SNAPSHOT_TABLE_BITNR),
+>> +    QCOW2_OL_INACTIVE_L1      = (1 << QCOW2_OL_INACTIVE_L1_BITNR),
+>>       /* NOTE: Checking overlaps with inactive L2 tables will result in bdrv
+>>        * reads. */
+>> -    QCOW2_OL_INACTIVE_L2    = (1 << QCOW2_OL_INACTIVE_L2_BITNR),
+>> +    QCOW2_OL_INACTIVE_L2      = (1 << QCOW2_OL_INACTIVE_L2_BITNR),
+>> +    QCOW2_OL_BITMAP_DIRECTORY = (1 << QCOW2_OL_BITMAP_DIRECTORY_BITNR),
+> and this one down here.
+>
+>>   } QCow2MetadataOverlap;
+>>   
+>>   /* Perform all overlap checks which can be done in constant time */
+>>   #define QCOW2_OL_CONSTANT \
+>>       (QCOW2_OL_MAIN_HEADER | QCOW2_OL_ACTIVE_L1 | QCOW2_OL_REFCOUNT_TABLE | \
+>> -     QCOW2_OL_SNAPSHOT_TABLE)
+>> +     QCOW2_OL_SNAPSHOT_TABLE | QCOW2_OL_BITMAP_DIRECTORY)
+>>   
+>>   /* Perform all overlap checks which don't require disk access */
+>>   #define QCOW2_OL_CACHED \
+>> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+>> index f45e46cfbd..fb750ba8d3 100644
+>> --- a/block/qcow2-bitmap.c
+>> +++ b/block/qcow2-bitmap.c
+>> @@ -776,7 +776,12 @@ static int bitmap_list_store(BlockDriverState *bs, Qcow2BitmapList *bm_list,
+>>           }
+>>       }
+>>   
+>> -    ret = qcow2_pre_write_overlap_check(bs, 0, dir_offset, dir_size);
+>> +    /* Actually, even in in-place case ignoring QCOW2_OL_BITMAP_DIRECTORY is not
+>> +     * necessary, because we drop QCOW2_AUTOCLEAR_BITMAPS when updating bitmap
+>> +     * directory in-place (actually, turn-off the extension), which is checked
+>> +     * in qcow2_check_metadata_overlap() */
+> I might need you to rephrase this for me.
+>
+> I guess we're ignoring QCOW2_OL_BITMAP_DIRECTORY if in_place is true,
+> but only as an optimization. Why is it not required?
 
-So, this is conceptually the right thing, but it is a migration
-compat break for any board which has a ram block which it doesn't
-call vmstate_register_ram() for. These are mostly going to be
-places that call one of the _nomigrate() functions to create an
-MMIO region, and then don't register the ram by hand either.
-Those are bugs, in my view, but we should consider fixing
-them while we're here.
+because, actually, we don't have any dirty bitmaps extension at the 
+moment when we rewrite bitmap directory in-place (as we drop autoclear 
+bit), so nothing will be checked.
 
-Here's the results of a grep and eyeballing of the results:
+>
+>> +    ret = qcow2_pre_write_overlap_check(
+>> +            bs, in_place ? QCOW2_OL_BITMAP_DIRECTORY : 0, dir_offset, dir_size);
+>>       if (ret < 0) {
+>>           goto fail;
+>>       }
+>> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+>> index 3de1ab51ba..275a303cfa 100644
+>> --- a/block/qcow2-refcount.c
+>> +++ b/block/qcow2-refcount.c
+>> @@ -2585,6 +2585,16 @@ int qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t offset,
+>>           }
+>>       }
+>>   
+>> +    if ((chk & QCOW2_OL_BITMAP_DIRECTORY) &&
+>> +        (s->autoclear_features & QCOW2_AUTOCLEAR_BITMAPS))
+>> +    {
+>> +        if (overlaps_with(s->bitmap_directory_offset,
+>> +                          s->bitmap_directory_size))
+>> +        {
+>> +            return QCOW2_OL_BITMAP_DIRECTORY;
+>> +        }
+>> +    }
+>> +
+>>       return 0;
+>>   }
+>>   
+>> diff --git a/block/qcow2.c b/block/qcow2.c
+>> index 1914a940e5..23f36a67c7 100644
+>> --- a/block/qcow2.c
+>> +++ b/block/qcow2.c
+>> @@ -655,6 +655,11 @@ static QemuOptsList qcow2_runtime_opts = {
+>>               .help = "Check for unintended writes into an inactive L2 table",
+>>           },
+>>           {
+>> +            .name = QCOW2_OPT_OVERLAP_BITMAP_DIRECTORY,
+>> +            .type = QEMU_OPT_BOOL,
+>> +            .help = "Check for unintended writes into the bitmap directory",
+>> +        },
+>> +        {
+>>               .name = QCOW2_OPT_CACHE_SIZE,
+>>               .type = QEMU_OPT_SIZE,
+>>               .help = "Maximum combined metadata (L2 tables and refcount blocks) "
+>> @@ -682,14 +687,15 @@ static QemuOptsList qcow2_runtime_opts = {
+>>   };
+>>   
+>>   static const char *overlap_bool_option_names[QCOW2_OL_MAX_BITNR] = {
+>> -    [QCOW2_OL_MAIN_HEADER_BITNR]    = QCOW2_OPT_OVERLAP_MAIN_HEADER,
+>> -    [QCOW2_OL_ACTIVE_L1_BITNR]      = QCOW2_OPT_OVERLAP_ACTIVE_L1,
+>> -    [QCOW2_OL_ACTIVE_L2_BITNR]      = QCOW2_OPT_OVERLAP_ACTIVE_L2,
+>> -    [QCOW2_OL_REFCOUNT_TABLE_BITNR] = QCOW2_OPT_OVERLAP_REFCOUNT_TABLE,
+>> -    [QCOW2_OL_REFCOUNT_BLOCK_BITNR] = QCOW2_OPT_OVERLAP_REFCOUNT_BLOCK,
+>> -    [QCOW2_OL_SNAPSHOT_TABLE_BITNR] = QCOW2_OPT_OVERLAP_SNAPSHOT_TABLE,
+>> -    [QCOW2_OL_INACTIVE_L1_BITNR]    = QCOW2_OPT_OVERLAP_INACTIVE_L1,
+>> -    [QCOW2_OL_INACTIVE_L2_BITNR]    = QCOW2_OPT_OVERLAP_INACTIVE_L2,
+>> +    [QCOW2_OL_MAIN_HEADER_BITNR]      = QCOW2_OPT_OVERLAP_MAIN_HEADER,
+>> +    [QCOW2_OL_ACTIVE_L1_BITNR]        = QCOW2_OPT_OVERLAP_ACTIVE_L1,
+>> +    [QCOW2_OL_ACTIVE_L2_BITNR]        = QCOW2_OPT_OVERLAP_ACTIVE_L2,
+>> +    [QCOW2_OL_REFCOUNT_TABLE_BITNR]   = QCOW2_OPT_OVERLAP_REFCOUNT_TABLE,
+>> +    [QCOW2_OL_REFCOUNT_BLOCK_BITNR]   = QCOW2_OPT_OVERLAP_REFCOUNT_BLOCK,
+>> +    [QCOW2_OL_SNAPSHOT_TABLE_BITNR]   = QCOW2_OPT_OVERLAP_SNAPSHOT_TABLE,
+>> +    [QCOW2_OL_INACTIVE_L1_BITNR]      = QCOW2_OPT_OVERLAP_INACTIVE_L1,
+>> +    [QCOW2_OL_INACTIVE_L2_BITNR]      = QCOW2_OPT_OVERLAP_INACTIVE_L2,
+> Just churn, and
+>
+>> +    [QCOW2_OL_BITMAP_DIRECTORY_BITNR] = QCOW2_OPT_OVERLAP_BITMAP_DIRECTORY,
+> this is the only new line.
+>
+>>   };
+>>   
+>>   static void cache_clean_timer_cb(void *opaque)
+>>
+> Looks okay to me overall, apart from needing a comment rephrase.
+>
+> --js
 
-These places are OK, because they register the memory region
-by hand one way or another:
 
-numa stuff, registers it when the backend is used:
-backends/hostmem-ram.c:
-memory_region_init_ram_shared_nomigrate(&backend->mr, OBJECT(backend),
-path,
-
-registers it globally by hand:
-numa.c:            memory_region_init_ram_nomigrate(mr, owner, name,
-ram_size, &error_fatal);
-numa.c:        memory_region_init_ram_nomigrate(mr, owner, name,
-ram_size, &error_fatal);
-hw/arm/aspeed_soc.c:    memory_region_init_ram_nomigrate(&s->sram,
-OBJECT(dev), "aspeed.sram",
-hw/block/onenand.c:    memory_region_init_ram_nomigrate(&s->ram,
-OBJECT(s), "onenand.ram",
-hw/display/cg3.c:    memory_region_init_ram_nomigrate(&s->rom, obj,
-"cg3.prom", FCODE_MAX_ROM_SIZE,
-hw/display/tcx.c:    memory_region_init_ram_nomigrate(&s->rom, obj,
-"tcx.prom", FCODE_MAX_ROM_SIZE,
-hw/display/tcx.c:    memory_region_init_ram_nomigrate(&s->vram_mem,
-OBJECT(s), "tcx.vram",
-hw/display/vga.c:    memory_region_init_ram_nomigrate(&s->vram, obj,
-"vga.vram", s->vram_size,
-hw/input/milkymist-softusb.c:
-memory_region_init_ram_nomigrate(&s->pmem, OBJECT(s),
-"milkymist-softusb.pmem",
-hw/input/milkymist-softusb.c:
-memory_region_init_ram_nomigrate(&s->dmem, OBJECT(s),
-"milkymist-softusb.dmem",
-hw/net/milkymist-minimac2.c:
-memory_region_init_ram_nomigrate(&s->buffers, OBJECT(dev),
-"milkymist-minimac2.buffers",
-hw/pci-host/prep.c:    memory_region_init_ram_nomigrate(&s->bios,
-OBJECT(s), "bios", BIOS_SIZE,
-hw/sparc/sun4m.c:    memory_region_init_ram_nomigrate(&s->mem, obj,
-hw/sparc/sun4m.c:    memory_region_init_ram_nomigrate(&s->mem, obj,
-"sun4m.afx", 4, &error_fatal);
-hw/sparc/sun4m.c:    memory_region_init_ram_nomigrate(&s->prom, obj,
-"sun4m.prom", PROM_SIZE_MAX,
-hw/sparc64/sun4u.c:    memory_region_init_ram_nomigrate(&s->prom, obj,
-"sun4u.prom", PROM_SIZE_MAX,
-hw/sparc64/sun4u.c:    memory_region_init_ram_nomigrate(&d->ram,
-OBJECT(d), "sun4u.ram", d->size,
-hw/xtensa/xtfpga.c:    memory_region_init_ram_nomigrate(ram,
-OBJECT(s), "open_eth.ram", 16384,
-
-registers it non-globally by hand:
-hw/xen/xen_pt_load_rom.c:
-memory_region_init_ram_nomigrate(&dev->rom, owner, name, st.st_size,
-&error_abort);
-
-These callsites are not OK, because they don't register the ram:
-
-hw/arm/aspeed.c:        memory_region_init_rom_nomigrate(boot_rom,
-OBJECT(bmc), "aspeed.boot_rom",
-hw/arm/highbank.c:    memory_region_init_ram_nomigrate(sysram, NULL,
-"highbank.sysram", 0x8000,
-hw/mips/boston.c:    memory_region_init_rom_nomigrate(flash, NULL,
-hw/mips/mips_malta.c:    memory_region_init_ram_nomigrate(bios_copy,
-NULL, "bios.1fc", BIOS_SIZE,
-hw/net/dp8393x.c:    memory_region_init_ram_nomigrate(&s->prom, OBJECT(dev)=
-,
-  [device only used on mips jazz board]
-hw/pci-host/xilinx-pcie.c:    memory_region_init_ram_nomigrate(&s->io,
-OBJECT(s), "io", 16, NULL);
-  [device only used on mips boston board]
-
-Notes:
- * any device that registers a ramblock globally is a bit dodgy, because
-it means you can't have more than one of it (the ramblock names would
-clash). We should fix those devices for the cases where we're willing
-to take the migration compat break.
- * the xen_pt_load_rom.c case could be cleaned up to use memory_region_init=
-_ram
-   rather than the _nomigrate function without breaking compat
-
-NB: I haven't actually tested whether this is a migration compat break,
-I merely believe it to be so :-)
-
-I think we can take the compat break on aspeed, highbank, malta and jazz.
-Not sure about boston, but I guess so given the board doesn't have
-per-QEMU-version machine models.
-
-thanks
--- PMM
+-- 
+Best regards,
+Vladimir
