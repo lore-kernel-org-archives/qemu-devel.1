@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f9PQs-0004v4-V4
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 02:22:08 -0400
+	(envelope-from <kwolf@redhat.com>) id 1f9PU9-0006S1-2l
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 02:25:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f9PQo-0008Rm-Vn
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 02:22:06 -0400
-Date: Fri, 20 Apr 2018 16:21:50 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180420062150.GL2434@umbus.fritz.box>
-References: <20180417071722.9399-1-david@gibson.dropbear.id.au>
-	<20180417071722.9399-10-david@gibson.dropbear.id.au>
-	<9a2e3789-aafa-44b5-e7e0-31713114fad9@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1f9PU7-0002Nv-PB
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 02:25:28 -0400
+Date: Fri, 20 Apr 2018 08:25:13 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180420062513.GB4078@localhost.localdomain>
+References: <20180419075232.31407-1-stefanha@redhat.com>
+	<20180419075232.31407-3-stefanha@redhat.com>
+	<20180419090546.GA2730@work-vm>
+	<20180420030221.GC10319@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="4oF+6Ged69J0+4/e"
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="XF85m9dhOBO43t/C"
 Content-Disposition: inline
-In-Reply-To: <9a2e3789-aafa-44b5-e7e0-31713114fad9@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH for-2.13 09/10] target/ppc:
- Don't bother with MSR_EP in cpu_ppc_set_papr()
+In-Reply-To: <20180420030221.GC10319@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [RFC 2/2] block/file-posix: verify page cache is
+ not used
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,86 +27,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org
 
 
---4oF+6Ged69J0+4/e
+--XF85m9dhOBO43t/C
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 20, 2018 at 08:08:59AM +0200, Thomas Huth wrote:
-> On 17.04.2018 09:17, David Gibson wrote:
-> > cpu_ppc_set_papr() removes the EP and HV bits from the MSR mask.  While
-> > removing the HV bit makes sense (a cpu in PAPR mode should never be
-> > emulated in hypervisor mode), the EP bit is just bizarre.  Although it's
-> > true that a papr mode guest shouldn't be able to change the exception
-> > prefix, the MSR[EP] bit doesn't even exist on the cpus supported for PA=
-PR
-> > mode, so it's pointless to do anything with it here.
+Am 20.04.2018 um 05:02 hat Stefan Hajnoczi geschrieben:
+> On Thu, Apr 19, 2018 at 10:05:47AM +0100, Dr. David Alan Gilbert wrote:
+> > * Stefan Hajnoczi (stefanha@redhat.com) wrote:
+> > > This commit is for debugging only.  Do not merge it.
+> > >=20
+> > > mincore(2) checks whether pages are resident.  Use it to verify that
+> > > page cache has been dropped.
+> > >=20
+> > > You can trigger a verification failure by mmapping the image file from
+> > > another process and loading a byte from a page so that it becomes
+> > > resident.  bdrv_co_invalidate_cache() will fail while the process is
+> > > alive.
 > >=20
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
-> >  target/ppc/translate_init.c | 9 ++++-----
-> >  1 file changed, 4 insertions(+), 5 deletions(-)
-> >=20
-> > diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> > index 5e89901149..bb5559d799 100644
-> > --- a/target/ppc/translate_init.c
-> > +++ b/target/ppc/translate_init.c
-> > @@ -8870,12 +8870,11 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVirtu=
-alHypervisor *vhyp)
-> > =20
-> >      cpu->vhyp =3D vhyp;
-> > =20
-> > -    /* PAPR always has exception vectors in RAM not ROM. To ensure thi=
-s,
-> > -     * MSR[IP] should never be set.
-> > -     *
-> > -     * We also disallow setting of MSR_HV
-> > +    /*
-> > +     * With a virtual hypervisor mode we never allow the CPU to go
-> > +     * hypervisor mode itself
-> >       */
-> > -    env->msr_mask &=3D ~((1ull << MSR_EP) | MSR_HVB);
-> > +    env->msr_mask &=3D ~MSR_HVB;
-> > =20
-> >      /* Tell KVM that we're in PAPR mode */
-> >      if (kvm_enabled()) {
+> > It doesn't seem a bad diagnostic to keep in (with a switch to activate)
+> > for when we're faced with some weird corruption on some weird storage
+> > system.
 >=20
-> Looks right.
->=20
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Okay.  It's very slow to mmap an entire image file and query mincore(2)
+> so it needs to be off by default.
 
-Turns out this one is pretty much independent of the rest of the
-series, so I've merged it to ppc-for-2.13 already.
+Also, having it enabled breaks localhost migration at least on tmpfs
+(which was what I tried out first).
 
+I wonder if the kernel would add some way to query whether the "advice"
+was actually acted upon if we asked. Either with a new function that
+returns an error if not everything is dropped (basically
+=2Ebdrv_invalidate_cache on the kernel level), or a function that just
+queries if any page is allocated (or maybe the address of the first
+allocated page in a given range) without having to use mincore() and
+iterating over all the pages in userspace.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Kevin
 
---4oF+6Ged69J0+4/e
+--XF85m9dhOBO43t/C
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrZhv4ACgkQbDjKyiDZ
-s5IOcA/7BQFYlROBjuGXoo5tycbnubgm+ACi3R+fVekUihOWmzHSiaao+OyXAm3L
-KGdlPEcmP762fOSVbN06+w+++WIddMooc/BYt5ZREKwqJzrlQLK55nrjt/R2vE4H
-An1VHxZOwD6tQtkwsstaBidsj5wOQlAaOWNGOPpYj+4WrJ7BAf6pbegsbHyjdxki
-tR0Sw9kG+i+drYzavN+z1Ei3cImInk2Py7kA9hI+e7ZzOvBzpnpJlwr/Bm9m8Vg1
-FWM1GDecjN/9bJVrD1Pm6C7ZElKZF4Z50c9wmyttxURGSZm20cMovvIhpT0coS78
-iVhKz9lrlgpa4t076Yh4F2WzZCLPt15HqMA0DyOAjpg+nr6mkyFiH3/k+fNaeeUX
-bBZ7YXuG9UVRk5wmwaFdCspMiWsNHW02DnxLabM22fg22xCuwFZCVviFpiaHlDq9
-PRRXu1xzK3hwZQ+cN0QGJCvi212dDeII3rnDhQFjY+lU82vuHgkzv6xFjZrXSj0i
-fYNKbV7WqI4Jq5LN08mG3yvC2Qk6vo6n9kj1IycHcBPisRi2f7XotZP2mOjAEYWT
-ffb01bHKNnT+UeGADIYzNiZGiEnauEvEnR6yxzYGncIvSKHrdCrJ/leJdlG/4n6e
-xIM5xNMn5AhiX84rOkrSlMue7MkmTxpCkx+VkEwb1pUcAo1FYJ8=
-=6B6I
+iQIcBAEBAgAGBQJa2YfJAAoJEH8JsnLIjy/W7YcP/RbPrB6gdiGmQdiuROmsaJ+E
+Uysj7L/Vbgv4YxQV+KSDQOw0VSmQ2GUNt5/jU7Gd6OrCr9p0gFwfOh6cIP8g6PMP
+eH/NFHPaWlYWuZg32UfMkUEkbjY1rT8H2nDOdH9Ip58Wm6Cz3J4XngXmCU0yBY0V
+ty72ueeKaKwSmDMatsGhlY4vNWagoxvj0ZE8r0UtgK83UM9zhWqNR89qJEwhYOYn
+OOLBoXDxYPOcFz7YhE1doHf3HhauK1Iue2tkrMigmxEAsJ9B74CvhMMzxmqAeZQD
+p3vj9Nvru2Up4TpAHT7ayE2D2M+9gfEdOWLzjfvC2FseN+Q0Nqmwor1J0duM4a0Q
+/fXf2zMAzqyx8/cEW3InX5SYm7yT4PQwwzMn2qxfRc3I5hJjlxvZwrHL6X1TKQ+x
+6QeW+avmvxvY0mffpPhrlLXfukv9DIhztKe3fbK/yQb0aB6c6P4lVZUJUu42sKQA
+QBt8fX4hedy0rfoAdehTcuQ1DgwpmpzXJNswg+lRjmxLhYgoqmVz5VjYftMT4Y6u
+j1HV+YbMxChwUCXp5f000Jn8ZsxDQZzdhwon2rrn2+CE1fqpX1joYENk6l+5NEpG
+iR7oMFomzvqKHO2wtg0Mry6AisqG/NCSl9kV8gciImg8ngvj7XxbAUv6WpSSUteN
+5gFVj0jwcU57r7psqDhE
+=p9/H
 -----END PGP SIGNATURE-----
 
---4oF+6Ged69J0+4/e--
+--XF85m9dhOBO43t/C--
