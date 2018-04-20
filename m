@@ -1,16 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f9eDh-0002F8-1T
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 18:09:29 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f9eDh-0002F5-0K
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 18:09:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f9eDf-0000w7-VJ
+	(envelope-from <mreitz@redhat.com>) id 1f9eDg-0000wX-32
 	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 18:09:28 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Sat, 21 Apr 2018 00:09:12 +0200
-Message-Id: <20180420220913.27000-3-mreitz@redhat.com>
-In-Reply-To: <20180420220913.27000-1-mreitz@redhat.com>
-References: <20180420220913.27000-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/3] block/file-posix: File locking during
+Date: Sat, 21 Apr 2018 00:09:10 +0200
+Message-Id: <20180420220913.27000-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/3] block/file-posix: File locking during
  creation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,88 +21,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-When creating a file, we should take the WRITE and RESIZE permissions.
-We do not need either for the creation itself, but we do need them for
-clearing and resizing it.  So we can take the proper permissions by
-replacing O_TRUNC with an explicit truncation to 0, and by taking the
-appropriate file locks between those two steps.
+Currently we do not take permissions on a file while it is being
+created.  That is a bit sad.  The simplest way to test this is the
+following:
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- block/file-posix.c | 41 +++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 39 insertions(+), 2 deletions(-)
+    $ qemu-img create -f qcow2 foo.qcow2 64M
+    Formatting 'foo.qcow2', fmt=qcow2 size=67108864 cluster_size=65536 lazy_refcounts=off refcount_bits=16
+    $ qemu-img convert -f qcow2 -O qcow2 foo.qcow2 foo.qcow2
+    qemu-img: foo.qcow2: error while converting qcow2: Failed to get "write" lock
+    Is another process using the image?
+    $ qemu-img info foo.qcow2
+    image: foo.qcow2
+    file format: raw
+    virtual size: 0 (0 bytes)
+    disk size: 0
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index c98a4a1556..ed7932d6e8 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1992,6 +1992,7 @@ static int raw_co_create(BlockdevCreateOptions *options, Error **errp)
- {
-     BlockdevCreateOptionsFile *file_opts;
-     int fd;
-+    int perm, shared;
-     int result = 0;
- 
-     /* Validate options and set default values */
-@@ -2006,14 +2007,48 @@ static int raw_co_create(BlockdevCreateOptions *options, Error **errp)
-     }
- 
-     /* Create file */
--    fd = qemu_open(file_opts->filename, O_RDWR | O_CREAT | O_TRUNC | O_BINARY,
--                   0644);
-+    fd = qemu_open(file_opts->filename, O_RDWR | O_CREAT | O_BINARY, 0644);
-     if (fd < 0) {
-         result = -errno;
-         error_setg_errno(errp, -result, "Could not create file");
-         goto out;
-     }
- 
-+    /* Take permissions: We want to discard everything, so we need
-+     * BLK_PERM_WRITE; and truncation to the desired size requires
-+     * BLK_PERM_RESIZE.
-+     * On the other hand, we cannot share the RESIZE permission
-+     * because we promise that after this function, the file has the
-+     * size given in the options.  If someone else were to resize it
-+     * concurrently, we could not guarantee that. */
-+    perm = BLK_PERM_WRITE | BLK_PERM_RESIZE;
-+    shared = BLK_PERM_ALL & ~BLK_PERM_RESIZE;
-+
-+    /* Step one: Take locks in shared mode */
-+    result = raw_apply_lock_bytes(fd, perm, shared, false, errp);
-+    if (result < 0) {
-+        goto out_close;
-+    }
-+
-+    /* Step two: Try to get them exclusively */
-+    result = raw_check_lock_bytes(fd, perm, shared, errp);
-+    if (result < 0) {
-+        goto out_close;
-+    }
-+
-+    /* Step three: Downgrade them to shared again, and keep
-+     *             them that way until we are done */
-+    result = raw_apply_lock_bytes(fd, perm, shared, true, errp);
-+    if (result < 0) {
-+        goto out_close;
-+    }
-+
-+    /* Clear the file by truncating it to 0 */
-+    result = raw_regular_truncate(fd, 0, PREALLOC_MODE_OFF, errp);
-+    if (result < 0) {
-+        goto out_close;
-+    }
-+
-     if (file_opts->nocow) {
- #ifdef __linux__
-         /* Set NOCOW flag to solve performance issue on fs like btrfs.
-@@ -2029,6 +2064,8 @@ static int raw_co_create(BlockdevCreateOptions *options, Error **errp)
- #endif
-     }
- 
-+    /* Resize and potentially preallocate the file to the desired
-+     * final size */
-     result = raw_regular_truncate(fd, file_opts->size, file_opts->preallocation,
-                                   errp);
-     if (result < 0) {
+(See also https://bugzilla.redhat.com/show_bug.cgi?id=1519144)
+
+Here is what's happening: file-posix opens the file with
+O_CREAT | O_TRUNC, thus truncating the file to 0.  Then qcow2 tries to
+format it, but fails because it needs the WRITE permission to do so.  So
+it cannot format it and the file stays empty.
+
+We should actually take a WRITE and a RESIZE permission before we
+truncate the file, and this is what this series does.
+
+I personally consider the solution taken here a bit of a hack, but it
+works and we don't have any locking in any drivers but file-posix
+anyway, so it isn't lacking anything in that regard.  Integrating it in
+blockdev-create might be possible, but there are two issues:
+(1) It would be harder.
+(2) What would we do anyway?  We'd advise protocol drivers to take WRITE
+    and RESIZE permissions before they truncate a file to be empty...
+    Well, and then they'd do exactly what file-posix is made to do in
+    this series.
+
+So basically what I consider a hack could be seen as exactly the right
+way to tackle the issue: Protocol drivers have to ensure the correct
+permissions (and they have to choose what those are) are applied before
+changing any file -- which is what this series implements.
+
+
+Max Reitz (3):
+  block/file-posix: Pass FD to locking helpers
+  block/file-posix: File locking during creation
+  iotests: Add creation test to 153
+
+ block/file-posix.c         | 68 ++++++++++++++++++++++++++++++++++++----------
+ tests/qemu-iotests/153     | 18 ++++++++++++
+ tests/qemu-iotests/153.out | 13 +++++++++
+ 3 files changed, 84 insertions(+), 15 deletions(-)
+
 -- 
 2.14.3
