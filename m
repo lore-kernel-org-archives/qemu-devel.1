@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f9Rik-0007Md-6a
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:48:43 -0400
+	(envelope-from <lersek@redhat.com>) id 1f9RvO-0004bi-6s
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 05:01:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f9Rif-0002mt-Ap
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:48:42 -0400
-Received: from mail-pg0-x22e.google.com ([2607:f8b0:400e:c05::22e]:36226)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1f9Rif-0002lW-4H
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:48:37 -0400
-Received: by mail-pg0-x22e.google.com with SMTP id i6so3760529pgv.3
-	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 01:48:36 -0700 (PDT)
-Date: Fri, 20 Apr 2018 16:48:32 +0800
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180420084832.GT15181@stefanha-x1.localdomain>
-References: <20180406194205.9872-1-nikhilbalachandra.inbox@gmail.com>
-	<20180416073100.GA28904@stefanha-x1.localdomain>
-	<CAAGXMmLL2TBmNDqtVjp7y56WT6NadmX8X4HMBhXaWX6jJnirDg@mail.gmail.com>
+	(envelope-from <lersek@redhat.com>) id 1f9RvI-0006Nn-Ic
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 05:01:46 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40220 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1f9RvI-0006NJ-Cr
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 05:01:40 -0400
+References: <20180417224054.26363-1-lersek@redhat.com>
+	<20180418060243.iafg4wj5gwsruop5@sirius.home.kraxel.org>
+	<b9c7d767-39c4-065f-f487-34c0c682bd85@redhat.com>
+	<20180419100900.7b66fde0@umbus.fritz.box>
+	<d032dfe2-bfab-5a12-c867-a5229f303f5f@redhat.com>
+	<20180420110301.1734899d@umbus.fritz.box>
+	<57df20fb-4a5b-7219-b364-29444ae86461@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <40fc25bc-8fa6-1a62-579d-95da029219ec@redhat.com>
+Date: Fri, 20 Apr 2018 11:01:28 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="k8r0khnpBuGu0wUi"
-Content-Disposition: inline
-In-Reply-To: <CAAGXMmLL2TBmNDqtVjp7y56WT6NadmX8X4HMBhXaWX6jJnirDg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] Make qemu-bridge-helper work in macOS
- and FreeBSD
+In-Reply-To: <57df20fb-4a5b-7219-b364-29444ae86461@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu RFC v2] qapi: add "firmware.json"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,47 +33,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikhil Balachandra <nikhilbalachandra.inbox@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, David Gibson <dgibson@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Eric Blake <eblake@redhat.com>, Gary Ching-Pang Lin <glin@suse.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Michal Privoznik <mprivozn@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
 
+On 04/20/18 10:47, Paolo Bonzini wrote:
+> On 20/04/2018 03:03, David Gibson wrote:
+>>> This also implies I shouldn't add "openbios" separately, which was
+>>> suggested earlier by Gerd -- according to
+>>> <https://en.wikipedia.org/wiki/OpenBIOS>, OpenBIOS is another
+>>> implementation of OFW.
+>>
+>> Right.  Although I think OpenBIOS and SLOF support a disjoint set of
+>> machines.  Openhackware which is (was?) used on some machines is yet
+>> another (very partial) openfirmware implementation.
+> 
+> We can:
+> 
+> 1a) replace the architecture field with an ABI field (seems wrong to me)
+> 
+> 1b) add an "ABI" field (containing e.g. prep, spapr, etc.) to complement
+> the architecture field
+> 
+> 2) we include directly a glob pattern for the QEMU machine types (also
+> seems wrong).
 
---k8r0khnpBuGu0wUi
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Using globs in machine types was what Gerd and Daniel agreed upon, and I
+was planning to do for v3. :(
 
-On Tue, Apr 17, 2018 at 09:57:46AM +0530, Nikhil Balachandra wrote:
-> Hi Stefan,
->=20
-> Thanks for the review. I'll be sending v2 version of this patch in next 3=
--4
-> days with the following changes.
->=20
-> 1) New scripts/update-xnu-headers.sh script to import if_bridgevar.h[4]
-> into include/standard-headers/xnu directory.
->     @qemu-devel - Please let me know if there is a better approach.
-> 2) Fix broken vnet hdr in this patch.
-> 3) Having minimal code in qemu-bridge-helper.c to open tap device instead
-> of using tap_open().
->=20
-> [4] - macOS if_bridgevar.h header file has APSL and BSD license.
+> 3) just like we effectively moved the guest ABI to the features field,
 
-Great, thank you!
+No, we didn't -- while it's true that a single firmware image can
+provide multiple guest ABIs, the implementation quality of those guest
+ABIs is not identical, and there is a preference order between them. The
+latest idea was to keep the @type field, but turn it into an ordered
+list of enum constants. Whichever constant is near the top is the more
+preferred ABI, and mgmt tools, when looking for "the" type of the
+firware, would consider the topmost (first) element.
 
-Stefan
+> we split the features into host-features and guest-features, and the
+> host ABI (prep, spapr, etc.; but also OVMF's SMM requirement fits here
+> for example) moves into host-features.  Again, just like 1a/1b, this can
+> be replace or complement the architecture field, and I think I'd prefer
+> the latter
 
---k8r0khnpBuGu0wUi
-Content-Type: application/pgp-signature; name="signature.asc"
+I'd prefer if we could mostly stick with the structure of the schema as
+seen in RFCv2 -- all the feedback until now implies that's possible,
+with minor tweaks. Let me post an RFCv3 soon, so that we have a more
+up-to-date basis for the discussion. (I've been waiting for some of the
+architecture (emulation target) technicalities to clear up, but I guess
+I had better postpone that now, because I see the discussion diverging.)
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJa2algAAoJEJykq7OBq3PIOFUIAMXEnciJ9YDD4YPRqCxSxtDJ
-di7zCvpe6SsM7oFT4CH5nLQzaMWJm91GqSmjP+oL6mwmKdzrgaomnGa/PWQgyMFJ
-Mezdl7PgVwkRS49h7dT750v158LPcvMuSMUStXdb68L+cb8MQp0fhMZN8wsxAvwy
-H27CG4vgH8Ca1qVY2H9EPLz6g1yu4rtpgHRZYm5H5T5YIOJTfvPSMUHlTfeTIVJ9
-qNplEn57OyOEwgZvGxasdMwGNZqpXrjuZ0Wm004q8zSQfWB7bDubwEEv4uMjMJX8
-Mix9QiH3d0kbLOtdg+/YR8DcqHPd9UbYUw3nsKf4PFEL4RgLHLg8SA57wjFFzuM=
-=fGgx
------END PGP SIGNATURE-----
-
---k8r0khnpBuGu0wUi--
+Thanks!
+Laszlo
