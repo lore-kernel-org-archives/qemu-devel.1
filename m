@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f9RQa-000120-CA
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:29:57 -0400
+	(envelope-from <jasowang@redhat.com>) id 1f9RRZ-0001tr-48
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:31:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1f9RQX-0007e5-8O
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:29:56 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:36176)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1f9RQX-0007dU-0l
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:29:53 -0400
-Received: by mail-wr0-x244.google.com with SMTP id m26-v6so2822473wrb.3
-	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 01:29:52 -0700 (PDT)
-References: <20180419135901.30035-1-alex.bennee@linaro.org>
-	<20180419135901.30035-32-alex.bennee@linaro.org>
-	<8ccf1143-5895-ca8b-eea5-c7d96c992455@amsat.org>
-	<87vacn9jd5.fsf@linaro.org>
-	<CAFEAcA8u5sfzcoqGhAagoUj6cE014hdyRgdm6=LBDfE9rV+cjw@mail.gmail.com>
-	<60b519a7-f49b-95e7-b9db-3e74133cf8c0@amsat.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <60b519a7-f49b-95e7-b9db-3e74133cf8c0@amsat.org>
-Date: Fri, 20 Apr 2018 09:29:50 +0100
-Message-ID: <87o9ie9t6p.fsf@linaro.org>
+	(envelope-from <jasowang@redhat.com>) id 1f9RRW-00089S-J2
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:30:57 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41118 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1f9RRW-00089C-EF
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:30:54 -0400
+References: <20180418045121.14233-1-peterx@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <e8574fde-b3f1-9c92-19f7-4b223ef298ec@redhat.com>
+Date: Fri, 20 Apr 2018 16:30:47 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180418045121.14233-1-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 31/43] tests/tcg: enable building for
- MIPS
+Subject: Re: [Qemu-devel] [PATCH] intel-iommu: send PSI always when
+ notify_unmap set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,71 +28,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Emilio G. Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, andrzej zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, Yongbok Kim <yongbok.kim@mips.com>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Eric Auger <eric.auger@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Alexander Witte <alexander.witte@baicanada.com>, Jintack Lim <jintack@cs.columbia.edu>
 
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-> On 04/19/2018 02:58 PM, Peter Maydell wrote:
->> On 19 April 2018 at 18:49, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
->>> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
->>>> On 04/19/2018 10:58 AM, Alex Benn=C3=A9e wrote:
->>>>> This doesn't add any additional tests but enables building the
->>>>> multiarch tests for MIPS using docker cross compilers. We don't have a
->>>>> cross compiler for mips64 big endian though.
->>>>
->>>> Oh we have one, using CFLAGS+=3D-EB
->>>>
->>>> we don't have cross libraries although.
->>>
->>> Yeah I thought the same with the ARM compilers (-mbig-endian) but it's
->>> the libraries that let us down. If, as you say, newlib gets this right I
->>> suspect we should use that to build the compilers not supported out of
->>> the box by Debian.
->>
->> I don't think we really want to get into the business of
->> building our own cross compilers if we can avoid it...it's harder
->> than it looks and we would be essentially reinventing the wheel.
+On 2018=E5=B9=B404=E6=9C=8818=E6=97=A5 12:51, Peter Xu wrote:
+> During IOVA page table walk, there is a special case when:
 >
-> I totally agree.
+> - notify_unmap is set, meanwhile
+> - entry is invalid
 >
-> I'v been looking at existing maintained images we can use to
-> cross-build, so we only have to pull (download) and image and use it,
-> not wasting cpu time building it.
+> In the past, we skip the entry always.  This is not correct.  We should
+> send UNMAP notification to registered notifiers in this case.  Otherwis=
+e
+> some stall pages will still be mapped in the host even if L1 guest
+> unmapped them already.
 >
-> However some images might be huge, full of things we don't need. But I
-> prefer that rather than having to maintain cross toolchains.
+> Without this patch, nested device assignment to L2 guests might dump
+> some errors like:
 >
-> An example I like to use is the coreboot-sdk, designed to build
-> i386/amd64 binaries, it fulfills our needs. But takes 2GB...
+> qemu-system-x86_64: VFIO_MAP_DMA: -17
+> qemu-system-x86_64: vfio_dma_map(0x557305420c30, 0xad000, 0x1000,
+>                      0x7f89a920d000) =3D -17 (File exists)
 >
-> $ docker pull coreboot/coreboot-sdk:1.47
-> 1.47: Pulling from coreboot/coreboot-sdk
-> 3d6aedfc3e47: Downloading [>              ]  538.2kB/1.201GB
-> d23c9a72f1e5: Waiting
+> To fix this, we need to apply this patch to L1 QEMU (L2 QEMU is not
+> affected by this problem).
 >
-> Another candidate is crossbuild, ~1GB
-> $ docker pull multiarch/crossbuild
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>
+> To test nested assignment, one also needs to apply below patchset:
+> https://lkml.org/lkml/2018/4/18/5
+> ---
+>   hw/i386/intel_iommu.c | 42 ++++++++++++++++++++++++++++++------------
+>   1 file changed, 30 insertions(+), 12 deletions(-)
+>
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index fb31de9416..b359efd6f9 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -722,6 +722,15 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, =
+uint64_t iova, bool is_write,
+>  =20
+>   typedef int (*vtd_page_walk_hook)(IOMMUTLBEntry *entry, void *private=
+);
+>  =20
+> +static int vtd_page_walk_one(IOMMUTLBEntry *entry, int level,
+> +                             vtd_page_walk_hook hook_fn, void *private=
+)
+> +{
+> +    assert(hook_fn);
+> +    trace_vtd_page_walk_one(level, entry->iova, entry->translated_addr=
+,
+> +                            entry->addr_mask, entry->perm);
+> +    return hook_fn(entry, private);
+> +}
+> +
+>   /**
+>    * vtd_page_walk_level - walk over specific level for IOVA range
+>    *
+> @@ -781,28 +790,37 @@ static int vtd_page_walk_level(dma_addr_t addr, u=
+int64_t start,
+>            */
+>           entry_valid =3D read_cur | write_cur;
+>  =20
+> +        entry.target_as =3D &address_space_memory;
+> +        entry.iova =3D iova & subpage_mask;
+> +        entry.perm =3D IOMMU_ACCESS_FLAG(read_cur, write_cur);
+> +        entry.addr_mask =3D ~subpage_mask;
+> +
+>           if (vtd_is_last_slpte(slpte, level)) {
+> -            entry.target_as =3D &address_space_memory;
+> -            entry.iova =3D iova & subpage_mask;
+>               /* NOTE: this is only meaningful if entry_valid =3D=3D tr=
+ue */
+>               entry.translated_addr =3D vtd_get_slpte_addr(slpte, aw);
+> -            entry.addr_mask =3D ~subpage_mask;
+> -            entry.perm =3D IOMMU_ACCESS_FLAG(read_cur, write_cur);
+>               if (!entry_valid && !notify_unmap) {
+>                   trace_vtd_page_walk_skip_perm(iova, iova_next);
+>                   goto next;
+>               }
+> -            trace_vtd_page_walk_one(level, entry.iova, entry.translate=
+d_addr,
+> -                                    entry.addr_mask, entry.perm);
+> -            if (hook_fn) {
+> -                ret =3D hook_fn(&entry, private);
+> -                if (ret < 0) {
+> -                    return ret;
+> -                }
+> +            ret =3D vtd_page_walk_one(&entry, level, hook_fn, private)=
+;
+> +            if (ret < 0) {
+> +                return ret;
+>               }
+>           } else {
+>               if (!entry_valid) {
+> -                trace_vtd_page_walk_skip_perm(iova, iova_next);
+> +                if (notify_unmap) {
+> +                    /*
+> +                     * The whole entry is invalid; unmap it all.
+> +                     * Translated address is meaningless, zero it.
+> +                     */
+> +                    entry.translated_addr =3D 0x0;
+> +                    ret =3D vtd_page_walk_one(&entry, level, hook_fn, =
+private);
+> +                    if (ret < 0) {
+> +                        return ret;
+> +                    }
+> +                } else {
+> +                    trace_vtd_page_walk_skip_perm(iova, iova_next);
+> +                }
+>                   goto next;
+>               }
+>               ret =3D vtd_page_walk_level(vtd_get_slpte_addr(slpte, aw)=
+, iova,
 
-I agree to a point. Our current images are all based off "official"
-docker hub images. I'm probably giving the state of officialness too
-much credit but I'm at least reasonably certain the Debian images can be
-re-created ourselves if we wanted to and have publicly available
-recipes.
-
-As a bonus, being Debian based, we meet our GPL compliance because
-everything on the image can have its source pulled with apt.
-
-I'm unsure about how the coreboot image was built or indeed if it is an
-official image. From my point of view it is just a bunch of binaries in
-a set of docker layers.
-
-So personally I would put "build our own compiler from source inside
-docker" slightly above "unpack a random binary tarball into docker".
-That said with some of our funkier supported guests we may end up having
-to do just that :-/
-
---
-Alex Benn=C3=A9e
+Acked-by: Jason Wang <jasowang@redhat.com>
