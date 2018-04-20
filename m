@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1f9ZvY-00006z-N6
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 13:34:30 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f9aBR-0006cA-9Q
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 13:50:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1f9ZvX-0000St-Nx
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 13:34:28 -0400
-References: <CAMxP3BTEzHjfxr=nnYDCL2v1djYJt5t5_hZ8rWo_S=qcbhQYVQ@mail.gmail.com>
-	<3d41de05-4bbd-3843-a0b7-fd71fc187022@redhat.com>
-	<CAMxP3BQSAMk2ytNajWMnr14t30uFEdE6FkNJU62J9A9MJcbVSQ@mail.gmail.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <af35a794-6c39-bdaa-8aa6-9d50ca759198@redhat.com>
-Date: Fri, 20 Apr 2018 13:34:12 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f9aBN-0003Wx-Ac
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 13:50:53 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:46959)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f9aBN-0003Wh-5R
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 13:50:49 -0400
+Received: by mail-qt0-x242.google.com with SMTP id h4-v6so10689458qtn.13
+	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 10:50:49 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180420145249.32435-1-peter.maydell@linaro.org>
+	<20180420145249.32435-14-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <d28ba1e3-7fb5-04e7-7743-b7cd980f4d6f@amsat.org>
+Date: Fri, 20 Apr 2018 14:50:43 -0300
 MIME-Version: 1.0
-In-Reply-To: <CAMxP3BQSAMk2ytNajWMnr14t30uFEdE6FkNJU62J9A9MJcbVSQ@mail.gmail.com>
+In-Reply-To: <20180420145249.32435-14-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [SPDK] qemu process hung at boot-up,
- no explicit errors or warnings
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 13/13] vl.c: new function max_serial_hds()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,89 +35,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bob Chen <a175818323@gmail.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
+On 04/20/2018 11:52 AM, Peter Maydell wrote:
+> Create a new function max_serial_hds() which returns the number of
+> serial ports defined by the user. This is needed only by spapr.
+> This allows us to remove the MAX_SERIAL_PORTS define.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  include/sysemu/sysemu.h | 6 ++++--
+>  hw/ppc/spapr.c          | 2 +-
+>  vl.c                    | 5 +++++
+>  3 files changed, 10 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> index 989cbc2b7b..612659a718 100644
+> --- a/include/sysemu/sysemu.h
+> +++ b/include/sysemu/sysemu.h
+> @@ -159,10 +159,12 @@ void hmp_pcie_aer_inject_error(Monitor *mon, const QDict *qdict);
+>  
+>  /* serial ports */
+>  
+> -#define MAX_SERIAL_PORTS 4
+> -
+>  /* Return the Chardev for serial port i, or NULL if none */
+>  Chardev *serial_hd(int i);
+> +/* return the number of serial ports defined by the user. serial_hd(i)
+> + * will always return NULL for any i which is greater than or equal to this.
+> + */
+> +int max_serial_hds(void);
 
+What about naming it serial_hds_count() to keep this under the serial_
+namespace? And about using a size_t for num_serial_hds?
 
-On 04/20/2018 07:13 AM, Bob Chen wrote:
-> 2.11.1 could work, qemu is no longer occupying 100% CPU. That's
-> interesting...
->=20
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Does 2.12 use 100% even at the firmware menu? Maybe we're not giving
-this VM long enough to hit the spot that causes it to use 100%.
-
-> Now I can see the starting screen via vnc, says that not a bootable dis=
-k.
->=20
-
-If it's stopping at the firmware I think the guest is not being taken
-into account, and the firmware is either trying to boot the wrong disk
-or your disk is corrupted. (Or it can't see your disk at all -- I'm
-personally not very familiar with using SPDK.)
-
-Can you share your command line with us?
-
->=20
-> Is that because the guest OS's virtio vhost driver is not up to date en=
-ough?
-> =E2=80=8B
->=20
-> Thanks,
-> Bob
->=20
-
-On the QEMU-devel list and many other technical lists, can you please
-reply in-line instead of replying above? ("top posting")
-
-Thank you,
---John
-
-> 2018-04-20 1:17 GMT+08:00 John Snow <jsnow@redhat.com
-> <mailto:jsnow@redhat.com>>:
->=20
->     Forwarding to qemu-block.
->=20
->     On 04/19/2018 06:13 AM, Bob Chen wrote:
->     > Hi,
->     >=20
->     > I was trying to run qemu with spdk, referring to
->     > http://www.spdk.io/doc/vhost.html#vhost_qemu_config
->     <http://www.spdk.io/doc/vhost.html#vhost_qemu_config>
->     >=20
->     > Everything went well since I had already set up hugepages, vfio, =
-vhost
->     > targets, vhost-scsi device(vhost-block was also tested), etc, wit=
-hout
->     > errors or warnings reported.
->     >=20
->     > But at the last step to run qemu, the process would somehow hang.=
- And its
->     > cpu busy remained 100%.
->     >=20
->     > I used `perf top -p` to monitor the process activity,
->     >=C2=A0 =C2=A018.28%=C2=A0 [kernel]=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 [k] vmx_vcpu_run
->     >=C2=A0 =C2=A0 3.06%=C2=A0 [kernel]=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 [k] vcpu_enter_guest
->     >=C2=A0 =C2=A0 3.05%=C2=A0 [kernel]=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 [k] system_call_after_swapgs
->     >=20
->     > Do you have any ideas about what happened here?
->     >=20
->     > Test environment: latest CentOS 7 kernel, nvme ssd, spdk v18.01.x=
-,
->     > dpdk 17.11.1, qemu 2.12.0-rc2. Detail log is attached within this=
- mail.
->     >=20
->=20
->     Have you tried any other versions? (2.11.1, or 2.12-rc4?)
->=20
->     >
->     >
->     > Thanks,
->     > Bob
->     >
->=20
->=20
+>  
+>  /* parallel ports */
+>  
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index b0ecfaca9e..8d2d36a606 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2589,7 +2589,7 @@ static void spapr_machine_init(MachineState *machine)
+>      /* Set up VIO bus */
+>      spapr->vio_bus = spapr_vio_bus_init();
+>  
+> -    for (i = 0; i < MAX_SERIAL_PORTS; i++) {
+> +    for (i = 0; i < max_serial_hds(); i++) {
+>          if (serial_hd(i)) {
+>              spapr_vty_create(spapr->vio_bus, serial_hd(i));
+>          }
+> diff --git a/vl.c b/vl.c
+> index a8a98c5a37..b587187052 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2524,6 +2524,11 @@ Chardev *serial_hd(int i)
+>      return NULL;
+>  }
+>  
+> +int max_serial_hds(void)
+> +{
+> +    return num_serial_hds;
+> +}
+> +
+>  static int parallel_parse(const char *devname)
+>  {
+>      static int index = 0;
+> 
