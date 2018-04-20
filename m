@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54418)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1f9Pa1-00011m-7s
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 02:31:34 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1f9PdA-0002yL-6K
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 02:34:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1f9PZv-000708-0E
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 02:31:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45644 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1f9PZu-0006yy-Rs
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 02:31:26 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1520860275-101576-1-git-send-email-imammedo@redhat.com>
-	<87zi21apkh.fsf@dusky.pond.sub.org>
-	<20180417142739.GV29865@localhost.localdomain>
-	<20180417174110.1a7f1daf@redhat.com>
-	<20180417204135.GB29865@localhost.localdomain>
-	<87d0yx2dqp.fsf@dusky.pond.sub.org>
-	<20180419100004.0b560c85@redhat.com>
-	<20180419194251.GZ29865@localhost.localdomain>
-Date: Fri, 20 Apr 2018 08:31:18 +0200
-In-Reply-To: <20180419194251.GZ29865@localhost.localdomain> (Eduardo Habkost's
-	message of "Thu, 19 Apr 2018 16:42:51 -0300")
-Message-ID: <87muxy2xu1.fsf@dusky.pond.sub.org>
+	(envelope-from <dgibson@ozlabs.org>) id 1f9Pd8-00029S-Qd
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 02:34:48 -0400
+Date: Fri, 20 Apr 2018 16:34:37 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180420063437.GM2434@umbus.fritz.box>
+References: <20180417071722.9399-1-david@gibson.dropbear.id.au>
+	<20180417071722.9399-2-david@gibson.dropbear.id.au>
+	<20180419154823.0e937610@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 0/9] enable numa configuration before
- machine_init() from QMP
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="n1iI6MeELQa9IOaF"
+Content-Disposition: inline
+In-Reply-To: <20180419154823.0e937610@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH for-2.13 01/10] spapr: Avoid redundant
+ calls to spapr_cpu_reset()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,148 +26,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, david@gibson.dropbear.id.au
+To: Greg Kurz <groug@kaod.org>
+Cc: benh@kernel.crashing.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
 
-> On Thu, Apr 19, 2018 at 10:00:04AM +0200, Igor Mammedov wrote:
->> On Wed, 18 Apr 2018 09:08:30 +0200
->> Markus Armbruster <armbru@redhat.com> wrote:
->> 
->> > Eduardo Habkost <ehabkost@redhat.com> writes:
->> > 
->> > > On Tue, Apr 17, 2018 at 05:41:10PM +0200, Igor Mammedov wrote:  
->> > >> On Tue, 17 Apr 2018 11:27:39 -0300
->> > >> Eduardo Habkost <ehabkost@redhat.com> wrote:
->> > >>   
->> > >> > On Tue, Apr 17, 2018 at 04:13:34PM +0200, Markus Armbruster wrote:  
->> > >> > > Igor Mammedov <imammedo@redhat.com> writes:
->> > >> > > 
->> > >> > > [...]    
->> > >> > > > Series allows to configure NUMA mapping at runtime using QMP
->> > >> > > > interface. For that to happen it introduces a new '-preconfig' CLI option
->> > >> > > > which allows to pause QEMU before machine_init() is run and
->> > >> > > > adds new set-numa-node QMP command which in conjunction with
->> > >> > > > query-hotpluggable-cpus allows to configure NUMA mapping for cpus.
->> > >> > > >
->> > >> > > > Later we can modify other commands to run early, for example device_add.
->> > >> > > > I recall SPAPR had problem when libvirt started QEMU with -S and, while it's
->> > >> > > > paused, added CPUs with device_add. Intent was to coldplug CPUs (but at that
->> > >> > > > stage it's considered hotplug already), so SPAPR had to work around the issue.    
->> > >> > > 
->> > >> > > That instance is just stupidity / laziness, I think: we consider any
->> > >> > > plug after machine creation a hot plug.  Real machines remain cold until
->> > >> > > you press the power button.  Our virtual machines should remain cold
->> > >> > > until they start running, i.e. with -S until the first "cont".  
->> > >> It probably would be too risky to change semantics of -S from hotplug to coldplug.
->> > >> But even if we were easy it won't matter in case if dynamic configuration
->> > >> done properly. More on it below.
->> > >>   
->> > >> > > I vaguely remember me asking this before, but your answer didn't make it
->> > >> > > into this cover letter, which gives me a pretext to ask again instead of
->> > >> > > looking it up in the archives: what exactly prevents us from keeping the
->> > >> > > machine cold enough for numa configuration until the first "cont"?    
->> > >> > 
->> > >> > I also think this would be better, but it seems to be difficult
->> > >> > in practice, see:
->> > >> > http://mid.mail-archive.com/20180323210532.GD28161@localhost.localdomain  
->> > >> 
->> > >> In addition to Eduardo's reply, here is what I've answered back
->> > >> when you've asked question the 1st time (v2 late at -S pause point reconfig):
->> > >> https://www.mail-archive.com/qemu-devel@nongnu.org/msg504140.html
->> > >> 
->> > >> In short:
->> > >> I think it's wrong in general doing fixups after machine is build
->> > >> instead of getting correct configuration before building machine.
->> > >> That's going to be complex and fragile and might be hard to do at
->> > >> all depending on what we are fixing up.  
->> > >
->> > > What "building the machine" should mean, exactly, for external
->> > > users?
->> under "building machine", I've meant machine_run_board_init()
->> and all follow up steps to machine_done stage.
->> 
->> > > The main question I'd like to see answered is: why exactly we
->> > > must "build" the machine before the first "cont" is issued when
->> > > using -S?  Why can't we delay everything to "cont" when using -S?  
->> Nor sure what question is about,
->> Did you mean if it were possible to postpone machine_run_board_init()
->> and all later steps to -S/cont time?
->
-> Exactly.  In other words, what exactly must be done before the
-> monitor is available when using -S, and what exactly can be
-> postponed after "cont" when using -S?
->
->>  
->> > > Is it just because it's a long and complex task?  Does that mean
->> > > we might still do that eventually, and eliminate the
->> > > prelaunch/preconfig distinction in the distant future?  
->> > 
->> > Why would anyone want to use -S going forward?  For reasons other "we've
->> > always used -S, and can't be bothered to change".
->> We should be able to deprecate/remove -S once we can do all
->> initial configuration that's possible to do there at
->> preconfig time.
+--n1iI6MeELQa9IOaF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This sounds like there are things we can do with -S but can't
---preconfig now.  Is that correct?
+On Thu, Apr 19, 2018 at 03:48:23PM +0200, Greg Kurz wrote:
+> On Tue, 17 Apr 2018 17:17:13 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > af81cf323c1 "spapr: CPU hotplug support" added a direct call to
+> > spapr_cpu_reset() in spapr_cpu_init(), as well as registering it as a
+> > reset callback.  That was in order to make sure that the reset function
+> > got called for a newly hotplugged cpu, which would miss the global mach=
+ine
+> > reset.
+> >=20
+> > However, this change means that spapr_cpu_reset() gets called twice for
+> > normal cold-plugged cpus: once from spapr_cpu_init(), then again during
+> > the system reset.  As well as being ugly in its redundancy, the first c=
+all
+> > happens before the machine reset calls have happened, which will cause
+> > problems for some things we're going to want to add.
+> >=20
+> > So, we remove the reset call from spapr_cpu_init().  We instead put an
+> > explicit reset call in the hotplug specific path.
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+>=20
+> I had sent a tentative patch to do something similar earlier this year:
+>=20
+> https://patchwork.ozlabs.org/patch/862116/
+>=20
+> but it got nacked for several reasons, one of them being you were
+> "always wary of using the hotplugged parameter, because what qemu
+> means by it often doesn't line up with what PAPR means by it."
 
-If yes, I got another question.  If you want to configure NUMA, you need
-to use --preconfig.  If you also want to configure one of the things you
-can't with --preconfig, you need to use -S.  In other words, you need to
-use both.  How would that work?
+Yeah, I was and am wary of that, but convinced myself it was correct
+in this case (which doesn't really interact with the PAPR meaning of
+hotplug).
 
-> If the plan is to deprecate -S, what are the important
-> user-visible differences between -S and -preconfig today?  Do we
-> plan to eliminate all those differences before
-> deprecating/removing -S?
+> >  hw/ppc/spapr.c                  |  6 ++++--
+> >  hw/ppc/spapr_cpu_core.c         | 13 ++++++++++++-
+> >  include/hw/ppc/spapr_cpu_core.h |  2 ++
+> >  3 files changed, 18 insertions(+), 3 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index 7b2bc4e25d..81b50af3b5 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -3370,9 +3370,11 @@ static void spapr_core_plug(HotplugHandler *hotp=
+lug_dev, DeviceState *dev,
+> > =20
+> >          if (hotplugged) {
+>=20
+> ... but you rely on it here. Can you explain why it is
+> okay now ?
 
-Documentation (including -help) needs to provide clear guidance on what
-to use when.
+So the value I actually need here is "wasn't present at the last
+system reset" (with false positives being mostly harmless, but not
+false negatives).
 
->> > > Even if we follow your approach, we need to answer these
->> > > questions.  I'm sure we will try to reorder initialization steps
->> > > between the preconfig/prelaunch states in the future, and we
->> > > shouldn't break any expectations from external users when doing
->> > > that.
->> As minimum I expect -preconfig to be a runtime equivalent to CLI,
->> with difference that it will be interactive and use QMP interface.
->> As long as it sits between CLI parsing and the rest of initialization
->> it shouldn't break that.
->
-> What prevents us from making -S a runtime equivalent to CLI?
+> Also, if QEMU is started with -incoming and the CPU core
+> is hotplugged before migration begins, the following will
+> return false:
+>=20
+> static inline bool spapr_drc_hotplugged(DeviceState *dev)
+> {
+>     return dev->hotplugged && !runstate_check(RUN_STATE_INMIGRATE);
+> }
+>=20
+> and the CPU core won't be reset.
 
-Good question.  Igor?
+Uh... spapr_dtc_hotplugged() would definitely be wrong here, which is
+why I'm not using it.
 
->> > Moreover, the questions need to be answered in Git.  Commit message,
->> > comments, docs/, use your judgement.
->> I've thought that commit messages/patches were describing introduced
->> changes sufficiently.
+>=20
+> >              /*
+> > -             * Send hotplug notification interrupt to the guest only
+> > -             * in case of hotplugged CPUs.
+> > +             * For hotplugged CPUs, we need to reset them (they missed
+> > +             * out on the system reset), and send the guest a
+> > +             * notification
+> >               */
+> > +            spapr_cpu_core_reset(core);
+>=20
+> spapr_cpu_reset() also sets the compat mode, which is used
+> to set some properties in the DT, ie, this should be called
+> before spapr_populate_hotplug_cpu_dt().
 
-Keep in mind that your poor reviewers context-switch to your patches
-from somewhere else entirely, then read (mostly) linearly, starting with
-the cover letter.  If the cover letter leads to questions and confusion,
-the reading likely stops.  Answers in the commit messages won't do you a
-lick of good then.
+Good point.  I've moved the reset to fix that.
 
-It's really, really useful to state the case for the feature right in
-the cover letter.  "What" and "why", not "how".  Write for your
-audience!  The cover letter's audience knows nothing (first order
-approximation).  Don't make them guess.  Especially not "why".  Keep it
-high-level.  Pointers to (specific!) commit messages for additional
-detail can make sense.
+>=20
+> >              spapr_hotplug_req_add_by_index(drc);
+> >          } else {
+> >              spapr_drc_reset(drc);
+> > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> > index 94afeb399e..aa17626cda 100644
+> > --- a/hw/ppc/spapr_cpu_core.c
+> > +++ b/hw/ppc/spapr_cpu_core.c
+> > @@ -70,7 +70,6 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, =
+PowerPCCPU *cpu,
+> >      cpu_ppc_set_papr(cpu, PPC_VIRTUAL_HYPERVISOR(spapr));
+> > =20
+> >      qemu_register_reset(spapr_cpu_reset, cpu);
+> > -    spapr_cpu_reset(cpu);
+>=20
+> spapr_cpu_reset() also sets cs->halted to 1, to let the guest start
+> non-boot CPUs with an RTAS call. With this change, a hotplugged CPU
+> is started right away and may run in the guest before the hotplug
+> path could even reset it.
 
->>                       But I've been sitting on these patches for
->> a long time and what's obvious to me might be not so clear to others.
+Uh.. I was assuming the plug path (the qemu side, obviously, not the
+guest side) would be completed before the cpu could execute.  If
+that's not the case I'll definitely have to rethink this.
 
-Par for the course, don't feel bad about it.
+> Not sure how to handle that other than setting halted to 1 in
+> spapr_cpu_init() as well, but you already nacked that approach
+> because it would mean "poking specifics in a CPU that hasn't
+> already been set to a known state by a reset"...
 
->> I might just not see what's missing. Any suggestions to improve it
->> are welcome.
->
-> I miss something that documents why both -S and -preconfig need
-> to exist, what are the differences between them today, and what
-> we plan to do about the differences between them in the future.
+Yeah.. I may have been off base with that comment.  Bear in mind that
+at the time I didn't see a specific reason to avoid the double reset -
+now I do.
 
-Yes, please.  Additionally, guidance for users on which of them to use.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--n1iI6MeELQa9IOaF
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrZifsACgkQbDjKyiDZ
+s5JfrxAAym+zveqMdPjmG77HlPAEFZBf0b22OtvgQ65IOtXBavcxxHkjEQrjrFFz
+U2LkYdkbH8aF3P5e+as0OYR2FWC89uWB7BhZHVa1kxovxm7B39goLT4IJWoaqz0v
+ftuEY8FkDlwLToxWAdFvkyUBO9ze0qYc4sQhAHD+rizKxfxtKKotaj4Wb03wHb2B
+qHCSFsJ9nnOaU5oLJE3WttLg+Lw7WNxKZQzGTYdwydtbu0EHhNb84bdi2nUvrc+0
+3gaPIluygnQKMRGg8PHBxpJsX3QnR9XU2bQRx4yVatdjXshiGlOB0i1pHv1eWTjW
+3PaKhbx01tHJGINPZWjfe9716hKbBLc53brDmgldPyv4EuNK9b1ic3lfV/z50nDD
+Hh3+iMVrJhaakat92CtTeciG6NKfmsQGO4ejTAC8B4YEFtev9pAtKPeaJ6d4KRWo
+sVDjtVGsFMdp8+sYb+FPxMsnUo/78NdGHP5KfJ/YSH+hENfxXpkivSM6a70UnTvX
+kj4dlKrgHOv9kQiu0NCB9MaVDa8BaG/s9NwdkHDs2v8xpG1MwBbpX0ReUf+PqSRq
+gP2VN2ZqsegU/nUKU/+xzTi2TZR6b4HCkOlldMuOnivcPUm2WfewLDu1jy/yRzd5
+yck5EiLzYAm4al9bIXszzAxBBxzUWmuvw8To6VEKeYaxEhgk/44=
+=V527
+-----END PGP SIGNATURE-----
+
+--n1iI6MeELQa9IOaF--
