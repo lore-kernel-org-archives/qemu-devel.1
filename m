@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f9ZMJ-000228-Oc
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:58:05 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1f9ZMn-0002Hu-MR
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:58:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f9ZMF-0002OL-TW
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:58:03 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:46687)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f9ZMF-0002Nw-NY
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:57:59 -0400
-Received: by mail-qk0-x241.google.com with SMTP id s70so9277815qks.13
-	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 09:57:59 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
+	(envelope-from <pbonzini@redhat.com>) id 1f9ZMj-0002k3-PI
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:58:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34424 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f9ZMj-0002j0-Jc
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:58:29 -0400
 References: <20180420145249.32435-1-peter.maydell@linaro.org>
-	<20180420145249.32435-11-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <d853a810-39bf-0a25-9aae-2926f2ab9195@amsat.org>
-Date: Fri, 20 Apr 2018 13:57:55 -0300
+	<20180420145249.32435-13-peter.maydell@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7c7d48b8-dc72-9c22-85e5-4dead88c991e@redhat.com>
+Date: Fri, 20 Apr 2018 18:58:14 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180420145249.32435-11-peter.maydell@linaro.org>
+In-Reply-To: <20180420145249.32435-13-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 10/13] serial-isa: Use MAX_ISA_SERIAL_PORTS
- instead of MAX_SERIAL_PORTS
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 12/13] vl.c: Remove compile time limit on
+ number of serial ports
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,136 +30,87 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: patches@linaro.org, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: patches@linaro.org, "Michael S . Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-On 04/20/2018 11:52 AM, Peter Maydell wrote:
-> The ISA serial port handling in serial-isa.c imposes a limit
-> of 4 serial ports. This is because we only know of 4 IO port
-> and IRQ settings for them, and is unrelated to the generic
-> MAX_SERIAL_PORTS limit, though they happen to both be set at
-> 4 currently.
-> 
-> Use a new MAX_ISA_SERIAL_PORTS wherever that is the correct
-> limit to be checking against.
+On 20/04/2018 16:52, Peter Maydell wrote:
+> Instead of having a fixed sized global serial_hds[] array,
+> use a local dynamically reallocated one, so we don't have
+> a compile time limit on how many serial ports a system has.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Just one question, would it make sense to use a GPtrArray instead?
 
-Except PNV:
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Thanks,
+
+Paolo
 
 > ---
->  include/hw/char/serial.h |  3 +++
->  hw/char/serial-isa.c     | 10 +++++-----
->  hw/i386/pc.c             |  2 +-
->  hw/mips/mips_r4k.c       |  2 +-
->  hw/ppc/pnv.c             |  2 +-
->  hw/sparc64/sun4u.c       |  2 +-
->  6 files changed, 12 insertions(+), 9 deletions(-)
+>  include/sysemu/sysemu.h |  2 --
+>  vl.c                    | 15 +++++++--------
+>  2 files changed, 7 insertions(+), 10 deletions(-)
 > 
-> diff --git a/include/hw/char/serial.h b/include/hw/char/serial.h
-> index c4daf11a14..0acfbbc382 100644
-> --- a/include/hw/char/serial.h
-> +++ b/include/hw/char/serial.h
-> @@ -95,6 +95,9 @@ SerialState *serial_mm_init(MemoryRegion *address_space,
->                              Chardev *chr, enum device_endian end);
+> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> index bd5b55c514..989cbc2b7b 100644
+> --- a/include/sysemu/sysemu.h
+> +++ b/include/sysemu/sysemu.h
+> @@ -161,8 +161,6 @@ void hmp_pcie_aer_inject_error(Monitor *mon, const QDict *qdict);
 >  
->  /* serial-isa.c */
+>  #define MAX_SERIAL_PORTS 4
+>  
+> -extern Chardev *serial_hds[MAX_SERIAL_PORTS];
+> -
+>  /* Return the Chardev for serial port i, or NULL if none */
+>  Chardev *serial_hd(int i);
+>  
+> diff --git a/vl.c b/vl.c
+> index 6daf026da6..a8a98c5a37 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -154,7 +154,8 @@ QEMUClockType rtc_clock;
+>  int vga_interface_type = VGA_NONE;
+>  static DisplayOptions dpy;
+>  int no_frame;
+> -Chardev *serial_hds[MAX_SERIAL_PORTS];
+> +static int num_serial_hds = 0;
+> +static Chardev **serial_hds = NULL;
+>  Chardev *parallel_hds[MAX_PARALLEL_PORTS];
+>  Chardev *virtcon_hds[MAX_VIRTIO_CONSOLES];
+>  Chardev *sclp_hds[MAX_SCLP_CONSOLES];
+> @@ -2496,30 +2497,28 @@ static int foreach_device_config(int type, int (*func)(const char *cmdline))
+>  
+>  static int serial_parse(const char *devname)
+>  {
+> -    static int index = 0;
+> +    int index = num_serial_hds;
+>      char label[32];
+>  
+>      if (strcmp(devname, "none") == 0)
+>          return 0;
+> -    if (index == MAX_SERIAL_PORTS) {
+> -        error_report("too many serial ports");
+> -        exit(1);
+> -    }
+>      snprintf(label, sizeof(label), "serial%d", index);
+> +    serial_hds = g_renew(Chardev *, serial_hds, index + 1);
 > +
-> +#define MAX_ISA_SERIAL_PORTS 4
-> +
->  #define TYPE_ISA_SERIAL "isa-serial"
->  void serial_hds_isa_init(ISABus *bus, int from, int to);
->  
-> diff --git a/hw/char/serial-isa.c b/hw/char/serial-isa.c
-> index eb5996159d..116b7b2e69 100644
-> --- a/hw/char/serial-isa.c
-> +++ b/hw/char/serial-isa.c
-> @@ -39,10 +39,10 @@ typedef struct ISASerialState {
->      SerialState state;
->  } ISASerialState;
->  
-> -static const int isa_serial_io[MAX_SERIAL_PORTS] = {
-> +static const int isa_serial_io[MAX_ISA_SERIAL_PORTS] = {
->      0x3f8, 0x2f8, 0x3e8, 0x2e8
->  };
-> -static const int isa_serial_irq[MAX_SERIAL_PORTS] = {
-> +static const int isa_serial_irq[MAX_ISA_SERIAL_PORTS] = {
->      4, 3, 4, 3
->  };
->  
-> @@ -56,9 +56,9 @@ static void serial_isa_realizefn(DeviceState *dev, Error **errp)
->      if (isa->index == -1) {
->          isa->index = index;
+>      serial_hds[index] = qemu_chr_new(label, devname);
+>      if (!serial_hds[index]) {
+>          error_report("could not connect serial device"
+>                       " to character backend '%s'", devname);
+>          return -1;
 >      }
-> -    if (isa->index >= MAX_SERIAL_PORTS) {
-> +    if (isa->index >= MAX_ISA_SERIAL_PORTS) {
->          error_setg(errp, "Max. supported number of ISA serial ports is %d.",
-> -                   MAX_SERIAL_PORTS);
-> +                   MAX_ISA_SERIAL_PORTS);
->          return;
+> -    index++;
+> +    num_serial_hds++;
+>      return 0;
+>  }
+>  
+>  Chardev *serial_hd(int i)
+>  {
+>      assert(i >= 0);
+> -    if (i < ARRAY_SIZE(serial_hds)) {
+> +    if (i < num_serial_hds) {
+>          return serial_hds[i];
 >      }
->      if (isa->iobase == -1) {
-> @@ -138,7 +138,7 @@ void serial_hds_isa_init(ISABus *bus, int from, int to)
->      int i;
->  
->      assert(from >= 0);
-> -    assert(to <= MAX_SERIAL_PORTS);
-> +    assert(to <= MAX_ISA_SERIAL_PORTS);
->  
->      for (i = from; i < to; ++i) {
->          if (serial_hd(i)) {
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index d36bac8c89..b297a5d63b 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1524,7 +1524,7 @@ static void pc_superio_init(ISABus *isa_bus, bool create_fdctrl, bool no_vmport)
->      qemu_irq *a20_line;
->      ISADevice *i8042, *port92, *vmmouse;
->  
-> -    serial_hds_isa_init(isa_bus, 0, MAX_SERIAL_PORTS);
-> +    serial_hds_isa_init(isa_bus, 0, MAX_ISA_SERIAL_PORTS);
->      parallel_hds_isa_init(isa_bus, MAX_PARALLEL_PORTS);
->  
->      for (i = 0; i < MAX_FD; i++) {
-> diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
-> index aeadc4a340..e04b49d3c5 100644
-> --- a/hw/mips/mips_r4k.c
-> +++ b/hw/mips/mips_r4k.c
-> @@ -274,7 +274,7 @@ void mips_r4k_init(MachineState *machine)
->  
->      pit = i8254_pit_init(isa_bus, 0x40, 0, NULL);
->  
-> -    serial_hds_isa_init(isa_bus, 0, MAX_SERIAL_PORTS);
-> +    serial_hds_isa_init(isa_bus, 0, MAX_ISA_SERIAL_PORTS);
->  
->      isa_vga_init(isa_bus);
->  
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index 98ee3c607a..549cfccdcb 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -648,7 +648,7 @@ static void pnv_init(MachineState *machine)
->      pnv->isa_bus = pnv_isa_create(pnv->chips[0]);
->  
->      /* Create serial port */
-> -    serial_hds_isa_init(pnv->isa_bus, 0, MAX_SERIAL_PORTS);
-> +    serial_hds_isa_init(pnv->isa_bus, 0, MAX_ISA_SERIAL_PORTS);
->  
->      /* Create an RTC ISA device too */
->      mc146818_rtc_init(pnv->isa_bus, 2000, NULL);
-> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-> index 9b441f704b..1bede85370 100644
-> --- a/hw/sparc64/sun4u.c
-> +++ b/hw/sparc64/sun4u.c
-> @@ -298,7 +298,7 @@ static void ebus_realize(PCIDevice *pci_dev, Error **errp)
->                         0, NULL, 115200, serial_hd(i), DEVICE_BIG_ENDIAN);
->          i++;
->      }
-> -    serial_hds_isa_init(s->isa_bus, i, MAX_SERIAL_PORTS);
-> +    serial_hds_isa_init(s->isa_bus, i, MAX_ISA_SERIAL_PORTS);
->  
->      /* Parallel ports */
->      parallel_hds_isa_init(s->isa_bus, MAX_PARALLEL_PORTS);
+>      return NULL;
 > 
