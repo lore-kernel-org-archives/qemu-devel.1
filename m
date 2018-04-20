@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33063)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1f9R8c-0000o5-1b
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:11:23 -0400
+	(envelope-from <frederic.konrad@adacore.com>) id 1f9RBa-00026L-CA
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:14:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1f9R8Y-0007hP-Qf
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:11:21 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36368 helo=mx1.redhat.com)
+	(envelope-from <frederic.konrad@adacore.com>) id 1f9RBX-0002ZA-7c
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:14:26 -0400
+Received: from mel.act-europe.fr ([194.98.77.210]:55026
+	helo=smtp.eu.adacore.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1f9R8Y-0007gk-M6
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:11:18 -0400
-References: <20180417224054.26363-1-lersek@redhat.com>
-	<87po2wzysh.fsf@dusky.pond.sub.org>
-	<8a52bb49-4194-3b91-8b67-a0e5700fd6ed@redhat.com>
-	<87in8nvdpn.fsf@dusky.pond.sub.org> <20180419075629.GC10259@redhat.com>
-	<5ed8b01f-7faa-b23d-5fd2-f4715294e061@redhat.com>
-	<20180419091201.GI10259@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <a9006770-b4e3-cf57-3efa-c967740f7a94@redhat.com>
-Date: Fri, 20 Apr 2018 10:11:08 +0200
+	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
+	id 1f9RBW-0002YE-Ul
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:14:23 -0400
+References: <20180413075200.15217-1-clg@kaod.org>
+	<CAFEAcA_2314nBLZxaK91dNnEaefF9RAf5DA208Zg-Kyp-zQ5cQ@mail.gmail.com>
+	<20180419174519.ardehg2pmp47fnvg@toto>
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Message-ID: <b5fa27c8-5ab1-a0c3-598a-5a377b0a441d@adacore.com>
+Date: Fri, 20 Apr 2018 10:14:15 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180419091201.GI10259@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180419174519.ardehg2pmp47fnvg@toto>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [libvirt] [qemu RFC v2] qapi: add "firmware.json"
+Subject: Re: [Qemu-devel] [PATCH v2] migration: discard non-migratable
+ RAMBlocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,72 +32,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, libvir-list@redhat.com, Michal Privoznik <mprivozn@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Gary Ching-Pang Lin <glin@suse.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <dgibson@redhat.com>
+To: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>, Alistair Francis <alistair@alistair23.me>, Juan Quintela <quintela@redhat.com>, Francisco Iglesias <frasse.iglesias@gmail.com>, joonas.lahtinen@linux.intel.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, zhenyuw@linux.intel.com, QEMU Developers <qemu-devel@nongnu.org>, Yulei Zhang <yulei.zhang@intel.com>, Alex Williamson <alex.williamson@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Kirti Wankhede <kwankhede@nvidia.com>, Paolo Bonzini <pbonzini@redhat.com>, zhi.a.wang@intel.com, David Gibson <david@gibson.dropbear.id.au>
 
-On 04/19/18 11:12, Daniel P. Berrang=C3=A9 wrote:
-> On Thu, Apr 19, 2018 at 10:39:32AM +0200, Laszlo Ersek wrote:
->> On 04/19/18 09:56, Daniel P. Berrang=C3=A9 wrote:
->>> On Thu, Apr 19, 2018 at 09:48:36AM +0200, Markus Armbruster wrote:
->>>> Laszlo Ersek <lersek@redhat.com> writes:
->>>>
->>>>> On 04/18/18 10:47, Markus Armbruster wrote:
->>>>>> Laszlo Ersek <lersek@redhat.com> writes:
->>>> Replacing CpuInfoArch by such an enum will change the discriminator
->>>> value from "other" to the real architecture, with the obvious
->>>> compatibility concerns.  But we've accepted similar changes twice
->>>> already: commit 9d0306dfdfb and commit 25fa194b7b1, both v2.12.0-rc0=
-.
->>>>
->>>> "other" was a bad idea.  Hindsight 20/20.
->>>>
->>>> Getting rid of it in one go rather than piecemeal seems like the lea=
-st
->>>> bad way out.  Too late for 2.12, though.  Eric, what do you think?
+
+
+On 04/19/2018 07:45 PM, Edgar E. Iglesias wrote:
+> On Thu, Apr 19, 2018 at 06:32:07PM +0100, Peter Maydell wrote:
+>> On 13 April 2018 at 08:52, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>>> On the POWER9 processor, the XIVE interrupt controller can control
+>>> interrupt sources using MMIO to trigger events, to EOI or to turn off
+>>> the sources. Priority management and interrupt acknowledgment is also
+>>> controlled by MMIO in the presenter sub-engine.
 >>>
->>> Given the context in which this "other" value is used, I think it is
->>> reasonable to kill it and put a full arch list in there.
+>>> These MMIO regions are exposed to guests in QEMU with a set of 'ram
+>>> device' memory mappings, similarly to VFIO, and the VMAs are populate=
+d
+>>> dynamically with the appropriate pages using a fault handler.
 >>>
->>> No app is likely to be accessing the struct under "other" because it
->>> is just an empty placeholder.
+>>> But, these regions are an issue for migration. We need to discard the
+>>> associated RAMBlocks from the RAM state on the source VM and let the
+>>> destination VM rebuild the memory mappings on the new host in the
+>>> post_load() operation just before resuming the system.
+>>>
+>>> To achieve this goal, the following introduces a new RAMBlock flag
+>>> RAM_MIGRATABLE which is updated in the vmstate_register_ram() and
+>>> vmstate_unregister_ram() routines. This flag is then used by the
+>>> migration to identify RAMBlocks to discard on the source. Some checks
+>>> are also performed on the destination to make sure nothing invalid wa=
+s
+>>> sent.
 >>
->> Commit 9d0306dfdfb added "s390" and "CpuInfoS390", which I guess had t=
-he
->> potential to confuse QMP clients that didn't expect "s390", but
->> otherwise it didn't mess with preexistent enum values / structures.
->=20
-> NB, qemu-system-s390x would previously have returned "other" in
-> this field, and now it returns "s390".  So while it didn't
-> remove "other" from the list of things that could potentially
-> exist, it did change what the s390x binary will actually report.
->=20
->> The same applies to commit 25fa194b7b1, just with "riscv" /
->> "CpuInfoRISCV" substituted.
+>> I think in theory this should Just Work for allowing us to
+>> enable migration when the xilinx-spips device is using its
+>> execute-from-mmio feature (we would just need to remove the
+>> code that puts in the migration blocker).
 >>
->> Removing "other" might confuse QMP clients that expect it, except
->> (according to Daniel) no such client exists, probably.
+>> Xilinx folks -- do you have a test image for a board that uses
+>> xilinx-spips and exercises the execute-from-mmio code, that
+>> we can use to test migration/vmsave with?
 >=20
-> When I say removing "other", I imply that we add an explicit arch
-> for all those which we currently are missing. IOW, all qemu-system-XXX
-> binaries which currently report "other" would change to report their
-> respective "XXX" values.
+> CC:ing Fred
 >=20
-> So in this way, it is exactly the same as what we did when we
-> introduced "s390" as an option.
+> I got an image from Fred a while back ago, I probably still have it
+> somewhere but I've totally forgotten the name for it.
 >=20
-> The only difference is that once we have every binary reporting the
-> correct arch, we can now also remove "other" from the schema itself
-> as it will then be unused.
+> Fred, do you have the image or roughly remember the filename?
+>=20
+> Cheers,
+> Edgar
+>=20
 
-Can we please translate this into more actionable items for me, because
-I'm getting confused :)
+Edgar,
 
-First, if I add "i386" and "x86_64" to the enum list, we'll have all
-three of "i386", "x86_64" and "x86". Is that useful? How will that work?
+That was a while ago! I don't recall the name sorry for that!
 
-Second, assuming I add constants for the ~10 (?) softmmu arches, can I
-still use @CpuInfoOther as the type for the corresponding new members in
-@CpuInfo? What C code changes will be necessary?
-
-Thanks
-Laszlo
+In the worse case maybe building and putting an u-boot binary for
+zynq in the SPIs will do the job?
