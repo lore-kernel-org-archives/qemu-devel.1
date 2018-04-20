@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33523)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f9bxN-0001la-K7
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 15:44:31 -0400
+	(envelope-from <eblake@redhat.com>) id 1f9c2P-0003xO-72
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 15:49:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f9bxJ-0005yx-GR
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 15:44:29 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:39179)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f9bxJ-0005ye-Bb
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 15:44:25 -0400
-Received: by mail-qt0-x244.google.com with SMTP id l8-v6so11072413qtp.6
-	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 12:44:25 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1524250517-28032-1-git-send-email-cota@braap.org>
-	<1524250517-28032-15-git-send-email-cota@braap.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3609de74-9288-beeb-ccfa-c3b12651d298@amsat.org>
-Date: Fri, 20 Apr 2018 16:44:19 -0300
+	(envelope-from <eblake@redhat.com>) id 1f9c2K-0001RN-Jh
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 15:49:41 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33164 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1f9c2K-0001Qh-CN
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 15:49:36 -0400
+References: <20180420175721.18479-1-dgilbert@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <bf695674-aa5e-e151-d921-225086d35c5d@redhat.com>
+Date: Fri, 20 Apr 2018 14:49:25 -0500
 MIME-Version: 1.0
-In-Reply-To: <1524250517-28032-15-git-send-email-cota@braap.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 14/18] target/openrisc: convert to
- DisasContextBase
+In-Reply-To: <20180420175721.18479-1-dgilbert@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="JDIFK9kWoXoFsAadYG5so2cF98H2mjOwB"
+Subject: Re: [Qemu-devel] [PATCH] migration: update docs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,287 +27,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Stafford Horne <shorne@gmail.com>, Richard Henderson <richard.henderson@linaro.org>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, peter.maydell@linaro.org
 
-On 04/20/2018 03:55 PM, Emilio G. Cota wrote:
-> While at it, set is_jmp to DISAS_NORETURN when generating
-> an exception.
-> 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--JDIFK9kWoXoFsAadYG5so2cF98H2mjOwB
+From: Eric Blake <eblake@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
+ qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com,
+ peter.maydell@linaro.org
+Message-ID: <bf695674-aa5e-e151-d921-225086d35c5d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] migration: update docs
+References: <20180420175721.18479-1-dgilbert@redhat.com>
+In-Reply-To: <20180420175721.18479-1-dgilbert@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> Cc: Stafford Horne <shorne@gmail.com>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
+On 04/20/2018 12:57 PM, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>=20
+> Update the migration docs:
+>=20
+> Among other changes:
+>   * Added a general list of advice for device authors
+>   * Reordered the section on conditional state (subsections etc)
+>     into the order we prefer.
+>   * Add a note about firmware
+>=20
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > ---
->  target/openrisc/translate.c | 93 ++++++++++++++++++++++-----------------------
->  1 file changed, 46 insertions(+), 47 deletions(-)
-> 
-> diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-> index 2747b24..b37414f 100644
-> --- a/target/openrisc/translate.c
-> +++ b/target/openrisc/translate.c
-> @@ -36,7 +36,8 @@
->  #include "exec/log.h"
->  
->  #define LOG_DIS(str, ...) \
-> -    qemu_log_mask(CPU_LOG_TB_IN_ASM, "%08x: " str, dc->pc, ## __VA_ARGS__)
-> +    qemu_log_mask(CPU_LOG_TB_IN_ASM, "%08x: " str, dc->base.pc_next,    \
-> +                  ## __VA_ARGS__)
->  
->  /* is_jmp field values */
->  #define DISAS_JUMP    DISAS_TARGET_0 /* only pc was modified dynamically */
-> @@ -44,13 +45,10 @@
->  #define DISAS_TB_JUMP DISAS_TARGET_2 /* only pc was modified statically */
->  
->  typedef struct DisasContext {
-> -    TranslationBlock *tb;
-> -    target_ulong pc;
-> -    uint32_t is_jmp;
-> +    DisasContextBase base;
->      uint32_t mem_idx;
->      uint32_t tb_flags;
->      uint32_t delayed_branch;
-> -    bool singlestep_enabled;
->  } DisasContext;
->  
->  static TCGv cpu_sr;
-> @@ -126,9 +124,9 @@ static void gen_exception(DisasContext *dc, unsigned int excp)
->  
->  static void gen_illegal_exception(DisasContext *dc)
->  {
-> -    tcg_gen_movi_tl(cpu_pc, dc->pc);
-> +    tcg_gen_movi_tl(cpu_pc, dc->base.pc_next);
->      gen_exception(dc, EXCP_ILLEGAL);
-> -    dc->is_jmp = DISAS_UPDATE;
-> +    dc->base.is_jmp = DISAS_NORETURN;
->  }
->  
->  /* not used yet, open it when we need or64.  */
-> @@ -166,12 +164,12 @@ static void check_ov64s(DisasContext *dc)
->  
->  static inline bool use_goto_tb(DisasContext *dc, target_ulong dest)
->  {
-> -    if (unlikely(dc->singlestep_enabled)) {
-> +    if (unlikely(dc->base.singlestep_enabled)) {
->          return false;
->      }
->  
->  #ifndef CONFIG_USER_ONLY
-> -    return (dc->tb->pc & TARGET_PAGE_MASK) == (dest & TARGET_PAGE_MASK);
-> +    return (dc->base.tb->pc & TARGET_PAGE_MASK) == (dest & TARGET_PAGE_MASK);
->  #else
->      return true;
->  #endif
-> @@ -182,10 +180,10 @@ static void gen_goto_tb(DisasContext *dc, int n, target_ulong dest)
->      if (use_goto_tb(dc, dest)) {
->          tcg_gen_movi_tl(cpu_pc, dest);
->          tcg_gen_goto_tb(n);
-> -        tcg_gen_exit_tb((uintptr_t)dc->tb + n);
-> +        tcg_gen_exit_tb((uintptr_t)dc->base.tb + n);
->      } else {
->          tcg_gen_movi_tl(cpu_pc, dest);
-> -        if (dc->singlestep_enabled) {
-> +        if (dc->base.singlestep_enabled) {
->              gen_exception(dc, EXCP_DEBUG);
->          }
->          tcg_gen_exit_tb(0);
-> @@ -194,16 +192,16 @@ static void gen_goto_tb(DisasContext *dc, int n, target_ulong dest)
->  
->  static void gen_jump(DisasContext *dc, int32_t n26, uint32_t reg, uint32_t op0)
->  {
-> -    target_ulong tmp_pc = dc->pc + n26 * 4;
-> +    target_ulong tmp_pc = dc->base.pc_next + n26 * 4;
->  
->      switch (op0) {
->      case 0x00:     /* l.j */
->          tcg_gen_movi_tl(jmp_pc, tmp_pc);
->          break;
->      case 0x01:     /* l.jal */
-> -        tcg_gen_movi_tl(cpu_R[9], dc->pc + 8);
-> +        tcg_gen_movi_tl(cpu_R[9], dc->base.pc_next + 8);
->          /* Optimize jal being used to load the PC for PIC.  */
-> -        if (tmp_pc == dc->pc + 8) {
-> +        if (tmp_pc == dc->base.pc_next + 8) {
->              return;
->          }
->          tcg_gen_movi_tl(jmp_pc, tmp_pc);
-> @@ -211,7 +209,7 @@ static void gen_jump(DisasContext *dc, int32_t n26, uint32_t reg, uint32_t op0)
->      case 0x03:     /* l.bnf */
->      case 0x04:     /* l.bf  */
->          {
-> -            TCGv t_next = tcg_const_tl(dc->pc + 8);
-> +            TCGv t_next = tcg_const_tl(dc->base.pc_next + 8);
->              TCGv t_true = tcg_const_tl(tmp_pc);
->              TCGv t_zero = tcg_const_tl(0);
->  
-> @@ -227,7 +225,7 @@ static void gen_jump(DisasContext *dc, int32_t n26, uint32_t reg, uint32_t op0)
->          tcg_gen_mov_tl(jmp_pc, cpu_R[reg]);
->          break;
->      case 0x12:     /* l.jalr */
-> -        tcg_gen_movi_tl(cpu_R[9], (dc->pc + 8));
-> +        tcg_gen_movi_tl(cpu_R[9], (dc->base.pc_next + 8));
->          tcg_gen_mov_tl(jmp_pc, cpu_R[reg]);
->          break;
->      default:
-> @@ -795,7 +793,7 @@ static void dec_misc(DisasContext *dc, uint32_t insn)
->                  return;
->              }
->              gen_helper_rfe(cpu_env);
-> -            dc->is_jmp = DISAS_UPDATE;
-> +            dc->base.is_jmp = DISAS_UPDATE;
->  #endif
->          }
->          break;
-> @@ -1254,15 +1252,16 @@ static void dec_sys(DisasContext *dc, uint32_t insn)
->      switch (op0) {
->      case 0x000:    /* l.sys */
->          LOG_DIS("l.sys %d\n", K16);
-> -        tcg_gen_movi_tl(cpu_pc, dc->pc);
-> +        tcg_gen_movi_tl(cpu_pc, dc->base.pc_next);
->          gen_exception(dc, EXCP_SYSCALL);
-> -        dc->is_jmp = DISAS_UPDATE;
-> +        dc->base.is_jmp = DISAS_NORETURN;
->          break;
->  
->      case 0x100:    /* l.trap */
->          LOG_DIS("l.trap %d\n", K16);
-> -        tcg_gen_movi_tl(cpu_pc, dc->pc);
-> +        tcg_gen_movi_tl(cpu_pc, dc->base.pc_next);
->          gen_exception(dc, EXCP_TRAP);
-> +        dc->base.is_jmp = DISAS_NORETURN;
->          break;
->  
->      case 0x300:    /* l.csync */
-> @@ -1479,7 +1478,7 @@ static void disas_openrisc_insn(DisasContext *dc, OpenRISCCPU *cpu)
->  {
->      uint32_t op0;
->      uint32_t insn;
-> -    insn = cpu_ldl_code(&cpu->env, dc->pc);
-> +    insn = cpu_ldl_code(&cpu->env, dc->base.pc_next);
->      op0 = extract32(insn, 26, 6);
->  
->      switch (op0) {
-> @@ -1532,14 +1531,15 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
->      int max_insns;
->  
->      pc_start = tb->pc;
-> -    dc->tb = tb;
->  
-> -    dc->is_jmp = DISAS_NEXT;
-> -    dc->pc = pc_start;
-> +    dc->base.tb = tb;
-> +    dc->base.singlestep_enabled = cs->singlestep_enabled;
-> +    dc->base.pc_next = pc_start;
-> +    dc->base.is_jmp = DISAS_NEXT;
+>  docs/devel/migration.rst | 524 +++++++++++++++++++++++++++------------=
+
+>  1 file changed, 370 insertions(+), 154 deletions(-)
+
+> @@ -40,16 +40,16 @@ to do migration:
+>  - fd migration: do the migration using an file descriptor that is
+>    passed to QEMU.  QEMU doesn't care how this file descriptor is opene=
+d.
+> =20
+> -All these four migration protocols use the same infrastructure to
+> +In addition support is included for migration using RDMA migration whi=
+ch
+
+The double migration in this phrase sounds redundant.  I think you can:
+
+s/In addition/In addition,/
+s/RDMA migration which/RDMA, which/
+
+> +transports the page data using ``RDMA``, where the hardware takes care=
+ of
+> +transporting the pages, and the load on the CPU is much lower.  While =
+the
+> +internals of RDMA migration are a bit different, this isn't really vis=
+ible
+> +outside the RAM migration code.
 > +
->      dc->mem_idx = cpu_mmu_index(&cpu->env, false);
-> -    dc->tb_flags = tb->flags;
-> +    dc->tb_flags = dc->base.tb->flags;
->      dc->delayed_branch = (dc->tb_flags & TB_FLAGS_DFLAG) != 0;
-> -    dc->singlestep_enabled = cs->singlestep_enabled;
->  
->      next_page_start = (pc_start & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
->      num_insns = 0;
-> @@ -1570,19 +1570,19 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
->      }
->  
->      do {
-> -        tcg_gen_insn_start(dc->pc, (dc->delayed_branch ? 1 : 0)
-> +        tcg_gen_insn_start(dc->base.pc_next, (dc->delayed_branch ? 1 : 0)
->  			   | (num_insns ? 2 : 0));
->          num_insns++;
->  
-> -        if (unlikely(cpu_breakpoint_test(cs, dc->pc, BP_ANY))) {
-> -            tcg_gen_movi_tl(cpu_pc, dc->pc);
-> +        if (unlikely(cpu_breakpoint_test(cs, dc->base.pc_next, BP_ANY))) {
-> +            tcg_gen_movi_tl(cpu_pc, dc->base.pc_next);
->              gen_exception(dc, EXCP_DEBUG);
-> -            dc->is_jmp = DISAS_UPDATE;
-> +            dc->base.is_jmp = DISAS_NORETURN;
->              /* The address covered by the breakpoint must be included in
->                 [tb->pc, tb->pc + tb->size) in order to for it to be
->                 properly cleared -- thus we increment the PC here so that
->                 the logic setting tb->size below does the right thing.  */
-> -            dc->pc += 4;
-> +            dc->base.pc_next += 4;
->              break;
->          }
->  
-> @@ -1590,7 +1590,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
->              gen_io_start();
->          }
->          disas_openrisc_insn(dc, cpu);
-> -        dc->pc = dc->pc + 4;
-> +        dc->base.pc_next += 4;
->  
->          /* delay slot */
->          if (dc->delayed_branch) {
-> @@ -1598,15 +1598,15 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
->              if (!dc->delayed_branch) {
->                  tcg_gen_mov_tl(cpu_pc, jmp_pc);
->                  tcg_gen_discard_tl(jmp_pc);
-> -                dc->is_jmp = DISAS_UPDATE;
-> +                dc->base.is_jmp = DISAS_UPDATE;
->                  break;
->              }
->          }
-> -    } while (!dc->is_jmp
-> +    } while (!dc->base.is_jmp
->               && !tcg_op_buf_full()
-> -             && !cs->singlestep_enabled
-> +             && !dc->base.singlestep_enabled
->               && !singlestep
-> -             && (dc->pc < next_page_start)
-> +             && (dc->base.pc_next < next_page_start)
->               && num_insns < max_insns);
->  
->      if (tb_cflags(tb) & CF_LAST_IO) {
-> @@ -1617,35 +1617,34 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
->          tcg_gen_movi_i32(cpu_dflag, dc->delayed_branch != 0);
->      }
->  
-> -    tcg_gen_movi_tl(cpu_ppc, dc->pc - 4);
-> -    if (dc->is_jmp == DISAS_NEXT) {
-> -        dc->is_jmp = DISAS_UPDATE;
-> -        tcg_gen_movi_tl(cpu_pc, dc->pc);
-> +    tcg_gen_movi_tl(cpu_ppc, dc->base.pc_next - 4);
-> +    if (dc->base.is_jmp == DISAS_NEXT) {
-> +        dc->base.is_jmp = DISAS_UPDATE;
-> +        tcg_gen_movi_tl(cpu_pc, dc->base.pc_next);
->      }
-> -    if (unlikely(cs->singlestep_enabled)) {
-> +    if (unlikely(dc->base.singlestep_enabled)) {
->          gen_exception(dc, EXCP_DEBUG);
->      } else {
-> -        switch (dc->is_jmp) {
-> +        switch (dc->base.is_jmp) {
->          case DISAS_NEXT:
-> -            gen_goto_tb(dc, 0, dc->pc);
-> +            gen_goto_tb(dc, 0, dc->base.pc_next);
->              break;
->          default:
-> +        case DISAS_NORETURN:
->          case DISAS_JUMP:
-> +        case DISAS_TB_JUMP:
->              break;
->          case DISAS_UPDATE:
->              /* indicate that the hash table must be used
->                 to find the next TB */
->              tcg_gen_exit_tb(0);
->              break;
-> -        case DISAS_TB_JUMP:
-> -            /* nothing more to generate */
-> -            break;
->          }
->      }
->  
->      gen_tb_end(tb, num_insns);
->  
-> -    tb->size = dc->pc - pc_start;
-> +    tb->size = dc->base.pc_next - pc_start;
->      tb->icount = num_insns;
->  
->      if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
-> 
+
+> +For most devices, the state is saved in a single call to the migration=
+
+> +infrastrucutre; these are *non-iterative* devices.  The data for these=
+
+
+s/infrastrucutre/infrastructure/
+
+> +devices is sent at the end of precopy migration, when the CPUs are pau=
+sed.
+> +Where the data associated with the device is very large (e.g. RAM or l=
+arge tables)
+> +see the iterative device section below.
+
+> +
+> +- Migrations timing out or being failed by higher levels of management=
+,
+> +  or failures of the destination host are not unusual, and care should=
+
+> +  be taken to ensure that the source VM can be restarted up until the =
+point
+> +  when the destination starts runing.  Valid examples include the mana=
+gement
+
+s/runing/running/
+
+> +  layer reverting the migration even though the QEMU level of migratio=
+n has
+> +  succeeded.  For this reason, the state on the source VM should not b=
+e
+> +  destroyed during the migration process in normal use.
+> +
+> +- Busses and devices should be able to explicitly specify addresses wh=
+en
+
+s/Busses/Buses/ ? (both spellings are common, but busses can also be
+confused with a synonym of kisses)
+
+> +When we migrate a device, we save/load the state as a series
+> +of fields.  Some times, due to bugs or new functionality, we need to
+> +change the state to store more/different information.  Changing the mi=
+gration
+> +state saved for a device can break migration comppatibility unless
+
+s/comppatibility/compatibility/
+
+> +care is taken to use the appropriate techniques.  In general QEMU trie=
+s
+> +to maintain forward migration compaitibility (i.e. migrating from
+
+s/compaitibility/compatibility/
+
+> +QEMU n->n+1) and there are users who benefit from backwards compatibil=
+ity
+> +as well.
+
+(fun - 3 spellings among 3 uses in 2 sentences - at least the last one
+was right)
+
+
+> +Note that the contents of the sections for iterative migration tend
+> +to be open-coded by the devices;  care should be taken in parsing
+
+Why the double space?
+
+
+> +
+> +The ``device data`` in each section consists of the data produced
+> +by the code described above.  For non-iterative devices they have a si=
+ngle
+> +section; iterative devices have an initial and last section and a set
+> +of parts inbetween.
+
+s/inbetween/in between/
+
+> +Note that there is very little checking by the common code of the inte=
+grity
+> +of the ``device data`` contents, that's upto the devices themselves.
+
+s/upto/up to/
+
+> +Only a unidirectional stream is required for normal migration, however=
+ a
+> +``return path`` can be created when bidirecitonal communication is des=
+ired.
+
+s/bidirecitonal/bidirectional/
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--JDIFK9kWoXoFsAadYG5so2cF98H2mjOwB
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlraREUACgkQp6FrSiUn
+Q2p42Af9GH6UbtwSdI7FZT+5xI3vHade+A+Z6FDn8WCv48slREwcXgWhs70+QXwb
++tfhVXaNbd+sig9XOHtg89THIcvKFc/hMg+slyfemJLJsZfRUaDNzPh+n1G2wbvt
+BcGKkGCciPW8ARxFZrbZQ/mmmgVBih4u8ZU8Owb54YLGR6+DPh4NwFVL0Jj5Z+17
+8x+xZeTK8aCmZWiQL2sUuI35aTT5ro5CT/snCFfHjYg3042VWS8tzdzA2lEbPt/h
+gZLPolX0+5+QArNEnXK8CmKMt+RssNcN+Nx6mbiK6DiY5YkWsFUX0gvRrLBW2W8M
+cZAvecP2Eh19K7E8i6CnAUtDcd82kw==
+=cKkG
+-----END PGP SIGNATURE-----
+
+--JDIFK9kWoXoFsAadYG5so2cF98H2mjOwB--
