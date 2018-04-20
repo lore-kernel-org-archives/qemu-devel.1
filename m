@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f9PZx-00011F-Gh
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 02:31:32 -0400
+	(envelope-from <armbru@redhat.com>) id 1f9Pa1-00011m-7s
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 02:31:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1f9PZu-0006zZ-CU
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 02:31:29 -0400
-References: <1524054707-20663-1-git-send-email-thuth@redhat.com>
-	<1524054707-20663-3-git-send-email-thuth@redhat.com>
-	<0be89209-6ee5-2f12-fae2-21709fcf6f8a@de.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <7ebf0874-1b70-47e4-fce6-15566887270f@redhat.com>
-Date: Fri, 20 Apr 2018 08:31:16 +0200
+	(envelope-from <armbru@redhat.com>) id 1f9PZv-000708-0E
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 02:31:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45644 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1f9PZu-0006yy-Rs
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 02:31:26 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1520860275-101576-1-git-send-email-imammedo@redhat.com>
+	<87zi21apkh.fsf@dusky.pond.sub.org>
+	<20180417142739.GV29865@localhost.localdomain>
+	<20180417174110.1a7f1daf@redhat.com>
+	<20180417204135.GB29865@localhost.localdomain>
+	<87d0yx2dqp.fsf@dusky.pond.sub.org>
+	<20180419100004.0b560c85@redhat.com>
+	<20180419194251.GZ29865@localhost.localdomain>
+Date: Fri, 20 Apr 2018 08:31:18 +0200
+In-Reply-To: <20180419194251.GZ29865@localhost.localdomain> (Eduardo Habkost's
+	message of "Thu, 19 Apr 2018 16:42:51 -0300")
+Message-ID: <87muxy2xu1.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <0be89209-6ee5-2f12-fae2-21709fcf6f8a@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 for-2.13 2/4] pc-bios/s390-ccw/net: Stop
- virtio-net device before jumping into the OS
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 0/9] enable numa configuration before
+ machine_init() from QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,23 +34,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
-On 19.04.2018 17:49, Christian Borntraeger wrote:
-> On 04/18/2018 02:31 PM, Thomas Huth wrote:
->> The virtio-net receive buffers are filled asynchronously, so we should
->> make sure to properly shut down the virtio-net device before we jump into
->> the loaded kernel. Otherwise an incoming packet could destroy memory of
->> the OS kernel if it did not re-initialize the virtio-net device fast
->> enough yet.
-> 
-> The normal bios does a full subsystem reset before we enter the OS.
-> (see jump_to_IPL_code the diag 308). That should reset all virtio 
-> devices on the qemu level. Shouldnt we rather do the same for
-> the net bios?
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-That should fix this issue, too, right. I'll give it a try and include
-it in v2 if I can make it work...
+> On Thu, Apr 19, 2018 at 10:00:04AM +0200, Igor Mammedov wrote:
+>> On Wed, 18 Apr 2018 09:08:30 +0200
+>> Markus Armbruster <armbru@redhat.com> wrote:
+>> 
+>> > Eduardo Habkost <ehabkost@redhat.com> writes:
+>> > 
+>> > > On Tue, Apr 17, 2018 at 05:41:10PM +0200, Igor Mammedov wrote:  
+>> > >> On Tue, 17 Apr 2018 11:27:39 -0300
+>> > >> Eduardo Habkost <ehabkost@redhat.com> wrote:
+>> > >>   
+>> > >> > On Tue, Apr 17, 2018 at 04:13:34PM +0200, Markus Armbruster wrote:  
+>> > >> > > Igor Mammedov <imammedo@redhat.com> writes:
+>> > >> > > 
+>> > >> > > [...]    
+>> > >> > > > Series allows to configure NUMA mapping at runtime using QMP
+>> > >> > > > interface. For that to happen it introduces a new '-preconfig' CLI option
+>> > >> > > > which allows to pause QEMU before machine_init() is run and
+>> > >> > > > adds new set-numa-node QMP command which in conjunction with
+>> > >> > > > query-hotpluggable-cpus allows to configure NUMA mapping for cpus.
+>> > >> > > >
+>> > >> > > > Later we can modify other commands to run early, for example device_add.
+>> > >> > > > I recall SPAPR had problem when libvirt started QEMU with -S and, while it's
+>> > >> > > > paused, added CPUs with device_add. Intent was to coldplug CPUs (but at that
+>> > >> > > > stage it's considered hotplug already), so SPAPR had to work around the issue.    
+>> > >> > > 
+>> > >> > > That instance is just stupidity / laziness, I think: we consider any
+>> > >> > > plug after machine creation a hot plug.  Real machines remain cold until
+>> > >> > > you press the power button.  Our virtual machines should remain cold
+>> > >> > > until they start running, i.e. with -S until the first "cont".  
+>> > >> It probably would be too risky to change semantics of -S from hotplug to coldplug.
+>> > >> But even if we were easy it won't matter in case if dynamic configuration
+>> > >> done properly. More on it below.
+>> > >>   
+>> > >> > > I vaguely remember me asking this before, but your answer didn't make it
+>> > >> > > into this cover letter, which gives me a pretext to ask again instead of
+>> > >> > > looking it up in the archives: what exactly prevents us from keeping the
+>> > >> > > machine cold enough for numa configuration until the first "cont"?    
+>> > >> > 
+>> > >> > I also think this would be better, but it seems to be difficult
+>> > >> > in practice, see:
+>> > >> > http://mid.mail-archive.com/20180323210532.GD28161@localhost.localdomain  
+>> > >> 
+>> > >> In addition to Eduardo's reply, here is what I've answered back
+>> > >> when you've asked question the 1st time (v2 late at -S pause point reconfig):
+>> > >> https://www.mail-archive.com/qemu-devel@nongnu.org/msg504140.html
+>> > >> 
+>> > >> In short:
+>> > >> I think it's wrong in general doing fixups after machine is build
+>> > >> instead of getting correct configuration before building machine.
+>> > >> That's going to be complex and fragile and might be hard to do at
+>> > >> all depending on what we are fixing up.  
+>> > >
+>> > > What "building the machine" should mean, exactly, for external
+>> > > users?
+>> under "building machine", I've meant machine_run_board_init()
+>> and all follow up steps to machine_done stage.
+>> 
+>> > > The main question I'd like to see answered is: why exactly we
+>> > > must "build" the machine before the first "cont" is issued when
+>> > > using -S?  Why can't we delay everything to "cont" when using -S?  
+>> Nor sure what question is about,
+>> Did you mean if it were possible to postpone machine_run_board_init()
+>> and all later steps to -S/cont time?
+>
+> Exactly.  In other words, what exactly must be done before the
+> monitor is available when using -S, and what exactly can be
+> postponed after "cont" when using -S?
+>
+>>  
+>> > > Is it just because it's a long and complex task?  Does that mean
+>> > > we might still do that eventually, and eliminate the
+>> > > prelaunch/preconfig distinction in the distant future?  
+>> > 
+>> > Why would anyone want to use -S going forward?  For reasons other "we've
+>> > always used -S, and can't be bothered to change".
+>> We should be able to deprecate/remove -S once we can do all
+>> initial configuration that's possible to do there at
+>> preconfig time.
 
- Thomas
+This sounds like there are things we can do with -S but can't
+--preconfig now.  Is that correct?
+
+If yes, I got another question.  If you want to configure NUMA, you need
+to use --preconfig.  If you also want to configure one of the things you
+can't with --preconfig, you need to use -S.  In other words, you need to
+use both.  How would that work?
+
+> If the plan is to deprecate -S, what are the important
+> user-visible differences between -S and -preconfig today?  Do we
+> plan to eliminate all those differences before
+> deprecating/removing -S?
+
+Documentation (including -help) needs to provide clear guidance on what
+to use when.
+
+>> > > Even if we follow your approach, we need to answer these
+>> > > questions.  I'm sure we will try to reorder initialization steps
+>> > > between the preconfig/prelaunch states in the future, and we
+>> > > shouldn't break any expectations from external users when doing
+>> > > that.
+>> As minimum I expect -preconfig to be a runtime equivalent to CLI,
+>> with difference that it will be interactive and use QMP interface.
+>> As long as it sits between CLI parsing and the rest of initialization
+>> it shouldn't break that.
+>
+> What prevents us from making -S a runtime equivalent to CLI?
+
+Good question.  Igor?
+
+>> > Moreover, the questions need to be answered in Git.  Commit message,
+>> > comments, docs/, use your judgement.
+>> I've thought that commit messages/patches were describing introduced
+>> changes sufficiently.
+
+Keep in mind that your poor reviewers context-switch to your patches
+from somewhere else entirely, then read (mostly) linearly, starting with
+the cover letter.  If the cover letter leads to questions and confusion,
+the reading likely stops.  Answers in the commit messages won't do you a
+lick of good then.
+
+It's really, really useful to state the case for the feature right in
+the cover letter.  "What" and "why", not "how".  Write for your
+audience!  The cover letter's audience knows nothing (first order
+approximation).  Don't make them guess.  Especially not "why".  Keep it
+high-level.  Pointers to (specific!) commit messages for additional
+detail can make sense.
+
+>>                       But I've been sitting on these patches for
+>> a long time and what's obvious to me might be not so clear to others.
+
+Par for the course, don't feel bad about it.
+
+>> I might just not see what's missing. Any suggestions to improve it
+>> are welcome.
+>
+> I miss something that documents why both -S and -preconfig need
+> to exist, what are the differences between them today, and what
+> we plan to do about the differences between them in the future.
+
+Yes, please.  Additionally, guidance for users on which of them to use.
