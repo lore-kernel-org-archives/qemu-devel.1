@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35475)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1f9Mca-0002MG-ON
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 23:22:01 -0400
+	(envelope-from <famz@redhat.com>) id 1f9Mqr-00072z-5k
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 23:36:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1f9McZ-0008Mj-Mk
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 23:22:00 -0400
-Date: Fri, 20 Apr 2018 11:21:38 +0800
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180420032138.GF10319@stefanha-x1.localdomain>
+	(envelope-from <famz@redhat.com>) id 1f9Mqq-0008EY-8Y
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 23:36:45 -0400
+Date: Fri, 20 Apr 2018 11:36:26 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180420033626.GF17690@lemon.usersys.redhat.com>
 References: <20180419075232.31407-1-stefanha@redhat.com>
 	<20180419075232.31407-2-stefanha@redhat.com>
-	<20180419091832.GB2730@work-vm>
+	<20180419081344.GA14514@lemon.usersys.redhat.com>
+	<20180420031508.GE10319@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="cpvLTH7QU4gwfq3S"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180419091832.GB2730@work-vm>
+In-Reply-To: <20180420031508.GE10319@stefanha-x1.localdomain>
 Subject: Re: [Qemu-devel] [RFC 1/2] block/file-posix: implement
  bdrv_co_invalidate_cache() on Linux
 List-Id: <qemu-devel.nongnu.org>
@@ -26,112 +26,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>
 
+On Fri, 04/20 11:15, Stefan Hajnoczi wrote:
+> On Thu, Apr 19, 2018 at 04:13:44PM +0800, Fam Zheng wrote:
+> > On Thu, 04/19 15:52, Stefan Hajnoczi wrote:
+> > > On Linux posix_fadvise(POSIX_FADV_DONTNEED) invalidates pages*.  Use
+> > > this to drop page cache on the destination host during shared storage
+> > > migration.  This way the destination host will read the latest copy of
+> > > the data and will not use stale data from the page cache.
+> > > 
+> > > The flow is as follows:
+> > > 
+> > > 1. Source host writes out all dirty pages and inactivates drives.
+> > > 2. QEMU_VM_EOF is sent on migration stream.
+> > > 3. Destination host invalidates caches before accessing drives.
+> > > 
+> > > This patch enables live migration even with -drive cache.direct=off.
+> > > 
+> > > * Terms and conditions may apply, please see patch for details.
+> > > 
+> > > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > > ---
+> > >  block/file-posix.c | 39 +++++++++++++++++++++++++++++++++++++++
+> > >  1 file changed, 39 insertions(+)
+> > > 
+> > > diff --git a/block/file-posix.c b/block/file-posix.c
+> > > index 3794c0007a..df4f52919f 100644
+> > > --- a/block/file-posix.c
+> > > +++ b/block/file-posix.c
+> > > @@ -2236,6 +2236,42 @@ static int coroutine_fn raw_co_block_status(BlockDriverState *bs,
+> > >      return ret | BDRV_BLOCK_OFFSET_VALID;
+> > >  }
+> > >  
+> > > +static void coroutine_fn raw_co_invalidate_cache(BlockDriverState *bs,
+> > > +                                                 Error **errp)
+> > > +{
+> > > +    BDRVRawState *s = bs->opaque;
+> > > +    int ret;
+> > > +
+> > > +    ret = fd_open(bs);
+> > > +    if (ret < 0) {
+> > > +        error_setg_errno(errp, -ret, "The file descriptor is not open");
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    if (s->open_flags & O_DIRECT) {
+> > > +        return; /* No host kernel page cache */
+> > > +    }
+> > > +
+> > > +#if defined(__linux__)
+> > > +    /* This sets the scene for the next syscall... */
+> > > +    ret = bdrv_co_flush(bs);
+> > > +    if (ret < 0) {
+> > > +        error_setg_errno(errp, -ret, "flush failed");
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    /* Linux does not invalidate pages that are dirty, locked, or mmapped by a
+> > > +     * process.  These limitations are okay because we just fsynced the file,
+> > > +     * we don't use mmap, and the file should not be in use by other processes.
+> > > +     */
+> > > +    ret = posix_fadvise(s->fd, 0, 0, POSIX_FADV_DONTNEED);
+> > > +    if (ret != 0) { /* the return value is a positive errno */
+> > > +        error_setg_errno(errp, ret, "fadvise failed");
+> > > +        return;
+> > > +    }
+> > > +#endif /* __linux__ */
+> > 
+> > What about the #else branch? It doesn't automatically work, I guess?
+> 
+> Right, no error is reported.  This is existing QEMU behavior.
+> 
+> If we want to change behavior then it must be done consistently (i.e. by
+> auditing the other block drivers) and we need to be prepared for bug
+> reports (just like file locking, it may expose interesting use cases
+> that we cannot easily dismiss as wrong).  I didn't want to go there.
+> 
+> If there is consensus then I will change the behavior.
 
---cpvLTH7QU4gwfq3S
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+No need to change behavior (reporting error), at least not in this patch. But a
 
-On Thu, Apr 19, 2018 at 10:18:33AM +0100, Dr. David Alan Gilbert wrote:
-> * Stefan Hajnoczi (stefanha@redhat.com) wrote:
-> > On Linux posix_fadvise(POSIX_FADV_DONTNEED) invalidates pages*.  Use
-> > this to drop page cache on the destination host during shared storage
-> > migration.  This way the destination host will read the latest copy of
-> > the data and will not use stale data from the page cache.
-> >=20
-> > The flow is as follows:
-> >=20
-> > 1. Source host writes out all dirty pages and inactivates drives.
-> > 2. QEMU_VM_EOF is sent on migration stream.
-> > 3. Destination host invalidates caches before accessing drives.
-> >=20
-> > This patch enables live migration even with -drive cache.direct=3Doff.
-> >=20
-> > * Terms and conditions may apply, please see patch for details.
-> >=20
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > ---
-> >  block/file-posix.c | 39 +++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 39 insertions(+)
-> >=20
-> > diff --git a/block/file-posix.c b/block/file-posix.c
-> > index 3794c0007a..df4f52919f 100644
-> > --- a/block/file-posix.c
-> > +++ b/block/file-posix.c
-> > @@ -2236,6 +2236,42 @@ static int coroutine_fn raw_co_block_status(Bloc=
-kDriverState *bs,
-> >      return ret | BDRV_BLOCK_OFFSET_VALID;
-> >  }
-> > =20
-> > +static void coroutine_fn raw_co_invalidate_cache(BlockDriverState *bs,
-> > +                                                 Error **errp)
-> > +{
-> > +    BDRVRawState *s =3D bs->opaque;
-> > +    int ret;
-> > +
-> > +    ret =3D fd_open(bs);
-> > +    if (ret < 0) {
-> > +        error_setg_errno(errp, -ret, "The file descriptor is not open"=
-);
-> > +        return;
-> > +    }
-> > +
-> > +    if (s->open_flags & O_DIRECT) {
-> > +        return; /* No host kernel page cache */
-> > +    }
-> > +
-> > +#if defined(__linux__)
-> > +    /* This sets the scene for the next syscall... */
-> > +    ret =3D bdrv_co_flush(bs);
-> > +    if (ret < 0) {
-> > +        error_setg_errno(errp, -ret, "flush failed");
-> > +        return;
-> > +    }
-> > +
-> > +    /* Linux does not invalidate pages that are dirty, locked, or mmap=
-ped by a
-> > +     * process.  These limitations are okay because we just fsynced th=
-e file,
-> > +     * we don't use mmap, and the file should not be in use by other p=
-rocesses.
-> > +     */
-> > +    ret =3D posix_fadvise(s->fd, 0, 0, POSIX_FADV_DONTNEED);
->=20
-> What happens if I try a migrate between two qemu's on the same host?
-> (Which I, and avocado, both use for testing; I think think users
-> occasionally do for QEMU updates).
+#else
+    /* TODO: ... */
+#endif
 
-The steps quoted from the commit description:
+to remember adding similar code to invalidate system cache on other *nix systems
+cannot hurt.  E.g BSDes have posix_fadvise() too, though I have no idea if
+POSIX_FADV_DONTNEED works the same.
 
-  1. Source host writes out all dirty pages and inactivates drives.
-  2. QEMU_VM_EOF is sent on migration stream.
-  3. Destination host invalidates caches before accessing drives.
+(I'm sure there are some tricks on Windows to but do we care? :)
 
-When we reach Step 3 the source QEMU is not doing I/O (no pages are
-locked).  The destination QEMU does bdrv_co_flush() so even if pages are
-still dirty (that shouldn't happen since the source already drained and
-flushed) they will be written out and pages will be clean.  Therefore
-fadvise really invalidates all resident pages.
-
-FWIW when writing this patch I tested with both QEMUs on the same host.
-
-Stefan
-
---cpvLTH7QU4gwfq3S
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJa2VzCAAoJEJykq7OBq3PIIYMIAJEIfqmLVIbOCEDQ2SuDj7x6
-7XcOdAScNwYYVrVO9EARYttQnUrKKON2PD6ST1dHLKr/uI9lLqKlmwO+cZKiv6z+
-imW2nd7Lf8F/GX5mwmENMaPsRV7BmpVOUQGgO0PEhqZ8zdbNf599pD7ldUsp0j6S
-nSgczNqWo6b1AGwO9WlYtmSg0QuZmfNTV9nFTFEXawUtySP9q8Rod6mMOYqoBEyS
-N+vnoUQWIDkdRxY6M2Q4NIDfwx8jSEVlIAXO50GMxd6zwxC0Rikrhzc0RPdeD+iF
-FgVsPGbWU4XJSM8cH2IMWg8ktXWZh9ENVX/bLlAOxyarQqCcgUV6fY/gCR84LzU=
-=XH4m
------END PGP SIGNATURE-----
-
---cpvLTH7QU4gwfq3S--
+Fam
