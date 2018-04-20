@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1f9TaH-0003Eo-Hd
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:48:06 -0400
+	(envelope-from <no-reply@patchew.org>) id 1f9Tdl-0005f9-UY
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:51:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1f9TaD-0006Fa-I6
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:48:05 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50080 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1f9TaD-0006Ei-Bd
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:48:01 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 86996F1205
-	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 10:47:57 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 20 Apr 2018 12:47:43 +0200
-Message-Id: <20180420104743.7396-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH] simple firmware.json test tool
+	(envelope-from <no-reply@patchew.org>) id 1f9Tdi-00006E-1t
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:51:42 -0400
+Resent-Message-Id: <E1f9Tdi-00006E-1t@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21057)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1f9Tdh-00005C-P6
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:51:37 -0400
+In-Reply-To: <20180420104743.7396-1-kraxel@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152422148524.2109.8545873362109975802@71c20359a636>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 20 Apr 2018 03:51:26 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] simple firmware.json test tool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,129 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: lersek@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
+To: kraxel@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, lersek@redhat.com
 
-applies on top of the firmware.json v2 series.
----
- configure       |  2 +-
- Makefile        |  2 ++
- qemu-firmware.c | 81 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 84 insertions(+), 1 deletion(-)
- create mode 100644 qemu-firmware.c
-
-diff --git a/configure b/configure
-index 0a19b033bc..753f80147b 100755
---- a/configure
-+++ b/configure
-@@ -5495,7 +5495,7 @@ fi
- 
- tools=""
- if test "$want_tools" = "yes" ; then
--  tools="qemu-img\$(EXESUF) qemu-io\$(EXESUF) $tools"
-+  tools="qemu-img\$(EXESUF) qemu-io\$(EXESUF) qemu-firmware\$(EXESUF) $tools"
-   if [ "$linux" = "yes" -o "$bsd" = "yes" -o "$solaris" = "yes" ] ; then
-     tools="qemu-nbd\$(EXESUF) $tools"
-   fi
-diff --git a/Makefile b/Makefile
-index 32034abe15..4d6e627113 100644
---- a/Makefile
-+++ b/Makefile
-@@ -543,6 +543,8 @@ qemu-bridge-helper$(EXESUF): qemu-bridge-helper.o $(COMMON_LDADDS)
- 
- qemu-keymap$(EXESUF): qemu-keymap.o ui/input-keymap.o $(COMMON_LDADDS)
- 
-+qemu-firmware$(EXESUF): qemu-firmware.o $(COMMON_LDADDS)
-+
- fsdev/virtfs-proxy-helper$(EXESUF): fsdev/virtfs-proxy-helper.o fsdev/9p-marshal.o fsdev/9p-iov-marshal.o $(COMMON_LDADDS)
- fsdev/virtfs-proxy-helper$(EXESUF): LIBS += -lcap
- 
-diff --git a/qemu-firmware.c b/qemu-firmware.c
-new file mode 100644
-index 0000000000..792f0fec8f
---- /dev/null
-+++ b/qemu-firmware.c
-@@ -0,0 +1,81 @@
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "qemu/error-report.h"
-+
-+#include "qapi/error.h"
-+#include "qapi/qapi-types-firmware.h"
-+#include "qapi/qapi-visit-firmware.h"
-+#include "qapi/qobject-input-visitor.h"
-+
-+int main(int argc, char *argv[])
-+{
-+    Error *err = NULL;
-+    FirmwareMappingFlash *flash;
-+    Firmware *fw;
-+    Visitor *v;
-+    int fd, size, rc;
-+    char *buf;
-+
-+    if (argc != 2) {
-+        fprintf(stderr, "usage: qemu-firmware <firmware-desc.json>\n");
-+        exit(1);
-+    }
-+
-+    /* read file */
-+    fd = open(argv[1], O_RDONLY);
-+    if (fd < 0) {
-+        fprintf(stderr, "open %s: %s\n", argv[1], strerror(errno));
-+        exit(1);
-+    }
-+    size = lseek(fd, 0, SEEK_END);
-+    if (size < 0) {
-+        perror("lseek");
-+        exit(1);
-+    }
-+    lseek(fd, 0, SEEK_SET);
-+    buf = malloc(size+1);
-+    rc = read(fd, buf, size);
-+    if (rc != size) {
-+        fprintf(stderr, "file read error\n");
-+        exit(1);
-+    }
-+    buf[size] = 0;
-+    close(fd);
-+
-+    /* parse file */
-+    v = qobject_input_visitor_new_str(buf, "", &err);
-+    if (!v) {
-+        error_report_err(err);
-+        exit(1);
-+    }
-+    visit_type_Firmware(v, NULL, &fw, &error_fatal);
-+    visit_free(v);
-+
-+    /* print cmdline */
-+    switch (fw->mapping->device) {
-+    case FIRMWARE_DEVICE_FLASH:
-+        /*
-+         * FIXME: nvram should be a per-guest copy.
-+         *        How to handle that best here?
-+         */
-+        flash = &fw->mapping->u.flash;
-+        printf("-drive if=pflash,index=0,format=%s,file=%s\n",
-+               BlockdevDriver_str(flash->executable->format),
-+               flash->executable->pathname);
-+        printf("-drive if=pflash,index=1,format=%s,file=%s\n",
-+               BlockdevDriver_str(flash->nvram_template->format),
-+               flash->nvram_template->pathname);
-+        break;
-+    case FIRMWARE_DEVICE_MEMORY:
-+        printf("-bios %s\n", fw->mapping->u.memory.pathname);
-+        break;
-+    case FIRMWARE_DEVICE_KERNEL:
-+        printf("-kernel %s\n", fw->mapping->u.kernel.pathname);
-+        break;
-+    default:
-+        fprintf(stderr, "TODO\n");
-+        break;
-+    }
-+
-+    exit(0);
-+}
--- 
-2.9.3
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNDIwMTA0NzQzLjczOTYtMS1rcmF4ZWxAcmVkaGF0LmNvbQpTdWJqZWN0
+OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBzaW1wbGUgZmlybXdhcmUuanNvbiB0ZXN0IHRvb2wKCj09
+PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9
+JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
+ZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21t
+aXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAk
+Y29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9n
+IC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1l
+bWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAg
+IGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAk
+ZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4
+MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXct
+cHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMTUyNDE1NTk4
+My0xNjcwNS0xLWdpdC1zZW5kLWVtYWlsLXN0ZWZhbmJAbGludXgudm5ldC5pYm0uY29tIC0+IHBh
+dGNoZXcvMTUyNDE1NTk4My0xNjcwNS0xLWdpdC1zZW5kLWVtYWlsLXN0ZWZhbmJAbGludXgudm5l
+dC5pYm0uY29tCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxODA0MTkyMjMx
+NTEuNjIzMTc0LTEtZWJsYWtlQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4MDQxOTIyMzE1MS42
+MjMxNzQtMS1lYmxha2VAcmVkaGF0LmNvbQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRj
+aGV3LzIwMTgwNDIwMDg0ODIwLjM4NzMtMS1rcmF4ZWxAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIw
+MTgwNDIwMDg0ODIwLjM4NzMtMS1rcmF4ZWxAcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10gICAgICAg
+ICAgICAgICBwYXRjaGV3LzIwMTgwNDIwMTA0NzQzLjczOTYtMS1rcmF4ZWxAcmVkaGF0LmNvbSAt
+PiBwYXRjaGV3LzIwMTgwNDIwMTA0NzQzLjczOTYtMS1rcmF4ZWxAcmVkaGF0LmNvbQpTd2l0Y2hl
+ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjcyNzI0ZGVkZWUgc2ltcGxlIGZpcm13YXJlLmpzb24g
+dGVzdCB0b29sCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IHNpbXBs
+ZSBmaXJtd2FyZS5qc29uIHRlc3QgdG9vbC4uLgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3Vu
+ZCB0aGF0ICcrJyAoY3R4OlZ4VikKIzc2OiBGSUxFOiBxZW11LWZpcm13YXJlLmM6MzY6CisgICAg
+YnVmID0gbWFsbG9jKHNpemUrMSk7CiAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogTWlz
+c2luZyBTaWduZWQtb2ZmLWJ5OiBsaW5lKHMpCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3Ms
+IDk3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
+cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
+dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
+Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgot
+LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
+ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRo
+YXQuY29t
