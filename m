@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58076)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f9YU6-0007In-SZ
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:02:04 -0400
+	(envelope-from <lersek@redhat.com>) id 1f9YXK-0001Sf-9e
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:05:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f9YU4-0007yT-BI
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:02:02 -0400
-Resent-Message-Id: <E1f9YU4-0007yT-BI@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21034)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1f9YU4-0007tT-43
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:02:00 -0400
-In-Reply-To: <20180420155045.18862-1-alex.bennee@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152424006923.2142.4951528468423243188@71c20359a636>
+	(envelope-from <lersek@redhat.com>) id 1f9YXD-0003sb-Ti
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:05:22 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60072 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1f9YXD-0003rL-Og
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:05:15 -0400
+References: <20180417224054.26363-1-lersek@redhat.com>
+	<87po2wzysh.fsf@dusky.pond.sub.org>
+	<8a52bb49-4194-3b91-8b67-a0e5700fd6ed@redhat.com>
+	<87in8nvdpn.fsf@dusky.pond.sub.org> <20180419075629.GC10259@redhat.com>
+	<5ed8b01f-7faa-b23d-5fd2-f4715294e061@redhat.com>
+	<87muxyyr82.fsf@dusky.pond.sub.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <8fc9f287-c0c1-45c1-b46c-64f479b12723@redhat.com>
+Date: Fri, 20 Apr 2018 18:04:59 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 20 Apr 2018 09:01:10 -0700 (PDT)
-Subject: Re: [Qemu-devel] [RFC PATCH 0/6] Convert softmmu-template into
- normal code
+In-Reply-To: <87muxyyr82.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [libvirt] [qemu RFC v2] qapi: add "firmware.json"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +32,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alex.bennee@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, richard.henderson@linaro.org, pbonzini@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, libvir-list@redhat.com, Michal Privoznik <mprivozn@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Gary Ching-Pang Lin <glin@suse.com>, Gerd Hoffmann <kraxel@redhat.com>, David Gibson <dgibson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNDIwMTU1MDQ1LjE4ODYyLTEtYWxleC5iZW5uZWVAbGluYXJvLm9yZwpT
-dWJqZWN0OiBbUWVtdS1kZXZlbF0gW1JGQyBQQVRDSCAwLzZdIENvbnZlcnQgc29mdG1tdS10ZW1w
-bGF0ZSBpbnRvIG5vcm1hbCBjb2RlCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
-YXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdj
-IC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
-YWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2
-ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQ
-QVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlm
-ICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAt
-LW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAg
-ICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
-VXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0
-dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAg
-ICAgICAgICBwYXRjaGV3LzIwMTgwNDIwMTU1MDQ1LjE4ODYyLTEtYWxleC5iZW5uZWVAbGluYXJv
-Lm9yZyAtPiBwYXRjaGV3LzIwMTgwNDIwMTU1MDQ1LjE4ODYyLTEtYWxleC5iZW5uZWVAbGluYXJv
-Lm9yZwogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwNDIwMTU1NTQ3Ljk0
-OTctMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE4MDQyMDE1NTU0Ny45
-NDk3LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
-dGVzdCcKMTNjYjFhYjM3OSBhY2NlbC90Y2c6IGNvbnZlcnQgNC84IGJ5dGUgYWNjZXNzIGFuZCBy
-ZW1vdmUgc29mdG1tdV90ZW1wbGF0ZQowMmMxMGEyZjg2IGFjY2VsL3RjZzogY3JlYXRlIHN0b3Jl
-X2hlbHBlcgpmYWM3YjhlYmZiIGFjY2VsL3RjZzogY3JlYXRlIGxvYWRfaGVscGVyCmY0Y2FmMjc4
-MjYgYWNjZWwvdGNnOiBhZGQgREFUQV9TSVpFID0gMiB0byBzb2Z0bW11CjU4YWQzMTRlZTQgYWNj
-ZWwvdGNnOiBuZXcgc29mdG1tdS5jIHdpdGggREFUQV9TSVpFPTEKYzYyY2Y0Y2VkMCBhY2NlbC90
-Y2c6IGV4cG9ydCBzb21lIGNwdXRsYiBmdW5jdGlvbnMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNo
-ZWNraW5nIFBBVENIIDEvNjogYWNjZWwvdGNnOiBleHBvcnQgc29tZSBjcHV0bGIgZnVuY3Rpb25z
-Li4uCkNoZWNraW5nIFBBVENIIDIvNjogYWNjZWwvdGNnOiBuZXcgc29mdG1tdS5jIHdpdGggREFU
-QV9TSVpFPTEuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE4NzogRklMRTog
-YWNjZWwvdGNnL3NvZnRtbXUuYzoxMzE6CisgICAgICAgIHRsYl9hZGRyID0gZW52LT50bGJfdGFi
-bGVbbW11X2lkeF1baW5kZXhdLmFkZHJfd3JpdGUgJiB+VExCX0lOVkFMSURfTUFTSzsKCnRvdGFs
-OiAwIGVycm9ycywgMSB3YXJuaW5ncywgMjc5IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFz
-IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
-cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
-Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMy82OiBhY2NlbC90Y2c6IGFk
-ZCBEQVRBX1NJWkUgPSAyIHRvIHNvZnRtbXUuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJh
-Y3RlcnMKIzIzOTogRklMRTogYWNjZWwvdGNnL3NvZnRtbXUuYzo0NDc6CisgICAgICAgIHRsYl9h
-ZGRyID0gZW52LT50bGJfdGFibGVbbW11X2lkeF1baW5kZXhdLmFkZHJfd3JpdGUgJiB+VExCX0lO
-VkFMSURfTUFTSzsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMTY6IEZJTEU6
-IGFjY2VsL3RjZy9zb2Z0bW11LmM6NTI0OgorICAgICAgICB0bGJfYWRkciA9IGVudi0+dGxiX3Rh
-YmxlW21tdV9pZHhdW2luZGV4XS5hZGRyX3dyaXRlICYgflRMQl9JTlZBTElEX01BU0s7Cgp0b3Rh
-bDogMCBlcnJvcnMsIDIgd2FybmluZ3MsIDQ3MyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDQvNjogYWNjZWwvdGNnOiBj
-cmVhdGUgbG9hZF9oZWxwZXIuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE2
-NzogRklMRTogYWNjZWwvdGNnL3NvZnRtbXUuYzoxMzI6CisgICAgICAgIHJlczEgPSBsb2FkX2hl
-bHBlcihlbnYsIGFkZHIxLCBzaXplLCBiaWdfZW5kaWFuLCBjb2RlX3JlYWQsIG9pLCByZXRhZGRy
-KTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxNjg6IEZJTEU6IGFjY2VsL3Rj
-Zy9zb2Z0bW11LmM6MTMzOgorICAgICAgICByZXMyID0gbG9hZF9oZWxwZXIoZW52LCBhZGRyMiwg
-c2l6ZSwgYmlnX2VuZGlhbiwgY29kZV9yZWFkLCBvaSwgcmV0YWRkcik7CgpFUlJPUjogc3BhY2Ug
-cHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygn
-CiMyNDQ6IEZJTEU6IGFjY2VsL3RjZy9zb2Z0bW11LmM6MjA0OgordWludDhfdCBfX2F0dHJpYnV0
-ZV9fKChmbGF0dGVuKSkgaGVscGVyX3JldF9sZGJfY21tdSAoQ1BVQXJjaFN0YXRlICplbnYsCgp0
-b3RhbDogMSBlcnJvcnMsIDIgd2FybmluZ3MsIDUwNiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA1LzY6IGFjY2VsL3Rj
-ZzogY3JlYXRlIHN0b3JlX2hlbHBlci4uLgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBhZnRlciB0
-aGF0IG9wZW4gcGFyZW50aGVzaXMgJygnCiMxNjI6IEZJTEU6IGFjY2VsL3RjZy9zb2Z0bW11LmM6
-MzE2OgorICAgICAgICAgICAgICAgIHd2ID0gYnN3YXAxNiggKHVpbnQxNl90KSB2YWwpOwoKRVJS
-T1I6IHNwYWNlIHJlcXVpcmVkIGJlZm9yZSB0aGUgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzIyNzog
-RklMRTogYWNjZWwvdGNnL3NvZnRtbXUuYzozNjg6CisgICAgc3dpdGNoKHNpemUpIHsKCnRvdGFs
-OiAyIGVycm9ycywgMCB3YXJuaW5ncywgMzE0IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFz
-IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
-cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
-Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDYvNjogYWNjZWwvdGNnOiBj
-b252ZXJ0IDQvOCBieXRlIGFjY2VzcyBhbmQgcmVtb3ZlIHNvZnRtbXVfdGVtcGxhdGUuLi4KPT09
-IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpF
-bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5v
-cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5j
-b20=
+On 04/20/18 14:53, Markus Armbruster wrote:
+> Laszlo Ersek <lersek@redhat.com> writes:
+
+[snip]
+
+>> The targets with softmmu are: aarch64, alpha, arm, cris, hppa, i386,
+>> lm32, m68k, microblaze, microblazeel, mips, mips64, mips64el, mipsel,
+>> moxie, nios2, or1k, ppc, ppc64, ppcemb, riscv32, riscv64, s390x, sh4,
+>> sh4eb, sparc, sparc64, tricore, unicore32, x86_64, xtensa, xtensaeb.
+>>
+>> That is, at least the following constants in CpuInfoArch have no
+>> corresponding (identical) mapping -- I'll state to the right of the
+>> arrow the emulation targets which I know or presume to be associated
+>> with the CpuInfoArch constant:
+>> - x86 -> i386, x86_64
+>> - sparc -> sparc, sparc64
+>> - ppc -> ppc, ppc64, ppcemb
+>> - mips -> mips, mips64, mips64el, mipsel
+>> - s390 -> s390x
+>> - riscv -> riscv32, riscv64
+>>
+>> The only constant that seems to have a 1:1 mapping is "tricore", but I
+>> could perfectly well be thinking even that just because I have no clue
+>> about "tricore".
+>>
+>> So, I don't think CpuInfoArch can be updated so that it both remains
+>> compatible with current QMP clients, and serves "firmware.json". In the
+>> firmware schema we don't just need CPU architecture, but actual emulator
+>> names (and board / machine types).
+> 
+> The completely orthodox fix for CpuInfo would be:
+> 
+> * Keep @arch unchanged.  In particular, keep "other" for all targets
+>   other than 'x86', 'sparc', 'ppc', 'mips', 'tricore'.
+> 
+> * Add a new member @target of new enum type Target, whose values match
+>   configures idea of targets exactly.
+> 
+> * Make the new member the union tag.
+> 
+> It's too late for complete orthodoxy; we already changed @arch.
+> 
+> A common enum type Target makes sense anyway, I think.
+> 
+> Using it in CpuInfo as described above may make sense, too.  Could be
+> left to a follow-up patch.
+> 
+>> I grepped 'qapi/*json' for the whole word "x86_64", and the only thing
+>> that remotely matches is the @TargetInfo structure, in which the @arch
+>> field is a string, coming with the example "x86_64". The example also
+>> names "i386" separately.
+> 
+> Well spotted.
+> 
+> TargetInfo member @arch is set to TARGET_NAME, which matches configure's
+> idea of the target.  If we add enum Target, we should change @arch's
+> type from str to Target.
+> 
+>> So what might make sense is to introduce a separate enum in
+>> "qapi/misc.json" with all the softmmu targets I listed above, and change
+>> the type of @TargetInfo.@arch to that enum.
+> 
+> I arrived at this conclusion, too.
+> 
+>>                                             In parallel,
+>> qmp_query_target() would have to be updated to look up the enum value
+>> matching TARGET_NAME. (I do think we can ignore linux-user etc emulators
+>> for collecting the relevant arches here: @TargetInfo is only used in the
+>> "query-target" QMP command, and Markus said above that QMP is only used
+>> with system emulation.)
+>>
+>> Should I do this?
+> 
+> Yes, please.
+
+OK, so here's my understanding:
+
+(1) I'll introduce a new @Target enum in misc.json. I'll inherit /
+include it in firmware.json. This is compatible with what Dan said.
+
+(2) I'll change @TargetInfo.@arch to the new type. I believe this will
+break the compilation of qmp_query_target(); I'll hack on that until it
+builds again, with the lookup. :)
+
+(3) Regarding the addition of @target to CpuInfo (accompanying @arch)
+doesn't look hard; what *does* look hard is changing the union
+discriminator from @arch to @target. @target has many more values, and I
+would have to map all of them to the (fewer) @arch values that currently
+do *not* select @CpuInfoOther. Here's an example:
+
+- Both @i386 and @x86_64 from @target mean @x86 in @arch,
+- because @x86 currently selects @CpuInfoX86, not @CpuInfoOther,
+  both @i386 and @x86_64 must be assigned @CpuInfoX86.
+
+This depends on the knowledge that "x86" actually *means* "i386 plus
+x86_64", and I totally don't have that knowledge for the rest of the
+arches / targets.
+
+So, the modification of @CpuInfo I would indeed like to pass off to
+someone else. (Well, if all the architecture maintainers follow up and
+tell me what emulators exactly fall under the umbrella of each
+individual @arch value, I can post the patch.) BTW... I wonder how
+compatibility would be affected if we just added @target to @CpuInfo,
+even without making it the new discriminator.
+
+... Anyway, I think I've gotten a huge amount of useful and actionable
+feedback; thanks everyone, let me work on RFCv3 and post it soon. :)
+
+Thanks!
+Laszlo
