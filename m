@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1f9MWH-0008WT-Ik
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 23:15:30 -0400
+	(envelope-from <stefanha@redhat.com>) id 1f9Mca-0002MG-ON
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 23:22:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1f9MWG-0006Ii-BI
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 23:15:29 -0400
-Date: Fri, 20 Apr 2018 11:15:08 +0800
+	(envelope-from <stefanha@redhat.com>) id 1f9McZ-0008Mj-Mk
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 23:22:00 -0400
+Date: Fri, 20 Apr 2018 11:21:38 +0800
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180420031508.GE10319@stefanha-x1.localdomain>
+Message-ID: <20180420032138.GF10319@stefanha-x1.localdomain>
 References: <20180419075232.31407-1-stefanha@redhat.com>
 	<20180419075232.31407-2-stefanha@redhat.com>
-	<20180419081344.GA14514@lemon.usersys.redhat.com>
+	<20180419091832.GB2730@work-vm>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ZRyEpB+iJ+qUx0kp"
+	protocol="application/pgp-signature"; boundary="cpvLTH7QU4gwfq3S"
 Content-Disposition: inline
-In-Reply-To: <20180419081344.GA14514@lemon.usersys.redhat.com>
+In-Reply-To: <20180419091832.GB2730@work-vm>
 Subject: Re: [Qemu-devel] [RFC 1/2] block/file-posix: implement
  bdrv_co_invalidate_cache() on Linux
 List-Id: <qemu-devel.nongnu.org>
@@ -26,17 +26,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org
 
 
---ZRyEpB+iJ+qUx0kp
+--cpvLTH7QU4gwfq3S
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 19, 2018 at 04:13:44PM +0800, Fam Zheng wrote:
-> On Thu, 04/19 15:52, Stefan Hajnoczi wrote:
+On Thu, Apr 19, 2018 at 10:18:33AM +0100, Dr. David Alan Gilbert wrote:
+> * Stefan Hajnoczi (stefanha@redhat.com) wrote:
 > > On Linux posix_fadvise(POSIX_FADV_DONTNEED) invalidates pages*.  Use
 > > this to drop page cache on the destination host during shared storage
 > > migration.  This way the destination host will read the latest copy of
@@ -99,37 +99,39 @@ e file,
 rocesses.
 > > +     */
 > > +    ret =3D posix_fadvise(s->fd, 0, 0, POSIX_FADV_DONTNEED);
-> > +    if (ret !=3D 0) { /* the return value is a positive errno */
-> > +        error_setg_errno(errp, ret, "fadvise failed");
-> > +        return;
-> > +    }
-> > +#endif /* __linux__ */
 >=20
-> What about the #else branch? It doesn't automatically work, I guess?
+> What happens if I try a migrate between two qemu's on the same host?
+> (Which I, and avocado, both use for testing; I think think users
+> occasionally do for QEMU updates).
 
-Right, no error is reported.  This is existing QEMU behavior.
+The steps quoted from the commit description:
 
-If we want to change behavior then it must be done consistently (i.e. by
-auditing the other block drivers) and we need to be prepared for bug
-reports (just like file locking, it may expose interesting use cases
-that we cannot easily dismiss as wrong).  I didn't want to go there.
+  1. Source host writes out all dirty pages and inactivates drives.
+  2. QEMU_VM_EOF is sent on migration stream.
+  3. Destination host invalidates caches before accessing drives.
 
-If there is consensus then I will change the behavior.
+When we reach Step 3 the source QEMU is not doing I/O (no pages are
+locked).  The destination QEMU does bdrv_co_flush() so even if pages are
+still dirty (that shouldn't happen since the source already drained and
+flushed) they will be written out and pages will be clean.  Therefore
+fadvise really invalidates all resident pages.
+
+FWIW when writing this patch I tested with both QEMUs on the same host.
 
 Stefan
 
---ZRyEpB+iJ+qUx0kp
+--cpvLTH7QU4gwfq3S
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJa2Vs8AAoJEJykq7OBq3PIpTQIAKKb12A0tXanZvijlSxYi2xD
-kmQsCLaRp1ltcbBSRvNwlQ0vAvOhkJwxszqtrNSjTrJ2Huj2hwRgyp0IgR9TTj3S
-wPb8IkhoCE/0GZQmqfvuQpqtWGfZwuWojJmNXzZq1hqTaOEj72NqjnhqR+1IzdTf
-tI8k161SMXI3blKIFODQHz48YX5kUlDEAAFiNCeIrhDHIoIoGRXCNkeTBZX9vBPu
-K9+r4cXHb1dN+/n0Ei4xVJNp8N8EhJTfkhnoC2lYwZcOqK2u63z2TAUB0pFu50fa
-vuKmwTtwpTYROXxvtI27xGn3UFJt7iz7Vzq4M93hmjLLjQ1FwTowYGWdmUH0xoE=
-=6yW1
+iQEcBAEBAgAGBQJa2VzCAAoJEJykq7OBq3PIIYMIAJEIfqmLVIbOCEDQ2SuDj7x6
+7XcOdAScNwYYVrVO9EARYttQnUrKKON2PD6ST1dHLKr/uI9lLqKlmwO+cZKiv6z+
+imW2nd7Lf8F/GX5mwmENMaPsRV7BmpVOUQGgO0PEhqZ8zdbNf599pD7ldUsp0j6S
+nSgczNqWo6b1AGwO9WlYtmSg0QuZmfNTV9nFTFEXawUtySP9q8Rod6mMOYqoBEyS
+N+vnoUQWIDkdRxY6M2Q4NIDfwx8jSEVlIAXO50GMxd6zwxC0Rikrhzc0RPdeD+iF
+FgVsPGbWU4XJSM8cH2IMWg8ktXWZh9ENVX/bLlAOxyarQqCcgUV6fY/gCR84LzU=
+=XH4m
 -----END PGP SIGNATURE-----
 
---ZRyEpB+iJ+qUx0kp--
+--cpvLTH7QU4gwfq3S--
