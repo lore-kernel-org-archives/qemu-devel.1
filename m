@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43024)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1f9Y6z-0006vE-Q7
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:38:11 -0400
+	(envelope-from <lersek@redhat.com>) id 1f9Y8g-0007tv-Ef
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:39:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1f9Y6v-0000fO-LW
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:38:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58422 helo=mx1.redhat.com)
+	(envelope-from <lersek@redhat.com>) id 1f9Y8c-0002cB-CW
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:39:54 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46034 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1f9Y6v-0000Yf-DH
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:38:05 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D555581A88BC
-	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 15:38:04 +0000 (UTC)
-References: <20180420104743.7396-1-kraxel@redhat.com>
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1f9Y8c-0002a2-6u
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:39:50 -0400
+References: <20180417224054.26363-1-lersek@redhat.com>
+	<87po2wzysh.fsf@dusky.pond.sub.org>
+	<8a52bb49-4194-3b91-8b67-a0e5700fd6ed@redhat.com>
+	<87in8nvdpn.fsf@dusky.pond.sub.org> <20180419075629.GC10259@redhat.com>
+	<5ed8b01f-7faa-b23d-5fd2-f4715294e061@redhat.com>
+	<20180419091201.GI10259@redhat.com>
+	<a9006770-b4e3-cf57-3efa-c967740f7a94@redhat.com>
+	<20180420093457.GE21035@redhat.com>
 From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <3f72757a-4b4c-9241-dd8f-561886cf3295@redhat.com>
-Date: Fri, 20 Apr 2018 17:38:03 +0200
+Message-ID: <f421cddb-8e0f-ce27-6ae5-05f6cfb2a4af@redhat.com>
+Date: Fri, 20 Apr 2018 17:39:42 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180420104743.7396-1-kraxel@redhat.com>
+In-Reply-To: <20180420093457.GE21035@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] simple firmware.json test tool
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [libvirt] [qemu RFC v2] qapi: add "firmware.json"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,144 +34,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, libvir-list@redhat.com, Michal Privoznik <mprivozn@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Gary Ching-Pang Lin <glin@suse.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <dgibson@redhat.com>
 
-On 04/20/18 12:47, Gerd Hoffmann wrote:
-> applies on top of the firmware.json v2 series.
-> ---
->  configure       |  2 +-
->  Makefile        |  2 ++
->  qemu-firmware.c | 81 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 84 insertions(+), 1 deletion(-)
->  create mode 100644 qemu-firmware.c
-> 
-> diff --git a/configure b/configure
-> index 0a19b033bc..753f80147b 100755
-> --- a/configure
-> +++ b/configure
-> @@ -5495,7 +5495,7 @@ fi
->  
->  tools=""
->  if test "$want_tools" = "yes" ; then
-> -  tools="qemu-img\$(EXESUF) qemu-io\$(EXESUF) $tools"
-> +  tools="qemu-img\$(EXESUF) qemu-io\$(EXESUF) qemu-firmware\$(EXESUF) $tools"
->    if [ "$linux" = "yes" -o "$bsd" = "yes" -o "$solaris" = "yes" ] ; then
->      tools="qemu-nbd\$(EXESUF) $tools"
->    fi
-> diff --git a/Makefile b/Makefile
-> index 32034abe15..4d6e627113 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -543,6 +543,8 @@ qemu-bridge-helper$(EXESUF): qemu-bridge-helper.o $(COMMON_LDADDS)
->  
->  qemu-keymap$(EXESUF): qemu-keymap.o ui/input-keymap.o $(COMMON_LDADDS)
->  
-> +qemu-firmware$(EXESUF): qemu-firmware.o $(COMMON_LDADDS)
-> +
->  fsdev/virtfs-proxy-helper$(EXESUF): fsdev/virtfs-proxy-helper.o fsdev/9p-marshal.o fsdev/9p-iov-marshal.o $(COMMON_LDADDS)
->  fsdev/virtfs-proxy-helper$(EXESUF): LIBS += -lcap
->  
-> diff --git a/qemu-firmware.c b/qemu-firmware.c
-> new file mode 100644
-> index 0000000000..792f0fec8f
-> --- /dev/null
-> +++ b/qemu-firmware.c
-> @@ -0,0 +1,81 @@
-> +#include "qemu/osdep.h"
-> +#include "qemu-common.h"
-> +#include "qemu/error-report.h"
-> +
-> +#include "qapi/error.h"
-> +#include "qapi/qapi-types-firmware.h"
-> +#include "qapi/qapi-visit-firmware.h"
-> +#include "qapi/qobject-input-visitor.h"
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +    Error *err = NULL;
-> +    FirmwareMappingFlash *flash;
-> +    Firmware *fw;
-> +    Visitor *v;
-> +    int fd, size, rc;
-> +    char *buf;
-> +
-> +    if (argc != 2) {
-> +        fprintf(stderr, "usage: qemu-firmware <firmware-desc.json>\n");
-> +        exit(1);
-> +    }
-> +
-> +    /* read file */
-> +    fd = open(argv[1], O_RDONLY);
-> +    if (fd < 0) {
-> +        fprintf(stderr, "open %s: %s\n", argv[1], strerror(errno));
-> +        exit(1);
-> +    }
-> +    size = lseek(fd, 0, SEEK_END);
-> +    if (size < 0) {
-> +        perror("lseek");
-> +        exit(1);
-> +    }
-> +    lseek(fd, 0, SEEK_SET);
-> +    buf = malloc(size+1);
-> +    rc = read(fd, buf, size);
-> +    if (rc != size) {
-> +        fprintf(stderr, "file read error\n");
-> +        exit(1);
-> +    }
-> +    buf[size] = 0;
-> +    close(fd);
-> +
-> +    /* parse file */
-> +    v = qobject_input_visitor_new_str(buf, "", &err);
-> +    if (!v) {
-> +        error_report_err(err);
-> +        exit(1);
-> +    }
-> +    visit_type_Firmware(v, NULL, &fw, &error_fatal);
-> +    visit_free(v);
-> +
-> +    /* print cmdline */
-> +    switch (fw->mapping->device) {
-> +    case FIRMWARE_DEVICE_FLASH:
-> +        /*
-> +         * FIXME: nvram should be a per-guest copy.
-> +         *        How to handle that best here?
-> +         */
+On 04/20/18 11:34, Daniel P. Berrang=C3=A9 wrote:
+> On Fri, Apr 20, 2018 at 10:11:08AM +0200, Laszlo Ersek wrote:
+>> On 04/19/18 11:12, Daniel P. Berrang=C3=A9 wrote:
+>>> On Thu, Apr 19, 2018 at 10:39:32AM +0200, Laszlo Ersek wrote:
+>>>> On 04/19/18 09:56, Daniel P. Berrang=C3=A9 wrote:
+>>>>> On Thu, Apr 19, 2018 at 09:48:36AM +0200, Markus Armbruster wrote:
+>>>>>> Laszlo Ersek <lersek@redhat.com> writes:
+>>>>>>
+>>>>>>> On 04/18/18 10:47, Markus Armbruster wrote:
+>>>>>>>> Laszlo Ersek <lersek@redhat.com> writes:
+>>>>>> Replacing CpuInfoArch by such an enum will change the discriminato=
+r
+>>>>>> value from "other" to the real architecture, with the obvious
+>>>>>> compatibility concerns.  But we've accepted similar changes twice
+>>>>>> already: commit 9d0306dfdfb and commit 25fa194b7b1, both v2.12.0-r=
+c0.
+>>>>>>
+>>>>>> "other" was a bad idea.  Hindsight 20/20.
+>>>>>>
+>>>>>> Getting rid of it in one go rather than piecemeal seems like the l=
+east
+>>>>>> bad way out.  Too late for 2.12, though.  Eric, what do you think?
+>>>>>
+>>>>> Given the context in which this "other" value is used, I think it i=
+s
+>>>>> reasonable to kill it and put a full arch list in there.
+>>>>>
+>>>>> No app is likely to be accessing the struct under "other" because i=
+t
+>>>>> is just an empty placeholder.
+>>>>
+>>>> Commit 9d0306dfdfb added "s390" and "CpuInfoS390", which I guess had=
+ the
+>>>> potential to confuse QMP clients that didn't expect "s390", but
+>>>> otherwise it didn't mess with preexistent enum values / structures.
+>>>
+>>> NB, qemu-system-s390x would previously have returned "other" in
+>>> this field, and now it returns "s390".  So while it didn't
+>>> remove "other" from the list of things that could potentially
+>>> exist, it did change what the s390x binary will actually report.
+>>>
+>>>> The same applies to commit 25fa194b7b1, just with "riscv" /
+>>>> "CpuInfoRISCV" substituted.
+>>>>
+>>>> Removing "other" might confuse QMP clients that expect it, except
+>>>> (according to Daniel) no such client exists, probably.
+>>>
+>>> When I say removing "other", I imply that we add an explicit arch
+>>> for all those which we currently are missing. IOW, all qemu-system-XX=
+X
+>>> binaries which currently report "other" would change to report their
+>>> respective "XXX" values.
+>>>
+>>> So in this way, it is exactly the same as what we did when we
+>>> introduced "s390" as an option.
+>>>
+>>> The only difference is that once we have every binary reporting the
+>>> correct arch, we can now also remove "other" from the schema itself
+>>> as it will then be unused.
+>>
+>> Can we please translate this into more actionable items for me, becaus=
+e
+>> I'm getting confused :)
+>>
+>> First, if I add "i386" and "x86_64" to the enum list, we'll have all
+>> three of "i386", "x86_64" and "x86". Is that useful? How will that wor=
+k?
+>=20
+> Hmm, yes, on closer look this is a big mess as it is. We've been using
+> generic terms for covering multiple architectures :-(  'x86' for both
+> i386 and x86_64,  'sparc' for sparc and sparc64, etc. If we try to fix
+> that we'll be entering a world of backcompat hurt :-(
+>=20
+> Since your schema is likely to end up just being a file in docs/specs,
+> rather than directly part of our existnig qapi schema, I suggest we jus=
+t
+> ignore whats there. Just define an arch enum in your spec which is righ=
+t,
+> and let someone else worry about fixing the mess
 
-Perhaps print a few shell commands first? Such as:
+I can't tell you how much I love this idea. :)
 
-  (
-    VARSTORE=$(mktemp)
-    trap 'rm -f -- "$VARSTORE"' EXIT
-    cat -- '[VARSTORE_TEMPLATE]' >> "$VARSTORE"
-    qemu ...
-  )
-
-It really does take separate actions, just like when you create a new
-disk image with "qemu-img".
-
-Thanks,
+Thanks!
 Laszlo
 
-> +        flash = &fw->mapping->u.flash;
-> +        printf("-drive if=pflash,index=0,format=%s,file=%s\n",
-> +               BlockdevDriver_str(flash->executable->format),
-> +               flash->executable->pathname);
-> +        printf("-drive if=pflash,index=1,format=%s,file=%s\n",
-> +               BlockdevDriver_str(flash->nvram_template->format),
-> +               flash->nvram_template->pathname);
-> +        break;
-> +    case FIRMWARE_DEVICE_MEMORY:
-> +        printf("-bios %s\n", fw->mapping->u.memory.pathname);
-> +        break;
-> +    case FIRMWARE_DEVICE_KERNEL:
-> +        printf("-kernel %s\n", fw->mapping->u.kernel.pathname);
-> +        break;
-> +    default:
-> +        fprintf(stderr, "TODO\n");
-> +        break;
-> +    }
-> +
-> +    exit(0);
-> +}
-> 
+>=20
+>> Second, assuming I add constants for the ~10 (?) softmmu arches, can I
+>> still use @CpuInfoOther as the type for the corresponding new members =
+in
+>> @CpuInfo? What C code changes will be necessary?
+>=20
+> Yes, we could still use the CpuInfoOther struct, since struct names are
+> invisible to consumers, but as above, lets ignore the mess
+>=20
+> Regards,
+> Daniel
+>=20
