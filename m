@@ -1,49 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38775)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1f9VKA-0002fX-76
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:39:35 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f9VKF-0002js-Na
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:39:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1f9VK6-0005Vd-7H
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:39:34 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49996
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
-	id 1f9VK6-0005Qy-1Y
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:39:30 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w3KCdHUj144905
-	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 08:39:29 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2hfe9w66x7-1
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 08:39:28 -0400
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
-	Fri, 20 Apr 2018 13:39:26 +0100
-References: <1524054707-20663-1-git-send-email-thuth@redhat.com>
-	<1524054707-20663-4-git-send-email-thuth@redhat.com>
-	<bc5533dc-9471-7dac-6aba-9014e9961376@linux.vnet.ibm.com>
-	<b0bb6918-0047-9a53-b03f-bff5669daaaa@redhat.com>
-	<2d59a139-3bdd-4b4e-882c-5cf845488eda@linux.vnet.ibm.com>
-	<475ea222-cc03-16e4-0f50-f89cf2bfae6f@redhat.com>
-	<0b6af02e-6e5b-76bb-a0d0-30038ad5a265@linux.vnet.ibm.com>
-	<a001b146-7091-63e6-a845-e276494cc518@redhat.com>
-	<ca20b91c-e92f-e539-590b-fcaa229a57d5@linux.vnet.ibm.com>
-	<c5a1b191-7d13-0738-4284-414b68883a6e@redhat.com>
-From: Viktor VM Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Date: Fri, 20 Apr 2018 14:11:39 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f9VKB-0005tK-NY
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:39:39 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:36353)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f9VKB-0005rv-Ih
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:39:35 -0400
+Received: by mail-qt0-x243.google.com with SMTP id q13-v6so9308112qtl.3
+	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 05:39:35 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180419220914.959-1-f4bug@amsat.org>
+	<20180419220914.959-2-f4bug@amsat.org>
+	<CAFEAcA-LYpqaYfdmjzXwMDau8bZH_zxXaRCCL5dRT1p6spjUxQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <f89278ba-b805-e47d-7e5e-d103ab9c4294@amsat.org>
+Date: Fri, 20 Apr 2018 09:39:31 -0300
 MIME-Version: 1.0
-In-Reply-To: <c5a1b191-7d13-0738-4284-414b68883a6e@redhat.com>
+In-Reply-To: <CAFEAcA-LYpqaYfdmjzXwMDau8bZH_zxXaRCCL5dRT1p6spjUxQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Message-Id: <85d00f5a-f77a-521b-3006-5295e5d5c507@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 for-2.13 3/4]
- pc-bios/s390-ccw/net: Add support for pxelinux-style config files
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] hw/isa/superio: Fix inconsistent use
+ of Chardev->be
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -52,58 +37,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
-Cc: Collin Walling <walling@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "=?UTF-8?Q?Daniel_P_._Berrang=c3=a9?=" <berrange@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 20.04.2018 10:40, Thomas Huth wrote:
-> On 20.04.2018 09:54, Viktor VM Mihajlovski wrote:
->> On 20.04.2018 09:36, Thomas Huth wrote:
->>> On 20.04.2018 08:53, Viktor VM Mihajlovski wrote:
->>>> On 19.04.2018 18:55, Thomas Huth wrote:
->> [...]
->>>> Well, if we don't add another identifier, and I feel reluctant about it
->>>> as well for the reasons you wrote, we may stick with 0x1f and consider
->>>> the additional capabilities as being optional (for special needs only).
->>>
->>> I tend to stay with 0x1f, since booting binaries is still the "primary"
->>> interface (the first check for the "default" or "# " magic keywords is
->>> not 100% reliable, since the config file could also start with another
->>> command, and the probing of pxelinux.cfg/* files is only tried afterwards).
->>>
->> Good. It would be important though to define and document the best way
->> to configure a pxelinux setup: empty bootfile name, bootfile empty (or
->> not existent) or a special file format for the bootfile content (like
->> 'PXE0' in EBCDIC). The former two carry the danger of accidentally
->> enabling the pxe-style boot process.
-> 
-> I don't like the idea of providing a bootfile with a magic content ...
-> if you have to provide a bootfile, you could also go with specifying
-> pxelinux.cfg/default (or whatever) directly, you just have to make sure
-> that the file starts with the right magic ("default" or "# ").
-> 
-> But I agree that starting to guess the non-MAC-based filenames in case
-> the boot file name is empty carries some danger, indeed. If we load
-> pxelinux.cfg/default on s390x, who guarantees that this was not the
-> default file for x86 instead? Maybe we should rather use "pzelinux.cfg"
-> as directory ;-) ?
-Yep. Sounds as if a null bootfile name should not be allowed at all and
-should be rejected by the netboot bios.
-> 
-> Or maybe it would rather make sense to force the users to specify the
-> path to the pxelinux config files instead, ending with a slash, so they
-> have to put "pxelinux.cfg/" or whatever location into the bootfile
-> parameter?
-Since the bootfile has to be architecture specific anyway, it would  a
-good idea to put it into a separate directory, e.g. "/tftpboot/s390".
-If the bootfile reported would be "/s390/" or a (nonexisting)
-"/s390/pxelinux.0", the new pxe loader could start its
-pxelinux.cfg/whatever probing from there. "/" or
-"/some-not-existing-file" would be a special case thereof.
-> 
->  Thomas
-> 
+Hi Peter,
 
+On 04/20/2018 05:43 AM, Peter Maydell wrote:
+> On 19 April 2018 at 23:09, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> 4c3119a6e3e and cd9526ab7c0 introduced an incorrect and inconsistent
+>> use of Chardev->be. Also, this CharBackend member is private and is
+>> not supposed to be accessible.
+>>
+>> Fix it by removing the inconsistent check.
+>>
+>> Reported-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>  hw/isa/isa-superio.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/isa/isa-superio.c b/hw/isa/isa-superio.c
+>> index b95608a003..08afe44731 100644
+>> --- a/hw/isa/isa-superio.c
+>> +++ b/hw/isa/isa-superio.c
+>> @@ -43,7 +43,7 @@ static void isa_superio_realize(DeviceState *dev, Error **errp)
+>>          if (!k->parallel.is_enabled || k->parallel.is_enabled(sio, i)) {
+>>              /* FIXME use a qdev chardev prop instead of parallel_hds[] */
+>>              chr = parallel_hds[i];
+>> -            if (chr == NULL || chr->be) {
+>> +            if (chr == NULL) {
+>>                  name = g_strdup_printf("discarding-parallel%d", i);
+>>                  chr = qemu_chr_new(name, "null");
+>>              } else {
+>> @@ -83,7 +83,7 @@ static void isa_superio_realize(DeviceState *dev, Error **errp)
+>>          if (!k->serial.is_enabled || k->serial.is_enabled(sio, i)) {
+>>              /* FIXME use a qdev chardev prop instead of serial_hds[] */
+>>              chr = serial_hds[i];
+>> -            if (chr == NULL || chr->be) {
+>> +            if (chr == NULL) {
+>>                  name = g_strdup_printf("discarding-serial%d", i);
+>>                  chr = qemu_chr_new(name, "null");
+>>              } else {
+> 
+> You should not need to create fake null devices like this. The
+> device using the chardev should just cope with having a NULL
+> pointer now we have commit 12051d82f004024.
 
--- 
-Regards,
-  Viktor Mihajlovski
+I am trying to model a SoC with 4 uarts, and started using the current
+pattern:
+
+  for (i = 0; i < MAX_SERIAL_PORTS; i+++) {
+    if (serial_hds[i]) {
+      serial_mm_init(..., serial_hds[i], ...);
+
+Then the test firmware failed due to unassigned access after rebasing,
+due to:
+
+  commit ed860129acd3fcd0b1e47884e810212aaca4d21b
+  Author: Peter Maydell <peter.maydell@linaro.org>
+  Date:   Thu Sep 7 13:54:54 2017 +0100
+
+    boards.h: Define new flag ignore_memory_transaction_failures
+
+    Define a new MachineClass field ignore_memory_transaction_failures.
+    If this is flag is true then the CPU will ignore memory transaction
+    failures which should cause the CPU to take an exception due to an
+    access to an unassigned physical address; the transaction will
+    instead return zero (for a read) or be ignored (for a write).  This
+    should be set only by legacy board models which rely on the old
+    RAZ/WI behaviour for handling devices that QEMU does not yet model.
+    New board models should instead use "unimplemented-device" for all
+    memory ranges where the guest will attempt to probe for a device that
+    QEMU doesn't implement and a stub device is required.
+
+    We need this for ARM boards, where we're about to implement support for
+    generating external aborts on memory transaction failures. Too many
+    of our legacy board models rely on the RAZ/WI behaviour and we
+    would break currently working guests when their "probe for device"
+    code provoked an external abort rather than a RAZ.
+
+Which is fine, I understand new boards shouldn't use the
+ignore_memory_transaction_failures flag.
+
+The chardev subsystem is still confuse to me.
+I think than checking if a chardev backend is connected to instantiate
+and mmap a device and his irqs is incorrect, since boards/SoCs always
+come with the same hardware.
+
+Indeed previous to 12051d82f004024, qemu_chr_fe_init(s=NULL) was doing
+
+     if (CHARDEV_IS_MUX(s)) {
+         ...
+     } else {
+         s->be = b; /* NULL deref... */
+     }
+
+Which seems the original reason of my bogus "if (chr == NULL || chr->be)
+..." check.
+
+Since we can now safely call serial_mm_init(..., chr=NULL, ...), I'll
+work on simplifying and fixing this.
+
+> Also consider having cc:stable on this patchset?
+
+Once we get a consensus on the series, OK.
+
+Thanks,
+
+Phil.
