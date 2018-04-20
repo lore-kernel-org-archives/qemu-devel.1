@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1f9X2u-0003hC-84
+	(envelope-from <mst@redhat.com>) id 1f9X2u-0003hD-8H
 	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 10:29:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1f9X2p-0002tH-2x
+	(envelope-from <mst@redhat.com>) id 1f9X2q-0002ul-06
 	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 10:29:52 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54854 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54864 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1f9X2o-0002rY-PS
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 10:29:46 -0400
-Date: Fri, 20 Apr 2018 17:29:37 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1f9X2p-0002tr-N7
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 10:29:47 -0400
+Date: Fri, 20 Apr 2018 17:29:42 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1524234528-373013-1-git-send-email-mst@redhat.com>
+Message-ID: <1524234528-373013-2-git-send-email-mst@redhat.com>
+References: <1524234528-373013-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Subject: [Qemu-devel] [PULL 0/1] pc: bugfix
+In-Reply-To: <1524234528-373013-1-git-send-email-mst@redhat.com>
+Subject: [Qemu-devel] [PULL 1/1] intel-iommu: send PSI always when
+ notify_unmap set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,30 +28,107 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Xu <peterx@redhat.com>, Jason Wang <jasowang@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-The following changes since commit 27e757e29cc79f3f104d2a84d17cdb3b4c11c8ff:
+From: Peter Xu <peterx@redhat.com>
 
-  Update version for v2.12.0-rc4 release (2018-04-17 22:26:44 +0100)
+During IOVA page table walk, there is a special case when:
 
-are available in the git repository at:
+- notify_unmap is set, meanwhile
+- entry is invalid
 
-  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+In the past, we skip the entry always.  This is not correct.  We should
+send UNMAP notification to registered notifiers in this case.  Otherwise
+some stall pages will still be mapped in the host even if L1 guest
+unmapped them already.
 
-for you to fetch changes up to f256f05c94d12eed2c1a0e9b6ed4fb1fb9d8ec72:
+Without this patch, nested device assignment to L2 guests might dump
+some errors like:
 
-  intel-iommu: send PSI always when notify_unmap set (2018-04-20 17:26:23 +0300)
+qemu-system-x86_64: VFIO_MAP_DMA: -17
+qemu-system-x86_64: vfio_dma_map(0x557305420c30, 0xad000, 0x1000,
+                    0x7f89a920d000) = -17 (File exists)
 
-----------------------------------------------------------------
-pc: bugfix
+To fix this, we need to apply this patch to L1 QEMU (L2 QEMU is not
+affected by this problem).
 
-Adds missing invalidations in vtd.
-
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Acked-by: Jason Wang <jasowang@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Peter Xu (1):
-      intel-iommu: send PSI always when notify_unmap set
-
+---
  hw/i386/intel_iommu.c | 42 ++++++++++++++++++++++++++++++------------
  1 file changed, 30 insertions(+), 12 deletions(-)
+
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index fb31de9..b359efd 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -722,6 +722,15 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
+ 
+ typedef int (*vtd_page_walk_hook)(IOMMUTLBEntry *entry, void *private);
+ 
++static int vtd_page_walk_one(IOMMUTLBEntry *entry, int level,
++                             vtd_page_walk_hook hook_fn, void *private)
++{
++    assert(hook_fn);
++    trace_vtd_page_walk_one(level, entry->iova, entry->translated_addr,
++                            entry->addr_mask, entry->perm);
++    return hook_fn(entry, private);
++}
++
+ /**
+  * vtd_page_walk_level - walk over specific level for IOVA range
+  *
+@@ -781,28 +790,37 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
+          */
+         entry_valid = read_cur | write_cur;
+ 
++        entry.target_as = &address_space_memory;
++        entry.iova = iova & subpage_mask;
++        entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
++        entry.addr_mask = ~subpage_mask;
++
+         if (vtd_is_last_slpte(slpte, level)) {
+-            entry.target_as = &address_space_memory;
+-            entry.iova = iova & subpage_mask;
+             /* NOTE: this is only meaningful if entry_valid == true */
+             entry.translated_addr = vtd_get_slpte_addr(slpte, aw);
+-            entry.addr_mask = ~subpage_mask;
+-            entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
+             if (!entry_valid && !notify_unmap) {
+                 trace_vtd_page_walk_skip_perm(iova, iova_next);
+                 goto next;
+             }
+-            trace_vtd_page_walk_one(level, entry.iova, entry.translated_addr,
+-                                    entry.addr_mask, entry.perm);
+-            if (hook_fn) {
+-                ret = hook_fn(&entry, private);
+-                if (ret < 0) {
+-                    return ret;
+-                }
++            ret = vtd_page_walk_one(&entry, level, hook_fn, private);
++            if (ret < 0) {
++                return ret;
+             }
+         } else {
+             if (!entry_valid) {
+-                trace_vtd_page_walk_skip_perm(iova, iova_next);
++                if (notify_unmap) {
++                    /*
++                     * The whole entry is invalid; unmap it all.
++                     * Translated address is meaningless, zero it.
++                     */
++                    entry.translated_addr = 0x0;
++                    ret = vtd_page_walk_one(&entry, level, hook_fn, private);
++                    if (ret < 0) {
++                        return ret;
++                    }
++                } else {
++                    trace_vtd_page_walk_skip_perm(iova, iova_next);
++                }
+                 goto next;
+             }
+             ret = vtd_page_walk_level(vtd_get_slpte_addr(slpte, aw), iova,
+-- 
+MST
