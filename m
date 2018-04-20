@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45987)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f9aBR-0006cA-9Q
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 13:50:54 -0400
+	(envelope-from <bounces@canonical.com>) id 1f9aDb-00088Q-9c
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 13:53:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f9aBN-0003Wx-Ac
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 13:50:53 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:46959)
+	(envelope-from <bounces@canonical.com>) id 1f9aDX-0005FH-A4
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 13:53:07 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52588)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1f9aBN-0003Wh-5R
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 13:50:49 -0400
-Received: by mail-qt0-x242.google.com with SMTP id h4-v6so10689458qtn.13
-	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 10:50:49 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180420145249.32435-1-peter.maydell@linaro.org>
-	<20180420145249.32435-14-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <d28ba1e3-7fb5-04e7-7743-b7cd980f4d6f@amsat.org>
-Date: Fri, 20 Apr 2018 14:50:43 -0300
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1f9aDX-0005EK-3L
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 13:53:03 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1f9aDU-0007ih-As
+	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 17:53:00 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4C1C12E80CC
+	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 17:53:00 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180420145249.32435-14-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 13/13] vl.c: new function max_serial_hds()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 20 Apr 2018 17:33:32 -0000
+From: Jason Wagner <1520730@bugs.launchpad.net>
+Reply-To: Bug 1520730 <1520730@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20151128034327.2137.99161.malonedeb@wampee.canonical.com>
+Message-Id: <152424561210.19798.13655458815806919532.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1520730] Re: 32-bit editors vim/rhide broken
+ keyboard handling in freedos 1.1 and ms-dos 6.22
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,74 +37,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: patches@linaro.org, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 04/20/2018 11:52 AM, Peter Maydell wrote:
-> Create a new function max_serial_hds() which returns the number of
-> serial ports defined by the user. This is needed only by spapr.
-> This allows us to remove the MAX_SERIAL_PORTS define.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  include/sysemu/sysemu.h | 6 ++++--
->  hw/ppc/spapr.c          | 2 +-
->  vl.c                    | 5 +++++
->  3 files changed, 10 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> index 989cbc2b7b..612659a718 100644
-> --- a/include/sysemu/sysemu.h
-> +++ b/include/sysemu/sysemu.h
-> @@ -159,10 +159,12 @@ void hmp_pcie_aer_inject_error(Monitor *mon, const QDict *qdict);
->  
->  /* serial ports */
->  
-> -#define MAX_SERIAL_PORTS 4
-> -
->  /* Return the Chardev for serial port i, or NULL if none */
->  Chardev *serial_hd(int i);
-> +/* return the number of serial ports defined by the user. serial_hd(i)
-> + * will always return NULL for any i which is greater than or equal to this.
-> + */
-> +int max_serial_hds(void);
+I'm seeing this issue in version 2.12.0-rc4. I wasn't seeing this as
+much in earlier 2.11, but its a major pain in the current version.
 
-What about naming it serial_hds_count() to keep this under the serial_
-namespace? And about using a size_t for num_serial_hds?
+-- =
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1520730
 
->  
->  /* parallel ports */
->  
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index b0ecfaca9e..8d2d36a606 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2589,7 +2589,7 @@ static void spapr_machine_init(MachineState *machine)
->      /* Set up VIO bus */
->      spapr->vio_bus = spapr_vio_bus_init();
->  
-> -    for (i = 0; i < MAX_SERIAL_PORTS; i++) {
-> +    for (i = 0; i < max_serial_hds(); i++) {
->          if (serial_hd(i)) {
->              spapr_vty_create(spapr->vio_bus, serial_hd(i));
->          }
-> diff --git a/vl.c b/vl.c
-> index a8a98c5a37..b587187052 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2524,6 +2524,11 @@ Chardev *serial_hd(int i)
->      return NULL;
->  }
->  
-> +int max_serial_hds(void)
-> +{
-> +    return num_serial_hds;
-> +}
-> +
->  static int parallel_parse(const char *devname)
->  {
->      static int index = 0;
-> 
+Title:
+  32-bit editors vim/rhide broken keyboard handling in freedos 1.1 and
+  ms-dos 6.22
+
+Status in QEMU:
+  New
+
+Bug description:
+  This bug is present as of the latest commit:
+  714487515dbe0c65d5904251e796cd3a5b3579fb
+
+  I also saw it in 2.4.1, but that was a distro package.
+
+  You can see the bug simply using the following line: qemu-system-i386
+  -hda freedos.disk
+
+  Simply type vim (or rhide) and start entering in some text. You'll
+  notice repeating characters, and also eventually the key mode will
+  change as if you're holding down the shift button. Not capslock. "a"
+  will become "A", but "\" will also become "|".
+
+  I don't think this is a bug in freedos because I get the same behavior
+  with dos 6.22. Not dosbox, though.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1520730/+subscriptions
