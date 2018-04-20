@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1f9Z32-0002vK-Ht
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:38:09 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f9ZD8-0006Es-QS
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:48:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1f9Z2z-0003TZ-Cb
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:38:08 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50084 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1f9Z2z-0003SW-7E
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:38:05 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180417224054.26363-1-lersek@redhat.com>
-	<87po2wzysh.fsf@dusky.pond.sub.org>
-	<8a52bb49-4194-3b91-8b67-a0e5700fd6ed@redhat.com>
-	<87in8nvdpn.fsf@dusky.pond.sub.org>
-	<20180419075629.GC10259@redhat.com>
-	<5ed8b01f-7faa-b23d-5fd2-f4715294e061@redhat.com>
-	<87muxyyr82.fsf@dusky.pond.sub.org>
-	<8fc9f287-c0c1-45c1-b46c-64f479b12723@redhat.com>
-Date: Fri, 20 Apr 2018 18:37:54 +0200
-In-Reply-To: <8fc9f287-c0c1-45c1-b46c-64f479b12723@redhat.com> (Laszlo Ersek's
-	message of "Fri, 20 Apr 2018 18:04:59 +0200")
-Message-ID: <87k1t1sujh.fsf@dusky.pond.sub.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f9ZD4-000474-37
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:48:34 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:44112)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f9ZD3-00046W-U1
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:48:29 -0400
+Received: by mail-qk0-x243.google.com with SMTP id h200so8696711qke.11
+	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 09:48:29 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180420145249.32435-1-peter.maydell@linaro.org>
+	<20180420145249.32435-3-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <8dcce14b-5daa-2f7b-7f37-8673afcafdea@amsat.org>
+Date: Fri, 20 Apr 2018 13:48:25 -0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [libvirt] [qemu RFC v2] qapi: add "firmware.json"
+In-Reply-To: <20180420145249.32435-3-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 02/13] hw/arm/fsl-imx*: Don't create "null"
+ chardevs for serial devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,161 +36,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, libvir-list@redhat.com, Michal Privoznik <mprivozn@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Gary Ching-Pang Lin <glin@suse.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <dgibson@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-Laszlo Ersek <lersek@redhat.com> writes:
+On 04/20/2018 11:52 AM, Peter Maydell wrote:
+> Following commit 12051d82f004024, UART devices should handle
+> being passed a NULL pointer chardev, so we don't need to
+> create "null" backends in board code. Remove the code that
+> does this and updates serial_hds[].
+> 
+> (fsl-imx7.c was already written this way.)
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  hw/arm/fsl-imx25.c | 12 +-----------
+>  hw/arm/fsl-imx31.c | 12 +-----------
+>  hw/arm/fsl-imx6.c  | 13 +------------
+>  3 files changed, 3 insertions(+), 34 deletions(-)
+> 
+> diff --git a/hw/arm/fsl-imx25.c b/hw/arm/fsl-imx25.c
+> index cb988a6c25..d7d064e5ce 100644
+> --- a/hw/arm/fsl-imx25.c
+> +++ b/hw/arm/fsl-imx25.c
+> @@ -118,17 +118,7 @@ static void fsl_imx25_realize(DeviceState *dev, Error **errp)
+>          };
+>  
+>          if (i < MAX_SERIAL_PORTS) {
+> -            Chardev *chr;
+> -
+> -            chr = serial_hds[i];
+> -
+> -            if (!chr) {
+> -                char label[20];
+> -                snprintf(label, sizeof(label), "imx31.uart%d", i);
+> -                chr = qemu_chr_new(label, "null");
+> -            }
+> -
+> -            qdev_prop_set_chr(DEVICE(&s->uart[i]), "chardev", chr);
+> +            qdev_prop_set_chr(DEVICE(&s->uart[i]), "chardev", serial_hds[i]);
+>          }
+>  
+>          object_property_set_bool(OBJECT(&s->uart[i]), true, "realized", &err);
+> diff --git a/hw/arm/fsl-imx31.c b/hw/arm/fsl-imx31.c
+> index 3eee83d547..e6c788049d 100644
+> --- a/hw/arm/fsl-imx31.c
+> +++ b/hw/arm/fsl-imx31.c
+> @@ -107,17 +107,7 @@ static void fsl_imx31_realize(DeviceState *dev, Error **errp)
+>          };
+>  
+>          if (i < MAX_SERIAL_PORTS) {
+> -            Chardev *chr;
+> -
+> -            chr = serial_hds[i];
+> -
+> -            if (!chr) {
+> -                char label[20];
+> -                snprintf(label, sizeof(label), "imx31.uart%d", i);
+> -                chr = qemu_chr_new(label, "null");
+> -            }
+> -
+> -            qdev_prop_set_chr(DEVICE(&s->uart[i]), "chardev", chr);
+> +            qdev_prop_set_chr(DEVICE(&s->uart[i]), "chardev", serial_hds[i]);
+>          }
+>  
+>          object_property_set_bool(OBJECT(&s->uart[i]), true, "realized", &err);
+> diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
+> index 9dfbc9a8c4..ea14de33c6 100644
+> --- a/hw/arm/fsl-imx6.c
+> +++ b/hw/arm/fsl-imx6.c
+> @@ -189,18 +189,7 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
+>          };
+>  
+>          if (i < MAX_SERIAL_PORTS) {
+> -            Chardev *chr;
+> -
+> -            chr = serial_hds[i];
+> -
+> -            if (!chr) {
+> -                char *label = g_strdup_printf("imx6.uart%d", i + 1);
+> -                chr = qemu_chr_new(label, "null");
+> -                g_free(label);
+> -                serial_hds[i] = chr;
+> -            }
+> -
+> -            qdev_prop_set_chr(DEVICE(&s->uart[i]), "chardev", chr);
+> +            qdev_prop_set_chr(DEVICE(&s->uart[i]), "chardev", serial_hds[i]);
+>          }
+>  
+>          object_property_set_bool(OBJECT(&s->uart[i]), true, "realized", &err);
 
-> On 04/20/18 14:53, Markus Armbruster wrote:
->> Laszlo Ersek <lersek@redhat.com> writes:
->
-> [snip]
->
->>> The targets with softmmu are: aarch64, alpha, arm, cris, hppa, i386,
->>> lm32, m68k, microblaze, microblazeel, mips, mips64, mips64el, mipsel,
->>> moxie, nios2, or1k, ppc, ppc64, ppcemb, riscv32, riscv64, s390x, sh4,
->>> sh4eb, sparc, sparc64, tricore, unicore32, x86_64, xtensa, xtensaeb.
->>>
->>> That is, at least the following constants in CpuInfoArch have no
->>> corresponding (identical) mapping -- I'll state to the right of the
->>> arrow the emulation targets which I know or presume to be associated
->>> with the CpuInfoArch constant:
->>> - x86 -> i386, x86_64
->>> - sparc -> sparc, sparc64
->>> - ppc -> ppc, ppc64, ppcemb
->>> - mips -> mips, mips64, mips64el, mipsel
->>> - s390 -> s390x
->>> - riscv -> riscv32, riscv64
->>>
->>> The only constant that seems to have a 1:1 mapping is "tricore", but I
->>> could perfectly well be thinking even that just because I have no clue
->>> about "tricore".
->>>
->>> So, I don't think CpuInfoArch can be updated so that it both remains
->>> compatible with current QMP clients, and serves "firmware.json". In the
->>> firmware schema we don't just need CPU architecture, but actual emulator
->>> names (and board / machine types).
->> 
->> The completely orthodox fix for CpuInfo would be:
->> 
->> * Keep @arch unchanged.  In particular, keep "other" for all targets
->>   other than 'x86', 'sparc', 'ppc', 'mips', 'tricore'.
->> 
->> * Add a new member @target of new enum type Target, whose values match
->>   configures idea of targets exactly.
->> 
->> * Make the new member the union tag.
->> 
->> It's too late for complete orthodoxy; we already changed @arch.
->> 
->> A common enum type Target makes sense anyway, I think.
->> 
->> Using it in CpuInfo as described above may make sense, too.  Could be
->> left to a follow-up patch.
->> 
->>> I grepped 'qapi/*json' for the whole word "x86_64", and the only thing
->>> that remotely matches is the @TargetInfo structure, in which the @arch
->>> field is a string, coming with the example "x86_64". The example also
->>> names "i386" separately.
->> 
->> Well spotted.
->> 
->> TargetInfo member @arch is set to TARGET_NAME, which matches configure's
->> idea of the target.  If we add enum Target, we should change @arch's
->> type from str to Target.
->> 
->>> So what might make sense is to introduce a separate enum in
->>> "qapi/misc.json" with all the softmmu targets I listed above, and change
->>> the type of @TargetInfo.@arch to that enum.
->> 
->> I arrived at this conclusion, too.
->> 
->>>                                             In parallel,
->>> qmp_query_target() would have to be updated to look up the enum value
->>> matching TARGET_NAME. (I do think we can ignore linux-user etc emulators
->>> for collecting the relevant arches here: @TargetInfo is only used in the
->>> "query-target" QMP command, and Markus said above that QMP is only used
->>> with system emulation.)
->>>
->>> Should I do this?
->> 
->> Yes, please.
->
-> OK, so here's my understanding:
->
-> (1) I'll introduce a new @Target enum in misc.json. I'll inherit /
-> include it in firmware.json. This is compatible with what Dan said.
->
-> (2) I'll change @TargetInfo.@arch to the new type. I believe this will
-> break the compilation of qmp_query_target(); I'll hack on that until it
-> builds again, with the lookup. :)
->
-> (3) Regarding the addition of @target to CpuInfo (accompanying @arch)
-> doesn't look hard; what *does* look hard is changing the union
-> discriminator from @arch to @target. @target has many more values, and I
-> would have to map all of them to the (fewer) @arch values that currently
-> do *not* select @CpuInfoOther. Here's an example:
->
-> - Both @i386 and @x86_64 from @target mean @x86 in @arch,
-> - because @x86 currently selects @CpuInfoX86, not @CpuInfoOther,
->   both @i386 and @x86_64 must be assigned @CpuInfoX86.
->
-> This depends on the knowledge that "x86" actually *means* "i386 plus
-> x86_64", and I totally don't have that knowledge for the rest of the
-> arches / targets.
-
-Start with qmp_query_cpus()'s code to initialize @arch:
-
-    #if defined(TARGET_I386)
-            info->value->arch = CPU_INFO_ARCH_X86;
-            info->value->u.x86.pc = env->eip + env->segs[R_CS].base;
-    #elif defined(TARGET_PPC)
-            info->value->arch = CPU_INFO_ARCH_PPC;
-            info->value->u.ppc.nip = env->nip;
-    #elif defined(TARGET_SPARC)
-            info->value->arch = CPU_INFO_ARCH_SPARC;
-            info->value->u.q_sparc.pc = env->pc;
-            info->value->u.q_sparc.npc = env->npc;
-    #elif defined(TARGET_MIPS)
-            info->value->arch = CPU_INFO_ARCH_MIPS;
-            info->value->u.q_mips.PC = env->active_tc.PC;
-    #elif defined(TARGET_TRICORE)
-            info->value->arch = CPU_INFO_ARCH_TRICORE;
-            info->value->u.tricore.PC = env->PC;
-    #elif defined(TARGET_S390X)
-            info->value->arch = CPU_INFO_ARCH_S390;
-            info->value->u.s390.cpu_state = env->cpu_state;
-    #elif defined(TARGET_RISCV)
-            info->value->arch = CPU_INFO_ARCH_RISCV;
-            info->value->u.riscv.pc = env->pc;
-    #else
-            info->value->arch = CPU_INFO_ARCH_OTHER;
-    #endif
-
-The TARGET_FOO come from config-target.h, generated by
-scripts/create_config from config-target.mak.  It derives FOO is from
-config-target.mak's TARGET_BASE_ARCH.  config-target.mak is in turn
-generated by configure.  It computes TARGET_BASE_ARCH from target_name.
-And that's your mapping.
-
-> So, the modification of @CpuInfo I would indeed like to pass off to
-> someone else. (Well, if all the architecture maintainers follow up and
-> tell me what emulators exactly fall under the umbrella of each
-> individual @arch value, I can post the patch.) BTW... I wonder how
-> compatibility would be affected if we just added @target to @CpuInfo,
-> even without making it the new discriminator.
-
-Doesn't work for "completely orthodox", because then @arch "other"
-comprises totally different targets.  But we're not doing that.
-
-We might have to switch the union tag eventually, but if there's no hard
-reason to switch it now, feel free to leave it for later.
-
-A comment explaining this mess would be nice, though.
-
-> ... Anyway, I think I've gotten a huge amount of useful and actionable
-> feedback; thanks everyone, let me work on RFCv3 and post it soon. :)
-
-I'm not demanding you do this work.  If you can do it, wonderful!  But
-if all you can do is introduce the new enum Target and leave the CpuInfo
-mess alone, that's okay.  Just add a suitable TODO then.
+Removing the now unneeded #include "chardev/char.h" from the 3 files:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
