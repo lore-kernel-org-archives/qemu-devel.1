@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f9Tdl-0005f9-UY
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:51:43 -0400
+	(envelope-from <tournier.elie@gmail.com>) id 1f9TeZ-0006D0-CO
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:52:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f9Tdi-00006E-1t
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:51:42 -0400
-Resent-Message-Id: <E1f9Tdi-00006E-1t@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21057)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1f9Tdh-00005C-P6
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:51:37 -0400
-In-Reply-To: <20180420104743.7396-1-kraxel@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152422148524.2109.8545873362109975802@71c20359a636>
+	(envelope-from <tournier.elie@gmail.com>) id 1f9TeV-0000bU-CU
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:52:31 -0400
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:32878)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tournier.elie@gmail.com>)
+	id 1f9TeV-0000ab-6D
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:52:27 -0400
+Received: by mail-wr0-x22d.google.com with SMTP id z73-v6so21837860wrb.0
+	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 03:52:27 -0700 (PDT)
+Date: Fri, 20 Apr 2018 11:46:11 +0100
+From: Elie Tournier <tournier.elie@gmail.com>
+Message-ID: <20180420104611.GB16234@Nikki.localdomain>
+References: <20180413135842.21325-1-tournier.elie@gmail.com>
+	<20180420093253.GA16234@Nikki.localdomain>
+	<20180420104444.fkchhoaxxas5bbt7@sirius.home.kraxel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 20 Apr 2018 03:51:26 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] simple firmware.json test tool
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180420104444.fkchhoaxxas5bbt7@sirius.home.kraxel.org>
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] Use SDL to create an OpenGL ES
+ context for virglrenderer.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +32,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, lersek@redhat.com
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, eblake@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNDIwMTA0NzQzLjczOTYtMS1rcmF4ZWxAcmVkaGF0LmNvbQpTdWJqZWN0
-OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBzaW1wbGUgZmlybXdhcmUuanNvbiB0ZXN0IHRvb2wKCj09
-PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9
-JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
-ZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21t
-aXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAk
-Y29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9n
-IC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1l
-bWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAg
-IGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAk
-ZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4
-MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXct
-cHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMTUyNDE1NTk4
-My0xNjcwNS0xLWdpdC1zZW5kLWVtYWlsLXN0ZWZhbmJAbGludXgudm5ldC5pYm0uY29tIC0+IHBh
-dGNoZXcvMTUyNDE1NTk4My0xNjcwNS0xLWdpdC1zZW5kLWVtYWlsLXN0ZWZhbmJAbGludXgudm5l
-dC5pYm0uY29tCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxODA0MTkyMjMx
-NTEuNjIzMTc0LTEtZWJsYWtlQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4MDQxOTIyMzE1MS42
-MjMxNzQtMS1lYmxha2VAcmVkaGF0LmNvbQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRj
-aGV3LzIwMTgwNDIwMDg0ODIwLjM4NzMtMS1rcmF4ZWxAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIw
-MTgwNDIwMDg0ODIwLjM4NzMtMS1rcmF4ZWxAcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10gICAgICAg
-ICAgICAgICBwYXRjaGV3LzIwMTgwNDIwMTA0NzQzLjczOTYtMS1rcmF4ZWxAcmVkaGF0LmNvbSAt
-PiBwYXRjaGV3LzIwMTgwNDIwMTA0NzQzLjczOTYtMS1rcmF4ZWxAcmVkaGF0LmNvbQpTd2l0Y2hl
-ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjcyNzI0ZGVkZWUgc2ltcGxlIGZpcm13YXJlLmpzb24g
-dGVzdCB0b29sCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IHNpbXBs
-ZSBmaXJtd2FyZS5qc29uIHRlc3QgdG9vbC4uLgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3Vu
-ZCB0aGF0ICcrJyAoY3R4OlZ4VikKIzc2OiBGSUxFOiBxZW11LWZpcm13YXJlLmM6MzY6CisgICAg
-YnVmID0gbWFsbG9jKHNpemUrMSk7CiAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogTWlz
-c2luZyBTaWduZWQtb2ZmLWJ5OiBsaW5lKHMpCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3Ms
-IDk3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgot
-LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
-ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRo
-YXQuY29t
+On Fri, Apr 20, 2018 at 12:44:44PM +0200, Gerd Hoffmann wrote:
+> On Fri, Apr 20, 2018 at 10:32:53AM +0100, Elie Tournier wrote:
+> > On Fri, Apr 13, 2018 at 02:58:39PM +0100, Elie Tournier wrote:
+> > > Hi,
+> > > 
+> > Hello,
+> > 
+> > Humble ping.
+> > This series is unreviewed.
+> 
+> Looks sane.  Plan to include it in the next pull request (unless
+> something shows up in testing).  Waiting for 2.12 being released and
+> master branch opening up for new development.
+
+Nice.
+Thank you very much.
+> 
+> cheers,
+>   Gerd
+> 
