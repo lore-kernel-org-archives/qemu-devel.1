@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f9RZH-0008HM-Op
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:38:56 -0400
+	(envelope-from <thuth@redhat.com>) id 1f9Rav-0001Kn-8u
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:40:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f9RZH-0007gG-1E
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:38:55 -0400
-Date: Fri, 20 Apr 2018 16:38:46 +0800
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180420083846.GQ15181@stefanha-x1.localdomain>
-References: <20180416165849.28864-1-mreitz@redhat.com>
-	<20180416165849.28864-9-mreitz@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1f9Rau-0000rF-E7
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:40:37 -0400
+References: <1524054707-20663-1-git-send-email-thuth@redhat.com>
+	<1524054707-20663-4-git-send-email-thuth@redhat.com>
+	<bc5533dc-9471-7dac-6aba-9014e9961376@linux.vnet.ibm.com>
+	<b0bb6918-0047-9a53-b03f-bff5669daaaa@redhat.com>
+	<2d59a139-3bdd-4b4e-882c-5cf845488eda@linux.vnet.ibm.com>
+	<475ea222-cc03-16e4-0f50-f89cf2bfae6f@redhat.com>
+	<0b6af02e-6e5b-76bb-a0d0-30038ad5a265@linux.vnet.ibm.com>
+	<a001b146-7091-63e6-a845-e276494cc518@redhat.com>
+	<ca20b91c-e92f-e539-590b-fcaa229a57d5@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <c5a1b191-7d13-0738-4284-414b68883a6e@redhat.com>
+Date: Fri, 20 Apr 2018 10:40:25 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="l8yJEXo8J9fv7OFY"
-Content-Disposition: inline
-In-Reply-To: <20180416165849.28864-9-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 8/9] iotests: Copy 197 for COR
- filter driver
+In-Reply-To: <ca20b91c-e92f-e539-590b-fcaa229a57d5@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 for-2.13 3/4]
+ pc-bios/s390-ccw/net: Add support for pxelinux-style config files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,43 +32,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Viktor VM Mihajlovski <mihajlov@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
+Cc: Collin Walling <walling@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
 
+On 20.04.2018 09:54, Viktor VM Mihajlovski wrote:
+> On 20.04.2018 09:36, Thomas Huth wrote:
+>> On 20.04.2018 08:53, Viktor VM Mihajlovski wrote:
+>>> On 19.04.2018 18:55, Thomas Huth wrote:
+> [...]
+>>> Well, if we don't add another identifier, and I feel reluctant about =
+it
+>>> as well for the reasons you wrote, we may stick with 0x1f and conside=
+r
+>>> the additional capabilities as being optional (for special needs only=
+).
+>>
+>> I tend to stay with 0x1f, since booting binaries is still the "primary=
+"
+>> interface (the first check for the "default" or "# " magic keywords is
+>> not 100% reliable, since the config file could also start with another
+>> command, and the probing of pxelinux.cfg/* files is only tried afterwa=
+rds).
+>>
+> Good. It would be important though to define and document the best way
+> to configure a pxelinux setup: empty bootfile name, bootfile empty (or
+> not existent) or a special file format for the bootfile content (like
+> 'PXE0' in EBCDIC). The former two carry the danger of accidentally
+> enabling the pxe-style boot process.
 
---l8yJEXo8J9fv7OFY
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I don't like the idea of providing a bootfile with a magic content ...
+if you have to provide a bootfile, you could also go with specifying
+pxelinux.cfg/default (or whatever) directly, you just have to make sure
+that the file starts with the right magic ("default" or "# ").
 
-On Mon, Apr 16, 2018 at 06:58:48PM +0200, Max Reitz wrote:
-> iotest 197 tests copy-on-read using the (now old) copy-on-read flag.
-> Copy it to 215 and modify it to use the COR filter driver instead.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/215     | 120 +++++++++++++++++++++++++++++++++++++++=
-++++++
->  tests/qemu-iotests/215.out |  26 ++++++++++
->  tests/qemu-iotests/group   |   1 +
->  3 files changed, 147 insertions(+)
->  create mode 100755 tests/qemu-iotests/215
->  create mode 100644 tests/qemu-iotests/215.out
+But I agree that starting to guess the non-MAC-based filenames in case
+the boot file name is empty carries some danger, indeed. If we load
+pxelinux.cfg/default on s390x, who guarantees that this was not the
+default file for x86 instead? Maybe we should rather use "pzelinux.cfg"
+as directory ;-) ?
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Or maybe it would rather make sense to force the users to specify the
+path to the pxelinux config files instead, ending with a slash, so they
+have to put "pxelinux.cfg/" or whatever location into the bootfile
+parameter?
 
---l8yJEXo8J9fv7OFY
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJa2acWAAoJEJykq7OBq3PIjq8H/1TZ3sjS5lUevDZLT+EvCeMB
-aJMBlbnxj1aAwqIO7GMJDWIwtFVmS+dN4UUA3jxlSNKTuuNYyupcWYHtKm4vIj2U
-OmC2BACUgjghPCl93Ly+nU5co7LEOJ4UB7YXXlHsZ0DGF8WVhYN0r5CeFQK+Kd+h
-Dt++gs4W8f2m+82XsnsWcFKMg0+pMOzAyaFWTGr+7SycHzMhkg6DlAB/T44SqgFp
-ihIuoyVzXjKpLSmOBOTdzCeuJvniVyfiMjSD46vbwesLv3hhcjKNrupIwsWb/v7T
-MGdGaeN7wQmx7sFutDfHO00FtT7Hk6EVqzItR4wEqLrNGXphwnWZv+1Db3mOWmA=
-=2kPi
------END PGP SIGNATURE-----
-
---l8yJEXo8J9fv7OFY--
+ Thomas
