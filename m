@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f9Sh3-00077H-Pj
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 05:51:02 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f9T79-0006Xs-Fv
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:18:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1f9Sgz-00034s-QS
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 05:51:01 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47920 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1f9Sgz-00034C-L8
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 05:50:57 -0400
-Date: Fri, 20 Apr 2018 10:50:53 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180420095053.GG21035@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180417224054.26363-1-lersek@redhat.com>
-	<87po2wzysh.fsf@dusky.pond.sub.org>
-	<8a52bb49-4194-3b91-8b67-a0e5700fd6ed@redhat.com>
-	<87in8nvdpn.fsf@dusky.pond.sub.org>
-	<20180419075629.GC10259@redhat.com>
-	<5ed8b01f-7faa-b23d-5fd2-f4715294e061@redhat.com>
-	<20180419091201.GI10259@redhat.com>
-	<a9006770-b4e3-cf57-3efa-c967740f7a94@redhat.com>
-	<20180420093457.GE21035@redhat.com>
-	<20180420094624.ltkg2jbugvgi4de5@sirius.home.kraxel.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1f9T78-0008Eb-Hu
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:17:59 -0400
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:34284)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1f9T78-0008E4-C2
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 06:17:58 -0400
+Received: by mail-ot0-x244.google.com with SMTP id i5-v6so9067899oth.1
+	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 03:17:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180420094624.ltkg2jbugvgi4de5@sirius.home.kraxel.org>
-Subject: Re: [Qemu-devel] [libvirt] [qemu RFC v2] qapi: add "firmware.json"
+In-Reply-To: <1523997485-1905-4-git-send-email-alindsay@codeaurora.org>
+References: <1523997485-1905-1-git-send-email-alindsay@codeaurora.org>
+	<1523997485-1905-4-git-send-email-alindsay@codeaurora.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 20 Apr 2018 11:17:36 +0100
+Message-ID: <CAFEAcA_g1Bb=-cj+QToHDypZPiqw_U5YioRWfDSs0Ano3PqDTQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4 03/21] target/arm: Reorganize PMCCNTR
+ accesses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,33 +30,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, libvir-list@redhat.com, Michal Privoznik <mprivozn@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Gary Ching-Pang Lin <glin@suse.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <dgibson@redhat.com>
+To: Aaron Lindsay <alindsay@codeaurora.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
 
-On Fri, Apr 20, 2018 at 11:46:24AM +0200, Gerd Hoffmann wrote:
->   Hi,
-> 
-> > Since your schema is likely to end up just being a file in docs/specs,
-> > rather than directly part of our existnig qapi schema, I suggest we just
-> > ignore whats there. Just define an arch enum in your spec which is right,
-> > and let someone else worry about fixing the mess
-> 
-> I think it would be useful to have this as part of the schema.  Should
-> be easy then to write up a small utility then which takes a json file as
-> input and translates that into qemu command line options.
+On 17 April 2018 at 21:37, Aaron Lindsay <alindsay@codeaurora.org> wrote:
+> pmccntr_read and pmccntr_write contained duplicate code that was already
+> being handled by pmccntr_sync. Consolidate the duplicated code into two
+> functions: pmccntr_op_start and pmccntr_op_finish. Add a companion to
+> c15_ccnt in CPUARMState so that we can simultaneously save both the
+> architectural register value and the last underlying cycle count - this
+> ensure time isn't lost and will also allow us to access the 'old'
+> architectural register value in order to detect overflows in later
+> patches.
+>
+> Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+> ---
+>  target/arm/cpu.h    |  28 ++++++++++-----
+>  target/arm/helper.c | 100 ++++++++++++++++++++++++++++------------------------
+>  2 files changed, 73 insertions(+), 55 deletions(-)
+>
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 19a0c03..04041db 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -454,10 +454,20 @@ typedef struct CPUARMState {
+>          uint64_t oslsr_el1; /* OS Lock Status */
+>          uint64_t mdcr_el2;
+>          uint64_t mdcr_el3;
+> -        /* If the counter is enabled, this stores the last time the counter
+> -         * was reset. Otherwise it stores the counter value
+> +        /* Stores the architectural value of the counter *the last time it was
+> +         * updated* by pmccntr_op_start. Accesses should always be surrounded
+> +         * by pmccntr_op_start/pmccntr_op_finish to guarantee the latest
+> +         * architecturally-corect value is being read/set.
+>           */
+>          uint64_t c15_ccnt;
+> +        /* Stores the delta between the architectural value and the underlying
+> +         * cycle count during normal operation. It is used to update c15_ccnt
+> +         * to be the correct architectural value before accesses. During
+> +         * accesses, c15_ccnt_delta contains the underlying count being used
+> +         * for the access, after which it reverts to the delta value in
+> +         * pmccntr_op_finish.
+> +         */
+> +        uint64_t c15_ccnt_delta;
 
-Currently we have two distinct QAPI schemas, one covering the system
-emulator for QMP and subset of CLI args, and one covering the guest
-agent.
+So the key question here is: how does this work for VM migration?
 
-
-This new schema isn't mapping to anything in QMP / CLI right now though.
-It can be used to decide how to generate CLI args, but it isn't describing
-those CLI args. So to me this is a 3rd distinct schema.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+thanks
+-- PMM
