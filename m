@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f9bBr-0005cz-Vq
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 14:55:28 -0400
+	(envelope-from <cota@braap.org>) id 1f9bBt-0005dN-Db
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 14:55:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1f9bBo-0001yz-Dj
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 14:55:23 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:38645)
+	(envelope-from <cota@braap.org>) id 1f9bBp-00020K-Ks
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 14:55:25 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:45151)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f9bBn-0001yB-Lq
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 14:55:19 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1f9bBp-0001zY-BA
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 14:55:21 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Fri, 20 Apr 2018 14:55:00 -0400
-Message-Id: <1524250517-28032-2-git-send-email-cota@braap.org>
+Date: Fri, 20 Apr 2018 14:55:09 -0400
+Message-Id: <1524250517-28032-11-git-send-email-cota@braap.org>
 In-Reply-To: <1524250517-28032-1-git-send-email-cota@braap.org>
 References: <1524250517-28032-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH 01/18] translator: merge max_insns into
- DisasContextBase
+Subject: [Qemu-devel] [PATCH 10/18] target/mips: convert to TranslatorOps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,289 +24,313 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>
 
-While at it, use int for both num_insns and max_insns to make
-sure we have same-type comparisons.
+Notes:
+
+- DISAS_TOO_MANY replaces the former "break" in the translation loop.
+  However, care must be taken not to overwrite a previous condition
+  in is_jmp; that's why in translate_insn we first check is_jmp and
+  return if it's != DISAS_NEXT.
+
+- Added an assert in translate_insn, before exiting due to an exception,
+  to make sure that is_jmp is set to DISAS_EXCP (the exception generation
+  function always sets it.)
+
+- Added an assert for the default case in is_jmp's switch.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Cc: Aurelien Jarno <aurelien@aurel32.net>
+Cc: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- accel/tcg/translator.c     | 21 ++++++++++-----------
- include/exec/translator.h  |  8 ++++----
- target/alpha/translate.c   |  6 ++----
- target/arm/translate-a64.c |  8 +++-----
- target/arm/translate.c     |  9 +++------
- target/hppa/translate.c    |  7 ++-----
- target/i386/translate.c    |  5 +----
- target/ppc/translate.c     |  5 ++---
- 8 files changed, 27 insertions(+), 42 deletions(-)
+ target/mips/translate.c | 227 ++++++++++++++++++++++++------------------------
+ 1 file changed, 113 insertions(+), 114 deletions(-)
 
-diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
-index 23c6602..0f9dca9 100644
---- a/accel/tcg/translator.c
-+++ b/accel/tcg/translator.c
-@@ -34,8 +34,6 @@ void translator_loop_temp_check(DisasContextBase *db)
- void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
-                      CPUState *cpu, TranslationBlock *tb)
- {
--    int max_insns;
--
-     /* Initialize DisasContext */
-     db->tb = tb;
-     db->pc_first = tb->pc;
-@@ -45,18 +43,18 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
-     db->singlestep_enabled = cpu->singlestep_enabled;
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index f086968..0593f31 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -1432,6 +1432,7 @@ static TCGv_i64 msa_wr_d[64];
+ typedef struct DisasContext {
+     DisasContextBase base;
+     target_ulong saved_pc;
++    target_ulong page_start;
+     uint32_t opcode;
+     int insn_flags;
+     int32_t CP0_Config1;
+@@ -20195,24 +20196,12 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
+     }
+ }
  
-     /* Instruction counting */
--    max_insns = tb_cflags(db->tb) & CF_COUNT_MASK;
+-void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
++static void mips_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+ {
++    DisasContext *ctx = container_of(dcbase, DisasContext, base);
+     CPUMIPSState *env = cs->env_ptr;
+-    DisasContext ctx1;
+-    DisasContext *ctx = &ctx1;
+-    target_ulong page_start;
+-    int max_insns;
+-    int insn_bytes;
+-    int is_slot;
+-
+-    ctx->base.tb = tb;
+-    ctx->base.pc_first = tb->pc;
+-    ctx->base.pc_next = tb->pc;
+-    ctx->base.is_jmp = DISAS_NEXT;
+-    ctx->base.singlestep_enabled = cs->singlestep_enabled;
+-    ctx->base.num_insns = 0;
+ 
+-    page_start = ctx->base.pc_first & TARGET_PAGE_MASK;
++    ctx->page_start = ctx->base.pc_first & TARGET_PAGE_MASK;
+     ctx->saved_pc = -1;
+     ctx->insn_flags = env->insn_flags;
+     ctx->CP0_Config1 = env->CP0_Config1;
+@@ -20245,99 +20234,102 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+ #endif
+     ctx->default_tcg_memop_mask = (ctx->insn_flags & ISA_MIPS32R6) ?
+                                   MO_UNALN : MO_ALIGN;
+-    max_insns = tb_cflags(tb) & CF_COUNT_MASK;
 -    if (max_insns == 0) {
 -        max_insns = CF_COUNT_MASK;
-+    db->max_insns = tb_cflags(db->tb) & CF_COUNT_MASK;
-+    if (db->max_insns == 0) {
-+        db->max_insns = CF_COUNT_MASK;
-     }
+-    }
 -    if (max_insns > TCG_MAX_INSNS) {
 -        max_insns = TCG_MAX_INSNS;
-+    if (db->max_insns > TCG_MAX_INSNS) {
-+        db->max_insns = TCG_MAX_INSNS;
-     }
-     if (db->singlestep_enabled || singlestep) {
--        max_insns = 1;
-+        db->max_insns = 1;
-     }
+-    }
  
--    max_insns = ops->init_disas_context(db, cpu, max_insns);
-+    ops->init_disas_context(db, cpu);
-     tcg_debug_assert(db->is_jmp == DISAS_NEXT);  /* no early exit */
+-    LOG_DISAS("\ntb %p idx %d hflags %04x\n", tb, ctx->mem_idx, ctx->hflags);
+-    gen_tb_start(tb);
+-    while (ctx->base.is_jmp == DISAS_NEXT) {
+-        tcg_gen_insn_start(ctx->base.pc_next, ctx->hflags & MIPS_HFLAG_BMASK,
+-                           ctx->btarget);
+-        ctx->base.num_insns++;
++    LOG_DISAS("\ntb %p idx %d hflags %04x\n", ctx->base.tb, ctx->mem_idx,
++              ctx->hflags);
++}
  
-     /* Reset the temp count so that we can identify leaks */
-@@ -95,7 +93,8 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
-            update db->pc_next and db->is_jmp to indicate what should be
-            done next -- either exiting this loop or locate the start of
-            the next instruction.  */
--        if (db->num_insns == max_insns && (tb_cflags(db->tb) & CF_LAST_IO)) {
-+        if (db->num_insns == db->max_insns
-+            && (tb_cflags(db->tb) & CF_LAST_IO)) {
-             /* Accept I/O on the last instruction.  */
-             gen_io_start();
-             ops->translate_insn(db, cpu);
-@@ -111,7 +110,7 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
+-        if (unlikely(cpu_breakpoint_test(cs, ctx->base.pc_next, BP_ANY))) {
+-            save_cpu_state(ctx, 1);
+-            ctx->base.is_jmp = DISAS_NORETURN;
+-            gen_helper_raise_exception_debug(cpu_env);
+-            /* The address covered by the breakpoint must be included in
+-               [tb->pc, tb->pc + tb->size) in order to for it to be
+-               properly cleared -- thus we increment the PC here so that
+-               the logic setting tb->size below does the right thing.  */
+-            ctx->base.pc_next += 4;
+-            goto done_generating;
+-        }
++static void mips_tr_tb_start(DisasContextBase *dcbase, CPUState *cs)
++{
++}
  
-         /* Stop translation if the output buffer is full,
-            or we have executed all of the allowed instructions.  */
--        if (tcg_op_buf_full() || db->num_insns >= max_insns) {
-+        if (tcg_op_buf_full() || db->num_insns >= db->max_insns) {
-             db->is_jmp = DISAS_TOO_MANY;
-             break;
+-        if (ctx->base.num_insns == max_insns && (tb_cflags(tb) & CF_LAST_IO)) {
+-            gen_io_start();
+-        }
++static void mips_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
++{
++    DisasContext *ctx = container_of(dcbase, DisasContext, base);
+ 
+-        is_slot = ctx->hflags & MIPS_HFLAG_BMASK;
+-        if (!(ctx->hflags & MIPS_HFLAG_M16)) {
+-            ctx->opcode = cpu_ldl_code(env, ctx->base.pc_next);
+-            insn_bytes = 4;
+-            decode_opc(env, ctx);
+-        } else if (ctx->insn_flags & ASE_MICROMIPS) {
+-            ctx->opcode = cpu_lduw_code(env, ctx->base.pc_next);
+-            insn_bytes = decode_micromips_opc(env, ctx);
+-        } else if (ctx->insn_flags & ASE_MIPS16) {
+-            ctx->opcode = cpu_lduw_code(env, ctx->base.pc_next);
+-            insn_bytes = decode_mips16_opc(env, ctx);
+-        } else {
+-            generate_exception_end(ctx, EXCP_RI);
+-            break;
+-        }
++    tcg_gen_insn_start(ctx->base.pc_next, ctx->hflags & MIPS_HFLAG_BMASK,
++                       ctx->btarget);
++}
+ 
+-        if (ctx->hflags & MIPS_HFLAG_BMASK) {
+-            if (!(ctx->hflags & (MIPS_HFLAG_BDS16 | MIPS_HFLAG_BDS32 |
+-                                MIPS_HFLAG_FBNSLOT))) {
+-                /* force to generate branch as there is neither delay nor
+-                   forbidden slot */
+-                is_slot = 1;
+-            }
+-            if ((ctx->hflags & MIPS_HFLAG_M16) &&
+-                (ctx->hflags & MIPS_HFLAG_FBNSLOT)) {
+-                /* Force to generate branch as microMIPS R6 doesn't restrict
+-                   branches in the forbidden slot. */
+-                is_slot = 1;
+-            }
+-        }
+-        if (is_slot) {
+-            gen_branch(ctx, insn_bytes);
+-        }
+-        ctx->base.pc_next += insn_bytes;
++static bool mips_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cs,
++                                     const CPUBreakpoint *bp)
++{
++    DisasContext *ctx = container_of(dcbase, DisasContext, base);
+ 
+-        /* Execute a branch and its delay slot as a single instruction.
+-           This is what GDB expects and is consistent with what the
+-           hardware does (e.g. if a delay slot instruction faults, the
+-           reported PC is the PC of the branch).  */
+-        if (ctx->base.singlestep_enabled &&
+-            (ctx->hflags & MIPS_HFLAG_BMASK) == 0) {
+-            break;
+-        }
++    save_cpu_state(ctx, 1);
++    ctx->base.is_jmp = DISAS_NORETURN;
++    gen_helper_raise_exception_debug(cpu_env);
++    /* The address covered by the breakpoint must be included in
++       [tb->pc, tb->pc + tb->size) in order to for it to be
++       properly cleared -- thus we increment the PC here so that
++       the logic setting tb->size below does the right thing.  */
++    ctx->base.pc_next += 4;
++    return true;
++}
+ 
+-        if (ctx->base.pc_next - page_start >= TARGET_PAGE_SIZE) {
+-            break;
+-        }
++static void mips_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
++{
++    CPUMIPSState *env = cs->env_ptr;
++    DisasContext *ctx = container_of(dcbase, DisasContext, base);
++    int insn_bytes;
++    int is_slot;
+ 
+-        if (tcg_op_buf_full()) {
+-            break;
+-        }
++    is_slot = ctx->hflags & MIPS_HFLAG_BMASK;
++    if (!(ctx->hflags & MIPS_HFLAG_M16)) {
++        ctx->opcode = cpu_ldl_code(env, ctx->base.pc_next);
++        insn_bytes = 4;
++        decode_opc(env, ctx);
++    } else if (ctx->insn_flags & ASE_MICROMIPS) {
++        ctx->opcode = cpu_lduw_code(env, ctx->base.pc_next);
++        insn_bytes = decode_micromips_opc(env, ctx);
++    } else if (ctx->insn_flags & ASE_MIPS16) {
++        ctx->opcode = cpu_lduw_code(env, ctx->base.pc_next);
++        insn_bytes = decode_mips16_opc(env, ctx);
++    } else {
++        generate_exception_end(ctx, EXCP_RI);
++        g_assert(ctx->base.is_jmp == DISAS_EXCP);
++        return;
++    }
+ 
+-        if (ctx->base.num_insns >= max_insns) {
+-            break;
++    if (ctx->hflags & MIPS_HFLAG_BMASK) {
++        if (!(ctx->hflags & (MIPS_HFLAG_BDS16 | MIPS_HFLAG_BDS32 |
++                             MIPS_HFLAG_FBNSLOT))) {
++            /* force to generate branch as there is neither delay nor
++               forbidden slot */
++            is_slot = 1;
++        }
++        if ((ctx->hflags & MIPS_HFLAG_M16) &&
++            (ctx->hflags & MIPS_HFLAG_FBNSLOT)) {
++            /* Force to generate branch as microMIPS R6 doesn't restrict
++               branches in the forbidden slot. */
++            is_slot = 1;
          }
-diff --git a/include/exec/translator.h b/include/exec/translator.h
-index e2dc2a0..71e7b2c 100644
---- a/include/exec/translator.h
-+++ b/include/exec/translator.h
-@@ -58,6 +58,7 @@ typedef enum DisasJumpType {
-  *           disassembly).
-  * @is_jmp: What instruction to disassemble next.
-  * @num_insns: Number of translated instructions (including current).
-+ * @max_insns: Maximum number of instructions to be translated in this TB.
-  * @singlestep_enabled: "Hardware" single stepping enabled.
-  *
-  * Architecture-agnostic disassembly context.
-@@ -67,7 +68,8 @@ typedef struct DisasContextBase {
-     target_ulong pc_first;
-     target_ulong pc_next;
-     DisasJumpType is_jmp;
--    unsigned int num_insns;
-+    int num_insns;
-+    int max_insns;
-     bool singlestep_enabled;
- } DisasContextBase;
++    }
++    if (is_slot) {
++        gen_branch(ctx, insn_bytes);
++    }
++    ctx->base.pc_next += insn_bytes;
  
-@@ -76,7 +78,6 @@ typedef struct DisasContextBase {
-  * @init_disas_context:
-  *      Initialize the target-specific portions of DisasContext struct.
-  *      The generic DisasContextBase has already been initialized.
-- *      Return max_insns, modified as necessary by db->tb->flags.
-  *
-  * @tb_start:
-  *      Emit any code required before the start of the main loop,
-@@ -106,8 +107,7 @@ typedef struct DisasContextBase {
-  *      Print instruction disassembly to log.
-  */
- typedef struct TranslatorOps {
--    int (*init_disas_context)(DisasContextBase *db, CPUState *cpu,
--                              int max_insns);
-+    void (*init_disas_context)(DisasContextBase *db, CPUState *cpu);
-     void (*tb_start)(DisasContextBase *db, CPUState *cpu);
-     void (*insn_start)(DisasContextBase *db, CPUState *cpu);
-     bool (*breakpoint_check)(DisasContextBase *db, CPUState *cpu,
-diff --git a/target/alpha/translate.c b/target/alpha/translate.c
-index 73a1b5e..15eca71 100644
---- a/target/alpha/translate.c
-+++ b/target/alpha/translate.c
-@@ -2919,8 +2919,7 @@ static DisasJumpType translate_one(DisasContext *ctx, uint32_t insn)
-     return ret;
- }
- 
--static int alpha_tr_init_disas_context(DisasContextBase *dcbase,
--                                       CPUState *cpu, int max_insns)
-+static void alpha_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cpu)
- {
-     DisasContext *ctx = container_of(dcbase, DisasContext, base);
-     CPUAlphaState *env = cpu->env_ptr;
-@@ -2959,8 +2958,7 @@ static int alpha_tr_init_disas_context(DisasContextBase *dcbase,
-         mask = TARGET_PAGE_MASK;
+-        if (singlestep)
+-            break;
++    if (ctx->base.is_jmp != DISAS_NEXT) {
++        return;
      }
-     bound = -(ctx->base.pc_first | mask) / 4;
--
--    return MIN(max_insns, bound);
-+    ctx->base.max_insns = MIN(ctx->base.max_insns, bound);
- }
- 
- static void alpha_tr_tb_start(DisasContextBase *db, CPUState *cpu)
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index c913292..1bf16ff 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -13218,8 +13218,8 @@ static void disas_a64_insn(CPUARMState *env, DisasContext *s)
-     free_tmp_a64(s);
- }
- 
--static int aarch64_tr_init_disas_context(DisasContextBase *dcbase,
--                                         CPUState *cpu, int max_insns)
-+static void aarch64_tr_init_disas_context(DisasContextBase *dcbase,
-+                                          CPUState *cpu)
- {
-     DisasContext *dc = container_of(dcbase, DisasContext, base);
-     CPUARMState *env = cpu->env_ptr;
-@@ -13282,11 +13282,9 @@ static int aarch64_tr_init_disas_context(DisasContextBase *dcbase,
-     if (dc->ss_active) {
-         bound = 1;
+-    if (tb_cflags(tb) & CF_LAST_IO) {
+-        gen_io_end();
++    /* Execute a branch and its delay slot as a single instruction.
++       This is what GDB expects and is consistent with what the
++       hardware does (e.g. if a delay slot instruction faults, the
++       reported PC is the PC of the branch).  */
++    if (ctx->base.singlestep_enabled &&
++        (ctx->hflags & MIPS_HFLAG_BMASK) == 0) {
++        ctx->base.is_jmp = DISAS_TOO_MANY;
++    }
++    if (ctx->base.pc_next - ctx->page_start >= TARGET_PAGE_SIZE) {
++        ctx->base.is_jmp = DISAS_TOO_MANY;
      }
--    max_insns = MIN(max_insns, bound);
-+    dc->base.max_insns = MIN(dc->base.max_insns, bound);
- 
-     init_tmp_a64_array(dc);
--
--    return max_insns;
- }
- 
- static void aarch64_tr_tb_start(DisasContextBase *db, CPUState *cpu)
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index d80c0c4..acf539f 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -12216,8 +12216,7 @@ static bool insn_crosses_page(CPUARMState *env, DisasContext *s)
-     return !thumb_insn_is_16bit(s, insn);
- }
- 
--static int arm_tr_init_disas_context(DisasContextBase *dcbase,
--                                     CPUState *cs, int max_insns)
-+static void arm_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
- {
-     DisasContext *dc = container_of(dcbase, DisasContext, base);
-     CPUARMState *env = cs->env_ptr;
-@@ -12278,14 +12277,14 @@ static int arm_tr_init_disas_context(DisasContextBase *dcbase,
- 
-     /* If architectural single step active, limit to 1.  */
-     if (is_singlestepping(dc)) {
--        max_insns = 1;
-+        dc->base.max_insns = 1;
++}
++
++static void mips_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
++{
++    DisasContext *ctx = container_of(dcbase, DisasContext, base);
++
+     if (ctx->base.singlestep_enabled && ctx->base.is_jmp != DISAS_NORETURN) {
+         save_cpu_state(ctx, ctx->base.is_jmp != DISAS_EXCP);
+         gen_helper_raise_exception_debug(cpu_env);
+@@ -20348,6 +20340,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+             tcg_gen_lookup_and_goto_ptr();
+             break;
+         case DISAS_NEXT:
++        case DISAS_TOO_MANY:
+             save_cpu_state(ctx, 0);
+             gen_goto_tb(ctx, 0, ctx->base.pc_next);
+             break;
+@@ -20356,28 +20349,34 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+             tcg_gen_exit_tb(0);
+             break;
+         case DISAS_NORETURN:
+-        default:
+             break;
++        default:
++            g_assert_not_reached();
+         }
      }
- 
-     /* ARM is a fixed-length ISA.  Bound the number of insns to execute
-        to those left on the page.  */
-     if (!dc->thumb) {
-         int bound = -(dc->base.pc_first | TARGET_PAGE_MASK) / 4;
--        max_insns = MIN(max_insns, bound);
-+        dc->base.max_insns = MIN(dc->base.max_insns, bound);
-     }
- 
-     cpu_F0s = tcg_temp_new_i32();
-@@ -12296,8 +12295,6 @@ static int arm_tr_init_disas_context(DisasContextBase *dcbase,
-     cpu_V1 = cpu_F1d;
-     /* FIXME: cpu_M0 can probably be the same as cpu_V0.  */
-     cpu_M0 = tcg_temp_new_i64();
+-done_generating:
+-    gen_tb_end(tb, ctx->base.num_insns);
 -
--    return max_insns;
- }
- 
- static void arm_tr_tb_start(DisasContextBase *dcbase, CPUState *cpu)
-diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index c532889..424991f 100644
---- a/target/hppa/translate.c
-+++ b/target/hppa/translate.c
-@@ -4681,8 +4681,7 @@ static DisasJumpType translate_one(DisasContext *ctx, uint32_t insn)
-     return gen_illegal(ctx);
- }
- 
--static int hppa_tr_init_disas_context(DisasContextBase *dcbase,
--                                      CPUState *cs, int max_insns)
-+static void hppa_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
- {
-     DisasContext *ctx = container_of(dcbase, DisasContext, base);
-     int bound;
-@@ -4712,14 +4711,12 @@ static int hppa_tr_init_disas_context(DisasContextBase *dcbase,
- 
-     /* Bound the number of instructions by those left on the page.  */
-     bound = -(ctx->base.pc_first | TARGET_PAGE_MASK) / 4;
--    bound = MIN(max_insns, bound);
-+    ctx->base.max_insns = MIN(ctx->base.max_insns, bound);
- 
-     ctx->ntempr = 0;
-     ctx->ntempl = 0;
-     memset(ctx->tempr, 0, sizeof(ctx->tempr));
-     memset(ctx->templ, 0, sizeof(ctx->templ));
+-    tb->size = ctx->base.pc_next - ctx->base.pc_first;
+-    tb->icount = ctx->base.num_insns;
 -
--    return bound;
+-#ifdef DEBUG_DISAS
+-    LOG_DISAS("\n");
+-    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
+-        && qemu_log_in_addr_range(ctx->base.pc_first)) {
+-        qemu_log_lock();
+-        qemu_log("IN: %s\n", lookup_symbol(ctx->base.pc_first));
+-        log_target_disas(cs, ctx->base.pc_first,
+-                         ctx->base.pc_next - ctx->base.pc_first);
+-        qemu_log("\n");
+-        qemu_log_unlock();
+-    }
+-#endif
++}
++
++static void mips_tr_disas_log(const DisasContextBase *dcbase, CPUState *cs)
++{
++    qemu_log("IN: %s\n", lookup_symbol(dcbase->pc_first));
++    log_target_disas(cs, dcbase->pc_first, dcbase->tb->size);
++}
++
++static const TranslatorOps mips_tr_ops = {
++    .init_disas_context = mips_tr_init_disas_context,
++    .tb_start           = mips_tr_tb_start,
++    .insn_start         = mips_tr_insn_start,
++    .breakpoint_check   = mips_tr_breakpoint_check,
++    .translate_insn     = mips_tr_translate_insn,
++    .tb_stop            = mips_tr_tb_stop,
++    .disas_log          = mips_tr_disas_log,
++};
++
++void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
++{
++    DisasContext ctx;
++
++    translator_loop(&mips_tr_ops, &ctx.base, cs, tb);
  }
  
- static void hppa_tr_tb_start(DisasContextBase *dcbase, CPUState *cs)
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index c9ed8dc..b0f6983 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -8402,8 +8402,7 @@ void tcg_x86_init(void)
-     }
- }
- 
--static int i386_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cpu,
--                                      int max_insns)
-+static void i386_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cpu)
- {
-     DisasContext *dc = container_of(dcbase, DisasContext, base);
-     CPUX86State *env = cpu->env_ptr;
-@@ -8470,8 +8469,6 @@ static int i386_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cpu,
-     cpu_ptr0 = tcg_temp_new_ptr();
-     cpu_ptr1 = tcg_temp_new_ptr();
-     cpu_cc_srcT = tcg_temp_local_new();
--
--    return max_insns;
- }
- 
- static void i386_tr_tb_start(DisasContextBase *db, CPUState *cpu)
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 3457d29..019489b 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -7212,8 +7212,7 @@ void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
- #endif
- }
- 
--static int ppc_tr_init_disas_context(DisasContextBase *dcbase,
--                                     CPUState *cs, int max_insns)
-+static void ppc_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
- {
-     DisasContext *ctx = container_of(dcbase, DisasContext, base);
-     CPUPPCState *env = cs->env_ptr;
-@@ -7278,7 +7277,7 @@ static int ppc_tr_init_disas_context(DisasContextBase *dcbase,
- #endif
- 
-     bound = -(ctx->base.pc_first | TARGET_PAGE_MASK) / 4;
--    return MIN(max_insns, bound);
-+    ctx->base.max_insns = MIN(ctx->base.max_insns, bound);
- }
- 
- static void ppc_tr_tb_start(DisasContextBase *db, CPUState *cs)
+ static void fpu_dump_state(CPUMIPSState *env, FILE *f, fprintf_function fpu_fprintf,
 -- 
 2.7.4
