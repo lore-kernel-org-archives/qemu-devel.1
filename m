@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1f9YE5-0002o7-Fr
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:45:30 -0400
+	(envelope-from <groug@kaod.org>) id 1f9YEu-0003Gu-Kj
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:46:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1f9YE2-0002F7-9K
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:45:29 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47460 helo=mx1.redhat.com)
+	(envelope-from <groug@kaod.org>) id 1f9YEo-0005Zu-5e
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:46:20 -0400
+Received: from 17.mo7.mail-out.ovh.net ([188.165.35.227]:51878)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1f9YE1-0002EI-R7
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:45:26 -0400
-References: <87po2wzysh.fsf@dusky.pond.sub.org>
-	<8a52bb49-4194-3b91-8b67-a0e5700fd6ed@redhat.com>
-	<87in8nvdpn.fsf@dusky.pond.sub.org> <20180419075629.GC10259@redhat.com>
-	<5ed8b01f-7faa-b23d-5fd2-f4715294e061@redhat.com>
-	<20180419091201.GI10259@redhat.com>
-	<a9006770-b4e3-cf57-3efa-c967740f7a94@redhat.com>
-	<20180420093457.GE21035@redhat.com>
-	<20180420094624.ltkg2jbugvgi4de5@sirius.home.kraxel.org>
-	<20180420095053.GG21035@redhat.com>
-	<20180420104154.gmqb26t4olj3mbcw@sirius.home.kraxel.org>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <29b926f9-90df-8006-dfb3-d6133e3dba0c@redhat.com>
-Date: Fri, 20 Apr 2018 17:45:18 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1f9YEn-0005Md-Tn
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:46:14 -0400
+Received: from player791.ha.ovh.net (unknown [10.109.108.35])
+	by mo7.mail-out.ovh.net (Postfix) with ESMTP id 4200CA2D87
+	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 17:46:12 +0200 (CEST)
+Date: Fri, 20 Apr 2018 17:46:07 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180420174607.412a9abf@bahia.lan>
+In-Reply-To: <20180417071722.9399-7-david@gibson.dropbear.id.au>
+References: <20180417071722.9399-1-david@gibson.dropbear.id.au>
+	<20180417071722.9399-7-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <20180420104154.gmqb26t4olj3mbcw@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [libvirt] [qemu RFC v2] qapi: add "firmware.json"
+Subject: Re: [Qemu-devel] [PATCH for-2.13 06/10] target/ppc: Add
+ ppc_store_lpcr() helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,31 +31,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, libvir-list@redhat.com, Michal Privoznik <mprivozn@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Gary Ching-Pang Lin <glin@suse.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <dgibson@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: benh@kernel.crashing.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On 04/20/18 12:41, Gerd Hoffmann wrote:
->>>> Since your schema is likely to end up just being a file in docs/specs,
+On Tue, 17 Apr 2018 17:17:18 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> There are some fields in the cpu state which need to be updated when the
+> LPCR register is changed, which is done by ppc_hash64_update_rmls() and
+> ppc_hash64_update_vrma().  Code which alters env->spr[SPR_LPCR] needs to
+> call them afterwards to make sure the state is up to date.
 > 
->>> I think it would be useful to have this as part of the schema.  Should
->>> be easy then to write up a small utility then which takes a json file as
->>> input and translates that into qemu command line options.
->>
->> Currently we have two distinct QAPI schemas, one covering the system
->> emulator for QMP and subset of CLI args, and one covering the guest
->> agent.
+> That's easy to get wrong.  The normal way of dealing with sitautions like
+
+                                                    s/sitautions/situations/
+
+> that is to use a helper which both updates the basic register value and the
+> derived state.
 > 
-> Yep, we can make it a third one, fine with me.
-> But it likewise wouldn't end up in docs/ then.
+> So, do that.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
 
-Let's please focus on the schema itself for now, with the stupid little
-test command included. Once the schema enjoys universal popularity, I'll
-be glad to pass it on to QMP wizards -- because, if we ultimately wanted
-to keep the schema code-enabled, then Markus's earlier suggestions apply
-too, regarding QMP test cases. I'll admit I haven't dared look at those
-yet (in particular because Paolo originally suggested to move this under
-docs/interop). Looking at my todo list, I'd really like to focus on the
-schema itself.
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-Thanks
-Laszlo
+>  hw/ppc/spapr_cpu_core.c |  6 +-----
+>  target/ppc/mmu-hash64.c | 15 +++++++++++----
+>  target/ppc/mmu-hash64.h |  3 +--
+>  3 files changed, 13 insertions(+), 11 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index 9080664ec1..b1c3cf11f0 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -74,14 +74,10 @@ static void spapr_cpu_reset(void *opaque)
+>          lpcr &= ~pcc->lpcr_pm;
+>      }
+>  
+> -    env->spr[SPR_LPCR] = lpcr;
+> +    ppc_store_lpcr(cpu, lpcr);
+>  
+>      /* Set a full AMOR so guest can use the AMR as it sees fit */
+>      env->spr[SPR_AMOR] = 0xffffffffffffffffull;
+> -
+> -    /* Update some env bits based on new LPCR value */
+> -    ppc_hash64_update_rmls(cpu);
+> -    ppc_hash64_update_vrma(cpu);
+>  }
+>  
+>  static void spapr_cpu_destroy(PowerPCCPU *cpu)
+> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+> index 7e0adecfd9..a1db20e3a8 100644
+> --- a/target/ppc/mmu-hash64.c
+> +++ b/target/ppc/mmu-hash64.c
+> @@ -942,7 +942,7 @@ void ppc_hash64_tlb_flush_hpte(PowerPCCPU *cpu, target_ulong ptex,
+>      cpu->env.tlb_need_flush = TLB_NEED_GLOBAL_FLUSH | TLB_NEED_LOCAL_FLUSH;
+>  }
+>  
+> -void ppc_hash64_update_rmls(PowerPCCPU *cpu)
+> +static void ppc_hash64_update_rmls(PowerPCCPU *cpu)
+>  {
+>      CPUPPCState *env = &cpu->env;
+>      uint64_t lpcr = env->spr[SPR_LPCR];
+> @@ -977,7 +977,7 @@ void ppc_hash64_update_rmls(PowerPCCPU *cpu)
+>      }
+>  }
+>  
+> -void ppc_hash64_update_vrma(PowerPCCPU *cpu)
+> +static void ppc_hash64_update_vrma(PowerPCCPU *cpu)
+>  {
+>      CPUPPCState *env = &cpu->env;
+>      const PPCHash64SegmentPageSizes *sps = NULL;
+> @@ -1028,9 +1028,9 @@ void ppc_hash64_update_vrma(PowerPCCPU *cpu)
+>      slb->sps = sps;
+>  }
+>  
+> -void helper_store_lpcr(CPUPPCState *env, target_ulong val)
+> +void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong val)
+>  {
+> -    PowerPCCPU *cpu = ppc_env_get_cpu(env);
+> +    CPUPPCState *env = &cpu->env;
+>      uint64_t lpcr = 0;
+>  
+>      /* Filter out bits */
+> @@ -1096,6 +1096,13 @@ void helper_store_lpcr(CPUPPCState *env, target_ulong val)
+>      ppc_hash64_update_vrma(cpu);
+>  }
+>  
+> +void helper_store_lpcr(CPUPPCState *env, target_ulong val)
+> +{
+> +    PowerPCCPU *cpu = ppc_env_get_cpu(env);
+> +
+> +    ppc_store_lpcr(cpu, val);
+> +}
+> +
+>  void ppc_hash64_init(PowerPCCPU *cpu)
+>  {
+>      CPUPPCState *env = &cpu->env;
+> diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
+> index d5fc03441d..f23b78d787 100644
+> --- a/target/ppc/mmu-hash64.h
+> +++ b/target/ppc/mmu-hash64.h
+> @@ -17,8 +17,7 @@ void ppc_hash64_tlb_flush_hpte(PowerPCCPU *cpu,
+>                                 target_ulong pte0, target_ulong pte1);
+>  unsigned ppc_hash64_hpte_page_shift_noslb(PowerPCCPU *cpu,
+>                                            uint64_t pte0, uint64_t pte1);
+> -void ppc_hash64_update_vrma(PowerPCCPU *cpu);
+> -void ppc_hash64_update_rmls(PowerPCCPU *cpu);
+> +void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong val);
+>  void ppc_hash64_init(PowerPCCPU *cpu);
+>  void ppc_hash64_finalize(PowerPCCPU *cpu);
+>  #endif
