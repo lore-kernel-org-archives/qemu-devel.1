@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1f9RRZ-0001tr-48
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:31:00 -0400
+	(envelope-from <stefanha@gmail.com>) id 1f9RSP-0002Ws-9o
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:31:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1f9RRW-00089S-J2
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:30:57 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41118 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1f9RRW-00089C-EF
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:30:54 -0400
-References: <20180418045121.14233-1-peterx@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <e8574fde-b3f1-9c92-19f7-4b223ef298ec@redhat.com>
-Date: Fri, 20 Apr 2018 16:30:47 +0800
+	(envelope-from <stefanha@gmail.com>) id 1f9RSO-0002Np-EZ
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 04:31:49 -0400
+Date: Fri, 20 Apr 2018 16:31:38 +0800
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180420083138.GK15181@stefanha-x1.localdomain>
+References: <20180416165849.28864-1-mreitz@redhat.com>
+	<20180416165849.28864-2-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180418045121.14233-1-peterx@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] intel-iommu: send PSI always when
- notify_unmap set
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Qo8f1a4rgWw9S/zY"
+Content-Disposition: inline
+In-Reply-To: <20180416165849.28864-2-mreitz@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/9] block: Add COR filter
+ driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,121 +25,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Eric Auger <eric.auger@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Alexander Witte <alexander.witte@baicanada.com>, Jintack Lim <jintack@cs.columbia.edu>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
 
+--Qo8f1a4rgWw9S/zY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 2018=E5=B9=B404=E6=9C=8818=E6=97=A5 12:51, Peter Xu wrote:
-> During IOVA page table walk, there is a special case when:
->
-> - notify_unmap is set, meanwhile
-> - entry is invalid
->
-> In the past, we skip the entry always.  This is not correct.  We should
-> send UNMAP notification to registered notifiers in this case.  Otherwis=
-e
-> some stall pages will still be mapped in the host even if L1 guest
-> unmapped them already.
->
-> Without this patch, nested device assignment to L2 guests might dump
-> some errors like:
->
-> qemu-system-x86_64: VFIO_MAP_DMA: -17
-> qemu-system-x86_64: vfio_dma_map(0x557305420c30, 0xad000, 0x1000,
->                      0x7f89a920d000) =3D -17 (File exists)
->
-> To fix this, we need to apply this patch to L1 QEMU (L2 QEMU is not
-> affected by this problem).
->
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->
-> To test nested assignment, one also needs to apply below patchset:
-> https://lkml.org/lkml/2018/4/18/5
-> ---
->   hw/i386/intel_iommu.c | 42 ++++++++++++++++++++++++++++++------------
->   1 file changed, 30 insertions(+), 12 deletions(-)
->
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index fb31de9416..b359efd6f9 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -722,6 +722,15 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, =
-uint64_t iova, bool is_write,
->  =20
->   typedef int (*vtd_page_walk_hook)(IOMMUTLBEntry *entry, void *private=
-);
->  =20
-> +static int vtd_page_walk_one(IOMMUTLBEntry *entry, int level,
-> +                             vtd_page_walk_hook hook_fn, void *private=
-)
-> +{
-> +    assert(hook_fn);
-> +    trace_vtd_page_walk_one(level, entry->iova, entry->translated_addr=
-,
-> +                            entry->addr_mask, entry->perm);
-> +    return hook_fn(entry, private);
-> +}
-> +
->   /**
->    * vtd_page_walk_level - walk over specific level for IOVA range
->    *
-> @@ -781,28 +790,37 @@ static int vtd_page_walk_level(dma_addr_t addr, u=
-int64_t start,
->            */
->           entry_valid =3D read_cur | write_cur;
->  =20
-> +        entry.target_as =3D &address_space_memory;
-> +        entry.iova =3D iova & subpage_mask;
-> +        entry.perm =3D IOMMU_ACCESS_FLAG(read_cur, write_cur);
-> +        entry.addr_mask =3D ~subpage_mask;
-> +
->           if (vtd_is_last_slpte(slpte, level)) {
-> -            entry.target_as =3D &address_space_memory;
-> -            entry.iova =3D iova & subpage_mask;
->               /* NOTE: this is only meaningful if entry_valid =3D=3D tr=
-ue */
->               entry.translated_addr =3D vtd_get_slpte_addr(slpte, aw);
-> -            entry.addr_mask =3D ~subpage_mask;
-> -            entry.perm =3D IOMMU_ACCESS_FLAG(read_cur, write_cur);
->               if (!entry_valid && !notify_unmap) {
->                   trace_vtd_page_walk_skip_perm(iova, iova_next);
->                   goto next;
->               }
-> -            trace_vtd_page_walk_one(level, entry.iova, entry.translate=
-d_addr,
-> -                                    entry.addr_mask, entry.perm);
-> -            if (hook_fn) {
-> -                ret =3D hook_fn(&entry, private);
-> -                if (ret < 0) {
-> -                    return ret;
-> -                }
-> +            ret =3D vtd_page_walk_one(&entry, level, hook_fn, private)=
-;
-> +            if (ret < 0) {
-> +                return ret;
->               }
->           } else {
->               if (!entry_valid) {
-> -                trace_vtd_page_walk_skip_perm(iova, iova_next);
-> +                if (notify_unmap) {
-> +                    /*
-> +                     * The whole entry is invalid; unmap it all.
-> +                     * Translated address is meaningless, zero it.
-> +                     */
-> +                    entry.translated_addr =3D 0x0;
-> +                    ret =3D vtd_page_walk_one(&entry, level, hook_fn, =
-private);
-> +                    if (ret < 0) {
-> +                        return ret;
-> +                    }
-> +                } else {
-> +                    trace_vtd_page_walk_skip_perm(iova, iova_next);
-> +                }
->                   goto next;
->               }
->               ret =3D vtd_page_walk_level(vtd_get_slpte_addr(slpte, aw)=
-, iova,
+On Mon, Apr 16, 2018 at 06:58:41PM +0200, Max Reitz wrote:
+>  { 'enum': 'BlockdevDriver',
+> -  'data': [ 'blkdebug', 'blkverify', 'bochs', 'cloop',
+> +  'data': [ 'blkdebug', 'blkverify', 'bochs', 'cloop', 'cor',
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+"copy-on-read" would be clearer than "cor" for the QMP API and the
+block/cor.c source file.  Is there a need to make the name very short?
+
+--Qo8f1a4rgWw9S/zY
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJa2aVqAAoJEJykq7OBq3PIKWMH/jMUjbGoP8DLF1E/M6bIvCCn
+/JM4/89pTE8/hBwmftV2uTaaXd8xBKXRN5oZkII/28bBkds/gJ11oZr8AaJbLMAs
+9d7MUhkPVZ4T0iY2VolZxmXVVlDbl292pU3A/5Mz4g4oHGdUXCMLKYwFT9TAI7pX
+GtdzMYHPnV2yw4ORuAyiYghQnEqnVdMDXuxmFfVZ8S9DoKwrX2xhluNFKuuGsUDB
+OmiqZBsqV4TWGsK3VOZEf9e+hg4wcL3BYx/hiLSbkqnnEbfi9ZC4xoizKUqUCxqW
+RbGZXEoaNINrXJErZXt8QDRaTEM5ucf5/39aD6ZpJYF2h3IVrMK1RypFYnhtK1Y=
+=2iwv
+-----END PGP SIGNATURE-----
+
+--Qo8f1a4rgWw9S/zY--
