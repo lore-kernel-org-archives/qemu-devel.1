@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f9XgD-0004Ya-Ks
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:10:30 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1f9Xip-0006MW-Dt
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:13:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1f9XgC-0002XE-JY
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:10:29 -0400
-Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:36066)
+	(envelope-from <peter.maydell@linaro.org>) id 1f9Xio-0005ht-Bc
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:13:11 -0400
+Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:33660)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1f9XgB-0002W7-Tm
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:10:28 -0400
-Received: by mail-ot0-x230.google.com with SMTP id p2-v6so9967054otf.3
-	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 08:10:27 -0700 (PDT)
+	id 1f9Xio-0005gd-6u
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 11:13:10 -0400
+Received: by mail-ot0-x230.google.com with SMTP id w2-v6so9978020otj.0
+	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 08:13:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180420175948-mutt-send-email-mst@kernel.org>
-References: <1524234528-373013-1-git-send-email-mst@redhat.com>
-	<CAFEAcA9M5q7Pq-Ooe2h96pW+r+d3m77_oepET8D4JtUUVyqRvQ@mail.gmail.com>
-	<20180420175948-mutt-send-email-mst@kernel.org>
+In-Reply-To: <152423701463.2118.8532788783924003585@71c20359a636>
+References: <20180420145249.32435-1-peter.maydell@linaro.org>
+	<152423701463.2118.8532788783924003585@71c20359a636>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Apr 2018 16:10:06 +0100
-Message-ID: <CAFEAcA_iT7T+x_iLK+QxbjfACWVHrmvsE3=q6vV3TpDNt0qSZA@mail.gmail.com>
+Date: Fri, 20 Apr 2018 16:12:49 +0100
+Message-ID: <CAFEAcA_O5nnd2NLHOuJocy4vh0StaK_Z_p3yn8Q4vvdAUUwuNQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/1] pc: bugfix
+Subject: Re: [Qemu-devel] [PATCH 00/13] Drop compile time limit on number of
+ serial ports
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,52 +30,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, "patches@linaro.org" <patches@linaro.org>
 
-On 20 April 2018 at 16:06, Michael S. Tsirkin <mst@redhat.com> wrote:
-> On Fri, Apr 20, 2018 at 03:55:31PM +0100, Peter Maydell wrote:
->> On 20 April 2018 at 15:29, Michael S. Tsirkin <mst@redhat.com> wrote:
->> > The following changes since commit 27e757e29cc79f3f104d2a84d17cdb3b4c11c8ff:
->> >
->> >   Update version for v2.12.0-rc4 release (2018-04-17 22:26:44 +0100)
->> >
->> > are available in the git repository at:
->> >
->> >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->> >
->> > for you to fetch changes up to f256f05c94d12eed2c1a0e9b6ed4fb1fb9d8ec72:
->> >
->> >   intel-iommu: send PSI always when notify_unmap set (2018-04-20 17:26:23 +0300)
->> >
->> > ----------------------------------------------------------------
->> > pc: bugfix
->> >
->> > Adds missing invalidations in vtd.
->> >
->> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->> >
->> > ----------------------------------------------------------------
->> > Peter Xu (1):
->> >       intel-iommu: send PSI always when notify_unmap set
->>
->> You really can't send me a pull request at rc4 and expect
->> me to apply it without a very clear and detailed rationale
->> in the cover letter for why this bug fix justifies having
->> to roll an extra rc and delay the release. "bugfix" is
->> not sufficient, I'm afraid.
+On 20 April 2018 at 16:10,  <no-reply@patchew.org> wrote:
 
-> Right, sorry about that.  It fixes a security problem unfortunately.
-> Would you like me to redo it with a more detailed description?
+> Checking PATCH 7/13: Change references to serial_hds[] to serial_hd()...
+> WARNING: line over 80 characters
+> #581: FILE: hw/cris/axis_dev88.c:340:
+> +        etraxfs_ser_create(0x30026000 + i * 0x2000, irq[0x14 + i], serial_hd(i));
+>
+> ERROR: spaces required around that '/' (ctx:VxV)
+> #824: FILE: hw/moxie/moxiesim.c:146:
+> +                       8000000/16, serial_hd(0), DEVICE_LITTLE_ENDIAN);
+>                                ^
+>
+> total: 1 errors, 1 warnings, 852 lines checked
 
-Would be nice. The commit message as it sounds certainly
-doesn't sound like a security problem. Does this have a CVE?
-If so the commit message should state it. Should it be cc:stable?
-Is it a regression since 2.11? What exactly are the consequences
-and who does it affect?
+These are in the "mechanical change only" patch, so I didn't
+want to change anything else there.
 
-It's probably easier if you explain in email here first, and
-then we can redo the commit message if it seems necessary.
+> Checking PATCH 12/13: vl.c: Remove compile time limit on number of serial ports...
+> ERROR: do not initialise statics to 0 or NULL
+> #35: FILE: vl.c:157:
+> +static int num_serial_hds = 0;
+>
+> ERROR: do not initialise statics to 0 or NULL
+> #36: FILE: vl.c:158:
+> +static Chardev **serial_hds = NULL;
+
+I'd forgotten checkpatch had this requirement; easy to fix.
 
 thanks
 -- PMM
