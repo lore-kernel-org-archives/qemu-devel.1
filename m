@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f9V5H-0002cU-4g
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:24:12 -0400
+	(envelope-from <groug@kaod.org>) id 1f9V6f-0003ai-54
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:25:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1f9V5G-0007v7-4E
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:24:11 -0400
-References: <20180416114414.18406-1-vsementsov@virtuozzo.com>
-	<20180416114414.18406-5-vsementsov@virtuozzo.com>
-	<5b5bfec8-ed19-dd0f-4d76-ee3513276dc2@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <e8f7437c-15b2-2ac5-aa45-312976414324@virtuozzo.com>
-Date: Fri, 20 Apr 2018 15:23:56 +0300
+	(envelope-from <groug@kaod.org>) id 1f9V6a-0000hi-LW
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:25:37 -0400
+Received: from 7.mo68.mail-out.ovh.net ([46.105.63.230]:41490)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1f9V6a-0000fC-B7
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:25:32 -0400
+Received: from player791.ha.ovh.net (unknown [10.109.122.24])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id F257AD0C75
+	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 14:25:29 +0200 (CEST)
+Date: Fri, 20 Apr 2018 14:25:23 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180420142523.515f0058@bahia.lan>
+In-Reply-To: <20180417071722.9399-3-david@gibson.dropbear.id.au>
+References: <20180417071722.9399-1-david@gibson.dropbear.id.au>
+	<20180417071722.9399-3-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <5b5bfec8-ed19-dd0f-4d76-ee3513276dc2@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 4/7] dirty-bitmap: separate unused
- meta-bitmap related functions
+Subject: Re: [Qemu-devel] [PATCH for-2.13 02/10] spapr: Remove support for
+ PowerPC 970 with pseries machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,115 +31,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: benh@kernel.crashing.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-20.04.2018 00:54, John Snow wrote:
-> On 04/16/2018 07:44 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Separate them in the header and clarify needed locking in comments.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   include/block/dirty-bitmap.h | 14 +++++++++-----
->>   block/dirty-bitmap.c         |  5 +++++
->>   2 files changed, 14 insertions(+), 5 deletions(-)
->>
->> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
->> index c7e910016d..b7ccfd1363 100644
->> --- a/include/block/dirty-bitmap.h
->> +++ b/include/block/dirty-bitmap.h
->> @@ -9,9 +9,6 @@ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriverState *bs,
->>                                             uint32_t granularity,
->>                                             const char *name,
->>                                             Error **errp);
->> -void bdrv_create_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap,
->> -                                   int chunk_size);
->> -void bdrv_release_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap);
->>   int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
->>                                          BdrvDirtyBitmap *bitmap,
->>                                          Error **errp);
->> @@ -45,7 +42,6 @@ void bdrv_set_dirty_bitmap(BdrvDirtyBitmap *bitmap,
->>                              int64_t offset, int64_t bytes);
->>   void bdrv_reset_dirty_bitmap(BdrvDirtyBitmap *bitmap,
->>                                int64_t offset, int64_t bytes);
->> -BdrvDirtyBitmapIter *bdrv_dirty_meta_iter_new(BdrvDirtyBitmap *bitmap);
->>   BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBitmap *bitmap);
->>   void bdrv_dirty_iter_free(BdrvDirtyBitmapIter *iter);
->>   
->> @@ -84,7 +80,6 @@ void bdrv_reset_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
->>   int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter);
->>   void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t offset);
->>   int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap);
->> -int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
->>   void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes);
->>   bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
->>   bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
->> @@ -99,4 +94,13 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
->>                                                     BdrvDirtyBitmap *bitmap,
->>                                                     Error **errp);
->>   
->> +/*
->> + * Unused for now meta-bitmaps related functions
->> + */
->> +
-> I assume you have plans to use them still? I thought these were useful
-> for storage migration -- but I guess we don't use these for the postcopy
-> mechanism?
+On Tue, 17 Apr 2018 17:17:14 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-I don't have plans for near future, so for me it's ok to drop them.
+> Current POWER cpus allow for a VRMA, a special mapping which describes a
+> guest's view of memory when in real mode (MMU off, from the guest's point
+> of view).  Older cpus didn't have that which meant that to support a guest
+> a special host-contiguous region of memory was needed to give the guest its
+> Real Mode Area (RMA).
+> 
+> This was useful in the early days of KVM on Power to allow it to be tested
+> on PowerPC 970 chips as used in Macintosh G5 machines.  Now, however, those
+> machines are so old as to be irrelevant, and the host kernel has long since
+> dropped support for this mode.  It hasn't been tested in ages either.
+> 
+> So, to simplify the code, drop the support from qemu as well.
+> 
+> As well as the code for handling contiguous RMAs, we can remove some
+> code to set the HIOR register, which existed on 970 but not on the
+> current and supported CPUs.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
 
-Theoretical usage is partial storing (if we know, which portions of 
-bitmaps are changed, we can save to file only these portions, not the 
-whole bitmaps), but it don't look like near future. May be, Fam has some 
-plans?
+Regardless of the discussion on the deprecation process, just
+a cosmetic remark...
 
->
->> +void bdrv_create_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap, int chunk_size);
->> +void bdrv_release_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap);
->> +BdrvDirtyBitmapIter *bdrv_dirty_meta_iter_new(BdrvDirtyBitmap *bitmap);
->> +int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
->> +
->>   #endif
->> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
->> index 6c00288fd7..1812e17549 100644
->> --- a/block/dirty-bitmap.c
->> +++ b/block/dirty-bitmap.c
->> @@ -149,6 +149,8 @@ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriverState *bs,
->>    * @bitmap: the block dirty bitmap for which to create a meta dirty bitmap.
->>    * @chunk_size: how many bytes of bitmap data does each bit in the meta bitmap
->>    * track.
->> + *
->> + * Called with BQL taken.
->>    */
->>   void bdrv_create_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap,
->>                                      int chunk_size)
->> @@ -160,6 +162,7 @@ void bdrv_create_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap,
->>       qemu_mutex_unlock(bitmap->mutex);
->>   }
->>   
->> +/* Called with BQL taken. */
->>   void bdrv_release_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap)
->>   {
->>       assert(bitmap->meta);
->> @@ -529,6 +532,7 @@ BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBitmap *bitmap)
->>       return iter;
->>   }
->>   
->> +/* Called with BQL and dirty_bitmap_mutex locked. */
->>   BdrvDirtyBitmapIter *bdrv_dirty_meta_iter_new(BdrvDirtyBitmap *bitmap)
->>   {
->>       BdrvDirtyBitmapIter *iter = g_new(BdrvDirtyBitmapIter, 1);
->> @@ -688,6 +692,7 @@ int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap)
->>       return hbitmap_count(bitmap->bitmap);
->>   }
->>   
->> +/* Called with BQL or dirty_bitmap_mutex locked */
->>   int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap)
->>   {
->>       return hbitmap_count(bitmap->meta);
->>
+>  hw/ppc/spapr.c          | 61 +++++++++++++++----------------------------------
+>  hw/ppc/spapr_cpu_core.c |  2 --
+>  target/ppc/kvm.c        | 36 -----------------------------
+>  target/ppc/kvm_ppc.h    |  6 -----
+>  4 files changed, 19 insertions(+), 86 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 81b50af3b5..fbb2c6752c 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2376,9 +2376,6 @@ static void spapr_machine_init(MachineState *machine)
+>      int i;
+>      MemoryRegion *sysmem = get_system_memory();
+>      MemoryRegion *ram = g_new(MemoryRegion, 1);
+> -    MemoryRegion *rma_region;
+> -    void *rma = NULL;
+> -    hwaddr rma_alloc_size;
+>      hwaddr node0_size = spapr_node0_size(machine);
+>      long load_limit, fw_size;
+>      char *filename;
+> @@ -2417,40 +2414,28 @@ static void spapr_machine_init(MachineState *machine)
+>          exit(1);
+>      }
+>  
+> -    /* Allocate RMA if necessary */
+> -    rma_alloc_size = kvmppc_alloc_rma(&rma);
+> +    spapr->rma_size = node0_size;
+>  
+> -    if (rma_alloc_size == -1) {
+> -        error_report("Unable to create RMA");
+> -        exit(1);
+> +    /* With KVM, we don't actually know whether KVM supports an
+> +     * unbounded RMA (PR KVM) or is limited by the hash table size (HV
+> +     * KVM using VRMA), so we always assume the latter
+> +     *
+> +     * In that case, we also limit the initial allocations for RTAS
+> +     * etc... to 256M since we have no way to know what the VRMA size
+> +     * is going to be as it depends on the size of the hash table
+> +     * isn't determined yet.
 
+... maybe s/isn't/which isn't/ while at it ?
 
--- 
-Best regards,
-Vladimir
+> +     */
+> +    if (kvm_enabled()) {
+> +        spapr->vrma_adjust = 1;
+> +        spapr->rma_size = MIN(spapr->rma_size, 0x10000000);
+>      }
+>  
+> -    if (rma_alloc_size && (rma_alloc_size < node0_size)) {
+> -        spapr->rma_size = rma_alloc_size;
+> -    } else {
+> -        spapr->rma_size = node0_size;
+> -
+> -        /* With KVM, we don't actually know whether KVM supports an
+> -         * unbounded RMA (PR KVM) or is limited by the hash table size
+> -         * (HV KVM using VRMA), so we always assume the latter
+> -         *
+> -         * In that case, we also limit the initial allocations for RTAS
+> -         * etc... to 256M since we have no way to know what the VRMA size
+> -         * is going to be as it depends on the size of the hash table
+> -         * isn't determined yet.
+> -         */
+> -        if (kvm_enabled()) {
+> -            spapr->vrma_adjust = 1;
+> -            spapr->rma_size = MIN(spapr->rma_size, 0x10000000);
+> -        }
+> -
+> -        /* Actually we don't support unbounded RMA anymore since we
+> -         * added proper emulation of HV mode. The max we can get is
+> -         * 16G which also happens to be what we configure for PAPR
+> -         * mode so make sure we don't do anything bigger than that
+> -         */
+> -        spapr->rma_size = MIN(spapr->rma_size, 0x400000000ull);
+> -    }
+> +    /* Actually we don't support unbounded RMA anymore since we
+> +     * added proper emulation of HV mode. The max we can get is
+> +     * 16G which also happens to be what we configure for PAPR
+> +     * mode so make sure we don't do anything bigger than that
+> +     */
+> +    spapr->rma_size = MIN(spapr->rma_size, 0x400000000ull);
+>  
+>      if (spapr->rma_size > node0_size) {
+>          error_report("Numa node 0 has to span the RMA (%#08"HWADDR_PRIx")",
+> @@ -2508,14 +2493,6 @@ static void spapr_machine_init(MachineState *machine)
+>                                           machine->ram_size);
+>      memory_region_add_subregion(sysmem, 0, ram);
+>  
+> -    if (rma_alloc_size && rma) {
+> -        rma_region = g_new(MemoryRegion, 1);
+> -        memory_region_init_ram_ptr(rma_region, NULL, "ppc_spapr.rma",
+> -                                   rma_alloc_size, rma);
+> -        vmstate_register_ram_global(rma_region);
+> -        memory_region_add_subregion(sysmem, 0, rma_region);
+> -    }
+> -
+>      /* initialize hotplug memory address space */
+>      if (machine->ram_size < machine->maxram_size) {
+>          ram_addr_t hotplug_mem_size = machine->maxram_size - machine->ram_size;
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index aa17626cda..f39d99a8da 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -36,8 +36,6 @@ static void spapr_cpu_reset(void *opaque)
+>       * using an RTAS call */
+>      cs->halted = 1;
+>  
+> -    env->spr[SPR_HIOR] = 0;
+> -
+>      /* Disable Power-saving mode Exit Cause exceptions for the CPU.
+>       * This can cause issues when rebooting the guest if a secondary
+>       * is awaken */
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 6de59c5b21..51177a8e00 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -2159,42 +2159,6 @@ void kvmppc_hint_smt_possible(Error **errp)
+>  
+>  
+>  #ifdef TARGET_PPC64
+> -off_t kvmppc_alloc_rma(void **rma)
+> -{
+> -    off_t size;
+> -    int fd;
+> -    struct kvm_allocate_rma ret;
+> -
+> -    /* If cap_ppc_rma == 0, contiguous RMA allocation is not supported
+> -     * if cap_ppc_rma == 1, contiguous RMA allocation is supported, but
+> -     *                      not necessary on this hardware
+> -     * if cap_ppc_rma == 2, contiguous RMA allocation is needed on this hardware
+> -     *
+> -     * FIXME: We should allow the user to force contiguous RMA
+> -     * allocation in the cap_ppc_rma==1 case.
+> -     */
+> -    if (cap_ppc_rma < 2) {
+> -        return 0;
+> -    }
+> -
+> -    fd = kvm_vm_ioctl(kvm_state, KVM_ALLOCATE_RMA, &ret);
+> -    if (fd < 0) {
+> -        fprintf(stderr, "KVM: Error on KVM_ALLOCATE_RMA: %s\n",
+> -                strerror(errno));
+> -        return -1;
+> -    }
+> -
+> -    size = MIN(ret.rma_size, 256ul << 20);
+> -
+> -    *rma = mmap(NULL, size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+> -    if (*rma == MAP_FAILED) {
+> -        fprintf(stderr, "KVM: Error mapping RMA: %s\n", strerror(errno));
+> -        return -1;
+> -    };
+> -
+> -    return size;
+> -}
+> -
+>  uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift)
+>  {
+>      struct kvm_ppc_smmu_info info;
+> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+> index 4d2789eef6..e2840e1d33 100644
+> --- a/target/ppc/kvm_ppc.h
+> +++ b/target/ppc/kvm_ppc.h
+> @@ -37,7 +37,6 @@ target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu,
+>                                       bool radix, bool gtse,
+>                                       uint64_t proc_tbl);
+>  #ifndef CONFIG_USER_ONLY
+> -off_t kvmppc_alloc_rma(void **rma);
+>  bool kvmppc_spapr_use_multitce(void);
+>  int kvmppc_spapr_enable_inkernel_multitce(void);
+>  void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
+> @@ -188,11 +187,6 @@ static inline target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu,
+>  }
+>  
+>  #ifndef CONFIG_USER_ONLY
+> -static inline off_t kvmppc_alloc_rma(void **rma)
+> -{
+> -    return 0;
+> -}
+> -
+>  static inline bool kvmppc_spapr_use_multitce(void)
+>  {
+>      return false;
