@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48766)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1f9VZg-0002HV-Sl
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:55:37 -0400
+	(envelope-from <armbru@redhat.com>) id 1f9Vak-0003Cs-UM
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:56:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1f9VZf-00009C-Ob
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:55:36 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Apr 2018 13:48:34 +0100
-Message-Id: <20180420124835.7268-3-peter.maydell@linaro.org>
-In-Reply-To: <20180420124835.7268-1-peter.maydell@linaro.org>
-References: <20180420124835.7268-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 2/3] hw/arm/aspeed: don't make 'boot_rom'
- region 'nomigrate'
+	(envelope-from <armbru@redhat.com>) id 1f9Vah-0004Eg-Rm
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:56:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55592 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1f9Vah-0004CA-MA
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:56:39 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1524156319-11465-1-git-send-email-ian.jackson@eu.citrix.com>
+	<1524156319-11465-11-git-send-email-ian.jackson@eu.citrix.com>
+Date: Fri, 20 Apr 2018 14:56:35 +0200
+In-Reply-To: <1524156319-11465-11-git-send-email-ian.jackson@eu.citrix.com>
+	(Ian Jackson's message of "Thu, 19 Apr 2018 17:45:13 +0100")
+Message-ID: <87in8myr24.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 10/16] os-posix: Provide new -runas
+ <uid>:<gid> facility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,36 +28,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Rob Herring <robh@kernel.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Ian Jackson <ian.jackson@eu.citrix.com>
+Cc: qemu-devel@nongnu.org, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Michael Tokarev <mjt@tls.msk.ru>, Ross Lagerwall <ross.lagerwall@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org
 
-Currently we use memory_region_init_ram_nomigrate() to create
-the "aspeed.boot_rom" memory region, and we don't manually
-register it with vmstate_register_ram(). This currently
-means that its contents are migrated but as a ram block
-whose name is the empty string; in future it may mean they
-are not migrated at all. Use memory_region_init_ram() instead.
+Ian Jackson <ian.jackson@eu.citrix.com> writes:
 
-Note that this is a cross-version migration compatibility break
-for the "palmetto-bmc", "ast2500-evb" and "romulus-bmc" machines.
+> This allows the caller to specify a uid and gid to use, even if there
+> is no corresponding password entry.  This will be useful in certain
+> Xen configurations.
+>
+> We don't support just -runas <uid> because: (i) deprivileging without
+> calling setgroups would be ineffective (ii) given only a uid we don't
+> know what gid we ought to use (since uids may eppear in multiple
+> passwd file entries with different gids).
+>
+> Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
+> Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> CC: Markus Armbruster <armbru@redhat.com>
+> CC: Daniel P. Berrange <berrange@redhat.com>
+> CC: Michael Tokarev <mjt@tls.msk.ru>
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/arm/aspeed.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index 7088c907bd..aecb3c1e75 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -225,7 +225,7 @@ static void aspeed_board_init(MachineState *machine,
-          * SoC and 128MB for the AST2500 SoC, which is twice as big as
-          * needed by the flash modules of the Aspeed machines.
-          */
--        memory_region_init_rom_nomigrate(boot_rom, OBJECT(bmc), "aspeed.boot_rom",
-+        memory_region_init_rom(boot_rom, OBJECT(bmc), "aspeed.boot_rom",
-                                fl->size, &error_abort);
-         memory_region_add_subregion(get_system_memory(), FIRMWARE_ADDR,
-                                     boot_rom);
--- 
-2.17.0
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
