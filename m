@@ -1,22 +1,45 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f9QDy-0007xl-Ar
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 03:12:51 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1f9QF9-0000St-9U
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 03:14:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1f9QDx-0004dt-Id
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 03:12:50 -0400
-Date: Fri, 20 Apr 2018 15:12:41 +0800
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180420071241.GD15181@stefanha-x1.localdomain>
-References: <20180411163940.2523-1-kwolf@redhat.com>
-	<20180411163940.2523-6-kwolf@redhat.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1f9QF6-000630-95
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 03:14:03 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60090
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1f9QF6-000625-25
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 03:14:00 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w3K75ciH100191
+	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 03:13:59 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2hf8g2euug-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 03:13:58 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Fri, 20 Apr 2018 08:13:56 +0100
+References: <20180419072123.682-1-david@gibson.dropbear.id.au>
+	<20180419143318.4e24edaf@redhat.com>
+	<20180419145840.324602ff.cohuck@redhat.com>
+	<77d0717b-6eba-8b20-6691-c3085937604b@de.ibm.com>
+	<065165b5-3ab4-ae1a-f72c-c04f911656c3@redhat.com>
+	<20180419180851.461a0db3@bahia.lan>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Fri, 20 Apr 2018 09:13:52 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="HWvPVVuAAfuRc6SZ"
-Content-Disposition: inline
-In-Reply-To: <20180411163940.2523-6-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 05/19] tests/test-bdrv-drain:
- bdrv_drain_all() works in coroutines now
+In-Reply-To: <20180419180851.461a0db3@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <4256dc8e-7f9d-1ba6-ea82-b04c8095f801@de.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH for-2.13] Clear mem_path if we
+ fall back to anonymous RAM allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,43 +48,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
+To: Greg Kurz <groug@kaod.org>, David Hildenbrand <david@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, ehabkost@redhat.com, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, pbonzini@redhat.com
 
 
---HWvPVVuAAfuRc6SZ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 11, 2018 at 06:39:26PM +0200, Kevin Wolf wrote:
-> Since we use bdrv_do_drained_begin/end() for bdrv_drain_all_begin/end(),
-> coroutine context is automatically left with a BH, preventing the
-> deadlocks that made bdrv_drain_all*() unsafe in coroutine context. We
-> can consider it compatible now the latest, after having removed the old
-> polling code as dead code.
->=20
-> Enable the coroutine test cases for bdrv_drain_all().
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  tests/test-bdrv-drain.c | 16 ++++++++++++++--
->  1 file changed, 14 insertions(+), 2 deletions(-)
+On 04/19/2018 06:08 PM, Greg Kurz wrote:
+> On Thu, 19 Apr 2018 16:11:37 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> On 19.04.2018 15:34, Christian Borntraeger wrote:
+>>>
+>>>
+>>> On 04/19/2018 02:58 PM, Cornelia Huck wrote:  
+>>>> On Thu, 19 Apr 2018 14:33:18 +0200
+>>>> Igor Mammedov <imammedo@redhat.com> wrote:
+>>>>  
+>>>>> On Thu, 19 Apr 2018 17:21:23 +1000
+>>>>> David Gibson <david@gibson.dropbear.id.au> wrote:
+>>>>>  
+>>>>>> If the -mem-path option is set, we attempt to map the guest's RAM from a
+>>>>>> file in the given path; it's usually used to back guest RAM with hugepages.
+>>>>>> If we're unable to (e.g. not enough free hugepages) then we fall back to
+>>>>>> allocating normal anonymous pages.  This behaviour can be surprising, but a
+>>>>>> comment in allocate_system_memory_nonnuma() suggests it's legacy behaviour
+>>>>>> we can't change.
+>>>>>>
+>>>>>> What really isn't ok, though, is that in this case we leave mem_path set.
+>>>>>> That means functions which attempt to determine the pagesize of main RAM
+>>>>>> can erroneously think it is hugepage based on the requested path, even
+>>>>>> though it's not.
+>>>>>>
+>>>>>> This is particular bad for the pseries machine type.  KVM HV limitations
+>>>>>> mean the guest can't use pagesizes larger than the host page size used to
+>>>>>> back RAM.  That means that such a fallback, rather than merely giving
+>>>>>> poorer performance that expected will cause the guest to freeze up early in
+>>>>>> boot as it attempts to use large page mappings that can't work.
+>>>>>>
+>>>>>> This patch addresses the problem by clearing the mem_path variable when we
+>>>>>> fall back to anonymous pages, meaning that subsequent attempts to
+>>>>>> determine the RAM page size will get an accurate result.
+>>>>>>
+>>>>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>>>>>> ---
+>>>>>>  numa.c | 1 +
+>>>>>>  1 file changed, 1 insertion(+)
+>>>>>>
+>>>>>> Paolo et al, as with my earlier patches adding some extensions to the
+>>>>>> helpers for determining backing page sizes, if there are no objections
+>>>>>> can I get an ack to merge this via my ppc tree?
+>>>>>>
+>>>>>> diff --git a/numa.c b/numa.c
+>>>>>> index 1116c90af9..78a869e598 100644
+>>>>>> --- a/numa.c
+>>>>>> +++ b/numa.c
+>>>>>> @@ -469,6 +469,7 @@ static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
+>>>>>>              /* Legacy behavior: if allocation failed, fall back to
+>>>>>>               * regular RAM allocation.
+>>>>>>               */
+>>>>>> +            mem_path = NULL;
+>>>>>>              memory_region_init_ram_nomigrate(mr, owner, name, ram_size, &error_fatal);
+>>>>>>          }
+>>>>>>  #else    
+>>>>>
+>>>>> mem_path is also used by kvm_s390_apply_cpu_model(),
+>>>>> and in ccw_init() memory is initialized before CPUs are
+> 
+> Something similar happens with spapr: kvm_fixup_page_sizes() calls
+> qemu_getrampagesize() during CPU start, which happens before the machine
+> init calls allocate_system_memory_nonnuma(). Shouldn't we allocate memory
+> before calling spapr_init_cpus() in spapr_machine_init() then ?
+> 
+>>>>> so if QEM was started with -mem-path, then before patch
+>>>>> created CPU won't have CMM enabled and print warning:
+>>>>>   
+>>>>>  "CMM will not be enabled because it is not compatible with hugetlbfs."
+>>>>>
+>>>>> and after patch it might enable CMM if we clear mem_path.
+>>>>> So question is do we care about this?  
+>>>>
+>>>> I don't quite remember the cmm semantics here -- Christian?  
+>>>
+>>> The CMMA interface does not work on large pages. I think the kernel will react
+>>> with EFAULT in some cases (cmma migration and others) so qemu will probably fail
+>>> unexpectedly. 
+>>>
+>>> But this patch seems to only clear mem-path if we do not allocate at all from
+>>> hugetlbfs. So things should be ok, no?
+>>>
+>>>   
+>>
+>> This even looks like the right thing to me, as hugetlbfs was never
+>> supported.
+>>
+> 
+> Unrelated to this patch, -mem-path can be passed something that doesn't sit
+> in a hugetlbfs, in which case we use getpagesize()... is there a reason for
+> kvm_s390_enable_cmma() to filter out this case as well ? Or should we rather
+> check mem_path isn't NULL and points to a hugetlbfs ?
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---HWvPVVuAAfuRc6SZ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJa2ZLoAAoJEJykq7OBq3PIxBkH/3ayRlpaKPFfNDHXwju2Z7wX
-keacPOEu7vAAZgAo8Xw+/2rfYFzvk/u2TRkFwfQmNxBDsvKcYZIJCTTqMGDpsbb0
-+Qbbui7DcFc1QKXgYuyfI353XaVW5Iwyxc+L0bn7SnYtI51ASlK5EoA2lidcdd9K
-/KiaTksFqdqJrW1aU3C/o67Ayuugv3K2bhWmnZXXrcVFpoDWHgE+f00LapfUhEkF
-OjweTZlCMA5IdqCN/FNl/mfz4L1kpVAsqQYc+oNmvjWzr+kSt855PAzh7olzHeNc
-MoOc6IeWU+u6VcxIm8w6yTnckLv1zl7K8n2cwgXJgOj1D7cVttBOP+PXjHktEoI=
-=cwM4
------END PGP SIGNATURE-----
-
---HWvPVVuAAfuRc6SZ--
+cmm is somewhat special, so I prefer to have it only for non-mem-path memory
+since I know that it works for anonymous pages. I would rather white list other
+mechanisms if necessary in the future.
+backings
