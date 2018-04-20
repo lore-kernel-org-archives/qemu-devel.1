@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1f9VFv-0007YB-Ra
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:35:13 -0400
+	(envelope-from <david@redhat.com>) id 1f9VFv-0007YA-Qm
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:35:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1f9VFs-0000Xy-VL
+	(envelope-from <david@redhat.com>) id 1f9VFr-0000XQ-Sm
 	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 08:35:11 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Fri, 20 Apr 2018 14:34:55 +0200
-Message-Id: <20180420123456.22196-3-david@redhat.com>
-In-Reply-To: <20180420123456.22196-1-david@redhat.com>
-References: <20180420123456.22196-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 2/3] machine: make MemoryHotplugState
- accessible via the machine
+Date: Fri, 20 Apr 2018 14:34:53 +0200
+Message-Id: <20180420123456.22196-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/3] pc-dimm: factor out MemoryDevice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,150 +20,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, David Hildenbrand <david@redhat.com>
 
-Let's allow to query the MemoryHotplugState from the machine.
+Right now we can only map PCDIMM/NVDIMM into guest address space. In the
+future, we might want to do the same for virtio devices - e.g.
+virtio-pmem or virtio-mem. Especially, they should be able to live side
+by side to each other.
 
-This allows us to generically detect if a certain machine has support
-for memory devices, and to generically manage it (find free address
-range, plug/unplug a memory region).
+E.g. the virto based memory devices regions will not be exposed via ACPI
+and friends. They will be detected just like other virtio devices and
+indicate the applicable memory region. This makes it possible to also use
+them on architectures without memory device detection support (e.g. s390x).
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/i386/pc.c             | 12 ++++++++++++
- hw/ppc/spapr.c           | 12 ++++++++++++
- include/hw/boards.h      | 16 ++++++++++++++++
- include/hw/mem/pc-dimm.h | 12 +-----------
- 4 files changed, 41 insertions(+), 11 deletions(-)
+Let's factor out the memory device code into a MemoryDevice interface.
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index d36bac8c89..fa8862af33 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -2337,6 +2337,17 @@ static void x86_nmi(NMIState *n, int cpu_index, Error **errp)
-     }
- }
- 
-+static MemoryHotplugState *pc_machine_get_memory_hotplug_state(MachineState *ms)
-+{
-+    PCMachineState *pcms = PC_MACHINE(ms);
-+
-+    if (!pcms->hotplug_memory.base) {
-+        /* hotplug not supported */
-+        return NULL;
-+    }
-+    return &pcms->hotplug_memory;
-+}
-+
- static void pc_machine_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc = MACHINE_CLASS(oc);
-@@ -2376,6 +2387,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     hc->unplug = pc_machine_device_unplug_cb;
-     nc->nmi_monitor_handler = x86_nmi;
-     mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
-+    mc->get_memory_hotplug_state = pc_machine_get_memory_hotplug_state;
- 
-     object_class_property_add(oc, PC_MACHINE_MEMHP_REGION_SIZE, "int",
-         pc_machine_get_hotplug_memory_region_size, NULL,
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index a7428f7da7..7ccdb705b3 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3868,6 +3868,17 @@ PowerPCCPU *spapr_find_cpu(int vcpu_id)
-     return NULL;
- }
- 
-+static MemoryHotplugState *spapr_get_memory_hotplug_state(MachineState *ms)
-+{
-+    sPAPRMachineState *spapr = SPAPR_MACHINE(ms);
-+
-+    if (!spapr->hotplug_memory.base) {
-+        /* hotplug not supported */
-+        return NULL;
-+    }
-+    return &spapr->hotplug_memory;
-+}
-+
- static void spapr_machine_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc = MACHINE_CLASS(oc);
-@@ -3927,6 +3938,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-      * in which LMBs are represented and hot-added
-      */
-     mc->numa_mem_align_shift = 28;
-+    mc->get_memory_hotplug_state = spapr_get_memory_hotplug_state;
- 
-     smc->default_caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
-     smc->default_caps.caps[SPAPR_CAP_VSX] = SPAPR_CAP_ON;
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index a609239112..447bdc7219 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -105,6 +105,17 @@ typedef struct {
-     CPUArchId cpus[0];
- } CPUArchIdList;
- 
-+/**
-+ * MemoryHotplugState:
-+ * @base: address in guest physical address space where hotplug memory
-+ * address space begins.
-+ * @mr: hotplug memory address space container
-+ */
-+typedef struct MemoryHotplugState {
-+    hwaddr base;
-+    MemoryRegion mr;
-+} MemoryHotplugState;
-+
- /**
-  * MachineClass:
-  * @max_cpus: maximum number of CPUs supported. Default: 1
-@@ -156,6 +167,10 @@ typedef struct {
-  *    should instead use "unimplemented-device" for all memory ranges where
-  *    the guest will attempt to probe for a device that QEMU doesn't
-  *    implement and a stub device is required.
-+ * @get_memory_hotplug_state:
-+ *    If a machine support memory hotplug, the returned data ontains
-+ *    information about the portion of guest physical address space
-+ *    where memory devices can be mapped to (e.g. to hotplug a pc-dimm).
-  */
- struct MachineClass {
-     /*< private >*/
-@@ -212,6 +227,7 @@ struct MachineClass {
-                                                          unsigned cpu_index);
-     const CPUArchIdList *(*possible_cpu_arch_ids)(MachineState *machine);
-     int64_t (*get_default_cpu_node_id)(const MachineState *ms, int idx);
-+    MemoryHotplugState *(*get_memory_hotplug_state)(MachineState *ms);
- };
- 
- /**
-diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-index e88073321f..8bda37adab 100644
---- a/include/hw/mem/pc-dimm.h
-+++ b/include/hw/mem/pc-dimm.h
-@@ -19,6 +19,7 @@
- #include "exec/memory.h"
- #include "sysemu/hostmem.h"
- #include "hw/qdev.h"
-+#include "hw/boards.h"
- 
- #define TYPE_PC_DIMM "pc-dimm"
- #define PC_DIMM(obj) \
-@@ -75,17 +76,6 @@ typedef struct PCDIMMDeviceClass {
-     MemoryRegion *(*get_vmstate_memory_region)(PCDIMMDevice *dimm);
- } PCDIMMDeviceClass;
- 
--/**
-- * MemoryHotplugState:
-- * @base: address in guest physical address space where hotplug memory
-- * address space begins.
-- * @mr: hotplug memory address space container
-- */
--typedef struct MemoryHotplugState {
--    hwaddr base;
--    MemoryRegion mr;
--} MemoryHotplugState;
--
- uint64_t pc_dimm_get_free_addr(uint64_t address_space_start,
-                                uint64_t address_space_size,
-                                uint64_t *hint, uint64_t align, uint64_t size,
+
+v2 -> v3:
+- "pc-dimm: factor out MemoryDevice interface"
+--> Lookup both classes when comparing (David Gibson)
+
+v1 -> v2:
+- Fix compile issues on ppc (still untested  )
+
+
+David Hildenbrand (3):
+  pc-dimm: factor out MemoryDevice interface
+  machine: make MemoryHotplugState accessible via the machine
+  pc-dimm: factor out address space logic into MemoryDevice code
+
+ hw/i386/acpi-build.c                         |   3 +-
+ hw/i386/pc.c                                 |  24 ++-
+ hw/mem/Makefile.objs                         |   1 +
+ hw/mem/memory-device.c                       | 282 +++++++++++++++++++++++++
+ hw/mem/pc-dimm.c                             | 304 +++++++--------------------
+ hw/ppc/spapr.c                               |  24 ++-
+ hw/ppc/spapr_hcall.c                         |   1 +
+ include/hw/boards.h                          |  16 ++
+ include/hw/mem/memory-device.h               |  48 +++++
+ include/hw/mem/pc-dimm.h                     |  26 +--
+ numa.c                                       |   3 +-
+ qmp.c                                        |   4 +-
+ stubs/Makefile.objs                          |   2 +-
+ stubs/{qmp_pc_dimm.c => qmp_memory_device.c} |   4 +-
+ 14 files changed, 465 insertions(+), 277 deletions(-)
+ create mode 100644 hw/mem/memory-device.c
+ create mode 100644 include/hw/mem/memory-device.h
+ rename stubs/{qmp_pc_dimm.c => qmp_memory_device.c} (61%)
+
 -- 
 2.14.3
