@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f9ZMn-0002Hu-MR
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:58:34 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f9ZPK-00042l-AI
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 13:01:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1f9ZMj-0002k3-PI
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:58:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34424 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1f9ZMj-0002j0-Jc
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 12:58:29 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f9ZPG-0004P1-Fi
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 13:01:10 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:38800)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f9ZPG-0004Ok-BK
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 13:01:06 -0400
+Received: by mail-qk0-x244.google.com with SMTP id b39so9303612qkb.5
+	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 10:01:06 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
 References: <20180420145249.32435-1-peter.maydell@linaro.org>
 	<20180420145249.32435-13-peter.maydell@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7c7d48b8-dc72-9c22-85e5-4dead88c991e@redhat.com>
-Date: Fri, 20 Apr 2018 18:58:14 +0200
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <ea52251d-6f18-4f18-cf86-9378e7c6d985@amsat.org>
+Date: Fri, 20 Apr 2018 14:01:02 -0300
 MIME-Version: 1.0
 In-Reply-To: <20180420145249.32435-13-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Subject: Re: [Qemu-devel] [PATCH 12/13] vl.c: Remove compile time limit on
  number of serial ports
 List-Id: <qemu-devel.nongnu.org>
@@ -30,21 +37,14 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: patches@linaro.org, "Michael S . Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: patches@linaro.org, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-On 20/04/2018 16:52, Peter Maydell wrote:
+On 04/20/2018 11:52 AM, Peter Maydell wrote:
 > Instead of having a fixed sized global serial_hds[] array,
 > use a local dynamically reallocated one, so we don't have
 > a compile time limit on how many serial ports a system has.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Just one question, would it make sense to use a GPtrArray instead?
-
-Thanks,
-
-Paolo
-
 > ---
 >  include/sysemu/sysemu.h |  2 --
 >  vl.c                    | 15 +++++++--------
@@ -60,6 +60,12 @@ Paolo
 >  
 > -extern Chardev *serial_hds[MAX_SERIAL_PORTS];
 > -
+
+Finally :)))
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 >  /* Return the Chardev for serial port i, or NULL if none */
 >  Chardev *serial_hd(int i);
 >  
