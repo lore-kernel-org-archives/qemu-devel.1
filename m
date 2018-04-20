@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1f9Jxq-0002R7-Su
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 20:31:49 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f9K5W-0004xb-OE
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 20:39:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1f9Jxo-0001nc-8d
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 20:31:46 -0400
-Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:32953)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f9K5R-0002T6-PF
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 20:39:42 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:44236)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1f9Jxo-0001ls-0F
-	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 20:31:44 -0400
-Received: by mail-oi0-x230.google.com with SMTP id 126-v6so6552074oig.0
-	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 17:31:43 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1f9K5R-0002SX-K6
+	for qemu-devel@nongnu.org; Thu, 19 Apr 2018 20:39:37 -0400
+Received: by mail-qt0-x241.google.com with SMTP id j26-v6so7835821qtl.11
+	for <qemu-devel@nongnu.org>; Thu, 19 Apr 2018 17:39:37 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <62d561d0-fe72-4971-1bf5-72adc4a979f2@amsat.org>
+	<CAMxuvaz40mfpVRhy+GggTveNB+qvXG=sA+g=9w7RyjYAHktXDg@mail.gmail.com>
+	<20180419164003.GV10259@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <01ca24c6-8010-b383-1f41-c84febc684f4@amsat.org>
+Date: Thu, 19 Apr 2018 21:39:33 -0300
 MIME-Version: 1.0
-In-Reply-To: <CA++6G0CNH5mzZFnsE-d6wS5jGr1YmVRc6VUhhBQYeMXKSQrqjQ@mail.gmail.com>
-References: <CA+ZOyaj_4my=u4-MkAbyoee5ORnRq6nyaU+HhX1K6t2+Cn5RHg@mail.gmail.com>
-	<3EFD5845-5CE7-45F5-AE4C-0C86CAFAA200@sifive.com>
-	<CA+ZOyajL25Gfz_NdcG+MxDAZb9qstjNo2sD_ExzX0fATaDg7HQ@mail.gmail.com>
-	<CAHNT7NtJd1ZtYqdVfuiqxe60rOjyc48qyGKrQ99xY0UVH4arHQ@mail.gmail.com>
-	<CAHNT7NtBzUUv4dGjLwxnMi9cOwoS5+7KVnKbrUynXkgX2C477Q@mail.gmail.com>
-	<CA++6G0CNH5mzZFnsE-d6wS5jGr1YmVRc6VUhhBQYeMXKSQrqjQ@mail.gmail.com>
-From: Michael Clark <mjc@sifive.com>
-Date: Fri, 20 Apr 2018 12:31:42 +1200
-Message-ID: <CAHNT7NshWPN-8pFzF9+PR9rcNOKmBDn5zpzvF0n6rfyzRg93tQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [sw-dev] The problem of write misa on QEMU and BBL
+In-Reply-To: <20180419164003.GV10259@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] vnc: heap-use-after-free in vnc_client_io() after
+ vnc_disconnect_finish()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,272 +37,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Waterman <andrew@sifive.com>
-Cc: Zong Li <zongbox@gmail.com>, Zong Li <zong@andestech.com>, Palmer Dabbelt <palmer@sifive.com>, RISC-V SW Dev <sw-dev@groups.riscv.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Alistair Francis <Alistair.Francis@wdc.com>, "Emilio G. Cota" <cota@braap.org>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Fri, Apr 20, 2018 at 12:12 PM, Andrew Waterman <andrew@sifive.com> wrote=
-:
-
->
->
-> On Thu, Apr 19, 2018 at 5:11 PM, Michael Clark <mjc@sifive.com> wrote:
->
+On 04/19/2018 01:40 PM, Daniel P. Berrangé wrote:
+> On Thu, Apr 19, 2018 at 06:37:12PM +0200, Marc-André Lureau wrote:
+>> On Tue, Apr 17, 2018 at 7:52 PM, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>> running commit ce8d4082054519f2eaac39958edde502860a7fc6:
+>>>
+>>> qemu-system-mips -M malta -m 512 \
+>>>   -kernel vmlinux-3.2.0-4-4kc-malta \
+>>>   -append 'root=/dev/sda1 console=ttyS0' \
+>>>   -hda debian_wheezy_mips_standard.qcow2 \
+>>>   -redir tcp:5556::22 -serial stdio
+>>>
+>>> and connecting with "xtightvncviewer :0" I get when closing vnc:
 >>
+>> This is also true with other targets, ex:
+>> x86_64-softmmu/qemu-system-x86_64 -vnc :0
 >>
->> On Fri, Apr 20, 2018 at 12:05 PM, Michael Clark <mjc@sifive.com> wrote:
->>
->>>
->>>
->>> On Thu, Apr 19, 2018 at 9:28 PM, Zong Li <zongbox@gmail.com> wrote:
->>>
->>>> 2018-04-19 12:43 GMT+08:00 Michael Clark <mjc@sifive.com>:
->>>> > Hi Zong,
->>>> >
->>>> >> On 19/04/2018, at 2:40 PM, Zong Li <zongbox@gmail.com> wrote:
->>>> >>
->>>> >> Hi all,
->>>> >>
->>>> >> For BBL part, in fp_init at machine/minit.c,
->>>> >> it will clear the D and F bits of misa register, and assertion that
->>>> >> the bits is cleared.
->>>> >> But the misa is WARL register, so there is no effect for writing it=
-,
->>>> >> and the assertion not be true.
->>>> >> So is there has necessary to do that if toolchain not support D and
->>>> F extension?
->>>> >>
->>>> >> For QEMU part, when writing misa, it will trigger the illegal
->>>> >> instruction exception, but I think that the WARL allow write
->>>> behavior?
->>>> >
->>>> > QEMU in the riscv-all branch should have WARL behavior.
->>>> >
->>>> > - https://github.com/riscv/riscv-qemu/commits/riscv-all
->>>> >
->>>> > There is a bug in upstream. We have submitted patches to fix the
->>>> issue for review on the qemu-devel mailing list. The patch series will=
- be
->>>> submitted for upstream review again shortly. We were holding off on th=
-e
->>>> series as we didn=E2=80=99t classify it as a =E2=80=9Ccritical bug=E2=
-=80=9D as QEMU was in
->>>> soft-freeze for 2.12 and we weren=E2=80=99t able to get review in time=
- to include
->>>> this fix in the 2.12 release.
->>>> >
->>>> > See =E2=80=9CNo traps on writes to misa,minstret,mcycle"
->>>> >
->>>> > - https://github.com/riscv/riscv-qemu/commits/qemu-2.13-for-upstream
->>>> >
->>>> > The history is that there were several unimplemented CSRs that had
->>>> printf followed by exit. Richard Henderson said we should fix this. I
->>>> changed several CSRs to cause illegal instruction traps instead of cal=
-ling
->>>> exit. That was a mistake as CSRs that don=E2=80=99t support write are =
-WARL (Write
->>>> Any Read Legal). It was certainly better than having the simulation ex=
-it as
->>>> a cpu doesn=E2=80=99t typically have a way to =E2=80=9Dexit=E2=80=9D l=
-ike a C program, nevertheless
->>>> trapping was wrong. My mistake. See here for the history:
->>>> >
->>>> > - https://github.com/riscv/riscv-qemu/blob/ff36f2f77ec3e6a6211
->>>> c63bfe1707ec057b12f7d/target-riscv/op_helper.c
->>>> >
->>>> > The implementation in the current tree is quite different. We have
->>>> recently made the CSR system more modular so that with minor changes,
->>>> custom CPUs will be able to hook their own control and status register=
-s.
->>>> >
->>>> > - https://github.com/riscv/riscv-qemu/blob/qemu-2.13-for-upstr
->>>> eam/target/riscv/csr.c#L780-L867
->>>> >
->>>> > See these changes:
->>>> >
->>>> > - https://github.com/riscv/riscv-qemu/commit/9d9c1bfef911c520a
->>>> 35bd3f8c0ed2e14cc96bbb7
->>>> > - https://github.com/riscv/riscv-qemu/commit/b5a4cd79ce6c7fbb6
->>>> 5fdcf078fb9a8391da1d6b1
->>>> >
->>>> > We know have a flexible system that will allow implementations to
->>>> hook per-cpu control and status registers, and we have predicates that=
- make
->>>> CSRs appear on some processor but not on others. i.e. if misa.S is not
->>>> present, then S-mode s* CSRs will trap. Sometimes WARL is the correct
->>>> behaviour, but sometimes trapping is the correct behaviour i.e. if the
->>>> processor does not implement S-mode.
->>>> >
->>>> > misa traps on write should only affect bootloaders as Supervisor=E2=
-=80=99s
->>>> like Linux don=E2=80=99t yet have access to the isa register. It=E2=80=
-=99s not a major
->>>> issuse.
->>>> >
->>>> > Michael.
->>>>
->>>> Hi Michael,
->>>>
->>>> Thanks for the information. The new CSR system is helpful for custom
->>>> CPU such as ours. Thanks.
->>>>
->>>> In the future, maybe we can do something like this in BBL for flexible
->>>> custom platform which has own device to control the timer, ipi and so
->>>> on.
->>>>
->>>> Back to the misa problem in BBL, at fp_init in BBL initial phrase, the
->>>> assertion will has problem because the bits of misa will not be
->>>> cleared.
->>>>
->>>> the code piece like below:
->>>>     uintptr_t fd_mask =3D (1 << ('F' - 'A')) | (1 << ('D' - 'A'));
->>>>     clear_csr(misa, fd_mask);
->>>>     assert(!(read_csr(misa) & fd_mask));
->>>>
->>>> I think that the assertion is not necessary even the clear misa.
->>>>
->>>
->>> I agree. The specification makes no guarantee that misa writes are not
->>> ignored so it is legal for a processor that supports FD to drop misa wr=
-ites
->>> and the assertion will trigger on legal RISC-V implementations. That co=
-de
->>> piece does not support legal RISC-V implementations that can't disable =
-F
->>> and D. Disabling F and D should not be asserted because it is harmless =
-if
->>> an unused extension is present.
->>>
->>> This assertion will always trigger in QEMU until we support the
->>> 'optional' feature to allow changes to 'misa'.
->>>
->>> Just noting this is not QEMU specifc so we should drop qemu-devel if we
->>> continue to discuss misa on RISC-V in bbl.
->>>
->>> Nevertheless, we do plan to support 'misa' writes however we need to do
->>> some work in translate.c to make sure that cached translations match th=
-e
->>> current state of misa. We may want to perform a tb_flush when we implem=
-ent
->>> writable misa. We also want writable misa to be a CPU feature so we can
->>> emulate CPUs that don't support writable misa. eg add this to the CPU m=
-odel.
->>>
->>>     set_feature(env, RISCV_FEATURE_MISA_WRITABLE)
->>>
->>> Thanks for raising this because the new modular CSR implementation only
->>> implemented 'existential' predicates for CSRs. We should add a write fl=
-ag
->>> to the predicate. Or we can just return -1 in the write_misa function. =
-e.g.
->>>
->>>     static int write_misa(CPURISCVState *env, int csrno, target_ulong
->>> val)
->>>     {
->>>         if (!riscv_feature(env, RISCV_FEATURE_MISA_WRITABLE)) {
->>>             return -1;
->>>         }
->>>         /* validate misa - must contain 'I' or 'E' */
->>>         env->misa =3D val;
->>>         tb_flush(CPU(riscv_env_get_cpu(env)));
->>>     }
->>>
->>> tb_flush is pessimistic but conservative. Currently its not common to
->>> write misa so it would be acceptable.
->>>
->>> There is a similar but somewhat more complex issue for disabling misa.C=
-.
->>> The behaviour has been discussed on the isa-dev mailing list. Iirc, we =
-have
->>> to ignore bit 1 in mepc/sepc in MRET/SRET if misa.C has been cleared an=
-d a
->>> 2-byte aligned address is present in mepc/sepc, so that MRET/SRET can o=
-nly
->>> jump to 4-byte aligned code. So we drop bit 1 on writes to mepc/sepc wh=
-ile
->>> misa.C is clear and we ignore bit 1 on reads from mepc/sepc while misa.=
-C is
->>> cleared. So the change needs slightly more work than just making 'misa'
->>> writable. We also have to enforce that 'I' or 'E' are set, and we curre=
-ntly
->>> don't have support for RVE emulation in RISC-V QEMU. This will require
->>> changes to validate registers in translate.c and cause illegal instruct=
-ions
->>> if regno >=3D 16 is used.
->>>
->>> I'm also not sure exactly how we add misa to the translation cache
->>> index, but tb_flush seems like the conservative way to ensure the
->>> translation cache matches the currently set bits in misa.
->>>
->>> We also have to audit translate.c to make sure that misa is checked for
->>> all allowable extensions. MAFDC. Currently it only checks 'C' so we wil=
-l
->>> need to add checks for 'M' in mul/mulw/div/divw/divu/divuw/rem/remw/rem=
-u/remuw
->>> and 'A' for amos, 'F' and 'D' in floating point operations, etc. It's a
->>> fair amount of work...
->>>
->>> $ grep -r has_ext target/riscv/
->>> target/riscv//csr.c:    return -!riscv_has_ext(env, RVS);
->>> target/riscv//csr.c:        (!riscv_has_ext(env, RVS) && mpp =3D=3D PRV=
-_S) ||
->>> target/riscv//csr.c:        (!riscv_has_ext(env, RVU) && mpp =3D=3D PRV=
-_U)) {
->>> target/riscv//cpu.h:static inline int riscv_has_ext(CPURISCVState *env,
->>> target_ulong ext)
->>> target/riscv//op_helper.c:    if (!riscv_has_ext(env, RVC) && (retpc &
->>> 0x3)) {
->>> target/riscv//op_helper.c:    if (!riscv_has_ext(env, RVC) && (retpc &
->>> 0x3)) {
->>> target/riscv//translate.c:    if (!riscv_has_ext(env, RVC)) {
->>> target/riscv//translate.c:        if (!riscv_has_ext(env, RVC)) {
->>> target/riscv//translate.c:    if (!riscv_has_ext(env, RVC) && ((ctx->pc
->>> + bimm) & 0x3)) {
->>> target/riscv//translate.c:            if (riscv_has_ext(env, RVS)) {
->>> target/riscv//translate.c:        if (!riscv_has_ext(env, RVC)) {
->>>
->>> So it seems like writable misa is a fair amount of work
->>>
->>> - RISCV_FEATURE_MISA_WRITABLE (easy)
->>> - ISA extension validation rules in write_misa (easy)
->>> - Extension checks in translate.c (time-consuming but easy)
->>> - RVC instruction pointer alignment checking rules (needs some care)
->>> - Make sure we have CPU models with and without writable 'misa' so we
->>> can test code to handle typical legal processor variants.
->>>
->>
->> - Check regno >=3D 16 && riscv_has_ext(env, RVE) then illegal instructio=
-n
->> trap (time-consuming - needs care to not miss any register)
->>
->> Are F & D legal with E? 16 register FPU? I guess not. We may need to mas=
-k
->> and drop some extension writes in the validate misa logic (WARL).
->>
->
-> No, the manual forbids this case.  E should preclude FD.
->
+>> Daniel, Gerd, are you looking at it? this looks like a 2.12 regression.
+> 
+> I've not had toime to look at it - would be useful if someone can bisect
+> it at least if its a regression since 2.11
 
-Good to know.
+My worst bisect so far, anyway here we go:
 
-In any case it seems we need some pretty major changes to translate.c
-before we can make misa writable in qemu-riscv. Almost every gen routine
-with the exception of RVI will need predication based on extensions. It
-makes one pause and think whether adding if statements is a good approach
-or whether having exension metadata available in the decoder so that it can
-be done generically. Adding lots of riscv_has_ext checks would be nasty.
+13e1d0e71e78a925848258391a6e616b6b5ae219 is the first bad commit
+commit 13e1d0e71e78a925848258391a6e616b6b5ae219
+Author: Daniel P. Berrange <berrange@redhat.com>
+Date:   Thu Feb 1 16:45:14 2018 +0000
 
-We will need to add misa to DisasContext so that we can
-remove CPURISCVState *env from gen methods.
+    ui: convert VNC server to QIONetListener
 
-It also doesn't make sense to start this until we have merged Emilio's
-DisasContextBase changes.
+    The VNC server already has the ability to listen on multiple sockets.
+    Converting it to use the QIONetListener APIs though, will reduce the
+    amount of code in the VNC server and improve the clarity of what is
+    left.
 
-It would be nice if Emilio's changes can be merged early in the 2.13 cycle
-so that folk are able to make progress on extension checking to
-target/riscv/translate.c
+    Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+    Message-id: 20180201164514.10330-1-berrange@redhat.com
+    Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 
-I'll be happy if we can nuke CPURISCVState *env and perform the misa checks
-on DisasContext. CSR instructions end translation blocks so its safe to
-read the 'misa' state at the start of a block.
 
-Michael
+>>> ==27686==ERROR: AddressSanitizer: heap-use-after-free on address
+>>> 0x63100003c814 at pc 0x55eed918362a bp 0x7ffdf5c36c80 sp 0x7ffdf5c36c78
+>>> READ of size 4 at 0x63100003c814 thread T0
+>>>     #0 0x55eed9183629 in vnc_client_io /source/qemu/ui/vnc.c:1549
+>>>     #1 0x55eed94ae26c in qio_channel_fd_source_dispatch
+>>> /source/qemu/io/channel-watch.c:84
+>>>     #2 0x7f3e181860f4 in g_main_context_dispatch
+>>> (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x4c0f4)
+>>>     #3 0x55eed95b9799 in glib_pollfds_poll /source/qemu/util/main-loop.c:215
+>>>     #4 0x55eed95b9989 in os_host_main_loop_wait
+>>> /source/qemu/util/main-loop.c:263
+>>>     #5 0x55eed95b9b5f in main_loop_wait /source/qemu/util/main-loop.c:522
+>>>     #6 0x55eed898f7dd in main_loop /source/qemu/vl.c:1943
+>>>     #7 0x55eed89a1f0b in main /source/qemu/vl.c:4734
+>>>     #8 0x7f3dfe094a86 in __libc_start_main
+>>> (/lib/x86_64-linux-gnu/libc.so.6+0x21a86)
+>>>     #9 0x55eed8518db9 in _start
+>>> (/build/qemu/mips-softmmu/qemu-system-mips+0x14f3db9)
+>>>
+>>> 0x63100003c814 is located 20 bytes inside of 75744-byte region
+>>> [0x63100003c800,0x63100004efe0)
+>>> freed by thread T0 here:
+>>>     #0 0x7f3e18b878c8 in __interceptor_free
+>>> (/usr/lib/x86_64-linux-gnu/libasan.so.4+0xd98c8)
+>>>     #1 0x55eed9181bb0 in vnc_disconnect_finish /source/qemu/ui/vnc.c:1278
+>>>     #2 0x55eed9183225 in vnc_client_read /source/qemu/ui/vnc.c:1511
+>>>     #3 0x55eed91835a9 in vnc_client_io /source/qemu/ui/vnc.c:1541
+>>>     #4 0x55eed94ae26c in qio_channel_fd_source_dispatch
+>>> /source/qemu/io/channel-watch.c:84
+>>>     #5 0x7f3e181860f4 in g_main_context_dispatch
+>>> (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x4c0f4)
+>>>
+>>> previously allocated by thread T0 here:
+>>>     #0 0x7f3e18b87df8 in calloc
+>>> (/usr/lib/x86_64-linux-gnu/libasan.so.4+0xd9df8)
+>>>     #1 0x7f3e1818b8b0 in g_malloc0
+>>> (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x518b0)
+>>>     #2 0x55eed9192aa0 in vnc_listen_io /source/qemu/ui/vnc.c:3186
+>>>     #3 0x55eed94b9fd7 in qio_net_listener_channel_func
+>>> /source/qemu/io/net-listener.c:57
+>>>     #4 0x55eed94ae26c in qio_channel_fd_source_dispatch
+>>> /source/qemu/io/channel-watch.c:84
+>>>     #5 0x7f3e181860f4 in g_main_context_dispatch
+>>> (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x4c0f4)
+>>>
+>>> SUMMARY: AddressSanitizer: heap-use-after-free
+>>> /source/qemu/ui/vnc.c:1549 in vnc_client_io
+>>> Shadow bytes around the buggy address:
+>>>   0x0c627ffff8b0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+>>>   0x0c627ffff8c0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+>>>   0x0c627ffff8d0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+>>>   0x0c627ffff8e0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+>>>   0x0c627ffff8f0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+>>> =>0x0c627ffff900: fd fd[fd]fd fd fd fd fd fd fd fd fd fd fd fd fd
+>>>   0x0c627ffff910: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+>>>   0x0c627ffff920: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+>>>   0x0c627ffff930: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+>>>   0x0c627ffff940: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+>>>   0x0c627ffff950: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+>>>
+>>> Shadow byte legend (one shadow byte represents 8 application bytes):
+>>>   Heap left redzone:       fa
+>>>   Freed heap region:       fd
+>>> ==26606==ABORTING
