@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f9vma-0007sz-IR
+	(envelope-from <mreitz@redhat.com>) id 1f9vma-0007t5-L6
 	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 12:54:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f9vmZ-0003A3-S1
+	(envelope-from <mreitz@redhat.com>) id 1f9vmZ-0003AA-UI
 	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 12:54:40 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Sat, 21 Apr 2018 18:54:17 +0200
-Message-Id: <20180421165423.30759-2-mreitz@redhat.com>
+Date: Sat, 21 Apr 2018 18:54:19 +0200
+Message-Id: <20180421165423.30759-4-mreitz@redhat.com>
 In-Reply-To: <20180421165423.30759-1-mreitz@redhat.com>
 References: <20180421165423.30759-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/7] qemu-img: Amendment support implies
- create_opts
+Subject: [Qemu-devel] [PATCH 3/7] qemu-option: Pull out "Supported options"
+ print
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +23,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Instead of checking whether a driver has a non-NULL create_opts we
-should check whether it supports image amendment in the first place.  If
-it does, it must have create_opts.
-
-On the other hand, if it does not have create_opts (so it does not
-support amendment either), the error message "does not support any
-options" is a bit useless.  Stating clearly that the driver has no
-amendment support whatsoever is probably better.
+It really is up to the caller to decide what this list of options means.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qemu-img.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ qemu-img.c         | 1 +
+ util/qemu-option.c | 1 -
+ 2 files changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/qemu-img.c b/qemu-img.c
-index 855fa52514..f60b22769e 100644
+index 375fe852e0..6dd8e95bb2 100644
 --- a/qemu-img.c
 +++ b/qemu-img.c
-@@ -3709,13 +3709,16 @@ static int img_amend(int argc, char **argv)
-         goto out;
+@@ -261,6 +261,7 @@ static int print_block_option_help(const char *filename, const char *fmt)
+         create_opts = qemu_opts_append(create_opts, proto_drv->create_opts);
      }
  
--    if (!bs->drv->create_opts) {
--        error_report("Format driver '%s' does not support any options to amend",
-+    if (!bs->drv->bdrv_amend_options) {
-+        error_report("Format driver '%s' does not support option amendment",
-                      fmt);
-         ret = -1;
-         goto out;
-     }
++    printf("Supported options:\n");
+     qemu_opts_print_help(create_opts);
+     qemu_opts_free(create_opts);
+     return 0;
+diff --git a/util/qemu-option.c b/util/qemu-option.c
+index d0756fda58..95e6cf4e49 100644
+--- a/util/qemu-option.c
++++ b/util/qemu-option.c
+@@ -218,7 +218,6 @@ void qemu_opts_print_help(QemuOptsList *list)
  
-+    /* Every driver supporting amendment must have create_opts */
-+    assert(bs->drv->create_opts);
-+
-     create_opts = qemu_opts_append(create_opts, bs->drv->create_opts);
-     opts = qemu_opts_create(create_opts, NULL, 0, &error_abort);
-     qemu_opts_do_parse(opts, options, NULL, &err);
+     assert(list);
+     desc = list->desc;
+-    printf("Supported options:\n");
+     while (desc && desc->name) {
+         printf("%-16s %s\n", desc->name,
+                desc->help ? desc->help : "No description available");
 -- 
 2.14.3
