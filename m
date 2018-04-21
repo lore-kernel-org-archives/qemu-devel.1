@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45627)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1f9wda-00041C-Ay
-	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 13:49:28 -0400
+	(envelope-from <yuval.shaia@oracle.com>) id 1f9wjH-0006JA-LB
+	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 13:55:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1f9wdY-0007Mj-Qe
-	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 13:49:26 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:39508)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1f9wdY-0007K4-E0
-	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 13:49:24 -0400
-Received: by mail-wr0-x234.google.com with SMTP id q3-v6so20558981wrj.6
-	for <qemu-devel@nongnu.org>; Sat, 21 Apr 2018 10:49:24 -0700 (PDT)
+	(envelope-from <yuval.shaia@oracle.com>) id 1f9wjG-0007aJ-MA
+	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 13:55:19 -0400
+Date: Sat, 21 Apr 2018 20:55:03 +0300
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <20180421175502.GB2711@yuvallap>
+References: <20180415234307.28132-1-f4bug@amsat.org>
+	<20180415234307.28132-39-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <87lgdmdmqh.fsf@dusky.pond.sub.org>
-References: <1520754314-5969-1-git-send-email-zhangckid@gmail.com>
-	<1520754314-5969-13-git-send-email-zhangckid@gmail.com>
-	<87lgdmdmqh.fsf@dusky.pond.sub.org>
-From: Zhang Chen <zhangckid@gmail.com>
-Date: Sun, 22 Apr 2018 01:49:22 +0800
-Message-ID: <CAK3tnv+TZLhHiXpQjPibxHQuBh-+cP23jSK_9+yVNZ+ftaciEQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V6 11/17] qapi: Add new command to query
- colo status
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180415234307.28132-39-f4bug@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 38/41] hw/rdma: Use the BYTE-based
+ definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,186 +25,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: qemu-trivial@nongnu.org, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>
 
-On Tue, Apr 17, 2018 at 8:46 PM, Markus Armbruster <armbru@redhat.com>
-wrote:
+On Sun, Apr 15, 2018 at 08:43:04PM -0300, Philippe Mathieu-Daud=E9 wrote:
+> It eases code review, unit is explicit.
+>=20
+> Patch generated using:
+>=20
+>   $ git grep -E '(1024|2048|4096|8192|(<<|>>).?(10|20|30))' hw/ include=
+/hw/
+>=20
+> and modified manually.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> ---
+>  hw/rdma/vmw/pvrdma.h | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/rdma/vmw/pvrdma.h b/hw/rdma/vmw/pvrdma.h
+> index 8c173cb824..f17143f0e6 100644
+> --- a/hw/rdma/vmw/pvrdma.h
+> +++ b/hw/rdma/vmw/pvrdma.h
+> @@ -16,6 +16,7 @@
+>  #ifndef PVRDMA_PVRDMA_H
+>  #define PVRDMA_PVRDMA_H
+> =20
+> +#include "qemu/units.h"
+>  #include "hw/pci/pci.h"
+>  #include "hw/pci/msix.h"
+> =20
+> @@ -30,7 +31,7 @@
+>  #define RDMA_MSIX_BAR_IDX    0
+>  #define RDMA_REG_BAR_IDX     1
+>  #define RDMA_UAR_BAR_IDX     2
+> -#define RDMA_BAR0_MSIX_SIZE  (16 * 1024)
+> +#define RDMA_BAR0_MSIX_SIZE  (16 * K_BYTE)
+>  #define RDMA_BAR1_REGS_SIZE  256
+>  #define RDMA_BAR2_UAR_SIZE   (0x1000 * MAX_UCS) /* each uc gets page *=
+/
 
-> Zhang Chen <zhangckid@gmail.com> writes:
->
-> > Libvirt or other high level software can use this command query colo
-> status.
-> > You can test this command like that:
-> > {'execute':'query-colo-status'}
-> >
-> > Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-> > ---
-> >  migration/colo.c    | 31 +++++++++++++++++++++++++++++++
-> >  qapi/migration.json | 33 +++++++++++++++++++++++++++++++++
-> >  2 files changed, 64 insertions(+)
-> >
-> > diff --git a/migration/colo.c b/migration/colo.c
-> > index 8ca6381..127db3c 100644
-> > --- a/migration/colo.c
-> > +++ b/migration/colo.c
-> > @@ -237,6 +237,37 @@ void qmp_xen_colo_do_checkpoint(Error **errp)
-> >  #endif
-> >  }
-> >
-> > +COLOStatus *qmp_query_colo_status(Error **errp)
-> > +{
-> > +    MigrationState *m;
-> > +    MigrationIncomingState *mis;
-> > +    COLOStatus *s = g_new0(COLOStatus, 1);
-> > +
-> > +    if (get_colo_mode() == COLO_MODE_PRIMARY) {
-> > +        m = migrate_get_current();
-> > +
-> > +        if (m->state == MIGRATION_STATUS_COLO) {
-> > +            s->colo_running = true;
-> > +        } else {
-> > +            s->colo_running = false;
-> > +        }
-> > +        s->mode = COLO_MODE_PRIMARY;
-> > +    } else {
->
-> Can get_colo_mode() == COLO_MODE_UNKNOWN happen here?  If not, why not?
->
+Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
 
-Good catch, I will check it in next version.
-
-
->
-> > +        mis = migration_incoming_get_current();
-> > +
-> > +        if (mis->state == MIGRATION_STATUS_COLO) {
-> > +            s->colo_running = true;
-> > +        } else {
-> > +            s->colo_running = false;
-> > +        }
-> > +        s->mode = COLO_MODE_SECONDARY;
-> > +    }
->
-> Simpler:
->
->        if (get_colo_mode() == COLO_MODE_PRIMARY) {
->            state = migrate_get_current()->state;
->        } else {
->            state = migration_incoming_get_current()->state;
->        }
->        s->colo_running = state == MIGRATION_STATUS_COLO;
->        s->mode = get_colo_mode();
->
-
-Good idea. I will use this codes in next version.
-By the way, do I need add your SOB?
-
-
->
-> > +
-> > +    s->reason = failover_get_state();
->
-> COLOStatus member @reason is COLOExitReason, but failover_get_state()
-> returns FailoverStatus, a different enum.  Am I confused?
->
-
-No, here I want to reused the FailoverStatus, but missed something in
-rebase progress.
-I will make FailoverStatus's @none = COLOExitReason's @none,
-                  FailoverStatus's @requre = COLOExitReason's @request
-                  FailoverStatus's other status = COLOExitReason's @error.
-in next version.
-
-
-
->
-> > +
-> > +    return s;
-> > +}
-> > +
-> >  static void colo_send_message(QEMUFile *f, COLOMessage msg,
-> >                                Error **errp)
-> >  {
-> > diff --git a/qapi/migration.json b/qapi/migration.json
-> > index 6c6c50e..8ccdd21 100644
-> > --- a/qapi/migration.json
-> > +++ b/qapi/migration.json
-> > @@ -1201,3 +1201,36 @@
-> >  # Since: 2.9
-> >  ##
-> >  { 'command': 'xen-colo-do-checkpoint' }
-> > +
-> > +##
-> > +# @COLOStatus:
-> > +#
-> > +# The result format for 'query-colo-status'.
-> > +#
-> > +# @mode: which COLO mode the VM was in when it exited.
->
-> This documents the meaning of @mode "when it exited".  Two questions:
->
-> 1. What's "it"?  The VM?  COLO?
->
-
-COLO.
-
-
->
-> 2. What's the meaning of @mode when "it" hasn't exited, yet?
->
-
-Just return the COLO running mode(primary, secondary or unknown) when COLO
-hasn't exited.
-
-
->
-> > +#
-> > +# @colo-running: if true means COLO running well, otherwise COLO have
-> done.
->
-> Suggest
->
->    # @colo-running: true if COLO is running
->
-> > +#
-> > +# @reason: describes the reason for the COLO exit.
->
-> If there has been no COLO exit, there can't be a reason for one.  What's
-> the value of @reason then?  Hmm, peeking at FailoverStatus makes me
-> guess its @none.  Correct?
->
-
-Yes, you are right. I will fix it in next version.
-
-Thanks your comments.
-Zhang Chen
-
-
-
->
-> > +#
-> > +# Since: 2.12
-> > +##
-> > +{ 'struct': 'COLOStatus',
-> > +  'data': { 'mode': 'COLOMode', 'colo-running': 'bool', 'reason':
-> 'COLOExitReason' } }
-> > +
-> > +##
-> > +# @query-colo-status:
-> > +#
-> > +# Query COLO status while the vm is running.
-> > +#
-> > +# Returns: A @COLOStatus object showing the status.
-> > +#
-> > +# Example:
-> > +#
-> > +# -> { "execute": "query-colo-status" }
-> > +# <- { "return": { "mode": "primary", "colo-running": true, "reason":
-> "request" } }
-> > +#
-> > +# Since: 2.12
-> > +##
-> > +{ 'command': 'query-colo-status',
-> > +  'returns': 'COLOStatus' }
->
+> =20
+> --=20
+> 2.17.0
+>=20
