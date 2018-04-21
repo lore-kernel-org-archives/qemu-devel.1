@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40935)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f9yDc-0002D1-VG
-	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 15:30:46 -0400
+	(envelope-from <bounces@canonical.com>) id 1f9yWv-0008OF-DI
+	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 15:50:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1f9yDY-0008L6-44
-	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 15:30:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47236)
+	(envelope-from <bounces@canonical.com>) id 1f9yWs-0004Yb-8A
+	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 15:50:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48650)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1f9yDX-0008Jy-U3
-	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 15:30:40 -0400
+	id 1f9yWr-0004Xh-G5
+	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 15:50:38 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1f9yDW-0007v0-HA
-	for <qemu-devel@nongnu.org>; Sat, 21 Apr 2018 19:30:38 +0000
+	id 1f9yWq-0000f9-Dc
+	for <qemu-devel@nongnu.org>; Sat, 21 Apr 2018 19:50:36 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 58F712E8056
-	for <qemu-devel@nongnu.org>; Sat, 21 Apr 2018 19:30:38 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 64F262E80C8
+	for <qemu-devel@nongnu.org>; Sat, 21 Apr 2018 19:50:36 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 21 Apr 2018 19:21:05 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 21 Apr 2018 19:37:00 -0000
+From: diddly <dflogeras2@gmail.com>
 Reply-To: Bug 1765970 <1765970@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <152432626539.12479.15065213360151643512.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152433846591.20297.1743098786020867856.malone@soybean.canonical.com>
+Message-Id: <152433942069.12613.6156917996015371488.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1765970] Re: qemu-arm (user mode) segfaults in
  uclibc-ng chroot after upgrade to 2.11.x
@@ -39,9 +39,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Could you try with current head-of-git (the 2.12 rc4)? We adjusted our
-logic for setting up the initial reserved space since 2.11 -- it may
-well not fix this bug, but maybe we'll be lucky...
+Unfortunately, no dice
 
 -- =
 
