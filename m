@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f9owM-0006Qr-KS
-	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 05:36:19 -0400
+	(envelope-from <clg@kaod.org>) id 1f9p2B-0000ah-Ev
+	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 05:42:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1f9owL-0002dZ-Ag
-	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 05:36:18 -0400
-Date: Sat, 21 Apr 2018 19:20:17 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180421092017.GW2434@umbus.fritz.box>
-References: <20180419072123.682-1-david@gibson.dropbear.id.au>
-	<20180419183037.21826f8a@bahia.lan>
-	<20180420021803.GC2434@umbus.fritz.box>
-	<53e6af87-5f29-95d9-a921-bdad5a8e1ed2@redhat.com>
+	(envelope-from <clg@kaod.org>) id 1f9p28-0007EC-Dy
+	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 05:42:19 -0400
+Received: from 8.mo179.mail-out.ovh.net ([46.105.75.26]:46186)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1f9p28-0007Cn-7l
+	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 05:42:16 -0400
+Received: from player796.ha.ovh.net (unknown [10.109.105.78])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 53EB2AC6B5
+	for <qemu-devel@nongnu.org>; Sat, 21 Apr 2018 11:42:14 +0200 (CEST)
+References: <20180420124835.7268-1-peter.maydell@linaro.org>
+	<20180420124835.7268-3-peter.maydell@linaro.org>
+	<f80b3748-12d4-de8b-1661-e07a7d33b60a@kaod.org>
+	<CAFEAcA8g_qcXj7ErMNODexU4k2k56nYUSzoh3WX06mZTVRMLLg@mail.gmail.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <11085e2c-69dd-93b1-ebeb-5b7c1257e26e@kaod.org>
+Date: Sat, 21 Apr 2018 11:42:06 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="MrbiU6dcJfOZ616B"
-Content-Disposition: inline
-In-Reply-To: <53e6af87-5f29-95d9-a921-bdad5a8e1ed2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.13] Clear mem_path if we fall back to
- anonymous RAM allocation
+In-Reply-To: <CAFEAcA8g_qcXj7ErMNODexU4k2k56nYUSzoh3WX06mZTVRMLLg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/3] hw/arm/aspeed: don't make 'boot_rom'
+ region 'nomigrate'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +34,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Greg Kurz <groug@kaod.org>, imammedo@redhat.com, ehabkost@redhat.com, clg@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Rob Herring <robh@kernel.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-
---MrbiU6dcJfOZ616B
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Apr 20, 2018 at 05:34:38PM +0200, Paolo Bonzini wrote:
-> On 20/04/2018 04:18, David Gibson wrote:
-> > Paolo et al, as with my earlier patches adding some extensions to the
-> > helpers for determining backing page sizes, if there are no objections
-> > can I get an ack to merge this via my ppc tree?
+On 04/21/2018 11:34 AM, Peter Maydell wrote:
+> On 21 April 2018 at 10:07, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>> On 04/20/2018 02:48 PM, Peter Maydell wrote:
+>>> Currently we use memory_region_init_ram_nomigrate() to create
+>>> the "aspeed.boot_rom" memory region, and we don't manually
+>>> register it with vmstate_register_ram(). This currently
+>>> means that its contents are migrated but as a ram block
+>>> whose name is the empty string; in future it may mean they
+>>> are not migrated at all. Use memory_region_init_ram() instead.
+>>>
+>>> Note that this is a cross-version migration compatibility break
+>>> for the "palmetto-bmc", "ast2500-evb" and "romulus-bmc" machines.
+>>
+>> Migration does not work for these.
 >=20
-> Yes, go ahead!
+> Well, at least we're not breaking anything :-)
+> Do you know why migration doesn't work?
 
-Thanks, applied to ppc-for-2.13.
+A quick migration test shows that :
 
->=20
-> Thanks,
->=20
-> Paolo
->=20
+qemu-system-arm: Missing section footer for aspeed.timerctrl
+qemu-system-arm: load of migration failed: Invalid argument
+
+which is surprising, the state looks correct. I will dig in.=20
+
+Thanks,
+
+C.
 
 
-
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---MrbiU6dcJfOZ616B
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrbAk8ACgkQbDjKyiDZ
-s5ILMA/6AvwvQxie+WFoqec5Y6h0sFPKnBzGDAHVKvLsraJUXibjfYBOIYeZ9XIY
-oMsWi0CmnllX5e+uNoNUmcPoGVHClHJjEKu76QbEfWCb6RIgf5Oq4n1S7X9ITFBO
-E4FD46lqNdcV1rERgzJEFjlcN/osGBDPRg1iIz1qIv0mSeGdK8M7K6JQz1vJT4FR
-FzuFzW73djRIVvlaUdaMiVIqCfwu/qNvc9zMogaBf5TA5sOGvXncXgmy6kPq0JbX
-JE/JcA2V3I6a3fcfER51rgkRxd+H4ljvHjNlv2pUwAtA6+iD8sBZLT/P6jvscgw3
-ib49+PC9oL5FB2QR3UofbLgrnD2Pj3ViO9zxbQDp1TOLLngAwGnj2trNUDQOO/sq
-9mrnSYPVEJHSP+pVZApzF3RBkk+uDYYpUCGlTOZ6/CJfw2YQFxkU62r/WrOq/K/F
-pJQVlNGKLumwu3pI7mipbdHghOJ0/ZIVvOfdngEeDSPjeLPcYXsiHyUaw4Paw1eK
-KT2qDgyoO6yvceKFMFkTd0k5+AdT2mCnLn/z/hK/XkO5TJDQBYeEMOUvDd91qoCn
-EmUmc8wjIWdV/LoPtFbKFjswJv7xm5/lUSkGJs4z95VpKs14FnfyzDQxfG/Kjjfk
-BOrHQHurDnmoLc0Drm+jM9sCS+yf4kscdseJTYvTjiKARnrLoK4=
-=OHi1
------END PGP SIGNATURE-----
-
---MrbiU6dcJfOZ616B--
+    "aspeed.timerctrl (8)": {
+        "ctrl": "0x00000003",
+        "ctrl2": "0x00000000",
+        "timers": [
+            {
+                "id": "0x00",
+                "level": "0x00000000",
+                "timer": "00 00 00 29 aa bd 88 44",
+                "reload": "0xffffffff",
+                "match": [
+                    "0x00000000",
+                    "0x00000000"
+                ]
+            },
+            {
+                "id": "0x01",
+                "level": "0x00000000",
+                "timer": "ff ff ff ff ff ff ff ff",
+                "reload": "0x00000000",
+                "match": [
+                    "0x00000000",
+                    "0x00000000"
+                ]
+            },
+            {
+                "id": "0x02",
+                "level": "0x00000000",
+                "timer": "ff ff ff ff ff ff ff ff",
+                "reload": "0x00000000",
+                "match": [
+                    "0x00000000",
+                    "0x00000000"
+                ]
+            },
+            {
+                "id": "0x03",
+                "level": "0x00000000",
+                "timer": "ff ff ff ff ff ff ff ff",
+                "reload": "0xffffffff",
+                "match": [
+                    "0x00000000",
+                    "0x00000000"
+                ]
+            },
+            {
+                "id": "0x04",
+                "level": "0x00000000",
+                "timer": "ff ff ff ff ff ff ff ff",
+                "reload": "0x00000000",
+                "match": [
+                    "0x00000000",
+                    "0x00000000"
+                ]
+            },
+            {
+                "id": "0x05",
+                "level": "0x00000000",
+                "timer": "ff ff ff ff ff ff ff ff",
+                "reload": "0x00000000",
+                "match": [
+                    "0x00000000",
+                    "0x00000000"
+                ]
+            },
+            {
+                "id": "0x06",
+                "level": "0x00000000",
+                "timer": "ff ff ff ff ff ff ff ff",
+                "reload": "0x00000000",
+                "match": [
+                    "0x00000000",
+                    "0x00000000"
+                ]
+            },
+            {
+                "id": "0x07",
+                "level": "0x00000000",
+                "timer": "ff ff ff ff ff ff ff ff",
+                "reload": "0x00000000",
+                "match": [
+                    "0x00000000",
+                    "0x00000000"
+                ]
+            }
+        ]
+    },
