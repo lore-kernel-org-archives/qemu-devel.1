@@ -1,16 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58676)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f9saa-00034Q-2E
-	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 09:30:07 -0400
+	(envelope-from <eblake@redhat.com>) id 1f9uYO-0003lG-2G
+	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 11:35:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f9saY-0000yY-GA
-	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 09:30:04 -0400
-From: Max Reitz <mreitz@redhat.com>
-Date: Sat, 21 Apr 2018 15:29:29 +0200
-Message-Id: <20180421132929.21610-10-mreitz@redhat.com>
-In-Reply-To: <20180421132929.21610-1-mreitz@redhat.com>
-References: <20180421132929.21610-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 9/9] iotests: Add test for COR across nodes
+	(envelope-from <eblake@redhat.com>) id 1f9uYN-0005GS-2G
+	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 11:35:56 -0400
+References: <20180420225320.11275-1-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0ac07a07-3c42-f37b-fb2e-48c467d73afd@redhat.com>
+Date: Sat, 21 Apr 2018 10:35:41 -0500
+MIME-Version: 1.0
+In-Reply-To: <20180420225320.11275-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="LLXGbEXQTV6ldkfjzmhbUZBPIEDQxNZtb"
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: Check post-truncation size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,200 +23,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-COR across nodes (that is, you have some filter node between the
-actually COR target and the node that performs the COR) cannot reliably
-work together with the permission system when there is no explicit COR
-node that can request the WRITE_UNCHANGED permission for its child.
-This is because COR (currently) sneaks its requests by the usual
-permission checks, so it can work without a WRITE* permission; but if
-there is a filter node in between, that will re-issue the request, which
-then passes through the usual check -- and if nobody has requested a
-WRITE_UNCHANGED permission, that check will fail.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--LLXGbEXQTV6ldkfjzmhbUZBPIEDQxNZtb
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <0ac07a07-3c42-f37b-fb2e-48c467d73afd@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: Check post-truncation size
+References: <20180420225320.11275-1-mreitz@redhat.com>
+In-Reply-To: <20180420225320.11275-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-There is no real direct fix apart from hoping that there is someone who
-has requested that permission; in case of just the qemu-io HMP command
-(and no guest device), however, that is not the case.  The real real fix
-is to implement the copy-on-read flag through an implicitly added COR
-node.  Such a node can request the necessary permissions as shown in
-this test.
+On 04/20/2018 05:53 PM, Max Reitz wrote:
+> Some block drivers (iscsi and file-posix when dealing with device files=
+)
+> do not actually support truncation, even though they provide a
+> .bdrv_truncate() method and will happily return success when providing =
+a
+> new size that does not exceed the current size.  This is because these
+> drivers expect the user to resize the image outside of qemu and then
+> provide qemu with that information through the block_resize command
+> (compare cb1b83e740384b4e0d950f3d7c81c02b8ce86c2e).
+>=20
+> Of course, anyone using qemu-img resize will find that behavior useless=
+=2E
+> So we should check the actual size of the image after the supposedly
+> successful truncation took place, emit an error if nothing changed and
+> emit a warning if the target size was not met.
+>=20
+> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1523065
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+> Testing this is not quite trivial.  Or, well, it is, but you need eithe=
+r
+> an iscsi test server or root access.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/216     | 117 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/216.out |  28 +++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 146 insertions(+)
- create mode 100755 tests/qemu-iotests/216
- create mode 100644 tests/qemu-iotests/216.out
+Or, you need NBD to document and implement NBD_CMD_RESIZE, and then the
+nbd driver will support .bdrv_truncate() but fail when talking to a
+server that doesn't actually resize after all.
 
-diff --git a/tests/qemu-iotests/216 b/tests/qemu-iotests/216
-new file mode 100755
-index 0000000000..b362cf93a8
---- /dev/null
-+++ b/tests/qemu-iotests/216
-@@ -0,0 +1,117 @@
-+#!/usr/bin/env python
-+#
-+# Copy-on-read tests using a COR filter node
-+#
-+# Copyright (C) 2018 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+# Creator/Owner: Max Reitz <mreitz@redhat.com>
-+#
-+# Non-shared storage migration test using NBD server and drive-mirror
-+
-+import iotests
-+from iotests import log, qemu_img_pipe, qemu_io, filter_qemu_io
-+
-+# Need backing file support
-+iotests.verify_image_format(supported_fmts=['qcow2', 'qcow', 'qed', 'vmdk'])
-+iotests.verify_platform(['linux'])
-+
-+log('')
-+log('=== Copy-on-read across nodes ===')
-+log('')
-+
-+# The old copy-on-read mechanism without a filter node cannot request
-+# WRITE_UNCHANGED permissions for its child.  Therefore it just tries
-+# to sneak its write by the usual permission system and holds its
-+# fingers crossed.  However, that sneaking does not work so well when
-+# there is a filter node in the way: That will receive the write
-+# request and re-issue a new one to its child, which this time is a
-+# proper write request that will make the permission system cough --
-+# unless there is someone at the top (like a guest device) that has
-+# requested write permissions.
-+#
-+# A COR filter node, however, can request the proper permissions for
-+# its child and therefore is not hit by this issue.
-+
-+with iotests.FilePath('base.img') as base_img_path, \
-+     iotests.FilePath('top.img') as top_img_path, \
-+     iotests.VM() as vm:
-+
-+    log('--- Setting up images ---')
-+    log('')
-+
-+    qemu_img_pipe('create', '-f', iotests.imgfmt, base_img_path, '64M')
-+
-+    log(filter_qemu_io(qemu_io(base_img_path, '-c', 'write -P 1 0M 1M')))
-+
-+    qemu_img_pipe('create', '-f', iotests.imgfmt, '-b', base_img_path,
-+                  top_img_path)
-+
-+    log(filter_qemu_io(qemu_io(top_img_path,  '-c', 'write -P 2 1M 1M')))
-+
-+    log('')
-+    log('--- Doing COR ---')
-+    log('')
-+
-+    # Compare with e.g. the following:
-+    #   vm.add_drive_raw('if=none,node-name=node0,copy-on-read=on,driver=raw,' \
-+    #                    'file.driver=%s,file.file.filename=%s' %
-+    #                       (iotests.imgfmt, top_img_path))
-+    # (Remove the blockdev-add instead.)
-+    # ((Not tested here because it hits an assertion in the permission
-+    #   system.))
-+
-+    vm.launch()
-+
-+    log(vm.qmp('blockdev-add',
-+                    node_name='node0',
-+                    driver='copy-on-read',
-+                    file={
-+                        'driver': 'raw',
-+                        'file': {
-+                            'driver': 'copy-on-read',
-+                            'file': {
-+                                'driver': 'raw',
-+                                'file': {
-+                                    'driver': iotests.imgfmt,
-+                                    'file': {
-+                                        'driver': 'file',
-+                                        'filename': top_img_path
-+                                    },
-+                                    'backing': {
-+                                        'driver': iotests.imgfmt,
-+                                        'file': {
-+                                            'driver': 'file',
-+                                            'filename': base_img_path
-+                                        }
-+                                    }
-+                                }
-+                            }
-+                        }
-+                    }))
-+
-+    # Trigger COR
-+    log(vm.qmp('human-monitor-command',
-+               command_line='qemu-io node0 "read 0 64M"'))
-+
-+    vm.shutdown()
-+
-+    log('')
-+    log('--- Checking COR result ---')
-+    log('')
-+
-+    log(filter_qemu_io(qemu_io(base_img_path, '-c', 'discard 0 64M')))
-+    log(filter_qemu_io(qemu_io(top_img_path,  '-c', 'read -P 1 0M 1M')))
-+    log(filter_qemu_io(qemu_io(top_img_path,  '-c', 'read -P 2 1M 1M')))
-diff --git a/tests/qemu-iotests/216.out b/tests/qemu-iotests/216.out
-new file mode 100644
-index 0000000000..d3fc590d29
---- /dev/null
-+++ b/tests/qemu-iotests/216.out
-@@ -0,0 +1,28 @@
-+
-+=== Copy-on-read across nodes ===
-+
-+--- Setting up images ---
-+
-+wrote 1048576/1048576 bytes at offset 0
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+wrote 1048576/1048576 bytes at offset 1048576
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+
-+--- Doing COR ---
-+
-+{u'return': {}}
-+{u'return': u''}
-+
-+--- Checking COR result ---
-+
-+discard 67108864/67108864 bytes at offset 0
-+64 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+read 1048576/1048576 bytes at offset 0
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+read 1048576/1048576 bytes at offset 1048576
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index f1179ffde7..2edc377370 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -214,3 +214,4 @@
- 213 rw auto quick
- 214 rw auto
- 215 rw auto quick
-+216 rw auto quick
--- 
-2.14.3
+>=20
+> Because in my opinion iotests that require root access are never run, I=
+
+> decided against writing such a test case.
+
+So maybe when I get around to adding NBD resize support, I should add
+such a test ;)
+
+
+> +    if (new_size !=3D total_size && new_size =3D=3D current_size) {
+> +        error_report("Image was not resized. Resizing may not be suppo=
+rted "
+> +                     "for this image.");
+
+error_report() generally does not have trailing dot, and generally has a
+single sentence.  Would this be better as:
+
+Image was not resized; resizing may not be supported for this image
+
+> +        ret =3D -1;
+> +        goto out;
+> +    }
+> +
+> +    if (new_size !=3D total_size) {
+> +        warn_report("Image should have been resized to %" PRIi64
+> +                    " bytes, but was resized to %" PRIi64 " bytes.",
+> +                    total_size, new_size);
+
+Trailing dot again.  Also, PRId64 is much more common than PRIi64, even
+though the two are identical in behavior.
+
+But the idea makes sense to me.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--LLXGbEXQTV6ldkfjzmhbUZBPIEDQxNZtb
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrbWk0ACgkQp6FrSiUn
+Q2pSDwgAidOf5Wu2jz5DZZx1B2uQt9N42yq8LroSJO1L+ltiOYgJwbHpTRHCa2RH
+ttN9AjMK3czv8uA7yCLewIcmAHo9qHLOFIiox+6EmtThIqPN+Chn8i4Q2wONLswd
+f61ep+RjjYH+Q6juz+ZfHVwQITXS4/w2C5T0ET6DOuOxvfgXO4/4nPnoCjVgjL2g
+PvDP2QQ8ppgEVLY4uJEkHb/Sx8pGMaeOME6/S3wYvMPpH8fABQGn5uUKxi3D25lE
+9iQ/m/DRHNnpOCdnJpw78o0MGDX+hrd4Crdb2oJ7ptto/PD9laKCKo48tn2zcBqs
+Nfyy0k8MM/ZZBUhF0untDT29gGRT/g==
+=Ce4q
+-----END PGP SIGNATURE-----
+
+--LLXGbEXQTV6ldkfjzmhbUZBPIEDQxNZtb--
