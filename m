@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f9qCH-0007Fi-OJ
-	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 06:56:51 -0400
+	(envelope-from <picnet@me.com>) id 1f9ooR-0001rX-E7
+	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 05:28:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1f9qCD-0007RK-EM
-	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 06:56:49 -0400
-Resent-Message-Id: <E1f9qCD-0007RK-EM@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21119)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1f9qCD-0007PO-5o
-	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 06:56:45 -0400
-In-Reply-To: <20180420145249.32435-1-peter.maydell@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152423701463.2118.8532788783924003585@71c20359a636>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 20 Apr 2018 08:10:15 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 00/13] Drop compile time limit on number of
- serial ports
+	(envelope-from <picnet@me.com>) id 1f9ooO-0004y2-AS
+	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 05:28:07 -0400
+Received: from st11p02im-asmtp001.me.com ([17.172.220.113]:44203)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <picnet@me.com>) id 1f9ooO-0004vE-52
+	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 05:28:04 -0400
+Received: from process-dkim-sign-daemon.st11p02im-asmtp001.me.com by
+	st11p02im-asmtp001.me.com
+	(Oracle Communications Messaging Server 8.0.1.2.20170607 64bit (built
+	Jun 7 2017)) id <0P7J00N003HAV800@st11p02im-asmtp001.me.com> for
+	qemu-devel@nongnu.org; Sat, 21 Apr 2018 09:28:01 +0000 (GMT)
+Received: from icloud.com ([127.0.0.1]) by st11p02im-asmtp001.me.com
+	(Oracle Communications Messaging Server 8.0.1.2.20170607 64bit (built
+	Jun 7
+	2017)) with ESMTPSA id <0P7J00O7W3MMSY30@st11p02im-asmtp001.me.com> for
+	qemu-devel@nongnu.org; Sat, 21 Apr 2018 09:28:01 +0000 (GMT)
+From: Mike R <picnet@me.com>
+Content-type: multipart/signed;
+	boundary="Apple-Mail=_F736233D-45E4-4F63-9B07-20ED163BDD43";
+	protocol="application/pgp-signature"; micalg=pgp-sha256
+Date: Sat, 21 Apr 2018 12:27:57 +0300
+Message-id: <3F07299A-A7AC-4254-B2C7-8DF15859ED58@me.com>
+MIME-version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: [Qemu-devel] unknown keycodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,81 +35,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, mst@redhat.com, f4bug@amsat.org, marcandre.lureau@redhat.com, patches@linaro.org
+To: qemu-devel@nongnu.org
+Cc: Mike R <picnet@me.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNDIwMTQ1MjQ5LjMyNDM1LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3Jn
-ClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMDAvMTNdIERyb3AgY29tcGlsZSB0aW1lIGxp
-bWl0IG9uIG51bWJlciBvZiBzZXJpYWwgcG9ydHMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
-IyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFT
-RS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9
-JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNo
-ZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4u
-IgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3Bh
-dGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwog
-ICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBF
-TkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0
-CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFn
-XSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxODA0MjAxNDUyNDkuMzI0MzUtMS1wZXRlci5tYXlk
-ZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE4MDQyMDE0NTI0OS4zMjQzNS0xLXBldGVyLm1h
-eWRlbGxAbGluYXJvLm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjk2ZGZjY2Iw
-MGIgdmwuYzogbmV3IGZ1bmN0aW9uIG1heF9zZXJpYWxfaGRzKCkKM2U3MWZkMzRlYiB2bC5jOiBS
-ZW1vdmUgY29tcGlsZSB0aW1lIGxpbWl0IG9uIG51bWJlciBvZiBzZXJpYWwgcG9ydHMKYzQzYjlm
-ZGZjMiBzdXBlcmlvOiBEb24ndCB1c2UgTUFYX1NFUklBTF9QT1JUUyBmb3Igc2VyaWFsIHBvcnQg
-bGltaXQKYjc3MGM1NDBhOSBzZXJpYWwtaXNhOiBVc2UgTUFYX0lTQV9TRVJJQUxfUE9SVFMgaW5z
-dGVhZCBvZiBNQVhfU0VSSUFMX1BPUlRTCjAzOGZmZTU3NGUgaHcvY2hhci9leHlub3M0MjEwX3Vh
-cnQuYzogUmVtb3ZlIHVubmVlZGVkIGhhbmRsaW5nIG9mIE5VTEwgY2hhcmRldgo4MTNiNmQ2Mjg3
-IFJlbW92ZSBjaGVja3Mgb24gTUFYX1NFUklBTF9QT1JUUyB0aGF0IGFyZSBqdXN0IGJvdW5kcyBj
-aGVja3MKMDY2ZjY3NmQ2NiBDaGFuZ2UgcmVmZXJlbmNlcyB0byBzZXJpYWxfaGRzW10gdG8gc2Vy
-aWFsX2hkKCkKZWRlOWRlMGMyNyB2bC5jOiBQcm92aWRlIGFjY2Vzc29yIGZ1bmN0aW9uIHNlcmlh
-bF9oZCgpIGZvciBzZXJpYWxfaGRzW10gYXJyYXkKYmZiZjBmMjBjYiBody94dGVuc2EveHRmcGdh
-LmM6IERvbid0IGNyZWF0ZSAibnVsbCIgY2hhcmRldnMgZm9yIHNlcmlhbCBkZXZpY2VzCmQzMWQw
-MmNiZDggaHcvbWlwcy9taXBzX21hbHRhOiBEb24ndCBjcmVhdGUgIm51bGwiIGNoYXJkZXZzIGZv
-ciBzZXJpYWwgZGV2aWNlcwozMjIxNmNlNWU1IGh3L21pcHMvYm9zdG9uLmM6IERvbid0IGNyZWF0
-ZSAibnVsbCIgY2hhcmRldnMgZm9yIHNlcmlhbCBkZXZpY2VzCjM2NDkxOGViZDkgaHcvYXJtL2Zz
-bC1pbXgqOiBEb24ndCBjcmVhdGUgIm51bGwiIGNoYXJkZXZzIGZvciBzZXJpYWwgZGV2aWNlcwo0
-YTVhNjEyYjc3IGh3L2NoYXIvc2VyaWFsOiBBbGxvdyBkaXNjb25uZWN0ZWQgY2hhcmRldnMKCj09
-PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTM6IGh3L2NoYXIvc2VyaWFsOiBB
-bGxvdyBkaXNjb25uZWN0ZWQgY2hhcmRldnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xMzogaHcvYXJt
-L2ZzbC1pbXgqOiBEb24ndCBjcmVhdGUgIm51bGwiIGNoYXJkZXZzIGZvciBzZXJpYWwgZGV2aWNl
-cy4uLgpDaGVja2luZyBQQVRDSCAzLzEzOiBody9taXBzL2Jvc3Rvbi5jOiBEb24ndCBjcmVhdGUg
-Im51bGwiIGNoYXJkZXZzIGZvciBzZXJpYWwgZGV2aWNlcy4uLgpDaGVja2luZyBQQVRDSCA0LzEz
-OiBody9taXBzL21pcHNfbWFsdGE6IERvbid0IGNyZWF0ZSAibnVsbCIgY2hhcmRldnMgZm9yIHNl
-cmlhbCBkZXZpY2VzLi4uCkNoZWNraW5nIFBBVENIIDUvMTM6IGh3L3h0ZW5zYS94dGZwZ2EuYzog
-RG9uJ3QgY3JlYXRlICJudWxsIiBjaGFyZGV2cyBmb3Igc2VyaWFsIGRldmljZXMuLi4KQ2hlY2tp
-bmcgUEFUQ0ggNi8xMzogdmwuYzogUHJvdmlkZSBhY2Nlc3NvciBmdW5jdGlvbiBzZXJpYWxfaGQo
-KSBmb3Igc2VyaWFsX2hkc1tdIGFycmF5Li4uCkNoZWNraW5nIFBBVENIIDcvMTM6IENoYW5nZSBy
-ZWZlcmVuY2VzIHRvIHNlcmlhbF9oZHNbXSB0byBzZXJpYWxfaGQoKS4uLgpXQVJOSU5HOiBsaW5l
-IG92ZXIgODAgY2hhcmFjdGVycwojNTgxOiBGSUxFOiBody9jcmlzL2F4aXNfZGV2ODguYzozNDA6
-CisgICAgICAgIGV0cmF4ZnNfc2VyX2NyZWF0ZSgweDMwMDI2MDAwICsgaSAqIDB4MjAwMCwgaXJx
-WzB4MTQgKyBpXSwgc2VyaWFsX2hkKGkpKTsKCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5k
-IHRoYXQgJy8nIChjdHg6VnhWKQojODI0OiBGSUxFOiBody9tb3hpZS9tb3hpZXNpbS5jOjE0NjoK
-KyAgICAgICAgICAgICAgICAgICAgICAgODAwMDAwMC8xNiwgc2VyaWFsX2hkKDApLCBERVZJQ0Vf
-TElUVExFX0VORElBTik7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDog
-MSBlcnJvcnMsIDEgd2FybmluZ3MsIDg1MiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBz
-dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
-IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
-UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA4LzEzOiBSZW1vdmUgY2hlY2tz
-IG9uIE1BWF9TRVJJQUxfUE9SVFMgdGhhdCBhcmUganVzdCBib3VuZHMgY2hlY2tzLi4uCkNoZWNr
-aW5nIFBBVENIIDkvMTM6IGh3L2NoYXIvZXh5bm9zNDIxMF91YXJ0LmM6IFJlbW92ZSB1bm5lZWRl
-ZCBoYW5kbGluZyBvZiBOVUxMIGNoYXJkZXYuLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMTM6IHNlcmlh
-bC1pc2E6IFVzZSBNQVhfSVNBX1NFUklBTF9QT1JUUyBpbnN0ZWFkIG9mIE1BWF9TRVJJQUxfUE9S
-VFMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMTM6IHN1cGVyaW86IERvbid0IHVzZSBNQVhfU0VSSUFM
-X1BPUlRTIGZvciBzZXJpYWwgcG9ydCBsaW1pdC4uLgpDaGVja2luZyBQQVRDSCAxMi8xMzogdmwu
-YzogUmVtb3ZlIGNvbXBpbGUgdGltZSBsaW1pdCBvbiBudW1iZXIgb2Ygc2VyaWFsIHBvcnRzLi4u
-CkVSUk9SOiBkbyBub3QgaW5pdGlhbGlzZSBzdGF0aWNzIHRvIDAgb3IgTlVMTAojMzU6IEZJTEU6
-IHZsLmM6MTU3Ogorc3RhdGljIGludCBudW1fc2VyaWFsX2hkcyA9IDA7CgpFUlJPUjogZG8gbm90
-IGluaXRpYWxpc2Ugc3RhdGljcyB0byAwIG9yIE5VTEwKIzM2OiBGSUxFOiB2bC5jOjE1ODoKK3N0
-YXRpYyBDaGFyZGV2ICoqc2VyaWFsX2hkcyA9IE5VTEw7Cgp0b3RhbDogMiBlcnJvcnMsIDAgd2Fy
-bmluZ3MsIDUyIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
-IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
-TkVSUy4KCkNoZWNraW5nIFBBVENIIDEzLzEzOiB2bC5jOiBuZXcgZnVuY3Rpb24gbWF4X3Nlcmlh
-bF9oZHMoKS4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBj
-b2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0
-dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
-ZGV2ZWxAcmVkaGF0LmNvbQ==
+
+--Apple-Mail=_F736233D-45E4-4F63-9B07-20ED163BDD43
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
+
+(qemu) unknown keycodes `empty+aliases(qwerty)=E2=80=99, please report =
+to qemu-devel@nongnu.org
+
+reported.
+
+
+
+
+--Apple-Mail=_F736233D-45E4-4F63-9B07-20ED163BDD43
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP using GPGMail
+
+-----BEGIN PGP SIGNATURE-----
+Comment: GPGTools - http://gpgtools.org
+
+iQIcBAEBCAAGBQJa2wQeAAoJEKjINxzU0U/j3FMQAIsczcndztBe8EHbHueYZ5VY
+mpSKWwpt35j0y/YY+iOx4Ww9SubzjXezQHHJ/CQG9/+FjL+IHmSE68RYEXbx1Kc7
+ysglOn2388pFXQgM0qETY0vW0sTSO+OH6GjTLKumPFYlnnEaVggT0Gdx8nO0XYoY
+D9AziNkQrcD49qdJ/arBKOdo70+ZMzrt1gQ+MFa6iKkXSVoqPp4Sn/epfTZINsFm
+4vHCDIaZGpV2nwgtxDOFHId3zgXCdQQXl1arictW58/TNbHaq95VCoMRn5dKqTMw
+8A8TPZ258WxEK6ffeZXTPqlsY+qeE/pke76L2vmq8QOmSocydfKhIf9kl2wjPiz2
+WiuGGE0GYxH9exgPJ0B0h0sfBuzwMfO77n4yBR+5fDjvazG9r97NfmMFOI57FkKh
+Oa28bt6Fr+vBc1SBtSUWLa+YVULlbAujTkfrgDE31vie/j0csH1S/qYqfInzK2cG
+BHMmHwanO155scqHipOScnDA8O7iR+m6NJ8mu5lTnxBk8Gj7Wmt53CD1TT1SvG3F
+fGHvurXx0tTw12aYC30Ac8f2AFzeq/2FJJY7yZsn+QEK66K0/OwhsGI2i9qJhKqL
+Ns+fdUChhiHjijugOuGSqWoVGS0Hu994t4ZCL63xER4lb6V+Eg4ixC03npH5fzpY
+tYK+l9atAorKlt2UAL2D
+=7Xr7
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_F736233D-45E4-4F63-9B07-20ED163BDD43--
