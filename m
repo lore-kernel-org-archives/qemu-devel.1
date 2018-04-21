@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f9vma-0007t5-L6
-	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 12:54:41 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f9vmb-0007tV-20
+	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 12:54:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f9vmZ-0003AA-UI
-	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 12:54:40 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f9vma-0003AF-3e
+	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 12:54:41 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Sat, 21 Apr 2018 18:54:19 +0200
-Message-Id: <20180421165423.30759-4-mreitz@redhat.com>
-In-Reply-To: <20180421165423.30759-1-mreitz@redhat.com>
-References: <20180421165423.30759-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/7] qemu-option: Pull out "Supported options"
- print
+Date: Sat, 21 Apr 2018 18:54:16 +0200
+Message-Id: <20180421165423.30759-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/7] qemu-img: Improve option help for amend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,37 +20,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-It really is up to the caller to decide what this list of options means.
+Currently, "qemu-img amend -f $format -o help" prints many things which
+it claims to be supported, but most of the time it's wrong.  Usually
+that starts with the format already: No format but qcow2 supports option
+amendment, so we should never claim that a format supports any options
+when it actually does not support amendment in the first place.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- qemu-img.c         | 1 +
- util/qemu-option.c | 1 -
- 2 files changed, 1 insertion(+), 1 deletion(-)
+It goes on with the options themselves.  The qcow2 driver does not
+support amendment of all creation options, so we should not claim it
+does.  Actually knowing which formats are supported exactly would be a
+bit difficult (this would probably involve adding a field to
+QemuOptDesc, and I don't really want to do that), but what we can do
+instead is to at least advise the user that the options we print are all
+of the creation options and that we might not support amending all of
+them.
 
-diff --git a/qemu-img.c b/qemu-img.c
-index 375fe852e0..6dd8e95bb2 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -261,6 +261,7 @@ static int print_block_option_help(const char *filename, const char *fmt)
-         create_opts = qemu_opts_append(create_opts, proto_drv->create_opts);
-     }
- 
-+    printf("Supported options:\n");
-     qemu_opts_print_help(create_opts);
-     qemu_opts_free(create_opts);
-     return 0;
-diff --git a/util/qemu-option.c b/util/qemu-option.c
-index d0756fda58..95e6cf4e49 100644
---- a/util/qemu-option.c
-+++ b/util/qemu-option.c
-@@ -218,7 +218,6 @@ void qemu_opts_print_help(QemuOptsList *list)
- 
-     assert(list);
-     desc = list->desc;
--    printf("Supported options:\n");
-     while (desc && desc->name) {
-         printf("%-16s %s\n", desc->name,
-                desc->help ? desc->help : "No description available");
+There is a Bugzilla for this here:
+https://bugzilla.redhat.com/show_bug.cgi?id=1537956
+
+On the way to address these issues, there is more to be done, though.
+bdrv_amend_options() does not have an Error parameter yet, and there is
+no real excuse for that.
+
+Also, "qemu-img create -o help" has its own little issue with formats
+that do not support creation:
+
+    $ qemu-img create -f bochs -o help
+    Supported options:
+    qemu-img: util/qemu-option.c:219:
+    qemu_opts_print_help: Assertion `list' failed.
+    [1]    24831 abort (core dumped)  qemu-img create -f bochs -o help
+
+Let's fix that, too.
+
+
+Max Reitz (7):
+  qemu-img: Amendment support implies create_opts
+  block: Add Error parameter to bdrv_amend_options
+  qemu-option: Pull out "Supported options" print
+  qemu-img: Add print_amend_option_help()
+  qemu-img: Recognize no creation support in -o help
+  iotests: Test help option for unsupporting formats
+  iotests: Rework 113
+
+ include/block/block.h      |  3 +-
+ include/block/block_int.h  |  3 +-
+ block.c                    |  8 ++++--
+ block/qcow2.c              | 72 ++++++++++++++++++++++++++++++----------------
+ qemu-img.c                 | 52 +++++++++++++++++++++++++++++----
+ util/qemu-option.c         |  1 -
+ tests/qemu-iotests/060.out |  4 +--
+ tests/qemu-iotests/061.out |  7 -----
+ tests/qemu-iotests/080.out |  4 +--
+ tests/qemu-iotests/082     |  9 ++++++
+ tests/qemu-iotests/082.out | 53 +++++++++++++++++++++++-----------
+ tests/qemu-iotests/112.out |  3 --
+ tests/qemu-iotests/113     | 19 ++++++------
+ tests/qemu-iotests/113.out |  7 +++--
+ 14 files changed, 166 insertions(+), 79 deletions(-)
+
 -- 
 2.14.3
