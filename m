@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1f9fe3-00038D-EN
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 19:40:48 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1f9h9J-0006pH-9H
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 21:17:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1f9fe0-0005Ya-1H
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 19:40:47 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44972 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1f9fdz-0005Xu-RX
-	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 19:40:43 -0400
-References: <20180420152511.18878-1-marcandre.lureau@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <e130d54a-0ea3-f149-e101-0f1ffd1cb60f@redhat.com>
-Date: Sat, 21 Apr 2018 01:40:34 +0200
+	(envelope-from <marcandre.lureau@gmail.com>) id 1f9h9I-0008Lu-BQ
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 21:17:09 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:40971)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1f9h9I-0008LB-3z
+	for qemu-devel@nongnu.org; Fri, 20 Apr 2018 21:17:08 -0400
+Received: by mail-wr0-x244.google.com with SMTP id v24-v6so27059405wra.8
+	for <qemu-devel@nongnu.org>; Fri, 20 Apr 2018 18:17:06 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180420152511.18878-1-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <5570aff71297a26c09ba9b6cb3f88f583ff31057.1524247958.git.tgolembi@redhat.com>
+References: <5570aff71297a26c09ba9b6cb3f88f583ff31057.1524247958.git.tgolembi@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Sat, 21 Apr 2018 03:17:04 +0200
+Message-ID: <CAJ+F1C+SHFGFVuk=-3+vOQ6z4mh8KG8qKY+O42PEgrS74Jk4Rg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qemu-ga: make get-fsinfo work over pci
- bridges
+Subject: Re: [Qemu-devel] [PATCH] qga/schema: fix documentation for
+ GuestOSInfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,83 +30,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com
+To: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, QEMU <qemu-devel@nongnu.org>
 
-Hi Marc-Andr=C3=A9,
+On Fri, Apr 20, 2018 at 8:12 PM, Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolemb=
+i@redhat.com> wrote:
+> The documentation for kernel-version and kernel-release on Windows was
+> swapped.
+>
+> Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
 
-On 04/20/18 17:25, Marc-Andr=C3=A9 Lureau wrote:
-> Iterate over the PCI bridges to lookup the PCI device associated with
-> the block device.
->=20
-> Fixes:
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D1567041
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+
 > ---
->  qga/commands-posix.c | 21 ++++++++++++++++++---
->  1 file changed, 18 insertions(+), 3 deletions(-)
->=20
-> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-> index 0dc219dbcf..5d4e5f627f 100644
-> --- a/qga/commands-posix.c
-> +++ b/qga/commands-posix.c
-> @@ -879,9 +879,24 @@ static void build_guest_fsinfo_for_real_device(cha=
-r const *syspath,
->          return;
->      }
-> =20
-> -    driver =3D get_pci_driver(syspath, (p + 12 + pcilen) - syspath, er=
-rp);
-> -    if (!driver) {
-> -        goto cleanup;
-> +    p +=3D 12 + pcilen;
-> +    while (true) {
-> +        driver =3D get_pci_driver(syspath, p - syspath, errp);
-> +        if (!driver) {
-> +            goto cleanup;
-> +        }
-> +
-> +        if (g_str_equal(driver, "pcieport")) {
-> +            if (sscanf(p, "/%x:%x:%x.%x%n",
-> +                       pci, pci + 1, pci + 2, pci + 3, &pcilen) < 4) {
-> +                g_debug("only pci device is supported: sysfs path \"%s=
-\"",
-> +                        syspath);
-> +                return;
-> +            }
-> +            p +=3D pcilen;
-> +            continue;
-> +        }
-> +        break;
->      }
-> =20
->      p =3D strstr(syspath, "/target");
->=20
+>  qga/qapi-schema.json | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+> index 17884c7c70..d3a686ba12 100644
+> --- a/qga/qapi-schema.json
+> +++ b/qga/qapi-schema.json
+> @@ -1168,10 +1168,10 @@
+>  #
+>  # @kernel-release:
+>  #     * POSIX: release field returned by uname(2)
+> -#     * Windows: version number of the OS
+> +#     * Windows: build number of the OS
+>  # @kernel-version:
+>  #     * POSIX: version field returned by uname(2)
+> -#     * Windows: build number of the OS
+> +#     * Windows: version number of the OS
+>  # @machine:
+>  #     * POSIX: machine field returned by uname(2)
+>  #     * Windows: one of x86, x86_64, arm, ia64
+> --
+> 2.17.0
+>
+>
 
-this patch looked like suitable chewing gum for my brain before I turn
-off my work laptop (Saturday 01:36AM, me at work, what else is new), so
-here goes:
 
-- Please consider adding a few example pathnames to the commit message
-or even the code (as comments). Up to you.
 
-- More importantly, I think this will only work if you use PCIe root
-ports and maybe PCIe switches. The original environment where at least I
-reproduced it was the "old-style" Q35 libvirt hierarchy: root complex ->
-DMI-PCI bridge -> PCI-PCI bridge -> virtio-scsi controller. And, in that
-case, the DMI-PCI bridge had no associated driver with it at all in the
-guest -- meaning that get_pci_driver() in your patch would return NULL
-just the same.
-
-So, I think you should continue scanning as long as:
-- driver is either missing or not on the list of desired drivers, AND
-- the next pathname component looks PCI-like, and can be parsed.
-
-If the first sub-condition fails, then you found a driver that we can
-report about. If the second sub-condition fails, then we give up.
-
-My understanding anyway.
-
-Thanks
-Laszlo
+--=20
+Marc-Andr=C3=A9 Lureau
