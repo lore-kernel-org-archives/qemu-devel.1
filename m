@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38445)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f9vYb-0003GX-EG
-	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 12:40:14 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f9vma-0007sz-IR
+	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 12:54:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f9vYa-0002aj-Dn
-	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 12:40:13 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f9vmZ-0003A3-S1
+	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 12:54:40 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Sat, 21 Apr 2018 18:39:57 +0200
-Message-Id: <20180421163957.29872-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] qemu-img: Check post-truncation size
+Date: Sat, 21 Apr 2018 18:54:17 +0200
+Message-Id: <20180421165423.30759-2-mreitz@redhat.com>
+In-Reply-To: <20180421165423.30759-1-mreitz@redhat.com>
+References: <20180421165423.30759-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/7] qemu-img: Amendment support implies
+ create_opts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,89 +21,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Some block drivers (iscsi and file-posix when dealing with device files)
-do not actually support truncation, even though they provide a
-.bdrv_truncate() method and will happily return success when providing a
-new size that does not exceed the current size.  This is because these
-drivers expect the user to resize the image outside of qemu and then
-provide qemu with that information through the block_resize command
-(compare cb1b83e740384b4e0d950f3d7c81c02b8ce86c2e).
+Instead of checking whether a driver has a non-NULL create_opts we
+should check whether it supports image amendment in the first place.  If
+it does, it must have create_opts.
 
-Of course, anyone using qemu-img resize will find that behavior useless.
-So we should check the actual size of the image after the supposedly
-successful truncation took place, emit an error if nothing changed and
-emit a warning if the target size was not met.
+On the other hand, if it does not have create_opts (so it does not
+support amendment either), the error message "does not support any
+options" is a bit useless.  Stating clearly that the driver has no
+amendment support whatsoever is probably better.
 
-Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1523065
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
-v2: Drop dots in {error,warn}_report() messages [Eric]
-
-v1: http://lists.nongnu.org/archive/html/qemu-block/2018-04/msg00441.html
----
- qemu-img.c | 39 +++++++++++++++++++++++++++++++++++----
- 1 file changed, 35 insertions(+), 4 deletions(-)
+ qemu-img.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/qemu-img.c b/qemu-img.c
-index 855fa52514..83208873a5 100644
+index 855fa52514..f60b22769e 100644
 --- a/qemu-img.c
 +++ b/qemu-img.c
-@@ -3381,7 +3381,7 @@ static int img_resize(int argc, char **argv)
-     Error *err = NULL;
-     int c, ret, relative;
-     const char *filename, *fmt, *size;
--    int64_t n, total_size, current_size;
-+    int64_t n, total_size, current_size, new_size;
-     bool quiet = false;
-     BlockBackend *blk = NULL;
-     PreallocMode prealloc = PREALLOC_MODE_OFF;
-@@ -3557,11 +3557,42 @@ static int img_resize(int argc, char **argv)
+@@ -3709,13 +3709,16 @@ static int img_amend(int argc, char **argv)
+         goto out;
      }
  
-     ret = blk_truncate(blk, total_size, prealloc, &err);
--    if (!ret) {
--        qprintf(quiet, "Image resized.\n");
--    } else {
-+    if (ret < 0) {
-         error_report_err(err);
-+        goto out;
-+    }
-+
-+    new_size = blk_getlength(blk);
-+    if (new_size < 0) {
-+        error_report("Failed to verify truncated image length: %s",
-+                     strerror(-new_size));
-+        ret = -1;
-+        goto out;
+-    if (!bs->drv->create_opts) {
+-        error_report("Format driver '%s' does not support any options to amend",
++    if (!bs->drv->bdrv_amend_options) {
++        error_report("Format driver '%s' does not support option amendment",
+                      fmt);
+         ret = -1;
+         goto out;
      }
+ 
++    /* Every driver supporting amendment must have create_opts */
++    assert(bs->drv->create_opts);
 +
-+    /* Some block drivers implement a truncation method, but only so
-+     * the user can cause qemu to refresh the image's size from disk.
-+     * The idea is that the user resizes the image outside of qemu and
-+     * then invokes block_resize to inform qemu about it.
-+     * (This includes iscsi and file-posix for device files.)
-+     * Of course, that is not the behavior someone invoking
-+     * qemu-img resize would find useful, so we catch that behavior
-+     * here and tell the user. */
-+    if (new_size != total_size && new_size == current_size) {
-+        error_report("Image was not resized; resizing may not be supported "
-+                     "for this image");
-+        ret = -1;
-+        goto out;
-+    }
-+
-+    if (new_size != total_size) {
-+        warn_report("Image should have been resized to %" PRIi64
-+                    " bytes, but was resized to %" PRIi64 " bytes",
-+                    total_size, new_size);
-+    }
-+
-+    qprintf(quiet, "Image resized.\n");
-+
- out:
-     blk_unref(blk);
-     if (ret) {
+     create_opts = qemu_opts_append(create_opts, bs->drv->create_opts);
+     opts = qemu_opts_create(create_opts, NULL, 0, &error_abort);
+     qemu_opts_do_parse(opts, options, NULL, &err);
 -- 
 2.14.3
