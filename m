@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f9uYO-0003lG-2G
-	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 11:35:57 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f9uc6-0005iC-9x
+	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 11:39:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1f9uYN-0005GS-2G
-	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 11:35:56 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f9uc5-0000ji-6F
+	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 11:39:46 -0400
 References: <20180420225320.11275-1-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0ac07a07-3c42-f37b-fb2e-48c467d73afd@redhat.com>
-Date: Sat, 21 Apr 2018 10:35:41 -0500
+	<0ac07a07-3c42-f37b-fb2e-48c467d73afd@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <3e5b9842-2031-9fc5-e1bd-d2316ccfa43b@redhat.com>
+Date: Sat, 21 Apr 2018 17:39:36 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180420225320.11275-1-mreitz@redhat.com>
+In-Reply-To: <0ac07a07-3c42-f37b-fb2e-48c467d73afd@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="LLXGbEXQTV6ldkfjzmhbUZBPIEDQxNZtb"
+	boundary="fdvCv34Dvac9WwVxvGsSpzZzygGqhZOLi"
 Subject: Re: [Qemu-devel] [PATCH] qemu-img: Check post-truncation size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,105 +24,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---LLXGbEXQTV6ldkfjzmhbUZBPIEDQxNZtb
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+--fdvCv34Dvac9WwVxvGsSpzZzygGqhZOLi
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <0ac07a07-3c42-f37b-fb2e-48c467d73afd@redhat.com>
+Message-ID: <3e5b9842-2031-9fc5-e1bd-d2316ccfa43b@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH] qemu-img: Check post-truncation size
 References: <20180420225320.11275-1-mreitz@redhat.com>
-In-Reply-To: <20180420225320.11275-1-mreitz@redhat.com>
+ <0ac07a07-3c42-f37b-fb2e-48c467d73afd@redhat.com>
+In-Reply-To: <0ac07a07-3c42-f37b-fb2e-48c467d73afd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 04/20/2018 05:53 PM, Max Reitz wrote:
-> Some block drivers (iscsi and file-posix when dealing with device files=
-)
-> do not actually support truncation, even though they provide a
-> .bdrv_truncate() method and will happily return success when providing =
+On 2018-04-21 17:35, Eric Blake wrote:
+> On 04/20/2018 05:53 PM, Max Reitz wrote:
+>> Some block drivers (iscsi and file-posix when dealing with device file=
+s)
+>> do not actually support truncation, even though they provide a
+>> .bdrv_truncate() method and will happily return success when providing=
+ a
+>> new size that does not exceed the current size.  This is because these=
+
+>> drivers expect the user to resize the image outside of qemu and then
+>> provide qemu with that information through the block_resize command
+>> (compare cb1b83e740384b4e0d950f3d7c81c02b8ce86c2e).
+>>
+>> Of course, anyone using qemu-img resize will find that behavior useles=
+s.
+>> So we should check the actual size of the image after the supposedly
+>> successful truncation took place, emit an error if nothing changed and=
+
+>> emit a warning if the target size was not met.
+>>
+>> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1523065
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>> Testing this is not quite trivial.  Or, well, it is, but you need eith=
+er
+>> an iscsi test server or root access.
+>=20
+> Or, you need NBD to document and implement NBD_CMD_RESIZE, and then the=
+
+> nbd driver will support .bdrv_truncate() but fail when talking to a
+> server that doesn't actually resize after all.
+
+I suppose the NBD client would recognize that, though, and return an
+error code (and set *errp).  The issue in this case is that the drivers
+in question pretend that everything went according to plan (they return
+success) when actually nothing was resized at all.
+
+>>
+>> Because in my opinion iotests that require root access are never run, =
+I
+>> decided against writing such a test case.
+>=20
+> So maybe when I get around to adding NBD resize support, I should add
+> such a test ;)
+>=20
+>=20
+>> +    if (new_size !=3D total_size && new_size =3D=3D current_size) {
+>> +        error_report("Image was not resized. Resizing may not be supp=
+orted "
+>> +                     "for this image.");
+>=20
+> error_report() generally does not have trailing dot, and generally has =
 a
-> new size that does not exceed the current size.  This is because these
-> drivers expect the user to resize the image outside of qemu and then
-> provide qemu with that information through the block_resize command
-> (compare cb1b83e740384b4e0d950f3d7c81c02b8ce86c2e).
+> single sentence.  Would this be better as:
 >=20
-> Of course, anyone using qemu-img resize will find that behavior useless=
-=2E
-> So we should check the actual size of the image after the supposedly
-> successful truncation took place, emit an error if nothing changed and
-> emit a warning if the target size was not met.
+> Image was not resized; resizing may not be supported for this image
+
+Yes, it would.  I just made this a qprintf() in the first version and
+forgot to change it when making it an error_report().
+
+>> +        ret =3D -1;
+>> +        goto out;
+>> +    }
+>> +
+>> +    if (new_size !=3D total_size) {
+>> +        warn_report("Image should have been resized to %" PRIi64
+>> +                    " bytes, but was resized to %" PRIi64 " bytes.",
+>> +                    total_size, new_size);
 >=20
-> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1523065
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
-> Testing this is not quite trivial.  Or, well, it is, but you need eithe=
-r
-> an iscsi test server or root access.
+> Trailing dot again.
 
-Or, you need NBD to document and implement NBD_CMD_RESIZE, and then the
-nbd driver will support .bdrv_truncate() but fail when talking to a
-server that doesn't actually resize after all.
+Same here, yes.
 
->=20
-> Because in my opinion iotests that require root access are never run, I=
+>                      Also, PRId64 is much more common than PRIi64, even=
 
-> decided against writing such a test case.
+> though the two are identical in behavior.
 
-So maybe when I get around to adding NBD resize support, I should add
-such a test ;)
+:-(
 
+But I like my %i!
 
-> +    if (new_size !=3D total_size && new_size =3D=3D current_size) {
-> +        error_report("Image was not resized. Resizing may not be suppo=
-rted "
-> +                     "for this image.");
+> But the idea makes sense to me.
 
-error_report() generally does not have trailing dot, and generally has a
-single sentence.  Would this be better as:
+OK, thanks.
 
-Image was not resized; resizing may not be supported for this image
-
-> +        ret =3D -1;
-> +        goto out;
-> +    }
-> +
-> +    if (new_size !=3D total_size) {
-> +        warn_report("Image should have been resized to %" PRIi64
-> +                    " bytes, but was resized to %" PRIi64 " bytes.",
-> +                    total_size, new_size);
-
-Trailing dot again.  Also, PRId64 is much more common than PRIi64, even
-though the two are identical in behavior.
-
-But the idea makes sense to me.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Max
 
 
---LLXGbEXQTV6ldkfjzmhbUZBPIEDQxNZtb
+--fdvCv34Dvac9WwVxvGsSpzZzygGqhZOLi
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrbWk0ACgkQp6FrSiUn
-Q2pSDwgAidOf5Wu2jz5DZZx1B2uQt9N42yq8LroSJO1L+ltiOYgJwbHpTRHCa2RH
-ttN9AjMK3czv8uA7yCLewIcmAHo9qHLOFIiox+6EmtThIqPN+Chn8i4Q2wONLswd
-f61ep+RjjYH+Q6juz+ZfHVwQITXS4/w2C5T0ET6DOuOxvfgXO4/4nPnoCjVgjL2g
-PvDP2QQ8ppgEVLY4uJEkHb/Sx8pGMaeOME6/S3wYvMPpH8fABQGn5uUKxi3D25lE
-9iQ/m/DRHNnpOCdnJpw78o0MGDX+hrd4Crdb2oJ7ptto/PD9laKCKo48tn2zcBqs
-Nfyy0k8MM/ZZBUhF0untDT29gGRT/g==
-=Ce4q
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlrbWzgACgkQ9AfbAGHV
+z0CUEgf/YUioHsS5YUTHUQHzV2Zs7Okgr6FsYMW7nlV3Qtyse5UaXEfSOh1OIzk8
+dskhcJosHsfXp0AQjMq5kpNBn4KvY+Oq9qFxwpVe8mHnLDIlDBgIn75itqw1Memx
+VKMrTLTIYsLDF1wsHY1kOqROuxSyT57j48oLn51aW0Oq74tEY+DSPy6oEAVmizOH
+sCQBTFc6C1ju2CNwEVOHwO2klshXMDZhyl0PA05iEeMbCc66ZAf+84LqtccfWJnK
+XQE9LDvWNbJNPhEUiTCw7pj4UGz4qSRuGAdW2J6tbAAG4MoW9EzHrbxHlq+eX9Sp
+3dmYoV/tpgAat+wfi7pD4wm7yeJe5w==
+=yUOq
 -----END PGP SIGNATURE-----
 
---LLXGbEXQTV6ldkfjzmhbUZBPIEDQxNZtb--
+--fdvCv34Dvac9WwVxvGsSpzZzygGqhZOLi--
