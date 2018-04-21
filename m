@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f9saW-00030J-Fl
-	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 09:30:02 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f9saa-00034Q-2E
+	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 09:30:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1f9saT-0000nO-Vf
-	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 09:30:00 -0400
+	(envelope-from <mreitz@redhat.com>) id 1f9saY-0000yY-GA
+	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 09:30:04 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Sat, 21 Apr 2018 15:29:28 +0200
-Message-Id: <20180421132929.21610-9-mreitz@redhat.com>
+Date: Sat, 21 Apr 2018 15:29:29 +0200
+Message-Id: <20180421132929.21610-10-mreitz@redhat.com>
 In-Reply-To: <20180421132929.21610-1-mreitz@redhat.com>
 References: <20180421132929.21610-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 8/9] iotests: Copy 197 for COR filter driver
+Subject: [Qemu-devel] [PATCH v2 9/9] iotests: Add test for COR across nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,27 +22,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
 
-iotest 197 tests copy-on-read using the (now old) copy-on-read flag.
-Copy it to 215 and modify it to use the COR filter driver instead.
+COR across nodes (that is, you have some filter node between the
+actually COR target and the node that performs the COR) cannot reliably
+work together with the permission system when there is no explicit COR
+node that can request the WRITE_UNCHANGED permission for its child.
+This is because COR (currently) sneaks its requests by the usual
+permission checks, so it can work without a WRITE* permission; but if
+there is a filter node in between, that will re-issue the request, which
+then passes through the usual check -- and if nobody has requested a
+WRITE_UNCHANGED permission, that check will fail.
+
+There is no real direct fix apart from hoping that there is someone who
+has requested that permission; in case of just the qemu-io HMP command
+(and no guest device), however, that is not the case.  The real real fix
+is to implement the copy-on-read flag through an implicitly added COR
+node.  Such a node can request the necessary permissions as shown in
+this test.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/215     | 120 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/215.out |  26 ++++++++++
+ tests/qemu-iotests/216     | 117 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/216.out |  28 +++++++++++
  tests/qemu-iotests/group   |   1 +
- 3 files changed, 147 insertions(+)
- create mode 100755 tests/qemu-iotests/215
- create mode 100644 tests/qemu-iotests/215.out
+ 3 files changed, 146 insertions(+)
+ create mode 100755 tests/qemu-iotests/216
+ create mode 100644 tests/qemu-iotests/216.out
 
-diff --git a/tests/qemu-iotests/215 b/tests/qemu-iotests/215
+diff --git a/tests/qemu-iotests/216 b/tests/qemu-iotests/216
 new file mode 100755
-index 0000000000..2e616ed659
+index 0000000000..b362cf93a8
 --- /dev/null
-+++ b/tests/qemu-iotests/215
-@@ -0,0 +1,120 @@
-+#!/bin/bash
++++ b/tests/qemu-iotests/216
+@@ -0,0 +1,117 @@
++#!/usr/bin/env python
 +#
-+# Test case for copy-on-read into qcow2, using the COR filter driver
++# Copy-on-read tests using a COR filter node
 +#
 +# Copyright (C) 2018 Red Hat, Inc.
 +#
@@ -59,147 +73,146 @@ index 0000000000..2e616ed659
 +# You should have received a copy of the GNU General Public License
 +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 +#
++# Creator/Owner: Max Reitz <mreitz@redhat.com>
++#
++# Non-shared storage migration test using NBD server and drive-mirror
 +
-+seq="$(basename $0)"
-+echo "QA output created by $seq"
++import iotests
++from iotests import log, qemu_img_pipe, qemu_io, filter_qemu_io
 +
-+here="$PWD"
-+status=1 # failure is the default!
++# Need backing file support
++iotests.verify_image_format(supported_fmts=['qcow2', 'qcow', 'qed', 'vmdk'])
++iotests.verify_platform(['linux'])
 +
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
++log('')
++log('=== Copy-on-read across nodes ===')
++log('')
 +
-+TEST_WRAP="$TEST_DIR/t.wrap.qcow2"
-+BLKDBG_CONF="$TEST_DIR/blkdebug.conf"
++# The old copy-on-read mechanism without a filter node cannot request
++# WRITE_UNCHANGED permissions for its child.  Therefore it just tries
++# to sneak its write by the usual permission system and holds its
++# fingers crossed.  However, that sneaking does not work so well when
++# there is a filter node in the way: That will receive the write
++# request and re-issue a new one to its child, which this time is a
++# proper write request that will make the permission system cough --
++# unless there is someone at the top (like a guest device) that has
++# requested write permissions.
++#
++# A COR filter node, however, can request the proper permissions for
++# its child and therefore is not hit by this issue.
 +
-+# Sanity check: our use of blkdebug fails if $TEST_DIR contains spaces
-+# or other problems
-+case "$TEST_DIR" in
-+    *[^-_a-zA-Z0-9/]*)
-+        _notrun "Suspicious TEST_DIR='$TEST_DIR', cowardly refusing to run" ;;
-+esac
++with iotests.FilePath('base.img') as base_img_path, \
++     iotests.FilePath('top.img') as top_img_path, \
++     iotests.VM() as vm:
 +
-+_cleanup()
-+{
-+    _cleanup_test_img
-+    rm -f "$TEST_WRAP"
-+    rm -f "$BLKDBG_CONF"
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
++    log('--- Setting up images ---')
++    log('')
 +
-+# Test is supported for any backing file; but we force qcow2 for our wrapper.
-+_supported_fmt generic
-+_supported_proto generic
-+_supported_os Linux
-+# LUKS support may be possible, but it complicates things.
-+_unsupported_fmt luks
++    qemu_img_pipe('create', '-f', iotests.imgfmt, base_img_path, '64M')
 +
-+echo
-+echo '=== Copy-on-read ==='
-+echo
++    log(filter_qemu_io(qemu_io(base_img_path, '-c', 'write -P 1 0M 1M')))
 +
-+# Prep the images
-+# VPC rounds image sizes to a specific geometry, force a specific size.
-+if [ "$IMGFMT" = "vpc" ]; then
-+    IMGOPTS=$(_optstr_add "$IMGOPTS" "force_size")
-+fi
-+_make_test_img 4G
-+$QEMU_IO -c "write -P 55 3G 1k" "$TEST_IMG" | _filter_qemu_io
-+IMGPROTO=file IMGFMT=qcow2 IMGOPTS= TEST_IMG_FILE="$TEST_WRAP" \
-+    _make_test_img -F "$IMGFMT" -b "$TEST_IMG" | _filter_img_create
-+$QEMU_IO -f qcow2 -c "write -z -u 1M 64k" "$TEST_WRAP" | _filter_qemu_io
++    qemu_img_pipe('create', '-f', iotests.imgfmt, '-b', base_img_path,
++                  top_img_path)
 +
-+# Ensure that a read of two clusters, but where one is already allocated,
-+# does not re-write the allocated cluster
-+cat > "$BLKDBG_CONF" <<EOF
-+[inject-error]
-+event = "cor_write"
-+sector = "2048"
-+EOF
-+$QEMU_IO -c "open \
-+ -o driver=copy-on-read,file.driver=blkdebug,file.config=$BLKDBG_CONF,file.image.driver=qcow2 $TEST_WRAP" \
-+ -c "read -P 0 1M 128k" | _filter_qemu_io
++    log(filter_qemu_io(qemu_io(top_img_path,  '-c', 'write -P 2 1M 1M')))
 +
-+# Read the areas we want copied. A zero-length read should still be a
-+# no-op.  The next read is under 2G, but aligned so that rounding to
-+# clusters copies more than 2G of zeroes. The final read will pick up
-+# the non-zero data in the same cluster.  Since a 2G read may exhaust
-+# memory on some machines (particularly 32-bit), we skip the test if
-+# that fails due to memory pressure.
-+$QEMU_IO \
-+    -c "open -o driver=copy-on-read,file.driver=qcow2 $TEST_WRAP" \
-+    -c "read 0 0" \
-+    | _filter_qemu_io
-+output=$($QEMU_IO \
-+         -c "open -o driver=copy-on-read,file.driver=qcow2 $TEST_WRAP" \
-+         -c "read -P 0 1k $((2*1024*1024*1024 - 512))" \
-+         2>&1 | _filter_qemu_io)
-+case $output in
-+    *allocate*)
-+        _notrun "Insufficent memory to run test" ;;
-+    *) printf '%s\n' "$output" ;;
-+esac
-+$QEMU_IO \
-+    -c "open -o driver=copy-on-read,file.driver=qcow2 $TEST_WRAP" \
-+    -c "read -P 0 $((3*1024*1024*1024 + 1024)) 1k" \
-+    | _filter_qemu_io
++    log('')
++    log('--- Doing COR ---')
++    log('')
 +
-+# Copy-on-read is incompatible with read-only
-+$QEMU_IO \
-+    -c "open -r -o driver=copy-on-read,file.driver=qcow2 $TEST_WRAP" \
-+    2>&1 | _filter_testdir
++    # Compare with e.g. the following:
++    #   vm.add_drive_raw('if=none,node-name=node0,copy-on-read=on,driver=raw,' \
++    #                    'file.driver=%s,file.file.filename=%s' %
++    #                       (iotests.imgfmt, top_img_path))
++    # (Remove the blockdev-add instead.)
++    # ((Not tested here because it hits an assertion in the permission
++    #   system.))
 +
-+# Break the backing chain, and show that images are identical, and that
-+# we properly copied over explicit zeros.
-+$QEMU_IMG rebase -u -b "" -f qcow2 "$TEST_WRAP"
-+$QEMU_IO -f qcow2 -c map "$TEST_WRAP"
-+_check_test_img
-+$QEMU_IMG compare -f $IMGFMT -F qcow2 "$TEST_IMG" "$TEST_WRAP"
++    vm.launch()
 +
-+# success, all done
-+echo '*** done'
-+status=0
-diff --git a/tests/qemu-iotests/215.out b/tests/qemu-iotests/215.out
++    log(vm.qmp('blockdev-add',
++                    node_name='node0',
++                    driver='copy-on-read',
++                    file={
++                        'driver': 'raw',
++                        'file': {
++                            'driver': 'copy-on-read',
++                            'file': {
++                                'driver': 'raw',
++                                'file': {
++                                    'driver': iotests.imgfmt,
++                                    'file': {
++                                        'driver': 'file',
++                                        'filename': top_img_path
++                                    },
++                                    'backing': {
++                                        'driver': iotests.imgfmt,
++                                        'file': {
++                                            'driver': 'file',
++                                            'filename': base_img_path
++                                        }
++                                    }
++                                }
++                            }
++                        }
++                    }))
++
++    # Trigger COR
++    log(vm.qmp('human-monitor-command',
++               command_line='qemu-io node0 "read 0 64M"'))
++
++    vm.shutdown()
++
++    log('')
++    log('--- Checking COR result ---')
++    log('')
++
++    log(filter_qemu_io(qemu_io(base_img_path, '-c', 'discard 0 64M')))
++    log(filter_qemu_io(qemu_io(top_img_path,  '-c', 'read -P 1 0M 1M')))
++    log(filter_qemu_io(qemu_io(top_img_path,  '-c', 'read -P 2 1M 1M')))
+diff --git a/tests/qemu-iotests/216.out b/tests/qemu-iotests/216.out
 new file mode 100644
-index 0000000000..70b0f5fb19
+index 0000000000..d3fc590d29
 --- /dev/null
-+++ b/tests/qemu-iotests/215.out
-@@ -0,0 +1,26 @@
-+QA output created by 215
++++ b/tests/qemu-iotests/216.out
+@@ -0,0 +1,28 @@
 +
-+=== Copy-on-read ===
++=== Copy-on-read across nodes ===
 +
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=4294967296
-+wrote 1024/1024 bytes at offset 3221225472
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Formatting 'TEST_DIR/t.wrap.IMGFMT', fmt=IMGFMT size=4294967296 backing_file=TEST_DIR/t.IMGFMT backing_fmt=IMGFMT
-+wrote 65536/65536 bytes at offset 1048576
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 131072/131072 bytes at offset 1048576
-+128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 0/0 bytes at offset 0
-+0 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 2147483136/2147483136 bytes at offset 1024
-+2 GiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 1024/1024 bytes at offset 3221226496
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+can't open device TEST_DIR/t.wrap.qcow2: Block node is read-only
-+2 GiB (0x80010000) bytes     allocated at offset 0 bytes (0x0)
-+1023.938 MiB (0x3fff0000) bytes not allocated at offset 2 GiB (0x80010000)
-+64 KiB (0x10000) bytes     allocated at offset 3 GiB (0xc0000000)
-+1023.938 MiB (0x3fff0000) bytes not allocated at offset 3 GiB (0xc0010000)
-+No errors were found on the image.
-+Images are identical.
-+*** done
++--- Setting up images ---
++
++wrote 1048576/1048576 bytes at offset 0
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++wrote 1048576/1048576 bytes at offset 1048576
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++
++--- Doing COR ---
++
++{u'return': {}}
++{u'return': u''}
++
++--- Checking COR result ---
++
++discard 67108864/67108864 bytes at offset 0
++64 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++read 1048576/1048576 bytes at offset 0
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++read 1048576/1048576 bytes at offset 1048576
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
 diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 3e2dcdfa33..f1179ffde7 100644
+index f1179ffde7..2edc377370 100644
 --- a/tests/qemu-iotests/group
 +++ b/tests/qemu-iotests/group
-@@ -213,3 +213,4 @@
- 212 rw auto quick
+@@ -214,3 +214,4 @@
  213 rw auto quick
  214 rw auto
-+215 rw auto quick
+ 215 rw auto quick
++216 rw auto quick
 -- 
 2.14.3
