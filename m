@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fA6aW-0008FA-E7
-	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 00:26:57 -0400
+	(envelope-from <bounces@canonical.com>) id 1fA6eu-0001dL-Bj
+	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 00:31:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fA6aS-0003B9-5Y
-	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 00:26:56 -0400
-Date: Sun, 22 Apr 2018 14:26:15 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180422042615.GY2434@umbus.fritz.box>
-References: <20180420123456.22196-1-david@redhat.com>
-	<20180420123456.22196-2-david@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1fA6ep-0007Ge-ET
+	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 00:31:28 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38128)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fA6ep-0007F8-8F
+	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 00:31:23 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fA6en-00009g-Si
+	for <qemu-devel@nongnu.org>; Sun, 22 Apr 2018 04:31:21 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D3BB62E80CD
+	for <qemu-devel@nongnu.org>; Sun, 22 Apr 2018 04:31:21 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="SBKwXYz1xY/kcGv0"
-Content-Disposition: inline
-In-Reply-To: <20180420123456.22196-2-david@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] pc-dimm: factor out MemoryDevice
- interface
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 22 Apr 2018 04:17:26 -0000
+From: Launchpad Bug Tracker <1187529@bugs.launchpad.net>
+Reply-To: Bug 1187529 <1187529@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130604183209.6036.79098.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152437064621.27054.12496737648880786346.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1187529] Re: Devices on PCI bridge stop working
+ when live-migrated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,97 +37,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>
+To: qemu-devel@nongnu.org
 
+[Expired for QEMU because there has been no activity for 60 days.]
 
---SBKwXYz1xY/kcGv0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-On Fri, Apr 20, 2018 at 02:34:54PM +0200, David Hildenbrand wrote:
-> On the qmp level, we already have the concept of memory devices:
->     "query-memory-devices"
-> Right now, we only support NVDIMM and PCDIMM.
->=20
-> We want to map other devices later into the address space of the guest.
-> Such device could e.g. be virtio devices. These devices will have a
-> guest memory range assigned but won't be exposed via e.g. ACPI. We want
-> to make them look like memory device, but not glued to pc-dimm.
->=20
-> Especially, it will not always be possible to have TYPE_PC_DIMM as a pare=
-nt
-> class (e.g. virtio devices). Let's use an interface instead. As a first
-> part, convert handling of
-> - qmp_pc_dimm_device_list
-> - get_plugged_memory_size
-> to our new model. plug/unplug stuff etc. will follow later.
->=20
-> A memory device will have to provide the following functions:
-> - get_addr(): Necessary, as the property "addr" can e.g. not be used for
->               virtio devices (already defined).
-> - get_plugged_size(): The amount this device offers to the guest as of
->                       now.
-> - get_region_size(): Because this can later on be bigger than the
->                      plugged size.
-> - fill_device_info(): Fill MemoryDeviceInfo, e.g. for qmp.
->=20
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+-- =
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1187529
 
-with the exception of some tiny nits..
+Title:
+  Devices on PCI bridge stop working when live-migrated
 
-[snip]
-> +static gint memory_device_addr_sort(gconstpointer a, gconstpointer b)
-> +{
-> +    MemoryDeviceState *md_a =3D MEMORY_DEVICE(a);
-> +    MemoryDeviceState *md_b =3D MEMORY_DEVICE(b);
+Status in QEMU:
+  Expired
 
-These probably should be const MemoryDeviceState *.
+Bug description:
+  qemu version: 1.4.50 (0ca5aa4f4c4a8bcc73988dd52a536241d35e5223)
+  host: x86_64, Linux 3.6.10 (Fedora 17)
+  client: x86_64 Centos 6.3 (doesn't matter, really)
 
-> +    MemoryDeviceClass *mdc_a =3D MEMORY_DEVICE_GET_CLASS(a);
-> +    MemoryDeviceClass *mdc_b =3D MEMORY_DEVICE_GET_CLASS(b);
-> +    const uint64_t addr_a =3D mdc_a->get_addr(md_a);
-> +    const uint64_t addr_b =3D mdc_b->get_addr(md_b);
-> +
-> +    if (addr_a > addr_b) {
-> +        return 1;
-> +    } else if (addr_a < addr_b) {
-> +        return -1;
-> +    }
-> +    return 0;
-> +}
-> +
-> +static int memory_device_built_list(Object *obj, void *opaque)
+  If a device, e.g. an lsi53c895a, is on a pci-bridge, after migration, the=
+ device stops working (e.g., commands like "poweroff"
+  get an Input/Output error. Fails under either xen or kvm. If "top" was ru=
+nning, some cpus go to ~100% wait.
 
-s/built/build/ will read a bit more clearly I think.
+  Sample KVM invocation line:
+  qemu-system-x86_64 -machine type=3Dpc,accel=3Dkvm -m 4096 -device pci-bri=
+dgemsi=3Don,chassis_nr=3D1,id=3DpciBridge1.0,addr=3D0x11.0 -device lsi53c89=
+5a,id=3Dsas,bus=3DpciBridge1.0,addr=3D0x1.0x0 -drive if=3Dnone,id=3Ddisk0,f=
+ile=3D/path/to/disk/image -device scsi-disk,bus=3Dsas.0,scsi-id=3D0,drive=
+=3Ddisk0 -vnc 127.0.0.1:0,to=3D99 -serial pty -boot order=3Dcda -smp 4,maxc=
+pus=3D4 -monitor vc
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---SBKwXYz1xY/kcGv0
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrcDucACgkQbDjKyiDZ
-s5Jbkw//cw0n13vlEcH0FlYdiBmkaincPzcKWECvQq45NhuNNSQHAnc13oe1dZsE
-qMg91mP/Z2sCHcdT4y7cQpu1I92ExY+gm+Z9eu04GrA0u1ftFEATjVdMlavJzZxt
-v4Nj9BscS+0OShygVQzF8pSeNJPK1d5zRhBmV4JB1+OfmUZA/XIH3AUgIUS/X4Dw
-yHqCxi37L3akCtTeweVY1M+yJQjzkj2u3aWGnDHCPoevwM76nmPNW/GU1dCywSEK
-th0XeeM/qATxdJFyvZQRwORPuTeD9I34Dw1ozHxxUzDVNszDTCzgd0ml4Ah6a5kt
-l6kHGPn57Yql2f+6J7Jh6ydHaZKcSL6vTG67ybabFZ4Pu6II8xq7iWUVrYPzE2i1
-I4xD460H9ADJQ3xuhMboMkKhrsW+KlNYeYYf8FuZT0BqC27JeJ5IEr26qF7Srl1S
-hJeHJRN0/2hXffzvQNCWXKRpRA0hrJNQ0vEAs+xZ/QzsYrTd/wPiDAl6XJ589sNG
-/10aCEAEZ9cBuF1HIYdg47YgRL7AarVCZRemUYRKOaK794wzkB4IgV9qYNXy+cfx
-FnN8w9FbDbcgs2RgwnNDDaczYrEFDiBM0lCCexH5u8SxIRHGtY1zUH7usEERPiCv
-xjXbTZ/nZ5zP3eEVbctxIPbS/rx5ZtY+Wls8MxBBrWDsdlnucz8=
-=lv1N
------END PGP SIGNATURE-----
-
---SBKwXYz1xY/kcGv0--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1187529/+subscriptions
