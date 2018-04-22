@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fA1oz-0002g8-RX
-	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 19:21:34 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fA6aW-0008FA-E7
+	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 00:26:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fA1ow-00007Z-Nx
-	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 19:21:33 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:35331)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fA1ow-00007O-Ix
-	for qemu-devel@nongnu.org; Sat, 21 Apr 2018 19:21:30 -0400
-Received: by mail-qk0-x242.google.com with SMTP id b131so8105739qkg.2
-	for <qemu-devel@nongnu.org>; Sat, 21 Apr 2018 16:21:30 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sat, 21 Apr 2018 20:21:20 -0300
-Message-Id: <20180421232120.22208-1-f4bug@amsat.org>
+	(envelope-from <dgibson@ozlabs.org>) id 1fA6aS-0003B9-5Y
+	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 00:26:56 -0400
+Date: Sun, 22 Apr 2018 14:26:15 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180422042615.GY2434@umbus.fritz.box>
+References: <20180420123456.22196-1-david@redhat.com>
+	<20180420123456.22196-2-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] elf-loader: Avoid calling qsort(NULL, 0,
- ...) call
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="SBKwXYz1xY/kcGv0"
+Content-Disposition: inline
+In-Reply-To: <20180420123456.22196-2-david@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] pc-dimm: factor out MemoryDevice
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,91 +25,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>
 
-This fixes the following ASan warning:
 
-  $ qemu-system-xtensa -M kc705 -m 128M -semihosting -nographic -monitor null -kernel Image.elf
-  include/hw/elf_ops.h:179:5: runtime error: null pointer passed as argument 1, which is declared to never be null
+--SBKwXYz1xY/kcGv0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Reported-by: AddressSanitizer
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- include/hw/elf_ops.h | 39 ++++++++++++++++++++++-----------------
- 1 file changed, 22 insertions(+), 17 deletions(-)
+On Fri, Apr 20, 2018 at 02:34:54PM +0200, David Hildenbrand wrote:
+> On the qmp level, we already have the concept of memory devices:
+>     "query-memory-devices"
+> Right now, we only support NVDIMM and PCDIMM.
+>=20
+> We want to map other devices later into the address space of the guest.
+> Such device could e.g. be virtio devices. These devices will have a
+> guest memory range assigned but won't be exposed via e.g. ACPI. We want
+> to make them look like memory device, but not glued to pc-dimm.
+>=20
+> Especially, it will not always be possible to have TYPE_PC_DIMM as a pare=
+nt
+> class (e.g. virtio devices). Let's use an interface instead. As a first
+> part, convert handling of
+> - qmp_pc_dimm_device_list
+> - get_plugged_memory_size
+> to our new model. plug/unplug stuff etc. will follow later.
+>=20
+> A memory device will have to provide the following functions:
+> - get_addr(): Necessary, as the property "addr" can e.g. not be used for
+>               virtio devices (already defined).
+> - get_plugged_size(): The amount this device offers to the guest as of
+>                       now.
+> - get_region_size(): Because this can later on be bigger than the
+>                      plugged size.
+> - fill_device_info(): Fill MemoryDeviceInfo, e.g. for qmp.
+>=20
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
-index b6e19e35d0..f0ac7c6c4e 100644
---- a/include/hw/elf_ops.h
-+++ b/include/hw/elf_ops.h
-@@ -110,7 +110,7 @@ static int glue(load_symbols, SZ)(struct elfhdr *ehdr, int fd, int must_swab,
-     struct elf_shdr *symtab, *strtab, *shdr_table = NULL;
-     struct elf_sym *syms = NULL;
-     struct syminfo *s;
--    int nsyms, i;
-+    int nsyms, i, ret = -1;
-     char *str = NULL;
- 
-     shdr_table = load_at(fd, ehdr->e_shoff,
-@@ -143,6 +143,7 @@ static int glue(load_symbols, SZ)(struct elfhdr *ehdr, int fd, int must_swab,
-     if (!str) {
-         goto fail;
-     }
-+    ret = 0;
- 
-     i = 0;
-     while (i < nsyms) {
-@@ -170,30 +171,34 @@ static int glue(load_symbols, SZ)(struct elfhdr *ehdr, int fd, int must_swab,
-         }
-         i++;
-     }
--    syms = g_realloc(syms, nsyms * sizeof(*syms));
-+    if (nsyms) {
-+        syms = g_realloc(syms, nsyms * sizeof(*syms));
- 
--    qsort(syms, nsyms, sizeof(*syms), glue(symcmp, SZ));
--    for (i = 0; i < nsyms - 1; i++) {
--        if (syms[i].st_size == 0) {
--            syms[i].st_size = syms[i + 1].st_value - syms[i].st_value;
-+        qsort(syms, nsyms, sizeof(*syms), glue(symcmp, SZ));
-+        for (i = 0; i < nsyms - 1; i++) {
-+            if (syms[i].st_size == 0) {
-+                syms[i].st_size = syms[i + 1].st_value - syms[i].st_value;
-+            }
-         }
-+
-+        /* Commit */
-+        s = g_malloc0(sizeof(*s));
-+        s->lookup_symbol = glue(lookup_symbol, SZ);
-+        glue(s->disas_symtab.elf, SZ) = syms;
-+        s->disas_num_syms = nsyms;
-+        s->disas_strtab = str;
-+        s->next = syminfos;
-+        syminfos = s;
-+
-+        goto out;
-     }
- 
--    /* Commit */
--    s = g_malloc0(sizeof(*s));
--    s->lookup_symbol = glue(lookup_symbol, SZ);
--    glue(s->disas_symtab.elf, SZ) = syms;
--    s->disas_num_syms = nsyms;
--    s->disas_strtab = str;
--    s->next = syminfos;
--    syminfos = s;
--    g_free(shdr_table);
--    return 0;
-  fail:
-     g_free(syms);
-     g_free(str);
-+ out:
-     g_free(shdr_table);
--    return -1;
-+    return ret;
- }
- 
- static int glue(elf_reloc, SZ)(struct elfhdr *ehdr, int fd, int must_swab,
--- 
-2.17.0
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
+with the exception of some tiny nits..
+
+[snip]
+> +static gint memory_device_addr_sort(gconstpointer a, gconstpointer b)
+> +{
+> +    MemoryDeviceState *md_a =3D MEMORY_DEVICE(a);
+> +    MemoryDeviceState *md_b =3D MEMORY_DEVICE(b);
+
+These probably should be const MemoryDeviceState *.
+
+> +    MemoryDeviceClass *mdc_a =3D MEMORY_DEVICE_GET_CLASS(a);
+> +    MemoryDeviceClass *mdc_b =3D MEMORY_DEVICE_GET_CLASS(b);
+> +    const uint64_t addr_a =3D mdc_a->get_addr(md_a);
+> +    const uint64_t addr_b =3D mdc_b->get_addr(md_b);
+> +
+> +    if (addr_a > addr_b) {
+> +        return 1;
+> +    } else if (addr_a < addr_b) {
+> +        return -1;
+> +    }
+> +    return 0;
+> +}
+> +
+> +static int memory_device_built_list(Object *obj, void *opaque)
+
+s/built/build/ will read a bit more clearly I think.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--SBKwXYz1xY/kcGv0
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrcDucACgkQbDjKyiDZ
+s5Jbkw//cw0n13vlEcH0FlYdiBmkaincPzcKWECvQq45NhuNNSQHAnc13oe1dZsE
+qMg91mP/Z2sCHcdT4y7cQpu1I92ExY+gm+Z9eu04GrA0u1ftFEATjVdMlavJzZxt
+v4Nj9BscS+0OShygVQzF8pSeNJPK1d5zRhBmV4JB1+OfmUZA/XIH3AUgIUS/X4Dw
+yHqCxi37L3akCtTeweVY1M+yJQjzkj2u3aWGnDHCPoevwM76nmPNW/GU1dCywSEK
+th0XeeM/qATxdJFyvZQRwORPuTeD9I34Dw1ozHxxUzDVNszDTCzgd0ml4Ah6a5kt
+l6kHGPn57Yql2f+6J7Jh6ydHaZKcSL6vTG67ybabFZ4Pu6II8xq7iWUVrYPzE2i1
+I4xD460H9ADJQ3xuhMboMkKhrsW+KlNYeYYf8FuZT0BqC27JeJ5IEr26qF7Srl1S
+hJeHJRN0/2hXffzvQNCWXKRpRA0hrJNQ0vEAs+xZ/QzsYrTd/wPiDAl6XJ589sNG
+/10aCEAEZ9cBuF1HIYdg47YgRL7AarVCZRemUYRKOaK794wzkB4IgV9qYNXy+cfx
+FnN8w9FbDbcgs2RgwnNDDaczYrEFDiBM0lCCexH5u8SxIRHGtY1zUH7usEERPiCv
+xjXbTZ/nZ5zP3eEVbctxIPbS/rx5ZtY+Wls8MxBBrWDsdlnucz8=
+=lv1N
+-----END PGP SIGNATURE-----
+
+--SBKwXYz1xY/kcGv0--
