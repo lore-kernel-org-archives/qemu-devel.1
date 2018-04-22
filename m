@@ -1,43 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fAH7U-0003xB-V3
-	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 11:41:42 -0400
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fAH9e-0005kK-RZ
+	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 11:43:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fAH7R-0000cj-10
-	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 11:41:40 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54080
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fAH9a-0002iR-VW
+	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 11:43:54 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45874)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <akrowiak@linux.vnet.ibm.com>)
-	id 1fAH7Q-0000cB-RW
-	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 11:41:36 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	id 1fAH9a-0002i7-NV
+	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 11:43:50 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w3MFcWxc007711
-	for <qemu-devel@nongnu.org>; Sun, 22 Apr 2018 11:41:36 -0400
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2hgk2dqkhp-1
+	w3MFfR63090387
+	for <qemu-devel@nongnu.org>; Sun, 22 Apr 2018 11:43:49 -0400
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2hgk2nynwc-1
 	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sun, 22 Apr 2018 11:41:35 -0400
+	for <qemu-devel@nongnu.org>; Sun, 22 Apr 2018 11:43:49 -0400
 Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <akrowiak@linux.vnet.ibm.com>;
-	Sun, 22 Apr 2018 11:41:35 -0400
+	Sun, 22 Apr 2018 11:43:48 -0400
 References: <1523819244-29954-1-git-send-email-akrowiak@linux.vnet.ibm.com>
 	<1523819244-29954-4-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<1808b8f3-9cff-c849-d012-b23f29d1c11f@redhat.com>
-	<354ba31f-7502-b873-e254-fe3dbfc07b54@de.ibm.com>
-	<20180418094029.14b64108.cohuck@redhat.com>
-	<9a0e71af-24cf-9674-e634-fdb3bf180d95@redhat.com>
+	<819cba2d-32d7-6a5c-978f-1c6aa04872fa@linux.vnet.ibm.com>
 From: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-Date: Sun, 22 Apr 2018 11:41:27 -0400
+Date: Sun, 22 Apr 2018 11:43:40 -0400
 MIME-Version: 1.0
-In-Reply-To: <9a0e71af-24cf-9674-e634-fdb3bf180d95@redhat.com>
+In-Reply-To: <819cba2d-32d7-6a5c-978f-1c6aa04872fa@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Message-Id: <2392354e-3843-498d-cec0-c812d45290b2@linux.vnet.ibm.com>
+Message-Id: <bf3ac9e4-1f53-0372-450d-1a84f780d25e@linux.vnet.ibm.com>
 Subject: Re: [Qemu-devel] [PATCH v4 3/5] s390x/cpumodel: Set up CPU model
  for AP device support
 List-Id: <qemu-devel.nongnu.org>
@@ -48,49 +44,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
+To: Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: mjrosato@linux.vnet.ibm.com, peter.maydell@linaro.org, alifm@linux.vnet.ibm.com, eskultet@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, cohuck@redhat.com, heiko.carstens@de.ibm.com, alex.williamson@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, jjherne@linux.vnet.ibm.com, schwidefsky@de.ibm.com, pbonzini@redhat.com, bjsdjshi@linux.vnet.ibm.com, eric.auger@redhat.com, rth@twiddle.net
 
-On 04/18/2018 04:59 AM, David Hildenbrand wrote:
-> On 18.04.2018 09:40, Cornelia Huck wrote:
->> On Tue, 17 Apr 2018 20:21:31 +0200
->> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+On 04/18/2018 06:55 AM, Halil Pasic wrote:
+>
+>
+> On 04/15/2018 09:07 PM, Tony Krowiak wrote:
+>> A new CPU model feature and two new CPU model facilities are
+>> introduced to support AP devices for a KVM guest.
+> [..]
+>> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
+>> index 3b9e274..5ee3a2d 100644
+>> --- a/target/s390x/cpu_features.c
+>> +++ b/target/s390x/cpu_features.c
+>> @@ -40,8 +40,10 @@ static const S390FeatDef s390_features[] = {
+>>       FEAT_INIT("srs", S390_FEAT_TYPE_STFL, 9, "Sense-running-status 
+>> facility"),
+>>       FEAT_INIT("csske", S390_FEAT_TYPE_STFL, 10, "Conditional-SSKE 
+>> facility"),
+>>       FEAT_INIT("ctop", S390_FEAT_TYPE_STFL, 11, 
+>> "Configuration-topology facility"),
+>> +    FEAT_INIT("apqci", S390_FEAT_TYPE_STFL, 12, "Query AP 
+>> Configuration facility"),
+>
+> Why did you change this form qci to apqci. Too may people found the
+> qci good?
+>
+>>       FEAT_INIT("ipter", S390_FEAT_TYPE_STFL, 13, "IPTE-range 
+>> facility"),
+>>       FEAT_INIT("nonqks", S390_FEAT_TYPE_STFL, 14, "Nonquiescing 
+>> key-setting facility"),
+>> +    FEAT_INIT("apft", S390_FEAT_TYPE_STFL, 15, "Adjunct Processor 
+>> Facilities Test facility"),
+>>       FEAT_INIT("etf2", S390_FEAT_TYPE_STFL, 16, 
+>> "Extended-translation facility 2"),
+>>       FEAT_INIT("msa-base", S390_FEAT_TYPE_STFL, 17, 
+>> "Message-security-assist facility (excluding subfunctions)"),
+>>       FEAT_INIT("ldisp", S390_FEAT_TYPE_STFL, 18, "Long-displacement 
+>> facility"),
+>> @@ -129,6 +131,7 @@ static const S390FeatDef s390_features[] = {
 >>
->>> On 04/16/2018 05:44 PM, David Hildenbrand wrote:
->>>>    
->>>>>   
->>>>> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
->>>>> index 0cdbc15..0d5b0f7 100644
->>>>> --- a/target/s390x/gen-features.c
->>>>> +++ b/target/s390x/gen-features.c
->>>>> @@ -447,6 +447,9 @@ static uint16_t full_GEN12_GA1[] = {
->>>>>       S390_FEAT_ADAPTER_INT_SUPPRESSION,
->>>>>       S390_FEAT_EDAT_2,
->>>>>       S390_FEAT_SIDE_EFFECT_ACCESS_ESOP2,
->>>>> +    S390_FEAT_AP_QUERY_CONFIG_INFO,
->>>>> +    S390_FEAT_AP_FACILITIES_TEST,
->>>>> +    S390_FEAT_AP,
->>>>>   };
->>>>>     
->>>> Now I have to ask a very stupid question:
->>>>
->>>> I heard that the execution controls in the SIE block for AP are one of
->>>> the oldest ones we have around. How can it be that the AP feature cannot
->>>> be used before zEC12?
->>> It was a suggestion from the crypto team due to testability. Nobody has a z196
->>> with the older cards.
->>>
->> Might be worth adding a note to that respect?
->>
-> We used to have the CPU model stick as close as possible to the real CPU
-> models.
+>>       FEAT_INIT_MISC("dateh2", "DAT-enhancement facility 2"),
+>>       FEAT_INIT_MISC("cmm", "Collaborative-memory-management facility"),
+>> +    FEAT_INIT_MISC("ap", "AP facilities installed"),
 >
-> Support statements should cover in specific products what is expected to
-> work and what not.
->
-> So is there any real (!support statement / !testability) reason to not
-> allow this feature on older CPU models that also had support for it?
+> Why plural ('facilities')? Would not s/facilities/instructions be more 
+> end-user
+> friendly?
 
-I'll discuss it with the team and get back to you.
+It's a matter of opinion. I prefer facilities because AP is comprised of 
+not only
+instructions, but also AP processors.
 
 >
+>
+> Regards,
+> Halil
