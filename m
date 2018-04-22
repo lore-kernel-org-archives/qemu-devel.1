@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fAAKr-0007rl-HF
-	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 04:27:02 -0400
+	(envelope-from <simon@ruderich.org>) id 1fAB9W-0006eT-0L
+	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 05:19:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fAAKm-0003D8-HI
-	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 04:27:01 -0400
-References: <20180420123456.22196-1-david@redhat.com>
-	<20180420123456.22196-2-david@redhat.com>
-	<1768047882.21650876.1524373778096.JavaMail.zimbra@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <9588e61b-e9d0-c320-d6f8-790b245a1dc8@redhat.com>
-Date: Sun, 22 Apr 2018 10:26:44 +0200
-MIME-Version: 1.0
-In-Reply-To: <1768047882.21650876.1524373778096.JavaMail.zimbra@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] pc-dimm: factor out MemoryDevice
- interface
+	(envelope-from <simon@ruderich.org>) id 1fAB9S-0002DY-3e
+	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 05:19:21 -0400
+Received: from zucker2.schokokeks.org ([178.63.68.90]:33177)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <simon@ruderich.org>) id 1fAB9R-0002BO-Tg
+	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 05:19:18 -0400
+Date: Sun, 22 Apr 2018 11:19:14 +0200
+From: Simon Ruderich <simon@ruderich.org>
+Message-ID: <20180422091914.GA29670@ruderich.org>
+References: <20180412124834.GA2025@ruderich.org>
+	<68c390f22ae2afc6539cd7b127063e3d9534d50b.1523537181.git.simon@ruderich.org>
+	<24508722-fcc7-f795-061c-638c9aa1a0ce@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <24508722-fcc7-f795-061c-638c9aa1a0ce@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/5] cpus: correct coding style in
+ qmp_memsave/qmp_pmemsave
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,33 +30,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org
 
->> +typedef struct MemoryDeviceClass {
->> +    InterfaceClass parent_class;
->> +
->> +    uint64_t (*get_addr)(MemoryDeviceState *md);
->> +    uint64_t (*get_plugged_size)(MemoryDeviceState *md, Error **errp)=
-;
->> +    uint64_t (*get_region_size)(MemoryDeviceState *md, Error **errp);
->=20
-> Just not sure if we need second argument 'Error **errp'? Or all functio=
-ns
-> declarations should have this?=20
+On Tue, Apr 17, 2018 at 03:56:58PM -0500, Eric Blake wrote:
+> On 04/12/2018 07:50 AM, Simon Ruderich wrote:
+>> Signed-off-by: Simon Ruderich <simon@ruderich.org>
+>> ---
+>>  cpus.c | 6 ++++--
+>>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>
+> However, as a meta-comment, this message was sent with:
+>
+>> Message-Id: <68c390f22ae2afc6539cd7b127063e3d9534d50b.1523537181.git.simon@ruderich.org>
+>> In-Reply-To: <20180412124834.GA2025@ruderich.org>
+>> References: <20180412124834.GA2025@ruderich.org>
+>
+> Looking on patchew, I see:
+> http://patchew.org/QEMU/20180412124834.GA2025@ruderich.org/
+> The requested URL /QEMU/20180412124834.GA2025@ruderich.org/ was not
+> found on this server.
+>
+> For most messages, looking up the In-Reply-To: message-id gives the
+> cover letter (for example,
+> http://patchew.org/QEMU/20180412115838.10208-1-alex.bennee@linaro.org/)
+>
+> Similarly, looking on the list archives, I don't see the 0/5 cover
+> letter, but rather that your messages are treated as threaded to your v1
+> thread:
+>
+> https://lists.gnu.org/archive/html/qemu-devel/2018-04/threads.html#01388
+>
+> For the sake of tooling, it's best to send a v2 series with a new cover
+> letter as a new top-level thread.
 
-We need them right now due to the existing implementation of PCDIMM. I
-don't think we will ever hit such a case (not if anything else is
-seriously wrong). If nobody has a problem with it, I'll drop these two
-parameters and directly use &error_abort internally (PCDIMM).
+Yeah, I screwed that part up. Sorry for the extra work. Will fix
+when I resend the series.
 
-Adding Error **errp to functions where we don't expect to be errors
-doesn't feel right.
-
-Thanks for pointing this out!
-
---=20
-
-Thanks,
-
-David / dhildenb
+Regards
+Simon
+-- 
++ privacy is necessary
++ using gnupg http://gnupg.org
++ public key id: 0x92FEFDB7E44C32F9
