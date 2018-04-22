@@ -1,38 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1fAHR3-0005vC-Fq
-	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 12:01:54 -0400
+	(envelope-from <pasic@linux.ibm.com>) id 1fAHSy-00076G-Fn
+	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 12:03:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1fAHR0-00067N-CD
-	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 12:01:53 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46554)
+	(envelope-from <pasic@linux.ibm.com>) id 1fAHSv-0007Sm-A8
+	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 12:03:52 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39376
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fAHR0-00065K-4g
-	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 12:01:50 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w3MG13Qw118661
-	for <qemu-devel@nongnu.org>; Sun, 22 Apr 2018 12:01:47 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2hgk2cr2y5-1
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fAHSv-0007SP-3U
+	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 12:03:49 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w3MFsvWX038798
+	for <qemu-devel@nongnu.org>; Sun, 22 Apr 2018 12:03:48 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2hgk2886e5-1
 	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sun, 22 Apr 2018 12:01:47 -0400
+	for <qemu-devel@nongnu.org>; Sun, 22 Apr 2018 12:03:47 -0400
 Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Sun, 22 Apr 2018 17:01:44 +0100
+	Sun, 22 Apr 2018 17:03:46 +0100
 References: <1523819244-29954-1-git-send-email-akrowiak@linux.vnet.ibm.com>
 	<1523819244-29954-4-git-send-email-akrowiak@linux.vnet.ibm.com>
 	<819cba2d-32d7-6a5c-978f-1c6aa04872fa@linux.vnet.ibm.com>
-	<bf3ac9e4-1f53-0372-450d-1a84f780d25e@linux.vnet.ibm.com>
+	<6436e788-ccc7-d292-6807-6dfa3d1bc49f@linux.vnet.ibm.com>
 From: Halil Pasic <pasic@linux.ibm.com>
-Date: Sun, 22 Apr 2018 18:01:39 +0200
+Date: Sun, 22 Apr 2018 18:03:39 +0200
 MIME-Version: 1.0
-In-Reply-To: <bf3ac9e4-1f53-0372-450d-1a84f780d25e@linux.vnet.ibm.com>
+In-Reply-To: <6436e788-ccc7-d292-6807-6dfa3d1bc49f@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Message-Id: <204d8b6e-0068-d8de-ebe6-2598d136997d@linux.ibm.com>
+Message-Id: <53ccfcdb-0e4b-cc79-8ba8-d115fe7675ad@linux.ibm.com>
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH v4 3/5] s390x/cpumodel: Set up CPU model
  for AP device support
@@ -49,33 +50,21 @@ Cc: mjrosato@linux.vnet.ibm.com, peter.maydell@linaro.org, alifm@linux.vnet.ibm.
 
 
 
-On 04/22/2018 05:43 PM, Tony Krowiak wrote:
->>> +=C2=A0=C2=A0=C2=A0=C2=A0FEAT_INIT_MISC("ap",=C2=A0"AP=C2=A0facilitie=
-s=C2=A0installed"),
+On 04/22/2018 05:52 PM, Tony Krowiak wrote:
+>>> +=C2=A0=C2=A0=C2=A0 FEAT_INIT("apqci", S390_FEAT_TYPE_STFL, 12, "Quer=
+y AP Configuration=C2=A0facility"),
 >>
->> Why plural ('facilities')? Would not s/facilities/instructions be more=
- end-user
->> friendly?
+>> Why=C2=A0did=C2=A0you=C2=A0change=C2=A0this=C2=A0form=C2=A0qci=C2=A0to=
+=C2=A0apqci.=C2=A0Too=C2=A0may=C2=A0people=C2=A0found=C2=A0the
+>> qci=C2=A0good?
 >=20
-> It's a matter of opinion. I prefer facilities because AP is comprised o=
-f not=C2=A0only
-> instructions,=C2=A0but=C2=A0also=C2=A0AP=C2=A0processors.
+> I changed it by request and I thought it made sense to do so. Maybe we =
+should=C2=A0just
+> take=C2=A0a=C2=A0vote.
 
-Please elaborate. You mean processors like AP cards? If yes what if the m=
-atrix is
-empty (e.g. the state we decided is the default when no further action is=
- taken
-(assign queues to the vfio-ap kernel driver, set up an mdev, -device vfio=
--ap on
-qemu cmd line))?
+Sorry I've missed that request. Could you give me a link into the mail ar=
+chive?
+I would like to examine the discussion.
 
-I just wanted to point out that this plural is very vague. Not speaking a=
-bout that
-QCI should be an AP facility too, but is not included in this 'features' =
-and is not
-covered by this cpu model feature. It has it's own cpu model feature and =
-even a
-dedicated STFLE bit.
-
-Regards,
+Thanks,
 Halil
