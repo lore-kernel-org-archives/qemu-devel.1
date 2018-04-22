@@ -1,24 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fADhX-0007A5-Ra
-	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 08:02:40 -0400
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fAH5z-0002qD-TS
+	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 11:40:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fADhT-0007dj-K8
-	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 08:02:39 -0400
-Date: Sun, 22 Apr 2018 20:10:00 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180422101000.GA4954@umbus.fritz.box>
-References: <20180420123456.22196-1-david@redhat.com>
-	<20180420123456.22196-2-david@redhat.com>
-	<20180422042615.GY2434@umbus.fritz.box>
-	<7809aad5-1513-caed-bc94-c5b08afe2ce6@redhat.com>
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fAH5v-0007TQ-Uf
+	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 11:40:07 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37668
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <akrowiak@linux.vnet.ibm.com>)
+	id 1fAH5v-0007Sj-OY
+	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 11:40:03 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w3MFcWPC008831
+	for <qemu-devel@nongnu.org>; Sun, 22 Apr 2018 11:40:02 -0400
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2hgk287mcr-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Sun, 22 Apr 2018 11:40:02 -0400
+Received: from localhost
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <akrowiak@linux.vnet.ibm.com>;
+	Sun, 22 Apr 2018 11:40:01 -0400
+References: <1523819244-29954-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<1523819244-29954-3-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<a28905d2-7f0f-aeb1-7c78-3a04e127438b@linux.vnet.ibm.com>
+From: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+Date: Sun, 22 Apr 2018 11:39:54 -0400
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="nFreZHaLTZJo0R7j"
-Content-Disposition: inline
-In-Reply-To: <7809aad5-1513-caed-bc94-c5b08afe2ce6@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] pc-dimm: factor out MemoryDevice
- interface
+In-Reply-To: <a28905d2-7f0f-aeb1-7c78-3a04e127438b@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Message-Id: <b84698e9-3198-ec63-15b1-dec7379c0ed4@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v4 2/5] s390x/ap: base Adjunct Processor
+ (AP) object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,112 +45,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>
+To: Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
 
+On 04/18/2018 05:16 AM, Pierre Morel wrote:
+> On 15/04/2018 21:07, Tony Krowiak wrote:
+>> This patch introduces the base object for an AP device.
+>>
+>> Signed-off-by: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+>> ---
+>>   hw/s390x/Makefile.objs       |    1 +
+>>   hw/s390x/ap-device.c         |   39 
+>> +++++++++++++++++++++++++++++++++++++++
+>>   include/hw/s390x/ap-device.h |   38 
+>> ++++++++++++++++++++++++++++++++++++++
+>>   ui/keycodemapdb              |    2 +-
+>>   4 files changed, 79 insertions(+), 1 deletions(-)
+>>   create mode 100644 hw/s390x/ap-device.c
+>>   create mode 100644 include/hw/s390x/ap-device.h
+>>
+>> diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
+>> index dc704b5..3247a07 100644
+>> --- a/hw/s390x/Makefile.objs
+>> +++ b/hw/s390x/Makefile.objs
+>> @@ -17,3 +17,4 @@ obj-y += s390-stattrib.o
+>>   obj-$(CONFIG_KVM) += s390-skeys-kvm.o
+>>   obj-$(CONFIG_KVM) += s390-stattrib-kvm.o
+>>   obj-y += s390-ccw.o
+>> +obj-y += ap-device.o
+>> diff --git a/hw/s390x/ap-device.c b/hw/s390x/ap-device.c
+>> new file mode 100644
+>> index 0000000..3cd4bae
+>> --- /dev/null
+>> +++ b/hw/s390x/ap-device.c
+>> @@ -0,0 +1,39 @@
+>> +/*
+>> + * Adjunct Processor (AP) matrix device
+>> + *
+>> + * Copyright 2018 IBM Corp.
+>> + * Author(s): Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 
+>> or (at
+>> + * your option) any later version. See the COPYING file in the 
+>> top-level
+>> + * directory.
+>> + */
+>> +#include "qemu/osdep.h"
+>> +#include "qemu/module.h"
+>> +#include "qapi/error.h"
+>> +#include "hw/qdev.h"
+>> +#include "hw/s390x/ap-device.h"
+>> +
+>> +static void ap_class_init(ObjectClass *klass, void *data)
+>> +{
+>> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>> +
+>> +    dc->desc = "AP device class";
+>> +    dc->hotpluggable = false;
+>> +}
+>> +
+>> +static const TypeInfo ap_device_info = {
+>> +    .name = AP_DEVICE_TYPE,
+>> +    .parent = TYPE_DEVICE,
+>> +    .instance_size = sizeof(APDevice),
+>> +    .class_size = sizeof(APDeviceClass),
+>> +    .class_init = ap_class_init,
+>> +    .abstract = true,
+>> +};
+>> +
+>> +static void ap_device_register(void)
+>> +{
+>> +    type_register_static(&ap_device_info);
+>> +}
+>> +
+>> +type_init(ap_device_register)
+>> diff --git a/include/hw/s390x/ap-device.h b/include/hw/s390x/ap-device.h
+>> new file mode 100644
+>> index 0000000..693df90
+>> --- /dev/null
+>> +++ b/include/hw/s390x/ap-device.h
+>> @@ -0,0 +1,38 @@
+>> +/*
+>> + * Adjunct Processor (AP) matrix device interfaces
+>> + *
+>> + * Copyright 2018 IBM Corp.
+>> + * Author(s): Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 
+>> or (at
+>> + * your option) any later version. See the COPYING file in the 
+>> top-level
+>> + * directory.
+>> + */
+>> +#ifndef HW_S390X_AP_DEVICE_H
+>> +#define HW_S390X_AP_DEVICE_H
+>> +
+>> +#define AP_DEVICE_TYPE       "ap-device"
+>> +
+>> +typedef struct APDevice {
+>> +    DeviceState parent_obj;
+>> +} APDevice;
+>> +
+>> +typedef struct APDeviceClass {
+>> +    DeviceClass parent_class;
+>> +} APDeviceClass;
+>> +
+>> +static inline APDevice *to_ap_dev(DeviceState *dev)
+>> +{
+>> +    return container_of(dev, APDevice, parent_obj);
+>> +}
+>> +
+>> +#define AP_DEVICE(obj) \
+>> +    OBJECT_CHECK(APDevice, (obj), AP_DEVICE_TYPE)
+>> +
+>> +#define AP_DEVICE_GET_CLASS(obj) \
+>> +    OBJECT_GET_CLASS(APDeviceClass, (obj), AP_DEVICE_TYPE)
+>> +
+>> +#define AP_DEVICE_CLASS(klass) \
+>> +    OBJECT_CLASS_CHECK(APDeviceClass, (klass), AP_DEVICE_TYPE)
+>> +
+>> +#endif /* HW_S390X_AP_DEVICE_H */
+>
+> until here, LGTM
+>
+> Does this next hunk belong to the patch?
 
---nFreZHaLTZJo0R7j
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+No it doesn't. I had compile problems due to keycodemap errors which I 
+fixed, but I
+have no idea how this got in here. There is a v5 coming, I'll make sure 
+this
+is removed.
 
-On Sun, Apr 22, 2018 at 10:21:34AM +0200, David Hildenbrand wrote:
-> On 22.04.2018 06:26, David Gibson wrote:
-> > On Fri, Apr 20, 2018 at 02:34:54PM +0200, David Hildenbrand wrote:
-> >> On the qmp level, we already have the concept of memory devices:
-> >>     "query-memory-devices"
-> >> Right now, we only support NVDIMM and PCDIMM.
-> >>
-> >> We want to map other devices later into the address space of the guest.
-> >> Such device could e.g. be virtio devices. These devices will have a
-> >> guest memory range assigned but won't be exposed via e.g. ACPI. We want
-> >> to make them look like memory device, but not glued to pc-dimm.
-> >>
-> >> Especially, it will not always be possible to have TYPE_PC_DIMM as a p=
-arent
-> >> class (e.g. virtio devices). Let's use an interface instead. As a first
-> >> part, convert handling of
-> >> - qmp_pc_dimm_device_list
-> >> - get_plugged_memory_size
-> >> to our new model. plug/unplug stuff etc. will follow later.
-> >>
-> >> A memory device will have to provide the following functions:
-> >> - get_addr(): Necessary, as the property "addr" can e.g. not be used f=
-or
-> >>               virtio devices (already defined).
-> >> - get_plugged_size(): The amount this device offers to the guest as of
-> >>                       now.
-> >> - get_region_size(): Because this can later on be bigger than the
-> >>                      plugged size.
-> >> - fill_device_info(): Fill MemoryDeviceInfo, e.g. for qmp.
-> >>
-> >> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >=20
-> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> >=20
-> > with the exception of some tiny nits..
-> >=20
-> > [snip]
-> >> +static gint memory_device_addr_sort(gconstpointer a, gconstpointer b)
-> >> +{
-> >> +    MemoryDeviceState *md_a =3D MEMORY_DEVICE(a);
-> >> +    MemoryDeviceState *md_b =3D MEMORY_DEVICE(b);
-> >=20
-> > These probably should be const MemoryDeviceState *.
->=20
-> Yes, that could work (depends on what the functions getting called
-> internally expect). Will look into it
-
-Well, the only thing being called here is the ->get_addr() hook, which
-you can redefine if necessary.  Discarding the const in the passed in
-pointers seems like bad idea, even though it won't explicitly warn due
-to the existing MEMORY_DEVICE() cast.
-
-> >> +    MemoryDeviceClass *mdc_a =3D MEMORY_DEVICE_GET_CLASS(a);
-> >> +    MemoryDeviceClass *mdc_b =3D MEMORY_DEVICE_GET_CLASS(b);
-> >> +    const uint64_t addr_a =3D mdc_a->get_addr(md_a);
-> >> +    const uint64_t addr_b =3D mdc_b->get_addr(md_b);
-> >> +
-> >> +    if (addr_a > addr_b) {
-> >> +        return 1;
-> >> +    } else if (addr_a < addr_b) {
-> >> +        return -1;
-> >> +    }
-> >> +    return 0;
-> >> +}
-> >> +
-> >> +static int memory_device_built_list(Object *obj, void *opaque)
-> >=20
-> > s/built/build/ will read a bit more clearly I think.
-> >=20
->=20
-> Indeed, thanks!
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---nFreZHaLTZJo0R7j
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrcX3YACgkQbDjKyiDZ
-s5IA2Q/9HlJ3VBaY8TiELQPfHgW7qtbCKKY8Te4TaF9bAJHRZcgEsOJgYaY2lFby
-ELon9ZS8eHWUwOsNVjLPpAG8Wf+IgAWyYuwB9vzH/xseTQwk+htrYHPeAqsARzsu
-w0JwIWOvJfOpEl2XtLhYoFlnWXizzHCiLVcbxh4ZtaMtez5mPFps+d/nb/QukIVM
-8050f+lS62QP1hpx7FV6+jHA2/gCJqD7lRJbA0PvPOAXVwBUgJmljsNABL3EHI91
-m8R5aEfP3976EQXYFs3KkPUdICA4hdEOHl566WKysRq1Ic2F2V/+k3Vu12SKH59N
-C+pD9rfHUy/fZPGE/OwKkzEVD9b1QyFzXckcunT2JpomV8e8h+J8TzWGr+kk4JzB
-g2qT2heOrd3ZsTHY/OqDn5CKqlhSQB178IjEX0cI4OnqJDp6555ML2x6ksJvpeyD
-4gr5Rm1A5Yxdr7sGVzt2XeJncfoYagQt0ckbV8/mOHvklFmosXGtkhE0wFFU4Wwo
-8HkjBZYGoxJotV1S2O2seCXLT22vXOEj3E2z+Flo6w17y8RicnlCXnbsj2hbWElf
-MrydXcoCAqPZZ7YVT3wsRYZubDFcSEfMI4wNpbqqB0G7ClBdsM4FpHmpJUWowZM9
-KkXv3vy9/Xt9WoPQLQDy4TX2fbzkDeiTxGEq6jHygirB2xXBRIE=
-=erDV
------END PGP SIGNATURE-----
-
---nFreZHaLTZJo0R7j--
+>> diff --git a/ui/keycodemapdb b/ui/keycodemapdb
+>> index 6b3d716..16e5b07 160000
+>> --- a/ui/keycodemapdb
+>> +++ b/ui/keycodemapdb
+>> @@ -1 +1 @@
+>> -Subproject commit 6b3d716e2b6472eb7189d3220552280ef3d832ce
+>> +Subproject commit 16e5b0787687d8904dad2c026107409eb9bfcb95
+>
+>
