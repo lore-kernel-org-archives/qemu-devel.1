@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fACRE-0007LG-0K
-	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 06:41:45 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fADhX-0007A5-Ra
+	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 08:02:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fACRC-000574-Fw
-	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 06:41:43 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:37745)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fACRC-00056C-B8
-	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 06:41:42 -0400
-Received: by mail-oi0-x241.google.com with SMTP id f63-v6so11743243oic.4
-	for <qemu-devel@nongnu.org>; Sun, 22 Apr 2018 03:41:41 -0700 (PDT)
+	(envelope-from <dgibson@ozlabs.org>) id 1fADhT-0007dj-K8
+	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 08:02:39 -0400
+Date: Sun, 22 Apr 2018 20:10:00 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180422101000.GA4954@umbus.fritz.box>
+References: <20180420123456.22196-1-david@redhat.com>
+	<20180420123456.22196-2-david@redhat.com>
+	<20180422042615.GY2434@umbus.fritz.box>
+	<7809aad5-1513-caed-bc94-c5b08afe2ce6@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180421211652.14794-1-f4bug@amsat.org>
-References: <20180421211652.14794-1-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sun, 22 Apr 2018 11:41:20 +0100
-Message-ID: <CAFEAcA_mSu00gEHgmfdpcvtaqfn7X0wbkUX54TCUW_FG+iURWQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] loader: Fix misaligned member access
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="nFreZHaLTZJo0R7j"
+Content-Disposition: inline
+In-Reply-To: <7809aad5-1513-caed-bc94-c5b08afe2ce6@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] pc-dimm: factor out MemoryDevice
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,65 +27,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Paul Burton <paul.burton@mips.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>
 
-On 21 April 2018 at 22:16, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wr=
-ote:
-> This fixes the following ASan warning:
->
->   $ mips64el-softmmu/qemu-system-mips64el -M boston -kernel vmlinux.gz.it=
-b -nographic
->   hw/core/loader-fit.c:108:17: runtime error: load of misaligned address =
-0x7f95cd7e4264 for type 'fdt64_t', which requires 8 byte alignment
->   0x7f95cd7e4264: note: pointer points here
->     00 00 00 3e ff ff ff ff  80 7d 2a c0 00 00 00 01  68 61 73 68 40 30 0=
-0 00  00 00 00 03 00 00 00 14
->                 ^
->
-> Reported-by: AddressSanitizer
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  hw/core/loader-fit.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/core/loader-fit.c b/hw/core/loader-fit.c
-> index 0c4a7207f4..1a69697f89 100644
-> --- a/hw/core/loader-fit.c
-> +++ b/hw/core/loader-fit.c
-> @@ -93,6 +93,8 @@ static int fit_image_addr(const void *itb, int img, con=
-st char *name,
->                            hwaddr *addr)
->  {
->      const void *prop;
-> +    fdt32_t v32;
-> +    fdt64_t v64;
->      int len;
->
->      prop =3D fdt_getprop(itb, img, name, &len);
-> @@ -102,10 +104,12 @@ static int fit_image_addr(const void *itb, int img,=
- const char *name,
->
->      switch (len) {
->      case 4:
-> -        *addr =3D fdt32_to_cpu(*(fdt32_t *)prop);
-> +        memcpy(&v32, prop, sizeof(v32));
-> +        *addr =3D fdt32_to_cpu(v32);
 
-If we need to do an unaligned load, then ldl_p() is the
-right way to do it. (We could also just do
- *addr =3D ldl_be_p(prop) but we maybe don't want to
-bake in knowledge that FDT is big-endian).
+--nFreZHaLTZJo0R7j
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This does make me suspicious that maybe we're not using
-the fdt APIs right here though. Since 'prop' is the return
-value of fdt_getprop(), shouldn't libfdt be providing
-APIs for "give me the fdt32 here" that don't require
-the libfdt user to either implement its own unaligned
-access helpers or invoke C undefined behaviour? David,
-any suggestions?
+On Sun, Apr 22, 2018 at 10:21:34AM +0200, David Hildenbrand wrote:
+> On 22.04.2018 06:26, David Gibson wrote:
+> > On Fri, Apr 20, 2018 at 02:34:54PM +0200, David Hildenbrand wrote:
+> >> On the qmp level, we already have the concept of memory devices:
+> >>     "query-memory-devices"
+> >> Right now, we only support NVDIMM and PCDIMM.
+> >>
+> >> We want to map other devices later into the address space of the guest.
+> >> Such device could e.g. be virtio devices. These devices will have a
+> >> guest memory range assigned but won't be exposed via e.g. ACPI. We want
+> >> to make them look like memory device, but not glued to pc-dimm.
+> >>
+> >> Especially, it will not always be possible to have TYPE_PC_DIMM as a p=
+arent
+> >> class (e.g. virtio devices). Let's use an interface instead. As a first
+> >> part, convert handling of
+> >> - qmp_pc_dimm_device_list
+> >> - get_plugged_memory_size
+> >> to our new model. plug/unplug stuff etc. will follow later.
+> >>
+> >> A memory device will have to provide the following functions:
+> >> - get_addr(): Necessary, as the property "addr" can e.g. not be used f=
+or
+> >>               virtio devices (already defined).
+> >> - get_plugged_size(): The amount this device offers to the guest as of
+> >>                       now.
+> >> - get_region_size(): Because this can later on be bigger than the
+> >>                      plugged size.
+> >> - fill_device_info(): Fill MemoryDeviceInfo, e.g. for qmp.
+> >>
+> >> Signed-off-by: David Hildenbrand <david@redhat.com>
+> >=20
+> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> >=20
+> > with the exception of some tiny nits..
+> >=20
+> > [snip]
+> >> +static gint memory_device_addr_sort(gconstpointer a, gconstpointer b)
+> >> +{
+> >> +    MemoryDeviceState *md_a =3D MEMORY_DEVICE(a);
+> >> +    MemoryDeviceState *md_b =3D MEMORY_DEVICE(b);
+> >=20
+> > These probably should be const MemoryDeviceState *.
+>=20
+> Yes, that could work (depends on what the functions getting called
+> internally expect). Will look into it
 
-(Similarly with the fdt64 access and ldq_p.)
+Well, the only thing being called here is the ->get_addr() hook, which
+you can redefine if necessary.  Discarding the const in the passed in
+pointers seems like bad idea, even though it won't explicitly warn due
+to the existing MEMORY_DEVICE() cast.
 
-thanks
--- PMM
+> >> +    MemoryDeviceClass *mdc_a =3D MEMORY_DEVICE_GET_CLASS(a);
+> >> +    MemoryDeviceClass *mdc_b =3D MEMORY_DEVICE_GET_CLASS(b);
+> >> +    const uint64_t addr_a =3D mdc_a->get_addr(md_a);
+> >> +    const uint64_t addr_b =3D mdc_b->get_addr(md_b);
+> >> +
+> >> +    if (addr_a > addr_b) {
+> >> +        return 1;
+> >> +    } else if (addr_a < addr_b) {
+> >> +        return -1;
+> >> +    }
+> >> +    return 0;
+> >> +}
+> >> +
+> >> +static int memory_device_built_list(Object *obj, void *opaque)
+> >=20
+> > s/built/build/ will read a bit more clearly I think.
+> >=20
+>=20
+> Indeed, thanks!
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--nFreZHaLTZJo0R7j
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrcX3YACgkQbDjKyiDZ
+s5IA2Q/9HlJ3VBaY8TiELQPfHgW7qtbCKKY8Te4TaF9bAJHRZcgEsOJgYaY2lFby
+ELon9ZS8eHWUwOsNVjLPpAG8Wf+IgAWyYuwB9vzH/xseTQwk+htrYHPeAqsARzsu
+w0JwIWOvJfOpEl2XtLhYoFlnWXizzHCiLVcbxh4ZtaMtez5mPFps+d/nb/QukIVM
+8050f+lS62QP1hpx7FV6+jHA2/gCJqD7lRJbA0PvPOAXVwBUgJmljsNABL3EHI91
+m8R5aEfP3976EQXYFs3KkPUdICA4hdEOHl566WKysRq1Ic2F2V/+k3Vu12SKH59N
+C+pD9rfHUy/fZPGE/OwKkzEVD9b1QyFzXckcunT2JpomV8e8h+J8TzWGr+kk4JzB
+g2qT2heOrd3ZsTHY/OqDn5CKqlhSQB178IjEX0cI4OnqJDp6555ML2x6ksJvpeyD
+4gr5Rm1A5Yxdr7sGVzt2XeJncfoYagQt0ckbV8/mOHvklFmosXGtkhE0wFFU4Wwo
+8HkjBZYGoxJotV1S2O2seCXLT22vXOEj3E2z+Flo6w17y8RicnlCXnbsj2hbWElf
+MrydXcoCAqPZZ7YVT3wsRYZubDFcSEfMI4wNpbqqB0G7ClBdsM4FpHmpJUWowZM9
+KkXv3vy9/Xt9WoPQLQDy4TX2fbzkDeiTxGEq6jHygirB2xXBRIE=
+=erDV
+-----END PGP SIGNATURE-----
+
+--nFreZHaLTZJo0R7j--
