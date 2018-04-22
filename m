@@ -1,39 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58607)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fAH9e-0005kK-RZ
-	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 11:43:55 -0400
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fAHHz-0000gQ-9E
+	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 11:52:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fAH9a-0002iR-VW
-	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 11:43:54 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45874)
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fAHHv-0000A7-E1
+	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 11:52:31 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56404)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <akrowiak@linux.vnet.ibm.com>)
-	id 1fAH9a-0002i7-NV
-	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 11:43:50 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	id 1fAHHv-0000A1-5T
+	for qemu-devel@nongnu.org; Sun, 22 Apr 2018 11:52:27 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w3MFfR63090387
-	for <qemu-devel@nongnu.org>; Sun, 22 Apr 2018 11:43:49 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2hgk2nynwc-1
+	w3MFn493076642
+	for <qemu-devel@nongnu.org>; Sun, 22 Apr 2018 11:52:25 -0400
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2hgk23fqch-1
 	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sun, 22 Apr 2018 11:43:49 -0400
+	for <qemu-devel@nongnu.org>; Sun, 22 Apr 2018 11:52:25 -0400
 Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <akrowiak@linux.vnet.ibm.com>;
-	Sun, 22 Apr 2018 11:43:48 -0400
+	Sun, 22 Apr 2018 11:52:22 -0400
 References: <1523819244-29954-1-git-send-email-akrowiak@linux.vnet.ibm.com>
 	<1523819244-29954-4-git-send-email-akrowiak@linux.vnet.ibm.com>
 	<819cba2d-32d7-6a5c-978f-1c6aa04872fa@linux.vnet.ibm.com>
 From: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-Date: Sun, 22 Apr 2018 11:43:40 -0400
+Date: Sun, 22 Apr 2018 11:52:15 -0400
 MIME-Version: 1.0
 In-Reply-To: <819cba2d-32d7-6a5c-978f-1c6aa04872fa@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Message-Id: <bf3ac9e4-1f53-0372-450d-1a84f780d25e@linux.vnet.ibm.com>
+Message-Id: <6436e788-ccc7-d292-6807-6dfa3d1bc49f@linux.vnet.ibm.com>
 Subject: Re: [Qemu-devel] [PATCH v4 3/5] s390x/cpumodel: Set up CPU model
  for AP device support
 List-Id: <qemu-devel.nongnu.org>
@@ -70,6 +70,12 @@ On 04/18/2018 06:55 AM, Halil Pasic wrote:
 >
 > Why did you change this form qci to apqci. Too may people found the
 > qci good?
+
+I changed it by request and I thought it made sense to do so. Maybe we 
+should just
+take a vote.
+
+>
 >
 >>       FEAT_INIT("ipter", S390_FEAT_TYPE_STFL, 13, "IPTE-range 
 >> facility"),
@@ -92,12 +98,6 @@ On 04/18/2018 06:55 AM, Halil Pasic wrote:
 > Why plural ('facilities')? Would not s/facilities/instructions be more 
 > end-user
 > friendly?
-
-It's a matter of opinion. I prefer facilities because AP is comprised of 
-not only
-instructions, but also AP processors.
-
->
 >
 > Regards,
 > Halil
