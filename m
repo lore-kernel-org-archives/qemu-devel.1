@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1fAXcb-0005lH-Rm
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 05:18:55 -0400
+	(envelope-from <clg@kaod.org>) id 1fAXm5-00026x-5S
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 05:28:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1fAXca-00007m-FF
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 05:18:53 -0400
+	(envelope-from <clg@kaod.org>) id 1fAXm0-0006Nx-To
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 05:28:41 -0400
+Received: from 2.mo178.mail-out.ovh.net ([46.105.39.61]:42997)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fAXm0-0006NM-MZ
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 05:28:36 -0400
+Received: from player737.ha.ovh.net (unknown [10.109.120.44])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id B9DA214B5F
+	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 11:28:34 +0200 (CEST)
+References: <20180423064020.25434-1-clg@kaod.org>
+	<CAFEAcA-LtNpGTV08jvK4i5C5i64WjM5gMB4zGr8P4fkVSkNH7g@mail.gmail.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <53691cbf-08bf-e3f7-22d3-601a279aa08a@kaod.org>
+Date: Mon, 23 Apr 2018 11:28:30 +0200
 MIME-Version: 1.0
-In-Reply-To: <af35a794-6c39-bdaa-8aa6-9d50ca759198@redhat.com>
-References: <CAMxP3BTEzHjfxr=nnYDCL2v1djYJt5t5_hZ8rWo_S=qcbhQYVQ@mail.gmail.com>
-	<3d41de05-4bbd-3843-a0b7-fd71fc187022@redhat.com>
-	<CAMxP3BQSAMk2ytNajWMnr14t30uFEdE6FkNJU62J9A9MJcbVSQ@mail.gmail.com>
-	<af35a794-6c39-bdaa-8aa6-9d50ca759198@redhat.com>
-From: Bob Chen <a175818323@gmail.com>
-Date: Mon, 23 Apr 2018 17:18:42 +0800
-Message-ID: <CAMxP3BTKka7j2ADpW+6smT8BwvXtxRjrBuP75nY8jkt3KSqjCg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [SPDK] qemu process hung at boot-up,
- no explicit errors or warnings
+In-Reply-To: <CAFEAcA-LtNpGTV08jvK4i5C5i64WjM5gMB4zGr8P4fkVSkNH7g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] timer/aspeed: fix vmstate version id
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,104 +31,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>
 
-2018-04-21 1:34 GMT+08:00 John Snow <jsnow@redhat.com>:
+On 04/23/2018 11:12 AM, Peter Maydell wrote:
+>> diff --git a/hw/timer/aspeed_timer.c b/hw/timer/aspeed_timer.c
+>> index 50acbf530a3a..7df19bd9df91 100644
+>> --- a/hw/timer/aspeed_timer.c
+>> +++ b/hw/timer/aspeed_timer.c
+>> @@ -498,8 +498,8 @@ static const VMStateDescription vmstate_aspeed_timer = {
+>>
+>>  static const VMStateDescription vmstate_aspeed_timer_state = {
+>>      .name = "aspeed.timerctrl",
+>> -    .version_id = 1,
+>> -    .minimum_version_id = 1,
+>> +    .version_id = 2,
+>> +    .minimum_version_id = 2,
+>>      .fields = (VMStateField[]) {
+>>          VMSTATE_UINT32(ctrl, AspeedTimerCtrlState),
+>>          VMSTATE_UINT32(ctrl2, AspeedTimerCtrlState),
+> Wouldn't it be simpler to just fix the incorrect value in
+> the VMSTATE_STRUCT_ARRAY(timers, AspeedTimerCtrlState,
+> line ?
 
->
->
-> On 04/20/2018 07:13 AM, Bob Chen wrote:
-> > 2.11.1 could work, qemu is no longer occupying 100% CPU. That's
-> > interesting...
-> >
->
-> Does 2.12 use 100% even at the firmware menu? Maybe we're not giving
-> this VM long enough to hit the spot that causes it to use 100%.
->
-> > Now I can see the starting screen via vnc, says that not a bootable dis=
-k.
-> >
->
-> If it's stopping at the firmware I think the guest is not being taken
-> into account, and the firmware is either trying to boot the wrong disk
-> or your disk is corrupted. (Or it can't see your disk at all -- I'm
-> personally not very familiar with using SPDK.)
+Yes. Also. 
 
+Or bring back all the version ids to 1, as we never supported 
+migration before.
 
-> Can you share your command line with us?
->
+Thanks,
 
-I opened another thread to discuss this issue, looks like there's something
-wrong with the spdk official doc.
-
-However, 2.12 is still very likely to be buggy. I'm sure I waited long
-enough but the CPU never dropped below 100%. The vnc screen stopped at
-"Loading SeaBIOS ..."
-
-Again, 2.10 and 2.11 are fine. Though "No bootable device" but CPU dropped
-anyway.
-
-
->
-> >
-> > Is that because the guest OS's virtio vhost driver is not up to date
-> enough?
-> > =E2=80=8B
-> >
-> > Thanks,
-> > Bob
-> >
->
-> On the QEMU-devel list and many other technical lists, can you please
-> reply in-line instead of replying above? ("top posting")
->
-> Thank you,
-> --John
->
-> > 2018-04-20 1:17 GMT+08:00 John Snow <jsnow@redhat.com
-> > <mailto:jsnow@redhat.com>>:
-> >
-> >     Forwarding to qemu-block.
-> >
-> >     On 04/19/2018 06:13 AM, Bob Chen wrote:
-> >     > Hi,
-> >     >
-> >     > I was trying to run qemu with spdk, referring to
-> >     > http://www.spdk.io/doc/vhost.html#vhost_qemu_config
-> >     <http://www.spdk.io/doc/vhost.html#vhost_qemu_config>
-> >     >
-> >     > Everything went well since I had already set up hugepages, vfio,
-> vhost
-> >     > targets, vhost-scsi device(vhost-block was also tested), etc,
-> without
-> >     > errors or warnings reported.
-> >     >
-> >     > But at the last step to run qemu, the process would somehow hang.
-> And its
-> >     > cpu busy remained 100%.
-> >     >
-> >     > I used `perf top -p` to monitor the process activity,
-> >     >   18.28%  [kernel]                      [k] vmx_vcpu_run
-> >     >    3.06%  [kernel]                      [k] vcpu_enter_guest
-> >     >    3.05%  [kernel]                      [k]
-> system_call_after_swapgs
-> >     >
-> >     > Do you have any ideas about what happened here?
-> >     >
-> >     > Test environment: latest CentOS 7 kernel, nvme ssd, spdk v18.01.x=
-,
-> >     > dpdk 17.11.1, qemu 2.12.0-rc2. Detail log is attached within this
-> mail.
-> >     >
-> >
-> >     Have you tried any other versions? (2.11.1, or 2.12-rc4?)
-> >
-> >     >
-> >     >
-> >     > Thanks,
-> >     > Bob
-> >     >
-> >
-> >
->
+C.
