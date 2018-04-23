@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fAdZ0-00069O-Vm
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 11:39:35 -0400
+	(envelope-from <armbru@redhat.com>) id 1fAdgU-0008Dl-WF
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 11:47:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fAdYx-00025J-QI
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 11:39:35 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:35455)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fAdYx-00024x-Id
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 11:39:31 -0400
-Received: by mail-wr0-x242.google.com with SMTP id w3-v6so42553436wrg.2
-	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 08:39:31 -0700 (PDT)
-References: <20180423144837.16710-1-f4bug@amsat.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180423144837.16710-1-f4bug@amsat.org>
-Date: Mon, 23 Apr 2018 16:39:29 +0100
-Message-ID: <87po2qkk3y.fsf@linaro.org>
+	(envelope-from <armbru@redhat.com>) id 1fAdgU-0007jP-4Q
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 11:47:19 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180423084518.2426-1-armbru@redhat.com>
+	<20180423130219.GD6630@localhost.localdomain>
+Date: Mon, 23 Apr 2018 17:47:00 +0200
+In-Reply-To: <20180423130219.GD6630@localhost.localdomain> (Kevin Wolf's
+	message of "Mon, 23 Apr 2018 15:02:19 +0200")
+Message-ID: <87604ilybv.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] docker: add debian/alpha image
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] cpus: Fix event order on resume of stopped
+ guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +24,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Fam Zheng <famz@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
+Kevin Wolf <kwolf@redhat.com> writes:
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
-
-> This image is not enough to cross-build QEMU,
-> but it is useful enough to cross-compile TCG tests.
+> Am 23.04.2018 um 10:45 hat Markus Armbruster geschrieben:
+>> When resume of a stopped guest immediately runs into block device
+>> errors, the BLOCK_IO_ERROR event is sent before the RESUME event.
+>> 
+>> Reproducer:
+>> 
+>> 1. Create a scratch image
+>>    $ dd if=/dev/zero of=scratch.img bs=1M count=100
+>> 
+>>    Size doesn't actually matter.
+>> 
+>> 2. Prepare blkdebug configuration:
+>> 
+>>    $ cat >blkdebug.conf <<EOF
+>>    [inject-error]
+>>    event = "write_aio"
+>>    errno = "5"
+>>    EOF
+>> 
+>>    Note that errno 5 is EIO.
+>> 
+>> 3. Run a guest with an additional scratch disk, i.e. with additional
+>>    arguments
+>>    -drive if=none,id=scratch-drive,format=raw,werror=stop,file=blkdebug:blkdebug.conf:scratch.img
+>>    -device virtio-blk-pci,id=scratch,drive=scratch-drive
+>> 
+>>    The blkdebug part makes all writes to the scratch drive fail with
+>>    EIO.  The werror=stop pauses the guest on write errors.
+>> 
+>> 4. Connect to the QMP socket e.g. like this:
+>>    $ socat UNIX:/your/qmp/socket READLINE,history=$HOME/.qmp_history,prompt='QMP> '
+>> 
+>>    Issue QMP command 'qmp_capabilities':
+>>    QMP> { "execute": "qmp_capabilities" }
+>> 
+>> 5. Boot the guest.
+>> 
+>> 6. In the guest, write to the scratch disk, e.g. like this:
+>> 
+>>    # dd if=/dev/zero of=/dev/vdb count=1
+>> 
+>>    Do double-check the device specified with of= is actually the
+>>    scratch device!
+>> 
+>> 7. Issue QMP command 'cont':
+>>    QMP> { "execute": "cont" }
+>> 
+>> After step 6, I get a BLOCK_IO_ERROR event followed by a STOP event.  Good.
+>> 
+>> After step 7, I get BLOCK_IO_ERROR, then RESUME, then STOP.  Not so
+>> good; I'd expect RESUME, then BLOCK_IO_ERROR, then STOP.
 >
-> Suggested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  tests/docker/dockerfiles/debian-alpha-cross.docker | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
->  create mode 100644 tests/docker/dockerfiles/debian-alpha-cross.docker
+> Do you want to rephrase this in the form of a script for qemu-iotests?
 >
-> diff --git a/tests/docker/dockerfiles/debian-alpha-cross.docker b/tests/d=
-ocker/dockerfiles/debian-alpha-cross.docker
-> new file mode 100644
-> index 0000000000..dce1d2e719
-> --- /dev/null
-> +++ b/tests/docker/dockerfiles/debian-alpha-cross.docker
-> @@ -0,0 +1,13 @@
-> +#
-> +# Docker alpha cross-compiler target
-> +#
-> +# This docker target builds on the debian Stretch base image.
-> +#
-> +FROM qemu:debian9
+> I suppose the 'dd' line can be replaced by a 'qemu-io' monitor command.
 
-I should have noticed this. However I'm currently enabling a bunch of
-additional cross compilers which SID has for the benefit of the various
-ports.
-
-> +
-> +# Add the foreign architecture we want and install dependencies
-> +RUN dpkg --add-architecture alpha
-> +RUN apt update
-> +RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
-> +    apt-get install -y --no-install-recommends \
-> +        gcc-alpha-linux-gnu
-
-
---
-Alex Benn=C3=A9e
+Makes sense, but I'm quite pretty much a noob there.  Perhaps I can copy
+an existing test and hack it up.  Which one would you recommend?
