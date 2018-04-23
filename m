@@ -1,25 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jan.kiszka@web.de>) id 1fAdrx-0004RU-QU
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 11:59:12 -0400
+	(envelope-from <muriloo@linux.ibm.com>) id 1fAe3b-0002Ke-QP
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 12:11:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jan.kiszka@web.de>) id 1fAdrr-0005Up-US
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 11:59:09 -0400
-Received: from mout.web.de ([212.227.15.14]:53447)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jan.kiszka@web.de>) id 1fAdrr-0005UO-JI
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 11:59:03 -0400
-References: <3301c5bc-7b47-1b0e-8ce4-30435057a276@web.de>
-	<CAFEAcA9KSUppGGom-ipX+N49j0gDJH3KDY8oyqT8cVOU0Mn8Rw@mail.gmail.com>
-From: Jan Kiszka <jan.kiszka@web.de>
-Message-ID: <685b5673-beac-e29b-a336-1082260073fa@web.de>
-Date: Mon, 23 Apr 2018 17:58:51 +0200
+	(envelope-from <muriloo@linux.ibm.com>) id 1fAe3X-0002Tw-MA
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 12:11:11 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44116
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <muriloo@linux.ibm.com>)
+	id 1fAe3X-0002PC-GG
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 12:11:07 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w3NGASBX095135
+	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 12:10:55 -0400
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2hhgxcp7eh-1
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 12:10:54 -0400
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <muriloo@linux.ibm.com>;
+	Mon, 23 Apr 2018 10:10:53 -0600
+Reply-To: muriloo@linux.ibm.com
+From: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+Date: Mon, 23 Apr 2018 13:10:47 -0300
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9KSUppGGom-ipX+N49j0gDJH3KDY8oyqT8cVOU0Mn8Rw@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="GYQI4WZlbLRPt0wAZwfcVMEmwTfsHd76F"
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/virt: Add linux, pci-domain property
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <c7e00162-cf50-0194-d283-17e7dc8fae56@linux.ibm.com>
+Subject: [Qemu-devel] [RFC] configure script mistakenly detects static
+ libraries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,94 +42,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Andrew Jones <drjones@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: muriloo@linux.ibm.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GYQI4WZlbLRPt0wAZwfcVMEmwTfsHd76F
-From: Jan Kiszka <jan.kiszka@web.de>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Andrew Jones <drjones@redhat.com>
-Message-ID: <685b5673-beac-e29b-a336-1082260073fa@web.de>
-Subject: Re: [PATCH] hw/arm/virt: Add linux,pci-domain property
-References: <3301c5bc-7b47-1b0e-8ce4-30435057a276@web.de>
- <CAFEAcA9KSUppGGom-ipX+N49j0gDJH3KDY8oyqT8cVOU0Mn8Rw@mail.gmail.com>
-In-Reply-To: <CAFEAcA9KSUppGGom-ipX+N49j0gDJH3KDY8oyqT8cVOU0Mn8Rw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi, everyone!
 
-On 2018-04-23 15:11, Peter Maydell wrote:
-> On 23 April 2018 at 06:18, Jan Kiszka <jan.kiszka@web.de> wrote:
->> From: Jan Kiszka <jan.kiszka@siemens.com>
->>
->> This allows to pin the host controller in the Linux PCI domain space.
->> Linux requires that property to be available consistently or not at al=
-l,
->> in which case the domain number becomes unstable on additions/removals=
-=2E
->> Adding it here won't make a difference in practice for most setups as =
-we
->> only expose one controller.
->>
->> However, enabling Jailhouse on top may introduce another controller, a=
-nd
->> that one would like to have stable address as well. So the property is=
+I'm facing an issue on how configure script detects static libraries and
+would like to hear from community to find a common ground on how to
+possibly fix it.
 
->> needed for the first controller as well.
->=20
-> Am I right in thinking that for ACPI the PCI domain number is
-> communicated via the _SEG method? If so, looks like we already
-> set that, and we set it to 0, which matches what we're doing here
-> in the DT, so that's good.
+Throughout configure, we use pkg-config command to verify if a library
+is installed so qemu can be linked to it. This works fine when linking
+qemu dynamically. However, configuring qemu with --static can mistakenly
+detect a library that is actually not present on the system.
 
-Looking at the related arm64 kernel code (not the spec), it seems __SEG
-is involved, yet.
+For example, on Ubuntu Xenial, libcacard-dev package provides only
+libcacard.so (not libcacard.a) and pkg-config reports success in both
+cases:
 
-Jan
+    $ pkg-config libcacard
+    $ echo $?
+    0
 
->=20
->> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
->> ---
->>  hw/arm/virt.c | 1 +
->>  1 file changed, 1 insertion(+)
->>
->> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
->> index 94dcb125d3..943371b75e 100644
->> --- a/hw/arm/virt.c
->> +++ b/hw/arm/virt.c
->> @@ -1023,6 +1023,7 @@ static void create_pcie(const VirtMachineState *=
-vms, qemu_irq *pic)
->>      qemu_fdt_setprop_string(vms->fdt, nodename, "device_type", "pci")=
-;
->>      qemu_fdt_setprop_cell(vms->fdt, nodename, "#address-cells", 3);
->>      qemu_fdt_setprop_cell(vms->fdt, nodename, "#size-cells", 2);
->> +    qemu_fdt_setprop_cell(vms->fdt, nodename, "linux,pci-domain", 0);=
+    $ pkg-config --static libcacard
+    $ echo $?
+    0
 
->>      qemu_fdt_setprop_cells(vms->fdt, nodename, "bus-range", 0,
->>                             nr_pcie_buses - 1);
->>      qemu_fdt_setprop(vms->fdt, nodename, "dma-coherent", NULL, 0);
->> --
->=20
-> Drew -- is minor changes to the DTC something we can do without
-> having to condition it on machine version? I forget...
->=20
-> thanks
-> -- PMM
->=20
+Since we use `pkg-config libcacard` to set smartcard=yes, this
+mistakenly enables smartcard feature. This is acceptable with dynamic
+linkage, but can be an issue with static linkage, where libcacard.a
+doesn't exist on the system, resulting on a build error:
 
+    $ ./configure --target-list=ppc64-softmmu --static && make -j$(nproc)
+    [...]
+    /usr/bin/ld: cannot find -lcacard
 
+A workaround can be specifying --disable-<feature> for all missing
+libraries.
 
---GYQI4WZlbLRPt0wAZwfcVMEmwTfsHd76F
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+One possible solution would be having a function, e.g. check_pkg_config,
+that writes a C skeleton and tries to compile it using the desired
+library, given as function parameter. Thus, compile_prog would return
+success if library actually exists on the system. For example:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+    check_pkg_config() {
+        local_pkg_name=$1
+        local_cflags=$($pkg_config --cflags $local_pkg_name)
+        local_ldflags=$($pkg_config --libs $local_pkg_name)
+        write_c_skeleton
+        compile_prog "$local_cflags" "$local_ldflags"
+    }
 
-iEYEARECAAYFAlreAr4ACgkQitSsb3rl5xR54QCg7BiFo2uGj+AfBHA5TMWoCC5c
-3eQAoLzLyTZWVRZTYgZD4tLpf2VoozGr
-=87BN
------END PGP SIGNATURE-----
+That would work for both dynamic and static linkages. Then we could just
+replace `$pkg_config <package>` by `check_pkg_config <package>` in the
+configure script.
 
---GYQI4WZlbLRPt0wAZwfcVMEmwTfsHd76F--
+My approach might not be the best and only one, so I'd like to hear from
+you what would be a reasoanble solution to fix this situation.
+
+Cheers
+Murilo
