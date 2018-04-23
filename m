@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49803)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fAY9V-0000FM-O8
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 05:52:55 -0400
+	(envelope-from <david@redhat.com>) id 1fAY9f-0000LA-SD
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 05:53:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fAY9S-0003fK-NL
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 05:52:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42192 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fAY9S-0003ey-Id
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 05:52:50 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1CBE08182D19
-	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 09:52:50 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180420231246.23130-1-lersek@redhat.com>
-	<20180420231246.23130-2-lersek@redhat.com>
-Date: Mon, 23 Apr 2018 11:52:44 +0200
-In-Reply-To: <20180420231246.23130-2-lersek@redhat.com> (Laszlo Ersek's
-	message of "Sat, 21 Apr 2018 01:12:44 +0200")
-Message-ID: <87tvs2ntar.fsf@dusky.pond.sub.org>
+	(envelope-from <david@redhat.com>) id 1fAY9c-0003jJ-QC
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 05:53:03 -0400
+References: <20180420123456.22196-1-david@redhat.com>
+	<20180420123456.22196-2-david@redhat.com>
+	<20180422042615.GY2434@umbus.fritz.box>
+	<7809aad5-1513-caed-bc94-c5b08afe2ce6@redhat.com>
+	<20180422101000.GA4954@umbus.fritz.box>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <43070125-12dc-17d2-e752-808cf60009de@redhat.com>
+Date: Mon, 23 Apr 2018 11:52:50 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [qemu RFC v3 1/3] qapi: add SysEmuTarget to
- "common.json"
+In-Reply-To: <20180422101000.GA4954@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] pc-dimm: factor out MemoryDevice
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,23 +28,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, Thomas Huth <thuth@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <dgibson@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>
 
-Laszlo Ersek <lersek@redhat.com> writes:
+On 22.04.2018 12:10, David Gibson wrote:
+> On Sun, Apr 22, 2018 at 10:21:34AM +0200, David Hildenbrand wrote:
+>> On 22.04.2018 06:26, David Gibson wrote:
+>>> On Fri, Apr 20, 2018 at 02:34:54PM +0200, David Hildenbrand wrote:
+>>>> On the qmp level, we already have the concept of memory devices:
+>>>>     "query-memory-devices"
+>>>> Right now, we only support NVDIMM and PCDIMM.
+>>>>
+>>>> We want to map other devices later into the address space of the guest.
+>>>> Such device could e.g. be virtio devices. These devices will have a
+>>>> guest memory range assigned but won't be exposed via e.g. ACPI. We want
+>>>> to make them look like memory device, but not glued to pc-dimm.
+>>>>
+>>>> Especially, it will not always be possible to have TYPE_PC_DIMM as a parent
+>>>> class (e.g. virtio devices). Let's use an interface instead. As a first
+>>>> part, convert handling of
+>>>> - qmp_pc_dimm_device_list
+>>>> - get_plugged_memory_size
+>>>> to our new model. plug/unplug stuff etc. will follow later.
+>>>>
+>>>> A memory device will have to provide the following functions:
+>>>> - get_addr(): Necessary, as the property "addr" can e.g. not be used for
+>>>>               virtio devices (already defined).
+>>>> - get_plugged_size(): The amount this device offers to the guest as of
+>>>>                       now.
+>>>> - get_region_size(): Because this can later on be bigger than the
+>>>>                      plugged size.
+>>>> - fill_device_info(): Fill MemoryDeviceInfo, e.g. for qmp.
+>>>>
+>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>
+>>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+>>>
+>>> with the exception of some tiny nits..
+>>>
+>>> [snip]
+>>>> +static gint memory_device_addr_sort(gconstpointer a, gconstpointer b)
+>>>> +{
+>>>> +    MemoryDeviceState *md_a = MEMORY_DEVICE(a);
+>>>> +    MemoryDeviceState *md_b = MEMORY_DEVICE(b);
+>>>
+>>> These probably should be const MemoryDeviceState *.
+>>
+>> Yes, that could work (depends on what the functions getting called
+>> internally expect). Will look into it
+> 
+> Well, the only thing being called here is the ->get_addr() hook, which
+> you can redefine if necessary.  Discarding the const in the passed in
+> pointers seems like bad idea, even though it won't explicitly warn due
+> to the existing MEMORY_DEVICE() cast.
 
-> We'll soon need an enumeration type that lists all the softmmu targets
-> that QEMU (the project) supports. Introduce @SysEmuTarget to
-> "common.json".
->
-> Cc: "Daniel P. Berrange" <berrange@redhat.com>
-> Cc: David Gibson <dgibson@redhat.com>
-> Cc: Eric Blake <eblake@redhat.com>
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Cc: Kashyap Chamarthy <kchamart@redhat.com>
-> Cc: Markus Armbruster <armbru@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+I converted all MemoryDevice functions to eat "const MemoryDeviceState *md".
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+The only problematic part now is
+
+static uint64_t pc_dimm_md_get_region_size(const MemoryDeviceState *md)
+
+It calls "ddc->get_memory_region(dimm, &error_abort);", and it looks
+like we cannot convert this to eat a const DIMM pointer (as it has to
+return a !const pointer to the memory region).
+
+So we will actually drop the const here - which is fine because we don't
+modify anything.
+
+> 
+>>>> +    MemoryDeviceClass *mdc_a = MEMORY_DEVICE_GET_CLASS(a);
+>>>> +    MemoryDeviceClass *mdc_b = MEMORY_DEVICE_GET_CLASS(b);
+>>>> +    const uint64_t addr_a = mdc_a->get_addr(md_a);
+>>>> +    const uint64_t addr_b = mdc_b->get_addr(md_b);
+>>>> +
+>>>> +    if (addr_a > addr_b) {
+>>>> +        return 1;
+>>>> +    } else if (addr_a < addr_b) {
+>>>> +        return -1;
+>>>> +    }
+>>>> +    return 0;
+>>>> +}
+>>>> +
+>>>> +static int memory_device_built_list(Object *obj, void *opaque)
+>>>
+>>> s/built/build/ will read a bit more clearly I think.
+>>>
+>>
+>> Indeed, thanks!
+>>
+> 
+
+
+-- 
+
+Thanks,
+
+David / dhildenb
