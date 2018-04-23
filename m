@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1fATZB-0007cv-66
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 00:59:06 -0400
+	(envelope-from <jan.kiszka@web.de>) id 1fATsC-00055E-Oh
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 01:18:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1fATZ6-00053o-CB
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 00:59:05 -0400
-Date: Mon, 23 Apr 2018 00:58:56 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <585131164.21709010.1524459536821.JavaMail.zimbra@redhat.com>
-In-Reply-To: <e3b1e7df-55ae-520f-bd52-0fc94f6b8ed3@redhat.com>
-References: <20180420123456.22196-1-david@redhat.com>
-	<693523847.21650747.1524373124143.JavaMail.zimbra@redhat.com>
-	<e3b1e7df-55ae-520f-bd52-0fc94f6b8ed3@redhat.com>
+	(envelope-from <jan.kiszka@web.de>) id 1fATs8-0006tQ-PO
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 01:18:44 -0400
+Received: from mout.web.de ([217.72.192.78]:53201)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jan.kiszka@web.de>) id 1fATs8-0006se-FK
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 01:18:40 -0400
+From: Jan Kiszka <jan.kiszka@web.de>
+Message-ID: <3301c5bc-7b47-1b0e-8ce4-30435057a276@web.de>
+Date: Mon, 23 Apr 2018 07:18:37 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] pc-dimm: factor out MemoryDevice
+Subject: [Qemu-devel] [PATCH] hw/arm/virt: Add linux,pci-domain property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,50 +25,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel <qemu-devel@nongnu.org>
 
+From: Jan Kiszka <jan.kiszka@siemens.com>
 
-> > 
-> > Hello,
-> > 
-> > This is good re-factoring and needed for 'virtio-pmem' as well to
-> > reserve memory region in system address space.
-> > 
-> > I have tested this code with virtio-pmem and its working fine. Thank you
-> > for the work.
-> > 
-> > I just have a small suggestion : when functions like(get_addr(),
-> > get_plugged_size etc)
-> > in the interface are not provided by derived class, Qemu crashes.
-> > 
-> > I think having a contract for must override functions with NULL check and
-> > error
-> > at the calling sites would be better?
-> 
-> I expect that all of these functions are implemented. It's a contract
-> for devices that are mapped into address space. We might later have
-> additional functions that might not be required to be provided and will
-> be checked for NULL.
-> 
-> So for the current set of functions, I don't think it makes sense to
-> make them optional.
+This allows to pin the host controller in the Linux PCI domain space.
+Linux requires that property to be available consistently or not at all,
+in which case the domain number becomes unstable on additions/removals.
+Adding it here won't make a difference in practice for most setups as we
+only expose one controller.
 
-o.k. that's reasonable.
+However, enabling Jailhouse on top may introduce another controller, and
+that one would like to have stable address as well. So the property is
+needed for the first controller as well.
 
-Thanks,
-Pankaj
-> 
-> Thanks!
-> 
-> > 
-> > Thanks,
-> > Pankaj
-> 
-> 
-> --
-> 
-> Thanks,
-> 
-> David / dhildenb
-> 
+Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+---
+ hw/arm/virt.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 94dcb125d3..943371b75e 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1023,6 +1023,7 @@ static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
+     qemu_fdt_setprop_string(vms->fdt, nodename, "device_type", "pci");
+     qemu_fdt_setprop_cell(vms->fdt, nodename, "#address-cells", 3);
+     qemu_fdt_setprop_cell(vms->fdt, nodename, "#size-cells", 2);
++    qemu_fdt_setprop_cell(vms->fdt, nodename, "linux,pci-domain", 0);
+     qemu_fdt_setprop_cells(vms->fdt, nodename, "bus-range", 0,
+                            nr_pcie_buses - 1);
+     qemu_fdt_setprop(vms->fdt, nodename, "dma-coherent", NULL, 0);
+-- 
+2.13.6
