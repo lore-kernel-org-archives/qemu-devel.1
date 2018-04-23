@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59558)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fATsw-0005Ub-L2
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 01:19:31 -0400
+	(envelope-from <peterx@redhat.com>) id 1fAUCd-0004Yp-Pl
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 01:39:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fATss-0007Cr-Je
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 01:19:30 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59742 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fAUCa-0001r8-OJ
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 01:39:51 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58814 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fATss-0007CH-Dk
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 01:19:26 -0400
-Date: Mon, 23 Apr 2018 13:19:10 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fAUCa-0001qA-KB
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 01:39:48 -0400
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180423051910.GA9036@xz-mi>
-References: <20180420044212.28765-1-peterx@redhat.com>
-	<20180420044212.28765-2-peterx@redhat.com>
-	<20180420170734.GA8811@flamenco>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180420170734.GA8811@flamenco>
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] qemu-thread: introduce
- qemu-thread-common.[ch]
+Date: Mon, 23 Apr 2018 13:39:23 +0800
+Message-Id: <20180423053927.13715-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 0/4] qemu-thread: support
+ --enable-debug-mutex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +22,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Emilio G . Cota" <cota@braap.org>, peterx@redhat.com
 
-On Fri, Apr 20, 2018 at 01:07:34PM -0400, Emilio G. Cota wrote:
-> On Fri, Apr 20, 2018 at 12:42:10 +0800, Peter Xu wrote:
-> > Put all the shared qemu-thread implementations into these files.  The
-> > header should be internal to qemu-thread but not for qemu-thread users.
-> > 
-> > Introduce some hooks correspondingly for the shared part.  Note that in
-> > qemu_mutex_unlock_impl() we moved the call before unlock operation which
-> > should make more sense.  And we don't need qemu_mutex_post_unlock() hook.
-> > 
-> > Currently the hooks only calls the tracepoints.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> (snip)
-> > -    trace_qemu_mutex_lock(mutex, file, line);
-> > -
-> > +    qemu_mutex_pre_lock(mutex, file, line);
-> >      err = pthread_mutex_lock(&mutex->lock);
-> >      if (err)
-> >          error_exit(err, __func__);
-> > -
-> > -    trace_qemu_mutex_locked(mutex, file, line);
-> > +    qemu_mutex_post_lock(mutex, file, line);
-> >  }
-> 
-> I see the value in consolidating these calls. However, having a separate
-> object means that this adds two function calls to mutex_lock. This
-> significantly reduces performance, even without --enable-debug-mutex:
-> - Before:
-> $ taskset -c 0 tests/atomic_add-bench -n 1 -m
-> Parameters:
->  # of threads:      1
->  duration:          1
->  ops' range:        1024
-> Results:
-> Duration:            1 s
->  Throughput:         57.24 Mops/s
->  Throughput/thread:  57.24 Mops/s/thread
-> 
-> - After:
-> $ taskset -c 0 tests/atomic_add-bench -n 1 -m
-> Parameters:
->  # of threads:      1
->  duration:          1
->  ops' range:        1024
-> Results:
-> Duration:            1 s
->  Throughput:         49.22 Mops/s
->  Throughput/thread:  49.22 Mops/s/thread
-> 
-> So either inlines/macros should be used instead -- I'd prefer
-> inlines but I'm not sure they'll work with the tracing calls.
+v4:
+- cherrypick Emilio's patch to add "-m" parameter to atomic_add-bench
+  tool.
+- use inline functions [Emilio]
 
-Indeed, it's about 10% drop.  I never thought an extra call would
-bring so much overhead, but after reading your patch I think I know -
-the test is only about raw mutex locking, so the extra call will be
-"amplified" comparing to real usages, where normally there can be much
-more things to be done besides taking and releasing the lock.
+Micro benchmark result on "taskset -c 0 atomic_add-bench -m":
 
-But sure making it inline should be better, and your reasoning is
-valid. Though I didn't see why it can't work with traces, I thought it
-should work natually.  I'll see.
+|--------+---------------------+------------------------|
+|        | with --enable-debug | without --enable-debug |
+|--------+---------------------+------------------------|
+| Before | 20 Mops/s           | 34 Mops/s              |
+| After  | 18 Mops/s           | 34 Mops/s              |
+|--------+---------------------+------------------------|
 
-> 
-> I think you should cherry-pick this patch[1] and add it to the
-> series -- it'll let you make sure the series does not affect
-> performance.
+v3:
+- note down owner for every locking operations [Emilio]
+- let Windows use it too [Emilio]
+- added two more patches: patch 1 & 3.
 
-Sure!  I'll attach benchmark results in my next post with your tool.
+Patch 1 generalize some common hooks for qemu-thread implementation
+for both POSIX and Windows.
 
-Thanks,
+Patch 2 introduces the new debugging facility.
+
+Patch 3 turns on mutex debugging automatically for "--enable-debug". I
+suppose most developers are with that so we naturally benefit from it.
+
+Please review.  Thanks.
+
+Emilio G. Cota (1):
+  tests/atomic_add-bench: add -m option to use mutexes
+
+Peter Xu (3):
+  qemu-thread: introduce qemu-thread-common.h
+  QemuMutex: support --enable-debug-mutex
+  configure: enable debug-mutex if debug enabled
+
+ configure                   | 11 +++++++++++
+ include/qemu/thread-posix.h |  4 ++++
+ include/qemu/thread-win32.h |  4 ++++
+ util/qemu-thread-common.h   | 46 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/atomic_add-bench.c    | 19 +++++++++++++++++--
+ util/qemu-thread-posix.c    | 17 +++++++----------
+ util/qemu-thread-win32.c    | 15 +++++++--------
+ 7 files changed, 96 insertions(+), 20 deletions(-)
+ create mode 100644 util/qemu-thread-common.h
 
 -- 
-Peter Xu
+2.14.3
