@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fAcQY-0003zT-H4
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 10:26:47 -0400
+	(envelope-from <prvs=644fc49e2=anthony.perard@citrix.com>)
+	id 1fAcSO-0005CA-Fe
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 10:28:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fAcQV-0003Ll-9n
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 10:26:46 -0400
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:46077)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fAcQV-0003L6-1g
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 10:26:43 -0400
-Received: by mail-wr0-x22b.google.com with SMTP id p5-v6so14078435wre.12
-	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 07:26:42 -0700 (PDT)
-References: <20180419135901.30035-1-alex.bennee@linaro.org>
-	<ef2caf0d-4bd0-9383-5d2f-e1f0ba9f536b@linaro.org>
-	<87sh7mkrsr.fsf@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <87sh7mkrsr.fsf@linaro.org>
-Date: Mon, 23 Apr 2018 15:26:40 +0100
-Message-ID: <87r2n6knhb.fsf@linaro.org>
+	(envelope-from <prvs=644fc49e2=anthony.perard@citrix.com>)
+	id 1fAcSL-0004kR-9E
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 10:28:40 -0400
+Received: from smtp03.citrix.com ([162.221.156.55]:19905)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71)
+	(envelope-from <prvs=644fc49e2=anthony.perard@citrix.com>)
+	id 1fAcSK-0004gD-Um
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 10:28:37 -0400
+Date: Mon, 23 Apr 2018 15:28:22 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20180423142822.GA1980@perard>
+References: <1524156319-11465-1-git-send-email-ian.jackson@eu.citrix.com>
+	<1524156319-11465-6-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 00/43] fix building of tests/tcg
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <1524156319-11465-6-git-send-email-ian.jackson@eu.citrix.com>
+Subject: Re: [Qemu-devel] [PATCH 05/16] xen: defer call to xen_restrict
+ until just before os_setup_post
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +32,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, qemu-devel@nongnu.org
+To: Ian Jackson <ian.jackson@eu.citrix.com>
+Cc: qemu-devel@nongnu.org, Ross Lagerwall <ross.lagerwall@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
+On Thu, Apr 19, 2018 at 05:45:08PM +0100, Ian Jackson wrote:
+> We need to restrict *all* the control fds that qemu opens.  Looking in
+> /proc/PID/fd shows there are many; their allocation seems scattered
+> throughout Xen support code in qemu.
+> 
+> We must postpone the restrict call until roughly the same time as qemu
+> changes its uid, chroots (if applicable), and so on.
+> 
+> There doesn't seem to be an appropriate hook already.  The RunState
+> change hook fires at different times depending on exactly what mode
+> qemu is operating in.
+> 
+> And it appears that no-one but the Xen code wants a hook at this phase
+> of execution.  So, introduce a bare call to a new function
+> xen_setup_post, just before os_setup_post.  Also provide the
+> appropriate stub for when Xen compilation is disabled.
+> 
+> We do the restriction before rather than after os_setup_post, because
+> xen_restrict may need to open /dev/null, and os_setup_post might have
+> called chroot.
+> 
+> Currently this does not work with migration, because when running as
+> the Xen device model qemu needs to signal to the toolstack that it is
+> ready.  It currently does this using xenstore, and for incoming
+> migration (but not for ordinary startup) that happens after
+> os_setup_post.
+> 
+> It is correct that this happens late: we want the incoming migration
+> stream to be processed by a restricted qemu.  The fix for this will be
+> to do the startup notification a different way, without using
+> xenstore.  (QMP is probably a reasonable choice.)
+> 
+> So for now this restriction feature cannot be used in conjunction with
+> migration.  (Note that this is not a regression in this patch, because
+> previously the -xen-restrict-domid call was, in fact, simply
+> ineffective!)  We will revisit this in the Xen 4.11 release cycle.
+> 
+> Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+Acked-by: Anthony PERARD <anthony.perard@citrix.com>
 
-> Richard Henderson <richard.henderson@linaro.org> writes:
->
->> On 04/19/2018 03:58 AM, Alex Benn=C3=A9e wrote:
->>> What would be really
->>> helpful is if the respective maintainers could encode their EXACT
->>> STEPS for building their cross compilers into some docker recipes.
->>
->> I've just re-built my alphaev67 cross-environment and recorded everythin=
-g.
-<snip>
->> Starting without that seed tarball is hard, as previously mentioned.  For
->> better supported platforms than alpha you can typically pull the same fi=
-les
->> from e.g. debian packages or a gentoo stage3 tarball.
->
-> Hmm I was hoping I could use --without-sysroot to build a gcc just for
-> building glibc and then re-build gcc once glibc was boot-strapped. But
-> that doesn't seem to work...
->
-> Maybe for alpha we just have to accept there is a blob of sysroot to get
-> the build going? Of course we should probably host that blob on qemu's
-> servers somewhere...
-
-New plan - Debian Sid has gcc-alpha-linux-gnu on account of the
-unofficial Debian Alpha port.
-
---
-Alex Benn=C3=A9e
+-- 
+Anthony PERARD
