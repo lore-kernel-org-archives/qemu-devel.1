@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fAaJD-0000bk-L9
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 08:11:06 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fAaLa-0001jA-2R
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 08:13:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fAaJ8-0002i0-NG
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 08:11:03 -0400
-References: <1523518688-26674-1-git-send-email-eric.auger@redhat.com>
-	<1523518688-26674-4-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA84iZV8vUK4DxPpuO6LwUqE=LEoW63qy=FTiF6KHvYhEw@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <677f3faa-24bd-0679-47ae-2dc9bd1c9bda@redhat.com>
-Date: Mon, 23 Apr 2018 14:10:39 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1fAaLZ-0004ec-0K
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 08:13:30 -0400
+References: <20180423084518.2426-1-armbru@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <fd298e0b-9f2f-cbaf-481b-78e5814d6fc1@redhat.com>
+Date: Mon, 23 Apr 2018 14:13:13 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA84iZV8vUK4DxPpuO6LwUqE=LEoW63qy=FTiF6KHvYhEw@mail.gmail.com>
+In-Reply-To: <20180423084518.2426-1-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v11 03/17] hw/arm/smmu-common: VMSAv8-64
- page table walk
+Subject: Re: [Qemu-devel] [PATCH] cpus: Fix event order on resume of stopped
+ guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,176 +24,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <cdall@kernel.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, kwolf@redhat.com
 
-Hi Peter,
+On 23/04/2018 10:45, Markus Armbruster wrote:
+> When resume of a stopped guest immediately runs into block device
+> errors, the BLOCK_IO_ERROR event is sent before the RESUME event.
+> 
+> Reproducer:
+> 
+> 1. Create a scratch image
+>    $ dd if=/dev/zero of=scratch.img bs=1M count=100
+> 
+>    Size doesn't actually matter.
+> 
+> 2. Prepare blkdebug configuration:
+> 
+>    $ cat >blkdebug.conf <<EOF
+>    [inject-error]
+>    event = "write_aio"
+>    errno = "5"
+>    EOF
+> 
+>    Note that errno 5 is EIO.
+> 
+> 3. Run a guest with an additional scratch disk, i.e. with additional
+>    arguments
+>    -drive if=none,id=scratch-drive,format=raw,werror=stop,file=blkdebug:blkdebug.conf:scratch.img
+>    -device virtio-blk-pci,id=scratch,drive=scratch-drive
+> 
+>    The blkdebug part makes all writes to the scratch drive fail with
+>    EIO.  The werror=stop pauses the guest on write errors.
+> 
+> 4. Connect to the QMP socket e.g. like this:
+>    $ socat UNIX:/your/qmp/socket READLINE,history=$HOME/.qmp_history,prompt='QMP> '
+> 
+>    Issue QMP command 'qmp_capabilities':
+>    QMP> { "execute": "qmp_capabilities" }
+> 
+> 5. Boot the guest.
+> 
+> 6. In the guest, write to the scratch disk, e.g. like this:
+> 
+>    # dd if=/dev/zero of=/dev/vdb count=1
+> 
+>    Do double-check the device specified with of= is actually the
+>    scratch device!
+> 
+> 7. Issue QMP command 'cont':
+>    QMP> { "execute": "cont" }
+> 
+> After step 6, I get a BLOCK_IO_ERROR event followed by a STOP event.  Good.
+> 
+> After step 7, I get BLOCK_IO_ERROR, then RESUME, then STOP.  Not so
+> good; I'd expect RESUME, then BLOCK_IO_ERROR, then STOP.
+> 
+> The funny event order confuses libvirt: virsh -r domstate DOMAIN
+> --reason reports "paused (unknown)" rather than "paused (I/O error)".
+> 
+> The culprit is vm_prepare_start().
+> 
+>     /* Ensure that a STOP/RESUME pair of events is emitted if a
+>      * vmstop request was pending.  The BLOCK_IO_ERROR event, for
+>      * example, according to documentation is always followed by
+>      * the STOP event.
+>      */
+>     if (runstate_is_running()) {
+>         qapi_event_send_stop(&error_abort);
+>         res = -1;
+>     } else {
+>         replay_enable_events();
+>         cpu_enable_ticks();
+>         runstate_set(RUN_STATE_RUNNING);
+>         vm_state_notify(1, RUN_STATE_RUNNING);
+>     }
+> 
+>     /* We are sending this now, but the CPUs will be resumed shortly later */
+>     qapi_event_send_resume(&error_abort);
+>     return res;
+> 
+> When resuming a stopped guest, we take the else branch before we get
+> to sending RESUME.  vm_state_notify() runs virtio_vmstate_change(),
+> among other things.  This restarts I/O, triggering the BLOCK_IO_ERROR
+> event.
+> 
+> Reshuffle vm_prepare_start() to send the RESUME event earlier.
+> 
+> Fixes RHBZ 1566153.
+> 
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  cpus.c | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
+> 
+> diff --git a/cpus.c b/cpus.c
+> index 38eba8bff3..398392bc3a 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -2043,7 +2043,6 @@ int vm_stop(RunState state)
+>  int vm_prepare_start(void)
+>  {
+>      RunState requested;
+> -    int res = 0;
+>  
+>      qemu_vmstop_requested(&requested);
+>      if (runstate_is_running() && requested == RUN_STATE__MAX) {
+> @@ -2057,17 +2056,18 @@ int vm_prepare_start(void)
+>       */
+>      if (runstate_is_running()) {
+>          qapi_event_send_stop(&error_abort);
+> -        res = -1;
+> -    } else {
+> -        replay_enable_events();
+> -        cpu_enable_ticks();
+> -        runstate_set(RUN_STATE_RUNNING);
+> -        vm_state_notify(1, RUN_STATE_RUNNING);
+> +        qapi_event_send_resume(&error_abort);
+> +        return -1;
+>      }
+>  
+>      /* We are sending this now, but the CPUs will be resumed shortly later */
+>      qapi_event_send_resume(&error_abort);
+> -    return res;
+> +
+> +    replay_enable_events();
+> +    cpu_enable_ticks();
+> +    runstate_set(RUN_STATE_RUNNING);
+> +    vm_state_notify(1, RUN_STATE_RUNNING);
+> +    return 0;
+>  }
+>  
+>  void vm_start(void)
+> 
 
-On 04/16/2018 02:59 PM, Peter Maydell wrote:
-> On 12 April 2018 at 08:37, Eric Auger <eric.auger@redhat.com> wrote:
->> This patch implements the page table walk for VMSAv8-64.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
-> 
->> diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
->> index 9a966bb..6a58948 100644
->> --- a/hw/arm/smmu-common.c
->> +++ b/hw/arm/smmu-common.c
->> @@ -27,6 +27,215 @@
->>
->>  #include "qemu/error-report.h"
->>  #include "hw/arm/smmu-common.h"
->> +#include "smmu-internal.h"
->> +
->> +/* VMSAv8-64 Translation */
->> +
->> +/**
->> + * get_pte - Get the content of a page table entry located t
->> + * @base_addr[@index]
->> + */
-> 
-> Comment appears to be truncated ?
-> 
->> +static int get_pte(dma_addr_t baseaddr, uint32_t index, uint64_t *pte,
->> +                   SMMUPTWEventInfo *info)
->> +{
->> +    int ret;
->> +    dma_addr_t addr = baseaddr + index * sizeof(*pte);
->> +
->> +    /* TODO: guarantee 64-bit single-copy atomicity */
->> +    ret = dma_memory_read(&address_space_memory, addr,
->> +                          (uint8_t *)pte, sizeof(*pte));
->> +
->> +    if (ret != MEMTX_OK) {
->> +        info->type = SMMU_PTW_ERR_WALK_EABT;
->> +        info->addr = addr;
->> +        return -EINVAL;
->> +    }
->> +    trace_smmu_get_pte(baseaddr, index, addr, *pte);
->> +    return 0;
->> +}
->> +
-> 
->> +/**
->> + * smmu_ptw - Walk the page tables for an IOVA, according to @cfg
->> + *
->> + * @cfg: translation configuration
->> + * @iova: iova to translate
->> + * @perm: tentative access type
->> + * @tlbe: returned entry
->> + * @info: ptw event handle
->> + *
->> + * return 0 on success
->> + */
->> +inline int smmu_ptw(SMMUTransCfg *cfg, dma_addr_t iova, IOMMUAccessFlags perm,
->> +             IOMMUTLBEntry *tlbe, SMMUPTWEventInfo *info)
->> +{
->> +    if (!cfg->aa64) {
->> +        /*
->> +         * This code path is not entered as we check this while decoding
->> +         * the configuration data in the derived SMMU model.
->> +         */
->> +        assert(0);
-> 
-> Prefer either g_assert_not_reached() or just assert(cfg->aa64).
-> 
->> +    }
->> +
->> +    return smmu_ptw_64(cfg, iova, perm, tlbe, info);
->> +}
->>
-> 
->> +
->> +/*
->> + * TODO: At the moment all transactions are considered as priviledged (EL1)
-> 
-> "privileged"
-> 
->> + * as IOMMU translation callback does not pass user/priv attributes.
->> + */
->> +#define is_permission_fault(ap, perm) \
->> +    (((perm) & IOMMU_WO) && ((ap) & 0x2))
->> +
->> +#define PTE_AP_TO_PERM(ap) \
->> +    (IOMMU_ACCESS_FLAG(true, !((ap) & 0x2)))
->> +
->> +/* Level Indexing */
->> +
->> +static inline int level_shift(int level, int granule_sz)
->> +{
->> +    return granule_sz + (3 - level) * (granule_sz - 3);
->> +}
->> +
->> +static inline uint64_t level_page_mask(int level, int granule_sz)
->> +{
->> +    return ~(MAKE_64BIT_MASK(0, level_shift(level, granule_sz)));
->> +}
->> +
->> +/**
->> + * TODO: handle the case where the level resolves less than
->> + * granule_sz -3 IA bits.
->> + */
->> +static inline
->> +uint64_t iova_level_offset(uint64_t iova, int level, int granule_sz)
->> +{
->> +    return (iova >> level_shift(level, granule_sz)) &
->> +            MAKE_64BIT_MASK(0, granule_sz - 3);
->> +}
->> +
->> +#endif
-> 
-> When does the TODO case happen, and what goes wrong?
-Sorry for the delay [back to the office].
+Queued, thanks.
 
-This refers to
-D4.2 of ARM ARM , Effect of granule size on translation table addressing
-and indexing/ Reduced IA width.
-
-"
-Depending on the configuration and implementation choices, the required
-input address width for the initial level of lookup might be smaller
-than the number of address bits that can be resolved at that level"
-
-For instance with 4k granule and IA limited to 35 bit, we use a 9-bit
-mask here and initial level 1 offset is based on IA[30, 38] although IA
-is limited to 35.
-
-Thanks
-
-Eric
-> 
->> --- a/include/hw/arm/smmu-common.h
->> +++ b/include/hw/arm/smmu-common.h
->> @@ -129,4 +129,18 @@ static inline uint16_t smmu_get_sid(SMMUDevice *sdev)
->>  {
->>      return  ((pci_bus_num(sdev->bus) & 0xff) << 8) | sdev->devfn;
->>  }
->> +
->> +/**
->> + * smmu_ptw - Perform the page table walk for a given iova / access flags
->> + * pair, according to @cfg translation config
->> + */
->> +int smmu_ptw(SMMUTransCfg *cfg, dma_addr_t iova, IOMMUAccessFlags perm,
->> +             IOMMUTLBEntry *tlbe, SMMUPTWEventInfo *info);
->> +
->> +/**
->> + * select_tt - compute which translation table shall be used according
-> 
-> "according to"
-> 
->> + * the input iova and tranlsation config and return the TT specific info
-> 
-> "translation"
-> 
->> + */
->> +SMMUTransTableInfo *select_tt(SMMUTransCfg *cfg, dma_addr_t iova);
->> +
->>  #endif  /* HW_ARM_SMMU_COMMON */
-> 
-> Otherwise
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> 
-> thanks
-> -- PMM
-> 
+Paolo
