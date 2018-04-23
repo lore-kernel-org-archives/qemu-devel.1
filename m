@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fAc44-00006l-2R
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 10:03:32 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fAc5N-0000vb-IF
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 10:04:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fAc3y-0002jr-Fk
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 10:03:32 -0400
-Received: from mail-ot0-x22c.google.com ([2607:f8b0:4003:c0f::22c]:38063)
+	(envelope-from <peter.maydell@linaro.org>) id 1fAc5M-0003TR-J2
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 10:04:53 -0400
+Received: from mail-oi0-x22c.google.com ([2607:f8b0:4003:c06::22c]:41742)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fAc3y-0002jL-86
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 10:03:26 -0400
-Received: by mail-ot0-x22c.google.com with SMTP id j27-v6so17159069ota.5
-	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 07:03:26 -0700 (PDT)
+	id 1fAc5M-0003T5-EG
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 10:04:52 -0400
+Received: by mail-oi0-x22c.google.com with SMTP id 188-v6so14367087oih.8
+	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 07:04:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <677f3faa-24bd-0679-47ae-2dc9bd1c9bda@redhat.com>
-References: <1523518688-26674-1-git-send-email-eric.auger@redhat.com>
-	<1523518688-26674-4-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA84iZV8vUK4DxPpuO6LwUqE=LEoW63qy=FTiF6KHvYhEw@mail.gmail.com>
-	<677f3faa-24bd-0679-47ae-2dc9bd1c9bda@redhat.com>
+In-Reply-To: <a3fc65b6-d906-fbfa-0102-a5382b15df8e@amsat.org>
+References: <20180421211652.14794-1-f4bug@amsat.org>
+	<CAFEAcA_mSu00gEHgmfdpcvtaqfn7X0wbkUX54TCUW_FG+iURWQ@mail.gmail.com>
+	<20180423031639.GB19804@umbus.fritz.box>
+	<a3fc65b6-d906-fbfa-0102-a5382b15df8e@amsat.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 23 Apr 2018 15:03:04 +0100
-Message-ID: <CAFEAcA9C2uuvE7MRt+TUnRARytKU5aH62FHf7c6F49KwRV-nFg@mail.gmail.com>
+Date: Mon, 23 Apr 2018 15:04:31 +0100
+Message-ID: <CAFEAcA8T=aDjRAxxRWOKJuhDJa1ROjQ43cvaTG5B44+=d9SVLQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v11 03/17] hw/arm/smmu-common: VMSAv8-64
- page table walk
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] loader: Fix misaligned member access
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,47 +32,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <cdall@kernel.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Paul Burton <paul.burton@mips.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 23 April 2018 at 13:10, Auger Eric <eric.auger@redhat.com> wrote:
-> Hi Peter,
+On 23 April 2018 at 14:57, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wr=
+ote:
+> On 04/23/2018 12:16 AM, David Gibson wrote:
+>> On Sun, Apr 22, 2018 at 11:41:20AM +0100, Peter Maydell wrote:
+>>> If we need to do an unaligned load, then ldl_p() is the
+>>> right way to do it. (We could also just do
+>>>  *addr =3D ldl_be_p(prop) but we maybe don't want to
+>>> bake in knowledge that FDT is big-endian).
 >
-> On 04/16/2018 02:59 PM, Peter Maydell wrote:
->> On 12 April 2018 at 08:37, Eric Auger <eric.auger@redhat.com> wrote:
+> Since it is, ldl_be_p() seems the clever/cleaner way indeed, but then we
+> assume we know the underlying type of fdt32_t; while using memcpy we
+> respect the FDT API.
 
->>> +/**
->>> + * TODO: handle the case where the level resolves less than
->>> + * granule_sz -3 IA bits.
->>> + */
->>> +static inline
->>> +uint64_t iova_level_offset(uint64_t iova, int level, int granule_sz)
->>> +{
->>> +    return (iova >> level_shift(level, granule_sz)) &
->>> +            MAKE_64BIT_MASK(0, granule_sz - 3);
->>> +}
->>> +
->>> +#endif
->>
->> When does the TODO case happen, and what goes wrong?
-> Sorry for the delay [back to the office].
->
-> This refers to
-> D4.2 of ARM ARM , Effect of granule size on translation table addressing
-> and indexing/ Reduced IA width.
->
-> "
-> Depending on the configuration and implementation choices, the required
-> input address width for the initial level of lookup might be smaller
-> than the number of address bits that can be resolved at that level"
->
-> For instance with 4k granule and IA limited to 35 bit, we use a 9-bit
-> mask here and initial level 1 offset is based on IA[30, 38] although IA
-> is limited to 35.
+ *addr =3D fdt32_to_cpu(ldl_p(prop));
 
-Hmm. We do get this right for the table walk code in
-target/arm/helper.c, so it would be kind of nice to get it
-right here too.
+is better than a raw memcpy still.
 
 thanks
 -- PMM
