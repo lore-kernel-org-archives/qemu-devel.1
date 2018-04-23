@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fAk1y-0006PL-Ce
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 18:33:55 -0400
+	(envelope-from <eblake@redhat.com>) id 1fAk1z-0006QF-ID
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 18:33:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fAk1x-0005cj-Ho
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 18:33:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1fAk1y-0005dO-8h
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 18:33:55 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 23 Apr 2018 17:33:33 -0500
-Message-Id: <20180423223337.82366-2-eblake@redhat.com>
+Date: Mon, 23 Apr 2018 17:33:37 -0500
+Message-Id: <20180423223337.82366-6-eblake@redhat.com>
 In-Reply-To: <20180423223337.82366-1-eblake@redhat.com>
 References: <20180423223337.82366-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 1/5] qcow2: Prefer byte-based calls into
- bs->file
+Subject: [Qemu-devel] [PATCH v5 5/5] qcow2: Avoid memory over-allocation on
+ compressed images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,63 +23,137 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, qemu-block@nongnu.org, berto@igalia.com, Max Reitz <mreitz@redhat.com>
 
-We had only a few sector-based stragglers left; convert them to use
-our preferred byte-based accesses.
+When reading a compressed image, we were allocating s->cluster_data
+to 32*cluster_size + 512 (possibly over 64 megabytes, for an image
+with 2M clusters).  Let's check out the history:
+
+Back when qcow2 was first written, we used s->cluster_data for
+everything, including copy_sectors() and encryption, where we want
+to operate on more than one cluster at once.  Obviously, at that
+point, the buffer had to be aligned for other users, even though
+compression itself doesn't require any alignment (the fact that
+the compressed data generally starts mid-sector means that aligning
+our buffer buys us nothing - either the protocol already supports
+byte-based access into whatever offset we want, or we are already
+using a bounce buffer to read a full sector, and copying into
+our destination no longer requires alignment).
+
+But commit 1b9f1491 (v1.1!) changed things to allocate parallel
+buffers on demand rather than sharing a single buffer, for encryption
+and COW, leaving compression as the final client of s->cluster_data.
+That use was still preserved, because if a single compressed cluster
+is read more than once, we reuse the cache instead of decompressing
+it a second time (someday, we may come up with better caching to
+avoid wasting repeated decompressions while still being more parallel,
+but that is a task for another patch; the XXX comment in
+qcow2_co_preadv for QCOW2_CLUSTER_COMPRESSED is telling).
+
+Much later, in commit de82815d (v2.2), we noticed that a 64M
+allocation is prone to failure, so we switched over to a graceful
+memory allocation error message.  Elsewhere in the code, we do
+g_malloc(2 * cluster_size) without ever checking for failure, but
+even 4M starts to be large enough that trying to be nice is worth
+the effort, so we want to keep that aspect.
+
+Then even later, in 3e4c7052 (2.11), we realized that allocating
+a large buffer up front for every qcow2 image is expensive, and
+switched to lazy allocation only for images that actually had
+compressed clusters.  But in the process, we never even bothered
+to check whether what we were allocating still made sense in its
+new context!
+
+So, it's time to cut back on the waste.  A compressed cluster
+written by qemu will NEVER occupy more than an uncompressed
+cluster, but based on mid-sector alignment, we may still need
+to read 1 cluster + 1 sector in order to recover enough bytes
+for the decompression.  But third-party producers of qcow2 may
+not be as smart, and gzip DOES document that because the
+compression stream adds metadata, and because of the pigeonhole
+principle, there are worst case scenarios where attempts to
+compress will actually inflate an image, by up to 0.015% (or 62
+sectors larger for an unfortunate 2M compression).  In fact,
+the qcow2 spec permits an all-ones sector count, plus a full
+sector containing the initial offset, for a maximum read of
+2 full clusters; and thanks to the way decompression works,
+even though such a value is probably too large for the actual
+compressed data, it really doesn't matter if we read too much
+(gzip ignores slop, once it has decoded a full cluster).  So
+it's easier to just allocate cluster_data to be as large as we
+can ever possibly see; even if it still wastes up to 2M on any
+image created by qcow2, that's still an improvment of 60M less
+waste than pre-patch.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 
 ---
-v5: commit message tweak
-v2: indentation fix
+v4: fix off-by-one in assertion and commit message [Berto]
+v3: tighten allocation [Berto]
+v2: actually check allocation failure (previous version meant
+to use g_malloc, but ended up posted with g_try_malloc without
+checking); add assertions outside of conditional, improve
+commit message to better match reality now that qcow2 spec bug
+has been fixed
 ---
- block/qcow2-cluster.c  | 5 ++---
- block/qcow2-refcount.c | 6 +++---
- 2 files changed, 5 insertions(+), 6 deletions(-)
+ block/qcow2-cluster.c | 27 ++++++++++++++++++---------
+ block/qcow2.c         |  2 +-
+ 2 files changed, 19 insertions(+), 10 deletions(-)
 
 diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 1aee726c6a4..1dc00ff2110 100644
+index 1dc00ff2110..6e3eb88a37a 100644
 --- a/block/qcow2-cluster.c
 +++ b/block/qcow2-cluster.c
-@@ -1616,13 +1616,12 @@ int qcow2_decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset)
+@@ -1599,20 +1599,29 @@ int qcow2_decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset)
+         sector_offset = coffset & 511;
+         csize = nb_csectors * 512 - sector_offset;
+
+-        /* Allocate buffers on first decompress operation, most images are
+-         * uncompressed and the memory overhead can be avoided.  The buffers
+-         * are freed in .bdrv_close().
++        /* Allocate buffers on the first decompress operation; most
++         * images are uncompressed and the memory overhead can be
++         * avoided.  The buffers are freed in .bdrv_close().  qemu
++         * never writes an inflated cluster, and gzip itself never
++         * inflates a problematic cluster by more than 0.015%, but the
++         * qcow2 format allows up to 1 byte short of 2 full clusters
++         * when including the sector containing offset.  gzip ignores
++         * trailing slop, so just allocate that much up front rather
++         * than reject third-party images with overlarge csize.
+          */
++        assert(!!s->cluster_data == !!s->cluster_cache);
++        assert(csize <= 2 * s->cluster_size);
+         if (!s->cluster_data) {
+-            /* one more sector for decompressed data alignment */
+-            s->cluster_data = qemu_try_blockalign(bs->file->bs,
+-                    QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size + 512);
++            s->cluster_data = g_try_malloc(2 * s->cluster_size);
+             if (!s->cluster_data) {
+                 return -ENOMEM;
+             }
+-        }
+-        if (!s->cluster_cache) {
+-            s->cluster_cache = g_malloc(s->cluster_size);
++            s->cluster_cache = g_try_malloc(s->cluster_size);
++            if (!s->cluster_cache) {
++                g_free(s->cluster_data);
++                s->cluster_data = NULL;
++                return -ENOMEM;
++            }
          }
 
          BLKDBG_EVENT(bs->file, BLKDBG_READ_COMPRESSED);
--        ret = bdrv_read(bs->file, coffset >> 9, s->cluster_data,
--                        nb_csectors);
-+        ret = bdrv_pread(bs->file, coffset, s->cluster_data, csize);
-         if (ret < 0) {
-             return ret;
-         }
-         if (decompress_buffer(s->cluster_cache, s->cluster_size,
--                              s->cluster_data + sector_offset, csize) < 0) {
-+                              s->cluster_data, csize) < 0) {
-             return -EIO;
-         }
-         s->cluster_cache_offset = coffset;
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 6b8b63514af..6bfc11bb48f 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -2359,8 +2359,8 @@ write_refblocks:
-         on_disk_refblock = (void *)((char *) *refcount_table +
-                                     refblock_index * s->cluster_size);
+diff --git a/block/qcow2.c b/block/qcow2.c
+index ef68772acad..a8301371ccc 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2151,7 +2151,7 @@ static void qcow2_close(BlockDriverState *bs)
+     g_free(s->image_backing_format);
 
--        ret = bdrv_write(bs->file, refblock_offset / BDRV_SECTOR_SIZE,
--                         on_disk_refblock, s->cluster_sectors);
-+        ret = bdrv_pwrite(bs->file, refblock_offset, on_disk_refblock,
-+                          s->cluster_size);
-         if (ret < 0) {
-             fprintf(stderr, "ERROR writing refblock: %s\n", strerror(-ret));
-             goto fail;
-@@ -2582,7 +2582,7 @@ fail:
-  * - 0 if writing to this offset will not affect the mentioned metadata
-  * - a positive QCow2MetadataOverlap value indicating one overlapping section
-  * - a negative value (-errno) indicating an error while performing a check,
-- *   e.g. when bdrv_read failed on QCOW2_OL_INACTIVE_L2
-+ *   e.g. when bdrv_pread failed on QCOW2_OL_INACTIVE_L2
-  */
- int qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t offset,
-                                  int64_t size)
+     g_free(s->cluster_cache);
+-    qemu_vfree(s->cluster_data);
++    g_free(s->cluster_data);
+     qcow2_refcount_close(bs);
+     qcow2_free_snapshots(bs);
+ }
 -- 
 2.14.3
