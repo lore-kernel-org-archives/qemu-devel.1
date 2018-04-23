@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fAbUm-0001iU-6w
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 09:27:08 -0400
+	(envelope-from <palves@redhat.com>) id 1fAbWB-0002k2-3s
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 09:28:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fAbUl-0001KW-Gh
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 09:27:04 -0400
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:41148)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fAbUl-0001K8-Au
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 09:27:03 -0400
-Received: by mail-ot0-x243.google.com with SMTP id m22-v6so17143490otf.8
-	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 06:27:03 -0700 (PDT)
+	(envelope-from <palves@redhat.com>) id 1fAbW7-0002RR-49
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 09:28:31 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38492 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <palves@redhat.com>) id 1fAbW6-0002OG-Vq
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 09:28:27 -0400
+References: <20180404103440.19546-1-stefanha@redhat.com>
+	<008ac6e8-1e68-b0f6-7e75-77453721d031@virtuozzo.com>
+	<20180410020823.GB11203@stefanha-x1.localdomain>
+	<fefd54c0-d5f2-dc31-ff3c-24eb29fd2101@simark.ca>
+From: Pedro Alves <palves@redhat.com>
+Message-ID: <788e662d-0fb6-8db8-a049-3714eaa32869@redhat.com>
+Date: Mon, 23 Apr 2018 14:28:16 +0100
 MIME-Version: 1.0
-In-Reply-To: <d3762ab7-e23c-9078-0e1f-57addc334cbe@st.com>
-References: <20180423075215.4572-1-christophe.lyon@st.com>
-	<20180423075215.4572-3-christophe.lyon@st.com>
-	<CAFEAcA9tnh9j=QMxZm7RTMzaRVxh10oEGDCYYO5TL5TvAuvLXw@mail.gmail.com>
-	<d3762ab7-e23c-9078-0e1f-57addc334cbe@st.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 23 Apr 2018 14:26:42 +0100
-Message-ID: <CAFEAcA-bhRhgxOqCWd3bA+qRsUaskT3XZ61u9_nPW-fnCvPRfw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [ARM/FDPIC v2 2/4] linux-user: ARM-FDPIC: Identify
- ARM FDPIC binaries
+In-Reply-To: <fefd54c0-d5f2-dc31-ff3c-24eb29fd2101@simark.ca>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] scripts/qemugdb: support coroutine
+ backtrace in coredumps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,35 +31,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christophe Lyon <christophe.lyon@st.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Christophe Lyon <christophe.lyon@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+To: Simon Marchi <simark@simark.ca>, Stefan Hajnoczi <stefanha@gmail.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, gdb@sourceware.org
 
-On 23 April 2018 at 13:53, Christophe Lyon <christophe.lyon@st.com> wrote:
-> On 23/04/2018 14:17, Peter Maydell wrote:
->> I have a strong dislike for per-target ifdef ladders. Can we instead
->> put the target's implementation of elf_is_fdpic() into
->> linux-user/$ARCH/target_elf.h
->> and also have that header do
->> #define TARGET_HAS_ELF_FDPIC
+On 04/23/2018 02:37 AM, Simon Marchi wrote:
+> On 2018-04-09 10:08 PM, Stefan Hajnoczi wrote:
+>> I wonder what the point of select-frame is then...
 >>
->> and then in the generic code we can protect the default elf_is_fdpic()
->> with #ifndef TARGET_HAS_ELF_FDPIC.
+>> I have CCed the GDB mailing list.  Maybe someone can help us.  Context:
 >>
->
-> How invasive could that be?
-> Your proposal is appealing, but target_elf.h is only included by
-> linux-user/main.c, which does not define elfhdr etc...
-> All that knowledge is in linux-user/elfload.c, which controls what
-> include/elf.h defines.
+>> QEMU implements coroutines using jmpbuf.  We'd like to print coroutine
+>> call stacks in GDB and have a script that works when a process is being
+>> debugged (it sets the registers).
+>>
+>> Now we'd like to extend the script to work on core dumps where it's not
+>> possible to set registers (since there is no process being debugged).
+>>
+>> Is there a way to backtrace an arbitrary call stack in a core dump?
+> 
+> Not that I know of.  The "frame <stack-addr> <pc-addr>" form of the frame
+> command sounds like it should be usable to achieve that, but it doesn't
+> seem to work in that way.  I really wonder if it's working as it was
+> intended initially.  I guess using that form of the frame command should
+> override/mask the real current values of $sp and $pc?
 
-Hmm, I see what you mean. We can't even put the function inside the
-existing per-target ifdef ladder, because that comes before the
-include of elf.h halfway down elfload.c.
+Yeah, "frame <args>" has a lot of problems.
 
-That's a bit of a mess, but it's a mess we shouldn't try to
-clean up as part of this patchset, so
+This series was working toward sorting out the "frame" command:
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+  https://sourceware.org/ml/gdb-patches/2015-09/msg00248.html
 
-thanks
--- PMM
+Follow the urls there for more background.
+
+To me, the important questions to answer are here:
+ https://sourceware.org/ml/gdb-patches/2015-09/msg00658.html
+
+Unfortunately, I don't think the series moved past that point.
+
+Thanks,
+Pedro Alves
