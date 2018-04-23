@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=644ea31d5=Ian.Jackson@citrix.com>)
-	id 1fAf0i-0003Wp-7W
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 13:12:17 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fAfKk-0000Ok-MN
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 13:32:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=644ea31d5=Ian.Jackson@citrix.com>)
-	id 1fAf0e-0002m5-Tc
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 13:12:16 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:36581)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=644ea31d5=Ian.Jackson@citrix.com>)
-	id 1fAf0e-0002lV-Kl
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 13:12:12 -0400
-From: Ian Jackson <ian.jackson@citrix.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1fAfKg-0000bX-0z
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 13:32:58 -0400
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:36525)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fAfKf-0000aw-QF
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 13:32:53 -0400
+Received: by mail-pg0-x241.google.com with SMTP id i6so8865031pgv.3
+	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 10:32:53 -0700 (PDT)
+References: <20180423162523.6392-1-f4bug@amsat.org>
+	<20180423162523.6392-2-f4bug@amsat.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <af1add67-8a9a-24d2-79f0-9b41d20974ea@linaro.org>
+Date: Mon, 23 Apr 2018 07:32:47 -1000
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
+In-Reply-To: <20180423162523.6392-2-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Message-ID: <23262.5095.477702.668746@mariner.uk.xensource.com>
-Date: Mon, 23 Apr 2018 18:12:07 +0100
-In-Reply-To: <20180423163809.GR3267@redhat.com>
-References: <1524156319-11465-1-git-send-email-ian.jackson@eu.citrix.com>
-	<1524156319-11465-17-git-send-email-ian.jackson@eu.citrix.com>
-	<20180423162142.GG1980@perard>	<20180423163809.GR3267@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 16/16] configure: do_compiler: Dump some
- extra info under bash
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] bswap.h: Fix ldl_he_p() signedness
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,26 +31,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P.=?iso-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>
-Cc: Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Peter Maydell <peter.maydell@linaro.org>, "Kent R. Spillner" <kspillner@acm.org>, qemu-devel@nongnu.org, Ross Lagerwall <ross.lagerwall@citrix.com>, Paolo
-	Bonzini <pbonzini@redhat.com>, xen-devel@lists.xenproject.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-Daniel P. Berrang� writes ("Re: [Qemu-devel] [PATCH 16/16] configure: do_compiler: Dump some extra info under bash"):
-> Personally I'd suggest we add informative messages throughout the
-> configure script for each check being run. If people really hate the
-> idea of a verbose output from configure, we could leave it silent by
-> default and add a '--verbose' option to turn it on.
+On 04/23/2018 06:25 AM, Philippe Mathieu-Daudé wrote:
+> As per the "Load and Store APIs" documentation (docs/devel/loads-stores.rst),
+> "No signed load operations are provided."
+> Update lduw_he_p() to return as unsigned.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  include/qemu/bswap.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/qemu/bswap.h b/include/qemu/bswap.h
+> index 3f28f661b1..613978f838 100644
+> --- a/include/qemu/bswap.h
+> +++ b/include/qemu/bswap.h
+> @@ -330,9 +330,9 @@ static inline void stw_he_p(void *ptr, uint16_t v)
+>      memcpy(ptr, &v, sizeof(v));
+>  }
+>  
+> -static inline int ldl_he_p(const void *ptr)
+> +static inline uint32_t ldl_he_p(const void *ptr)
+>  {
+> -    int32_t r;
+> +    uint32_t r;
 
-Doing that would be a lot of work.  I am not opposed to it, but I am
-not going to do it.
+Nack, not without auditing all users.
 
-My suggestion is a very small change which instantly makes configure
-much easier to debug, at least if you have bash available (and the bug
-you are fixing doesn't go away with bash).
+The documentation is clear about ldl being an oddball,
+primarily because we didn't audit all users last time.
 
-Please don't let the best be the enemy of an improvement.  If
-configure is ever improved (without being simply replaced), the
-logging code can easily be removed.
+In the short term, just cast your user, which is what
+we wind up doing elsewhere in the codebase.
 
-Thanks,
-Ian.
+r~
