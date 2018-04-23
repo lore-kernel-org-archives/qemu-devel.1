@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fAiy3-0003tb-D5
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 17:25:48 -0400
+	(envelope-from <bounces@canonical.com>) id 1fAjft-0002ap-9v
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 18:11:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fAiy0-0002fJ-4u
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 17:25:47 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51418)
+	(envelope-from <bounces@canonical.com>) id 1fAjfp-0004lT-9V
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 18:11:05 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41114)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fAixz-0002f2-Ua
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 17:25:44 -0400
+	id 1fAjfp-0004k6-39
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 18:11:01 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fAixy-0007t4-Pb
-	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 21:25:42 +0000
+	id 1fAjfo-0008SG-2Q
+	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 22:11:00 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BCE0C2E80C8
-	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 21:25:42 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 106012E80C9
+	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 22:11:00 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 23 Apr 2018 21:07:36 -0000
-From: Lukas Jirkovsky <1191326@bugs.launchpad.net>
-Reply-To: Bug 1191326 <1191326@bugs.launchpad.net>
+Date: Mon, 23 Apr 2018 22:04:28 -0000
+From: =?utf-8?q?Murilo_Opsfelder_Ara=C3=BAjo?= <1763536@bugs.launchpad.net>
+Reply-To: Bug 1763536 <1763536@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20130615151015.21597.4187.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152451765614.19725.13236394863098403859.malone@soybean.canonical.com>
+References: <152357545161.20027.863482450235173908.malonedeb@gac.canonical.com>
+Message-Id: <152452106895.12830.7222608458970817833.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1191326] Re: QNX 4 doesn't boot on qemu >= 1.3
+Subject: [Qemu-devel] [Bug 1763536] Re: go build fails under
+ qemu-ppc64le-static (qemu-user)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,48 +39,140 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-It turns out modifying code is not needed at all. The only thing that is
-needed is to configure SeaBIOS with CONFIG_ATA_DMA=3Dy.
+Using QEMU from tag v2.12.0-rc4 on Ubuntu Xenial ppc64el, it works.
 
-So the steps needed to make QNX 4 work on current QEMU are
-1. Download SeaBIOS source and make sure the configuration has CONFIG_ATA_D=
-MA=3Dy set
-2. Build SeaBIOS
-3. Run qemu such as "qemu-system-i386 -bios /path/to/seabios/bios.bin -hda =
-qnxdisk ..."
+muriloo@jaspion1:~/go-docker$ sudo docker run --rm -it qemutest
+/go # /usr/bin/qemu-ppc64le-static --version
+qemu-ppc64 version 2.11.94 (v2.12.0-rc4-dirty)
+Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+/go # go version
+go version go1.10.1 linux/ppc64le
+/go # go build hello.go
+/go # ./hello
+hello world
+/go #
+
+Here is how I configured QEMU:
+
+muriloo@jaspion1:~/sources/qemu$ ./configure --target-list=3Dppc64-linux-
+user --disable-system --disable-tools --static
+
+muriloo@jaspion1:~$ uname -a
+Linux jaspion1 4.4.0-119-generic #143-Ubuntu SMP Mon Apr 2 16:08:02 UTC 201=
+8 ppc64le ppc64le ppc64le GNU/Linux
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1191326
+https://bugs.launchpad.net/bugs/1763536
 
 Title:
-  QNX 4 doesn't boot on qemu >=3D 1.3
+  go build fails under qemu-ppc64le-static (qemu-user)
 
 Status in QEMU:
-  Confirmed
+  New
 
 Bug description:
-  I am using virtual machine with QNX4 operating system installed on it.  I=
- updated my qemu from version
-  to newer and QNX4 doesn't start any more. All is ok on version 1.2 but wh=
-en I try to use any newer version
-  (1.3, 1.4, 1.5)  QNX4 doesn't boot.  I tried on windows and linux ubuntu =
-hosts - effects are the same.
+  I am using qemu-user (built static) in a docker container environment.
+  When running multi-threaded go commands in the container (go build for
+  example) the process may hang, report segfaults or other errors.  I
+  built qemu-ppc64le from the upstream git (master).
 
-  When virtual machine boots qnx bootloader loads and starts operating syst=
-em. In the next step
-  qnx starts its ide driver, which detects qemu harddisk and cdrom. Problem=
- starts when operating system
-  tries mount partition - an error occur and qnx stop booting procedure:
+  I see the problem running on a multi core system with Intel i7 processors.
+  # cat /proc/cpuinfo | grep "model name"
+  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
+  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
+  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
+  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
+  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
+  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
+  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
+  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
 
-  mount -p "No bios signature in partition sector on /dev/hd0"
+  Steps to reproduce:
+  1) Build qemu-ppc64le as static and copy into docker build directory name=
+d it qemu-ppc64le-static.
 
-  I have tried install qnx from cdrom but it seems that there is the same p=
-roblem. QNX installer boot from
-  cdrom, detects hard disk and cdrom, but cdrom can't be mounted in the nex=
-t step of installation procedure.
+  2) Add hello.go to docker build dir.
+
+  package main
+  import "fmt"
+  func main() {
+  	fmt.Println("hello world")
+  }
+
+  3) Create the Dockerfile from below:
+
+  FROM ppc64le/golang:1.10.1-alpine3.
+  COPY qemu-ppc64le-static /usr/bin/
+  COPY hello.go /go
+
+  4) Build container
+  $ docker build -t qemutest -f Dockerfile ./go =
+
+
+  5) Run test
+  $ docker run -it qemutest
+
+  /go # /usr/bin/qemu-ppc64le-static --version
+  qemu-ppc64le version 2.11.93 (v2.12.0-rc3-dirty)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+
+  /go # go version
+  go version go1.10.1 linux/ppc64le
+
+  /go # go build hello.go
+  fatal error: fatal error: stopm holding locksunexpected signal during run=
+time execution
+
+  panic during panic
+  [signal SIGSEGV: segmentation violation code=3D0x1 addr=3D0x0 pc=3D0x1003=
+528c]
+
+  runtime stack:
+  runtime: unexpected return pc for syscall.Syscall6 called from 0xc42007f5=
+00
+  stack: frame=3D{sp:0xc4203be840, fp:0xc4203be860} stack=3D[0x4000b7ecf0,0=
+x4000b928f0)
+
+  syscall.Syscall6(0x100744e8, 0x3d, 0xc42050c140, 0x20, 0x18, 0x10422b80, =
+0xc4203be968[signal , 0x10012d88SIGSEGV: segmentation violation, 0xc4205940=
+00 code=3D, 0x00x1 addr=3D0x0 pc=3D0x1003528c)
+  ]
+
+  runtime stack:
+  	/usr/local/go/src/syscall/asm_linux_ppc64x.s:61runtime.throw(0x10472d19,=
+ 0x13)
+   +	/usr/local/go/src/runtime/panic.go:0x6c616 +0x68
+
+  =
+
+  runtime.stopm()
+  	/usr/local/go/src/runtime/proc.go:1939goroutine  +10x158
+   [runtime.exitsyscall0semacquire(0xc42007f500)
+  	/usr/local/go/src/runtime/proc.go:3129 +]:
+  0x130
+  runtime.mcall(0xc42007f500)
+  	/usr/local/go/src/runtime/asm_ppc64x.s:183 +0x58sync.runtime_Semacquire
+  (0xc4201fab1c)
+  	/usr/local/go/src/runtime/sema.go:56 +0x38
+
+  ----
+  Note the results may differ between attempts,  hangs and other faults som=
+etimes happen.
+  ----
+  If I run "go: single threaded I don't see the problem, for example:
+
+  /go # GOMAXPROCS=3D1 go build -p 1 hello.go =
+
+  /go # ./hello
+  hello world
+
+  I see the same issue with arm64.  I don't think this is a go issue,
+  but don't have a real evidence to prove that.  This problem looks
+  similar to other problem I have seen reported against qemu running
+  multi-threaded applications.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1191326/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1763536/+subscriptions
