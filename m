@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fAikb-0001qq-QA
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 17:11:54 -0400
+	(envelope-from <bounces@canonical.com>) id 1fAiy3-0003tb-D5
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 17:25:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fAikW-000673-Ro
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 17:11:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44422 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fAikW-00065X-Lp
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 17:11:48 -0400
-Date: Tue, 24 Apr 2018 00:11:39 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180424000615-mutt-send-email-mst@kernel.org>
-References: <CF6A88132359CE47947DB4C6E1709ED53973A6AF@ORSMSX110.amr.corp.intel.com>
+	(envelope-from <bounces@canonical.com>) id 1fAiy0-0002fJ-4u
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 17:25:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51418)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fAixz-0002f2-Ua
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 17:25:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fAixy-0007t4-Pb
+	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 21:25:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id BCE0C2E80C8
+	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 21:25:42 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CF6A88132359CE47947DB4C6E1709ED53973A6AF@ORSMSX110.amr.corp.intel.com>
-Subject: Re: [Qemu-devel] RFC: altering the NVDIMM acpi table
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 23 Apr 2018 21:07:36 -0000
+From: Lukas Jirkovsky <1191326@bugs.launchpad.net>
+Reply-To: Bug 1191326 <1191326@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130615151015.21597.4187.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152451765614.19725.13236394863098403859.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1191326] Re: QNX 4 doesn't boot on qemu >= 1.3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,66 +36,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Schmauss, Erik" <erik.schmauss@intel.com>
-Cc: "imammedo@redhat.com" <imammedo@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Williams, Dan J" <dan.j.williams@intel.com>, "He, Junyan" <junyan.he@intel.com>, "Moore, Robert" <robert.moore@intel.com>
+To: qemu-devel@nongnu.org
 
-On Mon, Apr 23, 2018 at 08:35:45PM +0000, Schmauss, Erik wrote:
-> Hello,
-> 
-> I work on ACPICA and we have recently made changes to the behavior of 
-> the Linux AML interpreter to match other OS implementations. After 
-> sending the patches to upstream Linux, we have identified that 
-> hw/acpi/nvdimm.c specifies an ACPI table with a forward reference
->  (MEMA is a forward reference that is no longer supported as of Linux 
-> 4.17-rc1).
-> 
-> We would like to change this file to move the declaration of Name 
-> (MEMA,...) to appear as the very first declaration in the SSDT. Below is a patch outlining the change that I would like to make. 
-> However, I am having a hard time getting make check to run
->  to completion in a reasonable amount of time. It always seems to fail 
-> on some sort of checksum test... It would be great if you could let me 
-> know what you think of the change and what I can do to speed up the 
-> execution time of make check...
-> 
-> 
-> Thanks,
-> 
-> Erik Schmauss
-> 
-> diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
-> index 59d6e4254c..7c9efd9ac7 100644
-> --- a/hw/acpi/nvdimm.c
-> +++ b/hw/acpi/nvdimm.c
-> @@ -1234,6 +1234,9 @@ static void nvdimm_build_ssdt(GArray *table_offsets, GArray *table_data,
->      ssdt = init_aml_allocator();
->      acpi_data_push(ssdt->buf, sizeof(AcpiTableHeader));
->  
-> +    mem_addr_offset = build_append_named_dword(table_data,
-> +                                               NVDIMM_ACPI_MEM_ADDR);
-> +
->      sb_scope = aml_scope("\\_SB");
+It turns out modifying code is not needed at all. The only thing that is
+needed is to configure SeaBIOS with CONFIG_ATA_DMA=3Dy.
 
-Hmm I suspect this won't work because you are appending to
-table_data, but the ssdt header isn't there yet - it's
-in ssdt at this point.
+So the steps needed to make QNX 4 work on current QEMU are
+1. Download SeaBIOS source and make sure the configuration has CONFIG_ATA_D=
+MA=3Dy set
+2. Build SeaBIOS
+3. Run qemu such as "qemu-system-i386 -bios /path/to/seabios/bios.bin -hda =
+qnxdisk ..."
 
-Look at hw/acpi/vmgenid.c for how to do it right:
+-- =
 
-    vgia_offset = table_data->len +
-        build_append_named_dword(ssdt->buf, "VGIA");
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1191326
 
-ugly, but works.
+Title:
+  QNX 4 doesn't boot on qemu >=3D 1.3
 
+Status in QEMU:
+  Confirmed
 
->  
->      dev = aml_device("NVDR");
-> @@ -1266,9 +1269,6 @@ static void nvdimm_build_ssdt(GArray *table_offsets, GArray *table_data,
->  
->      /* copy AML table into ACPI tables blob and patch header there */
->      g_array_append_vals(table_data, ssdt->buf->data, ssdt->buf->len);
-> -    mem_addr_offset = build_append_named_dword(table_data,
-> -                                               NVDIMM_ACPI_MEM_ADDR);
-> -
->      bios_linker_loader_alloc(linker,
->                               NVDIMM_DSM_MEM_FILE, dsm_dma_arrea,
->                               sizeof(NvdimmDsmIn), false /* high memory */);
+Bug description:
+  I am using virtual machine with QNX4 operating system installed on it.  I=
+ updated my qemu from version
+  to newer and QNX4 doesn't start any more. All is ok on version 1.2 but wh=
+en I try to use any newer version
+  (1.3, 1.4, 1.5)  QNX4 doesn't boot.  I tried on windows and linux ubuntu =
+hosts - effects are the same.
+
+  When virtual machine boots qnx bootloader loads and starts operating syst=
+em. In the next step
+  qnx starts its ide driver, which detects qemu harddisk and cdrom. Problem=
+ starts when operating system
+  tries mount partition - an error occur and qnx stop booting procedure:
+
+  mount -p "No bios signature in partition sector on /dev/hd0"
+
+  I have tried install qnx from cdrom but it seems that there is the same p=
+roblem. QNX installer boot from
+  cdrom, detects hard disk and cdrom, but cdrom can't be mounted in the nex=
+t step of installation procedure.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1191326/+subscriptions
