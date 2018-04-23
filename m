@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fAVLL-0003k4-Tn
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 02:52:57 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fAVSz-0007CU-Il
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 03:00:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fAVLI-000569-QI
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 02:52:55 -0400
-Date: Mon, 23 Apr 2018 16:52:45 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180423065245.GH19804@umbus.fritz.box>
-References: <20180423061302.24201-1-nikunj@linux.vnet.ibm.com>
+	(envelope-from <cohuck@redhat.com>) id 1fAVSu-0002BO-N5
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 03:00:49 -0400
+Date: Mon, 23 Apr 2018 09:00:20 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180423090020.3af9dbf4.cohuck@redhat.com>
+In-Reply-To: <93f675a5-ff33-d916-49e7-4e13babb419e@linux.vnet.ibm.com>
+References: <1523819244-29954-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<1523819244-29954-5-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<20180419140345.7dfc584e.cohuck@redhat.com>
+	<93f675a5-ff33-d916-49e7-4e13babb419e@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="CEUtFxTsmBsHRLs3"
-Content-Disposition: inline
-In-Reply-To: <20180423061302.24201-1-nikunj@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] target/ppc/kvm: set vcpu as online/offline
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 4/5] s390x/vfio: ap: Introduce VFIO AP
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,171 +26,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, paulus@samba.org
+To: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
 
+On Sun, 22 Apr 2018 12:05:44 -0400
+Tony Krowiak <akrowiak@linux.vnet.ibm.com> wrote:
 
---CEUtFxTsmBsHRLs3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On 04/19/2018 08:03 AM, Cornelia Huck wrote:
+> > On Sun, 15 Apr 2018 15:07:23 -0400
+> > Tony Krowiak <akrowiak@linux.vnet.ibm.com> wrote:
+> >  
+> >> Introduces a VFIO based AP device. The device is defined via
+> >> the QEMU command line by specifying:
+> >>
+> >>      -device vfio-ap,sysfsdev=<path-to-mediated-matrix-device>
+> >>
+> >> There may be only one vfio-ap device configured for a guest.
+> >>
+> >> The mediated matrix device is created by the VFIO AP device
+> >> driver by writing a UUID to a sysfs attribute file (see
+> >> docs/vfio-ap.txt). The mediated matrix device will be named
+> >> after the UUID. Symbolic links to the $uuid are created in
+> >> many places, so the path to the mediated matrix device $uuid
+> >> can be specified in any of the following ways:
+> >>
+> >> /sys/devices/vfio_ap/matrix/$uuid
+> >> /sys/devices/vfio_ap/matrix/mdev_supported_types/vfio_ap-passthrough/devices/$uuid
+> >> /sys/bus/mdev/devices/$uuid
+> >> /sys/bus/mdev/drivers/vfio_mdev/$uuid
+> >>
+> >> When the vfio-ap device is realized, it acquires and opens the
+> >> VFIO iommu group to which the mediated matrix device is
+> >> bound. This causes a VFIO group notification event to be
+> >> signaled. The vfio_ap device driver's group notification
+> >> handler will get called at which time the device driver
+> >> will configure the the AP devices to which the guest will
+> >> be granted access.
+> >>
+> >> Signed-off-by: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+> >> ---
+> >>   default-configs/s390x-softmmu.mak |    1 +
+> >>   hw/vfio/Makefile.objs             |    1 +
+> >>   hw/vfio/ap.c                      |  191 +++++++++++++++++++++++++++++++++++++
+> >>   include/hw/vfio/vfio-common.h     |    1 +
+> >>   4 files changed, 194 insertions(+), 0 deletions(-)
+> >>   create mode 100644 hw/vfio/ap.c
+> >> +static void vfio_ap_realize(DeviceState *dev, Error **errp)
+> >> +{
+> >> +    VFIODevice *vbasedev;
+> >> +    VFIOGroup *vfio_group;
+> >> +    APDevice *apdev = DO_UPCAST(APDevice, parent_obj, dev);
+> >> +    char *mdevid;
+> >> +    Error *local_err = NULL;
+> >> +    int ret;
+> >> +
+> >> +    /*
+> >> +     * Since a guest's matrix is configured in its entirety by the mediated
+> >> +     * matrix device and hot plug is not currently supported, there is no
+> >> +     * need to have more than one vfio-ap device. Check if a vfio-ap device
+> >> +     * has already been defined.
+> >> +     */
+> >> +    if (vfio_apdev) {
+> >> +        error_setg(&local_err, "Only one %s device is allowed",
+> >> +                   VFIO_AP_DEVICE_TYPE);
+> >> +        goto out_err;
+> >> +    }
+> >> +
+> >> +    if (!s390_has_feat(S390_FEAT_AP)) {
+> >> +        error_setg(&local_err, "AP support not enabled");
+> >> +        goto out_err;
+> >> +    }
+> >> +
+> >> +    vfio_apdev = DO_UPCAST(VFIOAPDevice, apdev, apdev);
+> >> +
+> >> +    vfio_group = vfio_ap_get_group(vfio_apdev, &local_err);
+> >> +    if (!vfio_group) {
+> >> +        goto out_err;
+> >> +    }
+> >> +
+> >> +    vfio_apdev->vdev.ops = &vfio_ap_ops;
+> >> +    vfio_apdev->vdev.type = VFIO_DEVICE_TYPE_AP;
+> >> +    mdevid = basename(vfio_apdev->vdev.sysfsdev);
+> >> +    vfio_apdev->vdev.name = g_strdup_printf("%s", mdevid);
+> >> +    vfio_apdev->vdev.dev = dev;
+> >> +    QLIST_FOREACH(vbasedev, &vfio_group->device_list, next) {
+> >> +        if (strcmp(vbasedev->name, vfio_apdev->vdev.name) == 0) {
+> >> +            error_setg(&local_err,
+> >> +                       "%s: AP device %s has already been realized",
+> >> +                       VFIO_AP_DEVICE_TYPE, vfio_apdev->vdev.name);
+> >> +            goto out_device_err;
+> >> +        }
+> >> +    }
+> >> +
+> >> +    ret = vfio_get_device(vfio_group, mdevid, &vfio_apdev->vdev, &local_err);
+> >> +    if (ret) {
+> >> +        goto out_device_err;
+> >> +    }  
+> > Don't you need a put somewhere to avoid memory leaks?  
+> 
+> There is a call to vfio_put_device in the unrealize function.
 
-On Mon, Apr 23, 2018 at 11:43:02AM +0530, Nikunj A Dadhania wrote:
-> Set the newly added register(KVM_REG_PPC_ONLINE) to indicate if the vcpu =
-is
-> online(1) or offline(0)
->=20
-> KVM will use this information to set the RWMR register, which controls th=
-e PURR
-> and SPURR accumulation.
->=20
-> CC: paulus@samba.org
-> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
->=20
-> ---
->=20
-> http://patchwork.ozlabs.org/patch/901897/
-> ---
->  hw/ppc/spapr.c                  | 1 +
->  hw/ppc/spapr_rtas.c             | 4 ++++
->  linux-headers/asm-powerpc/kvm.h | 1 +
+I don't think unrealize is called if realize failed, so you need to
+clean up in the error cases?
 
-The usual convention is to send updates to the imported headers, as a
-general update to a specific kernel SHA, rather than folding just the
-necessary parts into the patches that use them.
-
-This will need to wait for 2.13.
-
->  target/ppc/kvm.c                | 9 +++++++++
->  target/ppc/kvm_ppc.h            | 6 ++++++
->  5 files changed, 21 insertions(+)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index a81570e7c8..48bafe3765 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1549,6 +1549,7 @@ static void spapr_machine_reset(void)
->      first_ppc_cpu->env.gpr[5] =3D 0;
->      first_cpu->halted =3D 0;
->      first_ppc_cpu->env.nip =3D SPAPR_ENTRY_POINT;
-> +    kvmppc_set_reg_ppc_online(first_ppc_cpu, 1);
-> =20
->      spapr->cas_reboot =3D false;
->  }
-> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-> index 0ec5fa4cfe..0874a746dd 100644
-> --- a/hw/ppc/spapr_rtas.c
-> +++ b/hw/ppc/spapr_rtas.c
-> @@ -33,6 +33,7 @@
->  #include "sysemu/device_tree.h"
->  #include "sysemu/cpus.h"
->  #include "sysemu/kvm.h"
-> +#include "kvm_ppc.h"
-> =20
->  #include "hw/ppc/spapr.h"
->  #include "hw/ppc/spapr_vio.h"
-> @@ -184,6 +185,8 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPAPRMac=
-hineState *spapr,
->          spapr_cpu_set_endianness(cpu);
->          spapr_cpu_update_tb_offset(cpu);
-> =20
-> +        kvmppc_set_reg_ppc_online(cpu, 1);
-> +
->          qemu_cpu_kick(cs);
-> =20
->          rtas_st(rets, 0, RTAS_OUT_SUCCESS);
-> @@ -204,6 +207,7 @@ static void rtas_stop_self(PowerPCCPU *cpu, sPAPRMach=
-ineState *spapr,
->      PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
-> =20
->      cs->halted =3D 1;
-> +    kvmppc_set_reg_ppc_online(cpu, 0);
->      qemu_cpu_kick(cs);
-> =20
->      /* Disable Power-saving mode Exit Cause exceptions for the CPU.
-> diff --git a/linux-headers/asm-powerpc/kvm.h b/linux-headers/asm-powerpc/=
-kvm.h
-> index 833ed9a16a..1b32b56a03 100644
-> --- a/linux-headers/asm-powerpc/kvm.h
-> +++ b/linux-headers/asm-powerpc/kvm.h
-> @@ -633,6 +633,7 @@ struct kvm_ppc_cpu_char {
->  #define KVM_REG_PPC_PSSCR	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xbd)
-> =20
->  #define KVM_REG_PPC_DEC_EXPIRY	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xbe)
-> +#define KVM_REG_PPC_ONLINE	(KVM_REG_PPC | KVM_REG_SIZE_U32 | 0xbf)
-> =20
->  /* Transactional Memory checkpointed state:
->   * This is all GPRs, all VSX regs and a subset of SPRs
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 79a436a384..32a146f838 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -2877,3 +2877,12 @@ bool kvmppc_pvr_workaround_required(PowerPCCPU *cp=
-u)
-> =20
->      return !kvmppc_is_pr(cs->kvm_state);
->  }
-> +
-> +void kvmppc_set_reg_ppc_online(PowerPCCPU *cpu, unsigned int online)
-> +{
-> +    CPUState *cs =3D CPU(cpu);
-> +
-> +    if (kvm_enabled()) {
-> +        kvm_set_one_reg(cs, KVM_REG_PPC_ONLINE, &online);
-> +    }
-> +}
-> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-> index 4d2789eef6..7a915fe422 100644
-> --- a/target/ppc/kvm_ppc.h
-> +++ b/target/ppc/kvm_ppc.h
-> @@ -72,6 +72,7 @@ int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ul=
-ong flags, int shift);
->  bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu);
-> =20
->  bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path);
-> +void kvmppc_set_reg_ppc_online(PowerPCCPU *cpu, unsigned int online);
-> =20
->  #else
-> =20
-> @@ -187,6 +188,11 @@ static inline target_ulong kvmppc_configure_v3_mmu(P=
-owerPCCPU *cpu,
->      return 0;
->  }
-> =20
-> +static inline void kvmppc_set_reg_ppc_online(PowerPCCPU *cpu, unsigned i=
-nt online)
-> +{
-> +    return;
-> +}
-> +
->  #ifndef CONFIG_USER_ONLY
->  static inline off_t kvmppc_alloc_rma(void **rma)
->  {
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---CEUtFxTsmBsHRLs3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrdgr0ACgkQbDjKyiDZ
-s5Jkbg//SisiW9fu4NvfT/P49oN0qGPNeag1CqhcJ/sVmwEUIg6CrSKadDVa+GeU
-pOHbr1v6wms6/JLq0BFUv7Hkf+p43qcfn75Z137JI9yOReOa6tJrTDJENzxEpY/Q
-4UmTjxXbIONpKf6eSJiaCoTOPcNWumj68a22n4jIdwRKrK+cDGAW1NZUGe9aA19m
-PoaSlE4UaRYR2HREF99bY2RoQ+ILAcTwSmuVn3wJzjkhCiL10lSux4T1IHyZVSmB
-LFVRLlRlqmupAA8mBbmwaV+W+xJdOVYsmXB82YwnXR9vF6dD8uRkXq+iH8HZxWo+
-MptZjrqlegVlKp0g6gKh6izhwWFOwd1CY13lQH613zt1Pv6IZvinZ9Z0C95oXFqf
-AHZ1Ef0ni6wMdOUsnzETp9aUY3xlrHgX5cRzwEuDGvmJVo0TgqrkkR8Ei8kQd32j
-f1w0Ts04Qww6dVG+BpQxO5IwjgyrOvcW/AFEN/qj/J4mZ5/zd0odYw02QavrvZX1
-mO6rrMrspIm1tnRbb/oByldNYnDE0FNyfgghSZr2zY3f727D2Dw/OezQDVlFE7R1
-/MkLc7Wa+bc66OmATfNxH/wy80kR/+hIWaF/+W6FN4P2k4WpE1/saUae0x45imHC
-Pff2Z0LTCRCqR2LZm7uZs0ME5YQ5oWRcqtKFzcxCtkI1Uh+4zNU=
-=x0JJ
------END PGP SIGNATURE-----
-
---CEUtFxTsmBsHRLs3--
+> 
+> >  
+> >> +
+> >> +    return;
+> >> +
+> >> +
+> >> +out_device_err:
+> >> +    vfio_put_group(vfio_group);
+> >> +out_err:
+> >> +    vfio_apdev = NULL;
+> >> +    error_propagate(errp, local_err);
+> >> +}  
+> 
+> 
