@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fAfSp-0003Ov-Fq
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 13:41:20 -0400
+	(envelope-from <cota@braap.org>) id 1fAfsn-0000Nk-HG
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 14:08:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fAfSk-00077y-H3
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 13:41:19 -0400
-Date: Mon, 23 Apr 2018 20:40:59 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180423204018-mutt-send-email-mst@kernel.org>
-References: <20180423165126.15441-1-david@redhat.com>
+	(envelope-from <cota@braap.org>) id 1fAfsk-0003NQ-AL
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 14:08:09 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:46239)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fAfsk-0003ND-5X
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 14:08:06 -0400
+Date: Mon, 23 Apr 2018 14:08:04 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180423180804.GA27690@flamenco>
+References: <20180423053927.13715-1-peterx@redhat.com>
+	<20180423053927.13715-3-peterx@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180423165126.15441-1-david@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 00/11] pc-dimm: factor out MemoryDevice
+In-Reply-To: <20180423053927.13715-3-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 2/4] qemu-thread: introduce
+ qemu-thread-common.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,94 +28,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Mon, Apr 23, 2018 at 06:51:15PM +0200, David Hildenbrand wrote:
-> Right now we can only map PCDIMM/NVDIMM into guest address space. In the
-> future, we might want to do the same for virtio devices - e.g.
-> virtio-pmem or virtio-mem. Especially, they should be able to live side
-> by side to each other.
+On Mon, Apr 23, 2018 at 13:39:25 +0800, Peter Xu wrote:
+> Introduce some hooks for the shared part of qemu thread between POSIX
+> and Windows implementations.  Note that in qemu_mutex_unlock_impl() we
+> moved the call before unlock operation which should make more sense.
+> And we don't need qemu_mutex_post_unlock() hook.
 > 
-> E.g. the virto based memory devices regions will not be exposed via ACPI
-> and friends. They will be detected just like other virtio devices and
-> indicate the applicable memory region. This makes it possible to also use
-> them on architectures without memory device detection support (e.g. s390x).
+> Currently the hooks only calls the tracepoints.
 > 
-> Let's factor out the memory device code into a MemoryDevice interface.
+> Put all these shared hooks into the header files.  It should be internal
+> to qemu-thread but not for qemu-thread users, hence put into util/
+> directory.
 > 
-> Please note that the "slots" assignment code is not relevant for memory
-> devices that will not be exposed via ACPI or similar. That's why that
-> part won't be exposed. KVM/vhost "slots" for memory regions are still
-> necessary but don't have to be manually specified (e.g. the slot number
-> doesn't mather).
-> 
-> So we are basically converting the hotplug memory region to a memory device
-> region. I have patches that also set up such a region for s390x.
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+(snip)
+> @@ -92,11 +90,10 @@ void qemu_mutex_unlock_impl(QemuMutex *mutex, const char *file, const int line)
+>      int err;
+>  
+>      assert(mutex->initialized);
+> +    qemu_mutex_pre_unlock(mutex, file, line);
+>      err = pthread_mutex_unlock(&mutex->lock);
+>      if (err)
+>          error_exit(err, __func__);
+> -
+> -    trace_qemu_mutex_unlock(mutex, file, line);
+>  }
+(snip)
+> @@ -81,7 +80,7 @@ int qemu_mutex_trylock_impl(QemuMutex *mutex, const char *file, const int line)
+>  void qemu_mutex_unlock_impl(QemuMutex *mutex, const char *file, const int line)
+>  {
+>      assert(mutex->initialized);
+> -    trace_qemu_mutex_unlock(mutex, file, line);
+> +    qemu_mutex_pre_unlock(mutex, file, line);
+>      ReleaseSRWLockExclusive(&mutex->lock);
+>  }
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Note that in posix we're moving the unlock tracepoint before the actual
+unlock happens. But that makes it consistent with that we're doing in win32,
+and AFAICT it seems a better place to do it, so:
 
-Who's merging this? Eduardo?
+Reviewed-by: Emilio G. Cota <cota@braap.org>
 
-> v3 -> v4:
-> - "pc-dimm: factor out MemoryDevice interface"
-> -- dropped the "errp" parameter from the interface functions
-> -- made as many pointers const as I could :)
-> -- s/built/build/
-> - machine: make MemoryHotplugState accessible via the machine
-> -- State now kept via a pointer, not queried.
-> -- Added patches that rename the type and cleanup the terminology for
->    spapr and pc
-> - Split up the big "pc-dimm: factor out address space logic into MemoryDevice
->   code" into sub patches
-> --  We now pass the machine to the pc-dimm and MemoryDevice plug/unplug
->     functions, so we can avoid qdev_get_machine()
-> -- Moved some checks around as requested by Igor
-> - Added a patch to make maxmem not depend on slots
-> 
-> v2 -> v3:
-> - "pc-dimm: factor out MemoryDevice interface"
-> --> Lookup both classes when comparing (David Gibson)
-> 
-> v1 -> v2:
-> - Fix compile issues on ppc (still untested  )
-> 
-> 
-> David Hildenbrand (11):
->   pc-dimm: factor out MemoryDevice interface
->   machine: make MemoryHotplugState accessible via the machine
->   pc-dimm: no need to pass the memory region
->   pc-dimm: pass in the machine and to the MemoryHotplugState
->   pc-dimm: factor out address search into MemoryDevice code
->   pc-dimm: factor out capacity and slot checks into MemoryDevice
->   pc-dimm: move actual plug/unplug of a memory region to MemoryDevice
->   machine: rename MemoryHotplugState to DeviceMemoryState
->   pc: rename "hotplug memory" terminology to "device memory"
->   spapr: rename "hotplug memory" terminology to "device memory"
->   vl: allow 'maxmem' without 'slot'
-> 
->  hw/i386/acpi-build.c                         |   7 +-
->  hw/i386/pc.c                                 |  65 +++---
->  hw/mem/Makefile.objs                         |   1 +
->  hw/mem/memory-device.c                       | 275 ++++++++++++++++++++++++
->  hw/mem/pc-dimm.c                             | 304 +++++++--------------------
->  hw/ppc/spapr.c                               |  65 +++---
->  hw/ppc/spapr_hcall.c                         |   7 +-
->  hw/ppc/spapr_rtas_ddw.c                      |   5 +-
->  include/hw/boards.h                          |  12 ++
->  include/hw/i386/pc.h                         |   3 +-
->  include/hw/mem/memory-device.h               |  51 +++++
->  include/hw/mem/pc-dimm.h                     |  27 +--
->  include/hw/ppc/spapr.h                       |   5 +-
->  numa.c                                       |   3 +-
->  qmp.c                                        |   4 +-
->  stubs/Makefile.objs                          |   2 +-
->  stubs/{qmp_pc_dimm.c => qmp_memory_device.c} |   4 +-
->  vl.c                                         |  19 +-
->  18 files changed, 506 insertions(+), 353 deletions(-)
->  create mode 100644 hw/mem/memory-device.c
->  create mode 100644 include/hw/mem/memory-device.h
->  rename stubs/{qmp_pc_dimm.c => qmp_memory_device.c} (61%)
-> 
-> -- 
-> 2.14.3
+Thanks,
+
+		E.
