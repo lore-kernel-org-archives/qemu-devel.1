@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=644fc49e2=anthony.perard@citrix.com>)
-	id 1fAcSO-0005CA-Fe
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 10:28:41 -0400
+	(envelope-from <david@redhat.com>) id 1fAci7-0002hr-W7
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 10:44:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=644fc49e2=anthony.perard@citrix.com>)
-	id 1fAcSL-0004kR-9E
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 10:28:40 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:19905)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71)
-	(envelope-from <prvs=644fc49e2=anthony.perard@citrix.com>)
-	id 1fAcSK-0004gD-Um
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 10:28:37 -0400
-Date: Mon, 23 Apr 2018 15:28:22 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20180423142822.GA1980@perard>
-References: <1524156319-11465-1-git-send-email-ian.jackson@eu.citrix.com>
-	<1524156319-11465-6-git-send-email-ian.jackson@eu.citrix.com>
+	(envelope-from <david@redhat.com>) id 1fAci2-0001jv-7i
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 10:44:56 -0400
+References: <20180420123456.22196-1-david@redhat.com>
+	<20180420123456.22196-4-david@redhat.com>
+	<20180423141928.7e64b380@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <6e518802-62cb-126c-7ba4-3313e04befda@redhat.com>
+Date: Mon, 23 Apr 2018 16:44:34 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <1524156319-11465-6-git-send-email-ian.jackson@eu.citrix.com>
-Subject: Re: [Qemu-devel] [PATCH 05/16] xen: defer call to xen_restrict
- until just before os_setup_post
+In-Reply-To: <20180423141928.7e64b380@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] pc-dimm: factor out address space
+ logic into MemoryDevice code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,49 +26,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ian Jackson <ian.jackson@eu.citrix.com>
-Cc: qemu-devel@nongnu.org, Ross Lagerwall <ross.lagerwall@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>
 
-On Thu, Apr 19, 2018 at 05:45:08PM +0100, Ian Jackson wrote:
-> We need to restrict *all* the control fds that qemu opens.  Looking in
-> /proc/PID/fd shows there are many; their allocation seems scattered
-> throughout Xen support code in qemu.
+On 23.04.2018 14:19, Igor Mammedov wrote:
+> On Fri, 20 Apr 2018 14:34:56 +0200
+> David Hildenbrand <david@redhat.com> wrote:
 > 
-> We must postpone the restrict call until roughly the same time as qemu
-> changes its uid, chroots (if applicable), and so on.
+>> To be able to reuse MemoryDevice logic from other devices besides
+>> pc-dimm, factor the relevant stuff out into the MemoryDevice code.
+>>
+>> As we don't care about slots for memory devices that are not pc-dimm,
+>> don't factor that part out.
+> that's not really true, you still consume kvm and vhost slots (whatever it is)
+> whenever you map it into address space as ram memory region.
 > 
-> There doesn't seem to be an appropriate hook already.  The RunState
-> change hook fires at different times depending on exactly what mode
-> qemu is operating in.
+> Also ram_slots currently are (ab)used as flag that user enabled memory
+> hotplug via CLI.
+>  
+>> Most of this patch just moves checks and logic around. While at it, make
+>> the code properly detect certain error conditions better (e.g. fragmented
+>> memory).
+> I'd suggest splitting patch in several smaller ones if possible,
+> especially parts that do anything more than just moving code around.
 > 
-> And it appears that no-one but the Xen code wants a hook at this phase
-> of execution.  So, introduce a bare call to a new function
-> xen_setup_post, just before os_setup_post.  Also provide the
-> appropriate stub for when Xen compilation is disabled.
 > 
-> We do the restriction before rather than after os_setup_post, because
-> xen_restrict may need to open /dev/null, and os_setup_post might have
-> called chroot.
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  hw/i386/pc.c                   |  12 +--
+>>  hw/mem/memory-device.c         | 162 ++++++++++++++++++++++++++++++++++++
+>>  hw/mem/pc-dimm.c               | 185 +++--------------------------------------
+>>  hw/ppc/spapr.c                 |   9 +-
+>>  include/hw/mem/memory-device.h |   4 +
+>>  include/hw/mem/pc-dimm.h       |  14 +---
+>>  6 files changed, 185 insertions(+), 201 deletions(-)
+>>
+>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+>> index fa8862af33..1c25546a0c 100644
+>> --- a/hw/i386/pc.c
+>> +++ b/hw/i386/pc.c
+>> @@ -1711,7 +1711,7 @@ static void pc_dimm_plug(HotplugHandler *hotplug_dev,
+>>          goto out;
+>>      }
+>>  
+>> -    pc_dimm_memory_plug(dev, &pcms->hotplug_memory, mr, align, &local_err);
+>> +    pc_dimm_memory_plug(dev, align, &local_err);
+> Is there a reason why you are dropping pcms->hotplug_memory argument
+> and fall back to qdev_get_machine()?
 > 
-> Currently this does not work with migration, because when running as
-> the Xen device model qemu needs to signal to the toolstack that it is
-> ready.  It currently does this using xenstore, and for incoming
-> migration (but not for ordinary startup) that happens after
-> os_setup_post.
-> 
-> It is correct that this happens late: we want the incoming migration
-> stream to be processed by a restricted qemu.  The fix for this will be
-> to do the startup notification a different way, without using
-> xenstore.  (QMP is probably a reasonable choice.)
-> 
-> So for now this restriction feature cannot be used in conjunction with
-> migration.  (Note that this is not a regression in this patch, because
-> previously the -xen-restrict-domid call was, in fact, simply
-> ineffective!)  We will revisit this in the Xen 4.11 release cycle.
-> 
-> Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
+> I'd rather see it going other direction,
+> i.e. move hotplug_memory from PC
+> machine to MachineState and then pass it down as argument whenever it's needed.
 
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
+FWIW, I think I found a way to split this into smaller patches.
+
+The current prototypes will look like this for pc_dimm
+
+void pc_dimm_memory_plug(DeviceState *dev, MachineState *machine,
+                         uint64_t align, Error **errp);
+void pc_dimm_memory_unplug(DeviceState *dev, MachineState *machine);
+
+I am not sure yet if I'll work on the pre-plug stuff for pc-dimm (I want
+to get memory devices running not rewrite all of the pc-dimm memory
+hotplug code :) ), but that can be reworked later on easily.
 
 -- 
-Anthony PERARD
+
+Thanks,
+
+David / dhildenb
