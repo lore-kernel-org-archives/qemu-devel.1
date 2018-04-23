@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fAXm5-00026x-5S
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 05:28:47 -0400
+	(envelope-from <frederic.konrad@adacore.com>) id 1fAXp0-0004S9-22
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 05:31:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fAXm0-0006Nx-To
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 05:28:41 -0400
-Received: from 2.mo178.mail-out.ovh.net ([46.105.39.61]:42997)
+	(envelope-from <frederic.konrad@adacore.com>) id 1fAXow-0000kw-1Q
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 05:31:42 -0400
+Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:51896
+	helo=smtp.eu.adacore.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fAXm0-0006NM-MZ
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 05:28:36 -0400
-Received: from player737.ha.ovh.net (unknown [10.109.120.44])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id B9DA214B5F
-	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 11:28:34 +0200 (CEST)
-References: <20180423064020.25434-1-clg@kaod.org>
-	<CAFEAcA-LtNpGTV08jvK4i5C5i64WjM5gMB4zGr8P4fkVSkNH7g@mail.gmail.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <53691cbf-08bf-e3f7-22d3-601a279aa08a@kaod.org>
-Date: Mon, 23 Apr 2018 11:28:30 +0200
+	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
+	id 1fAXov-0000kF-QD
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 05:31:37 -0400
+References: <20180419131051.11249-1-kraxel@redhat.com>
+	<20180419131051.11249-5-kraxel@redhat.com>
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Message-ID: <833e23a9-4899-2a95-c4b1-027d437e2ef7@adacore.com>
+Date: Mon, 23 Apr 2018 11:31:34 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-LtNpGTV08jvK4i5C5i64WjM5gMB4zGr8P4fkVSkNH7g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180419131051.11249-5-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] timer/aspeed: fix vmstate version id
+Subject: Re: [Qemu-devel] [PATCH 4/4] audio/hda: detect output buffer
+ overruns and underruns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,34 +31,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: martin@schrodt.org
 
-On 04/23/2018 11:12 AM, Peter Maydell wrote:
->> diff --git a/hw/timer/aspeed_timer.c b/hw/timer/aspeed_timer.c
->> index 50acbf530a3a..7df19bd9df91 100644
->> --- a/hw/timer/aspeed_timer.c
->> +++ b/hw/timer/aspeed_timer.c
->> @@ -498,8 +498,8 @@ static const VMStateDescription vmstate_aspeed_timer = {
->>
->>  static const VMStateDescription vmstate_aspeed_timer_state = {
->>      .name = "aspeed.timerctrl",
->> -    .version_id = 1,
->> -    .minimum_version_id = 1,
->> +    .version_id = 2,
->> +    .minimum_version_id = 2,
->>      .fields = (VMStateField[]) {
->>          VMSTATE_UINT32(ctrl, AspeedTimerCtrlState),
->>          VMSTATE_UINT32(ctrl2, AspeedTimerCtrlState),
-> Wouldn't it be simpler to just fix the incorrect value in
-> the VMSTATE_STRUCT_ARRAY(timers, AspeedTimerCtrlState,
-> line ?
 
-Yes. Also. 
 
-Or bring back all the version ids to 1, as we never supported 
-migration before.
+On 04/19/2018 03:10 PM, Gerd Hoffmann wrote:
+> If some event caused some larger playback hickup the fine-grained timer
+> adjust isn't able to recover.  Use a buffer overruns and underruns as
+> indicator for that.  Reset timer adjust logic in case we detected one.
 
-Thanks,
+It seems that this patch causes big lockup of my Win10 KVM guest
+when it tries to output a sound.
+The three previous patches improved considerably the audio
+output though!
 
-C.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>   hw/audio/hda-codec.c  | 22 ++++++++++++++++++++++
+>   hw/audio/trace-events |  2 ++
+>   2 files changed, 24 insertions(+)
+> 
+> diff --git a/hw/audio/hda-codec.c b/hw/audio/hda-codec.c
+> index f6fb1d0fa0..623021b7c7 100644
+> --- a/hw/audio/hda-codec.c
+> +++ b/hw/audio/hda-codec.c
+> @@ -261,6 +261,13 @@ static void hda_audio_input_cb(void *opaque, int avail)
+>   
+>       int64_t to_transfer = audio_MIN(B_SIZE - (wpos - rpos), avail);
+>   
+> +    if (to_transfer == 0) {
+> +        /* reset timer adjust */
+> +        st->buft_start = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+> +        trace_hda_audio_underrun(st->node->name);
+> +        return;
+> +    }
+> +
+>       hda_timer_sync_adjust(st, -((wpos - rpos) + to_transfer - (B_SIZE >> 1)));
+>   
+>       while (to_transfer) {
+> @@ -325,6 +332,21 @@ static void hda_audio_output_cb(void *opaque, int avail)
+>   
+>       int64_t to_transfer = audio_MIN(wpos - rpos, avail);
+>   
+> +    if (to_transfer == 0) {
+> +        /* reset timer adjust */
+> +        st->buft_start = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+> +        trace_hda_audio_underrun(st->node->name);
+> +        return;
+> +    }
+
+The lock happen here:
+
+hda_audio_output_cb is called a lot and keeps running in
+underrun. While the 1kHz callback is called regularly and
+always "already have the data". So I wonder if the adjust here is
+not confusing the 1kHz callback which refuse to get new data.
+
+Regards,
+Fred
