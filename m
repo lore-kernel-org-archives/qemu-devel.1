@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fAYHb-0004Ej-U8
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 06:01:16 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fAYOt-00073U-Q6
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 06:08:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fAYHS-0007LM-KA
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 06:01:16 -0400
-Received: from 3.mo4.mail-out.ovh.net ([46.105.57.129]:39568)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fAYHS-0007JY-EA
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 06:01:06 -0400
-Received: from player737.ha.ovh.net (unknown [10.109.122.15])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id B4AAA162EC9
-	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 12:01:04 +0200 (CEST)
-References: <20180423064020.25434-1-clg@kaod.org>
-	<CAFEAcA-LtNpGTV08jvK4i5C5i64WjM5gMB4zGr8P4fkVSkNH7g@mail.gmail.com>
-	<53691cbf-08bf-e3f7-22d3-601a279aa08a@kaod.org>
-	<CAFEAcA9XBHE5YxN27M1ugprmSf=o5iiNakO2omrY+HBgCszV5Q@mail.gmail.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <a5ca89ac-7c8f-c565-30d0-357bacb1f61e@kaod.org>
-Date: Mon, 23 Apr 2018 12:00:57 +0200
+	(envelope-from <cohuck@redhat.com>) id 1fAYOo-0002pE-Tb
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 06:08:47 -0400
+Date: Mon, 23 Apr 2018 12:08:31 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180423120831.11cc785f.cohuck@redhat.com>
+In-Reply-To: <1523864720-4680-1-git-send-email-thuth@redhat.com>
+References: <1523864720-4680-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9XBHE5YxN27M1ugprmSf=o5iiNakO2omrY+HBgCszV5Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] timer/aspeed: fix vmstate version id
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.13] pc-bios/s390-ccw: size_t
+ should be unsigned
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,58 +23,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
 
-On 04/23/2018 11:34 AM, Peter Maydell wrote:
-> On 23 April 2018 at 10:28, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->> On 04/23/2018 11:12 AM, Peter Maydell wrote:
->>>> diff --git a/hw/timer/aspeed_timer.c b/hw/timer/aspeed_timer.c
->>>> index 50acbf530a3a..7df19bd9df91 100644
->>>> --- a/hw/timer/aspeed_timer.c
->>>> +++ b/hw/timer/aspeed_timer.c
->>>> @@ -498,8 +498,8 @@ static const VMStateDescription vmstate_aspeed_t=
-imer =3D {
->>>>
->>>>  static const VMStateDescription vmstate_aspeed_timer_state =3D {
->>>>      .name =3D "aspeed.timerctrl",
->>>> -    .version_id =3D 1,
->>>> -    .minimum_version_id =3D 1,
->>>> +    .version_id =3D 2,
->>>> +    .minimum_version_id =3D 2,
->>>>      .fields =3D (VMStateField[]) {
->>>>          VMSTATE_UINT32(ctrl, AspeedTimerCtrlState),
->>>>          VMSTATE_UINT32(ctrl2, AspeedTimerCtrlState),
->>> Wouldn't it be simpler to just fix the incorrect value in
->>> the VMSTATE_STRUCT_ARRAY(timers, AspeedTimerCtrlState,
->>> line ?
->>
->> Yes. Also.
->>
->> Or bring back all the version ids to 1, as we never supported
->> migration before.
->=20
-> I think it's nice to at least do the "bump version" thing, so you
-> get a (hopefully comprehensible) error rather than just wrong
-> data if you do try a cross version migration,=20
+On Mon, 16 Apr 2018 09:45:20 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-On that topic, the error message was :
+> "size_t" should be an unsigned type according to the C standard.
+> Thus we should also use this convention in the s390-ccw firmware to avoid
+> confusion. I checked the sources, and apart from one spot in libc.c, the
+> code should all be fine with this change.
+> 
+> Buglink: https://bugs.launchpad.net/qemu/+bug/1753437
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  v2: Use long instead of ssize_t in uitoa()
+> 
+>  pc-bios/s390-ccw/libc.c | 2 +-
+>  pc-bios/s390-ccw/libc.h | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 
-	Missing section footer for aspeed.timerctrl
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
-which is not very comprehensible for a version mismatch issue.
-
-Thanks,
-
-C.=20
-
-> so I would
-> vote for just fixing the one thing that was wrong: the
-> number in VMSTATE_STRUCT_ARRAY is the version to be used of
-> the substruct, so it didn't need to be bumped in commit
-> 1d3e65aa7a; the main version numbers for vmstate_aspeed_timer
-> did need to be bumped because part of the main struct changed.
->=20
-> thanks
-> -- PMM
->=20
+I assume you'll queue this one yourself?
