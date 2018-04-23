@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44581)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fAaLa-0001jA-2R
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 08:13:31 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fAaPX-0003Px-P2
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 08:17:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fAaLZ-0004ec-0K
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 08:13:30 -0400
-References: <20180423084518.2426-1-armbru@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <fd298e0b-9f2f-cbaf-481b-78e5814d6fc1@redhat.com>
-Date: Mon, 23 Apr 2018 14:13:13 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fAaPR-0006YE-Ub
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 08:17:35 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:42432)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fAaPR-0006Xw-OT
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 08:17:29 -0400
+Received: by mail-oi0-x243.google.com with SMTP id t27-v6so14007270oij.9
+	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 05:17:29 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180423084518.2426-1-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] cpus: Fix event order on resume of stopped
- guest
+In-Reply-To: <20180423075215.4572-3-christophe.lyon@st.com>
+References: <20180423075215.4572-1-christophe.lyon@st.com>
+	<20180423075215.4572-3-christophe.lyon@st.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 23 Apr 2018 13:17:08 +0100
+Message-ID: <CAFEAcA9tnh9j=QMxZm7RTMzaRVxh10oEGDCYYO5TL5TvAuvLXw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [ARM/FDPIC v2 2/4] linux-user: ARM-FDPIC: Identify
+ ARM FDPIC binaries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,140 +31,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, kwolf@redhat.com
+To: Christophe Lyon <christophe.lyon@st.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Christophe Lyon <christophe.lyon@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-On 23/04/2018 10:45, Markus Armbruster wrote:
-> When resume of a stopped guest immediately runs into block device
-> errors, the BLOCK_IO_ERROR event is sent before the RESUME event.
-> 
-> Reproducer:
-> 
-> 1. Create a scratch image
->    $ dd if=/dev/zero of=scratch.img bs=1M count=100
-> 
->    Size doesn't actually matter.
-> 
-> 2. Prepare blkdebug configuration:
-> 
->    $ cat >blkdebug.conf <<EOF
->    [inject-error]
->    event = "write_aio"
->    errno = "5"
->    EOF
-> 
->    Note that errno 5 is EIO.
-> 
-> 3. Run a guest with an additional scratch disk, i.e. with additional
->    arguments
->    -drive if=none,id=scratch-drive,format=raw,werror=stop,file=blkdebug:blkdebug.conf:scratch.img
->    -device virtio-blk-pci,id=scratch,drive=scratch-drive
-> 
->    The blkdebug part makes all writes to the scratch drive fail with
->    EIO.  The werror=stop pauses the guest on write errors.
-> 
-> 4. Connect to the QMP socket e.g. like this:
->    $ socat UNIX:/your/qmp/socket READLINE,history=$HOME/.qmp_history,prompt='QMP> '
-> 
->    Issue QMP command 'qmp_capabilities':
->    QMP> { "execute": "qmp_capabilities" }
-> 
-> 5. Boot the guest.
-> 
-> 6. In the guest, write to the scratch disk, e.g. like this:
-> 
->    # dd if=/dev/zero of=/dev/vdb count=1
-> 
->    Do double-check the device specified with of= is actually the
->    scratch device!
-> 
-> 7. Issue QMP command 'cont':
->    QMP> { "execute": "cont" }
-> 
-> After step 6, I get a BLOCK_IO_ERROR event followed by a STOP event.  Good.
-> 
-> After step 7, I get BLOCK_IO_ERROR, then RESUME, then STOP.  Not so
-> good; I'd expect RESUME, then BLOCK_IO_ERROR, then STOP.
-> 
-> The funny event order confuses libvirt: virsh -r domstate DOMAIN
-> --reason reports "paused (unknown)" rather than "paused (I/O error)".
-> 
-> The culprit is vm_prepare_start().
-> 
->     /* Ensure that a STOP/RESUME pair of events is emitted if a
->      * vmstop request was pending.  The BLOCK_IO_ERROR event, for
->      * example, according to documentation is always followed by
->      * the STOP event.
->      */
->     if (runstate_is_running()) {
->         qapi_event_send_stop(&error_abort);
->         res = -1;
->     } else {
->         replay_enable_events();
->         cpu_enable_ticks();
->         runstate_set(RUN_STATE_RUNNING);
->         vm_state_notify(1, RUN_STATE_RUNNING);
->     }
-> 
->     /* We are sending this now, but the CPUs will be resumed shortly later */
->     qapi_event_send_resume(&error_abort);
->     return res;
-> 
-> When resuming a stopped guest, we take the else branch before we get
-> to sending RESUME.  vm_state_notify() runs virtio_vmstate_change(),
-> among other things.  This restarts I/O, triggering the BLOCK_IO_ERROR
-> event.
-> 
-> Reshuffle vm_prepare_start() to send the RESUME event earlier.
-> 
-> Fixes RHBZ 1566153.
-> 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  cpus.c | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
-> 
-> diff --git a/cpus.c b/cpus.c
-> index 38eba8bff3..398392bc3a 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -2043,7 +2043,6 @@ int vm_stop(RunState state)
->  int vm_prepare_start(void)
->  {
->      RunState requested;
-> -    int res = 0;
->  
->      qemu_vmstop_requested(&requested);
->      if (runstate_is_running() && requested == RUN_STATE__MAX) {
-> @@ -2057,17 +2056,18 @@ int vm_prepare_start(void)
->       */
->      if (runstate_is_running()) {
->          qapi_event_send_stop(&error_abort);
-> -        res = -1;
-> -    } else {
-> -        replay_enable_events();
-> -        cpu_enable_ticks();
-> -        runstate_set(RUN_STATE_RUNNING);
-> -        vm_state_notify(1, RUN_STATE_RUNNING);
-> +        qapi_event_send_resume(&error_abort);
-> +        return -1;
+On 23 April 2018 at 08:51, Christophe Lyon <christophe.lyon@st.com> wrote:
+> Define an ARM-specific version of elf_is_fdpic:
+> FDPIC ELF objects are identified with e_ident[EI_OSABI] =3D=3D
+> ELFOSABI_ARM_FDPIC.
+>
+> Co-Authored-By: Micka=C3=ABl Gu=C3=AAn=C3=A9 <mickael.guene@st.com>
+> Signed-off-by: Christophe Lyon <christophe.lyon@st.com>
+>
+> diff --git a/include/elf.h b/include/elf.h
+> index c0dc9bb..934dbbd 100644
+> --- a/include/elf.h
+> +++ b/include/elf.h
+> @@ -1483,6 +1483,7 @@ typedef struct elf64_shdr {
+>  #define ELFOSABI_TRU64          10      /* Compaq TRU64 UNIX.  */
+>  #define ELFOSABI_MODESTO        11      /* Novell Modesto.  */
+>  #define ELFOSABI_OPENBSD        12      /* OpenBSD.  */
+> +#define ELFOSABI_ARM_FDPIC      65      /* ARM FDPIC */
+>  #define ELFOSABI_ARM            97      /* ARM */
+>  #define ELFOSABI_STANDALONE     255     /* Standalone (embedded) applica=
+tion */
+>
+> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+> index bbe93b0..76d7718 100644
+> --- a/linux-user/elfload.c
+> +++ b/linux-user/elfload.c
+> @@ -1681,11 +1681,18 @@ static void zero_bss(abi_ulong elf_bss, abi_ulong=
+ last_bss, int prot)
 >      }
->  
->      /* We are sending this now, but the CPUs will be resumed shortly later */
->      qapi_event_send_resume(&error_abort);
-> -    return res;
-> +
-> +    replay_enable_events();
-> +    cpu_enable_ticks();
-> +    runstate_set(RUN_STATE_RUNNING);
-> +    vm_state_notify(1, RUN_STATE_RUNNING);
-> +    return 0;
 >  }
->  
->  void vm_start(void)
-> 
+>
+> +#ifdef TARGET_ARM
+> +static int elf_is_fdpic(struct elfhdr *exec)
+> +{
+> +    return exec->e_ident[EI_OSABI] =3D=3D ELFOSABI_ARM_FDPIC;
+> +}
+> +#else
+>  /* Default implementation, always false.  */
+>  static int elf_is_fdpic(struct elfhdr *exec)
+>  {
+>      return 0;
+>  }
+> +#endif
 
-Queued, thanks.
+I have a strong dislike for per-target ifdef ladders. Can we instead
+put the target's implementation of elf_is_fdpic() into
+linux-user/$ARCH/target_elf.h
+and also have that header do
+#define TARGET_HAS_ELF_FDPIC
 
-Paolo
+and then in the generic code we can protect the default elf_is_fdpic()
+with #ifndef TARGET_HAS_ELF_FDPIC.
+
+thanks
+-- PMM
