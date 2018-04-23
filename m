@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fAiNa-0005Ua-Vu
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 16:48:07 -0400
+	(envelope-from <mst@redhat.com>) id 1fAiWS-0007Dz-Q1
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 16:57:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fAiNX-0004o5-UN
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 16:48:07 -0400
-Date: Mon, 23 Apr 2018 17:47:53 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180423204753.GS29865@localhost.localdomain>
-References: <20180423165126.15441-1-david@redhat.com>
-	<20180423204018-mutt-send-email-mst@kernel.org>
+	(envelope-from <mst@redhat.com>) id 1fAiWP-0008MD-NF
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 16:57:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54058 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fAiWP-0008M5-Hu
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 16:57:13 -0400
+Date: Mon, 23 Apr 2018 23:57:04 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180423234259-mutt-send-email-mst@kernel.org>
+References: <CF6A88132359CE47947DB4C6E1709ED53973A6AF@ORSMSX110.amr.corp.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180423204018-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v4 00/11] pc-dimm: factor out MemoryDevice
+In-Reply-To: <CF6A88132359CE47947DB4C6E1709ED53973A6AF@ORSMSX110.amr.corp.intel.com>
+Subject: Re: [Qemu-devel] RFC: altering the NVDIMM acpi table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,37 +26,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>
+To: "Schmauss, Erik" <erik.schmauss@intel.com>
+Cc: "imammedo@redhat.com" <imammedo@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Williams, Dan J" <dan.j.williams@intel.com>, "He, Junyan" <junyan.he@intel.com>, "Moore, Robert" <robert.moore@intel.com>
 
-On Mon, Apr 23, 2018 at 08:40:59PM +0300, Michael S. Tsirkin wrote:
-> On Mon, Apr 23, 2018 at 06:51:15PM +0200, David Hildenbrand wrote:
-> > Right now we can only map PCDIMM/NVDIMM into guest address space. In the
-> > future, we might want to do the same for virtio devices - e.g.
-> > virtio-pmem or virtio-mem. Especially, they should be able to live side
-> > by side to each other.
-> > 
-> > E.g. the virto based memory devices regions will not be exposed via ACPI
-> > and friends. They will be detected just like other virtio devices and
-> > indicate the applicable memory region. This makes it possible to also use
-> > them on architectures without memory device detection support (e.g. s390x).
-> > 
-> > Let's factor out the memory device code into a MemoryDevice interface.
-> > 
-> > Please note that the "slots" assignment code is not relevant for memory
-> > devices that will not be exposed via ACPI or similar. That's why that
-> > part won't be exposed. KVM/vhost "slots" for memory regions are still
-> > necessary but don't have to be manually specified (e.g. the slot number
-> > doesn't mather).
-> > 
-> > So we are basically converting the hotplug memory region to a memory device
-> > region. I have patches that also set up such a region for s390x.
+On Mon, Apr 23, 2018 at 08:35:45PM +0000, Schmauss, Erik wrote:
+> Hello,
 > 
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> 
-> Who's merging this? Eduardo?
+> I work on ACPICA and we have recently made changes to the behavior of 
+> the Linux AML interpreter to match other OS implementations. After 
+> sending the patches to upstream Linux, we have identified that 
+> hw/acpi/nvdimm.c specifies an ACPI table with a forward reference
+>  (MEMA is a forward reference that is no longer supported as of Linux 
+> 4.17-rc1).
 
-I just queued it.  Thanks!
+Interesting. What is the result if such a table is encountered?
+Will this break on old hypervisors that already
+shipped with this set of tables?
+
+> We would like to change this file to move the declaration of Name 
+> (MEMA,...) to appear as the very first declaration in the SSDT. Below is a patch outlining the change that I would like to make. 
+
+I think this will work just fine, but I would like to see a
+comment explaining what the issue is.
+Names aren't actually resolved until method actually runs, right?
+For example, a name could be defined by a dynamically loaded
+definition block ...
+
+> However, I am having a hard time getting make check to run
+>  to completion in a reasonable amount of time. It always seems to fail 
+> on some sort of checksum test...
+
+Are you running this on Linux? On bare metal or within a VM?
+Most people here test it on Linux with KVM.
+
+> It would be great if you could let me 
+> know what you think of the change and what I can do to speed up the 
+> execution time of make check...
+
+You could limit to just qtest tests.
+
+make check-qtest
+
+> 
+> Thanks,
+> 
+> Erik Schmauss
+> 
+> diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
+> index 59d6e4254c..7c9efd9ac7 100644
+> --- a/hw/acpi/nvdimm.c
+> +++ b/hw/acpi/nvdimm.c
+> @@ -1234,6 +1234,9 @@ static void nvdimm_build_ssdt(GArray *table_offsets, GArray *table_data,
+>      ssdt = init_aml_allocator();
+>      acpi_data_push(ssdt->buf, sizeof(AcpiTableHeader));
+>  
+> +    mem_addr_offset = build_append_named_dword(table_data,
+> +                                               NVDIMM_ACPI_MEM_ADDR);
+> +
+>      sb_scope = aml_scope("\\_SB");
+>  
+>      dev = aml_device("NVDR");
+> @@ -1266,9 +1269,6 @@ static void nvdimm_build_ssdt(GArray *table_offsets, GArray *table_data,
+>  
+>      /* copy AML table into ACPI tables blob and patch header there */
+>      g_array_append_vals(table_data, ssdt->buf->data, ssdt->buf->len);
+> -    mem_addr_offset = build_append_named_dword(table_data,
+> -                                               NVDIMM_ACPI_MEM_ADDR);
+> -
+>      bios_linker_loader_alloc(linker,
+>                               NVDIMM_DSM_MEM_FILE, dsm_dma_arrea,
+>                               sizeof(NvdimmDsmIn), false /* high memory */);
+
 
 -- 
-Eduardo
+MST
