@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41467)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <christophe.lyon@st.com>) id 1fAays-0007ZF-N6
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 08:54:12 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fAb7B-0004oh-N5
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 09:02:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <christophe.lyon@st.com>) id 1fAayp-0005wi-Fu
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 08:54:06 -0400
-Received: from mx07-00178001.pphosted.com ([62.209.51.94]:37332)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <christophe.lyon@st.com>)
-	id 1fAayp-0005vk-6F
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 08:54:03 -0400
-References: <20180423075215.4572-1-christophe.lyon@st.com>
-	<20180423075215.4572-3-christophe.lyon@st.com>
-	<CAFEAcA9tnh9j=QMxZm7RTMzaRVxh10oEGDCYYO5TL5TvAuvLXw@mail.gmail.com>
-From: Christophe Lyon <christophe.lyon@st.com>
-Message-ID: <d3762ab7-e23c-9078-0e1f-57addc334cbe@st.com>
-Date: Mon, 23 Apr 2018 14:53:38 +0200
+	(envelope-from <kwolf@redhat.com>) id 1fAb77-0004L4-Sh
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 09:02:41 -0400
+Date: Mon, 23 Apr 2018 15:02:19 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180423130219.GD6630@localhost.localdomain>
+References: <20180423084518.2426-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9tnh9j=QMxZm7RTMzaRVxh10oEGDCYYO5TL5TvAuvLXw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [ARM/FDPIC v2 2/4] linux-user: ARM-FDPIC: Identify
- ARM FDPIC binaries
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180423084518.2426-1-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] cpus: Fix event order on resume of stopped
+ guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,78 +23,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Christophe Lyon <christophe.lyon@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
 
-On 23/04/2018 14:17, Peter Maydell wrote:
-> On 23 April 2018 at 08:51, Christophe Lyon <christophe.lyon@st.com> wro=
-te:
->> Define an ARM-specific version of elf_is_fdpic:
->> FDPIC ELF objects are identified with e_ident[EI_OSABI] =3D=3D
->> ELFOSABI_ARM_FDPIC.
->>
->> Co-Authored-By: Micka=C3=ABl Gu=C3=AAn=C3=A9 <mickael.guene@st.com>
->> Signed-off-by: Christophe Lyon <christophe.lyon@st.com>
->>
->> diff --git a/include/elf.h b/include/elf.h
->> index c0dc9bb..934dbbd 100644
->> --- a/include/elf.h
->> +++ b/include/elf.h
->> @@ -1483,6 +1483,7 @@ typedef struct elf64_shdr {
->>   #define ELFOSABI_TRU64          10      /* Compaq TRU64 UNIX.  */
->>   #define ELFOSABI_MODESTO        11      /* Novell Modesto.  */
->>   #define ELFOSABI_OPENBSD        12      /* OpenBSD.  */
->> +#define ELFOSABI_ARM_FDPIC      65      /* ARM FDPIC */
->>   #define ELFOSABI_ARM            97      /* ARM */
->>   #define ELFOSABI_STANDALONE     255     /* Standalone (embedded) app=
-lication */
->>
->> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
->> index bbe93b0..76d7718 100644
->> --- a/linux-user/elfload.c
->> +++ b/linux-user/elfload.c
->> @@ -1681,11 +1681,18 @@ static void zero_bss(abi_ulong elf_bss, abi_ul=
-ong last_bss, int prot)
->>       }
->>   }
->>
->> +#ifdef TARGET_ARM
->> +static int elf_is_fdpic(struct elfhdr *exec)
->> +{
->> +    return exec->e_ident[EI_OSABI] =3D=3D ELFOSABI_ARM_FDPIC;
->> +}
->> +#else
->>   /* Default implementation, always false.  */
->>   static int elf_is_fdpic(struct elfhdr *exec)
->>   {
->>       return 0;
->>   }
->> +#endif
->=20
-> I have a strong dislike for per-target ifdef ladders. Can we instead
-> put the target's implementation of elf_is_fdpic() into
-> linux-user/$ARCH/target_elf.h
-> and also have that header do
-> #define TARGET_HAS_ELF_FDPIC
->=20
-> and then in the generic code we can protect the default elf_is_fdpic()
-> with #ifndef TARGET_HAS_ELF_FDPIC.
->=20
+Am 23.04.2018 um 10:45 hat Markus Armbruster geschrieben:
+> When resume of a stopped guest immediately runs into block device
+> errors, the BLOCK_IO_ERROR event is sent before the RESUME event.
+> 
+> Reproducer:
+> 
+> 1. Create a scratch image
+>    $ dd if=/dev/zero of=scratch.img bs=1M count=100
+> 
+>    Size doesn't actually matter.
+> 
+> 2. Prepare blkdebug configuration:
+> 
+>    $ cat >blkdebug.conf <<EOF
+>    [inject-error]
+>    event = "write_aio"
+>    errno = "5"
+>    EOF
+> 
+>    Note that errno 5 is EIO.
+> 
+> 3. Run a guest with an additional scratch disk, i.e. with additional
+>    arguments
+>    -drive if=none,id=scratch-drive,format=raw,werror=stop,file=blkdebug:blkdebug.conf:scratch.img
+>    -device virtio-blk-pci,id=scratch,drive=scratch-drive
+> 
+>    The blkdebug part makes all writes to the scratch drive fail with
+>    EIO.  The werror=stop pauses the guest on write errors.
+> 
+> 4. Connect to the QMP socket e.g. like this:
+>    $ socat UNIX:/your/qmp/socket READLINE,history=$HOME/.qmp_history,prompt='QMP> '
+> 
+>    Issue QMP command 'qmp_capabilities':
+>    QMP> { "execute": "qmp_capabilities" }
+> 
+> 5. Boot the guest.
+> 
+> 6. In the guest, write to the scratch disk, e.g. like this:
+> 
+>    # dd if=/dev/zero of=/dev/vdb count=1
+> 
+>    Do double-check the device specified with of= is actually the
+>    scratch device!
+> 
+> 7. Issue QMP command 'cont':
+>    QMP> { "execute": "cont" }
+> 
+> After step 6, I get a BLOCK_IO_ERROR event followed by a STOP event.  Good.
+> 
+> After step 7, I get BLOCK_IO_ERROR, then RESUME, then STOP.  Not so
+> good; I'd expect RESUME, then BLOCK_IO_ERROR, then STOP.
 
-How invasive could that be?
-Your proposal is appealing, but target_elf.h is only included by linux-us=
-er/main.c, which does not define elfhdr etc...
-All that knowledge is in linux-user/elfload.c, which controls what includ=
-e/elf.h defines.
+Do you want to rephrase this in the form of a script for qemu-iotests?
 
-Should I re-engineer that?
+I suppose the 'dd' line can be replaced by a 'qemu-io' monitor command.
 
-Thanks,
-
-Christophe
-
-
-> thanks
-> -- PMM
-> .
->=20
+Kevin
