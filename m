@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=644fc49e2=anthony.perard@citrix.com>)
-	id 1fAd2Z-0002Vt-7x
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 11:06:07 -0400
+	(envelope-from <omer@kazuar-tech.com>) id 1fAd7C-0005Fo-10
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 11:10:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=644fc49e2=anthony.perard@citrix.com>)
-	id 1fAd2U-0007l4-CW
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 11:06:03 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:24522)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71)
-	(envelope-from <prvs=644fc49e2=anthony.perard@citrix.com>)
-	id 1fAd2U-0007kO-2B
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 11:05:58 -0400
-Date: Mon, 23 Apr 2018 16:05:53 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20180423150553.GC1980@perard>
-References: <1524156319-11465-1-git-send-email-ian.jackson@eu.citrix.com>
-	<1524156319-11465-4-git-send-email-ian.jackson@eu.citrix.com>
+	(envelope-from <omer@kazuar-tech.com>) id 1fAd77-0002kq-RY
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 11:10:49 -0400
+Received: from mail-lf0-x22a.google.com ([2a00:1450:4010:c07::22a]:46062)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <omer@kazuar-tech.com>)
+	id 1fAd77-0002j7-Gk
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 11:10:45 -0400
+Received: by mail-lf0-x22a.google.com with SMTP id q5-v6so15495289lff.12
+	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 08:10:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <1524156319-11465-4-git-send-email-ian.jackson@eu.citrix.com>
-Subject: Re: [Qemu-devel] [PATCH 03/16] xen: link against xentoolcore
+From: Omer Katz <omer@kazuar-tech.com>
+Date: Mon, 23 Apr 2018 15:10:32 +0000
+Message-ID: <CAA-pg_qXZLDEHq6jMN_4GUrFvQgf0AS8Fs559JbucptK6_zrFw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] Filtering files passing through MTP devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,51 +26,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ian Jackson <ian.jackson@eu.citrix.com>
-Cc: qemu-devel@nongnu.org, Ross Lagerwall <ross.lagerwall@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org
+To: qemu-devel@nongnu.org
 
-On Thu, Apr 19, 2018 at 05:45:06PM +0100, Ian Jackson wrote:
-> From: Anthony PERARD <anthony.perard@citrix.com>
-> 
-> Xen libraries in 4.10 include a new xentoolcore library.  This
-> contains the xentoolcore_restrict_all function which we are about to
-> want to use.
-> 
-> Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
-> Acked-by: Stefano Stabellini <sstabellini@kernel.org>
-> ---
-> v5: More truthful commit message.
-> ---
->  configure | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/configure b/configure
-> index 0a19b03..f580255 100755
-> --- a/configure
-> +++ b/configure
-> @@ -2188,7 +2188,7 @@ if test "$xen" != "no" ; then
->        $($pkg_config --modversion xencontrol | sed 's/\./ /g') )"
->      xen=yes
->      xen_pc="xencontrol xenstore xenguest xenforeignmemory xengnttab"
-> -    xen_pc="$xen_pc xenevtchn xendevicemodel"
-> +    xen_pc="$xen_pc xenevtchn xendevicemodel xentoolcore"
+Hi everyone,
 
-I think we want to check if "xentoolcore" pkg_config exist before trying
-to use it. Otherwith, that is not going to work with Xen older than
-4.10.
+We have a use case that requires us to only allow certain files to pass
+through to the guest machine from USB storage devices.
 
-`pkg-config --libs` will throw an error without printing anything if
-one of the library doesn't exist.
+I was told on IRC that such a feature does not exist but the easiest way to
+achieve our goal is to contribute a patch the the MTP device driver since
+other drivers operate on a filesystem level instead of a file level which
+is what we need.
 
-Instead, we could do this:
-if $pkg_config --exists xentoolcore; then
-  xen_pc+=" xentoolcore"
-fi
+The plan is to pass the contents of each file to a program through stdin
+and decide based on the exit code if the file should be allowed to pass
+through to the guest or not.
 
->      QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags $xen_pc)"
->      libs_softmmu="$($pkg_config --libs $xen_pc) $libs_softmmu"
->      LDFLAGS="$($pkg_config --libs $xen_pc) $LDFLAGS"
+Since this is the first time I'm contributing to QEMU I'd like some
+guidance to where the filtering code should be.
+https://github.com/qemu/qemu/blob/master/hw/usb/dev-mtp.c doesn't look that
+complicated but I still need to understand it better to continue.
+Furthermore, I need to know where to add such a command line option to
+point QEMU to the filtering program.
 
+Would such a patch be accepted if all the requirements above are met?
 
--- 
-Anthony PERARD
+Best Regards,
+Omer Katz.
