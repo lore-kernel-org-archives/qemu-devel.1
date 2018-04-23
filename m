@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fAhMD-00070A-7O
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 15:42:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1fAhQX-0001Lt-Ld
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 15:47:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fAhMA-0005f6-4B
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 15:42:37 -0400
-References: <20180412192602.13430-1-david@redhat.com>
-	<20180423124222.3c79c3fe.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <7239f367-1661-bd0d-0625-b095df679f0f@redhat.com>
-Date: Mon, 23 Apr 2018 21:42:23 +0200
+	(envelope-from <eblake@redhat.com>) id 1fAhQT-0008AP-0q
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 15:47:05 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41010 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fAhQS-00089P-QH
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 15:47:00 -0400
+References: <20180412124834.GA2025@ruderich.org>
+	<68c390f22ae2afc6539cd7b127063e3d9534d50b.1523537181.git.simon@ruderich.org>
+	<6f775e11a75a2faa1c66a86e6d23a97f695c2ca1.1523537181.git.simon@ruderich.org>
+	<954f83a5-675c-c4ff-6c89-6f8eb820a806@redhat.com>
+	<20180422094728.GB29670@ruderich.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <68d7375c-ef2d-19ee-5bcd-cda8573c8492@redhat.com>
+Date: Mon, 23 Apr 2018 14:46:57 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180423124222.3c79c3fe.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC] s390x: refactor reset/reipl handling
+In-Reply-To: <20180422094728.GB29670@ruderich.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="LI54ADOp51kHxDdijdDNY72irdvFXphLJ"
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] qmp: add pmemload command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,215 +31,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Simon Ruderich <simon@ruderich.org>
+Cc: qemu-devel@nongnu.org
 
-On 23.04.2018 12:42, Cornelia Huck wrote:
-> On Thu, 12 Apr 2018 21:26:02 +0200
-> David Hildenbrand <david@redhat.com> wrote:
->=20
->> Calling pause_all_vcpus()/resume_all_vcpus() from a VCPU thread might
->> not be the best idea. As pause_all_vcpus() temporarily drops the qemu
->> mutex, two parallel calls to pause_all_vcpus() can be active at a time=
-,
->> resulting in a deadlock. (either by two VCPUs or by the main thread an=
-d a
->> VCPU)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--LI54ADOp51kHxDdijdDNY72irdvFXphLJ
+From: Eric Blake <eblake@redhat.com>
+To: Simon Ruderich <simon@ruderich.org>
+Cc: qemu-devel@nongnu.org
+Message-ID: <68d7375c-ef2d-19ee-5bcd-cda8573c8492@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] qmp: add pmemload command
+References: <20180412124834.GA2025@ruderich.org>
+ <68c390f22ae2afc6539cd7b127063e3d9534d50b.1523537181.git.simon@ruderich.org>
+ <6f775e11a75a2faa1c66a86e6d23a97f695c2ca1.1523537181.git.simon@ruderich.org>
+ <954f83a5-675c-c4ff-6c89-6f8eb820a806@redhat.com>
+ <20180422094728.GB29670@ruderich.org>
+In-Reply-To: <20180422094728.GB29670@ruderich.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 04/22/2018 04:47 AM, Simon Ruderich wrote:
+> On Tue, Apr 17, 2018 at 04:18:43PM -0500, Eric Blake wrote:
+>> Focusing on just the interface:
 >>
->> Let's handle it via the main loop instead, as suggested by Paolo. If w=
-e
->> would have two parallel reset requests by two different VCPUs at the
->> same time, the last one would win.
+>>> +++ b/qapi/misc.json
+>>> @@ -1185,6 +1185,26 @@
+>>>  { 'command': 'pmemsave',
+>>>    'data': {'val': 'int', 'size': 'int', 'filename': 'str'} }
+>>>
+>>> +##
+>>> +# @pmemload:
+>>> +#
+>>> +# Load a portion of guest physical memory from a file.
+>>> +#
+>>> +# @val: the physical address of the guest to start from
+>>> +#
+>>> +# @size: the size of memory region to load
 >>
->> We use the existing ipl device to handle it. The nice side effect is
->> that we can get rid of reipl_requested.
+>> Should size be an optional parameter (default read to the end of the f=
+ile)?
 >>
->> This change implies that all reset handling now goes via the common
->> path, so "no-reboot" handling is now active for all kinds of reboots.
+>>> +#
+>>> +# @offset: the offset in the file to start from
 >>
->> Let's execute any CPU initialization code on the target CPU using
->> run_on_cpu.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>
->> Did only a quick check with TCG. I think this way it is way easier to
->> control what is getting reset.
+>> Should offset be an optional parameter (default start reading from
+>> offset 0 of the file)?
 >=20
-> Yes, I like this patch.
->=20
->>
->>  hw/s390x/ipl.c                     | 44 ++++++++++++++++++++++++---
->>  hw/s390x/ipl.h                     | 16 ++++++++--
->>  hw/s390x/s390-virtio-ccw.c         | 49 +++++++++++++++++++++++++----=
--
->>  include/hw/s390x/s390-virtio-ccw.h |  2 --
->>  target/s390x/cpu.h                 | 26 ++++++++++++++++
->>  target/s390x/diag.c                | 61 +++--------------------------=
----------
->>  target/s390x/internal.h            |  6 ----
->>  target/s390x/kvm.c                 |  2 +-
->>  8 files changed, 127 insertions(+), 79 deletions(-)
->>
->> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
->> index fb554ab156..f7589d20f1 100644
->> --- a/hw/s390x/ipl.c
->> +++ b/hw/s390x/ipl.c
->> @@ -26,6 +26,7 @@
->>  #include "qemu/config-file.h"
->>  #include "qemu/cutils.h"
->>  #include "qemu/option.h"
->> +#include "exec/exec-all.h"
->> =20
->>  #define KERN_IMAGE_START                0x010000UL
->>  #define KERN_PARM_AREA                  0x010480UL
->> @@ -484,11 +485,22 @@ IplParameterBlock *s390_ipl_get_iplb(void)
->>      return &ipl->iplb;
->>  }
->> =20
->> -void s390_reipl_request(void)
->> +void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type)
->>  {
->>      S390IPLState *ipl =3D get_ipl_device();
->> =20
->> -    ipl->reipl_requested =3D true;
->> +    if (reset_type =3D=3D S390_RESET_EXTERNAL || reset_type =3D=3D S3=
-90_RESET_REIPL) {
->> +        /* let's always use CPU 0 */
->> +        ipl->reset_cpu =3D NULL;
->> +    } else {
->> +        ipl->reset_cpu =3D cs;
->> +    }
->> +    ipl->reset_type =3D reset_type;
->> +
->> +    if (reset_type !=3D S390_RESET_REIPL) {
->=20
-> Pull the check for S390_RESET_REIPL into the if condition below? Gets
-> rid of the goto :)
+>>From the QAPI point-of-view making both optional seems like a
+> good idea, however then pmemsave should also mark its "size"
+> parameter optional for consistency (this is backwards compatible
+> as existing callers are not affected).
 
-Yes, that's the thing I was no realizing, while hacking on this. I
-thought I would have to shift the whole block.
+Correct.
 
 >=20
->> +        goto no_reipl;
->> +    }
->> +
->>      if (ipl->iplb_valid &&
->>          !ipl->netboot &&
->>          ipl->iplb.pbt =3D=3D S390_IPL_TYPE_CCW &&
->> @@ -505,7 +517,32 @@ void s390_reipl_request(void)
->>              ipl->iplb_valid =3D s390_gen_initial_iplb(ipl);
->>          }
->>      }
->> +no_reipl:
->>      qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
->> +    /* as this is triggered by a CPU, make sure to exit the loop */
->> +    if (tcg_enabled()) {
->> +        cpu_loop_exit(cs);
->> +    }
->> +}
->> +
->> +void s390_ipl_get_reset_request(CPUState **cs, enum s390_reset *reset=
-_type)
->> +{
->> +    S390IPLState *ipl =3D get_ipl_device();
->> +
->> +    *cs =3D ipl->reset_cpu;
->> +    if (!ipl->reset_cpu) {
->> +        /* use CPU 0 as default */
->> +        *cs =3D qemu_get_cpu(0);
->=20
-> That looks somewhat ugly. Maybe just stuff cpu 0 in there at init time?
+> On the monitor API side this is more problematic as the order of
+> the pmemsave/pmemload parameters make optional parameters
+> impossible.
 
-Well, it's the same we already had just at a different place :)
+Back-compat in the QMP interface matters.  The HMP interface, however,
+exists to serve humans not machines, and we can break it at will to
+something that makes more sense to humans.  So don't let HMP concerns
+hold you back from a sane interface.
 
 >=20
-> As an aside: Are we guaranteed to always have cpu 0? IIRC there was
-> some code relying on that; but just grabbing an 'any' cpu looks more
-> like what we want.
-
-We will always create at least one CPU. The fist CPU will always be CPU
-with ID 0. As cpu_index corresponds to ID for us, we will always get CPU
-0 via qemu_get_cpu(). (and we don't have CPU unplug)
-
-However I might just store the cpu id in there instead of an reference.
-So we could "fallback" here to some random CPU that exists (in case
-qemu_get_cpu()  returns NULL).
-
+> Personally I'd keep it as is because it's simple and consistent
+> with the existing interface (and can be changed in the future
+> without breaking compatibility).
 >=20
->> +    }
->> +    *reset_type =3D ipl->reset_type;
->> +}
->=20
->>  static void s390_machine_reset(void)
->>  {
->> -    S390CPU *ipl_cpu =3D S390_CPU(qemu_get_cpu(0));
->> +    enum s390_reset reset_type;
->> +    CPUState *cs, *t;
->> =20
->> +    /* get the reset parameters, reset them once done */
->> +    s390_ipl_get_reset_request(&cs, &reset_type);
->> +
->> +    /* all CPUs are paused and synchronized at this point */
->>      s390_cmma_reset();
->> -    qemu_devices_reset();
->> -    s390_crypto_reset();
->> =20
->> -    /* all cpus are stopped - configure and start the ipl cpu only */
->> -    s390_ipl_prepare_cpu(ipl_cpu);
->> -    s390_cpu_set_state(S390_CPU_STATE_OPERATING, ipl_cpu);
->> +    switch (reset_type) {
->> +    case S390_RESET_EXTERNAL:
->> +    case S390_RESET_REIPL:
->> +        qemu_devices_reset();
->> +        s390_crypto_reset();
->> +
->> +        /* configure and start the ipl CPU only */
->> +        run_on_cpu(cs, s390_do_cpu_ipl, RUN_ON_CPU_NULL);
->> +        break;
->> +    case S390_RESET_MODIFIED_CLEAR:
->> +        CPU_FOREACH(t) {
->> +            run_on_cpu(t, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
->> +        }
->> +        subsystem_reset();
->> +        s390_crypto_reset();
->> +        run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
->> +        break;
->> +    case S390_RESET_LOAD_NORMAL:
->> +        CPU_FOREACH(t) {
->> +            run_on_cpu(t, s390_do_cpu_reset, RUN_ON_CPU_NULL);
->> +        }
->> +        subsystem_reset();
->> +        run_on_cpu(cs, s390_do_cpu_initital_reset, RUN_ON_CPU_NULL);
->=20
-> 'initital' looks like a typo; 'initial'?
+> In case you prefer those parameters to be optional I'll require
+> some help to implement that: I don't understand how
+> qapi-schema.json, hmp-commands.hx and hmp.h interact (I've to
+> admit I just copied that from the original patch and didn't give
+> it much thought as it worked fine) and would require some
+> pointers on how to implement optional arguments for
+> qapi-schema.json.
 
-I keep making this spelling error over and over again :D (I think my
-brain memorized how to type "initial" fast, the wrong way)
+Optional parameters are listed as '*name':'type' in the .json file,
+which tells the generator to create a 'has_name' bool parameter
+alongside the 'name' parameter in the C code for the QMP interface.  The
+HMP interface should then call into the QMP interface.
 
-Thanks!
-
->=20
-> (But you made the same typo twice, so it compiles :)
->=20
->> +        run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
->> +        break;
->=20
-> Moan on default case hit?
-
-Yes, makes sense!
-
->=20
->> +    }
->> +    s390_ipl_clear_reset_request();
->>  }
->> =20
->>  static void s390_machine_device_plug(HotplugHandler *hotplug_dev,
-
-Thanks!
+Recent HMP patches that I've authored may offer some inspiration: commit
+08fb10a added a new command, and commit dba4932 added an optional
+parameter to an existing command.
 
 --=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Thanks,
 
-David / dhildenb
+--LI54ADOp51kHxDdijdDNY72irdvFXphLJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlreODEACgkQp6FrSiUn
+Q2p3Ywf+KjmygRbHDQ2c+cwxYjDaqSb+lifCJHHGHih1udAYx4WiJn2oqMBa1T0u
+WB+2Bo48jqiQn/C2IMxXWptl8ERfkVNGwyOJ8sFTLrXYML2ggkaxt2XpMapaj/LH
+RgJttuXQSCxtZrG5I0N7VOlGVk+VpMFHguJNQp8Ao+hEFjNTFRozul2tjkShb/pX
+JxwEpcjM6EgNnrD1+Q08l7VSXzmvokAZeSUG5aqRyVQ2/D2WypdsoGEFtQppe/DM
+G795abdcyNy0WC6W2p31hRQmkIxg/Ay/kRSMj8/5D/98RSd7fkkrFmh/VZYsmOp9
+yK/qLMwOWsDiAboTEGybdd10nA7LXw==
+=GAHx
+-----END PGP SIGNATURE-----
+
+--LI54ADOp51kHxDdijdDNY72irdvFXphLJ--
