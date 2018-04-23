@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fAY9f-0000LA-SD
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 05:53:05 -0400
+	(envelope-from <clg@kaod.org>) id 1fAYCH-0001zK-SR
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 05:55:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fAY9c-0003jJ-QC
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 05:53:03 -0400
-References: <20180420123456.22196-1-david@redhat.com>
-	<20180420123456.22196-2-david@redhat.com>
-	<20180422042615.GY2434@umbus.fritz.box>
-	<7809aad5-1513-caed-bc94-c5b08afe2ce6@redhat.com>
-	<20180422101000.GA4954@umbus.fritz.box>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <43070125-12dc-17d2-e752-808cf60009de@redhat.com>
-Date: Mon, 23 Apr 2018 11:52:50 +0200
+	(envelope-from <clg@kaod.org>) id 1fAYCE-0004bn-Ms
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 05:55:45 -0400
+Received: from 6.mo179.mail-out.ovh.net ([46.105.56.76]:51286)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fAYCE-0004az-Ff
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 05:55:42 -0400
+Received: from player737.ha.ovh.net (unknown [10.109.105.95])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id AA703BA5B9
+	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 11:55:40 +0200 (CEST)
+References: <20180423064020.25434-1-clg@kaod.org>
+	<CAFEAcA-LtNpGTV08jvK4i5C5i64WjM5gMB4zGr8P4fkVSkNH7g@mail.gmail.com>
+	<53691cbf-08bf-e3f7-22d3-601a279aa08a@kaod.org>
+	<CAFEAcA9XBHE5YxN27M1ugprmSf=o5iiNakO2omrY+HBgCszV5Q@mail.gmail.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <32db3eed-81cc-64dc-a16f-78860c6d3838@kaod.org>
+Date: Mon, 23 Apr 2018 11:55:36 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180422101000.GA4954@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <CAFEAcA9XBHE5YxN27M1ugprmSf=o5iiNakO2omrY+HBgCszV5Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] pc-dimm: factor out MemoryDevice
- interface
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] timer/aspeed: fix vmstate version id
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,99 +33,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>
 
-On 22.04.2018 12:10, David Gibson wrote:
-> On Sun, Apr 22, 2018 at 10:21:34AM +0200, David Hildenbrand wrote:
->> On 22.04.2018 06:26, David Gibson wrote:
->>> On Fri, Apr 20, 2018 at 02:34:54PM +0200, David Hildenbrand wrote:
->>>> On the qmp level, we already have the concept of memory devices:
->>>>     "query-memory-devices"
->>>> Right now, we only support NVDIMM and PCDIMM.
+On 04/23/2018 11:34 AM, Peter Maydell wrote:
+> On 23 April 2018 at 10:28, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>> On 04/23/2018 11:12 AM, Peter Maydell wrote:
+>>>> diff --git a/hw/timer/aspeed_timer.c b/hw/timer/aspeed_timer.c
+>>>> index 50acbf530a3a..7df19bd9df91 100644
+>>>> --- a/hw/timer/aspeed_timer.c
+>>>> +++ b/hw/timer/aspeed_timer.c
+>>>> @@ -498,8 +498,8 @@ static const VMStateDescription vmstate_aspeed_t=
+imer =3D {
 >>>>
->>>> We want to map other devices later into the address space of the guest.
->>>> Such device could e.g. be virtio devices. These devices will have a
->>>> guest memory range assigned but won't be exposed via e.g. ACPI. We want
->>>> to make them look like memory device, but not glued to pc-dimm.
->>>>
->>>> Especially, it will not always be possible to have TYPE_PC_DIMM as a parent
->>>> class (e.g. virtio devices). Let's use an interface instead. As a first
->>>> part, convert handling of
->>>> - qmp_pc_dimm_device_list
->>>> - get_plugged_memory_size
->>>> to our new model. plug/unplug stuff etc. will follow later.
->>>>
->>>> A memory device will have to provide the following functions:
->>>> - get_addr(): Necessary, as the property "addr" can e.g. not be used for
->>>>               virtio devices (already defined).
->>>> - get_plugged_size(): The amount this device offers to the guest as of
->>>>                       now.
->>>> - get_region_size(): Because this can later on be bigger than the
->>>>                      plugged size.
->>>> - fill_device_info(): Fill MemoryDeviceInfo, e.g. for qmp.
->>>>
->>>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>>
->>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
->>>
->>> with the exception of some tiny nits..
->>>
->>> [snip]
->>>> +static gint memory_device_addr_sort(gconstpointer a, gconstpointer b)
->>>> +{
->>>> +    MemoryDeviceState *md_a = MEMORY_DEVICE(a);
->>>> +    MemoryDeviceState *md_b = MEMORY_DEVICE(b);
->>>
->>> These probably should be const MemoryDeviceState *.
+>>>>  static const VMStateDescription vmstate_aspeed_timer_state =3D {
+>>>>      .name =3D "aspeed.timerctrl",
+>>>> -    .version_id =3D 1,
+>>>> -    .minimum_version_id =3D 1,
+>>>> +    .version_id =3D 2,
+>>>> +    .minimum_version_id =3D 2,
+>>>>      .fields =3D (VMStateField[]) {
+>>>>          VMSTATE_UINT32(ctrl, AspeedTimerCtrlState),
+>>>>          VMSTATE_UINT32(ctrl2, AspeedTimerCtrlState),
+>>> Wouldn't it be simpler to just fix the incorrect value in
+>>> the VMSTATE_STRUCT_ARRAY(timers, AspeedTimerCtrlState,
+>>> line ?
 >>
->> Yes, that could work (depends on what the functions getting called
->> internally expect). Will look into it
-> 
-> Well, the only thing being called here is the ->get_addr() hook, which
-> you can redefine if necessary.  Discarding the const in the passed in
-> pointers seems like bad idea, even though it won't explicitly warn due
-> to the existing MEMORY_DEVICE() cast.
-
-I converted all MemoryDevice functions to eat "const MemoryDeviceState *md".
-
-The only problematic part now is
-
-static uint64_t pc_dimm_md_get_region_size(const MemoryDeviceState *md)
-
-It calls "ddc->get_memory_region(dimm, &error_abort);", and it looks
-like we cannot convert this to eat a const DIMM pointer (as it has to
-return a !const pointer to the memory region).
-
-So we will actually drop the const here - which is fine because we don't
-modify anything.
-
-> 
->>>> +    MemoryDeviceClass *mdc_a = MEMORY_DEVICE_GET_CLASS(a);
->>>> +    MemoryDeviceClass *mdc_b = MEMORY_DEVICE_GET_CLASS(b);
->>>> +    const uint64_t addr_a = mdc_a->get_addr(md_a);
->>>> +    const uint64_t addr_b = mdc_b->get_addr(md_b);
->>>> +
->>>> +    if (addr_a > addr_b) {
->>>> +        return 1;
->>>> +    } else if (addr_a < addr_b) {
->>>> +        return -1;
->>>> +    }
->>>> +    return 0;
->>>> +}
->>>> +
->>>> +static int memory_device_built_list(Object *obj, void *opaque)
->>>
->>> s/built/build/ will read a bit more clearly I think.
->>>
+>> Yes. Also.
 >>
->> Indeed, thanks!
->>
-> 
+>> Or bring back all the version ids to 1, as we never supported
+>> migration before.
+>=20
+> I think it's nice to at least do the "bump version" thing, so you
+> get a (hopefully comprehensible) error rather than just wrong
+> data if you do try a cross version migration, so I would
+> vote for just fixing the one thing that was wrong: the
+> number in VMSTATE_STRUCT_ARRAY is the version to be used of
+> the substruct, so it didn't need to be bumped in commit
+> 1d3e65aa7a; the main version numbers for vmstate_aspeed_timer
+> did need to be bumped because part of the main struct changed.
 
-
--- 
+Yes. This is correct. I will resend with just that change on=20
+VMSTATE_STRUCT_ARRAY.
 
 Thanks,
 
-David / dhildenb
+C.
+=20
