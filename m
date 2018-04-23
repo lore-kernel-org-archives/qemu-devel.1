@@ -1,17 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fAWMz-0003yV-F5
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 03:58:43 -0400
+	(envelope-from <clg@kaod.org>) id 1fAWNE-0004Fi-2u
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 03:58:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fAWMu-0003cD-Kg
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 03:58:41 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 23 Apr 2018 09:58:23 +0200
-Message-Id: <1524470305-26484-3-git-send-email-thuth@redhat.com>
-In-Reply-To: <1524470305-26484-1-git-send-email-thuth@redhat.com>
-References: <1524470305-26484-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/4] pc-bios/s390-ccw/net: Add support for
- pxelinux-style config files
+	(envelope-from <clg@kaod.org>) id 1fAWN9-0003lX-CQ
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 03:58:56 -0400
+Received: from 5.mo68.mail-out.ovh.net ([46.105.62.179]:56657)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fAWN9-0003l1-2G
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 03:58:51 -0400
+Received: from player737.ha.ovh.net (unknown [10.109.108.91])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 3D945E04C9
+	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 09:58:49 +0200 (CEST)
+References: <20180419124331.3915-1-clg@kaod.org>
+	<20180419124331.3915-4-clg@kaod.org>
+	<20180423064644.GG19804@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <8d1cb270-d62f-f08f-9167-3f130906f910@kaod.org>
+Date: Mon, 23 Apr 2018 09:58:43 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180423064644.GG19804@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 03/35] ppc/xive: introduce the
+ XiveFabric interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,322 +33,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-Since it is quite cumbersome to manually create a combined kernel with
-initrd image for network booting, we now support loading via pxelinux
-configuration files, too. In these files, the kernel, initrd and command
-line parameters can be specified seperately, and the firmware then takes
-care of glueing everything together in memory after the files have been
-downloaded.
+On 04/23/2018 08:46 AM, David Gibson wrote:
+> On Thu, Apr 19, 2018 at 02:42:59PM +0200, C=E9dric Le Goater wrote:
+>> The XiveFabric offers a simple interface, between the XiveSourve
+>> object and the device model owning the interrupt sources, to forward
+>> an event notification to the XIVE interrupt controller of the machine
+>> and if the owner is the controller, to call directly the routing
+>> sub-engine.
+>>
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>> ---
+>>  hw/intc/xive.c        | 37 ++++++++++++++++++++++++++++++++++++-
+>>  include/hw/ppc/xive.h | 25 +++++++++++++++++++++++++
+>>  2 files changed, 61 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+>> index 060976077dd7..b4c3d06c1219 100644
+>> --- a/hw/intc/xive.c
+>> +++ b/hw/intc/xive.c
+>> @@ -17,6 +17,21 @@
+>>  #include "hw/ppc/xive.h"
+>> =20
+>>  /*
+>> + * XIVE Fabric
+>> + */
+>> +
+>> +static void xive_fabric_route(XiveFabric *xf, int lisn)
+>> +{
+>> +
+>> +}
+>> +
+>> +static const TypeInfo xive_fabric_info =3D {
+>> +    .name =3D TYPE_XIVE_FABRIC,
+>> +    .parent =3D TYPE_INTERFACE,
+>> +    .class_size =3D sizeof(XiveFabricClass),
+>> +};
+>> +
+>> +/*
+>>   * XIVE Interrupt Source
+>>   */
+>> =20
+>> @@ -97,11 +112,19 @@ static bool xive_source_pq_trigger(XiveSource *xs=
+rc, uint32_t srcno)
+>> =20
+>>  /*
+>>   * Forward the source event notification to the associated XiveFabric=
+,
+>> - * the device owning the sources.
+>> + * the device owning the sources, or perform the routing if the devic=
+e
+>> + * is the interrupt controller.
+>>   */
+>>  static void xive_source_notify(XiveSource *xsrc, int srcno)
+>>  {
+>> =20
+>> +    XiveFabricClass *xfc =3D XIVE_FABRIC_GET_CLASS(xsrc->xive);
+>> +
+>> +    if (xfc->notify) {
+>> +        xfc->notify(xsrc->xive, srcno + xsrc->offset);
+>> +    } else {
+>> +        xive_fabric_route(xsrc->xive, srcno + xsrc->offset);
+>> +    }
+>=20
+> Why 2 cases?  Can't the XiveFabric object just make its notify equal
+> to xive_fabric_route if that's what it wants?
+Under sPAPR, all the sources, IPIs and virtual device interrupts,=20
+generate events which are directly routed by xive_fabric_route().=20
+There is no need of an extra hop. Indeed.=20
 
-The user can either specify a config file directly as bootfile via DHCP
-(but in this case, the file has to start either with "default" or a "#"
-comment so we can distinguish it from binary kernels), or a folder (i.e.
-the bootfile name must end with "/") where the firmware should look for
-the typical pxelinux.cfg file names based on MAC or IP address. If no
-direct file or folder has been specified, we still look for certain
-files in the default "pxelinux.cfg/" folder, but omit some of the file
-names to avoid to download x86 config files here by mistake.
+Under PowerNV, some sources forward the notification to the routing=20
+engine using a specific MMIO load on a notify address which is stored=20
+in one of the controller registers. So we need a hop to reach the=20
+device model, owning the sources, and do that load :=20
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- pc-bios/s390-ccw/netboot.mak |   5 +-
- pc-bios/s390-ccw/netmain.c   | 225 +++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 222 insertions(+), 8 deletions(-)
+	static void pnv_psi_notify(XiveFabric *xf, uint32_t lisn)
+	{
+	    PnvPsi *psi =3D PNV_PSI(xf);
+	    uint64_t notif_port =3D
+	        psi->regs[PSIHB_REG(PSIHB9_ESB_NOTIF_ADDR)];
+	    bool valid =3D notif_port & PSIHB9_ESB_NOTIF_VALID;
+	    uint64_t notify_addr =3D notif_port & ~PSIHB9_ESB_NOTIF_VALID;
+	    uint32_t data =3D cpu_to_be32(lisn);
+=09
+	    if (valid) {
+	        cpu_physical_memory_write(notify_addr, &data, sizeof(data));
+	    }
+	}
 
-diff --git a/pc-bios/s390-ccw/netboot.mak b/pc-bios/s390-ccw/netboot.mak
-index a25d238..8db9573 100644
---- a/pc-bios/s390-ccw/netboot.mak
-+++ b/pc-bios/s390-ccw/netboot.mak
-@@ -24,8 +24,9 @@ CTYPE_OBJS = isdigit.o isxdigit.o toupper.o
- %.o : $(SLOF_DIR)/lib/libc/ctype/%.c
- 	$(call quiet-command,$(CC) $(LIBC_CFLAGS) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
- 
--STRING_OBJS = strcat.o strchr.o strcmp.o strcpy.o strlen.o strncmp.o strncpy.o \
--	      strstr.o memset.o memcpy.o memmove.o memcmp.o
-+STRING_OBJS = strcasecmp.o strcat.o strchr.o strcmp.o strcpy.o strlen.o \
-+	      strncasecmp.o strncmp.o strncpy.o strstr.o \
-+	      memset.o memcpy.o memmove.o memcmp.o
- %.o : $(SLOF_DIR)/lib/libc/string/%.c
- 	$(call quiet-command,$(CC) $(LIBC_CFLAGS) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
- 
-diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
-index 8fa9e6c..129f009 100644
---- a/pc-bios/s390-ccw/netmain.c
-+++ b/pc-bios/s390-ccw/netmain.c
-@@ -39,11 +39,17 @@
- 
- extern char _start[];
- 
-+#define KERNEL_ADDR             ((void *)0L)
-+#define KERNEL_MAX_SIZE         ((long)_start)
-+#define ARCH_COMMAND_LINE_SIZE  896              /* Taken from Linux kernel */
-+
- char stack[PAGE_SIZE * 8] __attribute__((aligned(PAGE_SIZE)));
- IplParameterBlock iplb __attribute__((aligned(PAGE_SIZE)));
-+static char cfgbuf[2048];
- 
- static SubChannelId net_schid = { .one = 1 };
- static int ip_version = 4;
-+static uint8_t mac[6];
- static uint64_t dest_timer;
- 
- static uint64_t get_timer_ms(void)
-@@ -136,9 +142,15 @@ static int tftp_load(filename_ip_t *fnip, void *buffer, int len)
-     rc = tftp(fnip, buffer, len, DEFAULT_TFTP_RETRIES, &tftp_err, 1, 1428,
-               ip_version);
- 
--    if (rc > 0) {
--        printf("  TFTP: Received %s (%d KBytes)\n", fnip->filename,
--               rc / 1024);
-+    if (rc < 0) {
-+        /* Make sure that error messages are put into a new line */
-+        printf("\n  ");
-+    }
-+
-+    if (rc > 1024) {
-+        printf("  TFTP: Received %s (%d KBytes)\n", fnip->filename, rc / 1024);
-+    } else if (rc > 0) {
-+        printf("  TFTP: Received %s (%d Bytes)\n", fnip->filename, rc);
-     } else if (rc == -1) {
-         puts("unknown TFTP error");
-     } else if (rc == -2) {
-@@ -201,7 +213,6 @@ static int tftp_load(filename_ip_t *fnip, void *buffer, int len)
- 
- static int net_init(filename_ip_t *fn_ip)
- {
--    uint8_t mac[6];
-     int rc;
- 
-     memset(fn_ip, 0, sizeof(filename_ip_t));
-@@ -275,6 +286,202 @@ static void net_release(filename_ip_t *fn_ip)
-     }
- }
- 
-+/* This structure holds the data from one pxelinux.cfg file entry */
-+struct lkia {
-+    const char *label;
-+    const char *kernel;
-+    const char *initrd;
-+    const char *append;
-+};
-+
-+static int load_kernel_with_initrd(filename_ip_t *fn_ip, struct lkia *kia)
-+{
-+    int rc;
-+
-+    printf("Loading pxelinux.cfg entry '%s'\n", kia->label);
-+
-+    if (!kia->kernel) {
-+        printf("Kernel entry is missing!\n");
-+        return -1;
-+    }
-+
-+    strncpy((char *)&fn_ip->filename, kia->kernel, sizeof(fn_ip->filename));
-+    rc = tftp_load(fn_ip, KERNEL_ADDR, KERNEL_MAX_SIZE);
-+    if (rc < 0) {
-+        return rc;
-+    }
-+
-+    if (kia->initrd) {
-+        uint64_t iaddr = (rc + 0xfff) & ~0xfffUL;
-+
-+        strncpy((char *)&fn_ip->filename, kia->initrd, sizeof(fn_ip->filename));
-+        rc = tftp_load(fn_ip, (void *)iaddr, KERNEL_MAX_SIZE - iaddr);
-+        if (rc < 0) {
-+            return rc;
-+        }
-+        /* Patch location and size: */
-+        *(uint64_t *)0x10408 = iaddr;
-+        *(uint64_t *)0x10410 = rc;
-+        rc += iaddr;
-+    }
-+
-+    if (kia->append) {
-+        strncpy((char *)0x10480, kia->append, ARCH_COMMAND_LINE_SIZE);
-+    }
-+
-+    return rc;
-+}
-+
-+#define MAX_PXELINUX_ENTRIES 16
-+
-+/**
-+ * Parse a pxelinux-style configuration file.
-+ * See the following URL for more inforation about the config file syntax:
-+ * https://www.syslinux.org/wiki/index.php?title=PXELINUX
-+ */
-+static int handle_pxelinux_cfg(filename_ip_t *fn_ip, char *cfg, int cfgsize)
-+{
-+    struct lkia entries[MAX_PXELINUX_ENTRIES];
-+    int num_entries = 0;
-+    char *ptr = cfg, *eol, *arg;
-+    char *defaultlabel = NULL;
-+    int def_ent = 0;
-+
-+    while (ptr < cfg + cfgsize && num_entries < MAX_PXELINUX_ENTRIES) {
-+        eol = strchr(ptr, '\n');
-+        if (!eol) {
-+            eol = cfg + cfgsize;
-+        }
-+        if (eol > ptr && *(eol - 1) == '\r') {
-+            *(eol - 1) = 0;
-+        }
-+        *eol = '\0';
-+        while (*ptr == ' ' || *ptr == '\t') {
-+            ptr++;
-+        }
-+        if (*ptr == 0 || *ptr == '#') {   /* Ignore comments and empty lines */
-+            goto nextline;
-+        }
-+        arg = strchr(ptr, ' ');    /* Look for space between command and arg */
-+        if (!arg) {
-+            arg = strchr(ptr, '\t');
-+        }
-+        if (!arg) {
-+            printf("Failed to parse the following line:\n %s\n", ptr);
-+            goto nextline;
-+        }
-+        *arg++ = 0;
-+        while (*arg == ' ' || *arg == '\t') {
-+            arg++;
-+        }
-+        if (!strcasecmp("default", ptr)) {
-+            defaultlabel = arg;
-+        } else if (!strcasecmp("label", ptr)) {
-+            entries[num_entries].label = arg;
-+            if (defaultlabel && !strcmp(arg, defaultlabel)) {
-+                def_ent = num_entries;
-+            }
-+            num_entries++;
-+        } else if (!strcasecmp("kernel", ptr) && num_entries > 0) {
-+            entries[num_entries - 1].kernel = arg;
-+        } else if (!strcasecmp("initrd", ptr) && num_entries > 0) {
-+            entries[num_entries - 1].initrd = arg;
-+        } else if (!strcasecmp("append", ptr) && num_entries > 0) {
-+            entries[num_entries - 1].append = arg;
-+        } else {
-+            printf("Command '%s' is not supported.\n", ptr);
-+        }
-+nextline:
-+        ptr = eol + 1;
-+    }
-+
-+    return load_kernel_with_initrd(fn_ip, &entries[def_ent]);
-+}
-+
-+static int net_try_pxelinux_cfgs(filename_ip_t *fn_ip)
-+{
-+    int rc, idx;
-+    char basedir[256];
-+    int has_basedir;
-+
-+    cfgbuf[sizeof(cfgbuf) - 1] = 0;   /* Make sure that it is NUL-terminated */
-+
-+    /* Did we get a usable base directory via DHCP? */
-+    idx = strlen((char *)fn_ip->filename);
-+    if (idx > 0 && idx < sizeof(basedir) - 40 &&
-+        fn_ip->filename[idx - 1] == '/') {
-+        has_basedir = true;
-+        strcpy(basedir, (char *)fn_ip->filename);
-+    } else {
-+        has_basedir = false;
-+        strcpy(basedir, "pxelinux.cfg/");
-+    }
-+
-+    printf("Trying pxelinux.cfg files...\n");
-+
-+    /* Look for config file with MAC address in its name */
-+    sprintf((char *)fn_ip->filename, "%s%02x-%02x-%02x-%02x-%02x-%02x",
-+            basedir, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-+    rc = tftp_load(fn_ip, cfgbuf, sizeof(cfgbuf) - 1);
-+    if (rc > 0) {
-+        return handle_pxelinux_cfg(fn_ip, cfgbuf, sizeof(cfgbuf));
-+    }
-+
-+    /* Look for config file with IP address in its name */
-+    if (ip_version == 4) {
-+        for (idx = 0; (has_basedir && idx <= 7) || idx < 1; idx++) {
-+            sprintf((char *)fn_ip->filename, "%s%02X%02X%02X%02X", basedir,
-+                    (fn_ip->own_ip >> 24) & 0xff, (fn_ip->own_ip >> 16) & 0xff,
-+                    (fn_ip->own_ip >> 8) & 0xff, fn_ip->own_ip & 0xff);
-+            fn_ip->filename[strlen((char *)fn_ip->filename) - idx] = 0;
-+            rc = tftp_load(fn_ip, cfgbuf, sizeof(cfgbuf) - 1);
-+            if (rc > 0) {
-+                return handle_pxelinux_cfg(fn_ip, cfgbuf, sizeof(cfgbuf));
-+            }
-+        }
-+    }
-+
-+    /* Try "default" config file */
-+    if (has_basedir) {
-+        sprintf((char *)fn_ip->filename, "%sdefault", basedir);
-+        rc = tftp_load(fn_ip, cfgbuf, sizeof(cfgbuf) - 1);
-+        if (rc > 0) {
-+            return handle_pxelinux_cfg(fn_ip, cfgbuf, sizeof(cfgbuf));
-+        }
-+    }
-+
-+    return -1;
-+}
-+
-+static int net_try_direct_tftp_load(filename_ip_t *fn_ip)
-+{
-+    int rc;
-+    void *baseaddr = (void *)0x2000;  /* Load right after the low-core */
-+
-+    rc = tftp_load(fn_ip, baseaddr, KERNEL_MAX_SIZE - (long)baseaddr);
-+    if (rc < 0) {
-+        return rc;
-+    } else if (rc < 8) {
-+        printf("'%s' is too small (%i bytes only).\n", fn_ip->filename, rc);
-+        return -1;
-+    }
-+
-+    /* Check whether it is a configuration file instead of a kernel */
-+    if (rc < sizeof(cfgbuf) - 1) {
-+        memcpy(cfgbuf, baseaddr, rc);
-+        cfgbuf[rc] = 0;    /* Make sure that it is NUL-terminated */
-+        if (!strncasecmp("default", cfgbuf, 7) || !strncmp("# ", cfgbuf, 2)) {
-+            /* Looks like it is a pxelinux.cfg */
-+            return handle_pxelinux_cfg(fn_ip, cfgbuf, rc);
-+        }
-+    }
-+
-+    /* Move kernel to right location */
-+    memmove(KERNEL_ADDR, baseaddr, rc);
-+
-+    return rc;
-+}
-+
- void panic(const char *string)
- {
-     sclp_print(string);
-@@ -347,7 +554,7 @@ static void virtio_setup(void)
- void main(void)
- {
-     filename_ip_t fn_ip;
--    int rc;
-+    int rc, fnlen;
- 
-     sclp_setup();
-     sclp_print("Network boot starting...\n");
-@@ -359,7 +566,13 @@ void main(void)
-         panic("Network initialization failed. Halting.\n");
-     }
- 
--    rc = tftp_load(&fn_ip, NULL, (long)_start);
-+    fnlen = strlen((char *)fn_ip.filename);
-+    if (fnlen > 0 && fn_ip.filename[fnlen - 1] != '/') {
-+        rc = net_try_direct_tftp_load(&fn_ip);
-+    }
-+    if (rc <= 0) {
-+        rc = net_try_pxelinux_cfgs(&fn_ip);
-+    }
- 
-     net_release(&fn_ip);
- 
--- 
-1.8.3.1
+The PnvXive model handles the load and forwards to the fabric again. =20
+
+The IPIs under PowerNV do not need an extra hop so they reach the=20
+routing routine directly without the extra notify() hop.=20
+
+However, PowerNV at the end should be using xive_fabric_route()=20
+but there are some differences on how the NVT registers are=20
+updated (HV vs. OS mode) and it's not handled yet so it uses a=20
+notify() handler. But is should disappear and call directly=20
+xive_fabric_route() in a near future.
+
+
+May be, XiveFabricNotifier would be a better name for this feature ?
+I am adding a few ops later which are more related to routing.
+
+Thanks,
+
+C.
+
+
+>=20
+>>  }
+>> =20
+>>  /*
+>> @@ -302,6 +325,17 @@ static void xive_source_reset(DeviceState *dev)
+>>  static void xive_source_realize(DeviceState *dev, Error **errp)
+>>  {
+>>      XiveSource *xsrc =3D XIVE_SOURCE(dev);
+>> +    Object *obj;
+>> +    Error *local_err =3D NULL;
+>> +
+>> +    obj =3D object_property_get_link(OBJECT(dev), "xive", &local_err)=
+;
+>> +    if (!obj) {
+>> +        error_propagate(errp, local_err);
+>> +        error_prepend(errp, "required link 'xive' not found: ");
+>> +        return;
+>> +    }
+>> +
+>> +    xsrc->xive =3D XIVE_FABRIC(obj);
+>> =20
+>>      if (!xsrc->nr_irqs) {
+>>          error_setg(errp, "Number of interrupt needs to be greater tha=
+n 0");
+>> @@ -376,6 +410,7 @@ static const TypeInfo xive_source_info =3D {
+>>  static void xive_register_types(void)
+>>  {
+>>      type_register_static(&xive_source_info);
+>> +    type_register_static(&xive_fabric_info);
+>>  }
+>> =20
+>>  type_init(xive_register_types)
+>> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+>> index 0b76dd278d9b..4fcae2c763e6 100644
+>> --- a/include/hw/ppc/xive.h
+>> +++ b/include/hw/ppc/xive.h
+>> @@ -12,6 +12,8 @@
+>> =20
+>>  #include "hw/sysbus.h"
+>> =20
+>> +typedef struct XiveFabric XiveFabric;
+>> +
+>>  /*
+>>   * XIVE Interrupt Source
+>>   */
+>> @@ -46,6 +48,8 @@ typedef struct XiveSource {
+>>      hwaddr       esb_base;
+>>      uint32_t     esb_shift;
+>>      MemoryRegion esb_mmio;
+>> +
+>> +    XiveFabric   *xive;
+>>  } XiveSource;
+>> =20
+>>  /*
+>> @@ -143,4 +147,25 @@ static inline void xive_source_irq_set(XiveSource=
+ *xsrc, uint32_t srcno,
+>>      xsrc->status[srcno] |=3D lsi ? XIVE_STATUS_LSI : 0;
+>>  }
+>> =20
+>> +/*
+>> + * XIVE Fabric
+>> + */
+>> +
+>> +typedef struct XiveFabric {
+>> +    Object parent;
+>> +} XiveFabric;
+>> +
+>> +#define TYPE_XIVE_FABRIC "xive-fabric"
+>> +#define XIVE_FABRIC(obj)                                     \
+>> +    OBJECT_CHECK(XiveFabric, (obj), TYPE_XIVE_FABRIC)
+>> +#define XIVE_FABRIC_CLASS(klass)                                     =
+\
+>> +    OBJECT_CLASS_CHECK(XiveFabricClass, (klass), TYPE_XIVE_FABRIC)
+>> +#define XIVE_FABRIC_GET_CLASS(obj)                                   =
+\
+>> +    OBJECT_GET_CLASS(XiveFabricClass, (obj), TYPE_XIVE_FABRIC)
+>> +
+>> +typedef struct XiveFabricClass {
+>> +    InterfaceClass parent;
+>> +    void (*notify)(XiveFabric *xf, uint32_t lisn);
+>> +} XiveFabricClass;
+>> +
+>>  #endif /* PPC_XIVE_H */
+>=20
