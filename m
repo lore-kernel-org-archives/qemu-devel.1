@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fAhDT-0003sS-5D
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 15:33:39 -0400
+	(envelope-from <david@redhat.com>) id 1fAhGm-0005E3-Cr
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 15:37:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fAhDQ-0001Hm-1n
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 15:33:35 -0400
-Received: from mail-pg0-x22c.google.com ([2607:f8b0:400e:c05::22c]:41406)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fAhDP-0001HW-SJ
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 15:33:31 -0400
-Received: by mail-pg0-x22c.google.com with SMTP id m21so6060995pgv.8
-	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 12:33:31 -0700 (PDT)
-References: <20180423123225.30503-1-edgar.iglesias@gmail.com>
-	<20180423123225.30503-6-edgar.iglesias@gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <9bb35b84-494e-ea9e-3794-e6e3d5ebb075@linaro.org>
-Date: Mon, 23 Apr 2018 09:33:27 -1000
+	(envelope-from <david@redhat.com>) id 1fAhGj-0002Y5-7n
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 15:37:00 -0400
+References: <20180412192602.13430-1-david@redhat.com>
+	<ae3c3e54-8682-2f80-b54f-cceb29de7a8a@redhat.com>
+	<20180423124528.2eead1de.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <3bc9fc9c-0e05-df7b-1d5c-bf554147a51c@redhat.com>
+Date: Mon, 23 Apr 2018 21:36:46 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180423123225.30503-6-edgar.iglesias@gmail.com>
+In-Reply-To: <20180423124528.2eead1de.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 5/5] target-microblaze: mmu: Make the
- TLBX MISS bit read-only
+Subject: Re: [Qemu-devel] [PATCH RFC] s390x: refactor reset/reipl handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,21 +25,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, sai.pavan.boddu@xilinx.com, alistair@alistair23.me, frasse.iglesias@gmail.com, edgar.iglesias@xilinx.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 04/23/2018 02:32 AM, Edgar E. Iglesias wrote:
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+On 23.04.2018 12:45, Cornelia Huck wrote:
+> On Wed, 18 Apr 2018 16:33:13 +0200
+> David Hildenbrand <david@redhat.com> wrote:
 > 
-> Make the TLBX MISS bit read-only.
+>>>  static void s390_ipl_class_init(ObjectClass *klass, void *data)
+>>> diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+>>> index 0570d0ad75..102f1ea7af 100644
+>>> --- a/hw/s390x/ipl.h
+>>> +++ b/hw/s390x/ipl.h
+>>> @@ -87,7 +87,17 @@ int s390_ipl_set_loadparm(uint8_t *loadparm);
+>>>  void s390_ipl_update_diag308(IplParameterBlock *iplb);
+>>>  void s390_ipl_prepare_cpu(S390CPU *cpu);
+>>>  IplParameterBlock *s390_ipl_get_iplb(void);
+>>> -void s390_reipl_request(void);
+>>> +
+>>> +enum s390_reset {
+>>> +    /* default is a reset not triggered by a CPU e.g. issued by QMP */
+>>> +    S390_RESET_EXTERNAL = 0,
+>>> +    S390_RESET_REIPL,
+>>> +    S390_RESET_MODIFIED_CLEAR,
+>>> +    S390_RESET_LOAD_NORMAL,
+>>> +};
+>>> +void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type);
+>>> +void s390_ipl_get_reset_request(CPUState **cs, enum s390_reset *reset_type);
+>>> +void s390_ipl_clear_reset_request(void);
+>>>  
+>>>  #define QIPL_ADDRESS  0xcc
+>>>  
+>>> @@ -129,9 +139,11 @@ struct S390IPLState {
+>>>      bool enforce_bios;
+>>>      IplParameterBlock iplb;
+>>>      bool iplb_valid;
+>>> -    bool reipl_requested;
+>>>      bool netboot;
+>>>      QemuIplParameters qipl;
+>>> +    /* reset related properties don't have to be migrated or reset */
+>>> +    enum s390_reset reset_type;
+>>> +    CPUState *reset_cpu;  
+>>
+>> Wondering if storing the cpu number would be nicer. Opinions?
+>>
 > 
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> ---
->  target/microblaze/mmu.c | 4 ++++
->  1 file changed, 4 insertions(+)
+> Is there any difference in the number of QOM operations?
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Not that it would matter much. Just another VCPU lookup by ID.
 
+> 
+> Also, do you need to distinguish between 'specified cpu' and
+> 'default/any cpu'? Should be deductible from the reset type, though.
+> 
 
-r~
+Yes, I deduct that from the reset type.
+
+-- 
+
+Thanks,
+
+David / dhildenb
