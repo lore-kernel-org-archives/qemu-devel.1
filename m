@@ -1,34 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fAfQa-0002Tc-Rt
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 13:39:01 -0400
+	(envelope-from <mst@redhat.com>) id 1fAfSp-0003Ov-Fq
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 13:41:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fAfQV-0004nO-Uz
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 13:39:00 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:37347)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fAfQV-0004nF-Pz
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 13:38:55 -0400
-Received: by mail-qt0-x243.google.com with SMTP id w12-v6so18656404qti.4
-	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 10:38:55 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180423162523.6392-1-f4bug@amsat.org>
-	<20180423162523.6392-3-f4bug@amsat.org>
-	<756704ca-f41d-d0ec-fb57-cd844b6164e6@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c397f644-db18-1193-d8b2-457989e2c55f@amsat.org>
-Date: Mon, 23 Apr 2018 14:38:50 -0300
+	(envelope-from <mst@redhat.com>) id 1fAfSk-00077y-H3
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 13:41:19 -0400
+Date: Mon, 23 Apr 2018 20:40:59 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180423204018-mutt-send-email-mst@kernel.org>
+References: <20180423165126.15441-1-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <756704ca-f41d-d0ec-fb57-cd844b6164e6@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] loader: Fix 64-bit misaligned
- member access
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180423165126.15441-1-david@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 00/11] pc-dimm: factor out MemoryDevice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,22 +22,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Paul Burton <paul.burton@mips.com>, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>
 
-On 04/23/2018 02:34 PM, Richard Henderson wrote:
-> On 04/23/2018 06:25 AM, Philippe Mathieu-Daudé wrote:
->> Assuming the base of the fdt is aligned, a 32-bit property returns
->> a 32-bit aligned pointer...
-> ...
->>      case 4:
->> -        *addr = fdt32_to_cpu(*(fdt32_t *)prop);
->> +        *addr = fdt32_to_cpu(ldl_he_p(prop));
->>          return 0;
+On Mon, Apr 23, 2018 at 06:51:15PM +0200, David Hildenbrand wrote:
+> Right now we can only map PCDIMM/NVDIMM into guest address space. In the
+> future, we might want to do the same for virtio devices - e.g.
+> virtio-pmem or virtio-mem. Especially, they should be able to live side
+> by side to each other.
 > 
-> So why are you changing the 32-bit case?
+> E.g. the virto based memory devices regions will not be exposed via ACPI
+> and friends. They will be detected just like other virtio devices and
+> indicate the applicable memory region. This makes it possible to also use
+> them on architectures without memory device detection support (e.g. s390x).
+> 
+> Let's factor out the memory device code into a MemoryDevice interface.
+> 
+> Please note that the "slots" assignment code is not relevant for memory
+> devices that will not be exposed via ACPI or similar. That's why that
+> part won't be exposed. KVM/vhost "slots" for memory regions are still
+> necessary but don't have to be manually specified (e.g. the slot number
+> doesn't mather).
+> 
+> So we are basically converting the hotplug memory region to a memory device
+> region. I have patches that also set up such a region for s390x.
 
-First to not assume base fdt is always 32-bit aligned,
-second to keep calls similar and avoid someone use *(fdt64_t *) similar
-to the 32-bit property. But this is avoidable with a simple comment
-about why we have to use ldq_he_p().
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+
+Who's merging this? Eduardo?
+
+> v3 -> v4:
+> - "pc-dimm: factor out MemoryDevice interface"
+> -- dropped the "errp" parameter from the interface functions
+> -- made as many pointers const as I could :)
+> -- s/built/build/
+> - machine: make MemoryHotplugState accessible via the machine
+> -- State now kept via a pointer, not queried.
+> -- Added patches that rename the type and cleanup the terminology for
+>    spapr and pc
+> - Split up the big "pc-dimm: factor out address space logic into MemoryDevice
+>   code" into sub patches
+> --  We now pass the machine to the pc-dimm and MemoryDevice plug/unplug
+>     functions, so we can avoid qdev_get_machine()
+> -- Moved some checks around as requested by Igor
+> - Added a patch to make maxmem not depend on slots
+> 
+> v2 -> v3:
+> - "pc-dimm: factor out MemoryDevice interface"
+> --> Lookup both classes when comparing (David Gibson)
+> 
+> v1 -> v2:
+> - Fix compile issues on ppc (still untested  )
+> 
+> 
+> David Hildenbrand (11):
+>   pc-dimm: factor out MemoryDevice interface
+>   machine: make MemoryHotplugState accessible via the machine
+>   pc-dimm: no need to pass the memory region
+>   pc-dimm: pass in the machine and to the MemoryHotplugState
+>   pc-dimm: factor out address search into MemoryDevice code
+>   pc-dimm: factor out capacity and slot checks into MemoryDevice
+>   pc-dimm: move actual plug/unplug of a memory region to MemoryDevice
+>   machine: rename MemoryHotplugState to DeviceMemoryState
+>   pc: rename "hotplug memory" terminology to "device memory"
+>   spapr: rename "hotplug memory" terminology to "device memory"
+>   vl: allow 'maxmem' without 'slot'
+> 
+>  hw/i386/acpi-build.c                         |   7 +-
+>  hw/i386/pc.c                                 |  65 +++---
+>  hw/mem/Makefile.objs                         |   1 +
+>  hw/mem/memory-device.c                       | 275 ++++++++++++++++++++++++
+>  hw/mem/pc-dimm.c                             | 304 +++++++--------------------
+>  hw/ppc/spapr.c                               |  65 +++---
+>  hw/ppc/spapr_hcall.c                         |   7 +-
+>  hw/ppc/spapr_rtas_ddw.c                      |   5 +-
+>  include/hw/boards.h                          |  12 ++
+>  include/hw/i386/pc.h                         |   3 +-
+>  include/hw/mem/memory-device.h               |  51 +++++
+>  include/hw/mem/pc-dimm.h                     |  27 +--
+>  include/hw/ppc/spapr.h                       |   5 +-
+>  numa.c                                       |   3 +-
+>  qmp.c                                        |   4 +-
+>  stubs/Makefile.objs                          |   2 +-
+>  stubs/{qmp_pc_dimm.c => qmp_memory_device.c} |   4 +-
+>  vl.c                                         |  19 +-
+>  18 files changed, 506 insertions(+), 353 deletions(-)
+>  create mode 100644 hw/mem/memory-device.c
+>  create mode 100644 include/hw/mem/memory-device.h
+>  rename stubs/{qmp_pc_dimm.c => qmp_memory_device.c} (61%)
+> 
+> -- 
+> 2.14.3
