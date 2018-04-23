@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fAatM-0002yQ-Is
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 08:48:28 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fAaut-00045v-3R
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 08:50:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fAatH-0001Bv-By
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 08:48:24 -0400
-References: <1523518688-26674-1-git-send-email-eric.auger@redhat.com>
-	<1523518688-26674-5-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA979S2Hxdv6t+sODtyV8Z_G0kuJGUSe7P63psVMwTun3Q@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <2feffd41-d632-fb2a-6168-00fd25cac57a@redhat.com>
-Date: Mon, 23 Apr 2018 14:48:00 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fAaur-0002Fs-Ur
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 08:49:59 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:40881)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fAaur-0002FX-Oo
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 08:49:57 -0400
+Received: by mail-ot0-x243.google.com with SMTP id h8-v6so17016185otj.7
+	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 05:49:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA979S2Hxdv6t+sODtyV8Z_G0kuJGUSe7P63psVMwTun3Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v11 04/17] hw/arm/smmuv3: Skeleton
+In-Reply-To: <20180423075215.4572-4-christophe.lyon@st.com>
+References: <20180423075215.4572-1-christophe.lyon@st.com>
+	<20180423075215.4572-4-christophe.lyon@st.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 23 Apr 2018 13:49:36 +0100
+Message-ID: <CAFEAcA_fkkHFX1Ud36f9fy+-rrbK_TSu9wuiFVSLFC-tyD7cqA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [ARM/FDPIC v2 3/4] linux-user: ARM-FDPIC: Add
+ support of FDPIC for ARM.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,250 +31,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <cdall@kernel.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
+To: Christophe Lyon <christophe.lyon@st.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Christophe Lyon <christophe.lyon@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-Hi Peter,
-On 04/16/2018 03:08 PM, Peter Maydell wrote:
-> On 12 April 2018 at 08:37, Eric Auger <eric.auger@redhat.com> wrote:
->> From: Prem Mallappa <prem.mallappa@broadcom.com>
->>
->> This patch implements a skeleton for the smmuv3 device.
->> Datatypes and register definitions are introduced. The MMIO
->> region, the interrupts and the queue are initialized.
->>
->> Only the MMIO read operation is implemented here.
->>
->> Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->> v10 -> v11:
->> - remove irq_ctrl_ack and return irq_ctrl on A_IRQ_CTRL_ACK
->>   read
->>
->> v9 -> v10:
->> - s/hwaddr/uint64_t in trace-events
->> - add comments
->> - s->mrtypename = TYPE_SMMUV3_IOMMU_MEMORY_REGION
->> - removed iidr and idr from VMState
->> - use VMSTATE_STRUCT for the queues
->> - use qemu_log_mask(LOG_UNIMP,*) for unimplemented regs
->> - added SMMU_CMDQS, SMMU_EVENTQS
->> - use ops with attributes
->> - split readl/readll
->> - put id_regs in an array
->> - removed smmu_read64
->> - removed SMMU_FEATURE_2LVL_STE and NB_REGS
->> - RAZ when read access at unexpected address
->>
->> v8 -> v9:
->> - add #include "qemu/log.h"
->> - add parent_reset
->>
->> v7 -> v8:
->> - remove __smmu_data structs
->> - revisit struct SMMUQueue
->> - do not advertise stage 2 support anymore
->> - use the register definition API and get rid of REG array
->> - get read of queue structs
->>
->> v6 -> v7:
->> - split into several patches
->>
->> v5 -> v6:
->> - Use IOMMUMemoryregion
->> - regs become uint32_t and fix 64b MMIO access (.impl)
->> - trace_smmuv3_write/read_mmio take the size param
->>
->> v4 -> v5:
->> - change smmuv3_translate proto (IOMMUAccessFlags flag)
->> - has_stagex replaced by is_ste_stagex
->> - smmu_cfg_populate removed
->> - added smmuv3_decode_config and reworked error management
->> - remwork the naming of IOMMU mrs
->> - fix SMMU_CMDQ_CONS offset
->>
->> v3 -> v4
->> - smmu_irq_update
->> - fix hash key allocation
->> - set smmu_iommu_ops
->> - set SMMU_REG_CR0,
->> - smmuv3_translate: ret.perm not set in bypass mode
->> - use trace events
->> - renamed STM2U64 into L1STD_L2PTR and STMSPAN into L1STD_SPAN
->> - rework smmu_find_ste
->> - fix tg2granule in TT0/0b10 corresponds to 16kB
->>
->> v2 -> v3:
->> - move creation of include/hw/arm/smmuv3.h to this patch to fix compil issue
->> - compilation allowed
->> - fix sbus allocation in smmu_init_pci_iommu
->> - restructure code into headers
->> - misc cleanups
->>
->> Conflicts:
->>         hw/arm/Makefile.objs
->> ---
->>  hw/arm/Makefile.objs     |   2 +-
->>  hw/arm/smmuv3-internal.h | 167 ++++++++++++++++++++++
->>  hw/arm/smmuv3.c          | 365 +++++++++++++++++++++++++++++++++++++++++++++++
->>  hw/arm/trace-events      |   3 +
->>  include/hw/arm/smmuv3.h  |  87 +++++++++++
->>  5 files changed, 623 insertions(+), 1 deletion(-)
->>  create mode 100644 hw/arm/smmuv3-internal.h
->>  create mode 100644 hw/arm/smmuv3.c
->>  create mode 100644 include/hw/arm/smmuv3.h
->>
->> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
->> index 558436f..d51fcec 100644
->> --- a/hw/arm/Makefile.objs
->> +++ b/hw/arm/Makefile.objs
->> @@ -35,4 +35,4 @@ obj-$(CONFIG_MPS2) += mps2-tz.o
->>  obj-$(CONFIG_MSF2) += msf2-soc.o msf2-som.o
->>  obj-$(CONFIG_IOTKIT) += iotkit.o
->>  obj-$(CONFIG_FSL_IMX7) += fsl-imx7.o mcimx7d-sabre.o
->> -obj-$(CONFIG_ARM_SMMUV3) += smmu-common.o
->> +obj-$(CONFIG_ARM_SMMUV3) += smmu-common.o smmuv3.o
->> diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
->> new file mode 100644
->> index 0000000..a6461fe
->> --- /dev/null
->> +++ b/hw/arm/smmuv3-internal.h
->> @@ -0,0 +1,167 @@
->> +/*
->> + * ARM SMMUv3 support - Internal API
->> + *
->> + * Copyright (C) 2014-2016 Broadcom Corporation
->> + * Copyright (c) 2017 Red Hat, Inc.
->> + * Written by Prem Mallappa, Eric Auger
->> + *
->> + * This program is free software; you can redistribute it and/or modify
->> + * it under the terms of the GNU General Public License version 2 as
->> + * published by the Free Software Foundation.
->> + *
->> + * This program is distributed in the hope that it will be useful,
->> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> + * GNU General Public License for more details.
->> + *
->> + * You should have received a copy of the GNU General Public License along
->> + * with this program; if not, see <http://www.gnu.org/licenses/>.
->> + */
->> +
->> +#ifndef HW_ARM_SMMU_V3_INTERNAL_H
->> +#define HW_ARM_SMMU_V3_INTERNAL_H
->> +
->> +#include "qemu/log.h"
->> +#include "trace.h"
->> +#include "qemu/error-report.h"
-> 
-> I don't think you use these headers in this .h file -- they should
-> probably be included from the .c file(s) instead.
-indeed
-> 
->> +#include "hw/arm/smmu-common.h"
->> +
->> +/* MMIO Registers */
->> +
->> +REG32(IDR0,                0x0)
->> +    FIELD(IDR0, S1P,         1 , 1)
->> +    FIELD(IDR0, TTF,         2 , 2)
->> +    FIELD(IDR0, COHACC,      4 , 1)
->> +    FIELD(IDR0, ASID16,      12, 1)
->> +    FIELD(IDR0, TTENDIAN,    21, 2)
->> +    FIELD(IDR0, STALL_MODEL, 24, 2)
->> +    FIELD(IDR0, TERM_MODEL,  26, 1)
->> +    FIELD(IDR0, STLEVEL,     27, 2)
->> +
->> +REG32(IDR1,                0x4)
->> +    FIELD(IDR1, SIDSIZE,      0 , 6)
->> +    FIELD(IDR1, EVENTQS,      16, 5)
->> +    FIELD(IDR1, CMDQS,        21, 5)
->> +
->> +#define SMMU_IDR1_SIDSIZE 16
->> +#define SMMU_CMDQS   19
->> +#define SMMU_EVENTQS 19
->> +
->> +REG32(IDR2,                0x8)
->> +REG32(IDR3,                0xc)
->> +REG32(IDR4,                0x10)
->> +REG32(IDR5,                0x14)
->> +     FIELD(IDR5, OAS,         0, 3);
->> +     FIELD(IDR5, GRAN4K,      4, 1);
->> +     FIELD(IDR5, GRAN16K,     5, 1);
->> +     FIELD(IDR5, GRAN64K,     6, 1);
->> +
->> +#define SMMU_IDR5_OAS 4
->> +
->> +REG32(IIDR,                0x1c)
->> +REG32(CR0,                 0x20)
->> +    FIELD(CR0, SMMU_ENABLE,   0, 1)
->> +    FIELD(CR0, EVENTQEN,      2, 1)
->> +    FIELD(CR0, CMDQEN,        3, 1)
->> +
->> +REG32(CR0ACK,              0x24)
->> +REG32(CR1,                 0x28)
->> +REG32(CR2,                 0x2c)
->> +REG32(STATUSR,             0x40)
->> +REG32(IRQ_CTRL,            0x50)
->> +    FIELD(IRQ_CTRL, GERROR_IRQEN,        0, 1)
->> +    FIELD(IRQ_CTRL, PRI_IRQEN,           1, 1)
->> +    FIELD(IRQ_CTRL, EVENTQ_IRQEN,        2, 1)
->> +
->> +REG32(IRQ_CTRL_ACK,        0x54)
->> +REG32(GERROR,              0x60)
->> +    FIELD(GERROR, CMDQ_ERR,           0, 1)
->> +    FIELD(GERROR, EVENTQ_ABT_ERR,     2, 1)
->> +    FIELD(GERROR, PRIQ_ABT_ERR,       3, 1)
->> +    FIELD(GERROR, MSI_CMDQ_ABT_ERR,   4, 1)
->> +    FIELD(GERROR, MSI_EVENTQ_ABT_ERR, 5, 1)
->> +    FIELD(GERROR, MSI_PRIQ_ABT_ERR,   6, 1)
->> +    FIELD(GERROR, MSI_GERROR_ABT_ERR, 7, 1)
->> +    FIELD(GERROR, MSI_SFM_ERR,        8, 1)
->> +
->> +REG32(GERRORN,             0x64)
->> +
->> +#define A_GERROR_IRQ_CFG0  0x68 /* 64b */
->> +REG32(GERROR_IRQ_CFG1, 0x70)
->> +REG32(GERROR_IRQ_CFG2, 0x74)
->> +
->> +#define A_STRTAB_BASE      0x80 /* 64b */
-> 
-> Why do this constant and A_GERROR_IRQ_CFG0 have different values
-> but the same cryptic comment ?
-Those are 64-bit registers as opposed to other registers which are
-32-bit, hence the comment. I did not see any register API primitives for
-those regs.
-> 
-> 
->> +static inline uint64_t smmu_read64(uint64_t r, unsigned offset,
->> +                                   unsigned size)
-> 
-> Looks like this function is unused now ?
-indeed.
-> 
-> 
->> +    /*
->> +     * Return the value of the Primecell/Corelink ID registers at the
->> +     * specified offset from the first ID register.
->> +     * These value indicate an ARM implementation of MMU600 p1
->> +     */
->> +    static const uint8_t smmuv3_ids[] = {
->> +        0x4, 0, 0, 0, 0x84, 0xB4, 0xF0, 0x10, 0x0D, 0xF0, 0x05, 0xB1
-> 
-> Can you be consistent about whether you put the leading 0 in
-> for hex values less than 0x10 (0x4 vs 0x0D) ?
-sure
-> 
-> 
-> Otherwise
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+On 23 April 2018 at 08:51, Christophe Lyon <christophe.lyon@st.com> wrote:
+> Add FDPIC info into image_info structure since interpreter info is on
+> stack and needs to be saved to be accessed later on.
+>
+> Co-Authored-By:  Micka=C3=ABl Gu=C3=AAn=C3=A9 <mickael.guene@st.com>
+> Signed-off-by: Christophe Lyon <christophe.lyon@st.com>
+>
+> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+> index 76d7718..1ee1e38 100644
+> --- a/linux-user/elfload.c
+> +++ b/linux-user/elfload.c
+> @@ -78,6 +78,11 @@ enum {
+>   */
+>  #define personality(pers)       (pers & PER_MASK)
+>
+> +int info_is_fdpic(struct image_info *info)
+> +{
+> +    return (info->personality =3D=3D PER_LINUX_FDPIC);
+> +}
+> +
+>  /* this flag is uneffective under linux too, should be deleted */
+>  #ifndef MAP_DENYWRITE
+>  #define MAP_DENYWRITE 0
+> @@ -287,6 +292,24 @@ static inline void init_thread(struct target_pt_regs=
+ *regs,
+>      /* For uClinux PIC binaries.  */
+>      /* XXX: Linux does this only on ARM with no MMU (do we care ?) */
+>      regs->uregs[10] =3D infop->start_data;
+> +
+> +    /* Support ARM FDPIC.  */
+> +    if (info_is_fdpic(infop)) {
+> +            /* As described in the ABI document, r7 points to the loadma=
+p info
+> +             * prepared by the kernel. If an interpreter is needed, r8 p=
+oints
+> +             * to the interpreter loadmap and r9 points to the interpret=
+er
+> +             * PT_DYNAMIC info. If no interpreter is needed, r8 is zer0,=
+ and
 
-Thanks
+"zero"
 
-Eric
-> 
-> thanks
-> -- PMM
-> 
+> +             * r9 points to the main program PT_DYNAMIC info.  */
+
+Something odd seems to have happened to the indentation here.
+
+Nit: */ should be on a line of its own.
+
+> +            regs->uregs[7] =3D infop->loadmap_addr;
+> +            if (infop->interpreter_loadmap_addr) {
+> +                /* Executable is dynamically loaded.  */
+> +                regs->uregs[8] =3D infop->interpreter_loadmap_addr;
+> +                regs->uregs[9] =3D infop->interpreter_pt_dynamic_addr;
+> +            } else {
+> +                regs->uregs[8] =3D 0;
+> +                regs->uregs[9] =3D infop->pt_dynamic_addr;
+> +            }
+> +        }
+>  }
+>
+>  #define ELF_NREG    18
+> @@ -1745,6 +1768,11 @@ static abi_ulong create_elf_tables(abi_ulong p, in=
+t argc, int envc,
+>          if (interp_info) {
+>              interp_info->other_info =3D info;
+>              sp =3D loader_build_fdpic_loadmap(interp_info, sp);
+> +            info->interpreter_loadmap_addr =3D interp_info->loadmap_addr=
+;
+> +            info->interpreter_pt_dynamic_addr =3D interp_info->pt_dynami=
+c_addr;
+> +        } else {
+> +            info->interpreter_loadmap_addr =3D 0;
+> +            info->interpreter_pt_dynamic_addr =3D 0;
+>          }
+>      }
+>
+> diff --git a/linux-user/main.c b/linux-user/main.c
+> index 2acac36..3579f0e 100644
+> --- a/linux-user/main.c
+> +++ b/linux-user/main.c
+> @@ -4893,6 +4893,9 @@ int main(int argc, char **argv, char **envp)
+>              env->cp15.sctlr_el[1] |=3D SCTLR_B;
+>          }
+>  #endif
+> +
+> +        /* Are we running an FDPIC binary?  */
+> +        ((TaskState *)thread_cpu->opaque)->is_fdpic =3D info_is_fdpic(in=
+fo);
+>      }
+>  #elif defined(TARGET_SPARC)
+>      {
+> diff --git a/linux-user/qemu.h b/linux-user/qemu.h
+> index da3b517..a2ed148 100644
+> --- a/linux-user/qemu.h
+> +++ b/linux-user/qemu.h
+> @@ -57,6 +57,8 @@ struct image_info {
+>          uint16_t        nsegs;
+>          void           *loadsegs;
+>          abi_ulong       pt_dynamic_addr;
+> +        abi_ulong       interpreter_loadmap_addr;
+> +        abi_ulong       interpreter_pt_dynamic_addr;
+>          struct image_info *other_info;
+>  };
+>
+> @@ -145,6 +147,9 @@ typedef struct TaskState {
+>       */
+>      int signal_pending;
+>
+> +    /* We need to know if we have an FDPIC binary to adapt signal
+> +     * syscalls.  */
+> +    int is_fdpic;
+
+Looking at the TaskState struct it already has a pointer
+to the image_info struct. So we could just have something like
+    bool task_is_fdpic(TaskState *ts)
+    {
+        return ts->info->personality =3D=3D PER_LINUX_FDPIC;
+    }
+
+and save the need to set up and test a separate flag, I think.
+
+Otherwise looks good.
+
+thanks
+-- PMM
