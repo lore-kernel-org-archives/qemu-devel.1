@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fAegv-0007Uo-4E
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 12:51:50 -0400
+	(envelope-from <david@redhat.com>) id 1fAegv-0007Up-QD
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 12:51:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fAegr-0007ne-2B
+	(envelope-from <david@redhat.com>) id 1fAegu-0007ze-K1
 	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 12:51:49 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Mon, 23 Apr 2018 18:51:15 +0200
-Message-Id: <20180423165126.15441-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 00/11] pc-dimm: factor out MemoryDevice
+Date: Mon, 23 Apr 2018 18:51:18 +0200
+Message-Id: <20180423165126.15441-4-david@redhat.com>
+In-Reply-To: <20180423165126.15441-1-david@redhat.com>
+References: <20180423165126.15441-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 03/11] pc-dimm: no need to pass the memory
+ region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,86 +23,156 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
 
-Right now we can only map PCDIMM/NVDIMM into guest address space. In the
-future, we might want to do the same for virtio devices - e.g.
-virtio-pmem or virtio-mem. Especially, they should be able to live side
-by side to each other.
+We can just query it ourselves. When unplugging, we should always be
+able to the region (as it was previously plugged). E.g. PPC already
+assumed that and used &error_abort.
 
-E.g. the virto based memory devices regions will not be exposed via ACPI
-and friends. They will be detected just like other virtio devices and
-indicate the applicable memory region. This makes it possible to also use
-them on architectures without memory device detection support (e.g. s390x).
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ hw/i386/pc.c             | 13 ++-----------
+ hw/mem/pc-dimm.c         | 12 +++++++++---
+ hw/ppc/spapr.c           |  9 +++------
+ include/hw/mem/pc-dimm.h |  5 ++---
+ 4 files changed, 16 insertions(+), 23 deletions(-)
 
-Let's factor out the memory device code into a MemoryDevice interface.
-
-Please note that the "slots" assignment code is not relevant for memory
-devices that will not be exposed via ACPI or similar. That's why that
-part won't be exposed. KVM/vhost "slots" for memory regions are still
-necessary but don't have to be manually specified (e.g. the slot number
-doesn't mather).
-
-So we are basically converting the hotplug memory region to a memory device
-region. I have patches that also set up such a region for s390x.
-
-v3 -> v4:
-- "pc-dimm: factor out MemoryDevice interface"
--- dropped the "errp" parameter from the interface functions
--- made as many pointers const as I could :)
--- s/built/build/
-- machine: make MemoryHotplugState accessible via the machine
--- State now kept via a pointer, not queried.
--- Added patches that rename the type and cleanup the terminology for
-   spapr and pc
-- Split up the big "pc-dimm: factor out address space logic into MemoryDevice
-  code" into sub patches
---  We now pass the machine to the pc-dimm and MemoryDevice plug/unplug
-    functions, so we can avoid qdev_get_machine()
--- Moved some checks around as requested by Igor
-- Added a patch to make maxmem not depend on slots
-
-v2 -> v3:
-- "pc-dimm: factor out MemoryDevice interface"
---> Lookup both classes when comparing (David Gibson)
-
-v1 -> v2:
-- Fix compile issues on ppc (still untested  )
-
-
-David Hildenbrand (11):
-  pc-dimm: factor out MemoryDevice interface
-  machine: make MemoryHotplugState accessible via the machine
-  pc-dimm: no need to pass the memory region
-  pc-dimm: pass in the machine and to the MemoryHotplugState
-  pc-dimm: factor out address search into MemoryDevice code
-  pc-dimm: factor out capacity and slot checks into MemoryDevice
-  pc-dimm: move actual plug/unplug of a memory region to MemoryDevice
-  machine: rename MemoryHotplugState to DeviceMemoryState
-  pc: rename "hotplug memory" terminology to "device memory"
-  spapr: rename "hotplug memory" terminology to "device memory"
-  vl: allow 'maxmem' without 'slot'
-
- hw/i386/acpi-build.c                         |   7 +-
- hw/i386/pc.c                                 |  65 +++---
- hw/mem/Makefile.objs                         |   1 +
- hw/mem/memory-device.c                       | 275 ++++++++++++++++++++++++
- hw/mem/pc-dimm.c                             | 304 +++++++--------------------
- hw/ppc/spapr.c                               |  65 +++---
- hw/ppc/spapr_hcall.c                         |   7 +-
- hw/ppc/spapr_rtas_ddw.c                      |   5 +-
- include/hw/boards.h                          |  12 ++
- include/hw/i386/pc.h                         |   3 +-
- include/hw/mem/memory-device.h               |  51 +++++
- include/hw/mem/pc-dimm.h                     |  27 +--
- include/hw/ppc/spapr.h                       |   5 +-
- numa.c                                       |   3 +-
- qmp.c                                        |   4 +-
- stubs/Makefile.objs                          |   2 +-
- stubs/{qmp_pc_dimm.c => qmp_memory_device.c} |   4 +-
- vl.c                                         |  19 +-
- 18 files changed, 506 insertions(+), 353 deletions(-)
- create mode 100644 hw/mem/memory-device.c
- create mode 100644 include/hw/mem/memory-device.h
- rename stubs/{qmp_pc_dimm.c => qmp_memory_device.c} (61%)
-
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 19af0733fd..c14dec492b 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1715,8 +1715,7 @@ static void pc_dimm_plug(HotplugHandler *hotplug_dev,
+         goto out;
+     }
+ 
+-    pc_dimm_memory_plug(dev, MACHINE(pcms)->device_memory, mr, align,
+-                        &local_err);
++    pc_dimm_memory_plug(dev, MACHINE(pcms)->device_memory, align, &local_err);
+     if (local_err) {
+         goto out;
+     }
+@@ -1766,17 +1765,9 @@ static void pc_dimm_unplug(HotplugHandler *hotplug_dev,
+                            DeviceState *dev, Error **errp)
+ {
+     PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+-    PCDIMMDevice *dimm = PC_DIMM(dev);
+-    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+-    MemoryRegion *mr;
+     HotplugHandlerClass *hhc;
+     Error *local_err = NULL;
+ 
+-    mr = ddc->get_memory_region(dimm, &local_err);
+-    if (local_err) {
+-        goto out;
+-    }
+-
+     hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
+     hhc->unplug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
+ 
+@@ -1784,7 +1775,7 @@ static void pc_dimm_unplug(HotplugHandler *hotplug_dev,
+         goto out;
+     }
+ 
+-    pc_dimm_memory_unplug(dev, MACHINE(pcms)->device_memory, mr);
++    pc_dimm_memory_unplug(dev, MACHINE(pcms)->device_memory);
+     object_unparent(OBJECT(dev));
+ 
+  out:
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index ef330628c1..aeff369f6f 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -37,7 +37,7 @@ typedef struct pc_dimms_capacity {
+ } pc_dimms_capacity;
+ 
+ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
+-                         MemoryRegion *mr, uint64_t align, Error **errp)
++                         uint64_t align, Error **errp)
+ {
+     int slot;
+     MachineState *machine = MACHINE(qdev_get_machine());
+@@ -46,8 +46,14 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
+     MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm);
+     Error *local_err = NULL;
+     uint64_t existing_dimms_capacity = 0;
++    MemoryRegion *mr;
+     uint64_t addr;
+ 
++    mr = ddc->get_memory_region(dimm, &local_err);
++    if (local_err) {
++        goto out;
++    }
++
+     addr = object_property_get_uint(OBJECT(dimm),
+                                     PC_DIMM_ADDR_PROP, &local_err);
+     if (local_err) {
+@@ -116,12 +122,12 @@ out:
+     error_propagate(errp, local_err);
+ }
+ 
+-void pc_dimm_memory_unplug(DeviceState *dev, MemoryHotplugState *hpms,
+-                           MemoryRegion *mr)
++void pc_dimm_memory_unplug(DeviceState *dev, MemoryHotplugState *hpms)
+ {
+     PCDIMMDevice *dimm = PC_DIMM(dev);
+     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+     MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm);
++    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
+ 
+     memory_region_del_subregion(&hpms->mr, mr);
+     vmstate_unregister_ram(vmstate_mr, dev);
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 56d5e8201b..8c13d165b4 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3044,7 +3044,7 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     align = memory_region_get_alignment(mr);
+     size = memory_region_size(mr);
+ 
+-    pc_dimm_memory_plug(dev, MACHINE(ms)->device_memory, mr, align, &local_err);
++    pc_dimm_memory_plug(dev, MACHINE(ms)->device_memory, align, &local_err);
+     if (local_err) {
+         goto out;
+     }
+@@ -3065,7 +3065,7 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     return;
+ 
+ out_unplug:
+-    pc_dimm_memory_unplug(dev, MACHINE(ms)->device_memory, mr);
++    pc_dimm_memory_unplug(dev, MACHINE(ms)->device_memory);
+ out:
+     error_propagate(errp, local_err);
+ }
+@@ -3183,9 +3183,6 @@ static sPAPRDIMMState *spapr_recover_pending_dimm_state(sPAPRMachineState *ms,
+ void spapr_lmb_release(DeviceState *dev)
+ {
+     sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_hotplug_handler(dev));
+-    PCDIMMDevice *dimm = PC_DIMM(dev);
+-    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+-    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
+     sPAPRDIMMState *ds = spapr_pending_dimm_unplugs_find(spapr, PC_DIMM(dev));
+ 
+     /* This information will get lost if a migration occurs
+@@ -3205,7 +3202,7 @@ void spapr_lmb_release(DeviceState *dev)
+      * Now that all the LMBs have been removed by the guest, call the
+      * pc-dimm unplug handler to cleanup up the pc-dimm device.
+      */
+-    pc_dimm_memory_unplug(dev, MACHINE(spapr)->device_memory, mr);
++    pc_dimm_memory_unplug(dev, MACHINE(spapr)->device_memory);
+     object_unparent(OBJECT(dev));
+     spapr_pending_dimm_unplugs_remove(spapr, ds);
+ }
+diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
+index 8bda37adab..1d26e13cef 100644
+--- a/include/hw/mem/pc-dimm.h
++++ b/include/hw/mem/pc-dimm.h
+@@ -85,7 +85,6 @@ int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
+ 
+ uint64_t pc_existing_dimms_capacity(Error **errp);
+ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
+-                         MemoryRegion *mr, uint64_t align, Error **errp);
+-void pc_dimm_memory_unplug(DeviceState *dev, MemoryHotplugState *hpms,
+-                           MemoryRegion *mr);
++                         uint64_t align, Error **errp);
++void pc_dimm_memory_unplug(DeviceState *dev, MemoryHotplugState *hpms);
+ #endif
 -- 
 2.14.3
