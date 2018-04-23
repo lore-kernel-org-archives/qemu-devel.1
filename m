@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52944)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fAZlS-00064E-JJ
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 07:36:11 -0400
+	(envelope-from <thuth@redhat.com>) id 1fAaFY-0007UR-Gh
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 08:07:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fAZlL-0005LS-SL
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 07:36:09 -0400
-Received: from 6.mo6.mail-out.ovh.net ([87.98.177.69]:41539)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fAZlL-0005Ie-M5
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 07:36:03 -0400
-Received: from player737.ha.ovh.net (unknown [10.109.120.28])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 1EE0E1559A2
-	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 13:36:02 +0200 (CEST)
-References: <20180423064020.25434-1-clg@kaod.org>
-	<CAFEAcA-LtNpGTV08jvK4i5C5i64WjM5gMB4zGr8P4fkVSkNH7g@mail.gmail.com>
-	<53691cbf-08bf-e3f7-22d3-601a279aa08a@kaod.org>
-	<CAFEAcA9XBHE5YxN27M1ugprmSf=o5iiNakO2omrY+HBgCszV5Q@mail.gmail.com>
-	<a5ca89ac-7c8f-c565-30d0-357bacb1f61e@kaod.org>
-	<20180423104622.GG2518@work-vm>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <0fe02e1a-576b-cd6e-a79c-ede821cab983@kaod.org>
-Date: Mon, 23 Apr 2018 13:35:56 +0200
+	(envelope-from <thuth@redhat.com>) id 1fAaFV-0000zz-SR
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 08:07:16 -0400
+References: <1523864720-4680-1-git-send-email-thuth@redhat.com>
+	<20180423120831.11cc785f.cohuck@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <602d8411-1137-0499-17bf-a0b08e7a41fb@redhat.com>
+Date: Mon, 23 Apr 2018 14:07:03 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180423104622.GG2518@work-vm>
+In-Reply-To: <20180423120831.11cc785f.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] timer/aspeed: fix vmstate version id
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.13] pc-bios/s390-ccw: size_t
+ should be unsigned
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,30 +25,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
->>> I think it's nice to at least do the "bump version" thing, so you
->>> get a (hopefully comprehensible) error rather than just wrong
->>> data if you do try a cross version migration, 
->>
->> On that topic, the error message was :
->>
->> 	Missing section footer for aspeed.timerctrl
->>
->> which is not very comprehensible for a version mismatch issue.
+On 23.04.2018 12:08, Cornelia Huck wrote:
+> On Mon, 16 Apr 2018 09:45:20 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
 > 
-> Was that before your patch?
+>> "size_t" should be an unsigned type according to the C standard.
+>> Thus we should also use this convention in the s390-ccw firmware to avoid
+>> confusion. I checked the sources, and apart from one spot in libc.c, the
+>> code should all be fine with this change.
+>>
+>> Buglink: https://bugs.launchpad.net/qemu/+bug/1753437
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  v2: Use long instead of ssize_t in uitoa()
+>>
+>>  pc-bios/s390-ccw/libc.c | 2 +-
+>>  pc-bios/s390-ccw/libc.h | 2 +-
+>>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> 
+> I assume you'll queue this one yourself?
 
-yes.
+Yes, I'll queue it with the other pending s390-ccw bios patches.
 
-> The VMSTATE fields in the structure have no metadata stored
-> for them to be parsed with; if you send a different number
-> of array entries to the number the destination receives you end
-> up with a corrupt stream. Section footers are just a canary
-> that tells you something went wrong in that devices data.
-> It has no more information to give you a more detailed error.
-
-OK. Thanks for the explanation.
-
-C.
+ Thomas
