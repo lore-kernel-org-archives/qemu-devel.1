@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fAayI-0006zr-LY
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 08:53:31 -0400
+	(envelope-from <christophe.lyon@st.com>) id 1fAays-0007ZF-N6
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 08:54:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fAayF-0005YV-I6
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 08:53:30 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:44291)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fAayF-0005XV-8K
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 08:53:27 -0400
-Received: by mail-wr0-x234.google.com with SMTP id o15-v6so40951253wro.11
-	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 05:53:26 -0700 (PDT)
-References: <20180419135901.30035-1-alex.bennee@linaro.org>
-	<ef2caf0d-4bd0-9383-5d2f-e1f0ba9f536b@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <ef2caf0d-4bd0-9383-5d2f-e1f0ba9f536b@linaro.org>
-Date: Mon, 23 Apr 2018 13:53:24 +0100
-Message-ID: <87sh7mkrsr.fsf@linaro.org>
+	(envelope-from <christophe.lyon@st.com>) id 1fAayp-0005wi-Fu
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 08:54:06 -0400
+Received: from mx07-00178001.pphosted.com ([62.209.51.94]:37332)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <christophe.lyon@st.com>)
+	id 1fAayp-0005vk-6F
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 08:54:03 -0400
+References: <20180423075215.4572-1-christophe.lyon@st.com>
+	<20180423075215.4572-3-christophe.lyon@st.com>
+	<CAFEAcA9tnh9j=QMxZm7RTMzaRVxh10oEGDCYYO5TL5TvAuvLXw@mail.gmail.com>
+From: Christophe Lyon <christophe.lyon@st.com>
+Message-ID: <d3762ab7-e23c-9078-0e1f-57addc334cbe@st.com>
+Date: Mon, 23 Apr 2018 14:53:38 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAFEAcA9tnh9j=QMxZm7RTMzaRVxh10oEGDCYYO5TL5TvAuvLXw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 00/43] fix building of tests/tcg
+Subject: Re: [Qemu-devel] [ARM/FDPIC v2 2/4] linux-user: ARM-FDPIC: Identify
+ ARM FDPIC binaries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +31,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Christophe Lyon <christophe.lyon@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+
+On 23/04/2018 14:17, Peter Maydell wrote:
+> On 23 April 2018 at 08:51, Christophe Lyon <christophe.lyon@st.com> wro=
+te:
+>> Define an ARM-specific version of elf_is_fdpic:
+>> FDPIC ELF objects are identified with e_ident[EI_OSABI] =3D=3D
+>> ELFOSABI_ARM_FDPIC.
+>>
+>> Co-Authored-By: Micka=C3=ABl Gu=C3=AAn=C3=A9 <mickael.guene@st.com>
+>> Signed-off-by: Christophe Lyon <christophe.lyon@st.com>
+>>
+>> diff --git a/include/elf.h b/include/elf.h
+>> index c0dc9bb..934dbbd 100644
+>> --- a/include/elf.h
+>> +++ b/include/elf.h
+>> @@ -1483,6 +1483,7 @@ typedef struct elf64_shdr {
+>>   #define ELFOSABI_TRU64          10      /* Compaq TRU64 UNIX.  */
+>>   #define ELFOSABI_MODESTO        11      /* Novell Modesto.  */
+>>   #define ELFOSABI_OPENBSD        12      /* OpenBSD.  */
+>> +#define ELFOSABI_ARM_FDPIC      65      /* ARM FDPIC */
+>>   #define ELFOSABI_ARM            97      /* ARM */
+>>   #define ELFOSABI_STANDALONE     255     /* Standalone (embedded) app=
+lication */
+>>
+>> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+>> index bbe93b0..76d7718 100644
+>> --- a/linux-user/elfload.c
+>> +++ b/linux-user/elfload.c
+>> @@ -1681,11 +1681,18 @@ static void zero_bss(abi_ulong elf_bss, abi_ul=
+ong last_bss, int prot)
+>>       }
+>>   }
+>>
+>> +#ifdef TARGET_ARM
+>> +static int elf_is_fdpic(struct elfhdr *exec)
+>> +{
+>> +    return exec->e_ident[EI_OSABI] =3D=3D ELFOSABI_ARM_FDPIC;
+>> +}
+>> +#else
+>>   /* Default implementation, always false.  */
+>>   static int elf_is_fdpic(struct elfhdr *exec)
+>>   {
+>>       return 0;
+>>   }
+>> +#endif
+>=20
+> I have a strong dislike for per-target ifdef ladders. Can we instead
+> put the target's implementation of elf_is_fdpic() into
+> linux-user/$ARCH/target_elf.h
+> and also have that header do
+> #define TARGET_HAS_ELF_FDPIC
+>=20
+> and then in the generic code we can protect the default elf_is_fdpic()
+> with #ifndef TARGET_HAS_ELF_FDPIC.
+>=20
+
+How invasive could that be?
+Your proposal is appealing, but target_elf.h is only included by linux-us=
+er/main.c, which does not define elfhdr etc...
+All that knowledge is in linux-user/elfload.c, which controls what includ=
+e/elf.h defines.
+
+Should I re-engineer that?
+
+Thanks,
+
+Christophe
 
 
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> On 04/19/2018 03:58 AM, Alex Benn=C3=A9e wrote:
->> What would be really
->> helpful is if the respective maintainers could encode their EXACT
->> STEPS for building their cross compilers into some docker recipes.
->
-> I've just re-built my alphaev67 cross-environment and recorded everything.
->
-> Since the script begins with rebuilding glibc, it assumes you *already* h=
-ave a
-> cross-compiler.  If you don't have that, then you start in the middle of =
-the
-> script with the GCC build.  But in that case you must have the sysroot.ta=
-r.gz
-> that the first half just created.
-
-Could you send me the sysroot.tar.gz?
-
->
-> Starting without that seed tarball is hard, as previously mentioned.  For
-> better supported platforms than alpha you can typically pull the same fil=
-es
-> from e.g. debian packages or a gentoo stage3 tarball.
-
-Hmm I was hoping I could use --without-sysroot to build a gcc just for
-building glibc and then re-build gcc once glibc was boot-strapped. But
-that doesn't seem to work...
-
-Maybe for alpha we just have to accept there is a blob of sysroot to get
-the build going? Of course we should probably host that blob on qemu's
-servers somewhere...
-
-> While I've used git gcc/binutils/glibc, because I had them handy, of cour=
-se
-> everything would work equally well using release tarballs for each projec=
-t.
->
-> Let me know if you have any questions re cross-tools.
->
->
-> r~
-
-
---
-Alex Benn=C3=A9e
+> thanks
+> -- PMM
+> .
+>=20
