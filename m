@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fAXrv-0006CT-Og
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 05:34:44 -0400
+	(envelope-from <david@redhat.com>) id 1fAXu9-0007rY-0I
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 05:37:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fAXru-0002cc-Sc
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 05:34:43 -0400
-Received: from mail-oi0-x232.google.com ([2607:f8b0:4003:c06::232]:36146)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fAXru-0002cJ-O3
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 05:34:42 -0400
-Received: by mail-oi0-x232.google.com with SMTP id h11-v6so13640915oic.3
-	for <qemu-devel@nongnu.org>; Mon, 23 Apr 2018 02:34:42 -0700 (PDT)
+	(envelope-from <david@redhat.com>) id 1fAXu5-0003kV-1K
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 05:37:01 -0400
+References: <20180420123456.22196-1-david@redhat.com>
+	<20180420123456.22196-3-david@redhat.com>
+	<20180423032825.GD19804@umbus.fritz.box>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <a6d6e760-bffe-515d-de78-cc698f7341dc@redhat.com>
+Date: Mon, 23 Apr 2018 11:36:48 +0200
 MIME-Version: 1.0
-In-Reply-To: <53691cbf-08bf-e3f7-22d3-601a279aa08a@kaod.org>
-References: <20180423064020.25434-1-clg@kaod.org>
-	<CAFEAcA-LtNpGTV08jvK4i5C5i64WjM5gMB4zGr8P4fkVSkNH7g@mail.gmail.com>
-	<53691cbf-08bf-e3f7-22d3-601a279aa08a@kaod.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 23 Apr 2018 10:34:21 +0100
-Message-ID: <CAFEAcA9XBHE5YxN27M1ugprmSf=o5iiNakO2omrY+HBgCszV5Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] timer/aspeed: fix vmstate version id
+In-Reply-To: <20180423032825.GD19804@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] machine: make MemoryHotplugState
+ accessible via the machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,44 +26,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>
 
-On 23 April 2018 at 10:28, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-> On 04/23/2018 11:12 AM, Peter Maydell wrote:
->>> diff --git a/hw/timer/aspeed_timer.c b/hw/timer/aspeed_timer.c
->>> index 50acbf530a3a..7df19bd9df91 100644
->>> --- a/hw/timer/aspeed_timer.c
->>> +++ b/hw/timer/aspeed_timer.c
->>> @@ -498,8 +498,8 @@ static const VMStateDescription vmstate_aspeed_time=
-r =3D {
->>>
->>>  static const VMStateDescription vmstate_aspeed_timer_state =3D {
->>>      .name =3D "aspeed.timerctrl",
->>> -    .version_id =3D 1,
->>> -    .minimum_version_id =3D 1,
->>> +    .version_id =3D 2,
->>> +    .minimum_version_id =3D 2,
->>>      .fields =3D (VMStateField[]) {
->>>          VMSTATE_UINT32(ctrl, AspeedTimerCtrlState),
->>>          VMSTATE_UINT32(ctrl2, AspeedTimerCtrlState),
->> Wouldn't it be simpler to just fix the incorrect value in
->> the VMSTATE_STRUCT_ARRAY(timers, AspeedTimerCtrlState,
->> line ?
->
-> Yes. Also.
->
-> Or bring back all the version ids to 1, as we never supported
-> migration before.
+On 23.04.2018 05:28, David Gibson wrote:
+> On Fri, Apr 20, 2018 at 02:34:55PM +0200, David Hildenbrand wrote:
+>> Let's allow to query the MemoryHotplugState from the machine.
+>>
+>> This allows us to generically detect if a certain machine has support
+>> for memory devices, and to generically manage it (find free address
+>> range, plug/unplug a memory region).
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+> 
+> So, we're creating a hook where it seems very likely that the only
+> implementationss will be simply to retrieve the right field from the
+> machine specific structure.
+> 
+> So.. should we instead just move the hotplug_memory structure to the
+> based MachineState type?
 
-I think it's nice to at least do the "bump version" thing, so you
-get a (hopefully comprehensible) error rather than just wrong
-data if you do try a cross version migration, so I would
-vote for just fixing the one thing that was wrong: the
-number in VMSTATE_STRUCT_ARRAY is the version to be used of
-the substruct, so it didn't need to be bumped in commit
-1d3e65aa7a; the main version numbers for vmstate_aspeed_timer
-did need to be bumped because part of the main struct changed.
+It allows us in patch nr. 3 to report different error messages.
 
-thanks
--- PMM
+"Not supported" vs. "Not enabled (maxmem)".
+
+We could also handle that via a simple boolean flag inside of the
+struct. What do you think?
+
+
+-- 
+
+Thanks,
+
+David / dhildenb
