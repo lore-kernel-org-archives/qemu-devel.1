@@ -1,25 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <christophe.lyon@st.com>) id 1fAWIF-0000Vu-2M
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 03:53:48 -0400
+	(envelope-from <thuth@redhat.com>) id 1fAWMz-0003yW-F3
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 03:58:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <christophe.lyon@st.com>) id 1fAWID-0000a9-LN
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 03:53:47 -0400
-Received: from mx07-00178001.pphosted.com ([62.209.51.94]:6653)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <christophe.lyon@st.com>)
-	id 1fAWID-0000YJ-Cj
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 03:53:45 -0400
-From: Christophe Lyon <christophe.lyon@st.com>
-Date: Mon, 23 Apr 2018 09:51:55 +0200
-Message-ID: <20180423075215.4572-5-christophe.lyon@st.com>
-In-Reply-To: <20180423075215.4572-1-christophe.lyon@st.com>
-References: <20180423075215.4572-1-christophe.lyon@st.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [ARM/FDPIC v2 4/4] linux-user: ARM-FDPIC: Add support
- for signals for FDPIC targets
+	(envelope-from <thuth@redhat.com>) id 1fAWMv-0003d3-UT
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 03:58:41 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon, 23 Apr 2018 09:58:24 +0200
+Message-Id: <1524470305-26484-4-git-send-email-thuth@redhat.com>
+In-Reply-To: <1524470305-26484-1-git-send-email-thuth@redhat.com>
+References: <1524470305-26484-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 3/4] pc-bios/s390-ccw/net: Add support for
+ .INS config files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,199 +20,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, christophe.lyon@linaro.org, peter.maydell@linaro.org, riku.voipio@iki.fi, laurent@vivier.eu
+To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>
 
-The FDPIC restorer needs to deal with a function descriptor, hence we
-have to extend 'retcode' such that it can hold the instructions needed
-to perform this.
+The .INS config files can normally be found on CD-ROM ISO images,
+so by supporting these files, it is now possible to boot directly
+when the TFTP server is set up with the contents of such an CD-ROM
+image.
 
-The restorer sequence uses the same thumbness as the exception
-handler (mainly to support Thumb-only architectures).
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ pc-bios/s390-ccw/netmain.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
 
-Co-Authored-By: Micka=C3=ABl Gu=C3=AAn=C3=A9 <mickael.guene@st.com>
-Signed-off-by: Christophe Lyon <christophe.lyon@st.com>
-
-diff --git a/linux-user/signal.c b/linux-user/signal.c
-index 8d9e6e8..d01b459 100644
---- a/linux-user/signal.c
-+++ b/linux-user/signal.c
-@@ -2045,13 +2045,13 @@ struct sigframe_v1
- {
-     struct target_sigcontext sc;
-     abi_ulong extramask[TARGET_NSIG_WORDS-1];
--    abi_ulong retcode;
-+    abi_ulong retcode[4];
- };
-=20
- struct sigframe_v2
- {
-     struct target_ucontext_v2 uc;
--    abi_ulong retcode;
-+    abi_ulong retcode[4];
- };
-=20
- struct rt_sigframe_v1
-@@ -2060,14 +2060,14 @@ struct rt_sigframe_v1
-     abi_ulong puc;
-     struct target_siginfo info;
-     struct target_ucontext_v1 uc;
--    abi_ulong retcode;
-+    abi_ulong retcode[4];
- };
-=20
- struct rt_sigframe_v2
- {
-     struct target_siginfo info;
-     struct target_ucontext_v2 uc;
--    abi_ulong retcode;
-+    abi_ulong retcode[4];
- };
-=20
- #define TARGET_CONFIG_CPU_32 1
-@@ -2090,6 +2090,21 @@ static const abi_ulong retcodes[4] =3D {
- 	SWI_SYS_RT_SIGRETURN,	SWI_THUMB_RT_SIGRETURN
- };
-=20
-+/*
-+ * Stub needed to make sure the FD register (r9) contains the right
-+ * value.
+diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
+index 129f009..e5418a9 100644
+--- a/pc-bios/s390-ccw/netmain.c
++++ b/pc-bios/s390-ccw/netmain.c
+@@ -453,6 +453,55 @@ static int net_try_pxelinux_cfgs(filename_ip_t *fn_ip)
+     return -1;
+ }
+ 
++/**
++ * Load via information from a .INS file (which can be found on CD-ROMs
++ * for example)
 + */
-+static const unsigned long sigreturn_fdpic_codes[3] =3D {
-+    0xe59fc004, /* ldr r12, [pc, #4] to read function descriptor */
-+    0xe59c9004, /* ldr r9, [r12, #4] to setup GOT */
-+    0xe59cf000  /* ldr pc, [r12] to jump into restorer */
-+};
++static int handle_ins_cfg(filename_ip_t *fn_ip, char *cfg, int cfgsize)
++{
++    char *ptr;
++    int rc = -1, llen;
++    void *destaddr;
++    char *insbuf = cfg;
 +
-+static const unsigned long sigreturn_fdpic_thumb_codes[3] =3D {
-+    0xc008f8df, /* ldr r12, [pc, #8] to read function descriptor */
-+    0x9004f8dc, /* ldr r9, [r12, #4] to setup GOT */
-+    0xf000f8dc  /* ldr pc, [r12] to jump into restorer */
-+};
-=20
- static inline int valid_user_regs(CPUARMState *regs)
- {
-@@ -2149,7 +2164,21 @@ setup_return(CPUARMState *env, struct target_sigac=
-tion *ka,
- {
-     abi_ulong handler =3D ka->_sa_handler;
-     abi_ulong retcode;
--    int thumb =3D handler & 1;
-+    abi_ulong funcdesc_ptr =3D 0;
-+
-+    int thumb;
-+    int is_fdpic =3D ((TaskState *)thread_cpu->opaque)->is_fdpic;
-+
-+    if (is_fdpic) {
-+        /* In FDPIC mode, ka->_sa_handler points to a function
-+         * descriptor (FD). The first word contains the address of the
-+         * handler. The second word contains the value of the PIC
-+         * register (r9).  */
-+        funcdesc_ptr =3D ka->_sa_handler;
-+        get_user_ual(handler, funcdesc_ptr);
++    ptr = strchr(insbuf, '\n');
++    if (!ptr) {
++        puts("Does not seem to be a valid .INS file");
++        return -1;
 +    }
-+    thumb =3D handler & 1;
 +
-     uint32_t cpsr =3D cpsr_read(env);
-=20
-     cpsr &=3D ~CPSR_IT;
-@@ -2160,20 +2189,50 @@ setup_return(CPUARMState *env, struct target_siga=
-ction *ka,
-     }
-=20
-     if (ka->sa_flags & TARGET_SA_RESTORER) {
--        retcode =3D ka->sa_restorer;
--    } else {
--        unsigned int idx =3D thumb;
-+        if (is_fdpic) {
-+            /* For FDPIC we ensure that the restorer is called with a
-+             * correct r9 value.  For that we need to write code on
-+             * the stack that sets r9 and jumps back to restorer
-+             * value.
-+             */
-+            if (thumb) {
-+                __put_user(sigreturn_fdpic_thumb_codes[0], rc);
-+                __put_user(sigreturn_fdpic_thumb_codes[1], rc + 1);
-+                __put_user(sigreturn_fdpic_thumb_codes[2], rc + 2);
-+                __put_user((abi_ulong)ka->sa_restorer, rc + 3);
-+            } else {
-+                __put_user(sigreturn_fdpic_codes[0], rc);
-+                __put_user(sigreturn_fdpic_codes[1], rc + 1);
-+                __put_user(sigreturn_fdpic_codes[2], rc + 2);
-+                __put_user((abi_ulong)ka->sa_restorer, rc + 3);
-+            }
-=20
--        if (ka->sa_flags & TARGET_SA_SIGINFO) {
--            idx +=3D 2;
-+            retcode =3D rc_addr + thumb;
-+        } else {
-+            retcode =3D ka->sa_restorer;
-         }
-+    } else {
-+        if (is_fdpic) {
-+            qemu_log_mask(LOG_UNIMP,
-+                          "arm: FDPIC signal return not implemented");
-+            abort();
-+        } else {
-+            unsigned int idx =3D thumb;
++    *ptr = 0;
++    printf("\nParsing .INS file:\n %s\n", &insbuf[2]);
 +
-+            if (ka->sa_flags & TARGET_SA_SIGINFO) {
-+                idx +=3D 2;
-+            }
-=20
--        __put_user(retcodes[idx], rc);
-+            __put_user(retcodes[idx], rc);
-=20
--        retcode =3D rc_addr + thumb;
-+            retcode =3D rc_addr + thumb;
++    insbuf = ptr + 1;
++    while (*insbuf && insbuf < cfg + cfgsize) {
++        ptr = strchr(insbuf, '\n');
++        if (ptr) {
++            *ptr = 0;
 +        }
-     }
-=20
-     env->regs[0] =3D usig;
-+    if (is_fdpic) {
-+        get_user_ual(env->regs[9], funcdesc_ptr + 4);
++        llen = strlen(insbuf);
++        if (!llen) {
++            insbuf = ptr + 1;
++            continue;
++        }
++        ptr = strchr(insbuf, ' ');
++        if (!ptr) {
++            puts("Missing space separator in .INS file");
++            return -1;
++        }
++        *ptr = 0;
++        strncpy((char *)fn_ip->filename, insbuf, sizeof(fn_ip->filename));
++        destaddr = (char *)atol(ptr + 1);
++        rc = tftp_load(fn_ip, destaddr, (long)_start - (long)destaddr);
++        if (rc <= 0) {
++            break;
++        }
++        insbuf += llen + 1;
 +    }
-     env->regs[13] =3D frame_addr;
-     env->regs[14] =3D retcode;
-     env->regs[15] =3D handler & (thumb ? ~1 : ~3);
-@@ -2270,7 +2329,7 @@ static void setup_frame_v1(int usig, struct target_=
-sigaction *ka,
-         __put_user(set->sig[i], &frame->extramask[i - 1]);
++
++    return rc;
++}
++
+ static int net_try_direct_tftp_load(filename_ip_t *fn_ip)
+ {
+     int rc;
+@@ -473,6 +522,8 @@ static int net_try_direct_tftp_load(filename_ip_t *fn_ip)
+         if (!strncasecmp("default", cfgbuf, 7) || !strncmp("# ", cfgbuf, 2)) {
+             /* Looks like it is a pxelinux.cfg */
+             return handle_pxelinux_cfg(fn_ip, cfgbuf, rc);
++        } else if (!strncmp("* ", cfgbuf, 2)) {
++            return handle_ins_cfg(fn_ip, cfgbuf, rc);
+         }
      }
-=20
--    setup_return(regs, ka, &frame->retcode, frame_addr, usig,
-+    setup_return(regs, ka, frame->retcode, frame_addr, usig,
-                  frame_addr + offsetof(struct sigframe_v1, retcode));
-=20
-     unlock_user_struct(frame, frame_addr, 1);
-@@ -2292,7 +2351,7 @@ static void setup_frame_v2(int usig, struct target_=
-sigaction *ka,
-=20
-     setup_sigframe_v2(&frame->uc, set, regs);
-=20
--    setup_return(regs, ka, &frame->retcode, frame_addr, usig,
-+    setup_return(regs, ka, frame->retcode, frame_addr, usig,
-                  frame_addr + offsetof(struct sigframe_v2, retcode));
-=20
-     unlock_user_struct(frame, frame_addr, 1);
-@@ -2347,7 +2406,7 @@ static void setup_rt_frame_v1(int usig, struct targ=
-et_sigaction *ka,
-         __put_user(set->sig[i], &frame->uc.tuc_sigmask.sig[i]);
-     }
-=20
--    setup_return(env, ka, &frame->retcode, frame_addr, usig,
-+    setup_return(env, ka, frame->retcode, frame_addr, usig,
-                  frame_addr + offsetof(struct rt_sigframe_v1, retcode));
-=20
-     env->regs[1] =3D info_addr;
-@@ -2378,7 +2437,7 @@ static void setup_rt_frame_v2(int usig, struct targ=
-et_sigaction *ka,
-=20
-     setup_sigframe_v2(&frame->uc, set, env);
-=20
--    setup_return(env, ka, &frame->retcode, frame_addr, usig,
-+    setup_return(env, ka, frame->retcode, frame_addr, usig,
-                  frame_addr + offsetof(struct rt_sigframe_v2, retcode));
-=20
-     env->regs[1] =3D info_addr;
---=20
-2.6.3
+ 
+-- 
+1.8.3.1
