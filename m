@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fAWMz-0003ym-Ql
+	(envelope-from <thuth@redhat.com>) id 1fAWMz-0003yV-F5
 	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 03:58:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fAWMy-0003dv-7B
+	(envelope-from <thuth@redhat.com>) id 1fAWMu-0003cD-Kg
 	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 03:58:41 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 23 Apr 2018 09:58:25 +0200
-Message-Id: <1524470305-26484-5-git-send-email-thuth@redhat.com>
+Date: Mon, 23 Apr 2018 09:58:23 +0200
+Message-Id: <1524470305-26484-3-git-send-email-thuth@redhat.com>
 In-Reply-To: <1524470305-26484-1-git-send-email-thuth@redhat.com>
 References: <1524470305-26484-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 4/4] pc-bios/s390-ccw/net: Use diag308 to
- reset machine before jumping to the OS
+Subject: [Qemu-devel] [PATCH v2 2/4] pc-bios/s390-ccw/net: Add support for
+ pxelinux-style config files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,293 +23,319 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>
 
-The netboot firmware so far simply jumped directly into the OS kernel
-after the download has been completed. This, however, bears the risk
-that the virtio-net device still might be active in the background and
-incoming packets are still placed into the buffers - which could destroy
-memory of the now-running Linux kernel in case it did not take over the
-device fast enough. Also the SCLP console is not put into a well-defined
-state here. We should hand over the system in a clean state when jumping
-into the kernel, so let's use the same mechanism as it's done in the
-main s390-ccw firmware and reset the machine with diag308 into a clean
-state before jumping into the OS kernel code. To be able to share the
-code with the main s390-ccw firmware, the related functions are now
-extracted from bootmap.c into a new file called jump2ipl.c.
+Since it is quite cumbersome to manually create a combined kernel with
+initrd image for network booting, we now support loading via pxelinux
+configuration files, too. In these files, the kernel, initrd and command
+line parameters can be specified seperately, and the firmware then takes
+care of glueing everything together in memory after the files have been
+downloaded.
+
+The user can either specify a config file directly as bootfile via DHCP
+(but in this case, the file has to start either with "default" or a "#"
+comment so we can distinguish it from binary kernels), or a folder (i.e.
+the bootfile name must end with "/") where the firmware should look for
+the typical pxelinux.cfg file names based on MAC or IP address. If no
+direct file or folder has been specified, we still look for certain
+files in the default "pxelinux.cfg/" folder, but omit some of the file
+names to avoid to download x86 config files here by mistake.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/Makefile    |  4 ++-
- pc-bios/s390-ccw/bootmap.c   | 63 +---------------------------------
- pc-bios/s390-ccw/bootmap.h   |  4 ---
- pc-bios/s390-ccw/jump2ipl.c  | 81 ++++++++++++++++++++++++++++++++++++++++++++
- pc-bios/s390-ccw/netboot.mak |  3 +-
- pc-bios/s390-ccw/netmain.c   | 11 +++++-
- pc-bios/s390-ccw/s390-ccw.h  |  4 +++
- 7 files changed, 101 insertions(+), 69 deletions(-)
- create mode 100644 pc-bios/s390-ccw/jump2ipl.c
+ pc-bios/s390-ccw/netboot.mak |   5 +-
+ pc-bios/s390-ccw/netmain.c   | 225 +++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 222 insertions(+), 8 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
-index 1712c2d..439e3cc 100644
---- a/pc-bios/s390-ccw/Makefile
-+++ b/pc-bios/s390-ccw/Makefile
-@@ -9,7 +9,9 @@ $(call set-vpath, $(SRC_PATH)/pc-bios/s390-ccw)
- 
- .PHONY : all clean build-all
- 
--OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o libc.o menu.o
-+OBJECTS = start.o main.o bootmap.o jump2ipl.o sclp.o menu.o \
-+	  virtio.o virtio-scsi.o virtio-blkdev.o libc.o
-+
- QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS))
- QEMU_CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -msoft-float
- QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
-diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index 9287b7a..7e63e6b 100644
---- a/pc-bios/s390-ccw/bootmap.c
-+++ b/pc-bios/s390-ccw/bootmap.c
-@@ -29,14 +29,6 @@
- /* Scratch space */
- static uint8_t sec[MAX_SECTOR_SIZE*4] __attribute__((__aligned__(PAGE_SIZE)));
- 
--typedef struct ResetInfo {
--    uint32_t ipl_mask;
--    uint32_t ipl_addr;
--    uint32_t ipl_continue;
--} ResetInfo;
--
--static ResetInfo save;
--
- const uint8_t el_torito_magic[] = "EL TORITO SPECIFICATION"
-                                   "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
- 
-@@ -57,53 +49,6 @@ static inline bool is_iso_vd_valid(IsoVolDesc *vd)
-            vd->type <= VOL_DESC_TYPE_PARTITION;
- }
- 
--static void jump_to_IPL_2(void)
--{
--    ResetInfo *current = 0;
--
--    void (*ipl)(void) = (void *) (uint64_t) current->ipl_continue;
--    *current = save;
--    ipl(); /* should not return */
--}
--
--static void jump_to_IPL_code(uint64_t address)
--{
--    /* store the subsystem information _after_ the bootmap was loaded */
--    write_subsystem_identification();
--
--    /* prevent unknown IPL types in the guest */
--    if (iplb.pbt == S390_IPL_TYPE_QEMU_SCSI) {
--        iplb.pbt = S390_IPL_TYPE_CCW;
--        set_iplb(&iplb);
--    }
--
--    /*
--     * The IPL PSW is at address 0. We also must not overwrite the
--     * content of non-BIOS memory after we loaded the guest, so we
--     * save the original content and restore it in jump_to_IPL_2.
--     */
--    ResetInfo *current = 0;
--
--    save = *current;
--    current->ipl_addr = (uint32_t) (uint64_t) &jump_to_IPL_2;
--    current->ipl_continue = address & 0x7fffffff;
--
--    debug_print_int("set IPL addr to", current->ipl_continue);
--
--    /* Ensure the guest output starts fresh */
--    sclp_print("\n");
--
--    /*
--     * HACK ALERT.
--     * We use the load normal reset to keep r15 unchanged. jump_to_IPL_2
--     * can then use r15 as its stack pointer.
--     */
--    asm volatile("lghi 1,1\n\t"
--                 "diag 1,1,0x308\n\t"
--                 : : : "1", "memory");
--    panic("\n! IPL returns !\n");
--}
--
- /***********************************************************************
-  * IPL an ECKD DASD (CDL or LDL/CMS format)
-  */
-@@ -727,13 +672,7 @@ static void load_iso_bc_entry(IsoBcSection *load)
-                         (void *)((uint64_t)bswap16(s.load_segment)),
-                         blks_to_load);
- 
--    /* Trying to get PSW at zero address */
--    if (*((uint64_t *)0) & IPL_PSW_MASK) {
--        jump_to_IPL_code((*((uint64_t *)0)) & 0x7fffffff);
--    }
--
--    /* Try default linux start address */
--    jump_to_IPL_code(KERN_IMAGE_START);
-+    jump_to_low_kernel();
- }
- 
- static uint32_t find_iso_bc(void)
-diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
-index 07eb600..bef81ff 100644
---- a/pc-bios/s390-ccw/bootmap.h
-+++ b/pc-bios/s390-ccw/bootmap.h
-@@ -355,10 +355,6 @@ static inline uint32_t iso_733_to_u32(uint64_t x)
- #define ISO_SECTOR_SIZE 2048
- /* El Torito specifies boot image size in 512 byte blocks */
- #define ET_SECTOR_SHIFT 2
--#define KERN_IMAGE_START 0x010000UL
--#define PSW_MASK_64 0x0000000100000000ULL
--#define PSW_MASK_32 0x0000000080000000ULL
--#define IPL_PSW_MASK (PSW_MASK_32 | PSW_MASK_64)
- 
- #define ISO_PRIMARY_VD_SECTOR 16
- 
-diff --git a/pc-bios/s390-ccw/jump2ipl.c b/pc-bios/s390-ccw/jump2ipl.c
-new file mode 100644
-index 0000000..21b25d8
---- /dev/null
-+++ b/pc-bios/s390-ccw/jump2ipl.c
-@@ -0,0 +1,81 @@
-+/*
-+ * QEMU s390-ccw firmware - jump to IPL code
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
-+
-+#include "libc.h"
-+#include "s390-ccw.h"
-+
-+#define KERN_IMAGE_START 0x010000UL
-+#define PSW_MASK_64 0x0000000100000000ULL
-+#define PSW_MASK_32 0x0000000080000000ULL
-+#define IPL_PSW_MASK (PSW_MASK_32 | PSW_MASK_64)
-+
-+typedef struct ResetInfo {
-+    uint32_t ipl_mask;
-+    uint32_t ipl_addr;
-+    uint32_t ipl_continue;
-+} ResetInfo;
-+
-+static ResetInfo save;
-+
-+static void jump_to_IPL_2(void)
-+{
-+    ResetInfo *current = 0;
-+
-+    void (*ipl)(void) = (void *) (uint64_t) current->ipl_continue;
-+    *current = save;
-+    ipl(); /* should not return */
-+}
-+
-+void jump_to_IPL_code(uint64_t address)
-+{
-+    /* store the subsystem information _after_ the bootmap was loaded */
-+    write_subsystem_identification();
-+
-+    /* prevent unknown IPL types in the guest */
-+    if (iplb.pbt == S390_IPL_TYPE_QEMU_SCSI) {
-+        iplb.pbt = S390_IPL_TYPE_CCW;
-+        set_iplb(&iplb);
-+    }
-+
-+    /*
-+     * The IPL PSW is at address 0. We also must not overwrite the
-+     * content of non-BIOS memory after we loaded the guest, so we
-+     * save the original content and restore it in jump_to_IPL_2.
-+     */
-+    ResetInfo *current = 0;
-+
-+    save = *current;
-+    current->ipl_addr = (uint32_t) (uint64_t) &jump_to_IPL_2;
-+    current->ipl_continue = address & 0x7fffffff;
-+
-+    debug_print_int("set IPL addr to", current->ipl_continue);
-+
-+    /* Ensure the guest output starts fresh */
-+    sclp_print("\n");
-+
-+    /*
-+     * HACK ALERT.
-+     * We use the load normal reset to keep r15 unchanged. jump_to_IPL_2
-+     * can then use r15 as its stack pointer.
-+     */
-+    asm volatile("lghi 1,1\n\t"
-+                 "diag 1,1,0x308\n\t"
-+                 : : : "1", "memory");
-+    panic("\n! IPL returns !\n");
-+}
-+
-+void jump_to_low_kernel(void)
-+{
-+    /* Trying to get PSW at zero address */
-+    if (*((uint64_t *)0) & IPL_PSW_MASK) {
-+        jump_to_IPL_code((*((uint64_t *)0)) & 0x7fffffff);
-+    }
-+
-+    /* Try default linux start address */
-+    jump_to_IPL_code(KERN_IMAGE_START);
-+}
 diff --git a/pc-bios/s390-ccw/netboot.mak b/pc-bios/s390-ccw/netboot.mak
-index 8db9573..3434018 100644
+index a25d238..8db9573 100644
 --- a/pc-bios/s390-ccw/netboot.mak
 +++ b/pc-bios/s390-ccw/netboot.mak
-@@ -1,7 +1,8 @@
+@@ -24,8 +24,9 @@ CTYPE_OBJS = isdigit.o isxdigit.o toupper.o
+ %.o : $(SLOF_DIR)/lib/libc/ctype/%.c
+ 	$(call quiet-command,$(CC) $(LIBC_CFLAGS) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
  
- SLOF_DIR := $(SRC_PATH)/roms/SLOF
+-STRING_OBJS = strcat.o strchr.o strcmp.o strcpy.o strlen.o strncmp.o strncpy.o \
+-	      strstr.o memset.o memcpy.o memmove.o memcmp.o
++STRING_OBJS = strcasecmp.o strcat.o strchr.o strcmp.o strcpy.o strlen.o \
++	      strncasecmp.o strncmp.o strncpy.o strstr.o \
++	      memset.o memcpy.o memmove.o memcmp.o
+ %.o : $(SLOF_DIR)/lib/libc/string/%.c
+ 	$(call quiet-command,$(CC) $(LIBC_CFLAGS) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
  
--NETOBJS := start.o sclp.o virtio.o virtio-net.o netmain.o libnet.a libc.a
-+NETOBJS := start.o sclp.o virtio.o virtio-net.o jump2ipl.o netmain.o \
-+	   libnet.a libc.a
- 
- LIBC_INC := -nostdinc -I$(SLOF_DIR)/lib/libc/include
- LIBNET_INC := -I$(SLOF_DIR)/lib/libnet
 diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
-index e5418a9..fdf115e 100644
+index 8fa9e6c..129f009 100644
 --- a/pc-bios/s390-ccw/netmain.c
 +++ b/pc-bios/s390-ccw/netmain.c
-@@ -541,6 +541,15 @@ void panic(const char *string)
+@@ -39,11 +39,17 @@
+ 
+ extern char _start[];
+ 
++#define KERNEL_ADDR             ((void *)0L)
++#define KERNEL_MAX_SIZE         ((long)_start)
++#define ARCH_COMMAND_LINE_SIZE  896              /* Taken from Linux kernel */
++
+ char stack[PAGE_SIZE * 8] __attribute__((aligned(PAGE_SIZE)));
+ IplParameterBlock iplb __attribute__((aligned(PAGE_SIZE)));
++static char cfgbuf[2048];
+ 
+ static SubChannelId net_schid = { .one = 1 };
+ static int ip_version = 4;
++static uint8_t mac[6];
+ static uint64_t dest_timer;
+ 
+ static uint64_t get_timer_ms(void)
+@@ -136,9 +142,15 @@ static int tftp_load(filename_ip_t *fnip, void *buffer, int len)
+     rc = tftp(fnip, buffer, len, DEFAULT_TFTP_RETRIES, &tftp_err, 1, 1428,
+               ip_version);
+ 
+-    if (rc > 0) {
+-        printf("  TFTP: Received %s (%d KBytes)\n", fnip->filename,
+-               rc / 1024);
++    if (rc < 0) {
++        /* Make sure that error messages are put into a new line */
++        printf("\n  ");
++    }
++
++    if (rc > 1024) {
++        printf("  TFTP: Received %s (%d KBytes)\n", fnip->filename, rc / 1024);
++    } else if (rc > 0) {
++        printf("  TFTP: Received %s (%d Bytes)\n", fnip->filename, rc);
+     } else if (rc == -1) {
+         puts("unknown TFTP error");
+     } else if (rc == -2) {
+@@ -201,7 +213,6 @@ static int tftp_load(filename_ip_t *fnip, void *buffer, int len)
+ 
+ static int net_init(filename_ip_t *fn_ip)
+ {
+-    uint8_t mac[6];
+     int rc;
+ 
+     memset(fn_ip, 0, sizeof(filename_ip_t));
+@@ -275,6 +286,202 @@ static void net_release(filename_ip_t *fn_ip)
      }
  }
  
-+void write_subsystem_identification(void)
-+{
-+    uint32_t *schid = (uint32_t *) 184;
-+    uint32_t *zeroes = (uint32_t *) 188;
++/* This structure holds the data from one pxelinux.cfg file entry */
++struct lkia {
++    const char *label;
++    const char *kernel;
++    const char *initrd;
++    const char *append;
++};
 +
-+    *schid = 0;         /* We must not set this for virtio-net */
-+    *zeroes = 0;
++static int load_kernel_with_initrd(filename_ip_t *fn_ip, struct lkia *kia)
++{
++    int rc;
++
++    printf("Loading pxelinux.cfg entry '%s'\n", kia->label);
++
++    if (!kia->kernel) {
++        printf("Kernel entry is missing!\n");
++        return -1;
++    }
++
++    strncpy((char *)&fn_ip->filename, kia->kernel, sizeof(fn_ip->filename));
++    rc = tftp_load(fn_ip, KERNEL_ADDR, KERNEL_MAX_SIZE);
++    if (rc < 0) {
++        return rc;
++    }
++
++    if (kia->initrd) {
++        uint64_t iaddr = (rc + 0xfff) & ~0xfffUL;
++
++        strncpy((char *)&fn_ip->filename, kia->initrd, sizeof(fn_ip->filename));
++        rc = tftp_load(fn_ip, (void *)iaddr, KERNEL_MAX_SIZE - iaddr);
++        if (rc < 0) {
++            return rc;
++        }
++        /* Patch location and size: */
++        *(uint64_t *)0x10408 = iaddr;
++        *(uint64_t *)0x10410 = rc;
++        rc += iaddr;
++    }
++
++    if (kia->append) {
++        strncpy((char *)0x10480, kia->append, ARCH_COMMAND_LINE_SIZE);
++    }
++
++    return rc;
 +}
 +
- static bool find_net_dev(Schib *schib, int dev_no)
++#define MAX_PXELINUX_ENTRIES 16
++
++/**
++ * Parse a pxelinux-style configuration file.
++ * See the following URL for more inforation about the config file syntax:
++ * https://www.syslinux.org/wiki/index.php?title=PXELINUX
++ */
++static int handle_pxelinux_cfg(filename_ip_t *fn_ip, char *cfg, int cfgsize)
++{
++    struct lkia entries[MAX_PXELINUX_ENTRIES];
++    int num_entries = 0;
++    char *ptr = cfg, *eol, *arg;
++    char *defaultlabel = NULL;
++    int def_ent = 0;
++
++    while (ptr < cfg + cfgsize && num_entries < MAX_PXELINUX_ENTRIES) {
++        eol = strchr(ptr, '\n');
++        if (!eol) {
++            eol = cfg + cfgsize;
++        }
++        if (eol > ptr && *(eol - 1) == '\r') {
++            *(eol - 1) = 0;
++        }
++        *eol = '\0';
++        while (*ptr == ' ' || *ptr == '\t') {
++            ptr++;
++        }
++        if (*ptr == 0 || *ptr == '#') {   /* Ignore comments and empty lines */
++            goto nextline;
++        }
++        arg = strchr(ptr, ' ');    /* Look for space between command and arg */
++        if (!arg) {
++            arg = strchr(ptr, '\t');
++        }
++        if (!arg) {
++            printf("Failed to parse the following line:\n %s\n", ptr);
++            goto nextline;
++        }
++        *arg++ = 0;
++        while (*arg == ' ' || *arg == '\t') {
++            arg++;
++        }
++        if (!strcasecmp("default", ptr)) {
++            defaultlabel = arg;
++        } else if (!strcasecmp("label", ptr)) {
++            entries[num_entries].label = arg;
++            if (defaultlabel && !strcmp(arg, defaultlabel)) {
++                def_ent = num_entries;
++            }
++            num_entries++;
++        } else if (!strcasecmp("kernel", ptr) && num_entries > 0) {
++            entries[num_entries - 1].kernel = arg;
++        } else if (!strcasecmp("initrd", ptr) && num_entries > 0) {
++            entries[num_entries - 1].initrd = arg;
++        } else if (!strcasecmp("append", ptr) && num_entries > 0) {
++            entries[num_entries - 1].append = arg;
++        } else {
++            printf("Command '%s' is not supported.\n", ptr);
++        }
++nextline:
++        ptr = eol + 1;
++    }
++
++    return load_kernel_with_initrd(fn_ip, &entries[def_ent]);
++}
++
++static int net_try_pxelinux_cfgs(filename_ip_t *fn_ip)
++{
++    int rc, idx;
++    char basedir[256];
++    int has_basedir;
++
++    cfgbuf[sizeof(cfgbuf) - 1] = 0;   /* Make sure that it is NUL-terminated */
++
++    /* Did we get a usable base directory via DHCP? */
++    idx = strlen((char *)fn_ip->filename);
++    if (idx > 0 && idx < sizeof(basedir) - 40 &&
++        fn_ip->filename[idx - 1] == '/') {
++        has_basedir = true;
++        strcpy(basedir, (char *)fn_ip->filename);
++    } else {
++        has_basedir = false;
++        strcpy(basedir, "pxelinux.cfg/");
++    }
++
++    printf("Trying pxelinux.cfg files...\n");
++
++    /* Look for config file with MAC address in its name */
++    sprintf((char *)fn_ip->filename, "%s%02x-%02x-%02x-%02x-%02x-%02x",
++            basedir, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
++    rc = tftp_load(fn_ip, cfgbuf, sizeof(cfgbuf) - 1);
++    if (rc > 0) {
++        return handle_pxelinux_cfg(fn_ip, cfgbuf, sizeof(cfgbuf));
++    }
++
++    /* Look for config file with IP address in its name */
++    if (ip_version == 4) {
++        for (idx = 0; (has_basedir && idx <= 7) || idx < 1; idx++) {
++            sprintf((char *)fn_ip->filename, "%s%02X%02X%02X%02X", basedir,
++                    (fn_ip->own_ip >> 24) & 0xff, (fn_ip->own_ip >> 16) & 0xff,
++                    (fn_ip->own_ip >> 8) & 0xff, fn_ip->own_ip & 0xff);
++            fn_ip->filename[strlen((char *)fn_ip->filename) - idx] = 0;
++            rc = tftp_load(fn_ip, cfgbuf, sizeof(cfgbuf) - 1);
++            if (rc > 0) {
++                return handle_pxelinux_cfg(fn_ip, cfgbuf, sizeof(cfgbuf));
++            }
++        }
++    }
++
++    /* Try "default" config file */
++    if (has_basedir) {
++        sprintf((char *)fn_ip->filename, "%sdefault", basedir);
++        rc = tftp_load(fn_ip, cfgbuf, sizeof(cfgbuf) - 1);
++        if (rc > 0) {
++            return handle_pxelinux_cfg(fn_ip, cfgbuf, sizeof(cfgbuf));
++        }
++    }
++
++    return -1;
++}
++
++static int net_try_direct_tftp_load(filename_ip_t *fn_ip)
++{
++    int rc;
++    void *baseaddr = (void *)0x2000;  /* Load right after the low-core */
++
++    rc = tftp_load(fn_ip, baseaddr, KERNEL_MAX_SIZE - (long)baseaddr);
++    if (rc < 0) {
++        return rc;
++    } else if (rc < 8) {
++        printf("'%s' is too small (%i bytes only).\n", fn_ip->filename, rc);
++        return -1;
++    }
++
++    /* Check whether it is a configuration file instead of a kernel */
++    if (rc < sizeof(cfgbuf) - 1) {
++        memcpy(cfgbuf, baseaddr, rc);
++        cfgbuf[rc] = 0;    /* Make sure that it is NUL-terminated */
++        if (!strncasecmp("default", cfgbuf, 7) || !strncmp("# ", cfgbuf, 2)) {
++            /* Looks like it is a pxelinux.cfg */
++            return handle_pxelinux_cfg(fn_ip, cfgbuf, rc);
++        }
++    }
++
++    /* Move kernel to right location */
++    memmove(KERNEL_ADDR, baseaddr, rc);
++
++    return rc;
++}
++
+ void panic(const char *string)
  {
-     int i, r;
-@@ -629,7 +638,7 @@ void main(void)
+     sclp_print(string);
+@@ -347,7 +554,7 @@ static void virtio_setup(void)
+ void main(void)
+ {
+     filename_ip_t fn_ip;
+-    int rc;
++    int rc, fnlen;
  
-     if (rc > 0) {
-         sclp_print("Network loading done, starting kernel...\n");
--        asm volatile (" lpsw 0(%0) " : : "r"(0) : "memory");
-+        jump_to_low_kernel();
+     sclp_setup();
+     sclp_print("Network boot starting...\n");
+@@ -359,7 +566,13 @@ void main(void)
+         panic("Network initialization failed. Halting.\n");
      }
  
-     panic("Failed to load OS from network\n");
-diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
-index fd18da2..d88e637 100644
---- a/pc-bios/s390-ccw/s390-ccw.h
-+++ b/pc-bios/s390-ccw/s390-ccw.h
-@@ -87,6 +87,10 @@ ulong get_second(void);
- /* bootmap.c */
- void zipl_load(void);
+-    rc = tftp_load(&fn_ip, NULL, (long)_start);
++    fnlen = strlen((char *)fn_ip.filename);
++    if (fnlen > 0 && fn_ip.filename[fnlen - 1] != '/') {
++        rc = net_try_direct_tftp_load(&fn_ip);
++    }
++    if (rc <= 0) {
++        rc = net_try_pxelinux_cfgs(&fn_ip);
++    }
  
-+/* jump2ipl.c */
-+void jump_to_IPL_code(uint64_t address);
-+void jump_to_low_kernel(void);
-+
- /* menu.c */
- void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout);
- int menu_get_zipl_boot_index(const char *menu_data);
+     net_release(&fn_ip);
+ 
 -- 
 1.8.3.1
