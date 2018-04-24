@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fAzno-0006c6-BM
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:24:21 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fAznp-0006dD-9H
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:24:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fAznn-0005YW-4h
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:24:20 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:38390)
+	(envelope-from <alex.bennee@linaro.org>) id 1fAzno-0005af-7N
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:24:21 -0400
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:42963)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fAznm-0005XI-UY
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:24:19 -0400
-Received: by mail-wr0-x241.google.com with SMTP id h3-v6so50394275wrh.5
-	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 08:24:18 -0700 (PDT)
+	id 1fAzno-0005Yt-1K
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:24:20 -0400
+Received: by mail-wr0-x234.google.com with SMTP id s18-v6so50360486wrg.9
+	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 08:24:19 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 24 Apr 2018 16:23:28 +0100
-Message-Id: <20180424152405.10304-10-alex.bennee@linaro.org>
+Date: Tue, 24 Apr 2018 16:23:30 +0100
+Message-Id: <20180424152405.10304-12-alex.bennee@linaro.org>
 In-Reply-To: <20180424152405.10304-1-alex.bennee@linaro.org>
 References: <20180424152405.10304-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 09/46] docker: extend "cc" command to accept
- compiler
+Subject: [Qemu-devel] [PATCH v3 11/46] docker: Makefile.include introduce
+ DOCKER_SCRIPT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,40 +33,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-When calling our cross-compilation images we want to call something
-other than the default cc.
+Define this in one place to make it easy to re-use.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Fam Zheng <famz@redhat.com>
 ---
-v2
-  - use arg.cc default to simplify logic
----
- tests/docker/docker.py | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ tests/docker/Makefile.include | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-index bcc3ee2dee..59bce9f19a 100755
---- a/tests/docker/docker.py
-+++ b/tests/docker/docker.py
-@@ -415,6 +415,8 @@ class CcCommand(SubCommand):
-     def args(self, parser):
-         parser.add_argument("--image", "-i", required=True,
-                             help="The docker image in which to run cc")
-+        parser.add_argument("--cc", default="cc",
-+                            help="The compiler executable to call")
-         parser.add_argument("--source-path", "-s", nargs="*", dest="paths",
-                             help="""Extra paths to (ro) mount into container for
-                             reading sources""")
-@@ -428,7 +430,7 @@ class CcCommand(SubCommand):
-         if args.paths:
-             for p in args.paths:
-                 cmd += ["-v", "%s:%s:ro,z" % (p, p)]
--        cmd += [args.image, "cc"]
-+        cmd += [args.image, args.cc]
-         cmd += argv
-         return Docker().command("run", cmd, args.quiet)
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index de87341528..6a5aa9ec71 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -14,6 +14,8 @@ DOCKER_TESTS := $(notdir $(shell \
  
+ DOCKER_TOOLS := travis
+ 
++DOCKER_SCRIPT=$(SRC_PATH)/tests/docker/docker.py
++
+ TESTS ?= %
+ IMAGES ?= %
+ 
+@@ -37,7 +39,7 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
+ 		echo WARNING: EXECUTABLE is not set, debootstrap may fail. 2>&1 ; \
+ 	fi
+ 	$(call quiet-command,\
+-		$(SRC_PATH)/tests/docker/docker.py build qemu:$* $< \
++		$(DOCKER_SCRIPT) build qemu:$* $< \
+ 		$(if $V,,--quiet) $(if $(NOCACHE),--no-cache) \
+ 		$(if $(NOUSER),,--add-current-user) \
+ 		$(if $(EXTRA_FILES),--extra-files $(EXTRA_FILES))\
+@@ -129,11 +131,11 @@ docker-run: docker-qemu-src
+ 	fi
+ 	$(if $(EXECUTABLE),						\
+ 		$(call quiet-command,					\
+-			$(SRC_PATH)/tests/docker/docker.py update 	\
++			$(DOCKER_SCRIPT) update 			\
+ 			$(IMAGE) $(EXECUTABLE),				\
+ 			"  COPYING $(EXECUTABLE) to $(IMAGE)"))
+ 	$(call quiet-command,						\
+-		$(SRC_PATH)/tests/docker/docker.py run 			\
++		$(DOCKER_SCRIPT) run 					\
+ 			$(if $(NOUSER),,-u $(shell id -u)) 		\
+ 			--security-opt seccomp=unconfined		\
+ 			$(if $V,,--rm) 					\
+@@ -163,4 +165,4 @@ docker-run-%:
+ 	@$(MAKE) docker-run TEST=$(CMD) IMAGE=qemu:$(IMAGE)
+ 
+ docker-clean:
+-	$(call quiet-command, $(SRC_PATH)/tests/docker/docker.py clean)
++	$(call quiet-command, $(DOCKER_SCRIPT) clean)
 -- 
 2.17.0
