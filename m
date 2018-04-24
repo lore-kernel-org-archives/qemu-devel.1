@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48003)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fAzpN-0008AJ-78
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:25:59 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fAzpO-0008Bt-IZ
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:26:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fAzpL-0008LH-Sj
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:25:57 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fAzpM-0008MD-VM
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:25:58 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 24 Apr 2018 17:25:02 +0200
-Message-Id: <20180424152515.25664-21-kwolf@redhat.com>
+Date: Tue, 24 Apr 2018 17:25:05 +0200
+Message-Id: <20180424152515.25664-24-kwolf@redhat.com>
 In-Reply-To: <20180424152515.25664-1-kwolf@redhat.com>
 References: <20180424152515.25664-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 20/33] job: Replace BlockJob.completed with
- job_is_completed()
+Subject: [Qemu-devel] [RFC PATCH 23/33] job: Add job_event_*()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,168 +22,217 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-Since we introduced an explicit status to block job, BlockJob.completed
-is redundant because it can be derived from the status. Remove the field
-from BlockJob and add a function to derive it from the status at the Job
-level.
+Go through the Job layer in order to send QMP events. For the moment,
+these functions only call a notifier in the BlockJob layer that sends
+the existing commands.
+
+This uses notifiers rather than JobDriver callbacks because internal
+users of jobs won't receive QMP events, but might still be interested
+in getting notified for the events.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/block/blockjob.h |  3 ---
- include/qemu/job.h       |  3 +++
- blockjob.c               | 16 +++++++---------
- job.c                    | 22 ++++++++++++++++++++++
- qemu-img.c               |  4 ++--
- 5 files changed, 34 insertions(+), 14 deletions(-)
+ include/block/blockjob.h |  9 +++++++++
+ include/qemu/job.h       | 18 ++++++++++++++++++
+ blockjob.c               | 42 ++++++++++++++++++++++++++++--------------
+ job.c                    | 19 +++++++++++++++++++
+ 4 files changed, 74 insertions(+), 14 deletions(-)
 
 diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index ce136ff2ac..a2d16a700d 100644
+index a74d5d02fd..b5bcb52219 100644
 --- a/include/block/blockjob.h
 +++ b/include/block/blockjob.h
-@@ -88,9 +88,6 @@ typedef struct BlockJob {
-     /** The opaque value that is passed to the completion function.  */
-     void *opaque;
+@@ -82,6 +82,15 @@ typedef struct BlockJob {
+     /** Block other operations when block job is running */
+     Error *blocker;
  
--    /** True when job has reported completion by calling block_job_completed. */
--    bool completed;
--
-     /** ret code passed to block_job_completed. */
-     int ret;
++    /** Called when a cancelled job is finalised. */
++    Notifier finalize_cancelled_notifier;
++
++    /** Called when a successfully completed job is finalised. */
++    Notifier finalize_completed_notifier;
++
++    /** Called when the job transitions to PENDING */
++    Notifier pending_notifier;
++
+     /** BlockDriverStates that are involved in this block job */
+     GSList *nodes;
  
 diff --git a/include/qemu/job.h b/include/qemu/job.h
-index 54adb29958..fd4937ee8d 100644
+index ab3d49685a..3d9a9a8d77 100644
 --- a/include/qemu/job.h
 +++ b/include/qemu/job.h
-@@ -207,6 +207,9 @@ const char *job_type_str(Job *job);
- /** Returns whether the job is scheduled for cancellation. */
- bool job_is_cancelled(Job *job);
+@@ -105,6 +105,15 @@ typedef struct Job {
+     /** True if this job should automatically dismiss itself */
+     bool auto_dismiss;
  
-+/** Returns whether the job is in a completed state. */
-+bool job_is_completed(Job *job);
++    /** Notifiers called when a cancelled job is finalised */
++    NotifierList on_finalize_cancelled;
++
++    /** Notifiers called when a successfully completed job is finalised */
++    NotifierList on_finalize_completed;
++
++    /** Notifiers called when the job transitions to PENDING */
++    NotifierList on_pending;
++
+     /** Element of the list of jobs */
+     QLIST_ENTRY(Job) job_list;
+ } Job;
+@@ -182,6 +191,15 @@ void job_ref(Job *job);
+  */
+ void job_unref(Job *job);
+ 
++/** To be called when a cancelled job is finalised. */
++void job_event_cancelled(Job *job);
++
++/** To be called when a successfully completed job is finalised. */
++void job_event_completed(Job *job);
++
++/** To be called when the job transitions to PENDING */
++void job_event_pending(Job *job);
 +
  /**
-  * Asynchronously pause the specified @job.
-  * Do not allow a resume until a matching call to job_user_resume.
+  * @job: A job that has not yet been started.
+  *
 diff --git a/blockjob.c b/blockjob.c
-index cace95990f..54e74c5a76 100644
+index c49cfdf130..2f36888c0a 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -194,7 +194,7 @@ static void block_job_detach_aio_context(void *opaque)
+@@ -36,10 +36,6 @@
+ #include "qemu/coroutine.h"
+ #include "qemu/timer.h"
  
-     job_pause(&job->job);
+-static void block_job_event_cancelled(BlockJob *job);
+-static void block_job_event_completed(BlockJob *job, const char *msg);
+-static void block_job_event_pending(BlockJob *job);
+-
+ /* Transactional group of block jobs */
+ struct BlockJobTxn {
  
--    while (!job->job.paused && !job->completed) {
-+    while (!job->job.paused && !job_is_completed(&job->job)) {
-         block_job_drain(job);
-     }
- 
-@@ -270,7 +270,6 @@ const BlockJobDriver *block_job_driver(BlockJob *job)
- static void block_job_decommission(BlockJob *job)
- {
-     assert(job);
--    job->completed = true;
-     job->job.busy = false;
-     job->job.paused = false;
-     job->job.deferred_to_main_loop = true;
-@@ -335,7 +334,7 @@ static void block_job_clean(BlockJob *job)
- 
- static int block_job_finalize_single(BlockJob *job)
- {
--    assert(job->completed);
-+    assert(job_is_completed(&job->job));
- 
-     /* Ensure abort is called for late-transactional failures */
-     block_job_update_rc(job);
-@@ -428,10 +427,10 @@ static int block_job_finish_sync(BlockJob *job,
-     /* block_job_drain calls block_job_enter, and it should be enough to
-      * induce progress until the job completes or moves to the main thread.
-     */
--    while (!job->job.deferred_to_main_loop && !job->completed) {
-+    while (!job->job.deferred_to_main_loop && !job_is_completed(&job->job)) {
-         block_job_drain(job);
-     }
--    while (!job->completed) {
-+    while (!job_is_completed(&job->job)) {
-         aio_poll(qemu_get_aio_context(), true);
-     }
-     ret = (job_is_cancelled(&job->job) && job->ret == 0)
-@@ -472,7 +471,7 @@ static void block_job_completed_txn_abort(BlockJob *job)
-     while (!QLIST_EMPTY(&txn->jobs)) {
-         other_job = QLIST_FIRST(&txn->jobs);
-         ctx = blk_get_aio_context(other_job->blk);
--        if (!other_job->completed) {
-+        if (!job_is_completed(&other_job->job)) {
-             assert(job_is_cancelled(&other_job->job));
-             block_job_finish_sync(other_job, NULL, NULL);
+@@ -353,13 +349,9 @@ static int block_job_finalize_single(BlockJob *job)
+     /* Emit events only if we actually started */
+     if (job_started(&job->job)) {
+         if (job_is_cancelled(&job->job)) {
+-            block_job_event_cancelled(job);
++            job_event_cancelled(&job->job);
+         } else {
+-            const char *msg = NULL;
+-            if (job->ret < 0) {
+-                msg = strerror(-job->ret);
+-            }
+-            block_job_event_completed(job, msg);
++            job_event_completed(&job->job);
          }
-@@ -514,7 +513,7 @@ static void block_job_completed_txn_success(BlockJob *job)
-      * txn.
-      */
-     QLIST_FOREACH(other_job, &txn->jobs, txn_list) {
--        if (!other_job->completed) {
-+        if (!job_is_completed(&other_job->job)) {
-             return;
-         }
-         assert(other_job->ret == 0);
-@@ -846,9 +845,8 @@ void block_job_early_fail(BlockJob *job)
+     }
  
- void block_job_completed(BlockJob *job, int ret)
+@@ -505,7 +497,7 @@ static int block_job_transition_to_pending(BlockJob *job)
  {
--    assert(job && job->txn && !job->completed);
-+    assert(job && job->txn && !job_is_completed(&job->job));
-     assert(blk_bs(job->blk)->job == job);
--    job->completed = true;
-     job->ret = ret;
-     block_job_update_rc(job);
-     trace_block_job_completed(job, ret, job->ret);
-diff --git a/job.c b/job.c
-index 67b0405d9d..92157e59ea 100644
---- a/job.c
-+++ b/job.c
-@@ -122,6 +122,28 @@ bool job_is_cancelled(Job *job)
-     return job->cancelled;
+     job_state_transition(&job->job, JOB_STATUS_PENDING);
+     if (!job->job.auto_finalize) {
+-        block_job_event_pending(job);
++        job_event_pending(&job->job);
+     }
+     return 0;
+ }
+@@ -711,8 +703,10 @@ static void block_job_iostatus_set_err(BlockJob *job, int error)
+     }
  }
  
-+bool job_is_completed(Job *job)
-+{
-+    switch (job->status) {
-+    case JOB_STATUS_UNDEFINED:
-+    case JOB_STATUS_CREATED:
-+    case JOB_STATUS_RUNNING:
-+    case JOB_STATUS_PAUSED:
-+    case JOB_STATUS_READY:
-+    case JOB_STATUS_STANDBY:
-+        return false;
-+    case JOB_STATUS_WAITING:
-+    case JOB_STATUS_PENDING:
-+    case JOB_STATUS_ABORTING:
-+    case JOB_STATUS_CONCLUDED:
-+    case JOB_STATUS_NULL:
-+        return true;
-+    default:
-+        g_assert_not_reached();
+-static void block_job_event_cancelled(BlockJob *job)
++static void block_job_event_cancelled(Notifier *n, void *opaque)
+ {
++    BlockJob *job = opaque;
++
+     if (block_job_is_internal(job)) {
+         return;
+     }
+@@ -725,12 +719,19 @@ static void block_job_event_cancelled(BlockJob *job)
+                                         &error_abort);
+ }
+ 
+-static void block_job_event_completed(BlockJob *job, const char *msg)
++static void block_job_event_completed(Notifier *n, void *opaque)
+ {
++    BlockJob *job = opaque;
++    const char *msg = NULL;
++
+     if (block_job_is_internal(job)) {
+         return;
+     }
+ 
++    if (job->ret < 0) {
++        msg = strerror(-job->ret);
 +    }
-+    return false;
++
+     qapi_event_send_block_job_completed(job_type(&job->job),
+                                         job->job.id,
+                                         job->len,
+@@ -741,8 +742,10 @@ static void block_job_event_completed(BlockJob *job, const char *msg)
+                                         &error_abort);
+ }
+ 
+-static void block_job_event_pending(BlockJob *job)
++static void block_job_event_pending(Notifier *n, void *opaque)
+ {
++    BlockJob *job = opaque;
++
+     if (block_job_is_internal(job)) {
+         return;
+     }
+@@ -798,6 +801,17 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+     job->cb            = cb;
+     job->opaque        = opaque;
+ 
++    job->finalize_cancelled_notifier.notify = block_job_event_cancelled;
++    job->finalize_completed_notifier.notify = block_job_event_completed;
++    job->pending_notifier.notify = block_job_event_pending;
++
++    notifier_list_add(&job->job.on_finalize_cancelled,
++                      &job->finalize_cancelled_notifier);
++    notifier_list_add(&job->job.on_finalize_completed,
++                      &job->finalize_completed_notifier);
++    notifier_list_add(&job->job.on_pending,
++                      &job->pending_notifier);
++
+     error_setg(&job->blocker, "block device is in use by block job: %s",
+                job_type_str(&job->job));
+     block_job_add_bdrv(job, "main node", bs, 0, BLK_PERM_ALL, &error_abort);
+diff --git a/job.c b/job.c
+index 98113196af..ab9d6d8a22 100644
+--- a/job.c
++++ b/job.c
+@@ -216,6 +216,10 @@ void *job_create(const char *job_id, const JobDriver *driver, AioContext *ctx,
+     job->auto_finalize = !(flags & JOB_MANUAL_FINALIZE);
+     job->auto_dismiss  = !(flags & JOB_MANUAL_DISMISS);
+ 
++    notifier_list_init(&job->on_finalize_cancelled);
++    notifier_list_init(&job->on_finalize_completed);
++    notifier_list_init(&job->on_pending);
++
+     job_state_transition(job, JOB_STATUS_CREATED);
+     aio_timer_init(qemu_get_aio_context(), &job->sleep_timer,
+                    QEMU_CLOCK_REALTIME, SCALE_NS,
+@@ -248,6 +252,21 @@ void job_unref(Job *job)
+     }
+ }
+ 
++void job_event_cancelled(Job *job)
++{
++    notifier_list_notify(&job->on_finalize_cancelled, job);
 +}
 +
- bool job_started(Job *job)
- {
-     return job->co;
-diff --git a/qemu-img.c b/qemu-img.c
-index 62a52edc34..081b03fd91 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -867,9 +867,9 @@ static void run_block_job(BlockJob *job, Error **errp)
-         aio_poll(aio_context, true);
-         qemu_progress_print(job->len ?
-                             ((float)job->offset / job->len * 100.f) : 0.0f, 0);
--    } while (!job->ready && !job->completed);
-+    } while (!job->ready && !job_is_completed(&job->job));
- 
--    if (!job->completed) {
-+    if (!job_is_completed(&job->job)) {
-         ret = block_job_complete_sync(job, errp);
-     } else {
-         ret = job->ret;
++void job_event_completed(Job *job)
++{
++    notifier_list_notify(&job->on_finalize_completed, job);
++}
++
++void job_event_pending(Job *job)
++{
++    notifier_list_notify(&job->on_pending, job);
++}
++
+ /*
+  * Conditionally enter a job pending a call to fn() while under the job_lock
+  * critical section.
 -- 
 2.13.6
