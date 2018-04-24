@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fAzng-0006UW-W8
+	(envelope-from <alex.bennee@linaro.org>) id 1fAzng-0006Tr-1n
 	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:24:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fAznf-0005L3-33
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:24:12 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:33313)
+	(envelope-from <alex.bennee@linaro.org>) id 1fAznc-0005Fn-Jb
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:24:11 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:54601)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fAzne-0005J3-QJ
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:24:11 -0400
-Received: by mail-wr0-x241.google.com with SMTP id o4-v6so109384wrm.0
-	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 08:24:10 -0700 (PDT)
+	id 1fAznc-0005DS-73
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:24:08 -0400
+Received: by mail-wm0-x243.google.com with SMTP id f6so1802686wmc.4
+	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 08:24:07 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 24 Apr 2018 16:23:22 +0100
-Message-Id: <20180424152405.10304-4-alex.bennee@linaro.org>
-In-Reply-To: <20180424152405.10304-1-alex.bennee@linaro.org>
-References: <20180424152405.10304-1-alex.bennee@linaro.org>
+Date: Tue, 24 Apr 2018 16:23:19 +0100
+Message-Id: <20180424152405.10304-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 03/46] configure: add support for
- --cross-cc-FOO
+Subject: [Qemu-devel] [PATCH v3 00/46] fix building of tests/tcg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,299 +30,252 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This allows us to specify cross compilers for our guests. This is
-useful for building test images/programs. Currently we re-run the
-compile test for each target. I couldn't think of a way to cache the
-value for a given arch without getting messier configure code.
+Hi,
 
-The cross compiler for the guest is visible to each target as
-CROSS_CC_GUEST in config-target.mak.
+This is starting to shape up pretty nicely. I was able to add a whole
+bunch of additional architectures thanks to cross compilers in Debian
+Sid which are there to support the Debian "ports". These may not be
+around for ever, most "ports" are on the way out, but they will be the
+last thing to drop out of the Sid repo. Maybe when Debian stops
+caring (and no other distro does) maybe we should to?
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+However compiling big-endian targets continues to be a massive pain as
+even if compilers support switching endianess with flags you are
+usually let down by a partial set of headers or the linker not being
+able to link against wrong-endian crt.o or libgcc files. Ultimately
+any guests that are not supported by any distro are probably going to
+be stuck with bare metal or hand crafted tests like in
+tests/tcg/alpha.
 
----
-v3
-  - --cross-cc-*[!a-zA-Z0-9_-]*=*) error_exit...
-  - --cross-cc-*) cc_arch=${opt#--cross-cc-}; cc_arch=${cc_arch%%=*}
-  - add remaining target_compiler definitions
----
- configure | 79 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 79 insertions(+)
+The final patch (tests/tcg: override runners for broken tests)
+suppresses a bunch of tests that fail on different guest setups. This
+was to allow me to test "make check-tcg" could make it all the way
+through. I'm sure some of them are bugs that need fixing so it would
+be cool if maintainers could look through and see if there are any
+easy wins.
 
-diff --git a/configure b/configure
-index b0ae632ee4..caa838a0d0 100755
---- a/configure
-+++ b/configure
-@@ -453,6 +453,13 @@ vxhs=""
- libxml2=""
- docker="no"
- 
-+# cross compilers defaults, can be overridden with --cross-cc-ARCH
-+cross_cc_aarch64="aarch64-linux-gnu-gcc"
-+cross_cc_arm="arm-linux-gnueabihf-gcc"
-+cross_cc_powerpc="powerpc-linux-gnu-gcc"
-+
-+enabled_cross_compilers=""
-+
- supported_cpu="no"
- supported_os="no"
- bogus_os="no"
-@@ -483,6 +490,11 @@ for opt do
-   ;;
-   --disable-debug-info) debug_info="no"
-   ;;
-+  --cross-cc-*[!a-zA-Z0-9_-]*=*) error_exit "Passed bad --cross-cc-FOO option"
-+  ;;
-+  --cross-cc-*) cc_arch=${opt#--cross-cc-}; cc_arch=${cc_arch%%=*}
-+                eval "cross_cc_${cc_arch}=\$optarg"
-+  ;;
-   esac
- done
- # OS specific
-@@ -675,10 +687,12 @@ case "$cpu" in
-   i386|i486|i586|i686|i86pc|BePC)
-     cpu="i386"
-     supported_cpu="yes"
-+    cross_cc_i386=gcc
-   ;;
-   x86_64|amd64)
-     cpu="x86_64"
-     supported_cpu="yes"
-+    cross_cc_x86_64=gcc
-   ;;
-   armv*b|armv*l|arm)
-     cpu="arm"
-@@ -912,6 +926,8 @@ for opt do
-   ;;
-   --disable-debug-info)
-   ;;
-+  --cross-cc-*)
-+  ;;
-   --enable-modules)
-       modules="yes"
-   ;;
-@@ -6777,6 +6793,8 @@ case "$target" in
-     ;;
- esac
- 
-+target_compiler=""
-+
- mkdir -p $target_dir
- echo "# Automatically generated by configure - do not modify" > $config_target_mak
- 
-@@ -6792,19 +6810,23 @@ TARGET_ABI_DIR=""
- case "$target_name" in
-   i386)
-     gdb_xml_files="i386-32bit.xml i386-32bit-core.xml i386-32bit-sse.xml"
-+    target_compiler=$cross_cc_i386
-   ;;
-   x86_64)
-     TARGET_BASE_ARCH=i386
-     gdb_xml_files="i386-64bit.xml i386-64bit-core.xml i386-64bit-sse.xml"
-+    target_compiler=$cross_cc_x86_64
-   ;;
-   alpha)
-     mttcg="yes"
-+    target_compiler=$cross_cc_alpha
-   ;;
-   arm|armeb)
-     TARGET_ARCH=arm
-     bflt="yes"
-     mttcg="yes"
-     gdb_xml_files="arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
-+    target_compiler=$cross_cc_arm
-   ;;
-   aarch64|aarch64_be)
-     TARGET_ARCH=aarch64
-@@ -6812,58 +6834,73 @@ case "$target_name" in
-     bflt="yes"
-     mttcg="yes"
-     gdb_xml_files="aarch64-core.xml aarch64-fpu.xml arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
-+    target_compiler=$cross_cc_aarch64
-   ;;
-   cris)
-+    target_compiler=$cross_cc_cris
-   ;;
-   hppa)
-     mttcg="yes"
-+    target_compiler=$cross_cc_hppa
-   ;;
-   lm32)
-+    target_compiler=$cross_cc_lm32
-   ;;
-   m68k)
-     bflt="yes"
-     gdb_xml_files="cf-core.xml cf-fp.xml m68k-fp.xml"
-+    target_compiler=$cross_cc_m68k
-   ;;
-   microblaze|microblazeel)
-     TARGET_ARCH=microblaze
-     bflt="yes"
-+    target_compiler=$cross_cc_microblaze
-   ;;
-   mips|mipsel)
-     TARGET_ARCH=mips
-+    target_compiler=$cross_cc_mips
-     echo "TARGET_ABI_MIPSO32=y" >> $config_target_mak
-   ;;
-   mipsn32|mipsn32el)
-     TARGET_ARCH=mips64
-     TARGET_BASE_ARCH=mips
-+    target_compiler=$cross_cc_mipsn32
-     echo "TARGET_ABI_MIPSN32=y" >> $config_target_mak
-     echo "TARGET_ABI32=y" >> $config_target_mak
-   ;;
-   mips64|mips64el)
-     TARGET_ARCH=mips64
-     TARGET_BASE_ARCH=mips
-+    target_compiler=$cross_cc_mips64
-     echo "TARGET_ABI_MIPSN64=y" >> $config_target_mak
-   ;;
-   moxie)
-+    target_compiler=$cross_cc_moxie
-   ;;
-   nios2)
-+    target_compiler=$cross_cc_nios2
-   ;;
-   or1k)
-+    target_compiler=$cross_cc_or1k
-     TARGET_ARCH=openrisc
-     TARGET_BASE_ARCH=openrisc
-   ;;
-   ppc)
-     gdb_xml_files="power-core.xml power-fpu.xml power-altivec.xml power-spe.xml"
-+    target_compiler=$cross_cc_powerpc
-   ;;
-   ppcemb)
-     TARGET_BASE_ARCH=ppc
-     TARGET_ABI_DIR=ppc
-     gdb_xml_files="power-core.xml power-fpu.xml power-altivec.xml power-spe.xml"
-+    target_compiler=$cross_cc_ppcemb
-   ;;
-   ppc64)
-     TARGET_BASE_ARCH=ppc
-     TARGET_ABI_DIR=ppc
-     mttcg=yes
-     gdb_xml_files="power64-core.xml power-fpu.xml power-altivec.xml power-spe.xml power-vsx.xml"
-+    target_compiler=$cross_cc_ppc64
-   ;;
-   ppc64le)
-     TARGET_ARCH=ppc64
-@@ -6871,6 +6908,7 @@ case "$target_name" in
-     TARGET_ABI_DIR=ppc
-     mttcg=yes
-     gdb_xml_files="power64-core.xml power-fpu.xml power-altivec.xml power-spe.xml power-vsx.xml"
-+    target_compiler=$cross_cc_ppc64le
-   ;;
-   ppc64abi32)
-     TARGET_ARCH=ppc64
-@@ -6878,45 +6916,57 @@ case "$target_name" in
-     TARGET_ABI_DIR=ppc
-     echo "TARGET_ABI32=y" >> $config_target_mak
-     gdb_xml_files="power64-core.xml power-fpu.xml power-altivec.xml power-spe.xml power-vsx.xml"
-+    target_compiler=$cross_cc_ppc64abi32
-   ;;
-   riscv32)
-     TARGET_BASE_ARCH=riscv
-     TARGET_ABI_DIR=riscv
-     mttcg=yes
-+    target_compiler=$cross_cc_riscv32
-   ;;
-   riscv64)
-     TARGET_BASE_ARCH=riscv
-     TARGET_ABI_DIR=riscv
-     mttcg=yes
-+    target_compiler=$cross_cc_riscv64
-   ;;
-   sh4|sh4eb)
-     TARGET_ARCH=sh4
-     bflt="yes"
-+    target_compiler=$cross_cc_sh4
-   ;;
-   sparc)
-+    target_compiler=$cross_cc_sparc
-   ;;
-   sparc64)
-     TARGET_BASE_ARCH=sparc
-+    target_compiler=$cross_cc_sparc64
-   ;;
-   sparc32plus)
-     TARGET_ARCH=sparc64
-     TARGET_BASE_ARCH=sparc
-     TARGET_ABI_DIR=sparc
-+    target_compiler=$cross_cc_sparc32plus
-     echo "TARGET_ABI32=y" >> $config_target_mak
-   ;;
-   s390x)
-     mttcg=yes
-     gdb_xml_files="s390x-core64.xml s390-acr.xml s390-fpr.xml s390-vx.xml s390-cr.xml s390-virt.xml s390-gs.xml"
-+    target_compiler=$cross_cc_s390x
-   ;;
-   tilegx)
-+    target_compiler=$cross_cc_tilegx
-   ;;
-   tricore)
-+    target_compiler=$cross_cc_tricore
-   ;;
-   unicore32)
-+    target_compiler=$cross_cc_unicore32
-   ;;
-   xtensa|xtensaeb)
-     TARGET_ARCH=xtensa
-     mttcg="yes"
-+    target_compiler=$cross_cc_xtensa
-   ;;
-   *)
-     error_exit "Unsupported target CPU"
-@@ -6927,6 +6977,25 @@ if [ "$TARGET_BASE_ARCH" = "" ]; then
-   TARGET_BASE_ARCH=$TARGET_ARCH
- fi
- 
-+# Do we have a cross compiler for this target?
-+if has $target_compiler; then
-+
-+    cat > $TMPC << EOF
-+#include <stdio.h>
-+int main(void) {
-+    printf("Hello World!\n");
-+}
-+EOF
-+
-+    if ! do_compiler $target_compiler -o $TMPE $TMPC -static ; then
-+        target_compiler=""
-+    else
-+        enabled_cross_compilers="${enabled_cross_compilers} ${target_compiler}"
-+    fi
-+else
-+    target_compiler=""
-+fi
-+
- symlink "$source_path/Makefile.target" "$target_dir/Makefile"
- 
- upper() {
-@@ -7000,6 +7069,10 @@ if test "$target_bsd_user" = "yes" ; then
-   echo "CONFIG_BSD_USER=y" >> $config_target_mak
- fi
- 
-+if test -n "$target_compiler"; then
-+  echo "CROSS_CC_GUEST=$target_compiler" >> $config_target_mak
-+fi
-+
- # generate QEMU_CFLAGS/LDFLAGS for targets
- 
- cflags=""
-@@ -7122,6 +7195,12 @@ echo "QEMU_CFLAGS+=$cflags" >> $config_target_mak
- 
- done # for target in $targets
- 
-+if test -n "$enabled_cross_compilers"; then
-+    echo
-+    echo "NOTE: cross-compilers enabled:"
-+    printf '%s\n' $enabled_cross_compilers | sort -u
-+fi
-+
- if [ "$dtc_internal" = "yes" ]; then
-   echo "config-host.h: subdir-dtc" >> $config_host_mak
- fi
+Major Changes:
+  - check-tcg now runs the tests (c.f build-tcg/clean-tcg)
+  - clean use of quiet-command for CROSS-BUILD/RUN-TESTS and TEST
+  - bunch of additional targets (alpha, hppa, m68k, sh4, sparc64, mips64)
+  - review comments and tags
+  - dropped fp-test and additional aarch64 tests for now
+
+As usual detailed notes are bellow the --- in the commit messages.
+
+Currently un-reviewed:
+
+patch 0002/configure add test for docker availability.patch needs review
+patch 0003/configure add support for cross cc FOO.patch needs review
+patch 0004/configure move i386_cc to cross_cc_i386.patch needs review
+patch 0005/configure allow user to specify cross cc cflags f.patch needs review
+patch 0014/tests tcg multiarch enable additional linux test .patch needs review
+patch 0015/tests tcg multiarch move most output to stdout.patch needs review
+patch 0017/docker Add fedora i386 cross image.patch needs review
+patch 0018/tests tcg enable building for i386.patch needs review
+patch 0021/tests tcg i386 fix test i386 fprem.patch needs review
+patch 0022/tests tcg i386 disable i386 version of test i386 .patch needs review
+patch 0023/tests tcg x86_64 add Makefile.target.patch needs review
+patch 0025/tests tcg i386 test i386 fix printf format.patch needs review
+patch 0027/tests tcg arm fix up test arm iwmmxt test.patch needs review
+patch 0028/tests tcg aarch64 add Makefile.target.patch needs review
+patch 0029/tests tcg aarch64 add fcvt test cases for AArch64.patch needs review
+patch 0031/tests tcg enable building for MIPS.patch needs review
+patch 0032/tests tcg mips include common mips hello mips.patch needs review
+patch 0035/tests tcg enable building for Alpha.patch needs review
+patch 0036/tests tcg alpha add Alpha specific tests.patch needs review
+patch 0037/tests tcg alpha fix warnings about write.patch needs review
+patch 0038/tests tcg enable building for HPPA.patch needs review
+patch 0039/tests tcg enable building for m68k.patch needs review
+patch 0040/tests tcg enable building for sh4.patch needs review
+patch 0041/tests tcg enable building for sparc64.patch needs review
+patch 0042/tests tcg enable building for mips64.patch needs review
+patch 0043/tests tcg Makefile update to be called from Makef.patch needs review
+patch 0044/Makefile.target add clean guest tests targets.patch needs review
+patch 0046/tests tcg override runners for broken tests UPSTR.patch needs review
+
+
+Alex Bennée (41):
+  configure: add test for docker availability
+  configure: add support for --cross-cc-FOO
+  configure: move i386_cc to cross_cc_i386
+  configure: allow user to specify --cross-cc-cflags-foo=
+  configure: set cross_cc_FOO for host compiler
+  docker: Add "cc" subcommand
+  docker: extend "cc" command to accept compiler
+  docker: allow "cc" command to run in user context
+  docker: Makefile.include introduce DOCKER_SCRIPT
+  tests/tcg: move architecture independent tests into subdir
+  tests/tcg/multiarch: enable additional linux-test tests
+  tests/tcg/multiarch: move most output to stdout
+  tests/tcg: move i386 specific tests into subdir
+  tests/tcg: enable building for i386
+  tests/tcg/i386: fix test-i386
+  tests/tcg/i386: fix test-i386-fprem
+  tests/tcg/i386: disable i386 version of test-i386-ssse
+  tests/tcg/x86_64: add Makefile.target
+  tests/tcg/i386/test-i386: use modern vector_size attributes
+  tests/tcg/i386/test-i386: fix printf format
+  tests/tcg: move ARM specific tests into subdir
+  tests/tcg/arm: fix up test-arm-iwmmxt test
+  tests/tcg/aarch64: add Makefile.target
+  tests/tcg/aarch64: add fcvt test cases for AArch64
+  tests/tcg: move MIPS specific tests into subdir
+  tests/tcg: enable building for MIPS
+  tests/tcg/mips: include common mips hello-mips
+  tests/tcg: enable building for s390x
+  tests/tcg: enable building for ppc64
+  tests/tcg: enable building for Alpha
+  tests/tcg/alpha: add Alpha specific tests
+  tests/tcg/alpha: fix warnings about write()
+  tests/tcg: enable building for HPPA
+  tests/tcg: enable building for m68k
+  tests/tcg: enable building for sh4
+  tests/tcg: enable building for sparc64
+  tests/tcg: enable building for mips64
+  tests/tcg/Makefile: update to be called from Makefile.target
+  Makefile.target: add (clean-)guest-tests targets
+  tests/Makefile.include: add [build|clean|check]-tcg targets
+  tests/tcg: override runners for broken tests (!UPSTREAM)
+
+Fam Zheng (4):
+  Makefile: Rename TARGET_DIRS to TARGET_LIST
+  tests/tcg/multiarch: Build fix for linux-test
+  docker: Add fedora-i386-cross image
+  tests/tcg/i386: Build fix for hello-i386
+
+Peter Maydell (1):
+  docker: add "probe" command for configure
+
+ Makefile                                      |   20 +-
+ Makefile.target                               |    5 +
+ configure                                     |  136 +-
+ scripts/create_config                         |    2 +-
+ tests/Makefile.include                        |   28 +-
+ tests/docker/Makefile.include                 |   16 +-
+ tests/docker/docker.py                        |   49 +
+ .../dockerfiles/debian-alpha-cross.docker     |   12 +
+ .../dockerfiles/debian-cross-build.docker     |   36 +
+ .../dockerfiles/debian-hppa-cross.docker      |   12 +
+ .../dockerfiles/debian-m68k-cross.docker      |   12 +
+ .../dockerfiles/debian-mips64-cross.docker    |   12 +
+ .../dockerfiles/debian-sh4-cross.docker       |   12 +
+ tests/docker/dockerfiles/debian-sid.docker    |   23 +
+ .../dockerfiles/debian-sparc64-cross.docker   |   12 +
+ .../dockerfiles/fedora-i386-cross.docker      |   14 +
+ tests/tcg/Makefile                            |  193 +--
+ tests/tcg/Makefile.include                    |   86 ++
+ tests/tcg/README                              |   69 +-
+ tests/tcg/aarch64/Makefile.target             |   13 +
+ tests/tcg/aarch64/fcvt.c                      |  260 ++++
+ tests/tcg/aarch64/fcvt.out                    | 1305 +++++++++++++++++
+ tests/tcg/alpha/Makefile                      |   35 -
+ tests/tcg/alpha/Makefile.include              |    2 +
+ tests/tcg/alpha/Makefile.target               |   36 +
+ tests/tcg/alpha/{crt.s => crt.S}              |    0
+ tests/tcg/alpha/hello-alpha.c                 |    2 +
+ tests/tcg/alpha/test-cond.c                   |    1 +
+ tests/tcg/alpha/test-ovf.c                    |    2 +
+ tests/tcg/arm/Makefile.target                 |   20 +
+ tests/tcg/arm/README                          |   11 +
+ tests/tcg/{ => arm}/hello-arm.c               |    0
+ .../test-arm-iwmmxt.S}                        |    0
+ tests/tcg/hppa/Makefile.include               |    2 +
+ tests/tcg/hppa/Makefile.target                |   10 +
+ tests/tcg/i386/Makefile.include               |    9 +
+ tests/tcg/i386/Makefile.target                |   52 +
+ tests/tcg/i386/README                         |   38 +
+ tests/tcg/{ => i386}/hello-i386.c             |    1 +
+ tests/tcg/{ => i386}/pi_10.com                |  Bin
+ tests/tcg/{ => i386}/runcom.c                 |    0
+ tests/tcg/{ => i386}/test-i386-code16.S       |    0
+ tests/tcg/{ => i386}/test-i386-fprem.c        |   12 +-
+ tests/tcg/{ => i386}/test-i386-muldiv.h       |    0
+ tests/tcg/{ => i386}/test-i386-shift.h        |    0
+ tests/tcg/{ => i386}/test-i386-ssse3.c        |    0
+ tests/tcg/{ => i386}/test-i386-vm86.S         |    0
+ tests/tcg/{ => i386}/test-i386.c              |    7 +-
+ tests/tcg/{ => i386}/test-i386.h              |    0
+ tests/tcg/m68k/Makefile.include               |    2 +
+ tests/tcg/m68k/Makefile.target                |   11 +
+ tests/tcg/mips/Makefile.include               |   20 +
+ tests/tcg/mips/Makefile.target                |   29 +
+ tests/tcg/mips/README                         |    7 +
+ tests/tcg/{ => mips}/hello-mips.c             |    0
+ tests/tcg/multiarch/Makefile.target           |   29 +
+ tests/tcg/multiarch/README                    |    1 +
+ tests/tcg/{ => multiarch}/linux-test.c        |   93 +-
+ tests/tcg/{ => multiarch}/sha1.c              |    0
+ tests/tcg/{ => multiarch}/test-mmap.c         |   38 +-
+ tests/tcg/{ => multiarch}/testthread.c        |    0
+ tests/tcg/ppc64le/Makefile.include            |    2 +
+ tests/tcg/s390x/Makefile.include              |    2 +
+ tests/tcg/s390x/Makefile.target               |    6 +
+ tests/tcg/sh4/Makefile.include                |    4 +
+ tests/tcg/sh4/Makefile.target                 |    6 +
+ tests/tcg/sparc64/Makefile.include            |    2 +
+ tests/tcg/sparc64/Makefile.target             |    8 +
+ tests/tcg/test_path.c                         |  157 --
+ tests/tcg/x86_64/Makefile.target              |   15 +
+ 70 files changed, 2495 insertions(+), 504 deletions(-)
+ create mode 100644 tests/docker/dockerfiles/debian-alpha-cross.docker
+ create mode 100644 tests/docker/dockerfiles/debian-cross-build.docker
+ create mode 100644 tests/docker/dockerfiles/debian-hppa-cross.docker
+ create mode 100644 tests/docker/dockerfiles/debian-m68k-cross.docker
+ create mode 100644 tests/docker/dockerfiles/debian-mips64-cross.docker
+ create mode 100644 tests/docker/dockerfiles/debian-sh4-cross.docker
+ create mode 100644 tests/docker/dockerfiles/debian-sid.docker
+ create mode 100644 tests/docker/dockerfiles/debian-sparc64-cross.docker
+ create mode 100644 tests/docker/dockerfiles/fedora-i386-cross.docker
+ create mode 100644 tests/tcg/Makefile.include
+ create mode 100644 tests/tcg/aarch64/Makefile.target
+ create mode 100644 tests/tcg/aarch64/fcvt.c
+ create mode 100644 tests/tcg/aarch64/fcvt.out
+ delete mode 100644 tests/tcg/alpha/Makefile
+ create mode 100644 tests/tcg/alpha/Makefile.include
+ create mode 100644 tests/tcg/alpha/Makefile.target
+ rename tests/tcg/alpha/{crt.s => crt.S} (100%)
+ create mode 100644 tests/tcg/arm/Makefile.target
+ create mode 100644 tests/tcg/arm/README
+ rename tests/tcg/{ => arm}/hello-arm.c (100%)
+ rename tests/tcg/{test-arm-iwmmxt.s => arm/test-arm-iwmmxt.S} (100%)
+ create mode 100644 tests/tcg/hppa/Makefile.include
+ create mode 100644 tests/tcg/hppa/Makefile.target
+ create mode 100644 tests/tcg/i386/Makefile.include
+ create mode 100644 tests/tcg/i386/Makefile.target
+ create mode 100644 tests/tcg/i386/README
+ rename tests/tcg/{ => i386}/hello-i386.c (96%)
+ rename tests/tcg/{ => i386}/pi_10.com (100%)
+ rename tests/tcg/{ => i386}/runcom.c (100%)
+ rename tests/tcg/{ => i386}/test-i386-code16.S (100%)
+ rename tests/tcg/{ => i386}/test-i386-fprem.c (97%)
+ rename tests/tcg/{ => i386}/test-i386-muldiv.h (100%)
+ rename tests/tcg/{ => i386}/test-i386-shift.h (100%)
+ rename tests/tcg/{ => i386}/test-i386-ssse3.c (100%)
+ rename tests/tcg/{ => i386}/test-i386-vm86.S (100%)
+ rename tests/tcg/{ => i386}/test-i386.c (99%)
+ rename tests/tcg/{ => i386}/test-i386.h (100%)
+ create mode 100644 tests/tcg/m68k/Makefile.include
+ create mode 100644 tests/tcg/m68k/Makefile.target
+ create mode 100644 tests/tcg/mips/Makefile.include
+ create mode 100644 tests/tcg/mips/Makefile.target
+ create mode 100644 tests/tcg/mips/README
+ rename tests/tcg/{ => mips}/hello-mips.c (100%)
+ create mode 100644 tests/tcg/multiarch/Makefile.target
+ create mode 100644 tests/tcg/multiarch/README
+ rename tests/tcg/{ => multiarch}/linux-test.c (87%)
+ rename tests/tcg/{ => multiarch}/sha1.c (100%)
+ rename tests/tcg/{ => multiarch}/test-mmap.c (94%)
+ rename tests/tcg/{ => multiarch}/testthread.c (100%)
+ create mode 100644 tests/tcg/ppc64le/Makefile.include
+ create mode 100644 tests/tcg/s390x/Makefile.include
+ create mode 100644 tests/tcg/s390x/Makefile.target
+ create mode 100644 tests/tcg/sh4/Makefile.include
+ create mode 100644 tests/tcg/sh4/Makefile.target
+ create mode 100644 tests/tcg/sparc64/Makefile.include
+ create mode 100644 tests/tcg/sparc64/Makefile.target
+ delete mode 100644 tests/tcg/test_path.c
+ create mode 100644 tests/tcg/x86_64/Makefile.target
+
 -- 
 2.17.0
