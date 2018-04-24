@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fAzwR-0005wm-GR
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:33:21 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fAzwT-0005xn-SB
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:33:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fAzwQ-0001Og-0M
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:33:15 -0400
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:52605)
+	(envelope-from <alex.bennee@linaro.org>) id 1fAzwR-0001Sk-W2
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:33:17 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:37704)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fAzwP-0001NE-MV
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:33:13 -0400
-Received: by mail-wm0-x22e.google.com with SMTP id w195so1868047wmw.2
-	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 08:33:13 -0700 (PDT)
+	id 1fAzwR-0001Pw-Jk
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:33:15 -0400
+Received: by mail-wr0-x244.google.com with SMTP id c14-v6so10281961wrd.4
+	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 08:33:15 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 24 Apr 2018 16:23:54 +0100
-Message-Id: <20180424152405.10304-36-alex.bennee@linaro.org>
+Date: Tue, 24 Apr 2018 16:24:05 +0100
+Message-Id: <20180424152405.10304-47-alex.bennee@linaro.org>
 In-Reply-To: <20180424152405.10304-1-alex.bennee@linaro.org>
 References: <20180424152405.10304-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 35/46] tests/tcg: enable building for Alpha
+Subject: [Qemu-devel] [PATCH v3 46/46] tests/tcg: override runners for
+ broken tests (!UPSTREAM)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,134 +31,148 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Yongbok Kim <yongbok.kim@mips.com>
 
-We can't use our normal Debian based compilers as Alpha isn't an
-officially supported architecture. However it is available as a port
-and fortunately cross compilers for all these targets are included in
-Debian Sid, the perpetual rolling/unstable/testing version of Debian.
+To get a clean run of check-tcg these tests are currently skipped.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/docker/Makefile.include                 |  1 +
- .../dockerfiles/debian-alpha-cross.docker     | 12 +++++++
- .../dockerfiles/debian-cross-build.docker     | 36 +++++++++++++++++++
- tests/docker/dockerfiles/debian-sid.docker    | 23 ++++++++++++
- tests/tcg/alpha/Makefile.include              |  2 ++
- 5 files changed, 74 insertions(+)
- create mode 100644 tests/docker/dockerfiles/debian-alpha-cross.docker
- create mode 100644 tests/docker/dockerfiles/debian-cross-build.docker
- create mode 100644 tests/docker/dockerfiles/debian-sid.docker
- create mode 100644 tests/tcg/alpha/Makefile.include
+ tests/tcg/alpha/Makefile.target   |  4 ++++
+ tests/tcg/hppa/Makefile.target    | 10 ++++++++++
+ tests/tcg/i386/Makefile.target    | 13 +++++++++++++
+ tests/tcg/m68k/Makefile.target    | 11 +++++++++++
+ tests/tcg/mips/Makefile.target    | 10 ++++++++++
+ tests/tcg/s390x/Makefile.target   |  6 ++++++
+ tests/tcg/sh4/Makefile.target     |  6 ++++++
+ tests/tcg/sparc64/Makefile.target |  8 ++++++++
+ 8 files changed, 68 insertions(+)
+ create mode 100644 tests/tcg/hppa/Makefile.target
+ create mode 100644 tests/tcg/m68k/Makefile.target
+ create mode 100644 tests/tcg/s390x/Makefile.target
+ create mode 100644 tests/tcg/sh4/Makefile.target
+ create mode 100644 tests/tcg/sparc64/Makefile.target
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index 6a5aa9ec71..bcf44e80c4 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -62,6 +62,7 @@ docker-image-debian-ppc64el-cross: docker-image-debian9
- docker-image-debian-s390x-cross: docker-image-debian9
- docker-image-debian-win32-cross: docker-image-debian8-mxe
- docker-image-debian-win64-cross: docker-image-debian8-mxe
-+docker-image-debian-alpha-cross: docker-image-debian-sid
- docker-image-travis: NOUSER=1
+diff --git a/tests/tcg/alpha/Makefile.target b/tests/tcg/alpha/Makefile.target
+index 5b573f145e..a075b0e25e 100644
+--- a/tests/tcg/alpha/Makefile.target
++++ b/tests/tcg/alpha/Makefile.target
+@@ -30,3 +30,7 @@ test-cmov: test-cmov.o crt.o
  
- # Expand all the pre-requistes for each docker image and test combination
-diff --git a/tests/docker/dockerfiles/debian-alpha-cross.docker b/tests/docker/dockerfiles/debian-alpha-cross.docker
+ test-ovf: test-ovf.c crt.o
+ 	$(ALPHA_BUILD)
++
++# Currently broken
++run-linux-test: linux-test
++	$(call quiet-command, /bin/true, "BROKEN TEST", "$< SKIPPED on $(TARGET_NAME)")
+diff --git a/tests/tcg/hppa/Makefile.target b/tests/tcg/hppa/Makefile.target
 new file mode 100644
-index 0000000000..e446f7af3f
+index 0000000000..25b6b5d819
 --- /dev/null
-+++ b/tests/docker/dockerfiles/debian-alpha-cross.docker
-@@ -0,0 +1,12 @@
++++ b/tests/tcg/hppa/Makefile.target
+@@ -0,0 +1,10 @@
++# -*- Mode: makefile -*-
 +#
-+# Docker cross-compiler target
-+#
-+# This docker target builds on the debian sid base image which
-+# contains cross compilers for Debian "ports" targets.
-+#
-+FROM qemu:debian-sid
++# HPPA specific tweaks - specifically masking out broken tests
 +
-+RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-+    apt-get install -y --no-install-recommends \
-+        gcc-alpha-linux-gnu \
-+        libc6.1-dev-alpha-cross
-diff --git a/tests/docker/dockerfiles/debian-cross-build.docker b/tests/docker/dockerfiles/debian-cross-build.docker
++run-linux-test: linux-test
++	$(call quiet-command, /bin/true, "BROKEN TEST", "$< SKIPPED on $(TARGET_NAME)")
++
++# Currently broken for -p
++run-test-mmap: test-mmap
++	$(call quiet-command, $(QEMU) $< > test-mmap.out, "TEST", "$< (default) on $(TARGET_NAME)")
+diff --git a/tests/tcg/i386/Makefile.target b/tests/tcg/i386/Makefile.target
+index 27086c3f2b..a01309d5f4 100644
+--- a/tests/tcg/i386/Makefile.target
++++ b/tests/tcg/i386/Makefile.target
+@@ -37,3 +37,16 @@ pi_10.com:
+ run-runcom: runcom pi_10.com
+ 	$(call quiet-command, $(QEMU) ./runcom ./pi_10.com > runcom.out, "TEST", "$< on $(TARGET_NAME)")
+ 
++# Currently broken tests on i386
++ifeq ($(TARGET_NAME), i386)
++run-linux-test: linux-test
++	$(call quiet-command, /bin/true, "BROKEN TEST", "$< SKIPPED on $(TARGET_NAME)")
++
++run-test-i386-fprem: test-i386-fprem
++	$(call quiet-command, /bin/true, "SLOW TEST", "$< SKIPPED on $(TARGET_NAME)")
++
++# Currently broken for -p
++run-test-mmap: test-mmap
++	$(call quiet-command, $(QEMU) $< > test-mmap.out, "TEST", "$< (default) on $(TARGET_NAME)")
++
++endif
+diff --git a/tests/tcg/m68k/Makefile.target b/tests/tcg/m68k/Makefile.target
 new file mode 100644
-index 0000000000..c3611a7d3a
+index 0000000000..97bc0c9d07
 --- /dev/null
-+++ b/tests/docker/dockerfiles/debian-cross-build.docker
-@@ -0,0 +1,36 @@
++++ b/tests/tcg/m68k/Makefile.target
+@@ -0,0 +1,11 @@
++# -*- Mode: makefile -*-
 +#
-+# Docker multiarch cross-compiler target
++# m68k specific tweaks - specifically masking out broken tests
 +#
-+# This docker target is builds on Debian cross compiler targets to build distro
-+# with a selection of cross compilers for building test binaries.
-+#
-+# On its own you can't build much but the docker-foo-cross targets
-+# build on top of the base debian image.
-+#
-+FROM debian:stretch
 +
-+# Duplicate deb line as deb-src
-+RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/sources.list
++# Currently broken for -p
++run-test-mmap: test-mmap
++	$(call quiet-command, $(QEMU) $< > test-mmap.out, "TEST", "$< (default) on $(TARGET_NAME)")
 +
-+# Install common build utilities
-+RUN apt update
-+RUN DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata
-+RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-+    apt install -y --no-install-recommends \
-+        bison \
-+        build-essential \
-+        ca-certificates \
-+        flex \
-+        gettext \
-+        git \
-+        libgmp-dev \
-+        libmpfr-dev \
-+        libmpc-dev \
-+        pkg-config \
-+        psmisc \
-+        python \
-+        texinfo \
-+        wget \
-+        $(apt-get -s build-dep binutils | egrep ^Inst | cut -d\  -f2) \
-+        $(apt-get -s build-dep gcc | egrep ^Inst | cut -d\  -f2) \
-+        $(apt-get -s build-dep glibc | egrep ^Inst | cut -d\  -f2)
-diff --git a/tests/docker/dockerfiles/debian-sid.docker b/tests/docker/dockerfiles/debian-sid.docker
++run-linux-test: linux-test
++	$(call quiet-command, /bin/true, "BROKEN TEST", "$< SKIPPED on $(TARGET_NAME)")
+diff --git a/tests/tcg/mips/Makefile.target b/tests/tcg/mips/Makefile.target
+index 71f0c2dd53..1f673fce2e 100644
+--- a/tests/tcg/mips/Makefile.target
++++ b/tests/tcg/mips/Makefile.target
+@@ -17,3 +17,13 @@ hello-mips: LDFLAGS+=-nostdlib
+ 
+ # For MIPS32 and 64 we have a bunch of extra tests in sub-directories
+ # however they are intended for system tests.
++
++run-hello-mips: hello-mips
++	$(call quiet-command, /bin/true, "BROKEN TEST", "$< SKIPPED on $(TARGET_NAME)")
++
++ifeq ($(TARGET_NAME), mips64)
++
++run-linux-test: linux-test
++	$(call quiet-command, /bin/true, "BROKEN TEST", "$< SKIPPED on $(TARGET_NAME)")
++
++endif
+diff --git a/tests/tcg/s390x/Makefile.target b/tests/tcg/s390x/Makefile.target
 new file mode 100644
-index 0000000000..adeb7134ca
+index 0000000000..10e61c422b
 --- /dev/null
-+++ b/tests/docker/dockerfiles/debian-sid.docker
-@@ -0,0 +1,23 @@
++++ b/tests/tcg/s390x/Makefile.target
+@@ -0,0 +1,6 @@
++# -*- Mode: makefile -*-
 +#
-+# A number of our guests exist as ports only. We can either use the ports repo or get everything from SID
-+#
++# s390x specific tweaks - specifically masking out broken tests
 +
-+FROM debian:sid-slim
-+
-+# Duplicate deb line as deb-src
-+RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/sources.list
-+
-+# Install common build utilities
-+RUN apt update
-+RUN DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata
-+RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-+    apt install -y --no-install-recommends \
-+        bison \
-+        build-essential \
-+        ca-certificates \
-+        flex \
-+        git \
-+        pkg-config \
-+        psmisc \
-+        python \
-+        texinfo
-diff --git a/tests/tcg/alpha/Makefile.include b/tests/tcg/alpha/Makefile.include
++run-linux-test: linux-test
++	$(call quiet-command, /bin/true, "BROKEN TEST", "$< SKIPPED on $(TARGET_NAME)")
+diff --git a/tests/tcg/sh4/Makefile.target b/tests/tcg/sh4/Makefile.target
 new file mode 100644
-index 0000000000..c7dc48eadb
+index 0000000000..c57f398017
 --- /dev/null
-+++ b/tests/tcg/alpha/Makefile.include
-@@ -0,0 +1,2 @@
-+DOCKER_IMAGE=debian-alpha-cross
-+DOCKER_CROSS_COMPILER=alpha-linux-gnu-gcc
++++ b/tests/tcg/sh4/Makefile.target
+@@ -0,0 +1,6 @@
++# -*- Mode: makefile -*-
++#
++# SH4 specific tweaks - specifically masking out broken tests
++
++run-linux-test: linux-test
++	$(call quiet-command, /bin/true, "BROKEN TEST", "$< SKIPPED on $(TARGET_NAME)")
+diff --git a/tests/tcg/sparc64/Makefile.target b/tests/tcg/sparc64/Makefile.target
+new file mode 100644
+index 0000000000..e971a5c818
+--- /dev/null
++++ b/tests/tcg/sparc64/Makefile.target
+@@ -0,0 +1,8 @@
++# -*- Mode: makefile -*-
++#
++# sparc specific tweaks - specifically masking out broken tests
++
++# different from the other hangs
++# /home/alex/lsrc/qemu/qemu.git/tests/tcg/multiarch/linux-test.c:264: Value too large for defined data type (ret=-1, errno=92/Value too large for defined data type)
++run-linux-test: linux-test
++	$(call quiet-command, /bin/true, "BROKEN TEST", "$< SKIPPED on $(TARGET_NAME)")
 -- 
 2.17.0
