@@ -1,40 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1fAyDW-0005HG-LW
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 09:42:47 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fAyE6-0005en-QE
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 09:43:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1fAyDT-0007O3-BD
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 09:42:46 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56418)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
-	id 1fAyDS-0007NU-VQ
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 09:42:43 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w3ODbeEt017609
-	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 09:42:41 -0400
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2hj523agvb-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 09:42:39 -0400
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
-	Tue, 24 Apr 2018 14:41:34 +0100
-References: <1524470305-26484-1-git-send-email-thuth@redhat.com>
-	<1524470305-26484-3-git-send-email-thuth@redhat.com>
-From: Viktor VM Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Date: Tue, 24 Apr 2018 15:41:31 +0200
+	(envelope-from <stefanha@redhat.com>) id 1fAyE5-0007oB-Lq
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 09:43:22 -0400
+Date: Tue, 24 Apr 2018 14:43:07 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180424134307.GA5120@stefanha-x1.localdomain>
+References: <20180419075232.31407-1-stefanha@redhat.com>
+	<6d37b435-bc05-a776-3e7f-c73adec4ee74@redhat.com>
+	<20180420030542.GD10319@stefanha-x1.localdomain>
+	<dd343653-f9d0-48fa-b71f-27c845551130@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1524470305-26484-3-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Message-Id: <13a57e92-10ff-d89c-907b-3e927f6a9f3d@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] pc-bios/s390-ccw/net: Add support
- for pxelinux-style config files
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="sm4nu43k4a2Rpi4c"
+Content-Disposition: inline
+In-Reply-To: <dd343653-f9d0-48fa-b71f-27c845551130@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 0/2] block/file-posix: allow -drive
+ cache.direct=off live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,74 +27,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-On 23.04.2018 09:58, Thomas Huth wrote:
-[...]
-> +
-> +static int net_try_pxelinux_cfgs(filename_ip_t *fn_ip)
-> +{
-> +    int rc, idx;
-> +    char basedir[256];
-> +    int has_basedir;
-> +
-> +    cfgbuf[sizeof(cfgbuf) - 1] = 0;   /* Make sure that it is NUL-terminated */
-> +
-> +    /* Did we get a usable base directory via DHCP? */
-> +    idx = strlen((char *)fn_ip->filename);
-> +    if (idx > 0 && idx < sizeof(basedir) - 40 &&
-> +        fn_ip->filename[idx - 1] == '/') {
-> +        has_basedir = true;
-> +        strcpy(basedir, (char *)fn_ip->filename);
-> +    } else {
-> +        has_basedir = false;
-> +        strcpy(basedir, "pxelinux.cfg/");
-> +    }
-> +
-> +    printf("Trying pxelinux.cfg files...\n");
-> +
-> +    /* Look for config file with MAC address in its name */
-> +    sprintf((char *)fn_ip->filename, "%s%02x-%02x-%02x-%02x-%02x-%02x",
-> +            basedir, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-Just noticed that the filename has to be <basedir>/pxelinux.cfg/01-<mac>
-per [1].
-> +    rc = tftp_load(fn_ip, cfgbuf, sizeof(cfgbuf) - 1);
-> +    if (rc > 0) {
-> +        return handle_pxelinux_cfg(fn_ip, cfgbuf, sizeof(cfgbuf));
-> +    }
-> +
-> +    /* Look for config file with IP address in its name */
-> +    if (ip_version == 4) {
-> +        for (idx = 0; (has_basedir && idx <= 7) || idx < 1; idx++) {
-> +            sprintf((char *)fn_ip->filename, "%s%02X%02X%02X%02X", basedir,
-> +                    (fn_ip->own_ip >> 24) & 0xff, (fn_ip->own_ip >> 16) & 0xff,
-> +                    (fn_ip->own_ip >> 8) & 0xff, fn_ip->own_ip & 0xff);
-> +            fn_ip->filename[strlen((char *)fn_ip->filename) - idx] = 0;
-> +            rc = tftp_load(fn_ip, cfgbuf, sizeof(cfgbuf) - 1);
-> +            if (rc > 0) {
-> +                return handle_pxelinux_cfg(fn_ip, cfgbuf, sizeof(cfgbuf));
-> +            }
-> +        }
-> +    }
-> +
-> +    /* Try "default" config file */
-> +    if (has_basedir) {
-> +        sprintf((char *)fn_ip->filename, "%sdefault", basedir);
-> +        rc = tftp_load(fn_ip, cfgbuf, sizeof(cfgbuf) - 1);
-> +        if (rc > 0) {
-> +            return handle_pxelinux_cfg(fn_ip, cfgbuf, sizeof(cfgbuf));
-> +        }
-> +    }
-> +
-> +    return -1;
-> +}
-> +
-[...]
 
-[1
-]https://www.syslinux.org/wiki/index.php?title=PXELINUX#Configuration_filename
+--sm4nu43k4a2Rpi4c
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Regards,
-  Viktor Mihajlovski
+On Fri, Apr 20, 2018 at 08:53:33AM -0500, Eric Blake wrote:
+> On 04/19/2018 10:05 PM, Stefan Hajnoczi wrote:
+>=20
+> >>> This patch series implements .bdrv_co_invalidate_cache() for block/fi=
+le-posix.c
+> >>> on Linux so that shared storage live migration works.  I have sent it=
+ as an RFC
+> >>> because cache consistency is not binary, there are corner cases which=
+ I've
+> >>> described in the actual patch, and this may require more discussion.
+> >>
+> >> Interesting, in that the NBD list is also discussing the possible
+> >> standardization of a NBD_CMD_CACHE command (based on existing practice
+> >> in the xNBD implementation), and covering whether that MIGHT be worth
+> >> doing as a thin wrapper that corresponds to posix_fadvise() semantics.
+> >> Thus, if NBD_CMD_CACHE learns flags, we could support
+> >> .bdrv_co_invalidate_cache() through the NBD protocol driver, in additi=
+on
+> >> to the POSIX file driver.  Obviously, your usage invalidates the cache
+> >> of the entire file; but does it also make sense to expose a start/leng=
+th
+> >> subset invalidation, for better exposure to posix_fadvise() semantics?
+> >=20
+> > bdrv_co_invalidate_cache() is currently only used by migration before
+> > using a file that may have been touched by the other host.  I don't
+> > think start/length will be needed for that use case.
+> >=20
+> > Can you describe how will NBD use cache invalidation?  Maybe this will
+> > help me understand other use cases.
+>=20
+> That's where things are still under discussion - no one has yet provided
+> a case that would benefit from a POSIX_FADV_DONTNEED over just a range
+> of the file [1]; on the other hand, it might make sense that if you know
+> an implementation has a limited cache, then having control over the
+> various posix_fadvise() flags over various ranges of the files may lead
+> to more optimum behavior.  And posix_fadvise() does have the ability to
+> work over the entire file (offset 0 length 0) or a subrange (any offset
+> and nonzero length).  So I'm also fine if .bdrv_co_invalidate_cache()
+> doesn't expose offset/length parameters, particularly if NBD can't come
+> up with an actual use case that would benefit.
+>=20
+> [1] https://lists.debian.org/nbd/2018/04/msg00020.html
+
+Okay.  .bdrv_co_invalidate_cache() is an internal interface.  We can
+change it later to support NBD functionality, if necessary.  Let's keep
+it without start/length for now.
+
+Stefan
+
+--sm4nu43k4a2Rpi4c
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJa3zRrAAoJEJykq7OBq3PIOokH/2EYSmBesTa71q1TNb23cidW
+08vj/ttGrHv3C93GjQgnRFtqqu0AtvMoJIcvqqcAqaXC7nSVmwttBJsKB72ehm5W
+St36NL8Al49HRg/s1Xh2tXe2Zc23cPwdnJ3wyF4heaThlAOAv86YbHMMuEx9yOg7
+JN0wzS6Y1cRlVTP8kfVYwJFZZq5Z1FZNAF09DUItcRvX+QsAL3md2mj94/2ivPDT
+9WuuNwRZz+gcw19VhsddwkOC6OKntDxZhztIfcJi7UgnL/MsZt+WBITQsFa6OHpy
+axPiY5+BVPBACuYVIum/oBpoUlibYt1HEJPdw6cmB/qTBZ0eOXXQk1AtaewwcWI=
+=KNJr
+-----END PGP SIGNATURE-----
+
+--sm4nu43k4a2Rpi4c--
