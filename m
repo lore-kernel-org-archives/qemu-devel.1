@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36580)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36594)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=6454bde7c=Ian.Jackson@citrix.com>)
-	id 1fB2DK-0007KE-Uv
+	id 1fB2DL-0007KH-DJ
 	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:58:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=6454bde7c=Ian.Jackson@citrix.com>)
-	id 1fB2DH-00071J-5S
+	id 1fB2DK-00073S-4y
 	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:58:51 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:9743)
+Received: from smtp03.citrix.com ([162.221.156.55]:9785)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <prvs=6454bde7c=Ian.Jackson@citrix.com>)
-	id 1fB2DG-0006on-D9
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:58:47 -0400
+	id 1fB2DJ-00071c-RO
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:58:50 -0400
 From: Ian Jackson <ian.jackson@eu.citrix.com>
-Date: Tue, 24 Apr 2018 18:58:20 +0100
-Message-ID: <1524592709-6553-8-git-send-email-ian.jackson@eu.citrix.com>
+Date: Tue, 24 Apr 2018 18:58:23 +0100
+Message-ID: <1524592709-6553-11-git-send-email-ian.jackson@eu.citrix.com>
 In-Reply-To: <1524592709-6553-1-git-send-email-ian.jackson@eu.citrix.com>
 References: <1524592709-6553-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 07/16] xen: move xc_interface compatibility
- fallback further up the file
+Subject: [Qemu-devel] [PATCH 10/16] os-posix: Provide new -runas <uid>:<gid>
+ facility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,70 +30,167 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>
+Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
 
-We are going to want to use the dummy xendevicemodel_handle type in
-new stub functions in the CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
-section.  So we need to provide that definition, or (as applicable)
-include the appropriate header, earlier in the file.
+This allows the caller to specify a uid and gid to use, even if there
+is no corresponding password entry.  This will be useful in certain
+Xen configurations.
 
-(Ideally the newer compatibility layers would be at the bottom of the
-file, so that they can naturally benefit from the compatibility layers
-for earlier version.  But that's rather too much for this series.)
-
-No functional change.
+We don't support just -runas <uid> because: (i) deprivileging without
+calling setgroups would be ineffective (ii) given only a uid we don't
+know what gid we ought to use (since uids may eppear in multiple
+passwd file entries with different gids).
 
 Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
-Acked-by: Stefano Stabellini <sstabellini@kernel.org>
+Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Markus Armbruster <armbru@redhat.com>
+CC: Daniel P. Berrange <berrange@redhat.com>
+CC: Michael Tokarev <mjt@tls.msk.ru>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
-v2: New patch in v2 of the series
+v7: Be much more explicit about legal combinations of user_{pwd,uid,gid}.
+    Rely more on qemu_stroul being sane, dropping pointless
+     pre-assignments of errno and lv.
+    Retain optarg in error message about -runas argument.
+    Rebase over introduction of error_report in change_process_uid.
+v6.1: Fix constness of qemu_strtoul end pointer parameter.
+v6: Use qemu_strtoul for the first strtoul.
+    Use error_report rather than fprintf to print usage error message.
+    Fix an error message which still referred to . rather than :
+v5: Use : rather than . to separate uid from gid
+v4: Changed to reuse option -runas
+v3: Error messages fixed.  Thanks to Peter Maydell and Ross Lagerwall.
 ---
- include/hw/xen/xen_common.h | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+ os-posix.c      | 77 ++++++++++++++++++++++++++++++++++++++++++++++++---------
+ qemu-options.hx |  3 ++-
+ 2 files changed, 67 insertions(+), 13 deletions(-)
 
-diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
-index 1766bb9..60c4ebb 100644
---- a/include/hw/xen/xen_common.h
-+++ b/include/hw/xen/xen_common.h
-@@ -78,6 +78,17 @@ static inline void *xenforeignmemory_map(xc_interface *h, uint32_t dom,
- 
- extern xenforeignmemory_handle *xen_fmem;
- 
-+#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
-+
-+typedef xc_interface xendevicemodel_handle;
-+
-+#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
-+
-+#undef XC_WANT_COMPAT_DEVICEMODEL_API
-+#include <xendevicemodel.h>
-+
-+#endif
-+
- #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
- 
- #define XEN_COMPAT_PHYSMAP
-@@ -105,8 +116,6 @@ static inline int xentoolcore_restrict_all(domid_t domid)
- 
- #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
- 
--typedef xc_interface xendevicemodel_handle;
--
- static inline xendevicemodel_handle *xendevicemodel_open(
-     struct xentoollog_logger *logger, unsigned int open_flags)
- {
-@@ -228,11 +237,6 @@ static inline int xendevicemodel_set_mem_type(
-     return xc_hvm_set_mem_type(dmod, domid, mem_type, first_pfn, nr);
- }
- 
--#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
--
--#undef XC_WANT_COMPAT_DEVICEMODEL_API
--#include <xendevicemodel.h>
--
+diff --git a/os-posix.c b/os-posix.c
+index 560db95..0f59566 100644
+--- a/os-posix.c
++++ b/os-posix.c
+@@ -41,7 +41,14 @@
+ #include <sys/prctl.h>
  #endif
  
- extern xendevicemodel_handle *xen_dmod;
+-static struct passwd *user_pwd;
++/*
++ * Must set all three of these at once.
++ * Legal combinations are              unset   by name   by uid
++ */
++static struct passwd *user_pwd;    /*   NULL   non-NULL   NULL   */
++static uid_t user_uid = (uid_t)-1; /*   -1      -1        >=0    */
++static gid_t user_gid = (gid_t)-1; /*   -1      -1        >=0    */
++
+ static const char *chroot_dir;
+ static int daemonize;
+ static int daemon_pipe;
+@@ -127,6 +134,33 @@ void os_set_proc_name(const char *s)
+ #endif
+ }
+ 
++
++static bool os_parse_runas_uid_gid(const char *optarg)
++{
++    unsigned long lv;
++    const char *ep;
++    uid_t got_uid;
++    gid_t got_gid;
++    int rc;
++
++    rc = qemu_strtoul(optarg, &ep, 0, &lv);
++    got_uid = lv; /* overflow here is ID in C99 */
++    if (rc || *ep != ':' || got_uid != lv || got_uid == (uid_t)-1) {
++        return false;
++    }
++
++    rc = qemu_strtoul(ep + 1, 0, 0, &lv);
++    got_gid = lv; /* overflow here is ID in C99 */
++    if (rc || got_gid != lv || got_gid == (gid_t)-1) {
++        return false;
++    }
++
++    user_pwd = NULL;
++    user_uid = got_uid;
++    user_gid = got_gid;
++    return true;
++}
++
+ /*
+  * Parse OS specific command line options.
+  * return 0 if option handled, -1 otherwise
+@@ -144,8 +178,13 @@ void os_parse_cmd_args(int index, const char *optarg)
+ #endif
+     case QEMU_OPTION_runas:
+         user_pwd = getpwnam(optarg);
+-        if (!user_pwd) {
+-            fprintf(stderr, "User \"%s\" doesn't exist\n", optarg);
++        if (user_pwd) {
++            user_uid = -1;
++            user_gid = -1;
++        } else if (!os_parse_runas_uid_gid(optarg)) {
++            error_report("User \"%s\" doesn't exist"
++                         " (and is not <uid>:<gid>)",
++                         optarg);
+             exit(1);
+         }
+         break;
+@@ -165,18 +204,32 @@ void os_parse_cmd_args(int index, const char *optarg)
+ 
+ static void change_process_uid(void)
+ {
+-    if (user_pwd) {
+-        if (setgid(user_pwd->pw_gid) < 0) {
+-            error_report("Failed to setgid(%d)", user_pwd->pw_gid);
++    assert((user_uid == (uid_t)-1) || user_pwd == NULL);
++    assert((user_uid == (uid_t)-1) ==
++           (user_gid == (gid_t)-1));
++
++    if (user_pwd || user_uid != (uid_t)-1) {
++        gid_t intended_gid = user_pwd ? user_pwd->pw_gid : user_gid;
++        uid_t intended_uid = user_pwd ? user_pwd->pw_uid : user_uid;
++        if (setgid(intended_gid) < 0) {
++            error_report("Failed to setgid(%d)", intended_gid);
+             exit(1);
+         }
+-        if (initgroups(user_pwd->pw_name, user_pwd->pw_gid) < 0) {
+-            error_report("Failed to initgroups(\"%s\", %d)",
+-                         user_pwd->pw_name, user_pwd->pw_gid);
+-            exit(1);
++        if (user_pwd) {
++            if (initgroups(user_pwd->pw_name, user_pwd->pw_gid) < 0) {
++                error_report("Failed to initgroups(\"%s\", %d)",
++                        user_pwd->pw_name, user_pwd->pw_gid);
++                exit(1);
++            }
++        } else {
++            if (setgroups(1, &user_gid) < 0) {
++                error_report("Failed to setgroups(1, [%d])",
++                        user_gid);
++                exit(1);
++            }
+         }
+-        if (setuid(user_pwd->pw_uid) < 0) {
+-            error_report("Failed to setuid(%d)", user_pwd->pw_uid);
++        if (setuid(intended_uid) < 0) {
++            error_report("Failed to setuid(%d)", intended_uid);
+             exit(1);
+         }
+         if (setuid(0) != -1) {
+diff --git a/qemu-options.hx b/qemu-options.hx
+index ca4e412..5fbf966 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3765,7 +3765,8 @@ ETEXI
+ 
+ #ifndef _WIN32
+ DEF("runas", HAS_ARG, QEMU_OPTION_runas, \
+-    "-runas user     change to user id user just before starting the VM\n",
++    "-runas user     change to user id user just before starting the VM\n" \
++    "                user can be numeric uid:gid instead\n",
+     QEMU_ARCH_ALL)
+ #endif
+ STEXI
 -- 
 2.1.4
