@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fAzp1-0007mp-Fw
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:25:36 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fAzp3-0007pD-BF
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:25:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fAzoz-0007m6-2P
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:25:35 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fAzp1-0007sS-Ux
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:25:37 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 24 Apr 2018 17:24:42 +0200
-Message-Id: <20180424152515.25664-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 00/33] Generic background jobs
+Date: Tue, 24 Apr 2018 17:24:47 +0200
+Message-Id: <20180424152515.25664-6-kwolf@redhat.com>
+In-Reply-To: <20180424152515.25664-1-kwolf@redhat.com>
+References: <20180424152515.25664-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [RFC PATCH 05/33] blockjob: Add block_job_driver()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,90 +22,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-Before we can make x-blockdev-create a background job, we need to
-generalise the job infrastructure so that it can be used without any
-associated block node.
+The backup block job directly accesses the driver field in BlockJob. Add
+a wrapper for getting it.
 
-This series extracts a Job object from the block job infrastructure,
-which should contain everything related to jobs that doesn't require the
-block layer to be involved.
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ include/block/blockjob.h | 7 +++++++
+ block/backup.c           | 8 +++++---
+ blockjob.c               | 5 +++++
+ 3 files changed, 17 insertions(+), 3 deletions(-)
 
-The split between BlockJob and Job is reasonably complete as of this RFC
-(though there are still some rough edges). Missing are mainly:
-
-* Some cleanups. This means mostly TODOs left for functions moved to
-  job.c that should become static again, but were still called from
-  blockjob.c. At this point, most of these public declarations aren't
-  actually necessary any more, or very little is missing to make them
-  unnecessary.
-
-* A QMP interface that can be used with non-block job. The existing
-  block-job-* QMP commands will tell the user that they don't know the
-  job if you pass the ID of a non-block job.
-
-* The actual conversion of x-blockdev-create to Job, as a proof of
-  concept that the generalised infrastructure actually works.
-
-Kevin Wolf (33):
-  blockjob: Wrappers for progress counter access
-  blockjob: Move RateLimit to BlockJob
-  blockjob: Implement block_job_set_speed() centrally
-  blockjob: Introduce block_job_ratelimit_get_delay()
-  blockjob: Add block_job_driver()
-  blockjob: Remove block_job_pause/resume_all()
-  job: Create Job, JobDriver and job_create()
-  job: Rename BlockJobType into JobType
-  job: Add JobDriver.job_type
-  job: Add job_delete()
-  job: Maintain a list of all jobs
-  job: Move state transitions to Job
-  job: Add reference counting
-  job: Move cancelled to Job
-  job: Add Job.aio_context
-  job: Move defer_to_main_loop to Job
-  job: Move coroutine and related code to Job
-  job: Add job_sleep_ns()
-  job: Move pause/resume functions to Job
-  job: Replace BlockJob.completed with job_is_completed()
-  job: Move BlockJobCreateFlags to Job
-  blockjob: Split block_job_event_pending()
-  job: Add job_event_*()
-  job: Move single job finalisation to Job
-  job: Convert block_job_cancel_async() to Job
-  job: Add job_drain()
-  job: Move .complete callback to Job
-  job: Move job_finish_sync() to Job
-  job: Switch transactions to JobTxn
-  job: Move transactions to Job
-  job: Move completion and cancellation to Job
-  job: Add job_yield()
-  job: Add job_dismiss()
-
- qapi/block-core.json         |   28 +-
- include/block/block_int.h    |    2 +-
- include/block/blockjob.h     |  306 ++----------
- include/block/blockjob_int.h |  179 +------
- include/qemu/job.h           |  513 ++++++++++++++++++++
- block.c                      |    2 +-
- block/backup.c               |  111 +++--
- block/commit.c               |   75 ++-
- block/mirror.c               |  131 +++---
- block/replication.c          |   10 +-
- block/stream.c               |   68 ++-
- blockdev.c                   |   66 +--
- blockjob.c                   | 1054 ++++++------------------------------------
- job.c                        |  950 +++++++++++++++++++++++++++++++++++++
- qemu-img.c                   |   14 +-
- tests/test-bdrv-drain.c      |   61 +--
- tests/test-blockjob-txn.c    |   74 +--
- tests/test-blockjob.c        |  137 +++---
- MAINTAINERS                  |    2 +
- Makefile.objs                |    2 +-
- block/trace-events           |    5 -
- trace-events                 |    5 +
- 22 files changed, 2049 insertions(+), 1746 deletions(-)
- create mode 100644 include/qemu/job.h
- create mode 100644 job.c
-
+diff --git a/include/block/blockjob.h b/include/block/blockjob.h
+index 5aa8a6aaec..0b57d53084 100644
+--- a/include/block/blockjob.h
++++ b/include/block/blockjob.h
+@@ -452,4 +452,11 @@ void block_job_txn_add_job(BlockJobTxn *txn, BlockJob *job);
+  */
+ bool block_job_is_internal(BlockJob *job);
+ 
++/**
++ * block_job_driver:
++ *
++ * Returns the driver associated with a block job.
++ */
++const BlockJobDriver *block_job_driver(BlockJob *job);
++
+ #endif
+diff --git a/block/backup.c b/block/backup.c
+index 3f3ec6e408..1bc164d8ee 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -47,6 +47,8 @@ typedef struct BackupBlockJob {
+     HBitmap *copy_bitmap;
+ } BackupBlockJob;
+ 
++static const BlockJobDriver backup_job_driver;
++
+ /* See if in-flight requests overlap and wait for them to complete */
+ static void coroutine_fn wait_for_overlapping_requests(BackupBlockJob *job,
+                                                        int64_t start,
+@@ -241,7 +243,7 @@ void backup_do_checkpoint(BlockJob *job, Error **errp)
+     BackupBlockJob *backup_job = container_of(job, BackupBlockJob, common);
+     int64_t len;
+ 
+-    assert(job->driver->job_type == BLOCK_JOB_TYPE_BACKUP);
++    assert(block_job_driver(job) == &backup_job_driver);
+ 
+     if (backup_job->sync_mode != MIRROR_SYNC_MODE_NONE) {
+         error_setg(errp, "The backup job only supports block checkpoint in"
+@@ -259,7 +261,7 @@ void backup_wait_for_overlapping_requests(BlockJob *job, int64_t offset,
+     BackupBlockJob *backup_job = container_of(job, BackupBlockJob, common);
+     int64_t start, end;
+ 
+-    assert(job->driver->job_type == BLOCK_JOB_TYPE_BACKUP);
++    assert(block_job_driver(job) == &backup_job_driver);
+ 
+     start = QEMU_ALIGN_DOWN(offset, backup_job->cluster_size);
+     end = QEMU_ALIGN_UP(offset + bytes, backup_job->cluster_size);
+@@ -272,7 +274,7 @@ void backup_cow_request_begin(CowRequest *req, BlockJob *job,
+     BackupBlockJob *backup_job = container_of(job, BackupBlockJob, common);
+     int64_t start, end;
+ 
+-    assert(job->driver->job_type == BLOCK_JOB_TYPE_BACKUP);
++    assert(block_job_driver(job) == &backup_job_driver);
+ 
+     start = QEMU_ALIGN_DOWN(offset, backup_job->cluster_size);
+     end = QEMU_ALIGN_UP(offset + bytes, backup_job->cluster_size);
+diff --git a/blockjob.c b/blockjob.c
+index 31130d87cc..42e34aa704 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -359,6 +359,11 @@ static bool block_job_started(BlockJob *job)
+     return job->co;
+ }
+ 
++const BlockJobDriver *block_job_driver(BlockJob *job)
++{
++    return job->driver;
++}
++
+ /**
+  * All jobs must allow a pause point before entering their job proper. This
+  * ensures that jobs can be paused prior to being started, then resumed later.
 -- 
 2.13.6
