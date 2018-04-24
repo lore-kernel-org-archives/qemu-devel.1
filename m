@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fAydW-00050G-7x
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 10:09:42 -0400
+	(envelope-from <drjones@redhat.com>) id 1fAygt-0006dG-O8
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 10:13:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fAydR-0007Ta-9F
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 10:09:38 -0400
-Date: Tue, 24 Apr 2018 16:09:11 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180424160911.22a238bb.cohuck@redhat.com>
-In-Reply-To: <87f6ba73-2ded-06f2-c68f-d8ef4be50edf@redhat.com>
-References: <1524570294-23058-1-git-send-email-thuth@redhat.com>
-	<d2a9fc1a-9696-f2bd-d603-03b23de62004@de.ibm.com>
-	<87f6ba73-2ded-06f2-c68f-d8ef4be50edf@redhat.com>
+	(envelope-from <drjones@redhat.com>) id 1fAygo-0000xd-SO
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 10:13:07 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45744 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1fAygo-0000x7-KO
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 10:13:02 -0400
+Date: Tue, 24 Apr 2018 16:12:58 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20180424141258.cuenuefdtkefikr6@kamzik.brq.redhat.com>
+References: <3301c5bc-7b47-1b0e-8ce4-30435057a276@web.de>
+	<CAFEAcA9KSUppGGom-ipX+N49j0gDJH3KDY8oyqT8cVOU0Mn8Rw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH] hw/s390x: Allow to configure the
- consoles with the "-serial" parameter
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA9KSUppGGom-ipX+N49j0gDJH3KDY8oyqT8cVOU0Mn8Rw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/virt: Add linux, pci-domain property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,62 +27,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Jan Kiszka <jan.kiszka@web.de>, qemu-devel <qemu-devel@nongnu.org>
 
-On Tue, 24 Apr 2018 16:02:59 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+On Mon, Apr 23, 2018 at 02:11:40PM +0100, Peter Maydell wrote:
+> On 23 April 2018 at 06:18, Jan Kiszka <jan.kiszka@web.de> wrote:
+> > From: Jan Kiszka <jan.kiszka@siemens.com>
+> >
+> > This allows to pin the host controller in the Linux PCI domain space.
+> > Linux requires that property to be available consistently or not at all,
+> > in which case the domain number becomes unstable on additions/removals.
+> > Adding it here won't make a difference in practice for most setups as we
+> > only expose one controller.
+> >
+> > However, enabling Jailhouse on top may introduce another controller, and
+> > that one would like to have stable address as well. So the property is
+> > needed for the first controller as well.
+> 
+> Am I right in thinking that for ACPI the PCI domain number is
+> communicated via the _SEG method? If so, looks like we already
+> set that, and we set it to 0, which matches what we're doing here
+> in the DT, so that's good.
 
-> On 24.04.2018 13:49, Christian Borntraeger wrote:
-> > 
-> > 
-> > On 04/24/2018 01:44 PM, Thomas Huth wrote:  
-> >> The consoles ("sclpconsole" and "sclplmconsole") can only be configured
-> >> with "-device" and "-chardev" so far. Other machines use the convenience
-> >> option "-serial" to configure the default consoles, too, even for virtual
-> >> consoles like spapr-vty on the pseries machine. So let's support this
-> >> option on s390x, too, so we can easily enable the serial console here
-> >> again with "-nodefaults", for example. Also map the second -serial
-> >> option to the "sclplmconsole", so that there is now an easy way to
-> >> configure this second console on s390x, too.
-> >> Additionally, the new code is also smaller than the old one and we have
-> >> less s390x-specific code in vl.c :-)  
-> > 
-> > Can you show some new example command lines?  
-> 
-> Sure. I'm mainly using this together with nodefaults:
-> 
-> qemu-system-s390x -no-shutdown -nographic -nodefaults -serial mon:stdio
-> 
-> That's way easier than typing:
-> 
-> qemu-system-s390x -no-shutdown -nographic -nodefaults \
->   -chardev stdio,id=c1,mux=on -device sclpconsole,chardev=c1 \
->   -mon chardev=c1
-
-What, you don't like typing complicated command lines? :)
+_SEG and linux,pci-domain are similar in definition, but don't appear to
+be equivalent, as the same _SEG number is permitted across multiple host
+bridges, but linux,pci-domain must be unique for each host bridge. I
+think the (_SEG, _BBN) pair may form the equivalent. We also set _BBN
+to zero, so I think we're fine anyway.
 
 > 
-> Another example: You only want to see the QEMU monitor on stdio, but not
-> the serial output, without using -nodefaults (i.e. you still want to
-> have the other default devices). AFAIK that's pretty impossible with the
-> current code. But once you've got this patch applied, you can do:
+> > Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+> > ---
+> >  hw/arm/virt.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> > index 94dcb125d3..943371b75e 100644
+> > --- a/hw/arm/virt.c
+> > +++ b/hw/arm/virt.c
+> > @@ -1023,6 +1023,7 @@ static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
+> >      qemu_fdt_setprop_string(vms->fdt, nodename, "device_type", "pci");
+> >      qemu_fdt_setprop_cell(vms->fdt, nodename, "#address-cells", 3);
+> >      qemu_fdt_setprop_cell(vms->fdt, nodename, "#size-cells", 2);
+> > +    qemu_fdt_setprop_cell(vms->fdt, nodename, "linux,pci-domain", 0);
+> >      qemu_fdt_setprop_cells(vms->fdt, nodename, "bus-range", 0,
+> >                             nr_pcie_buses - 1);
+> >      qemu_fdt_setprop(vms->fdt, nodename, "dma-coherent", NULL, 0);
+> > --
 > 
-> qemu-system-s390x -no-shutdown -nographic -serial none
-> 
-> And to view the sclplm console, you can now simply do:
-> 
-> qemu-system-s390x -no-shutdown -nographic -serial null -serial mon:stdio
+> Drew -- is minor changes to the DTC something we can do without
+> having to condition it on machine version? I forget...
 
-Looks cool. Maybe add some of the examples to the patch description?
+Yes, and even less minor changes than this one can be made to ACPI and DT
+generation, per the "if a firwmare update could change it, then don't
+worry about it" policy.
 
-> 
-> > I read that as "the current command lines continue to work". Correct?  
-> 
-> Right. I was a little bit afraid that this might break migration, but I
-> gave it a quick check and it still seems to work fine here.
-> "info qom-tree" and "info qtree" at the HMP monitor show slightly
-> different output, though ... not sure whether that's critical or not?
+(I've CC'ed Igor in case he wants to chime in to correct anything I've
+ said.)
 
-What looks different? If we still send/expect the same kind of
-information, it should not have any impact, I guess.
+Thanks,
+drew
