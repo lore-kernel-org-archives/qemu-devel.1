@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fApvU-000211-M7
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 00:51:37 -0400
+	(envelope-from <peterx@redhat.com>) id 1fApvU-000212-Mn
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 00:51:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fApvP-0006Uh-OQ
+	(envelope-from <peterx@redhat.com>) id 1fApvT-0006Vf-7R
 	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 00:51:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45274 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58558 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fApvP-0006UQ-Jx
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 00:51:31 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fApvT-0006VV-25
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 00:51:35 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Tue, 24 Apr 2018 12:51:08 +0800
-Message-Id: <20180424045112.12963-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 0/4] qemu-thread: support
- --enable-debug-mutex
+Date: Tue, 24 Apr 2018 12:51:10 +0800
+Message-Id: <20180424045112.12963-3-peterx@redhat.com>
+In-Reply-To: <20180424045112.12963-1-peterx@redhat.com>
+References: <20180424045112.12963-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 2/4] qemu-thread: introduce
+ qemu-thread-common.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +27,210 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Emilio G . Cota" <cota@braap.org>, peterx@redhat.com
 
-v5:
-- init file/line [Emilio]
+Introduce some hooks for the shared part of qemu thread between POSIX
+and Windows implementations.  Note that in qemu_mutex_unlock_impl() we
+moved the call before unlock operation which should make more sense.
+And we don't need qemu_mutex_post_unlock() hook.
 
-v4:
-- cherrypick Emilio's patch to add "-m" parameter to atomic_add-bench
-  tool.
-- use inline functions [Emilio]
+Currently the hooks only calls the tracepoints.
 
-Micro benchmark result on "taskset -c 0 atomic_add-bench -m":
+Put all these shared hooks into the header files.  It should be internal
+to qemu-thread but not for qemu-thread users, hence put into util/
+directory.
 
-|--------+---------------------+------------------------|
-|        | with --enable-debug | without --enable-debug |
-|--------+---------------------+------------------------|
-| Before | 20 Mops/s           | 34 Mops/s              |
-| After  | 18 Mops/s           | 34 Mops/s              |
-|--------+---------------------+------------------------|
-
-Please review.  Thanks.
-
-Emilio G. Cota (1):
-  tests/atomic_add-bench: add -m option to use mutexes
-
-Peter Xu (3):
-  qemu-thread: introduce qemu-thread-common.h
-  QemuMutex: support --enable-debug-mutex
-  configure: enable debug-mutex if debug enabled
-
- configure                   | 11 +++++++++
- include/qemu/thread-posix.h |  4 ++++
- include/qemu/thread-win32.h |  4 ++++
- util/qemu-thread-common.h   | 55 +++++++++++++++++++++++++++++++++++++++++++++
- tests/atomic_add-bench.c    | 19 ++++++++++++++--
- util/qemu-thread-posix.c    | 19 +++++++---------
- util/qemu-thread-win32.c    | 17 +++++++-------
- 7 files changed, 107 insertions(+), 22 deletions(-)
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ util/qemu-thread-common.h | 43 +++++++++++++++++++++++++++++++++++++++++++
+ util/qemu-thread-posix.c  | 19 ++++++++-----------
+ util/qemu-thread-win32.c  | 17 ++++++++---------
+ 3 files changed, 59 insertions(+), 20 deletions(-)
  create mode 100644 util/qemu-thread-common.h
 
+diff --git a/util/qemu-thread-common.h b/util/qemu-thread-common.h
+new file mode 100644
+index 0000000000..3bf37c9963
+--- /dev/null
++++ b/util/qemu-thread-common.h
+@@ -0,0 +1,43 @@
++/*
++ * Common qemu-thread implementation header file.
++ *
++ * Copyright Red Hat, Inc. 2018
++ *
++ * Authors:
++ *  Peter Xu <peterx@redhat.com>,
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef __QEMU_THREAD_COMMON_H__
++#define __QEMU_THREAD_COMMON_H__
++
++#include "qemu/typedefs.h"
++#include "qemu/thread.h"
++#include "trace.h"
++
++static inline void qemu_mutex_post_init(QemuMutex *mutex)
++{
++    mutex->initialized = true;
++}
++
++static inline void qemu_mutex_pre_lock(QemuMutex *mutex,
++                                       const char *file, int line)
++{
++    trace_qemu_mutex_lock(mutex, file, line);
++}
++
++static inline void qemu_mutex_post_lock(QemuMutex *mutex,
++                                        const char *file, int line)
++{
++    trace_qemu_mutex_locked(mutex, file, line);
++}
++
++static inline void qemu_mutex_pre_unlock(QemuMutex *mutex,
++                                         const char *file, int line)
++{
++    trace_qemu_mutex_unlock(mutex, file, line);
++}
++
++#endif
+diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
+index b789cf32e9..2056d5c530 100644
+--- a/util/qemu-thread-posix.c
++++ b/util/qemu-thread-posix.c
+@@ -14,7 +14,7 @@
+ #include "qemu/thread.h"
+ #include "qemu/atomic.h"
+ #include "qemu/notify.h"
+-#include "trace.h"
++#include "qemu-thread-common.h"
+ 
+ static bool name_threads;
+ 
+@@ -43,7 +43,7 @@ void qemu_mutex_init(QemuMutex *mutex)
+     err = pthread_mutex_init(&mutex->lock, NULL);
+     if (err)
+         error_exit(err, __func__);
+-    mutex->initialized = true;
++    qemu_mutex_post_init(mutex);
+ }
+ 
+ void qemu_mutex_destroy(QemuMutex *mutex)
+@@ -62,13 +62,11 @@ void qemu_mutex_lock_impl(QemuMutex *mutex, const char *file, const int line)
+     int err;
+ 
+     assert(mutex->initialized);
+-    trace_qemu_mutex_lock(mutex, file, line);
+-
++    qemu_mutex_pre_lock(mutex, file, line);
+     err = pthread_mutex_lock(&mutex->lock);
+     if (err)
+         error_exit(err, __func__);
+-
+-    trace_qemu_mutex_locked(mutex, file, line);
++    qemu_mutex_post_lock(mutex, file, line);
+ }
+ 
+ int qemu_mutex_trylock_impl(QemuMutex *mutex, const char *file, const int line)
+@@ -78,7 +76,7 @@ int qemu_mutex_trylock_impl(QemuMutex *mutex, const char *file, const int line)
+     assert(mutex->initialized);
+     err = pthread_mutex_trylock(&mutex->lock);
+     if (err == 0) {
+-        trace_qemu_mutex_locked(mutex, file, line);
++        qemu_mutex_post_lock(mutex, file, line);
+         return 0;
+     }
+     if (err != EBUSY) {
+@@ -92,11 +90,10 @@ void qemu_mutex_unlock_impl(QemuMutex *mutex, const char *file, const int line)
+     int err;
+ 
+     assert(mutex->initialized);
++    qemu_mutex_pre_unlock(mutex, file, line);
+     err = pthread_mutex_unlock(&mutex->lock);
+     if (err)
+         error_exit(err, __func__);
+-
+-    trace_qemu_mutex_unlock(mutex, file, line);
+ }
+ 
+ void qemu_rec_mutex_init(QemuRecMutex *mutex)
+@@ -160,9 +157,9 @@ void qemu_cond_wait_impl(QemuCond *cond, QemuMutex *mutex, const char *file, con
+     int err;
+ 
+     assert(cond->initialized);
+-    trace_qemu_mutex_unlock(mutex, file, line);
++    qemu_mutex_pre_unlock(mutex, file, line);
+     err = pthread_cond_wait(&cond->cond, &mutex->lock);
+-    trace_qemu_mutex_locked(mutex, file, line);
++    qemu_mutex_post_lock(mutex, file, line);
+     if (err)
+         error_exit(err, __func__);
+ }
+diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
+index ab60c0d557..b303188a36 100644
+--- a/util/qemu-thread-win32.c
++++ b/util/qemu-thread-win32.c
+@@ -19,7 +19,7 @@
+ #include "qemu-common.h"
+ #include "qemu/thread.h"
+ #include "qemu/notify.h"
+-#include "trace.h"
++#include "qemu-thread-common.h"
+ #include <process.h>
+ 
+ static bool name_threads;
+@@ -46,7 +46,7 @@ static void error_exit(int err, const char *msg)
+ void qemu_mutex_init(QemuMutex *mutex)
+ {
+     InitializeSRWLock(&mutex->lock);
+-    mutex->initialized = true;
++    qemu_mutex_post_init(mutex);
+ }
+ 
+ void qemu_mutex_destroy(QemuMutex *mutex)
+@@ -59,10 +59,9 @@ void qemu_mutex_destroy(QemuMutex *mutex)
+ void qemu_mutex_lock_impl(QemuMutex *mutex, const char *file, const int line)
+ {
+     assert(mutex->initialized);
+-    trace_qemu_mutex_lock(mutex, file, line);
+-
++    qemu_mutex_pre_lock(mutex, file, line);
+     AcquireSRWLockExclusive(&mutex->lock);
+-    trace_qemu_mutex_locked(mutex, file, line);
++    qemu_mutex_post_lock(mutex, file, line);
+ }
+ 
+ int qemu_mutex_trylock_impl(QemuMutex *mutex, const char *file, const int line)
+@@ -72,7 +71,7 @@ int qemu_mutex_trylock_impl(QemuMutex *mutex, const char *file, const int line)
+     assert(mutex->initialized);
+     owned = TryAcquireSRWLockExclusive(&mutex->lock);
+     if (owned) {
+-        trace_qemu_mutex_locked(mutex, file, line);
++        qemu_mutex_post_lock(mutex, file, line);
+         return 0;
+     }
+     return -EBUSY;
+@@ -81,7 +80,7 @@ int qemu_mutex_trylock_impl(QemuMutex *mutex, const char *file, const int line)
+ void qemu_mutex_unlock_impl(QemuMutex *mutex, const char *file, const int line)
+ {
+     assert(mutex->initialized);
+-    trace_qemu_mutex_unlock(mutex, file, line);
++    qemu_mutex_pre_unlock(mutex, file, line);
+     ReleaseSRWLockExclusive(&mutex->lock);
+ }
+ 
+@@ -145,9 +144,9 @@ void qemu_cond_broadcast(QemuCond *cond)
+ void qemu_cond_wait_impl(QemuCond *cond, QemuMutex *mutex, const char *file, const int line)
+ {
+     assert(cond->initialized);
+-    trace_qemu_mutex_unlock(mutex, file, line);
++    qemu_mutex_pre_unlock(mutex, file, line);
+     SleepConditionVariableSRW(&cond->var, &mutex->lock, INFINITE, 0);
+-    trace_qemu_mutex_locked(mutex, file, line);
++    qemu_mutex_post_lock(mutex, file, line);
+ }
+ 
+ void qemu_sem_init(QemuSemaphore *sem, int init)
 -- 
 2.14.3
