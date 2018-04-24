@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1fArbv-0004wm-I7
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 02:39:32 -0400
+	(envelope-from <tina.zhang@intel.com>) id 1fArqf-0007Sx-Oi
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 02:54:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1fArbr-0001cW-4z
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 02:39:31 -0400
-Received: from mga07.intel.com ([134.134.136.100]:19659)
+	(envelope-from <tina.zhang@intel.com>) id 1fArqb-0006ta-Ss
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 02:54:45 -0400
+Received: from mga01.intel.com ([192.55.52.88]:39619)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1fArbq-0001cG-3Y
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 02:39:27 -0400
-Message-ID: <5ADED1EA.2000608@intel.com>
-Date: Tue, 24 Apr 2018 14:42:50 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <tina.zhang@intel.com>)
+	id 1fArqb-0006s5-HT
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 02:54:41 -0400
+From: "Zhang, Tina" <tina.zhang@intel.com>
+Date: Tue, 24 Apr 2018 06:54:35 +0000
+Message-ID: <237F54289DF84E4997F34151298ABEBC7C7E5046@SHSMSX101.ccr.corp.intel.com>
+References: <1524471278-22546-1-git-send-email-tina.zhang@intel.com>
+	<1524471278-22546-3-git-send-email-tina.zhang@intel.com>
+	<20180423131202.zcyam25lkh7khbil@sirius.home.kraxel.org>
+In-Reply-To: <20180423131202.zcyam25lkh7khbil@sirius.home.kraxel.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <1524550428-27173-1-git-send-email-wei.w.wang@intel.com>
-In-Reply-To: <1524550428-27173-1-git-send-email-wei.w.wang@intel.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 0/5] virtio-balloon: free page hint
- reporting support
+Subject: Re: [Qemu-devel] [PATCH 2/2] ui: introduce vfio_display_reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +30,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com
-Cc: pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "Yuan, Hang" <hang.yuan@intel.com>
 
-On 04/24/2018 02:13 PM, Wei Wang wrote:
-> This is the deivce part implementation to add a new feature,
-> VIRTIO_BALLOON_F_FREE_PAGE_HINT to the virtio-balloon device. The device
-> receives the guest free page hints from the driver and clears the
-> corresponding bits in the dirty bitmap, so that those free pages are
-> not transferred by the migration thread to the destination.
->
-> - Test Environment
->      Host: Intel(R) Xeon(R) CPU E5-2699 v4 @ 2.20GHz
->      Guest: 8G RAM, 4 vCPU
->      Migration setup: migrate_set_speed 100G, migrate_set_downtime 2 second
->
-> - Test Results
->      - Idle Guest Live Migration Time (results are averaged over 10 runs):
->          - Optimization v.s. Legacy = 271ms vs 1769ms --> ~86% reduction
->      - Guest with Linux Compilation Workload (make bzImage -j4):
->          - Live Migration Time (average)
->            Optimization v.s. Legacy = 1265ms v.s. 2634ms --> ~51% reduction
->          - Linux Compilation Time
->            Optimization v.s. Legacy = 4min56s v.s. 5min3s
->            --> no obvious difference
->
-> - Source Code
->      - QEMU:  https://github.com/wei-w-wang/qemu-free-page-lm.git
->      - Linux: https://github.com/wei-w-wang/linux-free-page-lm.git
->
-> ChangeLog:
-> v6->v7:
->        virtio-balloon/virtio_balloo_poll_free_page_hints:
->            - add virtio_notify() at the end to notify the driver that
->              the optimization is done, which indicates that the entries
->              have all been put back to the vq and ready to detach them.
-
-Hi Dave,
-
-Thanks for reviewing this patch series. Do you have more comments on 
-them? If no, would it be possible to get your reviewed-by?
-The current kernel part is done already. Hope we could finish the QEMU 
-part soon, and have people start to use this feature. Thanks.
-
-Best,
-Wei
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogaW50ZWwtZ3Z0LWRldiBb
+bWFpbHRvOmludGVsLWd2dC1kZXYtYm91bmNlc0BsaXN0cy5mcmVlZGVza3RvcC5vcmddIE9uDQo+
+IEJlaGFsZiBPZiBHZXJkIEhvZmZtYW5uDQo+IFNlbnQ6IE1vbmRheSwgQXByaWwgMjMsIDIwMTgg
+OToxMiBQTQ0KPiBUbzogWmhhbmcsIFRpbmEgPHRpbmEuemhhbmdAaW50ZWwuY29tPg0KPiBDYzog
+YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb207IGludGVsLWd2dC1kZXZAbGlzdHMuZnJlZWRlc2t0
+b3Aub3JnOyBxZW11LQ0KPiBkZXZlbEBub25nbnUub3JnOyB6aGVueXV3QGxpbnV4LmludGVsLmNv
+bTsgWXVhbiwgSGFuZw0KPiA8aGFuZy55dWFuQGludGVsLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQ
+QVRDSCAyLzJdIHVpOiBpbnRyb2R1Y2UgdmZpb19kaXNwbGF5X3Jlc2V0DQo+IA0KPiA+ICsgICAg
+c3VyZmFjZSA9IHFlbXVfY29uc29sZV9zdXJmYWNlKHZkZXYtPmRweS0+Y29uKTsNCj4gDQo+ID4g
+KyAgICBkcHlfZ2xfc2Nhbm91dF9kaXNhYmxlKHZkZXYtPmRweS0+Y29uKTsNCj4gPiArICAgIGRw
+eV9nZnhfc3dpdGNoX3N1cmZhY2UodmRldi0+ZHB5LT5jb24sIHN1cmZhY2UpOw0KPiANCj4gSG1t
+LCBzbyB5b3UgYXNrIHdoaWNoIHN1cmZhY2UgaXMgYWN0aXZlLCB0aGVuIHN3aXRjaCB0byBpdC4N
+Cj4gV2h5Pw0KDQpXaGF0IHRoaXMgcGF0Y2gtc2V0IGlzIGdvaW5nIHRvIGRvIGlzIHRvIGRpc2Fi
+bGUgc2Nhbm91dCBtb2RlIGR1cmluZyBndWVzdCBPUyByZXNldCwgc28gdGhhdCBRZW11IFVJIChl
+LmcuIGd0aykgY2FuIGRpcmVjdGx5IHVzZSBRZW11Q29uc29sZSdzIERpc3BsYXlTdXJmYWNlIGlu
+c3RlYWQgb2YgZ3Vlc3QgZG1hLWJ1ZiBmcmFtZWJ1ZmZlciBkdXJpbmcgdGhlIGd1ZXN0IE9TIHJl
+c2V0IHByb2Nlc3MuIA0KZ2RfZWdsX2RyYXcgaXMgaW52b2RrZWQgd2hlbiB0aGUgUWVtdSBVSSB3
+aW5kb3cgZ2V0cyB0aGUgZm9jdXMuIElmIHRoaXMgcHJvY2VzcyBpcyBoYXBwZW5lZCBkdXJpbmcg
+Z3Vlc3QgT1MgcmVib290LCBnZF9lZ2xfc2Nhbm91dF9mbHVzaCgpIHdpbGwgYmUgaW52b2tlZCAo
+YXMgdmMtPmdmeC5zY2Fub3V0X21vZGU9PXRydWUpLCB3aGljaCB1c2VzIGd1ZXN0IGRtYS1idWYg
+ZnJhbWVidWZmZXIuIFNlZSB0aGUgZm9sbG93aW5nIGxvZ2ljIGluIGd0ay1lZ2wuYzoNCnZvaWQg
+Z2RfZWdsX2RyYXcoVmlydHVhbENvbnNvbGUgKnZjKQ0Kew0KICAgIEdka1dpbmRvdyAqd2luZG93
+Ow0KICAgIGludCB3dywgd2g7DQoNCiAgICBpZiAoIXZjLT5nZnguZ2xzKSB7DQogICAgICAgIHJl
+dHVybjsNCiAgICB9DQoNCiAgICBpZiAodmMtPmdmeC5zY2Fub3V0X21vZGUpIHsNCiAgICAgICAg
+Z2RfZWdsX3NjYW5vdXRfZmx1c2goJnZjLT5nZnguZGNsLCAwLCAwLCB2Yy0+Z2Z4LncsIHZjLT5n
+ZnguaCk7DQogICAgfSBlbHNlIHsNCiAgICAgICAgaWYgKCF2Yy0+Z2Z4LmRzKSB7DQogICAgICAg
+ICAgICByZXR1cm47DQogICAgICAgIH0NCiAgICAgICAgZWdsTWFrZUN1cnJlbnQocWVtdV9lZ2xf
+ZGlzcGxheSwgdmMtPmdmeC5lc3VyZmFjZSwNCiAgICAgICAgICAgICAgICAgICAgICAgdmMtPmdm
+eC5lc3VyZmFjZSwgdmMtPmdmeC5lY3R4KTsNCg0KICAgICAgICB3aW5kb3cgPSBndGtfd2lkZ2V0
+X2dldF93aW5kb3codmMtPmdmeC5kcmF3aW5nX2FyZWEpOw0KICAgICAgICBnZGtfZHJhd2FibGVf
+Z2V0X3NpemUod2luZG93LCAmd3csICZ3aCk7DQogICAgICAgIHN1cmZhY2VfZ2xfc2V0dXBfdmll
+d3BvcnQodmMtPmdmeC5nbHMsIHZjLT5nZnguZHMsIHd3LCB3aCk7DQogICAgICAgIHN1cmZhY2Vf
+Z2xfcmVuZGVyX3RleHR1cmUodmMtPmdmeC5nbHMsIHZjLT5nZnguZHMpOw0KDQogICAgICAgIGVn
+bFN3YXBCdWZmZXJzKHFlbXVfZWdsX2Rpc3BsYXksIHZjLT5nZnguZXN1cmZhY2UpOw0KICAgIH0N
+Cn0NCg0KVXNpbmcgZ3Vlc3QgZG1hLWJ1ZiBmcmFtZWJ1ZmZlciBkdXJpbmcgZ3Vlc3QgT1MgcmVi
+b290IHdpbGwgbGVhZCB0byBob3N0IEdQVSBoYW5nLCBhcyB0aGUgR0dUVCBpcyBpbnZhbGlkIGR1
+cmluZyBndWVzdCBPUyByZWJvb3QuDQpUaGF0J3Mgd2h5IHdlIHdhbnQgdG8gZGlzYWJsZSB0aGUg
+c2Nhbm91dCBtb2RlIGFuZCByZWxlYXNlIGFsbCB0aGUgZG1hLWJ1ZiByZXNvdXJjZXMgZHVyaW5n
+IGd1ZXN0IE9TIHJlc2V0Lg0KDQpBZnRlciByZXZpZXdpbmcgdGhpcyBwYXRjaC1zZXQgYWdhaW4s
+IEkgdGhpbmsgd2UgbWlnaHQgbm90IG5lZWQgdGhlIHByb3Bvc2VkIGRweV9nZnhfc3dpdGNoX3N1
+cmZhY2UoKSBhbnkgbW9yZS4NClRoZSByZWFzb24gSSBwcm9wb3NlZCBpdCB3YXMgYmVjYXVzZSBJ
+IHRob3VnaHQgZ2Z4LmRzIGlzIGNoYW5nZWQgdG8gdGhlIHN1cmZhY2UgcmVsYXRlZCB0byBndWVz
+dCBkbWEtYnVmIGZyYW1lYnVmZmVyIGFuZCB3ZSBuZWVkIHRvIHN3aXRjaCBpdCB3aXRoIFFlbXVD
+b25zb2xlJ3MgRGlzcGxheVN1cmdmYWNlIGR1cmluZyByZXNldC4NCkJ1dCBhZnRlciByZXZpZXdp
+bmcgdGhlIGNvZGUsIHZjLT5nZnguZHMgaXMgYWx3YXlzIHBvaW50aW5nIHRvIHRoZSB2YWxpZCBR
+ZW11Q29uc29sZXMnIERpc3BsYXlTdXJmYWNlLiBTbyB3ZSBkb27igJl0IG5lZWQgZHB5X2dmeF9z
+d2l0Y2hfc3VyZmFjZSgpIHRvIHRha2UgY2FyZSBvZiBpdC4NClRoYW5rcy4NCg0KPiANCj4gTWF5
+YmUgeW91IGp1c3QgbmVlZCBhIGZ1bGwgZGlzcGxheSB1cGRhdGUgYWZ0ZXIgZGlzYWJsaW5nIHRo
+ZSBnbCBzY2Fub3V0Pw0KRG8geW91IHN0aWxsIHRoaW5rIHVwZGF0aW5nIGZ1bGwgZGlzcGxheSBp
+cyBuZWVkZWQ/IEl0IHNlZW1zIHRoZSBleGlzdGluZyB2ZmlvX2Rpc3BsYXlfZG1hYnVmX3VwZGF0
+ZSBjYW4gYmUgaGVscGZ1bCBlbm91Z2ggdG8gY3JlYXRlIGEgbmV3IHRleHR1cmUgaWYgbmVlZGVk
+Lg0KVGhhbmtzLg0KDQoNCkJSLA0KVGluYQ0KPiANCj4gY2hlZXJzLA0KPiAgIEdlcmQNCj4gDQo+
+IFBTOiBtYXliZSBhZGRpbmcgYSBkcHlfZ2Z4X3VwZGF0ZV9mdWxsKCkgaGVscGVyIGlzIHVzZWZ1
+bDoNCj4gDQo+IGRpZmYgLS1naXQgYS9pbmNsdWRlL3VpL2NvbnNvbGUuaCBiL2luY2x1ZGUvdWkv
+Y29uc29sZS5oIGluZGV4DQo+IDM3YThkNjhkMjkuLjk4MWI1MTlkZGUgMTAwNjQ0DQo+IC0tLSBh
+L2luY2x1ZGUvdWkvY29uc29sZS5oDQo+ICsrKyBiL2luY2x1ZGUvdWkvY29uc29sZS5oDQo+IEBA
+IC0yOTEsNiArMjkxLDcgQEAgYm9vbCBkcHlfdWlfaW5mb19zdXBwb3J0ZWQoUWVtdUNvbnNvbGUg
+KmNvbik7ICBpbnQNCj4gZHB5X3NldF91aV9pbmZvKFFlbXVDb25zb2xlICpjb24sIFFlbXVVSUlu
+Zm8gKmluZm8pOw0KPiANCj4gIHZvaWQgZHB5X2dmeF91cGRhdGUoUWVtdUNvbnNvbGUgKmNvbiwg
+aW50IHgsIGludCB5LCBpbnQgdywgaW50IGgpOw0KPiArdm9pZCBkcHlfZ2Z4X3VwZGF0ZV9mdWxs
+KFFlbXVDb25zb2xlICpjb24pOw0KPiAgdm9pZCBkcHlfZ2Z4X3JlcGxhY2Vfc3VyZmFjZShRZW11
+Q29uc29sZSAqY29uLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBEaXNwbGF5U3Vy
+ZmFjZSAqc3VyZmFjZSk7ICB2b2lkIGRweV90ZXh0X2N1cnNvcihRZW11Q29uc29sZQ0KPiAqY29u
+LCBpbnQgeCwgaW50IHkpOyBkaWZmIC0tZ2l0IGEvdWkvY29uc29sZS5jIGIvdWkvY29uc29sZS5j
+IGluZGV4DQo+IDNmYjJmNGUwOWYuLmIwMjUxMGNkY2EgMTAwNjQ0DQo+IC0tLSBhL3VpL2NvbnNv
+bGUuYw0KPiArKysgYi91aS9jb25zb2xlLmMNCj4gQEAgLTE1NzQsNiArMTU3NCwxNiBAQCB2b2lk
+IGRweV9nZnhfdXBkYXRlKFFlbXVDb25zb2xlICpjb24sIGludCB4LCBpbnQNCj4geSwgaW50IHcs
+IGludCBoKQ0KPiAgICAgIH0NCj4gIH0NCj4gDQo+ICt2b2lkIGRweV9nZnhfdXBkYXRlX2Z1bGwo
+UWVtdUNvbnNvbGUgKmNvbikgew0KPiArICAgIGlmICghY29uLT5zdXJmYWNlKSB7DQo+ICsgICAg
+ICAgIHJldHVybjsNCj4gKyAgICB9DQo+ICsgICAgZHB5X2dmeF91cGRhdGUoY29uLCAwLCAwLA0K
+PiArICAgICAgICAgICAgICAgICAgIHN1cmZhY2Vfd2lkdGgoY29uLT5zdXJmYWNlKSwNCj4gKyAg
+ICAgICAgICAgICAgICAgICBzdXJmYWNlX2hlaWdodChjb24tPnN1cmZhY2UpKTsgfQ0KPiArDQo+
+ICB2b2lkIGRweV9nZnhfcmVwbGFjZV9zdXJmYWNlKFFlbXVDb25zb2xlICpjb24sDQo+ICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIERpc3BsYXlTdXJmYWNlICpzdXJmYWNlKSAgew0KPiAN
+Cj4gX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18NCj4gaW50
+ZWwtZ3Z0LWRldiBtYWlsaW5nIGxpc3QNCj4gaW50ZWwtZ3Z0LWRldkBsaXN0cy5mcmVlZGVza3Rv
+cC5vcmcNCj4gaHR0cHM6Ly9saXN0cy5mcmVlZGVza3RvcC5vcmcvbWFpbG1hbi9saXN0aW5mby9p
+bnRlbC1ndnQtZGV2DQo=
