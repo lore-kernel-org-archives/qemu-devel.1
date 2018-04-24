@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49351)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fApvT-00020x-OC
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 00:51:36 -0400
+	(envelope-from <peterx@redhat.com>) id 1fApvj-00029Q-Dl
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 00:51:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fApvP-0006Um-PZ
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 00:51:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60898 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fApve-0006Zi-Qe
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 00:51:51 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32884 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fApvP-0006UR-KY
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 00:51:31 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fApve-0006ZA-MM
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 00:51:46 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Tue, 24 Apr 2018 12:51:09 +0800
-Message-Id: <20180424045112.12963-2-peterx@redhat.com>
+Date: Tue, 24 Apr 2018 12:51:12 +0800
+Message-Id: <20180424045112.12963-5-peterx@redhat.com>
 In-Reply-To: <20180424045112.12963-1-peterx@redhat.com>
 References: <20180424045112.12963-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 1/4] tests/atomic_add-bench: add -m option
- to use mutexes
+Subject: [Qemu-devel] [PATCH v5 4/4] configure: enable debug-mutex if debug
+ enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,87 +27,23 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Emilio G . Cota" <cota@braap.org>, peterx@redhat.com
 
-From: "Emilio G. Cota" <cota@braap.org>
-
-This allows us to use atomic-add-bench as a microbenchmark
-for evaluating qemu_mutex_lock's performance.
-
-Signed-off-by: Emilio G. Cota <cota@braap.org>
-[cherry picked from https://github.com/cota/qemu/commit/f04f34df]
+Reviewed-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- tests/atomic_add-bench.c | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+ configure | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tests/atomic_add-bench.c b/tests/atomic_add-bench.c
-index caa1e8e689..f96d448f77 100644
---- a/tests/atomic_add-bench.c
-+++ b/tests/atomic_add-bench.c
-@@ -8,6 +8,7 @@ struct thread_info {
- } QEMU_ALIGNED(64);
- 
- struct count {
-+    QemuMutex lock;
-     unsigned long val;
- } QEMU_ALIGNED(64);
- 
-@@ -18,11 +19,13 @@ static unsigned int n_ready_threads;
- static struct count *counts;
- static unsigned int duration = 1;
- static unsigned int range = 1024;
-+static bool use_mutex;
- static bool test_start;
- static bool test_stop;
- 
- static const char commands_string[] =
-     " -n = number of threads\n"
-+    " -m = use mutexes instead of atomic increments\n"
-     " -d = duration in seconds\n"
-     " -r = range (will be rounded up to pow2)";
- 
-@@ -59,7 +62,13 @@ static void *thread_func(void *arg)
- 
-         info->r = xorshift64star(info->r);
-         index = info->r & (range - 1);
--        atomic_inc(&counts[index].val);
-+        if (use_mutex) {
-+            qemu_mutex_lock(&counts[index].lock);
-+            counts[index].val += 1;
-+            qemu_mutex_unlock(&counts[index].lock);
-+        } else {
-+            atomic_inc(&counts[index].val);
-+        }
-     }
-     return NULL;
- }
-@@ -91,6 +100,9 @@ static void create_threads(void)
-     th_info = g_new(struct thread_info, n_threads);
-     counts = qemu_memalign(64, sizeof(*counts) * range);
-     memset(counts, 0, sizeof(*counts) * range);
-+    for (i = 0; i < range; i++) {
-+        qemu_mutex_init(&counts[i].lock);
-+    }
- 
-     for (i = 0; i < n_threads; i++) {
-         struct thread_info *info = &th_info[i];
-@@ -131,7 +143,7 @@ static void parse_args(int argc, char *argv[])
-     int c;
- 
-     for (;;) {
--        c = getopt(argc, argv, "hd:n:r:");
-+        c = getopt(argc, argv, "hd:n:mr:");
-         if (c < 0) {
-             break;
-         }
-@@ -145,6 +157,9 @@ static void parse_args(int argc, char *argv[])
-         case 'n':
-             n_threads = atoi(optarg);
-             break;
-+        case 'm':
-+            use_mutex = true;
-+            break;
-         case 'r':
-             range = pow2ceil(atoi(optarg));
-             break;
+diff --git a/configure b/configure
+index a80af735b2..87453edd88 100755
+--- a/configure
++++ b/configure
+@@ -1005,6 +1005,7 @@ for opt do
+   --enable-debug)
+       # Enable debugging options that aren't excessively noisy
+       debug_tcg="yes"
++      debug_mutex="yes"
+       debug="yes"
+       strip_opt="no"
+       fortify_source="no"
 -- 
 2.14.3
