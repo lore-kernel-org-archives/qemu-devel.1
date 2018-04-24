@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fB06I-0005OF-F6
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:43:32 -0400
+	(envelope-from <frederic.konrad@adacore.com>) id 1fB094-0007sG-0w
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:46:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fB06H-0000l0-D1
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:43:26 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:40270)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fB06H-0000kd-6I
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:43:25 -0400
-Received: by mail-wr0-x241.google.com with SMTP id v60-v6so50428456wrc.7
-	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 08:43:25 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 24 Apr 2018 16:23:37 +0100
-Message-Id: <20180424152405.10304-19-alex.bennee@linaro.org>
-In-Reply-To: <20180424152405.10304-1-alex.bennee@linaro.org>
-References: <20180424152405.10304-1-alex.bennee@linaro.org>
+	(envelope-from <frederic.konrad@adacore.com>) id 1fB090-0002PF-U7
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:46:18 -0400
+Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:41689
+	helo=smtp.eu.adacore.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
+	id 1fB090-0002OT-Ga
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:46:14 -0400
+References: <1524046608-12906-1-git-send-email-frederic.konrad@adacore.com>
+	<1524046608-12906-3-git-send-email-frederic.konrad@adacore.com>
+	<CAHNT7Nt5D6_7xUBPxkz-oAT5O-a0FZfyXXfiaEG8sFLRgfebAw@mail.gmail.com>
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Message-ID: <4d64e4dd-8a10-8778-2d97-e9005055aca2@adacore.com>
+Date: Tue, 24 Apr 2018 17:46:09 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 18/46] tests/tcg: enable building for i386
+In-Reply-To: <CAHNT7Nt5D6_7xUBPxkz-oAT5O-a0FZfyXXfiaEG8sFLRgfebAw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] riscv: htif: increase the priority
+ of the htif subregion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +32,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Michael Clark <mjc@sifive.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-While you can construct a compile command that does work using the
-x86_64 host compiler that most people use this is flakey. Different
-distros handle this is different ways so we default to using a known
-good i386 compiler via docker.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
----
-v3
-  - add runner for runcom
----
- tests/tcg/i386/Makefile.include | 9 +++++++++
- tests/tcg/i386/Makefile.target  | 9 +++++++++
- 2 files changed, 18 insertions(+)
- create mode 100644 tests/tcg/i386/Makefile.include
+On 04/20/2018 02:57 AM, Michael Clark wrote:
+> On Wed, Apr 18, 2018 at 10:16 PM, KONRAD Frederic <
+> frederic.konrad@adacore.com> wrote:
+> 
+>> The htif device is supposed to be mapped over an other subregion. So
+>> increase
+>> its priority to one to avoid any conflict.
+>>
+>> Here is the output of info mtree:
+>>
+>> Before:
+>> (qemu) info mtree
+>>   address-space: memory
+>>     0000000000000000-ffffffffffffffff (prio 0, i/o): system
+>>       0000000000000000-000000000000000f (prio 0, i/o): riscv.htif.uart
+>>       0000000000000000-0000000000011fff (prio 0, ram): riscv.spike.bootrom
+>>       0000000002000000-000000000200ffff (prio 0, i/o): riscv.sifive.clint
+>>       0000000080000000-0000000087ffffff (prio 0, ram): riscv.spike.ram
+>>
+>>   address-space: I/O
+>>     0000000000000000-000000000000ffff (prio 0, i/o): io
+>>
+>>   address-space: cpu-memory-0
+>>     0000000000000000-ffffffffffffffff (prio 0, i/o): system
+>>       0000000000000000-000000000000000f (prio 0, i/o): riscv.htif.uart
+>>       0000000000000000-0000000000011fff (prio 0, ram): riscv.spike.bootrom
+>>       0000000002000000-000000000200ffff (prio 0, i/o): riscv.sifive.clint
+>>       0000000080000000-0000000087ffffff (prio 0, ram): riscv.spike.ram
+>>
+>> After:
+>>   (qemu) info mtree
+>>   address-space: memory
+>>     0000000000000000-ffffffffffffffff (prio 0, i/o): system
+>>       0000000000000000-000000000000000f (prio 1, i/o): riscv.htif.uart
+>>       0000000000000000-0000000000011fff (prio 0, ram): riscv.spike.bootrom
+>>       0000000002000000-000000000200ffff (prio 0, i/o): riscv.sifive.clint
+>>       0000000080000000-0000000087ffffff (prio 0, ram): riscv.spike.ram
+>>
+>>   address-space: I/O
+>>     0000000000000000-000000000000ffff (prio 0, i/o): io
+>>
+>>   address-space: cpu-memory-0
+>>     0000000000000000-ffffffffffffffff (prio 0, i/o): system
+>>       0000000000000000-000000000000000f (prio 1, i/o): riscv.htif.uart
+>>       0000000000000000-0000000000011fff (prio 0, ram): riscv.spike.bootrom
+>>       0000000002000000-000000000200ffff (prio 0, i/o): riscv.sifive.clint
+>>       0000000080000000-0000000087ffffff (prio 0, ram): riscv.spike.ram
+>>
+>> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
+>>
+> 
+> Reviewed-by: Michael Clark <mjc@sifive.com>
+> 
+> BTW if you like I can incorporate these into the riscv tree. e.g. here,
+> feel free to make a PR in GitHub:
+> 
+> https://github.com/riscv/riscv-qemu/tree/qemu-2.13-for-upstream
+> 
+> (however the riscv.org tree has a lot of changes in it so you might be
+> better off getting these changes merged in upstream as the review backlog
+> is large)
+> 
+> It's just that i'd like to keep the trees in sync with upstream while at
+> the same time incorporating as many fixes as I can in the riscv tree
+> (before they are in upstream) so that the riscv tree is complete for users
+> who want to pull a branch that includes the outstanding riscv fixes. I have
+> scripts that can merge mutliple branches into 'riscv-all' in the riscv
+> github so if you make a PR against the riscv github I can merge them in
+> that tree, and drop them if they get accepted upstream independently. I'm
+> pulling from master frequently so its fine either way.
+> 
+> Just i'd like the riscv tree to accumulate all of the fixes that haven't
+> yet made it upstream.
 
-diff --git a/tests/tcg/i386/Makefile.include b/tests/tcg/i386/Makefile.include
-new file mode 100644
-index 0000000000..be1c3008dd
---- /dev/null
-+++ b/tests/tcg/i386/Makefile.include
-@@ -0,0 +1,9 @@
-+#
-+# Makefile.include for all i386
-+#
-+# There is enough brokeness in x86_64 compilers that we don't default
-+# to using the x86_64 system compiler for i386 binaries.
-+#
-+
-+DOCKER_IMAGE=fedora-i386-cross
-+DOCKER_CROSS_COMPILER=gcc
-diff --git a/tests/tcg/i386/Makefile.target b/tests/tcg/i386/Makefile.target
-index 2f27b65e2d..39a1627650 100644
---- a/tests/tcg/i386/Makefile.target
-+++ b/tests/tcg/i386/Makefile.target
-@@ -28,3 +28,12 @@ hello-i386: LDFLAGS+=-nostdlib
- test-i386: test-i386.c test-i386-code16.S test-i386-vm86.S test-i386.h test-i386-shift.h test-i386-muldiv.h
- 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ \
- 	   $(<D)/test-i386.c $(<D)/test-i386-code16.S $(<D)/test-i386-vm86.S -lm
-+
-+# Specialist test runners
-+.PHONY: pi_10.com
-+pi_10.com:
-+	cp $(I386_SRC)/pi_10.com .
-+
-+run-runcom: runcom pi_10.com
-+	$(call quiet-command, $(QEMU) ./runcom ./pi_10.com > runcom.out, "TEST", "$< on $(TARGET_NAME)")
-+
--- 
-2.17.0
+Hi Michael,
+
+Ok I'll respin on the list then and try to do a PR on GitHub.
+
+Thanks,
+Fred
+
+> 
+> ---
+>>   hw/riscv/riscv_htif.c | 5 +++--
+>>   1 file changed, 3 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/riscv/riscv_htif.c b/hw/riscv/riscv_htif.c
+>> index 6e687f2..48e5452 100644
+>> --- a/hw/riscv/riscv_htif.c
+>> +++ b/hw/riscv/riscv_htif.c
+>> @@ -253,8 +253,9 @@ HTIFState *htif_mm_init(MemoryRegion *address_space,
+>> MemoryRegion *main_mem,
+>>           htif_be_change, s, NULL, true);
+>>       if (address_symbol_set) {
+>>           memory_region_init_io(&s->mmio, NULL, &htif_mm_ops, s,
+>> -                            TYPE_HTIF_UART, size);
+>> -        memory_region_add_subregion(address_space, base, &s->mmio);
+>> +                              TYPE_HTIF_UART, size);
+>> +        memory_region_add_subregion_overlap(address_space, base,
+>> +                                            &s->mmio, 1);
+>>       }
+>>
+>>       return s;
+>> --
+>> 1.8.3.1
+>>
+>>
+> 
