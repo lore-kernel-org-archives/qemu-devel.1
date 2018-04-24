@@ -1,24 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fAxLF-0002yx-PE
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 08:46:42 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fAxgL-0007gl-6Z
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 09:08:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fAxLB-0002Mp-TH
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 08:46:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53068 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fAxLB-0002MQ-Nw
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 08:46:37 -0400
-References: <152406338081.5947.5696498314762417499@sif>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <6bb9731f-013d-018d-0b6e-c6dc55570f1f@redhat.com>
-Date: Tue, 24 Apr 2018 14:46:27 +0200
-MIME-Version: 1.0
-In-Reply-To: <152406338081.5947.5696498314762417499@sif>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [ANNOUNCE] QEMU 2.12.0-rc4 is now available
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fAxgG-0005U0-5g
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 09:08:29 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 24 Apr 2018 16:08:19 +0300
+Message-Id: <20180424130821.50987-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20180424130821.50987-1-vsementsov@virtuozzo.com>
+References: <20180424130821.50987-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [RFC 1/3] block: add bdrv_reconnect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +19,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Michael Clark <mjc@sifive.com>, Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, famz@redhat.com, pbonzini@redhat.com, eblake@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-Hi Peter,
+It will be used to reconnect NBD connection.
 
-On 04/18/18 16:56, Michael Roth wrote:
-> A note from the maintainer:
-> 
->   Barring any reports of showstopper bugs, the plan is to release
->   2.12.0 with no further changes on Tuesday 24th April.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ include/block/block.h     |  2 ++
+ include/block/block_int.h |  3 +++
+ block.c                   | 22 ++++++++++++++++++++++
+ 3 files changed, 27 insertions(+)
 
-I just noticed two QAPI bugs introduced in 2.12, in the following two
-commits:
-
-(1) ca230ff33f89 ("qmp: add architecture specific cpu data for
-query-cpus-fast", 2018-02-26)
-
-This commit added @arch to @CpuInfoFast, but it failed to set the new
-field to CPU_INFO_ARCH_OTHER in qmp_query_cpus_fast(), when TARGET_S390X
-is not defined.
-
-(2) 25fa194b7b11 ("RISC-V Build Infrastructure", 2018-03-07)
-
-This commit added the @riscv enum constant to @CpuInfoArch (used in both
-@CpuInfo and @CpuInfoFast -- the return types of the @query-cpus and
-@query-cpus-fast commands, respectively), and assigned, in both return
-structures, the @CpuInfoRISCV sub-structure to the new enum value.
-
-However, qmp_query_cpus_fast() does not populate the sub-structure, when
-TARGET_RISCV is defined; only qmp_query_cpus() does.
-
-The fixes don't look complicated. Do you want to hold the release while
-I post the fixes?
-
-I don't think these bugs are "show stoppers". On the other hand, QAPI is
-an external interface.
-
-Thanks
-Laszlo
+diff --git a/include/block/block.h b/include/block/block.h
+index cdec3639a3..912e3f3dcc 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -604,4 +604,6 @@ bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *name,
+  */
+ void bdrv_register_buf(BlockDriverState *bs, void *host, size_t size);
+ void bdrv_unregister_buf(BlockDriverState *bs, void *host);
++
++int bdrv_reconnect(BlockDriverState *bs, Error **errp);
+ #endif
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index c4dd1d4bb8..ab9018f1c4 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -475,6 +475,9 @@ struct BlockDriver {
+      */
+     void (*bdrv_register_buf)(BlockDriverState *bs, void *host, size_t size);
+     void (*bdrv_unregister_buf)(BlockDriverState *bs, void *host);
++
++    int (*bdrv_reconnect)(BlockDriverState *bs, Error **errp);
++
+     QLIST_ENTRY(BlockDriver) list;
+ };
+ 
+diff --git a/block.c b/block.c
+index a2caadf0a0..fab4413d59 100644
+--- a/block.c
++++ b/block.c
+@@ -4095,6 +4095,28 @@ int bdrv_has_zero_init(BlockDriverState *bs)
+     return 0;
+ }
+ 
++int bdrv_reconnect(BlockDriverState *bs, Error **errp)
++{
++    int ret;
++
++    if (bs->drv && bs->drv->bdrv_reconnect) {
++        return bs->drv->bdrv_reconnect(bs, errp);
++    }
++
++    if (bs->backing) {
++        ret = bdrv_reconnect(bs->backing->bs, errp);
++        if (ret < 0) {
++            return ret;
++        }
++    }
++
++    if (bs->file) {
++        return bdrv_reconnect(bs->file->bs, errp);
++    }
++
++    return 0;
++}
++
+ bool bdrv_unallocated_blocks_are_zero(BlockDriverState *bs)
+ {
+     BlockDriverInfo bdi;
+-- 
+2.11.1
