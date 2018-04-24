@@ -1,22 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35759)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fB5x3-0001Ki-2M
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 17:58:18 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1fB5z6-0002Iq-B3
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 18:00:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fB5x2-0003Sh-0n
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 17:58:17 -0400
-References: <20180424152515.25664-1-kwolf@redhat.com>
-	<20180424152515.25664-5-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d2668fdc-6baa-2e18-dc01-4af82db07eb3@redhat.com>
-Date: Tue, 24 Apr 2018 16:57:59 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1fB5z1-0004GM-Ex
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 18:00:24 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50318
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1fB5z1-0004Bq-91
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 18:00:19 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w3OLxWKD104883
+	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 18:00:16 -0400
+Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2hj96h89vf-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 18:00:15 -0400
+Received: from localhost
+	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Tue, 24 Apr 2018 18:00:15 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20180424152515.25664-5-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="bkPiWN9A7n0sxOQFlgbdOPGv8TNmPh5nO"
-Subject: Re: [Qemu-devel] [RFC PATCH 04/33] blockjob: Introduce
- block_job_ratelimit_get_delay()
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+Date: Tue, 24 Apr 2018 16:59:26 -0500
+Message-Id: <152460716629.27171.6282630298609252026@sif>
+Subject: [Qemu-devel] [ANNOUNCE] QEMU 2.12.0 is now available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,135 +39,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jcody@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---bkPiWN9A7n0sxOQFlgbdOPGv8TNmPh5nO
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jcody@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org,
- mreitz@redhat.com
-Message-ID: <d2668fdc-6baa-2e18-dc01-4af82db07eb3@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 04/33] blockjob: Introduce
- block_job_ratelimit_get_delay()
-References: <20180424152515.25664-1-kwolf@redhat.com>
- <20180424152515.25664-5-kwolf@redhat.com>
-In-Reply-To: <20180424152515.25664-5-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hello,
 
-On 04/24/2018 10:24 AM, Kevin Wolf wrote:
-> This gets us rid of more direct accesses to BlockJob fields from the
-> job drivers.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
+On behalf of the QEMU Team, I'd like to announce the availability of
+the QEMU 2.12.0 release. This release contains 2700+ commits from 204 =
 
-> +++ b/include/block/blockjob_int.h
-> @@ -166,6 +166,14 @@ void block_job_sleep_ns(BlockJob *job, int64_t ns)=
-;
->  void block_job_yield(BlockJob *job);
-> =20
->  /**
-> + * block_job_ratelimit_get_delay:
-> + *
-> + * Calculate and return delay for the next request in ns. See the docu=
-emntation
+authors.
 
-s/docuemntation/documentation/
+You can grab the tarball from our download page here:
 
-> + * of ratelimit_calculate_delay() for details.
-> + */
-> +int64_t block_job_ratelimit_get_delay(BlockJob *job, uint64_t n);
+  https://www.qemu.org/download/#source
 
-Signed return type matches ratelimit_calculate_delay, but what does a
-negative return really mean?  Hmm, it looks like it can't actually
-return a negative, other than if qemu_clock_get_ns() returns a negative
-on some sort of error (which appears to be unlikely - we don't even
-bother checking for it, even though it would mess things up if it did
-happen) - all other return paths are 0 or a subtraction between time
-values that can't overflow a 64-bit integer in our lifetime.  Should we
-audit the source to flip the callers to use an unsigned value, perhaps
-as a separate cleanup?
+The full list of changes are available at:
 
-> +
-> +/**
->   * block_job_pause_all:
->   *
->   * Asynchronously pause all jobs.
-> diff --git a/block/backup.c b/block/backup.c
-> index 8468fd9f94..3f3ec6e408 100644
-> --- a/block/backup.c
-> +++ b/block/backup.c
-> @@ -325,21 +325,17 @@ static void backup_complete(BlockJob *job, void *=
-opaque)
-> =20
->  static bool coroutine_fn yield_and_check(BackupBlockJob *job)
->  {
-> +    uint64_t delay_ns;
-> +
->      if (block_job_is_cancelled(&job->common)) {
->          return true;
->      }
-> =20
-> -    /* we need to yield so that bdrv_drain_all() returns.
-> -     * (without, VM does not reboot)
-> -     */
-> -    if (job->common.speed) {
-> -        uint64_t delay_ns =3D ratelimit_calculate_delay(&job->common.l=
-imit,
-> -                                                      job->bytes_read)=
-;
-> -        job->bytes_read =3D 0;
-> -        block_job_sleep_ns(&job->common, delay_ns);
-> -    } else {
-> -        block_job_sleep_ns(&job->common, 0);
-> -    }
-> +    /* we need to yield even for delay_ns =3D 0 so that bdrv_drain_all=
-() returns.
-> +     * (without it, the VM does not reboot) */
+  https://wiki.qemu.org/ChangeLog/2.12
 
-As long as you are touching this, is it worth further improving the gramm=
-ar?
+Highlights include:
 
-/* We need to yield even for delay_ns =3D 0 so that bdrv_drain_all() can
-return; without a yield, the VM would not reboot. */
+ * Spectre/Meltdown mitigation support for x86/pseries/s390 guests. For
+   more details see:
+     https://www.qemu.org/2018/02/14/qemu-2-11-1-and-spectre-update/
+ * Numerous block support improvements, including support for directly
+   interacting with userspace NVMe driver, and general improvements to
+   NBD server/client including more efficient reads of sparse files
+ * Networking support for VMWare paravirtualized RDMA device (RDMA
+   HCA and Soft-RoCE supported), CAN bus support via Linux SocketCAN and
+   SJA1000-based PCI interfaces, and general improvements for dual-stack
+   IPv4/IPv6 environments
+ * GUI security/bug fixes, dmabufs support for GTK/Spice.
+ * Better IPMI support for Platform Events and SEL logging in internal
+   BMC emulation
+ * SMBIOS support for "OEM Strings", which can be used for automating
+   guest image activation without relying on network-based querying
+ * KVM support for systems larger than 7.999TB
+ * Disk cache information via virtio-balloon
 
-> +    delay_ns =3D block_job_ratelimit_get_delay(&job->common, job->byte=
-s_read);
-> +    job->bytes_read =3D 0;
-> +    block_job_sleep_ns(&job->common, delay_ns);
-> =20
->      if (block_job_is_cancelled(&job->common)) {
->          return true;
+ * ARM: AArch64 new instructions for FCMA/RDM and SIMD/FP16/crypto/complex
+   number extensions
+ * ARM: initial support for Raspberry Pi 3 machine type
+ * ARM: Corex-M33/Armv8-M emulation via new mps2-an505 board and many
+   other improvements for M profile emulation
+ * HPPA: support for full machine emulation (hppa-softmmu)
+ * PowerPC: PPC4xx emulation improvements, including I2C bus support
+ * PowerPC: new Sam460ex machine type
+ * PowerPC: significant TCG performance improvements
+ * PowerPC: pseries: support for Spectre/Meltdown mitigations
+ * RISC-V: new RISC-V target via "spike_v1.9.1", "spike_v1.10", and "virt"
+   machine types
+ * s390: non-virtual devices no longer require dedicated channel subsystem
+   and guest support for multiple CSSs
+ * s390: general PCI improvements, MSI-X support for virtio-pci devices
+ * s390: improved TCG emulation support
+ * SPARC: sun4u power device emulation
+ * SPARC: improved trace-event support and emulation/debug fixes
+ * Tricore: new instruction variants for JEQ/JNE and 64-bit MOV
+ * x86: Intel IOMMU support for 48-bit addresses
+ * Xtensa: backend now uses libisa for instruction decoding/disassebly
+ * Xtensa: multi-threaded TCG support and noMMU configuration variants
 
-With typo fixes,
-Reviewed-by: Eric Blake <eblake@redhat.com>
+ * and lots more...
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---bkPiWN9A7n0sxOQFlgbdOPGv8TNmPh5nO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrfqGcACgkQp6FrSiUn
-Q2pePggAgcDy+1DPKLc/M0Mhp1yTnpp/Rncb/A/JXNKBzHy31UDe0dJmn5EJjOjN
-xzUJVL/E0DoL+ltlMCRGxQL4u9PLO8eYA5UesSS4BQux3ilaGw7Q1YvaktxK4ly5
-TLHtMcSz3/wlL9BlV0arTZ+Ug7pzZHrZdUowe5eglPSa6TZm1ESlfPuwTHjnHrWc
-RVUKbBMUCjrUr3/nyZimDpbM0q7lKCxkSVwV0nk9iCS6ngHgKE/rCKW3o9v3ladd
-cuQuq/IEzjjEUK0o6QgaYbLIzGYKATArZk2RIaw9SD2UeXTPjh1vGWYX4iA69zlk
-5HRTT45MlcbBusVy30rmaqM0uShWyw==
-=Z0wM
------END PGP SIGNATURE-----
-
---bkPiWN9A7n0sxOQFlgbdOPGv8TNmPh5nO--
+Thank you to everyone involved!
