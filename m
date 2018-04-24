@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fAz58-0006CH-F3
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 10:38:11 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fAz66-0006j2-Ji
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 10:39:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fAz52-00019C-C2
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 10:38:10 -0400
-Date: Tue, 24 Apr 2018 16:37:51 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180424163751.7a288803.cohuck@redhat.com>
-In-Reply-To: <6d699426-3525-f62a-c4ec-37dd5589654f@redhat.com>
-References: <1524570294-23058-1-git-send-email-thuth@redhat.com>
-	<d2a9fc1a-9696-f2bd-d603-03b23de62004@de.ibm.com>
-	<87f6ba73-2ded-06f2-c68f-d8ef4be50edf@redhat.com>
-	<20180424160911.22a238bb.cohuck@redhat.com>
-	<6d699426-3525-f62a-c4ec-37dd5589654f@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1fAz63-0001aQ-99
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 10:39:10 -0400
+Date: Tue, 24 Apr 2018 16:38:56 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180424163856.6584a73c@redhat.com>
+In-Reply-To: <44c86da6-7851-d0c6-1121-6d1395a705c6@redhat.com>
+References: <20180420123456.22196-1-david@redhat.com>
+	<20180420123456.22196-4-david@redhat.com>
+	<20180423141928.7e64b380@redhat.com>
+	<860a6828-e18f-555e-274d-f9be9245eccb@redhat.com>
+	<20180424152824.7a87a85c@redhat.com>
+	<44c86da6-7851-d0c6-1121-6d1395a705c6@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH] hw/s390x: Allow to configure the
- consoles with the "-serial" parameter
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] pc-dimm: factor out address space
+ logic into MemoryDevice code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,94 +28,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>
 
-On Tue, 24 Apr 2018 16:22:26 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+On Tue, 24 Apr 2018 15:39:30 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-> On 24.04.2018 16:09, Cornelia Huck wrote:
-> > On Tue, 24 Apr 2018 16:02:59 +0200
-> > Thomas Huth <thuth@redhat.com> wrote:
+> On 24.04.2018 15:28, Igor Mammedov wrote:
+> > On Mon, 23 Apr 2018 14:44:34 +0200
+> > David Hildenbrand <david@redhat.com> wrote:
 > >   
-> >> On 24.04.2018 13:49, Christian Borntraeger wrote:  
-> >>>
-> >>>
-> >>> On 04/24/2018 01:44 PM, Thomas Huth wrote:    
-> >>>> The consoles ("sclpconsole" and "sclplmconsole") can only be configured
-> >>>> with "-device" and "-chardev" so far. Other machines use the convenience
-> >>>> option "-serial" to configure the default consoles, too, even for virtual
-> >>>> consoles like spapr-vty on the pseries machine. So let's support this
-> >>>> option on s390x, too, so we can easily enable the serial console here
-> >>>> again with "-nodefaults", for example. Also map the second -serial
-> >>>> option to the "sclplmconsole", so that there is now an easy way to
-> >>>> configure this second console on s390x, too.
-> >>>> Additionally, the new code is also smaller than the old one and we have
-> >>>> less s390x-specific code in vl.c :-)    
-> [...]
-> >>> I read that as "the current command lines continue to work". Correct?    
-> >>
-> >> Right. I was a little bit afraid that this might break migration, but I
-> >> gave it a quick check and it still seems to work fine here.
-> >> "info qom-tree" and "info qtree" at the HMP monitor show slightly
-> >> different output, though ... not sure whether that's critical or not?  
+> >> On 23.04.2018 14:19, Igor Mammedov wrote:  
+> >>> On Fri, 20 Apr 2018 14:34:56 +0200
+> >>> David Hildenbrand <david@redhat.com> wrote:  
+> > considering v4 queued, I'm dropping mostly nor relevant points at this point.
+> > wrt, virtio I'll elaborate more in reply to Pankaj
 > > 
-> > What looks different? If we still send/expect the same kind of
-> > information, it should not have any impact, I guess.  
+> > [...]
+> >   
+> >>>> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+> >>>> index b860c9c582..b96efa3bf4 100644
+> >>>> --- a/hw/mem/memory-device.c
+> >>>> +++ b/hw/mem/memory-device.c
+> >>>> @@ -15,6 +15,8 @@
+> >>>>  #include "qapi/error.h"
+> >>>>  #include "hw/boards.h"
+> >>>>  #include "qemu/range.h"
+> >>>> +#include "hw/virtio/vhost.h"
+> >>>> +#include "sysemu/kvm.h"
+> >>>>  
+> >>>>  static gint memory_device_addr_sort(gconstpointer a, gconstpointer b)
+> >>>>  {
+> >>>> @@ -106,6 +108,166 @@ uint64_t get_plugged_memory_size(void)
+> >>>>      return size;
+> >>>>  }
+> >>>>  
+> >>>> +static int memory_device_used_region_size_internal(Object *obj, void *opaque)
+> >>>> +{
+> >>>> +    uint64_t *size = opaque;
+> >>>> +
+> >>>> +    if (object_dynamic_cast(obj, TYPE_MEMORY_DEVICE)) {
+> >>>> +        DeviceState *dev = DEVICE(obj);
+> >>>> +        MemoryDeviceState *md = MEMORY_DEVICE(obj);
+> >>>> +        MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(obj);
+> >>>> +
+> >>>> +        if (dev->realized) {
+> >>>> +            *size += mdc->get_region_size(md, &error_abort);
+> >>>> +        }
+> >>>> +    }
+> >>>> +
+> >>>> +    object_child_foreach(obj, memory_device_used_region_size_internal, opaque);
+> >>>> +    return 0;
+> >>>> +}
+> >>>> +
+> >>>> +static uint64_t memory_device_used_region_size(void)
+> >>>> +{
+> >>>> +    uint64_t size = 0;
+> >>>> +
+> >>>> +    memory_device_used_region_size_internal(qdev_get_machine(), &size);
+> >>>> +
+> >>>> +    return size;
+> >>>> +}
+> >>>> +
+> >>>> +uint64_t memory_device_get_free_addr(uint64_t *hint, uint64_t align,
+> >>>> +                                     uint64_t size, Error **errp)    
+> >>> I'd suggest to pc_dimm_memory_plug/pc_dimm_get_free_addr first,
+> >>> namely most of the stuff it does like checks and assigning default
+> >>> values should go to pre_plug (pre realize) handler and then only
+> >>> actual mapping is left for plug (after realize) handler to deal with:
+> >>>     
+> >>
+> >> Can you elaborate what you mean by pre-plug? If this is about pre plug
+> >> handler of the (machine) hotplug handler, it might be problematic for
+> >> virtio devices.  
+> > yes, something along these lines: c871bc70b
+> > 
+> >   
 > 
-> $ diff -u sclp-qtree-before.txt sclp-qtree-after.txt
-> --- sclp-qtree-before.txt	2018-04-24 16:17:14.527921927 +0200
-> +++ sclp-qtree-after.txt	2018-04-24 16:17:35.582877042 +0200
-> @@ -62,6 +62,6 @@
->      bus: s390-sclp-events-bus.0
->        type s390-sclp-events-bus
->        dev: sclpconsole, id ""
-> -        chardev = "sclpcon0"
-> +        chardev = "serial0"
->        dev: sclp-cpu-hotplug, id ""
->        dev: sclpquiesce, id ""
-> 
-> ... i.e. just the label of the chardev changed. I think that's ok, and
-> migration likely does not care about that.
-
-Nod.
-
-> 
-> $ diff -u sclp-qom-tree-before.txt sclp-qom-tree-after.txt
-> --- sclp-qom-tree-before.txt	2018-04-24 16:17:48.462849585 +0200
-> +++ sclp-qom-tree-after.txt	2018-04-24 16:18:02.222820256 +0200
-> @@ -1,13 +1,14 @@
-> -(qemu) info qom-tree
-> +(qemu) info qom-tree
->  /machine (s390-ccw-virtio-2.12-machine)
->    /unattached (container)
-> -    /system[0] (qemu:memory-region)
->      /sysbus (System)
-> -    /device[1] (virtio-net-ccw)
-> +    /device[0] (qemu-s390x-cpu)
-> +    /s390.ram[0] (qemu:memory-region)
-> +    /device[1] (sclpconsole)
-> +    /device[2] (virtio-net-ccw)
->        /virtio-backend (virtio-net-device)
->        /virtio-bus (virtio-ccw-bus)
-> -    /s390.ram[0] (qemu:memory-region)
-> -    /device[0] (qemu-s390x-cpu)
-> +    /system[0] (qemu:memory-region)
->      /io[0] (qemu:memory-region)
->    /sclp (sclp)
->      /s390-sclp-event-facility (s390-sclp-event-facility)
-> @@ -17,7 +18,6 @@
->    /s390-flic-qemu (s390-flic-qemu)
->    /s390-skeys (s390-skeys-qemu)
->    /peripheral-anon (container)
-> -    /device[0] (sclpconsole)
->    /peripheral (container)
->    /s390-ipl (s390-ipl)
->    /virtual-css-bridge (virtual-css-bridge)
-> 
-> ... the sclpconsole now shows up under /unattached instead of
-> /peripheral-anon ... does that matter? (I don't have a clue)
-
-That's because the device is no longer created through
-qdev_device_add(), which attaches it to peripheral-anon. Not sure what
-peripheral{,-anon} are used for?
+> Yes, we can factor that out (at least) for pc-dimm later on easily.
+> Seems to be just about moving a couple of calls.
+yep, but there is nice side effect,
+there is no need to call devicefoo::unrealize() on failure since
+devicefoo:realize() hasn't been called yet.
