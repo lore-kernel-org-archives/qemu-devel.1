@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fB5lK-0002lK-5k
+	(envelope-from <lersek@redhat.com>) id 1fB5lK-0002lJ-5P
 	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 17:46:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fB5lH-00072B-22
+	(envelope-from <lersek@redhat.com>) id 1fB5lG-000725-Ub
 	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 17:46:10 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42386 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fB5lG-00071h-TI
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 17:46:06 -0400
 From: Laszlo Ersek <lersek@redhat.com>
-Date: Tue, 24 Apr 2018 23:45:44 +0200
-Message-Id: <20180424214550.32549-1-lersek@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/6] qapi: introduce the SysEmuTarget
- enumeration
+Date: Tue, 24 Apr 2018 23:45:45 +0200
+Message-Id: <20180424214550.32549-2-lersek@redhat.com>
+In-Reply-To: <20180424214550.32549-1-lersek@redhat.com>
+References: <20180424214550.32549-1-lersek@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/6] qapi: fill in CpuInfoFast.arch in
+ query-cpus-fast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,82 +21,82 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Markus Armbruster <armbru@redhat.com>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Riku Voipio <riku.voipio@iki.fi>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Thomas Huth <thuth@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, qemu-stable@nongnu.org
 
-This patch set adds the @SysEmuTarget enum type, and rebases a few other
-types to it. Here's the "anatomy" of the series:
+Commit ca230ff33f89 added added the @arch field to @CpuInfoFast, but it
+failed to set the new field in qmp_query_cpus_fast(), when TARGET_S390X
+was not defined. The updated @query-cpus-fast example in
+"qapi-schema.json" showed "arch":"x86" only because qmp_query_cpus_fast()
+calls g_malloc0() to allocate CpuInfoFast, and the CPU_INFO_ARCH_X86 enum
+constant is generated with value 0.
 
-- Patches #1 and #2 fix QAPI bugs that have crept in in the 2.12
-  development cycle. I noticed the bugs while working on patch #6; i.e.
-  patch #6 depends on #1 and #2. The issues should likely be fixed in
-  2.12.1, so patches #1 and #2 are CC'd to qemu-stable.
+All @arch values other than @s390 implied the @CpuInfoOther sub-struct for
+@CpuInfoFast -- at the time of writing the patch --, thus no fields other
+than @arch needed to be set when TARGET_S390X was not defined. Set @arch
+now, by copying the corresponding assignments from qmp_query_cpus().
 
-- Patch #3 is what I primarily care about in this series. It introduces
-  the @SysEmuTarget enum, for the sake of my end-goal patch at:
-
-    [Qemu-devel] [qemu RFC v3 3/3] qapi: add "firmware.json"
-    http://mid.mail-archive.com/20180420231246.23130-4-lersek@redhat.com
-
-  (BTW review comments for that RFCv3 patch are still super welcome).
-
-- Patch #4 is a small cleanup that utilizes @SysEmuTarget, rebasing
-  @TargetInfo to it.
-
-- Patch #5 is an attempt at normalizing @CpuInfo and @CpuInfoFast, by
-  factoring out @CpuInfoCommon. I'm proposing this in order to save some
-  busy-work for patch #6. If patch #5 is doing the wrong thing, it can
-  be dropped, with relatively small updates to patch #6.
-
-- Patch #6 demotes the current discriminator field of @CpuInfo and
-  @CpuInfoFast, namely @arch (of type @CpuInfoArch), to "normal base
-  struct field", and introduces @target (of type @SysEmuTarget) in its
-  place. This is a pretty intrusive patch which caused me hours of
-  struggle. Similarly to patch #4, the goal is to help clean up the fuzz
-  around the "target architecture" concept in QAPI. I'm proposing this
-  patch because Markus suggested that I might try :) If significantly
-  more work was necessary to hammer this patch into acceptable shape,
-  then I'd prefer to limit the scope, just add @target, and keep @arch
-  as the discriminator.
-
-Sorry about the humongous CC list.
-
-Cc: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Cc: David Gibson <dgibson@redhat.com>
 Cc: Eric Blake <eblake@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Kashyap Chamarthy <kchamart@redhat.com>
-Cc: Laurent Vivier <laurent@vivier.eu>
 Cc: Markus Armbruster <armbru@redhat.com>
-Cc: Michael Clark <mjc@sifive.com>
-Cc: Palmer Dabbelt <palmer@sifive.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
 Cc: Richard Henderson <rth@twiddle.net>
-Cc: Riku Voipio <riku.voipio@iki.fi>
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-Cc: Thomas Huth <thuth@redhat.com>
+Cc: qemu-stable@nongnu.org
+Fixes: ca230ff33f89bf7102cbfbc2328716da6750aaed
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+---
 
-Thanks
-Laszlo
+Notes:
+    PATCHv1:
+    
+    - new patch
 
-Laszlo Ersek (6):
-  qapi: fill in CpuInfoFast.arch in query-cpus-fast
-  qapi: handle the riscv CpuInfoArch in query-cpus-fast
-  qapi: add SysEmuTarget to "common.json"
-  qapi: change the type of TargetInfo.arch from string to enum
-    SysEmuTarget
-  qapi: extract CpuInfoCommon to mitigate schema duplication
-  qapi: discriminate CpuInfo[Fast] on SysEmuTarget, not CpuInfoArch
+ cpus.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
- qapi/common.json                    |  19 +++
- qapi/misc.json                      | 196 ++++++++++++++++++++-------
- qapi/qapi-schema.json               |   2 +-
- arch_init.c                         |  10 +-
- cpus.c                              | 261 ++++++++++++++++++++++++++++--------
- tests/test-x86-cpuid-compat.c       |   2 +-
- tests/migration/guestperf/engine.py |   2 +-
- 7 files changed, 380 insertions(+), 112 deletions(-)
-
+diff --git a/cpus.c b/cpus.c
+index 38eba8bff334..1a9a2edee1f2 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -2210,27 +2210,39 @@ CpuInfoFastList *qmp_query_cpus_fast(Error **errp)
+         info->value->qom_path = object_get_canonical_path(OBJECT(cpu));
+         info->value->thread_id = cpu->thread_id;
+ 
+         info->value->has_props = !!mc->cpu_index_to_instance_props;
+         if (info->value->has_props) {
+             CpuInstanceProperties *props;
+             props = g_malloc0(sizeof(*props));
+             *props = mc->cpu_index_to_instance_props(ms, cpu->cpu_index);
+             info->value->props = props;
+         }
+ 
+-#if defined(TARGET_S390X)
++#if defined(TARGET_I386)
++        info->value->arch = CPU_INFO_ARCH_X86;
++#elif defined(TARGET_PPC)
++        info->value->arch = CPU_INFO_ARCH_PPC;
++#elif defined(TARGET_SPARC)
++        info->value->arch = CPU_INFO_ARCH_SPARC;
++#elif defined(TARGET_MIPS)
++        info->value->arch = CPU_INFO_ARCH_MIPS;
++#elif defined(TARGET_TRICORE)
++        info->value->arch = CPU_INFO_ARCH_TRICORE;
++#elif defined(TARGET_S390X)
+         s390_cpu = S390_CPU(cpu);
+         env = &s390_cpu->env;
+         info->value->arch = CPU_INFO_ARCH_S390;
+         info->value->u.s390.cpu_state = env->cpu_state;
++#else
++        info->value->arch = CPU_INFO_ARCH_OTHER;
+ #endif
+         if (!cur_item) {
+             head = cur_item = info;
+         } else {
+             cur_item->next = info;
+             cur_item = info;
+         }
+     }
+ 
+     return head;
+ }
 -- 
 2.14.1.3.gb7cf6e02401b
