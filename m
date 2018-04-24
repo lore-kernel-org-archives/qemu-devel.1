@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fB6UT-0005NC-Gp
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 18:32:53 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fB6zI-0004Yl-83
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 19:04:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fB6UN-0007IF-P5
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 18:32:49 -0400
-References: <20180424214550.32549-1-lersek@redhat.com>
-	<20180424214550.32549-3-lersek@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a1cd9e50-9379-1523-c5c8-9b6a29e01491@redhat.com>
-Date: Tue, 24 Apr 2018 17:32:41 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fB6zF-0003xl-0A
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 19:04:40 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:34047)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fB6zE-0003x2-Qb
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 19:04:36 -0400
+Received: by mail-qt0-x244.google.com with SMTP id a25-v6so24511288qtm.1
+	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 16:04:36 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180424152405.10304-1-alex.bennee@linaro.org>
+	<20180424152405.10304-18-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <1f0aeb03-f524-fe8b-c051-1bfc9c01e05f@amsat.org>
+Date: Tue, 24 Apr 2018 20:04:29 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180424214550.32549-3-lersek@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="WEiVG4RDKG3Sy7a5AdkgKltg2FrbKA8Nu"
-Subject: Re: [Qemu-devel] [PATCH 2/6] qapi: handle the riscv CpuInfoArch in
- query-cpus-fast
+In-Reply-To: <20180424152405.10304-18-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 17/46] docker: Add fedora-i386-cross
+ image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,95 +36,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Laurent Vivier <laurent@vivier.eu>, Markus Armbruster <armbru@redhat.com>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Riku Voipio <riku.voipio@iki.fi>, Sagar Karandikar <sagark@eecs.berkeley.edu>, qemu-stable@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WEiVG4RDKG3Sy7a5AdkgKltg2FrbKA8Nu
-From: Eric Blake <eblake@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Laurent Vivier <laurent@vivier.eu>, Markus Armbruster <armbru@redhat.com>,
- Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Peter Crosthwaite <crosthwaite.peter@gmail.com>,
- Richard Henderson <rth@twiddle.net>, Riku Voipio <riku.voipio@iki.fi>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>, qemu-stable@nongnu.org
-Message-ID: <a1cd9e50-9379-1523-c5c8-9b6a29e01491@redhat.com>
-Subject: Re: [PATCH 2/6] qapi: handle the riscv CpuInfoArch in query-cpus-fast
-References: <20180424214550.32549-1-lersek@redhat.com>
- <20180424214550.32549-3-lersek@redhat.com>
-In-Reply-To: <20180424214550.32549-3-lersek@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 04/24/2018 12:23 PM, Alex Bennée wrote:
+> From: Fam Zheng <famz@redhat.com>
+> 
+> It has some basic *-devel.i686 packages to be used with "gcc -m32" as a
+> 32 bit cross build environment.
+> 
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> [AJB: add glibc-static]
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-On 04/24/2018 04:45 PM, Laszlo Ersek wrote:
-> Commit 25fa194b7b11 added the @riscv enum constant to @CpuInfoArch (use=
-d
-> in both @CpuInfo and @CpuInfoFast -- the return types of the @query-cpu=
-s
-> and @query-cpus-fast commands, respectively), and assigned, in both ret=
-urn
-> structures, the @CpuInfoRISCV sub-structure to the new enum value.
->=20
-> However, qmp_query_cpus_fast() would not populate either the @arch fiel=
-d
-> or the @CpuInfoRISCV sub-structure, when TARGET_RISCV was defined; only=
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> qmp_query_cpus() would.
->=20
-> In theory, there are two ways to fix this:
->=20
-> (a) Fill in both the @arch field and the @CpuInfoRISCV sub-structure in=
-
->     qmp_query_cpus_fast(), by copying the logic from qmp_query_cpus().
->=20
-> (b) Assign @CpuInfoOther to the @riscv enum constant in @CpuInfoFast, a=
-nd
->     populate only the @arch field in qmp_query_cpus_fast().
->=20
-> Approach (b) seems more robust, because:
->=20
-> - clearly there has never been an attempt to get actual RISV CPU state
->   from qmp_query_cpus_fast(), so its lack of RISCV support is not actua=
-lly
->   a problem,
->=20
-> - getting CPU state without interrupting KVM looks like an exceptional
->   thing to do (only S390X does it currently).
->=20
-=2E..
-> Cc: qemu-stable@nongnu.org
-> Fixes: 25fa194b7b11901561532e435beb83d046899f7a
-> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+> 
 > ---
->=20
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---WEiVG4RDKG3Sy7a5AdkgKltg2FrbKA8Nu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrfsIkACgkQp6FrSiUn
-Q2pWQwgAnBq/A+s5T+nxPh1u0B9IKAow9LqdMOVIJCgQsxzNSbBBhXS8/ewPBKgf
-dTwunBULOWH6ANmsWIXDr8jkXyuA0iRQv0UmOnIy0nNyJHn1fyB8NcpOBR0gk3Rb
-+J/kjf6mwjC8TZBgxb1Wo8XfGFHieXUzc7P/lLjZ1aybdVDC30SG/FgkB6m/+9BZ
-q0wkztbXhciINYpJy5WDvipIl4Fvm0z9EI2E6yqzQXvTjLrIsxn9tI/tAje0ZwTB
-SBo6P/nKNHHPqtrNphzjSMSEonnkhlF+1ngZo0kvo/wiooQw6WoO0xd0ImjnAnwU
-DKZs1bhOz4sp9pA5Ny0ivy+s8RfmLg==
-=sI72
------END PGP SIGNATURE-----
-
---WEiVG4RDKG3Sy7a5AdkgKltg2FrbKA8Nu--
+> v2
+>   - include static glibc package as well
+> ---
+>  tests/docker/dockerfiles/fedora-i386-cross.docker | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+>  create mode 100644 tests/docker/dockerfiles/fedora-i386-cross.docker
+> 
+> diff --git a/tests/docker/dockerfiles/fedora-i386-cross.docker b/tests/docker/dockerfiles/fedora-i386-cross.docker
+> new file mode 100644
+> index 0000000000..8fbef2fa53
+> --- /dev/null
+> +++ b/tests/docker/dockerfiles/fedora-i386-cross.docker
+> @@ -0,0 +1,14 @@
+> +FROM fedora:latest
+> +ENV PACKAGES \
+> +    gcc \
+> +    glibc-static.i686 \
+> +    glibc-devel.i686 \
+> +    glib2-devel.i686 \
+> +    zlib-devel.i686 \
+> +    glib2-devel.i686 \
+> +    nettle-devel.i686 \
+> +    pixman-devel.i686 \
+> +    gnutls-devel.i686
+> +
+> +RUN dnf install -y $PACKAGES
+> +RUN rpm -q $PACKAGES | sort > /packages.txt
+> 
