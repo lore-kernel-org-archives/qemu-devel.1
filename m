@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36548)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=6454bde7c=Ian.Jackson@citrix.com>)
-	id 1fB2DE-0007Ac-9l
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:58:45 -0400
+	id 1fB2DG-0007Dg-Qo
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:58:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=6454bde7c=Ian.Jackson@citrix.com>)
-	id 1fB2DD-0006wq-FK
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:58:44 -0400
+	id 1fB2DF-0006zc-LF
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:58:46 -0400
 Received: from smtp03.citrix.com ([162.221.156.55]:9743)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <prvs=6454bde7c=Ian.Jackson@citrix.com>)
-	id 1fB2DD-0006on-5S
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:58:43 -0400
+	id 1fB2DF-0006on-8D
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:58:45 -0400
 From: Ian Jackson <ian.jackson@eu.citrix.com>
-Date: Tue, 24 Apr 2018 18:58:16 +0100
-Message-ID: <1524592709-6553-4-git-send-email-ian.jackson@eu.citrix.com>
+Date: Tue, 24 Apr 2018 18:58:18 +0100
+Message-ID: <1524592709-6553-6-git-send-email-ian.jackson@eu.citrix.com>
 In-Reply-To: <1524592709-6553-1-git-send-email-ian.jackson@eu.citrix.com>
 References: <1524592709-6553-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 03/16] xen: link against xentoolcore
+Subject: [Qemu-devel] [PATCH 05/16] xen: defer call to xen_restrict until
+ just before os_setup_post
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +30,113 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <Ian.Jackson@eu.citrix.com>
+Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-From: Anthony PERARD <anthony.perard@citrix.com>
+We need to restrict *all* the control fds that qemu opens.  Looking in
+/proc/PID/fd shows there are many; their allocation seems scattered
+throughout Xen support code in qemu.
 
-Xen libraries in 4.10 include a new xentoolcore library.  This
-contains the xentoolcore_restrict_all function which we are about to
-want to use.
+We must postpone the restrict call until roughly the same time as qemu
+changes its uid, chroots (if applicable), and so on.
+
+There doesn't seem to be an appropriate hook already.  The RunState
+change hook fires at different times depending on exactly what mode
+qemu is operating in.
+
+And it appears that no-one but the Xen code wants a hook at this phase
+of execution.  So, introduce a bare call to a new function
+xen_setup_post, just before os_setup_post.  Also provide the
+appropriate stub for when Xen compilation is disabled.
+
+We do the restriction before rather than after os_setup_post, because
+xen_restrict may need to open /dev/null, and os_setup_post might have
+called chroot.
+
+Currently this does not work with migration, because when running as
+the Xen device model qemu needs to signal to the toolstack that it is
+ready.  It currently does this using xenstore, and for incoming
+migration (but not for ordinary startup) that happens after
+os_setup_post.
+
+It is correct that this happens late: we want the incoming migration
+stream to be processed by a restricted qemu.  The fix for this will be
+to do the startup notification a different way, without using
+xenstore.  (QMP is probably a reasonable choice.)
+
+So for now this restriction feature cannot be used in conjunction with
+migration.  (Note that this is not a regression in this patch, because
+previously the -xen-restrict-domid call was, in fact, simply
+ineffective!)  We will revisit this in the Xen 4.11 release cycle.
 
 Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
-Acked-by: Stefano Stabellini <sstabellini@kernel.org>
+CC: Paolo Bonzini <pbonzini@redhat.com> (maintainer:X86)
+CC: Richard Henderson <rth@twiddle.net> (maintainer:X86)
+CC: Eduardo Habkost <ehabkost@redhat.com> (maintainer:X86)
+CC: Michael S. Tsirkin <mst@redhat.com> (supporter:PC)
+Acked-by: Anthony PERARD <anthony.perard@citrix.com>
 ---
-v8: In pkg-config branch, add xentoolcore conditionally.
-    This cope with Xen 4.9 found via pkg-config.
-v5: More truthful commit message.
+v8: Drop now-redundant hunk patching stubs/xen-hvm.c
+v7: Use new AccelClass setup_post hook, rather than ad-hoc call
+    in vl.c.
+v5: Discuss problems with migration startup notification
+    in the commit message.
+v3: Do xen_setup_post just before, not just after, os_setup_post,
+    to improve interaction with chroot.  Thanks to Ross Lagerwall.
 ---
- configure | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ hw/i386/xen/xen-hvm.c |  8 --------
+ hw/xen/xen-common.c   | 14 ++++++++++++++
+ 2 files changed, 14 insertions(+), 8 deletions(-)
 
-diff --git a/configure b/configure
-index 0a19b03..5cf9dde 100755
---- a/configure
-+++ b/configure
-@@ -2189,6 +2189,9 @@ if test "$xen" != "no" ; then
-     xen=yes
-     xen_pc="xencontrol xenstore xenguest xenforeignmemory xengnttab"
-     xen_pc="$xen_pc xenevtchn xendevicemodel"
-+    if $pkg_config --exists xentoolcore; then
-+      xen_pc="$xen_pc xentoolcore"
-+    fi
-     QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags $xen_pc)"
-     libs_softmmu="$($pkg_config --libs $xen_pc) $libs_softmmu"
-     LDFLAGS="$($pkg_config --libs $xen_pc) $LDFLAGS"
-@@ -2220,18 +2223,20 @@ EOF
-         cat > $TMPC <<EOF &&
- #undef XC_WANT_COMPAT_MAP_FOREIGN_API
- #include <xenforeignmemory.h>
-+#include <xentoolcore.h>
- int main(void) {
-   xenforeignmemory_handle *xfmem;
+diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+index f24b7d4..9c3b6b3 100644
+--- a/hw/i386/xen/xen-hvm.c
++++ b/hw/i386/xen/xen-hvm.c
+@@ -1254,14 +1254,6 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
+         goto err;
+     }
  
-   xfmem = xenforeignmemory_open(0, 0);
-   xenforeignmemory_map2(xfmem, 0, 0, 0, 0, 0, 0, 0);
-+  xentoolcore_restrict_all(0);
+-    if (xen_domid_restrict) {
+-        rc = xen_restrict(xen_domid);
+-        if (rc < 0) {
+-            error_report("failed to restrict: error %d", errno);
+-            goto err;
+-        }
+-    }
+-
+     xen_create_ioreq_server(xen_domid, &state->ioservid);
  
-   return 0;
+     state->exit.notify = xen_exit_notifier;
+diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
+index 83099dd..454777c 100644
+--- a/hw/xen/xen-common.c
++++ b/hw/xen/xen-common.c
+@@ -117,6 +117,19 @@ static void xen_change_state_handler(void *opaque, int running,
+     }
  }
- EOF
--        compile_prog "" "$xen_libs -lxendevicemodel $xen_stable_libs"
-+        compile_prog "" "$xen_libs -lxendevicemodel $xen_stable_libs -lxentoolcore"
-       then
--      xen_stable_libs="-lxendevicemodel $xen_stable_libs"
-+      xen_stable_libs="-lxendevicemodel $xen_stable_libs -lxentoolcore"
-       xen_ctrl_version=41000
-       xen=yes
-     elif
+ 
++static void xen_setup_post(MachineState *ms, AccelState *accel)
++{
++    int rc;
++
++    if (xen_domid_restrict) {
++        rc = xen_restrict(xen_domid);
++        if (rc < 0) {
++            perror("xen: failed to restrict");
++            exit(1);
++        }
++    }
++}
++
+ static int xen_init(MachineState *ms)
+ {
+     xen_xc = xc_interface_open(0, 0, 0);
+@@ -165,6 +178,7 @@ static void xen_accel_class_init(ObjectClass *oc, void *data)
+     AccelClass *ac = ACCEL_CLASS(oc);
+     ac->name = "Xen";
+     ac->init_machine = xen_init;
++    ac->setup_post = xen_setup_post;
+     ac->allowed = &xen_allowed;
+     ac->global_props = xen_compat_props;
+ }
 -- 
 2.1.4
