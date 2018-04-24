@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50468)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fAzwa-000648-CR
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:33:25 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fAzwc-00065p-SD
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:33:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fAzwY-0001bS-4H
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:33:24 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:39447)
+	(envelope-from <alex.bennee@linaro.org>) id 1fAzwb-0001hq-V3
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:33:26 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:41572)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fAzwX-0001aB-T1
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:33:22 -0400
-Received: by mail-wr0-x244.google.com with SMTP id q3-v6so40411812wrj.6
-	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 08:33:21 -0700 (PDT)
+	id 1fAzwb-0001ga-PD
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:33:25 -0400
+Received: by mail-wr0-x241.google.com with SMTP id g21-v6so22928191wrb.8
+	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 08:33:25 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 24 Apr 2018 16:23:41 +0100
-Message-Id: <20180424152405.10304-23-alex.bennee@linaro.org>
+Date: Tue, 24 Apr 2018 16:23:36 +0100
+Message-Id: <20180424152405.10304-18-alex.bennee@linaro.org>
 In-Reply-To: <20180424152405.10304-1-alex.bennee@linaro.org>
 References: <20180424152405.10304-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 22/46] tests/tcg/i386: disable i386 version
- of test-i386-ssse
+Subject: [Qemu-devel] [PATCH v3 17/46] docker: Add fedora-i386-cross image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,26 +32,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-It doesn't build for i386 easily and we probably need a better more
-methodical test for SSE et all in QEMU.
+From: Fam Zheng <famz@redhat.com>
 
+It has some basic *-devel.i686 packages to be used with "gcc -m32" as a
+32 bit cross build environment.
+
+Signed-off-by: Fam Zheng <famz@redhat.com>
+[AJB: add glibc-static]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/tcg/i386/Makefile.target | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/tcg/i386/Makefile.target b/tests/tcg/i386/Makefile.target
-index 39a1627650..80ccad3d7b 100644
---- a/tests/tcg/i386/Makefile.target
-+++ b/tests/tcg/i386/Makefile.target
-@@ -9,7 +9,7 @@ I386_SRCS=$(notdir $(wildcard $(I386_SRC)/*.c))
- I386_TESTS=$(I386_SRCS:.c=)
- 
- # Update TESTS
--TESTS+=$(I386_TESTS)
-+TESTS+=$(I386_ONLY_TESTS)
- 
- ifneq ($(TARGET_NAME),x86_64)
- CFLAGS+=-m32
+---
+v2
+  - include static glibc package as well
+---
+ tests/docker/dockerfiles/fedora-i386-cross.docker | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+ create mode 100644 tests/docker/dockerfiles/fedora-i386-cross.docker
+
+diff --git a/tests/docker/dockerfiles/fedora-i386-cross.docker b/tests/docker/dockerfiles/fedora-i386-cross.docker
+new file mode 100644
+index 0000000000..8fbef2fa53
+--- /dev/null
++++ b/tests/docker/dockerfiles/fedora-i386-cross.docker
+@@ -0,0 +1,14 @@
++FROM fedora:latest
++ENV PACKAGES \
++    gcc \
++    glibc-static.i686 \
++    glibc-devel.i686 \
++    glib2-devel.i686 \
++    zlib-devel.i686 \
++    glib2-devel.i686 \
++    nettle-devel.i686 \
++    pixman-devel.i686 \
++    gnutls-devel.i686
++
++RUN dnf install -y $PACKAGES
++RUN rpm -q $PACKAGES | sort > /packages.txt
 -- 
 2.17.0
