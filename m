@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fB6P9-0003A9-QB
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 18:27:20 -0400
+	(envelope-from <eblake@redhat.com>) id 1fB6Sl-0004Ut-Lu
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 18:31:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fB6P8-0004pL-Ld
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 18:27:19 -0400
-References: <20180424152515.25664-1-kwolf@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1fB6Si-00062F-GT
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 18:31:03 -0400
+References: <20180424214550.32549-1-lersek@redhat.com>
+	<20180424214550.32549-2-lersek@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <d456659b-7ea8-faab-8022-73a845974821@redhat.com>
-Date: Tue, 24 Apr 2018 17:27:04 -0500
+Message-ID: <e5a4a333-c960-59ce-a850-105a7b609084@redhat.com>
+Date: Tue, 24 Apr 2018 17:30:51 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180424152515.25664-1-kwolf@redhat.com>
+In-Reply-To: <20180424214550.32549-2-lersek@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="H0r8tQ6QhxrHD02CMLJhsMLNz3gtWrygp"
-Subject: Re: [Qemu-devel] [RFC PATCH 00/33] Generic background jobs
+	boundary="VLTeZgxgjZmzHeAksju4JsE2rjRYkTO3t"
+Subject: Re: [Qemu-devel] [PATCH 1/6] qapi: fill in CpuInfoFast.arch in
+ query-cpus-fast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,55 +25,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jcody@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, qemu-stable@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---H0r8tQ6QhxrHD02CMLJhsMLNz3gtWrygp
+--VLTeZgxgjZmzHeAksju4JsE2rjRYkTO3t
 From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jcody@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org,
- mreitz@redhat.com
-Message-ID: <d456659b-7ea8-faab-8022-73a845974821@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 00/33] Generic background jobs
-References: <20180424152515.25664-1-kwolf@redhat.com>
-In-Reply-To: <20180424152515.25664-1-kwolf@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>,
+ Richard Henderson <rth@twiddle.net>, qemu-stable@nongnu.org
+Message-ID: <e5a4a333-c960-59ce-a850-105a7b609084@redhat.com>
+Subject: Re: [PATCH 1/6] qapi: fill in CpuInfoFast.arch in query-cpus-fast
+References: <20180424214550.32549-1-lersek@redhat.com>
+ <20180424214550.32549-2-lersek@redhat.com>
+In-Reply-To: <20180424214550.32549-2-lersek@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 04/24/2018 10:24 AM, Kevin Wolf wrote:
-> Before we can make x-blockdev-create a background job, we need to
-> generalise the job infrastructure so that it can be used without any
-> associated block node.
->=20
-> This series extracts a Job object from the block job infrastructure,
-> which should contain everything related to jobs that doesn't require th=
-e
-> block layer to be involved.
->=20
-> The split between BlockJob and Job is reasonably complete as of this RF=
-C
-> (though there are still some rough edges). Missing are mainly:
->=20
-> * Some cleanups. This means mostly TODOs left for functions moved to
->   job.c that should become static again, but were still called from
->   blockjob.c. At this point, most of these public declarations aren't
->   actually necessary any more, or very little is missing to make them
->   unnecessary.
->=20
-> * A QMP interface that can be used with non-block job. The existing
->   block-job-* QMP commands will tell the user that they don't know the
->   job if you pass the ID of a non-block job.
->=20
-> * The actual conversion of x-blockdev-create to Job, as a proof of
->   concept that the generalised infrastructure actually works.
+On 04/24/2018 04:45 PM, Laszlo Ersek wrote:
+> Commit ca230ff33f89 added added the @arch field to @CpuInfoFast, but it=
 
-I didn't review the second half as closely, but did glance through the
-whole series.  Overall, I like what I'm seeing; it looks like you have
-indeed extracted the non-block portions into a reusable framework that
-can be extended to other uses.  It would also be interesting to see what
-other long-running operations we can map into this scheme, such as
-migration or capturing a screenshot.
+
+s/added added/added/
+
+> failed to set the new field in qmp_query_cpus_fast(), when TARGET_S390X=
+
+> was not defined. The updated @query-cpus-fast example in
+> "qapi-schema.json" showed "arch":"x86" only because qmp_query_cpus_fast=
+()
+> calls g_malloc0() to allocate CpuInfoFast, and the CPU_INFO_ARCH_X86 en=
+um
+> constant is generated with value 0.
+>=20
+> All @arch values other than @s390 implied the @CpuInfoOther sub-struct =
+for
+> @CpuInfoFast -- at the time of writing the patch --, thus no fields oth=
+er
+> than @arch needed to be set when TARGET_S390X was not defined. Set @arc=
+h
+> now, by copying the corresponding assignments from qmp_query_cpus().
+
+Perhaps worth mentioning that the riscv architecture shows up as 'other'
+in this patch?  (But that gets cleaned up in the next one, so no big deal=
+)
+
+>=20
+> Cc: Eric Blake <eblake@redhat.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: qemu-stable@nongnu.org
+> Fixes: ca230ff33f89bf7102cbfbc2328716da6750aaed
+> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+> ---
+>=20
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -79,7 +90,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---H0r8tQ6QhxrHD02CMLJhsMLNz3gtWrygp
+--VLTeZgxgjZmzHeAksju4JsE2rjRYkTO3t
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -88,14 +99,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrfrzgACgkQp6FrSiUn
-Q2o8pwf/dJwHVDnIU7YNm24U/s2sDSL2g5B1BUc5k6CWcWxXzqYs7JA7PTRDvU1a
-rjnU94zdcXxn/qXqb9qonv92LOtn71ylr86gTEWQ+DP6CPt4Cr10SFmaALAgDuwV
-Lp5R5b3/dYD6Qopr5n8dg8VVQfB9EK63At0lB5A1szXi3I1QgL2lG0+ryZd/Jg6O
-S9gEXC9/S6QWzrUxF68SSBl5I9CN1ySt8ue+NSiif+Xoegt5itDxRQidGRCZLEPU
-NMFybr4rArEiOg63Wj8rydaSXgANxfFLREwsDfKbhTSG5KTskxyV9h3QMH56Kv/C
-E6H2fkD6FTa3GK0xOgatHX0c5VjBgQ==
-=wh1n
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrfsBsACgkQp6FrSiUn
+Q2pJsggAgjM9bO26B/Kw0YrOQrV4kWDSq3guy/ksBy+3nUcsVxbkut88kqYV7Ghy
+sBr8SDFKXUlkkMFG28QrTkJauI8/OkE/wcSiTmkf0+NoiWgimxFSIIzIjrexVtbC
+1uvCp1yKJL1IAtKUj+3SCr+LFrg0Ht0rh2lZOZ6ZtZV5c20xStY3pWQkB+7taXn4
+bUBSu0P18nnVdvK3ou+3vsFOl+nMZlYzV9VVbMhm7hkwpcafTMAxKaOKifAbNVSG
+g+pdJMEIJgdZGVzPSeypTkIi9a0rxYLJQPFCOEHCdGeWDVZQfQ/AV78KvkP7AEev
+Bw4Jyv1CFwKppzXJBmYSIBueSusxFQ==
+=nwJy
 -----END PGP SIGNATURE-----
 
---H0r8tQ6QhxrHD02CMLJhsMLNz3gtWrygp--
+--VLTeZgxgjZmzHeAksju4JsE2rjRYkTO3t--
