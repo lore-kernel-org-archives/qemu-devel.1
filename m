@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1fAsw1-0005h3-Nq
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 04:04:22 -0400
+	(envelope-from <clg@kaod.org>) id 1fAt3A-0006tT-Ha
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 04:11:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1fAsvz-0001d5-3d
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 04:04:21 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54134 helo=mx1.redhat.com)
+	(envelope-from <clg@kaod.org>) id 1fAt37-0006vb-Og
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 04:11:44 -0400
+Received: from 4.mo178.mail-out.ovh.net ([46.105.49.171]:58366)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1fAsvy-0001cF-UL
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 04:04:19 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4C6074270969
-	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 08:04:14 +0000 (UTC)
-Date: Tue, 24 Apr 2018 10:04:04 +0200
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20180424080404.GO3502@paraplu>
-References: <20180420231246.23130-1-lersek@redhat.com>
-	<20180420231246.23130-2-lersek@redhat.com>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fAt37-0006Ze-FY
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 04:11:41 -0400
+Received: from player737.ha.ovh.net (unknown [10.109.108.38])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 0428314EDF
+	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 10:11:31 +0200 (CEST)
+References: <20180419124331.3915-1-clg@kaod.org>
+	<20180419124331.3915-3-clg@kaod.org>
+	<20180423064408.GF19804@umbus.fritz.box>
+	<ac69df02-8ee8-0506-36ac-83fdaccdca77@kaod.org>
+	<20180424064119.GO19804@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <0fb72eb1-d9b5-968b-137a-7d44af116530@kaod.org>
+Date: Tue, 24 Apr 2018 10:11:27 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180420231246.23130-2-lersek@redhat.com>
-Subject: Re: [Qemu-devel] [qemu RFC v3 1/3] qapi: add SysEmuTarget to
- "common.json"
+In-Reply-To: <20180424064119.GO19804@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 02/35] ppc/xive: add support for the LSI
+ interrupt sources
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,47 +35,259 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On Sat, Apr 21, 2018 at 01:12:44AM +0200, Laszlo Ersek wrote:
-> We'll soon need an enumeration type that lists all the softmmu targets
-> that QEMU (the project) supports. Introduce @SysEmuTarget to
-> "common.json".
+On 04/24/2018 08:41 AM, David Gibson wrote:
+> On Mon, Apr 23, 2018 at 09:31:24AM +0200, C=E9dric Le Goater wrote:
+>> On 04/23/2018 08:44 AM, David Gibson wrote:
+>>> On Thu, Apr 19, 2018 at 02:42:58PM +0200, C=E9dric Le Goater wrote:
+>>>> The 'sent' status of the LSI interrupt source is modeled with the 'P=
+'
+>>>> bit of the ESB and the assertion status of the source is maintained =
+in
+>>>> an array under the main sPAPRXive object. The type of the source is
+>>>> stored in the same array for practical reasons.
+>>>>
+>>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>>>> ---
+>>>>  hw/intc/xive.c        | 54 ++++++++++++++++++++++++++++++++++++++++=
++++++++----
+>>>>  include/hw/ppc/xive.h | 16 +++++++++++++++
+>>>>  2 files changed, 66 insertions(+), 4 deletions(-)
+>>>>
+>>>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+>>>> index c70578759d02..060976077dd7 100644
+>>>> --- a/hw/intc/xive.c
+>>>> +++ b/hw/intc/xive.c
+>>>> @@ -104,6 +104,21 @@ static void xive_source_notify(XiveSource *xsrc=
+, int srcno)
+>>>> =20
+>>>>  }
+>>>> =20
+>>>> +/*
+>>>> + * LSI interrupt sources use the P bit and a custom assertion flag
+>>>> + */
+>>>> +static bool xive_source_lsi_trigger(XiveSource *xsrc, uint32_t srcn=
+o)
+>>>> +{
+>>>> +    uint8_t old_pq =3D xive_source_pq_get(xsrc, srcno);
+>>>> +
+>>>> +    if  (old_pq =3D=3D XIVE_ESB_RESET &&
+>>>> +         xsrc->status[srcno] & XIVE_STATUS_ASSERTED) {
+>>>> +        xive_source_pq_set(xsrc, srcno, XIVE_ESB_PENDING);
+>>>> +        return true;
+>>>> +    }
+>>>> +    return false;
+>>>> +}
+>>>> +
+>>>>  /* In a two pages ESB MMIO setting, even page is the trigger page, =
+odd
+>>>>   * page is for management */
+>>>>  static inline bool xive_source_is_trigger_page(hwaddr addr)
+>>>> @@ -133,6 +148,13 @@ static uint64_t xive_source_esb_read(void *opaq=
+ue, hwaddr addr, unsigned size)
+>>>>           */
+>>>>          ret =3D xive_source_pq_eoi(xsrc, srcno);
+>>>> =20
+>>>> +        /* If the LSI source is still asserted, forward a new sourc=
+e
+>>>> +         * event notification */
+>>>> +        if (xive_source_irq_is_lsi(xsrc, srcno)) {
+>>>> +            if (xive_source_lsi_trigger(xsrc, srcno)) {
+>>>> +                xive_source_notify(xsrc, srcno);
+>>>> +            }
+>>>> +        }
+>>>>          break;
+>>>> =20
+>>>>      case XIVE_ESB_GET:
+>>>> @@ -183,6 +205,14 @@ static void xive_source_esb_write(void *opaque,=
+ hwaddr addr,
+>>>>           * notification
+>>>>           */
+>>>>          notify =3D xive_source_pq_eoi(xsrc, srcno);
+>>>> +
+>>>> +        /* LSI sources do not set the Q bit but they can still be
+>>>> +         * asserted, in which case we should forward a new source
+>>>> +         * event notification
+>>>> +         */
+>>>> +        if (xive_source_irq_is_lsi(xsrc, srcno)) {
+>>>> +            notify =3D xive_source_lsi_trigger(xsrc, srcno);
+>>>> +        }
+>>
+>> FYI, I have moved that common test under xive_source_pq_eoi()
+>=20
+> Ok.
+>=20
+>>>>          break;
+>>>> =20
+>>>>      default:
+>>>> @@ -216,8 +246,17 @@ static void xive_source_set_irq(void *opaque, i=
+nt srcno, int val)
+>>>>      XiveSource *xsrc =3D XIVE_SOURCE(opaque);
+>>>>      bool notify =3D false;
+>>>> =20
+>>>> -    if (val) {
+>>>> -        notify =3D xive_source_pq_trigger(xsrc, srcno);
+>>>> +    if (xive_source_irq_is_lsi(xsrc, srcno)) {
+>>>> +        if (val) {
+>>>> +            xsrc->status[srcno] |=3D XIVE_STATUS_ASSERTED;
+>>>> +        } else {
+>>>> +            xsrc->status[srcno] &=3D ~XIVE_STATUS_ASSERTED;
+>>>> +        }
+>>>> +        notify =3D xive_source_lsi_trigger(xsrc, srcno);
+>>>> +    } else {
+>>>> +        if (val) {
+>>>> +            notify =3D xive_source_pq_trigger(xsrc, srcno);
+>>>> +        }
+>>>>      }
+>>>> =20
+>>>>      /* Forward the source event notification for routing */
+>>>> @@ -234,13 +273,13 @@ void xive_source_pic_print_info(XiveSource *xs=
+rc, Monitor *mon)
+>>>>                     xsrc->offset, xsrc->offset + xsrc->nr_irqs - 1);
+>>>>      for (i =3D 0; i < xsrc->nr_irqs; i++) {
+>>>>          uint8_t pq =3D xive_source_pq_get(xsrc, i);
+>>>> -        uint32_t lisn =3D i  + xsrc->offset;
+>>>> =20
+>>>>          if (pq =3D=3D XIVE_ESB_OFF) {
+>>>>              continue;
+>>>>          }
+>>>> =20
+>>>> -        monitor_printf(mon, "  %4x %c%c\n", lisn,
+>>>> +        monitor_printf(mon, "  %4x %s %c%c\n", i + xsrc->offset,
+>>>> +                       xive_source_irq_is_lsi(xsrc, i) ? "LSI" : "M=
+SI",
+>>>>                         pq & XIVE_ESB_VAL_P ? 'P' : '-',
+>>>>                         pq & XIVE_ESB_VAL_Q ? 'Q' : '-');
+>>>>      }
+>>>> @@ -249,6 +288,12 @@ void xive_source_pic_print_info(XiveSource *xsr=
+c, Monitor *mon)
+>>>>  static void xive_source_reset(DeviceState *dev)
+>>>>  {
+>>>>      XiveSource *xsrc =3D XIVE_SOURCE(dev);
+>>>> +    int i;
+>>>> +
+>>>> +    /* Keep the IRQ type */
+>>>> +    for (i =3D 0; i < xsrc->nr_irqs; i++) {
+>>>> +        xsrc->status[i] &=3D ~XIVE_STATUS_ASSERTED;
+>>>> +    }
+>>>> =20
+>>>>      /* SBEs are initialized to 0b01 which corresponds to "ints off"=
+ */
+>>>>      memset(xsrc->sbe, 0x55, xsrc->sbe_size);
+>>>> @@ -273,6 +318,7 @@ static void xive_source_realize(DeviceState *dev=
+, Error **errp)
+>>>> =20
+>>>>      xsrc->qirqs =3D qemu_allocate_irqs(xive_source_set_irq, xsrc,
+>>>>                                       xsrc->nr_irqs);
+>>>> +    xsrc->status =3D g_malloc0(xsrc->nr_irqs);
+>>>> =20
+>>>>      /* Allocate the SBEs (State Bit Entry). 2 bits, so 4 entries pe=
+r byte */
+>>>>      xsrc->sbe_size =3D DIV_ROUND_UP(xsrc->nr_irqs, 4);
+>>>> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+>>>> index d92a50519edf..0b76dd278d9b 100644
+>>>> --- a/include/hw/ppc/xive.h
+>>>> +++ b/include/hw/ppc/xive.h
+>>>> @@ -33,6 +33,9 @@ typedef struct XiveSource {
+>>>>      uint32_t     nr_irqs;
+>>>>      uint32_t     offset;
+>>>>      qemu_irq     *qirqs;
+>>>> +#define XIVE_STATUS_LSI         0x1
+>>>> +#define XIVE_STATUS_ASSERTED    0x2
+>>>> +    uint8_t      *status;
+>>>
+>>> I don't love the idea of mixing configuration information (STATUS_LSI=
+)
+>>> with runtime state information (ASSERTED) in the same field.  Any
+>>> reason not to have these as parallel bitmaps.
+>>
+>> none. I can change that.=20
+>=20
+> Ok.
+>=20
+>>> Come to that.. is there a compelling reason to allow any individual
+>>> irq to be marked LSI or MSI, rather than using separate XiveSource
+>>> objects for MSIs and LSIs?
+>>
+>> yes. I would have preferred two distinct interrupt source objects but=20
+>> this is to be compatible with XICS, which uses only one. If we want
+>> to be able to change interrupt mode, the IRQ number space should be
+>> organized in the exact same way. Or we should change XICS also.
+>>
+>> Also, the change (a bitmap) is really small.
+>=20
+> Hrm, but since XIVE supports thousands of irqs, it could be quite a
+> large bitmap.
 
-[...]
+Yes. The change is small, not the bitmap.
+=20
+> It's not impossible - in fact, not really even that hard - to change
+> the existing irq layout on xics.  It does need a new machine type
+> variant, of course.
 
-> Notes:
->     RFCv3:
->     
->     - The patch is new in this version. [Dan, Markus]
->     
->     - The original idea was to call the new enum @Target; however, @Target
->       generates exactly the TARGET_AARCH64, TARGET_ALPHA, TARGET_ARM, ...
->       enumeration constants that conflict with the poisoned preprocessing
->       macros of the same names. Hence @SysEmuTarget -- it's more accurate
->       anyway, since we want it to stand for system emulation targets.
->     
->     - Also, we discussed defining the new type in either "common.json" or
->       "misc.json". "misc.json" turned out to be a problem: "firmware.json"
->       would then include "misc.json" for the new type's sake, but that
->       inclusion would become the first appearance of "misc.json" -- within
->       "firmware.json". That messed up the generated documentation. By adding
->       the new type to "common.json", "misc.json" (see the 2nd patch) and
->       "firmware.json" (see the 3rd patch) can both consume the new type
->       without problems.
+I did some work on that topic a while ago :
 
-The last two points are interesting enough (for me) to still to keep in
-the commit message, but that's minor :-)
+	https://patchwork.ozlabs.org/cover/836782/
 
->  qapi/common.json | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
+But we stopped exploring the idea. May be it was not the good approach.
+The PHBs LSIs would benefit from such a split though.
 
-FWIW:
+>>>>      /* PQ bits */
+>>>>      uint8_t      *sbe;
+>>>
+>>> .. and come to that is there a reason to keep the ASSERTED bit in a
+>>> separate array from sbe?  AFAICT the actual 2-bit-per-irq layout is
+>>> never exposed to the guests.
+>>
+>> indeed. we always use the xive_source_pq_get/set() helpers to=20
+>> manipulate the PQ bits. So we could add an extra bit for the ASSERT=20
+>> without too much changes. Could also we put the type there or would=20
+>> you still prefer a bitmap ? =20
+>=20
+> I'd prefer the type (config information) be separate from the P, Q,
+> ASSERTED bits (state information).
 
-Reviewed-by: Kashyap Chamarthy <kchamart@redhat.com>
+ok. So I will use the 'uint8_t *status' for P, Q, ASSERT, which leaves
+5 bits available, but I don't think it is really worth the pain to=20
+optimize the size. The sbe array will disappear and we will have=20
+a bitmap for the type.
 
-[...]
+Thanks,
 
--- 
-/kashyap
+C.=20
+
+>>> Or, even re-use the Q bit for asserted in LSIs (but report it as
+>>> always 0 in the register read/write path).
+>>
+>> I would prefer to add extra status bits. It is easier to debug.
+>>
+>> Thanks,
+>>
+>> C.
+>>
+>>>> @@ -127,4 +130,17 @@ uint8_t xive_source_pq_set(XiveSource *xsrc, ui=
+nt32_t srcno, uint8_t pq);
+>>>> =20
+>>>>  void xive_source_pic_print_info(XiveSource *xsrc, Monitor *mon);
+>>>> =20
+>>>> +static inline bool xive_source_irq_is_lsi(XiveSource *xsrc, uint32_=
+t srcno)
+>>>> +{
+>>>> +    assert(srcno < xsrc->nr_irqs);
+>>>> +    return xsrc->status[srcno] & XIVE_STATUS_LSI;
+>>>> +}
+>>>> +
+>>>> +static inline void xive_source_irq_set(XiveSource *xsrc, uint32_t s=
+rcno,
+>>>> +                                       bool lsi)
+>>>> +{
+>>>> +    assert(srcno < xsrc->nr_irqs);
+>>>> +    xsrc->status[srcno] |=3D lsi ? XIVE_STATUS_LSI : 0;
+>>>> +}
+>>>> +
+>>>>  #endif /* PPC_XIVE_H */
+>>>
+>>
+>=20
