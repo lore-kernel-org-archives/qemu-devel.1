@@ -1,39 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fAwSO-0003cM-Np
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 07:50:02 -0400
+	(envelope-from <clg@kaod.org>) id 1fAwfN-0007T9-Uw
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 08:03:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fAwSL-0003gF-ED
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 07:50:00 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48972)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1fAwSL-0003ft-5X
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 07:49:57 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w3OBnT4c116240
-	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 07:49:55 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2hj12rs1q4-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 07:49:53 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 24 Apr 2018 12:49:48 +0100
-References: <1524570294-23058-1-git-send-email-thuth@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 24 Apr 2018 13:49:44 +0200
+	(envelope-from <clg@kaod.org>) id 1fAwfJ-0002TF-DU
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 08:03:25 -0400
+Received: from 1.mo178.mail-out.ovh.net ([178.33.251.53]:45378)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fAwfJ-0002SW-5H
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 08:03:21 -0400
+Received: from player774.ha.ovh.net (unknown [10.109.120.69])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 756D311DAB
+	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 14:03:19 +0200 (CEST)
+References: <20180424113045.25687-1-clg@kaod.org>
+	<20180424113045.25687-5-clg@kaod.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <f949a056-23c2-fcfa-d9e0-6a2cb1142051@kaod.org>
+Date: Tue, 24 Apr 2018 14:03:14 +0200
 MIME-Version: 1.0
-In-Reply-To: <1524570294-23058-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <20180424113045.25687-5-clg@kaod.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <d2a9fc1a-9696-f2bd-d603-03b23de62004@de.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH] hw/s390x: Allow to configure the
- consoles with the "-serial" parameter
+Subject: Re: [Qemu-devel] [PATCH v4 4/5] target/ppc: add hash MMU support
+ for PowerNV POWER9 machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,240 +32,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-
-
-On 04/24/2018 01:44 PM, Thomas Huth wrote:
-> The consoles ("sclpconsole" and "sclplmconsole") can only be configured
-> with "-device" and "-chardev" so far. Other machines use the convenience
-> option "-serial" to configure the default consoles, too, even for virtual
-> consoles like spapr-vty on the pseries machine. So let's support this
-> option on s390x, too, so we can easily enable the serial console here
-> again with "-nodefaults", for example. Also map the second -serial
-> option to the "sclplmconsole", so that there is now an easy way to
-> configure this second console on s390x, too.
-> Additionally, the new code is also smaller than the old one and we have
-> less s390x-specific code in vl.c :-)
-
-Can you show some new example command lines?
-
-I read that as "the current command lines continue to work". Correct?
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  hw/s390x/event-facility.c         | 14 +++++++++++
->  hw/s390x/s390-virtio-ccw.c        | 19 +++++++++++++--
->  include/hw/boards.h               |  1 -
->  include/hw/s390x/event-facility.h |  2 ++
->  vl.c                              | 50 ---------------------------------------
->  5 files changed, 33 insertions(+), 53 deletions(-)
-> 
-> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-> index 9c24bc6..e6940a2 100644
-> --- a/hw/s390x/event-facility.c
-> +++ b/hw/s390x/event-facility.c
-> @@ -511,3 +511,17 @@ static void register_types(void)
->  }
->  
->  type_init(register_types)
-> +
-> +BusState *sclp_get_event_facility_bus(void)
+> +hwaddr ppc_hash64_hpt_reg(PowerPCCPU *cpu)
 > +{
-> +    Object *busobj;
-> +    SCLPEventsBus *sbus;
+> +    CPUPPCState *env = &cpu->env;
 > +
-> +    busobj = object_resolve_path_type("", TYPE_SCLP_EVENTS_BUS, NULL);
-> +    sbus = OBJECT_CHECK(SCLPEventsBus, busobj, TYPE_SCLP_EVENTS_BUS);
-> +    if (!sbus) {
-> +        return NULL;
+> +    /* We should not reach this routine on sPAPR machines */
+> +    assert(!cpu->vhyp);
+> +
+> +    /* PowerNV machine */
+> +    if (msr_hv) {
+> +        if (env->mmu_model & POWERPC_MMU_3_00) {
+> +            return ppc64_v3_get_patbe0(cpu);
+> +        } else {
+> +            return cpu->env.spr[SPR_SDR1];
+> +        }
+> +    } else {
+> +        error_report("PowerNV guest support Unimplemented");
+> +        exit(1);
+
+I just noticed that this breaks 970 CPUs ...
+
+C.
+
+
 > +    }
-> +
-> +    return &sbus->qbus;
 > +}
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 435f7c9..fe28514 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -288,6 +288,15 @@ static void s390_create_virtio_net(BusState *bus, const char *name)
->      }
->  }
->  
-> +static void s390_create_sclpconsole(const char *type, Chardev *chardev)
-> +{
-> +    DeviceState *dev;
-> +
-> +    dev = qdev_create(sclp_get_event_facility_bus(), type);
-> +    qdev_prop_set_chr(dev, "chardev", chardev);
-> +    qdev_init_nofail(dev);
-> +}
-> +
->  static void ccw_init(MachineState *machine)
->  {
->      int ret;
-> @@ -311,6 +320,14 @@ static void ccw_init(MachineState *machine)
->                        machine->initrd_filename, "s390-ccw.img",
->                        "s390-netboot.img", true);
->  
-> +    /* init consoles */
-> +    if (serial_hds[0]) {
-> +        s390_create_sclpconsole("sclpconsole", serial_hds[0]);
-> +    }
-> +    if (serial_hds[1]) {
-> +        s390_create_sclpconsole("sclplmconsole", serial_hds[1]);
-> +    }
-> +
->      /*
->       * We cannot easily make the pci host bridge conditional as older QEMUs
->       * always created it. Doing so would break migration across QEMU versions.
-> @@ -470,10 +487,8 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
->      mc->block_default_type = IF_VIRTIO;
->      mc->no_cdrom = 1;
->      mc->no_floppy = 1;
-> -    mc->no_serial = 1;
->      mc->no_parallel = 1;
->      mc->no_sdcard = 1;
-> -    mc->use_sclp = 1;
->      mc->max_cpus = S390_MAX_CPUS;
->      mc->has_hotpluggable_cpus = true;
->      mc->get_hotplug_handler = s390_get_hotplug_handler;
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index a609239..5c5eee5 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -180,7 +180,6 @@ struct MachineClass {
->      unsigned int no_serial:1,
->          no_parallel:1,
->          use_virtcon:1,
-> -        use_sclp:1,
->          no_floppy:1,
->          no_cdrom:1,
->          no_sdcard:1,
-> diff --git a/include/hw/s390x/event-facility.h b/include/hw/s390x/event-facility.h
-> index 5698e5e..5cc16f6 100644
-> --- a/include/hw/s390x/event-facility.h
-> +++ b/include/hw/s390x/event-facility.h
-> @@ -210,4 +210,6 @@ typedef struct SCLPEventFacilityClass {
->      bool (*event_pending)(SCLPEventFacility *ef);
->  } SCLPEventFacilityClass;
->  
-> +BusState *sclp_get_event_facility_bus(void);
-> +
->  #endif
-> diff --git a/vl.c b/vl.c
-> index fce1fd1..b32340c 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -133,7 +133,6 @@ int main(int argc, char **argv)
->  #include "sysemu/iothread.h"
->  
->  #define MAX_VIRTIO_CONSOLES 1
-> -#define MAX_SCLP_CONSOLES 1
->  
->  static const char *data_dir[16];
->  static int data_dir_idx;
-> @@ -157,7 +156,6 @@ int no_frame;
->  Chardev *serial_hds[MAX_SERIAL_PORTS];
->  Chardev *parallel_hds[MAX_PARALLEL_PORTS];
->  Chardev *virtcon_hds[MAX_VIRTIO_CONSOLES];
-> -Chardev *sclp_hds[MAX_SCLP_CONSOLES];
->  int win2k_install_hack = 0;
->  int singlestep = 0;
->  int smp_cpus;
-> @@ -209,7 +207,6 @@ static int has_defaults = 1;
->  static int default_serial = 1;
->  static int default_parallel = 1;
->  static int default_virtcon = 1;
-> -static int default_sclp = 1;
->  static int default_monitor = 1;
->  static int default_floppy = 1;
->  static int default_cdrom = 1;
-> @@ -2571,39 +2568,6 @@ static int virtcon_parse(const char *devname)
->      return 0;
->  }
->  
-> -static int sclp_parse(const char *devname)
-> -{
-> -    QemuOptsList *device = qemu_find_opts("device");
-> -    static int index = 0;
-> -    char label[32];
-> -    QemuOpts *dev_opts;
-> -
-> -    if (strcmp(devname, "none") == 0) {
-> -        return 0;
-> -    }
-> -    if (index == MAX_SCLP_CONSOLES) {
-> -        error_report("too many sclp consoles");
-> -        exit(1);
-> -    }
-> -
-> -    assert(arch_type == QEMU_ARCH_S390X);
-> -
-> -    dev_opts = qemu_opts_create(device, NULL, 0, NULL);
-> -    qemu_opt_set(dev_opts, "driver", "sclpconsole", &error_abort);
-> -
-> -    snprintf(label, sizeof(label), "sclpcon%d", index);
-> -    sclp_hds[index] = qemu_chr_new(label, devname);
-> -    if (!sclp_hds[index]) {
-> -        error_report("could not connect sclp console"
-> -                     " to character backend '%s'", devname);
-> -        return -1;
-> -    }
-> -    qemu_opt_set(dev_opts, "chardev", label, &error_abort);
-> -
-> -    index++;
-> -    return 0;
-> -}
-> -
->  static int debugcon_parse(const char *devname)
->  {
->      QemuOpts *opts;
-> @@ -4237,9 +4201,6 @@ int main(int argc, char **argv, char **envp)
->      if (!has_defaults || !machine_class->use_virtcon) {
->          default_virtcon = 0;
->      }
-> -    if (!has_defaults || !machine_class->use_sclp) {
-> -        default_sclp = 0;
-> -    }
->      if (!has_defaults || machine_class->no_floppy) {
->          default_floppy = 0;
->      }
-> @@ -4286,16 +4247,11 @@ int main(int argc, char **argv, char **envp)
->              add_device_config(DEV_SERIAL, "mon:stdio");
->          } else if (default_virtcon && default_monitor) {
->              add_device_config(DEV_VIRTCON, "mon:stdio");
-> -        } else if (default_sclp && default_monitor) {
-> -            add_device_config(DEV_SCLP, "mon:stdio");
->          } else {
->              if (default_serial)
->                  add_device_config(DEV_SERIAL, "stdio");
->              if (default_virtcon)
->                  add_device_config(DEV_VIRTCON, "stdio");
-> -            if (default_sclp) {
-> -                add_device_config(DEV_SCLP, "stdio");
-> -            }
->              if (default_monitor)
->                  monitor_parse("stdio", "readline", false);
->          }
-> @@ -4308,9 +4264,6 @@ int main(int argc, char **argv, char **envp)
->              monitor_parse("vc:80Cx24C", "readline", false);
->          if (default_virtcon)
->              add_device_config(DEV_VIRTCON, "vc:80Cx24C");
-> -        if (default_sclp) {
-> -            add_device_config(DEV_SCLP, "vc:80Cx24C");
-> -        }
->      }
->  
->  #if defined(CONFIG_VNC)
-> @@ -4560,9 +4513,6 @@ int main(int argc, char **argv, char **envp)
->          exit(1);
->      if (foreach_device_config(DEV_VIRTCON, virtcon_parse) < 0)
->          exit(1);
-> -    if (foreach_device_config(DEV_SCLP, sclp_parse) < 0) {
-> -        exit(1);
-> -    }
->      if (foreach_device_config(DEV_DEBUGCON, debugcon_parse) < 0)
->          exit(1);
->  
-> 
