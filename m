@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41780)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fB4I0-0003Gn-A1
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 16:11:51 -0400
+	(envelope-from <alindsay@codeaurora.org>) id 1fB4f1-0001G7-0W
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 16:35:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fB4Hx-0000Fh-3l
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 16:11:48 -0400
-Resent-Message-Id: <E1fB4Hx-0000Fh-3l@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21047)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fB4Hw-0000FH-S0
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 16:11:45 -0400
-In-Reply-To: <20180424152515.25664-1-kwolf@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152458715376.2265.14476729178300047719@71c20359a636>
+	(envelope-from <alindsay@codeaurora.org>) id 1fB4ez-0002DZ-OZ
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 16:35:35 -0400
+Date: Tue, 24 Apr 2018 16:35:18 -0400
+From: Aaron Lindsay <alindsay@codeaurora.org>
+Message-ID: <20180424203517.GA4771@codeaurora.org>
+References: <1521232280-13089-1-git-send-email-alindsay@codeaurora.org>
+	<1521232280-13089-16-git-send-email-alindsay@codeaurora.org>
+	<CAFEAcA9bYdwByseqCMKSVtWV59mNruT3jJfWWLju1koCnwSb=Q@mail.gmail.com>
+	<20180417142318.GO24561@codeaurora.org>
+	<CAFEAcA8RwC7DSbo+mMqYUS6tL5UwfQGMa_r5AnAkJqm7v63HWw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 24 Apr 2018 09:25:55 -0700 (PDT)
-Subject: Re: [Qemu-devel] [RFC PATCH 00/33] Generic background jobs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8RwC7DSbo+mMqYUS6tL5UwfQGMa_r5AnAkJqm7v63HWw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v3 15/22] target/arm: Add ARM_FEATURE_V7VE
+ for v7 Virtualization Extensions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,141 +27,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kwolf@redhat.com
-Cc: famz@redhat.com, qemu-block@nongnu.org, jcody@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNDI0MTUyNTE1LjI1NjY0LTEta3dvbGZAcmVkaGF0LmNvbQpTdWJqZWN0
-OiBbUWVtdS1kZXZlbF0gW1JGQyBQQVRDSCAwMC8zM10gR2VuZXJpYyBiYWNrZ3JvdW5kIGpvYnMK
-Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90
-YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
-bmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpj
-b21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBp
-biAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQg
-bG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1h
-dD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAg
-ICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhp
-dCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
-ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
-ZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxODA0
-MjQwNDUxMTIuMTI5NjMtMS1wZXRlcnhAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwNDI0MDQ1
-MTEyLjEyOTYzLTEtcGV0ZXJ4QHJlZGhhdC5jb20KICogW25ldyB0YWddICAgICAgICAgICAgICAg
-cGF0Y2hldy8yMDE4MDQyNDE1MjUxNS4yNTY2NC0xLWt3b2xmQHJlZGhhdC5jb20gLT4gcGF0Y2hl
-dy8yMDE4MDQyNDE1MjUxNS4yNTY2NC0xLWt3b2xmQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBu
-ZXcgYnJhbmNoICd0ZXN0JwphNTM1MTc1MDIzIGpvYjogQWRkIGpvYl9kaXNtaXNzKCkKMDc0NWY2
-ZWFkMCBqb2I6IEFkZCBqb2JfeWllbGQoKQozMGVjMzE0ZjdjIGpvYjogTW92ZSBjb21wbGV0aW9u
-IGFuZCBjYW5jZWxsYXRpb24gdG8gSm9iCjU1ZmViMGRkMDEgam9iOiBNb3ZlIHRyYW5zYWN0aW9u
-cyB0byBKb2IKMDFmZGVlNGVmNCBqb2I6IFN3aXRjaCB0cmFuc2FjdGlvbnMgdG8gSm9iVHhuCjA4
-Zjk3ZTMyMDMgam9iOiBNb3ZlIGpvYl9maW5pc2hfc3luYygpIHRvIEpvYgoyOTA4MzMzMWMwIGpv
-YjogTW92ZSAuY29tcGxldGUgY2FsbGJhY2sgdG8gSm9iCjQ4MTA5YmRmMDYgam9iOiBBZGQgam9i
-X2RyYWluKCkKOWNmNmVmZjI1NCBqb2I6IENvbnZlcnQgYmxvY2tfam9iX2NhbmNlbF9hc3luYygp
-IHRvIEpvYgo2ZjJlNWQxZTc2IGpvYjogTW92ZSBzaW5nbGUgam9iIGZpbmFsaXNhdGlvbiB0byBK
-b2IKNTQ4NGJkMzY0MSBqb2I6IEFkZCBqb2JfZXZlbnRfKigpCjJiMTZlZTg4ZjcgYmxvY2tqb2I6
-IFNwbGl0IGJsb2NrX2pvYl9ldmVudF9wZW5kaW5nKCkKZWZmNjU0YTg2NSBqb2I6IE1vdmUgQmxv
-Y2tKb2JDcmVhdGVGbGFncyB0byBKb2IKMjlhNTQxOTUzZiBqb2I6IFJlcGxhY2UgQmxvY2tKb2Iu
-Y29tcGxldGVkIHdpdGggam9iX2lzX2NvbXBsZXRlZCgpCmQ4ODM1ZDkzNzYgam9iOiBNb3ZlIHBh
-dXNlL3Jlc3VtZSBmdW5jdGlvbnMgdG8gSm9iCjBmNzhhOTE1NTggam9iOiBBZGQgam9iX3NsZWVw
-X25zKCkKODc2NzIzMWI2MyBqb2I6IE1vdmUgY29yb3V0aW5lIGFuZCByZWxhdGVkIGNvZGUgdG8g
-Sm9iCjY0ZDE5ZGY5NTggam9iOiBNb3ZlIGRlZmVyX3RvX21haW5fbG9vcCB0byBKb2IKYmRmZTBh
-MjI5NCBqb2I6IEFkZCBKb2IuYWlvX2NvbnRleHQKMjAzNzcxZTRjZSBqb2I6IE1vdmUgY2FuY2Vs
-bGVkIHRvIEpvYgowYjU5NDFmNWRmIGpvYjogQWRkIHJlZmVyZW5jZSBjb3VudGluZwpjN2Y3MDFj
-NjZkIGpvYjogTW92ZSBzdGF0ZSB0cmFuc2l0aW9ucyB0byBKb2IKYmQ0ZmEyM2M4NiBqb2I6IE1h
-aW50YWluIGEgbGlzdCBvZiBhbGwgam9icwowM2ZiMDg4OGYyIGpvYjogQWRkIGpvYl9kZWxldGUo
-KQpkM2VmYjkxNmIwIGpvYjogQWRkIEpvYkRyaXZlci5qb2JfdHlwZQo2YTNlZTY4NTAwIGpvYjog
-UmVuYW1lIEJsb2NrSm9iVHlwZSBpbnRvIEpvYlR5cGUKYjFhYmRiNDhjYSBqb2I6IENyZWF0ZSBK
-b2IsIEpvYkRyaXZlciBhbmQgam9iX2NyZWF0ZSgpCjQ5YmZjNjNiYzAgYmxvY2tqb2I6IFJlbW92
-ZSBibG9ja19qb2JfcGF1c2UvcmVzdW1lX2FsbCgpCjc3YWUyNzcwNWUgYmxvY2tqb2I6IEFkZCBi
-bG9ja19qb2JfZHJpdmVyKCkKNmIzZjkwZmFiNCBibG9ja2pvYjogSW50cm9kdWNlIGJsb2NrX2pv
-Yl9yYXRlbGltaXRfZ2V0X2RlbGF5KCkKNmZiODcyYTg1ZiBibG9ja2pvYjogSW1wbGVtZW50IGJs
-b2NrX2pvYl9zZXRfc3BlZWQoKSBjZW50cmFsbHkKOGIzOWY3MTY1MyBibG9ja2pvYjogTW92ZSBS
-YXRlTGltaXQgdG8gQmxvY2tKb2IKN2Q4MzYwMjBlYSBibG9ja2pvYjogV3JhcHBlcnMgZm9yIHBy
-b2dyZXNzIGNvdW50ZXIgYWNjZXNzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRD
-SCAxLzMzOiBibG9ja2pvYjogV3JhcHBlcnMgZm9yIHByb2dyZXNzIGNvdW50ZXIgYWNjZXNzLi4u
-CkNoZWNraW5nIFBBVENIIDIvMzM6IGJsb2Nram9iOiBNb3ZlIFJhdGVMaW1pdCB0byBCbG9ja0pv
-Yi4uLgpDaGVja2luZyBQQVRDSCAzLzMzOiBibG9ja2pvYjogSW1wbGVtZW50IGJsb2NrX2pvYl9z
-ZXRfc3BlZWQoKSBjZW50cmFsbHkuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8zMzogYmxvY2tqb2I6IElu
-dHJvZHVjZSBibG9ja19qb2JfcmF0ZWxpbWl0X2dldF9kZWxheSgpLi4uCkNoZWNraW5nIFBBVENI
-IDUvMzM6IGJsb2Nram9iOiBBZGQgYmxvY2tfam9iX2RyaXZlcigpLi4uCkNoZWNraW5nIFBBVENI
-IDYvMzM6IGJsb2Nram9iOiBSZW1vdmUgYmxvY2tfam9iX3BhdXNlL3Jlc3VtZV9hbGwoKS4uLgpD
-aGVja2luZyBQQVRDSCA3LzMzOiBqb2I6IENyZWF0ZSBKb2IsIEpvYkRyaXZlciBhbmQgam9iX2Ny
-ZWF0ZSgpLi4uCkNoZWNraW5nIFBBVENIIDgvMzM6IGpvYjogUmVuYW1lIEJsb2NrSm9iVHlwZSBp
-bnRvIEpvYlR5cGUuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8zMzogam9iOiBBZGQgSm9iRHJpdmVyLmpv
-Yl90eXBlLi4uCkNoZWNraW5nIFBBVENIIDEwLzMzOiBqb2I6IEFkZCBqb2JfZGVsZXRlKCkuLi4K
-Q2hlY2tpbmcgUEFUQ0ggMTEvMzM6IGpvYjogTWFpbnRhaW4gYSBsaXN0IG9mIGFsbCBqb2JzLi4u
-CkNoZWNraW5nIFBBVENIIDEyLzMzOiBqb2I6IE1vdmUgc3RhdGUgdHJhbnNpdGlvbnMgdG8gSm9i
-Li4uCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNxdWFyZSBicmFja2V0ICdb
-JwojMzM0OiBGSUxFOiBqb2IuYzozODoKKyAgICAvKiBVOiAqLyBbSk9CX1NUQVRVU19VTkRFRklO
-RURdID0gezAsIDEsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDB9LAoKRVJST1I6IHNwYWNlIHBy
-b2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiMzMzU6IEZJTEU6IGpvYi5j
-OjM5OgorICAgIC8qIEM6ICovIFtKT0JfU1RBVFVTX0NSRUFURURdICAgPSB7MCwgMCwgMSwgMCwg
-MCwgMCwgMCwgMCwgMSwgMCwgMX0sCgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZWZvcmUgb3Bl
-biBzcXVhcmUgYnJhY2tldCAnWycKIzMzNjogRklMRTogam9iLmM6NDA6CisgICAgLyogUjogKi8g
-W0pPQl9TVEFUVVNfUlVOTklOR10gICA9IHswLCAwLCAwLCAxLCAxLCAwLCAxLCAwLCAxLCAwLCAw
-fSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNxdWFyZSBicmFja2V0ICdb
-JwojMzM3OiBGSUxFOiBqb2IuYzo0MToKKyAgICAvKiBQOiAqLyBbSk9CX1NUQVRVU19QQVVTRURd
-ICAgID0gezAsIDAsIDEsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDB9LAoKRVJST1I6IHNwYWNlIHBy
-b2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiMzMzg6IEZJTEU6IGpvYi5j
-OjQyOgorICAgIC8qIFk6ICovIFtKT0JfU1RBVFVTX1JFQURZXSAgICAgPSB7MCwgMCwgMCwgMCwg
-MCwgMSwgMSwgMCwgMSwgMCwgMH0sCgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZWZvcmUgb3Bl
-biBzcXVhcmUgYnJhY2tldCAnWycKIzMzOTogRklMRTogam9iLmM6NDM6CisgICAgLyogUzogKi8g
-W0pPQl9TVEFUVVNfU1RBTkRCWV0gICA9IHswLCAwLCAwLCAwLCAxLCAwLCAwLCAwLCAwLCAwLCAw
-fSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNxdWFyZSBicmFja2V0ICdb
-JwojMzQwOiBGSUxFOiBqb2IuYzo0NDoKKyAgICAvKiBXOiAqLyBbSk9CX1NUQVRVU19XQUlUSU5H
-XSAgID0gezAsIDAsIDAsIDAsIDAsIDAsIDAsIDEsIDEsIDAsIDB9LAoKRVJST1I6IHNwYWNlIHBy
-b2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiMzNDE6IEZJTEU6IGpvYi5j
-OjQ1OgorICAgIC8qIEQ6ICovIFtKT0JfU1RBVFVTX1BFTkRJTkddICAgPSB7MCwgMCwgMCwgMCwg
-MCwgMCwgMCwgMCwgMSwgMSwgMH0sCgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZWZvcmUgb3Bl
-biBzcXVhcmUgYnJhY2tldCAnWycKIzM0MjogRklMRTogam9iLmM6NDY6CisgICAgLyogWDogKi8g
-W0pPQl9TVEFUVVNfQUJPUlRJTkddICA9IHswLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAxLCAxLCAw
-fSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNxdWFyZSBicmFja2V0ICdb
-JwojMzQzOiBGSUxFOiBqb2IuYzo0NzoKKyAgICAvKiBFOiAqLyBbSk9CX1NUQVRVU19DT05DTFVE
-RURdID0gezAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDF9LAoKRVJST1I6IHNwYWNlIHBy
-b2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiMzNDQ6IEZJTEU6IGpvYi5j
-OjQ4OgorICAgIC8qIE46ICovIFtKT0JfU1RBVFVTX05VTExdICAgICAgPSB7MCwgMCwgMCwgMCwg
-MCwgMCwgMCwgMCwgMCwgMCwgMH0sCgp0b3RhbDogMTEgZXJyb3JzLCAwIHdhcm5pbmdzLCA1MTUg
-bGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hl
-Y2tpbmcgUEFUQ0ggMTMvMzM6IGpvYjogQWRkIHJlZmVyZW5jZSBjb3VudGluZy4uLgpDaGVja2lu
-ZyBQQVRDSCAxNC8zMzogam9iOiBNb3ZlIGNhbmNlbGxlZCB0byBKb2IuLi4KQ2hlY2tpbmcgUEFU
-Q0ggMTUvMzM6IGpvYjogQWRkIEpvYi5haW9fY29udGV4dC4uLgpDaGVja2luZyBQQVRDSCAxNi8z
-Mzogam9iOiBNb3ZlIGRlZmVyX3RvX21haW5fbG9vcCB0byBKb2IuLi4KQ2hlY2tpbmcgUEFUQ0gg
-MTcvMzM6IGpvYjogTW92ZSBjb3JvdXRpbmUgYW5kIHJlbGF0ZWQgY29kZSB0byBKb2IuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMTgvMzM6IGpvYjogQWRkIGpvYl9zbGVlcF9ucygpLi4uCkNoZWNraW5nIFBB
-VENIIDE5LzMzOiBqb2I6IE1vdmUgcGF1c2UvcmVzdW1lIGZ1bmN0aW9ucyB0byBKb2IuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMjAvMzM6IGpvYjogUmVwbGFjZSBCbG9ja0pvYi5jb21wbGV0ZWQgd2l0aCBq
-b2JfaXNfY29tcGxldGVkKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMjEvMzM6IGpvYjogTW92ZSBCbG9j
-a0pvYkNyZWF0ZUZsYWdzIHRvIEpvYi4uLgpDaGVja2luZyBQQVRDSCAyMi8zMzogYmxvY2tqb2I6
-IFNwbGl0IGJsb2NrX2pvYl9ldmVudF9wZW5kaW5nKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMjMvMzM6
-IGpvYjogQWRkIGpvYl9ldmVudF8qKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMjQvMzM6IGpvYjogTW92
-ZSBzaW5nbGUgam9iIGZpbmFsaXNhdGlvbiB0byBKb2IuLi4KV0FSTklORzogbGluZSBvdmVyIDgw
-IGNoYXJhY3RlcnMKIzQ5NjogRklMRTogaW5jbHVkZS9xZW11L2pvYi5oOjIyMToKKyAgICAgICAg
-ICAgICAgICAgaW50IGZsYWdzLCBCbG9ja0NvbXBsZXRpb25GdW5jICpjYiwgdm9pZCAqb3BhcXVl
-LCBFcnJvciAqKmVycnApOwoKRVJST1I6ICIoZm9vKikiIHNob3VsZCBiZSAiKGZvbyAqKSIKIzU2
-NzogRklMRTogam9iLmM6NDYyOgorICAgIGJsb2NrX2pvYl90eG5fZGVsX2pvYigoQmxvY2tKb2Iq
-KSBqb2IpOwoKRVJST1I6ICIoZm9vKikiIHNob3VsZCBiZSAiKGZvbyAqKSIKIzY0ODogRklMRTog
-am9iLmM6NTQzOgorICAgIGJsb2NrX2pvYl90eG5fZGVsX2pvYigoQmxvY2tKb2IqKSBqb2IpOwoK
-dG90YWw6IDIgZXJyb3JzLCAxIHdhcm5pbmdzLCA2MTEgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRj
-aCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMjUvMzM6IGpvYjog
-Q29udmVydCBibG9ja19qb2JfY2FuY2VsX2FzeW5jKCkgdG8gSm9iLi4uCkNoZWNraW5nIFBBVENI
-IDI2LzMzOiBqb2I6IEFkZCBqb2JfZHJhaW4oKS4uLgpDaGVja2luZyBQQVRDSCAyNy8zMzogam9i
-OiBNb3ZlIC5jb21wbGV0ZSBjYWxsYmFjayB0byBKb2IuLi4KQ2hlY2tpbmcgUEFUQ0ggMjgvMzM6
-IGpvYjogTW92ZSBqb2JfZmluaXNoX3N5bmMoKSB0byBKb2IuLi4KV0FSTklORzogbGluZSBvdmVy
-IDgwIGNoYXJhY3RlcnMKIzEyMTogRklMRTogaW5jbHVkZS9xZW11L2pvYi5oOjM3NToKK2ludCBq
-b2JfZmluaXNoX3N5bmMoSm9iICpqb2IsIHZvaWQgKCpmaW5pc2gpKEpvYiAqLCBFcnJvciAqKmVy
-cnApLCBFcnJvciAqKmVycnApOwoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxMzIgbGlu
-ZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2lu
-ZyBQQVRDSCAyOS8zMzogam9iOiBTd2l0Y2ggdHJhbnNhY3Rpb25zIHRvIEpvYlR4bi4uLgpDaGVj
-a2luZyBQQVRDSCAzMC8zMzogam9iOiBNb3ZlIHRyYW5zYWN0aW9ucyB0byBKb2IuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMzEvMzM6IGpvYjogTW92ZSBjb21wbGV0aW9uIGFuZCBjYW5jZWxsYXRpb24gdG8g
-Sm9iLi4uCkNoZWNraW5nIFBBVENIIDMyLzMzOiBqb2I6IEFkZCBqb2JfeWllbGQoKS4uLgpDaGVj
-a2luZyBQQVRDSCAzMy8zMzogam9iOiBBZGQgam9iX2Rpc21pc3MoKS4uLgo9PT0gT1VUUFVUIEVO
-RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVy
-YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
-c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Apr 17 16:00, Peter Maydell wrote:
+> On 17 April 2018 at 15:23, Aaron Lindsay <alindsay@codeaurora.org> wrote:
+> > On Apr 12 18:17, Peter Maydell wrote:
+> >> What's the difference between this and ARM_FEATURE_EL2 ?
+> >
+> > I use ARM_FEATURE_V7VE in a later patch to guard against implementing
+> > PMOVSSET on v7 machines which don't implement the virtualization
+> > extensions
+> > (http://lists.nongnu.org/archive/html/qemu-devel/2018-03/msg04917.html).
+> > I could use ARM_FEATURE_EL2, but declaring that v7 machines supported
+> > EL2 didn't feel right. I don't feel strongly one way or the other - how
+> > do you prefer to handle this?
+> 
+> So, the underlying issue here is that there's a QEMU specific
+> fudge going on. Architecturally, if the CPU implements the
+> Virtualization Extensions, then:
+>  * it has Hyp mode
+>  * it must also implement the Security Extensions
+>  * on reset it starts in the Secure world
+>  * it has LPAE
+>  * it has some stuff that is not inherently tied to having EL2,
+>    like the SDIV and UDIV instructions, and the presence of
+>    PMOVSSET
+> 
+> In an ideal world, we'd just have a feature flag that turned
+> all that on. Unfortunately, a combination of backwards compatibility
+> issues, the order in which various features were implemented
+> in QEMU, and the fact that KVM can't emulate a guest CPU with
+> the Security Extensions means that we want to be able to model
+> variants of some CPUs that don't really exist in real hardware:
+> Cortex-A15 and -A7 which only implement EL0/EL1 but still have
+> all the v7VE features that you can see from those ELs. But we
+> didn't really properly lay out guidelines for how the feature
+> bits should work in this case, with the result that we have
+> a bunch of local hacks (for instance get_S1prot() has a check
+> on the LPAE feature bit, since in practice that bit is set in
+> exactly the CPUs that have v7VE; and the UDIV/SDIV insns have
+> their own feature bits.)
+> 
+> So we should probably sort out this mess first, either by:
+> 
+> (a) state that we use ARM_FEATURE_LPAE for all checks for
+> features that are architecturally v7VE but which we want to
+> exist even on our v7VE-no-Hyp-no-Secure oddballs
+Are you implying that this would only involve updating the comments to
+match the existing implementation?
+
+> (b) define an ARM_FEATURE_V7VE for them
+This seems the most attractive to me, though perhaps that's partially
+aspirational - it is closest to what would be happening in an ideal
+world where QEMU fully supported V7VE for this hardware.
+
+> (c) define separate feature bits for them individually
+
+I'm hesitant to formulate a patch for this - I'm not confident I
+understand the context and interactions of the pieces involved well
+enough to contribute productively. That said, I understand your
+motivation to fix this the right way and am willing to try with a little
+more direction/hand-holding.
+
+For instance, which CPUs are we talking about here - I only see both
+ARM_FEATURE_ARM_DIV and ARM_FEATURE_LPAE advertised together (without
+full V8) in cortex_a7_initfn and cortex_a15_initfn. I'm assuming that V8
+implies the full set of V7VE features we're discussing here so whatever
+we come up with as a solution would be automatically set in the
+ARM_FEATURE_V8 "Some features automatically imply others:" `if`
+statement in  arm_cpu_realizefn.
+
+-Aaron
+
+> In any case we'd retain ARM_FEATURE_EL2 for "and really
+> has EL2/Hyp mode", and we'd want to do an audit of current
+> uses of various feature bits to see whether they followed
+> the new rules.
+> 
+> (For AArch64 things are a bit less awkward because the
+> architecture allows the idea of an implementation that
+> has EL2 but not EL3.)
+
+
+
+-- 
+Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the
+Code Aurora Forum, a Linux Foundation Collaborative Project.
