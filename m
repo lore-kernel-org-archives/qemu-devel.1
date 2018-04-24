@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fAy86-0002CB-5y
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 09:37:11 -0400
+	(envelope-from <david@redhat.com>) id 1fAyAU-0003JI-Ay
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 09:39:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fAy82-0007BZ-Ul
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 09:37:10 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53606 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fAy82-00079d-P4
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 09:37:06 -0400
-Date: Tue, 24 Apr 2018 14:36:58 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180424133658.GD2521@work-vm>
-References: <1523089594-1422-1-git-send-email-lidongchen@tencent.com>
-	<20180411122923.GE2667@work-vm>
-	<CAOGPPbc1b+0raMDrz5jms+8jeLf6T76nXybsmhLN-Eepe-xXfA@mail.gmail.com>
+	(envelope-from <david@redhat.com>) id 1fAyAR-0003sp-3g
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 09:39:38 -0400
+References: <20180420123456.22196-1-david@redhat.com>
+	<20180420123456.22196-4-david@redhat.com>
+	<20180423141928.7e64b380@redhat.com>
+	<860a6828-e18f-555e-274d-f9be9245eccb@redhat.com>
+	<20180424152824.7a87a85c@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <44c86da6-7851-d0c6-1121-6d1395a705c6@redhat.com>
+Date: Tue, 24 Apr 2018 15:39:30 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOGPPbc1b+0raMDrz5jms+8jeLf6T76nXybsmhLN-Eepe-xXfA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 0/5] Enable postcopy RDMA live migration
+In-Reply-To: <20180424152824.7a87a85c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] pc-dimm: factor out address space
+ logic into MemoryDevice code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,80 +28,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 858585 jemmy <jemmy858585@gmail.com>
-Cc: Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, adido@mellanox.com, licq@mellanox.com, Lidong Chen <lidongchen@tencent.com>, Gal Shachaf <galsha@mellanox.com>, Aviad Yehezkel <aviadye@mellanox.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-* 858585 jemmy (jemmy858585@gmail.com) wrote:
-> On Wed, Apr 11, 2018 at 8:29 PM, Dr. David Alan Gilbert
-> <dgilbert@redhat.com> wrote:
-> > * Lidong Chen (jemmy858585@gmail.com) wrote:
-> >> Current Qemu RDMA communication does not support send and receive
-> >> data at the same time, so when RDMA live migration with postcopy
-> >> enabled, the source qemu return path thread get qemu file error.
-> >>
-> >> Those patch add the postcopy support for RDMA live migration.
-> >
-> > This description is a little misleading; it doesn't really
-> > do RDMA during the postcopy phase - what it really does is disable
-> > the RDMA page sending during the postcopy phase, relying on the
-> > RDMA codes stream emulation to send the page.
+On 24.04.2018 15:28, Igor Mammedov wrote:
+> On Mon, 23 Apr 2018 14:44:34 +0200
+> David Hildenbrand <david@redhat.com> wrote:
 > 
-> Hi Dave:
->     I will modify the description in next version patch.
+>> On 23.04.2018 14:19, Igor Mammedov wrote:
+>>> On Fri, 20 Apr 2018 14:34:56 +0200
+>>> David Hildenbrand <david@redhat.com> wrote:
+> considering v4 queued, I'm dropping mostly nor relevant points at this point.
+> wrt, virtio I'll elaborate more in reply to Pankaj
 > 
-> >
-> > That's not necessarily a bad fix; you get the nice performance of RDMA
-> > during the precopy phase, but how bad are you finding the performance
-> > during the postcopy phase - the RDMA code we have was only really
-> > designed for sending small commands over the stream?
+> [...]
 > 
-> I have not finished the performance test. There are three choices for RDMA
-> migration during the postcopy phase.
+>>>> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+>>>> index b860c9c582..b96efa3bf4 100644
+>>>> --- a/hw/mem/memory-device.c
+>>>> +++ b/hw/mem/memory-device.c
+>>>> @@ -15,6 +15,8 @@
+>>>>  #include "qapi/error.h"
+>>>>  #include "hw/boards.h"
+>>>>  #include "qemu/range.h"
+>>>> +#include "hw/virtio/vhost.h"
+>>>> +#include "sysemu/kvm.h"
+>>>>  
+>>>>  static gint memory_device_addr_sort(gconstpointer a, gconstpointer b)
+>>>>  {
+>>>> @@ -106,6 +108,166 @@ uint64_t get_plugged_memory_size(void)
+>>>>      return size;
+>>>>  }
+>>>>  
+>>>> +static int memory_device_used_region_size_internal(Object *obj, void *opaque)
+>>>> +{
+>>>> +    uint64_t *size = opaque;
+>>>> +
+>>>> +    if (object_dynamic_cast(obj, TYPE_MEMORY_DEVICE)) {
+>>>> +        DeviceState *dev = DEVICE(obj);
+>>>> +        MemoryDeviceState *md = MEMORY_DEVICE(obj);
+>>>> +        MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(obj);
+>>>> +
+>>>> +        if (dev->realized) {
+>>>> +            *size += mdc->get_region_size(md, &error_abort);
+>>>> +        }
+>>>> +    }
+>>>> +
+>>>> +    object_child_foreach(obj, memory_device_used_region_size_internal, opaque);
+>>>> +    return 0;
+>>>> +}
+>>>> +
+>>>> +static uint64_t memory_device_used_region_size(void)
+>>>> +{
+>>>> +    uint64_t size = 0;
+>>>> +
+>>>> +    memory_device_used_region_size_internal(qdev_get_machine(), &size);
+>>>> +
+>>>> +    return size;
+>>>> +}
+>>>> +
+>>>> +uint64_t memory_device_get_free_addr(uint64_t *hint, uint64_t align,
+>>>> +                                     uint64_t size, Error **errp)  
+>>> I'd suggest to pc_dimm_memory_plug/pc_dimm_get_free_addr first,
+>>> namely most of the stuff it does like checks and assigning default
+>>> values should go to pre_plug (pre realize) handler and then only
+>>> actual mapping is left for plug (after realize) handler to deal with:
+>>>   
+>>
+>> Can you elaborate what you mean by pre-plug? If this is about pre plug
+>> handler of the (machine) hotplug handler, it might be problematic for
+>> virtio devices.
+> yes, something along these lines: c871bc70b
 > 
-> 1. RDMA SEND operation from the source qemu
-> 2. RDMA Write with Immediate from the source qemu
-> 3. RDMA READ from the destination qemu
 > 
-> In theory, RDMA READ from the destination qemu is the best way.
-> But I think it's better to make choice base on the performance result.
-> I will send the performance result later.
 
-An RDMA read certainly sounds like an interesting way for postcopy,
-since it means the destination would be in control; so it can RDMA into
-temporaries that it could then atomically place.  An interesting
-thought.
+Yes, we can factor that out (at least) for pc-dimm later on easily.
+Seems to be just about moving a couple of calls.
 
-> If use another way during the postcopy phase, it will a big change for the code.
-> This patch just make postcopy works, and i will send another patch to
-> improve the performance.
+-- 
 
-Sure; I just wanted to check that, because the existing code wasn't
-designed for sending pages, that it wasn't really terribly slow.
+Thanks,
 
-Dave
-
-> Thanks.
-> 
-> >
-> > Dave
-> >
-> >> Lidong Chen (5):
-> >>   migration: create a dedicated connection for rdma return path
-> >>   migration: add the interface to set get_return_path
-> >>   migration: implement the get_return_path for RDMA iochannel
-> >>   migration: fix qemu carsh when RDMA live migration
-> >>   migration: disable RDMA WRITR after postcopy started.
-> >>
-> >>  migration/qemu-file-channel.c |  12 ++--
-> >>  migration/qemu-file.c         |  13 +++-
-> >>  migration/qemu-file.h         |   2 +-
-> >>  migration/rdma.c              | 148 ++++++++++++++++++++++++++++++++++++++++--
-> >>  4 files changed, 163 insertions(+), 12 deletions(-)
-> >>
-> >> --
-> >> 1.8.3.1
-> >>
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+David / dhildenb
