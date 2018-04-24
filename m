@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47457)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fAzoy-0007j4-1Q
+	(envelope-from <kwolf@redhat.com>) id 1fAzoz-0007k8-1Q
 	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:25:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fAzow-0007fr-LJ
+	(envelope-from <kwolf@redhat.com>) id 1fAzov-0007e6-NU
 	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:25:32 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 24 Apr 2018 17:24:45 +0200
-Message-Id: <20180424152515.25664-4-kwolf@redhat.com>
+Date: Tue, 24 Apr 2018 17:24:44 +0200
+Message-Id: <20180424152515.25664-3-kwolf@redhat.com>
 In-Reply-To: <20180424152515.25664-1-kwolf@redhat.com>
 References: <20180424152515.25664-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 03/33] blockjob: Implement
- block_job_set_speed() centrally
+Subject: [Qemu-devel] [RFC PATCH 02/33] blockjob: Move RateLimit to BlockJob
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,232 +22,161 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-All block job drivers support .set_speed and all of them duplicate the
-same code to implement it. Move that code to blockjob.c and remove the
-now useless callback.
+Every block job has a RateLimit, and they all do the exact same thing
+with it, so it should be common infrastructure. Move the struct field
+for a start.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/block/blockjob.h     |  2 ++
- include/block/blockjob_int.h |  3 ---
- block/backup.c               | 13 -------------
- block/commit.c               | 14 --------------
- block/mirror.c               | 14 --------------
- block/stream.c               | 14 --------------
- blockjob.c                   | 12 ++++--------
- 7 files changed, 6 insertions(+), 66 deletions(-)
+ include/block/blockjob.h | 4 ++++
+ block/backup.c           | 5 ++---
+ block/commit.c           | 5 ++---
+ block/mirror.c           | 6 +++---
+ block/stream.c           | 5 ++---
+ 5 files changed, 13 insertions(+), 12 deletions(-)
 
 diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index 22bf418209..5aa8a6aaec 100644
+index a2cc52233b..22bf418209 100644
 --- a/include/block/blockjob.h
 +++ b/include/block/blockjob.h
-@@ -29,6 +29,8 @@
- #include "block/block.h"
- #include "qemu/ratelimit.h"
+@@ -27,6 +27,7 @@
+ #define BLOCKJOB_H
  
-+#define SLICE_TIME 100000000ULL /* ns */
-+
+ #include "block/block.h"
++#include "qemu/ratelimit.h"
+ 
  typedef struct BlockJobDriver BlockJobDriver;
  typedef struct BlockJobTxn BlockJobTxn;
+@@ -118,6 +119,9 @@ typedef struct BlockJob {
+     /** Speed that was set with @block_job_set_speed.  */
+     int64_t speed;
  
-diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-index 642adce68b..870bd346a8 100644
---- a/include/block/blockjob_int.h
-+++ b/include/block/blockjob_int.h
-@@ -41,9 +41,6 @@ struct BlockJobDriver {
-     /** String describing the operation, part of query-block-jobs QMP API */
-     BlockJobType job_type;
- 
--    /** Optional callback for job types that support setting a speed limit */
--    void (*set_speed)(BlockJob *job, int64_t speed, Error **errp);
--
-     /** Mandatory: Entrypoint for the Coroutine. */
-     CoroutineEntry *start;
++    /** Rate limiting data structure for implementing @speed. */
++    RateLimit limit;
++
+     /** The completion function that will be called when the job completes.  */
+     BlockCompletionFunc *cb;
  
 diff --git a/block/backup.c b/block/backup.c
-index 7585c4391e..8468fd9f94 100644
+index 5d95805472..7585c4391e 100644
 --- a/block/backup.c
 +++ b/block/backup.c
-@@ -27,7 +27,6 @@
- #include "qemu/error-report.h"
- 
- #define BACKUP_CLUSTER_SIZE_DEFAULT (1 << 16)
--#define SLICE_TIME 100000000ULL /* ns */
- 
- typedef struct BackupBlockJob {
-     BlockJob common;
-@@ -190,17 +189,6 @@ static int coroutine_fn backup_before_write_notify(
-     return backup_do_cow(job, req->offset, req->bytes, NULL, true);
+@@ -35,7 +35,6 @@ typedef struct BackupBlockJob {
+     /* bitmap for sync=incremental */
+     BdrvDirtyBitmap *sync_bitmap;
+     MirrorSyncMode sync_mode;
+-    RateLimit limit;
+     BlockdevOnError on_source_error;
+     BlockdevOnError on_target_error;
+     CoRwlock flush_rwlock;
+@@ -199,7 +198,7 @@ static void backup_set_speed(BlockJob *job, int64_t speed, Error **errp)
+         error_setg(errp, QERR_INVALID_PARAMETER, "speed");
+         return;
+     }
+-    ratelimit_set_speed(&s->limit, speed, SLICE_TIME);
++    ratelimit_set_speed(&s->common.limit, speed, SLICE_TIME);
  }
  
--static void backup_set_speed(BlockJob *job, int64_t speed, Error **errp)
--{
--    BackupBlockJob *s = container_of(job, BackupBlockJob, common);
--
--    if (speed < 0) {
--        error_setg(errp, QERR_INVALID_PARAMETER, "speed");
--        return;
--    }
--    ratelimit_set_speed(&s->common.limit, speed, SLICE_TIME);
--}
--
  static void backup_cleanup_sync_bitmap(BackupBlockJob *job, int ret)
- {
-     BdrvDirtyBitmap *bm;
-@@ -540,7 +528,6 @@ static const BlockJobDriver backup_job_driver = {
-     .instance_size          = sizeof(BackupBlockJob),
-     .job_type               = BLOCK_JOB_TYPE_BACKUP,
-     .start                  = backup_run,
--    .set_speed              = backup_set_speed,
-     .commit                 = backup_commit,
-     .abort                  = backup_abort,
-     .clean                  = backup_clean,
+@@ -346,7 +345,7 @@ static bool coroutine_fn yield_and_check(BackupBlockJob *job)
+      * (without, VM does not reboot)
+      */
+     if (job->common.speed) {
+-        uint64_t delay_ns = ratelimit_calculate_delay(&job->limit,
++        uint64_t delay_ns = ratelimit_calculate_delay(&job->common.limit,
+                                                       job->bytes_read);
+         job->bytes_read = 0;
+         block_job_sleep_ns(&job->common, delay_ns);
 diff --git a/block/commit.c b/block/commit.c
-index beec5d0ad6..46cbeaec3e 100644
+index 50b191c980..beec5d0ad6 100644
 --- a/block/commit.c
 +++ b/block/commit.c
-@@ -31,8 +31,6 @@ enum {
-     COMMIT_BUFFER_SIZE = 512 * 1024, /* in bytes */
- };
+@@ -35,7 +35,6 @@ enum {
  
--#define SLICE_TIME 100000000ULL /* ns */
--
  typedef struct CommitBlockJob {
      BlockJob common;
+-    RateLimit limit;
      BlockDriverState *commit_top_bs;
-@@ -216,21 +214,9 @@ out:
-     block_job_defer_to_main_loop(&s->common, commit_complete, data);
+     BlockBackend *top;
+     BlockBackend *base;
+@@ -201,7 +200,7 @@ static void coroutine_fn commit_run(void *opaque)
+         block_job_progress_update(&s->common, n);
+ 
+         if (copy && s->common.speed) {
+-            delay_ns = ratelimit_calculate_delay(&s->limit, n);
++            delay_ns = ratelimit_calculate_delay(&s->common.limit, n);
+         } else {
+             delay_ns = 0;
+         }
+@@ -225,7 +224,7 @@ static void commit_set_speed(BlockJob *job, int64_t speed, Error **errp)
+         error_setg(errp, QERR_INVALID_PARAMETER, "speed");
+         return;
+     }
+-    ratelimit_set_speed(&s->limit, speed, SLICE_TIME);
++    ratelimit_set_speed(&s->common.limit, speed, SLICE_TIME);
  }
  
--static void commit_set_speed(BlockJob *job, int64_t speed, Error **errp)
--{
--    CommitBlockJob *s = container_of(job, CommitBlockJob, common);
--
--    if (speed < 0) {
--        error_setg(errp, QERR_INVALID_PARAMETER, "speed");
--        return;
--    }
--    ratelimit_set_speed(&s->common.limit, speed, SLICE_TIME);
--}
--
  static const BlockJobDriver commit_job_driver = {
-     .instance_size = sizeof(CommitBlockJob),
-     .job_type      = BLOCK_JOB_TYPE_COMMIT,
--    .set_speed     = commit_set_speed,
-     .start         = commit_run,
- };
- 
 diff --git a/block/mirror.c b/block/mirror.c
-index aece2b185c..de495fddc4 100644
+index 0e09e6fffb..aece2b185c 100644
 --- a/block/mirror.c
 +++ b/block/mirror.c
-@@ -22,7 +22,6 @@
- #include "qemu/ratelimit.h"
- #include "qemu/bitmap.h"
+@@ -36,7 +36,6 @@ typedef struct MirrorBuffer {
  
--#define SLICE_TIME    100000000ULL /* ns */
- #define MAX_IN_FLIGHT 16
- #define MAX_IO_BYTES (1 << 20) /* 1 Mb */
- #define DEFAULT_MIRROR_BUF_SIZE (MAX_IN_FLIGHT * MAX_IO_BYTES)
-@@ -904,17 +903,6 @@ immediate_exit:
-     block_job_defer_to_main_loop(&s->common, mirror_exit, data);
+ typedef struct MirrorBlockJob {
+     BlockJob common;
+-    RateLimit limit;
+     BlockBackend *target;
+     BlockDriverState *mirror_top_bs;
+     BlockDriverState *source;
+@@ -450,7 +449,8 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+         offset += io_bytes;
+         nb_chunks -= DIV_ROUND_UP(io_bytes, s->granularity);
+         if (s->common.speed) {
+-            delay_ns = ratelimit_calculate_delay(&s->limit, io_bytes_acct);
++            delay_ns = ratelimit_calculate_delay(&s->common.limit,
++                                                 io_bytes_acct);
+         }
+     }
+     return delay_ns;
+@@ -912,7 +912,7 @@ static void mirror_set_speed(BlockJob *job, int64_t speed, Error **errp)
+         error_setg(errp, QERR_INVALID_PARAMETER, "speed");
+         return;
+     }
+-    ratelimit_set_speed(&s->limit, speed, SLICE_TIME);
++    ratelimit_set_speed(&s->common.limit, speed, SLICE_TIME);
  }
  
--static void mirror_set_speed(BlockJob *job, int64_t speed, Error **errp)
--{
--    MirrorBlockJob *s = container_of(job, MirrorBlockJob, common);
--
--    if (speed < 0) {
--        error_setg(errp, QERR_INVALID_PARAMETER, "speed");
--        return;
--    }
--    ratelimit_set_speed(&s->common.limit, speed, SLICE_TIME);
--}
--
  static void mirror_complete(BlockJob *job, Error **errp)
- {
-     MirrorBlockJob *s = container_of(job, MirrorBlockJob, common);
-@@ -999,7 +987,6 @@ static void mirror_drain(BlockJob *job)
- static const BlockJobDriver mirror_job_driver = {
-     .instance_size          = sizeof(MirrorBlockJob),
-     .job_type               = BLOCK_JOB_TYPE_MIRROR,
--    .set_speed              = mirror_set_speed,
-     .start                  = mirror_run,
-     .complete               = mirror_complete,
-     .pause                  = mirror_pause,
-@@ -1010,7 +997,6 @@ static const BlockJobDriver mirror_job_driver = {
- static const BlockJobDriver commit_active_job_driver = {
-     .instance_size          = sizeof(MirrorBlockJob),
-     .job_type               = BLOCK_JOB_TYPE_COMMIT,
--    .set_speed              = mirror_set_speed,
-     .start                  = mirror_run,
-     .complete               = mirror_complete,
-     .pause                  = mirror_pause,
 diff --git a/block/stream.c b/block/stream.c
-index a1d4768c2e..797d7c4f21 100644
+index 8369852bda..a1d4768c2e 100644
 --- a/block/stream.c
 +++ b/block/stream.c
-@@ -29,8 +29,6 @@ enum {
-     STREAM_BUFFER_SIZE = 512 * 1024, /* in bytes */
- };
+@@ -33,7 +33,6 @@ enum {
  
--#define SLICE_TIME 100000000ULL /* ns */
--
  typedef struct StreamBlockJob {
      BlockJob common;
+-    RateLimit limit;
      BlockDriverState *base;
-@@ -210,21 +208,9 @@ out:
-     block_job_defer_to_main_loop(&s->common, stream_complete, data);
+     BlockdevOnError on_error;
+     char *backing_file_str;
+@@ -189,7 +188,7 @@ static void coroutine_fn stream_run(void *opaque)
+         /* Publish progress */
+         block_job_progress_update(&s->common, n);
+         if (copy && s->common.speed) {
+-            delay_ns = ratelimit_calculate_delay(&s->limit, n);
++            delay_ns = ratelimit_calculate_delay(&s->common.limit, n);
+         } else {
+             delay_ns = 0;
+         }
+@@ -219,7 +218,7 @@ static void stream_set_speed(BlockJob *job, int64_t speed, Error **errp)
+         error_setg(errp, QERR_INVALID_PARAMETER, "speed");
+         return;
+     }
+-    ratelimit_set_speed(&s->limit, speed, SLICE_TIME);
++    ratelimit_set_speed(&s->common.limit, speed, SLICE_TIME);
  }
  
--static void stream_set_speed(BlockJob *job, int64_t speed, Error **errp)
--{
--    StreamBlockJob *s = container_of(job, StreamBlockJob, common);
--
--    if (speed < 0) {
--        error_setg(errp, QERR_INVALID_PARAMETER, "speed");
--        return;
--    }
--    ratelimit_set_speed(&s->common.limit, speed, SLICE_TIME);
--}
--
  static const BlockJobDriver stream_job_driver = {
-     .instance_size = sizeof(StreamBlockJob),
-     .job_type      = BLOCK_JOB_TYPE_STREAM,
--    .set_speed     = stream_set_speed,
-     .start         = stream_run,
- };
- 
-diff --git a/blockjob.c b/blockjob.c
-index 46c8923986..9b79abc821 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -659,22 +659,18 @@ static bool block_job_timer_pending(BlockJob *job)
- 
- void block_job_set_speed(BlockJob *job, int64_t speed, Error **errp)
- {
--    Error *local_err = NULL;
-     int64_t old_speed = job->speed;
- 
--    if (!job->driver->set_speed) {
--        error_setg(errp, QERR_UNSUPPORTED);
--        return;
--    }
-     if (block_job_apply_verb(job, BLOCK_JOB_VERB_SET_SPEED, errp)) {
-         return;
-     }
--    job->driver->set_speed(job, speed, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (speed < 0) {
-+        error_setg(errp, QERR_INVALID_PARAMETER, "speed");
-         return;
-     }
- 
-+    ratelimit_set_speed(&job->limit, speed, SLICE_TIME);
-+
-     job->speed = speed;
-     if (speed && speed <= old_speed) {
-         return;
 -- 
 2.13.6
