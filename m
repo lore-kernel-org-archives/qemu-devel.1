@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fAzBQ-0008U2-ED
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 10:44:41 -0400
+	(envelope-from <simon@ruderich.org>) id 1fAzHa-00024l-06
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 10:51:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fAzBN-0004gF-A3
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 10:44:40 -0400
-Date: Tue, 24 Apr 2018 16:44:17 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180424164417.15347ebb@redhat.com>
-In-Reply-To: <f195e131-fde4-1ee9-d3d6-704f51137cb1@redhat.com>
-References: <20180420123456.22196-1-david@redhat.com>
-	<20180420123456.22196-4-david@redhat.com>
-	<20180423141928.7e64b380@redhat.com>
-	<908f1079-385f-24d3-99ad-152ecd6b01d2@redhat.com>
-	<20180424153154.05e79de7@redhat.com>
-	<f195e131-fde4-1ee9-d3d6-704f51137cb1@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+	(envelope-from <simon@ruderich.org>) id 1fAzHV-00089j-1N
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 10:51:02 -0400
+Received: from zucker2.schokokeks.org ([178.63.68.90]:38779)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <simon@ruderich.org>) id 1fAzHU-00086F-Q5
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 10:50:56 -0400
+Date: Tue, 24 Apr 2018 16:50:53 +0200
+From: Simon Ruderich <simon@ruderich.org>
+Message-ID: <20180424145053.GA21648@ruderich.org>
+References: <20180412124834.GA2025@ruderich.org>
+	<68c390f22ae2afc6539cd7b127063e3d9534d50b.1523537181.git.simon@ruderich.org>
+	<6f775e11a75a2faa1c66a86e6d23a97f695c2ca1.1523537181.git.simon@ruderich.org>
+	<954f83a5-675c-c4ff-6c89-6f8eb820a806@redhat.com>
+	<20180422094728.GB29670@ruderich.org>
+	<68d7375c-ef2d-19ee-5bcd-cda8573c8492@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] pc-dimm: factor out address space
- logic into MemoryDevice code
+Content-Disposition: inline
+In-Reply-To: <68d7375c-ef2d-19ee-5bcd-cda8573c8492@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] qmp: add pmemload command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +32,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Tue, 24 Apr 2018 15:41:23 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On Mon, Apr 23, 2018 at 02:46:57PM -0500, Eric Blake wrote:
+> Back-compat in the QMP interface matters.  The HMP interface, however,
+> exists to serve humans not machines, and we can break it at will to
+> something that makes more sense to humans.  So don't let HMP concerns
+> hold you back from a sane interface.
 
-> On 24.04.2018 15:31, Igor Mammedov wrote:
-> > On Mon, 23 Apr 2018 14:52:37 +0200
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >>>     
-> >>>> +    /* we will need a new memory slot for kvm and vhost */
-> >>>> +    if (kvm_enabled() && !kvm_has_free_slot(machine)) {
-> >>>> +        error_setg(errp, "hypervisor has no free memory slots left");
-> >>>> +        return;
-> >>>> +    }
-> >>>> +    if (!vhost_has_free_slot()) {
-> >>>> +        error_setg(errp, "a used vhost backend has no free memory slots left");
-> >>>> +        return;
-> >>>> +    }    
-> >>> move these checks to pre_plug time
-> >>>     
-> >>>> +
-> >>>> +    memory_region_add_subregion(&hpms->mr, addr - hpms->base, mr);    
-> >>> missing vmstate registration?    
-> >>
-> >> Missed this one: To be called by the caller. Important because e.g. for
-> >> virtio-pmem we don't want this (I assume :) ).  
-> > if pmem isn't on shared storage, then We'd probably want to migrate
-> > it as well, otherwise target would experience data loss.
-> > Anyways, I'd just reat it as normal RAM in migration case  
-> 
-> Yes, if we realize that all MemoryDevices need this call, we can move it
-> to that place, too.
-> 
-> Wonder if we might want to make this configurable for virtio-pmem later
-> on (via a flag or sth like that).
-I don't see any reason why we wouldn't like it to be migrated,
-it's the same as nvdimm but with another qemu:guest ABI
-and async flush instead of sync one we have with nvdimm.
+I see. However I don't like breaking existing interfaces unless I
+have to. In this case I think not having the optional parameters
+is fine and the consistency between the existing memsave/pmemsave
+functions is more important.
+
+> Optional parameters are listed as '*name':'type' in the .json file,
+> which tells the generator to create a 'has_name' bool parameter
+> alongside the 'name' parameter in the C code for the QMP interface.  The
+> HMP interface should then call into the QMP interface.
+>
+> Recent HMP patches that I've authored may offer some inspiration: commit
+> 08fb10a added a new command, and commit dba4932 added an optional
+> parameter to an existing command.
+
+Thank you for the explanation, this looks straight-forward.
+
+Do you have strong opinions regarding the optional parameters or
+would you accept the patch as is (minus possible implementation
+issues)? I like the symmetry to the existing functions (I noticed
+that size can only be optional for pmemload because saving the
+complete memory doesn't sound useful) and having to specify
+size/offset doesn't hurt the caller too much.
+
+Regards
+Simon
+-- 
++ privacy is necessary
++ using gnupg http://gnupg.org
++ public key id: 0x92FEFDB7E44C32F9
