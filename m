@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <erik.schmauss@intel.com>) id 1fB23A-0004cp-6C
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:48:21 -0400
+	(envelope-from <prvs=6454bde7c=Ian.Jackson@citrix.com>)
+	id 1fB2DA-000788-Mq
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:58:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <erik.schmauss@intel.com>) id 1fB235-0004Gu-My
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:48:20 -0400
-Received: from mga12.intel.com ([192.55.52.136]:20715)
+	(envelope-from <prvs=6454bde7c=Ian.Jackson@citrix.com>)
+	id 1fB2D5-0006ql-Si
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:58:40 -0400
+Received: from smtp03.citrix.com ([162.221.156.55]:9743)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <erik.schmauss@intel.com>)
-	id 1fB235-0004Eq-7P
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:48:15 -0400
-From: "Schmauss, Erik" <erik.schmauss@intel.com>
-Date: Tue, 24 Apr 2018 17:47:58 +0000
-Message-ID: <CF6A88132359CE47947DB4C6E1709ED53973A87A@ORSMSX110.amr.corp.intel.com>
-References: <1524524398-41342-1-git-send-email-mst@redhat.com>
-	<CF6A88132359CE47947DB4C6E1709ED53973A729@ORSMSX110.amr.corp.intel.com>
-	<20180424035504-mutt-send-email-mst@kernel.org>
-	<20180424095722.76105b40@redhat.com>
-	<20180424201554-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20180424201554-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <prvs=6454bde7c=Ian.Jackson@citrix.com>)
+	id 1fB2D5-0006on-Jq
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:58:35 -0400
+From: Ian Jackson <ian.jackson@eu.citrix.com>
+Date: Tue, 24 Apr 2018 18:58:13 +0100
+Message-ID: <1524592709-6553-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] acpi/nvdimm: remove forward name references
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v8 00/16] xen: xen-domid-restrict improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,186 +26,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Williams,
-	Dan J" <dan.j.williams@intel.com>
+To: qemu-devel@nongnu.org
+Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org
 
+This series provides necessary support for running qemu as a Xen
+device model without power equivalent to root.  In particular, it
+makes -xen-domid-restrict effective.
 
+Compared to v8, it addresses review comments.
 
-> -----Original Message-----
-> From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> Sent: Tuesday, April 24, 2018 10:43 AM
-> To: Igor Mammedov <imammedo@redhat.com>
-> Cc: Schmauss, Erik <erik.schmauss@intel.com>; qemu-devel@nongnu.org; Xiao
-> Guangrong <xiaoguangrong.eric@gmail.com>; Williams, Dan J
-> <dan.j.williams@intel.com>
-> Subject: Re: [PATCH] acpi/nvdimm: remove forward name references
->=20
-> On Tue, Apr 24, 2018 at 09:57:22AM +0200, Igor Mammedov wrote:
-> > On Tue, 24 Apr 2018 04:02:40 +0300
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >
-> > > On Tue, Apr 24, 2018 at 12:41:29AM +0000, Schmauss, Erik wrote:
-> > > >
-> > > >
-> > > > > -----Original Message-----
-> > > > > From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> > > > > Sent: Monday, April 23, 2018 4:03 PM
-> > > > > To: qemu-devel@nongnu.org
-> > > > > Cc: Schmauss, Erik <erik.schmauss@intel.com>; Igor Mammedov
-> > > > > <imammedo@redhat.com>; Xiao Guangrong
-> > > > > <xiaoguangrong.eric@gmail.com>
-> > > > > Subject: [PATCH] acpi/nvdimm: remove forward name references
-> > > > >
-> > > > > NVDIMM SSDT table references a name ("MEMA") before it is
-> > > > > defined. This is reported to no longer be supported since Linux 4=
-.17-rc1.
-> > > > >
-> > > > > While arguably Linux needs to keep working on old hypervisors,
-> > > > > and other OSes seem fine with our behaviour, it seems cleaner to
-> > > > > have the definition appear in the SSDT before use.
-> > > > >
-> > > > > Suggested-by: "Schmauss, Erik" <erik.schmauss@intel.com>
-> > > > > Cc: qemu-stable@nongnu.org
-> > > > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > > > > ---
-> > > > >
-> > > > > Hi Erik,
-> > > > > could you pls test the issue and report whether it addresses
-> > > > > your concern? I can't
-> > > > Hi Michael,
-> > > >
-> > > > > do much to fix past releases which IIUC shipped this code since
-> > > > > 2.6.0 about a year ago.
-> > > > >
-> > > > > Lightly tested with Linux only.
-> > > >
-> > > > I'm looking at the ASL tables generated by make check-qtest-x86_64.
-> > > > This line
-> > >
-> > > which line?
-> > >
-> > > > ends up generating a strange ACPI table where the Operation region
-> > > > and field declarations are stuck inside the NCAL method which is
-> > > > called from _DSM. If we create the operation region and methods
-> > > > inside methods, they disappear after the NCAL method returns.
-> > What's wrong with it?
-> > Method is complete so temporary objects it has used went out of scope,
-> > all within spec rules and worked fine with linux and windows guests.
-> >
-> > > > I think nvdimm_build_common_dsm() needs some refining.
-> > >
-> > > What exactly do you refer to?
-> > >
-> > > DefinitionBlock ("", "SSDT", 1, "BOCHS ", "NVDIMM", 0x00000001) {
-> > >     Name (MEMA, 0x07FFE000)
-> > >     Scope (\_SB)
-> > >     {
-> > >         Device (NVDR)
-> > >         {
-> > >             Name (_HID, "ACPI0012" /* NVDIMM Root Device */)  // _HID=
-:
-> Hardware ID
-> > >             Method (NCAL, 5, Serialized)
-> > >             {
-> > >                 Local6 =3D MEMA /* \MEMA */
-> > >                 OperationRegion (NPIO, SystemIO, 0x0A18, 0x04)
-> > >                 OperationRegion (NRAM, SystemMemory, Local6, 0x1000)
-> > >
-> > > 		^^^ this?
-> > >
-> > > I agree the NPIO could be moved out.
-> > > Don't really understand why is Local6 needed - can't MEMA be used
-> > > directly? Assuming it isn't NRAM could be moved out too.
-> > From spec
-> >  DefOpRegion :=3D OpRegionOp NameString RegionSpace RegionOffset
-> > RegionLen  RegionOffset :=3D TermArg =3D> Integer  TermArg :=3D Type2Op=
-code
-> > | DataObject | ArgObj | LocalObj
-> >
-> > So named object is not accepted,
->=20
-> might be worth checking what happens with actual OSPMs.
-> If it does happen to work, we can try tweaking the ACPI spec to allow thi=
-s.
+      01/16 checkpatch: Add xendevicemodel_handle to the list of
+  r   02/16 AccelClass: Introduce accel_setup_post
+ * a  03/16 xen: link against xentoolcore
+   a  04/16 xen: restrict: use xentoolcore_restrict_all
+ * a  05/16 xen: defer call to xen_restrict until just before
+   a  06/16 xen: destroy_hvm_domain: Move reason into a variable
+   a  07/16 xen: move xc_interface compatibility fallback further
+  r   08/16 xen: destroy_hvm_domain: Try xendevicemodel_shutdown
+      09/16 os-posix: cleanup: Replace fprintfs with error_report in change_...
+  r   10/16 os-posix: Provide new -runas <uid>:<gid> facility
+   a  11/16 xen: Use newly added dmops for mapping VGA memory
+   a  12/16 xen: Remove now-obsolete xen_xc_domain_add_to_physmap
+   a  13/16 xen: Expect xenstore write to fail when restricted
+ *r   14/16 os-posix: cleanup: Replace fprintf with error_report in remaining
+  r   15/16 os-posix: cleanup: Replace perror with error_report
+ *    16/16 configure: do_compiler: Dump some extra info under bash
 
-I'm looking at the ACPI6.2a spec on page 840 and it says
-TermArg :=3D Type2Opcode | DataObject | Argterm |LocalTerm |NameString |Sym=
-bolicExpression
+ r = reviewed (by someone other than me)
+ a = acked
+ * = amended patch
 
-In our case, MEMA is a namestring so we should be able to avoid the local6 =
-and insert MEMA instead. Just as long as the Named object appears in the ta=
-ble before the object is used, the windows parser should work fine.
+Thanks for your attention.
 
-After applying this patch, the only change in ASL/AML that I was expecting =
-was for MEMA to be moved to the top of the definition block and leave every=
-thing else alone.
-=20
-We usually do not recommend the creation of objects inside of control metho=
-ds due to the overhead of creating/destroying these objects after each meth=
-od call. So the one problem that I can see with this is that performance co=
-uld bog down if this method is called a lot. If it is not called very frequ=
-ently, then it's probably not a big deal.=20
-
->=20
-> > we could have played games with
-> > references and Type2Opcode but that didn't work nice with Windows ACPI
-> > parser. Hence local object.
->=20
-> A comment in code wouldn't hurt to explain this.
->=20
-> > The reason why OperationRegion is dynamic, is that if we put it
-> > outside of method it will become static, and we would have to use
-> > Integer constant there (no named objects are allowed) and then patch
-> > it dynamically in bios loader.
-> > I'd prefer to keep it as is, without introducing another hack like
-> > build_append_named_operation_region() to create it with know offset so
-> > firmware could patch it.
->=20
-> I agree to that.
->=20
-> > >
-> > >
-> > > It all seems suboptimal but given the method is serialized, I don't
-> > > see anything wrong with it as such.
-> > >
-> > >
-> > > >
-> > > > >
-> > > > >  hw/acpi/nvdimm.c | 6 ++++--
-> > > > >  1 file changed, 4 insertions(+), 2 deletions(-)
-> > > > >
-> > > > > diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c index
-> > > > > 59d6e42..fadebbd
-> > > > > 100644
-> > > > > --- a/hw/acpi/nvdimm.c
-> > > > > +++ b/hw/acpi/nvdimm.c
-> > > > > @@ -1234,6 +1234,10 @@ static void nvdimm_build_ssdt(GArray
-> > > > > *table_offsets, GArray *table_data,
-> > > > >      ssdt =3D init_aml_allocator();
-> > > > >      acpi_data_push(ssdt->buf, sizeof(AcpiTableHeader));
-> > > > >
-> > > > > +    /* Storage for the memory address */
-> > > > > +    mem_addr_offset =3D table_data->len +
-> > > > > +        build_append_named_dword(ssdt->buf,
-> > > > > + NVDIMM_ACPI_MEM_ADDR);
-> > > > > +
-> > > > >      sb_scope =3D aml_scope("\\_SB");
-> > > > >
-> > > > >      dev =3D aml_device("NVDR");
-> > > > > @@ -1266,8 +1270,6 @@ static void nvdimm_build_ssdt(GArray
-> > > > > *table_offsets, GArray *table_data,
-> > > > >
-> > > > >      /* copy AML table into ACPI tables blob and patch header the=
-re */
-> > > > >      g_array_append_vals(table_data, ssdt->buf->data, ssdt->buf->=
-len);
-> > > > > -    mem_addr_offset =3D build_append_named_dword(table_data,
-> > > > > -                                               NVDIMM_ACPI_MEM_A=
-DDR);
-> > > > >
-> > > > >      bios_linker_loader_alloc(linker,
-> > > > >                               NVDIMM_DSM_MEM_FILE,
-> > > > > dsm_dma_arrea,
-> > > > > --
-> > > > > MST
+Ian.
