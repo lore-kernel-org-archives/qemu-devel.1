@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fB1mR-0000Un-B7
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:31:04 -0400
+	(envelope-from <eblake@redhat.com>) id 1fB1vV-0002dj-KN
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:40:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fB1mQ-00005L-1O
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:31:03 -0400
-Date: Tue, 24 Apr 2018 13:30:46 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180424173046.GW12302@localhost.localdomain>
-References: <20180424123527.19168-1-stefanha@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1fB1vU-0002QD-KC
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:40:25 -0400
+References: <20180215192829.9944-1-eblake@redhat.com>
+	<20180215192829.9944-4-eblake@redhat.com>
+	<20180424155205.GD4080@localhost.localdomain>
+	<f9c2e87f-082e-36ce-971a-6b11cb65d843@redhat.com>
+	<20180424171920.GI4080@localhost.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1cee058b-465d-4862-7fb0-8567f79c79b1@redhat.com>
+Date: Tue, 24 Apr 2018 12:40:06 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180424123527.19168-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] block/mirror: honor ratelimit again
+In-Reply-To: <20180424171920.GI4080@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Vznfjcpaa8xGNGwkvymh9X68UiIHty2ue"
+Subject: Re: [Qemu-devel] [PATCH 3/6] null: Switch to byte-based read/write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,82 +27,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Liang Li <liliang.opensource@gmail.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Tue, Apr 24, 2018 at 01:35:27PM +0100, Stefan Hajnoczi wrote:
-> Commit b76e4458b1eb3c32e9824fe6aa51f67d2b251748 ("block/mirror: change
-> the semantic of 'force' of block-job-cancel") accidentally removed the
-> ratelimit in the mirror job.
-> 
-> Reintroduce the ratelimit but keep the block-job-cancel force=true
-> behavior that was added in commit
-> b76e4458b1eb3c32e9824fe6aa51f67d2b251748.
-> 
-> Note that block_job_sleep_ns() returns immediately when the job is
-> cancelled.  Therefore it's safe to unconditionally call
-> block_job_sleep_ns() - a cancelled job does not sleep.
-> 
-> This commit fixes the non-deterministic qemu-iotests 185 output.  The
-> test relies on the ratelimit to make the job sleep until the 'quit'
-> command is processed.  Previously the job could complete before the
-> 'quit' command was received since there was no ratelimit.
-> 
-> Cc: Liang Li <liliang.opensource@gmail.com>
-> Cc: Jeff Cody <jcody@redhat.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  block/mirror.c             | 8 +++++---
->  tests/qemu-iotests/185.out | 4 ++--
->  2 files changed, 7 insertions(+), 5 deletions(-)
-> 
-> diff --git a/block/mirror.c b/block/mirror.c
-> index 820f512c7b..9436a8d5ee 100644
-> --- a/block/mirror.c
-> +++ b/block/mirror.c
-> @@ -868,12 +868,14 @@ static void coroutine_fn mirror_run(void *opaque)
->          }
->  
->          ret = 0;
-> +
-> +        if (s->synced && !should_complete) {
-> +            delay_ns = (s->in_flight == 0 && cnt == 0 ? SLICE_TIME : 0);
-> +        }
->          trace_mirror_before_sleep(s, cnt, s->synced, delay_ns);
-> +        block_job_sleep_ns(&s->common, delay_ns);
->          if (block_job_is_cancelled(&s->common) && s->common.force) {
->              break;
-> -        } else if (!should_complete) {
-> -            delay_ns = (s->in_flight == 0 && cnt == 0 ? SLICE_TIME : 0);
-> -            block_job_sleep_ns(&s->common, delay_ns);
->          }
->          s->last_pause_ns = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
->      }
-> diff --git a/tests/qemu-iotests/185.out b/tests/qemu-iotests/185.out
-> index 2c4b04de73..992162f418 100644
-> --- a/tests/qemu-iotests/185.out
-> +++ b/tests/qemu-iotests/185.out
-> @@ -36,9 +36,9 @@ Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 backing_file=TEST_DIR/t.q
->  {"return": {}}
->  Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 cluster_size=65536 lazy_refcounts=off refcount_bits=16
->  {"return": {}}
-> +{"return": {}}
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
->  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "mirror"}}
-> -{"return": {}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
->  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "mirror"}}
->  
->  === Start backup job and exit qemu ===
-> -- 
-> 2.14.3
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Vznfjcpaa8xGNGwkvymh9X68UiIHty2ue
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Fam Zheng
+ <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
+Message-ID: <1cee058b-465d-4862-7fb0-8567f79c79b1@redhat.com>
+Subject: Re: [PATCH 3/6] null: Switch to byte-based read/write
+References: <20180215192829.9944-1-eblake@redhat.com>
+ <20180215192829.9944-4-eblake@redhat.com>
+ <20180424155205.GD4080@localhost.localdomain>
+ <f9c2e87f-082e-36ce-971a-6b11cb65d843@redhat.com>
+ <20180424171920.GI4080@localhost.localdomain>
+In-Reply-To: <20180424171920.GI4080@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
+On 04/24/2018 12:19 PM, Kevin Wolf wrote:
 
-Applied to my block branch:
+>>>> +static void null_refresh_limits(BlockDriverState *bs, Error **errp)=
 
-git://github.com/codyprime/qemu-kvm-jtc block
+>>>> +{
+>>>> +    bs->bl.request_alignment =3D 1;
+>>>> +}
+>>>
+>>> I would rather modify bdrv_refresh_limits() so that it defaults to 1 =
+for
+>>> drivers supporting either .bdrv_co_preadv or .bdrv_aio_preadv.
+>>
+>> Sure, I can do that (although then I may have to provide a
+>> refresh_limits callback for each of the other drivers that I
+>> specifically left at 512 alignment).
+>=20
+> Do we know that the other drivers need 512, or do we expect than they
+> can handle byte granularity, but we try to err on the safe side?
 
--Jeff
+Done to err on the safe side and avoid the difficulty of a deep audit in
+code I'm unfamiliar with; in fact, for vxhs, I wasn't even able to
+compile test things, which means I certainly wasn't able to reproduce a
+test to see if dropping the alignment would break anything under qemu-io.=
+
+
+>=20
+> If it's the latter (which would be my expectation), then it's probably
+> better to set request_alignment =3D 512 with a comment in those drivers=
+
+> and hope that someone will lift the restriction in the future.
+
+Indeed, leaving a good comment for a future reader is worth the effort.
+I'll send a v2 later today.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--Vznfjcpaa8xGNGwkvymh9X68UiIHty2ue
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrfa/YACgkQp6FrSiUn
+Q2rxKAf8CGpZezcnENXMg50E4AiiXK+QzFYvr+CMlPfBZw1HFijjrRhYHCv4idqp
+NaWR6fnfpmDsN7R95jds2TX44USkxiSS1frjzsiYVBgiv8I4IUkOjmS/Sk82d+xd
++6FDBPpTU7BPR9dgzjpfK8D6NNxYWqAFKE30IPW+XYGEHaacFji2jBce0jvaDBs1
+ypVMVZv3YvRax0plxX2kllqyDMBosytRj1L9lECBev9grlHUuVG2MIqBLv+z3aHv
+bM29Z6pddzf6qAg/QtCuAtpf4O9fclf2vzS3ertbJBnsP/dflIsHULfMIEy+N8eR
+Mo4Wq1ysJjqS3F52rE0PPXAlrFmazw==
+=dA+l
+-----END PGP SIGNATURE-----
+
+--Vznfjcpaa8xGNGwkvymh9X68UiIHty2ue--
