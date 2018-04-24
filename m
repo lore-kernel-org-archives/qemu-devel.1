@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1fAzzC-0008D0-JS
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:36:11 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fB03f-0003DK-06
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:40:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1fAzz9-0004Dn-Gv
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:36:06 -0400
-Message-ID: <1524584159.23669.13.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Tue, 24 Apr 2018 17:35:59 +0200
-In-Reply-To: <20180420102117.GQ2434@umbus.fritz.box>
-References: <20180419062917.31486-1-david@gibson.dropbear.id.au>
-	<1524151804.3017.9.camel@redhat.com>
-	<20180420023542.GD2434@umbus.fritz.box>
-	<1524216670.3017.11.camel@redhat.com>
-	<20180420102117.GQ2434@umbus.fritz.box>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC for-2.13 0/7] spapr: Clean up pagesize
- handling
+	(envelope-from <kwolf@redhat.com>) id 1fB03d-0007GN-Ue
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:40:43 -0400
+Date: Tue, 24 Apr 2018 17:40:26 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180424154026.GC4080@localhost.localdomain>
+References: <20180215192829.9944-1-eblake@redhat.com>
+	<20180215192829.9944-2-eblake@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180215192829.9944-2-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/6] block: Support byte-based aio callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,44 +23,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: groug@kaod.org, aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Fri, 2018-04-20 at 20:21 +1000, David Gibson wrote:
-> On Fri, Apr 20, 2018 at 11:31:10AM +0200, Andrea Bolognani wrote:
-> > I'll have to look into it to be sure, but I think it should be
-> > possible for libvirt to convert a generic
-> > 
-> >   <memoryBacking>
-> >     <hugepages/>
-> >   </memoryBacking>
-> > 
-> > to a more specific
-> > 
-> >   <memoryBacking>
-> >     <hugepages>
-> >       <page size="16384" unit="KiB"/>
-> >     </hugepages>
-> >   </memoryBacking>
-> > 
-> > by figuring out the page size for the default hugepage mount,
-> > which actually sounds like a good idea regardless. Of course users
-> > user would still be able to provide the page size themselves in the
-> > first place.
+Am 15.02.2018 um 20:28 hat Eric Blake geschrieben:
+> We are gradually moving away from sector-based interfaces, towards
+> byte-based.  Add new sector-based aio callbacks for read and write,
+> to match the fact that bdrv_aio_pdiscard is already byte-based.
 > 
-> Sounds like a good approach.
+> Ideally, drivers should be converted to use coroutine callbacks
+> rather than aio; but that is not quite as trivial (if we do that
+> conversion, the null-aio driver will disappear), so for the
+> short term, converting the signature but keeping things with aio
+> is easier.  Once all drivers are converted, the sector-based aio
+> callbacks will be removed.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  include/block/block_int.h |  6 ++++++
+>  block/io.c                | 37 +++++++++++++++++++++++++++----------
+>  2 files changed, 33 insertions(+), 10 deletions(-)
+> 
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index 5ae7738cf8d..c882dc4232d 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -137,9 +137,15 @@ struct BlockDriver {
+>      BlockAIOCB *(*bdrv_aio_readv)(BlockDriverState *bs,
+>          int64_t sector_num, QEMUIOVector *qiov, int nb_sectors,
+>          BlockCompletionFunc *cb, void *opaque);
+> +    BlockAIOCB *(*bdrv_aio_preadv)(BlockDriverState *bs,
+> +        uint64_t offset, uint64_t bytes, QEMUIOVector *qiov, int flags,
+> +        BlockCompletionFunc *cb, void *opaque);
+>      BlockAIOCB *(*bdrv_aio_writev)(BlockDriverState *bs,
+>          int64_t sector_num, QEMUIOVector *qiov, int nb_sectors,
+>          BlockCompletionFunc *cb, void *opaque);
+> +    BlockAIOCB *(*bdrv_aio_pwritev)(BlockDriverState *bs,
+> +        uint64_t offset, uint64_t bytes, QEMUIOVector *qiov, int flags,
+> +        BlockCompletionFunc *cb, void *opaque);
+>      BlockAIOCB *(*bdrv_aio_flush)(BlockDriverState *bs,
+>          BlockCompletionFunc *cb, void *opaque);
+>      BlockAIOCB *(*bdrv_aio_pdiscard)(BlockDriverState *bs,
+> diff --git a/block/io.c b/block/io.c
+> index 4d3d1f640a3..84a4caa72b7 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -934,9 +934,11 @@ static int coroutine_fn bdrv_driver_preadv(BlockDriverState *bs,
+>      sector_num = offset >> BDRV_SECTOR_BITS;
+>      nb_sectors = bytes >> BDRV_SECTOR_BITS;
+> 
+> -    assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
+> -    assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
+> -    assert((bytes >> BDRV_SECTOR_BITS) <= BDRV_REQUEST_MAX_SECTORS);
+> +    if (!drv->bdrv_aio_preadv) {
+> +        assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
+> +        assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
+> +        assert((bytes >> BDRV_SECTOR_BITS) <= BDRV_REQUEST_MAX_SECTORS);
+> +    }
 
-Unfortunately it seems like this is not going to be feasible, as
-POWER8 is apparently the only platform that enforces a strict
-relationship between host page size and guest page size: x86,
-aarch64 (and I have to assume POWER9 as well?) can reportedly all
-deal gracefully with guests migrating between hosts that have
-different hugepage mounts configured.
+Hm, this is kind of ugly. Previously, we handled everything byte-aligned
+in the first section, now we mix both in the second section.
 
-I need to spend some more time digesting the rest of the
-information you provided, but as it stands right now I'm starting
-to think this might actually need to be its own, explicit opt-in
-knob at the libvirt level too after all :(
+I can see that you do this so you don't have to duplicate the acb and
+coroutine yielding code below, but can we move things into the right
+place in the final patch at least? That is, calculate sector_num and
+nb_sectors only if all the byte-based interfaces weren't available.
 
--- 
-Andrea Bolognani / Red Hat / Virtualization
+Kevin
