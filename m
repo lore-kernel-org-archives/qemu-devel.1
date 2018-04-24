@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54798)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fAylg-0008Ch-JA
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 10:18:10 -0400
+	(envelope-from <thuth@redhat.com>) id 1fAyq2-0001xT-G2
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 10:22:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fAyla-0003eP-Qn
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 10:18:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46170 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1fAyla-0003dh-Kk
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 10:17:58 -0400
-Date: Tue, 24 Apr 2018 16:17:46 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20180424141746.pagolvh3v232my5z@kamzik.brq.redhat.com>
-References: <3301c5bc-7b47-1b0e-8ce4-30435057a276@web.de>
-	<CAFEAcA9KSUppGGom-ipX+N49j0gDJH3KDY8oyqT8cVOU0Mn8Rw@mail.gmail.com>
-	<20180424141258.cuenuefdtkefikr6@kamzik.brq.redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1fAypy-0002nC-H2
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 10:22:34 -0400
+References: <1524570294-23058-1-git-send-email-thuth@redhat.com>
+	<d2a9fc1a-9696-f2bd-d603-03b23de62004@de.ibm.com>
+	<87f6ba73-2ded-06f2-c68f-d8ef4be50edf@redhat.com>
+	<20180424160911.22a238bb.cohuck@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6d699426-3525-f62a-c4ec-37dd5589654f@redhat.com>
+Date: Tue, 24 Apr 2018 16:22:26 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180424141258.cuenuefdtkefikr6@kamzik.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/virt: Add linux, pci-domain property
+In-Reply-To: <20180424160911.22a238bb.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH] hw/s390x: Allow to configure the
+ consoles with the "-serial" parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +27,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Jan Kiszka <jan.kiszka@web.de>, qemu-devel <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Tue, Apr 24, 2018 at 04:12:58PM +0200, Andrew Jones wrote:
-> On Mon, Apr 23, 2018 at 02:11:40PM +0100, Peter Maydell wrote:
-> > On 23 April 2018 at 06:18, Jan Kiszka <jan.kiszka@web.de> wrote:
-> > > From: Jan Kiszka <jan.kiszka@siemens.com>
-> > >
-> > > This allows to pin the host controller in the Linux PCI domain space.
-> > > Linux requires that property to be available consistently or not at all,
-> > > in which case the domain number becomes unstable on additions/removals.
-> > > Adding it here won't make a difference in practice for most setups as we
-> > > only expose one controller.
-> > >
-> > > However, enabling Jailhouse on top may introduce another controller, and
-> > > that one would like to have stable address as well. So the property is
-> > > needed for the first controller as well.
-> > 
-> > Am I right in thinking that for ACPI the PCI domain number is
-> > communicated via the _SEG method? If so, looks like we already
-> > set that, and we set it to 0, which matches what we're doing here
-> > in the DT, so that's good.
+On 24.04.2018 16:09, Cornelia Huck wrote:
+> On Tue, 24 Apr 2018 16:02:59 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
 > 
-> _SEG and linux,pci-domain are similar in definition, but don't appear to
-> be equivalent, as the same _SEG number is permitted across multiple host
-> bridges, but linux,pci-domain must be unique for each host bridge. I
-> think the (_SEG, _BBN) pair may form the equivalent. We also set _BBN
-> to zero, so I think we're fine anyway.
+>> On 24.04.2018 13:49, Christian Borntraeger wrote:
+>>>
+>>>
+>>> On 04/24/2018 01:44 PM, Thomas Huth wrote:  
+>>>> The consoles ("sclpconsole" and "sclplmconsole") can only be configured
+>>>> with "-device" and "-chardev" so far. Other machines use the convenience
+>>>> option "-serial" to configure the default consoles, too, even for virtual
+>>>> consoles like spapr-vty on the pseries machine. So let's support this
+>>>> option on s390x, too, so we can easily enable the serial console here
+>>>> again with "-nodefaults", for example. Also map the second -serial
+>>>> option to the "sclplmconsole", so that there is now an easy way to
+>>>> configure this second console on s390x, too.
+>>>> Additionally, the new code is also smaller than the old one and we have
+>>>> less s390x-specific code in vl.c :-)  
+[...]
+>>> I read that as "the current command lines continue to work". Correct?  
+>>
+>> Right. I was a little bit afraid that this might break migration, but I
+>> gave it a quick check and it still seems to work fine here.
+>> "info qom-tree" and "info qtree" at the HMP monitor show slightly
+>> different output, though ... not sure whether that's critical or not?
 > 
-> > 
-> > > Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
-> > > ---
-> > >  hw/arm/virt.c | 1 +
-> > >  1 file changed, 1 insertion(+)
-> > >
-> > > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> > > index 94dcb125d3..943371b75e 100644
-> > > --- a/hw/arm/virt.c
-> > > +++ b/hw/arm/virt.c
-> > > @@ -1023,6 +1023,7 @@ static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
-> > >      qemu_fdt_setprop_string(vms->fdt, nodename, "device_type", "pci");
-> > >      qemu_fdt_setprop_cell(vms->fdt, nodename, "#address-cells", 3);
-> > >      qemu_fdt_setprop_cell(vms->fdt, nodename, "#size-cells", 2);
-> > > +    qemu_fdt_setprop_cell(vms->fdt, nodename, "linux,pci-domain", 0);
-> > >      qemu_fdt_setprop_cells(vms->fdt, nodename, "bus-range", 0,
-> > >                             nr_pcie_buses - 1);
-> > >      qemu_fdt_setprop(vms->fdt, nodename, "dma-coherent", NULL, 0);
-> > > --
-> > 
-> > Drew -- is minor changes to the DTC something we can do without
-> > having to condition it on machine version? I forget...
-> 
-> Yes, and even less minor changes than this one can be made to ACPI and DT
-> generation, per the "if a firwmare update could change it, then don't
-> worry about it" policy.
-> 
-> (I've CC'ed Igor in case he wants to chime in to correct anything I've
->  said.)
+> What looks different? If we still send/expect the same kind of
+> information, it should not have any impact, I guess.
 
-Eh, now I've CC'ed him...
+$ diff -u sclp-qtree-before.txt sclp-qtree-after.txt
+--- sclp-qtree-before.txt	2018-04-24 16:17:14.527921927 +0200
++++ sclp-qtree-after.txt	2018-04-24 16:17:35.582877042 +0200
+@@ -62,6 +62,6 @@
+     bus: s390-sclp-events-bus.0
+       type s390-sclp-events-bus
+       dev: sclpconsole, id ""
+-        chardev = "sclpcon0"
++        chardev = "serial0"
+       dev: sclp-cpu-hotplug, id ""
+       dev: sclpquiesce, id ""
+
+... i.e. just the label of the chardev changed. I think that's ok, and
+migration likely does not care about that.
+
+$ diff -u sclp-qom-tree-before.txt sclp-qom-tree-after.txt
+--- sclp-qom-tree-before.txt	2018-04-24 16:17:48.462849585 +0200
++++ sclp-qom-tree-after.txt	2018-04-24 16:18:02.222820256 +0200
+@@ -1,13 +1,14 @@
+-(qemu) info qom-tree
++(qemu) info qom-tree
+ /machine (s390-ccw-virtio-2.12-machine)
+   /unattached (container)
+-    /system[0] (qemu:memory-region)
+     /sysbus (System)
+-    /device[1] (virtio-net-ccw)
++    /device[0] (qemu-s390x-cpu)
++    /s390.ram[0] (qemu:memory-region)
++    /device[1] (sclpconsole)
++    /device[2] (virtio-net-ccw)
+       /virtio-backend (virtio-net-device)
+       /virtio-bus (virtio-ccw-bus)
+-    /s390.ram[0] (qemu:memory-region)
+-    /device[0] (qemu-s390x-cpu)
++    /system[0] (qemu:memory-region)
+     /io[0] (qemu:memory-region)
+   /sclp (sclp)
+     /s390-sclp-event-facility (s390-sclp-event-facility)
+@@ -17,7 +18,6 @@
+   /s390-flic-qemu (s390-flic-qemu)
+   /s390-skeys (s390-skeys-qemu)
+   /peripheral-anon (container)
+-    /device[0] (sclpconsole)
+   /peripheral (container)
+   /s390-ipl (s390-ipl)
+   /virtual-css-bridge (virtual-css-bridge)
+
+... the sclpconsole now shows up under /unattached instead of
+/peripheral-anon ... does that matter? (I don't have a clue)
+
+ Thomas
