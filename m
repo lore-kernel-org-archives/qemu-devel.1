@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57538)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fB3b4-0000Km-0d
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 15:27:28 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fB3b4-0000L9-F7
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 15:27:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fB3b1-0004vk-CA
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 15:27:25 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fB3b1-0004vW-47
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 15:27:26 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 24 Apr 2018 21:26:21 +0200
-Message-Id: <20180424192635.6027-7-laurent@vivier.eu>
+Date: Tue, 24 Apr 2018 21:26:20 +0200
+Message-Id: <20180424192635.6027-6-laurent@vivier.eu>
 In-Reply-To: <20180424192635.6027-1-laurent@vivier.eu>
 References: <20180424192635.6027-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH for 2.13 v4 06/20] linux-user: move cris
- signal.c parts to cris directory
+Subject: [Qemu-devel] [PATCH for 2.13 v4 05/20] linux-user: move microblaze
+ signal.c parts to microblaze directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,23 +27,23 @@ To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Laurent Vivier <laurent@vivier.eu>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
 No code change, only move code from signal.c to
-cris/signal.c, except adding includes and
+microblaze/signal.c, except adding includes and
 exporting setup_frame() and setup_rt_frame().
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/cris/signal.c        | 171 ++++++++++++++++++++++++++++++++++++++++
- linux-user/cris/target_signal.h |   6 +-
- linux-user/signal.c             | 168 ---------------------------------------
- 3 files changed, 176 insertions(+), 169 deletions(-)
+ linux-user/microblaze/signal.c        | 230 ++++++++++++++++++++++++++++++++++
+ linux-user/microblaze/target_signal.h |   6 +-
+ linux-user/signal.c                   | 227 ---------------------------------
+ 3 files changed, 235 insertions(+), 228 deletions(-)
 
-diff --git a/linux-user/cris/signal.c b/linux-user/cris/signal.c
-index 02ca338b6c..322d9db1a7 100644
---- a/linux-user/cris/signal.c
-+++ b/linux-user/cris/signal.c
-@@ -16,3 +16,174 @@
+diff --git a/linux-user/microblaze/signal.c b/linux-user/microblaze/signal.c
+index 02ca338b6c..5572baa7dc 100644
+--- a/linux-user/microblaze/signal.c
++++ b/linux-user/microblaze/signal.c
+@@ -16,3 +16,233 @@
   *  You should have received a copy of the GNU General Public License
   *  along with this program; if not, see <http://www.gnu.org/licenses/>.
   */
@@ -56,25 +56,36 @@ index 02ca338b6c..322d9db1a7 100644
 +struct target_sigcontext {
 +    struct target_pt_regs regs;  /* needs to be first */
 +    uint32_t oldmask;
-+    uint32_t usp;    /* usp before stacking this gunk on it */
++};
++
++struct target_stack_t {
++    abi_ulong ss_sp;
++    int ss_flags;
++    unsigned int ss_size;
++};
++
++struct target_ucontext {
++    abi_ulong tuc_flags;
++    abi_ulong tuc_link;
++    struct target_stack_t tuc_stack;
++    struct target_sigcontext tuc_mcontext;
++    uint32_t tuc_extramask[TARGET_NSIG_WORDS - 1];
 +};
 +
 +/* Signal frames. */
 +struct target_signal_frame {
-+    struct target_sigcontext sc;
++    struct target_ucontext uc;
 +    uint32_t extramask[TARGET_NSIG_WORDS - 1];
-+    uint16_t retcode[4];      /* Trampoline code. */
++    uint32_t tramp[2];
 +};
 +
 +struct rt_signal_frame {
-+    siginfo_t *pinfo;
-+    void *puc;
 +    siginfo_t info;
 +    ucontext_t uc;
-+    uint16_t retcode[4];      /* Trampoline code. */
++    uint32_t tramp[2];
 +};
 +
-+static void setup_sigcontext(struct target_sigcontext *sc, CPUCRISState *env)
++static void setup_sigcontext(struct target_sigcontext *sc, CPUMBState *env)
 +{
 +    __put_user(env->regs[0], &sc->regs.r0);
 +    __put_user(env->regs[1], &sc->regs.r1);
@@ -90,14 +101,28 @@ index 02ca338b6c..322d9db1a7 100644
 +    __put_user(env->regs[11], &sc->regs.r11);
 +    __put_user(env->regs[12], &sc->regs.r12);
 +    __put_user(env->regs[13], &sc->regs.r13);
-+    __put_user(env->regs[14], &sc->usp);
-+    __put_user(env->regs[15], &sc->regs.acr);
-+    __put_user(env->pregs[PR_MOF], &sc->regs.mof);
-+    __put_user(env->pregs[PR_SRP], &sc->regs.srp);
-+    __put_user(env->pc, &sc->regs.erp);
++    __put_user(env->regs[14], &sc->regs.r14);
++    __put_user(env->regs[15], &sc->regs.r15);
++    __put_user(env->regs[16], &sc->regs.r16);
++    __put_user(env->regs[17], &sc->regs.r17);
++    __put_user(env->regs[18], &sc->regs.r18);
++    __put_user(env->regs[19], &sc->regs.r19);
++    __put_user(env->regs[20], &sc->regs.r20);
++    __put_user(env->regs[21], &sc->regs.r21);
++    __put_user(env->regs[22], &sc->regs.r22);
++    __put_user(env->regs[23], &sc->regs.r23);
++    __put_user(env->regs[24], &sc->regs.r24);
++    __put_user(env->regs[25], &sc->regs.r25);
++    __put_user(env->regs[26], &sc->regs.r26);
++    __put_user(env->regs[27], &sc->regs.r27);
++    __put_user(env->regs[28], &sc->regs.r28);
++    __put_user(env->regs[29], &sc->regs.r29);
++    __put_user(env->regs[30], &sc->regs.r30);
++    __put_user(env->regs[31], &sc->regs.r31);
++    __put_user(env->sregs[SR_PC], &sc->regs.pc);
 +}
 +
-+static void restore_sigcontext(struct target_sigcontext *sc, CPUCRISState *env)
++static void restore_sigcontext(struct target_sigcontext *sc, CPUMBState *env)
 +{
 +    __get_user(env->regs[0], &sc->regs.r0);
 +    __get_user(env->regs[1], &sc->regs.r1);
@@ -113,60 +138,91 @@ index 02ca338b6c..322d9db1a7 100644
 +    __get_user(env->regs[11], &sc->regs.r11);
 +    __get_user(env->regs[12], &sc->regs.r12);
 +    __get_user(env->regs[13], &sc->regs.r13);
-+    __get_user(env->regs[14], &sc->usp);
-+    __get_user(env->regs[15], &sc->regs.acr);
-+    __get_user(env->pregs[PR_MOF], &sc->regs.mof);
-+    __get_user(env->pregs[PR_SRP], &sc->regs.srp);
-+    __get_user(env->pc, &sc->regs.erp);
++    __get_user(env->regs[14], &sc->regs.r14);
++    __get_user(env->regs[15], &sc->regs.r15);
++    __get_user(env->regs[16], &sc->regs.r16);
++    __get_user(env->regs[17], &sc->regs.r17);
++    __get_user(env->regs[18], &sc->regs.r18);
++    __get_user(env->regs[19], &sc->regs.r19);
++    __get_user(env->regs[20], &sc->regs.r20);
++    __get_user(env->regs[21], &sc->regs.r21);
++    __get_user(env->regs[22], &sc->regs.r22);
++    __get_user(env->regs[23], &sc->regs.r23);
++    __get_user(env->regs[24], &sc->regs.r24);
++    __get_user(env->regs[25], &sc->regs.r25);
++    __get_user(env->regs[26], &sc->regs.r26);
++    __get_user(env->regs[27], &sc->regs.r27);
++    __get_user(env->regs[28], &sc->regs.r28);
++    __get_user(env->regs[29], &sc->regs.r29);
++    __get_user(env->regs[30], &sc->regs.r30);
++    __get_user(env->regs[31], &sc->regs.r31);
++    __get_user(env->sregs[SR_PC], &sc->regs.pc);
 +}
 +
-+static abi_ulong get_sigframe(CPUCRISState *env, int framesize)
++static abi_ulong get_sigframe(struct target_sigaction *ka,
++                              CPUMBState *env, int frame_size)
 +{
-+    abi_ulong sp;
-+    /* Align the stack downwards to 4.  */
-+    sp = (env->regs[R_SP] & ~3);
-+    return sp - framesize;
++    abi_ulong sp = env->regs[1];
++
++    if ((ka->sa_flags & TARGET_SA_ONSTACK) != 0 && !on_sig_stack(sp)) {
++        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
++    }
++
++    return ((sp - frame_size) & -8UL);
 +}
 +
 +void setup_frame(int sig, struct target_sigaction *ka,
-+                 target_sigset_t *set, CPUCRISState *env)
++                 target_sigset_t *set, CPUMBState *env)
 +{
 +    struct target_signal_frame *frame;
 +    abi_ulong frame_addr;
 +    int i;
 +
-+    frame_addr = get_sigframe(env, sizeof *frame);
++    frame_addr = get_sigframe(ka, env, sizeof *frame);
 +    trace_user_setup_frame(env, frame_addr);
 +    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0))
 +        goto badframe;
 +
-+    /*
-+     * The CRIS signal return trampoline. A real linux/CRIS kernel doesn't
-+     * use this trampoline anymore but it sets it up for GDB.
-+     * In QEMU, using the trampoline simplifies things a bit so we use it.
-+     *
-+     * This is movu.w __NR_sigreturn, r9; break 13;
-+     */
-+    __put_user(0x9c5f, frame->retcode+0);
-+    __put_user(TARGET_NR_sigreturn,
-+               frame->retcode + 1);
-+    __put_user(0xe93d, frame->retcode + 2);
-+
 +    /* Save the mask.  */
-+    __put_user(set->sig[0], &frame->sc.oldmask);
++    __put_user(set->sig[0], &frame->uc.tuc_mcontext.oldmask);
 +
 +    for(i = 1; i < TARGET_NSIG_WORDS; i++) {
 +        __put_user(set->sig[i], &frame->extramask[i - 1]);
 +    }
 +
-+    setup_sigcontext(&frame->sc, env);
++    setup_sigcontext(&frame->uc.tuc_mcontext, env);
 +
-+    /* Move the stack and setup the arguments for the handler.  */
-+    env->regs[R_SP] = frame_addr;
-+    env->regs[10] = sig;
-+    env->pc = (unsigned long) ka->_sa_handler;
-+    /* Link SRP so the guest returns through the trampoline.  */
-+    env->pregs[PR_SRP] = frame_addr + offsetof(typeof(*frame), retcode);
++    /* Set up to return from userspace. If provided, use a stub
++       already in userspace. */
++    /* minus 8 is offset to cater for "rtsd r15,8" offset */
++    if (ka->sa_flags & TARGET_SA_RESTORER) {
++        env->regs[15] = ((unsigned long)ka->sa_restorer)-8;
++    } else {
++        uint32_t t;
++        /* Note, these encodings are _big endian_! */
++        /* addi r12, r0, __NR_sigreturn */
++        t = 0x31800000UL | TARGET_NR_sigreturn;
++        __put_user(t, frame->tramp + 0);
++        /* brki r14, 0x8 */
++        t = 0xb9cc0008UL;
++        __put_user(t, frame->tramp + 1);
++
++        /* Return from sighandler will jump to the tramp.
++           Negative 8 offset because return is rtsd r15, 8 */
++        env->regs[15] = frame_addr + offsetof(struct target_signal_frame, tramp)
++                                   - 8;
++    }
++
++    /* Set up registers for signal handler */
++    env->regs[1] = frame_addr;
++    /* Signal handler args: */
++    env->regs[5] = sig; /* Arg 0: signum */
++    env->regs[6] = 0;
++    /* arg 1: sigcontext */
++    env->regs[7] = frame_addr += offsetof(typeof(*frame), uc);
++
++    /* Offset of 4 to handle microblaze rtid r14, 0 */
++    env->sregs[SR_PC] = (unsigned long)ka->_sa_handler;
 +
 +    unlock_user_struct(frame, frame_addr, 1);
 +    return;
@@ -176,12 +232,12 @@ index 02ca338b6c..322d9db1a7 100644
 +
 +void setup_rt_frame(int sig, struct target_sigaction *ka,
 +                    target_siginfo_t *info,
-+                     target_sigset_t *set, CPUCRISState *env)
++                    target_sigset_t *set, CPUMBState *env)
 +{
-+    fprintf(stderr, "CRIS setup_rt_frame: not implemented\n");
++    fprintf(stderr, "Microblaze setup_rt_frame: not implemented\n");
 +}
 +
-+long do_sigreturn(CPUCRISState *env)
++long do_sigreturn(CPUMBState *env)
 +{
 +    struct target_signal_frame *frame;
 +    abi_ulong frame_addr;
@@ -192,19 +248,22 @@ index 02ca338b6c..322d9db1a7 100644
 +    frame_addr = env->regs[R_SP];
 +    trace_user_do_sigreturn(env, frame_addr);
 +    /* Make sure the guest isn't playing games.  */
-+    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 1)) {
++    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 1))
 +        goto badframe;
-+    }
 +
 +    /* Restore blocked signals */
-+    __get_user(target_set.sig[0], &frame->sc.oldmask);
++    __get_user(target_set.sig[0], &frame->uc.tuc_mcontext.oldmask);
 +    for(i = 1; i < TARGET_NSIG_WORDS; i++) {
 +        __get_user(target_set.sig[i], &frame->extramask[i - 1]);
 +    }
 +    target_to_host_sigset_internal(&set, &target_set);
 +    set_sigmask(&set);
 +
-+    restore_sigcontext(&frame->sc, env);
++    restore_sigcontext(&frame->uc.tuc_mcontext, env);
++    /* We got here through a sigreturn syscall, our path back is via an
++       rtb insn so setup r14 for that.  */
++    env->regs[14] = env->sregs[SR_PC];
++
 +    unlock_user_struct(frame, frame_addr, 0);
 +    return -TARGET_QEMU_ESIGRETURN;
 +badframe:
@@ -212,59 +271,70 @@ index 02ca338b6c..322d9db1a7 100644
 +    return -TARGET_QEMU_ESIGRETURN;
 +}
 +
-+long do_rt_sigreturn(CPUCRISState *env)
++long do_rt_sigreturn(CPUMBState *env)
 +{
 +    trace_user_do_rt_sigreturn(env, 0);
-+    fprintf(stderr, "CRIS do_rt_sigreturn: not implemented\n");
++    fprintf(stderr, "Microblaze do_rt_sigreturn: not implemented\n");
 +    return -TARGET_ENOSYS;
 +}
-diff --git a/linux-user/cris/target_signal.h b/linux-user/cris/target_signal.h
-index 664621bbcd..19c0d7b539 100644
---- a/linux-user/cris/target_signal.h
-+++ b/linux-user/cris/target_signal.h
-@@ -26,5 +26,9 @@ static inline abi_ulong get_sp_from_cpustate(CPUCRISState *state)
-     return state->regs[14];
+diff --git a/linux-user/microblaze/target_signal.h b/linux-user/microblaze/target_signal.h
+index 642865f12e..02c5cc56fa 100644
+--- a/linux-user/microblaze/target_signal.h
++++ b/linux-user/microblaze/target_signal.h
+@@ -26,5 +26,9 @@ static inline abi_ulong get_sp_from_cpustate(CPUMBState *state)
+     return state->regs[1];
  }
  
 -
 +void setup_frame(int sig, struct target_sigaction *ka,
-+                 target_sigset_t *set, CPUCRISState *env);
++                 target_sigset_t *set, CPUMBState *env);
 +void setup_rt_frame(int sig, struct target_sigaction *ka,
 +                    target_siginfo_t *info,
-+                     target_sigset_t *set, CPUCRISState *env);
- #endif /* CRIS_TARGET_SIGNAL_H */
++                    target_sigset_t *set, CPUMBState *env);
+ #endif /* MICROBLAZE_TARGET_SIGNAL_H */
 diff --git a/linux-user/signal.c b/linux-user/signal.c
-index 546311221b..3f3fd05822 100644
+index 5429c9aa38..546311221b 100644
 --- a/linux-user/signal.c
 +++ b/linux-user/signal.c
-@@ -2364,174 +2364,6 @@ badframe:
+@@ -2364,233 +2364,6 @@ badframe:
      return -TARGET_QEMU_ESIGRETURN;
  }
  
--#elif defined(TARGET_CRIS)
+-#elif defined(TARGET_MICROBLAZE)
 -
 -struct target_sigcontext {
 -    struct target_pt_regs regs;  /* needs to be first */
 -    uint32_t oldmask;
--    uint32_t usp;    /* usp before stacking this gunk on it */
+-};
+-
+-struct target_stack_t {
+-    abi_ulong ss_sp;
+-    int ss_flags;
+-    unsigned int ss_size;
+-};
+-
+-struct target_ucontext {
+-    abi_ulong tuc_flags;
+-    abi_ulong tuc_link;
+-    struct target_stack_t tuc_stack;
+-    struct target_sigcontext tuc_mcontext;
+-    uint32_t tuc_extramask[TARGET_NSIG_WORDS - 1];
 -};
 -
 -/* Signal frames. */
 -struct target_signal_frame {
--    struct target_sigcontext sc;
+-    struct target_ucontext uc;
 -    uint32_t extramask[TARGET_NSIG_WORDS - 1];
--    uint16_t retcode[4];      /* Trampoline code. */
+-    uint32_t tramp[2];
 -};
 -
 -struct rt_signal_frame {
--    siginfo_t *pinfo;
--    void *puc;
 -    siginfo_t info;
 -    ucontext_t uc;
--    uint16_t retcode[4];      /* Trampoline code. */
+-    uint32_t tramp[2];
 -};
 -
--static void setup_sigcontext(struct target_sigcontext *sc, CPUCRISState *env)
+-static void setup_sigcontext(struct target_sigcontext *sc, CPUMBState *env)
 -{
 -    __put_user(env->regs[0], &sc->regs.r0);
 -    __put_user(env->regs[1], &sc->regs.r1);
@@ -280,14 +350,28 @@ index 546311221b..3f3fd05822 100644
 -    __put_user(env->regs[11], &sc->regs.r11);
 -    __put_user(env->regs[12], &sc->regs.r12);
 -    __put_user(env->regs[13], &sc->regs.r13);
--    __put_user(env->regs[14], &sc->usp);
--    __put_user(env->regs[15], &sc->regs.acr);
--    __put_user(env->pregs[PR_MOF], &sc->regs.mof);
--    __put_user(env->pregs[PR_SRP], &sc->regs.srp);
--    __put_user(env->pc, &sc->regs.erp);
+-    __put_user(env->regs[14], &sc->regs.r14);
+-    __put_user(env->regs[15], &sc->regs.r15);
+-    __put_user(env->regs[16], &sc->regs.r16);
+-    __put_user(env->regs[17], &sc->regs.r17);
+-    __put_user(env->regs[18], &sc->regs.r18);
+-    __put_user(env->regs[19], &sc->regs.r19);
+-    __put_user(env->regs[20], &sc->regs.r20);
+-    __put_user(env->regs[21], &sc->regs.r21);
+-    __put_user(env->regs[22], &sc->regs.r22);
+-    __put_user(env->regs[23], &sc->regs.r23);
+-    __put_user(env->regs[24], &sc->regs.r24);
+-    __put_user(env->regs[25], &sc->regs.r25);
+-    __put_user(env->regs[26], &sc->regs.r26);
+-    __put_user(env->regs[27], &sc->regs.r27);
+-    __put_user(env->regs[28], &sc->regs.r28);
+-    __put_user(env->regs[29], &sc->regs.r29);
+-    __put_user(env->regs[30], &sc->regs.r30);
+-    __put_user(env->regs[31], &sc->regs.r31);
+-    __put_user(env->sregs[SR_PC], &sc->regs.pc);
 -}
 -
--static void restore_sigcontext(struct target_sigcontext *sc, CPUCRISState *env)
+-static void restore_sigcontext(struct target_sigcontext *sc, CPUMBState *env)
 -{
 -    __get_user(env->regs[0], &sc->regs.r0);
 -    __get_user(env->regs[1], &sc->regs.r1);
@@ -303,60 +387,91 @@ index 546311221b..3f3fd05822 100644
 -    __get_user(env->regs[11], &sc->regs.r11);
 -    __get_user(env->regs[12], &sc->regs.r12);
 -    __get_user(env->regs[13], &sc->regs.r13);
--    __get_user(env->regs[14], &sc->usp);
--    __get_user(env->regs[15], &sc->regs.acr);
--    __get_user(env->pregs[PR_MOF], &sc->regs.mof);
--    __get_user(env->pregs[PR_SRP], &sc->regs.srp);
--    __get_user(env->pc, &sc->regs.erp);
+-    __get_user(env->regs[14], &sc->regs.r14);
+-    __get_user(env->regs[15], &sc->regs.r15);
+-    __get_user(env->regs[16], &sc->regs.r16);
+-    __get_user(env->regs[17], &sc->regs.r17);
+-    __get_user(env->regs[18], &sc->regs.r18);
+-    __get_user(env->regs[19], &sc->regs.r19);
+-    __get_user(env->regs[20], &sc->regs.r20);
+-    __get_user(env->regs[21], &sc->regs.r21);
+-    __get_user(env->regs[22], &sc->regs.r22);
+-    __get_user(env->regs[23], &sc->regs.r23);
+-    __get_user(env->regs[24], &sc->regs.r24);
+-    __get_user(env->regs[25], &sc->regs.r25);
+-    __get_user(env->regs[26], &sc->regs.r26);
+-    __get_user(env->regs[27], &sc->regs.r27);
+-    __get_user(env->regs[28], &sc->regs.r28);
+-    __get_user(env->regs[29], &sc->regs.r29);
+-    __get_user(env->regs[30], &sc->regs.r30);
+-    __get_user(env->regs[31], &sc->regs.r31);
+-    __get_user(env->sregs[SR_PC], &sc->regs.pc);
 -}
 -
--static abi_ulong get_sigframe(CPUCRISState *env, int framesize)
+-static abi_ulong get_sigframe(struct target_sigaction *ka,
+-                              CPUMBState *env, int frame_size)
 -{
--    abi_ulong sp;
--    /* Align the stack downwards to 4.  */
--    sp = (env->regs[R_SP] & ~3);
--    return sp - framesize;
+-    abi_ulong sp = env->regs[1];
+-
+-    if ((ka->sa_flags & TARGET_SA_ONSTACK) != 0 && !on_sig_stack(sp)) {
+-        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
+-    }
+-
+-    return ((sp - frame_size) & -8UL);
 -}
 -
 -static void setup_frame(int sig, struct target_sigaction *ka,
--                        target_sigset_t *set, CPUCRISState *env)
+-                        target_sigset_t *set, CPUMBState *env)
 -{
 -    struct target_signal_frame *frame;
 -    abi_ulong frame_addr;
 -    int i;
 -
--    frame_addr = get_sigframe(env, sizeof *frame);
+-    frame_addr = get_sigframe(ka, env, sizeof *frame);
 -    trace_user_setup_frame(env, frame_addr);
 -    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0))
 -        goto badframe;
 -
--    /*
--     * The CRIS signal return trampoline. A real linux/CRIS kernel doesn't
--     * use this trampoline anymore but it sets it up for GDB.
--     * In QEMU, using the trampoline simplifies things a bit so we use it.
--     *
--     * This is movu.w __NR_sigreturn, r9; break 13;
--     */
--    __put_user(0x9c5f, frame->retcode+0);
--    __put_user(TARGET_NR_sigreturn,
--               frame->retcode + 1);
--    __put_user(0xe93d, frame->retcode + 2);
--
 -    /* Save the mask.  */
--    __put_user(set->sig[0], &frame->sc.oldmask);
+-    __put_user(set->sig[0], &frame->uc.tuc_mcontext.oldmask);
 -
 -    for(i = 1; i < TARGET_NSIG_WORDS; i++) {
 -        __put_user(set->sig[i], &frame->extramask[i - 1]);
 -    }
 -
--    setup_sigcontext(&frame->sc, env);
+-    setup_sigcontext(&frame->uc.tuc_mcontext, env);
 -
--    /* Move the stack and setup the arguments for the handler.  */
--    env->regs[R_SP] = frame_addr;
--    env->regs[10] = sig;
--    env->pc = (unsigned long) ka->_sa_handler;
--    /* Link SRP so the guest returns through the trampoline.  */
--    env->pregs[PR_SRP] = frame_addr + offsetof(typeof(*frame), retcode);
+-    /* Set up to return from userspace. If provided, use a stub
+-       already in userspace. */
+-    /* minus 8 is offset to cater for "rtsd r15,8" offset */
+-    if (ka->sa_flags & TARGET_SA_RESTORER) {
+-        env->regs[15] = ((unsigned long)ka->sa_restorer)-8;
+-    } else {
+-        uint32_t t;
+-        /* Note, these encodings are _big endian_! */
+-        /* addi r12, r0, __NR_sigreturn */
+-        t = 0x31800000UL | TARGET_NR_sigreturn;
+-        __put_user(t, frame->tramp + 0);
+-        /* brki r14, 0x8 */
+-        t = 0xb9cc0008UL;
+-        __put_user(t, frame->tramp + 1);
+-
+-        /* Return from sighandler will jump to the tramp.
+-           Negative 8 offset because return is rtsd r15, 8 */
+-        env->regs[15] = frame_addr + offsetof(struct target_signal_frame, tramp)
+-                                   - 8;
+-    }
+-
+-    /* Set up registers for signal handler */
+-    env->regs[1] = frame_addr;
+-    /* Signal handler args: */
+-    env->regs[5] = sig; /* Arg 0: signum */
+-    env->regs[6] = 0;
+-    /* arg 1: sigcontext */
+-    env->regs[7] = frame_addr += offsetof(typeof(*frame), uc);
+-
+-    /* Offset of 4 to handle microblaze rtid r14, 0 */
+-    env->sregs[SR_PC] = (unsigned long)ka->_sa_handler;
 -
 -    unlock_user_struct(frame, frame_addr, 1);
 -    return;
@@ -366,12 +481,12 @@ index 546311221b..3f3fd05822 100644
 -
 -static void setup_rt_frame(int sig, struct target_sigaction *ka,
 -                           target_siginfo_t *info,
--                           target_sigset_t *set, CPUCRISState *env)
+-                           target_sigset_t *set, CPUMBState *env)
 -{
--    fprintf(stderr, "CRIS setup_rt_frame: not implemented\n");
+-    fprintf(stderr, "Microblaze setup_rt_frame: not implemented\n");
 -}
 -
--long do_sigreturn(CPUCRISState *env)
+-long do_sigreturn(CPUMBState *env)
 -{
 -    struct target_signal_frame *frame;
 -    abi_ulong frame_addr;
@@ -382,19 +497,22 @@ index 546311221b..3f3fd05822 100644
 -    frame_addr = env->regs[R_SP];
 -    trace_user_do_sigreturn(env, frame_addr);
 -    /* Make sure the guest isn't playing games.  */
--    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 1)) {
+-    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 1))
 -        goto badframe;
--    }
 -
 -    /* Restore blocked signals */
--    __get_user(target_set.sig[0], &frame->sc.oldmask);
+-    __get_user(target_set.sig[0], &frame->uc.tuc_mcontext.oldmask);
 -    for(i = 1; i < TARGET_NSIG_WORDS; i++) {
 -        __get_user(target_set.sig[i], &frame->extramask[i - 1]);
 -    }
 -    target_to_host_sigset_internal(&set, &target_set);
 -    set_sigmask(&set);
 -
--    restore_sigcontext(&frame->sc, env);
+-    restore_sigcontext(&frame->uc.tuc_mcontext, env);
+-    /* We got here through a sigreturn syscall, our path back is via an
+-       rtb insn so setup r14 for that.  */
+-    env->regs[14] = env->sregs[SR_PC];
+-
 -    unlock_user_struct(frame, frame_addr, 0);
 -    return -TARGET_QEMU_ESIGRETURN;
 -badframe:
@@ -402,15 +520,15 @@ index 546311221b..3f3fd05822 100644
 -    return -TARGET_QEMU_ESIGRETURN;
 -}
 -
--long do_rt_sigreturn(CPUCRISState *env)
+-long do_rt_sigreturn(CPUMBState *env)
 -{
 -    trace_user_do_rt_sigreturn(env, 0);
--    fprintf(stderr, "CRIS do_rt_sigreturn: not implemented\n");
+-    fprintf(stderr, "Microblaze do_rt_sigreturn: not implemented\n");
 -    return -TARGET_ENOSYS;
 -}
 -
- #elif defined(TARGET_NIOS2)
+ #elif defined(TARGET_CRIS)
  
- #define MCONTEXT_VERSION 2
+ struct target_sigcontext {
 -- 
 2.14.3
