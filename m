@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fAzn9-0006AH-LZ
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:23:40 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fAzng-0006Tt-28
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:24:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fAzn6-0004AP-CI
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:23:39 -0400
-References: <20180420123456.22196-1-david@redhat.com>
-	<20180420123456.22196-4-david@redhat.com>
-	<20180423141928.7e64b380@redhat.com>
-	<908f1079-385f-24d3-99ad-152ecd6b01d2@redhat.com>
-	<20180424153154.05e79de7@redhat.com>
-	<f195e131-fde4-1ee9-d3d6-704f51137cb1@redhat.com>
-	<20180424164417.15347ebb@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <587545cc-6640-3c8b-f441-34c5f17cefee@redhat.com>
-Date: Tue, 24 Apr 2018 17:23:31 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1fAzne-0005Ip-3f
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:24:11 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:54600)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fAznd-0005H5-TH
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:24:10 -0400
+Received: by mail-wm0-x241.google.com with SMTP id f6so1802899wmc.4
+	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 08:24:09 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Tue, 24 Apr 2018 16:23:21 +0100
+Message-Id: <20180424152405.10304-3-alex.bennee@linaro.org>
+In-Reply-To: <20180424152405.10304-1-alex.bennee@linaro.org>
+References: <20180424152405.10304-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180424164417.15347ebb@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] pc-dimm: factor out address space
- logic into MemoryDevice code
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3 02/46] configure: add test for docker
+ availability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +30,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On 24.04.2018 16:44, Igor Mammedov wrote:
-> On Tue, 24 Apr 2018 15:41:23 +0200
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> On 24.04.2018 15:31, Igor Mammedov wrote:
->>> On Mon, 23 Apr 2018 14:52:37 +0200
->>> David Hildenbrand <david@redhat.com> wrote:
->>>   
->>>>>     
->>>>>> +    /* we will need a new memory slot for kvm and vhost */
->>>>>> +    if (kvm_enabled() && !kvm_has_free_slot(machine)) {
->>>>>> +        error_setg(errp, "hypervisor has no free memory slots left");
->>>>>> +        return;
->>>>>> +    }
->>>>>> +    if (!vhost_has_free_slot()) {
->>>>>> +        error_setg(errp, "a used vhost backend has no free memory slots left");
->>>>>> +        return;
->>>>>> +    }    
->>>>> move these checks to pre_plug time
->>>>>     
->>>>>> +
->>>>>> +    memory_region_add_subregion(&hpms->mr, addr - hpms->base, mr);    
->>>>> missing vmstate registration?    
->>>>
->>>> Missed this one: To be called by the caller. Important because e.g. for
->>>> virtio-pmem we don't want this (I assume :) ).  
->>> if pmem isn't on shared storage, then We'd probably want to migrate
->>> it as well, otherwise target would experience data loss.
->>> Anyways, I'd just reat it as normal RAM in migration case  
->>
->> Yes, if we realize that all MemoryDevices need this call, we can move it
->> to that place, too.
->>
->> Wonder if we might want to make this configurable for virtio-pmem later
->> on (via a flag or sth like that).
-> I don't see any reason why we wouldn't like it to be migrated,
-> it's the same as nvdimm but with another qemu:guest ABI
-> and async flush instead of sync one we have with nvdimm.
-> 
+This tests for a working docker installation without sudo and sets up
+config-host.mak accordingly. This will be useful from cross compiling
+things in the future.
 
-Didn't you just mention "shared storage" ? :)
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ configure | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-Anyhow, I leave such stuff to Pankaj to figure out. I remember him
-working on some page cache details. Once clarified, this is easily
-refactored later on.
-
+diff --git a/configure b/configure
+index 0a19b033bc..b0ae632ee4 100755
+--- a/configure
++++ b/configure
+@@ -451,6 +451,7 @@ jemalloc="no"
+ replication="yes"
+ vxhs=""
+ libxml2=""
++docker="no"
+ 
+ supported_cpu="no"
+ supported_os="no"
+@@ -5413,6 +5414,17 @@ EOF
+   fi
+ fi
+ 
++##########################################
++# Docker and cross-compiler support
++#
++# This is specifically for building test
++# cases for foreign architectures, not
++# cross-compiling QEMU itself.
++
++if has "docker"; then
++    docker=$($python $source_path/tests/docker/docker.py probe)
++fi
++
+ ##########################################
+ # End of CC checks
+ # After here, no more $cc or $ld runs
+@@ -5874,6 +5886,7 @@ echo "avx2 optimization $avx2_opt"
+ echo "replication support $replication"
+ echo "VxHS block device $vxhs"
+ echo "capstone          $capstone"
++echo "docker            $docker"
+ 
+ if test "$sdl_too_old" = "yes"; then
+ echo "-> Your SDL version is too old - please upgrade to have SDL support"
+@@ -6697,6 +6710,10 @@ if test "$gcov" = "yes" ; then
+   echo "GCOV=$gcov_tool" >> $config_host_mak
+ fi
+ 
++if test "$docker" != "no"; then
++    echo "HAVE_USER_DOCKER=y" >> $config_host_mak
++fi
++
+ # use included Linux headers
+ if test "$linux" = "yes" ; then
+   mkdir -p linux-headers
 -- 
-
-Thanks,
-
-David / dhildenb
+2.17.0
