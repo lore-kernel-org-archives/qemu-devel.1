@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fB2LB-0005P5-GK
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 14:06:59 -0400
+	(envelope-from <david@redhat.com>) id 1fB2Nk-0007nB-Io
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 14:09:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fB2L7-0002di-E4
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 14:06:57 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38166 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fB2L7-0002dZ-6j
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 14:06:53 -0400
-Date: Tue, 24 Apr 2018 21:06:37 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180424210040-mutt-send-email-mst@kernel.org>
-References: <1524524398-41342-1-git-send-email-mst@redhat.com>
-	<CF6A88132359CE47947DB4C6E1709ED53973A729@ORSMSX110.amr.corp.intel.com>
-	<20180424035504-mutt-send-email-mst@kernel.org>
-	<20180424095722.76105b40@redhat.com>
-	<20180424201554-mutt-send-email-mst@kernel.org>
-	<CF6A88132359CE47947DB4C6E1709ED53973A87A@ORSMSX110.amr.corp.intel.com>
+	(envelope-from <david@redhat.com>) id 1fB2Ng-0003qB-Fm
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 14:09:36 -0400
+References: <1524570294-23058-1-git-send-email-thuth@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <45e83916-df9d-6417-0646-35381f4a98d5@redhat.com>
+Date: Tue, 24 Apr 2018 20:09:29 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CF6A88132359CE47947DB4C6E1709ED53973A87A@ORSMSX110.amr.corp.intel.com>
-Subject: Re: [Qemu-devel] [PATCH] acpi/nvdimm: remove forward name references
+In-Reply-To: <1524570294-23058-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH] hw/s390x: Allow to configure the
+ consoles with the "-serial" parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,180 +24,242 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Schmauss, Erik" <erik.schmauss@intel.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Williams, Dan J" <dan.j.williams@intel.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Tue, Apr 24, 2018 at 05:47:58PM +0000, Schmauss, Erik wrote:
+On 24.04.2018 13:44, Thomas Huth wrote:
+> The consoles ("sclpconsole" and "sclplmconsole") can only be configured
+> with "-device" and "-chardev" so far. Other machines use the convenience
+> option "-serial" to configure the default consoles, too, even for virtual
+> consoles like spapr-vty on the pseries machine. So let's support this
+> option on s390x, too, so we can easily enable the serial console here
+> again with "-nodefaults", for example. Also map the second -serial
+> option to the "sclplmconsole", so that there is now an easy way to
+> configure this second console on s390x, too.
+> Additionally, the new code is also smaller than the old one and we have
+> less s390x-specific code in vl.c :-)
 > 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/s390x/event-facility.c         | 14 +++++++++++
+>  hw/s390x/s390-virtio-ccw.c        | 19 +++++++++++++--
+>  include/hw/boards.h               |  1 -
+>  include/hw/s390x/event-facility.h |  2 ++
+>  vl.c                              | 50 ---------------------------------------
+>  5 files changed, 33 insertions(+), 53 deletions(-)
 > 
-> > -----Original Message-----
-> > From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> > Sent: Tuesday, April 24, 2018 10:43 AM
-> > To: Igor Mammedov <imammedo@redhat.com>
-> > Cc: Schmauss, Erik <erik.schmauss@intel.com>; qemu-devel@nongnu.org; Xiao
-> > Guangrong <xiaoguangrong.eric@gmail.com>; Williams, Dan J
-> > <dan.j.williams@intel.com>
-> > Subject: Re: [PATCH] acpi/nvdimm: remove forward name references
-> > 
-> > On Tue, Apr 24, 2018 at 09:57:22AM +0200, Igor Mammedov wrote:
-> > > On Tue, 24 Apr 2018 04:02:40 +0300
-> > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > >
-> > > > On Tue, Apr 24, 2018 at 12:41:29AM +0000, Schmauss, Erik wrote:
-> > > > >
-> > > > >
-> > > > > > -----Original Message-----
-> > > > > > From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> > > > > > Sent: Monday, April 23, 2018 4:03 PM
-> > > > > > To: qemu-devel@nongnu.org
-> > > > > > Cc: Schmauss, Erik <erik.schmauss@intel.com>; Igor Mammedov
-> > > > > > <imammedo@redhat.com>; Xiao Guangrong
-> > > > > > <xiaoguangrong.eric@gmail.com>
-> > > > > > Subject: [PATCH] acpi/nvdimm: remove forward name references
-> > > > > >
-> > > > > > NVDIMM SSDT table references a name ("MEMA") before it is
-> > > > > > defined. This is reported to no longer be supported since Linux 4.17-rc1.
-> > > > > >
-> > > > > > While arguably Linux needs to keep working on old hypervisors,
-> > > > > > and other OSes seem fine with our behaviour, it seems cleaner to
-> > > > > > have the definition appear in the SSDT before use.
-> > > > > >
-> > > > > > Suggested-by: "Schmauss, Erik" <erik.schmauss@intel.com>
-> > > > > > Cc: qemu-stable@nongnu.org
-> > > > > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > > > > > ---
-> > > > > >
-> > > > > > Hi Erik,
-> > > > > > could you pls test the issue and report whether it addresses
-> > > > > > your concern? I can't
-> > > > > Hi Michael,
-> > > > >
-> > > > > > do much to fix past releases which IIUC shipped this code since
-> > > > > > 2.6.0 about a year ago.
-> > > > > >
-> > > > > > Lightly tested with Linux only.
-> > > > >
-> > > > > I'm looking at the ASL tables generated by make check-qtest-x86_64.
-> > > > > This line
-> > > >
-> > > > which line?
-> > > >
-> > > > > ends up generating a strange ACPI table where the Operation region
-> > > > > and field declarations are stuck inside the NCAL method which is
-> > > > > called from _DSM. If we create the operation region and methods
-> > > > > inside methods, they disappear after the NCAL method returns.
-> > > What's wrong with it?
-> > > Method is complete so temporary objects it has used went out of scope,
-> > > all within spec rules and worked fine with linux and windows guests.
-> > >
-> > > > > I think nvdimm_build_common_dsm() needs some refining.
-> > > >
-> > > > What exactly do you refer to?
-> > > >
-> > > > DefinitionBlock ("", "SSDT", 1, "BOCHS ", "NVDIMM", 0x00000001) {
-> > > >     Name (MEMA, 0x07FFE000)
-> > > >     Scope (\_SB)
-> > > >     {
-> > > >         Device (NVDR)
-> > > >         {
-> > > >             Name (_HID, "ACPI0012" /* NVDIMM Root Device */)  // _HID:
-> > Hardware ID
-> > > >             Method (NCAL, 5, Serialized)
-> > > >             {
-> > > >                 Local6 = MEMA /* \MEMA */
-> > > >                 OperationRegion (NPIO, SystemIO, 0x0A18, 0x04)
-> > > >                 OperationRegion (NRAM, SystemMemory, Local6, 0x1000)
-> > > >
-> > > > 		^^^ this?
-> > > >
-> > > > I agree the NPIO could be moved out.
-> > > > Don't really understand why is Local6 needed - can't MEMA be used
-> > > > directly? Assuming it isn't NRAM could be moved out too.
-> > > From spec
-> > >  DefOpRegion := OpRegionOp NameString RegionSpace RegionOffset
-> > > RegionLen  RegionOffset := TermArg => Integer  TermArg := Type2Opcode
-> > > | DataObject | ArgObj | LocalObj
-> > >
-> > > So named object is not accepted,
-> > 
-> > might be worth checking what happens with actual OSPMs.
-> > If it does happen to work, we can try tweaking the ACPI spec to allow this.
+> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+> index 9c24bc6..e6940a2 100644
+> --- a/hw/s390x/event-facility.c
+> +++ b/hw/s390x/event-facility.c
+> @@ -511,3 +511,17 @@ static void register_types(void)
+>  }
+>  
+>  type_init(register_types)
+> +
+> +BusState *sclp_get_event_facility_bus(void)
+> +{
+> +    Object *busobj;
+> +    SCLPEventsBus *sbus;
+> +
+> +    busobj = object_resolve_path_type("", TYPE_SCLP_EVENTS_BUS, NULL);
+> +    sbus = OBJECT_CHECK(SCLPEventsBus, busobj, TYPE_SCLP_EVENTS_BUS);
+> +    if (!sbus) {
+> +        return NULL;
+> +    }
+> +
+> +    return &sbus->qbus;
+> +}
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 435f7c9..fe28514 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -288,6 +288,15 @@ static void s390_create_virtio_net(BusState *bus, const char *name)
+>      }
+>  }
+>  
+> +static void s390_create_sclpconsole(const char *type, Chardev *chardev)
+> +{
+> +    DeviceState *dev;
+> +
+> +    dev = qdev_create(sclp_get_event_facility_bus(), type);
+> +    qdev_prop_set_chr(dev, "chardev", chardev);
+> +    qdev_init_nofail(dev);
+> +}
+> +
+>  static void ccw_init(MachineState *machine)
+>  {
+>      int ret;
+> @@ -311,6 +320,14 @@ static void ccw_init(MachineState *machine)
+>                        machine->initrd_filename, "s390-ccw.img",
+>                        "s390-netboot.img", true);
+>  
+> +    /* init consoles */
+> +    if (serial_hds[0]) {
+> +        s390_create_sclpconsole("sclpconsole", serial_hds[0]);
+> +    }
+> +    if (serial_hds[1]) {
+> +        s390_create_sclpconsole("sclplmconsole", serial_hds[1]);
+> +    }
+> +
+>      /*
+>       * We cannot easily make the pci host bridge conditional as older QEMUs
+>       * always created it. Doing so would break migration across QEMU versions.
+> @@ -470,10 +487,8 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
+>      mc->block_default_type = IF_VIRTIO;
+>      mc->no_cdrom = 1;
+>      mc->no_floppy = 1;
+> -    mc->no_serial = 1;
+>      mc->no_parallel = 1;
+>      mc->no_sdcard = 1;
+> -    mc->use_sclp = 1;
+>      mc->max_cpus = S390_MAX_CPUS;
+>      mc->has_hotpluggable_cpus = true;
+>      mc->get_hotplug_handler = s390_get_hotplug_handler;
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index a609239..5c5eee5 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -180,7 +180,6 @@ struct MachineClass {
+>      unsigned int no_serial:1,
+>          no_parallel:1,
+>          use_virtcon:1,
+> -        use_sclp:1,
+>          no_floppy:1,
+>          no_cdrom:1,
+>          no_sdcard:1,
+> diff --git a/include/hw/s390x/event-facility.h b/include/hw/s390x/event-facility.h
+> index 5698e5e..5cc16f6 100644
+> --- a/include/hw/s390x/event-facility.h
+> +++ b/include/hw/s390x/event-facility.h
+> @@ -210,4 +210,6 @@ typedef struct SCLPEventFacilityClass {
+>      bool (*event_pending)(SCLPEventFacility *ef);
+>  } SCLPEventFacilityClass;
+>  
+> +BusState *sclp_get_event_facility_bus(void);
+> +
+>  #endif
+> diff --git a/vl.c b/vl.c
+> index fce1fd1..b32340c 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -133,7 +133,6 @@ int main(int argc, char **argv)
+>  #include "sysemu/iothread.h"
+>  
+>  #define MAX_VIRTIO_CONSOLES 1
+> -#define MAX_SCLP_CONSOLES 1
+>  
+>  static const char *data_dir[16];
+>  static int data_dir_idx;
+> @@ -157,7 +156,6 @@ int no_frame;
+>  Chardev *serial_hds[MAX_SERIAL_PORTS];
+>  Chardev *parallel_hds[MAX_PARALLEL_PORTS];
+>  Chardev *virtcon_hds[MAX_VIRTIO_CONSOLES];
+> -Chardev *sclp_hds[MAX_SCLP_CONSOLES];
+>  int win2k_install_hack = 0;
+>  int singlestep = 0;
+>  int smp_cpus;
+> @@ -209,7 +207,6 @@ static int has_defaults = 1;
+>  static int default_serial = 1;
+>  static int default_parallel = 1;
+>  static int default_virtcon = 1;
+> -static int default_sclp = 1;
+>  static int default_monitor = 1;
+>  static int default_floppy = 1;
+>  static int default_cdrom = 1;
+> @@ -2571,39 +2568,6 @@ static int virtcon_parse(const char *devname)
+>      return 0;
+>  }
+>  
+> -static int sclp_parse(const char *devname)
+> -{
+> -    QemuOptsList *device = qemu_find_opts("device");
+> -    static int index = 0;
+> -    char label[32];
+> -    QemuOpts *dev_opts;
+> -
+> -    if (strcmp(devname, "none") == 0) {
+> -        return 0;
+> -    }
+> -    if (index == MAX_SCLP_CONSOLES) {
+> -        error_report("too many sclp consoles");
+> -        exit(1);
+> -    }
+> -
+> -    assert(arch_type == QEMU_ARCH_S390X);
+> -
+> -    dev_opts = qemu_opts_create(device, NULL, 0, NULL);
+> -    qemu_opt_set(dev_opts, "driver", "sclpconsole", &error_abort);
+> -
+> -    snprintf(label, sizeof(label), "sclpcon%d", index);
+> -    sclp_hds[index] = qemu_chr_new(label, devname);
+> -    if (!sclp_hds[index]) {
+> -        error_report("could not connect sclp console"
+> -                     " to character backend '%s'", devname);
+> -        return -1;
+> -    }
+> -    qemu_opt_set(dev_opts, "chardev", label, &error_abort);
+> -
+> -    index++;
+> -    return 0;
+> -}
+> -
+>  static int debugcon_parse(const char *devname)
+>  {
+>      QemuOpts *opts;
+> @@ -4237,9 +4201,6 @@ int main(int argc, char **argv, char **envp)
+>      if (!has_defaults || !machine_class->use_virtcon) {
+>          default_virtcon = 0;
+>      }
+> -    if (!has_defaults || !machine_class->use_sclp) {
+> -        default_sclp = 0;
+> -    }
+>      if (!has_defaults || machine_class->no_floppy) {
+>          default_floppy = 0;
+>      }
+> @@ -4286,16 +4247,11 @@ int main(int argc, char **argv, char **envp)
+>              add_device_config(DEV_SERIAL, "mon:stdio");
+>          } else if (default_virtcon && default_monitor) {
+>              add_device_config(DEV_VIRTCON, "mon:stdio");
+> -        } else if (default_sclp && default_monitor) {
+> -            add_device_config(DEV_SCLP, "mon:stdio");
+>          } else {
+>              if (default_serial)
+>                  add_device_config(DEV_SERIAL, "stdio");
+>              if (default_virtcon)
+>                  add_device_config(DEV_VIRTCON, "stdio");
+> -            if (default_sclp) {
+> -                add_device_config(DEV_SCLP, "stdio");
+> -            }
+>              if (default_monitor)
+>                  monitor_parse("stdio", "readline", false);
+>          }
+> @@ -4308,9 +4264,6 @@ int main(int argc, char **argv, char **envp)
+>              monitor_parse("vc:80Cx24C", "readline", false);
+>          if (default_virtcon)
+>              add_device_config(DEV_VIRTCON, "vc:80Cx24C");
+> -        if (default_sclp) {
+> -            add_device_config(DEV_SCLP, "vc:80Cx24C");
+> -        }
+>      }
+>  
+>  #if defined(CONFIG_VNC)
+> @@ -4560,9 +4513,6 @@ int main(int argc, char **argv, char **envp)
+>          exit(1);
+>      if (foreach_device_config(DEV_VIRTCON, virtcon_parse) < 0)
+>          exit(1);
+> -    if (foreach_device_config(DEV_SCLP, sclp_parse) < 0) {
+> -        exit(1);
+> -    }
+>      if (foreach_device_config(DEV_DEBUGCON, debugcon_parse) < 0)
+>          exit(1);
+>  
 > 
-> I'm looking at the ACPI6.2a spec on page 840 and it says
-> TermArg := Type2Opcode | DataObject | Argterm |LocalTerm |NameString |SymbolicExpression
 
-Oh right, that's there since ACPI 6.0. As usual, the issue is that
-we can't easily check what does OSPM support.
-This is really something worth fixing in the spec IMHO.
-We could just try and test a bunch of guest OSPMs and if
-they happen to work, switch to that. Lots of work for
-uncertain benefit.
+If this doesn't break any setups we have, I really like it :)
 
+-- 
 
-> In our case, MEMA is a namestring so we should be able to avoid the local6 and insert MEMA instead. Just as long as the Named object appears in the table before the object is used, the windows parser should work fine.
-> 
-> After applying this patch, the only change in ASL/AML that I was expecting was for MEMA to be moved to the top of the definition block and leave everything else alone.
+Thanks,
 
-Right. This is what I see.
-
-> We usually do not recommend the creation of objects inside of control methods due to the overhead of creating/destroying these objects after each method call. So the one problem that I can see with this is that performance could bog down if this method is called a lot. If it is not called very frequently, then it's probably not a big deal. 
-> 
-> > 
-> > > we could have played games with
-> > > references and Type2Opcode but that didn't work nice with Windows ACPI
-> > > parser. Hence local object.
-> > 
-> > A comment in code wouldn't hurt to explain this.
-> > 
-> > > The reason why OperationRegion is dynamic, is that if we put it
-> > > outside of method it will become static, and we would have to use
-> > > Integer constant there (no named objects are allowed) and then patch
-> > > it dynamically in bios loader.
-> > > I'd prefer to keep it as is, without introducing another hack like
-> > > build_append_named_operation_region() to create it with know offset so
-> > > firmware could patch it.
-> > 
-> > I agree to that.
-> > 
-> > > >
-> > > >
-> > > > It all seems suboptimal but given the method is serialized, I don't
-> > > > see anything wrong with it as such.
-> > > >
-> > > >
-> > > > >
-> > > > > >
-> > > > > >  hw/acpi/nvdimm.c | 6 ++++--
-> > > > > >  1 file changed, 4 insertions(+), 2 deletions(-)
-> > > > > >
-> > > > > > diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c index
-> > > > > > 59d6e42..fadebbd
-> > > > > > 100644
-> > > > > > --- a/hw/acpi/nvdimm.c
-> > > > > > +++ b/hw/acpi/nvdimm.c
-> > > > > > @@ -1234,6 +1234,10 @@ static void nvdimm_build_ssdt(GArray
-> > > > > > *table_offsets, GArray *table_data,
-> > > > > >      ssdt = init_aml_allocator();
-> > > > > >      acpi_data_push(ssdt->buf, sizeof(AcpiTableHeader));
-> > > > > >
-> > > > > > +    /* Storage for the memory address */
-> > > > > > +    mem_addr_offset = table_data->len +
-> > > > > > +        build_append_named_dword(ssdt->buf,
-> > > > > > + NVDIMM_ACPI_MEM_ADDR);
-> > > > > > +
-> > > > > >      sb_scope = aml_scope("\\_SB");
-> > > > > >
-> > > > > >      dev = aml_device("NVDR");
-> > > > > > @@ -1266,8 +1270,6 @@ static void nvdimm_build_ssdt(GArray
-> > > > > > *table_offsets, GArray *table_data,
-> > > > > >
-> > > > > >      /* copy AML table into ACPI tables blob and patch header there */
-> > > > > >      g_array_append_vals(table_data, ssdt->buf->data, ssdt->buf->len);
-> > > > > > -    mem_addr_offset = build_append_named_dword(table_data,
-> > > > > > -                                               NVDIMM_ACPI_MEM_ADDR);
-> > > > > >
-> > > > > >      bios_linker_loader_alloc(linker,
-> > > > > >                               NVDIMM_DSM_MEM_FILE,
-> > > > > > dsm_dma_arrea,
-> > > > > > --
-> > > > > > MST
+David / dhildenb
