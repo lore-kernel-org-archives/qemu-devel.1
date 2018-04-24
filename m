@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fAspR-00049o-Eq
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 03:57:34 -0400
+	(envelope-from <kchamart@redhat.com>) id 1fAsw1-0005h3-Nq
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 04:04:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fAspO-0005iP-79
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 03:57:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39214 helo=mx1.redhat.com)
+	(envelope-from <kchamart@redhat.com>) id 1fAsvz-0001d5-3d
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 04:04:21 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54134 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fAspO-0005hu-1L
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 03:57:30 -0400
-Date: Tue, 24 Apr 2018 09:57:22 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180424095722.76105b40@redhat.com>
-In-Reply-To: <20180424035504-mutt-send-email-mst@kernel.org>
-References: <1524524398-41342-1-git-send-email-mst@redhat.com>
-	<CF6A88132359CE47947DB4C6E1709ED53973A729@ORSMSX110.amr.corp.intel.com>
-	<20180424035504-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1fAsvy-0001cF-UL
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 04:04:19 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4C6074270969
+	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 08:04:14 +0000 (UTC)
+Date: Tue, 24 Apr 2018 10:04:04 +0200
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20180424080404.GO3502@paraplu>
+References: <20180420231246.23130-1-lersek@redhat.com>
+	<20180420231246.23130-2-lersek@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] acpi/nvdimm: remove forward name references
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180420231246.23130-2-lersek@redhat.com>
+Subject: Re: [Qemu-devel] [qemu RFC v3 1/3] qapi: add SysEmuTarget to
+ "common.json"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,143 +34,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "Schmauss, Erik" <erik.schmauss@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Williams, Dan J" <dan.j.williams@intel.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-On Tue, 24 Apr 2018 04:02:40 +0300
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+On Sat, Apr 21, 2018 at 01:12:44AM +0200, Laszlo Ersek wrote:
+> We'll soon need an enumeration type that lists all the softmmu targets
+> that QEMU (the project) supports. Introduce @SysEmuTarget to
+> "common.json".
 
-> On Tue, Apr 24, 2018 at 12:41:29AM +0000, Schmauss, Erik wrote:
-> >=20
-> >  =20
-> > > -----Original Message-----
-> > > From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> > > Sent: Monday, April 23, 2018 4:03 PM
-> > > To: qemu-devel@nongnu.org
-> > > Cc: Schmauss, Erik <erik.schmauss@intel.com>; Igor Mammedov
-> > > <imammedo@redhat.com>; Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-> > > Subject: [PATCH] acpi/nvdimm: remove forward name references
-> > >=20
-> > > NVDIMM SSDT table references a name ("MEMA") before it is defined. Th=
-is is
-> > > reported to no longer be supported since Linux 4.17-rc1.
-> > >=20
-> > > While arguably Linux needs to keep working on old hypervisors, and ot=
-her OSes
-> > > seem fine with our behaviour, it seems cleaner to have the definition=
- appear in
-> > > the SSDT before use.
-> > >=20
-> > > Suggested-by: "Schmauss, Erik" <erik.schmauss@intel.com>
-> > > Cc: qemu-stable@nongnu.org
-> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > > ---
-> > >=20
-> > > Hi Erik,
-> > > could you pls test the issue and report whether it addresses your con=
-cern? I can't =20
-> > Hi Michael,=20
-> >  =20
-> > > do much to fix past releases which IIUC shipped this code since 2.6.0=
- about a
-> > > year ago.
-> > >=20
-> > > Lightly tested with Linux only. =20
-> >=20
-> > I'm looking at the ASL tables generated by make check-qtest-x86_64.
-> > This line =20
->=20
-> which line?
->=20
-> > ends up generating a strange ACPI table where the Operation
-> > region and field declarations are stuck inside the NCAL method which
-> > is called from _DSM. If we create the operation region and methods
-> > inside methods, they disappear after the NCAL method returns.
-What's wrong with it?
-Method is complete so temporary objects
-it has used went out of scope, all within spec rules
-and worked fine with linux and windows guests.
+[...]
 
-> > I think nvdimm_build_common_dsm() needs some refining. =20
->=20
-> What exactly do you refer to?
->=20
-> DefinitionBlock ("", "SSDT", 1, "BOCHS ", "NVDIMM", 0x00000001)
-> {
->     Name (MEMA, 0x07FFE000)
->     Scope (\_SB)
->     {
->         Device (NVDR)
->         {
->             Name (_HID, "ACPI0012" /* NVDIMM Root Device */)  // _HID: Ha=
-rdware ID
->             Method (NCAL, 5, Serialized)
->             {
->                 Local6 =3D MEMA /* \MEMA */
->                 OperationRegion (NPIO, SystemIO, 0x0A18, 0x04)
->                 OperationRegion (NRAM, SystemMemory, Local6, 0x1000)
->=20
-> 		^^^ this?
->=20
-> I agree the NPIO could be moved out.
-> Don't really understand why is Local6 needed - can't MEMA be
-> used directly? Assuming it isn't NRAM could be moved out too.
-=46rom spec
- DefOpRegion :=3D OpRegionOp NameString RegionSpace RegionOffset RegionLen
- RegionOffset :=3D TermArg =3D> Integer
- TermArg :=3D Type2Opcode | DataObject | ArgObj | LocalObj
+> Notes:
+>     RFCv3:
+>     
+>     - The patch is new in this version. [Dan, Markus]
+>     
+>     - The original idea was to call the new enum @Target; however, @Target
+>       generates exactly the TARGET_AARCH64, TARGET_ALPHA, TARGET_ARM, ...
+>       enumeration constants that conflict with the poisoned preprocessing
+>       macros of the same names. Hence @SysEmuTarget -- it's more accurate
+>       anyway, since we want it to stand for system emulation targets.
+>     
+>     - Also, we discussed defining the new type in either "common.json" or
+>       "misc.json". "misc.json" turned out to be a problem: "firmware.json"
+>       would then include "misc.json" for the new type's sake, but that
+>       inclusion would become the first appearance of "misc.json" -- within
+>       "firmware.json". That messed up the generated documentation. By adding
+>       the new type to "common.json", "misc.json" (see the 2nd patch) and
+>       "firmware.json" (see the 3rd patch) can both consume the new type
+>       without problems.
 
-So named object is not accepted, we could have played games with
-references and Type2Opcode but that didn't work nice with Windows
-ACPI parser. Hence local object.
+The last two points are interesting enough (for me) to still to keep in
+the commit message, but that's minor :-)
 
-The reason why OperationRegion is dynamic, is that if we put it
-outside of method it will become static, and we would have to use
-Integer constant there (no named objects are allowed) and
-then patch it dynamically in bios loader.
-I'd prefer to keep it as is, without introducing another hack
-like build_append_named_operation_region() to create it with
-know offset so firmware could patch it.
+>  qapi/common.json | 19 +++++++++++++++++++
+>  1 file changed, 19 insertions(+)
 
->=20
->=20
-> It all seems suboptimal but given the method is serialized,
-> I don't see anything wrong with it as such.
->=20
->=20
-> >  =20
-> > >=20
-> > >  hw/acpi/nvdimm.c | 6 ++++--
-> > >  1 file changed, 4 insertions(+), 2 deletions(-)
-> > >=20
-> > > diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c index 59d6e42..fadeb=
-bd
-> > > 100644
-> > > --- a/hw/acpi/nvdimm.c
-> > > +++ b/hw/acpi/nvdimm.c
-> > > @@ -1234,6 +1234,10 @@ static void nvdimm_build_ssdt(GArray *table_of=
-fsets,
-> > > GArray *table_data,
-> > >      ssdt =3D init_aml_allocator();
-> > >      acpi_data_push(ssdt->buf, sizeof(AcpiTableHeader));
-> > >=20
-> > > +    /* Storage for the memory address */
-> > > +    mem_addr_offset =3D table_data->len +
-> > > +        build_append_named_dword(ssdt->buf, NVDIMM_ACPI_MEM_ADDR);
-> > > +
-> > >      sb_scope =3D aml_scope("\\_SB");
-> > >=20
-> > >      dev =3D aml_device("NVDR");
-> > > @@ -1266,8 +1270,6 @@ static void nvdimm_build_ssdt(GArray *table_off=
-sets,
-> > > GArray *table_data,
-> > >=20
-> > >      /* copy AML table into ACPI tables blob and patch header there */
-> > >      g_array_append_vals(table_data, ssdt->buf->data, ssdt->buf->len);
-> > > -    mem_addr_offset =3D build_append_named_dword(table_data,
-> > > -                                               NVDIMM_ACPI_MEM_ADDR);
-> > >=20
-> > >      bios_linker_loader_alloc(linker,
-> > >                               NVDIMM_DSM_MEM_FILE, dsm_dma_arrea,
-> > > --
-> > > MST =20
+FWIW:
+
+Reviewed-by: Kashyap Chamarthy <kchamart@redhat.com>
+
+[...]
+
+-- 
+/kashyap
