@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32870)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fB5lK-0002lH-4C
+	(envelope-from <lersek@redhat.com>) id 1fB5lK-0002lK-5k
 	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 17:46:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fB5lI-000730-Oa
+	(envelope-from <lersek@redhat.com>) id 1fB5lH-00072B-22
 	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 17:46:10 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32820 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42386 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fB5lI-00072m-Jq
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 17:46:08 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 25B15406E8C3
-	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 21:46:08 +0000 (UTC)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fB5lG-00071h-TI
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 17:46:06 -0400
 From: Laszlo Ersek <lersek@redhat.com>
-Date: Tue, 24 Apr 2018 23:45:47 +0200
-Message-Id: <20180424214550.32549-4-lersek@redhat.com>
-In-Reply-To: <20180424214550.32549-1-lersek@redhat.com>
-References: <20180424214550.32549-1-lersek@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/6] qapi: add SysEmuTarget to "common.json"
+Date: Tue, 24 Apr 2018 23:45:44 +0200
+Message-Id: <20180424214550.32549-1-lersek@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/6] qapi: introduce the SysEmuTarget
+ enumeration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,86 +23,82 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Markus Armbruster <armbru@redhat.com>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Riku Voipio <riku.voipio@iki.fi>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Thomas Huth <thuth@redhat.com>
 
-We'll soon need an enumeration type that lists all the softmmu targets
-that QEMU (the project) supports. Introduce @SysEmuTarget to
-"common.json".
+This patch set adds the @SysEmuTarget enum type, and rebases a few other
+types to it. Here's the "anatomy" of the series:
+
+- Patches #1 and #2 fix QAPI bugs that have crept in in the 2.12
+  development cycle. I noticed the bugs while working on patch #6; i.e.
+  patch #6 depends on #1 and #2. The issues should likely be fixed in
+  2.12.1, so patches #1 and #2 are CC'd to qemu-stable.
+
+- Patch #3 is what I primarily care about in this series. It introduces
+  the @SysEmuTarget enum, for the sake of my end-goal patch at:
+
+    [Qemu-devel] [qemu RFC v3 3/3] qapi: add "firmware.json"
+    http://mid.mail-archive.com/20180420231246.23130-4-lersek@redhat.com
+
+  (BTW review comments for that RFCv3 patch are still super welcome).
+
+- Patch #4 is a small cleanup that utilizes @SysEmuTarget, rebasing
+  @TargetInfo to it.
+
+- Patch #5 is an attempt at normalizing @CpuInfo and @CpuInfoFast, by
+  factoring out @CpuInfoCommon. I'm proposing this in order to save some
+  busy-work for patch #6. If patch #5 is doing the wrong thing, it can
+  be dropped, with relatively small updates to patch #6.
+
+- Patch #6 demotes the current discriminator field of @CpuInfo and
+  @CpuInfoFast, namely @arch (of type @CpuInfoArch), to "normal base
+  struct field", and introduces @target (of type @SysEmuTarget) in its
+  place. This is a pretty intrusive patch which caused me hours of
+  struggle. Similarly to patch #4, the goal is to help clean up the fuzz
+  around the "target architecture" concept in QAPI. I'm proposing this
+  patch because Markus suggested that I might try :) If significantly
+  more work was necessary to hammer this patch into acceptable shape,
+  then I'd prefer to limit the scope, just add @target, and keep @arch
+  as the discriminator.
+
+Sorry about the humongous CC list.
 
 Cc: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Cc: David Gibson <dgibson@redhat.com>
 Cc: Eric Blake <eblake@redhat.com>
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 Cc: Kashyap Chamarthy <kchamart@redhat.com>
+Cc: Laurent Vivier <laurent@vivier.eu>
 Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Michael Clark <mjc@sifive.com>
+Cc: Palmer Dabbelt <palmer@sifive.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Riku Voipio <riku.voipio@iki.fi>
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
 Cc: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Kashyap Chamarthy <kchamart@redhat.com>
----
 
-Notes:
-    PATCHv1:
-    
-    - pick up R-b's from Markus and Kashyap, no changes
-    
-    RFCv3:
-    
-    - The patch is new in this version. [Dan, Markus]
-    
-    - The original idea was to call the new enum @Target; however, @Target
-      generates exactly the TARGET_AARCH64, TARGET_ALPHA, TARGET_ARM, ...
-      enumeration constants that conflict with the poisoned preprocessing
-      macros of the same names. Hence @SysEmuTarget -- it's more accurate
-      anyway, since we want it to stand for system emulation targets.
-    
-    - Also, we discussed defining the new type in either "common.json" or
-      "misc.json". "misc.json" turned out to be a problem: "firmware.json"
-      would then include "misc.json" for the new type's sake, but that
-      inclusion would become the first appearance of "misc.json" -- within
-      "firmware.json". That messed up the generated documentation. By adding
-      the new type to "common.json", "misc.json" (see the 2nd patch) and
-      "firmware.json" (see the 3rd patch) can both consume the new type
-      without problems.
+Thanks
+Laszlo
 
- qapi/common.json | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+Laszlo Ersek (6):
+  qapi: fill in CpuInfoFast.arch in query-cpus-fast
+  qapi: handle the riscv CpuInfoArch in query-cpus-fast
+  qapi: add SysEmuTarget to "common.json"
+  qapi: change the type of TargetInfo.arch from string to enum
+    SysEmuTarget
+  qapi: extract CpuInfoCommon to mitigate schema duplication
+  qapi: discriminate CpuInfo[Fast] on SysEmuTarget, not CpuInfoArch
 
-diff --git a/qapi/common.json b/qapi/common.json
-index d9b14dd429f3..1fd63172754a 100644
---- a/qapi/common.json
-+++ b/qapi/common.json
-@@ -118,11 +118,30 @@
- #
- # @bar3: PCI BAR3 is used for the feature
- #
- # @bar4: PCI BAR4 is used for the feature
- #
- # @bar5: PCI BAR5 is used for the feature
- #
- # Since: 2.12
- ##
- { 'enum': 'OffAutoPCIBAR',
-   'data': [ 'off', 'auto', 'bar0', 'bar1', 'bar2', 'bar3', 'bar4', 'bar5' ] }
-+
-+##
-+# @SysEmuTarget:
-+#
-+# The comprehensive enumeration of QEMU system emulation ("softmmu")
-+# targets. Run "./configure --help" in the project root directory, and
-+# look for the *-softmmu targets near the "--target-list" option. The
-+# individual target constants are not documented here, for the time
-+# being.
-+#
-+# Since: 2.13
-+##
-+{ 'enum' : 'SysEmuTarget',
-+  'data' : [ 'aarch64', 'alpha', 'arm', 'cris', 'hppa', 'i386', 'lm32',
-+             'm68k', 'microblaze', 'microblazeel', 'mips', 'mips64',
-+             'mips64el', 'mipsel', 'moxie', 'nios2', 'or1k', 'ppc',
-+             'ppc64', 'ppcemb', 'riscv32', 'riscv64', 's390x', 'sh4',
-+             'sh4eb', 'sparc', 'sparc64', 'tricore', 'unicore32',
-+             'x86_64', 'xtensa', 'xtensaeb' ] }
+ qapi/common.json                    |  19 +++
+ qapi/misc.json                      | 196 ++++++++++++++++++++-------
+ qapi/qapi-schema.json               |   2 +-
+ arch_init.c                         |  10 +-
+ cpus.c                              | 261 ++++++++++++++++++++++++++++--------
+ tests/test-x86-cpuid-compat.c       |   2 +-
+ tests/migration/guestperf/engine.py |   2 +-
+ 7 files changed, 380 insertions(+), 112 deletions(-)
+
 -- 
 2.14.1.3.gb7cf6e02401b
