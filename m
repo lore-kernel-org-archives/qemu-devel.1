@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fAtm8-0008QP-Jd
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 04:58:13 -0400
+	(envelope-from <berto@igalia.com>) id 1fAu1K-0002t0-O3
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 05:14:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fAtm7-0004yx-Ur
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 04:58:12 -0400
-Date: Tue, 24 Apr 2018 10:58:02 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180424085802.GA4080@localhost.localdomain>
-References: <20180424085240.5798-1-stefanha@redhat.com>
+	(envelope-from <berto@igalia.com>) id 1fAu1G-0003Xv-Ew
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 05:13:54 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20180423223337.82366-3-eblake@redhat.com>
+References: <20180423223337.82366-1-eblake@redhat.com>
+	<20180423223337.82366-3-eblake@redhat.com>
+Date: Tue, 24 Apr 2018 11:13:47 +0200
+Message-ID: <w51lgdd55mc.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180424085240.5798-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] blockjob: drop block_job_pause/resume_all()
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 2/5] qcow2: Document some maximum size
+ constraints
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,21 +23,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Jeff Cody <jcody@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Am 24.04.2018 um 10:52 hat Stefan Hajnoczi geschrieben:
-> Commit 8119334918e86f45877cfc139192d54f2449a239 ("block: Don't
-> block_job_pause_all() in bdrv_drain_all()") removed the only callers of
-> block_job_pause/resume_all().
-> 
-> Pausing and resuming now happens in child_job_drained_begin/end() so
-> it's no longer necessary to globally pause/resume jobs.
-> 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+On Tue 24 Apr 2018 12:33:34 AM CEST, Eric Blake wrote:
+> Although off_t permits up to 63 bits (8EB) of file offsets, in
+> practice, we're going to hit other limits first.  Document some
+> of those limits in the qcow2 spec, and how choice of cluster size
+> can influence some of the limits.
+>
+> While at it, notice that since we cannot map any virtual cluster
+> to any address higher than 64 PB (56 bits) (due to the current L1/L2
+> field encoding stopping at bit 55), it makes little sense to require
+> the refcount table to access host offsets beyond that point.  Mark
+> the upper bits of the refcount table entries as reserved to match
+> the L1/L2 table, with no ill effects, since it is unlikely that there
+> are any existing images larger than 64PB in the first place, and thus
+> all existing images already have those bits as 0.  If 64PB proves to
+> be too small in the future, we could enlarge all three uses of bit
+> 55 into the reserved bits at that time.  (For reference, ext4 with
+> 4k blocks caps files at 16PB.)
+>
+> However, there is one limit that reserved bits don't help with: for
+> compressed clusters, the L2 layout requires an ever-smaller maximum
+> host offset as cluster size gets larger, down to a 512 TB maximum
+> with 2M clusters.
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-Yes, the same is part of my upcoming huge (non-)block job series. I
-think git should resolve the conflict fine, so feel free to apply this
-already while I finish my series.
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
-Kevin
+Berto
