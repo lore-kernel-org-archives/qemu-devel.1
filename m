@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52946)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fB3K1-0008WH-Pq
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 15:09:50 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fB3O5-0002Ly-HN
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 15:14:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fB3K0-0003YH-SY
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 15:09:49 -0400
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:40213)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fB3K0-0003Y1-Ni
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 15:09:48 -0400
-Received: by mail-ot0-x241.google.com with SMTP id h8-v6so22544760otj.7
-	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 12:09:48 -0700 (PDT)
+	(envelope-from <jsnow@redhat.com>) id 1fB3O4-000637-K0
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 15:14:01 -0400
+References: <20180215192829.9944-1-eblake@redhat.com>
+	<9c4fcd99-8a8c-62d3-3c0d-d26601910835@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <5667b131-9105-1685-3cfc-f97c700ce9ae@redhat.com>
+Date: Tue, 24 Apr 2018 15:13:46 -0400
 MIME-Version: 1.0
-In-Reply-To: <1524592709-6553-10-git-send-email-ian.jackson@eu.citrix.com>
-References: <1524592709-6553-1-git-send-email-ian.jackson@eu.citrix.com>
-	<1524592709-6553-10-git-send-email-ian.jackson@eu.citrix.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 24 Apr 2018 20:09:27 +0100
-Message-ID: <CAFEAcA_6+o=r4VPr69iJc7x19NZJR8Tow1QkTuSyyWTDGPuT_Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 09/16] os-posix: cleanup: Replace fprintfs
- with error_report in change_process_uid
+In-Reply-To: <9c4fcd99-8a8c-62d3-3c0d-d26601910835@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/6] block: byte-based AIO read/write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,21 +24,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ian Jackson <ian.jackson@eu.citrix.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Michael Tokarev <mjt@tls.msk.ru>, Markus Armbruster <armbru@redhat.com>, Ross Lagerwall <ross.lagerwall@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Anthony PERARD <anthony.perard@citrix.com>, "open list:X86" <xen-devel@lists.xenproject.org>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org
 
-On 24 April 2018 at 18:58, Ian Jackson <ian.jackson@eu.citrix.com> wrote:
-> I'm going to be editing this function and it makes sense to clean up
-> this style problem in advance.
->
-> Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
-> CC: Paolo Bonzini <pbonzini@redhat.com>
-> CC: Markus Armbruster <armbru@redhat.com>
-> CC: Daniel P. Berrange <berrange@redhat.com>
-> CC: Michael Tokarev <mjt@tls.msk.ru>
-> ---
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-thanks
--- PMM
+On 04/24/2018 11:02 AM, Eric Blake wrote:
+> On 02/15/2018 01:28 PM, Eric Blake wrote:
+>> While we would prefer that block drivers use coroutines instead
+>> of aio callbacks, it is a fairly easy exercise to prove that
+>> all existing drivers with aio callbacks are merely scaling
+>> from bytes into sectors and back to bytes.  So, even though I
+>> am not set up to completely run (or even compile-test) this
+>> full series, it seems pretty straightforward to change the
+>> signature to quit playing games with pointless scaling.
+>>
+>> Note that except for the null-aio driver, I intentionally did
+>> NOT try and change the request_alignment from the block layer's
+>> default of 512 (it defaults to 1 only for drivers that use
+>> coroutines).
+>>
+>> (And along the way, I got my docker-test-mingw@fedora working;
+>> thanks to the help I got on IRC)
+> 
+> ping
+> 
+
+One of your replies to patch 3 suggests you were going to send a v2 --
+is that not the case? Do you want deeper review of v1 first?
+
+--js
