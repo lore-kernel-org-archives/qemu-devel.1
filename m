@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48040)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fAzpO-0008Bh-D1
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:26:00 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fAzpK-000882-8v
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:25:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fAzpM-0008LT-0w
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:25:58 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fAzpI-0008GM-BA
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:25:54 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 24 Apr 2018 17:25:03 +0200
-Message-Id: <20180424152515.25664-22-kwolf@redhat.com>
+Date: Tue, 24 Apr 2018 17:25:00 +0200
+Message-Id: <20180424152515.25664-19-kwolf@redhat.com>
 In-Reply-To: <20180424152515.25664-1-kwolf@redhat.com>
 References: <20180424152515.25664-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 21/33] job: Move BlockJobCreateFlags to Job
+Subject: [Qemu-devel] [RFC PATCH 18/33] job: Add job_sleep_ns()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,407 +22,337 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-This renames the BlockJobCreateFlags constants, moves a few JOB_INTERNAL
-checks to job_create() and the auto_{finalize,dismiss} fields from
-BlockJob to Job.
+There is nothing block layer specific about block_job_sleep_ns(), so
+move the function to Job.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/block/blockjob.h     | 17 -----------------
- include/block/blockjob_int.h |  3 +--
- include/qemu/job.h           | 20 +++++++++++++++++++-
+ include/block/blockjob_int.h | 11 -----------
+ include/qemu/job.h           | 17 +++++++++++++++++
+ block/backup.c               |  2 +-
  block/commit.c               |  2 +-
- block/mirror.c               |  2 +-
- block/replication.c          |  4 ++--
+ block/mirror.c               |  4 ++--
  block/stream.c               |  2 +-
- blockdev.c                   | 14 +++++++-------
- blockjob.c                   | 27 +++++++--------------------
- job.c                        | 11 ++++++++++-
- qemu-img.c                   |  2 +-
+ blockjob.c                   | 27 ---------------------------
+ job.c                        | 32 ++++++++++++++++++++++++++++++++
+ tests/test-bdrv-drain.c      |  8 ++++----
  tests/test-blockjob-txn.c    |  2 +-
- tests/test-blockjob.c        |  4 ++--
- 13 files changed, 53 insertions(+), 57 deletions(-)
+ tests/test-blockjob.c        |  2 +-
+ 11 files changed, 60 insertions(+), 49 deletions(-)
 
-diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index a2d16a700d..a74d5d02fd 100644
---- a/include/block/blockjob.h
-+++ b/include/block/blockjob.h
-@@ -91,27 +91,10 @@ typedef struct BlockJob {
-     /** ret code passed to block_job_completed. */
-     int ret;
- 
--    /** True if this job should automatically finalize itself */
--    bool auto_finalize;
--
--    /** True if this job should automatically dismiss itself */
--    bool auto_dismiss;
--
-     BlockJobTxn *txn;
-     QLIST_ENTRY(BlockJob) txn_list;
- } BlockJob;
- 
--typedef enum BlockJobCreateFlags {
--    /* Default behavior */
--    BLOCK_JOB_DEFAULT = 0x00,
--    /* BlockJob is not QMP-created and should not send QMP events */
--    BLOCK_JOB_INTERNAL = 0x01,
--    /* BlockJob requires manual finalize step */
--    BLOCK_JOB_MANUAL_FINALIZE = 0x02,
--    /* BlockJob requires manual dismiss step */
--    BLOCK_JOB_MANUAL_DISMISS = 0x04,
--} BlockJobCreateFlags;
--
- /**
-  * block_job_next:
-  * @job: A block job, or %NULL.
 diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-index ca0610f967..543ca556fc 100644
+index 8bf7fbc94a..22177fb3ab 100644
 --- a/include/block/blockjob_int.h
 +++ b/include/block/blockjob_int.h
-@@ -106,8 +106,7 @@ struct BlockJobDriver {
-  * @bs: The block
-  * @perm, @shared_perm: Permissions to request for @bs
-  * @speed: The maximum speed, in bytes per second, or 0 for unlimited.
-- * @flags: Creation flags for the Block Job.
-- *         See @BlockJobCreateFlags
-+ * @flags: Creation flags for the Block Job. See @JobCreateFlags.
-  * @cb: Completion function for the job.
-  * @opaque: Opaque pointer value passed to @cb.
-  * @errp: Error object.
+@@ -134,17 +134,6 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+ void block_job_free(Job *job);
+ 
+ /**
+- * block_job_sleep_ns:
+- * @job: The job that calls the function.
+- * @ns: How many nanoseconds to stop for.
+- *
+- * Put the job to sleep (assuming that it wasn't canceled) for @ns
+- * %QEMU_CLOCK_REALTIME nanoseconds.  Canceling the job will immediately
+- * interrupt the wait.
+- */
+-void block_job_sleep_ns(BlockJob *job, int64_t ns);
+-
+-/**
+  * block_job_yield:
+  * @job: The job that calls the function.
+  *
 diff --git a/include/qemu/job.h b/include/qemu/job.h
-index fd4937ee8d..ab3d49685a 100644
+index 8e636ba970..e60d4b23cc 100644
 --- a/include/qemu/job.h
 +++ b/include/qemu/job.h
-@@ -99,6 +99,12 @@ typedef struct Job {
-     /** Set to true when the job has deferred work to the main loop. */
-     bool deferred_to_main_loop;
- 
-+    /** True if this job should automatically finalize itself */
-+    bool auto_finalize;
-+
-+    /** True if this job should automatically dismiss itself */
-+    bool auto_dismiss;
-+
-     /** Element of the list of jobs */
-     QLIST_ENTRY(Job) job_list;
- } Job;
-@@ -140,6 +146,17 @@ struct JobDriver {
-     void (*free)(Job *job);
- };
- 
-+typedef enum JobCreateFlags {
-+    /* Default behavior */
-+    JOB_DEFAULT = 0x00,
-+    /* Job is not QMP-created and should not send QMP events */
-+    JOB_INTERNAL = 0x01,
-+    /* Job requires manual finalize step */
-+    JOB_MANUAL_FINALIZE = 0x02,
-+    /* Job requires manual dismiss step */
-+    JOB_MANUAL_DISMISS = 0x04,
-+} JobCreateFlags;
-+
+@@ -161,6 +161,13 @@ void job_unref(Job *job);
+ void job_start(Job *job);
  
  /**
-  * Create a new long-running job and return it.
-@@ -147,10 +164,11 @@ struct JobDriver {
-  * @job_id: The id of the newly-created job, or %NULL for internal jobs
-  * @driver: The class object for the newly-created job.
-  * @ctx: The AioContext to run the job coroutine in.
-+ * @flags: Creation flags for the job. See @JobCreateFlags.
-  * @errp: Error object.
++ * @job: The job to enter.
++ *
++ * Continue the specified job by entering the coroutine.
++ */
++void job_enter(Job *job);
++
++/**
+  * @job: The job that is ready to pause.
+  *
+  * Pause now if job_pause() has been called. Jobs that perform lots of I/O
+@@ -168,6 +175,16 @@ void job_start(Job *job);
   */
- void *job_create(const char *job_id, const JobDriver *driver, AioContext *ctx,
--                 Error **errp);
-+                 int flags, Error **errp);
+ void coroutine_fn job_pause_point(Job *job);
  
- /**
-  * Add a reference to Job refcnt, it will be decreased with job_unref, and then
++/**
++ * @job: The job that calls the function.
++ * @ns: How many nanoseconds to stop for.
++ *
++ * Put the job to sleep (assuming that it wasn't canceled) for @ns
++ * %QEMU_CLOCK_REALTIME nanoseconds.  Canceling the job will immediately
++ * interrupt the wait.
++ */
++void coroutine_fn job_sleep_ns(Job *job, int64_t ns);
++
+ 
+ /** Returns the JobType of a given Job. */
+ JobType job_type(Job *job);
+diff --git a/block/backup.c b/block/backup.c
+index f81c137050..6f14476501 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -338,7 +338,7 @@ static bool coroutine_fn yield_and_check(BackupBlockJob *job)
+      * (without it, the VM does not reboot) */
+     delay_ns = block_job_ratelimit_get_delay(&job->common, job->bytes_read);
+     job->bytes_read = 0;
+-    block_job_sleep_ns(&job->common, delay_ns);
++    job_sleep_ns(&job->common.job, delay_ns);
+ 
+     if (job_is_cancelled(&job->common.job)) {
+         return true;
 diff --git a/block/commit.c b/block/commit.c
-index c4a98e5804..7a6ae59d42 100644
+index 2fbc31077a..1c6cb6c298 100644
 --- a/block/commit.c
 +++ b/block/commit.c
-@@ -282,7 +282,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-     }
- 
-     s = block_job_create(job_id, &commit_job_driver, NULL, bs, 0, BLK_PERM_ALL,
--                         speed, BLOCK_JOB_DEFAULT, NULL, NULL, errp);
-+                         speed, JOB_DEFAULT, NULL, NULL, errp);
-     if (!s) {
-         return;
-     }
+@@ -172,7 +172,7 @@ static void coroutine_fn commit_run(void *opaque)
+         /* Note that even when no rate limit is applied we need to yield
+          * with no pending I/O here so that bdrv_drain_all() returns.
+          */
+-        block_job_sleep_ns(&s->common, delay_ns);
++        job_sleep_ns(&s->common.job, delay_ns);
+         if (job_is_cancelled(&s->common.job)) {
+             break;
+         }
 diff --git a/block/mirror.c b/block/mirror.c
-index 876b636121..fc3bd702dc 100644
+index 36f21f6e7d..26f2c774ce 100644
 --- a/block/mirror.c
 +++ b/block/mirror.c
-@@ -1278,7 +1278,7 @@ void mirror_start(const char *job_id, BlockDriverState *bs,
-     }
-     is_none_mode = mode == MIRROR_SYNC_MODE_NONE;
-     base = mode == MIRROR_SYNC_MODE_TOP ? backing_bs(bs) : NULL;
--    mirror_start_job(job_id, bs, BLOCK_JOB_DEFAULT, target, replaces,
-+    mirror_start_job(job_id, bs, JOB_DEFAULT, target, replaces,
-                      speed, granularity, buf_size, backing_mode,
-                      on_source_error, on_target_error, unmap, NULL, NULL,
-                      &mirror_job_driver, is_none_mode, base, false,
-diff --git a/block/replication.c b/block/replication.c
-index 3f7500ee3f..8241400155 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -566,7 +566,7 @@ static void replication_start(ReplicationState *rs, ReplicationMode mode,
-         job = backup_job_create(NULL, s->secondary_disk->bs, s->hidden_disk->bs,
-                                 0, MIRROR_SYNC_MODE_NONE, NULL, false,
-                                 BLOCKDEV_ON_ERROR_REPORT,
--                                BLOCKDEV_ON_ERROR_REPORT, BLOCK_JOB_INTERNAL,
-+                                BLOCKDEV_ON_ERROR_REPORT, JOB_INTERNAL,
-                                 backup_job_completed, bs, NULL, &local_err);
-         if (local_err) {
-             error_propagate(errp, local_err);
-@@ -691,7 +691,7 @@ static void replication_stop(ReplicationState *rs, bool failover, Error **errp)
+@@ -595,7 +595,7 @@ static void mirror_throttle(MirrorBlockJob *s)
  
-         s->stage = BLOCK_REPLICATION_FAILOVER;
-         commit_active_start(NULL, s->active_disk->bs, s->secondary_disk->bs,
--                            BLOCK_JOB_INTERNAL, 0, BLOCKDEV_ON_ERROR_REPORT,
-+                            JOB_INTERNAL, 0, BLOCKDEV_ON_ERROR_REPORT,
-                             NULL, replication_done, bs, true, errp);
-         break;
-     default:
+     if (now - s->last_pause_ns > SLICE_TIME) {
+         s->last_pause_ns = now;
+-        block_job_sleep_ns(&s->common, 0);
++        job_sleep_ns(&s->common.job, 0);
+     } else {
+         job_pause_point(&s->common.job);
+     }
+@@ -869,7 +869,7 @@ static void coroutine_fn mirror_run(void *opaque)
+             break;
+         } else if (!should_complete) {
+             delay_ns = (s->in_flight == 0 && cnt == 0 ? SLICE_TIME : 0);
+-            block_job_sleep_ns(&s->common, delay_ns);
++            job_sleep_ns(&s->common.job, delay_ns);
+         }
+         s->last_pause_ns = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
+     }
 diff --git a/block/stream.c b/block/stream.c
-index e81b488a22..eee02538ed 100644
+index 6d8b7b6eee..1faab02086 100644
 --- a/block/stream.c
 +++ b/block/stream.c
-@@ -242,7 +242,7 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-                          BLK_PERM_GRAPH_MOD,
-                          BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
-                          BLK_PERM_WRITE,
--                         speed, BLOCK_JOB_DEFAULT, NULL, NULL, errp);
-+                         speed, JOB_DEFAULT, NULL, NULL, errp);
-     if (!s) {
-         goto fail;
-     }
-diff --git a/blockdev.c b/blockdev.c
-index 891cbe9940..fb7a3142e7 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3244,7 +3244,7 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
-             goto out;
+@@ -140,7 +140,7 @@ static void coroutine_fn stream_run(void *opaque)
+         /* Note that even when no rate limit is applied we need to yield
+          * with no pending I/O here so that bdrv_drain_all() returns.
+          */
+-        block_job_sleep_ns(&s->common, delay_ns);
++        job_sleep_ns(&s->common.job, delay_ns);
+         if (job_is_cancelled(&s->common.job)) {
+             break;
          }
-         commit_active_start(has_job_id ? job_id : NULL, bs, base_bs,
--                            BLOCK_JOB_DEFAULT, speed, on_error,
-+                            JOB_DEFAULT, speed, on_error,
-                             filter_node_name, NULL, NULL, false, &local_err);
-     } else {
-         BlockDriverState *overlay_bs = bdrv_find_overlay(bs, top_bs);
-@@ -3275,7 +3275,7 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
-     AioContext *aio_context;
-     QDict *options = NULL;
-     Error *local_err = NULL;
--    int flags, job_flags = BLOCK_JOB_DEFAULT;
-+    int flags, job_flags = JOB_DEFAULT;
-     int64_t size;
-     bool set_backing_hd = false;
- 
-@@ -3398,10 +3398,10 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
-         }
-     }
-     if (!backup->auto_finalize) {
--        job_flags |= BLOCK_JOB_MANUAL_FINALIZE;
-+        job_flags |= JOB_MANUAL_FINALIZE;
-     }
-     if (!backup->auto_dismiss) {
--        job_flags |= BLOCK_JOB_MANUAL_DISMISS;
-+        job_flags |= JOB_MANUAL_DISMISS;
-     }
- 
-     job = backup_job_create(backup->job_id, bs, target_bs, backup->speed,
-@@ -3442,7 +3442,7 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, BlockJobTxn *txn,
-     Error *local_err = NULL;
-     AioContext *aio_context;
-     BlockJob *job = NULL;
--    int job_flags = BLOCK_JOB_DEFAULT;
-+    int job_flags = JOB_DEFAULT;
- 
-     if (!backup->has_speed) {
-         backup->speed = 0;
-@@ -3491,10 +3491,10 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, BlockJobTxn *txn,
-         }
-     }
-     if (!backup->auto_finalize) {
--        job_flags |= BLOCK_JOB_MANUAL_FINALIZE;
-+        job_flags |= JOB_MANUAL_FINALIZE;
-     }
-     if (!backup->auto_dismiss) {
--        job_flags |= BLOCK_JOB_MANUAL_DISMISS;
-+        job_flags |= JOB_MANUAL_DISMISS;
-     }
-     job = backup_job_create(backup->job_id, bs, target_bs, backup->speed,
-                             backup->sync, NULL, backup->compress,
 diff --git a/blockjob.c b/blockjob.c
-index 54e74c5a76..62f4a87744 100644
+index ca4d50aaef..4ce4dd83a6 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -286,7 +286,7 @@ static void block_job_do_dismiss(BlockJob *job)
- static void block_job_conclude(BlockJob *job)
- {
-     job_state_transition(&job->job, JOB_STATUS_CONCLUDED);
--    if (job->auto_dismiss || !job_started(&job->job)) {
-+    if (job->job.auto_dismiss || !job_started(&job->job)) {
-         block_job_do_dismiss(job);
-     }
- }
-@@ -484,7 +484,7 @@ static void block_job_completed_txn_abort(BlockJob *job)
- 
- static int block_job_needs_finalize(BlockJob *job)
- {
--    return !job->auto_finalize;
-+    return !job->job.auto_finalize;
+@@ -174,7 +174,6 @@ void block_job_free(Job *job)
+                                     block_job_detach_aio_context, bjob);
+     blk_unref(bjob->blk);
+     error_free(bjob->blocker);
+-    assert(!timer_pending(&bjob->job.sleep_timer));
  }
  
- static void block_job_do_finalize(BlockJob *job)
-@@ -689,8 +689,8 @@ BlockJobInfo *block_job_query(BlockJob *job, Error **errp)
-     info->io_status = job->iostatus;
-     info->ready     = job->ready;
-     info->status    = job->job.status;
--    info->auto_finalize = job->auto_finalize;
--    info->auto_dismiss  = job->auto_dismiss;
-+    info->auto_finalize = job->job.auto_finalize;
-+    info->auto_dismiss  = job->job.auto_dismiss;
-     return info;
+ static void block_job_attached_aio_context(AioContext *new_context,
+@@ -283,13 +282,6 @@ const BlockJobDriver *block_job_driver(BlockJob *job)
+     return job->driver;
  }
  
-@@ -735,7 +735,7 @@ static void block_job_event_completed(BlockJob *job, const char *msg)
- static int block_job_event_pending(BlockJob *job)
- {
-     job_state_transition(&job->job, JOB_STATUS_PENDING);
--    if (!job->auto_finalize && !block_job_is_internal(job)) {
-+    if (!job->job.auto_finalize && !block_job_is_internal(job)) {
-         qapi_event_send_block_job_pending(job_type(&job->job),
-                                           job->job.id,
-                                           &error_abort);
-@@ -762,19 +762,8 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-         return NULL;
-     }
- 
--    if (job_id == NULL && !(flags & BLOCK_JOB_INTERNAL)) {
-+    if (job_id == NULL && !(flags & JOB_INTERNAL)) {
-         job_id = bdrv_get_device_name(bs);
--        if (!*job_id) {
--            error_setg(errp, "An explicit job ID is required for this node");
--            return NULL;
--        }
--    }
+-static void block_job_sleep_timer_cb(void *opaque)
+-{
+-    BlockJob *job = opaque;
 -
--    if (job_id) {
--        if (flags & BLOCK_JOB_INTERNAL) {
--            error_setg(errp, "Cannot specify job ID for internal block job");
--            return NULL;
--        }
-     }
- 
-     blk = blk_new(perm, shared_perm);
-@@ -785,7 +774,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-     }
- 
-     job = job_create(job_id, &driver->job_driver, blk_get_aio_context(blk),
--                     errp);
-+                     flags, errp);
-     if (job == NULL) {
-         blk_unref(blk);
-         return NULL;
-@@ -799,8 +788,6 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-     job->blk           = blk;
-     job->cb            = cb;
+-    block_job_enter(job);
+-}
+-
+ static void block_job_decommission(BlockJob *job)
+ {
+     assert(job);
+@@ -857,9 +849,6 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
      job->opaque        = opaque;
--    job->auto_finalize = !(flags & BLOCK_JOB_MANUAL_FINALIZE);
--    job->auto_dismiss  = !(flags & BLOCK_JOB_MANUAL_DISMISS);
+     job->auto_finalize = !(flags & BLOCK_JOB_MANUAL_FINALIZE);
+     job->auto_dismiss  = !(flags & BLOCK_JOB_MANUAL_DISMISS);
+-    aio_timer_init(qemu_get_aio_context(), &job->job.sleep_timer,
+-                   QEMU_CLOCK_REALTIME, SCALE_NS,
+-                   block_job_sleep_timer_cb, job);
  
      error_setg(&job->blocker, "block device is in use by block job: %s",
                 job_type_str(&job->job));
+@@ -922,22 +911,6 @@ void block_job_enter(BlockJob *job)
+     job_enter_cond(&job->job, NULL);
+ }
+ 
+-void block_job_sleep_ns(BlockJob *job, int64_t ns)
+-{
+-    assert(job->job.busy);
+-
+-    /* Check cancellation *before* setting busy = false, too!  */
+-    if (job_is_cancelled(&job->job)) {
+-        return;
+-    }
+-
+-    if (!job_should_pause(&job->job)) {
+-        job_do_yield(&job->job, qemu_clock_get_ns(QEMU_CLOCK_REALTIME) + ns);
+-    }
+-
+-    job_pause_point(&job->job);
+-}
+-
+ void block_job_yield(BlockJob *job)
+ {
+     assert(job->job.busy);
 diff --git a/job.c b/job.c
-index 92157e59ea..98113196af 100644
+index ea4ee8a325..d52f5586dc 100644
 --- a/job.c
 +++ b/job.c
-@@ -183,11 +183,15 @@ static void job_sleep_timer_cb(void *opaque)
+@@ -153,6 +153,13 @@ Job *job_get(const char *id)
+     return NULL;
  }
  
++static void job_sleep_timer_cb(void *opaque)
++{
++    Job *job = opaque;
++
++    job_enter(job);
++}
++
  void *job_create(const char *job_id, const JobDriver *driver, AioContext *ctx,
--                 Error **errp)
-+                 int flags, Error **errp)
+                  Error **errp)
  {
-     Job *job;
- 
-     if (job_id) {
-+        if (flags & JOB_INTERNAL) {
-+            error_setg(errp, "Cannot specify job ID for internal job");
-+            return NULL;
-+        }
-         if (!id_wellformed(job_id)) {
-             error_setg(errp, "Invalid job ID '%s'", job_id);
-             return NULL;
-@@ -196,6 +200,9 @@ void *job_create(const char *job_id, const JobDriver *driver, AioContext *ctx,
-             error_setg(errp, "Job ID '%s' already in use", job_id);
-             return NULL;
-         }
-+    } else if (!(flags & JOB_INTERNAL)) {
-+        error_setg(errp, "An explicit job ID is required");
-+        return NULL;
-     }
- 
-     job = g_malloc0(driver->instance_size);
-@@ -206,6 +213,8 @@ void *job_create(const char *job_id, const JobDriver *driver, AioContext *ctx,
-     job->busy          = false;
-     job->paused        = true;
+@@ -179,6 +186,9 @@ void *job_create(const char *job_id, const JobDriver *driver, AioContext *ctx,
      job->pause_count   = 1;
-+    job->auto_finalize = !(flags & JOB_MANUAL_FINALIZE);
-+    job->auto_dismiss  = !(flags & JOB_MANUAL_DISMISS);
  
      job_state_transition(job, JOB_STATUS_CREATED);
-     aio_timer_init(qemu_get_aio_context(), &job->sleep_timer,
-diff --git a/qemu-img.c b/qemu-img.c
-index 081b03fd91..3db8c557b4 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -1015,7 +1015,7 @@ static int img_commit(int argc, char **argv)
++    aio_timer_init(qemu_get_aio_context(), &job->sleep_timer,
++                   QEMU_CLOCK_REALTIME, SCALE_NS,
++                   job_sleep_timer_cb, job);
  
-     aio_context = bdrv_get_aio_context(bs);
-     aio_context_acquire(aio_context);
--    commit_active_start("commit", bs, base_bs, BLOCK_JOB_DEFAULT, 0,
-+    commit_active_start("commit", bs, base_bs, JOB_DEFAULT, 0,
-                         BLOCKDEV_ON_ERROR_REPORT, NULL, common_block_job_cb,
-                         &cbi, false, &local_err);
-     aio_context_release(aio_context);
-diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
-index 93d1ff0859..60e9fa2298 100644
---- a/tests/test-blockjob-txn.c
-+++ b/tests/test-blockjob-txn.c
-@@ -107,7 +107,7 @@ static BlockJob *test_block_job_start(unsigned int iterations,
+     QLIST_INSERT_HEAD(&jobs, job, job_list);
  
-     snprintf(job_id, sizeof(job_id), "job%u", counter++);
-     s = block_job_create(job_id, &test_block_job_driver, txn, bs,
--                         0, BLK_PERM_ALL, 0, BLOCK_JOB_DEFAULT,
-+                         0, BLK_PERM_ALL, 0, JOB_DEFAULT,
-                          test_block_job_cb, data, &error_abort);
-     s->iterations = iterations;
-     s->use_timer = use_timer;
-diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
-index ceb59600ed..8bb0aa8f85 100644
---- a/tests/test-blockjob.c
-+++ b/tests/test-blockjob.c
-@@ -59,7 +59,7 @@ static BlockJob *do_test_id(BlockBackend *blk, const char *id,
-                             bool should_succeed)
+@@ -194,6 +204,7 @@ void job_unref(Job *job)
  {
-     return mk_job(blk, id, &test_block_job_driver,
--                  should_succeed, BLOCK_JOB_DEFAULT);
-+                  should_succeed, JOB_DEFAULT);
+     if (--job->refcnt == 0) {
+         assert(job->status == JOB_STATUS_NULL);
++        assert(!timer_pending(&job->sleep_timer));
+ 
+         if (job->driver->free) {
+             job->driver->free(job);
+@@ -237,6 +248,11 @@ void job_enter_cond(Job *job, bool(*fn)(Job *job))
+     aio_co_wake(job->co);
  }
  
- /* This creates a BlockBackend (optionally with a name) with a
-@@ -214,7 +214,7 @@ static CancelJob *create_common(BlockJob **pjob)
++void job_enter(Job *job)
++{
++    job_enter_cond(job, NULL);
++}
++
+ /* Yield, and schedule a timer to reenter the coroutine after @ns nanoseconds.
+  * Reentering the job coroutine with block_job_enter() before the timer has
+  * expired is allowed and cancels the timer.
+@@ -288,6 +304,22 @@ void coroutine_fn job_pause_point(Job *job)
+     }
+ }
  
-     blk = create_blk(NULL);
-     job = mk_job(blk, "Steve", &test_cancel_driver, true,
--                 BLOCK_JOB_MANUAL_FINALIZE | BLOCK_JOB_MANUAL_DISMISS);
-+                 JOB_MANUAL_FINALIZE | JOB_MANUAL_DISMISS);
-     job_ref(&job->job);
-     assert(job->job.status == JOB_STATUS_CREATED);
-     s = container_of(job, CancelJob, common);
++void coroutine_fn job_sleep_ns(Job *job, int64_t ns)
++{
++    assert(job->busy);
++
++    /* Check cancellation *before* setting busy = false, too!  */
++    if (job_is_cancelled(job)) {
++        return;
++    }
++
++    if (!job_should_pause(job)) {
++        job_do_yield(job, qemu_clock_get_ns(QEMU_CLOCK_REALTIME) + ns);
++    }
++
++    job_pause_point(job);
++}
++
+ /**
+  * All jobs must allow a pause point before entering their job proper. This
+  * ensures that jobs can be paused prior to being started, then resumed later.
+diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+index c9f2f9b183..50232f5eaf 100644
+--- a/tests/test-bdrv-drain.c
++++ b/tests/test-bdrv-drain.c
+@@ -508,7 +508,7 @@ static void coroutine_fn test_job_start(void *opaque)
+ 
+     block_job_event_ready(&s->common);
+     while (!s->should_complete) {
+-        block_job_sleep_ns(&s->common, 100000);
++        job_sleep_ns(&s->common.job, 100000);
+     }
+ 
+     job_defer_to_main_loop(&s->common.job, test_job_completed, NULL);
+@@ -553,7 +553,7 @@ static void test_blockjob_common(enum drain_type drain_type)
+ 
+     g_assert_cmpint(job->job.pause_count, ==, 0);
+     g_assert_false(job->job.paused);
+-    g_assert_false(job->job.busy); /* We're in block_job_sleep_ns() */
++    g_assert_false(job->job.busy); /* We're in job_sleep_ns() */
+ 
+     do_drain_begin(drain_type, src);
+ 
+@@ -571,7 +571,7 @@ static void test_blockjob_common(enum drain_type drain_type)
+ 
+     g_assert_cmpint(job->job.pause_count, ==, 0);
+     g_assert_false(job->job.paused);
+-    g_assert_false(job->job.busy); /* We're in block_job_sleep_ns() */
++    g_assert_false(job->job.busy); /* We're in job_sleep_ns() */
+ 
+     do_drain_begin(drain_type, target);
+ 
+@@ -589,7 +589,7 @@ static void test_blockjob_common(enum drain_type drain_type)
+ 
+     g_assert_cmpint(job->job.pause_count, ==, 0);
+     g_assert_false(job->job.paused);
+-    g_assert_false(job->job.busy); /* We're in block_job_sleep_ns() */
++    g_assert_false(job->job.busy); /* We're in job_sleep_ns() */
+ 
+     ret = block_job_complete_sync(job, &error_abort);
+     g_assert_cmpint(ret, ==, 0);
+diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
+index 323e154a00..0e6162bc71 100644
+--- a/tests/test-blockjob-txn.c
++++ b/tests/test-blockjob-txn.c
+@@ -45,7 +45,7 @@ static void coroutine_fn test_block_job_run(void *opaque)
+ 
+     while (s->iterations--) {
+         if (s->use_timer) {
+-            block_job_sleep_ns(job, 0);
++            job_sleep_ns(&job->job, 0);
+         } else {
+             block_job_yield(job);
+         }
+diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
+index 1d18325feb..b329bd5274 100644
+--- a/tests/test-blockjob.c
++++ b/tests/test-blockjob.c
+@@ -188,7 +188,7 @@ static void coroutine_fn cancel_job_start(void *opaque)
+             block_job_event_ready(&s->common);
+         }
+ 
+-        block_job_sleep_ns(&s->common, 100000);
++        job_sleep_ns(&s->common.job, 100000);
+     }
+ 
+  defer:
 -- 
 2.13.6
