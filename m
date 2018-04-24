@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53515)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fAygt-0006dG-O8
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 10:13:13 -0400
+	(envelope-from <thuth@redhat.com>) id 1fAyhD-0006kM-Ae
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 10:13:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fAygo-0000xd-SO
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 10:13:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45744 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1fAygo-0000x7-KO
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 10:13:02 -0400
-Date: Tue, 24 Apr 2018 16:12:58 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20180424141258.cuenuefdtkefikr6@kamzik.brq.redhat.com>
-References: <3301c5bc-7b47-1b0e-8ce4-30435057a276@web.de>
-	<CAFEAcA9KSUppGGom-ipX+N49j0gDJH3KDY8oyqT8cVOU0Mn8Rw@mail.gmail.com>
+	(envelope-from <thuth@redhat.com>) id 1fAyh8-00019A-Ay
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 10:13:27 -0400
+References: <1524470305-26484-1-git-send-email-thuth@redhat.com>
+	<1524470305-26484-3-git-send-email-thuth@redhat.com>
+	<13a57e92-10ff-d89c-907b-3e927f6a9f3d@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <e7a8083e-aeda-ef03-a431-77eb23e9e561@redhat.com>
+Date: Tue, 24 Apr 2018 16:13:19 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9KSUppGGom-ipX+N49j0gDJH3KDY8oyqT8cVOU0Mn8Rw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/virt: Add linux, pci-domain property
+In-Reply-To: <13a57e92-10ff-d89c-907b-3e927f6a9f3d@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] pc-bios/s390-ccw/net: Add support
+ for pxelinux-style config files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,63 +26,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Jan Kiszka <jan.kiszka@web.de>, qemu-devel <qemu-devel@nongnu.org>
+To: Viktor VM Mihajlovski <mihajlov@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
+Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>
 
-On Mon, Apr 23, 2018 at 02:11:40PM +0100, Peter Maydell wrote:
-> On 23 April 2018 at 06:18, Jan Kiszka <jan.kiszka@web.de> wrote:
-> > From: Jan Kiszka <jan.kiszka@siemens.com>
-> >
-> > This allows to pin the host controller in the Linux PCI domain space.
-> > Linux requires that property to be available consistently or not at all,
-> > in which case the domain number becomes unstable on additions/removals.
-> > Adding it here won't make a difference in practice for most setups as we
-> > only expose one controller.
-> >
-> > However, enabling Jailhouse on top may introduce another controller, and
-> > that one would like to have stable address as well. So the property is
-> > needed for the first controller as well.
-> 
-> Am I right in thinking that for ACPI the PCI domain number is
-> communicated via the _SEG method? If so, looks like we already
-> set that, and we set it to 0, which matches what we're doing here
-> in the DT, so that's good.
+On 24.04.2018 15:41, Viktor VM Mihajlovski wrote:
+> On 23.04.2018 09:58, Thomas Huth wrote:
+> [...]
+>> +
+>> +static int net_try_pxelinux_cfgs(filename_ip_t *fn_ip)
+>> +{
+>> +    int rc, idx;
+>> +    char basedir[256];
+>> +    int has_basedir;
+>> +
+>> +    cfgbuf[sizeof(cfgbuf) - 1] =3D 0;   /* Make sure that it is NUL-t=
+erminated */
+>> +
+>> +    /* Did we get a usable base directory via DHCP? */
+>> +    idx =3D strlen((char *)fn_ip->filename);
+>> +    if (idx > 0 && idx < sizeof(basedir) - 40 &&
+>> +        fn_ip->filename[idx - 1] =3D=3D '/') {
+>> +        has_basedir =3D true;
+>> +        strcpy(basedir, (char *)fn_ip->filename);
+>> +    } else {
+>> +        has_basedir =3D false;
+>> +        strcpy(basedir, "pxelinux.cfg/");
+>> +    }
+>> +
+>> +    printf("Trying pxelinux.cfg files...\n");
+>> +
+>> +    /* Look for config file with MAC address in its name */
+>> +    sprintf((char *)fn_ip->filename, "%s%02x-%02x-%02x-%02x-%02x-%02x=
+",
+>> +            basedir, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+> Just noticed that the filename has to be <basedir>/pxelinux.cfg/01-<mac=
+>
+> per [1].
 
-_SEG and linux,pci-domain are similar in definition, but don't appear to
-be equivalent, as the same _SEG number is permitted across multiple host
-bridges, but linux,pci-domain must be unique for each host bridge. I
-think the (_SEG, _BBN) pair may form the equivalent. We also set _BBN
-to zero, so I think we're fine anyway.
+Ok. I just also had a closer look at the URL that you've mentioned on
+IRC (http://jk.ozlabs.org/blog/post/158/netbooting-petitboot/), and
+noticed that there is even an additional DHCP option (210) for
+specifying the prefix path ... so I'll try to rework my patches according=
+ly.
 
-> 
-> > Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
-> > ---
-> >  hw/arm/virt.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> >
-> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> > index 94dcb125d3..943371b75e 100644
-> > --- a/hw/arm/virt.c
-> > +++ b/hw/arm/virt.c
-> > @@ -1023,6 +1023,7 @@ static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
-> >      qemu_fdt_setprop_string(vms->fdt, nodename, "device_type", "pci");
-> >      qemu_fdt_setprop_cell(vms->fdt, nodename, "#address-cells", 3);
-> >      qemu_fdt_setprop_cell(vms->fdt, nodename, "#size-cells", 2);
-> > +    qemu_fdt_setprop_cell(vms->fdt, nodename, "linux,pci-domain", 0);
-> >      qemu_fdt_setprop_cells(vms->fdt, nodename, "bus-range", 0,
-> >                             nr_pcie_buses - 1);
-> >      qemu_fdt_setprop(vms->fdt, nodename, "dma-coherent", NULL, 0);
-> > --
-> 
-> Drew -- is minor changes to the DTC something we can do without
-> having to condition it on machine version? I forget...
-
-Yes, and even less minor changes than this one can be made to ACPI and DT
-generation, per the "if a firwmare update could change it, then don't
-worry about it" policy.
-
-(I've CC'ed Igor in case he wants to chime in to correct anything I've
- said.)
-
-Thanks,
-drew
+ Thomas
