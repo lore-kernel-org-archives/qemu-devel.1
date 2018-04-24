@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fB1vV-0002dj-KN
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:40:28 -0400
+	(envelope-from <mst@redhat.com>) id 1fB1yT-0003T2-SS
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:43:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fB1vU-0002QD-KC
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:40:25 -0400
-References: <20180215192829.9944-1-eblake@redhat.com>
-	<20180215192829.9944-4-eblake@redhat.com>
-	<20180424155205.GD4080@localhost.localdomain>
-	<f9c2e87f-082e-36ce-971a-6b11cb65d843@redhat.com>
-	<20180424171920.GI4080@localhost.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1cee058b-465d-4862-7fb0-8567f79c79b1@redhat.com>
-Date: Tue, 24 Apr 2018 12:40:06 -0500
+	(envelope-from <mst@redhat.com>) id 1fB1yQ-00084i-NR
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:43:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52364 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fB1yQ-00083n-HL
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:43:26 -0400
+Date: Tue, 24 Apr 2018 20:43:22 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180424201554-mutt-send-email-mst@kernel.org>
+References: <1524524398-41342-1-git-send-email-mst@redhat.com>
+	<CF6A88132359CE47947DB4C6E1709ED53973A729@ORSMSX110.amr.corp.intel.com>
+	<20180424035504-mutt-send-email-mst@kernel.org>
+	<20180424095722.76105b40@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180424171920.GI4080@localhost.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Vznfjcpaa8xGNGwkvymh9X68UiIHty2ue"
-Subject: Re: [Qemu-devel] [PATCH 3/6] null: Switch to byte-based read/write
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180424095722.76105b40@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] acpi/nvdimm: remove forward name references
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,83 +29,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: "Schmauss, Erik" <erik.schmauss@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Williams, Dan J" <dan.j.williams@intel.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Vznfjcpaa8xGNGwkvymh9X68UiIHty2ue
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Fam Zheng
- <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
-Message-ID: <1cee058b-465d-4862-7fb0-8567f79c79b1@redhat.com>
-Subject: Re: [PATCH 3/6] null: Switch to byte-based read/write
-References: <20180215192829.9944-1-eblake@redhat.com>
- <20180215192829.9944-4-eblake@redhat.com>
- <20180424155205.GD4080@localhost.localdomain>
- <f9c2e87f-082e-36ce-971a-6b11cb65d843@redhat.com>
- <20180424171920.GI4080@localhost.localdomain>
-In-Reply-To: <20180424171920.GI4080@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Apr 24, 2018 at 09:57:22AM +0200, Igor Mammedov wrote:
+> On Tue, 24 Apr 2018 04:02:40 +0300
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+> > On Tue, Apr 24, 2018 at 12:41:29AM +0000, Schmauss, Erik wrote:
+> > > 
+> > >   
+> > > > -----Original Message-----
+> > > > From: Michael S. Tsirkin [mailto:mst@redhat.com]
+> > > > Sent: Monday, April 23, 2018 4:03 PM
+> > > > To: qemu-devel@nongnu.org
+> > > > Cc: Schmauss, Erik <erik.schmauss@intel.com>; Igor Mammedov
+> > > > <imammedo@redhat.com>; Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+> > > > Subject: [PATCH] acpi/nvdimm: remove forward name references
+> > > > 
+> > > > NVDIMM SSDT table references a name ("MEMA") before it is defined. This is
+> > > > reported to no longer be supported since Linux 4.17-rc1.
+> > > > 
+> > > > While arguably Linux needs to keep working on old hypervisors, and other OSes
+> > > > seem fine with our behaviour, it seems cleaner to have the definition appear in
+> > > > the SSDT before use.
+> > > > 
+> > > > Suggested-by: "Schmauss, Erik" <erik.schmauss@intel.com>
+> > > > Cc: qemu-stable@nongnu.org
+> > > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > > > ---
+> > > > 
+> > > > Hi Erik,
+> > > > could you pls test the issue and report whether it addresses your concern? I can't  
+> > > Hi Michael, 
+> > >   
+> > > > do much to fix past releases which IIUC shipped this code since 2.6.0 about a
+> > > > year ago.
+> > > > 
+> > > > Lightly tested with Linux only.  
+> > > 
+> > > I'm looking at the ASL tables generated by make check-qtest-x86_64.
+> > > This line  
+> > 
+> > which line?
+> > 
+> > > ends up generating a strange ACPI table where the Operation
+> > > region and field declarations are stuck inside the NCAL method which
+> > > is called from _DSM. If we create the operation region and methods
+> > > inside methods, they disappear after the NCAL method returns.
+> What's wrong with it?
+> Method is complete so temporary objects
+> it has used went out of scope, all within spec rules
+> and worked fine with linux and windows guests.
+> 
+> > > I think nvdimm_build_common_dsm() needs some refining.  
+> > 
+> > What exactly do you refer to?
+> > 
+> > DefinitionBlock ("", "SSDT", 1, "BOCHS ", "NVDIMM", 0x00000001)
+> > {
+> >     Name (MEMA, 0x07FFE000)
+> >     Scope (\_SB)
+> >     {
+> >         Device (NVDR)
+> >         {
+> >             Name (_HID, "ACPI0012" /* NVDIMM Root Device */)  // _HID: Hardware ID
+> >             Method (NCAL, 5, Serialized)
+> >             {
+> >                 Local6 = MEMA /* \MEMA */
+> >                 OperationRegion (NPIO, SystemIO, 0x0A18, 0x04)
+> >                 OperationRegion (NRAM, SystemMemory, Local6, 0x1000)
+> > 
+> > 		^^^ this?
+> > 
+> > I agree the NPIO could be moved out.
+> > Don't really understand why is Local6 needed - can't MEMA be
+> > used directly? Assuming it isn't NRAM could be moved out too.
+> From spec
+>  DefOpRegion := OpRegionOp NameString RegionSpace RegionOffset RegionLen
+>  RegionOffset := TermArg => Integer
+>  TermArg := Type2Opcode | DataObject | ArgObj | LocalObj
+> 
+> So named object is not accepted,
 
-On 04/24/2018 12:19 PM, Kevin Wolf wrote:
+might be worth checking what happens with actual OSPMs.
+If it does happen to work, we can try tweaking the ACPI
+spec to allow this.
 
->>>> +static void null_refresh_limits(BlockDriverState *bs, Error **errp)=
+> we could have played games with
+> references and Type2Opcode but that didn't work nice with Windows
+> ACPI parser. Hence local object.
 
->>>> +{
->>>> +    bs->bl.request_alignment =3D 1;
->>>> +}
->>>
->>> I would rather modify bdrv_refresh_limits() so that it defaults to 1 =
-for
->>> drivers supporting either .bdrv_co_preadv or .bdrv_aio_preadv.
->>
->> Sure, I can do that (although then I may have to provide a
->> refresh_limits callback for each of the other drivers that I
->> specifically left at 512 alignment).
->=20
-> Do we know that the other drivers need 512, or do we expect than they
-> can handle byte granularity, but we try to err on the safe side?
+A comment in code wouldn't hurt to explain this.
 
-Done to err on the safe side and avoid the difficulty of a deep audit in
-code I'm unfamiliar with; in fact, for vxhs, I wasn't even able to
-compile test things, which means I certainly wasn't able to reproduce a
-test to see if dropping the alignment would break anything under qemu-io.=
+> The reason why OperationRegion is dynamic, is that if we put it
+> outside of method it will become static, and we would have to use
+> Integer constant there (no named objects are allowed) and
+> then patch it dynamically in bios loader.
+> I'd prefer to keep it as is, without introducing another hack
+> like build_append_named_operation_region() to create it with
+> know offset so firmware could patch it.
 
+I agree to that.
 
->=20
-> If it's the latter (which would be my expectation), then it's probably
-> better to set request_alignment =3D 512 with a comment in those drivers=
-
-> and hope that someone will lift the restriction in the future.
-
-Indeed, leaving a good comment for a future reader is worth the effort.
-I'll send a v2 later today.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---Vznfjcpaa8xGNGwkvymh9X68UiIHty2ue
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrfa/YACgkQp6FrSiUn
-Q2rxKAf8CGpZezcnENXMg50E4AiiXK+QzFYvr+CMlPfBZw1HFijjrRhYHCv4idqp
-NaWR6fnfpmDsN7R95jds2TX44USkxiSS1frjzsiYVBgiv8I4IUkOjmS/Sk82d+xd
-+6FDBPpTU7BPR9dgzjpfK8D6NNxYWqAFKE30IPW+XYGEHaacFji2jBce0jvaDBs1
-ypVMVZv3YvRax0plxX2kllqyDMBosytRj1L9lECBev9grlHUuVG2MIqBLv+z3aHv
-bM29Z6pddzf6qAg/QtCuAtpf4O9fclf2vzS3ertbJBnsP/dflIsHULfMIEy+N8eR
-Mo4Wq1ysJjqS3F52rE0PPXAlrFmazw==
-=dA+l
------END PGP SIGNATURE-----
-
---Vznfjcpaa8xGNGwkvymh9X68UiIHty2ue--
+> > 
+> > 
+> > It all seems suboptimal but given the method is serialized,
+> > I don't see anything wrong with it as such.
+> > 
+> > 
+> > >   
+> > > > 
+> > > >  hw/acpi/nvdimm.c | 6 ++++--
+> > > >  1 file changed, 4 insertions(+), 2 deletions(-)
+> > > > 
+> > > > diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c index 59d6e42..fadebbd
+> > > > 100644
+> > > > --- a/hw/acpi/nvdimm.c
+> > > > +++ b/hw/acpi/nvdimm.c
+> > > > @@ -1234,6 +1234,10 @@ static void nvdimm_build_ssdt(GArray *table_offsets,
+> > > > GArray *table_data,
+> > > >      ssdt = init_aml_allocator();
+> > > >      acpi_data_push(ssdt->buf, sizeof(AcpiTableHeader));
+> > > > 
+> > > > +    /* Storage for the memory address */
+> > > > +    mem_addr_offset = table_data->len +
+> > > > +        build_append_named_dword(ssdt->buf, NVDIMM_ACPI_MEM_ADDR);
+> > > > +
+> > > >      sb_scope = aml_scope("\\_SB");
+> > > > 
+> > > >      dev = aml_device("NVDR");
+> > > > @@ -1266,8 +1270,6 @@ static void nvdimm_build_ssdt(GArray *table_offsets,
+> > > > GArray *table_data,
+> > > > 
+> > > >      /* copy AML table into ACPI tables blob and patch header there */
+> > > >      g_array_append_vals(table_data, ssdt->buf->data, ssdt->buf->len);
+> > > > -    mem_addr_offset = build_append_named_dword(table_data,
+> > > > -                                               NVDIMM_ACPI_MEM_ADDR);
+> > > > 
+> > > >      bios_linker_loader_alloc(linker,
+> > > >                               NVDIMM_DSM_MEM_FILE, dsm_dma_arrea,
+> > > > --
+> > > > MST  
