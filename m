@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36523)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36500)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=6454bde7c=Ian.Jackson@citrix.com>)
-	id 1fB2DF-0007C5-D8
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:58:46 -0400
+	id 1fB2DE-0007Ac-9l
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:58:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=6454bde7c=Ian.Jackson@citrix.com>)
-	id 1fB2DE-0006xz-Cb
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:58:45 -0400
+	id 1fB2DD-0006wq-FK
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:58:44 -0400
 Received: from smtp03.citrix.com ([162.221.156.55]:9743)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <prvs=6454bde7c=Ian.Jackson@citrix.com>)
-	id 1fB2DE-0006on-3K
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:58:44 -0400
+	id 1fB2DD-0006on-5S
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 13:58:43 -0400
 From: Ian Jackson <ian.jackson@eu.citrix.com>
-Date: Tue, 24 Apr 2018 18:58:17 +0100
-Message-ID: <1524592709-6553-5-git-send-email-ian.jackson@eu.citrix.com>
+Date: Tue, 24 Apr 2018 18:58:16 +0100
+Message-ID: <1524592709-6553-4-git-send-email-ian.jackson@eu.citrix.com>
 In-Reply-To: <1524592709-6553-1-git-send-email-ian.jackson@eu.citrix.com>
 References: <1524592709-6553-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 04/16] xen: restrict: use
- xentoolcore_restrict_all
+Subject: [Qemu-devel] [PATCH 03/16] xen: link against xentoolcore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,105 +29,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>
+Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <Ian.Jackson@eu.citrix.com>
 
-And insist that it works.
+From: Anthony PERARD <anthony.perard@citrix.com>
 
-Drop individual use of xendevicemodel_restrict and
-xenforeignmemory_restrict.  These are not actually effective in this
-version of qemu, because qemu has a large number of fds open onto
-various Xen control devices.
-
-The restriction arrangements are still not right, because the
-restriction needs to be done very late - after qemu has opened all of
-its control fds.
-
-xentoolcore_restrict_all and xentoolcore.h are available in Xen 4.10
-and later, only.  Provide a compatibility stub.  And drop the
-compatibility stubs for the old functions.
+Xen libraries in 4.10 include a new xentoolcore library.  This
+contains the xentoolcore_restrict_all function which we are about to
+want to use.
 
 Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
-Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
 Acked-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
-v2: Modify the compatibility code, too.
-    Bump this patch ahead of "defer call to xen_restrict until running"
-    Retain call to xentoolcore_restrict_all
+v8: In pkg-config branch, add xentoolcore conditionally.
+    This cope with Xen 4.9 found via pkg-config.
+v5: More truthful commit message.
 ---
- include/hw/xen/xen_common.h | 46 +++++++++++----------------------------------
- 1 file changed, 11 insertions(+), 35 deletions(-)
+ configure | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
-index 64a978e..1766bb9 100644
---- a/include/hw/xen/xen_common.h
-+++ b/include/hw/xen/xen_common.h
-@@ -91,6 +91,16 @@ static inline void *xenforeignmemory_map2(xenforeignmemory_handle *h,
-     return xenforeignmemory_map(h, dom, prot, pages, arr, err);
- }
- 
-+static inline int xentoolcore_restrict_all(domid_t domid)
-+{
-+    errno = ENOTTY;
-+    return -1;
-+}
-+
-+#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 41000 */
-+
+diff --git a/configure b/configure
+index 0a19b03..5cf9dde 100755
+--- a/configure
++++ b/configure
+@@ -2189,6 +2189,9 @@ if test "$xen" != "no" ; then
+     xen=yes
+     xen_pc="xencontrol xenstore xenguest xenforeignmemory xengnttab"
+     xen_pc="$xen_pc xenevtchn xendevicemodel"
++    if $pkg_config --exists xentoolcore; then
++      xen_pc="$xen_pc xentoolcore"
++    fi
+     QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags $xen_pc)"
+     libs_softmmu="$($pkg_config --libs $xen_pc) $libs_softmmu"
+     LDFLAGS="$($pkg_config --libs $xen_pc) $LDFLAGS"
+@@ -2220,18 +2223,20 @@ EOF
+         cat > $TMPC <<EOF &&
+ #undef XC_WANT_COMPAT_MAP_FOREIGN_API
+ #include <xenforeignmemory.h>
 +#include <xentoolcore.h>
-+
- #endif
+ int main(void) {
+   xenforeignmemory_handle *xfmem;
  
- #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
-@@ -218,20 +228,6 @@ static inline int xendevicemodel_set_mem_type(
-     return xc_hvm_set_mem_type(dmod, domid, mem_type, first_pfn, nr);
+   xfmem = xenforeignmemory_open(0, 0);
+   xenforeignmemory_map2(xfmem, 0, 0, 0, 0, 0, 0, 0);
++  xentoolcore_restrict_all(0);
+ 
+   return 0;
  }
- 
--static inline int xendevicemodel_restrict(
--    xendevicemodel_handle *dmod, domid_t domid)
--{
--    errno = ENOTTY;
--    return -1;
--}
--
--static inline int xenforeignmemory_restrict(
--    xenforeignmemory_handle *fmem, domid_t domid)
--{
--    errno = ENOTTY;
--    return -1;
--}
--
- #else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
- 
- #undef XC_WANT_COMPAT_DEVICEMODEL_API
-@@ -290,28 +286,8 @@ static inline int xen_modified_memory(domid_t domid, uint64_t first_pfn,
- static inline int xen_restrict(domid_t domid)
- {
-     int rc;
--
--    /* Attempt to restrict devicemodel operations */
--    rc = xendevicemodel_restrict(xen_dmod, domid);
-+    rc = xentoolcore_restrict_all(domid);
-     trace_xen_domid_restrict(rc ? errno : 0);
--
--    if (rc < 0) {
--        /*
--         * If errno is ENOTTY then restriction is not implemented so
--         * there's no point in trying to restrict other types of
--         * operation, but it should not be treated as a failure.
--         */
--        if (errno == ENOTTY) {
--            return 0;
--        }
--
--        return rc;
--    }
--
--    /* Restrict foreignmemory operations */
--    rc = xenforeignmemory_restrict(xen_fmem, domid);
--    trace_xen_domid_restrict(rc ? errno : 0);
--
-     return rc;
- }
- 
+ EOF
+-        compile_prog "" "$xen_libs -lxendevicemodel $xen_stable_libs"
++        compile_prog "" "$xen_libs -lxendevicemodel $xen_stable_libs -lxentoolcore"
+       then
+-      xen_stable_libs="-lxendevicemodel $xen_stable_libs"
++      xen_stable_libs="-lxendevicemodel $xen_stable_libs -lxentoolcore"
+       xen_ctrl_version=41000
+       xen=yes
+     elif
 -- 
 2.1.4
