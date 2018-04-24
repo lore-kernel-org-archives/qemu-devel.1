@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33335)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fAlrc-0007Wb-Fl
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 20:31:21 -0400
+	(envelope-from <erik.schmauss@intel.com>) id 1fAm1a-0000MJ-To
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 20:41:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fAlrY-0005SP-I0
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 20:31:20 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:56045)
+	(envelope-from <erik.schmauss@intel.com>) id 1fAm1X-0000yB-00
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 20:41:38 -0400
+Received: from mga17.intel.com ([192.55.52.151]:59811)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fAlrY-0005Rj-EB
-	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 20:31:16 -0400
-Date: Mon, 23 Apr 2018 20:31:15 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180424003115.GD8651@flamenco>
-References: <1522980788-1252-1-git-send-email-cota@braap.org>
-	<1522980788-1252-13-git-send-email-cota@braap.org>
-	<565c5fac-2494-c30a-84c2-3bb1bb9c11b3@linaro.org>
+	(Exim 4.71) (envelope-from <erik.schmauss@intel.com>)
+	id 1fAm1W-0000sf-Lz
+	for qemu-devel@nongnu.org; Mon, 23 Apr 2018 20:41:34 -0400
+From: "Schmauss, Erik" <erik.schmauss@intel.com>
+Date: Tue, 24 Apr 2018 00:41:29 +0000
+Message-ID: <CF6A88132359CE47947DB4C6E1709ED53973A729@ORSMSX110.amr.corp.intel.com>
+References: <1524524398-41342-1-git-send-email-mst@redhat.com>
+In-Reply-To: <1524524398-41342-1-git-send-email-mst@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <565c5fac-2494-c30a-84c2-3bb1bb9c11b3@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v2 12/17] translate-all: add
- page_collection assertions
+Subject: Re: [Qemu-devel] [PATCH] acpi/nvdimm: remove forward name references
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +28,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Williams,
+	Dan J" <dan.j.williams@intel.com>
 
-On Fri, Apr 13, 2018 at 17:42:45 -1000, Richard Henderson wrote:
-> On 04/05/2018 04:13 PM, Emilio G. Cota wrote:
-> > +static __thread bool page_collection_locked;
-> > +
-> > +void assert_page_collection_locked(bool val)
-> > +{
-> > +    tcg_debug_assert(page_collection_locked == val);
-> > +}
-> > +
-> > +static inline void set_page_collection_locked(bool val)
-> > +{
-> > +    page_collection_locked = val;
-> > +}
-> > +
-> 
-> This seems fairly fragile to me.
-> 
-> (1) Do you ever do assert_page_collection_locked(true)?
 
-No.
 
-> You don't appear to do so, and it's somewhat confusing.
+> -----Original Message-----
+> From: Michael S. Tsirkin [mailto:mst@redhat.com]
+> Sent: Monday, April 23, 2018 4:03 PM
+> To: qemu-devel@nongnu.org
+> Cc: Schmauss, Erik <erik.schmauss@intel.com>; Igor Mammedov
+> <imammedo@redhat.com>; Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+> Subject: [PATCH] acpi/nvdimm: remove forward name references
+>=20
+> NVDIMM SSDT table references a name ("MEMA") before it is defined. This i=
+s
+> reported to no longer be supported since Linux 4.17-rc1.
+>=20
+> While arguably Linux needs to keep working on old hypervisors, and other =
+OSes
+> seem fine with our behaviour, it seems cleaner to have the definition app=
+ear in
+> the SSDT before use.
+>=20
+> Suggested-by: "Schmauss, Erik" <erik.schmauss@intel.com>
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>=20
+> Hi Erik,
+> could you pls test the issue and report whether it addresses your concern=
+? I can't
+Hi Michael,=20
 
-You're right. I think in testing I was using it, but now it
-might make more sense to not take any arguments.
+> do much to fix past releases which IIUC shipped this code since 2.6.0 abo=
+ut a
+> year ago.
+>=20
+> Lightly tested with Linux only.
 
-> (2) Why does do_page_entry_lock set "locked" and not page_collection_lock?
+I'm looking at the ASL tables generated by make check-qtest-x86_64. This li=
+ne ends up generating a strange ACPI table where the Operation region and f=
+ield declarations are stuck inside the NCAL method which is called from _DS=
+M. If we create the operation region and methods inside methods, they disap=
+pear after the NCAL method returns. I think nvdimm_build_common_dsm() needs=
+ some refining.
 
-page_collection_lock calls page_entry_lock and page_trylock_add,
-both of which end up calling do_page_entry_lock.
-
-Thanks,
-
-		Emilio
+>=20
+>  hw/acpi/nvdimm.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c index 59d6e42..fadebbd
+> 100644
+> --- a/hw/acpi/nvdimm.c
+> +++ b/hw/acpi/nvdimm.c
+> @@ -1234,6 +1234,10 @@ static void nvdimm_build_ssdt(GArray *table_offset=
+s,
+> GArray *table_data,
+>      ssdt =3D init_aml_allocator();
+>      acpi_data_push(ssdt->buf, sizeof(AcpiTableHeader));
+>=20
+> +    /* Storage for the memory address */
+> +    mem_addr_offset =3D table_data->len +
+> +        build_append_named_dword(ssdt->buf, NVDIMM_ACPI_MEM_ADDR);
+> +
+>      sb_scope =3D aml_scope("\\_SB");
+>=20
+>      dev =3D aml_device("NVDR");
+> @@ -1266,8 +1270,6 @@ static void nvdimm_build_ssdt(GArray *table_offsets=
+,
+> GArray *table_data,
+>=20
+>      /* copy AML table into ACPI tables blob and patch header there */
+>      g_array_append_vals(table_data, ssdt->buf->data, ssdt->buf->len);
+> -    mem_addr_offset =3D build_append_named_dword(table_data,
+> -                                               NVDIMM_ACPI_MEM_ADDR);
+>=20
+>      bios_linker_loader_alloc(linker,
+>                               NVDIMM_DSM_MEM_FILE, dsm_dma_arrea,
+> --
+> MST
