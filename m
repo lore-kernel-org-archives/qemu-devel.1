@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fAzSn-0005gs-EG
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:02:43 -0400
+	(envelope-from <prvs=6454bde7c=Ian.Jackson@citrix.com>)
+	id 1fAzVi-0007Sn-Rj
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:05:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fAzSm-0006dV-Cq
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:02:37 -0400
-References: <20180215192829.9944-1-eblake@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9c4fcd99-8a8c-62d3-3c0d-d26601910835@redhat.com>
-Date: Tue, 24 Apr 2018 10:02:10 -0500
+	(envelope-from <prvs=6454bde7c=Ian.Jackson@citrix.com>)
+	id 1fAzVZ-0002dw-7Z
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:05:38 -0400
+Received: from smtp03.citrix.com ([162.221.156.55]:57325)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <prvs=6454bde7c=Ian.Jackson@citrix.com>)
+	id 1fAzVY-0002XS-U9
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:05:29 -0400
+From: Ian Jackson <ian.jackson@citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <20180215192829.9944-1-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Zr3b1Ed3399tAKdyo1DrGeOXY57C0UFRs"
-Subject: Re: [Qemu-devel] [PATCH 0/6] block: byte-based AIO read/write
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Message-ID: <23263.18333.710326.753665@mariner.uk.xensource.com>
+Date: Tue, 24 Apr 2018 16:05:01 +0100
+In-Reply-To: <4402483b-17fd-60e0-4f00-05887a11320d@redhat.com>
+References: <1524156319-11465-1-git-send-email-ian.jackson@eu.citrix.com>
+	<1524156319-11465-17-git-send-email-ian.jackson@eu.citrix.com>
+	<20180423162142.GG1980@perard>
+	<23262.3101.567189.675156@mariner.uk.xensource.com>
+	<4402483b-17fd-60e0-4f00-05887a11320d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 16/16] configure: do_compiler: Dump some
+ extra info under bash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,84 +34,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, Stefano  Stabellini <sstabellini@kernel.org>, Peter Maydell <peter.maydell@linaro.org>, "Kent R. Spillner" <kspillner@acm.org>, qemu-devel@nongnu.org, Ross Lagerwall <ross.lagerwall@citrix.com>, Paolo
+	Bonzini <pbonzini@redhat.com>, xen-devel@lists.xenproject.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Zr3b1Ed3399tAKdyo1DrGeOXY57C0UFRs
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
-Message-ID: <9c4fcd99-8a8c-62d3-3c0d-d26601910835@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/6] block: byte-based AIO read/write
-References: <20180215192829.9944-1-eblake@redhat.com>
-In-Reply-To: <20180215192829.9944-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Eric Blake writes ("Re: [Qemu-devel] [PATCH 16/16] configure: do_compiler: Dump some extra info under bash"):
+> That's still fork-heavy.  You could do:
+> 
+> test -n "$BASH_VERSION" && eval '
+> echo >>config.log "
+> funcs: ${FUNCNAME[*]}
+> lines: ${BASH_LINENO[*]}
+> files: ${BASH_SOURCE[*]}"'
+> 
+> which avoids the fork, but remains silent on dash.
 
-On 02/15/2018 01:28 PM, Eric Blake wrote:
-> While we would prefer that block drivers use coroutines instead
-> of aio callbacks, it is a fairly easy exercise to prove that
-> all existing drivers with aio callbacks are merely scaling
-> from bytes into sectors and back to bytes.  So, even though I
-> am not set up to completely run (or even compile-test) this
-> full series, it seems pretty straightforward to change the
-> signature to quit playing games with pointless scaling.
->=20
-> Note that except for the null-aio driver, I intentionally did
-> NOT try and change the request_alignment from the block layer's
-> default of 512 (it defaults to 1 only for drivers that use
-> coroutines).
->=20
-> (And along the way, I got my docker-test-mingw@fedora working;
-> thanks to the help I got on IRC)
+Thanks.  I will adopt this.  Although I will use if ... then as that
+seems to be the usual style.  (&& would break with set -e which
+configure does not use...)
 
-ping
-
->=20
-> Eric Blake (6):
->   block: Support byte-based aio callbacks
->   file-win32: Switch to byte-based callbacks
->   null: Switch to byte-based read/write
->   rbd: Switch to byte-based callbacks
->   vxhs: Switch to byte-based callbacks
->   block: Drop last of the sector-based aio callbacks
->=20
->  include/block/block_int.h |  8 +++---
->  include/block/raw-aio.h   |  2 +-
->  block/io.c                | 26 ++++++++++++-------
->  block/file-win32.c        | 36 +++++++++++++-------------
->  block/null.c              | 66 ++++++++++++++++++++++++++-------------=
---------
->  block/rbd.c               | 36 ++++++++++++--------------
->  block/vxhs.c              | 36 +++++++++++---------------
->  block/win32-aio.c         |  5 ++--
->  8 files changed, 109 insertions(+), 106 deletions(-)
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---Zr3b1Ed3399tAKdyo1DrGeOXY57C0UFRs
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrfRvIACgkQp6FrSiUn
-Q2oAAQf+PuAldKFHFqS0QMZIALnuemw4NGD83XKDZOcEPrPxq5Qrq/eGYdmmpTZy
-JR21HJvzXKgCA+R/3yEK71F8+4oOGtDO7G6Q5fWuRA4hNMb2Yk6Md24VRQzO7xaC
-AzIFOHcZVkhsBzChbfJFUAJWxMzD+FDrj8nmZKzjHJiF1fwct3//8YhXPdLrvWSF
-AZRiRMuJPKaiPSp9YMi8hpS784G51itTLQWIe96vZeZcIPWZVUQY3UGVGGo8kgsE
-a0Mi11bafkzYJGKxDVSbynkVK5rDEwJ+WpiXPkxg/QRos3yPOs9aMXqhY4bkD61L
-9mxMG1oJ4AQfmKVSFpTIkavwx98r0g==
-=IJVB
------END PGP SIGNATURE-----
-
---Zr3b1Ed3399tAKdyo1DrGeOXY57C0UFRs--
+Ian.
