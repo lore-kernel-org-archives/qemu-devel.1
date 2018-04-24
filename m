@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50467)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fAzwa-000647-CD
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:33:25 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fAzwX-0001a7-AN
+	(envelope-from <alex.bennee@linaro.org>) id 1fAzwX-000612-9J
 	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:33:24 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:33393)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <alex.bennee@linaro.org>) id 1fAzwW-0001Yj-6F
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:33:21 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:41572)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fAzwX-0001ZI-40
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:33:21 -0400
-Received: by mail-wr0-x243.google.com with SMTP id o4-v6so141298wrm.0
-	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 08:33:21 -0700 (PDT)
+	id 1fAzwV-0001Xe-Tn
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:33:20 -0400
+Received: by mail-wr0-x242.google.com with SMTP id g21-v6so22927859wrb.8
+	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 08:33:19 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 24 Apr 2018 16:23:44 +0100
-Message-Id: <20180424152405.10304-26-alex.bennee@linaro.org>
+Date: Tue, 24 Apr 2018 16:23:34 +0100
+Message-Id: <20180424152405.10304-16-alex.bennee@linaro.org>
 In-Reply-To: <20180424152405.10304-1-alex.bennee@linaro.org>
 References: <20180424152405.10304-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 25/46] tests/tcg/i386/test-i386: fix printf
- format
+Subject: [Qemu-devel] [PATCH v3 15/46] tests/tcg/multiarch: move most output
+ to stdout
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,23 +33,181 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
+The default test run outputs to stdout so it can be re-directed.
+Errors are still reported to stderr.
+
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/tcg/i386/test-i386.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/tcg/multiarch/test-mmap.c | 38 ++++++++++++++++-----------------
+ 1 file changed, 19 insertions(+), 19 deletions(-)
 
-diff --git a/tests/tcg/i386/test-i386.c b/tests/tcg/i386/test-i386.c
-index caef4da176..a29b41e764 100644
---- a/tests/tcg/i386/test-i386.c
-+++ b/tests/tcg/i386/test-i386.c
-@@ -2258,7 +2258,7 @@ SSE_OP(a ## sd);
-         "pop %0\n"\
-         : "=rm" (eflags)\
-         : "x" (a.dq), "x" (b.dq));\
--    printf("%-9s: a=%f b=%f cc=%04x\n",\
-+    printf("%-9s: a=%f b=%f cc=%04lx\n",\
-            #op, a1, b1,\
-            eflags & (CC_C | CC_P | CC_Z | CC_S | CC_O | CC_A));\
+diff --git a/tests/tcg/multiarch/test-mmap.c b/tests/tcg/multiarch/test-mmap.c
+index cdefadfa4c..fd6ecc4880 100644
+--- a/tests/tcg/multiarch/test-mmap.c
++++ b/tests/tcg/multiarch/test-mmap.c
+@@ -57,7 +57,7 @@ void check_aligned_anonymous_unfixed_mmaps(void)
+ 	uintptr_t p;
+ 	int i;
+ 
+-	fprintf (stderr, "%s", __func__);
++	fprintf (stdout, "%s", __func__);
+ 	for (i = 0; i < 0x1fff; i++)
+ 	{
+ 		size_t len;
+@@ -106,7 +106,7 @@ void check_aligned_anonymous_unfixed_mmaps(void)
+ 		munmap (p4, len);
+ 		munmap (p5, len);
+ 	}
+-	fprintf (stderr, " passed\n");
++	fprintf (stdout, " passed\n");
  }
+ 
+ void check_large_anonymous_unfixed_mmap(void)
+@@ -115,7 +115,7 @@ void check_large_anonymous_unfixed_mmap(void)
+ 	uintptr_t p;
+ 	size_t len;
+ 
+-	fprintf (stderr, "%s", __func__);
++	fprintf (stdout, "%s", __func__);
+ 
+ 	len = 0x02000000;
+ 	p1 = mmap(NULL, len, PROT_READ, 
+@@ -130,7 +130,7 @@ void check_large_anonymous_unfixed_mmap(void)
+ 	/* Make sure we can read from the entire area.  */
+ 	memcpy (dummybuf, p1, pagesize);
+ 	munmap (p1, len);
+-	fprintf (stderr, " passed\n");
++	fprintf (stdout, " passed\n");
+ }
+ 
+ void check_aligned_anonymous_unfixed_colliding_mmaps(void)
+@@ -141,7 +141,7 @@ void check_aligned_anonymous_unfixed_colliding_mmaps(void)
+ 	uintptr_t p;
+ 	int i;
+ 
+-	fprintf (stderr, "%s", __func__);
++	fprintf (stdout, "%s", __func__);
+ 	for (i = 0; i < 0x2fff; i++)
+ 	{
+ 		int nlen;
+@@ -180,7 +180,7 @@ void check_aligned_anonymous_unfixed_colliding_mmaps(void)
+ 		munmap (p2, pagesize);
+ 		munmap (p3, nlen);
+ 	}
+-	fprintf (stderr, " passed\n");
++	fprintf (stdout, " passed\n");
+ }
+ 
+ void check_aligned_anonymous_fixed_mmaps(void)
+@@ -194,7 +194,7 @@ void check_aligned_anonymous_fixed_mmaps(void)
+ 	addr = mmap(NULL, pagesize * 40, PROT_READ | PROT_WRITE, 
+ 		    MAP_PRIVATE | MAP_ANONYMOUS,
+ 		    -1, 0);
+-	fprintf (stderr, "%s addr=%p", __func__, addr);
++	fprintf (stdout, "%s addr=%p", __func__, addr);
+ 	fail_unless (addr != MAP_FAILED);
+ 
+ 	for (i = 0; i < 40; i++)
+@@ -212,7 +212,7 @@ void check_aligned_anonymous_fixed_mmaps(void)
+ 		munmap (p1, pagesize);
+ 		addr += pagesize;
+ 	}
+-	fprintf (stderr, " passed\n");
++	fprintf (stdout, " passed\n");
+ }
+ 
+ void check_aligned_anonymous_fixed_mmaps_collide_with_host(void)
+@@ -225,8 +225,8 @@ void check_aligned_anonymous_fixed_mmaps_collide_with_host(void)
+ 	/* Find a suitable address to start with.  Right were the x86 hosts
+ 	 stack is.  */
+ 	addr = ((void *)0x80000000);
+-	fprintf (stderr, "%s addr=%p", __func__, addr);
+-	fprintf (stderr, "FIXME: QEMU fails to track pages used by the host.");
++	fprintf (stdout, "%s addr=%p", __func__, addr);
++	fprintf (stdout, "FIXME: QEMU fails to track pages used by the host.");
+ 
+ 	for (i = 0; i < 20; i++)
+ 	{
+@@ -243,7 +243,7 @@ void check_aligned_anonymous_fixed_mmaps_collide_with_host(void)
+ 		munmap (p1, pagesize);
+ 		addr += pagesize;
+ 	}
+-	fprintf (stderr, " passed\n");
++	fprintf (stdout, " passed\n");
+ }
+ 
+ void check_file_unfixed_mmaps(void)
+@@ -252,7 +252,7 @@ void check_file_unfixed_mmaps(void)
+ 	uintptr_t p;
+ 	int i;
+ 
+-	fprintf (stderr, "%s", __func__);
++	fprintf (stdout, "%s", __func__);
+ 	for (i = 0; i < 0x10; i++)
+ 	{
+ 		size_t len;
+@@ -294,7 +294,7 @@ void check_file_unfixed_mmaps(void)
+ 		munmap (p2, len);
+ 		munmap (p3, len);
+ 	}
+-	fprintf (stderr, " passed\n");
++	fprintf (stdout, " passed\n");
+ }
+ 
+ void check_file_unfixed_eof_mmaps(void)
+@@ -304,7 +304,7 @@ void check_file_unfixed_eof_mmaps(void)
+ 	uintptr_t p;
+ 	int i;
+ 
+-	fprintf (stderr, "%s", __func__);
++	fprintf (stdout, "%s", __func__);
+ 	for (i = 0; i < 0x10; i++)
+ 	{
+ 		p1 = mmap(NULL, pagesize, PROT_READ, 
+@@ -327,7 +327,7 @@ void check_file_unfixed_eof_mmaps(void)
+ 		fail_unless (cp[pagesize - 4] == 0);
+ 		munmap (p1, pagesize);
+ 	}
+-	fprintf (stderr, " passed\n");
++	fprintf (stdout, " passed\n");
+ }
+ 
+ void check_file_fixed_eof_mmaps(void)
+@@ -343,7 +343,7 @@ void check_file_fixed_eof_mmaps(void)
+ 		    MAP_PRIVATE | MAP_ANONYMOUS,
+ 		    -1, 0);
+ 
+-	fprintf (stderr, "%s addr=%p", __func__, (void *)addr);
++	fprintf (stdout, "%s addr=%p", __func__, (void *)addr);
+ 	fail_unless (addr != MAP_FAILED);
+ 
+ 	for (i = 0; i < 0x10; i++)
+@@ -371,7 +371,7 @@ void check_file_fixed_eof_mmaps(void)
+ 		munmap (p1, pagesize);
+ 		addr += pagesize;
+ 	}
+-	fprintf (stderr, " passed\n");
++	fprintf (stdout, " passed\n");
+ }
+ 
+ void check_file_fixed_mmaps(void)
+@@ -384,7 +384,7 @@ void check_file_fixed_mmaps(void)
+ 	addr = mmap(NULL, pagesize * 40 * 4, PROT_READ, 
+ 		    MAP_PRIVATE | MAP_ANONYMOUS,
+ 		    -1, 0);
+-	fprintf (stderr, "%s addr=%p", __func__, (void *)addr);
++	fprintf (stdout, "%s addr=%p", __func__, (void *)addr);
+ 	fail_unless (addr != MAP_FAILED);
+ 
+ 	for (i = 0; i < 40; i++)
+@@ -426,7 +426,7 @@ void check_file_fixed_mmaps(void)
+ 		munmap (p4, pagesize);
+ 		addr += pagesize * 4;
+ 	}
+-	fprintf (stderr, " passed\n");
++	fprintf (stdout, " passed\n");
+ }
+ 
+ void checked_write(int fd, const void *buf, size_t count)
 -- 
 2.17.0
