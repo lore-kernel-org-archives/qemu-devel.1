@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fApvW-00021G-8B
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 00:51:39 -0400
+	(envelope-from <peterx@redhat.com>) id 1fApvT-00020x-OC
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 00:51:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fApvV-0006WT-9D
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 00:51:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58562 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fApvP-0006Um-PZ
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 00:51:35 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60898 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fApvV-0006WL-4c
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 00:51:37 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fApvP-0006UR-KY
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 00:51:31 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Tue, 24 Apr 2018 12:51:11 +0800
-Message-Id: <20180424045112.12963-4-peterx@redhat.com>
+Date: Tue, 24 Apr 2018 12:51:09 +0800
+Message-Id: <20180424045112.12963-2-peterx@redhat.com>
 In-Reply-To: <20180424045112.12963-1-peterx@redhat.com>
 References: <20180424045112.12963-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 3/4] QemuMutex: support --enable-debug-mutex
+Subject: [Qemu-devel] [PATCH v5 1/4] tests/atomic_add-bench: add -m option
+ to use mutexes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,135 +27,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Emilio G . Cota" <cota@braap.org>, peterx@redhat.com
 
-We have had some tracing tools for mutex but it's not easy to use them
-for e.g. dead locks.  Let's provide "--enable-debug-mutex" parameter
-when configure to allow QemuMutex to store the last owner that took
-specific lock.  It will be easy to use this tool to debug deadlocks
-since we can directly know who took the lock then as long as we can have
-a debugger attached to the process.
+From: "Emilio G. Cota" <cota@braap.org>
 
+This allows us to use atomic-add-bench as a microbenchmark
+for evaluating qemu_mutex_lock's performance.
+
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+[cherry picked from https://github.com/cota/qemu/commit/f04f34df]
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- configure                   | 10 ++++++++++
- include/qemu/thread-posix.h |  4 ++++
- include/qemu/thread-win32.h |  4 ++++
- util/qemu-thread-common.h   | 12 ++++++++++++
- 4 files changed, 30 insertions(+)
+ tests/atomic_add-bench.c | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
 
-diff --git a/configure b/configure
-index 0a19b033bc..a80af735b2 100755
---- a/configure
-+++ b/configure
-@@ -451,6 +451,7 @@ jemalloc="no"
- replication="yes"
- vxhs=""
- libxml2=""
-+debug_mutex="no"
+diff --git a/tests/atomic_add-bench.c b/tests/atomic_add-bench.c
+index caa1e8e689..f96d448f77 100644
+--- a/tests/atomic_add-bench.c
++++ b/tests/atomic_add-bench.c
+@@ -8,6 +8,7 @@ struct thread_info {
+ } QEMU_ALIGNED(64);
  
- supported_cpu="no"
- supported_os="no"
-@@ -1374,6 +1375,10 @@ for opt do
-   ;;
-   --disable-git-update) git_update=no
-   ;;
-+  --enable-debug-mutex) debug_mutex=yes
-+  ;;
-+  --disable-debug-mutex) debug_mutex=no
-+  ;;
-   *)
-       echo "ERROR: unknown option $opt"
-       echo "Try '$0 --help' for more information"
-@@ -1631,6 +1636,7 @@ disabled with --disable-FEATURE, default is enabled if available:
-   crypto-afalg    Linux AF_ALG crypto backend driver
-   vhost-user      vhost-user support
-   capstone        capstone disassembler support
-+  debug-mutex     mutex debugging support
+ struct count {
++    QemuMutex lock;
+     unsigned long val;
+ } QEMU_ALIGNED(64);
  
- NOTE: The object files are built at the place where configure is launched
- EOF
-@@ -5874,6 +5880,7 @@ echo "avx2 optimization $avx2_opt"
- echo "replication support $replication"
- echo "VxHS block device $vxhs"
- echo "capstone          $capstone"
-+echo "mutex debugging   $debug_mutex"
+@@ -18,11 +19,13 @@ static unsigned int n_ready_threads;
+ static struct count *counts;
+ static unsigned int duration = 1;
+ static unsigned int range = 1024;
++static bool use_mutex;
+ static bool test_start;
+ static bool test_stop;
  
- if test "$sdl_too_old" = "yes"; then
- echo "-> Your SDL version is too old - please upgrade to have SDL support"
-@@ -6602,6 +6609,9 @@ fi
- if test "$capstone" != "no" ; then
-   echo "CONFIG_CAPSTONE=y" >> $config_host_mak
- fi
-+if test "$debug_mutex" = "yes" ; then
-+  echo "CONFIG_DEBUG_MUTEX=y" >> $config_host_mak
-+fi
+ static const char commands_string[] =
+     " -n = number of threads\n"
++    " -m = use mutexes instead of atomic increments\n"
+     " -d = duration in seconds\n"
+     " -r = range (will be rounded up to pow2)";
  
- # Hold two types of flag:
- #   CONFIG_THREAD_SETNAME_BYTHREAD  - we've got a way of setting the name on
-diff --git a/include/qemu/thread-posix.h b/include/qemu/thread-posix.h
-index f3f47e426f..fd27b34128 100644
---- a/include/qemu/thread-posix.h
-+++ b/include/qemu/thread-posix.h
-@@ -12,6 +12,10 @@ typedef QemuMutex QemuRecMutex;
+@@ -59,7 +62,13 @@ static void *thread_func(void *arg)
  
- struct QemuMutex {
-     pthread_mutex_t lock;
-+#ifdef CONFIG_DEBUG_MUTEX
-+    const char *file;
-+    int line;
-+#endif
-     bool initialized;
- };
- 
-diff --git a/include/qemu/thread-win32.h b/include/qemu/thread-win32.h
-index 3a05e3b3aa..d668d789b4 100644
---- a/include/qemu/thread-win32.h
-+++ b/include/qemu/thread-win32.h
-@@ -5,6 +5,10 @@
- 
- struct QemuMutex {
-     SRWLOCK lock;
-+#ifdef CONFIG_DEBUG_MUTEX
-+    const char *file;
-+    int line;
-+#endif
-     bool initialized;
- };
- 
-diff --git a/util/qemu-thread-common.h b/util/qemu-thread-common.h
-index 3bf37c9963..f7ec7b9fe3 100644
---- a/util/qemu-thread-common.h
-+++ b/util/qemu-thread-common.h
-@@ -19,6 +19,10 @@
- 
- static inline void qemu_mutex_post_init(QemuMutex *mutex)
- {
-+#ifdef CONFIG_DEBUG_MUTEX
-+    mutex->file = NULL;
-+    mutex->line = 0;
-+#endif
-     mutex->initialized = true;
+         info->r = xorshift64star(info->r);
+         index = info->r & (range - 1);
+-        atomic_inc(&counts[index].val);
++        if (use_mutex) {
++            qemu_mutex_lock(&counts[index].lock);
++            counts[index].val += 1;
++            qemu_mutex_unlock(&counts[index].lock);
++        } else {
++            atomic_inc(&counts[index].val);
++        }
+     }
+     return NULL;
  }
+@@ -91,6 +100,9 @@ static void create_threads(void)
+     th_info = g_new(struct thread_info, n_threads);
+     counts = qemu_memalign(64, sizeof(*counts) * range);
+     memset(counts, 0, sizeof(*counts) * range);
++    for (i = 0; i < range; i++) {
++        qemu_mutex_init(&counts[i].lock);
++    }
  
-@@ -31,12 +35,20 @@ static inline void qemu_mutex_pre_lock(QemuMutex *mutex,
- static inline void qemu_mutex_post_lock(QemuMutex *mutex,
-                                         const char *file, int line)
- {
-+#ifdef CONFIG_DEBUG_MUTEX
-+    mutex->file = file;
-+    mutex->line = line;
-+#endif
-     trace_qemu_mutex_locked(mutex, file, line);
- }
+     for (i = 0; i < n_threads; i++) {
+         struct thread_info *info = &th_info[i];
+@@ -131,7 +143,7 @@ static void parse_args(int argc, char *argv[])
+     int c;
  
- static inline void qemu_mutex_pre_unlock(QemuMutex *mutex,
-                                          const char *file, int line)
- {
-+#ifdef CONFIG_DEBUG_MUTEX
-+    mutex->file = NULL;
-+    mutex->line = 0;
-+#endif
-     trace_qemu_mutex_unlock(mutex, file, line);
- }
- 
+     for (;;) {
+-        c = getopt(argc, argv, "hd:n:r:");
++        c = getopt(argc, argv, "hd:n:mr:");
+         if (c < 0) {
+             break;
+         }
+@@ -145,6 +157,9 @@ static void parse_args(int argc, char *argv[])
+         case 'n':
+             n_threads = atoi(optarg);
+             break;
++        case 'm':
++            use_mutex = true;
++            break;
+         case 'r':
+             range = pow2ceil(atoi(optarg));
+             break;
 -- 
 2.14.3
