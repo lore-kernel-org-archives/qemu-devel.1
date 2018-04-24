@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fAzwb-00064Q-JL
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:33:26 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fAzwa-0001fj-PG
+	(envelope-from <alex.bennee@linaro.org>) id 1fAzwa-000647-CD
 	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:33:25 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:38472)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <alex.bennee@linaro.org>) id 1fAzwX-0001a7-AN
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:33:24 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:33393)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fAzwa-0001eE-Ho
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:33:24 -0400
-Received: by mail-wr0-x244.google.com with SMTP id h3-v6so50426354wrh.5
-	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 08:33:24 -0700 (PDT)
+	id 1fAzwX-0001ZI-40
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:33:21 -0400
+Received: by mail-wr0-x243.google.com with SMTP id o4-v6so141298wrm.0
+	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 08:33:21 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 24 Apr 2018 16:23:38 +0100
-Message-Id: <20180424152405.10304-20-alex.bennee@linaro.org>
+Date: Tue, 24 Apr 2018 16:23:44 +0100
+Message-Id: <20180424152405.10304-26-alex.bennee@linaro.org>
 In-Reply-To: <20180424152405.10304-1-alex.bennee@linaro.org>
 References: <20180424152405.10304-1-alex.bennee@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 19/46] tests/tcg/i386: Build fix for
- hello-i386
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3 25/46] tests/tcg/i386/test-i386: fix printf
+ format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +31,25 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-From: Fam Zheng <famz@redhat.com>
-
-We have -Werror=missing-prototype, add a dummy prototype to avoid that
-warning.
-
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/tcg/i386/hello-i386.c | 1 +
- 1 file changed, 1 insertion(+)
+ tests/tcg/i386/test-i386.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/tcg/i386/hello-i386.c b/tests/tcg/i386/hello-i386.c
-index fa00380de2..cfeb24b2f5 100644
---- a/tests/tcg/i386/hello-i386.c
-+++ b/tests/tcg/i386/hello-i386.c
-@@ -20,6 +20,7 @@ static inline int write(int fd, const char * buf, int len)
-   return status;
+diff --git a/tests/tcg/i386/test-i386.c b/tests/tcg/i386/test-i386.c
+index caef4da176..a29b41e764 100644
+--- a/tests/tcg/i386/test-i386.c
++++ b/tests/tcg/i386/test-i386.c
+@@ -2258,7 +2258,7 @@ SSE_OP(a ## sd);
+         "pop %0\n"\
+         : "=rm" (eflags)\
+         : "x" (a.dq), "x" (b.dq));\
+-    printf("%-9s: a=%f b=%f cc=%04x\n",\
++    printf("%-9s: a=%f b=%f cc=%04lx\n",\
+            #op, a1, b1,\
+            eflags & (CC_C | CC_P | CC_Z | CC_S | CC_O | CC_A));\
  }
- 
-+void _start(void);
- void _start(void)
- {
-     write(1, "Hello World\n", 12);
 -- 
 2.17.0
