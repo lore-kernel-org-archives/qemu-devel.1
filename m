@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fAzpe-000051-2u
+	(envelope-from <kwolf@redhat.com>) id 1fAzph-00008m-Fq
 	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:26:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fAzpb-0000KA-Bv
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:26:14 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fAzpe-0000Oi-CC
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:26:17 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 24 Apr 2018 17:25:13 +0200
-Message-Id: <20180424152515.25664-32-kwolf@redhat.com>
+Date: Tue, 24 Apr 2018 17:25:12 +0200
+Message-Id: <20180424152515.25664-31-kwolf@redhat.com>
 In-Reply-To: <20180424152515.25664-1-kwolf@redhat.com>
 References: <20180424152515.25664-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 31/33] job: Move completion and
- cancellation to Job
+Subject: [Qemu-devel] [RFC PATCH 30/33] job: Move transactions to Job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,725 +22,971 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-This moves the top-level job completion and cancellation functions from
-BlockJob to Job.
+This moves the logic that implements job transactions from BlockJob to
+Job.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/block/blockjob.h     | 55 --------------------------------
- include/block/blockjob_int.h | 18 -----------
- include/qemu/job.h           | 53 +++++++++++++++++++++++++++++-
- block.c                      |  2 +-
- block/backup.c               |  3 +-
- block/commit.c               |  8 ++---
- block/mirror.c               |  6 ++--
- block/replication.c          |  4 +--
- block/stream.c               |  2 +-
- blockdev.c                   |  8 ++---
- blockjob.c                   | 76 --------------------------------------------
- job.c                        | 68 +++++++++++++++++++++++++++++++++++++++
- qemu-img.c                   |  2 +-
- tests/test-bdrv-drain.c      |  5 ++-
- tests/test-blockjob-txn.c    | 14 ++++----
- tests/test-blockjob.c        | 21 ++++++------
- block/trace-events           |  3 --
- trace-events                 |  1 +
- 18 files changed, 157 insertions(+), 192 deletions(-)
+ include/block/blockjob.h     |  54 ----------
+ include/block/blockjob_int.h |  10 --
+ include/qemu/job.h           |  70 +++++++++++--
+ blockdev.c                   |   6 +-
+ blockjob.c                   | 238 +------------------------------------------
+ job.c                        | 233 ++++++++++++++++++++++++++++++++++++++++--
+ tests/test-blockjob-txn.c    |  12 +--
+ tests/test-blockjob.c        |   2 +-
+ 8 files changed, 303 insertions(+), 322 deletions(-)
 
 diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index e8e9e5f370..7a0d95e789 100644
+index fbb8f54dc6..e8e9e5f370 100644
 --- a/include/block/blockjob.h
 +++ b/include/block/blockjob.h
-@@ -141,15 +141,6 @@ void block_job_remove_all_bdrv(BlockJob *job);
- void block_job_set_speed(BlockJob *job, int64_t speed, Error **errp);
+@@ -33,7 +33,6 @@
+ #define SLICE_TIME 100000000ULL /* ns */
+ 
+ typedef struct BlockJobDriver BlockJobDriver;
+-typedef struct JobTxn JobTxn;
  
  /**
-- * block_job_cancel:
-- * @job: The job to be canceled.
-- * @force: Quit a job without waiting for data to be in sync.
+  * BlockJob:
+@@ -84,8 +83,6 @@ typedef struct BlockJob {
+ 
+     /** BlockDriverStates that are involved in this block job */
+     GSList *nodes;
+-
+-    JobTxn *txn;
+ } BlockJob;
+ 
+ /**
+@@ -153,22 +150,6 @@ void block_job_set_speed(BlockJob *job, int64_t speed, Error **errp);
+ void block_job_cancel(BlockJob *job, bool force);
+ 
+ /**
+- * block_job_finalize:
+- * @job: The job to fully commit and finish.
+- * @errp: Error object.
 - *
-- * Asynchronously cancel the specified job.
+- * For jobs that have finished their work and are pending
+- * awaiting explicit acknowledgement to commit their work,
+- * This will commit that work.
+- *
+- * FIXME: Make the below statement universally true:
+- * For jobs that support the manual workflow mode, all graph
+- * changes that occur as a result will occur after this command
+- * and before a successful reply.
 - */
--void block_job_cancel(BlockJob *job, bool force);
+-void block_job_finalize(BlockJob *job, Error **errp);
 -
 -/**
   * block_job_dismiss:
   * @job: The job to be dismissed.
   * @errp: Error object.
-@@ -186,52 +177,6 @@ void block_job_progress_set_remaining(BlockJob *job, uint64_t remaining);
- BlockJobInfo *block_job_query(BlockJob *job, Error **errp);
+@@ -260,41 +241,6 @@ int block_job_complete_sync(BlockJob *job, Error **errp);
+ void block_job_iostatus_reset(BlockJob *job);
  
  /**
-- * block_job_user_cancel:
-- * @job: The job to be cancelled.
-- * @force: Quit a job without waiting for data to be in sync.
+- * block_job_txn_new:
 - *
-- * Cancels the specified job, but may refuse to do so if the
-- * operation isn't currently meaningful.
+- * Allocate and return a new block job transaction.  Jobs can be added to the
+- * transaction using block_job_txn_add_job().
+- *
+- * The transaction is automatically freed when the last job completes or is
+- * cancelled.
+- *
+- * All jobs in the transaction either complete successfully or fail/cancel as a
+- * group.  Jobs wait for each other before completing.  Cancelling one job
+- * cancels all jobs in the transaction.
 - */
--void block_job_user_cancel(BlockJob *job, bool force, Error **errp);
+-JobTxn *block_job_txn_new(void);
 -
 -/**
-- * block_job_cancel_sync:
-- * @job: The job to be canceled.
+- * block_job_txn_unref:
 - *
-- * Synchronously cancel the job.  The completion callback is called
-- * before the function returns.  The job may actually complete
-- * instead of canceling itself; the circumstances under which this
-- * happens depend on the kind of job that is active.
-- *
-- * Returns the return value from the job if the job actually completed
-- * during the call, or -ECANCELED if it was canceled.
+- * Release a reference that was previously acquired with block_job_txn_add_job
+- * or block_job_txn_new. If it's the last reference to the object, it will be
+- * freed.
 - */
--int block_job_cancel_sync(BlockJob *job);
+-void block_job_txn_unref(JobTxn *txn);
 -
 -/**
-- * block_job_cancel_sync_all:
+- * block_job_txn_add_job:
+- * @txn: The transaction (may be NULL)
+- * @job: Job to add to the transaction
 - *
-- * Synchronously cancels all jobs using block_job_cancel_sync().
+- * Add @job to the transaction.  The @job must not already be in a transaction.
+- * The caller must call either block_job_txn_unref() or block_job_completed()
+- * to release the reference that is automatically grabbed here.
 - */
--void block_job_cancel_sync_all(void);
+-void block_job_txn_add_job(JobTxn *txn, BlockJob *job);
 -
 -/**
-- * block_job_complete_sync:
-- * @job: The job to be completed.
-- * @errp: Error object which may be set by block_job_complete(); this is not
-- *        necessarily set on every error, the job return value has to be
-- *        checked as well.
-- *
-- * Synchronously complete the job.  The completion callback is called before the
-- * function returns, unless it is NULL (which is permissible when using this
-- * function).
-- *
-- * Returns the return value from the job.
-- */
--int block_job_complete_sync(BlockJob *job, Error **errp);
--
--/**
-  * block_job_iostatus_reset:
-  * @job: The job whose I/O status should be reset.
+  * block_job_is_internal:
+  * @job: The job to determine if it is user-visible or not.
   *
 diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-index 2519b1f879..2fdf35a9fd 100644
+index 13c9924b9c..2519b1f879 100644
 --- a/include/block/blockjob_int.h
 +++ b/include/block/blockjob_int.h
-@@ -124,24 +124,6 @@ void block_job_yield(BlockJob *job);
- int64_t block_job_ratelimit_get_delay(BlockJob *job, uint64_t n);
+@@ -38,16 +38,6 @@ struct BlockJobDriver {
+     /** Generic JobDriver callbacks and settings */
+     JobDriver job_driver;
  
- /**
-- * block_job_completed:
-- * @job: The job being completed.
-- * @ret: The status code.
-- *
-- * Call the completion function that was registered at creation time, and
-- * free @job.
-- */
--void block_job_completed(BlockJob *job, int ret);
+-    /**
+-     * If the callback is not NULL, prepare will be invoked when all the jobs
+-     * belonging to the same transaction complete; or upon this job's completion
+-     * if it is not in a transaction.
+-     *
+-     * This callback will not be invoked if the job has already failed.
+-     * If it fails, abort and then clean will be called.
+-     */
+-    int (*prepare)(BlockJob *job);
 -
--/**
-- * block_job_enter:
-- * @job: The job to enter.
-- *
-- * Continue the specified job by entering the coroutine.
-- */
--void block_job_enter(BlockJob *job);
--
--/**
-  * block_job_event_ready:
-  * @job: The job which is now ready to be completed.
-  *
+     /*
+      * If the callback is not NULL, it will be invoked before the job is
+      * resumed in a new AioContext.  This is the place to move any resources
 diff --git a/include/qemu/job.h b/include/qemu/job.h
-index fceb18c6c7..9df0f5560b 100644
+index 0c8e7e85d0..fceb18c6c7 100644
 --- a/include/qemu/job.h
 +++ b/include/qemu/job.h
-@@ -392,8 +392,59 @@ Job *job_get(const char *id);
- /** The @job could not be started, free it. */
- void job_early_fail(Job *job);
+@@ -32,6 +32,8 @@
+ #include "block/aio.h"
  
-+/**
-+ * @job: The job being completed.
-+ * @ret: The status code.
-+ *
-+ * Marks @job as completed. If @ret is non-zero, the job transaction it is part
-+ * of is aborted. If @ret is zero, the job moves into the WAITING state. If it
-+ * is the last job to complete in its transaction, all jobs in the transaction
-+ * move from WAITING to PENDING.
-+ */
-+void job_completed(Job *job, int ret);
+ typedef struct JobDriver JobDriver;
++typedef struct JobTxn JobTxn;
 +
- /** Asynchronously complete the specified @job. */
--void job_complete(Job *job, Error **errp);;
-+void job_complete(Job *job, Error **errp);
-+
-+/**
-+ * Asynchronously cancel the specified @job. If @force is true, the job should
-+ * be cancelled immediately without waiting for a consistent state.
-+ */
-+void job_cancel(Job *job, bool force);
-+
-+/**
-+ * Cancels the specified job like job_cancel(), but may refuse to do so if the
-+ * operation isn't meaningful in the current state of the job.
-+ */
-+void job_user_cancel(Job *job, bool force, Error **errp);
-+
-+/**
-+ * Synchronously cancel the @job.  The completion callback is called
-+ * before the function returns.  The job may actually complete
-+ * instead of canceling itself; the circumstances under which this
-+ * happens depend on the kind of job that is active.
-+ *
-+ * Returns the return value from the job if the job actually completed
-+ * during the call, or -ECANCELED if it was canceled.
-+ */
-+int job_cancel_sync(Job *job);
-+
-+/** Synchronously cancels all jobs using job_cancel_sync(). */
-+void job_cancel_sync_all(void);
-+
-+/**
-+ * @job: The job to be completed.
-+ * @errp: Error object which may be set by job_complete(); this is not
-+ *        necessarily set on every error, the job return value has to be
-+ *        checked as well.
-+ *
-+ * Synchronously complete the job.  The completion callback is called before the
-+ * function returns, unless it is NULL (which is permissible when using this
-+ * function).
-+ *
-+ * Returns the return value from the job.
-+ */
-+int job_complete_sync(Job *job, Error **errp);
  
  /**
-  * For a @job that has finished its work and is pending awaiting explicit
-diff --git a/block.c b/block.c
-index a2caadf0a0..6352698367 100644
---- a/block.c
-+++ b/block.c
-@@ -3362,7 +3362,7 @@ static void bdrv_close(BlockDriverState *bs)
+  * Long-running operation.
+@@ -133,6 +135,9 @@ typedef struct Job {
+     /** Element of the list of jobs */
+     QLIST_ENTRY(Job) job_list;
  
- void bdrv_close_all(void)
- {
--    block_job_cancel_sync_all();
-+    job_cancel_sync_all();
-     nbd_export_close_all();
++    /** Transaction this job is part of */
++    JobTxn *txn;
++
+     /** Element of the list of jobs in a job transaction */
+     QLIST_ENTRY(Job) txn_list;
+ } Job;
+@@ -184,6 +189,16 @@ struct JobDriver {
+     void (*drain)(Job *job);
  
-     /* Drop references from requests still in flight, such as canceled block
-diff --git a/block/backup.c b/block/backup.c
-index f83b14d8dc..ecc1e9164c 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -319,10 +319,9 @@ typedef struct {
+     /**
++     * If the callback is not NULL, prepare will be invoked when all the jobs
++     * belonging to the same transaction complete; or upon this job's completion
++     * if it is not in a transaction.
++     *
++     * This callback will not be invoked if the job has already failed.
++     * If it fails, abort and then clean will be called.
++     */
++    int (*prepare)(Job *job);
++
++    /**
+      * If the callback is not NULL, it will be invoked when all the jobs
+      * belonging to the same transaction complete; or upon this job's
+      * completion if it is not in a transaction. Skipped if NULL.
+@@ -227,20 +242,52 @@ typedef enum JobCreateFlags {
+     JOB_MANUAL_DISMISS = 0x04,
+ } JobCreateFlags;
  
- static void backup_complete(Job *job, void *opaque)
- {
--    BlockJob *bjob = container_of(job, BlockJob, job);
-     BackupCompleteData *data = opaque;
++/**
++ * Allocate and return a new job transaction. Jobs can be added to the
++ * transaction using job_txn_add_job().
++ *
++ * The transaction is automatically freed when the last job completes or is
++ * cancelled.
++ *
++ * All jobs in the transaction either complete successfully or fail/cancel as a
++ * group.  Jobs wait for each other before completing.  Cancelling one job
++ * cancels all jobs in the transaction.
++ */
++JobTxn *job_txn_new(void);
++
++/**
++ * Release a reference that was previously acquired with job_txn_add_job or
++ * job_txn_new. If it's the last reference to the object, it will be freed.
++ */
++void job_txn_unref(JobTxn *txn);
++
++/**
++ * @txn: The transaction (may be NULL)
++ * @job: Job to add to the transaction
++ *
++ * Add @job to the transaction.  The @job must not already be in a transaction.
++ * The caller must call either block_job_txn_unref() or block_job_completed()
++ * to release the reference that is automatically grabbed here.
++ *
++ * If @txn is NULL, the function does nothing.
++ */
++void job_txn_add_job(JobTxn *txn, Job *job);
  
--    block_job_completed(bjob, data->ret);
-+    job_completed(job, data->ret);
-     g_free(data);
- }
+ /**
+  * Create a new long-running job and return it.
+  *
+  * @job_id: The id of the newly-created job, or %NULL for internal jobs
+  * @driver: The class object for the newly-created job.
++ * @txn: The transaction this job belongs to, if any. %NULL otherwise.
+  * @ctx: The AioContext to run the job coroutine in.
+  * @flags: Creation flags for the job. See @JobCreateFlags.
+  * @cb: Completion function for the job.
+  * @opaque: Opaque pointer value passed to @cb.
+  * @errp: Error object.
+  */
+-void *job_create(const char *job_id, const JobDriver *driver, AioContext *ctx,
+-                 int flags, BlockCompletionFunc *cb, void *opaque, Error **errp);
++void *job_create(const char *job_id, const JobDriver *driver, JobTxn *txn,
++                 AioContext *ctx, int flags, BlockCompletionFunc *cb,
++                 void *opaque, Error **errp);
  
-diff --git a/block/commit.c b/block/commit.c
-index 02a8af9127..56c3810bad 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -112,12 +112,12 @@ static void commit_complete(Job *job, void *opaque)
-     blk_unref(s->top);
+ /**
+  * Add a reference to Job refcnt, it will be decreased with job_unref, and then
+@@ -260,9 +307,6 @@ void job_event_cancelled(Job *job);
+ /** To be called when a successfully completed job is finalised. */
+ void job_event_completed(Job *job);
  
-     /* If there is more than one reference to the job (e.g. if called from
--     * block_job_finish_sync()), block_job_completed() won't free it and
--     * therefore the blockers on the intermediate nodes remain. This would
--     * cause bdrv_set_backing_hd() to fail. */
-+     * block_job_finish_sync()), job_completed() won't free it and therefore
-+     * the blockers on the intermediate nodes remain. This would cause
-+     * bdrv_set_backing_hd() to fail. */
-     block_job_remove_all_bdrv(bjob);
+-/** To be called when the job transitions to PENDING */
+-void job_event_pending(Job *job);
+-
+ /**
+  * @job: A job that has not yet been started.
+  *
+@@ -351,6 +395,16 @@ void job_early_fail(Job *job);
+ /** Asynchronously complete the specified @job. */
+ void job_complete(Job *job, Error **errp);;
  
--    block_job_completed(&s->common, ret);
-+    job_completed(job, ret);
-     g_free(data);
++/**
++ * For a @job that has finished its work and is pending awaiting explicit
++ * acknowledgement to commit its work, this will commit that work.
++ *
++ * FIXME: Make the below statement universally true:
++ * For jobs that support the manual workflow mode, all graph changes that occur
++ * as a result will occur after this command and before a successful reply.
++ */
++void job_finalize(Job *job, Error **errp);
++
+ typedef void JobDeferToMainLoopFn(Job *job, void *opaque);
  
-     /* If bdrv_drop_intermediate() didn't already do that, remove the commit
-diff --git a/block/mirror.c b/block/mirror.c
-index 9eb5a21cd9..b722a407e1 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -498,7 +498,7 @@ static void mirror_exit(Job *job, void *opaque)
-     bdrv_release_dirty_bitmap(src, s->dirty_bitmap);
+ /**
+@@ -389,8 +443,8 @@ void job_resume(Job *job);
+ void job_do_dismiss(Job *job);
+ int job_finalize_single(Job *job);
+ void job_update_rc(Job *job);
+-
+-typedef struct BlockJob BlockJob;
+-void block_job_txn_del_job(BlockJob *job);
++void job_cancel_async(Job *job, bool force);
++void job_completed_txn_abort(Job *job);
++void job_completed_txn_success(Job *job);
  
-     /* Make sure that the source BDS doesn't go away before we called
--     * block_job_completed(). */
-+     * job_completed(). */
-     bdrv_ref(src);
-     bdrv_ref(mirror_top_bs);
-     bdrv_ref(target_bs);
-@@ -581,7 +581,7 @@ static void mirror_exit(Job *job, void *opaque)
-     blk_set_perm(bjob->blk, 0, BLK_PERM_ALL, &error_abort);
-     blk_insert_bs(bjob->blk, mirror_top_bs, &error_abort);
- 
--    block_job_completed(&s->common, data->ret);
-+    job_completed(job, data->ret);
- 
-     g_free(data);
-     bdrv_drained_end(src);
-@@ -950,7 +950,7 @@ static void mirror_complete(Job *job, Error **errp)
-     }
- 
-     s->should_complete = true;
--    block_job_enter(&s->common);
-+    job_enter(job);
- }
- 
- static void mirror_pause(Job *job)
-diff --git a/block/replication.c b/block/replication.c
-index 8241400155..f3b2839531 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -145,7 +145,7 @@ static void replication_close(BlockDriverState *bs)
-         replication_stop(s->rs, false, NULL);
-     }
-     if (s->stage == BLOCK_REPLICATION_FAILOVER) {
--        block_job_cancel_sync(s->active_disk->bs->job);
-+        job_cancel_sync(&s->active_disk->bs->job->job);
-     }
- 
-     if (s->mode == REPLICATION_MODE_SECONDARY) {
-@@ -679,7 +679,7 @@ static void replication_stop(ReplicationState *rs, bool failover, Error **errp)
-          * disk, secondary disk in backup_job_completed().
-          */
-         if (s->secondary_disk->bs->job) {
--            block_job_cancel_sync(s->secondary_disk->bs->job);
-+            job_cancel_sync(&s->secondary_disk->bs->job->job);
-         }
- 
-         if (!failover) {
-diff --git a/block/stream.c b/block/stream.c
-index b996278ab3..8546c412cd 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -93,7 +93,7 @@ out:
-     }
- 
-     g_free(s->backing_file_str);
--    block_job_completed(&s->common, data->ret);
-+    job_completed(job, data->ret);
-     g_free(data);
- }
- 
+ #endif
 diff --git a/blockdev.c b/blockdev.c
-index ec05ad89ae..c3e5f6a804 100644
+index 69471c62b3..ec05ad89ae 100644
 --- a/blockdev.c
 +++ b/blockdev.c
-@@ -150,7 +150,7 @@ void blockdev_mark_auto_del(BlockBackend *blk)
-         aio_context_acquire(aio_context);
- 
-         if (bs->job) {
--            block_job_cancel(bs->job, false);
-+            job_cancel(&bs->job->job, false);
-         }
- 
-         aio_context_release(aio_context);
-@@ -1925,7 +1925,7 @@ static void drive_backup_abort(BlkActionState *common)
-         aio_context = bdrv_get_aio_context(state->bs);
-         aio_context_acquire(aio_context);
- 
--        block_job_cancel_sync(state->job);
-+        job_cancel_sync(&state->job->job);
- 
-         aio_context_release(aio_context);
-     }
-@@ -2023,7 +2023,7 @@ static void blockdev_backup_abort(BlkActionState *common)
-         aio_context = bdrv_get_aio_context(state->bs);
-         aio_context_acquire(aio_context);
- 
--        block_job_cancel_sync(state->job);
-+        job_cancel_sync(&state->job->job);
- 
-         aio_context_release(aio_context);
-     }
-@@ -3851,7 +3851,7 @@ void qmp_block_job_cancel(const char *device,
+@@ -2255,7 +2255,7 @@ void qmp_transaction(TransactionActionList *dev_list,
+      */
+     props = get_transaction_properties(props);
+     if (props->completion_mode != ACTION_COMPLETION_MODE_INDIVIDUAL) {
+-        block_job_txn = block_job_txn_new();
++        block_job_txn = job_txn_new();
      }
  
-     trace_qmp_block_job_cancel(job);
--    block_job_user_cancel(job, force, errp);
-+    job_user_cancel(&job->job, force, errp);
- out:
+     /* drain all i/o before any operations */
+@@ -2314,7 +2314,7 @@ exit:
+     if (!has_props) {
+         qapi_free_TransactionProperties(props);
+     }
+-    block_job_txn_unref(block_job_txn);
++    job_txn_unref(block_job_txn);
+ }
+ 
+ void qmp_eject(bool has_device, const char *device,
+@@ -3908,7 +3908,7 @@ void qmp_block_job_finalize(const char *id, Error **errp)
+     }
+ 
+     trace_qmp_block_job_finalize(job);
+-    block_job_finalize(job, errp);
++    job_finalize(&job->job, errp);
      aio_context_release(aio_context);
  }
+ 
 diff --git a/blockjob.c b/blockjob.c
-index b3d4c34e12..0cbe655c0e 100644
+index 3afa0dbdca..b3d4c34e12 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -256,63 +256,6 @@ void block_job_dismiss(BlockJob **jobptr, Error **errp)
-     *jobptr = NULL;
+@@ -36,19 +36,6 @@
+ #include "qemu/coroutine.h"
+ #include "qemu/timer.h"
+ 
+-/* Transactional group of block jobs */
+-struct JobTxn {
+-
+-    /* Is this txn being cancelled? */
+-    bool aborting;
+-
+-    /* List of jobs */
+-    QLIST_HEAD(, Job) jobs;
+-
+-    /* Reference count */
+-    int refcnt;
+-};
+-
+ /*
+  * The block job API is composed of two categories of functions.
+  *
+@@ -95,48 +82,6 @@ BlockJob *block_job_get(const char *id)
+     }
  }
  
--void block_job_cancel(BlockJob *job, bool force)
+-JobTxn *block_job_txn_new(void)
 -{
--    if (job->job.status == JOB_STATUS_CONCLUDED) {
--        job_do_dismiss(&job->job);
+-    JobTxn *txn = g_new0(JobTxn, 1);
+-    QLIST_INIT(&txn->jobs);
+-    txn->refcnt = 1;
+-    return txn;
+-}
+-
+-static void block_job_txn_ref(JobTxn *txn)
+-{
+-    txn->refcnt++;
+-}
+-
+-void block_job_txn_unref(JobTxn *txn)
+-{
+-    if (txn && --txn->refcnt == 0) {
+-        g_free(txn);
+-    }
+-}
+-
+-void block_job_txn_add_job(JobTxn *txn, BlockJob *job)
+-{
+-    if (!txn) {
 -        return;
 -    }
--    job_cancel_async(&job->job, force);
--    if (!job_started(&job->job)) {
--        block_job_completed(job, -ECANCELED);
--    } else if (job->job.deferred_to_main_loop) {
--        job_completed_txn_abort(&job->job);
+-
+-    assert(!job->txn);
+-    job->txn = txn;
+-
+-    QLIST_INSERT_HEAD(&txn->jobs, &job->job, txn_list);
+-    block_job_txn_ref(txn);
+-}
+-
+-void block_job_txn_del_job(BlockJob *job)
+-{
+-    if (job->txn) {
+-        QLIST_REMOVE(&job->job, txn_list);
+-        block_job_txn_unref(job->txn);
+-        job->txn = NULL;
+-    }
+-}
+-
+ static void block_job_attached_aio_context(AioContext *new_context,
+                                            void *opaque);
+ static void block_job_detach_aio_context(void *opaque);
+@@ -146,8 +91,6 @@ void block_job_free(Job *job)
+     BlockJob *bjob = container_of(job, BlockJob, job);
+     BlockDriverState *bs = blk_bs(bjob->blk);
+ 
+-    assert(!bjob->txn);
+-
+     bs->job = NULL;
+     block_job_remove_all_bdrv(bjob);
+     blk_remove_aio_context_notifier(bjob->blk,
+@@ -262,158 +205,6 @@ const BlockJobDriver *block_job_driver(BlockJob *job)
+     return job->driver;
+ }
+ 
+-static int block_job_prepare(BlockJob *job)
+-{
+-    if (job->job.ret == 0 && job->driver->prepare) {
+-        job->job.ret = job->driver->prepare(job);
+-    }
+-    return job->job.ret;
+-}
+-
+-static void job_cancel_async(Job *job, bool force)
+-{
+-    if (job->user_paused) {
+-        /* Do not call job_enter here, the caller will handle it.  */
+-        job->user_paused = false;
+-        if (job->driver->user_resume) {
+-            job->driver->user_resume(job);
+-        }
+-        assert(job->pause_count > 0);
+-        job->pause_count--;
+-    }
+-    job->cancelled = true;
+-    /* To prevent 'force == false' overriding a previous 'force == true' */
+-    job->force_cancel |= force;
+-}
+-
+-static int block_job_txn_apply(JobTxn *txn, int fn(BlockJob *), bool lock)
+-{
+-    AioContext *ctx;
+-    Job *job, *next;
+-    BlockJob *bjob;
+-    int rc = 0;
+-
+-    QLIST_FOREACH_SAFE(job, &txn->jobs, txn_list, next) {
+-        assert(is_block_job(job));
+-        bjob = container_of(job, BlockJob, job);
+-
+-        if (lock) {
+-            ctx = job->aio_context;
+-            aio_context_acquire(ctx);
+-        }
+-        rc = fn(bjob);
+-        if (lock) {
+-            aio_context_release(ctx);
+-        }
+-        if (rc) {
+-            break;
+-        }
+-    }
+-    return rc;
+-}
+-
+-static void block_job_completed_txn_abort(BlockJob *job)
+-{
+-    AioContext *ctx;
+-    JobTxn *txn = job->txn;
+-    Job *other_job;
+-
+-    if (txn->aborting) {
+-        /*
+-         * We are cancelled by another job, which will handle everything.
+-         */
+-        return;
+-    }
+-    txn->aborting = true;
+-    block_job_txn_ref(txn);
+-
+-    /* We are the first failed job. Cancel other jobs. */
+-    QLIST_FOREACH(other_job, &txn->jobs, txn_list) {
+-        ctx = other_job->aio_context;
+-        aio_context_acquire(ctx);
+-    }
+-
+-    /* Other jobs are effectively cancelled by us, set the status for
+-     * them; this job, however, may or may not be cancelled, depending
+-     * on the caller, so leave it. */
+-    QLIST_FOREACH(other_job, &txn->jobs, txn_list) {
+-        if (other_job != &job->job) {
+-            job_cancel_async(other_job, false);
+-        }
+-    }
+-    while (!QLIST_EMPTY(&txn->jobs)) {
+-        other_job = QLIST_FIRST(&txn->jobs);
+-        ctx = other_job->aio_context;
+-        if (!job_is_completed(other_job)) {
+-            assert(job_is_cancelled(other_job));
+-            job_finish_sync(other_job, NULL, NULL);
+-        }
+-        job_finalize_single(other_job);
+-        aio_context_release(ctx);
+-    }
+-
+-    block_job_txn_unref(txn);
+-}
+-
+-static int block_job_needs_finalize(BlockJob *job)
+-{
+-    return !job->job.auto_finalize;
+-}
+-
+-static int block_job_finalize_single(BlockJob *job)
+-{
+-    return job_finalize_single(&job->job);
+-}
+-
+-static void block_job_do_finalize(BlockJob *job)
+-{
+-    int rc;
+-    assert(job && job->txn);
+-
+-    /* prepare the transaction to complete */
+-    rc = block_job_txn_apply(job->txn, block_job_prepare, true);
+-    if (rc) {
+-        block_job_completed_txn_abort(job);
 -    } else {
--        block_job_enter(job);
+-        block_job_txn_apply(job->txn, block_job_finalize_single, true);
 -    }
 -}
 -
--void block_job_user_cancel(BlockJob *job, bool force, Error **errp)
+-static int block_job_transition_to_pending(BlockJob *job)
 -{
--    if (job_apply_verb(&job->job, JOB_VERB_CANCEL, errp)) {
+-    job_state_transition(&job->job, JOB_STATUS_PENDING);
+-    if (!job->job.auto_finalize) {
+-        job_event_pending(&job->job);
+-    }
+-    return 0;
+-}
+-
+-static void block_job_completed_txn_success(BlockJob *job)
+-{
+-    JobTxn *txn = job->txn;
+-    Job *other_job;
+-
+-    job_state_transition(&job->job, JOB_STATUS_WAITING);
+-
+-    /*
+-     * Successful completion, see if there are other running jobs in this
+-     * txn.
+-     */
+-    QLIST_FOREACH(other_job, &txn->jobs, txn_list) {
+-        if (!job_is_completed(other_job)) {
+-            return;
+-        }
+-        assert(other_job->ret == 0);
+-    }
+-
+-    block_job_txn_apply(txn, block_job_transition_to_pending, false);
+-
+-    /* If no jobs need manual finalization, automatically do so */
+-    if (block_job_txn_apply(txn, block_job_needs_finalize, false) == 0) {
+-        block_job_do_finalize(job);
+-    }
+-}
+-
+ /* Assumes the block_job_mutex is held */
+ static bool job_timer_pending(Job *job)
+ {
+@@ -452,15 +243,6 @@ int64_t block_job_ratelimit_get_delay(BlockJob *job, uint64_t n)
+     return ratelimit_calculate_delay(&job->limit, n);
+ }
+ 
+-void block_job_finalize(BlockJob *job, Error **errp)
+-{
+-    assert(job && job->job.id && job->txn);
+-    if (job_apply_verb(&job->job, JOB_VERB_FINALIZE, errp)) {
 -        return;
 -    }
--    block_job_cancel(job, force);
+-    block_job_do_finalize(job);
 -}
 -
--/* A wrapper around block_job_cancel() taking an Error ** parameter so it may be
-- * used with job_finish_sync() without the need for (rather nasty) function
-- * pointer casts there. */
--static void block_job_cancel_err(Job *job, Error **errp)
--{
--    BlockJob *bjob = container_of(job, BlockJob, job);
--    assert(is_block_job(job));
--    block_job_cancel(bjob, false);
--}
--
--int block_job_cancel_sync(BlockJob *job)
--{
--    return job_finish_sync(&job->job, &block_job_cancel_err, NULL);
--}
--
--void block_job_cancel_sync_all(void)
--{
--    BlockJob *job;
--    AioContext *aio_context;
--
--    while ((job = block_job_next(NULL))) {
--        aio_context = blk_get_aio_context(job->blk);
--        aio_context_acquire(aio_context);
--        block_job_cancel_sync(job);
--        aio_context_release(aio_context);
--    }
--}
--
--int block_job_complete_sync(BlockJob *job, Error **errp)
--{
--    return job_finish_sync(&job->job, job_complete, errp);
--}
--
- void block_job_progress_update(BlockJob *job, uint64_t done)
+ void block_job_dismiss(BlockJob **jobptr, Error **errp)
  {
-     job->offset += done;
-@@ -488,25 +431,6 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+     BlockJob *job = *jobptr;
+@@ -484,7 +266,7 @@ void block_job_cancel(BlockJob *job, bool force)
+     if (!job_started(&job->job)) {
+         block_job_completed(job, -ECANCELED);
+     } else if (job->job.deferred_to_main_loop) {
+-        block_job_completed_txn_abort(job);
++        job_completed_txn_abort(&job->job);
+     } else {
+         block_job_enter(job);
+     }
+@@ -655,7 +437,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+         return NULL;
+     }
+ 
+-    job = job_create(job_id, &driver->job_driver, blk_get_aio_context(blk),
++    job = job_create(job_id, &driver->job_driver, txn, blk_get_aio_context(blk),
+                      flags, cb, opaque, errp);
+     if (job == NULL) {
+         blk_unref(blk);
+@@ -703,30 +485,20 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+         }
+     }
+ 
+-    /* Single jobs are modeled as single-job transactions for sake of
+-     * consolidating the job management logic */
+-    if (!txn) {
+-        txn = block_job_txn_new();
+-        block_job_txn_add_job(txn, job);
+-        block_job_txn_unref(txn);
+-    } else {
+-        block_job_txn_add_job(txn, job);
+-    }
+-
      return job;
  }
  
--void block_job_completed(BlockJob *job, int ret)
--{
--    assert(job && job->job.txn && !job_is_completed(&job->job));
--    assert(blk_bs(job->blk)->job == job);
--    job->job.ret = ret;
--    job_update_rc(&job->job);
--    trace_block_job_completed(job, ret, job->job.ret);
--    if (job->job.ret) {
--        job_completed_txn_abort(&job->job);
--    } else {
--        job_completed_txn_success(&job->job);
--    }
--}
--
--void block_job_enter(BlockJob *job)
--{
--    job_enter_cond(&job->job, NULL);
--}
--
- void block_job_yield(BlockJob *job)
+ void block_job_completed(BlockJob *job, int ret)
  {
-     assert(job->job.busy);
-diff --git a/job.c b/job.c
-index f2381b559c..20c901f7a9 100644
---- a/job.c
-+++ b/job.c
-@@ -775,6 +775,74 @@ void job_completed_txn_success(Job *job)
+-    assert(job && job->txn && !job_is_completed(&job->job));
++    assert(job && job->job.txn && !job_is_completed(&job->job));
+     assert(blk_bs(job->blk)->job == job);
+     job->job.ret = ret;
+     job_update_rc(&job->job);
+     trace_block_job_completed(job, ret, job->job.ret);
+     if (job->job.ret) {
+-        block_job_completed_txn_abort(job);
++        job_completed_txn_abort(&job->job);
+     } else {
+-        block_job_completed_txn_success(job);
++        job_completed_txn_success(&job->job);
      }
  }
  
-+void job_completed(Job *job, int ret)
+diff --git a/job.c b/job.c
+index db3d8536f7..f2381b559c 100644
+--- a/job.c
++++ b/job.c
+@@ -63,6 +63,19 @@ bool JobVerbTable[JOB_VERB__MAX][JOB_STATUS__MAX] = {
+     [JOB_VERB_DISMISS]              = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
+ };
+ 
++/* Transactional group of jobs */
++struct JobTxn {
++
++    /* Is this txn being cancelled? */
++    bool aborting;
++
++    /* List of jobs */
++    QLIST_HEAD(, Job) jobs;
++
++    /* Reference count */
++    int refcnt;
++};
++
+ /* Right now, this mutex is only needed to synchronize accesses to job->busy
+  * and job->sleep_timer, such as concurrent calls to job_do_yield and
+  * job_enter. */
+@@ -83,6 +96,71 @@ static void __attribute__((__constructor__)) job_init(void)
+     qemu_mutex_init(&job_mutex);
+ }
+ 
++JobTxn *job_txn_new(void)
 +{
-+    assert(job && job->txn && !job_is_completed(job));
-+    job->ret = ret;
-+    job_update_rc(job);
-+    trace_job_completed(job, ret, job->ret);
-+    if (job->ret) {
-+        job_completed_txn_abort(job);
-+    } else {
-+        job_completed_txn_success(job);
++    JobTxn *txn = g_new0(JobTxn, 1);
++    QLIST_INIT(&txn->jobs);
++    txn->refcnt = 1;
++    return txn;
++}
++
++static void job_txn_ref(JobTxn *txn)
++{
++    txn->refcnt++;
++}
++
++void job_txn_unref(JobTxn *txn)
++{
++    if (txn && --txn->refcnt == 0) {
++        g_free(txn);
 +    }
 +}
 +
-+void job_cancel(Job *job, bool force)
++void job_txn_add_job(JobTxn *txn, Job *job)
 +{
-+    if (job->status == JOB_STATUS_CONCLUDED) {
-+        job_do_dismiss(job);
++    if (!txn) {
 +        return;
 +    }
-+    job_cancel_async(job, force);
-+    if (!job_started(job)) {
-+        job_completed(job, -ECANCELED);
-+    } else if (job->deferred_to_main_loop) {
-+        job_completed_txn_abort(job);
-+    } else {
-+        job_enter(job);
++
++    assert(!job->txn);
++    job->txn = txn;
++
++    QLIST_INSERT_HEAD(&txn->jobs, job, txn_list);
++    job_txn_ref(txn);
++}
++
++static void job_txn_del_job(Job *job)
++{
++    if (job->txn) {
++        QLIST_REMOVE(job, txn_list);
++        job_txn_unref(job->txn);
++        job->txn = NULL;
 +    }
 +}
 +
-+void job_user_cancel(Job *job, bool force, Error **errp)
++static int job_txn_apply(JobTxn *txn, int fn(Job *), bool lock)
 +{
-+    if (job_apply_verb(job, JOB_VERB_CANCEL, errp)) {
++    AioContext *ctx;
++    Job *job, *next;
++    int rc = 0;
++
++    QLIST_FOREACH_SAFE(job, &txn->jobs, txn_list, next) {
++        if (lock) {
++            ctx = job->aio_context;
++            aio_context_acquire(ctx);
++        }
++        rc = fn(job);
++        if (lock) {
++            aio_context_release(ctx);
++        }
++        if (rc) {
++            break;
++        }
++    }
++    return rc;
++}
++
++
+ /* TODO Make static once the whole state machine is in job.c */
+ void job_state_transition(Job *job, JobStatus s1)
+ {
+@@ -185,8 +263,9 @@ static void job_sleep_timer_cb(void *opaque)
+     job_enter(job);
+ }
+ 
+-void *job_create(const char *job_id, const JobDriver *driver, AioContext *ctx,
+-                 int flags, BlockCompletionFunc *cb, void *opaque, Error **errp)
++void *job_create(const char *job_id, const JobDriver *driver, JobTxn *txn,
++                 AioContext *ctx, int flags, BlockCompletionFunc *cb,
++                 void *opaque, Error **errp)
+ {
+     Job *job;
+ 
+@@ -232,6 +311,16 @@ void *job_create(const char *job_id, const JobDriver *driver, AioContext *ctx,
+ 
+     QLIST_INSERT_HEAD(&jobs, job, job_list);
+ 
++    /* Single jobs are modeled as single-job transactions for sake of
++     * consolidating the job management logic */
++    if (!txn) {
++        txn = job_txn_new();
++        job_txn_add_job(txn, job);
++        job_txn_unref(txn);
++    } else {
++        job_txn_add_job(txn, job);
++    }
++
+     return job;
+ }
+ 
+@@ -245,6 +334,7 @@ void job_unref(Job *job)
+     if (--job->refcnt == 0) {
+         assert(job->status == JOB_STATUS_NULL);
+         assert(!timer_pending(&job->sleep_timer));
++        assert(!job->txn);
+ 
+         if (job->driver->free) {
+             job->driver->free(job);
+@@ -267,9 +357,10 @@ void job_event_completed(Job *job)
+     notifier_list_notify(&job->on_finalize_completed, job);
+ }
+ 
+-void job_event_pending(Job *job)
++static int job_event_pending(Job *job)
+ {
+     notifier_list_notify(&job->on_pending, job);
++    return 0;
+ }
+ 
+ /*
+@@ -469,8 +560,7 @@ void job_do_dismiss(Job *job)
+     job->paused = false;
+     job->deferred_to_main_loop = true;
+ 
+-    /* TODO Don't assume it's a BlockJob */
+-    block_job_txn_del_job((BlockJob*) job);
++    job_txn_del_job(job);
+ 
+     job_state_transition(job, JOB_STATUS_NULL);
+     job_unref(job);
+@@ -550,12 +640,141 @@ int job_finalize_single(Job *job)
+         }
+     }
+ 
+-    /* TODO Don't assume it's a BlockJob */
+-    block_job_txn_del_job((BlockJob*) job);
++    job_txn_del_job(job);
+     job_conclude(job);
+     return 0;
+ }
+ 
++void job_cancel_async(Job *job, bool force)
++{
++    if (job->user_paused) {
++        /* Do not call job_enter here, the caller will handle it.  */
++        job->user_paused = false;
++        if (job->driver->user_resume) {
++            job->driver->user_resume(job);
++        }
++        assert(job->pause_count > 0);
++        job->pause_count--;
++    }
++    job->cancelled = true;
++    /* To prevent 'force == false' overriding a previous 'force == true' */
++    job->force_cancel |= force;
++}
++
++void job_completed_txn_abort(Job *job)
++{
++    AioContext *ctx;
++    JobTxn *txn = job->txn;
++    Job *other_job;
++
++    if (txn->aborting) {
++        /*
++         * We are cancelled by another job, which will handle everything.
++         */
 +        return;
 +    }
-+    job_cancel(job, force);
++    txn->aborting = true;
++    job_txn_ref(txn);
++
++    /* We are the first failed job. Cancel other jobs. */
++    QLIST_FOREACH(other_job, &txn->jobs, txn_list) {
++        ctx = other_job->aio_context;
++        aio_context_acquire(ctx);
++    }
++
++    /* Other jobs are effectively cancelled by us, set the status for
++     * them; this job, however, may or may not be cancelled, depending
++     * on the caller, so leave it. */
++    QLIST_FOREACH(other_job, &txn->jobs, txn_list) {
++        if (other_job != job) {
++            job_cancel_async(other_job, false);
++        }
++    }
++    while (!QLIST_EMPTY(&txn->jobs)) {
++        other_job = QLIST_FIRST(&txn->jobs);
++        ctx = other_job->aio_context;
++        if (!job_is_completed(other_job)) {
++            assert(job_is_cancelled(other_job));
++            job_finish_sync(other_job, NULL, NULL);
++        }
++        job_finalize_single(other_job);
++        aio_context_release(ctx);
++    }
++
++    job_txn_unref(txn);
 +}
 +
-+/* A wrapper around job_cancel() taking an Error ** parameter so it may be
-+ * used with job_finish_sync() without the need for (rather nasty) function
-+ * pointer casts there. */
-+static void job_cancel_err(Job *job, Error **errp)
++static int job_prepare(Job *job)
 +{
-+    job_cancel(job, false);
++    if (job->ret == 0 && job->driver->prepare) {
++        job->ret = job->driver->prepare(job);
++    }
++    return job->ret;
 +}
 +
-+int job_cancel_sync(Job *job)
++static int job_needs_finalize(Job *job)
 +{
-+    return job_finish_sync(job, &job_cancel_err, NULL);
++    return !job->auto_finalize;
 +}
 +
-+void job_cancel_sync_all(void)
++static void job_do_finalize(Job *job)
 +{
-+    Job *job;
-+    AioContext *aio_context;
++    int rc;
++    assert(job && job->txn);
 +
-+    while ((job = job_next(NULL))) {
-+        aio_context = job->aio_context;
-+        aio_context_acquire(aio_context);
-+        job_cancel_sync(job);
-+        aio_context_release(aio_context);
++    /* prepare the transaction to complete */
++    rc = job_txn_apply(job->txn, job_prepare, true);
++    if (rc) {
++        job_completed_txn_abort(job);
++    } else {
++        job_txn_apply(job->txn, job_finalize_single, true);
 +    }
 +}
 +
-+int job_complete_sync(Job *job, Error **errp)
++void job_finalize(Job *job, Error **errp)
 +{
-+    return job_finish_sync(job, job_complete, errp);
++    assert(job && job->id && job->txn);
++    if (job_apply_verb(job, JOB_VERB_FINALIZE, errp)) {
++        return;
++    }
++    job_do_finalize(job);
++}
++
++static int job_transition_to_pending(Job *job)
++{
++    job_state_transition(job, JOB_STATUS_PENDING);
++    if (!job->auto_finalize) {
++        job_event_pending(job);
++    }
++    return 0;
++}
++
++void job_completed_txn_success(Job *job)
++{
++    JobTxn *txn = job->txn;
++    Job *other_job;
++
++    job_state_transition(job, JOB_STATUS_WAITING);
++
++    /*
++     * Successful completion, see if there are other running jobs in this
++     * txn.
++     */
++    QLIST_FOREACH(other_job, &txn->jobs, txn_list) {
++        if (!job_is_completed(other_job)) {
++            return;
++        }
++        assert(other_job->ret == 0);
++    }
++
++    job_txn_apply(txn, job_transition_to_pending, false);
++
++    /* If no jobs need manual finalization, automatically do so */
++    if (job_txn_apply(txn, job_needs_finalize, false) == 0) {
++        job_do_finalize(job);
++    }
 +}
 +
  void job_complete(Job *job, Error **errp)
  {
      /* Should not be reachable via external interface for internal jobs */
-diff --git a/qemu-img.c b/qemu-img.c
-index 4888064beb..75b03ee49c 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -870,7 +870,7 @@ static void run_block_job(BlockJob *job, Error **errp)
-     } while (!job->ready && !job_is_completed(&job->job));
- 
-     if (!job_is_completed(&job->job)) {
--        ret = block_job_complete_sync(job, errp);
-+        ret = job_complete_sync(&job->job, errp);
-     } else {
-         ret = job->job.ret;
-     }
-diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
-index b428aaca68..3600ffd3fb 100644
---- a/tests/test-bdrv-drain.c
-+++ b/tests/test-bdrv-drain.c
-@@ -498,8 +498,7 @@ typedef struct TestBlockJob {
- 
- static void test_job_completed(Job *job, void *opaque)
- {
--    BlockJob *bjob = container_of(job, BlockJob, job);
--    block_job_completed(bjob, 0);
-+    job_completed(job, 0);
- }
- 
- static void coroutine_fn test_job_start(void *opaque)
-@@ -593,7 +592,7 @@ static void test_blockjob_common(enum drain_type drain_type)
-     g_assert_false(job->job.paused);
-     g_assert_false(job->job.busy); /* We're in job_sleep_ns() */
- 
--    ret = block_job_complete_sync(job, &error_abort);
-+    ret = job_complete_sync(&job->job, &error_abort);
-     g_assert_cmpint(ret, ==, 0);
- 
-     blk_unref(blk_src);
 diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
-index 6ee31d59ad..34ee179574 100644
+index ec5d592b68..6ee31d59ad 100644
 --- a/tests/test-blockjob-txn.c
 +++ b/tests/test-blockjob-txn.c
-@@ -34,7 +34,7 @@ static void test_block_job_complete(Job *job, void *opaque)
-         rc = -ECANCELED;
-     }
+@@ -125,7 +125,7 @@ static void test_single_job(int expected)
+     JobTxn *txn;
+     int result = -EINPROGRESS;
  
--    block_job_completed(bjob, rc);
-+    job_completed(job, rc);
-     bdrv_unref(bs);
- }
- 
-@@ -130,7 +130,7 @@ static void test_single_job(int expected)
+-    txn = block_job_txn_new();
++    txn = job_txn_new();
+     job = test_block_job_start(1, true, expected, &result, txn);
      job_start(&job->job);
  
-     if (expected == -ECANCELED) {
--        block_job_cancel(job, false);
-+        job_cancel(&job->job, false);
+@@ -138,7 +138,7 @@ static void test_single_job(int expected)
      }
+     g_assert_cmpint(result, ==, expected);
  
-     while (result == -EINPROGRESS) {
-@@ -176,10 +176,10 @@ static void test_pair_jobs(int expected1, int expected2)
-     job_txn_unref(txn);
- 
-     if (expected1 == -ECANCELED) {
--        block_job_cancel(job1, false);
-+        job_cancel(&job1->job, false);
-     }
-     if (expected2 == -ECANCELED) {
--        block_job_cancel(job2, false);
-+        job_cancel(&job2->job, false);
-     }
- 
-     while (result1 == -EINPROGRESS || result2 == -EINPROGRESS) {
-@@ -232,13 +232,13 @@ static void test_pair_jobs_fail_cancel_race(void)
-     job_start(&job1->job);
-     job_start(&job2->job);
- 
--    block_job_cancel(job1, false);
-+    job_cancel(&job1->job, false);
- 
-     /* Now make job2 finish before the main loop kicks jobs.  This simulates
-      * the race between a pending kick and another job completing.
-      */
--    block_job_enter(job2);
--    block_job_enter(job2);
-+    job_enter(&job2->job);
-+    job_enter(&job2->job);
- 
-     while (result1 == -EINPROGRESS || result2 == -EINPROGRESS) {
-         aio_poll(qemu_get_aio_context(), true);
-diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
-index 1e052c2e9c..46a78739aa 100644
---- a/tests/test-blockjob.c
-+++ b/tests/test-blockjob.c
-@@ -165,10 +165,9 @@ typedef struct CancelJob {
- 
- static void cancel_job_completed(Job *job, void *opaque)
- {
--    BlockJob *bjob = container_of(job, BlockJob, job);
-     CancelJob *s = opaque;
-     s->completed = true;
--    block_job_completed(bjob, 0);
-+    job_completed(job, 0);
+-    block_job_txn_unref(txn);
++    job_txn_unref(txn);
  }
  
- static void cancel_job_complete(Job *job, Error **errp)
-@@ -232,7 +231,7 @@ static void cancel_common(CancelJob *s)
-     BlockBackend *blk = s->blk;
-     JobStatus sts = job->job.status;
+ static void test_single_job_success(void)
+@@ -164,7 +164,7 @@ static void test_pair_jobs(int expected1, int expected2)
+     int result1 = -EINPROGRESS;
+     int result2 = -EINPROGRESS;
  
--    block_job_cancel_sync(job);
-+    job_cancel_sync(&job->job);
-     if (sts != JOB_STATUS_CREATED && sts != JOB_STATUS_CONCLUDED) {
-         BlockJob *dummy = job;
-         block_job_dismiss(&dummy, &error_abort);
-@@ -275,7 +274,7 @@ static void test_cancel_paused(void)
-     assert(job->job.status == JOB_STATUS_RUNNING);
+-    txn = block_job_txn_new();
++    txn = job_txn_new();
+     job1 = test_block_job_start(1, true, expected1, &result1, txn);
+     job2 = test_block_job_start(2, true, expected2, &result2, txn);
+     job_start(&job1->job);
+@@ -173,7 +173,7 @@ static void test_pair_jobs(int expected1, int expected2)
+     /* Release our reference now to trigger as many nice
+      * use-after-free bugs as possible.
+      */
+-    block_job_txn_unref(txn);
++    job_txn_unref(txn);
  
-     job_user_pause(&job->job, &error_abort);
--    block_job_enter(job);
-+    job_enter(&job->job);
-     assert(job->job.status == JOB_STATUS_PAUSED);
+     if (expected1 == -ECANCELED) {
+         block_job_cancel(job1, false);
+@@ -226,7 +226,7 @@ static void test_pair_jobs_fail_cancel_race(void)
+     int result1 = -EINPROGRESS;
+     int result2 = -EINPROGRESS;
  
-     cancel_common(s);
-@@ -292,7 +291,7 @@ static void test_cancel_ready(void)
-     assert(job->job.status == JOB_STATUS_RUNNING);
+-    txn = block_job_txn_new();
++    txn = job_txn_new();
+     job1 = test_block_job_start(1, true, -ECANCELED, &result1, txn);
+     job2 = test_block_job_start(2, false, 0, &result2, txn);
+     job_start(&job1->job);
+@@ -247,7 +247,7 @@ static void test_pair_jobs_fail_cancel_race(void)
+     g_assert_cmpint(result1, ==, -ECANCELED);
+     g_assert_cmpint(result2, ==, -ECANCELED);
  
-     s->should_converge = true;
--    block_job_enter(job);
-+    job_enter(&job->job);
-     assert(job->job.status == JOB_STATUS_READY);
+-    block_job_txn_unref(txn);
++    job_txn_unref(txn);
+ }
  
-     cancel_common(s);
-@@ -309,11 +308,11 @@ static void test_cancel_standby(void)
-     assert(job->job.status == JOB_STATUS_RUNNING);
- 
-     s->should_converge = true;
--    block_job_enter(job);
-+    job_enter(&job->job);
-     assert(job->job.status == JOB_STATUS_READY);
- 
-     job_user_pause(&job->job, &error_abort);
--    block_job_enter(job);
-+    job_enter(&job->job);
-     assert(job->job.status == JOB_STATUS_STANDBY);
- 
-     cancel_common(s);
-@@ -330,11 +329,11 @@ static void test_cancel_pending(void)
-     assert(job->job.status == JOB_STATUS_RUNNING);
- 
-     s->should_converge = true;
--    block_job_enter(job);
-+    job_enter(&job->job);
-     assert(job->job.status == JOB_STATUS_READY);
- 
-     job_complete(&job->job, &error_abort);
--    block_job_enter(job);
-+    job_enter(&job->job);
-     while (!s->completed) {
-         aio_poll(qemu_get_aio_context(), true);
+ int main(int argc, char **argv)
+diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
+index e44c608327..1e052c2e9c 100644
+--- a/tests/test-blockjob.c
++++ b/tests/test-blockjob.c
+@@ -364,7 +364,7 @@ static void test_cancel_concluded(void)
      }
-@@ -354,11 +353,11 @@ static void test_cancel_concluded(void)
-     assert(job->job.status == JOB_STATUS_RUNNING);
+     assert(job->job.status == JOB_STATUS_PENDING);
  
-     s->should_converge = true;
--    block_job_enter(job);
-+    job_enter(&job->job);
-     assert(job->job.status == JOB_STATUS_READY);
+-    block_job_finalize(job, &error_abort);
++    job_finalize(&job->job, &error_abort);
+     assert(job->job.status == JOB_STATUS_CONCLUDED);
  
-     job_complete(&job->job, &error_abort);
--    block_job_enter(job);
-+    job_enter(&job->job);
-     while (!s->completed) {
-         aio_poll(qemu_get_aio_context(), true);
-     }
-diff --git a/block/trace-events b/block/trace-events
-index 93b927908a..2d59b53fd3 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -4,9 +4,6 @@
- bdrv_open_common(void *bs, const char *filename, int flags, const char *format_name) "bs %p filename \"%s\" flags 0x%x format_name \"%s\""
- bdrv_lock_medium(void *bs, bool locked) "bs %p locked %d"
- 
--# blockjob.c
--block_job_completed(void *job, int ret, int jret) "job %p ret %d corrected ret %d"
--
- # block/block-backend.c
- blk_co_preadv(void *blk, void *bs, int64_t offset, unsigned int bytes, int flags) "blk %p bs %p offset %"PRId64" bytes %u flags 0x%x"
- blk_co_pwritev(void *blk, void *bs, int64_t offset, unsigned int bytes, int flags) "blk %p bs %p offset %"PRId64" bytes %u flags 0x%x"
-diff --git a/trace-events b/trace-events
-index 2507e1327d..ef7579a285 100644
---- a/trace-events
-+++ b/trace-events
-@@ -107,6 +107,7 @@ gdbstub_err_checksum_incorrect(uint8_t expected, uint8_t got) "got command packe
- # job.c
- job_state_transition(void *job,  int ret, const char *legal, const char *s0, const char *s1) "job %p (ret: %d) attempting %s transition (%s-->%s)"
- job_apply_verb(void *job, const char *state, const char *verb, const char *legal) "job %p in state %s; applying verb %s (%s)"
-+job_completed(void *job, int ret, int jret) "job %p ret %d corrected ret %d"
- 
- ### Guest events, keep at bottom
- 
+     cancel_common(s);
 -- 
 2.13.6
