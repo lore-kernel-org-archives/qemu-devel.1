@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fAyQm-0000nb-TJ
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 09:56:30 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fAyUU-0001uc-Cx
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 10:00:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fAyQj-0000NY-Pi
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 09:56:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55464 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fAyQj-0000BM-E8
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 09:56:25 -0400
-References: <152406338081.5947.5696498314762417499@sif>
-	<6bb9731f-013d-018d-0b6e-c6dc55570f1f@redhat.com>
-	<72d4dd49-19a2-2e24-48f0-7b81dc42e728@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <23067740-ed72-25f0-42e3-21b56019525e@redhat.com>
-Date: Tue, 24 Apr 2018 15:56:14 +0200
+	(envelope-from <imammedo@redhat.com>) id 1fAyUR-0003rO-6H
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 10:00:18 -0400
+Date: Tue, 24 Apr 2018 16:00:11 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180424160011.47475594@redhat.com>
+In-Reply-To: <459116211.21924603.1524497545197.JavaMail.zimbra@redhat.com>
+References: <20180420123456.22196-1-david@redhat.com>
+	<20180423143147.6b4df2ac@redhat.com>
+	<459116211.21924603.1524497545197.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <72d4dd49-19a2-2e24-48f0-7b81dc42e728@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [ANNOUNCE] QEMU 2.12.0-rc4 is now available
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] pc-dimm: factor out MemoryDevice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +24,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, peter.maydell@linaro.org
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Michael Clark <mjc@sifive.com>, Richard Henderson <richard.henderson@linaro.org>
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>
 
-On 04/24/18 15:39, Eric Blake wrote:
-> On 04/24/2018 07:46 AM, Laszlo Ersek wrote:
+On Mon, 23 Apr 2018 11:32:25 -0400 (EDT)
+Pankaj Gupta <pagupta@redhat.com> wrote:
+
+> Hi Igor,
 > 
->> I just noticed two QAPI bugs introduced in 2.12, in the following two
->> commits:
->>
->> (1) ca230ff33f89 ("qmp: add architecture specific cpu data for
->> query-cpus-fast", 2018-02-26)
->>
->> This commit added @arch to @CpuInfoFast, but it failed to set the new
->> field to CPU_INFO_ARCH_OTHER in qmp_query_cpus_fast(), when TARGET_S390X
->> is not defined.
+> >   
+> > > Right now we can only map PCDIMM/NVDIMM into guest address space. In the
+> > > future, we might want to do the same for virtio devices - e.g.
+> > > virtio-pmem or virtio-mem. Especially, they should be able to live side
+> > > by side to each other.
+> > > 
+> > > E.g. the virto based memory devices regions will not be exposed via ACPI
+> > > and friends. They will be detected just like other virtio devices and
+> > > indicate the applicable memory region. This makes it possible to also use
+> > > them on architectures without memory device detection support (e.g. s390x).
+> > > 
+> > > Let's factor out the memory device code into a MemoryDevice interface.  
+> > A couple of high level questions as relevant code is not here:
+> > 
+> >   1. what would hotplug/unplug call chain look like in case of virtio-pmem
+> >   device
+> >      (reason I'm asking is that pmem being PCI device would trigger
+> >       PCI bus hotplug controller and then it somehow should piggyback
+> >       to Machine provided hotplug handlers, so I wonder what kind of
+> >       havoc it would cause on hotplug infrastructure)  
 > 
-> We zero-initialize info->value, and info->value->arch == 0 happens to be
-> CPU_INFO_ARCH_X86 which is associated with the empty type CpuInfoOther,
-> which is no different than what we would have had with
-> CPU_INFO_ARCH_OTHER.  So the drawback is that on x86 architectures,
-> things look correct; while on sparc, ppc, mips, and tricore (which have
-> a specific type) and on all other platforms (which should use "other"),
-> the output wrongly reports "arch":"x86" but does not crash.
+> For first phase we are using 'virtio-pmem' as cold added devices. AFAIU
+> 'VirtioDeviceClass' being parent class and 'hotplug/unplug' methods implemented 
+> for virtio-pmem device. So, pci bus hotplug/unplug should call the corresponding
+> functions?
+the problem is with trying to use PCI bus based device with bus-less
+infrastructure used by (pc|nv)dimms.
 
-I agree.
+The important point which we should not to break here while trying to glue
+PCI hotplug handler with machine hotplug handler is:
 
+container MachineState::device_memory is owned by machine and
+it's up to machine plug handler (container's owner) to map device's mr
+into its address space.
+(i.e. nor device's realize nor PCI bus hotplug handler should do it)
+
+Not sure about virtio-mem but if it would use device_memory container,
+it should use machine's plug handler.
+
+I don't have out head ideas how to glue it cleanly, may be
+MachineState::device_memory is just not right thing to use
+for such devices.
+
+> >   2. why not use PCI bar mapping mechanism to do mapping since pmem is PCI
+> >   device?  
 > 
->>
->> (2) 25fa194b7b11 ("RISC-V Build Infrastructure", 2018-03-07)
->>
->> This commit added the @riscv enum constant to @CpuInfoArch (used in both
->> @CpuInfo and @CpuInfoFast -- the return types of the @query-cpus and
->> @query-cpus-fast commands, respectively), and assigned, in both return
->> structures, the @CpuInfoRISCV sub-structure to the new enum value.
+> I think even we use if as PCI BAR mapping with PCI we still need free guest physical 
+> address to provide to VM for mapping the memory range. For that there needs to 
+> be coordination between PCDIMM and VIRTIO pci device? Also, if we use RAM from QEMU 
+> address space tied to big region(system_memory) memory accounting gets easier and at single place.
+if PCI bar mapping is used, then during accounting we would need to
+additionally scan system_memory for virtio-pmem device to account
+for its memory (not a huge deal as we even differentiate between
+pc-dimm and nvdimm when building a list of memory devices so
+special casing another device types won't hurt),
+at least device management (most complex part) will be governed
+by respective subsystem the device belongs to.
+
+> Honestly speaking I don't think there will be much difference between the two approaches? unless
+> I am missing something important?
 > 
-> Ouch - we SHOULD have used 'CpuInfoOther' rather than 'CpuInfoRISCV' for
-> @CpuInfoFast.  We do NOT want to report the 'pc' field in the fast query.
-
-Right.
-
->>
->> However, qmp_query_cpus_fast() does not populate the sub-structure, when
->> TARGET_RISCV is defined; only qmp_query_cpus() does.
-> 
-> Indeed, the output wrongly reports "arch":"x86" instead of
-> "arch":"riscv" - but at least things do not crash.
-> 
->>
->> The fixes don't look complicated. Do you want to hold the release while
->> I post the fixes?
->>
->> I don't think these bugs are "show stoppers". On the other hand, QAPI is
->> an external interface.
-> 
-> It's too late for the 2.12 release.  We'll definitely fix things in
-> 2.12.1 (so cc the patches to qemu-stable),
-
-OK, will do.
-
-> and should document in the
-> release notes that query-cpus-fast is known to report bogus "arch" data
-> for all architectures except x86 and s390, so applications should be
-> careful to not rely on the bogus information.
-
-<https://wiki.qemu.org/ChangeLog/2.12#Known_issues> refers to
-<https://wiki.qemu.org/Planning/2.12>, so I've added the above sentence
-to <https://wiki.qemu.org/Planning/2.12#Issues_that_will_not_be_fixed>.
-
-Thanks, Eric!
-Laszlo
+> > 
+> >    
+> > > v2 -> v3:
+> > > - "pc-dimm: factor out MemoryDevice interface"  
+> > > --> Lookup both classes when comparing (David Gibson)  
+> > > 
+> > > v1 -> v2:
+> > > - Fix compile issues on ppc (still untested  )
+> > > 
+> > > 
+> > > David Hildenbrand (3):
+> > >   pc-dimm: factor out MemoryDevice interface
+> > >   machine: make MemoryHotplugState accessible via the machine
+> > >   pc-dimm: factor out address space logic into MemoryDevice code
+> > > 
+> > >  hw/i386/acpi-build.c                         |   3 +-
+> > >  hw/i386/pc.c                                 |  24 ++-
+> > >  hw/mem/Makefile.objs                         |   1 +
+> > >  hw/mem/memory-device.c                       | 282
+> > >  +++++++++++++++++++++++++
+> > >  hw/mem/pc-dimm.c                             | 304
+> > >  +++++++--------------------
+> > >  hw/ppc/spapr.c                               |  24 ++-
+> > >  hw/ppc/spapr_hcall.c                         |   1 +
+> > >  include/hw/boards.h                          |  16 ++
+> > >  include/hw/mem/memory-device.h               |  48 +++++
+> > >  include/hw/mem/pc-dimm.h                     |  26 +--
+> > >  numa.c                                       |   3 +-
+> > >  qmp.c                                        |   4 +-
+> > >  stubs/Makefile.objs                          |   2 +-
+> > >  stubs/{qmp_pc_dimm.c => qmp_memory_device.c} |   4 +-
+> > >  14 files changed, 465 insertions(+), 277 deletions(-)
+> > >  create mode 100644 hw/mem/memory-device.c
+> > >  create mode 100644 include/hw/mem/memory-device.h
+> > >  rename stubs/{qmp_pc_dimm.c => qmp_memory_device.c} (61%)
+> > >   
+> > 
+> > 
+> >   
