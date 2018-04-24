@@ -1,30 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fAuXf-0001GL-P4
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 05:48:09 -0400
+	(envelope-from <david@redhat.com>) id 1fAv2d-0007Kj-CD
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 06:19:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fAuWY-0003pg-OH
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 05:47:19 -0400
-Received: from 7.mo5.mail-out.ovh.net ([178.32.124.100]:50446)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fAuWY-0003o5-7k
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 05:46:10 -0400
-Received: from player774.ha.ovh.net (unknown [10.109.120.119])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 64BB61A2186
-	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 11:46:08 +0200 (CEST)
-References: <20180419124331.3915-1-clg@kaod.org>
-	<20180419124331.3915-5-clg@kaod.org>
-	<20180424065131.GQ19804@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <5def5bbb-9842-0121-e889-014ba88fd4c5@kaod.org>
-Date: Tue, 24 Apr 2018 11:46:04 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180424065131.GQ19804@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 04/35] spapr/xive: introduce a XIVE
- interrupt controller for sPAPR
+	(envelope-from <david@redhat.com>) id 1fAv2a-0001wC-4Y
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 06:19:19 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Tue, 24 Apr 2018 12:18:59 +0200
+Message-Id: <20180424101859.10239-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1] s390x: refactor reset/reipl handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,383 +17,405 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: qemu-s390x@nongnu.org
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>
 
-On 04/24/2018 08:51 AM, David Gibson wrote:
-> On Thu, Apr 19, 2018 at 02:43:00PM +0200, C=E9dric Le Goater wrote:
->> sPAPRXive is a model for the XIVE interrupt controller device of the
->> sPAPR machine. It holds the routing XIVE table, the Interrupt
->> Virtualization Entry (IVE) table which associates interrupt source
->> numbers with targets.
->>
->> Also extend the XiveFabric with an accessor to the IVT. This will be
->> needed by the routing algorithm.
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->> ---
->>
->>  May be should introduce a XiveRouter model to hold the IVT. To be
->>  discussed.
->=20
-> Yeah, maybe.  Am I correct in thinking that on pnv there could be more
-> than one XiveRouter?
+Calling pause_all_vcpus()/resume_all_vcpus() from a VCPU thread might
+not be the best idea. As pause_all_vcpus() temporarily drops the qemu
+mutex, two parallel calls to pause_all_vcpus() can be active at a time,
+resulting in a deadlock. (either by two VCPUs or by the main thread and a
+VCPU)
 
-There is only one, the main IC.=20
+Let's handle it via the main loop instead, as suggested by Paolo. If we
+would have two parallel reset requests by two different VCPUs at the
+same time, the last one would win.
 
-> If we did have a XiveRouter, I'm not sure we'd need the XiveFabric
-> interface, possibly its methods could just be class methods of
-> XiveRouter.
+We use the existing ipl device to handle it. The nice side effect is
+that we can get rid of reipl_requested.
 
-Yes. We could introduce a XiveRouter to share the ivt table between=20
-the sPAPRXive and the PnvXIVE models, the interrupt controllers of
-the machines. Methods would provide way to get the ivt/eq/nvt
-objects required for routing. I need to add a set_eq() to push the
-EQ data.
+This change implies that all reset handling now goes via the common
+path, so "no-reboot" handling is now active for all kinds of reboots.
 
-The XiveRouter would also be a XiveFabric (or some other name) to=20
-let the internal sources of the interrupt controller forward events.
+Let's execute any CPU initialization code on the target CPU using
+run_on_cpu.
 
->>
->>  Changes since v2 :
->>
->>  - introduced the XiveFabric interface
->>
->>  default-configs/ppc64-softmmu.mak |   1 +
->>  hw/intc/Makefile.objs             |   1 +
->>  hw/intc/spapr_xive.c              | 159 +++++++++++++++++++++++++++++=
-+++++++++
->>  hw/intc/xive.c                    |   7 ++
->>  include/hw/ppc/spapr_xive.h       |  31 ++++++++
->>  include/hw/ppc/xive.h             |   5 ++
->>  include/hw/ppc/xive_regs.h        |  33 ++++++++
->>  7 files changed, 237 insertions(+)
->>  create mode 100644 hw/intc/spapr_xive.c
->>  create mode 100644 include/hw/ppc/spapr_xive.h
->>  create mode 100644 include/hw/ppc/xive_regs.h
->>
->> diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64=
--softmmu.mak
->> index c6d13e757977..f8d34722931d 100644
->> --- a/default-configs/ppc64-softmmu.mak
->> +++ b/default-configs/ppc64-softmmu.mak
->> @@ -17,4 +17,5 @@ CONFIG_XICS=3D$(CONFIG_PSERIES)
->>  CONFIG_XICS_SPAPR=3D$(CONFIG_PSERIES)
->>  CONFIG_XICS_KVM=3D$(call land,$(CONFIG_PSERIES),$(CONFIG_KVM))
->>  CONFIG_XIVE=3D$(CONFIG_PSERIES)
->> +CONFIG_XIVE_SPAPR=3D$(CONFIG_PSERIES)
->>  CONFIG_MEM_HOTPLUG=3Dy
->> diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
->> index 72a46ed91c31..301a8e972d91 100644
->> --- a/hw/intc/Makefile.objs
->> +++ b/hw/intc/Makefile.objs
->> @@ -38,6 +38,7 @@ obj-$(CONFIG_XICS) +=3D xics.o
->>  obj-$(CONFIG_XICS_SPAPR) +=3D xics_spapr.o
->>  obj-$(CONFIG_XICS_KVM) +=3D xics_kvm.o
->>  obj-$(CONFIG_XIVE) +=3D xive.o
->> +obj-$(CONFIG_XIVE_SPAPR) +=3D spapr_xive.o
->>  obj-$(CONFIG_POWERNV) +=3D xics_pnv.o
->>  obj-$(CONFIG_ALLWINNER_A10_PIC) +=3D allwinner-a10-pic.o
->>  obj-$(CONFIG_S390_FLIC) +=3D s390_flic.o
->> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
->> new file mode 100644
->> index 000000000000..020444e2665a
->> --- /dev/null
->> +++ b/hw/intc/spapr_xive.c
->> @@ -0,0 +1,159 @@
->> +/*
->> + * QEMU PowerPC sPAPR XIVE interrupt controller model
->> + *
->> + * Copyright (c) 2017-2018, IBM Corporation.
->> + *
->> + * This code is licensed under the GPL version 2 or later. See the
->> + * COPYING file in the top-level directory.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "qemu/log.h"
->> +#include "qapi/error.h"
->> +#include "target/ppc/cpu.h"
->> +#include "sysemu/cpus.h"
->> +#include "monitor/monitor.h"
->> +#include "hw/ppc/spapr_xive.h"
->> +#include "hw/ppc/xive_regs.h"
->> +
->> +void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon)
->> +{
->> +    int i;
->> +
->> +    monitor_printf(mon, "IVE Table\n");
->> +    for (i =3D 0; i < xive->nr_irqs; i++) {
->> +        XiveIVE *ive =3D &xive->ivt[i];
->> +
->> +        if (!(ive->w & IVE_VALID)) {
->> +            continue;
->> +        }
->> +
->> +        monitor_printf(mon, "  %4x %s %08x %08x\n", i,
->> +                       ive->w & IVE_MASKED ? "M" : " ",
->> +                       (int) GETFIELD(IVE_EQ_INDEX, ive->w),
->> +                       (int) GETFIELD(IVE_EQ_DATA, ive->w));
->> +    }
->> +}
->> +
->> +static void spapr_xive_reset(DeviceState *dev)
->> +{
->> +    sPAPRXive *xive =3D SPAPR_XIVE(dev);
->> +    int i;
->> +
->> +    /* Mask all valid IVEs in the IRQ number space. */
->> +    for (i =3D 0; i < xive->nr_irqs; i++) {
->> +        XiveIVE *ive =3D &xive->ivt[i];
->> +        if (ive->w & IVE_VALID) {
->> +            ive->w |=3D IVE_MASKED;
->> +        }
->> +    }
->> +}
->> +
->> +static void spapr_xive_init(Object *obj)
->=20
-> I'm trying to standardize on init_instance methods being called
-> *_instance_init().  It helps to make it obvious that this is ineed an
-> instance_init() method, rather than one of the various other init
-> calls that exist in various places.
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
 
-ok. this is good practice. I will fix.
+RFC -> v1:
+- initital -> initial
+- get rid of goto
+- store CPU index instead of CPU. Fallback to any CPU in case not found
+- handle default case in switch-case
 
-Thanks,
+ hw/s390x/ipl.c                     | 43 +++++++++++++++++++++++----
+ hw/s390x/ipl.h                     | 16 ++++++++--
+ hw/s390x/s390-virtio-ccw.c         | 51 ++++++++++++++++++++++++++-----
+ include/hw/s390x/s390-virtio-ccw.h |  2 --
+ target/s390x/cpu.h                 | 26 ++++++++++++++++
+ target/s390x/diag.c                | 61 +++-----------------------------------
+ target/s390x/internal.h            |  6 ----
+ target/s390x/kvm.c                 |  2 +-
+ 8 files changed, 127 insertions(+), 80 deletions(-)
 
-C.
-
->=20
->> +{
->> +
->> +}
->> +
->> +static void spapr_xive_realize(DeviceState *dev, Error **errp)
->> +{
->> +    sPAPRXive *xive =3D SPAPR_XIVE(dev);
->> +
->> +    if (!xive->nr_irqs) {
->> +        error_setg(errp, "Number of interrupt needs to be greater 0")=
-;
->> +        return;
->> +    }
->> +
->> +    /* Allocate the Interrupt Virtualization Table */
->> +    xive->ivt =3D g_new0(XiveIVE, xive->nr_irqs);
->> +}
->> +
->> +static XiveIVE *spapr_xive_get_ive(XiveFabric *xf, uint32_t lisn)
->> +{
->> +    sPAPRXive *xive =3D SPAPR_XIVE(xf);
->> +
->> +    return lisn < xive->nr_irqs ? &xive->ivt[lisn] : NULL;
->> +}
->> +
->> +static const VMStateDescription vmstate_spapr_xive_ive =3D {
->> +    .name =3D TYPE_SPAPR_XIVE "/ive",
->> +    .version_id =3D 1,
->> +    .minimum_version_id =3D 1,
->> +    .fields =3D (VMStateField []) {
->> +        VMSTATE_UINT64(w, XiveIVE),
->> +        VMSTATE_END_OF_LIST()
->> +    },
->> +};
->> +
->> +static const VMStateDescription vmstate_spapr_xive =3D {
->> +    .name =3D TYPE_SPAPR_XIVE,
->> +    .version_id =3D 1,
->> +    .minimum_version_id =3D 1,
->> +    .fields =3D (VMStateField[]) {
->> +        VMSTATE_UINT32_EQUAL(nr_irqs, sPAPRXive, NULL),
->> +        VMSTATE_STRUCT_VARRAY_POINTER_UINT32(ivt, sPAPRXive, nr_irqs,
->> +                                     vmstate_spapr_xive_ive, XiveIVE)=
-,
->> +        VMSTATE_END_OF_LIST()
->> +    },
->> +};
->> +
->> +static Property spapr_xive_properties[] =3D {
->> +    DEFINE_PROP_UINT32("nr-irqs", sPAPRXive, nr_irqs, 0),
->> +    DEFINE_PROP_END_OF_LIST(),
->> +};
->> +
->> +static void spapr_xive_class_init(ObjectClass *klass, void *data)
->> +{
->> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
->> +    XiveFabricClass *xfc =3D XIVE_FABRIC_CLASS(klass);
->> +
->> +    dc->realize =3D spapr_xive_realize;
->> +    dc->reset =3D spapr_xive_reset;
->> +    dc->props =3D spapr_xive_properties;
->> +    dc->desc =3D "sPAPR XIVE interrupt controller";
->> +    dc->vmsd =3D &vmstate_spapr_xive;
->> +
->> +    xfc->get_ive =3D spapr_xive_get_ive;
->> +}
->> +
->> +static const TypeInfo spapr_xive_info =3D {
->> +    .name =3D TYPE_SPAPR_XIVE,
->> +    .parent =3D TYPE_SYS_BUS_DEVICE,
->> +    .instance_init =3D spapr_xive_init,
->> +    .instance_size =3D sizeof(sPAPRXive),
->> +    .class_init =3D spapr_xive_class_init,
->> +    .interfaces =3D (InterfaceInfo[]) {
->> +            { TYPE_XIVE_FABRIC },
->> +            { },
->> +    },
->> +};
->> +
->> +static void spapr_xive_register_types(void)
->> +{
->> +    type_register_static(&spapr_xive_info);
->> +}
->> +
->> +type_init(spapr_xive_register_types)
->> +
->> +bool spapr_xive_irq_enable(sPAPRXive *xive, uint32_t lisn, bool lsi)
->> +{
->> +    XiveIVE *ive =3D spapr_xive_get_ive(XIVE_FABRIC(xive), lisn);
->> +
->> +    if (!ive) {
->> +        return false;
->> +    }
->> +
->> +    ive->w |=3D IVE_VALID;
->> +    return true;
->> +}
->> +
->> +bool spapr_xive_irq_disable(sPAPRXive *xive, uint32_t lisn)
->> +{
->> +    XiveIVE *ive =3D spapr_xive_get_ive(XIVE_FABRIC(xive), lisn);
->> +
->> +    if (!ive) {
->> +        return false;
->> +    }
->> +
->> +    ive->w &=3D ~IVE_VALID;
->> +    return true;
->> +}
->> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
->> index b4c3d06c1219..dccad0318834 100644
->> --- a/hw/intc/xive.c
->> +++ b/hw/intc/xive.c
->> @@ -20,6 +20,13 @@
->>   * XIVE Fabric
->>   */
->> =20
->> +XiveIVE *xive_fabric_get_ive(XiveFabric *xf, uint32_t lisn)
->> +{
->> +    XiveFabricClass *xfc =3D XIVE_FABRIC_GET_CLASS(xf);
->> +
->> +    return xfc->get_ive(xf, lisn);
->> +}
->> +
->>  static void xive_fabric_route(XiveFabric *xf, int lisn)
->>  {
->> =20
->> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
->> new file mode 100644
->> index 000000000000..1d966b5d3a96
->> --- /dev/null
->> +++ b/include/hw/ppc/spapr_xive.h
->> @@ -0,0 +1,31 @@
->> +/*
->> + * QEMU PowerPC sPAPR XIVE interrupt controller model
->> + *
->> + * Copyright (c) 2017-2018, IBM Corporation.
->> + *
->> + * This code is licensed under the GPL version 2 or later. See the
->> + * COPYING file in the top-level directory.
->> + */
->> +
->> +#ifndef PPC_SPAPR_XIVE_H
->> +#define PPC_SPAPR_XIVE_H
->> +
->> +#include "hw/sysbus.h"
->> +#include "hw/ppc/xive.h"
->> +
->> +#define TYPE_SPAPR_XIVE "spapr-xive"
->> +#define SPAPR_XIVE(obj) OBJECT_CHECK(sPAPRXive, (obj), TYPE_SPAPR_XIV=
-E)
->> +
->> +typedef struct sPAPRXive {
->> +    SysBusDevice parent;
->> +
->> +    /* Routing table */
->> +    XiveIVE      *ivt;
->> +    uint32_t     nr_irqs;
->> +} sPAPRXive;
->> +
->> +bool spapr_xive_irq_enable(sPAPRXive *xive, uint32_t lisn, bool lsi);
->> +bool spapr_xive_irq_disable(sPAPRXive *xive, uint32_t lisn);
->> +void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
->> +
->> +#endif /* PPC_SPAPR_XIVE_H */
->> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
->> index 4fcae2c763e6..5b145816acdc 100644
->> --- a/include/hw/ppc/xive.h
->> +++ b/include/hw/ppc/xive.h
->> @@ -11,6 +11,7 @@
->>  #define PPC_XIVE_H
->> =20
->>  #include "hw/sysbus.h"
->> +#include "hw/ppc/xive_regs.h"
->> =20
->>  typedef struct XiveFabric XiveFabric;
->> =20
->> @@ -166,6 +167,10 @@ typedef struct XiveFabric {
->>  typedef struct XiveFabricClass {
->>      InterfaceClass parent;
->>      void (*notify)(XiveFabric *xf, uint32_t lisn);
->> +
->> +    XiveIVE *(*get_ive)(XiveFabric *xf, uint32_t lisn);
->>  } XiveFabricClass;
->> =20
->> +XiveIVE *xive_fabric_get_ive(XiveFabric *xf, uint32_t lisn);
->> +
->>  #endif /* PPC_XIVE_H */
->> diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
->> new file mode 100644
->> index 000000000000..5903f29eb789
->> --- /dev/null
->> +++ b/include/hw/ppc/xive_regs.h
->> @@ -0,0 +1,33 @@
->> +/*
->> + * QEMU PowerPC XIVE interrupt controller model
->> + *
->> + * Copyright (c) 2016-2018, IBM Corporation.
->> + *
->> + * This code is licensed under the GPL version 2 or later. See the
->> + * COPYING file in the top-level directory.
->> + */
->> +
->> +#ifndef _PPC_XIVE_REGS_H
->> +#define _PPC_XIVE_REGS_H
->> +
->> +/* IVE/EAS
->> + *
->> + * One per interrupt source. Targets that interrupt to a given EQ
->> + * and provides the corresponding logical interrupt number (EQ data)
->> + *
->> + * We also map this structure to the escalation descriptor inside
->> + * an EQ, though in that case the valid and masked bits are not used.
->> + */
->> +typedef struct XiveIVE {
->> +        /* Use a single 64-bit definition to make it easier to
->> +         * perform atomic updates
->> +         */
->> +        uint64_t        w;
->> +#define IVE_VALID       PPC_BIT(0)
->> +#define IVE_EQ_BLOCK    PPC_BITMASK(4, 7)        /* Destination EQ bl=
-ock# */
->> +#define IVE_EQ_INDEX    PPC_BITMASK(8, 31)       /* Destination EQ in=
-dex */
->> +#define IVE_MASKED      PPC_BIT(32)              /* Masked */
->> +#define IVE_EQ_DATA     PPC_BITMASK(33, 63)      /* Data written to t=
-he EQ */
->> +} XiveIVE;
->> +
->> +#endif /* _INTC_XIVE_INTERNAL_H */
->=20
+diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+index fb554ab156..e0d7265793 100644
+--- a/hw/s390x/ipl.c
++++ b/hw/s390x/ipl.c
+@@ -26,6 +26,7 @@
+ #include "qemu/config-file.h"
+ #include "qemu/cutils.h"
+ #include "qemu/option.h"
++#include "exec/exec-all.h"
+ 
+ #define KERN_IMAGE_START                0x010000UL
+ #define KERN_PARM_AREA                  0x010480UL
+@@ -484,12 +485,20 @@ IplParameterBlock *s390_ipl_get_iplb(void)
+     return &ipl->iplb;
+ }
+ 
+-void s390_reipl_request(void)
++void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type)
+ {
+     S390IPLState *ipl = get_ipl_device();
+ 
+-    ipl->reipl_requested = true;
+-    if (ipl->iplb_valid &&
++    if (reset_type == S390_RESET_EXTERNAL || reset_type == S390_RESET_REIPL) {
++        /* use CPU 0 for full resets */
++        ipl->reset_cpu_index = 0;
++    } else {
++        ipl->reset_cpu_index = cs->cpu_index;
++    }
++    ipl->reset_type = reset_type;
++
++    if (reset_type == S390_RESET_REIPL &&
++        ipl->iplb_valid &&
+         !ipl->netboot &&
+         ipl->iplb.pbt == S390_IPL_TYPE_CCW &&
+         is_virtio_scsi_device(&ipl->iplb)) {
+@@ -506,6 +515,31 @@ void s390_reipl_request(void)
+         }
+     }
+     qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
++    /* as this is triggered by a CPU, make sure to exit the loop */
++    if (tcg_enabled()) {
++        cpu_loop_exit(cs);
++    }
++}
++
++void s390_ipl_get_reset_request(CPUState **cs, enum s390_reset *reset_type)
++{
++    S390IPLState *ipl = get_ipl_device();
++
++    *cs = qemu_get_cpu(ipl->reset_cpu_index);
++    if (!*cs) {
++        /* use any CPU */
++        *cs = first_cpu;
++    }
++    *reset_type = ipl->reset_type;
++}
++
++void s390_ipl_clear_reset_request(void)
++{
++    S390IPLState *ipl = get_ipl_device();
++
++    ipl->reset_type = S390_RESET_EXTERNAL;
++    /* use CPU 0 for full resets */
++    ipl->reset_cpu_index = 0;
+ }
+ 
+ static void s390_ipl_prepare_qipl(S390CPU *cpu)
+@@ -552,11 +586,10 @@ static void s390_ipl_reset(DeviceState *dev)
+ {
+     S390IPLState *ipl = S390_IPL(dev);
+ 
+-    if (!ipl->reipl_requested) {
++    if (ipl->reset_type != S390_RESET_REIPL) {
+         ipl->iplb_valid = false;
+         memset(&ipl->iplb, 0, sizeof(IplParameterBlock));
+     }
+-    ipl->reipl_requested = false;
+ }
+ 
+ static void s390_ipl_class_init(ObjectClass *klass, void *data)
+diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+index 0570d0ad75..4e87b89418 100644
+--- a/hw/s390x/ipl.h
++++ b/hw/s390x/ipl.h
+@@ -87,7 +87,17 @@ int s390_ipl_set_loadparm(uint8_t *loadparm);
+ void s390_ipl_update_diag308(IplParameterBlock *iplb);
+ void s390_ipl_prepare_cpu(S390CPU *cpu);
+ IplParameterBlock *s390_ipl_get_iplb(void);
+-void s390_reipl_request(void);
++
++enum s390_reset {
++    /* default is a reset not triggered by a CPU e.g. issued by QMP */
++    S390_RESET_EXTERNAL = 0,
++    S390_RESET_REIPL,
++    S390_RESET_MODIFIED_CLEAR,
++    S390_RESET_LOAD_NORMAL,
++};
++void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type);
++void s390_ipl_get_reset_request(CPUState **cs, enum s390_reset *reset_type);
++void s390_ipl_clear_reset_request(void);
+ 
+ #define QIPL_ADDRESS  0xcc
+ 
+@@ -129,9 +139,11 @@ struct S390IPLState {
+     bool enforce_bios;
+     IplParameterBlock iplb;
+     bool iplb_valid;
+-    bool reipl_requested;
+     bool netboot;
+     QemuIplParameters qipl;
++    /* reset related properties don't have to be migrated or reset */
++    enum s390_reset reset_type;
++    int reset_cpu_index;
+ 
+     /*< public >*/
+     char *kernel;
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 435f7c99e7..945a8c6fb8 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -93,7 +93,7 @@ static const char *const reset_dev_types[] = {
+     "diag288",
+ };
+ 
+-void subsystem_reset(void)
++static void subsystem_reset(void)
+ {
+     DeviceState *dev;
+     int i;
+@@ -364,17 +364,54 @@ static void s390_cpu_plug(HotplugHandler *hotplug_dev,
+     }
+ }
+ 
++static inline void s390_do_cpu_ipl(CPUState *cs, run_on_cpu_data arg)
++{
++    S390CPU *cpu = S390_CPU(cs);
++
++    s390_ipl_prepare_cpu(cpu);
++    s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
++}
++
+ static void s390_machine_reset(void)
+ {
+-    S390CPU *ipl_cpu = S390_CPU(qemu_get_cpu(0));
++    enum s390_reset reset_type;
++    CPUState *cs, *t;
+ 
++    /* get the reset parameters, reset them once done */
++    s390_ipl_get_reset_request(&cs, &reset_type);
++
++    /* all CPUs are paused and synchronized at this point */
+     s390_cmma_reset();
+-    qemu_devices_reset();
+-    s390_crypto_reset();
+ 
+-    /* all cpus are stopped - configure and start the ipl cpu only */
+-    s390_ipl_prepare_cpu(ipl_cpu);
+-    s390_cpu_set_state(S390_CPU_STATE_OPERATING, ipl_cpu);
++    switch (reset_type) {
++    case S390_RESET_EXTERNAL:
++    case S390_RESET_REIPL:
++        qemu_devices_reset();
++        s390_crypto_reset();
++
++        /* configure and start the ipl CPU only */
++        run_on_cpu(cs, s390_do_cpu_ipl, RUN_ON_CPU_NULL);
++        break;
++    case S390_RESET_MODIFIED_CLEAR:
++        CPU_FOREACH(t) {
++            run_on_cpu(t, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
++        }
++        subsystem_reset();
++        s390_crypto_reset();
++        run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
++        break;
++    case S390_RESET_LOAD_NORMAL:
++        CPU_FOREACH(t) {
++            run_on_cpu(t, s390_do_cpu_reset, RUN_ON_CPU_NULL);
++        }
++        subsystem_reset();
++        run_on_cpu(cs, s390_do_cpu_initial_reset, RUN_ON_CPU_NULL);
++        run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
++        break;
++    default:
++        g_assert_not_reached();
++    }
++    s390_ipl_clear_reset_request();
+ }
+ 
+ static void s390_machine_device_plug(HotplugHandler *hotplug_dev,
+diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
+index ac896e31ea..ab88d49d10 100644
+--- a/include/hw/s390x/s390-virtio-ccw.h
++++ b/include/hw/s390x/s390-virtio-ccw.h
+@@ -53,6 +53,4 @@ bool cpu_model_allowed(void);
+  */
+ bool css_migration_enabled(void);
+ 
+-void subsystem_reset(void);
+-
+ #endif
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index 3ee40f08b7..6629a533f3 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -686,6 +686,32 @@ static inline uint64_t s390_build_validity_mcic(void)
+     return mcic;
+ }
+ 
++static inline void s390_do_cpu_full_reset(CPUState *cs, run_on_cpu_data arg)
++{
++    cpu_reset(cs);
++}
++
++static inline void s390_do_cpu_reset(CPUState *cs, run_on_cpu_data arg)
++{
++    S390CPUClass *scc = S390_CPU_GET_CLASS(cs);
++
++    scc->cpu_reset(cs);
++}
++
++static inline void s390_do_cpu_initial_reset(CPUState *cs, run_on_cpu_data arg)
++{
++    S390CPUClass *scc = S390_CPU_GET_CLASS(cs);
++
++    scc->initial_cpu_reset(cs);
++}
++
++static inline void s390_do_cpu_load_normal(CPUState *cs, run_on_cpu_data arg)
++{
++    S390CPUClass *scc = S390_CPU_GET_CLASS(cs);
++
++    scc->load_normal(cs);
++}
++
+ 
+ /* cpu.c */
+ int s390_get_clock(uint8_t *tod_high, uint64_t *tod_low);
+diff --git a/target/s390x/diag.c b/target/s390x/diag.c
+index a755837ad5..ac2c40f363 100644
+--- a/target/s390x/diag.c
++++ b/target/s390x/diag.c
+@@ -22,51 +22,6 @@
+ #include "hw/s390x/ipl.h"
+ #include "hw/s390x/s390-virtio-ccw.h"
+ 
+-static int modified_clear_reset(S390CPU *cpu)
+-{
+-    S390CPUClass *scc = S390_CPU_GET_CLASS(cpu);
+-    CPUState *t;
+-
+-    pause_all_vcpus();
+-    cpu_synchronize_all_states();
+-    CPU_FOREACH(t) {
+-        run_on_cpu(t, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
+-    }
+-    s390_cmma_reset();
+-    subsystem_reset();
+-    s390_crypto_reset();
+-    scc->load_normal(CPU(cpu));
+-    cpu_synchronize_all_post_reset();
+-    resume_all_vcpus();
+-    return 0;
+-}
+-
+-static inline void s390_do_cpu_reset(CPUState *cs, run_on_cpu_data arg)
+-{
+-    S390CPUClass *scc = S390_CPU_GET_CLASS(cs);
+-
+-    scc->cpu_reset(cs);
+-}
+-
+-static int load_normal_reset(S390CPU *cpu)
+-{
+-    S390CPUClass *scc = S390_CPU_GET_CLASS(cpu);
+-    CPUState *t;
+-
+-    pause_all_vcpus();
+-    cpu_synchronize_all_states();
+-    CPU_FOREACH(t) {
+-        run_on_cpu(t, s390_do_cpu_reset, RUN_ON_CPU_NULL);
+-    }
+-    s390_cmma_reset();
+-    subsystem_reset();
+-    scc->initial_cpu_reset(CPU(cpu));
+-    scc->load_normal(CPU(cpu));
+-    cpu_synchronize_all_post_reset();
+-    resume_all_vcpus();
+-    return 0;
+-}
+-
+ int handle_diag_288(CPUS390XState *env, uint64_t r1, uint64_t r3)
+ {
+     uint64_t func = env->regs[r1];
+@@ -101,6 +56,7 @@ int handle_diag_288(CPUS390XState *env, uint64_t r1, uint64_t r3)
+ 
+ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
+ {
++    CPUState *cs = CPU(s390_env_get_cpu(env));
+     uint64_t addr =  env->regs[r1];
+     uint64_t subcode = env->regs[r3];
+     IplParameterBlock *iplb;
+@@ -117,22 +73,13 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
+ 
+     switch (subcode) {
+     case 0:
+-        modified_clear_reset(s390_env_get_cpu(env));
+-        if (tcg_enabled()) {
+-            cpu_loop_exit(CPU(s390_env_get_cpu(env)));
+-        }
++        s390_ipl_reset_request(cs, S390_RESET_MODIFIED_CLEAR);
+         break;
+     case 1:
+-        load_normal_reset(s390_env_get_cpu(env));
+-        if (tcg_enabled()) {
+-            cpu_loop_exit(CPU(s390_env_get_cpu(env)));
+-        }
++        s390_ipl_reset_request(cs, S390_RESET_LOAD_NORMAL);
+         break;
+     case 3:
+-        s390_reipl_request();
+-        if (tcg_enabled()) {
+-            cpu_loop_exit(CPU(s390_env_get_cpu(env)));
+-        }
++        s390_ipl_reset_request(cs, S390_RESET_REIPL);
+         break;
+     case 5:
+         if ((r1 & 1) || (addr & 0x0fffULL)) {
+diff --git a/target/s390x/internal.h b/target/s390x/internal.h
+index d911e84958..e392a02d12 100644
+--- a/target/s390x/internal.h
++++ b/target/s390x/internal.h
+@@ -273,12 +273,6 @@ static inline hwaddr decode_basedisp_s(CPUS390XState *env, uint32_t ipb,
+ /* Base/displacement are at the same locations. */
+ #define decode_basedisp_rs decode_basedisp_s
+ 
+-static inline void s390_do_cpu_full_reset(CPUState *cs, run_on_cpu_data arg)
+-{
+-    cpu_reset(cs);
+-}
+-
+-
+ /* arch_dump.c */
+ int s390_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
+                               int cpuid, void *opaque);
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index fb59d92def..b033d53f69 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -1785,7 +1785,7 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+             ret = handle_intercept(cpu);
+             break;
+         case KVM_EXIT_S390_RESET:
+-            s390_reipl_request();
++            s390_ipl_reset_request(cs, S390_RESET_REIPL);
+             break;
+         case KVM_EXIT_S390_TSCH:
+             ret = handle_tsch(cpu);
+-- 
+2.14.3
