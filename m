@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fApvj-00029Q-Dl
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 00:51:52 -0400
+	(envelope-from <peterx@redhat.com>) id 1fApxm-0003Yq-2X
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 00:53:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fApve-0006Zi-Qe
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 00:51:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32884 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fApxh-0007Dk-F2
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 00:53:58 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32950 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fApve-0006ZA-MM
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 00:51:46 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fApxh-0007DS-Aw
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 00:53:53 -0400
+Date: Tue, 24 Apr 2018 12:53:47 +0800
 From: Peter Xu <peterx@redhat.com>
-Date: Tue, 24 Apr 2018 12:51:12 +0800
-Message-Id: <20180424045112.12963-5-peterx@redhat.com>
-In-Reply-To: <20180424045112.12963-1-peterx@redhat.com>
-References: <20180424045112.12963-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 4/4] configure: enable debug-mutex if debug
- enabled
+Message-ID: <20180424045347.GB9036@xz-mi>
+References: <20180423053927.13715-1-peterx@redhat.com>
+	<20180423053927.13715-4-peterx@redhat.com>
+	<20180423181107.GB27690@flamenco>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180423181107.GB27690@flamenco>
+Subject: Re: [Qemu-devel] [PATCH v4 3/4] QemuMutex: support
+ --enable-debug-mutex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,26 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Emilio G . Cota" <cota@braap.org>, peterx@redhat.com
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Reviewed-by: Emilio G. Cota <cota@braap.org>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- configure | 1 +
- 1 file changed, 1 insertion(+)
+On Mon, Apr 23, 2018 at 02:11:07PM -0400, Emilio G. Cota wrote:
+> On Mon, Apr 23, 2018 at 13:39:26 +0800, Peter Xu wrote:
+> > We have had some tracing tools for mutex but it's not easy to use them
+> > for e.g. dead locks.  Let's provide "--enable-debug-mutex" parameter
+> > when configure to allow QemuMutex to store the last owner that took
+> > specific lock.  It will be easy to use this tool to debug deadlocks
+> > since we can directly know who took the lock then as long as we can have
+> > a debugger attached to the process.
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> (snip)
+> >  static inline void qemu_mutex_pre_unlock(QemuMutex *mutex,
+> >                                           const char *file, int line)
+> >  {
+> > +#ifdef CONFIG_DEBUG_MUTEX
+> > +    mutex->file = NULL;
+> > +    mutex->line = 0;
+> > +#endif
+> >      trace_qemu_mutex_unlock(mutex, file, line);
+> >  }
+> 
+> I'd also initialize to NULL/0 the file/line pair at
+> qemu_mutex_init time for both posix and win32. Other than that:
+> 
+> Reviewed-by: Emilio G. Cota <cota@braap.org>
 
-diff --git a/configure b/configure
-index a80af735b2..87453edd88 100755
---- a/configure
-+++ b/configure
-@@ -1005,6 +1005,7 @@ for opt do
-   --enable-debug)
-       # Enable debugging options that aren't excessively noisy
-       debug_tcg="yes"
-+      debug_mutex="yes"
-       debug="yes"
-       strip_opt="no"
-       fortify_source="no"
+I did the same trick for mutex init in patch 2 & 3 and reposted, while
+I picked up your r-b for patch 4 only.  Please have a look.  Thanks,
+
 -- 
-2.14.3
+Peter Xu
