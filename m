@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fB3d2-00029E-Vn
+	(envelope-from <eblake@redhat.com>) id 1fB3d2-00029D-VZ
 	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 15:29:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fB3d1-00061A-SR
+	(envelope-from <eblake@redhat.com>) id 1fB3d1-00060x-LZ
 	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 15:29:28 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Tue, 24 Apr 2018 14:25:03 -0500
-Message-Id: <20180424192506.149089-4-eblake@redhat.com>
+Date: Tue, 24 Apr 2018 14:25:01 -0500
+Message-Id: <20180424192506.149089-2-eblake@redhat.com>
 In-Reply-To: <20180424192506.149089-1-eblake@redhat.com>
 References: <20180424192506.149089-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/6] null: Switch to byte-based read/write
+Subject: [Qemu-devel] [PATCH v2 1/6] block: Support byte-based aio callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,135 +20,144 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: jsnow@redhat.com, kwolf@redhat.com, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: jsnow@redhat.com, kwolf@redhat.com, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
 
 We are gradually moving away from sector-based interfaces, towards
-byte-based.  Make the change for the last few sector-based callbacks
-in the null-co and null-aio drivers.
+byte-based.  Add new sector-based aio callbacks for read and write,
+to match the fact that bdrv_aio_pdiscard is already byte-based.
 
-Note that since the null driver does nothing on writes, it trivially
-supports the BDRV_REQ_FUA flag (all writes have already landed to
-the same bit-bucket without needing an extra flush call).  Also, since
-the null driver does just as well with byte-based requests, we can
-now avoid cycles wasted on read-modify-write by taking advantage of
-the block layer now defaulting the alignment to 1 instead of 512.
+Ideally, drivers should be converted to use coroutine callbacks
+rather than aio; but that is not quite as trivial (and if we were
+to do that conversion, the null-aio driver would disappear), so for
+the short term, converting the signature but keeping things with
+aio is easier.  However, we CAN declare that a driver that uses
+the byte-based aio interfaces now defaults to byte-based
+operations, and must explicitly provide a refresh_limits override
+to stick with larger alignments (making the alignment issues more
+obvious directly in the drivers touched in the next few patches).
+
+Once all drivers are converted, the sector-based aio callbacks will
+be removed; in the meantime, a FIXME comment is added due to a
+slight inefficiency that will be touched up as part of that later
+cleanup.
+
+Simplify some instances of 'bs->drv' into 'drv' while touching this,
+since the local variable already exists to reduce typing.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
-v2: rely on new block layer default alignment [Kevin]
+v2: change default alignment to byte-based [Kevin], add comment
+about temporary slight inefficiency [Kevin]
 ---
- block/null.c | 59 ++++++++++++++++++++++++++++++-----------------------------
- 1 file changed, 30 insertions(+), 29 deletions(-)
+ include/block/block_int.h |  6 ++++++
+ block/io.c                | 38 +++++++++++++++++++++++++++++---------
+ 2 files changed, 35 insertions(+), 9 deletions(-)
 
-diff --git a/block/null.c b/block/null.c
-index 806a8631e4d..8fbbda52ea1 100644
---- a/block/null.c
-+++ b/block/null.c
-@@ -93,6 +93,7 @@ static int null_file_open(BlockDriverState *bs, QDict *options, int flags,
-     }
-     s->read_zeroes = qemu_opt_get_bool(opts, NULL_OPT_ZEROES, false);
-     qemu_opts_del(opts);
-+    bs->supported_write_flags = BDRV_REQ_FUA;
-     return ret;
- }
-
-@@ -116,22 +117,22 @@ static coroutine_fn int null_co_common(BlockDriverState *bs)
-     return 0;
- }
-
--static coroutine_fn int null_co_readv(BlockDriverState *bs,
--                                      int64_t sector_num, int nb_sectors,
--                                      QEMUIOVector *qiov)
-+static coroutine_fn int null_co_preadv(BlockDriverState *bs,
-+                                       uint64_t offset, uint64_t bytes,
-+                                       QEMUIOVector *qiov, int flags)
- {
-     BDRVNullState *s = bs->opaque;
-
-     if (s->read_zeroes) {
--        qemu_iovec_memset(qiov, 0, 0, nb_sectors * BDRV_SECTOR_SIZE);
-+        qemu_iovec_memset(qiov, 0, 0, bytes);
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index c4dd1d4bb8a..e772e3502b1 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -144,9 +144,15 @@ struct BlockDriver {
+     BlockAIOCB *(*bdrv_aio_readv)(BlockDriverState *bs,
+         int64_t sector_num, QEMUIOVector *qiov, int nb_sectors,
+         BlockCompletionFunc *cb, void *opaque);
++    BlockAIOCB *(*bdrv_aio_preadv)(BlockDriverState *bs,
++        uint64_t offset, uint64_t bytes, QEMUIOVector *qiov, int flags,
++        BlockCompletionFunc *cb, void *opaque);
+     BlockAIOCB *(*bdrv_aio_writev)(BlockDriverState *bs,
+         int64_t sector_num, QEMUIOVector *qiov, int nb_sectors,
+         BlockCompletionFunc *cb, void *opaque);
++    BlockAIOCB *(*bdrv_aio_pwritev)(BlockDriverState *bs,
++        uint64_t offset, uint64_t bytes, QEMUIOVector *qiov, int flags,
++        BlockCompletionFunc *cb, void *opaque);
+     BlockAIOCB *(*bdrv_aio_flush)(BlockDriverState *bs,
+         BlockCompletionFunc *cb, void *opaque);
+     BlockAIOCB *(*bdrv_aio_pdiscard)(BlockDriverState *bs,
+diff --git a/block/io.c b/block/io.c
+index bd9a19a9c4d..407bc25df41 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -92,7 +92,8 @@ void bdrv_refresh_limits(BlockDriverState *bs, Error **errp)
      }
 
-     return null_co_common(bs);
- }
+     /* Default alignment based on whether driver has byte interface */
+-    bs->bl.request_alignment = drv->bdrv_co_preadv ? 1 : 512;
++    bs->bl.request_alignment = (drv->bdrv_co_preadv ||
++                                drv->bdrv_aio_preadv) ? 1 : 512;
 
--static coroutine_fn int null_co_writev(BlockDriverState *bs,
--                                       int64_t sector_num, int nb_sectors,
--                                       QEMUIOVector *qiov)
-+static coroutine_fn int null_co_pwritev(BlockDriverState *bs,
-+                                        uint64_t offset, uint64_t bytes,
-+                                        QEMUIOVector *qiov, int flags)
- {
-     return null_co_common(bs);
- }
-@@ -186,26 +187,26 @@ static inline BlockAIOCB *null_aio_common(BlockDriverState *bs,
-     return &acb->common;
- }
+     /* Take some limits from the children as a default */
+     if (bs->file) {
+@@ -924,12 +925,15 @@ static int coroutine_fn bdrv_driver_preadv(BlockDriverState *bs,
+         return drv->bdrv_co_preadv(bs, offset, bytes, qiov, flags);
+     }
 
--static BlockAIOCB *null_aio_readv(BlockDriverState *bs,
--                                  int64_t sector_num, QEMUIOVector *qiov,
--                                  int nb_sectors,
--                                  BlockCompletionFunc *cb,
--                                  void *opaque)
--{
--    BDRVNullState *s = bs->opaque;
--
--    if (s->read_zeroes) {
--        qemu_iovec_memset(qiov, 0, 0, nb_sectors * BDRV_SECTOR_SIZE);
--    }
--
--    return null_aio_common(bs, cb, opaque);
--}
--
--static BlockAIOCB *null_aio_writev(BlockDriverState *bs,
--                                   int64_t sector_num, QEMUIOVector *qiov,
--                                   int nb_sectors,
-+static BlockAIOCB *null_aio_preadv(BlockDriverState *bs,
-+                                   uint64_t offset, uint64_t bytes,
-+                                   QEMUIOVector *qiov, int flags,
-                                    BlockCompletionFunc *cb,
-                                    void *opaque)
-+{
-+    BDRVNullState *s = bs->opaque;
-+
-+    if (s->read_zeroes) {
-+        qemu_iovec_memset(qiov, 0, 0, bytes);
++    /* FIXME - no need to calculate these if .bdrv_aio_preadv exists */
+     sector_num = offset >> BDRV_SECTOR_BITS;
+     nb_sectors = bytes >> BDRV_SECTOR_BITS;
+
+-    assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
+-    assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
+-    assert((bytes >> BDRV_SECTOR_BITS) <= BDRV_REQUEST_MAX_SECTORS);
++    if (!drv->bdrv_aio_preadv) {
++        assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
++        assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
++        assert((bytes >> BDRV_SECTOR_BITS) <= BDRV_REQUEST_MAX_SECTORS);
 +    }
-+
-+    return null_aio_common(bs, cb, opaque);
-+}
-+
-+static BlockAIOCB *null_aio_pwritev(BlockDriverState *bs,
-+                                    uint64_t offset, uint64_t bytes,
-+                                    QEMUIOVector *qiov, int flags,
-+                                    BlockCompletionFunc *cb,
-+                                    void *opaque)
- {
-     return null_aio_common(bs, cb, opaque);
- }
-@@ -266,8 +267,8 @@ static BlockDriver bdrv_null_co = {
-     .bdrv_close             = null_close,
-     .bdrv_getlength         = null_getlength,
 
--    .bdrv_co_readv          = null_co_readv,
--    .bdrv_co_writev         = null_co_writev,
-+    .bdrv_co_preadv         = null_co_preadv,
-+    .bdrv_co_pwritev        = null_co_pwritev,
-     .bdrv_co_flush_to_disk  = null_co_flush,
-     .bdrv_reopen_prepare    = null_reopen_prepare,
+     if (drv->bdrv_co_readv) {
+         return drv->bdrv_co_readv(bs, sector_num, nb_sectors, qiov);
+@@ -939,8 +943,13 @@ static int coroutine_fn bdrv_driver_preadv(BlockDriverState *bs,
+             .coroutine = qemu_coroutine_self(),
+         };
 
-@@ -286,8 +287,8 @@ static BlockDriver bdrv_null_aio = {
-     .bdrv_close             = null_close,
-     .bdrv_getlength         = null_getlength,
+-        acb = bs->drv->bdrv_aio_readv(bs, sector_num, qiov, nb_sectors,
++        if (drv->bdrv_aio_preadv) {
++            acb = drv->bdrv_aio_preadv(bs, offset, bytes, qiov, flags,
++                                       bdrv_co_io_em_complete, &co);
++        } else {
++            acb = drv->bdrv_aio_readv(bs, sector_num, qiov, nb_sectors,
+                                       bdrv_co_io_em_complete, &co);
++        }
+         if (acb == NULL) {
+             return -EIO;
+         } else {
+@@ -972,12 +981,15 @@ static int coroutine_fn bdrv_driver_pwritev(BlockDriverState *bs,
+         goto emulate_flags;
+     }
 
--    .bdrv_aio_readv         = null_aio_readv,
--    .bdrv_aio_writev        = null_aio_writev,
-+    .bdrv_aio_preadv        = null_aio_preadv,
-+    .bdrv_aio_pwritev       = null_aio_pwritev,
-     .bdrv_aio_flush         = null_aio_flush,
-     .bdrv_reopen_prepare    = null_reopen_prepare,
++    /* FIXME - no need to calculate these if .bdrv_aio_pwritev exists */
+     sector_num = offset >> BDRV_SECTOR_BITS;
+     nb_sectors = bytes >> BDRV_SECTOR_BITS;
 
+-    assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
+-    assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
+-    assert((bytes >> BDRV_SECTOR_BITS) <= BDRV_REQUEST_MAX_SECTORS);
++    if (!drv->bdrv_aio_pwritev) {
++        assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
++        assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
++        assert((bytes >> BDRV_SECTOR_BITS) <= BDRV_REQUEST_MAX_SECTORS);
++    }
+
+     if (drv->bdrv_co_writev_flags) {
+         ret = drv->bdrv_co_writev_flags(bs, sector_num, nb_sectors, qiov,
+@@ -992,8 +1004,16 @@ static int coroutine_fn bdrv_driver_pwritev(BlockDriverState *bs,
+             .coroutine = qemu_coroutine_self(),
+         };
+
+-        acb = bs->drv->bdrv_aio_writev(bs, sector_num, qiov, nb_sectors,
++        if (drv->bdrv_aio_pwritev) {
++            acb = drv->bdrv_aio_pwritev(bs, offset, bytes, qiov,
++                                        flags & bs->supported_write_flags,
++                                        bdrv_co_io_em_complete, &co);
++            flags &= ~bs->supported_write_flags;
++        } else {
++            assert(!bs->supported_write_flags);
++            acb = drv->bdrv_aio_writev(bs, sector_num, qiov, nb_sectors,
+                                        bdrv_co_io_em_complete, &co);
++        }
+         if (acb == NULL) {
+             ret = -EIO;
+         } else {
 -- 
 2.14.3
