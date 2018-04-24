@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fB2Nk-0007nB-Io
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 14:09:38 -0400
+	(envelope-from <berrange@redhat.com>) id 1fB2c7-0005O0-3n
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 14:24:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fB2Ng-0003qB-Fm
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 14:09:36 -0400
-References: <1524570294-23058-1-git-send-email-thuth@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <45e83916-df9d-6417-0646-35381f4a98d5@redhat.com>
-Date: Tue, 24 Apr 2018 20:09:29 +0200
+	(envelope-from <berrange@redhat.com>) id 1fB2c3-0002ZS-UK
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 14:24:27 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38604 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fB2c3-0002Z5-Nc
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 14:24:23 -0400
+Date: Tue, 24 Apr 2018 19:24:05 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180424182405.GM20310@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <1524295325-18136-1-git-send-email-wangxinxin.wang@huawei.com>
+	<20180424171631.GF2521@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <1524570294-23058-1-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH] hw/s390x: Allow to configure the
- consoles with the "-serial" parameter
+Content-Disposition: inline
+In-Reply-To: <20180424171631.GF2521@work-vm>
+Subject: Re: [Qemu-devel] [PATCH] migration/fd: abort migration if receive
+ POLLHUP event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,242 +29,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Wang Xin <wangxinxin.wang@huawei.com>, qemu-devel@nongnu.org, quintela@redhat.com, arei.gonglei@huawei.com, peterx@redhat.com
 
-On 24.04.2018 13:44, Thomas Huth wrote:
-> The consoles ("sclpconsole" and "sclplmconsole") can only be configured
-> with "-device" and "-chardev" so far. Other machines use the convenience
-> option "-serial" to configure the default consoles, too, even for virtual
-> consoles like spapr-vty on the pseries machine. So let's support this
-> option on s390x, too, so we can easily enable the serial console here
-> again with "-nodefaults", for example. Also map the second -serial
-> option to the "sclplmconsole", so that there is now an easy way to
-> configure this second console on s390x, too.
-> Additionally, the new code is also smaller than the old one and we have
-> less s390x-specific code in vl.c :-)
+On Tue, Apr 24, 2018 at 06:16:31PM +0100, Dr. David Alan Gilbert wrote:
+> * Wang Xin (wangxinxin.wang@huawei.com) wrote:
+> > If the fd socket peer closed shortly, ppoll may receive a POLLHUP
+> > event before the expected POLLIN event, and qemu will do nothing
+> > but goes into an infinite loop of the POLLHUP event.
+> > 
+> > So, abort the migration if we receive a POLLHUP event.
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  hw/s390x/event-facility.c         | 14 +++++++++++
->  hw/s390x/s390-virtio-ccw.c        | 19 +++++++++++++--
->  include/hw/boards.h               |  1 -
->  include/hw/s390x/event-facility.h |  2 ++
->  vl.c                              | 50 ---------------------------------------
->  5 files changed, 33 insertions(+), 53 deletions(-)
+> Hi Wang Xin,
+>   Can you explain how you manage to trigger this case; I've not hit it.
 > 
-> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-> index 9c24bc6..e6940a2 100644
-> --- a/hw/s390x/event-facility.c
-> +++ b/hw/s390x/event-facility.c
-> @@ -511,3 +511,17 @@ static void register_types(void)
->  }
->  
->  type_init(register_types)
-> +
-> +BusState *sclp_get_event_facility_bus(void)
-> +{
-> +    Object *busobj;
-> +    SCLPEventsBus *sbus;
-> +
-> +    busobj = object_resolve_path_type("", TYPE_SCLP_EVENTS_BUS, NULL);
-> +    sbus = OBJECT_CHECK(SCLPEventsBus, busobj, TYPE_SCLP_EVENTS_BUS);
-> +    if (!sbus) {
-> +        return NULL;
-> +    }
-> +
-> +    return &sbus->qbus;
-> +}
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 435f7c9..fe28514 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -288,6 +288,15 @@ static void s390_create_virtio_net(BusState *bus, const char *name)
->      }
->  }
->  
-> +static void s390_create_sclpconsole(const char *type, Chardev *chardev)
-> +{
-> +    DeviceState *dev;
-> +
-> +    dev = qdev_create(sclp_get_event_facility_bus(), type);
-> +    qdev_prop_set_chr(dev, "chardev", chardev);
-> +    qdev_init_nofail(dev);
-> +}
-> +
->  static void ccw_init(MachineState *machine)
->  {
->      int ret;
-> @@ -311,6 +320,14 @@ static void ccw_init(MachineState *machine)
->                        machine->initrd_filename, "s390-ccw.img",
->                        "s390-netboot.img", true);
->  
-> +    /* init consoles */
-> +    if (serial_hds[0]) {
-> +        s390_create_sclpconsole("sclpconsole", serial_hds[0]);
-> +    }
-> +    if (serial_hds[1]) {
-> +        s390_create_sclpconsole("sclplmconsole", serial_hds[1]);
-> +    }
-> +
->      /*
->       * We cannot easily make the pci host bridge conditional as older QEMUs
->       * always created it. Doing so would break migration across QEMU versions.
-> @@ -470,10 +487,8 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
->      mc->block_default_type = IF_VIRTIO;
->      mc->no_cdrom = 1;
->      mc->no_floppy = 1;
-> -    mc->no_serial = 1;
->      mc->no_parallel = 1;
->      mc->no_sdcard = 1;
-> -    mc->use_sclp = 1;
->      mc->max_cpus = S390_MAX_CPUS;
->      mc->has_hotpluggable_cpus = true;
->      mc->get_hotplug_handler = s390_get_hotplug_handler;
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index a609239..5c5eee5 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -180,7 +180,6 @@ struct MachineClass {
->      unsigned int no_serial:1,
->          no_parallel:1,
->          use_virtcon:1,
-> -        use_sclp:1,
->          no_floppy:1,
->          no_cdrom:1,
->          no_sdcard:1,
-> diff --git a/include/hw/s390x/event-facility.h b/include/hw/s390x/event-facility.h
-> index 5698e5e..5cc16f6 100644
-> --- a/include/hw/s390x/event-facility.h
-> +++ b/include/hw/s390x/event-facility.h
-> @@ -210,4 +210,6 @@ typedef struct SCLPEventFacilityClass {
->      bool (*event_pending)(SCLPEventFacility *ef);
->  } SCLPEventFacilityClass;
->  
-> +BusState *sclp_get_event_facility_bus(void);
-> +
->  #endif
-> diff --git a/vl.c b/vl.c
-> index fce1fd1..b32340c 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -133,7 +133,6 @@ int main(int argc, char **argv)
->  #include "sysemu/iothread.h"
->  
->  #define MAX_VIRTIO_CONSOLES 1
-> -#define MAX_SCLP_CONSOLES 1
->  
->  static const char *data_dir[16];
->  static int data_dir_idx;
-> @@ -157,7 +156,6 @@ int no_frame;
->  Chardev *serial_hds[MAX_SERIAL_PORTS];
->  Chardev *parallel_hds[MAX_PARALLEL_PORTS];
->  Chardev *virtcon_hds[MAX_VIRTIO_CONSOLES];
-> -Chardev *sclp_hds[MAX_SCLP_CONSOLES];
->  int win2k_install_hack = 0;
->  int singlestep = 0;
->  int smp_cpus;
-> @@ -209,7 +207,6 @@ static int has_defaults = 1;
->  static int default_serial = 1;
->  static int default_parallel = 1;
->  static int default_virtcon = 1;
-> -static int default_sclp = 1;
->  static int default_monitor = 1;
->  static int default_floppy = 1;
->  static int default_cdrom = 1;
-> @@ -2571,39 +2568,6 @@ static int virtcon_parse(const char *devname)
->      return 0;
->  }
->  
-> -static int sclp_parse(const char *devname)
-> -{
-> -    QemuOptsList *device = qemu_find_opts("device");
-> -    static int index = 0;
-> -    char label[32];
-> -    QemuOpts *dev_opts;
-> -
-> -    if (strcmp(devname, "none") == 0) {
-> -        return 0;
-> -    }
-> -    if (index == MAX_SCLP_CONSOLES) {
-> -        error_report("too many sclp consoles");
-> -        exit(1);
-> -    }
-> -
-> -    assert(arch_type == QEMU_ARCH_S390X);
-> -
-> -    dev_opts = qemu_opts_create(device, NULL, 0, NULL);
-> -    qemu_opt_set(dev_opts, "driver", "sclpconsole", &error_abort);
-> -
-> -    snprintf(label, sizeof(label), "sclpcon%d", index);
-> -    sclp_hds[index] = qemu_chr_new(label, devname);
-> -    if (!sclp_hds[index]) {
-> -        error_report("could not connect sclp console"
-> -                     " to character backend '%s'", devname);
-> -        return -1;
-> -    }
-> -    qemu_opt_set(dev_opts, "chardev", label, &error_abort);
-> -
-> -    index++;
-> -    return 0;
-> -}
-> -
->  static int debugcon_parse(const char *devname)
->  {
->      QemuOpts *opts;
-> @@ -4237,9 +4201,6 @@ int main(int argc, char **argv, char **envp)
->      if (!has_defaults || !machine_class->use_virtcon) {
->          default_virtcon = 0;
->      }
-> -    if (!has_defaults || !machine_class->use_sclp) {
-> -        default_sclp = 0;
-> -    }
->      if (!has_defaults || machine_class->no_floppy) {
->          default_floppy = 0;
->      }
-> @@ -4286,16 +4247,11 @@ int main(int argc, char **argv, char **envp)
->              add_device_config(DEV_SERIAL, "mon:stdio");
->          } else if (default_virtcon && default_monitor) {
->              add_device_config(DEV_VIRTCON, "mon:stdio");
-> -        } else if (default_sclp && default_monitor) {
-> -            add_device_config(DEV_SCLP, "mon:stdio");
->          } else {
->              if (default_serial)
->                  add_device_config(DEV_SERIAL, "stdio");
->              if (default_virtcon)
->                  add_device_config(DEV_VIRTCON, "stdio");
-> -            if (default_sclp) {
-> -                add_device_config(DEV_SCLP, "stdio");
-> -            }
->              if (default_monitor)
->                  monitor_parse("stdio", "readline", false);
->          }
-> @@ -4308,9 +4264,6 @@ int main(int argc, char **argv, char **envp)
->              monitor_parse("vc:80Cx24C", "readline", false);
->          if (default_virtcon)
->              add_device_config(DEV_VIRTCON, "vc:80Cx24C");
-> -        if (default_sclp) {
-> -            add_device_config(DEV_SCLP, "vc:80Cx24C");
-> -        }
->      }
->  
->  #if defined(CONFIG_VNC)
-> @@ -4560,9 +4513,6 @@ int main(int argc, char **argv, char **envp)
->          exit(1);
->      if (foreach_device_config(DEV_VIRTCON, virtcon_parse) < 0)
->          exit(1);
-> -    if (foreach_device_config(DEV_SCLP, sclp_parse) < 0) {
-> -        exit(1);
-> -    }
->      if (foreach_device_config(DEV_DEBUGCON, debugcon_parse) < 0)
->          exit(1);
->  
+> > Signed-off-by: Wang Xin <wangxinxin.wang@huawei.com>
+> > 
+> > diff --git a/migration/fd.c b/migration/fd.c
+> > index cd06182..5932c87 100644
+> > --- a/migration/fd.c
+> > +++ b/migration/fd.c
+> > @@ -15,6 +15,7 @@
+> >   */
+> >  
+> >  #include "qemu/osdep.h"
+> > +#include "qemu/error-report.h"
+> >  #include "channel.h"
+> >  #include "fd.h"
+> >  #include "monitor/monitor.h"
+> > @@ -46,6 +47,11 @@ static gboolean fd_accept_incoming_migration(QIOChannel *ioc,
+> >                                               GIOCondition condition,
+> >                                               gpointer opaque)
+> >  {
+> > +    if (condition & G_IO_HUP) {
+> > +        error_report("The migration peer closed, job abort");
+> > +        exit(EXIT_FAILURE);
+> > +    }
+> > +
 > 
+> OK,  I wish we had a nicer way for failing;  especially for the
+> multifd/postcopy recovery worlds where one failed connection might not
+> be fatal; but I don't see how to do that here.
 
-If this doesn't break any setups we have, I really like it :)
+This doesn't feel right to me.
 
+We have passed in a pre-opened FD to QEMU, and we registered a watch
+on it to detect when there is data from the src QEMU that is available
+to read.  Normally the src will have sent something so we'll get G_IO_IN,
+but you're suggesting the client has quit immediately, so we're getting
+G_IO_HUP due to end of file.
+
+The migration_channel_process_incoming() method that we pass the ioc
+object to will be calling qio_channel_read(ioc) somewhere to try to
+read that data.
+
+For QEMU to spin in infinite loop there must be code in the
+migration_channel_process_incoming() that is ignoring the return
+value of qio_channel_read() in some manner causing it to retry
+the read again & again I presume.
+
+Putting this check for G_IO_HUP fixes your immediate problem scenario,
+but whatever code was spinning in infinite loop is still broken and
+I'd guess it was possible to still trigger the loop. eg by writing
+1 single byte and then closing the socket.
+
+So, IMHO this fix is wrong - we need to find the root cause and fix
+that, not try to avoid calling the buggy code.
+
+> 
+> >      migration_channel_process_incoming(ioc);
+> >      object_unref(OBJECT(ioc));
+> >      return G_SOURCE_REMOVE;
+> > @@ -67,7 +73,7 @@ void fd_start_incoming_migration(const char *infd, Error **errp)
+> >  
+> >      qio_channel_set_name(QIO_CHANNEL(ioc), "migration-fd-incoming");
+> >      qio_channel_add_watch(ioc,
+> > -                          G_IO_IN,
+> > +                          G_IO_IN | G_IO_HUP,
+> >                            fd_accept_incoming_migration,
+> >                            NULL,
+> >                            NULL);
+> 
+> Dave
+> 
+> > -- 
+> > 2.8.1.windows.1
+> > 
+> > 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+Regards,
+Daniel
 -- 
-
-Thanks,
-
-David / dhildenb
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
