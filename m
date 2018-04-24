@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tina.zhang@intel.com>) id 1fArqf-0007Sx-Oi
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 02:54:47 -0400
+	(envelope-from <christophe.lyon@st.com>) id 1fAsN6-0003OH-4k
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 03:28:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tina.zhang@intel.com>) id 1fArqb-0006ta-Ss
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 02:54:45 -0400
-Received: from mga01.intel.com ([192.55.52.88]:39619)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tina.zhang@intel.com>)
-	id 1fArqb-0006s5-HT
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 02:54:41 -0400
-From: "Zhang, Tina" <tina.zhang@intel.com>
-Date: Tue, 24 Apr 2018 06:54:35 +0000
-Message-ID: <237F54289DF84E4997F34151298ABEBC7C7E5046@SHSMSX101.ccr.corp.intel.com>
-References: <1524471278-22546-1-git-send-email-tina.zhang@intel.com>
-	<1524471278-22546-3-git-send-email-tina.zhang@intel.com>
-	<20180423131202.zcyam25lkh7khbil@sirius.home.kraxel.org>
-In-Reply-To: <20180423131202.zcyam25lkh7khbil@sirius.home.kraxel.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <christophe.lyon@st.com>) id 1fAsN1-0004CY-2u
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 03:28:16 -0400
+Received: from mx07-00178001.pphosted.com ([62.209.51.94]:50615)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <christophe.lyon@st.com>)
+	id 1fAsN0-0004BY-B5
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 03:28:11 -0400
+From: Christophe Lyon <christophe.lyon@st.com>
+Date: Tue, 24 Apr 2018 09:27:38 +0200
+Message-ID: <20180424072758.21643-1-christophe.lyon@st.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 2/2] ui: introduce vfio_display_reset
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [ARM/FDPIC v3 3/4] linux-user: ARM-FDPIC: Add support
+ of FDPIC for ARM.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,84 +26,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "Yuan, Hang" <hang.yuan@intel.com>
+To: qemu-devel@nongnu.org, christophe.lyon@linaro.org, peter.maydell@linaro.org, riku.voipio@iki.fi, laurent@vivier.eu
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogaW50ZWwtZ3Z0LWRldiBb
-bWFpbHRvOmludGVsLWd2dC1kZXYtYm91bmNlc0BsaXN0cy5mcmVlZGVza3RvcC5vcmddIE9uDQo+
-IEJlaGFsZiBPZiBHZXJkIEhvZmZtYW5uDQo+IFNlbnQ6IE1vbmRheSwgQXByaWwgMjMsIDIwMTgg
-OToxMiBQTQ0KPiBUbzogWmhhbmcsIFRpbmEgPHRpbmEuemhhbmdAaW50ZWwuY29tPg0KPiBDYzog
-YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb207IGludGVsLWd2dC1kZXZAbGlzdHMuZnJlZWRlc2t0
-b3Aub3JnOyBxZW11LQ0KPiBkZXZlbEBub25nbnUub3JnOyB6aGVueXV3QGxpbnV4LmludGVsLmNv
-bTsgWXVhbiwgSGFuZw0KPiA8aGFuZy55dWFuQGludGVsLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQ
-QVRDSCAyLzJdIHVpOiBpbnRyb2R1Y2UgdmZpb19kaXNwbGF5X3Jlc2V0DQo+IA0KPiA+ICsgICAg
-c3VyZmFjZSA9IHFlbXVfY29uc29sZV9zdXJmYWNlKHZkZXYtPmRweS0+Y29uKTsNCj4gDQo+ID4g
-KyAgICBkcHlfZ2xfc2Nhbm91dF9kaXNhYmxlKHZkZXYtPmRweS0+Y29uKTsNCj4gPiArICAgIGRw
-eV9nZnhfc3dpdGNoX3N1cmZhY2UodmRldi0+ZHB5LT5jb24sIHN1cmZhY2UpOw0KPiANCj4gSG1t
-LCBzbyB5b3UgYXNrIHdoaWNoIHN1cmZhY2UgaXMgYWN0aXZlLCB0aGVuIHN3aXRjaCB0byBpdC4N
-Cj4gV2h5Pw0KDQpXaGF0IHRoaXMgcGF0Y2gtc2V0IGlzIGdvaW5nIHRvIGRvIGlzIHRvIGRpc2Fi
-bGUgc2Nhbm91dCBtb2RlIGR1cmluZyBndWVzdCBPUyByZXNldCwgc28gdGhhdCBRZW11IFVJIChl
-LmcuIGd0aykgY2FuIGRpcmVjdGx5IHVzZSBRZW11Q29uc29sZSdzIERpc3BsYXlTdXJmYWNlIGlu
-c3RlYWQgb2YgZ3Vlc3QgZG1hLWJ1ZiBmcmFtZWJ1ZmZlciBkdXJpbmcgdGhlIGd1ZXN0IE9TIHJl
-c2V0IHByb2Nlc3MuIA0KZ2RfZWdsX2RyYXcgaXMgaW52b2RrZWQgd2hlbiB0aGUgUWVtdSBVSSB3
-aW5kb3cgZ2V0cyB0aGUgZm9jdXMuIElmIHRoaXMgcHJvY2VzcyBpcyBoYXBwZW5lZCBkdXJpbmcg
-Z3Vlc3QgT1MgcmVib290LCBnZF9lZ2xfc2Nhbm91dF9mbHVzaCgpIHdpbGwgYmUgaW52b2tlZCAo
-YXMgdmMtPmdmeC5zY2Fub3V0X21vZGU9PXRydWUpLCB3aGljaCB1c2VzIGd1ZXN0IGRtYS1idWYg
-ZnJhbWVidWZmZXIuIFNlZSB0aGUgZm9sbG93aW5nIGxvZ2ljIGluIGd0ay1lZ2wuYzoNCnZvaWQg
-Z2RfZWdsX2RyYXcoVmlydHVhbENvbnNvbGUgKnZjKQ0Kew0KICAgIEdka1dpbmRvdyAqd2luZG93
-Ow0KICAgIGludCB3dywgd2g7DQoNCiAgICBpZiAoIXZjLT5nZnguZ2xzKSB7DQogICAgICAgIHJl
-dHVybjsNCiAgICB9DQoNCiAgICBpZiAodmMtPmdmeC5zY2Fub3V0X21vZGUpIHsNCiAgICAgICAg
-Z2RfZWdsX3NjYW5vdXRfZmx1c2goJnZjLT5nZnguZGNsLCAwLCAwLCB2Yy0+Z2Z4LncsIHZjLT5n
-ZnguaCk7DQogICAgfSBlbHNlIHsNCiAgICAgICAgaWYgKCF2Yy0+Z2Z4LmRzKSB7DQogICAgICAg
-ICAgICByZXR1cm47DQogICAgICAgIH0NCiAgICAgICAgZWdsTWFrZUN1cnJlbnQocWVtdV9lZ2xf
-ZGlzcGxheSwgdmMtPmdmeC5lc3VyZmFjZSwNCiAgICAgICAgICAgICAgICAgICAgICAgdmMtPmdm
-eC5lc3VyZmFjZSwgdmMtPmdmeC5lY3R4KTsNCg0KICAgICAgICB3aW5kb3cgPSBndGtfd2lkZ2V0
-X2dldF93aW5kb3codmMtPmdmeC5kcmF3aW5nX2FyZWEpOw0KICAgICAgICBnZGtfZHJhd2FibGVf
-Z2V0X3NpemUod2luZG93LCAmd3csICZ3aCk7DQogICAgICAgIHN1cmZhY2VfZ2xfc2V0dXBfdmll
-d3BvcnQodmMtPmdmeC5nbHMsIHZjLT5nZnguZHMsIHd3LCB3aCk7DQogICAgICAgIHN1cmZhY2Vf
-Z2xfcmVuZGVyX3RleHR1cmUodmMtPmdmeC5nbHMsIHZjLT5nZnguZHMpOw0KDQogICAgICAgIGVn
-bFN3YXBCdWZmZXJzKHFlbXVfZWdsX2Rpc3BsYXksIHZjLT5nZnguZXN1cmZhY2UpOw0KICAgIH0N
-Cn0NCg0KVXNpbmcgZ3Vlc3QgZG1hLWJ1ZiBmcmFtZWJ1ZmZlciBkdXJpbmcgZ3Vlc3QgT1MgcmVi
-b290IHdpbGwgbGVhZCB0byBob3N0IEdQVSBoYW5nLCBhcyB0aGUgR0dUVCBpcyBpbnZhbGlkIGR1
-cmluZyBndWVzdCBPUyByZWJvb3QuDQpUaGF0J3Mgd2h5IHdlIHdhbnQgdG8gZGlzYWJsZSB0aGUg
-c2Nhbm91dCBtb2RlIGFuZCByZWxlYXNlIGFsbCB0aGUgZG1hLWJ1ZiByZXNvdXJjZXMgZHVyaW5n
-IGd1ZXN0IE9TIHJlc2V0Lg0KDQpBZnRlciByZXZpZXdpbmcgdGhpcyBwYXRjaC1zZXQgYWdhaW4s
-IEkgdGhpbmsgd2UgbWlnaHQgbm90IG5lZWQgdGhlIHByb3Bvc2VkIGRweV9nZnhfc3dpdGNoX3N1
-cmZhY2UoKSBhbnkgbW9yZS4NClRoZSByZWFzb24gSSBwcm9wb3NlZCBpdCB3YXMgYmVjYXVzZSBJ
-IHRob3VnaHQgZ2Z4LmRzIGlzIGNoYW5nZWQgdG8gdGhlIHN1cmZhY2UgcmVsYXRlZCB0byBndWVz
-dCBkbWEtYnVmIGZyYW1lYnVmZmVyIGFuZCB3ZSBuZWVkIHRvIHN3aXRjaCBpdCB3aXRoIFFlbXVD
-b25zb2xlJ3MgRGlzcGxheVN1cmdmYWNlIGR1cmluZyByZXNldC4NCkJ1dCBhZnRlciByZXZpZXdp
-bmcgdGhlIGNvZGUsIHZjLT5nZnguZHMgaXMgYWx3YXlzIHBvaW50aW5nIHRvIHRoZSB2YWxpZCBR
-ZW11Q29uc29sZXMnIERpc3BsYXlTdXJmYWNlLiBTbyB3ZSBkb27igJl0IG5lZWQgZHB5X2dmeF9z
-d2l0Y2hfc3VyZmFjZSgpIHRvIHRha2UgY2FyZSBvZiBpdC4NClRoYW5rcy4NCg0KPiANCj4gTWF5
-YmUgeW91IGp1c3QgbmVlZCBhIGZ1bGwgZGlzcGxheSB1cGRhdGUgYWZ0ZXIgZGlzYWJsaW5nIHRo
-ZSBnbCBzY2Fub3V0Pw0KRG8geW91IHN0aWxsIHRoaW5rIHVwZGF0aW5nIGZ1bGwgZGlzcGxheSBp
-cyBuZWVkZWQ/IEl0IHNlZW1zIHRoZSBleGlzdGluZyB2ZmlvX2Rpc3BsYXlfZG1hYnVmX3VwZGF0
-ZSBjYW4gYmUgaGVscGZ1bCBlbm91Z2ggdG8gY3JlYXRlIGEgbmV3IHRleHR1cmUgaWYgbmVlZGVk
-Lg0KVGhhbmtzLg0KDQoNCkJSLA0KVGluYQ0KPiANCj4gY2hlZXJzLA0KPiAgIEdlcmQNCj4gDQo+
-IFBTOiBtYXliZSBhZGRpbmcgYSBkcHlfZ2Z4X3VwZGF0ZV9mdWxsKCkgaGVscGVyIGlzIHVzZWZ1
-bDoNCj4gDQo+IGRpZmYgLS1naXQgYS9pbmNsdWRlL3VpL2NvbnNvbGUuaCBiL2luY2x1ZGUvdWkv
-Y29uc29sZS5oIGluZGV4DQo+IDM3YThkNjhkMjkuLjk4MWI1MTlkZGUgMTAwNjQ0DQo+IC0tLSBh
-L2luY2x1ZGUvdWkvY29uc29sZS5oDQo+ICsrKyBiL2luY2x1ZGUvdWkvY29uc29sZS5oDQo+IEBA
-IC0yOTEsNiArMjkxLDcgQEAgYm9vbCBkcHlfdWlfaW5mb19zdXBwb3J0ZWQoUWVtdUNvbnNvbGUg
-KmNvbik7ICBpbnQNCj4gZHB5X3NldF91aV9pbmZvKFFlbXVDb25zb2xlICpjb24sIFFlbXVVSUlu
-Zm8gKmluZm8pOw0KPiANCj4gIHZvaWQgZHB5X2dmeF91cGRhdGUoUWVtdUNvbnNvbGUgKmNvbiwg
-aW50IHgsIGludCB5LCBpbnQgdywgaW50IGgpOw0KPiArdm9pZCBkcHlfZ2Z4X3VwZGF0ZV9mdWxs
-KFFlbXVDb25zb2xlICpjb24pOw0KPiAgdm9pZCBkcHlfZ2Z4X3JlcGxhY2Vfc3VyZmFjZShRZW11
-Q29uc29sZSAqY29uLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBEaXNwbGF5U3Vy
-ZmFjZSAqc3VyZmFjZSk7ICB2b2lkIGRweV90ZXh0X2N1cnNvcihRZW11Q29uc29sZQ0KPiAqY29u
-LCBpbnQgeCwgaW50IHkpOyBkaWZmIC0tZ2l0IGEvdWkvY29uc29sZS5jIGIvdWkvY29uc29sZS5j
-IGluZGV4DQo+IDNmYjJmNGUwOWYuLmIwMjUxMGNkY2EgMTAwNjQ0DQo+IC0tLSBhL3VpL2NvbnNv
-bGUuYw0KPiArKysgYi91aS9jb25zb2xlLmMNCj4gQEAgLTE1NzQsNiArMTU3NCwxNiBAQCB2b2lk
-IGRweV9nZnhfdXBkYXRlKFFlbXVDb25zb2xlICpjb24sIGludCB4LCBpbnQNCj4geSwgaW50IHcs
-IGludCBoKQ0KPiAgICAgIH0NCj4gIH0NCj4gDQo+ICt2b2lkIGRweV9nZnhfdXBkYXRlX2Z1bGwo
-UWVtdUNvbnNvbGUgKmNvbikgew0KPiArICAgIGlmICghY29uLT5zdXJmYWNlKSB7DQo+ICsgICAg
-ICAgIHJldHVybjsNCj4gKyAgICB9DQo+ICsgICAgZHB5X2dmeF91cGRhdGUoY29uLCAwLCAwLA0K
-PiArICAgICAgICAgICAgICAgICAgIHN1cmZhY2Vfd2lkdGgoY29uLT5zdXJmYWNlKSwNCj4gKyAg
-ICAgICAgICAgICAgICAgICBzdXJmYWNlX2hlaWdodChjb24tPnN1cmZhY2UpKTsgfQ0KPiArDQo+
-ICB2b2lkIGRweV9nZnhfcmVwbGFjZV9zdXJmYWNlKFFlbXVDb25zb2xlICpjb24sDQo+ICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIERpc3BsYXlTdXJmYWNlICpzdXJmYWNlKSAgew0KPiAN
-Cj4gX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18NCj4gaW50
-ZWwtZ3Z0LWRldiBtYWlsaW5nIGxpc3QNCj4gaW50ZWwtZ3Z0LWRldkBsaXN0cy5mcmVlZGVza3Rv
-cC5vcmcNCj4gaHR0cHM6Ly9saXN0cy5mcmVlZGVza3RvcC5vcmcvbWFpbG1hbi9saXN0aW5mby9p
-bnRlbC1ndnQtZGV2DQo=
+Add FDPIC info into image_info structure since interpreter info is on
+stack and needs to be saved to be accessed later on.
+
+Compared to v2: Do not add the is_fdpic field to TaskState, as the
+information can be retrieved from the 'info' data in TaskState.
+
+Co-Authored-By:  Micka=C3=ABl Gu=C3=AAn=C3=A9 <mickael.guene@st.com>
+Signed-off-by: Christophe Lyon <christophe.lyon@st.com>
+
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 76d7718..fad3c42 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -78,6 +78,11 @@ enum {
+  */
+ #define personality(pers)       (pers & PER_MASK)
+=20
++int info_is_fdpic(struct image_info *info)
++{
++    return (info->personality =3D=3D PER_LINUX_FDPIC);
++}
++
+ /* this flag is uneffective under linux too, should be deleted */
+ #ifndef MAP_DENYWRITE
+ #define MAP_DENYWRITE 0
+@@ -287,6 +292,25 @@ static inline void init_thread(struct target_pt_regs=
+ *regs,
+     /* For uClinux PIC binaries.  */
+     /* XXX: Linux does this only on ARM with no MMU (do we care ?) */
+     regs->uregs[10] =3D infop->start_data;
++
++    /* Support ARM FDPIC.  */
++    if (info_is_fdpic(infop)) {
++        /* As described in the ABI document, r7 points to the loadmap in=
+fo
++         * prepared by the kernel. If an interpreter is needed, r8 point=
+s
++         * to the interpreter loadmap and r9 points to the interpreter
++         * PT_DYNAMIC info. If no interpreter is needed, r8 is zero, and
++         * r9 points to the main program PT_DYNAMIC info.
++         */
++        regs->uregs[7] =3D infop->loadmap_addr;
++        if (infop->interpreter_loadmap_addr) {
++            /* Executable is dynamically loaded.  */
++            regs->uregs[8] =3D infop->interpreter_loadmap_addr;
++            regs->uregs[9] =3D infop->interpreter_pt_dynamic_addr;
++        } else {
++            regs->uregs[8] =3D 0;
++            regs->uregs[9] =3D infop->pt_dynamic_addr;
++        }
++    }
+ }
+=20
+ #define ELF_NREG    18
+@@ -1745,6 +1769,11 @@ static abi_ulong create_elf_tables(abi_ulong p, in=
+t argc, int envc,
+         if (interp_info) {
+             interp_info->other_info =3D info;
+             sp =3D loader_build_fdpic_loadmap(interp_info, sp);
++            info->interpreter_loadmap_addr =3D interp_info->loadmap_addr=
+;
++            info->interpreter_pt_dynamic_addr =3D interp_info->pt_dynami=
+c_addr;
++        } else {
++            info->interpreter_loadmap_addr =3D 0;
++            info->interpreter_pt_dynamic_addr =3D 0;
+         }
+     }
+=20
+diff --git a/linux-user/qemu.h b/linux-user/qemu.h
+index da3b517..f8b9896 100644
+--- a/linux-user/qemu.h
++++ b/linux-user/qemu.h
+@@ -57,6 +57,8 @@ struct image_info {
+         uint16_t        nsegs;
+         void           *loadsegs;
+         abi_ulong       pt_dynamic_addr;
++        abi_ulong       interpreter_loadmap_addr;
++        abi_ulong       interpreter_pt_dynamic_addr;
+         struct image_info *other_info;
+ };
+=20
+@@ -144,7 +146,6 @@ typedef struct TaskState {
+      * from multiple threads.)
+      */
+     int signal_pending;
+-
+ } __attribute__((aligned(16))) TaskState;
+=20
+ extern char *exec_path;
+@@ -182,6 +183,7 @@ abi_ulong loader_build_argptr(int envc, int argc, abi=
+_ulong sp,
+ int loader_exec(int fdexec, const char *filename, char **argv, char **en=
+vp,
+              struct target_pt_regs * regs, struct image_info *infop,
+              struct linux_binprm *);
++int info_is_fdpic(struct image_info *info);
+=20
+ uint32_t get_elf_eflags(int fd);
+ int load_elf_binary(struct linux_binprm *bprm, struct image_info *info);
+--=20
+2.6.3
