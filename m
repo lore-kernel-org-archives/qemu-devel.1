@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fB0PU-0004wl-KY
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 12:03:17 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fB0Pr-0005Et-8w
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 12:03:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fB0PQ-0005UJ-N8
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 12:03:16 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:55199)
+	(envelope-from <alex.bennee@linaro.org>) id 1fB0Pn-00063k-Bw
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 12:03:39 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36159)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fB0PQ-0005Rd-Gt
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 12:03:12 -0400
-Received: by mail-wm0-x243.google.com with SMTP id f6so2059064wmc.4
-	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 09:03:12 -0700 (PDT)
+	id 1fB0Pn-00062j-5r
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 12:03:35 -0400
+Received: by mail-wm0-x242.google.com with SMTP id n10so1760864wmc.1
+	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 09:03:35 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 24 Apr 2018 16:23:51 +0100
-Message-Id: <20180424152405.10304-33-alex.bennee@linaro.org>
-In-Reply-To: <20180424152405.10304-1-alex.bennee@linaro.org>
-References: <20180424152405.10304-1-alex.bennee@linaro.org>
+Date: Tue, 24 Apr 2018 17:03:29 +0100
+Message-Id: <20180424160329.8089-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 32/46] tests/tcg/mips: include common mips
- hello-mips
+Subject: [Qemu-devel] [PATCH] linux-user: set minimum uname for RISC-V
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +27,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Yongbok Kim <yongbok.kim@mips.com>
+To: qemu-devel@nongnu.org, mjc@sifive.com, palmer@sifive.com, sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+
+As support was merged into the mainline kernel at 4.15 it is unlikely
+3.8.0 is the correct value. Indeed when I testing binaries created by
+the current Debian SID compiler the tests failed with:
+
+  FATAL: kernel too old
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/tcg/mips/Makefile.target | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
- create mode 100644 tests/tcg/mips/Makefile.target
+ linux-user/riscv/target_syscall.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/tcg/mips/Makefile.target b/tests/tcg/mips/Makefile.target
-new file mode 100644
-index 0000000000..71f0c2dd53
---- /dev/null
-+++ b/tests/tcg/mips/Makefile.target
-@@ -0,0 +1,19 @@
-+# -*- Mode: makefile -*-
-+#
-+# MIPS - included from tests/tcg/Makefile.target
-+#
-+
-+MIPS_SRC=$(SRC_PATH)/tests/tcg/mips
-+
-+# Set search path for all sources
-+VPATH 		+= $(MIPS_SRC)
-+
-+MIPS_TESTS=hello-mips
-+
-+TESTS += $(MIPS_TESTS)
-+
-+hello-mips: CFLAGS+=-ffreestanding
-+hello-mips: LDFLAGS+=-nostdlib
-+
-+# For MIPS32 and 64 we have a bunch of extra tests in sub-directories
-+# however they are intended for system tests.
+diff --git a/linux-user/riscv/target_syscall.h b/linux-user/riscv/target_syscall.h
+index d4e109a27f..ee81d8bc88 100644
+--- a/linux-user/riscv/target_syscall.h
++++ b/linux-user/riscv/target_syscall.h
+@@ -45,7 +45,7 @@ struct target_pt_regs {
+ #else
+ #define UNAME_MACHINE "riscv64"
+ #endif
+-#define UNAME_MINIMUM_RELEASE "3.8.0"
++#define UNAME_MINIMUM_RELEASE "4.15.0"
+ 
+ #define TARGET_MINSIGSTKSZ 2048
+ #define TARGET_MLOCKALL_MCL_CURRENT 1
 -- 
 2.17.0
