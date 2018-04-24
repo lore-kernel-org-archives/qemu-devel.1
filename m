@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1fB2gJ-0007fb-C7
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 14:28:48 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fB3E1-0006OM-RI
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 15:03:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1fB2gG-0004DL-7p
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 14:28:47 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:42945)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1fB2gG-0004D9-1u
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 14:28:44 -0400
-Received: by mail-pf0-x243.google.com with SMTP id o16so12963855pfk.9
-	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 11:28:43 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20180424152405.10304-1-alex.bennee@linaro.org>
-	<20180424152405.10304-37-alex.bennee@linaro.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <58540476-c2fc-81b7-d806-bad0db73e440@twiddle.net>
-Date: Tue, 24 Apr 2018 08:28:37 -1000
+	(envelope-from <jsnow@redhat.com>) id 1fB3E1-0001XW-44
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 15:03:37 -0400
+References: <20180424085240.5798-1-stefanha@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <11a50e7b-4bfe-2c90-37b4-de25b58d09a1@redhat.com>
+Date: Tue, 24 Apr 2018 15:03:20 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180424152405.10304-37-alex.bennee@linaro.org>
+In-Reply-To: <20180424085240.5798-1-stefanha@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 36/46] tests/tcg/alpha: add Alpha
- specific tests
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] blockjob: drop
+ block_job_pause/resume_all()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,28 +24,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 04/24/2018 05:23 AM, Alex Bennée wrote:
-> These tests are a little strange as they use their own crt.o stub
-> instead of the system supplied one. We also disable the multiarch
-> testthread test as that requires a dynamically linked build.
+
+
+On 04/24/2018 04:52 AM, Stefan Hajnoczi wrote:
+> Commit 8119334918e86f45877cfc139192d54f2449a239 ("block: Don't
+> block_job_pause_all() in bdrv_drain_all()") removed the only callers of
+> block_job_pause/resume_all().
 > 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  tests/tcg/alpha/Makefile         | 35 --------------------------------
->  tests/tcg/alpha/Makefile.target  | 32 +++++++++++++++++++++++++++++
->  tests/tcg/alpha/{crt.s => crt.S} |  0
->  3 files changed, 32 insertions(+), 35 deletions(-)
->  delete mode 100644 tests/tcg/alpha/Makefile
->  create mode 100644 tests/tcg/alpha/Makefile.target
->  rename tests/tcg/alpha/{crt.s => crt.S} (100%)
+> Pausing and resuming now happens in child_job_drained_begin/end() so
+> it's no longer necessary to globally pause/resume jobs.
+> 
 
-Now that you have a cross-environment, you could simply drop the crt.o.
+neat!
 
-There's nothing special in there at all; it was just someone's attempt to
-produce tests *without* a fill cross-environment.
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-
-r~
+Reviewed-by: John Snow <jsnow@redhat.com>
