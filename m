@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fAznk-0006Xh-E4
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:24:17 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fAzno-0006c5-BG
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:24:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fAzng-0005Ne-67
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:24:16 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:53498)
+	(envelope-from <alex.bennee@linaro.org>) id 1fAznm-0005X1-55
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:24:20 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:35041)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fAznf-0005Lc-U8
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:24:12 -0400
-Received: by mail-wm0-x243.google.com with SMTP id 66so1795805wmd.3
-	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 08:24:11 -0700 (PDT)
+	id 1fAznl-0005VR-Nf
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 11:24:18 -0400
+Received: by mail-wr0-x244.google.com with SMTP id w3-v6so50366585wrg.2
+	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 08:24:17 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 24 Apr 2018 16:23:23 +0100
-Message-Id: <20180424152405.10304-5-alex.bennee@linaro.org>
+Date: Tue, 24 Apr 2018 16:23:26 +0100
+Message-Id: <20180424152405.10304-8-alex.bennee@linaro.org>
 In-Reply-To: <20180424152405.10304-1-alex.bennee@linaro.org>
 References: <20180424152405.10304-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 04/46] configure: move i386_cc to
- cross_cc_i386
+Subject: [Qemu-devel] [PATCH v3 07/46] Makefile: Rename TARGET_DIRS to
+ TARGET_LIST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,129 +31,136 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-Also dont assume x86_64 compiler can build i386 binaries.
+From: Fam Zheng <famz@redhat.com>
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+To be more accurate on its purpose and make code that looks for a certain
+target out of this variable more readable.
+
+Signed-off-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v2
-  - drop using system x86_64 compiler for i386 compiles
-v3
-  - fix cross_cc_i386 when on i386
----
- configure | 24 ++++++++++++++++--------
- 1 file changed, 16 insertions(+), 8 deletions(-)
+ Makefile               | 20 ++++++++++----------
+ configure              |  2 +-
+ scripts/create_config  |  2 +-
+ tests/Makefile.include |  2 +-
+ 4 files changed, 13 insertions(+), 13 deletions(-)
 
+diff --git a/Makefile b/Makefile
+index d71dd5bea4..e894431a89 100644
+--- a/Makefile
++++ b/Makefile
+@@ -62,8 +62,8 @@ seems to have been used for an in-tree build. You can fix this by running \
+ endif
+ endif
+ 
+-CONFIG_SOFTMMU := $(if $(filter %-softmmu,$(TARGET_DIRS)),y)
+-CONFIG_USER_ONLY := $(if $(filter %-user,$(TARGET_DIRS)),y)
++CONFIG_SOFTMMU := $(if $(filter %-softmmu,$(TARGET_LIST)),y)
++CONFIG_USER_ONLY := $(if $(filter %-user,$(TARGET_LIST)),y)
+ CONFIG_XEN := $(CONFIG_XEN_BACKEND)
+ CONFIG_ALL=y
+ -include config-all-devices.mak
+@@ -362,8 +362,8 @@ DOCS=
+ endif
+ 
+ SUBDIR_MAKEFLAGS=$(if $(V),,--no-print-directory --quiet) BUILD_DIR=$(BUILD_DIR)
+-SUBDIR_DEVICES_MAK=$(patsubst %, %/config-devices.mak, $(TARGET_DIRS))
+-SUBDIR_DEVICES_MAK_DEP=$(patsubst %, %-config-devices.mak.d, $(TARGET_DIRS))
++SUBDIR_DEVICES_MAK=$(patsubst %, %/config-devices.mak, $(TARGET_LIST))
++SUBDIR_DEVICES_MAK_DEP=$(patsubst %, %-config-devices.mak.d, $(TARGET_LIST))
+ 
+ ifeq ($(SUBDIR_DEVICES_MAK),)
+ config-all-devices.mak:
+@@ -466,7 +466,7 @@ config-host.h-timestamp: config-host.mak
+ qemu-options.def: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
+ 	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$@")
+ 
+-SUBDIR_RULES=$(patsubst %,subdir-%, $(TARGET_DIRS))
++SUBDIR_RULES=$(patsubst %,subdir-%, $(TARGET_LIST))
+ SOFTMMU_SUBDIR_RULES=$(filter %-softmmu,$(SUBDIR_RULES))
+ 
+ $(SOFTMMU_SUBDIR_RULES): $(block-obj-y)
+@@ -510,7 +510,7 @@ ROMSUBDIR_RULES=$(patsubst %,romsubdir-%, $(ROMS))
+ romsubdir-%:
+ 	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C pc-bios/$* V="$(V)" TARGET_DIR="$*/" CFLAGS="$(filter -O% -g%,$(CFLAGS))",)
+ 
+-ALL_SUBDIRS=$(TARGET_DIRS) $(patsubst %,pc-bios/%, $(ROMS))
++ALL_SUBDIRS=$(TARGET_LIST) $(patsubst %,pc-bios/%, $(ROMS))
+ 
+ recurse-all: $(SUBDIR_RULES) $(ROMSUBDIR_RULES)
+ 
+@@ -763,7 +763,7 @@ distclean: clean
+ 	rm -f docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf
+ 	rm -f docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html
+ 	rm -f docs/qemu-block-drivers.7
+-	for d in $(TARGET_DIRS); do \
++	for d in $(TARGET_LIST); do \
+ 	rm -rf $$d || exit 1 ; \
+         done
+ 	rm -Rf .sdk
+@@ -864,7 +864,7 @@ endif
+ 		$(INSTALL_DATA) $(SRC_PATH)/pc-bios/keymaps/$$x "$(DESTDIR)$(qemu_datadir)/keymaps"; \
+ 	done
+ 	$(INSTALL_DATA) $(BUILD_DIR)/trace-events-all "$(DESTDIR)$(qemu_datadir)/trace-events-all"
+-	for d in $(TARGET_DIRS); do \
++	for d in $(TARGET_LIST); do \
+ 	$(MAKE) $(SUBDIR_MAKEFLAGS) TARGET_DIR=$$d/ -C $$d $@ || exit 1 ; \
+         done
+ 
+@@ -1062,9 +1062,9 @@ endif
+ 	@echo  '  ctags/TAGS      - Generate tags file for editors'
+ 	@echo  '  cscope          - Generate cscope index'
+ 	@echo  ''
+-	@$(if $(TARGET_DIRS), \
++	@$(if $(TARGET_LIST), \
+ 		echo 'Architecture specific targets:'; \
+-		$(foreach t, $(TARGET_DIRS), \
++		$(foreach t, $(TARGET_LIST), \
+ 		printf "  %-30s - Build for %s\\n" $(patsubst %,subdir-%,$(t)) $(t);) \
+ 		echo '')
+ 	@echo  'Cleaning targets:'
 diff --git a/configure b/configure
-index caa838a0d0..ffd96d930f 100755
+index 0100545695..6d99d538cd 100755
 --- a/configure
 +++ b/configure
-@@ -284,7 +284,6 @@ libs_softmmu=""
- libs_tools=""
- audio_pt_int=""
- audio_win_int=""
--cc_i386=i386-pc-linux-gnu-gcc
- libs_qga=""
- debug_info="yes"
- stack_protector=""
-@@ -457,6 +456,8 @@ docker="no"
- cross_cc_aarch64="aarch64-linux-gnu-gcc"
- cross_cc_arm="arm-linux-gnueabihf-gcc"
- cross_cc_powerpc="powerpc-linux-gnu-gcc"
-+cross_cc_i386="i386-pc-linux-gnu-gcc"
-+cross_cc_cflags_i386=""
- 
- enabled_cross_compilers=""
- 
-@@ -687,12 +688,10 @@ case "$cpu" in
-   i386|i486|i586|i686|i86pc|BePC)
-     cpu="i386"
-     supported_cpu="yes"
--    cross_cc_i386=gcc
-   ;;
-   x86_64|amd64)
-     cpu="x86_64"
-     supported_cpu="yes"
--    cross_cc_x86_64=gcc
-   ;;
-   armv*b|armv*l|arm)
-     cpu="arm"
-@@ -1435,7 +1434,8 @@ case "$cpu" in
-     i386)
-            CPU_CFLAGS="-m32"
-            LDFLAGS="-m32 $LDFLAGS"
--           cc_i386='$(CC) -m32'
-+           cross_cc_i386=$cc
-+           cross_cc_cflags_i386=$CPU_CFLAGS
-            ;;
-     x86_64)
-            # ??? Only extremely old AMD cpus do not have cmpxchg16b.
-@@ -1443,12 +1443,14 @@ case "$cpu" in
-            # runtime and generate the fallback to serial emulation.
-            CPU_CFLAGS="-m64 -mcx16"
-            LDFLAGS="-m64 $LDFLAGS"
--           cc_i386='$(CC) -m32'
-+           cross_cc_x86_64=$cc
-+           cross_cc_cflags_x86_64=$CPU_CFLAGS
-            ;;
-     x32)
-            CPU_CFLAGS="-mx32"
-            LDFLAGS="-mx32 $LDFLAGS"
--           cc_i386='$(CC) -m32'
-+           cross_cc_i386=$cc
-+           cross_cc_cflags_i386="-m32"
-            ;;
-     # No special flags required for other host CPUs
- esac
-@@ -6675,7 +6677,6 @@ echo "CC=$cc" >> $config_host_mak
- if $iasl -h > /dev/null 2>&1; then
-   echo "IASL=$iasl" >> $config_host_mak
+@@ -6125,7 +6125,7 @@ qemu_version=$(head $source_path/VERSION)
+ echo "VERSION=$qemu_version" >>$config_host_mak
+ echo "PKGVERSION=$pkgversion" >>$config_host_mak
+ echo "SRC_PATH=$source_path" >> $config_host_mak
+-echo "TARGET_DIRS=$target_list" >> $config_host_mak
++echo "TARGET_LIST=$target_list" >> $config_host_mak
+ if [ "$docs" = "yes" ] ; then
+   echo "BUILD_DOCS=yes" >> $config_host_mak
  fi
--echo "CC_I386=$cc_i386" >> $config_host_mak
- echo "HOST_CC=$host_cc" >> $config_host_mak
- echo "CXX=$cxx" >> $config_host_mak
- echo "OBJCC=$objcc" >> $config_host_mak
-@@ -6794,6 +6795,7 @@ case "$target" in
- esac
+diff --git a/scripts/create_config b/scripts/create_config
+index d727e5e36e..58948a67a4 100755
+--- a/scripts/create_config
++++ b/scripts/create_config
+@@ -107,7 +107,7 @@ case $line in
+     target_name=${line#*=}
+     echo "#define TARGET_NAME \"$target_name\""
+     ;;
+- TARGET_DIRS=*)
++ TARGET_LIST=*)
+     # do nothing
+     ;;
+  TARGET_*=y) # configuration
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 3b9a5e31a2..3d2f0458ab 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -854,7 +854,7 @@ endif
  
- target_compiler=""
-+target_compiler_cflags=""
+ # QTest rules
  
- mkdir -p $target_dir
- echo "# Automatically generated by configure - do not modify" > $config_target_mak
-@@ -6811,6 +6813,7 @@ case "$target_name" in
-   i386)
-     gdb_xml_files="i386-32bit.xml i386-32bit-core.xml i386-32bit-sse.xml"
-     target_compiler=$cross_cc_i386
-+    target_compiler_cflags=$cross_cc_cflags_i386
-   ;;
-   x86_64)
-     TARGET_BASE_ARCH=i386
-@@ -6987,7 +6990,7 @@ int main(void) {
- }
- EOF
- 
--    if ! do_compiler $target_compiler -o $TMPE $TMPC -static ; then
-+    if ! do_compiler $target_compiler $target_compiler_cflags -o $TMPE $TMPC -static ; then
-         target_compiler=""
-     else
-         enabled_cross_compilers="${enabled_cross_compilers} ${target_compiler}"
-@@ -7071,8 +7074,13 @@ fi
- 
- if test -n "$target_compiler"; then
-   echo "CROSS_CC_GUEST=$target_compiler" >> $config_target_mak
-+
-+  if test -n "$target_compiler_cflags"; then
-+      echo "CROSS_CC_GUEST_CFLAGS=$target_compiler_cflags" >> $config_target_mak
-+  fi
- fi
- 
-+
- # generate QEMU_CFLAGS/LDFLAGS for targets
- 
- cflags=""
+-TARGETS=$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_DIRS)))
++TARGETS=$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_LIST)))
+ ifeq ($(CONFIG_POSIX),y)
+ QTEST_TARGETS = $(TARGETS)
+ check-qtest-y=$(foreach TARGET,$(TARGETS), $(check-qtest-$(TARGET)-y))
 -- 
 2.17.0
