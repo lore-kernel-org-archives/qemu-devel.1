@@ -1,29 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fAx9m-0008QR-6K
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 08:34:51 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fAxAs-0000dS-NW
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 08:36:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fAx9l-0003Fv-A8
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 08:34:50 -0400
-Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:39228)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fAx9l-0003FF-4x
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 08:34:49 -0400
-Received: by mail-oi0-x233.google.com with SMTP id n65-v6so17480473oig.6
-	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 05:34:48 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <87po2ohk68.fsf@dusky.pond.sub.org>
-References: <20180419150145.24795-1-marcandre.lureau@redhat.com>
-	<20180419150145.24795-2-marcandre.lureau@redhat.com>
-	<d573d5eb-e8a2-c6e3-82b7-ba712c001aba@redhat.com>
-	<CAJ+F1C+X9vAi2xx5Z7yoi_65o_C9SxfE_HNrV9BDBd81Y1wxwg@mail.gmail.com>
-	<87po2ohk68.fsf@dusky.pond.sub.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 24 Apr 2018 13:34:27 +0100
-Message-ID: <CAFEAcA-ynm85eJ9Q7F8mtYNNiUBY+BQQcCdEg_eAdfmVTD4GRw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v6 1/5] qobject: ensure base is at offset 0
+	(envelope-from <stefanha@redhat.com>) id 1fAxAn-0004FL-UZ
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 08:35:58 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Tue, 24 Apr 2018 13:35:27 +0100
+Message-Id: <20180424123527.19168-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH] block/mirror: honor ratelimit again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,17 +17,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Liang Li <liliang.opensource@gmail.com>
 
-On 24 April 2018 at 13:18, Markus Armbruster <armbru@redhat.com> wrote:
-> We define hundreds of QOM types without ever bothering to check the
-> super type comes first.  We don't even bother to clearly document it has
-> to come first.
+Commit b76e4458b1eb3c32e9824fe6aa51f67d2b251748 ("block/mirror: change
+the semantic of 'force' of block-job-cancel") accidentally removed the
+ratelimit in the mirror job.
 
-If you don't put the super type first then the first time you
-do MyParent *p = MY_PARENT(me); then the QOM cast will assert
-on you, so you'll figure it out pretty quickly...
+Reintroduce the ratelimit but keep the block-job-cancel force=true
+behavior that was added in commit
+b76e4458b1eb3c32e9824fe6aa51f67d2b251748.
 
-thanks
--- PMM
+Note that block_job_sleep_ns() returns immediately when the job is
+cancelled.  Therefore it's safe to unconditionally call
+block_job_sleep_ns() - a cancelled job does not sleep.
+
+This commit fixes the non-deterministic qemu-iotests 185 output.  The
+test relies on the ratelimit to make the job sleep until the 'quit'
+command is processed.  Previously the job could complete before the
+'quit' command was received since there was no ratelimit.
+
+Cc: Liang Li <liliang.opensource@gmail.com>
+Cc: Jeff Cody <jcody@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ block/mirror.c             | 8 +++++---
+ tests/qemu-iotests/185.out | 4 ++--
+ 2 files changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/block/mirror.c b/block/mirror.c
+index 820f512c7b..9436a8d5ee 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -868,12 +868,14 @@ static void coroutine_fn mirror_run(void *opaque)
+         }
+ 
+         ret = 0;
++
++        if (s->synced && !should_complete) {
++            delay_ns = (s->in_flight == 0 && cnt == 0 ? SLICE_TIME : 0);
++        }
+         trace_mirror_before_sleep(s, cnt, s->synced, delay_ns);
++        block_job_sleep_ns(&s->common, delay_ns);
+         if (block_job_is_cancelled(&s->common) && s->common.force) {
+             break;
+-        } else if (!should_complete) {
+-            delay_ns = (s->in_flight == 0 && cnt == 0 ? SLICE_TIME : 0);
+-            block_job_sleep_ns(&s->common, delay_ns);
+         }
+         s->last_pause_ns = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
+     }
+diff --git a/tests/qemu-iotests/185.out b/tests/qemu-iotests/185.out
+index 2c4b04de73..992162f418 100644
+--- a/tests/qemu-iotests/185.out
++++ b/tests/qemu-iotests/185.out
+@@ -36,9 +36,9 @@ Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 backing_file=TEST_DIR/t.q
+ {"return": {}}
+ Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 cluster_size=65536 lazy_refcounts=off refcount_bits=16
+ {"return": {}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "mirror"}}
+-{"return": {}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "mirror"}}
+ 
+ === Start backup job and exit qemu ===
+-- 
+2.14.3
