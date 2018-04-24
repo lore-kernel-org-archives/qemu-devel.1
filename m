@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fBJtN-0005lH-0Y
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 08:51:26 -0400
+	(envelope-from <eblake@redhat.com>) id 1fBJvf-0007lK-3d
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 08:53:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fBJtJ-0004N4-SY
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 08:51:25 -0400
-Resent-Message-Id: <E1fBJtJ-0004N4-SY@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21093)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fBJtJ-0004Mg-Jk
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 08:51:21 -0400
-In-Reply-To: <20180425045129.17449-1-peterx@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152463271320.2265.7000482836762876371@71c20359a636>
+	(envelope-from <eblake@redhat.com>) id 1fBJvb-0005aY-W2
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 08:53:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49726 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fBJvb-0005aC-QI
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 08:53:43 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DD74140201AF
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 12:53:39 +0000 (UTC)
+References: <20180424214550.32549-1-lersek@redhat.com>
+	<20180424214550.32549-4-lersek@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5f76e0aa-389f-82b8-9bac-8405f51b8d2c@redhat.com>
+Date: Tue, 24 Apr 2018 18:11:05 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 24 Apr 2018 22:05:14 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 00/10] intel-iommu: nested vIOMMU, cleanups,
- bug fixes
+In-Reply-To: <20180424214550.32549-4-lersek@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="dPCY5ckbfM95tqNZ3PFEGL6frDrZQmXXo"
+Subject: Re: [Qemu-devel] [PATCH 3/6] qapi: add SysEmuTarget to "common.json"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,65 +34,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peterx@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, jasowang@redhat.com, alex.williamson@redhat.com, jintack@cs.columbia.edu, mst@redhat.com
+To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, David Gibson <dgibson@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNDI1MDQ1MTI5LjE3NDQ5LTEtcGV0ZXJ4QHJlZGhhdC5jb20KU3ViamVj
-dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwMC8xMF0gaW50ZWwtaW9tbXU6IG5lc3RlZCB2SU9NTVUs
-IGNsZWFudXBzLCBidWcgZml4ZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jh
-c2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2Mg
-LWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBj
-b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5h
-bGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZl
-cnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBB
-VENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYg
-ISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0t
-bWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAg
-IG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpV
-cGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0
-cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAg
-ICAgICAgIHBhdGNoZXcvMTUyNDU5MjcwOS02NTUzLTEtZ2l0LXNlbmQtZW1haWwtaWFuLmphY2tz
-b25AZXUuY2l0cml4LmNvbSAtPiBwYXRjaGV3LzE1MjQ1OTI3MDktNjU1My0xLWdpdC1zZW5kLWVt
-YWlsLWlhbi5qYWNrc29uQGV1LmNpdHJpeC5jb20KIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAg
-cGF0Y2hldy8yMDE4MDQyNDE1MjQwNS4xMDMwNC0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcgLT4g
-cGF0Y2hldy8yMDE4MDQyNDE1MjQwNS4xMDMwNC0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcKICog
-W25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDQyNTA0NTEyOS4xNzQ0OS0xLXBl
-dGVyeEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxODA0MjUwNDUxMjkuMTc0NDktMS1wZXRlcnhA
-cmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjk4NWU0YmVkYmMgaW50
-ZWwtaW9tbXU6IHJlbW92ZSBub3RpZnlfdW5tYXAgZm9yIHBhZ2Ugd2FsawpkODM2NDlhNTNjIGlu
-dGVsLWlvbW11OiBkb24ndCB1bm1hcCBhbGwgZm9yIHNoYWRvdyBwYWdlIHRhYmxlCmU1YzAzNDI3
-YzkgaW50ZWwtaW9tbXU6IG1haW50YWluIHBlci1kZXZpY2UgaW92YSByYW5nZXMKNzcxOWFhMWFj
-OSB1dGlsOiBpbXBsZW1lbnQgc2ltcGxlIGludGVydmFsIHRyZWUgbG9naWMKZjYyZDY2OWVhYSBp
-bnRlbC1pb21tdTogcGFzcyBpbiBhZGRyZXNzIHNwYWNlIHdoZW4gcGFnZSB3YWxrCjk1MjU5ZjM0
-ZTkgaW50ZWwtaW9tbXU6IGludHJvZHVjZSB2dGRfcGFnZV93YWxrX2luZm8KZWY4MzYxMWE2NSBp
-bnRlbC1pb21tdTogb25seSBkbyBwYWdlIHdhbGsgZm9yIE1BUCBub3RpZmllcnMKOGU2MDZjYmVk
-OSBpbnRlbC1pb21tdTogYWRkIGlvbW11IGxvY2sKZGJmYjM2ODNjZSBpbnRlbC1pb21tdTogcmVt
-b3ZlIEludGVsSU9NTVVOb3RpZmllck5vZGUKNzNlOGM2MDViMyBpbnRlbC1pb21tdTogc2VuZCBQ
-U0kgYWx3YXlzIGV2ZW4gaWYgYWNyb3NzIFBERXMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNr
-aW5nIFBBVENIIDEvMTA6IGludGVsLWlvbW11OiBzZW5kIFBTSSBhbHdheXMgZXZlbiBpZiBhY3Jv
-c3MgUERFcy4uLgpDaGVja2luZyBQQVRDSCAyLzEwOiBpbnRlbC1pb21tdTogcmVtb3ZlIEludGVs
-SU9NTVVOb3RpZmllck5vZGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8xMDogaW50ZWwtaW9tbXU6IGFk
-ZCBpb21tdSBsb2NrLi4uCkNoZWNraW5nIFBBVENIIDQvMTA6IGludGVsLWlvbW11OiBvbmx5IGRv
-IHBhZ2Ugd2FsayBmb3IgTUFQIG5vdGlmaWVycy4uLgpDaGVja2luZyBQQVRDSCA1LzEwOiBpbnRl
-bC1pb21tdTogaW50cm9kdWNlIHZ0ZF9wYWdlX3dhbGtfaW5mby4uLgpDaGVja2luZyBQQVRDSCA2
-LzEwOiBpbnRlbC1pb21tdTogcGFzcyBpbiBhZGRyZXNzIHNwYWNlIHdoZW4gcGFnZSB3YWxrLi4u
-CkNoZWNraW5nIFBBVENIIDcvMTA6IHV0aWw6IGltcGxlbWVudCBzaW1wbGUgaW50ZXJ2YWwgdHJl
-ZSBsb2dpYy4uLgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQg
-YmUgYXZvaWRlZAojMzQ6IEZJTEU6IGluY2x1ZGUvcWVtdS9pbnRlcnZhbC10cmVlLmg6MTE6Cisj
-aWZuZGVmIF9fSU5URVJWQUxfVFJFRV9IX18KCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdl
-ZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzU2OiBGSUxFOiBpbmNs
-dWRlL3FlbXUvaW50ZXJ2YWwtdHJlZS5oOjMzOgordHlwZWRlZiBnYm9vbGVhbiAoKml0X3RyZWVf
-aXRlcmF0b3IpKElUVmFsdWUgc3RhcnQsIElUVmFsdWUgZW5kKTsKCnRvdGFsOiAxIGVycm9ycywg
-MSB3YXJuaW5ncywgMzUyIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
-ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
-aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
-QUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDgvMTA6IGludGVsLWlvbW11OiBtYWludGFpbiBw
-ZXItZGV2aWNlIGlvdmEgcmFuZ2VzLi4uCkNoZWNraW5nIFBBVENIIDkvMTA6IGludGVsLWlvbW11
-OiBkb24ndCB1bm1hcCBhbGwgZm9yIHNoYWRvdyBwYWdlIHRhYmxlLi4uCkNoZWNraW5nIFBBVENI
-IDEwLzEwOiBpbnRlbC1pb21tdTogcmVtb3ZlIG5vdGlmeV91bm1hcCBmb3IgcGFnZSB3YWxrLi4u
-Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgot
-LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
-ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRo
-YXQuY29t
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--dPCY5ckbfM95tqNZ3PFEGL6frDrZQmXXo
+From: Eric Blake <eblake@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ David Gibson <dgibson@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Kashyap Chamarthy <kchamart@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Thomas Huth <thuth@redhat.com>
+Message-ID: <5f76e0aa-389f-82b8-9bac-8405f51b8d2c@redhat.com>
+Subject: Re: [PATCH 3/6] qapi: add SysEmuTarget to "common.json"
+References: <20180424214550.32549-1-lersek@redhat.com>
+ <20180424214550.32549-4-lersek@redhat.com>
+In-Reply-To: <20180424214550.32549-4-lersek@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 04/24/2018 04:45 PM, Laszlo Ersek wrote:
+> We'll soon need an enumeration type that lists all the softmmu targets
+> that QEMU (the project) supports. Introduce @SysEmuTarget to
+> "common.json".
+>=20
+> Cc: "Daniel P. Berrange" <berrange@redhat.com>
+> Cc: David Gibson <dgibson@redhat.com>
+> Cc: Eric Blake <eblake@redhat.com>
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Cc: Kashyap Chamarthy <kchamart@redhat.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: Kashyap Chamarthy <kchamart@redhat.com>
+> ---
+>=20
+
+> +##
+> +{ 'enum' : 'SysEmuTarget',
+> +  'data' : [ 'aarch64', 'alpha', 'arm', 'cris', 'hppa', 'i386', 'lm32'=
+,
+> +             'm68k', 'microblaze', 'microblazeel', 'mips', 'mips64',
+> +             'mips64el', 'mipsel', 'moxie', 'nios2', 'or1k', 'ppc',
+> +             'ppc64', 'ppcemb', 'riscv32', 'riscv64', 's390x', 'sh4',
+> +             'sh4eb', 'sparc', 'sparc64', 'tricore', 'unicore32',
+> +             'x86_64', 'xtensa', 'xtensaeb' ] }
+
+x86_64 doesn't match our typical conventions of preferring '-' over '_';
+also, wikipedia mentions both spellings but under the page name
+'x86-64'.  Is it worth switching that enum constant?
+
+https://en.wikipedia.org/wiki/X86-64
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--dPCY5ckbfM95tqNZ3PFEGL6frDrZQmXXo
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrfuYkACgkQp6FrSiUn
+Q2ry3wf/QBH/94q01zSETa6SVmzcrwOjXhYJkZgHHfmE54690h5sKliqlD25HYr1
+qhT4IRiKJzoOLOh9rD0Pu7oHZ1Alu02mXojIiRqbWcTL1Kn2XniBTnIWtXeWHcIX
+EiFtsGdlwjWvVz+hT49xuJhlcfjj0DVXnrgxv/o4FVVRq6vrQm6lo5A8K8PhkL3H
+y7di2Nhn5f5OI5oJ1NaY8ColqQLZ2PFmIroAwlTjTSCJ9+Q3BIuVHzyrrdu43LDy
+YwM3mLw9SelVp4oDUdxVJFKTEsy+NNIHkAZJIYl/xgyBgvNCwbGhlsEjjXhgQ29k
+/2Ui4F2wV04Vc0+YpyYnFdjcLeTOgw==
+=gN8e
+-----END PGP SIGNATURE-----
+
+--dPCY5ckbfM95tqNZ3PFEGL6frDrZQmXXo--
