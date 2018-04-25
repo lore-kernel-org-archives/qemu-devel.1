@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fBLWd-0008E5-2t
+	(envelope-from <jemmy858585@gmail.com>) id 1fBLWd-0008E4-2j
 	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:36:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fBLWZ-0007bU-UV
+	(envelope-from <jemmy858585@gmail.com>) id 1fBLWb-0007cB-Gs
 	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:36:03 -0400
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:35913)
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:36202)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1fBLWZ-0007bH-Nr
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:35:59 -0400
-Received: by mail-pg0-x243.google.com with SMTP id i6so13487170pgv.3
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 07:35:59 -0700 (PDT)
+	id 1fBLWb-0007bf-Aw
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:36:01 -0400
+Received: by mail-pf0-x242.google.com with SMTP id g14so15397522pfh.3
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 07:36:01 -0700 (PDT)
 From: Lidong Chen <jemmy858585@gmail.com>
-Date: Wed, 25 Apr 2018 22:35:29 +0800
-Message-Id: <1524666934-8064-1-git-send-email-lidongchen@tencent.com>
-Subject: [Qemu-devel] [PATCH v2 0/5] Enable postcopy RDMA live migration
+Date: Wed, 25 Apr 2018 22:35:30 +0800
+Message-Id: <1524666934-8064-2-git-send-email-lidongchen@tencent.com>
+In-Reply-To: <1524666934-8064-1-git-send-email-lidongchen@tencent.com>
+References: <1524666934-8064-1-git-send-email-lidongchen@tencent.com>
+Subject: [Qemu-devel] [PATCH v2 1/5] migration: disable RDMA WRITE after
+ postcopy started
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +30,71 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: quintela@redhat.com, dgilbert@redhat.com
 Cc: qemu-devel@nongnu.org, galsha@mellanox.com, aviadye@mellanox.com, licq@mellanox.com, adido@mellanox.com, Lidong Chen <lidongchen@tencent.com>
 
-The RDMA QIOChannel does not support bi-directional communication, so when RDMA 
-live migration with postcopy enabled, the source qemu return path get qemu file 
-error.
+RDMA WRITE operations are performed with no notification to the destination
+qemu, then the destination qemu can not wakeup. This patch disable RDMA WRITE
+after postcopy started.
 
-These patches implement bi-directional communication for RDMA QIOChannel and 
-disable the RDMA WRITE during the postcopy phase.
+Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+---
+ migration/qemu-file.c |  8 ++++++--
+ migration/rdma.c      | 12 ++++++++++++
+ 2 files changed, 18 insertions(+), 2 deletions(-)
 
-This patch just make postcopy works, and will improve performance later.
-
-[v2]
- - does not update bytes_xfer when disable RDMA WRITE (David)
- - implement bi-directional communication for RDMA QIOChannel (Daniel)
-
-Please, review.
-
-Lidong Chen (5):
-  migration: disable RDMA WRITE after postcopy started
-  migration: create a dedicated connection for rdma return path
-  migration: remove unnecessary variables len in QIOChannelRDMA
-  migration: implement bi-directional RDMA QIOChannel
-  migration: Stop rdma yielding during incoming postcopy
-
- migration/qemu-file.c |   8 +-
- migration/rdma.c      | 287 +++++++++++++++++++++++++++++++++++++++++++++-----
- 2 files changed, 265 insertions(+), 30 deletions(-)
-
+diff --git a/migration/qemu-file.c b/migration/qemu-file.c
+index bb63c77..add8c3a 100644
+--- a/migration/qemu-file.c
++++ b/migration/qemu-file.c
+@@ -253,8 +253,12 @@ size_t ram_control_save_page(QEMUFile *f, ram_addr_t block_offset,
+     if (f->hooks && f->hooks->save_page) {
+         int ret = f->hooks->save_page(f, f->opaque, block_offset,
+                                       offset, size, bytes_sent);
+-        f->bytes_xfer += size;
+-        if (ret != RAM_SAVE_CONTROL_DELAYED) {
++        if (ret != RAM_SAVE_CONTROL_NOT_SUPP) {
++            f->bytes_xfer += size;
++        }
++
++        if (ret != RAM_SAVE_CONTROL_DELAYED &&
++            ret != RAM_SAVE_CONTROL_NOT_SUPP) {
+             if (bytes_sent && *bytes_sent > 0) {
+                 qemu_update_position(f, *bytes_sent);
+             } else if (ret < 0) {
+diff --git a/migration/rdma.c b/migration/rdma.c
+index da474fc..a22be43 100644
+--- a/migration/rdma.c
++++ b/migration/rdma.c
+@@ -2927,6 +2927,10 @@ static size_t qemu_rdma_save_page(QEMUFile *f, void *opaque,
+ 
+     CHECK_ERROR_STATE();
+ 
++    if (migrate_get_current()->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
++        return RAM_SAVE_CONTROL_NOT_SUPP;
++    }
++
+     qemu_fflush(f);
+ 
+     if (size > 0) {
+@@ -3482,6 +3486,10 @@ static int qemu_rdma_registration_start(QEMUFile *f, void *opaque,
+ 
+     CHECK_ERROR_STATE();
+ 
++    if (migrate_get_current()->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
++        return 0;
++    }
++
+     trace_qemu_rdma_registration_start(flags);
+     qemu_put_be64(f, RAM_SAVE_FLAG_HOOK);
+     qemu_fflush(f);
+@@ -3504,6 +3512,10 @@ static int qemu_rdma_registration_stop(QEMUFile *f, void *opaque,
+ 
+     CHECK_ERROR_STATE();
+ 
++    if (migrate_get_current()->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
++        return 0;
++    }
++
+     qemu_fflush(f);
+     ret = qemu_rdma_drain_cq(f, rdma);
+ 
 -- 
 1.8.3.1
