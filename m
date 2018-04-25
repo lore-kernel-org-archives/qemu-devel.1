@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33856)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBLYn-0001fH-KI
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:38:18 -0400
+	(envelope-from <thuth@redhat.com>) id 1fBLaQ-00038N-0q
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:39:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBLYk-00007T-GT
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:38:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45010 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1fBLaM-0000uU-Mg
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:39:58 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51732 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fBLYk-00007I-BV
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:38:14 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fBLaM-0000u4-B1
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:39:54 -0400
 References: <20180420145249.32435-1-peter.maydell@linaro.org>
-	<20180420145249.32435-5-peter.maydell@linaro.org>
+	<20180420145249.32435-6-peter.maydell@linaro.org>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <1eccc9b9-accb-acf6-a5e2-d9a6719f631d@redhat.com>
-Date: Wed, 25 Apr 2018 16:38:06 +0200
+Message-ID: <ef7d27a2-8c80-7678-9e25-005c294cc5b6@redhat.com>
+Date: Wed, 25 Apr 2018 16:39:43 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180420145249.32435-5-peter.maydell@linaro.org>
+In-Reply-To: <20180420145249.32435-6-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 04/13] hw/mips/mips_malta: Don't create
+Subject: Re: [Qemu-devel] [PATCH 05/13] hw/xtensa/xtfpga.c: Don't create
  "null" chardevs for serial devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -40,23 +40,22 @@ On 20.04.2018 16:52, Peter Maydell wrote:
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  hw/mips/mips_malta.c | 5 -----
->  1 file changed, 5 deletions(-)
+>  hw/xtensa/xtfpga.c | 4 ----
+>  1 file changed, 4 deletions(-)
 > 
-> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-> index f6513a4fd5..49fe7a0a72 100644
-> --- a/hw/mips/mips_malta.c
-> +++ b/hw/mips/mips_malta.c
-> @@ -1056,11 +1056,6 @@ void mips_malta_init(MachineState *machine)
+> diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
+> index 70686a2eb1..9db99e1f7e 100644
+> --- a/hw/xtensa/xtfpga.c
+> +++ b/hw/xtensa/xtfpga.c
+> @@ -278,10 +278,6 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
+>                  xtensa_get_extint(env, 1), nd_table);
+>      }
 >  
->      /* FPGA */
->  
-> -    /* Make sure the second serial port is associated with a device. */
-> -    if (!serial_hds[2]) {
-> -        serial_hds[2] = qemu_chr_new("fpga-uart", "null");
+> -    if (!serial_hds[0]) {
+> -        serial_hds[0] = qemu_chr_new("serial0", "null");
 > -    }
 > -
->      /* The CBUS UART is attached to the MIPS CPU INT2 pin, ie interrupt 4 */
->      malta_fpga_init(system_memory, FPGA_ADDRESS, cbus_irq, serial_hds[2]);
+>      serial_mm_init(system_io, 0x0d050020, 2, xtensa_get_extint(env, 0),
+>              115200, serial_hds[0], DEVICE_NATIVE_ENDIAN);
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
