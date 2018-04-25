@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fBJoa-0001Rv-T6
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 08:46:30 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fBJoi-0001YU-49
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 08:46:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fBJoW-0003eg-Rr
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 08:46:28 -0400
-References: <20180420123456.22196-1-david@redhat.com>
-	<20180423143147.6b4df2ac@redhat.com>
-	<459116211.21924603.1524497545197.JavaMail.zimbra@redhat.com>
-	<20180424160011.47475594@redhat.com>
-	<a048d777-38e5-a44a-c401-a5509ca29e37@redhat.com>
-	<20180425141535.5000bcb8@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <50c25d28-4cac-1e68-c149-e7a5ba8b0f40@redhat.com>
-Date: Wed, 25 Apr 2018 14:46:20 +0200
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fBJoe-00044h-4w
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 08:46:36 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:42420)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fBJod-00042R-NP
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 08:46:32 -0400
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Date: Wed, 25 Apr 2018 15:46:20 +0300
+Message-ID: <20180425124620.17182.7251.stgit@pasha-VirtualBox>
+In-Reply-To: <20180425124533.17182.53165.stgit@pasha-VirtualBox>
+References: <20180425124533.17182.53165.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
-In-Reply-To: <20180425141535.5000bcb8@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] pc-dimm: factor out MemoryDevice
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [RFC PATCH 08/17] replay: introduce info hmp/qmp
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,222 +27,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
+This patch introduces 'info replay' monitor command and
+corresponding qmp request.
+These commands request the current record/replay mode, replay log file name,
+and the execution step (number or recorded/replayed instructions).
 
->>>> For first phase we are using 'virtio-pmem' as cold added devices. AF=
-AIU
->>>> 'VirtioDeviceClass' being parent class and 'hotplug/unplug' methods =
-implemented=20
->>>> for virtio-pmem device. So, pci bus hotplug/unplug should call the c=
-orresponding
->>>> functions? =20
->>> the problem is with trying to use PCI bus based device with bus-less
->>> infrastructure used by (pc|nv)dimms. =20
->>
->> I can understand your reasoning, but for me these are some QEMU intern=
-al details
->> that should not stop the virtio-(p)mem train from rolling.
-> If it's quickly hacked up prototypes to play with than it's fine
-> as far as they are not being merged into QEMU.
-> If one plans to merge it, then code should be adapted to
-> whatever QEMU internal requirements are.
+Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+---
+ hmp-commands-info.hx      |   14 ++++++++++++++
+ hmp.h                     |    1 +
+ qapi/misc.json            |   36 ++++++++++++++++++++++++++++++++++++
+ replay/Makefile.objs      |    3 ++-
+ replay/replay-debugging.c |   41 +++++++++++++++++++++++++++++++++++++++++
+ replay/replay-internal.h  |    2 ++
+ replay/replay.c           |    3 +--
+ 7 files changed, 97 insertions(+), 3 deletions(-)
+ create mode 100644 replay/replay-debugging.c
 
-At one point we will have to decide if we want to develop good software
-(which tolerates layer violations if there is a good excuse) or build
-the perfect internal architecture. And we all know the latter is not the
-case right now and never will be.
-
-So yes, I will be looking into ways to make this work "nicer"
-internally, but quite frankly, it has very little priority.
-
->=20
->> In my world, device hotplug is composed of the following steps
->>
->> 1. Resource allocation
->> 2. Attaching the device to a bus (making it accessible by the guest)
->> 3. Notifying the guest
->>
->> I would e.g. also call ACPI sort of a bus structure. Now, the machine =
-hotplug
->> handler currently does parts of 1. and then hands of to ACPI to do 2 a=
-nd 3.
-> it's not a bus, it's concrete device implementing GPE logic,
-> on x86 it does the job on notifier #3 in case of hotplug.
->=20
->> virtio-mem and virtio-pmem do 1. partially in the realize function and=
- then
->> let 2. and 3. be handled by the proxy device specific hotplug handlers=
-.
->>
->> Mean people might say that the machine should not call the ACPI code b=
-ut there
->> should be a ACPI hotplug handler. So we would end up with the same res=
-ult.
-> it should be fine for parent to manage its children but not other way a=
-round
-
-A virtio-bus (e.g. CCW) also "belongs" to the machine. But we won't
-start to pass all device starting from the machine downwards to the
-concrete implementation.
-
-(but I get your point)
-
->=20
->=20
->> But anyhow, the resource allocation (getting an address and getting pl=
-ugged) will
->> be done in the first step out of the virtio-(p)mem realize function:
->>
->> static void virtio_mem_device_realize(DeviceState *dev, Error **errp)
->> {
->>    ...
->>    /* try to get a mapping in guest address space */
->>     vm->phys_addr =3D memory_device_get_free_addr(MACHINE(qdev_get_mac=
-hine))...
-> this should be a property, and if it's not set then realize should erro=
-r out
-
-It is a property but if it is 0 we do auto-detection right now (like DIMM=
-)
-
->=20
->>     if (local_err) {
->>         goto out;
->>     }
->>     ...
->>
->>     /* register the memory region */
->>     memory_device_plug_region(MACHINE(qdev_get_machine()), vm->mr,
->>                               vm->phys_addr);
->>    ...
->> }
->>
->> So this happens before any hotplug handler is called. Everything works
->> just fine. What you don't like about this is the qdev_get_machine(). I
->> also don't like it but in the short term I don't see any problem with
->> it. It is resource allocation and not a "device plug" in the typical f=
-orm.
->=20
-> It's not qdev_get_machine() that's issue, it's layer violation,
-> where child device is allocating and mapping resources of one of its pa=
-rents.
-
-Quite simple: introduce a function at the machine where the child can
-"request" to get an address and "request" to plug/unplug a region.
-
-Or what would be wrong about that?
-
->=20
-> that's been an issue and show stopper for patches in the past,
-> and that's probably not going to change in this case either.
->=20
-
-I can see that, but again, for me these are internal details.
-
-> =20
->>> The important point which we should not to break here while trying to=
- glue
->>> PCI hotplug handler with machine hotplug handler is: =20
->>
->> I could later on imagine something like a 2 step approach.
->>
->> 1. resource allocation handler by a machine for MemoryDevices
->> - assigns address, registers memory region
->> 2. hotplug handler (ACPI, PCI, CCW ...)
->> - assigns bus specific stuff, attaches device, notifies guest
->>
->> Importantly the device is not visible to the guest until 2.
-> So far it's about how QEMU models and manages wiring process,
-> that's why pre_plug/plug handlers were introduced, to allow
-> resource owner to attach devices that's plugged into it.
->=20
-> i.e. PCI devices are managed by PCI subsystem and DIMM
-> devices are managed by board where they are mapped into
-> reserved address space by board code that owns it.
->=20
-> Allowing random device to manage board resources directly
-> isn't really acceptable (even as temporary solution).
-
-I agree to "random" devices. This should not be the design principle.
-
->=20
-> In case of virtio-pmem it might be much cleaner to use
-> mapping mechanism provided by PCI sybsytem than trying
-> to bridge bus and buss-less device wiring as from device
-> modeling point of view (aside from providing RAM to guest)
-> it's 2 quite different devices.
-
-And again: Please don't forget virtio-ccw. We _don't_ want to glue
-virtio device specifics to the underlying proxy here.
-
->=20
-> i.e. if you think new device is RAM, which is governed by
-> -m option, then model it as bus-less device like dimm and
-> plug it directly into board, if its plugged in to a bus
-> it's that bus owner responsibility to allocate/manage
-> address space or bridge it to parent device.
->=20
-> (btw: virtio-pmem looks sort of like ivshmem, maybe they
-> can share some code on qemu side)
->=20
->> Of course, we could also take care of pre-plug things as you mentioned=
-.
->>
->>>
->>> container MachineState::device_memory is owned by machine and
->>> it's up to machine plug handler (container's owner) to map device's m=
-r
->>> into its address space.
->>> (i.e. nor device's realize nor PCI bus hotplug handler should do it) =
-=20
->>
->> I agree, but I think these are internal details.
-> it's internal details that we choose not to violate in QEMU
-> and were working towards that direction, getting rid of places
-> that do it wrongly.
-
-Yes, and I'll try my best to avoid it.
-
->=20
->>> Not sure about virtio-mem but if it would use device_memory container=
-,
->>> it should use machine's plug handler.
->>>
->>> I don't have out head ideas how to glue it cleanly, may be
->>> MachineState::device_memory is just not right thing to use
->>> for such devices. =20
->>
->> I strongly disagree. From the user point of view it should not matter =
-what
->> was added/plugged. There is just one guest physical memory and maxmem =
-is
->> defined for one QEMU instance. Exposing such details to the user shoul=
-d
->> definitely be avoided.
-> qemu user have to be exposed to details as he already adds
->  -device virtio-pmem,....
-> to CLI, maxmem accounting is a separate matter and probably
-> shouldn't be mixed with device model and how it's mapped into
-> guest's address space.
-
-I can't follow. Please step back and have a look at how it works on the
-qemu command line:
-
-1. You specify a maxmem option
-2. You plug DIMM/NVDIMM/virtio-mem/virtio-pmem
-
-Some machines (e.g. s390x) use maxmem to setup the maximum possible
-guest address space in KVM.
-
-Just because DIMM/NVDIMM was the first user does not mean that it is the
-only valid user. That is also the reason why it is named
-"query-memory-devices" and not "query-dimm-devices". The abstraction is
-there for a reason.
-
---=20
-
-Thanks,
-
-David / dhildenb
+diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+index ddfcd5a..f5631be 100644
+--- a/hmp-commands-info.hx
++++ b/hmp-commands-info.hx
+@@ -883,6 +883,20 @@ STEXI
+ Show SEV information.
+ ETEXI
+ 
++    {
++        .name       = "replay",
++        .args_type  = "",
++        .params     = "",
++        .help       = "show parameters of the record/replay",
++        .cmd        = hmp_info_replay,
++    },
++
++STEXI
++@item info replay
++@findex info replay
++Display the current record/replay mode and the currently executing step.
++ETEXI
++
+ STEXI
+ @end table
+ ETEXI
+diff --git a/hmp.h b/hmp.h
+index 4e2ec37..084fb62 100644
+--- a/hmp.h
++++ b/hmp.h
+@@ -144,5 +144,6 @@ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
+ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
+ void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
+ void hmp_info_sev(Monitor *mon, const QDict *qdict);
++void hmp_info_replay(Monitor *mon, const QDict *qdict);
+ 
+ #endif
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 5636f4a..2ded924 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -3449,3 +3449,39 @@
+ ##
+ { 'command': 'x-oob-test', 'data' : { 'lock': 'bool' },
+   'allow-oob': true }
++
++##
++# @ReplayInfo:
++#
++# Status of the record/replay mode.
++#
++# @mode: current mode.
++#
++# @filename: name of the record/replay log file.
++#
++# @step: current step number.
++#
++# Since: 2.13
++#
++##
++{ 'struct': 'ReplayInfo',
++  'data': { 'mode': 'ReplayMode', '*filename': 'str', 'step': 'int' } }
++
++
++##
++# @info_replay:
++#
++# Retrieves the status of the execution record/replay.
++#
++# Returns: structure with the properties of the record/replay.
++#
++# Since: 2.13
++#
++# Example:
++#
++# -> { "execute": "info_replay" }
++# <- { "return": { "mode": "play", "filename": "log.rr", "step": 220414 } }
++#
++##
++{ 'command': 'info_replay',
++  'returns': 'ReplayInfo' }
+diff --git a/replay/Makefile.objs b/replay/Makefile.objs
+index cee6539..6694e3e 100644
+--- a/replay/Makefile.objs
++++ b/replay/Makefile.objs
+@@ -6,4 +6,5 @@ common-obj-y += replay-input.o
+ common-obj-y += replay-char.o
+ common-obj-y += replay-snapshot.o
+ common-obj-y += replay-net.o
+-common-obj-y += replay-audio.o
+\ No newline at end of file
++common-obj-y += replay-audio.o
++common-obj-y += replay-debugging.o
+diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
+new file mode 100644
+index 0000000..2777e57
+--- /dev/null
++++ b/replay/replay-debugging.c
+@@ -0,0 +1,41 @@
++/*
++ * replay-debugging.c
++ *
++ * Copyright (c) 2010-2018 Institute for System Programming
++ *                         of the Russian Academy of Sciences.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "sysemu/replay.h"
++#include "replay-internal.h"
++#include "hmp.h"
++#include "monitor/monitor.h"
++#include "qapi/qapi-commands-misc.h"
++
++void hmp_info_replay(Monitor *mon, const QDict *qdict)
++{
++    if (replay_mode == REPLAY_MODE_NONE) {
++        monitor_printf(mon, "No record/replay\n");
++    } else {
++        monitor_printf(mon, "%s execution '%s': current step = %"PRId64"\n",
++            replay_mode == REPLAY_MODE_RECORD ? "Recording" : "Replaying",
++            replay_filename, replay_get_current_step());
++    }
++}
++
++ReplayInfo *qmp_info_replay(Error **errp)
++{
++    ReplayInfo *retval = g_new0(ReplayInfo, 1);
++    retval->mode = replay_mode;
++    if (replay_filename) {
++        retval->filename = g_strdup(replay_filename);
++        retval->has_filename = true;
++    }
++    retval->step = replay_get_current_step();
++    return retval;
++}
+diff --git a/replay/replay-internal.h b/replay/replay-internal.h
+index ac4b27b..ef82b5e 100644
+--- a/replay/replay-internal.h
++++ b/replay/replay-internal.h
+@@ -91,6 +91,8 @@ extern ReplayState replay_state;
+ 
+ /* File for replay writing */
+ extern FILE *replay_file;
++/*! Name of replay file  */
++extern char *replay_filename;
+ 
+ void replay_put_byte(uint8_t byte);
+ void replay_put_event(uint8_t event);
+diff --git a/replay/replay.c b/replay/replay.c
+index 58a986f..8b70d7d 100644
+--- a/replay/replay.c
++++ b/replay/replay.c
+@@ -29,8 +29,7 @@
+ ReplayMode replay_mode = REPLAY_MODE_NONE;
+ char *replay_snapshot;
+ 
+-/* Name of replay file  */
+-static char *replay_filename;
++char *replay_filename;
+ ReplayState replay_state;
+ static GSList *replay_blockers;
+ 
