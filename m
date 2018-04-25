@@ -1,19 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBBN8-0005Aq-Hb
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 23:45:35 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fBBP4-0005sK-IA
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 23:47:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBBN3-0003RE-LD
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 23:45:34 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43022 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fBBN3-0003R5-Dp
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 23:45:29 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 25 Apr 2018 05:45:18 +0200
-Message-Id: <1524627918-9661-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [qemu-web PATCH] Add a blog post about the release of
- version 2.12.0
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fBBOz-0004w7-U7
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 23:47:34 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:36842)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fBBOz-0004vv-PS
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 23:47:29 -0400
+Received: by mail-qt0-x242.google.com with SMTP id q13-v6so25120539qtl.3
+	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 20:47:29 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180424152405.10304-1-alex.bennee@linaro.org>
+	<20180424152405.10304-25-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c07c5222-9cdb-d4ab-fe2f-e0d657884078@amsat.org>
+Date: Wed, 25 Apr 2018 00:47:24 -0300
+MIME-Version: 1.0
+In-Reply-To: <20180424152405.10304-25-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 24/46] tests/tcg/i386/test-i386: use
+ modern vector_size attributes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,79 +36,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org
 
-Based on the contents of Michael Roth's announce e-mail for 2.12.0.
+On 04/24/2018 12:23 PM, Alex Bennée wrote:
+> The compiler complains about the old __mode__ style attributes.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- _posts/2018-04-25-qemu-2-12-0.md | 58 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 58 insertions(+)
- create mode 100644 _posts/2018-04-25-qemu-2-12-0.md
+old [school]
 
-diff --git a/_posts/2018-04-25-qemu-2-12-0.md b/_posts/2018-04-25-qemu-2-12-0.md
-new file mode 100644
-index 0000000..fdc4aea
---- /dev/null
-+++ b/_posts/2018-04-25-qemu-2-12-0.md
-@@ -0,0 +1,58 @@
-+---
-+layout: post
-+title:  "QEMU version 2.12.0 released"
-+date:   2018-04-25 05:30:00 +0200
-+categories: [releases, 'qemu 2.12']
-+---
-+We'd like to announce the availability of the QEMU 2.12.0 release.
-+This release contains 2700+ commits from 204 authors.
-+
-+You can grab the tarball from our 
-+[download page](https://www.qemu.org/download/#source).
-+The full list of changes are available
-+[in the Wiki](https://wiki.qemu.org/ChangeLog/2.12).
-+
-+Highlights include:
-+
-+ * Spectre/Meltdown mitigation support for x86/pseries/s390 guests. For
-+   more details see:
-+     https://www.qemu.org/2018/02/14/qemu-2-11-1-and-spectre-update/
-+ * Numerous block support improvements, including support for directly
-+   interacting with userspace NVMe driver, and general improvements to
-+   NBD server/client including more efficient reads of sparse files
-+ * Networking support for VMWare paravirtualized RDMA device (RDMA
-+   HCA and Soft-RoCE supported), CAN bus support via Linux SocketCAN and
-+   SJA1000-based PCI interfaces, and general improvements for dual-stack
-+   IPv4/IPv6 environments
-+ * GUI security/bug fixes, dmabufs support for GTK/Spice.
-+ * Better IPMI support for Platform Events and SEL logging in internal
-+   BMC emulation
-+ * SMBIOS support for "OEM Strings", which can be used for automating
-+   guest image activation without relying on network-based querying
-+ * Disk cache information via virtio-balloon
-+ * ARM: AArch64 new instructions for FCMA/RDM and SIMD/FP16/crypto/complex
-+   number extensions
-+ * ARM: initial support for Raspberry Pi 3 machine type
-+ * ARM: Corex-M33/Armv8-M emulation via new mps2-an505 board and many
-+   other improvements for M profile emulation
-+ * HPPA: support for full machine emulation (hppa-softmmu)
-+ * PowerPC: PPC4xx emulation improvements, including I2C bus support
-+ * PowerPC: new Sam460ex machine type
-+ * PowerPC: significant TCG performance improvements
-+ * PowerPC: pseries: support for Spectre/Meltdown mitigations
-+ * RISC-V: new RISC-V target via "spike_v1.9.1", "spike_v1.10", and "virt"
-+   machine types
-+ * s390: non-virtual devices no longer require dedicated channel subsystem
-+   and guest support for multiple CSSs
-+ * s390: general PCI improvements, MSI-X support for virtio-pci devices
-+ * s390: improved TCG emulation support
-+ * s390: KVM support for systems larger than 7.999TB
-+ * SPARC: sun4u power device emulation
-+ * SPARC: improved trace-event support and emulation/debug fixes
-+ * Tricore: new instruction variants for JEQ/JNE and 64-bit MOV
-+ * x86: Intel IOMMU support for 48-bit addresses
-+ * Xtensa: backend now uses libisa for instruction decoding/disassebly
-+ * Xtensa: multi-threaded TCG support and noMMU configuration variants
-+ * and lots more...
-+
-+Thank you to everyone involved!
--- 
-1.8.3.1
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> ---
+>  tests/tcg/i386/test-i386.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tests/tcg/i386/test-i386.c b/tests/tcg/i386/test-i386.c
+> index cae6a7773a..caef4da176 100644
+> --- a/tests/tcg/i386/test-i386.c
+> +++ b/tests/tcg/i386/test-i386.c
+> @@ -2106,8 +2106,8 @@ static void test_enter(void)
+>  
+>  #ifdef TEST_SSE
+>  
+> -typedef int __m64 __attribute__ ((__mode__ (__V2SI__)));
+> -typedef float __m128 __attribute__ ((__mode__(__V4SF__)));
+> +typedef int __m64 __attribute__ ((vector_size(8)));
+> +typedef float __m128 __attribute__ ((vector_size(16)));
+>  
+>  typedef union {
+>      double d[2];
+> 
