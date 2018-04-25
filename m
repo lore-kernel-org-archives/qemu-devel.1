@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fBAaT-0008WB-CM
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 22:55:20 -0400
+	(envelope-from <peterx@redhat.com>) id 1fBAaX-0008WT-Hm
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 22:55:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fBAaQ-0000C8-Ah
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 22:55:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55828 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fBAaW-0000EV-9r
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 22:55:21 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41708 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fBAaQ-000094-1p
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 22:55:14 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fBAaV-0000EJ-Vs
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 22:55:20 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Wed, 25 Apr 2018 10:54:55 +0800
-Message-Id: <20180425025459.5258-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 0/4] qemu-thread: support
- --enable-debug-mutex
+Date: Wed, 25 Apr 2018 10:54:58 +0800
+Message-Id: <20180425025459.5258-4-peterx@redhat.com>
+In-Reply-To: <20180425025459.5258-1-peterx@redhat.com>
+References: <20180425025459.5258-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v6 3/4] QemuMutex: support --enable-debug-mutex
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,46 +26,136 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Emilio G . Cota" <cota@braap.org>, peterx@redhat.com
 
-v6:
-- rename __QEMU_THREAD_COMMON_H__ to QEMU_THREAD_COMMON_H
-- collect r-bs for Emilio
+We have had some tracing tools for mutex but it's not easy to use them
+for e.g. dead locks.  Let's provide "--enable-debug-mutex" parameter
+when configure to allow QemuMutex to store the last owner that took
+specific lock.  It will be easy to use this tool to debug deadlocks
+since we can directly know who took the lock then as long as we can have
+a debugger attached to the process.
 
-v5:
-- init file/line [Emilio]
-
-v4:
-- cherrypick Emilio's patch to add "-m" parameter to atomic_add-bench
-  tool.
-- use inline functions [Emilio]
-
-Micro benchmark result on "taskset -c 0 atomic_add-bench -m":
-
-|--------+---------------------+------------------------|
-|        | with --enable-debug | without --enable-debug |
-|--------+---------------------+------------------------|
-| Before | 20 Mops/s           | 34 Mops/s              |
-| After  | 18 Mops/s           | 34 Mops/s              |
-|--------+---------------------+------------------------|
-
-Please review.  Thanks.
-
-Emilio G. Cota (1):
-  tests/atomic_add-bench: add -m option to use mutexes
-
-Peter Xu (3):
-  qemu-thread: introduce qemu-thread-common.h
-  QemuMutex: support --enable-debug-mutex
-  configure: enable debug-mutex if debug enabled
-
- configure                   | 11 +++++++++
+Reviewed-by: Emilio G. Cota <cota@braap.org>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ configure                   | 10 ++++++++++
  include/qemu/thread-posix.h |  4 ++++
  include/qemu/thread-win32.h |  4 ++++
- util/qemu-thread-common.h   | 55 +++++++++++++++++++++++++++++++++++++++++++++
- tests/atomic_add-bench.c    | 19 ++++++++++++++--
- util/qemu-thread-posix.c    | 19 +++++++---------
- util/qemu-thread-win32.c    | 17 +++++++-------
- 7 files changed, 107 insertions(+), 22 deletions(-)
- create mode 100644 util/qemu-thread-common.h
+ util/qemu-thread-common.h   | 12 ++++++++++++
+ 4 files changed, 30 insertions(+)
 
+diff --git a/configure b/configure
+index 0a19b033bc..a80af735b2 100755
+--- a/configure
++++ b/configure
+@@ -451,6 +451,7 @@ jemalloc="no"
+ replication="yes"
+ vxhs=""
+ libxml2=""
++debug_mutex="no"
+ 
+ supported_cpu="no"
+ supported_os="no"
+@@ -1374,6 +1375,10 @@ for opt do
+   ;;
+   --disable-git-update) git_update=no
+   ;;
++  --enable-debug-mutex) debug_mutex=yes
++  ;;
++  --disable-debug-mutex) debug_mutex=no
++  ;;
+   *)
+       echo "ERROR: unknown option $opt"
+       echo "Try '$0 --help' for more information"
+@@ -1631,6 +1636,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   crypto-afalg    Linux AF_ALG crypto backend driver
+   vhost-user      vhost-user support
+   capstone        capstone disassembler support
++  debug-mutex     mutex debugging support
+ 
+ NOTE: The object files are built at the place where configure is launched
+ EOF
+@@ -5874,6 +5880,7 @@ echo "avx2 optimization $avx2_opt"
+ echo "replication support $replication"
+ echo "VxHS block device $vxhs"
+ echo "capstone          $capstone"
++echo "mutex debugging   $debug_mutex"
+ 
+ if test "$sdl_too_old" = "yes"; then
+ echo "-> Your SDL version is too old - please upgrade to have SDL support"
+@@ -6602,6 +6609,9 @@ fi
+ if test "$capstone" != "no" ; then
+   echo "CONFIG_CAPSTONE=y" >> $config_host_mak
+ fi
++if test "$debug_mutex" = "yes" ; then
++  echo "CONFIG_DEBUG_MUTEX=y" >> $config_host_mak
++fi
+ 
+ # Hold two types of flag:
+ #   CONFIG_THREAD_SETNAME_BYTHREAD  - we've got a way of setting the name on
+diff --git a/include/qemu/thread-posix.h b/include/qemu/thread-posix.h
+index f3f47e426f..fd27b34128 100644
+--- a/include/qemu/thread-posix.h
++++ b/include/qemu/thread-posix.h
+@@ -12,6 +12,10 @@ typedef QemuMutex QemuRecMutex;
+ 
+ struct QemuMutex {
+     pthread_mutex_t lock;
++#ifdef CONFIG_DEBUG_MUTEX
++    const char *file;
++    int line;
++#endif
+     bool initialized;
+ };
+ 
+diff --git a/include/qemu/thread-win32.h b/include/qemu/thread-win32.h
+index 3a05e3b3aa..d668d789b4 100644
+--- a/include/qemu/thread-win32.h
++++ b/include/qemu/thread-win32.h
+@@ -5,6 +5,10 @@
+ 
+ struct QemuMutex {
+     SRWLOCK lock;
++#ifdef CONFIG_DEBUG_MUTEX
++    const char *file;
++    int line;
++#endif
+     bool initialized;
+ };
+ 
+diff --git a/util/qemu-thread-common.h b/util/qemu-thread-common.h
+index d3292084d6..a0ea7c0d92 100644
+--- a/util/qemu-thread-common.h
++++ b/util/qemu-thread-common.h
+@@ -19,6 +19,10 @@
+ 
+ static inline void qemu_mutex_post_init(QemuMutex *mutex)
+ {
++#ifdef CONFIG_DEBUG_MUTEX
++    mutex->file = NULL;
++    mutex->line = 0;
++#endif
+     mutex->initialized = true;
+ }
+ 
+@@ -31,12 +35,20 @@ static inline void qemu_mutex_pre_lock(QemuMutex *mutex,
+ static inline void qemu_mutex_post_lock(QemuMutex *mutex,
+                                         const char *file, int line)
+ {
++#ifdef CONFIG_DEBUG_MUTEX
++    mutex->file = file;
++    mutex->line = line;
++#endif
+     trace_qemu_mutex_locked(mutex, file, line);
+ }
+ 
+ static inline void qemu_mutex_pre_unlock(QemuMutex *mutex,
+                                          const char *file, int line)
+ {
++#ifdef CONFIG_DEBUG_MUTEX
++    mutex->file = NULL;
++    mutex->line = 0;
++#endif
+     trace_qemu_mutex_unlock(mutex, file, line);
+ }
+ 
 -- 
 2.14.3
