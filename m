@@ -1,16 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56138)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fBLEM-00015t-Ds
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:17:15 -0400
+	(envelope-from <mst@redhat.com>) id 1fBLEN-00017P-PQ
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:17:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fBLEK-0006Kv-6d
+	(envelope-from <mst@redhat.com>) id 1fBLEM-0006ME-91
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:17:11 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39850 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fBLEM-0006M3-3T
 	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:17:10 -0400
-From: Eric Auger <eric.auger@redhat.com>
-Date: Wed, 25 Apr 2018 16:16:01 +0200
-Message-Id: <1524665762-31355-17-git-send-email-eric.auger@redhat.com>
-In-Reply-To: <1524665762-31355-1-git-send-email-eric.auger@redhat.com>
-References: <1524665762-31355-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH v12 16/17] hw/arm/smmuv3: IOTLB emulation
+Date: Wed, 25 Apr 2018 17:17:04 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180425165847-mutt-send-email-mst@kernel.org>
+References: <1524524398-41342-1-git-send-email-mst@redhat.com>
+	<CF6A88132359CE47947DB4C6E1709ED53973A729@ORSMSX110.amr.corp.intel.com>
+	<20180424035504-mutt-send-email-mst@kernel.org>
+	<20180424095722.76105b40@redhat.com>
+	<20180424201554-mutt-send-email-mst@kernel.org>
+	<CF6A88132359CE47947DB4C6E1709ED53973A87A@ORSMSX110.amr.corp.intel.com>
+	<20180424210040-mutt-send-email-mst@kernel.org>
+	<20180425154938.78deea44@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180425154938.78deea44@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] acpi/nvdimm: remove forward name references
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,362 +33,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, prem.mallappa@gmail.com
-Cc: alex.williamson@redhat.com, tn@semihalf.com, mst@redhat.com, cdall@kernel.org, bharat.bhushan@nxp.com, jean-philippe.brucker@arm.com, linuc.decode@gmail.com, peterx@redhat.com, jintack@cs.columbia.edu
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: "Schmauss, Erik" <erik.schmauss@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Williams, Dan J" <dan.j.williams@intel.com>
 
-We emulate a TLB cache of size SMMU_IOTLB_MAX_SIZE=256.
-It is implemented as a hash table whose key is a combination
-of the 16b asid and 48b IOVA.
+On Wed, Apr 25, 2018 at 03:49:38PM +0200, Igor Mammedov wrote:
+> On Tue, 24 Apr 2018 21:06:37 +0300
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+> > On Tue, Apr 24, 2018 at 05:47:58PM +0000, Schmauss, Erik wrote:
+> > > 
+> > >   
+> > > > -----Original Message-----
+> > > > From: Michael S. Tsirkin [mailto:mst@redhat.com]
+> > > > Sent: Tuesday, April 24, 2018 10:43 AM
+> > > > To: Igor Mammedov <imammedo@redhat.com>
+> > > > Cc: Schmauss, Erik <erik.schmauss@intel.com>; qemu-devel@nongnu.org; Xiao
+> > > > Guangrong <xiaoguangrong.eric@gmail.com>; Williams, Dan J
+> > > > <dan.j.williams@intel.com>
+> > > > Subject: Re: [PATCH] acpi/nvdimm: remove forward name references
+> > > > 
+> > > > On Tue, Apr 24, 2018 at 09:57:22AM +0200, Igor Mammedov wrote:  
+> > > > > On Tue, 24 Apr 2018 04:02:40 +0300
+> > > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > > >  
+> > > > > > On Tue, Apr 24, 2018 at 12:41:29AM +0000, Schmauss, Erik wrote:  
+> > > > > > >
+> > > > > > >  
+> > > > > > > > -----Original Message-----
+> > > > > > > > From: Michael S. Tsirkin [mailto:mst@redhat.com]
+> > > > > > > > Sent: Monday, April 23, 2018 4:03 PM
+> > > > > > > > To: qemu-devel@nongnu.org
+> > > > > > > > Cc: Schmauss, Erik <erik.schmauss@intel.com>; Igor Mammedov
+> > > > > > > > <imammedo@redhat.com>; Xiao Guangrong
+> > > > > > > > <xiaoguangrong.eric@gmail.com>
+> > > > > > > > Subject: [PATCH] acpi/nvdimm: remove forward name references
+> > > > > > > >
+> > > > > > > > NVDIMM SSDT table references a name ("MEMA") before it is
+> > > > > > > > defined. This is reported to no longer be supported since Linux 4.17-rc1.
+> > > > > > > >
+> > > > > > > > While arguably Linux needs to keep working on old hypervisors,
+> > > > > > > > and other OSes seem fine with our behaviour, it seems cleaner to
+> > > > > > > > have the definition appear in the SSDT before use.
+> > > > > > > >
+> > > > > > > > Suggested-by: "Schmauss, Erik" <erik.schmauss@intel.com>
+> > > > > > > > Cc: qemu-stable@nongnu.org
+> > > > > > > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > > > > > > > ---
+> > > > > > > >
+> > > > > > > > Hi Erik,
+> > > > > > > > could you pls test the issue and report whether it addresses
+> > > > > > > > your concern? I can't  
+> > > > > > > Hi Michael,
+> > > > > > >  
+> > > > > > > > do much to fix past releases which IIUC shipped this code since
+> > > > > > > > 2.6.0 about a year ago.
+> > > > > > > >
+> > > > > > > > Lightly tested with Linux only.  
+> > > > > > >
+> > > > > > > I'm looking at the ASL tables generated by make check-qtest-x86_64.
+> > > > > > > This line  
+> > > > > >
+> > > > > > which line?
+> > > > > >  
+> > > > > > > ends up generating a strange ACPI table where the Operation region
+> > > > > > > and field declarations are stuck inside the NCAL method which is
+> > > > > > > called from _DSM. If we create the operation region and methods
+> > > > > > > inside methods, they disappear after the NCAL method returns.  
+> > > > > What's wrong with it?
+> > > > > Method is complete so temporary objects it has used went out of scope,
+> > > > > all within spec rules and worked fine with linux and windows guests.
+> > > > >  
+> > > > > > > I think nvdimm_build_common_dsm() needs some refining.  
+> > > > > >
+> > > > > > What exactly do you refer to?
+> > > > > >
+> > > > > > DefinitionBlock ("", "SSDT", 1, "BOCHS ", "NVDIMM", 0x00000001) {
+> > > > > >     Name (MEMA, 0x07FFE000)
+> > > > > >     Scope (\_SB)
+> > > > > >     {
+> > > > > >         Device (NVDR)
+> > > > > >         {
+> > > > > >             Name (_HID, "ACPI0012" /* NVDIMM Root Device */)  // _HID:  
+> > > > Hardware ID  
+> > > > > >             Method (NCAL, 5, Serialized)
+> > > > > >             {
+> > > > > >                 Local6 = MEMA /* \MEMA */
+> > > > > >                 OperationRegion (NPIO, SystemIO, 0x0A18, 0x04)
+> > > > > >                 OperationRegion (NRAM, SystemMemory, Local6, 0x1000)
+> > > > > >
+> > > > > > 		^^^ this?
+> > > > > >
+> > > > > > I agree the NPIO could be moved out.
+> > > > > > Don't really understand why is Local6 needed - can't MEMA be used
+> > > > > > directly? Assuming it isn't NRAM could be moved out too.  
+> > > > > From spec
+> > > > >  DefOpRegion := OpRegionOp NameString RegionSpace RegionOffset
+> > > > > RegionLen  RegionOffset := TermArg => Integer  TermArg := Type2Opcode
+> > > > > | DataObject | ArgObj | LocalObj
+> > > > >
+> > > > > So named object is not accepted,  
+> > > > 
+> > > > might be worth checking what happens with actual OSPMs.
+> > > > If it does happen to work, we can try tweaking the ACPI spec to allow this.  
+> > > 
+> > > I'm looking at the ACPI6.2a spec on page 840 and it says
+> > > TermArg := Type2Opcode | DataObject | Argterm |LocalTerm |NameString |SymbolicExpression  
+> > 
+> > Oh right, that's there since ACPI 6.0.
+> Strange, I've rechecked AML definition of TermArg in 6.0 and 6.2a
+> and it still says only
+> 
+>   TermArg := Type2Opcode | DataObject | ArgObj | LocalObj
+> 
+> For 6.2a, I'm looking at chapter "20.2.5 Term Objects Encoding"
+> where exactly do you guys see that longer variant?
 
-Entries are invalidated on TLB invalidation commands, either
-globally, or per asid, or per asid/iova.
+Oh interesting. That's in
+19.2.3 ASL Root and Secondary Terms
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+How come it's not the same?
 
----
+> 
+> > As usual, the issue is that
+> > we can't easily check what does OSPM support.
+> > This is really something worth fixing in the spec IMHO.
+> > We could just try and test a bunch of guest OSPMs and if
+> > they happen to work, switch to that. Lots of work for
+> > uncertain benefit.
+> I think some windows versions weren't happy with it when
+> we were trying to use dynamic operation regions with offset
+> as namestring.
 
-v11 -> v12:
-- Add new trace point when smmu is bypassed
-- s/iotlb_miss/iotlb_misses, s/iotlb_hit/iotlb_hits
-- use SMMUIOTLBKey as a key
 
-Credit to Tomasz Nowicki who did the first implementation of
-this IOTLB implementation, inspired of intel_iommu implementation.
----
- hw/arm/smmu-common.c         |  59 ++++++++++++++++++++++++
- hw/arm/smmuv3.c              | 105 ++++++++++++++++++++++++++++++++++++++++---
- hw/arm/trace-events          |  10 +++++
- include/hw/arm/smmu-common.h |  13 ++++++
- 4 files changed, 181 insertions(+), 6 deletions(-)
+Good to know, thanks.
 
-diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
-index eaa8a55..aaa80c3 100644
---- a/hw/arm/smmu-common.c
-+++ b/hw/arm/smmu-common.c
-@@ -24,11 +24,43 @@
- #include "qom/cpu.h"
- #include "hw/qdev-properties.h"
- #include "qapi/error.h"
-+#include "qemu/jhash.h"
- 
- #include "qemu/error-report.h"
- #include "hw/arm/smmu-common.h"
- #include "smmu-internal.h"
- 
-+/* IOTLB Management */
-+
-+inline void smmu_iotlb_inv_all(SMMUState *s)
-+{
-+    trace_smmu_iotlb_inv_all();
-+    g_hash_table_remove_all(s->iotlb);
-+}
-+
-+static gboolean smmu_hash_remove_by_asid(gpointer key, gpointer value,
-+                                         gpointer user_data)
-+{
-+    uint16_t asid = *(uint16_t *)user_data;
-+    SMMUIOTLBKey *iotlb_key = (SMMUIOTLBKey *)key;
-+
-+    return iotlb_key->asid == asid;
-+}
-+
-+inline void smmu_iotlb_inv_iova(SMMUState *s, uint16_t asid, dma_addr_t iova)
-+{
-+    SMMUIOTLBKey key = {.asid = asid, .iova = iova};
-+
-+    trace_smmu_iotlb_inv_iova(asid, iova);
-+    g_hash_table_remove(s->iotlb, &key);
-+}
-+
-+inline void smmu_iotlb_inv_asid(SMMUState *s, uint16_t asid)
-+{
-+    trace_smmu_iotlb_inv_asid(asid);
-+    g_hash_table_foreach_remove(s->iotlb, smmu_hash_remove_by_asid, &asid);
-+}
-+
- /* VMSAv8-64 Translation */
- 
- /**
-@@ -330,6 +362,30 @@ IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid)
-     return NULL;
- }
- 
-+static guint smmu_iotlb_key_hash(gconstpointer v)
-+{
-+    SMMUIOTLBKey *key = (SMMUIOTLBKey *)v;
-+    uint32_t a, b, c;
-+
-+    a = b = c = JHASH_INITVAL + sizeof(*key);
-+    a += key->asid;
-+    b += extract64(key->iova, 0, 32);
-+    c += extract64(key->iova, 32, 32);
-+
-+    __jhash_mix(a, b, c);
-+    __jhash_final(a, b, c);
-+
-+    return c;
-+}
-+
-+static gboolean smmu_iotlb_key_equal(gconstpointer v1, gconstpointer v2)
-+{
-+    SMMUIOTLBKey *k1 = (SMMUIOTLBKey *)v1;
-+    SMMUIOTLBKey *k2 = (SMMUIOTLBKey *)v2;
-+
-+    return (k1->asid == k2->asid) && (k1->iova == k2->iova);
-+}
-+
- static void smmu_base_realize(DeviceState *dev, Error **errp)
- {
-     SMMUState *s = ARM_SMMU(dev);
-@@ -342,6 +398,8 @@ static void smmu_base_realize(DeviceState *dev, Error **errp)
-         return;
-     }
-     s->configs = g_hash_table_new_full(NULL, NULL, NULL, g_free);
-+    s->iotlb = g_hash_table_new_full(smmu_iotlb_key_hash, smmu_iotlb_key_equal,
-+                                     g_free, g_free);
-     s->smmu_pcibus_by_busptr = g_hash_table_new(NULL, NULL);
- 
-     if (s->primary_bus) {
-@@ -356,6 +414,7 @@ static void smmu_base_reset(DeviceState *dev)
-     SMMUState *s = ARM_SMMU(dev);
- 
-     g_hash_table_remove_all(s->configs);
-+    g_hash_table_remove_all(s->iotlb);
- }
- 
- static Property smmu_dev_properties[] = {
-diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
-index cfece32..1a0e2e1 100644
---- a/hw/arm/smmuv3.c
-+++ b/hw/arm/smmuv3.c
-@@ -572,6 +572,8 @@ static SMMUTransCfg *smmuv3_get_config(SMMUDevice *sdev, SMMUEventInfo *event)
- 
-         if (!smmuv3_decode_config(&sdev->iommu, cfg, event)) {
-             g_hash_table_insert(bc->configs, sdev, cfg);
-+            cfg->iotlb_misses = 0;
-+            cfg->iotlb_hits = 0;
-         } else {
-             g_free(cfg);
-             cfg = NULL;
-@@ -595,8 +597,12 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
-     SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
-     SMMUv3State *s = sdev->smmu;
-     uint32_t sid = smmu_get_sid(sdev);
-+    SMMUState *bs = ARM_SMMU(s);
-     SMMUEventInfo event = {.type = SMMU_EVT_OK, .sid = sid};
-+    uint64_t page_mask, aligned_addr;
-+    IOMMUTLBEntry *cached_entry = NULL;
-     SMMUPTWEventInfo ptw_info = {};
-+    SMMUTransTableInfo *tt;
-     SMMUTransCfg *cfg = NULL;
-     IOMMUTLBEntry entry = {
-         .target_as = &address_space_memory,
-@@ -605,10 +611,13 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
-         .addr_mask = ~(hwaddr)0,
-         .perm = IOMMU_NONE,
-     };
-+    SMMUIOTLBKey key, *new_key;
-     int ret = 0;
- 
-     if (!smmu_enabled(s)) {
--        goto out;
-+        entry.perm = flag;
-+        trace_smmuv3_translate_pt(mr->parent_obj.name, sid, addr, flag);
-+        return entry;
-     }
- 
-     cfg = smmuv3_get_config(sdev, &event);
-@@ -621,8 +630,61 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
-         goto out;
-     }
- 
--    ret = smmu_ptw(cfg, addr, flag, &entry, &ptw_info);
--    if (ret) {
-+    tt = select_tt(cfg, addr);
-+    if (!tt) {
-+        if (event.record_trans_faults) {
-+            event.type = SMMU_EVT_F_TRANSLATION;
-+            event.u.f_translation.addr = addr;
-+            event.u.f_translation.rnw = flag & 0x1;
-+        }
-+        ret = -EINVAL;
-+        goto out;
-+    }
-+
-+    page_mask = (1ULL << (tt->granule_sz)) - 1;
-+    aligned_addr = addr & ~page_mask;
-+
-+    key.asid = cfg->asid;
-+    key.iova = aligned_addr;
-+
-+    cached_entry = g_hash_table_lookup(bs->iotlb, &key);
-+    if (cached_entry) {
-+        cfg->iotlb_hits += 1;
-+        trace_smmu_iotlb_cache_hit(cfg->asid, aligned_addr,
-+                                   cfg->iotlb_hits, cfg->iotlb_misses,
-+                                   100 * cfg->iotlb_hits /
-+                                   (cfg->iotlb_hits + cfg->iotlb_misses));
-+        if ((flag & IOMMU_WO) && !(cached_entry->perm & IOMMU_WO)) {
-+            ret = -EPERM;
-+            if (event.record_trans_faults) {
-+                event.type = SMMU_EVT_F_PERMISSION;
-+                event.u.f_permission.addr = addr;
-+                event.u.f_permission.rnw = flag & 0x1;
-+            }
-+        }
-+        goto out;
-+    }
-+
-+    cfg->iotlb_misses += 1;
-+    trace_smmu_iotlb_cache_miss(cfg->asid, addr & ~page_mask,
-+                                cfg->iotlb_hits, cfg->iotlb_misses,
-+                                100 * cfg->iotlb_hits /
-+                                (cfg->iotlb_hits + cfg->iotlb_misses));
-+
-+    if (g_hash_table_size(bs->iotlb) >= SMMU_IOTLB_MAX_SIZE) {
-+        smmu_iotlb_inv_all(bs);
-+    }
-+
-+    cached_entry = g_new0(IOMMUTLBEntry, 1);
-+
-+    ret = smmu_ptw(cfg, aligned_addr, flag, cached_entry, &ptw_info);
-+    if (!ret) {
-+        new_key = g_new0(SMMUIOTLBKey, 1);
-+        new_key->asid = cfg->asid;
-+        new_key->iova = aligned_addr;
-+        g_hash_table_insert(bs->iotlb, new_key, cached_entry);
-+    } else {
-+        g_free(cached_entry);
-         switch (ptw_info.type) {
-         case SMMU_PTW_ERR_WALK_EABT:
-             event.type = SMMU_EVT_F_WALK_EABT;
-@@ -672,6 +734,9 @@ out:
-         smmuv3_record_event(s, &event);
-     } else if (!cfg->aborted) {
-         entry.perm = flag;
-+        entry.translated_addr = cached_entry->translated_addr +
-+                                    (addr & page_mask);
-+        entry.addr_mask = cached_entry->addr_mask;
-         trace_smmuv3_translate(mr->parent_obj.name, sid, addr,
-                                entry.translated_addr, entry.perm);
-     }
-@@ -792,10 +857,39 @@ static int smmuv3_cmdq_consume(SMMUv3State *s)
-             smmuv3_flush_config(sdev);
-             break;
-         }
--        case SMMU_CMD_TLBI_NH_ALL:
-         case SMMU_CMD_TLBI_NH_ASID:
--        case SMMU_CMD_TLBI_NH_VA:
-+        {
-+            uint16_t asid = CMD_ASID(&cmd);
-+
-+            trace_smmuv3_cmdq_tlbi_nh_asid(asid);
-+            smmu_iotlb_inv_asid(bs, asid);
-+            break;
-+        }
-+        case SMMU_CMD_TLBI_NH_ALL:
-+        case SMMU_CMD_TLBI_NSNH_ALL:
-+            trace_smmuv3_cmdq_tlbi_nh();
-+            smmu_iotlb_inv_all(bs);
-+            break;
-         case SMMU_CMD_TLBI_NH_VAA:
-+        {
-+            dma_addr_t addr = CMD_ADDR(&cmd);
-+            uint16_t vmid = CMD_VMID(&cmd);
-+
-+            trace_smmuv3_cmdq_tlbi_nh_vaa(vmid, addr);
-+            smmu_iotlb_inv_all(bs);
-+            break;
-+        }
-+        case SMMU_CMD_TLBI_NH_VA:
-+        {
-+            uint16_t asid = CMD_ASID(&cmd);
-+            uint16_t vmid = CMD_VMID(&cmd);
-+            dma_addr_t addr = CMD_ADDR(&cmd);
-+            bool leaf = CMD_LEAF(&cmd);
-+
-+            trace_smmuv3_cmdq_tlbi_nh_va(vmid, asid, addr, leaf);
-+            smmu_iotlb_inv_iova(bs, asid, addr);
-+            break;
-+        }
-         case SMMU_CMD_TLBI_EL3_ALL:
-         case SMMU_CMD_TLBI_EL3_VA:
-         case SMMU_CMD_TLBI_EL2_ALL:
-@@ -804,7 +898,6 @@ static int smmuv3_cmdq_consume(SMMUv3State *s)
-         case SMMU_CMD_TLBI_EL2_VAA:
-         case SMMU_CMD_TLBI_S12_VMALL:
-         case SMMU_CMD_TLBI_S2_IPA:
--        case SMMU_CMD_TLBI_NSNH_ALL:
-         case SMMU_CMD_ATC_INV:
-         case SMMU_CMD_PRI_RESP:
-         case SMMU_CMD_RESUME:
-diff --git a/hw/arm/trace-events b/hw/arm/trace-events
-index 8cb73d2..e0cfcfc 100644
---- a/hw/arm/trace-events
-+++ b/hw/arm/trace-events
-@@ -12,6 +12,11 @@ smmu_ptw_invalid_pte(int stage, int level, uint64_t baseaddr, uint64_t pteaddr,
- smmu_ptw_page_pte(int stage, int level,  uint64_t iova, uint64_t baseaddr, uint64_t pteaddr, uint64_t pte, uint64_t address) "stage=%d level=%d iova=0x%"PRIx64" base@=0x%"PRIx64" pte@=0x%"PRIx64" pte=0x%"PRIx64" page address = 0x%"PRIx64
- smmu_ptw_block_pte(int stage, int level, uint64_t baseaddr, uint64_t pteaddr, uint64_t pte, uint64_t iova, uint64_t gpa, int bsize_mb) "stage=%d level=%d base@=0x%"PRIx64" pte@=0x%"PRIx64" pte=0x%"PRIx64" iova=0x%"PRIx64" block address = 0x%"PRIx64" block size = %d MiB"
- smmu_get_pte(uint64_t baseaddr, int index, uint64_t pteaddr, uint64_t pte) "baseaddr=0x%"PRIx64" index=0x%x, pteaddr=0x%"PRIx64", pte=0x%"PRIx64
-+smmu_iotlb_cache_hit(uint16_t asid, uint64_t addr, uint32_t hit, uint32_t miss, float p) "IOTLB cache HIT asid=%d addr=0x%"PRIx64" hit=%d miss=%d hit rate=%.1f"
-+smmu_iotlb_cache_miss(uint16_t asid, uint64_t addr, uint32_t hit, uint32_t miss, float p) "IOTLB cache MISS asid=%d addr=0x%"PRIx64" hit=%d miss=%d hit rate=%.1f"
-+smmu_iotlb_inv_all(void) "IOTLB invalidate all"
-+smmu_iotlb_inv_asid(uint16_t asid) "IOTLB invalidate asid=%d"
-+smmu_iotlb_inv_iova(uint16_t asid, uint64_t addr) "IOTLB invalidate asid=%d addr=0x%"PRIx64
- 
- #hw/arm/smmuv3.c
- smmuv3_read_mmio(uint64_t addr, uint64_t val, unsigned size, uint32_t r) "addr: 0x%"PRIx64" val:0x%"PRIx64" size: 0x%x(%d)"
-@@ -37,10 +42,15 @@ smmuv3_translate_bypass(const char *n, uint16_t sid, uint64_t addr, bool is_writ
- smmuv3_translate_in(uint16_t sid, int pci_bus_num, uint64_t strtab_base) "SID:0x%x bus:%d strtab_base:0x%"PRIx64
- smmuv3_get_cd(uint64_t addr) "CD addr: 0x%"PRIx64
- smmuv3_translate(const char *n, uint16_t sid, uint64_t iova, uint64_t translated, int perm) "%s sid=%d iova=0x%"PRIx64" translated=0x%"PRIx64" perm=0x%x"
-+smmuv3_translate_pt(const char *n, uint16_t sid, uint64_t iova, int perm) "%s sid=%d iova=0x%"PRIx64" perm=0x%x PASSTHROUGH"
- smmuv3_decode_cd(uint32_t oas) "oas=%d"
- smmuv3_decode_cd_tt(int i, uint32_t tsz, uint64_t ttb, uint32_t granule_sz) "TT[%d]:tsz:%d ttb:0x%"PRIx64" granule_sz:%d"
- smmuv3_cmdq_cfgi_ste(int streamid) "     |_ streamid =%d"
- smmuv3_cmdq_cfgi_ste_range(int start, int end) "     |_ start=0x%d - end=0x%d"
-+smmuv3_cmdq_tlbi_nh_va(int vmid, int asid, uint64_t addr, bool leaf) "     |_ vmid =%d asid =%d addr=0x%"PRIx64" leaf=%d"
-+smmuv3_cmdq_tlbi_nh_vaa(int vmid, uint64_t addr) "     |_ vmid =%d addr=0x%"PRIx64
-+smmuv3_cmdq_tlbi_nh(void) ""
-+smmuv3_cmdq_tlbi_nh_asid(uint16_t asid) "asid=%d"
- smmuv3_cmdq_cfgi_cd(uint32_t sid) "     |_ streamid = %d"
- smmuv3_config_cache_hit(uint32_t sid, uint32_t hits, uint32_t misses, float perc) "Config cache HIT for sid %d (hits=%d, misses=%d, hit rate=%.1f)"
- smmuv3_config_cache_miss(uint32_t sid, uint32_t hits, uint32_t misses, float perc) "Config cache MISS for sid %d (hits=%d, misses=%d, hit rate=%.1f)"
-diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
-index 7ce95ca..d173806 100644
---- a/include/hw/arm/smmu-common.h
-+++ b/include/hw/arm/smmu-common.h
-@@ -67,6 +67,8 @@ typedef struct SMMUTransCfg {
-     uint8_t tbi;               /* Top Byte Ignore */
-     uint16_t asid;
-     SMMUTransTableInfo tt[2];
-+    uint32_t iotlb_hits;       /* counts IOTLB hits for this asid */
-+    uint32_t iotlb_misses;     /* counts IOTLB misses for this asid */
- } SMMUTransCfg;
- 
- typedef struct SMMUDevice {
-@@ -89,6 +91,11 @@ typedef struct SMMUPciBus {
-     SMMUDevice   *pbdev[0]; /* Parent array is sparse, so dynamically alloc */
- } SMMUPciBus;
- 
-+typedef struct SMMUIOTLBKey {
-+    uint64_t iova;
-+    uint16_t asid;
-+} SMMUIOTLBKey;
-+
- typedef struct SMMUState {
-     /* <private> */
-     SysBusDevice  dev;
-@@ -147,4 +154,10 @@ SMMUTransTableInfo *select_tt(SMMUTransCfg *cfg, dma_addr_t iova);
- /* Return the iommu mr associated to @sid, or NULL if none */
- IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid);
- 
-+#define SMMU_IOTLB_MAX_SIZE 256
-+
-+void smmu_iotlb_inv_all(SMMUState *s);
-+void smmu_iotlb_inv_asid(SMMUState *s, uint16_t asid);
-+void smmu_iotlb_inv_iova(SMMUState *s, uint16_t asid, dma_addr_t iova);
-+
- #endif  /* HW_ARM_SMMU_COMMON */
--- 
-2.5.5
+> 
+> > > In our case, MEMA is a namestring so we should be able to avoid the local6 and insert MEMA instead. Just as long as the Named object appears in the table before the object is used, the windows parser should work fine.
+> > > 
+> > > After applying this patch, the only change in ASL/AML that I was expecting was for MEMA to be moved to the top of the definition block and leave everything else alone.  
+> > 
+> > Right. This is what I see.
+> > 
+> > > We usually do not recommend the creation of objects inside of control methods due to the overhead of creating/destroying these objects after each method call. So the one problem that I can see with this is that performance could bog down if this method is called a lot. If it is not called very frequently, then it's probably not a big deal. 
+> > >   
+> > > >   
+> > > > > we could have played games with
+> > > > > references and Type2Opcode but that didn't work nice with Windows ACPI
+> > > > > parser. Hence local object.  
+> > > > 
+> > > > A comment in code wouldn't hurt to explain this.
+> > > >   
+> > > > > The reason why OperationRegion is dynamic, is that if we put it
+> > > > > outside of method it will become static, and we would have to use
+> > > > > Integer constant there (no named objects are allowed) and then patch
+> > > > > it dynamically in bios loader.
+> > > > > I'd prefer to keep it as is, without introducing another hack like
+> > > > > build_append_named_operation_region() to create it with know offset so
+> > > > > firmware could patch it.  
+> > > > 
+> > > > I agree to that.
+> > > >   
+> > > > > >
+> > > > > >
+> > > > > > It all seems suboptimal but given the method is serialized, I don't
+> > > > > > see anything wrong with it as such.
+> > > > > >
+> > > > > >  
+> > > > > > >  
+> > > > > > > >
+> > > > > > > >  hw/acpi/nvdimm.c | 6 ++++--
+> > > > > > > >  1 file changed, 4 insertions(+), 2 deletions(-)
+> > > > > > > >
+> > > > > > > > diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c index
+> > > > > > > > 59d6e42..fadebbd
+> > > > > > > > 100644
+> > > > > > > > --- a/hw/acpi/nvdimm.c
+> > > > > > > > +++ b/hw/acpi/nvdimm.c
+> > > > > > > > @@ -1234,6 +1234,10 @@ static void nvdimm_build_ssdt(GArray
+> > > > > > > > *table_offsets, GArray *table_data,
+> > > > > > > >      ssdt = init_aml_allocator();
+> > > > > > > >      acpi_data_push(ssdt->buf, sizeof(AcpiTableHeader));
+> > > > > > > >
+> > > > > > > > +    /* Storage for the memory address */
+> > > > > > > > +    mem_addr_offset = table_data->len +
+> > > > > > > > +        build_append_named_dword(ssdt->buf,
+> > > > > > > > + NVDIMM_ACPI_MEM_ADDR);
+> > > > > > > > +
+> > > > > > > >      sb_scope = aml_scope("\\_SB");
+> > > > > > > >
+> > > > > > > >      dev = aml_device("NVDR");
+> > > > > > > > @@ -1266,8 +1270,6 @@ static void nvdimm_build_ssdt(GArray
+> > > > > > > > *table_offsets, GArray *table_data,
+> > > > > > > >
+> > > > > > > >      /* copy AML table into ACPI tables blob and patch header there */
+> > > > > > > >      g_array_append_vals(table_data, ssdt->buf->data, ssdt->buf->len);
+> > > > > > > > -    mem_addr_offset = build_append_named_dword(table_data,
+> > > > > > > > -                                               NVDIMM_ACPI_MEM_ADDR);
+> > > > > > > >
+> > > > > > > >      bios_linker_loader_alloc(linker,
+> > > > > > > >                               NVDIMM_DSM_MEM_FILE,
+> > > > > > > > dsm_dma_arrea,
+> > > > > > > > --
+> > > > > > > > MST  
