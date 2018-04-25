@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45593)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1fBM4i-0001L6-HG
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:11:17 -0400
+	(envelope-from <thuth@redhat.com>) id 1fBMAB-0004UN-NM
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:16:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1fBM4e-0007nM-E0
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:11:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38095)
+	(envelope-from <thuth@redhat.com>) id 1fBMA7-00025q-KN
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:16:55 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43026 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1fBM4e-0007m4-5w
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:11:12 -0400
-Date: Wed, 25 Apr 2018 11:11:09 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <1651348200.22658063.1524669069712.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20180425174705-mutt-send-email-mst@kernel.org>
-References: <20180425112415.12327-1-pagupta@redhat.com>
-	<20180425112415.12327-2-pagupta@redhat.com>
-	<20180425174705-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fBMA7-00025N-Ds
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:16:51 -0400
+References: <20180420145249.32435-1-peter.maydell@linaro.org>
+	<20180420145249.32435-13-peter.maydell@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <df3dfeac-5b64-bb92-9d3f-a05851c8a6d1@redhat.com>
+Date: Wed, 25 Apr 2018 17:16:43 +0200
 MIME-Version: 1.0
+In-Reply-To: <20180420145249.32435-13-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 1/2] virtio: add pmem driver
+Subject: Re: [Qemu-devel] [PATCH 12/13] vl.c: Remove compile time limit on
+ number of serial ports
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,116 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: kwolf@redhat.com, haozhong zhang <haozhong.zhang@intel.com>, lcapitulino@redhat.com, jack@suse.cz, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, kvm@vger.kernel.org, riel@surriel.com, linux-nvdimm@ml01.01.org, david@redhat.com, ross zwisler <ross.zwisler@intel.com>, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, hch@infradead.org, linux-mm@kvack.org, imammedo@redhat.com, stefanha@redhat.com, niteshnarayanlal@hotmail.com, marcel@redhat.com, pbonzini@redhat.com, dan j williams <dan.j.williams@intel.com>, nilal@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, patches@linaro.org
 
+On 20.04.2018 16:52, Peter Maydell wrote:
+> Instead of having a fixed sized global serial_hds[] array,
+> use a local dynamically reallocated one, so we don't have
+> a compile time limit on how many serial ports a system has.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  include/sysemu/sysemu.h |  2 --
+>  vl.c                    | 15 +++++++--------
+>  2 files changed, 7 insertions(+), 10 deletions(-)
+> 
+> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> index bd5b55c514..989cbc2b7b 100644
+> --- a/include/sysemu/sysemu.h
+> +++ b/include/sysemu/sysemu.h
+> @@ -161,8 +161,6 @@ void hmp_pcie_aer_inject_error(Monitor *mon, const QDict *qdict);
+>  
+>  #define MAX_SERIAL_PORTS 4
+>  
+> -extern Chardev *serial_hds[MAX_SERIAL_PORTS];
+> -
+>  /* Return the Chardev for serial port i, or NULL if none */
+>  Chardev *serial_hd(int i);
+>  
+> diff --git a/vl.c b/vl.c
+> index 6daf026da6..a8a98c5a37 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -154,7 +154,8 @@ QEMUClockType rtc_clock;
+>  int vga_interface_type = VGA_NONE;
+>  static DisplayOptions dpy;
+>  int no_frame;
+> -Chardev *serial_hds[MAX_SERIAL_PORTS];
+> +static int num_serial_hds = 0;
+> +static Chardev **serial_hds = NULL;
+>  Chardev *parallel_hds[MAX_PARALLEL_PORTS];
+>  Chardev *virtcon_hds[MAX_VIRTIO_CONSOLES];
+>  Chardev *sclp_hds[MAX_SCLP_CONSOLES];
+> @@ -2496,30 +2497,28 @@ static int foreach_device_config(int type, int (*func)(const char *cmdline))
+>  
+>  static int serial_parse(const char *devname)
+>  {
+> -    static int index = 0;
+> +    int index = num_serial_hds;
+>      char label[32];
+>  
+>      if (strcmp(devname, "none") == 0)
+>          return 0;
+> -    if (index == MAX_SERIAL_PORTS) {
+> -        error_report("too many serial ports");
+> -        exit(1);
+> -    }
+>      snprintf(label, sizeof(label), "serial%d", index);
+> +    serial_hds = g_renew(Chardev *, serial_hds, index + 1);
+> +
+>      serial_hds[index] = qemu_chr_new(label, devname);
+>      if (!serial_hds[index]) {
 
-> 
-> On Wed, Apr 25, 2018 at 04:54:13PM +0530, Pankaj Gupta wrote:
-> > diff --git a/include/uapi/linux/virtio_ids.h
-> > b/include/uapi/linux/virtio_ids.h
-> > index 6d5c3b2..5ebd049 100644
-> > --- a/include/uapi/linux/virtio_ids.h
-> > +++ b/include/uapi/linux/virtio_ids.h
-> > @@ -43,5 +43,6 @@
-> >  #define VIRTIO_ID_INPUT        18 /* virtio input */
-> >  #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
-> >  #define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
-> > +#define VIRTIO_ID_PMEM         21 /* virtio pmem */
-> >  
-> >  #endif /* _LINUX_VIRTIO_IDS_H */
-> 
-> Please register the device id with virtio TC.
+In case you respin: I think you could do this without the index variable
+and just use num_serial_hds directly instead (just a matter of taste,
+though).
 
-O.K Will create virtio spec and follow the procedure.
- 
-> 
-> 
-> > diff --git a/include/uapi/linux/virtio_pmem.h
-> > b/include/uapi/linux/virtio_pmem.h
-> > new file mode 100644
-> > index 0000000..2ec27cb
-> > --- /dev/null
-> > +++ b/include/uapi/linux/virtio_pmem.h
-> > @@ -0,0 +1,58 @@
-> > +/* Virtio pmem Driver
-> > + *
-> > + * Discovers persitent memory range information
-> > + * from host and provides a virtio based flushing
-> > + * interface.
-> > + */
-> > +
-> > +#ifndef _LINUX_VIRTIO_PMEM_H
-> > +#define _LINUX_VIRTIO_PMEM_H
-> > +
-> > +#include <linux/types.h>
-> > +#include <linux/virtio_types.h>
-> > +#include <linux/virtio_ids.h>
-> > +#include <linux/virtio_config.h>
-> > +#include <linux/virtio_ring.h>
-> > +
-> > +
-> > +struct virtio_pmem_config {
-> > +
-> 
-> don't add empty lines pls.
-
-o.k
-
-> 
-> > +	uint64_t start;
-> > +	uint64_t size;
-> 
-> Used LE fields for everything.
-
-o.k
-
-> 
-> > +};
-> > +
-> > +struct virtio_pmem {
-> > +
-> > +	struct virtio_device *vdev;
-> > +	struct virtqueue *req_vq;
-> > +
-> > +	uint64_t start;
-> > +	uint64_t size;
-> > +} __packed;
-> 
-> This does not belong in uapi, and should not be packed either.
-
-o.k
-
-> 
-> > +
-> > +static struct virtio_device_id id_table[] = {
-> > +	{ VIRTIO_ID_PMEM, VIRTIO_DEV_ANY_ID },
-> > +	{ 0 },
-> > +};
-> > +
-> > +void virtio_pmem_flush(struct device *dev)
-> > +{
-> > +	struct scatterlist sg;
-> > +	struct virtio_device *vdev  = dev_to_virtio(dev->parent->parent);
-> > +	struct virtio_pmem   *vpmem = vdev->priv;
-> > +	char *buf = "FLUSH";
-> > +	int err;
-> > +
-> > +	sg_init_one(&sg, buf, sizeof(buf));
-> > +
-> > +	err = virtqueue_add_outbuf(vpmem->req_vq, &sg, 1, buf, GFP_KERNEL);
-> > +
-> > +	if (err) {
-> > +		dev_err(&vdev->dev, "failed to send command to virtio pmem device\n");
-> > +		return;
-> > +	}
-> > +
-> > +	virtqueue_kick(vpmem->req_vq);
-> > +};
-> 
-> this doesn't belong in uapi.
-
-o.k.
-
-Thanks,
-Pankaj
+Reviewed-by: Thomas Huth <thuth@redhat.com>
