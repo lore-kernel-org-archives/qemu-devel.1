@@ -1,33 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ybettan@redhat.com>) id 1fBEBb-0000LL-28
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 02:45:52 -0400
+	(envelope-from <armbru@redhat.com>) id 1fBEE5-0001po-IQ
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 02:48:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ybettan@redhat.com>) id 1fBEBW-00025z-4p
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 02:45:51 -0400
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:34814)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ybettan@redhat.com>) id 1fBEBV-00025O-U8
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 02:45:46 -0400
-Received: by mail-wm0-f65.google.com with SMTP id w2so3292405wmw.1
-	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 23:45:45 -0700 (PDT)
-Received: from localhost.localdomain ([89.237.106.194])
-	by smtp.gmail.com with ESMTPSA id
-	s9sm10168290edc.85.2018.04.24.23.45.42 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 24 Apr 2018 23:45:43 -0700 (PDT)
-References: <20180419212727.26095-1-f4bug@amsat.org>
-	<20180419212727.26095-4-f4bug@amsat.org>
-From: Yoni Bettan <ybettan@redhat.com>
-Message-ID: <1cd8d331-70bf-0807-8609-7b497053b58f@redhat.com>
-Date: Wed, 25 Apr 2018 09:45:41 +0300
+	(envelope-from <armbru@redhat.com>) id 1fBEE0-0003pV-L2
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 02:48:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59672 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fBEE0-0003pH-FU
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 02:48:20 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0B53581A88A6
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 06:48:20 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180424214550.32549-1-lersek@redhat.com>
+	<20180424214550.32549-5-lersek@redhat.com>
+Date: Wed, 25 Apr 2018 08:48:15 +0200
+In-Reply-To: <20180424214550.32549-5-lersek@redhat.com> (Laszlo Ersek's
+	message of "Tue, 24 Apr 2018 23:45:48 +0200")
+Message-ID: <87in8faij4.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180419212727.26095-4-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v3 3/4] qdev: Simplify the
- SysBusDeviceClass::init path
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 4/6] qapi: change the type of
+ TargetInfo.arch from string to enum SysEmuTarget
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,136 +34,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <dgibson@redhat.com>
 
+Laszlo Ersek <lersek@redhat.com> writes:
 
-
-On 04/20/2018 12:27 AM, Philippe Mathieu-Daudé wrote:
-> The SysBusDevice is the last DeviceClass::init user.
+> Now that we have @SysEmuTarget, it makes sense to restict
+> @TargetInfo.@arch to valid sysemu targets at the schema level.
 >
-> Instead of using
->    SysBusDeviceClass::realize
->     -> DeviceClass::realize
->         -> DeviceClass::init
->             -> sysbus_device_init
->                -> SysBusDeviceClass::init
->
-> Simplify the path by directly calling SysBusDeviceClass::init
-> in SysBusDeviceClass::realize:
->
->    SysBusDeviceClass::realize
->     -> SysBusDeviceClass::init
->
-> Finally, remove the DeviceClass::init, there are no more users.
->
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Cc: "Daniel P. Berrange" <berrange@redhat.com>
+> Cc: David Gibson <dgibson@redhat.com>
+> Cc: Eric Blake <eblake@redhat.com>
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Cc: Kashyap Chamarthy <kchamart@redhat.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
 > ---
->   include/hw/qdev-core.h |  2 --
->   hw/core/qdev.c         | 14 --------------
->   hw/core/sysbus.c       | 15 ++++++++++-----
->   3 files changed, 10 insertions(+), 21 deletions(-)
 >
-> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-> index 9453588160..6f60748043 100644
-> --- a/include/hw/qdev-core.h
-> +++ b/include/hw/qdev-core.h
-> @@ -29,7 +29,6 @@ typedef enum DeviceCategory {
->       DEVICE_CATEGORY_MAX
->   } DeviceCategory;
->   
-> -typedef int (*qdev_initfn)(DeviceState *dev);
->   typedef int (*qdev_event)(DeviceState *dev);
->   typedef void (*DeviceRealize)(DeviceState *dev, Error **errp);
->   typedef void (*DeviceUnrealize)(DeviceState *dev, Error **errp);
-> @@ -124,7 +123,6 @@ typedef struct DeviceClass {
->       const struct VMStateDescription *vmsd;
->   
->       /* Private to qdev / bus.  */
-> -    qdev_initfn init; /* TODO remove, once users are converted to realize */
->       qdev_event exit; /* TODO remove, once users are converted to unrealize */
->       const char *bus_type;
->   } DeviceClass;
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index f6f92473b8..4153b733c8 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -208,19 +208,6 @@ void device_listener_unregister(DeviceListener *listener)
->       QTAILQ_REMOVE(&device_listeners, listener, link);
->   }
->   
-> -static void device_realize(DeviceState *dev, Error **errp)
-> -{
-> -    DeviceClass *dc = DEVICE_GET_CLASS(dev);
-> -
-> -    if (dc->init) {
-> -        int rc = dc->init(dev);
-> -        if (rc < 0) {
-> -            error_setg(errp, "Device initialization failed.");
-> -            return;
-> -        }
-> -    }
-> -}
-> -
->   static void device_unrealize(DeviceState *dev, Error **errp)
->   {
->       DeviceClass *dc = DEVICE_GET_CLASS(dev);
-> @@ -1065,7 +1052,6 @@ static void device_class_init(ObjectClass *class, void *data)
->       DeviceClass *dc = DEVICE_CLASS(class);
->   
->       class->unparent = device_unparent;
-> -    dc->realize = device_realize;
->       dc->unrealize = device_unrealize;
->   
->       /* by default all devices were considered as hotpluggable,
-> diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
-> index 5d0887f499..11f6d14b84 100644
-> --- a/hw/core/sysbus.c
-> +++ b/hw/core/sysbus.c
-> @@ -18,6 +18,7 @@
->    */
->   
->   #include "qemu/osdep.h"
+> Notes:
+>     PATCHv1:
+>     
+>     - qmp_query_target(): pass (-1) as fallback value [Markus]
+>     - qmp_query_target(): catch lookup error with error_abort [Markus]
+>     
+>     RFCv3:
+>     
+>     - The patch is new in this version. [Markus]
+>
+>  qapi/misc.json |  6 ++++--
+>  arch_init.c    | 10 +++++++++-
+>  2 files changed, 13 insertions(+), 3 deletions(-)
+>
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index 104d013adba6..460866cf542f 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -1,18 +1,20 @@
+>  # -*- Mode: Python -*-
+>  #
+>  
+>  ##
+>  # = Miscellanea
+>  ##
+>  
+> +{ 'include': 'common.json' }
+> +
+>  ##
+>  # @qmp_capabilities:
+>  #
+>  # Enable QMP capabilities.
+>  #
+>  # Arguments:
+>  #
+>  # @enable:   An optional list of QMPCapability values to enable.  The
+>  #            client must not enable any capability that is not
+>  #            mentioned in the QMP greeting message.  If the field is not
+>  #            provided, it means no QMP capabilities will be enabled.
+> @@ -2441,28 +2443,28 @@
+>  #      ]
+>  #    }
+>  #
+>  ##
+>  { 'command': 'query-fdsets', 'returns': ['FdsetInfo'] }
+>  
+>  ##
+>  # @TargetInfo:
+>  #
+>  # Information describing the QEMU target.
+>  #
+> -# @arch: the target architecture (eg "x86_64", "i386", etc)
+> +# @arch: the target architecture
+>  #
+>  # Since: 1.2.0
+>  ##
+>  { 'struct': 'TargetInfo',
+> -  'data': { 'arch': 'str' } }
+> +  'data': { 'arch': 'SysEmuTarget' } }
+>  
+>  ##
+>  # @query-target:
+>  #
+>  # Return information about the target for this QEMU
+>  #
+>  # Returns: TargetInfo
+>  #
+>  # Since: 1.2.0
+>  ##
+>  { 'command': 'query-target', 'returns': 'TargetInfo' }
+> diff --git a/arch_init.c b/arch_init.c
+> index 6ee07478bd11..ee3a57019000 100644
+> --- a/arch_init.c
+> +++ b/arch_init.c
+> @@ -21,22 +21,23 @@
+>   * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+>   * THE SOFTWARE.
+>   */
+>  #include "qemu/osdep.h"
+>  #include "qemu-common.h"
+>  #include "cpu.h"
+>  #include "sysemu/sysemu.h"
+>  #include "sysemu/arch_init.h"
+>  #include "hw/pci/pci.h"
+>  #include "hw/audio/soundhw.h"
+>  #include "qapi/qapi-commands-misc.h"
 > +#include "qapi/error.h"
->   #include "hw/sysbus.h"
->   #include "monitor/monitor.h"
->   #include "exec/address-spaces.h"
-> @@ -200,15 +201,19 @@ void sysbus_init_ioports(SysBusDevice *dev, uint32_t ioport, uint32_t size)
->       }
->   }
->   
-> -static int sysbus_device_init(DeviceState *dev)
-> +static void sysbus_realize(DeviceState *dev, Error **errp)
->   {
->       SysBusDevice *sd = SYS_BUS_DEVICE(dev);
->       SysBusDeviceClass *sbc = SYS_BUS_DEVICE_GET_CLASS(sd);
->   
-> -    if (!sbc->init) {
-> -        return 0;
+>  #include "qemu/config-file.h"
+>  #include "qemu/error-report.h"
+>  #include "hw/acpi/acpi.h"
+>  #include "qemu/help_option.h"
+>  
+>  #ifdef TARGET_SPARC
+>  int graphic_width = 1024;
+>  int graphic_height = 768;
+>  int graphic_depth = 8;
+>  #else
+>  int graphic_width = 800;
+> @@ -104,15 +105,22 @@ int xen_available(void)
+>      return 1;
+>  #else
+>      return 0;
+>  #endif
+>  }
+>  
+>  
+>  TargetInfo *qmp_query_target(Error **errp)
+>  {
+>      TargetInfo *info = g_malloc0(sizeof(*info));
+>  
+> -    info->arch = g_strdup(TARGET_NAME);
+> +    /*
+> +     * The fallback enum value is irrelevant here (TARGET_NAME is a
+> +     * macro and can never be NULL), so simply pass (-1). Also, the
+> +     * lookup should never fail -- if it fails, then @SysEmuTarget needs
+> +     * extending. Catch that with "error_abort".
+> +     */
+> +    info->arch = qapi_enum_parse(&SysEmuTarget_lookup, TARGET_NAME, -1,
+> +                                 &error_abort);
+>  
+>      return info;
+>  }
 
-Hello Philippe, is the purpose of this part to enable incremental 
-conversion init->realize
-to SysBusDevices ?!
+Not sure the comment is carrying its weight; for me, the use of -1 and
+&error_abort feels obvious enough.  But my feelings are subjective and
+could be off.
 
-Thanks,
-Yoni
-> +    /* TODO remove, once users are converted to realize */
-> +    if (sbc->init) {
-> +        int rc = sbc->init(sd);
-> +        if (rc < 0) {
-> +            error_setg(errp, "Device initialization failed.");
-> +            return;
-> +        }
->       }
-> -    return sbc->init(sd);
->   }
->   
->   DeviceState *sysbus_create_varargs(const char *name,
-> @@ -324,7 +329,7 @@ MemoryRegion *sysbus_address_space(SysBusDevice *dev)
->   static void sysbus_device_class_init(ObjectClass *klass, void *data)
->   {
->       DeviceClass *k = DEVICE_CLASS(klass);
-> -    k->init = sysbus_device_init;
-> +    k->realize = sysbus_realize;
->       k->bus_type = TYPE_SYSTEM_BUS;
->       /*
->        * device_add plugs devices into a suitable bus.  For "real" buses,
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
