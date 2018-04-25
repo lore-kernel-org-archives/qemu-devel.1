@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59131)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fBCPu-0004PQ-Ct
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 00:52:31 -0400
+	(envelope-from <thuth@redhat.com>) id 1fBCsb-0005Lu-1X
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 01:22:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fBCPt-0007TH-63
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 00:52:30 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58564 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fBCPt-0007T6-09
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 00:52:29 -0400
-From: Peter Xu <peterx@redhat.com>
-Date: Wed, 25 Apr 2018 12:51:29 +0800
-Message-Id: <20180425045129.17449-11-peterx@redhat.com>
-In-Reply-To: <20180425045129.17449-1-peterx@redhat.com>
-References: <20180425045129.17449-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 10/10] intel-iommu: remove notify_unmap for
- page walk
+	(envelope-from <thuth@redhat.com>) id 1fBCsX-0002OC-Rz
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 01:22:09 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Wed, 25 Apr 2018 07:21:55 +0200
+Message-Id: <1524633715-21393-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v1] hw/s390x: Allow to configure the consoles
+ with the "-serial" parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,151 +18,263 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>
+To: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Now after previous changes, we will always pass that parameter as true
-now.  Remove it. After removing that variable, now we can greatly
-simplify the page walking logic.
+The consoles ("sclpconsole" and "sclplmconsole") can only be configured
+with "-device" and "-chardev" so far. Other machines use the convenience
+option "-serial" to configure the default consoles, even for virtual
+consoles like spapr-vty on the pseries machine. So let's support this
+option on s390x, too. This way we can easily enable the serial console
+here again with "-nodefaults", for example:
 
-No functional change at all.
+qemu-system-s390x -no-shutdown -nographic -nodefaults -serial mon:stdio
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
+... which is way shorter than typing:
+
+qemu-system-s390x -no-shutdown -nographic -nodefaults \
+  -chardev stdio,id=c1,mux=on -device sclpconsole,chardev=c1 \
+  -mon chardev=c1
+
+The -serial parameter can also be used if you only want to see the QEMU
+monitor on stdio without using -nodefaults, but not the console output.
+That's something that is pretty impossible with the current code today:
+
+qemu-system-s390x -no-shutdown -nographic -serial none
+
+While we're at it, this patch also maps the second -serial option to the
+"sclplmconsole", so that there is now an easy way to configure this second
+console on s390x, too, for example:
+
+qemu-system-s390x -no-shutdown -nographic -serial null -serial mon:stdio
+
+Additionally, the new code is also smaller than the old one and we have
+less s390x-specific code in vl.c :-)
+
+I've also checked that migration still works as expected by migrating
+a guest with console output back and forth between a qemu-system-s390x
+that has this patch and an instance without this patch.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/i386/intel_iommu.c | 70 +++++++++++++++++++++------------------------------
- hw/i386/trace-events  |  1 -
- 2 files changed, 28 insertions(+), 43 deletions(-)
+ RFC -> v1:
+ - Improved the patch description (provided examples)
+ - Moved the "init consoles" hunk in ccw_init to a later point in time
+   so that the output of "info qom-tree" shows the same order of devices
+   in the "/machine/unattached" tree.
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index dedaebc46b..31e9b52452 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -762,7 +762,6 @@ typedef struct {
-     VTDAddressSpace *as;
-     vtd_page_walk_hook hook_fn;
-     void *private;
--    bool notify_unmap;
- } vtd_page_walk_info;
+ hw/s390x/event-facility.c         | 14 +++++++++++
+ hw/s390x/s390-virtio-ccw.c        | 19 +++++++++++++--
+ include/hw/boards.h               |  1 -
+ include/hw/s390x/event-facility.h |  2 ++
+ vl.c                              | 50 ---------------------------------------
+ 5 files changed, 33 insertions(+), 53 deletions(-)
+
+diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+index 9c24bc6..e6940a2 100644
+--- a/hw/s390x/event-facility.c
++++ b/hw/s390x/event-facility.c
+@@ -511,3 +511,17 @@ static void register_types(void)
+ }
  
- static int vtd_page_walk_one(IOMMUTLBEntry *entry, int level,
-@@ -858,45 +857,34 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
-          */
-         entry_valid = read_cur | write_cur;
- 
--        entry.target_as = &address_space_memory;
--        entry.iova = iova & subpage_mask;
--        entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
--        entry.addr_mask = ~subpage_mask;
--
--        if (vtd_is_last_slpte(slpte, level)) {
--            /* NOTE: this is only meaningful if entry_valid == true */
--            entry.translated_addr = vtd_get_slpte_addr(slpte, aw);
--            if (!entry_valid && !info->notify_unmap) {
--                trace_vtd_page_walk_skip_perm(iova, iova_next);
--                goto next;
--            }
--            ret = vtd_page_walk_one(&entry, level, info);
--            if (ret < 0) {
--                return ret;
--            }
--        } else {
--            if (!entry_valid) {
--                if (info->notify_unmap) {
--                    /*
--                     * The whole entry is invalid; unmap it all.
--                     * Translated address is meaningless, zero it.
--                     */
--                    entry.translated_addr = 0x0;
--                    ret = vtd_page_walk_one(&entry, level, info);
--                    if (ret < 0) {
--                        return ret;
--                    }
--                } else {
--                    trace_vtd_page_walk_skip_perm(iova, iova_next);
--                }
--                goto next;
--            }
-+        if (!vtd_is_last_slpte(slpte, level) && entry_valid) {
-+            /*
-+             * This is a valid PDE (or even bigger than PDE).  We need
-+             * to walk one further level.
-+             */
-             ret = vtd_page_walk_level(vtd_get_slpte_addr(slpte, aw),
-                                       iova, MIN(iova_next, end), level - 1,
-                                       read_cur, write_cur, info);
--            if (ret < 0) {
--                return ret;
--            }
-+        } else {
-+            /*
-+             * This means we are either:
-+             *
-+             * (1) the real page entry (either 4K page, or huge page)
-+             * (2) the whole range is invalid
-+             *
-+             * In either case, we send an IOTLB notification down.
-+             */
-+            entry.target_as = &address_space_memory;
-+            entry.iova = iova & subpage_mask;
-+            entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
-+            entry.addr_mask = ~subpage_mask;
-+            /* NOTE: this is only meaningful if entry_valid == true */
-+            entry.translated_addr = vtd_get_slpte_addr(slpte, aw);
-+            ret = vtd_page_walk_one(&entry, level, info);
-+        }
+ type_init(register_types)
 +
-+        if (ret < 0) {
-+            return ret;
-         }
++BusState *sclp_get_event_facility_bus(void)
++{
++    Object *busobj;
++    SCLPEventsBus *sbus;
++
++    busobj = object_resolve_path_type("", TYPE_SCLP_EVENTS_BUS, NULL);
++    sbus = OBJECT_CHECK(SCLPEventsBus, busobj, TYPE_SCLP_EVENTS_BUS);
++    if (!sbus) {
++        return NULL;
++    }
++
++    return &sbus->qbus;
++}
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 435f7c9..62d909e 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -288,6 +288,15 @@ static void s390_create_virtio_net(BusState *bus, const char *name)
+     }
+ }
  
- next:
-@@ -918,7 +906,7 @@ next:
-  */
- static int vtd_page_walk(VTDContextEntry *ce, uint64_t start, uint64_t end,
-                          vtd_page_walk_hook hook_fn, void *private,
--                         bool notify_unmap, VTDAddressSpace *as)
-+                         VTDAddressSpace *as)
++static void s390_create_sclpconsole(const char *type, Chardev *chardev)
++{
++    DeviceState *dev;
++
++    dev = qdev_create(sclp_get_event_facility_bus(), type);
++    qdev_prop_set_chr(dev, "chardev", chardev);
++    qdev_init_nofail(dev);
++}
++
+ static void ccw_init(MachineState *machine)
  {
-     dma_addr_t addr = vtd_ce_get_slpt_base(ce);
-     uint32_t level = vtd_ce_get_level(ce);
-@@ -926,7 +914,6 @@ static int vtd_page_walk(VTDContextEntry *ce, uint64_t start, uint64_t end,
-     vtd_page_walk_info info = {
-         .hook_fn = hook_fn,
-         .private = private,
--        .notify_unmap = notify_unmap,
-         .as = as,
-     };
+     int ret;
+@@ -346,6 +355,14 @@ static void ccw_init(MachineState *machine)
+     /* Create VirtIO network adapters */
+     s390_create_virtio_net(BUS(css_bus), "virtio-net-ccw");
  
-@@ -1491,7 +1478,7 @@ static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
-                  */
-                 vtd_page_walk(&ce, addr, addr + size,
-                               vtd_page_invalidate_notify_hook,
--                              (void *)&vtd_as->iommu, true, vtd_as);
-+                              (void *)&vtd_as->iommu, vtd_as);
-             } else {
-                 /*
-                  * For UNMAP-only notifiers, we don't need to walk the
-@@ -2962,8 +2949,7 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
-                                   ce.hi, ce.lo);
-         if (vtd_as_notify_mappings(vtd_as)) {
-             /* This is required only for MAP typed notifiers */
--            vtd_page_walk(&ce, 0, ~0ULL, vtd_replay_hook, (void *)n, true,
--                          vtd_as);
-+            vtd_page_walk(&ce, 0, ~0ULL, vtd_replay_hook, (void *)n, vtd_as);
++    /* init consoles */
++    if (serial_hds[0]) {
++        s390_create_sclpconsole("sclpconsole", serial_hds[0]);
++    }
++    if (serial_hds[1]) {
++        s390_create_sclpconsole("sclplmconsole", serial_hds[1]);
++    }
++
+     /* Register savevm handler for guest TOD clock */
+     register_savevm_live(NULL, "todclock", 0, 1, &savevm_gtod, NULL);
+ }
+@@ -470,10 +487,8 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
+     mc->block_default_type = IF_VIRTIO;
+     mc->no_cdrom = 1;
+     mc->no_floppy = 1;
+-    mc->no_serial = 1;
+     mc->no_parallel = 1;
+     mc->no_sdcard = 1;
+-    mc->use_sclp = 1;
+     mc->max_cpus = S390_MAX_CPUS;
+     mc->has_hotpluggable_cpus = true;
+     mc->get_hotplug_handler = s390_get_hotplug_handler;
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index a609239..5c5eee5 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -180,7 +180,6 @@ struct MachineClass {
+     unsigned int no_serial:1,
+         no_parallel:1,
+         use_virtcon:1,
+-        use_sclp:1,
+         no_floppy:1,
+         no_cdrom:1,
+         no_sdcard:1,
+diff --git a/include/hw/s390x/event-facility.h b/include/hw/s390x/event-facility.h
+index 5698e5e..5cc16f6 100644
+--- a/include/hw/s390x/event-facility.h
++++ b/include/hw/s390x/event-facility.h
+@@ -210,4 +210,6 @@ typedef struct SCLPEventFacilityClass {
+     bool (*event_pending)(SCLPEventFacility *ef);
+ } SCLPEventFacilityClass;
+ 
++BusState *sclp_get_event_facility_bus(void);
++
+ #endif
+diff --git a/vl.c b/vl.c
+index fce1fd1..b32340c 100644
+--- a/vl.c
++++ b/vl.c
+@@ -133,7 +133,6 @@ int main(int argc, char **argv)
+ #include "sysemu/iothread.h"
+ 
+ #define MAX_VIRTIO_CONSOLES 1
+-#define MAX_SCLP_CONSOLES 1
+ 
+ static const char *data_dir[16];
+ static int data_dir_idx;
+@@ -157,7 +156,6 @@ int no_frame;
+ Chardev *serial_hds[MAX_SERIAL_PORTS];
+ Chardev *parallel_hds[MAX_PARALLEL_PORTS];
+ Chardev *virtcon_hds[MAX_VIRTIO_CONSOLES];
+-Chardev *sclp_hds[MAX_SCLP_CONSOLES];
+ int win2k_install_hack = 0;
+ int singlestep = 0;
+ int smp_cpus;
+@@ -209,7 +207,6 @@ static int has_defaults = 1;
+ static int default_serial = 1;
+ static int default_parallel = 1;
+ static int default_virtcon = 1;
+-static int default_sclp = 1;
+ static int default_monitor = 1;
+ static int default_floppy = 1;
+ static int default_cdrom = 1;
+@@ -2571,39 +2568,6 @@ static int virtcon_parse(const char *devname)
+     return 0;
+ }
+ 
+-static int sclp_parse(const char *devname)
+-{
+-    QemuOptsList *device = qemu_find_opts("device");
+-    static int index = 0;
+-    char label[32];
+-    QemuOpts *dev_opts;
+-
+-    if (strcmp(devname, "none") == 0) {
+-        return 0;
+-    }
+-    if (index == MAX_SCLP_CONSOLES) {
+-        error_report("too many sclp consoles");
+-        exit(1);
+-    }
+-
+-    assert(arch_type == QEMU_ARCH_S390X);
+-
+-    dev_opts = qemu_opts_create(device, NULL, 0, NULL);
+-    qemu_opt_set(dev_opts, "driver", "sclpconsole", &error_abort);
+-
+-    snprintf(label, sizeof(label), "sclpcon%d", index);
+-    sclp_hds[index] = qemu_chr_new(label, devname);
+-    if (!sclp_hds[index]) {
+-        error_report("could not connect sclp console"
+-                     " to character backend '%s'", devname);
+-        return -1;
+-    }
+-    qemu_opt_set(dev_opts, "chardev", label, &error_abort);
+-
+-    index++;
+-    return 0;
+-}
+-
+ static int debugcon_parse(const char *devname)
+ {
+     QemuOpts *opts;
+@@ -4237,9 +4201,6 @@ int main(int argc, char **argv, char **envp)
+     if (!has_defaults || !machine_class->use_virtcon) {
+         default_virtcon = 0;
+     }
+-    if (!has_defaults || !machine_class->use_sclp) {
+-        default_sclp = 0;
+-    }
+     if (!has_defaults || machine_class->no_floppy) {
+         default_floppy = 0;
+     }
+@@ -4286,16 +4247,11 @@ int main(int argc, char **argv, char **envp)
+             add_device_config(DEV_SERIAL, "mon:stdio");
+         } else if (default_virtcon && default_monitor) {
+             add_device_config(DEV_VIRTCON, "mon:stdio");
+-        } else if (default_sclp && default_monitor) {
+-            add_device_config(DEV_SCLP, "mon:stdio");
          } else {
-             vtd_address_space_unmap(vtd_as, n);
+             if (default_serial)
+                 add_device_config(DEV_SERIAL, "stdio");
+             if (default_virtcon)
+                 add_device_config(DEV_VIRTCON, "stdio");
+-            if (default_sclp) {
+-                add_device_config(DEV_SCLP, "stdio");
+-            }
+             if (default_monitor)
+                 monitor_parse("stdio", "readline", false);
          }
-diff --git a/hw/i386/trace-events b/hw/i386/trace-events
-index 677f83420d..eb23ace5fb 100644
---- a/hw/i386/trace-events
-+++ b/hw/i386/trace-events
-@@ -43,7 +43,6 @@ vtd_page_walk_one(uint32_t level, uint64_t iova, uint64_t gpa, uint64_t mask, in
- vtd_page_walk_one_skip_map(uint64_t iova, uint64_t mask, uint64_t start, uint64_t end) "iova 0x%"PRIx64" mask 0x%"PRIx64" start 0x%"PRIx64" end 0x%"PRIx64
- vtd_page_walk_one_skip_unmap(uint64_t iova, uint64_t mask) "iova 0x%"PRIx64" mask 0x%"PRIx64
- vtd_page_walk_skip_read(uint64_t iova, uint64_t next) "Page walk skip iova 0x%"PRIx64" - 0x%"PRIx64" due to unable to read"
--vtd_page_walk_skip_perm(uint64_t iova, uint64_t next) "Page walk skip iova 0x%"PRIx64" - 0x%"PRIx64" due to perm empty"
- vtd_page_walk_skip_reserve(uint64_t iova, uint64_t next) "Page walk skip iova 0x%"PRIx64" - 0x%"PRIx64" due to rsrv set"
- vtd_switch_address_space(uint8_t bus, uint8_t slot, uint8_t fn, bool on) "Device %02x:%02x.%x switching address space (iommu enabled=%d)"
- vtd_as_unmap_whole(uint8_t bus, uint8_t slot, uint8_t fn, uint64_t iova, uint64_t size) "Device %02x:%02x.%x start 0x%"PRIx64" size 0x%"PRIx64
+@@ -4308,9 +4264,6 @@ int main(int argc, char **argv, char **envp)
+             monitor_parse("vc:80Cx24C", "readline", false);
+         if (default_virtcon)
+             add_device_config(DEV_VIRTCON, "vc:80Cx24C");
+-        if (default_sclp) {
+-            add_device_config(DEV_SCLP, "vc:80Cx24C");
+-        }
+     }
+ 
+ #if defined(CONFIG_VNC)
+@@ -4560,9 +4513,6 @@ int main(int argc, char **argv, char **envp)
+         exit(1);
+     if (foreach_device_config(DEV_VIRTCON, virtcon_parse) < 0)
+         exit(1);
+-    if (foreach_device_config(DEV_SCLP, sclp_parse) < 0) {
+-        exit(1);
+-    }
+     if (foreach_device_config(DEV_DEBUGCON, debugcon_parse) < 0)
+         exit(1);
+ 
 -- 
-2.14.3
+1.8.3.1
