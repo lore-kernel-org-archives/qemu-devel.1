@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fBMXN-0001Zh-4F
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:40:54 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fBMbf-0002st-GZ
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:45:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fBMXK-0000yP-F0
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:40:53 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:33347)
+	(envelope-from <peter.maydell@linaro.org>) id 1fBMbe-0002uu-JA
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:45:19 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:44059)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fBMXK-0000y1-4J
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:40:50 -0400
-Received: by mail-wr0-x242.google.com with SMTP id o4-v6so3513432wrm.0
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 08:40:49 -0700 (PDT)
-References: <20180424152405.10304-1-alex.bennee@linaro.org>
-	<20180424152405.10304-46-alex.bennee@linaro.org>
-	<71062159-d9c0-06b1-d7d5-32dc4662da6b@amsat.org>
-	<fee3b788-513f-d47b-4f5c-ce18894dd101@amsat.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <fee3b788-513f-d47b-4f5c-ce18894dd101@amsat.org>
-Date: Wed, 25 Apr 2018 16:40:47 +0100
-Message-ID: <878t9bl2f4.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fBMbe-0002tW-Eq
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:45:18 -0400
+Received: by mail-oi0-x241.google.com with SMTP id e80-v6so13832534oig.11
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 08:45:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <609a3ccf-88d7-bad3-c37a-eec6bcab0235@amsat.org>
+References: <20180420145249.32435-1-peter.maydell@linaro.org>
+	<20180420145249.32435-8-peter.maydell@linaro.org>
+	<609a3ccf-88d7-bad3-c37a-eec6bcab0235@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 25 Apr 2018 16:44:57 +0100
+Message-ID: <CAFEAcA8M6s-PjFbnuOkPHRSSb+dW2LH9D26p4VfogsdPenPAEw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 45/46] tests/Makefile.include: add
- [build|clean|check]-tcg targets
+Subject: Re: [Qemu-devel] [PATCH 07/13] Change references to serial_hds[] to
+ serial_hd()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,279 +32,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
 
-
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
-
-> On 04/24/2018 08:13 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->> On 04/24/2018 12:24 PM, Alex Benn=C3=A9e wrote:
->>> This will ensure all linux-user targets build their guest test
->>> programs and ensure check-tcg will run the respective tests.
->>>
->>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>> Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>> ---
->>> v2
->>>   - use -include instead of complex macro stuff
->>>   - also include TARGET_BASE_ARCH/Makefile
->>> v3
->>>   - add build-tcg, make check-tcg actually run tests
->>> ---
->>>  tests/Makefile.include     | 26 ++++++++++++++++++++++-
->>>  tests/tcg/Makefile.include | 43 ++++++++++++++++++++++----------------
->>>  2 files changed, 50 insertions(+), 19 deletions(-)
->>>
->>> diff --git a/tests/Makefile.include b/tests/Makefile.include
->>> index 3d2f0458ab..310ccefdd9 100644
->>> --- a/tests/Makefile.include
->>> +++ b/tests/Makefile.include
->>> @@ -10,6 +10,7 @@ check-help:
->>>  	@echo " $(MAKE) check-speed          Run qobject speed tests"
->>>  	@echo " $(MAKE) check-qapi-schema    Run QAPI schema tests"
->>>  	@echo " $(MAKE) check-block          Run block tests"
->>> +	@echo " $(MAKE) check-tcg            Run TCG tests"
->>>  	@echo " $(MAKE) check-report.html    Generates an HTML test report"
->>>  	@echo " $(MAKE) check-clean          Clean the tests"
->>>  	@echo
->>> @@ -916,6 +917,30 @@ check-report.xml: $(patsubst %,check-report-qtest-=
-%.xml, $(QTEST_TARGETS)) check
->>>  check-report.html: check-report.xml
->>>  	$(call quiet-command,gtester-report $< > $@,"GEN","$@")
->>>
->>> +# Per guest TCG tests
->>> +
->>> +LINUX_USER_TARGETS=3D$(filter %-linux-user,$(TARGET_LIST))
->>> +BUILD_TCG_TARGET_RULES=3D$(patsubst %,build-tcg-tests-%, $(LINUX_USER_=
-TARGETS))
->>> +CLEAN_TCG_TARGET_RULES=3D$(patsubst %,clean-tcg-tests-%, $(LINUX_USER_=
-TARGETS))
->>> +RUN_TCG_TARGET_RULES=3D$(patsubst %,run-tcg-tests-%, $(LINUX_USER_TARG=
-ETS))
->>> +
->>> +build-tcg-tests-%:
->>> +	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V=3D"$(V)" TAR=
-GET_DIR=3D"$*/" guest-tests,)
->>> +
->>> +run-tcg-tests-%: build-tcg-tests-%
->>> +	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V=3D"$(V)" TAR=
-GET_DIR=3D"$*/" run-guest-tests,)
->>> +
->>> +clean-tcg-tests-%:
->>> +	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V=3D"$(V)" TAR=
-GET_DIR=3D"$*/" clean-guest-tests,)
->>> +
->>> +.PHONY: build-tcg
->>> +build-tcg: $(BUILD_TCG_TARGET_RULES)
->>> +
->>> +.PHONY: check-tcg
->>> +check-tcg: $(RUN_TCG_TARGET_RULES)
->>> +
->>> +.PHONY: clean-tcg
->>> +clean-tcg: $(CLEAN_TCG_TARGET_RULES)
->>>
->>>  # Other tests
->>>
->>> @@ -958,7 +983,6 @@ check-speed: $(patsubst %,check-%, $(check-speed-y))
->>>  check-block: $(patsubst %,check-%, $(check-block-y))
->>>  check: check-qapi-schema check-unit check-qtest check-decodetree
->>>  check-clean:
->>> -	$(MAKE) -C tests/tcg clean
->>>  	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
->>>  	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$=
-(target)-y)) $(check-qtest-generic-y))
->>>  	rm -f tests/test-qapi-gen-timestamp
->>> diff --git a/tests/tcg/Makefile.include b/tests/tcg/Makefile.include
->>> index cb8bb36026..67e89ecb67 100644
->>> --- a/tests/tcg/Makefile.include
->>> +++ b/tests/tcg/Makefile.include
->>> @@ -8,19 +8,14 @@
->>>  # guest compiler or calling one of our docker images to do it for us.
->>>  #
->>>
->>> -# The per ARCH makefile, if it exists holds extra information about
->>> -# useful docker images or alternative compiler flags. Include it if it
->>> -# exists
->>> +# The per ARCH makefile, if it exists, holds extra information about
->>> +# useful docker images or alternative compiler flags.
->>>
->>> -ARCH_MAKEFILE=3D$(SRC_PATH)/tests/tcg/$(TARGET_NAME)/Makefile.include
->>> -CHECK_INCLUDE=3D$(wildcard $(ARCH_MAKEFILE))
->>> -
->>> -ifeq ($(ARCH_MAKEFILE),$(CHECK_INCLUDE))
->>> -include $(ARCH_MAKEFILE)
->>> -endif
->>> +-include $(SRC_PATH)/tests/tcg/$(TARGET_BASE_ARCH)/Makefile.include
->>> +-include $(SRC_PATH)/tests/tcg/$(TARGET_NAME)/Makefile.include
->>>
->>>  GUEST_BUILD=3D
->>> -
->>> +TCG_MAKE=3D$(SRC_PATH)/tests/tcg/Makefile
->>>  # Support installed Cross Compilers
->>>
->>>  ifdef CROSS_CC_GUEST
->>> @@ -28,10 +23,10 @@ ifdef CROSS_CC_GUEST
->>>  .PHONY: cross-build-guest-tests
->>>  cross-build-guest-tests:
->>>  	$(call quiet-command, \
->>> -          (mkdir -p tests && cd tests && \
->>> -	   make -f $(SRC_PATH)/tests/tcg/Makefile ARCH=3D$(TARGET_NAME) CC=3D=
-$(CROSS_CC_GUEST)), \
->>> -	  "CROSS-BUILD","$(TARGET_NAME) guest-tests with $(CROSS_CC_GUEST)")
->>> -
->>> +	   (mkdir -p tests && cd tests && \
->>> +	    make -f $(TCG_MAKE) CC=3D$(CROSS_CC_GUEST) \
->>> +				EXTRA_CFLAGS=3D$(CROSS_CC_GUEST_CFLAGS)), \
->>> +	"CROSS-BUILD","$(TARGET_NAME) guest-tests with $(CROSS_CC_GUEST)")
->>>
->>>  GUEST_BUILD=3Dcross-build-guest-tests
->>>
->>> @@ -54,9 +49,10 @@ DOCKER_PREREQ=3Ddocker-image-$(DOCKER_IMAGE)
->>>  .PHONY: docker-build-guest-tests
->>>  docker-build-guest-tests: $(DOCKER_PREREQ)
->>>  	$(call quiet-command, \
->>> -          (mkdir -p tests && cd tests && \
->>> -	   make -f $(SRC_PATH)/tests/tcg/Makefile ARCH=3D$(TARGET_NAME) CC=3D=
-$(DOCKER_COMPILE_CMD)), \
->>> -	  "CROSS-BUILD","$(TARGET_NAME) guest-tests with docker qemu:$(DOCKER=
-_IMAGE)")
->>> +	  (mkdir -p tests && cd tests && \
->>> +	   make -f $(TCG_MAKE) CC=3D$(DOCKER_COMPILE_CMD) \
->>> +			       EXTRA_CFLAGS=3D$(DOCKER_CROSS_COMPILER_CFLAGS)), \
->>> +	"CROSS-BUILD","$(TARGET_NAME) guest-tests with docker qemu:$(DOCKER_I=
-MAGE)")
+On 25 April 2018 at 15:54, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wr=
+ote:
+> Hi Peter,
+>
+> On 04/20/2018 11:52 AM, Peter Maydell wrote:
+>> Change all the uses of serial_hds[] to go via the new
+>> serial_hd() function. Code change produced with:
+>>  find hw -name '*.[ch]' | xargs sed -i -e 's/serial_hds\[\([^]]*\)\]/ser=
+ial_hd(\1)/g'
 >>
->> I'm not sure this is working as expected, for some reason "make
->> build-tcg-tests-aarch64-linux-user" try to use the debian-armel-cross im=
-age:
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+>> --- a/hw/arm/mps2-tz.c
+>> +++ b/hw/arm/mps2-tz.c
+>> @@ -172,7 +172,7 @@ static MemoryRegion *make_uart(MPS2TZMachineState *m=
+ms, void *opaque,
+>>  {
+>>      CMSDKAPBUART *uart =3D opaque;
+>>      int i =3D uart - &mms->uart[0];
+>> -    Chardev *uartchr =3D i < MAX_SERIAL_PORTS ? serial_hds[i] : NULL;
+>> +    Chardev *uartchr =3D i < MAX_SERIAL_PORTS ? serial_hd(i) : NULL;
+>
+> You can remove uartchr and directly use serial_hd(i).
+
+These kinds of cleanup are in later patches in the series --
+this one is kept strictly to the purely-mechanical sed change,
+as otherwise it would be a bit awkward to review I thought.
+
+>> diff --git a/hw/arm/msf2-soc.c b/hw/arm/msf2-soc.c
+>> index f68df56b97..75c44adf7d 100644
+>> --- a/hw/arm/msf2-soc.c
+>> +++ b/hw/arm/msf2-soc.c
+>> @@ -138,10 +138,10 @@ static void m2sxxx_soc_realize(DeviceState *dev_so=
+c, Error **errp)
+>>      system_clock_scale =3D NANOSECONDS_PER_SECOND / s->m3clk;
 >>
->> /build$ make build-tcg-tests-aarch64-linux-user V=3D1 -j1
->> make  BUILD_DIR=3D/build -C aarch64-linux-user V=3D"1"
->> TARGET_DIR=3D"aarch64-linux-user/" guest-tests
->> make[1]: Entering directory '/build/aarch64-linux-user'
->> /source/qemu/tests/docker/docker.py build qemu:debian9
->> /source/qemu/tests/docker/dockerfiles/debian9.docker   --add-current-user
->> [...]
->> /source/qemu/tests/docker/docker.py build qemu:debian-armel-cross
->> /source/qemu/tests/docker/dockerfiles/debian-armel-cross.docker
->> --add-current-user
->> [...]
->> (mkdir -p tests && cd tests && make -f /source/qemu/tests/tcg/Makefile
->> CC=3D"/source/qemu/tests/docker/docker.py cc --user 1000 --cc
->> arm-linux-gnueabi-gcc -i qemu:debian-armel-cross -s /source/qemu -- "
->> EXTRA_CFLAGS=3D)
->> make[2]: Entering directory '/home/phil/build/aarch64-linux-user/tests'
->> /source/qemu/tests/docker/docker.py cc --user 1000 --cc
->> arm-linux-gnueabi-gcc -i qemu:debian-armel-cross -s /source/qemu --
->> -Wall -O0 -g -fno-strict-aliasing  /source/qemu/tests/tcg/aarch64/fcvt.c
->> -o fcvt  -static -lm
->> /source/qemu/tests/tcg/aarch64/fcvt.c: In function 'print_double_number':
->> /source/qemu/tests/tcg/aarch64/fcvt.c:37:42: warning: format '%lx'
->> expects argument of type 'long unsigned int', but argument 4 has type
->> 'uint64_t {aka long long unsigned int}' [-Wformat=3D]
->>      printf("%02d DOUBLE: %02.20e / %#020lx  (%#x =3D> %s)\n",
->>                                           ^
->> /source/qemu/tests/tcg/aarch64/fcvt.c: In function 'convert_single_to_ha=
-lf':
->> /source/qemu/tests/tcg/aarch64/fcvt.c:82:9: error: inconsistent operand
->> constraints in an 'asm'
->>          asm("fcvt %h0, %d1" : "=3Dw" (output) : "x" (input));
->>          ^~~
->> /source/qemu/tests/tcg/aarch64/fcvt.c: In function 'main':
->> /source/qemu/tests/tcg/aarch64/fcvt.c:241:5: error: unknown register
->> name 'x1' in 'asm'
->>      asm("msr fpsr, x1\n\t"
->>      ^~~
->> make[2]: *** [/source/qemu/tests/tcg/Makefile:49: fcvt] Error 1
->> make[2]: Leaving directory '/home/phil/build/aarch64-linux-user/tests'
->> make[1]: *** [/source/qemu/tests/tcg/Makefile.include:51:
->> docker-build-guest-tests] Error 2
->> make[1]: Leaving directory '/home/phil/build/aarch64-linux-user'
->> make: *** [/source/qemu/tests/Makefile.include:928:
->> build-tcg-tests-aarch64-linux-user] Error 2
+>>      for (i =3D 0; i < MSF2_NUM_UARTS; i++) {
+>> -        if (serial_hds[i]) {
+>> +        if (serial_hd(i)) {
+>
+> We can now remove this check, but maybe another series...
+>
+>>              serial_mm_init(get_system_memory(), uart_addr[i], 2,
+>>                             qdev_get_gpio_in(armv7m, uart_irq[i]),
+>> -                           115200, serial_hds[i], DEVICE_NATIVE_ENDIAN)=
+;
+>> +                           115200, serial_hd(i), DEVICE_NATIVE_ENDIAN);
+>>          }
+
+I agree that's probably a good change to make, but it's also
+a behavioural change (we would go from only creating serial
+devices where -serial args are given, to always creating
+them). I wanted to generally avoid having any behavioural
+changes in this series.
+
+>> @@ -3963,21 +3963,21 @@ struct omap_mpu_state_s *omap310_mpu_init(Memory=
+Region *system_memory,
+>>                      omap_findclk(s, "uart1_ck"),
+>>                      s->drq[OMAP_DMA_UART1_TX], s->drq[OMAP_DMA_UART1_RX=
+],
+>>                      "uart1",
+>> -                    serial_hds[0]);
+>> +                    serial_hd(0));
+>>      s->uart[1] =3D omap_uart_init(0xfffb0800,
+>>                                  qdev_get_gpio_in(s->ih[1], OMAP_INT_UAR=
+T2),
+>>                      omap_findclk(s, "uart2_ck"),
+>>                      omap_findclk(s, "uart2_ck"),
+>>                      s->drq[OMAP_DMA_UART2_TX], s->drq[OMAP_DMA_UART2_RX=
+],
+>>                      "uart2",
+>> -                    serial_hds[0] ? serial_hds[1] : NULL);
+>> +                    serial_hd(0) ? serial_hd(1) : NULL);
+>
+> This will need cleanup later...
+
+It's a bit weird, but I don't think it's specifically wrong.
+
+>> --- a/hw/mips/mips_mipssim.c
+>> +++ b/hw/mips/mips_mipssim.c
+>> @@ -213,8 +213,8 @@ mips_mipssim_init(MachineState *machine)
 >>
->> Note this:
->>
->> Entering directory '/build/aarch64-linux-user'
->> [...]
->> docker.py build qemu:debian-armel-cross ...
->>
->> I'm not sure this is related to this patch or the previous (44).
+>>      /* A single 16450 sits at offset 0x3f8. It is attached to
+>>         MIPS CPU INT2, which is interrupt 4. */
+>> -    if (serial_hds[0])
+>> -        serial_init(0x3f8, env->irq[4], 115200, serial_hds[0],
+>> +    if (serial_hd(0))
 >
-> This is due to the missing tests/tcg/aarch64/Makefile.include in patch
-> 28/46.
->
->>>
->>>  GUEST_BUILD=3Ddocker-build-guest-tests
->>>
->>> @@ -68,9 +64,20 @@ endif
->>>
->>>  ifneq ($(GUEST_BUILD),)
->>>  guest-tests: $(GUEST_BUILD)
->>> +
->>> +run-guest-tests: guest-tests
->>> +	$(call quiet-command, \
->>> +	(cd tests && make -f $(TCG_MAKE) run), \
->>> +	"RUN-TESTS", "for $(TARGET_NAME)")
->>> +
->>>  else
->>>  guest-tests:
->>> -	$(call quiet-command, /bin/true, "CROSS-BUILD", "$(TARGET_NAME) guest=
--tests SKIPPED")
->>> +	$(call quiet-command, /bin/true, "CROSS-BUILD", \
->>> +		"$(TARGET_NAME) guest-tests SKIPPED")
->>> +
->>> +run-guest-tests:
->>> +	$(call quiet-command, /bin/true, "RUN-TESTS", \
->>> +		"for $(TARGET_NAME) SKIPPED")
->>>  endif
->>>
->>>  # It doesn't mater if these don't exits
->>>
->
-> There is still some rule missing:
->
-> $ make -j1 run-tcg-tests-sh4-linux-user  -k
->   BUILD   debian-sid
->   BUILD   debian-sh4-cross
->   CROSS-BUILD sh4 guest-tests with docker qemu:debian-sh4-cross
->   BUILD   debian-sid
->   BUILD   debian-sh4-cross
->   CROSS-BUILD sh4 guest-tests with docker qemu:debian-sh4-cross
->   RUN-TESTS for sh4
->   TEST    test-mmap (default) on sh4
-> /bin/sh: 1: ../qemu-sh4: not found
-> make[2]: *** [/source/qemu/tests/tcg/multiarch/Makefile.target:26:
-> run-test-mmap] Error 127
->   TEST    sha1 on sh4
-> /bin/sh: 1: ../qemu-sh4: not found
-> make[2]: *** [/source/qemu/tests/tcg/Makefile:64: run-sha1] Error 127
->   BROKEN TEST linux-test SKIPPED on sh4
->   TEST    testthread on sh4
-> /bin/sh: 1: ../qemu-sh4: not found
-> make[2]: *** [/source/qemu/tests/tcg/Makefile:64: run-testthread] Error 1=
-27
-> make[2]: Target 'run' not remade because of errors.
-> make[1]: *** [/source/qemu/tests/tcg/Makefile.include:69:
-> run-guest-tests] Error 2
-> make: *** [/source/qemu/tests/Makefile.include:931:
-> run-tcg-tests-sh4-linux-user] Error 2
->
-> Works with:
->
-> $ make -j1 subdir-sh4-linux-user run-tcg-tests-sh4-linux-user
+> We will drop this if () later... This now misses brackets :/
 
-I've added:
+Hazard of pure-mechanical-change cleanup is that it
+doesn't include coding-style fixes, but it's no
+worse than it was before.
 
-run-guest-tests: guest-tests qemu-$(TARGET_NAME)
-	$(call quiet-command, \
-	(cd tests && make -f $(TCG_MAKE) run), \
-	"RUN-TESTS", "for $(TARGET_NAME)")
-
-to tests/tcg/Makefile.include
-
-
---
-Alex Benn=C3=A9e
+thanks
+-- PMM
