@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58696)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quwenruo.btrfs@gmx.com>) id 1fBH2t-0003fD-9I
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 05:49:04 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fBJtN-0005lH-0Y
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 08:51:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quwenruo.btrfs@gmx.com>) id 1fBH2q-0000Un-1f
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 05:49:03 -0400
-Received: from mout.gmx.net ([212.227.15.15]:58401)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <quwenruo.btrfs@gmx.com>)
-	id 1fBH2p-0000U7-NL
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 05:48:59 -0400
-From: Qu Wenruo <quwenruo.btrfs@gmx.com>
-Message-ID: <c0eaa5d5-7b1a-74f9-1d34-d8ac7cff3546@gmx.com>
-Date: Wed, 25 Apr 2018 17:48:42 +0800
+	(envelope-from <no-reply@patchew.org>) id 1fBJtJ-0004N4-SY
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 08:51:25 -0400
+Resent-Message-Id: <E1fBJtJ-0004N4-SY@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21093)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fBJtJ-0004Mg-Jk
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 08:51:21 -0400
+In-Reply-To: <20180425045129.17449-1-peterx@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152463271320.2265.7000482836762876371@71c20359a636>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="hgvx0C9aY42QQ0JhcwaibquzkKs4AzNqq"
-Subject: [Qemu-devel] ridiculously slow VM memory performance on Ryzen CPU
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 24 Apr 2018 22:05:14 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 00/10] intel-iommu: nested vIOMMU, cleanups,
+ bug fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,76 +29,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kvm@vger.kernel.org, qemu-devel@nongnu.org
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: peterx@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, jasowang@redhat.com, alex.williamson@redhat.com, jintack@cs.columbia.edu, mst@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---hgvx0C9aY42QQ0JhcwaibquzkKs4AzNqq
-From: Qu Wenruo <quwenruo.btrfs@gmx.com>
-To: kvm@vger.kernel.org, qemu-devel@nongnu.org
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Message-ID: <c0eaa5d5-7b1a-74f9-1d34-d8ac7cff3546@gmx.com>
-Subject: ridiculously slow VM memory performance on Ryzen CPU
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-Hi,
-
-When testing IO heavy work on my VM backed by Ryzen 1700 CPU, I turned
-to brd modules, but surprisingly, the speed is even slower than some HDD:=
-
-
----
-$ sudo modprobe brd rd_nr=3D1 rd_size=3D1048576
-$ dd if=3D/dev/zero of=3D/dev/ram0 bs=3D1M count=3D1024
-1024+0 records in
-1024+0 records out
-1073741824 bytes (1.1 GB, 1.0 GiB) copied, 9.9928 s, 107 MB/s
----
-107MB is pretty lame...
-Even some HDD could be faster than this.
-
-On host, it's much better:
----
-$ if=3D/dev/zero of=3D/dev/ram0 bs=3D1M count=3D1024
-1024+0 records in
-1024+0 records out
-1073741824 bytes (1.1 GB, 1.0 GiB) copied, 0.754641 s, 1.4 GB/s
----
-
-For host hardware:
-CPU: Ryzen 1700 All cores @ 3.8G
-Mem: DDR4 2400 dual channel (8G x 2)
-
-For host software:
-Kernel:       4.16.3-1-ARCH
-Qemu:         2.11.1-2
-Distribution: Archlinux
-
-VM setup is mostly default setup done by libvirt.
-
-I'm not sure if this is related to this bug:
-https://www.redhat.com/archives/vfio-users/2017-April/msg00019.html
-
-Thanks,
-Qu
-
-
---hgvx0C9aY42QQ0JhcwaibquzkKs4AzNqq
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEELd9y5aWlW6idqkLhwj2R86El/qgFAlrgTvoACgkQwj2R86El
-/qhsqQgAlHEgMh4WOzZhYL464zlCGeiEJxoulYvJCPQ0MyVHcUQUXizevvAJUE95
-62+mmJTHzGS6Leeh/alfDbrES8aevE3R0ewNrFGxcPBNwgjbVZoAaA5hRfAW+fsb
-HzcjUmiS4dheLjk3LppCWcb7VQehY0L8lxZ93BwzCC9mXztEUnLhnG0p+hJ5dZX/
-/000A22OvOcv04BRnjRo+OVjXTJrDY+5192Psd1u1ZEBQEG/tNPAJg4TG+CY9FIz
-W5B3JD8h2UCS0GOnvA+z2yyIL+5cR06dGOhfaxc31WmSYmsASDNEqfnmjsvic1KO
-dzRWBHFwHQmsKC8nR8ukzVlnawmSUQ==
-=Osjm
------END PGP SIGNATURE-----
-
---hgvx0C9aY42QQ0JhcwaibquzkKs4AzNqq--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNDI1MDQ1MTI5LjE3NDQ5LTEtcGV0ZXJ4QHJlZGhhdC5jb20KU3ViamVj
+dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwMC8xMF0gaW50ZWwtaW9tbXU6IG5lc3RlZCB2SU9NTVUs
+IGNsZWFudXBzLCBidWcgZml4ZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jh
+c2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2Mg
+LWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5h
+bGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZl
+cnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBB
+VENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYg
+ISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0t
+bWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAg
+IG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpV
+cGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0
+cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAg
+ICAgICAgIHBhdGNoZXcvMTUyNDU5MjcwOS02NTUzLTEtZ2l0LXNlbmQtZW1haWwtaWFuLmphY2tz
+b25AZXUuY2l0cml4LmNvbSAtPiBwYXRjaGV3LzE1MjQ1OTI3MDktNjU1My0xLWdpdC1zZW5kLWVt
+YWlsLWlhbi5qYWNrc29uQGV1LmNpdHJpeC5jb20KIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAg
+cGF0Y2hldy8yMDE4MDQyNDE1MjQwNS4xMDMwNC0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcgLT4g
+cGF0Y2hldy8yMDE4MDQyNDE1MjQwNS4xMDMwNC0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcKICog
+W25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDQyNTA0NTEyOS4xNzQ0OS0xLXBl
+dGVyeEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxODA0MjUwNDUxMjkuMTc0NDktMS1wZXRlcnhA
+cmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjk4NWU0YmVkYmMgaW50
+ZWwtaW9tbXU6IHJlbW92ZSBub3RpZnlfdW5tYXAgZm9yIHBhZ2Ugd2FsawpkODM2NDlhNTNjIGlu
+dGVsLWlvbW11OiBkb24ndCB1bm1hcCBhbGwgZm9yIHNoYWRvdyBwYWdlIHRhYmxlCmU1YzAzNDI3
+YzkgaW50ZWwtaW9tbXU6IG1haW50YWluIHBlci1kZXZpY2UgaW92YSByYW5nZXMKNzcxOWFhMWFj
+OSB1dGlsOiBpbXBsZW1lbnQgc2ltcGxlIGludGVydmFsIHRyZWUgbG9naWMKZjYyZDY2OWVhYSBp
+bnRlbC1pb21tdTogcGFzcyBpbiBhZGRyZXNzIHNwYWNlIHdoZW4gcGFnZSB3YWxrCjk1MjU5ZjM0
+ZTkgaW50ZWwtaW9tbXU6IGludHJvZHVjZSB2dGRfcGFnZV93YWxrX2luZm8KZWY4MzYxMWE2NSBp
+bnRlbC1pb21tdTogb25seSBkbyBwYWdlIHdhbGsgZm9yIE1BUCBub3RpZmllcnMKOGU2MDZjYmVk
+OSBpbnRlbC1pb21tdTogYWRkIGlvbW11IGxvY2sKZGJmYjM2ODNjZSBpbnRlbC1pb21tdTogcmVt
+b3ZlIEludGVsSU9NTVVOb3RpZmllck5vZGUKNzNlOGM2MDViMyBpbnRlbC1pb21tdTogc2VuZCBQ
+U0kgYWx3YXlzIGV2ZW4gaWYgYWNyb3NzIFBERXMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNr
+aW5nIFBBVENIIDEvMTA6IGludGVsLWlvbW11OiBzZW5kIFBTSSBhbHdheXMgZXZlbiBpZiBhY3Jv
+c3MgUERFcy4uLgpDaGVja2luZyBQQVRDSCAyLzEwOiBpbnRlbC1pb21tdTogcmVtb3ZlIEludGVs
+SU9NTVVOb3RpZmllck5vZGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8xMDogaW50ZWwtaW9tbXU6IGFk
+ZCBpb21tdSBsb2NrLi4uCkNoZWNraW5nIFBBVENIIDQvMTA6IGludGVsLWlvbW11OiBvbmx5IGRv
+IHBhZ2Ugd2FsayBmb3IgTUFQIG5vdGlmaWVycy4uLgpDaGVja2luZyBQQVRDSCA1LzEwOiBpbnRl
+bC1pb21tdTogaW50cm9kdWNlIHZ0ZF9wYWdlX3dhbGtfaW5mby4uLgpDaGVja2luZyBQQVRDSCA2
+LzEwOiBpbnRlbC1pb21tdTogcGFzcyBpbiBhZGRyZXNzIHNwYWNlIHdoZW4gcGFnZSB3YWxrLi4u
+CkNoZWNraW5nIFBBVENIIDcvMTA6IHV0aWw6IGltcGxlbWVudCBzaW1wbGUgaW50ZXJ2YWwgdHJl
+ZSBsb2dpYy4uLgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQg
+YmUgYXZvaWRlZAojMzQ6IEZJTEU6IGluY2x1ZGUvcWVtdS9pbnRlcnZhbC10cmVlLmg6MTE6Cisj
+aWZuZGVmIF9fSU5URVJWQUxfVFJFRV9IX18KCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdl
+ZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzU2OiBGSUxFOiBpbmNs
+dWRlL3FlbXUvaW50ZXJ2YWwtdHJlZS5oOjMzOgordHlwZWRlZiBnYm9vbGVhbiAoKml0X3RyZWVf
+aXRlcmF0b3IpKElUVmFsdWUgc3RhcnQsIElUVmFsdWUgZW5kKTsKCnRvdGFsOiAxIGVycm9ycywg
+MSB3YXJuaW5ncywgMzUyIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
+ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
+aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
+QUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDgvMTA6IGludGVsLWlvbW11OiBtYWludGFpbiBw
+ZXItZGV2aWNlIGlvdmEgcmFuZ2VzLi4uCkNoZWNraW5nIFBBVENIIDkvMTA6IGludGVsLWlvbW11
+OiBkb24ndCB1bm1hcCBhbGwgZm9yIHNoYWRvdyBwYWdlIHRhYmxlLi4uCkNoZWNraW5nIFBBVENI
+IDEwLzEwOiBpbnRlbC1pb21tdTogcmVtb3ZlIG5vdGlmeV91bm1hcCBmb3IgcGFnZSB3YWxrLi4u
+Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgot
+LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
+ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRo
+YXQuY29t
