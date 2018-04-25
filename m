@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fBNyD-000317-BX
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 13:12:42 -0400
+	(envelope-from <omer@kazuar-tech.com>) id 1fBOns-00075m-U4
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 14:06:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fBNy8-0004SY-BO
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 13:12:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54356 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fBNy8-0004Id-5j
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 13:12:36 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D8525F10DF
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 17:12:25 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180424214550.32549-1-lersek@redhat.com>
-	<20180424214550.32549-6-lersek@redhat.com>
-	<877eovahoq.fsf@dusky.pond.sub.org>
-	<5ffb031a-554a-81c1-b374-eb82f410bf83@redhat.com>
-Date: Wed, 25 Apr 2018 19:12:20 +0200
-In-Reply-To: <5ffb031a-554a-81c1-b374-eb82f410bf83@redhat.com> (Laszlo Ersek's
-	message of "Wed, 25 Apr 2018 15:20:13 +0200")
-Message-ID: <87604f6wi3.fsf@dusky.pond.sub.org>
+	(envelope-from <omer@kazuar-tech.com>) id 1fBOnr-0001VB-9g
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 14:06:04 -0400
+Received: from mail-lf0-x231.google.com ([2a00:1450:4010:c07::231]:40285)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <omer@kazuar-tech.com>)
+	id 1fBOnq-0001RR-SY
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 14:06:03 -0400
+Received: by mail-lf0-x231.google.com with SMTP id j16-v6so9554471lfb.7
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 11:06:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 5/6] qapi: extract CpuInfoCommon to
- mitigate schema duplication
+References: <CAA-pg_qXZLDEHq6jMN_4GUrFvQgf0AS8Fs559JbucptK6_zrFw@mail.gmail.com>
+	<20180425095657.GF30024@redhat.com>
+	<CAA-pg_oDCGqVDzk67Rw4mL83SexPbt1eZ8AoSMux9Xjda8nUFg@mail.gmail.com>
+	<jpg36zjntuy.fsf@linux.bootlegged.copy>
+In-Reply-To: <jpg36zjntuy.fsf@linux.bootlegged.copy>
+From: Omer Katz <omer@kazuar-tech.com>
+Date: Wed, 25 Apr 2018 18:05:50 +0000
+Message-ID: <CAA-pg_rGtB_XVQ1+zWq3W7=SVMXJxoEOu9C7573pMNAA2yUb1g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Filtering files passing through MTP devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,187 +32,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Bandan Das <bsd@redhat.com>
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
-Laszlo Ersek <lersek@redhat.com> writes:
+What would be a simpler way to do this so that the guest machine would
+still be able to recognize the USB drive?
+Right now we're triggering a script whenever udev recognizes that a USB
+drive is plugged in.
+The script copies the allowed files to a certain folder. The guest has a
+cron job that periodically triggers scp from that folder to the guest.
+That's a very complicated flow and I just described only the flow which
+files are imported. I even omitted some of the moving parts since they are
+irrelevant.
+Long story short our architecture is very complicated because of this
+issue.
 
-> On 04/25/18 09:06, Markus Armbruster wrote:
->> Laszlo Ersek <lersek@redhat.com> writes:
->> 
->>> @CpuInfo and @CpuInfoFast duplicate the following four fields: @qom-path,
->>> @thread-id, @props and @arch. From these, extract the first three to a
->>> common structure called @CpuInfoCommon. (More on @arch later.)
->>>
->>> Introduce two new mid-layer structures, @CpuInfoBase and @CpuInfoFastBase,
->>> to soak up the union base struct fields on top of @CpuInfoCommon that are
->>> specific to @query-cpus and @query-cpus-fast, respectively.
->
-> [[
->
->>> This is
->>> necessary because the base struct spec in union definitions does not let
->>> us mix named fields with a recursive base struct. (In other words, we
->>> couldn't directly use @CpuInfoCommon *plus* some other fields within
->>> @CpuInfo and @CpuInfoFast as base struct).
->
-> ]]
->
->> 
->> Yes, you can either specify a base type or inline common members.  If
->> "union's common members = base type plus additional inline members"
->> turns out to be desirable in more places, we can try to add the feature.
->> I'm not asking *you* to find out, let alone try :)
->
-> [[
->
->>> @arch cannot be hoisted higher than to @CpuInfoBase and @CpuInfoFastBase
->>> because the union descriminator is only accepted from a direct base
->>> struct, not from an indirect one.
->
-> ]]
->
->> That's a bit of a blemish.  Again, I'm not asking you to do anything
->> about it.
->
-> If these characteristics of the generator are operating knowledge for
-> QAPI developers, I can trim the commit message -- those traits don't
-> bother me at all, I just felt that I needed to justify the code.
->
-> IOW, should I drop:
-> - the sentences marked with [[ ]] above,
-> - and/or the "Notes:" on @arch in the schema itself (which are updated
->   to @target, in the next patch)
-> ?
+On Wed, Apr 25, 2018, 7:17 PM Bandan Das <bsd@redhat.com> wrote:
 
-Let's keep them.
-
+> Omer Katz <omer@kazuar-tech.com> writes:
 >
-> [snip]
+> > We're connecting USB drives that we want the guests to copy files from.
+> > The user should only be allowed to copy certain files into the system.
+> > The same thing goes for copying files to the USB drive. We only allow
+> > certain files to be exported from the guest.
 >
->>> @@ -512,70 +541,77 @@
->>>  #
->>>  # Since: 0.14.0
->>>  #
->>>  # Example:
->>>  #
->>>  # -> { "execute": "query-cpus" }
->>>  # <- { "return": [
->>>  #          {
->>>  #             "CPU":0,
->>>  #             "current":true,
->>>  #             "halted":false,
->>> -#             "qom_path":"/machine/unattached/device[0]",
->>> +#             "qom-path":"/machine/unattached/device[0]",
->>>  #             "arch":"x86",
->>>  #             "pc":3227107138,
->>> -#             "thread_id":3134
->>> +#             "thread-id":3134
->>>  #          },
->>>  #          {
->>>  #             "CPU":1,
->>>  #             "current":false,
->>>  #             "halted":true,
->>> -#             "qom_path":"/machine/unattached/device[2]",
->>> +#             "qom-path":"/machine/unattached/device[2]",
->>>  #             "arch":"x86",
->>>  #             "pc":7108165,
->>> -#             "thread_id":3135
->>> +#             "thread-id":3135
->>>  #          }
->>>  #       ]
->>>  #    }
->> 
->> Compatibility break, whoops!
+> If I understand your problem correctly, this should be doable by plugging
+> in
+> your logic into usb_mtp_write_data for the write side and
+> usb_mtp_handle_data
+> for the read side. The write probably doesn't need a lot, you trigger an
+> error
+> response the moment your data has something you don't want and discard th=
+e
+> new file.
+> For the read, though, you probably have to read the whole file first,
+> which is not what the current code is doing (I think).
 >
-> But, at least, I updated the example! :)
-
-Thanks :)
-
->> CpuInfo and CpuInfoFast do share qom-path and thread-id *values*, but
->> the keys differ in '_' vs. '-'.  Sad.
->> 
->> What now?  Is there enough common stuff left to justify the refactoring?
+> Apart from that dev-mtp.c is implementing a MTP server based on the MTP
+> spec and adding
+> something like this would be confusing, I also feel that this is too
+> specific a usecase
+> and as Daniel said, there are perhaps simpler ways of doing it.
 >
-> While working on the schema changes, I saw the '_' vs. '-' difference
-> immediately, but I thought these two characters were treated
-> equivalently by all QAPI clients.
-
-I wish...
-
-QEMU could do that on QMP input.  We've talked about it, but no patches.
-
-On QMP output, we're screwed.
-
-Tolerating '_' was one of the dumber mistakes in QAPI.
-
-> Later I found (in the test suite) that this wasn't the case, so I
-> thought my memories must have applied to libvirtd only. (Because,
-> libvirt does map "_" to "-", right?) Anyway, I figured the best way to
-> ask was to post the patch like this :)
-
-Heh.  I would've appreciated a hint in the commit message, though.
-
-> So, if I drop @qom-path and @thread-id from CpuInfoCommon, then only
-> @props remains subject to hoisting, in this patch. In the next patch,
-> @arch joins @props.
+> Bandan
 >
-> I believe the refactoring is still worth doing, because otherwise, after
-> the addition of @target, we'd end up with:
+> > On Wed, Apr 25, 2018, 12:57 PM Daniel P. Berrang=C3=A9 <berrange@redhat=
+.com>
+> > wrote:
+> >
+> >> On Mon, Apr 23, 2018 at 03:10:32PM +0000, Omer Katz wrote:
+> >> > Hi everyone,
+> >> >
+> >> > We have a use case that requires us to only allow certain files to
+> pass
+> >> > through to the guest machine from USB storage devices.
+> >> >
+> >> > I was told on IRC that such a feature does not exist but the easiest
+> way
+> >> to
+> >> > achieve our goal is to contribute a patch the the MTP device driver
+> since
+> >> > other drivers operate on a filesystem level instead of a file level
+> which
+> >> > is what we need.
+> >>
+> >> IMHO the easiest way to stop the guest accessing files is to simply no=
+t
+> >> put them in the directory that you are exporting the guest in the firs=
+t
+> >> place. If you have a directory that has some files you don't want
+> accessed
+> >> and can't remove them, then perhaps create a second directory and use
+> >> symlinks or hardlinks to pull in files from the original directory.
+> >>
+> >> > The plan is to pass the contents of each file to a program through
+> stdin
+> >> > and decide based on the exit code if the file should be allowed to
+> pass
+> >> > through to the guest or not.
+> >>
+> >> I can't say I like this idea. It is a really very inefficient and heav=
+y
+> >> solution.
+> >>
+> >> > Since this is the first time I'm contributing to QEMU I'd like some
+> >> > guidance to where the filtering code should be.
+> >> > https://github.com/qemu/qemu/blob/master/hw/usb/dev-mtp.c doesn't
+> look
+> >> that
+> >> > complicated but I still need to understand it better to continue.
+> >> > Furthermore, I need to know where to add such a command line option =
+to
+> >> > point QEMU to the filtering program.
+> >> >
+> >> > Would such a patch be accepted if all the requirements above are met=
+?
+> >>
+> >> Can you explain the usage scenario you have in more details, rather th=
+an
+> >> just the high level abstract.
+> >>
+> >>
+> >> Regards,
+> >> Daniel
+> >> --
+> >> |: https://berrange.com      -o-
+> >> https://www.flickr.com/photos/dberrange :|
+> >> |: https://libvirt.org         -o-
+> >> https://fstop138.berrange.com :|
+> >> |: https://entangle-photo.org    -o-
+> >> https://www.instagram.com/dberrange :|
+> >>
 >
-> { 'union' : 'CpuInfo',
->   'base'  : { 'CPU'       : 'int',
->               'current'   : 'bool',
->               'halted'    : 'bool',
->               'qom_path'  : 'str',
->               'thread_id' : 'int',
->               '*props'    : 'CpuInstanceProperties',
->               'arch'      : 'CpuInfoArch',
->               'target'    : 'SysEmuTarget' },
-> ...
->
-> { 'union' : 'CpuInfoFast',
->   'base'  : { 'cpu-index' : 'int',
->               'qom-path'  : 'str',
->               'thread-id' : 'int',
->               '*props'    : 'CpuInstanceProperties',
->               'arch'      : 'CpuInfoArch',
->               'target'    : 'SysEmuTarget' },
-> ...
->
-> and people would ask themselves ever after, "are there some common
-> fields in there that we could extract ... hmmm, @props and @arch, okay,
-> maybe, maybe not, grey area". Let's do it now and save them the thinking.
-
-Works for me.
-
-> [snip]
->
->>> diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
->>> index 25bce78352b8..5bfd2ef1dd3b 100644
->>> --- a/qapi/qapi-schema.json
->>> +++ b/qapi/qapi-schema.json
->>> @@ -61,23 +61,23 @@
->>>          'query-migrate-cache-size',
->>>          'query-tpm-models',
->>>          'query-tpm-types',
->>>          'ringbuf-read' ],
->>>      'name-case-whitelist': [
->>>          'ACPISlotType',         # DIMM, visible through query-acpi-ospm-status
->>>          'CpuInfoMIPS',          # PC, visible through query-cpu
->>>          'CpuInfoTricore',       # PC, visible through query-cpu
->>>          'QapiErrorClass',       # all members, visible through errors
->>>          'UuidInfo',             # UUID, visible through query-uuid
->>>          'X86CPURegister32',     # all members, visible indirectly through qom-get
->>> -        'q_obj_CpuInfo-base'    # CPU, visible through query-cpu
->>> +        'CpuInfoBase'           # CPU, visible through query-cpu
->> 
->> Let's update this to "visible through query-cpus, query-cpus-fast" while
->> there.
->
-> Right, I noticed the typo in the preexistent comment too late (and I
-> didn't notice the "query-cpus-fast" omission at all).
->
-> Thanks!
-
-You're welcome!
