@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fBIRI-0003V6-Im
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:18:25 -0400
+	(envelope-from <quintela@redhat.com>) id 1fBISk-0004NS-Mv
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:19:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fBIRC-0002mA-MU
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:18:20 -0400
-References: <20180421132929.21610-1-mreitz@redhat.com>
-	<20180421132929.21610-2-mreitz@redhat.com>
-	<w51in8g63r5.fsf@maestria.local.igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <319c6e7b-c23c-09cd-4198-5b537a99c98c@redhat.com>
-Date: Wed, 25 Apr 2018 13:18:03 +0200
-MIME-Version: 1.0
-In-Reply-To: <w51in8g63r5.fsf@maestria.local.igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="obMYSMop57MIUSVtVh1gq860QgOjQS3qu"
-Subject: Re: [Qemu-devel] [PATCH v2 1/9] block: Add COR filter driver
+	(envelope-from <quintela@redhat.com>) id 1fBISe-0004d6-Cj
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:19:50 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42142 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fBISe-0004bv-2A
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:19:44 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3381C81A88B6
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 11:19:43 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Wed, 25 Apr 2018 13:19:32 +0200
+Message-Id: <20180425111940.1030-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH v8 0/8] Add make check tests for Migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,92 +27,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---obMYSMop57MIUSVtVh1gq860QgOjQS3qu
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <319c6e7b-c23c-09cd-4198-5b537a99c98c@redhat.com>
-Subject: Re: [PATCH v2 1/9] block: Add COR filter driver
-References: <20180421132929.21610-1-mreitz@redhat.com>
- <20180421132929.21610-2-mreitz@redhat.com>
- <w51in8g63r5.fsf@maestria.local.igalia.com>
-In-Reply-To: <w51in8g63r5.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2018-04-24 17:08, Alberto Garcia wrote:
-> On Sat 21 Apr 2018 03:29:21 PM CEST, Max Reitz wrote:
->> This adds a simple copy-on-read filter driver.  It relies on the alrea=
-dy
->> existing COR functionality in the central block layer code, which may =
-be
->> moved here once we no longer need it there.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->=20
->=20
->> +#define PERM_PASSTHROUGH (BLK_PERM_CONSISTENT_READ \
->> +                          | BLK_PERM_WRITE \
->> +                          | BLK_PERM_RESIZE)
->> +#define PERM_UNCHANGED (BLK_PERM_ALL & ~PERM_PASSTHROUGH)
->> +
->> +static void cor_child_perm(BlockDriverState *bs, BdrvChild *c,
->> +                           const BdrvChildRole *role,
->> +                           BlockReopenQueue *reopen_queue,
->> +                           uint64_t perm, uint64_t shared,
->> +                           uint64_t *nperm, uint64_t *nshared)
->> +{
->> +    if (c =3D=3D NULL) {
->> +        *nperm =3D (perm & PERM_PASSTHROUGH) | BLK_PERM_WRITE_UNCHANG=
-ED;
->> +        *nshared =3D (shared & PERM_PASSTHROUGH) | PERM_UNCHANGED;
->> +        return;
->> +    }
->> +
->> +    *nperm =3D (perm & PERM_PASSTHROUGH) |
->> +             (c->perm & PERM_UNCHANGED);
->=20
-> I admit I'm not completely familiar with this, but don't you need to ad=
-d
-> BLK_PERM_WRITE_UNCHANGED to *nperm ?
-
-As long as it's requested in when the child is attached (which it is in
-the "c =3D=3D NULL" case), it should be part of c->perm then.
-
-(And since PERM_PASSTHROUGH does not contain WRITE_UNCHANGED, it is part
-of PERM_UNCHANGED.)
-
-Max
-
->> +    *nshared =3D (shared & PERM_PASSTHROUGH) |
->> +               (c->shared_perm & PERM_UNCHANGED);
->> +}
->=20
-> Berto
->=20
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, berrange@redhat.com
 
 
+Hi
 
---obMYSMop57MIUSVtVh1gq860QgOjQS3qu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+v8:
+- just rebase to make things continue to wonk
 
------BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlrgY+sACgkQ9AfbAGHV
-z0CJTAf/TWGw1TEe89P4A8f3EIyXFpsRiXsPrvNUzS65mjyZ9ZRHCYWutn9AyUox
-Ab+Ang5WjCKK+Y3FMs4ku3Ap4dnYE5z/Oo5vjJxj8ZmZ7MBKCqyJc5qI8JSGNnnK
-B6PHoL44JcJN3UAkM5LE44IGLzoAsMcVYP3DqZku+imEv1z4Kw9cc6wXmiLUBpbp
-Z3mfoF0Mk0/L7JdlD2NvaLEFpRfg+jdvK6Wnzq6UHzL8upIIsycm4iyquqNadtd8
-tbC9lWt5r51dJ2OiD0WrIluk95fh387arx54dO1vM6wPCS7I7iA7Da7XkV8tbzDK
-rAJX3Xlg//NiV/AcyVeM/ykr5PRasg==
-=pOAC
------END PGP SIGNATURE-----
+New in the other v7:
+- SocketAddress is now a list (a.k.a make happy danp)
+- Rebase on top of upstream
+  network listener is *interesting*
+- *HACK* to make SocketAddress list in common
+  see patch: create-socket-paramenter
 
---obMYSMop57MIUSVtVh1gq860QgOjQS3qu--
+Please review, Juan.
+
+CC: berrange@redhat.com
+
+[v7]
+This is v6, it differest from the patches that I sent with previous
+multifd post:
+- Rename x-tcp-port to x-socket-address
+  This is more *complicated* that it looks as:
+
+  * it is a pointer, so I need to use QAPI_CLONE() to make info
+    migrate work
+
+  * this is an union of structs.  In QAPI. So, a dict of strings.  The
+    only way that I was able to make things work is parsing the qdict
+    to a SocketAddress and then output a SocketAddress as an str.  It
+    needs to be an easier way, for sure.
+
+  * Cleanups here andthere.
+
+Please, review, Juan.
+
+[v5]
+- Several patches moved to pull request
+- merge info_migrate and migration_tests
+  only missing bit is tcp_port, needed for tcp tests
+- Rename tcp-port to x-tcp-port
+  We will get better naming from David at some point, and we will use that bit
+- ppc: use inline code as suggested by lvivier
+
+Please, review.
+
+It is based on my previous pull request
+
+Based-on: 20180129120932.12874-1-quintela@redhat.com
+
+[v4]
+- rebase on top on v4 info_migrate patches
+- Tune sleeps to make patches fast
+- Create a deprecated test for deprecated commands (i.e. make peterxu happy)
+- create migrate_start_postcopy function
+- fix naming/sizes between power and x86
+- cleanup comments to match code
+
+[v3]
+
+- No more tests for deprecated parameters. Now I only use
+  migrate_set_parameter.  If there is a deprecated command for that,
+  we tests it there.
+- free "result" string, always good to return memory (Peter found it)
+- use the new tcp_port parameter from info migrate.  So we are
+  handling well the tcp case.
+- lots of code movement around to make everything consistent.
+- Several patches already integrated upstream.
+
+[v2]
+- to make review easier, I started renaming postcopy-test.c to migration-test.c
+- Did cleanups/refactoring there
+- Don't use global-qtest anymore
+- check that the parameters that we sent got really set
+- RFH: comrpress threads tests is not working for some weird reason.  Using the same code on command line works.
+  still investigating why.
+
+ToDoo:
+
+- tcp: after discussions with dave, we ended in conclusion that we
+  need to use the 0 port and let the system gives us a free one
+
+  But .... that means that we need to be able to get that port back somehow.
+  "info migrate" woring on destination side?
+
+- compression threads.  There is some weird interaction with the test
+  hardness and every migration thread get waiting in a different
+  semaphore.  Investigating if it is a race/bug/whateverr
+
+- deprecated commands: There was a suggestion to make
+  migrate_set_parameter look at the parameter name and test old/new
+  depending on something.  Not sure what to do here.
+
+- testing commands: Is there a way to launch qemu and just sent
+  qmp/hmp commands without having to really run anything else?
+
+[v1]
+- add test for precopy for unix/tcp
+  exec and fd to came, don't know how to test rdma without hardware
+- add tests using deprecated interfaces
+- add test for xbzrle
+  Note to myself, there is no way to set the cache size with migraton_set_parameters
+- Add test for compress threads
+  disabled on the series, right now it appears that compression is not working at all
+- Move postcopy to use new results
+  Idea is to move it on top of migration-test.c, but first I want some reviews on basic idea
+
+Juan Quintela (8):
+  qemu-sockets: Export SocketAddress_to_str
+  tests: Add migration precopy test
+  tests: Add migration xbzrle test
+  migration: Create socket-address parameter
+  tests: Migration ppc now inlines its program
+  tests: Add basic migration precopy tcp test
+  migration: Add multifd test
+  [RFH] tests: Add migration compress threads tests
+
+ chardev/char-socket.c  |  29 ----
+ hmp.c                  |  14 ++
+ include/qemu/sockets.h |   3 +
+ migration/migration.c  |  25 ++++
+ migration/migration.h  |   1 +
+ migration/socket.c     |  11 ++
+ qapi/migration.json    |  13 +-
+ qapi/sockets.json      |  13 ++
+ tests/migration-test.c | 332 ++++++++++++++++++++++++++++++++++++-----
+ util/qemu-sockets.c    |  29 ++++
+ 10 files changed, 398 insertions(+), 72 deletions(-)
+
+-- 
+2.17.0
