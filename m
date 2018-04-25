@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44938)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBM33-0008Uk-PD
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:09:34 -0400
+	(envelope-from <bounces@canonical.com>) id 1fBM4G-0000xz-4r
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:10:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBM2z-0006cK-MP
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:09:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42542 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fBM2z-0006cB-Ha
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:09:29 -0400
-References: <20180420145249.32435-1-peter.maydell@linaro.org>
-	<20180420145249.32435-11-peter.maydell@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <19b0361f-76f0-6c13-5e4f-2af792b5145d@redhat.com>
-Date: Wed, 25 Apr 2018 17:09:21 +0200
+	(envelope-from <bounces@canonical.com>) id 1fBM4C-0007Q6-0a
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:10:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53230)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fBM4B-0007Pt-Qf
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:10:43 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fBM4A-000293-Pl
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 15:10:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id BC6242E80C8
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 15:10:42 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180420145249.32435-11-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 10/13] serial-isa: Use MAX_ISA_SERIAL_PORTS
- instead of MAX_SERIAL_PORTS
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 25 Apr 2018 15:03:08 -0000
+From: xccx <1766904@bugs.launchpad.net>
+Reply-To: Bug 1766904 <1766904@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <152466858890.21548.13995835103547275465.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1766904] [NEW] Creating high hdd load (with
+ constant fsyncs) on a SATA disk leads to freezes and errors in guest dmesg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +36,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, patches@linaro.org
+To: qemu-devel@nongnu.org
 
-On 20.04.2018 16:52, Peter Maydell wrote:
-> The ISA serial port handling in serial-isa.c imposes a limit
-> of 4 serial ports. This is because we only know of 4 IO port
-> and IRQ settings for them, and is unrelated to the generic
-> MAX_SERIAL_PORTS limit, though they happen to both be set at
-> 4 currently.
-> 
-> Use a new MAX_ISA_SERIAL_PORTS wherever that is the correct
-> limit to be checking against.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  include/hw/char/serial.h |  3 +++
->  hw/char/serial-isa.c     | 10 +++++-----
->  hw/i386/pc.c             |  2 +-
->  hw/mips/mips_r4k.c       |  2 +-
->  hw/ppc/pnv.c             |  2 +-
->  hw/sparc64/sun4u.c       |  2 +-
->  6 files changed, 12 insertions(+), 9 deletions(-)
+Public bug reported:
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+After upgrading from qemu 2.10.0+dfsg-2 to 2.12~rc3+dfsg-2 (on debian
+sid host), centos 7 guest started to show freezes and ata errors in
+dmesg during hdd workloads with writing many small files and repeated
+fsyncs.
+
+Host kernel 4.15.0-3-amd64.
+Guest kernel 3.10.0-693.21.1.el7.x86_64 (slightly older guest kernel was te=
+sted too with same result).
+
+Script that reproduces the bug (first run usualy goes smooth, second and
+later runs result in dmesg errors and freezes):
+
+http://paste.debian.net/hidden/472fb220/
+
+Sample of error messages in guest dmesg:
+
+http://paste.debian.net/hidden/8219e234/
+
+This vm is launchd using virsh start. VM launch command (from logfile in
+/var/log/libvirt/qemu/):
+
+http://paste.debian.net/plainh/5604126f
+
+A workaround that I am using right now: I have detached this SATA
+storage and reattached the same .qcow2 file as SCSI - this has fixed the
+issue for me.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1766904
+
+Title:
+  Creating high hdd load (with constant fsyncs) on a SATA disk leads to
+  freezes and errors in guest dmesg
+
+Status in QEMU:
+  New
+
+Bug description:
+  After upgrading from qemu 2.10.0+dfsg-2 to 2.12~rc3+dfsg-2 (on debian
+  sid host), centos 7 guest started to show freezes and ata errors in
+  dmesg during hdd workloads with writing many small files and repeated
+  fsyncs.
+
+  Host kernel 4.15.0-3-amd64.
+  Guest kernel 3.10.0-693.21.1.el7.x86_64 (slightly older guest kernel was =
+tested too with same result).
+
+  Script that reproduces the bug (first run usualy goes smooth, second
+  and later runs result in dmesg errors and freezes):
+
+  http://paste.debian.net/hidden/472fb220/
+
+  Sample of error messages in guest dmesg:
+
+  http://paste.debian.net/hidden/8219e234/
+
+  This vm is launchd using virsh start. VM launch command (from logfile
+  in /var/log/libvirt/qemu/):
+
+  http://paste.debian.net/plainh/5604126f
+
+  A workaround that I am using right now: I have detached this SATA
+  storage and reattached the same .qcow2 file as SCSI - this has fixed
+  the issue for me.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1766904/+subscriptions
