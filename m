@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60433)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fBISn-0004Ps-Mo
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:19:54 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fBISm-0004mV-Qs
+	(envelope-from <quintela@redhat.com>) id 1fBISm-0004Oh-EN
 	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:19:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51038 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fBISm-0004li-N5
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <quintela@redhat.com>) id 1fBISi-0004hm-UL
 	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:19:52 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51036 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fBISi-0004hK-O2
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:19:48 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4EE0C8DC3B
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 11:19:52 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 632B68DC3B
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 11:19:48 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 25 Apr 2018 13:19:39 +0200
-Message-Id: <20180425111940.1030-8-quintela@redhat.com>
+Date: Wed, 25 Apr 2018 13:19:36 +0200
+Message-Id: <20180425111940.1030-5-quintela@redhat.com>
 In-Reply-To: <20180425111940.1030-1-quintela@redhat.com>
 References: <20180425111940.1030-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 7/8] migration: Add multifd test
+Subject: [Qemu-devel] [PATCH v8 4/8] migration: Create socket-address
+ parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,79 +33,233 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-We set the x-multifd-page-count and x-multifd-channels.
+It will be used to store the uri parameters. We want this only for
+tcp, so we don't set it for other uris.  We need it to know what port
+is migration running.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- tests/migration-test.c | 48 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
 
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 309ae4793e..873bb58200 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -742,6 +742,53 @@ static void test_precopy_tcp(void)
-     g_free(uri);
+--
+
+This used to be uri parameter, but it has so many troubles to
+reproduce that it don't just make sense.
+
+This used to be a port parameter.  I was asked to move to
+SocketAddress, done.
+I also merged the setting of the migration tcp port in this one
+because now I need to free the address, and this makes it easier.
+This used to be x-socket-address with a single direction, now it is a
+list of addresses.
+---
+ hmp.c                 | 14 ++++++++++++++
+ migration/migration.c | 25 +++++++++++++++++++++++++
+ migration/migration.h |  1 +
+ migration/socket.c    | 11 +++++++++++
+ qapi/migration.json   | 13 +++++++++++--
+ qapi/sockets.json     | 13 +++++++++++++
+ 6 files changed, 75 insertions(+), 2 deletions(-)
+
+diff --git a/hmp.c b/hmp.c
+index a25c7bd9a8..caf94345c9 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -355,6 +355,20 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
+         monitor_printf(mon, "%s: %" PRIu64 "\n",
+             MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE),
+             params->xbzrle_cache_size);
++        if (params->has_socket_address) {
++            SocketAddressList *addr;
++
++            monitor_printf(mon, "%s: [\n",
++                MigrationParameter_str(MIGRATION_PARAMETER_SOCKET_ADDRESS));
++
++            for (addr = params->socket_address; addr; addr = addr->next) {
++                char *s = SocketAddress_to_str("", addr->value,
++                                               false, false);
++                monitor_printf(mon, "\t%s\n", s);
++            }
++
++            monitor_printf(mon, "]\n");
++        }
+     }
+ 
+     qapi_free_MigrationParameters(params);
+diff --git a/migration/migration.c b/migration/migration.c
+index 52a5092add..7eca65d1f0 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -31,6 +31,8 @@
+ #include "migration/vmstate.h"
+ #include "block/block.h"
+ #include "qapi/error.h"
++#include "qapi/clone-visitor.h"
++#include "qapi/qapi-visit-sockets.h"
+ #include "qapi/qapi-commands-migration.h"
+ #include "qapi/qapi-events-migration.h"
+ #include "qapi/qmp/qerror.h"
+@@ -277,6 +279,21 @@ int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char *rbname,
+     return migrate_send_rp_message(mis, msg_type, msglen, bufc);
  }
  
-+static void test_multifd_tcp(void)
++void migrate_set_address(SocketAddress *address)
 +{
-+    char *uri;
-+    QTestState *from, *to;
++    MigrationState *s = migrate_get_current();
++    SocketAddressList *addrs;
 +
-+    test_migrate_start(&from, &to, "tcp:127.0.0.1:0", false);
++    addrs = g_new0(SocketAddressList, 1);
++    addrs->next = s->parameters.socket_address;
++    s->parameters.socket_address = addrs;
 +
-+    /* We want to pick a speed slow enough that the test completes
-+     * quickly, but that it doesn't complete precopy even on a slow
-+     * machine, so also set the downtime.
-+     */
-+    /* 1 ms should make it not converge*/
-+    migrate_set_parameter(from, "downtime-limit", "1");
-+    /* 1GB/s */
-+    migrate_set_parameter(from, "max-bandwidth", "1000000000");
-+
-+    migrate_set_parameter(from, "x-multifd-channels", "4");
-+    migrate_set_parameter(to, "x-multifd-channels", "4");
-+
-+    migrate_set_parameter(from, "x-multifd-page-count", "64");
-+    migrate_set_parameter(to, "x-multifd-page-count", "64");
-+
-+    migrate_set_capability(from, "x-multifd", "true");
-+    migrate_set_capability(to, "x-multifd", "true");
-+    /* Wait for the first serial output from the source */
-+    wait_for_serial("src_serial");
-+
-+    uri = migrate_get_socket_address(to, "socket-address");
-+
-+    migrate(from, uri);
-+
-+    wait_for_migration_pass(from);
-+
-+    /* 300ms it should converge */
-+    migrate_set_parameter(from, "downtime-limit", "300");
-+
-+    if (!got_stop) {
-+        qtest_qmp_eventwait(from, "STOP");
++    if (!s->parameters.has_socket_address) {
++        s->parameters.has_socket_address = true;
 +    }
-+    qtest_qmp_eventwait(to, "RESUME");
-+
-+    wait_for_serial("dest_serial");
-+    wait_for_migration_complete(from);
-+
-+    test_migrate_end(from, to, true);
++    addrs->value = QAPI_CLONE(SocketAddress, address);
 +}
 +
- int main(int argc, char **argv)
+ void qemu_start_incoming_migration(const char *uri, Error **errp)
  {
-     char template[] = "/tmp/migration-test-XXXXXX";
-@@ -767,6 +814,7 @@ int main(int argc, char **argv)
-     qtest_add_func("/migration/precopy/unix", test_precopy_unix);
-     qtest_add_func("/migration/precopy/tcp", test_precopy_tcp);
-     qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
-+    qtest_add_func("/migration/multifd/tcp", test_multifd_tcp);
+     const char *p;
+@@ -556,6 +573,11 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
+     params->x_multifd_page_count = s->parameters.x_multifd_page_count;
+     params->has_xbzrle_cache_size = true;
+     params->xbzrle_cache_size = s->parameters.xbzrle_cache_size;
++    if (s->parameters.socket_address) {
++        params->has_socket_address = true;
++        params->socket_address =
++            QAPI_CLONE(SocketAddressList, s->parameters.socket_address);
++    }
  
-     ret = g_test_run();
+     return params;
+ }
+@@ -2563,6 +2585,9 @@ static void migration_instance_finalize(Object *obj)
+     qemu_mutex_destroy(&ms->error_mutex);
+     g_free(params->tls_hostname);
+     g_free(params->tls_creds);
++    if (params->socket_address) {
++        qapi_free_SocketAddressList(params->socket_address);
++    }
+     qemu_sem_destroy(&ms->pause_sem);
+     error_free(ms->error);
+ }
+diff --git a/migration/migration.h b/migration/migration.h
+index 8d2f320c48..4774ee305f 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -241,5 +241,6 @@ int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char* rbname,
  
+ void dirty_bitmap_mig_before_vm_start(void);
+ void init_dirty_bitmap_incoming_migration(void);
++void migrate_set_address(SocketAddress *address);
+ 
+ #endif
+diff --git a/migration/socket.c b/migration/socket.c
+index 122d8ccfbe..edf33c70cf 100644
+--- a/migration/socket.c
++++ b/migration/socket.c
+@@ -15,6 +15,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/cutils.h"
+ 
+ #include "qemu-common.h"
+ #include "qemu/error-report.h"
+@@ -152,6 +153,7 @@ static void socket_start_incoming_migration(SocketAddress *saddr,
+                                             Error **errp)
+ {
+     QIONetListener *listener = qio_net_listener_new();
++    int i;
+ 
+     qio_net_listener_set_name(listener, "migration-socket-listener");
+ 
+@@ -163,6 +165,15 @@ static void socket_start_incoming_migration(SocketAddress *saddr,
+     qio_net_listener_set_client_func(listener,
+                                      socket_accept_incoming_migration,
+                                      NULL, NULL);
++
++    for (i = 0; i < listener->nsioc; i++)  {
++        SocketAddress *address =
++            qio_channel_socket_get_local_address(listener->sioc[i], errp);
++        if (address < 0) {
++            return;
++        }
++        migrate_set_address(address);
++    }
+ }
+ 
+ void tcp_start_incoming_migration(const char *host_port, Error **errp)
+diff --git a/qapi/migration.json b/qapi/migration.json
+index 9d0bf82cf4..c3aafaf8fe 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -6,6 +6,7 @@
+ ##
+ 
+ { 'include': 'common.json' }
++{ 'include': 'sockets.json' }
+ 
+ ##
+ # @MigrationStats:
+@@ -494,6 +495,9 @@
+ #                     and a power of 2
+ #                     (Since 2.11)
+ #
++# @socket-address: Only used for tcp, to know what the real port is
++#                  (Since 2.13)
++#
+ # Since: 2.4
+ ##
+ { 'enum': 'MigrationParameter',
+@@ -502,7 +506,7 @@
+            'tls-creds', 'tls-hostname', 'max-bandwidth',
+            'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
+            'x-multifd-channels', 'x-multifd-page-count',
+-           'xbzrle-cache-size' ] }
++           'xbzrle-cache-size', 'socket-address' ] }
+ 
+ ##
+ # @MigrateSetParameters:
+@@ -671,6 +675,10 @@
+ #                     needs to be a multiple of the target page size
+ #                     and a power of 2
+ #                     (Since 2.11)
++#
++# @socket-address: Only used for tcp, to know what the real port is
++#                  (Since 2.13)
++#
+ # Since: 2.4
+ ##
+ { 'struct': 'MigrationParameters',
+@@ -687,7 +695,8 @@
+             '*block-incremental': 'bool' ,
+             '*x-multifd-channels': 'uint8',
+             '*x-multifd-page-count': 'uint32',
+-            '*xbzrle-cache-size': 'size' } }
++            '*xbzrle-cache-size': 'size',
++            '*socket-address': ['SocketAddress'] } }
+ 
+ ##
+ # @query-migrate-parameters:
+diff --git a/qapi/sockets.json b/qapi/sockets.json
+index fc81d8d5e8..f1ca09a927 100644
+--- a/qapi/sockets.json
++++ b/qapi/sockets.json
+@@ -152,3 +152,16 @@
+             'unix': 'UnixSocketAddress',
+             'vsock': 'VsockSocketAddress',
+             'fd': 'String' } }
++
++##
++# @DummyStruct:
++#
++# Both block-core and migration needs SocketAddressList
++# I am open to comments about how to share it
++#
++# @dummy-list: A dummy list
++#
++# Since: 2.13
++##
++{ 'struct': 'DummyStruct',
++  'data': { 'dummy-list': ['SocketAddress'] } }
 -- 
 2.17.0
