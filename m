@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58632)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fB9Lf-00053T-LY
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 21:35:56 -0400
+	(envelope-from <peterx@redhat.com>) id 1fBAaT-0008WC-Ct
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 22:55:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fB9Lc-0005qe-Hv
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 21:35:55 -0400
-Resent-Message-Id: <E1fB9Lc-0005qe-Hv@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21087)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fB9Lc-0005nx-8N
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 21:35:52 -0400
-In-Reply-To: <20180425012300.14698-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152462012339.2265.3421078223281547945@71c20359a636>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 24 Apr 2018 18:35:24 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/9] target/arm: Fixups for
- ARM_FEATURE_V8_FP16
+	(envelope-from <peterx@redhat.com>) id 1fBAaQ-0000CD-Be
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 22:55:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54716 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fBAaQ-00009p-1o
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 22:55:14 -0400
+From: Peter Xu <peterx@redhat.com>
+Date: Wed, 25 Apr 2018 10:54:56 +0800
+Message-Id: <20180425025459.5258-2-peterx@redhat.com>
+In-Reply-To: <20180425025459.5258-1-peterx@redhat.com>
+References: <20180425025459.5258-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v6 1/4] tests/atomic_add-bench: add -m option
+ to use mutexes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +24,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, alex.bennee@linaro.org
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Emilio G . Cota" <cota@braap.org>, peterx@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNDI1MDEyMzAwLjE0Njk4LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
-Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvOV0gdGFyZ2V0L2FybTogRml4dXBz
-IGZvciBBUk1fRkVBVFVSRV9WOF9GUDE2Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
-bi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8
-IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
-cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
-ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
-IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
-CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
-PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9t
-IGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0g
-ICAgICAgICAgICBwYXRjaGV3LzE1MTMxNjAyNzItMTU5MjEtMS1naXQtc2VuZC1lbWFpbC1jaHJp
-c3RpYW4uZWhyaGFyZHRAY2Fub25pY2FsLmNvbSAtPiBwYXRjaGV3LzE1MTMxNjAyNzItMTU5MjEt
-MS1naXQtc2VuZC1lbWFpbC1jaHJpc3RpYW4uZWhyaGFyZHRAY2Fub25pY2FsLmNvbQogdCBbdGFn
-IHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTgwNDI0MTUyNDA1LjEwMzA0LTEtYWxleC5i
-ZW5uZWVAbGluYXJvLm9yZyAtPiBwYXRjaGV3LzIwMTgwNDI0MTUyNDA1LjEwMzA0LTEtYWxleC5i
-ZW5uZWVAbGluYXJvLm9yZwogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTgw
-NDI0MTYwMzI5LjgwODktMS1hbGV4LmJlbm5lZUBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxODA0
-MjQxNjAzMjkuODA4OS0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcKIHQgW3RhZyB1cGRhdGVdICAg
-ICAgICAgICAgcGF0Y2hldy8yMDE4MDQyNDIxNDU1MC4zMjU0OS0xLWxlcnNla0ByZWRoYXQuY29t
-IC0+IHBhdGNoZXcvMjAxODA0MjQyMTQ1NTAuMzI1NDktMS1sZXJzZWtAcmVkaGF0LmNvbQogdCBb
-dGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTgwNDI0MjIyMTAzLjE5OTQ2LTEtZjRi
-dWdAYW1zYXQub3JnIC0+IHBhdGNoZXcvMjAxODA0MjQyMjIxMDMuMTk5NDYtMS1mNGJ1Z0BhbXNh
-dC5vcmcKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDQyNTAxMjMwMC4x
-NDY5OC0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE4MDQyNTAx
-MjMwMC4xNDY5OC0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcKU3dpdGNoZWQgdG8gYSBu
-ZXcgYnJhbmNoICd0ZXN0Jwo4NGVmYzVjM2IxIHRhcmdldC9hcm06IEltcGxlbWVudCBGUCBkYXRh
-LXByb2Nlc3NpbmcgKDMgc291cmNlKSBmb3IgZnAxNgoxMDU3NDY3MGQ5IHRhcmdldC9hcm06IElt
-cGxlbWVudCBGUCBkYXRhLXByb2Nlc3NpbmcgKDIgc291cmNlKSBmb3IgZnAxNgoyZDRlMTg3ODY5
-IHRhcmdldC9hcm06IEltcGxlbWVudCBGQ1ZUIChzY2FsYXIsIGZpeGVkLXBvaW50KSBmb3IgZnAx
-NgplYzM1MDA2NWU0IHRhcmdldC9hcm06IEltcGxlbWVudCBGQ1ZUIChzY2FsYXIsIGludGVnZXIp
-IGZvciBmcDE2CmQxNTdhYWE1ODkgdGFyZ2V0L2FybTogSW1wbGVtZW50IEZNT1YgKGdlbmVyYWwp
-IGZvciBmcDE2CjdlZWI3ODE3OWYgdGFyZ2V0L2FybTogQ2xlYXIgU1ZFIGhpZ2ggYml0cyBmb3Ig
-Rk1PVgphN2ZlZDVkOGE2IHRhcmdldC9hcm06IEZpeCBmbG9hdDE2IHRvL2Zyb20gaW50MTYKNzIy
-MzkxMzNhMCB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgdmVjdG9yIHNoaWZ0ZWQgRkNWVCBmb3IgZnAx
-Ngo1Y2I0ZmYyOTk2IHRhcmdldC9hcm06IEltcGxlbWVudCB2ZWN0b3Igc2hpZnRlZCBTQ1ZGL1VD
-VkYgZm9yIGZwMTYKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvOTogdGFy
-Z2V0L2FybTogSW1wbGVtZW50IHZlY3RvciBzaGlmdGVkIFNDVkYvVUNWRiBmb3IgZnAxNi4uLgpD
-aGVja2luZyBQQVRDSCAyLzk6IHRhcmdldC9hcm06IEltcGxlbWVudCB2ZWN0b3Igc2hpZnRlZCBG
-Q1ZUIGZvciBmcDE2Li4uCkNoZWNraW5nIFBBVENIIDMvOTogdGFyZ2V0L2FybTogRml4IGZsb2F0
-MTYgdG8vZnJvbSBpbnQxNi4uLgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcq
-JyAoY3R4Old4VikKIzQwOiBGSUxFOiB0YXJnZXQvYXJtL2hlbHBlci5jOjExNDIzOgorc3RhdGlj
-IGZsb2F0MTYgZG9fcG9zdHNjYWxlX2ZwMTYoZmxvYXQ2NCBmLCBpbnQgc2hpZnQsIGZsb2F0X3N0
-YXR1cyAqZnBzdCkKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA4
-MyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
-dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
-dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpD
-aGVja2luZyBQQVRDSCA0Lzk6IHRhcmdldC9hcm06IENsZWFyIFNWRSBoaWdoIGJpdHMgZm9yIEZN
-T1YuLi4KQ2hlY2tpbmcgUEFUQ0ggNS85OiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgRk1PViAoZ2Vu
-ZXJhbCkgZm9yIGZwMTYuLi4KQ2hlY2tpbmcgUEFUQ0ggNi85OiB0YXJnZXQvYXJtOiBJbXBsZW1l
-bnQgRkNWVCAoc2NhbGFyLCBpbnRlZ2VyKSBmb3IgZnAxNi4uLgpDaGVja2luZyBQQVRDSCA3Lzk6
-IHRhcmdldC9hcm06IEltcGxlbWVudCBGQ1ZUIChzY2FsYXIsIGZpeGVkLXBvaW50KSBmb3IgZnAx
-Ni4uLgpDaGVja2luZyBQQVRDSCA4Lzk6IHRhcmdldC9hcm06IEltcGxlbWVudCBGUCBkYXRhLXBy
-b2Nlc3NpbmcgKDIgc291cmNlKSBmb3IgZnAxNi4uLgpDaGVja2luZyBQQVRDSCA5Lzk6IHRhcmdl
-dC9hcm06IEltcGxlbWVudCBGUCBkYXRhLXByb2Nlc3NpbmcgKDMgc291cmNlKSBmb3IgZnAxNi4u
-Lgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoK
-LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRj
-aGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVk
-aGF0LmNvbQ==
+From: "Emilio G. Cota" <cota@braap.org>
+
+This allows us to use atomic-add-bench as a microbenchmark
+for evaluating qemu_mutex_lock's performance.
+
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+[cherry picked from https://github.com/cota/qemu/commit/f04f34df]
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ tests/atomic_add-bench.c | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
+
+diff --git a/tests/atomic_add-bench.c b/tests/atomic_add-bench.c
+index caa1e8e689..f96d448f77 100644
+--- a/tests/atomic_add-bench.c
++++ b/tests/atomic_add-bench.c
+@@ -8,6 +8,7 @@ struct thread_info {
+ } QEMU_ALIGNED(64);
+ 
+ struct count {
++    QemuMutex lock;
+     unsigned long val;
+ } QEMU_ALIGNED(64);
+ 
+@@ -18,11 +19,13 @@ static unsigned int n_ready_threads;
+ static struct count *counts;
+ static unsigned int duration = 1;
+ static unsigned int range = 1024;
++static bool use_mutex;
+ static bool test_start;
+ static bool test_stop;
+ 
+ static const char commands_string[] =
+     " -n = number of threads\n"
++    " -m = use mutexes instead of atomic increments\n"
+     " -d = duration in seconds\n"
+     " -r = range (will be rounded up to pow2)";
+ 
+@@ -59,7 +62,13 @@ static void *thread_func(void *arg)
+ 
+         info->r = xorshift64star(info->r);
+         index = info->r & (range - 1);
+-        atomic_inc(&counts[index].val);
++        if (use_mutex) {
++            qemu_mutex_lock(&counts[index].lock);
++            counts[index].val += 1;
++            qemu_mutex_unlock(&counts[index].lock);
++        } else {
++            atomic_inc(&counts[index].val);
++        }
+     }
+     return NULL;
+ }
+@@ -91,6 +100,9 @@ static void create_threads(void)
+     th_info = g_new(struct thread_info, n_threads);
+     counts = qemu_memalign(64, sizeof(*counts) * range);
+     memset(counts, 0, sizeof(*counts) * range);
++    for (i = 0; i < range; i++) {
++        qemu_mutex_init(&counts[i].lock);
++    }
+ 
+     for (i = 0; i < n_threads; i++) {
+         struct thread_info *info = &th_info[i];
+@@ -131,7 +143,7 @@ static void parse_args(int argc, char *argv[])
+     int c;
+ 
+     for (;;) {
+-        c = getopt(argc, argv, "hd:n:r:");
++        c = getopt(argc, argv, "hd:n:mr:");
+         if (c < 0) {
+             break;
+         }
+@@ -145,6 +157,9 @@ static void parse_args(int argc, char *argv[])
+         case 'n':
+             n_threads = atoi(optarg);
+             break;
++        case 'm':
++            use_mutex = true;
++            break;
+         case 'r':
+             range = pow2ceil(atoi(optarg));
+             break;
+-- 
+2.14.3
