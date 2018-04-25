@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34076)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fBIaE-0002iO-Cc
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:27:35 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fBIaD-0004q3-Gs
+	(envelope-from <quintela@redhat.com>) id 1fBIaD-0002h4-1Y
 	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:27:34 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45562 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fBIaD-0004pN-Cn
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <quintela@redhat.com>) id 1fBIaC-0004nw-86
 	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:27:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45560 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fBIaC-0004n9-4V
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:27:32 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0B3F94022414
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 11:27:33 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B51C0402290A
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 11:27:31 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 25 Apr 2018 13:27:07 +0200
-Message-Id: <20180425112723.1111-6-quintela@redhat.com>
+Date: Wed, 25 Apr 2018 13:27:06 +0200
+Message-Id: <20180425112723.1111-5-quintela@redhat.com>
 In-Reply-To: <20180425112723.1111-1-quintela@redhat.com>
 References: <20180425112723.1111-1-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v12 05/21] migration: Export functions to
- create send channels
+Subject: [Qemu-devel] [PATCH v12 04/21] migration: Be sure all recv channels
+ are created
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,88 +36,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
+We need them before we start migration.
+
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- migration/socket.c | 28 +++++++++++++++++++++++++++-
- migration/socket.h |  7 +++++++
- 2 files changed, 34 insertions(+), 1 deletion(-)
+ migration/migration.c |  6 +++++-
+ migration/ram.c       | 11 +++++++++++
+ migration/ram.h       |  1 +
+ 3 files changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/migration/socket.c b/migration/socket.c
-index edf33c70cf..893a04f4cc 100644
---- a/migration/socket.c
-+++ b/migration/socket.c
-@@ -29,6 +29,28 @@
- #include "trace.h"
-=20
-=20
-+struct SocketOutgoingArgs {
-+    SocketAddress *saddr;
-+} outgoing_args;
-+
-+void socket_send_channel_create(QIOTaskFunc f, void *data)
-+{
-+    QIOChannelSocket *sioc =3D qio_channel_socket_new();
-+    qio_channel_socket_connect_async(sioc, outgoing_args.saddr,
-+                                     f, data, NULL, NULL);
-+}
-+
-+int socket_send_channel_destroy(QIOChannel *send)
-+{
-+    /* Remove channel */
-+    object_unref(OBJECT(send));
-+    if (outgoing_args.saddr) {
-+        qapi_free_SocketAddress(outgoing_args.saddr);
-+        outgoing_args.saddr =3D NULL;
-+    }
-+    return 0;
-+}
-+
- static SocketAddress *tcp_build_address(const char *host_port, Error **e=
-rrp)
+diff --git a/migration/migration.c b/migration/migration.c
+index 604722cec9..98f85e982c 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -479,7 +479,11 @@ void migration_ioc_process_incoming(QIOChannel *ioc)
+  */
+ bool migration_has_all_channels(void)
  {
-     SocketAddress *saddr;
-@@ -96,6 +118,11 @@ static void socket_start_outgoing_migration(Migration=
-State *s,
-     struct SocketConnectData *data =3D g_new0(struct SocketConnectData, =
-1);
-=20
-     data->s =3D s;
+-    return true;
++    bool all_channels;
 +
-+    /* in case previous migration leaked it */
-+    qapi_free_SocketAddress(outgoing_args.saddr);
-+    outgoing_args.saddr =3D saddr;
++    all_channels =3D multifd_recv_all_channels_created();
 +
-     if (saddr->type =3D=3D SOCKET_ADDRESS_TYPE_INET) {
-         data->hostname =3D g_strdup(saddr->u.inet.host);
-     }
-@@ -107,7 +134,6 @@ static void socket_start_outgoing_migration(Migration=
-State *s,
-                                      data,
-                                      socket_connect_data_free,
-                                      NULL);
--    qapi_free_SocketAddress(saddr);
++    return all_channels;
  }
 =20
- void tcp_start_outgoing_migration(MigrationState *s,
-diff --git a/migration/socket.h b/migration/socket.h
-index 6b91e9db38..528c3b0202 100644
---- a/migration/socket.h
-+++ b/migration/socket.h
-@@ -16,6 +16,13 @@
+ /*
+diff --git a/migration/ram.c b/migration/ram.c
+index c0ad6d8e9f..3a01472835 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -636,6 +636,17 @@ int multifd_load_setup(void)
+     return 0;
+ }
 =20
- #ifndef QEMU_MIGRATION_SOCKET_H
- #define QEMU_MIGRATION_SOCKET_H
++bool multifd_recv_all_channels_created(void)
++{
++    int thread_count =3D migrate_multifd_channels();
 +
-+#include "io/channel.h"
-+#include "io/task.h"
++    if (!migrate_use_multifd()) {
++        return true;
++    }
 +
-+void socket_send_channel_create(QIOTaskFunc f, void *data);
-+int socket_send_channel_destroy(QIOChannel *send);
++    return thread_count =3D=3D atomic_read(&multifd_recv_state->count);
++}
 +
- void tcp_start_incoming_migration(const char *host_port, Error **errp);
+ void multifd_recv_new_channel(QIOChannel *ioc)
+ {
+     /* nothing to do yet */
+diff --git a/migration/ram.h b/migration/ram.h
+index 06dbddc2a2..3f4b7daee8 100644
+--- a/migration/ram.h
++++ b/migration/ram.h
+@@ -45,6 +45,7 @@ int multifd_save_setup(void);
+ int multifd_save_cleanup(Error **errp);
+ int multifd_load_setup(void);
+ int multifd_load_cleanup(Error **errp);
++bool multifd_recv_all_channels_created(void);
+ void multifd_recv_new_channel(QIOChannel *ioc);
 =20
- void tcp_start_outgoing_migration(MigrationState *s, const char *host_po=
-rt,
+ uint64_t ram_pagesize_summary(void);
 --=20
 2.17.0
