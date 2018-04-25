@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fB9Hc-0002dt-16
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 21:31:44 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fB9Lf-00053T-LY
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 21:35:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fB9HX-0003ql-43
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 21:31:44 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:34942)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fB9HW-0003ps-V8
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 21:31:39 -0400
-Received: by mail-qk0-x243.google.com with SMTP id b131so17063961qkg.2
-	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 18:31:38 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180425012300.14698-1-richard.henderson@linaro.org>
-	<20180425012300.14698-6-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a361df8b-953e-bb2f-75d8-8729f3e27eb7@amsat.org>
-Date: Tue, 24 Apr 2018 22:31:34 -0300
+	(envelope-from <no-reply@patchew.org>) id 1fB9Lc-0005qe-Hv
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 21:35:55 -0400
+Resent-Message-Id: <E1fB9Lc-0005qe-Hv@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21087)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fB9Lc-0005nx-8N
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 21:35:52 -0400
+In-Reply-To: <20180425012300.14698-1-richard.henderson@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152462012339.2265.3421078223281547945@71c20359a636>
 MIME-Version: 1.0
-In-Reply-To: <20180425012300.14698-6-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 5/9] target/arm: Implement FMOV (general)
- for fp16
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 24 Apr 2018 18:35:24 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/9] target/arm: Fixups for
+ ARM_FEATURE_V8_FP16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,70 +29,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
+To: richard.henderson@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, alex.bennee@linaro.org
 
-Hi Richard,
-
-On 04/24/2018 10:22 PM, Richard Henderson wrote:
-> Adding the fp16 moves to/from general registers.
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/translate-a64.c | 22 +++++++++++++++++++++-
->  1 file changed, 21 insertions(+), 1 deletion(-)
-> 
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index f2241d8174..36bb5f6f08 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -5375,6 +5375,15 @@ static void handle_fmov(DisasContext *s, int rd, int rn, int type, bool itof)
->              tcg_gen_st_i64(tcg_rn, cpu_env, fp_reg_hi_offset(s, rd));
->              clear_vec_high(s, true, rd);
->              break;
-> +        case 3:
-> +            /* 16 bit */
-> +            tmp = tcg_temp_new_i64();
-> +            tcg_gen_ext16u_i64(tmp, tcg_rn);
-> +            write_fp_dreg(s, rd, tmp);
-> +            tcg_temp_free_i64(tmp);
-> +            break;
-> +        default:
-> +            g_assert_not_reached();
->          }
->      } else {
->          TCGv_i64 tcg_rd = cpu_reg(s, rd);
-> @@ -5392,6 +5401,12 @@ static void handle_fmov(DisasContext *s, int rd, int rn, int type, bool itof)
->              /* 64 bits from top half */
->              tcg_gen_ld_i64(tcg_rd, cpu_env, fp_reg_hi_offset(s, rn));
->              break;
-> +        case 3:
-> +            /* 16 bit */
-> +            tcg_gen_ld16u_i64(tcg_rd, cpu_env, fp_reg_offset(s, rn, MO_16));
-> +            break;
-> +        default:
-> +            g_assert_not_reached();
->          }
->      }
->  }
-> @@ -5431,10 +5446,15 @@ static void disas_fp_int_conv(DisasContext *s, uint32_t insn)
->          case 0xa: /* 64 bit */
->          case 0xd: /* 64 bit to top half of quad */
->              break;
-> +        case 0x6: /* 16-bit */
-> +            if (arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
-> +                break;
-> +            }
-> +            /* fallthru */
->          default:
->              /* all other sf/type/rmode combinations are invalid */
->              unallocated_encoding(s);
-> -            break;
-> +            return;
-
-Agreed with this change, however shouldn't this be in a separate patch?
-
->          }
->  
->          if (!fp_access_check(s)) {
-> 
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNDI1MDEyMzAwLjE0Njk4LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
+Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvOV0gdGFyZ2V0L2FybTogRml4dXBz
+IGZvciBBUk1fRkVBVFVSRV9WOF9GUDE2Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
+bi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8
+IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
+cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
+ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
+IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
+bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
+CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
+PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9t
+IGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0g
+ICAgICAgICAgICBwYXRjaGV3LzE1MTMxNjAyNzItMTU5MjEtMS1naXQtc2VuZC1lbWFpbC1jaHJp
+c3RpYW4uZWhyaGFyZHRAY2Fub25pY2FsLmNvbSAtPiBwYXRjaGV3LzE1MTMxNjAyNzItMTU5MjEt
+MS1naXQtc2VuZC1lbWFpbC1jaHJpc3RpYW4uZWhyaGFyZHRAY2Fub25pY2FsLmNvbQogdCBbdGFn
+IHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTgwNDI0MTUyNDA1LjEwMzA0LTEtYWxleC5i
+ZW5uZWVAbGluYXJvLm9yZyAtPiBwYXRjaGV3LzIwMTgwNDI0MTUyNDA1LjEwMzA0LTEtYWxleC5i
+ZW5uZWVAbGluYXJvLm9yZwogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTgw
+NDI0MTYwMzI5LjgwODktMS1hbGV4LmJlbm5lZUBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxODA0
+MjQxNjAzMjkuODA4OS0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcKIHQgW3RhZyB1cGRhdGVdICAg
+ICAgICAgICAgcGF0Y2hldy8yMDE4MDQyNDIxNDU1MC4zMjU0OS0xLWxlcnNla0ByZWRoYXQuY29t
+IC0+IHBhdGNoZXcvMjAxODA0MjQyMTQ1NTAuMzI1NDktMS1sZXJzZWtAcmVkaGF0LmNvbQogdCBb
+dGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTgwNDI0MjIyMTAzLjE5OTQ2LTEtZjRi
+dWdAYW1zYXQub3JnIC0+IHBhdGNoZXcvMjAxODA0MjQyMjIxMDMuMTk5NDYtMS1mNGJ1Z0BhbXNh
+dC5vcmcKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDQyNTAxMjMwMC4x
+NDY5OC0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE4MDQyNTAx
+MjMwMC4xNDY5OC0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcKU3dpdGNoZWQgdG8gYSBu
+ZXcgYnJhbmNoICd0ZXN0Jwo4NGVmYzVjM2IxIHRhcmdldC9hcm06IEltcGxlbWVudCBGUCBkYXRh
+LXByb2Nlc3NpbmcgKDMgc291cmNlKSBmb3IgZnAxNgoxMDU3NDY3MGQ5IHRhcmdldC9hcm06IElt
+cGxlbWVudCBGUCBkYXRhLXByb2Nlc3NpbmcgKDIgc291cmNlKSBmb3IgZnAxNgoyZDRlMTg3ODY5
+IHRhcmdldC9hcm06IEltcGxlbWVudCBGQ1ZUIChzY2FsYXIsIGZpeGVkLXBvaW50KSBmb3IgZnAx
+NgplYzM1MDA2NWU0IHRhcmdldC9hcm06IEltcGxlbWVudCBGQ1ZUIChzY2FsYXIsIGludGVnZXIp
+IGZvciBmcDE2CmQxNTdhYWE1ODkgdGFyZ2V0L2FybTogSW1wbGVtZW50IEZNT1YgKGdlbmVyYWwp
+IGZvciBmcDE2CjdlZWI3ODE3OWYgdGFyZ2V0L2FybTogQ2xlYXIgU1ZFIGhpZ2ggYml0cyBmb3Ig
+Rk1PVgphN2ZlZDVkOGE2IHRhcmdldC9hcm06IEZpeCBmbG9hdDE2IHRvL2Zyb20gaW50MTYKNzIy
+MzkxMzNhMCB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgdmVjdG9yIHNoaWZ0ZWQgRkNWVCBmb3IgZnAx
+Ngo1Y2I0ZmYyOTk2IHRhcmdldC9hcm06IEltcGxlbWVudCB2ZWN0b3Igc2hpZnRlZCBTQ1ZGL1VD
+VkYgZm9yIGZwMTYKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvOTogdGFy
+Z2V0L2FybTogSW1wbGVtZW50IHZlY3RvciBzaGlmdGVkIFNDVkYvVUNWRiBmb3IgZnAxNi4uLgpD
+aGVja2luZyBQQVRDSCAyLzk6IHRhcmdldC9hcm06IEltcGxlbWVudCB2ZWN0b3Igc2hpZnRlZCBG
+Q1ZUIGZvciBmcDE2Li4uCkNoZWNraW5nIFBBVENIIDMvOTogdGFyZ2V0L2FybTogRml4IGZsb2F0
+MTYgdG8vZnJvbSBpbnQxNi4uLgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcq
+JyAoY3R4Old4VikKIzQwOiBGSUxFOiB0YXJnZXQvYXJtL2hlbHBlci5jOjExNDIzOgorc3RhdGlj
+IGZsb2F0MTYgZG9fcG9zdHNjYWxlX2ZwMTYoZmxvYXQ2NCBmLCBpbnQgc2hpZnQsIGZsb2F0X3N0
+YXR1cyAqZnBzdCkKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA4
+MyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
+dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
+dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpD
+aGVja2luZyBQQVRDSCA0Lzk6IHRhcmdldC9hcm06IENsZWFyIFNWRSBoaWdoIGJpdHMgZm9yIEZN
+T1YuLi4KQ2hlY2tpbmcgUEFUQ0ggNS85OiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgRk1PViAoZ2Vu
+ZXJhbCkgZm9yIGZwMTYuLi4KQ2hlY2tpbmcgUEFUQ0ggNi85OiB0YXJnZXQvYXJtOiBJbXBsZW1l
+bnQgRkNWVCAoc2NhbGFyLCBpbnRlZ2VyKSBmb3IgZnAxNi4uLgpDaGVja2luZyBQQVRDSCA3Lzk6
+IHRhcmdldC9hcm06IEltcGxlbWVudCBGQ1ZUIChzY2FsYXIsIGZpeGVkLXBvaW50KSBmb3IgZnAx
+Ni4uLgpDaGVja2luZyBQQVRDSCA4Lzk6IHRhcmdldC9hcm06IEltcGxlbWVudCBGUCBkYXRhLXBy
+b2Nlc3NpbmcgKDIgc291cmNlKSBmb3IgZnAxNi4uLgpDaGVja2luZyBQQVRDSCA5Lzk6IHRhcmdl
+dC9hcm06IEltcGxlbWVudCBGUCBkYXRhLXByb2Nlc3NpbmcgKDMgc291cmNlKSBmb3IgZnAxNi4u
+Lgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoK
+LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRj
+aGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVk
+aGF0LmNvbQ==
