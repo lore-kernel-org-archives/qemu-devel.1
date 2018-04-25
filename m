@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35966)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBLeM-0006dM-Vv
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:44:03 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fBLeP-0006g7-FP
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:44:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBLeJ-00034j-Rp
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:44:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56928 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fBLeJ-00034J-Mi
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:43:59 -0400
-References: <20180420145249.32435-1-peter.maydell@linaro.org>
-	<20180420145249.32435-7-peter.maydell@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <9805c915-6209-593e-9a27-c8596a232874@redhat.com>
+	(envelope-from <eric.auger@redhat.com>) id 1fBLeO-00038U-Bo
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:44:05 -0400
+References: <1523518688-26674-1-git-send-email-eric.auger@redhat.com>
+	<1523518688-26674-12-git-send-email-eric.auger@redhat.com>
+	<CAFEAcA_hgGFmUmg2S7bb5nYeEh1z0kBNWrSud0_TMbkUcf7uxg@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <fff557f8-599b-9a30-4259-9e6f4f88718f@redhat.com>
 Date: Wed, 25 Apr 2018 16:43:56 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180420145249.32435-7-peter.maydell@linaro.org>
+In-Reply-To: <CAFEAcA_hgGFmUmg2S7bb5nYeEh1z0kBNWrSud0_TMbkUcf7uxg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 06/13] vl.c: Provide accessor function
- serial_hd() for serial_hds[] array
+Subject: Re: [Qemu-devel] [PATCH v11 11/17] target/arm/kvm: Translate the
+ MSI doorbell in kvm_arch_fixup_msi_route
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +25,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, patches@linaro.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christoffer Dall <cdall@kernel.org>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, linuc.decode@gmail.com, Peter Xu <peterx@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
 
-On 20.04.2018 16:52, Peter Maydell wrote:
-> Provide an accessor function serial_hd() to return the Chardev
-> (if any) associated with the numbered serial port. This will
-> be used to replace direct accesses to the serial_hds[] array,
-> so that calling code doesn't need to care about the size of
-> that array.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  include/sysemu/sysemu.h | 3 +++
->  vl.c                    | 9 +++++++++
->  2 files changed, 12 insertions(+)
-> 
-> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> index 2b42151c63..bd5b55c514 100644
-> --- a/include/sysemu/sysemu.h
-> +++ b/include/sysemu/sysemu.h
-> @@ -163,6 +163,9 @@ void hmp_pcie_aer_inject_error(Monitor *mon, const QDict *qdict);
->  
->  extern Chardev *serial_hds[MAX_SERIAL_PORTS];
->  
-> +/* Return the Chardev for serial port i, or NULL if none */
-> +Chardev *serial_hd(int i);
-> +
->  /* parallel ports */
->  
->  #define MAX_PARALLEL_PORTS 3
-> diff --git a/vl.c b/vl.c
-> index fce1fd12d8..6daf026da6 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2516,6 +2516,15 @@ static int serial_parse(const char *devname)
->      return 0;
->  }
->  
-> +Chardev *serial_hd(int i)
-> +{
-> +    assert(i >= 0);
-> +    if (i < ARRAY_SIZE(serial_hds)) {
-> +        return serial_hds[i];
-> +    }
-> +    return NULL;
-> +}
-> +
->  static int parallel_parse(const char *devname)
->  {
->      static int index = 0;
-> 
+Hi Peter,
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+On 04/17/2018 01:02 PM, Peter Maydell wrote:
+> On 12 April 2018 at 08:38, Eric Auger <eric.auger@redhat.com> wrote:
+>> In case the MSI is translated by an IOMMU we need to fixup the
+>> MSI route with the translated address.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Signed-off-by: Bharat Bhushan <Bharat.Bhushan@nxp.com>
+>>
+>> ---
+>> v9 -> v10:
+>> - use address_space_translate
+>>
+>> v5 -> v6:
+>> - use IOMMUMemoryRegionClass API
+>> ---
+>>  target/arm/kvm.c        | 27 +++++++++++++++++++++++++++
+>>  target/arm/trace-events |  3 +++
+>>  2 files changed, 30 insertions(+)
+>>
+>> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+>> index ecc39ac..c6f6aa8 100644
+>> --- a/target/arm/kvm.c
+>> +++ b/target/arm/kvm.c
+>> @@ -20,8 +20,10 @@
+>>  #include "sysemu/kvm.h"
+>>  #include "kvm_arm.h"
+>>  #include "cpu.h"
+>> +#include "trace.h"
+>>  #include "internals.h"
+>>  #include "hw/arm/arm.h"
+>> +#include "hw/pci/pci.h"
+>>  #include "exec/memattrs.h"
+>>  #include "exec/address-spaces.h"
+>>  #include "hw/boards.h"
+>> @@ -649,6 +651,31 @@ int kvm_arm_vgic_probe(void)
+>>  int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
+>>                               uint64_t address, uint32_t data, PCIDevice *dev)
+>>  {
+>> +    AddressSpace *as = pci_device_iommu_address_space(dev);
+>> +    hwaddr xlat, len, doorbell_gpa;
+>> +    MemoryRegionSection mrs;
+>> +    MemoryRegion *mr;
+>> +
+>> +    if (as == &address_space_memory) {
+>> +        return 0;
+>> +    }
+>> +
+>> +    /* MSI doorbell address is translated by an IOMMU */
+>> +
+>> +    rcu_read_lock();
+>> +    mr = address_space_translate(as, address, &xlat, &len, true);
+>> +    if (!mr) {
+>> +        return 1;
+> 
+> This early-return code path fails to release the rcu_read_lock.
+ough, fixed.
+> 
+>> +    }
+>> +    mrs = memory_region_find(mr, xlat, 0);
+> 
+> Is it really valid to pass a size of 0 to memory_region_find() ?
+> We should probably use however big the doorbell write is.
+Using size=1 as most of the callers do.
+> 
+> Do we need to do something here to handle the case where
+> memory_region_find() doesn't find a a region, or does that
+> just work automatically?
+Added a check on mrs.mr.
+
+Also released the ref on mrs.mr after usage.
+
+Thanks
+
+Eric
+> 
+>> +    doorbell_gpa = mrs.offset_within_address_space;
+>> +    rcu_read_unlock();
+>> +
+>> +    route->u.msi.address_lo = doorbell_gpa;
+>> +    route->u.msi.address_hi = doorbell_gpa >> 32;
+>> +
+>> +    trace_kvm_arm_fixup_msi_route(address, doorbell_gpa);
+>> +
+>>      return 0;
+>>  }
+>>
+>> diff --git a/target/arm/trace-events b/target/arm/trace-events
+>> index 9e37131..6b759f9 100644
+>> --- a/target/arm/trace-events
+>> +++ b/target/arm/trace-events
+>> @@ -8,3 +8,6 @@ arm_gt_tval_write(int timer, uint64_t value) "gt_tval_write: timer %d value 0x%"
+>>  arm_gt_ctl_write(int timer, uint64_t value) "gt_ctl_write: timer %d value 0x%" PRIx64
+>>  arm_gt_imask_toggle(int timer, int irqstate) "gt_ctl_write: timer %d IMASK toggle, new irqstate %d"
+>>  arm_gt_cntvoff_write(uint64_t value) "gt_cntvoff_write: value 0x%" PRIx64
+>> +
+>> +# target/arm/kvm.c
+>> +kvm_arm_fixup_msi_route(uint64_t iova, uint64_t gpa) "MSI iova = 0x%"PRIx64" is translated into 0x%"PRIx64
+>> --
+>> 2.5.5
+> 
+> thanks
+> -- PMM
+> 
