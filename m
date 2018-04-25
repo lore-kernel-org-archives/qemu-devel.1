@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1fBMKg-0001sM-23
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:27:47 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fBMOw-0005hu-G8
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:32:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1fBMKc-0007gB-QT
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:27:46 -0400
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:45473)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1fBMKc-0007f5-IU
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:27:42 -0400
-Received: by mail-pf0-x242.google.com with SMTP id l27so15517474pfk.12
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 08:27:42 -0700 (PDT)
-Sender: Corey Minyard <tcminyard@gmail.com>
-From: minyard@acm.org
-Date: Wed, 25 Apr 2018 10:27:31 -0500
-Message-Id: <1524670052-28373-3-git-send-email-minyard@acm.org>
-In-Reply-To: <1524670052-28373-1-git-send-email-minyard@acm.org>
-References: <1524670052-28373-1-git-send-email-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH v3 2/3] ipmi: Use proper struct reference for
- KCS vmstate
+	(envelope-from <imammedo@redhat.com>) id 1fBMOo-00007i-MC
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:32:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59546 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fBMOo-00006S-FU
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:32:02 -0400
+Date: Wed, 25 Apr 2018 17:31:52 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180425173152.4c2c1c4f@redhat.com>
+In-Reply-To: <20180425165847-mutt-send-email-mst@kernel.org>
+References: <1524524398-41342-1-git-send-email-mst@redhat.com>
+	<CF6A88132359CE47947DB4C6E1709ED53973A729@ORSMSX110.amr.corp.intel.com>
+	<20180424035504-mutt-send-email-mst@kernel.org>
+	<20180424095722.76105b40@redhat.com>
+	<20180424201554-mutt-send-email-mst@kernel.org>
+	<CF6A88132359CE47947DB4C6E1709ED53973A87A@ORSMSX110.amr.corp.intel.com>
+	<20180424210040-mutt-send-email-mst@kernel.org>
+	<20180425154938.78deea44@redhat.com>
+	<20180425165847-mutt-send-email-mst@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] acpi/nvdimm: remove forward name references
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,137 +34,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
-Cc: Corey Minyard <cminyard@mvista.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "Schmauss, Erik" <erik.schmauss@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Williams, Dan J" <dan.j.williams@intel.com>
 
-From: Corey Minyard <cminyard@mvista.com>
+On Wed, 25 Apr 2018 17:17:04 +0300
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-The vmstate for isa_ipmi_kcs was referencing into the kcs structure,
-instead create a kcs structure separate and use that.
+> On Wed, Apr 25, 2018 at 03:49:38PM +0200, Igor Mammedov wrote:
+> > On Tue, 24 Apr 2018 21:06:37 +0300
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >   
+> > > On Tue, Apr 24, 2018 at 05:47:58PM +0000, Schmauss, Erik wrote:  
+> > > > 
+> > > >     
+> > > > > -----Original Message-----
+> > > > > From: Michael S. Tsirkin [mailto:mst@redhat.com]
+> > > > > Sent: Tuesday, April 24, 2018 10:43 AM
+> > > > > To: Igor Mammedov <imammedo@redhat.com>
+> > > > > Cc: Schmauss, Erik <erik.schmauss@intel.com>; qemu-devel@nongnu.org; Xiao
+> > > > > Guangrong <xiaoguangrong.eric@gmail.com>; Williams, Dan J
+> > > > > <dan.j.williams@intel.com>
+> > > > > Subject: Re: [PATCH] acpi/nvdimm: remove forward name references
+> > > > > 
+> > > > > On Tue, Apr 24, 2018 at 09:57:22AM +0200, Igor Mammedov wrote:    
+> > > > > > On Tue, 24 Apr 2018 04:02:40 +0300
+> > > > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > > > > 
+[...]
+> > > > > > From spec
+> > > > > >  DefOpRegion := OpRegionOp NameString RegionSpace RegionOffset
+> > > > > > RegionLen  RegionOffset := TermArg => Integer  TermArg := Type2Opcode
+> > > > > > | DataObject | ArgObj | LocalObj
+> > > > > >
+> > > > > > So named object is not accepted,    
+> > > > > 
+> > > > > might be worth checking what happens with actual OSPMs.
+> > > > > If it does happen to work, we can try tweaking the ACPI spec to allow this.    
+> > > > 
+> > > > I'm looking at the ACPI6.2a spec on page 840 and it says
+> > > > TermArg := Type2Opcode | DataObject | Argterm |LocalTerm |NameString |SymbolicExpression    
+> > > 
+> > > Oh right, that's there since ACPI 6.0.  
+> > Strange, I've rechecked AML definition of TermArg in 6.0 and 6.2a
+> > and it still says only
+> > 
+> >   TermArg := Type2Opcode | DataObject | ArgObj | LocalObj
+> > 
+> > For 6.2a, I'm looking at chapter "20.2.5 Term Objects Encoding"
+> > where exactly do you guys see that longer variant?  
+> 
+> Oh interesting. That's in
+> 19.2.3 ASL Root and Secondary Terms
+> 
+> How come it's not the same?
+bugs are everywhere, see "20.2.5 Term Objects Encoding"
 
-There were also some issues in the state transfer.  The inlen field
-was not being transferred, so if a transaction was in process during
-the transfer it would be messed up.  And the use_irq field was
-transferred, but that should come from the configuration.
-
-To fix this, the new VMS_VSTRUCT macros are used so the exact
-version of the structure can be specified, depending on what
-version was being received.  So an upgrade should work for KCS.
-
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- hw/ipmi/isa_ipmi_kcs.c | 81 ++++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 66 insertions(+), 15 deletions(-)
-
-diff --git a/hw/ipmi/isa_ipmi_kcs.c b/hw/ipmi/isa_ipmi_kcs.c
-index 689587b..a794315 100644
---- a/hw/ipmi/isa_ipmi_kcs.c
-+++ b/hw/ipmi/isa_ipmi_kcs.c
-@@ -22,6 +22,7 @@
-  * THE SOFTWARE.
-  */
- #include "qemu/osdep.h"
-+#include "qemu/log.h"
- #include "qapi/error.h"
- #include "hw/hw.h"
- #include "hw/ipmi/ipmi.h"
-@@ -422,24 +423,69 @@ static void ipmi_isa_realize(DeviceState *dev, Error **errp)
-     isa_register_ioport(isadev, &iik->kcs.io, iik->kcs.io_base);
- }
- 
--const VMStateDescription vmstate_ISAIPMIKCSDevice = {
-+static int ipmi_kcs_vmstate_post_load(void *opaque, int version)
-+{
-+    IPMIKCS *ik = opaque;
-+
-+    /* Make sure all the values are sane. */
-+    if (ik->outpos >= MAX_IPMI_MSG_SIZE || ik->outlen >= MAX_IPMI_MSG_SIZE ||
-+        ik->outpos >= ik->outlen) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "ipmi:kcs: vmstate transfer received bad out values: %d %d\n",
-+                      ik->outpos, ik->outlen);
-+        ik->outpos = 0;
-+        ik->outlen = 0;
-+    }
-+
-+    if (ik->inlen >= MAX_IPMI_MSG_SIZE) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "ipmi:kcs: vmstate transfer received bad in value: %d\n",
-+                      ik->inlen);
-+        ik->inlen = 0;
-+    }
-+
-+    return 0;
-+}
-+
-+static bool vmstate_kcs_before_version2(void *opaque, int version)
-+{
-+    return version <= 1;
-+}
-+
-+static const VMStateDescription vmstate_IPMIKCS = {
-+    .name = TYPE_IPMI_INTERFACE_PREFIX "kcs",
-+    .version_id = 2,
-+    .minimum_version_id = 1,
-+    .post_load = ipmi_kcs_vmstate_post_load,
-+    .fields      = (VMStateField[]) {
-+        VMSTATE_BOOL(obf_irq_set, IPMIKCS),
-+        VMSTATE_BOOL(atn_irq_set, IPMIKCS),
-+        VMSTATE_UNUSED_TEST(vmstate_kcs_before_version2, 1), /* Was use_irq */
-+        VMSTATE_BOOL(irqs_enabled, IPMIKCS),
-+        VMSTATE_UINT32(outpos, IPMIKCS),
-+        VMSTATE_UINT32_V(outlen, IPMIKCS, 2),
-+        VMSTATE_UINT8_ARRAY(outmsg, IPMIKCS, MAX_IPMI_MSG_SIZE),
-+        VMSTATE_UINT32_V(inlen, IPMIKCS, 2),
-+        VMSTATE_UINT8_ARRAY(inmsg, IPMIKCS, MAX_IPMI_MSG_SIZE),
-+        VMSTATE_BOOL(write_end, IPMIKCS),
-+        VMSTATE_UINT8(status_reg, IPMIKCS),
-+        VMSTATE_UINT8(data_out_reg, IPMIKCS),
-+        VMSTATE_INT16(data_in_reg, IPMIKCS),
-+        VMSTATE_INT16(cmd_reg, IPMIKCS),
-+        VMSTATE_UINT8(waiting_rsp, IPMIKCS),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static const VMStateDescription vmstate_ISAIPMIKCSDevice = {
-     .name = TYPE_IPMI_INTERFACE,
--    .version_id = 1,
-+    .version_id = 2,
-     .minimum_version_id = 1,
-     .fields      = (VMStateField[]) {
--        VMSTATE_BOOL(kcs.obf_irq_set, ISAIPMIKCSDevice),
--        VMSTATE_BOOL(kcs.atn_irq_set, ISAIPMIKCSDevice),
--        VMSTATE_BOOL(kcs.use_irq, ISAIPMIKCSDevice),
--        VMSTATE_BOOL(kcs.irqs_enabled, ISAIPMIKCSDevice),
--        VMSTATE_UINT32(kcs.outpos, ISAIPMIKCSDevice),
--        VMSTATE_UINT8_ARRAY(kcs.outmsg, ISAIPMIKCSDevice, MAX_IPMI_MSG_SIZE),
--        VMSTATE_UINT8_ARRAY(kcs.inmsg, ISAIPMIKCSDevice, MAX_IPMI_MSG_SIZE),
--        VMSTATE_BOOL(kcs.write_end, ISAIPMIKCSDevice),
--        VMSTATE_UINT8(kcs.status_reg, ISAIPMIKCSDevice),
--        VMSTATE_UINT8(kcs.data_out_reg, ISAIPMIKCSDevice),
--        VMSTATE_INT16(kcs.data_in_reg, ISAIPMIKCSDevice),
--        VMSTATE_INT16(kcs.cmd_reg, ISAIPMIKCSDevice),
--        VMSTATE_UINT8(kcs.waiting_rsp, ISAIPMIKCSDevice),
-+        VMSTATE_VSTRUCT_TEST(kcs, ISAIPMIKCSDevice, vmstate_kcs_before_version2,
-+                             0, vmstate_IPMIKCS, IPMIKCS, 1),
-+        VMSTATE_VSTRUCT_V(kcs, ISAIPMIKCSDevice, 2, vmstate_IPMIKCS,
-+                          IPMIKCS, 2),
-         VMSTATE_END_OF_LIST()
-     }
- };
-@@ -450,6 +496,11 @@ static void isa_ipmi_kcs_init(Object *obj)
- 
-     ipmi_bmc_find_and_link(obj, (Object **) &iik->kcs.bmc);
- 
-+    /*
-+     * Version 1 had an incorrect name, it clashed with the BT
-+     * IPMI device, so receive it, but transmit a different
-+     * version.
-+     */
-     vmstate_register(NULL, 0, &vmstate_ISAIPMIKCSDevice, iik);
- }
- 
--- 
-2.7.4
+> 
+> >   
+> > > As usual, the issue is that
+> > > we can't easily check what does OSPM support.
+> > > This is really something worth fixing in the spec IMHO.
+> > > We could just try and test a bunch of guest OSPMs and if
+> > > they happen to work, switch to that. Lots of work for
+> > > uncertain benefit.  
+> > I think some windows versions weren't happy with it when
+> > we were trying to use dynamic operation regions with offset
+> > as namestring.  
+> 
+> 
+> Good to know, thanks.
+I'll try to retest MS VMs I have here, to see which one breaks.
