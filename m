@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fBMQj-0006sH-Ay
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:34:02 -0400
+	(envelope-from <thuth@redhat.com>) id 1fBMTL-0008Or-Eu
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:36:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fBMQg-0004t3-22
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:34:01 -0400
-Resent-Message-Id: <E1fBMQg-0004t3-22@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21008)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fBMQf-0004qZ-Q5
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:33:58 -0400
-In-Reply-To: <1524670052-28373-1-git-send-email-minyard@acm.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152467041860.2283.5349283769730551502@71c20359a636>
+	(envelope-from <thuth@redhat.com>) id 1fBMTI-0007U9-S7
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:36:43 -0400
+References: <1524647323-6449-1-git-send-email-thuth@redhat.com>
+	<1524647323-6449-3-git-send-email-thuth@redhat.com>
+	<60dc9968-58fd-46e3-b471-7a0b7093ba15@de.ibm.com>
+	<775de9f5-7da0-45fa-da32-edceac7cf258@redhat.com>
+	<24876878-e365-604e-348c-f649568e167f@de.ibm.com>
+	<7ed61a09-c00c-acf0-f504-f6feb8d55950@de.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6930de56-f73d-d466-110d-87ecdc74836d@redhat.com>
+Date: Wed, 25 Apr 2018 17:36:36 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 25 Apr 2018 08:33:39 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] ipmi: Fix vmstate transfer
+In-Reply-To: <7ed61a09-c00c-acf0-f504-f6feb8d55950@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] pc-bios/s390-ccw/net: Use diag308
+ to reset machine before jumping to the OS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +29,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: minyard@acm.org
-Cc: famz@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Farhan Ali <alifm@linux.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MjQ2NzAwNTItMjgzNzMtMS1naXQtc2VuZC1lbWFpbC1taW55YXJkQGFjbS5v
-cmcKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MyAwLzNdIGlwbWk6IEZpeCB2bXN0YXRl
-IHRyYW5zZmVyCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJh
-c2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9
-MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhp
-c3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4u
-KSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90
-YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cg
-JGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07
-IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkp
-CmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
-Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHVi
-LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRj
-aGV3LzE1MjQ2NzAwNTItMjgzNzMtMS1naXQtc2VuZC1lbWFpbC1taW55YXJkQGFjbS5vcmcgLT4g
-cGF0Y2hldy8xNTI0NjcwMDUyLTI4MzczLTEtZ2l0LXNlbmQtZW1haWwtbWlueWFyZEBhY20ub3Jn
-CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxODA0MjAxNDUyNDkuMzI0MzUt
-MS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE4MDQyMDE0NTI0OS4zMjQz
-NS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBw
-YXRjaGV3LzIwMTgwNDIzMjIzMzM3LjgyMzY2LTEtZWJsYWtlQHJlZGhhdC5jb20gLT4gcGF0Y2hl
-dy8yMDE4MDQyMzIyMzMzNy44MjM2Ni0xLWVibGFrZUByZWRoYXQuY29tCkF1dG8gcGFja2luZyB0
-aGUgcmVwb3NpdG9yeSBpbiBiYWNrZ3JvdW5kIGZvciBvcHRpbXVtIHBlcmZvcm1hbmNlLgpTZWUg
-ImdpdCBoZWxwIGdjIiBmb3IgbWFudWFsIGhvdXNla2VlcGluZy4KU3dpdGNoZWQgdG8gYSBuZXcg
-YnJhbmNoICd0ZXN0Jwo3ODI4NTkwOTBjIGlwbWk6IFVzZSBwcm9wZXIgc3RydWN0IHJlZmVyZW5j
-ZSBmb3IgQlQgdm1zdGF0ZQo0MzI0ZmFlOGMzIGlwbWk6IFVzZSBwcm9wZXIgc3RydWN0IHJlZmVy
-ZW5jZSBmb3IgS0NTIHZtc3RhdGUKYTcyNDYyYjE3NiB2bXN0YXRlOiBBZGQgYSBWU1RSVUNUIHR5
-cGUKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMzogdm1zdGF0ZTogQWRk
-IGEgVlNUUlVDVCB0eXBlLi4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNjc6IEZJ
-TEU6IGluY2x1ZGUvbWlncmF0aW9uL3Ztc3RhdGUuaDo0MjM6CisjZGVmaW5lIFZNU1RBVEVfVlNU
-UlVDVF9URVNUKF9maWVsZCwgX3N0YXRlLCBfdGVzdCwgX3ZlcnNpb24sIF92bXNkLCBfdHlwZSwg
-X3N0cnVjdF92ZXJzaW9uKSB7IFwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM4
-ODogRklMRTogaW5jbHVkZS9taWdyYXRpb24vdm1zdGF0ZS5oOjc1NDoKKyNkZWZpbmUgVk1TVEFU
-RV9WU1RSVUNUX1YoX2ZpZWxkLCBfc3RhdGUsIF92ZXJzaW9uLCBfdm1zZCwgX3R5cGUsIF9zdHJ1
-Y3RfdmVyc2lvbikgXAoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNDAgbGluZXMgY2hl
-Y2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
-bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFU
-Q0ggMi8zOiBpcG1pOiBVc2UgcHJvcGVyIHN0cnVjdCByZWZlcmVuY2UgZm9yIEtDUyB2bXN0YXRl
-Li4uCkNoZWNraW5nIFBBVENIIDMvMzogaXBtaTogVXNlIHByb3BlciBzdHJ1Y3QgcmVmZXJlbmNl
-IGZvciBCVCB2bXN0YXRlLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
-ZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
-Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
-cGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 25.04.2018 14:44, Christian Borntraeger wrote:
+> 
+> 
+> On 04/25/2018 02:41 PM, Christian Borntraeger wrote:
+>> You load from address 0. 
+>>
+>> On 04/25/2018 02:34 PM, Thomas Huth wrote:
+>>> On 25.04.2018 14:18, Christian Borntraeger wrote:
+>>>>
+>>>> On 04/25/2018 11:08 AM, Thomas Huth wrote:
+>>>>
+>>>>> --- a/pc-bios/s390-ccw/netmain.c
+>>>>> +++ b/pc-bios/s390-ccw/netmain.c
+>>>>> @@ -283,6 +283,15 @@ void panic(const char *string)
+>>>>>      }
+>>>>>  }
+>>>>>  
+>>>>> +void write_subsystem_identification(void)
+>>>>> +{
+>>>>> +    uint32_t *schid = (uint32_t *) 184;
+>>>>> +    uint32_t *zeroes = (uint32_t *) 188;
+>>>>> +
+>>>>> +    *schid = 0;         /* We must not set this for virtio-net */
+>>>>> +    *zeroes = 0;
+>>>>> +}
+>>>>> +
+>>>>
+>>>> I think we actually want to have the CCW devno of that network device
+>>>> stored. It has some value to know which CCW device we bootet from, no?
+>>>
+>>> Actually, I tried that first (and it took quite some time to debug it),
+>>> but the Linux kernel then bails out quite early, without any error
+>>> message. The trace looks like this:
+>>>
+>>> 0x0000000007801802:  diag	%r1,%r1,776
+>>> 0x0000000007801780:  larl	%r2,0x7831004
+>>> 0x0000000007801786:  llgf	%r1,8
+>>> 0x000000000780178c:  mvc	0(12,%r0),0(%r2)
+>>> 0x0000000007801792:  br	%r1
+>>> 0x0000000000000418:  bas	%r14,512
+>>> 0x0000000000000200:  mvi	163,1
+>>> 0x0000000000000204:  slr	%r0,%r0
+>>> 0x0000000000000206:  lhi	%r1,2
+>>> 0x000000000000020a:  sigp	%r1,%r0,18
+>>> 0x000000000000020e:  bras	%r13,0x252
+>>> 0x0000000000000252:  lmh	%r0,%r15,0(%r13)
+>>> 0x0000000000000258:  sam31
+>>> 0x000000000000025a:  br	%r14
+>>> 0x000000000000041c:  lh	%r1,184
+>>> 0x0000000000000420:  bct	%r1,1322
+>>> 0x0000000000000424:  l	%r1,184
+>>> 0x0000000000000428:  la	%r2,1840
+>>> 0x000000000000042c:  bas	%r14,640
+>>> 0x0000000000000280:  la	%r4,0(%r14)
+>>> 0x0000000000000284:  la	%r3,792
+>>> 0x0000000000000288:  la	%r5,804
+>>> 0x000000000000028c:  la	%r6,888
+>>> 0x0000000000000290:  la	%r7,20
+>>> 0x0000000000000294:  st	%r2,4(%r6)
+>>> 0x0000000000000298:  la	%r2,80(%r2)
+>>> 0x000000000000029c:  la	%r6,8(%r6)
+>>> 0x00000000000002a0:  bct	%r7,660
+>>> 0x00000000000002a4:  lctl	%c6,%c6,868
+>>> 0x00000000000002a8:  slr	%r2,%r2
+>>> 0x00000000000002aa:  ssch	0(%r3)
+>>> 0x00000000000002ae:  bne	786
+>>> 0x0000000000000312:  lpsw	880
+>>> Guest crashed on cpu 0: disabled-wait
+>>> PSW: 0x000a000000000000 0x0000000000000000
+>>>
+>>> That's the Lloader function in arch/s390/kernel/head.S which is failing
+>>> here, so seems like Linux tries to load from a block device in case
+>>> there is a value in 184. Thus I assume that 184 has to contain 0 in this
+>>> case.
+>>
+>> Hmm, I think this is because we jump to 418 for your kernel (which is the loader
+>> that tries to bootstrap the ccw ipl). When you look at ipl.c we override that
+>> and jump to 0x10000 instead for linux (which is also hackish) for image files.
+>> So I guess if we would do a psw restart instead (like you do) on a kernel image
+>> the normal ipl would also fail....
+> 
+> FWIW, zipl also loads linux kernels from 0x10000
+
+OK, I just checked, and indeed, if I change to code to jump to 0x10000,
+it also works when setting a value into 184. So I'll change this patch
+here accordingly.
+
+ Thomas
