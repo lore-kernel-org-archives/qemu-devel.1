@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55940)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fBPjD-0004sI-NP
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 15:05:20 -0400
+	(envelope-from <eblake@redhat.com>) id 1fBPkO-0005Wn-F3
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 15:06:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fBPjA-00025B-IU
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 15:05:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36436 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1fBPkN-0002b6-98
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 15:06:32 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60494 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fBPjA-000255-Dn
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 15:05:16 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8FC3281A88B7
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 19:05:12 +0000 (UTC)
-References: <20180424214550.32549-1-lersek@redhat.com>
-	<20180424214550.32549-4-lersek@redhat.com>
-	<5f76e0aa-389f-82b8-9bac-8405f51b8d2c@redhat.com>
-	<20180425125446.GJ30024@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <c2145dbd-5cbf-13df-76fe-68b86cde488e@redhat.com>
-Date: Wed, 25 Apr 2018 21:05:06 +0200
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fBPkN-0002am-2x
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 15:06:31 -0400
+References: <20180425124533.17182.53165.stgit@pasha-VirtualBox>
+	<20180425124620.17182.7251.stgit@pasha-VirtualBox>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <52eea29c-15e2-ee6e-22d5-ffcdffac5706@redhat.com>
+Date: Wed, 25 Apr 2018 14:06:28 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180425125446.GJ30024@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/6] qapi: add SysEmuTarget to "common.json"
+In-Reply-To: <20180425124620.17182.7251.stgit@pasha-VirtualBox>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="2ItppaJ1d8pjt2LzsQiMR6D73TuMiiHJB"
+Subject: Re: [Qemu-devel] [RFC PATCH 08/17] replay: introduce info hmp/qmp
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,61 +29,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, David Gibson <dgibson@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, crosthwaite.peter@gmail.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, dovgaluk@ispras.ru, mreitz@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
-On 04/25/18 14:54, Daniel P. Berrang=C3=A9 wrote:
-> On Tue, Apr 24, 2018 at 06:11:05PM -0500, Eric Blake wrote:
->> On 04/24/2018 04:45 PM, Laszlo Ersek wrote:
->>> We'll soon need an enumeration type that lists all the softmmu target=
-s
->>> that QEMU (the project) supports. Introduce @SysEmuTarget to
->>> "common.json".
->>>
->>> Cc: "Daniel P. Berrange" <berrange@redhat.com>
->>> Cc: David Gibson <dgibson@redhat.com>
->>> Cc: Eric Blake <eblake@redhat.com>
->>> Cc: Gerd Hoffmann <kraxel@redhat.com>
->>> Cc: Kashyap Chamarthy <kchamart@redhat.com>
->>> Cc: Markus Armbruster <armbru@redhat.com>
->>> Cc: Paolo Bonzini <pbonzini@redhat.com>
->>> Cc: Thomas Huth <thuth@redhat.com>
->>> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
->>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->>> Reviewed-by: Kashyap Chamarthy <kchamart@redhat.com>
->>> ---
->>>
->>
->>> +##
->>> +{ 'enum' : 'SysEmuTarget',
->>> +  'data' : [ 'aarch64', 'alpha', 'arm', 'cris', 'hppa', 'i386', 'lm3=
-2',
->>> +             'm68k', 'microblaze', 'microblazeel', 'mips', 'mips64',
->>> +             'mips64el', 'mipsel', 'moxie', 'nios2', 'or1k', 'ppc',
->>> +             'ppc64', 'ppcemb', 'riscv32', 'riscv64', 's390x', 'sh4'=
-,
->>> +             'sh4eb', 'sparc', 'sparc64', 'tricore', 'unicore32',
->>> +             'x86_64', 'xtensa', 'xtensaeb' ] }
->>
->> x86_64 doesn't match our typical conventions of preferring '-' over '_=
-';
->> also, wikipedia mentions both spellings but under the page name
->> 'x86-64'.  Is it worth switching that enum constant?
->>
->> https://en.wikipedia.org/wiki/X86-64
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--2ItppaJ1d8pjt2LzsQiMR6D73TuMiiHJB
+From: Eric Blake <eblake@redhat.com>
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com,
+ pbonzini@redhat.com, quintela@redhat.com, ciro.santilli@gmail.com,
+ jasowang@redhat.com, crosthwaite.peter@gmail.com, zuban32s@gmail.com,
+ armbru@redhat.com, maria.klimushenkova@ispras.ru, mst@redhat.com,
+ kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com,
+ dovgaluk@ispras.ru, mreitz@redhat.com, alex.bennee@linaro.org,
+ dgilbert@redhat.com, rth@twiddle.net
+Message-ID: <52eea29c-15e2-ee6e-22d5-ffcdffac5706@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 08/17] replay: introduce info hmp/qmp
+ command
+References: <20180425124533.17182.53165.stgit@pasha-VirtualBox>
+ <20180425124620.17182.7251.stgit@pasha-VirtualBox>
+In-Reply-To: <20180425124620.17182.7251.stgit@pasha-VirtualBox>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 04/25/2018 07:46 AM, Pavel Dovgalyuk wrote:
+> This patch introduces 'info replay' monitor command and
+> corresponding qmp request.
+> These commands request the current record/replay mode, replay log file =
+name,
+> and the execution step (number or recorded/replayed instructions).
 >=20
-> I would not want that - SysEmuTarget is supposed to be correlated with
-> the qemu-system-$TARGET  binary names and we use qemu-system-x86_64
-> there.
+> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> ---
 
-Right; also TARGET_NAME is looked up as follows in patch #4, in
-qmp_query_target():
+Focusing on the QMP portion:
 
-+    info->arch =3D qapi_enum_parse(&SysEmuTarget_lookup, TARGET_NAME, -1=
-,
-+                                 &error_abort);
 
-That would fail if we used "x86-64" here.
+> +++ b/qapi/misc.json
+> @@ -3449,3 +3449,39 @@
+>  ##
+>  { 'command': 'x-oob-test', 'data' : { 'lock': 'bool' },
+>    'allow-oob': true }
+> +
+> +##
+> +# @ReplayInfo:
+> +#
+> +# Status of the record/replay mode.
+> +#
+> +# @mode: current mode.
+> +#
+> +# @filename: name of the record/replay log file.
+> +#
+> +# @step: current step number.
+> +#
+> +# Since: 2.13
+> +#
+> +##
+> +{ 'struct': 'ReplayInfo',
+> +  'data': { 'mode': 'ReplayMode', '*filename': 'str', 'step': 'int' } =
+}
+> +
+> +
+> +##
+> +# @info_replay:
 
-Thanks!
-Laszlo
+Please call this 'query-replay', for consistency with other QMP commands
+(your version looks too much like an HMP command).
+
+> +#
+> +# Retrieves the status of the execution record/replay.
+> +#
+> +# Returns: structure with the properties of the record/replay.
+> +#
+> +# Since: 2.13
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "info_replay" }
+> +# <- { "return": { "mode": "play", "filename": "log.rr", "step": 22041=
+4 } }
+> +#
+> +##
+> +{ 'command': 'info_replay',
+> +  'returns': 'ReplayInfo' }
+
+Please put these additions to misc.json be grouped closer to the
+existing ReplayMode definition
+
+> diff --git a/replay/Makefile.objs b/replay/Makefile.objs
+> index cee6539..6694e3e 100644
+> --- a/replay/Makefile.objs
+> +++ b/replay/Makefile.objs
+> @@ -6,4 +6,5 @@ common-obj-y +=3D replay-input.o
+>  common-obj-y +=3D replay-char.o
+>  common-obj-y +=3D replay-snapshot.o
+>  common-obj-y +=3D replay-net.o
+> -common-obj-y +=3D replay-audio.o
+> \ No newline at end of file
+
+Eww, that's an existing trivial bug that we should fix (POSIX says that
+Makefiles should be text files, and that text files should end in a
+newline).  Just because GNU make handles a missing trailing newline on
+makefile include fragments doesn't mean we should rely on it.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--2ItppaJ1d8pjt2LzsQiMR6D73TuMiiHJB
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrg0bQACgkQp6FrSiUn
+Q2rtbQf/QW9Jq/qG7LbhbehMyzR/SNcFdMtIjCAaR0fc3FYBpXtkFq/fFEXqQpoX
+lvoJ3M2sUJ/TlG9SShB8VttZ5PCeCgDsbK+wW9aT2T27W2lCad9oczbUdbIuWMyW
++Um0u/2YPzvy+uVngrP7Cg6hB8Dn9u+sIUZmwFdz5UZFDs/yZsAPLfAaYk7JduAH
+AOfCiVpm0kRmhlS+iuDa8BQVPA8MF8GwbXxPfacD8o3BqT/RbcADGA/d7hgTZBnb
+DHBLs9EkV10OvJ7hG8bIPL6veamvppR4eZ33OFDzibP0MpY9BtdrL5UGhdw0NjMz
+ucJdUwoMMZ9qdBsMyhM1oQX238uO2w==
+=vCdq
+-----END PGP SIGNATURE-----
+
+--2ItppaJ1d8pjt2LzsQiMR6D73TuMiiHJB--
