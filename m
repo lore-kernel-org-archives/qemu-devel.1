@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quwenruo.btrfs@gmx.com>) id 1fBKYw-0007iB-Jm
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:34:29 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fBKcW-0000Xr-Ub
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:38:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quwenruo.btrfs@gmx.com>) id 1fBKYt-0007eK-HG
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:34:22 -0400
-Received: from mout.gmx.net ([212.227.15.18]:58103)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <quwenruo.btrfs@gmx.com>)
-	id 1fBKYt-0007ct-6q
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:34:19 -0400
-References: <c0eaa5d5-7b1a-74f9-1d34-d8ac7cff3546@gmx.com>
-	<20180425131833.GK30024@redhat.com>
-From: Qu Wenruo <quwenruo.btrfs@gmx.com>
-Message-ID: <42c2c567-8bca-69db-c27d-6e0af4f0e20d@gmx.com>
-Date: Wed, 25 Apr 2018 21:33:48 +0800
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fBKcS-0001r0-VS
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:38:04 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:38511)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fBKcS-0001qi-Pk
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:38:00 -0400
+Received: by mail-qk0-x241.google.com with SMTP id b39so22591108qkb.5
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 06:38:00 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180425100218.24785-1-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <cff9bcd8-b0dc-d731-1278-947886f2c251@amsat.org>
+Date: Wed, 25 Apr 2018 10:37:56 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180425131833.GK30024@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="gjgsKjFBZvA1TDamYscwhlyMtaLtDVG2m"
-Subject: Re: [Qemu-devel] ridiculously slow VM memory performance on Ryzen
- CPU
+In-Reply-To: <20180425100218.24785-1-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2] linux-user: set minimum uname for RISC-V
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,109 +34,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---gjgsKjFBZvA1TDamYscwhlyMtaLtDVG2m
-From: Qu Wenruo <quwenruo.btrfs@gmx.com>
-To: =?UTF-8?Q?Daniel_P._Berrang=c3=a9?= <berrange@redhat.com>
-Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Message-ID: <42c2c567-8bca-69db-c27d-6e0af4f0e20d@gmx.com>
-Subject: Re: [Qemu-devel] ridiculously slow VM memory performance on Ryzen CPU
-References: <c0eaa5d5-7b1a-74f9-1d34-d8ac7cff3546@gmx.com>
- <20180425131833.GK30024@redhat.com>
-In-Reply-To: <20180425131833.GK30024@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 04/25/2018 07:02 AM, Alex Bennée wrote:
+> As support for RISC-V was only merged into the mainline kernel at 4.15
+> it is unlikely that glibc will be happy with a reported kernel version
+> of 3.8.0. Indeed when I testing binaries created by the current Debian
+> Sid compiler the tests failed with:
+> 
+>   FATAL: kernel too old
+> 
+> Bump the version to the minimum a RISC-V glibc would expect:
+> 
+>   https://sourceware.org/git/?p=glibc.git;a=blob;f=sysdeps/unix/sysv/linux/riscv/configure.ac
 
+This link point to the last version which might change over time, can we
+use instead the full link Peter suggested?
 
+https://sourceware.org/git/?p=glibc.git;a=blob;f=sysdeps/unix/sysv/linux/riscv/configure.ac;h=4fae013ec91451370a6d14b15b7e6d37fcd669af;hb=HEAD
 
-On 2018=E5=B9=B404=E6=9C=8825=E6=97=A5 21:18, Daniel P. Berrang=C3=A9 wro=
-te:
-> On Wed, Apr 25, 2018 at 05:48:42PM +0800, Qu Wenruo wrote:
->> Hi,
->>
->> When testing IO heavy work on my VM backed by Ryzen 1700 CPU, I turned=
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
->> to brd modules, but surprisingly, the speed is even slower than some H=
-DD:
->>
->> ---
->> $ sudo modprobe brd rd_nr=3D1 rd_size=3D1048576
->> $ dd if=3D/dev/zero of=3D/dev/ram0 bs=3D1M count=3D1024
->> 1024+0 records in
->> 1024+0 records out
->> 1073741824 bytes (1.1 GB, 1.0 GiB) copied, 9.9928 s, 107 MB/s
->> ---
->> 107MB is pretty lame...
->> Even some HDD could be faster than this.
->=20
-> You are sure that QEMU is actually using KVM, and not TCG emulation
-> mode, as that could account for such terrible numbers. The QEMU
-> argv would confirm this or can query it live with
->=20
->    virsh qemu-monitor-command --hmp $GUESTNAME "info kvm"
->=20
->> On host, it's much better:
->> ---
->> $ if=3D/dev/zero of=3D/dev/ram0 bs=3D1M count=3D1024
->> 1024+0 records in
->> 1024+0 records out
->> 1073741824 bytes (1.1 GB, 1.0 GiB) copied, 0.754641 s, 1.4 GB/s
->> ---
->>
->> For host hardware:
->> CPU: Ryzen 1700 All cores @ 3.8G
->> Mem: DDR4 2400 dual channel (8G x 2)
->>
->> For host software:
->> Kernel:       4.16.3-1-ARCH
->> Qemu:         2.11.1-2
->> Distribution: Archlinux
->>
->> VM setup is mostly default setup done by libvirt.
->=20
-> Ideally please share the guest XML description from 'virsh dumpxml $GUE=
-STNAME'
-> and the corresponding QEMU argv from /var/log/libvirt/qemu/$GUESTNAME.l=
-og
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-It turns out that my debugging config (KASAN + lockdep, maybe something
-else) is causing the problem.
-
-With lockdep only, the guest degrades to about 50% of host memory
-performance.
-With lockde + KASAN, only 10% of host.
-
-So, in short, I'm just an idiot.
-Sorry for the trouble.
-
-Thanks,
-Qu
-
->=20
-> Regards,
-> Daniel
->=20
-
-
---gjgsKjFBZvA1TDamYscwhlyMtaLtDVG2m
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEELd9y5aWlW6idqkLhwj2R86El/qgFAlrgg7wACgkQwj2R86El
-/qgetgf+OoA+94iQjMcawMoLFUVc9a3gHUPNYKpyyLPQd9FEISLNASXAC7sPSpQH
-SlERayUuTxlDTdqUOGNCMjDHL7qC6Uf4rJ3Xi+/k2LizN14UBPYuhG4Gj9r1gvZU
-HMiI1JzNp3/Aw1mGzx5Dr+gpgQjwAMLb/Sw0WOF5lPqKfH0IeMeoOHJl7kqh2XUG
-MvU1i/NZ3XbTbjs8cGL6lq1vg1/9x76Gsc1xsy1RLdN20Vh4kdyLMmRHf98agNe5
-wnv+3ycozMd/GlSz0oy8rDo/epaTVM/n6XrnMh+ZbpZYiFUlz05/Vcm28uEvw1Y6
-qC+xfh3iNcYjVrSWEWepZuIwQbCWDg==
-=RW8W
------END PGP SIGNATURE-----
-
---gjgsKjFBZvA1TDamYscwhlyMtaLtDVG2m--
+> 
+> ---
+> v2
+>   - minor tweak to wording to make clearer and add link to glibc config
+> ---
+>  linux-user/riscv/target_syscall.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/linux-user/riscv/target_syscall.h b/linux-user/riscv/target_syscall.h
+> index d4e109a27f..ee81d8bc88 100644
+> --- a/linux-user/riscv/target_syscall.h
+> +++ b/linux-user/riscv/target_syscall.h
+> @@ -45,7 +45,7 @@ struct target_pt_regs {
+>  #else
+>  #define UNAME_MACHINE "riscv64"
+>  #endif
+> -#define UNAME_MINIMUM_RELEASE "3.8.0"
+> +#define UNAME_MINIMUM_RELEASE "4.15.0"
+>  
+>  #define TARGET_MINSIGSTKSZ 2048
+>  #define TARGET_MLOCKALL_MCL_CURRENT 1
+> 
