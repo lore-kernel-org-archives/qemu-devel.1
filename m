@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34414)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fBIaZ-00036C-8j
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:27:56 -0400
+	(envelope-from <berto@igalia.com>) id 1fBIhi-0000sW-FD
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:35:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fBIaY-0005OR-DZ
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:27:55 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59520 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fBIaY-0005Np-8y
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:27:54 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E20E7406E973
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 11:27:53 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 25 Apr 2018 13:27:23 +0200
-Message-Id: <20180425112723.1111-22-quintela@redhat.com>
-In-Reply-To: <20180425112723.1111-1-quintela@redhat.com>
-References: <20180425112723.1111-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v12 21/21] migration: Stop sending whole pages
- through main channel
+	(envelope-from <berto@igalia.com>) id 1fBIhh-0003bL-FZ
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:35:18 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <319c6e7b-c23c-09cd-4198-5b537a99c98c@redhat.com>
+References: <20180421132929.21610-1-mreitz@redhat.com>
+	<20180421132929.21610-2-mreitz@redhat.com>
+	<w51in8g63r5.fsf@maestria.local.igalia.com>
+	<319c6e7b-c23c-09cd-4198-5b537a99c98c@redhat.com>
+Date: Wed, 25 Apr 2018 13:35:07 +0200
+Message-ID: <w51604fsems.fsf@maestria.local.igalia.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 1/9] block: Add COR filter driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,65 +24,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-We have to flush() the QEMUFile because now we sent really few data
-through that channel.
+On Wed 25 Apr 2018 01:18:03 PM CEST, Max Reitz wrote:
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- migration/ram.c | 11 +++--------
- 1 file changed, 3 insertions(+), 8 deletions(-)
+>>> +#define PERM_PASSTHROUGH (BLK_PERM_CONSISTENT_READ \
+>>> +                          | BLK_PERM_WRITE \
+>>> +                          | BLK_PERM_RESIZE)
+>>> +#define PERM_UNCHANGED (BLK_PERM_ALL & ~PERM_PASSTHROUGH)
+>>> +
+>>> +static void cor_child_perm(BlockDriverState *bs, BdrvChild *c,
+>>> +                           const BdrvChildRole *role,
+>>> +                           BlockReopenQueue *reopen_queue,
+>>> +                           uint64_t perm, uint64_t shared,
+>>> +                           uint64_t *nperm, uint64_t *nshared)
+>>> +{
+>>> +    if (c == NULL) {
+>>> +        *nperm = (perm & PERM_PASSTHROUGH) | BLK_PERM_WRITE_UNCHANGED;
+>>> +        *nshared = (shared & PERM_PASSTHROUGH) | PERM_UNCHANGED;
+>>> +        return;
+>>> +    }
+>>> +
+>>> +    *nperm = (perm & PERM_PASSTHROUGH) |
+>>> +             (c->perm & PERM_UNCHANGED);
+>> 
+>> I admit I'm not completely familiar with this, but don't you need to
+>> add BLK_PERM_WRITE_UNCHANGED to *nperm ?
+>
+> As long as it's requested in when the child is attached (which it is
+> in the "c == NULL" case), it should be part of c->perm then.
+>
+> (And since PERM_PASSTHROUGH does not contain WRITE_UNCHANGED, it is
+> part of PERM_UNCHANGED.)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 23203756b7..f5cff2eb59 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -1634,20 +1634,12 @@ static int ram_multifd_page(RAMState *rs, PageSearchStatus *pss,
-                             bool last_stage)
- {
-     int pages;
--    uint8_t *p;
-     RAMBlock *block = pss->block;
-     ram_addr_t offset = pss->page << TARGET_PAGE_BITS;
- 
--    p = block->host + offset;
--
-     pages = save_zero_page(rs, block, offset);
-     if (pages == -1) {
--        ram_counters.transferred +=
--            save_page_header(rs, rs->f, block,
--                             offset | RAM_SAVE_FLAG_PAGE);
-         multifd_queue_page(block, offset);
--        qemu_put_buffer(rs->f, p, TARGET_PAGE_SIZE);
--        ram_counters.transferred += TARGET_PAGE_SIZE;
-         pages = 1;
-         ram_counters.normal++;
-     }
-@@ -2869,6 +2861,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
- 
-     multifd_send_sync_main();
-     qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
-+    qemu_fflush(f);
- 
-     return 0;
- }
-@@ -2946,6 +2939,7 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
-     multifd_send_sync_main();
- out:
-     qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
-+    qemu_fflush(f);
-     ram_counters.transferred += 8;
- 
-     ret = qemu_file_get_error(f);
-@@ -2999,6 +2993,7 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
- 
-     multifd_send_sync_main();
-     qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
-+    qemu_fflush(f);
- 
-     return 0;
- }
--- 
-2.17.0
+I see, thanks.
+
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+
+Berto
