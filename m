@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37799)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fBKGx-0007hV-4u
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:15:48 -0400
+	(envelope-from <berrange@redhat.com>) id 1fBKJk-0000A8-2c
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:18:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fBKGu-0005dC-0s
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:15:47 -0400
-From: David Hildenbrand <david@redhat.com>
-References: <20180420123456.22196-1-david@redhat.com>
-	<20180423143147.6b4df2ac@redhat.com>
-	<459116211.21924603.1524497545197.JavaMail.zimbra@redhat.com>
-	<20180424160011.47475594@redhat.com>
-	<a048d777-38e5-a44a-c401-a5509ca29e37@redhat.com>
-	<20180425141535.5000bcb8@redhat.com>
-	<50c25d28-4cac-1e68-c149-e7a5ba8b0f40@redhat.com>
-Message-ID: <04f968d4-cc3d-1b7b-3d70-f75014ba2742@redhat.com>
-Date: Wed, 25 Apr 2018 15:15:32 +0200
+	(envelope-from <berrange@redhat.com>) id 1fBKJg-00072J-UE
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:18:40 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37368 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fBKJg-000722-PF
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:18:36 -0400
+Date: Wed, 25 Apr 2018 14:18:33 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180425131833.GK30024@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <c0eaa5d5-7b1a-74f9-1d34-d8ac7cff3546@gmx.com>
 MIME-Version: 1.0
-In-Reply-To: <50c25d28-4cac-1e68-c149-e7a5ba8b0f40@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] pc-dimm: factor out MemoryDevice
+Content-Disposition: inline
+In-Reply-To: <c0eaa5d5-7b1a-74f9-1d34-d8ac7cff3546@gmx.com>
+Subject: Re: [Qemu-devel] ridiculously slow VM memory performance on Ryzen
+ CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +28,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>
+To: Qu Wenruo <quwenruo.btrfs@gmx.com>
+Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-
->>> So this happens before any hotplug handler is called. Everything works
->>> just fine. What you don't like about this is the qdev_get_machine(). I
->>> also don't like it but in the short term I don't see any problem with
->>> it. It is resource allocation and not a "device plug" in the typical form.
->>
->> It's not qdev_get_machine() that's issue, it's layer violation,
->> where child device is allocating and mapping resources of one of its parents.
+On Wed, Apr 25, 2018 at 05:48:42PM +0800, Qu Wenruo wrote:
+> Hi,
 > 
-> Quite simple: introduce a function at the machine where the child can
-> "request" to get an address and "request" to plug/unplug a region.
+> When testing IO heavy work on my VM backed by Ryzen 1700 CPU, I turned
+> to brd modules, but surprisingly, the speed is even slower than some HDD:
 > 
-> Or what would be wrong about that?
+> ---
+> $ sudo modprobe brd rd_nr=1 rd_size=1048576
+> $ dd if=/dev/zero of=/dev/ram0 bs=1M count=1024
+> 1024+0 records in
+> 1024+0 records out
+> 1073741824 bytes (1.1 GB, 1.0 GiB) copied, 9.9928 s, 107 MB/s
+> ---
+> 107MB is pretty lame...
+> Even some HDD could be faster than this.
+
+You are sure that QEMU is actually using KVM, and not TCG emulation
+mode, as that could account for such terrible numbers. The QEMU
+argv would confirm this or can query it live with
+
+   virsh qemu-monitor-command --hmp $GUESTNAME "info kvm"
+
+> On host, it's much better:
+> ---
+> $ if=/dev/zero of=/dev/ram0 bs=1M count=1024
+> 1024+0 records in
+> 1024+0 records out
+> 1073741824 bytes (1.1 GB, 1.0 GiB) copied, 0.754641 s, 1.4 GB/s
+> ---
 > 
+> For host hardware:
+> CPU: Ryzen 1700 All cores @ 3.8G
+> Mem: DDR4 2400 dual channel (8G x 2)
+> 
+> For host software:
+> Kernel:       4.16.3-1-ARCH
+> Qemu:         2.11.1-2
+> Distribution: Archlinux
+> 
+> VM setup is mostly default setup done by libvirt.
 
-To extend on such an idea (looking at virtio_bus_device_plugged()
-getting called from virtio realize functions)
+Ideally please share the guest XML description from 'virsh dumpxml $GUESTNAME'
+and the corresponding QEMU argv from /var/log/libvirt/qemu/$GUESTNAME.log
 
-Make the machine implement some new interface "MemoryDeviceManager".
->From virtio-mem/pmem realize, call a function like memory_device_plugged().
-
-Lookup the machine (qdev_get_machine() or walk all the way up until we
-find one that implements MemoryDeviceManager) and call
-pre_plugged/plugged/unplugged.
-
-We could hide that in a new device class TYPE_VIRTIO_MEMORY_DEVICE.
-
-Opinions? Completely nonsense? :) Alternatives?
-
+Regards,
+Daniel
 -- 
-
-Thanks,
-
-David / dhildenb
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
