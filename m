@@ -1,35 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50766)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fBKyx-0002DC-EL
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:01:21 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fBL1M-000402-RH
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:03:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fBKyr-0005ln-KQ
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:01:15 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:35132)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fBKyr-0005lH-Ea
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:01:09 -0400
-Received: by mail-qt0-x243.google.com with SMTP id s2-v6so26898359qti.2
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 07:01:09 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180424152405.10304-1-alex.bennee@linaro.org>
-	<20180424152405.10304-24-alex.bennee@linaro.org>
-	<39980aff-713f-0fcb-006f-13f74846bfa0@amsat.org>
-	<87lgdbllr9.fsf@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <172f8c57-de54-cc36-e381-2307e1c9b6b9@amsat.org>
-Date: Wed, 25 Apr 2018 11:01:03 -0300
+	(envelope-from <mreitz@redhat.com>) id 1fBL1H-0007QI-2i
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:03:44 -0400
+References: <20180412170711.GA6240@igalia.com>
+	<1695266a-47ac-1f6d-49d1-bdfb81e0e345@redhat.com>
+	<w517ep7gpsz.fsf@maestria.local.igalia.com>
+	<ee24e79d-b37e-ac8f-c349-b0fa637ba2a6@redhat.com>
+	<w51bmegjzp4.fsf@maestria.local.igalia.com>
+	<216e7398-0bc3-4822-d4b0-e0267c714abb@redhat.com>
+	<w5136zjsar5.fsf@maestria.local.igalia.com>
+	<bc26c382-458f-5a86-de59-3945397fbcac@redhat.com>
+	<w51wowvqu65.fsf@maestria.local.igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <b3ec832d-202b-db93-a163-3d63a4d36326@redhat.com>
+Date: Wed, 25 Apr 2018 16:03:22 +0200
 MIME-Version: 1.0
-In-Reply-To: <87lgdbllr9.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 23/46] tests/tcg/x86_64: add
- Makefile.target
+In-Reply-To: <w51wowvqu65.fsf@maestria.local.igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="vuDoQpdvO5ENU02gm38HqiUje5UiQpr2v"
+Subject: Re: [Qemu-devel] [RFC] Intermediate block mirroring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,138 +31,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, qemu-devel@nongnu.org
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vuDoQpdvO5ENU02gm38HqiUje5UiQpr2v
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <b3ec832d-202b-db93-a163-3d63a4d36326@redhat.com>
+Subject: Re: [RFC] Intermediate block mirroring
+References: <20180412170711.GA6240@igalia.com>
+ <1695266a-47ac-1f6d-49d1-bdfb81e0e345@redhat.com>
+ <w517ep7gpsz.fsf@maestria.local.igalia.com>
+ <ee24e79d-b37e-ac8f-c349-b0fa637ba2a6@redhat.com>
+ <w51bmegjzp4.fsf@maestria.local.igalia.com>
+ <216e7398-0bc3-4822-d4b0-e0267c714abb@redhat.com>
+ <w5136zjsar5.fsf@maestria.local.igalia.com>
+ <bc26c382-458f-5a86-de59-3945397fbcac@redhat.com>
+ <w51wowvqu65.fsf@maestria.local.igalia.com>
+In-Reply-To: <w51wowvqu65.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-
-On 04/25/2018 05:43 AM, Alex Bennée wrote:
-> 
-> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
-> 
->> On 04/24/2018 12:23 PM, Alex Bennée wrote:
->>> The sources for x86_64 are shared in the i386 directory which will be
->>> included thanks to TARGET_BASE_ARCH. However not all sources build so
->>> we need to filter out the ones we can't build in the 64 bit world.
+On 2018-04-25 15:42, Alberto Garcia wrote:
+> On Wed 25 Apr 2018 03:06:34 PM CEST, Max Reitz wrote:
+>>>>>>>>> One other way is to have a more generic replace-node command
+>>>>>>>>> which would call bdrv_replace_node(), but I don't know if we
+>>>>>>>>> want to expose that and I don't have any other use case for it
+>>>>>>>>> at the moment.
+>>>>>>>>
+>>>>>>>> I think we do want to expose that.  As far as I'm informed, for
+>>>>>>>> graph manipulation we want a command that can replace nodes
+>>>>>>>> (including replacing nothing by a new node or replacing an
+>>>>>>>> existing node by nothing, if the parent supports that).
+>>>>>>>
+>>>>>>> Was there any discussion about this in the mailing list?
+>>>>>>> (proposed name for this function, features, etc.)
+>>>>>>
+>>>>>> Well, there is x-blockdev-change.  But we probably want to expose
+>>>>>> bdrv_reopen() in the long run.
+>>>>>
+>>>>> Exposing bdrv_reopen() itself shouldn't be too much work (it takes
+>>>>> just two node names, or am I missing something?).
 >>>
->>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->>> ---
->>>  tests/tcg/i386/Makefile.target   |  2 +-
->>>  tests/tcg/x86_64/Makefile.target | 15 +++++++++++++++
->>>  2 files changed, 16 insertions(+), 1 deletion(-)
->>>  create mode 100644 tests/tcg/x86_64/Makefile.target
+>>> I just realized that I meant "Exposing bdrv_replace_node()" here.
 >>>
->>> diff --git a/tests/tcg/i386/Makefile.target b/tests/tcg/i386/Makefile.target
->>> index 80ccad3d7b..27086c3f2b 100644
->>> --- a/tests/tcg/i386/Makefile.target
->>> +++ b/tests/tcg/i386/Makefile.target
->>> @@ -7,7 +7,7 @@ VPATH 		+= $(I386_SRC)
+>>>> So from my perspective...  If you think it's easy, why don't you try=
+
+>>>> it and then we'll see? *cough*
 >>>
->>>  I386_SRCS=$(notdir $(wildcard $(I386_SRC)/*.c))
->>>  I386_TESTS=$(I386_SRCS:.c=)
->>> -
->>> +I386_ONLY_TESTS=$(filter-out test-i386-ssse3, $(I386_TESTS))
->>>  # Update TESTS
->>>  TESTS+=$(I386_ONLY_TESTS)
+>>> I'm doing it :-)
 >>>
->>> diff --git a/tests/tcg/x86_64/Makefile.target b/tests/tcg/x86_64/Makefile.target
->>> new file mode 100644
->>> index 0000000000..74f170b9ed
->>> --- /dev/null
->>> +++ b/tests/tcg/x86_64/Makefile.target
->>> @@ -0,0 +1,15 @@
->>> +# -*- Mode: makefile -*-
->>> +#
->>> +# x86_64 tests - included from tests/tcg/Makefile.target
->>> +#
->>> +# Currently we only build test-x86_64 and test-i386-ssse3 from
->>> +# $(SRC)/tests/tcg/i386/
->>> +#
->>> +
->>> +X86_64_TESTS=$(filter-out $(I386_ONLY_TESTS), $(TESTS))
->>> +X86_64_TESTS+=test-x86_64
->>
->> The linux-test is taking looooong... I canceled it after ~15min on a i7
->> 2GHz. Maybe it also belongs to the "BROKEN TEST" series on x86_64?
->> Currently it is only skipped if $(TARGET_NAME) == i386.
-> 
-> Hmm it runs pretty quickly for me:
-> 
-> time ./qemu-x86_64 ./tests/linux-test
-> 0.02user 0.03system 0:00.08elapsed 72%CPU (0avgtext+0avgdata 7384maxresident)k
-> 0inputs+0outputs (0major+1207minor)pagefaults 0swaps
-> 
-> I wonder if the failure mode you are seeing is the same as the others
-> which basically hang, which is why I added them to the broken test patch.
+>>>>> There's still the question of how to update the backing file string=
 
-The test_clone() hangs here:
+>>>>> (on the overlay). stream and commit do it automatically, but if we =
+do
+>>>>> bdrv_reopen() or the aforementioned modification to blockdev-mirror=
 
-    while (waitpid(pid1, &status1, 0) != pid1);
-
-32107 wait4(32109, 0x7ffdd2814a50, 0, NULL) = -1 ECHILD (No child processes)
-32107 wait4(32109,  <unfinished ...>
-32109 nanosleep({tv_sec=0, tv_nsec=10000000},  <unfinished ...>
-32107 <... wait4 resumed> 0x7ffdd2814a50, 0, NULL) = -1 ECHILD (No child
-processes)
-32107 wait4(32109, 0x7ffdd2814a50, 0, NULL) = -1 ECHILD (No child processes)
-
-> 
->>
->> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>
->>> +TESTS:=$(X86_64_TESTS)
->>> +
->>> +test-x86_64: LDFLAGS+=-lm -lc
->>> +test-x86_64: test-i386.c test-i386.h test-i386-shift.h test-i386-muldiv.h
->>> +	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
 >>>
+>>> bdrv_replace_node() again
 >>
->> $ make run-tcg-tests-x86_64-linux-user
->>   RUN-TESTS for x86_64
->>   TEST    test-mmap (default) on x86_64
->>   TEST    test-mmap (8k pages) on x86_64
->> ASAN:DEADLYSIGNAL
->> =================================================================
->> ==5717==ERROR: AddressSanitizer: SEGV on unknown address 0x7fcba47fc000
->> (pc 0x7fcba8a3bf4d bp 0x7ffd19d74700 sp 0x7ffd19d73e88 T0)
->> ==5717==The signal is caused by a WRITE memory access.
->>     #0 0x7fcba8a3bf4c  (/lib/x86_64-linux-gnu/libc.so.6+0x159f4c)
->>     #1 0x7fcbab33f891  (/usr/lib/x86_64-linux-gnu/libasan.so.4+0x5c891)
->>     #2 0x55dd3ae4a7e0 in mmap_frag /source/qemu/linux-user/mmap.c:189
->>     #3 0x55dd3ae4bbce in target_mmap /source/qemu/linux-user/mmap.c:533
->>     #4 0x55dd3ae4b8cb in target_mmap /source/qemu/linux-user/mmap.c:501
->>     #5 0x55dd3ae3895c in do_syscall /source/qemu/linux-user/syscall.c:9448
->>     #6 0x55dd3adfaa57 in cpu_loop /source/qemu/linux-user/main.c:258
->>     #7 0x55dd3ae005f5 in main /source/qemu/linux-user/main.c:5147
->>     #8 0x7fcba8903a86 in __libc_start_main
->> (/lib/x86_64-linux-gnu/libc.so.6+0x21a86)
->>     #9 0x55dd3ad34a89 in _start
->> (/source/qemu/build/full/x86_64-linux-user/qemu-x86_64+0x350a89)
->> AddressSanitizer can not provide additional info.
->> SUMMARY: AddressSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x159f4c)
->> ==5717==ABORTING
->> make[2]: ***
->> [/home/phil/source/qemu/tests/tcg/multiarch/Makefile.target:27:
->> run-test-mmap] Error 1
+>> But the question stands whether we need simple node replacement when
+>> we want bdrv_reopen() anyway.  In addition, we don't need just
+>> replacement, we also need addition and removal (e.g. for backing files=
+
+>> or quorum children) -- and especially in the case of quorum, that is
+>> going to be a pain (mostly naming the children).
 >>
->> Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> 
-> This is only with ASAN enabled right?
+>> With bdrv_reopen(), we can just require the user to respecify all
+>> children, so we don't run into the issue of how to name things at
+>> least.
+>=20
+> So in this example, if you want to replace [B] with [E] you would reope=
+n
+> [C] specifying the new backing file?
+>=20
+>    [A] <- [B] <- [C] <- [D]
+>=20
+>           [E]
 
-Yes, but even without ASan test_clone() hangs.
+You can just use child node name references like in blockdev-add.
 
-Commenting test_clone():
+Max
 
-$ make -j1 run-tcg-tests-x86_64-linux-user
-  CROSS-BUILD x86_64 guest-tests with gcc-7
-  CROSS-BUILD x86_64 guest-tests with gcc-7
-  RUN-TESTS for x86_64
-  TEST    test-mmap (default) on x86_64
-  TEST    test-mmap (8k pages) on x86_64
-  TEST    test-mmap (16k pages) on x86_64
-  TEST    test-mmap (32k pages) on x86_64
-  TEST    sha1 on x86_64
-  TEST    linux-test on x86_64
-  TEST    testthread on x86_64
-  TEST    test-x86_64 on x86_64
-$
+
+--vuDoQpdvO5ENU02gm38HqiUje5UiQpr2v
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlrgiqoACgkQ9AfbAGHV
+z0AdSAf/Sg6Rnl+Ells312HOosDhsF4fN5P+IKSYnvhRuDFsGcoqGLmBN+VZUwlo
+4Yg3wW1+GldJzxSAehCjG7fk0IblXEUycESEFcT2h83Q4hooH99BNjqE5wo32yuz
+4cVnNoPMdbvMoqGTt44LoO+rlSGXcwIYi4UilJLaY0HGARIQrEVJusa6xiQvYWr5
+fdgc81JJWz3+x+QExBufJtu5DJker8Vj/nHa2m+lHspoTVzGriCP69dmFjkAg3dV
+mO/FtqRcoCo9IooEYVXQLNI0Ep2ELKUKKz+mshXLcmZ2jbp7a5Yi1+GlBAK6/Y15
+b8M7tAHt3hK+tx+fpFzv5pKjLMfBYA==
+=CBbr
+-----END PGP SIGNATURE-----
+
+--vuDoQpdvO5ENU02gm38HqiUje5UiQpr2v--
