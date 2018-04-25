@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fBLEL-00015K-NB
+	(envelope-from <eric.auger@redhat.com>) id 1fBLEG-00011W-S9
 	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:17:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fBLEK-0006L0-8F
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:17:09 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fBLEB-0006AY-MJ
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:17:04 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Wed, 25 Apr 2018 16:16:02 +0200
-Message-Id: <1524665762-31355-18-git-send-email-eric.auger@redhat.com>
+Date: Wed, 25 Apr 2018 16:15:58 +0200
+Message-Id: <1524665762-31355-14-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1524665762-31355-1-git-send-email-eric.auger@redhat.com>
 References: <1524665762-31355-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH v12 17/17] hw/arm/smmuv3: Add notifications on
- invalidation
+Subject: [Qemu-devel] [PATCH v12 13/17] hw/arm/virt-acpi-build: Add smmuv3
+ node in IORT table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,245 +23,158 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, prem.mallappa@gmail.com
 Cc: alex.williamson@redhat.com, tn@semihalf.com, mst@redhat.com, cdall@kernel.org, bharat.bhushan@nxp.com, jean-philippe.brucker@arm.com, linuc.decode@gmail.com, peterx@redhat.com, jintack@cs.columbia.edu
 
-On TLB invalidation commands, let's call registered
-IOMMU notifiers. Those can only be UNMAP notifiers.
-SMMUv3 does not support notification on MAP (VFIO).
+From: Prem Mallappa <prem.mallappa@broadcom.com>
 
-This patch allows vhost use case where IOTLB API is notified
-on each guest IOTLB invalidation.
+This patch builds the smmuv3 node in the ACPI IORT table.
 
+The RID space of the root complex, which spans 0x0-0x10000
+maps to streamid space 0x0-0x10000 in smmuv3, which in turn
+maps to deviceid space 0x0-0x10000 in the ITS group.
+
+The guest must feature the IOMMU probe deferral series
+(https://lkml.org/lkml/2017/4/10/214) which fixes streamid
+multiple lookup. This bug is not related to the SMMU emulation.
+
+Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- hw/arm/smmu-common.c         | 34 +++++++++++++++
- hw/arm/smmuv3.c              | 99 +++++++++++++++++++++++++++++++++++++++++++-
- hw/arm/trace-events          |  5 +++
- include/hw/arm/smmu-common.h |  6 +++
- 4 files changed, 142 insertions(+), 2 deletions(-)
+Reviewed-by: Shannon Zhao <zhaoshenglong@huawei.com>
 
-diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
-index aaa80c3..abec46c 100644
---- a/hw/arm/smmu-common.c
-+++ b/hw/arm/smmu-common.c
-@@ -386,6 +386,40 @@ static gboolean smmu_iotlb_key_equal(gconstpointer v1, gconstpointer v2)
-     return (k1->asid == k2->asid) && (k1->iova == k2->iova);
+---
+
+v9 -> v10:
+- replaced vms->iommu tests by vms->iommu == VIRT_IOMMU_SMMUV3
+- Added Shannon's R-b
+
+v2 -> v3:
+- integrate into the existing IORT table made up of ITS, RC nodes
+- take into account vms->smmu
+- match linux actbl2.h acpi_iort_smmu_v3 field names
+---
+ hw/arm/virt-acpi-build.c    | 55 +++++++++++++++++++++++++++++++++++++++------
+ include/hw/acpi/acpi-defs.h | 15 +++++++++++++
+ 2 files changed, 63 insertions(+), 7 deletions(-)
+
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index c7c6a57..92ceee9 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -393,19 +393,26 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
  }
  
-+/* Unmap the whole notifier's range */
-+static void smmu_unmap_notifier_range(IOMMUNotifier *n)
-+{
-+    IOMMUTLBEntry entry;
-+
-+    entry.target_as = &address_space_memory;
-+    entry.iova = n->start;
-+    entry.perm = IOMMU_NONE;
-+    entry.addr_mask = n->end - n->start;
-+
-+    memory_region_notify_one(n, &entry);
-+}
-+
-+/* Unmap all notifiers attached to @mr */
-+inline void smmu_inv_notifiers_mr(IOMMUMemoryRegion *mr)
-+{
-+    IOMMUNotifier *n;
-+
-+    trace_smmu_inv_notifiers_mr(mr->parent_obj.name);
-+    IOMMU_NOTIFIER_FOREACH(n, mr) {
-+        smmu_unmap_notifier_range(n);
-+    }
-+}
-+
-+/* Unmap all notifiers of all mr's */
-+void smmu_inv_notifiers_all(SMMUState *s)
-+{
-+    SMMUNotifierNode *node;
-+
-+    QLIST_FOREACH(node, &s->notifiers_list, next) {
-+        smmu_inv_notifiers_mr(&node->sdev->iommu);
-+    }
-+}
-+
- static void smmu_base_realize(DeviceState *dev, Error **errp)
+ static void
+-build_iort(GArray *table_data, BIOSLinker *linker)
++build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
  {
-     SMMUState *s = ARM_SMMU(dev);
-diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
-index 1a0e2e1..f183304 100644
---- a/hw/arm/smmuv3.c
-+++ b/hw/arm/smmuv3.c
-@@ -744,6 +744,68 @@ out:
-     return entry;
- }
+-    int iort_start = table_data->len;
++    int nb_nodes, iort_start = table_data->len;
+     AcpiIortIdMapping *idmap;
+     AcpiIortItsGroup *its;
+     AcpiIortTable *iort;
+-    size_t node_size, iort_length;
++    AcpiIortSmmu3 *smmu;
++    size_t node_size, iort_length, smmu_offset = 0;
+     AcpiIortRC *rc;
  
-+/**
-+ * smmuv3_notify_iova - call the notifier @n for a given
-+ * @asid and @iova tuple.
-+ *
-+ * @mr: IOMMU mr region handle
-+ * @n: notifier to be called
-+ * @asid: address space ID or negative value if we don't care
-+ * @iova: iova
-+ */
-+static void smmuv3_notify_iova(IOMMUMemoryRegion *mr,
-+                               IOMMUNotifier *n,
-+                               int asid,
-+                               dma_addr_t iova)
-+{
-+    SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
-+    SMMUEventInfo event = {};
-+    SMMUTransTableInfo *tt;
-+    SMMUTransCfg *cfg;
-+    IOMMUTLBEntry entry;
-+
-+    cfg = smmuv3_get_config(sdev, &event);
-+    if (!cfg) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s error decoding the configuration for iommu mr=%s\n",
-+                      __func__, mr->parent_obj.name);
-+        return;
-+    }
-+
-+    if (asid >= 0 && cfg->asid != asid) {
-+        return;
-+    }
-+
-+    tt = select_tt(cfg, iova);
-+    if (!tt) {
-+        return;
-+    }
-+
-+    entry.target_as = &address_space_memory;
-+    entry.iova = iova;
-+    entry.addr_mask = (1 << tt->granule_sz) - 1;
-+    entry.perm = IOMMU_NONE;
-+
-+    memory_region_notify_one(n, &entry);
-+}
-+
-+/* invalidate an asid/iova tuple in all mr's */
-+static void smmuv3_inv_notifiers_iova(SMMUState *s, int asid, dma_addr_t iova)
-+{
-+    SMMUNotifierNode *node;
-+
-+    QLIST_FOREACH(node, &s->notifiers_list, next) {
-+        IOMMUMemoryRegion *mr = &node->sdev->iommu;
-+        IOMMUNotifier *n;
-+
-+        trace_smmuv3_inv_notifiers_iova(mr->parent_obj.name, asid, iova);
-+
-+        IOMMU_NOTIFIER_FOREACH(n, mr) {
-+            smmuv3_notify_iova(mr, n, asid, iova);
-+        }
-+    }
-+}
-+
- static int smmuv3_cmdq_consume(SMMUv3State *s)
- {
-     SMMUState *bs = ARM_SMMU(s);
-@@ -862,12 +924,14 @@ static int smmuv3_cmdq_consume(SMMUv3State *s)
-             uint16_t asid = CMD_ASID(&cmd);
+     iort = acpi_data_push(table_data, sizeof(*iort));
  
-             trace_smmuv3_cmdq_tlbi_nh_asid(asid);
-+            smmu_inv_notifiers_all(&s->smmu_state);
-             smmu_iotlb_inv_asid(bs, asid);
-             break;
-         }
-         case SMMU_CMD_TLBI_NH_ALL:
-         case SMMU_CMD_TLBI_NSNH_ALL:
-             trace_smmuv3_cmdq_tlbi_nh();
-+            smmu_inv_notifiers_all(&s->smmu_state);
-             smmu_iotlb_inv_all(bs);
-             break;
-         case SMMU_CMD_TLBI_NH_VAA:
-@@ -876,6 +940,7 @@ static int smmuv3_cmdq_consume(SMMUv3State *s)
-             uint16_t vmid = CMD_VMID(&cmd);
- 
-             trace_smmuv3_cmdq_tlbi_nh_vaa(vmid, addr);
-+            smmuv3_inv_notifiers_iova(bs, -1, addr);
-             smmu_iotlb_inv_all(bs);
-             break;
-         }
-@@ -887,6 +952,7 @@ static int smmuv3_cmdq_consume(SMMUv3State *s)
-             bool leaf = CMD_LEAF(&cmd);
- 
-             trace_smmuv3_cmdq_tlbi_nh_va(vmid, asid, addr, leaf);
-+            smmuv3_inv_notifiers_iova(bs, asid, addr);
-             smmu_iotlb_inv_iova(bs, asid, addr);
-             break;
-         }
-@@ -1362,9 +1428,38 @@ static void smmuv3_notify_flag_changed(IOMMUMemoryRegion *iommu,
-                                        IOMMUNotifierFlag old,
-                                        IOMMUNotifierFlag new)
- {
-+    SMMUDevice *sdev = container_of(iommu, SMMUDevice, iommu);
-+    SMMUv3State *s3 = sdev->smmu;
-+    SMMUState *s = &(s3->smmu_state);
-+    SMMUNotifierNode *node = NULL;
-+    SMMUNotifierNode *next_node = NULL;
-+
-+    if (new == IOMMU_NOTIFIER_MAP) {
-+        int bus_num = pci_bus_num(sdev->bus);
-+        PCIDevice *pcidev = pci_find_device(sdev->bus, bus_num, sdev->devfn);
-+
-+        warn_report("SMMUv3 does not support notification on MAP: "
-+                     "device %s will not function properly", pcidev->name);
++    if (vms->iommu == VIRT_IOMMU_SMMUV3) {
++        nb_nodes = 3; /* RC, ITS, SMMUv3 */
++    } else {
++        nb_nodes = 2; /* RC, ITS */
 +    }
 +
-     if (old == IOMMU_NOTIFIER_NONE) {
--        warn_report("SMMUV3 does not support vhost/vfio integration yet: "
--                    "devices of those types will not function properly");
-+        trace_smmuv3_notify_flag_add(iommu->parent_obj.name);
-+        node = g_malloc0(sizeof(*node));
-+        node->sdev = sdev;
-+        QLIST_INSERT_HEAD(&s->notifiers_list, node, next);
-+        return;
+     iort_length = sizeof(*iort);
+-    iort->node_count = cpu_to_le32(2); /* RC and ITS nodes */
++    iort->node_count = cpu_to_le32(nb_nodes);
+     iort->node_offset = cpu_to_le32(sizeof(*iort));
+ 
+     /* ITS group node */
+@@ -418,6 +425,34 @@ build_iort(GArray *table_data, BIOSLinker *linker)
+     its->its_count = cpu_to_le32(1);
+     its->identifiers[0] = 0; /* MADT translation_id */
+ 
++    if (vms->iommu == VIRT_IOMMU_SMMUV3) {
++        int irq =  vms->irqmap[VIRT_SMMU];
++
++        /* SMMUv3 node */
++        smmu_offset = iort->node_offset + node_size;
++        node_size = sizeof(*smmu) + sizeof(*idmap);
++        iort_length += node_size;
++        smmu = acpi_data_push(table_data, node_size);
++
++        smmu->type = ACPI_IORT_NODE_SMMU_V3;
++        smmu->length = cpu_to_le16(node_size);
++        smmu->mapping_count = cpu_to_le32(1);
++        smmu->mapping_offset = cpu_to_le32(sizeof(*smmu));
++        smmu->base_address = cpu_to_le64(vms->memmap[VIRT_SMMU].base);
++        smmu->event_gsiv = cpu_to_le32(irq);
++        smmu->pri_gsiv = cpu_to_le32(irq + 1);
++        smmu->gerr_gsiv = cpu_to_le32(irq + 2);
++        smmu->sync_gsiv = cpu_to_le32(irq + 3);
++
++        /* Identity RID mapping covering the whole input RID range */
++        idmap = &smmu->id_mapping_array[0];
++        idmap->input_base = 0;
++        idmap->id_count = cpu_to_le32(0xFFFF);
++        idmap->output_base = 0;
++        /* output IORT node is the ITS group node (the first node) */
++        idmap->output_reference = cpu_to_le32(iort->node_offset);
 +    }
 +
-+    /* update notifier node with new flags */
-+    QLIST_FOREACH_SAFE(node, &s->notifiers_list, next, next_node) {
-+        if (node->sdev == sdev) {
-+            if (new == IOMMU_NOTIFIER_NONE) {
-+                trace_smmuv3_notify_flag_del(iommu->parent_obj.name);
-+                QLIST_REMOVE(node, next);
-+                g_free(node);
-+            }
-+            return;
-+        }
+     /* Root Complex Node */
+     node_size = sizeof(*rc) + sizeof(*idmap);
+     iort_length += node_size;
+@@ -438,8 +473,14 @@ build_iort(GArray *table_data, BIOSLinker *linker)
+     idmap->input_base = 0;
+     idmap->id_count = cpu_to_le32(0xFFFF);
+     idmap->output_base = 0;
+-    /* output IORT node is the ITS group node (the first node) */
+-    idmap->output_reference = cpu_to_le32(iort->node_offset);
++
++    if (vms->iommu == VIRT_IOMMU_SMMUV3) {
++        /* output IORT node is the smmuv3 node */
++        idmap->output_reference = cpu_to_le32(smmu_offset);
++    } else {
++        /* output IORT node is the ITS group node (the first node) */
++        idmap->output_reference = cpu_to_le32(iort->node_offset);
++    }
+ 
+     iort->length = cpu_to_le32(iort_length);
+ 
+@@ -777,7 +818,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+ 
+     if (its_class_name() && !vmc->no_its) {
+         acpi_add_table(table_offsets, tables_blob);
+-        build_iort(tables_blob, tables->linker);
++        build_iort(tables_blob, tables->linker, vms);
      }
- }
  
-diff --git a/hw/arm/trace-events b/hw/arm/trace-events
-index e0cfcfc..acd2de4 100644
---- a/hw/arm/trace-events
-+++ b/hw/arm/trace-events
-@@ -17,6 +17,7 @@ smmu_iotlb_cache_miss(uint16_t asid, uint64_t addr, uint32_t hit, uint32_t miss,
- smmu_iotlb_inv_all(void) "IOTLB invalidate all"
- smmu_iotlb_inv_asid(uint16_t asid) "IOTLB invalidate asid=%d"
- smmu_iotlb_inv_iova(uint16_t asid, uint64_t addr) "IOTLB invalidate asid=%d addr=0x%"PRIx64
-+smmu_inv_notifiers_mr(const char *name) "iommu mr=%s"
+     /* XSDT is pointed to by RSDP */
+diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+index 5955eb4..af8e023 100644
+--- a/include/hw/acpi/acpi-defs.h
++++ b/include/hw/acpi/acpi-defs.h
+@@ -628,6 +628,21 @@ struct AcpiIortItsGroup {
+ } QEMU_PACKED;
+ typedef struct AcpiIortItsGroup AcpiIortItsGroup;
  
- #hw/arm/smmuv3.c
- smmuv3_read_mmio(uint64_t addr, uint64_t val, unsigned size, uint32_t r) "addr: 0x%"PRIx64" val:0x%"PRIx64" size: 0x%x(%d)"
-@@ -55,3 +56,7 @@ smmuv3_cmdq_cfgi_cd(uint32_t sid) "     |_ streamid = %d"
- smmuv3_config_cache_hit(uint32_t sid, uint32_t hits, uint32_t misses, float perc) "Config cache HIT for sid %d (hits=%d, misses=%d, hit rate=%.1f)"
- smmuv3_config_cache_miss(uint32_t sid, uint32_t hits, uint32_t misses, float perc) "Config cache MISS for sid %d (hits=%d, misses=%d, hit rate=%.1f)"
- smmuv3_config_cache_inv(uint32_t sid) "Config cache INV for sid %d"
-+smmuv3_notify_flag_add(const char *iommu) "ADD SMMUNotifier node for iommu mr=%s"
-+smmuv3_notify_flag_del(const char *iommu) "DEL SMMUNotifier node for iommu mr=%s"
-+smmuv3_inv_notifiers_iova(const char *name, uint16_t asid, uint64_t iova) "iommu mr=%s asid=%d iova=0x%"PRIx64
++struct AcpiIortSmmu3 {
++    ACPI_IORT_NODE_HEADER_DEF
++    uint64_t base_address;
++    uint32_t flags;
++    uint32_t reserved2;
++    uint64_t vatos_address;
++    uint32_t model;
++    uint32_t event_gsiv;
++    uint32_t pri_gsiv;
++    uint32_t gerr_gsiv;
++    uint32_t sync_gsiv;
++    AcpiIortIdMapping id_mapping_array[0];
++} QEMU_PACKED;
++typedef struct AcpiIortSmmu3 AcpiIortSmmu3;
 +
-diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
-index d173806..50e2912 100644
---- a/include/hw/arm/smmu-common.h
-+++ b/include/hw/arm/smmu-common.h
-@@ -160,4 +160,10 @@ void smmu_iotlb_inv_all(SMMUState *s);
- void smmu_iotlb_inv_asid(SMMUState *s, uint16_t asid);
- void smmu_iotlb_inv_iova(SMMUState *s, uint16_t asid, dma_addr_t iova);
- 
-+/* Unmap the range of all the notifiers registered to any IOMMU mr */
-+void smmu_inv_notifiers_all(SMMUState *s);
-+
-+/* Unmap the range of all the notifiers registered to @mr */
-+void smmu_inv_notifiers_mr(IOMMUMemoryRegion *mr);
-+
- #endif  /* HW_ARM_SMMU_COMMON */
+ struct AcpiIortRC {
+     ACPI_IORT_NODE_HEADER_DEF
+     AcpiIortMemoryAccess memory_properties;
 -- 
 2.5.5
