@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fBI9H-0007H8-Au
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 06:59:44 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fBILE-000161-T8
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:12:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fBI9G-0000Md-OM
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 06:59:43 -0400
-Date: Wed, 25 Apr 2018 12:59:35 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180425105935.GD4652@localhost.localdomain>
-References: <20180424192506.149089-1-eblake@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1fBILA-0005Ts-Ar
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:12:04 -0400
+Resent-Message-Id: <E1fBILA-0005Ts-Ar@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21104)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fBILA-0005TT-38
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:12:00 -0400
+In-Reply-To: <1524648037-5010-1-git-send-email-whois.zihan.yang@gmail.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152464835885.2268.12192930376125345254@71c20359a636>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180424192506.149089-1-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] block: byte-based AIO read/write
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 25 Apr 2018 02:25:59 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] hw/pci-host/q35: Replace hardcoded value
+ with macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,24 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, jsnow@redhat.com, qemu-block@nongnu.org
+To: whois.zihan.yang@gmail.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-Am 24.04.2018 um 21:25 hat Eric Blake geschrieben:
-> While we would prefer that block drivers use coroutines instead
-> of aio callbacks, it is a fairly easy exercise to prove that
-> all existing drivers with aio callbacks are merely scaling
-> from bytes into sectors and back to bytes.  So, even though I
-> am not set up to completely run (or even compile-test) this
-> full series, it seems pretty straightforward to change the
-> signature to quit playing games with pointless scaling.
-> 
-> Incorporate Kevin's review on v1, which amounted to pretty much
-> rewriting the series to be saner (the block layer now defaults
-> to alignment of 1, so drivers that still need 512 for keeping the
-> patch conservative have to override that; and improve the code
-> in io.c to put byte-based access before sector-based fallbacks).
-
-Thanks, applied to the block-next branch.
-
-Kevin
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MjQ2NDgwMzctNTAxMC0xLWdpdC1zZW5kLWVtYWlsLXdob2lzLnppaGFuLnlh
+bmdAZ21haWwuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIGh3L3BjaS1ob3N0L3Ez
+NTogUmVwbGFjZSBoYXJkY29kZWQgdmFsdWUgd2l0aCBtYWNybwoKPT09IFRFU1QgU0NSSVBUIEJF
+R0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVs
+aW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
+bmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAt
+LWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAg
+ZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0l
+cyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRz
+L2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAg
+ICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1Qg
+U0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4
+ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICog
+W25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8xNTI0NjQ4MDM3LTUwMTAtMS1naXQtc2Vu
+ZC1lbWFpbC13aG9pcy56aWhhbi55YW5nQGdtYWlsLmNvbSAtPiBwYXRjaGV3LzE1MjQ2NDgwMzct
+NTAxMC0xLWdpdC1zZW5kLWVtYWlsLXdob2lzLnppaGFuLnlhbmdAZ21haWwuY29tClN3aXRjaGVk
+IHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMzYxZGIwZGY1OSBody9wY2ktaG9zdC9xMzU6IFJlcGxh
+Y2UgaGFyZGNvZGVkIHZhbHVlIHdpdGggbWFjcm8KCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNr
+aW5nIFBBVENIIDEvMTogaHcvcGNpLWhvc3QvcTM1OiBSZXBsYWNlIGhhcmRjb2RlZCB2YWx1ZSB3
+aXRoIG1hY3JvLi4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMjI6IEZJTEU6IGh3
+L3BjaS1ob3N0L3EzNS5jOjUzODoKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbWNoLT5w
+Y2lfYWRkcmVzc19zcGFjZSwgTUNIX0hPU1RfQlJJREdFX1NNUkFNX0NfQkFTRSwgTUNIX0hPU1Rf
+QlJJREdFX1NNUkFNX0NfU0laRSk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwoj
+MjM6IEZJTEU6IGh3L3BjaS1ob3N0L3EzNS5jOjUzOToKKyAgICBtZW1vcnlfcmVnaW9uX2FkZF9z
+dWJyZWdpb25fb3ZlcmxhcChtY2gtPnN5c3RlbV9tZW1vcnksIE1DSF9IT1NUX0JSSURHRV9TTVJB
+TV9DX0JBU0UsCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzI5OiBGSUxFOiBody9w
+Y2ktaG9zdC9xMzUuYzo1NDQ6CisgICAgICAgICAgICAgICAgICAgICAgICAgICAgIG1jaC0+cmFt
+X21lbW9yeSwgTUNIX0hPU1RfQlJJREdFX1NNUkFNX0NfQkFTRSwgTUNIX0hPU1RfQlJJREdFX1NN
+UkFNX0NfU0laRSk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzg6IEZJTEU6
+IGh3L3BjaS1ob3N0L3EzNS5jOjU1MzoKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbWNo
+LT5yYW1fbWVtb3J5LCBNQ0hfSE9TVF9CUklER0VfU01SQU1fQ19CQVNFLCAweDIwMDAwKTsKCkVS
+Uk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNDE6IEZJTEU6IGh3L3BjaS1ob3N0L3EzNS5j
+OjU1NToKKyAgICBtZW1vcnlfcmVnaW9uX2FkZF9zdWJyZWdpb24oJm1jaC0+c21yYW0sIE1DSF9I
+T1NUX0JSSURHRV9TTVJBTV9DX0JBU0UsICZtY2gtPmxvd19zbXJhbSk7CgpFUlJPUjogbGluZSBv
+dmVyIDkwIGNoYXJhY3RlcnMKIzQ0OiBGSUxFOiBody9wY2ktaG9zdC9xMzUuYzo1NTc6CisgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIG1jaC0+cmFtX21lbW9yeSwgTUNIX0hPU1RfQlJJREdF
+X1NNUkFNX0NfQkFTRSwgTUNIX0hPU1RfQlJJREdFX1NNUkFNX0NfU0laRSk7Cgp0b3RhbDogNCBl
+cnJvcnMsIDIgd2FybmluZ3MsIDMwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxl
+IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
+c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
+SCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
+ZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
+Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
+cGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
