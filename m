@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46393)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBDvg-0001MB-Lq
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 02:29:26 -0400
+	(envelope-from <bounces@canonical.com>) id 1fBDxc-0002Ft-6y
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 02:31:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBDvd-0002Hw-Ft
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 02:29:24 -0400
-Received: from ozlabs.org ([203.11.71.1]:35893)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1fBDvc-0002GP-Ez
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 02:29:21 -0400
-Date: Wed, 25 Apr 2018 16:29:08 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180425062908.GS19804@umbus.fritz.box>
-References: <20180424222103.19946-1-f4bug@amsat.org>
+	(envelope-from <bounces@canonical.com>) id 1fBDxZ-00038d-1o
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 02:31:24 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35256)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fBDxY-00037g-Qt
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 02:31:20 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fBDxW-0001Kf-Ou
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 06:31:18 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B5A962E80CE
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 06:31:18 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ShzQXCswyqjgWi6k"
-Content-Disposition: inline
-In-Reply-To: <20180424222103.19946-1-f4bug@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH v4] loader: Fix misaligned member access
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 25 Apr 2018 06:17:48 -0000
+From: ChristianEhrhardt <1755912@bugs.launchpad.net>
+Reply-To: Bug 1755912 <1755912@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152106105315.14602.6749093724412548748.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152463706846.32553.1721396923610969347.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1755912] Re: qemu-system-x86_64 crashed with
+ SIGABRT when using option -vga qxl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,104 +37,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, Paul Burton <paul.burton@mips.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
 
+Thanks Leonardo, with that confirmed:
+- not dependent on the guest distribution
+- affecting latest upstream
+- good logs on the crash
 
---ShzQXCswyqjgWi6k
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The videos are not needed but nice to proove your case (just as my pre-
+analysis of the code path is nice but likely not useful to a developer
+that regularly works on that code sections).
 
-On Tue, Apr 24, 2018 at 07:21:03PM -0300, Philippe Mathieu-Daud=E9 wrote:
-> The libfdt does not guarantee than fdt_getprop() returns a pointer
-> aligned to the property size.
->=20
-> Assuming the base of the fdt is aligned, a 32-bit property returns
-> a 32-bit aligned pointer. This is however not guaranteed for 64-bit
-> properties, where 64-bit loads might trigger unaligned access.
->=20
-> Fix the 64-bit access using the ldst (host) API, which uses a local
-> copy on the stack, thus guaranteeing a safe aligned access.
->=20
-> This fixes the following ASan warning:
->=20
->   $ qemu-system-mips64el -M boston -kernel vmlinux.gz.itb -nographic
->   hw/core/loader-fit.c:108:17: runtime error: load of misaligned address =
-0x7f95cd7e4264 for type 'fdt64_t', which requires 8 byte alignment
->   0x7f95cd7e4264: note: pointer points here
->     00 00 00 3e ff ff ff ff  80 7d 2a c0 00 00 00 01  68 61 73 68 40 30 0=
-0 00  00 00 00 03 00 00 00 14
->                 ^
->=20
-> Reported-by: AddressSanitizer
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+Overall this should really be ready for upstreams attention, I added a
+Qemu task which will auto mirror this to the Mailing list.
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+** Also affects: qemu
+   Importance: Undecided
+       Status: New
 
-I'll look at adding a hlper for this to libfdt, but no promises on timefram=
-e.
+** Changed in: qemu (Ubuntu)
+       Status: Incomplete =3D> Confirmed
 
-> ---
-> v4: do not change the 32-bit access, use ldq_he_p() for the 64-bit access
-> v3: do not use memcpy(), incorrectly change ldl_he_p()
-> v2: do not change the 32-bit access, use memcpy(), add comments (David Gi=
-bson)
-> v1: use memcpy()
->=20
->  hw/core/loader-fit.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/core/loader-fit.c b/hw/core/loader-fit.c
-> index 0c4a7207f4..ed4140061b 100644
-> --- a/hw/core/loader-fit.c
-> +++ b/hw/core/loader-fit.c
-> @@ -102,10 +102,17 @@ static int fit_image_addr(const void *itb, int img,=
- const char *name,
-> =20
->      switch (len) {
->      case 4:
-> +        /* Assuming the base of the fdt is aligned, then fdt_getprop()
-> +         * returns 32-bit aligned properties, so this load is guaranteed
-> +         * to be 32-bit aligned.
-> +         */
->          *addr =3D fdt32_to_cpu(*(fdt32_t *)prop);
->          return 0;
->      case 8:
-> -        *addr =3D fdt64_to_cpu(*(fdt64_t *)prop);
-> +        /* Since the property is not guaranteed to be 64-bit aligned,
-> +         * use ldq_he_p()'s stack to avoid an unaligned load.
-> +         */
-> +        *addr =3D fdt64_to_cpu(ldq_he_p(prop));
->          return 0;
->      default:
->          error_printf("invalid %s address length %d\n", name, len);
+** Information type changed from Private to Public
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+-- =
 
---ShzQXCswyqjgWi6k
-Content-Type: application/pgp-signature; name="signature.asc"
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1755912
 
------BEGIN PGP SIGNATURE-----
+Title:
+  qemu-system-x86_64 crashed with SIGABRT when using option -vga qxl
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrgIDEACgkQbDjKyiDZ
-s5LbERAA18DsEDR073uAKOtXrMbFT/V/+dynlZhjnM/ZzPSidN/vRS5oO8PKX8QU
-L4kNSDLtl5RcUCU1Dlmrgl7yjk6ij9fUpdprgDrkweOl+rKBLeBNiIh4JtN0nXpX
-1q/5o1P9g6IYwGYzQzYQgfzndPH0N8i0TKZRPjhWew2BUnyoOsLawWjJj8YqDXpk
-0cZbPx3ljPwXVI0AlFHlBLDtNFy1UK2qgk3RflwN74C9ZGqFob9W32pz7fu6pJNJ
-6bLWBtVIB2t7gSNhl8/85vL4Q+VvrMns4sFePBRznjcIgrtMZWZfZVSPUJhJir9t
-qjMHv/hu+4q+cJ/QNGRg06A/Q2WDAq6VOQyXJLu74xpdDER0KSW/IXUoGPxFNzxA
-FNQebWLbt8rxx+ZfCZo+dWuik5rIWU58Nof0yesQjiYTkQINzUzs+Tkduq6lD/Bk
-u1MdbQTyO8YKr9ZcjOOB2NN9pONtiKgDWKryUaGLaZQcNfqTt/nrPwBOR8KycU1O
-HywnAEt/b8IQnp0F7pRa5qmDr2JDGrS64PcxjXj7GENWPFKR1bYqwWbIMhZy2G0n
-UcE19jJnPP+imFtzEbVxQcfcPrFjOwMiuzHXUWPOboRwShVfS6RS95Rqg533G9LW
-cb7frZh+rjllyO8OdAB2k+czAaP/XbMH4PIW/yTkXXJhSTC6vCY=
-=oPt2
------END PGP SIGNATURE-----
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  Confirmed
 
---ShzQXCswyqjgWi6k--
+Bug description:
+  When using qemu-system-x86_64 with the option -vga qxl, it crashes.
+  The easiest way to crash it is by trying to change the guest's
+  resolution. However, the system may randomly crash too, not happening
+  only when changing resolution. Here is the terminal output of one of
+  these random crashes:
+
+  --------
+
+  $ qemu-system-x86_64 -hda /dev/sdb -m 2048 -enable-kvm -cpu host -vga qxl=
+ -nodefaults -netdev user,id=3Dhostnet0 -device virtio-net-pci,id=3Dnet0,ne=
+tdev=3Dhostnet0
+  WARNING: Image format was not specified for '/dev/sdb' and probing guesse=
+d raw.
+           Automatically detecting the format is dangerous for raw images, =
+write operations on block 0 will be restricted.
+           Specify the 'raw' format explicitly to remove the restrictions.
+
+  (process:21313): Spice-WARNING **: 16:01:45.759: display-
+  channel.c:2431:display_channel_validate_surface: canvas address is
+  0x7f8eb948ab18 for 0 (and is NULL)
+
+  =
+
+  (process:21313): Spice-WARNING **: 16:01:45.759: display-channel.c:2432:d=
+isplay_channel_validate_surface: failed on 0
+
+  (process:21313): Spice-CRITICAL **: 16:01:45.759: display-channel.c:2035:=
+display_channel_update: condition `display_channel_validate_surface(display=
+, surface_id)' failed
+  Abortado (imagem do n=C3=BAcleo gravada)
+
+  --------
+
+  I was running QEMU as a normal user which is on the groups kvm and
+  disk. Initially I supposed the problem was because I was running QEMU
+  as root, but as a normal user this happens too.
+
+  I have tested with guests with different Ubuntu version: 18.04, 17.10
+  and 16.04. It is happening with them all.
+
+  ProblemType: Crash
+  DistroRelease: Ubuntu 18.04
+  Package: qemu-system-x86 1:2.11+dfsg-1ubuntu4
+  ProcVersionSignature: Ubuntu 4.15.0-10.11-generic 4.15.3
+  Uname: Linux 4.15.0-10-generic x86_64
+  ApportVersion: 2.20.8-0ubuntu10
+  Architecture: amd64
+  CurrentDesktop: XFCE
+  Date: Wed Mar 14 17:13:52 2018
+  ExecutablePath: /usr/bin/qemu-system-x86_64
+  InstallationDate: Installed on 2017-06-13 (273 days ago)
+  InstallationMedia: Xubuntu 17.04 "Zesty Zapus" - Release amd64 (20170412)
+  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
+  MachineType: LENOVO 80UG
+  ProcCmdline: qemu-system-x86_64 -hda /dev/sdb -smp cpus=3D2 -m 512 -enabl=
+e-kvm -cpu host -vga qxl -nodefaults -netdev user,id=3Dhostnet0 -device vir=
+tio-net-pci,id=3Dnet0,netdev=3Dhostnet0
+  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-4.15.0-10-generic.efi.signe=
+d root=3DUUID=3D6b4ae5c0-c78c-49a6-a1ba-029192618a7a ro quiet
+  Signal: 6
+  SourcePackage: qemu
+  StacktraceTop:
+   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+   () at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+  Title: qemu-system-x86_64 crashed with SIGABRT
+  UpgradeStatus: Upgraded to bionic on 2017-10-20 (145 days ago)
+  UserGroups: adm bluetooth cdrom dialout dip disk kvm libvirt lpadmin netd=
+ev plugdev sambashare sudo
+  dmi.bios.date: 07/10/2017
+  dmi.bios.vendor: LENOVO
+  dmi.bios.version: 0XCN43WW
+  dmi.board.asset.tag: NO Asset Tag
+  dmi.board.name: Toronto 4A2
+  dmi.board.vendor: LENOVO
+  dmi.board.version: SDK0J40679 WIN
+  dmi.chassis.asset.tag: NO Asset Tag
+  dmi.chassis.type: 10
+  dmi.chassis.vendor: LENOVO
+  dmi.chassis.version: Lenovo ideapad 310-14ISK
+  dmi.modalias: dmi:bvnLENOVO:bvr0XCN43WW:bd07/10/2017:svnLENOVO:pn80UG:pvr=
+Lenovoideapad310-14ISK:rvnLENOVO:rnToronto4A2:rvrSDK0J40679WIN:cvnLENOVO:ct=
+10:cvrLenovoideapad310-14ISK:
+  dmi.product.family: IDEAPAD
+  dmi.product.name: 80UG
+  dmi.product.version: Lenovo ideapad 310-14ISK
+  dmi.sys.vendor: LENOVO
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1755912/+subscriptions
