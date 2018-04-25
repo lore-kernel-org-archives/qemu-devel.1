@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fBLMg-0007p0-7D
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:25:47 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fBLPd-0001xP-Au
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:28:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fBLMc-0002jH-8v
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:25:46 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34328 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fBLMb-0002if-Uk
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:25:42 -0400
-References: <20180425112415.12327-1-pagupta@redhat.com>
-	<20180425112415.12327-4-pagupta@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <25f3e433-cfa6-4a62-ba7f-47aef1119dfc@redhat.com>
-Date: Wed, 25 Apr 2018 09:25:37 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fBLPZ-0004Wu-CM
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:28:49 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:41256)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fBLPZ-0004Wc-7r
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:28:45 -0400
+Received: by mail-qk0-x244.google.com with SMTP id d125so6719037qkb.8
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 07:28:45 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180424152405.10304-1-alex.bennee@linaro.org>
+	<20180424152405.10304-40-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <85bb0031-ee39-3504-1e19-e5023e21342a@amsat.org>
+Date: Wed, 25 Apr 2018 11:28:40 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180425112415.12327-4-pagupta@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="CFJqPHc1lVbGj70GneZIm5syNGVZjNCpA"
-Subject: Re: [Qemu-devel] [RFC v2] qemu: Add virtio pmem device
+In-Reply-To: <20180424152405.10304-40-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 39/46] tests/tcg: enable building for
+ m68k
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,137 +36,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-nvdimm@ml01.01.org, linux-mm@kvack.org
-Cc: kwolf@redhat.com, haozhong.zhang@intel.com, jack@suse.cz, xiaoguangrong.eric@gmail.com, riel@surriel.com, niteshnarayanlal@hotmail.com, david@redhat.com, ross.zwisler@intel.com, lcapitulino@redhat.com, hch@infradead.org, mst@redhat.com, stefanha@redhat.com, imammedo@redhat.com, marcel@redhat.com, pbonzini@redhat.com, dan.j.williams@intel.com, nilal@redhat.com
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---CFJqPHc1lVbGj70GneZIm5syNGVZjNCpA
-From: Eric Blake <eblake@redhat.com>
-To: Pankaj Gupta <pagupta@redhat.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-nvdimm@ml01.01.org,
- linux-mm@kvack.org
-Cc: kwolf@redhat.com, haozhong.zhang@intel.com, jack@suse.cz,
- xiaoguangrong.eric@gmail.com, riel@surriel.com,
- niteshnarayanlal@hotmail.com, david@redhat.com, ross.zwisler@intel.com,
- lcapitulino@redhat.com, hch@infradead.org, mst@redhat.com,
- stefanha@redhat.com, imammedo@redhat.com, marcel@redhat.com,
- pbonzini@redhat.com, dan.j.williams@intel.com, nilal@redhat.com
-Message-ID: <25f3e433-cfa6-4a62-ba7f-47aef1119dfc@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2] qemu: Add virtio pmem device
-References: <20180425112415.12327-1-pagupta@redhat.com>
- <20180425112415.12327-4-pagupta@redhat.com>
-In-Reply-To: <20180425112415.12327-4-pagupta@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 04/25/2018 06:24 AM, Pankaj Gupta wrote:
-> This patch adds virtio-pmem Qemu device.
->=20
-> This device presents memory address range=20
-> information to guest which is backed by file=20
-> backend type. It acts like persistent memory=20
-> device for KVM guest. Guest can perform read=20
-> and persistent write operations on this memory=20
-> range with the help of DAX capable filesystem.
->=20
-> Persistent guest writes are assured with the=20
-> help of virtio based flushing interface. When=20
-> guest userspace space performs fsync on file=20
-> fd on pmem device, a flush command is send to=20
-> Qemu over VIRTIO and host side flush/sync is=20
-> done on backing image file.
->=20
-> This PV device code is dependent and tested=20
-> with 'David Hildenbrand's ' patchset[1] to=20
-> map non-PCDIMM devices to guest address space.
-
-This sentence doesn't belong in git history.  It is better to put
-information like this...
-
-> There is still upstream discussion on using=20
-> among PCI bar vs memory device, will update=20
-> as per concensus.
-
-s/concensus/consensus/
-
->=20
-> [1] https://marc.info/?l=3Dqemu-devel&m=3D152450249319168&w=3D2
->=20
-> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+On 04/24/2018 12:23 PM, Alex Bennée wrote:
+> As before, using Debian SID compilers.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 > ---
-
-=2E..here, where it is part of the email, but not picked up by 'git am'.
-
-
-> +++ b/qapi/misc.json
-> @@ -2871,6 +2871,29 @@
->            }
->  }
-> =20
-> +##
-> +# @VirtioPMemDeviceInfo:
+>  tests/docker/Makefile.include                     |  1 +
+>  tests/docker/dockerfiles/debian-m68k-cross.docker | 12 ++++++++++++
+>  tests/tcg/m68k/Makefile.include                   |  2 ++
+>  3 files changed, 15 insertions(+)
+>  create mode 100644 tests/docker/dockerfiles/debian-m68k-cross.docker
+>  create mode 100644 tests/tcg/m68k/Makefile.include
+> 
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+> index 2471c4f30a..15c52127c7 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -64,6 +64,7 @@ docker-image-debian-win32-cross: docker-image-debian8-mxe
+>  docker-image-debian-win64-cross: docker-image-debian8-mxe
+>  docker-image-debian-alpha-cross: docker-image-debian-sid
+>  docker-image-debian-hppa-cross: docker-image-debian-sid
+> +docker-image-debian-m68k-cross: docker-image-debian-sid
+>  docker-image-travis: NOUSER=1
+>  
+>  # Expand all the pre-requistes for each docker image and test combination
+> diff --git a/tests/docker/dockerfiles/debian-m68k-cross.docker b/tests/docker/dockerfiles/debian-m68k-cross.docker
+> new file mode 100644
+> index 0000000000..21ba3b0132
+> --- /dev/null
+> +++ b/tests/docker/dockerfiles/debian-m68k-cross.docker
+> @@ -0,0 +1,12 @@
 > +#
-> +# VirtioPMem state information
+> +# Docker cross-compiler target
 > +#
-> +# @id: device's ID
+> +# This docker target builds on the debian sid base image which
+> +# contains cross compilers for Debian "ports" targets.
 > +#
-> +# @start: physical address, where device is mapped
-> +#
-> +# @size: size of memory that the device provides
-> +#
-> +# @memdev: memory backend linked with device
-> +#
-> +# Since: 2.13
-> +##
-> +{ 'struct': 'VirtioPMemDeviceInfo',
-> +    'data': { '*id': 'str',
-> +	      'start': 'size',
-> +	      'size': 'size',
-
-TAB damage.
-
-> +              'memdev': 'str'
-> +	    }
-> +}
+> +FROM qemu:debian-sid
 > +
->  ##
->  # @MemoryDeviceInfo:
->  #
-> @@ -2880,7 +2903,8 @@
->  ##
->  { 'union': 'MemoryDeviceInfo',
->    'data': { 'dimm': 'PCDIMMDeviceInfo',
-> -            'nvdimm': 'PCDIMMDeviceInfo'
-> +            'nvdimm': 'PCDIMMDeviceInfo',
-> +	    'virtio-pmem': 'VirtioPMemDeviceInfo'
->            }
->  }
-> =20
->=20
+> +RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+> +    apt-get install -y --no-install-recommends \
+> +        gcc-m68k-linux-gnu \
+> +        libc6-dev-m68k-cross
+> diff --git a/tests/tcg/m68k/Makefile.include b/tests/tcg/m68k/Makefile.include
+> new file mode 100644
+> index 0000000000..cd7c6bf50d
+> --- /dev/null
+> +++ b/tests/tcg/m68k/Makefile.include
+> @@ -0,0 +1,2 @@
+> +DOCKER_IMAGE=debian-m68k-cross
+> +DOCKER_CROSS_COMPILER=m68k-linux-gnu-gcc
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+$ make -j1 run-tcg-tests-m68k-linux-user
+  BUILD   debian-sid
+  BUILD   debian-m68k-cross
+  CROSS-BUILD m68k guest-tests with docker qemu:debian-m68k-cross
+/source/qemu/tests/tcg/m68k/Makefile.target:8: warning: overriding
+recipe for target 'run-test-mmap'
+/source/qemu/tests/tcg/multiarch/Makefile.target:26: warning: ignoring
+old recipe for target 'run-test-mmap'
+  BUILD   debian-sid
+  BUILD   debian-m68k-cross
+  CROSS-BUILD m68k guest-tests with docker qemu:debian-m68k-cross
+/source/qemu/tests/tcg/m68k/Makefile.target:8: warning: overriding
+recipe for target 'run-test-mmap'
+/source/qemu/tests/tcg/multiarch/Makefile.target:26: warning: ignoring
+old recipe for target 'run-test-mmap'
+  RUN-TESTS for m68k
+/source/qemu/tests/tcg/m68k/Makefile.target:8: warning: overriding
+recipe for target 'run-test-mmap'
+/source/qemu/tests/tcg/multiarch/Makefile.target:26: warning: ignoring
+old recipe for target 'run-test-mmap'
+  TEST    test-mmap (default) on m68k
+  TEST    sha1 on m68k
+  BROKEN TEST linux-test SKIPPED on m68k
+  TEST    testthread on m68k
 
-
---CFJqPHc1lVbGj70GneZIm5syNGVZjNCpA
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrgj+EACgkQp6FrSiUn
-Q2oftQgAkgISPCCNGA8QYSXkQfHKQ2qPa3CR6cJ1vSVXjJWEsPypyfrQ4P/caxJC
-OaTfjufz0Tgn/kn1MOzeDYgQGnOjYZJC+1YYcMhR8arrUb6Whv4ejHpnXGNC1lxJ
-hLcRxPhD7fg7CW55xgi/pXF1OLUxMMQdtyd57SCW5rCt5NPi8TZRsDOiM34KEbDW
-EewLjBrjnueBaLVywp5I0KFODWua4/qSmkzB3E/EnHw66uHKrWH0PAHnH2s3OnwL
-0o4eBB2YnSrf2eKCuLY5XvJwD9HyRQm9h6sKnuP7+PqzaLlycHphA1jfOL+hNK2w
-txr4zrD38INfFRWQy0QHUt84HMGbPg==
-=ylBq
------END PGP SIGNATURE-----
-
---CFJqPHc1lVbGj70GneZIm5syNGVZjNCpA--
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
