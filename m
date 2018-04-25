@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fBBiG-0003da-3d
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 00:07:25 -0400
+	(envelope-from <peterx@redhat.com>) id 1fBCPH-0003y5-Dk
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 00:51:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fBBiB-0002Qi-NV
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 00:07:24 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:41837)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fBBiB-0002QU-IU
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 00:07:19 -0400
-Received: by mail-qt0-x244.google.com with SMTP id d3-v6so25185118qth.8
-	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 21:07:19 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180424152405.10304-1-alex.bennee@linaro.org>
-	<20180424152405.10304-15-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ddb69b10-1bef-722c-3832-1c56b53a74a8@amsat.org>
-Date: Wed, 25 Apr 2018 01:07:14 -0300
-MIME-Version: 1.0
-In-Reply-To: <20180424152405.10304-15-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 14/46] tests/tcg/multiarch: enable
- additional linux-test tests
+	(envelope-from <peterx@redhat.com>) id 1fBCPE-0007BH-BK
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 00:51:51 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45212 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fBCPE-0007B0-5b
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 00:51:48 -0400
+From: Peter Xu <peterx@redhat.com>
+Date: Wed, 25 Apr 2018 12:51:20 +0800
+Message-Id: <20180425045129.17449-2-peterx@redhat.com>
+In-Reply-To: <20180425045129.17449-1-peterx@redhat.com>
+References: <20180425045129.17449-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH 01/10] intel-iommu: send PSI always even if
+ across PDEs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,149 +24,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>
 
-On 04/24/2018 12:23 PM, Alex Bennée wrote:
-> Un-comment the remaining tests.
-> 
-> I removed the itimer value tests because I'm fairly sure a re-arming
-> timer will always have a different value in it when you grab it.
-> 
-> I've also fixed up the clone thread flags as QEMU will only allow a
-> clone to use flags which match glibc.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+During IOVA page table walking, there is a special case when the PSI
+covers one whole PDE (Page Directory Entry, which contains 512 Page
+Table Entries) or more.  In the past, we skip that entry and we don't
+notify the IOMMU notifiers.  This is not correct.  We should send UNMAP
+notification to registered UNMAP notifiers in this case.
 
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+For UNMAP only notifiers, this might cause IOTLBs cached in the devices
+even if they were already invalid.  For MAP/UNMAP notifiers like
+vfio-pci, this will cause stale page mappings.
 
-> 
-> ---
-> v3
->   - make clone flags match CLONE_THREAD_FLAGS
-> ---
->  tests/tcg/multiarch/linux-test.c | 31 +++++++++++++++++--------------
->  1 file changed, 17 insertions(+), 14 deletions(-)
-> 
-> diff --git a/tests/tcg/multiarch/linux-test.c b/tests/tcg/multiarch/linux-test.c
-> index 4457bd04ba..754edf9910 100644
-> --- a/tests/tcg/multiarch/linux-test.c
-> +++ b/tests/tcg/multiarch/linux-test.c
-> @@ -16,6 +16,7 @@
->   *  You should have received a copy of the GNU General Public License
->   *  along with this program; if not, see <http://www.gnu.org/licenses/>.
->   */
-> +#define _GNU_SOURCE
->  #include <stdarg.h>
->  #include <stdlib.h>
->  #include <stdio.h>
-> @@ -39,6 +40,7 @@
->  #include <dirent.h>
->  #include <setjmp.h>
->  #include <sys/shm.h>
-> +#include <sched.h>
->  
->  #define TESTPATH "/tmp/linux-test.tmp"
->  #define TESTPORT 7654
-> @@ -58,8 +60,8 @@ static void error1(const char *filename, int line, const char *fmt, ...)
->  static int __chk_error(const char *filename, int line, int ret)
->  {
->      if (ret < 0) {
-> -        error1(filename, line, "%m (ret=%d, errno=%d)",
-> -               ret, errno);
-> +        error1(filename, line, "%m (ret=%d, errno=%d/%s)",
-> +               ret, errno, strerror(errno));
->      }
->      return ret;
->  }
-> @@ -320,7 +322,6 @@ static void test_socket(void)
->      chk_error(close(server_fd));
->  }
->  
-> -#if 0
->  #define WCOUNT_MAX 512
->  
->  static void test_pipe(void)
-> @@ -355,7 +356,7 @@ static void test_pipe(void)
->              }
->              if (FD_ISSET(fds[1], &wfds)) {
->                  ch = 'a';
-> -                chk_error(write(fds[0], &ch, 1));
-> +                chk_error(write(fds[1], &ch, 1));
->                  wcount++;
->              }
->          }
-> @@ -387,6 +388,9 @@ static int thread2_func(void *arg)
->      return 0;
->  }
->  
-> +/* For test_clone we must match the clone flags used by glibc, see
-> + * CLONE_THREAD_FLAGS in the QEMU source code.
-> + */
->  void test_clone(void)
->  {
->      uint8_t *stack1, *stack2;
-> @@ -394,11 +398,15 @@ void test_clone(void)
->  
->      stack1 = malloc(STACK_SIZE);
->      pid1 = chk_error(clone(thread1_func, stack1 + STACK_SIZE,
-> -                           CLONE_VM | CLONE_FS | CLONE_FILES | SIGCHLD, "hello1"));
-> +                           CLONE_VM | CLONE_FS | CLONE_FILES |
-> +                           CLONE_SIGHAND | CLONE_THREAD | CLONE_SYSVSEM,
-> +                            "hello1"));
->  
->      stack2 = malloc(STACK_SIZE);
->      pid2 = chk_error(clone(thread2_func, stack2 + STACK_SIZE,
-> -                           CLONE_VM | CLONE_FS | CLONE_FILES | SIGCHLD, "hello2"));
-> +                           CLONE_VM | CLONE_FS | CLONE_FILES |
-> +                           CLONE_SIGHAND | CLONE_THREAD | CLONE_SYSVSEM,
-> +                           "hello2"));
->  
->      while (waitpid(pid1, &status1, 0) != pid1);
->      free(stack1);
-> @@ -408,7 +416,6 @@ void test_clone(void)
->          thread2_res != 6)
->          error("clone");
->  }
-> -#endif
->  
->  /***********************************/
->  
-> @@ -449,12 +456,10 @@ static void test_signal(void)
->      it.it_value.tv_usec = 10 * 1000;
->      chk_error(setitimer(ITIMER_REAL, &it, NULL));
->      chk_error(getitimer(ITIMER_REAL, &oit));
-> -    if (oit.it_value.tv_sec != it.it_value.tv_sec ||
-> -        oit.it_value.tv_usec != it.it_value.tv_usec)
-> -        error("itimer");
->  
->      while (alarm_count < 5) {
->          usleep(10 * 1000);
-> +        getitimer(ITIMER_REAL, &oit);
->      }
->  
->      it.it_interval.tv_sec = 0;
-> @@ -463,9 +468,6 @@ static void test_signal(void)
->      it.it_value.tv_usec = 0;
->      memset(&oit, 0xff, sizeof(oit));
->      chk_error(setitimer(ITIMER_REAL, &it, &oit));
-> -    if (oit.it_value.tv_sec != 0 ||
-> -        oit.it_value.tv_usec != 10 * 1000)
-> -        error("setitimer");
->  
->      /* SIGSEGV test */
->      act.sa_sigaction = sig_segv;
-> @@ -503,10 +505,11 @@ static void test_shm(void)
->  int main(int argc, char **argv)
->  {
->      test_file();
-> +    test_pipe();
->      test_fork();
->      test_time();
->      test_socket();
-> -    //    test_clone();
-> +    test_clone();
->      test_signal();
->      test_shm();
->      return 0;
-> 
+This special case doesn't trigger often, but it is very easy to be
+triggered by nested device assignments, since in that case we'll
+possibly map the whole L2 guest RAM region into the device's IOVA
+address space (several GBs at least), which is far bigger than normal
+kernel driver usages of the device (tens of MBs normally).
+
+Without this patch applied to L1 QEMU, nested device assignment to L2
+guests will dump some errors like:
+
+qemu-system-x86_64: VFIO_MAP_DMA: -17
+qemu-system-x86_64: vfio_dma_map(0x557305420c30, 0xad000, 0x1000,
+                    0x7f89a920d000) = -17 (File exists)
+
+Acked-by: Jason Wang <jasowang@redhat.com>
+[peterx: rewrite the commit message]
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ hw/i386/intel_iommu.c | 42 ++++++++++++++++++++++++++++++------------
+ 1 file changed, 30 insertions(+), 12 deletions(-)
+
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index fb31de9416..b359efd6f9 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -722,6 +722,15 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
+ 
+ typedef int (*vtd_page_walk_hook)(IOMMUTLBEntry *entry, void *private);
+ 
++static int vtd_page_walk_one(IOMMUTLBEntry *entry, int level,
++                             vtd_page_walk_hook hook_fn, void *private)
++{
++    assert(hook_fn);
++    trace_vtd_page_walk_one(level, entry->iova, entry->translated_addr,
++                            entry->addr_mask, entry->perm);
++    return hook_fn(entry, private);
++}
++
+ /**
+  * vtd_page_walk_level - walk over specific level for IOVA range
+  *
+@@ -781,28 +790,37 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
+          */
+         entry_valid = read_cur | write_cur;
+ 
++        entry.target_as = &address_space_memory;
++        entry.iova = iova & subpage_mask;
++        entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
++        entry.addr_mask = ~subpage_mask;
++
+         if (vtd_is_last_slpte(slpte, level)) {
+-            entry.target_as = &address_space_memory;
+-            entry.iova = iova & subpage_mask;
+             /* NOTE: this is only meaningful if entry_valid == true */
+             entry.translated_addr = vtd_get_slpte_addr(slpte, aw);
+-            entry.addr_mask = ~subpage_mask;
+-            entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
+             if (!entry_valid && !notify_unmap) {
+                 trace_vtd_page_walk_skip_perm(iova, iova_next);
+                 goto next;
+             }
+-            trace_vtd_page_walk_one(level, entry.iova, entry.translated_addr,
+-                                    entry.addr_mask, entry.perm);
+-            if (hook_fn) {
+-                ret = hook_fn(&entry, private);
+-                if (ret < 0) {
+-                    return ret;
+-                }
++            ret = vtd_page_walk_one(&entry, level, hook_fn, private);
++            if (ret < 0) {
++                return ret;
+             }
+         } else {
+             if (!entry_valid) {
+-                trace_vtd_page_walk_skip_perm(iova, iova_next);
++                if (notify_unmap) {
++                    /*
++                     * The whole entry is invalid; unmap it all.
++                     * Translated address is meaningless, zero it.
++                     */
++                    entry.translated_addr = 0x0;
++                    ret = vtd_page_walk_one(&entry, level, hook_fn, private);
++                    if (ret < 0) {
++                        return ret;
++                    }
++                } else {
++                    trace_vtd_page_walk_skip_perm(iova, iova_next);
++                }
+                 goto next;
+             }
+             ret = vtd_page_walk_level(vtd_get_slpte_addr(slpte, aw), iova,
+-- 
+2.14.3
