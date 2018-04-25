@@ -1,45 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fBMtx-0003Uk-BM
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 12:04:14 -0400
+	(envelope-from <abologna@redhat.com>) id 1fBMzI-0007DV-FP
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 12:09:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fBMtt-0003L2-8M
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 12:04:13 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30170)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1fBMtt-0003KG-0P
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 12:04:09 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w3PG1N1f016255
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 12:04:07 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2hjut3kkaw-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 12:04:04 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 25 Apr 2018 17:03:52 +0100
-References: <1524647323-6449-1-git-send-email-thuth@redhat.com>
-	<1524647323-6449-3-git-send-email-thuth@redhat.com>
-	<60dc9968-58fd-46e3-b471-7a0b7093ba15@de.ibm.com>
-	<775de9f5-7da0-45fa-da32-edceac7cf258@redhat.com>
-	<24876878-e365-604e-348c-f649568e167f@de.ibm.com>
-	<7ed61a09-c00c-acf0-f504-f6feb8d55950@de.ibm.com>
-	<6930de56-f73d-d466-110d-87ecdc74836d@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 25 Apr 2018 18:03:48 +0200
-MIME-Version: 1.0
-In-Reply-To: <6930de56-f73d-d466-110d-87ecdc74836d@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+	(envelope-from <abologna@redhat.com>) id 1fBMzC-0007Tl-Gy
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 12:09:44 -0400
+Message-ID: <1524672566.23669.15.camel@redhat.com>
+From: Andrea Bolognani <abologna@redhat.com>
+Date: Wed, 25 Apr 2018 18:09:26 +0200
+In-Reply-To: <20180420102117.GQ2434@umbus.fritz.box>
+References: <20180419062917.31486-1-david@gibson.dropbear.id.au>
+	<1524151804.3017.9.camel@redhat.com>
+	<20180420023542.GD2434@umbus.fritz.box>
+	<1524216670.3017.11.camel@redhat.com>
+	<20180420102117.GQ2434@umbus.fritz.box>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <9daea5e5-a02d-7384-2203-6c0043880525@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] pc-bios/s390-ccw/net: Use diag308
- to reset machine before jumping to the OS
+Subject: Re: [Qemu-devel] [RFC for-2.13 0/7] spapr: Clean up pagesize
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,99 +27,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Farhan Ali <alifm@linux.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
 
-
-
-On 04/25/2018 05:36 PM, Thomas Huth wrote:
-> On 25.04.2018 14:44, Christian Borntraeger wrote:
->>
->>
->> On 04/25/2018 02:41 PM, Christian Borntraeger wrote:
->>> You load from address 0. 
->>>
->>> On 04/25/2018 02:34 PM, Thomas Huth wrote:
->>>> On 25.04.2018 14:18, Christian Borntraeger wrote:
->>>>>
->>>>> On 04/25/2018 11:08 AM, Thomas Huth wrote:
->>>>>
->>>>>> --- a/pc-bios/s390-ccw/netmain.c
->>>>>> +++ b/pc-bios/s390-ccw/netmain.c
->>>>>> @@ -283,6 +283,15 @@ void panic(const char *string)
->>>>>>      }
->>>>>>  }
->>>>>>  
->>>>>> +void write_subsystem_identification(void)
->>>>>> +{
->>>>>> +    uint32_t *schid = (uint32_t *) 184;
->>>>>> +    uint32_t *zeroes = (uint32_t *) 188;
->>>>>> +
->>>>>> +    *schid = 0;         /* We must not set this for virtio-net */
->>>>>> +    *zeroes = 0;
->>>>>> +}
->>>>>> +
->>>>>
->>>>> I think we actually want to have the CCW devno of that network device
->>>>> stored. It has some value to know which CCW device we bootet from, no?
->>>>
->>>> Actually, I tried that first (and it took quite some time to debug it),
->>>> but the Linux kernel then bails out quite early, without any error
->>>> message. The trace looks like this:
->>>>
->>>> 0x0000000007801802:  diag	%r1,%r1,776
->>>> 0x0000000007801780:  larl	%r2,0x7831004
->>>> 0x0000000007801786:  llgf	%r1,8
->>>> 0x000000000780178c:  mvc	0(12,%r0),0(%r2)
->>>> 0x0000000007801792:  br	%r1
->>>> 0x0000000000000418:  bas	%r14,512
->>>> 0x0000000000000200:  mvi	163,1
->>>> 0x0000000000000204:  slr	%r0,%r0
->>>> 0x0000000000000206:  lhi	%r1,2
->>>> 0x000000000000020a:  sigp	%r1,%r0,18
->>>> 0x000000000000020e:  bras	%r13,0x252
->>>> 0x0000000000000252:  lmh	%r0,%r15,0(%r13)
->>>> 0x0000000000000258:  sam31
->>>> 0x000000000000025a:  br	%r14
->>>> 0x000000000000041c:  lh	%r1,184
->>>> 0x0000000000000420:  bct	%r1,1322
->>>> 0x0000000000000424:  l	%r1,184
->>>> 0x0000000000000428:  la	%r2,1840
->>>> 0x000000000000042c:  bas	%r14,640
->>>> 0x0000000000000280:  la	%r4,0(%r14)
->>>> 0x0000000000000284:  la	%r3,792
->>>> 0x0000000000000288:  la	%r5,804
->>>> 0x000000000000028c:  la	%r6,888
->>>> 0x0000000000000290:  la	%r7,20
->>>> 0x0000000000000294:  st	%r2,4(%r6)
->>>> 0x0000000000000298:  la	%r2,80(%r2)
->>>> 0x000000000000029c:  la	%r6,8(%r6)
->>>> 0x00000000000002a0:  bct	%r7,660
->>>> 0x00000000000002a4:  lctl	%c6,%c6,868
->>>> 0x00000000000002a8:  slr	%r2,%r2
->>>> 0x00000000000002aa:  ssch	0(%r3)
->>>> 0x00000000000002ae:  bne	786
->>>> 0x0000000000000312:  lpsw	880
->>>> Guest crashed on cpu 0: disabled-wait
->>>> PSW: 0x000a000000000000 0x0000000000000000
->>>>
->>>> That's the Lloader function in arch/s390/kernel/head.S which is failing
->>>> here, so seems like Linux tries to load from a block device in case
->>>> there is a value in 184. Thus I assume that 184 has to contain 0 in this
->>>> case.
->>>
->>> Hmm, I think this is because we jump to 418 for your kernel (which is the loader
->>> that tries to bootstrap the ccw ipl). When you look at ipl.c we override that
->>> and jump to 0x10000 instead for linux (which is also hackish) for image files.
->>> So I guess if we would do a psw restart instead (like you do) on a kernel image
->>> the normal ipl would also fail....
->>
->> FWIW, zipl also loads linux kernels from 0x10000
+On Fri, 2018-04-20 at 20:21 +1000, David Gibson wrote:
+> On Fri, Apr 20, 2018 at 11:31:10AM +0200, Andrea Bolognani wrote:
+> > Is the 16 MiB page size available for both POWER8 and POWER9?
 > 
-> OK, I just checked, and indeed, if I change to code to jump to 0x10000,
-> it also works when setting a value into 184. So I'll change this patch
-> here accordingly.
+> No.  That's a big part of what makes this such a mess.  HPT has 16MiB
+> and 16GiB hugepages, RPT has 2MiB and 1GiB hugepages.  (Well, I guess
+> tecnically Power9 does have 16MiB pages - but only in hash mode, which
+> the host won't be).
+> 
+[...]
+> > > This does mean, for example, that if
+> > > it was just set to the hugepage size on a p9, 21 (2MiB) things should
+> > > work correctly (in practice it would act identically to setting it to
+> > > 16).
+> > 
+> > Wouldn't that lead to different behavior depending on whether you
+> > start the guest on a POWER9 or POWER8 machine? The former would be
+> > able to use 2 MiB hugepages, while the latter would be stuck using
+> > regular 64 KiB pages.
+> 
+> Well, no, because 2MiB hugepages aren't a thing in HPT mode.  In RPT
+> mode it'd be able to use 2MiB hugepages either way, because the
+> limitations only apply to HPT mode.
+> 
+> > Migration of such a guest from POWER9 to
+> > POWER8 wouldn't work because the hugepage allocation couldn't be
+> > fulfilled,
+> 
+> Sort of, you couldn't even get as far as staring the incoming qemu
+> with hpt-mps=21 on the POWER8 (unless you gave it 16MiB hugepages for
+> backing).
+> 
+> > but the other way around would probably work and lead to
+> > different page sizes being available inside the guest after a power
+> > cycle, no?
+> 
+> Well.. there are a few cases here.  If you migrated p8 -> p8 with
+> hpt-mps=21 on both ends, you couldn't actually start the guest on the
+> source without giving it hugepage backing.  In which case it'll be
+> fine on the p9 with hugepage mapping.
+> 
+> If you had hpt-mps=16 on the source and hpt-mps=21 on the other end,
+> well, you don't get to count on anything because you changed the VM
+> definition.  In fact it would work in this case, and you wouldn't even
+> get new page sizes after restart because HPT mode doesn't support any
+> pagesizes between 64kiB and 16MiB.
+> 
+> > > > I guess 34 corresponds to 1 GiB hugepages?
+> > > 
+> > > No, 16GiB hugepages, which is the "colossal page" size on HPT POWER
+> > > machines.  It's a simple shift, (1 << 34) == 16 GiB, 1GiB pages would
+> > > be 30 (but wouldn't let the guest do any more than 24 ~ 16 MiB in
+> > > practice).
+> > 
+> > Isn't 1 GiB hugepages support at least being worked on[1]?
+> 
+> That's for radix mode.  Hash mode has 16MiB and 16GiB, no 1GiB.
 
-This will of course break loading non-Linux binaries.
-Could we maybe check 0x10008 for S390EP (see head.S) which indicates Linux since 3.2 or so
-and only in that case change the address to 0x10000?
+So, I've spent some more time trying to wrap my head around the
+whole ordeal I'm still unclear about some of the details, though;
+hopefully you'll be willing to answer a few more questions.
+
+Basically the only page sizes you can have for HPT guests are
+4 KiB, 64 KiB, 16 MiB and 16 GiB; in each case, for KVM, you need
+the guest memory to be backed by host pages which are at least as
+big, or it won't work. The same limitation doesn't apply to either
+RPT or TCG guests.
+
+The new parameter would make it possible to make sure you will
+actually be able to use the page size you're interested in inside
+the guest, by preventing it from starting at all if the host didn't
+provide big enough backing pages; it would also ensure the guest
+gets access to different page sizes when running using TCG as an
+accelerator instead of KVM.
+
+For a KVM guest running on a POWER8 host, the matrix would look
+like
+
+    b \ m | 64 KiB |  2 MiB | 16 MiB |  1 GiB | 16 GiB |
+  -------- -------- -------- -------- -------- --------
+   64 KiB | 64 KiB | 64 KiB |        |        |        |
+  -------- -------- -------- -------- -------- --------
+   16 MiB | 64 KiB | 64 KiB | 16 MiB | 16 MiB |        |
+  -------- -------- -------- -------- -------- --------
+   16 GiB | 64 KiB | 64 KiB | 16 MiB | 16 MiB | 16 GiB |
+  -------- -------- -------- -------- -------- --------
+
+with backing page sizes from top to bottom, requested max page
+sizes from left to right, actual max page sizes in the cells and
+empty cells meaning the guest won't be able to start; on a POWER9
+machine, the matrix would look like
+
+    b \ m | 64 KiB |  2 MiB | 16 MiB |  1 GiB | 16 GiB |
+  -------- -------- -------- -------- -------- --------
+   64 KiB | 64 KiB | 64 KiB |        |        |        |
+  -------- -------- -------- -------- -------- --------
+    2 MiB | 64 KiB | 64 KiB |        |        |        |
+  -------- -------- -------- -------- -------- --------
+    1 GiB | 64 KiB | 64 KiB | 16 MiB | 16 MiB |        |
+  -------- -------- -------- -------- -------- --------
+
+instead, and finally on TCG the backing page size wouldn't matter
+and you would simply have
+
+    b \ m | 64 KiB |  2 MiB | 16 MiB |  1 GiB | 16 GiB |
+  -------- -------- -------- -------- -------- --------
+          | 64 KiB | 64 KiB | 16 MiB | 16 MiB | 16 GiB |
+  -------- -------- -------- -------- -------- --------
+
+Does everything up until here make sense?
+
+While trying to figure out this, one of the things I attempted to
+do was run a guest in POWER8 compatibility mode on a POWER9 host
+and use hugepages for backing, but that didn't seem to work at
+all, possibly hinting at the fact that not all of the above is
+actually accurate and I need you to correct me :)
+
+This is the command line I used:
+
+  /usr/libexec/qemu-kvm \
+  -machine pseries,accel=kvm \
+  -cpu host,compat=power8 \
+  -m 2048 \
+  -mem-prealloc \
+  -mem-path /dev/hugepages \
+  -smp 8,sockets=8,cores=1,threads=1 \
+  -display none \
+  -no-user-config \
+  -nodefaults \
+  -device virtio-blk-pci,scsi=off,bus=pci.0,addr=0x2,drive=vda \
+  -drive file=/var/lib/libvirt/images/huge.qcow2,format=qcow2,if=none,id=vda \
+  -serial mon:stdio
+
+-- 
+Andrea Bolognani / Red Hat / Virtualization
