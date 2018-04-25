@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fBFAw-00016v-8Q
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 03:49:15 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fBFC9-0001nb-A9
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 03:50:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fBFAs-0005n0-LQ
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 03:49:14 -0400
-Date: Wed, 25 Apr 2018 09:48:49 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180425094849.3dd619d1.cohuck@redhat.com>
-In-Reply-To: <87muxraips.fsf@dusky.pond.sub.org>
-References: <20180424214550.32549-1-lersek@redhat.com>
-	<20180424214550.32549-3-lersek@redhat.com>
-	<87muxraips.fsf@dusky.pond.sub.org>
+	(envelope-from <kwolf@redhat.com>) id 1fBFC8-0006DJ-4l
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 03:50:29 -0400
+Date: Wed, 25 Apr 2018 09:50:19 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180425075019.GA4652@localhost.localdomain>
+References: <20180405170619.20480-1-kwolf@redhat.com>
+	<87d0ywv9j0.fsf@dusky.pond.sub.org>
+	<20180418162823.GH4971@localhost.localdomain>
+	<87fu3qx7qx.fsf@dusky.pond.sub.org>
+	<20180424182621.GX12302@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/6] qapi: handle the riscv CpuInfoArch in
- query-cpus-fast
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180424182621.GX12302@localhost.localdomain>
+Subject: Re: [Qemu-devel] [RFC][BROKEN] rbd: Allow configuration of
+ authentication scheme
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,135 +27,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Riku Voipio <riku.voipio@iki.fi>, qemu-stable@nongnu.org, qemu-devel@nongnu.org, Michael Clark <mjc@sifive.com>, Luiz Capitulino <lcapitulino@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>
+To: Jeff Cody <jcody@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, jdurgin@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Wed, 25 Apr 2018 08:44:15 +0200
-Markus Armbruster <armbru@redhat.com> wrote:
+Am 24.04.2018 um 20:26 hat Jeff Cody geschrieben:
+> On Fri, Apr 20, 2018 at 04:39:02PM +0200, Markus Armbruster wrote:
+> > >> Ways to avoid the troublesome auth-cephx: {}:
+> > >> 
+> > >> (A) Make auth-cephx a bool, rely on the other ways to provide the key
+> > >> 
+> > >> (B) Make auth-cephx a bool and add the @key-secret member next to it
+> > >> 
+> > >>     Like @user, the member is meaningless with auth-none.
+> > >> 
+> > >> (C) Make auth-cephx.key-secret a mandatory StrOrNull
+> > >> 
+> > >>     Should take care of "vanishes on flattening" problem, but dotted key
+> > >>     syntax is still screwed: since any value is a valid string, there's
+> > >>     none left for null.  My take would be that if you want to say
+> > >>     auth-cephx.key-secret: {}, you get to say it in JSON.
+> > >> 
+> > >>     Aside: check_alternate() tries to catch such alternates, but we
+> > >>     failed to update it when we added first class null.  *sigh*
+> > >> 
+> > >> Which one do you hate least?
+> > >
+> > > What should happen with null when you stringify it? If we want to take
+> > > the options QDict, stringify all entries and run them through the keyval
+> > > visitor, I'm almost sure that null will be lost.
+> > 
+> > For the stringify idea to work, the keyval visitor needs to map the
+> > string right back to the original value.
+> > 
+> > The keyval visitor currently requires the value to be null, not a
+> > string.
+> > 
+> > Therefore, the stringify operation must leave null alone.  Not pretty,
+> > but works.
 
-> Laszlo Ersek <lersek@redhat.com> writes:
+Okay, I didn't know that the keyval visitor has any way to specify null.
+It doesn't really matter what the exact representation is as long as we
+can generate it. So sure, that's workable then.
+
+> > You might ask why not change the keyval visitor instead so it expects ""
+> > rather than null.  That's no good, because it makes StrOrNull ambiguous.
+> > 
+> > keyval.c can only create string scalars.  I think "use JSON if you want
+> > to specify null" is still good enough.  We can make keyval.c more
+> > expressive if we need to, but (1) I don't think we should block this
+> > work on it, and (2) see "hairy" above.
+> > 
+> > > So (A) doesn't work unless we can specify what "other ways" are that are
+> > > acceptable for libvirt,
+> > 
+> > Yes.
+> > 
+> > >                         and (C) probably doesn't play well with b. above
+> > > (the qdict_stringify_entries() for handling mixed type QDicts).
+> > 
+> > I think it could be done, and tried to sketch how.
+> > 
+> > > Looks like only (B) is left as viable, so that's automatically the one I
+> > > hate least of these. If we can fix the problems, I think I'd prefer (C),
+> > > though.
+> > 
+> > I could accept (B), in particular since it mirrors existing @user.
+
+I don't like (B) much because it adds additional rules which options
+must, may or can be present depending on the presence or value of other
+options. This kind of dependencies should be visible in the schema with
+nested structs and unions, and checked for consistency by QAPI, rather
+than being checked individually in .bdrv_open() implementations.
+
+As for @user, you had sources to confirm that it is indeed irrelevant
+for 'none', so I'd rather do the opposite thing and move it to
+RbdAuthCephx.
+
+> > I'm happy to help with exploring (C).
+> > 
+> > What's the next step?
 > 
-> > Commit 25fa194b7b11 added the @riscv enum constant to @CpuInfoArch (used
-> > in both @CpuInfo and @CpuInfoFast -- the return types of the @query-cpus
-> > and @query-cpus-fast commands, respectively), and assigned, in both return
-> > structures, the @CpuInfoRISCV sub-structure to the new enum value.
-> >
-> > However, qmp_query_cpus_fast() would not populate either the @arch field
-> > or the @CpuInfoRISCV sub-structure, when TARGET_RISCV was defined; only
-> > qmp_query_cpus() would.
-> >
-> > In theory, there are two ways to fix this:
-> >
-> > (a) Fill in both the @arch field and the @CpuInfoRISCV sub-structure in
-> >     qmp_query_cpus_fast(), by copying the logic from qmp_query_cpus().
-> >
-> > (b) Assign @CpuInfoOther to the @riscv enum constant in @CpuInfoFast, and
-> >     populate only the @arch field in qmp_query_cpus_fast().
-> >
-> > Approach (b) seems more robust, because:
-> >
-> > - clearly there has never been an attempt to get actual RISV CPU state
-> >   from qmp_query_cpus_fast(), so its lack of RISCV support is not actually
-> >   a problem,
-> >
-> > - getting CPU state without interrupting KVM looks like an exceptional
-> >   thing to do (only S390X does it currently).
-> >
-> > Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> > Cc: Eric Blake <eblake@redhat.com>
-> > Cc: Laurent Vivier <laurent@vivier.eu>
-> > Cc: Markus Armbruster <armbru@redhat.com>
-> > Cc: Michael Clark <mjc@sifive.com>
-> > Cc: Palmer Dabbelt <palmer@sifive.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
-> > Cc: Richard Henderson <rth@twiddle.net>
-> > Cc: Riku Voipio <riku.voipio@iki.fi>
-> > Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> > Cc: qemu-stable@nongnu.org
-> > Fixes: 25fa194b7b11901561532e435beb83d046899f7a
-> > Signed-off-by: Laszlo Ersek <lersek@redhat.com>
-> > ---
-> >
-> > Notes:
-> >     PATCHv1:
-> >     
-> >     - new patch
-> >
-> >  qapi/misc.json | 2 +-
-> >  cpus.c         | 2 ++
-> >  2 files changed, 3 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/qapi/misc.json b/qapi/misc.json
-> > index 5636f4a14997..104d013adba6 100644
-> > --- a/qapi/misc.json
-> > +++ b/qapi/misc.json
-> > @@ -565,23 +565,23 @@
-> >  { 'union': 'CpuInfoFast',
-> >    'base': {'cpu-index': 'int', 'qom-path': 'str',
-> >             'thread-id': 'int', '*props': 'CpuInstanceProperties',
-> >             'arch': 'CpuInfoArch' },
-> >    'discriminator': 'arch',
-> >    'data': { 'x86': 'CpuInfoOther',
-> >              'sparc': 'CpuInfoOther',
-> >              'ppc': 'CpuInfoOther',
-> >              'mips': 'CpuInfoOther',
-> >              'tricore': 'CpuInfoOther',
-> >              's390': 'CpuInfoS390',
-> > -            'riscv': 'CpuInfoRISCV',
-> > +            'riscv': 'CpuInfoOther',
-> >              'other': 'CpuInfoOther' } }  
-> 
-> Why do CpuInfoFast's variants match CpuInfo's for s390, but not the
-> others?  Your commit message has an educated guess: "looks like an
-> exceptional thing to do (only S390X does it currently)".  But why guess
-> when we can ask authors of commit ce74ee3dea6?  Luiz and Victor, please
-> advise.
+> My preference is (B).  Primarily because I don't like the idea of breaking
+> dotted key syntax for null keys.  I'd rather see something more verbose like
+> (B), that can still be navigated correctly both ways.
 
-I'm neither Luiz nor Viktor, but Laszlo's educated guess is correct. See
-https://www.redhat.com/archives/libvir-list/2018-February/msg00121.html
-for some background. So yes, s390x is exceptional in that it has state
-in QEMU that is actually interesting for upper layers and can be
-retrieved without performance penalty.
+Yes, it's not perfect, but it doesn't make any functionality unavailable
+because you can always using JSON, even on the command line. Dotted
+syntax is nicer for manual use, but in this specific case I think null
+will be the default, so there is no need to specify it explicitly
+anyway - neither with dotted key syntax nor with JSON.
 
-Might make sense to refer to the above.
+I prefer slightly unwieldy command line syntax to getting the internally
+used data types wrong (= hard to use correctly).
 
-> 
-> >  ##
-> >  # @query-cpus-fast:
-> >  #
-> >  # Returns information about all virtual CPUs. This command does not
-> >  # incur a performance penalty and should be used in production
-> >  # instead of query-cpus.
-> >  #
-> >  # Returns: list of @CpuInfoFast
-> >  #
-> > diff --git a/cpus.c b/cpus.c
-> > index 1a9a2edee1f2..60563a6d54ec 100644
-> > --- a/cpus.c
-> > +++ b/cpus.c
-> > @@ -2225,22 +2225,24 @@ CpuInfoFastList *qmp_query_cpus_fast(Error **errp)
-> >  #elif defined(TARGET_SPARC)
-> >          info->value->arch = CPU_INFO_ARCH_SPARC;
-> >  #elif defined(TARGET_MIPS)
-> >          info->value->arch = CPU_INFO_ARCH_MIPS;
-> >  #elif defined(TARGET_TRICORE)
-> >          info->value->arch = CPU_INFO_ARCH_TRICORE;
-> >  #elif defined(TARGET_S390X)
-> >          s390_cpu = S390_CPU(cpu);
-> >          env = &s390_cpu->env;
-> >          info->value->arch = CPU_INFO_ARCH_S390;
-> >          info->value->u.s390.cpu_state = env->cpu_state;
-> > +#elif defined(TARGET_RISCV)
-> > +        info->value->arch = CPU_INFO_ARCH_RISCV;
-> >  #else
-> >          info->value->arch = CPU_INFO_ARCH_OTHER;
-> >  #endif
-> >          if (!cur_item) {
-> >              head = cur_item = info;
-> >          } else {
-> >              cur_item->next = info;
-> >              cur_item = info;
-> >          }
-> >      }  
-> 
+> How about I put together a patch with (B) for an RFC v2?
+
+How about doing the same with (C) and moving @user? :-)
+
+Kevin
