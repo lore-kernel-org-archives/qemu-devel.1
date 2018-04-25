@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43686)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBLzk-0006KY-Qf
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:06:13 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fBM2l-0008Hs-CG
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:09:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBLzb-0005CM-6H
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:06:08 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42412 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fBLzb-0005CA-2E
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:05:59 -0400
-References: <20180420145249.32435-1-peter.maydell@linaro.org>
-	<20180420145249.32435-10-peter.maydell@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <2116cce5-6920-a42a-a4c0-880c102b30e6@redhat.com>
-Date: Wed, 25 Apr 2018 17:05:51 +0200
+	(envelope-from <mreitz@redhat.com>) id 1fBM2f-0006Tr-5T
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:09:15 -0400
+References: <20180421132929.21610-1-mreitz@redhat.com>
+	<20180421132929.21610-4-mreitz@redhat.com>
+	<5ee0cf91-5533-2500-b4f1-5eac0dee8be4@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <377c9a6a-aa05-dec8-52fb-f0cdfc2c2b50@redhat.com>
+Date: Wed, 25 Apr 2018 17:08:58 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180420145249.32435-10-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 09/13] hw/char/exynos4210_uart.c: Remove
- unneeded handling of NULL chardev
+In-Reply-To: <5ee0cf91-5533-2500-b4f1-5eac0dee8be4@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="UbsXZRjPzyn0644q2PHqtGDhYCQwQ58ek"
+Subject: Re: [Qemu-devel] [PATCH v2 3/9] block: Add BDRV_REQ_WRITE_UNCHANGED
+ flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,46 +26,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, patches@linaro.org
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 20.04.2018 16:52, Peter Maydell wrote:
-> The handling of NULL chardevs in exynos4210_uart_create() is now
-> all unnecessary: we don't need to create 'null' chardevs, and we
-> don't need to enforce a bounds check on serial_hd().
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/char/exynos4210_uart.c | 20 --------------------
->  1 file changed, 20 deletions(-)
-> 
-> diff --git a/hw/char/exynos4210_uart.c b/hw/char/exynos4210_uart.c
-> index c2bba03362..a5a285655f 100644
-> --- a/hw/char/exynos4210_uart.c
-> +++ b/hw/char/exynos4210_uart.c
-> @@ -589,28 +589,8 @@ DeviceState *exynos4210_uart_create(hwaddr addr,
->      DeviceState  *dev;
->      SysBusDevice *bus;
->  
-> -    const char chr_name[] = "serial";
-> -    char label[ARRAY_SIZE(chr_name) + 1];
-> -
->      dev = qdev_create(NULL, TYPE_EXYNOS4210_UART);
->  
-> -    if (!chr) {
-> -        if (channel >= MAX_SERIAL_PORTS) {
-> -            error_report("Only %d serial ports are supported by QEMU",
-> -                         MAX_SERIAL_PORTS);
-> -            exit(1);
-> -        }
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--UbsXZRjPzyn0644q2PHqtGDhYCQwQ58ek
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <377c9a6a-aa05-dec8-52fb-f0cdfc2c2b50@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/9] block: Add BDRV_REQ_WRITE_UNCHANGED
+ flag
+References: <20180421132929.21610-1-mreitz@redhat.com>
+ <20180421132929.21610-4-mreitz@redhat.com>
+ <5ee0cf91-5533-2500-b4f1-5eac0dee8be4@redhat.com>
+In-Reply-To: <5ee0cf91-5533-2500-b4f1-5eac0dee8be4@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-If I get the EXYNOS 4210 data sheet right, this chip has only 4 channels
-indeed:
+On 2018-04-25 16:33, Eric Blake wrote:
+> On 04/21/2018 08:29 AM, Max Reitz wrote:
+>> This flag signifies that a write request will not change the visible
+>> disk content.  With this flag set, it is sufficient to have the
+>> BLK_PERM_WRITE_UNCHANGED permission instead of BLK_PERM_WRITE.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+>> Reviewed-by: Alberto Garcia <berto@igalia.com>
+>> ---
+>>  include/block/block.h | 6 +++++-
+>>  block/io.c            | 6 +++++-
+>>  2 files changed, 10 insertions(+), 2 deletions(-)
+>=20
+> Since patch 5 adds an instance of a driver setting supported_write_flag=
+s
+> =3D BDRV_REQ_WRITE_UNCHANGED, I think this patch should tweak the
+> documentation of supported_write_flags (and supported_zero_flags?) in
+> block_int.h to mention that drivers can opt-in to supporting this
+> particular flag (rather than it being handled completely at the block
+> layer).
 
-http://www.samsung.com/global/business/semiconductor/file/product/Exynos_4_Dual_45nm_User_Manaul_Public_REV1.00-0.pdf
+Ah, right, I just didn't know we had a list of supported flags there.
 
-So I think you should at least keep an "assert(channel < 4)" in here?
+And the flag isn't handled by the block layer if drivers don't support
+it -- it just is cleared then and thus treated like a normal write.
 
-Apart from that, the patch looks sane to me, so when you add that assert():
+Maybe I should make a note that drivers should support the flag when
+they support writes to their children, but don't explicitly request a
+WRITE permission (so they rely on their parent to request the proper
+permission, which might be just WRITE_UNCHANGED and not the full WRITE).
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+I'll send a patch.
+
+> Also, that does raise the question of whether you have more work to
+> support write-zero requests with WRITE_UNCHANGED (which indeed sounds
+> like something plausible to support).
+
+I'm afraid I don't quite understand the question.
+BDRV_REQ_WRITE_UNCHANGED support is usually rather simple because as
+said above it is only needed by drivers that rely on their parent to
+request the permissions, i.e. filter drivers.  Since filter drivers just
+forward the requests, all they have to do is retain the
+BDRV_REQ_WRITE_UNCHANGED flag, be it a zero write or a normal write.
+
+It would be more complicated for format drivers, because they would have
+to verify that the incoming unchanged write actually ends up as an
+unchanged write in their file.  But we have already recognized that that
+would be too much to ask and that format drivers may want to generally
+just write anything to their child if it's writable (even regardless of
+whether the grandparent issues writes to the format driver node), so
+they always grab a WRITE permission on their file if possible.
+Therefore, they do not have to support this request flag.
+
+Max
+
+
+--UbsXZRjPzyn0644q2PHqtGDhYCQwQ58ek
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlrgmgoACgkQ9AfbAGHV
+z0AUBgf9FX9ENes3mFDNppL3eZqwFahrvXeee5FpSYSadoN73SNG/q2izL5uIRye
+FcTBuzePoEckbq5dgBf9q63ZrSbZkZGJ+4RimXROylachYoeKu9CTxlwvri0sqzg
+jdGcnLd81kNCELDFGWylDHulobrL1drUA9rKDy2PrM14wN0VJmgMDIu6YUvzlBvU
+Zfq5R/atLUbv7LewfDtFAstSoh5+79dYBHlqqaE7laXbNIkk2Q1F0QpVqbl7G7wh
+w7OqUrr2Dl1jnnha2Pghx7cdU9wUDvfDvuARctAnA9OCEi5mLNI4TDDARA2l4iIn
++bJEHQY77tQk3Ya5Dfxdc5gy/wGVog==
+=Okgn
+-----END PGP SIGNATURE-----
+
+--UbsXZRjPzyn0644q2PHqtGDhYCQwQ58ek--
