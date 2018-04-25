@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48086)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fB8oq-0005C5-2S
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 21:02:01 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fB99N-0003ye-KO
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 21:23:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fB8om-00005f-VC
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 21:02:00 -0400
-Received: from mail-qk0-x22b.google.com ([2607:f8b0:400d:c09::22b]:39111)
+	(envelope-from <richard.henderson@linaro.org>) id 1fB99M-0007CW-2l
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 21:23:13 -0400
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:37596)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fB8om-000051-Pt
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 21:01:56 -0400
-Received: by mail-qk0-x22b.google.com with SMTP id z75so10305030qkb.6
-	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 18:01:56 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1513160272-15921-1-git-send-email-christian.ehrhardt@canonical.com>
-	<CAATJJ0+snukR5zqeL4v3B+YfcVP8jwxjgjfV6pupeJpoGCeHfA@mail.gmail.com>
-	<CAATJJ0KK3Ya1RMyAjPDyYOQHbo+2xoWDbnVNup1Yop8Og00eBw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <d0b421e2-2c0b-db08-5f6e-d05e11bbc007@amsat.org>
-Date: Tue, 24 Apr 2018 22:01:49 -0300
-MIME-Version: 1.0
-In-Reply-To: <CAATJJ0KK3Ya1RMyAjPDyYOQHbo+2xoWDbnVNup1Yop8Og00eBw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] qemu-guest-agent: freeze-hook to ignore
- dpkg files as well
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fB99L-0007Ai-Ss
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 21:23:12 -0400
+Received: by mail-pf0-x242.google.com with SMTP id p6so13745898pfn.4
+	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 18:23:11 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Tue, 24 Apr 2018 15:22:53 -1000
+Message-Id: <20180425012300.14698-3-richard.henderson@linaro.org>
+In-Reply-To: <20180425012300.14698-1-richard.henderson@linaro.org>
+References: <20180425012300.14698-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 2/9] target/arm: Implement vector shifted FCVT
+ for fp16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,64 +27,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Ehrhardt <christian.ehrhardt@canonical.com>, qemu-devel <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 
-Hi Christian,
+While we have some of the scalar paths for FCVT for fp16,
+we failed to decode the fp16 version of these instructions.
 
-On 04/09/2018 04:18 AM, Christian Ehrhardt wrote:
-> Re-Ping for consideration?
-> 
-> On Mon, Jan 22, 2018 at 3:03 PM, Christian Ehrhardt <
-> christian.ehrhardt@canonical.com> wrote:
-> 
->> Hi,
->> maybe I missed a formal thing on this submission, but I don't see it right
->> away.
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/translate-a64.c | 65 ++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 46 insertions(+), 19 deletions(-)
 
-You missed to Cc the maintainer of this file:
-
-$ ./scripts/get_maintainer.pl -f scripts/qemu-guest-agent/fsfreeze-hook
-Michael Roth <mdroth@linux.vnet.ibm.com> (maintainer:QEMU Guest Agent)
-
-(I Cc'ed him).
-
-See https://wiki.qemu.org/Contribute/SubmitAPatch#CC_the_relevant_maintainer
-
->> So for now just a ping on any updates in regard to accept this?
->>
->> On Wed, Dec 13, 2017 at 11:17 AM, Christian Ehrhardt
->> <christian.ehrhardt@canonical.com> wrote:
->>> The hook already skips a set of rpm upgrade artifacts.
->>> Do the same with such files that might be created by dpkg.
->>>
->>> Fixes: https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/1484990
->>>
->>> Signed-off-by: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
->>> ---
->>>  scripts/qemu-guest-agent/fsfreeze-hook | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/scripts/qemu-guest-agent/fsfreeze-hook
->> b/scripts/qemu-guest-agent/fsfreeze-hook
->>> index c27b29f..13aafd4 100755
->>> --- a/scripts/qemu-guest-agent/fsfreeze-hook
->>> +++ b/scripts/qemu-guest-agent/fsfreeze-hook
->>> @@ -13,7 +13,7 @@ FSFREEZE_D=$(dirname -- "$0")/fsfreeze-hook.d
->>>  # Check whether file $1 is a backup or rpm-generated file and should be
->> ignored
->>>  is_ignored_file() {
->>>      case "$1" in
->>> -        *~ | *.bak | *.orig | *.rpmnew | *.rpmorig | *.rpmsave |
->> *.sample)
->>> +        *~ | *.bak | *.orig | *.rpmnew | *.rpmorig | *.rpmsave |
->> *.sample | *.dpkg-old | *.dpkg-new | *.dpkg-tmp | *.dpkg-dist | *.dpkg-bak
->> | *.dpkg-backup | *.dpkg-remove)
->>>              return 0 ;;
->>>      esac
->>>      return 1
->>> --
->>> 2.7.4
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index c92e052686..e2d11998bd 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -7120,19 +7120,28 @@ static void handle_simd_shift_fpint_conv(DisasContext *s, bool is_scalar,
+                                          bool is_q, bool is_u,
+                                          int immh, int immb, int rn, int rd)
+ {
+-    bool is_double = extract32(immh, 3, 1);
+     int immhb = immh << 3 | immb;
+-    int fracbits = (is_double ? 128 : 64) - immhb;
+-    int pass;
++    int pass, size, fracbits;
+     TCGv_ptr tcg_fpstatus;
+     TCGv_i32 tcg_rmode, tcg_shift;
+ 
+-    if (!extract32(immh, 2, 2)) {
+-        unallocated_encoding(s);
+-        return;
+-    }
+-
+-    if (!is_scalar && !is_q && is_double) {
++    if (immh & 0x8) {
++        size = MO_64;
++        if (!is_scalar && !is_q) {
++            unallocated_encoding(s);
++            return;
++        }
++    } else if (immh & 0x4) {
++        size = MO_32;
++    } else if (immh & 0x2) {
++        size = MO_16;
++        if (!arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
++            unallocated_encoding(s);
++            return;
++        }
++    } else {
++        /* Should have split out AdvSIMD modified immediate earlier.  */
++        assert(immh == 1);
+         unallocated_encoding(s);
+         return;
+     }
+@@ -7144,11 +7153,12 @@ static void handle_simd_shift_fpint_conv(DisasContext *s, bool is_scalar,
+     assert(!(is_scalar && is_q));
+ 
+     tcg_rmode = tcg_const_i32(arm_rmode_to_sf(FPROUNDING_ZERO));
+-    tcg_fpstatus = get_fpstatus_ptr(false);
++    tcg_fpstatus = get_fpstatus_ptr(size == MO_16);
+     gen_helper_set_rmode(tcg_rmode, tcg_rmode, tcg_fpstatus);
++    fracbits = (16 << size) - immhb;
+     tcg_shift = tcg_const_i32(fracbits);
+ 
+-    if (is_double) {
++    if (size == 3) {
+         int maxpass = is_scalar ? 1 : 2;
+ 
+         for (pass = 0; pass < maxpass; pass++) {
+@@ -7165,20 +7175,37 @@ static void handle_simd_shift_fpint_conv(DisasContext *s, bool is_scalar,
+         }
+         clear_vec_high(s, is_q, rd);
+     } else {
+-        int maxpass = is_scalar ? 1 : is_q ? 4 : 2;
++        void (*fn)(TCGv_i32, TCGv_i32, TCGv_i32, TCGv_ptr);
++        int maxpass = is_scalar ? 1 : (8 << is_q >> size);
++
++        switch (size) {
++        case MO_16:
++            if (is_u) {
++                fn = gen_helper_vfp_toulh;
++            } else {
++                fn = gen_helper_vfp_toslh;
++            }
++            break;
++        case MO_32:
++            if (is_u) {
++                fn = gen_helper_vfp_touls;
++            } else {
++                fn = gen_helper_vfp_tosls;
++            }
++            break;
++        default:
++            g_assert_not_reached();
++        }
++
+         for (pass = 0; pass < maxpass; pass++) {
+             TCGv_i32 tcg_op = tcg_temp_new_i32();
+ 
+-            read_vec_element_i32(s, tcg_op, rn, pass, MO_32);
+-            if (is_u) {
+-                gen_helper_vfp_touls(tcg_op, tcg_op, tcg_shift, tcg_fpstatus);
+-            } else {
+-                gen_helper_vfp_tosls(tcg_op, tcg_op, tcg_shift, tcg_fpstatus);
+-            }
++            read_vec_element_i32(s, tcg_op, rn, pass, size);
++            fn(tcg_op, tcg_op, tcg_shift, tcg_fpstatus);
+             if (is_scalar) {
+                 write_fp_sreg(s, rd, tcg_op);
+             } else {
+-                write_vec_element_i32(s, tcg_op, rd, pass, MO_32);
++                write_vec_element_i32(s, tcg_op, rd, pass, size);
+             }
+             tcg_temp_free_i32(tcg_op);
+         }
+-- 
+2.14.3
