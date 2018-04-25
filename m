@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fB99N-0003yf-LP
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 21:23:14 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fB99S-00041C-7N
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 21:23:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fB99K-000779-Co
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 21:23:13 -0400
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:42578)
+	(envelope-from <richard.henderson@linaro.org>) id 1fB99R-0007PT-8s
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 21:23:18 -0400
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:34310)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fB99K-00075J-7a
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 21:23:10 -0400
-Received: by mail-pf0-x242.google.com with SMTP id o16so13743790pfk.9
-	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 18:23:10 -0700 (PDT)
+	id 1fB99R-0007Ob-2B
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 21:23:17 -0400
+Received: by mail-pf0-x242.google.com with SMTP id a14so3243592pfi.1
+	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 18:23:16 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 24 Apr 2018 15:22:52 -1000
-Message-Id: <20180425012300.14698-2-richard.henderson@linaro.org>
+Date: Tue, 24 Apr 2018 15:22:56 -1000
+Message-Id: <20180425012300.14698-6-richard.henderson@linaro.org>
 In-Reply-To: <20180425012300.14698-1-richard.henderson@linaro.org>
 References: <20180425012300.14698-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 1/9] target/arm: Implement vector shifted
- SCVF/UCVF for fp16
+Subject: [Qemu-devel] [PATCH 5/9] target/arm: Implement FMOV (general) for
+ fp16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,72 +30,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 
-While we have some of the scalar paths for *CVF for fp16,
-we failed to decode the fp16 version of these instructions.
+Adding the fp16 moves to/from general registers.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-a64.c | 33 ++++++++++++++++++++-------------
- 1 file changed, 20 insertions(+), 13 deletions(-)
+ target/arm/translate-a64.c | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
 
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index b47319d437..c92e052686 100644
+index f2241d8174..36bb5f6f08 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -7077,13 +7077,26 @@ static void handle_simd_shift_intfp_conv(DisasContext *s, bool is_scalar,
-                                          int immh, int immb, int opcode,
-                                          int rn, int rd)
- {
--    bool is_double = extract32(immh, 3, 1);
--    int size = is_double ? MO_64 : MO_32;
--    int elements;
-+    int size, elements, fracbits;
-     int immhb = immh << 3 | immb;
--    int fracbits = (is_double ? 128 : 64) - immhb;
- 
--    if (!extract32(immh, 2, 2)) {
-+    if (immh & 8) {
-+        size = MO_64;
-+        if (!is_scalar && !is_q) {
-+            unallocated_encoding(s);
-+            return;
-+        }
-+    } else if (immh & 4) {
-+        size = MO_32;
-+    } else if (immh & 2) {
-+        size = MO_16;
-+        if (!arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
-+            unallocated_encoding(s);
-+            return;
-+        }
-+    } else {
-+        /* immh == 0 would be a failure of the decode logic */
-+        g_assert(immh == 1);
-         unallocated_encoding(s);
-         return;
-     }
-@@ -7091,20 +7104,14 @@ static void handle_simd_shift_intfp_conv(DisasContext *s, bool is_scalar,
-     if (is_scalar) {
-         elements = 1;
+@@ -5375,6 +5375,15 @@ static void handle_fmov(DisasContext *s, int rd, int rn, int type, bool itof)
+             tcg_gen_st_i64(tcg_rn, cpu_env, fp_reg_hi_offset(s, rd));
+             clear_vec_high(s, true, rd);
+             break;
++        case 3:
++            /* 16 bit */
++            tmp = tcg_temp_new_i64();
++            tcg_gen_ext16u_i64(tmp, tcg_rn);
++            write_fp_dreg(s, rd, tmp);
++            tcg_temp_free_i64(tmp);
++            break;
++        default:
++            g_assert_not_reached();
+         }
      } else {
--        elements = is_double ? 2 : is_q ? 4 : 2;
--        if (is_double && !is_q) {
--            unallocated_encoding(s);
--            return;
--        }
-+        elements = 8 << is_q >> size;
+         TCGv_i64 tcg_rd = cpu_reg(s, rd);
+@@ -5392,6 +5401,12 @@ static void handle_fmov(DisasContext *s, int rd, int rn, int type, bool itof)
+             /* 64 bits from top half */
+             tcg_gen_ld_i64(tcg_rd, cpu_env, fp_reg_hi_offset(s, rn));
+             break;
++        case 3:
++            /* 16 bit */
++            tcg_gen_ld16u_i64(tcg_rd, cpu_env, fp_reg_offset(s, rn, MO_16));
++            break;
++        default:
++            g_assert_not_reached();
+         }
      }
-+    fracbits = (16 << size) - immhb;
- 
-     if (!fp_access_check(s)) {
-         return;
-     }
- 
--    /* immh == 0 would be a failure of the decode logic */
--    g_assert(immh);
--
-     handle_simd_intfp_conv(s, rd, rn, elements, !is_u, fracbits, size);
  }
+@@ -5431,10 +5446,15 @@ static void disas_fp_int_conv(DisasContext *s, uint32_t insn)
+         case 0xa: /* 64 bit */
+         case 0xd: /* 64 bit to top half of quad */
+             break;
++        case 0x6: /* 16-bit */
++            if (arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
++                break;
++            }
++            /* fallthru */
+         default:
+             /* all other sf/type/rmode combinations are invalid */
+             unallocated_encoding(s);
+-            break;
++            return;
+         }
  
+         if (!fp_access_check(s)) {
 -- 
 2.14.3
