@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fBQdj-0003bk-MO
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 16:03:45 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fBQdg-0003a7-An
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 16:03:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fBQdi-00033D-F9
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 16:03:43 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57522 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1fBQde-00031R-Tb
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 16:03:40 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35562 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fBQdi-000330-AX
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 16:03:42 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fBQde-00031G-Ot
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 16:03:38 -0400
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 25 Apr 2018 21:03:19 +0100
-Message-Id: <20180425200326.72337-10-dgilbert@redhat.com>
+Date: Wed, 25 Apr 2018 21:03:16 +0100
+Message-Id: <20180425200326.72337-7-dgilbert@redhat.com>
 In-Reply-To: <20180425200326.72337-1-dgilbert@redhat.com>
 References: <20180425200326.72337-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 09/16] migration: stop decompression to allocate
- and free memory frequently
+Subject: [Qemu-devel] [PULL 06/16] migration: add postcopy total blocktime
+ into query-migrate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,202 +26,279 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, a.perevalov@samsung.com, xiaoguangrong@tencent.com
 
-From: Xiao Guangrong <xiaoguangrong@tencent.com>
+From: Alexey Perevalov <a.perevalov@samsung.com>
 
-Current code uses uncompress() to decompress memory which manages
-memory internally, that causes huge memory is allocated and freed
-very frequently, more worse, frequently returning memory to kernel
-will flush TLBs
+Postcopy total blocktime is available on destination side only.
+But query-migrate was possible only for source. This patch
+adds ability to call query-migrate on destination.
+To be able to see postcopy blocktime, need to request postcopy-blocktime
+capability.
 
-So, we maintain the memory by ourselves and reuse it for each
-decompression
+The query-migrate command will show following sample result:
+{"return":
+    "postcopy-vcpu-blocktime": [115, 100],
+    "status": "completed",
+    "postcopy-blocktime": 100
+}}
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Jiang Biao <jiang.biao2@zte.com.cn>
-Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
-Message-Id: <20180330075128.26919-4-xiaoguangrong@tencent.com>
+postcopy_vcpu_blocktime contains list, where the first item is the first
+vCPU in QEMU.
+
+This patch has a drawback, it combines states of incoming and
+outgoing migration. Ongoing migration state will overwrite incoming
+state. Looks like better to separate query-migrate for incoming and
+outgoing migration or add parameter to indicate type of migration.
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Message-Id: <1521742647-25550-7-git-send-email-a.perevalov@samsung.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/ram.c | 112 +++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 82 insertions(+), 30 deletions(-)
+ hmp.c                    | 15 +++++++++++
+ migration/migration.c    | 42 +++++++++++++++++++++++++++---
+ migration/migration.h    |  4 +++
+ migration/postcopy-ram.c | 56 ++++++++++++++++++++++++++++++++++++++++
+ migration/trace-events   |  1 +
+ qapi/migration.json      | 11 +++++++-
+ 6 files changed, 124 insertions(+), 5 deletions(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index a21514a469..fb24b2f32f 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -281,6 +281,7 @@ struct DecompressParam {
-     void *des;
-     uint8_t *compbuf;
-     int len;
-+    z_stream stream;
- };
- typedef struct DecompressParam DecompressParam;
+diff --git a/hmp.c b/hmp.c
+index a25c7bd9a8..898e25f3e1 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -274,6 +274,21 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+                        info->cpu_throttle_percentage);
+     }
  
-@@ -2524,6 +2525,31 @@ void ram_handle_compressed(void *host, uint8_t ch, uint64_t size)
++    if (info->has_postcopy_blocktime) {
++        monitor_printf(mon, "postcopy blocktime: %u\n",
++                       info->postcopy_blocktime);
++    }
++
++    if (info->has_postcopy_vcpu_blocktime) {
++        Visitor *v;
++        char *str;
++        v = string_output_visitor_new(false, &str);
++        visit_type_uint32List(v, NULL, &info->postcopy_vcpu_blocktime, NULL);
++        visit_complete(v, &str);
++        monitor_printf(mon, "postcopy vcpu blocktime: %s\n", str);
++        g_free(str);
++        visit_free(v);
++    }
+     qapi_free_MigrationInfo(info);
+     qapi_free_MigrationCapabilityStatusList(caps);
+ }
+diff --git a/migration/migration.c b/migration/migration.c
+index bf2e8db9c7..0bdb28e144 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -630,14 +630,15 @@ static void populate_disk_info(MigrationInfo *info)
      }
  }
  
-+/* return the size after decompression, or negative value on error */
-+static int
-+qemu_uncompress_data(z_stream *stream, uint8_t *dest, size_t dest_len,
-+                     const uint8_t *source, size_t source_len)
+-MigrationInfo *qmp_query_migrate(Error **errp)
++static void fill_source_migration_info(MigrationInfo *info)
+ {
+-    MigrationInfo *info = g_malloc0(sizeof(*info));
+     MigrationState *s = migrate_get_current();
+ 
+     switch (s->state) {
+     case MIGRATION_STATUS_NONE:
+         /* no migration has happened ever */
++        /* do not overwrite destination migration status */
++        return;
+         break;
+     case MIGRATION_STATUS_SETUP:
+         info->has_status = true;
+@@ -688,8 +689,6 @@ MigrationInfo *qmp_query_migrate(Error **errp)
+         break;
+     }
+     info->status = s->state;
+-
+-    return info;
+ }
+ 
+ /**
+@@ -753,6 +752,41 @@ static bool migrate_caps_check(bool *cap_list,
+     return true;
+ }
+ 
++static void fill_destination_migration_info(MigrationInfo *info)
 +{
-+    int err;
++    MigrationIncomingState *mis = migration_incoming_get_current();
 +
-+    err = inflateReset(stream);
-+    if (err != Z_OK) {
-+        return -1;
++    switch (mis->state) {
++    case MIGRATION_STATUS_NONE:
++        return;
++        break;
++    case MIGRATION_STATUS_SETUP:
++    case MIGRATION_STATUS_CANCELLING:
++    case MIGRATION_STATUS_CANCELLED:
++    case MIGRATION_STATUS_ACTIVE:
++    case MIGRATION_STATUS_POSTCOPY_ACTIVE:
++    case MIGRATION_STATUS_FAILED:
++    case MIGRATION_STATUS_COLO:
++        info->has_status = true;
++        break;
++    case MIGRATION_STATUS_COMPLETED:
++        info->has_status = true;
++        fill_destination_postcopy_migration_info(info);
++        break;
 +    }
-+
-+    stream->avail_in = source_len;
-+    stream->next_in = (uint8_t *)source;
-+    stream->avail_out = dest_len;
-+    stream->next_out = dest;
-+
-+    err = inflate(stream, Z_NO_FLUSH);
-+    if (err != Z_STREAM_END) {
-+        return -1;
-+    }
-+
-+    return stream->total_out;
++    info->status = mis->state;
 +}
 +
- static void *do_data_decompress(void *opaque)
- {
-     DecompressParam *param = opaque;
-@@ -2540,13 +2566,13 @@ static void *do_data_decompress(void *opaque)
-             qemu_mutex_unlock(&param->mutex);
- 
-             pagesize = TARGET_PAGE_SIZE;
--            /* uncompress() will return failed in some case, especially
--             * when the page is dirted when doing the compression, it's
--             * not a problem because the dirty page will be retransferred
-+            /* qemu_uncompress_data() will return failed in some case,
-+             * especially when the page is dirtied when doing the compression,
-+             * it's not a problem because the dirty page will be retransferred
-              * and uncompress() won't break the data in other pages.
-              */
--            uncompress((Bytef *)des, &pagesize,
--                       (const Bytef *)param->compbuf, len);
-+            qemu_uncompress_data(&param->stream, des, pagesize, param->compbuf,
-+                                 len);
- 
-             qemu_mutex_lock(&decomp_done_lock);
-             param->done = true;
-@@ -2581,30 +2607,6 @@ static void wait_for_decompress_done(void)
-     qemu_mutex_unlock(&decomp_done_lock);
- }
- 
--static void compress_threads_load_setup(void)
--{
--    int i, thread_count;
--
--    if (!migrate_use_compression()) {
--        return;
--    }
--    thread_count = migrate_decompress_threads();
--    decompress_threads = g_new0(QemuThread, thread_count);
--    decomp_param = g_new0(DecompressParam, thread_count);
--    qemu_mutex_init(&decomp_done_lock);
--    qemu_cond_init(&decomp_done_cond);
--    for (i = 0; i < thread_count; i++) {
--        qemu_mutex_init(&decomp_param[i].mutex);
--        qemu_cond_init(&decomp_param[i].cond);
--        decomp_param[i].compbuf = g_malloc0(compressBound(TARGET_PAGE_SIZE));
--        decomp_param[i].done = true;
--        decomp_param[i].quit = false;
--        qemu_thread_create(decompress_threads + i, "decompress",
--                           do_data_decompress, decomp_param + i,
--                           QEMU_THREAD_JOINABLE);
--    }
--}
--
- static void compress_threads_load_cleanup(void)
- {
-     int i, thread_count;
-@@ -2614,16 +2616,30 @@ static void compress_threads_load_cleanup(void)
-     }
-     thread_count = migrate_decompress_threads();
-     for (i = 0; i < thread_count; i++) {
-+        /*
-+         * we use it as a indicator which shows if the thread is
-+         * properly init'd or not
-+         */
-+        if (!decomp_param[i].compbuf) {
-+            break;
-+        }
-+
-         qemu_mutex_lock(&decomp_param[i].mutex);
-         decomp_param[i].quit = true;
-         qemu_cond_signal(&decomp_param[i].cond);
-         qemu_mutex_unlock(&decomp_param[i].mutex);
-     }
-     for (i = 0; i < thread_count; i++) {
-+        if (!decomp_param[i].compbuf) {
-+            break;
-+        }
-+
-         qemu_thread_join(decompress_threads + i);
-         qemu_mutex_destroy(&decomp_param[i].mutex);
-         qemu_cond_destroy(&decomp_param[i].cond);
-+        inflateEnd(&decomp_param[i].stream);
-         g_free(decomp_param[i].compbuf);
-+        decomp_param[i].compbuf = NULL;
-     }
-     g_free(decompress_threads);
-     g_free(decomp_param);
-@@ -2631,6 +2647,39 @@ static void compress_threads_load_cleanup(void)
-     decomp_param = NULL;
- }
- 
-+static int compress_threads_load_setup(void)
++MigrationInfo *qmp_query_migrate(Error **errp)
 +{
-+    int i, thread_count;
++    MigrationInfo *info = g_malloc0(sizeof(*info));
 +
-+    if (!migrate_use_compression()) {
++    fill_destination_migration_info(info);
++    fill_source_migration_info(info);
++
++    return info;
++}
++
+ void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
+                                   Error **errp)
+ {
+diff --git a/migration/migration.h b/migration/migration.h
+index 6d9aaeb480..7c69598c54 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -77,6 +77,10 @@ struct MigrationIncomingState {
+ 
+ MigrationIncomingState *migration_incoming_get_current(void);
+ void migration_incoming_state_destroy(void);
++/*
++ * Functions to work with blocktime context
++ */
++void fill_destination_postcopy_migration_info(MigrationInfo *info);
+ 
+ #define TYPE_MIGRATION "migration"
+ 
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index 6b34a7148e..8ceeaa2a93 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -139,6 +139,55 @@ static struct PostcopyBlocktimeContext *blocktime_context_new(void)
+     return ctx;
+ }
+ 
++static uint32List *get_vcpu_blocktime_list(PostcopyBlocktimeContext *ctx)
++{
++    uint32List *list = NULL, *entry = NULL;
++    int i;
++
++    for (i = smp_cpus - 1; i >= 0; i--) {
++        entry = g_new0(uint32List, 1);
++        entry->value = ctx->vcpu_blocktime[i];
++        entry->next = list;
++        list = entry;
++    }
++
++    return list;
++}
++
++/*
++ * This function just populates MigrationInfo from postcopy's
++ * blocktime context. It will not populate MigrationInfo,
++ * unless postcopy-blocktime capability was set.
++ *
++ * @info: pointer to MigrationInfo to populate
++ */
++void fill_destination_postcopy_migration_info(MigrationInfo *info)
++{
++    MigrationIncomingState *mis = migration_incoming_get_current();
++    PostcopyBlocktimeContext *bc = mis->blocktime_ctx;
++
++    if (!bc) {
++        return;
++    }
++
++    info->has_postcopy_blocktime = true;
++    info->postcopy_blocktime = bc->total_blocktime;
++    info->has_postcopy_vcpu_blocktime = true;
++    info->postcopy_vcpu_blocktime = get_vcpu_blocktime_list(bc);
++}
++
++static uint32_t get_postcopy_total_blocktime(void)
++{
++    MigrationIncomingState *mis = migration_incoming_get_current();
++    PostcopyBlocktimeContext *bc = mis->blocktime_ctx;
++
++    if (!bc) {
 +        return 0;
 +    }
 +
-+    thread_count = migrate_decompress_threads();
-+    decompress_threads = g_new0(QemuThread, thread_count);
-+    decomp_param = g_new0(DecompressParam, thread_count);
-+    qemu_mutex_init(&decomp_done_lock);
-+    qemu_cond_init(&decomp_done_cond);
-+    for (i = 0; i < thread_count; i++) {
-+        if (inflateInit(&decomp_param[i].stream) != Z_OK) {
-+            goto exit;
-+        }
-+
-+        decomp_param[i].compbuf = g_malloc0(compressBound(TARGET_PAGE_SIZE));
-+        qemu_mutex_init(&decomp_param[i].mutex);
-+        qemu_cond_init(&decomp_param[i].cond);
-+        decomp_param[i].done = true;
-+        decomp_param[i].quit = false;
-+        qemu_thread_create(decompress_threads + i, "decompress",
-+                           do_data_decompress, decomp_param + i,
-+                           QEMU_THREAD_JOINABLE);
-+    }
-+    return 0;
-+exit:
-+    compress_threads_load_cleanup();
-+    return -1;
++    return bc->total_blocktime;
 +}
 +
- static void decompress_data_with_multi_threads(QEMUFile *f,
-                                                void *host, int len)
- {
-@@ -2670,8 +2719,11 @@ static void decompress_data_with_multi_threads(QEMUFile *f,
-  */
- static int ram_load_setup(QEMUFile *f, void *opaque)
- {
-+    if (compress_threads_load_setup()) {
-+        return -1;
-+    }
+ /**
+  * receive_ufd_features: check userfault fd features, to request only supported
+  * features in the future.
+@@ -512,6 +561,9 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
+         munmap(mis->postcopy_tmp_zero_page, mis->largest_page_size);
+         mis->postcopy_tmp_zero_page = NULL;
+     }
++    trace_postcopy_ram_incoming_cleanup_blocktime(
++            get_postcopy_total_blocktime());
 +
-     xbzrle_load_setup();
--    compress_threads_load_setup();
-     ramblock_recv_map_init();
+     trace_postcopy_ram_incoming_cleanup_exit();
      return 0;
  }
+@@ -1157,6 +1209,10 @@ void *postcopy_get_tmp_page(MigrationIncomingState *mis)
+ 
+ #else
+ /* No target OS support, stubs just fail */
++void fill_destination_postcopy_migration_info(MigrationInfo *info)
++{
++}
++
+ bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
+ {
+     error_report("%s: No OS support", __func__);
+diff --git a/migration/trace-events b/migration/trace-events
+index 368bc4b663..d6be74b7a7 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -200,6 +200,7 @@ postcopy_ram_incoming_cleanup_closeuf(void) ""
+ postcopy_ram_incoming_cleanup_entry(void) ""
+ postcopy_ram_incoming_cleanup_exit(void) ""
+ postcopy_ram_incoming_cleanup_join(void) ""
++postcopy_ram_incoming_cleanup_blocktime(uint64_t total) "total blocktime %" PRIu64
+ postcopy_request_shared_page(const char *sharer, const char *rb, uint64_t rb_offset) "for %s in %s offset 0x%"PRIx64
+ postcopy_request_shared_page_present(const char *sharer, const char *rb, uint64_t rb_offset) "%s already %s offset 0x%"PRIx64
+ postcopy_wake_shared(uint64_t client_addr, const char *rb) "at 0x%"PRIx64" in %s"
+diff --git a/qapi/migration.json b/qapi/migration.json
+index 24bfc190ba..f3974c6807 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -155,6 +155,13 @@
+ # @error-desc: the human readable error description string, when
+ #              @status is 'failed'. Clients should not attempt to parse the
+ #              error strings. (Since 2.7)
++#
++# @postcopy-blocktime: total time when all vCPU were blocked during postcopy
++#           live migration (Since 2.13)
++#
++# @postcopy-vcpu-blocktime: list of the postcopy blocktime per vCPU (Since 2.13)
++#
++
+ #
+ # Since: 0.14.0
+ ##
+@@ -167,7 +174,9 @@
+            '*downtime': 'int',
+            '*setup-time': 'int',
+            '*cpu-throttle-percentage': 'int',
+-           '*error-desc': 'str'} }
++           '*error-desc': 'str',
++           '*postcopy-blocktime' : 'uint32',
++           '*postcopy-vcpu-blocktime': ['uint32']} }
+ 
+ ##
+ # @query-migrate:
 -- 
 2.17.0
