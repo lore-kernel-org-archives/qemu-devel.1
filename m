@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBM4G-0000xz-4r
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:10:49 -0400
+	(envelope-from <pagupta@redhat.com>) id 1fBM4i-0001L6-HG
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:11:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBM4C-0007Q6-0a
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:10:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53230)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fBM4B-0007Pt-Qf
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:10:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fBM4A-000293-Pl
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 15:10:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BC6242E80C8
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 15:10:42 +0000 (UTC)
+	(envelope-from <pagupta@redhat.com>) id 1fBM4e-0007nM-E0
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:11:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38095)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1fBM4e-0007m4-5w
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:11:12 -0400
+Date: Wed, 25 Apr 2018 11:11:09 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <1651348200.22658063.1524669069712.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20180425174705-mutt-send-email-mst@kernel.org>
+References: <20180425112415.12327-1-pagupta@redhat.com>
+	<20180425112415.12327-2-pagupta@redhat.com>
+	<20180425174705-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Apr 2018 15:03:08 -0000
-From: xccx <1766904@bugs.launchpad.net>
-Reply-To: Bug 1766904 <1766904@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <152466858890.21548.13995835103547275465.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1766904] [NEW] Creating high hdd load (with
- constant fsyncs) on a SATA disk leads to freezes and errors in guest dmesg
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v2 1/2] virtio: add pmem driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,81 +28,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: kwolf@redhat.com, haozhong zhang <haozhong.zhang@intel.com>, lcapitulino@redhat.com, jack@suse.cz, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, kvm@vger.kernel.org, riel@surriel.com, linux-nvdimm@ml01.01.org, david@redhat.com, ross zwisler <ross.zwisler@intel.com>, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, hch@infradead.org, linux-mm@kvack.org, imammedo@redhat.com, stefanha@redhat.com, niteshnarayanlal@hotmail.com, marcel@redhat.com, pbonzini@redhat.com, dan j williams <dan.j.williams@intel.com>, nilal@redhat.com
 
-Public bug reported:
 
-After upgrading from qemu 2.10.0+dfsg-2 to 2.12~rc3+dfsg-2 (on debian
-sid host), centos 7 guest started to show freezes and ata errors in
-dmesg during hdd workloads with writing many small files and repeated
-fsyncs.
+> 
+> On Wed, Apr 25, 2018 at 04:54:13PM +0530, Pankaj Gupta wrote:
+> > diff --git a/include/uapi/linux/virtio_ids.h
+> > b/include/uapi/linux/virtio_ids.h
+> > index 6d5c3b2..5ebd049 100644
+> > --- a/include/uapi/linux/virtio_ids.h
+> > +++ b/include/uapi/linux/virtio_ids.h
+> > @@ -43,5 +43,6 @@
+> >  #define VIRTIO_ID_INPUT        18 /* virtio input */
+> >  #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
+> >  #define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
+> > +#define VIRTIO_ID_PMEM         21 /* virtio pmem */
+> >  
+> >  #endif /* _LINUX_VIRTIO_IDS_H */
+> 
+> Please register the device id with virtio TC.
 
-Host kernel 4.15.0-3-amd64.
-Guest kernel 3.10.0-693.21.1.el7.x86_64 (slightly older guest kernel was te=
-sted too with same result).
+O.K Will create virtio spec and follow the procedure.
+ 
+> 
+> 
+> > diff --git a/include/uapi/linux/virtio_pmem.h
+> > b/include/uapi/linux/virtio_pmem.h
+> > new file mode 100644
+> > index 0000000..2ec27cb
+> > --- /dev/null
+> > +++ b/include/uapi/linux/virtio_pmem.h
+> > @@ -0,0 +1,58 @@
+> > +/* Virtio pmem Driver
+> > + *
+> > + * Discovers persitent memory range information
+> > + * from host and provides a virtio based flushing
+> > + * interface.
+> > + */
+> > +
+> > +#ifndef _LINUX_VIRTIO_PMEM_H
+> > +#define _LINUX_VIRTIO_PMEM_H
+> > +
+> > +#include <linux/types.h>
+> > +#include <linux/virtio_types.h>
+> > +#include <linux/virtio_ids.h>
+> > +#include <linux/virtio_config.h>
+> > +#include <linux/virtio_ring.h>
+> > +
+> > +
+> > +struct virtio_pmem_config {
+> > +
+> 
+> don't add empty lines pls.
 
-Script that reproduces the bug (first run usualy goes smooth, second and
-later runs result in dmesg errors and freezes):
+o.k
 
-http://paste.debian.net/hidden/472fb220/
+> 
+> > +	uint64_t start;
+> > +	uint64_t size;
+> 
+> Used LE fields for everything.
 
-Sample of error messages in guest dmesg:
+o.k
 
-http://paste.debian.net/hidden/8219e234/
+> 
+> > +};
+> > +
+> > +struct virtio_pmem {
+> > +
+> > +	struct virtio_device *vdev;
+> > +	struct virtqueue *req_vq;
+> > +
+> > +	uint64_t start;
+> > +	uint64_t size;
+> > +} __packed;
+> 
+> This does not belong in uapi, and should not be packed either.
 
-This vm is launchd using virsh start. VM launch command (from logfile in
-/var/log/libvirt/qemu/):
+o.k
 
-http://paste.debian.net/plainh/5604126f
+> 
+> > +
+> > +static struct virtio_device_id id_table[] = {
+> > +	{ VIRTIO_ID_PMEM, VIRTIO_DEV_ANY_ID },
+> > +	{ 0 },
+> > +};
+> > +
+> > +void virtio_pmem_flush(struct device *dev)
+> > +{
+> > +	struct scatterlist sg;
+> > +	struct virtio_device *vdev  = dev_to_virtio(dev->parent->parent);
+> > +	struct virtio_pmem   *vpmem = vdev->priv;
+> > +	char *buf = "FLUSH";
+> > +	int err;
+> > +
+> > +	sg_init_one(&sg, buf, sizeof(buf));
+> > +
+> > +	err = virtqueue_add_outbuf(vpmem->req_vq, &sg, 1, buf, GFP_KERNEL);
+> > +
+> > +	if (err) {
+> > +		dev_err(&vdev->dev, "failed to send command to virtio pmem device\n");
+> > +		return;
+> > +	}
+> > +
+> > +	virtqueue_kick(vpmem->req_vq);
+> > +};
+> 
+> this doesn't belong in uapi.
 
-A workaround that I am using right now: I have detached this SATA
-storage and reattached the same .qcow2 file as SCSI - this has fixed the
-issue for me.
+o.k.
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1766904
-
-Title:
-  Creating high hdd load (with constant fsyncs) on a SATA disk leads to
-  freezes and errors in guest dmesg
-
-Status in QEMU:
-  New
-
-Bug description:
-  After upgrading from qemu 2.10.0+dfsg-2 to 2.12~rc3+dfsg-2 (on debian
-  sid host), centos 7 guest started to show freezes and ata errors in
-  dmesg during hdd workloads with writing many small files and repeated
-  fsyncs.
-
-  Host kernel 4.15.0-3-amd64.
-  Guest kernel 3.10.0-693.21.1.el7.x86_64 (slightly older guest kernel was =
-tested too with same result).
-
-  Script that reproduces the bug (first run usualy goes smooth, second
-  and later runs result in dmesg errors and freezes):
-
-  http://paste.debian.net/hidden/472fb220/
-
-  Sample of error messages in guest dmesg:
-
-  http://paste.debian.net/hidden/8219e234/
-
-  This vm is launchd using virsh start. VM launch command (from logfile
-  in /var/log/libvirt/qemu/):
-
-  http://paste.debian.net/plainh/5604126f
-
-  A workaround that I am using right now: I have detached this SATA
-  storage and reattached the same .qcow2 file as SCSI - this has fixed
-  the issue for me.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1766904/+subscriptions
+Thanks,
+Pankaj
