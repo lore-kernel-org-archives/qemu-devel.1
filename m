@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fBIaN-0002sb-Qn
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:27:44 -0400
+	(envelope-from <quintela@redhat.com>) id 1fBIaO-0002tg-Td
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:27:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fBIaM-00056J-Ni
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:27:43 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46192 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fBIaO-00058i-0P
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:27:44 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45566 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fBIaM-00055Y-I7
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:27:42 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fBIaN-000585-SY
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:27:43 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2E027406C740
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 11:27:42 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 781D84023155
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 11:27:43 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 25 Apr 2018 13:27:14 +0200
-Message-Id: <20180425112723.1111-13-quintela@redhat.com>
+Date: Wed, 25 Apr 2018 13:27:15 +0200
+Message-Id: <20180425112723.1111-14-quintela@redhat.com>
 In-Reply-To: <20180425112723.1111-1-quintela@redhat.com>
 References: <20180425112723.1111-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v12 12/21] migration: Add multifd traces for
- start/end thread
+Subject: [Qemu-devel] [PATCH v12 13/21] migration: Calculate transferred ram
+ correctly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,105 +33,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-We want to know how many pages/packets each channel has sent.  Add
-counters for those.
+On multifd we send data from more places that main channel.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/ram.c        | 20 ++++++++++++++++++++
- migration/trace-events |  4 ++++
- 2 files changed, 24 insertions(+)
+ migration/migration.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 804c83ed89..0f1340b4e3 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -465,6 +465,10 @@ typedef struct {
-     uint32_t flags;
-     /* global number of generated multifd packets */
-     uint32_t seq;
-+    /* packets sent through this channel */
-+    uint32_t num_packets;
-+    /* pages sent through this channel */
-+    uint32_t num_pages;
- }  MultiFDSendParams;
+diff --git a/migration/migration.c b/migration/migration.c
+index 9b510a809a..75d30661e9 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -2246,12 +2246,19 @@ static void migration_update_counters(MigrationState *s,
+ {
+     uint64_t transferred, time_spent;
+     double bandwidth;
++    uint64_t now;
  
- typedef struct {
-@@ -495,6 +499,10 @@ typedef struct {
-     uint32_t flags;
-     /* global number of generated multifd packets */
-     uint32_t seq;
-+    /* packets sent through this channel */
-+    uint32_t num_packets;
-+    /* pages sent through this channel */
-+    uint32_t num_pages;
- } MultiFDRecvParams;
- 
- static int multifd_send_initial_packet(MultiFDSendParams *p, Error **errp)
-@@ -737,9 +745,13 @@ static void *multifd_send_thread(void *opaque)
-     MultiFDSendParams *p = opaque;
-     Error *local_err = NULL;
- 
-+    trace_multifd_send_thread_start(p->id);
-+
-     if (multifd_send_initial_packet(p, &local_err) < 0) {
-         goto out;
+     if (current_time < s->iteration_start_time + BUFFER_DELAY) {
+         return;
      }
-+    /* initial packet */
-+    p->num_packets = 1;
  
-     while (true) {
-         qemu_mutex_lock(&p->mutex);
-@@ -761,6 +773,8 @@ out:
-     p->running = false;
-     qemu_mutex_unlock(&p->mutex);
+-    transferred = qemu_ftell(s->to_dst_file) - s->iteration_initial_bytes;
++    if (migrate_use_multifd()) {
++        now = ram_counters.normal * qemu_target_page_size()
++            + qemu_ftell(s->to_dst_file);
++    } else {
++        now = qemu_ftell(s->to_dst_file);
++    }
++    transferred = now - s->iteration_initial_bytes;
+     time_spent = current_time - s->iteration_start_time;
+     bandwidth = (double)transferred / time_spent;
+     s->threshold_size = bandwidth * s->parameters.downtime_limit;
+@@ -2271,7 +2278,7 @@ static void migration_update_counters(MigrationState *s,
+     qemu_file_reset_rate_limit(s->to_dst_file);
  
-+    trace_multifd_send_thread_end(p->id, p->num_packets, p->num_pages);
-+
-     return NULL;
- }
+     s->iteration_start_time = current_time;
+-    s->iteration_initial_bytes = qemu_ftell(s->to_dst_file);
++    s->iteration_initial_bytes = now;
  
-@@ -888,6 +902,8 @@ static void *multifd_recv_thread(void *opaque)
-     Error *local_err = NULL;
-     int ret;
- 
-+    trace_multifd_recv_thread_start(p->id);
-+
-     while (true) {
-         qemu_mutex_lock(&p->mutex);
-         if (false)  {
-@@ -910,6 +926,8 @@ static void *multifd_recv_thread(void *opaque)
-     p->running = false;
-     qemu_mutex_unlock(&p->mutex);
- 
-+    trace_multifd_recv_thread_end(p->id, p->num_packets, p->num_pages);
-+
-     return NULL;
- }
- 
-@@ -975,6 +993,8 @@ void multifd_recv_new_channel(QIOChannel *ioc)
-     }
-     p->c = ioc;
-     object_ref(OBJECT(ioc));
-+    /* initial packet */
-+    p->num_packets = 1;
- 
-     p->running = true;
-     qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
-diff --git a/migration/trace-events b/migration/trace-events
-index a180d7b008..e480eb050e 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -77,6 +77,10 @@ ram_load_postcopy_loop(uint64_t addr, int flags) "@%" PRIx64 " %x"
- ram_postcopy_send_discard_bitmap(void) ""
- ram_save_page(const char *rbname, uint64_t offset, void *host) "%s: offset: 0x%" PRIx64 " host: %p"
- ram_save_queue_pages(const char *rbname, size_t start, size_t len) "%s: start: 0x%zx len: 0x%zx"
-+multifd_send_thread_start(uint8_t id) "%d"
-+multifd_send_thread_end(uint8_t id, uint32_t packets, uint32_t pages) "channel %d packets %d pages %d"
-+multifd_recv_thread_start(uint8_t id) "%d"
-+multifd_recv_thread_end(uint8_t id, uint32_t packets, uint32_t pages) "channel %d packets %d pages %d"
- 
- # migration/migration.c
- await_return_path_close_on_source_close(void) ""
+     trace_migrate_transferred(transferred, time_spent,
+                               bandwidth, s->threshold_size);
 -- 
 2.17.0
