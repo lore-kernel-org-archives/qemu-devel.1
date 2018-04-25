@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33126)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fBK0k-00043e-3X
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 08:59:07 -0400
+	(envelope-from <eblake@redhat.com>) id 1fBK26-0005LQ-3s
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:00:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fBK0h-0007Jl-0N
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 08:59:02 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <216e7398-0bc3-4822-d4b0-e0267c714abb@redhat.com>
-References: <20180412170711.GA6240@igalia.com>
-	<1695266a-47ac-1f6d-49d1-bdfb81e0e345@redhat.com>
-	<w517ep7gpsz.fsf@maestria.local.igalia.com>
-	<ee24e79d-b37e-ac8f-c349-b0fa637ba2a6@redhat.com>
-	<w51bmegjzp4.fsf@maestria.local.igalia.com>
-	<216e7398-0bc3-4822-d4b0-e0267c714abb@redhat.com>
-Date: Wed, 25 Apr 2018 14:58:54 +0200
-Message-ID: <w5136zjsar5.fsf@maestria.local.igalia.com>
+	(envelope-from <eblake@redhat.com>) id 1fBK22-0007kA-TB
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:00:26 -0400
+From: Eric Blake <eblake@redhat.com>
+References: <20180424192506.149089-1-eblake@redhat.com>
+	<20180424192506.149089-5-eblake@redhat.com>
+Message-ID: <b293a052-41c9-c6d9-e28a-ebcb8b11a9e8@redhat.com>
+Date: Wed, 25 Apr 2018 08:00:03 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC] Intermediate block mirroring
+In-Reply-To: <20180424192506.149089-5-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="h7eUmt8qy5IIpXL3sFVOEAmBHGDCiGi6s"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 4/6] rbd: Switch to
+ byte-based callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,52 +25,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Fri 20 Apr 2018 03:13:49 PM CEST, Max Reitz wrote:
->>>>>> One other way is to have a more generic replace-node command
->>>>>> which would call bdrv_replace_node(), but I don't know if we want
->>>>>> to expose that and I don't have any other use case for it at the
->>>>>> moment.
->>>>>
->>>>> I think we do want to expose that.  As far as I'm informed, for
->>>>> graph manipulation we want a command that can replace nodes
->>>>> (including replacing nothing by a new node or replacing an
->>>>> existing node by nothing, if the parent supports that).
->>>>
->>>> Was there any discussion about this in the mailing list? (proposed
->>>> name for this function, features, etc.)
->>>
->>> Well, there is x-blockdev-change.  But we probably want to expose
->>> bdrv_reopen() in the long run.
->> 
->> Exposing bdrv_reopen() itself shouldn't be too much work (it takes
->> just two node names, or am I missing something?).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--h7eUmt8qy5IIpXL3sFVOEAmBHGDCiGi6s
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Message-ID: <b293a052-41c9-c6d9-e28a-ebcb8b11a9e8@redhat.com>
+Subject: Re: [Qemu-block] [PATCH v2 4/6] rbd: Switch to byte-based callbacks
+References: <20180424192506.149089-1-eblake@redhat.com>
+ <20180424192506.149089-5-eblake@redhat.com>
+In-Reply-To: <20180424192506.149089-5-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I just realized that I meant "Exposing bdrv_replace_node()" here.
+On 04/24/2018 02:25 PM, Eric Blake wrote:
+> We are gradually moving away from sector-based interfaces, towards
+> byte-based.  Make the change for the last few sector-based callbacks
+> in the rbd driver.
+>=20
+> Note that the driver was already using byte-based calls for
+> performing actual I/O, so this just gets rid of a round trip
+> of scaling; however, as I don't know if RBD is tolerant of
+> non-sector AIO operations, I went with the conservate approach
 
-> So from my perspective...  If you think it's easy, why don't you try
-> it and then we'll see? *cough*
+s/conservate/conservative/
 
-I'm doing it :-)
+> of adding .bdrv_refresh_limits to override the block layer
+> defaults back to the pre-patch value of 512.
+>=20
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+>=20
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
->> There's still the question of how to update the backing file string
->> (on the overlay). stream and commit do it automatically, but if we do
->> bdrv_reopen() or the aforementioned modification to blockdev-mirror
 
-bdrv_replace_node() again
 
->> we'd need to do it explicitly with change-backing-file, or extend the
->> API to allow for that.
->
-> Well, the December notes do say that we probably want an option to
-> specify the target's filename which is what will be written into the
-> overlays of @to_replace as their backing file string, so I think
-> extending the API should be fine.
+--h7eUmt8qy5IIpXL3sFVOEAmBHGDCiGi6s
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Yes, but how do you find out what the overlays are (without an
-additional parameter, that is)? I thought we didn't want to support
-walking the backing chain in reverse direction.
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Berto
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrge9MACgkQp6FrSiUn
+Q2p9kwgArVsvH73xuWY/FGVUMZtHnUzSnRn1b5lMmTsyEdAN2akm9pVcJYfY4aEa
+qDTDyt8ni7+UiAz4PrucOlt8NVYdQsmYr58irgh+CIbXBWGLy1bHripuscCjc+7+
+GH5qpxgypnemPkFXq4QIqXQxFSgEFuDEjCGLg706bp+Hag4LarjaS53c0Oy6RLgD
+uFIUlmlIJaCH67LpWnVHMc8McLZEPlU/5LxAqUPJdmV9vsGAtfvYRgHURnPHjWCr
+rZwi9k0U11gUSS3+9Mcq0MeWHF0wK03Y/7GDFSU+1HPsrw8QYfFrygl0VcrFDVyE
+TBMzDv+Lx4/vxxg22lF+rcVpcAvUbw==
+=l6F3
+-----END PGP SIGNATURE-----
+
+--h7eUmt8qy5IIpXL3sFVOEAmBHGDCiGi6s--
