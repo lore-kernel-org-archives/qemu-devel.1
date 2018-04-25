@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45234)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45332)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fBQde-0003ZV-8G
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 16:03:40 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fBQdk-0003bo-S7
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 16:03:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fBQdb-0002zU-BJ
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 16:03:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39100 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1fBQdj-00033k-Kw
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 16:03:44 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44084 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fBQdb-0002yx-6N
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 16:03:35 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fBQdj-00033b-GD
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 16:03:43 -0400
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 25 Apr 2018 21:03:13 +0100
-Message-Id: <20180425200326.72337-4-dgilbert@redhat.com>
+Date: Wed, 25 Apr 2018 21:03:20 +0100
+Message-Id: <20180425200326.72337-11-dgilbert@redhat.com>
 In-Reply-To: <20180425200326.72337-1-dgilbert@redhat.com>
 References: <20180425200326.72337-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 03/16] migration: calculate vCPU blocktime on
- dst side
+Subject: [Qemu-devel] [PULL 10/16] migration: detect compression and
+ decompression errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,236 +26,221 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, a.perevalov@samsung.com, xiaoguangrong@tencent.com
 
-From: Alexey Perevalov <a.perevalov@samsung.com>
+From: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-This patch provides blocktime calculation per vCPU,
-as a summary and as a overlapped value for all vCPUs.
+Currently the page being compressed is allowed to be updated by
+the VM on the source QEMU, correspondingly the destination QEMU
+just ignores the decompression error. However, we completely miss
+the chance to catch real errors, then the VM is corrupted silently
 
-This approach was suggested by Peter Xu, as an improvements of
-previous approch where QEMU kept tree with faulted page address and cpus bitmask
-in it. Now QEMU is keeping array with faulted page address as value and vCPU
-as index. It helps to find proper vCPU at UFFD_COPY time. Also it keeps
-list for blocktime per vCPU (could be traced with page_fault_addr)
+To make the migration more robuster, we copy the page to a buffer
+first to avoid it being written by VM, then detect and handle the
+errors of both compression and decompression errors properly
 
-Blocktime will not calculated if postcopy_blocktime field of
-MigrationIncomingState wasn't initialized.
-
-Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Message-Id: <1521742647-25550-4-git-send-email-a.perevalov@samsung.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+Message-Id: <20180330075128.26919-5-xiaoguangrong@tencent.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/postcopy-ram.c | 151 ++++++++++++++++++++++++++++++++++++++-
- migration/trace-events   |   5 +-
- 2 files changed, 154 insertions(+), 2 deletions(-)
+ migration/qemu-file.c |  4 ++--
+ migration/ram.c       | 56 ++++++++++++++++++++++++++++++-------------
+ 2 files changed, 41 insertions(+), 19 deletions(-)
 
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index eddba05b57..6b34a7148e 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -636,6 +636,148 @@ int postcopy_request_shared_page(struct PostCopyFD *pcfd, RAMBlock *rb,
-     return 0;
- }
- 
-+static int get_mem_fault_cpu_index(uint32_t pid)
-+{
-+    CPUState *cpu_iter;
-+
-+    CPU_FOREACH(cpu_iter) {
-+        if (cpu_iter->thread_id == pid) {
-+            trace_get_mem_fault_cpu_index(cpu_iter->cpu_index, pid);
-+            return cpu_iter->cpu_index;
-+        }
-+    }
-+    trace_get_mem_fault_cpu_index(-1, pid);
-+    return -1;
-+}
-+
-+static uint32_t get_low_time_offset(PostcopyBlocktimeContext *dc)
-+{
-+    int64_t start_time_offset = qemu_clock_get_ms(QEMU_CLOCK_REALTIME) -
-+                                    dc->start_time;
-+    return start_time_offset < 1 ? 1 : start_time_offset & UINT32_MAX;
-+}
-+
-+/*
-+ * This function is being called when pagefault occurs. It
-+ * tracks down vCPU blocking time.
-+ *
-+ * @addr: faulted host virtual address
-+ * @ptid: faulted process thread id
-+ * @rb: ramblock appropriate to addr
-+ */
-+static void mark_postcopy_blocktime_begin(uintptr_t addr, uint32_t ptid,
-+                                          RAMBlock *rb)
-+{
-+    int cpu, already_received;
-+    MigrationIncomingState *mis = migration_incoming_get_current();
-+    PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
-+    uint32_t low_time_offset;
-+
-+    if (!dc || ptid == 0) {
-+        return;
-+    }
-+    cpu = get_mem_fault_cpu_index(ptid);
-+    if (cpu < 0) {
-+        return;
-+    }
-+
-+    low_time_offset = get_low_time_offset(dc);
-+    if (dc->vcpu_addr[cpu] == 0) {
-+        atomic_inc(&dc->smp_cpus_down);
-+    }
-+
-+    atomic_xchg(&dc->last_begin, low_time_offset);
-+    atomic_xchg(&dc->page_fault_vcpu_time[cpu], low_time_offset);
-+    atomic_xchg(&dc->vcpu_addr[cpu], addr);
-+
-+    /* check it here, not at the begining of the function,
-+     * due to, check could accur early than bitmap_set in
-+     * qemu_ufd_copy_ioctl */
-+    already_received = ramblock_recv_bitmap_test(rb, (void *)addr);
-+    if (already_received) {
-+        atomic_xchg(&dc->vcpu_addr[cpu], 0);
-+        atomic_xchg(&dc->page_fault_vcpu_time[cpu], 0);
-+        atomic_dec(&dc->smp_cpus_down);
-+    }
-+    trace_mark_postcopy_blocktime_begin(addr, dc, dc->page_fault_vcpu_time[cpu],
-+                                        cpu, already_received);
-+}
-+
-+/*
-+ *  This function just provide calculated blocktime per cpu and trace it.
-+ *  Total blocktime is calculated in mark_postcopy_blocktime_end.
-+ *
-+ *
-+ * Assume we have 3 CPU
-+ *
-+ *      S1        E1           S1               E1
-+ * -----***********------------xxx***************------------------------> CPU1
-+ *
-+ *             S2                E2
-+ * ------------****************xxx---------------------------------------> CPU2
-+ *
-+ *                         S3            E3
-+ * ------------------------****xxx********-------------------------------> CPU3
-+ *
-+ * We have sequence S1,S2,E1,S3,S1,E2,E3,E1
-+ * S2,E1 - doesn't match condition due to sequence S1,S2,E1 doesn't include CPU3
-+ * S3,S1,E2 - sequence includes all CPUs, in this case overlap will be S1,E2 -
-+ *            it's a part of total blocktime.
-+ * S1 - here is last_begin
-+ * Legend of the picture is following:
-+ *              * - means blocktime per vCPU
-+ *              x - means overlapped blocktime (total blocktime)
-+ *
-+ * @addr: host virtual address
-+ */
-+static void mark_postcopy_blocktime_end(uintptr_t addr)
-+{
-+    MigrationIncomingState *mis = migration_incoming_get_current();
-+    PostcopyBlocktimeContext *dc = mis->blocktime_ctx;
-+    int i, affected_cpu = 0;
-+    bool vcpu_total_blocktime = false;
-+    uint32_t read_vcpu_time, low_time_offset;
-+
-+    if (!dc) {
-+        return;
-+    }
-+
-+    low_time_offset = get_low_time_offset(dc);
-+    /* lookup cpu, to clear it,
-+     * that algorithm looks straighforward, but it's not
-+     * optimal, more optimal algorithm is keeping tree or hash
-+     * where key is address value is a list of  */
-+    for (i = 0; i < smp_cpus; i++) {
-+        uint32_t vcpu_blocktime = 0;
-+
-+        read_vcpu_time = atomic_fetch_add(&dc->page_fault_vcpu_time[i], 0);
-+        if (atomic_fetch_add(&dc->vcpu_addr[i], 0) != addr ||
-+            read_vcpu_time == 0) {
-+            continue;
-+        }
-+        atomic_xchg(&dc->vcpu_addr[i], 0);
-+        vcpu_blocktime = low_time_offset - read_vcpu_time;
-+        affected_cpu += 1;
-+        /* we need to know is that mark_postcopy_end was due to
-+         * faulted page, another possible case it's prefetched
-+         * page and in that case we shouldn't be here */
-+        if (!vcpu_total_blocktime &&
-+            atomic_fetch_add(&dc->smp_cpus_down, 0) == smp_cpus) {
-+            vcpu_total_blocktime = true;
-+        }
-+        /* continue cycle, due to one page could affect several vCPUs */
-+        dc->vcpu_blocktime[i] += vcpu_blocktime;
-+    }
-+
-+    atomic_sub(&dc->smp_cpus_down, affected_cpu);
-+    if (vcpu_total_blocktime) {
-+        dc->total_blocktime += low_time_offset - atomic_fetch_add(
-+                &dc->last_begin, 0);
-+    }
-+    trace_mark_postcopy_blocktime_end(addr, dc, dc->total_blocktime,
-+                                      affected_cpu);
-+}
-+
- /*
-  * Handle faults detected by the USERFAULT markings
-  */
-@@ -742,7 +884,12 @@ static void *postcopy_ram_fault_thread(void *opaque)
-             rb_offset &= ~(qemu_ram_pagesize(rb) - 1);
-             trace_postcopy_ram_fault_thread_request(msg.arg.pagefault.address,
-                                                 qemu_ram_get_idstr(rb),
--                                                rb_offset);
-+                                                rb_offset,
-+                                                msg.arg.pagefault.feat.ptid);
-+            mark_postcopy_blocktime_begin(
-+                    (uintptr_t)(msg.arg.pagefault.address),
-+                                msg.arg.pagefault.feat.ptid, rb);
-+
-             /*
-              * Send the request to the source - we want to request one
-              * of our host page sizes (which is >= TPS)
-@@ -890,6 +1037,8 @@ static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
-     if (!ret) {
-         ramblock_recv_bitmap_set_range(rb, host_addr,
-                                        pagesize / qemu_target_page_size());
-+        mark_postcopy_blocktime_end((uintptr_t)host_addr);
-+
+diff --git a/migration/qemu-file.c b/migration/qemu-file.c
+index bafe3a0c0d..0463f4c321 100644
+--- a/migration/qemu-file.c
++++ b/migration/qemu-file.c
+@@ -710,9 +710,9 @@ ssize_t qemu_put_compression_data(QEMUFile *f, z_stream *stream,
+     blen = qemu_compress_data(stream, f->buf + f->buf_index + sizeof(int32_t),
+                               blen, p, size);
+     if (blen < 0) {
+-        error_report("Compress Failed!");
+-        return 0;
++        return -1;
      }
-     return ret;
++
+     qemu_put_be32(f, blen);
+     if (f->ops->writev_buffer) {
+         add_to_iovec(f, f->buf + f->buf_index, blen, false);
+diff --git a/migration/ram.c b/migration/ram.c
+index fb24b2f32f..72cb8dfb66 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -269,7 +269,10 @@ struct CompressParam {
+     QemuCond cond;
+     RAMBlock *block;
+     ram_addr_t offset;
++
++    /* internally used fields */
+     z_stream stream;
++    uint8_t *originbuf;
+ };
+ typedef struct CompressParam CompressParam;
+ 
+@@ -296,13 +299,14 @@ static QemuCond comp_done_cond;
+ /* The empty QEMUFileOps will be used by file in CompressParam */
+ static const QEMUFileOps empty_ops = { };
+ 
++static QEMUFile *decomp_file;
+ static DecompressParam *decomp_param;
+ static QemuThread *decompress_threads;
+ static QemuMutex decomp_done_lock;
+ static QemuCond decomp_done_cond;
+ 
+ static int do_compress_ram_page(QEMUFile *f, z_stream *stream, RAMBlock *block,
+-                                ram_addr_t offset);
++                                ram_addr_t offset, uint8_t *source_buf);
+ 
+ static void *do_data_compress(void *opaque)
+ {
+@@ -318,7 +322,8 @@ static void *do_data_compress(void *opaque)
+             param->block = NULL;
+             qemu_mutex_unlock(&param->mutex);
+ 
+-            do_compress_ram_page(param->file, &param->stream, block, offset);
++            do_compress_ram_page(param->file, &param->stream, block, offset,
++                                 param->originbuf);
+ 
+             qemu_mutex_lock(&comp_done_lock);
+             param->done = true;
+@@ -370,6 +375,7 @@ static void compress_threads_save_cleanup(void)
+         qemu_mutex_destroy(&comp_param[i].mutex);
+         qemu_cond_destroy(&comp_param[i].cond);
+         deflateEnd(&comp_param[i].stream);
++        g_free(comp_param[i].originbuf);
+         qemu_fclose(comp_param[i].file);
+         comp_param[i].file = NULL;
+     }
+@@ -394,8 +400,14 @@ static int compress_threads_save_setup(void)
+     qemu_cond_init(&comp_done_cond);
+     qemu_mutex_init(&comp_done_lock);
+     for (i = 0; i < thread_count; i++) {
++        comp_param[i].originbuf = g_try_malloc(TARGET_PAGE_SIZE);
++        if (!comp_param[i].originbuf) {
++            goto exit;
++        }
++
+         if (deflateInit(&comp_param[i].stream,
+                         migrate_compress_level()) != Z_OK) {
++            g_free(comp_param[i].originbuf);
+             goto exit;
+         }
+ 
+@@ -1053,7 +1065,7 @@ static int ram_save_page(RAMState *rs, PageSearchStatus *pss, bool last_stage)
  }
-diff --git a/migration/trace-events b/migration/trace-events
-index a180d7b008..368bc4b663 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -115,6 +115,8 @@ process_incoming_migration_co_end(int ret, int ps) "ret=%d postcopy-state=%d"
- process_incoming_migration_co_postcopy_end_main(void) ""
- migration_set_incoming_channel(void *ioc, const char *ioctype) "ioc=%p ioctype=%s"
- migration_set_outgoing_channel(void *ioc, const char *ioctype, const char *hostname, void *err)  "ioc=%p ioctype=%s hostname=%s err=%p"
-+mark_postcopy_blocktime_begin(uint64_t addr, void *dd, uint32_t time, int cpu, int received) "addr: 0x%" PRIx64 ", dd: %p, time: %u, cpu: %d, already_received: %d"
-+mark_postcopy_blocktime_end(uint64_t addr, void *dd, uint32_t time, int affected_cpu) "addr: 0x%" PRIx64 ", dd: %p, time: %u, affected_cpu: %d"
  
- # migration/rdma.c
- qemu_rdma_accept_incoming_migration(void) ""
-@@ -193,7 +195,7 @@ postcopy_ram_fault_thread_exit(void) ""
- postcopy_ram_fault_thread_fds_core(int baseufd, int quitfd) "ufd: %d quitfd: %d"
- postcopy_ram_fault_thread_fds_extra(size_t index, const char *name, int fd) "%zd/%s: %d"
- postcopy_ram_fault_thread_quit(void) ""
--postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset) "Request for HVA=0x%" PRIx64 " rb=%s offset=0x%zx"
-+postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset, uint32_t pid) "Request for HVA=0x%" PRIx64 " rb=%s offset=0x%zx pid=%u"
- postcopy_ram_incoming_cleanup_closeuf(void) ""
- postcopy_ram_incoming_cleanup_entry(void) ""
- postcopy_ram_incoming_cleanup_exit(void) ""
-@@ -206,6 +208,7 @@ save_xbzrle_page_skipping(void) ""
- save_xbzrle_page_overflow(void) ""
- ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wait: %" PRIu64 " milliseconds, %d iterations"
- ram_load_complete(int ret, uint64_t seq_iter) "exit_code %d seq iteration %" PRIu64
-+get_mem_fault_cpu_index(int cpu, uint32_t pid) "cpu: %d, pid: %u"
+ static int do_compress_ram_page(QEMUFile *f, z_stream *stream, RAMBlock *block,
+-                                ram_addr_t offset)
++                                ram_addr_t offset, uint8_t *source_buf)
+ {
+     RAMState *rs = ram_state;
+     int bytes_sent, blen;
+@@ -1061,7 +1073,14 @@ static int do_compress_ram_page(QEMUFile *f, z_stream *stream, RAMBlock *block,
  
- # migration/exec.c
- migration_exec_outgoing(const char *cmd) "cmd=%s"
+     bytes_sent = save_page_header(rs, f, block, offset |
+                                   RAM_SAVE_FLAG_COMPRESS_PAGE);
+-    blen = qemu_put_compression_data(f, stream, p, TARGET_PAGE_SIZE);
++
++    /*
++     * copy it to a internal buffer to avoid it being modified by VM
++     * so that we can catch up the error during compression and
++     * decompression
++     */
++    memcpy(source_buf, p, TARGET_PAGE_SIZE);
++    blen = qemu_put_compression_data(f, stream, source_buf, TARGET_PAGE_SIZE);
+     if (blen < 0) {
+         bytes_sent = 0;
+         qemu_file_set_error(migrate_get_current()->to_dst_file, blen);
+@@ -2555,7 +2574,7 @@ static void *do_data_decompress(void *opaque)
+     DecompressParam *param = opaque;
+     unsigned long pagesize;
+     uint8_t *des;
+-    int len;
++    int len, ret;
+ 
+     qemu_mutex_lock(&param->mutex);
+     while (!param->quit) {
+@@ -2566,13 +2585,13 @@ static void *do_data_decompress(void *opaque)
+             qemu_mutex_unlock(&param->mutex);
+ 
+             pagesize = TARGET_PAGE_SIZE;
+-            /* qemu_uncompress_data() will return failed in some case,
+-             * especially when the page is dirtied when doing the compression,
+-             * it's not a problem because the dirty page will be retransferred
+-             * and uncompress() won't break the data in other pages.
+-             */
+-            qemu_uncompress_data(&param->stream, des, pagesize, param->compbuf,
+-                                 len);
++
++            ret = qemu_uncompress_data(&param->stream, des, pagesize,
++                                       param->compbuf, len);
++            if (ret < 0) {
++                error_report("decompress data failed");
++                qemu_file_set_error(decomp_file, ret);
++            }
+ 
+             qemu_mutex_lock(&decomp_done_lock);
+             param->done = true;
+@@ -2589,12 +2608,12 @@ static void *do_data_decompress(void *opaque)
+     return NULL;
+ }
+ 
+-static void wait_for_decompress_done(void)
++static int wait_for_decompress_done(void)
+ {
+     int idx, thread_count;
+ 
+     if (!migrate_use_compression()) {
+-        return;
++        return 0;
+     }
+ 
+     thread_count = migrate_decompress_threads();
+@@ -2605,6 +2624,7 @@ static void wait_for_decompress_done(void)
+         }
+     }
+     qemu_mutex_unlock(&decomp_done_lock);
++    return qemu_file_get_error(decomp_file);
+ }
+ 
+ static void compress_threads_load_cleanup(void)
+@@ -2645,9 +2665,10 @@ static void compress_threads_load_cleanup(void)
+     g_free(decomp_param);
+     decompress_threads = NULL;
+     decomp_param = NULL;
++    decomp_file = NULL;
+ }
+ 
+-static int compress_threads_load_setup(void)
++static int compress_threads_load_setup(QEMUFile *f)
+ {
+     int i, thread_count;
+ 
+@@ -2660,6 +2681,7 @@ static int compress_threads_load_setup(void)
+     decomp_param = g_new0(DecompressParam, thread_count);
+     qemu_mutex_init(&decomp_done_lock);
+     qemu_cond_init(&decomp_done_cond);
++    decomp_file = f;
+     for (i = 0; i < thread_count; i++) {
+         if (inflateInit(&decomp_param[i].stream) != Z_OK) {
+             goto exit;
+@@ -2719,7 +2741,7 @@ static void decompress_data_with_multi_threads(QEMUFile *f,
+  */
+ static int ram_load_setup(QEMUFile *f, void *opaque)
+ {
+-    if (compress_threads_load_setup()) {
++    if (compress_threads_load_setup(f)) {
+         return -1;
+     }
+ 
+@@ -3074,7 +3096,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+         }
+     }
+ 
+-    wait_for_decompress_done();
++    ret |= wait_for_decompress_done();
+     rcu_read_unlock();
+     trace_ram_load_complete(ret, seq_iter);
+     return ret;
 -- 
 2.17.0
