@@ -1,32 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55475)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fBLDT-0000NO-6E
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:16:16 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fBLDe-0000Ul-Nl
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:16:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fBLDO-0005dn-Dd
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:16:15 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:34507)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fBLDO-0005da-8l
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:16:10 -0400
-Received: by mail-qt0-x243.google.com with SMTP id a25-v6so26988908qtm.1
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 07:16:10 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180424152405.10304-1-alex.bennee@linaro.org>
-	<20180424152405.10304-41-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <13dde1ff-6365-dd69-0cfa-948c8d97a7cb@amsat.org>
-Date: Wed, 25 Apr 2018 11:16:03 -0300
-MIME-Version: 1.0
-In-Reply-To: <20180424152405.10304-41-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 40/46] tests/tcg: enable building for sh4
+	(envelope-from <eric.auger@redhat.com>) id 1fBLDd-0005n1-Bp
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:16:26 -0400
+From: Eric Auger <eric.auger@redhat.com>
+Date: Wed, 25 Apr 2018 16:15:47 +0200
+Message-Id: <1524665762-31355-3-git-send-email-eric.auger@redhat.com>
+In-Reply-To: <1524665762-31355-1-git-send-email-eric.auger@redhat.com>
+References: <1524665762-31355-1-git-send-email-eric.auger@redhat.com>
+Subject: [Qemu-devel] [PATCH v12 02/17] hw/arm/smmu-common: IOMMU memory
+ region and address space setup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,81 +20,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, prem.mallappa@gmail.com
+Cc: alex.williamson@redhat.com, tn@semihalf.com, mst@redhat.com, cdall@kernel.org, bharat.bhushan@nxp.com, jean-philippe.brucker@arm.com, linuc.decode@gmail.com, peterx@redhat.com, jintack@cs.columbia.edu
 
-On 04/24/2018 12:23 PM, Alex Bennée wrote:
-> As before, using Debian SID compilers. While the compiler can be
-> coerced into generating big-endian code it seems the linker can't deal
-> with it so we only enable the building for little endian SH4.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  tests/docker/Makefile.include                    |  1 +
->  tests/docker/dockerfiles/debian-sh4-cross.docker | 12 ++++++++++++
->  tests/tcg/sh4/Makefile.include                   |  4 ++++
->  3 files changed, 17 insertions(+)
->  create mode 100644 tests/docker/dockerfiles/debian-sh4-cross.docker
->  create mode 100644 tests/tcg/sh4/Makefile.include
-> 
-> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-> index 15c52127c7..c08f32ca58 100644
-> --- a/tests/docker/Makefile.include
-> +++ b/tests/docker/Makefile.include
-> @@ -65,6 +65,7 @@ docker-image-debian-win64-cross: docker-image-debian8-mxe
->  docker-image-debian-alpha-cross: docker-image-debian-sid
->  docker-image-debian-hppa-cross: docker-image-debian-sid
->  docker-image-debian-m68k-cross: docker-image-debian-sid
-> +docker-image-debian-sh4-cross: docker-image-debian-sid
->  docker-image-travis: NOUSER=1
->  
->  # Expand all the pre-requistes for each docker image and test combination
-> diff --git a/tests/docker/dockerfiles/debian-sh4-cross.docker b/tests/docker/dockerfiles/debian-sh4-cross.docker
-> new file mode 100644
-> index 0000000000..88a2423094
-> --- /dev/null
-> +++ b/tests/docker/dockerfiles/debian-sh4-cross.docker
-> @@ -0,0 +1,12 @@
-> +#
-> +# Docker cross-compiler target
-> +#
-> +# This docker target builds on the debian sid base image which
-> +# contains cross compilers for Debian "ports" targets.
-> +#
-> +FROM qemu:debian-sid
-> +
-> +RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-> +    apt-get install -y --no-install-recommends \
-> +        gcc-sh4-linux-gnu \
-> +        libc6-dev-sh4-cross
-> diff --git a/tests/tcg/sh4/Makefile.include b/tests/tcg/sh4/Makefile.include
-> new file mode 100644
-> index 0000000000..ad21594d9d
-> --- /dev/null
-> +++ b/tests/tcg/sh4/Makefile.include
-> @@ -0,0 +1,4 @@
-> +ifneq ($(TARGET_NAME), sh4eb)
-> +DOCKER_IMAGE=debian-sh4-cross
-> +DOCKER_CROSS_COMPILER=sh4-linux-gnu-gcc
-> +endif
-> 
+We set up the infrastructure to enumerate all the PCI devices
+attached to the SMMU and create an associated IOMMU memory
+region and address space.
 
-$ make -j1 run-tcg-tests-sh4-linux-user
-  GEN     sh4-linux-user/config-target.h
-  BUILD   debian-sid
-  BUILD   debian-sh4-cross
-  CROSS-BUILD sh4 guest-tests with docker qemu:debian-sh4-cross
-  BUILD   debian-sid
-  BUILD   debian-sh4-cross
-  CROSS-BUILD sh4 guest-tests with docker qemu:debian-sh4-cross
-  RUN-TESTS for sh4
-  TEST    test-mmap (default) on sh4
-  TEST    test-mmap (8k pages) on sh4
-  TEST    test-mmap (16k pages) on sh4
-  TEST    test-mmap (32k pages) on sh4
-  TEST    sha1 on sh4
-  BROKEN TEST linux-test SKIPPED on sh4
-  TEST    testthread on sh4
+Those info are stored in SMMUDevice objects. The devices are
+grouped according to the PCIBus they belong to. A hash table
+indexed by the PCIBus pointer is used. Also an array indexed by
+the bus number allows to find the list of SMMUDevices.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+---
+v11 -> v12:
+- use PCI_BUILD_BDF in smmu_get_sid and add Peter's R-b
+
+v9 -> v10:
+- comment functions added to the header
+- g_free(name)
+- renamed smmu_find_as_from_bus_num into smmu_find_smmu_pcibus
+- add a comment about lazy init in smmu_find_smmu_pcibus
+- add a trace event when creating the smmu iommu mr
+
+v8 -> v9:
+- fix key value for lookup
+
+v7 -> v8:
+- introduce SMMU_MAX_VA_BITS
+- use PCI bus handle as a key
+- do not clear s->smmu_as_by_bus_num
+- use g_new0 instead of g_malloc0
+- use primary_bus field
+---
+ hw/arm/smmu-common.c         | 69 ++++++++++++++++++++++++++++++++++++++++++++
+ hw/arm/trace-events          |  3 ++
+ include/hw/arm/smmu-common.h |  8 +++++
+ 3 files changed, 80 insertions(+)
+
+diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
+index e086ff5..3d64bcf 100644
+--- a/hw/arm/smmu-common.c
++++ b/hw/arm/smmu-common.c
+@@ -28,8 +28,69 @@
+ #include "qemu/error-report.h"
+ #include "hw/arm/smmu-common.h"
+ 
++/**
++ * The bus number is used for lookup when SID based invalidation occurs.
++ * In that case we lazily populate the SMMUPciBus array from the bus hash
++ * table. At the time the SMMUPciBus is created (smmu_find_add_as), the bus
++ * numbers may not be always initialized yet.
++ */
++SMMUPciBus *smmu_find_smmu_pcibus(SMMUState *s, uint8_t bus_num)
++{
++    SMMUPciBus *smmu_pci_bus = s->smmu_pcibus_by_bus_num[bus_num];
++
++    if (!smmu_pci_bus) {
++        GHashTableIter iter;
++
++        g_hash_table_iter_init(&iter, s->smmu_pcibus_by_busptr);
++        while (g_hash_table_iter_next(&iter, NULL, (void **)&smmu_pci_bus)) {
++            if (pci_bus_num(smmu_pci_bus->bus) == bus_num) {
++                s->smmu_pcibus_by_bus_num[bus_num] = smmu_pci_bus;
++                return smmu_pci_bus;
++            }
++        }
++    }
++    return smmu_pci_bus;
++}
++
++static AddressSpace *smmu_find_add_as(PCIBus *bus, void *opaque, int devfn)
++{
++    SMMUState *s = opaque;
++    SMMUPciBus *sbus = g_hash_table_lookup(s->smmu_pcibus_by_busptr, bus);
++    SMMUDevice *sdev;
++
++    if (!sbus) {
++        sbus = g_malloc0(sizeof(SMMUPciBus) +
++                         sizeof(SMMUDevice *) * SMMU_PCI_DEVFN_MAX);
++        sbus->bus = bus;
++        g_hash_table_insert(s->smmu_pcibus_by_busptr, bus, sbus);
++    }
++
++    sdev = sbus->pbdev[devfn];
++    if (!sdev) {
++        char *name = g_strdup_printf("%s-%d-%d",
++                                     s->mrtypename,
++                                     pci_bus_num(bus), devfn);
++        sdev = sbus->pbdev[devfn] = g_new0(SMMUDevice, 1);
++
++        sdev->smmu = s;
++        sdev->bus = bus;
++        sdev->devfn = devfn;
++
++        memory_region_init_iommu(&sdev->iommu, sizeof(sdev->iommu),
++                                 s->mrtypename,
++                                 OBJECT(s), name, 1ULL << SMMU_MAX_VA_BITS);
++        address_space_init(&sdev->as,
++                           MEMORY_REGION(&sdev->iommu), name);
++        trace_smmu_add_mr(name);
++        g_free(name);
++    }
++
++    return &sdev->as;
++}
++
+ static void smmu_base_realize(DeviceState *dev, Error **errp)
+ {
++    SMMUState *s = ARM_SMMU(dev);
+     SMMUBaseClass *sbc = ARM_SMMU_GET_CLASS(dev);
+     Error *local_err = NULL;
+ 
+@@ -38,6 +99,14 @@ static void smmu_base_realize(DeviceState *dev, Error **errp)
+         error_propagate(errp, local_err);
+         return;
+     }
++
++    s->smmu_pcibus_by_busptr = g_hash_table_new(NULL, NULL);
++
++    if (s->primary_bus) {
++        pci_setup_iommu(s->primary_bus, smmu_find_add_as, s);
++    } else {
++        error_setg(errp, "SMMU is not attached to any PCI bus!");
++    }
+ }
+ 
+ static void smmu_base_reset(DeviceState *dev)
+diff --git a/hw/arm/trace-events b/hw/arm/trace-events
+index 193063e..8e8b53c 100644
+--- a/hw/arm/trace-events
++++ b/hw/arm/trace-events
+@@ -2,3 +2,6 @@
+ 
+ # hw/arm/virt-acpi-build.c
+ virt_acpi_setup(void) "No fw cfg or ACPI disabled. Bailing out."
++
++# hw/arm/smmu-common.c
++smmu_add_mr(const char *name) "%s"
+\ No newline at end of file
+diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
+index d682be8..8b94777 100644
+--- a/include/hw/arm/smmu-common.h
++++ b/include/hw/arm/smmu-common.h
+@@ -120,4 +120,12 @@ typedef struct {
+ #define ARM_SMMU_GET_CLASS(obj)                              \
+     OBJECT_GET_CLASS(SMMUBaseClass, (obj), TYPE_ARM_SMMU)
+ 
++/* Return the SMMUPciBus handle associated to a PCI bus number */
++SMMUPciBus *smmu_find_smmu_pcibus(SMMUState *s, uint8_t bus_num);
++
++/* Return the stream ID of an SMMU device */
++static inline uint16_t smmu_get_sid(SMMUDevice *sdev)
++{
++    return PCI_BUILD_BDF(pci_bus_num(sdev->bus), sdev->devfn);
++}
+ #endif  /* HW_ARM_SMMU_COMMON */
+-- 
+2.5.5
