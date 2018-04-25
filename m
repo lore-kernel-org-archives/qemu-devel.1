@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56003)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fBG3I-0001RQ-Je
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 04:45:26 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fBG4B-00021q-Ru
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 04:46:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fBG3E-0007uU-IR
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 04:45:24 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:46138)
+	(envelope-from <alex.bennee@linaro.org>) id 1fBG47-00005l-Qt
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 04:46:19 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:40505)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fBG3E-0007u6-7l
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 04:45:20 -0400
-Received: by mail-wr0-x244.google.com with SMTP id d1-v6so52443385wrj.13
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 01:45:20 -0700 (PDT)
+	id 1fBG47-00005R-JM
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 04:46:15 -0400
+Received: by mail-wr0-x244.google.com with SMTP id v60-v6so52468388wrc.7
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 01:46:15 -0700 (PDT)
 References: <20180424152405.10304-1-alex.bennee@linaro.org>
 	<20180424152405.10304-22-alex.bennee@linaro.org>
-	<6470a208-c6e5-a8ba-ceb7-c3759c6ecd7b@amsat.org>
+	<118ab4fa-b0a1-ba50-0ee6-035431b889c7@redhat.com>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <6470a208-c6e5-a8ba-ceb7-c3759c6ecd7b@amsat.org>
-Date: Wed, 25 Apr 2018 09:45:17 +0100
-Message-ID: <87in8fllnm.fsf@linaro.org>
+In-reply-to: <118ab4fa-b0a1-ba50-0ee6-035431b889c7@redhat.com>
+Date: Wed, 25 Apr 2018 09:46:13 +0100
+Message-ID: <87h8nzllm2.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
@@ -32,13 +32,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, qemu-devel@nongnu.org
 
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+Thomas Huth <thuth@redhat.com> writes:
 
-> On 04/24/2018 12:23 PM, Alex Benn=C3=A9e wrote:
+> On 24.04.2018 17:23, Alex Benn=C3=A9e wrote:
 >> Remove dependencies on QEMU's source tree and build directly.
 >>
 >> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
@@ -95,29 +95,17 @@ t.  */
 >>      do_fprem(1.0, pos_denorm.d);
 >>
 >> +    do_fprem(smallest_positive_norm.d, smallest_positive_norm.d);
->> +
->>      /* printf("=3D underflow =3D\n"); */
->>      /* TODO: Is there a case where FPREM raises underflow? */
->>  }
->>
 >
-> This test is disabled in tests/tcg/i386/Makefile.target and it would be
-> nice to be able to run it without having to modify the Makefile, like
-> running "make SLOW=3D1" or "SPEED=3Dslow" like for iotests maybe?
+> How's that change related to the patch description? ... i.e. maybe you
+> should mention these changes in the patch description, too?
 
-Sounds like a good idea.
+Yeah I'll fix that up - they got added to stop the compiler bithing
+about un-used things.
 
 >
-> This test is too verbose and I wonder if we should redirect stdout to
-> /dev/null even for V=3D1.
-
-I think the original intention was to compare against a reference.
-Needless to say I think at the moment it's broken.
-
+> Apart from that:
 >
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Enabled via tcg/i386/Makefile.target:
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
 --
