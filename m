@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fBIaC-0002gF-3T
+	(envelope-from <quintela@redhat.com>) id 1fBIaC-0002gB-2T
 	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:27:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fBIaB-0004lt-4O
+	(envelope-from <quintela@redhat.com>) id 1fBIaB-0004lo-4L
 	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:27:32 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42382 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42384 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fBIaB-0004lB-0f
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fBIaB-0004lA-0s
 	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:27:31 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CBF1481A88AD
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 11:27:27 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 200D0814F0D2
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 11:27:29 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 25 Apr 2018 13:27:03 +0200
-Message-Id: <20180425112723.1111-2-quintela@redhat.com>
+Date: Wed, 25 Apr 2018 13:27:04 +0200
+Message-Id: <20180425112723.1111-3-quintela@redhat.com>
 In-Reply-To: <20180425112723.1111-1-quintela@redhat.com>
 References: <20180425112723.1111-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v12 01/21] migration: Set error state in case
- of error
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v12 02/21] migration: Introduce
+ multifd_recv_new_channel()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,57 +37,72 @@ To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- migration/ram.c | 24 ++++++++++++++++++++++--
- 1 file changed, 22 insertions(+), 2 deletions(-)
+ migration/migration.c | 3 ++-
+ migration/ram.c       | 6 ++++++
+ migration/ram.h       | 2 ++
+ 3 files changed, 10 insertions(+), 1 deletion(-)
 
+diff --git a/migration/migration.c b/migration/migration.c
+index 7eca65d1f0..604722cec9 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -466,8 +466,9 @@ void migration_ioc_process_incoming(QIOChannel *ioc)
+     if (!mis->from_src_file) {
+         QEMUFile *f =3D qemu_fopen_channel_input(ioc);
+         migration_fd_process_incoming(f);
++        return;
+     }
+-    /* We still only have a single channel.  Nothing to do here yet */
++    multifd_recv_new_channel(ioc);
+ }
+=20
+ /**
 diff --git a/migration/ram.c b/migration/ram.c
-index 0e90efa092..2ae560ea80 100644
+index 2ae560ea80..c3c330b0e0 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -415,10 +415,20 @@ struct {
-     int count;
- } *multifd_send_state;
- 
--static void terminate_multifd_send_threads(Error *errp)
-+static void terminate_multifd_send_threads(Error *err)
- {
-     int i;
- 
-+    if (err) {
-+        MigrationState *s = migrate_get_current();
-+        migrate_set_error(s, err);
-+        if (s->state == MIGRATION_STATUS_SETUP ||
-+            s->state == MIGRATION_STATUS_ACTIVE) {
-+            migrate_set_state(&s->state, s->state,
-+                              MIGRATION_STATUS_FAILED);
-+        }
-+    }
+@@ -36,6 +36,7 @@
+ #include "xbzrle.h"
+ #include "ram.h"
+ #include "migration.h"
++#include "socket.h"
+ #include "migration/register.h"
+ #include "migration/misc.h"
+ #include "qemu-file.h"
+@@ -619,6 +620,11 @@ int multifd_load_setup(void)
+     return 0;
+ }
+=20
++void multifd_recv_new_channel(QIOChannel *ioc)
++{
++    /* nothing to do yet */
++}
 +
-     for (i = 0; i < multifd_send_state->count; i++) {
-         MultiFDSendParams *p = &multifd_send_state->params[i];
- 
-@@ -515,10 +525,20 @@ struct {
-     int count;
- } *multifd_recv_state;
- 
--static void terminate_multifd_recv_threads(Error *errp)
-+static void terminate_multifd_recv_threads(Error *err)
- {
-     int i;
- 
-+    if (err) {
-+        MigrationState *s = migrate_get_current();
-+        migrate_set_error(s, err);
-+        if (s->state == MIGRATION_STATUS_SETUP ||
-+            s->state == MIGRATION_STATUS_ACTIVE) {
-+            migrate_set_state(&s->state, s->state,
-+                              MIGRATION_STATUS_FAILED);
-+        }
-+    }
-+
-     for (i = 0; i < multifd_recv_state->count; i++) {
-         MultiFDRecvParams *p = &multifd_recv_state->params[i];
- 
--- 
+ /**
+  * save_page_header: write page header to wire
+  *
+diff --git a/migration/ram.h b/migration/ram.h
+index 5030be110a..06dbddc2a2 100644
+--- a/migration/ram.h
++++ b/migration/ram.h
+@@ -32,6 +32,7 @@
+ #include "qemu-common.h"
+ #include "qapi/qapi-types-migration.h"
+ #include "exec/cpu-common.h"
++#include "io/channel.h"
+=20
+ extern MigrationStats ram_counters;
+ extern XBZRLECacheStats xbzrle_counters;
+@@ -44,6 +45,7 @@ int multifd_save_setup(void);
+ int multifd_save_cleanup(Error **errp);
+ int multifd_load_setup(void);
+ int multifd_load_cleanup(Error **errp);
++void multifd_recv_new_channel(QIOChannel *ioc);
+=20
+ uint64_t ram_pagesize_summary(void);
+ int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_=
+t len);
+--=20
 2.17.0
