@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fBDB1-0000mo-4g
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 01:41:11 -0400
+	(envelope-from <pagupta@redhat.com>) id 1fBDF0-0002Kb-H7
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 01:45:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fBDAx-0001J2-KB
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 01:41:11 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60734 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fBDAx-0001I4-Ga
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 01:41:07 -0400
-From: Peter Xu <peterx@redhat.com>
-Date: Wed, 25 Apr 2018 13:40:46 +0800
-Message-Id: <20180425054046.21519-1-peterx@redhat.com>
+	(envelope-from <pagupta@redhat.com>) id 1fBDEx-0002vP-Ef
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 01:45:18 -0400
+Date: Wed, 25 Apr 2018 01:45:12 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <1046685642.22350584.1524635112123.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20180424153154.05e79de7@redhat.com>
+References: <20180420123456.22196-1-david@redhat.com>
+	<20180420123456.22196-4-david@redhat.com>
+	<20180423141928.7e64b380@redhat.com>
+	<908f1079-385f-24d3-99ad-152ecd6b01d2@redhat.com>
+	<20180424153154.05e79de7@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] checkpatch.pl: add common glib defines to
- typelist
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] pc-dimm: factor out address space
+ logic into MemoryDevice code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,53 +27,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peterx@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Fam Zheng <famz@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-Otherwise it can warn this:
 
-  ERROR: space prohibited between function name and open parenthesis '('
+> 
+> > >   
+> > >> +    /* we will need a new memory slot for kvm and vhost */
+> > >> +    if (kvm_enabled() && !kvm_has_free_slot(machine)) {
+> > >> +        error_setg(errp, "hypervisor has no free memory slots left");
+> > >> +        return;
+> > >> +    }
+> > >> +    if (!vhost_has_free_slot()) {
+> > >> +        error_setg(errp, "a used vhost backend has no free memory slots
+> > >> left");
+> > >> +        return;
+> > >> +    }
+> > > move these checks to pre_plug time
+> > >   
+> > >> +
+> > >> +    memory_region_add_subregion(&hpms->mr, addr - hpms->base, mr);
+> > > missing vmstate registration?
+> > 
+> > Missed this one: To be called by the caller. Important because e.g. for
+> > virtio-pmem we don't want this (I assume :) ).
+> if pmem isn't on shared storage, then We'd probably want to migrate
+> it as well, otherwise target would experience data loss.
+> Anyways, I'd just reat it as normal RAM in migration case
 
-When with things like this:
+Main difference between RAM and pmem it acts like combination of RAM and disk.
+Saying this, in normal use-case size would be 100 GB's - few TB's range. 
+I am not sure we really want to migrate it for non-shared storage use-case.
 
-  typedef gboolean (*it_tree_iterator)(ITValue start, ITValue end);
+One reason why nvdimm added vmstate info could be: still there would be transient
+writes in memory with fake DAX and there is no way(till now) to flush the guest 
+writes. But with virtio-pmem we can flush such writes before migration and automatically
+at destination host with shared disk we will have updated data.
 
-CC: Paolo Bonzini <pbonzini@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>
-CC: "Daniel P. Berrang=C3=A9" <berrange@redhat.com>
-CC: Markus Armbruster <armbru@redhat.com>
-CC: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-CC: Fam Zheng <famz@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- scripts/checkpatch.pl | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
 
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index d52207a3cc..6c25449cd3 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -266,6 +266,20 @@ our @typeList =3D (
- 	qr{target_(?:u)?long},
- 	qr{hwaddr},
- 	qr{xml${Ident}},
-+	# Glib definitions
-+	qr{gchar},
-+	qr{gshort},
-+	qr{glong},
-+	qr{gint},
-+	qr{gboolean},
-+	qr{guchar},
-+	qr{gushort},
-+	qr{gulong},
-+	qr{guint},
-+	qr{gfloat},
-+	qr{gdouble},
-+	qr{gpointer},
-+	qr{gconstpointer},
- );
-=20
- # This can be modified by sub possible.  Since it can be empty, be caref=
-ul
---=20
-2.14.3
+Thanks,
+Pankaj  
