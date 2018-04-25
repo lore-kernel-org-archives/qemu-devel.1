@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cminyard@mvista.com>) id 1fBRl1-0006Yq-Go
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 17:15:20 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fBRvY-0000ho-H1
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 17:26:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cminyard@mvista.com>) id 1fBRky-0001BI-B5
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 17:15:19 -0400
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:36128)
+	(envelope-from <richard.henderson@linaro.org>) id 1fBRvV-0006w2-Da
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 17:26:12 -0400
+Received: from mail-pf0-x22c.google.com ([2607:f8b0:400e:c00::22c]:36712)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <cminyard@mvista.com>) id 1fBRky-0001B5-44
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 17:15:16 -0400
-Received: by mail-ot0-x243.google.com with SMTP id p2-v6so26977064otf.3
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 14:15:15 -0700 (PDT)
-References: <1524670052-28373-1-git-send-email-minyard@acm.org>
-	<1524670052-28373-4-git-send-email-minyard@acm.org>
-	<26047f47-95d4-7cc5-68d2-ced812742c33@amsat.org>
-From: Corey Minyard <cminyard@mvista.com>
-Message-ID: <ad22d602-ca7d-4181-b344-e5e4be51eea9@mvista.com>
-Date: Wed, 25 Apr 2018 16:15:13 -0500
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fBRvV-0006vd-6Q
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 17:26:09 -0400
+Received: by mail-pf0-x22c.google.com with SMTP id g14so16309780pfh.3
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 14:26:09 -0700 (PDT)
+References: <20180424152405.10304-1-alex.bennee@linaro.org>
+	<20180424152405.10304-44-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <84e43559-54ee-315b-24c9-c7e62e5a6d64@linaro.org>
+Date: Wed, 25 Apr 2018 11:26:02 -1000
 MIME-Version: 1.0
-In-Reply-To: <26047f47-95d4-7cc5-68d2-ced812742c33@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180424152405.10304-44-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] ipmi: Use proper struct reference
- for BT vmstate
+Subject: Re: [Qemu-devel] [PATCH v3 43/46] tests/tcg/Makefile: update to be
+ called from Makefile.target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,126 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, minyard@acm.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org
 
-On 04/25/2018 03:27 PM, Philippe Mathieu-Daudé wrote:
-> Hi Corey,
->
-> On 04/25/2018 12:27 PM, minyard@acm.org wrote:
->> From: Corey Minyard <cminyard@mvista.com>
->>
->> The vmstate for isa_ipmi_bt was referencing into the bt structure,
->> instead create a bt structure separate and use that.
->>
->> The version 1 of the BT transfer was fairly broken, if a migration
->> occured during an IPMI operation, it is likely the migration would
->> be corrupted because I misunderstood the VMSTATE_VBUFFER_UINT32()
->> handling, I thought it handled transferring the length field,
->> too.  So I just remove support for that.  I doubt anyone is using
->> it at this point.
->>
->> This also removes the transfer of use_irq, since that should come
->> from configuration.
->>
->> Signed-off-by: Corey Minyard <cminyard@mvista.com>
->> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> It seems you mis-pasted Signed-off-by -> Reviewed-by.
+On 04/24/2018 05:24 AM, Alex Bennée wrote:
+> +run-%: %
+> +	$(call quiet-command, $(QEMU) $< > $<.out, "TEST", "$< on $(TARGET_NAME)")
 
-Yes, I did. Thanks.
+I've just had an x86_64 guest test run for 70 minutes.  We need to limit the
+amount of time spent here in some way, with excessive time reported as test
+failure.
 
--corey
+One potential way would be to add "ulimit -t $TIMEOUT" to the subshell before
+running qemu.  A default TIMEOUT might be e.g. 15 seconds.  I'm not sure what
+we should expect for the largest test on the smallest hosts...
 
->> ---
->>   hw/ipmi/isa_ipmi_bt.c | 68 +++++++++++++++++++++++++++++++++++++++++----------
->>   1 file changed, 55 insertions(+), 13 deletions(-)
->>
->> diff --git a/hw/ipmi/isa_ipmi_bt.c b/hw/ipmi/isa_ipmi_bt.c
->> index e946030..8bbb1fa 100644
->> --- a/hw/ipmi/isa_ipmi_bt.c
->> +++ b/hw/ipmi/isa_ipmi_bt.c
->> @@ -22,6 +22,7 @@
->>    * THE SOFTWARE.
->>    */
->>   #include "qemu/osdep.h"
->> +#include "qemu/log.h"
->>   #include "qapi/error.h"
->>   #include "hw/hw.h"
->>   #include "hw/ipmi/ipmi.h"
->> @@ -450,22 +451,63 @@ static void isa_ipmi_bt_realize(DeviceState *dev, Error **errp)
->>       isa_register_ioport(isadev, &iib->bt.io, iib->bt.io_base);
->>   }
->>   
->> -static const VMStateDescription vmstate_ISAIPMIBTDevice = {
->> -    .name = TYPE_IPMI_INTERFACE,
->> +static int ipmi_bt_vmstate_post_load(void *opaque, int version)
->> +{
->> +    IPMIBT *ib = opaque;
->> +
->> +    /* Make sure all the values are sane. */
->> +    if (ib->outpos >= MAX_IPMI_MSG_SIZE || ib->outlen >= MAX_IPMI_MSG_SIZE ||
->> +        ib->outpos >= ib->outlen) {
->> +        qemu_log_mask(LOG_GUEST_ERROR,
->> +                      "ipmi:bt: vmstate transfer received bad out values: %d %d\n",
->> +                      ib->outpos, ib->outlen);
->> +        ib->outpos = 0;
->> +        ib->outlen = 0;
->> +    }
->> +
->> +    if (ib->inlen >= MAX_IPMI_MSG_SIZE) {
->> +        qemu_log_mask(LOG_GUEST_ERROR,
->> +                      "ipmi:bt: vmstate transfer received bad in value: %d\n",
->> +                      ib->inlen);
->> +        ib->inlen = 0;
->> +    }
->> +
->> +    return 0;
->> +}
->> +
->> +const VMStateDescription vmstate_IPMIBT = {
->> +    .name = TYPE_IPMI_INTERFACE_PREFIX "bt",
->>       .version_id = 1,
->>       .minimum_version_id = 1,
->> +    .post_load = ipmi_bt_vmstate_post_load,
->> +    .fields      = (VMStateField[]) {
->> +        VMSTATE_BOOL(obf_irq_set, IPMIBT),
->> +        VMSTATE_BOOL(atn_irq_set, IPMIBT),
->> +        VMSTATE_BOOL(irqs_enabled, IPMIBT),
->> +        VMSTATE_UINT32(outpos, IPMIBT),
->> +        VMSTATE_UINT32(outlen, IPMIBT),
->> +        VMSTATE_UINT8_ARRAY(outmsg, IPMIBT, MAX_IPMI_MSG_SIZE),
->> +        VMSTATE_UINT32(inlen, IPMIBT),
->> +        VMSTATE_UINT8_ARRAY(inmsg, IPMIBT, MAX_IPMI_MSG_SIZE),
->> +        VMSTATE_UINT8(control_reg, IPMIBT),
->> +        VMSTATE_UINT8(mask_reg, IPMIBT),
->> +        VMSTATE_UINT8(waiting_rsp, IPMIBT),
->> +        VMSTATE_UINT8(waiting_seq, IPMIBT),
->> +        VMSTATE_END_OF_LIST()
->> +    }
->> +};
->> +
->> +static const VMStateDescription vmstate_ISAIPMIBTDevice = {
->> +    .name = TYPE_IPMI_INTERFACE_PREFIX "isa-bt",
->> +    .version_id = 2,
->> +    .minimum_version_id = 2,
->> +    /*
->> +     * Version 1 had messed up the array transfer, it's not even usable
->> +     * because it used VMSTATE_VBUFFER_UINT32, but it did not transfer
->> +     * the buffer length, so random things would happen.
->> +     */
->>       .fields      = (VMStateField[]) {
->> -        VMSTATE_BOOL(bt.obf_irq_set, ISAIPMIBTDevice),
->> -        VMSTATE_BOOL(bt.atn_irq_set, ISAIPMIBTDevice),
->> -        VMSTATE_BOOL(bt.use_irq, ISAIPMIBTDevice),
->> -        VMSTATE_BOOL(bt.irqs_enabled, ISAIPMIBTDevice),
->> -        VMSTATE_UINT32(bt.outpos, ISAIPMIBTDevice),
->> -        VMSTATE_VBUFFER_UINT32(bt.outmsg, ISAIPMIBTDevice, 1, NULL, bt.outlen),
->> -        VMSTATE_VBUFFER_UINT32(bt.inmsg, ISAIPMIBTDevice, 1, NULL, bt.inlen),
->> -        VMSTATE_UINT8(bt.control_reg, ISAIPMIBTDevice),
->> -        VMSTATE_UINT8(bt.mask_reg, ISAIPMIBTDevice),
->> -        VMSTATE_UINT8(bt.waiting_rsp, ISAIPMIBTDevice),
->> -        VMSTATE_UINT8(bt.waiting_seq, ISAIPMIBTDevice),
->> +        VMSTATE_STRUCT(bt, ISAIPMIBTDevice, 1, vmstate_IPMIBT, IPMIBT),
->>           VMSTATE_END_OF_LIST()
->>       }
->>   };
->>
+
+r~
