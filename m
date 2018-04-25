@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBMTL-0008Or-Eu
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:36:44 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fBMXN-0001Zh-4F
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:40:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBMTI-0007U9-S7
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:36:43 -0400
-References: <1524647323-6449-1-git-send-email-thuth@redhat.com>
-	<1524647323-6449-3-git-send-email-thuth@redhat.com>
-	<60dc9968-58fd-46e3-b471-7a0b7093ba15@de.ibm.com>
-	<775de9f5-7da0-45fa-da32-edceac7cf258@redhat.com>
-	<24876878-e365-604e-348c-f649568e167f@de.ibm.com>
-	<7ed61a09-c00c-acf0-f504-f6feb8d55950@de.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <6930de56-f73d-d466-110d-87ecdc74836d@redhat.com>
-Date: Wed, 25 Apr 2018 17:36:36 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1fBMXK-0000yP-F0
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:40:53 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:33347)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fBMXK-0000y1-4J
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:40:50 -0400
+Received: by mail-wr0-x242.google.com with SMTP id o4-v6so3513432wrm.0
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 08:40:49 -0700 (PDT)
+References: <20180424152405.10304-1-alex.bennee@linaro.org>
+	<20180424152405.10304-46-alex.bennee@linaro.org>
+	<71062159-d9c0-06b1-d7d5-32dc4662da6b@amsat.org>
+	<fee3b788-513f-d47b-4f5c-ce18894dd101@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <fee3b788-513f-d47b-4f5c-ce18894dd101@amsat.org>
+Date: Wed, 25 Apr 2018 16:40:47 +0100
+Message-ID: <878t9bl2f4.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <7ed61a09-c00c-acf0-f504-f6feb8d55950@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] pc-bios/s390-ccw/net: Use diag308
- to reset machine before jumping to the OS
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 45/46] tests/Makefile.include: add
+ [build|clean|check]-tcg targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,94 +33,279 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Farhan Ali <alifm@linux.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, qemu-devel@nongnu.org
 
-On 25.04.2018 14:44, Christian Borntraeger wrote:
-> 
-> 
-> On 04/25/2018 02:41 PM, Christian Borntraeger wrote:
->> You load from address 0. 
+
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+
+> On 04/24/2018 08:13 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> On 04/24/2018 12:24 PM, Alex Benn=C3=A9e wrote:
+>>> This will ensure all linux-user targets build their guest test
+>>> programs and ensure check-tcg will run the respective tests.
+>>>
+>>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>> Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>> ---
+>>> v2
+>>>   - use -include instead of complex macro stuff
+>>>   - also include TARGET_BASE_ARCH/Makefile
+>>> v3
+>>>   - add build-tcg, make check-tcg actually run tests
+>>> ---
+>>>  tests/Makefile.include     | 26 ++++++++++++++++++++++-
+>>>  tests/tcg/Makefile.include | 43 ++++++++++++++++++++++----------------
+>>>  2 files changed, 50 insertions(+), 19 deletions(-)
+>>>
+>>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>>> index 3d2f0458ab..310ccefdd9 100644
+>>> --- a/tests/Makefile.include
+>>> +++ b/tests/Makefile.include
+>>> @@ -10,6 +10,7 @@ check-help:
+>>>  	@echo " $(MAKE) check-speed          Run qobject speed tests"
+>>>  	@echo " $(MAKE) check-qapi-schema    Run QAPI schema tests"
+>>>  	@echo " $(MAKE) check-block          Run block tests"
+>>> +	@echo " $(MAKE) check-tcg            Run TCG tests"
+>>>  	@echo " $(MAKE) check-report.html    Generates an HTML test report"
+>>>  	@echo " $(MAKE) check-clean          Clean the tests"
+>>>  	@echo
+>>> @@ -916,6 +917,30 @@ check-report.xml: $(patsubst %,check-report-qtest-=
+%.xml, $(QTEST_TARGETS)) check
+>>>  check-report.html: check-report.xml
+>>>  	$(call quiet-command,gtester-report $< > $@,"GEN","$@")
+>>>
+>>> +# Per guest TCG tests
+>>> +
+>>> +LINUX_USER_TARGETS=3D$(filter %-linux-user,$(TARGET_LIST))
+>>> +BUILD_TCG_TARGET_RULES=3D$(patsubst %,build-tcg-tests-%, $(LINUX_USER_=
+TARGETS))
+>>> +CLEAN_TCG_TARGET_RULES=3D$(patsubst %,clean-tcg-tests-%, $(LINUX_USER_=
+TARGETS))
+>>> +RUN_TCG_TARGET_RULES=3D$(patsubst %,run-tcg-tests-%, $(LINUX_USER_TARG=
+ETS))
+>>> +
+>>> +build-tcg-tests-%:
+>>> +	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V=3D"$(V)" TAR=
+GET_DIR=3D"$*/" guest-tests,)
+>>> +
+>>> +run-tcg-tests-%: build-tcg-tests-%
+>>> +	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V=3D"$(V)" TAR=
+GET_DIR=3D"$*/" run-guest-tests,)
+>>> +
+>>> +clean-tcg-tests-%:
+>>> +	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V=3D"$(V)" TAR=
+GET_DIR=3D"$*/" clean-guest-tests,)
+>>> +
+>>> +.PHONY: build-tcg
+>>> +build-tcg: $(BUILD_TCG_TARGET_RULES)
+>>> +
+>>> +.PHONY: check-tcg
+>>> +check-tcg: $(RUN_TCG_TARGET_RULES)
+>>> +
+>>> +.PHONY: clean-tcg
+>>> +clean-tcg: $(CLEAN_TCG_TARGET_RULES)
+>>>
+>>>  # Other tests
+>>>
+>>> @@ -958,7 +983,6 @@ check-speed: $(patsubst %,check-%, $(check-speed-y))
+>>>  check-block: $(patsubst %,check-%, $(check-block-y))
+>>>  check: check-qapi-schema check-unit check-qtest check-decodetree
+>>>  check-clean:
+>>> -	$(MAKE) -C tests/tcg clean
+>>>  	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+>>>  	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$=
+(target)-y)) $(check-qtest-generic-y))
+>>>  	rm -f tests/test-qapi-gen-timestamp
+>>> diff --git a/tests/tcg/Makefile.include b/tests/tcg/Makefile.include
+>>> index cb8bb36026..67e89ecb67 100644
+>>> --- a/tests/tcg/Makefile.include
+>>> +++ b/tests/tcg/Makefile.include
+>>> @@ -8,19 +8,14 @@
+>>>  # guest compiler or calling one of our docker images to do it for us.
+>>>  #
+>>>
+>>> -# The per ARCH makefile, if it exists holds extra information about
+>>> -# useful docker images or alternative compiler flags. Include it if it
+>>> -# exists
+>>> +# The per ARCH makefile, if it exists, holds extra information about
+>>> +# useful docker images or alternative compiler flags.
+>>>
+>>> -ARCH_MAKEFILE=3D$(SRC_PATH)/tests/tcg/$(TARGET_NAME)/Makefile.include
+>>> -CHECK_INCLUDE=3D$(wildcard $(ARCH_MAKEFILE))
+>>> -
+>>> -ifeq ($(ARCH_MAKEFILE),$(CHECK_INCLUDE))
+>>> -include $(ARCH_MAKEFILE)
+>>> -endif
+>>> +-include $(SRC_PATH)/tests/tcg/$(TARGET_BASE_ARCH)/Makefile.include
+>>> +-include $(SRC_PATH)/tests/tcg/$(TARGET_NAME)/Makefile.include
+>>>
+>>>  GUEST_BUILD=3D
+>>> -
+>>> +TCG_MAKE=3D$(SRC_PATH)/tests/tcg/Makefile
+>>>  # Support installed Cross Compilers
+>>>
+>>>  ifdef CROSS_CC_GUEST
+>>> @@ -28,10 +23,10 @@ ifdef CROSS_CC_GUEST
+>>>  .PHONY: cross-build-guest-tests
+>>>  cross-build-guest-tests:
+>>>  	$(call quiet-command, \
+>>> -          (mkdir -p tests && cd tests && \
+>>> -	   make -f $(SRC_PATH)/tests/tcg/Makefile ARCH=3D$(TARGET_NAME) CC=3D=
+$(CROSS_CC_GUEST)), \
+>>> -	  "CROSS-BUILD","$(TARGET_NAME) guest-tests with $(CROSS_CC_GUEST)")
+>>> -
+>>> +	   (mkdir -p tests && cd tests && \
+>>> +	    make -f $(TCG_MAKE) CC=3D$(CROSS_CC_GUEST) \
+>>> +				EXTRA_CFLAGS=3D$(CROSS_CC_GUEST_CFLAGS)), \
+>>> +	"CROSS-BUILD","$(TARGET_NAME) guest-tests with $(CROSS_CC_GUEST)")
+>>>
+>>>  GUEST_BUILD=3Dcross-build-guest-tests
+>>>
+>>> @@ -54,9 +49,10 @@ DOCKER_PREREQ=3Ddocker-image-$(DOCKER_IMAGE)
+>>>  .PHONY: docker-build-guest-tests
+>>>  docker-build-guest-tests: $(DOCKER_PREREQ)
+>>>  	$(call quiet-command, \
+>>> -          (mkdir -p tests && cd tests && \
+>>> -	   make -f $(SRC_PATH)/tests/tcg/Makefile ARCH=3D$(TARGET_NAME) CC=3D=
+$(DOCKER_COMPILE_CMD)), \
+>>> -	  "CROSS-BUILD","$(TARGET_NAME) guest-tests with docker qemu:$(DOCKER=
+_IMAGE)")
+>>> +	  (mkdir -p tests && cd tests && \
+>>> +	   make -f $(TCG_MAKE) CC=3D$(DOCKER_COMPILE_CMD) \
+>>> +			       EXTRA_CFLAGS=3D$(DOCKER_CROSS_COMPILER_CFLAGS)), \
+>>> +	"CROSS-BUILD","$(TARGET_NAME) guest-tests with docker qemu:$(DOCKER_I=
+MAGE)")
 >>
->> On 04/25/2018 02:34 PM, Thomas Huth wrote:
->>> On 25.04.2018 14:18, Christian Borntraeger wrote:
->>>>
->>>> On 04/25/2018 11:08 AM, Thomas Huth wrote:
->>>>
->>>>> --- a/pc-bios/s390-ccw/netmain.c
->>>>> +++ b/pc-bios/s390-ccw/netmain.c
->>>>> @@ -283,6 +283,15 @@ void panic(const char *string)
->>>>>      }
->>>>>  }
->>>>>  
->>>>> +void write_subsystem_identification(void)
->>>>> +{
->>>>> +    uint32_t *schid = (uint32_t *) 184;
->>>>> +    uint32_t *zeroes = (uint32_t *) 188;
->>>>> +
->>>>> +    *schid = 0;         /* We must not set this for virtio-net */
->>>>> +    *zeroes = 0;
->>>>> +}
->>>>> +
->>>>
->>>> I think we actually want to have the CCW devno of that network device
->>>> stored. It has some value to know which CCW device we bootet from, no?
->>>
->>> Actually, I tried that first (and it took quite some time to debug it),
->>> but the Linux kernel then bails out quite early, without any error
->>> message. The trace looks like this:
->>>
->>> 0x0000000007801802:  diag	%r1,%r1,776
->>> 0x0000000007801780:  larl	%r2,0x7831004
->>> 0x0000000007801786:  llgf	%r1,8
->>> 0x000000000780178c:  mvc	0(12,%r0),0(%r2)
->>> 0x0000000007801792:  br	%r1
->>> 0x0000000000000418:  bas	%r14,512
->>> 0x0000000000000200:  mvi	163,1
->>> 0x0000000000000204:  slr	%r0,%r0
->>> 0x0000000000000206:  lhi	%r1,2
->>> 0x000000000000020a:  sigp	%r1,%r0,18
->>> 0x000000000000020e:  bras	%r13,0x252
->>> 0x0000000000000252:  lmh	%r0,%r15,0(%r13)
->>> 0x0000000000000258:  sam31
->>> 0x000000000000025a:  br	%r14
->>> 0x000000000000041c:  lh	%r1,184
->>> 0x0000000000000420:  bct	%r1,1322
->>> 0x0000000000000424:  l	%r1,184
->>> 0x0000000000000428:  la	%r2,1840
->>> 0x000000000000042c:  bas	%r14,640
->>> 0x0000000000000280:  la	%r4,0(%r14)
->>> 0x0000000000000284:  la	%r3,792
->>> 0x0000000000000288:  la	%r5,804
->>> 0x000000000000028c:  la	%r6,888
->>> 0x0000000000000290:  la	%r7,20
->>> 0x0000000000000294:  st	%r2,4(%r6)
->>> 0x0000000000000298:  la	%r2,80(%r2)
->>> 0x000000000000029c:  la	%r6,8(%r6)
->>> 0x00000000000002a0:  bct	%r7,660
->>> 0x00000000000002a4:  lctl	%c6,%c6,868
->>> 0x00000000000002a8:  slr	%r2,%r2
->>> 0x00000000000002aa:  ssch	0(%r3)
->>> 0x00000000000002ae:  bne	786
->>> 0x0000000000000312:  lpsw	880
->>> Guest crashed on cpu 0: disabled-wait
->>> PSW: 0x000a000000000000 0x0000000000000000
->>>
->>> That's the Lloader function in arch/s390/kernel/head.S which is failing
->>> here, so seems like Linux tries to load from a block device in case
->>> there is a value in 184. Thus I assume that 184 has to contain 0 in this
->>> case.
+>> I'm not sure this is working as expected, for some reason "make
+>> build-tcg-tests-aarch64-linux-user" try to use the debian-armel-cross im=
+age:
 >>
->> Hmm, I think this is because we jump to 418 for your kernel (which is the loader
->> that tries to bootstrap the ccw ipl). When you look at ipl.c we override that
->> and jump to 0x10000 instead for linux (which is also hackish) for image files.
->> So I guess if we would do a psw restart instead (like you do) on a kernel image
->> the normal ipl would also fail....
-> 
-> FWIW, zipl also loads linux kernels from 0x10000
+>> /build$ make build-tcg-tests-aarch64-linux-user V=3D1 -j1
+>> make  BUILD_DIR=3D/build -C aarch64-linux-user V=3D"1"
+>> TARGET_DIR=3D"aarch64-linux-user/" guest-tests
+>> make[1]: Entering directory '/build/aarch64-linux-user'
+>> /source/qemu/tests/docker/docker.py build qemu:debian9
+>> /source/qemu/tests/docker/dockerfiles/debian9.docker   --add-current-user
+>> [...]
+>> /source/qemu/tests/docker/docker.py build qemu:debian-armel-cross
+>> /source/qemu/tests/docker/dockerfiles/debian-armel-cross.docker
+>> --add-current-user
+>> [...]
+>> (mkdir -p tests && cd tests && make -f /source/qemu/tests/tcg/Makefile
+>> CC=3D"/source/qemu/tests/docker/docker.py cc --user 1000 --cc
+>> arm-linux-gnueabi-gcc -i qemu:debian-armel-cross -s /source/qemu -- "
+>> EXTRA_CFLAGS=3D)
+>> make[2]: Entering directory '/home/phil/build/aarch64-linux-user/tests'
+>> /source/qemu/tests/docker/docker.py cc --user 1000 --cc
+>> arm-linux-gnueabi-gcc -i qemu:debian-armel-cross -s /source/qemu --
+>> -Wall -O0 -g -fno-strict-aliasing  /source/qemu/tests/tcg/aarch64/fcvt.c
+>> -o fcvt  -static -lm
+>> /source/qemu/tests/tcg/aarch64/fcvt.c: In function 'print_double_number':
+>> /source/qemu/tests/tcg/aarch64/fcvt.c:37:42: warning: format '%lx'
+>> expects argument of type 'long unsigned int', but argument 4 has type
+>> 'uint64_t {aka long long unsigned int}' [-Wformat=3D]
+>>      printf("%02d DOUBLE: %02.20e / %#020lx  (%#x =3D> %s)\n",
+>>                                           ^
+>> /source/qemu/tests/tcg/aarch64/fcvt.c: In function 'convert_single_to_ha=
+lf':
+>> /source/qemu/tests/tcg/aarch64/fcvt.c:82:9: error: inconsistent operand
+>> constraints in an 'asm'
+>>          asm("fcvt %h0, %d1" : "=3Dw" (output) : "x" (input));
+>>          ^~~
+>> /source/qemu/tests/tcg/aarch64/fcvt.c: In function 'main':
+>> /source/qemu/tests/tcg/aarch64/fcvt.c:241:5: error: unknown register
+>> name 'x1' in 'asm'
+>>      asm("msr fpsr, x1\n\t"
+>>      ^~~
+>> make[2]: *** [/source/qemu/tests/tcg/Makefile:49: fcvt] Error 1
+>> make[2]: Leaving directory '/home/phil/build/aarch64-linux-user/tests'
+>> make[1]: *** [/source/qemu/tests/tcg/Makefile.include:51:
+>> docker-build-guest-tests] Error 2
+>> make[1]: Leaving directory '/home/phil/build/aarch64-linux-user'
+>> make: *** [/source/qemu/tests/Makefile.include:928:
+>> build-tcg-tests-aarch64-linux-user] Error 2
+>>
+>> Note this:
+>>
+>> Entering directory '/build/aarch64-linux-user'
+>> [...]
+>> docker.py build qemu:debian-armel-cross ...
+>>
+>> I'm not sure this is related to this patch or the previous (44).
+>
+> This is due to the missing tests/tcg/aarch64/Makefile.include in patch
+> 28/46.
+>
+>>>
+>>>  GUEST_BUILD=3Ddocker-build-guest-tests
+>>>
+>>> @@ -68,9 +64,20 @@ endif
+>>>
+>>>  ifneq ($(GUEST_BUILD),)
+>>>  guest-tests: $(GUEST_BUILD)
+>>> +
+>>> +run-guest-tests: guest-tests
+>>> +	$(call quiet-command, \
+>>> +	(cd tests && make -f $(TCG_MAKE) run), \
+>>> +	"RUN-TESTS", "for $(TARGET_NAME)")
+>>> +
+>>>  else
+>>>  guest-tests:
+>>> -	$(call quiet-command, /bin/true, "CROSS-BUILD", "$(TARGET_NAME) guest=
+-tests SKIPPED")
+>>> +	$(call quiet-command, /bin/true, "CROSS-BUILD", \
+>>> +		"$(TARGET_NAME) guest-tests SKIPPED")
+>>> +
+>>> +run-guest-tests:
+>>> +	$(call quiet-command, /bin/true, "RUN-TESTS", \
+>>> +		"for $(TARGET_NAME) SKIPPED")
+>>>  endif
+>>>
+>>>  # It doesn't mater if these don't exits
+>>>
+>
+> There is still some rule missing:
+>
+> $ make -j1 run-tcg-tests-sh4-linux-user  -k
+>   BUILD   debian-sid
+>   BUILD   debian-sh4-cross
+>   CROSS-BUILD sh4 guest-tests with docker qemu:debian-sh4-cross
+>   BUILD   debian-sid
+>   BUILD   debian-sh4-cross
+>   CROSS-BUILD sh4 guest-tests with docker qemu:debian-sh4-cross
+>   RUN-TESTS for sh4
+>   TEST    test-mmap (default) on sh4
+> /bin/sh: 1: ../qemu-sh4: not found
+> make[2]: *** [/source/qemu/tests/tcg/multiarch/Makefile.target:26:
+> run-test-mmap] Error 127
+>   TEST    sha1 on sh4
+> /bin/sh: 1: ../qemu-sh4: not found
+> make[2]: *** [/source/qemu/tests/tcg/Makefile:64: run-sha1] Error 127
+>   BROKEN TEST linux-test SKIPPED on sh4
+>   TEST    testthread on sh4
+> /bin/sh: 1: ../qemu-sh4: not found
+> make[2]: *** [/source/qemu/tests/tcg/Makefile:64: run-testthread] Error 1=
+27
+> make[2]: Target 'run' not remade because of errors.
+> make[1]: *** [/source/qemu/tests/tcg/Makefile.include:69:
+> run-guest-tests] Error 2
+> make: *** [/source/qemu/tests/Makefile.include:931:
+> run-tcg-tests-sh4-linux-user] Error 2
+>
+> Works with:
+>
+> $ make -j1 subdir-sh4-linux-user run-tcg-tests-sh4-linux-user
 
-OK, I just checked, and indeed, if I change to code to jump to 0x10000,
-it also works when setting a value into 184. So I'll change this patch
-here accordingly.
+I've added:
 
- Thomas
+run-guest-tests: guest-tests qemu-$(TARGET_NAME)
+	$(call quiet-command, \
+	(cd tests && make -f $(TCG_MAKE) run), \
+	"RUN-TESTS", "for $(TARGET_NAME)")
+
+to tests/tcg/Makefile.include
+
+
+--
+Alex Benn=C3=A9e
