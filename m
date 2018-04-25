@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fBB9l-0001st-4f
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 23:31:46 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fBBBZ-0002bn-6f
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 23:33:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fBB9h-00062J-RA
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 23:31:44 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55726 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fBB9h-000629-LT
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 23:31:41 -0400
-Date: Wed, 25 Apr 2018 11:31:31 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180425033131.GI9036@xz-mi>
-References: <1524295325-18136-1-git-send-email-wangxinxin.wang@huawei.com>
-	<20180424171631.GF2521@work-vm> <20180424182405.GM20310@redhat.com>
-	<20180425031423.GH9036@xz-mi>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fBBBU-0006Uc-OB
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 23:33:37 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:33414)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fBBBU-0006UJ-I2
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 23:33:32 -0400
+Received: by mail-qt0-x241.google.com with SMTP id f16-v6so21298776qth.0
+	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 20:33:32 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180424152405.10304-1-alex.bennee@linaro.org>
+	<20180424152405.10304-19-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <d668a3a2-1742-d5d7-7f1c-5bbfa08aa754@amsat.org>
+Date: Wed, 25 Apr 2018 00:33:26 -0300
 MIME-Version: 1.0
+In-Reply-To: <20180424152405.10304-19-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180425031423.GH9036@xz-mi>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] migration/fd: abort migration if receive
- POLLHUP event
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 18/46] tests/tcg: enable building for
+ i386
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,108 +36,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Wang Xin <wangxinxin.wang@huawei.com>, qemu-devel@nongnu.org, quintela@redhat.com, arei.gonglei@huawei.com
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org
 
-On Wed, Apr 25, 2018 at 11:14:23AM +0800, Peter Xu wrote:
-> On Tue, Apr 24, 2018 at 07:24:05PM +0100, Daniel P. Berrang=C3=A9 wrote=
-:
-> > On Tue, Apr 24, 2018 at 06:16:31PM +0100, Dr. David Alan Gilbert wrot=
-e:
-> > > * Wang Xin (wangxinxin.wang@huawei.com) wrote:
-> > > > If the fd socket peer closed shortly, ppoll may receive a POLLHUP
-> > > > event before the expected POLLIN event, and qemu will do nothing
-> > > > but goes into an infinite loop of the POLLHUP event.
-> > > >=20
-> > > > So, abort the migration if we receive a POLLHUP event.
-> > >=20
-> > > Hi Wang Xin,
-> > >   Can you explain how you manage to trigger this case; I've not hit=
- it.
-> > >=20
-> > > > Signed-off-by: Wang Xin <wangxinxin.wang@huawei.com>
-> > > >=20
-> > > > diff --git a/migration/fd.c b/migration/fd.c
-> > > > index cd06182..5932c87 100644
-> > > > --- a/migration/fd.c
-> > > > +++ b/migration/fd.c
-> > > > @@ -15,6 +15,7 @@
-> > > >   */
-> > > > =20
-> > > >  #include "qemu/osdep.h"
-> > > > +#include "qemu/error-report.h"
-> > > >  #include "channel.h"
-> > > >  #include "fd.h"
-> > > >  #include "monitor/monitor.h"
-> > > > @@ -46,6 +47,11 @@ static gboolean fd_accept_incoming_migration(Q=
-IOChannel *ioc,
-> > > >                                               GIOCondition condit=
-ion,
-> > > >                                               gpointer opaque)
-> > > >  {
-> > > > +    if (condition & G_IO_HUP) {
-> > > > +        error_report("The migration peer closed, job abort");
-> > > > +        exit(EXIT_FAILURE);
-> > > > +    }
-> > > > +
-> > >=20
-> > > OK,  I wish we had a nicer way for failing;  especially for the
-> > > multifd/postcopy recovery worlds where one failed connection might =
-not
-> > > be fatal; but I don't see how to do that here.
-> >=20
-> > This doesn't feel right to me.
-> >=20
-> > We have passed in a pre-opened FD to QEMU, and we registered a watch
-> > on it to detect when there is data from the src QEMU that is availabl=
-e
-> > to read.  Normally the src will have sent something so we'll get G_IO=
-_IN,
-> > but you're suggesting the client has quit immediately, so we're getti=
-ng
-> > G_IO_HUP due to end of file.
-> >=20
-> > The migration_channel_process_incoming() method that we pass the ioc
-> > object to will be calling qio_channel_read(ioc) somewhere to try to
-> > read that data.
-> >=20
-> > For QEMU to spin in infinite loop there must be code in the
-> > migration_channel_process_incoming() that is ignoring the return
-> > value of qio_channel_read() in some manner causing it to retry
-> > the read again & again I presume.
-> >=20
-> > Putting this check for G_IO_HUP fixes your immediate problem scenario=
-,
-> > but whatever code was spinning in infinite loop is still broken and
-> > I'd guess it was possible to still trigger the loop. eg by writing
-> > 1 single byte and then closing the socket.
-> >=20
-> > So, IMHO this fix is wrong - we need to find the root cause and fix
-> > that, not try to avoid calling the buggy code.
->=20
-> I agree. AFAIU the first read should be in qemu_loadvm_state():
->=20
->     v =3D qemu_get_be32(f);
->     if (v !=3D QEMU_VM_FILE_MAGIC) {
->         error_report("Not a migration stream");
->         return -EINVAL;
->     }
->=20
-> So I would be curious more about how that infinite loop happened.
+On 04/24/2018 12:23 PM, Alex Bennée wrote:
+> While you can construct a compile command that does work using the
+> x86_64 host compiler that most people use this is flakey. Different
+> distros handle this is different ways so we default to using a known
+> good i386 compiler via docker.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> 
+> ---
+> v3
+>   - add runner for runcom
+> ---
+>  tests/tcg/i386/Makefile.include | 9 +++++++++
+>  tests/tcg/i386/Makefile.target  | 9 +++++++++
+>  2 files changed, 18 insertions(+)
+>  create mode 100644 tests/tcg/i386/Makefile.include
+> 
+> diff --git a/tests/tcg/i386/Makefile.include b/tests/tcg/i386/Makefile.include
+> new file mode 100644
+> index 0000000000..be1c3008dd
+> --- /dev/null
+> +++ b/tests/tcg/i386/Makefile.include
+> @@ -0,0 +1,9 @@
+> +#
+> +# Makefile.include for all i386
+> +#
+> +# There is enough brokeness in x86_64 compilers that we don't default
+> +# to using the x86_64 system compiler for i386 binaries.
+> +#
+> +
+> +DOCKER_IMAGE=fedora-i386-cross
+> +DOCKER_CROSS_COMPILER=gcc
+> diff --git a/tests/tcg/i386/Makefile.target b/tests/tcg/i386/Makefile.target
+> index 2f27b65e2d..39a1627650 100644
+> --- a/tests/tcg/i386/Makefile.target
+> +++ b/tests/tcg/i386/Makefile.target
+> @@ -28,3 +28,12 @@ hello-i386: LDFLAGS+=-nostdlib
+>  test-i386: test-i386.c test-i386-code16.S test-i386-vm86.S test-i386.h test-i386-shift.h test-i386-muldiv.h
+>  	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ \
+>  	   $(<D)/test-i386.c $(<D)/test-i386-code16.S $(<D)/test-i386-vm86.S -lm
+> +
+> +# Specialist test runners
+> +.PHONY: pi_10.com
+> +pi_10.com:
+> +	cp $(I386_SRC)/pi_10.com .
+> +
+> +run-runcom: runcom pi_10.com
+> +	$(call quiet-command, $(QEMU) ./runcom ./pi_10.com > runcom.out, "TEST", "$< on $(TARGET_NAME)")
+> +
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Ah, wait.  I just noticed that Xin mentioned about the loop already -
-it's an infinite loop of SIGHUP.  I suppose it means that we'll just
-never go into fd_accept_incoming_migration() at all?
-
-If so, I'm not sure whether we should just always watch on G_IO_HUP
-(and possibly G_IO_ERR too) in qio_channel_create_watch():
-
-  GSource *ret =3D klass->io_create_watch(ioc, condition | G_IO_HUP | G_I=
-O_ERR);
-
-Otherwise I'm not sure the same loop will happen for other users of
-qio_channel_add_watch().
-
-Regards,
---=20
-Peter Xu
+"make run-tcg-tests-i386-linux-user" without ASan:
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
