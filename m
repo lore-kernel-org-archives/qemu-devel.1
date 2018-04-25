@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48322)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fBPDa-0005xF-Js
+	(envelope-from <eblake@redhat.com>) id 1fBPDa-0005xU-QL
 	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 14:32:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fBPDZ-0004Qf-GD
+	(envelope-from <eblake@redhat.com>) id 1fBPDZ-0004QX-Fv
 	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 14:32:38 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Wed, 25 Apr 2018 13:32:18 -0500
-Message-Id: <20180425183223.580566-4-eblake@redhat.com>
+Date: Wed, 25 Apr 2018 13:32:16 -0500
+Message-Id: <20180425183223.580566-2-eblake@redhat.com>
 In-Reply-To: <20180425183223.580566-1-eblake@redhat.com>
 References: <20180425183223.580566-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/8] qcow: Switch qcow_co_readv to byte-based
- calls
+Subject: [Qemu-devel] [PATCH 1/8] parallels: Switch to byte-based calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,129 +20,73 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:qcow" <qemu-block@nongnu.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:parallels" <qemu-block@nongnu.org>
 
 We are gradually moving away from sector-based interfaces, towards
-byte-based.  Make the change for the internals of the qcow
-driver read function, by iterating over offset/bytes instead of
-sector_num/nb_sectors, and repurposing index_in_cluster and n
-to be bytes instead of sectors.
+byte-based.  Make the change for the last few sector-based calls
+into the block layer from the parallels driver.
 
-A later patch will then switch the qcow driver as a whole over
-to byte-based operation.
+Ideally, the parallels driver should switch to doing everything
+byte-based, but that's a more invasive change that requires a
+bit more auditing.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- block/qcow.c | 39 +++++++++++++++++++--------------------
- 1 file changed, 19 insertions(+), 20 deletions(-)
+ block/parallels.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/block/qcow.c b/block/qcow.c
-index 32730a8dd91..bf9d80fd227 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -623,6 +623,8 @@ static coroutine_fn int qcow_co_readv(BlockDriverState *bs, int64_t sector_num,
-     QEMUIOVector hd_qiov;
-     uint8_t *buf;
-     void *orig_buf;
-+    int64_t offset = sector_num << BDRV_SECTOR_BITS;
-+    int64_t bytes = nb_sectors << BDRV_SECTOR_BITS;
+diff --git a/block/parallels.c b/block/parallels.c
+index 3f74fcb877a..c071c7f759f 100644
+--- a/block/parallels.c
++++ b/block/parallels.c
+@@ -226,14 +226,15 @@ static int64_t allocate_clusters(BlockDriverState *bs, int64_t sector_num,
+         };
+         qemu_iovec_init_external(&qiov, &iov, 1);
 
-     if (qiov->niov > 1) {
-         buf = orig_buf = qemu_try_blockalign(bs, qiov->size);
-@@ -636,36 +638,36 @@ static coroutine_fn int qcow_co_readv(BlockDriverState *bs, int64_t sector_num,
+-        ret = bdrv_co_readv(bs->backing, idx * s->tracks, nb_cow_sectors,
+-                            &qiov);
++        ret = bdrv_co_preadv(bs->backing, idx * s->tracks * BDRV_SECTOR_SIZE,
++                             nb_cow_bytes, &qiov, 0);
+         if (ret < 0) {
+             qemu_vfree(iov.iov_base);
+             return ret;
+         }
 
-     qemu_co_mutex_lock(&s->lock);
+-        ret = bdrv_co_writev(bs->file, s->data_end, nb_cow_sectors, &qiov);
++        ret = bdrv_co_pwritev(bs->file, s->data_end * BDRV_SECTOR_SIZE,
++                              nb_cow_bytes, &qiov, 0);
+         qemu_vfree(iov.iov_base);
+         if (ret < 0) {
+             return ret;
+@@ -339,7 +340,8 @@ static coroutine_fn int parallels_co_writev(BlockDriverState *bs,
+         qemu_iovec_reset(&hd_qiov);
+         qemu_iovec_concat(&hd_qiov, qiov, bytes_done, nbytes);
 
--    while (nb_sectors != 0) {
-+    while (bytes != 0) {
-         /* prepare next request */
--        ret = get_cluster_offset(bs, sector_num << 9,
-+        ret = get_cluster_offset(bs, offset,
-                                  0, 0, 0, 0, &cluster_offset);
+-        ret = bdrv_co_writev(bs->file, position, n, &hd_qiov);
++        ret = bdrv_co_pwritev(bs->file, position * BDRV_SECTOR_SIZE, nbytes,
++                              &hd_qiov, 0);
          if (ret < 0) {
              break;
          }
--        index_in_cluster = sector_num & (s->cluster_sectors - 1);
--        n = s->cluster_sectors - index_in_cluster;
--        if (n > nb_sectors) {
--            n = nb_sectors;
-+        index_in_cluster = offset & (s->cluster_size - 1);
-+        n = s->cluster_size - index_in_cluster;
-+        if (n > bytes) {
-+            n = bytes;
-         }
+@@ -378,7 +380,8 @@ static coroutine_fn int parallels_co_readv(BlockDriverState *bs,
 
-         if (!cluster_offset) {
+         if (position < 0) {
              if (bs->backing) {
-                 /* read from the base image */
-                 hd_iov.iov_base = (void *)buf;
--                hd_iov.iov_len = n * 512;
-+                hd_iov.iov_len = n;
-                 qemu_iovec_init_external(&hd_qiov, &hd_iov, 1);
-                 qemu_co_mutex_unlock(&s->lock);
-                 /* qcow2 emits this on bs->file instead of bs->backing */
-                 BLKDBG_EVENT(bs->file, BLKDBG_READ_BACKING_AIO);
 -                ret = bdrv_co_readv(bs->backing, sector_num, n, &hd_qiov);
-+                ret = bdrv_co_preadv(bs->backing, offset, n, &hd_qiov, 0);
-                 qemu_co_mutex_lock(&s->lock);
++                ret = bdrv_co_preadv(bs->backing, sector_num * BDRV_SECTOR_SIZE,
++                                     nbytes, &hd_qiov, 0);
                  if (ret < 0) {
                      break;
                  }
-             } else {
-                 /* Note: in this case, no need to wait */
--                memset(buf, 0, 512 * n);
-+                memset(buf, 0, n);
+@@ -386,7 +389,8 @@ static coroutine_fn int parallels_co_readv(BlockDriverState *bs,
+                 qemu_iovec_memset(&hd_qiov, 0, 0, nbytes);
              }
-         } else if (cluster_offset & QCOW_OFLAG_COMPRESSED) {
-             /* add AIO support for compressed blocks ? */
-@@ -673,21 +675,19 @@ static coroutine_fn int qcow_co_readv(BlockDriverState *bs, int64_t sector_num,
-                 ret = -EIO;
-                 break;
-             }
--            memcpy(buf,
--                   s->cluster_cache + index_in_cluster * 512, 512 * n);
-+            memcpy(buf, s->cluster_cache + index_in_cluster, n);
          } else {
-             if ((cluster_offset & 511) != 0) {
-                 ret = -EIO;
-                 break;
-             }
-             hd_iov.iov_base = (void *)buf;
--            hd_iov.iov_len = n * 512;
-+            hd_iov.iov_len = n;
-             qemu_iovec_init_external(&hd_qiov, &hd_iov, 1);
-             qemu_co_mutex_unlock(&s->lock);
-             BLKDBG_EVENT(bs->file, BLKDBG_READ_AIO);
--            ret = bdrv_co_readv(bs->file,
--                                (cluster_offset >> 9) + index_in_cluster,
--                                n, &hd_qiov);
-+            ret = bdrv_co_preadv(bs->file, cluster_offset + index_in_cluster,
-+                                 n, &hd_qiov, 0);
-             qemu_co_mutex_lock(&s->lock);
+-            ret = bdrv_co_readv(bs->file, position, n, &hd_qiov);
++            ret = bdrv_co_preadv(bs->file, position * BDRV_SECTOR_SIZE, nbytes,
++                                 &hd_qiov, 0);
              if (ret < 0) {
                  break;
-@@ -695,8 +695,7 @@ static coroutine_fn int qcow_co_readv(BlockDriverState *bs, int64_t sector_num,
-             if (bs->encrypted) {
-                 assert(s->crypto);
-                 if (qcrypto_block_decrypt(s->crypto,
--                                          sector_num * BDRV_SECTOR_SIZE, buf,
--                                          n * BDRV_SECTOR_SIZE, NULL) < 0) {
-+                                          offset, buf, n, NULL) < 0) {
-                     ret = -EIO;
-                     break;
-                 }
-@@ -704,9 +703,9 @@ static coroutine_fn int qcow_co_readv(BlockDriverState *bs, int64_t sector_num,
-         }
-         ret = 0;
-
--        nb_sectors -= n;
--        sector_num += n;
--        buf += n * 512;
-+        bytes -= n;
-+        offset += n;
-+        buf += n;
-     }
-
-     qemu_co_mutex_unlock(&s->lock);
+             }
 -- 
 2.14.3
