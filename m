@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60445)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fBISp-0004RH-3y
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:19:56 -0400
+	(envelope-from <quintela@redhat.com>) id 1fBISm-0004Ob-DG
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:19:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fBISo-0004nR-3x
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:19:55 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33322 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fBISh-0004gV-KA
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:19:52 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42144 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fBISn-0004n9-Ua
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:19:54 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fBISh-0004g1-Ey
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:19:47 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9BE77EC01A
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 11:19:53 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 199B681A88BB
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 11:19:47 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 25 Apr 2018 13:19:40 +0200
-Message-Id: <20180425111940.1030-9-quintela@redhat.com>
+Date: Wed, 25 Apr 2018 13:19:35 +0200
+Message-Id: <20180425111940.1030-4-quintela@redhat.com>
 In-Reply-To: <20180425111940.1030-1-quintela@redhat.com>
 References: <20180425111940.1030-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 8/8] [RFH] tests: Add migration compress
- threads tests
+Subject: [Qemu-devel] [PATCH v8 3/8] tests: Add migration xbzrle test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,26 +32,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Yeap, it is still not working. trying to learn how to debug threads
-for guests running from the testt hardness.
-
-For some reason, compression is not working at the moment, test is
-disabled until I found why.
-
 Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- tests/migration-test.c | 52 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 52 insertions(+)
+ tests/migration-test.c | 64 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 64 insertions(+)
 
 diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 873bb58200..cf6cec11ef 100644
+index 834cdf50f2..fd885ba909 100644
 --- a/tests/migration-test.c
 +++ b/tests/migration-test.c
-@@ -789,6 +789,55 @@ static void test_multifd_tcp(void)
-     test_migrate_end(from, to, true);
+@@ -512,6 +512,20 @@ static void deprecated_set_speed(QTestState *who, const char *value)
+     migrate_check_parameter(who, "max-bandwidth", value);
  }
  
-+static void test_compress(const char *uri)
++static void deprecated_set_cache_size(QTestState *who, const char *value)
++{
++    QDict *rsp;
++    gchar *cmd;
++
++    cmd = g_strdup_printf("{ 'execute': 'migrate-set-cache-size',"
++                          "'arguments': { 'value': %s } }", value);
++    rsp = qtest_qmp(who, cmd);
++    g_free(cmd);
++    g_assert(qdict_haskey(rsp, "return"));
++    QDECREF(rsp);
++    migrate_check_parameter(who, "xbzrle-cache-size", value);
++}
++
+ static void test_deprecated(void)
+ {
+     QTestState *from;
+@@ -520,6 +534,7 @@ static void test_deprecated(void)
+ 
+     deprecated_set_downtime(from, 0.12345);
+     deprecated_set_speed(from, "12345");
++    deprecated_set_cache_size(from, "4096");
+ 
+     qtest_quit(from);
+ }
+@@ -634,6 +649,54 @@ static void test_precopy_unix(void)
+     g_free(uri);
+ }
+ 
++static void test_xbzrle(const char *uri)
 +{
 +    QTestState *from, *to;
 +
@@ -67,11 +90,10 @@ index 873bb58200..cf6cec11ef 100644
 +    /* 1GB/s */
 +    migrate_set_parameter(from, "max-bandwidth", "1000000000");
 +
-+    migrate_set_parameter(from, "compress-threads", "4");
-+    migrate_set_parameter(to, "decompress-threads", "3");
++    migrate_set_parameter(from, "xbzrle-cache-size", "33554432");
 +
-+    migrate_set_capability(from, "compress", "true");
-+    migrate_set_capability(to, "compress", "true");
++    migrate_set_capability(from, "xbzrle", "true");
++    migrate_set_capability(to, "xbzrle", "true");
 +    /* Wait for the first serial output from the source */
 +    wait_for_serial("src_serial");
 +
@@ -79,7 +101,7 @@ index 873bb58200..cf6cec11ef 100644
 +
 +    wait_for_migration_pass(from);
 +
-+    /* 300ms it should converge */
++    /* 300ms should converge */
 +    migrate_set_parameter(from, "downtime-limit", "300");
 +
 +    if (!got_stop) {
@@ -93,24 +115,22 @@ index 873bb58200..cf6cec11ef 100644
 +    test_migrate_end(from, to, true);
 +}
 +
-+static void test_compress_unix(void)
++static void test_xbzrle_unix(void)
 +{
 +    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
 +
-+    test_compress(uri);
++    test_xbzrle(uri);
 +    g_free(uri);
 +}
 +
  int main(int argc, char **argv)
  {
      char template[] = "/tmp/migration-test-XXXXXX";
-@@ -815,6 +864,9 @@ int main(int argc, char **argv)
-     qtest_add_func("/migration/precopy/tcp", test_precopy_tcp);
-     qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
-     qtest_add_func("/migration/multifd/tcp", test_multifd_tcp);
-+    if (0) {
-+        qtest_add_func("/migration/compress/unix", test_compress_unix);
-+    }
+@@ -657,6 +720,7 @@ int main(int argc, char **argv)
+     qtest_add_func("/migration/deprecated", test_deprecated);
+     qtest_add_func("/migration/bad_dest", test_baddest);
+     qtest_add_func("/migration/precopy/unix", test_precopy_unix);
++    qtest_add_func("/migration/xbzrle/unix", test_xbzrle_unix);
  
      ret = g_test_run();
  
