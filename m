@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBHhM-0001AP-H4
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 06:30:53 -0400
+	(envelope-from <omer@kazuar-tech.com>) id 1fBHqR-0002h6-CD
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 06:40:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBHhH-0006Gr-KM
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 06:30:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50640)
+	(envelope-from <omer@kazuar-tech.com>) id 1fBHqO-0001Jq-3T
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 06:40:15 -0400
+Received: from mail-lf0-x22c.google.com ([2a00:1450:4010:c07::22c]:35835)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fBHhH-0006GB-E1
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 06:30:47 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fBHhG-0007yo-Hb
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 10:30:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 645962E80C9
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 10:30:46 +0000 (UTC)
+	(Exim 4.71) (envelope-from <omer@kazuar-tech.com>)
+	id 1fBHqN-0001Id-M4
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 06:40:12 -0400
+Received: by mail-lf0-x22c.google.com with SMTP id r125-v6so24737126lfe.2
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 03:40:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <CAA-pg_qXZLDEHq6jMN_4GUrFvQgf0AS8Fs559JbucptK6_zrFw@mail.gmail.com>
+	<20180425095657.GF30024@redhat.com>
+In-Reply-To: <20180425095657.GF30024@redhat.com>
+From: Omer Katz <omer@kazuar-tech.com>
+Date: Wed, 25 Apr 2018 10:39:59 +0000
+Message-ID: <CAA-pg_oDCGqVDzk67Rw4mL83SexPbt1eZ8AoSMux9Xjda8nUFg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Apr 2018 10:23:07 -0000
-From: Justin <1766841@bugs.launchpad.net>
-Reply-To: Bug 1766841 <1766841@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <152465178789.21509.8085388028037824608.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1766841] [NEW] QEMU 2.12 Running Problem in
- Windows 7 Installation
+Subject: Re: [Qemu-devel] Filtering files passing through MTP devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,86 +30,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Bandan Das <bsd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
-Public bug reported:
+We're connecting USB drives that we want the guests to copy files from.
+The user should only be allowed to copy certain files into the system.
+The same thing goes for copying files to the USB drive. We only allow
+certain files to be exported from the guest.
 
-QEMU Version: 2.12 (Binary installer qemu-w64-setup-20180424.exe  from Stef=
-an Weil's website so I am not sure I should report it to Weil by email or b=
-y this bug report system.)
-Host System: Windows 7 64bit
-Guest System: 9front 6350 (Codename=E2=80=9CCONTENTS, MAINTAINED, STABLE=E2=
-=80=9D, Release 2018/02/02)
+On Wed, Apr 25, 2018, 12:57 PM Daniel P. Berrang=C3=A9 <berrange@redhat.com=
+>
+wrote:
 
-QEMU Command:
-qemu-system-x86_64 -usb -device usb-mouse -hda plan9.qcow2.img -cdrom 9fron=
-t-6350.iso -boot d
-
-QEMU warning: =
-
-(qemu-system-x86_64.exe:8844): GdkPixbuf-WARNING **: Cannot open pixbuf loa=
-der module file 'D:\qemu\lib\gdk-pixbuf-2.0\2.10.0\loaders.cache': No such =
-file or directory
-
-This likely means that your installation is broken.
-Try running the command
-  gdk-pixbuf-query-loaders > D:\qemu\lib\gdk-pixbuf-2.0\2.10.0\loaders.cache
-to make things work again for the time being.
-
-(qemu-system-x86_64.exe:8844): Gtk-WARNING **: Could not find the icon 'win=
-dow-minimize-symbolic-ltr'. The 'hicolor' theme was not found either, perha=
-ps you need to install it.
-You can get a copy from:
-        http://icon-theme.freedesktop.org/releases
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: installation windows
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1766841
-
-Title:
-  QEMU 2.12 Running Problem in Windows 7 Installation
-
-Status in QEMU:
-  New
-
-Bug description:
-  QEMU Version: 2.12 (Binary installer qemu-w64-setup-20180424.exe  from St=
-efan Weil's website so I am not sure I should report it to Weil by email or=
- by this bug report system.)
-  Host System: Windows 7 64bit
-  Guest System: 9front 6350 (Codename=E2=80=9CCONTENTS, MAINTAINED, STABLE=
-=E2=80=9D, Release 2018/02/02)
-
-  QEMU Command:
-  qemu-system-x86_64 -usb -device usb-mouse -hda plan9.qcow2.img -cdrom 9fr=
-ont-6350.iso -boot d
-
-  QEMU warning: =
-
-  (qemu-system-x86_64.exe:8844): GdkPixbuf-WARNING **: Cannot open pixbuf l=
-oader module file 'D:\qemu\lib\gdk-pixbuf-2.0\2.10.0\loaders.cache': No suc=
-h file or directory
-
-  This likely means that your installation is broken.
-  Try running the command
-    gdk-pixbuf-query-loaders > D:\qemu\lib\gdk-pixbuf-2.0\2.10.0\loaders.ca=
-che
-  to make things work again for the time being.
-
-  (qemu-system-x86_64.exe:8844): Gtk-WARNING **: Could not find the icon 'w=
-indow-minimize-symbolic-ltr'. The 'hicolor' theme was not found either, per=
-haps you need to install it.
-  You can get a copy from:
-          http://icon-theme.freedesktop.org/releases
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1766841/+subscriptions
+> On Mon, Apr 23, 2018 at 03:10:32PM +0000, Omer Katz wrote:
+> > Hi everyone,
+> >
+> > We have a use case that requires us to only allow certain files to pass
+> > through to the guest machine from USB storage devices.
+> >
+> > I was told on IRC that such a feature does not exist but the easiest wa=
+y
+> to
+> > achieve our goal is to contribute a patch the the MTP device driver sin=
+ce
+> > other drivers operate on a filesystem level instead of a file level whi=
+ch
+> > is what we need.
+>
+> IMHO the easiest way to stop the guest accessing files is to simply not
+> put them in the directory that you are exporting the guest in the first
+> place. If you have a directory that has some files you don't want accesse=
+d
+> and can't remove them, then perhaps create a second directory and use
+> symlinks or hardlinks to pull in files from the original directory.
+>
+> > The plan is to pass the contents of each file to a program through stdi=
+n
+> > and decide based on the exit code if the file should be allowed to pass
+> > through to the guest or not.
+>
+> I can't say I like this idea. It is a really very inefficient and heavy
+> solution.
+>
+> > Since this is the first time I'm contributing to QEMU I'd like some
+> > guidance to where the filtering code should be.
+> > https://github.com/qemu/qemu/blob/master/hw/usb/dev-mtp.c doesn't look
+> that
+> > complicated but I still need to understand it better to continue.
+> > Furthermore, I need to know where to add such a command line option to
+> > point QEMU to the filtering program.
+> >
+> > Would such a patch be accepted if all the requirements above are met?
+>
+> Can you explain the usage scenario you have in more details, rather than
+> just the high level abstract.
+>
+>
+> Regards,
+> Daniel
+> --
+> |: https://berrange.com      -o-
+> https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-
+> https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-
+> https://www.instagram.com/dberrange :|
+>
