@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wangxinxin.wang@huawei.com>) id 1fBEtx-00050g-EE
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 03:31:43 -0400
+	(envelope-from <armbru@redhat.com>) id 1fBEvh-0005o4-L5
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 03:33:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wangxinxin.wang@huawei.com>) id 1fBEtu-0005oy-9E
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 03:31:41 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2268 helo=huawei.com)
+	(envelope-from <armbru@redhat.com>) id 1fBEve-0006eL-E4
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 03:33:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50732 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wangxinxin.wang@huawei.com>)
-	id 1fBEtt-0005iL-Gn
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 03:31:38 -0400
-From: "wangxin (U)" <wangxinxin.wang@huawei.com>
-Date: Wed, 25 Apr 2018 07:29:05 +0000
-Message-ID: <8ADDA2EB7601DA429B6B2A43EF4620A55B76E463@DGGEMA503-MBX.china.huawei.com>
-References: <1524295325-18136-1-git-send-email-wangxinxin.wang@huawei.com>
-	<20180424171631.GF2521@work-vm> <20180424182405.GM20310@redhat.com>
-	<20180425031423.GH9036@xz-mi> <20180425033131.GI9036@xz-mi>
-In-Reply-To: <20180425033131.GI9036@xz-mi>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fBEve-0006e5-7o
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 03:33:26 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180424214550.32549-1-lersek@redhat.com>
+	<20180424214550.32549-7-lersek@redhat.com>
+Date: Wed, 25 Apr 2018 09:33:16 +0200
+In-Reply-To: <20180424214550.32549-7-lersek@redhat.com> (Laszlo Ersek's
+	message of "Tue, 24 Apr 2018 23:45:50 +0200")
+Message-ID: <8736zjagg3.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] migration/fd: abort migration if receive
- POLLHUP event
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 6/6] qapi: discriminate CpuInfo[Fast] on
+ SysEmuTarget, not CpuInfoArch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,135 +28,703 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "quintela@redhat.com" <quintela@redhat.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IFBldGVyIFh1IFttYWlsdG86
-cGV0ZXJ4QHJlZGhhdC5jb21dDQo+IFNlbnQ6IFdlZG5lc2RheSwgQXByaWwgMjUsIDIwMTggMTE6
-MzIgQU0NCj4gVG86IERhbmllbCBQLiBCZXJyYW5nw6kgPGJlcnJhbmdlQHJlZGhhdC5jb20+DQo+
-IENjOiBEci4gRGF2aWQgQWxhbiBHaWxiZXJ0IDxkZ2lsYmVydEByZWRoYXQuY29tPjsgd2FuZ3hp
-biAoVSkNCj4gPHdhbmd4aW54aW4ud2FuZ0BodWF3ZWkuY29tPjsgcWVtdS1kZXZlbEBub25nbnUu
-b3JnOw0KPiBxdWludGVsYUByZWRoYXQuY29tOyBHb25nbGVpIChBcmVpKSA8YXJlaS5nb25nbGVp
-QGh1YXdlaS5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0hdIG1pZ3JhdGlvbi9mZDogYWJvcnQg
-bWlncmF0aW9uIGlmIHJlY2VpdmUgUE9MTEhVUCBldmVudA0KPiANCj4gT24gV2VkLCBBcHIgMjUs
-IDIwMTggYXQgMTE6MTQ6MjNBTSArMDgwMCwgUGV0ZXIgWHUgd3JvdGU6DQo+ID4gT24gVHVlLCBB
-cHIgMjQsIDIwMTggYXQgMDc6MjQ6MDVQTSArMDEwMCwgRGFuaWVsIFAuIEJlcnJhbmfDqSB3cm90
-ZToNCj4gPiA+IE9uIFR1ZSwgQXByIDI0LCAyMDE4IGF0IDA2OjE2OjMxUE0gKzAxMDAsIERyLiBE
-YXZpZCBBbGFuIEdpbGJlcnQgd3JvdGU6DQo+ID4gPiA+ICogV2FuZyBYaW4gKHdhbmd4aW54aW4u
-d2FuZ0BodWF3ZWkuY29tKSB3cm90ZToNCj4gPiA+ID4gPiBJZiB0aGUgZmQgc29ja2V0IHBlZXIg
-Y2xvc2VkIHNob3J0bHksIHBwb2xsIG1heSByZWNlaXZlIGEgUE9MTEhVUA0KPiA+ID4gPiA+IGV2
-ZW50IGJlZm9yZSB0aGUgZXhwZWN0ZWQgUE9MTElOIGV2ZW50LCBhbmQgcWVtdSB3aWxsIGRvIG5v
-dGhpbmcNCj4gPiA+ID4gPiBidXQgZ29lcyBpbnRvIGFuIGluZmluaXRlIGxvb3Agb2YgdGhlIFBP
-TExIVVAgZXZlbnQuDQo+ID4gPiA+ID4NCj4gPiA+ID4gPiBTbywgYWJvcnQgdGhlIG1pZ3JhdGlv
-biBpZiB3ZSByZWNlaXZlIGEgUE9MTEhVUCBldmVudC4NCj4gPiA+ID4NCj4gPiA+ID4gSGkgV2Fu
-ZyBYaW4sDQo+ID4gPiA+ICAgQ2FuIHlvdSBleHBsYWluIGhvdyB5b3UgbWFuYWdlIHRvIHRyaWdn
-ZXIgdGhpcyBjYXNlOyBJJ3ZlIG5vdCBoaXQgaXQuDQoNCkhpIERhdmlkLA0KDQpJIGhhdmVuJ3Qg
-ZmluZCBhIHdheSBvZiBzdGFibGUgcmVwcm9kdWN0aW9uLg0KSXQgaGFwcGVuZWQgd2hlbiBJIHRy
-eSB0byB1c2UgbGlidmlydCBjb21tYW5kIHRvIHJlc3RvcmUgYSBWTSBmcm9tIGFuIHJlbW90ZSBp
-bWFnZSwgYW5kIHRoZSBuZXQgYnJva2VuIHVuZXhwZWN0ZWRseS4NCg0KICAgICAgICAgICAgdmly
-c2ggcmVzdG9yZSAtLS0tLS0tPiAgIGxpYnZpcnRkDQogICAgICAgICAgICAgICAgICAgICAgICAg
-IHJ1bi8gICAgICAgXCBwYXNzIGZkDQpSZW1vdGUgaW1hZ2UgPC0tLS0+IGxpYnZpcnRfaW9oZWxw
-ZXIgPC0tcGlwZS0tPiBxZW11IC1taWdyYXRpb24NCg0KSGVyZSBhcmUgc29tZSBrZXkgbG9nOg0K
-MSkgdmlyc2ggcmVzb3RyZSAvb3B0L2dhbGF4L21udC9oaWJlcm5hdGluZy9kYjg5ODIxOS0xY2Rl
-LTQ1YmYtYjQ2ZS00ZTQzOWFhMmQ1NzMvZGI4OTgyMTktMWNkZS00NWJmLWI0NmUtNGU0MzlhYTJk
-NTczLmltZyAgLS1ieXBhc3MtY2FjaGUNCjIwMTgtMDQtMTdUMDk6NDU6MDQuMTI4OTc5KzA4OjAw
-fGluZm98bGlidmlydGRbNDgzNF18WzUwOThdfHZpckRvbWFpblJlc3RvcmVGbGFnc1sxMTQwXXw6
-IGVudGVyIHZpckRvbWFpblJlc3RvcmVGbGFncyBmcm9tPS9vcHQvZ2FsYXgvbW50L2hpYmVybmF0
-aW5nL2RiODk4MjE5LTFjZGUtNDViZi1iNDZlLTRlNDM5YWEyZDU3My9kYjg5ODIxOS0xY2RlLTQ1
-YmYtYjQ2ZS00ZTQzOWFhMmQ1NzMuaW1nLCBmbGFncz0zDQoNCjIpc29tZSBxZW11IGxvZyB3ZSBj
-YXRjaGVkOg0KMjAxOC0wNC0xN1QwOTo0NTowNi4xMTE2ODIrMDg6MDB8aW5mb3xxZW11WzE2Mjhd
-fFsxNjI4XXxkb19xbXBfZGlzcGF0Y2hbMTA5XXw6IHFtcF9jbWRfbmFtZTogbWlncmF0ZS1pbmNv
-bWluZywgYXJndW1lbnRzOiB7InVyaSI6ICJmZDozNyJ9DQoyMDE4LTA0LTE3VDA5OjQ1OjA2LjEx
-MTczNSswODowMHxpbmZvfHFlbXVbMTYyOF18WzE2MjhdfG1vbml0b3JfcWFwaV9ldmVudF9lbWl0
-WzQyM118OiB7InRpbWVzdGFtcCI6IHsic2Vjb25kcyI6IDE1MjM5Mjk1MDYsICJtaWNyb3NlY29u
-ZHMiOiAxMTE3MDZ9LCAiZXZlbnQiOiAiTUlHUkFUSU9OIiwgImRhdGEiOiB7InN0YXR1cyI6ICJz
-ZXR1cCJ9fQ0KMjAxOC0wNC0xN1QwOTo0NTowNi4xMTIzNTMrMDg6MDB8aW5mb3xxZW11WzE2Mjhd
-fFsxNjI4XXxtb25pdG9yX3FhcGlfZXZlbnRfZW1pdFs0MjNdfDogeyJ0aW1lc3RhbXAiOiB7InNl
-Y29uZHMiOiAxNTIzOTI5NTA2LCAibWljcm9zZWNvbmRzIjogMTEyMzE3fSwgImV2ZW50IjogIk1J
-R1JBVElPTiIsICJkYXRhIjogeyJzdGF0dXMiOiAiYWN0aXZlIn19DQouLi4gdGhlbiBub3RoaW5n
-IHByaW50DQoNCjMpIFJlbW90ZSBzdG9yYWdlIGJyb2tlbiwgcHJvY2VzcyBsaWJ2aXJ0X2lvaGVs
-cGVyIGRvIGVycm9yIGV4aXQuIFRoZSBzeXN0ZW0ga2V5IG1lc3NhZ2VzIGFzIGJlbG93Og0KMjAx
-OC0wNC0xN1QwOTo0NTowNC4yOTgwODUrMDg6MDB8aW5mb3xzeXN0ZW1kLW1hY2hpbmVkWy1dfE5l
-dyBtYWNoaW5lIHFlbXUtMS1pLTAwMDAwMjNGLg0KMjAxOC0wNC0xN1QwOTo0NTowNC4yOTg1NDcr
-MDg6MDB8aW5mb3xzeXN0ZW1kWy1dfFN0YXJ0ZWQgVmlydHVhbCBNYWNoaW5lIHFlbXUtMS1pLTAw
-MDAwMjNGLg0KMjAxOC0wNC0xN1QwOTo0NTowNC4yOTg5MTgrMDg6MDB8aW5mb3xzeXN0ZW1kWy1d
-fFN0YXJ0aW5nIFZpcnR1YWwgTWFjaGluZSBxZW11LTEtaS0wMDAwMDIzRi4NCjIwMTgtMDQtMTdU
-MDk6NDU6MDYuMTg4MjU5KzA4OjAwfGluZm98a2VybmVsWy1dfFs1NTM2OS40MTQ2NDBdICBjb25u
-ZWN0aW9uNjowOiBkZXRlY3RlZCBjb25uIGVycm9yICgxMDIwKSAgLy9SZW1vdGUgc3RvcmFnZSBi
-cm9rZW4sIGxpYnZpcnRfaW9oZWxwZXIgZG8gZXJyb3IgZXhpdA0KMjAxOC0wNC0xN1QwOTo0NTow
-Ni4xOTgyMjkrMDg6MDB8aW5mb3xrZXJuZWxbLV18WzU1MzY5LjQyMzk3N10gIGNvbm5lY3Rpb243
-OjA6IGRldGVjdGVkIGNvbm4gZXJyb3IgKDEwMjApDQoyMDE4LTA0LTE3VDA5OjQ1OjA2Ljc3Njk5
-MiswODowMHx3YXJuaW5nfGlzY3NpZFstXXxLZXJuZWwgcmVwb3J0ZWQgaVNDU0kgY29ubmVjdGlv
-biA2OjAgZXJyb3IgKDEwMjAgLSBJU0NTSV9FUlJfVENQX0NPTk5fQ0xPU0U6IFRDUCBjb25uZWN0
-aW9uIGNsb3NlZCkgc3RhdGUgKDMpDQoyMDE4LTA0LTE3VDA5OjQ1OjA2Ljc3NzIwMCswODowMHx3
-YXJuaW5nfGlzY3NpZFstXXxLZXJuZWwgcmVwb3J0ZWQgaVNDU0kgY29ubmVjdGlvbiA3OjAgZXJy
-b3IgKDEwMjAgLSBJU0NTSV9FUlJfVENQX0NPTk5fQ0xPU0U6IFRDUCBjb25uZWN0aW9uIGNsb3Nl
-ZCkgc3RhdGUgKDMpDQoNCjQpIFFlbXUgcHBvbGwoKSBleGl0IGZyZXF1ZW50bHkgYmVjYXVzZSBv
-ZiBQT0xMSFVQIGV2ZW50DQooZ2RiKSBwICgoR1BvbGxGRCAqKWdwb2xsZmRzLT5kYXRlKVs4XQ0K
-JDExNyA9IHtmZCA9IDM3LCBldmVudHMgPSAxLCByZXZlbnRzID0gMTZ9DQoNCj4gPiA+ID4NCj4g
-PiA+ID4gPiBTaWduZWQtb2ZmLWJ5OiBXYW5nIFhpbiA8d2FuZ3hpbnhpbi53YW5nQGh1YXdlaS5j
-b20+DQo+ID4gPiA+ID4NCj4gPiA+ID4gPiBkaWZmIC0tZ2l0IGEvbWlncmF0aW9uL2ZkLmMgYi9t
-aWdyYXRpb24vZmQuYw0KPiA+ID4gPiA+IGluZGV4IGNkMDYxODIuLjU5MzJjODcgMTAwNjQ0DQo+
-ID4gPiA+ID4gLS0tIGEvbWlncmF0aW9uL2ZkLmMNCj4gPiA+ID4gPiArKysgYi9taWdyYXRpb24v
-ZmQuYw0KPiA+ID4gPiA+IEBAIC0xNSw2ICsxNSw3IEBADQo+ID4gPiA+ID4gICAqLw0KPiA+ID4g
-PiA+DQo+ID4gPiA+ID4gICNpbmNsdWRlICJxZW11L29zZGVwLmgiDQo+ID4gPiA+ID4gKyNpbmNs
-dWRlICJxZW11L2Vycm9yLXJlcG9ydC5oIg0KPiA+ID4gPiA+ICAjaW5jbHVkZSAiY2hhbm5lbC5o
-Ig0KPiA+ID4gPiA+ICAjaW5jbHVkZSAiZmQuaCINCj4gPiA+ID4gPiAgI2luY2x1ZGUgIm1vbml0
-b3IvbW9uaXRvci5oIg0KPiA+ID4gPiA+IEBAIC00Niw2ICs0NywxMSBAQCBzdGF0aWMgZ2Jvb2xl
-YW4NCj4gZmRfYWNjZXB0X2luY29taW5nX21pZ3JhdGlvbihRSU9DaGFubmVsICppb2MsDQo+ID4g
-PiA+ID4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEdJT0Nv
-bmRpdGlvbg0KPiBjb25kaXRpb24sDQo+ID4gPiA+ID4gICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIGdwb2ludGVyDQo+IG9wYXF1ZSkNCj4gPiA+ID4gPiAgew0K
-PiA+ID4gPiA+ICsgICAgaWYgKGNvbmRpdGlvbiAmIEdfSU9fSFVQKSB7DQo+ID4gPiA+ID4gKyAg
-ICAgICAgZXJyb3JfcmVwb3J0KCJUaGUgbWlncmF0aW9uIHBlZXIgY2xvc2VkLCBqb2IgYWJvcnQi
-KTsNCj4gPiA+ID4gPiArICAgICAgICBleGl0KEVYSVRfRkFJTFVSRSk7DQo+ID4gPiA+ID4gKyAg
-ICB9DQo+ID4gPiA+ID4gKw0KPiA+ID4gPg0KPiA+ID4gPiBPSywgIEkgd2lzaCB3ZSBoYWQgYSBu
-aWNlciB3YXkgZm9yIGZhaWxpbmc7ICBlc3BlY2lhbGx5IGZvciB0aGUNCj4gPiA+ID4gbXVsdGlm
-ZC9wb3N0Y29weSByZWNvdmVyeSB3b3JsZHMgd2hlcmUgb25lIGZhaWxlZCBjb25uZWN0aW9uIG1p
-Z2h0IG5vdA0KPiA+ID4gPiBiZSBmYXRhbDsgYnV0IEkgZG9uJ3Qgc2VlIGhvdyB0byBkbyB0aGF0
-IGhlcmUuDQoNCkFueSBzdWdnZXN0aW9uPyBDbG9zaW5nIHRoZSBmZCBpcyB0aGUgbm9ybWFsIHdh
-eSB0byBoYW5kbGUgR19JT19IVVAgZXZlbnQuDQoNCj4gPiA+DQo+ID4gPiBUaGlzIGRvZXNuJ3Qg
-ZmVlbCByaWdodCB0byBtZS4NCj4gPiA+DQo+ID4gPiBXZSBoYXZlIHBhc3NlZCBpbiBhIHByZS1v
-cGVuZWQgRkQgdG8gUUVNVSwgYW5kIHdlIHJlZ2lzdGVyZWQgYSB3YXRjaA0KPiA+ID4gb24gaXQg
-dG8gZGV0ZWN0IHdoZW4gdGhlcmUgaXMgZGF0YSBmcm9tIHRoZSBzcmMgUUVNVSB0aGF0IGlzIGF2
-YWlsYWJsZQ0KPiA+ID4gdG8gcmVhZC4gIE5vcm1hbGx5IHRoZSBzcmMgd2lsbCBoYXZlIHNlbnQg
-c29tZXRoaW5nIHNvIHdlJ2xsIGdldCBHX0lPX0lOLA0KPiA+ID4gYnV0IHlvdSdyZSBzdWdnZXN0
-aW5nIHRoZSBjbGllbnQgaGFzIHF1aXQgaW1tZWRpYXRlbHksIHNvIHdlJ3JlIGdldHRpbmcNCj4g
-PiA+IEdfSU9fSFVQIGR1ZSB0byBlbmQgb2YgZmlsZS4NCj4gPiA+DQo+ID4gPiBUaGUgbWlncmF0
-aW9uX2NoYW5uZWxfcHJvY2Vzc19pbmNvbWluZygpIG1ldGhvZCB0aGF0IHdlIHBhc3MgdGhlIGlv
-Yw0KPiA+ID4gb2JqZWN0IHRvIHdpbGwgYmUgY2FsbGluZyBxaW9fY2hhbm5lbF9yZWFkKGlvYykg
-c29tZXdoZXJlIHRvIHRyeSB0bw0KPiA+ID4gcmVhZCB0aGF0IGRhdGEuDQo+ID4gPg0KPiA+ID4g
-Rm9yIFFFTVUgdG8gc3BpbiBpbiBpbmZpbml0ZSBsb29wIHRoZXJlIG11c3QgYmUgY29kZSBpbiB0
-aGUNCj4gPiA+IG1pZ3JhdGlvbl9jaGFubmVsX3Byb2Nlc3NfaW5jb21pbmcoKSB0aGF0IGlzIGln
-bm9yaW5nIHRoZSByZXR1cm4NCj4gPiA+IHZhbHVlIG9mIHFpb19jaGFubmVsX3JlYWQoKSBpbiBz
-b21lIG1hbm5lciBjYXVzaW5nIGl0IHRvIHJldHJ5DQo+ID4gPiB0aGUgcmVhZCBhZ2FpbiAmIGFn
-YWluIEkgcHJlc3VtZS4NCj4gPiA+DQo+ID4gPiBQdXR0aW5nIHRoaXMgY2hlY2sgZm9yIEdfSU9f
-SFVQIGZpeGVzIHlvdXIgaW1tZWRpYXRlIHByb2JsZW0gc2NlbmFyaW8sDQo+ID4gPiBidXQgd2hh
-dGV2ZXIgY29kZSB3YXMgc3Bpbm5pbmcgaW4gaW5maW5pdGUgbG9vcCBpcyBzdGlsbCBicm9rZW4g
-YW5kDQo+ID4gPiBJJ2QgZ3Vlc3MgaXQgd2FzIHBvc3NpYmxlIHRvIHN0aWxsIHRyaWdnZXIgdGhl
-IGxvb3AuIGVnIGJ5IHdyaXRpbmcNCj4gPiA+IDEgc2luZ2xlIGJ5dGUgYW5kIHRoZW4gY2xvc2lu
-ZyB0aGUgc29ja2V0Lg0KPiA+ID4NCj4gPiA+IFNvLCBJTUhPIHRoaXMgZml4IGlzIHdyb25nIC0g
-d2UgbmVlZCB0byBmaW5kIHRoZSByb290IGNhdXNlIGFuZCBmaXgNCj4gPiA+IHRoYXQsIG5vdCB0
-cnkgdG8gYXZvaWQgY2FsbGluZyB0aGUgYnVnZ3kgY29kZS4NCj4gPg0KPiA+IEkgYWdyZWUuIEFG
-QUlVIHRoZSBmaXJzdCByZWFkIHNob3VsZCBiZSBpbiBxZW11X2xvYWR2bV9zdGF0ZSgpOg0KPiA+
-DQo+ID4gICAgIHYgPSBxZW11X2dldF9iZTMyKGYpOw0KPiA+ICAgICBpZiAodiAhPSBRRU1VX1ZN
-X0ZJTEVfTUFHSUMpIHsNCj4gPiAgICAgICAgIGVycm9yX3JlcG9ydCgiTm90IGEgbWlncmF0aW9u
-IHN0cmVhbSIpOw0KPiA+ICAgICAgICAgcmV0dXJuIC1FSU5WQUw7DQo+ID4gICAgIH0NCj4gPg0K
-PiA+IFNvIEkgd291bGQgYmUgY3VyaW91cyBtb3JlIGFib3V0IGhvdyB0aGF0IGluZmluaXRlIGxv
-b3AgaGFwcGVuZWQuDQo+IA0KPiBBaCwgd2FpdC4gIEkganVzdCBub3RpY2VkIHRoYXQgWGluIG1l
-bnRpb25lZCBhYm91dCB0aGUgbG9vcCBhbHJlYWR5IC0NCj4gaXQncyBhbiBpbmZpbml0ZSBsb29w
-IG9mIFNJR0hVUC4gIEkgc3VwcG9zZSBpdCBtZWFucyB0aGF0IHdlJ2xsIGp1c3QNCj4gbmV2ZXIg
-Z28gaW50byBmZF9hY2NlcHRfaW5jb21pbmdfbWlncmF0aW9uKCkgYXQgYWxsPw0KDQpZZWFoLCB0
-aGF0J3Mgd2hhdCBJIHdhbnQgdG8gZml4Lg0KDQo+IA0KPiBJZiBzbywgSSdtIG5vdCBzdXJlIHdo
-ZXRoZXIgd2Ugc2hvdWxkIGp1c3QgYWx3YXlzIHdhdGNoIG9uIEdfSU9fSFVQDQo+IChhbmQgcG9z
-c2libHkgR19JT19FUlIgdG9vKSBpbiBxaW9fY2hhbm5lbF9jcmVhdGVfd2F0Y2goKToNCj4gDQo+
-ICAgR1NvdXJjZSAqcmV0ID0ga2xhc3MtPmlvX2NyZWF0ZV93YXRjaChpb2MsIGNvbmRpdGlvbiB8
-IEdfSU9fSFVQIHwNCj4gR19JT19FUlIpOw0KPiANCj4gT3RoZXJ3aXNlIEknbSBub3Qgc3VyZSB0
-aGUgc2FtZSBsb29wIHdpbGwgaGFwcGVuIGZvciBvdGhlciB1c2VycyBvZg0KPiBxaW9fY2hhbm5l
-bF9hZGRfd2F0Y2goKS4NCj4gDQpIaSBEYW5pZWwgYW5kIFBldGVyLA0KDQpJbiBteSBzY2VuYXJp
-bywgaXQncyBjbGVhciB0aGUgY2xpZW50IHF1aXQgaW1tZWRpYXRlbHkgYW5kIHdlIG5ldmVyIGdv
-dCBhIFBPTExJTiBldmVudCwgb3RoZXJ3aXNlLCANCnRoZSB3YXRjaCBzaG91bGQgYmUgdW5yZWdp
-c3RlcmVkIHdoZW4gUE9MTElOIGV2ZW50IGNvbWluZy4gDQpBcyBEYW5pZWwgc2FpZCwgbm9ybWFs
-bHkgR19JT19JTiB3aWxsIGJlIHRoZSBmaXJzdCBldmVudCwgd2UgbmVlZCB0byBmaW5kIHdoeSBQ
-T0xMSU4gZXZlbnQgbmV2ZXIgaGFwcGVuZWQsIEknbGwgdHJ5IGl0Lg0KDQo+IFJlZ2FyZHMsDQo+
-IC0tDQo+IFBldGVyIFh1DQo=
+Laszlo Ersek <lersek@redhat.com> writes:
+
+> Add a new field @target (of type @SysEmuTarget) to the outputs of the
+> @query-cpus and @query-cpus-fast commands, which provides more information
+> about the emulation target than the field @arch (of type @CpuInfoArch).
+> Keep @arch for compatibility.
+>
+> Make @target the new discriminator for the @CpuInfo and @CpuInfoFast
+> return structures. This lets us hoist @arch to @CpuInfoCommon, but it also
+> requires some gymnastics in qmp_query_cpus() and qmp_query_cpus_fast().
+>
+> In particular, conditional compilation cannot be removed, because each
+> pair of CPU base arch structures, such as X86CPU/CPUX86State,
+> PowerPCCPU/CPUPPCState, SPARCCPU/CPUSPARCState, is only visible when
+> building QEMU for a target that maps to that CPU base arch.
+>
+> Cc: Eric Blake <eblake@redhat.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+> ---
+>
+> Notes:
+>     PATCHv1:
+>     
+>     - new patch
+>
+>  qapi/misc.json | 118 ++++++++++++++++++-------
+>  cpus.c         | 275 ++++++++++++++++++++++++++++++++++++++++++---------------
+>  2 files changed, 291 insertions(+), 102 deletions(-)
+>
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index d7b776a5af37..98c15880f9f0 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -361,77 +361,105 @@
+>  # Collects fields common to @CpuInfoBase and @CpuInfoFastBase; that is,
+>  # fields that are shared by @query-cpus and @query-cpus-fast, and not
+>  # specific to the target architecture.
+>  #
+>  # @qom-path: path to the CPU object in the QOM tree (since 2.4)
+>  #
+>  # @thread-id: ID of the underlying host thread
+>  #
+>  # @props: properties describing which node/socket/core/thread the
+>  #         virtual CPU belongs to, if supported by the board (since 2.10)
+>  #
+> +# @arch: base architecture of the cpu (since 2.6)
+> +#
+>  # Since: 2.13
+>  ##
+>  { 'struct' : 'CpuInfoCommon',
+>    'data'   : { 'qom-path'  : 'str',
+>                 'thread-id' : 'int',
+> -               '*props'    : 'CpuInstanceProperties' } }
+> +               '*props'    : 'CpuInstanceProperties',
+> +               'arch'      : 'CpuInfoArch' } }
+>  
+>  ##
+>  # @CpuInfoBase:
+>  #
+>  # Extends @CpuInfoCommon with fields that are specific to the @query-cpus
+>  # command, but not specific to the target architecture.
+>  #
+>  # @CPU: the index of the virtual CPU
+>  #
+>  # @current: this only exists for backwards compatibility and should be ignored
+>  #
+>  # @halted: true if the virtual CPU is in the halt state.  Halt usually refers
+>  #          to a processor specific low power mode.
+>  #
+> -# @arch: architecture of the cpu, which determines which additional fields
+> -#        will be listed (since 2.6)
+> +# @target: the QEMU system emulation target, which is more specific than
+> +#          @arch and determines which additional fields will be listed
+> +#
+>  #
+>  # Since: 2.13
+>  #
+>  # Notes: @halted is a transient state that changes frequently.  By the time the
+>  #        data is sent to the client, the guest may no longer be halted.
+> -#        Moreover, @arch cannot be moved up to @CpuInfoCommon because
+> +#        Moreover, @target cannot be moved up to @CpuInfoCommon because
+>  #        that would prevent its use as the discriminator in @CpuInfo.
+>  ##
+>  { 'struct' : 'CpuInfoBase',
+>    'base'   : 'CpuInfoCommon',
+>    'data'   : { 'CPU'     : 'int',
+>                 'current' : 'bool',
+>                 'halted'  : 'bool',
+> -               'arch'    : 'CpuInfoArch' } }
+> +               'target'  : 'SysEmuTarget' } }
+>  
+>  ##
+>  # @CpuInfo:
+>  #
+>  # Information about a virtual CPU
+>  #
+>  # Since: 0.14.0
+>  ##
+> -{ 'union': 'CpuInfo',
+> -  'base': 'CpuInfoBase',
+> -  'discriminator': 'arch',
+> -  'data': { 'x86': 'CpuInfoX86',
+> -            'sparc': 'CpuInfoSPARC',
+> -            'ppc': 'CpuInfoPPC',
+> -            'mips': 'CpuInfoMIPS',
+> -            'tricore': 'CpuInfoTricore',
+> -            's390': 'CpuInfoS390',
+> -            'riscv': 'CpuInfoRISCV',
+> -            'other': 'CpuInfoOther' } }
+> +{ 'union'         : 'CpuInfo',
+> +  'base'          : 'CpuInfoBase',
+> +  'discriminator' : 'target',
+> +  'data'          : { 'i386'         : 'CpuInfoX86',
+> +                      'x86_64'       : 'CpuInfoX86',
+> +                      'sparc'        : 'CpuInfoSPARC',
+> +                      'sparc64'      : 'CpuInfoSPARC',
+> +                      'ppc'          : 'CpuInfoPPC',
+> +                      'ppcemb'       : 'CpuInfoPPC',
+> +                      'ppc64'        : 'CpuInfoPPC',
+> +                      'mips'         : 'CpuInfoMIPS',
+> +                      'mipsel'       : 'CpuInfoMIPS',
+> +                      'mips64'       : 'CpuInfoMIPS',
+> +                      'mips64el'     : 'CpuInfoMIPS',
+> +                      'tricore'      : 'CpuInfoTricore',
+> +                      's390x'        : 'CpuInfoS390',
+> +                      'riscv32'      : 'CpuInfoRISCV',
+> +                      'riscv64'      : 'CpuInfoRISCV',
+> +                      'aarch64'      : 'CpuInfoOther',
+> +                      'alpha'        : 'CpuInfoOther',
+> +                      'arm'          : 'CpuInfoOther',
+> +                      'cris'         : 'CpuInfoOther',
+> +                      'hppa'         : 'CpuInfoOther',
+> +                      'lm32'         : 'CpuInfoOther',
+> +                      'm68k'         : 'CpuInfoOther',
+> +                      'microblaze'   : 'CpuInfoOther',
+> +                      'microblazeel' : 'CpuInfoOther',
+> +                      'moxie'        : 'CpuInfoOther',
+> +                      'nios2'        : 'CpuInfoOther',
+> +                      'or1k'         : 'CpuInfoOther',
+> +                      'sh4'          : 'CpuInfoOther',
+> +                      'sh4eb'        : 'CpuInfoOther',
+> +                      'unicore32'    : 'CpuInfoOther',
+> +                      'xtensa'       : 'CpuInfoOther',
+> +                      'xtensaeb'     : 'CpuInfoOther' } }
+>  
+>  ##
+>  # @CpuInfoX86:
+>  #
+>  # Additional information about a virtual i386 or x86_64 CPU
+>  #
+>  # @pc: the 64-bit instruction pointer
+>  #
+>  # Since: 2.6
+>  ##
+>  { 'struct': 'CpuInfoX86', 'data': { 'pc': 'int' } }
+> @@ -543,84 +571,110 @@
+>  #
+>  # Example:
+>  #
+>  # -> { "execute": "query-cpus" }
+>  # <- { "return": [
+>  #          {
+>  #             "CPU":0,
+>  #             "current":true,
+>  #             "halted":false,
+>  #             "qom-path":"/machine/unattached/device[0]",
+>  #             "arch":"x86",
+> +#             "target":"x86_64",
+>  #             "pc":3227107138,
+>  #             "thread-id":3134
+>  #          },
+>  #          {
+>  #             "CPU":1,
+>  #             "current":false,
+>  #             "halted":true,
+>  #             "qom-path":"/machine/unattached/device[2]",
+>  #             "arch":"x86",
+> +#             "target":"x86_64",
+>  #             "pc":7108165,
+>  #             "thread-id":3135
+>  #          }
+>  #       ]
+>  #    }
+>  #
+>  # Notes: This interface is deprecated (since 2.12.0), and it is strongly
+>  #        recommended that you avoid using it. Use @query-cpus-fast to
+>  #        obtain information about virtual CPUs.
+>  #
+>  ##
+>  { 'command': 'query-cpus', 'returns': ['CpuInfo'] }
+>  
+>  ##
+>  # @CpuInfoFastBase:
+>  #
+>  # Extends @CpuInfoCommon with fields that are specific to the
+>  # @query-cpus-fast command, but not specific to the target architecture.
+>  #
+>  # @cpu-index: index of the virtual CPU
+>  #
+> -# @arch: architecture of the cpu, which determines which additional fields
+> -#        will be listed
+> +# @target: the QEMU system emulation target, which is more specific than
+> +#          @arch and determines which additional fields will be listed
+>  #
+>  # Since: 2.13
+>  #
+> -# Notes: @arch cannot be moved up to @CpuInfoCommon because that would
+> +# Notes: @target cannot be moved up to @CpuInfoCommon because that would
+>  #        prevent its use as the discriminator in @CpuInfoFast.
+>  ##
+>  { 'struct' : 'CpuInfoFastBase',
+>    'base'   : 'CpuInfoCommon',
+>    'data'   : { 'cpu-index' : 'int',
+> -               'arch'      : 'CpuInfoArch' } }
+> +               'target'    : 'SysEmuTarget' } }
+>  
+>  ##
+>  # @CpuInfoFast:
+>  #
+>  # Information about a virtual CPU
+>  #
+>  # Since: 2.12
+>  #
+>  ##
+> -{ 'union': 'CpuInfoFast',
+> -  'base': 'CpuInfoFastBase',
+> -  'discriminator': 'arch',
+> -  'data': { 'x86': 'CpuInfoOther',
+> -            'sparc': 'CpuInfoOther',
+> -            'ppc': 'CpuInfoOther',
+> -            'mips': 'CpuInfoOther',
+> -            'tricore': 'CpuInfoOther',
+> -            's390': 'CpuInfoS390',
+> -            'riscv': 'CpuInfoOther',
+> -            'other': 'CpuInfoOther' } }
+> +{ 'union'         : 'CpuInfoFast',
+> +  'base'          : 'CpuInfoFastBase',
+> +  'discriminator' : 'target',
+> +  'data'          : { 'i386'         : 'CpuInfoOther',
+> +                      'x86_64'       : 'CpuInfoOther',
+> +                      'sparc'        : 'CpuInfoOther',
+> +                      'sparc64'      : 'CpuInfoOther',
+> +                      'ppc'          : 'CpuInfoOther',
+> +                      'ppcemb'       : 'CpuInfoOther',
+> +                      'ppc64'        : 'CpuInfoOther',
+> +                      'mips'         : 'CpuInfoOther',
+> +                      'mipsel'       : 'CpuInfoOther',
+> +                      'mips64'       : 'CpuInfoOther',
+> +                      'mips64el'     : 'CpuInfoOther',
+> +                      'tricore'      : 'CpuInfoOther',
+> +                      's390x'        : 'CpuInfoS390',
+> +                      'riscv32'      : 'CpuInfoOther',
+> +                      'riscv64'      : 'CpuInfoOther',
+> +                      'aarch64'      : 'CpuInfoOther',
+> +                      'alpha'        : 'CpuInfoOther',
+> +                      'arm'          : 'CpuInfoOther',
+> +                      'cris'         : 'CpuInfoOther',
+> +                      'hppa'         : 'CpuInfoOther',
+> +                      'lm32'         : 'CpuInfoOther',
+> +                      'm68k'         : 'CpuInfoOther',
+> +                      'microblaze'   : 'CpuInfoOther',
+> +                      'microblazeel' : 'CpuInfoOther',
+> +                      'moxie'        : 'CpuInfoOther',
+> +                      'nios2'        : 'CpuInfoOther',
+> +                      'or1k'         : 'CpuInfoOther',
+> +                      'sh4'          : 'CpuInfoOther',
+> +                      'sh4eb'        : 'CpuInfoOther',
+> +                      'unicore32'    : 'CpuInfoOther',
+> +                      'xtensa'       : 'CpuInfoOther',
+> +                      'xtensaeb'     : 'CpuInfoOther' } }
+>  
+>  ##
+>  # @query-cpus-fast:
+>  #
+>  # Returns information about all virtual CPUs. This command does not
+>  # incur a performance penalty and should be used in production
+>  # instead of query-cpus.
+>  #
+>  # Returns: list of @CpuInfoFast
+>  #
+>  # Since: 2.12
+> @@ -630,33 +684,35 @@
+>  # -> { "execute": "query-cpus-fast" }
+>  # <- { "return": [
+>  #         {
+>  #             "thread-id": 25627,
+>  #             "props": {
+>  #                 "core-id": 0,
+>  #                 "thread-id": 0,
+>  #                 "socket-id": 0
+>  #             },
+>  #             "qom-path": "/machine/unattached/device[0]",
+>  #             "arch":"x86",
+> +#             "target":"x86_64",
+>  #             "cpu-index": 0
+>  #         },
+>  #         {
+>  #             "thread-id": 25628,
+>  #             "props": {
+>  #                 "core-id": 0,
+>  #                 "thread-id": 0,
+>  #                 "socket-id": 1
+>  #             },
+>  #             "qom-path": "/machine/unattached/device[2]",
+>  #             "arch":"x86",
+> +#             "target":"x86_64",
+>  #             "cpu-index": 1
+>  #         }
+>  #     ]
+>  # }
+>  ##
+>  { 'command': 'query-cpus-fast', 'returns': [ 'CpuInfoFast' ] }
+>  
+>  ##
+>  # @IOThreadInfo:
+>  #
+>  # Information about an iothread
+> diff --git a/cpus.c b/cpus.c
+> index 60563a6d54ec..86eed0ffe796 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -2093,88 +2093,235 @@ int vm_stop_force_state(RunState state)
+>      }
+>  }
+>  
+>  void list_cpus(FILE *f, fprintf_function cpu_fprintf, const char *optarg)
+>  {
+>      /* XXX: implement xxx_cpu_list for targets that still miss it */
+>  #if defined(cpu_list)
+>      cpu_list(f, cpu_fprintf);
+>  #endif
+>  }
+>  
+> +static CpuInfoArch sysemu_target_to_cpuinfo_arch(SysEmuTarget target)
+> +{
+> +    /*
+> +     * The @SysEmuTarget -> @CpuInfoArch mapping below is based on the
+> +     * TARGET_ARCH -> TARGET_BASE_ARCH mapping in the "configure" script.
+> +     */
+> +    switch (target) {
+> +    case SYS_EMU_TARGET_I386:
+> +    case SYS_EMU_TARGET_X86_64:
+> +        return CPU_INFO_ARCH_X86;
+> +
+> +    case SYS_EMU_TARGET_PPC:
+> +    case SYS_EMU_TARGET_PPCEMB:
+> +    case SYS_EMU_TARGET_PPC64:
+> +        return CPU_INFO_ARCH_PPC;
+> +
+> +    case SYS_EMU_TARGET_SPARC:
+> +    case SYS_EMU_TARGET_SPARC64:
+> +        return CPU_INFO_ARCH_SPARC;
+> +
+> +    case SYS_EMU_TARGET_MIPS:
+> +    case SYS_EMU_TARGET_MIPSEL:
+> +    case SYS_EMU_TARGET_MIPS64:
+> +    case SYS_EMU_TARGET_MIPS64EL:
+> +        return CPU_INFO_ARCH_MIPS;
+> +
+> +    case SYS_EMU_TARGET_TRICORE:
+> +        return CPU_INFO_ARCH_TRICORE;
+> +
+> +    case SYS_EMU_TARGET_S390X:
+> +        return CPU_INFO_ARCH_S390;
+> +
+> +    case SYS_EMU_TARGET_RISCV32:
+> +    case SYS_EMU_TARGET_RISCV64:
+> +        return CPU_INFO_ARCH_RISCV;
+> +
+> +    default:
+> +        return CPU_INFO_ARCH_OTHER;
+> +    }
+> +}
+
+Hmm.  Can we avoid duplicating configure's mapping here?  More on that
+below.
+
+> +
+> +static void cpustate_to_cpuinfo_x86(CpuInfoX86 *info, const CPUState *cpu)
+> +{
+> +#ifdef TARGET_I386
+> +    X86CPU *x86_cpu = X86_CPU(cpu);
+> +    CPUX86State *env = &x86_cpu->env;
+> +
+> +    info->pc = env->eip + env->segs[R_CS].base;
+> +#else
+> +    abort();
+> +#endif
+> +}
+> +
+> +static void cpustate_to_cpuinfo_ppc(CpuInfoPPC *info, const CPUState *cpu)
+> +{
+> +#ifdef TARGET_PPC
+> +    PowerPCCPU *ppc_cpu = POWERPC_CPU(cpu);
+> +    CPUPPCState *env = &ppc_cpu->env;
+> +
+> +    info->nip = env->nip;
+> +#else
+> +    abort();
+> +#endif
+> +}
+> +
+> +static void cpustate_to_cpuinfo_sparc(CpuInfoSPARC *info, const CPUState *cpu)
+> +{
+> +#ifdef TARGET_SPARC
+> +    SPARCCPU *sparc_cpu = SPARC_CPU(cpu);
+> +    CPUSPARCState *env = &sparc_cpu->env;
+> +
+> +    info->pc = env->pc;
+> +    info->npc = env->npc;
+> +#else
+> +    abort();
+> +#endif
+> +}
+> +
+> +static void cpustate_to_cpuinfo_mips(CpuInfoMIPS *info, const CPUState *cpu)
+> +{
+> +#ifdef TARGET_MIPS
+> +    MIPSCPU *mips_cpu = MIPS_CPU(cpu);
+> +    CPUMIPSState *env = &mips_cpu->env;
+> +
+> +    info->PC = env->active_tc.PC;
+> +#else
+> +    abort();
+> +#endif
+> +}
+> +
+> +static void cpustate_to_cpuinfo_tricore(CpuInfoTricore *info,
+> +                                        const CPUState *cpu)
+> +{
+> +#ifdef TARGET_TRICORE
+> +    TriCoreCPU *tricore_cpu = TRICORE_CPU(cpu);
+> +    CPUTriCoreState *env = &tricore_cpu->env;
+> +
+> +    info->PC = env->PC;
+> +#else
+> +    abort();
+> +#endif
+> +}
+> +
+> +static void cpustate_to_cpuinfo_s390(CpuInfoS390 *info, const CPUState *cpu)
+> +{
+> +#ifdef TARGET_S390X
+> +    S390CPU *s390_cpu = S390_CPU(cpu);
+> +    CPUS390XState *env = &s390_cpu->env;
+> +
+> +    info->cpu_state = env->cpu_state;
+> +#else
+> +    abort();
+> +#endif
+> +}
+> +
+> +static void cpustate_to_cpuinfo_riscv(CpuInfoRISCV *info, const CPUState *cpu)
+> +{
+> +#ifdef TARGET_RISCV
+> +    RISCVCPU *riscv_cpu = RISCV_CPU(cpu);
+> +    CPURISCVState *env = &riscv_cpu->env;
+> +
+> +    info->pc = env->pc;
+> +#else
+> +    abort();
+> +#endif
+> +}
+> +
+
+To reduce #ifdeffery here, these helpers could be moved to suitable
+files in target/*/, plus stubs, but I doubt it's worth the bother.
+
+>  CpuInfoList *qmp_query_cpus(Error **errp)
+>  {
+>      MachineState *ms = MACHINE(qdev_get_machine());
+>      MachineClass *mc = MACHINE_GET_CLASS(ms);
+>      CpuInfoList *head = NULL, *cur_item = NULL;
+> +    SysEmuTarget target = qapi_enum_parse(&SysEmuTarget_lookup, TARGET_NAME,
+> +                                          -1, &error_abort);
+
+Note how configure providing TARGET_NAME makes computing target easy.
+
+Compare to how sysemu_target_to_cpuinfo_arch() computes arch.  Would it
+make sense to have configure provide TARGET_BASE_NAME, so we can compute
+arch the same way as target?
+
+>      CPUState *cpu;
+>  
+>      CPU_FOREACH(cpu) {
+>          CpuInfoList *info;
+> -#if defined(TARGET_I386)
+> -        X86CPU *x86_cpu = X86_CPU(cpu);
+> -        CPUX86State *env = &x86_cpu->env;
+> -#elif defined(TARGET_PPC)
+> -        PowerPCCPU *ppc_cpu = POWERPC_CPU(cpu);
+> -        CPUPPCState *env = &ppc_cpu->env;
+> -#elif defined(TARGET_SPARC)
+> -        SPARCCPU *sparc_cpu = SPARC_CPU(cpu);
+> -        CPUSPARCState *env = &sparc_cpu->env;
+> -#elif defined(TARGET_RISCV)
+> -        RISCVCPU *riscv_cpu = RISCV_CPU(cpu);
+> -        CPURISCVState *env = &riscv_cpu->env;
+> -#elif defined(TARGET_MIPS)
+> -        MIPSCPU *mips_cpu = MIPS_CPU(cpu);
+> -        CPUMIPSState *env = &mips_cpu->env;
+> -#elif defined(TARGET_TRICORE)
+> -        TriCoreCPU *tricore_cpu = TRICORE_CPU(cpu);
+> -        CPUTriCoreState *env = &tricore_cpu->env;
+> -#elif defined(TARGET_S390X)
+> -        S390CPU *s390_cpu = S390_CPU(cpu);
+> -        CPUS390XState *env = &s390_cpu->env;
+> -#endif
+>  
+>          cpu_synchronize_state(cpu);
+>  
+>          info = g_malloc0(sizeof(*info));
+>          info->value = g_malloc0(sizeof(*info->value));
+>          info->value->CPU = cpu->cpu_index;
+>          info->value->current = (cpu == first_cpu);
+>          info->value->halted = cpu->halted;
+>          info->value->qom_path = object_get_canonical_path(OBJECT(cpu));
+>          info->value->thread_id = cpu->thread_id;
+> -#if defined(TARGET_I386)
+> -        info->value->arch = CPU_INFO_ARCH_X86;
+> -        info->value->u.x86.pc = env->eip + env->segs[R_CS].base;
+> -#elif defined(TARGET_PPC)
+> -        info->value->arch = CPU_INFO_ARCH_PPC;
+> -        info->value->u.ppc.nip = env->nip;
+> -#elif defined(TARGET_SPARC)
+> -        info->value->arch = CPU_INFO_ARCH_SPARC;
+> -        info->value->u.q_sparc.pc = env->pc;
+> -        info->value->u.q_sparc.npc = env->npc;
+> -#elif defined(TARGET_MIPS)
+> -        info->value->arch = CPU_INFO_ARCH_MIPS;
+> -        info->value->u.q_mips.PC = env->active_tc.PC;
+> -#elif defined(TARGET_TRICORE)
+> -        info->value->arch = CPU_INFO_ARCH_TRICORE;
+> -        info->value->u.tricore.PC = env->PC;
+> -#elif defined(TARGET_S390X)
+> -        info->value->arch = CPU_INFO_ARCH_S390;
+> -        info->value->u.s390.cpu_state = env->cpu_state;
+> -#elif defined(TARGET_RISCV)
+> -        info->value->arch = CPU_INFO_ARCH_RISCV;
+> -        info->value->u.riscv.pc = env->pc;
+> -#else
+> -        info->value->arch = CPU_INFO_ARCH_OTHER;
+> -#endif
+> +        info->value->arch = sysemu_target_to_cpuinfo_arch(target);
+> +        info->value->target = target;
+> +
+> +        /*
+> +         * The @SysEmuTarget -> @CpuInfo mapping below is based on the
+> +         * TARGET_ARCH -> TARGET_BASE_ARCH mapping in the "configure" script.
+> +         */
+> +        switch (target) {
+> +        case SYS_EMU_TARGET_I386:
+> +            cpustate_to_cpuinfo_x86(&info->value->u.i386, cpu);
+> +            break;
+> +        case SYS_EMU_TARGET_X86_64:
+> +            cpustate_to_cpuinfo_x86(&info->value->u.x86_64, cpu);
+> +            break;
+> +
+> +        case SYS_EMU_TARGET_PPC:
+> +            cpustate_to_cpuinfo_ppc(&info->value->u.ppc, cpu);
+> +            break;
+> +        case SYS_EMU_TARGET_PPCEMB:
+> +            cpustate_to_cpuinfo_ppc(&info->value->u.ppcemb, cpu);
+> +            break;
+> +        case SYS_EMU_TARGET_PPC64:
+> +            cpustate_to_cpuinfo_ppc(&info->value->u.ppc64, cpu);
+> +            break;
+> +
+> +        case SYS_EMU_TARGET_SPARC:
+> +            cpustate_to_cpuinfo_sparc(&info->value->u.q_sparc, cpu);
+> +            break;
+> +        case SYS_EMU_TARGET_SPARC64:
+> +            cpustate_to_cpuinfo_sparc(&info->value->u.sparc64, cpu);
+> +            break;
+> +
+> +        case SYS_EMU_TARGET_MIPS:
+> +            cpustate_to_cpuinfo_mips(&info->value->u.q_mips, cpu);
+> +            break;
+> +        case SYS_EMU_TARGET_MIPSEL:
+> +            cpustate_to_cpuinfo_mips(&info->value->u.mipsel, cpu);
+> +            break;
+> +        case SYS_EMU_TARGET_MIPS64:
+> +            cpustate_to_cpuinfo_mips(&info->value->u.mips64, cpu);
+> +            break;
+> +        case SYS_EMU_TARGET_MIPS64EL:
+> +            cpustate_to_cpuinfo_mips(&info->value->u.mips64el, cpu);
+> +            break;
+> +
+> +        case SYS_EMU_TARGET_TRICORE:
+> +            cpustate_to_cpuinfo_tricore(&info->value->u.tricore, cpu);
+> +            break;
+> +
+> +        case SYS_EMU_TARGET_S390X:
+> +            cpustate_to_cpuinfo_s390(&info->value->u.s390x, cpu);
+> +            break;
+> +
+> +        case SYS_EMU_TARGET_RISCV32:
+> +            cpustate_to_cpuinfo_riscv(&info->value->u.riscv32, cpu);
+> +            break;
+> +        case SYS_EMU_TARGET_RISCV64:
+> +            cpustate_to_cpuinfo_riscv(&info->value->u.riscv64, cpu);
+> +            break;
+> +
+> +        default:
+> +            /* do nothing for @CpuInfoOther */
+> +            break;
+> +        }
+> +
+>          info->value->has_props = !!mc->cpu_index_to_instance_props;
+>          if (info->value->has_props) {
+>              CpuInstanceProperties *props;
+>              props = g_malloc0(sizeof(*props));
+>              *props = mc->cpu_index_to_instance_props(ms, cpu->cpu_index);
+>              info->value->props = props;
+>          }
+>  
+>          /* XXX: waiting for the qapi to support GSList */
+>          if (!cur_item) {
+>              head = cur_item = info;
+> @@ -2188,64 +2335,50 @@ CpuInfoList *qmp_query_cpus(Error **errp)
+>  }
+>  
+>  /*
+>   * fast means: we NEVER interrupt vCPU threads to retrieve
+>   * information from KVM.
+>   */
+>  CpuInfoFastList *qmp_query_cpus_fast(Error **errp)
+>  {
+>      MachineState *ms = MACHINE(qdev_get_machine());
+>      MachineClass *mc = MACHINE_GET_CLASS(ms);
+>      CpuInfoFastList *head = NULL, *cur_item = NULL;
+> +    SysEmuTarget target = qapi_enum_parse(&SysEmuTarget_lookup, TARGET_NAME,
+> +                                          -1, &error_abort);
+>      CPUState *cpu;
+> -#if defined(TARGET_S390X)
+> -    S390CPU *s390_cpu;
+> -    CPUS390XState *env;
+> -#endif
+>  
+>      CPU_FOREACH(cpu) {
+>          CpuInfoFastList *info = g_malloc0(sizeof(*info));
+>          info->value = g_malloc0(sizeof(*info->value));
+>  
+>          info->value->cpu_index = cpu->cpu_index;
+>          info->value->qom_path = object_get_canonical_path(OBJECT(cpu));
+>          info->value->thread_id = cpu->thread_id;
+>  
+>          info->value->has_props = !!mc->cpu_index_to_instance_props;
+>          if (info->value->has_props) {
+>              CpuInstanceProperties *props;
+>              props = g_malloc0(sizeof(*props));
+>              *props = mc->cpu_index_to_instance_props(ms, cpu->cpu_index);
+>              info->value->props = props;
+>          }
+>  
+> -#if defined(TARGET_I386)
+> -        info->value->arch = CPU_INFO_ARCH_X86;
+> -#elif defined(TARGET_PPC)
+> -        info->value->arch = CPU_INFO_ARCH_PPC;
+> -#elif defined(TARGET_SPARC)
+> -        info->value->arch = CPU_INFO_ARCH_SPARC;
+> -#elif defined(TARGET_MIPS)
+> -        info->value->arch = CPU_INFO_ARCH_MIPS;
+> -#elif defined(TARGET_TRICORE)
+> -        info->value->arch = CPU_INFO_ARCH_TRICORE;
+> -#elif defined(TARGET_S390X)
+> -        s390_cpu = S390_CPU(cpu);
+> -        env = &s390_cpu->env;
+> -        info->value->arch = CPU_INFO_ARCH_S390;
+> -        info->value->u.s390.cpu_state = env->cpu_state;
+> -#elif defined(TARGET_RISCV)
+> -        info->value->arch = CPU_INFO_ARCH_RISCV;
+> -#else
+> -        info->value->arch = CPU_INFO_ARCH_OTHER;
+> -#endif
+> +        info->value->arch = sysemu_target_to_cpuinfo_arch(target);
+> +        info->value->target = target;
+> +        if (target == SYS_EMU_TARGET_S390X) {
+> +            cpustate_to_cpuinfo_s390(&info->value->u.s390x, cpu);
+> +        } else {
+> +            /* do nothing for @CpuInfoOther */
+> +        }
+> +
+>          if (!cur_item) {
+>              head = cur_item = info;
+>          } else {
+>              cur_item->next = info;
+>              cur_item = info;
+>          }
+>      }
+>  
+>      return head;
+>  }
