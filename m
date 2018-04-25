@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50393)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fBEAE-0007vg-Gw
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 02:44:27 -0400
+	(envelope-from <ybettan@redhat.com>) id 1fBEBb-0000LL-28
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 02:45:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fBEAA-0001Qp-St
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 02:44:26 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180424214550.32549-1-lersek@redhat.com>
-	<20180424214550.32549-3-lersek@redhat.com>
-Date: Wed, 25 Apr 2018 08:44:15 +0200
-In-Reply-To: <20180424214550.32549-3-lersek@redhat.com> (Laszlo Ersek's
-	message of "Tue, 24 Apr 2018 23:45:46 +0200")
-Message-ID: <87muxraips.fsf@dusky.pond.sub.org>
+	(envelope-from <ybettan@redhat.com>) id 1fBEBW-00025z-4p
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 02:45:51 -0400
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:34814)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ybettan@redhat.com>) id 1fBEBV-00025O-U8
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 02:45:46 -0400
+Received: by mail-wm0-f65.google.com with SMTP id w2so3292405wmw.1
+	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 23:45:45 -0700 (PDT)
+Received: from localhost.localdomain ([89.237.106.194])
+	by smtp.gmail.com with ESMTPSA id
+	s9sm10168290edc.85.2018.04.24.23.45.42 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 24 Apr 2018 23:45:43 -0700 (PDT)
+References: <20180419212727.26095-1-f4bug@amsat.org>
+	<20180419212727.26095-4-f4bug@amsat.org>
+From: Yoni Bettan <ybettan@redhat.com>
+Message-ID: <1cd8d331-70bf-0807-8609-7b497053b58f@redhat.com>
+Date: Wed, 25 Apr 2018 09:45:41 +0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/6] qapi: handle the riscv CpuInfoArch in
- query-cpus-fast
+In-Reply-To: <20180419212727.26095-4-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v3 3/4] qdev: Simplify the
+ SysBusDeviceClass::init path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,122 +36,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-stable@nongnu.org, Palmer Dabbelt <palmer@sifive.com>, Laurent Vivier <laurent@vivier.eu>, Michael Clark <mjc@sifive.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Luiz Capitulino <lcapitulino@redhat.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
 
-Laszlo Ersek <lersek@redhat.com> writes:
 
-> Commit 25fa194b7b11 added the @riscv enum constant to @CpuInfoArch (used
-> in both @CpuInfo and @CpuInfoFast -- the return types of the @query-cpus
-> and @query-cpus-fast commands, respectively), and assigned, in both return
-> structures, the @CpuInfoRISCV sub-structure to the new enum value.
+
+On 04/20/2018 12:27 AM, Philippe Mathieu-Daudé wrote:
+> The SysBusDevice is the last DeviceClass::init user.
 >
-> However, qmp_query_cpus_fast() would not populate either the @arch field
-> or the @CpuInfoRISCV sub-structure, when TARGET_RISCV was defined; only
-> qmp_query_cpus() would.
+> Instead of using
+>    SysBusDeviceClass::realize
+>     -> DeviceClass::realize
+>         -> DeviceClass::init
+>             -> sysbus_device_init
+>                -> SysBusDeviceClass::init
 >
-> In theory, there are two ways to fix this:
+> Simplify the path by directly calling SysBusDeviceClass::init
+> in SysBusDeviceClass::realize:
 >
-> (a) Fill in both the @arch field and the @CpuInfoRISCV sub-structure in
->     qmp_query_cpus_fast(), by copying the logic from qmp_query_cpus().
+>    SysBusDeviceClass::realize
+>     -> SysBusDeviceClass::init
 >
-> (b) Assign @CpuInfoOther to the @riscv enum constant in @CpuInfoFast, and
->     populate only the @arch field in qmp_query_cpus_fast().
+> Finally, remove the DeviceClass::init, there are no more users.
 >
-> Approach (b) seems more robust, because:
->
-> - clearly there has never been an attempt to get actual RISV CPU state
->   from qmp_query_cpus_fast(), so its lack of RISCV support is not actually
->   a problem,
->
-> - getting CPU state without interrupting KVM looks like an exceptional
->   thing to do (only S390X does it currently).
->
-> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Cc: Eric Blake <eblake@redhat.com>
-> Cc: Laurent Vivier <laurent@vivier.eu>
-> Cc: Markus Armbruster <armbru@redhat.com>
-> Cc: Michael Clark <mjc@sifive.com>
-> Cc: Palmer Dabbelt <palmer@sifive.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Riku Voipio <riku.voipio@iki.fi>
-> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> Cc: qemu-stable@nongnu.org
-> Fixes: 25fa194b7b11901561532e435beb83d046899f7a
-> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
+>   include/hw/qdev-core.h |  2 --
+>   hw/core/qdev.c         | 14 --------------
+>   hw/core/sysbus.c       | 15 ++++++++++-----
+>   3 files changed, 10 insertions(+), 21 deletions(-)
 >
-> Notes:
->     PATCHv1:
->     
->     - new patch
->
->  qapi/misc.json | 2 +-
->  cpus.c         | 2 ++
->  2 files changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/qapi/misc.json b/qapi/misc.json
-> index 5636f4a14997..104d013adba6 100644
-> --- a/qapi/misc.json
-> +++ b/qapi/misc.json
-> @@ -565,23 +565,23 @@
->  { 'union': 'CpuInfoFast',
->    'base': {'cpu-index': 'int', 'qom-path': 'str',
->             'thread-id': 'int', '*props': 'CpuInstanceProperties',
->             'arch': 'CpuInfoArch' },
->    'discriminator': 'arch',
->    'data': { 'x86': 'CpuInfoOther',
->              'sparc': 'CpuInfoOther',
->              'ppc': 'CpuInfoOther',
->              'mips': 'CpuInfoOther',
->              'tricore': 'CpuInfoOther',
->              's390': 'CpuInfoS390',
-> -            'riscv': 'CpuInfoRISCV',
-> +            'riscv': 'CpuInfoOther',
->              'other': 'CpuInfoOther' } }
+> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+> index 9453588160..6f60748043 100644
+> --- a/include/hw/qdev-core.h
+> +++ b/include/hw/qdev-core.h
+> @@ -29,7 +29,6 @@ typedef enum DeviceCategory {
+>       DEVICE_CATEGORY_MAX
+>   } DeviceCategory;
+>   
+> -typedef int (*qdev_initfn)(DeviceState *dev);
+>   typedef int (*qdev_event)(DeviceState *dev);
+>   typedef void (*DeviceRealize)(DeviceState *dev, Error **errp);
+>   typedef void (*DeviceUnrealize)(DeviceState *dev, Error **errp);
+> @@ -124,7 +123,6 @@ typedef struct DeviceClass {
+>       const struct VMStateDescription *vmsd;
+>   
+>       /* Private to qdev / bus.  */
+> -    qdev_initfn init; /* TODO remove, once users are converted to realize */
+>       qdev_event exit; /* TODO remove, once users are converted to unrealize */
+>       const char *bus_type;
+>   } DeviceClass;
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index f6f92473b8..4153b733c8 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -208,19 +208,6 @@ void device_listener_unregister(DeviceListener *listener)
+>       QTAILQ_REMOVE(&device_listeners, listener, link);
+>   }
+>   
+> -static void device_realize(DeviceState *dev, Error **errp)
+> -{
+> -    DeviceClass *dc = DEVICE_GET_CLASS(dev);
+> -
+> -    if (dc->init) {
+> -        int rc = dc->init(dev);
+> -        if (rc < 0) {
+> -            error_setg(errp, "Device initialization failed.");
+> -            return;
+> -        }
+> -    }
+> -}
+> -
+>   static void device_unrealize(DeviceState *dev, Error **errp)
+>   {
+>       DeviceClass *dc = DEVICE_GET_CLASS(dev);
+> @@ -1065,7 +1052,6 @@ static void device_class_init(ObjectClass *class, void *data)
+>       DeviceClass *dc = DEVICE_CLASS(class);
+>   
+>       class->unparent = device_unparent;
+> -    dc->realize = device_realize;
+>       dc->unrealize = device_unrealize;
+>   
+>       /* by default all devices were considered as hotpluggable,
+> diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
+> index 5d0887f499..11f6d14b84 100644
+> --- a/hw/core/sysbus.c
+> +++ b/hw/core/sysbus.c
+> @@ -18,6 +18,7 @@
+>    */
+>   
+>   #include "qemu/osdep.h"
+> +#include "qapi/error.h"
+>   #include "hw/sysbus.h"
+>   #include "monitor/monitor.h"
+>   #include "exec/address-spaces.h"
+> @@ -200,15 +201,19 @@ void sysbus_init_ioports(SysBusDevice *dev, uint32_t ioport, uint32_t size)
+>       }
+>   }
+>   
+> -static int sysbus_device_init(DeviceState *dev)
+> +static void sysbus_realize(DeviceState *dev, Error **errp)
+>   {
+>       SysBusDevice *sd = SYS_BUS_DEVICE(dev);
+>       SysBusDeviceClass *sbc = SYS_BUS_DEVICE_GET_CLASS(sd);
+>   
+> -    if (!sbc->init) {
+> -        return 0;
 
-Why do CpuInfoFast's variants match CpuInfo's for s390, but not the
-others?  Your commit message has an educated guess: "looks like an
-exceptional thing to do (only S390X does it currently)".  But why guess
-when we can ask authors of commit ce74ee3dea6?  Luiz and Victor, please
-advise.
+Hello Philippe, is the purpose of this part to enable incremental 
+conversion init->realize
+to SysBusDevices ?!
 
->  ##
->  # @query-cpus-fast:
->  #
->  # Returns information about all virtual CPUs. This command does not
->  # incur a performance penalty and should be used in production
->  # instead of query-cpus.
->  #
->  # Returns: list of @CpuInfoFast
->  #
-> diff --git a/cpus.c b/cpus.c
-> index 1a9a2edee1f2..60563a6d54ec 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -2225,22 +2225,24 @@ CpuInfoFastList *qmp_query_cpus_fast(Error **errp)
->  #elif defined(TARGET_SPARC)
->          info->value->arch = CPU_INFO_ARCH_SPARC;
->  #elif defined(TARGET_MIPS)
->          info->value->arch = CPU_INFO_ARCH_MIPS;
->  #elif defined(TARGET_TRICORE)
->          info->value->arch = CPU_INFO_ARCH_TRICORE;
->  #elif defined(TARGET_S390X)
->          s390_cpu = S390_CPU(cpu);
->          env = &s390_cpu->env;
->          info->value->arch = CPU_INFO_ARCH_S390;
->          info->value->u.s390.cpu_state = env->cpu_state;
-> +#elif defined(TARGET_RISCV)
-> +        info->value->arch = CPU_INFO_ARCH_RISCV;
->  #else
->          info->value->arch = CPU_INFO_ARCH_OTHER;
->  #endif
->          if (!cur_item) {
->              head = cur_item = info;
->          } else {
->              cur_item->next = info;
->              cur_item = info;
->          }
->      }
+Thanks,
+Yoni
+> +    /* TODO remove, once users are converted to realize */
+> +    if (sbc->init) {
+> +        int rc = sbc->init(sd);
+> +        if (rc < 0) {
+> +            error_setg(errp, "Device initialization failed.");
+> +            return;
+> +        }
+>       }
+> -    return sbc->init(sd);
+>   }
+>   
+>   DeviceState *sysbus_create_varargs(const char *name,
+> @@ -324,7 +329,7 @@ MemoryRegion *sysbus_address_space(SysBusDevice *dev)
+>   static void sysbus_device_class_init(ObjectClass *klass, void *data)
+>   {
+>       DeviceClass *k = DEVICE_CLASS(klass);
+> -    k->init = sysbus_device_init;
+> +    k->realize = sysbus_realize;
+>       k->bus_type = TYPE_SYSTEM_BUS;
+>       /*
+>        * device_add plugs devices into a suitable bus.  For "real" buses,
