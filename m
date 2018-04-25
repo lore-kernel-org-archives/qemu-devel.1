@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fBMQb-0006mj-Tx
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:33:55 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fBMQj-0006sH-Ay
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:34:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fBMQY-0004eU-MO
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:33:53 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:34477)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fBMQY-0004c7-EL
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:33:50 -0400
-Received: by mail-wr0-x244.google.com with SMTP id p18-v6so34571770wrm.1
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 08:33:50 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed, 25 Apr 2018 16:33:43 +0100
-Message-Id: <20180425153343.24023-1-alex.bennee@linaro.org>
+	(envelope-from <no-reply@patchew.org>) id 1fBMQg-0004t3-22
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:34:01 -0400
+Resent-Message-Id: <E1fBMQg-0004t3-22@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21008)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fBMQf-0004qZ-Q5
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:33:58 -0400
+In-Reply-To: <1524670052-28373-1-git-send-email-minyard@acm.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152467041860.2283.5349283769730551502@71c20359a636>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH] hw/core: expand description of null-machine
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 25 Apr 2018 08:33:39 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] ipmi: Fix vmstate transfer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,35 +28,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: minyard@acm.org
+Cc: famz@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org
 
-People following old instructions for QEMU get the message "No machine
-specified, and there is no default" and run -machine help to pick a
-new machine. Lay people might consider the null-machine to be such a
-basic starting point but they won't get far. This leads to confusion,
-see https://bugs.launchpad.net/qemu/+bug/1766896 as an example.
-
-I'm open to better words - I figured "THIS PROBABLY ISN'T WHAT YOU
-WANT" seemed less helpful though.
-
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- hw/core/null-machine.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
-index cde4d3eb57..72f0815045 100644
---- a/hw/core/null-machine.c
-+++ b/hw/core/null-machine.c
-@@ -50,7 +50,7 @@ static void machine_none_init(MachineState *mch)
- 
- static void machine_none_machine_init(MachineClass *mc)
- {
--    mc->desc = "empty machine";
-+    mc->desc = "empty machine (for probing/QMP)";
-     mc->init = machine_none_init;
-     mc->max_cpus = 1;
-     mc->default_ram_size = 0;
--- 
-2.17.0
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MjQ2NzAwNTItMjgzNzMtMS1naXQtc2VuZC1lbWFpbC1taW55YXJkQGFjbS5v
+cmcKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MyAwLzNdIGlwbWk6IEZpeCB2bXN0YXRl
+IHRyYW5zZmVyCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJh
+c2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9
+MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9j
+YWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhp
+c3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4u
+KSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90
+YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cg
+JGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07
+IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkp
+CmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
+Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHVi
+LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRj
+aGV3LzE1MjQ2NzAwNTItMjgzNzMtMS1naXQtc2VuZC1lbWFpbC1taW55YXJkQGFjbS5vcmcgLT4g
+cGF0Y2hldy8xNTI0NjcwMDUyLTI4MzczLTEtZ2l0LXNlbmQtZW1haWwtbWlueWFyZEBhY20ub3Jn
+CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxODA0MjAxNDUyNDkuMzI0MzUt
+MS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE4MDQyMDE0NTI0OS4zMjQz
+NS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBw
+YXRjaGV3LzIwMTgwNDIzMjIzMzM3LjgyMzY2LTEtZWJsYWtlQHJlZGhhdC5jb20gLT4gcGF0Y2hl
+dy8yMDE4MDQyMzIyMzMzNy44MjM2Ni0xLWVibGFrZUByZWRoYXQuY29tCkF1dG8gcGFja2luZyB0
+aGUgcmVwb3NpdG9yeSBpbiBiYWNrZ3JvdW5kIGZvciBvcHRpbXVtIHBlcmZvcm1hbmNlLgpTZWUg
+ImdpdCBoZWxwIGdjIiBmb3IgbWFudWFsIGhvdXNla2VlcGluZy4KU3dpdGNoZWQgdG8gYSBuZXcg
+YnJhbmNoICd0ZXN0Jwo3ODI4NTkwOTBjIGlwbWk6IFVzZSBwcm9wZXIgc3RydWN0IHJlZmVyZW5j
+ZSBmb3IgQlQgdm1zdGF0ZQo0MzI0ZmFlOGMzIGlwbWk6IFVzZSBwcm9wZXIgc3RydWN0IHJlZmVy
+ZW5jZSBmb3IgS0NTIHZtc3RhdGUKYTcyNDYyYjE3NiB2bXN0YXRlOiBBZGQgYSBWU1RSVUNUIHR5
+cGUKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMzogdm1zdGF0ZTogQWRk
+IGEgVlNUUlVDVCB0eXBlLi4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNjc6IEZJ
+TEU6IGluY2x1ZGUvbWlncmF0aW9uL3Ztc3RhdGUuaDo0MjM6CisjZGVmaW5lIFZNU1RBVEVfVlNU
+UlVDVF9URVNUKF9maWVsZCwgX3N0YXRlLCBfdGVzdCwgX3ZlcnNpb24sIF92bXNkLCBfdHlwZSwg
+X3N0cnVjdF92ZXJzaW9uKSB7IFwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM4
+ODogRklMRTogaW5jbHVkZS9taWdyYXRpb24vdm1zdGF0ZS5oOjc1NDoKKyNkZWZpbmUgVk1TVEFU
+RV9WU1RSVUNUX1YoX2ZpZWxkLCBfc3RhdGUsIF92ZXJzaW9uLCBfdm1zZCwgX3R5cGUsIF9zdHJ1
+Y3RfdmVyc2lvbikgXAoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNDAgbGluZXMgY2hl
+Y2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
+bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
+IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFU
+Q0ggMi8zOiBpcG1pOiBVc2UgcHJvcGVyIHN0cnVjdCByZWZlcmVuY2UgZm9yIEtDUyB2bXN0YXRl
+Li4uCkNoZWNraW5nIFBBVENIIDMvMzogaXBtaTogVXNlIHByb3BlciBzdHJ1Y3QgcmVmZXJlbmNl
+IGZvciBCVCB2bXN0YXRlLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
+ZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
+Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
+cGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
