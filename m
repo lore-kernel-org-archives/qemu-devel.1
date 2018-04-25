@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fBKLQ-0001HF-Fo
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:20:25 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fBKMB-0001qd-G3
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:21:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fBKLN-0007WB-7U
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:20:24 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37422 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1fBKM8-0007sp-C4
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:21:11 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47890 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fBKLM-0007W3-O3
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:20:20 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5E59B406F88F
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 13:20:20 +0000 (UTC)
-References: <20180424214550.32549-1-lersek@redhat.com>
-	<20180424214550.32549-6-lersek@redhat.com>
-	<877eovahoq.fsf@dusky.pond.sub.org>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <5ffb031a-554a-81c1-b374-eb82f410bf83@redhat.com>
-Date: Wed, 25 Apr 2018 15:20:13 +0200
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fBKM8-0007sA-6C
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:21:08 -0400
+References: <1524627918-9661-1-git-send-email-thuth@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d3c98bff-4e9a-3190-6ee1-2eff27448225@redhat.com>
+Date: Wed, 25 Apr 2018 15:20:57 +0200
 MIME-Version: 1.0
-In-Reply-To: <877eovahoq.fsf@dusky.pond.sub.org>
+In-Reply-To: <1524627918-9661-1-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 5/6] qapi: extract CpuInfoCommon to
- mitigate schema duplication
+Subject: Re: [Qemu-devel] [qemu-web PATCH] Add a blog post about the release
+ of version 2.12.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,169 +28,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On 04/25/18 09:06, Markus Armbruster wrote:
-> Laszlo Ersek <lersek@redhat.com> writes:
+On 25/04/2018 05:45, Thomas Huth wrote:
+> Based on the contents of Michael Roth's announce e-mail for 2.12.0.
 > 
->> @CpuInfo and @CpuInfoFast duplicate the following four fields: @qom-path,
->> @thread-id, @props and @arch. From these, extract the first three to a
->> common structure called @CpuInfoCommon. (More on @arch later.)
->>
->> Introduce two new mid-layer structures, @CpuInfoBase and @CpuInfoFastBase,
->> to soak up the union base struct fields on top of @CpuInfoCommon that are
->> specific to @query-cpus and @query-cpus-fast, respectively.
-
-[[
-
->> This is
->> necessary because the base struct spec in union definitions does not let
->> us mix named fields with a recursive base struct. (In other words, we
->> couldn't directly use @CpuInfoCommon *plus* some other fields within
->> @CpuInfo and @CpuInfoFast as base struct).
-
-]]
-
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  _posts/2018-04-25-qemu-2-12-0.md | 58 ++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 58 insertions(+)
+>  create mode 100644 _posts/2018-04-25-qemu-2-12-0.md
 > 
-> Yes, you can either specify a base type or inline common members.  If
-> "union's common members = base type plus additional inline members"
-> turns out to be desirable in more places, we can try to add the feature.
-> I'm not asking *you* to find out, let alone try :)
-
-[[
-
->> @arch cannot be hoisted higher than to @CpuInfoBase and @CpuInfoFastBase
->> because the union descriminator is only accepted from a direct base
->> struct, not from an indirect one.
-
-]]
-
-> That's a bit of a blemish.  Again, I'm not asking you to do anything
-> about it.
-
-If these characteristics of the generator are operating knowledge for
-QAPI developers, I can trim the commit message -- those traits don't
-bother me at all, I just felt that I needed to justify the code.
-
-IOW, should I drop:
-- the sentences marked with [[ ]] above,
-- and/or the "Notes:" on @arch in the schema itself (which are updated
-  to @target, in the next patch)
-?
-
-[snip]
-
->> @@ -512,70 +541,77 @@
->>  #
->>  # Since: 0.14.0
->>  #
->>  # Example:
->>  #
->>  # -> { "execute": "query-cpus" }
->>  # <- { "return": [
->>  #          {
->>  #             "CPU":0,
->>  #             "current":true,
->>  #             "halted":false,
->> -#             "qom_path":"/machine/unattached/device[0]",
->> +#             "qom-path":"/machine/unattached/device[0]",
->>  #             "arch":"x86",
->>  #             "pc":3227107138,
->> -#             "thread_id":3134
->> +#             "thread-id":3134
->>  #          },
->>  #          {
->>  #             "CPU":1,
->>  #             "current":false,
->>  #             "halted":true,
->> -#             "qom_path":"/machine/unattached/device[2]",
->> +#             "qom-path":"/machine/unattached/device[2]",
->>  #             "arch":"x86",
->>  #             "pc":7108165,
->> -#             "thread_id":3135
->> +#             "thread-id":3135
->>  #          }
->>  #       ]
->>  #    }
+> diff --git a/_posts/2018-04-25-qemu-2-12-0.md b/_posts/2018-04-25-qemu-2-12-0.md
+> new file mode 100644
+> index 0000000..fdc4aea
+> --- /dev/null
+> +++ b/_posts/2018-04-25-qemu-2-12-0.md
+> @@ -0,0 +1,58 @@
+> +---
+> +layout: post
+> +title:  "QEMU version 2.12.0 released"
+> +date:   2018-04-25 05:30:00 +0200
+> +categories: [releases, 'qemu 2.12']
+> +---
+> +We'd like to announce the availability of the QEMU 2.12.0 release.
+> +This release contains 2700+ commits from 204 authors.
+> +
+> +You can grab the tarball from our 
+> +[download page](https://www.qemu.org/download/#source).
+> +The full list of changes are available
+> +[in the Wiki](https://wiki.qemu.org/ChangeLog/2.12).
+> +
+> +Highlights include:
+> +
+> + * Spectre/Meltdown mitigation support for x86/pseries/s390 guests. For
+> +   more details see:
+> +     https://www.qemu.org/2018/02/14/qemu-2-11-1-and-spectre-update/
+> + * Numerous block support improvements, including support for directly
+> +   interacting with userspace NVMe driver, and general improvements to
+> +   NBD server/client including more efficient reads of sparse files
+> + * Networking support for VMWare paravirtualized RDMA device (RDMA
+> +   HCA and Soft-RoCE supported), CAN bus support via Linux SocketCAN and
+> +   SJA1000-based PCI interfaces, and general improvements for dual-stack
+> +   IPv4/IPv6 environments
+> + * GUI security/bug fixes, dmabufs support for GTK/Spice.
+> + * Better IPMI support for Platform Events and SEL logging in internal
+> +   BMC emulation
+> + * SMBIOS support for "OEM Strings", which can be used for automating
+> +   guest image activation without relying on network-based querying
+> + * Disk cache information via virtio-balloon
+> + * ARM: AArch64 new instructions for FCMA/RDM and SIMD/FP16/crypto/complex
+> +   number extensions
+> + * ARM: initial support for Raspberry Pi 3 machine type
+> + * ARM: Corex-M33/Armv8-M emulation via new mps2-an505 board and many
+> +   other improvements for M profile emulation
+> + * HPPA: support for full machine emulation (hppa-softmmu)
+> + * PowerPC: PPC4xx emulation improvements, including I2C bus support
+> + * PowerPC: new Sam460ex machine type
+> + * PowerPC: significant TCG performance improvements
+> + * PowerPC: pseries: support for Spectre/Meltdown mitigations
+> + * RISC-V: new RISC-V target via "spike_v1.9.1", "spike_v1.10", and "virt"
+> +   machine types
+> + * s390: non-virtual devices no longer require dedicated channel subsystem
+> +   and guest support for multiple CSSs
+> + * s390: general PCI improvements, MSI-X support for virtio-pci devices
+> + * s390: improved TCG emulation support
+> + * s390: KVM support for systems larger than 7.999TB
+> + * SPARC: sun4u power device emulation
+> + * SPARC: improved trace-event support and emulation/debug fixes
+> + * Tricore: new instruction variants for JEQ/JNE and 64-bit MOV
+> + * x86: Intel IOMMU support for 48-bit addresses
+> + * Xtensa: backend now uses libisa for instruction decoding/disassebly
+> + * Xtensa: multi-threaded TCG support and noMMU configuration variants
+> + * and lots more...
+> +
+> +Thank you to everyone involved!
 > 
-> Compatibility break, whoops!
 
-But, at least, I updated the example! :)
+Go ahead and push it!  Do you have time to write a blog post about -net,
+-nic and all that?
 
-> 
-> CpuInfo and CpuInfoFast do share qom-path and thread-id *values*, but
-> the keys differ in '_' vs. '-'.  Sad.
-> 
-> What now?  Is there enough common stuff left to justify the refactoring?
+Thanks,
 
-While working on the schema changes, I saw the '_' vs. '-' difference
-immediately, but I thought these two characters were treated
-equivalently by all QAPI clients.
-
-Later I found (in the test suite) that this wasn't the case, so I
-thought my memories must have applied to libvirtd only. (Because,
-libvirt does map "_" to "-", right?) Anyway, I figured the best way to
-ask was to post the patch like this :)
-
-
-So, if I drop @qom-path and @thread-id from CpuInfoCommon, then only
-@props remains subject to hoisting, in this patch. In the next patch,
-@arch joins @props.
-
-I believe the refactoring is still worth doing, because otherwise, after
-the addition of @target, we'd end up with:
-
-{ 'union' : 'CpuInfo',
-  'base'  : { 'CPU'       : 'int',
-              'current'   : 'bool',
-              'halted'    : 'bool',
-              'qom_path'  : 'str',
-              'thread_id' : 'int',
-              '*props'    : 'CpuInstanceProperties',
-              'arch'      : 'CpuInfoArch',
-              'target'    : 'SysEmuTarget' },
-...
-
-{ 'union' : 'CpuInfoFast',
-  'base'  : { 'cpu-index' : 'int',
-              'qom-path'  : 'str',
-              'thread-id' : 'int',
-              '*props'    : 'CpuInstanceProperties',
-              'arch'      : 'CpuInfoArch',
-              'target'    : 'SysEmuTarget' },
-...
-
-and people would ask themselves ever after, "are there some common
-fields in there that we could extract ... hmmm, @props and @arch, okay,
-maybe, maybe not, grey area". Let's do it now and save them the thinking.
-
-[snip]
-
->> diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
->> index 25bce78352b8..5bfd2ef1dd3b 100644
->> --- a/qapi/qapi-schema.json
->> +++ b/qapi/qapi-schema.json
->> @@ -61,23 +61,23 @@
->>          'query-migrate-cache-size',
->>          'query-tpm-models',
->>          'query-tpm-types',
->>          'ringbuf-read' ],
->>      'name-case-whitelist': [
->>          'ACPISlotType',         # DIMM, visible through query-acpi-ospm-status
->>          'CpuInfoMIPS',          # PC, visible through query-cpu
->>          'CpuInfoTricore',       # PC, visible through query-cpu
->>          'QapiErrorClass',       # all members, visible through errors
->>          'UuidInfo',             # UUID, visible through query-uuid
->>          'X86CPURegister32',     # all members, visible indirectly through qom-get
->> -        'q_obj_CpuInfo-base'    # CPU, visible through query-cpu
->> +        'CpuInfoBase'           # CPU, visible through query-cpu
-> 
-> Let's update this to "visible through query-cpus, query-cpus-fast" while
-> there.
-
-Right, I noticed the typo in the preexistent comment too late (and I
-didn't notice the "query-cpus-fast" omission at all).
-
-Thanks!
-Laszlo
+Paolo
