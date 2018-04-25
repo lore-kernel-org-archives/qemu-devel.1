@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39285)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fBKMB-0001qd-G3
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:21:13 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fBKP2-0003PH-UD
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:24:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fBKM8-0007sp-C4
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:21:11 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47890 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fBKM8-0007sA-6C
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:21:08 -0400
-References: <1524627918-9661-1-git-send-email-thuth@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d3c98bff-4e9a-3190-6ee1-2eff27448225@redhat.com>
-Date: Wed, 25 Apr 2018 15:20:57 +0200
+	(envelope-from <imammedo@redhat.com>) id 1fBKOz-0000LG-Pl
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:24:08 -0400
+Date: Wed, 25 Apr 2018 15:23:56 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180425152356.46ee7e04@redhat.com>
+In-Reply-To: <1046685642.22350584.1524635112123.JavaMail.zimbra@redhat.com>
+References: <20180420123456.22196-1-david@redhat.com>
+	<20180420123456.22196-4-david@redhat.com>
+	<20180423141928.7e64b380@redhat.com>
+	<908f1079-385f-24d3-99ad-152ecd6b01d2@redhat.com>
+	<20180424153154.05e79de7@redhat.com>
+	<1046685642.22350584.1524635112123.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1524627918-9661-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-web PATCH] Add a blog post about the release
- of version 2.12.0
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] pc-dimm: factor out address space
+ logic into MemoryDevice code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +28,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-On 25/04/2018 05:45, Thomas Huth wrote:
-> Based on the contents of Michael Roth's announce e-mail for 2.12.0.
+On Wed, 25 Apr 2018 01:45:12 -0400 (EDT)
+Pankaj Gupta <pagupta@redhat.com> wrote:
+
+> >   
+> > > >     
+> > > >> +    /* we will need a new memory slot for kvm and vhost */
+> > > >> +    if (kvm_enabled() && !kvm_has_free_slot(machine)) {
+> > > >> +        error_setg(errp, "hypervisor has no free memory slots left");
+> > > >> +        return;
+> > > >> +    }
+> > > >> +    if (!vhost_has_free_slot()) {
+> > > >> +        error_setg(errp, "a used vhost backend has no free memory slots
+> > > >> left");
+> > > >> +        return;
+> > > >> +    }  
+> > > > move these checks to pre_plug time
+> > > >     
+> > > >> +
+> > > >> +    memory_region_add_subregion(&hpms->mr, addr - hpms->base, mr);  
+> > > > missing vmstate registration?  
+> > > 
+> > > Missed this one: To be called by the caller. Important because e.g. for
+> > > virtio-pmem we don't want this (I assume :) ).  
+> > if pmem isn't on shared storage, then We'd probably want to migrate
+> > it as well, otherwise target would experience data loss.
+> > Anyways, I'd just reat it as normal RAM in migration case  
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  _posts/2018-04-25-qemu-2-12-0.md | 58 ++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 58 insertions(+)
->  create mode 100644 _posts/2018-04-25-qemu-2-12-0.md
+> Main difference between RAM and pmem it acts like combination of RAM and disk.
+> Saying this, in normal use-case size would be 100 GB's - few TB's range. 
+> I am not sure we really want to migrate it for non-shared storage use-case.
+with non shared storage you'd have to migrate it target host but
+with shared storage it might be possible to flush it and use directly
+from target host. That probably won't work right out of box and would
+need some sort of synchronization between src/dst hosts.
+
+The same applies to nv/pc-dimm as well, as backend file easily could be
+on pmem storage as well.
+
+Maybe for now we should migrate everything so it would work in case of
+non shared NVDIMM on host. And then later add migration-less capability
+to all of them.
+
+> One reason why nvdimm added vmstate info could be: still there would be transient
+> writes in memory with fake DAX and there is no way(till now) to flush the guest 
+> writes. But with virtio-pmem we can flush such writes before migration and automatically
+> at destination host with shared disk we will have updated data.
+nvdimm has concept of flush address hint (may be not implemented in qemu yet)
+but it can flush. The only reason I'm buying into virtio-mem idea
+is that would allow async flush queues which would reduce number
+of vmexits.
+
 > 
-> diff --git a/_posts/2018-04-25-qemu-2-12-0.md b/_posts/2018-04-25-qemu-2-12-0.md
-> new file mode 100644
-> index 0000000..fdc4aea
-> --- /dev/null
-> +++ b/_posts/2018-04-25-qemu-2-12-0.md
-> @@ -0,0 +1,58 @@
-> +---
-> +layout: post
-> +title:  "QEMU version 2.12.0 released"
-> +date:   2018-04-25 05:30:00 +0200
-> +categories: [releases, 'qemu 2.12']
-> +---
-> +We'd like to announce the availability of the QEMU 2.12.0 release.
-> +This release contains 2700+ commits from 204 authors.
-> +
-> +You can grab the tarball from our 
-> +[download page](https://www.qemu.org/download/#source).
-> +The full list of changes are available
-> +[in the Wiki](https://wiki.qemu.org/ChangeLog/2.12).
-> +
-> +Highlights include:
-> +
-> + * Spectre/Meltdown mitigation support for x86/pseries/s390 guests. For
-> +   more details see:
-> +     https://www.qemu.org/2018/02/14/qemu-2-11-1-and-spectre-update/
-> + * Numerous block support improvements, including support for directly
-> +   interacting with userspace NVMe driver, and general improvements to
-> +   NBD server/client including more efficient reads of sparse files
-> + * Networking support for VMWare paravirtualized RDMA device (RDMA
-> +   HCA and Soft-RoCE supported), CAN bus support via Linux SocketCAN and
-> +   SJA1000-based PCI interfaces, and general improvements for dual-stack
-> +   IPv4/IPv6 environments
-> + * GUI security/bug fixes, dmabufs support for GTK/Spice.
-> + * Better IPMI support for Platform Events and SEL logging in internal
-> +   BMC emulation
-> + * SMBIOS support for "OEM Strings", which can be used for automating
-> +   guest image activation without relying on network-based querying
-> + * Disk cache information via virtio-balloon
-> + * ARM: AArch64 new instructions for FCMA/RDM and SIMD/FP16/crypto/complex
-> +   number extensions
-> + * ARM: initial support for Raspberry Pi 3 machine type
-> + * ARM: Corex-M33/Armv8-M emulation via new mps2-an505 board and many
-> +   other improvements for M profile emulation
-> + * HPPA: support for full machine emulation (hppa-softmmu)
-> + * PowerPC: PPC4xx emulation improvements, including I2C bus support
-> + * PowerPC: new Sam460ex machine type
-> + * PowerPC: significant TCG performance improvements
-> + * PowerPC: pseries: support for Spectre/Meltdown mitigations
-> + * RISC-V: new RISC-V target via "spike_v1.9.1", "spike_v1.10", and "virt"
-> +   machine types
-> + * s390: non-virtual devices no longer require dedicated channel subsystem
-> +   and guest support for multiple CSSs
-> + * s390: general PCI improvements, MSI-X support for virtio-pci devices
-> + * s390: improved TCG emulation support
-> + * s390: KVM support for systems larger than 7.999TB
-> + * SPARC: sun4u power device emulation
-> + * SPARC: improved trace-event support and emulation/debug fixes
-> + * Tricore: new instruction variants for JEQ/JNE and 64-bit MOV
-> + * x86: Intel IOMMU support for 48-bit addresses
-> + * Xtensa: backend now uses libisa for instruction decoding/disassebly
-> + * Xtensa: multi-threaded TCG support and noMMU configuration variants
-> + * and lots more...
-> +
-> +Thank you to everyone involved!
 > 
-
-Go ahead and push it!  Do you have time to write a blog post about -net,
--nic and all that?
-
-Thanks,
-
-Paolo
+> Thanks,
+> Pankaj  
+> 
+> 
