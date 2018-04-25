@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fBKR2-0004tv-Db
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:26:13 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fBKVZ-0006M5-L9
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:30:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fBKQz-0001sf-Ak
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:26:12 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20180424085240.5798-1-stefanha@redhat.com>
-References: <20180424085240.5798-1-stefanha@redhat.com>
-Date: Wed, 25 Apr 2018 15:26:07 +0200
-Message-ID: <w51zi1rquxc.fsf@maestria.local.igalia.com>
+	(envelope-from <pbonzini@redhat.com>) id 1fBKVW-0004wu-IO
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:30:53 -0400
+References: <20180425131828.15604-1-clg@kaod.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <06ef1590-370a-4f76-f0bf-bfcce81328c1@redhat.com>
+Date: Wed, 25 Apr 2018 15:30:39 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] blockjob: drop
- block_job_pause/resume_all()
+In-Reply-To: <20180425131828.15604-1-clg@kaod.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] cpus: tcg: fix never exiting loop on unplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,19 +23,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, qemu-stable <qemu-stable@nongnu.org>
 
-On Tue 24 Apr 2018 10:52:40 AM CEST, Stefan Hajnoczi wrote:
-> Commit 8119334918e86f45877cfc139192d54f2449a239 ("block: Don't
-> block_job_pause_all() in bdrv_drain_all()") removed the only callers of
-> block_job_pause/resume_all().
->
-> Pausing and resuming now happens in child_job_drained_begin/end() so
-> it's no longer necessary to globally pause/resume jobs.
->
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+On 25/04/2018 15:18, C=C3=A9dric Le Goater wrote:
+> Commit 9b0605f9837b ("cpus: tcg: unregister thread with RCU, fix
+> exiting of loop on unplug") changed the exit condition of the loop in
+> the vCPU thread function but forgot to remove the beginning 'while (1)'
+> statement. The resulting code :
+>=20
+> 	while (1) {
+> 	...
+> 	} while (!cpu->unplug || cpu_can_run(cpu));
+>=20
+> is a sequence of two distinct two while() loops, the first not exiting
+> in case of an unplug event.
+>=20
+> Remove the first while (1) to fix CPU unplug.
+>=20
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+>  cpus.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/cpus.c b/cpus.c
+> index 38eba8bff334..e1d94038fd0d 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -1648,7 +1648,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+>      /* process any pending work */
+>      cpu->exit_request =3D 1;
+> =20
+> -    while (1) {
+> +    do {
+>          if (cpu_can_run(cpu)) {
+>              int r;
+>              qemu_mutex_unlock_iothread();
+>=20
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+Cc: qemu-stable@nongnu.org
 
-Berto
+Queued, thanks.
+
+Paolo
