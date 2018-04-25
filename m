@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fB7ww-0007yC-T4
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 20:06:19 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fB80k-0000lX-MJ
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 20:10:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fB7wu-0002uu-80
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 20:06:18 -0400
-Received: from mail-pf0-x22f.google.com ([2607:f8b0:400e:c00::22f]:33072)
+	(envelope-from <richard.henderson@linaro.org>) id 1fB80h-0004V6-P1
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 20:10:14 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:36466)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fB7wu-0002uk-23
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 20:06:16 -0400
-Received: by mail-pf0-x22f.google.com with SMTP id f15so13610682pfn.0
-	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 17:06:15 -0700 (PDT)
+	id 1fB80h-0004TC-K8
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 20:10:11 -0400
+Received: by mail-pg0-x242.google.com with SMTP id i6so12028154pgv.3
+	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 17:10:11 -0700 (PDT)
 References: <20180424152405.10304-1-alex.bennee@linaro.org>
-	<20180424152405.10304-3-alex.bennee@linaro.org>
+	<20180424152405.10304-4-alex.bennee@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <1085f22e-7a13-9870-5d80-9004232e8ba6@linaro.org>
-Date: Tue, 24 Apr 2018 14:06:10 -1000
+Message-ID: <dd4e664e-87ed-9c69-f554-9c6496ec9343@linaro.org>
+Date: Tue, 24 Apr 2018 14:10:06 -1000
 MIME-Version: 1.0
-In-Reply-To: <20180424152405.10304-3-alex.bennee@linaro.org>
+In-Reply-To: <20180424152405.10304-4-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 02/46] configure: add test for docker
- availability
+Subject: Re: [Qemu-devel] [PATCH v3 03/46] configure: add support for
+ --cross-cc-FOO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,15 +36,24 @@ To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.
 Cc: qemu-devel@nongnu.org
 
 On 04/24/2018 05:23 AM, Alex Bennée wrote:
-> This tests for a working docker installation without sudo and sets up
-> config-host.mak accordingly. This will be useful from cross compiling
-> things in the future.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  configure | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
+> @@ -675,10 +687,12 @@ case "$cpu" in
+>    i386|i486|i586|i686|i86pc|BePC)
+>      cpu="i386"
+>      supported_cpu="yes"
+> +    cross_cc_i386=gcc
+>    ;;
+>    x86_64|amd64)
+>      cpu="x86_64"
+>      supported_cpu="yes"
+> +    cross_cc_x86_64=gcc
+>    ;;
+>    armv*b|armv*l|arm)
+>      cpu="arm"
 
+Isn't this hunk taken care of in the next patch, where you set these to $cc?
+And if not, surely bare "gcc" isn't correct...
+
+Otherwise,
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
