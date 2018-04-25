@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1fBU84-0004SN-6q
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 19:47:17 -0400
+	(envelope-from <mjc@sifive.com>) id 1fBU89-0004VU-UD
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 19:47:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1fBU83-0004kx-Hy
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 19:47:16 -0400
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:35727)
+	(envelope-from <mjc@sifive.com>) id 1fBU86-0004me-QP
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 19:47:21 -0400
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:44915)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fBU83-0004kf-C2
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 19:47:15 -0400
-Received: by mail-pg0-x244.google.com with SMTP id j11so14456962pgf.2
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 16:47:15 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fBU86-0004mD-KG
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 19:47:18 -0400
+Received: by mail-pf0-x241.google.com with SMTP id q22so1642890pff.11
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 16:47:18 -0700 (PDT)
 From: Michael Clark <mjc@sifive.com>
-Date: Thu, 26 Apr 2018 11:45:05 +1200
-Message-Id: <1524699938-6764-3-git-send-email-mjc@sifive.com>
+Date: Thu, 26 Apr 2018 11:45:06 +1200
+Message-Id: <1524699938-6764-4-git-send-email-mjc@sifive.com>
 In-Reply-To: <1524699938-6764-1-git-send-email-mjc@sifive.com>
 References: <1524699938-6764-1-git-send-email-mjc@sifive.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v8 02/35] RISC-V: Make virt board description
- match spike
+Subject: [Qemu-devel] [PATCH v8 03/35] RISC-V: Use ROM base address and size
+ from memmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,8 +32,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@groups.riscv.org, Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>
 
-This makes 'qemu-system-riscv64 -machine help' output more tidy
-and consistent.
+Another case of replacing hard coded constants, this time
+referring to the definition in the virt machine's memmap.
 
 Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
 Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
@@ -41,21 +41,40 @@ Signed-off-by: Michael Clark <mjc@sifive.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/riscv/virt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/riscv/virt.c         | 4 ++--
+ include/hw/riscv/virt.h | 2 --
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index 86a86c9..dc74fd6 100644
+index dc74fd6..ac0106e 100644
 --- a/hw/riscv/virt.c
 +++ b/hw/riscv/virt.c
-@@ -407,7 +407,7 @@ static const TypeInfo riscv_virt_board_device = {
+@@ -341,11 +341,11 @@ static void riscv_virt_board_init(MachineState *machine)
+     };
  
- static void riscv_virt_board_machine_init(MachineClass *mc)
- {
--    mc->desc = "RISC-V VirtIO Board (Privileged spec v1.10)";
-+    mc->desc = "RISC-V VirtIO Board (Privileged ISA v1.10)";
-     mc->init = riscv_virt_board_init;
-     mc->max_cpus = 8; /* hardcoded limit in BBL */
- }
+     /* copy in the reset vector */
+-    copy_le32_to_phys(ROM_BASE, reset_vec, sizeof(reset_vec));
++    copy_le32_to_phys(memmap[VIRT_MROM].base, reset_vec, sizeof(reset_vec));
+ 
+     /* copy in the device tree */
+     qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
+-    cpu_physical_memory_write(ROM_BASE + sizeof(reset_vec),
++    cpu_physical_memory_write(memmap[VIRT_MROM].base + sizeof(reset_vec),
+         s->fdt, s->fdt_size);
+ 
+     /* create PLIC hart topology configuration string */
+diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
+index 2fbe808..655e85d 100644
+--- a/include/hw/riscv/virt.h
++++ b/include/hw/riscv/virt.h
+@@ -23,8 +23,6 @@
+ #define VIRT(obj) \
+     OBJECT_CHECK(RISCVVirtState, (obj), TYPE_RISCV_VIRT_BOARD)
+ 
+-enum { ROM_BASE = 0x1000 };
+-
+ typedef struct {
+     /*< private >*/
+     SysBusDevice parent_obj;
 -- 
 2.7.0
