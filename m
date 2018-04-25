@@ -1,17 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBGQ7-0006X3-J7
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 05:09:03 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fBGSC-0008Kk-2W
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 05:11:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBGQ6-00021l-8X
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 05:08:59 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 25 Apr 2018 11:08:43 +0200
-Message-Id: <1524647323-6449-4-git-send-email-thuth@redhat.com>
-In-Reply-To: <1524647323-6449-1-git-send-email-thuth@redhat.com>
-References: <1524647323-6449-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 3/3] pc-bios/s390-ccw/net: Add support for
- .INS config files
+	(envelope-from <alex.bennee@linaro.org>) id 1fBGS2-0002y8-CT
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 05:11:08 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:44860)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fBGS2-0002xj-5Q
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 05:10:58 -0400
+Received: by mail-wr0-x242.google.com with SMTP id o15-v6so52549293wro.11
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 02:10:58 -0700 (PDT)
+References: <20180424152405.10304-1-alex.bennee@linaro.org>
+	<20180424152405.10304-4-alex.bennee@linaro.org>
+	<dd4e664e-87ed-9c69-f554-9c6496ec9343@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <dd4e664e-87ed-9c69-f554-9c6496ec9343@linaro.org>
+Date: Wed, 25 Apr 2018 10:10:56 +0100
+Message-ID: <87efj3lkgv.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 03/46] configure: add support for
+ --cross-cc-FOO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,159 +32,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Farhan Ali <alifm@linux.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, qemu-devel@nongnu.org
 
-The .INS config files can normally be found on CD-ROM ISO images,
-so by supporting these files, it is now possible to boot directly
-when the TFTP server is set up with the contents of such an CD-ROM
-image.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- pc-bios/s390-ccw/netmain.c | 100 ++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 95 insertions(+), 5 deletions(-)
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
-index 5f28ea0..c10b0ac 100644
---- a/pc-bios/s390-ccw/netmain.c
-+++ b/pc-bios/s390-ccw/netmain.c
-@@ -39,8 +39,12 @@
- 
- extern char _start[];
- 
-+#define KERNEL_ADDR             ((void *)0L)
-+#define KERNEL_MAX_SIZE         ((long)_start)
-+
- char stack[PAGE_SIZE * 8] __attribute__((aligned(PAGE_SIZE)));
- IplParameterBlock iplb __attribute__((aligned(PAGE_SIZE)));
-+static char cfgbuf[2048];
- 
- static SubChannelId net_schid = { .one = 1 };
- static int ip_version = 4;
-@@ -136,9 +140,15 @@ static int tftp_load(filename_ip_t *fnip, void *buffer, int len)
-     rc = tftp(fnip, buffer, len, DEFAULT_TFTP_RETRIES, &tftp_err, 1, 1428,
-               ip_version);
- 
--    if (rc > 0) {
--        printf("  TFTP: Received %s (%d KBytes)\n", fnip->filename,
--               rc / 1024);
-+    if (rc < 0) {
-+        /* Make sure that error messages are put into a new line */
-+        printf("\n  ");
-+    }
-+
-+    if (rc > 1024) {
-+        printf("  TFTP: Received %s (%d KBytes)\n", fnip->filename, rc / 1024);
-+    } else if (rc > 0) {
-+        printf("  TFTP: Received %s (%d Bytes)\n", fnip->filename, rc);
-     } else if (rc == -1) {
-         puts("unknown TFTP error");
-     } else if (rc == -2) {
-@@ -275,6 +285,83 @@ static void net_release(filename_ip_t *fn_ip)
-     }
- }
- 
-+/**
-+ * Load via information from a .INS file (which can be found on CD-ROMs
-+ * for example)
-+ */
-+static int handle_ins_cfg(filename_ip_t *fn_ip, char *cfg, int cfgsize)
-+{
-+    char *ptr;
-+    int rc = -1, llen;
-+    void *destaddr;
-+    char *insbuf = cfg;
-+
-+    ptr = strchr(insbuf, '\n');
-+    if (!ptr) {
-+        puts("Does not seem to be a valid .INS file");
-+        return -1;
-+    }
-+
-+    *ptr = 0;
-+    printf("\nParsing .INS file:\n %s\n", &insbuf[2]);
-+
-+    insbuf = ptr + 1;
-+    while (*insbuf && insbuf < cfg + cfgsize) {
-+        ptr = strchr(insbuf, '\n');
-+        if (ptr) {
-+            *ptr = 0;
-+        }
-+        llen = strlen(insbuf);
-+        if (!llen) {
-+            insbuf = ptr + 1;
-+            continue;
-+        }
-+        ptr = strchr(insbuf, ' ');
-+        if (!ptr) {
-+            puts("Missing space separator in .INS file");
-+            return -1;
-+        }
-+        *ptr = 0;
-+        strncpy((char *)fn_ip->filename, insbuf, sizeof(fn_ip->filename));
-+        destaddr = (char *)atol(ptr + 1);
-+        rc = tftp_load(fn_ip, destaddr, (long)_start - (long)destaddr);
-+        if (rc <= 0) {
-+            break;
-+        }
-+        insbuf += llen + 1;
-+    }
-+
-+    return rc;
-+}
-+
-+static int net_try_bootfile_load(filename_ip_t *fn_ip)
-+{
-+    int rc;
-+    void *loadaddr = (void *)0x2000;  /* Load right after the low-core */
-+
-+    rc = tftp_load(fn_ip, loadaddr, KERNEL_MAX_SIZE - (long)loadaddr);
-+    if (rc < 0) {
-+        return rc;
-+    } else if (rc < 8) {
-+        printf("'%s' is too small (%i bytes only).\n", fn_ip->filename, rc);
-+        return -1;
-+    }
-+
-+    /* Check whether it is a configuration file instead of a kernel */
-+    if (rc < sizeof(cfgbuf) - 1) {
-+        memcpy(cfgbuf, loadaddr, rc);
-+        cfgbuf[rc] = 0;    /* Make sure that it is NUL-terminated */
-+        if (!strncmp("* ", cfgbuf, 2)) {
-+            return handle_ins_cfg(fn_ip, cfgbuf, rc);
-+        }
-+    }
-+
-+    /* Move kernel to right location */
-+    memmove(KERNEL_ADDR, loadaddr, rc);
-+
-+    return rc;
-+}
-+
- void panic(const char *string)
- {
-     sclp_print(string);
-@@ -356,7 +443,7 @@ static void virtio_setup(void)
- void main(void)
- {
-     filename_ip_t fn_ip;
--    int rc;
-+    int rc, fnlen;
- 
-     sclp_setup();
-     sclp_print("Network boot starting...\n");
-@@ -368,7 +455,10 @@ void main(void)
-         panic("Network initialization failed. Halting.\n");
-     }
- 
--    rc = tftp_load(&fn_ip, NULL, (long)_start);
-+    fnlen = strlen((char *)fn_ip.filename);
-+    if (fnlen > 0 && fn_ip.filename[fnlen - 1] != '/') {
-+        rc = net_try_bootfile_load(&fn_ip);
-+    }
- 
-     net_release(&fn_ip);
- 
--- 
-1.8.3.1
+> On 04/24/2018 05:23 AM, Alex Benn=C3=A9e wrote:
+>> @@ -675,10 +687,12 @@ case "$cpu" in
+>>    i386|i486|i586|i686|i86pc|BePC)
+>>      cpu=3D"i386"
+>>      supported_cpu=3D"yes"
+>> +    cross_cc_i386=3Dgcc
+>>    ;;
+>>    x86_64|amd64)
+>>      cpu=3D"x86_64"
+>>      supported_cpu=3D"yes"
+>> +    cross_cc_x86_64=3Dgcc
+>>    ;;
+>>    armv*b|armv*l|arm)
+>>      cpu=3D"arm"
+>
+> Isn't this hunk taken care of in the next patch, where you set these to $=
+cc?
+> And if not, surely bare "gcc" isn't correct...
+
+Woops, I'll fix that.
+
+>
+> Otherwise,
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>
+>
+> r~
+
+
+--
+Alex Benn=C3=A9e
