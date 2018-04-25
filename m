@@ -1,34 +1,45 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBMrP-0001XC-6v
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 12:01:39 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1fBMtx-0003Uk-BM
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 12:04:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBMrK-0001l9-9t
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 12:01:35 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56004)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fBMrK-0001ko-3O
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 12:01:30 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fBMrG-0000cB-87
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 16:01:26 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A77C02E80CE
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 16:01:25 +0000 (UTC)
+	(envelope-from <borntraeger@de.ibm.com>) id 1fBMtt-0003L2-8M
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 12:04:13 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30170)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1fBMtt-0003KG-0P
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 12:04:09 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w3PG1N1f016255
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 12:04:07 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2hjut3kkaw-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 12:04:04 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Wed, 25 Apr 2018 17:03:52 +0100
+References: <1524647323-6449-1-git-send-email-thuth@redhat.com>
+	<1524647323-6449-3-git-send-email-thuth@redhat.com>
+	<60dc9968-58fd-46e3-b471-7a0b7093ba15@de.ibm.com>
+	<775de9f5-7da0-45fa-da32-edceac7cf258@redhat.com>
+	<24876878-e365-604e-348c-f649568e167f@de.ibm.com>
+	<7ed61a09-c00c-acf0-f504-f6feb8d55950@de.ibm.com>
+	<6930de56-f73d-d466-110d-87ecdc74836d@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Wed, 25 Apr 2018 18:03:48 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Apr 2018 15:55:42 -0000
-From: David Wilder <1763536@bugs.launchpad.net>
-Reply-To: Bug 1763536 <1763536@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152357545161.20027.863482450235173908.malonedeb@gac.canonical.com>
-Message-Id: <152467174267.6122.7857206154238883619.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1763536] Re: go build fails under
- qemu-ppc64le-static (qemu-user)
+In-Reply-To: <6930de56-f73d-d466-110d-87ecdc74836d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <9daea5e5-a02d-7384-2203-6c0043880525@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] pc-bios/s390-ccw/net: Use diag308
+ to reset machine before jumping to the OS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,123 +48,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-Thanks for the update,  I will test that version and report back ( it
-may be a few days)
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1763536
-
-Title:
-  go build fails under qemu-ppc64le-static (qemu-user)
-
-Status in QEMU:
-  New
-
-Bug description:
-  I am using qemu-user (built static) in a docker container environment.
-  When running multi-threaded go commands in the container (go build for
-  example) the process may hang, report segfaults or other errors.  I
-  built qemu-ppc64le from the upstream git (master).
-
-  I see the problem running on a multi core system with Intel i7 processors.
-  # cat /proc/cpuinfo | grep "model name"
-  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
-  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
-  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
-  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
-  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
-  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
-  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
-  model name	: Intel(R) Core(TM) i7-2760QM CPU @ 2.40GHz
-
-  Steps to reproduce:
-  1) Build qemu-ppc64le as static and copy into docker build directory name=
-d it qemu-ppc64le-static.
-
-  2) Add hello.go to docker build dir.
-
-  package main
-  import "fmt"
-  func main() {
-  	fmt.Println("hello world")
-  }
-
-  3) Create the Dockerfile from below:
-
-  FROM ppc64le/golang:1.10.1-alpine3.
-  COPY qemu-ppc64le-static /usr/bin/
-  COPY hello.go /go
-
-  4) Build container
-  $ docker build -t qemutest -f Dockerfile ./go =
+To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Farhan Ali <alifm@linux.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
 
 
-  5) Run test
-  $ docker run -it qemutest
 
-  /go # /usr/bin/qemu-ppc64le-static --version
-  qemu-ppc64le version 2.11.93 (v2.12.0-rc3-dirty)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+On 04/25/2018 05:36 PM, Thomas Huth wrote:
+> On 25.04.2018 14:44, Christian Borntraeger wrote:
+>>
+>>
+>> On 04/25/2018 02:41 PM, Christian Borntraeger wrote:
+>>> You load from address 0. 
+>>>
+>>> On 04/25/2018 02:34 PM, Thomas Huth wrote:
+>>>> On 25.04.2018 14:18, Christian Borntraeger wrote:
+>>>>>
+>>>>> On 04/25/2018 11:08 AM, Thomas Huth wrote:
+>>>>>
+>>>>>> --- a/pc-bios/s390-ccw/netmain.c
+>>>>>> +++ b/pc-bios/s390-ccw/netmain.c
+>>>>>> @@ -283,6 +283,15 @@ void panic(const char *string)
+>>>>>>      }
+>>>>>>  }
+>>>>>>  
+>>>>>> +void write_subsystem_identification(void)
+>>>>>> +{
+>>>>>> +    uint32_t *schid = (uint32_t *) 184;
+>>>>>> +    uint32_t *zeroes = (uint32_t *) 188;
+>>>>>> +
+>>>>>> +    *schid = 0;         /* We must not set this for virtio-net */
+>>>>>> +    *zeroes = 0;
+>>>>>> +}
+>>>>>> +
+>>>>>
+>>>>> I think we actually want to have the CCW devno of that network device
+>>>>> stored. It has some value to know which CCW device we bootet from, no?
+>>>>
+>>>> Actually, I tried that first (and it took quite some time to debug it),
+>>>> but the Linux kernel then bails out quite early, without any error
+>>>> message. The trace looks like this:
+>>>>
+>>>> 0x0000000007801802:  diag	%r1,%r1,776
+>>>> 0x0000000007801780:  larl	%r2,0x7831004
+>>>> 0x0000000007801786:  llgf	%r1,8
+>>>> 0x000000000780178c:  mvc	0(12,%r0),0(%r2)
+>>>> 0x0000000007801792:  br	%r1
+>>>> 0x0000000000000418:  bas	%r14,512
+>>>> 0x0000000000000200:  mvi	163,1
+>>>> 0x0000000000000204:  slr	%r0,%r0
+>>>> 0x0000000000000206:  lhi	%r1,2
+>>>> 0x000000000000020a:  sigp	%r1,%r0,18
+>>>> 0x000000000000020e:  bras	%r13,0x252
+>>>> 0x0000000000000252:  lmh	%r0,%r15,0(%r13)
+>>>> 0x0000000000000258:  sam31
+>>>> 0x000000000000025a:  br	%r14
+>>>> 0x000000000000041c:  lh	%r1,184
+>>>> 0x0000000000000420:  bct	%r1,1322
+>>>> 0x0000000000000424:  l	%r1,184
+>>>> 0x0000000000000428:  la	%r2,1840
+>>>> 0x000000000000042c:  bas	%r14,640
+>>>> 0x0000000000000280:  la	%r4,0(%r14)
+>>>> 0x0000000000000284:  la	%r3,792
+>>>> 0x0000000000000288:  la	%r5,804
+>>>> 0x000000000000028c:  la	%r6,888
+>>>> 0x0000000000000290:  la	%r7,20
+>>>> 0x0000000000000294:  st	%r2,4(%r6)
+>>>> 0x0000000000000298:  la	%r2,80(%r2)
+>>>> 0x000000000000029c:  la	%r6,8(%r6)
+>>>> 0x00000000000002a0:  bct	%r7,660
+>>>> 0x00000000000002a4:  lctl	%c6,%c6,868
+>>>> 0x00000000000002a8:  slr	%r2,%r2
+>>>> 0x00000000000002aa:  ssch	0(%r3)
+>>>> 0x00000000000002ae:  bne	786
+>>>> 0x0000000000000312:  lpsw	880
+>>>> Guest crashed on cpu 0: disabled-wait
+>>>> PSW: 0x000a000000000000 0x0000000000000000
+>>>>
+>>>> That's the Lloader function in arch/s390/kernel/head.S which is failing
+>>>> here, so seems like Linux tries to load from a block device in case
+>>>> there is a value in 184. Thus I assume that 184 has to contain 0 in this
+>>>> case.
+>>>
+>>> Hmm, I think this is because we jump to 418 for your kernel (which is the loader
+>>> that tries to bootstrap the ccw ipl). When you look at ipl.c we override that
+>>> and jump to 0x10000 instead for linux (which is also hackish) for image files.
+>>> So I guess if we would do a psw restart instead (like you do) on a kernel image
+>>> the normal ipl would also fail....
+>>
+>> FWIW, zipl also loads linux kernels from 0x10000
+> 
+> OK, I just checked, and indeed, if I change to code to jump to 0x10000,
+> it also works when setting a value into 184. So I'll change this patch
+> here accordingly.
 
-  /go # go version
-  go version go1.10.1 linux/ppc64le
-
-  /go # go build hello.go
-  fatal error: fatal error: stopm holding locksunexpected signal during run=
-time execution
-
-  panic during panic
-  [signal SIGSEGV: segmentation violation code=3D0x1 addr=3D0x0 pc=3D0x1003=
-528c]
-
-  runtime stack:
-  runtime: unexpected return pc for syscall.Syscall6 called from 0xc42007f5=
-00
-  stack: frame=3D{sp:0xc4203be840, fp:0xc4203be860} stack=3D[0x4000b7ecf0,0=
-x4000b928f0)
-
-  syscall.Syscall6(0x100744e8, 0x3d, 0xc42050c140, 0x20, 0x18, 0x10422b80, =
-0xc4203be968[signal , 0x10012d88SIGSEGV: segmentation violation, 0xc4205940=
-00 code=3D, 0x00x1 addr=3D0x0 pc=3D0x1003528c)
-  ]
-
-  runtime stack:
-  	/usr/local/go/src/syscall/asm_linux_ppc64x.s:61runtime.throw(0x10472d19,=
- 0x13)
-   +	/usr/local/go/src/runtime/panic.go:0x6c616 +0x68
-
-  =
-
-  runtime.stopm()
-  	/usr/local/go/src/runtime/proc.go:1939goroutine  +10x158
-   [runtime.exitsyscall0semacquire(0xc42007f500)
-  	/usr/local/go/src/runtime/proc.go:3129 +]:
-  0x130
-  runtime.mcall(0xc42007f500)
-  	/usr/local/go/src/runtime/asm_ppc64x.s:183 +0x58sync.runtime_Semacquire
-  (0xc4201fab1c)
-  	/usr/local/go/src/runtime/sema.go:56 +0x38
-
-  ----
-  Note the results may differ between attempts,  hangs and other faults som=
-etimes happen.
-  ----
-  If I run "go: single threaded I don't see the problem, for example:
-
-  /go # GOMAXPROCS=3D1 go build -p 1 hello.go =
-
-  /go # ./hello
-  hello world
-
-  I see the same issue with arm64.  I don't think this is a go issue,
-  but don't have a real evidence to prove that.  This problem looks
-  similar to other problem I have seen reported against qemu running
-  multi-threaded applications.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1763536/+subscriptions
+This will of course break loading non-Linux binaries.
+Could we maybe check 0x10008 for S390EP (see head.S) which indicates Linux since 3.2 or so
+and only in that case change the address to 0x10000?
