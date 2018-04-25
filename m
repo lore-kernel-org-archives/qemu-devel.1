@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBE0h-0004HO-DE
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 02:34:36 -0400
+	(envelope-from <armbru@redhat.com>) id 1fBE5n-0006lg-UJ
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 02:39:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBE0g-0004tc-24
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 02:34:35 -0400
-Date: Wed, 25 Apr 2018 16:32:57 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180425063257.GT19804@umbus.fritz.box>
-References: <20180419062917.31486-1-david@gibson.dropbear.id.au>
-	<1524151804.3017.9.camel@redhat.com>
-	<20180420023542.GD2434@umbus.fritz.box>
-	<1524216670.3017.11.camel@redhat.com>
-	<20180420102117.GQ2434@umbus.fritz.box>
-	<1524584159.23669.13.camel@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1fBE5j-0007m6-CJ
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 02:39:51 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180424214550.32549-1-lersek@redhat.com>
+	<20180424214550.32549-2-lersek@redhat.com>
+Date: Wed, 25 Apr 2018 08:39:38 +0200
+In-Reply-To: <20180424214550.32549-2-lersek@redhat.com> (Laszlo Ersek's
+	message of "Tue, 24 Apr 2018 23:45:45 +0200")
+Message-ID: <87r2n3aixh.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="rBVNTu5JXDAWzN2S"
-Content-Disposition: inline
-In-Reply-To: <1524584159.23669.13.camel@redhat.com>
-Subject: Re: [Qemu-devel] [RFC for-2.13 0/7] spapr: Clean up pagesize
- handling
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/6] qapi: fill in CpuInfoFast.arch in
+ query-cpus-fast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,83 +24,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>
-Cc: groug@kaod.org, aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
+Laszlo Ersek <lersek@redhat.com> writes:
 
---rBVNTu5JXDAWzN2S
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Commit ca230ff33f89 added added the @arch field to @CpuInfoFast, but it
+> failed to set the new field in qmp_query_cpus_fast(), when TARGET_S390X
+> was not defined. The updated @query-cpus-fast example in
+> "qapi-schema.json" showed "arch":"x86" only because qmp_query_cpus_fast()
+> calls g_malloc0() to allocate CpuInfoFast, and the CPU_INFO_ARCH_X86 enum
+> constant is generated with value 0.
+>
+> All @arch values other than @s390 implied the @CpuInfoOther sub-struct for
+> @CpuInfoFast -- at the time of writing the patch --, thus no fields other
+> than @arch needed to be set when TARGET_S390X was not defined. Set @arch
+> now, by copying the corresponding assignments from qmp_query_cpus().
 
-On Tue, Apr 24, 2018 at 05:35:59PM +0200, Andrea Bolognani wrote:
-> On Fri, 2018-04-20 at 20:21 +1000, David Gibson wrote:
-> > On Fri, Apr 20, 2018 at 11:31:10AM +0200, Andrea Bolognani wrote:
-> > > I'll have to look into it to be sure, but I think it should be
-> > > possible for libvirt to convert a generic
-> > >=20
-> > >   <memoryBacking>
-> > >     <hugepages/>
-> > >   </memoryBacking>
-> > >=20
-> > > to a more specific
-> > >=20
-> > >   <memoryBacking>
-> > >     <hugepages>
-> > >       <page size=3D"16384" unit=3D"KiB"/>
-> > >     </hugepages>
-> > >   </memoryBacking>
-> > >=20
-> > > by figuring out the page size for the default hugepage mount,
-> > > which actually sounds like a good idea regardless. Of course users
-> > > user would still be able to provide the page size themselves in the
-> > > first place.
-> >=20
-> > Sounds like a good approach.
->=20
-> Unfortunately it seems like this is not going to be feasible, as
-> POWER8 is apparently the only platform that enforces a strict
-> relationship between host page size and guest page size: x86,
-> aarch64 (and I have to assume POWER9 as well?) can reportedly all
-> deal gracefully with guests migrating between hosts that have
-> different hugepage mounts configured.
+Now I'm confused.
 
-Yes, that's right.  As you guess POWER9 will also allow this.. at
-least as long as the guest is in radix mode.  If the guest is in hash
-mode (which includes but isn't limited to POWER8 compat mode guests)
-then it will suffer from the same pagesize limitations as POWER8.
+In the schema, @arch "riscv" implies CpuInfoRISCV:
 
-> I need to spend some more time digesting the rest of the
-> information you provided, but as it stands right now I'm starting
-> to think this might actually need to be its own, explicit opt-in
-> knob at the libvirt level too after all :(
+    { 'union': 'CpuInfoFast',
+      'base': {'cpu-index': 'int', 'qom-path': 'str',
+               'thread-id': 'int', '*props': 'CpuInstanceProperties',
+               'arch': 'CpuInfoArch' },
+      'discriminator': 'arch',
+      'data': { 'x86': 'CpuInfoOther',
+                'sparc': 'CpuInfoOther',
+                'ppc': 'CpuInfoOther',
+                'mips': 'CpuInfoOther',
+                'tricore': 'CpuInfoOther',
+                's390': 'CpuInfoS390',
+                'riscv': 'CpuInfoRISCV',
+                'other': 'CpuInfoOther' } }
 
-Poo.
+In qmp_query_cpus_fast(), it can't imply anything, because can't occur.
+That's a bug, and this patch fixes it.  Except it sets @arch to "other"
+instead of "riscv" when defined(TARGET_RISCV).  Why?  Oh, I see, that
+gets fixed in the next patch.  Please explain that in your commit
+message, or squash the two patches.  The latter feels simpler, so that's
+what I'd do.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---rBVNTu5JXDAWzN2S
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrgIRkACgkQbDjKyiDZ
-s5KuMg//WipwgSSJFWjG+m5zERpqGuTwgunCdMfy7CoK3rFvci/7XxY7pdqaf0dv
-3LkrcKCVWqWZZbFDmsa2fcUaKk7GiQdLFNncJumW4+zj4iVi5Ew2fxGb6kTB0D8g
-rZCZVTbnvlNADSBvvUlX2AD9T0ZDIn4DpYkTPKU1Ud1f4CHccbwnx1ygHt1VwqyK
-PGbJHn3Y+5gpAmtS3I4a0jm4r7yjNyMNYk4JXiIKQo27He+rW+Nhy8BQy5r9Z286
-4M9wxq9Po5yfZFYXahAz0mVRcmf2upiTSr+/v4dApQYqLDSTca73iYWXP6+LER49
-EQT7zjJzl6WYG+Sic9Ns0B6ajFY33HmPud6kgsa40+cgasbFOjIgzdZuKL5XrRIt
-TTD6vyzfjIc3iJyr8J1v6LN0alxn+NlEWkpK57ysjej/01IKRChrHPD47QtSmTcB
-cRNYW2cUeSq0WBgmFQ1Lxgy6THKMltLimJaGuu8jc7qRgtJmTA1GuSh1AiMeRtnj
-TUDV3kHXonoDeRlIf1piuRGVJqhqdabwVYPLtqmgyTuC+BgAOn5pwE6qw2ysa1fs
-VTAfdY424GSxoRofBEGtvGIAq/3u3c9DQtEkt6FIIhJx6KSfSQ5n/CxyIB6OSwKc
-fcBuo5tq4GFtA8lfuUNUq2hUyCSQNnTAVWoHw/P7PP96BIjANRM=
-=CHYD
------END PGP SIGNATURE-----
-
---rBVNTu5JXDAWzN2S--
+>
+> Cc: Eric Blake <eblake@redhat.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: qemu-stable@nongnu.org
+> Fixes: ca230ff33f89bf7102cbfbc2328716da6750aaed
+> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
