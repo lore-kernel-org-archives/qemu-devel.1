@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44046)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fBHAm-0007Br-8y
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 05:57:13 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fBHG6-00005a-FI
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 06:02:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fBHAj-0004qR-LI
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 05:57:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41918 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fBHAj-0004q8-H0
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 05:57:09 -0400
-Date: Wed, 25 Apr 2018 10:56:57 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180425095657.GF30024@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <CAA-pg_qXZLDEHq6jMN_4GUrFvQgf0AS8Fs559JbucptK6_zrFw@mail.gmail.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1fBHG3-0007jK-Rg
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 06:02:42 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:37567)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fBHG3-0007iz-K7
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 06:02:39 -0400
+Received: by mail-wr0-x243.google.com with SMTP id c14-v6so12589390wrd.4
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 03:02:39 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Wed, 25 Apr 2018 11:02:18 +0100
+Message-Id: <20180425100218.24785-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAA-pg_qXZLDEHq6jMN_4GUrFvQgf0AS8Fs559JbucptK6_zrFw@mail.gmail.com>
-Subject: Re: [Qemu-devel] Filtering files passing through MTP devices
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2] linux-user: set minimum uname for RISC-V
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +27,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Omer Katz <omer@kazuar-tech.com>, Bandan Das <bsd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-On Mon, Apr 23, 2018 at 03:10:32PM +0000, Omer Katz wrote:
-> Hi everyone,
-> 
-> We have a use case that requires us to only allow certain files to pass
-> through to the guest machine from USB storage devices.
-> 
-> I was told on IRC that such a feature does not exist but the easiest way to
-> achieve our goal is to contribute a patch the the MTP device driver since
-> other drivers operate on a filesystem level instead of a file level which
-> is what we need.
+As support for RISC-V was only merged into the mainline kernel at 4.15
+it is unlikely that glibc will be happy with a reported kernel version
+of 3.8.0. Indeed when I testing binaries created by the current Debian
+Sid compiler the tests failed with:
 
-IMHO the easiest way to stop the guest accessing files is to simply not
-put them in the directory that you are exporting the guest in the first
-place. If you have a directory that has some files you don't want accessed
-and can't remove them, then perhaps create a second directory and use
-symlinks or hardlinks to pull in files from the original directory.
+  FATAL: kernel too old
 
-> The plan is to pass the contents of each file to a program through stdin
-> and decide based on the exit code if the file should be allowed to pass
-> through to the guest or not.
+Bump the version to the minimum a RISC-V glibc would expect:
 
-I can't say I like this idea. It is a really very inefficient and heavy
-solution.
+  https://sourceware.org/git/?p=glibc.git;a=blob;f=sysdeps/unix/sysv/linux/riscv/configure.ac
 
-> Since this is the first time I'm contributing to QEMU I'd like some
-> guidance to where the filtering code should be.
-> https://github.com/qemu/qemu/blob/master/hw/usb/dev-mtp.c doesn't look that
-> complicated but I still need to understand it better to continue.
-> Furthermore, I need to know where to add such a command line option to
-> point QEMU to the filtering program.
-> 
-> Would such a patch be accepted if all the requirements above are met?
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Can you explain the usage scenario you have in more details, rather than
-just the high level abstract.
+---
+v2
+  - minor tweak to wording to make clearer and add link to glibc config
+---
+ linux-user/riscv/target_syscall.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-Regards,
-Daniel
+diff --git a/linux-user/riscv/target_syscall.h b/linux-user/riscv/target_syscall.h
+index d4e109a27f..ee81d8bc88 100644
+--- a/linux-user/riscv/target_syscall.h
++++ b/linux-user/riscv/target_syscall.h
+@@ -45,7 +45,7 @@ struct target_pt_regs {
+ #else
+ #define UNAME_MACHINE "riscv64"
+ #endif
+-#define UNAME_MINIMUM_RELEASE "3.8.0"
++#define UNAME_MINIMUM_RELEASE "4.15.0"
+ 
+ #define TARGET_MINSIGSTKSZ 2048
+ #define TARGET_MLOCKALL_MCL_CURRENT 1
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.17.0
