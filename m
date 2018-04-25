@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fBIaC-0002gi-LQ
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:27:34 -0400
+	(envelope-from <quintela@redhat.com>) id 1fBIaD-0002h5-25
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:27:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fBIaB-0004m0-5E
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:27:32 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46184 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fBIaB-0004m7-86
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:27:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46182 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fBIaB-0004l7-1J
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fBIaA-0004l8-Vz
 	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 07:27:31 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6B755406C740
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 11:27:30 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 81B37406C741
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 11:27:26 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 25 Apr 2018 13:27:05 +0200
-Message-Id: <20180425112723.1111-4-quintela@redhat.com>
-In-Reply-To: <20180425112723.1111-1-quintela@redhat.com>
-References: <20180425112723.1111-1-quintela@redhat.com>
+Date: Wed, 25 Apr 2018 13:27:02 +0200
+Message-Id: <20180425112723.1111-1-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v12 03/21] migration: terminate_* can be called
- for other threads
+Subject: [Qemu-devel] [PATCH v12 00/21] Multifd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,179 +33,315 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Once there, make  count field to always be accessed with atomic
-operations.  To make blocking operations, we need to know that the
-thread is running, so create a bool to indicate that.
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Hi
 
---
 
-Once here, s/terminate_multifd_*-threads/multifd_*_terminate_threads/
-This is consistente with every other function
----
- migration/ram.c | 44 ++++++++++++++++++++++++++++++--------------
- 1 file changed, 30 insertions(+), 14 deletions(-)
+[v12]
 
-diff --git a/migration/ram.c b/migration/ram.c
-index c3c330b0e0..c0ad6d8e9f 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -406,6 +406,7 @@ struct MultiFDSendParams {
-     QemuThread thread;
-     QemuSemaphore sem;
-     QemuMutex mutex;
-+    bool running;
-     bool quit;
- };
- typedef struct MultiFDSendParams MultiFDSendParams;
-@@ -416,7 +417,7 @@ struct {
-     int count;
- } *multifd_send_state;
-=20
--static void terminate_multifd_send_threads(Error *err)
-+static void multifd_send_terminate_threads(Error *err)
- {
-     int i;
-=20
-@@ -430,7 +431,7 @@ static void terminate_multifd_send_threads(Error *err=
-)
-         }
-     }
-=20
--    for (i =3D 0; i < multifd_send_state->count; i++) {
-+    for (i =3D 0; i < migrate_multifd_channels(); i++) {
-         MultiFDSendParams *p =3D &multifd_send_state->params[i];
-=20
-         qemu_mutex_lock(&p->mutex);
-@@ -448,11 +449,13 @@ int multifd_save_cleanup(Error **errp)
-     if (!migrate_use_multifd()) {
-         return 0;
-     }
--    terminate_multifd_send_threads(NULL);
--    for (i =3D 0; i < multifd_send_state->count; i++) {
-+    multifd_send_terminate_threads(NULL);
-+    for (i =3D 0; i < migrate_multifd_channels(); i++) {
-         MultiFDSendParams *p =3D &multifd_send_state->params[i];
-=20
--        qemu_thread_join(&p->thread);
-+        if (p->running) {
-+            qemu_thread_join(&p->thread);
-+        }
-         qemu_mutex_destroy(&p->mutex);
-         qemu_sem_destroy(&p->sem);
-         g_free(p->name);
-@@ -479,6 +482,10 @@ static void *multifd_send_thread(void *opaque)
-         qemu_sem_wait(&p->sem);
-     }
-=20
-+    qemu_mutex_lock(&p->mutex);
-+    p->running =3D false;
-+    qemu_mutex_unlock(&p->mutex);
-+
-     return NULL;
- }
-=20
-@@ -493,7 +500,7 @@ int multifd_save_setup(void)
-     thread_count =3D migrate_multifd_channels();
-     multifd_send_state =3D g_malloc0(sizeof(*multifd_send_state));
-     multifd_send_state->params =3D g_new0(MultiFDSendParams, thread_coun=
-t);
--    multifd_send_state->count =3D 0;
-+    atomic_set(&multifd_send_state->count, 0);
-     for (i =3D 0; i < thread_count; i++) {
-         MultiFDSendParams *p =3D &multifd_send_state->params[i];
-=20
-@@ -502,10 +509,11 @@ int multifd_save_setup(void)
-         p->quit =3D false;
-         p->id =3D i;
-         p->name =3D g_strdup_printf("multifdsend_%d", i);
-+        p->running =3D true;
-         qemu_thread_create(&p->thread, p->name, multifd_send_thread, p,
-                            QEMU_THREAD_JOINABLE);
-=20
--        multifd_send_state->count++;
-+        atomic_inc(&multifd_send_state->count);
-     }
-     return 0;
- }
-@@ -516,6 +524,7 @@ struct MultiFDRecvParams {
-     QemuThread thread;
-     QemuSemaphore sem;
-     QemuMutex mutex;
-+    bool running;
-     bool quit;
- };
- typedef struct MultiFDRecvParams MultiFDRecvParams;
-@@ -526,7 +535,7 @@ struct {
-     int count;
- } *multifd_recv_state;
-=20
--static void terminate_multifd_recv_threads(Error *err)
-+static void multifd_recv_terminate_threads(Error *err)
- {
-     int i;
-=20
-@@ -540,7 +549,7 @@ static void terminate_multifd_recv_threads(Error *err=
-)
-         }
-     }
-=20
--    for (i =3D 0; i < multifd_recv_state->count; i++) {
-+    for (i =3D 0; i < migrate_multifd_channels(); i++) {
-         MultiFDRecvParams *p =3D &multifd_recv_state->params[i];
-=20
-         qemu_mutex_lock(&p->mutex);
-@@ -558,11 +567,13 @@ int multifd_load_cleanup(Error **errp)
-     if (!migrate_use_multifd()) {
-         return 0;
-     }
--    terminate_multifd_recv_threads(NULL);
--    for (i =3D 0; i < multifd_recv_state->count; i++) {
-+    multifd_recv_terminate_threads(NULL);
-+    for (i =3D 0; i < migrate_multifd_channels(); i++) {
-         MultiFDRecvParams *p =3D &multifd_recv_state->params[i];
-=20
--        qemu_thread_join(&p->thread);
-+        if (p->running) {
-+            qemu_thread_join(&p->thread);
-+        }
-         qemu_mutex_destroy(&p->mutex);
-         qemu_sem_destroy(&p->sem);
-         g_free(p->name);
-@@ -590,6 +601,10 @@ static void *multifd_recv_thread(void *opaque)
-         qemu_sem_wait(&p->sem);
-     }
-=20
-+    qemu_mutex_lock(&p->mutex);
-+    p->running =3D false;
-+    qemu_mutex_unlock(&p->mutex);
-+
-     return NULL;
- }
-=20
-@@ -604,7 +619,7 @@ int multifd_load_setup(void)
-     thread_count =3D migrate_multifd_channels();
-     multifd_recv_state =3D g_malloc0(sizeof(*multifd_recv_state));
-     multifd_recv_state->params =3D g_new0(MultiFDRecvParams, thread_coun=
-t);
--    multifd_recv_state->count =3D 0;
-+    atomic_set(&multifd_recv_state->count, 0);
-     for (i =3D 0; i < thread_count; i++) {
-         MultiFDRecvParams *p =3D &multifd_recv_state->params[i];
-=20
-@@ -613,9 +628,10 @@ int multifd_load_setup(void)
-         p->quit =3D false;
-         p->id =3D i;
-         p->name =3D g_strdup_printf("multifdrecv_%d", i);
-+        p->running =3D true;
-         qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
-                            QEMU_THREAD_JOINABLE);
--        multifd_recv_state->count++;
-+        atomic_inc(&multifd_recv_state->count);
-     }
-     return 0;
- }
+Big news, it is not RFC anymore, it works reliabely for me.
+
+Changes:
+- Locknig changed completely (several times)
+- We now send  all pages through the channels.  In a 2GB guest with 1 dis=
+k and a network card, the amount of data send for RAM was 80KB.
+- This is not optimized yet, but it shouws clear improvements over precop=
+y.  testing over localhost networking I can guet:
+  - 2 VCPUs guest
+  - 2GB RAM
+  - runn stress --vm 4 --vm 500GB (i.e. dirtying 2GB or RAM each second)
+
+  - Total time: precopy ~50seconds, multifd  around 11seconds
+  - Bandwidth usage is around 273MB/s vs 71MB/s on the same hardware
+
+This is very preleminary testing, will send more numbers when I got them.=
+  But looks promissing.
+
+Things that will be improved later:
+- Initial synchronization is too slow (around 1s)
+- We synchronize all threads after each RAM section, we can move to only
+  synchronize them after we have done a bitmap syncrhronization
+- We can improve bitmap walking (but that is independent of multifd)
+
+Please review.
+
+Later, Juan.
+
+
+[v11]
+
+Changes on top of previous sumbimission:
+- Now on top of migration-tests/v6 that I sent on Wednesday
+- Rebased to latest upstream
+- Everything that is sent through the network should be converted correct=
+ly
+  (famous last words)
+- Still on RFC (sometimes it ends some packets at the end), just to
+  show how things are going on.  Problems are only on the last patch.
+
+- Redo some locking (again) Now the problem is being able te send the
+  synchronization through the multifd channels.  I end the migration
+  _before_ all the channels have recevied all the packets.
+
+- Trying to get a flags argument into each packet, to be able to synchron=
+ze
+  through the network, not from the "main" incoming corroutine.
+
+- Related to the network-safe fields, now everything is in its own
+  routine, it should be easier to understand/review.  Once there, I
+  check that all values are inside range.
+
+So, please comment.
+
+Thanks, Juan.
+
+
+[v10]
+Lots of changes from previous versions:
+a - everything is sent now through the multifd channels, nothing is sent =
+through main channel
+b - locking is band new, I was getting into a hole with the previous appr=
+oach, right now, there is a single way to
+    do locking (both source and destination)
+       main thread : sets a ->sync variable for each thread and wakeps it
+       multifd threads: clean the variable and signal (sem) back to main =
+thread
+
+    using this for either:
+    - all threads have started
+    - we need to synchronize after each round through memory
+    - all threads have finished
+
+c - I have to use a qio watcher for a thread to wait for ready data to re=
+ad
+
+d - lots of cleanups
+
+e - to make things easier, I have included the missing tests stuff on
+    this round of patches, because they build on top of them
+
+f - lots of traces, it is now much easier to follow what is happening
+
+Now, why it is an RFC:
+
+- in the last patch, there is still race between the whatcher, the
+  ->quit of the threads and the last synchronization.  Techinically they
+  are done in oder, but in practice, they are hanging sometimes.
+
+- I *know* I can optimize the synchronization of the threads sending
+  the "we start a new round" through the multifd channels, have to add a =
+flag here.
+
+- Not having a thread on the incoming side  is a mess, I can't block wait=
+ing for things to happen :-(
+
+- When doing the synchronization, I need to optimize the sending of the "=
+not finished packet" of pages, working on that.
+
+please, take a look and review.
+
+Thanks, Juan.
+
+[v9]
+
+This series is on top of my migration test series just sent, only reject =
+should be on the test system, though.
+
+On v9 series for you:
+- qobject_unref() as requested by dan
+
+  Yes he was right, I had a reference leak for _non_ multifd, I
+  *thought* he mean for multifd, and that took a while to understand
+  (and then find when/where).
+
+- multifd page count: it is dropped for good
+- uuid handling: we use the default qemu uuid of 0000...
+- uuid handling: using and struct and sending the struct
+  * idea is to add a size field and add more parameter after that
+  * anyone has a good idea how to "ouptut" info
+    migrate_capabilities/parameters json into a string and how to read it=
+ back?
+- changed how we test that all threads/channels are already created.
+  Should be more robust.
+- Add tests multifd.  Still not ported on top of migration-tests series s=
+ent early
+  waiting for review on the ideas there.
+- Rebase and remove al the integrated patches (back at 12)
+
+Please, review.
+
+Later, Juan.
+
+[v8]
+Things NOT done yet:
+
+- drop x-multifd-page-count?  We can use performance to set a default val=
+ue
+- paolo suggestion of not having a control channel
+  needs iyet more cleanups to be able to have more than one ramstate, try=
+ing it.
+- still not performance done, but it has been very stable
+
+On v8:
+- use connect_async
+- rename multifd-group to multifd-page-count (danp suggestion)
+- rename multifd-threads to multifd-channels (danp suggestion)
+- use new qio*channel functions
+- Address rest of comments left
+
+
+So, please review.
+
+My idea will be to pull this changes and continue performance changes
+for inside, basically everything is already reviewed.
+
+Thanks, Juan.
+
+On v7:
+- tests fixed as danp wanted
+- have to revert danp qio_*_all patches, as they break multifd, I have to=
+ investigate why.
+- error_abort is gone.  After several tries about getting errors, I ended=
+ having a single error
+  proceted by a lock and first error wins.
+- Addressed basically all reviews (see on ToDo)
+- Pointers to struct are done now
+- fix lots of leaks
+- lots of small fixes
+
+
+[v6]
+- Improve migration_ioc_porcess_incoming
+- teach about G_SOURCE_REMOVE/CONTINUE
+- Add test for migration_has_all_channels
+- use DEFIN_PROP*
+- change recv_state to use pointers to parameters
+  make easier to receive channels out of order
+- use g_strdup_printf()
+- improve count of threads to know when we have to finish
+- report channel id's on errors
+- Use last_page parameter for multifd_send_page() sooner
+- Improve commets for address
+- use g_new0() instead of g_malloc()
+- create MULTIFD_CONTINUE instead of using UINT16_MAX
+- clear memory used by group of pages
+  once there, pass everything to the global state variables instead of be=
+ing
+  local to the function.  This way it works if we cancel migration and st=
+art
+  a new one
+- Really wait to create the migration_thread until all channels are creat=
+ed
+- split initial_bytes setup to make clearer following patches.
+- createRAM_SAVE_FLAG_MULTIFD_SYNC macro, to make clear what we are doing
+- move setting of need_flush to inside bitmap_sync
+- Lots of other small changes & reorderings
+
+Please, comment.
+
+
+[v5]
+
+- tests from qio functions (a.k.a. make danp happy)
+- 1st message from one channel to the other contains:
+   <uuid> multifd <channel number>
+   This would allow us to create more channels as we want them.
+   a.k.a. Making dave happy
+- Waiting in reception for new channels using qio listeners
+  Getting threads, qio and reference counters working at the same time
+  was interesing.
+  Another make danp happy.
+
+- Lots and lots of small changes and fixes.  Notice that the last 70 patc=
+hes
+  that I merged or so what to make this series easier/smaller.
+
+- NOT DONE: I haven't been woring on measuring performance
+  differences, this was about getting the creation of the
+  threads/channels right.
+
+So, what I want:
+
+- Are people happy with how I have (ab)used qio channels? (yes danp,
+  that is you).
+- My understanding is th
+
+ToDo:
+
+- Make paolo happy: He wanted to test using control information
+  through each channel, not only pages.  This requires yet more
+  cleanups to be able to have more than one QEMUFile/RAMState open at
+  the same time.
+
+- How I create multiple channels.  Things I know:
+  * with current changes, it should work with fd/channels (the multifd bi=
+ts),
+    but we don;t have a way to pass multiple fd;s or exec files.
+    Danp, any idea about how to create an UI for it?
+  * My idea is that we would split current code to be:
+    + channel creation at migration.c
+    + rest of bits at ram.c
+    + change format to:
+      <uuid> main <rest of migration capabilities/paramentes> so we can c=
+heck
+      <uuid> postcopy <no clue what parameters are needed>
+          Dave wanted a way to create a new fd for postcopy for some time
+    + Adding new channels is easy
+
+- Performance data/numbers: Yes, I wanted to get this out at once, I
+  would continue with this.
+
+
+Please, review.
+
+
+[v4]
+This is the 4th version of multifd. Changes:
+- XBZRLE don't need to be checked for
+- Documentation and defaults are consistent
+- split socketArgs
+- use iovec instead of creating something similar.
+- We use now the exported size of target page (another HACK removal)
+- created qio_chanel_{wirtev,readv}_all functions.  the _full() name
+  was already taken.
+  What they do is the same that the without _all() function, but if it
+  returns due to blocking it redo the call.
+- it is checkpatch.pl clean now.
+
+Please comment, Juan.
+
+
+Juan Quintela (21):
+  migration: Set error state in case of error
+  migration: Introduce multifd_recv_new_channel()
+  migration: terminate_* can be called for other threads
+  migration: Be sure all recv channels are created
+  migration: Export functions to create send channels
+  migration: Create multifd channels
+  migration: Delay start of migration main routines
+  migration: Transmit initial package through the multifd channels
+  migration: Define MultifdRecvParams sooner
+  migration: Create multipage support
+  migration: Create multifd packet
+  migration: Add multifd traces for start/end thread
+  migration: Calculate transferred ram correctly
+  migration: Multifd channels always wait on the sem
+  migration: Add block where to send/receive packets
+  migration: Synchronize multifd threads with main thread
+  migration: Create ram_multifd_page
+  migration: Start sending messages
+  migration: Wait for blocking IO
+  migration: Remove not needed semaphore and quit
+  migration: Stop sending whole pages through main channel
+
+ migration/migration.c  |  24 +-
+ migration/migration.h  |   1 +
+ migration/ram.c        | 710 ++++++++++++++++++++++++++++++++++++++---
+ migration/ram.h        |   3 +
+ migration/socket.c     |  32 +-
+ migration/socket.h     |   7 +
+ migration/trace-events |  12 +
+ 7 files changed, 740 insertions(+), 49 deletions(-)
+
 --=20
 2.17.0
