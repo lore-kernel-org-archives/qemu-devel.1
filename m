@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fB99N-0003ye-KO
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 21:23:15 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fB99N-0003yd-K4
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 21:23:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fB99M-0007CW-2l
+	(envelope-from <richard.henderson@linaro.org>) id 1fB99I-00073O-Lt
 	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 21:23:13 -0400
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:37596)
+Received: from mail-pf0-x233.google.com ([2607:f8b0:400e:c00::233]:42584)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fB99L-0007Ai-Ss
-	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 21:23:12 -0400
-Received: by mail-pf0-x242.google.com with SMTP id p6so13745898pfn.4
-	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 18:23:11 -0700 (PDT)
+	id 1fB99I-00072d-FA
+	for qemu-devel@nongnu.org; Tue, 24 Apr 2018 21:23:08 -0400
+Received: by mail-pf0-x233.google.com with SMTP id o16so13743726pfk.9
+	for <qemu-devel@nongnu.org>; Tue, 24 Apr 2018 18:23:08 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 24 Apr 2018 15:22:53 -1000
-Message-Id: <20180425012300.14698-3-richard.henderson@linaro.org>
-In-Reply-To: <20180425012300.14698-1-richard.henderson@linaro.org>
-References: <20180425012300.14698-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 2/9] target/arm: Implement vector shifted FCVT
- for fp16
+Date: Tue, 24 Apr 2018 15:22:51 -1000
+Message-Id: <20180425012300.14698-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 0/9] target/arm: Fixups for ARM_FEATURE_V8_FP16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,116 +27,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 
-While we have some of the scalar paths for FCVT for fp16,
-we failed to decode the fp16 version of these instructions.
+When running the gcc testsuite with current aarch64-linux-user,
+the testsuite detects the presence of the fp16 extension and
+enables lots of extra tests for builtins.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/translate-a64.c | 65 ++++++++++++++++++++++++++++++++--------------
- 1 file changed, 46 insertions(+), 19 deletions(-)
+Quite a few of these new tests fail because we missed implementing
+some instructions.  We really should go back and verify that nothing
+else is missing from this (rather large) extension.
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index c92e052686..e2d11998bd 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -7120,19 +7120,28 @@ static void handle_simd_shift_fpint_conv(DisasContext *s, bool is_scalar,
-                                          bool is_q, bool is_u,
-                                          int immh, int immb, int rn, int rd)
- {
--    bool is_double = extract32(immh, 3, 1);
-     int immhb = immh << 3 | immb;
--    int fracbits = (is_double ? 128 : 64) - immhb;
--    int pass;
-+    int pass, size, fracbits;
-     TCGv_ptr tcg_fpstatus;
-     TCGv_i32 tcg_rmode, tcg_shift;
- 
--    if (!extract32(immh, 2, 2)) {
--        unallocated_encoding(s);
--        return;
--    }
--
--    if (!is_scalar && !is_q && is_double) {
-+    if (immh & 0x8) {
-+        size = MO_64;
-+        if (!is_scalar && !is_q) {
-+            unallocated_encoding(s);
-+            return;
-+        }
-+    } else if (immh & 0x4) {
-+        size = MO_32;
-+    } else if (immh & 0x2) {
-+        size = MO_16;
-+        if (!arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
-+            unallocated_encoding(s);
-+            return;
-+        }
-+    } else {
-+        /* Should have split out AdvSIMD modified immediate earlier.  */
-+        assert(immh == 1);
-         unallocated_encoding(s);
-         return;
-     }
-@@ -7144,11 +7153,12 @@ static void handle_simd_shift_fpint_conv(DisasContext *s, bool is_scalar,
-     assert(!(is_scalar && is_q));
- 
-     tcg_rmode = tcg_const_i32(arm_rmode_to_sf(FPROUNDING_ZERO));
--    tcg_fpstatus = get_fpstatus_ptr(false);
-+    tcg_fpstatus = get_fpstatus_ptr(size == MO_16);
-     gen_helper_set_rmode(tcg_rmode, tcg_rmode, tcg_fpstatus);
-+    fracbits = (16 << size) - immhb;
-     tcg_shift = tcg_const_i32(fracbits);
- 
--    if (is_double) {
-+    if (size == 3) {
-         int maxpass = is_scalar ? 1 : 2;
- 
-         for (pass = 0; pass < maxpass; pass++) {
-@@ -7165,20 +7175,37 @@ static void handle_simd_shift_fpint_conv(DisasContext *s, bool is_scalar,
-         }
-         clear_vec_high(s, is_q, rd);
-     } else {
--        int maxpass = is_scalar ? 1 : is_q ? 4 : 2;
-+        void (*fn)(TCGv_i32, TCGv_i32, TCGv_i32, TCGv_ptr);
-+        int maxpass = is_scalar ? 1 : (8 << is_q >> size);
-+
-+        switch (size) {
-+        case MO_16:
-+            if (is_u) {
-+                fn = gen_helper_vfp_toulh;
-+            } else {
-+                fn = gen_helper_vfp_toslh;
-+            }
-+            break;
-+        case MO_32:
-+            if (is_u) {
-+                fn = gen_helper_vfp_touls;
-+            } else {
-+                fn = gen_helper_vfp_tosls;
-+            }
-+            break;
-+        default:
-+            g_assert_not_reached();
-+        }
-+
-         for (pass = 0; pass < maxpass; pass++) {
-             TCGv_i32 tcg_op = tcg_temp_new_i32();
- 
--            read_vec_element_i32(s, tcg_op, rn, pass, MO_32);
--            if (is_u) {
--                gen_helper_vfp_touls(tcg_op, tcg_op, tcg_shift, tcg_fpstatus);
--            } else {
--                gen_helper_vfp_tosls(tcg_op, tcg_op, tcg_shift, tcg_fpstatus);
--            }
-+            read_vec_element_i32(s, tcg_op, rn, pass, size);
-+            fn(tcg_op, tcg_op, tcg_shift, tcg_fpstatus);
-             if (is_scalar) {
-                 write_fp_sreg(s, rd, tcg_op);
-             } else {
--                write_vec_element_i32(s, tcg_op, rd, pass, MO_32);
-+                write_vec_element_i32(s, tcg_op, rd, pass, size);
-             }
-             tcg_temp_free_i32(tcg_op);
-         }
+In addition, it tests some edge conditions on data that show flaws
+in the way we were performing integer<->fp conversion; particularly
+with respect to scaled conversion.
+
+
+r~
+
+PS: FWIW, this was written against my tgt-arm-sve-9 tree, since I
+was trying to test sve as generated by gcc.  I don't *think* there
+are any dependencies on any of the sve patches, but I didn't check.
+
+PPS: There are two more failures that might be qemu fp16 failures,
+but those are SIGSEGV.  This patch set cures all of the SIGILL and
+(subsequent) SIGABRT type failures within the testsuite.
+
+
+Richard Henderson (9):
+  target/arm: Implement vector shifted SCVF/UCVF for fp16
+  target/arm: Implement vector shifted FCVT for fp16
+  target/arm: Fix float16 to/from int16
+  target/arm: Clear SVE high bits for FMOV
+  target/arm: Implement FMOV (general) for fp16
+  target/arm: Implement FCVT (scalar,integer) for fp16
+  target/arm: Implement FCVT (scalar,fixed-point) for fp16
+  target/arm: Implement FP data-processing (2 source) for fp16
+  target/arm: Implement FP data-processing (3 source) for fp16
+
+ target/arm/helper.h        |   6 +
+ target/arm/helper.c        |  87 ++++++++++-
+ target/arm/translate-a64.c | 371 +++++++++++++++++++++++++++++++++++++--------
+ 3 files changed, 399 insertions(+), 65 deletions(-)
+
 -- 
 2.14.3
