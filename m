@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fBLIQ-0004Bb-TE
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:21:24 -0400
+	(envelope-from <dan.j.williams@intel.com>) id 1fBLIS-0004CE-K4
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:21:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fBLIL-0000Ve-6m
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:21:22 -0400
-Received: from mail-vk0-x243.google.com ([2607:f8b0:400c:c05::243]:42551)
+	(envelope-from <dan.j.williams@intel.com>) id 1fBLIR-0000fw-Qx
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:21:24 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:33852)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fBLIL-0000Ur-2J
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:21:17 -0400
-Received: by mail-vk0-x243.google.com with SMTP id g6so13931239vkb.9
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 07:21:17 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180424152405.10304-1-alex.bennee@linaro.org>
-	<20180424152405.10304-29-alex.bennee@linaro.org>
-	<040568a9-908c-be0b-be87-657220a93f04@amsat.org>
-	<87k1svllqc.fsf@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <74eb3163-332d-e4df-f3a6-8acd7aeb4a66@amsat.org>
-Date: Wed, 25 Apr 2018 11:21:03 -0300
+	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
+	id 1fBLIR-0000ec-JP
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 10:21:23 -0400
+Received: by mail-ot0-x241.google.com with SMTP id i5-v6so25518502oth.1
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 07:21:22 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87k1svllqc.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 28/46] tests/tcg/aarch64: add
- Makefile.target
+In-Reply-To: <20180425112415.12327-2-pagupta@redhat.com>
+References: <20180425112415.12327-1-pagupta@redhat.com>
+	<20180425112415.12327-2-pagupta@redhat.com>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Wed, 25 Apr 2018 07:21:21 -0700
+Message-ID: <CAPcyv4hvrB08XPTbVK0xT2_1Xmaid=-v3OMxJVDTNwQucsOHLA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC v2 1/2] virtio: add pmem driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,42 +29,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: peter.maydell@linaro.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, qemu-devel@nongnu.org
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, KVM list <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, linux-nvdimm <linux-nvdimm@ml01.01.org>, Linux MM <linux-mm@kvack.org>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Rik van Riel <riel@surriel.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Nitesh Narayan Lal <nilal@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Zwisler, Ross" <ross.zwisler@intel.com>, David Hildenbrand <david@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Christoph Hellwig <hch@infradead.org>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, niteshnarayanlal@hotmail.com, Igor Mammedov <imammedo@redhat.com>, lcapitulino@redhat.com
 
-On 04/25/2018 05:43 AM, Alex Bennée wrote:
-> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
->> On 04/24/2018 12:23 PM, Alex Bennée wrote:
->>> Nothing much here yet.
->>>
->>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->>> ---
->>>  tests/tcg/aarch64/Makefile.target | 5 +++++
->>>  1 file changed, 5 insertions(+)
->>>  create mode 100644 tests/tcg/aarch64/Makefile.target
->>>
->>> diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefile.target
->>> new file mode 100644
->>> index 0000000000..4ac8fbe73f
->>> --- /dev/null
->>> +++ b/tests/tcg/aarch64/Makefile.target
->>> @@ -0,0 +1,5 @@
->>> +# -*- Mode: makefile -*-
->>> +#
->>> +# AArch64 specific tweaks
->>> +
->>> +fcvt: LDFLAGS+=-lm
->>>
->>
->> You missed tests/tcg/aarch64/Makefile.include with:
->>
->> DOCKER_IMAGE=debian-arm64-cross
->> DOCKER_CROSS_COMPILER=aarch64-linux-gnueabi-gcc
+On Wed, Apr 25, 2018 at 4:24 AM, Pankaj Gupta <pagupta@redhat.com> wrote:
+> This patch adds virtio-pmem driver for KVM
+> guest.
 
-Err this is not gnueabi, the correct line is:
+Minor nit, please expand your changelog line wrapping to 72 columns.
 
-DOCKER_CROSS_COMPILER=aarch64-linux-gnu-gcc
+>
+> Guest reads the persistent memory range
+> information from Qemu over VIRTIO and registers
+> it on nvdimm_bus. It also creates a nd_region
+> object with the persistent memory range
+> information so that existing 'nvdimm/pmem'
+> driver can reserve this into system memory map.
+> This way 'virtio-pmem' driver uses existing
+> functionality of pmem driver to register persistent
+> memory compatible for DAX capable filesystems.
 
-> 
-> Doh.. of course I was testing with my cross-compiler and forgot about
-> this ;-)
+We need some additional enabling to disable MAP_SYNC for this
+configuration. In other words, if fsync() is required then we must
+disable the MAP_SYNC optimization. I think this should be a struct
+dax_device property looked up at mmap time in each MAP_SYNC capable
+->mmap() file operation implementation.
