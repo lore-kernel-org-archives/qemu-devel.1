@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fBRGT-00088K-52
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 16:43:46 -0400
+	(envelope-from <omer@kazuar-tech.com>) id 1fBRJA-0000hC-RE
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 16:46:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fBRGO-0005je-Te
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 16:43:45 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59206 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fBRGO-0005jD-Mi
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 16:43:40 -0400
-References: <20180323122520.11270-1-kraxel@redhat.com>
-	<43fc23c1-d72f-748a-5b9d-a816466d7406@redhat.com>
-	<20180425140749.6x3w4h4i2n6uaq7o@sirius.home.kraxel.org>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <1ed94b1c-b416-eebe-9cf3-91943a0e6c5a@redhat.com>
-Date: Wed, 25 Apr 2018 22:43:29 +0200
+	(envelope-from <omer@kazuar-tech.com>) id 1fBRJ8-0006dK-W0
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 16:46:32 -0400
+Received: from mail-lf0-x22f.google.com ([2a00:1450:4010:c07::22f]:39299)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <omer@kazuar-tech.com>)
+	id 1fBRJ8-0006cx-GK
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 16:46:30 -0400
+Received: by mail-lf0-x22f.google.com with SMTP id j193-v6so4425289lfg.6
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 13:46:30 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180425140749.6x3w4h4i2n6uaq7o@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] ramfb: simple boot framebuffer,
- no legacy vga
+References: <CAA-pg_qXZLDEHq6jMN_4GUrFvQgf0AS8Fs559JbucptK6_zrFw@mail.gmail.com>
+	<20180425095657.GF30024@redhat.com>
+	<CAA-pg_oDCGqVDzk67Rw4mL83SexPbt1eZ8AoSMux9Xjda8nUFg@mail.gmail.com>
+	<jpg36zjntuy.fsf@linux.bootlegged.copy>
+	<CAA-pg_rGtB_XVQ1+zWq3W7=SVMXJxoEOu9C7573pMNAA2yUb1g@mail.gmail.com>
+	<jpgbme7f37y.fsf@linux.bootlegged.copy>
+In-Reply-To: <jpgbme7f37y.fsf@linux.bootlegged.copy>
+From: Omer Katz <omer@kazuar-tech.com>
+Date: Wed, 25 Apr 2018 20:46:18 +0000
+Message-ID: <CAA-pg_rvmi-qHgmvmhMznx1n6BgKNr+Uee7jJaY0ZreTqrXtsQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Filtering files passing through MTP devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,108 +34,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
+To: Bandan Das <bsd@redhat.com>
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
-On 04/25/18 16:07, Gerd Hoffmann wrote:
->   Hi,
-> 
->>> We should make sure that any device model that combines ramfb with
->>> another PCI display device is not matched by the OVMF driver for that
->>> PCI display device. IOW, we should use separate PCI IDs or subsystem
->>> IDs (I don't recall the details off-hand). I'd like to avoid messing
->>> with the current device probing code in OVMF. It just wouldn't be nice
->>> if two independent drivers (e.g. VirtioGpuDxe and a supposed
->>> "RamFbDxe") bound the two interfaces at the same time.
->>
->> For example, virtio-vga is already problematic like this (it could be
->> driven by both Virtio10Dxe+VirtioGpuDxe, and QemuVideoDxe), and it had
->> to be hacked around in Virtio10Dxe. So I'm strongly in favor of a device
->> model that clearly looks like one device and one device only to the full
->> set of edk2 drivers, without cross-driver hacks.
-> 
-> Hmm, trying to figure what we should do here best ...
-> 
-> First, ramfb has absolutely no connection to the "combined" device,
-> other than that the combined devices have a single device only.
+I didn't really want MTP. Someone suggested it on IRC.
+What I really wanted is to be able to run my filters while using the normal
+QEMU USB driver.
+I'm not sure how MTP even works so I figured that before I learn anything
+about MTP I'll check here to see if I can implement this easily and
+contribute such a patch.
+On Wed, Apr 25, 2018, 11:20 PM Bandan Das <bsd@redhat.com> wrote:
 
-I think you mean "... single back-end only">
-
-> From
-> the guests point of view there is no difference between
-> 
->   (a) qemu -device virtio-ramfb, and
->   (b) qemu -device virtio-gpu-pci -device ramfb-testdev
-> 
-> On the host side the difference is that (a) is a single QemuConsole
-> which shows virtio-gpu-pci once activated and ramfb otherwise, and
-> (b) is two QemuConsoles, so you can see both virtio-gpu-pci and ramfb
-> side-by-side, for debugging purposes.
-
-Exactly this "multiple frontends, single backend" connection is the
-problem. In UEFI, it is possible to establish a priority order between
-drivers that are all capable of binding the same controller ("handle"),
-but especially with ramfb + another (PCI) video frontend, it's the
-"handles" that are different. The "priority mechanism" would have no
-idea that the drivers cannot peacefully coexist, i.e. it's clueless
-about the (host side only) competition.
-
-This is a problem because you display something on the one device, and
-the screen still shows the other, and users complain.
-
-To my understanding, in Linux, special cross-driver hacks exist for
-this. For example, you boot with efifb (which is not a PCI device), and
-once an actual PCI display driver is configured, it is considered
-superior, and it supplants efifb.
-
-On a tangent: on the host side, we already have to entirely separate I/O
-consoles: some kind of graphics + emulated keyboard, plus serial. Those
-are always displayed in parallel -- not in two GUI toolkit windows, mind
-you, but it's never the case that one permanently "hides" the other. You
-can switch between them in virt-manager. Or, connect to the emulated
-serial port from a terminal window that is separate from the main
-graphics window.
-
-If this was the case with ramfb + something else (i.e., writing to ramfb
-wouldn't be possible to "read back" for the other firmware driver, from
-the PCI framebuffer, and one could switch back and forth between ramfb
-display and PCI display on their desktop), then it would be OK for both
-firmware drivers to bind. Point is, the two back-ends need not occupy
-double the screen real estate; it would suffice if one didn't hide the
-other permanently, and users could switch at will.
-
-> Second, one usecase is vgpu boot display.  When combining ramfb with a
-> (mdev) vgpu qemu can't modify the pci device.  Which I think pretty much
-> implies that adding a whitelist of pci devices to ramfb isn't going to
-> fly.  It would also have the drawback that -device ramfb-testdev will
-> not work.
-> 
-> So lets do it the other way around?  Blacklist devices which
-> QemuVideoDxe and VirtioGpuDxe should *not* bind to?
-
-(It's a bit worse than that, actually -- VirtioGpuDxe does not consume
-EFI_PCI_IO_PROTOCOL, it consumes VIRTIO_DEVICE_PROTOCOL.
-VIRTIO_DEVICE_PROTOCOL is produced by the various virtio transport
-drivers we have; in this particular case, that is Virtio10Dxe. And it is
-Virtio10Dxe that consumes EFI_PCI_IO_PROTOCOL. So the mutual exclusion,
-for virtio-vga anyway, happens between QemuVideoDxe and Virtio10Dxe, on
-the controller handle that has a PciIo interface on it.)
-
-> One way would be to
-> just use different pci (subsystem) ids.  Problem is that the guest os
-> driver might not bind too then.  So something else?  Add a pci
-> capability maybe?  Other ideas?
-
-I could imagine an OvmfPkg-specific PCI capability that said, "all PCI
-drivers in OvmfPkg that could otherwise drive this device, ignore it --
-another (platform) driver in OvmfPkg will pick it up instead". This
-would resolve the competition between ramfb and whatever PCI device;
-ramfb would always win. (We should add the capability check to OvmfPkg's
-PCI drivers *no later* than introducing the ramfb driver though, so
-there be no "window" where both kinds bound.)
-
-(Wrt. updating the PCI ID lists of guest OS drivers -- I guess that too
-could be viable, at least for Linux. I'm not really certain.)
-
-Thanks
-Laszlo
+> Omer Katz <omer@kazuar-tech.com> writes:
+>
+> > What would be a simpler way to do this so that the guest machine would
+> > still be able to recognize the USB drive?
+> > Right now we're triggering a script whenever udev recognizes that a USB
+> > drive is plugged in.
+> > The script copies the allowed files to a certain folder. The guest has =
+a
+> > cron job that periodically triggers scp from that folder to the guest.
+> > That's a very complicated flow and I just described only the flow which
+> > files are imported. I even omitted some of the moving parts since they
+> are
+> > irrelevant.
+> > Long story short our architecture is very complicated because of this
+> > issue.
+>
+> If you are using a physical USB drive, where do you envision the emulated
+> mtp share fits ? One way would be that your udev scripts only copies
+> files that can be read to the mtp share. Similarly, it only copies back
+> written files that accept a certain criteria from the share.
+>
+> Ofcourse, you can try out adding your filter hooks to dev-mtp.c as well
+> if you think that seems more suited to your use case. I was just
+> wondering whether reviewers will point it out as too specific. In the
+> worst case, it will be a in-house change that you will have to maintain
+> yourself.
+>
+> Bandan
+>
+> >
+> > On Wed, Apr 25, 2018, 7:17 PM Bandan Das <bsd@redhat.com> wrote:
+> >
+> >> Omer Katz <omer@kazuar-tech.com> writes:
+> >>
+> >> > We're connecting USB drives that we want the guests to copy files
+> from.
+> >> > The user should only be allowed to copy certain files into the syste=
+m.
+> >> > The same thing goes for copying files to the USB drive. We only allo=
+w
+> >> > certain files to be exported from the guest.
+> >>
+> >> If I understand your problem correctly, this should be doable by
+> plugging
+> >> in
+> >> your logic into usb_mtp_write_data for the write side and
+> >> usb_mtp_handle_data
+> >> for the read side. The write probably doesn't need a lot, you trigger =
+an
+> >> error
+> >> response the moment your data has something you don't want and discard
+> the
+> >> new file.
+> >> For the read, though, you probably have to read the whole file first,
+> >> which is not what the current code is doing (I think).
+> >>
+> >> Apart from that dev-mtp.c is implementing a MTP server based on the MT=
+P
+> >> spec and adding
+> >> something like this would be confusing, I also feel that this is too
+> >> specific a usecase
+> >> and as Daniel said, there are perhaps simpler ways of doing it.
+> >>
+> >> Bandan
+> >>
+> >> > On Wed, Apr 25, 2018, 12:57 PM Daniel P. Berrang=C3=A9 <
+> berrange@redhat.com>
+> >> > wrote:
+> >> >
+> >> >> On Mon, Apr 23, 2018 at 03:10:32PM +0000, Omer Katz wrote:
+> >> >> > Hi everyone,
+> >> >> >
+> >> >> > We have a use case that requires us to only allow certain files t=
+o
+> >> pass
+> >> >> > through to the guest machine from USB storage devices.
+> >> >> >
+> >> >> > I was told on IRC that such a feature does not exist but the
+> easiest
+> >> way
+> >> >> to
+> >> >> > achieve our goal is to contribute a patch the the MTP device driv=
+er
+> >> since
+> >> >> > other drivers operate on a filesystem level instead of a file lev=
+el
+> >> which
+> >> >> > is what we need.
+> >> >>
+> >> >> IMHO the easiest way to stop the guest accessing files is to simply
+> not
+> >> >> put them in the directory that you are exporting the guest in the
+> first
+> >> >> place. If you have a directory that has some files you don't want
+> >> accessed
+> >> >> and can't remove them, then perhaps create a second directory and u=
+se
+> >> >> symlinks or hardlinks to pull in files from the original directory.
+> >> >>
+> >> >> > The plan is to pass the contents of each file to a program throug=
+h
+> >> stdin
+> >> >> > and decide based on the exit code if the file should be allowed t=
+o
+> >> pass
+> >> >> > through to the guest or not.
+> >> >>
+> >> >> I can't say I like this idea. It is a really very inefficient and
+> heavy
+> >> >> solution.
+> >> >>
+> >> >> > Since this is the first time I'm contributing to QEMU I'd like so=
+me
+> >> >> > guidance to where the filtering code should be.
+> >> >> > https://github.com/qemu/qemu/blob/master/hw/usb/dev-mtp.c doesn't
+> >> look
+> >> >> that
+> >> >> > complicated but I still need to understand it better to continue.
+> >> >> > Furthermore, I need to know where to add such a command line
+> option to
+> >> >> > point QEMU to the filtering program.
+> >> >> >
+> >> >> > Would such a patch be accepted if all the requirements above are
+> met?
+> >> >>
+> >> >> Can you explain the usage scenario you have in more details, rather
+> than
+> >> >> just the high level abstract.
+> >> >>
+> >> >>
+> >> >> Regards,
+> >> >> Daniel
+> >> >> --
+> >> >> |: https://berrange.com      -o-
+> >> >> https://www.flickr.com/photos/dberrange :|
+> >> >> |: https://libvirt.org         -o-
+> >> >> https://fstop138.berrange.com :|
+> >> >> |: https://entangle-photo.org    -o-
+> >> >> https://www.instagram.com/dberrange :|
+> >> >>
+> >>
+>
