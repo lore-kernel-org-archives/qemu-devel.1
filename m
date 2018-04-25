@@ -1,39 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58332)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1fBMiI-0005BB-AI
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:52:11 -0400
+	(envelope-from <thuth@redhat.com>) id 1fBMid-0005Oc-LS
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:52:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1fBMiE-0006Cs-7B
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:52:10 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46532)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1fBMiD-0006CH-TA
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:52:06 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w3PFl171101796
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 11:52:03 -0400
-Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2hjut3jx2k-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 11:52:02 -0400
-Received: from localhost
-	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
-	Wed, 25 Apr 2018 09:52:01 -0600
-References: <1524647323-6449-1-git-send-email-thuth@redhat.com>
-	<1524647323-6449-2-git-send-email-thuth@redhat.com>
-From: Farhan Ali <alifm@linux.ibm.com>
-Date: Wed, 25 Apr 2018 11:51:57 -0400
+	(envelope-from <thuth@redhat.com>) id 1fBMiZ-0006J1-MO
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:52:31 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40822 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fBMiZ-0006Im-HE
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 11:52:27 -0400
+References: <20180425153343.24023-1-alex.bennee@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <cb41b3a5-0e3b-f30b-a02c-1cc333d38ab1@redhat.com>
+Date: Wed, 25 Apr 2018 17:52:15 +0200
 MIME-Version: 1.0
-In-Reply-To: <1524647323-6449-2-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180425153343.24023-1-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <119edcae-745d-f31e-c0a3-62ae1fe75c24@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] pc-bios/s390-ccw/net: Split up
- net_load() into init, load and uninit parts
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH] hw/core: expand description of
+ null-machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,27 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel@redhat.com>, peter.maydell@linaro.org, Eduardo Habkost <ehabkost@redhat.com>
 
+On 25.04.2018 17:33, Alex Benn=C3=A9e wrote:
+> People following old instructions for QEMU get the message "No machine
+> specified, and there is no default" and run -machine help to pick a
+> new machine. Lay people might consider the null-machine to be such a
+> basic starting point but they won't get far. This leads to confusion,
+> see https://bugs.launchpad.net/qemu/+bug/1766896 as an example.
+>=20
+> I'm open to better words - I figured "THIS PROBABLY ISN'T WHAT YOU
+> WANT" seemed less helpful though.
+>=20
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  hw/core/null-machine.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
+> index cde4d3eb57..72f0815045 100644
+> --- a/hw/core/null-machine.c
+> +++ b/hw/core/null-machine.c
+> @@ -50,7 +50,7 @@ static void machine_none_init(MachineState *mch)
+> =20
+>  static void machine_none_machine_init(MachineClass *mc)
+>  {
+> -    mc->desc =3D "empty machine";
+> +    mc->desc =3D "empty machine (for probing/QMP)";
 
+Actually, with certain CPUs, you can really use the "none" machine as a
+pure instruction set testing system. For example, on m68k, there used to
+be an explicit "dummy" machine for this job, and we removed it in favour
+of the "none" machine:
 
-On 04/25/2018 05:08 AM, Thomas Huth wrote:
-> When we want to support pxelinux-style network booting later, we've got
-> to do several TFTP transfers - and we do not want to apply for a new IP
-> address via DHCP each time. So split up net_load into three parts:
-> 
-> 1. net_init(), which initializes virtio-net, gets an IP address via DHCP
->     and prints out the related information.
-> 
-> 2. The tftp_load call is now moved directly into the main() function
-> 
-> 3. A new net_release() function which should tear down the network stack
->     before we are done in the firmware.
-> 
-> This will make it easier to extend the code in the next patches.
-> 
-> Signed-off-by: Thomas Huth<thuth@redhat.com>
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D22f2dbe7eaf3e12e38c=
+9c210
 
-You might want to change the commit header "uninit parts" to "release 
-parts" :)
+So I'd rather not add such wording. We should rather fix those segfaults
+instead (QEMU should never segfault - in case a device can not be used
+with the "none" machine, there rather should be an error message instead)=
+.
+
+ Thomas
