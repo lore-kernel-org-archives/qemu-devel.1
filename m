@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fBKuC-0007V2-1u
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:56:21 -0400
+	(envelope-from <pagupta@redhat.com>) id 1fBKul-0007nU-KM
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:56:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fBKu8-00033K-U7
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:56:20 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53134 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fBKu8-000339-NO
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:56:16 -0400
-Date: Wed, 25 Apr 2018 15:56:07 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180425155607.61cec750@redhat.com>
-In-Reply-To: <20180425154938.78deea44@redhat.com>
-References: <1524524398-41342-1-git-send-email-mst@redhat.com>
-	<CF6A88132359CE47947DB4C6E1709ED53973A729@ORSMSX110.amr.corp.intel.com>
-	<20180424035504-mutt-send-email-mst@kernel.org>
-	<20180424095722.76105b40@redhat.com>
-	<20180424201554-mutt-send-email-mst@kernel.org>
-	<CF6A88132359CE47947DB4C6E1709ED53973A87A@ORSMSX110.amr.corp.intel.com>
-	<20180424210040-mutt-send-email-mst@kernel.org>
-	<20180425154938.78deea44@redhat.com>
+	(envelope-from <pagupta@redhat.com>) id 1fBKui-0003EK-FT
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 09:56:55 -0400
+Date: Wed, 25 Apr 2018 09:56:49 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <709141862.22620677.1524664609218.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20180425152356.46ee7e04@redhat.com>
+References: <20180420123456.22196-1-david@redhat.com>
+	<20180420123456.22196-4-david@redhat.com>
+	<20180423141928.7e64b380@redhat.com>
+	<908f1079-385f-24d3-99ad-152ecd6b01d2@redhat.com>
+	<20180424153154.05e79de7@redhat.com>
+	<1046685642.22350584.1524635112123.JavaMail.zimbra@redhat.com>
+	<20180425152356.46ee7e04@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] acpi/nvdimm: remove forward name references
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] pc-dimm: factor out address space
+ logic into MemoryDevice code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,204 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "Williams, Dan J" <dan.j.williams@intel.com>, "Schmauss, Erik" <erik.schmauss@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-On Wed, 25 Apr 2018 15:49:38 +0200
-Igor Mammedov <imammedo@redhat.com> wrote:
 
-> On Tue, 24 Apr 2018 21:06:37 +0300
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
-> > On Tue, Apr 24, 2018 at 05:47:58PM +0000, Schmauss, Erik wrote:  
-> > > 
-> > >     
-> > > > -----Original Message-----
-> > > > From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> > > > Sent: Tuesday, April 24, 2018 10:43 AM
-> > > > To: Igor Mammedov <imammedo@redhat.com>
-> > > > Cc: Schmauss, Erik <erik.schmauss@intel.com>; qemu-devel@nongnu.org; Xiao
-> > > > Guangrong <xiaoguangrong.eric@gmail.com>; Williams, Dan J
-> > > > <dan.j.williams@intel.com>
-> > > > Subject: Re: [PATCH] acpi/nvdimm: remove forward name references
+> > > > >     
+> > > > >> +
+> > > > >> +    memory_region_add_subregion(&hpms->mr, addr - hpms->base, mr);
+> > > > > missing vmstate registration?
 > > > > 
-> > > > On Tue, Apr 24, 2018 at 09:57:22AM +0200, Igor Mammedov wrote:    
-> > > > > On Tue, 24 Apr 2018 04:02:40 +0300
-> > > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > > >    
-> > > > > > On Tue, Apr 24, 2018 at 12:41:29AM +0000, Schmauss, Erik wrote:    
-> > > > > > >
-> > > > > > >    
-> > > > > > > > -----Original Message-----
-> > > > > > > > From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> > > > > > > > Sent: Monday, April 23, 2018 4:03 PM
-> > > > > > > > To: qemu-devel@nongnu.org
-> > > > > > > > Cc: Schmauss, Erik <erik.schmauss@intel.com>; Igor Mammedov
-> > > > > > > > <imammedo@redhat.com>; Xiao Guangrong
-> > > > > > > > <xiaoguangrong.eric@gmail.com>
-> > > > > > > > Subject: [PATCH] acpi/nvdimm: remove forward name references
-> > > > > > > >
-> > > > > > > > NVDIMM SSDT table references a name ("MEMA") before it is
-> > > > > > > > defined. This is reported to no longer be supported since Linux 4.17-rc1.
-> > > > > > > >
-> > > > > > > > While arguably Linux needs to keep working on old hypervisors,
-> > > > > > > > and other OSes seem fine with our behaviour, it seems cleaner to
-> > > > > > > > have the definition appear in the SSDT before use.
-> > > > > > > >
-> > > > > > > > Suggested-by: "Schmauss, Erik" <erik.schmauss@intel.com>
-> > > > > > > > Cc: qemu-stable@nongnu.org
-> > > > > > > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > > > > > > > ---
-> > > > > > > >
-> > > > > > > > Hi Erik,
-> > > > > > > > could you pls test the issue and report whether it addresses
-> > > > > > > > your concern? I can't    
-> > > > > > > Hi Michael,
-> > > > > > >    
-> > > > > > > > do much to fix past releases which IIUC shipped this code since
-> > > > > > > > 2.6.0 about a year ago.
-> > > > > > > >
-> > > > > > > > Lightly tested with Linux only.    
-> > > > > > >
-> > > > > > > I'm looking at the ASL tables generated by make check-qtest-x86_64.
-> > > > > > > This line    
-> > > > > >
-> > > > > > which line?
-> > > > > >    
-> > > > > > > ends up generating a strange ACPI table where the Operation region
-> > > > > > > and field declarations are stuck inside the NCAL method which is
-> > > > > > > called from _DSM. If we create the operation region and methods
-> > > > > > > inside methods, they disappear after the NCAL method returns.    
-> > > > > What's wrong with it?
-> > > > > Method is complete so temporary objects it has used went out of scope,
-> > > > > all within spec rules and worked fine with linux and windows guests.
-> > > > >    
-> > > > > > > I think nvdimm_build_common_dsm() needs some refining.    
-> > > > > >
-> > > > > > What exactly do you refer to?
-> > > > > >
-> > > > > > DefinitionBlock ("", "SSDT", 1, "BOCHS ", "NVDIMM", 0x00000001) {
-> > > > > >     Name (MEMA, 0x07FFE000)
-> > > > > >     Scope (\_SB)
-> > > > > >     {
-> > > > > >         Device (NVDR)
-> > > > > >         {
-> > > > > >             Name (_HID, "ACPI0012" /* NVDIMM Root Device */)  // _HID:    
-> > > > Hardware ID    
-> > > > > >             Method (NCAL, 5, Serialized)
-> > > > > >             {
-> > > > > >                 Local6 = MEMA /* \MEMA */
-> > > > > >                 OperationRegion (NPIO, SystemIO, 0x0A18, 0x04)
-> > > > > >                 OperationRegion (NRAM, SystemMemory, Local6, 0x1000)
-> > > > > >
-> > > > > > 		^^^ this?
-> > > > > >
-> > > > > > I agree the NPIO could be moved out.
-> > > > > > Don't really understand why is Local6 needed - can't MEMA be used
-> > > > > > directly? Assuming it isn't NRAM could be moved out too.    
-> > > > > From spec
-> > > > >  DefOpRegion := OpRegionOp NameString RegionSpace RegionOffset
-> > > > > RegionLen  RegionOffset := TermArg => Integer  TermArg := Type2Opcode
-> > > > > | DataObject | ArgObj | LocalObj
-> > > > >
-> > > > > So named object is not accepted,    
-> > > > 
-> > > > might be worth checking what happens with actual OSPMs.
-> > > > If it does happen to work, we can try tweaking the ACPI spec to allow this.    
-> > > 
-> > > I'm looking at the ACPI6.2a spec on page 840 and it says
-> > > TermArg := Type2Opcode | DataObject | Argterm |LocalTerm |NameString |SymbolicExpression    
+> > > > Missed this one: To be called by the caller. Important because e.g. for
+> > > > virtio-pmem we don't want this (I assume :) ).
+> > > if pmem isn't on shared storage, then We'd probably want to migrate
+> > > it as well, otherwise target would experience data loss.
+> > > Anyways, I'd just reat it as normal RAM in migration case
 > > 
-> > Oh right, that's there since ACPI 6.0.  
-> Strange, I've rechecked AML definition of TermArg in 6.0 and 6.2a
-> and it still says only
-> 
->   TermArg := Type2Opcode | DataObject | ArgObj | LocalObj
-> 
-> For 6.2a, I'm looking at chapter "20.2.5 Term Objects Encoding"
-> where exactly do you guys see that longer variant?
-Found it in "19.2.3 ASL Root and Secondary Terms",
-so it looks like we have a bug in spec since definition
-of TermArg differs.
+> > Main difference between RAM and pmem it acts like combination of RAM and
+> > disk.
+> > Saying this, in normal use-case size would be 100 GB's - few TB's range.
+> > I am not sure we really want to migrate it for non-shared storage use-case.
+> with non shared storage you'd have to migrate it target host but
+> with shared storage it might be possible to flush it and use directly
+> from target host. That probably won't work right out of box and would
+> need some sort of synchronization between src/dst hosts.
 
-  
-> > As usual, the issue is that
-> > we can't easily check what does OSPM support.
-> > This is really something worth fixing in the spec IMHO.
-> > We could just try and test a bunch of guest OSPMs and if
-> > they happen to work, switch to that. Lots of work for
-> > uncertain benefit.  
-> I think some windows versions weren't happy with it when
-> we were trying to use dynamic operation regions with offset
-> as namestring.
+Shared storage should work out of the box. Only thing is data in destination
+host will be cache cold and existing pages in cache should be invalidated first. 
+But if we migrate entire fake DAX RAMstate it will populate destination host page 
+cache including pages while were idle in source host. This would unnecessarily 
+create entropy in destination host. 
+
+To me this feature don't make much sense. Problem which we are solving is:
+Efficiently use guest RAM. 
+
 > 
+> The same applies to nv/pc-dimm as well, as backend file easily could be
+> on pmem storage as well.
+
+Are you saying backing file is in actual actual nvdimm hardware? we don't need 
+emulation at all. 
+
 > 
-> > > In our case, MEMA is a namestring so we should be able to avoid the local6 and insert MEMA instead. Just as long as the Named object appears in the table before the object is used, the windows parser should work fine.
-> > > 
-> > > After applying this patch, the only change in ASL/AML that I was expecting was for MEMA to be moved to the top of the definition block and leave everything else alone.    
-> > 
-> > Right. This is what I see.
-> >   
-> > > We usually do not recommend the creation of objects inside of control methods due to the overhead of creating/destroying these objects after each method call. So the one problem that I can see with this is that performance could bog down if this method is called a lot. If it is not called very frequently, then it's probably not a big deal. 
-> > >     
-> > > >     
-> > > > > we could have played games with
-> > > > > references and Type2Opcode but that didn't work nice with Windows ACPI
-> > > > > parser. Hence local object.    
-> > > > 
-> > > > A comment in code wouldn't hurt to explain this.
-> > > >     
-> > > > > The reason why OperationRegion is dynamic, is that if we put it
-> > > > > outside of method it will become static, and we would have to use
-> > > > > Integer constant there (no named objects are allowed) and then patch
-> > > > > it dynamically in bios loader.
-> > > > > I'd prefer to keep it as is, without introducing another hack like
-> > > > > build_append_named_operation_region() to create it with know offset so
-> > > > > firmware could patch it.    
-> > > > 
-> > > > I agree to that.
-> > > >     
-> > > > > >
-> > > > > >
-> > > > > > It all seems suboptimal but given the method is serialized, I don't
-> > > > > > see anything wrong with it as such.
-> > > > > >
-> > > > > >    
-> > > > > > >    
-> > > > > > > >
-> > > > > > > >  hw/acpi/nvdimm.c | 6 ++++--
-> > > > > > > >  1 file changed, 4 insertions(+), 2 deletions(-)
-> > > > > > > >
-> > > > > > > > diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c index
-> > > > > > > > 59d6e42..fadebbd
-> > > > > > > > 100644
-> > > > > > > > --- a/hw/acpi/nvdimm.c
-> > > > > > > > +++ b/hw/acpi/nvdimm.c
-> > > > > > > > @@ -1234,6 +1234,10 @@ static void nvdimm_build_ssdt(GArray
-> > > > > > > > *table_offsets, GArray *table_data,
-> > > > > > > >      ssdt = init_aml_allocator();
-> > > > > > > >      acpi_data_push(ssdt->buf, sizeof(AcpiTableHeader));
-> > > > > > > >
-> > > > > > > > +    /* Storage for the memory address */
-> > > > > > > > +    mem_addr_offset = table_data->len +
-> > > > > > > > +        build_append_named_dword(ssdt->buf,
-> > > > > > > > + NVDIMM_ACPI_MEM_ADDR);
-> > > > > > > > +
-> > > > > > > >      sb_scope = aml_scope("\\_SB");
-> > > > > > > >
-> > > > > > > >      dev = aml_device("NVDR");
-> > > > > > > > @@ -1266,8 +1270,6 @@ static void nvdimm_build_ssdt(GArray
-> > > > > > > > *table_offsets, GArray *table_data,
-> > > > > > > >
-> > > > > > > >      /* copy AML table into ACPI tables blob and patch header there */
-> > > > > > > >      g_array_append_vals(table_data, ssdt->buf->data, ssdt->buf->len);
-> > > > > > > > -    mem_addr_offset = build_append_named_dword(table_data,
-> > > > > > > > -                                               NVDIMM_ACPI_MEM_ADDR);
-> > > > > > > >
-> > > > > > > >      bios_linker_loader_alloc(linker,
-> > > > > > > >                               NVDIMM_DSM_MEM_FILE,
-> > > > > > > > dsm_dma_arrea,
-> > > > > > > > --
-> > > > > > > > MST    
+> Maybe for now we should migrate everything so it would work in case of
+> non shared NVDIMM on host. And then later add migration-less capability
+> to all of them.
+
+not sure I agree.
+
 > 
-> 
+> > One reason why nvdimm added vmstate info could be: still there would be
+> > transient
+> > writes in memory with fake DAX and there is no way(till now) to flush the
+> > guest
+> > writes. But with virtio-pmem we can flush such writes before migration and
+> > automatically
+> > at destination host with shared disk we will have updated data.
+> nvdimm has concept of flush address hint (may be not implemented in qemu yet)
+> but it can flush. The only reason I'm buying into virtio-mem idea
+> is that would allow async flush queues which would reduce number
+> of vmexits.
+
+Thats correct.
+
+Thanks,
+Pankaj
+
+ 
