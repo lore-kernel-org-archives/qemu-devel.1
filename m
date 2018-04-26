@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54075)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fBZiu-0002zh-OK
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:45:41 -0400
+	(envelope-from <bounces@canonical.com>) id 1fBZsx-00052Q-1V
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:56:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fBZip-0004Mi-TZ
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:45:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56662 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fBZip-0004MT-P6
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:45:35 -0400
-Date: Thu, 26 Apr 2018 13:45:22 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180426054522.GP9036@xz-mi>
-References: <20180425045129.17449-1-peterx@redhat.com>
-	<20180425045129.17449-4-peterx@redhat.com>
-	<20180425162658.GA9204@flamenco>
+	(envelope-from <bounces@canonical.com>) id 1fBZst-0007RN-6D
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:56:03 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56668)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fBZst-0007Qr-0E
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:55:59 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fBZsn-0006l6-2Y
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 05:55:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A005F2E80D3
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 05:55:50 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180425162658.GA9204@flamenco>
-Subject: Re: [Qemu-devel] [PATCH 03/10] intel-iommu: add iommu lock
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 26 Apr 2018 05:43:00 -0000
+From: Thomas Huth <1726733@bugs.launchpad.net>
+Reply-To: Bug 1726733 <1726733@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150883054273.17842.2005412492234406727.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152472138068.7415.12721827716594345185.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] =?utf-8?b?W0J1ZyAxNzI2NzMzXSBSZTog4oCYcWVtdS1pbWcg?=
+ =?utf-8?q?info_replication=3A=E2=80=99_causes_segfault?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +37,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>, "Michael S . Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Wed, Apr 25, 2018 at 12:26:58PM -0400, Emilio G. Cota wrote:
-> On Wed, Apr 25, 2018 at 12:51:22 +0800, Peter Xu wrote:
-> > Add a per-iommu big lock to protect IOMMU status.  Currently the only
-> > thing to be protected is the IOTLB cache, since that can be accessed
-> > even without BQL, e.g., in IO dataplane.
-> 
-> Is the added lock going to protect anything else beyond a g_hash_table?
+Fixed here:
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Dcb83d2efe1f591cdc7
 
-It's only for that now.  Maybe there can be other candidates.
+** Changed in: qemu
+       Status: Fix Committed =3D> Fix Released
 
-> If not, did you consider using qht instead of the lock + hash table?
-> It would give you lockless lookups as well as scalable updates.
+-- =
 
-Thanks for pointing that out.  I didn't even know that we have such a
-nice hash there. :) Though for this series I would still prefer to
-keep the mutex way as is for now.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1726733
 
-Firstly, I'd better fix the problem first before considering
-performance - after all this series is not really persuing for
-performance but fixing holes.  So we can have follow up works for QHT
-convertions.  Meanwhile, IOTLB is a bit special in that it might
-really update more often than we thought, so I'm not really sure
-whether a RCU-based hash would bring better performance.  This is even
-not considering the fact that Linux guest intel-iommu driver will do
-more tricks (like frequently flushing IOTLBs) to make the update much
-more than usual.
+Title:
+  =E2=80=98qemu-img info replication:=E2=80=99 causes segfault
 
-But again, the suggestion is valid and it worths further
-investigations to make sure my understandings are correct.
+Status in QEMU:
+  Fix Released
 
-> 
-> [Sorry if my question isn't relevant, I am not familiar with
-> this code and just briefly skimmed over this series.
+Bug description:
+  Typing the literal command =E2=80=98qemu-img info replication:=E2=80=99 c=
+auses a
+  segfault.  Note that =E2=80=98replication:=E2=80=99 is not a filename.
 
-It's of course relevant.  Thanks for your input!
+  $ ./qemu-img info replication:
+  qemu-img: block.c:2609: bdrv_open_inherit: Assertion `!!(flags & BDRV_O_P=
+ROTOCOL) =3D=3D !!drv->bdrv_file_open' failed.
+  Aborted (core dumped)
 
--- 
-Peter Xu
+  This was originally found by Han Han and reported in Fedora:
+  https://bugzilla.redhat.com/show_bug.cgi?id=3D1505652
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1726733/+subscriptions
