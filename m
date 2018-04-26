@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBoJo-0006lr-QI
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 17:20:45 -0400
+	(envelope-from <mjc@sifive.com>) id 1fBonY-0005hB-89
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 17:51:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBoJj-0005ee-Se
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 17:20:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43176)
+	(envelope-from <mjc@sifive.com>) id 1fBonW-0001cy-Rw
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 17:51:28 -0400
+Received: from mail-ot0-x22f.google.com ([2607:f8b0:4003:c0f::22f]:40613)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fBoJj-0005eK-MJ
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 17:20:39 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fBoJi-0008AO-Oo
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 21:20:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9F1182E80C7
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 21:20:38 +0000 (UTC)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fBonW-0001bq-Ku
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 17:51:26 -0400
+Received: by mail-ot0-x22f.google.com with SMTP id n1-v6so1111106otf.7
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 14:51:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Apr 2018 21:14:50 -0000
-From: nada <1767200@bugs.launchpad.net>
-Reply-To: Bug 1767200 <1767200@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <152477729035.32740.12821774063572767433.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1767200] [NEW] Kernel Panic Unable to mount root
- fs on unknown-block(31, 3)
+In-Reply-To: <CAFEAcA_4_K-aGJL4ds3G3p_-Dc1=6OGp9fUaZFuE+PW=UBoSSg@mail.gmail.com>
+References: <20180426135755.GI29865@localhost.localdomain>
+	<CAFEAcA_4_K-aGJL4ds3G3p_-Dc1=6OGp9fUaZFuE+PW=UBoSSg@mail.gmail.com>
+From: Michael Clark <mjc@sifive.com>
+Date: Fri, 27 Apr 2018 09:51:25 +1200
+Message-ID: <CAHNT7NtRy0PcrnT-=xkX1P7m=L7x6NrXN0r27o6fFHZ3q4vfnQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Who is running QEMU automated tests, and when?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,52 +28,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Yash Mankad <ymankad@redhat.com>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Palmer Dabbelt <palmer@sifive.com>, Andrew Waterman <andrew@sifive.com>
 
-Public bug reported:
+On Fri, Apr 27, 2018 at 2:04 AM, Peter Maydell <peter.maydell@linaro.org>
+wrote:
 
-Using the latest qemu:
-qemu-system-arm.exe -kernel C:\Users\a\Downloads\kernel-qemu-4.4.34-jessie =
--cpu arm1176 -m 256 -machine versatilepb -cdrom C:\Users\a\Downloads\picore=
--9.0.3.img
+> On 26 April 2018 at 14:57, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > Peter, do you have additional tests you run before merging a pull
+> > request?  Additional test sets run before tagging a release?
+>
+> I run make && make check, on a variety of hosts, before merging
+> any pull request. That's the only testing I do, and I don't
+> do anything more before I do a tag.
+>
 
-Gives error:
-Kernel Panic Unable to mount root fs on unknown-block(31,3)
+This is what I do on riscv, however it is not yet automated:
 
-I have tried different ARMv6 ARMv7 images/kernels with the same result.
+- QEMU upstream `make check` tests are run in Travis and they should all
+pass.
+- The RISC-V ISA compatibility tests from the `riscv-tests` repository are
+  run and currently all of the tests pass.
+- Fedora Linux and Debian Linux are used for running self-hosted GCC
+bootstraps
+  using the latest Linux kernel and GLIBC user-space in the `virt` machine.
+  A parallel GCC bootstrap is used for stress testing MTTCG, SMP and the
+  interrupt controllers in a multi-core RISC-V virtual machine.
+- Linux 4.6.2 with bbl and busybox are used for backward compatibility
+testing
+  in the `spike_v1.9.1` machine.
+- Linux 4.15.0 with bbl and busybox are used for forward compatibility
+testing
+  in the `spike_v1.10` machine.
+- HiFive1 binaries from the `freedom-u-sdk` are used for testing the
+  `sifive_e` machine.
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+I only run the 24-hour type tests if I am changing anything related to
+interrupts. We are working on interrupt controller emulation and the SMP
+PLIC used by the 'virt' machine was authored by me, however Stefan O'Rear
+contributed to the interrupt handling code and I've been very careful to
+test that I haven't broken and to fully understand the logic and atomicity
+of interrupts. We are working on a new interrupt controller and are
+specifically looking at the possibility of adding a GPIO mock that could be
+combined with some sort of replay mechanism to test the interrupt
+controllers.
 
-** Attachment added: "VFS Kernel Panic Unable to mount root fs on unknown-b=
-lock(31,3)"
-   https://bugs.launchpad.net/bugs/1767200/+attachment/5127917/+files/Qemu-=
-PANIC-VFS-31-3.JPG
+We could bring a snapshot of riscv-tests into the QEMU tree however it
+would be best if they retained the BSD license so we can share locally
+added tests with upstream as upstream is adding tests periodically.
 
--- =
+We have recently made changes to the riscv page walker where we have
+documented it in such a way that each clause represents a descriprition for
+a test case. Our goal is that we would like the code to read similarly to
+the RISC-V Privileged ISA specification where possible.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1767200
+-
+https://github.com/riscv/riscv-qemu/blob/qemu-2.13-for-upstream/target/riscv/cpu_helper.c#L210-L243
 
-Title:
-  Kernel Panic Unable to mount root fs on unknown-block(31,3)
+BTW Andrew Waterman reviewed my update to the page walker and caught a bug.
+Linux testing doesn't exercise every dimension of the page permission
+checks. We effectively need malware type tests. Multi-core PTE update
+atomicity tests will also be interesting. The SiFive verification team have
+been working on PMP tests however I am not sure whether these will be made
+open source. The RISC-V QEMU PMP code needs testing. It also needs to
+implement recent changes to the specification for coarse grain PMPs (4K
+granularity) given we use the TLB page size so that PMP can be implemented
+with reasonable performance.
 
-Status in QEMU:
-  New
+We would like to automate all of this and we are working towards that goal.
+One of the dependencies for docker tests are the riscv toolchain packages
+and we are working on this...
 
-Bug description:
-  Using the latest qemu:
-  qemu-system-arm.exe -kernel C:\Users\a\Downloads\kernel-qemu-4.4.34-jessi=
-e -cpu arm1176 -m 256 -machine versatilepb -cdrom C:\Users\a\Downloads\pico=
-re-9.0.3.img
-
-  Gives error:
-  Kernel Panic Unable to mount root fs on unknown-block(31,3)
-
-  I have tried different ARMv6 ARMv7 images/kernels with the same
-  result.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1767200/+subscriptions
+Adding port specific tests, like riscv tests to QEMU not only benefits the
+particular port but also exercises a log of generic code such as the TCG,
+the IO system, IO mutex, Virt IO and many other shared code paths.
