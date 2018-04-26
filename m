@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tina.zhang@intel.com>) id 1fBcEb-0003td-Pr
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 04:26:34 -0400
+	(envelope-from <peterx@redhat.com>) id 1fBcH6-0005gg-Ko
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 04:29:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tina.zhang@intel.com>) id 1fBcEa-0003Lr-Ua
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 04:26:33 -0400
-Received: from mga07.intel.com ([134.134.136.100]:55657)
+	(envelope-from <peterx@redhat.com>) id 1fBcH3-0004mX-DT
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 04:29:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50780 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tina.zhang@intel.com>)
-	id 1fBcEa-0003LZ-M5
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 04:26:32 -0400
-From: Tina Zhang <tina.zhang@intel.com>
-Date: Thu, 26 Apr 2018 16:21:20 +0800
-Message-Id: <1524730880-7154-3-git-send-email-tina.zhang@intel.com>
-In-Reply-To: <1524730880-7154-1-git-send-email-tina.zhang@intel.com>
-References: <1524730880-7154-1-git-send-email-tina.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH v3 2/2] ui: introduce vfio_display_reset
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fBcH3-0004mL-7d
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 04:29:05 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9B4FE406C74B
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 08:29:00 +0000 (UTC)
+Date: Thu, 26 Apr 2018 16:28:52 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180426082852.GU9036@xz-mi>
+References: <20180425112723.1111-1-quintela@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180425112723.1111-1-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v12 00/21] Multifd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,89 +32,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alex.williamson@redhat.com, kraxel@redhat.com, zhenyuw@linux.intel.com, hang.yuan@intel.com
-Cc: Tina Zhang <tina.zhang@intel.com>, intel-gvt-dev@lists.freedesktop.org, qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
 
-During guest OS reboot, guest framebuffer is invalid. It will cause
-bugs, if the invalid guest framebuffer is still used by host.
+On Wed, Apr 25, 2018 at 01:27:02PM +0200, Juan Quintela wrote:
+> 
+> Hi
+> 
+> 
+> [v12]
+> 
+> Big news, it is not RFC anymore, it works reliabely for me.
+> 
+> Changes:
+> - Locknig changed completely (several times)
+> - We now send  all pages through the channels.  In a 2GB guest with 1 disk and a network card, the amount of data send for RAM was 80KB.
+> - This is not optimized yet, but it shouws clear improvements over precopy.  testing over localhost networking I can guet:
+>   - 2 VCPUs guest
+>   - 2GB RAM
+>   - runn stress --vm 4 --vm 500GB (i.e. dirtying 2GB or RAM each second)
+> 
+>   - Total time: precopy ~50seconds, multifd  around 11seconds
+>   - Bandwidth usage is around 273MB/s vs 71MB/s on the same hardware
+> 
+> This is very preleminary testing, will send more numbers when I got them.  But looks promissing.
+> 
+> Things that will be improved later:
+> - Initial synchronization is too slow (around 1s)
+> - We synchronize all threads after each RAM section, we can move to only
+>   synchronize them after we have done a bitmap syncrhronization
+> - We can improve bitmap walking (but that is independent of multifd)
 
-This patch is to introduce vfio_display_reset which is invoked
-during vfio display reset. This vfio_display_reset function is used
-to release the invalid display resource, disable scanout mode and
-replace the invalid surface with QemuConsole's DisplaySurafce.
+Hi, Juan,
 
-This patch can fix the GPU hang issue caused by gd_egl_draw during
-guest OS reboot.
+I got some high level review comments and notes:
 
-Changes v2->v3:
- - Limit vfio_display_reset to dma-buf based vfio display. (Gerd)
+- This series may need to rebase after Guangrong's cleanup series.
 
-Changes v1->v2:
- - Use dpy_gfx_update_full() update screen after reset. (Gerd)
- - Remove dpy_gfx_switch_surface(). (Gerd)
+- Looks like now we allow multifd and compression be enabled
+  together.  Shall we restrict on that?
 
-Signed-off-by: Tina Zhang <tina.zhang@intel.com>
----
- hw/vfio/display.c | 10 ++++++++++
- hw/vfio/pci.c     |  7 +++++++
- hw/vfio/pci.h     |  1 +
- 3 files changed, 18 insertions(+)
+- Is multifd only for TCP?  If so, do we check against that?  E.g.,
+  should we fail the unix/fd/exec migrations when multifd is enabled?
 
-diff --git a/hw/vfio/display.c b/hw/vfio/display.c
-index 7d727ce..dc4b1e9 100644
---- a/hw/vfio/display.c
-+++ b/hw/vfio/display.c
-@@ -198,6 +198,16 @@ static void vfio_display_dmabuf_exit(VFIODisplay *dpy)
- }
- 
- /* ---------------------------------------------------------------------- */
-+void vfio_display_reset(VFIOPCIDevice *vdev)
-+{
-+    if (!vdev || !vdev->dpy || !vdev->dpy->con) {
-+        return;
-+    }
-+
-+    dpy_gl_scanout_disable(vdev->dpy->con);
-+    vfio_display_dmabuf_exit(vdev->dpy);
-+    dpy_gfx_update_full(vdev->dpy->con);
-+}
- 
- static void vfio_display_region_update(void *opaque)
- {
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index b9bc6cd..648b29d 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -3098,11 +3098,18 @@ static void vfio_pci_reset(DeviceState *dev)
- {
-     PCIDevice *pdev = DO_UPCAST(PCIDevice, qdev, dev);
-     VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
-+    VFIODisplay *dpy = vdev->dpy;
- 
-     trace_vfio_pci_reset(vdev->vbasedev.name);
- 
-     vfio_pci_pre_reset(vdev);
- 
-+    /* vfio_display_reset is needed by dma-buf based vfio display */
-+    if (vdev->display != ON_OFF_AUTO_OFF && dpy &&
-+        dpy->dmabuf.primary) {
-+        vfio_display_reset(vdev);
-+    }
-+
-     if (vdev->resetfn && !vdev->resetfn(vdev)) {
-         goto post_reset;
-     }
-diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-index 629c875..59ab775 100644
---- a/hw/vfio/pci.h
-+++ b/hw/vfio/pci.h
-@@ -176,6 +176,7 @@ int vfio_pci_igd_opregion_init(VFIOPCIDevice *vdev,
-                                struct vfio_region_info *info,
-                                Error **errp);
- 
-+void vfio_display_reset(VFIOPCIDevice *vdev);
- int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp);
- void vfio_display_finalize(VFIOPCIDevice *vdev);
- 
+- Why init sync is slow (1s)?   Is there any clue of that problem?
+
+- Currently the sync between threads are still very complicated to
+  me... we have these on the sender side (I didn't dig the recv side):
+
+  - two global semaphores in multifd_send_state,
+  - one mutex and two semaphores in each of the send thread,
+
+  So in total we'll have 2+3*N such locks/sems.
+
+  I'm thinking whether we can further simplify the sync logic a bit...
+
+Thanks,
+
 -- 
-2.7.4
+Peter Xu
