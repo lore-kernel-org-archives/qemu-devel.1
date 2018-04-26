@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50673)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <juterry@microsoft.com>) id 1fBlI8-0002vd-C4
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:06:49 -0400
+	(envelope-from <eblake@redhat.com>) id 1fBlIn-0003GY-42
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:07:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <juterry@microsoft.com>) id 1fBlI7-000487-0b
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:06:48 -0400
-Received: from mail-co1nam03on0709.outbound.protection.outlook.com
-	([2a01:111:f400:fe48::709]:11396
-	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <juterry@microsoft.com>)
-	id 1fBlI6-00047c-H3
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:06:46 -0400
-From: "Justin Terry (VM)" <juterry@microsoft.com>
-Date: Thu, 26 Apr 2018 18:06:43 +0000
-Message-ID: <DM5PR21MB0170B7D8E14270FF25868E23B68E0@DM5PR21MB0170.namprd21.prod.outlook.com>
-References: <2adfc981-9587-3b41-fcb9-f661c71f51c2@linux.intel.com>
-In-Reply-To: <2adfc981-9587-3b41-fcb9-f661c71f51c2@linux.intel.com>
-Content-Language: en-US
+	(envelope-from <eblake@redhat.com>) id 1fBlIi-0004T6-Qs
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:07:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51134 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fBlIi-0004T1-Ji
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:07:24 -0400
+References: <1524761612-5307-1-git-send-email-ian.jackson@eu.citrix.com>
+	<1524761612-5307-4-git-send-email-ian.jackson@eu.citrix.com>
+	<60a2650a-ff36-1641-51b1-5c5b1a36f18a@redhat.com>
+	<23266.4013.789190.625834@mariner.uk.xensource.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d570f1f7-0db7-cbfb-6a13-eae66263555c@redhat.com>
+Date: Thu, 26 Apr 2018 13:07:16 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] Cannot launch QEMU with -accel whpx
+In-Reply-To: <23266.4013.789190.625834@mariner.uk.xensource.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="kg7WsmI0STDx7KYYjPB0UIUdds9ClIJVz"
+Subject: Re: [Qemu-devel] [RFC PATCH 3/7] error reporting: Use
+ error_report_errno in obvious places
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +31,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wang Wenchao <wenchao.wang@linux.intel.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Ian Jackson <ian.jackson@citrix.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "=?UTF-8?Q?Daniel_P.Berrang=c3=a9?=" <berrange@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Markus Armbruster <armbru@redhat.com>
 
-SGV5IFdlbmNoYW8sDQoNCkl0IGxvb2tzIGxpa2UgeW91ciBzcGVjcyBzaG91bGQgZnVsbHkgc3Vw
-cG9ydCBydW5uaW5nIHRoaXMuIERpZCB5b3UgYnkgY2hhbmNlIGZvcmdldCB0byBlbmFibGUgdGhl
-IFdpbmRvd3Mgb3B0aW9uYWwgZmVhdHVyZT8gSGF2aW5nIHRoZSBsaWIvZGxs4oCZcyBmcm9tIHRo
-ZSBTREsgaXNu4oCZdCBhbGwgeW91IG5lZWQuDQoNClRyeToNCihhZG1pbikgUFM+IEVuYWJsZS1X
-aW5kb3dzT3B0aW9uYWxGZWF0dXJlIC1PbmxpbmUgLUZlYXR1cmVOYW1lIEh5cGVydmlzb3JQbGF0
-Zm9ybQ0KKHJlYm9vdCB0aGUgbWFjaGluZSkNCj4gcWVtdS1zeXN0ZW0teDg2XzY0LmV4ZSAtYWNj
-ZWwgd2hweCDigKYNCg0KTGV0IG1lIGtub3cgaWYgdGhhdCB3YXNu4oCZdCB0aGUgaXNzdWUuDQoN
-ClRoYW5rcywNCkp1c3Rpbg0KDQpGcm9tOiBXYW5nIFdlbmNoYW8gPHdlbmNoYW8ud2FuZ0BsaW51
-eC5pbnRlbC5jb20+DQpTZW50OiBUaHVyc2RheSwgQXByaWwgMjYsIDIwMTggMzo0NyBBTQ0KVG86
-IEp1c3RpbiBUZXJyeSAoVk0pIDxqdXRlcnJ5QG1pY3Jvc29mdC5jb20+DQpDYzogcWVtdS1kZXZl
-bEBub25nbnUub3JnDQpTdWJqZWN0OiBDYW5ub3QgbGF1bmNoIFFFTVUgd2l0aCAtYWNjZWwgd2hw
-eA0KDQpIaSwgSnVzdGluLA0KDQpXZSBhcmUgaW50ZXJlc3RlZCBpbiBXSFBYIGJ1dCBoYXZlbid0
-IGdvdCBpdCB0byB3b3JrLiBXZSB3ZXJlIGFibGUgdG8gYnVpbGQgUUVNVSB3aXRoIFdIUFggc3Vw
-cG9ydC4gV2UgdXNlZCBNU1lTMiBidWlsZCBlbnZpcm9ubWVudCBwbHVzIHR3byBsaWJyYXJpZXMg
-KFdpbkh2Ki5saWIpIGZyb20gdGhlIGxhdGVzdCBXaW5kb3dzIDEwIFNESyBJbnNpZGVyIFByZXZp
-ZXcgdG8gYnVpbGQgUUVNVSBhbmQgYWRkZWQgJy0tZW5hYmxlLXdocHgnIHBhcmFtZXRlciBpbiBj
-b25maWcuIEJ1dCB3aGVuIHdlIHJhbiBpdCBvbiBXaW5kb3dzIHdpdGggSHlwZXItViBvbiwgUUVN
-VSBmYWlsZWQgdG8gYmUgbGF1bmNoZWQuDQoNClRoZSBjb21tYW5kIHRvIGxhdW5jaCBRRU1VIGlz
-IGFzIGJlbG93LA0KDQo+IHFlbXUtc3lzdGVtLXg4Nl82NC5leGUgLWFjY2VsIHdocHgNCg0KVGhl
-IGZvbGxvd2luZyBlcnJvcnMgd2VyZSBvdXRwdXQgZnJvbSB0aGUgY29tbWFuZCBsaW5lLA0KDQpx
-ZW11LXN5c3RlbS14ODZfNjQuZXhlOiBXSFBYOiBObyBhY2NlbGVyYXRvciBmb3VuZCwgaHI9MDAw
-MDAwMDANCnFlbXUtc3lzdGVtLXg4Nl82NC5leGU6IGZhaWxlZCB0byBpbml0aWFsaXplIFdIUFg6
-IE5vIHNwYWNlIGxlZnQgb24gZGV2aWNlDQoNCldlIGFuYWx5emVkIHRoZSBpc3N1ZSBhbmQgZm91
-bmQgd2hlbiBpbnZva2luZyB0aGUgV2luZG93cyBIeXBlcnZpc29yIFBsYXRmb3JtIEFQSSBXSHZH
-ZXRDYXBhYmlsaXR5KCksIGl0IHJldHVybmVkIHdocHhfY2FwLkh5cGVydmlzb3JQcmVzZW50IHdp
-dGggRkFMU0UgYW5kIHRoZW4gV0hQWCBmYWlsZWQgdG8gaW5pdGlhbGl6ZS4gRG8geW91IGhhdmUg
-YW55IHN1Z2dlc3Rpb24gb24gdGhhdD8gVGhhbmtzLg0KDQpXZSBidWlsZCBhbmQgcnVuIFFFTVUg
-b24gdGhlIHNhbWUgbWFjaGluZS4gQmVsb3cgYXJlIGl0cyBzcGVjcywNCg0KV2luZG93cyBPUzog
-V2luZG93cyAxMCBJbnNpZGVyIFByZXZpZXcNCldpbmRvd3MgZWRpdGlvbjogUHJvZmVzc2lvbmFs
-DQpXaW5kb3dzIHZlcnNpb246IDE4MDMgKE9TIGJ1aWxkIDE3MTMzLjEpDQpTREsgdmVyc2lvbjog
-MTAuMC4xNzEyNS4wDQoNClByb2Nlc3NvcjogSW50ZWwoUikgQ29yZShUTSkgaTctODU1MFUgQ1BV
-IEAgMS44MEdIeiAxLjk5R0h6DQpSQU06IDguMDAgR0INClN5c3RlbSBUeXBlOiA2NC1iaXQgT3Bl
-cmF0aW5nIFN5c3RlbSwgeDY0LWJhc2VkIHByb2Nlc3Nvcg0KDQoNCkJlc3QgUmVnYXJkcywNCldl
-bmNoYW8NCg==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--kg7WsmI0STDx7KYYjPB0UIUdds9ClIJVz
+From: Eric Blake <eblake@redhat.com>
+To: Ian Jackson <ian.jackson@citrix.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+ <f4bug@amsat.org>, =?UTF-8?Q?Daniel_P.Berrang=c3=a9?= <berrange@redhat.com>,
+ Alistair Francis <alistair.francis@xilinx.com>,
+ Markus Armbruster <armbru@redhat.com>
+Message-ID: <d570f1f7-0db7-cbfb-6a13-eae66263555c@redhat.com>
+Subject: Re: [RFC PATCH 3/7] error reporting: Use error_report_errno in
+ obvious places
+References: <1524761612-5307-1-git-send-email-ian.jackson@eu.citrix.com>
+ <1524761612-5307-4-git-send-email-ian.jackson@eu.citrix.com>
+ <60a2650a-ff36-1641-51b1-5c5b1a36f18a@redhat.com>
+ <23266.4013.789190.625834@mariner.uk.xensource.com>
+In-Reply-To: <23266.4013.789190.625834@mariner.uk.xensource.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 04/26/2018 12:43 PM, Ian Jackson wrote:
+> Eric Blake writes ("Re: [RFC PATCH 3/7] error reporting: Use error_repo=
+rt_errno in obvious places"):
+>> Misses a lot of two-line instances, such as:
+>> $ git grep -A1 error_report | grep -C1 strerror.errno
+>> ...
+> ...
+>> If we're going to clean up these instances, we might as well look hard=
+er
+>> for them.  Can Coccinelle be coaxed into helping us (at least for
+>> identifying callsites, even if I can't figure out how to make it
+>> slice-and-dice format strings)?
+>=20
+> I have never used Coccinelle, so I don't know.
+
+It was quite easy to detect spots that would benefit from this pattern;
+I'm less certain about getting Coccinelle to rewrite them, but at least
+knowing where they are makes it easier to ensure you aren't missing
+obvious candidates:
+
+$ cat error_report.cocci
+@@
+expression E;
+@@
+* error_report(..., strerror(E))
+
+$ spatch --sp-file error_report.cocci \
+  --macro-file scripts/cocci-macro-file.h --dir . 2>/dev/null \
+  grep -c error_report
+149
+
+Between patch 2 and 5, I thus see 149 instances of a call to strerror()
+embedded as the last parameter to error_report(), which is more than you
+found.
+
+As an example, the tail of the Coccinelle output shows the one in
+block/file-posix.c that I demonstrated that you missed, plus the one in
+util/osdep.c that your simpler perl script caught:
+
+=2E..
+--- ./block/file-posix.c
++++ /tmp/nothing/block/file-posix.c
+@@ -1762,8 +1762,6 @@ static int raw_regular_truncate(int fd,
+ out:
+     if (result < 0) {
+         if (ftruncate(fd, current_length) < 0) {
+-            error_report("Failed to restore old file length: %s",
+-                         strerror(errno));
+         }
+     }
+
+diff -u -p ./util/osdep.c /tmp/nothing/util/osdep.c
+--- ./util/osdep.c
++++ /tmp/nothing/util/osdep.c
+@@ -89,7 +89,6 @@ static int qemu_mprotect__osdep(void *ad
+     return 0;
+ #else
+     if (mprotect(addr, size, prot)) {
+-        error_report("%s: mprotect failed: %s", __func__, strerror(errno=
+));
+         return -1;
+     }
+     return 0;
+
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--kg7WsmI0STDx7KYYjPB0UIUdds9ClIJVz
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlriFVQACgkQp6FrSiUn
+Q2qaiAf/diknlTSgyQDkSFdPh+JCOOgwUWFRUcNwNeLuxBb9L8PiBRMd08tn5mvp
+7H7Zu4uGMDBlsYKnemwxdyhzrPgZW5HgMZxPsiiAQ5MeCjzx2icS3wKGbFmUs5Zd
+QkgyTC2/Ra+vWdpRxySJKRW/x1Xa/D3GlTNUd09wkRE0v/T4ZJyMxXGM4wboUwcQ
+xAei0mNKciT1I0x1r5R3yLZpi98SpMAPEEilkEENzLM+g1HCW5sxcmESSnv1xL+p
+6P0ZR3uHQEaI4cSLoBxcU6CGbYonKVxMBOYxJzSz4+yOG+x31/l7bFOjh6QYZHIj
+dfctzAxbUX6hiKQTgPcCQY2BF5XxPw==
+=wJ14
+-----END PGP SIGNATURE-----
+
+--kg7WsmI0STDx7KYYjPB0UIUdds9ClIJVz--
