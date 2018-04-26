@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fBk56-0002lO-T1
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:49:18 -0400
+	(envelope-from <prvs=647a3a28a=Ian.Jackson@citrix.com>)
+	id 1fBkAC-0006j7-7w
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:54:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fBk56-0007oc-70
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:49:16 -0400
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:34783)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1fBk55-0007oU-Va
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:49:16 -0400
-Received: by mail-lf0-x242.google.com with SMTP id h4-v6so4960931lfc.1
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 09:49:15 -0700 (PDT)
+	(envelope-from <prvs=647a3a28a=Ian.Jackson@citrix.com>)
+	id 1fBkA7-0001Ry-Gy
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:54:32 -0400
+Received: from smtp03.citrix.com ([162.221.156.55]:34804)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <prvs=647a3a28a=Ian.Jackson@citrix.com>)
+	id 1fBkA7-0001Re-5W
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:54:27 -0400
+From: Ian Jackson <ian.jackson@eu.citrix.com>
+Date: Thu, 26 Apr 2018 17:53:25 +0100
+Message-ID: <1524761612-5307-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
-References: <1524699938-6764-1-git-send-email-mjc@sifive.com>
-	<1524699938-6764-11-git-send-email-mjc@sifive.com>
-In-Reply-To: <1524699938-6764-11-git-send-email-mjc@sifive.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 26 Apr 2018 16:48:49 +0000
-Message-ID: <CAKmqyKMaXs0+id2eUBbtyUXAZW7rJWC9wcX9E79tsuWF7-W+Dg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v8 10/35] RISC-V: Remove erroneous comment
- from translate.c
+Content-Type: text/plain
+Subject: [Qemu-devel] [RFC PATCH 0/7] Introduce error_[v]report_errno[val]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +26,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, palmer@sifive.com, Alistair Francis <Alistair.Francis@wdc.com>, patches@groups.riscv.org
+To: qemu-devel@nongnu.org
+Cc: Ian Jackson <Ian.Jackson@eu.citrix.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>
 
-On Wed, Apr 25, 2018 at 5:00 PM Michael Clark <mjc@sifive.com> wrote:
+From: Ian Jackson <Ian.Jackson@eu.citrix.com>
 
-> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Cc: Palmer Dabbelt <palmer@sifive.com>
-> Cc: Alistair Francis <Alistair.Francis@wdc.com>
-> Signed-off-by: Michael Clark <mjc@sifive.com>
+This is apropos if a suggestion from Philippe.  I've compile-tested
+this but not executed it yet.  Let me know what you think.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Thanks,
+Ian.
 
-Alistair
+Ian Jackson (7):
+  error reporting: Introduce errnoval parameter to vreport
+  error reporting: Provide error_report_errno (and error_vreport_errno)
+  error reporting: Use error_report_errno in obvious places
+  error reporting: Fix some error messages to use ":" rather than ","
+  error reporting: Provide error_report_errnoval (and
+    error_vreport_errnoval)
+  error reporting: Use error_report_errnoval in obvious places
+  error reporting: HACKING: Say to use error_report_errno
 
-> ---
->   target/riscv/translate.c | 1 -
->   1 file changed, 1 deletion(-)
+ HACKING                      |  1 +
+ audio/wavcapture.c           |  2 +-
+ block/nvme.c                 |  2 +-
+ block/rbd.c                  |  2 +-
+ block/sheepdog.c             | 16 ++++-----
+ cpus.c                       |  2 +-
+ hw/i386/xen/xen-hvm.c        |  2 +-
+ hw/ppc/spapr_hcall.c         |  2 +-
+ hw/s390x/s390-stattrib-kvm.c |  6 ++--
+ hw/s390x/s390-virtio-ccw.c   |  2 +-
+ hw/scsi/vhost-scsi.c         |  2 +-
+ hw/scsi/vhost-user-scsi.c    |  2 +-
+ hw/tpm/tpm_emulator.c        |  2 +-
+ hw/xen/xen_pt_load_rom.c     |  4 +--
+ include/qemu/error-report.h  |  7 ++++
+ migration/migration.c        |  2 +-
+ migration/postcopy-ram.c     | 12 +++----
+ net/tap-linux.c              |  2 +-
+ os-posix.c                   |  8 ++---
+ qemu-img.c                   | 10 +++---
+ qemu-io-cmds.c               |  4 +--
+ qemu-nbd.c                   | 10 +++---
+ scsi/qemu-pr-helper.c        |  8 ++---
+ slirp/misc.c                 |  4 +--
+ target/arm/kvm64.c           |  4 +--
+ util/osdep.c                 |  2 +-
+ util/qemu-error.c            | 77 ++++++++++++++++++++++++++++++++++++++++----
+ vl.c                         |  6 ++--
+ 28 files changed, 137 insertions(+), 66 deletions(-)
 
-> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-> index 808eab7..c3a029a 100644
-> --- a/target/riscv/translate.c
-> +++ b/target/riscv/translate.c
-> @@ -280,7 +280,6 @@ static void gen_arith(DisasContext *ctx, uint32_t
-opc, int rd, int rs1,
->           tcg_gen_andi_tl(source2, source2, 0x1F);
->           tcg_gen_sar_tl(source1, source1, source2);
->           break;
-> -        /* fall through to SRA */
->   #endif
->       case OPC_RISC_SRA:
->           tcg_gen_andi_tl(source2, source2, TARGET_LONG_BITS - 1);
-> --
-> 2.7.0
+-- 
+2.1.4
