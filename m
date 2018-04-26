@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33192)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBhqI-0008Du-8m
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 10:25:51 -0400
+	(envelope-from <armbru@redhat.com>) id 1fBhyW-00035F-3K
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 10:34:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBhqH-0006Ft-6Y
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 10:25:50 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39702 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fBhyR-0002DV-7D
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 10:34:20 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39986 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fBhqH-0006Fp-2K
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 10:25:49 -0400
-References: <20180426135755.GI29865@localhost.localdomain>
-	<dffa77fa-11d7-5f3c-4c1e-7ed25a55fa25@redhat.com>
-	<20180426141400.GM26812@redhat.com>
-	<20180426142236.GJ29865@localhost.localdomain>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <38a11e73-bb46-873c-b452-feed630b7325@redhat.com>
-Date: Thu, 26 Apr 2018 16:25:40 +0200
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fBhyR-0002CS-3T
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 10:34:15 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180424214550.32549-1-lersek@redhat.com>
+	<20180424214550.32549-7-lersek@redhat.com>
+	<8736zjagg3.fsf@dusky.pond.sub.org>
+	<4509705a-43b2-db40-aa24-18eff649e750@redhat.com>
+	<87sh7i4h5y.fsf@dusky.pond.sub.org>
+	<ea646e6d-9512-559d-be8d-fd3c754cc301@redhat.com>
+	<136c5d3a-9d5b-eb15-a1f4-18150662144b@redhat.com>
+Date: Thu, 26 Apr 2018 16:34:04 +0200
+In-Reply-To: <136c5d3a-9d5b-eb15-a1f4-18150662144b@redhat.com> (Laszlo Ersek's
+	message of "Thu, 26 Apr 2018 15:33:15 +0200")
+Message-ID: <87vacexcir.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180426142236.GJ29865@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Who is running QEMU automated tests, and when?
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 6/6] qapi: discriminate CpuInfo[Fast] on
+ SysEmuTarget, not CpuInfoArch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +33,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Yash Mankad <ymankad@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-On 26.04.2018 16:22, Eduardo Habkost wrote:
-> On Thu, Apr 26, 2018 at 03:14:00PM +0100, Daniel P. Berrang=C3=A9 wrote=
-:
->> On Thu, Apr 26, 2018 at 04:09:55PM +0200, Thomas Huth wrote:
->>> On 26.04.2018 15:57, Eduardo Habkost wrote:
->>>> (Starting a new thread, for more visibility)
->>>>
->>>> (This was: Re: [Qemu-devel] [RFC PATCH] tests/device-introspect: Tes=
-t
->>>> devices with all machines, not only with "none")
->>>>
->>>> On Thu, Apr 26, 2018 at 01:54:43PM +0200, Markus Armbruster wrote:
->>> [...]
->>>>> I don't mind having make check SPEED=3Dslow run more extensive test=
-s.
->>>>> Assuming we actually run them at least once in a while, which seems
->>>>> doubtful.
->>>>
->>>> We probably don't do that, but we really must be running a more
->>>> extensive (and slower) test set at least once before every
->>>> release.
->>>>
->>>> Maybe some people are running SPEED=3Dslow tests, or even more
->>>> extensive test suites like avocado-vt once in a while, but we
->>>> need to know who is running them, and when.
+Laszlo Ersek <lersek@redhat.com> writes:
+
+> On 04/26/18 11:18, Laszlo Ersek wrote:
+>> On 04/26/18 08:26, Markus Armbruster wrote:
+>>> Laszlo Ersek <lersek@redhat.com> writes:
 >>>
->>> At least I am running "make check SPEED=3Dslow" manually from time to
->>> time, especially when we enter the hard freeze period.
->>
->> Hmm, we could get this done by travis. It has the concept of "cron job=
-s"
->> for scheduling builds separately from pushes.
->>
->> So we could keep the current travis jobs unchanged, but then add an
->> use of SPEED=3Dslow when TRAVIS_EVENT_TYPE =3D=3D "cron" in the travis=
-.yml,
->> so we can get SPEED=3Dslow run once a day. Just have to be careful whi=
-ch
->> jobs we make slow so we don't hit the 50 minute timeout.
->=20
-> I expect SPEED=3Dslow tests to eventually take longer than 50
-> minutes, but we can try this and see what happens.
+>>> [...]
+>>>> In brief, I think extending configure / the build system would only help
+>>>> with the less painful part of this (the scalar mapping), and so it's not
+>>>> worth doing.
+>>>
+>>> We're going to leave deprecated query-cpus alone (see Eric's review of
+>>> the previous patch).
+>> 
+>> Yes.
+>> 
+>>> Does that change matters?
+>> 
+>> It does.
+>> 
+>>> PS: Instead of configure changes, #TARGET_BASE_ARCH might do.
+>> 
+>> Does that already exist as a macro? Hmm... After grepping my build dir,
+>> it doesn't seem to, but maybe I can change that. Because,
+>> TARGET_BASE_ARCH is exactly what we need.
+>
+> Acerbic discovery of the day: @CpuInfoArch has "x86", while configure
+> produces:
+>
+>   TARGET_NAME  TARGET_BASE_ARCH
+>          i386              i386
+>        x86_64              i386
+>
+> Note how "i386" does not match "x86".
 
-I already had to move some of the slow tests to SPEED=3Dslow mode in the
-past due to the travis timeouts (which are hit when the machines are
-very loaded), so my guess is that SPEED=3Dslow will hardly work with trav=
-is.
+Review fail.
 
- Thomas
+Just three weeks ago, we could still have fixed query-cpus-fast...
+
+> I guess I'll have to keep the sysemu_target_to_cpuinfo_arch() function.
+
+Assuming this is the only offender, you could also s/i386/x86/ before
+you pass it to qapi_enum_parse().  Pick what you hate less.
