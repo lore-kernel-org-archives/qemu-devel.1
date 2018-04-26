@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34719)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=647a3a28a=Ian.Jackson@citrix.com>)
-	id 1fBjGL-0000y7-Uf
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:56:56 -0400
+	id 1fBjGR-000159-AK
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:56:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=647a3a28a=Ian.Jackson@citrix.com>)
-	id 1fBjGK-0003eg-Im
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:56:50 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:29395)
+	id 1fBjGQ-0003je-GG
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:56:55 -0400
+Received: from smtp03.citrix.com ([162.221.156.55]:29416)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <prvs=647a3a28a=Ian.Jackson@citrix.com>)
-	id 1fBjGK-0003eE-9G
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:56:48 -0400
+	id 1fBjGQ-0003i7-6O
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:56:54 -0400
 From: Ian Jackson <ian.jackson@eu.citrix.com>
-Date: Thu, 26 Apr 2018 16:56:13 +0100
-Message-ID: <1524758187-9351-3-git-send-email-ian.jackson@eu.citrix.com>
+Date: Thu, 26 Apr 2018 16:56:26 +0100
+Message-ID: <1524758187-9351-16-git-send-email-ian.jackson@eu.citrix.com>
 In-Reply-To: <1524758187-9351-1-git-send-email-ian.jackson@eu.citrix.com>
 References: <1524758187-9351-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PULL 02/16] AccelClass: Introduce accel_setup_post
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 15/16] os-posix: cleanup: Replace perror with
+ error_report
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +31,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>
+Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Alistair Francis <alistair.francis@xilinx.com>
 
-This is called just before os_setup_post.  Currently none of the
-accelerators provide this hook, but the Xen one is going to provide
-one in a moment.
+perror() is defined to fprintf(stderr,...).  HACKING says
+fprintf(stderr,...) is wrong.  So perror() is too.
 
 Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Markus Armbruster <armbru@redhat.com>
+CC: Daniel P. Berrange <berrange@redhat.com>
+CC: Michael Tokarev <mjt@tls.msk.ru>
+CC: Alistair Francis <alistair.francis@xilinx.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- accel/accel.c          | 9 +++++++++
- include/sysemu/accel.h | 3 +++
- vl.c                   | 1 +
- 3 files changed, 13 insertions(+)
+ os-posix.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/accel/accel.c b/accel/accel.c
-index 93e2434..9cfab11 100644
---- a/accel/accel.c
-+++ b/accel/accel.c
-@@ -126,6 +126,15 @@ void accel_register_compat_props(AccelState *accel)
-     register_compat_props_array(class->global_props);
- }
+diff --git a/os-posix.c b/os-posix.c
+index a2ba50d..24eb700 100644
+--- a/os-posix.c
++++ b/os-posix.c
+@@ -125,7 +125,7 @@ void os_set_proc_name(const char *s)
+     /* Could rewrite argv[0] too, but that's a bit more complicated.
+        This simple way is enough for `top'. */
+     if (prctl(PR_SET_NAME, name)) {
+-        perror("unable to change process name");
++        error_report("unable to change process name: %s", strerror(errno));
+         exit(1);
+     }
+ #else
+@@ -247,7 +247,7 @@ static void change_root(void)
+             exit(1);
+         }
+         if (chdir("/")) {
+-            perror("not able to chdir to /");
++            error_report("not able to chdir to /: %s", strerror(errno));
+             exit(1);
+         }
+     }
+@@ -309,7 +309,7 @@ void os_setup_post(void)
  
-+void accel_setup_post(MachineState *ms)
-+{
-+    AccelState *accel = ms->accelerator;
-+    AccelClass *acc = ACCEL_GET_CLASS(accel);
-+    if (acc->setup_post) {
-+        acc->setup_post(ms, accel);
-+    }
-+}
-+
- static void register_accel_types(void)
- {
-     type_register_static(&accel_type);
-diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
-index 5a632ce..637358f 100644
---- a/include/sysemu/accel.h
-+++ b/include/sysemu/accel.h
-@@ -40,6 +40,7 @@ typedef struct AccelClass {
-     const char *name;
-     int (*available)(void);
-     int (*init_machine)(MachineState *ms);
-+    void (*setup_post)(MachineState *ms, AccelState *accel);
-     bool *allowed;
-     /*
-      * Array of global properties that would be applied when specific
-@@ -68,5 +69,7 @@ extern unsigned long tcg_tb_size;
- void configure_accelerator(MachineState *ms);
- /* Register accelerator specific global properties */
- void accel_register_compat_props(AccelState *accel);
-+/* Called just before os_setup_post (ie just before drop OS privs) */
-+void accel_setup_post(MachineState *ms);
+     if (daemonize) {
+         if (chdir("/")) {
+-            perror("not able to chdir to /");
++            error_report("not able to chdir to /: %s", strerror(errno));
+             exit(1);
+         }
+         TFR(fd = qemu_open("/dev/null", O_RDWR));
+@@ -383,7 +383,7 @@ int os_mlock(void)
  
- #endif
-diff --git a/vl.c b/vl.c
-index 616956a..d37e857 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4742,6 +4742,7 @@ int main(int argc, char **argv, char **envp)
-         vm_start();
+     ret = mlockall(MCL_CURRENT | MCL_FUTURE);
+     if (ret < 0) {
+-        perror("mlockall");
++        error_report("mlockall: %s", strerror(errno));
      }
  
-+    accel_setup_post(current_machine);
-     os_setup_post();
- 
-     main_loop();
+     return ret;
 -- 
 2.1.4
