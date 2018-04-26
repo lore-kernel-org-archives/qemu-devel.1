@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fBj5V-0002vM-UX
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:45:39 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fBj5f-00030w-5w
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:45:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fBj5R-0006mn-Qb
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:45:37 -0400
-Resent-Message-Id: <E1fBj5R-0006mn-Qb@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21111)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fBj5R-0006mM-82
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:45:33 -0400
-In-Reply-To: <20180426154035.16155-1-alex.bennee@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152475749180.2340.1230613596329558666@71c20359a636>
+	(envelope-from <cohuck@redhat.com>) id 1fBj5b-0006vR-VH
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:45:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38716 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1fBj5b-0006vJ-Nq
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:45:43 -0400
+Date: Thu, 26 Apr 2018 17:45:39 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180426174539.020fdf55.cohuck@redhat.com>
+In-Reply-To: <38a11e73-bb46-873c-b452-feed630b7325@redhat.com>
+References: <20180426135755.GI29865@localhost.localdomain>
+	<dffa77fa-11d7-5f3c-4c1e-7ed25a55fa25@redhat.com>
+	<20180426141400.GM26812@redhat.com>
+	<20180426142236.GJ29865@localhost.localdomain>
+	<38a11e73-bb46-873c-b452-feed630b7325@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 26 Apr 2018 08:44:52 -0700 (PDT)
-Subject: Re: [Qemu-devel] [RFC PATCH] softfloat: re-factor float to float
- conversions
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Who is running QEMU automated tests, and when?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +30,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alex.bennee@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, richard.henderson@linaro.org, aurelien@aurel32.net
+To: Thomas Huth <thuth@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Daniel P. =?UTF-8?B?QmVycmFu?=
+	=?UTF-8?B?Z8Op?=" <berrange@redhat.com>, Yash Mankad <ymankad@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNDI2MTU0MDM1LjE2MTU1LTEtYWxleC5iZW5uZWVAbGluYXJvLm9yZwpT
-dWJqZWN0OiBbUWVtdS1kZXZlbF0gW1JGQyBQQVRDSF0gc29mdGZsb2F0OiByZS1mYWN0b3IgZmxv
-YXQgdG8gZmxvYXQgY29udmVyc2lvbnMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
-L2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwg
-d2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1y
-ZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5n
-IFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAg
-aWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
-IC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkK
-ICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09
-CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20g
-aHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAg
-ICAgICAgICAgIHBhdGNoZXcvMjAxODA0MjYxNTQwMzUuMTYxNTUtMS1hbGV4LmJlbm5lZUBsaW5h
-cm8ub3JnIC0+IHBhdGNoZXcvMjAxODA0MjYxNTQwMzUuMTYxNTUtMS1hbGV4LmJlbm5lZUBsaW5h
-cm8ub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKOWUyODgxM2NiMCBzb2Z0Zmxv
-YXQ6IHJlLWZhY3RvciBmbG9hdCB0byBmbG9hdCBjb252ZXJzaW9ucwoKPT09IE9VVFBVVCBCRUdJ
-TiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBzb2Z0ZmxvYXQ6IHJlLWZhY3RvciBmbG9hdCB0byBm
-bG9hdCBjb252ZXJzaW9ucy4uLgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZWZvcmUgdGhhdCBj
-bG9zZSBwYXJlbnRoZXNpcyAnKScKIzEwMzogRklMRTogZnB1L3NvZnRmbG9hdC5jOjEyMTY6Cisg
-ICAgICAgIGlmIChpc19zbmFuKGEuY2xzKSB8fCBhcm1faHAgKSB7Cgp0b3RhbDogMSBlcnJvcnMs
-IDAgd2FybmluZ3MsIDU2NSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9i
-bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
-c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
-TUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0
-aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
-W2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNo
-ZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Thu, 26 Apr 2018 16:25:40 +0200
+Thomas Huth <thuth@redhat.com> wrote:
+
+> On 26.04.2018 16:22, Eduardo Habkost wrote:
+> > On Thu, Apr 26, 2018 at 03:14:00PM +0100, Daniel P. Berrang=C3=A9 wrote=
+: =20
+> >> On Thu, Apr 26, 2018 at 04:09:55PM +0200, Thomas Huth wrote: =20
+> >>> On 26.04.2018 15:57, Eduardo Habkost wrote: =20
+> >>>> (Starting a new thread, for more visibility)
+> >>>>
+> >>>> (This was: Re: [Qemu-devel] [RFC PATCH] tests/device-introspect: Test
+> >>>> devices with all machines, not only with "none")
+> >>>>
+> >>>> On Thu, Apr 26, 2018 at 01:54:43PM +0200, Markus Armbruster wrote: =
+=20
+> >>> [...] =20
+> >>>>> I don't mind having make check SPEED=3Dslow run more extensive test=
+s.
+> >>>>> Assuming we actually run them at least once in a while, which seems
+> >>>>> doubtful. =20
+> >>>>
+> >>>> We probably don't do that, but we really must be running a more
+> >>>> extensive (and slower) test set at least once before every
+> >>>> release.
+> >>>>
+> >>>> Maybe some people are running SPEED=3Dslow tests, or even more
+> >>>> extensive test suites like avocado-vt once in a while, but we
+> >>>> need to know who is running them, and when. =20
+> >>>
+> >>> At least I am running "make check SPEED=3Dslow" manually from time to
+> >>> time, especially when we enter the hard freeze period. =20
+> >>
+> >> Hmm, we could get this done by travis. It has the concept of "cron job=
+s"
+> >> for scheduling builds separately from pushes.
+> >>
+> >> So we could keep the current travis jobs unchanged, but then add an
+> >> use of SPEED=3Dslow when TRAVIS_EVENT_TYPE =3D=3D "cron" in the travis=
+.yml,
+> >> so we can get SPEED=3Dslow run once a day. Just have to be careful whi=
+ch
+> >> jobs we make slow so we don't hit the 50 minute timeout. =20
+> >=20
+> > I expect SPEED=3Dslow tests to eventually take longer than 50
+> > minutes, but we can try this and see what happens. =20
+>=20
+> I already had to move some of the slow tests to SPEED=3Dslow mode in the
+> past due to the travis timeouts (which are hit when the machines are
+> very loaded), so my guess is that SPEED=3Dslow will hardly work with trav=
+is.
+
+Do we have another automation infrastructure for that, preferably with
+multiple host architectures? I usually run SPEED=3Dslow before I send a
+pull request, on s390x and x86 -- unless I forget it. (I really should
+script my procedure. Some time.)
