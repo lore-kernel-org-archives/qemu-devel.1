@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35097)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fBm56-0000ae-Qo
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:57:25 -0400
+	(envelope-from <mlureau@redhat.com>) id 1fBm7O-0001cA-QF
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:59:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fBm53-0000vW-Ny
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:57:24 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48100 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fBm53-0000v8-Is
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:57:21 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1F953A2C78
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 18:57:20 +0000 (UTC)
-Date: Thu, 26 Apr 2018 21:57:17 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180426215700-mutt-send-email-mst@kernel.org>
-References: <20180321032124.24028-1-peterx@redhat.com>
+	(envelope-from <mlureau@redhat.com>) id 1fBm7L-00023f-OV
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:59:46 -0400
+Received: from mail-io0-f195.google.com ([209.85.223.195]:43020)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1fBm7L-00023B-JX
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:59:43 -0400
+Received: by mail-io0-f195.google.com with SMTP id t23-v6so19334818ioc.10
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 11:59:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180321032124.24028-1-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] vhost: add trace for IOTLB miss
+In-Reply-To: <20180426152805.8469-1-armbru@redhat.com>
+References: <20180426152805.8469-1-armbru@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Thu, 26 Apr 2018 20:59:40 +0200
+Message-ID: <CAMxuvazATn8H7u6NL5_CWvCj47XZco1hQnOUaa8wEYYhiVFTJQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] qobject: Use qobject_to() instead of type
+ cast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,72 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "Blake, Eric" <eblake@redhat.com>
 
-On Wed, Mar 21, 2018 at 11:21:24AM +0800, Peter Xu wrote:
-> Add some trace points for IOTLB translation for vhost. After vhost-user
-> is setup, the only IO path that QEMU will participate should be the
-> IOMMU translation, so it'll be good we can track this with explicit
-> timestamps when needed to see how long time we take to do the
-> translation, and whether there's anything stuck inside.  It might be
-> useful for triaging vhost-user problems.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+On Thu, Apr 26, 2018 at 5:28 PM, Markus Armbruster <armbru@redhat.com> wrot=
+e:
+> The proper way to convert from (abstract) QObject to a (concrete)
+> subtype is qobject_to().  Look for offenders that type cast instead:
+>
+>     $ git-grep '(Q[A-Z][a-z]* \*)'
+>     hmp.c:    qmp_device_add((QDict *)qdict, NULL, &err);
+>     include/qapi/qmp/qobject.h:        return (QObject *)obj;
+>     qobject/qobject.c:static void (*qdestroy[QTYPE__MAX])(QObject *) =3D =
+{
+>     tests/check-qdict.c:    dst =3D (QDict *)qdict_crumple(src, &error_ab=
+ort);
+>
+> The first two cast away const, the third isn't a type cast.  Fix the
+> fourth.
+>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Could you rebase pls?
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
 
 > ---
->  hw/virtio/trace-events | 1 +
->  hw/virtio/vhost.c      | 7 +++++++
->  2 files changed, 8 insertions(+)
-> 
-> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-> index 742ff0f90b..933eaab133 100644
-> --- a/hw/virtio/trace-events
-> +++ b/hw/virtio/trace-events
-> @@ -5,6 +5,7 @@ vhost_commit(bool started, bool changed) "Started: %d Changed: %d"
->  vhost_region_add_section(const char *name, uint64_t gpa, uint64_t size, uint64_t host) "%s: 0x%"PRIx64"+0x%"PRIx64" @ 0x%"PRIx64
->  vhost_region_add_section_abut(const char *name, uint64_t new_size) "%s: 0x%"PRIx64
->  vhost_section(const char *name, int r) "%s:%d"
-> +vhost_iotlb_miss(void *dev, int step) "%p step %d"
->  
->  # hw/virtio/virtio.c
->  virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned out_num) "elem %p size %zd in_num %u out_num %u"
-> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> index d8d0ef92e1..aa68f79510 100644
-> --- a/hw/virtio/vhost.c
-> +++ b/hw/virtio/vhost.c
-> @@ -839,12 +839,15 @@ int vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write)
->  
->      rcu_read_lock();
->  
-> +    trace_vhost_iotlb_miss(dev, 1);
-> +
->      iotlb = address_space_get_iotlb_entry(dev->vdev->dma_as,
->                                            iova, write);
->      if (iotlb.target_as != NULL) {
->          ret = vhost_memory_region_lookup(dev, iotlb.translated_addr,
->                                           &uaddr, &len);
->          if (ret) {
-> +            trace_vhost_iotlb_miss(dev, 3);
->              error_report("Fail to lookup the translated address "
->                           "%"PRIx64, iotlb.translated_addr);
->              goto out;
-> @@ -856,10 +859,14 @@ int vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write)
->          ret = vhost_backend_update_device_iotlb(dev, iova, uaddr,
->                                                  len, iotlb.perm);
->          if (ret) {
-> +            trace_vhost_iotlb_miss(dev, 4);
->              error_report("Fail to update device iotlb");
->              goto out;
->          }
->      }
-> +
-> +    trace_vhost_iotlb_miss(dev, 2);
-> +
->  out:
->      rcu_read_unlock();
->  
-> -- 
-> 2.14.3
+>  tests/check-qdict.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/tests/check-qdict.c b/tests/check-qdict.c
+> index a0e0454684..eba5d3528e 100644
+> --- a/tests/check-qdict.c
+> +++ b/tests/check-qdict.c
+> @@ -657,7 +657,7 @@ static void qdict_crumple_test_empty(void)
+>
+>      src =3D qdict_new();
+>
+> -    dst =3D (QDict *)qdict_crumple(src, &error_abort);
+> +    dst =3D qobject_to(QDict, qdict_crumple(src, &error_abort));
+>
+>      g_assert_cmpint(qdict_size(dst), =3D=3D, 0);
+>
+> --
+> 2.13.6
+>
