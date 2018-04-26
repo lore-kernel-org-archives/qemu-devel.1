@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBjdk-0003pP-QS
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:21:04 -0400
+	(envelope-from <Babu.Moger@amd.com>) id 1fBjjg-0000L7-2g
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:27:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBjdf-0000ou-SH
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:21:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60828)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fBjdf-0000oe-Lg
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:20:55 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fBjdc-0005BS-Ht
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 16:20:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D74942E80CF
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 16:20:51 +0000 (UTC)
+	(envelope-from <Babu.Moger@amd.com>) id 1fBjjc-0003F2-3A
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:27:08 -0400
+Received: from mail-sn1nam01on0075.outbound.protection.outlook.com
+	([104.47.32.75]:12173
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fBjjb-0003Be-P5
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:27:04 -0400
+From: Babu Moger <babu.moger@amd.com>
+Date: Thu, 26 Apr 2018 11:26:40 -0500
+Message-ID: <1524760009-24710-1-git-send-email-babu.moger@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Apr 2018 16:07:48 -0000
-From: Maximilian W <1767146@bugs.launchpad.net>
-Reply-To: Bug 1767146 <1767146@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152475835505.21429.10760202253240886546.malonedeb@soybean.canonical.com>
-Message-Id: <152475886916.32517.8290606389908542400.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1767146] Re: No ACPI-table found,
- option -M 1.6 not found either
+Subject: [Qemu-devel] [PATCH v7 0/9] i386: Enable TOPOEXT to support
+ hyperthreading on AMD CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,58 +27,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: mst@redhat.com, marcel@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, kash@tripleback.net, geoff@hostfission.com, babu.moger@amd.com
 
-** Attachment added: "juxtaposition of two VMs running the same kernel (dif=
-ferent amounts of memory)"
-   https://bugs.launchpad.net/qemu/+bug/1767146/+attachment/5127733/+files/=
-Auswahl_364.png
+This series enables the TOPOEXT feature for AMD CPUs. This is required to
+support hyperthreading on kvm guests.
 
--- =
+This addresses the issues reported in these bugs:
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1481253
+https://bugs.launchpad.net/qemu/+bug/1703506=20
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1767146
+v7:
+ Rebased on top of latest tree after 2.12 release and done few basic tests.=
+ There are
+ no changes except for few minor hunks. Hopefully this gets pulled into 2.1=
+3 release.
+ Please review, let me know of any feedback.
 
-Title:
-  No ACPI-table found, option -M 1.6 not found either
+v6:
+1.Fixed problem with patch#4(Add new property to control cache info). The p=
+arameter
+ legacy_cache should be "on" by default on machine type "pc-q35-2.10". This=
+ was
+ found by Alexandr Iarygin.
+2.Fixed the l3 cache size for EPYC based machines(patch#3). Also, fixed the=
+ number of
+ logical processors sharing the cache(patch#6). Only L3 cache is shared by =
+multiple
+ cores but not L1 or L2. This was a bug while decoding. This was found by G=
+eoffrey McRae
+ and he verified the fix.=20
 
-Status in QEMU:
-  New
+v5:
+ In this series I tried to address the feedback from Eduardo Habkost.
+ The discussion thread is here.
+ https://patchwork.kernel.org/patch/10299745/
+ The previous thread is here.
+ http://patchwork.ozlabs.org/cover/884885/
 
-Bug description:
-  Currently writing a small kernel, when trying to detect memory blocks
-  that contain ACPI information, no such block is found. When ran in
-  Oracle Virtualbox, code runs flawlessly.
+Reason for these changes.
+ The cache properties for AMD family of processors have changed from
+ previous releases. We don't want to display the new information on the
+ old family of processors as this might cause compatibility issues.
 
-  Code that is detecting the ACPI-Info (with a bit of debug-output):
+Changes:
+1.Based the patches on top of Eduardo's(patch#1) patch.
+  Changed few things.
+  Moved the Cache definitions to cpu.h file.
+  Changed the CPUID_4 names to generic names.
+2.Added a new propery "legacy-cache" in cpu object(patch#2). This can be
+  used to display the old property even if the host supports the new cache
+  properties.
+3.Added cache information in X86CPUDefinition and CPUX86State
+4.Patch 6-7 changed quite a bit from previous version does to new approach.
+5.Addressed few issues with CPUID_8000_001d and CPUID_8000_001E.
 
-  ```
-  multiboot_memory_map32_t* map =3D (multiboot_memory_map32_t*)mmap;
-  for (uint32_t i =3D 0; i < size; i++) {
-  =C2=A0Termutils::cout << map[i].type << "type of block  ";
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (mmap[i].type =3D=3D M=
-ULTIBOOT_MEMORY_ACPI_RECLAIMABLE) {
-  =C2=A0           =C2=A0Termutils::cout << "WE ARE INSIDE\n";
-  =C2=A0           =C2=A0fadt =3D (FADT*)(map[i].base_addr_low);
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-  =C2=A0if (i % 9 =3D=3D 0) {
-  =C2=A0=C2=A0Termutils::cout << "\n";
-  =C2=A0}
-  }
-  ```
+v4:
+1.Removed the checks under cpuid 0x8000001D leaf(patch #2). These check are
+  not necessary. Found this during internal review.
+2.Added CPUID_EXT3_TOPOEXT feature for all the 17 family(patch #4). This wa=
+s
+  found by Kash Pande during his testing.
+3.Removed th hardcoded cpuid xlevel and dynamically extended if CPUID_EXT3_=
+TOPOEXT
+  is supported(Suggested by Brijesh Singh).=20
 
-  command qemu is run with:
+v3:
+1.Removed the patch #1. Radim mentioned that original typo problem is in=20
+  linux kernel header. qemu is just copying those files.
+2.In previous version, I used the cpuid 4 definitions for AMDs cpuid leaf
+  0x8000001D. CPUID 4 is very intel specific and we dont want to expose tho=
+se
+  details under AMD. I have renamed some of these definitions as generic.
+  These changes are in patch#1. Radim, let me know if this is what you inte=
+nded.
+3.Added assert to for core_id(Suggested by Radim Kr=C4=8Dm=C3=A1=C5=99).
+4.Changed the if condition under "L3 cache info"(Suggested by Gary Hook).
+5.Addressed few more text correction and code cleanup(Suggested by Thomas L=
+endacky).
 
-  qemu-img create build/objects/test 500M
-  qemu-system-i386 -hda $(APP_DIR)/clinl.iso -hdb ./build/objects/test
+v2:
+  Fixed few more minor issues per Gary Hook's comments. Thank you Gary.
+  Removed the patch#1. We need to handle the instruction cache associativit=
+y=20
+  seperately. It varies based on the cpu family. I will comeback to that la=
+ter.
+  Added two more typo corrections in patch#1 and patch#5.
 
-  The iso-image is (zipped) included as attachment.
+v1:
+  Stanislav Lanci posted few patches earlier.=20
+  https://patchwork.kernel.org/patch/10040903/
 
-  qemu-system-i386 --version:
+Rebased his patches with few changes.
+1.Spit the patches into two, separating cpuid functions=20
+  0x8000001D and 0x8000001E (Patch 2 and 3).
+2.Removed the generic non-intel check and made a separate patch
+  with some changes(Patch 5).
+3.Fixed L3_N_SETS_AMD(from 4096 to 8192) based on CPUID_Fn8000001D_ECX_x03.
 
-  QEMU emulator version 2.10.1(qemu-2.10.1-3.fc27)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+Added 2 more patches.
+Patch 1. Fixes cache associativity.
+Patch 4. Adds TOPOEXT feature on AMD EPYC CPU.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1767146/+subscriptions
+
+Babu Moger (8):
+  i386: Add cache information in X86CPUDefinition
+  i386: Initialize cache information for EPYC family processors
+  i386: Add new property to control cache info
+  i386: Use the statically loaded cache definitions
+  i386: Populate AMD Processor Cache Information for cpuid 0x8000001D
+  i386: Add support for CPUID_8000_001E for AMD
+  i386: Enable TOPOEXT feature on AMD EPYC CPU
+  i386: Remove generic SMT thread check
+
+Eduardo Habkost (1):
+  i386: Helpers to encode cache information consistently
+
+ include/hw/i386/pc.h |   4 +
+ target/i386/cpu.c    | 736 ++++++++++++++++++++++++++++++++++++++++++-----=
+----
+ target/i386/cpu.h    |  66 +++++
+ target/i386/kvm.c    |  29 +-
+ 4 files changed, 702 insertions(+), 133 deletions(-)
+
+--=20
+2.7.4
