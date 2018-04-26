@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fBlOD-0004vz-6p
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:13:06 -0400
+	(envelope-from <prvs=647a3a28a=Ian.Jackson@citrix.com>)
+	id 1fBlP5-0005Ov-Cc
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:14:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fBlO9-0007ED-Rc
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:13:05 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58568 helo=mx1.redhat.com)
+	(envelope-from <prvs=647a3a28a=Ian.Jackson@citrix.com>)
+	id 1fBlP2-00085t-1L
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:13:59 -0400
+Received: from smtp03.citrix.com ([162.221.156.55]:41785)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fBlO9-0007Dj-Kv
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:13:01 -0400
-References: <1524761612-5307-1-git-send-email-ian.jackson@eu.citrix.com>
-	<1524761612-5307-2-git-send-email-ian.jackson@eu.citrix.com>
-	<f9d7f1bd-2ef2-691a-fa98-129ecca06b02@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <dc046746-c36d-33fc-de34-2c8b2dc150a8@redhat.com>
-Date: Thu, 26 Apr 2018 13:12:53 -0500
+	(Exim 4.71) (envelope-from <prvs=647a3a28a=Ian.Jackson@citrix.com>)
+	id 1fBlP1-00084L-Mn
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:13:55 -0400
+From: Ian Jackson <ian.jackson@citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <f9d7f1bd-2ef2-691a-fa98-129ecca06b02@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="jbQ6p6eo2zTmufPYQWO9ESqsZhORZ3AGz"
-Subject: Re: [Qemu-devel] [RFC PATCH 1/7] error reporting: Introduce
- errnoval parameter to vreport
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Message-ID: <23266.5853.998350.948709@mariner.uk.xensource.com>
+Date: Thu, 26 Apr 2018 19:13:49 +0100
+In-Reply-To: <CAFEAcA_V_XodQRGAs=PosBZ5ZPBswnbqXbp-h7REijyqBVdkJg@mail.gmail.com>
+References: <1524758187-9351-1-git-send-email-ian.jackson@eu.citrix.com>
+	<CAFEAcA9cumr=t7mRZ-9KtLMWAK-9nVGmRsnXjJ+pc899ePxfVg@mail.gmail.com>
+	<23266.3638.876146.489411@mariner.uk.xensource.com>
+	<CAFEAcA_V_XodQRGAs=PosBZ5ZPBswnbqXbp-h7REijyqBVdkJg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL v9 00/16] xen: xen-domid-restrict
+ improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,87 +33,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ian Jackson <ian.jackson@eu.citrix.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Alistair Francis <alistair.francis@xilinx.com>, Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, "open list:X86" <xen-devel@lists.xenproject.org>, Alistair Francis <alistair.francis@wdc.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---jbQ6p6eo2zTmufPYQWO9ESqsZhORZ3AGz
-From: Eric Blake <eblake@redhat.com>
-To: Ian Jackson <ian.jackson@eu.citrix.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Alistair Francis <alistair.francis@xilinx.com>,
- Markus Armbruster <armbru@redhat.com>
-Message-ID: <dc046746-c36d-33fc-de34-2c8b2dc150a8@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 1/7] error reporting: Introduce errnoval
- parameter to vreport
-References: <1524761612-5307-1-git-send-email-ian.jackson@eu.citrix.com>
- <1524761612-5307-2-git-send-email-ian.jackson@eu.citrix.com>
- <f9d7f1bd-2ef2-691a-fa98-129ecca06b02@redhat.com>
-In-Reply-To: <f9d7f1bd-2ef2-691a-fa98-129ecca06b02@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Peter Maydell writes ("Re: [PULL v9 00/16] xen: xen-domid-restrict improvements"):
+> On 26 April 2018 at 18:36, Ian Jackson <ian.jackson@citrix.com> wrote:
+> > I can do that.  Alternatively you could manually verify the signature
+> > on my email and observe that it mentions the correct commit hash.
+> 
+> I could, but I hope you will appreciate that I'm not terribly
+> interested in trying to fathom the mysteries of gpg in order
+> to deal with a single pull request that doesn't appear in
+> the form that my tooling expects it to be and that every other
+> pull request I deal with comes in...
 
-On 04/26/2018 12:24 PM, Eric Blake wrote:
+Fair enough.
 
->> @@ -222,6 +224,11 @@ static void vreport(report_type type, const char =
-*fmt, va_list ap)
->>      }
->> =20
->>      error_vprintf(fmt, ap);
->> +
->> +    if (errnoval >=3D 0) {
->> +        error_printf(": %s", strerror(errnoval));
->=20
-> Off-by-one.  You do NOT want to print strerror(0) (that results in
-> appending ": Success" or similar to what is supposed to be an error
-> message).
+> I have fixed the wiki page to be clearer about what we mean by
+> "signed pull requests".
 
->=20
-> Passing -1 to suppress the output feels awkward, especially if 0 can be=
+Thanks :-).
 
-> used for the same purpose and would then let us use -errno and errno
-> interchangeable by passing the absolute value to sterror.
->=20
+> > Anyway, would you like me to make a signed tag and send you an
+> > unsigned email referring to it, then ?
+> 
+> Yes, please. (You can sign the email as well if you like, but I'm
+> not going to be checking that, so it will be wasted effort :-)).
 
-I'm also using, as my reference, the glibc 'man 3 error' function, which
-specifically documents:
+I will do this in a moment.
 
-  if  errnum  is  nonzero,  a second colon and a space followed by the
-string
-       given by strerror(errnum).
-
-making it a very versatile function for outputting messages to stderr
-whether or not you also have an errno value to convert via strerror(),
-by using 0 (not -1) as the sentinel value.
-
-Consistency argues that even if we are going to invent our own qemu
-functions, we're better off sticking to well-known paradigms already in
-the wild (such as 0 to suppress appending strerror()) rather than making
-readers learn yet another paradigm.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---jbQ6p6eo2zTmufPYQWO9ESqsZhORZ3AGz
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlriFqUACgkQp6FrSiUn
-Q2qv3Af/V56eve9zt5QGLecjhwRdBNujZdLxvt+ziCFUqzeEgk45mvx68OTC+UOY
-n9+jBsxTNeIwx4cslRbGPcxC/smIVQK6qT4R34t4j6U7Uhr4TR+2CNckZwT2qYeA
-Dwrh0IQzrFxUjfrhDNpeH2BgGnKypiFL7+L8xTevZ5GT7ZD3eLQDoj59UlPCnDdY
-NLMy/wWKzVp7lvpfGicKd+uf4NjootzHRmiy1QIHWxjXA2BeK35V9VJOP0vinL4F
-GXx0D52qFThXl4yG7LJ/fczgNM6yptJsRsbc8qCc0DS52qKinuvkjAH8ytLGfLz4
-iZ7hahAYWMmZvdXMUR6RQUADb2LlQA==
-=VNgZ
------END PGP SIGNATURE-----
-
---jbQ6p6eo2zTmufPYQWO9ESqsZhORZ3AGz--
+Ian.
