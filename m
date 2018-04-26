@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBY3c-0004zl-Oo
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 23:58:58 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fBY3e-0004zm-5M
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 23:59:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBY3b-00082U-4D
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 23:58:56 -0400
-Date: Thu, 26 Apr 2018 13:28:13 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fBY3b-00082P-2x
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 23:58:58 -0400
+Date: Thu, 26 Apr 2018 13:54:52 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180426032812.GD8800@umbus.fritz.box>
+Message-ID: <20180426035452.GE8800@umbus.fritz.box>
 References: <20180419124331.3915-1-clg@kaod.org>
-	<20180419124331.3915-3-clg@kaod.org>
-	<20180423064408.GF19804@umbus.fritz.box>
-	<ac69df02-8ee8-0506-36ac-83fdaccdca77@kaod.org>
-	<20180424064119.GO19804@umbus.fritz.box>
-	<0fb72eb1-d9b5-968b-137a-7d44af116530@kaod.org>
+	<20180419124331.3915-4-clg@kaod.org>
+	<20180423064644.GG19804@umbus.fritz.box>
+	<8d1cb270-d62f-f08f-9167-3f130906f910@kaod.org>
+	<20180424064629.GP19804@umbus.fritz.box>
+	<3b57fde8-ee11-81a0-271b-9e514ed63856@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ylS2wUBXLOxYXZFQ"
+	protocol="application/pgp-signature"; boundary="BQPnanjtCNWHyqYD"
 Content-Disposition: inline
-In-Reply-To: <0fb72eb1-d9b5-968b-137a-7d44af116530@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v3 02/35] ppc/xive: add support for the LSI
- interrupt sources
+In-Reply-To: <3b57fde8-ee11-81a0-271b-9e514ed63856@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v3 03/35] ppc/xive: introduce the
+ XiveFabric interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,275 +33,258 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---ylS2wUBXLOxYXZFQ
+--BQPnanjtCNWHyqYD
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 24, 2018 at 10:11:27AM +0200, C=E9dric Le Goater wrote:
-> On 04/24/2018 08:41 AM, David Gibson wrote:
-> > On Mon, Apr 23, 2018 at 09:31:24AM +0200, C=E9dric Le Goater wrote:
-> >> On 04/23/2018 08:44 AM, David Gibson wrote:
-> >>> On Thu, Apr 19, 2018 at 02:42:58PM +0200, C=E9dric Le Goater wrote:
-> >>>> The 'sent' status of the LSI interrupt source is modeled with the 'P'
-> >>>> bit of the ESB and the assertion status of the source is maintained =
-in
-> >>>> an array under the main sPAPRXive object. The type of the source is
-> >>>> stored in the same array for practical reasons.
+On Tue, Apr 24, 2018 at 11:33:11AM +0200, C=E9dric Le Goater wrote:
+> On 04/24/2018 08:46 AM, David Gibson wrote:
+> > On Mon, Apr 23, 2018 at 09:58:43AM +0200, C=E9dric Le Goater wrote:
+> >> On 04/23/2018 08:46 AM, David Gibson wrote:
+> >>> On Thu, Apr 19, 2018 at 02:42:59PM +0200, C=E9dric Le Goater wrote:
+> >>>> The XiveFabric offers a simple interface, between the XiveSourve
+> >>>> object and the device model owning the interrupt sources, to forward
+> >>>> an event notification to the XIVE interrupt controller of the machine
+> >>>> and if the owner is the controller, to call directly the routing
+> >>>> sub-engine.
 > >>>>
 > >>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 > >>>> ---
-> >>>>  hw/intc/xive.c        | 54 ++++++++++++++++++++++++++++++++++++++++=
-+++++++----
-> >>>>  include/hw/ppc/xive.h | 16 +++++++++++++++
-> >>>>  2 files changed, 66 insertions(+), 4 deletions(-)
+> >>>>  hw/intc/xive.c        | 37 ++++++++++++++++++++++++++++++++++++-
+> >>>>  include/hw/ppc/xive.h | 25 +++++++++++++++++++++++++
+> >>>>  2 files changed, 61 insertions(+), 1 deletion(-)
 > >>>>
 > >>>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> >>>> index c70578759d02..060976077dd7 100644
+> >>>> index 060976077dd7..b4c3d06c1219 100644
 > >>>> --- a/hw/intc/xive.c
 > >>>> +++ b/hw/intc/xive.c
-> >>>> @@ -104,6 +104,21 @@ static void xive_source_notify(XiveSource *xsrc=
-, int srcno)
+> >>>> @@ -17,6 +17,21 @@
+> >>>>  #include "hw/ppc/xive.h"
 > >>>> =20
-> >>>>  }
-> >>>> =20
-> >>>> +/*
-> >>>> + * LSI interrupt sources use the P bit and a custom assertion flag
+> >>>>  /*
+> >>>> + * XIVE Fabric
 > >>>> + */
-> >>>> +static bool xive_source_lsi_trigger(XiveSource *xsrc, uint32_t srcn=
-o)
-> >>>> +{
-> >>>> +    uint8_t old_pq =3D xive_source_pq_get(xsrc, srcno);
 > >>>> +
-> >>>> +    if  (old_pq =3D=3D XIVE_ESB_RESET &&
-> >>>> +         xsrc->status[srcno] & XIVE_STATUS_ASSERTED) {
-> >>>> +        xive_source_pq_set(xsrc, srcno, XIVE_ESB_PENDING);
-> >>>> +        return true;
-> >>>> +    }
-> >>>> +    return false;
+> >>>> +static void xive_fabric_route(XiveFabric *xf, int lisn)
+> >>>> +{
+> >>>> +
 > >>>> +}
 > >>>> +
-> >>>>  /* In a two pages ESB MMIO setting, even page is the trigger page, =
-odd
-> >>>>   * page is for management */
-> >>>>  static inline bool xive_source_is_trigger_page(hwaddr addr)
-> >>>> @@ -133,6 +148,13 @@ static uint64_t xive_source_esb_read(void *opaq=
-ue, hwaddr addr, unsigned size)
-> >>>>           */
-> >>>>          ret =3D xive_source_pq_eoi(xsrc, srcno);
-> >>>> =20
-> >>>> +        /* If the LSI source is still asserted, forward a new source
-> >>>> +         * event notification */
-> >>>> +        if (xive_source_irq_is_lsi(xsrc, srcno)) {
-> >>>> +            if (xive_source_lsi_trigger(xsrc, srcno)) {
-> >>>> +                xive_source_notify(xsrc, srcno);
-> >>>> +            }
-> >>>> +        }
-> >>>>          break;
-> >>>> =20
-> >>>>      case XIVE_ESB_GET:
-> >>>> @@ -183,6 +205,14 @@ static void xive_source_esb_write(void *opaque,=
- hwaddr addr,
-> >>>>           * notification
-> >>>>           */
-> >>>>          notify =3D xive_source_pq_eoi(xsrc, srcno);
+> >>>> +static const TypeInfo xive_fabric_info =3D {
+> >>>> +    .name =3D TYPE_XIVE_FABRIC,
+> >>>> +    .parent =3D TYPE_INTERFACE,
+> >>>> +    .class_size =3D sizeof(XiveFabricClass),
+> >>>> +};
 > >>>> +
-> >>>> +        /* LSI sources do not set the Q bit but they can still be
-> >>>> +         * asserted, in which case we should forward a new source
-> >>>> +         * event notification
-> >>>> +         */
-> >>>> +        if (xive_source_irq_is_lsi(xsrc, srcno)) {
-> >>>> +            notify =3D xive_source_lsi_trigger(xsrc, srcno);
-> >>>> +        }
-> >>
-> >> FYI, I have moved that common test under xive_source_pq_eoi()
-> >=20
-> > Ok.
-> >=20
-> >>>>          break;
+> >>>> +/*
+> >>>>   * XIVE Interrupt Source
+> >>>>   */
 > >>>> =20
-> >>>>      default:
-> >>>> @@ -216,8 +246,17 @@ static void xive_source_set_irq(void *opaque, i=
-nt srcno, int val)
-> >>>>      XiveSource *xsrc =3D XIVE_SOURCE(opaque);
-> >>>>      bool notify =3D false;
+> >>>> @@ -97,11 +112,19 @@ static bool xive_source_pq_trigger(XiveSource *=
+xsrc, uint32_t srcno)
 > >>>> =20
-> >>>> -    if (val) {
-> >>>> -        notify =3D xive_source_pq_trigger(xsrc, srcno);
-> >>>> +    if (xive_source_irq_is_lsi(xsrc, srcno)) {
-> >>>> +        if (val) {
-> >>>> +            xsrc->status[srcno] |=3D XIVE_STATUS_ASSERTED;
-> >>>> +        } else {
-> >>>> +            xsrc->status[srcno] &=3D ~XIVE_STATUS_ASSERTED;
-> >>>> +        }
-> >>>> +        notify =3D xive_source_lsi_trigger(xsrc, srcno);
-> >>>> +    } else {
-> >>>> +        if (val) {
-> >>>> +            notify =3D xive_source_pq_trigger(xsrc, srcno);
-> >>>> +        }
-> >>>>      }
-> >>>> =20
-> >>>>      /* Forward the source event notification for routing */
-> >>>> @@ -234,13 +273,13 @@ void xive_source_pic_print_info(XiveSource *xs=
-rc, Monitor *mon)
-> >>>>                     xsrc->offset, xsrc->offset + xsrc->nr_irqs - 1);
-> >>>>      for (i =3D 0; i < xsrc->nr_irqs; i++) {
-> >>>>          uint8_t pq =3D xive_source_pq_get(xsrc, i);
-> >>>> -        uint32_t lisn =3D i  + xsrc->offset;
-> >>>> =20
-> >>>>          if (pq =3D=3D XIVE_ESB_OFF) {
-> >>>>              continue;
-> >>>>          }
-> >>>> =20
-> >>>> -        monitor_printf(mon, "  %4x %c%c\n", lisn,
-> >>>> +        monitor_printf(mon, "  %4x %s %c%c\n", i + xsrc->offset,
-> >>>> +                       xive_source_irq_is_lsi(xsrc, i) ? "LSI" : "M=
-SI",
-> >>>>                         pq & XIVE_ESB_VAL_P ? 'P' : '-',
-> >>>>                         pq & XIVE_ESB_VAL_Q ? 'Q' : '-');
-> >>>>      }
-> >>>> @@ -249,6 +288,12 @@ void xive_source_pic_print_info(XiveSource *xsr=
-c, Monitor *mon)
-> >>>>  static void xive_source_reset(DeviceState *dev)
+> >>>>  /*
+> >>>>   * Forward the source event notification to the associated XiveFabr=
+ic,
+> >>>> - * the device owning the sources.
+> >>>> + * the device owning the sources, or perform the routing if the dev=
+ice
+> >>>> + * is the interrupt controller.
+> >>>>   */
+> >>>>  static void xive_source_notify(XiveSource *xsrc, int srcno)
 > >>>>  {
-> >>>>      XiveSource *xsrc =3D XIVE_SOURCE(dev);
-> >>>> +    int i;
+> >>>> =20
+> >>>> +    XiveFabricClass *xfc =3D XIVE_FABRIC_GET_CLASS(xsrc->xive);
 > >>>> +
-> >>>> +    /* Keep the IRQ type */
-> >>>> +    for (i =3D 0; i < xsrc->nr_irqs; i++) {
-> >>>> +        xsrc->status[i] &=3D ~XIVE_STATUS_ASSERTED;
+> >>>> +    if (xfc->notify) {
+> >>>> +        xfc->notify(xsrc->xive, srcno + xsrc->offset);
+> >>>> +    } else {
+> >>>> +        xive_fabric_route(xsrc->xive, srcno + xsrc->offset);
 > >>>> +    }
-> >>>> =20
-> >>>>      /* SBEs are initialized to 0b01 which corresponds to "ints off"=
- */
-> >>>>      memset(xsrc->sbe, 0x55, xsrc->sbe_size);
-> >>>> @@ -273,6 +318,7 @@ static void xive_source_realize(DeviceState *dev=
-, Error **errp)
-> >>>> =20
-> >>>>      xsrc->qirqs =3D qemu_allocate_irqs(xive_source_set_irq, xsrc,
-> >>>>                                       xsrc->nr_irqs);
-> >>>> +    xsrc->status =3D g_malloc0(xsrc->nr_irqs);
-> >>>> =20
-> >>>>      /* Allocate the SBEs (State Bit Entry). 2 bits, so 4 entries pe=
-r byte */
-> >>>>      xsrc->sbe_size =3D DIV_ROUND_UP(xsrc->nr_irqs, 4);
-> >>>> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> >>>> index d92a50519edf..0b76dd278d9b 100644
-> >>>> --- a/include/hw/ppc/xive.h
-> >>>> +++ b/include/hw/ppc/xive.h
-> >>>> @@ -33,6 +33,9 @@ typedef struct XiveSource {
-> >>>>      uint32_t     nr_irqs;
-> >>>>      uint32_t     offset;
-> >>>>      qemu_irq     *qirqs;
-> >>>> +#define XIVE_STATUS_LSI         0x1
-> >>>> +#define XIVE_STATUS_ASSERTED    0x2
-> >>>> +    uint8_t      *status;
 > >>>
-> >>> I don't love the idea of mixing configuration information (STATUS_LSI)
-> >>> with runtime state information (ASSERTED) in the same field.  Any
-> >>> reason not to have these as parallel bitmaps.
-> >>
-> >> none. I can change that.=20
+> >>> Why 2 cases?  Can't the XiveFabric object just make its notify equal
+> >>> to xive_fabric_route if that's what it wants?
+> >> Under sPAPR, all the sources, IPIs and virtual device interrupts,=20
+> >> generate events which are directly routed by xive_fabric_route().=20
+> >> There is no need of an extra hop. Indeed.=20
 > >=20
 > > Ok.
 > >=20
-> >>> Come to that.. is there a compelling reason to allow any individual
-> >>> irq to be marked LSI or MSI, rather than using separate XiveSource
-> >>> objects for MSIs and LSIs?
-> >>
-> >> yes. I would have preferred two distinct interrupt source objects but=
+> >> Under PowerNV, some sources forward the notification to the routing=20
+> >> engine using a specific MMIO load on a notify address which is stored=
 =20
-> >> this is to be compatible with XICS, which uses only one. If we want
-> >> to be able to change interrupt mode, the IRQ number space should be
-> >> organized in the exact same way. Or we should change XICS also.
-> >>
-> >> Also, the change (a bitmap) is really small.
+> >> in one of the controller registers. So we need a hop to reach the=20
+> >> device model, owning the sources, and do that load :
 > >=20
-> > Hrm, but since XIVE supports thousands of irqs, it could be quite a
-> > large bitmap.
+> > Hm.  So you're saying that in pnv some sources send their notification
+> > to some other unit,=20
 >=20
-> Yes. The change is small, not the bitmap.
-> =20
-> > It's not impossible - in fact, not really even that hard - to change
-> > the existing irq layout on xics.  It does need a new machine type
-> > variant, of course.
+> Not to any unit/device, to the device owning the sources.
 >=20
-> I did some work on that topic a while ago :
+> For the XiveSource object under PSI, the XIVEFabric interface is the=20
+> PSI device object it self, which knows how to forward the notification=20
+> on the XIVE Power "bus". To be more precise, the PSI HB device has=20
+> 14 interrupt sources, which notifications are forwarded using a MMIO=20
+> load to some address. The load address is configured (by skiboot) in=20
+> one of the PSI device registers, and points to a MMIO region of the=20
+> main XIVE interrupt controller.=20
 >=20
-> 	https://patchwork.ozlabs.org/cover/836782/
+> The PHB4 sources should be the same.
 >=20
-> But we stopped exploring the idea. May be it was not the good approach.
-> The PHBs LSIs would benefit from such a split though.
+> For the XiveSource object (all interrupts) under sPAPRXive, the=20
+> XIVEFabric is the main interrupt controller sPAPRXive.
+>=20
+> For the XiveSource object (IPIs) under PnvXive, the XIVEFabric is=20
+> also the main interrupt controller PnvXive.
 
-So, no, I don't think that was a good approach, but that doesn't mean
-other ways of rearranging the irq numbers aren't ok.  The thing here
-is that we don't want to think of an "irq allocator" - there are some
-bits like that in there already, but they were always a mistake.
+Hrm.  Apparently I'm missing something, I'm really not getting what
+you're trying to explain here.
 
-We have lots of irq space (both XICS and XIVE) so instead we should
-come up with a static mapping of irqs to devices.
+> > that would then (after possible masking) forward on to the overall> xiv=
+e fabric ?=20
+>=20
+> yes. May be XIVEFabric is a confusing name. What about XIVEForwarder ?=20
 
+Maybe..?
 
-> >>>>      /* PQ bits */
-> >>>>      uint8_t      *sbe;
-> >>>
-> >>> .. and come to that is there a reason to keep the ASSERTED bit in a
-> >>> separate array from sbe?  AFAICT the actual 2-bit-per-irq layout is
-> >>> never exposed to the guests.
+> > That seems like a property of the source object,=20
+>=20
+> The source object is generic. It's a bunch of PQ bits that can be=20
+> controlled by MMIOs. Nothing more.
+
+Hmm.  Isn't the source object also responsible for forwarding the
+interrupt to something up the chain (whatever that is)?
+
+>=20
+> > rather than a
+> > property of the fabric.  Indeed varying this by source object would
+> > require the objects have a different xive pointer, when I thought the
+> > idea was that the XiveFabric was global.
+>=20
+> When a notification is forwarded, the sources needs to call an=20
+> interface which generally is implemented by the source owner,
+
+I'm not quite sure what you mean by "source owner".
+
+> which is not necessarily the main IC.=20
+>=20
+> >> 	static void pnv_psi_notify(XiveFabric *xf, uint32_t lisn)
+> >> 	{
+> >> 	    PnvPsi *psi =3D PNV_PSI(xf);
+> >> 	    uint64_t notif_port =3D
+> >> 	        psi->regs[PSIHB_REG(PSIHB9_ESB_NOTIF_ADDR)];
+> >> 	    bool valid =3D notif_port & PSIHB9_ESB_NOTIF_VALID;
+> >> 	    uint64_t notify_addr =3D notif_port & ~PSIHB9_ESB_NOTIF_VALID;
+> >> 	    uint32_t data =3D cpu_to_be32(lisn);
+> >> =09
+> >> 	    if (valid) {
+> >> 	        cpu_physical_memory_write(notify_addr, &data, sizeof(data));
+> >> 	    }
+> >> 	}
 > >>
-> >> indeed. we always use the xive_source_pq_get/set() helpers to=20
-> >> manipulate the PQ bits. So we could add an extra bit for the ASSERT=20
-> >> without too much changes. Could also we put the type there or would=20
-> >> you still prefer a bitmap ? =20
-> >=20
-> > I'd prefer the type (config information) be separate from the P, Q,
-> > ASSERTED bits (state information).
->=20
-> ok. So I will use the 'uint8_t *status' for P, Q, ASSERT, which leaves
-> 5 bits available, but I don't think it is really worth the pain to=20
-> optimize the size.
-
-Sure.  I don't really care if it's packed or not.
-
-> The sbe array will disappear and we will have=20
-> a bitmap for the type.
-
-We may or may not keep the type bitmap based on the discussion above,
-but in any case this is a good step forward.
-
->=20
-> Thanks,
->=20
-> C.=20
->=20
-> >>> Or, even re-use the Q bit for asserted in LSIs (but report it as
-> >>> always 0 in the register read/write path).
+> >> The PnvXive model handles the load and forwards to the fabric again. =
+=20
 > >>
-> >> I would prefer to add extra status bits. It is easier to debug.
+> >> The IPIs under PowerNV do not need an extra hop so they reach the=20
+> >> routing routine directly without the extra notify() hop.=20
+> >>
+> >> However, PowerNV at the end should be using xive_fabric_route()=20
+> >> but there are some differences on how the NVT registers are=20
+> >> updated (HV vs. OS mode) and it's not handled yet so it uses a=20
+> >> notify() handler. But is should disappear and call directly=20
+> >> xive_fabric_route() in a near future.
+> >>
+> >>
+> >> May be, XiveFabricNotifier would be a better name for this feature ?
+> >> I am adding a few ops later which are more related to routing.
 > >>
 > >> Thanks,
 > >>
 > >> C.
 > >>
-> >>>> @@ -127,4 +130,17 @@ uint8_t xive_source_pq_set(XiveSource *xsrc, ui=
-nt32_t srcno, uint8_t pq);
+> >>
+> >>>
+> >>>>  }
 > >>>> =20
-> >>>>  void xive_source_pic_print_info(XiveSource *xsrc, Monitor *mon);
-> >>>> =20
-> >>>> +static inline bool xive_source_irq_is_lsi(XiveSource *xsrc, uint32_=
-t srcno)
-> >>>> +{
-> >>>> +    assert(srcno < xsrc->nr_irqs);
-> >>>> +    return xsrc->status[srcno] & XIVE_STATUS_LSI;
-> >>>> +}
+> >>>>  /*
+> >>>> @@ -302,6 +325,17 @@ static void xive_source_reset(DeviceState *dev)
+> >>>>  static void xive_source_realize(DeviceState *dev, Error **errp)
+> >>>>  {
+> >>>>      XiveSource *xsrc =3D XIVE_SOURCE(dev);
+> >>>> +    Object *obj;
+> >>>> +    Error *local_err =3D NULL;
 > >>>> +
-> >>>> +static inline void xive_source_irq_set(XiveSource *xsrc, uint32_t s=
-rcno,
-> >>>> +                                       bool lsi)
-> >>>> +{
-> >>>> +    assert(srcno < xsrc->nr_irqs);
-> >>>> +    xsrc->status[srcno] |=3D lsi ? XIVE_STATUS_LSI : 0;
-> >>>> +}
+> >>>> +    obj =3D object_property_get_link(OBJECT(dev), "xive", &local_er=
+r);
+> >>>> +    if (!obj) {
+> >>>> +        error_propagate(errp, local_err);
+> >>>> +        error_prepend(errp, "required link 'xive' not found: ");
+> >>>> +        return;
+> >>>> +    }
+> >>>> +
+> >>>> +    xsrc->xive =3D XIVE_FABRIC(obj);
+> >>>> =20
+> >>>>      if (!xsrc->nr_irqs) {
+> >>>>          error_setg(errp, "Number of interrupt needs to be greater t=
+han 0");
+> >>>> @@ -376,6 +410,7 @@ static const TypeInfo xive_source_info =3D {
+> >>>>  static void xive_register_types(void)
+> >>>>  {
+> >>>>      type_register_static(&xive_source_info);
+> >>>> +    type_register_static(&xive_fabric_info);
+> >>>>  }
+> >>>> =20
+> >>>>  type_init(xive_register_types)
+> >>>> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+> >>>> index 0b76dd278d9b..4fcae2c763e6 100644
+> >>>> --- a/include/hw/ppc/xive.h
+> >>>> +++ b/include/hw/ppc/xive.h
+> >>>> @@ -12,6 +12,8 @@
+> >>>> =20
+> >>>>  #include "hw/sysbus.h"
+> >>>> =20
+> >>>> +typedef struct XiveFabric XiveFabric;
+> >>>> +
+> >>>>  /*
+> >>>>   * XIVE Interrupt Source
+> >>>>   */
+> >>>> @@ -46,6 +48,8 @@ typedef struct XiveSource {
+> >>>>      hwaddr       esb_base;
+> >>>>      uint32_t     esb_shift;
+> >>>>      MemoryRegion esb_mmio;
+> >>>> +
+> >>>> +    XiveFabric   *xive;
+> >>>>  } XiveSource;
+> >>>> =20
+> >>>>  /*
+> >>>> @@ -143,4 +147,25 @@ static inline void xive_source_irq_set(XiveSour=
+ce *xsrc, uint32_t srcno,
+> >>>>      xsrc->status[srcno] |=3D lsi ? XIVE_STATUS_LSI : 0;
+> >>>>  }
+> >>>> =20
+> >>>> +/*
+> >>>> + * XIVE Fabric
+> >>>> + */
+> >>>> +
+> >>>> +typedef struct XiveFabric {
+> >>>> +    Object parent;
+> >>>> +} XiveFabric;
+> >>>> +
+> >>>> +#define TYPE_XIVE_FABRIC "xive-fabric"
+> >>>> +#define XIVE_FABRIC(obj)                                     \
+> >>>> +    OBJECT_CHECK(XiveFabric, (obj), TYPE_XIVE_FABRIC)
+> >>>> +#define XIVE_FABRIC_CLASS(klass)                                   =
+  \
+> >>>> +    OBJECT_CLASS_CHECK(XiveFabricClass, (klass), TYPE_XIVE_FABRIC)
+> >>>> +#define XIVE_FABRIC_GET_CLASS(obj)                                 =
+  \
+> >>>> +    OBJECT_GET_CLASS(XiveFabricClass, (obj), TYPE_XIVE_FABRIC)
+> >>>> +
+> >>>> +typedef struct XiveFabricClass {
+> >>>> +    InterfaceClass parent;
+> >>>> +    void (*notify)(XiveFabric *xf, uint32_t lisn);
+> >>>> +} XiveFabricClass;
 > >>>> +
 > >>>>  #endif /* PPC_XIVE_H */
 > >>>
@@ -315,24 +298,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---ylS2wUBXLOxYXZFQ
+--BQPnanjtCNWHyqYD
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrhR0oACgkQbDjKyiDZ
-s5Jv9BAA0b0eIRMIwStVt7LHgQJHGLm0btMmZzLmBobuvRjbzqd4wvo0yYFgsB46
-OjWSd1uY/dZuyPwepXZ7EHQOx/WQypvTpT5V38X492JUTX0qOS/jRgn1hDwujx7X
-QYhGgz9YfKKzADP/ET34k5VjeCERHDdA+mLjs0MsOkLMrmVuGDO6MqCLAZczk7gP
-gt0wXfoZkjtsoKhyhmV2pXgGuu+nMhzWZYA5brHCtG14BPS8Y56DZR8EZ7cxPVLt
-WyHgZPtYK2PkdtrDd8PNFfPj/lQYGveisywV++7cH2qi9ql4tbyBgI5i5BIopQs+
-x+c0nPv3Jkc+YSvzjUINtmbgQtKWRKTPSV30OI/Z+ZkbKIW9pJiBituQkQha0iSU
-GiZFGQkNC5tBLvdAkCMqg1kwWmqHVafD98HkvzOV3MuVthvJ9/ChZOsIFKmJj1F/
-hk2CAOLH+71HDBSpBzACZ90Bo2tnZCtSRZSsXn/1U2X7WJZhm5dT8IIkDQRS2Sdt
-zpCVP58yKB+A8azU/9v/Q6oYMqn8bnJfmZhzOUDHqRwEadA7N8F1Kqbew82/+U5i
-BzejT4OBL9nb5x9ONMVl5Cjm/qBej4u4Uiuy8EthnSX6A0F2ikOR36PoAsvZ4HAf
-FC6Xo/H+9QZ0d4HjYWI0DB5+R+2on6nHQZJLcCaheQRbiY2l1A4=
-=XEMO
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrhTYkACgkQbDjKyiDZ
+s5JN3Q//VOF/yiVZHc8dt1oYjbzfjrdojzkFGJ9wdZP4TEqtfIYTd9cNTUOaAvaD
+xSH98iX1bCbZysWzWPnjh2X+F1o1eVuMxswVKBbCGwFugg0b8rtYvM/C8RHaKzKf
+TaROBybGHzWbIaCdouLnZx2VJ+rPV9jPjsa98twWEK5h6cu17z1tui/4rakENkeN
+LVxc7ISl4ct9PLAqnCIwOlSKv8eK7N4yfHP2xw51LU0IAI0XFmb5ffDLGRFK8mUY
+EYF0yCduhwSyrSTFj06KkKSwLRK+6DE8g1FEiEJYONQ2IJ2DqEfRAuY6xulBlyI5
+v8kyGqWjOIQKdVBmVAY5+OEaPWxdcsKHdoALyJrcTIu1Q1v0jaH5Yz8koDu3BNqI
+X1z5+tbpB22qvOwTt7DdM3Gwp0SEl7BRcaeS5haT38WMEY/+MyaLL+rKVvtOW3nQ
+vnrfMXUHIegQfmJv5Rz2e1YTaISeWp98RREOjmAEiGdZMTTKHrneuoq6nhA02qAU
+MAa6zHCI11F24cCkPXSmnOJCsi07LiHbrd3o4IRikHX8B7c4e2N1npq9ILZl1RRl
+mPcTpuGf/uqCTbo6bBR7k1DJGYLE7Jv60Km4JldQL0l2eU+JfEQC1PdGLpXtmddT
+Zj/jH78IZn8aPMqezEgZMoPKwRxOnPyNUMBHmevOJfu/gPmAMSQ=
+=DA4n
 -----END PGP SIGNATURE-----
 
---ylS2wUBXLOxYXZFQ--
+--BQPnanjtCNWHyqYD--
