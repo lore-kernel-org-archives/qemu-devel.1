@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49875)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBd3k-0000hE-MJ
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 05:19:25 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fBd4T-0001DS-0x
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 05:20:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBd3c-0004Hm-Po
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 05:19:24 -0400
-References: <20180418123838.3511-1-olaf@aepfle.de>
-	<20180418124753.GM27579@redhat.com>
-	<CAFEAcA_TtC-p4JJFRPaBFwim1a8J9G+z79KAK8vqrTx7ZKjOKg@mail.gmail.com>
-	<20180418144433.GV27579@redhat.com>
-	<CAFEAcA8jXwo35B7KVdVZEiqZTtMRvVXCP87iHKECjWPkHiTJ_A@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <91e6dbdd-6086-7c60-4bc9-a6ace1d041fc@redhat.com>
-Date: Thu, 26 Apr 2018 11:19:07 +0200
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fBd4P-0004ng-OO
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 05:20:09 -0400
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:42128)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
+	id 1fBd4P-0004n7-HZ
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 05:20:05 -0400
+Received: by mail-pg0-x241.google.com with SMTP id e12so15459244pgn.9
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 02:20:05 -0700 (PDT)
+From: Xiao Guangrong <guangrong.xiao@gmail.com>
+References: <20180426091519.26934-1-xiaoguangrong@tencent.com>
+Message-ID: <f58e5e7d-da9c-6424-f0a7-29b5cadd72e4@gmail.com>
+Date: Thu, 26 Apr 2018 17:19:58 +0800
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8jXwo35B7KVdVZEiqZTtMRvVXCP87iHKECjWPkHiTJ_A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180426091519.26934-1-xiaoguangrong@tencent.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1] configure: require glib-2.24
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] migration: introduce decompress-error-check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,40 +30,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: Olaf Hering <olaf@aepfle.de>, Fam Zheng <famz@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redhat.com, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On 26.04.2018 10:17, Peter Maydell wrote:
-> On 18 April 2018 at 15:44, Daniel P. Berrang=C3=A9 <berrange@redhat.com=
-> wrote:
->> On Wed, Apr 18, 2018 at 02:29:47PM +0100, Peter Maydell wrote:
->>> Yes, my OSX build system is on glib 2.22. It's using 'fink' for 3rd
->>> party library installations, and they somehow seem to have got stuck
->>> on 2.22. Looking at the website the project seems to have basically
->>> stagnated, and I guess I need to move to homebrew at some point
->>> (likely after we get 2.12 out the door). But for the moment this
->>> patch would break my pullrequest testing builds.
->>
->> Yeah that sounds reasonable as it would also align your build env with
->> what we are testing via travis too.
->=20
-> I've now made the switch to homebrew, and so my OSX build tests
-> will be using glib 2.56. NB that this means that none of my merge
-> testing will catch "glib version too old" for our current setting
-> of "too old" -- I'm not sure what my current oldest version is in
-> the test machine set.
->=20
-> I've also upgraded Xcode, which means I now have a machine with
-> a clang that emits all the -Waddress-of-packed-member complaints.
-> I have configured the test build so those aren't fatal
-> (via --extra-cflags=3D'-Werror -Wno-error=3Daddress-of-packed-member
-> -Wno-error=3Ddeprecated-declarations') but I'm now more interested in
-> getting those cleaned up so they don't clutter up my logfiles :-)
 
-Isn't the -Wno-error=3Daddress-of-packed-members flag added by Gerd's
-patch already? See:
+Hi Dave,
 
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D0e39c4aa7ecc5699bc3=
-91fcb
+On 04/26/2018 05:15 PM, guangrong.xiao@gmail.com wrote:
+> From: Xiao Guangrong <xiaoguangrong@tencent.com>
+> 
+> QEMU 2.13 enables strict check for compression & decompression to
+> make the migration more robuster, that depends on the source to fix
+> the internal design which triggers the unexpected error conditions
+> 
+> To make it work for migrating old version QEMU to 2.13 QEMU, we
+> introduce this parameter to disable the error check on the
+> destination
 
- Thomas
+We noticed this issue when evaluated your pull request, could you
+please review this fix and pull it to 2.13 release? Sorry, i did
+not realize it before. :(
