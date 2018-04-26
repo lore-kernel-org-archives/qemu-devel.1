@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fBjAv-0006VO-Af
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:51:14 -0400
+	(envelope-from <prvs=647a3a28a=Ian.Jackson@citrix.com>)
+	id 1fBjGM-0000yS-9j
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:56:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fBjAs-0000kO-5F
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:51:13 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42736 helo=mx1.redhat.com)
+	(envelope-from <prvs=647a3a28a=Ian.Jackson@citrix.com>)
+	id 1fBjGL-0003f6-5C
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:56:50 -0400
+Received: from smtp03.citrix.com ([162.221.156.55]:29395)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fBjAs-0000kB-0Z
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:51:10 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180424214550.32549-1-lersek@redhat.com>
-	<20180424214550.32549-7-lersek@redhat.com>
-	<8736zjagg3.fsf@dusky.pond.sub.org>
-	<4509705a-43b2-db40-aa24-18eff649e750@redhat.com>
-	<87sh7i4h5y.fsf@dusky.pond.sub.org>
-	<ea646e6d-9512-559d-be8d-fd3c754cc301@redhat.com>
-	<136c5d3a-9d5b-eb15-a1f4-18150662144b@redhat.com>
-	<87vacexcir.fsf@dusky.pond.sub.org>
-	<230b57bf-1bf0-fd4e-05bf-cb7c4902975d@redhat.com>
-Date: Thu, 26 Apr 2018 17:51:08 +0200
-In-Reply-To: <230b57bf-1bf0-fd4e-05bf-cb7c4902975d@redhat.com> (Eric Blake's
-	message of "Thu, 26 Apr 2018 09:48:03 -0500")
-Message-ID: <8736zix8yb.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <prvs=647a3a28a=Ian.Jackson@citrix.com>)
+	id 1fBjGK-0003eE-Rv
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:56:49 -0400
+From: Ian Jackson <ian.jackson@eu.citrix.com>
+Date: Thu, 26 Apr 2018 16:56:15 +0100
+Message-ID: <1524758187-9351-5-git-send-email-ian.jackson@eu.citrix.com>
+In-Reply-To: <1524758187-9351-1-git-send-email-ian.jackson@eu.citrix.com>
+References: <1524758187-9351-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 6/6] qapi: discriminate CpuInfo[Fast] on
- SysEmuTarget, not CpuInfoArch
+Subject: [Qemu-devel] [PULL 04/16] xen: restrict: use
+ xentoolcore_restrict_all
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,39 +29,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>
 
-Eric Blake <eblake@redhat.com> writes:
+And insist that it works.
 
-> On 04/26/2018 09:34 AM, Markus Armbruster wrote:
->>>
->>> Acerbic discovery of the day: @CpuInfoArch has "x86", while configure
->>> produces:
->>>
->>>   TARGET_NAME  TARGET_BASE_ARCH
->>>          i386              i386
->>>        x86_64              i386
->>>
->>> Note how "i386" does not match "x86".
->> 
->> Review fail.
->> 
->> Just three weeks ago, we could still have fixed query-cpus-fast...
->
-> Actually, I think we still can.  We already documented in the 2.12
-> release notes that the "arch" field of query-cpus-fast is known to be
-> broken for all but "s390x" (which is really the only arch field that
-> MUST be correct, as that is the only time we send additional
-> information).  And introspection can easily see both the enum contents
-> (if we add something) as well as any other additions to the
-> query-cpus-fast output union (although that is less likely), to use
-> those as a witness for whether qemu is new enough to have fixed the
-> bogus "arch" values.  I'd argue that if we change things right now, with
-> intent to include the change in 2.12.1, before people start relying on
-> the bogus "arch" of 2.12, then we should feel free to make
-> query-cpus-fast output whatever we want for all architectures other than
-> "s390x", even if it changes the current output of "x86".
+Drop individual use of xendevicemodel_restrict and
+xenforeignmemory_restrict.  These are not actually effective in this
+version of qemu, because qemu has a large number of fds open onto
+various Xen control devices.
 
-In other words, we managed to screw up query-cpus-fast sufficiently to
-let us fix it even now.  Cool, let's do it!
+The restriction arrangements are still not right, because the
+restriction needs to be done very late - after qemu has opened all of
+its control fds.
+
+xentoolcore_restrict_all and xentoolcore.h are available in Xen 4.10
+and later, only.  Provide a compatibility stub.  And drop the
+compatibility stubs for the old functions.
+
+Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
+Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
+Acked-by: Stefano Stabellini <sstabellini@kernel.org>
+---
+ include/hw/xen/xen_common.h | 46 +++++++++++----------------------------------
+ 1 file changed, 11 insertions(+), 35 deletions(-)
+
+diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
+index 64a978e..1766bb9 100644
+--- a/include/hw/xen/xen_common.h
++++ b/include/hw/xen/xen_common.h
+@@ -91,6 +91,16 @@ static inline void *xenforeignmemory_map2(xenforeignmemory_handle *h,
+     return xenforeignmemory_map(h, dom, prot, pages, arr, err);
+ }
+ 
++static inline int xentoolcore_restrict_all(domid_t domid)
++{
++    errno = ENOTTY;
++    return -1;
++}
++
++#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 41000 */
++
++#include <xentoolcore.h>
++
+ #endif
+ 
+ #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
+@@ -218,20 +228,6 @@ static inline int xendevicemodel_set_mem_type(
+     return xc_hvm_set_mem_type(dmod, domid, mem_type, first_pfn, nr);
+ }
+ 
+-static inline int xendevicemodel_restrict(
+-    xendevicemodel_handle *dmod, domid_t domid)
+-{
+-    errno = ENOTTY;
+-    return -1;
+-}
+-
+-static inline int xenforeignmemory_restrict(
+-    xenforeignmemory_handle *fmem, domid_t domid)
+-{
+-    errno = ENOTTY;
+-    return -1;
+-}
+-
+ #else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
+ 
+ #undef XC_WANT_COMPAT_DEVICEMODEL_API
+@@ -290,28 +286,8 @@ static inline int xen_modified_memory(domid_t domid, uint64_t first_pfn,
+ static inline int xen_restrict(domid_t domid)
+ {
+     int rc;
+-
+-    /* Attempt to restrict devicemodel operations */
+-    rc = xendevicemodel_restrict(xen_dmod, domid);
++    rc = xentoolcore_restrict_all(domid);
+     trace_xen_domid_restrict(rc ? errno : 0);
+-
+-    if (rc < 0) {
+-        /*
+-         * If errno is ENOTTY then restriction is not implemented so
+-         * there's no point in trying to restrict other types of
+-         * operation, but it should not be treated as a failure.
+-         */
+-        if (errno == ENOTTY) {
+-            return 0;
+-        }
+-
+-        return rc;
+-    }
+-
+-    /* Restrict foreignmemory operations */
+-    rc = xenforeignmemory_restrict(xen_fmem, domid);
+-    trace_xen_domid_restrict(rc ? errno : 0);
+-
+     return rc;
+ }
+ 
+-- 
+2.1.4
