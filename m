@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51292)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBicV-0006DY-9L
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:15:40 -0400
+	(envelope-from <thuth@redhat.com>) id 1fBihS-000815-G5
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:20:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBicQ-0002RT-8F
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:15:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58700)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fBicP-0002R2-Ow
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:15:34 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fBicO-0007Bm-Ot
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 15:15:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B4BC72E804E
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 15:15:32 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1fBihR-000573-EX
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:20:46 -0400
+References: <1521452376-25099-1-git-send-email-thuth@redhat.com>
+	<87bme62nu0.fsf@dusky.pond.sub.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <068649bc-1546-6fc5-3e41-63512196cbf8@redhat.com>
+Date: Thu, 26 Apr 2018 17:20:25 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <87bme62nu0.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Apr 2018 15:05:34 -0000
-From: Thomas Huth <1767126@bugs.launchpad.net>
-Reply-To: Bug 1767126 <1767126@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152475251964.6950.2732473928297665160.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152475513517.21887.14925923572522182237.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1767126] Re: Man page documents qemu -drive
- if=scsi but it no longer works
+Subject: Re: [Qemu-devel] [RFC PATCH] tests/device-introspect: Test devices
+ with all machines, not only with "none"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,37 +25,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Eduardo Habkost <ehabkost@redhat.com>
 
-The -drive if=3Dscsi still works on the machines that have a SCSI bus by
-default. And the change for x86 has been documented in the ChangeLog:
-https://wiki.qemu.org/ChangeLog/2.12
+On 26.04.2018 13:45, Markus Armbruster wrote:
+> Thomas Huth <thuth@redhat.com> writes:
+[...]
+>> @@ -260,6 +263,26 @@ static void test_abstract_interfaces(void)
+>>      qtest_end();
+>>  }
+>> =20
+>> +static void add_machine_test_case(const char *mname)
+>> +{
+>> +    char *path, *args;
+>> +
+>> +    /* Ignore blacklisted machines */
+>> +    if (g_str_equal("xenfv", mname) || g_str_equal("xenpv", mname)) {
+>> +        return;
+>> +    }
+>> +
+>> +    path =3D g_strdup_printf("device/introspect/concrete-defaults-%s"=
+, mname);
+>> +    args =3D g_strdup_printf("-machine %s", mname);
+>> +    qtest_add_data_func(path, args, test_device_intro_concrete);
+>=20
+> This runs test_device_intro_concrete() with "-machine M" for all machin=
+e
+> types M, in SPEED=3Dslow mode.
+>=20
+>> +    g_free(path);
+>> +
+>> +    path =3D g_strdup_printf("device/introspect/concrete-nodefaults-%=
+s", mname);
+>> +    args =3D g_strdup_printf("-nodefaults -machine %s", mname);
+>> +    qtest_add_data_func(path, args, test_device_intro_concrete);
+>=20
+> This runs test_device_intro_concrete() with "-nodefaults -machine M" fo=
+r
+> all machine types M, in SPEED=3Dslow mode.
+>=20
+> Has "without -nodefaults" exposed additional bugs?
 
--- =
+After testing this with all machines, I had to discover that
+"-nodefaults" does not work so easily: A lot of the embedded machines
+(especially the ARM machines) simply refuse to work with "-nodefaults"
+and exit immediately instead. E.g.:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1767126
+$ arm-softmmu/qemu-system-arm -nodefaults -nographic -M n810,accel=3Dqtes=
+t
+qemu-system-arm: missing SecureDigital device
 
-Title:
-  Man page documents qemu -drive if=3Dscsi but it no longer works
+So we'd either need a rather big black list for the machines that do not
+work, or simply drop the "-nodefaults" tests from this patch.
 
-Status in QEMU:
-  New
+> Please mention "with and without -nodefaults" in the commit message.
+>=20
+> I'd try "with -nodefaults" before "without", because "with" is the
+> simpler test case.
 
-Bug description:
-  The qemu man page section documenting the -drive option contains
+For most boards, it seems rather to be the more "difficult" setting
+since most boards are only tested without "-nodefaults" obviously.
 
-             if=3Dinterface
-                 This option defines on which type on interface the drive is
-                 connected.  Available types are: ide, scsi, sd, mtd, flopp=
-y,
-                 pflash, virtio, none.
+>> +    g_free(path);
+>> +}
+>> +
+>>  int main(int argc, char **argv)
+>>  {
+>>      g_test_init(&argc, &argv, NULL);
+>> @@ -268,8 +291,12 @@ int main(int argc, char **argv)
+>>      qtest_add_func("device/introspect/list-fields", test_qom_list_fie=
+lds);
+>>      qtest_add_func("device/introspect/none", test_device_intro_none);
+>>      qtest_add_func("device/introspect/abstract", test_device_intro_ab=
+stract);
+>> -    qtest_add_func("device/introspect/concrete", test_device_intro_co=
+ncrete);
+>>      qtest_add_func("device/introspect/abstract-interfaces", test_abst=
+ract_interfaces);
+>> +    qtest_add_data_func("device/introspect/concrete", g_strdup(common=
+_args),
+>> +                        test_device_intro_concrete);
+>=20
+> This runs test_device_intro_concrete() with "-nodefaults -machine
+> none".  Duplicate in SPEED=3Dslow mode?
 
-  but if=3Dscsi no longer works as of version 2.12.0.
+Yes, it's a duplicate, we should skip that in SPEED=3Dslow mode.
 
-  If you really have to make backwards incompatible changes, it would be
-  helpful if you could at least document them.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1767126/+subscriptions
+ Thomas
