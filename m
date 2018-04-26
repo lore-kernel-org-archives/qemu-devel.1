@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fBZAg-0006Jt-MH
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:10:20 -0400
+	(envelope-from <bounces@canonical.com>) id 1fBZBH-0006f8-6I
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:10:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fBZAd-00020H-D4
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:10:18 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41956 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fBZAd-0001wX-6T
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:10:15 -0400
-Date: Thu, 26 Apr 2018 13:09:59 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180426050959.GN9036@xz-mi>
-References: <20180420175721.18479-1-dgilbert@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1fBZBE-0002rw-0i
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:10:55 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45552)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fBZBD-0002qF-Pv
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:10:51 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fBZBC-0000M5-NF
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 05:10:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id AB4D82E80C8
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 05:10:50 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180420175721.18479-1-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] migration: update docs
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 26 Apr 2018 05:03:10 -0000
+From: Thomas Huth <1761535@bugs.launchpad.net>
+Reply-To: Bug 1761535 <1761535@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152294403750.8450.15164247999601342743.malonedeb@soybean.canonical.com>
+Message-Id: <152471899123.21735.181565830446079661.launchpad@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1761535] Re: qemu-aarch64-static docker
+ arm64v8/openjdk coredump
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,133 +37,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
 
-On Fri, Apr 20, 2018 at 06:57:21PM +0100, Dr. David Alan Gilbert (git) wrote:
+** Changed in: qemu
+       Status: Fix Committed =3D> Fix Released
 
-[...]
+-- =
 
->  Saving the state of one device
->  ==============================
->  
-> -The state of a device is saved using intermediate buffers.  There are
-> -some helper functions to assist this saving.
-> -
-> -There is a new concept that we have to explain here: device state
-> -version.  When we migrate a device, we save/load the state as a series
-> -of fields.  Some times, due to bugs or new functionality, we need to
-> -change the state to store more/different information.  We use the
-> -version to identify each time that we do a change.  Each version is
-> -associated with a series of fields saved.  The `save_state` always saves
-> -the state as the newer version.  But `load_state` sometimes is able to
-> -load state from an older version.
-> -
-> -Legacy way
-> -----------
-> -
-> -This way is going to disappear as soon as all current users are ported to VMSTATE.
-> -
-> -Each device has to register two functions, one to save the state and
-> -another to load the state back.
-> -
-> -.. code:: c
-> -
-> -  int register_savevm(DeviceState *dev,
-> -                      const char *idstr,
-> -                      int instance_id,
-> -                      int version_id,
-> -                      SaveStateHandler *save_state,
-> -                      LoadStateHandler *load_state,
-> -                      void *opaque);
-> -
-> -  typedef void SaveStateHandler(QEMUFile *f, void *opaque);
-> -  typedef int LoadStateHandler(QEMUFile *f, void *opaque, int version_id);
-> -
-> -The important functions for the device state format are the `save_state`
-> -and `load_state`.  Notice that `load_state` receives a version_id
-> -parameter to know what state format is receiving.  `save_state` doesn't
-> -have a version_id parameter because it always uses the latest version.
-> +For most devices, the state is saved in a single call to the migration
-> +infrastrucutre; these are *non-iterative* devices.  The data for these
-> +devices is sent at the end of precopy migration, when the CPUs are paused.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1761535
 
-> +Where the data associated with the device is very large (e.g. RAM or large tables)
-> +see the iterative device section below.
+Title:
+  qemu-aarch64-static docker arm64v8/openjdk coredump
 
-I would prefer:
+Status in QEMU:
+  Fix Released
 
-  There are also devices called *iterative* devices, which contain a
-  huge amount of data as device states (e.g., RAM or large tables).
-  Please refer to the iterative device section below for more information.
+Bug description:
+  I am using qemu-aarch64-static to run the arm64v8/openjdk official
+  image on my x86 machine. Using QEMU master, I immediately hit a bug
+  which hangs the container. With Ubuntu default version qemu-aarch64
+  version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.24) and qemu-aarch64
+  version 2.11.1 (v2.11.1-dirty) the hang does not take place.
 
-> +
-> +General advice for device developers
-> +------------------------------------
-> +
-> +- The migration state saved should reflect the device being modelled rather
-> +  than the way your implementation works.   That way if you change the implementation
-> +  later the migration stream will stay compatible.  That model may include
-> +  internal state that's not directly visible in a register.
-> +
-> +- When saving a migration stream the device code may walk and check
-> +  the state of the device.  These checks might fail in various ways (e.g.
-> +  discovering internal state is corrupt or that the guest has done something bad).
-> +  Consider carefully before asserting/aborting at this point, since the
-> +  normal response from users is that *migration broke their VM* since it had
-> +  apparently been running fine until then.
+  To reproduce (and get to the core dump):
 
-Maybe we can give some further suggestions?
+  $ /tmp/tmptgyg3nvh/qemu-aarch64-static/qemu-aarch64-static -version
+  qemu-aarch64 version 2.11.91 (v2.12.0-rc1-5-g47d3b60-dirty)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
 
-  Instead of aborting the whole VM, we can dump some error messages
-  when necessary for further diagnose. Or, we can set the device into
-  error state (or even disable the device) where capable so that at
-  least other part of the VM won't be affected, then the guest OS can
-  decide what to do next with that.
+  $ docker run -it -v /tmp/tmptgyg3nvh/qemu-aarch64-static:/usr/bin/qemu-aa=
+rch64-static arm64v8/openjdk /bin/bash
+  root@bf75cf45d311:/# javac
+  Usage: javac <options> <source files>
+  where possible options include:
+    -g                         Generate all debugging info
+  <...snip...>
+    @<filename>                Read options and filenames from file
 
-> +
-> +- The migration might happen at an inconvenient point,
-> +  e.g. right in the middle of the guest reprogramming the device, during
-> +  guest reboot or shutdown or while the device is waiting for external IO.
-> +  It's strongly preferred that migrations do not fail in this situation,
-> +  since in the cloud environment migrations might happen automatically to
-> +  VMs that the administrator doesn't directly control.
-> +
-> +- If you do need to fail a migration, ensure that sufficient information
-> +  is logged to identify what went wrong.
-> +
-> +- The destination should treat an incoming migration stream as hostile
-> +  (which we do to varying degrees in the existing code).  Check that offsets
-> +  into buffers and the like can't cause overruns.  Fail the incoming migration
-> +  in the case of a corrupted stream like this.
-> +
-> +- Take care with internal device state or behaviour that might become
-> +  migration version dependent.  For example, the order of PCI capabilities
-> +  is required to stay constant across migration.  Another example would
-> +  be that a special case handled by subsections (see below) might become
-> +  much more common if a default behaviour is changed.
-> +
-> +- Migrations timing out or being failed by higher levels of management,
-> +  or failures of the destination host are not unusual, and care should
-> +  be taken to ensure that the source VM can be restarted up until the point
-> +  when the destination starts runing.  Valid examples include the management
-> +  layer reverting the migration even though the QEMU level of migration has
-> +  succeeded.  For this reason, the state on the source VM should not be
-> +  destroyed during the migration process in normal use.
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  ...TERMINAL HANGS...
 
-I would prefer we have a summary at the start, or just move the last
-sentence there.  Otherwise it'll be hard for quick readers to catch
-the point:
+  =
 
-  Device states should still be kept even after a savevm operation.
-  The reason is that ...
+  To get the core dump, In a separate terminal:
 
-All comments are subjective and optional, so please choose either way
-you would prefer.  The rest looks quite good to me.
+  # snapshot the file system of the hung image
+  $ docker commit $(docker ps -aqf "name=3Dlatest_qemu") qemu_coredump
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+  # connect with known working qemu
+  $ docker run -t -v /usr/bin/qemu-aarch64-static:/usr/bin/qemu-aarch64-sta=
+tic  -i qemu_coredump /bin/bash
 
-Thanks,
+  $$ ls -lat
+  total 10608
+  <snip>
+  -rw-r--r--   1 root root 10792960 Mar 29 18:02 qemu_bash_20180329-180251_=
+1.core
+  drwxrwxrwt   5 root root     4096 Mar 29 18:02 tmp
+  <snip>
 
--- 
-Peter Xu
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1761535/+subscriptions
