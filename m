@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fBfUA-0007nu-Qh
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 07:54:51 -0400
+	(envelope-from <armbru@redhat.com>) id 1fBfWu-0000SF-9x
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 07:57:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fBfUA-0001HH-0L
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 07:54:50 -0400
+	(envelope-from <armbru@redhat.com>) id 1fBfWr-00030G-8s
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 07:57:40 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51528 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fBfWr-000309-4S
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 07:57:37 -0400
 From: Markus Armbruster <armbru@redhat.com>
-References: <1521452376-25099-1-git-send-email-thuth@redhat.com>
-	<87in8qf2w3.fsf@dusky.pond.sub.org>
-	<62dba5cf-b497-1a98-0af5-971e169a3458@redhat.com>
-Date: Thu, 26 Apr 2018 13:54:43 +0200
-In-Reply-To: <62dba5cf-b497-1a98-0af5-971e169a3458@redhat.com> (Thomas Huth's
-	message of "Thu, 26 Apr 2018 12:24:48 +0200")
-Message-ID: <877eou2nek.fsf@dusky.pond.sub.org>
+References: <20180424214550.32549-1-lersek@redhat.com>
+	<20180424214550.32549-7-lersek@redhat.com>
+	<8736zjagg3.fsf@dusky.pond.sub.org>
+	<4509705a-43b2-db40-aa24-18eff649e750@redhat.com>
+	<87sh7i4h5y.fsf@dusky.pond.sub.org>
+	<ea646e6d-9512-559d-be8d-fd3c754cc301@redhat.com>
+Date: Thu, 26 Apr 2018 13:57:27 +0200
+In-Reply-To: <ea646e6d-9512-559d-be8d-fd3c754cc301@redhat.com> (Laszlo Ersek's
+	message of "Thu, 26 Apr 2018 11:18:18 +0200")
+Message-ID: <8736zi2na0.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC PATCH] tests/device-introspect: Test devices
- with all machines, not only with "none"
+Subject: Re: [Qemu-devel] [PATCH 6/6] qapi: discriminate CpuInfo[Fast] on
+ SysEmuTarget, not CpuInfoArch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,74 +32,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-Thomas Huth <thuth@redhat.com> writes:
+Laszlo Ersek <lersek@redhat.com> writes:
 
-> On 17.04.2018 14:12, Markus Armbruster wrote:
->> Thomas Huth <thuth@redhat.com> writes:
+> On 04/26/18 08:26, Markus Armbruster wrote:
+>> Laszlo Ersek <lersek@redhat.com> writes:
 >> 
->>> Many device introspection crashes only happen if you are using a
->>> certain machine, e.g.:
->>>
->>> $ ppc-softmmu/qemu-system-ppc -S -M ref405ep,accel=qtest -qmp stdio
->>> {"QMP": {"version": {"qemu": {"micro": 50, "minor": 11, "major": 2},
->>>  "package": "build-all"}, "capabilities": []}}
->>> { 'execute': 'qmp_capabilities' }
->>> {"return": {}}
->>> { 'execute': 'device-list-properties',
->>>   'arguments': {'typename': 'macio-newworld'}}
->>> Unexpected error in qemu_chr_fe_init() at chardev/char-fe.c:222:
->>> Device 'serial0' is in use
->>> Aborted (core dumped)
->>>
->>> To be able to catch these problems, let's extend the device-introspect
->>> test to check the devices on all machine types. Since this is a rather
->>> slow operation, the test is only run in "SPEED=slow" mode.
+>> [...]
+>>> In brief, I think extending configure / the build system would only help
+>>> with the less painful part of this (the scalar mapping), and so it's not
+>>> worth doing.
 >> 
->> If the device works with one machine type, it has a decent chance to
->> work with others, too.  Thus, testing each device with every machine
->> type is overkill.  I appreciate having overkill as an option :)
->> 
->> What I'd like to see for a quick "make check" is testing each device
->> once.  That should flush out most bugs.  
+>> We're going to leave deprecated query-cpus alone (see Eric's review of
+>> the previous patch).
 >
-> That's already done with the "none" machine.
-
-I was too terse.  We test each device with -machine none for every
-target.  Fine if that's quick enough.  If not, we might want to reduce
-redundancy there.
-
-Actually, a worse offender in the "waste everybody's time via redunancy"
-department could be qom-test.
-
-> Anyway, do you think my patch here is useful and has a chance of getting
-> included? I.e. shall I re-spin this as a non-RFC patch? Or shall we
-> rather wait for Eduardo's python-based tests to get included into the
-> repository?
-
-I don't mind having make check SPEED=slow run more extensive tests.
-Assuming we actually run them at least once in a while, which seems
-doubtful.
-
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  In case someone wants to help with creating some bug fix patches
->>>  during the QEMU hard freeze phase: This test can now be used to
->>>  trigger lots of introspection bugs that we were not aware of yet.
->>>  I think most of the bugs are due to wrong handling of instance_init
->>>  vs. realize functions.
->> 
->> Yes, that's a common class of bugs.  There's little guidance on what
->> kind of work belongs where, and plenty of bad examples.
+> Yes.
 >
-> I think we urgently need a file in doc/devel/ that describes the various
-> states / functions of a device, where we should properly describe the
-> differences between instance_init and realize. ... I'll try to come up
-> with something when I've got some spare time (unless somebody else
-> volunteers to do that first).
+>> Does that change matters?
+>
+> It does.
+>
+>> PS: Instead of configure changes, #TARGET_BASE_ARCH might do.
+>
+> Does that already exist as a macro? Hmm... After grepping my build dir,
+> it doesn't seem to, but maybe I can change that. Because,
+> TARGET_BASE_ARCH is exactly what we need.
 
-Please do.
-
-Widen the scope from just TYPE_DEVICE to all of QOM?
+You're right, it's not in config-target.h, only in config-target.mak.
+scripts/create_config would need a (trivial) patch.
