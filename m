@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBZKP-00021M-HU
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:20:23 -0400
+	(envelope-from <bounces@canonical.com>) id 1fBZKk-0002BH-65
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:20:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBZKM-00031g-D1
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:20:21 -0400
-Date: Thu, 26 Apr 2018 14:46:35 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180426044635.GG8800@umbus.fritz.box>
-References: <20180419124331.3915-1-clg@kaod.org>
-	<20180419124331.3915-6-clg@kaod.org>
-	<20180424065810.GR19804@umbus.fritz.box>
-	<6086f4d7-c927-6660-679b-719c59003f64@kaod.org>
+	(envelope-from <bounces@canonical.com>) id 1fBZKj-0003KL-8e
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:20:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47332)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fBZKj-0003JK-2R
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:20:41 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fBZKh-0001Jx-58
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 05:20:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id E4A962E80D9
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 05:20:38 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="FwyhczKCDPOVeYh6"
-Content-Disposition: inline
-In-Reply-To: <6086f4d7-c927-6660-679b-719c59003f64@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v3 05/35] spapr/xive: add a single source
- block to the sPAPR XIVE model
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 26 Apr 2018 05:12:21 -0000
+From: Thomas Huth <1754372@bugs.launchpad.net>
+Reply-To: Bug 1754372 <1754372@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152052329803.20387.7205053769147453578.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152471954218.6979.2279479586188044756.launchpad@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1754372] Re: Set MIPS MSA in ELF Auxiliary Vectors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,213 +36,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: qemu-devel@nongnu.org
 
+** Changed in: qemu
+       Status: Fix Committed =3D> Fix Released
 
---FwyhczKCDPOVeYh6
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+-- =
 
-On Tue, Apr 24, 2018 at 10:19:58AM +0200, C=E9dric Le Goater wrote:
-> On 04/24/2018 08:58 AM, David Gibson wrote:
-> > On Thu, Apr 19, 2018 at 02:43:01PM +0200, C=E9dric Le Goater wrote:
-> >> Bare-metal systems (PowerNV) have multiples interrupt sources. The
-> >> XIVE interrupt controller has an internal source for IPIs and generic
-> >> IPIs, the PSIHB has one and also the PHBs. But, for simplicity on the
-> >> sPAPR machine, we use a unique XiveSource object for all IPIs and
-> >> virtual device interrupts of the VM.
-> >>
-> >> The ESB MMIO region used to control the sources is mapped at the
-> >> address of chip 0 of a real system and only the provisioned IRQ
-> >> numbers are covered.
-> >=20
-> > Is that MMIO address PAPR specified, or arbitrary?
->=20
-> There are no specified value for the ESB address. It's queried by=20
-> the guest using the H_INT_GET_SOURCE_INFO hcall. For KVM, I have
-> introduced a ioctl to configure the KVM device.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1754372
 
-Ok.
+Title:
+  Set MIPS MSA in ELF Auxiliary Vectors
 
->=20
-> Same for the TIMA, but in this case, the address is exposed to the
-> guest in the device tree.
-> =20
-> >=20
-> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> >> ---
-> >>  hw/intc/spapr_xive.c        | 34 ++++++++++++++++++++++++++++++++++
-> >>  include/hw/ppc/spapr_xive.h |  3 +++
-> >>  include/hw/ppc/xive.h       |  6 ++++++
-> >>  3 files changed, 43 insertions(+)
-> >>
-> >> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> >> index 020444e2665a..90cde8a4082d 100644
-> >> --- a/hw/intc/spapr_xive.c
-> >> +++ b/hw/intc/spapr_xive.c
-> >> @@ -14,12 +14,15 @@
-> >>  #include "sysemu/cpus.h"
-> >>  #include "monitor/monitor.h"
-> >>  #include "hw/ppc/spapr_xive.h"
-> >> +#include "hw/ppc/xive.h"
-> >>  #include "hw/ppc/xive_regs.h"
-> >> =20
-> >>  void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon)
-> >>  {
-> >>      int i;
-> >> =20
-> >> +    xive_source_pic_print_info(&xive->source, mon);
-> >> +
-> >>      monitor_printf(mon, "IVE Table\n");
-> >>      for (i =3D 0; i < xive->nr_irqs; i++) {
-> >>          XiveIVE *ive =3D &xive->ivt[i];
-> >> @@ -40,6 +43,9 @@ static void spapr_xive_reset(DeviceState *dev)
-> >>      sPAPRXive *xive =3D SPAPR_XIVE(dev);
-> >>      int i;
-> >> =20
-> >> +    /* Xive Source reset is done through SysBus, it should put all
-> >> +     * IRQs to OFF (!P|Q) */
-> >> +
-> >>      /* Mask all valid IVEs in the IRQ number space. */
-> >>      for (i =3D 0; i < xive->nr_irqs; i++) {
-> >>          XiveIVE *ive =3D &xive->ivt[i];
-> >> @@ -51,18 +57,42 @@ static void spapr_xive_reset(DeviceState *dev)
-> >> =20
-> >>  static void spapr_xive_init(Object *obj)
-> >>  {
-> >> +    sPAPRXive *xive =3D SPAPR_XIVE(obj);
-> >> =20
-> >> +    object_initialize(&xive->source, sizeof(xive->source), TYPE_XIVE_=
-SOURCE);
-> >> +    object_property_add_child(obj, "source", OBJECT(&xive->source), N=
-ULL);
-> >>  }
-> >> =20
-> >>  static void spapr_xive_realize(DeviceState *dev, Error **errp)
-> >>  {
-> >>      sPAPRXive *xive =3D SPAPR_XIVE(dev);
-> >> +    XiveSource *xsrc =3D &xive->source;
-> >> +    Error *local_err =3D NULL;
-> >> =20
-> >>      if (!xive->nr_irqs) {
-> >>          error_setg(errp, "Number of interrupt needs to be greater 0");
-> >>          return;
-> >>      }
-> >> =20
-> >> +    /* The XIVE interrupt controller has an internal source for IPIs
-> >> +     * and generic IPIs, the PSIHB has one and also the PHBs. For
-> >> +     * simplicity, we use a unique XIVE source object for *all*
-> >> +     * interrupts on sPAPR. The ESBs pages are mapped at the address
-> >> +     * of chip 0 of a real system.
-> >> +     */
-> >> +    object_property_set_int(OBJECT(xsrc), XIVE_VC_BASE, "bar",
-> >> +                            &error_fatal);
-> >> +    object_property_set_int(OBJECT(xsrc), xive->nr_irqs, "nr-irqs",
-> >> +                            &error_fatal);
-> >> +    object_property_add_const_link(OBJECT(xsrc), "xive", OBJECT(xive),
-> >> +                                   &error_fatal);
-> >> +    object_property_set_bool(OBJECT(xsrc), true, "realized", &local_e=
-rr);
-> >> +    if (local_err) {
-> >> +        error_propagate(errp, local_err);
-> >> +        return;
-> >> +    }
-> >> +    qdev_set_parent_bus(DEVICE(xsrc), sysbus_get_default());
-> >> +
-> >>      /* Allocate the Interrupt Virtualization Table */
-> >>      xive->ivt =3D g_new0(XiveIVE, xive->nr_irqs);
-> >>  }
-> >> @@ -137,23 +167,27 @@ type_init(spapr_xive_register_types)
-> >>  bool spapr_xive_irq_enable(sPAPRXive *xive, uint32_t lisn, bool lsi)
-> >>  {
-> >>      XiveIVE *ive =3D spapr_xive_get_ive(XIVE_FABRIC(xive), lisn);
-> >> +    XiveSource *xsrc =3D &xive->source;
-> >> =20
-> >>      if (!ive) {
-> >>          return false;
-> >>      }
-> >> =20
-> >>      ive->w |=3D IVE_VALID;
-> >> +    xive_source_irq_set(xsrc, lisn - xsrc->offset, lsi);
-> >>      return true;
-> >>  }
-> >> =20
-> >>  bool spapr_xive_irq_disable(sPAPRXive *xive, uint32_t lisn)
-> >>  {
-> >>      XiveIVE *ive =3D spapr_xive_get_ive(XIVE_FABRIC(xive), lisn);
-> >> +    XiveSource *xsrc =3D &xive->source;
-> >> =20
-> >>      if (!ive) {
-> >>          return false;
-> >>      }
-> >> =20
-> >>      ive->w &=3D ~IVE_VALID;
-> >> +    xive_source_irq_set(xsrc, lisn - xsrc->offset, false);
-> >>      return true;
-> >>  }
-> >> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> >> index 1d966b5d3a96..4538c622b60a 100644
-> >> --- a/include/hw/ppc/spapr_xive.h
-> >> +++ b/include/hw/ppc/spapr_xive.h
-> >> @@ -19,6 +19,9 @@
-> >>  typedef struct sPAPRXive {
-> >>      SysBusDevice parent;
-> >> =20
-> >> +    /* Internal interrupt source for IPIs and virtual devices */
-> >> +    XiveSource   source;
-> >> +
-> >>      /* Routing table */
-> >>      XiveIVE      *ivt;
-> >>      uint32_t     nr_irqs;
-> >> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> >> index 5b145816acdc..57295715a4a5 100644
-> >> --- a/include/hw/ppc/xive.h
-> >> +++ b/include/hw/ppc/xive.h
-> >> @@ -16,6 +16,12 @@
-> >>  typedef struct XiveFabric XiveFabric;
-> >> =20
-> >>  /*
-> >> + * XIVE MMIO regions
-> >> + */
-> >> +
-> >> +#define XIVE_VC_BASE   0x0006010000000000ull
+Status in QEMU:
+  Fix Released
 
+Bug description:
+  The MIPS MSA feature is currently not set in the ELF auxiliary vector.
 
+  That is, querying the AT_HWCAP key of the ELF auxiliary vectors for a
+  MIPS CPU that has the MSA feature should return a value that has the
+  second bit [0] set.
 
-> >> +
-> >> +/*
-> >>   * XIVE Interrupt Source
-> >>   */
-> >> =20
-> >=20
->=20
+  From [0], `HWCAP_MIPS_MSA` is defined to `1 << 1`.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+  [0]:
+  https://github.com/torvalds/linux/blob/master/arch/mips/include/uapi/asm/=
+hwcap.h
 
---FwyhczKCDPOVeYh6
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrhWakACgkQbDjKyiDZ
-s5JrGw/+KxVUYDTeuf5WXnLtq2xurcW7Rr/p+yV4Fzlwmm1gdArQ3g5XKnNqKjR2
-DU/FIDQ9ImWMueW919KmSVhmxT2BO1pAcaoCPE+rNTmnTDPtaYPYJUZpHzZF3p1e
-UttwXiztsTHpOj9F5zf/Ne0wZLknlUlcIlsqhp0qW8w0YoR6UvF0mOIIz+zMh8UK
-U1nVXdECI77R8GIUzyqW0E+ugcdqi+dpQZ3sb40XYaOAnzRsiwR131Q3moBsaEh9
-1cyVDlyZFWoPZUoQHRGf7B3dNLnlFYdcE41HfuqsAT0aY2HeRVIeWHJ4iAGXG76+
-geWfk2LMSY1+NRRu8M7akKFsCBZlyKHvR1G3qEP4OuwjEsbKigk+XEI3GaoAp18I
-e9fWXgNev3UKFR+wDVSOrNnpoDlGRw2ULZENbXU4Sf4d0DIJH+Cif0iQNfYVXyUv
-W9rInHgq+Y8wnB4zn+ybLC9FftMibqq5vuIINbmXDh5oiav7yrGDcLew7MoT8P+s
-s3zo318D5kvbtaDkae4voO7InOVpMxC1I7suPm5QTw+/SxpobIpAo1y7jVqvNWCv
-rs1IjM0XbW/4GYICc7ocm1oUY6XA/j2K0oIvVgMF6aI9ssyotKOuVmgl1xc7+yaJ
-mrvmPS4Y8UbeVADF4F3ePyok/QwPqCdETAav4LMb82UBabm2V4g=
-=kVtx
------END PGP SIGNATURE-----
-
---FwyhczKCDPOVeYh6--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1754372/+subscriptions
