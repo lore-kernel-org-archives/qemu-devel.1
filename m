@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fBkdN-0000hq-UY
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 13:24:43 -0400
+	(envelope-from <eblake@redhat.com>) id 1fBkgQ-0002g1-Nm
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 13:27:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fBkdM-0002dm-Kq
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 13:24:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37928 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1fBkgN-0004jA-Fr
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 13:27:50 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49074 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fBkdM-0002da-FQ
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 13:24:40 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fBkgN-0004iy-AY
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 13:27:47 -0400
 References: <1524761612-5307-1-git-send-email-ian.jackson@eu.citrix.com>
-	<1524761612-5307-2-git-send-email-ian.jackson@eu.citrix.com>
+	<1524761612-5307-3-git-send-email-ian.jackson@eu.citrix.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <f9d7f1bd-2ef2-691a-fa98-129ecca06b02@redhat.com>
-Date: Thu, 26 Apr 2018 12:24:37 -0500
+Message-ID: <3b3c510e-c497-79b8-bc88-76d5b8b0d184@redhat.com>
+Date: Thu, 26 Apr 2018 12:27:45 -0500
 MIME-Version: 1.0
-In-Reply-To: <1524761612-5307-2-git-send-email-ian.jackson@eu.citrix.com>
+In-Reply-To: <1524761612-5307-3-git-send-email-ian.jackson@eu.citrix.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="AnnMCAGu7ES5vrbJ4hw9J1wfLnbjmV3wX"
-Subject: Re: [Qemu-devel] [RFC PATCH 1/7] error reporting: Introduce
- errnoval parameter to vreport
+	boundary="fQ5iF2BOQfoMwnHZndrZwUXewB1zj3Ksk"
+Subject: Re: [Qemu-devel] [RFC PATCH 2/7] error reporting: Provide
+ error_report_errno (and error_vreport_errno)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,102 +33,55 @@ To: Ian Jackson <ian.jackson@eu.citrix.com>, qemu-devel@nongnu.org
 Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "=?UTF-8?Q?Daniel_P_._Berrang=c3=a9?=" <berrange@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---AnnMCAGu7ES5vrbJ4hw9J1wfLnbjmV3wX
+--fQ5iF2BOQfoMwnHZndrZwUXewB1zj3Ksk
 From: Eric Blake <eblake@redhat.com>
 To: Ian Jackson <ian.jackson@eu.citrix.com>, qemu-devel@nongnu.org
 Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  =?UTF-8?Q?Daniel_P_._Berrang=c3=a9?= <berrange@redhat.com>,
  Alistair Francis <alistair.francis@xilinx.com>
-Message-ID: <f9d7f1bd-2ef2-691a-fa98-129ecca06b02@redhat.com>
-Subject: Re: [RFC PATCH 1/7] error reporting: Introduce errnoval parameter to
- vreport
+Message-ID: <3b3c510e-c497-79b8-bc88-76d5b8b0d184@redhat.com>
+Subject: Re: [RFC PATCH 2/7] error reporting: Provide error_report_errno (and
+ error_vreport_errno)
 References: <1524761612-5307-1-git-send-email-ian.jackson@eu.citrix.com>
- <1524761612-5307-2-git-send-email-ian.jackson@eu.citrix.com>
-In-Reply-To: <1524761612-5307-2-git-send-email-ian.jackson@eu.citrix.com>
+ <1524761612-5307-3-git-send-email-ian.jackson@eu.citrix.com>
+In-Reply-To: <1524761612-5307-3-git-send-email-ian.jackson@eu.citrix.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 04/26/2018 11:53 AM, Ian Jackson wrote:
-> This will allow new callers of vreport to specify that an errno value
-> should be printed too.  Update all existing callers.
+> This will let us replace a lot of open coded calls to perror,
+> strerror, etc.
 >=20
-> We use strerror rather than strerror_r because strerror_r presents
-> portability difficulties.  Replacing strerror with strerror_r (or
-> something else) is left to the future.
-
-Is g_strerror() suitably easy to use, which would at least avoid the
-portability difficulties?
-
->=20
-> No functional change yet.
+> No callers yet so no functional change.
 >=20
 > Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
 > ---
->  util/qemu-error.c | 21 ++++++++++++++-------
->  1 file changed, 14 insertions(+), 7 deletions(-)
+>  include/qemu/error-report.h |  2 ++
+>  util/qemu-error.c           | 28 ++++++++++++++++++++++++++++
+>  2 files changed, 30 insertions(+)
 >=20
-> diff --git a/util/qemu-error.c b/util/qemu-error.c
-> index a25d3b9..9acc4b5 100644
-> --- a/util/qemu-error.c
-> +++ b/util/qemu-error.c
-> @@ -191,12 +191,14 @@ bool enable_timestamp_msg;
->  /*
->   * Print a message to current monitor if we have one, else to stderr.
->   * @report_type is the type of message: error, warning or informationa=
-l.
-> + * If @errnoval is nonnegative it is fed to strerror and printed too.
-
-That implies 0 is fed to strerror(), which is not the case.  Better
-would be "If @errnoval is positive...".  Or, if we wanted, we could say
-"If @errnoval is not zero, its absolute value is fed to strerror" to let
-people pass in both EIO and -EIO for the same output (something that
-strerror() can't do, but our wrapper can) - but I don't know if that
-convenience is a good thing.
-
->   * Format arguments like vsprintf().  The resulting message should be
->   * a single phrase, with no newline or trailing punctuation.
->   * Prepend the current location and append a newline.
->   * It's wrong to call this in a QMP monitor.  Use error_setg() there.
->   */
-> -static void vreport(report_type type, const char *fmt, va_list ap)
-> +static void vreport(report_type type, int errnoval,
-
-Bikeshedding: Is 'err' or 'errval' a better name in terms of length and
-legibility?
-
-> +                    const char *fmt, va_list ap)
->  {
->      GTimeVal tv;
->      gchar *timestr;
-> @@ -222,6 +224,11 @@ static void vreport(report_type type, const char *=
-fmt, va_list ap)
->      }
+> diff --git a/include/qemu/error-report.h b/include/qemu/error-report.h
+> index e1c8ae1..2b29678 100644
+> --- a/include/qemu/error-report.h
+> +++ b/include/qemu/error-report.h
+> @@ -37,10 +37,12 @@ void error_printf_unless_qmp(const char *fmt, ...) =
+GCC_FMT_ATTR(1, 2);
+>  void error_set_progname(const char *argv0);
 > =20
->      error_vprintf(fmt, ap);
-> +
-> +    if (errnoval >=3D 0) {
-> +        error_printf(": %s", strerror(errnoval));
+>  void error_vreport(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
+> +void error_vreport_errno(const char *fmt, va_list ap) GCC_FMT_ATTR(1, =
+0);
 
-Off-by-one.  You do NOT want to print strerror(0) (that results in
-appending ": Success" or similar to what is supposed to be an error
-message).
+I'd rather us ALWAYS require an explicit argument for the error value,
+rather than reading errno.  That way, it's easier to audit that the
+caller is passing in a known error value, rather than checking if errno
+has been inadvertently changed during intermediate code between when the
+error was detected and when the message is generated.  Furthermore, this
+is inconsistent with the existing error_setg_errno().
 
-> +    }
-> +
->      error_printf("\n");
->  }
-> =20
-> @@ -234,7 +241,7 @@ static void vreport(report_type type, const char *f=
-mt, va_list ap)
->   */
->  void error_vreport(const char *fmt, va_list ap)
->  {
-> -    vreport(REPORT_TYPE_ERROR, fmt, ap);
-> +    vreport(REPORT_TYPE_ERROR, -1, fmt, ap);
-
-Passing -1 to suppress the output feels awkward, especially if 0 can be
-used for the same purpose and would then let us use -errno and errno
-interchangeable by passing the absolute value to sterror.
+Thus, I do not think we want this function.  Your addition in 5/7 is
+better, but a rather verbose name, so I think THAT addition deserves to
+be named error_vreport_errno.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -136,7 +89,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---AnnMCAGu7ES5vrbJ4hw9J1wfLnbjmV3wX
+--fQ5iF2BOQfoMwnHZndrZwUXewB1zj3Ksk
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -145,14 +98,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlriC1UACgkQp6FrSiUn
-Q2rNGwf/WVVDc+Qq7M42V99P/PhxffHhFHE5h0aAzImFjVdMsxFLJoUfQwHOKrrA
-Ia8UGFjjTc6g1ZvP8C6bVKoZzuLO8w7c0fI/fOXR0bFrtzryYvlJRKSziar7g/Ef
-+86GTSmQzW6D2OKxtpNTHhChvC/L5pMLOcTUeSTwtNBuSlnyH2BBPMAOhGzU2r8p
-pszIFSg7CTegO9i4hatTrewDYMAic0zjJqeqpn8hCOIl2SPR0X+xVXMYsg60lbh0
-bzKqVx75J2zJa4es+YhqppKcRS06Brk2mMQ+MyUc5fGVlK5sAS0UJGX8OszofND1
-W3INWDaKhcgOSx/7b/i9qF5jNXfkhA==
-=DJr+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlriDBEACgkQp6FrSiUn
+Q2pAHwgAgQsxqZaPn9Fl5G0g2meobeiz57JRCXGl7UE3SU+QWziqjsw23WxhooUg
+qHGSe9GaaZO9o2wTunG+pt29h6GXBU3ZPtBLFlbErGbHOVSAtFWBVOFUTgWALyLx
+io8ma8pK+9IcHKyfDNGOscyW3X5h5ISzpdNArOd/FgTjBB0nEQiTBZdJBKMAqrZ7
+0EM91Uf1htrrBsY2ZDr45ULzs7AwSY+OE7ZMliYHZQzNC5IOznjWXVATfCIN0XC8
+mnS5MyTPNUv3TtZNfo3QT+Sbp0UL6yK6JUupg2VcuAZmzLyVgi4f+fA7Ov0eE294
+d5eqTRXWaDmmzkJBu5Yst5Dov2aTCA==
+=3UXp
 -----END PGP SIGNATURE-----
 
---AnnMCAGu7ES5vrbJ4hw9J1wfLnbjmV3wX--
+--fQ5iF2BOQfoMwnHZndrZwUXewB1zj3Ksk--
