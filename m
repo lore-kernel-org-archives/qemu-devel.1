@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39888)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fBeR1-0002lH-NV
+	(envelope-from <pm215@archaic.org.uk>) id 1fBeR2-0002mR-MG
 	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:47:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fBeR0-0001bR-Fp
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:47:31 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fBeR1-0001d7-HR
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:47:32 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41154)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fBeR0-0001XB-8d
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:47:30 -0400
+	id 1fBeR1-0001XB-8N
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:47:31 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fBeQn-0002z2-6Z
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:47:17 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fBeR0-00037G-4o
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:47:30 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 26 Apr 2018 11:46:57 +0100
-Message-Id: <20180426104715.21702-2-peter.maydell@linaro.org>
+Date: Thu, 26 Apr 2018 11:47:15 +0100
+Message-Id: <20180426104715.21702-20-peter.maydell@linaro.org>
 In-Reply-To: <20180426104715.21702-1-peter.maydell@linaro.org>
 References: <20180426104715.21702-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 01/19] device_tree: Increase FDT_MAX_SIZE to 1
- MiB
+Subject: [Qemu-devel] [PULL 19/19] xilinx_spips: Correct SNOOP_NONE state
+ when flushing the txfifo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +30,32 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Geert Uytterhoeven <geert+renesas@glider.be>
+From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
 
-It is not uncommon for a contemporary FDT to be larger than 64 KiB,
-leading to failures loading the device tree from sysfs:
+SNOOP_NONE state handle is moved above in the if ladder, as it's same
+as SNOOP_STRIPPING during data cycles.
 
-    qemu-system-aarch64: qemu_fdt_setprop: Couldn't set ...: FDT_ERR_NOSPACE
-
-Hence increase the limit to 1 MiB, like on PPC.
-
-For reference, the largest arm64 DTB created from the Linux sources is
-ca. 75 KiB large (100 KiB when built with symbols/fixup support).
-
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-Message-id: 1523541337-23919-1-git-send-email-geert+renesas@glider.be
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Sai Pavan Boddu <saipava@xilinx.com>
+Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
+Message-id: 1524119244-1240-1-git-send-email-saipava@xilinx.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- device_tree.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/ssi/xilinx_spips.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/device_tree.c b/device_tree.c
-index 19458b32bf..52c3358a55 100644
---- a/device_tree.c
-+++ b/device_tree.c
-@@ -29,7 +29,7 @@
- 
- #include <libfdt.h>
- 
--#define FDT_MAX_SIZE  0x10000
-+#define FDT_MAX_SIZE  0x100000
- 
- void *create_device_tree(int *sizep)
- {
+diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+index 426f971311..03f5faee4b 100644
+--- a/hw/ssi/xilinx_spips.c
++++ b/hw/ssi/xilinx_spips.c
+@@ -616,7 +616,8 @@ static void xilinx_spips_flush_txfifo(XilinxSPIPS *s)
+         if (fifo8_is_empty(&s->tx_fifo)) {
+             xilinx_spips_update_ixr(s);
+             return;
+-        } else if (s->snoop_state == SNOOP_STRIPING) {
++        } else if (s->snoop_state == SNOOP_STRIPING ||
++                   s->snoop_state == SNOOP_NONE) {
+             for (i = 0; i < num_effective_busses(s); ++i) {
+                 tx_rx[i] = fifo8_pop(&s->tx_fifo);
+             }
 -- 
 2.17.0
