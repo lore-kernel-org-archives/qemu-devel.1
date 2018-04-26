@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38408)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBeLl-0007JF-1f
+	(envelope-from <bounces@canonical.com>) id 1fBeLl-0007JG-1z
 	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:42:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBeLj-00085x-Ar
+	(envelope-from <bounces@canonical.com>) id 1fBeLh-00084U-Ud
 	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:42:05 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59462)
+Received: from indium.canonical.com ([91.189.90.7]:59382)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fBeLj-00084j-4s
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:42:03 -0400
+	id 1fBeLh-00083o-OL
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:42:01 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fBeLi-0003YP-2B
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 10:42:02 +0000
+	id 1fBeLg-0003el-Ba
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 10:42:00 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0ECFA2E80C7
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 10:42:02 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 549542E8060
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 10:42:00 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Apr 2018 10:28:50 -0000
-From: Thomas Huth <1660599@bugs.launchpad.net>
-Reply-To: Bug 1660599 <1660599@bugs.launchpad.net>
+Date: Thu, 26 Apr 2018 10:26:17 -0000
+From: Thomas Huth <1738283@bugs.launchpad.net>
+Reply-To: Bug 1738283 <1738283@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20170131114543.27337.90403.malonedeb@wampee.canonical.com>
-Message-Id: <152473853013.21771.8469919382388122218.malone@soybean.canonical.com>
+References: <151328724563.26325.11755910452939969450.malonedeb@wampee.canonical.com>
+Message-Id: <152473837762.7415.15554771622795646850.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1660599] Re: v2.8.0 won't compile if g++ compiler
- doesn't understand "-fstack-protector-strong"
+Subject: [Qemu-devel] [Bug 1738283] Re: 'Less than' (<), 'more than' (>),
+ and 'pipe' (|) can't be typed via VNC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,31 +39,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Which version of gcc (i.e. normal C-compiler, not g++) did you use here?
-Can you still reproduce this issue with the latest release of QEMU?
+QEMU 2.12 has now been release, so marking this one as "Fix Released".
 
 ** Changed in: qemu
-       Status: New =3D> Incomplete
+       Status: Fix Committed =3D> Fix Released
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1660599
+https://bugs.launchpad.net/bugs/1738283
 
 Title:
-  v2.8.0 won't compile if g++ compiler doesn't understand "-fstack-
-  protector-strong"
+  'Less than' (<), 'more than' (>), and 'pipe' (|) can't be typed via
+  VNC
 
 Status in QEMU:
-  Incomplete
+  Fix Released
 
 Bug description:
-  For example, Ubuntu Trusty (LTS 14.04) uses g++ v4.8.5.
-  Compilation fails with a syntax error saying that the ""-fstack-protector=
--strong" option in g++ is unrecognized.
-  Instead, under Ubuntu Xenial (LTS 16.04), the g++ compiler is v5.4.0 and =
-the compilation goes on smoothly.
+  If I start QEMU 2.11 (from
+  https://build.opensuse.org/package/show/Virtualization/qemu) VM with
+  VNC, I am unable to type following three characters: 'less than' (<),
+  'more than' (>), and 'pipe' (|) on en_US QWERTY keyboard. Other
+  characters work fine. QEMu version 2.10.1 worked fine.
+
+  /usr/bin/qemu-kvm -m 2048 -cpu kvm64 -drive
+  media=3Dcdrom,if=3Dnone,id=3Dcd0,format=3Draw,file=3DOI-hipster-
+  minimal-20171031.iso -device ide-cd,drive=3Dcd0 -boot once=3Dd,menu=3Don
+  ,splash-time=3D5000 -device usb-ehci -device usb-tablet -smp 1 -enable-
+  kvm -vnc :91,share=3Dforce-shared
+
+  The ISO can be downloaded here: https://www.openindiana.org/download/
+
+  Also tried Fedora-Server-dvd-x86_64-25-1.3.iso and it's the same
+  situation.
+
+  If I run the same command without '-vnc :91,share=3Dforce-shared',
+  everything works just fine.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1660599/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1738283/+subscriptions
