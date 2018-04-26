@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fBlhh-0004qs-21
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:33:14 -0400
+	(envelope-from <lersek@redhat.com>) id 1fBlil-0005R6-6c
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:34:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fBlhd-0006tU-U6
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:33:13 -0400
-Resent-Message-Id: <E1fBlhd-0006tU-U6@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21114)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fBlhd-0006sw-Lg
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:33:09 -0400
-In-Reply-To: <20180426161958.2872-1-rkagan@virtuozzo.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152476123379.2343.11831759109826938559@71c20359a636>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 26 Apr 2018 09:47:14 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 00/17] iotests: don't choke on disabled
- drivers
+	(envelope-from <lersek@redhat.com>) id 1fBlii-0007Tq-2x
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:34:19 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40932 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fBlih-0007T3-TG
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:34:16 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C9F2483055DC
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 18:34:13 +0000 (UTC)
+From: Laszlo Ersek <lersek@redhat.com>
+Date: Thu, 26 Apr 2018 20:34:02 +0200
+Message-Id: <20180426183404.3756-3-lersek@redhat.com>
+In-Reply-To: <20180426183404.3756-1-lersek@redhat.com>
+References: <20180426183404.3756-1-lersek@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 2/4] qapi: add SysEmuTarget to "common.json"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,86 +29,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: rkagan@virtuozzo.com
-Cc: famz@redhat.com, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: qemu devel list <qemu-devel@nongnu.org>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNDI2MTYxOTU4LjI4NzItMS1ya2FnYW5AdmlydHVvenpvLmNvbQpTdWJq
-ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAwLzE3XSBpb3Rlc3RzOiBkb24ndCBjaG9rZSBvbiBk
-aXNhYmxlZCBkcml2ZXJzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpC
-QVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpm
-YWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3Jp
-dGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAk
-QkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAk
-bi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0
-IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxi
-YWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQo
-KG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
-bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8v
-Z2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAg
-ICBwYXRjaGV3LzE1MjQ2NjY5MzQtODA2NC0xLWdpdC1zZW5kLWVtYWlsLWxpZG9uZ2NoZW5AdGVu
-Y2VudC5jb20gLT4gcGF0Y2hldy8xNTI0NjY2OTM0LTgwNjQtMS1naXQtc2VuZC1lbWFpbC1saWRv
-bmdjaGVuQHRlbmNlbnQuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAx
-ODA0MjYxNjE5NTguMjg3Mi0xLXJrYWdhbkB2aXJ0dW96em8uY29tIC0+IHBhdGNoZXcvMjAxODA0
-MjYxNjE5NTguMjg3Mi0xLXJrYWdhbkB2aXJ0dW96em8uY29tClN3aXRjaGVkIHRvIGEgbmV3IGJy
-YW5jaCAndGVzdCcKMDczOTk0ZWRlMCBpb3Rlc3QgMTg0OiBub3RydW4gaWYgbnVsbC1jbyBvciB0
-aHJvdHRsZSBpcyBkaXNhYmxlZAowZDZhMTAzYTJlIGlvdGVzdCAxNDc6IG5vdHJ1biBpZiBuYmQg
-aXMgZGlzYWJsZWQKM2I2Yzg4YzQwMCBpb3Rlc3QgMTM5OiBza2lwIHRlc3RjYXNlcyB1c2luZyBk
-aXNhYmxlZCBkcml2ZXJzCmU2ZjEyNTUxZGIgaW90ZXN0IDEyNDogc2tpcCB0ZXN0Y2FzZXMgdXNp
-bmcgYmxrZGVidWcgaWYgZGlzYWJsZWQKMTRhMmNjODc0ZCBpb3Rlc3QgMDk5OiBub3RydW4gaWYg
-YmxrZGVidWcgb3IgYmxrdmVyaWZ5IGlzIGRpc2FibGVkCmYwYTQyMjc4Y2MgaW90ZXN0IDA5Mzog
-bm90cnVuIGlmIG51bGwtY28gb3IgbnVsbC1haW8gaXMgZGlzYWJsZWQKZWRhNWI4NThjNyBpb3Rl
-c3QgMDg3OiBub3RydW4gaWYgbnVsbC1jbyBpcyBkaXNhYmxlZApkZDYwN2NkZjhhIGlvdGVzdCAw
-ODE6IG5vdHJ1biBpZiBxdW9ydW0gaXMgZGlzYWJsZWQKNzhjNmVmMzYxZiBpb3Rlc3QgMDcxOiBu
-b3RydW4gaWYgYmxrZGVidWcgb3IgYmxrdmVyaWZ5IGlzIGRpc2FibGVkCmEwNGZiM2QzZTIgaW90
-ZXN0IDA1Njogc2tpcCB0ZXN0Y2FzZXMgdXNpbmcgYmxrZGVidWcgaWYgZGlzYWJsZWQKZGYyMjFj
-Y2RlYSBpb3Rlc3QgMDU1OiByZXF1aXJlIGJsa2RlYnVnCjcxMDI1NDc0NGQgaW90ZXN0IDA1NTog
-c2tpcCB1bnN1cHBvcnRlZCBiYWNrdXAgdGFyZ2V0IGZvcm1hdHMKYzYzNTkzOWU1MCBpb3Rlc3Qg
-MDMwOiByZXF1aXJlIGJsa2RlYnVnCjUzMzhjNTNkMGYgaW90ZXN0IDAzMDogc2tpcCBxdW9ydW0g
-dGVzdCBzZXR1cC90ZWFyZG93biB0b28KY2EyNGUyODFkOCBpb3Rlc3RzOiBhc2sgcWVtdSBmb3Ig
-c3VwcG9ydGVkIGZvcm1hdHMKNjQyMDIwZmYyOSBpb3Rlc3RzOiBpb3Rlc3RzLnB5OiBwcmV2ZW50
-IGRlYWRsb2NrIGluIHN1YnByb2Nlc3MKMGMwZjdkNzAwNSBibG9jazogaXRlcmF0ZV9mb3JtYXQg
-d2l0aCBhY2NvdW50IG9mIHdoaXRlbGlzdGluZwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tp
-bmcgUEFUQ0ggMS8xNzogYmxvY2s6IGl0ZXJhdGVfZm9ybWF0IHdpdGggYWNjb3VudCBvZiB3aGl0
-ZWxpc3RpbmcuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xNzogaW90ZXN0czogaW90ZXN0cy5weTogcHJl
-dmVudCBkZWFkbG9jayBpbiBzdWJwcm9jZXNzLi4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFj
-dGVycwojMjk6IEZJTEU6IHRlc3RzL3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5OjEwOToKKyAgICAg
-ICAgc3lzLnN0ZGVyci53cml0ZSgncWVtdS1pbWcgcmVjZWl2ZWQgc2lnbmFsICVpOiAlc1xuJyAl
-ICgtc3VicC5yZXR1cm5jb2RlLCAnICcuam9pbihxZW11X2ltZ19hcmdzICsgbGlzdChhcmdzKSkp
-KQoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM0MzogRklMRTogdGVzdHMvcWVtdS1p
-b3Rlc3RzL2lvdGVzdHMucHk6MTE5OgorICAgICAgICBzeXMuc3RkZXJyLndyaXRlKCdxZW11LWlv
-IHJlY2VpdmVkIHNpZ25hbCAlaTogJXNcbicgJSAoLXN1YnAucmV0dXJuY29kZSwgJyAnLmpvaW4o
-YXJncykpKQoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAyOCBsaW5lcyBjaGVja2VkCgpZ
-b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAzLzE3
-OiBpb3Rlc3RzOiBhc2sgcWVtdSBmb3Igc3VwcG9ydGVkIGZvcm1hdHMuLi4KRVJST1I6IGxpbmUg
-b3ZlciA5MCBjaGFyYWN0ZXJzCiM1ODogRklMRTogdGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMu
-cHk6MTMwOgorICAgICAgICBzeXMuc3RkZXJyLndyaXRlKCdxZW11IHJlY2VpdmVkIHNpZ25hbCAl
-aTogJXNcbicgJSAoLXN1YnAucmV0dXJuY29kZSwgJyAnLmpvaW4oYXJncykpKQoKdG90YWw6IDEg
-ZXJyb3JzLCAwIHdhcm5pbmdzLCA3MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA0LzE3OiBpb3Rlc3QgMDMwOiBza2lw
-IHF1b3J1bSB0ZXN0IHNldHVwL3RlYXJkb3duIHRvby4uLgpDaGVja2luZyBQQVRDSCA1LzE3OiBp
-b3Rlc3QgMDMwOiByZXF1aXJlIGJsa2RlYnVnLi4uCkNoZWNraW5nIFBBVENIIDYvMTc6IGlvdGVz
-dCAwNTU6IHNraXAgdW5zdXBwb3J0ZWQgYmFja3VwIHRhcmdldCBmb3JtYXRzLi4uCkNoZWNraW5n
-IFBBVENIIDcvMTc6IGlvdGVzdCAwNTU6IHJlcXVpcmUgYmxrZGVidWcuLi4KQ2hlY2tpbmcgUEFU
-Q0ggOC8xNzogaW90ZXN0IDA1Njogc2tpcCB0ZXN0Y2FzZXMgdXNpbmcgYmxrZGVidWcgaWYgZGlz
-YWJsZWQuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8xNzogaW90ZXN0IDA3MTogbm90cnVuIGlmIGJsa2Rl
-YnVnIG9yIGJsa3ZlcmlmeSBpcyBkaXNhYmxlZC4uLgpDaGVja2luZyBQQVRDSCAxMC8xNzogaW90
-ZXN0IDA4MTogbm90cnVuIGlmIHF1b3J1bSBpcyBkaXNhYmxlZC4uLgpDaGVja2luZyBQQVRDSCAx
-MS8xNzogaW90ZXN0IDA4Nzogbm90cnVuIGlmIG51bGwtY28gaXMgZGlzYWJsZWQuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMTIvMTc6IGlvdGVzdCAwOTM6IG5vdHJ1biBpZiBudWxsLWNvIG9yIG51bGwtYWlv
-IGlzIGRpc2FibGVkLi4uCkNoZWNraW5nIFBBVENIIDEzLzE3OiBpb3Rlc3QgMDk5OiBub3RydW4g
-aWYgYmxrZGVidWcgb3IgYmxrdmVyaWZ5IGlzIGRpc2FibGVkLi4uCkNoZWNraW5nIFBBVENIIDE0
-LzE3OiBpb3Rlc3QgMTI0OiBza2lwIHRlc3RjYXNlcyB1c2luZyBibGtkZWJ1ZyBpZiBkaXNhYmxl
-ZC4uLgpDaGVja2luZyBQQVRDSCAxNS8xNzogaW90ZXN0IDEzOTogc2tpcCB0ZXN0Y2FzZXMgdXNp
-bmcgZGlzYWJsZWQgZHJpdmVycy4uLgpDaGVja2luZyBQQVRDSCAxNi8xNzogaW90ZXN0IDE0Nzog
-bm90cnVuIGlmIG5iZCBpcyBkaXNhYmxlZC4uLgpDaGVja2luZyBQQVRDSCAxNy8xNzogaW90ZXN0
-IDE4NDogbm90cnVuIGlmIG51bGwtY28gb3IgdGhyb3R0bGUgaXMgZGlzYWJsZWQuLi4KPT09IE9V
-VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFp
-bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
-XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+We'll soon need an enumeration type that lists all the softmmu targets
+that QEMU (the project) supports. Introduce @SysEmuTarget to
+"common.json".
+
+The enum constant @x86_64 is not spelled @x86-64 because the corresponding
+emulator is called qemu-system-x86_64.
+
+Like other enum types, @SysEmuTarget too can be used for discriminator
+fields in unions. For the @i386 constant, a C-language union member called
+"i386" would be generated. On mingw build hosts, "i386" is a macro
+however. Add "i386" to "polluted_words" at once.
+
+Cc: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+---
+
+Notes:
+    PATCHv2:
+    
+    - document the use of the underscore in @x86_64 in both the commit
+      message and in the schema [Eric, Dan]
+    
+    - extend "polluted_words" with "i386" [Eric]
+    
+    - drop previous R-b's
+    
+    - update the CC list
+    
+    PATCHv1:
+    
+    - pick up R-b's from Markus and Kashyap, no changes
+    
+    RFCv3:
+    
+    - The patch is new in this version. [Dan, Markus]
+    
+    - The original idea was to call the new enum @Target; however, @Target
+      generates exactly the TARGET_AARCH64, TARGET_ALPHA, TARGET_ARM, ...
+      enumeration constants that conflict with the poisoned preprocessing
+      macros of the same names. Hence @SysEmuTarget -- it's more accurate
+      anyway, since we want it to stand for system emulation targets.
+    
+    - Also, we discussed defining the new type in either "common.json" or
+      "misc.json". "misc.json" turned out to be a problem: "firmware.json"
+      would then include "misc.json" for the new type's sake, but that
+      inclusion would become the first appearance of "misc.json" -- within
+      "firmware.json". That messed up the generated documentation. By adding
+      the new type to "common.json", "misc.json" (see the 2nd patch) and
+      "firmware.json" (see the 3rd patch) can both consume the new type
+      without problems.
+
+ qapi/common.json       | 27 +++++++++++++++++++++++++++
+ scripts/qapi/common.py |  2 +-
+ 2 files changed, 28 insertions(+), 1 deletion(-)
+
+diff --git a/qapi/common.json b/qapi/common.json
+index d9b14dd429f3..7daa9b6798ac 100644
+--- a/qapi/common.json
++++ b/qapi/common.json
+@@ -118,11 +118,38 @@
+ #
+ # @bar3: PCI BAR3 is used for the feature
+ #
+ # @bar4: PCI BAR4 is used for the feature
+ #
+ # @bar5: PCI BAR5 is used for the feature
+ #
+ # Since: 2.12
+ ##
+ { 'enum': 'OffAutoPCIBAR',
+   'data': [ 'off', 'auto', 'bar0', 'bar1', 'bar2', 'bar3', 'bar4', 'bar5' ] }
++
++##
++# @SysEmuTarget:
++#
++# The comprehensive enumeration of QEMU system emulation ("softmmu")
++# targets. Run "./configure --help" in the project root directory, and
++# look for the *-softmmu targets near the "--target-list" option. The
++# individual target constants are not documented here, for the time
++# being.
++#
++# Notes: @x86_64 doesn't match the QAPI convention of preferring hyphen
++#        ("-") over underscore ("_"). This is intentional; the
++#        @SysEmuTarget constants are supposed to produce QEMU executable
++#        names when stringified and appended to the "qemu-system-"
++#        prefix. Put differently, the replacement text of the
++#        TARGET_NAME preprocessor macro must be possible to look up in
++#        the list of (stringified) enum constants.
++#
++# Since: 2.13
++##
++{ 'enum' : 'SysEmuTarget',
++  'data' : [ 'aarch64', 'alpha', 'arm', 'cris', 'hppa', 'i386', 'lm32',
++             'm68k', 'microblaze', 'microblazeel', 'mips', 'mips64',
++             'mips64el', 'mipsel', 'moxie', 'nios2', 'or1k', 'ppc',
++             'ppc64', 'ppcemb', 'riscv32', 'riscv64', 's390x', 'sh4',
++             'sh4eb', 'sparc', 'sparc64', 'tricore', 'unicore32',
++             'x86_64', 'xtensa', 'xtensaeb' ] }
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index 3e14bc41f2c0..a032cec37509 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -1814,23 +1814,23 @@ def c_name(name, protect=True):
+     # C++ ISO/IEC 14882:2003 2.11
+     cpp_words = set(['bool', 'catch', 'class', 'const_cast', 'delete',
+                      'dynamic_cast', 'explicit', 'false', 'friend', 'mutable',
+                      'namespace', 'new', 'operator', 'private', 'protected',
+                      'public', 'reinterpret_cast', 'static_cast', 'template',
+                      'this', 'throw', 'true', 'try', 'typeid', 'typename',
+                      'using', 'virtual', 'wchar_t',
+                      # alternative representations
+                      'and', 'and_eq', 'bitand', 'bitor', 'compl', 'not',
+                      'not_eq', 'or', 'or_eq', 'xor', 'xor_eq'])
+     # namespace pollution:
+-    polluted_words = set(['unix', 'errno', 'mips', 'sparc'])
++    polluted_words = set(['unix', 'errno', 'mips', 'sparc', 'i386'])
+     name = name.translate(c_name_trans)
+     if protect and (name in c89_words | c99_words | c11_words | gcc_words
+                     | cpp_words | polluted_words):
+         return 'q_' + name
+     return name
+ 
+ eatspace = '\033EATSPACE.'
+ pointer_suffix = ' *' + eatspace
+ 
+ 
+ def genindent(count):
+-- 
+2.14.1.3.gb7cf6e02401b
