@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41823)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1fBYMW-0008U8-Gu
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 00:18:29 -0400
+	(envelope-from <peterx@redhat.com>) id 1fBZAg-0006Jt-MH
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:10:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1fBYMR-0007P0-Hl
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 00:18:28 -0400
-Received: from mail-wm0-f54.google.com ([74.125.82.54]:36053)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1fBYMR-0007Nz-BG
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 00:18:23 -0400
-Received: by mail-wm0-f54.google.com with SMTP id n10so10373348wmc.1
-	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 21:18:22 -0700 (PDT)
-References: <AFF77CBF-01EC-494F-AA9C-9820F368EA32@gmail.com>
-From: Thomas Huth <huth@tuxfamily.org>
-Message-ID: <0a704c5f-8f14-c755-e1e1-1a87967471ed@tuxfamily.org>
-Date: Thu, 26 Apr 2018 06:18:20 +0200
+	(envelope-from <peterx@redhat.com>) id 1fBZAd-00020H-D4
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:10:18 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41956 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fBZAd-0001wX-6T
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:10:15 -0400
+Date: Thu, 26 Apr 2018 13:09:59 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180426050959.GN9036@xz-mi>
+References: <20180420175721.18479-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <AFF77CBF-01EC-494F-AA9C-9820F368EA32@gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] Large patch set advice
+Content-Disposition: inline
+In-Reply-To: <20180420175721.18479-1-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] migration: update docs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,84 +26,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Warner Losh <imp@bsdimp.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc: Kamil Rytarowski <kamil@netbsd.org>, Brad Smith <brad@comstyle.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, peter.maydell@linaro.org
 
-On 25.04.2018 21:57, Warner Losh wrote:
-> Greetings,
-> 
-> I’ve foolishly volunteered to rebase all the changes that the bad-user mode folks have done to a recent master rev to get these changes upstreamed.
-
-Great that finally someone dares to do this step! But I hope the "bad"
-was just a typo ;-)
+On Fri, Apr 20, 2018 at 06:57:21PM +0100, Dr. David Alan Gilbert (git) wrote:
 
 [...]
-> So as with everything that’s developed over time, the early patches no longer are bistable because there’s later patches that fix the old APIs that were current at the start of the project to use newer APIs.
 
-bistable = bisectable? ... well, I guess that doesn't really matter here
-since the upstream bsd-user code is completely broken anyway.
+>  Saving the state of one device
+>  ==============================
+>  
+> -The state of a device is saved using intermediate buffers.  There are
+> -some helper functions to assist this saving.
+> -
+> -There is a new concept that we have to explain here: device state
+> -version.  When we migrate a device, we save/load the state as a series
+> -of fields.  Some times, due to bugs or new functionality, we need to
+> -change the state to store more/different information.  We use the
+> -version to identify each time that we do a change.  Each version is
+> -associated with a series of fields saved.  The `save_state` always saves
+> -the state as the newer version.  But `load_state` sometimes is able to
+> -load state from an older version.
+> -
+> -Legacy way
+> -----------
+> -
+> -This way is going to disappear as soon as all current users are ported to VMSTATE.
+> -
+> -Each device has to register two functions, one to save the state and
+> -another to load the state back.
+> -
+> -.. code:: c
+> -
+> -  int register_savevm(DeviceState *dev,
+> -                      const char *idstr,
+> -                      int instance_id,
+> -                      int version_id,
+> -                      SaveStateHandler *save_state,
+> -                      LoadStateHandler *load_state,
+> -                      void *opaque);
+> -
+> -  typedef void SaveStateHandler(QEMUFile *f, void *opaque);
+> -  typedef int LoadStateHandler(QEMUFile *f, void *opaque, int version_id);
+> -
+> -The important functions for the device state format are the `save_state`
+> -and `load_state`.  Notice that `load_state` receives a version_id
+> -parameter to know what state format is receiving.  `save_state` doesn't
+> -have a version_id parameter because it always uses the latest version.
+> +For most devices, the state is saved in a single call to the migration
+> +infrastrucutre; these are *non-iterative* devices.  The data for these
+> +devices is sent at the end of precopy migration, when the CPUs are paused.
 
-[...]
-> Oh, and the number of SoBs in the original code is somewhat lacking. A tedious detail I need to chase down independent of all the other stuff.
+> +Where the data associated with the device is very large (e.g. RAM or large tables)
+> +see the iterative device section below.
 
-Yes, please chase that down first. QEMU project is quite strict about SoBs.
+I would prefer:
 
-[...]
-> My first question seems almost rhetorical: that’s not an acceptable state of affairs, and curation is needed to upstream. Right?
+  There are also devices called *iterative* devices, which contain a
+  huge amount of data as device states (e.g., RAM or large tables).
+  Please refer to the iterative device section below for more information.
 
-I'd say this does not sound like an acceptable state, but it's finally
-Peter who decides what patches get merged.
+> +
+> +General advice for device developers
+> +------------------------------------
+> +
+> +- The migration state saved should reflect the device being modelled rather
+> +  than the way your implementation works.   That way if you change the implementation
+> +  later the migration stream will stay compatible.  That model may include
+> +  internal state that's not directly visible in a register.
+> +
+> +- When saving a migration stream the device code may walk and check
+> +  the state of the device.  These checks might fail in various ways (e.g.
+> +  discovering internal state is corrupt or that the guest has done something bad).
+> +  Consider carefully before asserting/aborting at this point, since the
+> +  normal response from users is that *migration broke their VM* since it had
+> +  apparently been running fine until then.
 
-> My curation plans:
-> 
-> (1) Find where each of the bits of my ‘true up’ commits at the end are needed and to merge those bits back to those commits (I’m guessing it’s due to conflicts, or false conflict detection in git’s merging logic, since it was 4 hours and there attepts to get through the ‘git rebase -i master’ phase). These aren’t true changes anyway: just my screw up. Most of them are easy to find where they belong.
-> 
-> (2) back merge the API changes as best I can to as early in the stream as possible. One wrinkle here is that there’s a lot of code motion in the early patches to get the MI/MD stuff right, but even in the original commits, it never was very pure at all. And these changes are 2-3k lines long, but completely confined to bsd-user so maybe that’s OK. (I say completely, but sometimes there’s this or that thing added to a Makefile).
-> 
-> (3) Keep the classes of syscall implementation commits separate, but merge back the API and/or related new syscalls that were added. It’s a tradeoff between having 200 diffs that are minnows and 20 diffs that are related schools of fish vs one huge whale that’s just too big.
-> 
-> (4) Deal with the cases where multiple people have worked on a patch by putting SoBs for all of them (or reworking them if I can’t get a hold of the original authors) on the commits that are merged. I didn’t see a specific policy for this, but this seems sane. The alternative seems worse (having elements that don’t compile)
+Maybe we can give some further suggestions?
 
-AFAIK, merging patches is ok, just mention it in the patch description.
-For example if you have a patch with a description like this:
+  Instead of aborting the whole VM, we can dump some error messages
+  when necessary for further diagnose. Or, we can set the device into
+  error state (or even disable the device) where capable so that at
+  least other part of the VM won't be affected, then the guest OS can
+  decide what to do next with that.
 
-"
- Implement new feature XYZ
+> +
+> +- The migration might happen at an inconvenient point,
+> +  e.g. right in the middle of the guest reprogramming the device, during
+> +  guest reboot or shutdown or while the device is waiting for external IO.
+> +  It's strongly preferred that migrations do not fail in this situation,
+> +  since in the cloud environment migrations might happen automatically to
+> +  VMs that the administrator doesn't directly control.
+> +
+> +- If you do need to fail a migration, ensure that sufficient information
+> +  is logged to identify what went wrong.
+> +
+> +- The destination should treat an incoming migration stream as hostile
+> +  (which we do to varying degrees in the existing code).  Check that offsets
+> +  into buffers and the like can't cause overruns.  Fail the incoming migration
+> +  in the case of a corrupted stream like this.
+> +
+> +- Take care with internal device state or behaviour that might become
+> +  migration version dependent.  For example, the order of PCI capabilities
+> +  is required to stay constant across migration.  Another example would
+> +  be that a special case handled by subsections (see below) might become
+> +  much more common if a default behaviour is changed.
+> +
+> +- Migrations timing out or being failed by higher levels of management,
+> +  or failures of the destination host are not unusual, and care should
+> +  be taken to ensure that the source VM can be restarted up until the point
+> +  when the destination starts runing.  Valid examples include the management
+> +  layer reverting the migration even though the QEMU level of migration has
+> +  succeeded.  For this reason, the state on the source VM should not be
+> +  destroyed during the migration process in normal use.
 
- This patch implements a new feature that is very cool.
+I would prefer we have a summary at the start, or just move the last
+sentence there.  Otherwise it'll be hard for quick readers to catch
+the point:
 
- Signed-off-by: Alice
-"
+  Device states should still be kept even after a savevm operation.
+  The reason is that ...
 
-and then a fixup patch later:
+All comments are subjective and optional, so please choose either way
+you would prefer.  The rest looks quite good to me.
 
-"
- Fix XYZ
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
- This fixes a bug in XYZ
+Thanks,
 
- Signed-off-by: Bob
-"
-
-You could merge them by supplying a note in square brackets:
-
-"
- Implement new feature XYZ
-
- This patch implements a new feature that is very cool.
-
- Signed-off-by: Alice
- Signed-off-by: Bob
- [imp: merged fix from Bob into the patch from Alice]
- Signed-off-by: Warner Losh <imp@bsdimp.com>
-"
-
-I think it depends on the contents of Bob's patch whether you should
-also include the complete patch description of Bob's patch or not.
-
-> (5) Send them in small batches. I’d go insane trying to manage 200 concurrent code reviews, and I can’t image that I’m unique in this. I also image that fixes in the early part of the series may have ripples to the later parts if my past experience with these things has any relevance.
-
-Yes, please keep the batch sizes small and digestible.
-
- Thanks,
-  Thomas
+-- 
+Peter Xu
