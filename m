@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fBkRR-0003u0-Fz
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 13:12:25 -0400
+	(envelope-from <pagupta@redhat.com>) id 1fBkSs-0004aw-OO
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 13:13:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fBkRQ-0002l3-J6
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 13:12:21 -0400
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:44160)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1fBkRQ-0002kk-Ah
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 13:12:20 -0400
-Received: by mail-lf0-x242.google.com with SMTP id h197-v6so4456246lfg.11
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 10:12:20 -0700 (PDT)
+	(envelope-from <pagupta@redhat.com>) id 1fBkSo-0003HX-Ky
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 13:13:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46078)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1fBkSo-0003H0-DB
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 13:13:46 -0400
+Date: Thu, 26 Apr 2018 13:13:44 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <1302242642.23016855.1524762824836.JavaMail.zimbra@redhat.com>
+In-Reply-To: <CAPcyv4jv-hJNKJxak98T7aCnWztVEDTE8o=8fjvOrVmrTfyjdA@mail.gmail.com>
+References: <20180425112415.12327-1-pagupta@redhat.com>
+	<20180425112415.12327-3-pagupta@redhat.com>
+	<20180426131517.GB30991@stefanha-x1.localdomain>
+	<58645254.23011245.1524760853269.JavaMail.zimbra@redhat.com>
+	<CAPcyv4jv-hJNKJxak98T7aCnWztVEDTE8o=8fjvOrVmrTfyjdA@mail.gmail.com>
 MIME-Version: 1.0
-References: <1524699938-6764-1-git-send-email-mjc@sifive.com>
-	<1524699938-6764-15-git-send-email-mjc@sifive.com>
-In-Reply-To: <1524699938-6764-15-git-send-email-mjc@sifive.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 26 Apr 2018 17:11:53 +0000
-Message-ID: <CAKmqyKO9iFSFSfhu1UoVecv8ZHxEdhqAAVDwNrOqLFYxPZEYcg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v8 14/35] RISC-V: Update E order and I
- extension order
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v2 2/2] pmem: device flush over VIRTIO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +30,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, palmer@sifive.com, Alistair Francis <Alistair.Francis@wdc.com>, patches@groups.riscv.org
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, KVM list <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, linux-nvdimm <linux-nvdimm@ml01.01.org>, Linux MM <linux-mm@kvack.org>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Rik van Riel <riel@surriel.com>, haozhong zhang <haozhong.zhang@intel.com>, Nitesh Narayan Lal <nilal@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, ross zwisler <ross.zwisler@intel.com>, David Hildenbrand <david@redhat.com>, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, Christoph Hellwig <hch@infradead.org>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, niteshnarayanlal@hotmail.com, Igor Mammedov <imammedo@redhat.com>, lcapitulino@redhat.com
 
-On Wed, Apr 25, 2018 at 4:53 PM Michael Clark <mjc@sifive.com> wrote:
 
-> Section 22.8 Subset Naming Convention of the RISC-V ISA Specification
-> defines the canonical order for extensions in the ISA string. It is
-> silent on the position of the E extension however E is a substitute
-> for I so it must come early in the extension list order. A comment
-> is added to state E and I are mutually exclusive, as the E extension
-> will be added to the RISC-V port in the future.
+> >
+> >>
+> >> On Wed, Apr 25, 2018 at 04:54:14PM +0530, Pankaj Gupta wrote:
+> >> > This patch adds functionality to perform
+> >> > flush from guest to hosy over VIRTIO
+> >> > when 'ND_REGION_VIRTIO'flag is set on
+> >> > nd_negion. Flag is set by 'virtio-pmem'
+> >> > driver.
+> >> >
+> >> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> >> > ---
+> >> >  drivers/nvdimm/region_devs.c | 7 +++++++
+> >> >  1 file changed, 7 insertions(+)
+> >> >
+> >> > diff --git a/drivers/nvdimm/region_devs.c b/drivers/nvdimm/region_devs.c
+> >> > index a612be6..6c6454e 100644
+> >> > --- a/drivers/nvdimm/region_devs.c
+> >> > +++ b/drivers/nvdimm/region_devs.c
+> >> > @@ -20,6 +20,7 @@
+> >> >  #include <linux/nd.h>
+> >> >  #include "nd-core.h"
+> >> >  #include "nd.h"
+> >> > +#include <linux/virtio_pmem.h>
+> >> >
+> >> >  /*
+> >> >   * For readq() and writeq() on 32-bit builds, the hi-lo, lo-hi order is
+> >> > @@ -1074,6 +1075,12 @@ void nvdimm_flush(struct nd_region *nd_region)
+> >> >     struct nd_region_data *ndrd = dev_get_drvdata(&nd_region->dev);
+> >> >     int i, idx;
+> >> >
+> >> > +       /* call PV device flush */
+> >> > +   if (test_bit(ND_REGION_VIRTIO, &nd_region->flags)) {
+> >> > +           virtio_pmem_flush(&nd_region->dev);
+> >> > +           return;
+> >> > +   }
+> >>
+> >> How does libnvdimm know when flush has completed?
+> >>
+> >> Callers expect the flush to be finished when nvdimm_flush() returns but
+> >> the virtio driver has only queued the request, it hasn't waited for
+> >> completion!
+> >
+> > I tried to implement what nvdimm does right now. It just writes to
+> > flush hint address to make sure data persists.
+> 
+> nvdimm_flush() is currently expected to be synchronous. Currently it
+> is sfence(); write to special address; sfence(). By the time the
+> second sfence returns the data is flushed. So you would need to make
+> this virtio flush interface synchronous as well, but that appears
+> problematic to stop the guest for unbounded amounts of time. Instead,
+> you need to rework nvdimm_flush() and the pmem driver to make these
+> flush requests asynchronous and add the plumbing for completion
+> callbacks via bio_endio().
 
-> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Cc: Palmer Dabbelt <palmer@sifive.com>
-> Cc: Alistair Francis <Alistair.Francis@wdc.com>
-> Signed-off-by: Michael Clark <mjc@sifive.com>
+o.k. 
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> 
+> > I just did not want to block guest write requests till host side
+> > fsync completes.
+> 
+> You must complete the flush before bio_endio(), otherwise you're
+> violating the expectations of the guest filesystem/block-layer.
 
-Alistair
+sure!
 
-> ---
->   target/riscv/cpu.c | 2 +-
->   target/riscv/cpu.h | 1 +
->   2 files changed, 2 insertions(+), 1 deletion(-)
+> 
+> >
+> > be worse for operations on different guest files because all these
+> > operations would happen
+> > ultimately on same file at host.
+> >
+> > I think with current way, we can achieve an asynchronous queuing mechanism
+> > on cost of not
+> > 100% sure when fsync would complete but it is assured it will happen. Also,
+> > its entire block
+> > flush.
+> 
+> No, again,  that's broken. We need to add the plumbing for
+> communicating the fsync() completion relative the WRITE_{FLUSH,FUA}
+> bio in the guest.
 
-> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-> index 5a527fb..4e5a56d 100644
-> --- a/target/riscv/cpu.c
-> +++ b/target/riscv/cpu.c
-> @@ -26,7 +26,7 @@
+Sure. Thanks Dan & Stefan for the explanation and review. 
 
->   /* RISC-V CPU definitions */
-
-> -static const char riscv_exts[26] = "IMAFDQECLBJTPVNSUHKORWXYZG";
-> +static const char riscv_exts[26] = "IEMAFDQCLBJTPVNSUHKORWXYZG";
-
->   const char * const riscv_int_regnames[] = {
->     "zero", "ra  ", "sp  ", "gp  ", "tp  ", "t0  ", "t1  ", "t2  ",
-> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> index f3f131b..890cd96 100644
-> --- a/target/riscv/cpu.h
-> +++ b/target/riscv/cpu.h
-> @@ -71,6 +71,7 @@
->   #define RV(x) ((target_ulong)1 << (x - 'A'))
-
->   #define RVI RV('I')
-> +#define RVE RV('E') /* E and I are mutually exclusive */
->   #define RVM RV('M')
->   #define RVA RV('A')
->   #define RVF RV('F')
-> --
-> 2.7.0
+Best regards,
+Pankaj
