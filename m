@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fBc5v-0000jP-Lr
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 04:17:38 -0400
+	(envelope-from <peterx@redhat.com>) id 1fBc6r-0001I8-4G
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 04:18:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fBc5u-0006Ns-NY
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 04:17:35 -0400
-Received: from mail-ot0-x233.google.com ([2607:f8b0:4003:c0f::233]:43808)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fBc5u-0006NZ-I8
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 04:17:34 -0400
-Received: by mail-ot0-x233.google.com with SMTP id y10-v6so15451106otg.10
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 01:17:34 -0700 (PDT)
+	(envelope-from <peterx@redhat.com>) id 1fBc6n-0006og-44
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 04:18:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34212 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fBc6m-0006oG-Tr
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 04:18:29 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CC946406E8B9
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 08:18:24 +0000 (UTC)
+Date: Thu, 26 Apr 2018 16:18:15 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180426081815.GT9036@xz-mi>
+References: <20180425112723.1111-1-quintela@redhat.com>
+	<20180425112723.1111-18-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180418144433.GV27579@redhat.com>
-References: <20180418123838.3511-1-olaf@aepfle.de>
-	<20180418124753.GM27579@redhat.com>
-	<CAFEAcA_TtC-p4JJFRPaBFwim1a8J9G+z79KAK8vqrTx7ZKjOKg@mail.gmail.com>
-	<20180418144433.GV27579@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 26 Apr 2018 09:17:13 +0100
-Message-ID: <CAFEAcA8jXwo35B7KVdVZEiqZTtMRvVXCP87iHKECjWPkHiTJ_A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1] configure: require glib-2.24
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180425112723.1111-18-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v12 17/21] migration: Create
+ ram_multifd_page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,34 +34,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: Olaf Hering <olaf@aepfle.de>, QEMU Trivial <qemu-trivial@nongnu.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
 
-On 18 April 2018 at 15:44, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wr=
-ote:
-> On Wed, Apr 18, 2018 at 02:29:47PM +0100, Peter Maydell wrote:
->> Yes, my OSX build system is on glib 2.22. It's using 'fink' for 3rd
->> party library installations, and they somehow seem to have got stuck
->> on 2.22. Looking at the website the project seems to have basically
->> stagnated, and I guess I need to move to homebrew at some point
->> (likely after we get 2.12 out the door). But for the moment this
->> patch would break my pullrequest testing builds.
->
-> Yeah that sounds reasonable as it would also align your build env with
-> what we are testing via travis too.
+On Wed, Apr 25, 2018 at 01:27:19PM +0200, Juan Quintela wrote:
+> The function still don't use multifd, but we have simplified
+> ram_save_page, xbzrle and RDMA stuff is gone.  We have added a new
+> counter.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> 
+> --
+> Add last_page parameter
+> Add commets for done and address
+> Remove multifd field, it is the same than normal pages
+> Merge next patch, now we send multiple pages at a time
+> Remove counter for multifd pages, it is identical to normal pages
+> Use iovec's instead of creating the equivalent.
+> Clear memory used by pages (dave)
+> Use g_new0(danp)
+> define MULTIFD_CONTINUE
+> now pages member is a pointer
+> Fix off-by-one in number of pages in one packet
+> Remove RAM_SAVE_FLAG_MULTIFD_PAGE
+> s/multifd_pages_t/MultiFDPages_t/
+> ---
+>  migration/ram.c | 93 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 93 insertions(+)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 398cb0af3b..862ec53d32 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -54,6 +54,7 @@
+>  #include "migration/block.h"
+>  #include "sysemu/sysemu.h"
+>  #include "qemu/uuid.h"
+> +#include "qemu/iov.h"
+>  
+>  /***********************************************************/
+>  /* ram save/restore */
+> @@ -692,8 +693,65 @@ struct {
+>      QemuSemaphore sem_sync;
+>      /* global number of generated multifd packets */
+>      uint32_t seq;
+> +    /* send channels ready */
+> +    QemuSemaphore channels_ready;
+>  } *multifd_send_state;
+>  
+> +static void multifd_send_pages(void)
+> +{
+> +    int i;
+> +    static int next_channel;
+> +    MultiFDSendParams *p = NULL; /* make happy gcc */
+> +    MultiFDPages_t *pages = multifd_send_state->pages;
+> +
+> +    qemu_sem_wait(&multifd_send_state->channels_ready);
 
-I've now made the switch to homebrew, and so my OSX build tests
-will be using glib 2.56. NB that this means that none of my merge
-testing will catch "glib version too old" for our current setting
-of "too old" -- I'm not sure what my current oldest version is in
-the test machine set.
+This sem is posted when a thread has finished its work.  However this
+is called in the main migration thread.  If with this line, are the
+threads really sending things in parallel?  Since it looks to me that
+this function (and the main thread) won't send the 2nd page array if
+the 1st hasn't finished, and won't send the 3rd if the 2nd hasn't,
+vice versa...
 
-I've also upgraded Xcode, which means I now have a machine with
-a clang that emits all the -Waddress-of-packed-member complaints.
-I have configured the test build so those aren't fatal
-(via --extra-cflags=3D'-Werror -Wno-error=3Daddress-of-packed-member
--Wno-error=3Ddeprecated-declarations') but I'm now more interested in
-getting those cleaned up so they don't clutter up my logfiles :-)
+Maybe I misunderstood something.  Please feel free to correct me.
 
-thanks
--- PMM
+> +    for (i = next_channel;; i = (i + 1) % migrate_multifd_channels()) {
+> +        p = &multifd_send_state->params[i];
+> +
+> +        qemu_mutex_lock(&p->mutex);
+> +        if (!p->pending_job) {
+> +            p->pending_job++;
+> +            next_channel = (i + 1) % migrate_multifd_channels();
+> +            break;
+> +        }
+> +        qemu_mutex_unlock(&p->mutex);
+> +    }
+> +    p->pages->used = 0;
+> +    multifd_send_state->seq++;
+> +    p->seq = multifd_send_state->seq;
+> +    p->pages->block = NULL;
+> +    multifd_send_state->pages = p->pages;
+> +    p->pages = pages;
+
+Here we directly replaced MultiFDSendParams.pages with
+multifd_send_state->pages.  Then are we always using a single
+MultiFDPages_t struct?  And if so, will all the initial
+MultiFDSendParams.pages memory leaked without freed?
+
+> +    qemu_mutex_unlock(&p->mutex);
+> +    qemu_sem_post(&p->sem);
+> +}
+
+Thanks,
+
+-- 
+Peter Xu
