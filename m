@@ -1,34 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58135)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBaCS-0001xH-I8
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 02:16:14 -0400
+	(envelope-from <armbru@redhat.com>) id 1fBaGB-0004Yo-H9
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 02:20:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBaCP-0004Lp-8G
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 02:16:12 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60586)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fBaCP-0004LU-2N
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 02:16:09 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fBaCN-0000a2-HO
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 06:16:07 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 641EA2E80C8
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 06:16:07 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1fBaG8-0006eO-C1
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 02:20:03 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43420 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fBaG8-0006e1-7r
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 02:20:00 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6698FEC00F
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 06:19:56 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180424214550.32549-1-lersek@redhat.com>
+	<20180424214550.32549-6-lersek@redhat.com>
+	<877eovahoq.fsf@dusky.pond.sub.org>
+	<5ffb031a-554a-81c1-b374-eb82f410bf83@redhat.com>
+	<ccb8aaa0-c523-8360-be73-749cf08d074f@redhat.com>
+	<7cc33c11-1a6f-1cf8-8115-f0cd4633a482@redhat.com>
+Date: Thu, 26 Apr 2018 08:19:50 +0200
+In-Reply-To: <7cc33c11-1a6f-1cf8-8115-f0cd4633a482@redhat.com> (Laszlo Ersek's
+	message of "Thu, 26 Apr 2018 00:56:46 +0200")
+Message-ID: <87wowu4hh5.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Apr 2018 06:03:56 -0000
-From: Thomas Huth <1735576@bugs.launchpad.net>
-Reply-To: Bug 1735576 <1735576@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151208334189.10571.827872595239738257.malonedeb@soybean.canonical.com>
-Message-Id: <152472263668.22033.3323166989226897864.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1735576] Re: Support more than 4G memory for
- guest with Intel HAXM acceleration
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 5/6] qapi: extract CpuInfoCommon to
+ mitigate schema duplication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,56 +38,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 
-Fix has been included here:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D7a5235c9e679c58be4
+Laszlo Ersek <lersek@redhat.com> writes:
 
-** Changed in: qemu
-       Status: New =3D> Fix Released
+> On 04/25/18 21:12, Eric Blake wrote:
+>> On 04/25/2018 08:20 AM, Laszlo Ersek wrote:
+>> 
+>>> ...
+>>>
+>>> and people would ask themselves ever after, "are there some common
+>>> fields in there that we could extract ... hmmm, @props and @arch, okay,
+>>> maybe, maybe not, grey area". Let's do it now and save them the thinking.
+>> 
+>> No, CpuInfo is slated for death in the next year or so; per commit
+>> ff9a9156.
 
--- =
+Good catch, I missed it.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1735576
+>>            Once it disappears (in 2.14 or 2.15?), we will ONLY have
+>> CpuInfoFast (although we might rename it at that time, as the name of
+>> QMP structs is not part of the introspection interface).
+>> 
+>> So, my personal inclination is to just live with the mindless
+>> near-duplication until the deprecation period ends, rather than wasting
+>> cycles refactoring things just to refactor it back out when removing the
+>> dead code later.
+>> 
+>
+> This is an important update; thank you for it. Because, it tells me that
+> we might not need to add @target to CpuInfo at all. Why *extend* an
+> interface that is deprecated to the point that we're reluctant even to
+> *refactor* it?
+>
+> (BTW, I had noticed the deprecation note in the schema source code, from
+> what you've now identified as commit ff9a9156; I didn't know what it
+> meant -- I didn't know it carried a removal sentence.)
 
-Title:
-  Support more than 4G memory for guest with Intel HAXM acceleration
+No need to enhance it even without a removal sentence.
 
-Status in QEMU:
-  Fix Released
+> The consequence is that I could drop the painful modifications for
+> qmp_query_cpus() altogether, and just keep the simple ones for
+> qmp_query_cpus_fast().
+>
+> Markus, does that work for you? Forget about @CpuInfo for good?
 
-Bug description:
-  setup:
-
-  host: windows 7 professional 64bit
-  guest: centos 7
-  qemu 2.10.92
-  haxm 6.2.1
-
-  issue: when assign 4096M or more memory to the guest, I got following err=
-or message:
-  E:\qemuvm\vm-svr>qemu-system-x86_64 -accel hax -hda centos-1.vdi -m 4096
-  HAX is working and emulator runs in fast virt mode.
-  Failed to allocate 0 memory
-  hax_transaction_commit: Failed mapping @0x0000000000000000+0xc0000000 fla=
-gs 00
-  hax_transaction_commit: Failed mapping @0x0000000100000000+0x40000000 fla=
-gs 00
-  VCPU shutdown request
-  VCPU shutdown request
-  if I change memory to 4095M, guest VM boot up without issue
-
-  E:\qemuvm\vm-svr>qemu-system-x86_64 -accel hax -hda centos-1.vdi -m 4095
-  HAX is working and emulator runs in fast virt mode.
-
-  =
-
-  This is known limitation, I already raised a request on HAXM github site =
-for fix this: https://github.com/intel/haxm/issues/13, and it got accepted =
-will be fixed in next haxm release; however it seems there is also qemu sid=
-e work (according to haxm dev), so I raise this for qemu side fix;
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1735576/+subscriptions
+Absolutely.
