@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBlp6-0002Lv-O3
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:40:54 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fBlsQ-0003aq-P2
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:44:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBlp3-0002sM-Jg
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:40:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45776)
+	(envelope-from <alex.bennee@linaro.org>) id 1fBlsN-00047V-Lc
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:44:18 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:37902)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fBlp3-0002s8-BO
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:40:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fBlp2-00036G-AG
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 18:40:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4A1012E806F
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 18:40:48 +0000 (UTC)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fBlsN-00047J-Ee
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:44:15 -0400
+Received: by mail-wm0-x232.google.com with SMTP id i3so15051700wmf.3
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 11:44:15 -0700 (PDT)
+References: <20180425153343.24023-1-alex.bennee@linaro.org>
+	<cb41b3a5-0e3b-f30b-a02c-1cc333d38ab1@redhat.com>
+	<87604ekl0c.fsf@linaro.org>
+	<2f69532c-8651-ef67-0910-1fad91808608@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <2f69532c-8651-ef67-0910-1fad91808608@redhat.com>
+Date: Thu, 26 Apr 2018 19:44:12 +0100
+Message-ID: <874ljxlseb.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Apr 2018 18:22:30 -0000
-From: Dominyk Tiller <1767176@bugs.launchpad.net>
-Reply-To: Bug 1767176 <1767176@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <152476695027.6122.1941123400059547378.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1767176] [NEW] GTK build fails with qemu 2.12.0
+Subject: Re: [Qemu-devel] [RFC PATCH] hw/core: expand description of
+ null-machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,325 +33,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, peter.maydell@linaro.org, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 
-Public bug reported:
 
-With the 2.12.0 release of QEMU passing `--enable-gtk` to configure
-causes the build to fail. I'm running macOS 10.13.5 with Xcode 9.3 FWIW.
+Thomas Huth <thuth@redhat.com> writes:
 
-I'm building against GTK 2.24.32, which I appreciate is no longer the
-preferred version here, but I don't think the error is related to that
-aspect. I'll try and find the time later to attempt a GTK3 build to
-check that though.
+> On 26.04.2018 18:09, Alex Benn=C3=A9e wrote:
+>>
+>> Thomas Huth <thuth@redhat.com> writes:
+>>
+>>> On 25.04.2018 17:33, Alex Benn=C3=A9e wrote:
+>>>> People following old instructions for QEMU get the message "No machine
+>>>> specified, and there is no default" and run -machine help to pick a
+>>>> new machine. Lay people might consider the null-machine to be such a
+>>>> basic starting point but they won't get far. This leads to confusion,
+>>>> see https://bugs.launchpad.net/qemu/+bug/1766896 as an example.
+>>>>
+>>>> I'm open to better words - I figured "THIS PROBABLY ISN'T WHAT YOU
+>>>> WANT" seemed less helpful though.
+>>>>
+>>>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>>> ---
+>>>>  hw/core/null-machine.c | 2 +-
+>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
+>>>> index cde4d3eb57..72f0815045 100644
+>>>> --- a/hw/core/null-machine.c
+>>>> +++ b/hw/core/null-machine.c
+>>>> @@ -50,7 +50,7 @@ static void machine_none_init(MachineState *mch)
+>>>>
+>>>>  static void machine_none_machine_init(MachineClass *mc)
+>>>>  {
+>>>> -    mc->desc =3D "empty machine";
+>>>> +    mc->desc =3D "empty machine (for probing/QMP)";
+>>>
+>>> Actually, with certain CPUs, you can really use the "none" machine as a
+>>> pure instruction set testing system. For example, on m68k, there used to
+>>> be an explicit "dummy" machine for this job, and we removed it in favour
+>>> of the "none" machine:
+>>>
+>>> https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D22f2dbe7eaf3e12e3=
+8c9c210
+>>
+>> Ahh OK. Do you know what other CPUs can be used in this way?
+>
+> I think it should be possible with at least all the boards that have a
+> "sim" machine, e.g. xtensa, mips, moxie and openrisc.
+>
+>>> So I'd rather not add such wording. We should rather fix those segfaults
+>>> instead (QEMU should never segfault - in case a device can not be used
+>>> with the "none" machine, there rather should be an error message instea=
+d).
+>>
+>> Hmm the ARM world is complicated by peripherals that are on-chip but not
+>> part of the "CPU". I wonder if this is a edge case for our modelling?
+>> Should for example -cpu cortex-m3 imply additional peripherals and how
+>> do we handle that in the -m none case?
+>
+> I don't think it makes sense to instantiate e.g. an interrupt controller
+> with the "none" machine automatically ... so the raw cortex-m3 core
+> should either be usable without that, too, or there just should be an
+> error message instead of a crash when the additional hardware is not
+> available
 
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-ui/gtk.c:1147:16: error: use of undeclared identifier 'qemu_input_map_osx_t=
-o_qcode'; did you mean 'qemu_input_map_usb_to_qcode'?
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return qemu_input_map_osx_t=
-o_qcode;
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0^~~~~~~~~~~~~~~~~~~~~~~~~~~
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0qemu_input_map_usb_to_qcode
-/private/tmp/qemu-20180426-60786-1av6pq8/qemu-2.12.0/include/ui/input.h:99:=
-22: note: 'qemu_input_map_usb_to_qcode' declared here
-extern const guint16 qemu_input_map_usb_to_qcode[];
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Well I think this is where out abstraction breaks down. The cortex-m3 is
+an ARMv7 core but with a bunch of stuff also on the SoC, including an
+IRQ controller and MPU. However these devices are instantiated as part
+of the machine model.
 
-I tried poking around locally by applying the following diff, based off
-of a very brief glance over the code involved, but that simply causes
-the build to error out in a different way at a later point, so I assume
-I'm doing something stupid.
+> - since it's not that urgent that the raw cortex-m3 core is
+> usable with the none machine, is it?
 
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-diff --git a/Makefile b/Makefile
-index d71dd5b..e857c3c 100644
---- a/Makefile
-+++ b/Makefile
-@@ -313,6 +313,7 @@ KEYCODEMAP_FILES =3D \
-=C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-qnum-to-qcode.c \
-=C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-usb-to-qcode.c \
-=C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-win32-to-qcode.c \
-+     ui/input-keymap-osx-to-qcode.c \
-=C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-x11-to-qcode.c \
-=C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-xorgevdev-to-qcode.c \
-=C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-xorgkbd-to-qcode.c \
-diff --git a/include/ui/input.h b/include/ui/input.h
-index 16395ab..8183840 100644
---- a/include/ui/input.h
-+++ b/include/ui/input.h
-@@ -101,6 +101,9 @@ extern const guint16 qemu_input_map_usb_to_qcode[];
-=C2=A0extern const guint qemu_input_map_win32_to_qcode_len;
-=C2=A0extern const guint16 qemu_input_map_win32_to_qcode[];
+No although it would theoretically be possible to use a cortex-m3 on
+it's own with nothing else but some RAM and some buffers for it's serial
+ports. Currently -cpu cortex-m3 will fail hard if not instantiated with
+a m3 aware machine model.
 
-+extern const guint qemu_input_map_osx_to_qcode_len;
-+extern const guint16 qemu_input_map_osx_to_qcode[];
-+
-=C2=A0extern const guint qemu_input_map_x11_to_qcode_len;
-=C2=A0extern const guint16 qemu_input_map_x11_to_qcode[];
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Description changed:
-
-  With the 2.12.0 release of QEMU passing `--enable-gtk` to configure
-  causes the build to fail. I'm running macOS 10.13.5 with Xcode 9.3 FWIW.
-  =
-
-  I'm building against GTK 2.24.32, which I appreciate is no longer the
-  preferred version here, but I don't think the error is related to that
-  aspect. I'll try and find the time later to attempt a GTK3 build to
-  check that though.
-  =
-
-- ```
-+ =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  ui/gtk.c:1147:16: error: use of undeclared identifier 'qemu_input_map_osx=
-_to_qcode'; did you mean 'qemu_input_map_usb_to_qcode'?
--         return qemu_input_map_osx_to_qcode;
--                ^~~~~~~~~~~~~~~~~~~~~~~~~~~
--                qemu_input_map_usb_to_qcode
-+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return qemu_input_map_osx=
-_to_qcode;
-+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~~~~~~~~~~~~~~~~
-+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0qemu_input_map_usb_to_qcode
-  /private/tmp/qemu-20180426-60786-1av6pq8/qemu-2.12.0/include/ui/input.h:9=
-9:22: note: 'qemu_input_map_usb_to_qcode' declared here
-  extern const guint16 qemu_input_map_usb_to_qcode[];
--                      ^
-- ```
-+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^
-+ =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  =
-
-  I tried poking around locally by applying the following diff, based off
-  of a very brief glance over the code involved, but that simply causes
-  the build to error out in a different way at a later point, so I assume
-  I'm doing something stupid.
-  =
-
-- =
-
-- ```
-+ =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  diff --git a/Makefile b/Makefile
-  index d71dd5b..e857c3c 100644
-  --- a/Makefile
-  +++ b/Makefile
-  @@ -313,6 +313,7 @@ KEYCODEMAP_FILES =3D \
--  		 ui/input-keymap-qnum-to-qcode.c \
--  		 ui/input-keymap-usb-to-qcode.c \
--  		 ui/input-keymap-win32-to-qcode.c \
-- +		 ui/input-keymap-osx-to-qcode.c \
--  		 ui/input-keymap-x11-to-qcode.c \
--  		 ui/input-keymap-xorgevdev-to-qcode.c \
--  		 ui/input-keymap-xorgkbd-to-qcode.c \
-+ =C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-qnum-to-qcode.c \
-+ =C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-usb-to-qcode.c \
-+ =C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-win32-to-qcode.c \
-+ +   ui/input-keymap-osx-to-qcode.c \
-+ =C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-x11-to-qcode.c \
-+ =C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-xorgevdev-to-qcode.c \
-+ =C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-xorgkbd-to-qcode.c \
-  diff --git a/include/ui/input.h b/include/ui/input.h
-  index 16395ab..8183840 100644
-  --- a/include/ui/input.h
-  +++ b/include/ui/input.h
-  @@ -101,6 +101,9 @@ extern const guint16 qemu_input_map_usb_to_qcode[];
--  extern const guint qemu_input_map_win32_to_qcode_len;
--  extern const guint16 qemu_input_map_win32_to_qcode[];
--  =
-
-+ =C2=A0extern const guint qemu_input_map_win32_to_qcode_len;
-+ =C2=A0extern const guint16 qemu_input_map_win32_to_qcode[];
-+ =
-
-  +extern const guint qemu_input_map_osx_to_qcode_len;
-  +extern const guint16 qemu_input_map_osx_to_qcode[];
-  +
--  extern const guint qemu_input_map_x11_to_qcode_len;
--  extern const guint16 qemu_input_map_x11_to_qcode[];
-- ```
-+ =C2=A0extern const guint qemu_input_map_x11_to_qcode_len;
-+ =C2=A0extern const guint16 qemu_input_map_x11_to_qcode[];
-+ =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-** Description changed:
-
-  With the 2.12.0 release of QEMU passing `--enable-gtk` to configure
-  causes the build to fail. I'm running macOS 10.13.5 with Xcode 9.3 FWIW.
-  =
-
-  I'm building against GTK 2.24.32, which I appreciate is no longer the
-  preferred version here, but I don't think the error is related to that
-  aspect. I'll try and find the time later to attempt a GTK3 build to
-  check that though.
-  =
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  ui/gtk.c:1147:16: error: use of undeclared identifier 'qemu_input_map_osx=
-_to_qcode'; did you mean 'qemu_input_map_usb_to_qcode'?
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return qemu_input_map_osx=
-_to_qcode;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~~~~~~~~~~~~~~~~
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0qemu_input_map_usb_to_qcode
-  /private/tmp/qemu-20180426-60786-1av6pq8/qemu-2.12.0/include/ui/input.h:9=
-9:22: note: 'qemu_input_map_usb_to_qcode' declared here
-  extern const guint16 qemu_input_map_usb_to_qcode[];
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  =
-
-  I tried poking around locally by applying the following diff, based off
-  of a very brief glance over the code involved, but that simply causes
-  the build to error out in a different way at a later point, so I assume
-  I'm doing something stupid.
-  =
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  diff --git a/Makefile b/Makefile
-  index d71dd5b..e857c3c 100644
-  --- a/Makefile
-  +++ b/Makefile
-  @@ -313,6 +313,7 @@ KEYCODEMAP_FILES =3D \
-  =C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-qnum-to-qcode.c \
-  =C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-usb-to-qcode.c \
-  =C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-win32-to-qcode.c \
-- +   ui/input-keymap-osx-to-qcode.c \
-+ +     ui/input-keymap-osx-to-qcode.c \
-  =C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-x11-to-qcode.c \
-  =C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-xorgevdev-to-qcode.c \
-  =C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-xorgkbd-to-qcode.c \
-  diff --git a/include/ui/input.h b/include/ui/input.h
-  index 16395ab..8183840 100644
-  --- a/include/ui/input.h
-  +++ b/include/ui/input.h
-  @@ -101,6 +101,9 @@ extern const guint16 qemu_input_map_usb_to_qcode[];
-  =C2=A0extern const guint qemu_input_map_win32_to_qcode_len;
-  =C2=A0extern const guint16 qemu_input_map_win32_to_qcode[];
-  =
-
-  +extern const guint qemu_input_map_osx_to_qcode_len;
-  +extern const guint16 qemu_input_map_osx_to_qcode[];
-  +
-  =C2=A0extern const guint qemu_input_map_x11_to_qcode_len;
-  =C2=A0extern const guint16 qemu_input_map_x11_to_qcode[];
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1767176
-
-Title:
-  GTK build fails with qemu 2.12.0
-
-Status in QEMU:
-  New
-
-Bug description:
-  With the 2.12.0 release of QEMU passing `--enable-gtk` to configure
-  causes the build to fail. I'm running macOS 10.13.5 with Xcode 9.3
-  FWIW.
-
-  I'm building against GTK 2.24.32, which I appreciate is no longer the
-  preferred version here, but I don't think the error is related to that
-  aspect. I'll try and find the time later to attempt a GTK3 build to
-  check that though.
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  ui/gtk.c:1147:16: error: use of undeclared identifier 'qemu_input_map_osx=
-_to_qcode'; did you mean 'qemu_input_map_usb_to_qcode'?
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return qemu_input_map_osx=
-_to_qcode;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~~~~~~~~~~~~~~~~
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0qemu_input_map_usb_to_qcode
-  /private/tmp/qemu-20180426-60786-1av6pq8/qemu-2.12.0/include/ui/input.h:9=
-9:22: note: 'qemu_input_map_usb_to_qcode' declared here
-  extern const guint16 qemu_input_map_usb_to_qcode[];
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  I tried poking around locally by applying the following diff, based
-  off of a very brief glance over the code involved, but that simply
-  causes the build to error out in a different way at a later point, so
-  I assume I'm doing something stupid.
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  diff --git a/Makefile b/Makefile
-  index d71dd5b..e857c3c 100644
-  --- a/Makefile
-  +++ b/Makefile
-  @@ -313,6 +313,7 @@ KEYCODEMAP_FILES =3D \
-  =C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-qnum-to-qcode.c \
-  =C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-usb-to-qcode.c \
-  =C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-win32-to-qcode.c \
-  +     ui/input-keymap-osx-to-qcode.c \
-  =C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-x11-to-qcode.c \
-  =C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-xorgevdev-to-qcode.c \
-  =C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-xorgkbd-to-qcode.c \
-  diff --git a/include/ui/input.h b/include/ui/input.h
-  index 16395ab..8183840 100644
-  --- a/include/ui/input.h
-  +++ b/include/ui/input.h
-  @@ -101,6 +101,9 @@ extern const guint16 qemu_input_map_usb_to_qcode[];
-  =C2=A0extern const guint qemu_input_map_win32_to_qcode_len;
-  =C2=A0extern const guint16 qemu_input_map_win32_to_qcode[];
-
-  +extern const guint qemu_input_map_osx_to_qcode_len;
-  +extern const guint16 qemu_input_map_osx_to_qcode[];
-  +
-  =C2=A0extern const guint qemu_input_map_x11_to_qcode_len;
-  =C2=A0extern const guint16 qemu_input_map_x11_to_qcode[];
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1767176/+subscriptions
+--
+Alex Benn=C3=A9e
