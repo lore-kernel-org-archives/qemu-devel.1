@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39693)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fBeQy-0002kf-4s
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:47:31 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fBeR0-0002lD-Lm
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:47:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fBeQx-0001XS-9z
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:47:28 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41152)
+	(envelope-from <pm215@archaic.org.uk>) id 1fBeQz-0001a5-IL
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:47:30 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41154)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fBeQx-0001Vb-2S
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:47:27 -0400
+	id 1fBeQz-0001XB-BV
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:47:29 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fBeQv-00034U-RD
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:47:25 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fBeQp-00030a-Ay
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:47:19 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 26 Apr 2018 11:47:09 +0100
-Message-Id: <20180426104715.21702-14-peter.maydell@linaro.org>
+Date: Thu, 26 Apr 2018 11:47:00 +0100
+Message-Id: <20180426104715.21702-5-peter.maydell@linaro.org>
 In-Reply-To: <20180426104715.21702-1-peter.maydell@linaro.org>
 References: <20180426104715.21702-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 13/19] target/arm: Make PMOVSCLR and PMUSERENR
- 64 bits wide
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 04/19] target/arm: Use v7m_stack_read() for
+ reading the frame signature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +33,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Aaron Lindsay <alindsay@codeaurora.org>
+In commit 95695effe8caa552b8f2 we changed the v7M/v8M stack
+pop code to use a new v7m_stack_read() function that checks
+whether the read should fail due to an MPU or bus abort.
+We missed one call though, the one which reads the signature
+word for the callee-saved register part of the frame.
 
-This is a bug fix to ensure 64-bit reads of these registers don't read
-adjacent data.
+Correct the omission.
 
-Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
-Message-id: 1523997485-1905-13-git-send-email-alindsay@codeaurora.org
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20180419142106.9694-1-peter.maydell@linaro.org
 ---
- target/arm/cpu.h    | 4 ++--
- target/arm/helper.c | 5 +++--
- 2 files changed, 5 insertions(+), 4 deletions(-)
+ target/arm/helper.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index b9b47f4b22..44e6b77151 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -367,8 +367,8 @@ typedef struct CPUARMState {
-         uint32_t c9_data;
-         uint64_t c9_pmcr; /* performance monitor control register */
-         uint64_t c9_pmcnten; /* perf monitor counter enables */
--        uint32_t c9_pmovsr; /* perf monitor overflow status */
--        uint32_t c9_pmuserenr; /* perf monitor user enable */
-+        uint64_t c9_pmovsr; /* perf monitor overflow status */
-+        uint64_t c9_pmuserenr; /* perf monitor user enable */
-         uint64_t c9_pmselr; /* perf monitor counter selection register */
-         uint64_t c9_pminten; /* perf monitor interrupt enables */
-         union { /* Memory attribute redirection */
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 85c289f3b9..52a88e0297 100644
+index 3ad0371aeb..0fa02c31e1 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -1305,7 +1305,8 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
-       .fieldoffset = offsetof(CPUARMState, cp15.c9_pmcnten),
-       .writefn = pmcntenclr_write },
-     { .name = "PMOVSR", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 3,
--      .access = PL0_RW, .fieldoffset = offsetof(CPUARMState, cp15.c9_pmovsr),
-+      .access = PL0_RW,
-+      .fieldoffset = offsetoflow32(CPUARMState, cp15.c9_pmovsr),
-       .accessfn = pmreg_access,
-       .writefn = pmovsr_write,
-       .raw_writefn = raw_write },
-@@ -1360,7 +1361,7 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
-       .accessfn = pmreg_access_xevcntr },
-     { .name = "PMUSERENR", .cp = 15, .crn = 9, .crm = 14, .opc1 = 0, .opc2 = 0,
-       .access = PL0_R | PL1_RW, .accessfn = access_tpm,
--      .fieldoffset = offsetof(CPUARMState, cp15.c9_pmuserenr),
-+      .fieldoffset = offsetoflow32(CPUARMState, cp15.c9_pmuserenr),
-       .resetvalue = 0,
-       .writefn = pmuserenr_write, .raw_writefn = raw_write },
-     { .name = "PMUSERENR_EL0", .state = ARM_CP_STATE_AA64,
+@@ -6913,7 +6913,6 @@ static bool v7m_push_stack(ARMCPU *cpu)
+ static void do_v7m_exception_exit(ARMCPU *cpu)
+ {
+     CPUARMState *env = &cpu->env;
+-    CPUState *cs = CPU(cpu);
+     uint32_t excret;
+     uint32_t xpsr;
+     bool ufault = false;
+@@ -7112,9 +7111,11 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
+             ((excret & R_V7M_EXCRET_ES_MASK) == 0 ||
+              (excret & R_V7M_EXCRET_DCRS_MASK) == 0)) {
+             uint32_t expected_sig = 0xfefa125b;
+-            uint32_t actual_sig = ldl_phys(cs->as, frameptr);
++            uint32_t actual_sig;
+ 
+-            if (expected_sig != actual_sig) {
++            pop_ok = v7m_stack_read(cpu, &actual_sig, frameptr, mmu_idx);
++
++            if (pop_ok && expected_sig != actual_sig) {
+                 /* Take a SecureFault on the current stack */
+                 env->v7m.sfsr |= R_V7M_SFSR_INVIS_MASK;
+                 armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_SECURE, false);
+@@ -7125,7 +7126,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
+                 return;
+             }
+ 
+-            pop_ok =
++            pop_ok = pop_ok &&
+                 v7m_stack_read(cpu, &env->regs[4], frameptr + 0x8, mmu_idx) &&
+                 v7m_stack_read(cpu, &env->regs[4], frameptr + 0x8, mmu_idx) &&
+                 v7m_stack_read(cpu, &env->regs[5], frameptr + 0xc, mmu_idx) &&
 -- 
 2.17.0
