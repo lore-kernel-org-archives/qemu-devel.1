@@ -1,35 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fBaGB-0004Yo-H9
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 02:20:04 -0400
+	(envelope-from <armbru@redhat.com>) id 1fBaMi-0006gR-94
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 02:26:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fBaG8-0006eO-C1
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 02:20:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43420 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fBaMd-0001wf-Aw
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 02:26:48 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45694 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fBaG8-0006e1-7r
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 02:20:00 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6698FEC00F
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 06:19:56 +0000 (UTC)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fBaMd-0001w1-6D
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 02:26:43 -0400
 From: Markus Armbruster <armbru@redhat.com>
 References: <20180424214550.32549-1-lersek@redhat.com>
-	<20180424214550.32549-6-lersek@redhat.com>
-	<877eovahoq.fsf@dusky.pond.sub.org>
-	<5ffb031a-554a-81c1-b374-eb82f410bf83@redhat.com>
-	<ccb8aaa0-c523-8360-be73-749cf08d074f@redhat.com>
-	<7cc33c11-1a6f-1cf8-8115-f0cd4633a482@redhat.com>
-Date: Thu, 26 Apr 2018 08:19:50 +0200
-In-Reply-To: <7cc33c11-1a6f-1cf8-8115-f0cd4633a482@redhat.com> (Laszlo Ersek's
-	message of "Thu, 26 Apr 2018 00:56:46 +0200")
-Message-ID: <87wowu4hh5.fsf@dusky.pond.sub.org>
+	<20180424214550.32549-7-lersek@redhat.com>
+	<8736zjagg3.fsf@dusky.pond.sub.org>
+	<4509705a-43b2-db40-aa24-18eff649e750@redhat.com>
+Date: Thu, 26 Apr 2018 08:26:33 +0200
+In-Reply-To: <4509705a-43b2-db40-aa24-18eff649e750@redhat.com> (Laszlo Ersek's
+	message of "Wed, 25 Apr 2018 15:47:10 +0200")
+Message-ID: <87sh7i4h5y.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 5/6] qapi: extract CpuInfoCommon to
- mitigate schema duplication
+Subject: Re: [Qemu-devel] [PATCH 6/6] qapi: discriminate CpuInfo[Fast] on
+ SysEmuTarget, not CpuInfoArch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,49 +31,16 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Laszlo Ersek <lersek@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
 Laszlo Ersek <lersek@redhat.com> writes:
 
-> On 04/25/18 21:12, Eric Blake wrote:
->> On 04/25/2018 08:20 AM, Laszlo Ersek wrote:
->> 
->>> ...
->>>
->>> and people would ask themselves ever after, "are there some common
->>> fields in there that we could extract ... hmmm, @props and @arch, okay,
->>> maybe, maybe not, grey area". Let's do it now and save them the thinking.
->> 
->> No, CpuInfo is slated for death in the next year or so; per commit
->> ff9a9156.
+[...]
+> In brief, I think extending configure / the build system would only help
+> with the less painful part of this (the scalar mapping), and so it's not
+> worth doing.
 
-Good catch, I missed it.
+We're going to leave deprecated query-cpus alone (see Eric's review of
+the previous patch).  Does that change matters?
 
->>            Once it disappears (in 2.14 or 2.15?), we will ONLY have
->> CpuInfoFast (although we might rename it at that time, as the name of
->> QMP structs is not part of the introspection interface).
->> 
->> So, my personal inclination is to just live with the mindless
->> near-duplication until the deprecation period ends, rather than wasting
->> cycles refactoring things just to refactor it back out when removing the
->> dead code later.
->> 
->
-> This is an important update; thank you for it. Because, it tells me that
-> we might not need to add @target to CpuInfo at all. Why *extend* an
-> interface that is deprecated to the point that we're reluctant even to
-> *refactor* it?
->
-> (BTW, I had noticed the deprecation note in the schema source code, from
-> what you've now identified as commit ff9a9156; I didn't know what it
-> meant -- I didn't know it carried a removal sentence.)
-
-No need to enhance it even without a removal sentence.
-
-> The consequence is that I could drop the painful modifications for
-> qmp_query_cpus() altogether, and just keep the simple ones for
-> qmp_query_cpus_fast().
->
-> Markus, does that work for you? Forget about @CpuInfo for good?
-
-Absolutely.
+PS: Instead of configure changes, #TARGET_BASE_ARCH might do.
