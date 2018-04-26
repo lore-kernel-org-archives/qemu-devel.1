@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42626)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fBjcC-0002de-7A
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:19:25 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fBjd2-00037l-M0
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:20:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fBjcB-0000Ia-4L
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:19:24 -0400
-References: <20180424130821.50987-1-vsementsov@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <bb12a725-0908-cab8-5dfd-2cdd3a1aa0d6@virtuozzo.com>
-Date: Thu, 26 Apr 2018 19:19:09 +0300
+	(envelope-from <dgilbert@redhat.com>) id 1fBjcx-0000ZG-Rg
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:20:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43576 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fBjcx-0000Y3-LJ
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:20:11 -0400
+Date: Thu, 26 Apr 2018 17:19:59 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180426161959.GK2631@work-vm>
+References: <1524666934-8064-1-git-send-email-lidongchen@tencent.com>
+	<1524666934-8064-3-git-send-email-lidongchen@tencent.com>
 MIME-Version: 1.0
-In-Reply-To: <20180424130821.50987-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [RFC 0/3] NBD reconnect
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1524666934-8064-3-git-send-email-lidongchen@tencent.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] migration: create a dedicated
+ connection for rdma return path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,56 +28,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, famz@redhat.com, pbonzini@redhat.com, eblake@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: Lidong Chen <jemmy858585@gmail.com>
+Cc: quintela@redhat.com, qemu-devel@nongnu.org, galsha@mellanox.com, aviadye@mellanox.com, licq@mellanox.com, adido@mellanox.com, Lidong Chen <lidongchen@tencent.com>
 
-24.04.2018 16:08, Vladimir Sementsov-Ogievskiy wrote:
-> Hi all.
->
-> Here is a draft of NBD reconnect, to negotiate overall design. It is done
-> through implementing new error action: reconnect.
->
-> New action works as follows:
->
-> Firstly, not stopping the vm, it tries to bdrv_reconnect several times
-> with given pause. Then, if we failed to reconnect fallthrough to 'stop'
-> error action.
->
-> My RFC doubts:
-> 1. introducing new .bdrv_reconnect(). Is bdrv_reopen() appropriate for
->     the feature? I'm not sure, because it is not recursive, and don't
->     really reopen files..
-> 2. introducing new error action. Anyway, I'll have to add some configuration
->     parameters (see 03), so, the feature may be just an option to 'stop'
->     action, rather than separate error action.
->
-> Vladimir Sementsov-Ogievskiy (3):
->    block: add bdrv_reconnect
->    nbd: add .bdrv_reconnect handler
->    blk: add 'reconnect' error action
->
->   qapi/block-core.json      |  4 ++--
->   include/block/block.h     |  2 ++
->   include/block/block_int.h |  3 +++
->   block.c                   | 22 +++++++++++++++++
->   block/block-backend.c     | 48 ++++++++++++++++++++++++++++++++++++-
->   block/nbd.c               | 60 ++++++++++++++++++++++++++++++++++-------------
->   hw/scsi/scsi-disk.c       |  4 +++-
->   7 files changed, 123 insertions(+), 20 deletions(-)
->
+* Lidong Chen (jemmy858585@gmail.com) wrote:
+> If start a RDMA migration with postcopy enabled, the source qemu
+> establish a dedicated connection for return path.
+> 
+> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Hm, answering myself:
+Oops, I should have Reviewed-by rather than Signed-off-by, so:
 
-it's a bad design:
 
-1. Assume we have a tree of nodes. So, if one node was disconnected, we 
-will reconnect all nodes. It's better to reconnect only one node.
-2. Possibility to reconnect looks more like option, rather than separate 
-error_action, as we may want reconnect before stop in _STOP action, and 
-reconnect if disconnected with _NOSPC error action.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-So, I'll try to rewrite it to be a simple nbd-driver option.
-
--- 
-Best regards,
-Vladimir
+> ---
+>  migration/rdma.c | 94 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 91 insertions(+), 3 deletions(-)
+> 
+> diff --git a/migration/rdma.c b/migration/rdma.c
+> index a22be43..c745427 100644
+> --- a/migration/rdma.c
+> +++ b/migration/rdma.c
+> @@ -387,6 +387,10 @@ typedef struct RDMAContext {
+>      uint64_t unregistrations[RDMA_SIGNALED_SEND_MAX];
+>  
+>      GHashTable *blockmap;
+> +
+> +    /* the RDMAContext for return path */
+> +    struct RDMAContext *return_path;
+> +    bool is_return_path;
+>  } RDMAContext;
+>  
+>  #define TYPE_QIO_CHANNEL_RDMA "qio-channel-rdma"
+> @@ -2329,10 +2333,22 @@ static void qemu_rdma_cleanup(RDMAContext *rdma)
+>          rdma_destroy_id(rdma->cm_id);
+>          rdma->cm_id = NULL;
+>      }
+> +
+> +    /* the destination side, listen_id and channel is shared */
+>      if (rdma->listen_id) {
+> -        rdma_destroy_id(rdma->listen_id);
+> +        if (!rdma->is_return_path) {
+> +            rdma_destroy_id(rdma->listen_id);
+> +        }
+>          rdma->listen_id = NULL;
+> +
+> +        if (rdma->channel) {
+> +            if (!rdma->is_return_path) {
+> +                rdma_destroy_event_channel(rdma->channel);
+> +            }
+> +            rdma->channel = NULL;
+> +        }
+>      }
+> +
+>      if (rdma->channel) {
+>          rdma_destroy_event_channel(rdma->channel);
+>          rdma->channel = NULL;
+> @@ -2561,6 +2577,25 @@ err_dest_init_create_listen_id:
+>  
+>  }
+>  
+> +static void qemu_rdma_return_path_dest_init(RDMAContext *rdma_return_path,
+> +                                            RDMAContext *rdma)
+> +{
+> +    int idx;
+> +
+> +    for (idx = 0; idx < RDMA_WRID_MAX; idx++) {
+> +        rdma_return_path->wr_data[idx].control_len = 0;
+> +        rdma_return_path->wr_data[idx].control_curr = NULL;
+> +    }
+> +
+> +    /*the CM channel and CM id is shared*/
+> +    rdma_return_path->channel = rdma->channel;
+> +    rdma_return_path->listen_id = rdma->listen_id;
+> +
+> +    rdma->return_path = rdma_return_path;
+> +    rdma_return_path->return_path = rdma;
+> +    rdma_return_path->is_return_path = true;
+> +}
+> +
+>  static void *qemu_rdma_data_init(const char *host_port, Error **errp)
+>  {
+>      RDMAContext *rdma = NULL;
+> @@ -3018,6 +3053,8 @@ err:
+>      return ret;
+>  }
+>  
+> +static void rdma_accept_incoming_migration(void *opaque);
+> +
+>  static int qemu_rdma_accept(RDMAContext *rdma)
+>  {
+>      RDMACapabilities cap;
+> @@ -3112,7 +3149,14 @@ static int qemu_rdma_accept(RDMAContext *rdma)
+>          }
+>      }
+>  
+> -    qemu_set_fd_handler(rdma->channel->fd, NULL, NULL, NULL);
+> +    /* Accept the second connection request for return path */
+> +    if (migrate_postcopy() && !rdma->is_return_path) {
+> +        qemu_set_fd_handler(rdma->channel->fd, rdma_accept_incoming_migration,
+> +                            NULL,
+> +                            (void *)(intptr_t)rdma->return_path);
+> +    } else {
+> +        qemu_set_fd_handler(rdma->channel->fd, NULL, NULL, NULL);
+> +    }
+>  
+>      ret = rdma_accept(rdma->cm_id, &conn_param);
+>      if (ret) {
+> @@ -3693,6 +3737,10 @@ static void rdma_accept_incoming_migration(void *opaque)
+>  
+>      trace_qemu_rdma_accept_incoming_migration_accepted();
+>  
+> +    if (rdma->is_return_path) {
+> +        return;
+> +    }
+> +
+>      f = qemu_fopen_rdma(rdma, "rb");
+>      if (f == NULL) {
+>          ERROR(errp, "could not qemu_fopen_rdma!");
+> @@ -3707,7 +3755,7 @@ static void rdma_accept_incoming_migration(void *opaque)
+>  void rdma_start_incoming_migration(const char *host_port, Error **errp)
+>  {
+>      int ret;
+> -    RDMAContext *rdma;
+> +    RDMAContext *rdma, *rdma_return_path;
+>      Error *local_err = NULL;
+>  
+>      trace_rdma_start_incoming_migration();
+> @@ -3734,12 +3782,24 @@ void rdma_start_incoming_migration(const char *host_port, Error **errp)
+>  
+>      trace_rdma_start_incoming_migration_after_rdma_listen();
+>  
+> +    /* initialize the RDMAContext for return path */
+> +    if (migrate_postcopy()) {
+> +        rdma_return_path = qemu_rdma_data_init(host_port, &local_err);
+> +
+> +        if (rdma_return_path == NULL) {
+> +            goto err;
+> +        }
+> +
+> +        qemu_rdma_return_path_dest_init(rdma_return_path, rdma);
+> +    }
+> +
+>      qemu_set_fd_handler(rdma->channel->fd, rdma_accept_incoming_migration,
+>                          NULL, (void *)(intptr_t)rdma);
+>      return;
+>  err:
+>      error_propagate(errp, local_err);
+>      g_free(rdma);
+> +    g_free(rdma_return_path);
+>  }
+>  
+>  void rdma_start_outgoing_migration(void *opaque,
+> @@ -3747,6 +3807,7 @@ void rdma_start_outgoing_migration(void *opaque,
+>  {
+>      MigrationState *s = opaque;
+>      RDMAContext *rdma = qemu_rdma_data_init(host_port, errp);
+> +    RDMAContext *rdma_return_path = NULL;
+>      int ret = 0;
+>  
+>      if (rdma == NULL) {
+> @@ -3767,6 +3828,32 @@ void rdma_start_outgoing_migration(void *opaque,
+>          goto err;
+>      }
+>  
+> +    /* RDMA postcopy need a seprate queue pair for return path */
+> +    if (migrate_postcopy()) {
+> +        rdma_return_path = qemu_rdma_data_init(host_port, errp);
+> +
+> +        if (rdma_return_path == NULL) {
+> +            goto err;
+> +        }
+> +
+> +        ret = qemu_rdma_source_init(rdma_return_path,
+> +            s->enabled_capabilities[MIGRATION_CAPABILITY_RDMA_PIN_ALL], errp);
+> +
+> +        if (ret) {
+> +            goto err;
+> +        }
+> +
+> +        ret = qemu_rdma_connect(rdma_return_path, errp);
+> +
+> +        if (ret) {
+> +            goto err;
+> +        }
+> +
+> +        rdma->return_path = rdma_return_path;
+> +        rdma_return_path->return_path = rdma;
+> +        rdma_return_path->is_return_path = true;
+> +    }
+> +
+>      trace_rdma_start_outgoing_migration_after_rdma_connect();
+>  
+>      s->to_dst_file = qemu_fopen_rdma(rdma, "wb");
+> @@ -3774,4 +3861,5 @@ void rdma_start_outgoing_migration(void *opaque,
+>      return;
+>  err:
+>      g_free(rdma);
+> +    g_free(rdma_return_path);
+>  }
+> -- 
+> 1.8.3.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
