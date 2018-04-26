@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fBeR0-0002l7-IN
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:47:33 -0400
+	(envelope-from <bounces@canonical.com>) id 1fBeUL-0005Ww-6l
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:50:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fBeQy-0001Yc-6n
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:47:29 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41152)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fBeQx-0001Vb-VV
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:47:28 -0400
-Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fBeQs-00032Q-9V
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:47:22 +0100
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 26 Apr 2018 11:47:04 +0100
-Message-Id: <20180426104715.21702-9-peter.maydell@linaro.org>
-In-Reply-To: <20180426104715.21702-1-peter.maydell@linaro.org>
-References: <20180426104715.21702-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 08/19] target/arm: Fetch GICv3 state directly
- from CPUARMState
+	(envelope-from <bounces@canonical.com>) id 1fBeUJ-0002wi-Gz
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:50:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60902)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fBeUJ-0002w1-AR
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:50:55 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fBeUG-0004SD-L3
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 10:50:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 3A4932E81A6
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 10:50:49 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 26 Apr 2018 10:37:11 -0000
+From: Thomas Huth <1761027@bugs.launchpad.net>
+Reply-To: Bug 1761027 <1761027@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152280226155.9459.1066946337801120026.malonedeb@soybean.canonical.com>
+Message-Id: <152473903215.21807.7504261524101619269.launchpad@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1761027] Re: Unexpected error: "AioContext
+ polling is not implemented on Windows"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +39,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Aaron Lindsay <alindsay@codeaurora.org>
+** Changed in: qemu
+       Status: Fix Committed =3D> Fix Released
 
-This eliminates the need for fetching it from el_change_hook_opaque, and
-allows for supporting multiple el_change_hooks without having to hack
-something together to find the registered opaque belonging to GICv3.
+-- =
 
-Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 1523997485-1905-6-git-send-email-alindsay@codeaurora.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/cpu.h          | 10 ----------
- hw/intc/arm_gicv3_cpuif.c | 10 ++--------
- 2 files changed, 2 insertions(+), 18 deletions(-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1761027
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 19a0c03f9b..6bd8ff5917 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -2902,16 +2902,6 @@ static inline AddressSpace *arm_addressspace(CPUState *cs, MemTxAttrs attrs)
- void arm_register_el_change_hook(ARMCPU *cpu, ARMELChangeHook *hook,
-                                  void *opaque);
- 
--/**
-- * arm_get_el_change_hook_opaque:
-- * Return the opaque data that will be used by the el_change_hook
-- * for this CPU.
-- */
--static inline void *arm_get_el_change_hook_opaque(ARMCPU *cpu)
--{
--    return cpu->el_change_hook_opaque;
--}
--
- /**
-  * aa32_vfp_dreg:
-  * Return a pointer to the Dn register within env in 32-bit mode.
-diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
-index 26f5eeda94..cb9a3a542d 100644
---- a/hw/intc/arm_gicv3_cpuif.c
-+++ b/hw/intc/arm_gicv3_cpuif.c
-@@ -29,11 +29,7 @@ void gicv3_set_gicv3state(CPUState *cpu, GICv3CPUState *s)
- 
- static GICv3CPUState *icc_cs_from_env(CPUARMState *env)
- {
--    /* Given the CPU, find the right GICv3CPUState struct.
--     * Since we registered the CPU interface with the EL change hook as
--     * the opaque pointer, we can just directly get from the CPU to it.
--     */
--    return arm_get_el_change_hook_opaque(arm_env_get_cpu(env));
-+    return env->gicv3state;
- }
- 
- static bool gicv3_use_ns_bank(CPUARMState *env)
-@@ -2615,9 +2611,7 @@ void gicv3_init_cpuif(GICv3State *s)
-          * it might be with code translated by CPU 0 but run by CPU 1, in
-          * which case we'd get the wrong value.
-          * So instead we define the regs with no ri->opaque info, and
--         * get back to the GICv3CPUState from the ARMCPU by reading back
--         * the opaque pointer from the el_change_hook, which we're going
--         * to need to register anyway.
-+         * get back to the GICv3CPUState from the CPUARMState.
-          */
-         define_arm_cp_regs(cpu, gicv3_cpuif_reginfo);
-         if (arm_feature(&cpu->env, ARM_FEATURE_EL2)
--- 
-2.17.0
+Title:
+  Unexpected error: "AioContext polling is not implemented on Windows"
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  When run it this error happens:
+  Unexpected error in aio_context_set_poll_params() at /home/stefan/src/qem=
+u/repo.or.cz/qemu/ar7/util/aio-win32.c:413:
+  C:\Program Files\qemu\qemu-system-x86_64.exe: AioContext polling is not i=
+mplemented on Windows
+
+  This application has requested the Runtime to terminate it in an unusual =
+way.
+  Please contact the application's support team for more information.
+
+
+  System:
+  Windows 10 x64
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1761027/+subscriptions
