@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tiwei.bie@intel.com>) id 1fBeOo-0000zk-Tq
+	(envelope-from <tiwei.bie@intel.com>) id 1fBeOo-0000zj-Tt
 	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:45:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tiwei.bie@intel.com>) id 1fBeOm-0000SU-8f
+	(envelope-from <tiwei.bie@intel.com>) id 1fBeOn-0000St-LO
 	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:45:14 -0400
-Received: from mga14.intel.com ([192.55.52.115]:13329)
+Received: from mga14.intel.com ([192.55.52.115]:13332)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1fBeOl-0000Rt-V3
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:45:12 -0400
+	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1fBeOn-0000Sc-Ci
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:45:13 -0400
 From: Tiwei Bie <tiwei.bie@intel.com>
-Date: Thu, 26 Apr 2018 18:45:52 +0800
-Message-Id: <20180426104553.31034-2-tiwei.bie@intel.com>
+Date: Thu, 26 Apr 2018 18:45:53 +0800
+Message-Id: <20180426104553.31034-3-tiwei.bie@intel.com>
 In-Reply-To: <20180426104553.31034-1-tiwei.bie@intel.com>
 References: <20180426104553.31034-1-tiwei.bie@intel.com>
-Subject: [Qemu-devel] [PATCH 1/2] libvhost-user: support host notifier
+Subject: [Qemu-devel] [PATCH 2/2] vhost-user-bridge: support host notifier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,213 +27,194 @@ To: mst@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org
 Cc: dan.daly@intel.com, cunming.liang@intel.com, zhihong.wang@intel.com, tiwei.bie@intel.com
 
 This patch introduces the host notifier support in
-libvhost-user. A new API is added to support setting
-host notifier for each queue.
+vhost-user-bridge. A new option (-H) is added to use
+the host notifier. This is mainly used to test the
+host notifier implementation in vhost user.
 
 Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
 ---
- contrib/libvhost-user/libvhost-user.c | 76 +++++++++++++++++++++++++++++++----
- contrib/libvhost-user/libvhost-user.h | 31 ++++++++++++++
- 2 files changed, 99 insertions(+), 8 deletions(-)
+ tests/vhost-user-bridge.c | 98 +++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 95 insertions(+), 3 deletions(-)
 
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-index beeed0c43f..d7872d2df6 100644
---- a/contrib/libvhost-user/libvhost-user.c
-+++ b/contrib/libvhost-user/libvhost-user.c
-@@ -314,11 +314,6 @@ vu_message_write(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
-         msg.msg_controllen = 0;
-     }
+diff --git a/tests/vhost-user-bridge.c b/tests/vhost-user-bridge.c
+index e0605a529e..0884294141 100644
+--- a/tests/vhost-user-bridge.c
++++ b/tests/vhost-user-bridge.c
+@@ -29,6 +29,7 @@
  
--    /* Set the version in the flags when sending the reply */
--    vmsg->flags &= ~VHOST_USER_VERSION_MASK;
--    vmsg->flags |= VHOST_USER_VERSION;
--    vmsg->flags |= VHOST_USER_REPLY_MASK;
--
-     do {
-         rc = sendmsg(conn_fd, &msg, 0);
-     } while (rc < 0 && (errno == EINTR || errno == EAGAIN));
-@@ -339,6 +334,39 @@ vu_message_write(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
-     return true;
- }
+ #define _FILE_OFFSET_BITS 64
  
-+static bool
-+vu_send_reply(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
-+{
-+    /* Set the version in the flags when sending the reply */
-+    vmsg->flags &= ~VHOST_USER_VERSION_MASK;
-+    vmsg->flags |= VHOST_USER_VERSION;
-+    vmsg->flags |= VHOST_USER_REPLY_MASK;
-+
-+    return vu_message_write(dev, conn_fd, vmsg);
-+}
-+
-+static bool
-+vu_process_message_reply(VuDev *dev, const VhostUserMsg *vmsg)
-+{
-+    VhostUserMsg msg_reply;
-+
-+    if ((vmsg->flags & VHOST_USER_NEED_REPLY_MASK) == 0) {
-+        return true;
-+    }
-+
-+    if (!vu_message_read(dev, dev->slave_fd, &msg_reply)) {
-+        return false;
-+    }
-+
-+    if (msg_reply.request != vmsg->request) {
-+        DPRINT("Received unexpected msg type. Expected %d received %d",
-+               vmsg->request, msg_reply.request);
-+        return false;
-+    }
-+
-+    return msg_reply.payload.u64 == 0;
-+}
-+
- /* Kick the log_call_fd if required. */
++#include "qemu/atomic.h"
+ #include "qemu/osdep.h"
+ #include "qemu/iov.h"
+ #include "standard-headers/linux/virtio_net.h"
+@@ -65,6 +66,11 @@ typedef struct VubrDev {
+     int sock;
+     int ready;
+     int quit;
++    struct {
++        int fd;
++        void *addr;
++        pthread_t thread;
++    } notifier;
+ } VubrDev;
+ 
  static void
- vu_log_kick(VuDev *dev)
-@@ -534,7 +562,7 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUserMsg *vmsg)
- 
-     /* Send the message back to qemu with the addresses filled in */
-     vmsg->fd_num = 0;
--    if (!vu_message_write(dev, dev->sock, vmsg)) {
-+    if (!vu_send_reply(dev, dev->sock, vmsg)) {
-         vu_panic(dev, "failed to respond to set-mem-table for postcopy");
-         return false;
-     }
-@@ -914,6 +942,37 @@ void vu_set_queue_handler(VuDev *dev, VuVirtq *vq,
-     }
+@@ -445,14 +451,22 @@ static uint64_t
+ vubr_get_features(VuDev *dev)
+ {
+     return 1ULL << VIRTIO_NET_F_GUEST_ANNOUNCE |
+-        1ULL << VIRTIO_NET_F_MRG_RXBUF;
++        1ULL << VIRTIO_NET_F_MRG_RXBUF |
++        1ULL << VIRTIO_F_VERSION_1;
  }
  
-+bool vu_set_queue_host_notifier(VuDev *dev, VuVirtq *vq, int fd,
-+                                int size, int offset)
+ static void
+ vubr_queue_set_started(VuDev *dev, int qidx, bool started)
+ {
++    VubrDev *vubr = container_of(dev, VubrDev, vudev);
+     VuVirtq *vq = vu_get_queue(dev, qidx);
+ 
++    if (started && vubr->notifier.fd >= 0) {
++        vu_set_queue_host_notifier(dev, vq, vubr->notifier.fd,
++                                   getpagesize(),
++                                   qidx * getpagesize());
++    }
++
+     if (qidx % 2 == 1) {
+         vu_set_queue_handler(dev, vq, started ? vubr_handle_tx : NULL);
+     }
+@@ -522,6 +536,8 @@ vubr_new(const char *path, bool client)
+         vubr_die("socket");
+     }
+ 
++    dev->notifier.fd = -1;
++
+     un.sun_family = AF_UNIX;
+     strcpy(un.sun_path, path);
+     len = sizeof(un.sun_family) + strlen(path);
+@@ -559,6 +575,73 @@ vubr_new(const char *path, bool client)
+     return dev;
+ }
+ 
++static void *notifier_thread(void *arg)
 +{
-+    int qidx = vq - dev->vq;
-+    int fd_num = 0;
-+    VhostUserMsg vmsg = {
-+        .request = VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG,
-+        .flags = VHOST_USER_VERSION | VHOST_USER_NEED_REPLY_MASK,
-+        .size = sizeof(vmsg.payload.area),
-+        .payload.area = {
-+            .u64 = qidx & VHOST_USER_VRING_IDX_MASK,
-+            .size = size,
-+            .offset = offset,
-+        },
-+    };
++    VuDev *dev = (VuDev *)arg;
++    VubrDev *vubr = container_of(dev, VubrDev, vudev);
++    int pagesize = getpagesize();
++    int qidx;
 +
-+    if (fd == -1) {
-+        vmsg.payload.area.u64 |= VHOST_USER_VRING_NOFD_MASK;
-+    } else {
-+        vmsg.fds[fd_num++] = fd;
++    while (true) {
++        for (qidx = 0; qidx < VHOST_MAX_NR_VIRTQUEUE; qidx++) {
++            uint16_t *n = vubr->notifier.addr + pagesize * qidx;
++
++            if (*n == qidx) {
++                *n = 0xffff;
++                /* We won't miss notifications if we reset
++                 * the memory first. */
++                smp_mb();
++
++                DPRINT("Got a notification for queue%d via host notifier.\n",
++                       qidx);
++
++                if (qidx % 2 == 1) {
++                    vubr_handle_tx(dev, qidx);
++                }
++            }
++            usleep(1000);
++        }
 +    }
 +
-+    vmsg.fd_num = fd_num;
-+
-+    if (!vu_message_write(dev, dev->slave_fd, &vmsg)) {
-+        return false;
-+    }
-+
-+    return vu_process_message_reply(dev, &vmsg);
++    return NULL;
 +}
 +
- static bool
- vu_set_vring_call_exec(VuDev *dev, VhostUserMsg *vmsg)
++static void
++vubr_host_notifier_setup(VubrDev *dev)
++{
++    char template[] = "/tmp/vubr-XXXXXX";
++    pthread_t thread;
++    size_t length;
++    void *addr;
++    int fd;
++
++    length = getpagesize() * VHOST_MAX_NR_VIRTQUEUE;
++
++    fd = mkstemp(template);
++    if (fd < 0) {
++        vubr_die("mkstemp()");
++    }
++
++    if (posix_fallocate(fd, 0, length) != 0) {
++        vubr_die("posix_fallocate()");
++    }
++
++    addr = mmap(NULL, length, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
++    if (addr == MAP_FAILED) {
++        vubr_die("mmap()");
++    }
++
++    memset(addr, 0xff, length);
++
++    if (pthread_create(&thread, NULL, notifier_thread, &dev->vudev) != 0) {
++        vubr_die("pthread_create()");
++    }
++
++    dev->notifier.fd = fd;
++    dev->notifier.addr = addr;
++    dev->notifier.thread = thread;
++}
++
+ static void
+ vubr_set_host(struct sockaddr_in *saddr, const char *host)
  {
-@@ -966,7 +1025,8 @@ static bool
- vu_get_protocol_features_exec(VuDev *dev, VhostUserMsg *vmsg)
- {
-     uint64_t features = 1ULL << VHOST_USER_PROTOCOL_F_LOG_SHMFD |
--                        1ULL << VHOST_USER_PROTOCOL_F_SLAVE_REQ;
-+                        1ULL << VHOST_USER_PROTOCOL_F_SLAVE_REQ |
-+                        1ULL << VHOST_USER_PROTOCOL_F_HOST_NOTIFIER;
+@@ -673,8 +756,9 @@ main(int argc, char *argv[])
+     VubrDev *dev;
+     int opt;
+     bool client = false;
++    bool host_notifier = false;
  
-     if (have_userfault()) {
-         features |= 1ULL << VHOST_USER_PROTOCOL_F_PAGEFAULT;
-@@ -1250,7 +1310,7 @@ vu_dispatch(VuDev *dev)
-         goto end;
+-    while ((opt = getopt(argc, argv, "l:r:u:c")) != -1) {
++    while ((opt = getopt(argc, argv, "l:r:u:cH")) != -1) {
+ 
+         switch (opt) {
+         case 'l':
+@@ -693,6 +777,9 @@ main(int argc, char *argv[])
+         case 'c':
+             client = true;
+             break;
++        case 'H':
++            host_notifier = true;
++            break;
+         default:
+             goto out;
+         }
+@@ -708,6 +795,10 @@ main(int argc, char *argv[])
+         return 1;
      }
  
--    if (!vu_message_write(dev, dev->sock, &vmsg)) {
-+    if (!vu_send_reply(dev, dev->sock, &vmsg)) {
-         goto end;
-     }
- 
-diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
-index b27075ea3b..90806a25f9 100644
---- a/contrib/libvhost-user/libvhost-user.h
-+++ b/contrib/libvhost-user/libvhost-user.h
-@@ -51,6 +51,7 @@ enum VhostUserProtocolFeature {
-     VHOST_USER_PROTOCOL_F_CRYPTO_SESSION = 7,
-     VHOST_USER_PROTOCOL_F_PAGEFAULT = 8,
-     VHOST_USER_PROTOCOL_F_CONFIG = 9,
-+    VHOST_USER_PROTOCOL_F_HOST_NOTIFIER = 10,
- 
-     VHOST_USER_PROTOCOL_F_MAX
- };
-@@ -92,6 +93,14 @@ typedef enum VhostUserRequest {
-     VHOST_USER_MAX
- } VhostUserRequest;
- 
-+typedef enum VhostUserSlaveRequest {
-+    VHOST_USER_SLAVE_NONE = 0,
-+    VHOST_USER_SLAVE_IOTLB_MSG = 1,
-+    VHOST_USER_SLAVE_CONFIG_CHANGE_MSG = 2,
-+    VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG = 3,
-+    VHOST_USER_SLAVE_MAX
-+}  VhostUserSlaveRequest;
++    if (host_notifier) {
++        vubr_host_notifier_setup(dev);
++    }
 +
- typedef struct VhostUserMemoryRegion {
-     uint64_t guest_phys_addr;
-     uint64_t memory_size;
-@@ -122,6 +131,12 @@ static VhostUserConfig c __attribute__ ((unused));
-                                    + sizeof(c.size) \
-                                    + sizeof(c.flags))
+     vubr_backend_udp_setup(dev, lhost, lport, rhost, rport);
+     vubr_run(dev);
  
-+typedef struct VhostUserVringArea {
-+    uint64_t u64;
-+    uint64_t size;
-+    uint64_t offset;
-+} VhostUserVringArea;
-+
- #if defined(_WIN32)
- # define VU_PACKED __attribute__((gcc_struct, packed))
- #else
-@@ -133,6 +148,7 @@ typedef struct VhostUserMsg {
+@@ -717,7 +808,7 @@ main(int argc, char *argv[])
  
- #define VHOST_USER_VERSION_MASK     (0x3)
- #define VHOST_USER_REPLY_MASK       (0x1 << 2)
-+#define VHOST_USER_NEED_REPLY_MASK  (0x1 << 3)
-     uint32_t flags;
-     uint32_t size; /* the following payload size */
+ out:
+     fprintf(stderr, "Usage: %s ", argv[0]);
+-    fprintf(stderr, "[-c] [-u ud_socket_path] [-l lhost:lport] [-r rhost:rport]\n");
++    fprintf(stderr, "[-c] [-H] [-u ud_socket_path] [-l lhost:lport] [-r rhost:rport]\n");
+     fprintf(stderr, "\t-u path to unix doman socket. default: %s\n",
+             DEFAULT_UD_SOCKET);
+     fprintf(stderr, "\t-l local host and port. default: %s:%s\n",
+@@ -725,6 +816,7 @@ out:
+     fprintf(stderr, "\t-r remote host and port. default: %s:%s\n",
+             DEFAULT_RHOST, DEFAULT_RPORT);
+     fprintf(stderr, "\t-c client mode\n");
++    fprintf(stderr, "\t-H use host notifier\n");
  
-@@ -145,6 +161,7 @@ typedef struct VhostUserMsg {
-         VhostUserMemory memory;
-         VhostUserLog log;
-         VhostUserConfig config;
-+        VhostUserVringArea area;
-     } payload;
- 
-     int fds[VHOST_MEMORY_MAX_NREGIONS];
-@@ -368,6 +385,20 @@ VuVirtq *vu_get_queue(VuDev *dev, int qidx);
- void vu_set_queue_handler(VuDev *dev, VuVirtq *vq,
-                           vu_queue_handler_cb handler);
- 
-+/**
-+ * vu_set_queue_host_notifier:
-+ * @dev: a VuDev context
-+ * @vq: a VuVirtq queue
-+ * @fd: a file descriptor
-+ * @size: host page size
-+ * @offset: notifier offset in @fd file
-+ *
-+ * Set queue's host notifier. This function may be called several
-+ * times for the same queue. If called with -1 @fd, the notifier
-+ * is removed.
-+ */
-+bool vu_set_queue_host_notifier(VuDev *dev, VuVirtq *vq, int fd,
-+                                int size, int offset);
- 
- /**
-  * vu_queue_set_notification:
+     return 1;
+ }
 -- 
 2.11.0
