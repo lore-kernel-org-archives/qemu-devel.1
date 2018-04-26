@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fBjmy-0003cQ-52
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:30:33 -0400
+	(envelope-from <alistair23@gmail.com>) id 1fBju5-00018z-Fq
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:37:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fBjmu-0005Gm-5o
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:30:32 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40852 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fBjmt-0005Fp-TK
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:30:28 -0400
-References: <20180424214550.32549-1-lersek@redhat.com>
-	<20180424214550.32549-7-lersek@redhat.com>
-	<8736zjagg3.fsf@dusky.pond.sub.org>
-	<4509705a-43b2-db40-aa24-18eff649e750@redhat.com>
-	<87sh7i4h5y.fsf@dusky.pond.sub.org>
-	<ea646e6d-9512-559d-be8d-fd3c754cc301@redhat.com>
-	<136c5d3a-9d5b-eb15-a1f4-18150662144b@redhat.com>
-	<87vacexcir.fsf@dusky.pond.sub.org>
-	<230b57bf-1bf0-fd4e-05bf-cb7c4902975d@redhat.com>
-	<8736zix8yb.fsf@dusky.pond.sub.org>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <f0c9c7ca-3dcf-4f74-9812-5dea5b6376cd@redhat.com>
-Date: Thu, 26 Apr 2018 18:30:19 +0200
+	(envelope-from <alistair23@gmail.com>) id 1fBju3-0003FA-TL
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:37:53 -0400
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:43110)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1fBju3-0003EY-HC
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:37:51 -0400
+Received: by mail-lf0-x241.google.com with SMTP id g12-v6so15611589lfb.10
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 09:37:51 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <8736zix8yb.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 6/6] qapi: discriminate CpuInfo[Fast] on
- SysEmuTarget, not CpuInfoArch
+References: <1524699938-6764-1-git-send-email-mjc@sifive.com>
+	<1524699938-6764-2-git-send-email-mjc@sifive.com>
+In-Reply-To: <1524699938-6764-2-git-send-email-mjc@sifive.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 26 Apr 2018 16:37:24 +0000
+Message-ID: <CAKmqyKO346ApaG06dGEH3u0HPePFKuyWaEF57D6f4D700LRr-w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v8 01/35] RISC-V: Replace hardcoded
+ constants with enum values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,94 +31,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: Michael Clark <mjc@sifive.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, patches@groups.riscv.org, palmer@sifive.com, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-On 04/26/18 17:51, Markus Armbruster wrote:
-> Eric Blake <eblake@redhat.com> writes:
-> 
->> On 04/26/2018 09:34 AM, Markus Armbruster wrote:
->>>>
->>>> Acerbic discovery of the day: @CpuInfoArch has "x86", while configure
->>>> produces:
->>>>
->>>>   TARGET_NAME  TARGET_BASE_ARCH
->>>>          i386              i386
->>>>        x86_64              i386
->>>>
->>>> Note how "i386" does not match "x86".
->>>
->>> Review fail.
->>>
->>> Just three weeks ago, we could still have fixed query-cpus-fast...
->>
->> Actually, I think we still can.  We already documented in the 2.12
->> release notes that the "arch" field of query-cpus-fast is known to be
->> broken for all but "s390x" (which is really the only arch field that
->> MUST be correct, as that is the only time we send additional
->> information).  And introspection can easily see both the enum contents
->> (if we add something) as well as any other additions to the
->> query-cpus-fast output union (although that is less likely), to use
->> those as a witness for whether qemu is new enough to have fixed the
->> bogus "arch" values.  I'd argue that if we change things right now, with
->> intent to include the change in 2.12.1, before people start relying on
->> the bogus "arch" of 2.12, then we should feel free to make
->> query-cpus-fast output whatever we want for all architectures other than
->> "s390x", even if it changes the current output of "x86".
-> 
-> In other words, we managed to screw up query-cpus-fast sufficiently to
-> let us fix it even now.  Cool, let's do it!
-> 
+On Wed, Apr 25, 2018 at 4:47 PM Michael Clark <mjc@sifive.com> wrote:
 
-Let me clarify a little.
+> The RISC-V device-tree code has a number of hard-coded
+> constants and this change moves them into header enums.
 
-The @CpuInfoArch enum has the following constants now:
+> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> Signed-off-by: Michael Clark <mjc@sifive.com>
+> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-['x86', 'sparc', 'ppc', 'mips', 'tricore', 's390', 'riscv', 'other' ]
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-This enum was originally introduced in 2.6 (according to the
-documentation), and only the @s390 and @riscv constants were added in 2.12.
+Alistair
 
-The enum constants show up in the following two places, *on the wire*:
+> ---
+>   hw/riscv/sifive_clint.c         | 9 +++------
+>   hw/riscv/sifive_u.c             | 6 ++++--
+>   hw/riscv/spike.c                | 6 ++++--
+>   hw/riscv/virt.c                 | 6 ++++--
+>   include/hw/riscv/sifive_clint.h | 4 ++++
+>   include/hw/riscv/sifive_u.h     | 4 ++++
+>   include/hw/riscv/spike.h        | 4 ++++
+>   include/hw/riscv/virt.h         | 4 ++++
+>   8 files changed, 31 insertions(+), 12 deletions(-)
 
-- in @CpuInfo.@arch, only produced by @query-cpus,
-- in @CpuInfoFast.@arch, only produced by @query-cpus-fast.
+> diff --git a/hw/riscv/sifive_clint.c b/hw/riscv/sifive_clint.c
+> index 4893453..7cc606e 100644
+> --- a/hw/riscv/sifive_clint.c
+> +++ b/hw/riscv/sifive_clint.c
+> @@ -26,13 +26,10 @@
+>   #include "hw/riscv/sifive_clint.h"
+>   #include "qemu/timer.h"
 
-The plan would be to rewrite *all* those enum constants of @CpuInfoArch
-to which the respective TARGET_BASE_ARCH values (from "configure") do
-not map *identically*. Here's the mapping:
+> -/* See: riscv-pk/machine/sbi_entry.S and arch/riscv/kernel/time.c */
+> -#define TIMER_FREQ (10 * 1000 * 1000)
+> -
+>   static uint64_t cpu_riscv_read_rtc(void)
+>   {
+> -    return muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL), TIMER_FREQ,
+> -                    NANOSECONDS_PER_SECOND);
+> +    return muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
+> +        SIFIVE_CLINT_TIMEBASE_FREQ, NANOSECONDS_PER_SECOND);
+>   }
 
-  TARGET_BASE_ARCH  CpuInfoArch  CpuInfoArch needs change
-  ----------------  -----------  ------------------------
-  i386              x86          YES
-  sparc             sparc        no
-  ppc               ppc          no
-  mips              mips         no
-  tricore           tricore      no
-  s390x             s390         YES
-  riscv             riscv        no
+>   /*
+> @@ -59,7 +56,7 @@ static void sifive_clint_write_timecmp(RISCVCPU *cpu,
+uint64_t value)
+>       diff =3D cpu->env.timecmp - rtc_r;
+>       /* back to ns (note args switched in muldiv64) */
+>       next =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+> -        muldiv64(diff, NANOSECONDS_PER_SECOND, TIMER_FREQ);
+> +        muldiv64(diff, NANOSECONDS_PER_SECOND,
+SIFIVE_CLINT_TIMEBASE_FREQ);
+>       timer_mod(cpu->env.timer, next);
+>   }
 
-In other words, @CpuInfoArch would have to be changed to the following:
+> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> index 1c2deef..f3f7615 100644
+> --- a/hw/riscv/sifive_u.c
+> +++ b/hw/riscv/sifive_u.c
+> @@ -122,7 +122,8 @@ static void create_fdt(SiFiveUState *s, const struct
+MemmapEntry *memmap,
+>       g_free(nodename);
 
-['i386', 'sparc', 'ppc', 'mips', 'tricore', 's390x', 'riscv', 'other' ]
- ^^^^^^                                     ^^^^^^^
+>       qemu_fdt_add_subnode(fdt, "/cpus");
+> -    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency", 10000000);
+> +    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency",
+> +        SIFIVE_CLINT_TIMEBASE_FREQ);
+>       qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
+>       qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
 
-This means that the @arch field, returned by @query-cpus and
-@query-cpus-fast, would change incompatibly for those QAPI clients that
-look specifically for "x86" or "s390".
+> @@ -131,7 +132,8 @@ static void create_fdt(SiFiveUState *s, const struct
+MemmapEntry *memmap,
+>           char *intc =3D g_strdup_printf("/cpus/cpu@%d/interrupt-controll=
+er",
+cpu);
+>           char *isa =3D riscv_isa_string(&s->soc.harts[cpu]);
+>           qemu_fdt_add_subnode(fdt, nodename);
+> -        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
+1000000000);
+> +        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
+> +                              SIFIVE_U_CLOCK_FREQ);
+>           qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48"=
+);
+>           qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
+>           qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
+> diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+> index 2d1f114..4c233ec 100644
+> --- a/hw/riscv/spike.c
+> +++ b/hw/riscv/spike.c
+> @@ -115,7 +115,8 @@ static void create_fdt(SpikeState *s, const struct
+MemmapEntry *memmap,
+>       g_free(nodename);
 
-Is this a safe change?
+>       qemu_fdt_add_subnode(fdt, "/cpus");
+> -    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency", 10000000);
+> +    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency",
+> +        SIFIVE_CLINT_TIMEBASE_FREQ);
+>       qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
+>       qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
 
-I would say, because of the 's390' -> 's390x' change, that it isn't.
+> @@ -124,7 +125,8 @@ static void create_fdt(SpikeState *s, const struct
+MemmapEntry *memmap,
+>           char *intc =3D g_strdup_printf("/cpus/cpu@%d/interrupt-controll=
+er",
+cpu);
+>           char *isa =3D riscv_isa_string(&s->soc.harts[cpu]);
+>           qemu_fdt_add_subnode(fdt, nodename);
+> -        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
+1000000000);
+> +        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
+> +                              SPIKE_CLOCK_FREQ);
+>           qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48"=
+);
+>           qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
+>           qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
+> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+> index e2c214e..86a86c9 100644
+> --- a/hw/riscv/virt.c
+> +++ b/hw/riscv/virt.c
+> @@ -145,7 +145,8 @@ static void *create_fdt(RISCVVirtState *s, const
+struct MemmapEntry *memmap,
+>       g_free(nodename);
 
-(Also, to confirm, the wiki section at
-<https://wiki.qemu.org/Planning/2.12#Issues_that_will_not_be_fixed> states,
+>       qemu_fdt_add_subnode(fdt, "/cpus");
+> -    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency", 10000000);
+> +    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency",
+> +                          SIFIVE_CLINT_TIMEBASE_FREQ);
+>       qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
+>       qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
 
-  * the query-cpus-fast QMP command reports bogus arch data for all
-    architectures except x86 and s390; applications should be careful to
-    not rely on the bogus information
+> @@ -155,7 +156,8 @@ static void *create_fdt(RISCVVirtState *s, const
+struct MemmapEntry *memmap,
+>           char *intc =3D g_strdup_printf("/cpus/cpu@%d/interrupt-controll=
+er",
+cpu);
+>           char *isa =3D riscv_isa_string(&s->soc.harts[cpu]);
+>           qemu_fdt_add_subnode(fdt, nodename);
+> -        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
+1000000000);
+> +        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
+> +                              VIRT_CLOCK_FREQ);
+>           qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48"=
+);
+>           qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
+>           qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
+> diff --git a/include/hw/riscv/sifive_clint.h
+b/include/hw/riscv/sifive_clint.h
+> index aaa2a58..e2865be 100644
+> --- a/include/hw/riscv/sifive_clint.h
+> +++ b/include/hw/riscv/sifive_clint.h
+> @@ -47,4 +47,8 @@ enum {
+>       SIFIVE_TIME_BASE    =3D 0xBFF8
+>   };
 
-It (correctly) refers to "s390". That value would change.)
+> +enum {
+> +    SIFIVE_CLINT_TIMEBASE_FREQ =3D 10000000
+> +};
+> +
+>   #endif
+> diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+> index 662e8a1..be38aa0 100644
+> --- a/include/hw/riscv/sifive_u.h
+> +++ b/include/hw/riscv/sifive_u.h
+> @@ -50,6 +50,10 @@ enum {
+>       SIFIVE_U_UART1_IRQ =3D 4
+>   };
 
-Thanks
-Laszlo
+> +enum {
+> +    SIFIVE_U_CLOCK_FREQ =3D 1000000000
+> +};
+> +
+>   #define SIFIVE_U_PLIC_HART_CONFIG "MS"
+>   #define SIFIVE_U_PLIC_NUM_SOURCES 127
+>   #define SIFIVE_U_PLIC_NUM_PRIORITIES 7
+> diff --git a/include/hw/riscv/spike.h b/include/hw/riscv/spike.h
+> index cb55a14..d85a64e 100644
+> --- a/include/hw/riscv/spike.h
+> +++ b/include/hw/riscv/spike.h
+> @@ -42,6 +42,10 @@ enum {
+>       SPIKE_DRAM
+>   };
+
+> +enum {
+> +    SPIKE_CLOCK_FREQ =3D 1000000000
+> +};
+> +
+>   #if defined(TARGET_RISCV32)
+>   #define SPIKE_V1_09_1_CPU TYPE_RISCV_CPU_RV32GCSU_V1_09_1
+>   #define SPIKE_V1_10_0_CPU TYPE_RISCV_CPU_RV32GCSU_V1_10_0
+> diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
+> index 7525647..2fbe808 100644
+> --- a/include/hw/riscv/virt.h
+> +++ b/include/hw/riscv/virt.h
+> @@ -55,6 +55,10 @@ enum {
+>       VIRTIO_NDEV =3D 10
+>   };
+
+> +enum {
+> +    VIRT_CLOCK_FREQ =3D 1000000000
+> +};
+> +
+>   #define VIRT_PLIC_HART_CONFIG "MS"
+>   #define VIRT_PLIC_NUM_SOURCES 127
+>   #define VIRT_PLIC_NUM_PRIORITIES 7
+> --
+> 2.7.0
