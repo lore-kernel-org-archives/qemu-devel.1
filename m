@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBeQX-0002PQ-6s
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:47:02 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fBeQv-0002iY-I3
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:47:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBeQT-00017l-5H
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:47:01 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59656)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fBeQS-00016H-V5
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:46:57 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fBeQR-0003vP-N7
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 10:46:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AE1252E8060
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 10:46:55 +0000 (UTC)
+	(envelope-from <pm215@archaic.org.uk>) id 1fBeQu-0001Tr-Ky
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:47:25 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41150)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1fBeQu-0001OF-EG
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:47:24 -0400
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
+	(envelope-from <pm215@archaic.org.uk>) id 1fBeQm-0002yn-Fo
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:47:16 +0100
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 26 Apr 2018 11:46:56 +0100
+Message-Id: <20180426104715.21702-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Apr 2018 10:30:21 -0000
-From: Thomas Huth <628082@bugs.launchpad.net>
-Reply-To: Bug 628082 <628082@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20100901133500.26711.95342.malonedeb@wampee.canonical.com>
-Message-Id: <152473862169.6712.16315240085633341145.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 628082] Re: nl-be keymap is wrong
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 00/19] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,39 +30,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-There have been quite a lot of changes with regards to keyboard mapping
-in QEMU recently, could you please try again with QEMU 2.12 to see
-whether this has been fixed now?
+First arm pullreq of the 2.13 cycle!
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+-- PMM
 
--- =
+The following changes since commit 4743c23509a51bd4ee85cc272287a41917d1be35:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/628082
+  Update version for v2.12.0 release (2018-04-24 16:44:55 +0100)
 
-Title:
-  nl-be keymap is wrong
+are available in the Git repository at:
 
-Status in QEMU:
-  Incomplete
+  git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20180426
 
-Bug description:
-  As mentioned on
-  https://bugs.launchpad.net/ubuntu/+source/kvm/+bug/429965 as well as
-  the kvm mailinglist
-  (http://thread.gmane.org/gmane.comp.emulators.kvm.devel/14413), the
-  nl-be keymap does not work. The number keys above the regular keys
-  (non-numeric keypad numbers) as well as vital keys such as slash,
-  backslash, dash, ... are not working.
+for you to fetch changes up to fbf32752663878947de455ff57cb5b9318f14bec:
 
-  The nl-be keymap that is presented in the above URLs (and also
-  attached to this bug) does work properly.
+  xilinx_spips: Correct SNOOP_NONE state when flushing the txfifo (2018-04-26 11:04:40 +0100)
 
-  Would it be possible to include this keymap rather than the current
-  one?
+----------------------------------------------------------------
+target-arm queue:
+ * xilinx_spips: Correct SNOOP_NONE state when flushing the txfifo
+ * timer/aspeed: fix vmstate version id
+ * hw/arm/aspeed_soc: don't use vmstate_register_ram_global for SRAM
+ * hw/arm/aspeed: don't make 'boot_rom' region 'nomigrate'
+ * hw/arm/highbank: don't make sysram 'nomigrate'
+ * hw/arm/raspi: Don't bother setting default_cpu_type
+ * PMU emulation: some minor bugfixes and preparation for
+   support of other events than just the cycle counter
+ * target/arm: Use v7m_stack_read() for reading the frame signature
+ * target/arm: Remove stale TODO comment
+ * arm: always start from first_cpu when registering loader cpu reset callback
+ * device_tree: Increase FDT_MAX_SIZE to 1 MiB
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/628082/+subscriptions
+----------------------------------------------------------------
+Aaron Lindsay (9):
+      target/arm: Check PMCNTEN for whether PMCCNTR is enabled
+      target/arm: Treat PMCCNTR as alias of PMCCNTR_EL0
+      target/arm: Mask PMU register writes based on PMCR_EL0.N
+      target/arm: Fetch GICv3 state directly from CPUARMState
+      target/arm: Support multiple EL change hooks
+      target/arm: Add pre-EL change hooks
+      target/arm: Allow EL change hooks to do IO
+      target/arm: Fix bitmask for PMCCFILTR writes
+      target/arm: Make PMOVSCLR and PMUSERENR 64 bits wide
+
+Cédric Le Goater (1):
+      timer/aspeed: fix vmstate version id
+
+Geert Uytterhoeven (1):
+      device_tree: Increase FDT_MAX_SIZE to 1 MiB
+
+Igor Mammedov (1):
+      arm: always start from first_cpu when registering loader cpu reset callback
+
+Peter Maydell (6):
+      target/arm: Remove stale TODO comment
+      target/arm: Use v7m_stack_read() for reading the frame signature
+      hw/arm/raspi: Don't bother setting default_cpu_type
+      hw/arm/highbank: don't make sysram 'nomigrate'
+      hw/arm/aspeed: don't make 'boot_rom' region 'nomigrate'
+      hw/arm/aspeed_soc: don't use vmstate_register_ram_global for SRAM
+
+Sai Pavan Boddu (1):
+      xilinx_spips: Correct SNOOP_NONE state when flushing the txfifo
+
+ target/arm/cpu.h           | 48 +++++++++++++++++-------------
+ target/arm/internals.h     | 14 +++++++--
+ device_tree.c              |  2 +-
+ hw/arm/aspeed.c            |  2 +-
+ hw/arm/aspeed_soc.c        |  3 +-
+ hw/arm/boot.c              |  2 +-
+ hw/arm/highbank.c          |  2 +-
+ hw/arm/raspi.c             |  2 --
+ hw/intc/arm_gicv3_cpuif.c  | 10 ++-----
+ hw/ssi/xilinx_spips.c      |  3 +-
+ hw/timer/aspeed_timer.c    |  2 +-
+ target/arm/cpu.c           | 37 +++++++++++++++++++----
+ target/arm/helper.c        | 73 ++++++++++++++++++++++++++--------------------
+ target/arm/op_helper.c     |  8 +++++
+ target/arm/translate-a64.c |  6 ++++
+ target/arm/translate.c     | 12 ++++++++
+ 16 files changed, 148 insertions(+), 78 deletions(-)
