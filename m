@@ -1,15 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBiNT-0006Ch-6Y
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:00:11 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fBiWH-0002yN-Bi
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:09:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBiNM-0003gN-Ny
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:00:07 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 26 Apr 2018 16:59:54 +0200
-Message-Id: <1524754794-28005-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] hw/s390x: Allow to configure the consoles with
- the "-serial" parameter
+	(envelope-from <pm215@archaic.org.uk>) id 1fBiWA-0007tX-TU
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:09:13 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41170)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1fBiWA-0007rh-Gy
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:09:06 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 26 Apr 2018 16:09:01 +0100
+Message-Id: <20180426150901.30278-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [RFC PATCH] mmio-exec: Make device return MemoryRegion
+ rather than host pointer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,276 +23,289 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-s390x@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Francisco Iglesias <frasse.iglesias@gmail.com>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, KONRAD Frederic <frederic.konrad@adacore.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "Emilio G. Cota" <cota@braap.org>
 
-The consoles ("sclpconsole" and "sclplmconsole") can only be configured
-with "-device" and "-chardev" so far. Other machines use the convenience
-option "-serial" to configure the default consoles, even for virtual
-consoles like spapr-vty on the pseries machine. So let's support this
-option on s390x, too. This way we can easily enable the serial console
-here again with "-nodefaults", for example:
+Our current interface for allowing a device to support execution from
+MMIO regions has the device return a pointer into host memory
+containing the contents to be used for execution.  Unfortunately the
+obvious implementation this encourages (and which our only in-tree
+user uses) is to have a single buffer which is reused for each new
+request_ptr call.  This doesn't work, because RCU means that removal
+of the old RAMBlock based on the host pointer may be deferred until a
+point after a new RAMBlock with the same pointer has been added to
+the list.  The RAMBlock APIs assume that the host-pointer to ram_addr
+mapping is unique, and mmio-exec is breaking that assumption.
 
-qemu-system-s390x -no-shutdown -nographic -nodefaults -serial mon:stdio
+Instead, change the API so that the device is responsible for
+allocating a new RAM MemoryRegion and populating it.  The
+MemoryRegion will be g_free()d when the region is eventually
+invalidated or otherwise unneeded.
 
-... which is way shorter than typing:
+HACKS:
+ * Note that in order for the refcounting to work correctly without
+   having to manufacture a device purely to be the owner of the
+   MemoryRegion, we must pass OBJECT(newmr) as the owner (so the MR is
+   its own owner!) and NULL as the name (or the property created on the
+   owner causes the refcount to go negative during finalization)...
 
-qemu-system-s390x -no-shutdown -nographic -nodefaults \
-  -chardev stdio,id=c1,mux=on -device sclpconsole,chardev=c1 \
-  -mon chardev=c1
+QUESTIONS:
+ * do we really need to postpone things from
+   memory_region_invalidate_mmio_ptr() to
+   memory_region_do_invalidate_mmio_ptr(), given that the deletion of
+   the memory region and ramblock is RCU-deferred anyway?
+ * should we add the subregion at elevated prio so it definitely hits
+   first?  I've left it the way the existing code does for the
+   moment...
+ * is there any way to avoid the weird self-owning MemoryRegion
+   and corresponding need to pass a NULL name pointer?
 
-The -serial parameter can also be used if you only want to see the QEMU
-monitor on stdio without using -nodefaults, but not the console output.
-That's something that is pretty impossible with the current code today:
+NOTES:
+ * This change means that hw/misc/mmio_interface.c is no longer
+   used; if this gets beyond RFC stage then another patch to
+   delete it can follow.
+ * The "request_mmio_exec mustn't fail after it has called
+   memory_region_mmio_ptr_alloc()" requirement is a bit ugly, but
+   could probably be removed.
 
-qemu-system-s390x -no-shutdown -nographic -serial none
-
-While we're at it, this patch also maps the second -serial option to the
-"sclplmconsole", so that there is now an easy way to configure this second
-console on s390x, too, for example:
-
-qemu-system-s390x -no-shutdown -nographic -serial null -serial mon:stdio
-
-Additionally, the new code is also smaller than the old one and we have
-less s390x-specific code in vl.c :-)
-
-I've also checked that migration still works as expected by migrating
-a guest with console output back and forth between a qemu-system-s390x
-that has this patch and an instance without this patch.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- v2:
- - Fixed the boot-serial-tester
- - Switched to the new serial_hd() function
+This is decidedly RFC, but it is sufficient to get the xilinx-spips
+mmio-execution test case to run without crashing. Mostly looking for
+feedback on whether this is the right general direction or a load
+of rubbish :-)
 
- hw/s390x/event-facility.c         | 14 +++++++++++
- hw/s390x/s390-virtio-ccw.c        | 19 +++++++++++++--
- include/hw/boards.h               |  1 -
- include/hw/s390x/event-facility.h |  2 ++
- tests/boot-serial-test.c          |  3 +--
- vl.c                              | 50 ---------------------------------------
- 6 files changed, 34 insertions(+), 55 deletions(-)
+ include/exec/memory.h | 44 ++++++++++++++++++++----
+ hw/ssi/xilinx_spips.c | 22 ++++++++----
+ memory.c              | 78 ++++++++++++++++++++++++++++---------------
+ 3 files changed, 105 insertions(+), 39 deletions(-)
 
-diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-index 9c24bc6..e6940a2 100644
---- a/hw/s390x/event-facility.c
-+++ b/hw/s390x/event-facility.c
-@@ -511,3 +511,17 @@ static void register_types(void)
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 31eae0a640..e55e06a166 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -139,14 +139,32 @@ struct MemoryRegionOps {
+                                     unsigned size,
+                                     MemTxAttrs attrs);
+     /* Instruction execution pre-callback:
+-     * @addr is the address of the access relative to the @mr.
+-     * @size is the size of the area returned by the callback.
+-     * @offset is the location of the pointer inside @mr.
++     * @opaque is the opaque pointer for the MemoryRegion.
++     * @alloc_token is a token to pass to memory_region_mmio_ptr_alloc()
++     * @offset contains the address of the access relative to the @mr.
+      *
+-     * Returns a pointer to a location which contains guest code.
++     * The request_mmio_exec callback must:
++     *  - adjust the offset downwards as desired and determine the size
++     *    of the region it wants to provide cached guest code for.
++     *    This must start on a guest page boundary and be a multiple
++     *    of a guest page in size.
++     *  - call memory_region_mmio_ptr_alloc(@alloc_token, size)
++     *  - fill in the contents of the RAM
++     * Ownership of @newmr remains with the caller; it will be
++     * automatically freed when no longer in use.
++     *
++     * If the callback cannot satisfy the request then it should
++     * return false. Otherwise it must
++     *  - update @offset to the offset of the memory within the MemoryRegion
++     *    this is a callback for (ie the possibly rounded down value)
++     *  - return true
++     * Note that if you return false then execution of the guest is going
++     * to go wrong, either by QEMU delivering a bus abort exception to the
++     * guest, or by simply exiting as unable to handle the situation, in
++     * the same way that it would if you did not provide a request_mmio_exec
++     * callback at all.
+      */
+-    void *(*request_ptr)(void *opaque, hwaddr addr, unsigned *size,
+-                         unsigned *offset);
++    bool (*request_mmio_exec)(void *opaque, void *alloc_token, hwaddr *offset);
+ 
+     enum device_endian endianness;
+     /* Guest-visible constraints: */
+@@ -1569,6 +1587,20 @@ bool memory_region_request_mmio_ptr(MemoryRegion *mr, hwaddr addr);
+ void memory_region_invalidate_mmio_ptr(MemoryRegion *mr, hwaddr offset,
+                                        unsigned size);
+ 
++/**
++ * memory_region_mmio_ptr_alloc: allocate memory from request_mmio_exec callback
++ *
++ * This function should be called only from a MemoryRegion's request_mmio_exec
++ * callback function, in order to allocate the memory that should be filled
++ * with the cached contents to be executed.
++ * Note that once the request_mmio_exec callback calls this function it is
++ * committed to handling the request, and may not return false.
++ *
++ * @alloc_token: the argument passed into the request_mmio_exec callback
++ * @size: size in bytes to allocate
++ */
++void *memory_region_mmio_ptr_alloc(void *alloc_token, uint64_t size);
++
+ /**
+  * memory_region_dispatch_read: perform a read directly to the specified
+  * MemoryRegion.
+diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+index 03f5faee4b..8bb049f797 100644
+--- a/hw/ssi/xilinx_spips.c
++++ b/hw/ssi/xilinx_spips.c
+@@ -1202,21 +1202,29 @@ static void lqspi_load_cache(void *opaque, hwaddr addr)
+     }
  }
  
- type_init(register_types)
+-static void *lqspi_request_mmio_ptr(void *opaque, hwaddr addr, unsigned *size,
+-                                    unsigned *offset)
++static bool lqspi_request_mmio_exec(void *opaque, void *alloc_token,
++                                    hwaddr *offset)
+ {
+     XilinxQSPIPS *q = opaque;
+     hwaddr offset_within_the_region;
++    void *hostptr;
+ 
+     if (!q->mmio_execution_enabled) {
+-        return NULL;
++        return false;
+     }
+ 
+-    offset_within_the_region = addr & ~(LQSPI_CACHE_SIZE - 1);
++    /* This could perhaps be cleverer and avoid the memcpy by
++     * caching directly into the allocated area.
++     */
++    offset_within_the_region = *offset & ~(LQSPI_CACHE_SIZE - 1);
+     lqspi_load_cache(opaque, offset_within_the_region);
+-    *size = LQSPI_CACHE_SIZE;
 +
-+BusState *sclp_get_event_facility_bus(void)
++    hostptr = memory_region_mmio_ptr_alloc(alloc_token, LQSPI_CACHE_SIZE);
++
++    memcpy(hostptr, q->lqspi_buf, LQSPI_CACHE_SIZE);
++
+     *offset = offset_within_the_region;
+-    return q->lqspi_buf;
++    return true;
+ }
+ 
+ static uint64_t
+@@ -1240,7 +1248,7 @@ lqspi_read(void *opaque, hwaddr addr, unsigned int size)
+ 
+ static const MemoryRegionOps lqspi_ops = {
+     .read = lqspi_read,
+-    .request_ptr = lqspi_request_mmio_ptr,
++    .request_mmio_exec = lqspi_request_mmio_exec,
+     .endianness = DEVICE_NATIVE_ENDIAN,
+     .valid = {
+         .min_access_size = 1,
+diff --git a/memory.c b/memory.c
+index e70b64b8b9..71dec85156 100644
+--- a/memory.c
++++ b/memory.c
+@@ -2653,41 +2653,74 @@ void memory_listener_unregister(MemoryListener *listener)
+ 
+ bool memory_region_request_mmio_ptr(MemoryRegion *mr, hwaddr addr)
+ {
+-    void *host;
+-    unsigned size = 0;
+-    unsigned offset = 0;
+-    Object *new_interface;
++    MemoryRegion *newmr;
++    hwaddr offset;
+ 
+-    if (!mr || !mr->ops->request_ptr) {
++    if (!mr || !mr->ops->request_mmio_exec) {
+         return false;
+     }
+ 
+     /*
+-     * Avoid an update if the request_ptr call
+-     * memory_region_invalidate_mmio_ptr which seems to be likely when we use
+-     * a cache.
++     * Avoid an update if the request_mmio_exec hook calls
++     * memory_region_invalidate_mmio_ptr, which it will do if the
++     * device can only handle one outstanding MMIO exec region at once.
+      */
+     memory_region_transaction_begin();
+ 
+-    host = mr->ops->request_ptr(mr->opaque, addr - mr->addr, &size, &offset);
+-
+-    if (!host || !size) {
++    newmr = g_new0(MemoryRegion, 1);
++    offset = addr - mr->addr;
++    if (!mr->ops->request_mmio_exec(mr->opaque, newmr, &offset)) {
+         memory_region_transaction_commit();
++        g_free(newmr);
+         return false;
+     }
+ 
+-    new_interface = object_new("mmio_interface");
+-    qdev_prop_set_uint64(DEVICE(new_interface), "start", offset);
+-    qdev_prop_set_uint64(DEVICE(new_interface), "end", offset + size - 1);
+-    qdev_prop_set_bit(DEVICE(new_interface), "ro", true);
+-    qdev_prop_set_ptr(DEVICE(new_interface), "host_ptr", host);
+-    qdev_prop_set_ptr(DEVICE(new_interface), "subregion", mr);
+-    object_property_set_bool(OBJECT(new_interface), true, "realized", NULL);
++    /* These requirements are because currently TCG needs a page sized
++     * area to execute from.
++     */
++    assert((offset & ~TARGET_PAGE_MASK) == 0);
++    assert((memory_region_size(newmr) & ~TARGET_PAGE_MASK) == 0);
+ 
++
++    memory_region_add_subregion(mr, offset, newmr);
+     memory_region_transaction_commit();
++
++    /* Arrange that we automatically free this MemoryRegion when
++     * its refcount goes to zero, which (once we've unrefed it here)
++     * will happen when it is removed from the subregion.
++     */
++    OBJECT(newmr)->free = g_free;
++    object_unref(OBJECT(newmr));
+     return true;
+ }
+ 
++void *memory_region_mmio_ptr_alloc(void *alloc_token, uint64_t size)
 +{
-+    Object *busobj;
-+    SCLPEventsBus *sbus;
++    /* Allocate and return memory for an mmio_ptr request. This
++     * is a function intended to be called from a memory region's
++     * request_mmio_exec function, and the opaque pointer is the
++     * newmr MemoryRegion allocated in memory_region_request_mmio_ptr().
++     */
++    MemoryRegion *newmr = alloc_token;
++    Error *err = NULL;
 +
-+    busobj = object_resolve_path_type("", TYPE_SCLP_EVENTS_BUS, NULL);
-+    sbus = OBJECT_CHECK(SCLPEventsBus, busobj, TYPE_SCLP_EVENTS_BUS);
-+    if (!sbus) {
++    /* Note that in order for the refcounting to work correctly
++     * without having to manufacture a device purely to be the
++     * owner of the MemoryRegion, we must pass OBJECT(newmr) as
++     * the owner (so the MR is its own owner!) and NULL as the name
++     * (or the property created on the owner causes the refcount
++     * to go negative during finalization)...
++     */
++    memory_region_init_ram_nomigrate(newmr, OBJECT(newmr), NULL,
++                                     size, &err);
++    if (err) {
++        error_free(err);
 +        return NULL;
 +    }
 +
-+    return &sbus->qbus;
-+}
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 435f7c9..70305d0 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -288,6 +288,15 @@ static void s390_create_virtio_net(BusState *bus, const char *name)
-     }
- }
- 
-+static void s390_create_sclpconsole(const char *type, Chardev *chardev)
-+{
-+    DeviceState *dev;
-+
-+    dev = qdev_create(sclp_get_event_facility_bus(), type);
-+    qdev_prop_set_chr(dev, "chardev", chardev);
-+    qdev_init_nofail(dev);
++    return memory_region_get_ram_ptr(newmr);
 +}
 +
- static void ccw_init(MachineState *machine)
- {
-     int ret;
-@@ -346,6 +355,14 @@ static void ccw_init(MachineState *machine)
-     /* Create VirtIO network adapters */
-     s390_create_virtio_net(BUS(css_bus), "virtio-net-ccw");
+ typedef struct MMIOPtrInvalidate {
+     MemoryRegion *mr;
+     hwaddr offset;
+@@ -2714,15 +2747,8 @@ static void memory_region_do_invalidate_mmio_ptr(CPUState *cpu,
+     cpu_physical_memory_test_and_clear_dirty(offset, size, 1);
  
-+    /* init consoles */
-+    if (serial_hd(0)) {
-+        s390_create_sclpconsole("sclpconsole", serial_hd(0));
-+    }
-+    if (serial_hd(1)) {
-+        s390_create_sclpconsole("sclplmconsole", serial_hd(1));
-+    }
-+
-     /* Register savevm handler for guest TOD clock */
-     register_savevm_live(NULL, "todclock", 0, 1, &savevm_gtod, NULL);
- }
-@@ -470,10 +487,8 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
-     mc->block_default_type = IF_VIRTIO;
-     mc->no_cdrom = 1;
-     mc->no_floppy = 1;
--    mc->no_serial = 1;
-     mc->no_parallel = 1;
-     mc->no_sdcard = 1;
--    mc->use_sclp = 1;
-     mc->max_cpus = S390_MAX_CPUS;
-     mc->has_hotpluggable_cpus = true;
-     mc->get_hotplug_handler = s390_get_hotplug_handler;
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index a609239..5c5eee5 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -180,7 +180,6 @@ struct MachineClass {
-     unsigned int no_serial:1,
-         no_parallel:1,
-         use_virtcon:1,
--        use_sclp:1,
-         no_floppy:1,
-         no_cdrom:1,
-         no_sdcard:1,
-diff --git a/include/hw/s390x/event-facility.h b/include/hw/s390x/event-facility.h
-index 5698e5e..5cc16f6 100644
---- a/include/hw/s390x/event-facility.h
-+++ b/include/hw/s390x/event-facility.h
-@@ -210,4 +210,6 @@ typedef struct SCLPEventFacilityClass {
-     bool (*event_pending)(SCLPEventFacility *ef);
- } SCLPEventFacilityClass;
- 
-+BusState *sclp_get_event_facility_bus(void);
-+
- #endif
-diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-index 011525d..4d6815c 100644
---- a/tests/boot-serial-test.c
-+++ b/tests/boot-serial-test.c
-@@ -96,8 +96,7 @@ static testdef_t tests[] = {
-     { "sparc", "SS-4", "", "MB86904" },
-     { "sparc", "SS-600MP", "", "TMS390Z55" },
-     { "sparc64", "sun4u", "", "UltraSPARC" },
--    { "s390x", "s390-ccw-virtio",
--      "-nodefaults -device sclpconsole,chardev=serial0", "virtio device" },
-+    { "s390x", "s390-ccw-virtio", "", "virtio device" },
-     { "m68k", "mcf5208evb", "", "TT", sizeof(kernel_mcf5208), kernel_mcf5208 },
-     { "microblaze", "petalogix-s3adsp1800", "", "TT",
-       sizeof(kernel_pls3adsp1800), kernel_pls3adsp1800 },
-diff --git a/vl.c b/vl.c
-index 616956a..91a589c 100644
---- a/vl.c
-+++ b/vl.c
-@@ -133,7 +133,6 @@ int main(int argc, char **argv)
- #include "sysemu/iothread.h"
- 
- #define MAX_VIRTIO_CONSOLES 1
--#define MAX_SCLP_CONSOLES 1
- 
- static const char *data_dir[16];
- static int data_dir_idx;
-@@ -158,7 +157,6 @@ static int num_serial_hds = 0;
- static Chardev **serial_hds = NULL;
- Chardev *parallel_hds[MAX_PARALLEL_PORTS];
- Chardev *virtcon_hds[MAX_VIRTIO_CONSOLES];
--Chardev *sclp_hds[MAX_SCLP_CONSOLES];
- int win2k_install_hack = 0;
- int singlestep = 0;
- int smp_cpus;
-@@ -210,7 +208,6 @@ static int has_defaults = 1;
- static int default_serial = 1;
- static int default_parallel = 1;
- static int default_virtcon = 1;
--static int default_sclp = 1;
- static int default_monitor = 1;
- static int default_floppy = 1;
- static int default_cdrom = 1;
-@@ -2584,39 +2581,6 @@ static int virtcon_parse(const char *devname)
-     return 0;
- }
- 
--static int sclp_parse(const char *devname)
--{
--    QemuOptsList *device = qemu_find_opts("device");
--    static int index = 0;
--    char label[32];
--    QemuOpts *dev_opts;
--
--    if (strcmp(devname, "none") == 0) {
--        return 0;
--    }
--    if (index == MAX_SCLP_CONSOLES) {
--        error_report("too many sclp consoles");
--        exit(1);
--    }
--
--    assert(arch_type == QEMU_ARCH_S390X);
--
--    dev_opts = qemu_opts_create(device, NULL, 0, NULL);
--    qemu_opt_set(dev_opts, "driver", "sclpconsole", &error_abort);
--
--    snprintf(label, sizeof(label), "sclpcon%d", index);
--    sclp_hds[index] = qemu_chr_new(label, devname);
--    if (!sclp_hds[index]) {
--        error_report("could not connect sclp console"
--                     " to character backend '%s'", devname);
--        return -1;
--    }
--    qemu_opt_set(dev_opts, "chardev", label, &error_abort);
--
--    index++;
--    return 0;
--}
--
- static int debugcon_parse(const char *devname)
- {
-     QemuOpts *opts;
-@@ -4250,9 +4214,6 @@ int main(int argc, char **argv, char **envp)
-     if (!has_defaults || !machine_class->use_virtcon) {
-         default_virtcon = 0;
-     }
--    if (!has_defaults || !machine_class->use_sclp) {
--        default_sclp = 0;
--    }
-     if (!has_defaults || machine_class->no_floppy) {
-         default_floppy = 0;
-     }
-@@ -4299,16 +4260,11 @@ int main(int argc, char **argv, char **envp)
-             add_device_config(DEV_SERIAL, "mon:stdio");
-         } else if (default_virtcon && default_monitor) {
-             add_device_config(DEV_VIRTCON, "mon:stdio");
--        } else if (default_sclp && default_monitor) {
--            add_device_config(DEV_SCLP, "mon:stdio");
-         } else {
-             if (default_serial)
-                 add_device_config(DEV_SERIAL, "stdio");
-             if (default_virtcon)
-                 add_device_config(DEV_VIRTCON, "stdio");
--            if (default_sclp) {
--                add_device_config(DEV_SCLP, "stdio");
--            }
-             if (default_monitor)
-                 monitor_parse("stdio", "readline", false);
-         }
-@@ -4321,9 +4277,6 @@ int main(int argc, char **argv, char **envp)
-             monitor_parse("vc:80Cx24C", "readline", false);
-         if (default_virtcon)
-             add_device_config(DEV_VIRTCON, "vc:80Cx24C");
--        if (default_sclp) {
--            add_device_config(DEV_SCLP, "vc:80Cx24C");
+     if (section.mr != mr) {
+-        /* memory_region_find add a ref on section.mr */
++        memory_region_del_subregion(mr, section.mr);
+         memory_region_unref(section.mr);
+-        if (MMIO_INTERFACE(section.mr->owner)) {
+-            /* We found the interface just drop it. */
+-            object_property_set_bool(section.mr->owner, false, "realized",
+-                                     NULL);
+-            object_unref(section.mr->owner);
+-            object_unparent(section.mr->owner);
 -        }
      }
  
- #if defined(CONFIG_VNC)
-@@ -4573,9 +4526,6 @@ int main(int argc, char **argv, char **envp)
-         exit(1);
-     if (foreach_device_config(DEV_VIRTCON, virtcon_parse) < 0)
-         exit(1);
--    if (foreach_device_config(DEV_SCLP, sclp_parse) < 0) {
--        exit(1);
--    }
-     if (foreach_device_config(DEV_DEBUGCON, debugcon_parse) < 0)
-         exit(1);
- 
+     qemu_mutex_unlock_iothread();
 -- 
-1.8.3.1
+2.17.0
