@@ -1,30 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48974)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fBh1d-0002eE-GB
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 09:33:33 -0400
+	(envelope-from <eblake@redhat.com>) id 1fBhBB-0005M4-QA
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 09:43:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fBh1Z-0007Cp-JE
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 09:33:29 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46486 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fBh1Z-0007CV-EL
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 09:33:25 -0400
-From: Laszlo Ersek <lersek@redhat.com>
-References: <20180424214550.32549-1-lersek@redhat.com>
-	<20180424214550.32549-7-lersek@redhat.com>
-	<8736zjagg3.fsf@dusky.pond.sub.org>
-	<4509705a-43b2-db40-aa24-18eff649e750@redhat.com>
-	<87sh7i4h5y.fsf@dusky.pond.sub.org>
-	<ea646e6d-9512-559d-be8d-fd3c754cc301@redhat.com>
-Message-ID: <136c5d3a-9d5b-eb15-a1f4-18150662144b@redhat.com>
-Date: Thu, 26 Apr 2018 15:33:15 +0200
-MIME-Version: 1.0
-In-Reply-To: <ea646e6d-9512-559d-be8d-fd3c754cc301@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 6/6] qapi: discriminate CpuInfo[Fast] on
- SysEmuTarget, not CpuInfoArch
+	(envelope-from <eblake@redhat.com>) id 1fBhBB-0003mt-0Q
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 09:43:21 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Thu, 26 Apr 2018 08:43:03 -0500
+Message-Id: <20180426134305.642080-2-eblake@redhat.com>
+In-Reply-To: <20180426134305.642080-1-eblake@redhat.com>
+References: <20180426134305.642080-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/3] vdi: Switch to byte-based calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,43 +19,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, Stefan Weil <sw@weilnetz.de>, Max Reitz <mreitz@redhat.com>
 
-On 04/26/18 11:18, Laszlo Ersek wrote:
-> On 04/26/18 08:26, Markus Armbruster wrote:
->> Laszlo Ersek <lersek@redhat.com> writes:
->>
->> [...]
->>> In brief, I think extending configure / the build system would only help
->>> with the less painful part of this (the scalar mapping), and so it's not
->>> worth doing.
->>
->> We're going to leave deprecated query-cpus alone (see Eric's review of
->> the previous patch).
-> 
-> Yes.
-> 
->> Does that change matters?
-> 
-> It does.
-> 
->> PS: Instead of configure changes, #TARGET_BASE_ARCH might do.
-> 
-> Does that already exist as a macro? Hmm... After grepping my build dir,
-> it doesn't seem to, but maybe I can change that. Because,
-> TARGET_BASE_ARCH is exactly what we need.
+We are gradually moving away from sector-based interfaces, towards
+byte-based.  Make the change for the last few sector-based calls
+into the block layer from the vdi driver.
 
-Acerbic discovery of the day: @CpuInfoArch has "x86", while configure
-produces:
+Ideally, the vdi driver should switch to doing everything
+byte-based, but that's a more invasive change that requires a
+bit more auditing.
 
-  TARGET_NAME  TARGET_BASE_ARCH
-         i386              i386
-       x86_64              i386
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ block/vdi.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-Note how "i386" does not match "x86".
+diff --git a/block/vdi.c b/block/vdi.c
+index 4a2d1ff88d4..fd745982caf 100644
+--- a/block/vdi.c
++++ b/block/vdi.c
+@@ -379,7 +379,7 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
 
-I guess I'll have to keep the sysemu_target_to_cpuinfo_arch() function.
+     logout("\n");
 
-Thanks
-Laszlo
+-    ret = bdrv_read(bs->file, 0, (uint8_t *)&header, 1);
++    ret = bdrv_pread(bs->file, 0, &header, sizeof(header));
+     if (ret < 0) {
+         goto fail;
+     }
+@@ -468,15 +468,14 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
+     s->header = header;
+
+     bmap_size = header.blocks_in_image * sizeof(uint32_t);
+-    bmap_size = DIV_ROUND_UP(bmap_size, SECTOR_SIZE);
+-    s->bmap = qemu_try_blockalign(bs->file->bs, bmap_size * SECTOR_SIZE);
++    s->bmap = qemu_try_blockalign(bs->file->bs, bmap_size);
+     if (s->bmap == NULL) {
+         ret = -ENOMEM;
+         goto fail;
+     }
+
+-    ret = bdrv_read(bs->file, s->bmap_sector, (uint8_t *)s->bmap,
+-                    bmap_size);
++    ret = bdrv_pread(bs->file, s->bmap_sector * SECTOR_SIZE, s->bmap,
++                     bmap_size);
+     if (ret < 0) {
+         goto fail_free_bmap;
+     }
+@@ -695,7 +694,7 @@ nonallocating_write:
+         assert(VDI_IS_ALLOCATED(bmap_first));
+         *header = s->header;
+         vdi_header_to_le(header);
+-        ret = bdrv_write(bs->file, 0, block, 1);
++        ret = bdrv_pwrite(bs->file, 0, block, SECTOR_SIZE);
+         g_free(block);
+         block = NULL;
+
+@@ -713,7 +712,8 @@ nonallocating_write:
+         base = ((uint8_t *)&s->bmap[0]) + bmap_first * SECTOR_SIZE;
+         logout("will write %u block map sectors starting from entry %u\n",
+                n_sectors, bmap_first);
+-        ret = bdrv_write(bs->file, offset, base, n_sectors);
++        ret = bdrv_pwrite(bs->file, offset * SECTOR_SIZE, base,
++                          n_sectors * SECTOR_SIZE);
+     }
+
+     return ret;
+-- 
+2.14.3
