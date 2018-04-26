@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fBmqB-0005RQ-Ia
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 15:46:04 -0400
+	(envelope-from <wlosh@bsdimp.com>) id 1fBmvh-00073Z-Dh
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 15:51:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fBmq8-0005Jc-GC
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 15:46:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50906 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fBmq8-0005J4-AS
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 15:46:00 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D9A2D8E7B9
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 19:45:59 +0000 (UTC)
-References: <20180426183404.3756-1-lersek@redhat.com>
-	<20180426183404.3756-5-lersek@redhat.com>
-	<16b5979b-3db1-73fe-fb9b-d73b08b11177@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <af535d63-2b57-7707-1a5d-0d7175122c52@redhat.com>
-Date: Thu, 26 Apr 2018 14:45:58 -0500
+	(envelope-from <wlosh@bsdimp.com>) id 1fBmve-0001k2-A6
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 15:51:45 -0400
+Received: from mail-it0-x231.google.com ([2607:f8b0:4001:c0b::231]:55908)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <wlosh@bsdimp.com>) id 1fBmve-0001jh-1c
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 15:51:42 -0400
+Received: by mail-it0-x231.google.com with SMTP id 144-v6so11159427iti.5
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 12:51:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <16b5979b-3db1-73fe-fb9b-d73b08b11177@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="wbUDv1wNrcrQojHsnlsMiBhTZ6cFjsAoz"
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] qapi: discriminate CpuInfoFast on
- SysEmuTarget, not CpuInfoArch
+Sender: wlosh@bsdimp.com
+In-Reply-To: <CAFEAcA9ycYWLJfog5ieugos2DzQGQHU5iyEAutPWCA7Pfr5HpQ@mail.gmail.com>
+References: <AFF77CBF-01EC-494F-AA9C-9820F368EA32@gmail.com>
+	<CAFEAcA9ycYWLJfog5ieugos2DzQGQHU5iyEAutPWCA7Pfr5HpQ@mail.gmail.com>
+From: Warner Losh <imp@bsdimp.com>
+Date: Thu, 26 Apr 2018 13:51:40 -0600
+Message-ID: <CANCZdfo+da8TRAxz=-69r-ert5b83FaXL=zkBWJGZ_w3n0oZeg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Large patch set advice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,61 +30,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, qemu devel list <qemu-devel@nongnu.org>
-Cc: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wbUDv1wNrcrQojHsnlsMiBhTZ6cFjsAoz
-From: Eric Blake <eblake@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>, qemu devel list <qemu-devel@nongnu.org>
-Cc: Markus Armbruster <armbru@redhat.com>
-Message-ID: <af535d63-2b57-7707-1a5d-0d7175122c52@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] qapi: discriminate CpuInfoFast on
- SysEmuTarget, not CpuInfoArch
-References: <20180426183404.3756-1-lersek@redhat.com>
- <20180426183404.3756-5-lersek@redhat.com>
- <16b5979b-3db1-73fe-fb9b-d73b08b11177@redhat.com>
-In-Reply-To: <16b5979b-3db1-73fe-fb9b-d73b08b11177@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, Apr 26, 2018 at 2:11 AM, Peter Maydell <peter.maydell@linaro.org>
+wrote:
 
-On 04/26/2018 02:41 PM, Eric Blake wrote:
+> On 25 April 2018 at 20:57, Warner Losh <imp@bsdimp.com> wrote:
+> > I=E2=80=99ve foolishly volunteered to rebase all the changes that the b=
+ad-user
+> > mode folks have done to a recent master rev to get these changes
+> upstreamed.
+> > A number of people have been working on this for a long time. It=E2=80=
+=99s
+> possible
+> > now to run almost any FreeBSD binary from all the architectures. We use
+> it
+> > to do =E2=80=98native=E2=80=99 builds of tens of thousands of packages =
+in a chroot (so
+> > building FreeBSD/arm packages on a FreeBSD amd64 box). The diffs are
+> quite
+> > large (on the order of 42k lines), so I anticipate some bumps in moving
+> > this stuff upstream.
+>
+> So, first up, thanks for agreeing to do this. It sounds from your
+> mail like you're already pretty well aware of the usual pitfalls
+> with this kind of work, and I don't really have much to add that's
+> QEMU specific that nobody else has said already.
+>
 
-> I also like that this approach is introspectible via 'query-qmp-schema'=
-
-> - if 'query-cpus-fast' has the "target" member, then you know that it i=
-s
-> fixed (you can ignore "arch" in that case, even though you know it
-> works); if it lacks "target", you know that "arch":"s390x" is the only
-
-Correcting myself: "arch":"s390" is the magic string for older qemu; and
-your mapping function from target to arch keeps it that way, so that
-older clients not aware of "target":"s390x" still get the right behavior.=
-
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Yea, this isn't my first rodeo :)
 
 
---wbUDv1wNrcrQojHsnlsMiBhTZ6cFjsAoz
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> One question I do have is about the other BSDs: bsd-user at least
+> in theory is supposed to support freebsd, netbsd and openbsd.
+> Your patchsets should fix freebsd, but do you know what the status
+> is of netbsd and openbsd? Upstream we do compiletest but no runtime
+> testing; I think last time I tried it they didn't work very well,
+> but it would be worth checking with the other BSDs downstream to
+> see if they're using bsd-user and to make sure we don't break anything
+> that is currently working for netbsd/openbsd...
+>
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+I thought that was the empty set: I was under the impression that bsd-user
+in upstream was basically totally broken and nothing non-trivial worked.
+Since nothing is working, I'd posit that it follows that nobody could be
+currently using it. I've certainly heard of no parallel efforts to make
+similar changes for NetBSD/OpenBSD.
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlriLHcACgkQp6FrSiUn
-Q2pmOAgAk0RRu0GYtjvF8XdxCYj0JAdvlUuZhPnOlgAbN2J5hM4IuFB3nxG67Fvk
-TSKVdJ8C8We2vyXCgw5j8XeO1prlcPd4AEkdeMCR4omnBsGln3oTBpG6tSN9VbkV
-7Bq47yJP1FgLU+5W5oFuzpURJ421WMbr+T8DqITNNe7zosxiNOrYyT+luWlwP94U
-phKFcbpWKIi0MF37I2t5H7E2pYbtCBRsSO0jguLLtcyDjU1VsouMVGVGKfRm7wBR
-tCfnaRfAEe+Wp/6fED3P+8TIGF68bukFHSkqUNk3RjETpGQ6MK9AWuGByRwMa6n9
-Q1XbPvzsNUtF9Jr42Xn+cKT3FmLbNg==
-=4sp4
------END PGP SIGNATURE-----
+I have no plans to do any testing of NetBSD or OpenBSD binaries. The vast
+majority of the patches are FreeBSD oriented, but the split is done such
+that NetBSD and OpenBSD specific stuff can be augmented. Although
+NetBSD/OpenBSD share a history with FreeBSD, only the first 150 syscalls or
+so are the same. Around that time, the syscall numbers were assigned
+independently, and the API/ABIs started to diverge, sometimes
+significantly. The people that did the early work made sure that all the
+BSDs could be supported, even if most of the focus has been on making
+FreeBSD binaries work well.
 
---wbUDv1wNrcrQojHsnlsMiBhTZ6cFjsAoz--
+Now, having said that, if somebody pops up and wants to do the work and
+needs changes to make things work, I'm happy to work with them. I think
+this is a reasonable approach, and matches what other projects I've been
+involved with have expected.
+
+Warner
