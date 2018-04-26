@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34686)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1fBm3K-0007yi-Lz
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:55:37 -0400
+	(envelope-from <mst@redhat.com>) id 1fBm56-0000ae-Qo
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:57:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1fBm3J-00005V-Pq
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:55:34 -0400
-Received: from mail-yw0-x243.google.com ([2607:f8b0:4002:c05::243]:45351)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1fBm3J-000058-Kx
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:55:33 -0400
-Received: by mail-yw0-x243.google.com with SMTP id g9-v6so7912589ywb.12
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 11:55:33 -0700 (PDT)
+	(envelope-from <mst@redhat.com>) id 1fBm53-0000vW-Ny
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:57:24 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48100 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fBm53-0000v8-Is
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:57:21 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1F953A2C78
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 18:57:20 +0000 (UTC)
+Date: Thu, 26 Apr 2018 21:57:17 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180426215700-mutt-send-email-mst@kernel.org>
+References: <20180321032124.24028-1-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <2f69532c-8651-ef67-0910-1fad91808608@redhat.com>
-References: <20180425153343.24023-1-alex.bennee@linaro.org>
-	<cb41b3a5-0e3b-f30b-a02c-1cc333d38ab1@redhat.com>
-	<87604ekl0c.fsf@linaro.org>
-	<2f69532c-8651-ef67-0910-1fad91808608@redhat.com>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Thu, 26 Apr 2018 11:55:32 -0700
-Message-ID: <CAMo8BfKJwZOCaQrSCnFMVNy=L8Z0yo7sAw3q5Sfaof-ko_+NjQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] hw/core: expand description of
- null-machine
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180321032124.24028-1-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] vhost: add trace for IOTLB miss
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,31 +32,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
 
-On Thu, Apr 26, 2018 at 11:18 AM, Thomas Huth <thuth@redhat.com> wrote:
-> On 26.04.2018 18:09, Alex Benn=C3=A9e wrote:
->> Thomas Huth <thuth@redhat.com> writes:
->>> Actually, with certain CPUs, you can really use the "none" machine as a
->>> pure instruction set testing system. For example, on m68k, there used t=
-o
->>> be an explicit "dummy" machine for this job, and we removed it in favou=
-r
->>> of the "none" machine:
->>>
->>> https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D22f2dbe7eaf3e12e3=
-8c9c210
->>
->> Ahh OK. Do you know what other CPUs can be used in this way?
->
-> I think it should be possible with at least all the boards that have a
-> "sim" machine, e.g. xtensa, mips, moxie and openrisc.
+On Wed, Mar 21, 2018 at 11:21:24AM +0800, Peter Xu wrote:
+> Add some trace points for IOTLB translation for vhost. After vhost-user
+> is setup, the only IO path that QEMU will participate should be the
+> IOMMU translation, so it'll be good we can track this with explicit
+> timestamps when needed to see how long time we take to do the
+> translation, and whether there's anything stuck inside.  It might be
+> useful for triaging vhost-user problems.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-xtensa sim machine is a bit more than just instruction simulator:
-it instantiates CPU-configuration-specific local memories. It is meant
-to be compatible with Xtensa ISS from Xtensa development tools.
+Could you rebase pls?
 
---=20
-Thanks.
--- Max
+> ---
+>  hw/virtio/trace-events | 1 +
+>  hw/virtio/vhost.c      | 7 +++++++
+>  2 files changed, 8 insertions(+)
+> 
+> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+> index 742ff0f90b..933eaab133 100644
+> --- a/hw/virtio/trace-events
+> +++ b/hw/virtio/trace-events
+> @@ -5,6 +5,7 @@ vhost_commit(bool started, bool changed) "Started: %d Changed: %d"
+>  vhost_region_add_section(const char *name, uint64_t gpa, uint64_t size, uint64_t host) "%s: 0x%"PRIx64"+0x%"PRIx64" @ 0x%"PRIx64
+>  vhost_region_add_section_abut(const char *name, uint64_t new_size) "%s: 0x%"PRIx64
+>  vhost_section(const char *name, int r) "%s:%d"
+> +vhost_iotlb_miss(void *dev, int step) "%p step %d"
+>  
+>  # hw/virtio/virtio.c
+>  virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned out_num) "elem %p size %zd in_num %u out_num %u"
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index d8d0ef92e1..aa68f79510 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -839,12 +839,15 @@ int vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write)
+>  
+>      rcu_read_lock();
+>  
+> +    trace_vhost_iotlb_miss(dev, 1);
+> +
+>      iotlb = address_space_get_iotlb_entry(dev->vdev->dma_as,
+>                                            iova, write);
+>      if (iotlb.target_as != NULL) {
+>          ret = vhost_memory_region_lookup(dev, iotlb.translated_addr,
+>                                           &uaddr, &len);
+>          if (ret) {
+> +            trace_vhost_iotlb_miss(dev, 3);
+>              error_report("Fail to lookup the translated address "
+>                           "%"PRIx64, iotlb.translated_addr);
+>              goto out;
+> @@ -856,10 +859,14 @@ int vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write)
+>          ret = vhost_backend_update_device_iotlb(dev, iova, uaddr,
+>                                                  len, iotlb.perm);
+>          if (ret) {
+> +            trace_vhost_iotlb_miss(dev, 4);
+>              error_report("Fail to update device iotlb");
+>              goto out;
+>          }
+>      }
+> +
+> +    trace_vhost_iotlb_miss(dev, 2);
+> +
+>  out:
+>      rcu_read_unlock();
+>  
+> -- 
+> 2.14.3
