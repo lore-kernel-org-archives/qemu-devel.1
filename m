@@ -1,24 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fBWPQ-00076B-Mv
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 22:13:21 -0400
+	(envelope-from <eblake@redhat.com>) id 1fBX0h-0005Pi-FL
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 22:51:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fBWPP-0005xi-MC
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 22:13:20 -0400
-References: <20180421132929.21610-1-mreitz@redhat.com>
-	<20180421132929.21610-4-mreitz@redhat.com>
-	<5ee0cf91-5533-2500-b4f1-5eac0dee8be4@redhat.com>
-	<377c9a6a-aa05-dec8-52fb-f0cdfc2c2b50@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1fBX0g-00069O-Az
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 22:51:51 -0400
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <ae48f373-a9a5-fb67-3241-4812e13a4b08@redhat.com>
-Date: Wed, 25 Apr 2018 21:12:54 -0500
-MIME-Version: 1.0
-In-Reply-To: <377c9a6a-aa05-dec8-52fb-f0cdfc2c2b50@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="YuCYkA4wgbe523PQNRvXrjD0GkJadfXGA"
-Subject: Re: [Qemu-devel] [PATCH v2 3/9] block: Add BDRV_REQ_WRITE_UNCHANGED
- flag
+Date: Wed, 25 Apr 2018 21:51:27 -0500
+Message-Id: <20180426025129.621969-5-eblake@redhat.com>
+In-Reply-To: <20180426025129.621969-1-eblake@redhat.com>
+References: <20180426025129.621969-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v6 4/6] qcow2: Don't allow overflow during
+ cluster allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,89 +20,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, berto@igalia.com, qemu-block@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---YuCYkA4wgbe523PQNRvXrjD0GkJadfXGA
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <ae48f373-a9a5-fb67-3241-4812e13a4b08@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/9] block: Add BDRV_REQ_WRITE_UNCHANGED
- flag
-References: <20180421132929.21610-1-mreitz@redhat.com>
- <20180421132929.21610-4-mreitz@redhat.com>
- <5ee0cf91-5533-2500-b4f1-5eac0dee8be4@redhat.com>
- <377c9a6a-aa05-dec8-52fb-f0cdfc2c2b50@redhat.com>
-In-Reply-To: <377c9a6a-aa05-dec8-52fb-f0cdfc2c2b50@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Our code was already checking that we did not attempt to
+allocate more clusters than what would fit in an INT64 (the
+physical maximimum if we can access a full off_t's worth of
+data).  But this does not catch smaller limits enforced by
+various spots in the qcow2 image description: L1 and normal
+clusters of L2 are documented as having bits 63-56 reserved
+for other purposes, capping our maximum offset at 64PB (bit
+55 is the maximum bit set).  And for compressed images with
+2M clusters, the cap drops the maximum offset to bit 48, or
+a maximum offset of 512TB.  If we overflow that offset, we
+would write compressed data into one place, but try to
+decompress from another, which won't work.
 
-On 04/25/2018 10:08 AM, Max Reitz wrote:
+It's actually possible to prove that overflow can cause image
+corruption without this patch; I'll add the iotests separately
+in the next commit.
 
->=20
->> Also, that does raise the question of whether you have more work to
->> support write-zero requests with WRITE_UNCHANGED (which indeed sounds
->> like something plausible to support).
->=20
-> I'm afraid I don't quite understand the question.
-> BDRV_REQ_WRITE_UNCHANGED support is usually rather simple because as
-> said above it is only needed by drivers that rely on their parent to
-> request the permissions, i.e. filter drivers.  Since filter drivers jus=
-t
-> forward the requests, all they have to do is retain the
-> BDRV_REQ_WRITE_UNCHANGED flag, be it a zero write or a normal write.
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
-I'm trying to figure out if BDRV_REQ_WRITE_UNCHANGED makes sense for
-bdrv_co_pwrite_zeroes as well as bdrv_co_pwrite. I think the answer is
-yes (if we know the guest already reads zeroes, but need to write to the
-protocol layer anyways because of a commit operation, then mixing both
-BDRV_REQ_WRITE_UNCHANGED and BDRV_REQ_ZERO_WRITE to the block layer
-makes sense, and supported_zero_flags should indeed pass
-BDRV_REQ_WRITE_UNCHANGED on to a driver.
+---
+v6: improve commit message, now that iotests is possible [Max]
+v3: use s->cluster_offset_mask instead of open-coding it [Berto],
+use MIN() to clamp offset on small cluster size, add spec patch
+first to justify clamping even on refcount allocations
+---
+ block/qcow2.h          |  6 ++++++
+ block/qcow2-refcount.c | 21 ++++++++++++++-------
+ 2 files changed, 20 insertions(+), 7 deletions(-)
 
->=20
-> It would be more complicated for format drivers, because they would hav=
-e
-> to verify that the incoming unchanged write actually ends up as an
-> unchanged write in their file.  But we have already recognized that tha=
-t
-> would be too much to ask and that format drivers may want to generally
-> just write anything to their child if it's writable (even regardless of=
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 1df15a18aa1..a3b9faa9d53 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -41,6 +41,12 @@
+ #define QCOW_MAX_CRYPT_CLUSTERS 32
+ #define QCOW_MAX_SNAPSHOTS 65536
 
-> whether the grandparent issues writes to the format driver node), so
-> they always grab a WRITE permission on their file if possible.
-> Therefore, they do not have to support this request flag.
++/* Field widths in qcow2 mean normal cluster offsets cannot reach
++ * 64PB; depending on cluster size, compressed clusters can have a
++ * smaller limit (64PB for up to 16k clusters, then ramps down to
++ * 512TB for 2M clusters).  */
++#define QCOW_MAX_CLUSTER_OFFSET ((1ULL << 56) - 1)
++
+ /* 8 MB refcount table is enough for 2 PB images at 64k cluster size
+  * (128 GB for 512 byte clusters, 2 EB for 2 MB clusters) */
+ #define QCOW_MAX_REFTABLE_SIZE 0x800000
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 6bfc11bb48f..fcbea3c9644 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -31,7 +31,8 @@
+ #include "qemu/bswap.h"
+ #include "qemu/cutils.h"
 
-So qcow2 doesn't have to support the flag, but file-posix.c might want
-to.  Or are you saying that only filter drivers need to advertise
-support for the flag?
+-static int64_t alloc_clusters_noref(BlockDriverState *bs, uint64_t size);
++static int64_t alloc_clusters_noref(BlockDriverState *bs, uint64_t size,
++                                    uint64_t max);
+ static int QEMU_WARN_UNUSED_RESULT update_refcount(BlockDriverState *bs,
+                             int64_t offset, int64_t length, uint64_t addend,
+                             bool decrease, enum qcow2_discard_type type);
+@@ -362,7 +363,8 @@ static int alloc_refcount_block(BlockDriverState *bs,
+     }
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+     /* Allocate the refcount block itself and mark it as used */
+-    int64_t new_block = alloc_clusters_noref(bs, s->cluster_size);
++    int64_t new_block = alloc_clusters_noref(bs, s->cluster_size,
++                                             QCOW_MAX_CLUSTER_OFFSET);
+     if (new_block < 0) {
+         return new_block;
+     }
+@@ -954,7 +956,8 @@ int qcow2_update_cluster_refcount(BlockDriverState *bs,
 
 
---YuCYkA4wgbe523PQNRvXrjD0GkJadfXGA
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+ /* return < 0 if error */
+-static int64_t alloc_clusters_noref(BlockDriverState *bs, uint64_t size)
++static int64_t alloc_clusters_noref(BlockDriverState *bs, uint64_t size,
++                                    uint64_t max)
+ {
+     BDRVQcow2State *s = bs->opaque;
+     uint64_t i, nb_clusters, refcount;
+@@ -979,9 +982,9 @@ retry:
+     }
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+     /* Make sure that all offsets in the "allocated" range are representable
+-     * in an int64_t */
++     * in the requested max */
+     if (s->free_cluster_index > 0 &&
+-        s->free_cluster_index - 1 > (INT64_MAX >> s->cluster_bits))
++        s->free_cluster_index - 1 > (max >> s->cluster_bits))
+     {
+         return -EFBIG;
+     }
+@@ -1001,7 +1004,7 @@ int64_t qcow2_alloc_clusters(BlockDriverState *bs, uint64_t size)
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrhNaYACgkQp6FrSiUn
-Q2pt8Af/VlPNq/AlWyZpnutzl93MMYCZeLVmb1az3Z/TCcJnDI5uzDctKqkGS+Sm
-y3Vs6CAEv1ZB2aA7YwfSLPs70Lqdp3XWhs5Od359Pmv5NDjyfxaUMCKlh9s43/M6
-3lpp9plP4S3XY2Z7CoKJYY1Z7Wp1eJmSBfZnHSB7r29DSJznrm0yAlOoOENqABVH
-uAhOv1nd9BMDy5phV1prl8/xSb3wyyHGN+vFPTpVBPhdmd2m5I5tAiLU3rvyYpyJ
-Ss7W0JDTvb/VjxGQRF9+lI8XIROHXJWK4c+Zznjzizfym7BEavfhkSFJzfKyXV5a
-5od4jWjGZuQm06SMjwUGZD8G7/FSTA==
-=0fF/
------END PGP SIGNATURE-----
-
---YuCYkA4wgbe523PQNRvXrjD0GkJadfXGA--
+     BLKDBG_EVENT(bs->file, BLKDBG_CLUSTER_ALLOC);
+     do {
+-        offset = alloc_clusters_noref(bs, size);
++        offset = alloc_clusters_noref(bs, size, QCOW_MAX_CLUSTER_OFFSET);
+         if (offset < 0) {
+             return offset;
+         }
+@@ -1083,7 +1086,11 @@ int64_t qcow2_alloc_bytes(BlockDriverState *bs, int size)
+     free_in_cluster = s->cluster_size - offset_into_cluster(s, offset);
+     do {
+         if (!offset || free_in_cluster < size) {
+-            int64_t new_cluster = alloc_clusters_noref(bs, s->cluster_size);
++            int64_t new_cluster;
++
++            new_cluster = alloc_clusters_noref(bs, s->cluster_size,
++                                               MIN(s->cluster_offset_mask,
++                                                   QCOW_MAX_CLUSTER_OFFSET));
+             if (new_cluster < 0) {
+                 return new_cluster;
+             }
+-- 
+2.14.3
