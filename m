@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fBfwu-0003FK-B6
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 08:24:33 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fBg16-0006Ts-He
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 08:28:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fBfwq-0005K5-69
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 08:24:32 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60792 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1fBg12-00076w-B6
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 08:28:52 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52978 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fBfwq-0005Jh-0z
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 08:24:28 -0400
-Date: Thu, 26 Apr 2018 13:24:14 +0100
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fBg12-00076b-5h
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 08:28:48 -0400
+Date: Thu, 26 Apr 2018 13:28:44 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180426122413.GC2631@work-vm>
+Message-ID: <20180426122843.GD2631@work-vm>
 References: <20180425200326.72337-1-dgilbert@redhat.com>
-	<20180425200326.72337-2-dgilbert@redhat.com>
-	<5ac3b2f4-fff5-f9bc-1f90-289638f8e94f@redhat.com>
+	<20180425200326.72337-7-dgilbert@redhat.com>
+	<a9d3149c-f5a3-c220-a802-5ea7a4bffd90@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5ac3b2f4-fff5-f9bc-1f90-289638f8e94f@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 01/16] migration: introduce
- postcopy-blocktime capability
+In-Reply-To: <a9d3149c-f5a3-c220-a802-5ea7a4bffd90@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 06/16] migration: add postcopy total
+ blocktime into query-migrate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,55 +36,40 @@ Cc: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, a.perevalov@s
 > On 04/25/2018 03:03 PM, Dr. David Alan Gilbert (git) wrote:
 > > From: Alexey Perevalov <a.perevalov@samsung.com>
 > > 
-> > Right now it could be used on destination side to
-> > enable vCPU blocktime calculation for postcopy live migration.
-> > vCPU blocktime - it's time since vCPU thread was put into
-> > interruptible sleep, till memory page was copied and thread awake.
-> > 
-> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-> > Reviewed-by: Juan Quintela <quintela@redhat.com>
-> > Signed-off-by: Juan Quintela <quintela@redhat.com>
-> > Message-Id: <1521742647-25550-2-git-send-email-a.perevalov@samsung.com>
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
+> > Postcopy total blocktime is available on destination side only.
+> > But query-migrate was possible only for source. This patch
+> > adds ability to call query-migrate on destination.
+> > To be able to see postcopy blocktime, need to request postcopy-blocktime
+> > capability.
+> 
+> This prerequisite command...
+> 
 > 
 > > +++ b/qapi/migration.json
-> > @@ -354,16 +354,20 @@
-> >  #
-> >  # @x-multifd: Use more than one fd for migration (since 2.11)
-> >  #
+> > @@ -155,6 +155,13 @@
+> >  # @error-desc: the human readable error description string, when
+> >  #              @status is 'failed'. Clients should not attempt to parse the
+> >  #              error strings. (Since 2.7)
 > > +#
-> >  # @dirty-bitmaps: If enabled, QEMU will migrate named dirty bitmaps.
+> > +# @postcopy-blocktime: total time when all vCPU were blocked during postcopy
+> > +#           live migration (Since 2.13)
+> > +#
+> > +# @postcopy-vcpu-blocktime: list of the postcopy blocktime per vCPU (Since 2.13)
 > 
-> Why is the extra blank line added here?  Doesn't hold up the pull
-> request, but might be worth a trivial followup patch.
+> ... should be documented here (something along the lines of "This field
+> is only present if the postcopy-blocktime migration capability was enabled")
+> 
+> > +#
+> > +
+> >  #
+> 
+> Why the blank line addition?  More to include in your followup cleanup
+> patch.
 
-I think it's just a merge artifact; this patch has been around for a few
-versions so has been bumped down that list a few times.
-
-OK, I'll do that.
+Again I'll fix those up.
 
 Dave
 
-> >  #                 (since 2.12)
-> >  #
-> > +# @postcopy-blocktime: Calculate downtime for postcopy live migration
-> > +#                     (since 2.13)
-> > +#
-> >  # Since: 1.2
-> >  ##
-> >  { 'enum': 'MigrationCapability',
-> >    'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
-> >             'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram',
-> >             'block', 'return-path', 'pause-before-switchover', 'x-multifd',
-> > -           'dirty-bitmaps' ] }
-> > +           'dirty-bitmaps', 'postcopy-blocktime' ] }
-> >  
-> >  ##
-> >  # @MigrationCapabilityStatus:
-> > 
-> 
 > -- 
 > Eric Blake, Principal Software Engineer
 > Red Hat, Inc.           +1-919-301-3266
