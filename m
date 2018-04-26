@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBeUO-0005Zt-BI
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:51:01 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fBeaj-0002Rd-2L
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:57:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBeUN-0002yU-7x
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:51:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:32918)
+	(envelope-from <peter.maydell@linaro.org>) id 1fBeai-0006ic-AK
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:57:33 -0400
+Received: from mail-ot0-x233.google.com ([2607:f8b0:4003:c0f::233]:42357)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fBeUN-0002xu-07
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:50:59 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fBeUJ-0004SS-UK
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 10:50:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E7D0A2E81EB
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 10:50:52 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fBeai-0006iR-4C
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:57:32 -0400
+Received: by mail-ot0-x233.google.com with SMTP id l13-v6so6790218otk.9
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 03:57:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Apr 2018 10:36:44 -0000
-From: Thomas Huth <1740219@bugs.launchpad.net>
-Reply-To: Bug 1740219 <1740219@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151435405424.26166.7757673860586517511.malonedeb@gac.canonical.com>
-Message-Id: <152473900625.6895.1975413252773804426.launchpad@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1740219] Re: static linux-user ARM emulation has
- several-second startup time
+In-Reply-To: <20180425200326.72337-1-dgilbert@redhat.com>
+References: <20180425200326.72337-1-dgilbert@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 26 Apr 2018 11:57:10 +0100
+Message-ID: <CAFEAcA8keFUKJMyjVtqs4-NDH9FRcgFjc+sXHbOzhfW07mozxg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/16] migration queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,83 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Peter Xu <peterx@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, xiaoguangrong@tencent.com
 
-** Changed in: qemu
-       Status: Fix Committed =3D> Fix Released
+On 25 April 2018 at 21:03, Dr. David Alan Gilbert (git)
+<dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> The following changes since commit 4743c23509a51bd4ee85cc272287a41917d1be35:
+>
+>   Update version for v2.12.0 release (2018-04-24 16:44:55 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/dagrh/qemu.git tags/pull-migration-20180425a
+>
+> for you to fetch changes up to da3f56cb2e767016d3f204837a77caf35b463f90:
+>
+>   migration: remove ram_save_compressed_page() (2018-04-25 18:04:14 +0100)
+>
+> ----------------------------------------------------------------
+> Migration pull for 2.13
+>
+> Alexey Perevalov's postcopy blocktime statistics
+> Xiao Guangrong's compression performance improvements
 
--- =
+Applied, thanks.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1740219
-
-Title:
-  static linux-user ARM emulation has several-second startup time
-
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-
-Bug description:
-  static linux-user emulation has several-second startup time
-
-  My problem: I'm a Parabola packager, and I'm updating our
-  qemu-user-static package from 2.8 to 2.11.  With my new
-  statically-linked 2.11, running `qemu-arm /my/arm-chroot/bin/true`
-  went from taking 0.006s to 3s!  This does not happen with the normal
-  dynamically linked 2.11, or the old static 2.8.
-
-  What happens is it gets stuck in
-  `linux-user/elfload.c:init_guest_space()`.  What `init_guest_space`
-  does is map 2 parts of the address space: `[base, base+guest_size]`
-  and `[base+0xffff0000, base+0xffff0000+page_size]`; where it must find
-  an acceptable `base`.  Its strategy is to `mmap(NULL, guest_size,
-  ...)` decide where the first range is, and then check if that
-  +0xffff0000 is also available.  If it isn't, then it starts trying
-  `mmap(base, ...)` for the entire address space from low-address to
-  high-address.
-
-  "Normally," it finds an accaptable `base` within the first 2 tries.
-  With a static 2.11, it's taking thousands of tries.
-
-  ----
-
-  Now, from my understanding, there are 2 factors working together to
-  cause that in static 2.11 but not the other builds:
-
-   - 2.11 increased the default `guest_size` from 0xf7000000 to 0xffff0000
-   - PIE (and thus ASLR) is disabled for static builds
-
-  For some reason that I don't understand, with the smaller
-  `guest_size` the initial `mmap(NULL, guest_size, ...)` usually
-  returns an acceptable address range; but larger `guest_size` makes it
-  consistently return a block of memory that butts right up against
-  another already mapped chunk of memory.  This isn't just true on the
-  older builds, it's true with the 2.11 builds if I use the `-R` flag to
-  shrink the `guest_size` back down to 0xf7000000.  That is with
-  linux-hardened 4.13.13 on x86-64.
-
-  So then, it it falls back to crawling the entire address space; so it
-  tries base=3D0x00001000.  With ASLR, that probably succeeds.  But with
-  ASLR being disabled on static builds, the text segment is at
-  0x60000000; which is does not leave room for the needed
-  0xffff1000-size block before it.  So then it tries base=3D0x00002000.
-  And so on, more than 6000 times until it finally gets to and passes
-  the text segment; calling mmap more than 12000 times.
-
-  ----
-
-  I'm not sure what the fix is.  Perhaps try to mmap a continuous chunk
-  of size 0xffff1000, then munmap it and then mmap the 2 chunks that we
-  actually need.  The disadvantage to that is that it does not support
-  the sparse address space that the current algorithm supports for
-  `guest_size < 0xffff0000`.  If `guest_size < 0xffff0000` *and* the big
-  mmap fails, then it could fall back to a sparse search; though I'm not
-  sure the current algorithm is a good choice for it, as we see in this
-  bug.  Perhaps it should inspect /proc/self/maps to try to find a
-  suitable range before ever calling mmap?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1740219/+subscriptions
+-- PMM
