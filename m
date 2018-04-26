@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fBfoy-0007Zd-R0
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 08:16:23 -0400
+	(envelope-from <ciro.santilli@gmail.com>) id 1fBfu7-00017D-A1
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 08:21:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fBfov-0002Zc-Fb
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 08:16:20 -0400
-Received: from 7.mo68.mail-out.ovh.net ([46.105.63.230]:50457)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fBfov-0002WS-26
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 08:16:17 -0400
-Received: from player774.ha.ovh.net (unknown [10.109.105.96])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 347A8DF217
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 14:16:12 +0200 (CEST)
-References: <20180419124331.3915-1-clg@kaod.org>
-	<20180419124331.3915-3-clg@kaod.org>
-	<20180423064408.GF19804@umbus.fritz.box>
-	<ac69df02-8ee8-0506-36ac-83fdaccdca77@kaod.org>
-	<20180424064119.GO19804@umbus.fritz.box>
-	<0fb72eb1-d9b5-968b-137a-7d44af116530@kaod.org>
-	<20180426032812.GD8800@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <9c1bbe54-bdbf-ba1b-29b9-bd5df31b0f07@kaod.org>
-Date: Thu, 26 Apr 2018 14:16:06 +0200
+	(envelope-from <ciro.santilli@gmail.com>) id 1fBfu5-0004dM-Py
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 08:21:39 -0400
+Received: from mail-io0-x235.google.com ([2607:f8b0:4001:c06::235]:34322)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ciro.santilli@gmail.com>)
+	id 1fBfu5-0004dC-JV
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 08:21:37 -0400
+Received: by mail-io0-x235.google.com with SMTP id p124-v6so5544219iod.1
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 05:21:37 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180426032812.GD8800@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 02/35] ppc/xive: add support for the LSI
- interrupt sources
+In-Reply-To: <20180425124533.17182.53165.stgit@pasha-VirtualBox>
+References: <20180425124533.17182.53165.stgit@pasha-VirtualBox>
+From: Ciro Santilli <ciro.santilli@gmail.com>
+Date: Thu, 26 Apr 2018 13:21:15 +0100
+Message-ID: <CAFXrp_f-r4+G1BOVaCh9a6kzR45rnqgvq5UEnMzNjfHB=BDBCw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC PATCH 00/17] reverse debugging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,303 +28,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, war2jordan@live.com, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Igor R <boost.lists@gmail.com>, Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Aleksandr Bezzubikov <zuban32s@gmail.com>, armbru@redhat.com, maria.klimushenkova@ispras.ru, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Gerd Hoffmann <kraxel@redhat.com>, Thomas Dullien <thomas.dullien@googlemail.com>, Paolo Bonzini <pbonzini@redhat.com>, mreitz@redhat.com, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, dgilbert@redhat.com, rth@twiddle.net
 
-On 04/26/2018 05:28 AM, David Gibson wrote:
-> On Tue, Apr 24, 2018 at 10:11:27AM +0200, C=E9dric Le Goater wrote:
->> On 04/24/2018 08:41 AM, David Gibson wrote:
->>> On Mon, Apr 23, 2018 at 09:31:24AM +0200, C=E9dric Le Goater wrote:
->>>> On 04/23/2018 08:44 AM, David Gibson wrote:
->>>>> On Thu, Apr 19, 2018 at 02:42:58PM +0200, C=E9dric Le Goater wrote:
->>>>>> The 'sent' status of the LSI interrupt source is modeled with the =
-'P'
->>>>>> bit of the ESB and the assertion status of the source is maintaine=
-d in
->>>>>> an array under the main sPAPRXive object. The type of the source i=
-s
->>>>>> stored in the same array for practical reasons.
->>>>>>
->>>>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->>>>>> ---
->>>>>>  hw/intc/xive.c        | 54 ++++++++++++++++++++++++++++++++++++++=
-+++++++++----
->>>>>>  include/hw/ppc/xive.h | 16 +++++++++++++++
->>>>>>  2 files changed, 66 insertions(+), 4 deletions(-)
->>>>>>
->>>>>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
->>>>>> index c70578759d02..060976077dd7 100644
->>>>>> --- a/hw/intc/xive.c
->>>>>> +++ b/hw/intc/xive.c
->>>>>> @@ -104,6 +104,21 @@ static void xive_source_notify(XiveSource *xs=
-rc, int srcno)
->>>>>> =20
->>>>>>  }
->>>>>> =20
->>>>>> +/*
->>>>>> + * LSI interrupt sources use the P bit and a custom assertion fla=
-g
->>>>>> + */
->>>>>> +static bool xive_source_lsi_trigger(XiveSource *xsrc, uint32_t sr=
-cno)
->>>>>> +{
->>>>>> +    uint8_t old_pq =3D xive_source_pq_get(xsrc, srcno);
->>>>>> +
->>>>>> +    if  (old_pq =3D=3D XIVE_ESB_RESET &&
->>>>>> +         xsrc->status[srcno] & XIVE_STATUS_ASSERTED) {
->>>>>> +        xive_source_pq_set(xsrc, srcno, XIVE_ESB_PENDING);
->>>>>> +        return true;
->>>>>> +    }
->>>>>> +    return false;
->>>>>> +}
->>>>>> +
->>>>>>  /* In a two pages ESB MMIO setting, even page is the trigger page=
-, odd
->>>>>>   * page is for management */
->>>>>>  static inline bool xive_source_is_trigger_page(hwaddr addr)
->>>>>> @@ -133,6 +148,13 @@ static uint64_t xive_source_esb_read(void *op=
-aque, hwaddr addr, unsigned size)
->>>>>>           */
->>>>>>          ret =3D xive_source_pq_eoi(xsrc, srcno);
->>>>>> =20
->>>>>> +        /* If the LSI source is still asserted, forward a new sou=
-rce
->>>>>> +         * event notification */
->>>>>> +        if (xive_source_irq_is_lsi(xsrc, srcno)) {
->>>>>> +            if (xive_source_lsi_trigger(xsrc, srcno)) {
->>>>>> +                xive_source_notify(xsrc, srcno);
->>>>>> +            }
->>>>>> +        }
->>>>>>          break;
->>>>>> =20
->>>>>>      case XIVE_ESB_GET:
->>>>>> @@ -183,6 +205,14 @@ static void xive_source_esb_write(void *opaqu=
-e, hwaddr addr,
->>>>>>           * notification
->>>>>>           */
->>>>>>          notify =3D xive_source_pq_eoi(xsrc, srcno);
->>>>>> +
->>>>>> +        /* LSI sources do not set the Q bit but they can still be
->>>>>> +         * asserted, in which case we should forward a new source
->>>>>> +         * event notification
->>>>>> +         */
->>>>>> +        if (xive_source_irq_is_lsi(xsrc, srcno)) {
->>>>>> +            notify =3D xive_source_lsi_trigger(xsrc, srcno);
->>>>>> +        }
->>>>
->>>> FYI, I have moved that common test under xive_source_pq_eoi()
->>>
->>> Ok.
->>>
->>>>>>          break;
->>>>>> =20
->>>>>>      default:
->>>>>> @@ -216,8 +246,17 @@ static void xive_source_set_irq(void *opaque,=
- int srcno, int val)
->>>>>>      XiveSource *xsrc =3D XIVE_SOURCE(opaque);
->>>>>>      bool notify =3D false;
->>>>>> =20
->>>>>> -    if (val) {
->>>>>> -        notify =3D xive_source_pq_trigger(xsrc, srcno);
->>>>>> +    if (xive_source_irq_is_lsi(xsrc, srcno)) {
->>>>>> +        if (val) {
->>>>>> +            xsrc->status[srcno] |=3D XIVE_STATUS_ASSERTED;
->>>>>> +        } else {
->>>>>> +            xsrc->status[srcno] &=3D ~XIVE_STATUS_ASSERTED;
->>>>>> +        }
->>>>>> +        notify =3D xive_source_lsi_trigger(xsrc, srcno);
->>>>>> +    } else {
->>>>>> +        if (val) {
->>>>>> +            notify =3D xive_source_pq_trigger(xsrc, srcno);
->>>>>> +        }
->>>>>>      }
->>>>>> =20
->>>>>>      /* Forward the source event notification for routing */
->>>>>> @@ -234,13 +273,13 @@ void xive_source_pic_print_info(XiveSource *=
-xsrc, Monitor *mon)
->>>>>>                     xsrc->offset, xsrc->offset + xsrc->nr_irqs - 1=
-);
->>>>>>      for (i =3D 0; i < xsrc->nr_irqs; i++) {
->>>>>>          uint8_t pq =3D xive_source_pq_get(xsrc, i);
->>>>>> -        uint32_t lisn =3D i  + xsrc->offset;
->>>>>> =20
->>>>>>          if (pq =3D=3D XIVE_ESB_OFF) {
->>>>>>              continue;
->>>>>>          }
->>>>>> =20
->>>>>> -        monitor_printf(mon, "  %4x %c%c\n", lisn,
->>>>>> +        monitor_printf(mon, "  %4x %s %c%c\n", i + xsrc->offset,
->>>>>> +                       xive_source_irq_is_lsi(xsrc, i) ? "LSI" : =
-"MSI",
->>>>>>                         pq & XIVE_ESB_VAL_P ? 'P' : '-',
->>>>>>                         pq & XIVE_ESB_VAL_Q ? 'Q' : '-');
->>>>>>      }
->>>>>> @@ -249,6 +288,12 @@ void xive_source_pic_print_info(XiveSource *x=
-src, Monitor *mon)
->>>>>>  static void xive_source_reset(DeviceState *dev)
->>>>>>  {
->>>>>>      XiveSource *xsrc =3D XIVE_SOURCE(dev);
->>>>>> +    int i;
->>>>>> +
->>>>>> +    /* Keep the IRQ type */
->>>>>> +    for (i =3D 0; i < xsrc->nr_irqs; i++) {
->>>>>> +        xsrc->status[i] &=3D ~XIVE_STATUS_ASSERTED;
->>>>>> +    }
->>>>>> =20
->>>>>>      /* SBEs are initialized to 0b01 which corresponds to "ints of=
-f" */
->>>>>>      memset(xsrc->sbe, 0x55, xsrc->sbe_size);
->>>>>> @@ -273,6 +318,7 @@ static void xive_source_realize(DeviceState *d=
-ev, Error **errp)
->>>>>> =20
->>>>>>      xsrc->qirqs =3D qemu_allocate_irqs(xive_source_set_irq, xsrc,
->>>>>>                                       xsrc->nr_irqs);
->>>>>> +    xsrc->status =3D g_malloc0(xsrc->nr_irqs);
->>>>>> =20
->>>>>>      /* Allocate the SBEs (State Bit Entry). 2 bits, so 4 entries =
-per byte */
->>>>>>      xsrc->sbe_size =3D DIV_ROUND_UP(xsrc->nr_irqs, 4);
->>>>>> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
->>>>>> index d92a50519edf..0b76dd278d9b 100644
->>>>>> --- a/include/hw/ppc/xive.h
->>>>>> +++ b/include/hw/ppc/xive.h
->>>>>> @@ -33,6 +33,9 @@ typedef struct XiveSource {
->>>>>>      uint32_t     nr_irqs;
->>>>>>      uint32_t     offset;
->>>>>>      qemu_irq     *qirqs;
->>>>>> +#define XIVE_STATUS_LSI         0x1
->>>>>> +#define XIVE_STATUS_ASSERTED    0x2
->>>>>> +    uint8_t      *status;
->>>>>
->>>>> I don't love the idea of mixing configuration information (STATUS_L=
-SI)
->>>>> with runtime state information (ASSERTED) in the same field.  Any
->>>>> reason not to have these as parallel bitmaps.
->>>>
->>>> none. I can change that.=20
->>>
->>> Ok.
->>>
->>>>> Come to that.. is there a compelling reason to allow any individual
->>>>> irq to be marked LSI or MSI, rather than using separate XiveSource
->>>>> objects for MSIs and LSIs?
->>>>
->>>> yes. I would have preferred two distinct interrupt source objects bu=
-t=20
->>>> this is to be compatible with XICS, which uses only one. If we want
->>>> to be able to change interrupt mode, the IRQ number space should be
->>>> organized in the exact same way. Or we should change XICS also.
->>>>
->>>> Also, the change (a bitmap) is really small.
->>>
->>> Hrm, but since XIVE supports thousands of irqs, it could be quite a
->>> large bitmap.
->>
->> Yes. The change is small, not the bitmap.
->> =20
->>> It's not impossible - in fact, not really even that hard - to change
->>> the existing irq layout on xics.  It does need a new machine type
->>> variant, of course.
->>
->> I did some work on that topic a while ago :
->>
->> 	https://patchwork.ozlabs.org/cover/836782/
->>
->> But we stopped exploring the idea. May be it was not the good approach=
-.
->> The PHBs LSIs would benefit from such a split though.
->=20
-> So, no, I don't think that was a good approach, but that doesn't mean
-> other ways of rearranging the irq numbers aren't ok.  The thing here
-> is that we don't want to think of an "irq allocator" - there are some
-> bits like that in there already, but they were always a mistake.
->=20
-> We have lots of irq space (both XICS and XIVE) so instead we should
-> come up with a static mapping of irqs to devices.
+On Wed, Apr 25, 2018 at 1:45 PM, Pavel Dovgalyuk
+<Pavel.Dovgaluk@ispras.ru> wrote:
+> GDB remote protocol supports reverse debugging of the targets.
+> It includes 'reverse step' and 'reverse continue' operations.
+> The first one finds the previous step of the execution,
+> and the second one is intended to stop at the last breakpoint that
+> would happen when the program is executed normally.
+>
+> Reverse debugging is possible in the replay mode, when at least
+> one snapshot was created at the record or replay phase.
+> QEMU can use these snapshots for travelling back in time with GDB.
+>
 
-yes. I would prefer that also.=20
+Hi Pavel,
 
-We could change the spapr_irq_alloc() routine to get a block of=20
-IRQs in the range defined for a device family, and use a device=20
-id to offset in that family range ? Here are some figures :
+1)
 
-device family        block size  max devices =20
+Can you provide more details on how to run the reverse debugging? In
+particular how to take the checkpoint?
 
-EVENT_CLASS_EPOW              1           1 =20
-EVENT_CLASS_HOT_PLUG          1           1  =20
-VIO_VSCSI                     1          10 =20
-VIO_LLAN                      1          10 =20
-VIO_VTY                       1           5 =20
-                     =20
-PCI/PHB                    1024           5 =20
+My test setup is described in detail at:
+https://github.com/cirosantilli/qemu-test/tree/8127452e5685ed233dc7357a1fe34b7a2d173480
+command "x86_64/reverse-debug".
 
-C.
+Here are the actual commands:
 
+#!/usr/bin/env bash
+set -eu
+dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/.."
+cmd="\
+time \
+./x86_64-softmmu/qemu-system-x86_64 \
+-M pc \
+-append 'root=/dev/sda console=ttyS0 nokaslr printk.time=y -
+lkmc_eval=\"/rand_check.out;/sbin/ifup -a;wget -S
+google.com;/poweroff.out;\"' \
+-kernel '${dir}/out/x86_64/buildroot/images/bzImage' \
+-nographic \
+-serial mon:stdio \
+-monitor telnet::45454,server,nowait \
+\
+-drive file='${dir}/out/x86_64/buildroot/images/rootfs.ext2.qcow2,if=none,id=img-direct,format=qcow2,snapshot'
+\
+-drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay \
+-device ide-hd,drive=img-blkreplay \
+\
+-netdev user,id=net1 \
+-device rtl8139,netdev=net1 \
+-object filter-replay,id=replay,netdev=net1 \
+"
+cmd="${cmd} $@"
+echo "$cmd"
+eval "$cmd -icount 'shift=7,rr=record,rrfile=replay.bin'"
+eval "$cmd -icount 'shift=7,rr=replay,rrfile=replay.bin' -S -s"
 
->>>>>>      /* PQ bits */
->>>>>>      uint8_t      *sbe;
->>>>>
->>>>> .. and come to that is there a reason to keep the ASSERTED bit in a
->>>>> separate array from sbe?  AFAICT the actual 2-bit-per-irq layout is
->>>>> never exposed to the guests.
->>>>
->>>> indeed. we always use the xive_source_pq_get/set() helpers to=20
->>>> manipulate the PQ bits. So we could add an extra bit for the ASSERT=20
->>>> without too much changes. Could also we put the type there or would=20
->>>> you still prefer a bitmap ? =20
->>>
->>> I'd prefer the type (config information) be separate from the P, Q,
->>> ASSERTED bits (state information).
->>
->> ok. So I will use the 'uint8_t *status' for P, Q, ASSERT, which leaves
->> 5 bits available, but I don't think it is really worth the pain to=20
->> optimize the size.
->=20
-> Sure.  I don't really care if it's packed or not.
->=20
->> The sbe array will disappear and we will have=20
->> a bitmap for the type.
->=20
-> We may or may not keep the type bitmap based on the discussion above,
-> but in any case this is a good step forward.
->=20
->>
->> Thanks,
->>
->> C.=20
->>
->>>>> Or, even re-use the Q bit for asserted in LSIs (but report it as
->>>>> always 0 in the register read/write path).
->>>>
->>>> I would prefer to add extra status bits. It is easier to debug.
->>>>
->>>> Thanks,
->>>>
->>>> C.
->>>>
->>>>>> @@ -127,4 +130,17 @@ uint8_t xive_source_pq_set(XiveSource *xsrc, =
-uint32_t srcno, uint8_t pq);
->>>>>> =20
->>>>>>  void xive_source_pic_print_info(XiveSource *xsrc, Monitor *mon);
->>>>>> =20
->>>>>> +static inline bool xive_source_irq_is_lsi(XiveSource *xsrc, uint3=
-2_t srcno)
->>>>>> +{
->>>>>> +    assert(srcno < xsrc->nr_irqs);
->>>>>> +    return xsrc->status[srcno] & XIVE_STATUS_LSI;
->>>>>> +}
->>>>>> +
->>>>>> +static inline void xive_source_irq_set(XiveSource *xsrc, uint32_t=
- srcno,
->>>>>> +                                       bool lsi)
->>>>>> +{
->>>>>> +    assert(srcno < xsrc->nr_irqs);
->>>>>> +    xsrc->status[srcno] |=3D lsi ? XIVE_STATUS_LSI : 0;
->>>>>> +}
->>>>>> +
->>>>>>  #endif /* PPC_XIVE_H */
->>>>>
->>>>
->>>
->>
->=20
+Then I take a snapshot right at the beginning of the execution:
+
+telnet 45454
+savevm a
+
+And on another shell:
+
+/data/git/linux-kernel-module-cheat/out/x86_64/buildroot/host/usr/bin/x86_64-linux-gdb
+\
+-q \
+-ex 'file vmlinux' \
+-ex 'target remote localhost:1234' \
+-ex 'break start_kernel' \
+-ex 'continue' \
+
+But now if I try on GDB:
+
+next
+next
+next
+reverse-continue
+
+hoping to go back to start_kernel, but nothing happens.
+
+Same behavior if I take the snapshot after reaching start_kernel instead.
+
+2)
+
+I wonder if it would be possible to expose checkpoint taking through
+GDB example via:
+https://sourceware.org/gdb/onlinedocs/gdb/Checkpoint_002fRestart.html
+
+Or some other more convenient checkpoint generation method, e.g.
+automatically take checkpoints every N instructions.
+
+> Running the execution in replay mode allows using GDB reverse debugging
+> commands:
+>  - reverse-stepi (or rsi): Steps one instruction to the past.
+>    QEMU loads on of the prior snapshots and proceeds to the desired
+>    instruction forward. When that step is reaches, execution stops.
+>  - reverse-continue (or rc): Runs execution "backwards".
+>    QEMU tries to find breakpoint or watchpoint by loaded prior snapshot
+>    and replaying the execution. Then QEMU loads snapshots again and
+>    replays to the latest breakpoint. When there are no breakpoints in
+>    the examined section of the execution, QEMU finds one more snapshot
+>    and tries again. After the first snapshot is processed, execution
+>    stops at this snapshot.
+>
+> The set of patches include the following modifications:
+>  - gdbstub update for reverse debugging support
+>  - functions that automatically perform reverse step and reverse
+>    continue operations
+>  - hmp/qmp commands for manipulating the replay process
+>  - improvement of the snapshotting for saving the execution step
+>    in the snapshot parameters
+>  - other record/replay fixes
+>
+> The patches are available in the repository:
+> https://github.com/ispras/qemu/tree/rr-180207
+>
+> ---
+>
+> Pavel Dovgalyuk (17):
+>       block: implement bdrv_snapshot_goto for blkreplay
+>       replay: disable default snapshot for record/replay
+>       replay: update docs for record/replay with block devices
+>       replay: don't drain/flush bdrv queue while RR is working
+>       replay: finish record/replay before closing the disks
+>       migration: introduce icount field for snapshots
+>       qcow2: introduce icount field for snapshots
+>       replay: introduce info hmp/qmp command
+>       replay: introduce breakpoint at the specified step
+>       replay: implement replay_seek command to proceed to the desired step
+>       replay: flush events when exitting
+>       timer: remove replay clock probe in deadline calculation
+>       replay: refine replay-time module
+>       translator: fix breakpoint processing
+>       replay: flush rr queue before loading the vmstate
+>       gdbstub: add reverse step support in replay mode
+>       gdbstub: add reverse continue support in replay mode
+>
+>
+>  accel/tcg/translator.c    |    8 +
+>  block/blkreplay.c         |    8 +
+>  block/io.c                |   22 +++
+>  block/qapi.c              |   11 +-
+>  block/qcow2-snapshot.c    |    9 +
+>  block/qcow2.h             |    2
+>  blockdev.c                |    3
+>  cpus.c                    |   19 ++-
+>  docs/replay.txt           |   12 +-
+>  exec.c                    |    6 +
+>  gdbstub.c                 |   50 +++++++-
+>  hmp-commands-info.hx      |   14 ++
+>  hmp-commands.hx           |   30 +++++
+>  hmp.h                     |    3
+>  include/block/snapshot.h  |    1
+>  include/sysemu/replay.h   |   18 +++
+>  migration/savevm.c        |   11 +-
+>  qapi/block-core.json      |    5 +
+>  qapi/block.json           |    3
+>  qapi/misc.json            |   69 +++++++++++
+>  replay/Makefile.objs      |    3
+>  replay/replay-debugging.c |  286 +++++++++++++++++++++++++++++++++++++++++++++
+>  replay/replay-events.c    |   14 --
+>  replay/replay-internal.h  |   10 +-
+>  replay/replay-time.c      |   27 ++--
+>  replay/replay.c           |   22 +++
+>  stubs/replay.c            |   10 ++
+>  util/qemu-timer.c         |   11 --
+>  vl.c                      |   11 +-
+>  29 files changed, 625 insertions(+), 73 deletions(-)
+>  create mode 100644 replay/replay-debugging.c
+>
+> --
+> Pavel Dovgalyuk
