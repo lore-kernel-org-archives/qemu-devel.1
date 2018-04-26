@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fBlil-0005RA-7x
+	(envelope-from <lersek@redhat.com>) id 1fBlil-0005R4-6b
 	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:34:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fBlii-0007Ta-2V
+	(envelope-from <lersek@redhat.com>) id 1fBlii-0007Th-37
 	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:34:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46906 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fBlih-0007T5-Sv
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:34:15 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4D03740201A4
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 18:34:15 +0000 (UTC)
 From: Laszlo Ersek <lersek@redhat.com>
-Date: Thu, 26 Apr 2018 20:34:03 +0200
-Message-Id: <20180426183404.3756-4-lersek@redhat.com>
+Date: Thu, 26 Apr 2018 20:34:01 +0200
+Message-Id: <20180426183404.3756-2-lersek@redhat.com>
 In-Reply-To: <20180426183404.3756-1-lersek@redhat.com>
 References: <20180426183404.3756-1-lersek@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/4] qapi: change the type of
- TargetInfo.arch from string to enum SysEmuTarget
+Subject: [Qemu-devel] [PATCH v2 1/4] qapi: fill in CpuInfoFast.arch in
+ query-cpus-fast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,141 +21,150 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu devel list <qemu-devel@nongnu.org>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Viktor VM Mihajlovski <mihajlov@linux.vnet.ibm.com>, qemu-stable@nongnu.org
 
-Now that we have @SysEmuTarget, it makes sense to restrict
-@TargetInfo.@arch to valid sysemu targets at the schema level.
+* Commit ca230ff33f89 added the @arch field to @CpuInfoFast, but it failed
+  to set the new field in qmp_query_cpus_fast(), when TARGET_S390X was not
+  defined. The updated @query-cpus-fast example in "qapi-schema.json"
+  showed "arch":"x86" only because qmp_query_cpus_fast() calls g_malloc0()
+  to allocate @CpuInfoFast, and the CPU_INFO_ARCH_X86 enum constant is
+  generated with value 0.
 
-Cc: "Daniel P. Berrange" <berrange@redhat.com>
+  All @arch values other than @s390 implied the @CpuInfoOther sub-struct
+  for @CpuInfoFast -- at the time of writing the patch --, thus no fields
+  other than @arch needed to be set when TARGET_S390X was not defined. Set
+  @arch now, by copying the corresponding assignments from
+  qmp_query_cpus().
+
+* Commit 25fa194b7b11 added the @riscv enum constant to @CpuInfoArch (used
+  in both @CpuInfo and @CpuInfoFast -- the return types of the @query-cpus
+  and @query-cpus-fast commands, respectively), and assigned, in both
+  return structures, the @CpuInfoRISCV sub-structure to the new enum
+  value.
+
+  However, qmp_query_cpus_fast() would not populate either the @arch field
+  or the @CpuInfoRISCV sub-structure, when TARGET_RISCV was defined; only
+  qmp_query_cpus() would.
+
+  Assign @CpuInfoOther to the @riscv enum constant in @CpuInfoFast, and
+  populate only the @arch field in qmp_query_cpus_fast(). Getting CPU
+  state without interrupting KVM is an exceptional thing that only S390X
+  does currently. Quoting Cornelia Huck <cohuck@redhat.com>, "s390x is
+  exceptional in that it has state in QEMU that is actually interesting
+  for upper layers and can be retrieved without performance penalty". See
+  also
+  <https://www.redhat.com/archives/libvir-list/2018-February/msg00121.html>.
+
+Cc: Cornelia Huck <cohuck@redhat.com>
 Cc: Eric Blake <eblake@redhat.com>
 Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Viktor VM Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Cc: qemu-stable@nongnu.org
+Fixes: ca230ff33f89bf7102cbfbc2328716da6750aaed
+Fixes: 25fa194b7b11901561532e435beb83d046899f7a
 Signed-off-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
 
 Notes:
     PATCHv2:
     
-    - drop naive code comment in qmp_query_target() [Markus]
+    - squash v1 patches 1/6 and 2/6 [Eric, Markus, Cornelia]
     
-    - pick up Markus's R-b
+    - fix "added added" typo in the commit message [Eric]
     
-    - update CC list
+    - update commit message wrt. S390X particulars [Cornelia, Markus,
+      Viktor]
+    
+    - pick up Eric's R-b (synthesized from his R-b's for v1 1/6 & 2/6)
+    
+    - don't pick up Cornelia's R-b (only given for v1 1/6)
+    
+    - update the CC list
     
     PATCHv1:
     
-    - qmp_query_target(): pass (-1) as fallback value [Markus]
-    - qmp_query_target(): catch lookup error with error_abort [Markus]
-    
-    RFCv3:
-    
-    - The patch is new in this version. [Markus]
+    - new patch
 
- qapi/misc.json | 6 ++++--
- arch_init.c    | 4 +++-
- 2 files changed, 7 insertions(+), 3 deletions(-)
+ qapi/misc.json |  2 +-
+ cpus.c         | 16 +++++++++++++++-
+ 2 files changed, 16 insertions(+), 2 deletions(-)
 
 diff --git a/qapi/misc.json b/qapi/misc.json
-index 104d013adba6..460866cf542f 100644
+index 5636f4a14997..104d013adba6 100644
 --- a/qapi/misc.json
 +++ b/qapi/misc.json
-@@ -1,18 +1,20 @@
- # -*- Mode: Python -*-
- #
+@@ -565,23 +565,23 @@
+ { 'union': 'CpuInfoFast',
+   'base': {'cpu-index': 'int', 'qom-path': 'str',
+            'thread-id': 'int', '*props': 'CpuInstanceProperties',
+            'arch': 'CpuInfoArch' },
+   'discriminator': 'arch',
+   'data': { 'x86': 'CpuInfoOther',
+             'sparc': 'CpuInfoOther',
+             'ppc': 'CpuInfoOther',
+             'mips': 'CpuInfoOther',
+             'tricore': 'CpuInfoOther',
+             's390': 'CpuInfoS390',
+-            'riscv': 'CpuInfoRISCV',
++            'riscv': 'CpuInfoOther',
+             'other': 'CpuInfoOther' } }
  
  ##
- # = Miscellanea
- ##
+ # @query-cpus-fast:
+ #
+ # Returns information about all virtual CPUs. This command does not
+ # incur a performance penalty and should be used in production
+ # instead of query-cpus.
+ #
+ # Returns: list of @CpuInfoFast
+ #
+diff --git a/cpus.c b/cpus.c
+index 38eba8bff334..60563a6d54ec 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -2210,27 +2210,41 @@ CpuInfoFastList *qmp_query_cpus_fast(Error **errp)
+         info->value->qom_path = object_get_canonical_path(OBJECT(cpu));
+         info->value->thread_id = cpu->thread_id;
  
-+{ 'include': 'common.json' }
-+
- ##
- # @qmp_capabilities:
- #
- # Enable QMP capabilities.
- #
- # Arguments:
- #
- # @enable:   An optional list of QMPCapability values to enable.  The
- #            client must not enable any capability that is not
- #            mentioned in the QMP greeting message.  If the field is not
- #            provided, it means no QMP capabilities will be enabled.
-@@ -2441,28 +2443,28 @@
- #      ]
- #    }
- #
- ##
- { 'command': 'query-fdsets', 'returns': ['FdsetInfo'] }
+         info->value->has_props = !!mc->cpu_index_to_instance_props;
+         if (info->value->has_props) {
+             CpuInstanceProperties *props;
+             props = g_malloc0(sizeof(*props));
+             *props = mc->cpu_index_to_instance_props(ms, cpu->cpu_index);
+             info->value->props = props;
+         }
  
- ##
- # @TargetInfo:
- #
- # Information describing the QEMU target.
- #
--# @arch: the target architecture (eg "x86_64", "i386", etc)
-+# @arch: the target architecture
- #
- # Since: 1.2.0
- ##
- { 'struct': 'TargetInfo',
--  'data': { 'arch': 'str' } }
-+  'data': { 'arch': 'SysEmuTarget' } }
- 
- ##
- # @query-target:
- #
- # Return information about the target for this QEMU
- #
- # Returns: TargetInfo
- #
- # Since: 1.2.0
- ##
- { 'command': 'query-target', 'returns': 'TargetInfo' }
-diff --git a/arch_init.c b/arch_init.c
-index 6ee07478bd11..9597218ceda3 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -21,22 +21,23 @@
-  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-  * THE SOFTWARE.
-  */
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "cpu.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/arch_init.h"
- #include "hw/pci/pci.h"
- #include "hw/audio/soundhw.h"
- #include "qapi/qapi-commands-misc.h"
-+#include "qapi/error.h"
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
- #include "hw/acpi/acpi.h"
- #include "qemu/help_option.h"
- 
- #ifdef TARGET_SPARC
- int graphic_width = 1024;
- int graphic_height = 768;
- int graphic_depth = 8;
- #else
- int graphic_width = 800;
-@@ -104,15 +105,16 @@ int xen_available(void)
-     return 1;
- #else
-     return 0;
+-#if defined(TARGET_S390X)
++#if defined(TARGET_I386)
++        info->value->arch = CPU_INFO_ARCH_X86;
++#elif defined(TARGET_PPC)
++        info->value->arch = CPU_INFO_ARCH_PPC;
++#elif defined(TARGET_SPARC)
++        info->value->arch = CPU_INFO_ARCH_SPARC;
++#elif defined(TARGET_MIPS)
++        info->value->arch = CPU_INFO_ARCH_MIPS;
++#elif defined(TARGET_TRICORE)
++        info->value->arch = CPU_INFO_ARCH_TRICORE;
++#elif defined(TARGET_S390X)
+         s390_cpu = S390_CPU(cpu);
+         env = &s390_cpu->env;
+         info->value->arch = CPU_INFO_ARCH_S390;
+         info->value->u.s390.cpu_state = env->cpu_state;
++#elif defined(TARGET_RISCV)
++        info->value->arch = CPU_INFO_ARCH_RISCV;
++#else
++        info->value->arch = CPU_INFO_ARCH_OTHER;
  #endif
- }
+         if (!cur_item) {
+             head = cur_item = info;
+         } else {
+             cur_item->next = info;
+             cur_item = info;
+         }
+     }
  
- 
- TargetInfo *qmp_query_target(Error **errp)
- {
-     TargetInfo *info = g_malloc0(sizeof(*info));
- 
--    info->arch = g_strdup(TARGET_NAME);
-+    info->arch = qapi_enum_parse(&SysEmuTarget_lookup, TARGET_NAME, -1,
-+                                 &error_abort);
- 
-     return info;
+     return head;
  }
 -- 
 2.14.1.3.gb7cf6e02401b
