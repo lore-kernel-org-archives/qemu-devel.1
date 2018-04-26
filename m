@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34627)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=647a3a28a=Ian.Jackson@citrix.com>)
-	id 1fBjGM-0000yg-ME
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:56:51 -0400
+	id 1fBjGO-00011z-22
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:56:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=647a3a28a=Ian.Jackson@citrix.com>)
-	id 1fBjGL-0003fL-Iy
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:56:50 -0400
+	id 1fBjGM-0003gk-Sf
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:56:52 -0400
 Received: from smtp03.citrix.com ([162.221.156.55]:29395)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <prvs=647a3a28a=Ian.Jackson@citrix.com>)
-	id 1fBjGL-0003eE-AM
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:56:49 -0400
+	id 1fBjGM-0003eE-GP
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:56:50 -0400
 From: Ian Jackson <ian.jackson@eu.citrix.com>
-Date: Thu, 26 Apr 2018 16:56:17 +0100
-Message-ID: <1524758187-9351-7-git-send-email-ian.jackson@eu.citrix.com>
+Date: Thu, 26 Apr 2018 16:56:18 +0100
+Message-ID: <1524758187-9351-8-git-send-email-ian.jackson@eu.citrix.com>
 In-Reply-To: <1524758187-9351-1-git-send-email-ian.jackson@eu.citrix.com>
 References: <1524758187-9351-1-git-send-email-ian.jackson@eu.citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PULL 06/16] xen: destroy_hvm_domain: Move reason into
- a variable
+Subject: [Qemu-devel] [PULL 07/16] xen: move xc_interface compatibility
+ fallback further up the file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,36 +32,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <ian.jackson@eu.citrix.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>
 
-We are going to want to reuse this.
+We are going to want to use the dummy xendevicemodel_handle type in
+new stub functions in the CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
+section.  So we need to provide that definition, or (as applicable)
+include the appropriate header, earlier in the file.
+
+(Ideally the newer compatibility layers would be at the bottom of the
+file, so that they can naturally benefit from the compatibility layers
+for earlier version.  But that's rather too much for this series.)
 
 No functional change.
 
 Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
-Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
+Acked-by: Anthony PERARD <anthony.perard@citrix.com>
 Acked-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
- hw/i386/xen/xen-hvm.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ include/hw/xen/xen_common.h | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
 
-diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-index 9c3b6b3..3590d99 100644
---- a/hw/i386/xen/xen-hvm.c
-+++ b/hw/i386/xen/xen-hvm.c
-@@ -1387,12 +1387,13 @@ void destroy_hvm_domain(bool reboot)
-     xc_interface *xc_handle;
-     int sts;
+diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
+index 1766bb9..60c4ebb 100644
+--- a/include/hw/xen/xen_common.h
++++ b/include/hw/xen/xen_common.h
+@@ -78,6 +78,17 @@ static inline void *xenforeignmemory_map(xc_interface *h, uint32_t dom,
  
-+    unsigned int reason = reboot ? SHUTDOWN_reboot : SHUTDOWN_poweroff;
+ extern xenforeignmemory_handle *xen_fmem;
+ 
++#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
 +
-     xc_handle = xc_interface_open(0, 0, 0);
-     if (xc_handle == NULL) {
-         fprintf(stderr, "Cannot acquire xenctrl handle\n");
-     } else {
--        sts = xc_domain_shutdown(xc_handle, xen_domid,
--                                 reboot ? SHUTDOWN_reboot : SHUTDOWN_poweroff);
-+        sts = xc_domain_shutdown(xc_handle, xen_domid, reason);
-         if (sts != 0) {
-             fprintf(stderr, "xc_domain_shutdown failed to issue %s, "
-                     "sts %d, %s\n", reboot ? "reboot" : "poweroff",
++typedef xc_interface xendevicemodel_handle;
++
++#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
++
++#undef XC_WANT_COMPAT_DEVICEMODEL_API
++#include <xendevicemodel.h>
++
++#endif
++
+ #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
+ 
+ #define XEN_COMPAT_PHYSMAP
+@@ -105,8 +116,6 @@ static inline int xentoolcore_restrict_all(domid_t domid)
+ 
+ #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
+ 
+-typedef xc_interface xendevicemodel_handle;
+-
+ static inline xendevicemodel_handle *xendevicemodel_open(
+     struct xentoollog_logger *logger, unsigned int open_flags)
+ {
+@@ -228,11 +237,6 @@ static inline int xendevicemodel_set_mem_type(
+     return xc_hvm_set_mem_type(dmod, domid, mem_type, first_pfn, nr);
+ }
+ 
+-#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
+-
+-#undef XC_WANT_COMPAT_DEVICEMODEL_API
+-#include <xendevicemodel.h>
+-
+ #endif
+ 
+ extern xendevicemodel_handle *xen_dmod;
 -- 
 2.1.4
