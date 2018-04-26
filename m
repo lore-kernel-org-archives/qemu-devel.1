@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48805)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fBjwY-0003OX-7K
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:40:27 -0400
+	(envelope-from <pagupta@redhat.com>) id 1fBjx4-0003qv-Sr
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:40:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fBjwV-0004BH-2V
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:40:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55612 helo=mx1.redhat.com)
+	(envelope-from <pagupta@redhat.com>) id 1fBjx1-0004J7-ON
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:40:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51594)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fBjwU-0004As-NS
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:40:22 -0400
-Date: Thu, 26 Apr 2018 17:40:11 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180426164011.GM2631@work-vm>
-References: <1524666934-8064-1-git-send-email-lidongchen@tencent.com>
-	<1524666934-8064-4-git-send-email-lidongchen@tencent.com>
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1fBjx1-0004Ih-G3
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:40:55 -0400
+Date: Thu, 26 Apr 2018 12:40:53 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <58645254.23011245.1524760853269.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20180426131517.GB30991@stefanha-x1.localdomain>
+References: <20180425112415.12327-1-pagupta@redhat.com>
+	<20180425112415.12327-3-pagupta@redhat.com>
+	<20180426131517.GB30991@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1524666934-8064-4-git-send-email-lidongchen@tencent.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] migration: remove unnecessary
- variables len in QIOChannelRDMA
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v2 2/2] pmem: device flush over VIRTIO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,83 +28,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lidong Chen <jemmy858585@gmail.com>, berrange@redhat.com
-Cc: quintela@redhat.com, qemu-devel@nongnu.org, galsha@mellanox.com, aviadye@mellanox.com, licq@mellanox.com, adido@mellanox.com, Lidong Chen <lidongchen@tencent.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-nvdimm@ml01.01.org, linux-mm@kvack.org, jack@suse.cz, stefanha@redhat.com, dan j williams <dan.j.williams@intel.com>, riel@surriel.com, haozhong zhang <haozhong.zhang@intel.com>, nilal@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, ross zwisler <ross.zwisler@intel.com>, david@redhat.com, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, hch@infradead.org, marcel@redhat.com, mst@redhat.com, niteshnarayanlal@hotmail.com, imammedo@redhat.com, lcapitulino@redhat.com
 
-* Lidong Chen (jemmy858585@gmail.com) wrote:
-> Because qio_channel_rdma_writev and qio_channel_rdma_readv maybe invoked
-> by different threads concurrently, this patch removes unnecessary variables
-> len in QIOChannelRDMA and use local variable instead.
+
 > 
-> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
-
-I'm OK with this patch as is; but now you're making me worried that I
-don't quite understand what thrads are accessing it at the same time; we
-need to document/comment what's accessed concurrently.
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> ---
->  migration/rdma.c | 15 +++++++--------
->  1 file changed, 7 insertions(+), 8 deletions(-)
+> On Wed, Apr 25, 2018 at 04:54:14PM +0530, Pankaj Gupta wrote:
+> > This patch adds functionality to perform
+> > flush from guest to hosy over VIRTIO
+> > when 'ND_REGION_VIRTIO'flag is set on
+> > nd_negion. Flag is set by 'virtio-pmem'
+> > driver.
+> > 
+> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> > ---
+> >  drivers/nvdimm/region_devs.c | 7 +++++++
+> >  1 file changed, 7 insertions(+)
+> > 
+> > diff --git a/drivers/nvdimm/region_devs.c b/drivers/nvdimm/region_devs.c
+> > index a612be6..6c6454e 100644
+> > --- a/drivers/nvdimm/region_devs.c
+> > +++ b/drivers/nvdimm/region_devs.c
+> > @@ -20,6 +20,7 @@
+> >  #include <linux/nd.h>
+> >  #include "nd-core.h"
+> >  #include "nd.h"
+> > +#include <linux/virtio_pmem.h>
+> >  
+> >  /*
+> >   * For readq() and writeq() on 32-bit builds, the hi-lo, lo-hi order is
+> > @@ -1074,6 +1075,12 @@ void nvdimm_flush(struct nd_region *nd_region)
+> >  	struct nd_region_data *ndrd = dev_get_drvdata(&nd_region->dev);
+> >  	int i, idx;
+> >  
+> > +       /* call PV device flush */
+> > +	if (test_bit(ND_REGION_VIRTIO, &nd_region->flags)) {
+> > +		virtio_pmem_flush(&nd_region->dev);
+> > +		return;
+> > +	}
 > 
-> diff --git a/migration/rdma.c b/migration/rdma.c
-> index c745427..f5c1d02 100644
-> --- a/migration/rdma.c
-> +++ b/migration/rdma.c
-> @@ -404,7 +404,6 @@ struct QIOChannelRDMA {
->      QIOChannel parent;
->      RDMAContext *rdma;
->      QEMUFile *file;
-> -    size_t len;
->      bool blocking; /* XXX we don't actually honour this yet */
->  };
->  
-> @@ -2640,6 +2639,7 @@ static ssize_t qio_channel_rdma_writev(QIOChannel *ioc,
->      int ret;
->      ssize_t done = 0;
->      size_t i;
-> +    size_t len = 0;
->  
->      CHECK_ERROR_STATE();
->  
-> @@ -2659,10 +2659,10 @@ static ssize_t qio_channel_rdma_writev(QIOChannel *ioc,
->          while (remaining) {
->              RDMAControlHeader head;
->  
-> -            rioc->len = MIN(remaining, RDMA_SEND_INCREMENT);
-> -            remaining -= rioc->len;
-> +            len = MIN(remaining, RDMA_SEND_INCREMENT);
-> +            remaining -= len;
->  
-> -            head.len = rioc->len;
-> +            head.len = len;
->              head.type = RDMA_CONTROL_QEMU_FILE;
->  
->              ret = qemu_rdma_exchange_send(rdma, &head, data, NULL, NULL, NULL);
-> @@ -2672,8 +2672,8 @@ static ssize_t qio_channel_rdma_writev(QIOChannel *ioc,
->                  return ret;
->              }
->  
-> -            data += rioc->len;
-> -            done += rioc->len;
-> +            data += len;
-> +            done += len;
->          }
->      }
->  
-> @@ -2768,8 +2768,7 @@ static ssize_t qio_channel_rdma_readv(QIOChannel *ioc,
->              }
->          }
->      }
-> -    rioc->len = done;
-> -    return rioc->len;
-> +    return done;
->  }
->  
->  /*
-> -- 
-> 1.8.3.1
+> How does libnvdimm know when flush has completed?
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Callers expect the flush to be finished when nvdimm_flush() returns but
+> the virtio driver has only queued the request, it hasn't waited for
+> completion!
+
+I tried to implement what nvdimm does right now. It just writes to
+flush hint address to make sure data persists.
+
+I just did not want to block guest write requests till host side 
+fsync completes.
+
+Operations(write/fsync) on same file would be blocking at guest side and wait time could 
+be worse for operations on different guest files because all these operations would happen 
+ultimately on same file at host.
+
+I think with current way, we can achieve an asynchronous queuing mechanism on cost of not 
+100% sure when fsync would complete but it is assured it will happen. Also, its entire block
+flush.
+
+I am open for suggestions here, this is my current thought and implementation. 
+
+Thanks,
+Pankaj
