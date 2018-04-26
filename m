@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52468)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fBfH0-0003se-Nd
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 07:41:15 -0400
+	(envelope-from <armbru@redhat.com>) id 1fBfLS-0005JB-Sk
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 07:45:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fBfGz-0003mg-SD
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 07:41:14 -0400
-References: <20180426103430.768-1-david@redhat.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <17e55323-8266-2bed-780a-3559d87c8c56@gmail.com>
-Date: Thu, 26 Apr 2018 14:41:01 +0300
+	(envelope-from <armbru@redhat.com>) id 1fBfLR-0006gj-Kf
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 07:45:50 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1521452376-25099-1-git-send-email-thuth@redhat.com>
+Date: Thu, 26 Apr 2018 13:45:27 +0200
+In-Reply-To: <1521452376-25099-1-git-send-email-thuth@redhat.com> (Thomas
+	Huth's message of "Mon, 19 Mar 2018 10:39:36 +0100")
+Message-ID: <87bme62nu0.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180426103430.768-1-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] pc-dimm: fix error messages if no slots
- were defined
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC PATCH] tests/device-introspect: Test devices
+ with all machines, not only with "none"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,52 +23,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eduardo Habkost <ehabkost@redhat.com>
 
-Hi David,
+Thomas Huth <thuth@redhat.com> writes:
 
-On 26/04/2018 13:34, David Hildenbrand wrote:
-> If not slots were defined we try to allocate an empty bitmap, which
-
-not -> no
-
-> fails.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+> Many device introspection crashes only happen if you are using a
+> certain machine, e.g.:
+>
+> $ ppc-softmmu/qemu-system-ppc -S -M ref405ep,accel=qtest -qmp stdio
+> {"QMP": {"version": {"qemu": {"micro": 50, "minor": 11, "major": 2},
+>  "package": "build-all"}, "capabilities": []}}
+> { 'execute': 'qmp_capabilities' }
+> {"return": {}}
+> { 'execute': 'device-list-properties',
+>   'arguments': {'typename': 'macio-newworld'}}
+> Unexpected error in qemu_chr_fe_init() at chardev/char-fe.c:222:
+> Device 'serial0' is in use
+> Aborted (core dumped)
+>
+> To be able to catch these problems, let's extend the device-introspect
+> test to check the devices on all machine types. Since this is a rather
+> slow operation, the test is only run in "SPEED=slow" mode.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
-> 
-> This fixes the queued patch "exec: Allow memory regions with size 0"
-> 
->  hw/mem/pc-dimm.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> index 0119c68e01..f2c140947d 100644
-> --- a/hw/mem/pc-dimm.c
-> +++ b/hw/mem/pc-dimm.c
-> @@ -118,9 +118,15 @@ static int pc_dimm_slot2bitmap(Object *obj, void *opaque)
+>  In case someone wants to help with creating some bug fix patches
+>  during the QEMU hard freeze phase: This test can now be used to
+>  trigger lots of introspection bugs that we were not aware of yet.
+>  I think most of the bugs are due to wrong handling of instance_init
+>  vs. realize functions.
+>  For Example:
+>  $ make check-qtest SPEED=slow
+>   GTESTER check-qtest-aarch64
+>  RAMBlock "integrator.flash" already registered, abort!
+>  Broken pipe
+>  GTester: last random seed: R02S8e52709605790d290d2c8261cefb8b0e
+>  Unsupported NIC model: lan9118
+>  Broken pipe
+>  GTester: last random seed: R02S326d4ea43bfce860ebe2d554192540f7
+>  qemu-system-aarch64: warning: nic lan9118.0 has no peer
+>  Unsupported NIC model: smc91c111
+>  Broken pipe
+>  GTester: last random seed: R02Se9783b450806f350a14e757b175e3dc4
+>  qemu-system-aarch64: missing SecureDigital device
+>  Broken pipe
+>  GTester: last random seed: R02S5c718b8f4c4fd48a358de8daafcf1b6f
+>  qemu-system-aarch64: warning: nic lan9118.0 has no peer
+>  Unexpected error in error_set_from_qdev_prop_error() at hw/core/qdev-properties.c:1095:
+>  Property 'allwinner-emac.netdev' can't take value 'hub0port0', it's in use
+>  Broken pipe
+>  GTester: last random seed: R02S597848ddcfdc76a695a946a9d4e50146
+>  qemu-system-aarch64: warning: nic ftgmac100.0 has no peer
+>  GTester: last random seed: R02Seea0f0b769a2161fa53a50479fd68d84
+>  qemu-system-aarch64: warning: nic imx.fec.0 has no peer
+>  qemu-system-aarch64: missing SecureDigital device
+>  Broken pipe
+>  GTester: last random seed: R02S9c2d3e34427162e7a56aa4ac859f1a6b
+>  Unsupported NIC model: virtio-net-pci
+>  Broken pipe
+>  GTester: last random seed: R02Sd61c0e9ed52d50a17c784213e5c6590c
+>  Unsupported NIC model: mv88w8618
+>  Broken pipe
+>  GTester: last random seed: R02Sbfaecfe58dd643f2faca218e3051d464
+>  qemu-system-aarch64: warning: nic mv88w8618_eth.0 has no peer
+>  qemu-system-aarch64: missing SecureDigital device
+>  Broken pipe
+>  Unsupported NIC model: xgmac
+>  Broken pipe
+>  GTester: last random seed: R02Sc61e65e884e364652c3a0c4190023565
+>  fsl,imx7: Only 2 CPUs are supported (4 requested)
+>  Broken pipe
+>  GTester: last random seed: R02S0cfda43bc17e3e052d5a994b2c96457b
+>  etc.
+>
+>  tests/device-introspect-test.c | 33 ++++++++++++++++++++++++++++++---
+>  1 file changed, 30 insertions(+), 3 deletions(-)
+>
+> diff --git a/tests/device-introspect-test.c b/tests/device-introspect-test.c
+> index b80058f..a9b9cf7 100644
+> --- a/tests/device-introspect-test.c
+> +++ b/tests/device-introspect-test.c
+> @@ -105,6 +105,8 @@ static void test_one_device(const char *type)
+>      QDict *resp;
+>      char *help, *qom_tree;
 >  
->  int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp)
+> +    g_debug("Testing device '%s'", type);
+> +
+>      resp = qmp("{'execute': 'device-list-properties',"
+>                 " 'arguments': {'typename': %s}}",
+>                 type);
+> @@ -206,13 +208,13 @@ static void test_device_intro_abstract(void)
+>      qtest_end();
+>  }
+>  
+> -static void test_device_intro_concrete(void)
+> +static void test_device_intro_concrete(gconstpointer args)
+
+const void *, please, because that's what qtest_add_data_func() takes.
+
 >  {
-> -    unsigned long *bitmap = bitmap_new(max_slots);
-> +    unsigned long *bitmap;
->      int slot = 0;
+>      QList *types;
+>      QListEntry *entry;
+>      const char *type;
 >  
-> +    if (max_slots <= 0) {
-> +        error_setg(errp, "no free slots available");
-
-Maybe a better error message would be "no slots were allocated"
-since max_slots is 0.
-
-Thanks,
-Marcel
-
-> +        return slot;
+> -    qtest_start(common_args);
+> +    qtest_start((const char *)args);
+>      types = device_type_list(false);
+>  
+>      QLIST_FOREACH_ENTRY(types, entry) {
+> @@ -224,6 +226,7 @@ static void test_device_intro_concrete(void)
+>  
+>      QDECREF(types);
+>      qtest_end();
+> +    g_free((void *)args);
+>  }
+>  
+>  static void test_abstract_interfaces(void)
+> @@ -260,6 +263,26 @@ static void test_abstract_interfaces(void)
+>      qtest_end();
+>  }
+>  
+> +static void add_machine_test_case(const char *mname)
+> +{
+> +    char *path, *args;
+> +
+> +    /* Ignore blacklisted machines */
+> +    if (g_str_equal("xenfv", mname) || g_str_equal("xenpv", mname)) {
+> +        return;
 > +    }
 > +
-> +    bitmap = bitmap_new(max_slots);
->      object_child_foreach(qdev_get_machine(), pc_dimm_slot2bitmap, bitmap);
+> +    path = g_strdup_printf("device/introspect/concrete-defaults-%s", mname);
+> +    args = g_strdup_printf("-machine %s", mname);
+> +    qtest_add_data_func(path, args, test_device_intro_concrete);
+
+This runs test_device_intro_concrete() with "-machine M" for all machine
+types M, in SPEED=slow mode.
+
+> +    g_free(path);
+> +
+> +    path = g_strdup_printf("device/introspect/concrete-nodefaults-%s", mname);
+> +    args = g_strdup_printf("-nodefaults -machine %s", mname);
+> +    qtest_add_data_func(path, args, test_device_intro_concrete);
+
+This runs test_device_intro_concrete() with "-nodefaults -machine M" for
+all machine types M, in SPEED=slow mode.
+
+Has "without -nodefaults" exposed additional bugs?
+
+Please mention "with and without -nodefaults" in the commit message.
+
+I'd try "with -nodefaults" before "without", because "with" is the
+simpler test case.
+
+> +    g_free(path);
+> +}
+> +
+>  int main(int argc, char **argv)
+>  {
+>      g_test_init(&argc, &argv, NULL);
+> @@ -268,8 +291,12 @@ int main(int argc, char **argv)
+>      qtest_add_func("device/introspect/list-fields", test_qom_list_fields);
+>      qtest_add_func("device/introspect/none", test_device_intro_none);
+>      qtest_add_func("device/introspect/abstract", test_device_intro_abstract);
+> -    qtest_add_func("device/introspect/concrete", test_device_intro_concrete);
+>      qtest_add_func("device/introspect/abstract-interfaces", test_abstract_interfaces);
+> +    qtest_add_data_func("device/introspect/concrete", g_strdup(common_args),
+> +                        test_device_intro_concrete);
+
+This runs test_device_intro_concrete() with "-nodefaults -machine
+none".  Duplicate in SPEED=slow mode?
+
+> +    if (g_test_slow()) {
+> +        qtest_cb_for_every_machine(add_machine_test_case);
+> +    }
 >  
->      /* check if requested slot is not occupied */
-> 
+>      return g_test_run();
+>  }
