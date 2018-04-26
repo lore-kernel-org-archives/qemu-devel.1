@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fBlQP-0006WQ-1j
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:15:21 -0400
+	(envelope-from <prvs=647a3a28a=Ian.Jackson@citrix.com>)
+	id 1fBlQh-0006iO-5G
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:15:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fBlQN-0001C8-T9
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:15:21 -0400
-References: <20180426161958.2872-1-rkagan@virtuozzo.com>
-	<20180426161958.2872-2-rkagan@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <42359b37-0520-5c71-7a7a-9d347c0475da@redhat.com>
-Date: Thu, 26 Apr 2018 13:15:13 -0500
+	(envelope-from <prvs=647a3a28a=Ian.Jackson@citrix.com>)
+	id 1fBlQd-0001S3-NZ
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:15:39 -0400
+Received: from smtp03.citrix.com ([162.221.156.55]:41944)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <prvs=647a3a28a=Ian.Jackson@citrix.com>)
+	id 1fBlQd-0001PQ-6D
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:15:35 -0400
+From: Ian Jackson <ian.jackson@citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <20180426161958.2872-2-rkagan@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="8dDJQG5LY2kqyMv2KLKvuPoo5nJ347Nb8"
-Subject: Re: [Qemu-devel] [PATCH 01/17] block: iterate_format with account
- of whitelisting
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Message-ID: <23266.5953.493587.944766@mariner.uk.xensource.com>
+Date: Thu, 26 Apr 2018 19:15:29 +0100
+Subject: [Qemu-devel] [RESEND PULL v9 00/16] xen: xen-domid-restrict
+ improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,66 +28,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Ross Lagerwall <ross.lagerwall@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Ian Jackson <Ian.Jackson@eu.citrix.com>, Alistair Francis <alistair.francis@wdc.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---8dDJQG5LY2kqyMv2KLKvuPoo5nJ347Nb8
-From: Eric Blake <eblake@redhat.com>
-To: Roman Kagan <rkagan@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Message-ID: <42359b37-0520-5c71-7a7a-9d347c0475da@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 01/17] block: iterate_format with account of
- whitelisting
-References: <20180426161958.2872-1-rkagan@virtuozzo.com>
- <20180426161958.2872-2-rkagan@virtuozzo.com>
-In-Reply-To: <20180426161958.2872-2-rkagan@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The following changes since commit b8846a4d6352b2a1d2012f8b3b9115640524aeda:
 
-On 04/26/2018 11:19 AM, Roman Kagan wrote:
-> bdrv_iterate_format (which is currently only used for printing out the
-> formats supported by the block layer) doesn't take format whitelisting
-> into account.
->=20
-> As a result, QEMU lies when asked for the list of block drivers it
-> supports with "-drive format=3D?": some of the formats there may be
-> recognized by qemu-* tools but unusable in qemu proper.
->=20
-> To avoid that, exclude formats that are not whitelisted from
-> enumeration, if whitelisting is in use.  Since we have separate
-> whitelists for r/w and r/o, take this as a parameter to
-> bdrv_iterate_format, and print two lists of supported formats (r/w and
-> r/o) in main qemu.
->=20
-> Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
-> ---
+  vl.c: new function serial_max_hds() (2018-04-26 13:58:29 +0100)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+are available in the git repository at:
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+  https://xenbits.xen.org/git-http/people/iwj/qemu.git tags/for-upstream.depriv-2
 
+for you to fetch changes up to 8bbe05d77360b73c1834808023016a778ccf55ca:
 
---8dDJQG5LY2kqyMv2KLKvuPoo5nJ347Nb8
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  configure: do_compiler: Dump some extra info under bash (2018-04-26 16:29:52 +0100)
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+----------------------------------------------------------------
+xen: xen-domid-restrict improvements
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlriFzEACgkQp6FrSiUn
-Q2rYZAgAm67b2HCzFcVsZiZRsY6FgCZ5EbEpJi0gqiRLiuyhUhbqKg4Ruv9Wfu4t
-cA9cTYQe6qKb5ECeUcnet3lVsqcUxFo+cKVyKchHBbvAwTmgFSgQRRT/9YmK3M/i
-E2qvXiQlNIXe8F2nEXdr/NcXjKsyi71QD3opLVQZfpGESX/6yr6fuwzs9eT+OJrF
-g9hQkkxi39bqGKNRt4HDOW01JUF68mvsYAMmGjJxN7T55qXyojWYmIDoVHZs2aJS
-tJ0aP2fAAeXhbwnW1/Fy+alfP4pNnk6Qmc9ZbNky2zojbulmj3vuj5A5iJJw6T1H
-lyJj3wJURTy54cevX1wIRN+rRp2bnQ==
-=UjhH
------END PGP SIGNATURE-----
+This series provides necessary support for running qemu as a Xen
+device model without power equivalent to root.  In particular, it
+makes -xen-domid-restrict effective.
 
---8dDJQG5LY2kqyMv2KLKvuPoo5nJ347Nb8--
+The patches are unchanged since v8, apart from additional reviews, and
+rebasing onto master.  All the patches are now reviewed and/or acked
+apart from the patch to configure, which has a Tested-by from Thomas
+Huth.  I have stripped off the per-patch-series-verson update
+comments.
+
+----------------------------------------------------------------
+Anthony PERARD (1):
+      xen: link against xentoolcore
+
+Ian Jackson (13):
+      checkpatch: Add xendevicemodel_handle to the list of types
+      AccelClass: Introduce accel_setup_post
+      xen: restrict: use xentoolcore_restrict_all
+      xen: defer call to xen_restrict until just before os_setup_post
+      xen: destroy_hvm_domain: Move reason into a variable
+      xen: move xc_interface compatibility fallback further up the file
+      xen: destroy_hvm_domain: Try xendevicemodel_shutdown
+      os-posix: cleanup: Replace fprintfs with error_report in change_process_uid
+      os-posix: Provide new -runas <uid>:<gid> facility
+      xen: Remove now-obsolete xen_xc_domain_add_to_physmap
+      os-posix: cleanup: Replace fprintf with error_report in remaining call sites
+      os-posix: cleanup: Replace perror with error_report
+      configure: do_compiler: Dump some extra info under bash
+
+Ross Lagerwall (2):
+      xen: Use newly added dmops for mapping VGA memory
+      xen: Expect xenstore write to fail when restricted
+
+ accel/accel.c               |   9 ++++
+ configure                   |  33 +++++++++++-
+ hw/i386/xen/xen-hvm.c       |  75 ++++++++++++++------------
+ hw/xen/xen-common.c         |  21 +++++++-
+ include/hw/xen/xen_common.h | 125 +++++++++++++++++++++-----------------------
+ include/sysemu/accel.h      |   3 ++
+ os-posix.c                  |  91 +++++++++++++++++++++++++-------
+ qemu-options.hx             |   3 +-
+ scripts/checkpatch.pl       |   1 +
+ vl.c                        |   1 +
+ 10 files changed, 242 insertions(+), 120 deletions(-)
