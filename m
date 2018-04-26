@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45166)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fBiLR-0004RV-Sn
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 10:58:02 -0400
+	(envelope-from <jmoyer@redhat.com>) id 1fBg05-0005dY-PZ
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 08:27:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fBiLO-00033G-7p
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 10:58:01 -0400
-Date: Thu, 26 Apr 2018 15:57:54 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180426145754.GH30991@stefanha-x1.localdomain>
-References: <20180418030424.28980-1-famz@redhat.com>
-	<20180418030424.28980-3-famz@redhat.com>
+	(envelope-from <jmoyer@redhat.com>) id 1fBg00-0006LC-Oc
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 08:27:49 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43924 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jmoyer@redhat.com>) id 1fBg00-0006JQ-KJ
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 08:27:44 -0400
+From: Jeff Moyer <jmoyer@redhat.com>
+References: <20180425112415.12327-1-pagupta@redhat.com>
+	<20180425112415.12327-2-pagupta@redhat.com>
+	<CAPcyv4hvrB08XPTbVK0xT2_1Xmaid=-v3OMxJVDTNwQucsOHLA@mail.gmail.com>
+	<CAPcyv4hiowWozV527sQA_e4fdgCYbD6xfG==vepAqu0hxQEQcw@mail.gmail.com>
+Date: Thu, 26 Apr 2018 08:27:41 -0400
+In-Reply-To: <CAPcyv4hiowWozV527sQA_e4fdgCYbD6xfG==vepAqu0hxQEQcw@mail.gmail.com>
+	(Dan Williams's message of "Wed, 25 Apr 2018 07:43:52 -0700")
+Message-ID: <x49o9i6885e.fsf@segfault.boston.devel.redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ZPDwMsyfds7q4mrK"
-Content-Disposition: inline
-In-Reply-To: <20180418030424.28980-3-famz@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH v2 2/7] raw: Implement
- copy offloading
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC v2 1/2] virtio: add pmem driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,37 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Max Reitz <mreitz@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: Pankaj Gupta <pagupta@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, KVM list <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, linux-nvdimm <linux-nvdimm@ml01.01.org>, Linux MM <linux-mm@kvack.org>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Rik van Riel <riel@surriel.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Nitesh Narayan Lal <nilal@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Zwisler,
+	Ross" <ross.zwisler@intel.com>, David Hildenbrand <david@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Christoph Hellwig <hch@infradead.org>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, niteshnarayanlal@hotmail.com, Igor Mammedov <imammedo@redhat.com>, lcapitulino@redhat.com
 
+Dan Williams <dan.j.williams@intel.com> writes:
 
---ZPDwMsyfds7q4mrK
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> [ adding Jeff directly since he has also been looking at
+> infrastructure to track when MAP_SYNC should be disabled ]
+>
+> On Wed, Apr 25, 2018 at 7:21 AM, Dan Williams <dan.j.williams@intel.com> wrote:
+>> On Wed, Apr 25, 2018 at 4:24 AM, Pankaj Gupta <pagupta@redhat.com> wrote:
+>>> This patch adds virtio-pmem driver for KVM
+>>> guest.
+>>
+>> Minor nit, please expand your changelog line wrapping to 72 columns.
+>>
+>>>
+>>> Guest reads the persistent memory range
+>>> information from Qemu over VIRTIO and registers
+>>> it on nvdimm_bus. It also creates a nd_region
+>>> object with the persistent memory range
+>>> information so that existing 'nvdimm/pmem'
+>>> driver can reserve this into system memory map.
+>>> This way 'virtio-pmem' driver uses existing
+>>> functionality of pmem driver to register persistent
+>>> memory compatible for DAX capable filesystems.
+>>
+>> We need some additional enabling to disable MAP_SYNC for this
 
-On Wed, Apr 18, 2018 at 11:04:19AM +0800, Fam Zheng wrote:
-> Just pass down to ->file.
->=20
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  block/raw-format.c | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
+enable to disable... I like it!  ;-)
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+>> configuration. In other words, if fsync() is required then we must
+>> disable the MAP_SYNC optimization. I think this should be a struct
+>> dax_device property looked up at mmap time in each MAP_SYNC capable
+>> ->mmap() file operation implementation.
 
---ZPDwMsyfds7q4mrK
-Content-Type: application/pgp-signature; name="signature.asc"
+Ideally, qemu (seabios?) would advertise a platform capabilities
+sub-table that doesn't fill in the flush bits.
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJa4ejyAAoJEJykq7OBq3PIbXUH+wUPmqdHS/5j7ImpjImNt1c7
-39sShcc+s8sPqs1X2TJ8oxSr1qO7jr5/LFnX6nNNFO0qUh0AZigTXEPREBYK9JJ0
-2eYFD/aoaIztzXluNi6VXAuE3awwLsfZCYfVMEA+3Ck6tushnEbLCMQVhxPnO3h5
-m0+t7uzuPGW1vky6bo6sHqu5QzugUSeZFfMouNMWbCapzrPmG/tiCGS4SCWjp3G1
-0OMyx4lI8yxlwAJzKRXL7K9flS9BdOIL+gf5QYN425HUf9tA+UOYRZSd/oANfZX2
-moCZNoQZ4bMTUKIYtd92MNZpOKVCvTH7/PscC6D7J4zrXEE7l3LxVaJAh7tnLrg=
-=QLe+
------END PGP SIGNATURE-----
-
---ZPDwMsyfds7q4mrK--
+-Jeff
