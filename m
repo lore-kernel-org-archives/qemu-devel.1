@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56515)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56888)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fBlg0-0004AH-60
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:31:29 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fBlhh-0004qs-21
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:33:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fBlfz-0005ss-A3
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:31:28 -0400
-Received: from mail-ot0-x229.google.com ([2607:f8b0:4003:c0f::229]:37844)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fBlfz-0005sd-3f
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:31:27 -0400
-Received: by mail-ot0-x229.google.com with SMTP id 77-v6so24433584otd.4
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 11:31:27 -0700 (PDT)
+	(envelope-from <no-reply@patchew.org>) id 1fBlhd-0006tU-U6
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:33:13 -0400
+Resent-Message-Id: <E1fBlhd-0006tU-U6@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21114)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fBlhd-0006sw-Lg
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 14:33:09 -0400
+In-Reply-To: <20180426161958.2872-1-rkagan@virtuozzo.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152476123379.2343.11831759109826938559@71c20359a636>
 MIME-Version: 1.0
-In-Reply-To: <2f69532c-8651-ef67-0910-1fad91808608@redhat.com>
-References: <20180425153343.24023-1-alex.bennee@linaro.org>
-	<cb41b3a5-0e3b-f30b-a02c-1cc333d38ab1@redhat.com>
-	<87604ekl0c.fsf@linaro.org>
-	<2f69532c-8651-ef67-0910-1fad91808608@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 26 Apr 2018 19:31:05 +0100
-Message-ID: <CAFEAcA_G0n2ar6PYOuxyppD5jBbs+fXEC=PGA9+-+BsyGNMX8g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC PATCH] hw/core: expand description of
- null-machine
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 26 Apr 2018 09:47:14 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 00/17] iotests: don't choke on disabled
+ drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,35 +29,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+To: rkagan@virtuozzo.com
+Cc: famz@redhat.com, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-On 26 April 2018 at 19:18, Thomas Huth <thuth@redhat.com> wrote:
-> I don't think it makes sense to instantiate e.g. an interrupt controller
-> with the "none" machine automatically ... so the raw cortex-m3 core
-> should either be usable without that, too
-
-The interrupt controller in an M-profile core is an integral
-part of the CPU itself (it happens to be accessible via
-memory-mapped accesses); our "nvic" object in QEMU also
-implements various other "core part of the CPU but the
-interface is memory mapped registers" functionality that isn't
-strictly part of the interrupt controller. A configuration
-which has an M profile CPU and does not have these registers
-and the interrupt controller isn't architecturally permitted
-and is just not right. We shouldn't let users configure QEMU
-that way.
-
-It's not really clear to me what the "none" machine is for,
-though...
-
-> or there just should be an error message instead of a crash
-> when the additional hardware is not available
-
-This would certainly be a good start.
-
-(M profile is significantly different from A profile in
-this area, which is why A profile doesn't crash here.)
-
-thanks
--- PMM
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNDI2MTYxOTU4LjI4NzItMS1ya2FnYW5AdmlydHVvenpvLmNvbQpTdWJq
+ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAwLzE3XSBpb3Rlc3RzOiBkb24ndCBjaG9rZSBvbiBk
+aXNhYmxlZCBkcml2ZXJzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpC
+QVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpm
+YWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3Jp
+dGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAk
+QkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAk
+bi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0
+IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxi
+YWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQo
+KG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
+bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8v
+Z2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAg
+ICBwYXRjaGV3LzE1MjQ2NjY5MzQtODA2NC0xLWdpdC1zZW5kLWVtYWlsLWxpZG9uZ2NoZW5AdGVu
+Y2VudC5jb20gLT4gcGF0Y2hldy8xNTI0NjY2OTM0LTgwNjQtMS1naXQtc2VuZC1lbWFpbC1saWRv
+bmdjaGVuQHRlbmNlbnQuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAx
+ODA0MjYxNjE5NTguMjg3Mi0xLXJrYWdhbkB2aXJ0dW96em8uY29tIC0+IHBhdGNoZXcvMjAxODA0
+MjYxNjE5NTguMjg3Mi0xLXJrYWdhbkB2aXJ0dW96em8uY29tClN3aXRjaGVkIHRvIGEgbmV3IGJy
+YW5jaCAndGVzdCcKMDczOTk0ZWRlMCBpb3Rlc3QgMTg0OiBub3RydW4gaWYgbnVsbC1jbyBvciB0
+aHJvdHRsZSBpcyBkaXNhYmxlZAowZDZhMTAzYTJlIGlvdGVzdCAxNDc6IG5vdHJ1biBpZiBuYmQg
+aXMgZGlzYWJsZWQKM2I2Yzg4YzQwMCBpb3Rlc3QgMTM5OiBza2lwIHRlc3RjYXNlcyB1c2luZyBk
+aXNhYmxlZCBkcml2ZXJzCmU2ZjEyNTUxZGIgaW90ZXN0IDEyNDogc2tpcCB0ZXN0Y2FzZXMgdXNp
+bmcgYmxrZGVidWcgaWYgZGlzYWJsZWQKMTRhMmNjODc0ZCBpb3Rlc3QgMDk5OiBub3RydW4gaWYg
+YmxrZGVidWcgb3IgYmxrdmVyaWZ5IGlzIGRpc2FibGVkCmYwYTQyMjc4Y2MgaW90ZXN0IDA5Mzog
+bm90cnVuIGlmIG51bGwtY28gb3IgbnVsbC1haW8gaXMgZGlzYWJsZWQKZWRhNWI4NThjNyBpb3Rl
+c3QgMDg3OiBub3RydW4gaWYgbnVsbC1jbyBpcyBkaXNhYmxlZApkZDYwN2NkZjhhIGlvdGVzdCAw
+ODE6IG5vdHJ1biBpZiBxdW9ydW0gaXMgZGlzYWJsZWQKNzhjNmVmMzYxZiBpb3Rlc3QgMDcxOiBu
+b3RydW4gaWYgYmxrZGVidWcgb3IgYmxrdmVyaWZ5IGlzIGRpc2FibGVkCmEwNGZiM2QzZTIgaW90
+ZXN0IDA1Njogc2tpcCB0ZXN0Y2FzZXMgdXNpbmcgYmxrZGVidWcgaWYgZGlzYWJsZWQKZGYyMjFj
+Y2RlYSBpb3Rlc3QgMDU1OiByZXF1aXJlIGJsa2RlYnVnCjcxMDI1NDc0NGQgaW90ZXN0IDA1NTog
+c2tpcCB1bnN1cHBvcnRlZCBiYWNrdXAgdGFyZ2V0IGZvcm1hdHMKYzYzNTkzOWU1MCBpb3Rlc3Qg
+MDMwOiByZXF1aXJlIGJsa2RlYnVnCjUzMzhjNTNkMGYgaW90ZXN0IDAzMDogc2tpcCBxdW9ydW0g
+dGVzdCBzZXR1cC90ZWFyZG93biB0b28KY2EyNGUyODFkOCBpb3Rlc3RzOiBhc2sgcWVtdSBmb3Ig
+c3VwcG9ydGVkIGZvcm1hdHMKNjQyMDIwZmYyOSBpb3Rlc3RzOiBpb3Rlc3RzLnB5OiBwcmV2ZW50
+IGRlYWRsb2NrIGluIHN1YnByb2Nlc3MKMGMwZjdkNzAwNSBibG9jazogaXRlcmF0ZV9mb3JtYXQg
+d2l0aCBhY2NvdW50IG9mIHdoaXRlbGlzdGluZwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tp
+bmcgUEFUQ0ggMS8xNzogYmxvY2s6IGl0ZXJhdGVfZm9ybWF0IHdpdGggYWNjb3VudCBvZiB3aGl0
+ZWxpc3RpbmcuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xNzogaW90ZXN0czogaW90ZXN0cy5weTogcHJl
+dmVudCBkZWFkbG9jayBpbiBzdWJwcm9jZXNzLi4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFj
+dGVycwojMjk6IEZJTEU6IHRlc3RzL3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5OjEwOToKKyAgICAg
+ICAgc3lzLnN0ZGVyci53cml0ZSgncWVtdS1pbWcgcmVjZWl2ZWQgc2lnbmFsICVpOiAlc1xuJyAl
+ICgtc3VicC5yZXR1cm5jb2RlLCAnICcuam9pbihxZW11X2ltZ19hcmdzICsgbGlzdChhcmdzKSkp
+KQoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM0MzogRklMRTogdGVzdHMvcWVtdS1p
+b3Rlc3RzL2lvdGVzdHMucHk6MTE5OgorICAgICAgICBzeXMuc3RkZXJyLndyaXRlKCdxZW11LWlv
+IHJlY2VpdmVkIHNpZ25hbCAlaTogJXNcbicgJSAoLXN1YnAucmV0dXJuY29kZSwgJyAnLmpvaW4o
+YXJncykpKQoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAyOCBsaW5lcyBjaGVja2VkCgpZ
+b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
+aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
+aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAzLzE3
+OiBpb3Rlc3RzOiBhc2sgcWVtdSBmb3Igc3VwcG9ydGVkIGZvcm1hdHMuLi4KRVJST1I6IGxpbmUg
+b3ZlciA5MCBjaGFyYWN0ZXJzCiM1ODogRklMRTogdGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMu
+cHk6MTMwOgorICAgICAgICBzeXMuc3RkZXJyLndyaXRlKCdxZW11IHJlY2VpdmVkIHNpZ25hbCAl
+aTogJXNcbicgJSAoLXN1YnAucmV0dXJuY29kZSwgJyAnLmpvaW4oYXJncykpKQoKdG90YWw6IDEg
+ZXJyb3JzLCAwIHdhcm5pbmdzLCA3MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
+ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
+bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
+Q0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA0LzE3OiBpb3Rlc3QgMDMwOiBza2lw
+IHF1b3J1bSB0ZXN0IHNldHVwL3RlYXJkb3duIHRvby4uLgpDaGVja2luZyBQQVRDSCA1LzE3OiBp
+b3Rlc3QgMDMwOiByZXF1aXJlIGJsa2RlYnVnLi4uCkNoZWNraW5nIFBBVENIIDYvMTc6IGlvdGVz
+dCAwNTU6IHNraXAgdW5zdXBwb3J0ZWQgYmFja3VwIHRhcmdldCBmb3JtYXRzLi4uCkNoZWNraW5n
+IFBBVENIIDcvMTc6IGlvdGVzdCAwNTU6IHJlcXVpcmUgYmxrZGVidWcuLi4KQ2hlY2tpbmcgUEFU
+Q0ggOC8xNzogaW90ZXN0IDA1Njogc2tpcCB0ZXN0Y2FzZXMgdXNpbmcgYmxrZGVidWcgaWYgZGlz
+YWJsZWQuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8xNzogaW90ZXN0IDA3MTogbm90cnVuIGlmIGJsa2Rl
+YnVnIG9yIGJsa3ZlcmlmeSBpcyBkaXNhYmxlZC4uLgpDaGVja2luZyBQQVRDSCAxMC8xNzogaW90
+ZXN0IDA4MTogbm90cnVuIGlmIHF1b3J1bSBpcyBkaXNhYmxlZC4uLgpDaGVja2luZyBQQVRDSCAx
+MS8xNzogaW90ZXN0IDA4Nzogbm90cnVuIGlmIG51bGwtY28gaXMgZGlzYWJsZWQuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMTIvMTc6IGlvdGVzdCAwOTM6IG5vdHJ1biBpZiBudWxsLWNvIG9yIG51bGwtYWlv
+IGlzIGRpc2FibGVkLi4uCkNoZWNraW5nIFBBVENIIDEzLzE3OiBpb3Rlc3QgMDk5OiBub3RydW4g
+aWYgYmxrZGVidWcgb3IgYmxrdmVyaWZ5IGlzIGRpc2FibGVkLi4uCkNoZWNraW5nIFBBVENIIDE0
+LzE3OiBpb3Rlc3QgMTI0OiBza2lwIHRlc3RjYXNlcyB1c2luZyBibGtkZWJ1ZyBpZiBkaXNhYmxl
+ZC4uLgpDaGVja2luZyBQQVRDSCAxNS8xNzogaW90ZXN0IDEzOTogc2tpcCB0ZXN0Y2FzZXMgdXNp
+bmcgZGlzYWJsZWQgZHJpdmVycy4uLgpDaGVja2luZyBQQVRDSCAxNi8xNzogaW90ZXN0IDE0Nzog
+bm90cnVuIGlmIG5iZCBpcyBkaXNhYmxlZC4uLgpDaGVja2luZyBQQVRDSCAxNy8xNzogaW90ZXN0
+IDE4NDogbm90cnVuIGlmIG51bGwtY28gb3IgdGhyb3R0bGUgaXMgZGlzYWJsZWQuLi4KPT09IE9V
+VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
+XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
