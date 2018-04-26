@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fBfRp-0006vB-9j
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 07:52:26 -0400
+	(envelope-from <armbru@redhat.com>) id 1fBfUA-0007nu-Qh
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 07:54:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fBfRk-0000jY-DX
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 07:52:25 -0400
-References: <20180418123838.3511-1-olaf@aepfle.de>
-	<20180418124753.GM27579@redhat.com>
-	<CAFEAcA_TtC-p4JJFRPaBFwim1a8J9G+z79KAK8vqrTx7ZKjOKg@mail.gmail.com>
-	<20180418144433.GV27579@redhat.com>
-	<CAFEAcA8jXwo35B7KVdVZEiqZTtMRvVXCP87iHKECjWPkHiTJ_A@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c9b7c417-e714-658b-20da-7150c9ec8ab9@redhat.com>
-Date: Thu, 26 Apr 2018 13:52:04 +0200
+	(envelope-from <armbru@redhat.com>) id 1fBfUA-0001HH-0L
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 07:54:50 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1521452376-25099-1-git-send-email-thuth@redhat.com>
+	<87in8qf2w3.fsf@dusky.pond.sub.org>
+	<62dba5cf-b497-1a98-0af5-971e169a3458@redhat.com>
+Date: Thu, 26 Apr 2018 13:54:43 +0200
+In-Reply-To: <62dba5cf-b497-1a98-0af5-971e169a3458@redhat.com> (Thomas Huth's
+	message of "Thu, 26 Apr 2018 12:24:48 +0200")
+Message-ID: <877eou2nek.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8jXwo35B7KVdVZEiqZTtMRvVXCP87iHKECjWPkHiTJ_A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] configure: require glib-2.24
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC PATCH] tests/device-introspect: Test devices
+ with all machines, not only with "none"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,17 +25,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: Olaf Hering <olaf@aepfle.de>, QEMU Trivial <qemu-trivial@nongnu.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 
-On 26/04/2018 10:17, Peter Maydell wrote:
-> I've now made the switch to homebrew, and so my OSX build tests
-> will be using glib 2.56. NB that this means that none of my merge
-> testing will catch "glib version too old" for our current setting
-> of "too old" -- I'm not sure what my current oldest version is in
-> the test machine set.
+Thomas Huth <thuth@redhat.com> writes:
 
-The min-glib Dockerfile is using glib 2.22 (on CentOS 6).  The CentOS 6
-build is using 2.28.
+> On 17.04.2018 14:12, Markus Armbruster wrote:
+>> Thomas Huth <thuth@redhat.com> writes:
+>> 
+>>> Many device introspection crashes only happen if you are using a
+>>> certain machine, e.g.:
+>>>
+>>> $ ppc-softmmu/qemu-system-ppc -S -M ref405ep,accel=qtest -qmp stdio
+>>> {"QMP": {"version": {"qemu": {"micro": 50, "minor": 11, "major": 2},
+>>>  "package": "build-all"}, "capabilities": []}}
+>>> { 'execute': 'qmp_capabilities' }
+>>> {"return": {}}
+>>> { 'execute': 'device-list-properties',
+>>>   'arguments': {'typename': 'macio-newworld'}}
+>>> Unexpected error in qemu_chr_fe_init() at chardev/char-fe.c:222:
+>>> Device 'serial0' is in use
+>>> Aborted (core dumped)
+>>>
+>>> To be able to catch these problems, let's extend the device-introspect
+>>> test to check the devices on all machine types. Since this is a rather
+>>> slow operation, the test is only run in "SPEED=slow" mode.
+>> 
+>> If the device works with one machine type, it has a decent chance to
+>> work with others, too.  Thus, testing each device with every machine
+>> type is overkill.  I appreciate having overkill as an option :)
+>> 
+>> What I'd like to see for a quick "make check" is testing each device
+>> once.  That should flush out most bugs.  
+>
+> That's already done with the "none" machine.
 
-Paolo
+I was too terse.  We test each device with -machine none for every
+target.  Fine if that's quick enough.  If not, we might want to reduce
+redundancy there.
+
+Actually, a worse offender in the "waste everybody's time via redunancy"
+department could be qom-test.
+
+> Anyway, do you think my patch here is useful and has a chance of getting
+> included? I.e. shall I re-spin this as a non-RFC patch? Or shall we
+> rather wait for Eduardo's python-based tests to get included into the
+> repository?
+
+I don't mind having make check SPEED=slow run more extensive tests.
+Assuming we actually run them at least once in a while, which seems
+doubtful.
+
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>>  In case someone wants to help with creating some bug fix patches
+>>>  during the QEMU hard freeze phase: This test can now be used to
+>>>  trigger lots of introspection bugs that we were not aware of yet.
+>>>  I think most of the bugs are due to wrong handling of instance_init
+>>>  vs. realize functions.
+>> 
+>> Yes, that's a common class of bugs.  There's little guidance on what
+>> kind of work belongs where, and plenty of bad examples.
+>
+> I think we urgently need a file in doc/devel/ that describes the various
+> states / functions of a device, where we should properly describe the
+> differences between instance_init and realize. ... I'll try to come up
+> with something when I've got some spare time (unless somebody else
+> volunteers to do that first).
+
+Please do.
+
+Widen the scope from just TYPE_DEVICE to all of QOM?
