@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fBhCD-0006Ck-TA
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 09:44:29 -0400
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fBhJM-0000n5-TJ
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 09:51:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fBhCA-00048v-Qj
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 09:44:25 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36620)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fBhCA-00048f-IR
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 09:44:22 -0400
-Received: by mail-wm0-x244.google.com with SMTP id n10so13357279wmc.1
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 06:44:22 -0700 (PDT)
-Date: Thu, 26 Apr 2018 14:24:06 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180426132406.GC30991@stefanha-x1.localdomain>
-References: <20180425112415.12327-1-pagupta@redhat.com>
-	<20180425112415.12327-4-pagupta@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Fig2xvG2VGoz8o/s"
-Content-Disposition: inline
-In-Reply-To: <20180425112415.12327-4-pagupta@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2] qemu: Add virtio pmem device
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fBhJJ-0007id-VF
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 09:51:48 -0400
+Received: from smtp23.cstnet.cn ([159.226.251.23]:49994 helo=cstnet.cn)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fBhJJ-0007gt-4K
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 09:51:45 -0400
+From: Su Hang <suhang16@mails.ucas.ac.cn>
+Date: Thu, 26 Apr 2018 21:51:36 +0800
+Message-Id: <1524750698-16322-1-git-send-email-suhang16@mails.ucas.ac.cn>
+Subject: [Qemu-devel] [PATCH v6 0/2] Implement Hex file loader and add test
+ case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +22,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-nvdimm@ml01.01.org, linux-mm@kvack.org, jack@suse.cz, stefanha@redhat.com, dan.j.williams@intel.com, riel@surriel.com, haozhong.zhang@intel.com, nilal@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, ross.zwisler@intel.com, david@redhat.com, xiaoguangrong.eric@gmail.com, hch@infradead.org, marcel@redhat.com, mst@redhat.com, niteshnarayanlal@hotmail.com, imammedo@redhat.com, lcapitulino@redhat.com
+To: stefanha@gmail.com, jim@groklearning.com, joel@jms.id.au
+Cc: qemu-devel@nongnu.org
 
 
---Fig2xvG2VGoz8o/s
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+These series of patchs implement Intel Hexadecimal File loader and
+add QTest testcase to verify the correctness of Loader.
 
-On Wed, Apr 25, 2018 at 04:54:15PM +0530, Pankaj Gupta wrote:
-> +static void virtio_pmem_flush(VirtIODevice *vdev, VirtQueue *vq)
-> +{
-> +    VirtQueueElement *elem;
-> +    VirtIOPMEM *pmem = VIRTIO_PMEM(vdev);
-> +    HostMemoryBackend *backend = MEMORY_BACKEND(pmem->memdev);
-> +    int fd = memory_region_get_fd(&backend->mr);
-> +
-> +    elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
-> +    if (!elem) {
-> +        return;
-> +    }
-> +    /* flush raw backing image */
-> +    fsync(fd);
+v1: Basic version.
+v2: Replace `do{}while(cond);` block with `for(;;)` block.
+v3: Add two new files information in MAINTAINERS.
+v4: Correct the 'test.hex' path in hexloader-test.c.
+v5: Split huge parse_hex_blob() function into four small function;
+    Add check for memory bounds;
+    Check validation for Record type;
+    Replace function ctoh() with glib function g_ascii_xdigit_value();
+    Remove check for '.hex' suffix;
+    Remove unnecessary type cast;
+    Remove duplicate zero-initialization;
+    Correct typos;
+v6: Call Intel HEX loader after load_uimage_as();
+    Remove use of KERNEL_LOAD_ADDR;
+    Change (hwaddr) type argument to (hwaddr *) type;
+    Use new struct HexParser to contain all arguments needed by
+        handle_record_type();
+    Enable discontiguous data records (again);
+    Remove unnecessary memory clean: bin_buf and HexLine line;
+    Correct typo;
+    Remove unnecessary check for hex file size;
+    Add entry point handle for START_SEG_ADDR_RECORD and
+        START_LINEAR_ADDR_RECORD record type;
+    Use hwaddr * type to store entry point;
 
-fsync(2) is a blocking syscall.  This can hang QEMU for an unbounded
-amount of time.
+Su Hang (2):
+  Implement .hex file loader
+  Add QTest testcase for the Intel Hexadecimal Object File Loader.
 
-Please do the fsync from a thread pool.  See block/file-posix.c's
-aio_worker() for an example.
+ MAINTAINERS                          |   6 +
+ hw/arm/boot.c                        |  17 ++-
+ hw/core/loader.c                     | 241 +++++++++++++++++++++++++++++++++++
+ include/hw/loader.h                  |  16 +++
+ tests/Makefile.include               |   2 +
+ tests/hex-loader-check-data/test.hex |  12 ++
+ tests/hexloader-test.c               |  56 ++++++++
+ 7 files changed, 345 insertions(+), 5 deletions(-)
+ create mode 100644 tests/hex-loader-check-data/test.hex
+ create mode 100644 tests/hexloader-test.c
 
-> +static void virtio_pmem_get_config(VirtIODevice *vdev, uint8_t *config)
-> +{
-> +    VirtIOPMEM *pmem = VIRTIO_PMEM(vdev);
-> +    struct virtio_pmem_config *pmemcfg = (struct virtio_pmem_config *) config;
-> +
-> +    pmemcfg->start = pmem->start;
-> +    pmemcfg->size  = pmem->size;
-
-Endianness.  Please use virtio_st*_p() instead.
-
-> +#define VIRTIO_PMEM_PLUG 0
-
-What is this?
-
---Fig2xvG2VGoz8o/s
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJa4dL2AAoJEJykq7OBq3PIp2cH/04ij3qJX2uJVEfJckUXj9lJ
-fjMJsmgdYmJatxT52TPw12puheCukYnuCbsWspRls4Q2Lr0sKRZ1vQ9nObO8yTUT
-jtsRUwuiezUPUwih88GHt0Rud52SZtq9fCtkYf3mupjxn22n9x2xeFVMqgKvKZoJ
-QdfS/K5FrrD+wBAptUjTMWt7Kf0mTANUDUUfHj5zgQwT6nwHbFyImF3etC4I98Yf
-MSjPFw3V5mF4TYV5ZoPHXQmE6tjVj2G17SJiKfa5x53RNUMDTYD4DJaLQnCeRLLa
-7ka5Z4SDUlBvZkLDEAx5VQ7rWHPjCpoddcqqXAhiDGDBb6zZAKtY7i/WUV9kxaE=
-=NyIA
------END PGP SIGNATURE-----
-
---Fig2xvG2VGoz8o/s--
+--
+2.7.4
