@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fBghg-0005E8-0l
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 09:12:52 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fBgk9-0006uC-3U
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 09:15:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fBghb-0007X7-38
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 09:12:51 -0400
-References: <20180426103430.768-1-david@redhat.com>
-	<17e55323-8266-2bed-780a-3559d87c8c56@gmail.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <2cd9a5dd-80d4-80d3-ed58-99dc280bc1dd@redhat.com>
-Date: Thu, 26 Apr 2018 15:12:35 +0200
+	(envelope-from <stefanha@gmail.com>) id 1fBgk4-0008WB-4o
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 09:15:25 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:51229)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fBgk3-0008Vm-Np
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 09:15:20 -0400
+Received: by mail-wm0-x242.google.com with SMTP id j4so12901461wme.1
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 06:15:19 -0700 (PDT)
+Date: Thu, 26 Apr 2018 14:15:17 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180426131517.GB30991@stefanha-x1.localdomain>
+References: <20180425112415.12327-1-pagupta@redhat.com>
+	<20180425112415.12327-3-pagupta@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <17e55323-8266-2bed-780a-3559d87c8c56@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] pc-dimm: fix error messages if no slots
- were defined
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="NDin8bjvE/0mNLFQ"
+Content-Disposition: inline
+In-Reply-To: <20180425112415.12327-3-pagupta@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2 2/2] pmem: device flush over VIRTIO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,69 +30,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-devel@nongnu.org
-Cc: Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
-
-On 26.04.2018 13:41, Marcel Apfelbaum wrote:
-> Hi David,
-> 
-> On 26/04/2018 13:34, David Hildenbrand wrote:
->> If not slots were defined we try to allocate an empty bitmap, which
-> 
-> not -> no
-> 
->> fails.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>
->> This fixes the queued patch "exec: Allow memory regions with size 0"
->>
->>  hw/mem/pc-dimm.c | 8 +++++++-
->>  1 file changed, 7 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
->> index 0119c68e01..f2c140947d 100644
->> --- a/hw/mem/pc-dimm.c
->> +++ b/hw/mem/pc-dimm.c
->> @@ -118,9 +118,15 @@ static int pc_dimm_slot2bitmap(Object *obj, void *opaque)
->>  
->>  int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp)
->>  {
->> -    unsigned long *bitmap = bitmap_new(max_slots);
->> +    unsigned long *bitmap;
->>      int slot = 0;
->>  
->> +    if (max_slots <= 0) {
->> +        error_setg(errp, "no free slots available");
-> 
-> Maybe a better error message would be "no slots were allocated"
-> since max_slots is 0.
-
-I am using the same error message as if there are no more slots
-available. If can change it to "no slots where allocated, please specify
-the 'slots' option.
-
-Using max_slots would be wrong.
-
-Thanks!
-
-> 
-> Thanks,
-> Marcel
-> 
->> +        return slot;
->> +    }
->> +
->> +    bitmap = bitmap_new(max_slots);
->>      object_child_foreach(qdev_get_machine(), pc_dimm_slot2bitmap, bitmap);
->>  
->>      /* check if requested slot is not occupied */
->>
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-nvdimm@ml01.01.org, linux-mm@kvack.org, jack@suse.cz, stefanha@redhat.com, dan.j.williams@intel.com, riel@surriel.com, haozhong.zhang@intel.com, nilal@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, ross.zwisler@intel.com, david@redhat.com, xiaoguangrong.eric@gmail.com, hch@infradead.org, marcel@redhat.com, mst@redhat.com, niteshnarayanlal@hotmail.com, imammedo@redhat.com, lcapitulino@redhat.com
 
 
--- 
+--NDin8bjvE/0mNLFQ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
+On Wed, Apr 25, 2018 at 04:54:14PM +0530, Pankaj Gupta wrote:
+> This patch adds functionality to perform=20
+> flush from guest to hosy over VIRTIO=20
+> when 'ND_REGION_VIRTIO'flag is set on=20
+> nd_negion. Flag is set by 'virtio-pmem'
+> driver.
+>=20
+> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> ---
+>  drivers/nvdimm/region_devs.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+>=20
+> diff --git a/drivers/nvdimm/region_devs.c b/drivers/nvdimm/region_devs.c
+> index a612be6..6c6454e 100644
+> --- a/drivers/nvdimm/region_devs.c
+> +++ b/drivers/nvdimm/region_devs.c
+> @@ -20,6 +20,7 @@
+>  #include <linux/nd.h>
+>  #include "nd-core.h"
+>  #include "nd.h"
+> +#include <linux/virtio_pmem.h>
+> =20
+>  /*
+>   * For readq() and writeq() on 32-bit builds, the hi-lo, lo-hi order is
+> @@ -1074,6 +1075,12 @@ void nvdimm_flush(struct nd_region *nd_region)
+>  	struct nd_region_data *ndrd =3D dev_get_drvdata(&nd_region->dev);
+>  	int i, idx;
+> =20
+> +       /* call PV device flush */
+> +	if (test_bit(ND_REGION_VIRTIO, &nd_region->flags)) {
+> +		virtio_pmem_flush(&nd_region->dev);
+> +		return;
+> +	}
 
-David / dhildenb
+How does libnvdimm know when flush has completed?
+
+Callers expect the flush to be finished when nvdimm_flush() returns but
+the virtio driver has only queued the request, it hasn't waited for
+completion!
+
+--NDin8bjvE/0mNLFQ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJa4dDlAAoJEJykq7OBq3PI980IAJY41FLfXhqcQzxR13OvtKqj
+cM7mQMJIee6fETlh9HYqEh7dOvOHhpqojY9PEKA+Bu1f/KC3Y03liilCCKdLiHc+
+WpCVSyT3nOTjPlY4tS+e4WEEzaCwqNYu8rbz7sfJxd1c+4Hl9VuLfBQLieSnTsmE
+GUawKQak2e+c7EdOdKxmxtaeZfX1qJcm6ZMhbqSrvIrzR+E+fz4WKmntxrdgeDwY
+4IzZHK5h2u4z0jSeLf0tfdWf/77y1IWPqKGvuK6MTZHFxvMn6AiI4VZ116LfXgNC
+l7SS25ehqJ5WGgBrUYsL40QAimQDSCQL2ouNwyx/Q1+Ub/xi6TWKN17u3UV5Bpc=
+=i3H2
+-----END PGP SIGNATURE-----
+
+--NDin8bjvE/0mNLFQ--
