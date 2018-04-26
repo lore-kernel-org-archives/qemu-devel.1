@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56460)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1fBkDT-0001Uq-7d
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:57:56 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1fBkGH-0004G7-O3
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 13:00:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1fBkDS-0003iv-7A
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:57:55 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:35426)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
-	id 1fBkDR-0003Ts-UP
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:57:54 -0400
-Received: by mail-oi0-x244.google.com with SMTP id a6-v6so15724999oia.2
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 09:57:46 -0700 (PDT)
+	(envelope-from <alex.williamson@redhat.com>) id 1fBkGD-00059R-1A
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 13:00:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32820)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1fBkGC-00057n-Qt
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 13:00:44 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5816A30F8D81
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 17:00:38 +0000 (UTC)
+Date: Thu, 26 Apr 2018 11:00:28 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180426110028.738cb2f1@w520.home>
+In-Reply-To: <20180426184017-mutt-send-email-mst@kernel.org>
+References: <20180424063857.29246-1-kraxel@redhat.com>
+	<20180426180955-mutt-send-email-mst@kernel.org>
+	<20180426153148.rbjgglui2shdlzpg@sirius.home.kraxel.org>
+	<20180426184017-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <58645254.23011245.1524760853269.JavaMail.zimbra@redhat.com>
-References: <20180425112415.12327-1-pagupta@redhat.com>
-	<20180425112415.12327-3-pagupta@redhat.com>
-	<20180426131517.GB30991@stefanha-x1.localdomain>
-	<58645254.23011245.1524760853269.JavaMail.zimbra@redhat.com>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Thu, 26 Apr 2018 09:57:45 -0700
-Message-ID: <CAPcyv4jv-hJNKJxak98T7aCnWztVEDTE8o=8fjvOrVmrTfyjdA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC v2 2/2] pmem: device flush over VIRTIO
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] allocate pci id for mdpy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,78 +36,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, KVM list <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, linux-nvdimm <linux-nvdimm@ml01.01.org>, Linux MM <linux-mm@kvack.org>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Rik van Riel <riel@surriel.com>, haozhong zhang <haozhong.zhang@intel.com>, Nitesh Narayan Lal <nilal@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, ross zwisler <ross.zwisler@intel.com>, David Hildenbrand <david@redhat.com>, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, Christoph Hellwig <hch@infradead.org>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, niteshnarayanlal@hotmail.com, Igor Mammedov <imammedo@redhat.com>, lcapitulino@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>
 
-On Thu, Apr 26, 2018 at 9:40 AM, Pankaj Gupta <pagupta@redhat.com> wrote:
->
->>
->> On Wed, Apr 25, 2018 at 04:54:14PM +0530, Pankaj Gupta wrote:
->> > This patch adds functionality to perform
->> > flush from guest to hosy over VIRTIO
->> > when 'ND_REGION_VIRTIO'flag is set on
->> > nd_negion. Flag is set by 'virtio-pmem'
->> > driver.
->> >
->> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
->> > ---
->> >  drivers/nvdimm/region_devs.c | 7 +++++++
->> >  1 file changed, 7 insertions(+)
->> >
->> > diff --git a/drivers/nvdimm/region_devs.c b/drivers/nvdimm/region_devs.c
->> > index a612be6..6c6454e 100644
->> > --- a/drivers/nvdimm/region_devs.c
->> > +++ b/drivers/nvdimm/region_devs.c
->> > @@ -20,6 +20,7 @@
->> >  #include <linux/nd.h>
->> >  #include "nd-core.h"
->> >  #include "nd.h"
->> > +#include <linux/virtio_pmem.h>
->> >
->> >  /*
->> >   * For readq() and writeq() on 32-bit builds, the hi-lo, lo-hi order is
->> > @@ -1074,6 +1075,12 @@ void nvdimm_flush(struct nd_region *nd_region)
->> >     struct nd_region_data *ndrd = dev_get_drvdata(&nd_region->dev);
->> >     int i, idx;
->> >
->> > +       /* call PV device flush */
->> > +   if (test_bit(ND_REGION_VIRTIO, &nd_region->flags)) {
->> > +           virtio_pmem_flush(&nd_region->dev);
->> > +           return;
->> > +   }
->>
->> How does libnvdimm know when flush has completed?
->>
->> Callers expect the flush to be finished when nvdimm_flush() returns but
->> the virtio driver has only queued the request, it hasn't waited for
->> completion!
->
-> I tried to implement what nvdimm does right now. It just writes to
-> flush hint address to make sure data persists.
+On Thu, 26 Apr 2018 18:40:40 +0300
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-nvdimm_flush() is currently expected to be synchronous. Currently it
-is sfence(); write to special address; sfence(). By the time the
-second sfence returns the data is flushed. So you would need to make
-this virtio flush interface synchronous as well, but that appears
-problematic to stop the guest for unbounded amounts of time. Instead,
-you need to rework nvdimm_flush() and the pmem driver to make these
-flush requests asynchronous and add the plumbing for completion
-callbacks via bio_endio().
+> On Thu, Apr 26, 2018 at 05:31:48PM +0200, Gerd Hoffmann wrote:
+> > On Thu, Apr 26, 2018 at 06:10:48PM +0300, Michael S. Tsirkin wrote:  
+> > > On Tue, Apr 24, 2018 at 08:38:57AM +0200, Gerd Hoffmann wrote:  
+> > > > mdpy is a sample pci device for vfio-mdev.  Not (yet) merged upstream,
+> > > > patch available here:
+> > > > 
+> > > > https://www.kraxel.org/cgit/linux/commit/?h=vfio-sample-display&id=6fd86cff3d7df38ab89625b16fdd6434b1c18749
+> > > > 
+> > > > Cc: Alex Williamson <alex.williamson@redhat.com>
+> > > > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>  
+> > > 
+> > > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> > > 
+> > > I presume this should be merged together with the
+> > > device implementation in qemu, or do you want this
+> > > in tree sooner?  
+> > 
+> > There isn't a device implementation in qemu.  It's a mdev device
+> > provided by the kernel.  Can be used with qemu using vfio. 
+> 
+> Why do we need a define in pci.h then?
 
-> I just did not want to block guest write requests till host side
-> fsync completes.
+Because we want to allocate the device ID rather than squat on an
+unused one and risk that it later conflicts with an another device.  Do
+we track device ID allocations from the RH vendor ID other than here in
+QEMU?  Thanks,
 
-You must complete the flush before bio_endio(), otherwise you're
-violating the expectations of the guest filesystem/block-layer.
-
->
-> be worse for operations on different guest files because all these operations would happen
-> ultimately on same file at host.
->
-> I think with current way, we can achieve an asynchronous queuing mechanism on cost of not
-> 100% sure when fsync would complete but it is assured it will happen. Also, its entire block
-> flush.
-
-No, again,  that's broken. We need to add the plumbing for
-communicating the fsync() completion relative the WRITE_{FLUSH,FUA}
-bio in the guest.
+Alex
