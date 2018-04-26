@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50245)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50269)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBZKk-0002BH-65
+	(envelope-from <bounces@canonical.com>) id 1fBZKl-0002BI-89
 	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:20:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBZKj-0003KL-8e
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:20:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47332)
+	(envelope-from <bounces@canonical.com>) id 1fBZKk-0003L8-27
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:20:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47412)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fBZKj-0003JK-2R
+	id 1fBZKj-0003KU-T0
 	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:20:41 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fBZKh-0001Jx-58
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 05:20:39 +0000
+	id 1fBZKi-0001Jx-Me
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 05:20:40 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E4A962E80D9
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 05:20:38 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 9AA482E80D8
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 05:20:40 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Apr 2018 05:12:21 -0000
-From: Thomas Huth <1754372@bugs.launchpad.net>
-Reply-To: Bug 1754372 <1754372@bugs.launchpad.net>
+Date: Thu, 26 Apr 2018 05:14:32 -0000
+From: Thomas Huth <1748434@bugs.launchpad.net>
+Reply-To: Bug 1748434 <1748434@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <152052329803.20387.7205053769147453578.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152471954218.6979.2279479586188044756.launchpad@wampee.canonical.com>
+References: <151817810596.29573.3248344286701751294.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152471967345.757.15241529909711194575.launchpad@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1754372] Re: Set MIPS MSA in ELF Auxiliary Vectors
+Subject: [Qemu-devel] [Bug 1748434] Re: Possibly wrong GICv3 behavior when
+ secure enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,26 +46,31 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1754372
+https://bugs.launchpad.net/bugs/1748434
 
 Title:
-  Set MIPS MSA in ELF Auxiliary Vectors
+  Possibly wrong GICv3 behavior when secure enabled
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  The MIPS MSA feature is currently not set in the ELF auxiliary vector.
+  I an tried arm-aarch64 interrupt routing to EL3, by SCR_EL3.FIQ=3D1. Firs=
+t I am started QEMU with secure=3Don and GICv3 support.
+  I programmed secure and non-secure timers and set-up appropriate interrup=
+ts.Secure timer to be GRP1_Secure and non-secure timer to be GRP1_NonSecure=
+. ICC_PMR =3D 0xff. Then I switched CPU to EL1. =
 
-  That is, querying the AT_HWCAP key of the ELF auxiliary vectors for a
-  MIPS CPU that has the MSA feature should return a value that has the
-  second bit [0] set.
+  With that setup no interrupt was delivered to PE. GIC interface showed th=
+at non secure IRQ is pending. ICC_PMR read at EL1 returns 0 (shall return v=
+alue ((PMR_(el3) << 1) & 0xff) according to GIC specification.
+  Than I tried to increase interrupt priority mask  - so I set ICC_PMR =3D =
+0x7f (at EL3). Then I read at EL1 ICC_PMR=3D0xfe - (is shall be 0). With th=
+is setup IRQ of secure timer was taken at EL3, non secure timer didn't rise=
+ IRQ (as it is masked by PMR). =
 
-  From [0], `HWCAP_MIPS_MSA` is defined to `1 << 1`.
-
-  [0]:
-  https://github.com/torvalds/linux/blob/master/arch/mips/include/uapi/asm/=
-hwcap.h
+  I dig to qemu code and see wrong condition in file arm_gicv3_cpuif.c in f=
+unction  icc_pmr_read(). This behavior is opposite of ARM specification.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1754372/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1748434/+subscriptions
