@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fBX0h-0005OG-5h
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 22:51:51 -0400
+	(envelope-from <eblake@redhat.com>) id 1fBX0h-0005QQ-Vb
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 22:51:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fBX0g-00069k-E8
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 22:51:51 -0400
+	(envelope-from <eblake@redhat.com>) id 1fBX0g-00069d-DK
+	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 22:51:52 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Wed, 25 Apr 2018 21:51:26 -0500
-Message-Id: <20180426025129.621969-4-eblake@redhat.com>
+Date: Wed, 25 Apr 2018 21:51:28 -0500
+Message-Id: <20180426025129.621969-6-eblake@redhat.com>
 In-Reply-To: <20180426025129.621969-1-eblake@redhat.com>
 References: <20180426025129.621969-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 3/6] qcow2: Reduce REFT_OFFSET_MASK
+Subject: [Qemu-devel] [PATCH v6 5/6] iotests: Add new test 214 for max
+ compressed cluster offset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,34 +23,201 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, berto@igalia.com, qemu-block@nongnu.org
 
-Match our code to the spec change in the previous patch - there's
-no reason for the refcount table to allow larger offsets than the
-L1/L2 tables. In practice, no image has more than 64PB of
-allocated clusters anyways, as anything beyond that can't be
-expressed via L2 mappings to host offsets.
+If you have a capable file system (tmpfs is good, ext4 not so much;
+run ./check with TEST_DIR pointing to a good location so as not
+to skip the test), it's actually possible to create a qcow2 file
+that expands to a sparse 512T image with just over 38M of content.
+The test is not the world's fastest (qemu crawling through 256M
+bits of refcount table to find the next cluster to allocate takes
+several seconds, as does qemu-img check reporting millions of
+leaked clusters); but it DOES catch the problem that the previous
+patch just fixed where writing a compressed cluster to a full
+image ended up overwriting the wrong cluster.
 
-Suggested-by: Alberto Garcia <berto@igalia.com>
+Suggested-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
 
 ---
-v4: new patch
+v6: new patch; took over 90 seconds to run on my setup, using tmpfs
 ---
- block/qcow2.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/qemu-iotests/214     | 97 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/214.out | 54 ++++++++++++++++++++++++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 152 insertions(+)
+ create mode 100755 tests/qemu-iotests/214
+ create mode 100644 tests/qemu-iotests/214.out
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index adf5c3950fd..1df15a18aa1 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -443,7 +443,7 @@ typedef enum QCow2MetadataOverlap {
- #define L2E_OFFSET_MASK 0x00fffffffffffe00ULL
- #define L2E_COMPRESSED_OFFSET_SIZE_MASK 0x3fffffffffffffffULL
-
--#define REFT_OFFSET_MASK 0xfffffffffffffe00ULL
-+#define REFT_OFFSET_MASK 0x00fffffffffffe00ULL
-
- static inline int64_t start_of_cluster(BDRVQcow2State *s, int64_t offset)
- {
+diff --git a/tests/qemu-iotests/214 b/tests/qemu-iotests/214
+new file mode 100755
+index 00000000000..b4127facd12
+--- /dev/null
++++ b/tests/qemu-iotests/214
+@@ -0,0 +1,97 @@
++#!/bin/bash
++#
++# max limits on compression in huge qcow2 files
++#
++# Copyright (C) 2018 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++seq=`basename $0`
++echo "QA output created by $seq"
++
++here=`pwd`
++status=1    # failure is the default!
++
++_cleanup()
++{
++    _cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++. ./common.pattern
++
++_supported_fmt qcow2
++_supported_proto file
++_supported_os Linux
++
++echo "== Creating huge file =="
++
++# Sanity check: We require a file system that permits the creation
++# of a HUGE (but very sparse) file.  tmpfs works, ext4 does not.
++if ! truncate --size=513T "$TEST_IMG"; then
++    _notrun "file system on $TEST_DIR does not support large enough files"
++fi
++rm "$TEST_IMG"
++IMGOPTS='cluster_size=2M,refcount_bits=1' _make_test_img 513T
++
++echo "== Populating refcounts =="
++# We want an image with 256M refcounts * 2M clusters = 512T referenced.
++# Each 2M cluster holds 16M refcounts; the refcount table initially uses
++# 1 refblock, so we need to add 15 more.  The refcount table lives at 2M,
++# first refblock at 4M, L2 at 6M, so our remaining additions start at 8M.
++# Then, for each refblock, mark it as fully populated.
++to_hex() {
++    printf %016x\\n $1 | sed 's/\(..\)/\\x\1/g'
++}
++truncate --size=38m "$TEST_IMG"
++entry=$((0x200000))
++$QEMU_IO_PROG -f raw -c "w -P 0xff 4m 2m" "$TEST_IMG" | _filter_qemu_io
++for i in {1..15}; do
++    offs=$((0x600000 + i*0x200000))
++    poke_file "$TEST_IMG" $((i*8 + entry)) $(to_hex $offs)
++    $QEMU_IO_PROG -f raw -c "w -P 0xff $offs 2m" "$TEST_IMG" | _filter_qemu_io
++done
++
++echo "== Checking file before =="
++# FIXME: 'qemu-img check' doesn't diagnose refcounts beyond the end of
++# the file as leaked clusters
++_check_test_img 2>&1 | sed '/^Leaked cluster/d'
++stat -c 'image size %s' "$TEST_IMG"
++
++echo "== Trying to write compressed cluster =="
++# Given our file size, the next available cluster at 512T lies beyond the
++# maximum offset that a compressed 2M cluster can reside in
++$QEMU_IO_PROG -c 'w -c 0 2m' "$TEST_IMG" | _filter_qemu_io
++# The attempt failed, but ended up allocating a new refblock
++stat -c 'image size %s' "$TEST_IMG"
++
++echo "== Writing normal cluster =="
++# The failed write should not corrupt the image, so a normal write succeeds
++$QEMU_IO_PROG -c 'w 0 2m' "$TEST_IMG" | _filter_qemu_io
++
++echo "== Checking file after =="
++# qemu-img now sees the millions of leaked clusters, thanks to the allocations
++# at 512T.  Undo many of our faked references to speed up the check.
++$QEMU_IO_PROG -f raw -c "w -z 5m 1m" -c "w -z 8m 30m" "$TEST_IMG" |
++    _filter_qemu_io
++_check_test_img 2>&1 | sed '/^Leaked cluster/d'
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/214.out b/tests/qemu-iotests/214.out
+new file mode 100644
+index 00000000000..38aafe1b961
+--- /dev/null
++++ b/tests/qemu-iotests/214.out
+@@ -0,0 +1,54 @@
++QA output created by 214
++== Creating huge file ==
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=564049465049088
++== Populating refcounts ==
++wrote 2097152/2097152 bytes at offset 4194304
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 8388608
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 10485760
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 12582912
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 14680064
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 16777216
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 18874368
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 20971520
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 23068672
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 25165824
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 27262976
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 29360128
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 31457280
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 33554432
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 35651584
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 2097152/2097152 bytes at offset 37748736
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++== Checking file before ==
++No errors were found on the image.
++image size 39845888
++== Trying to write compressed cluster ==
++write failed: Input/output error
++image size 562949957615616
++== Writing normal cluster ==
++wrote 2097152/2097152 bytes at offset 0
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++== Checking file after ==
++wrote 1048576/1048576 bytes at offset 5242880
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 31457280/31457280 bytes at offset 8388608
++30 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++8388589 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 52a80f3f9e9..3e2dcdfa33d 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -212,3 +212,4 @@
+ 211 rw auto quick
+ 212 rw auto quick
+ 213 rw auto quick
++214 rw auto
 -- 
 2.14.3
