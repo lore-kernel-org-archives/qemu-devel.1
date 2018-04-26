@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fBjUM-0004vj-Cj
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:11:19 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fBjcC-0002de-7A
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:19:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fBjUH-0003l3-O7
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:11:18 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43328 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fBjUH-0003ki-IM
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:11:13 -0400
-Date: Thu, 26 Apr 2018 17:11:03 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180426161103.GJ2631@work-vm>
-References: <1524666934-8064-1-git-send-email-lidongchen@tencent.com>
-	<1524666934-8064-2-git-send-email-lidongchen@tencent.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fBjcB-0000Ia-4L
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:19:24 -0400
+References: <20180424130821.50987-1-vsementsov@virtuozzo.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <bb12a725-0908-cab8-5dfd-2cdd3a1aa0d6@virtuozzo.com>
+Date: Thu, 26 Apr 2018 19:19:09 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1524666934-8064-2-git-send-email-lidongchen@tencent.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/5] migration: disable RDMA WRITE after
- postcopy started
+In-Reply-To: <20180424130821.50987-1-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [RFC 0/3] NBD reconnect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,81 +23,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lidong Chen <jemmy858585@gmail.com>
-Cc: quintela@redhat.com, qemu-devel@nongnu.org, galsha@mellanox.com, aviadye@mellanox.com, licq@mellanox.com, adido@mellanox.com, Lidong Chen <lidongchen@tencent.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, famz@redhat.com, pbonzini@redhat.com, eblake@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
-* Lidong Chen (jemmy858585@gmail.com) wrote:
-> RDMA WRITE operations are performed with no notification to the destination
-> qemu, then the destination qemu can not wakeup. This patch disable RDMA WRITE
-> after postcopy started.
-> 
-> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+24.04.2018 16:08, Vladimir Sementsov-Ogievskiy wrote:
+> Hi all.
+>
+> Here is a draft of NBD reconnect, to negotiate overall design. It is done
+> through implementing new error action: reconnect.
+>
+> New action works as follows:
+>
+> Firstly, not stopping the vm, it tries to bdrv_reconnect several times
+> with given pause. Then, if we failed to reconnect fallthrough to 'stop'
+> error action.
+>
+> My RFC doubts:
+> 1. introducing new .bdrv_reconnect(). Is bdrv_reopen() appropriate for
+>     the feature? I'm not sure, because it is not recursive, and don't
+>     really reopen files..
+> 2. introducing new error action. Anyway, I'll have to add some configuration
+>     parameters (see 03), so, the feature may be just an option to 'stop'
+>     action, rather than separate error action.
+>
+> Vladimir Sementsov-Ogievskiy (3):
+>    block: add bdrv_reconnect
+>    nbd: add .bdrv_reconnect handler
+>    blk: add 'reconnect' error action
+>
+>   qapi/block-core.json      |  4 ++--
+>   include/block/block.h     |  2 ++
+>   include/block/block_int.h |  3 +++
+>   block.c                   | 22 +++++++++++++++++
+>   block/block-backend.c     | 48 ++++++++++++++++++++++++++++++++++++-
+>   block/nbd.c               | 60 ++++++++++++++++++++++++++++++++++-------------
+>   hw/scsi/scsi-disk.c       |  4 +++-
+>   7 files changed, 123 insertions(+), 20 deletions(-)
+>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Hm, answering myself:
 
-> ---
->  migration/qemu-file.c |  8 ++++++--
->  migration/rdma.c      | 12 ++++++++++++
->  2 files changed, 18 insertions(+), 2 deletions(-)
-> 
-> diff --git a/migration/qemu-file.c b/migration/qemu-file.c
-> index bb63c77..add8c3a 100644
-> --- a/migration/qemu-file.c
-> +++ b/migration/qemu-file.c
-> @@ -253,8 +253,12 @@ size_t ram_control_save_page(QEMUFile *f, ram_addr_t block_offset,
->      if (f->hooks && f->hooks->save_page) {
->          int ret = f->hooks->save_page(f, f->opaque, block_offset,
->                                        offset, size, bytes_sent);
-> -        f->bytes_xfer += size;
-> -        if (ret != RAM_SAVE_CONTROL_DELAYED) {
-> +        if (ret != RAM_SAVE_CONTROL_NOT_SUPP) {
-> +            f->bytes_xfer += size;
-> +        }
-> +
-> +        if (ret != RAM_SAVE_CONTROL_DELAYED &&
-> +            ret != RAM_SAVE_CONTROL_NOT_SUPP) {
->              if (bytes_sent && *bytes_sent > 0) {
->                  qemu_update_position(f, *bytes_sent);
->              } else if (ret < 0) {
-> diff --git a/migration/rdma.c b/migration/rdma.c
-> index da474fc..a22be43 100644
-> --- a/migration/rdma.c
-> +++ b/migration/rdma.c
-> @@ -2927,6 +2927,10 @@ static size_t qemu_rdma_save_page(QEMUFile *f, void *opaque,
->  
->      CHECK_ERROR_STATE();
->  
-> +    if (migrate_get_current()->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
-> +        return RAM_SAVE_CONTROL_NOT_SUPP;
-> +    }
-> +
->      qemu_fflush(f);
->  
->      if (size > 0) {
-> @@ -3482,6 +3486,10 @@ static int qemu_rdma_registration_start(QEMUFile *f, void *opaque,
->  
->      CHECK_ERROR_STATE();
->  
-> +    if (migrate_get_current()->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
-> +        return 0;
-> +    }
-> +
->      trace_qemu_rdma_registration_start(flags);
->      qemu_put_be64(f, RAM_SAVE_FLAG_HOOK);
->      qemu_fflush(f);
-> @@ -3504,6 +3512,10 @@ static int qemu_rdma_registration_stop(QEMUFile *f, void *opaque,
->  
->      CHECK_ERROR_STATE();
->  
-> +    if (migrate_get_current()->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
-> +        return 0;
-> +    }
-> +
->      qemu_fflush(f);
->      ret = qemu_rdma_drain_cq(f, rdma);
->  
-> -- 
-> 1.8.3.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+it's a bad design:
+
+1. Assume we have a tree of nodes. So, if one node was disconnected, we 
+will reconnect all nodes. It's better to reconnect only one node.
+2. Possibility to reconnect looks more like option, rather than separate 
+error_action, as we may want reconnect before stop in _STOP action, and 
+reconnect if disconnected with _NOSPC error action.
+
+So, I'll try to rewrite it to be a simple nbd-driver option.
+
+-- 
+Best regards,
+Vladimir
