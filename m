@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBio5-0003BK-5h
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:27:38 -0400
+	(envelope-from <armbru@redhat.com>) id 1fBioc-0003ao-Tb
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:28:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBio4-0007OD-5i
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:27:37 -0400
-References: <1521452376-25099-1-git-send-email-thuth@redhat.com>
-	<87in8qf2w3.fsf@dusky.pond.sub.org>
-	<62dba5cf-b497-1a98-0af5-971e169a3458@redhat.com>
-	<877eou2nek.fsf@dusky.pond.sub.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <71e91497-42bd-eea7-636d-9e725c4d2906@redhat.com>
-Date: Thu, 26 Apr 2018 17:27:20 +0200
-MIME-Version: 1.0
-In-Reply-To: <877eou2nek.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] tests/device-introspect: Test devices
- with all machines, not only with "none"
+	(envelope-from <armbru@redhat.com>) id 1fBioY-0007XK-UQ
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:28:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37690 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fBioY-0007XC-OI
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:28:06 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5E373A201D
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 15:28:06 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Thu, 26 Apr 2018 17:28:05 +0200
+Message-Id: <20180426152805.8469-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH] qobject: Use qobject_to() instead of type cast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +27,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, eblake@redhat.com
 
-On 26.04.2018 13:54, Markus Armbruster wrote:
-> Thomas Huth <thuth@redhat.com> writes:
-[...]
-> Actually, a worse offender in the "waste everybody's time via redunancy=
-"
-> department could be qom-test.
+The proper way to convert from (abstract) QObject to a (concrete)
+subtype is qobject_to().  Look for offenders that type cast instead:
 
-I guess we could also change the logic in qom-tester to only run with
-all machines if we're in SPEED=3Dslow mode, and rather only use the "none=
-"
-machine by default?
+    $ git-grep '(Q[A-Z][a-z]* \*)'
+    hmp.c:    qmp_device_add((QDict *)qdict, NULL, &err);
+    include/qapi/qmp/qobject.h:        return (QObject *)obj;
+    qobject/qobject.c:static void (*qdestroy[QTYPE__MAX])(QObject *) = {
+    tests/check-qdict.c:    dst = (QDict *)qdict_crumple(src, &error_abort);
 
->> Anyway, do you think my patch here is useful and has a chance of getti=
-ng
->> included? I.e. shall I re-spin this as a non-RFC patch? Or shall we
->> rather wait for Eduardo's python-based tests to get included into the
->> repository?
->=20
-> I don't mind having make check SPEED=3Dslow run more extensive tests.
-> Assuming we actually run them at least once in a while, which seems
-> doubtful.
+The first two cast away const, the third isn't a type cast.  Fix the
+fourth.
 
-If some developers (like myself) are running it at least every couple of
-weeks manually, that's already much better than nothing!
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ tests/check-qdict.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>> ---
->>>>  In case someone wants to help with creating some bug fix patches
->>>>  during the QEMU hard freeze phase: This test can now be used to
->>>>  trigger lots of introspection bugs that we were not aware of yet.
->>>>  I think most of the bugs are due to wrong handling of instance_init
->>>>  vs. realize functions.
->>>
->>> Yes, that's a common class of bugs.  There's little guidance on what
->>> kind of work belongs where, and plenty of bad examples.
->>
->> I think we urgently need a file in doc/devel/ that describes the vario=
-us
->> states / functions of a device, where we should properly describe the
->> differences between instance_init and realize. ... I'll try to come up
->> with something when I've got some spare time (unless somebody else
->> volunteers to do that first).
->=20
-> Please do.
->=20
-> Widen the scope from just TYPE_DEVICE to all of QOM?
-
-I don't have that much experience with QOM yet that I'd dare to write a
-doc about it. Would you maybe be interested in writing something up
-about QOM?
-
- Thomas
+diff --git a/tests/check-qdict.c b/tests/check-qdict.c
+index a0e0454684..eba5d3528e 100644
+--- a/tests/check-qdict.c
++++ b/tests/check-qdict.c
+@@ -657,7 +657,7 @@ static void qdict_crumple_test_empty(void)
+ 
+     src = qdict_new();
+ 
+-    dst = (QDict *)qdict_crumple(src, &error_abort);
++    dst = qobject_to(QDict, qdict_crumple(src, &error_abort));
+ 
+     g_assert_cmpint(qdict_size(dst), ==, 0);
+ 
+-- 
+2.13.6
