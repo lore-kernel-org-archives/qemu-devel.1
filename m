@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBY3e-0004zm-5M
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 23:59:00 -0400
+	(envelope-from <th.huth@gmail.com>) id 1fBYMW-0008U8-Gu
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 00:18:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBY3b-00082P-2x
-	for qemu-devel@nongnu.org; Wed, 25 Apr 2018 23:58:58 -0400
-Date: Thu, 26 Apr 2018 13:54:52 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180426035452.GE8800@umbus.fritz.box>
-References: <20180419124331.3915-1-clg@kaod.org>
-	<20180419124331.3915-4-clg@kaod.org>
-	<20180423064644.GG19804@umbus.fritz.box>
-	<8d1cb270-d62f-f08f-9167-3f130906f910@kaod.org>
-	<20180424064629.GP19804@umbus.fritz.box>
-	<3b57fde8-ee11-81a0-271b-9e514ed63856@kaod.org>
+	(envelope-from <th.huth@gmail.com>) id 1fBYMR-0007P0-Hl
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 00:18:28 -0400
+Received: from mail-wm0-f54.google.com ([74.125.82.54]:36053)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1fBYMR-0007Nz-BG
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 00:18:23 -0400
+Received: by mail-wm0-f54.google.com with SMTP id n10so10373348wmc.1
+	for <qemu-devel@nongnu.org>; Wed, 25 Apr 2018 21:18:22 -0700 (PDT)
+References: <AFF77CBF-01EC-494F-AA9C-9820F368EA32@gmail.com>
+From: Thomas Huth <huth@tuxfamily.org>
+Message-ID: <0a704c5f-8f14-c755-e1e1-1a87967471ed@tuxfamily.org>
+Date: Thu, 26 Apr 2018 06:18:20 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="BQPnanjtCNWHyqYD"
-Content-Disposition: inline
-In-Reply-To: <3b57fde8-ee11-81a0-271b-9e514ed63856@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v3 03/35] ppc/xive: introduce the
- XiveFabric interface
+In-Reply-To: <AFF77CBF-01EC-494F-AA9C-9820F368EA32@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] Large patch set advice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,293 +29,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Warner Losh <imp@bsdimp.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+Cc: Kamil Rytarowski <kamil@netbsd.org>, Brad Smith <brad@comstyle.com>
 
+On 25.04.2018 21:57, Warner Losh wrote:
+> Greetings,
+> 
+> I’ve foolishly volunteered to rebase all the changes that the bad-user mode folks have done to a recent master rev to get these changes upstreamed.
 
---BQPnanjtCNWHyqYD
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Great that finally someone dares to do this step! But I hope the "bad"
+was just a typo ;-)
 
-On Tue, Apr 24, 2018 at 11:33:11AM +0200, C=E9dric Le Goater wrote:
-> On 04/24/2018 08:46 AM, David Gibson wrote:
-> > On Mon, Apr 23, 2018 at 09:58:43AM +0200, C=E9dric Le Goater wrote:
-> >> On 04/23/2018 08:46 AM, David Gibson wrote:
-> >>> On Thu, Apr 19, 2018 at 02:42:59PM +0200, C=E9dric Le Goater wrote:
-> >>>> The XiveFabric offers a simple interface, between the XiveSourve
-> >>>> object and the device model owning the interrupt sources, to forward
-> >>>> an event notification to the XIVE interrupt controller of the machine
-> >>>> and if the owner is the controller, to call directly the routing
-> >>>> sub-engine.
-> >>>>
-> >>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> >>>> ---
-> >>>>  hw/intc/xive.c        | 37 ++++++++++++++++++++++++++++++++++++-
-> >>>>  include/hw/ppc/xive.h | 25 +++++++++++++++++++++++++
-> >>>>  2 files changed, 61 insertions(+), 1 deletion(-)
-> >>>>
-> >>>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> >>>> index 060976077dd7..b4c3d06c1219 100644
-> >>>> --- a/hw/intc/xive.c
-> >>>> +++ b/hw/intc/xive.c
-> >>>> @@ -17,6 +17,21 @@
-> >>>>  #include "hw/ppc/xive.h"
-> >>>> =20
-> >>>>  /*
-> >>>> + * XIVE Fabric
-> >>>> + */
-> >>>> +
-> >>>> +static void xive_fabric_route(XiveFabric *xf, int lisn)
-> >>>> +{
-> >>>> +
-> >>>> +}
-> >>>> +
-> >>>> +static const TypeInfo xive_fabric_info =3D {
-> >>>> +    .name =3D TYPE_XIVE_FABRIC,
-> >>>> +    .parent =3D TYPE_INTERFACE,
-> >>>> +    .class_size =3D sizeof(XiveFabricClass),
-> >>>> +};
-> >>>> +
-> >>>> +/*
-> >>>>   * XIVE Interrupt Source
-> >>>>   */
-> >>>> =20
-> >>>> @@ -97,11 +112,19 @@ static bool xive_source_pq_trigger(XiveSource *=
-xsrc, uint32_t srcno)
-> >>>> =20
-> >>>>  /*
-> >>>>   * Forward the source event notification to the associated XiveFabr=
-ic,
-> >>>> - * the device owning the sources.
-> >>>> + * the device owning the sources, or perform the routing if the dev=
-ice
-> >>>> + * is the interrupt controller.
-> >>>>   */
-> >>>>  static void xive_source_notify(XiveSource *xsrc, int srcno)
-> >>>>  {
-> >>>> =20
-> >>>> +    XiveFabricClass *xfc =3D XIVE_FABRIC_GET_CLASS(xsrc->xive);
-> >>>> +
-> >>>> +    if (xfc->notify) {
-> >>>> +        xfc->notify(xsrc->xive, srcno + xsrc->offset);
-> >>>> +    } else {
-> >>>> +        xive_fabric_route(xsrc->xive, srcno + xsrc->offset);
-> >>>> +    }
-> >>>
-> >>> Why 2 cases?  Can't the XiveFabric object just make its notify equal
-> >>> to xive_fabric_route if that's what it wants?
-> >> Under sPAPR, all the sources, IPIs and virtual device interrupts,=20
-> >> generate events which are directly routed by xive_fabric_route().=20
-> >> There is no need of an extra hop. Indeed.=20
-> >=20
-> > Ok.
-> >=20
-> >> Under PowerNV, some sources forward the notification to the routing=20
-> >> engine using a specific MMIO load on a notify address which is stored=
-=20
-> >> in one of the controller registers. So we need a hop to reach the=20
-> >> device model, owning the sources, and do that load :
-> >=20
-> > Hm.  So you're saying that in pnv some sources send their notification
-> > to some other unit,=20
->=20
-> Not to any unit/device, to the device owning the sources.
->=20
-> For the XiveSource object under PSI, the XIVEFabric interface is the=20
-> PSI device object it self, which knows how to forward the notification=20
-> on the XIVE Power "bus". To be more precise, the PSI HB device has=20
-> 14 interrupt sources, which notifications are forwarded using a MMIO=20
-> load to some address. The load address is configured (by skiboot) in=20
-> one of the PSI device registers, and points to a MMIO region of the=20
-> main XIVE interrupt controller.=20
->=20
-> The PHB4 sources should be the same.
->=20
-> For the XiveSource object (all interrupts) under sPAPRXive, the=20
-> XIVEFabric is the main interrupt controller sPAPRXive.
->=20
-> For the XiveSource object (IPIs) under PnvXive, the XIVEFabric is=20
-> also the main interrupt controller PnvXive.
+[...]
+> So as with everything that’s developed over time, the early patches no longer are bistable because there’s later patches that fix the old APIs that were current at the start of the project to use newer APIs.
 
-Hrm.  Apparently I'm missing something, I'm really not getting what
-you're trying to explain here.
+bistable = bisectable? ... well, I guess that doesn't really matter here
+since the upstream bsd-user code is completely broken anyway.
 
-> > that would then (after possible masking) forward on to the overall> xiv=
-e fabric ?=20
->=20
-> yes. May be XIVEFabric is a confusing name. What about XIVEForwarder ?=20
+[...]
+> Oh, and the number of SoBs in the original code is somewhat lacking. A tedious detail I need to chase down independent of all the other stuff.
 
-Maybe..?
+Yes, please chase that down first. QEMU project is quite strict about SoBs.
 
-> > That seems like a property of the source object,=20
->=20
-> The source object is generic. It's a bunch of PQ bits that can be=20
-> controlled by MMIOs. Nothing more.
+[...]
+> My first question seems almost rhetorical: that’s not an acceptable state of affairs, and curation is needed to upstream. Right?
 
-Hmm.  Isn't the source object also responsible for forwarding the
-interrupt to something up the chain (whatever that is)?
+I'd say this does not sound like an acceptable state, but it's finally
+Peter who decides what patches get merged.
 
->=20
-> > rather than a
-> > property of the fabric.  Indeed varying this by source object would
-> > require the objects have a different xive pointer, when I thought the
-> > idea was that the XiveFabric was global.
->=20
-> When a notification is forwarded, the sources needs to call an=20
-> interface which generally is implemented by the source owner,
+> My curation plans:
+> 
+> (1) Find where each of the bits of my ‘true up’ commits at the end are needed and to merge those bits back to those commits (I’m guessing it’s due to conflicts, or false conflict detection in git’s merging logic, since it was 4 hours and there attepts to get through the ‘git rebase -i master’ phase). These aren’t true changes anyway: just my screw up. Most of them are easy to find where they belong.
+> 
+> (2) back merge the API changes as best I can to as early in the stream as possible. One wrinkle here is that there’s a lot of code motion in the early patches to get the MI/MD stuff right, but even in the original commits, it never was very pure at all. And these changes are 2-3k lines long, but completely confined to bsd-user so maybe that’s OK. (I say completely, but sometimes there’s this or that thing added to a Makefile).
+> 
+> (3) Keep the classes of syscall implementation commits separate, but merge back the API and/or related new syscalls that were added. It’s a tradeoff between having 200 diffs that are minnows and 20 diffs that are related schools of fish vs one huge whale that’s just too big.
+> 
+> (4) Deal with the cases where multiple people have worked on a patch by putting SoBs for all of them (or reworking them if I can’t get a hold of the original authors) on the commits that are merged. I didn’t see a specific policy for this, but this seems sane. The alternative seems worse (having elements that don’t compile)
 
-I'm not quite sure what you mean by "source owner".
+AFAIK, merging patches is ok, just mention it in the patch description.
+For example if you have a patch with a description like this:
 
-> which is not necessarily the main IC.=20
->=20
-> >> 	static void pnv_psi_notify(XiveFabric *xf, uint32_t lisn)
-> >> 	{
-> >> 	    PnvPsi *psi =3D PNV_PSI(xf);
-> >> 	    uint64_t notif_port =3D
-> >> 	        psi->regs[PSIHB_REG(PSIHB9_ESB_NOTIF_ADDR)];
-> >> 	    bool valid =3D notif_port & PSIHB9_ESB_NOTIF_VALID;
-> >> 	    uint64_t notify_addr =3D notif_port & ~PSIHB9_ESB_NOTIF_VALID;
-> >> 	    uint32_t data =3D cpu_to_be32(lisn);
-> >> =09
-> >> 	    if (valid) {
-> >> 	        cpu_physical_memory_write(notify_addr, &data, sizeof(data));
-> >> 	    }
-> >> 	}
-> >>
-> >> The PnvXive model handles the load and forwards to the fabric again. =
-=20
-> >>
-> >> The IPIs under PowerNV do not need an extra hop so they reach the=20
-> >> routing routine directly without the extra notify() hop.=20
-> >>
-> >> However, PowerNV at the end should be using xive_fabric_route()=20
-> >> but there are some differences on how the NVT registers are=20
-> >> updated (HV vs. OS mode) and it's not handled yet so it uses a=20
-> >> notify() handler. But is should disappear and call directly=20
-> >> xive_fabric_route() in a near future.
-> >>
-> >>
-> >> May be, XiveFabricNotifier would be a better name for this feature ?
-> >> I am adding a few ops later which are more related to routing.
-> >>
-> >> Thanks,
-> >>
-> >> C.
-> >>
-> >>
-> >>>
-> >>>>  }
-> >>>> =20
-> >>>>  /*
-> >>>> @@ -302,6 +325,17 @@ static void xive_source_reset(DeviceState *dev)
-> >>>>  static void xive_source_realize(DeviceState *dev, Error **errp)
-> >>>>  {
-> >>>>      XiveSource *xsrc =3D XIVE_SOURCE(dev);
-> >>>> +    Object *obj;
-> >>>> +    Error *local_err =3D NULL;
-> >>>> +
-> >>>> +    obj =3D object_property_get_link(OBJECT(dev), "xive", &local_er=
-r);
-> >>>> +    if (!obj) {
-> >>>> +        error_propagate(errp, local_err);
-> >>>> +        error_prepend(errp, "required link 'xive' not found: ");
-> >>>> +        return;
-> >>>> +    }
-> >>>> +
-> >>>> +    xsrc->xive =3D XIVE_FABRIC(obj);
-> >>>> =20
-> >>>>      if (!xsrc->nr_irqs) {
-> >>>>          error_setg(errp, "Number of interrupt needs to be greater t=
-han 0");
-> >>>> @@ -376,6 +410,7 @@ static const TypeInfo xive_source_info =3D {
-> >>>>  static void xive_register_types(void)
-> >>>>  {
-> >>>>      type_register_static(&xive_source_info);
-> >>>> +    type_register_static(&xive_fabric_info);
-> >>>>  }
-> >>>> =20
-> >>>>  type_init(xive_register_types)
-> >>>> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> >>>> index 0b76dd278d9b..4fcae2c763e6 100644
-> >>>> --- a/include/hw/ppc/xive.h
-> >>>> +++ b/include/hw/ppc/xive.h
-> >>>> @@ -12,6 +12,8 @@
-> >>>> =20
-> >>>>  #include "hw/sysbus.h"
-> >>>> =20
-> >>>> +typedef struct XiveFabric XiveFabric;
-> >>>> +
-> >>>>  /*
-> >>>>   * XIVE Interrupt Source
-> >>>>   */
-> >>>> @@ -46,6 +48,8 @@ typedef struct XiveSource {
-> >>>>      hwaddr       esb_base;
-> >>>>      uint32_t     esb_shift;
-> >>>>      MemoryRegion esb_mmio;
-> >>>> +
-> >>>> +    XiveFabric   *xive;
-> >>>>  } XiveSource;
-> >>>> =20
-> >>>>  /*
-> >>>> @@ -143,4 +147,25 @@ static inline void xive_source_irq_set(XiveSour=
-ce *xsrc, uint32_t srcno,
-> >>>>      xsrc->status[srcno] |=3D lsi ? XIVE_STATUS_LSI : 0;
-> >>>>  }
-> >>>> =20
-> >>>> +/*
-> >>>> + * XIVE Fabric
-> >>>> + */
-> >>>> +
-> >>>> +typedef struct XiveFabric {
-> >>>> +    Object parent;
-> >>>> +} XiveFabric;
-> >>>> +
-> >>>> +#define TYPE_XIVE_FABRIC "xive-fabric"
-> >>>> +#define XIVE_FABRIC(obj)                                     \
-> >>>> +    OBJECT_CHECK(XiveFabric, (obj), TYPE_XIVE_FABRIC)
-> >>>> +#define XIVE_FABRIC_CLASS(klass)                                   =
-  \
-> >>>> +    OBJECT_CLASS_CHECK(XiveFabricClass, (klass), TYPE_XIVE_FABRIC)
-> >>>> +#define XIVE_FABRIC_GET_CLASS(obj)                                 =
-  \
-> >>>> +    OBJECT_GET_CLASS(XiveFabricClass, (obj), TYPE_XIVE_FABRIC)
-> >>>> +
-> >>>> +typedef struct XiveFabricClass {
-> >>>> +    InterfaceClass parent;
-> >>>> +    void (*notify)(XiveFabric *xf, uint32_t lisn);
-> >>>> +} XiveFabricClass;
-> >>>> +
-> >>>>  #endif /* PPC_XIVE_H */
-> >>>
-> >>
-> >=20
->=20
+"
+ Implement new feature XYZ
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+ This patch implements a new feature that is very cool.
 
---BQPnanjtCNWHyqYD
-Content-Type: application/pgp-signature; name="signature.asc"
+ Signed-off-by: Alice
+"
 
------BEGIN PGP SIGNATURE-----
+and then a fixup patch later:
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrhTYkACgkQbDjKyiDZ
-s5JN3Q//VOF/yiVZHc8dt1oYjbzfjrdojzkFGJ9wdZP4TEqtfIYTd9cNTUOaAvaD
-xSH98iX1bCbZysWzWPnjh2X+F1o1eVuMxswVKBbCGwFugg0b8rtYvM/C8RHaKzKf
-TaROBybGHzWbIaCdouLnZx2VJ+rPV9jPjsa98twWEK5h6cu17z1tui/4rakENkeN
-LVxc7ISl4ct9PLAqnCIwOlSKv8eK7N4yfHP2xw51LU0IAI0XFmb5ffDLGRFK8mUY
-EYF0yCduhwSyrSTFj06KkKSwLRK+6DE8g1FEiEJYONQ2IJ2DqEfRAuY6xulBlyI5
-v8kyGqWjOIQKdVBmVAY5+OEaPWxdcsKHdoALyJrcTIu1Q1v0jaH5Yz8koDu3BNqI
-X1z5+tbpB22qvOwTt7DdM3Gwp0SEl7BRcaeS5haT38WMEY/+MyaLL+rKVvtOW3nQ
-vnrfMXUHIegQfmJv5Rz2e1YTaISeWp98RREOjmAEiGdZMTTKHrneuoq6nhA02qAU
-MAa6zHCI11F24cCkPXSmnOJCsi07LiHbrd3o4IRikHX8B7c4e2N1npq9ILZl1RRl
-mPcTpuGf/uqCTbo6bBR7k1DJGYLE7Jv60Km4JldQL0l2eU+JfEQC1PdGLpXtmddT
-Zj/jH78IZn8aPMqezEgZMoPKwRxOnPyNUMBHmevOJfu/gPmAMSQ=
-=DA4n
------END PGP SIGNATURE-----
+"
+ Fix XYZ
 
---BQPnanjtCNWHyqYD--
+ This fixes a bug in XYZ
+
+ Signed-off-by: Bob
+"
+
+You could merge them by supplying a note in square brackets:
+
+"
+ Implement new feature XYZ
+
+ This patch implements a new feature that is very cool.
+
+ Signed-off-by: Alice
+ Signed-off-by: Bob
+ [imp: merged fix from Bob into the patch from Alice]
+ Signed-off-by: Warner Losh <imp@bsdimp.com>
+"
+
+I think it depends on the contents of Bob's patch whether you should
+also include the complete patch description of Bob's patch or not.
+
+> (5) Send them in small batches. I’d go insane trying to manage 200 concurrent code reviews, and I can’t image that I’m unique in this. I also image that fixes in the early part of the series may have ripples to the later parts if my past experience with these things has any relevance.
+
+Yes, please keep the batch sizes small and digestible.
+
+ Thanks,
+  Thomas
