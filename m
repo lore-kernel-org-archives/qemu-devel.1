@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBZKp-0002D6-A4
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:20:48 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBZKm-0003Mx-1D
+	(envelope-from <bounces@canonical.com>) id 1fBZKm-0002BK-A4
 	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:20:47 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47546)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <bounces@canonical.com>) id 1fBZKl-0003Ls-0Q
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:20:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47476)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fBZKl-0003MG-RQ
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:20:43 -0400
+	id 1fBZKk-0003LD-Pz
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 01:20:42 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fBZKk-0001Lc-GO
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 05:20:42 +0000
+	id 1fBZKj-0001MX-Hn
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 05:20:41 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7512A2E80CE
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 05:20:42 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 85AD92E80C8
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 05:20:41 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Apr 2018 05:12:04 -0000
-From: Thomas Huth <1727259@bugs.launchpad.net>
-Reply-To: Bug 1727259 <1727259@bugs.launchpad.net>
+Date: Thu, 26 Apr 2018 05:14:11 -0000
+From: Thomas Huth <1739378@bugs.launchpad.net>
+Reply-To: Bug 1739378 <1739378@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <150892430716.18436.10907121916690603983.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152471952572.21465.4468902700775743619.launchpad@soybean.canonical.com>
+References: <151375741208.25451.9053884797959645588.malonedeb@wampee.canonical.com>
+Message-Id: <152471965175.757.17495638669072877147.launchpad@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1727259] Re: qemu-io-test 58 segfaults when
- configured with gcov
+Subject: [Qemu-devel] [Bug 1739378] Re: migration state save/load of sdcard
+ device is broken
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,114 +46,72 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1727259
+https://bugs.launchpad.net/bugs/1739378
 
 Title:
-  qemu-io-test 58 segfaults when configured with gcov
+  migration state save/load of sdcard device is broken
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  Head is at 3d7196d43bfe12efe98568cb60057e273652b99b
+  I'm having different issues trying to have QEMU snapshots working
+  using qemu-system-arm with vexpress-a15 board.
 
-  Steps to re-produce:
-  1. git clone
-  ./configure --enable-gcov --target-list=3Dppc64-softmmu
-  make
-  cd tests/qemu-iotests
+  In this opportunity, I'm trying the git master head version:
+  # git rev-parse HEAD
+  af352675efb7e92a1f5f6461a042a12015ab3d12
 
-  2. export qemu binary, in my environment
-  export QEMU_PROG=3D/home/nasastry/qemu_gcov/ppc64-softmmu/qemu-system-ppc=
-64
+  $ /usr/local/bin/qemu-system-arm -kernel kernel/vmlinuz-4.10.0-42-generic=
+ -initrd kernel/initrd.img-4.10.0-42-generic -M vexpress-a15 -m 2048 -appen=
+d 'root=3D/dev/mmcblk0 rootwait console=3Dtty0' -sd vexpress-4G.qcow2 -dtb =
+device-tree/vexpress-v2p-ca15-tc1.dtb
+  audio: Could not init `oss' audio driver
 
-  3. Run test 58 with format qcow2
-  ./check -qcow2 58
+  Later on, when the machine finishes booting I savevm ss and quit.
+  However, when I try to restore it, I have that Missing section footer
+  error:
 
-  QEMU          -- "/home/nasastry/qemu_gcov/ppc64-softmmu/qemu-system-ppc6=
-4" -nodefaults -machine accel=3Dqtest
-  QEMU_IMG      -- "/home/nasastry/qemu_gcov/qemu-img"
-  QEMU_IO       -- "/home/nasastry/qemu_gcov/qemu-io"  --cache writeback -f=
- qcow2
-  QEMU_NBD      -- "/home/nasastry/qemu_gcov/qemu-nbd"
-  IMGFMT        -- qcow2 (compat=3D1.1)
-  IMGPROTO      -- file
-  PLATFORM      -- Linux/ppc64le zzfp365-lp1 4.13.0-4.rel.git49564cb.el7.ce=
-ntos.ppc64le
-  TEST_DIR      -- /home/nasastry/qemu_gcov/tests/qemu-iotests/scratch
-  SOCKET_SCM_HELPER -- /home/nasastry/qemu_gcov/tests/qemu-iotests/socket_s=
-cm_helper
+  $ /usr/local/bin/qemu-system-arm -kernel kernel/vmlinuz-4.10.0-42-generic=
+ -initrd kernel/initrd.img-4.10.0-42-generic -M vexpress-a15 -m 2048 -appen=
+d 'root=3D/dev/mmcblk0 rootwait console=3Dtty0' -sd vexpress-4G.qcow2 -dtb =
+device-tree/vexpress-v2p-ca15-tc1.dtb  -loadvm ss
+  audio: Could not init `oss' audio driver
+  qemu-system-arm: Missing section footer for sd-card
+  qemu-system-arm: Error -22 while loading VM state
 
-  058 1s ... - output mismatch (see 058.out.bad)
-  --- /home/nasastry/qemu_gcov/tests/qemu-iotests/058.out	2017-10-09 14:09:=
-04.262726912 +0530
-  +++ /home/nasastry/qemu_gcov/tests/qemu-iotests/058.out.bad	2017-10-25 15=
-:00:52.037515025 +0530
-  @@ -19,16 +19,28 @@
-   4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+  OS: Ubuntu 16.04.3 LTS (xenial)
 
-   =3D=3D verifying the exported snapshot with patterns, method 1 =3D=3D
-  -read 4096/4096 bytes at offset 4096
-  -4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-  -read 4096/4096 bytes at offset 8192
-  -4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-  +./common.rc: line 66: 36255 Segmentation fault      (core dumped) ( if [=
- "${VALGRIND_QEMU}" =3D=3D "y" ]; then
-  +    exec valgrind --log-file=3D"${VALGRIND_LOGFILE}" --error-exitcode=3D=
-99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-  +else
-  +    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-  +fi )
-  +./common.rc: line 66: 36262 Segmentation fault      (core dumped) ( if [=
- "${VALGRIND_QEMU}" =3D=3D "y" ]; then
-  +    exec valgrind --log-file=3D"${VALGRIND_LOGFILE}" --error-exitcode=3D=
-99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-  +else
-  +    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-  +fi )
+  $ gcc --version
+  gcc (Ubuntu 5.4.0-6ubuntu1~16.04.5) 5.4.0 20160609
 
-   =3D=3D verifying the exported snapshot with patterns, method 2 =3D=3D
-  -read 4096/4096 bytes at offset 4096
-  -4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-  -read 4096/4096 bytes at offset 8192
-  -4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-  +./common.rc: line 66: 36274 Segmentation fault      (core dumped) ( if [=
- "${VALGRIND_QEMU}" =3D=3D "y" ]; then
-  +    exec valgrind --log-file=3D"${VALGRIND_LOGFILE}" --error-exitcode=3D=
-99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-  +else
-  +    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-  +fi )
-  +./common.rc: line 66: 36282 Segmentation fault      (core dumped) ( if [=
- "${VALGRIND_QEMU}" =3D=3D "y" ]; then
-  +    exec valgrind --log-file=3D"${VALGRIND_LOGFILE}" --error-exitcode=3D=
-99 "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-  +else
-  +    exec "$QEMU_IO_PROG" $QEMU_IO_ARGS "$@";
-  +fi )
+  How have I built it?
+  # git clone git://git.qemu.org/qemu.git
+  # cd qemu
+  # git submodule update --init --checkout
+  # make clean && ./configure --target-list=3Darm-softmmu && make -j8
+  # sudo make install
 
-   =3D=3D verifying the converted snapshot with patterns, method 1 =3D=3D
-   read 4096/4096 bytes at offset 4096
-  Failures: 058
-  Failed 1 of 1 tests
+  I've also tried a different ./configure line, explicitly enabling some
+  of the features, i.e. smartcard, with the same results:
 
-  with out gcov configured this test case is pass.
-  # ./check -qcow2 58
-  QEMU          -- "/home/nasastry/qemu/ppc64-softmmu/qemu-system-ppc64" -n=
-odefaults -machine accel=3Dqtest
-  QEMU_IMG      -- "/home/nasastry/qemu/qemu-img"
-  QEMU_IO       -- "/home/nasastry/qemu/qemu-io"  --cache writeback -f qcow2
-  QEMU_NBD      -- "/home/nasastry/qemu/qemu-nbd"
-  IMGFMT        -- qcow2 (compat=3D1.1)
-  IMGPROTO      -- file
-  PLATFORM      -- Linux/ppc64le zzfp365-lp1 4.13.0-4.rel.git49564cb.el7.ce=
-ntos.ppc64le
-  TEST_DIR      -- /home/nasastry/qemu/tests/qemu-iotests/scratch
-  SOCKET_SCM_HELPER -- /home/nasastry/qemu/tests/qemu-iotests/socket_scm_he=
-lper
+  ./configure '--disable-user' '--enable-system' '--enable-linux-user'
+  '--enable-modules' '--enable-linux-aio' '--audio-drv-list=3Dpa'
+  '--enable-attr' '--enable-brlapi' '--enable-virtfs' '--enable-cap-ng'
+  '--enable-curl' '--enable-fdt' '--enable-gnutls' '--disable-gtk'
+  '--disable-vte' '--enable-libiscsi' '--enable-curses' '--enable-
+  smartcard' '--enable-rbd' '--enable-vnc-sasl' '--enable-seccomp'
+  '--enable-spice' '--enable-libusb' '--enable-usb-redir' '--enable-
+  xfsctl' '--enable-vnc' '--enable-vnc-jpeg' '--enable-vnc-png'
+  '--enable-kvm' '--enable-vhost-net'
 
-  058 0s ...
-  Passed all 1 tests
+  As a reference, and just in case these may be in some way related,
+  I've just submitted another ticket for a different issue with
+  snapshots using Ubuntu Qemu version
+  (https://bugs.launchpad.net/qemu/+bug/1739371)
+
+  Cheers,
+  Gus
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1727259/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1739378/+subscriptions
