@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBeUL-0005XR-Nl
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:50:59 -0400
+	(envelope-from <bounces@canonical.com>) id 1fBeUM-0005YK-Ln
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:51:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fBeUK-0002x9-Fh
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:50:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60944)
+	(envelope-from <bounces@canonical.com>) id 1fBeUL-0002xk-JY
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:50:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:32816)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fBeUK-0002wJ-8R
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:50:56 -0400
+	id 1fBeUL-0002ww-E3
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:50:57 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fBeUH-0004Rz-Dx
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 10:50:53 +0000
+	id 1fBeUI-0004Q9-5a
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 10:50:54 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0E8C12E81B9
+	by loganberry.canonical.com (Postfix) with ESMTP id EAFC12E81D9
 	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 10:50:50 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Apr 2018 10:38:35 -0000
-From: Thomas Huth <1756519@bugs.launchpad.net>
-Reply-To: Bug 1756519 <1756519@bugs.launchpad.net>
+Date: Thu, 26 Apr 2018 10:38:16 -0000
+From: Thomas Huth <1755479@bugs.launchpad.net>
+Reply-To: Bug 1755479 <1755479@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <152127850171.4068.8714943507984957739.malonedeb@gac.canonical.com>
-Message-Id: <152473911627.6156.17584543509175901030.launchpad@chaenomeles.canonical.com>
+References: <152094809386.3778.6282045564987107259.malonedeb@gac.canonical.com>
+Message-Id: <152473909706.21699.6329804118455321535.launchpad@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1756519] Re: qemu linux-user crash in QOM path
- canonicalization during do_fork() call to cpu_create
+Subject: [Qemu-devel] [Bug 1755479] Re: Cortex M:qemu abort with optimized
+ code and icount
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,103 +46,55 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1756519
+https://bugs.launchpad.net/bugs/1755479
 
 Title:
-  qemu linux-user crash in QOM path canonicalization during do_fork()
-  call to cpu_create
+  Cortex M:qemu abort with optimized code and icount
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  qemu-riscv64 version 2.11.50 (v2.11.0-2491-g2bb39a657a)  crashes
-  running gcc libgomp.c/sort-1.c testsuite test case with the following
-  message:
+  A basic program runs fine if compiled with flag -O0 with gcc, but trigger=
+s a qemu abort when compiled with -O1 and run with icount:
+  "qemu: fatal: IO on conditional branch instruction"
 
-  (process:11683): GLib-CRITICAL **: g_hash_table_iter_next: assertion 'ri-=
->version =3D=3D ri->hash_table->version' failed
-  **
-  ERROR:qom/object.c:1665:object_get_canonical_path_component: code should =
-not be reached
-  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x6013=
-9c16
+  I also noticed the problem on C source like this with -O0:
+  "int foo =3D *bar; bar++;" : OK
+  "int foo =3D *bar++;" : FAIL (!!!)
 
-  =
+  Optimized binary attached to this ticket.
 
-  Backtrace obtained via gdb:
+  command line:
+  qemu-system-arm -M lm3s6965evb -nographic -kernel hello.bin -serial file:=
+$(tty) -icount 4 -cpu cortex-m4
+  (working fine without icount)
 
-  #0  raise (sig=3Dsig@entry=3D6) at ../sysdeps/unix/sysv/linux/raise.c:51
-  #1  0x0000000060139b21 in abort () at abort.c:79
-  #2  0x0000000060100505 in g_assertion_message (domain=3Ddomain@entry=3D0x=
-0, file=3Dfile@entry=3D0x60213ca1 "qom/object.c", line=3Dline@entry=3D1665, =
+  version: =
 
-      func=3Dfunc@entry=3D0x60214420 <__func__.18106> "object_get_canonical=
-_path_component", message=3Dmessage@entry=3D0x7fffe8000cd0 "code should not=
- be reached")
-      at gtestutils.c:2430
-  #3  0x0000000060100586 in g_assertion_message_expr (domain=3D0x0, file=3D=
-0x60213ca1 "qom/object.c", line=3D1665, =
+  QEMU emulator version 2.11.50 (v2.11.0-2146-gd9bbfea-dirty)
 
-      func=3D0x60214420 <__func__.18106> "object_get_canonical_path_compone=
-nt", expr=3D<optimized out>) at gtestutils.c:2453
-  #4  0x0000000060098334 in object_get_canonical_path_component (obj=3D0x7f=
-ffe81340b0) at qom/object.c:1665
-  #5  0x0000000060098366 in object_get_canonical_path (obj=3D0x7fffe81340b0=
-) at qom/object.c:1675
-  #6  0x000000006008e152 in device_set_realized (obj=3D0x7fffe81340b0, valu=
-e=3Dtrue, errp=3D0x7ffff762fe68) at hw/core/qdev.c:874
-  #7  0x0000000060098bf4 in property_set_bool (obj=3D0x7fffe81340b0, v=3D0x=
-7fffe80fd3c0, name=3D0x60213694 "realized", opaque=3D0x7fffe80fd140, errp=
-=3D0x7ffff762fe68)
-      at qom/object.c:1926
-  #8  0x0000000060096fee in object_property_set (obj=3D0x7fffe81340b0, v=3D=
-0x7fffe80fd3c0, name=3D0x60213694 "realized", errp=3D0x7ffff762fe68) at qom=
-/object.c:1122
-  #9  0x0000000060099ebd in object_property_set_qobject (obj=3D0x7fffe81340=
-b0, value=3D0x7fffe80fd310, name=3D0x60213694 "realized", errp=3D0x7ffff762=
-fe68)
-      at qom/qom-qobject.c:27
-  #10 0x0000000060097274 in object_property_set_bool (obj=3D0x7fffe81340b0,=
- value=3Dtrue, name=3D0x60213694 "realized", errp=3D0x7ffff762fe68) at qom/=
-object.c:1191
-  #11 0x0000000060092ec5 in cpu_create (typename=3D0x6250e1a0 "any-riscv-cp=
-u") at qom/cpu.c:61
-  #12 0x000000006009301a in cpu_generic_init (typename=3D0x601dd58f "riscv-=
-cpu", cpu_model=3D0x601dd527 "any") at qom/cpu.c:98
-  #13 0x000000006004cb61 in cpu_copy (env=3D0x7ffff008cd60) at /opt/qemu/li=
-nux-user/main.c:3881
-  #14 0x000000006005b79a in do_fork (env=3D0x7ffff008cd60, flags=3D4001536,=
- newsp=3D275531880704, parent_tidptr=3D275531882704, newtls=3D275531884288, =
+  Compilation options:
+  ./configure --target-list=3Darm-softmmu --disable-slirp --disable-blobs -=
+-disable-docs --disable-guest-agent --disable-gnutls --disable-nettle --dis=
+able-gcrypt --disable-sdl --disable-gtk --disable-vnc --disable-virtfs --di=
+sable-mpath --disable-xen --disable-brlapi --disable-curl --disable-bluez -=
+-disable-kvm --disable-hax --disable-hvf --disable-whpx --disable-rdma --di=
+sable-vde --disable-netmap --disable-linux-aio --disable-cap-ng --disable-a=
+ttr --disable-vhost-net --disable-spice --disable-rbd --disable-libiscsi --=
+disable-libnfs --disable-smartcard --disable-libusb --disable-live-block-mi=
+gration --disable-usb-redir --disable-lzo --disable-snappy --disable-bzip2 =
+--disable-seccomp --disable-glusterfs --disable-tpm --disable-libssh2 --dis=
+able-numa --disable-libxml2 --disable-tcmalloc --disable-jemalloc --disable=
+-replication --disable-vhost-vsock --disable-opengl --disable-virglrenderer=
+ --disable-xfsctl --disable-qom-cast-debug --disable-vxhs --disable-crypto-=
+afalg --disable-vhost-user --disable-capstone --disable-pie --extra-cflags=
+=3D-mtune=3Dnative
 
-      child_tidptr=3D275531882704) at /opt/qemu/linux-user/syscall.c:6348
-  #15 0x0000000060063e56 in do_syscall (cpu_env=3D0x7ffff008cd60, num=3D220=
-, arg1=3D4001536, arg2=3D275531880704, arg3=3D275531882704, arg4=3D27553188=
-4288, =
-
-      arg5=3D275531882704, arg6=3D275531884288, arg7=3D0, arg8=3D0) at /opt=
-/qemu/linux-user/syscall.c:10001
-  #16 0x000000006004c89f in cpu_loop (env=3D0x7ffff008cd60) at /opt/qemu/li=
-nux-user/main.c:3600
-  #17 0x000000006005b68f in clone_func (arg=3D0x7ffff7775050) at /opt/qemu/=
-linux-user/syscall.c:6311
-  #18 0x0000000060121797 in start_thread (arg=3D0x7ffff7632700) at pthread_=
-create.c:463
-  #19 0x000000006019b4fb in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
-lone.S:95
-
-  =
-
-  Attached is a test case source code extracted from libgomp test suite.
-
-  Note that it is a multi-threaded and requires 5 or more threads to
-  fail. Number of launched threads is controlled by OMP_NUM_THREADS
-  evironment variable, defaulting to number of hardware threads.
-  Changing constants in the test case makes it fail with different
-  numbers of threads.
-
-  I will attach statically linked riscv64 binary executable if size
-  limits permit.
+  I have also tested previous versions:
+  - stock qemu-system-arm 2.5.0 from ubuntu 16.04: OK
+  - git version: QEMU emulator version 2.10.0 (v2.10.2-dirty): OK
+  - git version: QEMU emulator version 2.10.90 (v2.11.0-rc0-dirty): FAIL
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1756519/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1755479/+subscriptions
