@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <qemu-devel@lists.ewheeler.net>) id 1fBqOl-0007Q0-RZ
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 19:34:01 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fBqjZ-00012W-4s
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 19:55:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <qemu-devel@lists.ewheeler.net>) id 1fBqOh-0000xZ-Sl
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 19:33:59 -0400
-Received: from mx.ewheeler.net ([66.155.3.69]:34886 helo=mail.ewheeler.net)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <qemu-devel@lists.ewheeler.net>) id 1fBqOh-0000wt-JZ
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 19:33:55 -0400
-Received: from localhost (localhost [127.0.0.1])
-	by mail.ewheeler.net (Postfix) with ESMTP id E3B99A0414
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 23:33:53 +0000 (UTC)
-Received: from mail.ewheeler.net ([127.0.0.1])
-	by localhost (mail.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
-	with LMTP id Lw8Bu6pXOhcZ for <qemu-devel@nongnu.org>;
-	Thu, 26 Apr 2018 23:33:53 +0000 (UTC)
-Received: from mx.ewheeler.net (mx.ewheeler.net [66.155.3.69])
-	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mail.ewheeler.net (Postfix) with ESMTPSA id 7370EA03B0
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 23:33:53 +0000 (UTC)
-Date: Thu, 26 Apr 2018 23:33:53 +0000 (UTC)
-From: Eric Wheeler <qemu-devel@lists.ewheeler.net>
-Message-ID: <alpine.LRH.2.11.1804262308190.12327@mail.ewheeler.net>
+	(envelope-from <ehabkost@redhat.com>) id 1fBqjU-0007i8-4m
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 19:55:29 -0400
+Date: Thu, 26 Apr 2018 20:55:15 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180426235515.GL29865@localhost.localdomain>
+References: <1524570294-23058-1-git-send-email-thuth@redhat.com>
+	<d2a9fc1a-9696-f2bd-d603-03b23de62004@de.ibm.com>
+	<87f6ba73-2ded-06f2-c68f-d8ef4be50edf@redhat.com>
+	<20180424160911.22a238bb.cohuck@redhat.com>
+	<6d699426-3525-f62a-c4ec-37dd5589654f@redhat.com>
+	<64848d8f-071d-e6c8-58a7-d1e74e93e4f0@redhat.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Qemu-devel] Migration without memory page transfer
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <64848d8f-071d-e6c8-58a7-d1e74e93e4f0@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH] hw/s390x: Allow to configure the
+ consoles with the "-serial" parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,88 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-Hello all,
+On Tue, Apr 24, 2018 at 06:19:35PM +0200, Paolo Bonzini wrote:
+> On 24/04/2018 16:22, Thomas Huth wrote:
+> > $ diff -u sclp-qom-tree-before.txt sclp-qom-tree-after.txt
+> > --- sclp-qom-tree-before.txt	2018-04-24 16:17:48.462849585 +0200
+> > +++ sclp-qom-tree-after.txt	2018-04-24 16:18:02.222820256 +0200
+> > @@ -1,13 +1,14 @@
+> > -(qemu) info qom-tree
+> > +(qemu) info qom-tree
+> >  /machine (s390-ccw-virtio-2.12-machine)
+> >    /unattached (container)
+> > -    /system[0] (qemu:memory-region)
+> >      /sysbus (System)
+> > -    /device[1] (virtio-net-ccw)
+> > +    /device[0] (qemu-s390x-cpu)
+> > +    /s390.ram[0] (qemu:memory-region)
+> > +    /device[1] (sclpconsole)
+> > +    /device[2] (virtio-net-ccw)
+> >        /virtio-backend (virtio-net-device)
+> >        /virtio-bus (virtio-ccw-bus)
+> > -    /s390.ram[0] (qemu:memory-region)
+> > -    /device[0] (qemu-s390x-cpu)
+> > +    /system[0] (qemu:memory-region)
+> >      /io[0] (qemu:memory-region)
+> >    /sclp (sclp)
+> >      /s390-sclp-event-facility (s390-sclp-event-facility)
+> > @@ -17,7 +18,6 @@
+> >    /s390-flic-qemu (s390-flic-qemu)
+> >    /s390-skeys (s390-skeys-qemu)
+> >    /peripheral-anon (container)
+> > -    /device[0] (sclpconsole)
+> >    /peripheral (container)
+> >    /s390-ipl (s390-ipl)
+> >    /virtual-css-bridge (virtual-css-bridge)
+> > 
+> > ... the sclpconsole now shows up under /unattached instead of
+> > /peripheral-anon ... does that matter? (I don't have a clue)
+> 
+> If the devices are created in the same order, before and after the
+> patch, it should be okay.
 
-This is my first time inside of the qemu code, so your help is greatly 
-appreciated!
+Is there a way to find out if the devices are created in the same
+order using only QMP commands?  It would be very useful to
+automatically validate compatibility between QEMU versions.
 
-I have been experimenting with stop/start of VMs to/from a migration 
-stream that excludes RAM pages and let the RAM pages come from memory file 
-provided by the memory-backend-file called '/dev/shm/mem'.
-
-To disable writing of memory pages to the migration stream, I've disabled 
-calls to ram_find_and_save_block in ram_save_iterate() and 
-ram_save_complete() (see patch below).  Thus, the migration stream has the 
-"ram" SaveStateEntry section start/ends, but no pages:
-
-qemu-system-x86_64 \
-	-object memory-backend-file,prealloc=no,mem-path=/dev/shm/mem,id=ram-node0,host-nodes=0,policy=bind,size=64m,share=on \
-	-numa node,nodeid=0,cpus=0,memdev=ram-node0\
-	-m 64 -vnc 0:0
-
-Once the VM is running, I press ctrl-B to get the IPXE prompt and then 
-run 'kernel http://192.168.0.1/foo' to start a network request and watch 
-it in tcpdump.
-
-Once the download starts, I save the migration file:
-	migrate "exec:cat > /dev/shm/t"
-
-	# ls -lh /dev/shm/t
-	-rw-r--r-- 1 root root 321K Apr 26 16:06 /dev/shm/t
-
-Now I can kill qemu and boot it again with -incoming:
-
-qemu-system-x86_64 \
-	-object memory-backend-file,prealloc=no,mem-path=/dev/shm/mem,id=ram-node0,host-nodes=0,policy=bind,size=64m,share=on \
-	-numa node,nodeid=0,cpus=0,memdev=ram-node0\
-	-m 64 -vnc 0:0 \
-	-incoming 'exec:cat /dev/shm/t'
-
-It seems to work.  That is, network traffic continues (http from IPXE) 
-which I can see from tcpdump.  I can type into the console and it moves 
-the cursor around---but there is nothing on the screen except the blinking 
-text-mode cursor!  I can even blindly start a new transfer in ipxe: kernel 
-http://192.168.0.222/foo2 and see it in tcpdump.
-
-So what am I missing here?  Is the video memory not saved to /dev/shm/mem?
-
-Or perhaps it is saved, but VGA isn't initialized to use what is 
-already in /dev/shm/mem?  I've tried the cirrus, std, and vmware drivers 
-to see if they behave differently, but the do not seem to.
-
-Thanks for your help!
-
---
-Eric Wheeler
-
-
-diff --git a/migration/ram.c b/migration/ram.c
-index 021d583..9f4bfff 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2267,9 +2267,9 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
-     t0 = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
-     i = 0;
-     while ((ret = qemu_file_rate_limit(f)) == 0) {
--        int pages;
-+        int pages = 0;
- 
--        pages = ram_find_and_save_block(rs, false);
-+        if (0) pages = ram_find_and_save_block(rs, false);
-         /* no more pages to sent */
-         if (pages == 0) {
-             done = 1;
-@@ -2338,9 +2338,9 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
- 
-     /* flush all remaining blocks regardless of rate limiting */
-     while (true) {
--        int pages;
-+        int pages = 0;
- 
--        pages = ram_find_and_save_block(rs, !migration_in_colo_state());
-+        if (0) pages = ram_find_and_save_block(rs, !migration_in_colo_state());
-         /* no more blocks to sent */
-         if (pages == 0) {
-             break;
+-- 
+Eduardo
