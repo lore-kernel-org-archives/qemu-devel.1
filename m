@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fBj10-0000Ow-1l
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:40:59 -0400
+	(envelope-from <pagupta@redhat.com>) id 1fBj50-0002ZS-A9
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:45:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fBj0w-0005Ax-Qh
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:40:58 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34292 helo=mx1.redhat.com)
+	(envelope-from <pagupta@redhat.com>) id 1fBj4v-0006V6-Ib
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:45:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57044)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fBj0w-0005Aa-Kr
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:40:54 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A4995818533A
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 15:40:50 +0000 (UTC)
-Date: Thu, 26 Apr 2018 18:40:40 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180426184017-mutt-send-email-mst@kernel.org>
-References: <20180424063857.29246-1-kraxel@redhat.com>
-	<20180426180955-mutt-send-email-mst@kernel.org>
-	<20180426153148.rbjgglui2shdlzpg@sirius.home.kraxel.org>
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1fBj4v-0006Uz-AF
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 11:45:01 -0400
+Date: Thu, 26 Apr 2018 11:44:59 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <197910974.22984070.1524757499459.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20180426131236.GA30991@stefanha-x1.localdomain>
+References: <20180425112415.12327-1-pagupta@redhat.com>
+	<20180425112415.12327-2-pagupta@redhat.com>
+	<20180426131236.GA30991@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180426153148.rbjgglui2shdlzpg@sirius.home.kraxel.org>
-Subject: Re: [Qemu-devel] [PATCH] allocate pci id for mdpy
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v2 1/2] virtio: add pmem driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,33 +28,374 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-nvdimm@ml01.01.org, linux-mm@kvack.org, kwolf@redhat.com, haozhong zhang <haozhong.zhang@intel.com>, jack@suse.cz, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, riel@surriel.com, niteshnarayanlal@hotmail.com, david@redhat.com, ross zwisler <ross.zwisler@intel.com>, lcapitulino@redhat.com, hch@infradead.org, mst@redhat.com, stefanha@redhat.com, imammedo@redhat.com, marcel@redhat.com, pbonzini@redhat.com, dan j williams <dan.j.williams@intel.com>, nilal@redhat.com
 
-On Thu, Apr 26, 2018 at 05:31:48PM +0200, Gerd Hoffmann wrote:
-> On Thu, Apr 26, 2018 at 06:10:48PM +0300, Michael S. Tsirkin wrote:
-> > On Tue, Apr 24, 2018 at 08:38:57AM +0200, Gerd Hoffmann wrote:
-> > > mdpy is a sample pci device for vfio-mdev.  Not (yet) merged upstream,
-> > > patch available here:
-> > > 
-> > > https://www.kraxel.org/cgit/linux/commit/?h=vfio-sample-display&id=6fd86cff3d7df38ab89625b16fdd6434b1c18749
-> > > 
-> > > Cc: Alex Williamson <alex.williamson@redhat.com>
-> > > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+
+> > This patch adds virtio-pmem driver for KVM
+> > guest.
 > > 
-> > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> > Guest reads the persistent memory range
+> > information from Qemu over VIRTIO and registers
+> > it on nvdimm_bus. It also creates a nd_region
+> > object with the persistent memory range
+> > information so that existing 'nvdimm/pmem'
+> > driver can reserve this into system memory map.
+> > This way 'virtio-pmem' driver uses existing
+> > functionality of pmem driver to register persistent
+> > memory compatible for DAX capable filesystems.
 > > 
-> > I presume this should be merged together with the
-> > device implementation in qemu, or do you want this
-> > in tree sooner?
+> > This also provides function to perform guest flush
+> > over VIRTIO from 'pmem' driver when userspace
+> > performs flush on DAX memory range.
+> > 
+> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> > ---
+> >  drivers/virtio/Kconfig           |  12 ++++
+> >  drivers/virtio/Makefile          |   1 +
+> >  drivers/virtio/virtio_pmem.c     | 118
+> >  +++++++++++++++++++++++++++++++++++++++
+> >  include/linux/libnvdimm.h        |   4 ++
+> >  include/uapi/linux/virtio_ids.h  |   1 +
+> >  include/uapi/linux/virtio_pmem.h |  58 +++++++++++++++++++
+> >  6 files changed, 194 insertions(+)
+> >  create mode 100644 drivers/virtio/virtio_pmem.c
+> >  create mode 100644 include/uapi/linux/virtio_pmem.h
+> > 
+> > diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
+> > index 3589764..879335d 100644
+> > --- a/drivers/virtio/Kconfig
+> > +++ b/drivers/virtio/Kconfig
+> > @@ -42,6 +42,18 @@ config VIRTIO_PCI_LEGACY
+> >  
+> >  	  If unsure, say Y.
+> >  
+> > +config VIRTIO_PMEM
+> > +	tristate "Virtio pmem driver"
+> > +	depends on VIRTIO
+> > +	help
+> > +	 This driver adds persistent memory range to nd_region and registers
+> > +	 with nvdimm bus. NVDIMM 'pmem' driver later allocates a persistent
+> > +	 memory range on the memory information added by this driver. In addition
+> > +	 to this, 'virtio-pmem' driver also provides a paravirt flushing
+> > interface
+> > +	 from guest to host.
+> > +
+> > +	 If unsure, say M.
+> > +
+> >  config VIRTIO_BALLOON
+> >  	tristate "Virtio balloon driver"
+> >  	depends on VIRTIO
+> > diff --git a/drivers/virtio/Makefile b/drivers/virtio/Makefile
+> > index 3a2b5c5..cbe91c6 100644
+> > --- a/drivers/virtio/Makefile
+> > +++ b/drivers/virtio/Makefile
+> > @@ -6,3 +6,4 @@ virtio_pci-y := virtio_pci_modern.o virtio_pci_common.o
+> >  virtio_pci-$(CONFIG_VIRTIO_PCI_LEGACY) += virtio_pci_legacy.o
+> >  obj-$(CONFIG_VIRTIO_BALLOON) += virtio_balloon.o
+> >  obj-$(CONFIG_VIRTIO_INPUT) += virtio_input.o
+> > +obj-$(CONFIG_VIRTIO_PMEM) += virtio_pmem.o
+> > diff --git a/drivers/virtio/virtio_pmem.c b/drivers/virtio/virtio_pmem.c
+> > new file mode 100644
+> > index 0000000..0906d2d
+> > --- /dev/null
+> > +++ b/drivers/virtio/virtio_pmem.c
+> > @@ -0,0 +1,118 @@
 > 
-> There isn't a device implementation in qemu.  It's a mdev device
-> provided by the kernel.  Can be used with qemu using vfio.
+> SPDX license line?  See Documentation/process/license-rules.rst.
+
+o.k. 
+
 > 
-> cheers,
->   Gerd
+> > +/* Virtio pmem Driver
+> > + *
+> > + * Discovers persitent memory range information
+> 
+> s/persitent/persistent/
+> 
+> > + * from host and provides a virtio based flushing
+> > + * interface.
+> > + */
+> > +
+> > +#include <linux/virtio.h>
+> > +#include <linux/swap.h>
+> > +#include <linux/workqueue.h>
+> > +#include <linux/delay.h>
+> > +#include <linux/slab.h>
+> > +#include <linux/module.h>
+> > +#include <linux/oom.h>
+> > +#include <linux/wait.h>
+> > +#include <linux/magic.h>
+> > +#include <linux/virtio_pmem.h>
+> > +#include <linux/libnvdimm.h>
+> 
+> Are all these headers really needed?  delay.h?  oom.h?
 
-Why do we need a define in pci.h then?
+Will remove not required ones. There are from previous
+RFC where used *memremap* and other mm & block includes.
 
--- 
-MST
+> 
+> > +
+> > +static int init_vq(struct virtio_pmem *vpmem)
+> > +{
+> > +	struct virtqueue *vq;
+> > +
+> > +	/* single vq */
+> > +	vpmem->req_vq = vq = virtio_find_single_vq(vpmem->vdev,
+> > +				NULL, "flush_queue");
+> > +
+> > +	if (IS_ERR(vq))
+> > +		return PTR_ERR(vq);
+> > +
+> > +	return 0;
+> > +};
+> > +
+> > +static int virtio_pmem_probe(struct virtio_device *vdev)
+> > +{
+> > +	int err = 0;
+> > +	struct resource res;
+> > +	struct virtio_pmem *vpmem;
+> > +	struct nvdimm_bus *nvdimm_bus;
+> > +	struct nd_region_desc ndr_desc;
+> > +	int nid = dev_to_node(&vdev->dev);
+> > +	static struct nvdimm_bus_descriptor nd_desc;
+> > +
+> > +	if (!vdev->config->get) {
+> > +		dev_err(&vdev->dev, "%s failure: config disabled\n",
+> > +			__func__);
+> > +		return -EINVAL;
+> > +	}
+> > +
+> > +	vdev->priv = vpmem = devm_kzalloc(&vdev->dev, sizeof(*vpmem),
+> > +			GFP_KERNEL);
+> > +	if (!vpmem) {
+> > +		err = -ENOMEM;
+> > +		goto out;
+> > +	}
+> > +
+> > +	vpmem->vdev = vdev;
+> > +	err = init_vq(vpmem);
+> > +	if (err)
+> > +		goto out;
+> > +
+> > +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
+> > +			start, &vpmem->start);
+> > +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
+> > +			size, &vpmem->size);
+> > +
+> > +	res.start = vpmem->start;
+> > +	res.end   = vpmem->start + vpmem->size-1;
+> > +
+> > +	memset(&nd_desc, 0, sizeof(nd_desc));
+> > +	nd_desc.provider_name = "virtio-pmem";
+> > +	nd_desc.module = THIS_MODULE;
+> > +	nvdimm_bus = nvdimm_bus_register(&vdev->dev, &nd_desc);
+> > +
+> > +	if (!nvdimm_bus)
+> > +		goto out_nd;
+> > +	dev_set_drvdata(&vdev->dev, nvdimm_bus);
+> > +
+> > +	memset(&ndr_desc, 0, sizeof(ndr_desc));
+> > +	ndr_desc.res = &res;
+> > +	ndr_desc.numa_node = nid;
+> > +	set_bit(ND_REGION_PAGEMAP, &ndr_desc.flags);
+> > +	set_bit(ND_REGION_VIRTIO, &ndr_desc.flags);
+> > +
+> > +	if (!nvdimm_pmem_region_create(nvdimm_bus, &ndr_desc))
+> > +		goto out_nd;
+> > +
+> > +	virtio_device_ready(vdev);
+> > +	return 0;
+> > +
+> > +out_nd:
+> > +	nvdimm_bus_unregister(nvdimm_bus);
+> > +out:
+> > +	dev_err(&vdev->dev, "failed to register virtio pmem memory\n");
+> > +	vdev->config->del_vqs(vdev);
+> > +	return err;
+> > +}
+> > +
+> > +static void virtio_pmem_remove(struct virtio_device *vdev)
+> > +{
+> > +	struct nvdimm_bus *nvdimm_bus = dev_get_drvdata(&vdev->dev);
+> > +
+> > +	nvdimm_bus_unregister(nvdimm_bus);
+> > +	vdev->config->del_vqs(vdev);
+> > +}
+> > +
+> > +static struct virtio_driver virtio_pmem_driver = {
+> > +	.driver.name		= KBUILD_MODNAME,
+> > +	.driver.owner		= THIS_MODULE,
+> > +	.id_table		= id_table,
+> > +	.probe			= virtio_pmem_probe,
+> > +	.remove			= virtio_pmem_remove,
+> > +};
+> > +
+> > +module_virtio_driver(virtio_pmem_driver);
+> > +MODULE_DEVICE_TABLE(virtio, id_table);
+> > +MODULE_DESCRIPTION("Virtio pmem driver");
+> > +MODULE_LICENSE("GPL");
+> > diff --git a/include/linux/libnvdimm.h b/include/linux/libnvdimm.h
+> > index 097072c..b1b7f14 100644
+> > --- a/include/linux/libnvdimm.h
+> > +++ b/include/linux/libnvdimm.h
+> > @@ -58,6 +58,10 @@ enum {
+> >  	 * (ADR)
+> >  	 */
+> >  	ND_REGION_PERSIST_MEMCTRL = 2,
+> > +	/*
+> > +	 * region flag indicating to use VIRTIO flush interface for pmem
+> > +	 */
+> > +	ND_REGION_VIRTIO = 3,
+> 
+> Can you add a generic flush callback to libnvdimm instead?  That way
+> virtio and other drivers can hook in without hardcoding knowledge of
+> these drivers into libnvdimm.
+
+Sure! Working on this. Same suggestion by Dan.
+
+> 
+> >  
+> >  	/* mark newly adjusted resources as requiring a label update */
+> >  	DPA_RESOURCE_ADJUSTED = 1 << 0,
+> > diff --git a/include/uapi/linux/virtio_ids.h
+> > b/include/uapi/linux/virtio_ids.h
+> > index 6d5c3b2..5ebd049 100644
+> > --- a/include/uapi/linux/virtio_ids.h
+> > +++ b/include/uapi/linux/virtio_ids.h
+> > @@ -43,5 +43,6 @@
+> >  #define VIRTIO_ID_INPUT        18 /* virtio input */
+> >  #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
+> >  #define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
+> > +#define VIRTIO_ID_PMEM         21 /* virtio pmem */
+> >  
+> >  #endif /* _LINUX_VIRTIO_IDS_H */
+> > diff --git a/include/uapi/linux/virtio_pmem.h
+> > b/include/uapi/linux/virtio_pmem.h
+> > new file mode 100644
+> > index 0000000..2ec27cb
+> > --- /dev/null
+> > +++ b/include/uapi/linux/virtio_pmem.h
+> > @@ -0,0 +1,58 @@
+> > +/* Virtio pmem Driver
+> > + *
+> > + * Discovers persitent memory range information
+> 
+> s/persitent/persistent/
+> 
+> > + * from host and provides a virtio based flushing
+> > + * interface.
+> > + */
+> > +
+> > +#ifndef _LINUX_VIRTIO_PMEM_H
+> > +#define _LINUX_VIRTIO_PMEM_H
+> > +
+> > +#include <linux/types.h>
+> > +#include <linux/virtio_types.h>
+> > +#include <linux/virtio_ids.h>
+> > +#include <linux/virtio_config.h>
+> > +#include <linux/virtio_ring.h>
+> > +
+> > +
+> > +struct virtio_pmem_config {
+> > +
+> > +	uint64_t start;
+> > +	uint64_t size;
+> > +};
+> > +
+> > +struct virtio_pmem {
+> > +
+> > +	struct virtio_device *vdev;
+> > +	struct virtqueue *req_vq;
+> > +
+> > +	uint64_t start;
+> > +	uint64_t size;
+> > +} __packed;
+> 
+> This is a userspace API header file, it should contain definitions that
+> userspace programs need.  struct virtio_pmem is a kernel-internal struct
+> that should not be in the uapi headers.
+> 
+> Only define virtio spec structs in this header file (e.g. config space,
+> request structs, etc).
+
+o.k 
+
+> 
+> > +static struct virtio_device_id id_table[] = {
+> > +	{ VIRTIO_ID_PMEM, VIRTIO_DEV_ANY_ID },
+> > +	{ 0 },
+> > +};
+> 
+> Why is static variable in the header file?
+
+mistake :)
+
+> 
+> > +
+> > +void virtio_pmem_flush(struct device *dev)
+> 
+> This only implements flush command submission, not completion.  Maybe
+> the next patch will implement that but it's a little strange to only see
+> half of the flush operation.
+> 
+> Please put the whole flush operation in one patch so it can be reviewed
+> easily.  At this point I don't know if you've forgotten to implement
+> wait for completion.
+> 
+> > +{
+> 
+> Why is this function body in the header file?
+
+Because I was trying to use it from pmem module without loading
+virtio_pmem driver or load it dynamically. I think adding flush function in
+'nd_region' struct and set it as per region type looks better solution. 
+Suggested by Dan & you. 
+
+> 
+> > +	struct scatterlist sg;
+> > +	struct virtio_device *vdev  = dev_to_virtio(dev->parent->parent);
+> > +	struct virtio_pmem   *vpmem = vdev->priv;
+> > +	char *buf = "FLUSH";
+> 
+> I'm surprised this compiles without a warning.  String literals should
+> be constant but the char pointer isn't constant.
+
+Point taken.
+
+> 
+> > +	int err;
+> > +
+> > +	sg_init_one(&sg, buf, sizeof(buf));
+> > +
+> > +	err = virtqueue_add_outbuf(vpmem->req_vq, &sg, 1, buf, GFP_KERNEL);
+> > +
+> > +	if (err) {
+> > +		dev_err(&vdev->dev, "failed to send command to virtio pmem device\n");
+> > +		return;
+> > +	}
+> > +
+> > +	virtqueue_kick(vpmem->req_vq);
+> 
+> Is any locking necessary?  Two CPUs must not invoke virtio_pmem_flush()
+> at the same time.  Not sure if anything guarantees this, maybe you're
+> relying on libnvdimm but I haven't checked.
+
+I thought about it to some extent, and wanted to go ahead with simple version first:
+
+- I think file 'inode -> locking' sill is there for request on single file.
+- For multiple files, our aim is to just flush the backend block image.
+- Even there is collision for virt queue read/write entry it should just trigger a Qemu fsync. 
+  We just want most recent flush to assure guest writes are synced properly.
+
+Important point here: We are doing entire block fsync for guest virtual disk.
+
+> 
+> > +};
+> > +
+> > +#endif
+> > --
+> > 2.9.3
+> > 
+> > 
+> 
