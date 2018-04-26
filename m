@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fBgk9-0006uC-3U
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 09:15:30 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fBgms-0007oY-DB
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 09:18:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fBgk4-0008WB-4o
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 09:15:25 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:51229)
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fBgmm-0001Py-MM
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 09:18:14 -0400
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:40561)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fBgk3-0008Vm-Np
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 09:15:20 -0400
-Received: by mail-wm0-x242.google.com with SMTP id j4so12901461wme.1
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 06:15:19 -0700 (PDT)
-Date: Thu, 26 Apr 2018 14:15:17 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180426131517.GB30991@stefanha-x1.localdomain>
-References: <20180425112415.12327-1-pagupta@redhat.com>
-	<20180425112415.12327-3-pagupta@redhat.com>
+	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
+	id 1fBgmm-0001Pn-FY
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 09:18:08 -0400
+Received: by mail-pf0-x241.google.com with SMTP id f189so9240983pfa.7
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 06:18:08 -0700 (PDT)
+References: <20180426091519.26934-1-xiaoguangrong@tencent.com>
+	<20180426093443.GA2631@work-vm>
+From: Xiao Guangrong <guangrong.xiao@gmail.com>
+Message-ID: <34c11cfa-3199-6097-3412-d7214fde0a08@gmail.com>
+Date: Thu, 26 Apr 2018 21:18:01 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="NDin8bjvE/0mNLFQ"
-Content-Disposition: inline
-In-Reply-To: <20180425112415.12327-3-pagupta@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2 2/2] pmem: device flush over VIRTIO
+In-Reply-To: <20180426093443.GA2631@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] migration: introduce decompress-error-check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +31,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-nvdimm@ml01.01.org, linux-mm@kvack.org, jack@suse.cz, stefanha@redhat.com, dan.j.williams@intel.com, riel@surriel.com, haozhong.zhang@intel.com, nilal@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, ross.zwisler@intel.com, david@redhat.com, xiaoguangrong.eric@gmail.com, hch@infradead.org, marcel@redhat.com, mst@redhat.com, niteshnarayanlal@hotmail.com, imammedo@redhat.com, lcapitulino@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, peterx@redhat.com, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
 
---NDin8bjvE/0mNLFQ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 25, 2018 at 04:54:14PM +0530, Pankaj Gupta wrote:
-> This patch adds functionality to perform=20
-> flush from guest to hosy over VIRTIO=20
-> when 'ND_REGION_VIRTIO'flag is set on=20
-> nd_negion. Flag is set by 'virtio-pmem'
-> driver.
->=20
-> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> ---
->  drivers/nvdimm/region_devs.c | 7 +++++++
->  1 file changed, 7 insertions(+)
->=20
-> diff --git a/drivers/nvdimm/region_devs.c b/drivers/nvdimm/region_devs.c
-> index a612be6..6c6454e 100644
-> --- a/drivers/nvdimm/region_devs.c
-> +++ b/drivers/nvdimm/region_devs.c
-> @@ -20,6 +20,7 @@
->  #include <linux/nd.h>
->  #include "nd-core.h"
->  #include "nd.h"
-> +#include <linux/virtio_pmem.h>
-> =20
->  /*
->   * For readq() and writeq() on 32-bit builds, the hi-lo, lo-hi order is
-> @@ -1074,6 +1075,12 @@ void nvdimm_flush(struct nd_region *nd_region)
->  	struct nd_region_data *ndrd =3D dev_get_drvdata(&nd_region->dev);
->  	int i, idx;
-> =20
-> +       /* call PV device flush */
-> +	if (test_bit(ND_REGION_VIRTIO, &nd_region->flags)) {
-> +		virtio_pmem_flush(&nd_region->dev);
-> +		return;
-> +	}
+On 04/26/2018 05:34 PM, Dr. David Alan Gilbert wrote:
+> * guangrong.xiao@gmail.com (guangrong.xiao@gmail.com) wrote:
+>> From: Xiao Guangrong <xiaoguangrong@tencent.com>
+>>
+>> QEMU 2.13 enables strict check for compression & decompression to
+>> make the migration more robuster, that depends on the source to fix
+>> the internal design which triggers the unexpected error conditions
+> 
+> Hmm that's painful!
 
-How does libnvdimm know when flush has completed?
+Yup, i will think it more carefully next time. :(
 
-Callers expect the flush to be finished when nvdimm_flush() returns but
-the virtio driver has only queued the request, it hasn't waited for
-completion!
+> 
+>> To make it work for migrating old version QEMU to 2.13 QEMU, we
+>> introduce this parameter to disable the error check on the
+>> destination
+>>
+>> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+>> ---
+>>   hmp.c                 |  8 ++++++++
+>>   migration/migration.c | 19 +++++++++++++++++++
+>>   migration/migration.h |  1 +
+>>   migration/ram.c       |  2 +-
+>>   qapi/migration.json   | 43 +++++++++++++++++++++++++++++++++++++++----
+>>   5 files changed, 68 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/hmp.c b/hmp.c
+>> index 898e25f3e1..f0b934368b 100644
+>> --- a/hmp.c
+>> +++ b/hmp.c
+>> @@ -329,6 +329,10 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
+>>           monitor_printf(mon, "%s: %u\n",
+>>               MigrationParameter_str(MIGRATION_PARAMETER_DECOMPRESS_THREADS),
+>>               params->decompress_threads);
+>> +        assert(params->has_decompress_error_check);
+>> +        monitor_printf(mon, "%s: %s\n",
+>> +            MigrationParameter_str(MIGRATION_PARAMETER_DECOMPRESS_ERROR_CHECK),
+>> +            params->decompress_error_check ? "on" : "off");
+> 
+> Since it's a bool, this should be a migration-capability rather than a
+> parameter I think.
+> 
 
---NDin8bjvE/0mNLFQ
-Content-Type: application/pgp-signature; name="signature.asc"
+The parameter, @block-incremental, it is also a bool, i think it is okay to
+decompress-error-check as well, and it is one of the configurations
+of decompression, it is better to group them. Right? :)
 
------BEGIN PGP SIGNATURE-----
+> Also, we need to make sure it defaults to off for compatibility.
 
-iQEcBAEBAgAGBQJa4dDlAAoJEJykq7OBq3PI980IAJY41FLfXhqcQzxR13OvtKqj
-cM7mQMJIee6fETlh9HYqEh7dOvOHhpqojY9PEKA+Bu1f/KC3Y03liilCCKdLiHc+
-WpCVSyT3nOTjPlY4tS+e4WEEzaCwqNYu8rbz7sfJxd1c+4Hl9VuLfBQLieSnTsmE
-GUawKQak2e+c7EdOdKxmxtaeZfX1qJcm6ZMhbqSrvIrzR+E+fz4WKmntxrdgeDwY
-4IzZHK5h2u4z0jSeLf0tfdWf/77y1IWPqKGvuK6MTZHFxvMn6AiI4VZ116LfXgNC
-l7SS25ehqJ5WGgBrUYsL40QAimQDSCQL2ouNwyx/Q1+Ub/xi6TWKN17u3UV5Bpc=
-=i3H2
------END PGP SIGNATURE-----
+Yes, the parameter is allocated by zalloc, it has already been false on
+default, do you think we should make it be false explicitly?
 
---NDin8bjvE/0mNLFQ--
+> 
+> Other than that, I think it's OK.
+
+Thank you, Dave!
