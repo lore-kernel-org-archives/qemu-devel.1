@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fBeAv-0003YR-2O
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:30:55 -0400
+	(envelope-from <bounces@canonical.com>) id 1fBeB6-0003dL-U8
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:31:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fBeAr-0002Zi-2a
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:30:53 -0400
-Received: from 3.mo179.mail-out.ovh.net ([178.33.251.175]:43317)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fBeAq-0002Yv-Q3
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:30:49 -0400
-Received: from player774.ha.ovh.net (unknown [10.109.105.86])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id E2613BB46E
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 12:30:46 +0200 (CEST)
-References: <20180419124331.3915-1-clg@kaod.org>
-	<20180419124331.3915-4-clg@kaod.org>
-	<20180423064644.GG19804@umbus.fritz.box>
-	<8d1cb270-d62f-f08f-9167-3f130906f910@kaod.org>
-	<20180424064629.GP19804@umbus.fritz.box>
-	<3b57fde8-ee11-81a0-271b-9e514ed63856@kaod.org>
-	<20180426035452.GE8800@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <b11688ae-a08f-320f-2bb5-46262ccb6376@kaod.org>
-Date: Thu, 26 Apr 2018 12:30:42 +0200
+	(envelope-from <bounces@canonical.com>) id 1fBeB4-0002gT-1M
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:31:04 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55712)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fBeB3-0002fg-Oa
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 06:31:01 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fBeB2-0001Vb-0o
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 10:31:00 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B9F702E806B
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 10:30:59 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180426035452.GE8800@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 03/35] ppc/xive: introduce the
- XiveFabric interface
+Date: Thu, 26 Apr 2018 10:25:25 -0000
+From: Thomas Huth <1727250@bugs.launchpad.net>
+Reply-To: Bug 1727250 <1727250@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150892252192.18283.8177817026945520523.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152473832619.6197.13935644020316737285.launchpad@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1727250] Re: qemu-io-test 147 segfaults when
+ configured with gcov
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,303 +37,230 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: qemu-devel@nongnu.org
 
-On 04/26/2018 05:54 AM, David Gibson wrote:
-> On Tue, Apr 24, 2018 at 11:33:11AM +0200, C=E9dric Le Goater wrote:
->> On 04/24/2018 08:46 AM, David Gibson wrote:
->>> On Mon, Apr 23, 2018 at 09:58:43AM +0200, C=E9dric Le Goater wrote:
->>>> On 04/23/2018 08:46 AM, David Gibson wrote:
->>>>> On Thu, Apr 19, 2018 at 02:42:59PM +0200, C=E9dric Le Goater wrote:
->>>>>> The XiveFabric offers a simple interface, between the XiveSourve
->>>>>> object and the device model owning the interrupt sources, to forwa=
-rd
->>>>>> an event notification to the XIVE interrupt controller of the mach=
-ine
->>>>>> and if the owner is the controller, to call directly the routing
->>>>>> sub-engine.
->>>>>>
->>>>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->>>>>> ---
->>>>>>  hw/intc/xive.c        | 37 ++++++++++++++++++++++++++++++++++++-
->>>>>>  include/hw/ppc/xive.h | 25 +++++++++++++++++++++++++
->>>>>>  2 files changed, 61 insertions(+), 1 deletion(-)
->>>>>>
->>>>>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
->>>>>> index 060976077dd7..b4c3d06c1219 100644
->>>>>> --- a/hw/intc/xive.c
->>>>>> +++ b/hw/intc/xive.c
->>>>>> @@ -17,6 +17,21 @@
->>>>>>  #include "hw/ppc/xive.h"
->>>>>> =20
->>>>>>  /*
->>>>>> + * XIVE Fabric
->>>>>> + */
->>>>>> +
->>>>>> +static void xive_fabric_route(XiveFabric *xf, int lisn)
->>>>>> +{
->>>>>> +
->>>>>> +}
->>>>>> +
->>>>>> +static const TypeInfo xive_fabric_info =3D {
->>>>>> +    .name =3D TYPE_XIVE_FABRIC,
->>>>>> +    .parent =3D TYPE_INTERFACE,
->>>>>> +    .class_size =3D sizeof(XiveFabricClass),
->>>>>> +};
->>>>>> +
->>>>>> +/*
->>>>>>   * XIVE Interrupt Source
->>>>>>   */
->>>>>> =20
->>>>>> @@ -97,11 +112,19 @@ static bool xive_source_pq_trigger(XiveSource=
- *xsrc, uint32_t srcno)
->>>>>> =20
->>>>>>  /*
->>>>>>   * Forward the source event notification to the associated XiveFa=
-bric,
->>>>>> - * the device owning the sources.
->>>>>> + * the device owning the sources, or perform the routing if the d=
-evice
->>>>>> + * is the interrupt controller.
->>>>>>   */
->>>>>>  static void xive_source_notify(XiveSource *xsrc, int srcno)
->>>>>>  {
->>>>>> =20
->>>>>> +    XiveFabricClass *xfc =3D XIVE_FABRIC_GET_CLASS(xsrc->xive);
->>>>>> +
->>>>>> +    if (xfc->notify) {
->>>>>> +        xfc->notify(xsrc->xive, srcno + xsrc->offset);
->>>>>> +    } else {
->>>>>> +        xive_fabric_route(xsrc->xive, srcno + xsrc->offset);
->>>>>> +    }
->>>>>
->>>>> Why 2 cases?  Can't the XiveFabric object just make its notify equa=
-l
->>>>> to xive_fabric_route if that's what it wants?
->>>> Under sPAPR, all the sources, IPIs and virtual device interrupts,=20
->>>> generate events which are directly routed by xive_fabric_route().=20
->>>> There is no need of an extra hop. Indeed.=20
->>>
->>> Ok.
->>>
->>>> Under PowerNV, some sources forward the notification to the routing=20
->>>> engine using a specific MMIO load on a notify address which is store=
-d=20
->>>> in one of the controller registers. So we need a hop to reach the=20
->>>> device model, owning the sources, and do that load :
->>>
->>> Hm.  So you're saying that in pnv some sources send their notificatio=
-n
->>> to some other unit,=20
->>
->> Not to any unit/device, to the device owning the sources.
->>
->> For the XiveSource object under PSI, the XIVEFabric interface is the=20
->> PSI device object it self, which knows how to forward the notification=
-=20
->> on the XIVE Power "bus". To be more precise, the PSI HB device has=20
->> 14 interrupt sources, which notifications are forwarded using a MMIO=20
->> load to some address. The load address is configured (by skiboot) in=20
->> one of the PSI device registers, and points to a MMIO region of the=20
->> main XIVE interrupt controller.=20
->>
->> The PHB4 sources should be the same.
->>
->> For the XiveSource object (all interrupts) under sPAPRXive, the=20
->> XIVEFabric is the main interrupt controller sPAPRXive.
->>
->> For the XiveSource object (IPIs) under PnvXive, the XIVEFabric is=20
->> also the main interrupt controller PnvXive.
->=20
-> Hrm.  Apparently I'm missing something, I'm really not getting what
-> you're trying to explain here.
+** Changed in: qemu
+       Status: Fix Committed =3D> Fix Released
 
-I see that. Let's try again.
+-- =
 
->>> that would then (after possible masking) forward on to the overall> x=
-ive fabric ?=20
->>
->> yes. May be XIVEFabric is a confusing name. What about XIVEForwarder ?=
-=20
->=20
-> Maybe..?
->=20
->>> That seems like a property of the source object,=20
->>
->> The source object is generic. It's a bunch of PQ bits that can be=20
->> controlled by MMIOs. Nothing more.
->=20
-> Hmm.  Isn't the source object also responsible for forwarding the
-> interrupt to something up the chain (whatever that is)?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1727250
 
-Yes but it can not forward directly. The XiveSource is generic and=20
-can only call a handler :
+Title:
+  qemu-io-test 147 segfaults when configured with gcov
 
-	xfc->notify(xsrc->xive, srcno + xsrc->offset);
+Status in QEMU:
+  Fix Released
 
-The device model owner, the parent of the XiveSource object, would=20
-do the real forward.=20
+Bug description:
+  Head is at 3d7196d43bfe12efe98568cb60057e273652b99b
 
-It's very similar to what we have today with XICS :
+  Steps to re-produce:
+  1. git clone
+  ./configure --enable-gcov --target-list=3Dppc64-softmmu
+  make
+  cd tests/qemu-iotests
 
-	- The sPAPR model has an ICSState =20
-	- The PnvPSI model has an ICSState=20
-	- The PnvPHB3 model has two ICSStates
+  2. export qemu binary, in my environment
+  export QEMU_PROG=3D/home/nasastry/qemu_gcov/ppc64-softmmu/qemu-system-ppc=
+64
 
-and the 'xics' pointer in ICSState points to the 'interrupt unit' of=20
-the machine to do resends and to grab ICPs. So it used for routing=20
-essentially.
+  3. Run test 147 with format qcow2
+  ./check -qcow2 147
 
-in Xive=20
+  QEMU          -- "/home/nasastry/qemu_gcov/ppc64-softmmu/qemu-system-ppc6=
+4" -nodefaults -machine accel=3Dqtest
+  QEMU_IMG      -- "/home/nasastry/qemu/qemu-img"
+  QEMU_IO       -- "/home/nasastry/qemu/qemu-io"  --cache writeback -f qcow2
+  QEMU_NBD      -- "/home/nasastry/qemu/qemu-nbd"
+  IMGFMT        -- qcow2 (compat=3D1.1)
+  IMGPROTO      -- file
+  PLATFORM      -- Linux/ppc64le zzfp365-lp1 4.13.0-4.rel.git49564cb.el7.ce=
+ntos.ppc64le
+  TEST_DIR      -- /home/nasastry/qemu/tests/qemu-iotests/scratch
+  SOCKET_SCM_HELPER -- /home/nasastry/qemu/tests/qemu-iotests/socket_scm_he=
+lper
 
-	- sPAPRXive model has a XiveSource
-	- PnvXive model has a XiveSource
-	- PnvPSI model has a XiveSource
-	- PnvPHB4 model should have also.
+  147 0s ... [failed, exit status 1] - output mismatch (see 147.out.bad)
+  --- /home/nasastry/qemu/tests/qemu-iotests/147.out	2017-10-25 14:04:54.97=
+8600753 +0530
+  +++ /home/nasastry/qemu/tests/qemu-iotests/147.out.bad	2017-10-25 14:09:5=
+3.769783770 +0530
+  @@ -1,5 +1,95 @@
+  -......
+  +WARNING:qemu:qemu received signal -11: /home/nasastry/qemu_gcov/ppc64-so=
+ftmmu/qemu-system-ppc64 -chardev socket,id=3Dmon,path=3D/home/nasastry/qemu=
+/tests/qemu-iotests/scratch/qemu-28636-monitor.sock -mon chardev=3Dmon,mode=
+=3Dcontrol -display none -vga none -qtest unix:path=3D/home/nasastry/qemu/t=
+ests/qemu-iotests/scratch/qemu-28636-qtest.sock -machine accel=3Dqtest -nod=
+efaults -machine accel=3Dqtest
+  +WARNING:qemu:qemu received signal -11: /home/nasastry/qemu_gcov/ppc64-so=
+ftmmu/qemu-system-ppc64 -chardev socket,id=3Dmon,path=3D/home/nasastry/qemu=
+/tests/qemu-iotests/scratch/qemu-28636-monitor.sock -mon chardev=3Dmon,mode=
+=3Dcontrol -display none -vga none -qtest unix:path=3D/home/nasastry/qemu/t=
+ests/qemu-iotests/scratch/qemu-28636-qtest.sock -machine accel=3Dqtest -nod=
+efaults -machine accel=3Dqtest
+  +WARNING:qemu:qemu received signal -11: /home/nasastry/qemu_gcov/ppc64-so=
+ftmmu/qemu-system-ppc64 -chardev socket,id=3Dmon,path=3D/home/nasastry/qemu=
+/tests/qemu-iotests/scratch/qemu-28636-monitor.sock -mon chardev=3Dmon,mode=
+=3Dcontrol -display none -vga none -qtest unix:path=3D/home/nasastry/qemu/t=
+ests/qemu-iotests/scratch/qemu-28636-qtest.sock -machine accel=3Dqtest -nod=
+efaults -machine accel=3Dqtest
+  +WARNING:qemu:qemu received signal -11: /home/nasastry/qemu_gcov/ppc64-so=
+ftmmu/qemu-system-ppc64 -chardev socket,id=3Dmon,path=3D/home/nasastry/qemu=
+/tests/qemu-iotests/scratch/qemu-28636-monitor.sock -mon chardev=3Dmon,mode=
+=3Dcontrol -display none -vga none -qtest unix:path=3D/home/nasastry/qemu/t=
+ests/qemu-iotests/scratch/qemu-28636-qtest.sock -machine accel=3Dqtest -nod=
+efaults -machine accel=3Dqtest
+  +WARNING:qemu:qemu received signal -11: /home/nasastry/qemu_gcov/ppc64-so=
+ftmmu/qemu-system-ppc64 -chardev socket,id=3Dmon,path=3D/home/nasastry/qemu=
+/tests/qemu-iotests/scratch/qemu-28636-monitor.sock -mon chardev=3Dmon,mode=
+=3Dcontrol -display none -vga none -qtest unix:path=3D/home/nasastry/qemu/t=
+ests/qemu-iotests/scratch/qemu-28636-qtest.sock -machine accel=3Dqtest -nod=
+efaults -machine accel=3Dqtest
+  +WARNING:qemu:qemu received signal -11: /home/nasastry/qemu_gcov/ppc64-so=
+ftmmu/qemu-system-ppc64 -chardev socket,id=3Dmon,path=3D/home/nasastry/qemu=
+/tests/qemu-iotests/scratch/qemu-28636-monitor.sock -mon chardev=3Dmon,mode=
+=3Dcontrol -display none -vga none -qtest unix:path=3D/home/nasastry/qemu/t=
+ests/qemu-iotests/scratch/qemu-28636-qtest.sock -machine accel=3Dqtest -nod=
+efaults -machine accel=3Dqtest
+  +FFFFFF
+  +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  +FAIL: test_fd (__main__.BuiltinNBD)
+  +----------------------------------------------------------------------
+  +Traceback (most recent call last):
+  +  File "147", line 203, in test_fd
+  +    self.client_test(filename, flatten_sock_addr(address), 'nbd-export')
+  +  File "147", line 55, in client_test
+  +    self.assert_qmp(result, 'return', {})
+  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 315, in=
+ assert_qmp
+  +    result =3D self.dictpath(d, path)
+  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 274, in=
+ dictpath
+  +    self.fail('failed path traversal for "%s" in "%s"' % (path, str(d)))
+  +AssertionError: failed path traversal for "return" in "None"
+  +
+  +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  +FAIL: test_inet (__main__.BuiltinNBD)
+  +----------------------------------------------------------------------
+  +Traceback (most recent call last):
+  +  File "147", line 146, in test_inet
+  +    flatten_sock_addr(address), 'nbd-export')
+  +  File "147", line 55, in client_test
+  +    self.assert_qmp(result, 'return', {})
+  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 315, in=
+ assert_qmp
+  +    result =3D self.dictpath(d, path)
+  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 274, in=
+ dictpath
+  +    self.fail('failed path traversal for "%s" in "%s"' % (path, str(d)))
+  +AssertionError: failed path traversal for "return" in "None"
+  +
+  +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  +FAIL: test_inet6 (__main__.BuiltinNBD)
+  +----------------------------------------------------------------------
+  +Traceback (most recent call last):
+  +  File "147", line 171, in test_inet6
+  +    self.client_test(filename, flatten_sock_addr(address), 'nbd-export')
+  +  File "147", line 55, in client_test
+  +    self.assert_qmp(result, 'return', {})
+  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 315, in=
+ assert_qmp
+  +    result =3D self.dictpath(d, path)
+  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 274, in=
+ dictpath
+  +    self.fail('failed path traversal for "%s" in "%s"' % (path, str(d)))
+  +AssertionError: failed path traversal for "return" in "None"
+  +
+  +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  +FAIL: test_unix (__main__.BuiltinNBD)
+  +----------------------------------------------------------------------
+  +Traceback (most recent call last):
+  +  File "147", line 179, in test_unix
+  +    flatten_sock_addr(address), 'nbd-export')
+  +  File "147", line 55, in client_test
+  +    self.assert_qmp(result, 'return', {})
+  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 315, in=
+ assert_qmp
+  +    result =3D self.dictpath(d, path)
+  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 274, in=
+ dictpath
+  +    self.fail('failed path traversal for "%s" in "%s"' % (path, str(d)))
+  +AssertionError: failed path traversal for "return" in "None"
+  +
+  +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  +FAIL: test_inet (__main__.QemuNBD)
+  +----------------------------------------------------------------------
+  +Traceback (most recent call last):
+  +  File "147", line 96, in test_inet
+  +    flatten_sock_addr(address))
+  +  File "147", line 55, in client_test
+  +    self.assert_qmp(result, 'return', {})
+  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 315, in=
+ assert_qmp
+  +    result =3D self.dictpath(d, path)
+  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 274, in=
+ dictpath
+  +    self.fail('failed path traversal for "%s" in "%s"' % (path, str(d)))
+  +AssertionError: failed path traversal for "return" in "None"
+  +
+  +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  +FAIL: test_unix (__main__.QemuNBD)
+  +----------------------------------------------------------------------
+  +Traceback (most recent call last):
+  +  File "147", line 103, in test_unix
+  +    flatten_sock_addr(address))
+  +  File "147", line 55, in client_test
+  +    self.assert_qmp(result, 'return', {})
+  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 315, in=
+ assert_qmp
+  +    result =3D self.dictpath(d, path)
+  +  File "/home/nasastry/qemu/tests/qemu-iotests/iotests.py", line 274, in=
+ dictpath
+  +    self.fail('failed path traversal for "%s" in "%s"' % (path, str(d)))
+  +AssertionError: failed path traversal for "return" in "None"
+  +
+   ----------------------------------------------------------------------
+   Ran 6 tests
 
-and the 'xive' pointer in XiveSource points to the parent object,
-which will handle the event notification forwarding or routing.
-=20
-C.
+  -OK
+  +FAILED (failures=3D6)
+  Failures: 147
+  Failed 1 of 1 tests
 
->>> rather than a
->>> property of the fabric.  Indeed varying this by source object would
->>> require the objects have a different xive pointer, when I thought the
->>> idea was that the XiveFabric was global.
->>
->> When a notification is forwarded, the sources needs to call an=20
->> interface which generally is implemented by the source owner,
->=20
-> I'm not quite sure what you mean by "source owner".
+  With out gcov configured, the above test get pass.
+  export QEMU_PROG=3D/home/nasastry/qemu/ppc64-softmmu/qemu-system-ppc64
+  ./check -qcow2 147
+  QEMU          -- "/home/nasastry/qemu/ppc64-softmmu/qemu-system-ppc64" -n=
+odefaults -machine accel=3Dqtest
+  QEMU_IMG      -- "/home/nasastry/qemu/qemu-img"
+  QEMU_IO       -- "/home/nasastry/qemu/qemu-io"  --cache writeback -f qcow2
+  QEMU_NBD      -- "/home/nasastry/qemu/qemu-nbd"
+  IMGFMT        -- qcow2 (compat=3D1.1)
+  IMGPROTO      -- file
+  PLATFORM      -- Linux/ppc64le zzfp365-lp1 4.13.0-4.rel.git49564cb.el7.ce=
+ntos.ppc64le
+  TEST_DIR      -- /home/nasastry/qemu/tests/qemu-iotests/scratch
+  SOCKET_SCM_HELPER -- /home/nasastry/qemu/tests/qemu-iotests/socket_scm_he=
+lper
 
-The parent object.
-=20
->> which is not necessarily the main IC.=20
->>
->>>> 	static void pnv_psi_notify(XiveFabric *xf, uint32_t lisn)
->>>> 	{
->>>> 	    PnvPsi *psi =3D PNV_PSI(xf);
->>>> 	    uint64_t notif_port =3D
->>>> 	        psi->regs[PSIHB_REG(PSIHB9_ESB_NOTIF_ADDR)];
->>>> 	    bool valid =3D notif_port & PSIHB9_ESB_NOTIF_VALID;
->>>> 	    uint64_t notify_addr =3D notif_port & ~PSIHB9_ESB_NOTIF_VALID;
->>>> 	    uint32_t data =3D cpu_to_be32(lisn);
->>>> =09
->>>> 	    if (valid) {
->>>> 	        cpu_physical_memory_write(notify_addr, &data, sizeof(data))=
-;
->>>> 	    }
->>>> 	}
->>>>
->>>> The PnvXive model handles the load and forwards to the fabric again.=
- =20
->>>>
->>>> The IPIs under PowerNV do not need an extra hop so they reach the=20
->>>> routing routine directly without the extra notify() hop.=20
->>>>
->>>> However, PowerNV at the end should be using xive_fabric_route()=20
->>>> but there are some differences on how the NVT registers are=20
->>>> updated (HV vs. OS mode) and it's not handled yet so it uses a=20
->>>> notify() handler. But is should disappear and call directly=20
->>>> xive_fabric_route() in a near future.
->>>>
->>>>
->>>> May be, XiveFabricNotifier would be a better name for this feature ?
->>>> I am adding a few ops later which are more related to routing.
->>>>
->>>> Thanks,
->>>>
->>>> C.
->>>>
->>>>
->>>>>
->>>>>>  }
->>>>>> =20
->>>>>>  /*
->>>>>> @@ -302,6 +325,17 @@ static void xive_source_reset(DeviceState *de=
-v)
->>>>>>  static void xive_source_realize(DeviceState *dev, Error **errp)
->>>>>>  {
->>>>>>      XiveSource *xsrc =3D XIVE_SOURCE(dev);
->>>>>> +    Object *obj;
->>>>>> +    Error *local_err =3D NULL;
->>>>>> +
->>>>>> +    obj =3D object_property_get_link(OBJECT(dev), "xive", &local_=
-err);
->>>>>> +    if (!obj) {
->>>>>> +        error_propagate(errp, local_err);
->>>>>> +        error_prepend(errp, "required link 'xive' not found: ");
->>>>>> +        return;
->>>>>> +    }
->>>>>> +
->>>>>> +    xsrc->xive =3D XIVE_FABRIC(obj);
->>>>>> =20
->>>>>>      if (!xsrc->nr_irqs) {
->>>>>>          error_setg(errp, "Number of interrupt needs to be greater=
- than 0");
->>>>>> @@ -376,6 +410,7 @@ static const TypeInfo xive_source_info =3D {
->>>>>>  static void xive_register_types(void)
->>>>>>  {
->>>>>>      type_register_static(&xive_source_info);
->>>>>> +    type_register_static(&xive_fabric_info);
->>>>>>  }
->>>>>> =20
->>>>>>  type_init(xive_register_types)
->>>>>> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
->>>>>> index 0b76dd278d9b..4fcae2c763e6 100644
->>>>>> --- a/include/hw/ppc/xive.h
->>>>>> +++ b/include/hw/ppc/xive.h
->>>>>> @@ -12,6 +12,8 @@
->>>>>> =20
->>>>>>  #include "hw/sysbus.h"
->>>>>> =20
->>>>>> +typedef struct XiveFabric XiveFabric;
->>>>>> +
->>>>>>  /*
->>>>>>   * XIVE Interrupt Source
->>>>>>   */
->>>>>> @@ -46,6 +48,8 @@ typedef struct XiveSource {
->>>>>>      hwaddr       esb_base;
->>>>>>      uint32_t     esb_shift;
->>>>>>      MemoryRegion esb_mmio;
->>>>>> +
->>>>>> +    XiveFabric   *xive;
->>>>>>  } XiveSource;
->>>>>> =20
->>>>>>  /*
->>>>>> @@ -143,4 +147,25 @@ static inline void xive_source_irq_set(XiveSo=
-urce *xsrc, uint32_t srcno,
->>>>>>      xsrc->status[srcno] |=3D lsi ? XIVE_STATUS_LSI : 0;
->>>>>>  }
->>>>>> =20
->>>>>> +/*
->>>>>> + * XIVE Fabric
->>>>>> + */
->>>>>> +
->>>>>> +typedef struct XiveFabric {
->>>>>> +    Object parent;
->>>>>> +} XiveFabric;
->>>>>> +
->>>>>> +#define TYPE_XIVE_FABRIC "xive-fabric"
->>>>>> +#define XIVE_FABRIC(obj)                                     \
->>>>>> +    OBJECT_CHECK(XiveFabric, (obj), TYPE_XIVE_FABRIC)
->>>>>> +#define XIVE_FABRIC_CLASS(klass)                                 =
-    \
->>>>>> +    OBJECT_CLASS_CHECK(XiveFabricClass, (klass), TYPE_XIVE_FABRIC=
-)
->>>>>> +#define XIVE_FABRIC_GET_CLASS(obj)                               =
-    \
->>>>>> +    OBJECT_GET_CLASS(XiveFabricClass, (obj), TYPE_XIVE_FABRIC)
->>>>>> +
->>>>>> +typedef struct XiveFabricClass {
->>>>>> +    InterfaceClass parent;
->>>>>> +    void (*notify)(XiveFabric *xf, uint32_t lisn);
->>>>>> +} XiveFabricClass;
->>>>>> +
->>>>>>  #endif /* PPC_XIVE_H */
->>>>>
->>>>
->>>
->>
->=20
+  147
+  Passed all 1 tests
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1727250/+subscriptions
