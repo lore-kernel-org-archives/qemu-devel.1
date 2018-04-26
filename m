@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1fBjd7-0003EA-Pe
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:20:26 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1fBjdE-0003KA-Px
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:20:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1fBjd5-0000fJ-Mw
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:20:21 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1fBjdC-0000j3-NP
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:20:28 -0400
 From: Roman Kagan <rkagan@virtuozzo.com>
-Date: Thu, 26 Apr 2018 19:19:47 +0300
-Message-Id: <20180426161958.2872-7-rkagan@virtuozzo.com>
+Date: Thu, 26 Apr 2018 19:19:54 +0300
+Message-Id: <20180426161958.2872-14-rkagan@virtuozzo.com>
 In-Reply-To: <20180426161958.2872-1-rkagan@virtuozzo.com>
 References: <20180426161958.2872-1-rkagan@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 06/17] iotest 055: skip unsupported backup
- target formats
+Subject: [Qemu-devel] [PATCH 13/17] iotest 099: notrun if blkdebug or
+ blkverify is disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,60 +26,20 @@ To: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbrus
 
 Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
 ---
- tests/qemu-iotests/055 | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ tests/qemu-iotests/099 | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tests/qemu-iotests/055 b/tests/qemu-iotests/055
-index 3437c11507..3a47aaa886 100755
---- a/tests/qemu-iotests/055
-+++ b/tests/qemu-iotests/055
-@@ -490,11 +490,15 @@ class TestDriveCompression(iotests.QMPTestCase):
+diff --git a/tests/qemu-iotests/099 b/tests/qemu-iotests/099
+index caaf58eee5..80dab909d5 100755
+--- a/tests/qemu-iotests/099
++++ b/tests/qemu-iotests/099
+@@ -45,6 +45,7 @@ _supported_proto file
+ _supported_os Linux
+ _unsupported_imgopts "subformat=monolithicFlat" "subformat=twoGbMaxExtentFlat" \
+     "subformat=twoGbMaxExtentSparse"
++_require_format blkdebug blkverify
  
-     def test_complete_compress_drive_backup(self):
-         for format in TestDriveCompression.fmt_supports_compression:
-+            if not iotests.supports_format(format['type']):
-+                continue
-             self.do_test_compress_complete('drive-backup', format, False,
-                                            target=blockdev_target_img, mode='existing')
- 
-     def test_complete_compress_blockdev_backup(self):
-         for format in TestDriveCompression.fmt_supports_compression:
-+            if not iotests.supports_format(format['type']):
-+                continue
-             self.do_test_compress_complete('blockdev-backup', format, True,
-                                            target='drive1')
- 
-@@ -514,11 +518,15 @@ class TestDriveCompression(iotests.QMPTestCase):
- 
-     def test_compress_cancel_drive_backup(self):
-         for format in TestDriveCompression.fmt_supports_compression:
-+            if not iotests.supports_format(format['type']):
-+                continue
-             self.do_test_compress_cancel('drive-backup', format, False,
-                                          target=blockdev_target_img, mode='existing')
- 
-     def test_compress_cancel_blockdev_backup(self):
-        for format in TestDriveCompression.fmt_supports_compression:
-+            if not iotests.supports_format(format['type']):
-+                continue
-             self.do_test_compress_cancel('blockdev-backup', format, True,
-                                          target='drive1')
- 
-@@ -554,11 +562,15 @@ class TestDriveCompression(iotests.QMPTestCase):
- 
-     def test_compress_pause_drive_backup(self):
-         for format in TestDriveCompression.fmt_supports_compression:
-+            if not iotests.supports_format(format['type']):
-+                continue
-             self.do_test_compress_pause('drive-backup', format, False,
-                                         target=blockdev_target_img, mode='existing')
- 
-     def test_compress_pause_blockdev_backup(self):
-         for format in TestDriveCompression.fmt_supports_compression:
-+            if not iotests.supports_format(format['type']):
-+                continue
-             self.do_test_compress_pause('blockdev-backup', format, True,
-                                         target='drive1')
- 
+ function do_run_qemu()
+ {
 -- 
 2.14.3
