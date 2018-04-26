@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49581)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fBjz7-0005gp-BE
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:43:06 -0400
+	(envelope-from <pagupta@redhat.com>) id 1fBjzV-00063n-7F
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:43:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fBjz6-0005BX-AC
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:43:05 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:37946)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1fBjz6-0005AG-1F
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:43:04 -0400
-Received: by mail-lf0-x243.google.com with SMTP id z130-v6so31735960lff.5
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 09:43:03 -0700 (PDT)
+	(envelope-from <pagupta@redhat.com>) id 1fBjzS-0005U9-0M
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:43:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57830)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1fBjzR-0005Tl-Of
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 12:43:25 -0400
+Date: Thu, 26 Apr 2018 12:43:24 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <358601698.23011599.1524761004239.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20180426132406.GC30991@stefanha-x1.localdomain>
+References: <20180425112415.12327-1-pagupta@redhat.com>
+	<20180425112415.12327-4-pagupta@redhat.com>
+	<20180426132406.GC30991@stefanha-x1.localdomain>
 MIME-Version: 1.0
-References: <1524699938-6764-1-git-send-email-mjc@sifive.com>
-	<1524699938-6764-10-git-send-email-mjc@sifive.com>
-In-Reply-To: <1524699938-6764-10-git-send-email-mjc@sifive.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 26 Apr 2018 16:42:36 +0000
-Message-ID: <CAKmqyKNayXzEHiy_igKPB6x2U5+hs87ng2=B9ewTQ33Q8Y-vng@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 09/35] RISC-V: Remove EM_RISCV
- ELF_MACHINE indirection
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v2] qemu: Add virtio pmem device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,102 +28,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, patches@groups.riscv.org, palmer@sifive.com, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: jack@suse.cz, kvm@vger.kernel.org, david@redhat.com, linux-nvdimm@ml01.01.org, ross zwisler <ross.zwisler@intel.com>, qemu-devel@nongnu.org, lcapitulino@redhat.com, linux-mm@kvack.org, niteshnarayanlal@hotmail.com, mst@redhat.com, hch@infradead.org, marcel@redhat.com, nilal@redhat.com, haozhong zhang <haozhong.zhang@intel.com>, riel@surriel.com, stefanha@redhat.com, pbonzini@redhat.com, dan j williams <dan.j.williams@intel.com>, kwolf@redhat.com, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, linux-kernel@vger.kernel.org, imammedo@redhat.com
 
-On Wed, Apr 25, 2018 at 4:51 PM Michael Clark <mjc@sifive.com> wrote:
 
-> Pointless indirection. Other ports use EM_ constants directly.
 
-> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Signed-off-by: Michael Clark <mjc@sifive.com>
-> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> > +static void virtio_pmem_flush(VirtIODevice *vdev, VirtQueue *vq)
+> > +{
+> > +    VirtQueueElement *elem;
+> > +    VirtIOPMEM *pmem = VIRTIO_PMEM(vdev);
+> > +    HostMemoryBackend *backend = MEMORY_BACKEND(pmem->memdev);
+> > +    int fd = memory_region_get_fd(&backend->mr);
+> > +
+> > +    elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
+> > +    if (!elem) {
+> > +        return;
+> > +    }
+> > +    /* flush raw backing image */
+> > +    fsync(fd);
+> 
+> fsync(2) is a blocking syscall.  This can hang QEMU for an unbounded
+> amount of time.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+o.k. Main thread will block, agree.
 
-Alistair
+> 
+> Please do the fsync from a thread pool.  See block/file-posix.c's
+> aio_worker() for an example.
 
-> ---
->   hw/riscv/sifive_e.c | 2 +-
->   hw/riscv/sifive_u.c | 2 +-
->   hw/riscv/spike.c    | 2 +-
->   hw/riscv/virt.c     | 2 +-
->   target/riscv/cpu.h  | 1 -
->   5 files changed, 4 insertions(+), 5 deletions(-)
+Sure!
 
-> diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-> index 4872b68..39e4cb4 100644
-> --- a/hw/riscv/sifive_e.c
-> +++ b/hw/riscv/sifive_e.c
-> @@ -88,7 +88,7 @@ static uint64_t load_kernel(const char *kernel_filename=
-)
+> 
+> > +static void virtio_pmem_get_config(VirtIODevice *vdev, uint8_t *config)
+> > +{
+> > +    VirtIOPMEM *pmem = VIRTIO_PMEM(vdev);
+> > +    struct virtio_pmem_config *pmemcfg = (struct virtio_pmem_config *)
+> > config;
+> > +
+> > +    pmemcfg->start = pmem->start;
+> > +    pmemcfg->size  = pmem->size;
+> 
+> Endianness.  Please use virtio_st*_p() instead.
 
->       if (load_elf(kernel_filename, NULL, NULL,
->                    &kernel_entry, NULL, &kernel_high,
-> -                 0, ELF_MACHINE, 1, 0) < 0) {
-> +                 0, EM_RISCV, 1, 0) < 0) {
->           error_report("qemu: could not load kernel '%s'",
-kernel_filename);
->           exit(1);
->       }
-> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index 2412b5d..115618b 100644
-> --- a/hw/riscv/sifive_u.c
-> +++ b/hw/riscv/sifive_u.c
-> @@ -74,7 +74,7 @@ static uint64_t load_kernel(const char *kernel_filename=
-)
+sure.
 
->       if (load_elf(kernel_filename, NULL, NULL,
->                    &kernel_entry, NULL, &kernel_high,
-> -                 0, ELF_MACHINE, 1, 0) < 0) {
-> +                 0, EM_RISCV, 1, 0) < 0) {
->           error_report("qemu: could not load kernel '%s'",
-kernel_filename);
->           exit(1);
->       }
-> diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
-> index f370f12..3f6bd0a 100644
-> --- a/hw/riscv/spike.c
-> +++ b/hw/riscv/spike.c
-> @@ -64,7 +64,7 @@ static uint64_t load_kernel(const char *kernel_filename=
-)
->       uint64_t kernel_entry, kernel_high;
+> 
+> > +#define VIRTIO_PMEM_PLUG 0
+> 
+> What is this?
 
->       if (load_elf_ram_sym(kernel_filename, NULL, NULL,
-> -            &kernel_entry, NULL, &kernel_high, 0, ELF_MACHINE, 1, 0,
-> +            &kernel_entry, NULL, &kernel_high, 0, EM_RISCV, 1, 0,
->               NULL, true, htif_symbol_callback) < 0) {
->           error_report("qemu: could not load kernel '%s'",
-kernel_filename);
->           exit(1);
-> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-> index 782996c..090befe 100644
-> --- a/hw/riscv/virt.c
-> +++ b/hw/riscv/virt.c
-> @@ -68,7 +68,7 @@ static uint64_t load_kernel(const char *kernel_filename=
-)
+will remove
 
->       if (load_elf(kernel_filename, NULL, NULL,
->                    &kernel_entry, NULL, &kernel_high,
-> -                 0, ELF_MACHINE, 1, 0) < 0) {
-> +                 0, EM_RISCV, 1, 0) < 0) {
->           error_report("qemu: could not load kernel '%s'",
-kernel_filename);
->           exit(1);
->       }
-> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> index 41e06ac..9871e6f 100644
-> --- a/target/riscv/cpu.h
-> +++ b/target/riscv/cpu.h
-> @@ -34,7 +34,6 @@
-
->   #define TCG_GUEST_DEFAULT_MO 0
-
-> -#define ELF_MACHINE EM_RISCV
->   #define CPUArchState struct CPURISCVState
-
->   #include "qemu-common.h"
-> --
-> 2.7.0
+Thanks,
+Pankaj 
