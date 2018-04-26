@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43595)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fBbAn-0001vg-Up
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 03:18:34 -0400
+	(envelope-from <clg@kaod.org>) id 1fBbCX-0002ma-IQ
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 03:20:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fBbAi-0005OC-LU
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 03:18:33 -0400
-Received: from 8.mo178.mail-out.ovh.net ([46.105.74.227]:36359)
+	(envelope-from <clg@kaod.org>) id 1fBbCS-0006TQ-RO
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 03:20:21 -0400
+Received: from 1.mo2.mail-out.ovh.net ([46.105.63.121]:35451)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fBbAi-0005Nc-FI
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 03:18:28 -0400
-Received: from player774.ha.ovh.net (unknown [10.109.108.59])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id A11C8135E5
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 09:18:26 +0200 (CEST)
-References: <20180425093424.18713-1-clg@kaod.org>
-	<20180426011916.GB8800@umbus.fritz.box>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fBbCS-0006T0-KU
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 03:20:16 -0400
+Received: from player774.ha.ovh.net (unknown [10.109.122.114])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 2282612F7B2
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 09:20:14 +0200 (CEST)
+References: <20180417071722.9399-1-david@gibson.dropbear.id.au>
+	<20180417071722.9399-4-david@gibson.dropbear.id.au>
+	<a01bebe8-85b7-f2b4-3675-401367471204@kaod.org>
+	<20180426064600.GI8800@umbus.fritz.box>
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <33034bc0-c8ec-3b07-74aa-285daf8e6cdc@kaod.org>
-Date: Thu, 26 Apr 2018 09:18:21 +0200
+Message-ID: <5f09ca4d-3c01-7e89-fa87-6340060cf579@kaod.org>
+Date: Thu, 26 Apr 2018 09:20:11 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180426011916.GB8800@umbus.fritz.box>
+In-Reply-To: <20180426064600.GI8800@umbus.fritz.box>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] spapr: fix entry point for secondary CPUs
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH for-2.13 03/10] target/ppc:
+ Remove unnecessary initialization of LPCR_UPRT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,30 +35,64 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On 04/26/2018 03:19 AM, David Gibson wrote:
-> On Wed, Apr 25, 2018 at 11:34:24AM +0200, C=E9dric Le Goater wrote:
->> Secondary CPUs do not start at SPAPR_ENTRY_POINT but at an address
->> given by the guest OS.
+On 04/26/2018 08:46 AM, David Gibson wrote:
+> On Wed, Apr 25, 2018 at 11:52:18AM +0200, C=E9dric Le Goater wrote:
+>> On 04/17/2018 09:17 AM, David Gibson wrote:
+>>> In cpu_ppc_set_papr() the UPRT and GTSE bits of the LPCR are initiali=
+zed
+>>> based on on ppc64_radix_guest().  Which seems reasonable, except that
+>>> ppc64_radix_guest() is based on spapr->patb_entry which is only set u=
+p
+>>> in spapr_machine_reset, called much later than cpu_ppc_set_papr().
+>>>
+>>> So the initialization here is pointless.  The base cpu initialization
+>>> already sets a value that's good enough until the guest uses an hcall=
+ to
+>>> configure it's preferred MMU mode.
+>>>
+>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>>> ---
+>>>  target/ppc/translate_init.c | 16 ----------------
+>>>  1 file changed, 16 deletions(-)
+>>>
+>>> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.=
+c
+>>> index bb79d23b50..14f346f441 100644
+>>> --- a/target/ppc/translate_init.c
+>>> +++ b/target/ppc/translate_init.c
+>>> @@ -8897,22 +8897,6 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVirt=
+ualHypervisor *vhyp)
+>>>      lpcr->default_value &=3D ~LPCR_RMLS;
+>>>      lpcr->default_value |=3D 1ull << LPCR_RMLS_SHIFT;
+>>> =20
+>>> -    if (env->mmu_model =3D=3D POWERPC_MMU_3_00) {
+>>> -        /* By default we choose legacy mode and switch to new hash o=
+r radix
+>>> -         * when a register process table hcall is made. So disable p=
+rocess
+>>> -         * tables and guest translation shootdown by default
+>>> -         *
+>>> -         * Hot-plugged CPUs inherit from the guest radix setting und=
+er
+>>> -         * KVM but not under TCG. Update the default LPCR to keep ne=
+w
+>>> -         * CPUs in sync when radix is enabled.
+>>> -         */
 >>
->> Fixes commit c79128c14c20 ("spapr: Make a helper to set up cpu entry
->> point state")
 >>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->=20
-> Oops.  Since I haven't send that patch upstream yet, I've folded this
-> fix in rather than including it as a separate patch.
-
-OK.=20
-
-> Note that ppc-for-<whatever> are rebasing trees, so commit ids in
-> there aren't stable.
-
-yes. I usually track these at the beginning of the dev cycle. So I=20
-have rebased all my QEMU development trees on ppc-for-2.13 yesterday=20
-and found a couple of issues in TCG hot(un)plug, the entry point and=20
-the radix LPCR setting.
-
-C.
+>> This is breaking CPU hotplug under TCG. Should we reintroduce the same=
 =20
+>> settings in spapr_cpu_reset() now ?
+>=20
+> Sod.  Yeah, this code is important for the hotplug case.
+>=20
+> But, no, I don't think it should go into reset, I think it should go
+> into the rtas start-cpu path; it only makes sense for secondary CPUs.
+
+yes. I will send a fix.
+
+Thanks,
+
+C.=20
