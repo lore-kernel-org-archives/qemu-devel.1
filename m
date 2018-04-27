@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fC46L-0006PB-H2
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 10:11:54 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fC4BS-0001mp-4R
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 10:17:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fC46I-0007zY-97
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 10:11:53 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:52535)
+	(envelope-from <laurent@vivier.eu>) id 1fC4BN-0002DA-6u
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 10:17:10 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:52705)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fC46H-0007yu-Un
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 10:11:50 -0400
-References: <20180313155918.23591-1-laurent@vivier.eu>
-	<20180313155918.23591-3-laurent@vivier.eu>
-	<CAFEAcA9w8js-9S_72TxYgXzf0SvW_fr_G4tovbRHc=cqD--+kA@mail.gmail.com>
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fC4BM-0002BD-Tx
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 10:17:05 -0400
+References: <20180309142630.2170-1-laurent@vivier.eu>
+	<20180309142630.2170-3-laurent@vivier.eu>
+	<CAFEAcA_9biKcR9pon0eTVkDXwobBepUgs12rCfdGcRyE3HfUXQ@mail.gmail.com>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <1301571a-6410-f970-3f39-a196bc817b35@vivier.eu>
-Date: Fri, 27 Apr 2018 16:11:46 +0200
+Message-ID: <ab1bcd13-0ccd-ee62-657a-cc823491e6fd@vivier.eu>
+Date: Fri, 27 Apr 2018 16:17:01 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9w8js-9S_72TxYgXzf0SvW_fr_G4tovbRHc=cqD--+kA@mail.gmail.com>
+In-Reply-To: <CAFEAcA_9biKcR9pon0eTVkDXwobBepUgs12rCfdGcRyE3HfUXQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 02/11] target/m68k: implement fsin
+Subject: Re: [Qemu-devel] [PULL 2/8] target/m68k: implement flognp1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,199 +32,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Le 27/04/2018 à 15:47, Peter Maydell a écrit :
-> On 13 March 2018 at 15:59, Laurent Vivier <laurent@vivier.eu> wrote:
->> Using a local m68k floatx80_sin()
+Le 27/04/2018 à 15:43, Peter Maydell a écrit :
+> On 9 March 2018 at 14:26, Laurent Vivier <laurent@vivier.eu> wrote:
+>> Using a local m68k floatx80_lognp1()
 >> [copied from previous:
 >> Written by Andreas Grabher for Previous, NeXT Computer Emulator.]
 >>
 >> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
->> Message-Id: <20180312202728.23790-3-laurent@vivier.eu>
->> ---
->>  target/m68k/fpu_helper.c |   5 +
->>  target/m68k/helper.h     |   1 +
->>  target/m68k/softfloat.c  | 247 +++++++++++++++++++++++++++++++++++++++++++++++
->>  target/m68k/softfloat.h  |   1 +
->>  target/m68k/translate.c  |   3 +
->>  5 files changed, 257 insertions(+)
->>
->> diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
->> index c41115ea05..a6cfb4db1a 100644
->> --- a/target/m68k/fpu_helper.c
->> +++ b/target/m68k/fpu_helper.c
->> @@ -597,3 +597,8 @@ void HELPER(ftan)(CPUM68KState *env, FPReg *res, FPReg *val)
->>  {
->>      res->d = floatx80_tan(val->d, &env->fp_status);
->>  }
->> +
->> +void HELPER(fsin)(CPUM68KState *env, FPReg *res, FPReg *val)
->> +{
->> +    res->d = floatx80_sin(val->d, &env->fp_status);
->> +}
->> diff --git a/target/m68k/helper.h b/target/m68k/helper.h
->> index af9480fe49..6d8bfaab64 100644
->> --- a/target/m68k/helper.h
->> +++ b/target/m68k/helper.h
->> @@ -76,6 +76,7 @@ DEF_HELPER_3(fetox, void, env, fp, fp)
->>  DEF_HELPER_3(ftwotox, void, env, fp, fp)
->>  DEF_HELPER_3(ftentox, void, env, fp, fp)
->>  DEF_HELPER_3(ftan, void, env, fp, fp)
->> +DEF_HELPER_3(fsin, void, env, fp, fp)
->>
->>  DEF_HELPER_3(mac_move, void, env, i32, i32)
->>  DEF_HELPER_3(macmulf, i64, env, i32, i32)
->> diff --git a/target/m68k/softfloat.c b/target/m68k/softfloat.c
->> index 488dbc522b..6fb9665336 100644
->> --- a/target/m68k/softfloat.c
->> +++ b/target/m68k/softfloat.c
->> @@ -1476,3 +1476,250 @@ floatx80 floatx80_tan(floatx80 a, float_status *status)
->>          }
->>      }
->>  }
->> +
->> +/*----------------------------------------------------------------------------
->> + | Sine
->> + *----------------------------------------------------------------------------*/
->> +
->> +floatx80 floatx80_sin(floatx80 a, float_status *status)
+>> Message-Id: <20180305203910.10391-3-laurent@vivier.eu>
+> 
+>> +floatx80 floatx80_lognp1(floatx80 a, float_status *status)
 >> +{
 > 
-> Hi; Coverity (CID1390617) points out that there is dead code in this function:
+> ...
 > 
->> +    flag aSign, xSign;
->> +    int32_t aExp, xExp;
->> +    uint64_t aSig, xSig;
->> +
->> +    int8_t user_rnd_mode, user_rnd_prec;
->> +
->> +    int32_t compact, l, n, j;
->> +    floatx80 fp0, fp1, fp2, fp3, fp4, fp5, x, invtwopi, twopi1, twopi2;
->> +    float32 posneg1, twoto63;
->> +    flag adjn, endflag;
->> +
->> +    aSig = extractFloatx80Frac(a);
->> +    aExp = extractFloatx80Exp(a);
->> +    aSign = extractFloatx80Sign(a);
->> +
->> +    if (aExp == 0x7FFF) {
->> +        if ((uint64_t) (aSig << 1)) {
->> +            return propagateFloatx80NaNOneArg(a, status);
->> +        }
->> +        float_raise(float_flag_invalid, status);
->> +        return floatx80_default_nan(status);
->> +    }
->> +
->> +    if (aExp == 0 && aSig == 0) {
->> +        return packFloatx80(aSign, 0, 0);
->> +    }
->> +
->> +    adjn = 0;
+>> +    if (aSign && aExp >= one_exp) {
+>> +        if (aExp == one_exp && aSig == one_sig) {
+>> +            float_raise(float_flag_divbyzero, status);
+>> +            packFloatx80(aSign, floatx80_infinity.high, floatx80_infinity.low);
 > 
-> Here we set adjn == 0...
->> +
->> +    user_rnd_mode = status->float_rounding_mode;
->> +    user_rnd_prec = status->floatx80_rounding_precision;
->> +    status->float_rounding_mode = float_round_nearest_even;
->> +    status->floatx80_rounding_precision = 80;
->> +
->> +    compact = floatx80_make_compact(aExp, aSig);
->> +
->> +    fp0 = a;
->> +
->> +    if (compact < 0x3FD78000 || compact > 0x4004BC7E) {
->> +        /* 2^(-40) > |X| > 15 PI */
->> +        if (compact > 0x3FFF8000) { /* |X| >= 15 PI */
->> +            /* REDUCEX */
->> +            fp1 = packFloatx80(0, 0, 0);
->> +            if (compact == 0x7FFEFFFF) {
->> +                twopi1 = packFloatx80(aSign ^ 1, 0x7FFE,
->> +                                      LIT64(0xC90FDAA200000000));
->> +                twopi2 = packFloatx80(aSign ^ 1, 0x7FDC,
->> +                                      LIT64(0x85A308D300000000));
->> +                fp0 = floatx80_add(fp0, twopi1, status);
->> +                fp1 = fp0;
->> +                fp0 = floatx80_add(fp0, twopi2, status);
->> +                fp1 = floatx80_sub(fp1, fp0, status);
->> +                fp1 = floatx80_add(fp1, twopi2, status);
->> +            }
->> +        loop:
->> +            xSign = extractFloatx80Sign(fp0);
->> +            xExp = extractFloatx80Exp(fp0);
->> +            xExp -= 0x3FFF;
->> +            if (xExp <= 28) {
->> +                l = 0;
->> +                endflag = 1;
->> +            } else {
->> +                l = xExp - 27;
->> +                endflag = 0;
->> +            }
->> +            invtwopi = packFloatx80(0, 0x3FFE - l,
->> +                                    LIT64(0xA2F9836E4E44152A)); /* INVTWOPI */
->> +            twopi1 = packFloatx80(0, 0x3FFF + l, LIT64(0xC90FDAA200000000));
->> +            twopi2 = packFloatx80(0, 0x3FDD + l, LIT64(0x85A308D300000000));
->> +
->> +            /* SIGN(INARG)*2^63 IN SGL */
->> +            twoto63 = packFloat32(xSign, 0xBE, 0);
->> +
->> +            fp2 = floatx80_mul(fp0, invtwopi, status);
->> +            fp2 = floatx80_add(fp2, float32_to_floatx80(twoto63, status),
->> +                               status); /* THE FRACT PART OF FP2 IS ROUNDED */
->> +            fp2 = floatx80_sub(fp2, float32_to_floatx80(twoto63, status),
->> +                               status); /* FP2 is N */
->> +            fp4 = floatx80_mul(twopi1, fp2, status); /* W = N*P1 */
->> +            fp5 = floatx80_mul(twopi2, fp2, status); /* w = N*P2 */
->> +            fp3 = floatx80_add(fp4, fp5, status); /* FP3 is P */
->> +            fp4 = floatx80_sub(fp4, fp3, status); /* W-P */
->> +            fp0 = floatx80_sub(fp0, fp3, status); /* FP0 is A := R - P */
->> +            fp4 = floatx80_add(fp4, fp5, status); /* FP4 is p = (W-P)+w */
->> +            fp3 = fp0; /* FP3 is A */
->> +            fp1 = floatx80_sub(fp1, fp4, status); /* FP1 is a := r - p */
->> +            fp0 = floatx80_add(fp0, fp1, status); /* FP0 is R := A+a */
->> +
->> +            if (endflag > 0) {
->> +                n = floatx80_to_int32(fp2, status);
->> +                goto sincont;
->> +            }
->> +            fp3 = floatx80_sub(fp3, fp0, status); /* A-R */
->> +            fp1 = floatx80_add(fp1, fp3, status); /* FP1 is r := (A-R)+a */
->> +            goto loop;
->> +        } else {
->> +            /* SINSM */
->> +            fp0 = float32_to_floatx80(make_float32(0x3F800000),
->> +                                      status); /* 1 */
->> +
->> +            status->float_rounding_mode = user_rnd_mode;
->> +            status->floatx80_rounding_precision = user_rnd_prec;
->> +
->> +            if (adjn) {
-> 
-> ...and we never change it before here, so this branch of this 'if'
-> is dead code.
-> 
->> +                /* COSTINY */
->> +                a = floatx80_sub(fp0, float32_to_floatx80(
->> +                                 make_float32(0x00800000), status), status);
->> +            } else {
->> +                /* SINTINY */
->> +                a = floatx80_move(a, status);
->> +            }
->> +            float_raise(float_flag_inexact, status);
->> +
->> +            return a;
->> +        }
-> 
-> Similarly in floatx80_cos(), we set adjn = 1 at the top of
-> the function, and then later test it.
-> 
-> Should these two functions be sharing code? They do look
-> rather similar...
+> Hi; Coverity (CID1390587) points out that packFloatx80 doesn't
+> do anything except return a value which is here being thrown
+> away, making the call useless. Should this be maybe
+> "return packFloatx80(...)" ?
 
-yes, I'm aware of these problems, but I let the code as-is to only port
-functions from "Previous" to QEMU. In fact, the original assembly code
-uses a sincos() function to compute both of them and then sin() and
-cos() calls it.
-
-All these function need some cleanup now...
+Yes, you're right, I didn't correctly port the code from "Previous" here.
 
 Thanks,
 Laurent
