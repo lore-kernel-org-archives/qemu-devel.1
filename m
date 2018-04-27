@@ -1,21 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tina.zhang@intel.com>) id 1fBzUL-0005pe-6H
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:16:22 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fBzZS-0000rk-AZ
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:21:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tina.zhang@intel.com>) id 1fBzUI-0006qw-24
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:16:21 -0400
-Received: from mga05.intel.com ([192.55.52.43]:31927)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tina.zhang@intel.com>)
-	id 1fBzUH-0006qF-PV
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:16:17 -0400
-From: Tina Zhang <tina.zhang@intel.com>
-Date: Fri, 27 Apr 2018 17:11:06 +0800
-Message-Id: <1524820266-27079-3-git-send-email-tina.zhang@intel.com>
-In-Reply-To: <1524820266-27079-1-git-send-email-tina.zhang@intel.com>
-References: <1524820266-27079-1-git-send-email-tina.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH v4 2/2] ui: introduce vfio_display_reset
+	(envelope-from <dgibson@ozlabs.org>) id 1fBzZQ-0001o2-4R
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:21:38 -0400
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Fri, 27 Apr 2018 19:20:41 +1000
+Message-Id: <20180427092126.24812-5-david@gibson.dropbear.id.au>
+In-Reply-To: <20180427092126.24812-1-david@gibson.dropbear.id.au>
+References: <20180427092126.24812-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PULL 04/49] uninorth: remove stray PCIBus realize
+ from mac_newworld.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,86 +20,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alex.williamson@redhat.com, kraxel@redhat.com, zhenyuw@linux.intel.com, hang.yuan@intel.com
-Cc: Tina Zhang <tina.zhang@intel.com>, intel-gvt-dev@lists.freedesktop.org, qemu-devel@nongnu.org
+To: peter.maydell@linaro.org
+Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, David Gibson <david@gibson.dropbear.id.au>
 
-During guest OS reboot, guest framebuffer is invalid. It will cause
-bugs, if the invalid guest framebuffer is still used by host.
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-This patch is to introduce vfio_display_reset which is invoked
-during vfio display reset. This vfio_display_reset function is used
-to release the invalid display resource, disable scanout mode and
-replace the invalid surface with QemuConsole's DisplaySurafce.
+After QOMification this is clearly no longer needed (and possibly hasn't been
+for some time).
 
-This patch can fix the GPU hang issue caused by gd_egl_draw during
-guest OS reboot.
-
-Changes v3->v4:
- - Move dma-buf based display check into the vfio_display_reset().
-   (Gerd)
-
-Changes v2->v3:
- - Limit vfio_display_reset to dma-buf based vfio display. (Gerd)
-
-Changes v1->v2:
- - Use dpy_gfx_update_full() update screen after reset. (Gerd)
- - Remove dpy_gfx_switch_surface(). (Gerd)
-
-Signed-off-by: Tina Zhang <tina.zhang@intel.com>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/vfio/display.c | 11 +++++++++++
- hw/vfio/pci.c     |  4 ++++
- hw/vfio/pci.h     |  1 +
- 3 files changed, 16 insertions(+)
+ hw/ppc/mac_newworld.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/hw/vfio/display.c b/hw/vfio/display.c
-index 7d727ce..59c0e5d 100644
---- a/hw/vfio/display.c
-+++ b/hw/vfio/display.c
-@@ -198,6 +198,17 @@ static void vfio_display_dmabuf_exit(VFIODisplay *dpy)
- }
- 
- /* ---------------------------------------------------------------------- */
-+void vfio_display_reset(VFIOPCIDevice *vdev)
-+{
-+    if (!vdev || !vdev->dpy || !vdev->dpy->con ||
-+        !vdev->dpy->dmabuf.primary) {
-+        return;
-+    }
-+
-+    dpy_gl_scanout_disable(vdev->dpy->con);
-+    vfio_display_dmabuf_exit(vdev->dpy);
-+    dpy_gfx_update_full(vdev->dpy->con);
-+}
- 
- static void vfio_display_region_update(void *opaque)
- {
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index b9bc6cd..4947fe3 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -3103,6 +3103,10 @@ static void vfio_pci_reset(DeviceState *dev)
- 
-     vfio_pci_pre_reset(vdev);
- 
-+    if (vdev->display != ON_OFF_AUTO_OFF) {
-+        vfio_display_reset(vdev);
-+    }
-+
-     if (vdev->resetfn && !vdev->resetfn(vdev)) {
-         goto post_reset;
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index 39944203a4..4ff1c293a8 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -350,7 +350,6 @@ static void ppc_core99_init(MachineState *machine)
+         pci_bus = pci_pmac_init(pic, get_system_memory(), get_system_io());
+         machine_arch = ARCH_MAC99;
      }
-diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-index 629c875..59ab775 100644
---- a/hw/vfio/pci.h
-+++ b/hw/vfio/pci.h
-@@ -176,6 +176,7 @@ int vfio_pci_igd_opregion_init(VFIOPCIDevice *vdev,
-                                struct vfio_region_info *info,
-                                Error **errp);
+-    object_property_set_bool(OBJECT(pci_bus), true, "realized", &error_abort);
  
-+void vfio_display_reset(VFIOPCIDevice *vdev);
- int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp);
- void vfio_display_finalize(VFIOPCIDevice *vdev);
+     machine->usb |= defaults_enabled() && !machine->usb_disabled;
  
 -- 
-2.7.4
+2.14.3
