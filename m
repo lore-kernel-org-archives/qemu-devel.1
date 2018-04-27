@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45825)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fC2an-0004N3-Gd
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:35:14 -0400
+	(envelope-from <marcel@redhat.com>) id 1fC2cH-0005P1-TZ
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:36:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fC2am-0007lC-Hn
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:35:13 -0400
-Received: from mail-ot0-x232.google.com ([2607:f8b0:4003:c0f::232]:34267)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fC2am-0007kf-By
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:35:12 -0400
-Received: by mail-ot0-x232.google.com with SMTP id i5-v6so1840045oth.1
-	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 05:35:12 -0700 (PDT)
+	(envelope-from <marcel@redhat.com>) id 1fC2cD-0008Nj-1t
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:36:45 -0400
+References: <20180427120515.24067-1-david@redhat.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <a0539fcb-3d7b-9101-59be-a87c2f7afef8@redhat.com>
+Date: Fri, 27 Apr 2018 15:36:25 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180306040154.3669-4-david@gibson.dropbear.id.au>
-References: <20180306040154.3669-1-david@gibson.dropbear.id.au>
-	<20180306040154.3669-4-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 27 Apr 2018 13:34:51 +0100
-Message-ID: <CAFEAcA_ErkL21OvsXtHWX6k9wTM0DYv0eHOTio7aX=0YP1RTqg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 03/30] ppc440: Add emulation of plb-pcix
- controller found in some 440 SoCs
+In-Reply-To: <20180427120515.24067-1-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] pc-dimm: fix error messages if no slots
+ were defined
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +24,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Greg Kurz <groug@kaod.org>, Alexander Graf <agraf@suse.de>, surajjs@au1.ibm.com, qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, BALATON Zoltan <balaton@eik.bme.hu>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>
 
-On 6 March 2018 at 04:01, David Gibson <david@gibson.dropbear.id.au> wrote:
-> From: BALATON Zoltan <balaton@eik.bme.hu>
->
-> This is the PCIX controller found in newer 440 core SoCs e.g. the
-> AMMC 460EX. The device tree refers to this as plb-pcix compared to
-> the plb-pci controller in older 440 SoCs.
->
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> [dwg: Remove hwaddr from trace-events, that doesn't work with some
->  trace backends]
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+On 27/04/2018 15:05, David Hildenbrand wrote:
+> If no slots were defined we try to allocate an empty bitmap, which
+> fails.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+> 
+> v1 -> v2: more detailed error message
+> 
+>  hw/mem/pc-dimm.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> index 0119c68e01..12da89d562 100644
+> --- a/hw/mem/pc-dimm.c
+> +++ b/hw/mem/pc-dimm.c
+> @@ -118,9 +118,16 @@ static int pc_dimm_slot2bitmap(Object *obj, void *opaque)
+>  
+>  int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp)
+>  {
+> -    unsigned long *bitmap = bitmap_new(max_slots);
+> +    unsigned long *bitmap;
+>      int slot = 0;
+>  
+> +    if (max_slots <= 0) {
+> +        error_setg(errp, "no slots where allocated, please specify "
+> +                   "the 'slots' option");
+> +        return slot;
+> +    }
+> +
+> +    bitmap = bitmap_new(max_slots);
+>      object_child_foreach(qdev_get_machine(), pc_dimm_slot2bitmap, bitmap);
+>  
+>      /* check if requested slot is not occupied */
+> 
 
-> +    case PCIX0_PIM2SAL:
-> +        s->pim[2].sa &= 0xffffffff00000000ULL;
-> +        s->pim[2].sa = val;
-> +        ppc440_pcix_update_pim(s, 2);
-> +        break;
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 
-Coverity (CID1390577) points out that the "s->pim[2].sa = val;"
-overwrites the value set by the &= line, making it pointless.
-Should this be "|= val" like the other cases in this switch?
-
-thanks
--- PMM
+Thanks,
+Marcel
