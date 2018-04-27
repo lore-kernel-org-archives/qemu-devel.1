@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60616)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fBzcC-0003ky-M9
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:24:30 -0400
+	(envelope-from <peterx@redhat.com>) id 1fBzjQ-0002dM-Sv
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:31:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fBzc9-0002uc-HQ
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:24:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39426 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fBzjM-0007mO-BZ
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:31:56 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38244 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fBzc9-0002uU-BL
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:24:25 -0400
-Date: Fri, 27 Apr 2018 10:24:14 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180427092413.GA2609@work-vm>
-References: <alpine.LRH.2.11.1804262308190.12327@mail.ewheeler.net>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fBzjM-0007lq-7X
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:31:52 -0400
+Date: Fri, 27 Apr 2018 17:31:35 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180427093135.GC13269@xz-mi>
+References: <20180426091519.26934-1-xiaoguangrong@tencent.com>
+	<32eaad8e-35a0-5240-37a2-4242b7890ab9@redhat.com>
+	<a14b1b5b-4f0c-c085-35b8-9539afa5091f@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <alpine.LRH.2.11.1804262308190.12327@mail.ewheeler.net>
-Subject: Re: [Qemu-devel] Migration without memory page transfer
+In-Reply-To: <a14b1b5b-4f0c-c085-35b8-9539afa5091f@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] migration: introduce decompress-error-check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,113 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Wheeler <qemu-devel@lists.ewheeler.net>
-Cc: qemu-devel@nongnu.org, peterx@redhat.com
+To: Xiao Guangrong <guangrong.xiao@gmail.com>
+Cc: Eric Blake <eblake@redhat.com>, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, kvm@vger.kernel.org, Xiao Guangrong <xiaoguangrong@tencent.com>, qemu-devel@nongnu.org, dgilbert@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn
 
-* Eric Wheeler (qemu-devel@lists.ewheeler.net) wrote:
-> Hello all,
+On Fri, Apr 27, 2018 at 11:15:37AM +0800, Xiao Guangrong wrote:
+> 
+> 
+> On 04/26/2018 10:01 PM, Eric Blake wrote:
+> > On 04/26/2018 04:15 AM, guangrong.xiao@gmail.com wrote:
+> > > From: Xiao Guangrong <xiaoguangrong@tencent.com>
+> > > 
+> > > QEMU 2.13 enables strict check for compression & decompression to
+> > > make the migration more robuster, that depends on the source to fix
+> > 
+> > s/robuster/robust/
+> > 
+> 
+> Will fix, thank you for pointing it out.
+> 
+> > > the internal design which triggers the unexpected error conditions
+> > 
+> > 2.13 hasn't been released yet.  Why do we need a knob to explicitly turn
+> > off strict checking?  Can we not instead make 2.13 automatically smart
+> > enough to tell if the incoming stream is coming from an older qemu
+> > (which might fail if the strict checks are enabled) vs. a newer qemu
+> > (the sender gave us what we need to ensure the strict checks are
+> > worthwhile)?
+> > 
+> 
+> Really smart.
+> 
+> How about introduce a new command, MIG_CMD_DECOMPRESS_ERR_CHECK,
+> the destination will do strict check if got this command (i.e, new
+> QEMU is running on the source), otherwise, turn the check off.
 
-Hi Eric,
+Why not we just introduce a compat bit for that?  I mean something
+like: 15c3850325 ("migration: move skip_section_footers",
+2017-06-28).  Then we turn that check bit off for <=2.12.
 
-> This is my first time inside of the qemu code, so your help is greatly 
-> appreciated!
-> 
-> I have been experimenting with stop/start of VMs to/from a migration 
-> stream that excludes RAM pages and let the RAM pages come from memory file 
-> provided by the memory-backend-file called '/dev/shm/mem'.
-> 
-> To disable writing of memory pages to the migration stream, I've disabled 
-> calls to ram_find_and_save_block in ram_save_iterate() and 
-> ram_save_complete() (see patch below).  Thus, the migration stream has the 
-> "ram" SaveStateEntry section start/ends, but no pages:
+Would that work?
 
-You're in luck, because someone else has just done something very
-similar.
+(I would suspect that's what Eric mean too)
 
-> qemu-system-x86_64 \
-> 	-object memory-backend-file,prealloc=no,mem-path=/dev/shm/mem,id=ram-node0,host-nodes=0,policy=bind,size=64m,share=on \
-> 	-numa node,nodeid=0,cpus=0,memdev=ram-node0\
-> 	-m 64 -vnc 0:0
-> 
-> Once the VM is running, I press ctrl-B to get the IPXE prompt and then 
-> run 'kernel http://192.168.0.1/foo' to start a network request and watch 
-> it in tcpdump.
-> 
-> Once the download starts, I save the migration file:
-> 	migrate "exec:cat > /dev/shm/t"
-> 
-> 	# ls -lh /dev/shm/t
-> 	-rw-r--r-- 1 root root 321K Apr 26 16:06 /dev/shm/t
-> 
-> Now I can kill qemu and boot it again with -incoming:
-> 
-> qemu-system-x86_64 \
-> 	-object memory-backend-file,prealloc=no,mem-path=/dev/shm/mem,id=ram-node0,host-nodes=0,policy=bind,size=64m,share=on \
-> 	-numa node,nodeid=0,cpus=0,memdev=ram-node0\
-> 	-m 64 -vnc 0:0 \
-> 	-incoming 'exec:cat /dev/shm/t'
-> 
-> It seems to work.  That is, network traffic continues (http from IPXE) 
-> which I can see from tcpdump.  I can type into the console and it moves 
-> the cursor around---but there is nothing on the screen except the blinking 
-> text-mode cursor!  I can even blindly start a new transfer in ipxe: kernel 
-> http://192.168.0.222/foo2 and see it in tcpdump.
-> 
-> So what am I missing here?  Is the video memory not saved to /dev/shm/mem?
-> 
-> Or perhaps it is saved, but VGA isn't initialized to use what is 
-> already in /dev/shm/mem?  I've tried the cirrus, std, and vmware drivers 
-> to see if they behave differently, but the do not seem to.
+Regards,
 
-They have their own RAMBlocks, not the main RAM, so that does need
-migrating.
-
-The patch here:
-   http://lists.gnu.org/archive/html/qemu-devel/2018-04/msg00003.html
-
-should do what you want.
-You need to turn on the bypass-shared-memory capability.
-   migrate_set_capability bypass-shared-memory on
-
-Dave
-
-
-> Thanks for your help!
-
-
-> --
-> Eric Wheeler
-> 
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 021d583..9f4bfff 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -2267,9 +2267,9 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
->      t0 = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
->      i = 0;
->      while ((ret = qemu_file_rate_limit(f)) == 0) {
-> -        int pages;
-> +        int pages = 0;
->  
-> -        pages = ram_find_and_save_block(rs, false);
-> +        if (0) pages = ram_find_and_save_block(rs, false);
->          /* no more pages to sent */
->          if (pages == 0) {
->              done = 1;
-> @@ -2338,9 +2338,9 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
->  
->      /* flush all remaining blocks regardless of rate limiting */
->      while (true) {
-> -        int pages;
-> +        int pages = 0;
->  
-> -        pages = ram_find_and_save_block(rs, !migration_in_colo_state());
-> +        if (0) pages = ram_find_and_save_block(rs, !migration_in_colo_state());
->          /* no more blocks to sent */
->          if (pages == 0) {
->              break;
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- 
+Peter Xu
