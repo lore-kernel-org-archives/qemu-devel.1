@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBzb1-0002gK-Q6
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:23:19 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fBzb7-0002m5-OY
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:23:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBzb0-0002VY-KY
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:23:15 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fBzb5-0002X8-U1
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:23:21 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 27 Apr 2018 19:21:12 +1000
-Message-Id: <20180427092126.24812-36-david@gibson.dropbear.id.au>
+Date: Fri, 27 Apr 2018 19:21:23 +1000
+Message-Id: <20180427092126.24812-47-david@gibson.dropbear.id.au>
 In-Reply-To: <20180427092126.24812-1-david@gibson.dropbear.id.au>
 References: <20180427092126.24812-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 35/49] target/ppc: Remove fallback 64k pagesize
- information
+Subject: [Qemu-devel] [PULL 46/49] spapr: Support ibm,
+ dynamic-memory-v2 property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,130 +21,348 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-CPU definitions for cpus with the 64-bit hash MMU can include a table of
-available pagesizes.  If this isn't supplied ppc_cpu_instance_init() will
-fill it in a fallback table based on the POWERPC_MMU_64K bit in mmu_model=
-.
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-However, it turns out all the cpus which support 64K pages already includ=
-e
-an explicit table of page sizes, so there's no point to the fallback tabl=
-e
-including 64k pages.
+The new property ibm,dynamic-memory-v2 allows memory to be represented
+in a more compact manner in device tree.
 
-That removes the only place which tests POWERPC_MMU_64K, so we can remove
-it.  Which in turn allows some logic to be removed from
-kvm_fixup_page_sizes().
-
+Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- target/ppc/cpu-qom.h        |  4 ----
- target/ppc/kvm.c            |  7 -------
- target/ppc/translate_init.c | 20 ++------------------
- 3 files changed, 2 insertions(+), 29 deletions(-)
+ docs/specs/ppc-spapr-hotplug.txt |  19 ++++
+ hw/ppc/spapr.c                   | 230 +++++++++++++++++++++++++++++++--------
+ include/hw/ppc/spapr_ovec.h      |   1 +
+ 3 files changed, 202 insertions(+), 48 deletions(-)
 
-diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-index deaa46a14b..9bbb05cf62 100644
---- a/target/ppc/cpu-qom.h
-+++ b/target/ppc/cpu-qom.h
-@@ -70,7 +70,6 @@ enum powerpc_mmu_t {
- #define POWERPC_MMU_64       0x00010000
- #define POWERPC_MMU_1TSEG    0x00020000
- #define POWERPC_MMU_AMR      0x00040000
--#define POWERPC_MMU_64K      0x00080000
- #define POWERPC_MMU_V3       0x00100000 /* ISA V3.00 MMU Support */
-     /* 64 bits PowerPC MMU                                     */
-     POWERPC_MMU_64B        =3D POWERPC_MMU_64 | 0x00000001,
-@@ -78,15 +77,12 @@ enum powerpc_mmu_t {
-     POWERPC_MMU_2_03       =3D POWERPC_MMU_64 | 0x00000002,
-     /* Architecture 2.06 variant                               */
-     POWERPC_MMU_2_06       =3D POWERPC_MMU_64 | POWERPC_MMU_1TSEG
--                             | POWERPC_MMU_64K
-                              | POWERPC_MMU_AMR | 0x00000003,
-     /* Architecture 2.07 variant                               */
-     POWERPC_MMU_2_07       =3D POWERPC_MMU_64 | POWERPC_MMU_1TSEG
--                             | POWERPC_MMU_64K
-                              | POWERPC_MMU_AMR | 0x00000004,
-     /* Architecture 3.00 variant                               */
-     POWERPC_MMU_3_00       =3D POWERPC_MMU_64 | POWERPC_MMU_1TSEG
--                             | POWERPC_MMU_64K
-                              | POWERPC_MMU_AMR | POWERPC_MMU_V3
-                              | 0x00000005,
- };
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index f62f7ac288..660467aec6 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -425,7 +425,6 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
-     static bool has_smmu_info;
-     CPUPPCState *env =3D &cpu->env;
-     int iq, ik, jq, jk;
--    bool has_64k_pages =3D false;
-=20
-     /* We only handle page sizes for 64-bit server guests for now */
-     if (!(env->mmu_model & POWERPC_MMU_64)) {
-@@ -471,9 +470,6 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
-                                      ksps->enc[jk].page_shift)) {
-                 continue;
-             }
--            if (ksps->enc[jk].page_shift =3D=3D 16) {
--                has_64k_pages =3D true;
--            }
-             qsps->enc[jq].page_shift =3D ksps->enc[jk].page_shift;
-             qsps->enc[jq].pte_enc =3D ksps->enc[jk].pte_enc;
-             if (++jq >=3D PPC_PAGE_SIZES_MAX_SZ) {
-@@ -488,9 +484,6 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
-     if (!(smmu_info.flags & KVM_PPC_1T_SEGMENTS)) {
-         env->mmu_model &=3D ~POWERPC_MMU_1TSEG;
-     }
--    if (!has_64k_pages) {
--        env->mmu_model &=3D ~POWERPC_MMU_64K;
+diff --git a/docs/specs/ppc-spapr-hotplug.txt b/docs/specs/ppc-spapr-hotplug.txt
+index f57e2a09c6..cc7833108e 100644
+--- a/docs/specs/ppc-spapr-hotplug.txt
++++ b/docs/specs/ppc-spapr-hotplug.txt
+@@ -387,4 +387,23 @@ Each LMB list entry consists of the following elements:
+ - A 32bit flags word. The bit at bit position 0x00000008 defines whether
+   the LMB is assigned to the the partition as of boot time.
+ 
++ibm,dynamic-memory-v2
++
++This property describes the dynamically reconfigurable memory. This is
++an alternate and newer way to describe dyanamically reconfigurable memory.
++It is a property encoded array that has an integer N (the number of
++LMB set entries) followed by N LMB set entries. There is an LMB set entry
++for each sequential group of LMBs that share common attributes.
++
++Each LMB set entry consists of the following elements:
++
++- Number of sequential LMBs in the entry represented by a 32bit integer.
++- Logical address of the first LMB in the set encoded as a 64bit integer.
++- DRC index of the first LMB in the set.
++- Associativity list index that is used as an index into
++  ibm,associativity-lookup-arrays property described earlier. This
++  is used to retrieve the right associativity list to be used for all
++  the LMBs in this set.
++- A 32bit flags word that applies to all the LMBs in the set.
++
+ [1] http://thread.gmane.org/gmane.linux.ports.ppc.embedded/75350/focus=106867
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 2203b6f46d..b35aff5d81 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -668,63 +668,137 @@ static uint32_t spapr_pc_dimm_node(MemoryDeviceInfoList *list, ram_addr_t addr)
+     return -1;
+ }
+ 
+-/*
+- * Adds ibm,dynamic-reconfiguration-memory node.
+- * Refer to docs/specs/ppc-spapr-hotplug.txt for the documentation
+- * of this device tree node.
+- */
+-static int spapr_populate_drconf_memory(sPAPRMachineState *spapr, void *fdt)
++struct sPAPRDrconfCellV2 {
++     uint32_t seq_lmbs;
++     uint64_t base_addr;
++     uint32_t drc_index;
++     uint32_t aa_index;
++     uint32_t flags;
++} QEMU_PACKED;
++
++typedef struct DrconfCellQueue {
++    struct sPAPRDrconfCellV2 cell;
++    QSIMPLEQ_ENTRY(DrconfCellQueue) entry;
++} DrconfCellQueue;
++
++static DrconfCellQueue *
++spapr_get_drconf_cell(uint32_t seq_lmbs, uint64_t base_addr,
++                      uint32_t drc_index, uint32_t aa_index,
++                      uint32_t flags)
+ {
+-    MachineState *machine = MACHINE(spapr);
+-    int ret, i, offset;
+-    uint64_t lmb_size = SPAPR_MEMORY_BLOCK_SIZE;
+-    uint32_t prop_lmb_size[] = {0, cpu_to_be32(lmb_size)};
+-    uint32_t hotplug_lmb_start = spapr->hotplug_memory.base / lmb_size;
+-    uint32_t nr_lmbs = (spapr->hotplug_memory.base +
+-                       memory_region_size(&spapr->hotplug_memory.mr)) /
+-                       lmb_size;
+-    uint32_t *int_buf, *cur_index, buf_len;
+-    int nr_nodes = nb_numa_nodes ? nb_numa_nodes : 1;
+-    MemoryDeviceInfoList *dimms = NULL;
++    DrconfCellQueue *elem;
+ 
+-    /*
+-     * Don't create the node if there is no hotpluggable memory
+-     */
+-    if (machine->ram_size == machine->maxram_size) {
+-        return 0;
 -    }
- }
-=20
- bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 29bd6f3654..99be6fcd68 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -10469,7 +10469,7 @@ static void ppc_cpu_instance_init(Object *obj)
-         env->sps =3D *pcc->sps;
-     } else if (env->mmu_model & POWERPC_MMU_64) {
-         /* Use default sets of page sizes. We don't support MPSS */
--        static const struct ppc_segment_page_sizes defsps_4k =3D {
-+        static const struct ppc_segment_page_sizes defsps =3D {
-             .sps =3D {
-                 { .page_shift =3D 12, /* 4K */
-                   .slb_enc =3D 0,
-@@ -10481,23 +10481,7 @@ static void ppc_cpu_instance_init(Object *obj)
-                 },
-             },
-         };
--        static const struct ppc_segment_page_sizes defsps_64k =3D {
--            .sps =3D {
--                { .page_shift =3D 12, /* 4K */
--                  .slb_enc =3D 0,
--                  .enc =3D { { .page_shift =3D 12, .pte_enc =3D 0 } }
--                },
--                { .page_shift =3D 16, /* 64K */
--                  .slb_enc =3D 0x110,
--                  .enc =3D { { .page_shift =3D 16, .pte_enc =3D 1 } }
--                },
--                { .page_shift =3D 24, /* 16M */
--                  .slb_enc =3D 0x100,
--                  .enc =3D { { .page_shift =3D 24, .pte_enc =3D 0 } }
--                },
--            },
--        };
--        env->sps =3D (env->mmu_model & POWERPC_MMU_64K) ? defsps_64k : d=
-efsps_4k;
-+        env->sps =3D defsps;
++    elem = g_malloc0(sizeof(*elem));
++    elem->cell.seq_lmbs = cpu_to_be32(seq_lmbs);
++    elem->cell.base_addr = cpu_to_be64(base_addr);
++    elem->cell.drc_index = cpu_to_be32(drc_index);
++    elem->cell.aa_index = cpu_to_be32(aa_index);
++    elem->cell.flags = cpu_to_be32(flags);
+ 
+-    /*
+-     * Allocate enough buffer size to fit in ibm,dynamic-memory
+-     * or ibm,associativity-lookup-arrays
+-     */
+-    buf_len = MAX(nr_lmbs * SPAPR_DR_LMB_LIST_ENTRY_SIZE + 1, nr_nodes * 4 + 2)
+-              * sizeof(uint32_t);
+-    cur_index = int_buf = g_malloc0(buf_len);
++    return elem;
++}
+ 
+-    offset = fdt_add_subnode(fdt, 0, "ibm,dynamic-reconfiguration-memory");
++/* ibm,dynamic-memory-v2 */
++static int spapr_populate_drmem_v2(sPAPRMachineState *spapr, void *fdt,
++                                   int offset, MemoryDeviceInfoList *dimms)
++{
++    uint8_t *int_buf, *cur_index, buf_len;
++    int ret;
++    uint64_t lmb_size = SPAPR_MEMORY_BLOCK_SIZE;
++    uint64_t addr, cur_addr, size;
++    uint32_t nr_boot_lmbs = (spapr->hotplug_memory.base / lmb_size);
++    uint64_t mem_end = spapr->hotplug_memory.base +
++                       memory_region_size(&spapr->hotplug_memory.mr);
++    uint32_t node, nr_entries = 0;
++    sPAPRDRConnector *drc;
++    DrconfCellQueue *elem, *next;
++    MemoryDeviceInfoList *info;
++    QSIMPLEQ_HEAD(, DrconfCellQueue) drconf_queue
++        = QSIMPLEQ_HEAD_INITIALIZER(drconf_queue);
++
++    /* Entry to cover RAM and the gap area */
++    elem = spapr_get_drconf_cell(nr_boot_lmbs, 0, 0, -1,
++                                 SPAPR_LMB_FLAGS_RESERVED |
++                                 SPAPR_LMB_FLAGS_DRC_INVALID);
++    QSIMPLEQ_INSERT_TAIL(&drconf_queue, elem, entry);
++    nr_entries++;
++
++    cur_addr = spapr->hotplug_memory.base;
++    for (info = dimms; info; info = info->next) {
++        PCDIMMDeviceInfo *di = info->value->u.dimm.data;
++
++        addr = di->addr;
++        size = di->size;
++        node = di->node;
++
++        /* Entry for hot-pluggable area */
++        if (cur_addr < addr) {
++            drc = spapr_drc_by_id(TYPE_SPAPR_DRC_LMB, cur_addr / lmb_size);
++            g_assert(drc);
++            elem = spapr_get_drconf_cell((addr - cur_addr) / lmb_size,
++                                         cur_addr, spapr_drc_index(drc), -1, 0);
++            QSIMPLEQ_INSERT_TAIL(&drconf_queue, elem, entry);
++            nr_entries++;
++        }
+ 
+-    ret = fdt_setprop(fdt, offset, "ibm,lmb-size", prop_lmb_size,
+-                    sizeof(prop_lmb_size));
+-    if (ret < 0) {
+-        goto out;
++        /* Entry for DIMM */
++        drc = spapr_drc_by_id(TYPE_SPAPR_DRC_LMB, addr / lmb_size);
++        g_assert(drc);
++        elem = spapr_get_drconf_cell(size / lmb_size, addr,
++                                     spapr_drc_index(drc), node,
++                                     SPAPR_LMB_FLAGS_ASSIGNED);
++        QSIMPLEQ_INSERT_TAIL(&drconf_queue, elem, entry);
++        nr_entries++;
++        cur_addr = addr + size;
      }
- #endif /* defined(TARGET_PPC64) */
+ 
+-    ret = fdt_setprop_cell(fdt, offset, "ibm,memory-flags-mask", 0xff);
+-    if (ret < 0) {
+-        goto out;
++    /* Entry for remaining hotpluggable area */
++    if (cur_addr < mem_end) {
++        drc = spapr_drc_by_id(TYPE_SPAPR_DRC_LMB, cur_addr / lmb_size);
++        g_assert(drc);
++        elem = spapr_get_drconf_cell((mem_end - cur_addr) / lmb_size,
++                                     cur_addr, spapr_drc_index(drc), -1, 0);
++        QSIMPLEQ_INSERT_TAIL(&drconf_queue, elem, entry);
++        nr_entries++;
+     }
+ 
+-    ret = fdt_setprop_cell(fdt, offset, "ibm,memory-preservation-time", 0x0);
+-    if (ret < 0) {
+-        goto out;
++    buf_len = nr_entries * sizeof(struct sPAPRDrconfCellV2) + sizeof(uint32_t);
++    int_buf = cur_index = g_malloc0(buf_len);
++    *(uint32_t *)int_buf = cpu_to_be32(nr_entries);
++    cur_index += sizeof(nr_entries);
++
++    QSIMPLEQ_FOREACH_SAFE(elem, &drconf_queue, entry, next) {
++        memcpy(cur_index, &elem->cell, sizeof(elem->cell));
++        cur_index += sizeof(elem->cell);
++        QSIMPLEQ_REMOVE(&drconf_queue, elem, DrconfCellQueue, entry);
++        g_free(elem);
+     }
+ 
+-    if (hotplug_lmb_start) {
+-        dimms = qmp_pc_dimm_device_list();
++    ret = fdt_setprop(fdt, offset, "ibm,dynamic-memory-v2", int_buf, buf_len);
++    g_free(int_buf);
++    if (ret < 0) {
++        return -1;
+     }
++    return 0;
++}
++
++/* ibm,dynamic-memory */
++static int spapr_populate_drmem_v1(sPAPRMachineState *spapr, void *fdt,
++                                   int offset, MemoryDeviceInfoList *dimms)
++{
++    int i, ret;
++    uint64_t lmb_size = SPAPR_MEMORY_BLOCK_SIZE;
++    uint32_t hotplug_lmb_start = spapr->hotplug_memory.base / lmb_size;
++    uint32_t nr_lmbs = (spapr->hotplug_memory.base +
++                       memory_region_size(&spapr->hotplug_memory.mr)) /
++                       lmb_size;
++    uint32_t *int_buf, *cur_index, buf_len;
+ 
+-    /* ibm,dynamic-memory */
++    /*
++     * Allocate enough buffer size to fit in ibm,dynamic-memory
++     */
++    buf_len = (nr_lmbs * SPAPR_DR_LMB_LIST_ENTRY_SIZE + 1) * sizeof(uint32_t);
++    cur_index = int_buf = g_malloc0(buf_len);
+     int_buf[0] = cpu_to_be32(nr_lmbs);
+     cur_index++;
+     for (i = 0; i < nr_lmbs; i++) {
+@@ -764,13 +838,71 @@ static int spapr_populate_drconf_memory(sPAPRMachineState *spapr, void *fdt)
+ 
+         cur_index += SPAPR_DR_LMB_LIST_ENTRY_SIZE;
+     }
+-    qapi_free_MemoryDeviceInfoList(dimms);
+     ret = fdt_setprop(fdt, offset, "ibm,dynamic-memory", int_buf, buf_len);
++    g_free(int_buf);
+     if (ret < 0) {
+-        goto out;
++        return -1;
++    }
++    return 0;
++}
++
++/*
++ * Adds ibm,dynamic-reconfiguration-memory node.
++ * Refer to docs/specs/ppc-spapr-hotplug.txt for the documentation
++ * of this device tree node.
++ */
++static int spapr_populate_drconf_memory(sPAPRMachineState *spapr, void *fdt)
++{
++    MachineState *machine = MACHINE(spapr);
++    int ret, i, offset;
++    uint64_t lmb_size = SPAPR_MEMORY_BLOCK_SIZE;
++    uint32_t prop_lmb_size[] = {0, cpu_to_be32(lmb_size)};
++    uint32_t *int_buf, *cur_index, buf_len;
++    int nr_nodes = nb_numa_nodes ? nb_numa_nodes : 1;
++    MemoryDeviceInfoList *dimms = NULL;
++
++    /*
++     * Don't create the node if there is no hotpluggable memory
++     */
++    if (machine->ram_size == machine->maxram_size) {
++        return 0;
++    }
++
++    offset = fdt_add_subnode(fdt, 0, "ibm,dynamic-reconfiguration-memory");
++
++    ret = fdt_setprop(fdt, offset, "ibm,lmb-size", prop_lmb_size,
++                    sizeof(prop_lmb_size));
++    if (ret < 0) {
++        return ret;
++    }
++
++    ret = fdt_setprop_cell(fdt, offset, "ibm,memory-flags-mask", 0xff);
++    if (ret < 0) {
++        return ret;
++    }
++
++    ret = fdt_setprop_cell(fdt, offset, "ibm,memory-preservation-time", 0x0);
++    if (ret < 0) {
++        return ret;
++    }
++
++    /* ibm,dynamic-memory or ibm,dynamic-memory-v2 */
++    dimms = qmp_pc_dimm_device_list();
++    if (spapr_ovec_test(spapr->ov5_cas, OV5_DRMEM_V2)) {
++        ret = spapr_populate_drmem_v2(spapr, fdt, offset, dimms);
++    } else {
++        ret = spapr_populate_drmem_v1(spapr, fdt, offset, dimms);
++    }
++    qapi_free_MemoryDeviceInfoList(dimms);
++
++    if (ret < 0) {
++        return ret;
+     }
+ 
+     /* ibm,associativity-lookup-arrays */
++    buf_len = (nr_nodes * 4 + 2) * sizeof(uint32_t);
++    cur_index = int_buf = g_malloc0(buf_len);
++
+     cur_index = int_buf;
+     int_buf[0] = cpu_to_be32(nr_nodes);
+     int_buf[1] = cpu_to_be32(4); /* Number of entries per associativity list */
+@@ -787,8 +919,8 @@ static int spapr_populate_drconf_memory(sPAPRMachineState *spapr, void *fdt)
+     }
+     ret = fdt_setprop(fdt, offset, "ibm,associativity-lookup-arrays", int_buf,
+             (cur_index - int_buf) * sizeof(uint32_t));
+-out:
+     g_free(int_buf);
++
+     return ret;
  }
---=20
+ 
+@@ -2491,6 +2623,9 @@ static void spapr_machine_init(MachineState *machine)
+         spapr_ovec_set(spapr->ov5, OV5_HPT_RESIZE);
+     }
+ 
++    /* advertise support for ibm,dyamic-memory-v2 */
++    spapr_ovec_set(spapr->ov5, OV5_DRMEM_V2);
++
+     /* init CPUs */
+     spapr_init_cpus(spapr);
+ 
+@@ -2918,7 +3053,6 @@ static void spapr_instance_init(Object *obj)
+                                     " place of standard EPOW events when possible"
+                                     " (required for memory hot-unplug support)",
+                                     NULL);
+-
+     ppc_compat_add_property(obj, "max-cpu-compat", &spapr->max_compat_pvr,
+                             "Maximum permitted CPU compatibility mode",
+                             &error_fatal);
+diff --git a/include/hw/ppc/spapr_ovec.h b/include/hw/ppc/spapr_ovec.h
+index bf25e5d954..0f2d8d715d 100644
+--- a/include/hw/ppc/spapr_ovec.h
++++ b/include/hw/ppc/spapr_ovec.h
+@@ -51,6 +51,7 @@ typedef struct sPAPROptionVector sPAPROptionVector;
+ #define OV5_FORM1_AFFINITY      OV_BIT(5, 0)
+ #define OV5_HP_EVT              OV_BIT(6, 5)
+ #define OV5_HPT_RESIZE          OV_BIT(6, 7)
++#define OV5_DRMEM_V2            OV_BIT(22, 0)
+ #define OV5_XIVE_BOTH           OV_BIT(23, 0)
+ #define OV5_XIVE_EXPLOIT        OV_BIT(23, 1) /* 1=exploitation 0=legacy */
+ 
+-- 
 2.14.3
