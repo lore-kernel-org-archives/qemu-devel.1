@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1fC9Al-0003Hc-AZ
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 15:36:49 -0400
+	(envelope-from <marcel@redhat.com>) id 1fC9Kj-00068I-Il
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 15:47:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1fC9Ai-0005sb-6u
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 15:36:47 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35104 helo=mx1.redhat.com)
+	(envelope-from <marcel@redhat.com>) id 1fC9Kf-0002yq-CJ
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 15:47:05 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55100 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1fC9Ai-0005s5-13
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 15:36:44 -0400
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1fC9Kf-0002yg-6C
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 15:47:01 -0400
 References: <20180219114332.70443-1-marcel@redhat.com>
 	<20180219114332.70443-10-marcel@redhat.com>
-	<CAFEAcA8_LPFnLjCS30vWDZM49ztHE0gvqmrTNnyb4SFTE97W7Q@mail.gmail.com>
+	<CAFEAcA8yh0hhbhqBM3-iBXWHB72qx--FmnwFdQiPt9Fx13Fzmg@mail.gmail.com>
 From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <8659dc43-a5a2-f4ca-3381-8698a1a06ad3@redhat.com>
-Date: Fri, 27 Apr 2018 22:36:33 +0300
+Message-ID: <5026a614-5124-aecd-5221-5b105c82533b@redhat.com>
+Date: Fri, 27 Apr 2018 22:46:51 +0300
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8_LPFnLjCS30vWDZM49ztHE0gvqmrTNnyb4SFTE97W7Q@mail.gmail.com>
+In-Reply-To: <CAFEAcA8yh0hhbhqBM3-iBXWHB72qx--FmnwFdQiPt9Fx13Fzmg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -30,10 +30,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Yuval Shaia <yuval.shaia@oracle.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Yuval Shaia <yuval.shaia@oracle.com>, Michael Tsirkin <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On 27/04/2018 17:49, Peter Maydell wrote:
+On 27/04/2018 17:55, Peter Maydell wrote:
 > On 19 February 2018 at 11:43, Marcel Apfelbaum <marcel@redhat.com> wrote:
 >> From: Yuval Shaia <yuval.shaia@oracle.com>
 >>
@@ -63,54 +63,58 @@ On 27/04/2018 17:49, Peter Maydell wrote:
 >> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 >> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
 > 
-> Hi; this is something odd I noticed reading through the code.
 > 
->> +static void init_bars(PCIDevice *pdev)
+>> +static void free_ports(PVRDMADev *dev)
 >> +{
->> +    PVRDMADev *dev = PVRDMA_DEV(pdev);
+>> +    int i;
 >> +
->> +    /* BAR 0 - MSI-X */
->> +    memory_region_init(&dev->msix, OBJECT(dev), "pvrdma-msix",
->> +                       RDMA_BAR0_MSIX_SIZE);
->> +    pci_register_bar(pdev, RDMA_MSIX_BAR_IDX, PCI_BASE_ADDRESS_SPACE_MEMORY,
->> +                     &dev->msix);
+>> +    for (i = 0; i < MAX_PORTS; i++) {
+>> +        g_free(dev->rdma_dev_res.ports[i].gid_tbl);
+> 
+> Coverity (CID 1390628) points out that this is attempting to
+> call free on an array, which is not valid...
+>
+
+Definitely a bug, thanks! (git_tbl is part of RdmaRmPort,
+it makes no sense to free it)
+
+We didn't catch it because, funny thing,
+the QOM 'exit' function is not called when QEMU exits
+for any device created with "-device".
+
+[Adding Michael and Markus]
+Does anybody know anything about this issue? Is it on purpose?
+Am I getting it wrong?
+
+
+>> +    }
+>> +}
 >> +
->> +    /* BAR 1 - Registers */
->> +    memset(&dev->regs_data, 0, sizeof(dev->regs_data));
->> +    memory_region_init_io(&dev->regs, OBJECT(dev), &regs_ops, dev,
->> +                          "pvrdma-regs", RDMA_BAR1_REGS_SIZE);
+>> +static void init_ports(PVRDMADev *dev, Error **errp)
+>> +{
+>> +    int i;
+>> +
+>> +    memset(dev->rdma_dev_res.ports, 0, sizeof(dev->rdma_dev_res.ports));
+>> +
+>> +    for (i = 0; i < MAX_PORTS; i++) {
+>> +        dev->rdma_dev_res.ports[i].state = PVRDMA_PORT_DOWN;
+>> +
+>> +        dev->rdma_dev_res.ports[i].pkey_tbl =
+>> +            g_malloc0(sizeof(*dev->rdma_dev_res.ports[i].pkey_tbl) *
+>> +                      MAX_PORT_PKEYS);
 > 
-> RDMA_BAR1_REGS_SIZE is used in pvrdma.h to declare the regs array:
->     uint32_t regs_data[RDMA_BAR1_REGS_SIZE];
-> and that and the way that get_reg_val/set_reg_val do "addr >> 2" to
-> convert from an address to an array index suggest that it is the
-> size of the BAR in 32-bit words. However here we're passing it
-> as the size parameter of memory_region_init_io(), which wants a
-> size in bytes. Which is correct ?
+> ...init_ports() is allocated memory into ports[i].pkey_tbl,
+> so maybe this is what free_ports() is intended to be freeing ?
 > 
 
-I think that RDMA_BAR1_REGS_SIZE (256) is the size in bytes,
-this is the layout of the registers (linux kernel):
+Right, we will fix it.
 
-/* Register offsets within PCI resource on BAR1. */
-#define PVRDMA_REG_VERSION      0x00    /* R: Version of device. */
-#define PVRDMA_REG_DSRLOW       0x04    /* W: Device shared region low PA. */
-#define PVRDMA_REG_DSRHIGH      0x08    /* W: Device shared region high PA. */
-#define PVRDMA_REG_CTL          0x0c    /* W: PVRDMA_DEVICE_CTL */
-#define PVRDMA_REG_REQUEST      0x10    /* W: Indicate device request. */
-#define PVRDMA_REG_ERR          0x14    /* R: Device error. */
-#define PVRDMA_REG_ICR          0x18    /* R: Interrupt cause. */
-#define PVRDMA_REG_IMR          0x1c    /* R/W: Interrupt mask. */
-#define PVRDMA_REG_MACL         0x20    /* R/W: MAC address low. */
-#define PVRDMA_REG_MACH         0x24    /* R/W: MAC address high. */
-
-So we don't need 256 32-bit words.
-Yuval can you please confirm?
-
-
-Thanks,
+Thanks again for running Coverity!
 Marcel
 
+>> +    }
+>> +}
+> 
 > thanks
 > -- PMM
 > 
