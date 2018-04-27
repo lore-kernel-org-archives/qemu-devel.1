@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59903)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBzac-0002ER-6J
+	(envelope-from <dgibson@ozlabs.org>) id 1fBzac-0002F1-IW
 	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:22:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBzaZ-0002KO-2u
+	(envelope-from <dgibson@ozlabs.org>) id 1fBzab-0002Lh-PQ
 	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:22:50 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 27 Apr 2018 19:21:18 +1000
-Message-Id: <20180427092126.24812-42-david@gibson.dropbear.id.au>
+Date: Fri, 27 Apr 2018 19:21:06 +1000
+Message-Id: <20180427092126.24812-30-david@gibson.dropbear.id.au>
 In-Reply-To: <20180427092126.24812-1-david@gibson.dropbear.id.au>
 References: <20180427092126.24812-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 41/49] target/ppc: Remove unnecessary
- POWERPC_MMU_V3 flag from mmu_model
+Subject: [Qemu-devel] [PULL 29/49] Revert "spapr: Don't allow memory hotplug
+ to memory less nodes"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,58 +21,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Serhii Popovych <spopovyc@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-The only place we test this flag is in conjunction with
-ppc64_use_proc_tbl().  That checks for the LPCR_UPRT bit, which we alread=
-y
-ensure can't be set except on a machine with a v3 MMU (i.e. POWER9).
+From: Serhii Popovych <spopovyc@redhat.com>
 
+This reverts commit b556854bd8524c26b8be98ab1bfdf0826831e793.
+
+Leave change @node type from uint32_t to to int from reverted commit
+because node < 0 is always false.
+
+Note that implementing capability or some trick to detect if guest
+kernel does not support hot-add to memory: this returns previous
+behavour where memory added to first non-empty node.
+
+Signed-off-by: Serhii Popovych <spopovyc@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- target/ppc/cpu-qom.h    | 4 +---
- target/ppc/mmu-hash64.c | 2 +-
- 2 files changed, 2 insertions(+), 4 deletions(-)
+ hw/ppc/spapr.c | 22 ----------------------
+ 1 file changed, 22 deletions(-)
 
-diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-index 2bd58b2a84..ef96d42cf2 100644
---- a/target/ppc/cpu-qom.h
-+++ b/target/ppc/cpu-qom.h
-@@ -68,7 +68,6 @@ enum powerpc_mmu_t {
-     /* PowerPC 601 MMU model (specific BATs format)            */
-     POWERPC_MMU_601        =3D 0x0000000A,
- #define POWERPC_MMU_64       0x00010000
--#define POWERPC_MMU_V3       0x00100000 /* ISA V3.00 MMU Support */
-     /* 64 bits PowerPC MMU                                     */
-     POWERPC_MMU_64B        =3D POWERPC_MMU_64 | 0x00000001,
-     /* Architecture 2.03 and later (has LPCR) */
-@@ -78,8 +77,7 @@ enum powerpc_mmu_t {
-     /* Architecture 2.07 variant                               */
-     POWERPC_MMU_2_07       =3D POWERPC_MMU_64 | 0x00000004,
-     /* Architecture 3.00 variant                               */
--    POWERPC_MMU_3_00       =3D POWERPC_MMU_64 | POWERPC_MMU_V3
--                             | 0x00000005,
-+    POWERPC_MMU_3_00       =3D POWERPC_MMU_64 | 0x00000005,
- };
- #define POWERPC_MMU_VER(x) ((x) & (POWERPC_MMU_64 | 0xFFFF))
- #define POWERPC_MMU_VER_64B POWERPC_MMU_VER(POWERPC_MMU_64B)
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index f341714550..df26a03c15 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -761,7 +761,7 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vadd=
-r eaddr,
-     slb =3D slb_lookup(cpu, eaddr);
-     if (!slb) {
-         /* No entry found, check if in-memory segment tables are in use =
-*/
--        if ((env->mmu_model & POWERPC_MMU_V3) && ppc64_use_proc_tbl(cpu)=
-) {
-+        if (ppc64_use_proc_tbl(cpu)) {
-             /* TODO - Unsupported */
-             error_report("Segment Table Support Unimplemented");
-             exit(1);
---=20
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 5a1c1e25e1..fc86ba6934 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3478,28 +3478,6 @@ static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
+             return;
+         }
+ 
+-        /*
+-         * Currently PowerPC kernel doesn't allow hot-adding memory to
+-         * memory-less node, but instead will silently add the memory
+-         * to the first node that has some memory. This causes two
+-         * unexpected behaviours for the user.
+-         *
+-         * - Memory gets hotplugged to a different node than what the user
+-         *   specified.
+-         * - Since pc-dimm subsystem in QEMU still thinks that memory belongs
+-         *   to memory-less node, a reboot will set things accordingly
+-         *   and the previously hotplugged memory now ends in the right node.
+-         *   This appears as if some memory moved from one node to another.
+-         *
+-         * So until kernel starts supporting memory hotplug to memory-less
+-         * nodes, just prevent such attempts upfront in QEMU.
+-         */
+-        if (nb_numa_nodes && !numa_info[node].node_mem) {
+-            error_setg(errp, "Can't hotplug memory to memory-less node %d",
+-                       node);
+-            return;
+-        }
+-
+         spapr_memory_plug(hotplug_dev, dev, node, errp);
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
+         spapr_core_plug(hotplug_dev, dev, errp);
+-- 
 2.14.3
