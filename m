@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fC69q-0005qu-UF
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:23:42 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fC6BB-0008Vo-Eq
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:25:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fC69p-0006YS-MJ
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:23:38 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri, 27 Apr 2018 17:23:12 +0100
-Message-Id: <20180427162312.18583-3-stefanha@redhat.com>
-In-Reply-To: <20180427162312.18583-1-stefanha@redhat.com>
-References: <20180427162312.18583-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/2] block/file-posix: add
- x-check-page-cache=on|off option
+	(envelope-from <peter.maydell@linaro.org>) id 1fC6BA-0000na-HF
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:25:01 -0400
+Received: from mail-ot0-x22e.google.com ([2607:f8b0:4003:c0f::22e]:33666)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fC6BA-0000mz-9k
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:25:00 -0400
+Received: by mail-ot0-x22e.google.com with SMTP id l22-v6so2675624otj.0
+	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 09:25:00 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <d50e3a40-d7f3-4c9b-e930-4c2f4d6c8a53@redhat.com>
+References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
+	<d50e3a40-d7f3-4c9b-e930-4c2f4d6c8a53@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 27 Apr 2018 17:24:38 +0100
+Message-ID: <CAFEAcA8wJuJ9464LadgjJOo-7ttdGYcfDQWALbkxBRJCr_knkg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] release retrospective, next release timing,
+ numbering
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,228 +30,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Sergio Lopez <slp@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-mincore(2) checks whether pages are resident.  Use it to verify that
-page cache has been dropped.
+On 27 April 2018 at 17:17, Thomas Huth <thuth@redhat.com> wrote:
+> On 27.04.2018 17:51, Peter Maydell wrote:
+>> Hi; I usually let people forget about releases for a month or
+>> so before bringing this topic up, but:
+>>
+>> (1) do we want to call the next release 2.13, or something else?
+>> There's no particular reason to bump to 3.0 except some combination of
+>>  * if we keep going like this we'll get up to 2.42, which starts to
+>>    get silly
+>>  * Linus-style "avoid being too predictable"
+>>  * triskaidekaphobia
+>
+> and maybe:
+>
+>  * Celebrate 15 years of QEMU
 
-You can trigger a verification failure by mmapping the image file from
-another process that loads a byte from a page, forcing it to become
-resident.  bdrv_co_invalidate_cache() will fail while that process is
-alive.
+Oh, hey, I hadn't noticed that. That's as good a reason as
+any other!
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- qapi/block-core.json |   7 +++-
- block/file-posix.c   | 100 +++++++++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 104 insertions(+), 3 deletions(-)
+> By the way, just another crazy idea for v3.0 (i.e. feel free to turn it
+> down immediately ;-)): Since compilation and testing time for QEMU is
+> really huge, what do you think if we got rid of some QEMU binaries?
+> qemu-system-aarch64 is a superset of qemu-system-arm, qemu-system-x86_64
+> is a superset of qemu-system-i386 and qemu-system-ppc64 is a superset of
+> qemu-system-ppc (and qemu-system-ppcemb). Would be feasible to get rid
+> of the subset binaries with some work? (I think they were especially
+> useful on 32-bit machines in the past, but most people are using 64-bit
+> machines nowadays, aren't they?).
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index c50517bff3..21c3470234 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2530,6 +2530,10 @@
- # @locking:     whether to enable file locking. If set to 'auto', only enable
- #               when Open File Descriptor (OFD) locking API is available
- #               (default: auto, since 2.10)
-+# @x-check-cache-dropped: whether to check that page cache was dropped on live
-+#                         migration.  May cause noticeable delays if the image
-+#                         file is large, do not use in production.
-+#                         (default: off) (since: 2.13)
- #
- # Since: 2.9
- ##
-@@ -2537,7 +2541,8 @@
-   'data': { 'filename': 'str',
-             '*pr-manager': 'str',
-             '*locking': 'OnOffAuto',
--            '*aio': 'BlockdevAioOptions' } }
-+            '*aio': 'BlockdevAioOptions',
-+            '*x-check-cache-dropped': 'bool' } }
- 
- ##
- # @BlockdevOptionsNull:
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 3707ea2d1c..5a602cfe37 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -161,6 +161,7 @@ typedef struct BDRVRawState {
-     bool page_cache_inconsistent:1;
-     bool has_fallocate;
-     bool needs_alignment;
-+    bool check_cache_dropped;
- 
-     PRManager *pr_mgr;
- } BDRVRawState;
-@@ -168,6 +169,7 @@ typedef struct BDRVRawState {
- typedef struct BDRVRawReopenState {
-     int fd;
-     int open_flags;
-+    bool check_cache_dropped;
- } BDRVRawReopenState;
- 
- static int fd_open(BlockDriverState *bs);
-@@ -415,6 +417,11 @@ static QemuOptsList raw_runtime_opts = {
-             .type = QEMU_OPT_STRING,
-             .help = "id of persistent reservation manager object (default: none)",
-         },
-+        {
-+            .name = "x-check-cache-dropped",
-+            .type = QEMU_OPT_BOOL,
-+            .help = "check that page cache was dropped on live migration (default: off)"
-+        },
-         { /* end of list */ }
-     },
- };
-@@ -500,6 +507,9 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
-         }
-     }
- 
-+    s->check_cache_dropped = qemu_opt_get_bool(opts, "x-check-cache-dropped",
-+                                               false);
-+
-     s->open_flags = open_flags;
-     raw_parse_flags(bdrv_flags, &s->open_flags);
- 
-@@ -777,6 +787,7 @@ static int raw_reopen_prepare(BDRVReopenState *state,
- {
-     BDRVRawState *s;
-     BDRVRawReopenState *rs;
-+    QemuOpts *opts;
-     int ret = 0;
-     Error *local_err = NULL;
- 
-@@ -787,6 +798,19 @@ static int raw_reopen_prepare(BDRVReopenState *state,
- 
-     state->opaque = g_new0(BDRVRawReopenState, 1);
-     rs = state->opaque;
-+    rs->fd = -1;
-+
-+    /* Handle options changes */
-+    opts = qemu_opts_create(&raw_runtime_opts, NULL, 0, &error_abort);
-+    qemu_opts_absorb_qdict(opts, state->options, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        ret = -EINVAL;
-+        goto out;
-+    }
-+
-+    rs->check_cache_dropped = qemu_opt_get_bool(opts, "x-check-cache-dropped",
-+                                                s->check_cache_dropped);
- 
-     if (s->type == FTYPE_CD) {
-         rs->open_flags |= O_NONBLOCK;
-@@ -794,8 +818,6 @@ static int raw_reopen_prepare(BDRVReopenState *state,
- 
-     raw_parse_flags(state->flags, &rs->open_flags);
- 
--    rs->fd = -1;
--
-     int fcntl_flags = O_APPEND | O_NONBLOCK;
- #ifdef O_NOATIME
-     fcntl_flags |= O_NOATIME;
-@@ -850,6 +872,8 @@ static int raw_reopen_prepare(BDRVReopenState *state,
-         }
-     }
- 
-+out:
-+    qemu_opts_del(opts);
-     return ret;
- }
- 
-@@ -858,6 +882,7 @@ static void raw_reopen_commit(BDRVReopenState *state)
-     BDRVRawReopenState *rs = state->opaque;
-     BDRVRawState *s = state->bs->opaque;
- 
-+    s->check_cache_dropped = rs->check_cache_dropped;
-     s->open_flags = rs->open_flags;
- 
-     qemu_close(s->fd);
-@@ -2236,6 +2261,73 @@ static int coroutine_fn raw_co_block_status(BlockDriverState *bs,
-     return ret | BDRV_BLOCK_OFFSET_VALID;
- }
- 
-+#if defined(__linux__)
-+/* Verify that the file is not in the page cache */
-+static void check_cache_dropped(BlockDriverState *bs, Error **errp)
-+{
-+    const size_t window_size = 128 * 1024 * 1024;
-+    BDRVRawState *s = bs->opaque;
-+    void *window = NULL;
-+    size_t length = 0;
-+    unsigned char *vec;
-+    size_t page_size;
-+    off_t offset;
-+    off_t end;
-+
-+    /* mincore(2) page status information requires 1 byte per page */
-+    page_size = sysconf(_SC_PAGESIZE);
-+    vec = g_malloc(DIV_ROUND_UP(window_size, page_size));
-+
-+    end = raw_getlength(bs);
-+
-+    for (offset = 0; offset < end; offset += window_size) {
-+        void *new_window;
-+        size_t new_length;
-+        size_t vec_end;
-+        size_t i;
-+        int ret;
-+
-+        /* Unmap previous window if size has changed */
-+        new_length = MIN(end - offset, window_size);
-+        if (new_length != length) {
-+            munmap(window, length);
-+            window = NULL;
-+            length = 0;
-+        }
-+
-+        new_window = mmap(window, new_length, PROT_NONE, MAP_PRIVATE,
-+                          s->fd, offset);
-+        if (new_window == MAP_FAILED) {
-+            error_setg_errno(errp, errno, "mmap failed");
-+            break;
-+        }
-+
-+        window = new_window;
-+        length = new_length;
-+
-+        ret = mincore(window, length, vec);
-+        if (ret < 0) {
-+            error_setg_errno(errp, errno, "mincore failed");
-+            break;
-+        }
-+
-+        vec_end = DIV_ROUND_UP(length, page_size);
-+        for (i = 0; i < vec_end; i++) {
-+            if (vec[i] & 0x1) {
-+                error_setg(errp, "page cache still in use!");
-+                break;
-+            }
-+        }
-+    }
-+
-+    if (window) {
-+        munmap(window, length);
-+    }
-+
-+    g_free(vec);
-+}
-+#endif /* __linux__ */
-+
- static void coroutine_fn raw_co_invalidate_cache(BlockDriverState *bs,
-                                                  Error **errp)
- {
-@@ -2269,6 +2361,10 @@ static void coroutine_fn raw_co_invalidate_cache(BlockDriverState *bs,
-         error_setg_errno(errp, ret, "fadvise failed");
-         return;
-     }
-+
-+    if (s->check_cache_dropped) {
-+        check_cache_dropped(bs, errp);
-+    }
- #else /* __linux__ */
-     /* Do nothing.  Live migration to a remote host with cache.direct=off is
-      * unsupported on other host operating systems.  Cache consistency issues
--- 
-2.14.3
+I think Markus' backward-compatibility rubber chicken may prevent
+us from removing those executables...
+
+(In the utopian far future I'd like us to have just one QEMU
+executable that could handle all architectures at once :-))
+
+thanks
+-- PMM
