@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fBxnv-00054X-8f
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 03:28:28 -0400
+	(envelope-from <armbru@redhat.com>) id 1fBxom-0005ii-C4
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 03:29:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fBxnq-0001Uu-AU
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 03:28:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60538 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fBxoi-0001wq-40
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 03:29:20 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48584 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fBxnq-0001UT-4g
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 03:28:22 -0400
-Date: Fri, 27 Apr 2018 15:28:10 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180427072810.GB13269@xz-mi>
-References: <20180425045129.17449-1-peterx@redhat.com>
-	<20180425045129.17449-9-peterx@redhat.com>
-	<2b05e076-0af9-0ee9-c076-7acc29714913@redhat.com>
-	<AADFC41AFE54684AB9EE6CBC0274A5D19113B5D2@SHSMSX101.ccr.corp.intel.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fBxoh-0001wS-WC
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 03:29:16 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9996240252F3
+	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 07:29:15 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180426183404.3756-1-lersek@redhat.com>
+	<20180426183404.3756-5-lersek@redhat.com>
+Date: Fri, 27 Apr 2018 09:29:14 +0200
+In-Reply-To: <20180426183404.3756-5-lersek@redhat.com> (Laszlo Ersek's message
+	of "Thu, 26 Apr 2018 20:34:04 +0200")
+Message-ID: <87vacdt8dx.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19113B5D2@SHSMSX101.ccr.corp.intel.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 08/10] intel-iommu: maintain per-device
- iova ranges
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] qapi: discriminate CpuInfoFast on
+ SysEmuTarget, not CpuInfoArch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,166 +34,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: Jason Wang <jasowang@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu devel list <qemu-devel@nongnu.org>
 
-On Fri, Apr 27, 2018 at 07:02:14AM +0000, Tian, Kevin wrote:
-> > From: Jason Wang [mailto:jasowang@redhat.com]
-> > Sent: Friday, April 27, 2018 2:08 PM
-> >=20
-> > On 2018=E5=B9=B404=E6=9C=8825=E6=97=A5 12:51, Peter Xu wrote:
-> > > For each VTDAddressSpace, now we maintain what IOVA ranges we have
-> > > mapped and what we have not.  With that information, now we only
-> > send
-> > > MAP or UNMAP when necessary.  Say, we don't send MAP notifies if we
-> > know
-> > > we have already mapped the range, meanwhile we don't send UNMAP
-> > notifies
-> > > if we know we never mapped the range at all.
-> > >
-> > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > ---
-> > >   include/hw/i386/intel_iommu.h |  2 ++
-> > >   hw/i386/intel_iommu.c         | 28 ++++++++++++++++++++++++++++
-> > >   hw/i386/trace-events          |  2 ++
-> > >   3 files changed, 32 insertions(+)
-> > >
-> > > diff --git a/include/hw/i386/intel_iommu.h
-> > b/include/hw/i386/intel_iommu.h
-> > > index 486e205e79..09a2e94404 100644
-> > > --- a/include/hw/i386/intel_iommu.h
-> > > +++ b/include/hw/i386/intel_iommu.h
-> > > @@ -27,6 +27,7 @@
-> > >   #include "hw/i386/ioapic.h"
-> > >   #include "hw/pci/msi.h"
-> > >   #include "hw/sysbus.h"
-> > > +#include "qemu/interval-tree.h"
-> > >
-> > >   #define TYPE_INTEL_IOMMU_DEVICE "intel-iommu"
-> > >   #define INTEL_IOMMU_DEVICE(obj) \
-> > > @@ -95,6 +96,7 @@ struct VTDAddressSpace {
-> > >       QLIST_ENTRY(VTDAddressSpace) next;
-> > >       /* Superset of notifier flags that this address space has */
-> > >       IOMMUNotifierFlag notifier_flags;
-> > > +    ITTree *iova_tree;          /* Traces mapped IOVA ranges */
-> > >   };
-> > >
-> > >   struct VTDBus {
-> > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > > index a19c18b8d4..8f396a5d13 100644
-> > > --- a/hw/i386/intel_iommu.c
-> > > +++ b/hw/i386/intel_iommu.c
-> > > @@ -768,12 +768,37 @@ typedef struct {
-> > >   static int vtd_page_walk_one(IOMMUTLBEntry *entry, int level,
-> > >                                vtd_page_walk_info *info)
-> > >   {
-> > > +    VTDAddressSpace *as =3D info->as;
-> > >       vtd_page_walk_hook hook_fn =3D info->hook_fn;
-> > >       void *private =3D info->private;
-> > > +    ITRange *mapped =3D it_tree_find(as->iova_tree, entry->iova,
-> > > +                                   entry->iova + entry->addr_mask)=
-;
-> > >
-> > >       assert(hook_fn);
-> > > +
-> > > +    /* Update local IOVA mapped ranges */
-> > > +    if (entry->perm) {
-> > > +        if (mapped) {
-> > > +            /* Skip since we have already mapped this range */
-> > > +            trace_vtd_page_walk_one_skip_map(entry->iova, entry-
-> > >addr_mask,
-> > > +                                             mapped->start, mapped=
-->end);
-> > > +            return 0;
-> > > +        }
-> > > +        it_tree_insert(as->iova_tree, entry->iova,
-> > > +                       entry->iova + entry->addr_mask);
-> >=20
-> > I was consider a case e.g:
-> >=20
-> > 1) map A (iova) to B (pa)
-> > 2) invalidate A
-> > 3) map A (iova) to C (pa)
-> > 4) invalidate A
-> >=20
-> > In this case, we will probably miss a walk here. But I'm not sure it =
-was
-> > allowed by the spec (though I think so).
-> >=20
+Laszlo Ersek <lersek@redhat.com> writes:
 
-Hi, Kevin,
+> Add a new field @target (of type @SysEmuTarget) to the output of the
+> @query-cpus-fast command, which provides more information about the
+> emulation target than the field @arch (of type @CpuInfoArch). Make @target
+> the new discriminator for the @CpuInfoFast return structure. Keep @arch
+> for compatibility.
+>
+> Cc: "Daniel P. Berrange" <berrange@redhat.com>
+> Cc: Eric Blake <eblake@redhat.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+> ---
+>
+> Notes:
+>     PATCHv2:
+>     
+>     - drop patch v1 5/6 with the CpuInfoCommon refactoring / extraction, as
+>       @CpuInfo / @query-cpus are deprecated [Eric, Markus]
+>     
+>     - for the same reason, add @target to @CpuInfoFast / @query-cpus-fast
+>       only [Eric, Markus]
+>     
+>     - Can't set @arch compatibly from a QAPI enum lookup of the proposed
+>       TARGET_BASE_ARCH macro, because TARGET_BASE_ARCH=s390x is not
+>       identical to the @s390 @CpuInfoArch constant -- see more at
+>       <http://mid.mail-archive.com/f0c9c7ca-3dcf-4f74-9812-5dea5b6376cd@redhat.com>.
+>       Keep sysemu_target_to_cpuinfo_arch() instead. [Markus, Eric]
+>     
+>     - update CC list
+>     
+>     PATCHv1:
+>     
+>     - new patch
+>
+>  qapi/misc.json | 63 ++++++++++++++++++++++++++++++++----------
+>  cpus.c         | 87 ++++++++++++++++++++++++++++++++++++++++++----------------
+>  2 files changed, 111 insertions(+), 39 deletions(-)
+>
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index 460866cf542f..74e5c2e3b8f7 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -550,41 +550,72 @@
+>  # Information about a virtual CPU
+>  #
+>  # @cpu-index: index of the virtual CPU
+>  #
+>  # @qom-path: path to the CPU object in the QOM tree
+>  #
+>  # @thread-id: ID of the underlying host thread
+>  #
+>  # @props: properties describing to which node/socket/core/thread
+>  #         virtual CPU belongs to, provided if supported by board
+>  #
+> -# @arch: architecture of the cpu, which determines which additional fields
+> -#        will be listed
+> +# @arch: base architecture of the cpu
 
-Thanks for joining the discussion.
+Let's deprecate this misbegotten enumeration, as I proposed in
+Message-ID: <87bme5uolc.fsf@dusky.pond.sub.org>.  Could be done as a
+follow-up patch.
 
->=20
-> I thought it was wrong in a glimpse, but then changed my mind after
-> another thinking. As long as device driver can quiescent the device
-> to not access A (iova) within above window, then above sequence
-> has no problem since any stale mappings (A->B) added before step 4)
-> won't be used and then will get flushed after step 4). Regarding to
-> that actually the 1st invalidation can be skipped:
->=20
-> 1) map A (iova) to B (pa)
-> 2) driver programs device to use A
-> 3) driver programs device to not use A
-> 4) map A (iova) to C (pa)
-> 	A->B may be still valid in IOTLB
-> 5) invalidate A
-> 6) driver programs device to use A
+> +#
+> +# @target: the QEMU system emulation target, which is more specific than
+> +#          @arch and determines which additional fields will be listed
+> +#          (since 2.13)
+> +#
 
-Note that IMHO this is a bit different from Jason's example, and it'll
-be fine.  Current code should work well with this scenario since the
-emulation code will not aware of the map A until step (5).  Then we'll
-have the correct mapping.
+May want to drop "is more specific than @arch and" then.
 
-While for Jason's example it's exactly the extra PSI that might cause
-stale mappings (though again I think it's still problematic...).
+>  #
+>  # Since: 2.12
+>  #
+>  ##
+[...]
 
-Actually I think I can just fix up the code even if Jason's case
-happens by unmapping that first then remap:
-
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 31e9b52452..2a9584f9d8 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -778,13 +778,21 @@ static int vtd_page_walk_one(IOMMUTLBEntry *entry, =
-int level,
-     /* Update local IOVA mapped ranges */
-     if (entry->perm) {
-         if (mapped) {
--            /* Skip since we have already mapped this range */
--            trace_vtd_page_walk_one_skip_map(entry->iova, entry->addr_ma=
-sk,
--                                             mapped->start, mapped->end)=
-;
--            return 0;
-+            int ret;
-+            /* Cache the write permission */
-+            IOMMUAccessFlags flags =3D entry->perm;
-+
-+            /* UNMAP the old first then remap.  No need to touch IOVA tr=
-ee */
-+            entry->perm =3D IOMMU_NONE;
-+            ret =3D hook_fn(entry, private);
-+            if (ret) {
-+                return ret;
-+            }
-+            entry->perm =3D flags;
-+        } else {
-+            it_tree_insert(as->iova_tree, entry->iova,
-+                           entry->iova + entry->addr_mask);
-         }
--        it_tree_insert(as->iova_tree, entry->iova,
--                       entry->iova + entry->addr_mask);
-     } else {
-         if (!mapped) {
-             /* Skip since we didn't map this range at all */
-
-If we really think it necessary, I can squash this in, though this is
-a bit ugly.  But I just want to confirm whether this would be anything
-we want...
-
-Thanks,
-
---=20
-Peter Xu
+In case we decide not to deprecate @arch right away:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
