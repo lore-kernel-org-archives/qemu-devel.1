@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50916)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fC0eR-0000dH-8X
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 06:30:52 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fC0mr-0007WI-Ro
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 06:39:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fC0eN-0008AP-70
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 06:30:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45070)
+	(envelope-from <peter.maydell@linaro.org>) id 1fC0mq-0003Sg-Qe
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 06:39:33 -0400
+Received: from mail-oi0-x236.google.com ([2607:f8b0:4003:c06::236]:43516)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fC0eN-00089o-1T
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 06:30:47 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fC0eL-0005yK-ER
-	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 10:30:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 257192E80CE
-	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 10:30:45 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fC0mq-0003S8-Jp
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 06:39:32 -0400
+Received: by mail-oi0-x236.google.com with SMTP id p62-v6so1155787oie.10
+	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 03:39:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 27 Apr 2018 10:15:47 -0000
+In-Reply-To: <20180427092126.24812-1-david@gibson.dropbear.id.au>
+References: <20180427092126.24812-1-david@gibson.dropbear.id.au>
 From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1767200 <1767200@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152477729035.32740.12821774063572767433.malonedeb@gac.canonical.com>
-Message-Id: <152482414729.21735.11071637612543894282.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1767200] Re: Kernel Panic Unable to mount root fs
- on unknown-block(31, 3)
+Date: Fri, 27 Apr 2018 11:39:11 +0100
+Message-ID: <CAFEAcA-wfEoR36y36bvOGSowCmsZyEEXUKb=U+fbs1h31k1Qdw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/49] ppc-for-2.13 queue 20180427
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,40 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Greg Kurz <groug@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>
 
-That's a guest error message, meaning it couldn't mount the root filesystem=
-. This is almost certainly because you're not telling the guest kernel the =
-right argument for where to find its rootfs (which you've provided with -cd=
-rom). Googling suggests that you're getting this kernel from https://github=
-.com/dhruvvyas90/qemu-rpi-kernel -- which has a readme file which tells you=
- what command line options you need to use. Specifically:
- * you need to have 'root=3D/dev/sda2' in your -append argument
- * you want to use -hda rather than -cdrom
+On 27 April 2018 at 10:20, David Gibson <david@gibson.dropbear.id.au> wrote:
+> The following changes since commit ca92651697bdb2f15b36d347a498fbc31f4a4893:
+>
+>   Merge remote-tracking branch 'remotes/iwj/tags/for-upstream.depriv-2' into staging (2018-04-26 19:22:09 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/dgibson/qemu.git tags/ppc-for-2.13-20180427
+>
+> for you to fetch changes up to 6233b679cae8741890f981c9dd6570d47715141e:
+>
+>   Clear mem_path if we fall back to anonymous RAM allocation (2018-04-27 18:05:23 +1000)
+>
+> ----------------------------------------------------------------
+> ppc patch queue 2018-04-27
+>
+> Here's the first batch of ppc patches for 2.13.  This has a lot of
+> stuff that's accumulated during the 2.12 freeze.  Highlights are:
+>
+>     * Many improvements for the Uninorth PCI host bridge for Mac
+>       machine types
+>     * Preliminary helpers improve handling of multiple backing
+>       pagesizes (not strictly ppc related, but have acks and aimed to
+>       allow future ppc changes)
+>     * Cleanups to pseries cpu initialization
+>     * Cleanups to hash64 MMU handling
+>     * Assorted bugfixes and improvements
+>
 
--- =
+Applied, thanks.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1767200
-
-Title:
-  Kernel Panic Unable to mount root fs on unknown-block(31,3)
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  Using the latest qemu:
-  qemu-system-arm.exe -kernel C:\Users\a\Downloads\kernel-qemu-4.4.34-jessi=
-e -cpu arm1176 -m 256 -machine versatilepb -cdrom C:\Users\a\Downloads\pico=
-re-9.0.3.img
-
-  Gives error:
-  Kernel Panic Unable to mount root fs on unknown-block(31,3)
-
-  I have tried different ARMv6 ARMv7 images/kernels with the same
-  result.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1767200/+subscriptions
+-- PMM
