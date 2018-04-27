@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1fC2UG-0006t0-OR
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:28:29 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1fC2Uj-0007Kh-6N
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:28:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1fC2UF-0004tO-T1
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:28:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33262 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1fC2UF-0004t8-OE
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:28:27 -0400
-References: <20180427121723.3543-1-lvivier@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <a14b1299-318d-7cff-899a-4ae6d9273491@redhat.com>
-Date: Fri, 27 Apr 2018 14:28:17 +0200
+	(envelope-from <dovgaluk@ispras.ru>) id 1fC2Ue-00053i-8I
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:28:57 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:43258)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1fC2Ud-000537-V2
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:28:52 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <1488382850-19252-1-git-send-email-kraxel@redhat.com>
+	<1488382850-19252-2-git-send-email-kraxel@redhat.com>
+	<CAFEAcA828YS+TfiiCfgAM6WMrSr1PGrTBgHrL0NNiw87LW+Mzw@mail.gmail.com>
+In-Reply-To: <CAFEAcA828YS+TfiiCfgAM6WMrSr1PGrTBgHrL0NNiw87LW+Mzw@mail.gmail.com>
+Date: Fri, 27 Apr 2018 15:28:41 +0300
+Message-ID: <002701d3de23$46d963f0$d48c2bd0$@ru>
 MIME-Version: 1.0
-In-Reply-To: <20180427121723.3543-1-lvivier@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain;
+	charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] tcg: workaround branch instruction overflow
- in tcg_out_qemu_ld/st
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PULL v3 1/3] replay: add record/replay for audio
+ passthrough
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +31,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>
+To: 'Peter Maydell' <peter.maydell@linaro.org>, 'Gerd Hoffmann' <kraxel@redhat.com>
+Cc: 'QEMU Developers' <qemu-devel@nongnu.org>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, 'Paolo Bonzini' <pbonzini@redhat.com>
 
-On 27/04/2018 14:17, Laurent Vivier wrote:
-> ppc64 uses a BC instruction to call the tcg_out_qemu_ld/st
-> slow path. BC instruction uses a relative address encoded
-> on 14 bits.
+> From: Peter Maydell [mailto:peter.maydell@linaro.org]
+> On 1 March 2017 at 15:40, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> > From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+> >
+> > This patch adds recording and replaying audio data. Is saves synchronization
+> > information for audio out and inputs from the microphone.
+> >
+> > v2: removed unneeded whitespace change
+> >
+> > Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+> > Message-id: 20170202055054.4848.94901.stgit@PASHA-ISP.lan02.inno
+> >
+> > [ kraxel: add qemu/error-report.h include to fix osx build failure ]
+> >
+> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> > ---
+> >  audio/audio.c            |  9 ++++--
+> >  audio/audio.h            |  5 +++
+> >  audio/mixeng.c           | 32 ++++++++++++++++++++
+> >  docs/replay.txt          |  7 +++++
+> >  include/sysemu/replay.h  |  7 +++++
+> >  replay/Makefile.objs     |  1 +
+> >  replay/replay-audio.c    | 79 ++++++++++++++++++++++++++++++++++++++++++++++++
+> >  replay/replay-internal.h |  4 +++
+> >  8 files changed, 142 insertions(+), 2 deletions(-)
+> >  create mode 100644 replay/replay-audio.c
+> >
+> > diff --git a/audio/audio.c b/audio/audio.c
+> > index c845a44..21f7b0b 100644
+> > --- a/audio/audio.c
+> > +++ b/audio/audio.c
+> > @@ -28,6 +28,7 @@
+> >  #include "qemu/timer.h"
+> >  #include "sysemu/sysemu.h"
+> >  #include "qemu/cutils.h"
+> > +#include "sysemu/replay.h"
+> >
+> >  #define AUDIO_CAP "audio"
+> >  #include "audio_int.h"
+> > @@ -1387,6 +1388,7 @@ static void audio_run_out (AudioState *s)
+> >
+> >          prev_rpos = hw->rpos;
+> >          played = hw->pcm_ops->run_out (hw, live);
+> > +        replay_audio_out(&played);
+> >          if (audio_bug (AUDIO_FUNC, hw->rpos >= hw->samples)) {
+> >              dolog ("hw->rpos=%d hw->samples=%d played=%d\n",
+> >                     hw->rpos, hw->samples, played);
 > 
-> The slow path functions are added at the end of the generated
-> instructions buffer, in the reverse order of the callers.
-> So more we have slow path functions more the distance between
-> the caller (BC) and the function increases.
+> Hi. Coverity produces a new warning because of this change (CID1390632),
+> because it treats the replay file as "tainted data", and complains
+> that we trust a value from the file to become a sample count
+> passed to audio_capture_mix_and_clear() and eventually used as
+> a byte count for a memset.
 > 
-> This patch changes the behavior to generate the functions in
-> the same order of the callers.
-> 
-> Fixes: 15fa08f845 ("tcg: Dynamically allocate TCGOps")
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
-> 
-> Notes:
->     This is an RFC for several reasons:
->     - it doens't really fix the overflow problem
->       only avoids the case
->     - it uses a recursive function to revert the slow path
->       functions order (and we can have a stack overflow...),
+> Do we trust the replay file to be non-malicious (making this
+> a false-positive), or not (in which case we need to sanitize
+> or check its contents somehow) ?
 
-I think the number of slow path functions cannot be greater than
-TCG_MAX_INSNS (i.e. 512): is it enough to overflow the stack?
+Replay file is generated by QEMU and does not affected by the guest system directly.
+This file is used by the developer himself (e.g., recording and replaying execution
+on the same machine for the analysis or debugging).
+Replay file can also be used by testers for bug reporting (e.g., to send bug
+reproduction scenario to the developer).
 
-Thanks,
-Laurent
+In the case of transferring the file it can be used as an exploit.
+But I cannot judge is it a real threat or just inessential one.
+
+Pavel Dovgalyuk
