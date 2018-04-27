@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fC0Yy-00031N-QV
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 06:25:13 -0400
+	(envelope-from <bounces@canonical.com>) id 1fC0eR-0000dH-8X
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 06:30:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fC0Yy-0005ZD-3k
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 06:25:12 -0400
-References: <1521452376-25099-1-git-send-email-thuth@redhat.com>
-	<87in8qf2w3.fsf@dusky.pond.sub.org>
-	<62dba5cf-b497-1a98-0af5-971e169a3458@redhat.com>
-	<877eou2nek.fsf@dusky.pond.sub.org>
-	<099d2af4-8fe3-f80c-693f-495accb26a17@redhat.com>
-	<CAFEAcA_VAckXDgARe5dJdxe9N19quUD5Dn+Dseuj=itLbFmG0g@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <40c06711-f9a0-3440-9a47-8230cbcb3d55@redhat.com>
-Date: Fri, 27 Apr 2018 12:24:57 +0200
+	(envelope-from <bounces@canonical.com>) id 1fC0eN-0008AP-70
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 06:30:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45070)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fC0eN-00089o-1T
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 06:30:47 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fC0eL-0005yK-ER
+	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 10:30:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 257192E80CE
+	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 10:30:45 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_VAckXDgARe5dJdxe9N19quUD5Dn+Dseuj=itLbFmG0g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-arm]  qom-test
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 27 Apr 2018 10:15:47 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1767200 <1767200@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152477729035.32740.12821774063572767433.malonedeb@gac.canonical.com>
+Message-Id: <152482414729.21735.11071637612543894282.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1767200] Re: Kernel Panic Unable to mount root fs
+ on unknown-block(31, 3)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +37,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 27.04.2018 12:20, Peter Maydell wrote:
-> On 27 April 2018 at 07:06, Thomas Huth <thuth@redhat.com> wrote:
->> On 26.04.2018 13:54, Markus Armbruster wrote:
->> [...]
->>> Actually, a worse offender in the "waste everybody's time via redunancy"
->>> department could be qom-test.
->>
->> Shall we change qom-test to also only test with the "none" machine in
->> the normal "make check" mode and only do the full test with all machines
->> in "make check SPEED=slow" ?
-> 
-> We definitely want something that tries to instantiate every
-> machine, because that does catch bugs.
+That's a guest error message, meaning it couldn't mount the root filesystem=
+. This is almost certainly because you're not telling the guest kernel the =
+right argument for where to find its rootfs (which you've provided with -cd=
+rom). Googling suggests that you're getting this kernel from https://github=
+.com/dhruvvyas90/qemu-rpi-kernel -- which has a readme file which tells you=
+ what command line options you need to use. Specifically:
+ * you need to have 'root=3D/dev/sda2' in your -append argument
+ * you want to use -hda rather than -cdrom
 
-Yes, after having a closer look at this one, I also think that we should
-*not* change it to run with "none" by default only. The 'qom-list'
-command results in quite a different output depending on which machine
-you run it on.
+-- =
 
- Thomas
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1767200
+
+Title:
+  Kernel Panic Unable to mount root fs on unknown-block(31,3)
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Using the latest qemu:
+  qemu-system-arm.exe -kernel C:\Users\a\Downloads\kernel-qemu-4.4.34-jessi=
+e -cpu arm1176 -m 256 -machine versatilepb -cdrom C:\Users\a\Downloads\pico=
+re-9.0.3.img
+
+  Gives error:
+  Kernel Panic Unable to mount root fs on unknown-block(31,3)
+
+  I have tried different ARMv6 ARMv7 images/kernels with the same
+  result.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1767200/+subscriptions
