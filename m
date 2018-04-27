@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fBzIz-0000z5-FG
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:04:45 -0400
+	(envelope-from <peterx@redhat.com>) id 1fBzLu-0002q2-LX
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:07:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fBzIt-0001xU-MK
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:04:37 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54292 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fBzLq-0002zG-Jl
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:07:38 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33954 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fBzIt-0001xK-Ge
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:04:31 -0400
-Date: Fri, 27 Apr 2018 10:04:18 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180427090418.GC32172@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1524666934-8064-1-git-send-email-lidongchen@tencent.com>
-	<1524666934-8064-4-git-send-email-lidongchen@tencent.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1524666934-8064-4-git-send-email-lidongchen@tencent.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] migration: remove unnecessary
- variables len in QIOChannelRDMA
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fBzLq-0002z5-F7
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:07:34 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1A9EA722FC
+	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 09:07:34 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Fri, 27 Apr 2018 17:07:24 +0800
+Message-Id: <20180427090724.18338-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] vhost: add trace for IOTLB miss
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +27,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lidong Chen <jemmy858585@gmail.com>
-Cc: quintela@redhat.com, dgilbert@redhat.com, galsha@mellanox.com, adido@mellanox.com, aviadye@mellanox.com, qemu-devel@nongnu.org, licq@mellanox.com, Lidong Chen <lidongchen@tencent.com>
+To: qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>
 
-On Wed, Apr 25, 2018 at 10:35:32PM +0800, Lidong Chen wrote:
-> Because qio_channel_rdma_writev and qio_channel_rdma_readv maybe invoke=
-d
-> by different threads concurrently, this patch removes unnecessary varia=
-bles
-> len in QIOChannelRDMA and use local variable instead.
->=20
-> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
-> ---
->  migration/rdma.c | 15 +++++++--------
->  1 file changed, 7 insertions(+), 8 deletions(-)
+Add some trace points for IOTLB translation for vhost. After vhost-user
+is setup, the only IO path that QEMU will participate should be the
+IOMMU translation, so it'll be good we can track this with explicit
+timestamps when needed to see how long time we take to do the
+translation, and whether there's anything stuck inside.  It might be
+useful for triaging vhost-user problems.
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+v2:
+- rebase
+---
+ hw/virtio/vhost.c      | 7 +++++++
+ hw/virtio/trace-events | 1 +
+ 2 files changed, 8 insertions(+)
 
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index 9d5850a7d7..b08290036d 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -894,12 +894,15 @@ int vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write)
+ 
+     rcu_read_lock();
+ 
++    trace_vhost_iotlb_miss(dev, 1);
++
+     iotlb = address_space_get_iotlb_entry(dev->vdev->dma_as,
+                                           iova, write);
+     if (iotlb.target_as != NULL) {
+         ret = vhost_memory_region_lookup(dev, iotlb.translated_addr,
+                                          &uaddr, &len);
+         if (ret) {
++            trace_vhost_iotlb_miss(dev, 3);
+             error_report("Fail to lookup the translated address "
+                          "%"PRIx64, iotlb.translated_addr);
+             goto out;
+@@ -911,10 +914,14 @@ int vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write)
+         ret = vhost_backend_update_device_iotlb(dev, iova, uaddr,
+                                                 len, iotlb.perm);
+         if (ret) {
++            trace_vhost_iotlb_miss(dev, 4);
+             error_report("Fail to update device iotlb");
+             goto out;
+         }
+     }
++
++    trace_vhost_iotlb_miss(dev, 2);
++
+ out:
+     rcu_read_unlock();
+ 
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+index 1422ff03ab..07bcbe9e85 100644
+--- a/hw/virtio/trace-events
++++ b/hw/virtio/trace-events
+@@ -6,6 +6,7 @@ vhost_region_add_section(const char *name, uint64_t gpa, uint64_t size, uint64_t
+ vhost_region_add_section_merge(const char *name, uint64_t new_size, uint64_t gpa, uint64_t owr) "%s: size: 0x%"PRIx64 " gpa: 0x%"PRIx64 " owr: 0x%"PRIx64
+ vhost_region_add_section_aligned(const char *name, uint64_t gpa, uint64_t size, uint64_t host) "%s: 0x%"PRIx64"+0x%"PRIx64" @ 0x%"PRIx64
+ vhost_section(const char *name, int r) "%s:%d"
++vhost_iotlb_miss(void *dev, int step) "%p step %d"
+ 
+ # hw/virtio/vhost-user.c
+ vhost_user_postcopy_end_entry(void) ""
+-- 
+2.14.3
