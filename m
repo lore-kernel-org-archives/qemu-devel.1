@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53730)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fC93V-00065F-JK
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 15:29:19 -0400
+	(envelope-from <marcel@redhat.com>) id 1fC9Al-0003Hc-AZ
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 15:36:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fC93U-00010O-FT
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 15:29:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43330 helo=mx1.redhat.com)
+	(envelope-from <marcel@redhat.com>) id 1fC9Ai-0005sb-6u
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 15:36:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35104 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fC93U-0000w7-AN
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 15:29:16 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3E6ACEBFF7
-	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 19:29:10 +0000 (UTC)
-From: Laszlo Ersek <lersek@redhat.com>
-Date: Fri, 27 Apr 2018 21:28:49 +0200
-Message-Id: <20180427192852.15013-3-lersek@redhat.com>
-In-Reply-To: <20180427192852.15013-1-lersek@redhat.com>
-References: <20180427192852.15013-1-lersek@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 2/5] qapi: add SysEmuTarget to "common.json"
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1fC9Ai-0005s5-13
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 15:36:44 -0400
+References: <20180219114332.70443-1-marcel@redhat.com>
+	<20180219114332.70443-10-marcel@redhat.com>
+	<CAFEAcA8_LPFnLjCS30vWDZM49ztHE0gvqmrTNnyb4SFTE97W7Q@mail.gmail.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <8659dc43-a5a2-f4ca-3381-8698a1a06ad3@redhat.com>
+Date: Fri, 27 Apr 2018 22:36:33 +0300
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA8_LPFnLjCS30vWDZM49ztHE0gvqmrTNnyb4SFTE97W7Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH PULL v2 09/10] hw/rdma: Implementation of
+ PVRDMA device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,145 +30,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Yuval Shaia <yuval.shaia@oracle.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-We'll soon need an enumeration type that lists all the softmmu targets
-that QEMU (the project) supports. Introduce @SysEmuTarget to
-"common.json".
+On 27/04/2018 17:49, Peter Maydell wrote:
+> On 19 February 2018 at 11:43, Marcel Apfelbaum <marcel@redhat.com> wrote:
+>> From: Yuval Shaia <yuval.shaia@oracle.com>
+>>
+>> PVRDMA is the QEMU implementation of VMware's paravirtualized RDMA device.
+>> It works with its Linux Kernel driver AS IS, no need for any special
+>> guest modifications.
+>>
+>> While it complies with the VMware device, it can also communicate with
+>> bare metal RDMA-enabled machines and does not require an RDMA HCA in the
+>> host, it can work with Soft-RoCE (rxe).
+>>
+>> It does not require the whole guest RAM to be pinned allowing memory
+>> over-commit and, even if not implemented yet, migration support will be
+>> possible with some HW assistance.
+>>
+>> Implementation is divided into 2 components, rdma general and pvRDMA
+>> specific functions and structures.
+>>
+>> The second PVRDMA sub-module - interaction with PCI layer.
+>> - Device configuration and setup (MSIX, BARs etc).
+>> - Setup of DSR (Device Shared Resources)
+>> - Setup of device ring.
+>> - Device management.
+>>
+>> Reviewed-by: Dotan Barak <dotanb@mellanox.com>
+>> Reviewed-by: Zhu Yanjun <yanjun.zhu@oracle.com>
+>> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+>> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+> 
+> Hi; this is something odd I noticed reading through the code.
+> 
+>> +static void init_bars(PCIDevice *pdev)
+>> +{
+>> +    PVRDMADev *dev = PVRDMA_DEV(pdev);
+>> +
+>> +    /* BAR 0 - MSI-X */
+>> +    memory_region_init(&dev->msix, OBJECT(dev), "pvrdma-msix",
+>> +                       RDMA_BAR0_MSIX_SIZE);
+>> +    pci_register_bar(pdev, RDMA_MSIX_BAR_IDX, PCI_BASE_ADDRESS_SPACE_MEMORY,
+>> +                     &dev->msix);
+>> +
+>> +    /* BAR 1 - Registers */
+>> +    memset(&dev->regs_data, 0, sizeof(dev->regs_data));
+>> +    memory_region_init_io(&dev->regs, OBJECT(dev), &regs_ops, dev,
+>> +                          "pvrdma-regs", RDMA_BAR1_REGS_SIZE);
+> 
+> RDMA_BAR1_REGS_SIZE is used in pvrdma.h to declare the regs array:
+>     uint32_t regs_data[RDMA_BAR1_REGS_SIZE];
+> and that and the way that get_reg_val/set_reg_val do "addr >> 2" to
+> convert from an address to an array index suggest that it is the
+> size of the BAR in 32-bit words. However here we're passing it
+> as the size parameter of memory_region_init_io(), which wants a
+> size in bytes. Which is correct ?
+> 
 
-The enum constant @x86_64 doesn't match the QAPI convention of preferring
-hyphen ("-") over underscore ("_"). This is intentional; the @SysEmuTarget
-constants are supposed to produce QEMU executable names when stringified
-and appended to the "qemu-system-" prefix. Put differently, the
-replacement text of the TARGET_NAME preprocessor macro must be possible to
-look up in the list of (stringified) enum constants.
+I think that RDMA_BAR1_REGS_SIZE (256) is the size in bytes,
+this is the layout of the registers (linux kernel):
 
-Like other enum types, @SysEmuTarget too can be used for discriminator
-fields in unions. For the @i386 constant, a C-language union member called
-"i386" would be generated. On mingw build hosts, "i386" is a macro
-however. Add "i386" to "polluted_words" at once.
+/* Register offsets within PCI resource on BAR1. */
+#define PVRDMA_REG_VERSION      0x00    /* R: Version of device. */
+#define PVRDMA_REG_DSRLOW       0x04    /* W: Device shared region low PA. */
+#define PVRDMA_REG_DSRHIGH      0x08    /* W: Device shared region high PA. */
+#define PVRDMA_REG_CTL          0x0c    /* W: PVRDMA_DEVICE_CTL */
+#define PVRDMA_REG_REQUEST      0x10    /* W: Indicate device request. */
+#define PVRDMA_REG_ERR          0x14    /* R: Device error. */
+#define PVRDMA_REG_ICR          0x18    /* R: Interrupt cause. */
+#define PVRDMA_REG_IMR          0x1c    /* R/W: Interrupt mask. */
+#define PVRDMA_REG_MACL         0x20    /* R/W: MAC address low. */
+#define PVRDMA_REG_MACH         0x24    /* R/W: MAC address high. */
 
-Cc: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Laszlo Ersek <lersek@redhat.com>
----
+So we don't need 256 32-bit words.
+Yuval can you please confirm?
 
-Notes:
-    PATCHv3:
-    
-    - copy the suggested (shorter) Notes: wrt. underscore use in @x86_64 to
-      the schema, and move the original (longer) schema Notes: to the commit
-      message [Eric]
-    
-    - no R-b's picked up due to the above change
-    
-    PATCHv2:
-    
-    - document the use of the underscore in @x86_64 in both the commit
-      message and in the schema [Eric, Dan]
-    
-    - extend "polluted_words" with "i386" [Eric]
-    
-    - drop previous R-b's
-    
-    - update the CC list
-    
-    PATCHv1:
-    
-    - pick up R-b's from Markus and Kashyap, no changes
-    
-    RFCv3:
-    
-    - The patch is new in this version. [Dan, Markus]
-    
-    - The original idea was to call the new enum @Target; however, @Target
-      generates exactly the TARGET_AARCH64, TARGET_ALPHA, TARGET_ARM, ...
-      enumeration constants that conflict with the poisoned preprocessing
-      macros of the same names. Hence @SysEmuTarget -- it's more accurate
-      anyway, since we want it to stand for system emulation targets.
-    
-    - Also, we discussed defining the new type in either "common.json" or
-      "misc.json". "misc.json" turned out to be a problem: "firmware.json"
-      would then include "misc.json" for the new type's sake, but that
-      inclusion would become the first appearance of "misc.json" -- within
-      "firmware.json". That messed up the generated documentation. By adding
-      the new type to "common.json", "misc.json" (see the 2nd patch) and
-      "firmware.json" (see the 3rd patch) can both consume the new type
-      without problems.
 
- qapi/common.json       | 23 +++++++++++++++++++++++
- scripts/qapi/common.py |  2 +-
- 2 files changed, 24 insertions(+), 1 deletion(-)
+Thanks,
+Marcel
 
-diff --git a/qapi/common.json b/qapi/common.json
-index d9b14dd429f3..c811d0498457 100644
---- a/qapi/common.json
-+++ b/qapi/common.json
-@@ -118,11 +118,34 @@
- #
- # @bar3: PCI BAR3 is used for the feature
- #
- # @bar4: PCI BAR4 is used for the feature
- #
- # @bar5: PCI BAR5 is used for the feature
- #
- # Since: 2.12
- ##
- { 'enum': 'OffAutoPCIBAR',
-   'data': [ 'off', 'auto', 'bar0', 'bar1', 'bar2', 'bar3', 'bar4', 'bar5' ] }
-+
-+##
-+# @SysEmuTarget:
-+#
-+# The comprehensive enumeration of QEMU system emulation ("softmmu")
-+# targets. Run "./configure --help" in the project root directory, and
-+# look for the *-softmmu targets near the "--target-list" option. The
-+# individual target constants are not documented here, for the time
-+# being.
-+#
-+# Notes: The resulting QMP strings can be appended to the "qemu-system-"
-+#        prefix to produce the corresponding QEMU executable name. This
-+#        is true even for "qemu-system-x86_64".
-+#
-+# Since: 2.13
-+##
-+{ 'enum' : 'SysEmuTarget',
-+  'data' : [ 'aarch64', 'alpha', 'arm', 'cris', 'hppa', 'i386', 'lm32',
-+             'm68k', 'microblaze', 'microblazeel', 'mips', 'mips64',
-+             'mips64el', 'mipsel', 'moxie', 'nios2', 'or1k', 'ppc',
-+             'ppc64', 'ppcemb', 'riscv32', 'riscv64', 's390x', 'sh4',
-+             'sh4eb', 'sparc', 'sparc64', 'tricore', 'unicore32',
-+             'x86_64', 'xtensa', 'xtensaeb' ] }
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 3e14bc41f2c0..a032cec37509 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -1814,23 +1814,23 @@ def c_name(name, protect=True):
-     # C++ ISO/IEC 14882:2003 2.11
-     cpp_words = set(['bool', 'catch', 'class', 'const_cast', 'delete',
-                      'dynamic_cast', 'explicit', 'false', 'friend', 'mutable',
-                      'namespace', 'new', 'operator', 'private', 'protected',
-                      'public', 'reinterpret_cast', 'static_cast', 'template',
-                      'this', 'throw', 'true', 'try', 'typeid', 'typename',
-                      'using', 'virtual', 'wchar_t',
-                      # alternative representations
-                      'and', 'and_eq', 'bitand', 'bitor', 'compl', 'not',
-                      'not_eq', 'or', 'or_eq', 'xor', 'xor_eq'])
-     # namespace pollution:
--    polluted_words = set(['unix', 'errno', 'mips', 'sparc'])
-+    polluted_words = set(['unix', 'errno', 'mips', 'sparc', 'i386'])
-     name = name.translate(c_name_trans)
-     if protect and (name in c89_words | c99_words | c11_words | gcc_words
-                     | cpp_words | polluted_words):
-         return 'q_' + name
-     return name
- 
- eatspace = '\033EATSPACE.'
- pointer_suffix = ' *' + eatspace
- 
- 
- def genindent(count):
--- 
-2.14.1.3.gb7cf6e02401b
+> thanks
+> -- PMM
+> 
