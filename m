@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBzsI-0002PC-U1
+	(envelope-from <thuth@redhat.com>) id 1fBzsI-0002PI-VA
 	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:41:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBzsI-0003yc-2v
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:41:06 -0400
+	(envelope-from <thuth@redhat.com>) id 1fBzsI-0003yn-52
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:41:07 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Fri, 27 Apr 2018 11:40:42 +0200
-Message-Id: <1524822046-22779-1-git-send-email-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 0/4] Add new CD-ROM related qtests
+Date: Fri, 27 Apr 2018 11:40:46 +0200
+Message-Id: <1524822046-22779-5-git-send-email-thuth@redhat.com>
+In-Reply-To: <1524822046-22779-1-git-send-email-thuth@redhat.com>
+References: <1524822046-22779-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 4/4] MAINTAINERS: Add the cdrom-test to
+ John's section
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,41 +23,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 Cc: qemu-block@nongnu.org
 
-With one of my clean-up patches (see commit 1454509726719e0933c800), I
-recently accidentially broke the "-cdrom" parameter (more precisely
-"-drive if=3Dscsi") on a couple of boards, since there was no error
-detected during the "make check" regression testing. This is clearly an
-indication that we are lacking tests in this area.
-So this small patch series now introduces some tests for CD-ROM drives:
-The first two patches introduce the possibility to check that booting
-from CD-ROM drives still works fine for x86 and s390x, and the third
-patch adds a test that certain machines can at least still be started
-with the "-cdrom" parameter (i.e. that test would have catched the
-mistake that I did with my SCSI cleanup patch).
+The cdrom-test checks various block types - IDE, SCSI and
+virtio, so it's a little bit hard to decide where this should
+belong to in the MAINTAINERS file. But John volunteered to take
+it, so let's put it into the IDE section for now.
 
-v3:
- - Rebased to current master branch
- - Add a final patch that adds an entry to the MAINTAINERS file
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-v2:
- - Use g_spawn_sync() instead of execlp() to run genisoimage
- - The "-cdrom" parameter test is now run on all architectures (with
-   machine "none" for the machines that are not explicitly checked)
- - Some rewordings and improved comments here and there
-
-Thomas Huth (4):
-  tests/boot-sector: Add magic bytes to s390x boot code header
-  tests/cdrom-test: Test booting from CD-ROM ISO image file
-  tests/cdrom-test: Test that -cdrom parameter is working
-  MAINTAINERS: Add the cdrom-test to John's section
-
- MAINTAINERS            |   1 +
- tests/Makefile.include |   2 +
- tests/boot-sector.c    |   9 +-
- tests/cdrom-test.c     | 222 +++++++++++++++++++++++++++++++++++++++++++=
-++++++
- 4 files changed, 231 insertions(+), 3 deletions(-)
- create mode 100644 tests/cdrom-test.c
-
---=20
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 24b7016..6cceb10 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -998,6 +998,7 @@ F: hw/block/cdrom.c
+ F: hw/block/hd-geometry.c
+ F: tests/ide-test.c
+ F: tests/ahci-test.c
++F: tests/cdrom-test.c
+ F: tests/libqos/ahci*
+ T: git git://github.com/jnsnow/qemu.git ide
+ 
+-- 
 1.8.3.1
