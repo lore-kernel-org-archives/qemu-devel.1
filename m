@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fC6Yu-0004J6-Ao
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:49:33 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fC74w-0005nV-Ni
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 13:22:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fC6Yq-0005LC-9z
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:49:32 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39190 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fC6Yq-0005Kl-2W
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:49:28 -0400
-Date: Fri, 27 Apr 2018 17:49:14 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180427164914.GM2608@work-vm>
-References: <20180420175721.18479-1-dgilbert@redhat.com>
-	<20180426050959.GN9036@xz-mi>
+	(envelope-from <alex.bennee@linaro.org>) id 1fC74r-0002rF-Nr
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 13:22:38 -0400
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:33346)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fC74r-0002qz-DJ
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 13:22:33 -0400
+Received: by mail-wm0-x231.google.com with SMTP id x12so4006136wmc.0
+	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 10:22:33 -0700 (PDT)
+References: <20180425012300.14698-1-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180425012300.14698-1-richard.henderson@linaro.org>
+Date: Fri, 27 Apr 2018 18:22:30 +0100
+Message-ID: <87wowsk1ih.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180426050959.GN9036@xz-mi>
-Subject: Re: [Qemu-devel] [PATCH] migration: update docs
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/9] target/arm: Fixups for
+ ARM_FEATURE_V8_FP16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,161 +30,218 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, peter.maydell@linaro.org
-
-* Peter Xu (peterx@redhat.com) wrote:
-> On Fri, Apr 20, 2018 at 06:57:21PM +0100, Dr. David Alan Gilbert (git) wrote:
-> 
-> [...]
-> 
-> >  Saving the state of one device
-> >  ==============================
-> >  
-> > -The state of a device is saved using intermediate buffers.  There are
-> > -some helper functions to assist this saving.
-> > -
-> > -There is a new concept that we have to explain here: device state
-> > -version.  When we migrate a device, we save/load the state as a series
-> > -of fields.  Some times, due to bugs or new functionality, we need to
-> > -change the state to store more/different information.  We use the
-> > -version to identify each time that we do a change.  Each version is
-> > -associated with a series of fields saved.  The `save_state` always saves
-> > -the state as the newer version.  But `load_state` sometimes is able to
-> > -load state from an older version.
-> > -
-> > -Legacy way
-> > -----------
-> > -
-> > -This way is going to disappear as soon as all current users are ported to VMSTATE.
-> > -
-> > -Each device has to register two functions, one to save the state and
-> > -another to load the state back.
-> > -
-> > -.. code:: c
-> > -
-> > -  int register_savevm(DeviceState *dev,
-> > -                      const char *idstr,
-> > -                      int instance_id,
-> > -                      int version_id,
-> > -                      SaveStateHandler *save_state,
-> > -                      LoadStateHandler *load_state,
-> > -                      void *opaque);
-> > -
-> > -  typedef void SaveStateHandler(QEMUFile *f, void *opaque);
-> > -  typedef int LoadStateHandler(QEMUFile *f, void *opaque, int version_id);
-> > -
-> > -The important functions for the device state format are the `save_state`
-> > -and `load_state`.  Notice that `load_state` receives a version_id
-> > -parameter to know what state format is receiving.  `save_state` doesn't
-> > -have a version_id parameter because it always uses the latest version.
-> > +For most devices, the state is saved in a single call to the migration
-> > +infrastrucutre; these are *non-iterative* devices.  The data for these
-> > +devices is sent at the end of precopy migration, when the CPUs are paused.
-> 
-> > +Where the data associated with the device is very large (e.g. RAM or large tables)
-> > +see the iterative device section below.
-> 
-> I would prefer:
-> 
->   There are also devices called *iterative* devices, which contain a
->   huge amount of data as device states (e.g., RAM or large tables).
->   Please refer to the iterative device section below for more information.
-
-OK, I've gone with:
-There are also *iterative* devices, which contain a very large amount of
-data (e.g. RAM or large tables).  See the iterative device section below.
-
-> > +
-> > +General advice for device developers
-> > +------------------------------------
-> > +
-> > +- The migration state saved should reflect the device being modelled rather
-> > +  than the way your implementation works.   That way if you change the implementation
-> > +  later the migration stream will stay compatible.  That model may include
-> > +  internal state that's not directly visible in a register.
-> > +
-> > +- When saving a migration stream the device code may walk and check
-> > +  the state of the device.  These checks might fail in various ways (e.g.
-> > +  discovering internal state is corrupt or that the guest has done something bad).
-> > +  Consider carefully before asserting/aborting at this point, since the
-> > +  normal response from users is that *migration broke their VM* since it had
-> > +  apparently been running fine until then.
-> 
-> Maybe we can give some further suggestions?
-> 
->   Instead of aborting the whole VM, we can dump some error messages
->   when necessary for further diagnose. Or, we can set the device into
->   error state (or even disable the device) where capable so that at
->   least other part of the VM won't be affected, then the guest OS can
->   decide what to do next with that.
-
-I've put:
-  In these error cases, the device
-  should log a message indicating the cause of error, and should consider
-  putting the device into an error state, allowing the rest of the VM to
-  continue execution.
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
 
-> > +
-> > +- The migration might happen at an inconvenient point,
-> > +  e.g. right in the middle of the guest reprogramming the device, during
-> > +  guest reboot or shutdown or while the device is waiting for external IO.
-> > +  It's strongly preferred that migrations do not fail in this situation,
-> > +  since in the cloud environment migrations might happen automatically to
-> > +  VMs that the administrator doesn't directly control.
-> > +
-> > +- If you do need to fail a migration, ensure that sufficient information
-> > +  is logged to identify what went wrong.
-> > +
-> > +- The destination should treat an incoming migration stream as hostile
-> > +  (which we do to varying degrees in the existing code).  Check that offsets
-> > +  into buffers and the like can't cause overruns.  Fail the incoming migration
-> > +  in the case of a corrupted stream like this.
-> > +
-> > +- Take care with internal device state or behaviour that might become
-> > +  migration version dependent.  For example, the order of PCI capabilities
-> > +  is required to stay constant across migration.  Another example would
-> > +  be that a special case handled by subsections (see below) might become
-> > +  much more common if a default behaviour is changed.
-> > +
-> > +- Migrations timing out or being failed by higher levels of management,
-> > +  or failures of the destination host are not unusual, and care should
-> > +  be taken to ensure that the source VM can be restarted up until the point
-> > +  when the destination starts runing.  Valid examples include the management
-> > +  layer reverting the migration even though the QEMU level of migration has
-> > +  succeeded.  For this reason, the state on the source VM should not be
-> > +  destroyed during the migration process in normal use.
-> 
-> I would prefer we have a summary at the start, or just move the last
-> sentence there.  Otherwise it'll be hard for quick readers to catch
-> the point:
-> 
->   Device states should still be kept even after a savevm operation.
->   The reason is that ...
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-Good point:
-- The state of the source should not be changed or destroyed by the
-  outgoing migration.  Migrations timing out or being failed by
-  higher levels of management, or failures of the destination host are
-  not unusual, and in that case the VM is restarted on the source.
-  Note that the management layer can validly revert the migration
-  even though the QEMU level of migration has succeeded as long as it
-  does it before starting execution on the destination.
+> When running the gcc testsuite with current aarch64-linux-user,
+> the testsuite detects the presence of the fp16 extension and
+> enables lots of extra tests for builtins.
+>
+> Quite a few of these new tests fail because we missed implementing
+> some instructions.  We really should go back and verify that nothing
+> else is missing from this (rather large) extension.
+
+So this set of instructions is generated from any ASL description that
+contains "half":
+
+# Input file for risugen defining AArch64 instructions
+.mode arm.aarch64
+FADDP_asisdpair_only_H A64_V 0101111000110000110110 Rn:5  Rd:5
+FRECPS_asimdsamefp16_only A64_V 0 Q:1 001110010 Rm:5 001111 Rn:5  Rd:5
+FMAXNMP_asisdpair_only_H A64_V 0101111000110000110010 Rn:5  Rd:5
+SCVTF_asimdmiscfp16_R A64_V 0 Q:1 00111001111001110110 Rn:5  Rd:5
+FRSQRTE_asisdmiscfp16_R A64_V 0111111011111001110110 Rn:5  Rd:5
+FCMGT_asisdmiscfp16_FZ A64_V 0101111011111000110010 Rn:5  Rd:5
+FMUL_asimdsamefp16_only A64_V 0 Q:1 101110010 Rm:5 000111 Rn:5  Rd:5
+FSUB_asimdsamefp16_only A64_V 0 Q:1 001110110 Rm:5 000101 Rn:5  Rd:5
+FMAX_H_floatdp2 A64_V 00011110111 Rm:5 010010 Rn:5  Rd:5
+FADDP_asimdsamefp16_only A64_V 0 Q:1 101110010 Rm:5 000101 Rn:5  Rd:5
+FMAXNMP_asimdsamefp16_only A64_V 0 Q:1 101110010 Rm:5 000001 Rn:5  Rd:5
+FMUL_asisdelem_RH_H A64_V 0101111100 L:1  M:1  Rm:4 1001 H:1 0 Rn:5  Rd:5
+FCMGT_asimdsamefp16_only A64_V 0 Q:1 101110110 Rm:5 001001 Rn:5  Rd:5
+FCVTAS_asisdmiscfp16_R A64_V 0101111001111001110010 Rn:5  Rd:5
+FADD_asimdsamefp16_only A64_V 0 Q:1 001110010 Rm:5 000101 Rn:5  Rd:5
+FCSEL_H_floatsel A64_V 00011110111 Rm:5  cond:4 11 Rn:5  Rd:5
+FMAXNM_H_floatdp2 A64_V 00011110111 Rm:5 011010 Rn:5  Rd:5
+FMAXNM_asimdsamefp16_only A64_V 0 Q:1 001110010 Rm:5 000001 Rn:5  Rd:5
+FMINNMP_asisdpair_only_H A64_V 0101111010110000110010 Rn:5  Rd:5
+FNMUL_H_floatdp2 A64_V 00011110111 Rm:5 100010 Rn:5  Rd:5
+FCMPE_H_floatcmp A64_V 00011110111 Rm:5 001000 Rn:5 10000
+FMUL_asimdelem_RH_H A64_V 0 Q:1 00111100 L:1  M:1  Rm:4 1001 H:1 0 Rn:5  Rd=
+:5
+FRINTN_asimdmiscfp16_R A64_V 0 Q:1 00111001111001100010 Rn:5  Rd:5
+FCCMP_H_floatccmp A64_V 00011110111 Rm:5  cond:4 01 Rn:5 0 nzcv:4
+FMADD_H_floatdp3 A64_V 00011111110 Rm:5 0 Ra:5  Rn:5  Rd:5
+FCVTZS_asisdmiscfp16_R A64_V 0101111011111001101110 Rn:5  Rd:5
+FCVTMS_asisdmiscfp16_R A64_V 0101111001111001101110 Rn:5  Rd:5
+FMINP_asimdsamefp16_only A64_V 0 Q:1 101110110 Rm:5 001101 Rn:5  Rd:5
+FRECPE_asimdmiscfp16_R A64_V 0 Q:1 00111011111001110110 Rn:5  Rd:5
+FCMGE_asisdmiscfp16_FZ A64_V 0111111011111000110010 Rn:5  Rd:5
+FNEG_asimdmiscfp16_R A64_V 0 Q:1 10111011111000111110 Rn:5  Rd:5
+FCMGE_asisdsamefp16_only A64_V 01111110010 Rm:5 001001 Rn:5  Rd:5
+FMULX_asisdelem_RH_H A64_V 0111111100 L:1  M:1  Rm:4 1001 H:1 0 Rn:5  Rd:5
+SCVTF_asisdmiscfp16_R A64_V 0101111001111001110110 Rn:5  Rd:5
+FMAXNMV_asimdall_only_H A64_V 0 Q:1 00111000110000110010 Rn:5  Rd:5
+FMLA_asimdsamefp16_only A64_V 0 Q:1 001110010 Rm:5 000011 Rn:5  Rd:5
+FACGT_asisdsamefp16_only A64_V 01111110110 Rm:5 001011 Rn:5  Rd:5
+FRINTP_H_floatdp1 A64_V 0001111011100100110000 Rn:5  Rd:5
+FRINTZ_asimdmiscfp16_R A64_V 0 Q:1 00111011111001100110 Rn:5  Rd:5
+FRINTI_asimdmiscfp16_R A64_V 0 Q:1 10111011111001100110 Rn:5  Rd:5
+FDIV_H_floatdp2 A64_V 00011110111 Rm:5 000110 Rn:5  Rd:5
+FCVTZS_asimdmiscfp16_R A64_V 0 Q:1 00111011111001101110 Rn:5  Rd:5
+FRINTP_asimdmiscfp16_R A64_V 0 Q:1 00111011111001100010 Rn:5  Rd:5
+FCCMPE_H_floatccmp A64_V 00011110111 Rm:5  cond:4 01 Rn:5 1 nzcv:4
+FCMGT_asisdsamefp16_only A64_V 01111110110 Rm:5 001001 Rn:5  Rd:5
+FRINTM_asimdmiscfp16_R A64_V 0 Q:1 00111001111001100110 Rn:5  Rd:5
+FMAXP_asimdsamefp16_only A64_V 0 Q:1 101110010 Rm:5 001101 Rn:5  Rd:5
+FABD_asisdsamefp16_only A64_V 01111110110 Rm:5 000101 Rn:5  Rd:5
+FCMGE_asimdmiscfp16_FZ A64_V 0 Q:1 10111011111000110010 Rn:5  Rd:5
+FCMEQ_asimdsamefp16_only A64_V 0 Q:1 001110010 Rm:5 001001 Rn:5  Rd:5
+FMINNM_asimdsamefp16_only A64_V 0 Q:1 001110110 Rm:5 000001 Rn:5  Rd:5
+FNMADD_H_floatdp3 A64_V 00011111111 Rm:5 0 Ra:5  Rn:5  Rd:5
+FRINTI_H_floatdp1 A64_V 0001111011100111110000 Rn:5  Rd:5
+FMINNM_H_floatdp2 A64_V 00011110111 Rm:5 011110 Rn:5  Rd:5
+FCMLT_asimdmiscfp16_FZ A64_V 0 Q:1 00111011111000111010 Rn:5  Rd:5
+FCVTAU_asisdmiscfp16_R A64_V 0111111001111001110010 Rn:5  Rd:5
+FCVTNU_asisdmiscfp16_R A64_V 0111111001111001101010 Rn:5  Rd:5
+FCVTZU_asisdmiscfp16_R A64_V 0111111011111001101110 Rn:5  Rd:5
+FABS_asimdmiscfp16_R A64_V 0 Q:1 00111011111000111110 Rn:5  Rd:5
+FMLS_asisdelem_RH_H A64_V 0101111100 L:1  M:1  Rm:4 0101 H:1 0 Rn:5  Rd:5
+FCMLT_asisdmiscfp16_FZ A64_V 0101111011111000111010 Rn:5  Rd:5
+FMAXP_asisdpair_only_H A64_V 0101111000110000111110 Rn:5  Rd:5
+FCVTPS_asisdmiscfp16_R A64_V 0101111011111001101010 Rn:5  Rd:5
+FRECPE_asisdmiscfp16_R A64_V 0101111011111001110110 Rn:5  Rd:5
+FMINNMV_asimdall_only_H A64_V 0 Q:1 00111010110000110010 Rn:5  Rd:5
+FRSQRTE_asimdmiscfp16_R A64_V 0 Q:1 10111011111001110110 Rn:5  Rd:5
+FMUL_H_floatdp2 A64_V 00011110111 Rm:5 000010 Rn:5  Rd:5
+FMLS_asimdsamefp16_only A64_V 0 Q:1 001110110 Rm:5 000011 Rn:5  Rd:5
+FDIV_asimdsamefp16_only A64_V 0 Q:1 101110010 Rm:5 001111 Rn:5  Rd:5
+FSUB_H_floatdp2 A64_V 00011110111 Rm:5 001110 Rn:5  Rd:5
+FMLS_asimdelem_RH_H A64_V 0 Q:1 00111100 L:1  M:1  Rm:4 0101 H:1 0 Rn:5  Rd=
+:5
+FMLA_asimdelem_RH_H A64_V 0 Q:1 00111100 L:1  M:1  Rm:4 0001 H:1 0 Rn:5  Rd=
+:5
+FCVTPU_asimdmiscfp16_R A64_V 0 Q:1 10111011111001101010 Rn:5  Rd:5
+FCMLE_asimdmiscfp16_FZ A64_V 0 Q:1 10111011111000110110 Rn:5  Rd:5
+FMLA_asisdelem_RH_H A64_V 0101111100 L:1  M:1  Rm:4 0001 H:1 0 Rn:5  Rd:5
+FCVTMS_asimdmiscfp16_R A64_V 0 Q:1 00111001111001101110 Rn:5  Rd:5
+FRINTM_H_floatdp1 A64_V 0001111011100101010000 Rn:5  Rd:5
+FCVTMU_asimdmiscfp16_R A64_V 0 Q:1 10111001111001101110 Rn:5  Rd:5
+FCMGE_asimdsamefp16_only A64_V 0 Q:1 101110010 Rm:5 001001 Rn:5  Rd:5
+FRSQRTS_asisdsamefp16_only A64_V 01011110110 Rm:5 001111 Rn:5  Rd:5
+FCMEQ_asisdsamefp16_only A64_V 01011110010 Rm:5 001001 Rn:5  Rd:5
+FRINTZ_H_floatdp1 A64_V 0001111011100101110000 Rn:5  Rd:5
+FCVTNS_asimdmiscfp16_R A64_V 0 Q:1 00111001111001101010 Rn:5  Rd:5
+FRSQRTS_asimdsamefp16_only A64_V 0 Q:1 001110110 Rm:5 001111 Rn:5  Rd:5
+FRINTX_H_floatdp1 A64_V 0001111011100111010000 Rn:5  Rd:5
+FRINTA_H_floatdp1 A64_V 0001111011100110010000 Rn:5  Rd:5
+FABD_asimdsamefp16_only A64_V 0 Q:1 101110110 Rm:5 000101 Rn:5  Rd:5
+FCVTPU_asisdmiscfp16_R A64_V 0111111011111001101010 Rn:5  Rd:5
+FACGE_asisdsamefp16_only A64_V 01111110010 Rm:5 001011 Rn:5  Rd:5
+FACGT_asimdsamefp16_only A64_V 0 Q:1 101110110 Rm:5 001011 Rn:5  Rd:5
+FCMEQ_asisdmiscfp16_FZ A64_V 0101111011111000110110 Rn:5  Rd:5
+FCVTAS_asimdmiscfp16_R A64_V 0 Q:1 00111001111001110010 Rn:5  Rd:5
+FMULX_asimdsamefp16_only A64_V 0 Q:1 001110010 Rm:5 000111 Rn:5  Rd:5
+FMSUB_H_floatdp3 A64_V 00011111110 Rm:5 1 Ra:5  Rn:5  Rd:5
+FCVTMU_asisdmiscfp16_R A64_V 0111111001111001101110 Rn:5  Rd:5
+FMIN_H_floatdp2 A64_V 00011110111 Rm:5 010110 Rn:5  Rd:5
+FSQRT_asimdmiscfp16_R A64_V 0 Q:1 10111011111001111110 Rn:5  Rd:5
+FRINTX_asimdmiscfp16_R A64_V 0 Q:1 10111001111001100110 Rn:5  Rd:5
+UCVTF_asimdmiscfp16_R A64_V 0 Q:1 10111001111001110110 Rn:5  Rd:5
+FNMSUB_H_floatdp3 A64_V 00011111111 Rm:5 1 Ra:5  Rn:5  Rd:5
+FCVTNU_asimdmiscfp16_R A64_V 0 Q:1 10111001111001101010 Rn:5  Rd:5
+FMINNMP_asimdsamefp16_only A64_V 0 Q:1 101110110 Rm:5 000001 Rn:5  Rd:5
+FRECPX_asisdmiscfp16_R A64_V 0101111011111001111110 Rn:5  Rd:5
+FMULX_asisdsamefp16_only A64_V 01011110010 Rm:5 000111 Rn:5  Rd:5
+FABS_H_floatdp1 A64_V 0001111011100000110000 Rn:5  Rd:5
+FMAX_asimdsamefp16_only A64_V 0 Q:1 001110010 Rm:5 001101 Rn:5  Rd:5
+FADD_H_floatdp2 A64_V 00011110111 Rm:5 001010 Rn:5  Rd:5
+FRINTN_H_floatdp1 A64_V 0001111011100100010000 Rn:5  Rd:5
+UCVTF_asisdmiscfp16_R A64_V 0111111001111001110110 Rn:5  Rd:5
+FACGE_asimdsamefp16_only A64_V 0 Q:1 101110010 Rm:5 001011 Rn:5  Rd:5
+FCMP_H_floatcmp A64_V 00011110111 Rm:5 001000 Rn:5 00000
+FSQRT_H_floatdp1 A64_V 0001111011100001110000 Rn:5  Rd:5
+FMAXV_asimdall_only_H A64_V 0 Q:1 00111000110000111110 Rn:5  Rd:5
+FCVTPS_asimdmiscfp16_R A64_V 0 Q:1 00111011111001101010 Rn:5  Rd:5
+FCMLE_asisdmiscfp16_FZ A64_V 0111111011111000110110 Rn:5  Rd:5
+FMINV_asimdall_only_H A64_V 0 Q:1 00111010110000111110 Rn:5  Rd:5
+FMINP_asisdpair_only_H A64_V 0101111010110000111110 Rn:5  Rd:5
+FCMGT_asimdmiscfp16_FZ A64_V 0 Q:1 00111011111000110010 Rn:5  Rd:5
+FCMP_HZ_floatcmp A64_V 00011110111 Rm:5 001000 Rn:5 01000
+FRECPS_asisdsamefp16_only A64_V 01011110010 Rm:5 001111 Rn:5  Rd:5
+FMOV_H_floatimm A64_V 00011110111 imm8:8 10000000 Rd:5
+FCVTNS_asisdmiscfp16_R A64_V 0101111001111001101010 Rn:5  Rd:5
+FMULX_asimdelem_RH_H A64_V 0 Q:1 10111100 L:1  M:1  Rm:4 1001 H:1 0 Rn:5  R=
+d:5
+FRINTA_asimdmiscfp16_R A64_V 0 Q:1 10111001111001100010 Rn:5  Rd:5
+FCVTAU_asimdmiscfp16_R A64_V 0 Q:1 10111001111001110010 Rn:5  Rd:5
+FMIN_asimdsamefp16_only A64_V 0 Q:1 001110110 Rm:5 001101 Rn:5  Rd:5
+FCMEQ_asimdmiscfp16_FZ A64_V 0 Q:1 00111011111000110110 Rn:5  Rd:5
+FCMPE_HZ_floatcmp A64_V 00011110111 Rm:5 001000 Rn:5 11000
+FCVTZU_asimdmiscfp16_R A64_V 0 Q:1 10111011111001101110 Rn:5  Rd:5
+FNEG_H_floatdp1 A64_V 0001111011100001010000 Rn:5  Rd:5
+FMOV_H_floatdp1 A64_V 0001111011100000010000 Rn:5  Rd:5
+
+And the generated test cases and traces:
+
+  http://people.linaro.org/~alex.bennee/testcases/arm64.risu/testcases.armv=
+8.2_half.tar.xz
+
+Currently I'm seeing failures on:
+
+Failed 9 tests:
+testcases.armv8.2_half/insn_FCCMP_H_floatccmp__INC.risu.bin
+testcases.armv8.2_half/insn_FCCMPE_H_floatccmp__INC.risu.bin
+testcases.armv8.2_half/insn_FCMP_H_floatcmp__INC.risu.bin
+testcases.armv8.2_half/insn_FCMP_HZ_floatcmp__INC.risu.bin
+testcases.armv8.2_half/insn_FCMPE_H_floatcmp__INC.risu.bin
+testcases.armv8.2_half/insn_FCMPE_HZ_floatcmp__INC.risu.bin
+testcases.armv8.2_half/insn_FCSEL_H_floatsel__INC.risu.bin
+testcases.armv8.2_half/insn_FMOV_H_floatimm__INC.risu.bin
+testcases.armv8.2_half/insn_FSQRT_H_floatdp1__INC.risu.bin
+
+but I haven't checked to see if that is just instructions the FVP has in
+full SVE mode that aren't in the just FP16 fixes branch I was testing
+against.
 
 
-> All comments are subjective and optional, so please choose either way
-> you would prefer.  The rest looks quite good to me.
-> 
-> Reviewed-by: Peter Xu <peterx@redhat.com>
+>
+> In addition, it tests some edge conditions on data that show flaws
+> in the way we were performing integer<->fp conversion; particularly
+> with respect to scaled conversion.
+>
+>
+> r~
+>
+> PS: FWIW, this was written against my tgt-arm-sve-9 tree, since I
+> was trying to test sve as generated by gcc.  I don't *think* there
+> are any dependencies on any of the sve patches, but I didn't check.
+>
+> PPS: There are two more failures that might be qemu fp16 failures,
+> but those are SIGSEGV.  This patch set cures all of the SIGILL and
+> (subsequent) SIGABRT type failures within the testsuite.
+>
+>
+> Richard Henderson (9):
+>   target/arm: Implement vector shifted SCVF/UCVF for fp16
+>   target/arm: Implement vector shifted FCVT for fp16
+>   target/arm: Fix float16 to/from int16
+>   target/arm: Clear SVE high bits for FMOV
+>   target/arm: Implement FMOV (general) for fp16
+>   target/arm: Implement FCVT (scalar,integer) for fp16
+>   target/arm: Implement FCVT (scalar,fixed-point) for fp16
+>   target/arm: Implement FP data-processing (2 source) for fp16
+>   target/arm: Implement FP data-processing (3 source) for fp16
+>
+>  target/arm/helper.h        |   6 +
+>  target/arm/helper.c        |  87 ++++++++++-
+>  target/arm/translate-a64.c | 371 +++++++++++++++++++++++++++++++++++++--=
+------
+>  3 files changed, 399 insertions(+), 65 deletions(-)
 
-Thanks.
 
-Dave
-
-> Thanks,
-> 
-> -- 
-> Peter Xu
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Alex Benn=C3=A9e
