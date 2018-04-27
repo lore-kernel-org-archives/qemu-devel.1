@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42975)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fBwJQ-0007uk-C3
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 01:52:53 -0400
+	(envelope-from <jasowang@redhat.com>) id 1fBwKJ-0008NF-F2
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 01:53:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fBwJP-0004Dm-Gx
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 01:52:52 -0400
-Date: Fri, 27 Apr 2018 13:52:33 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180427055233.GB4217@lemon.usersys.redhat.com>
-References: <20180418030424.28980-1-famz@redhat.com>
-	<20180418030424.28980-2-famz@redhat.com>
-	<20180426145702.GG30991@stefanha-x1.localdomain>
+	(envelope-from <jasowang@redhat.com>) id 1fBwKE-0004mf-Dc
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 01:53:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56742 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fBwKE-0004mR-8D
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 01:53:42 -0400
+References: <20180425045129.17449-1-peterx@redhat.com>
+	<20180425045129.17449-8-peterx@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <df734575-d387-eec6-fd8a-ad66d31da95d@redhat.com>
+Date: Fri, 27 Apr 2018 13:53:35 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180426145702.GG30991@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH v2 1/7] block: Introduce
- API for copy offloading
+In-Reply-To: <20180425045129.17449-8-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 07/10] util: implement simple interval tree
+ logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,75 +29,417 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Max Reitz <mreitz@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
 
-On Thu, 04/26 15:57, Stefan Hajnoczi wrote:
-> On Wed, Apr 18, 2018 at 11:04:18AM +0800, Fam Zheng wrote:
-> > diff --git a/block/io.c b/block/io.c
-> > index bd9a19a9c4..d274e9525f 100644
-> > --- a/block/io.c
-> > +++ b/block/io.c
-> > @@ -2826,3 +2826,94 @@ void bdrv_unregister_buf(BlockDriverState *bs, void *host)
-> >          bdrv_unregister_buf(child->bs, host);
-> >      }
-> >  }
-> > +
-> > +static int bdrv_co_copy_range_internal(BdrvChild *src,
-> 
-> Please remember to use coroutine_fn for coroutines!  This applies to the
-> other functions in this patch too.
 
-OK!
 
-> 
-> > +int bdrv_co_copy_range(BdrvChild *src, uint64_t src_offset,
-> > +                       BdrvChild *dst, uint64_t dst_offset,
-> > +                       uint64_t bytes, BdrvRequestFlags flags)
-> > +{
-> > +    BdrvTrackedRequest src_req, dst_req;
-> > +    BlockDriverState *src_bs = src->bs;
-> > +    BlockDriverState *dst_bs = dst->bs;
-> > +    int ret;
-> > +
-> > +    bdrv_inc_in_flight(src_bs);
-> > +    bdrv_inc_in_flight(dst_bs);
-> > +    tracked_request_begin(&src_req, src_bs, src_offset,
-> > +                          bytes, BDRV_TRACKED_READ);
-> > +    tracked_request_begin(&dst_req, dst_bs, dst_offset,
-> > +                          bytes, BDRV_TRACKED_WRITE);
-> 
-> Tracked requests and in-flight counters are only updated on root nodes.
-> This is not how read/write works.  Does drain work on an internal or
-> leaf node with multiple parents?
+On 2018=E5=B9=B404=E6=9C=8825=E6=97=A5 12:51, Peter Xu wrote:
+> Introduce a simplest interval tree implementation based on GTree.
+> Current implementation is mostly tailored to maintain and trace device
+> mapped IOVA ranges, but still it might be useful to other modules in th=
+e
+> future.
+>
+> It is naive in that it even does not allow user to pass in private
+> structs along with the ranges.  However it's good in that the tree can
+> do mergings of ranges when necessary when without such information.
+>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>   include/qemu/interval-tree.h | 130 ++++++++++++++++++++++++++
+>   util/interval-tree.c         | 217 ++++++++++++++++++++++++++++++++++=
++++++++++
+>   util/Makefile.objs           |   1 +
+>   3 files changed, 348 insertions(+)
+>   create mode 100644 include/qemu/interval-tree.h
+>   create mode 100644 util/interval-tree.c
+>
+> diff --git a/include/qemu/interval-tree.h b/include/qemu/interval-tree.=
+h
+> new file mode 100644
+> index 0000000000..4485f4b338
+> --- /dev/null
+> +++ b/include/qemu/interval-tree.h
+> @@ -0,0 +1,130 @@
+> +/*
+> + * An very simplified interval tree implementation based on GTree.
+> + *
+> + * Copyright 2018 Red Hat, Inc.
+> + *
+> + * Authors:
+> + *  Peter Xu <peterx@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or =
+later.
+> + */
+> +#ifndef __INTERVAL_TREE_H__
+> +#define __INTERVAL_TREE_H__
+> +
+> +/*
+> + * Currently the interval tree will only allow to keep ranges
+> + * information, and no extra user data is allowed for each element.  A
+> + * benefit is that we can merge adjacent ranges internally within the
+> + * tree.  It can save a lot of memory when the ranges are splitted but
+> + * mostly continuous.
+> + *
+> + * Note that current implementation does not provide any thread
+> + * protections.  Callers of the interval tree should be responsible
+> + * for the thread safety issue.
+> + */
+> +
+> +#include <glib.h>
+> +
+> +#define  IT_OK           (0)
+> +#define  IT_ERR_OVERLAP  (-1)
+> +
+> +typedef unsigned long long ITValue;
+> +typedef struct ITTree ITTree;
+> +typedef gboolean (*it_tree_iterator)(ITValue start, ITValue end);
+> +
+> +struct ITRange {
+> +    ITValue start;
+> +    ITValue end;
+> +};
+> +typedef struct ITRange ITRange;
+> +
+> +/**
+> + * it_tree_new:
+> + *
+> + * Create a new interval tree.
+> + *
+> + * Returns: the tree pointer when succeeded, or NULL if error.
+> + */
+> +ITTree *it_tree_new(void);
+> +
+> +/**
+> + * it_tree_insert:
+> + *
+> + * @tree: the interval tree to insert
+> + * @start: the start of range, inclusive
+> + * @end: the end of range, inclusive
+> + *
+> + * Insert an interval range to the tree.  If there is overlapped
+> + * ranges, IT_ERR_OVERLAP will be returned.
+> + *
+> + * Return: 0 if succeeded, or <0 if error.
+> + */
+> +int it_tree_insert(ITTree *tree, ITValue start, ITValue end);
+> +
+> +/**
+> + * it_tree_remove:
+> + *
+> + * @tree: the interval tree to remove range from
+> + * @start: the start of range, inclusive
+> + * @end: the end of range, inclusive
+> + *
+> + * Remove an range from the tree.  The range does not need to be
+> + * exactly what has inserted.  All the ranges that are included in the
+> + * provided range will be removed from the tree.
+> + *
+> + * Return: 0 if succeeded, or <0 if error.
+> + */
+> +int it_tree_remove(ITTree *tree, ITValue start, ITValue end);
+> +
+> +/**
+> + * it_tree_find:
+> + *
+> + * @tree: the interval tree to search from
+> + * @start: the start of range, inclusive
+> + * @end: the end of range, inclusive
+> + *
+> + * Search for a range in the interval tree that overlaps with the
+> + * range specified.  Only the first found range will be returned.
+> + *
+> + * Return: ITRange if found, or NULL if not found.  Note: the returned
+> + * ITRange pointer is maintained internally.  User should only read
+> + * the content but never modify or free the content.
+> + */
+> +ITRange *it_tree_find(ITTree *tree, ITValue start, ITValue end);
+> +
+> +/**
+> + * it_tree_find_value:
+> + *
+> + * @tree: the interval tree to search from
+> + * @value: the value to find
+> + *
+> + * Similar to it_tree_find(), but it tries to find range (value, value=
+).
+> + *
+> + * Return: same as it_tree_find().
+> + */
+> +ITRange *it_tree_find_value(ITTree *tree, ITValue value);
+> +
+> +/**
+> + * it_tree_foreach:
+> + *
+> + * @tree: the interval tree to iterate on
+> + * @iterator: the interator for the ranges, return true to stop
+> + *
+> + * Search for a range in the interval tree.
+> + *
+> + * Return: 1 if found any overlap, 0 if not, <0 if error.
+> + */
+> +void it_tree_foreach(ITTree *tree, it_tree_iterator iterator);
+> +
+> +/**
+> + * it_tree_destroy:
+> + *
+> + * @tree: the interval tree to destroy
+> + *
+> + * Destroy an existing interval tree.
+> + *
+> + * Return: None.
+> + */
+> +void it_tree_destroy(ITTree *tree);
+> +
+> +#endif
+> diff --git a/util/interval-tree.c b/util/interval-tree.c
+> new file mode 100644
+> index 0000000000..0e7a37c2c6
+> --- /dev/null
+> +++ b/util/interval-tree.c
+> @@ -0,0 +1,217 @@
+> +/*
+> + * An very simplified interval tree implementation based on GTree.
+> + *
+> + * Copyright 2018 Red Hat, Inc.
+> + *
+> + * Authors:
+> + *  Peter Xu <peterx@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or =
+later.
+> + */
+> +
+> +#include <glib.h>
+> +#include "qemu/interval-tree.h"
+> +
+> +/*
+> + * Each element of the internal tree is an ITRange.  It is shared
+> + * between the key and value of the element, or we can see it a tree
+> + * with keys only but no values.
+> + */
+> +
+> +struct ITTree {
+> +    GTree *tree;
+> +};
+> +
+> +static int it_tree_compare(gconstpointer a, gconstpointer b, gpointer =
+data)
+> +{
+> +    const ITRange *r1 =3D a, *r2 =3D b;
+> +
+> +    if (r1->start > r2->end) {
+> +        return 1;
+> +    }
+> +
+> +    if (r1->end < r2->start) {
+> +        return -1;
+> +    }
+> +
+> +    /* Overlapped */
+> +    return 0;
+> +}
+> +
+> +/* Find out intersection of range A and B, put into OUT */
+> +static inline void it_range_and(ITRange *out, ITRange *a, ITRange *b)
+> +{
+> +    out->start =3D MAX(a->start, b->start);
+> +    out->end =3D MIN(a->end, b->end);
+> +}
+> +
+> +static inline gboolean it_range_equal(ITRange *a, ITRange *b)
+> +{
+> +    return a->start =3D=3D b->start && a->end =3D=3D b->end;
+> +}
+> +
+> +/* Whether ITRange A is superset of B? */
+> +static inline gboolean it_range_cover(ITRange *a, ITRange *b)
+> +{
+> +    return a->start <=3D b->start && a->end >=3D b->end;
+> +}
+> +
+> +ITTree *it_tree_new(void)
+> +{
+> +    ITTree *ittree =3D g_new0(ITTree, 1);
+> +
+> +    /* We don't have values actually, no need to free */
+> +    ittree->tree =3D g_tree_new_full(it_tree_compare, NULL, g_free, NU=
+LL);
+> +
+> +    return ittree;
+> +}
+> +
+> +ITRange *it_tree_find(ITTree *tree, ITValue start, ITValue end)
+> +{
+> +    ITRange range;
+> +
+> +    g_assert(tree);
+> +
+> +    range.start =3D start;
+> +    range.end =3D end;
+> +
+> +    return g_tree_lookup(tree->tree, &range);
+> +}
+> +
+> +ITRange *it_tree_find_value(ITTree *tree, ITValue value)
+> +{
+> +    return it_tree_find(tree, value, value);
+> +}
+> +
+> +static inline void it_tree_insert_internal(GTree *gtree, ITRange *rang=
+e)
+> +{
+> +    /* Key and value are sharing the same range data */
+> +    g_tree_insert(gtree, range, range);
+> +}
+> +
+> +int it_tree_insert(ITTree *tree, ITValue start, ITValue end)
+> +{
+> +    ITRange *range =3D g_new0(ITRange, 1), *overlap;
+> +    GTree *gtree;
+> +
+> +    g_assert(tree);
+> +    g_assert(start <=3D end);
+> +
+> +    gtree =3D tree->tree;
+> +
+> +    range->start =3D start;
+> +    range->end =3D end;
+> +
+> +    /* We don't allow to insert range that overlaps with existings */
+> +    if (g_tree_lookup(gtree, range)) {
+> +        g_free(range);
+> +        return IT_ERR_OVERLAP;
+> +    }
+> +
+> +    /* Merge left adjacent range */
+> +    overlap =3D it_tree_find_value(tree, start - 1);
+> +    if (overlap) {
+> +        range->start =3D overlap->start;
+> +        g_tree_remove(gtree, overlap);
+> +    }
+> +
+> +    /* Merge right adjacent range */
+> +    overlap =3D it_tree_find_value(tree, end + 1);
+> +    if (overlap) {
+> +        range->end =3D overlap->end;
+> +        g_tree_remove(gtree, overlap);
+> +    }
+> +
+> +    /* Key and value are sharing the same range data */
+> +    it_tree_insert_internal(gtree, range);
 
-Telling from how bdrv_do_drained_begin is implemented now (recursive both to
-parents and children), I think it should work. But you are right this is
-inconsistent with read/write code, it seems I could move this it to
-bdrv_co_copy_range_internal.
+A small optimization here is to delay the allocation until you're sure=20
+there's not overlapping.
 
-> 
-> > diff --git a/include/block/block.h b/include/block/block.h
-> > index cdec3639a3..72ac011b2b 100644
-> > --- a/include/block/block.h
-> > +++ b/include/block/block.h
-> > @@ -604,4 +604,8 @@ bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *name,
-> >   */
-> >  void bdrv_register_buf(BlockDriverState *bs, void *host, size_t size);
-> >  void bdrv_unregister_buf(BlockDriverState *bs, void *host);
-> > +
-> > +int bdrv_co_copy_range(BdrvChild *bs, uint64_t offset,
-> > +                       BdrvChild *src, uint64_t src_offset,
-> > +                       uint64_t bytes, BdrvRequestFlags flags);
-> 
-> Please document this new block.h API.
+> +
+> +    return IT_OK;
+> +}
+> +
+> +static gboolean it_tree_traverse(gpointer key, gpointer value,
+> +                                gpointer data)
+> +{
+> +    it_tree_iterator iterator =3D data;
+> +    ITRange *range =3D key;
+> +
+> +    g_assert(key =3D=3D value);
+> +
+> +    return iterator(range->start, range->end);
+> +}
+> +
+> +void it_tree_foreach(ITTree *tree, it_tree_iterator iterator)
+> +{
+> +    g_assert(tree && iterator);
+> +    g_tree_foreach(tree->tree, it_tree_traverse, iterator);
+> +}
+> +
+> +/* Remove subset `range', which is part of `overlap'. */
+> +static void it_tree_remove_subset(GTree *gtree, const ITRange *overlap=
+,
+> +                                  const ITRange *range)
+> +{
+> +    ITRange *range1, *range2;
+> +
+> +    if (overlap->start < range->start) {
+> +        range1 =3D g_new0(ITRange, 1);
+> +        range1->start =3D overlap->start;
+> +        range1->end =3D range->start - 1;
+> +    } else {
+> +        range1 =3D NULL;
+> +    }
+> +    if (range->end < overlap->end) {
+> +        range2 =3D g_new0(ITRange, 1);
+> +        range2->start =3D range->end + 1;
+> +        range2->end =3D overlap->end;
+> +    } else {
+> +        range2 =3D NULL;
+> +    }
+> +
+> +    g_tree_remove(gtree, overlap);
+> +
+> +    if (range1) {
+> +        it_tree_insert_internal(gtree, range1);
+> +    }
+> +    if (range2) {
+> +        it_tree_insert_internal(gtree, range2);
+> +    }
+> +}
+> +
+> +int it_tree_remove(ITTree *tree, ITValue start, ITValue end)
+> +{
+> +    ITRange range =3D { .start =3D start, .end =3D end }, *overlap, an=
+d;
+> +    GTree *gtree;
+> +
+> +    g_assert(tree);
+> +
+> +    gtree =3D tree->tree;
+> +    while ((overlap =3D g_tree_lookup(gtree, &range))) {
+> +        if (it_range_equal(overlap, &range)) {
+> +            /* Exactly what we want to remove; done */
+> +            g_tree_remove(gtree, overlap);
+> +            break;
+> +        } else if (it_range_cover(overlap, &range)) {
+> +            /* Split existing range into two; done */
+> +            it_tree_remove_subset(gtree, overlap, &range);
+> +            break;
+> +        } else if (it_range_cover(&range, overlap)) {
+> +            /* Drop this range and continue */
+> +            g_tree_remove(gtree, overlap);
+> +        } else {
+> +            /*
+> +             * The range to remove has intersection with existing
+> +             * ranges.  Remove part of the range and continue
+> +             */
+> +            it_range_and(&and, overlap, &range);
+> +            g_assert(and.start <=3D and.end);
+> +            it_tree_remove_subset(gtree, overlap, &and);
+> +        }
+> +    }
+> +
 
-OK.
+Looks like what we need here is just calculate the intersection part the=20
+remove it.
 
-> 
-> These arguments are in the wrong order!  The first BdrvChild is the
-> source and the second is the destination.
+Thanks
 
-Right, will fix.
-
-Fam
+> +    return IT_OK;
+> +}
+> +
+> +void it_tree_destroy(ITTree *tree)
+> +{
+> +    g_tree_destroy(tree->tree);
+> +    g_free(tree);
+> +}
+> diff --git a/util/Makefile.objs b/util/Makefile.objs
+> index 728c3541db..4ac33910ed 100644
+> --- a/util/Makefile.objs
+> +++ b/util/Makefile.objs
+> @@ -47,4 +47,5 @@ util-obj-y +=3D qht.o
+>   util-obj-y +=3D range.o
+>   util-obj-y +=3D stats64.o
+>   util-obj-y +=3D systemd.o
+> +util-obj-y +=3D interval-tree.o
+>   util-obj-$(CONFIG_LINUX) +=3D vfio-helpers.o
