@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41130)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fC05S-0007Om-M0
+	(envelope-from <kraxel@redhat.com>) id 1fC05S-0007OP-AM
 	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:54:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fC05R-0001fB-Ns
+	(envelope-from <kraxel@redhat.com>) id 1fC05R-0001ey-JA
 	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:54:42 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40854 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36842 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fC05R-0001em-JL
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fC05R-0001ek-FP
 	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:54:41 -0400
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 27 Apr 2018 11:54:34 +0200
-Message-Id: <20180427095434.14013-7-kraxel@redhat.com>
+Date: Fri, 27 Apr 2018 11:54:33 +0200
+Message-Id: <20180427095434.14013-6-kraxel@redhat.com>
 In-Reply-To: <20180427095434.14013-1-kraxel@redhat.com>
 References: <20180427095434.14013-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 6/6] ui: introduce vfio_display_reset
+Subject: [Qemu-devel] [PULL 5/6] console: introduce dpy_gfx_update_full
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,85 +28,50 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Markus 
 
 From: Tina Zhang <tina.zhang@intel.com>
 
-During guest OS reboot, guest framebuffer is invalid. It will cause
-bugs, if the invalid guest framebuffer is still used by host.
+dpy_gfx_update_full is used to do the whole display surface update.
 
-This patch is to introduce vfio_display_reset which is invoked
-during vfio display reset. This vfio_display_reset function is used
-to release the invalid display resource, disable scanout mode and
-replace the invalid surface with QemuConsole's DisplaySurafce.
-
-This patch can fix the GPU hang issue caused by gd_egl_draw during
-guest OS reboot.
-
-Changes v3->v4:
- - Move dma-buf based display check into the vfio_display_reset().
-   (Gerd)
-
-Changes v2->v3:
- - Limit vfio_display_reset to dma-buf based vfio display. (Gerd)
-
-Changes v1->v2:
- - Use dpy_gfx_update_full() update screen after reset. (Gerd)
- - Remove dpy_gfx_switch_surface(). (Gerd)
+This function is proposed by Gerd Hoffmann.
 
 Signed-off-by: Tina Zhang <tina.zhang@intel.com>
-Message-id: 1524820266-27079-3-git-send-email-tina.zhang@intel.com
+Message-id: 1524820266-27079-2-git-send-email-tina.zhang@intel.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/vfio/pci.h     |  1 +
- hw/vfio/display.c | 11 +++++++++++
- hw/vfio/pci.c     |  4 ++++
- 3 files changed, 16 insertions(+)
+ include/ui/console.h |  1 +
+ ui/console.c         | 10 ++++++++++
+ 2 files changed, 11 insertions(+)
 
-diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-index 629c875701..59ab7757a3 100644
---- a/hw/vfio/pci.h
-+++ b/hw/vfio/pci.h
-@@ -176,6 +176,7 @@ int vfio_pci_igd_opregion_init(VFIOPCIDevice *vdev,
-                                struct vfio_region_info *info,
-                                Error **errp);
+diff --git a/include/ui/console.h b/include/ui/console.h
+index 37a8d68d29..981b519dde 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -291,6 +291,7 @@ bool dpy_ui_info_supported(QemuConsole *con);
+ int dpy_set_ui_info(QemuConsole *con, QemuUIInfo *info);
  
-+void vfio_display_reset(VFIOPCIDevice *vdev);
- int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp);
- void vfio_display_finalize(VFIOPCIDevice *vdev);
- 
-diff --git a/hw/vfio/display.c b/hw/vfio/display.c
-index 7d727ce910..59c0e5d1d7 100644
---- a/hw/vfio/display.c
-+++ b/hw/vfio/display.c
-@@ -198,6 +198,17 @@ static void vfio_display_dmabuf_exit(VFIODisplay *dpy)
+ void dpy_gfx_update(QemuConsole *con, int x, int y, int w, int h);
++void dpy_gfx_update_full(QemuConsole *con);
+ void dpy_gfx_replace_surface(QemuConsole *con,
+                              DisplaySurface *surface);
+ void dpy_text_cursor(QemuConsole *con, int x, int y);
+diff --git a/ui/console.c b/ui/console.c
+index 3fb2f4e09f..b02510cdca 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -1574,6 +1574,16 @@ void dpy_gfx_update(QemuConsole *con, int x, int y, int w, int h)
+     }
  }
  
- /* ---------------------------------------------------------------------- */
-+void vfio_display_reset(VFIOPCIDevice *vdev)
++void dpy_gfx_update_full(QemuConsole *con)
 +{
-+    if (!vdev || !vdev->dpy || !vdev->dpy->con ||
-+        !vdev->dpy->dmabuf.primary) {
++    if (!con->surface) {
 +        return;
 +    }
-+
-+    dpy_gl_scanout_disable(vdev->dpy->con);
-+    vfio_display_dmabuf_exit(vdev->dpy);
-+    dpy_gfx_update_full(vdev->dpy->con);
++    dpy_gfx_update(con, 0, 0,
++                   surface_width(con->surface),
++                   surface_height(con->surface));
 +}
- 
- static void vfio_display_region_update(void *opaque)
- {
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index b9bc6cd310..4947fe39a2 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -3103,6 +3103,10 @@ static void vfio_pci_reset(DeviceState *dev)
- 
-     vfio_pci_pre_reset(vdev);
- 
-+    if (vdev->display != ON_OFF_AUTO_OFF) {
-+        vfio_display_reset(vdev);
-+    }
 +
-     if (vdev->resetfn && !vdev->resetfn(vdev)) {
-         goto post_reset;
-     }
+ void dpy_gfx_replace_surface(QemuConsole *con,
+                              DisplaySurface *surface)
+ {
 -- 
 2.9.3
