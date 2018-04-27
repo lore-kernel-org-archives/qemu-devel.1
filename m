@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBzaZ-0002Bw-L7
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:22:50 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fBzac-0002ES-6Y
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:22:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBzaY-0002K1-I7
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:22:47 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fBzab-0002LH-1c
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:22:50 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 27 Apr 2018 19:21:04 +1000
-Message-Id: <20180427092126.24812-28-david@gibson.dropbear.id.au>
+Date: Fri, 27 Apr 2018 19:21:24 +1000
+Message-Id: <20180427092126.24812-48-david@gibson.dropbear.id.au>
 In-Reply-To: <20180427092126.24812-1-david@gibson.dropbear.id.au>
 References: <20180427092126.24812-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 27/49] Add host_memory_backend_pagesize() helper
+Subject: [Qemu-devel] [PULL 47/49] target/ppc: Don't bother with MSR_EP in
+ cpu_ppc_set_papr()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,103 +23,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-There are a couple places (one generic, one target specific) where we need
-to get the host page size associated with a particular memory backend.  I
-have some upcoming code which will add another place which wants this.  So,
-for convenience, add a helper function to calculate this.
-
-host_memory_backend_pagesize() returns the host pagesize for a given
-HostMemoryBackend object.
+cpu_ppc_set_papr() removes the EP and HV bits from the MSR mask.  While
+removing the HV bit makes sense (a cpu in PAPR mode should never be
+emulated in hypervisor mode), the EP bit is just bizarre.  Although it's
+true that a papr mode guest shouldn't be able to change the exception
+prefix, the MSR[EP] bit doesn't even exist on the cpus supported for PAPR
+mode, so it's pointless to do anything with it here.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- backends/hostmem.c       | 18 ++++++++++++++++++
- exec.c                   |  5 ++---
- include/sysemu/hostmem.h |  2 ++
- target/ppc/kvm.c         |  6 +-----
- 4 files changed, 23 insertions(+), 8 deletions(-)
+ target/ppc/translate_init.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/backends/hostmem.c b/backends/hostmem.c
-index f61093654e..6a0c474222 100644
---- a/backends/hostmem.c
-+++ b/backends/hostmem.c
-@@ -18,6 +18,7 @@
- #include "qapi/visitor.h"
- #include "qemu/config-file.h"
- #include "qom/object_interfaces.h"
-+#include "qemu/mmap-alloc.h"
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index bb79d23b50..808f6c1a08 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -8874,12 +8874,11 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp)
  
- #ifdef CONFIG_NUMA
- #include <numaif.h>
-@@ -262,6 +263,23 @@ bool host_memory_backend_is_mapped(HostMemoryBackend *backend)
-     return backend->is_mapped;
- }
+     cpu->vhyp = vhyp;
  
-+#ifdef __linux__
-+size_t host_memory_backend_pagesize(HostMemoryBackend *memdev)
-+{
-+    Object *obj = OBJECT(memdev);
-+    char *path = object_property_get_str(obj, "mem-path", NULL);
-+    size_t pagesize = qemu_mempath_getpagesize(path);
-+
-+    g_free(path);
-+    return pagesize;
-+}
-+#else
-+size_t host_memory_backend_pagesize(HostMemoryBackend *memdev)
-+{
-+    return getpagesize();
-+}
-+#endif
-+
- static void
- host_memory_backend_memory_complete(UserCreatable *uc, Error **errp)
- {
-diff --git a/exec.c b/exec.c
-index b38b004563..c7fcefa851 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1491,9 +1491,8 @@ static int find_max_supported_pagesize(Object *obj, void *opaque)
-     long *hpsize_min = opaque;
+-    /* PAPR always has exception vectors in RAM not ROM. To ensure this,
+-     * MSR[IP] should never be set.
+-     *
+-     * We also disallow setting of MSR_HV
++    /*
++     * With a virtual hypervisor mode we never allow the CPU to go
++     * hypervisor mode itself
+      */
+-    env->msr_mask &= ~((1ull << MSR_EP) | MSR_HVB);
++    env->msr_mask &= ~MSR_HVB;
  
-     if (object_dynamic_cast(obj, TYPE_MEMORY_BACKEND)) {
--        char *mem_path = object_property_get_str(obj, "mem-path", NULL);
--        long hpsize = qemu_mempath_getpagesize(mem_path);
--        g_free(mem_path);
-+        long hpsize = host_memory_backend_pagesize(MEMORY_BACKEND(obj));
-+
-         if (hpsize < *hpsize_min) {
-             *hpsize_min = hpsize;
-         }
-diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
-index 47bc9846ac..bc36899bb8 100644
---- a/include/sysemu/hostmem.h
-+++ b/include/sysemu/hostmem.h
-@@ -68,4 +68,6 @@ MemoryRegion *host_memory_backend_get_memory(HostMemoryBackend *backend,
- 
- void host_memory_backend_set_mapped(HostMemoryBackend *backend, bool mapped);
- bool host_memory_backend_is_mapped(HostMemoryBackend *backend);
-+size_t host_memory_backend_pagesize(HostMemoryBackend *memdev);
-+
- #endif
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index e24fa50dc9..f62f7ac288 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -496,11 +496,7 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
- bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
- {
-     Object *mem_obj = object_resolve_path(obj_path, NULL);
--    char *mempath = object_property_get_str(mem_obj, "mem-path", NULL);
--    long pagesize;
--
--    pagesize = qemu_mempath_getpagesize(mempath);
--    g_free(mempath);
-+    long pagesize = host_memory_backend_pagesize(MEMORY_BACKEND(mem_obj));
- 
-     return pagesize >= max_cpu_page_size;
- }
+     /* Set emulated LPCR to not send interrupts to hypervisor. Note that
+      * under KVM, the actual HW LPCR will be set differently by KVM itself,
 -- 
 2.14.3
