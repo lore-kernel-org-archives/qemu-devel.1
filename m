@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fC2gf-0000XN-JG
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:41:18 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fC2iI-0001f4-7d
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:42:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fC2ga-0003J1-Ob
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:41:17 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52180)
+	(envelope-from <peter.maydell@linaro.org>) id 1fC2iH-0004Tx-B0
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:42:58 -0400
+Received: from mail-ot0-x229.google.com ([2607:f8b0:4003:c0f::229]:33098)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fC2ga-0003Fq-Hx
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:41:12 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fC2gY-0007bo-FO
-	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 12:41:10 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7249C2E80CE
-	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 12:41:10 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fC2iH-0004TZ-5o
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:42:57 -0400
+Received: by mail-ot0-x229.google.com with SMTP id l22-v6so1866570otj.0
+	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 05:42:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1517858941-5538-39-git-send-email-pbonzini@redhat.com>
+References: <1517858941-5538-1-git-send-email-pbonzini@redhat.com>
+	<1517858941-5538-39-git-send-email-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 27 Apr 2018 13:42:35 +0100
+Message-ID: <CAFEAcA_G=rp1nVOKgdQQb0bgunHktnsfP2-dPcm2eOq0BDm4pA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 27 Apr 2018 12:27:36 -0000
-From: Bruno Haible <bruno@clisp.org>
-Reply-To: Bug 1704658 <1704658@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150022185647.5906.17655055691802268187.malonedeb@gac.canonical.com>
-Message-Id: <152483205628.21735.11356468534562850542.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1704658] Re: O_CLOEXEC not handled in dup3 system
- call in user mode
+Subject: Re: [Qemu-devel] [PULL 38/47] memfd: add hugetlbsize argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,44 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
 
-Confirmed: It's fixed in qemu-2.12.
+On 5 February 2018 at 19:28, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>
+> Learn to specificy hugetlb size as qemu_memfd_create() argument.
 
--- =
+>  int qemu_memfd_create(const char *name, size_t size, bool hugetlb,
+> -                      unsigned int seals, Error **errp)
+> +                      uint64_t hugetlbsize, unsigned int seals, Error **=
+errp)
+>  {
+> +    int htsize =3D hugetlbsize ? ctz64(hugetlbsize) : 0;
+> +
+> +    if (htsize && 1 << htsize !=3D hugetlbsize) {
+> +        error_setg(errp, "Hugepage size must be a power of 2");
+> +        return -1;
+> +    }
+> +
+> +    htsize =3D htsize << MFD_HUGE_SHIFT;
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1704658
+Hi; Coverity complains about this function (CID 1385858) because
+we calculate a bit poisition htsize which could be up to 63, but
+then use it in "1 << htsize" which is a 32-bit integer calculation
+and could push the 1 off the top of the value.
 
-Title:
-  O_CLOEXEC not handled in dup3 system call in user mode
+This should be "1ULL", though of course a hugetlbsize of 4GB
+is not very plausible.
 
-Status in QEMU:
-  Fix Released
+PS: the variable name is "hugetlbsize" but the error message
+says "hugepage size" -- is it a TLB size or a page size ?
 
-Bug description:
-  In qemu user mode, for hppa and sparc64 targets, the parameter of the
-  dup3 is not passed correctly when it contains the O_CLOEXEC flag.
-
-  When the attached program runs, the expected output is:
-  errno=3D9=3DEBADF
-
-  How to reproduce on hppa:
-  - Compile the program: hppa-linux-gnu-gcc-5 -O -Wall -static testdup3.c -=
-o testdup3-hppa
-  - Set environment variables for running qemu-hppa.
-  - ~/inst-qemu/2.9.0/bin/qemu-hppa testdup3-hppa
-  errno=3D22=3DEINVAL
-  testdup3.c:54: assertion 'errno =3D=3D EBADF' failed
-
-  How to reproduce on sparc64:
-  - Compile the program: sparc64-linux-gnu-gcc-5 -O -Wall -static testdup3.=
-c -o testdup3-sparc64
-  - Set environment variables for running qemu-sparc64.
-  - ~/inst-qemu/2.9.0/bin/qemu-sparc64 testdup3-sparc64
-  errno=3D22=3DEINVAL
-  testdup3.c:54: assertion 'errno =3D=3D EBADF' failed
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1704658/+subscriptions
+thanks
+-- PMM
