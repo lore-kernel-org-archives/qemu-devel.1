@@ -1,19 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1fC2Jl-0006Fy-Lm
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:17:38 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fC2Lu-0007Wd-Ns
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:19:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1fC2Ji-0000Ao-Gp
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:17:37 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44952 helo=mx1.redhat.com)
+	(envelope-from <imammedo@redhat.com>) id 1fC2Lr-00010G-Id
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:19:50 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48724 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1fC2Ji-0000Ac-Cc
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:17:34 -0400
-From: Laurent Vivier <lvivier@redhat.com>
-Date: Fri, 27 Apr 2018 14:17:23 +0200
-Message-Id: <20180427121723.3543-1-lvivier@redhat.com>
-Subject: [Qemu-devel] [RFC] tcg: workaround branch instruction overflow in
- tcg_out_qemu_ld/st
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fC2Lr-000104-Di
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:19:47 -0400
+Date: Fri, 27 Apr 2018 14:19:44 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180427141944.7c3288e2@redhat.com>
+In-Reply-To: <318e4cfd-22ec-9cb1-a139-07e83a45ed8c@redhat.com>
+References: <20180417142739.GV29865@localhost.localdomain>
+	<20180417174110.1a7f1daf@redhat.com>
+	<20180417204135.GB29865@localhost.localdomain>
+	<87d0yx2dqp.fsf@dusky.pond.sub.org>
+	<20180419100004.0b560c85@redhat.com>
+	<20180419194251.GZ29865@localhost.localdomain>
+	<87muxy2xu1.fsf@dusky.pond.sub.org>
+	<20180423115016.31b4a302@redhat.com>
+	<20180423130554.GL29865@localhost.localdomain>
+	<20180423185514.1dcaa223@redhat.com>
+	<20180423204531.GR29865@localhost.localdomain>
+	<20180426163911.270915c9@redhat.com>
+	<318e4cfd-22ec-9cb1-a139-07e83a45ed8c@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 0/9] enable numa configuration before
+ machine_init() from QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,80 +39,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <lvivier@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Eric Blake <eblake@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, peter.maydell@linaro.org, pkrempa@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
-ppc64 uses a BC instruction to call the tcg_out_qemu_ld/st
-slow path. BC instruction uses a relative address encoded
-on 14 bits.
+On Thu, 26 Apr 2018 09:55:40 -0500
+Eric Blake <eblake@redhat.com> wrote:
 
-The slow path functions are added at the end of the generated
-instructions buffer, in the reverse order of the callers.
-So more we have slow path functions more the distance between
-the caller (BC) and the function increases.
+> On 04/26/2018 09:39 AM, Igor Mammedov wrote:
+> 
+> >>> I'll try to come up with a text for qemu-doc.texi, not about
+> >>> deprecating -S but about when --preconfig should be used vs -S
+> >>> and where to get list of commands that could be used at preconfig state.    
+> >>
+> >> Sounds good to me.  Thanks!  
+> > how about something like this:
+> > 
+> > diff --git a/qemu-tech.texi b/qemu-tech.texi
+> > index 52a56ae..6951258 100644
+> > --- a/qemu-tech.texi
+> > +++ b/qemu-tech.texi
+> > @@ -5,6 +5,7 @@
+> >  * CPU emulation::
+> >  * Translator Internals::
+> >  * QEMU compared to other emulators::
+> > +* Managed start up options::
+> >  * Bibliography::
+> >  @end menu
+> >  
+> > @@ -314,6 +315,44 @@ VirtualBox [9], Xen [10] and KVM [11] are based on QEMU. QEMU-SystemC
+> >  [12] uses QEMU to simulate a system where some hardware devices are
+> >  developed in SystemC.
+> >  
+> > +@node Managed start up options
+> > +@section Managed start up options
+> > +
+> > +In system mode emulation, it's possible to create VM in paused state using
+> > +-S command line option. In this state the machine is completely initialized
+> > +according to command line options and ready to execute VM code but VCPU threads
+> > +are not executing any code. VM state in this paused state depends on way QEMU
+> > +was started. It could be in:
+> > +@table @asis
+> > +@item initial state (after reset/power on state)
+> > +@item with direct kernel loading initial state could be ammended to execute  
+> 
+> s/ammended/amended/
+> 
+> > +code loaded by QEMU in VM's RAM and with incomming migration  
+> 
+> s/incomming/incoming/
+> 
+> > +@item with incomming migrartion, initial state will by ammended by the migrated  
+> 
+> and again, for both words
+> s/migrartion/migration/
+> 
+> > +machine state after migration completes.
+> > +@end table
+> > +
+> > +This paused state is typically used by users to query machine state and/or
+> > +additionally configure machine (hotplug devices) in runtime before allowing
+> > +VM code to run.
+> > +
+> > +However at -S pause point it's impossible to configure options that affect
+> > +initial VM creation (like: -smp/-m/-numa ...) or cold plug devices. That's
+> > +when -preconfig command line option should be used. It allows to pause  
+> 
+> s/to pause/pausing/
+> 
+> > +QEMU before initial VM creation in preconfig state, query being created
+> > +VM at runtime and configure start up options depending on previous query  
+> 
+> Reads awkwardly.  Maybe:
+> 
+> It allows pausing QEMU before the initial VM creation, in a new
+> preconfig state, where additional queries and configuration can be
+> performed via QMP before moving on to the resulting configuration startup.
+> 
+> > +results. In preconfig state QEMU allows to configure VM only via QMP monitor
+> > +with a limited command set which doesn't depend on completely initialized
+> > +machine, which includes but not limited to:  
+> 
+> In the preconfig state, QEMU only allows a limited set of commands over
+> the QMP monitor, where the commands do not depend on an initialized
+> machine, including but not limited to:
 
-This patch changes the behavior to generate the functions in
-the same order of the callers.
+thanks for review,
+I amended patches as you suggested.
+I plan to respin v6 today with these changes since exit-preconfig
+affected several patches in series.
 
-Fixes: 15fa08f845 ("tcg: Dynamically allocate TCGOps")
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
----
+> 
+> > +@table @asis
+> > +@item qmp_capabilities
+> > +@item query-qmp-schema
+> > +@item query-commands
+> > +@item query-status
+> > +@end table
+> > +The full list of commands is in QMP schema which could be queried with
+> > +query-qmp-schema, where commands supported at preconfig state have option
+> > +'allowed-in-preconfig' set to true.
+> > +
+> >  @node Bibliography
+> >  @section Bibliography
+> >   
+> 
+> >> A separate command would have less room for ambiguity.  
+> > I've added following instead of reusing 'cont':
+> > 
+> > ##                                                                               
+> > # @exit-preconfig:                                                                 
+> 
+> This should definitely be mentioned in the docs section of commands
+> permitted during preconfig.
+done
 
-Notes:
-    This is an RFC for several reasons:
-    - it doens't really fix the overflow problem
-      only avoids the case
-    - it uses a recursive function to revert the slow path
-      functions order (and we can have a stack overflow...),
-
- tcg/tcg-ldst.inc.c | 25 +++++++++++++++++--------
- 1 file changed, 17 insertions(+), 8 deletions(-)
-
-diff --git a/tcg/tcg-ldst.inc.c b/tcg/tcg-ldst.inc.c
-index 0e14cf4357..1f41cda482 100644
---- a/tcg/tcg-ldst.inc.c
-+++ b/tcg/tcg-ldst.inc.c
-@@ -41,12 +41,16 @@ typedef struct TCGLabelQemuLdst {
- static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *l);
- static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *l);
- 
--static bool tcg_out_ldst_finalize(TCGContext *s)
-+static bool tcg_out_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
- {
--    TCGLabelQemuLdst *lb;
-+    bool ret;
- 
--    /* qemu_ld/st slow paths */
--    for (lb = s->ldst_labels; lb != NULL; lb = lb->next) {
-+    if (lb == NULL) {
-+        return true;
-+    }
-+
-+    ret = tcg_out_slow_path(s, lb->next);
-+    if (ret) {
-         if (lb->is_ld) {
-             tcg_out_qemu_ld_slow_path(s, lb);
-         } else {
-@@ -57,11 +61,16 @@ static bool tcg_out_ldst_finalize(TCGContext *s)
-            one operation beginning below the high water mark cannot overrun
-            the buffer completely.  Thus we can test for overflow after
-            generating code without having to check during generation.  */
--        if (unlikely((void *)s->code_ptr > s->code_gen_highwater)) {
--            return false;
--        }
-+        ret = (void *)s->code_ptr <= s->code_gen_highwater;
-     }
--    return true;
-+
-+    return ret;
-+}
-+
-+static bool tcg_out_ldst_finalize(TCGContext *s)
-+{
-+    /* qemu_ld/st slow paths */
-+    return tcg_out_slow_path(s, s->ldst_labels);
- }
- 
- /*
--- 
-2.14.3
+> 
+> > #                                                                                
+> > # Exit from "preconfig" state                                                    
+> > #                                                                                
+> > # Since 2.13                                                                     
+> > #                                                                                
+> > # Returns: nothing                                                               
+> > #                                                                                
+> > # Notes: Command makes QEMU exit from preconfig state and proceeds with          
+> > # VM initialization using configuration data provided on command line            
+> > # and via QMP monitor at preconfig state. Command is available only at           
+> > # preconfig state (i.e. if --preconfig command line option).                     
+> > #                                                                                
+> > # Example:                                                                       
+> > #                                                                                
+> > # -> { "execute": "exit-preconfig" }                                             
+> > # <- { "return": {} }                                                            
+> > #                                                                                
+> > ##                                                                               
+> > { 'command': 'exit-preconfig', 'allowed-in-preconfig': true } 
+> > 
+> >   
+> 
