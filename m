@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53156)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fBuQU-0006jn-8R
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 23:52:03 -0400
+	(envelope-from <thuth@redhat.com>) id 1fBuRe-0007MB-V3
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 23:53:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fBuQT-0002s6-Ai
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 23:52:02 -0400
-Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:38160)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1fBuQT-0002re-5F
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 23:52:01 -0400
-Received: by mail-io0-x241.google.com with SMTP id z4-v6so984780iof.5
-	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 20:52:00 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1fBuRd-0003Ws-Tt
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 23:53:15 -0400
+References: <1521452376-25099-1-git-send-email-thuth@redhat.com>
+	<87bme62nu0.fsf@dusky.pond.sub.org>
+	<068649bc-1546-6fc5-3e41-63512196cbf8@redhat.com>
+	<20180427003215.GU29865@localhost.localdomain>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <0f69501c-f7cb-864a-3aa5-710fbe769f82@redhat.com>
+Date: Fri, 27 Apr 2018 05:52:58 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180426164011.GM2631@work-vm>
-References: <1524666934-8064-1-git-send-email-lidongchen@tencent.com>
-	<1524666934-8064-4-git-send-email-lidongchen@tencent.com>
-	<20180426164011.GM2631@work-vm>
-From: 858585 jemmy <jemmy858585@gmail.com>
-Date: Fri, 27 Apr 2018 11:51:59 +0800
-Message-ID: <CAOGPPbcSBxdja0hZLmhqA5y5RBCGjV5-d+ptdGEHh9_CZnWhPQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] migration: remove unnecessary
- variables len in QIOChannelRDMA
+In-Reply-To: <20180427003215.GU29865@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH] tests/device-introspect: Test devices
+ with all machines, not only with "none"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,97 +27,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Gal Shachaf <galsha@mellanox.com>, Aviad Yehezkel <aviadye@mellanox.com>, licq@mellanox.com, adido@mellanox.com, Lidong Chen <lidongchen@tencent.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-On Fri, Apr 27, 2018 at 12:40 AM, Dr. David Alan Gilbert
-<dgilbert@redhat.com> wrote:
-> * Lidong Chen (jemmy858585@gmail.com) wrote:
->> Because qio_channel_rdma_writev and qio_channel_rdma_readv maybe invoked
->> by different threads concurrently, this patch removes unnecessary variables
->> len in QIOChannelRDMA and use local variable instead.
+On 27.04.2018 02:32, Eduardo Habkost wrote:
+> On Thu, Apr 26, 2018 at 05:20:25PM +0200, Thomas Huth wrote:
+>> On 26.04.2018 13:45, Markus Armbruster wrote:
+>>> Thomas Huth <thuth@redhat.com> writes:
+>> [...]
+>>>> @@ -260,6 +263,26 @@ static void test_abstract_interfaces(void)
+>>>>      qtest_end();
+>>>>  }
+>>>> =20
+>>>> +static void add_machine_test_case(const char *mname)
+>>>> +{
+>>>> +    char *path, *args;
+>>>> +
+>>>> +    /* Ignore blacklisted machines */
+>>>> +    if (g_str_equal("xenfv", mname) || g_str_equal("xenpv", mname))=
+ {
+>>>> +        return;
+>>>> +    }
+>>>> +
+>>>> +    path =3D g_strdup_printf("device/introspect/concrete-defaults-%=
+s", mname);
+>>>> +    args =3D g_strdup_printf("-machine %s", mname);
+>>>> +    qtest_add_data_func(path, args, test_device_intro_concrete);
+>>>
+>>> This runs test_device_intro_concrete() with "-machine M" for all mach=
+ine
+>>> types M, in SPEED=3Dslow mode.
+>>>
+>>>> +    g_free(path);
+>>>> +
+>>>> +    path =3D g_strdup_printf("device/introspect/concrete-nodefaults=
+-%s", mname);
+>>>> +    args =3D g_strdup_printf("-nodefaults -machine %s", mname);
+>>>> +    qtest_add_data_func(path, args, test_device_intro_concrete);
+>>>
+>>> This runs test_device_intro_concrete() with "-nodefaults -machine M" =
+for
+>>> all machine types M, in SPEED=3Dslow mode.
+>>>
+>>> Has "without -nodefaults" exposed additional bugs?
 >>
->> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
->
-> I'm OK with this patch as is; but now you're making me worried that I
-> don't quite understand what thrads are accessing it at the same time; we
-> need to document/comment what's accessed concurrently..
+>> After testing this with all machines, I had to discover that
+>> "-nodefaults" does not work so easily: A lot of the embedded machines
+>> (especially the ARM machines) simply refuse to work with "-nodefaults"
+>> and exit immediately instead. E.g.:
+>>
+>> $ arm-softmmu/qemu-system-arm -nodefaults -nographic -M n810,accel=3Dq=
+test
+>> qemu-system-arm: missing SecureDigital device
+>>
+>> So we'd either need a rather big black list for the machines that do n=
+ot
+>> work, or simply drop the "-nodefaults" tests from this patch.
+>=20
+> Or we could try to test all machines anyway, but not consider it
+> an error if QEMU just does exit(1).  Can the qtest C API give us
+> that information?
 
-for the source qemu, migration thread invokes qio_channel_rdma_writev,
-and the return
-path thread invokes qio_channel_rdma_readv.
+At a first glance, I haven't seen an easy way to do this. I guess we
+could do some polling with waitid() or do something with SIGCHLD, but...
 
-for the destination qemu, before postcopy, the main thread invokes
-qio_channel_rdma_readv
-and qio_channel_rdma_writev.
-after postcopy, the listen_thread invokes qio_channel_rdma_readv, and
-the ram_fault_thread
-invokes qio_channel_rdma_writev.
+> (Or we could simply let -nodefaults aside by now, and do this
+> after we implement this test case in Python.)
 
->
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->
->> ---
->>  migration/rdma.c | 15 +++++++--------
->>  1 file changed, 7 insertions(+), 8 deletions(-)
->>
->> diff --git a/migration/rdma.c b/migration/rdma.c
->> index c745427..f5c1d02 100644
->> --- a/migration/rdma.c
->> +++ b/migration/rdma.c
->> @@ -404,7 +404,6 @@ struct QIOChannelRDMA {
->>      QIOChannel parent;
->>      RDMAContext *rdma;
->>      QEMUFile *file;
->> -    size_t len;
->>      bool blocking; /* XXX we don't actually honour this yet */
->>  };
->>
->> @@ -2640,6 +2639,7 @@ static ssize_t qio_channel_rdma_writev(QIOChannel *ioc,
->>      int ret;
->>      ssize_t done = 0;
->>      size_t i;
->> +    size_t len = 0;
->>
->>      CHECK_ERROR_STATE();
->>
->> @@ -2659,10 +2659,10 @@ static ssize_t qio_channel_rdma_writev(QIOChannel *ioc,
->>          while (remaining) {
->>              RDMAControlHeader head;
->>
->> -            rioc->len = MIN(remaining, RDMA_SEND_INCREMENT);
->> -            remaining -= rioc->len;
->> +            len = MIN(remaining, RDMA_SEND_INCREMENT);
->> +            remaining -= len;
->>
->> -            head.len = rioc->len;
->> +            head.len = len;
->>              head.type = RDMA_CONTROL_QEMU_FILE;
->>
->>              ret = qemu_rdma_exchange_send(rdma, &head, data, NULL, NULL, NULL);
->> @@ -2672,8 +2672,8 @@ static ssize_t qio_channel_rdma_writev(QIOChannel *ioc,
->>                  return ret;
->>              }
->>
->> -            data += rioc->len;
->> -            done += rioc->len;
->> +            data += len;
->> +            done += len;
->>          }
->>      }
->>
->> @@ -2768,8 +2768,7 @@ static ssize_t qio_channel_rdma_readv(QIOChannel *ioc,
->>              }
->>          }
->>      }
->> -    rioc->len = done;
->> -    return rioc->len;
->> +    return done;
->>  }
->>
->>  /*
->> --
->> 1.8.3.1
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+... I'd rather prefer that for now, assuming that the test will later
+get replaced by the python test anyway.
+
+ Thomas
