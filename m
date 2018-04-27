@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42588)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1fC89V-0000QH-Vi
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 14:31:27 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fC8XB-0000qZ-AK
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 14:55:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1fC89S-0006Za-12
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 14:31:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51204 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1fC89R-0006ZV-Qn
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 14:31:21 -0400
-References: <20180219114332.70443-1-marcel@redhat.com>
-	<20180219114332.70443-9-marcel@redhat.com>
-	<CAFEAcA8rx712pVT=yn0Xx_CEza2cSNO26F7_RPDudKWi6LnMwA@mail.gmail.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <7e9f042e-bea2-f855-cb0e-810831449637@redhat.com>
-Date: Fri, 27 Apr 2018 21:31:18 +0300
+	(envelope-from <alex.bennee@linaro.org>) id 1fC8X8-0007JU-5a
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 14:55:53 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:39754)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fC8X7-0007HD-Us
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 14:55:50 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id q3-v6so2682150wrj.6
+	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 11:55:49 -0700 (PDT)
+References: <20180425012300.14698-1-richard.henderson@linaro.org>
+	<87wowsk1ih.fsf@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <87wowsk1ih.fsf@linaro.org>
+Date: Fri, 27 Apr 2018 19:55:47 +0100
+Message-ID: <87vaccjx70.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8rx712pVT=yn0Xx_CEza2cSNO26F7_RPDudKWi6LnMwA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH PULL v2 08/10] hw/rdma: PVRDMA commands and
- data-path ops
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/9] target/arm: Fixups for
+ ARM_FEATURE_V8_FP16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,74 +31,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Yuval Shaia <yuval.shaia@oracle.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-On 27/04/2018 18:01, Peter Maydell wrote:
-> On 19 February 2018 at 11:43, Marcel Apfelbaum <marcel@redhat.com> wrote:
->> From: Yuval Shaia <yuval.shaia@oracle.com>
+
+Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+
+> Richard Henderson <richard.henderson@linaro.org> writes:
+>
+>> When running the gcc testsuite with current aarch64-linux-user,
+>> the testsuite detects the presence of the fp16 extension and
+>> enables lots of extra tests for builtins.
 >>
->> First PVRDMA sub-module - implementation of the PVRDMA device.
->> - PVRDMA commands such as create CQ and create MR.
->> - Data path QP operations - post_send and post_recv.
->> - Completion handler.
-> 
-> Coverity CID 1390620: we call munmap() on a NULL pointer.
-> 
->> +static int create_mr(PVRDMADev *dev, union pvrdma_cmd_req *req,
->> +                     union pvrdma_cmd_resp *rsp)
->> +{
->> +    struct pvrdma_cmd_create_mr *cmd = &req->create_mr;
->> +    struct pvrdma_cmd_create_mr_resp *resp = &rsp->create_mr_resp;
->> +    PCIDevice *pci_dev = PCI_DEVICE(dev);
->> +    void *host_virt = NULL;
-> 
-> Here we set host_virt to NULL...
-> 
->> +
->> +    memset(resp, 0, sizeof(*resp));
->> +    resp->hdr.response = cmd->hdr.response;
->> +    resp->hdr.ack = PVRDMA_CMD_CREATE_MR_RESP;
->> +
->> +    pr_dbg("pd_handle=%d\n", cmd->pd_handle);
->> +    pr_dbg("access_flags=0x%x\n", cmd->access_flags);
->> +    pr_dbg("flags=0x%x\n", cmd->flags);
->> +
->> +    if (!(cmd->flags & PVRDMA_MR_FLAG_DMA)) {
-> 
-> ...and if we don't take this if() we won't set host_virt to anything...
-> 
->> +        host_virt = pvrdma_map_to_pdir(pci_dev, cmd->pdir_dma, cmd->nchunks,
->> +                                       cmd->length);
->> +        if (!host_virt) {
->> +            pr_dbg("Failed to map to pdir\n");
->> +            resp->hdr.err = -EINVAL;
->> +            goto out;
->> +        }
->> +    }
->> +
->> +    resp->hdr.err = rdma_rm_alloc_mr(&dev->rdma_dev_res, cmd->pd_handle,
->> +                                     cmd->start, cmd->length, host_virt,
->> +                                     cmd->access_flags, &resp->mr_handle,
->> +                                     &resp->lkey, &resp->rkey);
->> +    if (!resp->hdr.err) {
->> +        munmap(host_virt, cmd->length);
-> 
-> ...but here we call munmap() on it without checking if it is NULL.
-> Unlike g_free(), munmap() isn't specified to be "do nothing if
-> passed a NULL pointer".
+>> Quite a few of these new tests fail because we missed implementing
+>> some instructions.  We really should go back and verify that nothing
+>> else is missing from this (rather large) extension.
+>
+> So this set of instructions is generated from any ASL description that
+> contains "half":
+<snip>
+>
+> Failed 9 tests:
+> testcases.armv8.2_half/insn_FCCMP_H_floatccmp__INC.risu.bin
+> testcases.armv8.2_half/insn_FCCMPE_H_floatccmp__INC.risu.bin
+> testcases.armv8.2_half/insn_FCMP_H_floatcmp__INC.risu.bin
+> testcases.armv8.2_half/insn_FCMP_HZ_floatcmp__INC.risu.bin
+> testcases.armv8.2_half/insn_FCMPE_H_floatcmp__INC.risu.bin
+> testcases.armv8.2_half/insn_FCMPE_HZ_floatcmp__INC.risu.bin
+> testcases.armv8.2_half/insn_FCSEL_H_floatsel__INC.risu.bin
 
-Will fix, thanks for finding it!
-Marcel
+Well that looks like a whole class of compares we are missing. I'll get
+to work on that.
 
-> 
->> +    }
->> +
->> +out:
->> +    pr_dbg("ret=%d\n", resp->hdr.err);
->> +    return resp->hdr.err;
->> +}
-> 
-> thanks
-> -- PMM
-> 
+> testcases.armv8.2_half/insn_FMOV_H_floatimm__INC.risu.bin
+> testcases.armv8.2_half/insn_FSQRT_H_floatdp1__INC.risu.bin
+>
+> but I haven't checked to see if that is just instructions the FVP has in
+> full SVE mode that aren't in the just FP16 fixes branch I was testing
+> against.
+>
+>
+>>
+>> In addition, it tests some edge conditions on data that show flaws
+>> in the way we were performing integer<->fp conversion; particularly
+>> with respect to scaled conversion.
+>>
+>>
+>> r~
+>>
+>> PS: FWIW, this was written against my tgt-arm-sve-9 tree, since I
+>> was trying to test sve as generated by gcc.  I don't *think* there
+>> are any dependencies on any of the sve patches, but I didn't check.
+>>
+>> PPS: There are two more failures that might be qemu fp16 failures,
+>> but those are SIGSEGV.  This patch set cures all of the SIGILL and
+>> (subsequent) SIGABRT type failures within the testsuite.
+>>
+>>
+>> Richard Henderson (9):
+>>   target/arm: Implement vector shifted SCVF/UCVF for fp16
+>>   target/arm: Implement vector shifted FCVT for fp16
+>>   target/arm: Fix float16 to/from int16
+>>   target/arm: Clear SVE high bits for FMOV
+>>   target/arm: Implement FMOV (general) for fp16
+>>   target/arm: Implement FCVT (scalar,integer) for fp16
+>>   target/arm: Implement FCVT (scalar,fixed-point) for fp16
+>>   target/arm: Implement FP data-processing (2 source) for fp16
+>>   target/arm: Implement FP data-processing (3 source) for fp16
+>>
+>>  target/arm/helper.h        |   6 +
+>>  target/arm/helper.c        |  87 ++++++++++-
+>>  target/arm/translate-a64.c | 371 +++++++++++++++++++++++++++++++++++++-=
+-------
+>>  3 files changed, 399 insertions(+), 65 deletions(-)
+
+
+--
+Alex Benn=C3=A9e
