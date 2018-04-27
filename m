@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45156)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fC2Wt-0001Xp-Qe
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:31:15 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fC2an-0004N3-Gd
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:35:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fC2Wo-00061i-VY
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:31:11 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49892)
+	(envelope-from <peter.maydell@linaro.org>) id 1fC2am-0007lC-Hn
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:35:13 -0400
+Received: from mail-ot0-x232.google.com ([2607:f8b0:4003:c0f::232]:34267)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fC2Wo-00060D-Oh
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:31:06 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fC2Wm-00067A-3a
-	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 12:31:04 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B54412E818B
-	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 12:31:01 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fC2am-0007kf-By
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:35:12 -0400
+Received: by mail-ot0-x232.google.com with SMTP id i5-v6so1840045oth.1
+	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 05:35:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 27 Apr 2018 12:25:08 -0000
-From: Bruno Haible <bruno@clisp.org>
-Reply-To: Bug 1701808 <1701808@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149891130681.24932.1838110700653893581.malonedeb@soybean.canonical.com>
-Message-Id: <152483190887.6994.4153600817846350197.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1701808] Re: stack smashing in or after recvmsg
- system call in aarch64 user mode
+In-Reply-To: <20180306040154.3669-4-david@gibson.dropbear.id.au>
+References: <20180306040154.3669-1-david@gibson.dropbear.id.au>
+	<20180306040154.3669-4-david@gibson.dropbear.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 27 Apr 2018 13:34:51 +0100
+Message-ID: <CAFEAcA_ErkL21OvsXtHWX6k9wTM0DYv0eHOTio7aX=0YP1RTqg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 03/30] ppc440: Add emulation of plb-pcix
+ controller found in some 440 SoCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,45 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Greg Kurz <groug@kaod.org>, Alexander Graf <agraf@suse.de>, surajjs@au1.ibm.com, qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, BALATON Zoltan <balaton@eik.bme.hu>
 
-Confirmed: It's fixed in qemu-2.12.
+On 6 March 2018 at 04:01, David Gibson <david@gibson.dropbear.id.au> wrote:
+> From: BALATON Zoltan <balaton@eik.bme.hu>
+>
+> This is the PCIX controller found in newer 440 core SoCs e.g. the
+> AMMC 460EX. The device tree refers to this as plb-pcix compared to
+> the plb-pci controller in older 440 SoCs.
+>
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> [dwg: Remove hwaddr from trace-events, that doesn't work with some
+>  trace backends]
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 
--- =
+> +    case PCIX0_PIM2SAL:
+> +        s->pim[2].sa &= 0xffffffff00000000ULL;
+> +        s->pim[2].sa = val;
+> +        ppc440_pcix_update_pim(s, 2);
+> +        break;
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1701808
+Coverity (CID1390577) points out that the "s->pim[2].sa = val;"
+overwrites the value set by the &= line, making it pointless.
+Should this be "|= val" like the other cases in this switch?
 
-Title:
-  stack smashing in or after recvmsg system call in aarch64 user mode
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  A program that invokes recvmsg aborts with "*** stack smashing
-  detected ***" when run in qemu-aarch64 (user mode), but works fine
-  when running on native aarch64 hardware.
-
-  How to reproduce:
-  $ aarch64-linux-gnu-gcc-5 -O -Wall /media/develdata/devel/qemu-bug/testpa=
-ssfd.c -static -DEXTRA_SPACE=3D0
-  $ QEMU_LD_PREFIX=3D/usr/aarch64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-aarc=
-h64 ./a.out
-  *** stack smashing detected ***: ./a.out terminated
-  qemu: uncaught target signal 6 (Aborted) - core dumped
-
-  On native aarch64 hardware:
-  $ ./a.out =
-
-  $ echo $?
-  0
-
-  The parameter EXTRA_SPACE can be used to add additional space to the
-  array that receives the recvmsg data. With -DEXTRA_SPACE=3D9 (or
-  larger), the program runs fine. Which suggests that recvmsg is storing
-  up to 9 bytes more than allowed in memory.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1701808/+subscriptions
+thanks
+-- PMM
