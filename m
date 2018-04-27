@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fC3DR-0001Mr-Vs
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 09:15:11 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fC3FC-0002jM-OF
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 09:16:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fC3DN-0002a7-8W
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 09:15:09 -0400
-References: <1524734910-17970-1-git-send-email-thuth@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <06fd547e-6a1b-6920-fb5e-acadea0b8fd0@redhat.com>
-Date: Fri, 27 Apr 2018 15:14:57 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fC3F6-0003Hy-Or
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 09:16:58 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:39469)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fC3F6-0003Hq-JR
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 09:16:52 -0400
+Received: by mail-ot0-x241.google.com with SMTP id l12-v6so1967936oth.6
+	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 06:16:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1524734910-17970-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 0/3] pc-bios/s390-ccw: Some
- few network boot improvements
+In-Reply-To: <20180312091405.19610-14-kraxel@redhat.com>
+References: <20180312091405.19610-1-kraxel@redhat.com>
+	<20180312091405.19610-14-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 27 Apr 2018 14:16:31 +0100
+Message-ID: <CAFEAcA8XWcJfjgeNRg4j7yMwPx2fNmjxL3qEgnkX8qJrUHQb5g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 13/14] spice: add cursor_dmabuf support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,65 +30,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Cc: Farhan Ali <alifm@linux.ibm.com>, Collin Walling <walling@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 26.04.2018 11:28, Thomas Huth wrote:
-> Note: I've decided to removed the pxelinux.cfg patches from this series
-> for now, since full pxelinux support requires to parse some additional
-> DHCP options (see https://tools.ietf.org/html/rfc5071), and for this, the
-> SLOF libnet code needs to be changed first. So I guess I first have to
-> implement pxelinux.cfg support for PPC, too, which will likely take a
-> little bit longer...
+On 12 March 2018 at 09:14, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> Add support for cursor dmabufs.  qemu has to render the cursor for
+> that, so in case a cursor is present qemu allocates a new dmabuf, blits
+> the scanout, blends in the pointer and passes on the new dmabuf to
+> spice-server.  Without cursor qemu continues to simply pass on the
+> scanout dmabuf as-is.
+>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Message-id: 20180308090618.30147-4-kraxel@redhat.com
+> +static void qemu_spice_gl_cursor_position(DisplayChangeListener *dcl,
+> +                                          uint32_t pos_x, uint32_t pos_y=
+)
+> +{
+> +    SimpleSpiceDisplay *ssd =3D container_of(dcl, SimpleSpiceDisplay, dc=
+l);
+> +
+> +    ssd->ptr_x =3D pos_x;
+> +    ssd->ptr_y =3D pos_y;
 
-I don't think it would be wrong to include it for now. We just don't
-support all options yet - that can be fixed later. If the current state
-is what 99.9999% of all users will need, than include it. If it is a
-crucial feature, than I agree.
+Is it safe to write to these fields of ssd without holding
+ssd->lock ? Coverity thinks it might not be (CID 1390631) because
+we do take the lock to update them in display_mouse_set().
 
-> Thus to keep this series short and reviewable, and to avoid that the other
-> patches bit-rot on my hard disk, I've now only included the patches that
-> are not related to pxelinux.cfg.
-> 
-> The first patch is just a minor code refactoring which should not have
-> any visible impact, but makes the following patches easier.
-> 
-> The second patch makes sure that we leave the machine in a sane state
-> before jumping into the Linux kernel - i.e. the netboot firmware now
-> resets the machine with diag308, too, just like the main s390-ccw
-> is doing it already.
-> 
-> Patch 3 adds support for loading kernels via .INS configuration files.
-> You can find these .INS config files on ISO images, so with this patch,
-> it should be possible to boot if the TFTP server is configured to use
-> the contents of such an ISO image.
-> 
-> v4:
->  - s/uninit/release/ in the title of the first patch
->  - Set schid of the network device in 184
->  - Jump to 0x10000 start address if S390EP magic is available
-> 
-> Thomas Huth (3):
->   pc-bios/s390-ccw/net: Split up net_load() into init, load and release
->     parts
->   pc-bios/s390-ccw/net: Use diag308 to reset machine before jumping to
->     the OS
->   pc-bios/s390-ccw/net: Add support for .INS config files
-> 
->  pc-bios/s390-ccw/Makefile    |   4 +-
->  pc-bios/s390-ccw/bootmap.c   |  63 +---------------
->  pc-bios/s390-ccw/bootmap.h   |   4 --
->  pc-bios/s390-ccw/jump2ipl.c  |  91 +++++++++++++++++++++++
->  pc-bios/s390-ccw/netboot.mak |   3 +-
->  pc-bios/s390-ccw/netmain.c   | 168 +++++++++++++++++++++++++++++++++++--------
->  pc-bios/s390-ccw/s390-ccw.h  |   4 ++
->  7 files changed, 240 insertions(+), 97 deletions(-)
->  create mode 100644 pc-bios/s390-ccw/jump2ipl.c
-> 
-
-
--- 
-
-Thanks,
-
-David / dhildenb
+thanks
+-- PMM
