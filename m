@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49082)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fBu4s-0007Lw-VQ
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 23:29:44 -0400
+	(envelope-from <mst@redhat.com>) id 1fBu4s-0007Ly-VV
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 23:29:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fBu4p-0002c2-UR
+	(envelope-from <mst@redhat.com>) id 1fBu4p-0002br-TS
 	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 23:29:42 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45852 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33150 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fBu4p-0002bF-Ou
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fBu4p-0002bB-O1
 	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 23:29:39 -0400
-Date: Fri, 27 Apr 2018 06:29:34 +0300
+Date: Fri, 27 Apr 2018 06:29:36 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1524799751-151698-2-git-send-email-mst@redhat.com>
+Message-ID: <1524799751-151698-3-git-send-email-mst@redhat.com>
 References: <1524799751-151698-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1524799751-151698-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 1/4] intel-iommu: send PSI always when
- notify_unmap set
+Subject: [Qemu-devel] [PULL 2/4] hw/pci-host/q35: Replace hardcoded value
+ with macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,107 +28,63 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Xu <peterx@redhat.com>, Jason Wang <jasowang@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Zihan Yang <whois.zihan.yang@gmail.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-From: Peter Xu <peterx@redhat.com>
+From: Zihan Yang <whois.zihan.yang@gmail.com>
 
-During IOVA page table walk, there is a special case when:
+During smram region initialization some addresses are hardcoded,
+replace them with macro to be more clear to readers.
 
-- notify_unmap is set, meanwhile
-- entry is invalid
+Previous patch forgets about one value and exceeds the line
+limit of 90 characters. The v2 breaks a few long lines
 
-In the past, we skip the entry always.  This is not correct.  We should
-send UNMAP notification to registered notifiers in this case.  Otherwise
-some stall pages will still be mapped in the host even if L1 guest
-unmapped them already.
-
-Without this patch, nested device assignment to L2 guests might dump
-some errors like:
-
-qemu-system-x86_64: VFIO_MAP_DMA: -17
-qemu-system-x86_64: vfio_dma_map(0x557305420c30, 0xad000, 0x1000,
-                    0x7f89a920d000) = -17 (File exists)
-
-To fix this, we need to apply this patch to L1 QEMU (L2 QEMU is not
-affected by this problem).
-
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
+Signed-off-by: Zihan Yang <whois.zihan.yang@gmail.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/i386/intel_iommu.c | 42 ++++++++++++++++++++++++++++++------------
- 1 file changed, 30 insertions(+), 12 deletions(-)
+ hw/pci-host/q35.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index fb31de9..b359efd 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -722,6 +722,15 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
+diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+index a36a119..02f9576 100644
+--- a/hw/pci-host/q35.c
++++ b/hw/pci-host/q35.c
+@@ -535,13 +535,15 @@ static void mch_realize(PCIDevice *d, Error **errp)
  
- typedef int (*vtd_page_walk_hook)(IOMMUTLBEntry *entry, void *private);
+     /* if *disabled* show SMRAM to all CPUs */
+     memory_region_init_alias(&mch->smram_region, OBJECT(mch), "smram-region",
+-                             mch->pci_address_space, 0xa0000, 0x20000);
+-    memory_region_add_subregion_overlap(mch->system_memory, 0xa0000,
++                             mch->pci_address_space, MCH_HOST_BRIDGE_SMRAM_C_BASE,
++                             MCH_HOST_BRIDGE_SMRAM_C_SIZE);
++    memory_region_add_subregion_overlap(mch->system_memory, MCH_HOST_BRIDGE_SMRAM_C_BASE,
+                                         &mch->smram_region, 1);
+     memory_region_set_enabled(&mch->smram_region, true);
  
-+static int vtd_page_walk_one(IOMMUTLBEntry *entry, int level,
-+                             vtd_page_walk_hook hook_fn, void *private)
-+{
-+    assert(hook_fn);
-+    trace_vtd_page_walk_one(level, entry->iova, entry->translated_addr,
-+                            entry->addr_mask, entry->perm);
-+    return hook_fn(entry, private);
-+}
-+
- /**
-  * vtd_page_walk_level - walk over specific level for IOVA range
-  *
-@@ -781,28 +790,37 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
-          */
-         entry_valid = read_cur | write_cur;
+     memory_region_init_alias(&mch->open_high_smram, OBJECT(mch), "smram-open-high",
+-                             mch->ram_memory, 0xa0000, 0x20000);
++                             mch->ram_memory, MCH_HOST_BRIDGE_SMRAM_C_BASE,
++                             MCH_HOST_BRIDGE_SMRAM_C_SIZE);
+     memory_region_add_subregion_overlap(mch->system_memory, 0xfeda0000,
+                                         &mch->open_high_smram, 1);
+     memory_region_set_enabled(&mch->open_high_smram, false);
+@@ -550,11 +552,14 @@ static void mch_realize(PCIDevice *d, Error **errp)
+     memory_region_init(&mch->smram, OBJECT(mch), "smram", 1ull << 32);
+     memory_region_set_enabled(&mch->smram, true);
+     memory_region_init_alias(&mch->low_smram, OBJECT(mch), "smram-low",
+-                             mch->ram_memory, 0xa0000, 0x20000);
++                             mch->ram_memory, MCH_HOST_BRIDGE_SMRAM_C_BASE,
++                             MCH_HOST_BRIDGE_SMRAM_C_SIZE);
+     memory_region_set_enabled(&mch->low_smram, true);
+-    memory_region_add_subregion(&mch->smram, 0xa0000, &mch->low_smram);
++    memory_region_add_subregion(&mch->smram, MCH_HOST_BRIDGE_SMRAM_C_BASE,
++                                &mch->low_smram);
+     memory_region_init_alias(&mch->high_smram, OBJECT(mch), "smram-high",
+-                             mch->ram_memory, 0xa0000, 0x20000);
++                             mch->ram_memory, MCH_HOST_BRIDGE_SMRAM_C_BASE,
++                             MCH_HOST_BRIDGE_SMRAM_C_SIZE);
+     memory_region_set_enabled(&mch->high_smram, true);
+     memory_region_add_subregion(&mch->smram, 0xfeda0000, &mch->high_smram);
  
-+        entry.target_as = &address_space_memory;
-+        entry.iova = iova & subpage_mask;
-+        entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
-+        entry.addr_mask = ~subpage_mask;
-+
-         if (vtd_is_last_slpte(slpte, level)) {
--            entry.target_as = &address_space_memory;
--            entry.iova = iova & subpage_mask;
-             /* NOTE: this is only meaningful if entry_valid == true */
-             entry.translated_addr = vtd_get_slpte_addr(slpte, aw);
--            entry.addr_mask = ~subpage_mask;
--            entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
-             if (!entry_valid && !notify_unmap) {
-                 trace_vtd_page_walk_skip_perm(iova, iova_next);
-                 goto next;
-             }
--            trace_vtd_page_walk_one(level, entry.iova, entry.translated_addr,
--                                    entry.addr_mask, entry.perm);
--            if (hook_fn) {
--                ret = hook_fn(&entry, private);
--                if (ret < 0) {
--                    return ret;
--                }
-+            ret = vtd_page_walk_one(&entry, level, hook_fn, private);
-+            if (ret < 0) {
-+                return ret;
-             }
-         } else {
-             if (!entry_valid) {
--                trace_vtd_page_walk_skip_perm(iova, iova_next);
-+                if (notify_unmap) {
-+                    /*
-+                     * The whole entry is invalid; unmap it all.
-+                     * Translated address is meaningless, zero it.
-+                     */
-+                    entry.translated_addr = 0x0;
-+                    ret = vtd_page_walk_one(&entry, level, hook_fn, private);
-+                    if (ret < 0) {
-+                        return ret;
-+                    }
-+                } else {
-+                    trace_vtd_page_walk_skip_perm(iova, iova_next);
-+                }
-                 goto next;
-             }
-             ret = vtd_page_walk_level(vtd_get_slpte_addr(slpte, aw), iova,
 -- 
 MST
