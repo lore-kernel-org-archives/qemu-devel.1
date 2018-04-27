@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59196)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fC7I9-0004Ua-2B
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 13:36:17 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fC7IA-0004VZ-Ed
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 13:36:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fC7I8-0007t5-9m
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 13:36:17 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fC7I9-0007uK-IC
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 13:36:18 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 27 Apr 2018 18:36:09 +0100
-Message-Id: <20180427173611.10281-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 0/2] arm: convert a couple of devices away from
+Date: Fri, 27 Apr 2018 18:36:11 +0100
+Message-Id: <20180427173611.10281-3-peter.maydell@linaro.org>
+In-Reply-To: <20180427173611.10281-1-peter.maydell@linaro.org>
+References: <20180427173611.10281-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 2/2] hw/net/smc91c111: Convert away from
  old_mmio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -21,43 +23,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-We've had an API transition running for years for MemoryRegionOps
-away from the old_mmio function-per-width to the new-style single
-function each for read and write. This patchset converts a couple
-of devices used in Arm machines to the new style.
+Convert the smc91c111 device away from using the old_mmio field of
+MemoryRegionOps. This device is used by several Arm board models.
 
-This leaves us with:
- * hw/char/parallel
- * hw/block/pflash_cfi02
- * hw/display/vga-isa-mm
- * hw/input/pckbd
- * hw/intc/apic
- * hw/m68k/mcf5206
- * hw/net/pcinet-pci
- * hw/pci-host/bonito
- * hw/ppc/ppc405_boards
- * hw/ppc/ppc405_uc
- * hw/ppc/prep
- * hw/sh4/sh7750
- * hw/timer/m48t59
- * hw/watchdog/wdt_i6300esb
-
-for 17 uses in total.
-
-The conversions are fairly simple, so it would be nice to get
-this transition done for the next release -- then we can delete
-the code in memory.c that has to consider old_mmio.
-
-thanks
--- PMM
-
-Peter Maydell (2):
-  hw/usb/tusb6010: Convert away from old_mmio
-  hw/net/smc91c111: Convert away from old_mmio
-
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
  hw/net/smc91c111.c | 54 +++++++++++++++++++++-------------------------
- hw/usb/tusb6010.c  | 40 ++++++++++++++++++++++++++++++----
- 2 files changed, 61 insertions(+), 33 deletions(-)
+ 1 file changed, 25 insertions(+), 29 deletions(-)
 
+diff --git a/hw/net/smc91c111.c b/hw/net/smc91c111.c
+index 3b16dcf5a1..c8cc5379b7 100644
+--- a/hw/net/smc91c111.c
++++ b/hw/net/smc91c111.c
+@@ -625,37 +625,33 @@ static uint32_t smc91c111_readb(void *opaque, hwaddr offset)
+     return 0;
+ }
+ 
+-static void smc91c111_writew(void *opaque, hwaddr offset,
+-                             uint32_t value)
++static uint64_t smc91c111_readfn(void *opaque, hwaddr addr, unsigned size)
+ {
+-    smc91c111_writeb(opaque, offset, value & 0xff);
+-    smc91c111_writeb(opaque, offset + 1, value >> 8);
++    int i;
++    uint32_t val = 0;
++
++    for (i = 0; i < size; i++) {
++        val |= smc91c111_readb(opaque, addr + i) << (i * 8);
++    }
++    return val;
+ }
+ 
+-static void smc91c111_writel(void *opaque, hwaddr offset,
+-                             uint32_t value)
++static void smc91c111_writefn(void *opaque, hwaddr addr,
++                               uint64_t value, unsigned size)
+ {
++    int i = 0;
++
+     /* 32-bit writes to offset 0xc only actually write to the bank select
+-       register (offset 0xe)  */
+-    if (offset != 0xc)
+-        smc91c111_writew(opaque, offset, value & 0xffff);
+-    smc91c111_writew(opaque, offset + 2, value >> 16);
+-}
++     * register (offset 0xe), so skip the first two bytes we would write.
++     */
++    if (addr == 0xc && size == 4) {
++        i += 2;
++    }
+ 
+-static uint32_t smc91c111_readw(void *opaque, hwaddr offset)
+-{
+-    uint32_t val;
+-    val = smc91c111_readb(opaque, offset);
+-    val |= smc91c111_readb(opaque, offset + 1) << 8;
+-    return val;
+-}
+-
+-static uint32_t smc91c111_readl(void *opaque, hwaddr offset)
+-{
+-    uint32_t val;
+-    val = smc91c111_readw(opaque, offset);
+-    val |= smc91c111_readw(opaque, offset + 2) << 16;
+-    return val;
++    for (; i < size; i++) {
++        smc91c111_writeb(opaque, addr + i,
++                         extract32(value, i * 8, 8));
++    }
+ }
+ 
+ static int smc91c111_can_receive_nc(NetClientState *nc)
+@@ -747,10 +743,10 @@ static const MemoryRegionOps smc91c111_mem_ops = {
+     /* The special case for 32 bit writes to 0xc means we can't just
+      * set .impl.min/max_access_size to 1, unfortunately
+      */
+-    .old_mmio = {
+-        .read = { smc91c111_readb, smc91c111_readw, smc91c111_readl, },
+-        .write = { smc91c111_writeb, smc91c111_writew, smc91c111_writel, },
+-    },
++    .read = smc91c111_readfn,
++    .write = smc91c111_writefn,
++    .valid.min_access_size = 1,
++    .valid.max_access_size = 4,
+     .endianness = DEVICE_NATIVE_ENDIAN,
+ };
+ 
 -- 
 2.17.0
