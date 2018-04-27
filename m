@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1fBxOi-0004Kv-DV
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 03:02:29 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fBxS6-0005aF-CI
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 03:05:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1fBxOf-0005JD-2P
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 03:02:24 -0400
-Received: from mga09.intel.com ([134.134.136.24]:17748)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kevin.tian@intel.com>)
-	id 1fBxOe-0005Gl-Nw
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 03:02:21 -0400
-From: "Tian, Kevin" <kevin.tian@intel.com>
-Date: Fri, 27 Apr 2018 07:02:14 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19113B5D2@SHSMSX101.ccr.corp.intel.com>
-References: <20180425045129.17449-1-peterx@redhat.com>
-	<20180425045129.17449-9-peterx@redhat.com>
-	<2b05e076-0af9-0ee9-c076-7acc29714913@redhat.com>
-In-Reply-To: <2b05e076-0af9-0ee9-c076-7acc29714913@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <cohuck@redhat.com>) id 1fBxS3-0007oK-1z
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 03:05:54 -0400
+Date: Fri, 27 Apr 2018 09:05:39 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180427090539.7a7ffa0d.cohuck@redhat.com>
+In-Reply-To: <20180426183404.3756-2-lersek@redhat.com>
+References: <20180426183404.3756-1-lersek@redhat.com>
+	<20180426183404.3756-2-lersek@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 08/10] intel-iommu: maintain per-device
- iova ranges
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] qapi: fill in CpuInfoFast.arch in
+ query-cpus-fast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,73 +24,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, Peter Xu <peterx@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu devel list <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Viktor VM Mihajlovski <mihajlov@linux.vnet.ibm.com>, qemu-stable@nongnu.org
 
-PiBGcm9tOiBKYXNvbiBXYW5nIFttYWlsdG86amFzb3dhbmdAcmVkaGF0LmNvbV0NCj4gU2VudDog
-RnJpZGF5LCBBcHJpbCAyNywgMjAxOCAyOjA4IFBNDQo+IA0KPiBPbiAyMDE45bm0MDTmnIgyNeaX
-pSAxMjo1MSwgUGV0ZXIgWHUgd3JvdGU6DQo+ID4gRm9yIGVhY2ggVlREQWRkcmVzc1NwYWNlLCBu
-b3cgd2UgbWFpbnRhaW4gd2hhdCBJT1ZBIHJhbmdlcyB3ZSBoYXZlDQo+ID4gbWFwcGVkIGFuZCB3
-aGF0IHdlIGhhdmUgbm90LiAgV2l0aCB0aGF0IGluZm9ybWF0aW9uLCBub3cgd2Ugb25seQ0KPiBz
-ZW5kDQo+ID4gTUFQIG9yIFVOTUFQIHdoZW4gbmVjZXNzYXJ5LiAgU2F5LCB3ZSBkb24ndCBzZW5k
-IE1BUCBub3RpZmllcyBpZiB3ZQ0KPiBrbm93DQo+ID4gd2UgaGF2ZSBhbHJlYWR5IG1hcHBlZCB0
-aGUgcmFuZ2UsIG1lYW53aGlsZSB3ZSBkb24ndCBzZW5kIFVOTUFQDQo+IG5vdGlmaWVzDQo+ID4g
-aWYgd2Uga25vdyB3ZSBuZXZlciBtYXBwZWQgdGhlIHJhbmdlIGF0IGFsbC4NCj4gPg0KPiA+IFNp
-Z25lZC1vZmYtYnk6IFBldGVyIFh1IDxwZXRlcnhAcmVkaGF0LmNvbT4NCj4gPiAtLS0NCj4gPiAg
-IGluY2x1ZGUvaHcvaTM4Ni9pbnRlbF9pb21tdS5oIHwgIDIgKysNCj4gPiAgIGh3L2kzODYvaW50
-ZWxfaW9tbXUuYyAgICAgICAgIHwgMjggKysrKysrKysrKysrKysrKysrKysrKysrKysrKw0KPiA+
-ICAgaHcvaTM4Ni90cmFjZS1ldmVudHMgICAgICAgICAgfCAgMiArKw0KPiA+ICAgMyBmaWxlcyBj
-aGFuZ2VkLCAzMiBpbnNlcnRpb25zKCspDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9o
-dy9pMzg2L2ludGVsX2lvbW11LmgNCj4gYi9pbmNsdWRlL2h3L2kzODYvaW50ZWxfaW9tbXUuaA0K
-PiA+IGluZGV4IDQ4NmUyMDVlNzkuLjA5YTJlOTQ0MDQgMTAwNjQ0DQo+ID4gLS0tIGEvaW5jbHVk
-ZS9ody9pMzg2L2ludGVsX2lvbW11LmgNCj4gPiArKysgYi9pbmNsdWRlL2h3L2kzODYvaW50ZWxf
-aW9tbXUuaA0KPiA+IEBAIC0yNyw2ICsyNyw3IEBADQo+ID4gICAjaW5jbHVkZSAiaHcvaTM4Ni9p
-b2FwaWMuaCINCj4gPiAgICNpbmNsdWRlICJody9wY2kvbXNpLmgiDQo+ID4gICAjaW5jbHVkZSAi
-aHcvc3lzYnVzLmgiDQo+ID4gKyNpbmNsdWRlICJxZW11L2ludGVydmFsLXRyZWUuaCINCj4gPg0K
-PiA+ICAgI2RlZmluZSBUWVBFX0lOVEVMX0lPTU1VX0RFVklDRSAiaW50ZWwtaW9tbXUiDQo+ID4g
-ICAjZGVmaW5lIElOVEVMX0lPTU1VX0RFVklDRShvYmopIFwNCj4gPiBAQCAtOTUsNiArOTYsNyBA
-QCBzdHJ1Y3QgVlREQWRkcmVzc1NwYWNlIHsNCj4gPiAgICAgICBRTElTVF9FTlRSWShWVERBZGRy
-ZXNzU3BhY2UpIG5leHQ7DQo+ID4gICAgICAgLyogU3VwZXJzZXQgb2Ygbm90aWZpZXIgZmxhZ3Mg
-dGhhdCB0aGlzIGFkZHJlc3Mgc3BhY2UgaGFzICovDQo+ID4gICAgICAgSU9NTVVOb3RpZmllckZs
-YWcgbm90aWZpZXJfZmxhZ3M7DQo+ID4gKyAgICBJVFRyZWUgKmlvdmFfdHJlZTsgICAgICAgICAg
-LyogVHJhY2VzIG1hcHBlZCBJT1ZBIHJhbmdlcyAqLw0KPiA+ICAgfTsNCj4gPg0KPiA+ICAgc3Ry
-dWN0IFZUREJ1cyB7DQo+ID4gZGlmZiAtLWdpdCBhL2h3L2kzODYvaW50ZWxfaW9tbXUuYyBiL2h3
-L2kzODYvaW50ZWxfaW9tbXUuYw0KPiA+IGluZGV4IGExOWMxOGI4ZDQuLjhmMzk2YTVkMTMgMTAw
-NjQ0DQo+ID4gLS0tIGEvaHcvaTM4Ni9pbnRlbF9pb21tdS5jDQo+ID4gKysrIGIvaHcvaTM4Ni9p
-bnRlbF9pb21tdS5jDQo+ID4gQEAgLTc2OCwxMiArNzY4LDM3IEBAIHR5cGVkZWYgc3RydWN0IHsN
-Cj4gPiAgIHN0YXRpYyBpbnQgdnRkX3BhZ2Vfd2Fsa19vbmUoSU9NTVVUTEJFbnRyeSAqZW50cnks
-IGludCBsZXZlbCwNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdnRkX3BhZ2Vf
-d2Fsa19pbmZvICppbmZvKQ0KPiA+ICAgew0KPiA+ICsgICAgVlREQWRkcmVzc1NwYWNlICphcyA9
-IGluZm8tPmFzOw0KPiA+ICAgICAgIHZ0ZF9wYWdlX3dhbGtfaG9vayBob29rX2ZuID0gaW5mby0+
-aG9va19mbjsNCj4gPiAgICAgICB2b2lkICpwcml2YXRlID0gaW5mby0+cHJpdmF0ZTsNCj4gPiAr
-ICAgIElUUmFuZ2UgKm1hcHBlZCA9IGl0X3RyZWVfZmluZChhcy0+aW92YV90cmVlLCBlbnRyeS0+
-aW92YSwNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBlbnRyeS0+aW92
-YSArIGVudHJ5LT5hZGRyX21hc2spOw0KPiA+DQo+ID4gICAgICAgYXNzZXJ0KGhvb2tfZm4pOw0K
-PiA+ICsNCj4gPiArICAgIC8qIFVwZGF0ZSBsb2NhbCBJT1ZBIG1hcHBlZCByYW5nZXMgKi8NCj4g
-PiArICAgIGlmIChlbnRyeS0+cGVybSkgew0KPiA+ICsgICAgICAgIGlmIChtYXBwZWQpIHsNCj4g
-PiArICAgICAgICAgICAgLyogU2tpcCBzaW5jZSB3ZSBoYXZlIGFscmVhZHkgbWFwcGVkIHRoaXMg
-cmFuZ2UgKi8NCj4gPiArICAgICAgICAgICAgdHJhY2VfdnRkX3BhZ2Vfd2Fsa19vbmVfc2tpcF9t
-YXAoZW50cnktPmlvdmEsIGVudHJ5LQ0KPiA+YWRkcl9tYXNrLA0KPiA+ICsgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBtYXBwZWQtPnN0YXJ0LCBtYXBwZWQtPmVu
-ZCk7DQo+ID4gKyAgICAgICAgICAgIHJldHVybiAwOw0KPiA+ICsgICAgICAgIH0NCj4gPiArICAg
-ICAgICBpdF90cmVlX2luc2VydChhcy0+aW92YV90cmVlLCBlbnRyeS0+aW92YSwNCj4gPiArICAg
-ICAgICAgICAgICAgICAgICAgICBlbnRyeS0+aW92YSArIGVudHJ5LT5hZGRyX21hc2spOw0KPiAN
-Cj4gSSB3YXMgY29uc2lkZXIgYSBjYXNlIGUuZzoNCj4gDQo+IDEpIG1hcCBBIChpb3ZhKSB0byBC
-IChwYSkNCj4gMikgaW52YWxpZGF0ZSBBDQo+IDMpIG1hcCBBIChpb3ZhKSB0byBDIChwYSkNCj4g
-NCkgaW52YWxpZGF0ZSBBDQo+IA0KPiBJbiB0aGlzIGNhc2UsIHdlIHdpbGwgcHJvYmFibHkgbWlz
-cyBhIHdhbGsgaGVyZS4gQnV0IEknbSBub3Qgc3VyZSBpdCB3YXMNCj4gYWxsb3dlZCBieSB0aGUg
-c3BlYyAodGhvdWdoIEkgdGhpbmsgc28pLg0KPiANCg0KSSB0aG91Z2h0IGl0IHdhcyB3cm9uZyBp
-biBhIGdsaW1wc2UsIGJ1dCB0aGVuIGNoYW5nZWQgbXkgbWluZCBhZnRlcg0KYW5vdGhlciB0aGlu
-a2luZy4gQXMgbG9uZyBhcyBkZXZpY2UgZHJpdmVyIGNhbiBxdWllc2NlbnQgdGhlIGRldmljZQ0K
-dG8gbm90IGFjY2VzcyBBIChpb3ZhKSB3aXRoaW4gYWJvdmUgd2luZG93LCB0aGVuIGFib3ZlIHNl
-cXVlbmNlDQpoYXMgbm8gcHJvYmxlbSBzaW5jZSBhbnkgc3RhbGUgbWFwcGluZ3MgKEEtPkIpIGFk
-ZGVkIGJlZm9yZSBzdGVwIDQpDQp3b24ndCBiZSB1c2VkIGFuZCB0aGVuIHdpbGwgZ2V0IGZsdXNo
-ZWQgYWZ0ZXIgc3RlcCA0KS4gUmVnYXJkaW5nIHRvDQp0aGF0IGFjdHVhbGx5IHRoZSAxc3QgaW52
-YWxpZGF0aW9uIGNhbiBiZSBza2lwcGVkOg0KDQoxKSBtYXAgQSAoaW92YSkgdG8gQiAocGEpDQoy
-KSBkcml2ZXIgcHJvZ3JhbXMgZGV2aWNlIHRvIHVzZSBBDQozKSBkcml2ZXIgcHJvZ3JhbXMgZGV2
-aWNlIHRvIG5vdCB1c2UgQQ0KNCkgbWFwIEEgKGlvdmEpIHRvIEMgKHBhKQ0KCUEtPkIgbWF5IGJl
-IHN0aWxsIHZhbGlkIGluIElPVExCDQo1KSBpbnZhbGlkYXRlIEENCjYpIGRyaXZlciBwcm9ncmFt
-cyBkZXZpY2UgdG8gdXNlIEENCg0KT2YgY291cnNlIGFib3ZlIGRvZXNuJ3QgZ2VuZXJhdGUgYSBz
-YW5lIElPTU1VIEFQSSBmcmFtZXdvcmssDQpqdXN0IGFzIFBldGVyIHBvaW50ZWQgb3V0LiBCdXQg
-ZnJvbSBoYXJkd2FyZSBwLm8udiBpdCBsb29rcyBubw0KcHJvYmxlbS4NCg0KVGhhbmtzDQpLZXZp
-bg0K
+On Thu, 26 Apr 2018 20:34:01 +0200
+Laszlo Ersek <lersek@redhat.com> wrote:
+
+> * Commit ca230ff33f89 added the @arch field to @CpuInfoFast, but it failed
+>   to set the new field in qmp_query_cpus_fast(), when TARGET_S390X was not
+>   defined. The updated @query-cpus-fast example in "qapi-schema.json"
+>   showed "arch":"x86" only because qmp_query_cpus_fast() calls g_malloc0()
+>   to allocate @CpuInfoFast, and the CPU_INFO_ARCH_X86 enum constant is
+>   generated with value 0.
+> 
+>   All @arch values other than @s390 implied the @CpuInfoOther sub-struct
+>   for @CpuInfoFast -- at the time of writing the patch --, thus no fields
+>   other than @arch needed to be set when TARGET_S390X was not defined. Set
+>   @arch now, by copying the corresponding assignments from
+>   qmp_query_cpus().
+> 
+> * Commit 25fa194b7b11 added the @riscv enum constant to @CpuInfoArch (used
+>   in both @CpuInfo and @CpuInfoFast -- the return types of the @query-cpus
+>   and @query-cpus-fast commands, respectively), and assigned, in both
+>   return structures, the @CpuInfoRISCV sub-structure to the new enum
+>   value.
+> 
+>   However, qmp_query_cpus_fast() would not populate either the @arch field
+>   or the @CpuInfoRISCV sub-structure, when TARGET_RISCV was defined; only
+>   qmp_query_cpus() would.
+> 
+>   Assign @CpuInfoOther to the @riscv enum constant in @CpuInfoFast, and
+>   populate only the @arch field in qmp_query_cpus_fast(). Getting CPU
+>   state without interrupting KVM is an exceptional thing that only S390X
+>   does currently. Quoting Cornelia Huck <cohuck@redhat.com>, "s390x is
+>   exceptional in that it has state in QEMU that is actually interesting
+>   for upper layers and can be retrieved without performance penalty". See
+>   also
+>   <https://www.redhat.com/archives/libvir-list/2018-February/msg00121.html>.
+> 
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Eric Blake <eblake@redhat.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Cc: Viktor VM Mihajlovski <mihajlov@linux.vnet.ibm.com>
+> Cc: qemu-stable@nongnu.org
+> Fixes: ca230ff33f89bf7102cbfbc2328716da6750aaed
+> Fixes: 25fa194b7b11901561532e435beb83d046899f7a
+> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> ---
+> 
+> Notes:
+>     PATCHv2:
+>     
+>     - squash v1 patches 1/6 and 2/6 [Eric, Markus, Cornelia]
+>     
+>     - fix "added added" typo in the commit message [Eric]
+>     
+>     - update commit message wrt. S390X particulars [Cornelia, Markus,
+>       Viktor]
+>     
+>     - pick up Eric's R-b (synthesized from his R-b's for v1 1/6 & 2/6)
+>     
+>     - don't pick up Cornelia's R-b (only given for v1 1/6)
+>     
+>     - update the CC list
+>     
+>     PATCHv1:
+>     
+>     - new patch
+> 
+>  qapi/misc.json |  2 +-
+>  cpus.c         | 16 +++++++++++++++-
+>  2 files changed, 16 insertions(+), 2 deletions(-)
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
