@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50193)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fC4xF-0002Lr-8z
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 11:06:35 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fC4xI-0002Nl-Jx
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 11:06:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fC4xC-0003QT-LK
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 11:06:32 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43050 helo=mx1.redhat.com)
+	(envelope-from <imammedo@redhat.com>) id 1fC4xH-0003W4-A7
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 11:06:36 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52244 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fC4xC-0003QJ-Fx
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 11:06:30 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fC4xH-0003VJ-4L
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 11:06:35 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 23E50406C74B
-	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 15:06:30 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 85AB942F09FF
+	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 15:06:34 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Fri, 27 Apr 2018 17:05:19 +0200
-Message-Id: <1524841523-95513-8-git-send-email-imammedo@redhat.com>
+Date: Fri, 27 Apr 2018 17:05:23 +0200
+Message-Id: <1524841523-95513-12-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1524841523-95513-1-git-send-email-imammedo@redhat.com>
 References: <1524841523-95513-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 07/11] tests: add allowed-in-preconfig-test
- for qapi-schema
+Subject: [Qemu-devel] [PATCH v6 11/11] tests: functional tests for QMP
+ command set-numa-node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,102 +33,161 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, ehabkost@redhat.com, pkrempa@redhat.com, armbru@redhat.com
 
-make sure the QAPISchema can parse allowed-in-preconfig correctly
+ * start QEMU with 2 unmapped cpus,
+ * while in preconfig state
+    * add 2 numa nodes
+    * assign cpus to them
+ * exit preconfig and in running state check that cpus
+   are mapped correctly.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- tests/Makefile.include                           | 1 +
- tests/qapi-schema/allowed-in-preconfig-test.err  | 1 +
- tests/qapi-schema/allowed-in-preconfig-test.exit | 1 +
- tests/qapi-schema/allowed-in-preconfig-test.json | 2 ++
- tests/qapi-schema/allowed-in-preconfig-test.out  | 0
- tests/qapi-schema/qapi-schema-test.json          | 3 +++
- tests/qapi-schema/qapi-schema-test.out           | 2 ++
- tests/test-qmp-cmds.c                            | 4 ++++
- 8 files changed, 14 insertions(+)
- create mode 100644 tests/qapi-schema/allowed-in-preconfig-test.err
- create mode 100644 tests/qapi-schema/allowed-in-preconfig-test.exit
- create mode 100644 tests/qapi-schema/allowed-in-preconfig-test.json
- create mode 100644 tests/qapi-schema/allowed-in-preconfig-test.out
+v6:
+  * replace 'cont' with 'exit-preconfig' command
+v5:
+  * s/qobject_to_qdict(/qobject_to(QDict,/
+  * s/-preconfig/--preconfig/
+v4:
+  * drop duplicate is_err() and reuse qmp_rsp_is_err() wich is moved
+    to generic file libqtest.c. (Eric Blake <eblake@redhat.com>)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 3b9a5e3..4d2460d 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -524,6 +524,7 @@ qapi-schema += missing-type.json
- qapi-schema += nested-struct-data.json
- qapi-schema += non-objects.json
- qapi-schema += oob-test.json
-+qapi-schema += allowed-in-preconfig-test.json
- qapi-schema += pragma-doc-required-crap.json
- qapi-schema += pragma-extra-junk.json
- qapi-schema += pragma-name-case-whitelist-crap.json
-diff --git a/tests/qapi-schema/allowed-in-preconfig-test.err b/tests/qapi-schema/allowed-in-preconfig-test.err
-new file mode 100644
-index 0000000..2b0511b
---- /dev/null
-+++ b/tests/qapi-schema/allowed-in-preconfig-test.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/allowed-in-preconfig-test.json:2: 'allowed-in-preconfig' of command 'allowed-in-preconfig-test' should only use true value
-diff --git a/tests/qapi-schema/allowed-in-preconfig-test.exit b/tests/qapi-schema/allowed-in-preconfig-test.exit
-new file mode 100644
-index 0000000..d00491f
---- /dev/null
-+++ b/tests/qapi-schema/allowed-in-preconfig-test.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/allowed-in-preconfig-test.json b/tests/qapi-schema/allowed-in-preconfig-test.json
-new file mode 100644
-index 0000000..7e0e6cb
---- /dev/null
-+++ b/tests/qapi-schema/allowed-in-preconfig-test.json
-@@ -0,0 +1,2 @@
-+# Check against allowed-in-preconfig illegal value
-+{ 'command': 'allowed-in-preconfig-test', 'allowed-in-preconfig': 'some-string' }
-diff --git a/tests/qapi-schema/allowed-in-preconfig-test.out b/tests/qapi-schema/allowed-in-preconfig-test.out
-new file mode 100644
-index 0000000..e69de29
-diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/qapi-schema-test.json
-index 06e30f4..608ca35 100644
---- a/tests/qapi-schema/qapi-schema-test.json
-+++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -142,6 +142,9 @@
- # Smoke test on Out-Of-Band
- { 'command': 'an-oob-command', 'allow-oob': true }
+FIXUP! tests: functional tests for QMP command  set-numa-node
+---
+ tests/libqtest.h  |  9 ++++++++
+ tests/libqtest.c  |  7 +++++++
+ tests/numa-test.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qmp-test.c  |  7 -------
+ 4 files changed, 77 insertions(+), 7 deletions(-)
+
+diff --git a/tests/libqtest.h b/tests/libqtest.h
+index cbe8df4..ac52872 100644
+--- a/tests/libqtest.h
++++ b/tests/libqtest.h
+@@ -972,4 +972,13 @@ void qtest_qmp_device_add(const char *driver, const char *id, const char *fmt,
+  */
+ void qtest_qmp_device_del(const char *id);
  
-+# test allowed-in-preconfig flag
-+{ 'command': 'allowed-in-preconfig-test', 'allowed-in-preconfig': true }
++/**
++ * qmp_rsp_is_err:
++ * @rsp: QMP response to check for error
++ *
++ * Test @rsp for error and discard @rsp.
++ * Returns 'true' if there is error in @rsp and 'false' otherwise.
++ */
++bool qmp_rsp_is_err(QDict *rsp);
 +
- # For testing integer range flattening in opts-visitor. The following schema
- # corresponds to the option format:
- #
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/qapi-schema-test.out
-index 1f5038f..c955e2d 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -168,6 +168,8 @@ command boxed-union UserDefNativeListUnion -> None
-    gen=True success_response=True boxed=True oob=False preconfig=False
- command an-oob-command None -> None
-    gen=True success_response=True boxed=False oob=True preconfig=False
-+command allowed-in-preconfig-test None -> None
-+   gen=True success_response=True boxed=False oob=False preconfig=True
- object UserDefOptions
-     member i64: intList optional=True
-     member u64: uint64List optional=True
-diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
-index db690cc..730476a 100644
---- a/tests/test-qmp-cmds.c
-+++ b/tests/test-qmp-cmds.c
-@@ -20,6 +20,10 @@ void qmp_an_oob_command(Error **errp)
- {
+ #endif
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index 6f33a37..33426d5 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -1098,3 +1098,10 @@ void qtest_qmp_device_del(const char *id)
+     QDECREF(response1);
+     QDECREF(response2);
+ }
++
++bool qmp_rsp_is_err(QDict *rsp)
++{
++    QDict *error = qdict_get_qdict(rsp, "error");
++    QDECREF(rsp);
++    return !!error;
++}
+diff --git a/tests/numa-test.c b/tests/numa-test.c
+index 0f861d8..0135a0c 100644
+--- a/tests/numa-test.c
++++ b/tests/numa-test.c
+@@ -260,6 +260,66 @@ static void aarch64_numa_cpu(const void *data)
+     g_free(cli);
  }
  
-+void qmp_allowed_in_preconfig_test(Error **errp)
++static void pc_dynamic_cpu_cfg(const void *data)
 +{
++    QObject *e;
++    QDict *resp;
++    QList *cpus;
++    QTestState *qs;
++
++    qs = qtest_startf("%s %s", data ? (char *)data : "",
++                              "-nodefaults --preconfig -smp 2");
++
++    /* create 2 numa nodes */
++    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
++        " 'arguments': { 'type': 'node', 'nodeid': 0 } }")));
++    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
++        " 'arguments': { 'type': 'node', 'nodeid': 1 } }")));
++
++    /* map 2 cpus in non default reverse order
++     * i.e socket1->node0, socket0->node1
++     */
++    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
++        " 'arguments': { 'type': 'cpu', 'node-id': 0, 'socket-id': 1 } }")));
++    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
++        " 'arguments': { 'type': 'cpu', 'node-id': 1, 'socket-id': 0 } }")));
++
++    /* let machine initialization to complete and run */
++    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'exit-preconfig' }")));
++    qtest_qmp_eventwait(qs, "RESUME");
++
++    /* check that CPUs are mapped as expected */
++    resp = qtest_qmp(qs, "{ 'execute': 'query-hotpluggable-cpus'}");
++    g_assert(qdict_haskey(resp, "return"));
++    cpus = qdict_get_qlist(resp, "return");
++    g_assert(cpus);
++    while ((e = qlist_pop(cpus))) {
++        const QDict *cpu, *props;
++        int64_t socket, node;
++
++        cpu = qobject_to(QDict, e);
++        g_assert(qdict_haskey(cpu, "props"));
++        props = qdict_get_qdict(cpu, "props");
++
++        g_assert(qdict_haskey(props, "node-id"));
++        node = qdict_get_int(props, "node-id");
++        g_assert(qdict_haskey(props, "socket-id"));
++        socket = qdict_get_int(props, "socket-id");
++
++        if (socket == 0) {
++            g_assert_cmpint(node, ==, 1);
++        } else if (socket == 1) {
++            g_assert_cmpint(node, ==, 0);
++        } else {
++            g_assert(false);
++        }
++        qobject_decref(e);
++    }
++    QDECREF(resp);
++
++    qtest_quit(qs);
 +}
 +
- Empty2 *qmp_user_def_cmd0(Error **errp)
+ int main(int argc, char **argv)
  {
-     return g_new0(Empty2, 1);
+     const char *args = NULL;
+@@ -278,6 +338,7 @@ int main(int argc, char **argv)
+ 
+     if (!strcmp(arch, "i386") || !strcmp(arch, "x86_64")) {
+         qtest_add_data_func("/numa/pc/cpu/explicit", args, pc_numa_cpu);
++        qtest_add_data_func("/numa/pc/dynamic/cpu", args, pc_dynamic_cpu_cfg);
+     }
+ 
+     if (!strcmp(arch, "ppc64")) {
+diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+index c49837a..4d5f198 100644
+--- a/tests/qmp-test.c
++++ b/tests/qmp-test.c
+@@ -392,13 +392,6 @@ static void add_query_tests(QmpSchema *schema)
+     }
+ }
+ 
+-static bool qmp_rsp_is_err(QDict *rsp)
+-{
+-    QDict *error = qdict_get_qdict(rsp, "error");
+-    QDECREF(rsp);
+-    return !!error;
+-}
+-
+ static void test_qmp_preconfig(void)
+ {
+     QDict *rsp, *ret;
 -- 
 2.7.4
