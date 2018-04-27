@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56687)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fBrei-0004sw-Qa
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 20:54:34 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fBt0R-0000a1-Hu
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 22:21:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fBref-0000xk-Q7
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 20:54:32 -0400
-Resent-Message-Id: <E1fBref-0000xk-Q7@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21118)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fBref-0000xP-GP
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 20:54:29 -0400
-In-Reply-To: <20180427002651.28356-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152479043774.2352.17360615748073470290@71c20359a636>
+	(envelope-from <dgibson@ozlabs.org>) id 1fBt0N-0004ki-GB
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 22:21:03 -0400
+Date: Fri, 27 Apr 2018 12:14:22 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180427021422.GL8800@umbus.fritz.box>
+References: <20180419062917.31486-1-david@gibson.dropbear.id.au>
+	<1524151804.3017.9.camel@redhat.com>
+	<20180420023542.GD2434@umbus.fritz.box>
+	<1524216670.3017.11.camel@redhat.com>
+	<20180420102117.GQ2434@umbus.fritz.box>
+	<1524672566.23669.15.camel@redhat.com>
+	<20180426005555.GA8800@umbus.fritz.box>
+	<1524732340.23669.21.camel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 26 Apr 2018 17:53:58 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/9] target/arm: Implement v8.1-Atomics
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="oY1uq2ONqt5kuovO"
+Content-Disposition: inline
+In-Reply-To: <1524732340.23669.21.camel@redhat.com>
+Subject: Re: [Qemu-devel] [RFC for-2.13 0/7] spapr: Clean up pagesize
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,65 +31,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+To: Andrea Bolognani <abologna@redhat.com>
+Cc: groug@kaod.org, aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNDI3MDAyNjUxLjI4MzU2LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
-Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvOV0gdGFyZ2V0L2FybTogSW1wbGVt
-ZW50IHY4LjEtQXRvbWljcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoK
-QkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkK
-ZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29y
-aXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2Ug
-JEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0gg
-JG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdp
-dCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWls
-YmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0k
-KChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
-aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczov
-L2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAgICAgICAg
-ICAgcGF0Y2hldy8xNTI0NzYwMDA5LTI0NzEwLTEtZ2l0LXNlbmQtZW1haWwtYmFidS5tb2dlckBh
-bWQuY29tIC0+IHBhdGNoZXcvMTUyNDc2MDAwOS0yNDcxMC0xLWdpdC1zZW5kLWVtYWlsLWJhYnUu
-bW9nZXJAYW1kLmNvbQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTgwNDI2
-MTUyODA1Ljg0NjktMS1hcm1icnVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwNDI2MTUyODA1
-Ljg0NjktMS1hcm1icnVAcmVkaGF0LmNvbQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRj
-aGV3LzIwMTgwNDI2MTgzNDA0LjM3NTYtMS1sZXJzZWtAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIw
-MTgwNDI2MTgzNDA0LjM3NTYtMS1sZXJzZWtAcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10gICAgICAg
-ICAgICAgICBwYXRjaGV3LzIwMTgwNDI3MDAyNjUxLjI4MzU2LTEtcmljaGFyZC5oZW5kZXJzb25A
-bGluYXJvLm9yZyAtPiBwYXRjaGV3LzIwMTgwNDI3MDAyNjUxLjI4MzU2LTEtcmljaGFyZC5oZW5k
-ZXJzb25AbGluYXJvLm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmYxYzBlYjFl
-MjYgdGFyZ2V0L2FybTogRW5hYmxlIEFSTV9GRUFUVVJFX1Y4X0FUT01JQ1MgZm9yIHVzZXItb25s
-eQpkODk3OGEzNzYxIHRhcmdldC9hcm06IEltcGxlbWVudCBDQVMgYW5kIENBU1AKMjIyOWRkNDNh
-YiB0YXJnZXQvYXJtOiBGaWxsIGluIGRpc2FzX2xkc3RfYXRvbWljCjBjYzdjNGEyYmQgdGFyZ2V0
-L2FybTogSW50cm9kdWNlIEFSTV9GRUFUVVJFX1Y4X0FUT01JQ1MgYW5kIGluaXRpYWwgZGVjb2Rl
-CjNkZjk0MDMxZmQgdGFyZ2V0L3Jpc2N2OiBVc2UgbmV3IGF0b21pYyBtaW4vbWF4IGV4cGFuZGVy
-cwo5ZTFjYjY3ODJlIHRjZzogSW50cm9kdWNlIGF0b21pYyBoZWxwZXJzIGZvciBpbnRlZ2VyIG1p
-bi9tYXgKYjJmOWU2ODNjOCB0YXJnZXQveHRlbnNhOiBVc2UgbmV3IG1pbi9tYXggZXhwYW5kZXJz
-CjdjNTUyY2EyZTcgdGFyZ2V0L2FybTogVXNlIG5ldyBtaW4vbWF4IGV4cGFuZGVycwpmYTk5MDE1
-ZjdhIHRjZzogSW50cm9kdWNlIGhlbHBlcnMgZm9yIGludGVnZXIgbWluL21heAoKPT09IE9VVFBV
-VCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS85OiB0Y2c6IEludHJvZHVjZSBoZWxwZXJzIGZv
-ciBpbnRlZ2VyIG1pbi9tYXguLi4KQ2hlY2tpbmcgUEFUQ0ggMi85OiB0YXJnZXQvYXJtOiBVc2Ug
-bmV3IG1pbi9tYXggZXhwYW5kZXJzLi4uCkNoZWNraW5nIFBBVENIIDMvOTogdGFyZ2V0L3h0ZW5z
-YTogVXNlIG5ldyBtaW4vbWF4IGV4cGFuZGVycy4uLgpDaGVja2luZyBQQVRDSCA0Lzk6IHRjZzog
-SW50cm9kdWNlIGF0b21pYyBoZWxwZXJzIGZvciBpbnRlZ2VyIG1pbi9tYXguLi4KRVJST1I6IG1l
-bW9yeSBiYXJyaWVyIHdpdGhvdXQgY29tbWVudAojNTU6IEZJTEU6IGFjY2VsL3RjZy9hdG9taWNf
-dGVtcGxhdGUuaDoxMzc6CisgICAgc21wX21iKCk7ICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKCkVSUk9SOiBtZW1vcnkgYmFycmllciB3aXRo
-b3V0IGNvbW1lbnQKIzk1OiBGSUxFOiBhY2NlbC90Y2cvYXRvbWljX3RlbXBsYXRlLmg6Mjg1Ogor
-ICAgIHNtcF9tYigpOyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICBcCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDIzNiBsaW5lcyBjaGVj
-a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRD
-SCA1Lzk6IHRhcmdldC9yaXNjdjogVXNlIG5ldyBhdG9taWMgbWluL21heCBleHBhbmRlcnMuLi4K
-Q2hlY2tpbmcgUEFUQ0ggNi85OiB0YXJnZXQvYXJtOiBJbnRyb2R1Y2UgQVJNX0ZFQVRVUkVfVjhf
-QVRPTUlDUyBhbmQgaW5pdGlhbCBkZWNvZGUuLi4KQ2hlY2tpbmcgUEFUQ0ggNy85OiB0YXJnZXQv
-YXJtOiBGaWxsIGluIGRpc2FzX2xkc3RfYXRvbWljLi4uCkNoZWNraW5nIFBBVENIIDgvOTogdGFy
-Z2V0L2FybTogSW1wbGVtZW50IENBUyBhbmQgQ0FTUC4uLgpDaGVja2luZyBQQVRDSCA5Lzk6IHRh
-cmdldC9hcm06IEVuYWJsZSBBUk1fRkVBVFVSRV9WOF9BVE9NSUNTIGZvciB1c2VyLW9ubHkuLi4K
-PT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0t
-LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hl
-dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhh
-dC5jb20=
+
+--oY1uq2ONqt5kuovO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Apr 26, 2018 at 10:45:40AM +0200, Andrea Bolognani wrote:
+> On Thu, 2018-04-26 at 10:55 +1000, David Gibson wrote:
+> > On Wed, Apr 25, 2018 at 06:09:26PM +0200, Andrea Bolognani wrote:
+> > > The new parameter would make it possible to make sure you will
+> > > actually be able to use the page size you're interested in inside
+> > > the guest, by preventing it from starting at all if the host didn't
+> > > provide big enough backing pages;
+> >=20
+> > That's right
+> >=20
+> > > it would also ensure the guest
+> > > gets access to different page sizes when running using TCG as an
+> > > accelerator instead of KVM.
+> >=20
+> > Uh.. it would ensure the guest *doesn't* get access to different page
+> > sizes in TCG vs. KVM.  Is that what you meant to say?
+>=20
+> Oops, looks like I accidentally a word there. Of course you got it
+> right and I meant exactly the opposite of what I actually wrote :/
+
+:)
+
+> > > For a KVM guest running on a POWER8 host, the matrix would look
+> > > like
+> > >=20
+> > >     b \ m | 64 KiB |  2 MiB | 16 MiB |  1 GiB | 16 GiB |
+> > >   -------- -------- -------- -------- -------- --------
+> > >    64 KiB | 64 KiB | 64 KiB |        |        |        |
+> > >   -------- -------- -------- -------- -------- --------
+> > >    16 MiB | 64 KiB | 64 KiB | 16 MiB | 16 MiB |        |
+> > >   -------- -------- -------- -------- -------- --------
+> > >    16 GiB | 64 KiB | 64 KiB | 16 MiB | 16 MiB | 16 GiB |
+> > >   -------- -------- -------- -------- -------- --------
+> > >=20
+> > > with backing page sizes from top to bottom, requested max page
+> > > sizes from left to right, actual max page sizes in the cells and
+> > > empty cells meaning the guest won't be able to start; on a POWER9
+> > > machine, the matrix would look like
+> > >=20
+> > >     b \ m | 64 KiB |  2 MiB | 16 MiB |  1 GiB | 16 GiB |
+> > >   -------- -------- -------- -------- -------- --------
+> > >    64 KiB | 64 KiB | 64 KiB |        |        |        |
+> > >   -------- -------- -------- -------- -------- --------
+> > >     2 MiB | 64 KiB | 64 KiB |        |        |        |
+> > >   -------- -------- -------- -------- -------- --------
+> > >     1 GiB | 64 KiB | 64 KiB | 16 MiB | 16 MiB |        |
+> > >   -------- -------- -------- -------- -------- --------
+> > >=20
+> > > instead, and finally on TCG the backing page size wouldn't matter
+> > > and you would simply have
+> > >=20
+> > >     b \ m | 64 KiB |  2 MiB | 16 MiB |  1 GiB | 16 GiB |
+> > >   -------- -------- -------- -------- -------- --------
+> > >           | 64 KiB | 64 KiB | 16 MiB | 16 MiB | 16 GiB |
+> > >   -------- -------- -------- -------- -------- --------
+> > >=20
+> > > Does everything up until here make sense?
+> >=20
+> > Yes, that all looks right.
+>=20
+> Cool.
+>=20
+> Unfortunately, that pretty much seals the deal on libvirt *not* being
+> able to infer the value from other guest settings :(
+>=20
+> The only reasonable candidate would be the size of host pages used for
+> backing guest memory; however
+
+Right.
+
+>   * TCG, RPT and KVM PR guests can't infer anything from it, as they
+>     are not tied to it. Having different behaviors for TCG and KVM
+>     would be easy, but differentiating between HPT KVM HV guest and
+>     all other kinds is something we can't do at the moment, and that
+>     in the past have actively resisted doing;
+
+Yeah, I certainly wouldn't recommend that.  It's basically what we're
+doing in qemu now, and I want to change, because it's a bad idea.
+
+It still would be possible to key off the host side hugepage size, but
+apply the limit to all VMs - in a sense crippling TCG guests to give
+them matching behaviour to KVM guests.
+
+>   * the user might want to limit things further, eg. preventing an
+>     HPT KVM HV guest backed by 16 MiB pages or an HPT TCG guest from
+>     using hugepages.
+
+Right.. note that with the draft qemu patches a TCG guest will be
+prevented from using hugepages *by default* (the default value of the
+capability is 16).  You have to explicitly change it to allow
+hugepages to be used in a TCG guest (but you don't have to supply
+hugepage backing).
+
+> With the second use case in mind: would it make sense, or even be
+> possible, to make it so the capability works for RPT guests too?
+
+Possible, maybe.. I think there's another property where RPT pagesizes
+are advertised.  But I think it's a bad idea.  In order to have the
+normal HPT case work consistently we need to set the default cap value
+to 16 (64kiB page max).  If that applied to RPT guests as well, we'd
+be unnecessarily crippling nearly all RPT guests.
+
+> Thinking even further, what about other architectures? Is this
+> something they might want to do too? The scenario I have in mind is
+> guests backed by regular pages being prevented from using hugepages
+> with the rationale that they wouldn't have the same performance
+> characteristics as if they were backed by hugepages; on the opposite
+> side of the spectrum, you might want to ensure the pages used to
+> back guest memory are as big as the biggest page you plan to use in
+> the guest, in order to guarantee the performance characteristics
+> fully match expectations.
+
+Hm, well, you'd have to ask other arch people if they see a use for
+that.  It doesn't look very useful to me.  I don't think libvirt can
+or should ensure identical performance characteristics for a guest
+across all possible migrations.  But for HPT guests, it's not a matter
+of performance characteristics: if it tries to use a large page size
+and KVM doesn't have large enough backing pages, the guest will
+quickly just freeze on a page fault that can never be satisfied.
+
+> > > While trying to figure out this, one of the things I attempted to
+> > > do was run a guest in POWER8 compatibility mode on a POWER9 host
+> > > and use hugepages for backing, but that didn't seem to work at
+> > > all, possibly hinting at the fact that not all of the above is
+> > > actually accurate and I need you to correct me :)
+> > > [...]
+> >=20
+> > Ok, so note that the scheme I'm talking about here is *not* merged as
+> > yet.  The above command line will run the guest with 2MiB backing.
+> >=20
+> > With the existing code that should work, but the guest will only be
+> > able to use 64kiB pages.
+>=20
+> Understood: even without the ability to limit it further, the max
+> guest page size is obviously still capped by the backing page size.
+>=20
+> > If it didn't work at all.. there was a bug
+> > fixed relatively recently that broke all hugepage backing, so you
+> > could try updating to a more recent host kernel.
+>=20
+> That was probably it then!
+>=20
+> I'll see whether I can get a newer kernel running on the host, but
+> my primary concern was not having gotten the command line (or the
+> concepts above) completely wrong :)
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--oY1uq2ONqt5kuovO
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrih3wACgkQbDjKyiDZ
+s5J4Wg/+KBreDhtY1rmVaP6/VUXTn9gwrM4Njgk+Tl0Xn+Cg4arspnUEWjndpni4
+FMvwHIb+JMIzBRRgGDCzxavHfPmV6eUHKs8FERhg92BEoniJ4z3+h9CX78PjMNS6
+0KqmmzicCzJTJvAkpzGwiAd/gfw9ahfRFDhibO9zwcTpPwxJiLgVp8ko5/AjPrQI
+MjJbE9S0qi29+GzOR3ZYlfsuwz7JkMr0RNeIpdPaeo8PVH4YOW0WT83IssRKzUZp
+lTvy8A6zc3d53vaRG/ESwrT0Yy7WRA7YbCQzhpZpMVQvPKt2s3GCCMhlxLME2Hgm
+XoN03Af6ReYLoY03vH0LwFJQ8uFxhVmmq5YF8Trp3FsFTDpE8E5Cb53kRuFXyppK
+5HuXJZsNL0/afOr3gWTnTKdyntGR+jOSwlyNsHGByysU/wgJKuDTB53w/o99VL8g
+82XB5pWflirqAU9V6tkUnohB16AFZvhC2mJ6xdmPqIf2MV2SLqcbTh+Wo8p/2x+6
+7sTnOQdPnTdPVscpLWEVjldeDPcnyvvWzxWIHAHF4Q8GlPpDE8W3AHHIzCpcMcvx
+uQd5eW7HNTn6pWYlzYGXyc41W6VrCnBY2MYKyqEkQphKx33I0MjDkUxCgZ411WdP
+Poiatr6tluDN/dcJaS+s0zGXluQ2GGH9carLWbAw5r7Dn+NkPZY=
+=Rsou
+-----END PGP SIGNATURE-----
+
+--oY1uq2ONqt5kuovO--
