@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fBxS6-0005aF-CI
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 03:05:55 -0400
+	(envelope-from <armbru@redhat.com>) id 1fBxeI-000818-10
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 03:18:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fBxS3-0007oK-1z
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 03:05:54 -0400
-Date: Fri, 27 Apr 2018 09:05:39 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180427090539.7a7ffa0d.cohuck@redhat.com>
-In-Reply-To: <20180426183404.3756-2-lersek@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1fBxeE-0004uQ-RJ
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 03:18:30 -0400
+From: Markus Armbruster <armbru@redhat.com>
 References: <20180426183404.3756-1-lersek@redhat.com>
 	<20180426183404.3756-2-lersek@redhat.com>
+Date: Fri, 27 Apr 2018 09:18:17 +0200
+In-Reply-To: <20180426183404.3756-2-lersek@redhat.com> (Laszlo Ersek's message
+	of "Thu, 26 Apr 2018 20:34:01 +0200")
+Message-ID: <877eotungm.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Subject: Re: [Qemu-devel] [PATCH v2 1/4] qapi: fill in CpuInfoFast.arch in
  query-cpus-fast
 List-Id: <qemu-devel.nongnu.org>
@@ -25,10 +25,9 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu devel list <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Viktor VM Mihajlovski <mihajlov@linux.vnet.ibm.com>, qemu-stable@nongnu.org
+Cc: qemu devel list <qemu-devel@nongnu.org>, qemu-stable@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Viktor VM Mihajlovski <mihajlov@linux.vnet.ibm.com>
 
-On Thu, 26 Apr 2018 20:34:01 +0200
-Laszlo Ersek <lersek@redhat.com> wrote:
+Laszlo Ersek <lersek@redhat.com> writes:
 
 > * Commit ca230ff33f89 added the @arch field to @CpuInfoFast, but it failed
 >   to set the new field in qmp_query_cpus_fast(), when TARGET_S390X was not
@@ -36,23 +35,23 @@ Laszlo Ersek <lersek@redhat.com> wrote:
 >   showed "arch":"x86" only because qmp_query_cpus_fast() calls g_malloc0()
 >   to allocate @CpuInfoFast, and the CPU_INFO_ARCH_X86 enum constant is
 >   generated with value 0.
-> 
+>
 >   All @arch values other than @s390 implied the @CpuInfoOther sub-struct
 >   for @CpuInfoFast -- at the time of writing the patch --, thus no fields
 >   other than @arch needed to be set when TARGET_S390X was not defined. Set
 >   @arch now, by copying the corresponding assignments from
 >   qmp_query_cpus().
-> 
+>
 > * Commit 25fa194b7b11 added the @riscv enum constant to @CpuInfoArch (used
 >   in both @CpuInfo and @CpuInfoFast -- the return types of the @query-cpus
 >   and @query-cpus-fast commands, respectively), and assigned, in both
 >   return structures, the @CpuInfoRISCV sub-structure to the new enum
 >   value.
-> 
+>
 >   However, qmp_query_cpus_fast() would not populate either the @arch field
 >   or the @CpuInfoRISCV sub-structure, when TARGET_RISCV was defined; only
 >   qmp_query_cpus() would.
-> 
+>
 >   Assign @CpuInfoOther to the @riscv enum constant in @CpuInfoFast, and
 >   populate only the @arch field in qmp_query_cpus_fast(). Getting CPU
 >   state without interrupting KVM is an exceptional thing that only S390X
@@ -61,7 +60,7 @@ Laszlo Ersek <lersek@redhat.com> wrote:
 >   for upper layers and can be retrieved without performance penalty". See
 >   also
 >   <https://www.redhat.com/archives/libvir-list/2018-February/msg00121.html>.
-> 
+>
 > Cc: Cornelia Huck <cohuck@redhat.com>
 > Cc: Eric Blake <eblake@redhat.com>
 > Cc: Markus Armbruster <armbru@redhat.com>
@@ -71,30 +70,5 @@ Laszlo Ersek <lersek@redhat.com> wrote:
 > Fixes: 25fa194b7b11901561532e435beb83d046899f7a
 > Signed-off-by: Laszlo Ersek <lersek@redhat.com>
 > Reviewed-by: Eric Blake <eblake@redhat.com>
-> ---
-> 
-> Notes:
->     PATCHv2:
->     
->     - squash v1 patches 1/6 and 2/6 [Eric, Markus, Cornelia]
->     
->     - fix "added added" typo in the commit message [Eric]
->     
->     - update commit message wrt. S390X particulars [Cornelia, Markus,
->       Viktor]
->     
->     - pick up Eric's R-b (synthesized from his R-b's for v1 1/6 & 2/6)
->     
->     - don't pick up Cornelia's R-b (only given for v1 1/6)
->     
->     - update the CC list
->     
->     PATCHv1:
->     
->     - new patch
-> 
->  qapi/misc.json |  2 +-
->  cpus.c         | 16 +++++++++++++++-
->  2 files changed, 16 insertions(+), 2 deletions(-)
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
