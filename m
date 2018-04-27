@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBzZU-0000tG-I3
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:21:41 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fBzZa-00011u-DC
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:21:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBzZT-0001pk-Ar
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:21:40 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fBzZX-0001sI-7w
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:21:46 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 27 Apr 2018 19:20:47 +1000
-Message-Id: <20180427092126.24812-11-david@gibson.dropbear.id.au>
+Date: Fri, 27 Apr 2018 19:20:51 +1000
+Message-Id: <20180427092126.24812-15-david@gibson.dropbear.id.au>
 In-Reply-To: <20180427092126.24812-1-david@gibson.dropbear.id.au>
 References: <20180427092126.24812-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 10/49] grackle: move PCI IO (ISA) memory region
- into the grackle device
+Subject: [Qemu-devel] [PULL 14/49] uninorth: introduce temporary pic_irqs
+ device property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,88 +25,125 @@ Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Mark Cave-Ayland
 
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-This simplifies the Old World machine to simply mapping the ISA memory region
-into the main address space.
+This is in preparation for moving the PCI bus wiring inside the uninorth
+host bridge devices. In the future it will be possible to remove this once the
+PICs have been switched to use qdev GPIOs.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/pci-host/grackle.c | 7 ++++++-
- hw/ppc/mac_oldworld.c | 9 +++------
- 2 files changed, 9 insertions(+), 7 deletions(-)
+ hw/pci-host/uninorth.c         | 25 +++++++++++++++++++++++--
+ include/hw/pci-host/uninorth.h |  1 +
+ 2 files changed, 24 insertions(+), 2 deletions(-)
 
-diff --git a/hw/pci-host/grackle.c b/hw/pci-host/grackle.c
-index e4583d493b..4810a4de79 100644
---- a/hw/pci-host/grackle.c
-+++ b/hw/pci-host/grackle.c
-@@ -41,6 +41,7 @@ typedef struct GrackleState {
-     qemu_irq irqs[4];
-     MemoryRegion pci_mmio;
-     MemoryRegion pci_hole;
-+    MemoryRegion pci_io;
- } GrackleState;
+diff --git a/hw/pci-host/uninorth.c b/hw/pci-host/uninorth.c
+index 5b8fc3aa16..fc59698f06 100644
+--- a/hw/pci-host/uninorth.c
++++ b/hw/pci-host/uninorth.c
+@@ -188,6 +188,7 @@ UNINState *pci_pmac_init(qemu_irq *pic,
+     /* Use values found on a real PowerMac */
+     /* Uninorth main bus */
+     dev = qdev_create(NULL, TYPE_UNI_NORTH_PCI_HOST_BRIDGE);
++    qdev_prop_set_ptr(dev, "pic-irqs", pic);
+     qdev_init_nofail(dev);
+     s = SYS_BUS_DEVICE(dev);
+     h = PCI_HOST_BRIDGE(s);
+@@ -199,7 +200,7 @@ UNINState *pci_pmac_init(qemu_irq *pic,
  
- /* Don't know if this matches real hardware, but it agrees with OHW.  */
-@@ -76,7 +77,7 @@ static void grackle_realize(DeviceState *dev, Error **errp)
-                                      pci_grackle_map_irq,
-                                      s,
-                                      &s->pci_mmio,
--                                     get_system_io(),
-+                                     &s->pci_io,
-                                      0, 4, TYPE_PCI_BUS);
+     h->bus = pci_register_root_bus(dev, NULL,
+                                    pci_unin_set_irq, pci_unin_map_irq,
+-                                   pic,
++                                   d->pic_irqs,
+                                    &d->pci_mmio,
+                                    address_space_io,
+                                    PCI_DEVFN(11, 0), 4, TYPE_PCI_BUS);
+@@ -220,6 +221,7 @@ UNINState *pci_pmac_init(qemu_irq *pic,
+     /* Uninorth AGP bus */
+     pci_create_simple(h->bus, PCI_DEVFN(11, 0), "uni-north-agp");
+     dev = qdev_create(NULL, TYPE_UNI_NORTH_AGP_HOST_BRIDGE);
++    qdev_prop_set_ptr(dev, "pic-irqs", pic);
+     qdev_init_nofail(dev);
+     s = SYS_BUS_DEVICE(dev);
+     sysbus_mmio_map(s, 0, 0xf0800000);
+@@ -251,6 +253,7 @@ UNINState *pci_pmac_u3_init(qemu_irq *pic,
  
-     pci_create_simple(phb->bus, 0, "grackle");
-@@ -90,6 +91,9 @@ static void grackle_init(Object *obj)
-     PCIHostState *phb = PCI_HOST_BRIDGE(obj);
+     /* Uninorth AGP bus */
+     dev = qdev_create(NULL, TYPE_U3_AGP_HOST_BRIDGE);
++    qdev_prop_set_ptr(dev, "pic-irqs", pic);
+     qdev_init_nofail(dev);
+     s = SYS_BUS_DEVICE(dev);
+     h = PCI_HOST_BRIDGE(dev);
+@@ -263,7 +266,7 @@ UNINState *pci_pmac_u3_init(qemu_irq *pic,
  
-     memory_region_init(&s->pci_mmio, OBJECT(s), "pci-mmio", 0x100000000ULL);
-+    memory_region_init_io(&s->pci_io, OBJECT(s), &unassigned_io_ops, obj,
-+                          "pci-isa-mmio", 0x00200000);
+     h->bus = pci_register_root_bus(dev, NULL,
+                                    pci_unin_set_irq, pci_unin_map_irq,
+-                                   pic,
++                                   d->pic_irqs,
+                                    &d->pci_mmio,
+                                    address_space_io,
+                                    PCI_DEVFN(11, 0), 4, TYPE_PCI_BUS);
+@@ -436,10 +439,16 @@ static const TypeInfo unin_internal_pci_host_info = {
+     },
+ };
+ 
++static Property pci_unin_main_properties[] = {
++    DEFINE_PROP_PTR("pic-irqs", UNINState, pic_irqs),
++    DEFINE_PROP_END_OF_LIST(),
++};
 +
-     memory_region_init_alias(&s->pci_hole, OBJECT(s), "pci-hole", &s->pci_mmio,
-                              0x80000000ULL, 0x7e000000ULL);
+ static void pci_unin_main_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
  
-@@ -106,6 +110,7 @@ static void grackle_init(Object *obj)
-     sysbus_init_mmio(sbd, &phb->conf_mem);
-     sysbus_init_mmio(sbd, &phb->data_mem);
-     sysbus_init_mmio(sbd, &s->pci_hole);
-+    sysbus_init_mmio(sbd, &s->pci_io);
++    dc->props = pci_unin_main_properties;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
  }
  
- static void grackle_pci_realize(PCIDevice *d, Error **errp)
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index f0246f43d3..f9e63b8d83 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -91,7 +91,6 @@ static void ppc_heathrow_init(MachineState *machine)
-     int linux_boot, i;
-     MemoryRegion *ram = g_new(MemoryRegion, 1);
-     MemoryRegion *bios = g_new(MemoryRegion, 1);
--    MemoryRegion *isa = g_new(MemoryRegion, 1);
-     uint32_t kernel_base, initrd_base, cmdline_base = 0;
-     int32_t kernel_size, initrd_size;
-     PCIBus *pci_bus;
-@@ -225,11 +224,6 @@ static void ppc_heathrow_init(MachineState *machine)
-         }
-     }
+@@ -451,10 +460,16 @@ static const TypeInfo pci_unin_main_info = {
+     .class_init    = pci_unin_main_class_init,
+ };
  
--    /* Register 2 MB of ISA IO space */
--    memory_region_init_alias(isa, NULL, "isa_mmio",
--                             get_system_io(), 0, 0x00200000);
--    memory_region_add_subregion(sysmem, 0xfe000000, isa);
--
-     /* XXX: we register only 1 output pin for heathrow PIC */
-     pic_dev = qdev_create(NULL, TYPE_HEATHROW);
-     qdev_init_nofail(pic_dev);
-@@ -276,6 +270,9 @@ static void ppc_heathrow_init(MachineState *machine)
-     /* PCI hole */
-     memory_region_add_subregion(get_system_memory(), 0x80000000ULL,
-                                 sysbus_mmio_get_region(s, 2));
-+    /* Register 2 MB of ISA IO space */
-+    memory_region_add_subregion(get_system_memory(), 0xfe000000,
-+                                sysbus_mmio_get_region(s, 3));
++static Property pci_u3_agp_properties[] = {
++    DEFINE_PROP_PTR("pic-irqs", UNINState, pic_irqs),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void pci_u3_agp_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
  
-     pci_bus = PCI_HOST_BRIDGE(dev)->bus;
++    dc->props = pci_u3_agp_properties;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+ }
  
+@@ -466,10 +481,16 @@ static const TypeInfo pci_u3_agp_info = {
+     .class_init    = pci_u3_agp_class_init,
+ };
+ 
++static Property pci_unin_agp_class_properties[] = {
++    DEFINE_PROP_PTR("pic-irqs", UNINState, pic_irqs),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void pci_unin_agp_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
++    dc->props = pci_unin_agp_class_properties;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+ }
+ 
+diff --git a/include/hw/pci-host/uninorth.h b/include/hw/pci-host/uninorth.h
+index 0366376a3b..e4fa11c145 100644
+--- a/include/hw/pci-host/uninorth.h
++++ b/include/hw/pci-host/uninorth.h
+@@ -44,6 +44,7 @@
+ typedef struct UNINState {
+     PCIHostState parent_obj;
+ 
++    void *pic_irqs;
+     MemoryRegion pci_mmio;
+     MemoryRegion pci_hole;
+ } UNINState;
 -- 
 2.14.3
