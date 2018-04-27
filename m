@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBzaT-00024g-Vp
+	(envelope-from <dgibson@ozlabs.org>) id 1fBzaU-00025V-LS
 	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:22:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBzaS-0002GE-9n
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:22:41 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fBzaT-0002Gf-P6
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:22:42 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 27 Apr 2018 19:21:10 +1000
-Message-Id: <20180427092126.24812-34-david@gibson.dropbear.id.au>
+Date: Fri, 27 Apr 2018 19:21:08 +1000
+Message-Id: <20180427092126.24812-32-david@gibson.dropbear.id.au>
 In-Reply-To: <20180427092126.24812-1-david@gibson.dropbear.id.au>
 References: <20180427092126.24812-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 33/49] target/ppc: Pass cpu instead of env to
- ppc_create_page_sizes_prop()
+Subject: [Qemu-devel] [PULL 31/49] target/ppc: Standardize instance_init and
+ realize function names
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,88 +23,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-As a rule we prefer to pass PowerPCCPU instead of CPUPPCState, and this
-change will make some things simpler later on.
+Because of the various hooks called some variant on "init" - and the rather
+greater number that used to exist, I'm always wondering when a function
+called simply "*_init" or "*_initfn" will be called.
+
+To make it easier on myself, and maybe others, rename the instance_init
+hooks for ppc cpus to *_instance_init().  While we're at it rename the
+realize time hooks to *_realize() (from *_realizefn()) which seems to be
+the more common current convention.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/ppc/fdt.c         | 5 +++--
- hw/ppc/pnv.c         | 4 ++--
- hw/ppc/spapr.c       | 4 ++--
- include/hw/ppc/fdt.h | 2 +-
- 4 files changed, 8 insertions(+), 7 deletions(-)
+ target/ppc/translate_init.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/hw/ppc/fdt.c b/hw/ppc/fdt.c
-index 2ffc5866e4..2721603ffa 100644
---- a/hw/ppc/fdt.c
-+++ b/hw/ppc/fdt.c
-@@ -13,9 +13,10 @@
- #include "hw/ppc/fdt.h"
-=20
- #if defined(TARGET_PPC64)
--size_t ppc_create_page_sizes_prop(CPUPPCState *env, uint32_t *prop,
--                                     size_t maxsize)
-+size_t ppc_create_page_sizes_prop(PowerPCCPU *cpu, uint32_t *prop,
-+                                  size_t maxsize)
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 391b94b97d..56b80a204a 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -9726,7 +9726,7 @@ static inline bool ppc_cpu_is_valid(PowerPCCPUClass *pcc)
+ #endif
+ }
+ 
+-static void ppc_cpu_realizefn(DeviceState *dev, Error **errp)
++static void ppc_cpu_realize(DeviceState *dev, Error **errp)
  {
-+    CPUPPCState *env =3D &cpu->env;
-     size_t maxcells =3D maxsize / sizeof(uint32_t);
-     int i, j, count;
-     uint32_t *p =3D prop;
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 549cfccdcb..3220ef8f79 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -209,8 +209,8 @@ static void pnv_dt_core(PnvChip *chip, PnvCore *pc, v=
-oid *fdt)
-         _FDT((fdt_setprop_cell(fdt, offset, "ibm,dfp", 1)));
-     }
-=20
--    page_sizes_prop_size =3D ppc_create_page_sizes_prop(env, page_sizes_=
-prop,
--                                                  sizeof(page_sizes_prop=
-));
-+    page_sizes_prop_size =3D ppc_create_page_sizes_prop(cpu, page_sizes_=
-prop,
-+                                                      sizeof(page_sizes_=
-prop));
-     if (page_sizes_prop_size) {
-         _FDT((fdt_setprop(fdt, offset, "ibm,segment-page-sizes",
-                            page_sizes_prop, page_sizes_prop_size)));
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index d35a88ca80..a4b3722656 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -581,8 +581,8 @@ static void spapr_populate_cpu_dt(CPUState *cs, void =
-*fdt, int offset,
-         _FDT((fdt_setprop_cell(fdt, offset, "ibm,dfp", 1)));
-     }
-=20
--    page_sizes_prop_size =3D ppc_create_page_sizes_prop(env, page_sizes_=
-prop,
--                                                  sizeof(page_sizes_prop=
-));
-+    page_sizes_prop_size =3D ppc_create_page_sizes_prop(cpu, page_sizes_=
-prop,
-+                                                      sizeof(page_sizes_=
-prop));
-     if (page_sizes_prop_size) {
-         _FDT((fdt_setprop(fdt, offset, "ibm,segment-page-sizes",
-                           page_sizes_prop, page_sizes_prop_size)));
-diff --git a/include/hw/ppc/fdt.h b/include/hw/ppc/fdt.h
-index bd5b0a8c3d..a8cd85069f 100644
---- a/include/hw/ppc/fdt.h
-+++ b/include/hw/ppc/fdt.h
-@@ -23,7 +23,7 @@
-         }                                                          \
-     } while (0)
-=20
--size_t ppc_create_page_sizes_prop(CPUPPCState *env, uint32_t *prop,
-+size_t ppc_create_page_sizes_prop(PowerPCCPU *cpu, uint32_t *prop,
-                                   size_t maxsize);
-=20
- #endif /* PPC_FDT_H */
---=20
+     CPUState *cs = CPU(dev);
+     PowerPCCPU *cpu = POWERPC_CPU(dev);
+@@ -9952,7 +9952,7 @@ unrealize:
+     cpu_exec_unrealizefn(cs);
+ }
+ 
+-static void ppc_cpu_unrealizefn(DeviceState *dev, Error **errp)
++static void ppc_cpu_unrealize(DeviceState *dev, Error **errp)
+ {
+     PowerPCCPU *cpu = POWERPC_CPU(dev);
+     PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
+@@ -10438,7 +10438,7 @@ static bool ppc_cpu_is_big_endian(CPUState *cs)
+ }
+ #endif
+ 
+-static void ppc_cpu_initfn(Object *obj)
++static void ppc_cpu_instance_init(Object *obj)
+ {
+     CPUState *cs = CPU(obj);
+     PowerPCCPU *cpu = POWERPC_CPU(obj);
+@@ -10561,9 +10561,9 @@ static void ppc_cpu_class_init(ObjectClass *oc, void *data)
+     CPUClass *cc = CPU_CLASS(oc);
+     DeviceClass *dc = DEVICE_CLASS(oc);
+ 
+-    device_class_set_parent_realize(dc, ppc_cpu_realizefn,
++    device_class_set_parent_realize(dc, ppc_cpu_realize,
+                                     &pcc->parent_realize);
+-    device_class_set_parent_unrealize(dc, ppc_cpu_unrealizefn,
++    device_class_set_parent_unrealize(dc, ppc_cpu_unrealize,
+                                       &pcc->parent_unrealize);
+     pcc->pvr_match = ppc_pvr_match_default;
+     pcc->interrupts_big_endian = ppc_cpu_interrupts_big_endian_always;
+@@ -10623,7 +10623,7 @@ static const TypeInfo ppc_cpu_type_info = {
+     .name = TYPE_POWERPC_CPU,
+     .parent = TYPE_CPU,
+     .instance_size = sizeof(PowerPCCPU),
+-    .instance_init = ppc_cpu_initfn,
++    .instance_init = ppc_cpu_instance_init,
+     .abstract = true,
+     .class_size = sizeof(PowerPCCPUClass),
+     .class_init = ppc_cpu_class_init,
+-- 
 2.14.3
