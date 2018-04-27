@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fBxGe-00022k-K6
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 02:54:05 -0400
+	(envelope-from <kevin.tian@intel.com>) id 1fBxOi-0004Kv-DV
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 03:02:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fBxGa-0000NC-My
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 02:54:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41484 helo=mx1.redhat.com)
+	(envelope-from <kevin.tian@intel.com>) id 1fBxOf-0005JD-2P
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 03:02:24 -0400
+Received: from mga09.intel.com ([134.134.136.24]:17748)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fBxGa-0000Mq-Hc
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 02:54:00 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180424214550.32549-1-lersek@redhat.com>
-	<20180424214550.32549-7-lersek@redhat.com>
-	<8736zjagg3.fsf@dusky.pond.sub.org>
-	<4509705a-43b2-db40-aa24-18eff649e750@redhat.com>
-	<87sh7i4h5y.fsf@dusky.pond.sub.org>
-	<ea646e6d-9512-559d-be8d-fd3c754cc301@redhat.com>
-	<136c5d3a-9d5b-eb15-a1f4-18150662144b@redhat.com>
-	<87vacexcir.fsf@dusky.pond.sub.org>
-	<230b57bf-1bf0-fd4e-05bf-cb7c4902975d@redhat.com>
-	<8736zix8yb.fsf@dusky.pond.sub.org>
-	<f0c9c7ca-3dcf-4f74-9812-5dea5b6376cd@redhat.com>
-Date: Fri, 27 Apr 2018 08:53:51 +0200
-In-Reply-To: <f0c9c7ca-3dcf-4f74-9812-5dea5b6376cd@redhat.com> (Laszlo Ersek's
-	message of "Thu, 26 Apr 2018 18:30:19 +0200")
-Message-ID: <87bme5uolc.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <kevin.tian@intel.com>)
+	id 1fBxOe-0005Gl-Nw
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 03:02:21 -0400
+From: "Tian, Kevin" <kevin.tian@intel.com>
+Date: Fri, 27 Apr 2018 07:02:14 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19113B5D2@SHSMSX101.ccr.corp.intel.com>
+References: <20180425045129.17449-1-peterx@redhat.com>
+	<20180425045129.17449-9-peterx@redhat.com>
+	<2b05e076-0af9-0ee9-c076-7acc29714913@redhat.com>
+In-Reply-To: <2b05e076-0af9-0ee9-c076-7acc29714913@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 6/6] qapi: discriminate CpuInfo[Fast] on
- SysEmuTarget, not CpuInfoArch
+Subject: Re: [Qemu-devel] [PATCH 08/10] intel-iommu: maintain per-device
+ iova ranges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,113 +31,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: Jason Wang <jasowang@redhat.com>, Peter Xu <peterx@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
 
-Laszlo Ersek <lersek@redhat.com> writes:
-
-> On 04/26/18 17:51, Markus Armbruster wrote:
->> Eric Blake <eblake@redhat.com> writes:
->> 
->>> On 04/26/2018 09:34 AM, Markus Armbruster wrote:
->>>>>
->>>>> Acerbic discovery of the day: @CpuInfoArch has "x86", while configure
->>>>> produces:
->>>>>
->>>>>   TARGET_NAME  TARGET_BASE_ARCH
->>>>>          i386              i386
->>>>>        x86_64              i386
->>>>>
->>>>> Note how "i386" does not match "x86".
->>>>
->>>> Review fail.
->>>>
->>>> Just three weeks ago, we could still have fixed query-cpus-fast...
->>>
->>> Actually, I think we still can.  We already documented in the 2.12
->>> release notes that the "arch" field of query-cpus-fast is known to be
->>> broken for all but "s390x" (which is really the only arch field that
->>> MUST be correct, as that is the only time we send additional
->>> information).  And introspection can easily see both the enum contents
->>> (if we add something) as well as any other additions to the
->>> query-cpus-fast output union (although that is less likely), to use
->>> those as a witness for whether qemu is new enough to have fixed the
->>> bogus "arch" values.  I'd argue that if we change things right now, with
->>> intent to include the change in 2.12.1, before people start relying on
->>> the bogus "arch" of 2.12, then we should feel free to make
->>> query-cpus-fast output whatever we want for all architectures other than
->>> "s390x", even if it changes the current output of "x86".
->> 
->> In other words, we managed to screw up query-cpus-fast sufficiently to
->> let us fix it even now.  Cool, let's do it!
->> 
->
-> Let me clarify a little.
->
-> The @CpuInfoArch enum has the following constants now:
->
-> ['x86', 'sparc', 'ppc', 'mips', 'tricore', 's390', 'riscv', 'other' ]
->
-> This enum was originally introduced in 2.6 (according to the
-> documentation), and only the @s390 and @riscv constants were added in 2.12.
->
-> The enum constants show up in the following two places, *on the wire*:
->
-> - in @CpuInfo.@arch, only produced by @query-cpus,
-> - in @CpuInfoFast.@arch, only produced by @query-cpus-fast.
->
-> The plan would be to rewrite *all* those enum constants of @CpuInfoArch
-> to which the respective TARGET_BASE_ARCH values (from "configure") do
-> not map *identically*. Here's the mapping:
->
->   TARGET_BASE_ARCH  CpuInfoArch  CpuInfoArch needs change
->   ----------------  -----------  ------------------------
->   i386              x86          YES
->   sparc             sparc        no
->   ppc               ppc          no
->   mips              mips         no
->   tricore           tricore      no
->   s390x             s390         YES
->   riscv             riscv        no
->
-> In other words, @CpuInfoArch would have to be changed to the following:
->
-> ['i386', 'sparc', 'ppc', 'mips', 'tricore', 's390x', 'riscv', 'other' ]
->  ^^^^^^                                     ^^^^^^^
->
-> This means that the @arch field, returned by @query-cpus and
-> @query-cpus-fast, would change incompatibly for those QAPI clients that
-> look specifically for "x86" or "s390".
->
-> Is this a safe change?
->
-> I would say, because of the 's390' -> 's390x' change, that it isn't.
->
-> (Also, to confirm, the wiki section at
-> <https://wiki.qemu.org/Planning/2.12#Issues_that_will_not_be_fixed> states,
->
->   * the query-cpus-fast QMP command reports bogus arch data for all
->     architectures except x86 and s390; applications should be careful to
->     not rely on the bogus information
->
-> It (correctly) refers to "s390". That value would change.)
-
-You're right, that's a compatibility break.
-
-We could perhaps still declare *all* @arch values useless in v2.12.0,
-then fix them in v2.12.1.
-
-Or we deprecate @arch right when we introduce @target, and drop it later
-in accordance with our deprecation policy (qemu-doc.texi @appendix
-Deprecated features).  That way, the rather ridiculous code to compute
-it will be temporary.  I think that's cleaner.
-
-   @arch in     query-cpus      query-cpus-fast
-   before 2.6   nonexistent
-   2.6 - 2.11   CpuInfoArch
-   2.12         cmd deprecated  CpuInfoArch
-   2.13         cmd deprecated  memb deprecated
-   2.14         cmd gone        memb deprecated
-   2.15         cmd gone        memb gone
-
-Opinions?
+PiBGcm9tOiBKYXNvbiBXYW5nIFttYWlsdG86amFzb3dhbmdAcmVkaGF0LmNvbV0NCj4gU2VudDog
+RnJpZGF5LCBBcHJpbCAyNywgMjAxOCAyOjA4IFBNDQo+IA0KPiBPbiAyMDE45bm0MDTmnIgyNeaX
+pSAxMjo1MSwgUGV0ZXIgWHUgd3JvdGU6DQo+ID4gRm9yIGVhY2ggVlREQWRkcmVzc1NwYWNlLCBu
+b3cgd2UgbWFpbnRhaW4gd2hhdCBJT1ZBIHJhbmdlcyB3ZSBoYXZlDQo+ID4gbWFwcGVkIGFuZCB3
+aGF0IHdlIGhhdmUgbm90LiAgV2l0aCB0aGF0IGluZm9ybWF0aW9uLCBub3cgd2Ugb25seQ0KPiBz
+ZW5kDQo+ID4gTUFQIG9yIFVOTUFQIHdoZW4gbmVjZXNzYXJ5LiAgU2F5LCB3ZSBkb24ndCBzZW5k
+IE1BUCBub3RpZmllcyBpZiB3ZQ0KPiBrbm93DQo+ID4gd2UgaGF2ZSBhbHJlYWR5IG1hcHBlZCB0
+aGUgcmFuZ2UsIG1lYW53aGlsZSB3ZSBkb24ndCBzZW5kIFVOTUFQDQo+IG5vdGlmaWVzDQo+ID4g
+aWYgd2Uga25vdyB3ZSBuZXZlciBtYXBwZWQgdGhlIHJhbmdlIGF0IGFsbC4NCj4gPg0KPiA+IFNp
+Z25lZC1vZmYtYnk6IFBldGVyIFh1IDxwZXRlcnhAcmVkaGF0LmNvbT4NCj4gPiAtLS0NCj4gPiAg
+IGluY2x1ZGUvaHcvaTM4Ni9pbnRlbF9pb21tdS5oIHwgIDIgKysNCj4gPiAgIGh3L2kzODYvaW50
+ZWxfaW9tbXUuYyAgICAgICAgIHwgMjggKysrKysrKysrKysrKysrKysrKysrKysrKysrKw0KPiA+
+ICAgaHcvaTM4Ni90cmFjZS1ldmVudHMgICAgICAgICAgfCAgMiArKw0KPiA+ICAgMyBmaWxlcyBj
+aGFuZ2VkLCAzMiBpbnNlcnRpb25zKCspDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9o
+dy9pMzg2L2ludGVsX2lvbW11LmgNCj4gYi9pbmNsdWRlL2h3L2kzODYvaW50ZWxfaW9tbXUuaA0K
+PiA+IGluZGV4IDQ4NmUyMDVlNzkuLjA5YTJlOTQ0MDQgMTAwNjQ0DQo+ID4gLS0tIGEvaW5jbHVk
+ZS9ody9pMzg2L2ludGVsX2lvbW11LmgNCj4gPiArKysgYi9pbmNsdWRlL2h3L2kzODYvaW50ZWxf
+aW9tbXUuaA0KPiA+IEBAIC0yNyw2ICsyNyw3IEBADQo+ID4gICAjaW5jbHVkZSAiaHcvaTM4Ni9p
+b2FwaWMuaCINCj4gPiAgICNpbmNsdWRlICJody9wY2kvbXNpLmgiDQo+ID4gICAjaW5jbHVkZSAi
+aHcvc3lzYnVzLmgiDQo+ID4gKyNpbmNsdWRlICJxZW11L2ludGVydmFsLXRyZWUuaCINCj4gPg0K
+PiA+ICAgI2RlZmluZSBUWVBFX0lOVEVMX0lPTU1VX0RFVklDRSAiaW50ZWwtaW9tbXUiDQo+ID4g
+ICAjZGVmaW5lIElOVEVMX0lPTU1VX0RFVklDRShvYmopIFwNCj4gPiBAQCAtOTUsNiArOTYsNyBA
+QCBzdHJ1Y3QgVlREQWRkcmVzc1NwYWNlIHsNCj4gPiAgICAgICBRTElTVF9FTlRSWShWVERBZGRy
+ZXNzU3BhY2UpIG5leHQ7DQo+ID4gICAgICAgLyogU3VwZXJzZXQgb2Ygbm90aWZpZXIgZmxhZ3Mg
+dGhhdCB0aGlzIGFkZHJlc3Mgc3BhY2UgaGFzICovDQo+ID4gICAgICAgSU9NTVVOb3RpZmllckZs
+YWcgbm90aWZpZXJfZmxhZ3M7DQo+ID4gKyAgICBJVFRyZWUgKmlvdmFfdHJlZTsgICAgICAgICAg
+LyogVHJhY2VzIG1hcHBlZCBJT1ZBIHJhbmdlcyAqLw0KPiA+ICAgfTsNCj4gPg0KPiA+ICAgc3Ry
+dWN0IFZUREJ1cyB7DQo+ID4gZGlmZiAtLWdpdCBhL2h3L2kzODYvaW50ZWxfaW9tbXUuYyBiL2h3
+L2kzODYvaW50ZWxfaW9tbXUuYw0KPiA+IGluZGV4IGExOWMxOGI4ZDQuLjhmMzk2YTVkMTMgMTAw
+NjQ0DQo+ID4gLS0tIGEvaHcvaTM4Ni9pbnRlbF9pb21tdS5jDQo+ID4gKysrIGIvaHcvaTM4Ni9p
+bnRlbF9pb21tdS5jDQo+ID4gQEAgLTc2OCwxMiArNzY4LDM3IEBAIHR5cGVkZWYgc3RydWN0IHsN
+Cj4gPiAgIHN0YXRpYyBpbnQgdnRkX3BhZ2Vfd2Fsa19vbmUoSU9NTVVUTEJFbnRyeSAqZW50cnks
+IGludCBsZXZlbCwNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdnRkX3BhZ2Vf
+d2Fsa19pbmZvICppbmZvKQ0KPiA+ICAgew0KPiA+ICsgICAgVlREQWRkcmVzc1NwYWNlICphcyA9
+IGluZm8tPmFzOw0KPiA+ICAgICAgIHZ0ZF9wYWdlX3dhbGtfaG9vayBob29rX2ZuID0gaW5mby0+
+aG9va19mbjsNCj4gPiAgICAgICB2b2lkICpwcml2YXRlID0gaW5mby0+cHJpdmF0ZTsNCj4gPiAr
+ICAgIElUUmFuZ2UgKm1hcHBlZCA9IGl0X3RyZWVfZmluZChhcy0+aW92YV90cmVlLCBlbnRyeS0+
+aW92YSwNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBlbnRyeS0+aW92
+YSArIGVudHJ5LT5hZGRyX21hc2spOw0KPiA+DQo+ID4gICAgICAgYXNzZXJ0KGhvb2tfZm4pOw0K
+PiA+ICsNCj4gPiArICAgIC8qIFVwZGF0ZSBsb2NhbCBJT1ZBIG1hcHBlZCByYW5nZXMgKi8NCj4g
+PiArICAgIGlmIChlbnRyeS0+cGVybSkgew0KPiA+ICsgICAgICAgIGlmIChtYXBwZWQpIHsNCj4g
+PiArICAgICAgICAgICAgLyogU2tpcCBzaW5jZSB3ZSBoYXZlIGFscmVhZHkgbWFwcGVkIHRoaXMg
+cmFuZ2UgKi8NCj4gPiArICAgICAgICAgICAgdHJhY2VfdnRkX3BhZ2Vfd2Fsa19vbmVfc2tpcF9t
+YXAoZW50cnktPmlvdmEsIGVudHJ5LQ0KPiA+YWRkcl9tYXNrLA0KPiA+ICsgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBtYXBwZWQtPnN0YXJ0LCBtYXBwZWQtPmVu
+ZCk7DQo+ID4gKyAgICAgICAgICAgIHJldHVybiAwOw0KPiA+ICsgICAgICAgIH0NCj4gPiArICAg
+ICAgICBpdF90cmVlX2luc2VydChhcy0+aW92YV90cmVlLCBlbnRyeS0+aW92YSwNCj4gPiArICAg
+ICAgICAgICAgICAgICAgICAgICBlbnRyeS0+aW92YSArIGVudHJ5LT5hZGRyX21hc2spOw0KPiAN
+Cj4gSSB3YXMgY29uc2lkZXIgYSBjYXNlIGUuZzoNCj4gDQo+IDEpIG1hcCBBIChpb3ZhKSB0byBC
+IChwYSkNCj4gMikgaW52YWxpZGF0ZSBBDQo+IDMpIG1hcCBBIChpb3ZhKSB0byBDIChwYSkNCj4g
+NCkgaW52YWxpZGF0ZSBBDQo+IA0KPiBJbiB0aGlzIGNhc2UsIHdlIHdpbGwgcHJvYmFibHkgbWlz
+cyBhIHdhbGsgaGVyZS4gQnV0IEknbSBub3Qgc3VyZSBpdCB3YXMNCj4gYWxsb3dlZCBieSB0aGUg
+c3BlYyAodGhvdWdoIEkgdGhpbmsgc28pLg0KPiANCg0KSSB0aG91Z2h0IGl0IHdhcyB3cm9uZyBp
+biBhIGdsaW1wc2UsIGJ1dCB0aGVuIGNoYW5nZWQgbXkgbWluZCBhZnRlcg0KYW5vdGhlciB0aGlu
+a2luZy4gQXMgbG9uZyBhcyBkZXZpY2UgZHJpdmVyIGNhbiBxdWllc2NlbnQgdGhlIGRldmljZQ0K
+dG8gbm90IGFjY2VzcyBBIChpb3ZhKSB3aXRoaW4gYWJvdmUgd2luZG93LCB0aGVuIGFib3ZlIHNl
+cXVlbmNlDQpoYXMgbm8gcHJvYmxlbSBzaW5jZSBhbnkgc3RhbGUgbWFwcGluZ3MgKEEtPkIpIGFk
+ZGVkIGJlZm9yZSBzdGVwIDQpDQp3b24ndCBiZSB1c2VkIGFuZCB0aGVuIHdpbGwgZ2V0IGZsdXNo
+ZWQgYWZ0ZXIgc3RlcCA0KS4gUmVnYXJkaW5nIHRvDQp0aGF0IGFjdHVhbGx5IHRoZSAxc3QgaW52
+YWxpZGF0aW9uIGNhbiBiZSBza2lwcGVkOg0KDQoxKSBtYXAgQSAoaW92YSkgdG8gQiAocGEpDQoy
+KSBkcml2ZXIgcHJvZ3JhbXMgZGV2aWNlIHRvIHVzZSBBDQozKSBkcml2ZXIgcHJvZ3JhbXMgZGV2
+aWNlIHRvIG5vdCB1c2UgQQ0KNCkgbWFwIEEgKGlvdmEpIHRvIEMgKHBhKQ0KCUEtPkIgbWF5IGJl
+IHN0aWxsIHZhbGlkIGluIElPVExCDQo1KSBpbnZhbGlkYXRlIEENCjYpIGRyaXZlciBwcm9ncmFt
+cyBkZXZpY2UgdG8gdXNlIEENCg0KT2YgY291cnNlIGFib3ZlIGRvZXNuJ3QgZ2VuZXJhdGUgYSBz
+YW5lIElPTU1VIEFQSSBmcmFtZXdvcmssDQpqdXN0IGFzIFBldGVyIHBvaW50ZWQgb3V0LiBCdXQg
+ZnJvbSBoYXJkd2FyZSBwLm8udiBpdCBsb29rcyBubw0KcHJvYmxlbS4NCg0KVGhhbmtzDQpLZXZp
+bg0K
