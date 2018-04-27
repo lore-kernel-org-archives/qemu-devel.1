@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fC5Ai-00075h-Oh
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 11:20:32 -0400
+	(envelope-from <mst@redhat.com>) id 1fC5Bo-00084v-Kl
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 11:21:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fC5Ac-00046R-O0
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 11:20:28 -0400
-References: <20180427142002.21930-1-vsementsov@virtuozzo.com>
-	<20180427142002.21930-2-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <fda2fb9a-e627-4627-b659-fc3854a8cbc6@redhat.com>
-Date: Fri, 27 Apr 2018 10:20:11 -0500
+	(envelope-from <mst@redhat.com>) id 1fC5Bk-0004hR-JU
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 11:21:36 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34984 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fC5Bk-0004h0-EL
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 11:21:32 -0400
+Date: Fri, 27 Apr 2018 18:21:31 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180427182101-mutt-send-email-mst@kernel.org>
+References: <1524799751-151698-1-git-send-email-mst@redhat.com>
+	<CAFEAcA-FNy7cdKkUDctnf08Ska-piZo7QKwRD90G=zB5_QsS_A@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180427142002.21930-2-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="2byHPasWFUOkA9rstKZqfVXZ6bfkz3EPY"
-Subject: Re: [Qemu-devel] [PATCH 1/2] nbd/client: fix
- nbd_negotiate_simple_meta_context
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-FNy7cdKkUDctnf08Ska-piZo7QKwRD90G=zB5_QsS_A@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 0/4] pc, pci, virtio: fixes, features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,69 +27,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, qemu-stable@nongnu.org
-Cc: pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com, famz@redhat.com, stefanha@redhat.com, den@openvz.org, peter.maydell@linaro.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2byHPasWFUOkA9rstKZqfVXZ6bfkz3EPY
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, qemu-stable@nongnu.org
-Cc: pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com,
- famz@redhat.com, stefanha@redhat.com, den@openvz.org,
- peter.maydell@linaro.org
-Message-ID: <fda2fb9a-e627-4627-b659-fc3854a8cbc6@redhat.com>
-Subject: Re: [PATCH 1/2] nbd/client: fix nbd_negotiate_simple_meta_context
-References: <20180427142002.21930-1-vsementsov@virtuozzo.com>
- <20180427142002.21930-2-vsementsov@virtuozzo.com>
-In-Reply-To: <20180427142002.21930-2-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Apr 27, 2018 at 10:49:06AM +0100, Peter Maydell wrote:
+> On 27 April 2018 at 04:29, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > The following changes since commit 4743c23509a51bd4ee85cc272287a41917d1be35:
+> >
+> >   Update version for v2.12.0 release (2018-04-24 16:44:55 +0100)
+> >
+> > are available in the git repository at:
+> >
+> >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+> >
+> > for you to fetch changes up to fb6fd86f712c73a40fbe0c6be86d4635239b1304:
+> >
+> >   virtio-balloon: add hugetlb page allocation counts (2018-04-27 06:25:27 +0300)
+> >
+> > ----------------------------------------------------------------
+> > pc, pci, virtio: fixes, features
+> >
+> > A bugfix that just missed 2.12, a new PCI,
+> > and a new virtio balloon stat.
+> >
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> > Peter Xu (1):
+> >       intel-iommu: send PSI always when notify_unmap set
+> 
+> This patch is still missing:
+>  * a clear description of when the bug applies and its severity
 
-On 04/27/2018 09:20 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Initialize received variable. Otherwise, is is possible for server to
-> answer without any contexts, but we will set context_id to something
-> random (received_id is not initialized too) and return 1, which is
-> wrong.
->=20
-> To solve it, just initialize received to false. Initialize received_id
-> too, just to make all possible checkers happy.
->=20
-> But was introduced in 78a33ab58782efdb206de14 "nbd: BLOCK_STATUS for
+I'm still working on that. Do we want to defer merging until we have
+that?
 
-s/But/Bug/
+>  * a cc:stable marking
 
-> standard get_block_status function: client part" with the whole
-> function.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  nbd/client.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+Will do.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---2byHPasWFUOkA9rstKZqfVXZ6bfkz3EPY
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrjP6sACgkQp6FrSiUn
-Q2oPSwgAg6kvTeuij6nExT5KSKQTbbqHHWqXRv8XnUpDiXwu7s3mIrImTnam5qFm
-+EbIe3d6oEpimboxwF3rlqJbN1MMKWQF4x7uhM3YNKPmKPjxWsfMfM5AJoGJvyMr
-XSIMWTXS44LWnS6Ucii0ZhxPiTV/68alRWKdtxwA3ICBzYqfWuuuF7R6x6E8m9HQ
-uuByx6qurYjoo9a+Vd9etreW5ys7eFmasEg3LhT+yTa4FfGB4S3bUjaxCWm5bDzS
-niKT4vYa2LlQX5AWIjuZXDsekkjyjAve6d9I1fpP3WJ6A1nKSD/5qaLfgvJbOuN2
-JYBs8QrtOHjIheEX5MndfABC1r9EvQ==
-=9IT1
------END PGP SIGNATURE-----
-
---2byHPasWFUOkA9rstKZqfVXZ6bfkz3EPY--
+> Please can you fix that and resend?
+> 
+> thanks
+> -- PMM
