@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fBwxt-00062J-Qc
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 02:34:43 -0400
+	(envelope-from <armbru@redhat.com>) id 1fBxGe-00022k-K6
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 02:54:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fBwxo-0008Qc-SU
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 02:34:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45596 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fBxGa-0000NC-My
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 02:54:04 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41484 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fBwxo-0008QQ-NC
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 02:34:36 -0400
-Date: Fri, 27 Apr 2018 14:34:26 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180427063426.GA9036@xz-mi>
-References: <20180425045129.17449-1-peterx@redhat.com>
-	<20180425045129.17449-9-peterx@redhat.com>
-	<2b05e076-0af9-0ee9-c076-7acc29714913@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fBxGa-0000Mq-Hc
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 02:54:00 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180424214550.32549-1-lersek@redhat.com>
+	<20180424214550.32549-7-lersek@redhat.com>
+	<8736zjagg3.fsf@dusky.pond.sub.org>
+	<4509705a-43b2-db40-aa24-18eff649e750@redhat.com>
+	<87sh7i4h5y.fsf@dusky.pond.sub.org>
+	<ea646e6d-9512-559d-be8d-fd3c754cc301@redhat.com>
+	<136c5d3a-9d5b-eb15-a1f4-18150662144b@redhat.com>
+	<87vacexcir.fsf@dusky.pond.sub.org>
+	<230b57bf-1bf0-fd4e-05bf-cb7c4902975d@redhat.com>
+	<8736zix8yb.fsf@dusky.pond.sub.org>
+	<f0c9c7ca-3dcf-4f74-9812-5dea5b6376cd@redhat.com>
+Date: Fri, 27 Apr 2018 08:53:51 +0200
+In-Reply-To: <f0c9c7ca-3dcf-4f74-9812-5dea5b6376cd@redhat.com> (Laszlo Ersek's
+	message of "Thu, 26 Apr 2018 18:30:19 +0200")
+Message-ID: <87bme5uolc.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <2b05e076-0af9-0ee9-c076-7acc29714913@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 08/10] intel-iommu: maintain per-device
- iova ranges
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 6/6] qapi: discriminate CpuInfo[Fast] on
+ SysEmuTarget, not CpuInfoArch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,103 +37,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>, "Tian, Kevin" <kevin.tian@intel.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On Fri, Apr 27, 2018 at 02:07:46PM +0800, Jason Wang wrote:
->=20
->=20
-> On 2018=E5=B9=B404=E6=9C=8825=E6=97=A5 12:51, Peter Xu wrote:
-> > For each VTDAddressSpace, now we maintain what IOVA ranges we have
-> > mapped and what we have not.  With that information, now we only send
-> > MAP or UNMAP when necessary.  Say, we don't send MAP notifies if we k=
-now
-> > we have already mapped the range, meanwhile we don't send UNMAP notif=
-ies
-> > if we know we never mapped the range at all.
-> >=20
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >   include/hw/i386/intel_iommu.h |  2 ++
-> >   hw/i386/intel_iommu.c         | 28 ++++++++++++++++++++++++++++
-> >   hw/i386/trace-events          |  2 ++
-> >   3 files changed, 32 insertions(+)
-> >=20
-> > diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_io=
-mmu.h
-> > index 486e205e79..09a2e94404 100644
-> > --- a/include/hw/i386/intel_iommu.h
-> > +++ b/include/hw/i386/intel_iommu.h
-> > @@ -27,6 +27,7 @@
-> >   #include "hw/i386/ioapic.h"
-> >   #include "hw/pci/msi.h"
-> >   #include "hw/sysbus.h"
-> > +#include "qemu/interval-tree.h"
-> >   #define TYPE_INTEL_IOMMU_DEVICE "intel-iommu"
-> >   #define INTEL_IOMMU_DEVICE(obj) \
-> > @@ -95,6 +96,7 @@ struct VTDAddressSpace {
-> >       QLIST_ENTRY(VTDAddressSpace) next;
-> >       /* Superset of notifier flags that this address space has */
-> >       IOMMUNotifierFlag notifier_flags;
-> > +    ITTree *iova_tree;          /* Traces mapped IOVA ranges */
-> >   };
-> >   struct VTDBus {
-> > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > index a19c18b8d4..8f396a5d13 100644
-> > --- a/hw/i386/intel_iommu.c
-> > +++ b/hw/i386/intel_iommu.c
-> > @@ -768,12 +768,37 @@ typedef struct {
-> >   static int vtd_page_walk_one(IOMMUTLBEntry *entry, int level,
-> >                                vtd_page_walk_info *info)
-> >   {
-> > +    VTDAddressSpace *as =3D info->as;
-> >       vtd_page_walk_hook hook_fn =3D info->hook_fn;
-> >       void *private =3D info->private;
-> > +    ITRange *mapped =3D it_tree_find(as->iova_tree, entry->iova,
-> > +                                   entry->iova + entry->addr_mask);
-> >       assert(hook_fn);
-> > +
-> > +    /* Update local IOVA mapped ranges */
-> > +    if (entry->perm) {
-> > +        if (mapped) {
-> > +            /* Skip since we have already mapped this range */
-> > +            trace_vtd_page_walk_one_skip_map(entry->iova, entry->add=
-r_mask,
-> > +                                             mapped->start, mapped->=
-end);
-> > +            return 0;
-> > +        }
-> > +        it_tree_insert(as->iova_tree, entry->iova,
-> > +                       entry->iova + entry->addr_mask);
->=20
-> I was consider a case e.g:
->=20
-> 1) map A (iova) to B (pa)
-> 2) invalidate A
+Laszlo Ersek <lersek@redhat.com> writes:
 
-Here to be more explicit you mean guest sends a PSI, not really
-invalidation of the mapping.
+> On 04/26/18 17:51, Markus Armbruster wrote:
+>> Eric Blake <eblake@redhat.com> writes:
+>> 
+>>> On 04/26/2018 09:34 AM, Markus Armbruster wrote:
+>>>>>
+>>>>> Acerbic discovery of the day: @CpuInfoArch has "x86", while configure
+>>>>> produces:
+>>>>>
+>>>>>   TARGET_NAME  TARGET_BASE_ARCH
+>>>>>          i386              i386
+>>>>>        x86_64              i386
+>>>>>
+>>>>> Note how "i386" does not match "x86".
+>>>>
+>>>> Review fail.
+>>>>
+>>>> Just three weeks ago, we could still have fixed query-cpus-fast...
+>>>
+>>> Actually, I think we still can.  We already documented in the 2.12
+>>> release notes that the "arch" field of query-cpus-fast is known to be
+>>> broken for all but "s390x" (which is really the only arch field that
+>>> MUST be correct, as that is the only time we send additional
+>>> information).  And introspection can easily see both the enum contents
+>>> (if we add something) as well as any other additions to the
+>>> query-cpus-fast output union (although that is less likely), to use
+>>> those as a witness for whether qemu is new enough to have fixed the
+>>> bogus "arch" values.  I'd argue that if we change things right now, with
+>>> intent to include the change in 2.12.1, before people start relying on
+>>> the bogus "arch" of 2.12, then we should feel free to make
+>>> query-cpus-fast output whatever we want for all architectures other than
+>>> "s390x", even if it changes the current output of "x86".
+>> 
+>> In other words, we managed to screw up query-cpus-fast sufficiently to
+>> let us fix it even now.  Cool, let's do it!
+>> 
+>
+> Let me clarify a little.
+>
+> The @CpuInfoArch enum has the following constants now:
+>
+> ['x86', 'sparc', 'ppc', 'mips', 'tricore', 's390', 'riscv', 'other' ]
+>
+> This enum was originally introduced in 2.6 (according to the
+> documentation), and only the @s390 and @riscv constants were added in 2.12.
+>
+> The enum constants show up in the following two places, *on the wire*:
+>
+> - in @CpuInfo.@arch, only produced by @query-cpus,
+> - in @CpuInfoFast.@arch, only produced by @query-cpus-fast.
+>
+> The plan would be to rewrite *all* those enum constants of @CpuInfoArch
+> to which the respective TARGET_BASE_ARCH values (from "configure") do
+> not map *identically*. Here's the mapping:
+>
+>   TARGET_BASE_ARCH  CpuInfoArch  CpuInfoArch needs change
+>   ----------------  -----------  ------------------------
+>   i386              x86          YES
+>   sparc             sparc        no
+>   ppc               ppc          no
+>   mips              mips         no
+>   tricore           tricore      no
+>   s390x             s390         YES
+>   riscv             riscv        no
+>
+> In other words, @CpuInfoArch would have to be changed to the following:
+>
+> ['i386', 'sparc', 'ppc', 'mips', 'tricore', 's390x', 'riscv', 'other' ]
+>  ^^^^^^                                     ^^^^^^^
+>
+> This means that the @arch field, returned by @query-cpus and
+> @query-cpus-fast, would change incompatibly for those QAPI clients that
+> look specifically for "x86" or "s390".
+>
+> Is this a safe change?
+>
+> I would say, because of the 's390' -> 's390x' change, that it isn't.
+>
+> (Also, to confirm, the wiki section at
+> <https://wiki.qemu.org/Planning/2.12#Issues_that_will_not_be_fixed> states,
+>
+>   * the query-cpus-fast QMP command reports bogus arch data for all
+>     architectures except x86 and s390; applications should be careful to
+>     not rely on the bogus information
+>
+> It (correctly) refers to "s390". That value would change.)
 
-> 3) map A (iova) to C (pa)
-> 4) invalidate A
+You're right, that's a compatibility break.
 
-Here too.
+We could perhaps still declare *all* @arch values useless in v2.12.0,
+then fix them in v2.12.1.
 
->=20
-> In this case, we will probably miss a walk here. But I'm not sure it wa=
-s
-> allowed by the spec (though I think so).
+Or we deprecate @arch right when we introduce @target, and drop it later
+in accordance with our deprecation policy (qemu-doc.texi @appendix
+Deprecated features).  That way, the rather ridiculous code to compute
+it will be temporary.  I think that's cleaner.
 
-IMHO IOMMU page tables should not be modified by guest directly.  It
-can be mapped, unmapped, but should not be modified directly.  I
-suppose that's why Linux IOMMU API won't provide iommu_modify() but
-only iommu_[un]map(), etc.. I don't know whether there is anything in
-the spec, but AFAIU this can cause coherence issue on device side
-since after step (1) device should be able to know the mapping
-already, then modifying that mapping without UNMAP that on device side
-will cause undefined behaviors.
+   @arch in     query-cpus      query-cpus-fast
+   before 2.6   nonexistent
+   2.6 - 2.11   CpuInfoArch
+   2.12         cmd deprecated  CpuInfoArch
+   2.13         cmd deprecated  memb deprecated
+   2.14         cmd gone        memb deprecated
+   2.15         cmd gone        memb gone
 
-Thanks,
-
---=20
-Peter Xu
+Opinions?
