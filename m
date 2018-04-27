@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zyimin@linux.ibm.com>) id 1fC0DS-00068Z-FZ
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 06:03:04 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fC0GP-00021T-LL
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 06:06:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zyimin@linux.ibm.com>) id 1fC0DP-00051g-Bn
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 06:02:58 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50364)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zyimin@linux.ibm.com>)
-	id 1fC0DP-00051Y-2w
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 06:02:55 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w3R9xtlF128613
-	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 06:02:52 -0400
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2hm1hb8q36-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 06:02:52 -0400
-Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <zyimin@linux.ibm.com>;
-	Fri, 27 Apr 2018 04:02:51 -0600
-From: Yi Min Zhao <zyimin@linux.ibm.com>
-Date: Fri, 27 Apr 2018 18:02:43 +0800
-Message-Id: <20180427100244.14258-1-zyimin@linux.ibm.com>
-Subject: [Qemu-devel] [RFC PATCH 0/1] s390x/pci: add common fmb
+	(envelope-from <peter.maydell@linaro.org>) id 1fC0GO-0005s7-Ot
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 06:06:01 -0400
+Received: from mail-ot0-x22d.google.com ([2607:f8b0:4003:c0f::22d]:39149)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fC0GO-0005rx-JJ
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 06:06:00 -0400
+Received: by mail-ot0-x22d.google.com with SMTP id l12-v6so1409113oth.6
+	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 03:06:00 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <CANCZdfo+da8TRAxz=-69r-ert5b83FaXL=zkBWJGZ_w3n0oZeg@mail.gmail.com>
+References: <AFF77CBF-01EC-494F-AA9C-9820F368EA32@gmail.com>
+	<CAFEAcA9ycYWLJfog5ieugos2DzQGQHU5iyEAutPWCA7Pfr5HpQ@mail.gmail.com>
+	<CANCZdfo+da8TRAxz=-69r-ert5b83FaXL=zkBWJGZ_w3n0oZeg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 27 Apr 2018 11:05:39 +0100
+Message-ID: <CAFEAcA-C=QqEV0KJvHft4+iO8fYfiHhibG9SLH97iqdk9EP6FQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Large patch set advice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,22 +30,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, zyimin@linux.ibm.com
+To: Warner Losh <imp@bsdimp.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Currently the code misses FMB functionality. This patch fixup this. Only common
-FMB is supported now.
+On 26 April 2018 at 20:51, Warner Losh <imp@bsdimp.com> wrote:
+> On Thu, Apr 26, 2018 at 2:11 AM, Peter Maydell <peter.maydell@linaro.org>
+> wrote:
+>> One question I do have is about the other BSDs: bsd-user at least
+>> in theory is supposed to support freebsd, netbsd and openbsd.
+>> Your patchsets should fix freebsd, but do you know what the status
+>> is of netbsd and openbsd? Upstream we do compiletest but no runtime
+>> testing; I think last time I tried it they didn't work very well,
+>> but it would be worth checking with the other BSDs downstream to
+>> see if they're using bsd-user and to make sure we don't break anything
+>> that is currently working for netbsd/openbsd...
+>
+>
+> I thought that was the empty set: I was under the impression that bsd-user
+> in upstream was basically totally broken and nothing non-trivial worked.
+> Since nothing is working, I'd posit that it follows that nobody could be
+> currently using it. I've certainly heard of no parallel efforts to make
+> similar changes for NetBSD/OpenBSD.
 
-bb/zyimin/fmb
+Well, I'm basically just asking you to reach out and check with
+the other *BSD folks that they agree with that "it's totally broken"
+analysis (which I guess they would). I see Kamil has given the
+answer for NetBSD already.
 
-Yi Min Zhao (1):
-  s390x/pci: add common fmb
-
- hw/s390x/s390-pci-bus.c  |  3 ++-
- hw/s390x/s390-pci-bus.h  | 16 +++++++++++++
- hw/s390x/s390-pci-inst.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++-
- hw/s390x/s390-pci-inst.h |  1 +
- 4 files changed, 78 insertions(+), 2 deletions(-)
-
--- 
-2.15.1 (Apple Git-101)
+thanks
+-- PMM
