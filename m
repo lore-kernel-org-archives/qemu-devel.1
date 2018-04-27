@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47541)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fC0Tq-0006IG-G6
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 06:19:55 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fC0Ue-00070O-SI
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 06:20:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fC0Tp-00030E-Nr
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 06:19:54 -0400
-Received: from mail-oi0-x22d.google.com ([2607:f8b0:4003:c06::22d]:40922)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fC0Tp-000306-IJ
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 06:19:53 -0400
-Received: by mail-oi0-x22d.google.com with SMTP id c203-v6so1121359oib.7
-	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 03:19:53 -0700 (PDT)
+	(envelope-from <kraxel@redhat.com>) id 1fC0Ub-0003NB-Qa
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 06:20:44 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42198 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fC0Ub-0003N3-Ms
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 06:20:41 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5A87EFA466
+	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 10:20:41 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri, 27 Apr 2018 12:20:30 +0200
+Message-Id: <20180427102033.20232-1-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAHNT7NsFuC4kHPvdVHkmMzJCr_Z80t-eNdbaaw6pt29dDh-8pw@mail.gmail.com>
-References: <1524699938-6764-1-git-send-email-mjc@sifive.com>
-	<CAHNT7NsVNohpxfic=A30oAufaygPWFp1BoT+PUTcgPyhaVif6g@mail.gmail.com>
-	<CAHNT7NtRi4qwqpR+SuU-ANXHEAAkp6TitkWFroJ54GsJowTXNg@mail.gmail.com>
-	<CAKmqyKMtO5JQ7GnpKU9E_MGeDRGHsb=c0ra0CnGX8vxKtKsunQ@mail.gmail.com>
-	<CAHNT7NsFuC4kHPvdVHkmMzJCr_Z80t-eNdbaaw6pt29dDh-8pw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 27 Apr 2018 11:19:32 +0100
-Message-ID: <CAFEAcA_b6SVjdv+QeRC4MYX-npLD8nuzhc0ha9CGd=1TzCeBWg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v8 00/35] QEMU 2.13 Privileged ISA
- emulation updates
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/3] Usb 20180427 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,22 +30,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: Alistair Francis <alistair23@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Su Hang <suhang16@mails.ucas.ac.cn>, Matthew Suozzo <msuozzo@google.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Richard Henderson <richard.henderson@linaro.org>, "Emilio G. Cota" <cota@braap.org>, Alistair Francis <Alistair.Francis@wdc.com>, RISC-V Patches <patches@groups.riscv.org>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On 27 April 2018 at 01:34, Michael Clark <mjc@sifive.com> wrote:
-> I wasn't sure whether I was going to send this series out before or after
-> the 2.12 release and the remaining patches that need review depend on the
-> earlier patches. The reason was so that patchew could digest the series i.e.
-> if I sent out 26 patches that depend on changes made in the first 9 which
-> weren't merged then patchew wouldn't be able to apply the series.
+The following changes since commit b8846a4d6352b2a1d2012f8b3b9115640524ae=
+da:
 
-Patchew has a feature to support that. In the second series, after
-the '---' line you say
-Based-on: <message-id-of-first-patchset-cover-letter>
+  vl.c: new function serial_max_hds() (2018-04-26 13:58:29 +0100)
 
-and then patchew knows it needs to apply the first patchset before
-trying to apply and test the second.
+are available in the git repository at:
 
-thanks
--- PMM
+  git://git.kraxel.org/qemu tags/usb-20180427-pull-request
+
+for you to fetch changes up to 0f5c642d49c3a843bd8b8790d7014fd84bcf6405:
+
+  ccid-card: include libcacard.h only (2018-04-27 10:57:09 +0200)
+
+----------------------------------------------------------------
+usb: ccid bugfix, misc small improvements.
+
+----------------------------------------------------------------
+
+Jason Andryuk (1):
+  ccid: Fix dwProtocols advertisement of T=3D0
+
+John Thomson (1):
+  Fix libusb-1.0.22 deprecated libusb_set_debug with libusb_set_option
+
+Michal Privoznik (1):
+  ccid-card: include libcacard.h only
+
+ configure                     | 2 +-
+ hw/usb/ccid-card-emulated.c   | 5 +----
+ hw/usb/ccid-card-passthru.c   | 2 +-
+ hw/usb/dev-smartcard-reader.c | 4 ++--
+ hw/usb/host-libusb.c          | 4 ++++
+ 5 files changed, 9 insertions(+), 8 deletions(-)
+
+--=20
+2.9.3
