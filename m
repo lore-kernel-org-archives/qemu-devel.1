@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fC9OE-000747-RI
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 15:50:43 -0400
+	(envelope-from <eblake@redhat.com>) id 1fC9OP-0007A6-1X
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 15:50:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fC9OA-0004Dw-Pg
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 15:50:42 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:38966)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fC9OA-0004De-IH
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 15:50:38 -0400
-Received: by mail-wr0-x231.google.com with SMTP id q3-v6so2795235wrj.6
-	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 12:50:38 -0700 (PDT)
-References: <20180425012300.14698-1-richard.henderson@linaro.org>
-	<87wowsk1ih.fsf@linaro.org> <87vaccjx70.fsf@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <87vaccjx70.fsf@linaro.org>
-Date: Fri, 27 Apr 2018 20:50:36 +0100
-Message-ID: <87tvrwjunn.fsf@linaro.org>
+	(envelope-from <eblake@redhat.com>) id 1fC9OO-0004KR-71
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 15:50:53 -0400
+References: <20180427191916.26637-1-alex.bennee@linaro.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7781dba2-883b-52b2-2c80-316816779e15@redhat.com>
+Date: Fri, 27 Apr 2018 14:50:34 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/9] target/arm: Fixups for
- ARM_FEATURE_V8_FP16
+In-Reply-To: <20180427191916.26637-1-alex.bennee@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="lH8UHjazXymAow9HLzaV1QTruWMQqneUX"
+Subject: Re: [Qemu-devel] [PATCH] arm/translate-a64: add FP16 FCMP operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,31 +23,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, richard.henderson@linaro.org
+Cc: peter.maydell@linaro.org, "open list:ARM" <qemu-arm@nongnu.org>, qemu-devel@nongnu.org, qemu-stable@nongnu.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--lH8UHjazXymAow9HLzaV1QTruWMQqneUX
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ richard.henderson@linaro.org
+Cc: peter.maydell@linaro.org, "open list:ARM" <qemu-arm@nongnu.org>,
+ qemu-devel@nongnu.org, qemu-stable@nongnu.org
+Message-ID: <7781dba2-883b-52b2-2c80-316816779e15@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] arm/translate-a64: add FP16 FCMP operations
+References: <20180427191916.26637-1-alex.bennee@linaro.org>
+In-Reply-To: <20180427191916.26637-1-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 04/27/2018 02:19 PM, Alex Benn=C3=A9e wrote:
+> These where missed out from the rest of the half-precision work.
+>=20
+
+s/where missed out from/were missed during/
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+--lH8UHjazXymAow9HLzaV1QTruWMQqneUX
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
->
->> Richard Henderson <richard.henderson@linaro.org> writes:
->>
-<snip>
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-If you take my patches from:
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrjfwoACgkQp6FrSiUn
+Q2ptsgf/YVER4UoC9XqlpRFKOUB10lvesS6dUjDQrqFEwfeVkNY7cuzieEDjwBsu
+OZsS0480x18L/7vf3QX4MBUiT2K1pt+hkieWzNmtTGpgKIiwFbtWFBLwoNNBxitM
+okW+rYLb4sdg6htHRrn3frucX3rj68pHUou9fGkxYyx3pfGh8JrOHUMGbH8ywOHo
+vu2P0E9djlj+7w1Ko0cjIPUHByZwawDVaS4yskAhgT82/Nb+HqdhDDNn8mIJ2Ohs
+fZ51bcK7x26mIivUwM4QGWpX9QVkFBGhbSq/BmXfqbMla638rpDCzjhHdLn42G/w
+/BO6tV054xSJ5x1s15EiO59VA/SqJQ==
+=8FD2
+-----END PGP SIGNATURE-----
 
-  https://github.com/stsquad/qemu/tree/review/rth-fp16-fixes
-
-443a7c3d38 arm/translate-a64: fix-up FMOV FP16 immediate
-be4430e9c9 arm/translate-a64: add FP16 FCSEL
-7badf508ab arm/translate-a64: add FP16 FCMP operations
-
->> testcases.armv8.2_half/insn_FSQRT_H_floatdp1__INC.risu.bi
-
-This is the only failure I have left. As it is approaching 2100 on a
-Friday night I leave that for you to look at as you'll be up before me
-on Monday ;-)
-
---
-Alex Benn=C3=A9e
+--lH8UHjazXymAow9HLzaV1QTruWMQqneUX--
