@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBzaB-0001nU-Fw
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:22:28 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fBzaG-0001pN-Ka
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:22:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBza9-00027v-SJ
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:22:23 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fBzaF-0002A4-El
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:22:28 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 27 Apr 2018 19:21:16 +1000
-Message-Id: <20180427092126.24812-40-david@gibson.dropbear.id.au>
+Date: Fri, 27 Apr 2018 19:21:15 +1000
+Message-Id: <20180427092126.24812-39-david@gibson.dropbear.id.au>
 In-Reply-To: <20180427092126.24812-1-david@gibson.dropbear.id.au>
 References: <20180427092126.24812-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 39/49] target/ppc: Move 1T segment and AMR
- options to PPCHash64Options
+Subject: [Qemu-devel] [PULL 38/49] target/ppc: Make hash64_opts field
+ mandatory for 64-bit hash MMUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,180 +26,113 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-Currently env->mmu_model is a bit of an unholy mess of an enum of distinc=
-t
-MMU types, with various flag bits as well.  This makes which bits of the
-field should be compared pretty confusing.
+Currently some cpus set the hash64_opts field in the class structure, wit=
+h
+specific details of their variant of the 64-bit hash mmu.  For the
+remaining cpus with that mmu, ppc_hash64_realize() fills in defaults.
 
-Make a start on cleaning that up by moving two of the flags bits -
-POWERPC_MMU_1TSEG and POWERPC_MMU_AMR - which are specific to the 64-bit
-hash MMU into a new flags field in PPCHash64Options structure.
+But there are only a couple of cpus that use those fallbacks, so just hav=
+e
+them to set the has64_opts field instead, simplifying the logic.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/pnv.c            |  3 ++-
- hw/ppc/spapr.c          |  2 +-
- target/ppc/cpu-qom.h    | 11 +++--------
- target/ppc/kvm.c        |  4 ++--
- target/ppc/mmu-hash64.c |  6 ++++--
- target/ppc/mmu-hash64.h |  8 ++++++++
- 6 files changed, 20 insertions(+), 14 deletions(-)
+ target/ppc/mmu-hash64.c     | 36 ++++++++++++++++++------------------
+ target/ppc/mmu-hash64.h     |  1 +
+ target/ppc/translate_init.c |  2 ++
+ 3 files changed, 21 insertions(+), 18 deletions(-)
 
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 3220ef8f79..0e49c5e9b8 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -36,6 +36,7 @@
- #include "monitor/monitor.h"
- #include "hw/intc/intc.h"
- #include "hw/ipmi/ipmi.h"
-+#include "target/ppc/mmu-hash64.h"
-=20
- #include "hw/ppc/xics.h"
- #include "hw/ppc/pnv_xscom.h"
-@@ -187,7 +188,7 @@ static void pnv_dt_core(PnvChip *chip, PnvCore *pc, v=
-oid *fdt)
-         _FDT((fdt_setprop(fdt, offset, "ibm,purr", NULL, 0)));
-     }
-=20
--    if (env->mmu_model & POWERPC_MMU_1TSEG) {
-+    if (ppc_hash64_has(cpu, PPC_HASH64_1TSEG)) {
-         _FDT((fdt_setprop(fdt, offset, "ibm,processor-segment-sizes",
-                            segs, sizeof(segs))));
-     }
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index a4b3722656..9c26dc37e1 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -557,7 +557,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void =
-*fdt, int offset,
-         _FDT((fdt_setprop(fdt, offset, "ibm,purr", NULL, 0)));
-     }
-=20
--    if (env->mmu_model & POWERPC_MMU_1TSEG) {
-+    if (ppc_hash64_has(cpu, PPC_HASH64_1TSEG)) {
-         _FDT((fdt_setprop(fdt, offset, "ibm,processor-segment-sizes",
-                           segs, sizeof(segs))));
-     }
-diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-index 3e5ef7375f..2bd58b2a84 100644
---- a/target/ppc/cpu-qom.h
-+++ b/target/ppc/cpu-qom.h
-@@ -68,22 +68,17 @@ enum powerpc_mmu_t {
-     /* PowerPC 601 MMU model (specific BATs format)            */
-     POWERPC_MMU_601        =3D 0x0000000A,
- #define POWERPC_MMU_64       0x00010000
--#define POWERPC_MMU_1TSEG    0x00020000
--#define POWERPC_MMU_AMR      0x00040000
- #define POWERPC_MMU_V3       0x00100000 /* ISA V3.00 MMU Support */
-     /* 64 bits PowerPC MMU                                     */
-     POWERPC_MMU_64B        =3D POWERPC_MMU_64 | 0x00000001,
-     /* Architecture 2.03 and later (has LPCR) */
-     POWERPC_MMU_2_03       =3D POWERPC_MMU_64 | 0x00000002,
-     /* Architecture 2.06 variant                               */
--    POWERPC_MMU_2_06       =3D POWERPC_MMU_64 | POWERPC_MMU_1TSEG
--                             | POWERPC_MMU_AMR | 0x00000003,
-+    POWERPC_MMU_2_06       =3D POWERPC_MMU_64 | 0x00000003,
-     /* Architecture 2.07 variant                               */
--    POWERPC_MMU_2_07       =3D POWERPC_MMU_64 | POWERPC_MMU_1TSEG
--                             | POWERPC_MMU_AMR | 0x00000004,
-+    POWERPC_MMU_2_07       =3D POWERPC_MMU_64 | 0x00000004,
-     /* Architecture 3.00 variant                               */
--    POWERPC_MMU_3_00       =3D POWERPC_MMU_64 | POWERPC_MMU_1TSEG
--                             | POWERPC_MMU_AMR | POWERPC_MMU_V3
-+    POWERPC_MMU_3_00       =3D POWERPC_MMU_64 | POWERPC_MMU_V3
-                              | 0x00000005,
- };
- #define POWERPC_MMU_VER(x) ((x) & (POWERPC_MMU_64 | 0xFFFF))
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index c67254acca..b53af75ecf 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -302,7 +302,7 @@ static void kvm_get_fallback_smmu_info(PowerPCCPU *cp=
-u,
-         /* HV KVM has backing store size restrictions */
-         info->flags =3D KVM_PPC_PAGE_SIZES_REAL;
-=20
--        if (env->mmu_model & POWERPC_MMU_1TSEG) {
-+        if (ppc_hash64_has(cpu, PPC_HASH64_1TSEG)) {
-             info->flags |=3D KVM_PPC_1T_SEGMENTS;
-         }
-=20
-@@ -482,7 +482,7 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
-     }
-     env->slb_nr =3D smmu_info.slb_size;
-     if (!(smmu_info.flags & KVM_PPC_1T_SEGMENTS)) {
--        env->mmu_model &=3D ~POWERPC_MMU_1TSEG;
-+        cpu->hash64_opts->flags &=3D ~PPC_HASH64_1TSEG;
-     }
- }
-=20
 diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index 2809c31170..c9ee55e1ea 100644
+index 6758afd9de..2809c31170 100644
 --- a/target/ppc/mmu-hash64.c
 +++ b/target/ppc/mmu-hash64.c
-@@ -160,7 +160,7 @@ int ppc_store_slb(PowerPCCPU *cpu, target_ulong slot,
-     if (vsid & (SLB_VSID_B & ~SLB_VSID_B_1T)) {
-         return -1; /* Bad segment size */
-     }
--    if ((vsid & SLB_VSID_B) && !(env->mmu_model & POWERPC_MMU_1TSEG)) {
-+    if ((vsid & SLB_VSID_B) && !(ppc_hash64_has(cpu, PPC_HASH64_1TSEG)))=
- {
-         return -1; /* 1T segment on MMU that doesn't support it */
-     }
+@@ -1100,25 +1100,12 @@ void ppc_hash64_init(PowerPCCPU *cpu)
+     CPUPPCState *env =3D &cpu->env;
+     PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
 =20
-@@ -369,7 +369,7 @@ static int ppc_hash64_amr_prot(PowerPCCPU *cpu, ppc_h=
-ash_pte64_t pte)
-     int prot =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-=20
-     /* Only recent MMUs implement Virtual Page Class Key Protection */
--    if (!(env->mmu_model & POWERPC_MMU_AMR)) {
-+    if (!ppc_hash64_has(cpu, PPC_HASH64_AMR)) {
-         return prot;
+-    if (pcc->hash64_opts) {
+-        cpu->hash64_opts =3D g_memdup(pcc->hash64_opts,
+-                                    sizeof(*cpu->hash64_opts));
+-    } else if (env->mmu_model & POWERPC_MMU_64) {
+-        /* Use default sets of page sizes. We don't support MPSS */
+-        static const PPCHash64Options defopts =3D {
+-            .sps =3D {
+-                { .page_shift =3D 12, /* 4K */
+-                  .slb_enc =3D 0,
+-                  .enc =3D { { .page_shift =3D 12, .pte_enc =3D 0 } }
+-                },
+-                { .page_shift =3D 24, /* 16M */
+-                  .slb_enc =3D 0x100,
+-                  .enc =3D { { .page_shift =3D 24, .pte_enc =3D 0 } }
+-                },
+-            },
+-        };
+-        cpu->hash64_opts =3D g_memdup(&defopts, sizeof(*cpu->hash64_opts=
+));
++    if (!pcc->hash64_opts) {
++        assert(!(env->mmu_model & POWERPC_MMU_64));
++        return;
      }
-=20
-@@ -1114,6 +1114,7 @@ void ppc_hash64_finalize(PowerPCCPU *cpu)
++
++    cpu->hash64_opts =3D g_memdup(pcc->hash64_opts, sizeof(*cpu->hash64_=
+opts));
  }
 =20
- const PPCHash64Options ppc_hash64_opts_basic =3D {
-+    .flags =3D 0,
-     .sps =3D {
-         { .page_shift =3D 12, /* 4K */
-           .slb_enc =3D 0,
-@@ -1127,6 +1128,7 @@ const PPCHash64Options ppc_hash64_opts_basic =3D {
- };
+ void ppc_hash64_finalize(PowerPCCPU *cpu)
+@@ -1126,6 +1113,19 @@ void ppc_hash64_finalize(PowerPCCPU *cpu)
+     g_free(cpu->hash64_opts);
+ }
 =20
++const PPCHash64Options ppc_hash64_opts_basic =3D {
++    .sps =3D {
++        { .page_shift =3D 12, /* 4K */
++          .slb_enc =3D 0,
++          .enc =3D { { .page_shift =3D 12, .pte_enc =3D 0 } }
++        },
++        { .page_shift =3D 24, /* 16M */
++          .slb_enc =3D 0x100,
++          .enc =3D { { .page_shift =3D 24, .pte_enc =3D 0 } }
++        },
++    },
++};
++
  const PPCHash64Options ppc_hash64_opts_POWER7 =3D {
-+    .flags =3D PPC_HASH64_1TSEG | PPC_HASH64_AMR,
      .sps =3D {
          {
-             .page_shift =3D 12, /* 4K */
 diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
-index 341c1524c2..b2b5d25238 100644
+index 957bd68e33..341c1524c2 100644
 --- a/target/ppc/mmu-hash64.h
 +++ b/target/ppc/mmu-hash64.h
-@@ -153,12 +153,20 @@ struct PPCHash64SegmentPageSizes {
- };
-=20
- struct PPCHash64Options {
-+#define PPC_HASH64_1TSEG        0x00001
-+#define PPC_HASH64_AMR          0x00002
-+    unsigned flags;
+@@ -156,6 +156,7 @@ struct PPCHash64Options {
      PPCHash64SegmentPageSizes sps[PPC_PAGE_SIZES_MAX_SZ];
  };
 =20
- extern const PPCHash64Options ppc_hash64_opts_basic;
++extern const PPCHash64Options ppc_hash64_opts_basic;
  extern const PPCHash64Options ppc_hash64_opts_POWER7;
 =20
-+static inline bool ppc_hash64_has(PowerPCCPU *cpu, unsigned feature)
-+{
-+    return !!(cpu->hash64_opts->flags & feature);
-+}
-+
  #endif /* CONFIG_USER_ONLY */
-=20
- #if defined(CONFIG_USER_ONLY) || !defined(TARGET_PPC64)
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 040d6fbac3..ae005b2a54 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -8242,6 +8242,7 @@ POWERPC_FAMILY(970)(ObjectClass *oc, void *data)
+     pcc->mmu_model =3D POWERPC_MMU_64B;
+ #if defined(CONFIG_SOFTMMU)
+     pcc->handle_mmu_fault =3D ppc_hash64_handle_mmu_fault;
++    pcc->hash64_opts =3D &ppc_hash64_opts_basic;
+ #endif
+     pcc->excp_model =3D POWERPC_EXCP_970;
+     pcc->bus_model =3D PPC_FLAGS_INPUT_970;
+@@ -8319,6 +8320,7 @@ POWERPC_FAMILY(POWER5P)(ObjectClass *oc, void *data=
+)
+     pcc->mmu_model =3D POWERPC_MMU_2_03;
+ #if defined(CONFIG_SOFTMMU)
+     pcc->handle_mmu_fault =3D ppc_hash64_handle_mmu_fault;
++    pcc->hash64_opts =3D &ppc_hash64_opts_basic;
+ #endif
+     pcc->excp_model =3D POWERPC_EXCP_970;
+     pcc->bus_model =3D PPC_FLAGS_INPUT_970;
 --=20
 2.14.3
