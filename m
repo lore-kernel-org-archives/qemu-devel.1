@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fC5A7-0006Ho-DB
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 11:19:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1fC5Ai-00075h-Oh
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 11:20:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fC5A6-0003wX-K5
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 11:19:51 -0400
+	(envelope-from <eblake@redhat.com>) id 1fC5Ac-00046R-O0
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 11:20:28 -0400
 References: <20180427142002.21930-1-vsementsov@virtuozzo.com>
+	<20180427142002.21930-2-vsementsov@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <d5b0df82-8ab4-a4fe-3f47-a3be6a9536d2@redhat.com>
-Date: Fri, 27 Apr 2018 10:19:31 -0500
+Message-ID: <fda2fb9a-e627-4627-b659-fc3854a8cbc6@redhat.com>
+Date: Fri, 27 Apr 2018 10:20:11 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180427142002.21930-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20180427142002.21930-2-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="a1EUOIHEGELD4Z8shAiwxPjd1mQBLJJjT"
-Subject: Re: [Qemu-devel] [PATCH 0/2] fix coverity bugs
+	boundary="2byHPasWFUOkA9rstKZqfVXZ6bfkz3EPY"
+Subject: Re: [Qemu-devel] [PATCH 1/2] nbd/client: fix
+ nbd_negotiate_simple_meta_context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,35 +29,41 @@ To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.o
 Cc: pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com, famz@redhat.com, stefanha@redhat.com, den@openvz.org, peter.maydell@linaro.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---a1EUOIHEGELD4Z8shAiwxPjd1mQBLJJjT
+--2byHPasWFUOkA9rstKZqfVXZ6bfkz3EPY
 From: Eric Blake <eblake@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-devel@nongnu.org, qemu-block@nongnu.org, qemu-stable@nongnu.org
 Cc: pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com,
  famz@redhat.com, stefanha@redhat.com, den@openvz.org,
  peter.maydell@linaro.org
-Message-ID: <d5b0df82-8ab4-a4fe-3f47-a3be6a9536d2@redhat.com>
-Subject: Re: [PATCH 0/2] fix coverity bugs
+Message-ID: <fda2fb9a-e627-4627-b659-fc3854a8cbc6@redhat.com>
+Subject: Re: [PATCH 1/2] nbd/client: fix nbd_negotiate_simple_meta_context
 References: <20180427142002.21930-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20180427142002.21930-1-vsementsov@virtuozzo.com>
+ <20180427142002.21930-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20180427142002.21930-2-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 04/27/2018 09:20 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Hi all.
+> Initialize received variable. Otherwise, is is possible for server to
+> answer without any contexts, but we will set context_id to something
+> random (received_id is not initialized too) and return 1, which is
+> wrong.
 >=20
-> Here are two bug fixes, thanks to Peter for reporting.
+> To solve it, just initialize received to false. Initialize received_id
+> too, just to make all possible checkers happy.
 >=20
-> Both are introduced in 2.12.
->=20
-> Vladimir Sementsov-Ogievskiy (2):
->   nbd/client: fix nbd_negotiate_simple_meta_context
->   migration/block-dirty-bitmap: fix memory leak in
->     dirty_bitmap_load_bits
+> But was introduced in 78a33ab58782efdb206de14 "nbd: BLOCK_STATUS for
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+s/But/Bug/
 
-Adding both to my NBD queue
+> standard get_block_status function: client part" with the whole
+> function.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  nbd/client.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -63,7 +71,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---a1EUOIHEGELD4Z8shAiwxPjd1mQBLJJjT
+--2byHPasWFUOkA9rstKZqfVXZ6bfkz3EPY
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -72,14 +80,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrjP4MACgkQp6FrSiUn
-Q2qLEwgAh9+kRcEGcGhkPF3cFxcASrVnAUhgIi3Z+OHDc1+/pnrhdD8qBEW0Sis4
-O32WQRo+vTVvUH2WWgkq7Fd5H8xsiVyoNQbR5Y0rbnoqUWyW//nWgwrKLiD0xOgy
-T+MbgH4rhxxBXLaQFMrcZOYuuyO6wP6AiuaVGh2HcpGzMzDPFQWONrOo8Xo2hvVz
-CBWqQrrVSIMMDDiR2bkNu+abiNFRA7E+kJ+TnU89/k/uflsagQEkKW1pdnroAeXb
-Cuf6a8T4A2FvMxAHbX+k4JlIJei58dNU3sMSzmPlu/bi/52xslDfgByTDb59/7H3
-I+8T2Km168xVtUvawyMmrABcxx9+/w==
-=6jHh
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlrjP6sACgkQp6FrSiUn
+Q2oPSwgAg6kvTeuij6nExT5KSKQTbbqHHWqXRv8XnUpDiXwu7s3mIrImTnam5qFm
++EbIe3d6oEpimboxwF3rlqJbN1MMKWQF4x7uhM3YNKPmKPjxWsfMfM5AJoGJvyMr
+XSIMWTXS44LWnS6Ucii0ZhxPiTV/68alRWKdtxwA3ICBzYqfWuuuF7R6x6E8m9HQ
+uuByx6qurYjoo9a+Vd9etreW5ys7eFmasEg3LhT+yTa4FfGB4S3bUjaxCWm5bDzS
+niKT4vYa2LlQX5AWIjuZXDsekkjyjAve6d9I1fpP3WJ6A1nKSD/5qaLfgvJbOuN2
+JYBs8QrtOHjIheEX5MndfABC1r9EvQ==
+=9IT1
 -----END PGP SIGNATURE-----
 
---a1EUOIHEGELD4Z8shAiwxPjd1mQBLJJjT--
+--2byHPasWFUOkA9rstKZqfVXZ6bfkz3EPY--
