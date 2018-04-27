@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fC69n-0005oP-SR
+	(envelope-from <stefanha@redhat.com>) id 1fC69o-0005od-EA
 	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:23:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fC69m-0006Wn-NJ
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:23:35 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fC69n-0006XA-BX
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:23:36 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri, 27 Apr 2018 17:23:10 +0100
-Message-Id: <20180427162312.18583-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/2] block/file-posix: allow -drive
- cache.direct=off live migration
+Date: Fri, 27 Apr 2018 17:23:11 +0100
+Message-Id: <20180427162312.18583-2-stefanha@redhat.com>
+In-Reply-To: <20180427162312.18583-1-stefanha@redhat.com>
+References: <20180427162312.18583-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/2] block/file-posix: implement
+ bdrv_co_invalidate_cache() on Linux
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,46 +23,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Sergio Lopez <slp@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-v2:
- * Add comment on !__linux__ situation [Fam]
- * Add file-posix.c x-check-cache-dropped=on|off option [DaveG, Kevin]
+On Linux posix_fadvise(POSIX_FADV_DONTNEED) invalidates pages*.  Use
+this to drop page cache on the destination host during shared storage
+migration.  This way the destination host will read the latest copy of
+the data and will not use stale data from the page cache.
 
-file-posix.c only supports shared storage live migration with -drive
-cache.direct=off due to cache consistency issues.  There are two main shared
-storage configurations: files on NFS and host block devices on SAN LUNs.
+The flow is as follows:
 
-The problem is that QEMU starts on the destination host before the source host
-has written everything out to the disk.  The page cache on the destination host
-may contain stale data read when QEMU opened the image file (before migration
-handover).  Using O_DIRECT avoids this problem but prevents users from taking
-advantage of the host page cache.
+1. Source host writes out all dirty pages and inactivates drives.
+2. QEMU_VM_EOF is sent on migration stream.
+3. Destination host invalidates caches before accessing drives.
 
-Although cache=none is the recommended setting for virtualization use cases,
-there are scenarios where cache=writeback makes sense.  If the guest has much
-less RAM than the host or many guests share the same backing file, then the
-host page cache can significantly improve disk I/O performance.
+This patch enables live migration even with -drive cache.direct=off.
 
-This patch series implements .bdrv_co_invalidate_cache() for block/file-posix.c
-on Linux so that shared storage live migration works.  I have sent it as an RFC
-because cache consistency is not binary, there are corner cases which I've
-described in the actual patch, and this may require more discussion.
+* Terms and conditions may apply, please see patch for details.
 
-Regarding NFS, QEMU relies on O_DIRECT rather than the close-to-open
-consistency model (see nfs(5)), which is the basic guarantee provided by NFS.
-After this patch cache consistency is no longer provided by O_DIRECT.
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ block/file-posix.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
 
-This patch series relies on fdatasync(2) (source) +
-posix_fadvise(POSIX_FADV_DONTNEED) (destination) instead.  I believe it is safe
-for both NFS and SAN LUNs.  Maybe we should use fsync(2) instead of
-fdatasync(2) so that NFS has up-to-date inode metadata?
-
-Stefan Hajnoczi (2):
-  block/file-posix: implement bdrv_co_invalidate_cache() on Linux
-  block/file-posix: add x-check-page-cache=on|off option
-
- qapi/block-core.json |   7 ++-
- block/file-posix.c   | 146 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 150 insertions(+), 3 deletions(-)
-
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 3794c0007a..3707ea2d1c 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -2236,6 +2236,49 @@ static int coroutine_fn raw_co_block_status(BlockDriverState *bs,
+     return ret | BDRV_BLOCK_OFFSET_VALID;
+ }
+ 
++static void coroutine_fn raw_co_invalidate_cache(BlockDriverState *bs,
++                                                 Error **errp)
++{
++    BDRVRawState *s = bs->opaque;
++    int ret;
++
++    ret = fd_open(bs);
++    if (ret < 0) {
++        error_setg_errno(errp, -ret, "The file descriptor is not open");
++        return;
++    }
++
++    if (s->open_flags & O_DIRECT) {
++        return; /* No host kernel page cache */
++    }
++
++#if defined(__linux__)
++    /* This sets the scene for the next syscall... */
++    ret = bdrv_co_flush(bs);
++    if (ret < 0) {
++        error_setg_errno(errp, -ret, "flush failed");
++        return;
++    }
++
++    /* Linux does not invalidate pages that are dirty, locked, or mmapped by a
++     * process.  These limitations are okay because we just fsynced the file,
++     * we don't use mmap, and the file should not be in use by other processes.
++     */
++    ret = posix_fadvise(s->fd, 0, 0, POSIX_FADV_DONTNEED);
++    if (ret != 0) { /* the return value is a positive errno */
++        error_setg_errno(errp, ret, "fadvise failed");
++        return;
++    }
++#else /* __linux__ */
++    /* Do nothing.  Live migration to a remote host with cache.direct=off is
++     * unsupported on other host operating systems.  Cache consistency issues
++     * may occur but no error is reported here, partly because that's the
++     * historical behavior and partly because it's hard to differentiate valid
++     * configurations that should not cause errors.
++     */
++#endif /* !__linux__ */
++}
++
+ static coroutine_fn BlockAIOCB *raw_aio_pdiscard(BlockDriverState *bs,
+     int64_t offset, int bytes,
+     BlockCompletionFunc *cb, void *opaque)
+@@ -2328,6 +2371,7 @@ BlockDriver bdrv_file = {
+     .bdrv_co_create_opts = raw_co_create_opts,
+     .bdrv_has_zero_init = bdrv_has_zero_init_1,
+     .bdrv_co_block_status = raw_co_block_status,
++    .bdrv_co_invalidate_cache = raw_co_invalidate_cache,
+     .bdrv_co_pwrite_zeroes = raw_co_pwrite_zeroes,
+ 
+     .bdrv_co_preadv         = raw_co_preadv,
+@@ -2805,6 +2849,7 @@ static BlockDriver bdrv_host_device = {
+     .bdrv_reopen_abort   = raw_reopen_abort,
+     .bdrv_co_create_opts = hdev_co_create_opts,
+     .create_opts         = &raw_create_opts,
++    .bdrv_co_invalidate_cache = raw_co_invalidate_cache,
+     .bdrv_co_pwrite_zeroes = hdev_co_pwrite_zeroes,
+ 
+     .bdrv_co_preadv         = raw_co_preadv,
+@@ -2927,6 +2972,7 @@ static BlockDriver bdrv_host_cdrom = {
+     .bdrv_reopen_abort   = raw_reopen_abort,
+     .bdrv_co_create_opts = hdev_co_create_opts,
+     .create_opts         = &raw_create_opts,
++    .bdrv_co_invalidate_cache = raw_co_invalidate_cache,
+ 
+ 
+     .bdrv_co_preadv         = raw_co_preadv,
 -- 
 2.14.3
