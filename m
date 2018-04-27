@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42361)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fC2Lz-0007Zq-0O
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:19:56 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fC2M0-0007bS-Pn
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:19:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fC2Ly-00013v-1E
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:19:54 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45158 helo=mx1.redhat.com)
+	(envelope-from <kraxel@redhat.com>) id 1fC2Lz-00016S-MX
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:19:56 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45160 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fC2Lx-00012r-TA
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:19:53 -0400
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fC2Lz-00016F-JL
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:19:55 -0400
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 27 Apr 2018 14:19:51 +0200
-Message-Id: <20180427121951.29769-5-kraxel@redhat.com>
+Date: Fri, 27 Apr 2018 14:19:49 +0200
+Message-Id: <20180427121951.29769-3-kraxel@redhat.com>
 In-Reply-To: <20180427121951.29769-1-kraxel@redhat.com>
 References: <20180427121951.29769-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 4/4] audio/hda: detect output buffer overruns
+Subject: [Qemu-devel] [PATCH v2 2/4] audio/hda: turn some dprintfs into
+ trace points
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,44 +27,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: martin@schrodt.org, Gerd Hoffmann <kraxel@redhat.com>
 
-If some event caused some larger playback hickup the fine-grained timer
-adjust isn't able to recover.  Use a buffer overruns as indicator for
-that.  Reset timer adjust logic in case we detected one.
-
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/audio/hda-codec.c  | 9 +++++++++
- hw/audio/trace-events | 1 +
- 2 files changed, 10 insertions(+)
+ hw/audio/hda-codec.c  | 9 ++++-----
+ hw/audio/trace-events | 4 ++++
+ 2 files changed, 8 insertions(+), 5 deletions(-)
 
 diff --git a/hw/audio/hda-codec.c b/hw/audio/hda-codec.c
-index f6fb1d0fa0..fc4945086b 100644
+index 9ee2f3d55f..13d4473f18 100644
 --- a/hw/audio/hda-codec.c
 +++ b/hw/audio/hda-codec.c
-@@ -325,6 +325,15 @@ static void hda_audio_output_cb(void *opaque, int avail)
+@@ -24,6 +24,7 @@
+ #include "intel-hda.h"
+ #include "intel-hda-defs.h"
+ #include "audio/audio.h"
++#include "trace.h"
  
-     int64_t to_transfer = audio_MIN(wpos - rpos, avail);
+ /* -------------------------------------------------------------------------- */
  
-+    if (wpos - rpos == B_SIZE) {
-+        /* drop buffer, reset timer adjust */
-+        st->rpos = 0;
-+        st->wpos = 0;
-+        st->buft_start = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+        trace_hda_audio_overrun(st->node->name);
-+        return;
-+    }
-+
-     hda_timer_sync_adjust(st, (wpos - rpos) - to_transfer - (B_SIZE >> 1));
+@@ -394,8 +395,7 @@ static void hda_audio_set_running(HDAAudioStream *st, bool running)
+         return;
+     }
+     st->running = running;
+-    dprint(st->state, 1, "%s: %s (stream %d)\n", st->node->name,
+-           st->running ? "on" : "off", st->stream);
++    trace_hda_audio_running(st->node->name, st->stream, st->running);
+     if (st->state->use_timer) {
+         if (running) {
+             int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+@@ -449,9 +449,8 @@ static void hda_audio_setup(HDAAudioStream *st)
+         return;
+     }
  
-     while (to_transfer) {
+-    dprint(st->state, 1, "%s: format: %d x %s @ %d Hz\n",
+-           st->node->name, st->as.nchannels,
+-           fmt2name[st->as.fmt], st->as.freq);
++    trace_hda_audio_format(st->node->name, st->as.nchannels,
++                           fmt2name[st->as.fmt], st->as.freq);
+ 
+     if (st->output) {
+         if (use_timer) {
 diff --git a/hw/audio/trace-events b/hw/audio/trace-events
-index 30112d97c4..5891b4e2b9 100644
+index fa1646d169..03340b9359 100644
 --- a/hw/audio/trace-events
 +++ b/hw/audio/trace-events
-@@ -22,3 +22,4 @@ milkymist_ac97_out_cb_transferred(int transferred) "transferred %d"
- hda_audio_running(const char *stream, int nr, bool running) "st %s, nr %d, run %d"
- hda_audio_format(const char *stream, int chan, const char *fmt, int freq) "st %s, %d x %s @ %d Hz"
- hda_audio_adjust(const char *stream, int pos) "st %s, pos %d"
-+hda_audio_overrun(const char *stream) "st %s"
+@@ -17,3 +17,7 @@ milkymist_ac97_in_cb(int avail, uint32_t remaining) "avail %d remaining %u"
+ milkymist_ac97_in_cb_transferred(int transferred) "transferred %d"
+ milkymist_ac97_out_cb(int free, uint32_t remaining) "free %d remaining %u"
+ milkymist_ac97_out_cb_transferred(int transferred) "transferred %d"
++
++# hw/audio/hda-codec.c
++hda_audio_running(const char *stream, int nr, bool running) "st %s, nr %d, run %d"
++hda_audio_format(const char *stream, int chan, const char *fmt, int freq) "st %s, %d x %s @ %d Hz"
 -- 
 2.9.3
