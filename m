@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37108)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fC5rp-0005ci-Rq
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:05:07 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fC5zV-0000XQ-I6
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:12:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fC5rk-0006Hp-U3
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:05:01 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:42748)
+	(envelope-from <peter.maydell@linaro.org>) id 1fC5zU-0001vr-Hu
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:12:57 -0400
+Received: from mail-oi0-x236.google.com ([2607:f8b0:4003:c06::236]:39236)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fC5rk-0006HP-NC
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:04:56 -0400
-Received: by mail-wr0-x243.google.com with SMTP id v5-v6so2270022wrf.9
-	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 09:04:56 -0700 (PDT)
-References: <20180425012300.14698-1-richard.henderson@linaro.org>
-	<20180425012300.14698-2-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180425012300.14698-2-richard.henderson@linaro.org>
-Date: Fri, 27 Apr 2018 17:04:53 +0100
-Message-ID: <87y3h8k53u.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fC5zU-0001vb-BR
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:12:56 -0400
+Received: by mail-oi0-x236.google.com with SMTP id n65-v6so2043722oig.6
+	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 09:12:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1521515720-612046-32-git-send-email-mst@redhat.com>
+References: <1521515720-612046-1-git-send-email-mst@redhat.com>
+	<1521515720-612046-32-git-send-email-mst@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 27 Apr 2018 17:12:34 +0100
+Message-ID: <CAFEAcA_kuyWHnqhcA-Zo5+q4u48dDLv4nxrEm5fFcbjZh9U6KQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/9] target/arm: Implement vector shifted
- SCVF/UCVF for fp16
+Subject: Re: [Qemu-devel] [PULL v2 31/50] vhost+postcopy: Register shared
+ ufd with postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,97 +31,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
 
-
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> While we have some of the scalar paths for *CVF for fp16,
-> we failed to decode the fp16 version of these instructions.
+On 20 March 2018 at 03:17, Michael S. Tsirkin <mst@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 >
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> Register the UFD that comes in as the response to the 'advise' method
+> with the postcopy code.
+>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 > ---
->  target/arm/translate-a64.c | 33 ++++++++++++++++++++-------------
->  1 file changed, 20 insertions(+), 13 deletions(-)
->
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index b47319d437..c92e052686 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -7077,13 +7077,26 @@ static void handle_simd_shift_intfp_conv(DisasCon=
-text *s, bool is_scalar,
->                                           int immh, int immb, int opcode,
->                                           int rn, int rd)
->  {
-> -    bool is_double =3D extract32(immh, 3, 1);
-> -    int size =3D is_double ? MO_64 : MO_32;
-> -    int elements;
-> +    int size, elements, fracbits;
->      int immhb =3D immh << 3 | immb;
-> -    int fracbits =3D (is_double ? 128 : 64) - immhb;
->
-> -    if (!extract32(immh, 2, 2)) {
-> +    if (immh & 8) {
-> +        size =3D MO_64;
-> +        if (!is_scalar && !is_q) {
-> +            unallocated_encoding(s);
-> +            return;
-> +        }
-> +    } else if (immh & 4) {
-> +        size =3D MO_32;
-> +    } else if (immh & 2) {
-> +        size =3D MO_16;
-> +        if (!arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
-> +            unallocated_encoding(s);
-> +            return;
-> +        }
-> +    } else {
-> +        /* immh =3D=3D 0 would be a failure of the decode logic */
-> +        g_assert(immh =3D=3D 1);
->          unallocated_encoding(s);
->          return;
+>  hw/virtio/vhost-user.c | 20 +++++++++++++++++++-
+>  1 file changed, 19 insertions(+), 1 deletion(-)
+
+> @@ -835,8 +847,14 @@ static int vhost_user_postcopy_advise(struct vhost_d=
+ev *dev, Error **errp)
+>          error_setg(errp, "%s: Failed to get ufd", __func__);
+>          return -1;
 >      }
-> @@ -7091,20 +7104,14 @@ static void handle_simd_shift_intfp_conv(DisasCon=
-text *s, bool is_scalar,
->      if (is_scalar) {
->          elements =3D 1;
->      } else {
-> -        elements =3D is_double ? 2 : is_q ? 4 : 2;
-> -        if (is_double && !is_q) {
-> -            unallocated_encoding(s);
-> -            return;
-> -        }
-> +        elements =3D 8 << is_q >> size;
+> +    fcntl(ufd, F_SETFL, O_NONBLOCK);
 
-That is a brain exercise for operator precedence. Would:
+Hi; this would probably be more neatly done with
+       qemu_set_nonblock(ufd);
+unless you really wanted to clear the other fd flags.
+Among other things, it avoids Coverity producing a complaint
+that we didn't check the fcntl return value (though we seem
+to assume it can't fail in general, hence qemu_set_nonblock()
+returning NULL.) -- CID1390601, which I've marked as false-positive.
 
-     elements =3D (is_q ? 16 : 8) >> size;
-
-be clearer? Personally I'd have probably done it long hand in each size
-leg above, e.g:
-
-    size =3D MO_16;
-    elements =3D is_scalar ? 1 : (is_q ? 8 : 4);
-
->      }
-> +    fracbits =3D (16 << size) - immhb;
-
-The ship has already sailed on this but I'm wishing we had a
-mosize_to_bits() helper function to be explicit about this
-transformation.
-
->
->      if (!fp_access_check(s)) {
->          return;
->      }
->
-> -    /* immh =3D=3D 0 would be a failure of the decode logic */
-> -    g_assert(immh);
-> -
->      handle_simd_intfp_conv(s, rd, rn, elements, !is_u, fracbits, size);
+> -    /* TODO: register ufd with userfault thread */
+> +    /* register ufd with userfault thread */
+> +    u->postcopy_fd.fd =3D ufd;
+> +    u->postcopy_fd.data =3D dev;
+> +    u->postcopy_fd.handler =3D vhost_user_postcopy_fault_handler;
+> +    u->postcopy_fd.idstr =3D "vhost-user"; /* Need to find unique name *=
+/
+> +    postcopy_register_shared_ufd(&u->postcopy_fd);
+>      return 0;
 >  }
 
-
---
-Alex Benn=C3=A9e
+thanks
+-- PMM
