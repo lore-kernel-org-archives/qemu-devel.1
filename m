@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBzsJ-0002Pi-Cp
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:41:08 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fC00O-0001oG-Q8
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:49:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBzsI-0003z6-9r
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:41:07 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Fri, 27 Apr 2018 11:40:45 +0200
-Message-Id: <1524822046-22779-4-git-send-email-thuth@redhat.com>
-In-Reply-To: <1524822046-22779-1-git-send-email-thuth@redhat.com>
-References: <1524822046-22779-1-git-send-email-thuth@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fC00N-0008Bd-Si
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:49:28 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:45391)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fC00N-0008BN-Np
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:49:27 -0400
+Received: by mail-oi0-x241.google.com with SMTP id b130-v6so1051065oif.12
+	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 02:49:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 3/4] tests/cdrom-test: Test that -cdrom
- parameter is working
+In-Reply-To: <1524799751-151698-1-git-send-email-mst@redhat.com>
+References: <1524799751-151698-1-git-send-email-mst@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 27 Apr 2018 10:49:06 +0100
+Message-ID: <CAFEAcA-FNy7cdKkUDctnf08Ska-piZo7QKwRD90G=zB5_QsS_A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/4] pc, pci, virtio: fixes, features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,111 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Commit 1454509726719e0933c800 recently broke the "-cdrom" parameter
-on a couple of boards without us noticing it immediately. Thus let's
-add a test which checks that "-cdrom" can at least be used to start
-QEMU with certain machine types.
+On 27 April 2018 at 04:29, Michael S. Tsirkin <mst@redhat.com> wrote:
+> The following changes since commit 4743c23509a51bd4ee85cc272287a41917d1be35:
+>
+>   Update version for v2.12.0 release (2018-04-24 16:44:55 +0100)
+>
+> are available in the git repository at:
+>
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+>
+> for you to fetch changes up to fb6fd86f712c73a40fbe0c6be86d4635239b1304:
+>
+>   virtio-balloon: add hugetlb page allocation counts (2018-04-27 06:25:27 +0300)
+>
+> ----------------------------------------------------------------
+> pc, pci, virtio: fixes, features
+>
+> A bugfix that just missed 2.12, a new PCI,
+> and a new virtio balloon stat.
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
-Acked-By: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/cdrom-test.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
- 1 file changed, 58 insertions(+)
+> Peter Xu (1):
+>       intel-iommu: send PSI always when notify_unmap set
 
-diff --git a/tests/cdrom-test.c b/tests/cdrom-test.c
-index 5bbf322..7a1fce5 100644
---- a/tests/cdrom-test.c
-+++ b/tests/cdrom-test.c
-@@ -13,6 +13,7 @@
- #include "qemu/osdep.h"
- #include "libqtest.h"
- #include "boot-sector.h"
-+#include "qapi/qmp/qdict.h"
-=20
- static char isoimage[] =3D "cdrom-boot-iso-XXXXXX";
-=20
-@@ -89,6 +90,32 @@ cleanup:
-     return ret;
- }
-=20
-+/**
-+ * Check that at least the -cdrom parameter is basically working, i.e. w=
-e can
-+ * see the filename of the ISO image in the output of "info block" after=
-wards
-+ */
-+static void test_cdrom_param(gconstpointer data)
-+{
-+    QTestState *qts;
-+    char *resp;
-+
-+    qts =3D qtest_startf("-M %s -cdrom %s", (const char *)data, isoimage=
-);
-+    resp =3D qtest_hmp(qts, "info block");
-+    g_assert(strstr(resp, isoimage) !=3D 0);
-+    g_free(resp);
-+    qtest_quit(qts);
-+}
-+
-+static void add_cdrom_param_tests(const char **machines)
-+{
-+    while (*machines) {
-+        char *testname =3D g_strdup_printf("cdrom/param/%s", *machines);
-+        qtest_add_data_func(testname, *machines, test_cdrom_param);
-+        g_free(testname);
-+        machines++;
-+    }
-+}
-+
- static void test_cdboot(gconstpointer data)
- {
-     QTestState *qts;
-@@ -154,6 +181,37 @@ int main(int argc, char **argv)
-         add_x86_tests();
-     } else if (g_str_equal(arch, "s390x")) {
-         add_s390x_tests();
-+    } else if (g_str_equal(arch, "ppc64")) {
-+        const char *ppcmachines[] =3D {
-+            "pseries", "mac99", "g3beige", "40p", "prep", NULL
-+        };
-+        add_cdrom_param_tests(ppcmachines);
-+    } else if (g_str_equal(arch, "sparc")) {
-+        const char *sparcmachines[] =3D {
-+            "LX", "SPARCClassic", "SPARCbook", "SS-10", "SS-20", "SS-4",
-+            "SS-5", "SS-600MP", "Voyager", "leon3_generic", NULL
-+        };
-+        add_cdrom_param_tests(sparcmachines);
-+    } else if (g_str_equal(arch, "sparc64")) {
-+        const char *sparc64machines[] =3D {
-+            "niagara", "sun4u", "sun4v", NULL
-+        };
-+        add_cdrom_param_tests(sparc64machines);
-+    } else if (!strncmp(arch, "mips64", 6)) {
-+        const char *mips64machines[] =3D {
-+            "magnum", "malta", "mips", "pica61", NULL
-+        };
-+        add_cdrom_param_tests(mips64machines);
-+    } else if (g_str_equal(arch, "arm") || g_str_equal(arch, "aarch64"))=
- {
-+        const char *armmachines[] =3D {
-+            "realview-eb", "realview-eb-mpcore", "realview-pb-a8",
-+            "realview-pbx-a9", "versatileab", "versatilepb", "vexpress-a=
-15",
-+            "vexpress-a9", "virt", NULL
-+        };
-+        add_cdrom_param_tests(armmachines);
-+    } else {
-+        const char *nonemachine[] =3D { "none", NULL };
-+        add_cdrom_param_tests(nonemachine);
-     }
-=20
-     ret =3D g_test_run();
---=20
-1.8.3.1
+This patch is still missing:
+ * a clear description of when the bug applies and its severity
+ * a cc:stable marking
+
+Please can you fix that and resend?
+
+thanks
+-- PMM
