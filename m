@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58053)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1fBxfJ-0000MD-FQ
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 03:19:34 -0400
+	(envelope-from <mjc@sifive.com>) id 1fBxkT-00034v-Bb
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 03:24:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1fBxfG-0005BJ-AA
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 03:19:33 -0400
-Received: from mga18.intel.com ([134.134.136.126]:55966)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kevin.tian@intel.com>)
-	id 1fBxfF-0005B2-Tz
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 03:19:30 -0400
-From: "Tian, Kevin" <kevin.tian@intel.com>
-Date: Fri, 27 Apr 2018 07:19:25 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19113B628@SHSMSX101.ccr.corp.intel.com>
-References: <20180425045129.17449-1-peterx@redhat.com>
-	<20180425045129.17449-4-peterx@redhat.com>
-	<2492f7d8-ed63-6f1c-773f-baa223020022@redhat.com>
-	<20180427062615.GY9036@xz-mi>
-In-Reply-To: <20180427062615.GY9036@xz-mi>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <mjc@sifive.com>) id 1fBxkR-0007UH-OW
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 03:24:53 -0400
+Received: from mail-ot0-x229.google.com ([2607:f8b0:4003:c0f::229]:42670)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fBxkR-0007Tv-E8
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 03:24:51 -0400
+Received: by mail-ot0-x229.google.com with SMTP id l13-v6so989834otk.9
+	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 00:24:51 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 03/10] intel-iommu: add iommu lock
+In-Reply-To: <20180427002651.28356-6-richard.henderson@linaro.org>
+References: <20180427002651.28356-1-richard.henderson@linaro.org>
+	<20180427002651.28356-6-richard.henderson@linaro.org>
+From: Michael Clark <mjc@sifive.com>
+Date: Fri, 27 Apr 2018 19:24:50 +1200
+Message-ID: <CAHNT7NujtwKtCtsxG91DtgriDd2sjVZwyqKhAp03LR=eJjdMtQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 5/9] target/riscv: Use new atomic min/max
+ expanders
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +29,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, Jason Wang <jasowang@redhat.com>
-Cc: Jintack Lim <jintack@cs.columbia.edu>, Alex Williamson <alex.williamson@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm@nongnu.org, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, "Emilio G. Cota" <cota@braap.org>
 
-PiBGcm9tOiBQZXRlciBYdQ0KPiBTZW50OiBGcmlkYXksIEFwcmlsIDI3LCAyMDE4IDI6MjYgUE0N
-Cj4gDQo+IE9uIEZyaSwgQXByIDI3LCAyMDE4IGF0IDAxOjEzOjAyUE0gKzA4MDAsIEphc29uIFdh
-bmcgd3JvdGU6DQo+ID4NCj4gPg0KPiA+IE9uIDIwMTjlubQwNOaciDI15pelIDEyOjUxLCBQZXRl
-ciBYdSB3cm90ZToNCj4gPiA+IEFkZCBhIHBlci1pb21tdSBiaWcgbG9jayB0byBwcm90ZWN0IElP
-TU1VIHN0YXR1cy4gIEN1cnJlbnRseSB0aGUgb25seQ0KPiA+ID4gdGhpbmcgdG8gYmUgcHJvdGVj
-dGVkIGlzIHRoZSBJT1RMQiBjYWNoZSwgc2luY2UgdGhhdCBjYW4gYmUgYWNjZXNzZWQNCj4gPiA+
-IGV2ZW4gd2l0aG91dCBCUUwsIGUuZy4sIGluIElPIGRhdGFwbGFuZS4NCj4gPiA+DQo+ID4gPiBO
-b3RlIHRoYXQgZGV2aWNlIHBhZ2UgdGFibGVzIHNob3VsZCBub3QgbmVlZCBhbnkgcHJvdGVjdGlv
-bi4gIFRoZQ0KPiBzYWZldHkNCj4gPiA+IG9mIHRoYXQgc2hvdWxkIGJlIHByb3ZpZGVkIGJ5IGd1
-ZXN0IE9TLiAgRS5nLiwgd2hlbiBhIHBhZ2UgZW50cnkgaXMNCj4gPiA+IGZyZWVkLCB0aGUgZ3Vl
-c3QgT1Mgc2hvdWxkIGJlIHJlc3BvbnNpYmxlIHRvIG1ha2Ugc3VyZSB0aGF0IG5vIGRldmljZQ0K
-PiA+ID4gd2lsbCBiZSB1c2luZyB0aGF0IHBhZ2UgYW55IG1vcmUuDQoNCmRldmljZSBwYWdlIHRh
-YmxlIGRlZmluaXRlbHkgZG9lc24ndCByZXF1aXJlIHByb3RlY3Rpb24sIHNpbmNlIGl0IGlzDQpp
-bi1tZW1vcnkgc3RydWN0dXJlIG1hbmFnZWQgYnkgZ3Vlc3QuIEhvd2V2ZXIgdGhlIHJlYXNvbg0K
-YWJvdmUgaXMgbm90IGFjY3VyYXRlIC0gdGhlcmUgaXMgbm8gd2F5IHRoYXQgZ3Vlc3QgT1MgY2Fu
-IG1ha2UNCnN1cmUgbm8gZGV2aWNlIHVzZXMgbm9uLXByZXNlbnQgcGFnZSBlbnRyeSwgb3RoZXJ3
-aXNlIGl0IGRvZXNuJ3QNCnJlcXVpcmUgdmlydHVhbCBJT01NVSB0byBwcm90ZWN0IGl0c2VsZi4g
-VGhlcmUgY291bGQgYmUgYm9ndXMvDQptYWxpY2lvdXMgZHJpdmVycyB3aGljaCBzdXJlbHkgbWF5
-IHByb2dyYW0gdGhlIGRldmljZSB0byBhdHRlbXB0IHNvLg0KDQo+ID4gPg0KPiA+ID4gUmVwb3J0
-ZWQtYnk6IEZhbSBaaGVuZzxmYW16QHJlZGhhdC5jb20+DQo+ID4gPiBTaWduZWQtb2ZmLWJ5OiBQ
-ZXRlciBYdTxwZXRlcnhAcmVkaGF0LmNvbT4NCj4gPiA+IC0tLQ0KPiA+ID4gICBpbmNsdWRlL2h3
-L2kzODYvaW50ZWxfaW9tbXUuaCB8ICA4ICsrKysrKysrDQo+ID4gPiAgIGh3L2kzODYvaW50ZWxf
-aW9tbXUuYyAgICAgICAgIHwgMzEgKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLQ0KPiA+
-ID4gICAyIGZpbGVzIGNoYW5nZWQsIDM3IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+
-ID4gPg0KPiA+ID4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvaHcvaTM4Ni9pbnRlbF9pb21tdS5oDQo+
-IGIvaW5jbHVkZS9ody9pMzg2L2ludGVsX2lvbW11LmgNCj4gPiA+IGluZGV4IDIyMDY5NzI1M2Yu
-LjFhOGJhOGU0MTUgMTAwNjQ0DQo+ID4gPiAtLS0gYS9pbmNsdWRlL2h3L2kzODYvaW50ZWxfaW9t
-bXUuaA0KPiA+ID4gKysrIGIvaW5jbHVkZS9ody9pMzg2L2ludGVsX2lvbW11LmgNCj4gPiA+IEBA
-IC0yNjIsNiArMjYyLDE0IEBAIHN0cnVjdCBJbnRlbElPTU1VU3RhdGUgew0KPiA+ID4gICAgICAg
-dWludDhfdCB3MWNtYXNrW0RNQVJfUkVHX1NJWkVdOyAvKiBSVzFDKFdyaXRlIDEgdG8gQ2xlYXIp
-IGJ5dGVzDQo+ICovDQo+ID4gPiAgICAgICB1aW50OF90IHdvbWFza1tETUFSX1JFR19TSVpFXTsg
-IC8qIFdPICh3cml0ZSBvbmx5IC0gcmVhZCByZXR1cm5zDQo+IDApICovDQo+ID4gPiAgICAgICB1
-aW50MzJfdCB2ZXJzaW9uOw0KPiA+ID4gKyAgICAvKg0KPiA+ID4gKyAgICAgKiBQcm90ZWN0cyBJ
-T01NVSBzdGF0ZXMgaW4gZ2VuZXJhbC4gIE5vcm1hbGx5IHdlIGRvbid0IG5lZWQgdG8NCj4gPiA+
-ICsgICAgICogdGFrZSB0aGlzIGxvY2sgd2hlbiB3ZSBhcmUgd2l0aCBCUUwgaGVsZC4gIEhvd2V2
-ZXIgd2UgaGF2ZSBjb2RlDQo+ID4gPiArICAgICAqIHBhdGhzIHRoYXQgbWF5IHJ1biBldmVuIHdp
-dGhvdXQgQlFMLiAgSW4gdGhvc2UgY2FzZXMsIHdlIG5lZWQNCj4gPiA+ICsgICAgICogdG8gdGFr
-ZSB0aGUgbG9jayB3aGVuIHdlIGhhdmUgYWNjZXNzIHRvIElPTU1VIHN0YXRlDQo+ID4gPiArICAg
-ICAqIGluZm9ybWF0aW9ucywgZS5nLiwgdGhlIElPVExCLg0KDQpiZXR0ZXIgaWYgeW91IGNhbiB3
-aGl0ZWxpc3QgdGhvc2UgcGF0aHMgaGVyZSB0byBjbGFyaWZ5Lg0KDQo+ID4gPiArICAgICAqLw0K
-PiA+ID4gKyAgICBRZW11TXV0ZXggaW9tbXVfbG9jazsNCj4gPg0KPiA+IFNvbWUgcXVlc3Rpb25z
-Og0KPiA+DQo+ID4gMSkgRG8gd2UgbmVlZCB0byBwcm90ZWN0IGNvbnRleHQgY2FjaGUgdG9vPw0K
-PiANCj4gSU1ITyB0aGUgY29udGV4dCBjYWNoZSBlbnRyeSBzaG91bGQgd29yayBldmVuIHdpdGhv
-dXQgbG9jay4gIFRoYXQncyBhDQo+IGJpdCB0cmlja2x5IHNpbmNlIHdlIGhhdmUgdHdvIGNhc2Vz
-IHRoYXQgdGhpcyBjYWNoZSB3aWxsIGJlIHVwZGF0ZWQ6DQo+IA0KPiAgICgxKSBmaXJzdCB0cmFu
-c2xhdGlvbiBvZiB0aGUgYWRkcmVzcyBzcGFjZSBvZiBhIGRldmljZQ0KPiAgICgyKSBpbnZhbGlk
-YXRpb24gb2YgY29udGV4dCBlbnRyaWVzDQo+IA0KPiBGb3IgKDIpIElNSE8gd2UgZG9uJ3QgbmVl
-ZCB0byB3b3JyeSBhYm91dCBzaW5jZSBndWVzdCBPUyBzaG91bGQgYmUNCj4gY29udHJvbGxpbmcg
-dGhhdCBwYXJ0LCBzYXksIGRldmljZSBzaG91bGQgbm90IGJlIGRvaW5nIGFueSB0cmFuc2xhdGlv
-bg0KPiAoRE1BIG9wZXJhdGlvbnMpIHdoZW4gdGhlIGNvbnRleHQgZW50cnkgaXMgaW52YWxpZGF0
-ZWQuDQoNCmFnYWluIGFib3ZlIGNhbm5vdCBiZSBhc3N1bWVkLg0KDQo+IA0KPiBGb3IgKDEpIHRo
-ZSB3b3JzdCBjYXNlIGlzIHRoYXQgdGhlIGNvbnRleHQgZW50cnkgY2FjaGUgYmUgdXBkYXRlZA0K
-PiBtdWx0aXBsZSB0aW1lcyB3aXRoIHRoZSBzYW1lIHZhbHVlIGJ5IG11bHRpcGxlIHRocmVhZHMu
-ICBJTUhPIHRoYXQnbGwNCj4gYmUgZmluZSB0b28uDQo+IA0KPiBCdXQgeWVzIGZvciBzdXJlIHdl
-IGNhbiBwcm90ZWN0IHRoYXQgdG9vIHdpdGggdGhlIGlvbW11IGxvY2suDQo+IA0KPiA+IDIpIENh
-biB3ZSBqdXN0IHJldXNlIHFlbXUgQlFMIGhlcmU/DQo+IA0KPiBJIHdvdWxkIHByZWZlciBub3Qu
-ICBBcyBJIG1lbnRpb25lZCwgYXQgbGVhc3QgSSBoYXZlIHNwZW50IHRvbyBtdWNoDQo+IHRpbWUg
-b24gZmlnaHRpbmcgQlFMIGFscmVhZHkuICBJIHJlYWxseSBob3BlIHdlIGNhbiBzdGFydCB0byB1
-c2UNCj4gaXNvbGF0ZWQgbG9ja3Mgd2hlbiBjYXBhYmxlLiAgQlFMIGlzIGFsd2F5cyB0aGUgd29y
-c3QgY2hvaWNlIHRvIG1lLg0KPiANCj4gPiAzKSBJIHRoaW5rIHRoZSBpc3N1ZSBpcyBjb21tb24g
-dG8gYWxsIG90aGVyIGtpbmRzIG9mIElPTU1VLCBzbyBjYW4gd2UNCj4gc2ltcGx5DQo+ID4gc3lu
-Y2hyb25pemUgYmVmb3JlIGNhbGxpbmcgLT50cmFuc2xhdGUoKSBpbiBtZW1vcnkuYy4gVGhpcyBz
-ZWVtcyBhIG1vcmUNCj4gPiBjb21tb24gc29sdXRpb24uDQo+IA0KPiBJIHN1c3BlY3QgUG93ZXIg
-YW5kIHMzOTAgbGl2ZSB3ZWxsIHdpdGggdGhhdC4gIEkgdGhpbmsgaXQgbWVhbiBhdA0KPiBsZWFz
-dCB0aGVzZSBwbGF0Zm9ybXMgd29uJ3QgaGF2ZSBwcm9ibGVtIGluIGNvbmN1cnJlbmN5LiAgSSdt
-IGFkZGluZw0KPiBEYXZpZEcgaW4gbG9vcCBpbiBjYXNlIHRoZXJlIGlzIGZ1cnRoZXIgY29tbWVu
-dC4gIElNSE8gd2Ugc2hvdWxkIGp1c3QNCj4gbWFrZSBzdXJlIElPTU1VIGNvZGUgYmUgdGhyZWFk
-IHNhZmUsIGFuZCB3ZSBmaXggcHJvYmxlbSBpZiB0aGVyZSBpcy4NCj4gDQo+IFRoYW5rcywNCj4g
-DQo+IC0tDQo+IFBldGVyIFh1DQoNCg==
+On Fri, Apr 27, 2018 at 12:26 PM, Richard Henderson <
+richard.henderson@linaro.org> wrote:
+
+> Cc: Michael Clark <mjc@sifive.com>
+> Cc: Palmer Dabbelt <palmer@sifive.com>
+> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>
+
+Reviewed-by: Michael Clark <mjc@sifive.com>
+
+If you give me a remote I can pull into my local workspace and test. The
+change looks pretty straight-forward. There are tests for amos in
+riscv-tests but no parallel tests (i.e. contended case).
+
+Regarding this target/riscv/translate.c. I'd like to make a patch to
+remove CPURISCVState *env arguments from several gen functions.
+
+---
+>  target/riscv/translate.c | 72 ++++++++++++++----------------
+> ------------------
+>  1 file changed, 20 insertions(+), 52 deletions(-)
+>
+> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+> index 808eab7f50..9cab717088 100644
+> --- a/target/riscv/translate.c
+> +++ b/target/riscv/translate.c
+> @@ -725,7 +725,6 @@ static void gen_atomic(DisasContext *ctx, uint32_t opc,
+>      TCGv src1, src2, dat;
+>      TCGLabel *l1, *l2;
+>      TCGMemOp mop;
+> -    TCGCond cond;
+>      bool aq, rl;
+>
+>      /* Extract the size of the atomic operation.  */
+> @@ -823,60 +822,29 @@ static void gen_atomic(DisasContext *ctx, uint32_t
+> opc,
+>          tcg_gen_atomic_fetch_or_tl(src2, src1, src2, ctx->mem_idx, mop);
+>          gen_set_gpr(rd, src2);
+>          break;
+> -
+>      case OPC_RISC_AMOMIN:
+> -        cond = TCG_COND_LT;
+> -        goto do_minmax;
+> -    case OPC_RISC_AMOMAX:
+> -        cond = TCG_COND_GT;
+> -        goto do_minmax;
+> -    case OPC_RISC_AMOMINU:
+> -        cond = TCG_COND_LTU;
+> -        goto do_minmax;
+> -    case OPC_RISC_AMOMAXU:
+> -        cond = TCG_COND_GTU;
+> -        goto do_minmax;
+> -    do_minmax:
+> -        /* Handle the RL barrier.  The AQ barrier is handled along the
+> -           parallel path by the SC atomic cmpxchg.  On the serial path,
+> -           of course, barriers do not matter.  */
+> -        if (rl) {
+> -            tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
+> -        }
+> -        if (tb_cflags(ctx->tb) & CF_PARALLEL) {
+> -            l1 = gen_new_label();
+> -            gen_set_label(l1);
+> -        } else {
+> -            l1 = NULL;
+> -        }
+> -
+>          gen_get_gpr(src1, rs1);
+>          gen_get_gpr(src2, rs2);
+> -        if ((mop & MO_SSIZE) == MO_SL) {
+> -            /* Sign-extend the register comparison input.  */
+> -            tcg_gen_ext32s_tl(src2, src2);
+> -        }
+> -        dat = tcg_temp_local_new();
+> -        tcg_gen_qemu_ld_tl(dat, src1, ctx->mem_idx, mop);
+> -        tcg_gen_movcond_tl(cond, src2, dat, src2, dat, src2);
+> -
+> -        if (tb_cflags(ctx->tb) & CF_PARALLEL) {
+> -            /* Parallel context.  Make this operation atomic by verifying
+> -               that the memory didn't change while we computed the
+> result.  */
+> -            tcg_gen_atomic_cmpxchg_tl(src2, src1, dat, src2,
+> ctx->mem_idx, mop);
+> -
+> -            /* If the cmpxchg failed, retry. */
+> -            /* ??? There is an assumption here that this will eventually
+> -               succeed, such that we don't live-lock.  This is not unlike
+> -               a similar loop that the compiler would generate for e.g.
+> -               __atomic_fetch_and_xor, so don't worry about it.  */
+> -            tcg_gen_brcond_tl(TCG_COND_NE, dat, src2, l1);
+> -        } else {
+> -            /* Serial context.  Directly store the result.  */
+> -            tcg_gen_qemu_st_tl(src2, src1, ctx->mem_idx, mop);
+> -        }
+> -        gen_set_gpr(rd, dat);
+> -        tcg_temp_free(dat);
+> +        tcg_gen_atomic_fetch_smin_tl(src2, src1, src2, ctx->mem_idx,
+> mop);
+> +        gen_set_gpr(rd, src2);
+> +        break;
+> +    case OPC_RISC_AMOMAX:
+> +        gen_get_gpr(src1, rs1);
+> +        gen_get_gpr(src2, rs2);
+> +        tcg_gen_atomic_fetch_smax_tl(src2, src1, src2, ctx->mem_idx,
+> mop);
+> +        gen_set_gpr(rd, src2);
+> +        break;
+> +    case OPC_RISC_AMOMINU:
+> +        gen_get_gpr(src1, rs1);
+> +        gen_get_gpr(src2, rs2);
+> +        tcg_gen_atomic_fetch_umin_tl(src2, src1, src2, ctx->mem_idx,
+> mop);
+> +        gen_set_gpr(rd, src2);
+> +        break;
+> +    case OPC_RISC_AMOMAXU:
+> +        gen_get_gpr(src1, rs1);
+> +        gen_get_gpr(src2, rs2);
+> +        tcg_gen_atomic_fetch_umax_tl(src2, src1, src2, ctx->mem_idx,
+> mop);
+> +        gen_set_gpr(rd, src2);
+>          break;
+>
+>      default:
+> --
+> 2.14.3
+>
+>
