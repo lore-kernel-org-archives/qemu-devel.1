@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fC1ZV-0005Bo-E3
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 07:29:50 -0400
+	(envelope-from <peterx@redhat.com>) id 1fC1kI-0000qQ-BH
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 07:40:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fC1ZS-0004Ex-Ad
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 07:29:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52624 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fC1kF-0000Zz-6d
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 07:40:58 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43358 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fC1ZS-0004EY-54
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 07:29:46 -0400
-Date: Fri, 27 Apr 2018 12:29:26 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180427112926.GE2608@work-vm>
-References: <20180426091519.26934-1-xiaoguangrong@tencent.com>
-	<32eaad8e-35a0-5240-37a2-4242b7890ab9@redhat.com>
-	<a14b1b5b-4f0c-c085-35b8-9539afa5091f@gmail.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fC1kE-0000ZG-Tr
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 07:40:55 -0400
+Date: Fri, 27 Apr 2018 19:40:29 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180427114029.GF13269@xz-mi>
+References: <20180425045129.17449-1-peterx@redhat.com>
+	<20180425045129.17449-9-peterx@redhat.com>
+	<2b05e076-0af9-0ee9-c076-7acc29714913@redhat.com>
+	<AADFC41AFE54684AB9EE6CBC0274A5D19113B5D2@SHSMSX101.ccr.corp.intel.com>
+	<20180427072810.GB13269@xz-mi>
+	<AADFC41AFE54684AB9EE6CBC0274A5D19113C1C9@SHSMSX101.ccr.corp.intel.com>
+	<20180427095527.GE13269@xz-mi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <a14b1b5b-4f0c-c085-35b8-9539afa5091f@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] migration: introduce decompress-error-check
+In-Reply-To: <20180427095527.GE13269@xz-mi>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 08/10] intel-iommu: maintain per-device
+ iova ranges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,98 +34,247 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <guangrong.xiao@gmail.com>
-Cc: Eric Blake <eblake@redhat.com>, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, kvm@vger.kernel.org, Xiao Guangrong <xiaoguangrong@tencent.com>, qemu-devel@nongnu.org, peterx@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn
+To: "Tian, Kevin" <kevin.tian@intel.com>
+Cc: Jason Wang <jasowang@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
 
-* Xiao Guangrong (guangrong.xiao@gmail.com) wrote:
-> 
-> 
-> On 04/26/2018 10:01 PM, Eric Blake wrote:
-> > On 04/26/2018 04:15 AM, guangrong.xiao@gmail.com wrote:
-> > > From: Xiao Guangrong <xiaoguangrong@tencent.com>
-> > > 
-> > > QEMU 2.13 enables strict check for compression & decompression to
-> > > make the migration more robuster, that depends on the source to fix
-> > 
-> > s/robuster/robust/
-> > 
-> 
-> Will fix, thank you for pointing it out.
-> 
-> > > the internal design which triggers the unexpected error conditions
-> > 
-> > 2.13 hasn't been released yet.  Why do we need a knob to explicitly turn
-> > off strict checking?  Can we not instead make 2.13 automatically smart
-> > enough to tell if the incoming stream is coming from an older qemu
-> > (which might fail if the strict checks are enabled) vs. a newer qemu
-> > (the sender gave us what we need to ensure the strict checks are
-> > worthwhile)?
-> > 
-> 
-> Really smart.
-> 
-> How about introduce a new command, MIG_CMD_DECOMPRESS_ERR_CHECK,
-> the destination will do strict check if got this command (i.e, new
-> QEMU is running on the source), otherwise, turn the check off.
+On Fri, Apr 27, 2018 at 05:55:27PM +0800, Peter Xu wrote:
+> On Fri, Apr 27, 2018 at 07:44:07AM +0000, Tian, Kevin wrote:
+> > > From: Peter Xu [mailto:peterx@redhat.com]
+> > > Sent: Friday, April 27, 2018 3:28 PM
+> > >=20
+> > > On Fri, Apr 27, 2018 at 07:02:14AM +0000, Tian, Kevin wrote:
+> > > > > From: Jason Wang [mailto:jasowang@redhat.com]
+> > > > > Sent: Friday, April 27, 2018 2:08 PM
+> > > > >
+> > > > > On 2018=E5=B9=B404=E6=9C=8825=E6=97=A5 12:51, Peter Xu wrote:
+> > > > > > For each VTDAddressSpace, now we maintain what IOVA ranges we
+> > > have
+> > > > > > mapped and what we have not.  With that information, now we o=
+nly
+> > > > > send
+> > > > > > MAP or UNMAP when necessary.  Say, we don't send MAP notifies=
+ if
+> > > we
+> > > > > know
+> > > > > > we have already mapped the range, meanwhile we don't send
+> > > UNMAP
+> > > > > notifies
+> > > > > > if we know we never mapped the range at all.
+> > > > > >
+> > > > > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > > > > ---
+> > > > > >   include/hw/i386/intel_iommu.h |  2 ++
+> > > > > >   hw/i386/intel_iommu.c         | 28 ++++++++++++++++++++++++=
+++++
+> > > > > >   hw/i386/trace-events          |  2 ++
+> > > > > >   3 files changed, 32 insertions(+)
+> > > > > >
+> > > > > > diff --git a/include/hw/i386/intel_iommu.h
+> > > > > b/include/hw/i386/intel_iommu.h
+> > > > > > index 486e205e79..09a2e94404 100644
+> > > > > > --- a/include/hw/i386/intel_iommu.h
+> > > > > > +++ b/include/hw/i386/intel_iommu.h
+> > > > > > @@ -27,6 +27,7 @@
+> > > > > >   #include "hw/i386/ioapic.h"
+> > > > > >   #include "hw/pci/msi.h"
+> > > > > >   #include "hw/sysbus.h"
+> > > > > > +#include "qemu/interval-tree.h"
+> > > > > >
+> > > > > >   #define TYPE_INTEL_IOMMU_DEVICE "intel-iommu"
+> > > > > >   #define INTEL_IOMMU_DEVICE(obj) \
+> > > > > > @@ -95,6 +96,7 @@ struct VTDAddressSpace {
+> > > > > >       QLIST_ENTRY(VTDAddressSpace) next;
+> > > > > >       /* Superset of notifier flags that this address space h=
+as */
+> > > > > >       IOMMUNotifierFlag notifier_flags;
+> > > > > > +    ITTree *iova_tree;          /* Traces mapped IOVA ranges=
+ */
+> > > > > >   };
+> > > > > >
+> > > > > >   struct VTDBus {
+> > > > > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> > > > > > index a19c18b8d4..8f396a5d13 100644
+> > > > > > --- a/hw/i386/intel_iommu.c
+> > > > > > +++ b/hw/i386/intel_iommu.c
+> > > > > > @@ -768,12 +768,37 @@ typedef struct {
+> > > > > >   static int vtd_page_walk_one(IOMMUTLBEntry *entry, int leve=
+l,
+> > > > > >                                vtd_page_walk_info *info)
+> > > > > >   {
+> > > > > > +    VTDAddressSpace *as =3D info->as;
+> > > > > >       vtd_page_walk_hook hook_fn =3D info->hook_fn;
+> > > > > >       void *private =3D info->private;
+> > > > > > +    ITRange *mapped =3D it_tree_find(as->iova_tree, entry->i=
+ova,
+> > > > > > +                                   entry->iova + entry->addr=
+_mask);
+> > > > > >
+> > > > > >       assert(hook_fn);
+> > > > > > +
+> > > > > > +    /* Update local IOVA mapped ranges */
+> > > > > > +    if (entry->perm) {
+> > > > > > +        if (mapped) {
+> > > > > > +            /* Skip since we have already mapped this range =
+*/
+> > > > > > +            trace_vtd_page_walk_one_skip_map(entry->iova, en=
+try-
+> > > > > >addr_mask,
+> > > > > > +                                             mapped->start, =
+mapped->end);
+> > > > > > +            return 0;
+> > > > > > +        }
+> > > > > > +        it_tree_insert(as->iova_tree, entry->iova,
+> > > > > > +                       entry->iova + entry->addr_mask);
+> > > > >
+> > > > > I was consider a case e.g:
+> > > > >
+> > > > > 1) map A (iova) to B (pa)
+> > > > > 2) invalidate A
+> > > > > 3) map A (iova) to C (pa)
+> > > > > 4) invalidate A
+> > > > >
+> > > > > In this case, we will probably miss a walk here. But I'm not su=
+re it was
+> > > > > allowed by the spec (though I think so).
+> > > > >
+> > >=20
+> > > Hi, Kevin,
+> > >=20
+> > > Thanks for joining the discussion.
+> > >=20
+> > > >
+> > > > I thought it was wrong in a glimpse, but then changed my mind aft=
+er
+> > > > another thinking. As long as device driver can quiescent the devi=
+ce
+> > > > to not access A (iova) within above window, then above sequence
+> > > > has no problem since any stale mappings (A->B) added before step =
+4)
+> > > > won't be used and then will get flushed after step 4). Regarding =
+to
+> > > > that actually the 1st invalidation can be skipped:
+> > > >
+> > > > 1) map A (iova) to B (pa)
+> > > > 2) driver programs device to use A
+> > > > 3) driver programs device to not use A
+> > > > 4) map A (iova) to C (pa)
+> > > > 	A->B may be still valid in IOTLB
+> > > > 5) invalidate A
+> > > > 6) driver programs device to use A
+> > >=20
+> > > Note that IMHO this is a bit different from Jason's example, and it=
+'ll
+> > > be fine.  Current code should work well with this scenario since th=
+e
+> > > emulation code will not aware of the map A until step (5).  Then we=
+'ll
+> > > have the correct mapping.
+> >=20
+> > you are right. we still need the extra PSI otherwise the 1st mapping
+> > is problematic for use. So back to Jason's example.
+> >=20
+> > >=20
+> > > While for Jason's example it's exactly the extra PSI that might cau=
+se
+> > > stale mappings (though again I think it's still problematic...).
+> >=20
+> > problematic in software side (e.g. that way IOMMU core relies on
+> > device drivers which conflict with the value of using IOMMU) but
+> > it is OK from hardware p.o.v. btw the extra PSI itself doesn't cause
+> > stale mapping. Instead it is device activity after that PSI may cause=
+ it.
+> >=20
+> > >=20
+> > > Actually I think I can just fix up the code even if Jason's case
+> > > happens by unmapping that first then remap:
+> > >=20
+> > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> > > index 31e9b52452..2a9584f9d8 100644
+> > > --- a/hw/i386/intel_iommu.c
+> > > +++ b/hw/i386/intel_iommu.c
+> > > @@ -778,13 +778,21 @@ static int vtd_page_walk_one(IOMMUTLBEntry
+> > > *entry, int level,
+> > >      /* Update local IOVA mapped ranges */
+> > >      if (entry->perm) {
+> > >          if (mapped) {
+> > > -            /* Skip since we have already mapped this range */
+> > > -            trace_vtd_page_walk_one_skip_map(entry->iova, entry-
+> > > >addr_mask,
+> > > -                                             mapped->start, mapped=
+->end);
+> > > -            return 0;
+> > > +            int ret;
+> > > +            /* Cache the write permission */
+> > > +            IOMMUAccessFlags flags =3D entry->perm;
+> > > +
+> > > +            /* UNMAP the old first then remap.  No need to touch I=
+OVA tree */
+> > > +            entry->perm =3D IOMMU_NONE;
+> > > +            ret =3D hook_fn(entry, private);
+> > > +            if (ret) {
+> > > +                return ret;
+> > > +            }
+> > > +            entry->perm =3D flags;
+> > > +        } else {
+> > > +            it_tree_insert(as->iova_tree, entry->iova,
+> > > +                           entry->iova + entry->addr_mask);
+> > >          }
+> > > -        it_tree_insert(as->iova_tree, entry->iova,
+> > > -                       entry->iova + entry->addr_mask);
+> > >      } else {
+> > >          if (!mapped) {
+> > >              /* Skip since we didn't map this range at all */
+> > >=20
+> > > If we really think it necessary, I can squash this in, though this =
+is
+> > > a bit ugly.  But I just want to confirm whether this would be anyth=
+ing
+> > > we want...
+> > >=20
+> >=20
+> > I didn=E2=80=99t look into your actual code yet. If others think abov=
+e
+> > change is OK then it's definitely good as we conform to hardware
+> > behavior here. Otherwise if there is a way to detect such unusual=20
+> > usage and then adopt some action (say kill the VM), it's also fine=20
+> > since user knows he runs a bad OS which is not supported by=20
+> > Qemu. It's just not good if such situation is not handled, which=20
+> > leads to some undefined behavior which nobody knows the reason=20
+> > w/o hard debug into. :-)
+>=20
+> Yeah, then let me do this. :)
+>=20
+> Jason, would you be good with above change squashed?
 
-The problem is that if it's received by an old qemu it will fail,
-so that breaks backwards migration which is unfortunate.
+Self NAK on this...
 
-> > > 
-> > > To make it work for migrating old version QEMU to 2.13 QEMU, we
-> > > introduce this parameter to disable the error check on the
-> > > destination
-> > > 
-> > > Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
-> > > ---
-> > 
-> > > +++ b/qapi/migration.json
-> > > @@ -455,6 +455,17 @@
-> > >   #          compression, so set the decompress-threads to the number about 1/4
-> > >   #          of compress-threads is adequate.
-> > >   #
-> > > +# @decompress-error-check: check decompression errors. When false, the errors
-> > > +#                          triggered by memory decompression are ignored.
-> > 
-> > What are the consequences of such an error?  Is it a security hole to
-> > leave this at false, when a malicious migration stream can cause us to
-> > misbehave by ignoring the errors?
-> 
-> The issue fixed by strict error check is avoiding VM corruption if zlib failed
-> to compress & decompress the memory, i.e, catch error conditions returned by
-> zlib API.
-> 
-> > 
-> > > +#                          When true, migration is aborted if the errors are
-> > > +#                          detected. For the old QEMU versions (< 2.13) the
-> > > +#                          internal design will cause decompression to fail
-> > > +#                          so the destination should completely ignore the
-> > > +#                          error conditions, i.e, make it be false if these
-> > > +#                          QEMUs are going to be migrated. Since 2.13, this
-> > > +#                          design is fixed, make it be true to avoid corrupting
-> > > +#                          the VM silently (Since 2.13)
-> > 
-> > Rather wordy; I'd suggest:
-> > 
-> > @decompress-error-check: Set to true to abort the migration if
-> >          decompression errors are detected at the destination. Should be
-> >          left at false (default) for qemu older than 2.13, since only
-> >          newer qemu sends streams that do not trigger spurious
-> >          decompression errors. (Since 2.13)
-> > 
-> 
-> Yup, much better.
-> 
-> > But that's if we even need it (it SHOULD be possible to design something
-> > into the migration stream so that you can detect this property
-> > automatically instead of relying on the user to set the property).
-> > 
-> 
-> Yes, can not agree with you more. :)
+More than half of the whole series tries to solve the solo problem
+that we unmapped some pages that were already mapped, which proved to
+be wrong.  Now if we squash the change we will do the same wrong
+thing, so we'll still have a very small window that the remapped page
+be missing from a device's POV.
 
-The challenge is how to put something into the stream without breaking
-an old version of QEMU that's receiving the stream.
+Now to solve this I suppose we'll need to cache every translation then
+we can know whether a mapping has changed, and we only remap when it
+really has changed.  But I'm afraid that can be a big amount of data
+for nested guests.  For a most common 4G L2 guest, I think the worst
+case (e.g., no huge page at all, no continuous pages) is 4G/4K=3D1M
+entries in that tree.
 
-Dave
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Is it really worth it to solve this possibly-buggy-guest-OS problem
+with such a overhead?  I don't know..
+
+I'm not sure whether it's still acceptable that we put this issue
+aside.  We should know that normal OSs should not do this, and if they
+do, IMHO it proves a buggy OS already (so even from hardware POV we
+allow this, from software POV it should still be problematic), then
+it'll have problem for sure, but only within the VM itself, and it
+won't affect other VMs or the host.  That sounds still reasonable to
+me so far.
+
+Of course I'm always willing to listen to more advice on this.
+
+Thanks,
+
+--=20
+Peter Xu
