@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59481)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBzaA-0001m6-7A
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:22:23 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fBzaB-0001nU-Fw
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:22:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBza5-00026D-K4
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:22:22 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fBza9-00027v-SJ
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:22:23 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 27 Apr 2018 19:20:59 +1000
-Message-Id: <20180427092126.24812-23-david@gibson.dropbear.id.au>
+Date: Fri, 27 Apr 2018 19:21:16 +1000
+Message-Id: <20180427092126.24812-40-david@gibson.dropbear.id.au>
 In-Reply-To: <20180427092126.24812-1-david@gibson.dropbear.id.au>
 References: <20180427092126.24812-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 22/49] uninorth: rename UNINState to
- UNINHostState
+Subject: [Qemu-devel] [PULL 39/49] target/ppc: Move 1T segment and AMR
+ options to PPCHash64Options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,250 +24,182 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Currently env->mmu_model is a bit of an unholy mess of an enum of distinc=
+t
+MMU types, with various flag bits as well.  This makes which bits of the
+field should be compared pretty confusing.
 
-The existing UNINState actually represents the PCI/AGP host bridge stage =
-so
-rename it accordingly.
+Make a start on cleaning that up by moving two of the flags bits -
+POWERPC_MMU_1TSEG and POWERPC_MMU_AMR - which are specific to the 64-bit
+hash MMU into a new flags field in PPCHash64Options structure.
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/pci-host/uninorth.c         | 32 ++++++++++++++++----------------
- hw/ppc/mac.h                   |  8 ++++----
- hw/ppc/mac_newworld.c          |  2 +-
- include/hw/pci-host/uninorth.h | 12 ++++++------
- 4 files changed, 27 insertions(+), 27 deletions(-)
+ hw/ppc/pnv.c            |  3 ++-
+ hw/ppc/spapr.c          |  2 +-
+ target/ppc/cpu-qom.h    | 11 +++--------
+ target/ppc/kvm.c        |  4 ++--
+ target/ppc/mmu-hash64.c |  6 ++++--
+ target/ppc/mmu-hash64.h |  8 ++++++++
+ 6 files changed, 20 insertions(+), 14 deletions(-)
 
-diff --git a/hw/pci-host/uninorth.c b/hw/pci-host/uninorth.c
-index 3a29a4410e..fada0ffd5f 100644
---- a/hw/pci-host/uninorth.c
-+++ b/hw/pci-host/uninorth.c
-@@ -38,7 +38,7 @@ static int pci_unin_map_irq(PCIDevice *pci_dev, int irq=
-_num)
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 3220ef8f79..0e49c5e9b8 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -36,6 +36,7 @@
+ #include "monitor/monitor.h"
+ #include "hw/intc/intc.h"
+ #include "hw/ipmi/ipmi.h"
++#include "target/ppc/mmu-hash64.h"
 =20
- static void pci_unin_set_irq(void *opaque, int irq_num, int level)
- {
--    UNINState *s =3D opaque;
-+    UNINHostState *s =3D opaque;
+ #include "hw/ppc/xics.h"
+ #include "hw/ppc/pnv_xscom.h"
+@@ -187,7 +188,7 @@ static void pnv_dt_core(PnvChip *chip, PnvCore *pc, v=
+oid *fdt)
+         _FDT((fdt_setprop(fdt, offset, "ibm,purr", NULL, 0)));
+     }
 =20
-     trace_unin_set_irq(unin_irq_line[irq_num], level);
-     qemu_set_irq(s->irqs[irq_num], level);
-@@ -81,7 +81,7 @@ static uint32_t unin_get_config_reg(uint32_t reg, uint3=
-2_t addr)
- static void unin_data_write(void *opaque, hwaddr addr,
-                             uint64_t val, unsigned len)
- {
--    UNINState *s =3D opaque;
-+    UNINHostState *s =3D opaque;
-     PCIHostState *phb =3D PCI_HOST_BRIDGE(s);
-     trace_unin_data_write(addr, len, val);
-     pci_data_write(phb->bus,
-@@ -92,7 +92,7 @@ static void unin_data_write(void *opaque, hwaddr addr,
- static uint64_t unin_data_read(void *opaque, hwaddr addr,
-                                unsigned len)
- {
--    UNINState *s =3D opaque;
-+    UNINHostState *s =3D opaque;
-     PCIHostState *phb =3D PCI_HOST_BRIDGE(s);
-     uint32_t val;
+-    if (env->mmu_model & POWERPC_MMU_1TSEG) {
++    if (ppc_hash64_has(cpu, PPC_HASH64_1TSEG)) {
+         _FDT((fdt_setprop(fdt, offset, "ibm,processor-segment-sizes",
+                            segs, sizeof(segs))));
+     }
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index a4b3722656..9c26dc37e1 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -557,7 +557,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void =
+*fdt, int offset,
+         _FDT((fdt_setprop(fdt, offset, "ibm,purr", NULL, 0)));
+     }
 =20
-@@ -109,7 +109,7 @@ static const MemoryRegionOps unin_data_ops =3D {
-     .endianness =3D DEVICE_LITTLE_ENDIAN,
+-    if (env->mmu_model & POWERPC_MMU_1TSEG) {
++    if (ppc_hash64_has(cpu, PPC_HASH64_1TSEG)) {
+         _FDT((fdt_setprop(fdt, offset, "ibm,processor-segment-sizes",
+                           segs, sizeof(segs))));
+     }
+diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+index 3e5ef7375f..2bd58b2a84 100644
+--- a/target/ppc/cpu-qom.h
++++ b/target/ppc/cpu-qom.h
+@@ -68,22 +68,17 @@ enum powerpc_mmu_t {
+     /* PowerPC 601 MMU model (specific BATs format)            */
+     POWERPC_MMU_601        =3D 0x0000000A,
+ #define POWERPC_MMU_64       0x00010000
+-#define POWERPC_MMU_1TSEG    0x00020000
+-#define POWERPC_MMU_AMR      0x00040000
+ #define POWERPC_MMU_V3       0x00100000 /* ISA V3.00 MMU Support */
+     /* 64 bits PowerPC MMU                                     */
+     POWERPC_MMU_64B        =3D POWERPC_MMU_64 | 0x00000001,
+     /* Architecture 2.03 and later (has LPCR) */
+     POWERPC_MMU_2_03       =3D POWERPC_MMU_64 | 0x00000002,
+     /* Architecture 2.06 variant                               */
+-    POWERPC_MMU_2_06       =3D POWERPC_MMU_64 | POWERPC_MMU_1TSEG
+-                             | POWERPC_MMU_AMR | 0x00000003,
++    POWERPC_MMU_2_06       =3D POWERPC_MMU_64 | 0x00000003,
+     /* Architecture 2.07 variant                               */
+-    POWERPC_MMU_2_07       =3D POWERPC_MMU_64 | POWERPC_MMU_1TSEG
+-                             | POWERPC_MMU_AMR | 0x00000004,
++    POWERPC_MMU_2_07       =3D POWERPC_MMU_64 | 0x00000004,
+     /* Architecture 3.00 variant                               */
+-    POWERPC_MMU_3_00       =3D POWERPC_MMU_64 | POWERPC_MMU_1TSEG
+-                             | POWERPC_MMU_AMR | POWERPC_MMU_V3
++    POWERPC_MMU_3_00       =3D POWERPC_MMU_64 | POWERPC_MMU_V3
+                              | 0x00000005,
+ };
+ #define POWERPC_MMU_VER(x) ((x) & (POWERPC_MMU_64 | 0xFFFF))
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index c67254acca..b53af75ecf 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -302,7 +302,7 @@ static void kvm_get_fallback_smmu_info(PowerPCCPU *cp=
+u,
+         /* HV KVM has backing store size restrictions */
+         info->flags =3D KVM_PPC_PAGE_SIZES_REAL;
+=20
+-        if (env->mmu_model & POWERPC_MMU_1TSEG) {
++        if (ppc_hash64_has(cpu, PPC_HASH64_1TSEG)) {
+             info->flags |=3D KVM_PPC_1T_SEGMENTS;
+         }
+=20
+@@ -482,7 +482,7 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
+     }
+     env->slb_nr =3D smmu_info.slb_size;
+     if (!(smmu_info.flags & KVM_PPC_1T_SEGMENTS)) {
+-        env->mmu_model &=3D ~POWERPC_MMU_1TSEG;
++        cpu->hash64_opts->flags &=3D ~PPC_HASH64_1TSEG;
+     }
+ }
+=20
+diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+index 2809c31170..c9ee55e1ea 100644
+--- a/target/ppc/mmu-hash64.c
++++ b/target/ppc/mmu-hash64.c
+@@ -160,7 +160,7 @@ int ppc_store_slb(PowerPCCPU *cpu, target_ulong slot,
+     if (vsid & (SLB_VSID_B & ~SLB_VSID_B_1T)) {
+         return -1; /* Bad segment size */
+     }
+-    if ((vsid & SLB_VSID_B) && !(env->mmu_model & POWERPC_MMU_1TSEG)) {
++    if ((vsid & SLB_VSID_B) && !(ppc_hash64_has(cpu, PPC_HASH64_1TSEG)))=
+ {
+         return -1; /* 1T segment on MMU that doesn't support it */
+     }
+=20
+@@ -369,7 +369,7 @@ static int ppc_hash64_amr_prot(PowerPCCPU *cpu, ppc_h=
+ash_pte64_t pte)
+     int prot =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+=20
+     /* Only recent MMUs implement Virtual Page Class Key Protection */
+-    if (!(env->mmu_model & POWERPC_MMU_AMR)) {
++    if (!ppc_hash64_has(cpu, PPC_HASH64_AMR)) {
+         return prot;
+     }
+=20
+@@ -1114,6 +1114,7 @@ void ppc_hash64_finalize(PowerPCCPU *cpu)
+ }
+=20
+ const PPCHash64Options ppc_hash64_opts_basic =3D {
++    .flags =3D 0,
+     .sps =3D {
+         { .page_shift =3D 12, /* 4K */
+           .slb_enc =3D 0,
+@@ -1127,6 +1128,7 @@ const PPCHash64Options ppc_hash64_opts_basic =3D {
  };
 =20
--static void pci_unin_init_irqs(UNINState *s)
-+static void pci_unin_init_irqs(UNINHostState *s)
- {
-     int i;
-=20
-@@ -120,7 +120,7 @@ static void pci_unin_init_irqs(UNINState *s)
-=20
- static void pci_unin_main_realize(DeviceState *dev, Error **errp)
- {
--    UNINState *s =3D UNI_NORTH_PCI_HOST_BRIDGE(dev);
-+    UNINHostState *s =3D UNI_NORTH_PCI_HOST_BRIDGE(dev);
-     PCIHostState *h =3D PCI_HOST_BRIDGE(dev);
-=20
-     h->bus =3D pci_register_root_bus(dev, NULL,
-@@ -142,7 +142,7 @@ static void pci_unin_main_realize(DeviceState *dev, E=
-rror **errp)
-=20
- static void pci_unin_main_init(Object *obj)
- {
--    UNINState *s =3D UNI_NORTH_PCI_HOST_BRIDGE(obj);
-+    UNINHostState *s =3D UNI_NORTH_PCI_HOST_BRIDGE(obj);
-     SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
-     PCIHostState *h =3D PCI_HOST_BRIDGE(obj);
-=20
-@@ -175,7 +175,7 @@ static void pci_unin_main_init(Object *obj)
-=20
- static void pci_u3_agp_realize(DeviceState *dev, Error **errp)
- {
--    UNINState *s =3D U3_AGP_HOST_BRIDGE(dev);
-+    UNINHostState *s =3D U3_AGP_HOST_BRIDGE(dev);
-     PCIHostState *h =3D PCI_HOST_BRIDGE(dev);
-=20
-     h->bus =3D pci_register_root_bus(dev, NULL,
-@@ -191,7 +191,7 @@ static void pci_u3_agp_realize(DeviceState *dev, Erro=
-r **errp)
-=20
- static void pci_u3_agp_init(Object *obj)
- {
--    UNINState *s =3D U3_AGP_HOST_BRIDGE(obj);
-+    UNINHostState *s =3D U3_AGP_HOST_BRIDGE(obj);
-     SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
-     PCIHostState *h =3D PCI_HOST_BRIDGE(obj);
-=20
-@@ -223,7 +223,7 @@ static void pci_u3_agp_init(Object *obj)
-=20
- static void pci_unin_agp_realize(DeviceState *dev, Error **errp)
- {
--    UNINState *s =3D UNI_NORTH_AGP_HOST_BRIDGE(dev);
-+    UNINHostState *s =3D UNI_NORTH_AGP_HOST_BRIDGE(dev);
-     PCIHostState *h =3D PCI_HOST_BRIDGE(dev);
-=20
-     h->bus =3D pci_register_root_bus(dev, NULL,
-@@ -239,7 +239,7 @@ static void pci_unin_agp_realize(DeviceState *dev, Er=
-ror **errp)
-=20
- static void pci_unin_agp_init(Object *obj)
- {
--    UNINState *s =3D UNI_NORTH_AGP_HOST_BRIDGE(obj);
-+    UNINHostState *s =3D UNI_NORTH_AGP_HOST_BRIDGE(obj);
-     SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
-     PCIHostState *h =3D PCI_HOST_BRIDGE(obj);
-=20
-@@ -260,7 +260,7 @@ static void pci_unin_agp_init(Object *obj)
-=20
- static void pci_unin_internal_realize(DeviceState *dev, Error **errp)
- {
--    UNINState *s =3D UNI_NORTH_INTERNAL_PCI_HOST_BRIDGE(dev);
-+    UNINHostState *s =3D UNI_NORTH_INTERNAL_PCI_HOST_BRIDGE(dev);
-     PCIHostState *h =3D PCI_HOST_BRIDGE(dev);
-=20
-     h->bus =3D pci_register_root_bus(dev, NULL,
-@@ -276,7 +276,7 @@ static void pci_unin_internal_realize(DeviceState *de=
-v, Error **errp)
-=20
- static void pci_unin_internal_init(Object *obj)
- {
--    UNINState *s =3D UNI_NORTH_INTERNAL_PCI_HOST_BRIDGE(obj);
-+    UNINHostState *s =3D UNI_NORTH_INTERNAL_PCI_HOST_BRIDGE(obj);
-     SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
-     PCIHostState *h =3D PCI_HOST_BRIDGE(obj);
-=20
-@@ -466,7 +466,7 @@ static void pci_unin_main_class_init(ObjectClass *kla=
-ss, void *data)
- static const TypeInfo pci_unin_main_info =3D {
-     .name          =3D TYPE_UNI_NORTH_PCI_HOST_BRIDGE,
-     .parent        =3D TYPE_PCI_HOST_BRIDGE,
--    .instance_size =3D sizeof(UNINState),
-+    .instance_size =3D sizeof(UNINHostState),
-     .instance_init =3D pci_unin_main_init,
-     .class_init    =3D pci_unin_main_class_init,
+ const PPCHash64Options ppc_hash64_opts_POWER7 =3D {
++    .flags =3D PPC_HASH64_1TSEG | PPC_HASH64_AMR,
+     .sps =3D {
+         {
+             .page_shift =3D 12, /* 4K */
+diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
+index 341c1524c2..b2b5d25238 100644
+--- a/target/ppc/mmu-hash64.h
++++ b/target/ppc/mmu-hash64.h
+@@ -153,12 +153,20 @@ struct PPCHash64SegmentPageSizes {
  };
-@@ -482,7 +482,7 @@ static void pci_u3_agp_class_init(ObjectClass *klass,=
- void *data)
- static const TypeInfo pci_u3_agp_info =3D {
-     .name          =3D TYPE_U3_AGP_HOST_BRIDGE,
-     .parent        =3D TYPE_PCI_HOST_BRIDGE,
--    .instance_size =3D sizeof(UNINState),
-+    .instance_size =3D sizeof(UNINHostState),
-     .instance_init =3D pci_u3_agp_init,
-     .class_init    =3D pci_u3_agp_class_init,
+=20
+ struct PPCHash64Options {
++#define PPC_HASH64_1TSEG        0x00001
++#define PPC_HASH64_AMR          0x00002
++    unsigned flags;
+     PPCHash64SegmentPageSizes sps[PPC_PAGE_SIZES_MAX_SZ];
  };
-@@ -498,7 +498,7 @@ static void pci_unin_agp_class_init(ObjectClass *klas=
-s, void *data)
- static const TypeInfo pci_unin_agp_info =3D {
-     .name          =3D TYPE_UNI_NORTH_AGP_HOST_BRIDGE,
-     .parent        =3D TYPE_PCI_HOST_BRIDGE,
--    .instance_size =3D sizeof(UNINState),
-+    .instance_size =3D sizeof(UNINHostState),
-     .instance_init =3D pci_unin_agp_init,
-     .class_init    =3D pci_unin_agp_class_init,
- };
-@@ -514,7 +514,7 @@ static void pci_unin_internal_class_init(ObjectClass =
-*klass, void *data)
- static const TypeInfo pci_unin_internal_info =3D {
-     .name          =3D TYPE_UNI_NORTH_INTERNAL_PCI_HOST_BRIDGE,
-     .parent        =3D TYPE_PCI_HOST_BRIDGE,
--    .instance_size =3D sizeof(UNINState),
-+    .instance_size =3D sizeof(UNINHostState),
-     .instance_init =3D pci_unin_internal_init,
-     .class_init    =3D pci_unin_internal_class_init,
- };
-diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
-index 1ab2a3b354..892dd03789 100644
---- a/hw/ppc/mac.h
-+++ b/hw/ppc/mac.h
-@@ -89,10 +89,10 @@ void macio_init(PCIDevice *dev,
- #define TYPE_GRACKLE_PCI_HOST_BRIDGE "grackle-pcihost"
 =20
- /* UniNorth PCI */
--UNINState *pci_pmac_init(qemu_irq *pic,
--                         MemoryRegion *address_space_mem);
--UNINState *pci_pmac_u3_init(qemu_irq *pic,
--                            MemoryRegion *address_space_mem);
-+UNINHostState *pci_pmac_init(qemu_irq *pic,
-+                             MemoryRegion *address_space_mem);
-+UNINHostState *pci_pmac_u3_init(qemu_irq *pic,
-+                                MemoryRegion *address_space_mem);
+ extern const PPCHash64Options ppc_hash64_opts_basic;
+ extern const PPCHash64Options ppc_hash64_opts_POWER7;
 =20
- /* Mac NVRAM */
- #define TYPE_MACIO_NVRAM "macio-nvram"
-diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-index bd7ffdb0fb..29bd3838bf 100644
---- a/hw/ppc/mac_newworld.c
-+++ b/hw/ppc/mac_newworld.c
-@@ -150,7 +150,7 @@ static void ppc_core99_init(MachineState *machine)
-     MemoryRegion *ram =3D g_new(MemoryRegion, 1), *bios =3D g_new(Memory=
-Region, 1);
-     hwaddr kernel_base, initrd_base, cmdline_base =3D 0;
-     long kernel_size, initrd_size;
--    UNINState *uninorth_pci;
-+    UNINHostState *uninorth_pci;
-     PCIBus *pci_bus;
-     NewWorldMacIOState *macio;
-     MACIOIDEState *macio_ide;
-diff --git a/include/hw/pci-host/uninorth.h b/include/hw/pci-host/uninort=
-h.h
-index a953b5e9b1..f0e6836c76 100644
---- a/include/hw/pci-host/uninorth.h
-+++ b/include/hw/pci-host/uninorth.h
-@@ -35,15 +35,15 @@
- #define TYPE_U3_AGP_HOST_BRIDGE "u3-agp-pcihost"
++static inline bool ppc_hash64_has(PowerPCCPU *cpu, unsigned feature)
++{
++    return !!(cpu->hash64_opts->flags & feature);
++}
++
+ #endif /* CONFIG_USER_ONLY */
 =20
- #define UNI_NORTH_PCI_HOST_BRIDGE(obj) \
--    OBJECT_CHECK(UNINState, (obj), TYPE_UNI_NORTH_PCI_HOST_BRIDGE)
-+    OBJECT_CHECK(UNINHostState, (obj), TYPE_UNI_NORTH_PCI_HOST_BRIDGE)
- #define UNI_NORTH_AGP_HOST_BRIDGE(obj) \
--    OBJECT_CHECK(UNINState, (obj), TYPE_UNI_NORTH_AGP_HOST_BRIDGE)
-+    OBJECT_CHECK(UNINHostState, (obj), TYPE_UNI_NORTH_AGP_HOST_BRIDGE)
- #define UNI_NORTH_INTERNAL_PCI_HOST_BRIDGE(obj) \
--    OBJECT_CHECK(UNINState, (obj), TYPE_UNI_NORTH_INTERNAL_PCI_HOST_BRID=
-GE)
-+    OBJECT_CHECK(UNINHostState, (obj), TYPE_UNI_NORTH_INTERNAL_PCI_HOST_=
-BRIDGE)
- #define U3_AGP_HOST_BRIDGE(obj) \
--    OBJECT_CHECK(UNINState, (obj), TYPE_U3_AGP_HOST_BRIDGE)
-+    OBJECT_CHECK(UNINHostState, (obj), TYPE_U3_AGP_HOST_BRIDGE)
-=20
--typedef struct UNINState {
-+typedef struct UNINHostState {
-     PCIHostState parent_obj;
-=20
-     OpenPICState *pic;
-@@ -51,6 +51,6 @@ typedef struct UNINState {
-     MemoryRegion pci_mmio;
-     MemoryRegion pci_hole;
-     MemoryRegion pci_io;
--} UNINState;
-+} UNINHostState;
-=20
- #endif /* UNINORTH_H */
+ #if defined(CONFIG_USER_ONLY) || !defined(TARGET_PPC64)
 --=20
 2.14.3
