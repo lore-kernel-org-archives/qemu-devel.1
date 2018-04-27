@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBzZS-0000rj-AJ
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:21:39 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fBzZU-0000tG-I3
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:21:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBzZO-0001nN-U0
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:21:37 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fBzZT-0001pk-Ar
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:21:40 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 27 Apr 2018 19:20:40 +1000
-Message-Id: <20180427092126.24812-4-david@gibson.dropbear.id.au>
+Date: Fri, 27 Apr 2018 19:20:47 +1000
+Message-Id: <20180427092126.24812-11-david@gibson.dropbear.id.au>
 In-Reply-To: <20180427092126.24812-1-david@gibson.dropbear.id.au>
 References: <20180427092126.24812-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 03/49] uninorth: QOMify PCI and AGP host bridges
+Subject: [Qemu-devel] [PULL 10/49] grackle: move PCI IO (ISA) memory region
+ into the grackle device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,186 +25,88 @@ Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Mark Cave-Ayland
 
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
+This simplifies the Old World machine to simply mapping the ISA memory region
+into the main address space.
+
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/pci-host/uninorth.c | 79 ++++++++++++++++++++------------------------------
- 1 file changed, 32 insertions(+), 47 deletions(-)
+ hw/pci-host/grackle.c | 7 ++++++-
+ hw/ppc/mac_oldworld.c | 9 +++------
+ 2 files changed, 9 insertions(+), 7 deletions(-)
 
-diff --git a/hw/pci-host/uninorth.c b/hw/pci-host/uninorth.c
-index 710818e355..1d4d3f5705 100644
---- a/hw/pci-host/uninorth.c
-+++ b/hw/pci-host/uninorth.c
-@@ -129,72 +129,61 @@ static const MemoryRegionOps unin_data_ops = {
-     .endianness = DEVICE_LITTLE_ENDIAN,
- };
+diff --git a/hw/pci-host/grackle.c b/hw/pci-host/grackle.c
+index e4583d493b..4810a4de79 100644
+--- a/hw/pci-host/grackle.c
++++ b/hw/pci-host/grackle.c
+@@ -41,6 +41,7 @@ typedef struct GrackleState {
+     qemu_irq irqs[4];
+     MemoryRegion pci_mmio;
+     MemoryRegion pci_hole;
++    MemoryRegion pci_io;
+ } GrackleState;
  
--static int pci_unin_main_init_device(SysBusDevice *dev)
-+static void pci_unin_main_init(Object *obj)
- {
--    PCIHostState *h;
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    PCIHostState *h = PCI_HOST_BRIDGE(obj);
+ /* Don't know if this matches real hardware, but it agrees with OHW.  */
+@@ -76,7 +77,7 @@ static void grackle_realize(DeviceState *dev, Error **errp)
+                                      pci_grackle_map_irq,
+                                      s,
+                                      &s->pci_mmio,
+-                                     get_system_io(),
++                                     &s->pci_io,
+                                      0, 4, TYPE_PCI_BUS);
  
-     /* Use values found on a real PowerMac */
-     /* Uninorth main bus */
--    h = PCI_HOST_BRIDGE(dev);
+     pci_create_simple(phb->bus, 0, "grackle");
+@@ -90,6 +91,9 @@ static void grackle_init(Object *obj)
+     PCIHostState *phb = PCI_HOST_BRIDGE(obj);
+ 
+     memory_region_init(&s->pci_mmio, OBJECT(s), "pci-mmio", 0x100000000ULL);
++    memory_region_init_io(&s->pci_io, OBJECT(s), &unassigned_io_ops, obj,
++                          "pci-isa-mmio", 0x00200000);
++
+     memory_region_init_alias(&s->pci_hole, OBJECT(s), "pci-hole", &s->pci_mmio,
+                              0x80000000ULL, 0x7e000000ULL);
+ 
+@@ -106,6 +110,7 @@ static void grackle_init(Object *obj)
+     sysbus_init_mmio(sbd, &phb->conf_mem);
+     sysbus_init_mmio(sbd, &phb->data_mem);
+     sysbus_init_mmio(sbd, &s->pci_hole);
++    sysbus_init_mmio(sbd, &s->pci_io);
+ }
+ 
+ static void grackle_pci_realize(PCIDevice *d, Error **errp)
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index f0246f43d3..f9e63b8d83 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -91,7 +91,6 @@ static void ppc_heathrow_init(MachineState *machine)
+     int linux_boot, i;
+     MemoryRegion *ram = g_new(MemoryRegion, 1);
+     MemoryRegion *bios = g_new(MemoryRegion, 1);
+-    MemoryRegion *isa = g_new(MemoryRegion, 1);
+     uint32_t kernel_base, initrd_base, cmdline_base = 0;
+     int32_t kernel_size, initrd_size;
+     PCIBus *pci_bus;
+@@ -225,11 +224,6 @@ static void ppc_heathrow_init(MachineState *machine)
+         }
+     }
+ 
+-    /* Register 2 MB of ISA IO space */
+-    memory_region_init_alias(isa, NULL, "isa_mmio",
+-                             get_system_io(), 0, 0x00200000);
+-    memory_region_add_subregion(sysmem, 0xfe000000, isa);
 -
-     memory_region_init_io(&h->conf_mem, OBJECT(h), &pci_host_conf_le_ops,
--                          dev, "pci-conf-idx", 0x1000);
--    memory_region_init_io(&h->data_mem, OBJECT(h), &unin_data_ops, dev,
-+                          obj, "pci-conf-idx", 0x1000);
-+    memory_region_init_io(&h->data_mem, OBJECT(h), &unin_data_ops, obj,
-                           "pci-conf-data", 0x1000);
--    sysbus_init_mmio(dev, &h->conf_mem);
--    sysbus_init_mmio(dev, &h->data_mem);
--
--    return 0;
-+    sysbus_init_mmio(sbd, &h->conf_mem);
-+    sysbus_init_mmio(sbd, &h->data_mem);
- }
+     /* XXX: we register only 1 output pin for heathrow PIC */
+     pic_dev = qdev_create(NULL, TYPE_HEATHROW);
+     qdev_init_nofail(pic_dev);
+@@ -276,6 +270,9 @@ static void ppc_heathrow_init(MachineState *machine)
+     /* PCI hole */
+     memory_region_add_subregion(get_system_memory(), 0x80000000ULL,
+                                 sysbus_mmio_get_region(s, 2));
++    /* Register 2 MB of ISA IO space */
++    memory_region_add_subregion(get_system_memory(), 0xfe000000,
++                                sysbus_mmio_get_region(s, 3));
  
--
--static int pci_u3_agp_init_device(SysBusDevice *dev)
-+static void pci_u3_agp_init(Object *obj)
- {
--    PCIHostState *h;
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    PCIHostState *h = PCI_HOST_BRIDGE(obj);
- 
-     /* Uninorth U3 AGP bus */
--    h = PCI_HOST_BRIDGE(dev);
--
-     memory_region_init_io(&h->conf_mem, OBJECT(h), &pci_host_conf_le_ops,
--                          dev, "pci-conf-idx", 0x1000);
--    memory_region_init_io(&h->data_mem, OBJECT(h), &unin_data_ops, dev,
-+                          obj, "pci-conf-idx", 0x1000);
-+    memory_region_init_io(&h->data_mem, OBJECT(h), &unin_data_ops, obj,
-                           "pci-conf-data", 0x1000);
--    sysbus_init_mmio(dev, &h->conf_mem);
--    sysbus_init_mmio(dev, &h->data_mem);
--
--    return 0;
-+    sysbus_init_mmio(sbd, &h->conf_mem);
-+    sysbus_init_mmio(sbd, &h->data_mem);
- }
- 
--static int pci_unin_agp_init_device(SysBusDevice *dev)
-+static void pci_unin_agp_init(Object *obj)
- {
--    PCIHostState *h;
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    PCIHostState *h = PCI_HOST_BRIDGE(obj);
- 
-     /* Uninorth AGP bus */
--    h = PCI_HOST_BRIDGE(dev);
--
-     memory_region_init_io(&h->conf_mem, OBJECT(h), &pci_host_conf_le_ops,
--                          dev, "pci-conf-idx", 0x1000);
-+                          obj, "pci-conf-idx", 0x1000);
-     memory_region_init_io(&h->data_mem, OBJECT(h), &pci_host_data_le_ops,
--                          dev, "pci-conf-data", 0x1000);
--    sysbus_init_mmio(dev, &h->conf_mem);
--    sysbus_init_mmio(dev, &h->data_mem);
--    return 0;
-+                          obj, "pci-conf-data", 0x1000);
-+    sysbus_init_mmio(sbd, &h->conf_mem);
-+    sysbus_init_mmio(sbd, &h->data_mem);
- }
- 
--static int pci_unin_internal_init_device(SysBusDevice *dev)
-+static void pci_unin_internal_init(Object *obj)
- {
--    PCIHostState *h;
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    PCIHostState *h = PCI_HOST_BRIDGE(obj);
- 
-     /* Uninorth internal bus */
--    h = PCI_HOST_BRIDGE(dev);
--
-     memory_region_init_io(&h->conf_mem, OBJECT(h), &pci_host_conf_le_ops,
--                          dev, "pci-conf-idx", 0x1000);
-+                          obj, "pci-conf-idx", 0x1000);
-     memory_region_init_io(&h->data_mem, OBJECT(h), &pci_host_data_le_ops,
--                          dev, "pci-conf-data", 0x1000);
--    sysbus_init_mmio(dev, &h->conf_mem);
--    sysbus_init_mmio(dev, &h->data_mem);
--    return 0;
-+                          obj, "pci-conf-data", 0x1000);
-+    sysbus_init_mmio(sbd, &h->conf_mem);
-+    sysbus_init_mmio(sbd, &h->data_mem);
- }
- 
- PCIBus *pci_pmac_init(qemu_irq *pic,
-@@ -461,10 +450,8 @@ static const TypeInfo unin_internal_pci_host_info = {
- 
- static void pci_unin_main_class_init(ObjectClass *klass, void *data)
- {
--    SysBusDeviceClass *sbc = SYS_BUS_DEVICE_CLASS(klass);
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
--    sbc->init = pci_unin_main_init_device;
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
- }
- 
-@@ -472,15 +459,14 @@ static const TypeInfo pci_unin_main_info = {
-     .name          = TYPE_UNI_NORTH_PCI_HOST_BRIDGE,
-     .parent        = TYPE_PCI_HOST_BRIDGE,
-     .instance_size = sizeof(UNINState),
-+    .instance_init = pci_unin_main_init,
-     .class_init    = pci_unin_main_class_init,
- };
- 
- static void pci_u3_agp_class_init(ObjectClass *klass, void *data)
- {
--    SysBusDeviceClass *sbc = SYS_BUS_DEVICE_CLASS(klass);
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
--    sbc->init = pci_u3_agp_init_device;
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
- }
- 
-@@ -488,15 +474,14 @@ static const TypeInfo pci_u3_agp_info = {
-     .name          = TYPE_U3_AGP_HOST_BRIDGE,
-     .parent        = TYPE_PCI_HOST_BRIDGE,
-     .instance_size = sizeof(UNINState),
-+    .instance_init = pci_u3_agp_init,
-     .class_init    = pci_u3_agp_class_init,
- };
- 
- static void pci_unin_agp_class_init(ObjectClass *klass, void *data)
- {
--    SysBusDeviceClass *sbc = SYS_BUS_DEVICE_CLASS(klass);
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
--    sbc->init = pci_unin_agp_init_device;
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
- }
- 
-@@ -504,15 +489,14 @@ static const TypeInfo pci_unin_agp_info = {
-     .name          = TYPE_UNI_NORTH_AGP_HOST_BRIDGE,
-     .parent        = TYPE_PCI_HOST_BRIDGE,
-     .instance_size = sizeof(UNINState),
-+    .instance_init = pci_unin_agp_init,
-     .class_init    = pci_unin_agp_class_init,
- };
- 
- static void pci_unin_internal_class_init(ObjectClass *klass, void *data)
- {
--    SysBusDeviceClass *sbc = SYS_BUS_DEVICE_CLASS(klass);
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
--    sbc->init = pci_unin_internal_init_device;
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
- }
- 
-@@ -520,6 +504,7 @@ static const TypeInfo pci_unin_internal_info = {
-     .name          = TYPE_UNI_NORTH_INTERNAL_PCI_HOST_BRIDGE,
-     .parent        = TYPE_PCI_HOST_BRIDGE,
-     .instance_size = sizeof(UNINState),
-+    .instance_init = pci_unin_internal_init,
-     .class_init    = pci_unin_internal_class_init,
- };
+     pci_bus = PCI_HOST_BRIDGE(dev)->bus;
  
 -- 
 2.14.3
