@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59216)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fC7IA-0004VZ-Ed
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 13:36:19 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fC7IB-0004WH-5y
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 13:36:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fC7I9-0007uK-IC
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 13:36:18 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fC7IA-0007up-9F
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 13:36:19 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 27 Apr 2018 18:36:11 +0100
-Message-Id: <20180427173611.10281-3-peter.maydell@linaro.org>
+Date: Fri, 27 Apr 2018 18:36:10 +0100
+Message-Id: <20180427173611.10281-2-peter.maydell@linaro.org>
 In-Reply-To: <20180427173611.10281-1-peter.maydell@linaro.org>
 References: <20180427173611.10281-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 2/2] hw/net/smc91c111: Convert away from
- old_mmio
+Subject: [Qemu-devel] [PATCH 1/2] hw/usb/tusb6010: Convert away from old_mmio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,87 +22,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-Convert the smc91c111 device away from using the old_mmio field of
-MemoryRegionOps. This device is used by several Arm board models.
+Convert the tusb6010 device away from using the old_mmio field
+of MemoryRegionOps. This device is used only in the n800 and n810
+boards.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/net/smc91c111.c | 54 +++++++++++++++++++++-------------------------
- 1 file changed, 25 insertions(+), 29 deletions(-)
+ hw/usb/tusb6010.c | 40 ++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 36 insertions(+), 4 deletions(-)
 
-diff --git a/hw/net/smc91c111.c b/hw/net/smc91c111.c
-index 3b16dcf5a1..c8cc5379b7 100644
---- a/hw/net/smc91c111.c
-+++ b/hw/net/smc91c111.c
-@@ -625,37 +625,33 @@ static uint32_t smc91c111_readb(void *opaque, hwaddr offset)
-     return 0;
+diff --git a/hw/usb/tusb6010.c b/hw/usb/tusb6010.c
+index 2662c060ed..a2128024c1 100644
+--- a/hw/usb/tusb6010.c
++++ b/hw/usb/tusb6010.c
+@@ -641,11 +641,43 @@ static void tusb_async_writew(void *opaque, hwaddr addr,
+     }
  }
  
--static void smc91c111_writew(void *opaque, hwaddr offset,
--                             uint32_t value)
-+static uint64_t smc91c111_readfn(void *opaque, hwaddr addr, unsigned size)
- {
--    smc91c111_writeb(opaque, offset, value & 0xff);
--    smc91c111_writeb(opaque, offset + 1, value >> 8);
-+    int i;
-+    uint32_t val = 0;
-+
-+    for (i = 0; i < size; i++) {
-+        val |= smc91c111_readb(opaque, addr + i) << (i * 8);
++static uint64_t tusb_async_readfn(void *opaque, hwaddr addr, unsigned size)
++{
++    switch (size) {
++    case 1:
++        return tusb_async_readb(opaque, addr);
++    case 2:
++        return tusb_async_readh(opaque, addr);
++    case 4:
++        return tusb_async_readw(opaque, addr);
++    default:
++        g_assert_not_reached();
 +    }
-+    return val;
- }
- 
--static void smc91c111_writel(void *opaque, hwaddr offset,
--                             uint32_t value)
-+static void smc91c111_writefn(void *opaque, hwaddr addr,
++}
++
++static void tusb_async_writefn(void *opaque, hwaddr addr,
 +                               uint64_t value, unsigned size)
- {
-+    int i = 0;
++{
++    switch (size) {
++    case 1:
++        tusb_async_writeb(opaque, addr, value);
++        break;
++    case 2:
++        tusb_async_writeh(opaque, addr, value);
++        break;
++    case 4:
++        tusb_async_writew(opaque, addr, value);
++        break;
++    default:
++        g_assert_not_reached();
++    }
++}
 +
-     /* 32-bit writes to offset 0xc only actually write to the bank select
--       register (offset 0xe)  */
--    if (offset != 0xc)
--        smc91c111_writew(opaque, offset, value & 0xffff);
--    smc91c111_writew(opaque, offset + 2, value >> 16);
--}
-+     * register (offset 0xe), so skip the first two bytes we would write.
-+     */
-+    if (addr == 0xc && size == 4) {
-+        i += 2;
-+    }
- 
--static uint32_t smc91c111_readw(void *opaque, hwaddr offset)
--{
--    uint32_t val;
--    val = smc91c111_readb(opaque, offset);
--    val |= smc91c111_readb(opaque, offset + 1) << 8;
--    return val;
--}
--
--static uint32_t smc91c111_readl(void *opaque, hwaddr offset)
--{
--    uint32_t val;
--    val = smc91c111_readw(opaque, offset);
--    val |= smc91c111_readw(opaque, offset + 2) << 16;
--    return val;
-+    for (; i < size; i++) {
-+        smc91c111_writeb(opaque, addr + i,
-+                         extract32(value, i * 8, 8));
-+    }
- }
- 
- static int smc91c111_can_receive_nc(NetClientState *nc)
-@@ -747,10 +743,10 @@ static const MemoryRegionOps smc91c111_mem_ops = {
-     /* The special case for 32 bit writes to 0xc means we can't just
-      * set .impl.min/max_access_size to 1, unfortunately
-      */
+ static const MemoryRegionOps tusb_async_ops = {
 -    .old_mmio = {
--        .read = { smc91c111_readb, smc91c111_readw, smc91c111_readl, },
--        .write = { smc91c111_writeb, smc91c111_writew, smc91c111_writel, },
+-        .read = { tusb_async_readb, tusb_async_readh, tusb_async_readw, },
+-        .write =  { tusb_async_writeb, tusb_async_writeh, tusb_async_writew, },
 -    },
-+    .read = smc91c111_readfn,
-+    .write = smc91c111_writefn,
++    .read = tusb_async_readfn,
++    .write = tusb_async_writefn,
 +    .valid.min_access_size = 1,
 +    .valid.max_access_size = 4,
      .endianness = DEVICE_NATIVE_ENDIAN,
