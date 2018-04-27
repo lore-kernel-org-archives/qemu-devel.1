@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fC4xF-0002ME-V0
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 11:06:35 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fC4xH-0002NR-QB
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 11:06:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fC4xE-0003S0-7t
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 11:06:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34378 helo=mx1.redhat.com)
+	(envelope-from <imammedo@redhat.com>) id 1fC4xD-0003RH-NA
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 11:06:35 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34382 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fC4xE-0003NZ-31
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 11:06:32 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fC4xD-0003R0-JH
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 11:06:31 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 683C38182D05
-	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 15:06:23 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3CAB081A88BC
+	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 15:06:31 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Fri, 27 Apr 2018 17:05:13 +0200
-Message-Id: <1524841523-95513-2-git-send-email-imammedo@redhat.com>
+Date: Fri, 27 Apr 2018 17:05:20 +0200
+Message-Id: <1524841523-95513-9-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1524841523-95513-1-git-send-email-imammedo@redhat.com>
 References: <1524841523-95513-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 01/11] numa: postpone options
- post-processing till machine_run_board_init()
+Subject: [Qemu-devel] [PATCH v6 08/11] tests: extend qmp test with preconfig
+ checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,92 +33,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, ehabkost@redhat.com, pkrempa@redhat.com, armbru@redhat.com
 
-in preparation for numa options to being handled via QMP before
-machine_run_board_init(), move final numa configuration checks
-and processing to machine_run_board_init() so it could take into
-account both CLI (via parse_numa_opts()) and QMP input
+Add permission checks for commands at 'preconfig' stage.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-v2:
-  - remove duplicate qemu_opts_foreach() in numa_complete_configuration()
-    that was causing non explicitly IDed node "-numa node" parsed twice.
+v6:
+  * replace 'cont' with 'exit-preconfig' command
+v5:
+  * s/-preconfig/--preconfig/
+v4:
+  * s/is_err()/qmp_rsp_is_err()/
+  * return true even if 'error' doesn't contain 'desc'
+    (Eric Blake <eblake@redhat.com>)
 ---
- include/sysemu/numa.h |  1 +
- hw/core/machine.c     |  5 +++--
- numa.c                | 13 ++++++++-----
- 3 files changed, 12 insertions(+), 7 deletions(-)
+ tests/qmp-test.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
 
-diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-index d99e547..21713b7 100644
---- a/include/sysemu/numa.h
-+++ b/include/sysemu/numa.h
-@@ -23,6 +23,7 @@ struct NumaNodeMem {
- 
- extern NodeInfo numa_info[MAX_NODES];
- void parse_numa_opts(MachineState *ms);
-+void numa_complete_configuration(MachineState *ms);
- void query_numa_node_mem(NumaNodeMem node_mem[]);
- extern QemuOptsList qemu_numa_opts;
- void numa_legacy_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 2040177..617e5f8 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -737,7 +737,7 @@ static char *cpu_slot_to_string(const CPUArchId *cpu)
-     return g_string_free(s, false);
- }
- 
--static void machine_numa_finish_init(MachineState *machine)
-+static void machine_numa_finish_cpu_init(MachineState *machine)
- {
-     int i;
-     bool default_mapping;
-@@ -792,7 +792,8 @@ void machine_run_board_init(MachineState *machine)
-     MachineClass *machine_class = MACHINE_GET_CLASS(machine);
- 
-     if (nb_numa_nodes) {
--        machine_numa_finish_init(machine);
-+        numa_complete_configuration(machine);
-+        machine_numa_finish_cpu_init(machine);
-     }
- 
-     /* If the machine supports the valid_cpu_types check and the user
-diff --git a/numa.c b/numa.c
-index 78a869e..d0abd7c 100644
---- a/numa.c
-+++ b/numa.c
-@@ -338,15 +338,11 @@ void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
-     nodes[i].node_mem = size - usedmem;
- }
- 
--void parse_numa_opts(MachineState *ms)
-+void numa_complete_configuration(MachineState *ms)
- {
-     int i;
-     MachineClass *mc = MACHINE_GET_CLASS(ms);
- 
--    if (qemu_opts_foreach(qemu_find_opts("numa"), parse_numa, ms, NULL)) {
--        exit(1);
--    }
--
-     /*
-      * If memory hotplug is enabled (slots > 0) but without '-numa'
-      * options explicitly on CLI, guestes will break.
-@@ -433,6 +429,13 @@ void parse_numa_opts(MachineState *ms)
+diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+index 772058f..c49837a 100644
+--- a/tests/qmp-test.c
++++ b/tests/qmp-test.c
+@@ -392,6 +392,49 @@ static void add_query_tests(QmpSchema *schema)
      }
  }
  
-+void parse_numa_opts(MachineState *ms)
++static bool qmp_rsp_is_err(QDict *rsp)
 +{
-+    if (qemu_opts_foreach(qemu_find_opts("numa"), parse_numa, ms, NULL)) {
-+        exit(1);
-+    }
++    QDict *error = qdict_get_qdict(rsp, "error");
++    QDECREF(rsp);
++    return !!error;
 +}
 +
- void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **errp)
++static void test_qmp_preconfig(void)
++{
++    QDict *rsp, *ret;
++    QTestState *qs = qtest_startf("%s --preconfig", common_args);
++
++    /* preconfig state */
++    /* enabled commands, no error expected  */
++    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'query-commands' }")));
++
++    /* forbidden commands, expected error */
++    g_assert(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'query-cpus' }")));
++
++    /* check that query-status returns preconfig state */
++    rsp = qtest_qmp(qs, "{ 'execute': 'query-status' }");
++    ret = qdict_get_qdict(rsp, "return");
++    g_assert(ret);
++    g_assert_cmpstr(qdict_get_try_str(ret, "status"), ==, "preconfig");
++    QDECREF(rsp);
++
++    /* exit preconfig state */
++    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'exit-preconfig' }")));
++    qtest_qmp_eventwait(qs, "RESUME");
++
++    /* check that query-status returns running state */
++    rsp = qtest_qmp(qs, "{ 'execute': 'query-status' }");
++    ret = qdict_get_qdict(rsp, "return");
++    g_assert(ret);
++    g_assert_cmpstr(qdict_get_try_str(ret, "status"), ==, "running");
++    QDECREF(rsp);
++
++    /* enabled commands, no error expected  */
++    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'query-cpus' }")));
++
++    qtest_quit(qs);
++}
++
+ int main(int argc, char *argv[])
  {
-     int node_id = object_property_get_int(OBJECT(dev), "node-id", &error_abort);
+     QmpSchema schema;
+@@ -403,6 +446,7 @@ int main(int argc, char *argv[])
+     qtest_add_func("qmp/oob", test_qmp_oob);
+     qmp_schema_init(&schema);
+     add_query_tests(&schema);
++    qtest_add_func("qmp/preconfig", test_qmp_preconfig);
+ 
+     ret = g_test_run();
+ 
 -- 
 2.7.4
