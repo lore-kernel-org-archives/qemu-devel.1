@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fC2tI-00072o-E3
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:54:21 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fC30X-0001kf-US
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 09:01:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fC2tH-0000zH-Cw
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:54:20 -0400
-Received: from mail-oi0-x235.google.com ([2607:f8b0:4003:c06::235]:44551)
+	(envelope-from <peter.maydell@linaro.org>) id 1fC30U-0005pw-2h
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 09:01:50 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:38273)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fC2tH-0000z7-8L
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:54:19 -0400
-Received: by mail-oi0-x235.google.com with SMTP id e80-v6so1455757oig.11
-	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 05:54:19 -0700 (PDT)
+	id 1fC30T-0005pg-UK
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 09:01:46 -0400
+Received: by mail-ot0-x243.google.com with SMTP id j27-v6so1916855ota.5
+	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 06:01:45 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1520945798-50640-23-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1520945798-50640-11-git-send-email-pbonzini@redhat.com>
 References: <1520945798-50640-1-git-send-email-pbonzini@redhat.com>
-	<1520945798-50640-23-git-send-email-pbonzini@redhat.com>
+	<1520945798-50640-11-git-send-email-pbonzini@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 27 Apr 2018 13:53:57 +0100
-Message-ID: <CAFEAcA_Gne1c4+D75BBNuHMV8UQaqbzpJC+z6qkcYApH7iGUrg@mail.gmail.com>
+Date: Fri, 27 Apr 2018 14:01:24 +0100
+Message-ID: <CAFEAcA8AAJK+oMyhY9QGSR4-i0FT3QhHNGF+L_gMmYP6BeM8-g@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 22/22] sev/i386: add sev_get_capabilities()
+Subject: Re: [Qemu-devel] [PULL 10/22] sev/i386: add command to initialize
+ the memory encryption context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,57 +36,59 @@ Cc: QEMU Developers <qemu-devel@nongnu.org>, Brijesh Singh <brijesh.singh@amd.co
 On 13 March 2018 at 12:56, Paolo Bonzini <pbonzini@redhat.com> wrote:
 > From: Brijesh Singh <brijesh.singh@amd.com>
 >
-> The function can be used to get the current SEV capabilities.
-> The capabilities include platform diffie-hellman key (pdh) and certificate
-> chain. The key can be provided to the external entities which wants to
-> establish a trusted channel between SEV firmware and guest owner.
+> When memory encryption is enabled, KVM_SEV_INIT command is used to
+> initialize the platform. The command loads the SEV related persistent
+> data from non-volatile storage and initializes the platform context.
+> This command should be first issued before invoking any other guest
+> commands provided by the SEV firmware.
 
-Hi; Coverity points out a resource leak in this function.
+Hi; Coverity points out a memory leak in this code
+(CID 1390613):
 
-> +SevCapability *
-> +sev_get_capabilities(void)
+> +void *
+> +sev_guest_init(const char *id)
 > +{
-> +    SevCapability *cap;
-> +    guchar *pdh_data, *cert_chain_data;
-> +    size_t pdh_len = 0, cert_chain_len = 0;
+> +    SEVState *s;
+> +    char *devname;
+> +    int ret, fw_error;
 > +    uint32_t ebx;
-> +    int fd;
+> +    uint32_t host_cbitpos;
+> +    struct sev_user_data_status status = {};
 > +
-> +    fd = open(DEFAULT_SEV_DEVICE, O_RDWR);
-> +    if (fd < 0) {
-> +        error_report("%s: Failed to open %s '%s'", __func__,
-> +                     DEFAULT_SEV_DEVICE, strerror(errno));
-> +        return NULL;
+> +    s = g_new0(SEVState, 1);
+
+Here we allocate memory into 's'...
+
+> +    s->sev_info = lookup_sev_guest_info(id);
+> +    if (!s->sev_info) {
+> +        error_report("%s: '%s' is not a valid '%s' object",
+> +                     __func__, id, TYPE_QSEV_GUEST_INFO);
+> +        goto err;
+
+...and this error-exit path will not free it because
+it does g_free(sev_state), not g_free(s).
+
 > +    }
 > +
-> +    if (sev_get_pdh_info(fd, &pdh_data, &pdh_len,
-> +                         &cert_chain_data, &cert_chain_len)) {
-> +        return NULL;
+> +    sev_state = s;
+> +    s->state = SEV_STATE_UNINIT;
 
-CID 1390570 says that in this error-return path we leak
-fd(), because we never close it.
+[...]
 
-> +    }
-> +
-> +    cap = g_new0(SevCapability, 1);
-> +    cap->pdh = g_base64_encode(pdh_data, pdh_len);
-> +    cap->cert_chain = g_base64_encode(cert_chain_data, cert_chain_len);
-> +
-> +    host_cpuid(0x8000001F, 0, NULL, &ebx, NULL, NULL);
-> +    cap->cbitpos = ebx & 0x3f;
-> +
-> +    /*
-> +     * When SEV feature is enabled, we loose one bit in guest physical
-> +     * addressing.
-> +     */
-> +    cap->reduced_phys_bits = 1;
-> +
-> +    g_free(pdh_data);
-> +    g_free(cert_chain_data);
-> +
-> +    close(fd);
-> +    return cap;
+> +err:
+> +    g_free(sev_state);
+> +    sev_state = NULL;
+> +    return NULL;
 > +}
+
+The simplest fix is probably to move the 'sev_state = s;
+s->state = SEV_STATE_UNINIT;' assignments to earlier in the
+function.
+
+Cleaner might be to ensure that nothing in the rest of
+the function depends on sev_state being initialized,
+and then to work purely with 's' and only set sev_state
+to s just before returning success.
 
 thanks
 -- PMM
