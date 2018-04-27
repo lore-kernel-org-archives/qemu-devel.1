@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49987)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wenchao.wang@linux.intel.com>) id 1fBu8v-0001Zf-V7
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 23:33:55 -0400
+	(envelope-from <thuth@redhat.com>) id 1fBuJw-0005BJ-V6
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 23:45:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wenchao.wang@linux.intel.com>) id 1fBu8s-0005yx-Qk
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 23:33:53 -0400
-Received: from mga05.intel.com ([192.55.52.43]:18377)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wenchao.wang@linux.intel.com>)
-	id 1fBu8s-0005vg-Eo
-	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 23:33:50 -0400
-References: <2adfc981-9587-3b41-fcb9-f661c71f51c2@linux.intel.com>
-	<DM5PR21MB0170B7D8E14270FF25868E23B68E0@DM5PR21MB0170.namprd21.prod.outlook.com>
-From: Wang Wenchao <wenchao.wang@linux.intel.com>
-Message-ID: <93092163-1199-28ff-6579-76e5ad8f1fc8@linux.intel.com>
-Date: Fri, 27 Apr 2018 11:33:42 +0800
+	(envelope-from <thuth@redhat.com>) id 1fBuJw-00050T-4J
+	for qemu-devel@nongnu.org; Thu, 26 Apr 2018 23:45:16 -0400
+References: <1521452376-25099-1-git-send-email-thuth@redhat.com>
+	<87in8qf2w3.fsf@dusky.pond.sub.org>
+	<62dba5cf-b497-1a98-0af5-971e169a3458@redhat.com>
+	<877eou2nek.fsf@dusky.pond.sub.org>
+	<20180427003414.GV29865@localhost.localdomain>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <9fb0acdb-b1a5-c3e1-dd3d-db42af71f62f@redhat.com>
+Date: Fri, 27 Apr 2018 05:45:01 +0200
 MIME-Version: 1.0
-In-Reply-To: <DM5PR21MB0170B7D8E14270FF25868E23B68E0@DM5PR21MB0170.namprd21.prod.outlook.com>
+In-Reply-To: <20180427003414.GV29865@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] Cannot launch QEMU with -accel whpx
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH] tests/device-introspect: Test devices
+ with all machines, not only with "none"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,81 +28,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Justin Terry (VM)" <juterry@microsoft.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Hi, Justin,
+On 27.04.2018 02:34, Eduardo Habkost wrote:
+> On Thu, Apr 26, 2018 at 01:54:43PM +0200, Markus Armbruster wrote:
+>> Thomas Huth <thuth@redhat.com> writes:
+>>
+>>> On 17.04.2018 14:12, Markus Armbruster wrote:
+>>>> Thomas Huth <thuth@redhat.com> writes:
+>>>>
+>>>>> Many device introspection crashes only happen if you are using a
+>>>>> certain machine, e.g.:
+>>>>>
+>>>>> $ ppc-softmmu/qemu-system-ppc -S -M ref405ep,accel=qtest -qmp stdio
+>>>>> {"QMP": {"version": {"qemu": {"micro": 50, "minor": 11, "major": 2},
+>>>>>  "package": "build-all"}, "capabilities": []}}
+>>>>> { 'execute': 'qmp_capabilities' }
+>>>>> {"return": {}}
+>>>>> { 'execute': 'device-list-properties',
+>>>>>   'arguments': {'typename': 'macio-newworld'}}
+>>>>> Unexpected error in qemu_chr_fe_init() at chardev/char-fe.c:222:
+>>>>> Device 'serial0' is in use
+>>>>> Aborted (core dumped)
+>>>>>
+>>>>> To be able to catch these problems, let's extend the device-introspect
+>>>>> test to check the devices on all machine types. Since this is a rather
+>>>>> slow operation, the test is only run in "SPEED=slow" mode.
+>>>>
+>>>> If the device works with one machine type, it has a decent chance to
+>>>> work with others, too.  Thus, testing each device with every machine
+>>>> type is overkill.  I appreciate having overkill as an option :)
+>>>>
+>>>> What I'd like to see for a quick "make check" is testing each device
+>>>> once.  That should flush out most bugs.  
+>>>
+>>> That's already done with the "none" machine.
+>>
+>> I was too terse.  We test each device with -machine none for every
+>> target.  Fine if that's quick enough.  If not, we might want to reduce
+>> redundancy there.
+>>
+>> Actually, a worse offender in the "waste everybody's time via redunancy"
+>> department could be qom-test.
+>>
+>>> Anyway, do you think my patch here is useful and has a chance of getting
+>>> included? I.e. shall I re-spin this as a non-RFC patch? Or shall we
+>>> rather wait for Eduardo's python-based tests to get included into the
+>>> repository?
+>>
+>> I don't mind having make check SPEED=slow run more extensive tests.
+>> Assuming we actually run them at least once in a while, which seems
+>> doubtful.
+> 
+> The infrastructure for Python-based tests might take a while to
+> be included, as I'm busy with other stuff right now.  I wouldn't
+> mind including this patch, as long as you don't mind seeing it
+> deleted after we reimplement it in Python.
 
-That hits the issue. QEMU can be launched with WHPX enabling. Great 
-thanks for your reply.
+Fine for me.
 
-
-Best Regards,
-Wenchao
-
-On 4/27/2018 2:06, Justin Terry (VM) wrote:
->
-> Hey Wenchao,
->
-> It looks like your specs should fully support running this. Did you by 
-> chance forget to enable the Windows optional feature? Having the 
-> lib/dll’s from the SDK isn’t all you need.
->
-> Try:
->
-> (admin) PS> Enable-WindowsOptionalFeature -Online -FeatureName 
-> HypervisorPlatform
->
-> (reboot the machine)
->
-> > qemu-system-x86_64.exe -accel whpx …
->
-> Let me know if that wasn’t the issue.
->
-> Thanks,
->
-> Justin
->
-> *From:*Wang Wenchao <wenchao.wang@linux.intel.com>
-> *Sent:* Thursday, April 26, 2018 3:47 AM
-> *To:* Justin Terry (VM) <juterry@microsoft.com>
-> *Cc:* qemu-devel@nongnu.org
-> *Subject:* Cannot launch QEMU with -accel whpx
->
-> Hi, Justin,
->
-> We are interested in WHPX but haven't got it to work. We were able to 
-> build QEMU with WHPX support. We used MSYS2 build environment plus two 
-> libraries (WinHv*.lib) from the latest Windows 10 SDK Insider Preview 
-> to build QEMU and added '--enable-whpx' parameter in config. But when 
-> we ran it on Windows with Hyper-V on, QEMU failed to be launched.
->
-> The command to launch QEMU is as below,
->
-> > qemu-system-x86_64.exe -accel whpx
->
-> The following errors were output from the command line,
->
-> qemu-system-x86_64.exe: WHPX: No accelerator found, hr=00000000
-> qemu-system-x86_64.exe: failed to initialize WHPX: No space left on device
->
-> We analyzed the issue and found when invoking the Windows Hypervisor 
-> Platform API WHvGetCapability(), it returned 
-> whpx_cap.HypervisorPresent with FALSE and then WHPX failed to 
-> initialize. Do you have any suggestion on that? Thanks.
->
-> We build and run QEMU on the same machine. Below are its specs,
->
-> Windows OS: Windows 10 Insider Preview
-> Windows edition: Professional
-> Windows version: 1803 (OS build 17133.1)
-> SDK version: 10.0.17125.0
->
-> Processor: Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz 1.99GHz
-> RAM: 8.00 GB
-> System Type: 64-bit Operating System, x64-based processor
->
->
-> Best Regards,
-> Wenchao
->
+ Thomas
