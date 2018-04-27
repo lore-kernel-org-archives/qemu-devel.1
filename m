@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fBuyz-0006W7-FS
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 00:27:42 -0400
+	(envelope-from <mjc@sifive.com>) id 1fBvV8-00053D-Rx
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 01:00:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fBuyy-0006ab-8u
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 00:27:41 -0400
-Date: Fri, 27 Apr 2018 00:27:22 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180427042722.GY12302@localhost.localdomain>
-References: <20180405170619.20480-1-kwolf@redhat.com>
-	<87d0ywv9j0.fsf@dusky.pond.sub.org>
-	<20180418162823.GH4971@localhost.localdomain>
-	<87fu3qx7qx.fsf@dusky.pond.sub.org>
-	<20180424182621.GX12302@localhost.localdomain>
-	<20180425075019.GA4652@localhost.localdomain>
+	(envelope-from <mjc@sifive.com>) id 1fBvV7-0002wk-OP
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 01:00:54 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:44928)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fBvV7-0002wb-J9
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 01:00:53 -0400
+Received: by mail-ot0-x243.google.com with SMTP id g7-v6so682388otj.11
+	for <qemu-devel@nongnu.org>; Thu, 26 Apr 2018 22:00:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180425075019.GA4652@localhost.localdomain>
-Subject: Re: [Qemu-devel] [RFC][BROKEN] rbd: Allow configuration of
- authentication scheme
+In-Reply-To: <4e30b71b-7007-d879-d1c4-12eeb94ed6c5@linaro.org>
+References: <1524699938-6764-1-git-send-email-mjc@sifive.com>
+	<CAHNT7NsVNohpxfic=A30oAufaygPWFp1BoT+PUTcgPyhaVif6g@mail.gmail.com>
+	<CAHNT7NtRi4qwqpR+SuU-ANXHEAAkp6TitkWFroJ54GsJowTXNg@mail.gmail.com>
+	<CAKmqyKMtO5JQ7GnpKU9E_MGeDRGHsb=c0ra0CnGX8vxKtKsunQ@mail.gmail.com>
+	<4e30b71b-7007-d879-d1c4-12eeb94ed6c5@linaro.org>
+From: Michael Clark <mjc@sifive.com>
+Date: Fri, 27 Apr 2018 17:00:52 +1200
+Message-ID: <CAHNT7Nu2nfNeavnifS-Jv+3gH2iKVf1JKhPoG00RHsgQDs0R8A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v8 00/35] QEMU 2.13 Privileged ISA
+ emulation updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,111 +32,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, jdurgin@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: Alistair Francis <alistair23@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Su Hang <suhang16@mails.ucas.ac.cn>, Matthew Suozzo <msuozzo@google.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, "Emilio G. Cota" <cota@braap.org>, Alistair Francis <Alistair.Francis@wdc.com>, RISC-V Patches <patches@groups.riscv.org>
 
-On Wed, Apr 25, 2018 at 09:50:19AM +0200, Kevin Wolf wrote:
-> Am 24.04.2018 um 20:26 hat Jeff Cody geschrieben:
-> > On Fri, Apr 20, 2018 at 04:39:02PM +0200, Markus Armbruster wrote:
-> > > >> Ways to avoid the troublesome auth-cephx: {}:
-> > > >> 
-> > > >> (A) Make auth-cephx a bool, rely on the other ways to provide the key
-> > > >> 
-> > > >> (B) Make auth-cephx a bool and add the @key-secret member next to it
-> > > >> 
-> > > >>     Like @user, the member is meaningless with auth-none.
-> > > >> 
-> > > >> (C) Make auth-cephx.key-secret a mandatory StrOrNull
-> > > >> 
-> > > >>     Should take care of "vanishes on flattening" problem, but dotted key
-> > > >>     syntax is still screwed: since any value is a valid string, there's
-> > > >>     none left for null.  My take would be that if you want to say
-> > > >>     auth-cephx.key-secret: {}, you get to say it in JSON.
-> > > >> 
-> > > >>     Aside: check_alternate() tries to catch such alternates, but we
-> > > >>     failed to update it when we added first class null.  *sigh*
-> > > >> 
-> > > >> Which one do you hate least?
-> > > >
-> > > > What should happen with null when you stringify it? If we want to take
-> > > > the options QDict, stringify all entries and run them through the keyval
-> > > > visitor, I'm almost sure that null will be lost.
-> > > 
-> > > For the stringify idea to work, the keyval visitor needs to map the
-> > > string right back to the original value.
-> > > 
-> > > The keyval visitor currently requires the value to be null, not a
-> > > string.
-> > > 
-> > > Therefore, the stringify operation must leave null alone.  Not pretty,
-> > > but works.
-> 
-> Okay, I didn't know that the keyval visitor has any way to specify null.
-> It doesn't really matter what the exact representation is as long as we
-> can generate it. So sure, that's workable then.
-> 
-> > > You might ask why not change the keyval visitor instead so it expects ""
-> > > rather than null.  That's no good, because it makes StrOrNull ambiguous.
-> > > 
-> > > keyval.c can only create string scalars.  I think "use JSON if you want
-> > > to specify null" is still good enough.  We can make keyval.c more
-> > > expressive if we need to, but (1) I don't think we should block this
-> > > work on it, and (2) see "hairy" above.
-> > > 
-> > > > So (A) doesn't work unless we can specify what "other ways" are that are
-> > > > acceptable for libvirt,
-> > > 
-> > > Yes.
-> > > 
-> > > >                         and (C) probably doesn't play well with b. above
-> > > > (the qdict_stringify_entries() for handling mixed type QDicts).
-> > > 
-> > > I think it could be done, and tried to sketch how.
-> > > 
-> > > > Looks like only (B) is left as viable, so that's automatically the one I
-> > > > hate least of these. If we can fix the problems, I think I'd prefer (C),
-> > > > though.
-> > > 
-> > > I could accept (B), in particular since it mirrors existing @user.
-> 
-> I don't like (B) much because it adds additional rules which options
-> must, may or can be present depending on the presence or value of other
-> options. This kind of dependencies should be visible in the schema with
-> nested structs and unions, and checked for consistency by QAPI, rather
-> than being checked individually in .bdrv_open() implementations.
-> 
-> As for @user, you had sources to confirm that it is indeed irrelevant
-> for 'none', so I'd rather do the opposite thing and move it to
-> RbdAuthCephx.
-> 
-> > > I'm happy to help with exploring (C).
-> > > 
-> > > What's the next step?
-> > 
-> > My preference is (B).  Primarily because I don't like the idea of breaking
-> > dotted key syntax for null keys.  I'd rather see something more verbose like
-> > (B), that can still be navigated correctly both ways.
-> 
-> Yes, it's not perfect, but it doesn't make any functionality unavailable
-> because you can always using JSON, even on the command line. Dotted
-> syntax is nicer for manual use, but in this specific case I think null
-> will be the default, so there is no need to specify it explicitly
-> anyway - neither with dotted key syntax nor with JSON.
-> 
+On Fri, Apr 27, 2018 at 12:35 PM, Richard Henderson <
+richard.henderson@linaro.org> wrote:
 
-Good point on the default case, that essentially negates my concerns.
-
-> I prefer slightly unwieldy command line syntax to getting the internally
-> used data types wrong (= hard to use correctly).
-> 
-
-Fair enough.
-
-> > How about I put together a patch with (B) for an RFC v2?
-> 
-> How about doing the same with (C) and moving @user? :-)
+> On 04/26/2018 08:22 AM, Alistair Francis wrote:
+> > On Wed, Apr 25, 2018 at 7:01 PM Michael Clark <mjc@sifive.com> wrote:
+> >> We can make a PR for the first 9 patches as they are already reviewed,
+> >> however, the with this series is to gather review for the new baseline
+> we
+> >> have in the riscv repo.
+> >
+> > I think it is worth sending a PR for the first 9 patches. The current
+> > master doesn't boot the sifive_u board and those patches will fix that.
+> > That also helps create a smaller patch series which is easier to review.
+>
+> FYI, for patches that affect usability like this, you should also Cc:
+> qemu-stable@nongnu.org in your pull request.  That way they should be
+> cherry-picked from master into the 2.12.1 release.
 >
 
-Sounds like a plan!
-
--Jeff
+Ok I will. Thanks.
