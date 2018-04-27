@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBzsK-0002QY-0I
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:41:09 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBzsI-0003zk-KU
+	(envelope-from <thuth@redhat.com>) id 1fBzsJ-0002Pi-Cp
 	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:41:08 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <thuth@redhat.com>) id 1fBzsI-0003z6-9r
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:41:07 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Fri, 27 Apr 2018 11:40:44 +0200
-Message-Id: <1524822046-22779-3-git-send-email-thuth@redhat.com>
+Date: Fri, 27 Apr 2018 11:40:45 +0200
+Message-Id: <1524822046-22779-4-git-send-email-thuth@redhat.com>
 In-Reply-To: <1524822046-22779-1-git-send-email-thuth@redhat.com>
 References: <1524822046-22779-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 2/4] tests/cdrom-test: Test booting from
- CD-ROM ISO image file
+Subject: [Qemu-devel] [PATCH v3 3/4] tests/cdrom-test: Test that -cdrom
+ parameter is working
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,10 +26,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 Cc: qemu-block@nongnu.org
 
-We already have the code for a boot file in tests/boot-sector.c,
-so if the genisoimage program is available, we can easily create
-a bootable CD ISO image that we can use for testing whether our
-CD-ROM emulation and the BIOS CD-ROM boot works correctly.
+Commit 1454509726719e0933c800 recently broke the "-cdrom" parameter
+on a couple of boards without us noticing it immediately. Thus let's
+add a test which checks that "-cdrom" can at least be used to start
+QEMU with certain machine types.
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
@@ -37,221 +37,97 @@ Reviewed-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
 Acked-By: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/Makefile.include |   2 +
- tests/cdrom-test.c     | 164 +++++++++++++++++++++++++++++++++++++++++++=
+ tests/cdrom-test.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++=
 ++++++
- 2 files changed, 166 insertions(+)
- create mode 100644 tests/cdrom-test.c
+ 1 file changed, 58 insertions(+)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 3b9a5e3..41abda0 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -179,6 +179,7 @@ check-qtest-generic-y =3D tests/qmp-test$(EXESUF)
- gcov-files-generic-y =3D monitor.c qapi/qmp-dispatch.c
- check-qtest-generic-y +=3D tests/device-introspect-test$(EXESUF)
- gcov-files-generic-y =3D qdev-monitor.c qmp.c
-+check-qtest-generic-y +=3D tests/cdrom-test$(EXESUF)
-=20
- gcov-files-ipack-y +=3D hw/ipack/ipack.c
- check-qtest-ipack-y +=3D tests/ipoctal232-test$(EXESUF)
-@@ -835,6 +836,7 @@ tests/test-qapi-util$(EXESUF): tests/test-qapi-util.o=
- $(test-util-obj-y)
- tests/numa-test$(EXESUF): tests/numa-test.o
- tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/boot-sector.o te=
-sts/acpi-utils.o
- tests/sdhci-test$(EXESUF): tests/sdhci-test.o $(libqos-pc-obj-y)
-+tests/cdrom-test$(EXESUF): tests/cdrom-test.o tests/boot-sector.o $(libq=
-os-obj-y)
-=20
- tests/migration/stress$(EXESUF): tests/migration/stress.o
- 	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,=
-"LINK","$(TARGET_DIR)$@")
 diff --git a/tests/cdrom-test.c b/tests/cdrom-test.c
-new file mode 100644
-index 0000000..5bbf322
---- /dev/null
+index 5bbf322..7a1fce5 100644
+--- a/tests/cdrom-test.c
 +++ b/tests/cdrom-test.c
-@@ -0,0 +1,164 @@
-+/*
-+ * Various tests for emulated CD-ROM drives.
-+ *
-+ * Copyright (c) 2018 Red Hat Inc.
-+ *
-+ * Author:
-+ *    Thomas Huth <thuth@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2
-+ * or later. See the COPYING file in the top-level directory.
+@@ -13,6 +13,7 @@
+ #include "qemu/osdep.h"
+ #include "libqtest.h"
+ #include "boot-sector.h"
++#include "qapi/qmp/qdict.h"
+=20
+ static char isoimage[] =3D "cdrom-boot-iso-XXXXXX";
+=20
+@@ -89,6 +90,32 @@ cleanup:
+     return ret;
+ }
+=20
++/**
++ * Check that at least the -cdrom parameter is basically working, i.e. w=
+e can
++ * see the filename of the ISO image in the output of "info block" after=
+wards
 + */
-+
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+#include "boot-sector.h"
-+
-+static char isoimage[] =3D "cdrom-boot-iso-XXXXXX";
-+
-+static int exec_genisoimg(const char **args)
-+{
-+    gchar *out_err =3D NULL;
-+    gint exit_status =3D -1;
-+    bool success;
-+
-+    success =3D g_spawn_sync(NULL, (gchar **)args, NULL,
-+                           G_SPAWN_SEARCH_PATH | G_SPAWN_STDOUT_TO_DEV_N=
-ULL,
-+                           NULL, NULL, NULL, &out_err, &exit_status, NUL=
-L);
-+    if (!success) {
-+        return -ENOENT;
-+    }
-+    if (out_err) {
-+        fputs(out_err, stderr);
-+        g_free(out_err);
-+    }
-+
-+    return exit_status;
-+}
-+
-+static int prepare_image(const char *arch, char *isoimage)
-+{
-+    char srcdir[] =3D "cdrom-test-dir-XXXXXX";
-+    char *codefile =3D NULL;
-+    int ifh, ret =3D -1;
-+    const char *args[] =3D {
-+        "genisoimage", "-quiet", "-l", "-no-emul-boot",
-+        "-b", NULL, "-o", isoimage, srcdir, NULL
-+    };
-+
-+    ifh =3D mkstemp(isoimage);
-+    if (ifh < 0) {
-+        perror("Error creating temporary iso image file");
-+        return -1;
-+    }
-+    if (!mkdtemp(srcdir)) {
-+        perror("Error creating temporary directory");
-+        goto cleanup;
-+    }
-+
-+    if (g_str_equal(arch, "i386") || g_str_equal(arch, "x86_64") ||
-+        g_str_equal(arch, "s390x")) {
-+        codefile =3D g_strdup_printf("%s/bootcode-XXXXXX", srcdir);
-+        ret =3D boot_sector_init(codefile);
-+        if (ret) {
-+            goto cleanup;
-+        }
-+    } else {
-+        /* Just create a dummy file */
-+        char txt[] =3D "empty disc";
-+        codefile =3D g_strdup_printf("%s/readme.txt", srcdir);
-+        if (!g_file_set_contents(codefile, txt, sizeof(txt) - 1, NULL)) =
-{
-+            fprintf(stderr, "Failed to create '%s'\n", codefile);
-+            goto cleanup;
-+        }
-+    }
-+
-+    args[5] =3D strchr(codefile, '/') + 1;
-+    ret =3D exec_genisoimg(args);
-+    if (ret) {
-+        fprintf(stderr, "genisoimage failed: %i\n", ret);
-+    }
-+
-+    unlink(codefile);
-+
-+cleanup:
-+    g_free(codefile);
-+    rmdir(srcdir);
-+    close(ifh);
-+
-+    return ret;
-+}
-+
-+static void test_cdboot(gconstpointer data)
++static void test_cdrom_param(gconstpointer data)
 +{
 +    QTestState *qts;
++    char *resp;
 +
-+    qts =3D qtest_startf("-accel kvm:tcg -no-shutdown %s%s", (const char=
- *)data,
-+                       isoimage);
-+    boot_sector_test(qts);
++    qts =3D qtest_startf("-M %s -cdrom %s", (const char *)data, isoimage=
+);
++    resp =3D qtest_hmp(qts, "info block");
++    g_assert(strstr(resp, isoimage) !=3D 0);
++    g_free(resp);
 +    qtest_quit(qts);
 +}
 +
-+static void add_x86_tests(void)
++static void add_cdrom_param_tests(const char **machines)
 +{
-+    qtest_add_data_func("cdrom/boot/default", "-cdrom ", test_cdboot);
-+    qtest_add_data_func("cdrom/boot/virtio-scsi",
-+                        "-device virtio-scsi -device scsi-cd,drive=3Dcdr=
- "
-+                        "-blockdev file,node-name=3Dcdr,filename=3D", te=
-st_cdboot);
-+    qtest_add_data_func("cdrom/boot/isapc", "-M isapc "
-+                        "-drive if=3Dide,media=3Dcdrom,file=3D", test_cd=
-boot);
-+    qtest_add_data_func("cdrom/boot/am53c974",
-+                        "-device am53c974 -device scsi-cd,drive=3Dcd1 "
-+                        "-drive if=3Dnone,id=3Dcd1,format=3Draw,file=3D"=
-, test_cdboot);
-+    qtest_add_data_func("cdrom/boot/dc390",
-+                        "-device dc390 -device scsi-cd,drive=3Dcd1 "
-+                        "-blockdev file,node-name=3Dcd1,filename=3D", te=
-st_cdboot);
-+    qtest_add_data_func("cdrom/boot/lsi53c895a",
-+                        "-device lsi53c895a -device scsi-cd,drive=3Dcd1 =
-"
-+                        "-blockdev file,node-name=3Dcd1,filename=3D", te=
-st_cdboot);
-+    qtest_add_data_func("cdrom/boot/megasas", "-M q35 "
-+                        "-device megasas -device scsi-cd,drive=3Dcd1 "
-+                        "-blockdev file,node-name=3Dcd1,filename=3D", te=
-st_cdboot);
-+    qtest_add_data_func("cdrom/boot/megasas-gen2", "-M q35 "
-+                        "-device megasas-gen2 -device scsi-cd,drive=3Dcd=
-1 "
-+                        "-blockdev file,node-name=3Dcd1,filename=3D", te=
-st_cdboot);
++    while (*machines) {
++        char *testname =3D g_strdup_printf("cdrom/param/%s", *machines);
++        qtest_add_data_func(testname, *machines, test_cdrom_param);
++        g_free(testname);
++        machines++;
++    }
 +}
 +
-+static void add_s390x_tests(void)
-+{
-+    qtest_add_data_func("cdrom/boot/default", "-cdrom ", test_cdboot);
-+    qtest_add_data_func("cdrom/boot/virtio-scsi",
-+                        "-device virtio-scsi -device scsi-cd,drive=3Dcdr=
- "
-+                        "-blockdev file,node-name=3Dcdr,filename=3D", te=
-st_cdboot);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    int ret;
-+    const char *arch =3D qtest_get_arch();
-+    const char *genisocheck[] =3D { "genisoimage", "-version", NULL };
-+
-+    g_test_init(&argc, &argv, NULL);
-+
-+    if (exec_genisoimg(genisocheck)) {
-+        /* genisoimage not available - so can't run tests */
-+        return 0;
-+    }
-+
-+    ret =3D prepare_image(arch, isoimage);
-+    if (ret) {
-+        return ret;
-+    }
-+
-+    if (g_str_equal(arch, "i386") || g_str_equal(arch, "x86_64")) {
-+        add_x86_tests();
-+    } else if (g_str_equal(arch, "s390x")) {
-+        add_s390x_tests();
-+    }
-+
-+    ret =3D g_test_run();
-+
-+    unlink(isoimage);
-+
-+    return ret;
-+}
+ static void test_cdboot(gconstpointer data)
+ {
+     QTestState *qts;
+@@ -154,6 +181,37 @@ int main(int argc, char **argv)
+         add_x86_tests();
+     } else if (g_str_equal(arch, "s390x")) {
+         add_s390x_tests();
++    } else if (g_str_equal(arch, "ppc64")) {
++        const char *ppcmachines[] =3D {
++            "pseries", "mac99", "g3beige", "40p", "prep", NULL
++        };
++        add_cdrom_param_tests(ppcmachines);
++    } else if (g_str_equal(arch, "sparc")) {
++        const char *sparcmachines[] =3D {
++            "LX", "SPARCClassic", "SPARCbook", "SS-10", "SS-20", "SS-4",
++            "SS-5", "SS-600MP", "Voyager", "leon3_generic", NULL
++        };
++        add_cdrom_param_tests(sparcmachines);
++    } else if (g_str_equal(arch, "sparc64")) {
++        const char *sparc64machines[] =3D {
++            "niagara", "sun4u", "sun4v", NULL
++        };
++        add_cdrom_param_tests(sparc64machines);
++    } else if (!strncmp(arch, "mips64", 6)) {
++        const char *mips64machines[] =3D {
++            "magnum", "malta", "mips", "pica61", NULL
++        };
++        add_cdrom_param_tests(mips64machines);
++    } else if (g_str_equal(arch, "arm") || g_str_equal(arch, "aarch64"))=
+ {
++        const char *armmachines[] =3D {
++            "realview-eb", "realview-eb-mpcore", "realview-pb-a8",
++            "realview-pbx-a9", "versatileab", "versatilepb", "vexpress-a=
+15",
++            "vexpress-a9", "virt", NULL
++        };
++        add_cdrom_param_tests(armmachines);
++    } else {
++        const char *nonemachine[] =3D { "none", NULL };
++        add_cdrom_param_tests(nonemachine);
+     }
+=20
+     ret =3D g_test_run();
 --=20
 1.8.3.1
