@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1fC8om-0007mr-3Z
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 15:14:05 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fC8tz-0001Vl-4Z
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 15:19:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1fC8oi-00072Y-0j
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 15:14:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39100 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1fC8oh-0006ww-PV
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 15:13:59 -0400
-References: <20180426135755.GI29865@localhost.localdomain>
-From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
-Message-ID: <54b50fb6-9619-ffda-fb4b-8702166628de@redhat.com>
-Date: Fri, 27 Apr 2018 21:13:42 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1fC8tv-0002w9-2V
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 15:19:27 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:32919)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fC8tu-0002v5-Nx
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 15:19:22 -0400
+Received: by mail-wr0-x242.google.com with SMTP id o4-v6so2729276wrm.0
+	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 12:19:22 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Fri, 27 Apr 2018 20:19:16 +0100
+Message-Id: <20180427191916.26637-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180426135755.GI29865@localhost.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="veyGDOpNOefdm6UMZDBqwXOjLXbeKtSgC"
-Subject: Re: [Qemu-devel] Who is running QEMU automated tests, and when?
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] arm/translate-a64: add FP16 FCMP operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,198 +27,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Yash Mankad <ymankad@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: richard.henderson@linaro.org
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-stable@nongnu.org, "open list:ARM" <qemu-arm@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---veyGDOpNOefdm6UMZDBqwXOjLXbeKtSgC
-From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
-Cc: Yash Mankad <ymankad@redhat.com>, Thomas Huth <thuth@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <f4bug@amsat.org>
-Message-ID: <54b50fb6-9619-ffda-fb4b-8702166628de@redhat.com>
-Subject: Re: [Qemu-devel] Who is running QEMU automated tests, and when?
-References: <20180426135755.GI29865@localhost.localdomain>
-In-Reply-To: <20180426135755.GI29865@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+These where missed out from the rest of the half-precision work.
 
-Dne 26.4.2018 v 15:57 Eduardo Habkost napsal(a):
-> (Starting a new thread, for more visibility)
->=20
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Cc: qemu-stable@nongnu.org
+---
+ target/arm/helper-a64.c    | 10 +++++++
+ target/arm/helper-a64.h    |  2 ++
+ target/arm/translate-a64.c | 60 ++++++++++++++++++++++++++++++++------
+ 3 files changed, 63 insertions(+), 9 deletions(-)
 
-Hello guys,
-
-what a nice topic. My Jenkins runs following weekly/daily upstream checks=
- using RHEL.7 as host:
-
-ppc64
-=3D=3D=3D=3D=3D
-
-frequency: weekly
-host:
-    - ppc64
-    - ppc64le
-tests:
-    - make    # building all targets
-    - SPEED=3Dslow make check
-    - kvm-unit-tests:
-        - ACCEL=3Dkvm,kvm-type=3DHV
-        - ACCEL=3Dkvm,kvm-type=3DPR
-        - ACCEL=3Dtcg
-    - qemu-iotests:
-        - ALL_TESTS -qcow2 -file
-        - ALL_TESTS -qcow2 -nbd    # quite broken
-        - ALL_TESTS -raw -file
-        - ALL_TESTS -raw -nbd    # quite broken
-        - 059 -vmdk
-        - 064 vhdx
-        - 070 vhdx
-        - 075 cloop
-        - 076 parallels
-        - 078 -bochs
-        - 084 -vdi
-        - 088 -vpc
-        - 116 -qed
-        - 131 -parallels
-        - 135 -vpc
-        - 146 -vpc
-        # I tried -nfs but it seems broken and I'm still waiting for feed=
-back
-    - functonal:    # using Avocado-vt
-        guest:
-            - ppc64
-            - ppc64le
-        tests:
-            - various RHEL.7 install jobs
-            - migration between various tagged qemu revisions
-
-s390x
-=3D=3D=3D=3D=3D
-
-frequency: daily
-tests:
-    - make     # building all targets
-    - SPEED=3Dslow make check
-    - kvm-unit-tests
-    - functonal:    # using Avocado-vt
-        - various RHEL.7 install jobs
-        - migration using the latest qemu only
-
-Unfortunately I'm currently changing the setup so for the past 1-2 months=
- it's semi-broken. When I finish the transition I plan to add aarch64 ups=
-tream checks as well (as I am already running similar downstream suite th=
-ere), but now I'm struggling with Jenkins and the new setup (which should=
- have simplified things).
-
-Kind regards,
-Luk=C3=A1=C5=A1
-
-
-> (This was: Re: [Qemu-devel] [RFC PATCH] tests/device-introspect: Test
-> devices with all machines, not only with "none")
->=20
-> On Thu, Apr 26, 2018 at 01:54:43PM +0200, Markus Armbruster wrote:
->> Thomas Huth <thuth@redhat.com> writes:
->>> On 17.04.2018 14:12, Markus Armbruster wrote:
->>>> Thomas Huth <thuth@redhat.com> writes:
->>>>
->>>>> Many device introspection crashes only happen if you are using a
->>>>> certain machine, e.g.:
->>>>>
->>>>> $ ppc-softmmu/qemu-system-ppc -S -M ref405ep,accel=3Dqtest -qmp std=
-io
->>>>> {"QMP": {"version": {"qemu": {"micro": 50, "minor": 11, "major": 2}=
-,
->>>>>  "package": "build-all"}, "capabilities": []}}
->>>>> { 'execute': 'qmp_capabilities' }
->>>>> {"return": {}}
->>>>> { 'execute': 'device-list-properties',
->>>>>   'arguments': {'typename': 'macio-newworld'}}
->>>>> Unexpected error in qemu_chr_fe_init() at chardev/char-fe.c:222:
->>>>> Device 'serial0' is in use
->>>>> Aborted (core dumped)
->>>>>
->>>>> To be able to catch these problems, let's extend the device-introsp=
-ect
->>>>> test to check the devices on all machine types. Since this is a rat=
-her
->>>>> slow operation, the test is only run in "SPEED=3Dslow" mode.
->>>>
->>>> If the device works with one machine type, it has a decent chance to=
-
->>>> work with others, too.  Thus, testing each device with every machine=
-
->>>> type is overkill.  I appreciate having overkill as an option :)
->>>>
->>>> What I'd like to see for a quick "make check" is testing each device=
-
->>>> once.  That should flush out most bugs. =20
->>>
->>> That's already done with the "none" machine.
->>
->> I was too terse.  We test each device with -machine none for every
->> target.  Fine if that's quick enough.  If not, we might want to reduce=
-
->> redundancy there.
->>
->> Actually, a worse offender in the "waste everybody's time via redunanc=
-y"
->> department could be qom-test.
->>
->>> Anyway, do you think my patch here is useful and has a chance of gett=
-ing
->>> included? I.e. shall I re-spin this as a non-RFC patch? Or shall we
->>> rather wait for Eduardo's python-based tests to get included into the=
-
->>> repository?
->>
->> I don't mind having make check SPEED=3Dslow run more extensive tests.
->> Assuming we actually run them at least once in a while, which seems
->> doubtful.
->=20
-> We probably don't do that, but we really must be running a more
-> extensive (and slower) test set at least once before every
-> release.
->=20
-> Maybe some people are running SPEED=3Dslow tests, or even more
-> extensive test suites like avocado-vt once in a while, but we
-> need to know who is running them, and when.
->=20
-> Today, the only test set I know people really run and would
-> surely block a release is "make check [SPEED=3Dquick]".
->=20
-> So, for anybody that runs automated QEMU tests once in a while,
-> can we know:
->=20
-> * What test cases are you running?  Where can we get more
->   information about the tests you run?
-> * When do you run them?  What triggers a new test run?
->=20
-> Peter, do you have additional tests you run before merging a pull
-> request?  Additional test sets run before tagging a release?
->=20
-
-
-
---veyGDOpNOefdm6UMZDBqwXOjLXbeKtSgC
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEpApMRcQDTeAqWtSDJrNi5H/PIsEFAlrjdmYACgkQJrNi5H/P
-IsHNWgf+I8TD76xp1DTGp2WvZXXl2AhtaJBLtyj7ya+juf682zABQSoBlphHm1GW
-msklkrfHNNJ29LY8wDGGLzckCe6Fh6smkEd7gvKFGWTnU02JzCNYKsEE15QyBYcl
-LCnVWSgTxOJgfTZSVYKafxv3K56NUvNYPTH1q6xUYExf14SkphdBeX05oYhxUMhU
-kcB4UIHuEcfDe61XVvVtzCgw7NDpOFqbIHudufW85DET3Ne71pYY/omM3wDBwVCa
-WX24wX/3eDf/YkMTTz+5s8tqXDYOWpyi4nz2QBzbaIhHrG99D8Q8V9Y4lJ9AzN6M
-NwdVgpnGYN4FQdcR5/iiCJ4eg2fo0A==
-=hn91
------END PGP SIGNATURE-----
-
---veyGDOpNOefdm6UMZDBqwXOjLXbeKtSgC--
+diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+index afb25ad20c..35df07adb9 100644
+--- a/target/arm/helper-a64.c
++++ b/target/arm/helper-a64.c
+@@ -85,6 +85,16 @@ static inline uint32_t float_rel_to_flags(int res)
+     return flags;
+ }
+ 
++uint64_t HELPER(vfp_cmph_a64)(float16 x, float16 y, void *fp_status)
++{
++    return float_rel_to_flags(float16_compare_quiet(x, y, fp_status));
++}
++
++uint64_t HELPER(vfp_cmpeh_a64)(float16 x, float16 y, void *fp_status)
++{
++    return float_rel_to_flags(float16_compare(x, y, fp_status));
++}
++
+ uint64_t HELPER(vfp_cmps_a64)(float32 x, float32 y, void *fp_status)
+ {
+     return float_rel_to_flags(float32_compare_quiet(x, y, fp_status));
+diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
+index ef4ddfe9d8..5c0b9bd799 100644
+--- a/target/arm/helper-a64.h
++++ b/target/arm/helper-a64.h
+@@ -19,6 +19,8 @@
+ DEF_HELPER_FLAGS_2(udiv64, TCG_CALL_NO_RWG_SE, i64, i64, i64)
+ DEF_HELPER_FLAGS_2(sdiv64, TCG_CALL_NO_RWG_SE, s64, s64, s64)
+ DEF_HELPER_FLAGS_1(rbit64, TCG_CALL_NO_RWG_SE, i64, i64)
++DEF_HELPER_3(vfp_cmph_a64, i64, f16, f16, ptr)
++DEF_HELPER_3(vfp_cmpeh_a64, i64, f16, f16, ptr)
+ DEF_HELPER_3(vfp_cmps_a64, i64, f32, f32, ptr)
+ DEF_HELPER_3(vfp_cmpes_a64, i64, f32, f32, ptr)
+ DEF_HELPER_3(vfp_cmpd_a64, i64, f64, f64, ptr)
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index c91329249d..d27f4f24d5 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -4461,16 +4461,27 @@ static void disas_data_proc_reg(DisasContext *s, uint32_t insn)
+     }
+ }
+ 
+-static void handle_fp_compare(DisasContext *s, bool is_double,
++static void handle_fp_compare(DisasContext *s, int type,
+                               unsigned int rn, unsigned int rm,
+                               bool cmp_with_zero, bool signal_all_nans)
+ {
+-    TCGv_i64 tcg_flags = tcg_temp_new_i64();
+-    TCGv_ptr fpst = get_fpstatus_ptr(false);
++    TCGv_i64 tcg_flags;
++    TCGv_ptr fpst;
+ 
+-    if (is_double) {
++    if (type == 2 ||
++        (type == 3 && !arm_dc_feature(s, ARM_FEATURE_V8_FP16))) {
++        unallocated_encoding(s);
++        return;
++    }
++
++    tcg_flags = tcg_temp_new_i64();
++
++    switch (type) {
++    case 1: /* double */
++    {
+         TCGv_i64 tcg_vn, tcg_vm;
+ 
++        fpst = get_fpstatus_ptr(false);
+         tcg_vn = read_fp_dreg(s, rn);
+         if (cmp_with_zero) {
+             tcg_vm = tcg_const_i64(0);
+@@ -4484,9 +4495,13 @@ static void handle_fp_compare(DisasContext *s, bool is_double,
+         }
+         tcg_temp_free_i64(tcg_vn);
+         tcg_temp_free_i64(tcg_vm);
+-    } else {
++        break;
++    }
++    case 0: /* single */
++    {
+         TCGv_i32 tcg_vn, tcg_vm;
+ 
++        fpst = get_fpstatus_ptr(false);
+         tcg_vn = read_fp_sreg(s, rn);
+         if (cmp_with_zero) {
+             tcg_vm = tcg_const_i32(0);
+@@ -4500,6 +4515,33 @@ static void handle_fp_compare(DisasContext *s, bool is_double,
+         }
+         tcg_temp_free_i32(tcg_vn);
+         tcg_temp_free_i32(tcg_vm);
++        break;
++    }
++    case 3: /* half */
++    {
++        TCGv_i32 tcg_vn = tcg_temp_new_i32();
++        TCGv_i32 tcg_vm = tcg_temp_new_i32();
++
++        fpst = get_fpstatus_ptr(true);
++        read_vec_element_i32(s, tcg_vn, rn, 0, MO_16);
++
++        if (cmp_with_zero) {
++            tcg_vm = tcg_const_i32(0);
++        } else {
++            read_vec_element_i32(s, tcg_vm, rm, 0, MO_16);
++        }
++        if (signal_all_nans) {
++            gen_helper_vfp_cmpeh_a64(tcg_flags, tcg_vn, tcg_vm, fpst);
++        } else {
++            gen_helper_vfp_cmph_a64(tcg_flags, tcg_vn, tcg_vm, fpst);
++        }
++        tcg_temp_free_i32(tcg_vn);
++        tcg_temp_free_i32(tcg_vm);
++        break;
++    }
++    default:
++        g_assert_not_reached();
++        break;
+     }
+ 
+     tcg_temp_free_ptr(fpst);
+@@ -4520,14 +4562,14 @@ static void disas_fp_compare(DisasContext *s, uint32_t insn)
+     unsigned int mos, type, rm, op, rn, opc, op2r;
+ 
+     mos = extract32(insn, 29, 3);
+-    type = extract32(insn, 22, 2); /* 0 = single, 1 = double */
++    type = extract32(insn, 22, 2);
+     rm = extract32(insn, 16, 5);
+     op = extract32(insn, 14, 2);
+     rn = extract32(insn, 5, 5);
+     opc = extract32(insn, 3, 2);
+     op2r = extract32(insn, 0, 3);
+ 
+-    if (mos || op || op2r || type > 1) {
++    if (mos || op || op2r) {
+         unallocated_encoding(s);
+         return;
+     }
+@@ -4552,14 +4594,14 @@ static void disas_fp_ccomp(DisasContext *s, uint32_t insn)
+     TCGLabel *label_continue = NULL;
+ 
+     mos = extract32(insn, 29, 3);
+-    type = extract32(insn, 22, 2); /* 0 = single, 1 = double */
++    type = extract32(insn, 22, 2);
+     rm = extract32(insn, 16, 5);
+     cond = extract32(insn, 12, 4);
+     rn = extract32(insn, 5, 5);
+     op = extract32(insn, 4, 1);
+     nzcv = extract32(insn, 0, 4);
+ 
+-    if (mos || type > 1) {
++    if (mos) {
+         unallocated_encoding(s);
+         return;
+     }
+-- 
+2.17.0
