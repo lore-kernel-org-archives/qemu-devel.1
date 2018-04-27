@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fC05T-0007Q9-Qb
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:54:44 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fC05S-0001g7-Rh
+	(envelope-from <kraxel@redhat.com>) id 1fC05S-0007Om-M0
 	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:54:43 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57010 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fC05S-0001fg-Lf
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <kraxel@redhat.com>) id 1fC05R-0001fB-Ns
 	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:54:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40854 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fC05R-0001em-JL
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:54:41 -0400
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 27 Apr 2018 11:54:32 +0200
-Message-Id: <20180427095434.14013-5-kraxel@redhat.com>
+Date: Fri, 27 Apr 2018 11:54:34 +0200
+Message-Id: <20180427095434.14013-7-kraxel@redhat.com>
 In-Reply-To: <20180427095434.14013-1-kraxel@redhat.com>
 References: <20180427095434.14013-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 4/6] sdl: Allow OpenGL ES context creation
+Subject: [Qemu-devel] [PULL 6/6] ui: introduce vfio_display_reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,83 +24,89 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Elie Tournier <tournier.elie@gmail.com>, Elie Tournier <elie.tournier@collabora.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Tina Zhang <tina.zhang@intel.com>
 
-From: Elie Tournier <tournier.elie@gmail.com>
+From: Tina Zhang <tina.zhang@intel.com>
 
-Signed-off-by: Elie Tournier <elie.tournier@collabora.com>
-Message-id: 20180413135842.21325-4-tournier.elie@gmail.com
+During guest OS reboot, guest framebuffer is invalid. It will cause
+bugs, if the invalid guest framebuffer is still used by host.
 
-[ kraxel: fix indent ]
+This patch is to introduce vfio_display_reset which is invoked
+during vfio display reset. This vfio_display_reset function is used
+to release the invalid display resource, disable scanout mode and
+replace the invalid surface with QemuConsole's DisplaySurafce.
 
+This patch can fix the GPU hang issue caused by gd_egl_draw during
+guest OS reboot.
+
+Changes v3->v4:
+ - Move dma-buf based display check into the vfio_display_reset().
+   (Gerd)
+
+Changes v2->v3:
+ - Limit vfio_display_reset to dma-buf based vfio display. (Gerd)
+
+Changes v1->v2:
+ - Use dpy_gfx_update_full() update screen after reset. (Gerd)
+ - Remove dpy_gfx_switch_surface(). (Gerd)
+
+Signed-off-by: Tina Zhang <tina.zhang@intel.com>
+Message-id: 1524820266-27079-3-git-send-email-tina.zhang@intel.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- ui/sdl2-gl.c    | 19 +++++++++++++++++--
- vl.c            |  4 ++++
- qemu-options.hx |  2 +-
- 3 files changed, 22 insertions(+), 3 deletions(-)
+ hw/vfio/pci.h     |  1 +
+ hw/vfio/display.c | 11 +++++++++++
+ hw/vfio/pci.c     |  4 ++++
+ 3 files changed, 16 insertions(+)
 
-diff --git a/ui/sdl2-gl.c b/ui/sdl2-gl.c
-index c3683e6b65..83b71853d1 100644
---- a/ui/sdl2-gl.c
-+++ b/ui/sdl2-gl.c
-@@ -140,12 +140,27 @@ QEMUGLContext sdl2_gl_create_context(DisplayChangeListener *dcl,
-     SDL_GL_MakeCurrent(scon->real_window, scon->winctx);
+diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+index 629c875701..59ab7757a3 100644
+--- a/hw/vfio/pci.h
++++ b/hw/vfio/pci.h
+@@ -176,6 +176,7 @@ int vfio_pci_igd_opregion_init(VFIOPCIDevice *vdev,
+                                struct vfio_region_info *info,
+                                Error **errp);
  
-     SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
--    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
--                        SDL_GL_CONTEXT_PROFILE_CORE);
-+    if (scon->opts->gl == DISPLAYGL_MODE_ON ||
-+        scon->opts->gl == DISPLAYGL_MODE_CORE) {
-+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
-+                            SDL_GL_CONTEXT_PROFILE_CORE);
-+    } else if (scon->opts->gl == DISPLAYGL_MODE_ES) {
-+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
-+                            SDL_GL_CONTEXT_PROFILE_ES);
-+    }
-     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, params->major_ver);
-     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, params->minor_ver);
++void vfio_display_reset(VFIOPCIDevice *vdev);
+ int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp);
+ void vfio_display_finalize(VFIOPCIDevice *vdev);
  
-     ctx = SDL_GL_CreateContext(scon->real_window);
-+
-+    /* If SDL fail to create a GL context and we use the "on" flag,
-+     * then try to fallback to GLES.
-+     */
-+    if (!ctx && scon->opts->gl == DISPLAYGL_MODE_ON) {
-+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
-+                            SDL_GL_CONTEXT_PROFILE_ES);
-+        ctx = SDL_GL_CreateContext(scon->real_window);
-+    }
-     return (QEMUGLContext)ctx;
+diff --git a/hw/vfio/display.c b/hw/vfio/display.c
+index 7d727ce910..59c0e5d1d7 100644
+--- a/hw/vfio/display.c
++++ b/hw/vfio/display.c
+@@ -198,6 +198,17 @@ static void vfio_display_dmabuf_exit(VFIODisplay *dpy)
  }
  
-diff --git a/vl.c b/vl.c
-index f7804f7a18..916d2a80a7 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2144,6 +2144,10 @@ static void parse_display(const char *p)
-                 dpy.has_gl = true;
-                 if (strstart(opts, "on", &nextopt)) {
-                     dpy.gl = DISPLAYGL_MODE_ON;
-+                } else if (strstart(opts, "core", &nextopt)) {
-+                    dpy.gl = DISPLAYGL_MODE_CORE;
-+                } else if (strstart(opts, "es", &nextopt)) {
-+                    dpy.gl = DISPLAYGL_MODE_ES;
-                 } else if (strstart(opts, "off", &nextopt)) {
-                     dpy.gl = DISPLAYGL_MODE_OFF;
-                 } else {
-diff --git a/qemu-options.hx b/qemu-options.hx
-index ca4e412f2f..333dd1f1c8 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -1240,7 +1240,7 @@ ETEXI
+ /* ---------------------------------------------------------------------- */
++void vfio_display_reset(VFIOPCIDevice *vdev)
++{
++    if (!vdev || !vdev->dpy || !vdev->dpy->con ||
++        !vdev->dpy->dmabuf.primary) {
++        return;
++    }
++
++    dpy_gl_scanout_disable(vdev->dpy->con);
++    vfio_display_dmabuf_exit(vdev->dpy);
++    dpy_gfx_update_full(vdev->dpy->con);
++}
  
- DEF("display", HAS_ARG, QEMU_OPTION_display,
-     "-display sdl[,frame=on|off][,alt_grab=on|off][,ctrl_grab=on|off]\n"
--    "            [,window_close=on|off][,gl=on|off]\n"
-+    "            [,window_close=on|off][,gl=on|core|es|off]\n"
-     "-display gtk[,grab_on_hover=on|off][,gl=on|off]|\n"
-     "-display vnc=<display>[,<optargs>]\n"
-     "-display curses\n"
+ static void vfio_display_region_update(void *opaque)
+ {
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index b9bc6cd310..4947fe39a2 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -3103,6 +3103,10 @@ static void vfio_pci_reset(DeviceState *dev)
+ 
+     vfio_pci_pre_reset(vdev);
+ 
++    if (vdev->display != ON_OFF_AUTO_OFF) {
++        vfio_display_reset(vdev);
++    }
++
+     if (vdev->resetfn && !vdev->resetfn(vdev)) {
+         goto post_reset;
+     }
 -- 
 2.9.3
