@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44155)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fC2SF-0004th-Ks
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:26:24 -0400
+	(envelope-from <lvivier@redhat.com>) id 1fC2UG-0006t0-OR
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:28:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fC2SE-00049I-NC
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:26:23 -0400
-Received: from mail-oi0-x22d.google.com ([2607:f8b0:4003:c06::22d]:40522)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fC2SE-00048a-ID
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:26:22 -0400
-Received: by mail-oi0-x22d.google.com with SMTP id c203-v6so1399204oib.7
-	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 05:26:22 -0700 (PDT)
+	(envelope-from <lvivier@redhat.com>) id 1fC2UF-0004tO-T1
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:28:28 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33262 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1fC2UF-0004t8-OE
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 08:28:27 -0400
+References: <20180427121723.3543-1-lvivier@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <a14b1299-318d-7cff-899a-4ae6d9273491@redhat.com>
+Date: Fri, 27 Apr 2018 14:28:17 +0200
 MIME-Version: 1.0
-In-Reply-To: <1519998711-73430-5-git-send-email-mjc@sifive.com>
-References: <1519998711-73430-1-git-send-email-mjc@sifive.com>
-	<1519998711-73430-5-git-send-email-mjc@sifive.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 27 Apr 2018 13:26:01 +0100
-Message-ID: <CAFEAcA8sadsm3SkoZLVk0qWWxfnGAHFbofpxV08QxVpyjZTZkA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v8 04/23] RISC-V Disassembler
+In-Reply-To: <20180427121723.3543-1-lvivier@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] tcg: workaround branch instruction overflow
+ in tcg_out_qemu_ld/st
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, RISC-V Patches <patches@groups.riscv.org>
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>
 
-On 2 March 2018 at 13:51, Michael Clark <mjc@sifive.com> wrote:
-> The RISC-V disassembler has no dependencies outside of the 'disas'
-> directory so it can be applied independently. The majority of the
-> disassembler is machine-generated from instruction set metadata:
->
-> - https://github.com/michaeljclark/riscv-meta
+On 27/04/2018 14:17, Laurent Vivier wrote:
+> ppc64 uses a BC instruction to call the tcg_out_qemu_ld/st
+> slow path. BC instruction uses a relative address encoded
+> on 14 bits.
+> 
+> The slow path functions are added at the end of the generated
+> instructions buffer, in the reverse order of the callers.
+> So more we have slow path functions more the distance between
+> the caller (BC) and the function increases.
+> 
+> This patch changes the behavior to generate the functions in
+> the same order of the callers.
+> 
+> Fixes: 15fa08f845 ("tcg: Dynamically allocate TCGOps")
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> ---
+> 
+> Notes:
+>     This is an RFC for several reasons:
+>     - it doens't really fix the overflow problem
+>       only avoids the case
+>     - it uses a recursive function to revert the slow path
+>       functions order (and we can have a stack overflow...),
 
-> +        case 5:
-> +            if (isa == rv128) {
-> +                op = rv_op_c_sqsp;
-> +            } else {
-> +                op = rv_op_c_fsdsp; break;
-> +            }
-> +        case 6: op = rv_op_c_swsp; break;
+I think the number of slow path functions cannot be greater than
+TCG_MAX_INSNS (i.e. 512): is it enough to overflow the stack?
 
-Coverity (CID1390575) points out that for the
-case 5 / isa == rv128 codepath, we set op, and
-then fall through into case 6 which overwrites it.
-
-Is there a missing "break" statement here? (If the
-fallthrough is deliberate it should be marked with a
-/* fallthrough */ comment.)
-
-thanks
--- PMM
+Thanks,
+Laurent
