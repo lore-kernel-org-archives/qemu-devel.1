@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37364)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBzsI-0002Oi-AE
+	(envelope-from <thuth@redhat.com>) id 1fBzsI-0002PC-U1
 	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:41:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fBzsH-0003xF-Gm
+	(envelope-from <thuth@redhat.com>) id 1fBzsI-0003yc-2v
 	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:41:06 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Fri, 27 Apr 2018 11:40:43 +0200
-Message-Id: <1524822046-22779-2-git-send-email-thuth@redhat.com>
-In-Reply-To: <1524822046-22779-1-git-send-email-thuth@redhat.com>
-References: <1524822046-22779-1-git-send-email-thuth@redhat.com>
+Date: Fri, 27 Apr 2018 11:40:42 +0200
+Message-Id: <1524822046-22779-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 1/4] tests/boot-sector: Add magic bytes to
- s390x boot code header
+Subject: [Qemu-devel] [PATCH v3 0/4] Add new CD-ROM related qtests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,54 +23,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 Cc: qemu-block@nongnu.org
 
-We're going to use the s390x boot code for testing CD-ROM booting.
-But the ISO loader of the s390-ccw bios is a little bit more picky
-than the network loader and expects some magic bytes in the header
-of the file (see linux_s390_magic in pc-bios/s390-ccw/bootmap.c), so
-we've got to add them in our boot code here, too.
+With one of my clean-up patches (see commit 1454509726719e0933c800), I
+recently accidentially broke the "-cdrom" parameter (more precisely
+"-drive if=3Dscsi") on a couple of boards, since there was no error
+detected during the "make check" regression testing. This is clearly an
+indication that we are lacking tests in this area.
+So this small patch series now introduces some tests for CD-ROM drives:
+The first two patches introduce the possibility to check that booting
+from CD-ROM drives still works fine for x86 and s390x, and the third
+patch adds a test that certain machines can at least still be started
+with the "-cdrom" parameter (i.e. that test would have catched the
+mistake that I did with my SCSI cleanup patch).
 
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
-Acked-By: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/boot-sector.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+v3:
+ - Rebased to current master branch
+ - Add a final patch that adds an entry to the MAINTAINERS file
 
-diff --git a/tests/boot-sector.c b/tests/boot-sector.c
-index c373f0e..7824286 100644
---- a/tests/boot-sector.c
-+++ b/tests/boot-sector.c
-@@ -68,8 +68,11 @@ static uint8_t x86_boot_sector[512] =3D {
- };
-=20
- /* For s390x, use a mini "kernel" with the appropriate signature */
--static const uint8_t s390x_psw[] =3D {
--    0x00, 0x08, 0x00, 0x00, 0x80, 0x01, 0x00, 0x00
-+static const uint8_t s390x_psw_and_magic[] =3D {
-+    0x00, 0x08, 0x00, 0x00, 0x80, 0x01, 0x00, 0x00,  /* Program status w=
-ord  */
-+    0x02, 0x00, 0x00, 0x18, 0x60, 0x00, 0x00, 0x50,  /* Magic:          =
-     */
-+    0x02, 0x00, 0x00, 0x68, 0x60, 0x00, 0x00, 0x50,  /* see linux_s390_m=
-agic */
-+    0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40   /* in the s390-ccw =
-bios */
- };
- static const uint8_t s390x_code[] =3D {
-     0xa7, 0xf4, 0x00, 0x0a,                                /* j 0x10010 =
-*/
-@@ -110,7 +113,7 @@ int boot_sector_init(char *fname)
-     } else if (g_str_equal(arch, "s390x")) {
-         len =3D 0x10000 + sizeof(s390x_code);
-         boot_code =3D g_malloc0(len);
--        memcpy(boot_code, s390x_psw, sizeof(s390x_psw));
-+        memcpy(boot_code, s390x_psw_and_magic, sizeof(s390x_psw_and_magi=
-c));
-         memcpy(&boot_code[0x10000], s390x_code, sizeof(s390x_code));
-     } else {
-         g_assert_not_reached();
+v2:
+ - Use g_spawn_sync() instead of execlp() to run genisoimage
+ - The "-cdrom" parameter test is now run on all architectures (with
+   machine "none" for the machines that are not explicitly checked)
+ - Some rewordings and improved comments here and there
+
+Thomas Huth (4):
+  tests/boot-sector: Add magic bytes to s390x boot code header
+  tests/cdrom-test: Test booting from CD-ROM ISO image file
+  tests/cdrom-test: Test that -cdrom parameter is working
+  MAINTAINERS: Add the cdrom-test to John's section
+
+ MAINTAINERS            |   1 +
+ tests/Makefile.include |   2 +
+ tests/boot-sector.c    |   9 +-
+ tests/cdrom-test.c     | 222 +++++++++++++++++++++++++++++++++++++++++++=
+++++++
+ 4 files changed, 231 insertions(+), 3 deletions(-)
+ create mode 100644 tests/cdrom-test.c
+
 --=20
 1.8.3.1
