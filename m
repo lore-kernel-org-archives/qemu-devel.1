@@ -1,11 +1,10 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fC6Ga-0003kE-Ag
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:30:37 -0400
+	(envelope-from <thuth@redhat.com>) id 1fC6Mj-000694-Et
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:37:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fC6GY-00079p-Ix
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:30:36 -0400
-From: Markus Armbruster <armbru@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1fC6Mi-00012w-Jf
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:36:57 -0400
 References: <1521452376-25099-1-git-send-email-thuth@redhat.com>
 	<87in8qf2w3.fsf@dusky.pond.sub.org>
 	<62dba5cf-b497-1a98-0af5-971e169a3458@redhat.com>
@@ -13,13 +12,16 @@ References: <1521452376-25099-1-git-send-email-thuth@redhat.com>
 	<099d2af4-8fe3-f80c-693f-495accb26a17@redhat.com>
 	<CAFEAcA_VAckXDgARe5dJdxe9N19quUD5Dn+Dseuj=itLbFmG0g@mail.gmail.com>
 	<40c06711-f9a0-3440-9a47-8230cbcb3d55@redhat.com>
-Date: Fri, 27 Apr 2018 18:30:18 +0200
-In-Reply-To: <40c06711-f9a0-3440-9a47-8230cbcb3d55@redhat.com> (Thomas Huth's
-	message of "Fri, 27 Apr 2018 12:24:57 +0200")
-Message-ID: <87muxoehnp.fsf@dusky.pond.sub.org>
+	<87muxoehnp.fsf@dusky.pond.sub.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <155fc4fe-f8d6-a3d9-0f50-d5384a09835a@redhat.com>
+Date: Fri, 27 Apr 2018 18:36:38 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-arm]  qom-test
+In-Reply-To: <87muxoehnp.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc]  [Qemu-arm] qom-test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>
 
-Thomas Huth <thuth@redhat.com> writes:
-
-> On 27.04.2018 12:20, Peter Maydell wrote:
->> On 27 April 2018 at 07:06, Thomas Huth <thuth@redhat.com> wrote:
->>> On 26.04.2018 13:54, Markus Armbruster wrote:
->>> [...]
->>>> Actually, a worse offender in the "waste everybody's time via redunancy"
->>>> department could be qom-test.
-
-Supporting numbers:
-
-$ time for i in *-softmmu/qemu-system-*; do [ -x $i ] || continue; QTEST_QEMU_BINARY=$i QTEST_QEMU_IMG=qemu-img MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))} gtester -k --verbose -m=quick  tests/qom-test ; done
+On 27.04.2018 18:30, Markus Armbruster wrote:
+> Thomas Huth <thuth@redhat.com> writes:
+> 
+>> On 27.04.2018 12:20, Peter Maydell wrote:
+>>> On 27 April 2018 at 07:06, Thomas Huth <thuth@redhat.com> wrote:
 [...]
-real	3m27.427s
-user	2m7.141s
-sys	1m44.354s
+>>>> Shall we change qom-test to also only test with the "none" machine in
+>>>> the normal "make check" mode and only do the full test with all machines
+>>>> in "make check SPEED=slow" ?
+>>>
+>>> We definitely want something that tries to instantiate every
+>>> machine, because that does catch bugs.
+>>
+>> Yes, after having a closer look at this one, I also think that we should
+>> *not* change it to run with "none" by default only. The 'qom-list'
+>> command results in quite a different output depending on which machine
+>> you run it on.
+> 
+> Only running "none" is too naive.
 
-aarch64, arm, i386, x86_64 each take more than 30s.
+For the targets that have "versioned" machine types, I think we could
+skip all the older machine versions, so that we only test with
+pc-i440fx-2.12 but not with pc-i440fx-2.11 and older anymore. That would
+need some more or less clever algorithm to detect the latest version,
+though.
 
-For each target, we walk /machine and qom-get every property.  The test
-passes if qom-get doesn't crash, the values we get don't matter.
-
-For x86_64 alone, qom-test executes qom-get more than 45,000 times to
-test almost 9,500 objects.  It gets the properties of more than 5000
-qemu:memory-region objects, more than 2500 irq objects, almost 300
-smbus-eeprom objects, 110 IDE objects, ...  It's nice we can test
-qom-get doesn't crash on any of IDE's properties in 110 very slight
-variations.  But most of the time, one of the variations would be
-enough.
-
->>> Shall we change qom-test to also only test with the "none" machine in
->>> the normal "make check" mode and only do the full test with all machines
->>> in "make check SPEED=slow" ?
->> 
->> We definitely want something that tries to instantiate every
->> machine, because that does catch bugs.
->
-> Yes, after having a closer look at this one, I also think that we should
-> *not* change it to run with "none" by default only. The 'qom-list'
-> command results in quite a different output depending on which machine
-> you run it on.
-
-Only running "none" is too naive.
+ Thomas
