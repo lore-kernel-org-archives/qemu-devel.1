@@ -1,19 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBzZS-0000rm-B5
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:21:39 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fBzZU-0000tE-HC
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:21:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBzZO-0001nS-UK
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:21:37 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fBzZS-0001pX-UN
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:21:40 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 27 Apr 2018 19:20:38 +1000
-Message-Id: <20180427092126.24812-2-david@gibson.dropbear.id.au>
+Date: Fri, 27 Apr 2018 19:20:45 +1000
+Message-Id: <20180427092126.24812-9-david@gibson.dropbear.id.au>
 In-Reply-To: <20180427092126.24812-1-david@gibson.dropbear.id.au>
 References: <20180427092126.24812-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 01/49] uninorth: trivial style fixups
+Subject: [Qemu-devel] [PULL 08/49] grackle: general tidy-up and QOMify
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,76 +24,225 @@ Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Mark Cave-Ayland
 
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-This makes sure we keep patchew/checkpatch happy during the remainder of =
-this
-patchset.
+This is the first step towards removing the old-style pci_grackle_init()
+function. Following on from the previous commit we can now pass the heathrow
+device as an object link and wire up the heathrow IRQs via qdev GPIOs.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/pci-host/uninorth.c | 29 +++++++++++++++++++----------
- 1 file changed, 19 insertions(+), 10 deletions(-)
+ hw/pci-host/grackle.c | 96 +++++++++++++++++++++++++++++++++------------------
+ hw/ppc/mac.h          |  2 +-
+ hw/ppc/mac_oldworld.c |  2 +-
+ 3 files changed, 64 insertions(+), 36 deletions(-)
 
-diff --git a/hw/pci-host/uninorth.c b/hw/pci-host/uninorth.c
-index 66991da975..710818e355 100644
---- a/hw/pci-host/uninorth.c
-+++ b/hw/pci-host/uninorth.c
-@@ -272,7 +272,6 @@ PCIBus *pci_pmac_u3_init(qemu_irq *pic,
-     UNINState *d;
-=20
-     /* Uninorth AGP bus */
--
-     dev =3D qdev_create(NULL, TYPE_U3_AGP_HOST_BRIDGE);
-     qdev_init_nofail(dev);
-     s =3D SYS_BUS_DEVICE(dev);
-@@ -302,16 +301,23 @@ PCIBus *pci_pmac_u3_init(qemu_irq *pic,
-=20
- static void unin_main_pci_host_realize(PCIDevice *d, Error **errp)
+diff --git a/hw/pci-host/grackle.c b/hw/pci-host/grackle.c
+index 033588b7d2..f8935246c3 100644
+--- a/hw/pci-host/grackle.c
++++ b/hw/pci-host/grackle.c
+@@ -27,6 +27,8 @@
+ #include "hw/pci/pci_host.h"
+ #include "hw/ppc/mac.h"
+ #include "hw/pci/pci.h"
++#include "hw/intc/heathrow_pic.h"
++#include "qapi/error.h"
+ #include "trace.h"
+ 
+ #define GRACKLE_PCI_HOST_BRIDGE(obj) \
+@@ -35,6 +37,8 @@
+ typedef struct GrackleState {
+     PCIHostState parent_obj;
+ 
++    HeathrowState *pic;
++    qemu_irq irqs[4];
+     MemoryRegion pci_mmio;
+     MemoryRegion pci_hole;
+ } GrackleState;
+@@ -47,13 +51,22 @@ static int pci_grackle_map_irq(PCIDevice *pci_dev, int irq_num)
+ 
+ static void pci_grackle_set_irq(void *opaque, int irq_num, int level)
  {
--    d->config[0x0C] =3D 0x08; // cache_line_size
--    d->config[0x0D] =3D 0x10; // latency_timer
--    d->config[0x34] =3D 0x00; // capabilities_pointer
-+    /* cache_line_size */
-+    d->config[0x0C] =3D 0x08;
-+    /* latency_timer */
-+    d->config[0x0D] =3D 0x10;
-+    /* capabilities_pointer */
-+    d->config[0x34] =3D 0x00;
+-    qemu_irq *pic = opaque;
++    GrackleState *s = opaque;
+ 
+     trace_grackle_set_irq(irq_num, level);
+-    qemu_set_irq(pic[irq_num + 0x15], level);
++    qemu_set_irq(s->irqs[irq_num], level);
  }
-=20
- static void unin_agp_pci_host_realize(PCIDevice *d, Error **errp)
- {
--    d->config[0x0C] =3D 0x08; // cache_line_size
--    d->config[0x0D] =3D 0x10; // latency_timer
--    //    d->config[0x34] =3D 0x80; // capabilities_pointer
-+    /* cache_line_size */
-+    d->config[0x0C] =3D 0x08;
-+    /* latency_timer */
-+    d->config[0x0D] =3D 0x10;
-+    /* capabilities_pointer
-+    d->config[0x34] =3D 0x80; */
+ 
+-PCIBus *pci_grackle_init(uint32_t base, qemu_irq *pic,
++static void grackle_init_irqs(GrackleState *s)
++{
++    int i;
 +
-     /*
-      * Set kMacRISCPCIAddressSelect (0x48) register to indicate PCI
-      * memory space with base 0x80000000, size 0x10000000 for Apple's
-@@ -333,9 +339,12 @@ static void u3_agp_pci_host_realize(PCIDevice *d, Er=
-ror **errp)
-=20
- static void unin_internal_pci_host_realize(PCIDevice *d, Error **errp)
++    for (i = 0; i < ARRAY_SIZE(s->irqs); i++) {
++        s->irqs[i] = qdev_get_gpio_in(DEVICE(s->pic), 0x15 + i);
++    }
++}
++
++PCIBus *pci_grackle_init(uint32_t base, DeviceState *pic_dev,
+                          MemoryRegion *address_space_mem,
+                          MemoryRegion *address_space_io)
  {
--    d->config[0x0C] =3D 0x08; // cache_line_size
--    d->config[0x0D] =3D 0x10; // latency_timer
--    d->config[0x34] =3D 0x00; // capabilities_pointer
-+    /* cache_line_size */
-+    d->config[0x0C] =3D 0x08;
-+    /* latency_timer */
-+    d->config[0x0D] =3D 0x10;
-+    /* capabilities_pointer */
-+    d->config[0x34] =3D 0x00;
+@@ -63,60 +76,75 @@ PCIBus *pci_grackle_init(uint32_t base, qemu_irq *pic,
+     GrackleState *d;
+ 
+     dev = qdev_create(NULL, TYPE_GRACKLE_PCI_HOST_BRIDGE);
++    object_property_set_link(OBJECT(dev), OBJECT(pic_dev), "pic",
++                             &error_abort);
++    qdev_init_nofail(dev);
++
+     s = SYS_BUS_DEVICE(dev);
+     phb = PCI_HOST_BRIDGE(dev);
+     d = GRACKLE_PCI_HOST_BRIDGE(dev);
+ 
+-    memory_region_init(&d->pci_mmio, OBJECT(s), "pci-mmio", 0x100000000ULL);
+-    memory_region_init_alias(&d->pci_hole, OBJECT(s), "pci-hole", &d->pci_mmio,
+-                             0x80000000ULL, 0x7e000000ULL);
+     memory_region_add_subregion(address_space_mem, 0x80000000ULL,
+                                 &d->pci_hole);
+ 
++    sysbus_mmio_map(s, 0, base);
++    sysbus_mmio_map(s, 1, base + 0x00200000);
++
++    return phb->bus;
++}
++
++static void grackle_realize(DeviceState *dev, Error **errp)
++{
++    GrackleState *s = GRACKLE_PCI_HOST_BRIDGE(dev);
++    PCIHostState *phb = PCI_HOST_BRIDGE(dev);
++
+     phb->bus = pci_register_root_bus(dev, NULL,
+                                      pci_grackle_set_irq,
+                                      pci_grackle_map_irq,
+-                                     pic,
+-                                     &d->pci_mmio,
+-                                     address_space_io,
++                                     s,
++                                     &s->pci_mmio,
++                                     get_system_io(),
+                                      0, 4, TYPE_PCI_BUS);
+ 
+     pci_create_simple(phb->bus, 0, "grackle");
+-    qdev_init_nofail(dev);
+-
+-    sysbus_mmio_map(s, 0, base);
+-    sysbus_mmio_map(s, 1, base + 0x00200000);
+-
+-    return phb->bus;
++    grackle_init_irqs(s);
  }
-=20
- static void unin_main_pci_host_class_init(ObjectClass *klass, void *data=
-)
---=20
+ 
+-static int pci_grackle_init_device(SysBusDevice *dev)
++static void grackle_init(Object *obj)
+ {
+-    PCIHostState *phb;
++    GrackleState *s = GRACKLE_PCI_HOST_BRIDGE(obj);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++    PCIHostState *phb = PCI_HOST_BRIDGE(obj);
+ 
+-    phb = PCI_HOST_BRIDGE(dev);
++    memory_region_init(&s->pci_mmio, OBJECT(s), "pci-mmio", 0x100000000ULL);
++    memory_region_init_alias(&s->pci_hole, OBJECT(s), "pci-hole", &s->pci_mmio,
++                             0x80000000ULL, 0x7e000000ULL);
+ 
+-    memory_region_init_io(&phb->conf_mem, OBJECT(dev), &pci_host_conf_le_ops,
+-                          dev, "pci-conf-idx", 0x1000);
+-    memory_region_init_io(&phb->data_mem, OBJECT(dev), &pci_host_data_le_ops,
+-                          dev, "pci-data-idx", 0x1000);
+-    sysbus_init_mmio(dev, &phb->conf_mem);
+-    sysbus_init_mmio(dev, &phb->data_mem);
++    memory_region_init_io(&phb->conf_mem, obj, &pci_host_conf_le_ops,
++                          DEVICE(obj), "pci-conf-idx", 0x1000);
++    memory_region_init_io(&phb->data_mem, obj, &pci_host_data_le_ops,
++                          DEVICE(obj), "pci-data-idx", 0x1000);
+ 
+-    return 0;
++    object_property_add_link(obj, "pic", TYPE_HEATHROW,
++                             (Object **) &s->pic,
++                             qdev_prop_allow_set_link_before_realize,
++                             0, NULL);
++
++    sysbus_init_mmio(sbd, &phb->conf_mem);
++    sysbus_init_mmio(sbd, &phb->data_mem);
+ }
+ 
+-static void grackle_pci_host_realize(PCIDevice *d, Error **errp)
++static void grackle_pci_realize(PCIDevice *d, Error **errp)
+ {
+     d->config[0x09] = 0x01;
+ }
+ 
+ static void grackle_pci_class_init(ObjectClass *klass, void *data)
+ {
+-    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+     DeviceClass *dc = DEVICE_CLASS(klass);
++    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+ 
+-    k->realize   = grackle_pci_host_realize;
++    k->realize   = grackle_pci_realize;
+     k->vendor_id = PCI_VENDOR_ID_MOTOROLA;
+     k->device_id = PCI_DEVICE_ID_MOTOROLA_MPC106;
+     k->revision  = 0x00;
+@@ -139,26 +167,26 @@ static const TypeInfo grackle_pci_info = {
+     },
+ };
+ 
+-static void pci_grackle_class_init(ObjectClass *klass, void *data)
++static void grackle_class_init(ObjectClass *klass, void *data)
+ {
+-    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+-    k->init = pci_grackle_init_device;
++    dc->realize = grackle_realize;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+ }
+ 
+-static const TypeInfo grackle_pci_host_info = {
++static const TypeInfo grackle_host_info = {
+     .name          = TYPE_GRACKLE_PCI_HOST_BRIDGE,
+     .parent        = TYPE_PCI_HOST_BRIDGE,
+     .instance_size = sizeof(GrackleState),
+-    .class_init    = pci_grackle_class_init,
++    .instance_init = grackle_init,
++    .class_init    = grackle_class_init,
+ };
+ 
+ static void grackle_register_types(void)
+ {
+     type_register_static(&grackle_pci_info);
+-    type_register_static(&grackle_pci_host_info);
++    type_register_static(&grackle_host_info);
+ }
+ 
+ type_init(grackle_register_types)
+diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
+index d661515e9d..695557b8bf 100644
+--- a/hw/ppc/mac.h
++++ b/hw/ppc/mac.h
+@@ -79,7 +79,7 @@ void macio_init(PCIDevice *dev,
+ 
+ /* Grackle PCI */
+ #define TYPE_GRACKLE_PCI_HOST_BRIDGE "grackle-pcihost"
+-PCIBus *pci_grackle_init(uint32_t base, qemu_irq *pic,
++PCIBus *pci_grackle_init(uint32_t base, DeviceState *pic_dev,
+                          MemoryRegion *address_space_mem,
+                          MemoryRegion *address_space_io);
+ 
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index 9bd4ece16d..d48abfef07 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -261,7 +261,7 @@ static void ppc_heathrow_init(MachineState *machine)
+         exit(1);
+     }
+ 
+-    pci_bus = pci_grackle_init(0xfec00000, pic,
++    pci_bus = pci_grackle_init(0xfec00000, pic_dev,
+                                get_system_memory(),
+                                get_system_io());
+     pci_vga_init(pci_bus);
+-- 
 2.14.3
