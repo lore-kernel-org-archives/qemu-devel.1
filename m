@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBzZa-00011u-DC
+	(envelope-from <dgibson@ozlabs.org>) id 1fBzZa-00011v-DU
 	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:21:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fBzZX-0001sI-7w
+	(envelope-from <dgibson@ozlabs.org>) id 1fBzZY-0001t3-OW
 	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 05:21:46 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 27 Apr 2018 19:20:51 +1000
-Message-Id: <20180427092126.24812-15-david@gibson.dropbear.id.au>
+Date: Fri, 27 Apr 2018 19:20:49 +1000
+Message-Id: <20180427092126.24812-13-david@gibson.dropbear.id.au>
 In-Reply-To: <20180427092126.24812-1-david@gibson.dropbear.id.au>
 References: <20180427092126.24812-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 14/49] uninorth: introduce temporary pic_irqs
- device property
+Subject: [Qemu-devel] [PULL 12/49] mac_oldworld: move wiring of macio IRQs
+ to macio_oldworld_realize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,125 +25,127 @@ Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Mark Cave-Ayland
 
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-This is in preparation for moving the PCI bus wiring inside the uninorth
-host bridge devices. In the future it will be possible to remove this once the
-PICs have been switched to use qdev GPIOs.
+Since the macio device has a link to the PIC device, we can now wire up the
+IRQs directly via qdev GPIOs rather than having to use an intermediate array.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/pci-host/uninorth.c         | 25 +++++++++++++++++++++++--
- include/hw/pci-host/uninorth.h |  1 +
- 2 files changed, 24 insertions(+), 2 deletions(-)
+ hw/misc/macio/macio.c         | 37 ++++++++++++++++++++++---------------
+ hw/ppc/mac_oldworld.c         | 14 --------------
+ include/hw/misc/macio/macio.h |  1 -
+ 3 files changed, 22 insertions(+), 30 deletions(-)
 
-diff --git a/hw/pci-host/uninorth.c b/hw/pci-host/uninorth.c
-index 5b8fc3aa16..fc59698f06 100644
---- a/hw/pci-host/uninorth.c
-+++ b/hw/pci-host/uninorth.c
-@@ -188,6 +188,7 @@ UNINState *pci_pmac_init(qemu_irq *pic,
-     /* Use values found on a real PowerMac */
-     /* Uninorth main bus */
-     dev = qdev_create(NULL, TYPE_UNI_NORTH_PCI_HOST_BRIDGE);
-+    qdev_prop_set_ptr(dev, "pic-irqs", pic);
-     qdev_init_nofail(dev);
-     s = SYS_BUS_DEVICE(dev);
-     h = PCI_HOST_BRIDGE(s);
-@@ -199,7 +200,7 @@ UNINState *pci_pmac_init(qemu_irq *pic,
- 
-     h->bus = pci_register_root_bus(dev, NULL,
-                                    pci_unin_set_irq, pci_unin_map_irq,
--                                   pic,
-+                                   d->pic_irqs,
-                                    &d->pci_mmio,
-                                    address_space_io,
-                                    PCI_DEVFN(11, 0), 4, TYPE_PCI_BUS);
-@@ -220,6 +221,7 @@ UNINState *pci_pmac_init(qemu_irq *pic,
-     /* Uninorth AGP bus */
-     pci_create_simple(h->bus, PCI_DEVFN(11, 0), "uni-north-agp");
-     dev = qdev_create(NULL, TYPE_UNI_NORTH_AGP_HOST_BRIDGE);
-+    qdev_prop_set_ptr(dev, "pic-irqs", pic);
-     qdev_init_nofail(dev);
-     s = SYS_BUS_DEVICE(dev);
-     sysbus_mmio_map(s, 0, 0xf0800000);
-@@ -251,6 +253,7 @@ UNINState *pci_pmac_u3_init(qemu_irq *pic,
- 
-     /* Uninorth AGP bus */
-     dev = qdev_create(NULL, TYPE_U3_AGP_HOST_BRIDGE);
-+    qdev_prop_set_ptr(dev, "pic-irqs", pic);
-     qdev_init_nofail(dev);
-     s = SYS_BUS_DEVICE(dev);
-     h = PCI_HOST_BRIDGE(dev);
-@@ -263,7 +266,7 @@ UNINState *pci_pmac_u3_init(qemu_irq *pic,
- 
-     h->bus = pci_register_root_bus(dev, NULL,
-                                    pci_unin_set_irq, pci_unin_map_irq,
--                                   pic,
-+                                   d->pic_irqs,
-                                    &d->pci_mmio,
-                                    address_space_io,
-                                    PCI_DEVFN(11, 0), 4, TYPE_PCI_BUS);
-@@ -436,10 +439,16 @@ static const TypeInfo unin_internal_pci_host_info = {
-     },
- };
- 
-+static Property pci_unin_main_properties[] = {
-+    DEFINE_PROP_PTR("pic-irqs", UNINState, pic_irqs),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
- static void pci_unin_main_class_init(ObjectClass *klass, void *data)
+diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
+index a0cefe5719..dac7bcd15e 100644
+--- a/hw/misc/macio/macio.c
++++ b/hw/misc/macio/macio.c
+@@ -152,10 +152,9 @@ static void macio_oldworld_realize(PCIDevice *d, Error **errp)
  {
-     DeviceClass *dc = DEVICE_CLASS(klass);
+     MacIOState *s = MACIO(d);
+     OldWorldMacIOState *os = OLDWORLD_MACIO(d);
++    DeviceState *pic_dev = DEVICE(os->pic);
+     Error *err = NULL;
+     SysBusDevice *sysbus_dev;
+-    int i;
+-    int cur_irq = 0;
  
-+    dc->props = pci_unin_main_properties;
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+     macio_common_realize(d, &err);
+     if (err) {
+@@ -164,11 +163,14 @@ static void macio_oldworld_realize(PCIDevice *d, Error **errp)
+     }
+ 
+     sysbus_dev = SYS_BUS_DEVICE(&s->cuda);
+-    sysbus_connect_irq(sysbus_dev, 0, os->irqs[cur_irq++]);
++    sysbus_connect_irq(sysbus_dev, 0, qdev_get_gpio_in(pic_dev,
++                                                       OLDWORLD_CUDA_IRQ));
+ 
+     sysbus_dev = SYS_BUS_DEVICE(&s->escc);
+-    sysbus_connect_irq(sysbus_dev, 0, os->irqs[cur_irq++]);
+-    sysbus_connect_irq(sysbus_dev, 1, os->irqs[cur_irq++]);
++    sysbus_connect_irq(sysbus_dev, 0, qdev_get_gpio_in(pic_dev,
++                                                       OLDWORLD_ESCCB_IRQ));
++    sysbus_connect_irq(sysbus_dev, 1, qdev_get_gpio_in(pic_dev,
++                                                       OLDWORLD_ESCCA_IRQ));
+ 
+     object_property_set_bool(OBJECT(&os->nvram), true, "realized", &err);
+     if (err) {
+@@ -186,15 +188,22 @@ static void macio_oldworld_realize(PCIDevice *d, Error **errp)
+                                 sysbus_mmio_get_region(sysbus_dev, 0));
+ 
+     /* IDE buses */
+-    for (i = 0; i < ARRAY_SIZE(os->ide); i++) {
+-        qemu_irq irq0 = os->irqs[cur_irq++];
+-        qemu_irq irq1 = os->irqs[cur_irq++];
++    macio_realize_ide(s, &os->ide[0],
++                      qdev_get_gpio_in(pic_dev, OLDWORLD_IDE0_IRQ),
++                      qdev_get_gpio_in(pic_dev, OLDWORLD_IDE0_DMA_IRQ),
++                      0x16, &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
+ 
+-        macio_realize_ide(s, &os->ide[i], irq0, irq1, 0x16 + (i * 4), &err);
+-        if (err) {
+-            error_propagate(errp, err);
+-            return;
+-        }
++    macio_realize_ide(s, &os->ide[1],
++                      qdev_get_gpio_in(pic_dev, OLDWORLD_IDE1_IRQ),
++                      qdev_get_gpio_in(pic_dev, OLDWORLD_IDE1_DMA_IRQ),
++                      0x1a, &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
+     }
  }
  
-@@ -451,10 +460,16 @@ static const TypeInfo pci_unin_main_info = {
-     .class_init    = pci_unin_main_class_init,
- };
+@@ -219,8 +228,6 @@ static void macio_oldworld_init(Object *obj)
+     DeviceState *dev;
+     int i;
  
-+static Property pci_u3_agp_properties[] = {
-+    DEFINE_PROP_PTR("pic-irqs", UNINState, pic_irqs),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
- static void pci_u3_agp_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
+-    qdev_init_gpio_out(DEVICE(obj), os->irqs, ARRAY_SIZE(os->irqs));
+-
+     object_property_add_link(obj, "pic", TYPE_HEATHROW,
+                              (Object **) &os->pic,
+                              qdev_prop_allow_set_link_before_realize,
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index 2bbcefa076..4608bab014 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -281,20 +281,6 @@ static void ppc_heathrow_init(MachineState *machine)
+     /* MacIO */
+     macio = OLDWORLD_MACIO(pci_create(pci_bus, -1, TYPE_OLDWORLD_MACIO));
+     dev = DEVICE(macio);
+-    qdev_connect_gpio_out(dev, 0,
+-        qdev_get_gpio_in(pic_dev, OLDWORLD_CUDA_IRQ));
+-    qdev_connect_gpio_out(dev, 1,
+-        qdev_get_gpio_in(pic_dev, OLDWORLD_ESCCB_IRQ));
+-    qdev_connect_gpio_out(dev, 2,
+-        qdev_get_gpio_in(pic_dev, OLDWORLD_ESCCA_IRQ));
+-    qdev_connect_gpio_out(dev, 3,
+-        qdev_get_gpio_in(pic_dev, OLDWORLD_IDE0_IRQ));
+-    qdev_connect_gpio_out(dev, 4,
+-        qdev_get_gpio_in(pic_dev, OLDWORLD_IDE0_DMA_IRQ));
+-    qdev_connect_gpio_out(dev, 5,
+-        qdev_get_gpio_in(pic_dev, OLDWORLD_IDE1_IRQ));
+-    qdev_connect_gpio_out(dev, 6,
+-        qdev_get_gpio_in(pic_dev, OLDWORLD_IDE1_DMA_IRQ));
+     qdev_prop_set_uint64(dev, "frequency", tbfreq);
+     object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
+                              &error_abort);
+diff --git a/include/hw/misc/macio/macio.h b/include/hw/misc/macio/macio.h
+index 4528282b36..64a2584a77 100644
+--- a/include/hw/misc/macio/macio.h
++++ b/include/hw/misc/macio/macio.h
+@@ -56,7 +56,6 @@ typedef struct OldWorldMacIOState {
+     /*< public >*/
  
-+    dc->props = pci_u3_agp_properties;
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
- }
+     HeathrowState *pic;
+-    qemu_irq irqs[7];
  
-@@ -466,10 +481,16 @@ static const TypeInfo pci_u3_agp_info = {
-     .class_init    = pci_u3_agp_class_init,
- };
- 
-+static Property pci_unin_agp_class_properties[] = {
-+    DEFINE_PROP_PTR("pic-irqs", UNINState, pic_irqs),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
- static void pci_unin_agp_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
-+    dc->props = pci_unin_agp_class_properties;
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
- }
- 
-diff --git a/include/hw/pci-host/uninorth.h b/include/hw/pci-host/uninorth.h
-index 0366376a3b..e4fa11c145 100644
---- a/include/hw/pci-host/uninorth.h
-+++ b/include/hw/pci-host/uninorth.h
-@@ -44,6 +44,7 @@
- typedef struct UNINState {
-     PCIHostState parent_obj;
- 
-+    void *pic_irqs;
-     MemoryRegion pci_mmio;
-     MemoryRegion pci_hole;
- } UNINState;
+     MacIONVRAMState nvram;
+     MACIOIDEState ide[2];
 -- 
 2.14.3
