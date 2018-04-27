@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fC61t-000290-Bq
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:15:26 -0400
+	(envelope-from <thuth@redhat.com>) id 1fC647-0003FH-55
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:17:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fC61r-0002lP-WA
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:15:25 -0400
-Received: from mail-ot0-x236.google.com ([2607:f8b0:4003:c0f::236]:33818)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fC61r-0002lC-Jf
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:15:23 -0400
-Received: by mail-ot0-x236.google.com with SMTP id i5-v6so2640642oth.1
-	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 09:15:23 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1fC644-0003on-0m
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:17:43 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55132 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fC643-0003oB-SH
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 12:17:39 -0400
+References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <d50e3a40-d7f3-4c9b-e930-4c2f4d6c8a53@redhat.com>
+Date: Fri, 27 Apr 2018 18:17:27 +0200
 MIME-Version: 1.0
-In-Reply-To: <1519922735-29054-11-git-send-email-mst@redhat.com>
-References: <1519922735-29054-1-git-send-email-mst@redhat.com>
-	<1519922735-29054-11-git-send-email-mst@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 27 Apr 2018 17:15:02 +0100
-Message-ID: <CAFEAcA8=4nyvq4949e171pScH86HbFdKxArHxC-gBcvm6Kytww@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 10/13] cryptodev: add vhost-user as a new
- cryptodev backend
+In-Reply-To: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] release retrospective, next release timing,
+ numbering
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Gonglei <arei.gonglei@huawei.com>, Longpeng <longpeng2@huawei.com>, Jay Zhou <jianjay.zhou@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
 
-On 1 March 2018 at 16:46, Michael S. Tsirkin <mst@redhat.com> wrote:
-> From: Gonglei <arei.gonglei@huawei.com>
->
-> Usage:
->  -chardev socket,id=charcrypto0,path=/path/to/your/socket
->  -object cryptodev-vhost-user,id=cryptodev0,chardev=charcrypto0
->  -device virtio-crypto-pci,id=crypto0,cryptodev=cryptodev0
->
-> Signed-off-by: Gonglei <arei.gonglei@huawei.com>
-> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
-> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+On 27.04.2018 17:51, Peter Maydell wrote:
+> Hi; I usually let people forget about releases for a month or
+> so before bringing this topic up, but:
+>=20
+> (1) do we want to call the next release 2.13, or something else?
+> There's no particular reason to bump to 3.0 except some combination of
+>  * if we keep going like this we'll get up to 2.42, which starts to
+>    get silly
+>  * Linus-style "avoid being too predictable"
+>  * triskaidekaphobia
 
-Hi; Coverity (CID 1390600) points out that there's dead code
-in this function:
+and maybe:
 
-> +static void cryptodev_vhost_user_event(void *opaque, int event)
-> +{
-> +    CryptoDevBackendVhostUser *s = opaque;
-> +    CryptoDevBackend *b = CRYPTODEV_BACKEND(s);
-> +    Error *err = NULL;
+ * Celebrate 15 years of QEMU
+ * Use 3.x to sympathize with Python3 and GTK3
+ * Avoid that users mix up 2.13 with 2.1.3 and think that their
+   QEMU 2.9 is way newer than 2.13
+ * Celebrate that we could get rid of the -net vlan stuff
+ * Finally stop me from sending stupid I-want-v3.0 mails
 
-We set err to NULL here...
+By the way, just another crazy idea for v3.0 (i.e. feel free to turn it
+down immediately ;-)): Since compilation and testing time for QEMU is
+really huge, what do you think if we got rid of some QEMU binaries?
+qemu-system-aarch64 is a superset of qemu-system-arm, qemu-system-x86_64
+is a superset of qemu-system-i386 and qemu-system-ppc64 is a superset of
+qemu-system-ppc (and qemu-system-ppcemb). Would be feasible to get rid
+of the subset binaries with some work? (I think they were especially
+useful on 32-bit machines in the past, but most people are using 64-bit
+machines nowadays, aren't they?).
 
-> +    int queues = b->conf.peers.queues;
-> +
-> +    assert(queues < MAX_CRYPTO_QUEUE_NUM);
-> +
-> +    switch (event) {
-> +    case CHR_EVENT_OPENED:
-> +        if (cryptodev_vhost_user_start(queues, s) < 0) {
-> +            exit(1);
-> +        }
-> +        b->ready = true;
-> +        break;
-> +    case CHR_EVENT_CLOSED:
-> +        b->ready = false;
-> +        cryptodev_vhost_user_stop(queues, s);
-> +        break;
-> +    }
-
-...and nothing here does anything with err...
-
-> +
-> +    if (err) {
-> +        error_report_err(err);
-> +    }
-
-...so this if() is all dead code and we could remove err entirely.
-
-> +}
-
-thanks
--- PMM
+ Happy Friday,
+  Thomas
