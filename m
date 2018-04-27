@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ross.zwisler@linux.intel.com>) id 1fCBJX-0004Z7-Fh
+	(envelope-from <ross.zwisler@linux.intel.com>) id 1fCBJX-0004Z6-FC
 	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 17:54:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ross.zwisler@linux.intel.com>) id 1fCBJU-0007mo-B4
+	(envelope-from <ross.zwisler@linux.intel.com>) id 1fCBJU-0007n1-Qc
 	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 17:53:59 -0400
 Received: from mga01.intel.com ([192.55.52.88]:32371)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <ross.zwisler@linux.intel.com>)
-	id 1fCBJU-0007mH-1I
+	id 1fCBJU-0007mH-Ge
 	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 17:53:56 -0400
 From: Ross Zwisler <ross.zwisler@linux.intel.com>
-Date: Fri, 27 Apr 2018 15:53:12 -0600
-Message-Id: <20180427215314.23168-1-ross.zwisler@linux.intel.com>
-Subject: [Qemu-devel] [PATCH 1/3] nvdimm: fix typo in label-size definition
+Date: Fri, 27 Apr 2018 15:53:13 -0600
+Message-Id: <20180427215314.23168-2-ross.zwisler@linux.intel.com>
+In-Reply-To: <20180427215314.23168-1-ross.zwisler@linux.intel.com>
+References: <20180427215314.23168-1-ross.zwisler@linux.intel.com>
+Subject: [Qemu-devel] [PATCH 2/3] nvdimm,
+ acpi: add NFIT platform capabilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,41 +28,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Haozhong Zhang <haozhong.zhang@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, linux-nvdimm <linux-nvdimm@lists.01.org>
 Cc: Ross Zwisler <ross.zwisler@linux.intel.com>
 
-Signed-off-by: Ross Zwisler <ross.zwisler@linux.intel.com>
-Fixes: commit da6789c27c2e ("nvdimm: add a macro for property "label-size"")
-Cc: Haozhong Zhang <haozhong.zhang@intel.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
----
- hw/mem/nvdimm.c         | 2 +-
- include/hw/mem/nvdimm.h | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Add support for the NFIT Platform Capabilities Structure, newly added in
+ACPI 6.2 Errata A.
 
-diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
-index acb656b672..4087aca25e 100644
---- a/hw/mem/nvdimm.c
-+++ b/hw/mem/nvdimm.c
-@@ -89,7 +89,7 @@ static void nvdimm_set_unarmed(Object *obj, bool value, Error **errp)
+Signed-off-by: Ross Zwisler <ross.zwisler@linux.intel.com>
+---
+ hw/acpi/nvdimm.c | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+
+diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
+index 59d6e4254c..859b390e07 100644
+--- a/hw/acpi/nvdimm.c
++++ b/hw/acpi/nvdimm.c
+@@ -169,6 +169,21 @@ struct NvdimmNfitControlRegion {
+ } QEMU_PACKED;
+ typedef struct NvdimmNfitControlRegion NvdimmNfitControlRegion;
  
- static void nvdimm_init(Object *obj)
++/*
++ * NVDIMM Platform Capabilities Structure
++ *
++ * Defined in section 5.2.25.9 of ACPI 6.2 Errata A, September 2017
++ */
++struct NvdimmNfitPlatformCaps {
++    uint16_t type;
++    uint16_t length;
++    uint8_t highest_cap;
++    uint8_t reserved[3];
++    uint32_t capabilities;
++    uint8_t reserved2[4];
++} QEMU_PACKED;
++typedef struct NvdimmNfitPlatformCaps NvdimmNfitPlatformCaps;
++
+ /*
+  * Module serial number is a unique number for each device. We use the
+  * slot id of NVDIMM device to generate this number so that each device
+@@ -351,6 +366,21 @@ static void nvdimm_build_structure_dcr(GArray *structures, DeviceState *dev)
+                                          JEDEC Annex L Release 3. */);
+ }
+ 
++/*
++ * ACPI 6.2 Errata A: 5.2.25.9 NVDIMM Platform Capabilities Structure
++ */
++static void
++nvdimm_build_structure_caps(GArray *structures)
++{
++    NvdimmNfitPlatformCaps *nfit_caps;
++
++    nfit_caps = acpi_data_push(structures, sizeof(*nfit_caps));
++
++    nfit_caps->type = cpu_to_le16(7 /* NVDIMM Platform Capabilities */);
++    nfit_caps->length = cpu_to_le16(sizeof(*nfit_caps));
++    nfit_caps->highest_cap = 1;
++    nfit_caps->capabilities = cpu_to_le32(2 /* memory controller */);
++}
+ static GArray *nvdimm_build_device_structure(void)
  {
--    object_property_add(obj, NVDIMM_LABLE_SIZE_PROP, "int",
-+    object_property_add(obj, NVDIMM_LABEL_SIZE_PROP, "int",
-                         nvdimm_get_label_size, nvdimm_set_label_size, NULL,
-                         NULL, NULL);
-     object_property_add_bool(obj, NVDIMM_UNARMED_PROP,
-diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
-index 7fd87c4e1c..74c60332e1 100644
---- a/include/hw/mem/nvdimm.h
-+++ b/include/hw/mem/nvdimm.h
-@@ -48,7 +48,7 @@
- #define NVDIMM_GET_CLASS(obj) OBJECT_GET_CLASS(NVDIMMClass, (obj), \
-                                                TYPE_NVDIMM)
+     GSList *device_list = nvdimm_get_device_list();
+@@ -373,6 +403,8 @@ static GArray *nvdimm_build_device_structure(void)
+     }
+     g_slist_free(device_list);
  
--#define NVDIMM_LABLE_SIZE_PROP "label-size"
-+#define NVDIMM_LABEL_SIZE_PROP "label-size"
- #define NVDIMM_UNARMED_PROP    "unarmed"
++    nvdimm_build_structure_caps(structures);
++
+     return structures;
+ }
  
- struct NVDIMMDevice {
 -- 
 2.14.3
