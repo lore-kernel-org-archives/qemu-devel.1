@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fBwpw-0000xM-J6
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 02:26:29 -0400
+	(envelope-from <peterx@redhat.com>) id 1fBwrL-0001mq-JX
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 02:27:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fBwpr-0003Ez-KT
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 02:26:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57876 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fBwrG-00046I-MG
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 02:27:55 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57914 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fBwpr-0003Ec-Dl
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 02:26:23 -0400
-Date: Fri, 27 Apr 2018 14:26:15 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fBwrG-000462-HY
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 02:27:50 -0400
+Date: Fri, 27 Apr 2018 14:27:44 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180427062615.GY9036@xz-mi>
+Message-ID: <20180427062744.GZ9036@xz-mi>
 References: <20180425045129.17449-1-peterx@redhat.com>
-	<20180425045129.17449-4-peterx@redhat.com>
-	<2492f7d8-ed63-6f1c-773f-baa223020022@redhat.com>
+	<20180425045129.17449-8-peterx@redhat.com>
+	<df734575-d387-eec6-fd8a-ad66d31da95d@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <2492f7d8-ed63-6f1c-773f-baa223020022@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 03/10] intel-iommu: add iommu lock
+In-Reply-To: <df734575-d387-eec6-fd8a-ad66d31da95d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 07/10] util: implement simple interval tree
+ logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,87 +30,65 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Jason Wang <jasowang@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
 
-On Fri, Apr 27, 2018 at 01:13:02PM +0800, Jason Wang wrote:
->=20
->=20
-> On 2018=E5=B9=B404=E6=9C=8825=E6=97=A5 12:51, Peter Xu wrote:
-> > Add a per-iommu big lock to protect IOMMU status.  Currently the only
-> > thing to be protected is the IOTLB cache, since that can be accessed
-> > even without BQL, e.g., in IO dataplane.
-> >=20
-> > Note that device page tables should not need any protection.  The saf=
-ety
-> > of that should be provided by guest OS.  E.g., when a page entry is
-> > freed, the guest OS should be responsible to make sure that no device
-> > will be using that page any more.
-> >=20
-> > Reported-by: Fam Zheng<famz@redhat.com>
-> > Signed-off-by: Peter Xu<peterx@redhat.com>
-> > ---
-> >   include/hw/i386/intel_iommu.h |  8 ++++++++
-> >   hw/i386/intel_iommu.c         | 31 +++++++++++++++++++++++++++++--
-> >   2 files changed, 37 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_io=
-mmu.h
-> > index 220697253f..1a8ba8e415 100644
-> > --- a/include/hw/i386/intel_iommu.h
-> > +++ b/include/hw/i386/intel_iommu.h
-> > @@ -262,6 +262,14 @@ struct IntelIOMMUState {
-> >       uint8_t w1cmask[DMAR_REG_SIZE]; /* RW1C(Write 1 to Clear) bytes=
- */
-> >       uint8_t womask[DMAR_REG_SIZE];  /* WO (write only - read return=
-s 0) */
-> >       uint32_t version;
-> > +    /*
-> > +     * Protects IOMMU states in general.  Normally we don't need to
-> > +     * take this lock when we are with BQL held.  However we have co=
-de
-> > +     * paths that may run even without BQL.  In those cases, we need
-> > +     * to take the lock when we have access to IOMMU state
-> > +     * informations, e.g., the IOTLB.
-> > +     */
-> > +    QemuMutex iommu_lock;
->=20
-> Some questions:
->=20
-> 1) Do we need to protect context cache too?
+On Fri, Apr 27, 2018 at 01:53:35PM +0800, Jason Wang wrote:
 
-IMHO the context cache entry should work even without lock.  That's a
-bit trickly since we have two cases that this cache will be updated:
+[...]
 
-  (1) first translation of the address space of a device
-  (2) invalidation of context entries
+> > +    /* Merge right adjacent range */
+> > +    overlap = it_tree_find_value(tree, end + 1);
+> > +    if (overlap) {
+> > +        range->end = overlap->end;
+> > +        g_tree_remove(gtree, overlap);
+> > +    }
+> > +
+> > +    /* Key and value are sharing the same range data */
+> > +    it_tree_insert_internal(gtree, range);
+> 
+> A small optimization here is to delay the allocation until you're sure
+> there's not overlapping.
 
-For (2) IMHO we don't need to worry about since guest OS should be
-controlling that part, say, device should not be doing any translation
-(DMA operations) when the context entry is invalidated.
+Yes I can.
 
-For (1) the worst case is that the context entry cache be updated
-multiple times with the same value by multiple threads.  IMHO that'll
-be fine too.
+[...]
 
-But yes for sure we can protect that too with the iommu lock.
+> > +int it_tree_remove(ITTree *tree, ITValue start, ITValue end)
+> > +{
+> > +    ITRange range = { .start = start, .end = end }, *overlap, and;
+> > +    GTree *gtree;
+> > +
+> > +    g_assert(tree);
+> > +
+> > +    gtree = tree->tree;
+> > +    while ((overlap = g_tree_lookup(gtree, &range))) {
+> > +        if (it_range_equal(overlap, &range)) {
+> > +            /* Exactly what we want to remove; done */
+> > +            g_tree_remove(gtree, overlap);
+> > +            break;
+> > +        } else if (it_range_cover(overlap, &range)) {
+> > +            /* Split existing range into two; done */
+> > +            it_tree_remove_subset(gtree, overlap, &range);
+> > +            break;
+> > +        } else if (it_range_cover(&range, overlap)) {
+> > +            /* Drop this range and continue */
+> > +            g_tree_remove(gtree, overlap);
+> > +        } else {
+> > +            /*
+> > +             * The range to remove has intersection with existing
+> > +             * ranges.  Remove part of the range and continue
+> > +             */
+> > +            it_range_and(&and, overlap, &range);
+> > +            g_assert(and.start <= and.end);
+> > +            it_tree_remove_subset(gtree, overlap, &and);
+> > +        }
+> > +    }
+> > +
+> 
+> Looks like what we need here is just calculate the intersection part the
+> remove it.
 
-> 2) Can we just reuse qemu BQL here?
+Yes.  Will fix that.  Thanks,
 
-I would prefer not.  As I mentioned, at least I have spent too much
-time on fighting BQL already.  I really hope we can start to use
-isolated locks when capable.  BQL is always the worst choice to me.
-
-> 3) I think the issue is common to all other kinds of IOMMU, so can we s=
-imply
-> synchronize before calling ->translate() in memory.c. This seems a more
-> common solution.
-
-I suspect Power and s390 live well with that.  I think it mean at
-least these platforms won't have problem in concurrency.  I'm adding
-DavidG in loop in case there is further comment.  IMHO we should just
-make sure IOMMU code be thread safe, and we fix problem if there is.
-
-Thanks,
-
---=20
+-- 
 Peter Xu
