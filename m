@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fCNeK-0004PB-BW
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 07:04:18 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fCNtP-0000XA-8q
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 07:19:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fCNeI-0000Cg-VW
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 07:04:16 -0400
-References: <20180420220913.27000-1-mreitz@redhat.com>
-	<20180420220913.27000-3-mreitz@redhat.com>
-	<20180427062221.GD4217@lemon.usersys.redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1fCNtO-0005qk-9q
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 07:19:51 -0400
+References: <20180421132929.21610-1-mreitz@redhat.com>
+	<20180421132929.21610-4-mreitz@redhat.com>
+	<5ee0cf91-5533-2500-b4f1-5eac0dee8be4@redhat.com>
+	<377c9a6a-aa05-dec8-52fb-f0cdfc2c2b50@redhat.com>
+	<ae48f373-a9a5-fb67-3241-4812e13a4b08@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <9801ca35-b050-d482-f482-f1364bf07e1c@redhat.com>
-Date: Sat, 28 Apr 2018 13:03:54 +0200
+Message-ID: <7632df03-6884-7533-f2b1-cdd8f293bea1@redhat.com>
+Date: Sat, 28 Apr 2018 13:19:37 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180427062221.GD4217@lemon.usersys.redhat.com>
+In-Reply-To: <ae48f373-a9a5-fb67-3241-4812e13a4b08@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="HEF2NvHGU9tE4UuUNaq8wIgSIdCwbtGlQ"
-Subject: Re: [Qemu-devel] [PATCH 2/3] block/file-posix: File locking during
- creation
+	boundary="WsqXQmGPcl1VQF40BZEIDpEnUIjphGMbF"
+Subject: Re: [Qemu-devel] [PATCH v2 3/9] block: Add BDRV_REQ_WRITE_UNCHANGED
+ flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,171 +28,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HEF2NvHGU9tE4UuUNaq8wIgSIdCwbtGlQ
+--WsqXQmGPcl1VQF40BZEIDpEnUIjphGMbF
 From: Max Reitz <mreitz@redhat.com>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- qemu-devel@nongnu.org
-Message-ID: <9801ca35-b050-d482-f482-f1364bf07e1c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/3] block/file-posix: File locking during
- creation
-References: <20180420220913.27000-1-mreitz@redhat.com>
- <20180420220913.27000-3-mreitz@redhat.com>
- <20180427062221.GD4217@lemon.usersys.redhat.com>
-In-Reply-To: <20180427062221.GD4217@lemon.usersys.redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <7632df03-6884-7533-f2b1-cdd8f293bea1@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/9] block: Add BDRV_REQ_WRITE_UNCHANGED
+ flag
+References: <20180421132929.21610-1-mreitz@redhat.com>
+ <20180421132929.21610-4-mreitz@redhat.com>
+ <5ee0cf91-5533-2500-b4f1-5eac0dee8be4@redhat.com>
+ <377c9a6a-aa05-dec8-52fb-f0cdfc2c2b50@redhat.com>
+ <ae48f373-a9a5-fb67-3241-4812e13a4b08@redhat.com>
+In-Reply-To: <ae48f373-a9a5-fb67-3241-4812e13a4b08@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2018-04-27 08:22, Fam Zheng wrote:
-> On Sat, 04/21 00:09, Max Reitz wrote:
->> When creating a file, we should take the WRITE and RESIZE permissions.=
-
->> We do not need either for the creation itself, but we do need them for=
-
->> clearing and resizing it.  So we can take the proper permissions by
->> replacing O_TRUNC with an explicit truncation to 0, and by taking the
->> appropriate file locks between those two steps.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  block/file-posix.c | 41 +++++++++++++++++++++++++++++++++++++++--
->>  1 file changed, 39 insertions(+), 2 deletions(-)
->>
->> diff --git a/block/file-posix.c b/block/file-posix.c
->> index c98a4a1556..ed7932d6e8 100644
->> --- a/block/file-posix.c
->> +++ b/block/file-posix.c
->> @@ -1992,6 +1992,7 @@ static int raw_co_create(BlockdevCreateOptions *=
-options, Error **errp)
->>  {
->>      BlockdevCreateOptionsFile *file_opts;
->>      int fd;
->> +    int perm, shared;
->>      int result =3D 0;
->> =20
->>      /* Validate options and set default values */
->> @@ -2006,14 +2007,48 @@ static int raw_co_create(BlockdevCreateOptions=
- *options, Error **errp)
->>      }
->> =20
->>      /* Create file */
->> -    fd =3D qemu_open(file_opts->filename, O_RDWR | O_CREAT | O_TRUNC =
-| O_BINARY,
->> -                   0644);
->> +    fd =3D qemu_open(file_opts->filename, O_RDWR | O_CREAT | O_BINARY=
-, 0644);
->>      if (fd < 0) {
->>          result =3D -errno;
->>          error_setg_errno(errp, -result, "Could not create file");
->>          goto out;
->>      }
->> =20
->> +    /* Take permissions: We want to discard everything, so we need
->> +     * BLK_PERM_WRITE; and truncation to the desired size requires
->> +     * BLK_PERM_RESIZE.
->> +     * On the other hand, we cannot share the RESIZE permission
->> +     * because we promise that after this function, the file has the
->> +     * size given in the options.  If someone else were to resize it
->> +     * concurrently, we could not guarantee that. */
+On 2018-04-26 04:12, Eric Blake wrote:
+> On 04/25/2018 10:08 AM, Max Reitz wrote:
 >=20
-> Strictly speaking, we do close(fd) before this function returns so the =
-lock is
-> lost and race can happen.
+>>
+>>> Also, that does raise the question of whether you have more work to
+>>> support write-zero requests with WRITE_UNCHANGED (which indeed sounds=
 
-Right, but then creation from the perspective of file-posix is over.  We
-are going to reopen the file for formatting, but that is just a normal
-bdrv_open() so it will automatically be locked, no?
-
->> +    perm =3D BLK_PERM_WRITE | BLK_PERM_RESIZE;
->> +    shared =3D BLK_PERM_ALL & ~BLK_PERM_RESIZE;
->> +
->> +    /* Step one: Take locks in shared mode */
->> +    result =3D raw_apply_lock_bytes(fd, perm, shared, false, errp);
->> +    if (result < 0) {
->> +        goto out_close;
->> +    }
->> +
->> +    /* Step two: Try to get them exclusively */
->> +    result =3D raw_check_lock_bytes(fd, perm, shared, errp);
->> +    if (result < 0) {
->> +        goto out_close;
->> +    }
->> +
->> +    /* Step three: Downgrade them to shared again, and keep
->> +     *             them that way until we are done */
->> +    result =3D raw_apply_lock_bytes(fd, perm, shared, true, errp);
+>>> like something plausible to support).
+>>
+>> I'm afraid I don't quite understand the question.
+>> BDRV_REQ_WRITE_UNCHANGED support is usually rather simple because as
+>> said above it is only needed by drivers that rely on their parent to
+>> request the permissions, i.e. filter drivers.  Since filter drivers ju=
+st
+>> forward the requests, all they have to do is retain the
+>> BDRV_REQ_WRITE_UNCHANGED flag, be it a zero write or a normal write.
 >=20
-> You comment it as "downgrade to shared" but what this actually does in =
-addition
-> to step one is to "unlock" unneeded bytes which we haven't locked anywa=
-y. So I'm
-> confused why we need this stop. IIUC no downgrading is necessary after =
-step one
-> and step two: only necessary shared locks are acquired in step one, and=
- step two
-> is read-only op (F_OFD_GETLK).
+> I'm trying to figure out if BDRV_REQ_WRITE_UNCHANGED makes sense for
+> bdrv_co_pwrite_zeroes as well as bdrv_co_pwrite. I think the answer is
+> yes (if we know the guest already reads zeroes, but need to write to th=
+e
+> protocol layer anyways because of a commit operation, then mixing both
+> BDRV_REQ_WRITE_UNCHANGED and BDRV_REQ_ZERO_WRITE to the block layer
+> makes sense, and supported_zero_flags should indeed pass
+> BDRV_REQ_WRITE_UNCHANGED on to a driver.
 
-Oops.  For some reason I thought raw_check_lock_bytes() would take the
-locks exclusively.  Yes, then we don't need this third step.
+Well, why not.
 
-Thanks for reviewing!
+>> It would be more complicated for format drivers, because they would ha=
+ve
+>> to verify that the incoming unchanged write actually ends up as an
+>> unchanged write in their file.  But we have already recognized that th=
+at
+>> would be too much to ask and that format drivers may want to generally=
+
+>> just write anything to their child if it's writable (even regardless o=
+f
+>> whether the grandparent issues writes to the format driver node), so
+>> they always grab a WRITE permission on their file if possible.
+>> Therefore, they do not have to support this request flag.
+>=20
+> So qcow2 doesn't have to support the flag, but file-posix.c might want
+> to.  Or are you saying that only filter drivers need to advertise
+> support for the flag?
+
+It might make sense for file-posix, but when you think further, it
+wouldn't do anything in practice.
+
+First, if a protocol driver receives WRITE_UNCHANGED, there are two
+things it can do: If it knows that it only has very plain storage, it
+can just ignore the request because it won't do anything.
+
+If a protocol driver supports backing files (gluster does, I think), it
+cannot ignore them because just like qcow2 it needs to now make sure
+that the data ends up in the top layer.  So if the protocol driver can
+draw any benefits from advertising to the protocol that this is an
+unchanging write (or that it just wants to bring data from a backing
+file up to the top level, which it can infer from the WRITE_UNCHANGED
+flag), then it would make sense for it to support the flag.
+
+(Good point to add to the documentation.)
+
+But from qemu's perspective, this is not required.  The protocol driver
+will just be less efficient if it submits normal writes (and it can do
+that, because qemu will refuse to grant WRITE_UNCHANGED on read-only
+nodes, so the protocol driver must have write access).
+
+OTOH, filter drivers (usually) *must* support this flag because they are
+caught up in qemu's permission system.  They do not submit the writes to
+some protocol, but to the block layer, and the block layer wants you to
+have the proper permissions for that -- and that's not a simple RW/RO
+decision, but we have read/write-unchanged in between.  So if a filter
+driver that only forwards the permissions from its parent may only do
+the very same requests the parent does -- and if the parent does a
+WRITE_UNCHANGED request, the filter driver must do the same.
 
 Max
 
->> +    if (result < 0) {
->> +        goto out_close;
->> +    }
->> +
->> +    /* Clear the file by truncating it to 0 */
->> +    result =3D raw_regular_truncate(fd, 0, PREALLOC_MODE_OFF, errp);
->> +    if (result < 0) {
->> +        goto out_close;
->> +    }
->> +
->>      if (file_opts->nocow) {
->>  #ifdef __linux__
->>          /* Set NOCOW flag to solve performance issue on fs like btrfs=
-=2E
->> @@ -2029,6 +2064,8 @@ static int raw_co_create(BlockdevCreateOptions *=
-options, Error **errp)
->>  #endif
->>      }
->> =20
->> +    /* Resize and potentially preallocate the file to the desired
->> +     * final size */
->>      result =3D raw_regular_truncate(fd, file_opts->size, file_opts->p=
-reallocation,
->>                                    errp);
->>      if (result < 0) {
->> --=20
->> 2.14.3
->>
->>
->=20
-> Fam
->=20
 
-
-
---HEF2NvHGU9tE4UuUNaq8wIgSIdCwbtGlQ
+--WsqXQmGPcl1VQF40BZEIDpEnUIjphGMbF
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlrkVRoACgkQ9AfbAGHV
-z0CpyggAj4P3QckqMygojHvyziVEJrCzK09qKCUq5BqbqjOF0q7jjtiwVubP5/7q
-WhnDzRR0mVydsm10QvXYC4GJrg1CNk81wMFL5kzK6EtoDqtjglc+dW8JRY9E17NG
-IIAc021tMknwQCzA0Vdusi4PFJP9YF3AwQIDYY85IkL4lCaZ2WdsaAcYRaB6Vb6N
-RwjPjFPTYefS0dblWXVXk0quSb94xqPtTRbvrYMTGq83UpBsx2f55U9homxxouZP
-/6zmi/+l2Z9ePz9IyI2gZVuwcz18bwo0tuFnBZYs3yrvyOs3dwEYadrhO/tShUSo
-zsjSI+1j8AogYdAEyl4OE/nOdmeVag==
-=uM2G
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlrkWMkACgkQ9AfbAGHV
+z0DF4AgAu8hw88IQWNetBT+HRCSdjZj9vWK3m0GTE5FXQUe+nDPt/LABJaRJtbqt
+SMrdZjKZhWLq0g8B0THN+oK/EyKI5oDAEP1PfmTIhF8bgBQj8boV88GGfHLGFyZv
+TL9FAkjbXgj33KlJdiA3puBCbui5plyOvbHdjAd9byQXjjwdTg48jiSuBfV6U+0W
+TWg6W6xZwT39H+nqRYnGKJH5o27vQ+IqrbJEmfX2tEyfu+v721VL4hZYSKCYNELL
+CvmG6XBmuAg8kmFAz8W5dB3VE9owFXlQbN127q9SDsrcqdlh9Fye9M4r8A7Nq2xI
+f2rxgOrm1hrkMYCrNGBpWTYsUVgSjg==
+=SVxL
 -----END PGP SIGNATURE-----
 
---HEF2NvHGU9tE4UuUNaq8wIgSIdCwbtGlQ--
+--WsqXQmGPcl1VQF40BZEIDpEnUIjphGMbF--
