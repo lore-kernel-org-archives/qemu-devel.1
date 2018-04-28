@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35048)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fCF1z-0003e5-Lz
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 21:52:08 -0400
+	(envelope-from <kevin.tian@intel.com>) id 1fCF4X-0004t6-Rh
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 21:54:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fCF1v-0004GD-P0
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 21:52:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56538 helo=mx1.redhat.com)
+	(envelope-from <kevin.tian@intel.com>) id 1fCF4T-0004pD-Uo
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 21:54:45 -0400
+Received: from mga17.intel.com ([192.55.52.151]:11679)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fCF1v-0004Fa-Iu
-	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 21:52:03 -0400
-References: <1520219524-17160-1-git-send-email-jasowang@redhat.com>
-	<1520219524-17160-8-git-send-email-jasowang@redhat.com>
-	<CAFEAcA9UKGD6rziW=MVsJSgXvF10eTgTHd87qUwL9+aEKAy2zw@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <0125c397-4c62-0aa3-0bc1-1fd83c6f6401@redhat.com>
-Date: Sat, 28 Apr 2018 09:51:55 +0800
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9UKGD6rziW=MVsJSgXvF10eTgTHd87qUwL9+aEKAy2zw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(Exim 4.71) (envelope-from <kevin.tian@intel.com>)
+	id 1fCF4T-0004p7-LD
+	for qemu-devel@nongnu.org; Fri, 27 Apr 2018 21:54:41 -0400
+From: "Tian, Kevin" <kevin.tian@intel.com>
+Date: Sat, 28 Apr 2018 01:54:37 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19113D477@SHSMSX101.ccr.corp.intel.com>
+References: <20180425045129.17449-1-peterx@redhat.com>
+	<20180425045129.17449-4-peterx@redhat.com>
+	<2492f7d8-ed63-6f1c-773f-baa223020022@redhat.com>
+	<20180427062615.GY9036@xz-mi>
+	<AADFC41AFE54684AB9EE6CBC0274A5D19113B628@SHSMSX101.ccr.corp.intel.com>
+	<20180427095352.GD13269@xz-mi>
+In-Reply-To: <20180427095352.GD13269@xz-mi>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 7/9] net: Add a new convenience option
- "--nic" to configure default/on-board NICs
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 03/10] intel-iommu: add iommu lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,91 +33,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>, Alex Williamson <alex.williamson@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>
 
-
-
-On 2018=E5=B9=B404=E6=9C=8827=E6=97=A5 20:29, Peter Maydell wrote:
-> On 5 March 2018 at 03:12, Jason Wang <jasowang@redhat.com> wrote:
->> From: Thomas Huth <thuth@redhat.com>
-> Hi. Coverity (CID 1390615) points out that we leak memory
-> in an error-exit codepath in this function.
->
->> +/* For the convenience "--nic" parameter */
->> +static int net_param_nic(void *dummy, QemuOpts *opts, Error **errp)
->> +{
->> +    char *mac, *nd_id;
->> +    int idx, ret;
->> +    NICInfo *ni;
->> +    const char *type;
->> +
->> +    type =3D qemu_opt_get(opts, "type");
->> +    if (type && g_str_equal(type, "none")) {
->> +        return 0;    /* Nothing to do, default_net is cleared in vl.c=
- */
->> +    }
->> +
->> +    idx =3D nic_get_free_idx();
->> +    if (idx =3D=3D -1 || nb_nics >=3D MAX_NICS) {
->> +        error_setg(errp, "no more on-board/default NIC slots availabl=
-e");
->> +        return -1;
->> +    }
->> +
->> +    if (!type) {
->> +        qemu_opt_set(opts, "type", "user", &error_abort);
->> +    }
->> +
->> +    ni =3D &nd_table[idx];
->> +    memset(ni, 0, sizeof(*ni));
->> +    ni->model =3D qemu_opt_get_del(opts, "model");
->> +
->> +    /* Create an ID if the user did not specify one */
->> +    nd_id =3D g_strdup(qemu_opts_id(opts));
->> +    if (!nd_id) {
->> +        nd_id =3D g_strdup_printf("__org.qemu.nic%i\n", idx);
->> +        qemu_opts_set_id(opts, nd_id);
->> +    }
-> Here we allocate nd_id...
->
->> +
->> +    /* Handle MAC address */
->> +    mac =3D qemu_opt_get_del(opts, "mac");
->> +    if (mac) {
->> +        ret =3D net_parse_macaddr(ni->macaddr.a, mac);
->> +        g_free(mac);
->> +        if (ret) {
->> +            error_setg(errp, "invalid syntax for ethernet address");
->> +            return -1;
->> +        }
->> +        if (is_multicast_ether_addr(ni->macaddr.a)) {
->> +            error_setg(errp, "NIC cannot have multicast MAC address")=
-;
->> +            return -1;
->> +        }
-> ...but in these two error-exit paths we do not free nd_id.
->
->> +    }
->> +    qemu_macaddr_default_if_unset(&ni->macaddr);
->> +
->> +    ret =3D net_client_init(opts, true, errp);
->> +    if (ret =3D=3D 0) {
->> +        ni->netdev =3D qemu_find_netdev(nd_id);
->> +        ni->used =3D true;
->> +        nb_nics++;
->> +    }
-> Putting a label "out:" here and replacing the 'return -1's
-> with "ret =3D -1; goto out;" would fix this.
->
->> +    g_free(nd_id);
->> +    return ret;
->> +}
->> +
-> thanks
-> -- PMM
->
-
-Thanks Peter.
-
-Thomas, want to send a fix for this?
+PiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBldGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBGcmlk
+YXksIEFwcmlsIDI3LCAyMDE4IDU6NTQgUE0NCj4gDQo+IE9uIEZyaSwgQXByIDI3LCAyMDE4IGF0
+IDA3OjE5OjI1QU0gKzAwMDAsIFRpYW4sIEtldmluIHdyb3RlOg0KPiA+ID4gRnJvbTogUGV0ZXIg
+WHUNCj4gPiA+IFNlbnQ6IEZyaWRheSwgQXByaWwgMjcsIDIwMTggMjoyNiBQTQ0KPiA+ID4NCj4g
+PiA+IE9uIEZyaSwgQXByIDI3LCAyMDE4IGF0IDAxOjEzOjAyUE0gKzA4MDAsIEphc29uIFdhbmcg
+d3JvdGU6DQo+ID4gPiA+DQo+ID4gPiA+DQo+ID4gPiA+IE9uIDIwMTjlubQwNOaciDI15pelIDEy
+OjUxLCBQZXRlciBYdSB3cm90ZToNCj4gPiA+ID4gPiBBZGQgYSBwZXItaW9tbXUgYmlnIGxvY2sg
+dG8gcHJvdGVjdCBJT01NVSBzdGF0dXMuICBDdXJyZW50bHkgdGhlDQo+IG9ubHkNCj4gPiA+ID4g
+PiB0aGluZyB0byBiZSBwcm90ZWN0ZWQgaXMgdGhlIElPVExCIGNhY2hlLCBzaW5jZSB0aGF0IGNh
+biBiZSBhY2Nlc3NlZA0KPiA+ID4gPiA+IGV2ZW4gd2l0aG91dCBCUUwsIGUuZy4sIGluIElPIGRh
+dGFwbGFuZS4NCj4gPiA+ID4gPg0KPiA+ID4gPiA+IE5vdGUgdGhhdCBkZXZpY2UgcGFnZSB0YWJs
+ZXMgc2hvdWxkIG5vdCBuZWVkIGFueSBwcm90ZWN0aW9uLiAgVGhlDQo+ID4gPiBzYWZldHkNCj4g
+PiA+ID4gPiBvZiB0aGF0IHNob3VsZCBiZSBwcm92aWRlZCBieSBndWVzdCBPUy4gIEUuZy4sIHdo
+ZW4gYSBwYWdlIGVudHJ5IGlzDQo+ID4gPiA+ID4gZnJlZWQsIHRoZSBndWVzdCBPUyBzaG91bGQg
+YmUgcmVzcG9uc2libGUgdG8gbWFrZSBzdXJlIHRoYXQgbm8NCj4gZGV2aWNlDQo+ID4gPiA+ID4g
+d2lsbCBiZSB1c2luZyB0aGF0IHBhZ2UgYW55IG1vcmUuDQo+ID4NCj4gPiBkZXZpY2UgcGFnZSB0
+YWJsZSBkZWZpbml0ZWx5IGRvZXNuJ3QgcmVxdWlyZSBwcm90ZWN0aW9uLCBzaW5jZSBpdCBpcw0K
+PiA+IGluLW1lbW9yeSBzdHJ1Y3R1cmUgbWFuYWdlZCBieSBndWVzdC4gSG93ZXZlciB0aGUgcmVh
+c29uDQo+ID4gYWJvdmUgaXMgbm90IGFjY3VyYXRlIC0gdGhlcmUgaXMgbm8gd2F5IHRoYXQgZ3Vl
+c3QgT1MgY2FuIG1ha2UNCj4gPiBzdXJlIG5vIGRldmljZSB1c2VzIG5vbi1wcmVzZW50IHBhZ2Ug
+ZW50cnksIG90aGVyd2lzZSBpdCBkb2Vzbid0DQo+ID4gcmVxdWlyZSB2aXJ0dWFsIElPTU1VIHRv
+IHByb3RlY3QgaXRzZWxmLiBUaGVyZSBjb3VsZCBiZSBib2d1cy8NCj4gPiBtYWxpY2lvdXMgZHJp
+dmVycyB3aGljaCBzdXJlbHkgbWF5IHByb2dyYW0gdGhlIGRldmljZSB0byBhdHRlbXB0IHNvLg0K
+PiANCj4gSG93IGFib3V0IHRoaXM6DQo+IA0KPiAgIE5vdGUgdGhhdCB3ZSBkb24ndCBuZWVkIHRv
+IHByb3RlY3QgZGV2aWNlIHBhZ2UgdGFibGVzIHNpbmNlIHRoYXQncw0KPiAgIGZ1bGx5IGNvbnRy
+b2xsZWQgYnkgdGhlIGd1ZXN0IGtlcm5lbC4gIEhvd2V2ZXIgdGhlcmUgaXMgc3RpbGwNCj4gICBw
+b3NzaWJpbGl0aWVzIHRoYXQgbWFsaWNpb3VzIGRyaXZlcnMgd2lsbCBzdGlsbCBwcm9ncmFtIHRo
+ZSBkZXZpY2UNCj4gICB0byBub3QgZGlzb2JleSB0aGUgcnVsZS4gIEluIHRoYXQgY2FzZSBRRU1V
+IGNhbid0IHJlYWxseSBkbyBhbnl0aGluZw0KPiAgIHVzZWZ1bCwgaW5zdGVhZCB0aGUgZ3Vlc3Qg
+aXRzZWxmIHdpbGwgYmUgcmVzcG9uc2libGUgZm9yIGFsbA0KPiAgIHVuY2VydGFpbnRpZXMuDQo+
+IA0KDQp5ZXMsIE9LIHRvIG1lDQoNClRoYW5rcw0KS2V2aW4NCg==
