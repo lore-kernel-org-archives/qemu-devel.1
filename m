@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54143)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fCHVJ-0000OD-H3
+	(envelope-from <bounces@canonical.com>) id 1fCHVJ-0000OC-Gu
 	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 00:30:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fCHVH-0003od-TM
+	(envelope-from <bounces@canonical.com>) id 1fCHVG-0003o0-Bm
 	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 00:30:33 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58334)
+Received: from indium.canonical.com ([91.189.90.7]:58278)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fCHVH-0003oH-ME
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 00:30:31 -0400
+	id 1fCHVG-0003nc-0p
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 00:30:30 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fCHVG-0006UG-QL
-	for <qemu-devel@nongnu.org>; Sat, 28 Apr 2018 04:30:30 +0000
+	id 1fCHVE-0006S4-SZ
+	for <qemu-devel@nongnu.org>; Sat, 28 Apr 2018 04:30:28 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C2FAA2E8071
-	for <qemu-devel@nongnu.org>; Sat, 28 Apr 2018 04:30:30 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id CFA022E8059
+	for <qemu-devel@nongnu.org>; Sat, 28 Apr 2018 04:30:28 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 28 Apr 2018 04:17:29 -0000
-From: Launchpad Bug Tracker <1429034@bugs.launchpad.net>
-Reply-To: Bug 1429034 <1429034@bugs.launchpad.net>
+Date: Sat, 28 Apr 2018 04:17:28 -0000
+From: Launchpad Bug Tracker <1432103@bugs.launchpad.net>
+Reply-To: Bug 1432103 <1432103@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20150306094424.12161.38872.malonedeb@gac.canonical.com>
-Message-Id: <152488904995.26551.5641384055101449194.malone@loganberry.canonical.com>
+References: <20150314042811.14702.61970.malonedeb@wampee.canonical.com>
+Message-Id: <152488904894.26551.16112480134961934406.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1429034] Re: qemu abort in qemu_coroutine_enter
- when multi-thread writing
+Subject: [Qemu-devel] [Bug 1432103] Re: error in x86 executable segment
+ permission check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,51 +48,19 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1429034
+https://bugs.launchpad.net/bugs/1432103
 
 Title:
-  qemu abort in qemu_coroutine_enter when multi-thread writing
+  error in x86 executable segment permission check
 
 Status in QEMU:
   Expired
 
 Bug description:
-  qemu release version: 2.2.0
-  platform: x86_64
-
-  qemu would be aborted when there are two threads to write two seperate
-  qcow2 files.
-
-  call stack:
-
-  #0 0x7ffff5e18989	__GI_raise(sig=3Dsig@entry=3D6) (../nptl/sysdeps/unix/s=
-ysv/linux/raise.c:56)
-  #1 0x7ffff5e1a098	__GI_abort() (abort.c:90)
-  #2 0x7ffff728c034	qemu_coroutine_enter(co=3D0x7fffe0004800, opaque=3D0x0)=
- (qemu-coroutine.c:117)
-  #3 0x7ffff727df39	bdrv_co_io_em_complete(opaque=3D0x7ffff7fd6ae0, ret=3D0=
-) (block.c:4847)
-  #4 0x7ffff7270314	thread_pool_completion_bh(opaque=3D0x7fffe0006ad0) (thr=
-ead-pool.c:187)
-  #5 0x7ffff726f873	aio_bh_poll(ctx=3D0x7fffe0001d00) (async.c:82)
-  #6 0x7ffff728340b	aio_dispatch(ctx=3D0x7fffe0001d00) (aio-posix.c:137)
-  #7 0x7ffff72837b0	aio_poll(ctx=3D0x7fffe0001d00, blocking=3Dtrue) (aio-po=
-six.c:248)
-  #8 ??	0x00007ffff72795a8 in bdrv_prwv_co (bs=3D0x7fffdc0021c0, offset=3D1=
-2071639552, qiov=3D0x7fffe67fa590, is_write=3Dtrue, flags=3D(unknown: 0)) (=
-block.c:2703)
-  #9 ??	0x00007ffff727966a in bdrv_rw_co (bs=3D0x7fffdc0021c0, sector_num=
-=3D23577421, buf=3D0x7fffe4629250 "\234\b\335=C7=BC\254\213q\301\366\315=3D=
-\005oI\301\245=3D\373\004+2?H\212\025\035+\262\274C;X\301FaP\324\335\061=D2=
-=9D&Y\316=3D\347\335\020\365\003go=C9=BF\214\312S=3D\v2]\373\363C\311\341\3=
-34\r5k\346k\204\332\023\264\315=E9=99=8C\230\203J\222u\214\066", nb_sectors=
-=3D128, is_write=3Dtrue, flags=3D(unknown: 0)) (block.c:2726)
-  #10 0x7ffff7279758	bdrv_write(bs=3D0x7fffdc0021c0, sector_num=3D23577421,=
- buf=3D0x7fffe4629250 "\234\b\335=C7=BC\254\213q\301\366\315=3D\005oI\301\2=
-45=3D\373\004+2?H\212\025\035+\262\274C;X\301FaP\324\335\061=D2=9D&Y\316=3D=
-\347\335\020\365\003go=C9=BF\214\312S=3D\v2]\373\363C\311\341\334\r5k\346k\=
-204\332\023\264\315=E9=99=8C\230\203J\222u\214\066", nb_sectors=3D128) (blo=
-ck.c:2760)
+  When the code segment register (%cs) selects an executable segment
+  with no read permission, mov instructions that read from the segment
+  via %cs prefix can still succeed without causing a general protection
+  error.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1429034/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1432103/+subscriptions
