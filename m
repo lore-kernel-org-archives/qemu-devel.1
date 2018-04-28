@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58444)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP66-00028A-4K
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 08:37:03 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP6a-0002TI-Vd
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 08:37:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP61-00047P-7q
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 08:37:02 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:55900)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP6W-0004Wd-1K
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 08:37:32 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:56062)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP5y-00045X-3z
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 08:36:54 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP6Q-0004SI-MR
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 08:37:27 -0400
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Sat, 28 Apr 2018 15:36:45 +0300
-Message-ID: <20180428123645.12445.18399.stgit@pasha-VirtualBox>
+Date: Sat, 28 Apr 2018 15:37:14 +0300
+Message-ID: <20180428123714.12445.19186.stgit@pasha-VirtualBox>
 In-Reply-To: <20180428123627.12445.9923.stgit@pasha-VirtualBox>
 References: <20180428123627.12445.9923.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RFC PATCH v2 03/19] replay: update docs for
- record/replay with block devices
+Subject: [Qemu-devel] [RFC PATCH v2 08/19] replay: introduce info hmp/qmp
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +30,193 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
-This patch updates the description of the command lines for using
-record/replay with attached block devices.
+This patch introduces 'info replay' monitor command and
+corresponding qmp request.
+These commands request the current record/replay mode, replay log file name,
+and the execution step (number or recorded/replayed instructions).
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
----
- docs/replay.txt |   12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/docs/replay.txt b/docs/replay.txt
-index 2e21e9c..f7def53 100644
---- a/docs/replay.txt
-+++ b/docs/replay.txt
-@@ -27,7 +27,7 @@ Usage of the record/replay:
-  * First, record the execution with the following command line:
-     qemu-system-i386 \
-      -icount shift=7,rr=record,rrfile=replay.bin \
--     -drive file=disk.qcow2,if=none,id=img-direct \
-+     -drive file=disk.qcow2,if=none,snapshot,id=img-direct \
-      -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay \
-      -device ide-hd,drive=img-blkreplay \
-      -netdev user,id=net1 -device rtl8139,netdev=net1 \
-@@ -35,7 +35,7 @@ Usage of the record/replay:
-  * After recording, you can replay it by using another command line:
-     qemu-system-i386 \
-      -icount shift=7,rr=replay,rrfile=replay.bin \
--     -drive file=disk.qcow2,if=none,id=img-direct \
-+     -drive file=disk.qcow2,if=none,snapshot,id=img-direct \
-      -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay \
-      -device ide-hd,drive=img-blkreplay \
-      -netdev user,id=net1 -device rtl8139,netdev=net1 \
-@@ -223,7 +223,7 @@ Block devices record/replay module intercepts calls of
- bdrv coroutine functions at the top of block drivers stack.
- To record and replay block operations the drive must be configured
- as following:
-- -drive file=disk.qcow2,if=none,id=img-direct
-+ -drive file=disk.qcow2,if=none,snapshot,id=img-direct
-  -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay
-  -device ide-hd,drive=img-blkreplay
+--
+
+v2:
+ - renamed info_replay qmp into query-replay (suggested by Eric Blake)
+---
+ hmp-commands-info.hx      |   14 ++++++++++++++
+ hmp.h                     |    1 +
+ qapi/misc.json            |   35 +++++++++++++++++++++++++++++++++++
+ replay/Makefile.objs      |    3 ++-
+ replay/replay-debugging.c |   41 +++++++++++++++++++++++++++++++++++++++++
+ replay/replay-internal.h  |    2 ++
+ replay/replay.c           |    3 +--
+ 7 files changed, 96 insertions(+), 3 deletions(-)
+ create mode 100644 replay/replay-debugging.c
+
+diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+index ddfcd5a..f5631be 100644
+--- a/hmp-commands-info.hx
++++ b/hmp-commands-info.hx
+@@ -883,6 +883,20 @@ STEXI
+ Show SEV information.
+ ETEXI
  
-@@ -252,6 +252,12 @@ This snapshot is created at start of recording and restored at start
- of replaying. It also can be loaded while replaying to roll back
- the execution.
- 
-+'snapshot' flag of the disk image must be removed to save the snapshots
-+in the overlay (or original image) instead of using the temporary overlay.
-+ -drive file=disk.ovl,if=none,id=img-direct
-+ -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay
-+ -device ide-hd,drive=img-blkreplay
++    {
++        .name       = "replay",
++        .args_type  = "",
++        .params     = "",
++        .help       = "show parameters of the record/replay",
++        .cmd        = hmp_info_replay,
++    },
 +
- Use QEMU monitor to create additional snapshots. 'savevm <name>' command
- created the snapshot and 'loadvm <name>' restores it. To prevent corruption
- of the original disk image, use overlay files linked to the original images.
++STEXI
++@item info replay
++@findex info replay
++Display the current record/replay mode and the currently executing step.
++ETEXI
++
+ STEXI
+ @end table
+ ETEXI
+diff --git a/hmp.h b/hmp.h
+index 4e2ec37..084fb62 100644
+--- a/hmp.h
++++ b/hmp.h
+@@ -144,5 +144,6 @@ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
+ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
+ void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
+ void hmp_info_sev(Monitor *mon, const QDict *qdict);
++void hmp_info_replay(Monitor *mon, const QDict *qdict);
+ 
+ #endif
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 5636f4a..0b0e874 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -3064,6 +3064,41 @@
+   'data': [ 'none', 'record', 'play' ] }
+ 
+ ##
++# @ReplayInfo:
++#
++# Status of the record/replay mode.
++#
++# @mode: current mode.
++#
++# @filename: name of the record/replay log file.
++#
++# @step: current step number.
++#
++# Since: 2.13
++#
++##
++{ 'struct': 'ReplayInfo',
++  'data': { 'mode': 'ReplayMode', '*filename': 'str', 'step': 'int' } }
++
++##
++# @query-replay:
++#
++# Retrieves the status of the execution record/replay.
++#
++# Returns: structure with the properties of the record/replay.
++#
++# Since: 2.13
++#
++# Example:
++#
++# -> { "execute": "query-replay" }
++# <- { "return": { "mode": "play", "filename": "log.rr", "step": 220414 } }
++#
++##
++{ 'command': 'query-replay',
++  'returns': 'ReplayInfo' }
++
++##
+ # @xen-load-devices-state:
+ #
+ # Load the state of all devices from file. The RAM and the block devices
+diff --git a/replay/Makefile.objs b/replay/Makefile.objs
+index cee6539..6694e3e 100644
+--- a/replay/Makefile.objs
++++ b/replay/Makefile.objs
+@@ -6,4 +6,5 @@ common-obj-y += replay-input.o
+ common-obj-y += replay-char.o
+ common-obj-y += replay-snapshot.o
+ common-obj-y += replay-net.o
+-common-obj-y += replay-audio.o
+\ No newline at end of file
++common-obj-y += replay-audio.o
++common-obj-y += replay-debugging.o
+diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
+new file mode 100644
+index 0000000..03e7db8
+--- /dev/null
++++ b/replay/replay-debugging.c
+@@ -0,0 +1,41 @@
++/*
++ * replay-debugging.c
++ *
++ * Copyright (c) 2010-2018 Institute for System Programming
++ *                         of the Russian Academy of Sciences.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "sysemu/replay.h"
++#include "replay-internal.h"
++#include "hmp.h"
++#include "monitor/monitor.h"
++#include "qapi/qapi-commands-misc.h"
++
++void hmp_info_replay(Monitor *mon, const QDict *qdict)
++{
++    if (replay_mode == REPLAY_MODE_NONE) {
++        monitor_printf(mon, "No record/replay\n");
++    } else {
++        monitor_printf(mon, "%s execution '%s': current step = %"PRId64"\n",
++            replay_mode == REPLAY_MODE_RECORD ? "Recording" : "Replaying",
++            replay_filename, replay_get_current_step());
++    }
++}
++
++ReplayInfo *qmp_query_replay(Error **errp)
++{
++    ReplayInfo *retval = g_new0(ReplayInfo, 1);
++    retval->mode = replay_mode;
++    if (replay_filename) {
++        retval->filename = g_strdup(replay_filename);
++        retval->has_filename = true;
++    }
++    retval->step = replay_get_current_step();
++    return retval;
++}
+diff --git a/replay/replay-internal.h b/replay/replay-internal.h
+index ac4b27b..ef82b5e 100644
+--- a/replay/replay-internal.h
++++ b/replay/replay-internal.h
+@@ -91,6 +91,8 @@ extern ReplayState replay_state;
+ 
+ /* File for replay writing */
+ extern FILE *replay_file;
++/*! Name of replay file  */
++extern char *replay_filename;
+ 
+ void replay_put_byte(uint8_t byte);
+ void replay_put_event(uint8_t event);
+diff --git a/replay/replay.c b/replay/replay.c
+index 58a986f..8b70d7d 100644
+--- a/replay/replay.c
++++ b/replay/replay.c
+@@ -29,8 +29,7 @@
+ ReplayMode replay_mode = REPLAY_MODE_NONE;
+ char *replay_snapshot;
+ 
+-/* Name of replay file  */
+-static char *replay_filename;
++char *replay_filename;
+ ReplayState replay_state;
+ static GSList *replay_blockers;
+ 
