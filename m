@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP6a-0002TI-Vd
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 08:37:34 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP6a-0002TD-Vf
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 08:37:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP6W-0004Wd-1K
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP6W-0004W1-0L
 	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 08:37:32 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:56062)
+Received: from mail.ispras.ru ([83.149.199.45]:56000)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP6Q-0004SI-MR
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP6F-0004L3-4K
 	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 08:37:27 -0400
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Sat, 28 Apr 2018 15:37:14 +0300
-Message-ID: <20180428123714.12445.19186.stgit@pasha-VirtualBox>
+Date: Sat, 28 Apr 2018 15:37:02 +0300
+Message-ID: <20180428123702.12445.39836.stgit@pasha-VirtualBox>
 In-Reply-To: <20180428123627.12445.9923.stgit@pasha-VirtualBox>
 References: <20180428123627.12445.9923.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RFC PATCH v2 08/19] replay: introduce info hmp/qmp
- command
+Subject: [Qemu-devel] [RFC PATCH v2 06/19] qcow2: introduce icount field for
+ snapshots
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,193 +30,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
-This patch introduces 'info replay' monitor command and
-corresponding qmp request.
-These commands request the current record/replay mode, replay log file name,
-and the execution step (number or recorded/replayed instructions).
+This patch introduces the icount field for saving within the snapshot.
+It is required for navigation between the snapshots in record/replay mode.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
 --
 
 v2:
- - renamed info_replay qmp into query-replay (suggested by Eric Blake)
+ - documented format changes in docs/interop/qcow2.txt
+   (suggested by Eric Blake)
 ---
- hmp-commands-info.hx      |   14 ++++++++++++++
- hmp.h                     |    1 +
- qapi/misc.json            |   35 +++++++++++++++++++++++++++++++++++
- replay/Makefile.objs      |    3 ++-
- replay/replay-debugging.c |   41 +++++++++++++++++++++++++++++++++++++++++
- replay/replay-internal.h  |    2 ++
- replay/replay.c           |    3 +--
- 7 files changed, 96 insertions(+), 3 deletions(-)
- create mode 100644 replay/replay-debugging.c
+ block/qcow2-snapshot.c |    7 +++++++
+ block/qcow2.h          |    2 ++
+ docs/interop/qcow2.txt |    4 ++++
+ 3 files changed, 13 insertions(+)
 
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index ddfcd5a..f5631be 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -883,6 +883,20 @@ STEXI
- Show SEV information.
- ETEXI
+diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
+index 74293be..d04553e 100644
+--- a/block/qcow2-snapshot.c
++++ b/block/qcow2-snapshot.c
+@@ -103,6 +103,12 @@ int qcow2_read_snapshots(BlockDriverState *bs)
+             sn->disk_size = bs->total_sectors * BDRV_SECTOR_SIZE;
+         }
  
-+    {
-+        .name       = "replay",
-+        .args_type  = "",
-+        .params     = "",
-+        .help       = "show parameters of the record/replay",
-+        .cmd        = hmp_info_replay,
-+    },
++        if (extra_data_size >= 24) {
++            sn->icount = be64_to_cpu(extra.icount);
++        } else {
++            sn->icount = -1ULL;
++        }
 +
-+STEXI
-+@item info replay
-+@findex info replay
-+Display the current record/replay mode and the currently executing step.
-+ETEXI
-+
- STEXI
- @end table
- ETEXI
-diff --git a/hmp.h b/hmp.h
-index 4e2ec37..084fb62 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -144,5 +144,6 @@ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
- void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
- void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
- void hmp_info_sev(Monitor *mon, const QDict *qdict);
-+void hmp_info_replay(Monitor *mon, const QDict *qdict);
+         /* Read snapshot ID */
+         sn->id_str = g_malloc(id_str_size + 1);
+         ret = bdrv_pread(bs->file, offset, sn->id_str, id_str_size);
+@@ -209,6 +215,7 @@ static int qcow2_write_snapshots(BlockDriverState *bs)
+         memset(&extra, 0, sizeof(extra));
+         extra.vm_state_size_large = cpu_to_be64(sn->vm_state_size);
+         extra.disk_size = cpu_to_be64(sn->disk_size);
++        extra.icount = cpu_to_be64(sn->icount);
  
- #endif
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 5636f4a..0b0e874 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -3064,6 +3064,41 @@
-   'data': [ 'none', 'record', 'play' ] }
+         id_str_size = strlen(sn->id_str);
+         name_size = strlen(sn->name);
+diff --git a/block/qcow2.h b/block/qcow2.h
+index adf5c39..8880937 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -151,6 +151,7 @@ typedef struct QEMU_PACKED QCowSnapshotHeader {
+ typedef struct QEMU_PACKED QCowSnapshotExtraData {
+     uint64_t vm_state_size_large;
+     uint64_t disk_size;
++    uint64_t icount;
+ } QCowSnapshotExtraData;
  
- ##
-+# @ReplayInfo:
-+#
-+# Status of the record/replay mode.
-+#
-+# @mode: current mode.
-+#
-+# @filename: name of the record/replay log file.
-+#
-+# @step: current step number.
-+#
-+# Since: 2.13
-+#
-+##
-+{ 'struct': 'ReplayInfo',
-+  'data': { 'mode': 'ReplayMode', '*filename': 'str', 'step': 'int' } }
-+
-+##
-+# @query-replay:
-+#
-+# Retrieves the status of the execution record/replay.
-+#
-+# Returns: structure with the properties of the record/replay.
-+#
-+# Since: 2.13
-+#
-+# Example:
-+#
-+# -> { "execute": "query-replay" }
-+# <- { "return": { "mode": "play", "filename": "log.rr", "step": 220414 } }
-+#
-+##
-+{ 'command': 'query-replay',
-+  'returns': 'ReplayInfo' }
-+
-+##
- # @xen-load-devices-state:
- #
- # Load the state of all devices from file. The RAM and the block devices
-diff --git a/replay/Makefile.objs b/replay/Makefile.objs
-index cee6539..6694e3e 100644
---- a/replay/Makefile.objs
-+++ b/replay/Makefile.objs
-@@ -6,4 +6,5 @@ common-obj-y += replay-input.o
- common-obj-y += replay-char.o
- common-obj-y += replay-snapshot.o
- common-obj-y += replay-net.o
--common-obj-y += replay-audio.o
-\ No newline at end of file
-+common-obj-y += replay-audio.o
-+common-obj-y += replay-debugging.o
-diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
-new file mode 100644
-index 0000000..03e7db8
---- /dev/null
-+++ b/replay/replay-debugging.c
-@@ -0,0 +1,41 @@
-+/*
-+ * replay-debugging.c
-+ *
-+ * Copyright (c) 2010-2018 Institute for System Programming
-+ *                         of the Russian Academy of Sciences.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "sysemu/replay.h"
-+#include "replay-internal.h"
-+#include "hmp.h"
-+#include "monitor/monitor.h"
-+#include "qapi/qapi-commands-misc.h"
-+
-+void hmp_info_replay(Monitor *mon, const QDict *qdict)
-+{
-+    if (replay_mode == REPLAY_MODE_NONE) {
-+        monitor_printf(mon, "No record/replay\n");
-+    } else {
-+        monitor_printf(mon, "%s execution '%s': current step = %"PRId64"\n",
-+            replay_mode == REPLAY_MODE_RECORD ? "Recording" : "Replaying",
-+            replay_filename, replay_get_current_step());
-+    }
-+}
-+
-+ReplayInfo *qmp_query_replay(Error **errp)
-+{
-+    ReplayInfo *retval = g_new0(ReplayInfo, 1);
-+    retval->mode = replay_mode;
-+    if (replay_filename) {
-+        retval->filename = g_strdup(replay_filename);
-+        retval->has_filename = true;
-+    }
-+    retval->step = replay_get_current_step();
-+    return retval;
-+}
-diff --git a/replay/replay-internal.h b/replay/replay-internal.h
-index ac4b27b..ef82b5e 100644
---- a/replay/replay-internal.h
-+++ b/replay/replay-internal.h
-@@ -91,6 +91,8 @@ extern ReplayState replay_state;
  
- /* File for replay writing */
- extern FILE *replay_file;
-+/*! Name of replay file  */
-+extern char *replay_filename;
+@@ -164,6 +165,7 @@ typedef struct QCowSnapshot {
+     uint32_t date_sec;
+     uint32_t date_nsec;
+     uint64_t vm_clock_nsec;
++    uint64_t icount;
+ } QCowSnapshot;
  
- void replay_put_byte(uint8_t byte);
- void replay_put_event(uint8_t event);
-diff --git a/replay/replay.c b/replay/replay.c
-index 58a986f..8b70d7d 100644
---- a/replay/replay.c
-+++ b/replay/replay.c
-@@ -29,8 +29,7 @@
- ReplayMode replay_mode = REPLAY_MODE_NONE;
- char *replay_snapshot;
+ struct Qcow2Cache;
+diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
+index feb711f..ff5b4ed 100644
+--- a/docs/interop/qcow2.txt
++++ b/docs/interop/qcow2.txt
+@@ -506,6 +506,10 @@ Snapshot table entry:
  
--/* Name of replay file  */
--static char *replay_filename;
-+char *replay_filename;
- ReplayState replay_state;
- static GSList *replay_blockers;
+                     Byte 48 - 55:   Virtual disk size of the snapshot in bytes
+ 
++                    Byte 56 - 63:   icount value which corresponds to
++                                    the record/replay step when the snapshot
++                                    was taken
++
+                     Version 3 images must include extra data at least up to
+                     byte 55.
  
