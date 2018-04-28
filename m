@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP5t-0001wZ-Lm
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 08:36:50 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP66-00028B-4t
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 08:37:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP5s-00041Y-NB
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 08:36:49 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:55878)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP64-00049c-0g
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 08:37:02 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:55934)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP5s-00041I-Es
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 08:36:48 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP63-000494-OB
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 08:36:59 -0400
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Sat, 28 Apr 2018 15:36:40 +0300
-Message-ID: <20180428123640.12445.67155.stgit@pasha-VirtualBox>
+Date: Sat, 28 Apr 2018 15:36:51 +0300
+Message-ID: <20180428123651.12445.90766.stgit@pasha-VirtualBox>
 In-Reply-To: <20180428123627.12445.9923.stgit@pasha-VirtualBox>
 References: <20180428123627.12445.9923.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RFC PATCH v2 02/19] replay: disable default snapshot
- for record/replay
+Subject: [Qemu-devel] [RFC PATCH v2 04/19] replay: don't drain/flush bdrv
+ queue while RR is working
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +30,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
-From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-
-This patch disables setting '-snapshot' option on by default
-in record/replay mode. This is needed for creating vmstates in record
-and replay modes.
+In record/replay mode bdrv queue is controlled by replay mechanism.
+It does not allow saving or loading the snapshots
+when bdrv queue is not empty. Stopping the VM is not blocked by nonempty
+queue, but flushing the queue is still impossible there,
+because it may cause deadlocks in replay mode.
+This patch disables bdrv_drain_all and bdrv_flush_all in
+record/replay mode.
 
 Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 ---
- vl.c |   10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ block/io.c |   22 ++++++++++++++++++++++
+ cpus.c     |    2 --
+ 2 files changed, 22 insertions(+), 2 deletions(-)
 
-diff --git a/vl.c b/vl.c
-index 7487535..39fc03a 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3243,7 +3243,13 @@ int main(int argc, char **argv, char **envp)
-                 drive_add(IF_PFLASH, -1, optarg, PFLASH_OPTS);
-                 break;
-             case QEMU_OPTION_snapshot:
--                snapshot = 1;
-+                {
-+                    Error *blocker = NULL;
-+                    snapshot = 1;
-+                    error_setg(&blocker, QERR_REPLAY_NOT_SUPPORTED,
-+                               "-snapshot");
-+                    replay_add_blocker(blocker);
-+                }
-                 break;
-             case QEMU_OPTION_numa:
-                 opts = qemu_opts_parse_noisily(qemu_find_opts("numa"),
-@@ -4546,7 +4552,7 @@ int main(int argc, char **argv, char **envp)
-         qapi_free_BlockdevOptions(bdo->bdo);
-         g_free(bdo);
+diff --git a/block/io.c b/block/io.c
+index bd9a19a..1ceefbc 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -32,6 +32,7 @@
+ #include "qemu/cutils.h"
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
++#include "sysemu/replay.h"
+ 
+ #define NOT_DONE 0x7fffffff /* used while emulated sync operation in progress */
+ 
+@@ -407,6 +408,13 @@ void bdrv_drain_all_begin(void)
+     BdrvNextIterator it;
+     GSList *aio_ctxs = NULL, *ctx;
+ 
++    /* bdrv queue is managed by record/replay,
++       waiting for finishing the I/O requests may
++       be infinite */
++    if (replay_events_enabled()) {
++        return;
++    }
++
+     /* BDRV_POLL_WHILE() for a node can only be called from its own I/O thread
+      * or the main loop AioContext. We potentially use BDRV_POLL_WHILE() on
+      * nodes in several different AioContexts, so make sure we're in the main
+@@ -458,6 +466,13 @@ void bdrv_drain_all_end(void)
+     BlockDriverState *bs;
+     BdrvNextIterator it;
+ 
++    /* bdrv queue is managed by record/replay,
++       waiting for finishing the I/O requests may
++       be endless */
++    if (replay_events_enabled()) {
++        return;
++    }
++
+     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+         AioContext *aio_context = bdrv_get_aio_context(bs);
+ 
+@@ -1832,6 +1847,13 @@ int bdrv_flush_all(void)
+     BlockDriverState *bs = NULL;
+     int result = 0;
+ 
++    /* bdrv queue is managed by record/replay,
++       creating new flush request for stopping
++       the VM may break the determinism */
++    if (replay_events_enabled()) {
++        return result;
++    }
++
+     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+         AioContext *aio_context = bdrv_get_aio_context(bs);
+         int ret;
+diff --git a/cpus.c b/cpus.c
+index 38eba8b..140cc4f 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1016,7 +1016,6 @@ static int do_vm_stop(RunState state, bool send_stop)
      }
--    if (snapshot || replay_mode != REPLAY_MODE_NONE) {
-+    if (snapshot) {
-         qemu_opts_foreach(qemu_find_opts("drive"), drive_enable_snapshot,
-                           NULL, NULL);
-     }
+ 
+     bdrv_drain_all();
+-    replay_disable_events();
+     ret = bdrv_flush_all();
+ 
+     return ret;
+@@ -2059,7 +2058,6 @@ int vm_prepare_start(void)
+         qapi_event_send_stop(&error_abort);
+         res = -1;
+     } else {
+-        replay_enable_events();
+         cpu_enable_ticks();
+         runstate_set(RUN_STATE_RUNNING);
+         vm_state_notify(1, RUN_STATE_RUNNING);
