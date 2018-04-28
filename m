@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fCHHt-0004zC-4l
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 00:16:43 -0400
+	(envelope-from <bounces@canonical.com>) id 1fCHVJ-0000OD-H3
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 00:30:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fCHHr-0006VU-Cb
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 00:16:41 -0400
-Received: from mail-it0-x232.google.com ([2607:f8b0:4001:c0b::232]:55329)
+	(envelope-from <bounces@canonical.com>) id 1fCHVH-0003od-TM
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 00:30:33 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58334)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1fCHHr-0006Ul-5F
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 00:16:39 -0400
-Received: by mail-it0-x232.google.com with SMTP id 144-v6so4310071iti.5
-	for <qemu-devel@nongnu.org>; Fri, 27 Apr 2018 21:16:37 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fCHVH-0003oH-ME
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 00:30:31 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fCHVG-0006UG-QL
+	for <qemu-devel@nongnu.org>; Sat, 28 Apr 2018 04:30:30 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C2FAA2E8071
+	for <qemu-devel@nongnu.org>; Sat, 28 Apr 2018 04:30:30 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180427091603.GD32172@redhat.com>
-References: <1524666934-8064-1-git-send-email-lidongchen@tencent.com>
-	<1524666934-8064-5-git-send-email-lidongchen@tencent.com>
-	<20180426173641.GN2631@work-vm>
-	<CAOGPPbcPb4F2m_o4jPn2ELRK19=Yr=P+QRi4r_-eVhzmV0d5kA@mail.gmail.com>
-	<20180427091603.GD32172@redhat.com>
-From: 858585 jemmy <jemmy858585@gmail.com>
-Date: Sat, 28 Apr 2018 12:16:36 +0800
-Message-ID: <CAOGPPbcG4-FiV1d134g5YA8z4cNrdzELED3rpR+NrJzc2OfwcA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 4/5] migration: implement bi-directional
- RDMA QIOChannel
+Date: Sat, 28 Apr 2018 04:17:29 -0000
+From: Launchpad Bug Tracker <1429034@bugs.launchpad.net>
+Reply-To: Bug 1429034 <1429034@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150306094424.12161.38872.malonedeb@gac.canonical.com>
+Message-Id: <152488904995.26551.5641384055101449194.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1429034] Re: qemu abort in qemu_coroutine_enter
+ when multi-thread writing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,163 +37,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Gal Shachaf <galsha@mellanox.com>, Aviad Yehezkel <aviadye@mellanox.com>, licq@mellanox.com, adido@mellanox.com, Lidong Chen <lidongchen@tencent.com>
+To: qemu-devel@nongnu.org
 
-On Fri, Apr 27, 2018 at 5:16 PM, Daniel P. Berrang=C3=A9 <berrange@redhat.c=
-om> wrote:
-> On Fri, Apr 27, 2018 at 03:56:38PM +0800, 858585 jemmy wrote:
->> On Fri, Apr 27, 2018 at 1:36 AM, Dr. David Alan Gilbert
->> <dgilbert@redhat.com> wrote:
->> > * Lidong Chen (jemmy858585@gmail.com) wrote:
->> >> This patch implements bi-directional RDMA QIOChannel. Because differe=
-nt
->> >> threads may access RDMAQIOChannel concurrently, this patch use RCU to=
- protect it.
->> >>
->> >> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
->> >
->> > I'm a bit confused by this.
->> >
->> > I can see it's adding RCU to protect the rdma structures against
->> > deletion from multiple threads; that I'm OK with in principal; is that
->> > the only locking we need? (I guess the two directions are actually
->> > separate RDMAContext's so maybe).
->>
->> The qio_channel_rdma_close maybe invoked by migration thread and
->> return path thread
->> concurrently, so I use a mutex to protect it.
->
-> Hmm, that is not good - concurrent threads calling close must not be
-> allowed to happen even with non-RDMA I/O chanels.
->
-> For example, with the QIOChannelSocket, one thread can call close
-> which sets the fd =3D -1, another thread can race with this and either
-> end up calling close again on the same FD or calling close on -1.
-> Either way the second thread will get an error from close() when
-> it should have skipped the close() and returned success. Perhaps
-> migration gets lucky and this doesn't result in it being marked
-> as failed, but it is still not good.
->
-> So only one thread should be calling close().
+[Expired for QEMU because there has been no activity for 60 days.]
 
-for live migration, source qemu invokes qemu_fclose in different
-threads, include main thread,
-migration thread, return path thread.
-destination qemu invokes qemu_fclose in main thread, listen thread and
-COLO incoming thread.
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-so I prefer to add a lock for QEMUFile struct, like this:
+-- =
 
-int qemu_fclose(QEMUFile *f)
-{
-    int ret;
-    qemu_fflush(f);
-    ret =3D qemu_file_get_error(f);
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1429034
 
-    if (f->ops->close) {
-+        qemu_mutex_lock(&f->lock);
-        int ret2 =3D f->ops->close(f->opaque);
-+       qemu_mutex_unlock(&f->lock);
-        if (ret >=3D 0) {
-            ret =3D ret2;
-        }
-    }
-    /* If any error was spotted before closing, we should report it
-     * instead of the close() return value.
-     */
-    if (f->last_error) {
-        ret =3D f->last_error;
-    }
-    g_free(f);
-    trace_qemu_file_fclose();
-    return ret;
-}
+Title:
+  qemu abort in qemu_coroutine_enter when multi-thread writing
 
-Any suggestion?
+Status in QEMU:
+  Expired
 
->
->> If one thread invoke qio_channel_rdma_writev, another thread invokes
->> qio_channel_rdma_readv,
->> two threads will use separate RDMAContext, so it does not need a lock.
->>
->> If two threads invoke qio_channel_rdma_writev concurrently, it will
->> need a lock to protect.
->> but I find source qemu migration thread only invoke
->> qio_channel_rdma_writev, the return path
->> thread only invokes qio_channel_rdma_readv.
->
-> QIOChannel impls are only intended to cope with a single thread doing
-> I/O in each direction. If you have two threads needing to read, or
-> two threads needing to write, the layer above should provide locking
-> to ensure correct ordering  of I/O oprations.
+Bug description:
+  qemu release version: 2.2.0
+  platform: x86_64
 
-yes, so I think RCU is enough, we do not need more lock.
+  qemu would be aborted when there are two threads to write two seperate
+  qcow2 files.
 
->
->> The destination qemu only invoked qio_channel_rdma_readv by main
->> thread before postcopy and or
->> listen thread after postcopy.
->>
->> The destination qemu have already protected it by using
->> qemu_mutex_lock(&mis->rp_mutex) when writing data to
->> source qemu.
->>
->> But should we use qemu_mutex_lock to protect qio_channel_rdma_writev
->> and qio_channel_rdma_readv?
->> to avoid some change in future invoke qio_channel_rdma_writev or
->> qio_channel_rdma_readv concurrently?
->
->>
->> >
->> > But is there nothing else to make the QIOChannel bidirectional?
->> >
->> > Also, a lot seems dependent on listen_id, can you explain how that's
->> > being used.
->>
->> The destination qemu is server side, so listen_id is not zero. the
->> source qemu is client side,
->> the listen_id is zero.
->> I use listen_id to determine whether qemu is destination or source.
->>
->> for the destination qemu, if write data to source, it need use the
->> return_path rdma, like this:
->>     if (rdma->listen_id) {
->>         rdma =3D rdma->return_path;
->>     }
->>
->> for the source qemu, if read data from destination, it also need use
->> the return_path rdma.
->>     if (!rdma->listen_id) {
->>         rdma =3D rdma->return_path;
->>     }
->
-> This feels uncessarily complex to me. Why not just change QIOCHannelRMDA
-> struct, so that it has 2 RDMA context pointers eg
->
-> struct QIOChannelRDMA {
->     QIOChannel parent;
->     RDMAContext *rdmain;
->     RDMAContext *rdmaout;
->     QEMUFile *file;
->     bool blocking; /* XXX we don't actually honour this yet */
-> };
+  call stack:
 
-The reason is the parameter of some function is RDMAContext.
-like qemu_rdma_accept, rdma_start_outgoing_migration.
-It's easier to implement return path.
+  #0 0x7ffff5e18989	__GI_raise(sig=3Dsig@entry=3D6) (../nptl/sysdeps/unix/s=
+ysv/linux/raise.c:56)
+  #1 0x7ffff5e1a098	__GI_abort() (abort.c:90)
+  #2 0x7ffff728c034	qemu_coroutine_enter(co=3D0x7fffe0004800, opaque=3D0x0)=
+ (qemu-coroutine.c:117)
+  #3 0x7ffff727df39	bdrv_co_io_em_complete(opaque=3D0x7ffff7fd6ae0, ret=3D0=
+) (block.c:4847)
+  #4 0x7ffff7270314	thread_pool_completion_bh(opaque=3D0x7fffe0006ad0) (thr=
+ead-pool.c:187)
+  #5 0x7ffff726f873	aio_bh_poll(ctx=3D0x7fffe0001d00) (async.c:82)
+  #6 0x7ffff728340b	aio_dispatch(ctx=3D0x7fffe0001d00) (aio-posix.c:137)
+  #7 0x7ffff72837b0	aio_poll(ctx=3D0x7fffe0001d00, blocking=3Dtrue) (aio-po=
+six.c:248)
+  #8 ??	0x00007ffff72795a8 in bdrv_prwv_co (bs=3D0x7fffdc0021c0, offset=3D1=
+2071639552, qiov=3D0x7fffe67fa590, is_write=3Dtrue, flags=3D(unknown: 0)) (=
+block.c:2703)
+  #9 ??	0x00007ffff727966a in bdrv_rw_co (bs=3D0x7fffdc0021c0, sector_num=
+=3D23577421, buf=3D0x7fffe4629250 "\234\b\335=C7=BC\254\213q\301\366\315=3D=
+\005oI\301\245=3D\373\004+2?H\212\025\035+\262\274C;X\301FaP\324\335\061=D2=
+=9D&Y\316=3D\347\335\020\365\003go=C9=BF\214\312S=3D\v2]\373\363C\311\341\3=
+34\r5k\346k\204\332\023\264\315=E9=99=8C\230\203J\222u\214\066", nb_sectors=
+=3D128, is_write=3Dtrue, flags=3D(unknown: 0)) (block.c:2726)
+  #10 0x7ffff7279758	bdrv_write(bs=3D0x7fffdc0021c0, sector_num=3D23577421,=
+ buf=3D0x7fffe4629250 "\234\b\335=C7=BC\254\213q\301\366\315=3D\005oI\301\2=
+45=3D\373\004+2?H\212\025\035+\262\274C;X\301FaP\324\335\061=D2=9D&Y\316=3D=
+\347\335\020\365\003go=C9=BF\214\312S=3D\v2]\373\363C\311\341\334\r5k\346k\=
+204\332\023\264\315=E9=99=8C\230\203J\222u\214\066", nb_sectors=3D128) (blo=
+ck.c:2760)
 
-so I should add some comment to the code.
-
->
->
->
-> Regards,
-> Daniel
-> --
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1429034/+subscriptions
