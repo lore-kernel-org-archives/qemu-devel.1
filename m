@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fCSoL-00041u-FS
+	(envelope-from <mreitz@redhat.com>) id 1fCSoM-00042N-2L
 	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 12:35:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fCSoK-0004gW-Ip
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 12:34:57 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fCSoK-0004gg-PX
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 12:34:58 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Sat, 28 Apr 2018 18:34:40 +0200
-Message-Id: <20180428163442.6238-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/2] qcow2: Repair OFLAG_COPIED when fixing
+Date: Sat, 28 Apr 2018 18:34:41 +0200
+Message-Id: <20180428163442.6238-2-mreitz@redhat.com>
+In-Reply-To: <20180428163442.6238-1-mreitz@redhat.com>
+References: <20180428163442.6238-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/2] qcow2: Repair OFLAG_COPIED when fixing
  leaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -21,42 +23,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Suppose you have an image with consistent OFLAG_COPIED and refcounts.
-Now further suppose that image has leaked clusters (single reference,
-but refcount 2).  When checking such an image with qemu-img check, it
-will notify you of the leakage, and that's it.
+Repairing OFLAG_COPIED is usually safe because it is done after the
+refcounts have been repaired.  Therefore, it we did not find anyone else
+referencing a data or L2 cluster, it makes no sense to not set
+OFLAG_COPIED -- and the other direction (clearing OFLAG_COPIED) is
+always safe, anyway, it may just induce leaks.
 
-Now when trying to repair that image, you naturally use -r leaks because
-that should be sufficient and you want to give qemu-img check just as
-many "permissions" as it needs so it doesn't destroy your image by
-accident.  But while the qcow2 driver will fix the refcounts, alas! it
-will now complain about OFLAG_COPIED because that should be set now.
-However, it will not set that without -r all.  So, congratulations, now
-you have an image that qemu-img check tells you is really corrupted.
+Furthermore, if OFLAG_COPIED is actually consistent with a wrong (leaky)
+refcount, we will decrement the refcount with -r leaks, but OFLAG_COPIED
+will then be wrong.  qemu-img check should not produce images that are
+more corrupted afterwards then they were before.
 
-This series makes -r leaks fix OFLAG_COPIED as well, but only if
-repairing the refcounts was completely successful.
+Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1527085
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ block/qcow2-refcount.c | 25 +++++++++++++++++--------
+ 1 file changed, 17 insertions(+), 8 deletions(-)
 
-There is a Red Hat Bugzilla entry here:
-https://bugzilla.redhat.com/show_bug.cgi?id=1527085
-
-...but I'm afraid the bug description is set to confidential, although I
-don't know why.  Sorry. :-/
-For everyone who cannot read it, let's say the test case in this series
-may very well be a good indication of what you don't see.
-
-
-Max Reitz (2):
-  qcow2: Repair OFLAG_COPIED when fixing leaks
-  iotests: Repairing error during snapshot deletion
-
- block/qcow2-refcount.c     | 25 ++++++++-----
- tests/qemu-iotests/217     | 89 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/217.out | 42 ++++++++++++++++++++++
- tests/qemu-iotests/group   |  1 +
- 4 files changed, 149 insertions(+), 8 deletions(-)
- create mode 100755 tests/qemu-iotests/217
- create mode 100644 tests/qemu-iotests/217.out
-
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 2dc23005b7..e1ab4d0bfd 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -1799,6 +1799,19 @@ static int check_oflag_copied(BlockDriverState *bs, BdrvCheckResult *res,
+     int ret;
+     uint64_t refcount;
+     int i, j;
++    bool repair;
++
++    if (fix & BDRV_FIX_ERRORS) {
++        /* Always repair */
++        repair = true;
++    } else if (fix & BDRV_FIX_LEAKS) {
++        /* Repair only if that seems safe: This function is always
++         * called after the refcounts have been fixed, so the refcount
++         * is accurate if that repair was successful */
++        repair = !res->check_errors && !res->corruptions && !res->leaks;
++    } else {
++        repair = false;
++    }
+ 
+     for (i = 0; i < s->l1_size; i++) {
+         uint64_t l1_entry = s->l1_table[i];
+@@ -1818,10 +1831,8 @@ static int check_oflag_copied(BlockDriverState *bs, BdrvCheckResult *res,
+         if ((refcount == 1) != ((l1_entry & QCOW_OFLAG_COPIED) != 0)) {
+             fprintf(stderr, "%s OFLAG_COPIED L2 cluster: l1_index=%d "
+                     "l1_entry=%" PRIx64 " refcount=%" PRIu64 "\n",
+-                    fix & BDRV_FIX_ERRORS ? "Repairing" :
+-                                            "ERROR",
+-                    i, l1_entry, refcount);
+-            if (fix & BDRV_FIX_ERRORS) {
++                    repair ? "Repairing" : "ERROR", i, l1_entry, refcount);
++            if (repair) {
+                 s->l1_table[i] = refcount == 1
+                                ? l1_entry |  QCOW_OFLAG_COPIED
+                                : l1_entry & ~QCOW_OFLAG_COPIED;
+@@ -1862,10 +1873,8 @@ static int check_oflag_copied(BlockDriverState *bs, BdrvCheckResult *res,
+                 if ((refcount == 1) != ((l2_entry & QCOW_OFLAG_COPIED) != 0)) {
+                     fprintf(stderr, "%s OFLAG_COPIED data cluster: "
+                             "l2_entry=%" PRIx64 " refcount=%" PRIu64 "\n",
+-                            fix & BDRV_FIX_ERRORS ? "Repairing" :
+-                                                    "ERROR",
+-                            l2_entry, refcount);
+-                    if (fix & BDRV_FIX_ERRORS) {
++                            repair ? "Repairing" : "ERROR", l2_entry, refcount);
++                    if (repair) {
+                         l2_table[j] = cpu_to_be64(refcount == 1
+                                     ? l2_entry |  QCOW_OFLAG_COPIED
+                                     : l2_entry & ~QCOW_OFLAG_COPIED);
 -- 
 2.14.3
