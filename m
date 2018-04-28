@@ -1,17 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46551)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fCSoM-00042N-2L
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 12:35:01 -0400
+	(envelope-from <bounces@canonical.com>) id 1fCUNw-0002vT-8z
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 14:15:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fCSoK-0004gg-PX
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 12:34:58 -0400
-From: Max Reitz <mreitz@redhat.com>
-Date: Sat, 28 Apr 2018 18:34:41 +0200
-Message-Id: <20180428163442.6238-2-mreitz@redhat.com>
-In-Reply-To: <20180428163442.6238-1-mreitz@redhat.com>
-References: <20180428163442.6238-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/2] qcow2: Repair OFLAG_COPIED when fixing
- leaks
+	(envelope-from <bounces@canonical.com>) id 1fCUNt-0003ky-2y
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 14:15:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53646)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fCUNs-0003ko-SI
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 14:15:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fCUNr-0008HK-5A
+	for <qemu-devel@nongnu.org>; Sat, 28 Apr 2018 18:15:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1313D2E80D0
+	for <qemu-devel@nongnu.org>; Sat, 28 Apr 2018 18:15:43 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 28 Apr 2018 18:03:43 -0000
+From: Jake <1766904@bugs.launchpad.net>
+Reply-To: Bug 1766904 <1766904@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152466858890.21548.13995835103547275465.malonedeb@soybean.canonical.com>
+Message-Id: <152493862375.674.4224839729836840678.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1766904] Re: Creating high hdd load (with
+ constant fsyncs) on a SATA disk leads to freezes and errors in guest dmesg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,75 +37,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org
 
-Repairing OFLAG_COPIED is usually safe because it is done after the
-refcounts have been repaired.  Therefore, it we did not find anyone else
-referencing a data or L2 cluster, it makes no sense to not set
-OFLAG_COPIED -- and the other direction (clearing OFLAG_COPIED) is
-always safe, anyway, it may just induce leaks.
+I am getting the exact same issue. The freeze occurred when I tried to
+install Ubuntu 18.04 with qemu-2.12. However, it seems to be working
+just fine with qemu-2.11.1. So it seems that something in between 2.11.1
+and 2.12 is the culprit.
 
-Furthermore, if OFLAG_COPIED is actually consistent with a wrong (leaky)
-refcount, we will decrement the refcount with -r leaks, but OFLAG_COPIED
-will then be wrong.  qemu-img check should not produce images that are
-more corrupted afterwards then they were before.
+-- =
 
-Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1527085
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- block/qcow2-refcount.c | 25 +++++++++++++++++--------
- 1 file changed, 17 insertions(+), 8 deletions(-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1766904
 
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 2dc23005b7..e1ab4d0bfd 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -1799,6 +1799,19 @@ static int check_oflag_copied(BlockDriverState *bs, BdrvCheckResult *res,
-     int ret;
-     uint64_t refcount;
-     int i, j;
-+    bool repair;
-+
-+    if (fix & BDRV_FIX_ERRORS) {
-+        /* Always repair */
-+        repair = true;
-+    } else if (fix & BDRV_FIX_LEAKS) {
-+        /* Repair only if that seems safe: This function is always
-+         * called after the refcounts have been fixed, so the refcount
-+         * is accurate if that repair was successful */
-+        repair = !res->check_errors && !res->corruptions && !res->leaks;
-+    } else {
-+        repair = false;
-+    }
- 
-     for (i = 0; i < s->l1_size; i++) {
-         uint64_t l1_entry = s->l1_table[i];
-@@ -1818,10 +1831,8 @@ static int check_oflag_copied(BlockDriverState *bs, BdrvCheckResult *res,
-         if ((refcount == 1) != ((l1_entry & QCOW_OFLAG_COPIED) != 0)) {
-             fprintf(stderr, "%s OFLAG_COPIED L2 cluster: l1_index=%d "
-                     "l1_entry=%" PRIx64 " refcount=%" PRIu64 "\n",
--                    fix & BDRV_FIX_ERRORS ? "Repairing" :
--                                            "ERROR",
--                    i, l1_entry, refcount);
--            if (fix & BDRV_FIX_ERRORS) {
-+                    repair ? "Repairing" : "ERROR", i, l1_entry, refcount);
-+            if (repair) {
-                 s->l1_table[i] = refcount == 1
-                                ? l1_entry |  QCOW_OFLAG_COPIED
-                                : l1_entry & ~QCOW_OFLAG_COPIED;
-@@ -1862,10 +1873,8 @@ static int check_oflag_copied(BlockDriverState *bs, BdrvCheckResult *res,
-                 if ((refcount == 1) != ((l2_entry & QCOW_OFLAG_COPIED) != 0)) {
-                     fprintf(stderr, "%s OFLAG_COPIED data cluster: "
-                             "l2_entry=%" PRIx64 " refcount=%" PRIu64 "\n",
--                            fix & BDRV_FIX_ERRORS ? "Repairing" :
--                                                    "ERROR",
--                            l2_entry, refcount);
--                    if (fix & BDRV_FIX_ERRORS) {
-+                            repair ? "Repairing" : "ERROR", l2_entry, refcount);
-+                    if (repair) {
-                         l2_table[j] = cpu_to_be64(refcount == 1
-                                     ? l2_entry |  QCOW_OFLAG_COPIED
-                                     : l2_entry & ~QCOW_OFLAG_COPIED);
--- 
-2.14.3
+Title:
+  Creating high hdd load (with constant fsyncs) on a SATA disk leads to
+  freezes and errors in guest dmesg
+
+Status in QEMU:
+  New
+
+Bug description:
+  After upgrading from qemu 2.10.0+dfsg-2 to 2.12~rc3+dfsg-2 (on debian
+  sid host), centos 7 guest started to show freezes and ata errors in
+  dmesg during hdd workloads with writing many small files and repeated
+  fsyncs.
+
+  Host kernel 4.15.0-3-amd64.
+  Guest kernel 3.10.0-693.21.1.el7.x86_64 (slightly older guest kernel was =
+tested too with same result).
+
+  Script that reproduces the bug (first run usualy goes smooth, second
+  and later runs result in dmesg errors and freezes):
+
+  http://paste.debian.net/hidden/472fb220/
+
+  Sample of error messages in guest dmesg:
+
+  http://paste.debian.net/hidden/8219e234/
+
+  This vm is launchd using virsh start. VM launch command (from logfile
+  in /var/log/libvirt/qemu/):
+
+  http://paste.debian.net/plainh/5604126f
+
+  A workaround that I am using right now: I have detached this SATA
+  storage and reattached the same .qcow2 file as SCSI - this has fixed
+  the issue for me.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1766904/+subscriptions
