@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46772)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fCR2j-0003tx-PG
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 10:41:42 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fCR2k-0003um-OE
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 10:41:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fCR2i-0004kt-Hj
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 10:41:41 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fCR2j-0004nk-Vs
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 10:41:42 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Sat, 28 Apr 2018 16:41:21 +0200
-Message-Id: <20180428144123.30333-4-mreitz@redhat.com>
+Date: Sat, 28 Apr 2018 16:41:22 +0200
+Message-Id: <20180428144123.30333-5-mreitz@redhat.com>
 In-Reply-To: <20180428144123.30333-1-mreitz@redhat.com>
 References: <20180428144123.30333-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/5] qemu-io: Exit with error when a command
- failed
+Subject: [Qemu-devel] [PATCH 4/5] iotests.py: Add qemu_io_silent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,98 +22,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Currently, qemu-io basically always returns success when it gets to
-interactive mode (so once the whole command line has been parsed; even
-before the commands on the command line are interpreted).  That is not
-very useful.
+With qemu-io now returning a useful exit code, some tests may find it
+sufficient to just query that instead of logging (and filtering) the
+whole output.
 
-This patch makes qemu-io return failure when any of the executed
-commands failed.
-
-Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1519617
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qemu-io.c | 28 ++++++++++++++++++++++------
- 1 file changed, 22 insertions(+), 6 deletions(-)
+ tests/qemu-iotests/iotests.py | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/qemu-io.c b/qemu-io.c
-index e82dd0b999..c95886d22a 100644
---- a/qemu-io.c
-+++ b/qemu-io.c
-@@ -400,17 +400,21 @@ static void prep_fetchline(void *opaque)
-     *fetchable= 1;
- }
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index b25d48a91b..9747ca9eba 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -119,6 +119,15 @@ def qemu_io(*args):
+         sys.stderr.write('qemu-io received signal %i: %s\n' % (-exitcode, ' '.join(args)))
+     return subp.communicate()[0]
  
--static void command_loop(void)
-+static int command_loop(void)
- {
-     int i, fetchable = 0, prompted = 0;
-+    int ret, last_error = 0;
-     char *input;
- 
-     for (i = 0; !quit_qemu_io && i < ncmdline; i++) {
--        qemuio_command(qemuio_blk, cmdline[i]);
-+        ret = qemuio_command(qemuio_blk, cmdline[i]);
-+        if (ret < 0) {
-+            last_error = ret;
-+        }
-     }
-     if (cmdline) {
-         g_free(cmdline);
--        return;
-+        return last_error;
-     }
- 
-     while (!quit_qemu_io) {
-@@ -431,13 +435,19 @@ static void command_loop(void)
-         if (input == NULL) {
-             break;
-         }
--        qemuio_command(qemuio_blk, input);
-+        ret = qemuio_command(qemuio_blk, input);
-         g_free(input);
- 
-+        if (ret < 0) {
-+            last_error = ret;
-+        }
++def qemu_io_silent(*args):
++    '''Run qemu-io and return the exit code, suppressing stdout'''
++    args = qemu_io_args + list(args)
++    exitcode = subprocess.call(args, stdout=open('/dev/null', 'w'))
++    if exitcode < 0:
++        sys.stderr.write('qemu-io received signal %i: %s\n' %
++                         (-exitcode, ' '.join(args)))
++    return exitcode
 +
-         prompted = 0;
-         fetchable = 0;
-     }
-     qemu_set_fd_handler(STDIN_FILENO, NULL, NULL, NULL);
-+
-+    return last_error;
- }
  
- static void add_user_command(char *optarg)
-@@ -502,6 +512,7 @@ int main(int argc, char **argv)
-     int c;
-     int opt_index = 0;
-     int flags = BDRV_O_UNMAP;
-+    int ret;
-     bool writethrough = true;
-     Error *local_error = NULL;
-     QDict *opts = NULL;
-@@ -663,7 +674,7 @@ int main(int argc, char **argv)
-             }
-         }
-     }
--    command_loop();
-+    ret = command_loop();
- 
-     /*
-      * Make sure all outstanding requests complete before the program exits.
-@@ -672,5 +683,10 @@ int main(int argc, char **argv)
- 
-     blk_unref(qemuio_blk);
-     g_free(readline_state);
--    return 0;
-+
-+    if (ret < 0) {
-+        return 1;
-+    } else {
-+        return 0;
-+    }
- }
+ class QemuIoInteractive:
+     def __init__(self, *args):
 -- 
 2.14.3
