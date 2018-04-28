@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fCUNw-0002vT-8z
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 14:15:49 -0400
+	(envelope-from <andrewjameswood@ymail.com>) id 1fCYoq-0005Jh-GD
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 18:59:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fCUNt-0003ky-2y
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 14:15:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53646)
+	(envelope-from <andrewjameswood@ymail.com>) id 1fCYon-0002m6-Ec
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 18:59:52 -0400
+Received: from sonic308-19.consmr.mail.ir2.yahoo.com ([77.238.178.147]:38705)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fCUNs-0003ko-SI
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 14:15:44 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fCUNr-0008HK-5A
-	for <qemu-devel@nongnu.org>; Sat, 28 Apr 2018 18:15:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1313D2E80D0
-	for <qemu-devel@nongnu.org>; Sat, 28 Apr 2018 18:15:43 +0000 (UTC)
+	(Exim 4.71) (envelope-from <andrewjameswood@ymail.com>)
+	id 1fCYon-0002lu-73
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 18:59:49 -0400
+Received: from host109-151-162-242.range109-151.btcentralplus.com (EHLO
+	[192.168.253.68]) ([109.151.162.242])
+	by smtp425.mail.ir2.yahoo.com (Oath Hermes SMTP Server) with ESMTPA ID
+	e104b822293fb193f564fa9f924952a0 for <qemu-devel@nongnu.org>;
+	Sat, 28 Apr 2018 22:59:42 +0000 (UTC)
+From: Andrew Wood <andrewjameswood@ymail.com>
+Message-ID: <ba020090-1877-6b9a-891d-dbfbabf25c71@ymail.com>
+Date: Sat, 28 Apr 2018 23:59:41 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 28 Apr 2018 18:03:43 -0000
-From: Jake <1766904@bugs.launchpad.net>
-Reply-To: Bug 1766904 <1766904@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152466858890.21548.13995835103547275465.malonedeb@soybean.canonical.com>
-Message-Id: <152493862375.674.4224839729836840678.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1766904] Re: Creating high hdd load (with
- constant fsyncs) on a SATA disk leads to freezes and errors in guest dmesg
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: [Qemu-devel] Unix signal to send ACPI-shutdown to Guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,51 +33,22 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-I am getting the exact same issue. The freeze occurred when I tried to
-install Ubuntu 18.04 with qemu-2.12. However, it seems to be working
-just fine with qemu-2.11.1. So it seems that something in between 2.11.1
-and 2.12 is the culprit.
+Ive been looking into the possibility of using a unix signal to send an 
+acpi shutdown request to a VM, and came across a posting on this l in 
+March 1. See 
+https://lists.nongnu.org/archive/html/qemu-devel/2017-03/msg04169.html
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1766904
+To summarise to refresh memories  there was a patch proposed using 
+SIGINT followed by discussion as to why SIGINT wasnt ideal because it 
+would cause regressions for anyone relying on the existing handling of 
+SIGINT, and various other signals were considered including HUP & USR1 & 
+USR2 all of which are already used for something else.
 
-Title:
-  Creating high hdd load (with constant fsyncs) on a SATA disk leads to
-  freezes and errors in guest dmesg
+Is SIGPWR a suitable candidate, I have made a patch to use SIGPWR but as 
+Im new to QEMUs internals Im not sure if there are any circumstances in 
+which an alternative handler is registered for SIGPWR which might conflict?
 
-Status in QEMU:
-  New
+Regards
 
-Bug description:
-  After upgrading from qemu 2.10.0+dfsg-2 to 2.12~rc3+dfsg-2 (on debian
-  sid host), centos 7 guest started to show freezes and ata errors in
-  dmesg during hdd workloads with writing many small files and repeated
-  fsyncs.
-
-  Host kernel 4.15.0-3-amd64.
-  Guest kernel 3.10.0-693.21.1.el7.x86_64 (slightly older guest kernel was =
-tested too with same result).
-
-  Script that reproduces the bug (first run usualy goes smooth, second
-  and later runs result in dmesg errors and freezes):
-
-  http://paste.debian.net/hidden/472fb220/
-
-  Sample of error messages in guest dmesg:
-
-  http://paste.debian.net/hidden/8219e234/
-
-  This vm is launchd using virsh start. VM launch command (from logfile
-  in /var/log/libvirt/qemu/):
-
-  http://paste.debian.net/plainh/5604126f
-
-  A workaround that I am using right now: I have detached this SATA
-  storage and reattached the same .qcow2 file as SCSI - this has fixed
-  the issue for me.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1766904/+subscriptions
+Andrew
