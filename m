@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58503)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP6a-0002TJ-Ve
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP6a-0002TK-Vm
 	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 08:37:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP6W-0004WS-0k
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP6W-0004XO-QL
 	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 08:37:32 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:56038)
+Received: from mail.ispras.ru ([83.149.199.45]:56090)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP6L-0004Oq-0Y
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 08:37:27 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP6W-0004Wt-DM
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 08:37:28 -0400
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Sat, 28 Apr 2018 15:37:08 +0300
-Message-ID: <20180428123708.12445.23614.stgit@pasha-VirtualBox>
+Date: Sat, 28 Apr 2018 15:37:20 +0300
+Message-ID: <20180428123720.12445.38753.stgit@pasha-VirtualBox>
 In-Reply-To: <20180428123627.12445.9923.stgit@pasha-VirtualBox>
 References: <20180428123627.12445.9923.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RFC PATCH v2 07/19] migration: introduce icount field
- for snapshots
+Subject: [Qemu-devel] [RFC PATCH v2 09/19] replay: introduce breakpoint at
+ the specified step
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,205 +30,233 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
-Saving icount as a parameters of the snapshot allows navigation between
-them in the execution replay scenario.
-This information can be used for finding a specific snapshot for rewinding
-the recorded execution to the specific moment of the time.
-E.g., 'reverse step' action needs to load the nearest snapshot which is
-prior to the current moment of time .
+This patch introduces replay_break qmp and hmp commands.
+These commands allow stopping at the specified instruction.
+It may be useful for debugging when there are some known
+events that should be investigated.
+The commands have one argument - number of instructions
+executed since the start of the replay.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
 --
 
 v2:
- - made icount in SnapshotInfo optional (suggested by Eric Blake)
+ - renamed replay_break qmp command into replay-break
+   (suggested by Eric Blake)
 ---
- block/qapi.c             |   17 +++++++++++++----
- block/qcow2-snapshot.c   |    2 ++
- blockdev.c               |   10 ++++++++++
- include/block/snapshot.h |    1 +
- migration/savevm.c       |    5 +++++
- qapi/block-core.json     |    5 ++++-
- qapi/block.json          |    3 ++-
- 7 files changed, 37 insertions(+), 6 deletions(-)
+ hmp-commands.hx           |   15 ++++++++++++
+ hmp.h                     |    1 +
+ include/sysemu/replay.h   |    3 ++
+ qapi/misc.json            |   17 ++++++++++++++
+ replay/replay-debugging.c |   55 +++++++++++++++++++++++++++++++++++++++++++++
+ replay/replay-internal.h  |    4 +++
+ replay/replay.c           |   17 ++++++++++++++
+ 7 files changed, 112 insertions(+)
 
-diff --git a/block/qapi.c b/block/qapi.c
-index 04c6fc6..b4f9c2f 100644
---- a/block/qapi.c
-+++ b/block/qapi.c
-@@ -210,6 +210,7 @@ int bdrv_query_snapshot_info_list(BlockDriverState *bs,
-         info->date_nsec     = sn_tab[i].date_nsec;
-         info->vm_clock_sec  = sn_tab[i].vm_clock_nsec / 1000000000;
-         info->vm_clock_nsec = sn_tab[i].vm_clock_nsec % 1000000000;
-+        info->icount        = sn_tab[i].icount;
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 35d862a..f162f5e 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -1820,6 +1820,21 @@ Set QOM property @var{property} of object at location @var{path} to value @var{v
+ ETEXI
  
-         info_list = g_new0(SnapshotInfoList, 1);
-         info_list->value = info;
-@@ -648,14 +649,15 @@ void bdrv_snapshot_dump(fprintf_function func_fprintf, void *f,
-                         QEMUSnapshotInfo *sn)
+     {
++        .name       = "replay_break",
++        .args_type  = "step:i",
++        .params     = "step",
++        .help       = "sets breakpoint on the specified step of the replay",
++        .cmd        = hmp_replay_break,
++    },
++
++STEXI
++@item replay_break @var{step}
++@findex replay_break
++Set breakpoint on the specified step of the replay.
++Execution stops when the specified step is reached.
++ETEXI
++
++    {
+         .name       = "info",
+         .args_type  = "item:s?",
+         .params     = "[subcommand]",
+diff --git a/hmp.h b/hmp.h
+index 084fb62..5ef8f56 100644
+--- a/hmp.h
++++ b/hmp.h
+@@ -145,5 +145,6 @@ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
+ void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
+ void hmp_info_sev(Monitor *mon, const QDict *qdict);
+ void hmp_info_replay(Monitor *mon, const QDict *qdict);
++void hmp_replay_break(Monitor *mon, const QDict *qdict);
+ 
+ #endif
+diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
+index 3ced6bc..98d709c 100644
+--- a/include/sysemu/replay.h
++++ b/include/sysemu/replay.h
+@@ -71,6 +71,9 @@ void replay_start(void);
+ void replay_finish(void);
+ /*! Adds replay blocker with the specified error description */
+ void replay_add_blocker(Error *reason);
++/*! Sets breakpoint at the specified step.
++    If step = -1LL the existing breakpoint is removed. */
++void replay_break(int64_t step, QEMUTimerCB callback, void *opaque);
+ 
+ /* Processing the instructions */
+ 
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 0b0e874..ef8fe3c 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -3099,6 +3099,23 @@
+   'returns': 'ReplayInfo' }
+ 
+ ##
++# @replay-break:
++#
++# Set breakpoint on the specified step of the replay.
++# Execution stops when the specified step is reached.
++#
++# @step: execution step to stop at
++#
++# Since: 2.13
++#
++# Example:
++#
++# -> { "execute": "replay-break", "data": { "step": 220414 } }
++#
++##
++{ 'command': 'replay-break', 'data': { 'step': 'int' } }
++
++##
+ # @xen-load-devices-state:
+ #
+ # Load the state of all devices from file. The RAM and the block devices
+diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
+index 03e7db8..819017e 100644
+--- a/replay/replay-debugging.c
++++ b/replay/replay-debugging.c
+@@ -16,6 +16,8 @@
+ #include "hmp.h"
+ #include "monitor/monitor.h"
+ #include "qapi/qapi-commands-misc.h"
++#include "qapi/qmp/qdict.h"
++#include "qemu/timer.h"
+ 
+ void hmp_info_replay(Monitor *mon, const QDict *qdict)
  {
-     char buf1[128], date_buf[128], clock_buf[128];
-+    char icount_buf[128] = {0};
-     struct tm tm;
-     time_t ti;
-     int64_t secs;
- 
-     if (!sn) {
-         func_fprintf(f,
--                     "%-10s%-20s%7s%20s%15s",
--                     "ID", "TAG", "VM SIZE", "DATE", "VM CLOCK");
-+                     "%-10s%-18s%7s%20s%13s%11s",
-+                     "ID", "TAG", "VM SIZE", "DATE", "VM CLOCK", "ICOUNT");
-     } else {
-         ti = sn->date_sec;
-         localtime_r(&ti, &tm);
-@@ -668,13 +670,18 @@ void bdrv_snapshot_dump(fprintf_function func_fprintf, void *f,
-                  (int)((secs / 60) % 60),
-                  (int)(secs % 60),
-                  (int)((sn->vm_clock_nsec / 1000000) % 1000));
-+        if (sn->icount != -1ULL) {
-+            snprintf(icount_buf, sizeof(icount_buf),
-+                "%"PRId64, sn->icount);
+@@ -39,3 +41,56 @@ ReplayInfo *qmp_query_replay(Error **errp)
+     retval->step = replay_get_current_step();
+     return retval;
+ }
++
++void replay_break(int64_t step, QEMUTimerCB callback, void *opaque)
++{
++    assert(replay_mode == REPLAY_MODE_PLAY);
++    assert(replay_mutex_locked());
++
++    replay_break_step = step;
++    if (replay_break_timer) {
++        timer_del(replay_break_timer);
++        timer_free(replay_break_timer);
++        replay_break_timer = NULL;
++    }
++
++    if (replay_break_step == -1LL) {
++        return;
++    }
++    assert(replay_break_step >= replay_get_current_step());
++    assert(callback);
++
++    replay_break_timer = timer_new_ns(QEMU_CLOCK_REALTIME, callback, opaque);
++}
++
++static void replay_stop_vm(void *opaque)
++{
++    vm_stop(RUN_STATE_PAUSED);
++    replay_break(-1LL, NULL, NULL);
++}
++
++void qmp_replay_break(int64_t step, Error **errp)
++{
++    if (replay_mode ==  REPLAY_MODE_PLAY) {
++        if (step >= replay_get_current_step()) {
++            replay_break(step, replay_stop_vm, NULL);
++        } else {
++            error_setg(errp, "cannot set break at the step in the past");
 +        }
-         func_fprintf(f,
--                     "%-10s%-20s%7s%20s%15s",
-+                     "%-10s%-18s%7s%20s%13s%11s",
-                      sn->id_str, sn->name,
-                      get_human_readable_size(buf1, sizeof(buf1),
-                                              sn->vm_state_size),
-                      date_buf,
--                     clock_buf);
-+                     clock_buf,
-+                     icount_buf);
++    } else {
++        error_setg(errp, "setting the break is allowed only in play mode");
++    }
++}
++
++void hmp_replay_break(Monitor *mon, const QDict *qdict)
++{
++    int64_t step = qdict_get_try_int(qdict, "step", -1LL);
++    Error *err = NULL;
++
++    qmp_replay_break(step, &err);
++    if (err) {
++        monitor_printf(mon, "replay_break error: %s\n", error_get_pretty(err));
++        error_free(err);
++        return;
++    }
++}
+diff --git a/replay/replay-internal.h b/replay/replay-internal.h
+index ef82b5e..34d19eb 100644
+--- a/replay/replay-internal.h
++++ b/replay/replay-internal.h
+@@ -93,6 +93,10 @@ extern ReplayState replay_state;
+ extern FILE *replay_file;
+ /*! Name of replay file  */
+ extern char *replay_filename;
++/*! Step of the replay breakpoint */
++extern int64_t replay_break_step;
++/*! Timer for the replay breakpoint callback */
++extern QEMUTimer *replay_break_timer;
+ 
+ void replay_put_byte(uint8_t byte);
+ void replay_put_event(uint8_t event);
+diff --git a/replay/replay.c b/replay/replay.c
+index 8b70d7d..dcce902 100644
+--- a/replay/replay.c
++++ b/replay/replay.c
+@@ -33,6 +33,10 @@ char *replay_filename;
+ ReplayState replay_state;
+ static GSList *replay_blockers;
+ 
++/* Replay breakpoints */
++int64_t replay_break_step = -1LL;
++QEMUTimer *replay_break_timer;
++
+ bool replay_next_event_is(int event)
+ {
+     bool res = false;
+@@ -72,6 +76,13 @@ int replay_get_instructions(void)
+     replay_mutex_lock();
+     if (replay_next_event_is(EVENT_INSTRUCTION)) {
+         res = replay_state.instructions_count;
++        if (replay_break_step != -1LL) {
++            uint64_t current = replay_get_current_step();
++            assert(replay_break_step >= current);
++            if (current + res > replay_break_step) {
++                res = replay_break_step - current;
++            }
++        }
+     }
+     replay_mutex_unlock();
+     return res;
+@@ -98,6 +109,12 @@ void replay_account_executed_instructions(void)
+                    will be read from the log. */
+                 qemu_notify_event();
+             }
++            /* Execution reached the break step */
++            if (replay_break_step == replay_state.current_step) {
++                /* Cannot make callback directly from the vCPU thread */
++                timer_mod_ns(replay_break_timer,
++                    qemu_clock_get_ns(QEMU_CLOCK_REALTIME));
++            }
+         }
      }
  }
- 
-@@ -842,6 +849,8 @@ void bdrv_image_info_dump(fprintf_function func_fprintf, void *f,
-                 .date_nsec = elem->value->date_nsec,
-                 .vm_clock_nsec = elem->value->vm_clock_sec * 1000000000ULL +
-                                  elem->value->vm_clock_nsec,
-+                .icount = elem->value->has_icount ?
-+                          elem->value->icount : -1ULL,
-             };
- 
-             pstrcpy(sn.id_str, sizeof(sn.id_str), elem->value->id);
-diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
-index d04553e..0af32c3 100644
---- a/block/qcow2-snapshot.c
-+++ b/block/qcow2-snapshot.c
-@@ -379,6 +379,7 @@ int qcow2_snapshot_create(BlockDriverState *bs, QEMUSnapshotInfo *sn_info)
-     sn->date_sec = sn_info->date_sec;
-     sn->date_nsec = sn_info->date_nsec;
-     sn->vm_clock_nsec = sn_info->vm_clock_nsec;
-+    sn->icount = sn_info->icount;
- 
-     /* Allocate the L1 table of the snapshot and copy the current one there. */
-     l1_table_offset = qcow2_alloc_clusters(bs, s->l1_size * sizeof(uint64_t));
-@@ -698,6 +699,7 @@ int qcow2_snapshot_list(BlockDriverState *bs, QEMUSnapshotInfo **psn_tab)
-         sn_info->date_sec = sn->date_sec;
-         sn_info->date_nsec = sn->date_nsec;
-         sn_info->vm_clock_nsec = sn->vm_clock_nsec;
-+        sn_info->icount = sn->icount;
-     }
-     *psn_tab = sn_tab;
-     return s->nb_snapshots;
-diff --git a/blockdev.c b/blockdev.c
-index c31bf3d..965c96a 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -56,6 +56,7 @@
- #include "block/trace.h"
- #include "sysemu/arch_init.h"
- #include "sysemu/qtest.h"
-+#include "sysemu/replay.h"
- #include "qemu/cutils.h"
- #include "qemu/help_option.h"
- #include "qemu/throttle-options.h"
-@@ -1348,6 +1349,10 @@ SnapshotInfo *qmp_blockdev_snapshot_delete_internal_sync(const char *device,
-     info->vm_state_size = sn.vm_state_size;
-     info->vm_clock_nsec = sn.vm_clock_nsec % 1000000000;
-     info->vm_clock_sec = sn.vm_clock_nsec / 1000000000;
-+    if (sn.icount != -1ULL) {
-+        info->icount = sn.icount;
-+        info->has_icount = true;
-+    }
- 
-     return info;
- 
-@@ -1556,6 +1561,11 @@ static void internal_snapshot_prepare(BlkActionState *common,
-     sn->date_sec = tv.tv_sec;
-     sn->date_nsec = tv.tv_usec * 1000;
-     sn->vm_clock_nsec = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    if (replay_mode != REPLAY_MODE_NONE) {
-+        sn->icount = replay_get_current_step();
-+    } else {
-+        sn->icount = -1ULL;
-+    }
- 
-     ret1 = bdrv_snapshot_create(bs, sn);
-     if (ret1 < 0) {
-diff --git a/include/block/snapshot.h b/include/block/snapshot.h
-index f73d109..c9c8975 100644
---- a/include/block/snapshot.h
-+++ b/include/block/snapshot.h
-@@ -42,6 +42,7 @@ typedef struct QEMUSnapshotInfo {
-     uint32_t date_sec; /* UTC date of the snapshot */
-     uint32_t date_nsec;
-     uint64_t vm_clock_nsec; /* VM clock relative to boot */
-+    uint64_t icount; /* record/replay step */
- } QEMUSnapshotInfo;
- 
- int bdrv_snapshot_find(BlockDriverState *bs, QEMUSnapshotInfo *sn_info,
-diff --git a/migration/savevm.c b/migration/savevm.c
-index e2be02a..08c1d4c 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -2270,6 +2270,11 @@ int save_snapshot(const char *name, Error **errp)
-     sn->date_sec = tv.tv_sec;
-     sn->date_nsec = tv.tv_usec * 1000;
-     sn->vm_clock_nsec = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    if (replay_mode != REPLAY_MODE_NONE) {
-+        sn->icount = replay_get_current_step();
-+    } else {
-+        sn->icount = -1ULL;
-+    }
- 
-     if (name) {
-         ret = bdrv_snapshot_find(bs, old_sn, name);
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index c50517b..f82ec45 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -25,13 +25,16 @@
- #
- # @vm-clock-nsec: fractional part in nano seconds to be used with vm-clock-sec
- #
-+# @icount: current instruction count for execution record/replay (since 2.13)
-+#
- # Since: 1.3
- #
- ##
- { 'struct': 'SnapshotInfo',
-   'data': { 'id': 'str', 'name': 'str', 'vm-state-size': 'int',
-             'date-sec': 'int', 'date-nsec': 'int',
--            'vm-clock-sec': 'int', 'vm-clock-nsec': 'int' } }
-+            'vm-clock-sec': 'int', 'vm-clock-nsec': 'int',
-+            '*icount': 'int' } }
- 
- ##
- # @ImageInfoSpecificQCow2EncryptionBase:
-diff --git a/qapi/block.json b/qapi/block.json
-index c694524..2f364f7 100644
---- a/qapi/block.json
-+++ b/qapi/block.json
-@@ -148,7 +148,8 @@
- #                    "date-sec": 1000012,
- #                    "date-nsec": 10,
- #                    "vm-clock-sec": 100,
--#                    "vm-clock-nsec": 20
-+#                    "vm-clock-nsec": 20,
-+#                    "icount": 220414
- #      }
- #    }
- #
