@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fCR2r-00041x-9R
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 10:41:55 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fCSoM-00042O-46
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 12:35:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fCR2m-0004r5-Fc
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 10:41:49 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fCSoK-0004gl-Vd
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 12:34:58 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Sat, 28 Apr 2018 16:41:20 +0200
-Message-Id: <20180428144123.30333-3-mreitz@redhat.com>
-In-Reply-To: <20180428144123.30333-1-mreitz@redhat.com>
-References: <20180428144123.30333-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/5] qemu-io: Let command functions return
- error code
+Date: Sat, 28 Apr 2018 18:34:42 +0200
+Message-Id: <20180428163442.6238-3-mreitz@redhat.com>
+In-Reply-To: <20180428163442.6238-1-mreitz@redhat.com>
+References: <20180428163442.6238-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/2] iotests: Repairing error during snapshot
+ deletion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,1429 +23,172 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-This is basically what everything else in the qemu code base does, so we
-can do it here, too.
+This adds a test for an I/O error during snapshot deletion, and maybe
+more importantly, for how to repair the resulting image.  If the
+snapshot has been deleted before the error occurs, the only negative
+result will be leaked clusters -- and those should be repairable with
+qemu-img check -r leaks.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/qemu-io.h |   4 +-
- qemu-io-cmds.c    | 346 ++++++++++++++++++++++++++++++++----------------------
- qemu-io.c         |  34 ++++--
- 3 files changed, 227 insertions(+), 157 deletions(-)
+ tests/qemu-iotests/217     | 89 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/217.out | 42 ++++++++++++++++++++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 132 insertions(+)
+ create mode 100755 tests/qemu-iotests/217
+ create mode 100644 tests/qemu-iotests/217.out
 
-diff --git a/include/qemu-io.h b/include/qemu-io.h
-index 06cdfbf660..380724ad59 100644
---- a/include/qemu-io.h
-+++ b/include/qemu-io.h
-@@ -22,7 +22,7 @@
- 
- #define CMD_FLAG_GLOBAL ((int)0x80000000) /* don't iterate "args" */
- 
--typedef void (*cfunc_t)(BlockBackend *blk, int argc, char **argv);
-+typedef int (*cfunc_t)(BlockBackend *blk, int argc, char **argv);
- typedef void (*helpfunc_t)(void);
- 
- typedef struct cmdinfo {
-@@ -41,7 +41,7 @@ typedef struct cmdinfo {
- 
- extern bool qemuio_misalign;
- 
--void qemuio_command(BlockBackend *blk, const char *cmd);
-+int qemuio_command(BlockBackend *blk, const char *cmd);
- 
- void qemuio_add_command(const cmdinfo_t *ci);
- void qemuio_command_usage(const cmdinfo_t *ci);
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index c2fbaae0fd..5bf5f28178 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -65,13 +65,13 @@ static int init_check_command(BlockBackend *blk, const cmdinfo_t *ct)
-     return 1;
- }
- 
--static void command(BlockBackend *blk, const cmdinfo_t *ct, int argc,
--                    char **argv)
-+static int command(BlockBackend *blk, const cmdinfo_t *ct, int argc,
-+                   char **argv)
- {
-     char *cmd = argv[0];
- 
-     if (!init_check_command(blk, ct)) {
--        return;
-+        return -EINVAL;
-     }
- 
-     if (argc - 1 < ct->argmin || (ct->argmax != -1 && argc - 1 > ct->argmax)) {
-@@ -88,7 +88,7 @@ static void command(BlockBackend *blk, const cmdinfo_t *ct, int argc,
-                     "bad argument count %d to %s, expected between %d and %d arguments\n",
-                     argc-1, cmd, ct->argmin, ct->argmax);
-         }
--        return;
-+        return -EINVAL;
-     }
- 
-     /* Request additional permissions if necessary for this command. The caller
-@@ -108,13 +108,13 @@ static void command(BlockBackend *blk, const cmdinfo_t *ct, int argc,
-             ret = blk_set_perm(blk, new_perm, orig_shared_perm, &local_err);
-             if (ret < 0) {
-                 error_report_err(local_err);
--                return;
-+                return ret;
-             }
-         }
-     }
- 
-     optind = 0;
--    ct->cfunc(blk, argc, argv);
-+    return ct->cfunc(blk, argc, argv);
- }
- 
- static const cmdinfo_t *find_command(const char *cmd)
-@@ -633,7 +633,7 @@ static void read_help(void)
- "\n");
- }
- 
--static void read_f(BlockBackend *blk, int argc, char **argv);
-+static int read_f(BlockBackend *blk, int argc, char **argv);
- 
- static const cmdinfo_t read_cmd = {
-     .name       = "read",
-@@ -646,12 +646,12 @@ static const cmdinfo_t read_cmd = {
-     .help       = read_help,
- };
- 
--static void read_f(BlockBackend *blk, int argc, char **argv)
-+static int read_f(BlockBackend *blk, int argc, char **argv)
- {
-     struct timeval t1, t2;
-     bool Cflag = false, qflag = false, vflag = false;
-     bool Pflag = false, sflag = false, lflag = false, bflag = false;
--    int c, cnt;
-+    int c, cnt, ret;
-     char *buf;
-     int64_t offset;
-     int64_t count;
-@@ -673,7 +673,7 @@ static void read_f(BlockBackend *blk, int argc, char **argv)
-             pattern_count = cvtnum(optarg);
-             if (pattern_count < 0) {
-                 print_cvtnum_err(pattern_count, optarg);
--                return;
-+                return pattern_count;
-             }
-             break;
-         case 'p':
-@@ -683,7 +683,7 @@ static void read_f(BlockBackend *blk, int argc, char **argv)
-             Pflag = true;
-             pattern = parse_pattern(optarg);
-             if (pattern < 0) {
--                return;
-+                return -EINVAL;
-             }
-             break;
-         case 'q':
-@@ -694,7 +694,7 @@ static void read_f(BlockBackend *blk, int argc, char **argv)
-             pattern_offset = cvtnum(optarg);
-             if (pattern_offset < 0) {
-                 print_cvtnum_err(pattern_offset, optarg);
--                return;
-+                return pattern_offset;
-             }
-             break;
-         case 'v':
-@@ -702,35 +702,35 @@ static void read_f(BlockBackend *blk, int argc, char **argv)
-             break;
-         default:
-             qemuio_command_usage(&read_cmd);
--            return;
-+            return -EINVAL;
-         }
-     }
- 
-     if (optind != argc - 2) {
-         qemuio_command_usage(&read_cmd);
--        return;
-+        return -EINVAL;
-     }
- 
-     offset = cvtnum(argv[optind]);
-     if (offset < 0) {
-         print_cvtnum_err(offset, argv[optind]);
--        return;
-+        return offset;
-     }
- 
-     optind++;
-     count = cvtnum(argv[optind]);
-     if (count < 0) {
-         print_cvtnum_err(count, argv[optind]);
--        return;
-+        return count;
-     } else if (count > BDRV_REQUEST_MAX_BYTES) {
-         printf("length cannot exceed %" PRIu64 ", given %s\n",
-                (uint64_t)BDRV_REQUEST_MAX_BYTES, argv[optind]);
--        return;
-+        return -EINVAL;
-     }
- 
-     if (!Pflag && (lflag || sflag)) {
-         qemuio_command_usage(&read_cmd);
--        return;
-+        return -EINVAL;
-     }
- 
-     if (!lflag) {
-@@ -739,19 +739,19 @@ static void read_f(BlockBackend *blk, int argc, char **argv)
- 
-     if ((pattern_count < 0) || (pattern_count + pattern_offset > count))  {
-         printf("pattern verification range exceeds end of read data\n");
--        return;
-+        return -EINVAL;
-     }
- 
-     if (bflag) {
-         if (!QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE)) {
-             printf("%" PRId64 " is not a sector-aligned value for 'offset'\n",
-                    offset);
--            return;
-+            return -EINVAL;
-         }
-         if (!QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE)) {
-             printf("%"PRId64" is not a sector-aligned value for 'count'\n",
-                    count);
--            return;
-+            return -EINVAL;
-         }
-     }
- 
-@@ -759,16 +759,19 @@ static void read_f(BlockBackend *blk, int argc, char **argv)
- 
-     gettimeofday(&t1, NULL);
-     if (bflag) {
--        cnt = do_load_vmstate(blk, buf, offset, count, &total);
-+        ret = do_load_vmstate(blk, buf, offset, count, &total);
-     } else {
--        cnt = do_pread(blk, buf, offset, count, &total);
-+        ret = do_pread(blk, buf, offset, count, &total);
-     }
-     gettimeofday(&t2, NULL);
- 
--    if (cnt < 0) {
--        printf("read failed: %s\n", strerror(-cnt));
-+    if (ret < 0) {
-+        printf("read failed: %s\n", strerror(-ret));
-         goto out;
-     }
-+    cnt = ret;
+diff --git a/tests/qemu-iotests/217 b/tests/qemu-iotests/217
+new file mode 100755
+index 0000000000..3b42138760
+--- /dev/null
++++ b/tests/qemu-iotests/217
+@@ -0,0 +1,89 @@
++#!/bin/bash
++#
++# I/O errors when working with internal qcow2 snapshots, and repairing
++# the result
++#
++# Copyright (C) 2018 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 +
-+    ret = 0;
- 
-     if (Pflag) {
-         void *cmp_buf = g_malloc(pattern_count);
-@@ -777,6 +780,7 @@ static void read_f(BlockBackend *blk, int argc, char **argv)
-             printf("Pattern verification failed at offset %"
-                    PRId64 ", %"PRId64" bytes\n",
-                    offset + pattern_offset, pattern_count);
-+            ret = -EINVAL;
-         }
-         g_free(cmp_buf);
-     }
-@@ -795,6 +799,7 @@ static void read_f(BlockBackend *blk, int argc, char **argv)
- 
- out:
-     qemu_io_free(buf);
-+    return ret;
- }
- 
- static void readv_help(void)
-@@ -816,7 +821,7 @@ static void readv_help(void)
- "\n");
- }
- 
--static void readv_f(BlockBackend *blk, int argc, char **argv);
-+static int readv_f(BlockBackend *blk, int argc, char **argv);
- 
- static const cmdinfo_t readv_cmd = {
-     .name       = "readv",
-@@ -828,11 +833,11 @@ static const cmdinfo_t readv_cmd = {
-     .help       = readv_help,
- };
- 
--static void readv_f(BlockBackend *blk, int argc, char **argv)
-+static int readv_f(BlockBackend *blk, int argc, char **argv)
- {
-     struct timeval t1, t2;
-     bool Cflag = false, qflag = false, vflag = false;
--    int c, cnt;
-+    int c, cnt, ret;
-     char *buf;
-     int64_t offset;
-     /* Some compilers get confused and warn if this is not initialized.  */
-@@ -851,7 +856,7 @@ static void readv_f(BlockBackend *blk, int argc, char **argv)
-             Pflag = true;
-             pattern = parse_pattern(optarg);
-             if (pattern < 0) {
--                return;
-+                return -EINVAL;
-             }
-             break;
-         case 'q':
-@@ -862,37 +867,40 @@ static void readv_f(BlockBackend *blk, int argc, char **argv)
-             break;
-         default:
-             qemuio_command_usage(&readv_cmd);
--            return;
-+            return -EINVAL;
-         }
-     }
- 
-     if (optind > argc - 2) {
-         qemuio_command_usage(&readv_cmd);
--        return;
-+        return -EINVAL;
-     }
- 
- 
-     offset = cvtnum(argv[optind]);
-     if (offset < 0) {
-         print_cvtnum_err(offset, argv[optind]);
--        return;
-+        return offset;
-     }
-     optind++;
- 
-     nr_iov = argc - optind;
-     buf = create_iovec(blk, &qiov, &argv[optind], nr_iov, 0xab);
-     if (buf == NULL) {
--        return;
-+        return -EINVAL;
-     }
- 
-     gettimeofday(&t1, NULL);
--    cnt = do_aio_readv(blk, &qiov, offset, &total);
-+    ret = do_aio_readv(blk, &qiov, offset, &total);
-     gettimeofday(&t2, NULL);
- 
--    if (cnt < 0) {
--        printf("readv failed: %s\n", strerror(-cnt));
-+    if (ret < 0) {
-+        printf("readv failed: %s\n", strerror(-ret));
-         goto out;
-     }
-+    cnt = ret;
++seq=$(basename $0)
++echo "QA output created by $seq"
 +
-+    ret = 0;
- 
-     if (Pflag) {
-         void *cmp_buf = g_malloc(qiov.size);
-@@ -900,6 +908,7 @@ static void readv_f(BlockBackend *blk, int argc, char **argv)
-         if (memcmp(buf, cmp_buf, qiov.size)) {
-             printf("Pattern verification failed at offset %"
-                    PRId64 ", %zd bytes\n", offset, qiov.size);
-+            ret = -EINVAL;
-         }
-         g_free(cmp_buf);
-     }
-@@ -919,6 +928,7 @@ static void readv_f(BlockBackend *blk, int argc, char **argv)
- out:
-     qemu_iovec_destroy(&qiov);
-     qemu_io_free(buf);
-+    return ret;
- }
- 
- static void write_help(void)
-@@ -944,7 +954,7 @@ static void write_help(void)
- "\n");
- }
- 
--static void write_f(BlockBackend *blk, int argc, char **argv);
-+static int write_f(BlockBackend *blk, int argc, char **argv);
- 
- static const cmdinfo_t write_cmd = {
-     .name       = "write",
-@@ -958,13 +968,13 @@ static const cmdinfo_t write_cmd = {
-     .help       = write_help,
- };
- 
--static void write_f(BlockBackend *blk, int argc, char **argv)
-+static int write_f(BlockBackend *blk, int argc, char **argv)
- {
-     struct timeval t1, t2;
-     bool Cflag = false, qflag = false, bflag = false;
-     bool Pflag = false, zflag = false, cflag = false;
-     int flags = 0;
--    int c, cnt;
-+    int c, cnt, ret;
-     char *buf = NULL;
-     int64_t offset;
-     int64_t count;
-@@ -993,7 +1003,7 @@ static void write_f(BlockBackend *blk, int argc, char **argv)
-             Pflag = true;
-             pattern = parse_pattern(optarg);
-             if (pattern < 0) {
--                return;
-+                return -EINVAL;
-             }
-             break;
-         case 'q':
-@@ -1007,63 +1017,63 @@ static void write_f(BlockBackend *blk, int argc, char **argv)
-             break;
-         default:
-             qemuio_command_usage(&write_cmd);
--            return;
-+            return -EINVAL;
-         }
-     }
- 
-     if (optind != argc - 2) {
-         qemuio_command_usage(&write_cmd);
--        return;
-+        return -EINVAL;
-     }
- 
-     if (bflag && zflag) {
-         printf("-b and -z cannot be specified at the same time\n");
--        return;
-+        return -EINVAL;
-     }
- 
-     if ((flags & BDRV_REQ_FUA) && (bflag || cflag)) {
-         printf("-f and -b or -c cannot be specified at the same time\n");
--        return;
-+        return -EINVAL;
-     }
- 
-     if ((flags & BDRV_REQ_MAY_UNMAP) && !zflag) {
-         printf("-u requires -z to be specified\n");
--        return;
-+        return -EINVAL;
-     }
- 
-     if (zflag && Pflag) {
-         printf("-z and -P cannot be specified at the same time\n");
--        return;
-+        return -EINVAL;
-     }
- 
-     offset = cvtnum(argv[optind]);
-     if (offset < 0) {
-         print_cvtnum_err(offset, argv[optind]);
--        return;
-+        return offset;
-     }
- 
-     optind++;
-     count = cvtnum(argv[optind]);
-     if (count < 0) {
-         print_cvtnum_err(count, argv[optind]);
--        return;
-+        return count;
-     } else if (count > BDRV_REQUEST_MAX_BYTES) {
-         printf("length cannot exceed %" PRIu64 ", given %s\n",
-                (uint64_t)BDRV_REQUEST_MAX_BYTES, argv[optind]);
--        return;
-+        return -EINVAL;
-     }
- 
-     if (bflag || cflag) {
-         if (!QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE)) {
-             printf("%" PRId64 " is not a sector-aligned value for 'offset'\n",
-                    offset);
--            return;
-+            return -EINVAL;
-         }
- 
-         if (!QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE)) {
-             printf("%"PRId64" is not a sector-aligned value for 'count'\n",
-                    count);
--            return;
-+            return -EINVAL;
-         }
-     }
- 
-@@ -1073,20 +1083,23 @@ static void write_f(BlockBackend *blk, int argc, char **argv)
- 
-     gettimeofday(&t1, NULL);
-     if (bflag) {
--        cnt = do_save_vmstate(blk, buf, offset, count, &total);
-+        ret = do_save_vmstate(blk, buf, offset, count, &total);
-     } else if (zflag) {
--        cnt = do_co_pwrite_zeroes(blk, offset, count, flags, &total);
-+        ret = do_co_pwrite_zeroes(blk, offset, count, flags, &total);
-     } else if (cflag) {
--        cnt = do_write_compressed(blk, buf, offset, count, &total);
-+        ret = do_write_compressed(blk, buf, offset, count, &total);
-     } else {
--        cnt = do_pwrite(blk, buf, offset, count, flags, &total);
-+        ret = do_pwrite(blk, buf, offset, count, flags, &total);
-     }
-     gettimeofday(&t2, NULL);
- 
--    if (cnt < 0) {
--        printf("write failed: %s\n", strerror(-cnt));
-+    if (ret < 0) {
-+        printf("write failed: %s\n", strerror(-ret));
-         goto out;
-     }
-+    cnt = ret;
++status=1	# failure is the default!
 +
-+    ret = 0;
- 
-     if (qflag) {
-         goto out;
-@@ -1100,6 +1113,7 @@ out:
-     if (!zflag) {
-         qemu_io_free(buf);
-     }
-+    return ret;
- }
- 
- static void
-@@ -1121,7 +1135,7 @@ writev_help(void)
- "\n");
- }
- 
--static void writev_f(BlockBackend *blk, int argc, char **argv);
-+static int writev_f(BlockBackend *blk, int argc, char **argv);
- 
- static const cmdinfo_t writev_cmd = {
-     .name       = "writev",
-@@ -1134,12 +1148,12 @@ static const cmdinfo_t writev_cmd = {
-     .help       = writev_help,
- };
- 
--static void writev_f(BlockBackend *blk, int argc, char **argv)
-+static int writev_f(BlockBackend *blk, int argc, char **argv)
- {
-     struct timeval t1, t2;
-     bool Cflag = false, qflag = false;
-     int flags = 0;
--    int c, cnt;
-+    int c, cnt, ret;
-     char *buf;
-     int64_t offset;
-     /* Some compilers get confused and warn if this is not initialized.  */
-@@ -1162,41 +1176,44 @@ static void writev_f(BlockBackend *blk, int argc, char **argv)
-         case 'P':
-             pattern = parse_pattern(optarg);
-             if (pattern < 0) {
--                return;
-+                return -EINVAL;
-             }
-             break;
-         default:
-             qemuio_command_usage(&writev_cmd);
--            return;
-+            return -EINVAL;
-         }
-     }
- 
-     if (optind > argc - 2) {
-         qemuio_command_usage(&writev_cmd);
--        return;
-+        return -EINVAL;
-     }
- 
-     offset = cvtnum(argv[optind]);
-     if (offset < 0) {
-         print_cvtnum_err(offset, argv[optind]);
--        return;
-+        return offset;
-     }
-     optind++;
- 
-     nr_iov = argc - optind;
-     buf = create_iovec(blk, &qiov, &argv[optind], nr_iov, pattern);
-     if (buf == NULL) {
--        return;
-+        return -EINVAL;
-     }
- 
-     gettimeofday(&t1, NULL);
--    cnt = do_aio_writev(blk, &qiov, offset, flags, &total);
-+    ret = do_aio_writev(blk, &qiov, offset, flags, &total);
-     gettimeofday(&t2, NULL);
- 
--    if (cnt < 0) {
--        printf("writev failed: %s\n", strerror(-cnt));
-+    if (ret < 0) {
-+        printf("writev failed: %s\n", strerror(-ret));
-         goto out;
-     }
-+    cnt = ret;
++_cleanup()
++{
++    _cleanup_test_img
++    rm -f "$TEST_DIR/blkdebug.conf"
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
 +
-+    ret = 0;
- 
-     if (qflag) {
-         goto out;
-@@ -1208,6 +1225,7 @@ static void writev_f(BlockBackend *blk, int argc, char **argv)
- out:
-     qemu_iovec_destroy(&qiov);
-     qemu_io_free(buf);
-+    return ret;
- }
- 
- struct aio_ctx {
-@@ -1314,6 +1332,9 @@ static void aio_read_help(void)
- " standard output stream (with -v option) for subsequent inspection.\n"
- " The read is performed asynchronously and the aio_flush command must be\n"
- " used to ensure all outstanding aio requests have been completed.\n"
-+" Note that due to its asynchronous nature, this command will be\n"
-+" considered successful once the request is submitted, independently\n"
-+" of potential I/O errors or pattern mismatches.\n"
- " -C, -- report statistics in a machine parsable format\n"
- " -P, -- use a pattern to verify read data\n"
- " -i, -- treat request as invalid, for exercising stats\n"
-@@ -1322,7 +1343,7 @@ static void aio_read_help(void)
- "\n");
- }
- 
--static void aio_read_f(BlockBackend *blk, int argc, char **argv);
-+static int aio_read_f(BlockBackend *blk, int argc, char **argv);
- 
- static const cmdinfo_t aio_read_cmd = {
-     .name       = "aio_read",
-@@ -1334,7 +1355,7 @@ static const cmdinfo_t aio_read_cmd = {
-     .help       = aio_read_help,
- };
- 
--static void aio_read_f(BlockBackend *blk, int argc, char **argv)
-+static int aio_read_f(BlockBackend *blk, int argc, char **argv)
- {
-     int nr_iov, c;
-     struct aio_ctx *ctx = g_new0(struct aio_ctx, 1);
-@@ -1350,14 +1371,14 @@ static void aio_read_f(BlockBackend *blk, int argc, char **argv)
-             ctx->pattern = parse_pattern(optarg);
-             if (ctx->pattern < 0) {
-                 g_free(ctx);
--                return;
-+                return -EINVAL;
-             }
-             break;
-         case 'i':
-             printf("injecting invalid read request\n");
-             block_acct_invalid(blk_get_stats(blk), BLOCK_ACCT_READ);
-             g_free(ctx);
--            return;
-+            return 0;
-         case 'q':
-             ctx->qflag = true;
-             break;
-@@ -1367,21 +1388,22 @@ static void aio_read_f(BlockBackend *blk, int argc, char **argv)
-         default:
-             g_free(ctx);
-             qemuio_command_usage(&aio_read_cmd);
--            return;
-+            return -EINVAL;
-         }
-     }
- 
-     if (optind > argc - 2) {
-         g_free(ctx);
-         qemuio_command_usage(&aio_read_cmd);
--        return;
-+        return -EINVAL;
-     }
- 
-     ctx->offset = cvtnum(argv[optind]);
-     if (ctx->offset < 0) {
--        print_cvtnum_err(ctx->offset, argv[optind]);
-+        int ret = ctx->offset;
-+        print_cvtnum_err(ret, argv[optind]);
-         g_free(ctx);
--        return;
-+        return ret;
-     }
-     optind++;
- 
-@@ -1390,13 +1412,14 @@ static void aio_read_f(BlockBackend *blk, int argc, char **argv)
-     if (ctx->buf == NULL) {
-         block_acct_invalid(blk_get_stats(blk), BLOCK_ACCT_READ);
-         g_free(ctx);
--        return;
-+        return -EINVAL;
-     }
- 
-     gettimeofday(&ctx->t1, NULL);
-     block_acct_start(blk_get_stats(blk), &ctx->acct, ctx->qiov.size,
-                      BLOCK_ACCT_READ);
-     blk_aio_preadv(blk, ctx->offset, &ctx->qiov, 0, aio_read_done, ctx);
-+    return 0;
- }
- 
- static void aio_write_help(void)
-@@ -1413,6 +1436,9 @@ static void aio_write_help(void)
- " filled with a set pattern (0xcdcdcdcd).\n"
- " The write is performed asynchronously and the aio_flush command must be\n"
- " used to ensure all outstanding aio requests have been completed.\n"
-+" Note that due to its asynchronous nature, this command will be\n"
-+" considered successful once the request is submitted, independently\n"
-+" of potential I/O errors or pattern mismatches.\n"
- " -P, -- use different pattern to fill file\n"
- " -C, -- report statistics in a machine parsable format\n"
- " -f, -- use Force Unit Access semantics\n"
-@@ -1423,7 +1449,7 @@ static void aio_write_help(void)
- "\n");
- }
- 
--static void aio_write_f(BlockBackend *blk, int argc, char **argv);
-+static int aio_write_f(BlockBackend *blk, int argc, char **argv);
- 
- static const cmdinfo_t aio_write_cmd = {
-     .name       = "aio_write",
-@@ -1436,7 +1462,7 @@ static const cmdinfo_t aio_write_cmd = {
-     .help       = aio_write_help,
- };
- 
--static void aio_write_f(BlockBackend *blk, int argc, char **argv)
-+static int aio_write_f(BlockBackend *blk, int argc, char **argv)
- {
-     int nr_iov, c;
-     int pattern = 0xcd;
-@@ -1462,53 +1488,54 @@ static void aio_write_f(BlockBackend *blk, int argc, char **argv)
-             pattern = parse_pattern(optarg);
-             if (pattern < 0) {
-                 g_free(ctx);
--                return;
-+                return -EINVAL;
-             }
-             break;
-         case 'i':
-             printf("injecting invalid write request\n");
-             block_acct_invalid(blk_get_stats(blk), BLOCK_ACCT_WRITE);
-             g_free(ctx);
--            return;
-+            return 0;
-         case 'z':
-             ctx->zflag = true;
-             break;
-         default:
-             g_free(ctx);
-             qemuio_command_usage(&aio_write_cmd);
--            return;
-+            return -EINVAL;
-         }
-     }
- 
-     if (optind > argc - 2) {
-         g_free(ctx);
-         qemuio_command_usage(&aio_write_cmd);
--        return;
-+        return -EINVAL;
-     }
- 
-     if (ctx->zflag && optind != argc - 2) {
-         printf("-z supports only a single length parameter\n");
-         g_free(ctx);
--        return;
-+        return -EINVAL;
-     }
- 
-     if ((flags & BDRV_REQ_MAY_UNMAP) && !ctx->zflag) {
-         printf("-u requires -z to be specified\n");
-         g_free(ctx);
--        return;
-+        return -EINVAL;
-     }
- 
-     if (ctx->zflag && ctx->Pflag) {
-         printf("-z and -P cannot be specified at the same time\n");
-         g_free(ctx);
--        return;
-+        return -EINVAL;
-     }
- 
-     ctx->offset = cvtnum(argv[optind]);
-     if (ctx->offset < 0) {
--        print_cvtnum_err(ctx->offset, argv[optind]);
-+        int ret = ctx->offset;
-+        print_cvtnum_err(ret, argv[optind]);
-         g_free(ctx);
--        return;
-+        return ret;
-     }
-     optind++;
- 
-@@ -1517,7 +1544,7 @@ static void aio_write_f(BlockBackend *blk, int argc, char **argv)
-         if (count < 0) {
-             print_cvtnum_err(count, argv[optind]);
-             g_free(ctx);
--            return;
-+            return count;
-         }
- 
-         ctx->qiov.size = count;
-@@ -1530,7 +1557,7 @@ static void aio_write_f(BlockBackend *blk, int argc, char **argv)
-         if (ctx->buf == NULL) {
-             block_acct_invalid(blk_get_stats(blk), BLOCK_ACCT_WRITE);
-             g_free(ctx);
--            return;
-+            return -EINVAL;
-         }
- 
-         gettimeofday(&ctx->t1, NULL);
-@@ -1540,14 +1567,17 @@ static void aio_write_f(BlockBackend *blk, int argc, char **argv)
-         blk_aio_pwritev(blk, ctx->offset, &ctx->qiov, flags, aio_write_done,
-                         ctx);
-     }
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
 +
-+    return 0;
- }
- 
--static void aio_flush_f(BlockBackend *blk, int argc, char **argv)
-+static int aio_flush_f(BlockBackend *blk, int argc, char **argv)
- {
-     BlockAcctCookie cookie;
-     block_acct_start(blk_get_stats(blk), &cookie, 0, BLOCK_ACCT_FLUSH);
-     blk_drain_all();
-     block_acct_done(blk_get_stats(blk), &cookie);
-+    return 0;
- }
- 
- static const cmdinfo_t aio_flush_cmd = {
-@@ -1556,9 +1586,9 @@ static const cmdinfo_t aio_flush_cmd = {
-     .oneline    = "completes all outstanding aio requests"
- };
- 
--static void flush_f(BlockBackend *blk, int argc, char **argv)
-+static int flush_f(BlockBackend *blk, int argc, char **argv)
- {
--    blk_flush(blk);
-+    return blk_flush(blk);
- }
- 
- static const cmdinfo_t flush_cmd = {
-@@ -1568,7 +1598,7 @@ static const cmdinfo_t flush_cmd = {
-     .oneline    = "flush all in-core file state to disk",
- };
- 
--static void truncate_f(BlockBackend *blk, int argc, char **argv)
-+static int truncate_f(BlockBackend *blk, int argc, char **argv)
- {
-     Error *local_err = NULL;
-     int64_t offset;
-@@ -1577,14 +1607,16 @@ static void truncate_f(BlockBackend *blk, int argc, char **argv)
-     offset = cvtnum(argv[1]);
-     if (offset < 0) {
-         print_cvtnum_err(offset, argv[1]);
--        return;
-+        return offset;
-     }
- 
-     ret = blk_truncate(blk, offset, PREALLOC_MODE_OFF, &local_err);
-     if (ret < 0) {
-         error_report_err(local_err);
--        return;
-+        return ret;
-     }
++# This test is specific to qcow2
++_supported_fmt qcow2
++_supported_proto file
++_supported_os Linux
 +
-+    return 0;
- }
- 
- static const cmdinfo_t truncate_cmd = {
-@@ -1598,7 +1630,7 @@ static const cmdinfo_t truncate_cmd = {
-     .oneline    = "truncates the current file at the given offset",
- };
- 
--static void length_f(BlockBackend *blk, int argc, char **argv)
-+static int length_f(BlockBackend *blk, int argc, char **argv)
- {
-     int64_t size;
-     char s1[64];
-@@ -1606,11 +1638,12 @@ static void length_f(BlockBackend *blk, int argc, char **argv)
-     size = blk_getlength(blk);
-     if (size < 0) {
-         printf("getlength: %s\n", strerror(-size));
--        return;
-+        return size;
-     }
- 
-     cvtstr(size, s1, sizeof(s1));
-     printf("%s\n", s1);
-+    return 0;
- }
- 
- 
-@@ -1622,7 +1655,7 @@ static const cmdinfo_t length_cmd = {
- };
- 
- 
--static void info_f(BlockBackend *blk, int argc, char **argv)
-+static int info_f(BlockBackend *blk, int argc, char **argv)
- {
-     BlockDriverState *bs = blk_bs(blk);
-     BlockDriverInfo bdi;
-@@ -1639,7 +1672,7 @@ static void info_f(BlockBackend *blk, int argc, char **argv)
- 
-     ret = bdrv_get_info(bs, &bdi);
-     if (ret) {
--        return;
-+        return ret;
-     }
- 
-     cvtstr(bdi.cluster_size, s1, sizeof(s1));
-@@ -1654,6 +1687,8 @@ static void info_f(BlockBackend *blk, int argc, char **argv)
-         bdrv_image_info_specific_dump(fprintf, stdout, spec_info);
-         qapi_free_ImageInfoSpecific(spec_info);
-     }
++# Internal snapshots are (currently) impossible with refcount_bits=1
++_unsupported_imgopts 'refcount_bits=1[^0-9]'
 +
-+    return 0;
- }
- 
- 
-@@ -1680,7 +1715,7 @@ static void discard_help(void)
- "\n");
- }
- 
--static void discard_f(BlockBackend *blk, int argc, char **argv);
-+static int discard_f(BlockBackend *blk, int argc, char **argv);
- 
- static const cmdinfo_t discard_cmd = {
-     .name       = "discard",
-@@ -1694,7 +1729,7 @@ static const cmdinfo_t discard_cmd = {
-     .help       = discard_help,
- };
- 
--static void discard_f(BlockBackend *blk, int argc, char **argv)
-+static int discard_f(BlockBackend *blk, int argc, char **argv)
- {
-     struct timeval t1, t2;
-     bool Cflag = false, qflag = false;
-@@ -1711,31 +1746,31 @@ static void discard_f(BlockBackend *blk, int argc, char **argv)
-             break;
-         default:
-             qemuio_command_usage(&discard_cmd);
--            return;
-+            return -EINVAL;
-         }
-     }
- 
-     if (optind != argc - 2) {
-         qemuio_command_usage(&discard_cmd);
--        return;
-+        return -EINVAL;
-     }
- 
-     offset = cvtnum(argv[optind]);
-     if (offset < 0) {
-         print_cvtnum_err(offset, argv[optind]);
--        return;
-+        return offset;
-     }
- 
-     optind++;
-     bytes = cvtnum(argv[optind]);
-     if (bytes < 0) {
-         print_cvtnum_err(bytes, argv[optind]);
--        return;
-+        return bytes;
-     } else if (bytes >> BDRV_SECTOR_BITS > BDRV_REQUEST_MAX_SECTORS) {
-         printf("length cannot exceed %"PRIu64", given %s\n",
-                (uint64_t)BDRV_REQUEST_MAX_SECTORS << BDRV_SECTOR_BITS,
-                argv[optind]);
--        return;
-+        return -EINVAL;
-     }
- 
-     gettimeofday(&t1, NULL);
-@@ -1744,7 +1779,7 @@ static void discard_f(BlockBackend *blk, int argc, char **argv)
- 
-     if (ret < 0) {
-         printf("discard failed: %s\n", strerror(-ret));
--        return;
-+        return ret;
-     }
- 
-     /* Finally, report back -- -C gives a parsable format */
-@@ -1752,9 +1787,11 @@ static void discard_f(BlockBackend *blk, int argc, char **argv)
-         t2 = tsub(t2, t1);
-         print_report("discard", &t2, offset, bytes, bytes, 1, Cflag);
-     }
++echo
++echo '=== Simulating an I/O error during snapshot deletion ==='
++echo
 +
-+    return 0;
- }
- 
--static void alloc_f(BlockBackend *blk, int argc, char **argv)
-+static int alloc_f(BlockBackend *blk, int argc, char **argv)
- {
-     BlockDriverState *bs = blk_bs(blk);
-     int64_t offset, start, remaining, count;
-@@ -1765,14 +1802,14 @@ static void alloc_f(BlockBackend *blk, int argc, char **argv)
-     start = offset = cvtnum(argv[1]);
-     if (offset < 0) {
-         print_cvtnum_err(offset, argv[1]);
--        return;
-+        return offset;
-     }
- 
-     if (argc == 3) {
-         count = cvtnum(argv[2]);
-         if (count < 0) {
-             print_cvtnum_err(count, argv[2]);
--            return;
-+            return count;
-         }
-     } else {
-         count = BDRV_SECTOR_SIZE;
-@@ -1784,7 +1821,7 @@ static void alloc_f(BlockBackend *blk, int argc, char **argv)
-         ret = bdrv_is_allocated(bs, offset, remaining, &num);
-         if (ret < 0) {
-             printf("is_allocated failed: %s\n", strerror(-ret));
--            return;
-+            return ret;
-         }
-         offset += num;
-         remaining -= num;
-@@ -1801,6 +1838,7 @@ static void alloc_f(BlockBackend *blk, int argc, char **argv)
- 
-     printf("%"PRId64"/%"PRId64" bytes allocated at offset %s\n",
-            sum_alloc, count, s1);
-+    return 0;
- }
- 
- static const cmdinfo_t alloc_cmd = {
-@@ -1846,7 +1884,7 @@ static int map_is_allocated(BlockDriverState *bs, int64_t offset,
-     return firstret;
- }
- 
--static void map_f(BlockBackend *blk, int argc, char **argv)
-+static int map_f(BlockBackend *blk, int argc, char **argv)
- {
-     int64_t offset, bytes;
-     char s1[64], s2[64];
-@@ -1858,17 +1896,17 @@ static void map_f(BlockBackend *blk, int argc, char **argv)
-     bytes = blk_getlength(blk);
-     if (bytes < 0) {
-         error_report("Failed to query image length: %s", strerror(-bytes));
--        return;
-+        return bytes;
-     }
- 
-     while (bytes) {
-         ret = map_is_allocated(blk_bs(blk), offset, bytes, &num);
-         if (ret < 0) {
-             error_report("Failed to get allocation status: %s", strerror(-ret));
--            return;
-+            return ret;
-         } else if (!num) {
-             error_report("Unexpected end of image");
--            return;
-+            return -EIO;
-         }
- 
-         retstr = ret ? "    allocated" : "not allocated";
-@@ -1880,6 +1918,8 @@ static void map_f(BlockBackend *blk, int argc, char **argv)
-         offset += num;
-         bytes -= num;
-     }
++_make_test_img 64M
++$QEMU_IO -c 'write 0 64k' "$TEST_IMG" | _filter_qemu_io
 +
-+    return 0;
- }
- 
- static const cmdinfo_t map_cmd = {
-@@ -1907,7 +1947,7 @@ static void reopen_help(void)
- "\n");
- }
- 
--static void reopen_f(BlockBackend *blk, int argc, char **argv);
-+static int reopen_f(BlockBackend *blk, int argc, char **argv);
- 
- static QemuOptsList reopen_opts = {
-     .name = "reopen",
-@@ -1929,7 +1969,7 @@ static const cmdinfo_t reopen_cmd = {
-        .help           = reopen_help,
- };
- 
--static void reopen_f(BlockBackend *blk, int argc, char **argv)
-+static int reopen_f(BlockBackend *blk, int argc, char **argv)
- {
-     BlockDriverState *bs = blk_bs(blk);
-     QemuOpts *qopts;
-@@ -1947,19 +1987,19 @@ static void reopen_f(BlockBackend *blk, int argc, char **argv)
-         case 'c':
-             if (bdrv_parse_cache_mode(optarg, &flags, &writethrough) < 0) {
-                 error_report("Invalid cache option: %s", optarg);
--                return;
-+                return -EINVAL;
-             }
-             break;
-         case 'o':
-             if (!qemu_opts_parse_noisily(&reopen_opts, optarg, 0)) {
-                 qemu_opts_reset(&reopen_opts);
--                return;
-+                return -EINVAL;
-             }
-             break;
-         case 'r':
-             if (has_rw_option) {
-                 error_report("Only one -r/-w option may be given");
--                return;
-+                return -EINVAL;
-             }
-             flags &= ~BDRV_O_RDWR;
-             has_rw_option = true;
-@@ -1967,7 +2007,7 @@ static void reopen_f(BlockBackend *blk, int argc, char **argv)
-         case 'w':
-             if (has_rw_option) {
-                 error_report("Only one -r/-w option may be given");
--                return;
-+                return -EINVAL;
-             }
-             flags |= BDRV_O_RDWR;
-             has_rw_option = true;
-@@ -1975,14 +2015,14 @@ static void reopen_f(BlockBackend *blk, int argc, char **argv)
-         default:
-             qemu_opts_reset(&reopen_opts);
-             qemuio_command_usage(&reopen_cmd);
--            return;
-+            return -EINVAL;
-         }
-     }
- 
-     if (optind != argc) {
-         qemu_opts_reset(&reopen_opts);
-         qemuio_command_usage(&reopen_cmd);
--        return;
-+        return -EINVAL;
-     }
- 
-     if (writethrough != blk_enable_write_cache(blk) &&
-@@ -1990,7 +2030,7 @@ static void reopen_f(BlockBackend *blk, int argc, char **argv)
-     {
-         error_report("Cannot change cache.writeback: Device attached");
-         qemu_opts_reset(&reopen_opts);
--        return;
-+        return -EBUSY;
-     }
- 
-     if (!(flags & BDRV_O_RDWR)) {
-@@ -2016,29 +2056,37 @@ static void reopen_f(BlockBackend *blk, int argc, char **argv)
- 
-     if (local_err) {
-         error_report_err(local_err);
--    } else {
--        blk_set_enable_write_cache(blk, !writethrough);
-+        return -EINVAL;
-     }
++# Create the snapshot
++$QEMU_IMG snapshot -c foo "$TEST_IMG"
 +
-+    blk_set_enable_write_cache(blk, !writethrough);
-+    return 0;
- }
- 
--static void break_f(BlockBackend *blk, int argc, char **argv)
-+static int break_f(BlockBackend *blk, int argc, char **argv)
- {
-     int ret;
- 
-     ret = bdrv_debug_breakpoint(blk_bs(blk), argv[1], argv[2]);
-     if (ret < 0) {
-         printf("Could not set breakpoint: %s\n", strerror(-ret));
-+        return ret;
-     }
++# Verify the snapshot is there
++echo
++_img_info | grep 'Snapshot list'
++echo '(Snapshot filtered)'
++echo
 +
-+    return 0;
- }
- 
--static void remove_break_f(BlockBackend *blk, int argc, char **argv)
-+static int remove_break_f(BlockBackend *blk, int argc, char **argv)
- {
-     int ret;
- 
-     ret = bdrv_debug_remove_breakpoint(blk_bs(blk), argv[1]);
-     if (ret < 0) {
-         printf("Could not remove breakpoint %s: %s\n", argv[1], strerror(-ret));
-+        return ret;
-     }
++# Try to delete the snapshot (with an error happening when freeing the
++# then leaked clusters)
++cat > "$TEST_DIR/blkdebug.conf" <<EOF
++[inject-error]
++event = "cluster_free"
++errno = "5"
++EOF
++$QEMU_IMG snapshot -d foo "blkdebug:$TEST_DIR/blkdebug.conf:$TEST_IMG"
 +
-+    return 0;
- }
- 
- static const cmdinfo_t break_cmd = {
-@@ -2060,14 +2108,17 @@ static const cmdinfo_t remove_break_cmd = {
-        .oneline        = "remove a breakpoint by tag",
- };
- 
--static void resume_f(BlockBackend *blk, int argc, char **argv)
-+static int resume_f(BlockBackend *blk, int argc, char **argv)
- {
-     int ret;
- 
-     ret = bdrv_debug_resume(blk_bs(blk), argv[1]);
-     if (ret < 0) {
-         printf("Could not resume request: %s\n", strerror(-ret));
-+        return ret;
-     }
++# Verify the snapshot is gone
++echo
++_img_info | grep 'Snapshot list'
 +
-+    return 0;
- }
- 
- static const cmdinfo_t resume_cmd = {
-@@ -2079,11 +2130,12 @@ static const cmdinfo_t resume_cmd = {
-        .oneline        = "resumes the request tagged as tag",
- };
- 
--static void wait_break_f(BlockBackend *blk, int argc, char **argv)
-+static int wait_break_f(BlockBackend *blk, int argc, char **argv)
- {
-     while (!bdrv_debug_is_suspended(blk_bs(blk), argv[1])) {
-         aio_poll(blk_get_aio_context(blk), true);
-     }
-+    return 0;
- }
- 
- static const cmdinfo_t wait_break_cmd = {
-@@ -2095,7 +2147,7 @@ static const cmdinfo_t wait_break_cmd = {
-        .oneline        = "waits for the suspension of a request",
- };
- 
--static void abort_f(BlockBackend *blk, int argc, char **argv)
-+static int abort_f(BlockBackend *blk, int argc, char **argv)
- {
-     abort();
- }
-@@ -2121,7 +2173,7 @@ static void sigraise_help(void)
- "\n", SIGTERM);
- }
- 
--static void sigraise_f(BlockBackend *blk, int argc, char **argv);
-+static int sigraise_f(BlockBackend *blk, int argc, char **argv);
- 
- static const cmdinfo_t sigraise_cmd = {
-     .name       = "sigraise",
-@@ -2134,16 +2186,16 @@ static const cmdinfo_t sigraise_cmd = {
-     .help       = sigraise_help,
- };
- 
--static void sigraise_f(BlockBackend *blk, int argc, char **argv)
-+static int sigraise_f(BlockBackend *blk, int argc, char **argv)
- {
-     int64_t sig = cvtnum(argv[1]);
-     if (sig < 0) {
-         print_cvtnum_err(sig, argv[1]);
--        return;
-+        return sig;
-     } else if (sig > NSIG) {
-         printf("signal argument '%s' is too large to be a valid signal\n",
-                argv[1]);
--        return;
-+        return -EINVAL;
-     }
- 
-     /* Using raise() to kill this process does not necessarily flush all open
-@@ -2153,6 +2205,8 @@ static void sigraise_f(BlockBackend *blk, int argc, char **argv)
-     fflush(stderr);
- 
-     raise(sig);
++# Should only show leaks
++echo '--- Checking test image ---'
++_check_test_img
 +
-+    return 0;
- }
- 
- static void sleep_cb(void *opaque)
-@@ -2161,7 +2215,7 @@ static void sleep_cb(void *opaque)
-     *expired = true;
- }
- 
--static void sleep_f(BlockBackend *blk, int argc, char **argv)
-+static int sleep_f(BlockBackend *blk, int argc, char **argv)
- {
-     char *endptr;
-     long ms;
-@@ -2171,7 +2225,7 @@ static void sleep_f(BlockBackend *blk, int argc, char **argv)
-     ms = strtol(argv[1], &endptr, 0);
-     if (ms < 0 || *endptr != '\0') {
-         printf("%s is not a valid number\n", argv[1]);
--        return;
-+        return -EINVAL;
-     }
- 
-     timer = timer_new_ns(QEMU_CLOCK_HOST, sleep_cb, &expired);
-@@ -2182,6 +2236,7 @@ static void sleep_f(BlockBackend *blk, int argc, char **argv)
-     }
- 
-     timer_free(timer);
-+    return 0;
- }
- 
- static const cmdinfo_t sleep_cmd = {
-@@ -2228,22 +2283,23 @@ static void help_all(void)
-     printf("\nUse 'help commandname' for extended help.\n");
- }
- 
--static void help_f(BlockBackend *blk, int argc, char **argv)
-+static int help_f(BlockBackend *blk, int argc, char **argv)
- {
-     const cmdinfo_t *ct;
- 
-     if (argc == 1) {
-         help_all();
--        return;
-+        return 0;
-     }
- 
-     ct = find_command(argv[1]);
-     if (ct == NULL) {
-         printf("command %s not found\n", argv[1]);
--        return;
-+        return -EINVAL;
-     }
- 
-     help_onecmd(argv[1], ct);
-+    return 0;
- }
- 
- static const cmdinfo_t help_cmd = {
-@@ -2257,13 +2313,14 @@ static const cmdinfo_t help_cmd = {
-     .oneline    = "help for one or all commands",
- };
- 
--void qemuio_command(BlockBackend *blk, const char *cmd)
-+int qemuio_command(BlockBackend *blk, const char *cmd)
- {
-     AioContext *ctx;
-     char *input;
-     const cmdinfo_t *ct;
-     char **v;
-     int c;
-+    int ret = 0;
- 
-     input = g_strdup(cmd);
-     v = breakline(input, &c);
-@@ -2272,14 +2329,17 @@ void qemuio_command(BlockBackend *blk, const char *cmd)
-         if (ct) {
-             ctx = blk ? blk_get_aio_context(blk) : qemu_get_aio_context();
-             aio_context_acquire(ctx);
--            command(blk, ct, c, v);
-+            ret = command(blk, ct, c, v);
-             aio_context_release(ctx);
-         } else {
-             fprintf(stderr, "command \"%s\" not found\n", v[0]);
-+            ret = -EINVAL;
-         }
-     }
-     g_free(input);
-     g_free(v);
++echo
 +
-+    return ret;
- }
- 
- static void __attribute((constructor)) init_qemuio_commands(void)
-diff --git a/qemu-io.c b/qemu-io.c
-index 4578ccfaa5..e82dd0b999 100644
---- a/qemu-io.c
-+++ b/qemu-io.c
-@@ -66,10 +66,11 @@ static int get_eof_char(void)
- #endif
- }
- 
--static void close_f(BlockBackend *blk, int argc, char **argv)
-+static int close_f(BlockBackend *blk, int argc, char **argv)
- {
-     blk_unref(qemuio_blk);
-     qemuio_blk = NULL;
-+    return 0;
- }
- 
- static const cmdinfo_t close_cmd = {
-@@ -136,7 +137,7 @@ static void open_help(void)
- "\n");
- }
- 
--static void open_f(BlockBackend *blk, int argc, char **argv);
-+static int open_f(BlockBackend *blk, int argc, char **argv);
- 
- static const cmdinfo_t open_cmd = {
-     .name       = "open",
-@@ -160,12 +161,13 @@ static QemuOptsList empty_opts = {
-     },
- };
- 
--static void open_f(BlockBackend *blk, int argc, char **argv)
-+static int open_f(BlockBackend *blk, int argc, char **argv)
- {
-     int flags = BDRV_O_UNMAP;
-     int readonly = 0;
-     bool writethrough = true;
-     int c;
-+    int ret;
-     QemuOpts *qopts;
-     QDict *opts;
-     bool force_share = false;
-@@ -192,25 +194,25 @@ static void open_f(BlockBackend *blk, int argc, char **argv)
-             if (bdrv_parse_cache_mode(optarg, &flags, &writethrough) < 0) {
-                 error_report("Invalid cache option: %s", optarg);
-                 qemu_opts_reset(&empty_opts);
--                return;
-+                return -EINVAL;
-             }
-             break;
-         case 'd':
-             if (bdrv_parse_discard_flags(optarg, &flags) < 0) {
-                 error_report("Invalid discard option: %s", optarg);
-                 qemu_opts_reset(&empty_opts);
--                return;
-+                return -EINVAL;
-             }
-             break;
-         case 'o':
-             if (imageOpts) {
-                 printf("--image-opts and 'open -o' are mutually exclusive\n");
-                 qemu_opts_reset(&empty_opts);
--                return;
-+                return -EINVAL;
-             }
-             if (!qemu_opts_parse_noisily(&empty_opts, optarg, false)) {
-                 qemu_opts_reset(&empty_opts);
--                return;
-+                return -EINVAL;
-             }
-             break;
-         case 'U':
-@@ -219,7 +221,7 @@ static void open_f(BlockBackend *blk, int argc, char **argv)
-         default:
-             qemu_opts_reset(&empty_opts);
-             qemuio_command_usage(&open_cmd);
--            return;
-+            return -EINVAL;
-         }
-     }
- 
-@@ -230,7 +232,7 @@ static void open_f(BlockBackend *blk, int argc, char **argv)
-     if (imageOpts && (optind == argc - 1)) {
-         if (!qemu_opts_parse_noisily(&empty_opts, argv[optind], false)) {
-             qemu_opts_reset(&empty_opts);
--            return;
-+            return -EINVAL;
-         }
-         optind++;
-     }
-@@ -240,18 +242,26 @@ static void open_f(BlockBackend *blk, int argc, char **argv)
-     qemu_opts_reset(&empty_opts);
- 
-     if (optind == argc - 1) {
--        openfile(argv[optind], flags, writethrough, force_share, opts);
-+        ret = openfile(argv[optind], flags, writethrough, force_share, opts);
-     } else if (optind == argc) {
--        openfile(NULL, flags, writethrough, force_share, opts);
-+        ret = openfile(NULL, flags, writethrough, force_share, opts);
-     } else {
-         QDECREF(opts);
-         qemuio_command_usage(&open_cmd);
-+        return -EINVAL;
-+    }
++# As there are only leaks, this should be able to fully repair the
++# image
++echo '--- Repairing test image ---'
++_check_test_img -r leaks
 +
-+    if (ret) {
-+        return -EINVAL;
-     }
 +
-+    return 0;
- }
- 
--static void quit_f(BlockBackend *blk, int argc, char **argv)
-+static int quit_f(BlockBackend *blk, int argc, char **argv)
- {
-     quit_qemu_io = true;
-+    return 0;
- }
- 
- static const cmdinfo_t quit_cmd = {
++# success, all done
++echo '*** done'
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/217.out b/tests/qemu-iotests/217.out
+new file mode 100644
+index 0000000000..e3fc40a8c7
+--- /dev/null
++++ b/tests/qemu-iotests/217.out
+@@ -0,0 +1,42 @@
++QA output created by 217
++
++=== Simulating an I/O error during snapshot deletion ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++wrote 65536/65536 bytes at offset 0
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++Snapshot list:
++(Snapshot filtered)
++
++qcow2_free_clusters failed: Input/output error
++qemu-img: Could not delete snapshot 'foo': Failed to free the cluster and L1 table: Input/output error
++
++--- Checking test image ---
++Leaked cluster 4 refcount=2 reference=1
++Leaked cluster 5 refcount=2 reference=1
++Leaked cluster 6 refcount=1 reference=0
++Leaked cluster 7 refcount=1 reference=0
++
++4 leaked clusters were found on the image.
++This means waste of disk space, but no harm to data.
++
++--- Repairing test image ---
++Leaked cluster 4 refcount=2 reference=1
++Leaked cluster 5 refcount=2 reference=1
++Leaked cluster 6 refcount=1 reference=0
++Leaked cluster 7 refcount=1 reference=0
++Repairing cluster 4 refcount=2 reference=1
++Repairing cluster 5 refcount=2 reference=1
++Repairing cluster 6 refcount=1 reference=0
++Repairing cluster 7 refcount=1 reference=0
++Repairing OFLAG_COPIED L2 cluster: l1_index=0 l1_entry=40000 refcount=1
++Repairing OFLAG_COPIED data cluster: l2_entry=50000 refcount=1
++The following inconsistencies were found and repaired:
++
++    4 leaked clusters
++    2 corruptions
++
++Double checking the fixed image now...
++No errors were found on the image.
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 2edc377370..b20afb940b 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -215,3 +215,4 @@
+ 214 rw auto
+ 215 rw auto quick
+ 216 rw auto quick
++217 rw auto quick
 -- 
 2.14.3
