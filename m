@@ -1,24 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP7W-0003HC-Mq
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 08:38:32 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fCR2i-0003tC-IB
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 10:41:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP7R-0005Km-R5
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 08:38:30 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:56332)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP7R-0005KK-Hn
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 08:38:25 -0400
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Sat, 28 Apr 2018 15:38:17 +0300
-Message-ID: <20180428123817.12445.83865.stgit@pasha-VirtualBox>
-In-Reply-To: <20180428123627.12445.9923.stgit@pasha-VirtualBox>
-References: <20180428123627.12445.9923.stgit@pasha-VirtualBox>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RFC PATCH v2 19/19] replay: allow loading any
- snapshots before recording
+	(envelope-from <mreitz@redhat.com>) id 1fCR2h-0004jf-NL
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 10:41:40 -0400
+From: Max Reitz <mreitz@redhat.com>
+Date: Sat, 28 Apr 2018 16:41:18 +0200
+Message-Id: <20180428144123.30333-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/5] qemu-io: Exit with error when a command
+ failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,69 +18,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-This patch enables using -loadvm in recording mode to allow starting
-the execution recording from any of the available snapshots.
-It also fixes loading of the record/replay state, therefore snapshots
-created in replay mode may also be used for starting the new recording.
+Right now, qemu-io's exit code is rather useless as it is usually 0.
+Except sometimes, then it's 1 in case of an error (mostly when you
+specify a filename as an argument and it cannot open that).
 
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
----
- replay/replay-snapshot.c |   17 ++++++++++++-----
- vl.c                     |    7 ++++---
- 2 files changed, 16 insertions(+), 8 deletions(-)
+At the same time, most command functions' return values are rather
+useless as they are usually 0 (meaning "continue execution").  There is
+only a single function that breaks that pattern, which is "quit".  On
+one hand, this is pointless because "quit" is in qemu-io.c, so it can
+easily signal that fact through a global (yet static) variable.  On the
+other, it breaks the usual pattern of I/O functions returning error
+codes.
 
-diff --git a/replay/replay-snapshot.c b/replay/replay-snapshot.c
-index 2ab85cf..16bacc9 100644
---- a/replay/replay-snapshot.c
-+++ b/replay/replay-snapshot.c
-@@ -33,11 +33,18 @@ static int replay_pre_save(void *opaque)
- static int replay_post_load(void *opaque, int version_id)
- {
-     ReplayState *state = opaque;
--    fseek(replay_file, state->file_offset, SEEK_SET);
--    qemu_clock_set_last(QEMU_CLOCK_HOST, state->host_clock_last);
--    /* If this was a vmstate, saved in recording mode,
--       we need to initialize replay data fields. */
--    replay_fetch_data_kind();
-+    if (replay_mode == REPLAY_MODE_PLAY) {
-+        fseek(replay_file, state->file_offset, SEEK_SET);
-+        qemu_clock_set_last(QEMU_CLOCK_HOST, state->host_clock_last);
-+        /* If this was a vmstate, saved in recording mode,
-+           we need to initialize replay data fields. */
-+        replay_fetch_data_kind();
-+    } else if (replay_mode == REPLAY_MODE_RECORD) {
-+        /* This is only useful for loading the initial state.
-+           Therefore reset all the counters. */
-+        state->instructions_count = 0;
-+        state->block_request_id = 0;
-+    }
- 
-     return 0;
- }
-diff --git a/vl.c b/vl.c
-index 3bf85a4..122ee6b 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4724,15 +4724,16 @@ int main(int argc, char **argv, char **envp)
-     replay_checkpoint(CHECKPOINT_RESET);
-     qemu_system_reset(SHUTDOWN_CAUSE_NONE);
-     register_global_state();
--    if (replay_mode != REPLAY_MODE_NONE) {
--        replay_vmstate_init();
--    } else if (loadvm) {
-+    if (loadvm) {
-         Error *local_err = NULL;
-         if (load_snapshot(loadvm, &local_err) < 0) {
-             error_report_err(local_err);
-             autostart = 0;
-         }
-     }
-+    if (replay_mode != REPLAY_MODE_NONE) {
-+        replay_vmstate_init();
-+    }
- 
-     qdev_prop_check_globals();
-     if (vmstate_dump_file) {
+This series resolves the overlap between both issues by making the
+command functions' return error values instead of whether to continue
+execution or not, and thus makes qemu-io return 1 if any of the commands
+executed has failed and 0 only if all of them have succeeded.
+
+Patch 5 showcases how that may be useful for iotests.
+
+
+See also: https://bugzilla.redhat.com/show_bug.cgi?id=1519617
+
+
+Max Reitz (5):
+  qemu-io: Drop command functions' return values
+  qemu-io: Let command functions return error code
+  qemu-io: Exit with error when a command failed
+  iotests.py: Add qemu_io_silent
+  iotests: Let 216 make use of qemu-io's exit code
+
+ include/qemu-io.h             |   4 +-
+ qemu-io-cmds.c                | 276 ++++++++++++++++++++++++------------------
+ qemu-io.c                     |  62 +++++++---
+ tests/qemu-iotests/216        |  23 ++--
+ tests/qemu-iotests/216.out    |  17 +--
+ tests/qemu-iotests/iotests.py |   9 ++
+ 6 files changed, 226 insertions(+), 165 deletions(-)
+
+-- 
+2.14.3
