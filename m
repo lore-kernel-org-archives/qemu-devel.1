@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fCNtP-0000XA-8q
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 07:19:52 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP5p-0001vF-P9
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 08:36:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fCNtO-0005qk-9q
-	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 07:19:51 -0400
-References: <20180421132929.21610-1-mreitz@redhat.com>
-	<20180421132929.21610-4-mreitz@redhat.com>
-	<5ee0cf91-5533-2500-b4f1-5eac0dee8be4@redhat.com>
-	<377c9a6a-aa05-dec8-52fb-f0cdfc2c2b50@redhat.com>
-	<ae48f373-a9a5-fb67-3241-4812e13a4b08@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <7632df03-6884-7533-f2b1-cdd8f293bea1@redhat.com>
-Date: Sat, 28 Apr 2018 13:19:37 +0200
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP5m-0003tM-Vg
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 08:36:45 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:55850)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fCP5m-0003sh-My
+	for qemu-devel@nongnu.org; Sat, 28 Apr 2018 08:36:42 -0400
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Date: Sat, 28 Apr 2018 15:36:34 +0300
+Message-ID: <20180428123634.12445.90565.stgit@pasha-VirtualBox>
+In-Reply-To: <20180428123627.12445.9923.stgit@pasha-VirtualBox>
+References: <20180428123627.12445.9923.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
-In-Reply-To: <ae48f373-a9a5-fb67-3241-4812e13a4b08@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="WsqXQmGPcl1VQF40BZEIDpEnUIjphGMbF"
-Subject: Re: [Qemu-devel] [PATCH v2 3/9] block: Add BDRV_REQ_WRITE_UNCHANGED
- flag
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [RFC PATCH v2 01/19] block: implement
+ bdrv_snapshot_goto for blkreplay
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,121 +27,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WsqXQmGPcl1VQF40BZEIDpEnUIjphGMbF
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <7632df03-6884-7533-f2b1-cdd8f293bea1@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/9] block: Add BDRV_REQ_WRITE_UNCHANGED
- flag
-References: <20180421132929.21610-1-mreitz@redhat.com>
- <20180421132929.21610-4-mreitz@redhat.com>
- <5ee0cf91-5533-2500-b4f1-5eac0dee8be4@redhat.com>
- <377c9a6a-aa05-dec8-52fb-f0cdfc2c2b50@redhat.com>
- <ae48f373-a9a5-fb67-3241-4812e13a4b08@redhat.com>
-In-Reply-To: <ae48f373-a9a5-fb67-3241-4812e13a4b08@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-On 2018-04-26 04:12, Eric Blake wrote:
-> On 04/25/2018 10:08 AM, Max Reitz wrote:
->=20
->>
->>> Also, that does raise the question of whether you have more work to
->>> support write-zero requests with WRITE_UNCHANGED (which indeed sounds=
+This patch enables making snapshots with blkreplay used in
+block devices.
+This function is required to make bdrv_snapshot_goto without
+calling .bdrv_open which is not implemented.
 
->>> like something plausible to support).
->>
->> I'm afraid I don't quite understand the question.
->> BDRV_REQ_WRITE_UNCHANGED support is usually rather simple because as
->> said above it is only needed by drivers that rely on their parent to
->> request the permissions, i.e. filter drivers.  Since filter drivers ju=
-st
->> forward the requests, all they have to do is retain the
->> BDRV_REQ_WRITE_UNCHANGED flag, be it a zero write or a normal write.
->=20
-> I'm trying to figure out if BDRV_REQ_WRITE_UNCHANGED makes sense for
-> bdrv_co_pwrite_zeroes as well as bdrv_co_pwrite. I think the answer is
-> yes (if we know the guest already reads zeroes, but need to write to th=
-e
-> protocol layer anyways because of a commit operation, then mixing both
-> BDRV_REQ_WRITE_UNCHANGED and BDRV_REQ_ZERO_WRITE to the block layer
-> makes sense, and supported_zero_flags should indeed pass
-> BDRV_REQ_WRITE_UNCHANGED on to a driver.
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+---
+ block/blkreplay.c |    8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Well, why not.
-
->> It would be more complicated for format drivers, because they would ha=
-ve
->> to verify that the incoming unchanged write actually ends up as an
->> unchanged write in their file.  But we have already recognized that th=
-at
->> would be too much to ask and that format drivers may want to generally=
-
->> just write anything to their child if it's writable (even regardless o=
-f
->> whether the grandparent issues writes to the format driver node), so
->> they always grab a WRITE permission on their file if possible.
->> Therefore, they do not have to support this request flag.
->=20
-> So qcow2 doesn't have to support the flag, but file-posix.c might want
-> to.  Or are you saying that only filter drivers need to advertise
-> support for the flag?
-
-It might make sense for file-posix, but when you think further, it
-wouldn't do anything in practice.
-
-First, if a protocol driver receives WRITE_UNCHANGED, there are two
-things it can do: If it knows that it only has very plain storage, it
-can just ignore the request because it won't do anything.
-
-If a protocol driver supports backing files (gluster does, I think), it
-cannot ignore them because just like qcow2 it needs to now make sure
-that the data ends up in the top layer.  So if the protocol driver can
-draw any benefits from advertising to the protocol that this is an
-unchanging write (or that it just wants to bring data from a backing
-file up to the top level, which it can infer from the WRITE_UNCHANGED
-flag), then it would make sense for it to support the flag.
-
-(Good point to add to the documentation.)
-
-But from qemu's perspective, this is not required.  The protocol driver
-will just be less efficient if it submits normal writes (and it can do
-that, because qemu will refuse to grant WRITE_UNCHANGED on read-only
-nodes, so the protocol driver must have write access).
-
-OTOH, filter drivers (usually) *must* support this flag because they are
-caught up in qemu's permission system.  They do not submit the writes to
-some protocol, but to the block layer, and the block layer wants you to
-have the proper permissions for that -- and that's not a simple RW/RO
-decision, but we have read/write-unchanged in between.  So if a filter
-driver that only forwards the permissions from its parent may only do
-the very same requests the parent does -- and if the parent does a
-WRITE_UNCHANGED request, the filter driver must do the same.
-
-Max
-
-
---WsqXQmGPcl1VQF40BZEIDpEnUIjphGMbF
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlrkWMkACgkQ9AfbAGHV
-z0DF4AgAu8hw88IQWNetBT+HRCSdjZj9vWK3m0GTE5FXQUe+nDPt/LABJaRJtbqt
-SMrdZjKZhWLq0g8B0THN+oK/EyKI5oDAEP1PfmTIhF8bgBQj8boV88GGfHLGFyZv
-TL9FAkjbXgj33KlJdiA3puBCbui5plyOvbHdjAd9byQXjjwdTg48jiSuBfV6U+0W
-TWg6W6xZwT39H+nqRYnGKJH5o27vQ+IqrbJEmfX2tEyfu+v721VL4hZYSKCYNELL
-CvmG6XBmuAg8kmFAz8W5dB3VE9owFXlQbN127q9SDsrcqdlh9Fye9M4r8A7Nq2xI
-f2rxgOrm1hrkMYCrNGBpWTYsUVgSjg==
-=SVxL
------END PGP SIGNATURE-----
-
---WsqXQmGPcl1VQF40BZEIDpEnUIjphGMbF--
+diff --git a/block/blkreplay.c b/block/blkreplay.c
+index fe5a9b4..ec0aa82 100755
+--- a/block/blkreplay.c
++++ b/block/blkreplay.c
+@@ -127,6 +127,12 @@ static int coroutine_fn blkreplay_co_flush(BlockDriverState *bs)
+     return ret;
+ }
+ 
++static int blkreplay_snapshot_goto(BlockDriverState *bs,
++                                   const char *snapshot_id)
++{
++    return bdrv_snapshot_goto(bs->file->bs, snapshot_id, NULL);
++}
++
+ static BlockDriver bdrv_blkreplay = {
+     .format_name            = "blkreplay",
+     .instance_size          = 0,
+@@ -142,6 +148,8 @@ static BlockDriver bdrv_blkreplay = {
+     .bdrv_co_pwrite_zeroes  = blkreplay_co_pwrite_zeroes,
+     .bdrv_co_pdiscard       = blkreplay_co_pdiscard,
+     .bdrv_co_flush          = blkreplay_co_flush,
++
++    .bdrv_snapshot_goto     = blkreplay_snapshot_goto,
+ };
+ 
+ static void bdrv_blkreplay_init(void)
