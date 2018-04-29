@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37895)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1fCimh-0006Yt-34
-	for qemu-devel@nongnu.org; Sun, 29 Apr 2018 05:38:20 -0400
+	(envelope-from <rafaelkioji@gmail.com>) id 1fCjMf-0007Cd-Be
+	for qemu-devel@nongnu.org; Sun, 29 Apr 2018 06:15:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1fCimd-0000Wj-W2
-	for qemu-devel@nongnu.org; Sun, 29 Apr 2018 05:38:19 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:44646)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1fCimd-0000WC-LQ
-	for qemu-devel@nongnu.org; Sun, 29 Apr 2018 05:38:15 -0400
-Date: Sun, 29 Apr 2018 12:38:04 +0300
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20180429093803.GD2597@yuvallap>
-References: <20180219114332.70443-1-marcel@redhat.com>
-	<20180219114332.70443-10-marcel@redhat.com>
-	<CAFEAcA8_LPFnLjCS30vWDZM49ztHE0gvqmrTNnyb4SFTE97W7Q@mail.gmail.com>
-	<8659dc43-a5a2-f4ca-3381-8698a1a06ad3@redhat.com>
+	(envelope-from <rafaelkioji@gmail.com>) id 1fCjMa-0005AY-DL
+	for qemu-devel@nongnu.org; Sun, 29 Apr 2018 06:15:29 -0400
+Received: from mail-pg0-x22a.google.com ([2607:f8b0:400e:c05::22a]:46057)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rafaelkioji@gmail.com>)
+	id 1fCjMa-00059C-6T
+	for qemu-devel@nongnu.org; Sun, 29 Apr 2018 06:15:24 -0400
+Received: by mail-pg0-x22a.google.com with SMTP id i29-v6so4451562pgn.12
+	for <qemu-devel@nongnu.org>; Sun, 29 Apr 2018 03:15:23 -0700 (PDT)
+Received: from [143.89.131.93] (eepc93.ee.ust.hk. [143.89.131.93])
+	by smtp.googlemail.com with ESMTPSA id
+	s17sm10987043pfi.165.2018.04.29.03.15.20 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Sun, 29 Apr 2018 03:15:21 -0700 (PDT)
+From: Rafael Kioji <rafaelkioji@gmail.com>
+Message-ID: <7366cfc5-e37f-483d-917b-2aae41d1e59e@gmail.com>
+Date: Sun, 29 Apr 2018 18:15:18 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8659dc43-a5a2-f4ca-3381-8698a1a06ad3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH PULL v2 09/10] hw/rdma: Implementation of
- PVRDMA device
+Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] Difference between tcg_gen_ld_i64 and
+ tcg_gen_qemu_ld_i64.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,95 +34,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, yuval.shaia@oracle.com
+To: qemu-devel@nongnu.org
 
-On Fri, Apr 27, 2018 at 10:36:33PM +0300, Marcel Apfelbaum wrote:
-> On 27/04/2018 17:49, Peter Maydell wrote:
-> > On 19 February 2018 at 11:43, Marcel Apfelbaum <marcel@redhat.com> wrote:
-> >> From: Yuval Shaia <yuval.shaia@oracle.com>
-> >>
-> >> PVRDMA is the QEMU implementation of VMware's paravirtualized RDMA device.
-> >> It works with its Linux Kernel driver AS IS, no need for any special
-> >> guest modifications.
-> >>
-> >> While it complies with the VMware device, it can also communicate with
-> >> bare metal RDMA-enabled machines and does not require an RDMA HCA in the
-> >> host, it can work with Soft-RoCE (rxe).
-> >>
-> >> It does not require the whole guest RAM to be pinned allowing memory
-> >> over-commit and, even if not implemented yet, migration support will be
-> >> possible with some HW assistance.
-> >>
-> >> Implementation is divided into 2 components, rdma general and pvRDMA
-> >> specific functions and structures.
-> >>
-> >> The second PVRDMA sub-module - interaction with PCI layer.
-> >> - Device configuration and setup (MSIX, BARs etc).
-> >> - Setup of DSR (Device Shared Resources)
-> >> - Setup of device ring.
-> >> - Device management.
-> >>
-> >> Reviewed-by: Dotan Barak <dotanb@mellanox.com>
-> >> Reviewed-by: Zhu Yanjun <yanjun.zhu@oracle.com>
-> >> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-> >> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
-> > 
-> > Hi; this is something odd I noticed reading through the code.
-> > 
-> >> +static void init_bars(PCIDevice *pdev)
-> >> +{
-> >> +    PVRDMADev *dev = PVRDMA_DEV(pdev);
-> >> +
-> >> +    /* BAR 0 - MSI-X */
-> >> +    memory_region_init(&dev->msix, OBJECT(dev), "pvrdma-msix",
-> >> +                       RDMA_BAR0_MSIX_SIZE);
-> >> +    pci_register_bar(pdev, RDMA_MSIX_BAR_IDX, PCI_BASE_ADDRESS_SPACE_MEMORY,
-> >> +                     &dev->msix);
-> >> +
-> >> +    /* BAR 1 - Registers */
-> >> +    memset(&dev->regs_data, 0, sizeof(dev->regs_data));
-> >> +    memory_region_init_io(&dev->regs, OBJECT(dev), &regs_ops, dev,
-> >> +                          "pvrdma-regs", RDMA_BAR1_REGS_SIZE);
-> > 
-> > RDMA_BAR1_REGS_SIZE is used in pvrdma.h to declare the regs array:
-> >     uint32_t regs_data[RDMA_BAR1_REGS_SIZE];
-> > and that and the way that get_reg_val/set_reg_val do "addr >> 2" to
-> > convert from an address to an array index suggest that it is the
-> > size of the BAR in 32-bit words. However here we're passing it
-> > as the size parameter of memory_region_init_io(), which wants a
-> > size in bytes. Which is correct ?
-> > 
-> 
-> I think that RDMA_BAR1_REGS_SIZE (256) is the size in bytes,
-> this is the layout of the registers (linux kernel):
-> 
-> /* Register offsets within PCI resource on BAR1. */
-> #define PVRDMA_REG_VERSION      0x00    /* R: Version of device. */
-> #define PVRDMA_REG_DSRLOW       0x04    /* W: Device shared region low PA. */
-> #define PVRDMA_REG_DSRHIGH      0x08    /* W: Device shared region high PA. */
-> #define PVRDMA_REG_CTL          0x0c    /* W: PVRDMA_DEVICE_CTL */
-> #define PVRDMA_REG_REQUEST      0x10    /* W: Indicate device request. */
-> #define PVRDMA_REG_ERR          0x14    /* R: Device error. */
-> #define PVRDMA_REG_ICR          0x18    /* R: Interrupt cause. */
-> #define PVRDMA_REG_IMR          0x1c    /* R/W: Interrupt mask. */
-> #define PVRDMA_REG_MACL         0x20    /* R/W: MAC address low. */
-> #define PVRDMA_REG_MACH         0x24    /* R/W: MAC address high. */
-> 
-> So we don't need 256 32-bit words.
-> Yuval can you please confirm?
+Dear all,
 
-Correct, will make it smaller while taking care for the reported size in
-call to memory_region_init.
+What is the difference between these two functions? They are located in 
+the file "tcg/tcg-op.c". Here is their header:
 
-Yuval
+ 1. static inline void tcg_gen_ld_i64(TCGv_i64 ret, TCGv_ptr arg2,
+    tcg_target_long offset)
+ 2. void tcg_gen_qemu_ld_i64(TCGv_i64 val, TCGv addr, TCGArg idx,
+    TCGMemOp memop)
 
-> 
-> 
-> Thanks,
-> Marcel
-> 
-> > thanks
-> > -- PMM
-> > 
-> 
+I don't quite understand the need for function (1). Especially because 
+it is usually passed "cpu_env" for arg2. Like in 
+target/arm/translate-a64.c:595:
+
+> /* Convenience accessors for reading and writing single and double
+>  * FP registers. Writing clears the upper parts of the associated
+>  * 128 bit vector register, as required by the architecture.
+>  * Note that unlike the GP register accessors, the values returned
+>  * by the read functions must be manually freed.
+>  */
+> static TCGv_i64 read_fp_dreg(DisasContext *s, int reg)
+> {
+>     TCGv_i64 v = tcg_temp_new_i64();
+>
+>     tcg_gen_ld_i64(v, cpu_env, fp_reg_offset(s, reg, MO_64));
+>     return v;
+> }
+
+
+Thanks!
+
+  
+--
+Att.,
+Rafael
