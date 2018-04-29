@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rafaelkioji@gmail.com>) id 1fCjMf-0007Cd-Be
-	for qemu-devel@nongnu.org; Sun, 29 Apr 2018 06:15:30 -0400
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1fCkM7-0005DL-RB
+	for qemu-devel@nongnu.org; Sun, 29 Apr 2018 07:19:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rafaelkioji@gmail.com>) id 1fCjMa-0005AY-DL
-	for qemu-devel@nongnu.org; Sun, 29 Apr 2018 06:15:29 -0400
-Received: from mail-pg0-x22a.google.com ([2607:f8b0:400e:c05::22a]:46057)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rafaelkioji@gmail.com>)
-	id 1fCjMa-00059C-6T
-	for qemu-devel@nongnu.org; Sun, 29 Apr 2018 06:15:24 -0400
-Received: by mail-pg0-x22a.google.com with SMTP id i29-v6so4451562pgn.12
-	for <qemu-devel@nongnu.org>; Sun, 29 Apr 2018 03:15:23 -0700 (PDT)
-Received: from [143.89.131.93] (eepc93.ee.ust.hk. [143.89.131.93])
-	by smtp.googlemail.com with ESMTPSA id
-	s17sm10987043pfi.165.2018.04.29.03.15.20 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sun, 29 Apr 2018 03:15:21 -0700 (PDT)
-From: Rafael Kioji <rafaelkioji@gmail.com>
-Message-ID: <7366cfc5-e37f-483d-917b-2aae41d1e59e@gmail.com>
-Date: Sun, 29 Apr 2018 18:15:18 +0800
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1fCkM2-0006Tb-W6
+	for qemu-devel@nongnu.org; Sun, 29 Apr 2018 07:18:59 -0400
+Received: from mail.uni-paderborn.de ([131.234.142.9]:48004)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+	id 1fCkM2-0006TH-IM
+	for qemu-devel@nongnu.org; Sun, 29 Apr 2018 07:18:54 -0400
+References: <7366cfc5-e37f-483d-917b-2aae41d1e59e@gmail.com>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <7a5d09e7-3e30-3683-41ae-076bd4532786@mail.uni-paderborn.de>
+Date: Sun, 29 Apr 2018 13:18:50 +0200
 MIME-Version: 1.0
+In-Reply-To: <7366cfc5-e37f-483d-917b-2aae41d1e59e@gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] Difference between tcg_gen_ld_i64 and
+Subject: Re: [Qemu-devel] Difference between tcg_gen_ld_i64 and
  tcg_gen_qemu_ld_i64.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -34,40 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Rafael Kioji <rafaelkioji@gmail.com>, qemu-devel@nongnu.org
 
-Dear all,
+On 04/29/2018 12:15 PM, Rafael Kioji wrote:
+> Dear all,
+> 
+> What is the difference between these two functions? They are located in the file
+> "tcg/tcg-op.c". Here is their header:
+> 
+> 1. static inline void tcg_gen_ld_i64(TCGv_i64 ret, TCGv_ptr arg2,
+>    tcg_target_long offset)
 
-What is the difference between these two functions? They are located in 
-the file "tcg/tcg-op.c". Here is their header:
+This is used to access fields of qemu data structures from generated code, e.g.
+CPUArmState.
 
- 1. static inline void tcg_gen_ld_i64(TCGv_i64 ret, TCGv_ptr arg2,
-    tcg_target_long offset)
- 2. void tcg_gen_qemu_ld_i64(TCGv_i64 val, TCGv addr, TCGArg idx,
-    TCGMemOp memop)
+> 2. void tcg_gen_qemu_ld_i64(TCGv_i64 val, TCGv addr, TCGArg idx,
+>    TCGMemOp memop)
 
-I don't quite understand the need for function (1). Especially because 
-it is usually passed "cpu_env" for arg2. Like in 
-target/arm/translate-a64.c:595:
+This actually generates a load to guest memory.
 
-> /* Convenience accessors for reading and writing single and double
->  * FP registers. Writing clears the upper parts of the associated
->  * 128 bit vector register, as required by the architecture.
->  * Note that unlike the GP register accessors, the values returned
->  * by the read functions must be manually freed.
->  */
-> static TCGv_i64 read_fp_dreg(DisasContext *s, int reg)
-> {
->     TCGv_i64 v = tcg_temp_new_i64();
->
->     tcg_gen_ld_i64(v, cpu_env, fp_reg_offset(s, reg, MO_64));
->     return v;
-> }
+> 
+> I don't quite understand the need for function (1). Especially because it is
+> usually passed "cpu_env" for arg2. Like in target/arm/translate-a64.c:595:
 
+cpu_env is a pointer to CPUArmState.
 
-Thanks!
-
-  
---
-Att.,
-Rafael
+Cheers,
+Bastian
