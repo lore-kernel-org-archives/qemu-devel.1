@@ -1,18 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fD5eP-00085h-Vx
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 06:03:21 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fD5g7-0000oV-Sx
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 06:05:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fD5eK-0007nj-Ux
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 06:03:18 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38970 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fD5eK-0007n6-Ph
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 06:03:12 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fD5g2-0000FA-Qm
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 06:05:03 -0400
+Received: from mail-wr0-f193.google.com ([209.85.128.193]:38633)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fD5g2-0000Er-JB
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 06:04:58 -0400
+Received: by mail-wr0-f193.google.com with SMTP id 94-v6so6160981wrf.5
+	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 03:04:58 -0700 (PDT)
+References: <20180303002504.25142-1-aik@ozlabs.ru>
+	<20180303002504.25142-2-aik@ozlabs.ru>
+	<f3b6cbb3-4484-55cf-3529-ce1a9946904f@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 30 Apr 2018 12:03:02 +0200
-Message-Id: <20180430100302.15959-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH] target/i386: sev: fix memory leaks
+Message-ID: <fe645105-209e-6ba1-5661-d475cb74f3a8@redhat.com>
+Date: Mon, 30 Apr 2018 12:04:55 +0200
+MIME-Version: 1.0
+In-Reply-To: <f3b6cbb3-4484-55cf-3529-ce1a9946904f@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu v4 1/2] qmp: Merge ObjectPropertyInfo
+ and DevicePropertyInfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,135 +32,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Brijesh Singh <brijesh.singh@amd.com>
+To: Eric Blake <eblake@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Andrea Bolognani <abologna@redhat.com>
 
-Reported by Coverity.
+On 18/04/2018 18:35, Eric Blake wrote:
+> On 03/02/2018 06:25 PM, Alexey Kardashevskiy wrote:
+>> ObjectPropertyInfo is more generic and only missing @description.
+>> This adds a description to ObjectPropertyInfo and removes
+>> DevicePropertyInfo so the resulting ObjectPropertyInfo can be used
+>> elsewhere.
+>>
+>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>> ---
+>> Changes:
+>> v4:
+>> * added (since 2.12) to the new field
+> 
+> And since it missed 2.12,
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- target/i386/sev.c | 32 +++++++++++++++++---------------
- 1 file changed, 17 insertions(+), 15 deletions(-)
+It is in 2.12:
 
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index c01167143f..2395171acf 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -430,7 +430,8 @@ static int
- sev_get_pdh_info(int fd, guchar **pdh, size_t *pdh_len, guchar **cert_chain,
-                  size_t *cert_chain_len)
- {
--    guchar *pdh_data, *cert_chain_data;
-+    guchar *pdh_data = NULL;
-+    guchar *cert_chain_data = NULL;
-     struct sev_user_data_pdh_cert_export export = {};
-     int err, r;
- 
-@@ -471,8 +472,9 @@ e_free:
- SevCapability *
- sev_get_capabilities(void)
- {
--    SevCapability *cap;
--    guchar *pdh_data, *cert_chain_data;
-+    SevCapability *cap = NULL;
-+    guchar *pdh_data = NULL;
-+    guchar *cert_chain_data = NULL;
-     size_t pdh_len = 0, cert_chain_len = 0;
-     uint32_t ebx;
-     int fd;
-@@ -486,7 +488,7 @@ sev_get_capabilities(void)
- 
-     if (sev_get_pdh_info(fd, &pdh_data, &pdh_len,
-                          &cert_chain_data, &cert_chain_len)) {
--        return NULL;
-+        goto out;
-     }
- 
-     cap = g_new0(SevCapability, 1);
-@@ -502,9 +504,9 @@ sev_get_capabilities(void)
-      */
-     cap->reduced_phys_bits = 1;
- 
-+out:
-     g_free(pdh_data);
-     g_free(cert_chain_data);
--
-     close(fd);
-     return cap;
- }
-@@ -530,7 +532,7 @@ sev_launch_start(SEVState *s)
- {
-     gsize sz;
-     int ret = 1;
--    int fw_error;
-+    int fw_error, rc;
-     QSevGuestInfo *sev = s->sev_info;
-     struct kvm_sev_launch_start *start;
-     guchar *session = NULL, *dh_cert = NULL;
-@@ -543,7 +545,7 @@ sev_launch_start(SEVState *s)
-                                             &error_abort);
-     if (sev->session_file) {
-         if (sev_read_file_base64(sev->session_file, &session, &sz) < 0) {
--            return 1;
-+            goto out;
-         }
-         start->session_uaddr = (unsigned long)session;
-         start->session_len = sz;
-@@ -551,18 +553,18 @@ sev_launch_start(SEVState *s)
- 
-     if (sev->dh_cert_file) {
-         if (sev_read_file_base64(sev->dh_cert_file, &dh_cert, &sz) < 0) {
--            return 1;
-+            goto out;
-         }
-         start->dh_uaddr = (unsigned long)dh_cert;
-         start->dh_len = sz;
-     }
- 
-     trace_kvm_sev_launch_start(start->policy, session, dh_cert);
--    ret = sev_ioctl(s->sev_fd, KVM_SEV_LAUNCH_START, start, &fw_error);
--    if (ret < 0) {
-+    rc = sev_ioctl(s->sev_fd, KVM_SEV_LAUNCH_START, start, &fw_error);
-+    if (rc < 0) {
-         error_report("%s: LAUNCH_START ret=%d fw_error=%d '%s'",
-                 __func__, ret, fw_error, fw_error_to_str(fw_error));
--        return 1;
-+        goto out;
-     }
- 
-     object_property_set_int(OBJECT(sev), start->handle, "handle",
-@@ -570,12 +572,13 @@ sev_launch_start(SEVState *s)
-     sev_set_guest_state(SEV_STATE_LAUNCH_UPDATE);
-     s->handle = start->handle;
-     s->policy = start->policy;
-+    ret = 0;
- 
-+out:
-     g_free(start);
-     g_free(session);
-     g_free(dh_cert);
--
--    return 0;
-+    return ret;
- }
- 
- static int
-@@ -712,7 +715,7 @@ sev_guest_init(const char *id)
-     uint32_t host_cbitpos;
-     struct sev_user_data_status status = {};
- 
--    s = g_new0(SEVState, 1);
-+    sev_state = s = g_new0(SEVState, 1);
-     s->sev_info = lookup_sev_guest_info(id);
-     if (!s->sev_info) {
-         error_report("%s: '%s' is not a valid '%s' object",
-@@ -720,7 +723,6 @@ sev_guest_init(const char *id)
-         goto err;
-     }
- 
--    sev_state = s;
-     s->state = SEV_STATE_UNINIT;
- 
-     host_cpuid(0x8000001F, 0, NULL, &ebx, NULL, NULL);
--- 
-2.17.0
+commit 961c47bb8bacc9ae21c0760fa6e2594156299dd7
+Author: Alexey Kardashevskiy <aik@ozlabs.ru>
+Date:   Fri Mar 2 00:09:39 2018 +1100
+
+    qmp: Add qom-list-properties to list QOM object properties
+    
+    There is already 'device-list-properties' which does most of the job,
+    however it does not handle everything returned by qom-list-types such
+    as machines as they inherit directly from TYPE_OBJECT and not TYPE_DEVICE.
+    It does not handle abstract classes either.
+    
+    This adds a new qom-list-properties command which prints properties
+    of a specific class and its instance. It is pretty much a simplified copy
+    of the device-list-properties handler.
+    
+    Since it creates an object instance, device properties should appear
+    in the output as they are copied to QOM properties at the instance_init
+    hook.
+    
+    This adds a object_class_property_iter_init() helper to allow class
+    properties enumeration uses it in the new QMP command to allow properties
+    listing for abstract classes.
+    
+    Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+    Message-Id: <20180301130939.15875-3-aik@ozlabs.ru>
+    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+commit 35f63767dc77d85bebff6c6565aceaf74023776a
+Author: Alexey Kardashevskiy <aik@ozlabs.ru>
+Date:   Fri Mar 2 00:09:38 2018 +1100
+
+    qmp: Merge ObjectPropertyInfo and DevicePropertyInfo
+    
+    ObjectPropertyInfo is more generic and only missing @description.
+    This adds a description to ObjectPropertyInfo and removes
+    DevicePropertyInfo so the resulting ObjectPropertyInfo can be used
+    elsewhere.
+    
+    Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+    Message-Id: <20180301130939.15875-2-aik@ozlabs.ru>
+    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Thanks,
+
+Paolo
+
+>> * removed wrong reindents
+>> ---
+>>  qapi-schema.json | 23 +++++------------------
+>>  qdev-monitor.c   |  6 +++---
+>>  qmp.c            | 14 +++++++-------
+>>  3 files changed, 15 insertions(+), 28 deletions(-)
+>>
+>> diff --git a/qapi-schema.json b/qapi-schema.json
+>> index 0262b9f..5cdf89a 100644
+>> --- a/qapi-schema.json
+>> +++ b/qapi-schema.json
+>> @@ -1266,10 +1266,12 @@
+>>  #        3) A link type in the form 'link<subtype>' where subtype is a qdev
+>>  #           device type name.  Link properties form the device model graph.
+>>  #
+>> +# @description: if specified, the description of the property (since 2.12).
+> 
+> this should be tweaked to say since 2.13.
+> 
+> 
