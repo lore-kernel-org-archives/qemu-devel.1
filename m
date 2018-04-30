@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fDAPZ-0005mv-Dk
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 11:08:18 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fDAQ0-00061q-WC
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 11:08:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fDAPY-0004r1-Cb
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 11:08:17 -0400
-References: <20180428144123.30333-1-mreitz@redhat.com>
-	<20180428144123.30333-3-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <26182b94-a34a-ad71-255b-f18dd677efd6@redhat.com>
-Date: Mon, 30 Apr 2018 10:08:03 -0500
-MIME-Version: 1.0
-In-Reply-To: <20180428144123.30333-3-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/5] qemu-io: Let command functions return
- error code
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fDAPx-0004yD-M0
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 11:08:44 -0400
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:39399)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
+	id 1fDAPx-0004xi-Dv
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 11:08:41 -0400
+Received: by mail-lf0-x242.google.com with SMTP id j193-v6so12575394lfg.6
+	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 08:08:41 -0700 (PDT)
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Date: Mon, 30 Apr 2018 17:08:32 +0200
+Message-Id: <20180430150837.20470-1-edgar.iglesias@gmail.com>
+Subject: [Qemu-devel] [PULL v1 0/5] Xilinx queue 2018-04-30
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,48 +24,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, sai.pavan.boddu@xilinx.com, alistair@alistair23.me, frasse.iglesias@gmail.com, edgar.iglesias@xilinx.com
 
-On 04/28/2018 09:41 AM, Max Reitz wrote:
-> This is basically what everything else in the qemu code base does, so we
-> can do it here, too.
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->   include/qemu-io.h |   4 +-
->   qemu-io-cmds.c    | 346 ++++++++++++++++++++++++++++++++----------------------
->   qemu-io.c         |  34 ++++--
->   3 files changed, 227 insertions(+), 157 deletions(-)
-> 
-> diff --git a/include/qemu-io.h b/include/qemu-io.h
-> index 06cdfbf660..380724ad59 100644
-> --- a/include/qemu-io.h
-> +++ b/include/qemu-io.h
-> @@ -22,7 +22,7 @@
->   
->   #define CMD_FLAG_GLOBAL ((int)0x80000000) /* don't iterate "args" */
->   
-> -typedef void (*cfunc_t)(BlockBackend *blk, int argc, char **argv);
-> +typedef int (*cfunc_t)(BlockBackend *blk, int argc, char **argv);
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Quite a bit of churn on the definition here; squashing 1 and 2 might 
-make for a smaller patch.  But I agree that doing it this way (2 
-separate patches) forces us to audit (with the compiler's help) that all 
-callers are caught and adjusted to the new semantics.
+The following changes since commit 6f0c4706b35dead265509115ddbd2a8d1af516c1:
 
-However, a comment before the typedef would be useful, so that writing a 
-new command knows what semantics it must provide.  It can be as simple as:
+  Merge remote-tracking branch 'remotes/kraxel/tags/usb-20180427-pull-request' into staging (2018-04-27 12:27:59 +0100)
 
-/* Implement a qemu-io command.
-  * Operate on @blk using @argc/@argv as the command's arguments, and
-  * return 0 on success or negative errno on failure.
-  */
+are available in the git repository at:
 
-With a comment added,
-Reviewed-by: Eric Blake <eblake@redhat.com>
+  git@github.com:edgarigl/qemu.git tags/edgar/xilinx-next-2018-04-30.for-upstream
+
+for you to fetch changes up to fce6a8eceb07e27f0cdea87427f4e560dfa0b1c8:
+
+  target-microblaze: mmu: Make the TLBX MISS bit read-only (2018-04-30 16:43:20 +0200)
+
+----------------------------------------------------------------
+edgar/xilinx-next-2018-01.for-upstream
+
+----------------------------------------------------------------
+Edgar E. Iglesias (5):
+      target-microblaze: Respect MSR.PVR as read-only
+      target-microblaze: Fix trap checks for FPU insns
+      target-microblaze: Don't clobber the IMM reg for ld/st reversed
+      target-microblaze: mmu: Make TLBSX write-only
+      target-microblaze: mmu: Make the TLBX MISS bit read-only
+
+ target/microblaze/mmu.c       | 9 ++++++++-
+ target/microblaze/translate.c | 6 ++----
+ 2 files changed, 10 insertions(+), 5 deletions(-)
+
+Edgar E. Iglesias (5):
+  target-microblaze: Respect MSR.PVR as read-only
+  target-microblaze: Fix trap checks for FPU insns
+  target-microblaze: Don't clobber the IMM reg for ld/st reversed
+  target-microblaze: mmu: Make TLBSX write-only
+  target-microblaze: mmu: Make the TLBX MISS bit read-only
+
+ target/microblaze/mmu.c       | 9 ++++++++-
+ target/microblaze/translate.c | 6 ++----
+ 2 files changed, 10 insertions(+), 5 deletions(-)
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.14.1
