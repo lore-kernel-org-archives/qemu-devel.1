@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49468)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fDDOJ-00030q-Hu
+	(envelope-from <pm215@archaic.org.uk>) id 1fDDOJ-00030o-G8
 	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 14:19:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fDDOI-0007Gv-Mr
+	(envelope-from <pm215@archaic.org.uk>) id 1fDDOI-0007Fu-E1
 	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 14:19:11 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41282)
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41268)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fDDOI-0007Fb-HC
+	id 1fDDOI-0007Ew-5h
 	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 14:19:10 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 30 Apr 2018 19:18:58 +0100
-Message-Id: <20180430181905.32327-5-peter.maydell@linaro.org>
+Date: Mon, 30 Apr 2018 19:18:57 +0100
+Message-Id: <20180430181905.32327-4-peter.maydell@linaro.org>
 In-Reply-To: <20180430181905.32327-1-peter.maydell@linaro.org>
 References: <20180430181905.32327-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [RFC PATCH 04/11] Make flatview_extend_translation()
+Subject: [Qemu-devel] [RFC PATCH 03/11] Make address_space_access_valid()
  take a MemTxAttrs argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,40 +29,130 @@ To: qemu-devel@nongnu.org
 Cc: patches@linaro.org, Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 As part of plumbing MemTxAttrs down to the IOMMU translate method,
-add MemTxAttrs as an argument to flatview_extend_translation().
+add MemTxAttrs as an argument to address_space_access_valid().
 Its callers either have an attrs value to hand, or don't care
 and can use MEMTXATTRS_UNSPECIFIED.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- exec.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ include/exec/memory.h      | 4 +++-
+ include/sysemu/dma.h       | 3 ++-
+ exec.c                     | 3 ++-
+ target/s390x/diag.c        | 6 ++++--
+ target/s390x/excp_helper.c | 3 ++-
+ target/s390x/mmu_helper.c  | 3 ++-
+ target/s390x/sigp.c        | 3 ++-
+ 7 files changed, 17 insertions(+), 8 deletions(-)
 
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 1af4e3cd5b..eb1ceace27 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -1938,8 +1938,10 @@ static inline MemoryRegion *address_space_translate(AddressSpace *as,
+  * @addr: address within that address space
+  * @len: length of the area to be checked
+  * @is_write: indicates the transfer direction
++ * @attrs: memory attributes
+  */
+-bool address_space_access_valid(AddressSpace *as, hwaddr addr, int len, bool is_write);
++bool address_space_access_valid(AddressSpace *as, hwaddr addr, int len,
++                                bool is_write, MemTxAttrs attrs);
+ 
+ /* address_space_map: map a physical memory region into a host virtual address
+  *
+diff --git a/include/sysemu/dma.h b/include/sysemu/dma.h
+index 0d73902634..5da3c4e3c5 100644
+--- a/include/sysemu/dma.h
++++ b/include/sysemu/dma.h
+@@ -77,7 +77,8 @@ static inline bool dma_memory_valid(AddressSpace *as,
+                                     DMADirection dir)
+ {
+     return address_space_access_valid(as, addr, len,
+-                                      dir == DMA_DIRECTION_FROM_DEVICE);
++                                      dir == DMA_DIRECTION_FROM_DEVICE,
++                                      MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ static inline int dma_memory_rw_relaxed(AddressSpace *as, dma_addr_t addr,
 diff --git a/exec.c b/exec.c
-index 87650dc7ed..e56c3442c7 100644
+index eb6471abfe..87650dc7ed 100644
 --- a/exec.c
 +++ b/exec.c
-@@ -3460,9 +3460,9 @@ bool address_space_access_valid(AddressSpace *as, hwaddr addr,
+@@ -3445,7 +3445,8 @@ static bool flatview_access_valid(FlatView *fv, hwaddr addr, int len,
+ }
  
- static hwaddr
- flatview_extend_translation(FlatView *fv, hwaddr addr,
--                                 hwaddr target_len,
--                                 MemoryRegion *mr, hwaddr base, hwaddr len,
--                                 bool is_write)
-+                            hwaddr target_len,
-+                            MemoryRegion *mr, hwaddr base, hwaddr len,
-+                            bool is_write, MemTxAttrs attrs)
+ bool address_space_access_valid(AddressSpace *as, hwaddr addr,
+-                                int len, bool is_write)
++                                int len, bool is_write,
++                                MemTxAttrs attrs)
  {
-     hwaddr done = 0;
-     hwaddr xlat;
-@@ -3539,7 +3539,7 @@ void *address_space_map(AddressSpace *as,
+     FlatView *fv;
+     bool result;
+diff --git a/target/s390x/diag.c b/target/s390x/diag.c
+index a755837ad5..6ab473e7b6 100644
+--- a/target/s390x/diag.c
++++ b/target/s390x/diag.c
+@@ -140,7 +140,8 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
+             return;
+         }
+         if (!address_space_access_valid(&address_space_memory, addr,
+-                                        sizeof(IplParameterBlock), false)) {
++                                        sizeof(IplParameterBlock), false,
++                                        MEMTXATTRS_UNSPECIFIED)) {
+             s390_program_interrupt(env, PGM_ADDRESSING, ILEN_AUTO, ra);
+             return;
+         }
+@@ -169,7 +170,8 @@ out:
+             return;
+         }
+         if (!address_space_access_valid(&address_space_memory, addr,
+-                                        sizeof(IplParameterBlock), true)) {
++                                        sizeof(IplParameterBlock), true,
++                                        MEMTXATTRS_UNSPECIFIED)) {
+             s390_program_interrupt(env, PGM_ADDRESSING, ILEN_AUTO, ra);
+             return;
+         }
+diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
+index dfee221111..f0ce60cff2 100644
+--- a/target/s390x/excp_helper.c
++++ b/target/s390x/excp_helper.c
+@@ -120,7 +120,8 @@ int s390_cpu_handle_mmu_fault(CPUState *cs, vaddr orig_vaddr, int size,
  
-     memory_region_ref(mr);
-     *plen = flatview_extend_translation(fv, addr, len, mr, xlat,
--                                             l, is_write);
-+                                        l, is_write, attrs);
-     ptr = qemu_ram_ptr_length(mr->ram_block, xlat, plen, true);
-     rcu_read_unlock();
+     /* check out of RAM access */
+     if (!address_space_access_valid(&address_space_memory, raddr,
+-                                    TARGET_PAGE_SIZE, rw)) {
++                                    TARGET_PAGE_SIZE, rw,
++                                    MEMTXATTRS_UNSPECIFIED)) {
+         DPRINTF("%s: raddr %" PRIx64 " > ram_size %" PRIx64 "\n", __func__,
+                 (uint64_t)raddr, (uint64_t)ram_size);
+         trigger_pgm_exception(env, PGM_ADDRESSING, ILEN_AUTO);
+diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
+index a25deef5dd..145b62a7ef 100644
+--- a/target/s390x/mmu_helper.c
++++ b/target/s390x/mmu_helper.c
+@@ -461,7 +461,8 @@ static int translate_pages(S390CPU *cpu, vaddr addr, int nr_pages,
+             return ret;
+         }
+         if (!address_space_access_valid(&address_space_memory, pages[i],
+-                                        TARGET_PAGE_SIZE, is_write)) {
++                                        TARGET_PAGE_SIZE, is_write,
++                                        MEMTXATTRS_UNSPECIFIED)) {
+             trigger_access_exception(env, PGM_ADDRESSING, ILEN_AUTO, 0);
+             return -EFAULT;
+         }
+diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
+index aff1530c82..c1f9245797 100644
+--- a/target/s390x/sigp.c
++++ b/target/s390x/sigp.c
+@@ -280,7 +280,8 @@ static void sigp_set_prefix(CPUState *cs, run_on_cpu_data arg)
+     cpu_synchronize_state(cs);
  
+     if (!address_space_access_valid(&address_space_memory, addr,
+-                                    sizeof(struct LowCore), false)) {
++                                    sizeof(struct LowCore), false,
++                                    MEMTXATTRS_UNSPECIFIED)) {
+         set_sigp_status(si, SIGP_STAT_INVALID_PARAMETER);
+         return;
+     }
 -- 
 2.17.0
