@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38646)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fDCjP-0004En-Ji
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 13:36:56 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fDCqe-0007Nj-4U
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 13:44:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fDCjM-0003dj-FP
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 13:36:55 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59084 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fDCjM-0003dR-AE
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 13:36:52 -0400
-References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
-	<20180430103312.GH3249@redhat.com>
-	<20180430132107.0a37704d.cohuck@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <ac216b06-9469-addd-b5a1-3a3a89fd0782@redhat.com>
-Date: Mon, 30 Apr 2018 19:36:40 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1fDCqY-0007Nc-PJ
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 13:44:24 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:45883)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fDCqY-0007NI-Gu
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 13:44:18 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id p5-v6so8795095wre.12
+	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 10:44:18 -0700 (PDT)
+References: <20180413142336.32163-1-peter.maydell@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180413142336.32163-1-peter.maydell@linaro.org>
+Date: Mon, 30 Apr 2018 18:44:15 +0100
+Message-ID: <87k1so4mj4.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180430132107.0a37704d.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] release retrospective, next release timing,
- numbering
+Subject: Re: [Qemu-devel] [PATCH for-2.12] tcg/mips: Handle large offsets
+ from target env to tlb_table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Aurelien Jarno <aurelien@aurel32.net>, patches@linaro.org
 
-On 30.04.2018 13:21, Cornelia Huck wrote:
-> On Mon, 30 Apr 2018 11:33:12 +0100
-> Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
-[...]
->> Given, that we have a clear deprecation process now, my view is that
->> we should formally declare that major version numbers changes are
->> meaningless. As soon as you try to assign special meaning to major
->> version changes, you open the door to endless debate about whether
->> a particular set of changes is meaningful enough to justify the
->> major version change, leading to eventually 2.42.=20
->=20
-> I agree.
 
-I agree with this, too. We've seen that in some v3.0 discussions during
-the last year.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
->> Two possible options
->>
->>  a) Bump major version once a year, so we'll have 3.0, 3.1, 3.3,
->>     4.0, 4.1, 4.2, 5.0, ...etc  We missed the first release this
->>     year, so we would only have 3.0 and 3.1 this year.
->>
->>  b) Bump major release when minor version gets double-digits.
->>     eg 3.0, 3.1, ...., 3.9, 3.9, 4.0, ...., 4.9, 5.0...
+> The MIPS TCG target makes the assumption that the offset from the
+> target env pointer to the tlb_table is less than about 64K. This
+> used to be true, but gradual addition of features to the Arm
+> target means that it's no longer true there. This results in
+> the build-time assertion failing:
+>
+> In file included from /home/pm215/qemu/include/qemu/osdep.h:36:0,
+>                  from /home/pm215/qemu/tcg/tcg.c:28:
+> /home/pm215/qemu/tcg/mips/tcg-target.inc.c: In function =E2=80=98tcg_out_=
+tlb_load=E2=80=99:
+> /home/pm215/qemu/include/qemu/compiler.h:90:36: error: static assertion f=
+ailed: "not expecting: offsetof(CPUArchState, tlb_table[NB_MMU_MODES - 1][1=
+]) > 0x7ff0 + 0x7fff"
+>  #define QEMU_BUILD_BUG_MSG(x, msg) _Static_assert(!(x), msg)
+>                                     ^
+> /home/pm215/qemu/include/qemu/compiler.h:98:30: note: in expansion of mac=
+ro =E2=80=98QEMU_BUILD_BUG_MSG=E2=80=99
+>  #define QEMU_BUILD_BUG_ON(x) QEMU_BUILD_BUG_MSG(x, "not expecting: " #x)
+>                               ^
+> /home/pm215/qemu/tcg/mips/tcg-target.inc.c:1236:9: note: in expansion of =
+macro =E2=80=98QEMU_BUILD_BUG_ON=E2=80=99
+>          QEMU_BUILD_BUG_ON(offsetof(CPUArchState,
+>          ^
+> /home/pm215/qemu/rules.mak:66: recipe for target 'tcg/tcg.o' failed
+>
+> An ideal long term approach would be to rearrange the CPU state
+> so that the tlb_table was not so far along it, but this is tricky
+> because it would move it from the "not cleared on CPU reset" part
+> of the struct to the "cleared on CPU reset" part.
 
-It's just a matter of taste, but I think I'd prefer variant b). That
-will bump the major release approx. every three years which sounds like
-a good time frame for me.
+Is that really a problem? Doesn't it mean we'll just reload the TLB
+after a reset?
 
-> If we bump the major version each year anyway, why not go the whole way
-> and use 2018.1, 2018.2, ... (or even <year>.<month>)? The nice thing
-> about that is that you can see at a glance when the release took place.
-
-... or simply drop the first two digits and call them 18.1, 18.2, ...?
-
- Thomas
+--
+Alex Benn=C3=A9e
