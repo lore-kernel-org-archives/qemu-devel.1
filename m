@@ -1,18 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fD3DD-0001IE-Qs
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 03:27:04 -0400
+	(envelope-from <thuth@redhat.com>) id 1fD3Ic-0002wQ-0P
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 03:32:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fD3DA-0002JG-Mq
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 03:27:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60524 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fD3DA-0002Iu-Ir
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 03:27:00 -0400
+	(envelope-from <thuth@redhat.com>) id 1fD3IY-0005U1-U5
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 03:32:38 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 30 Apr 2018 09:26:45 +0200
-Message-Id: <1525073205-22394-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] net: Fix memory leak in net_param_nic()
+Date: Mon, 30 Apr 2018 09:32:19 +0200
+Message-Id: <1525073539-27991-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] trivial: Do not include pci.h if it is not
+ necessary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,44 +18,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>
 
-The early exits in case of errors leak the memory allocated for nd_id.
-Fix it by using a "goto out" to the cleanup at the end of the function
-instead.
+There is no need to include pci.h in these files.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- net/net.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ include/hw/ppc/ppc4xx.h            | 2 --
+ include/hw/virtio/virtio-balloon.h | 1 -
+ include/hw/virtio/virtio-gpu.h     | 1 -
+ 3 files changed, 4 deletions(-)
 
-diff --git a/net/net.c b/net/net.c
-index 29f8398..65457b7 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -1502,11 +1502,12 @@ static int net_param_nic(void *dummy, QemuOpts *opts, Error **errp)
-         g_free(mac);
-         if (ret) {
-             error_setg(errp, "invalid syntax for ethernet address");
--            return -1;
-+            goto out;
-         }
-         if (is_multicast_ether_addr(ni->macaddr.a)) {
-             error_setg(errp, "NIC cannot have multicast MAC address");
--            return -1;
-+            ret = -1;
-+            goto out;
-         }
-     }
-     qemu_macaddr_default_if_unset(&ni->macaddr);
-@@ -1518,6 +1519,7 @@ static int net_param_nic(void *dummy, QemuOpts *opts, Error **errp)
-         nb_nics++;
-     }
+diff --git a/include/hw/ppc/ppc4xx.h b/include/hw/ppc/ppc4xx.h
+index cb0bb55..3a2a04c 100644
+--- a/include/hw/ppc/ppc4xx.h
++++ b/include/hw/ppc/ppc4xx.h
+@@ -25,8 +25,6 @@
+ #ifndef PPC4XX_H
+ #define PPC4XX_H
  
-+out:
-     g_free(nd_id);
-     return ret;
- }
+-#include "hw/pci/pci.h"
+-
+ /* PowerPC 4xx core initialization */
+ PowerPCCPU *ppc4xx_init(const char *cpu_model,
+                         clk_setup_t *cpu_clk, clk_setup_t *tb_clk,
+diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
+index 1ea13bd..e0df352 100644
+--- a/include/hw/virtio/virtio-balloon.h
++++ b/include/hw/virtio/virtio-balloon.h
+@@ -17,7 +17,6 @@
+ 
+ #include "standard-headers/linux/virtio_balloon.h"
+ #include "hw/virtio/virtio.h"
+-#include "hw/pci/pci.h"
+ 
+ #define TYPE_VIRTIO_BALLOON "virtio-balloon-device"
+ #define VIRTIO_BALLOON(obj) \
+diff --git a/include/hw/virtio/virtio-gpu.h b/include/hw/virtio/virtio-gpu.h
+index 22ac3c2..79bb3fb 100644
+--- a/include/hw/virtio/virtio-gpu.h
++++ b/include/hw/virtio/virtio-gpu.h
+@@ -18,7 +18,6 @@
+ #include "ui/qemu-pixman.h"
+ #include "ui/console.h"
+ #include "hw/virtio/virtio.h"
+-#include "hw/pci/pci.h"
+ #include "qemu/log.h"
+ 
+ #include "standard-headers/linux/virtio_gpu.h"
 -- 
 1.8.3.1
