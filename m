@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fD4ql-000749-FF
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:12:05 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fD4qo-00075t-8D
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:12:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fD4qh-0006tM-Dh
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:11:59 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fD4qd-0006qc-OS
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:12:02 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon, 30 Apr 2018 11:10:32 +0200
-Message-Id: <20180430091037.13878-38-laurent@vivier.eu>
+Date: Mon, 30 Apr 2018 11:10:14 +0200
+Message-Id: <20180430091037.13878-20-laurent@vivier.eu>
 In-Reply-To: <20180430091037.13878-1-laurent@vivier.eu>
 References: <20180430091037.13878-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 37/42] linux-user: move s390x cpu loop to s390x
- directory
+Subject: [Qemu-devel] [PULL 19/42] linux-user: move sparc/sparc64 signal.c
+ parts to sparc directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,332 +26,1292 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Cornelia Huck <cohuck@redhat.com>
 
-No code change, only move code from main.c to
-s390x/cpu_loop.c.
+No code change, only move code from signal.c to
+sparc/signal.c, except adding includes and
+exporting setup_frame() and setup_rt_frame().
+
+sparc64/signal.c includes sparc/signal.c
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Acked-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20180411185651.21351-16-laurent@vivier.eu>
+Message-Id: <20180424192635.6027-18-laurent@vivier.eu>
 ---
- linux-user/main.c           | 146 --------------------------------------------
- linux-user/s390x/cpu_loop.c | 139 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 139 insertions(+), 146 deletions(-)
+ linux-user/signal.c                | 604 +-----------------------------------
+ linux-user/sparc/signal.c          | 606 +++++++++++++++++++++++++++++++++++++
+ linux-user/sparc/target_signal.h   |   6 +-
+ linux-user/sparc64/signal.c        |   2 +
+ linux-user/sparc64/target_signal.h |   6 +-
+ 5 files changed, 619 insertions(+), 605 deletions(-)
 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 37cf3a7d6f..7f6cfa5548 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -149,143 +149,6 @@ void fork_end(int child)
-     }
+diff --git a/linux-user/signal.c b/linux-user/signal.c
+index 830f778262..27c3769c5e 100644
+--- a/linux-user/signal.c
++++ b/linux-user/signal.c
+@@ -803,609 +803,7 @@ int do_sigaction(int sig, const struct target_sigaction *act,
+     return ret;
  }
  
--#ifdef TARGET_S390X
+-#if defined(TARGET_SPARC)
 -
--/* s390x masks the fault address it reports in si_addr for SIGSEGV and SIGBUS */
--#define S390X_FAIL_ADDR_MASK -4096LL
+-#define __SUNOS_MAXWIN   31
 -
--void cpu_loop(CPUS390XState *env)
+-/* This is what SunOS does, so shall I. */
+-struct target_sigcontext {
+-    abi_ulong sigc_onstack;      /* state to restore */
+-
+-    abi_ulong sigc_mask;         /* sigmask to restore */
+-    abi_ulong sigc_sp;           /* stack pointer */
+-    abi_ulong sigc_pc;           /* program counter */
+-    abi_ulong sigc_npc;          /* next program counter */
+-    abi_ulong sigc_psr;          /* for condition codes etc */
+-    abi_ulong sigc_g1;           /* User uses these two registers */
+-    abi_ulong sigc_o0;           /* within the trampoline code. */
+-
+-    /* Now comes information regarding the users window set
+-         * at the time of the signal.
+-         */
+-    abi_ulong sigc_oswins;       /* outstanding windows */
+-
+-    /* stack ptrs for each regwin buf */
+-    char *sigc_spbuf[__SUNOS_MAXWIN];
+-
+-    /* Windows to restore after signal */
+-    struct {
+-        abi_ulong locals[8];
+-        abi_ulong ins[8];
+-    } sigc_wbuf[__SUNOS_MAXWIN];
+-};
+-/* A Sparc stack frame */
+-struct sparc_stackf {
+-    abi_ulong locals[8];
+-    abi_ulong ins[8];
+-    /* It's simpler to treat fp and callers_pc as elements of ins[]
+-         * since we never need to access them ourselves.
+-         */
+-    char *structptr;
+-    abi_ulong xargs[6];
+-    abi_ulong xxargs[1];
+-};
+-
+-typedef struct {
+-    struct {
+-        abi_ulong psr;
+-        abi_ulong pc;
+-        abi_ulong npc;
+-        abi_ulong y;
+-        abi_ulong u_regs[16]; /* globals and ins */
+-    }               si_regs;
+-    int             si_mask;
+-} __siginfo_t;
+-
+-typedef struct {
+-    abi_ulong  si_float_regs[32];
+-    unsigned   long si_fsr;
+-    unsigned   long si_fpqdepth;
+-    struct {
+-        unsigned long *insn_addr;
+-        unsigned long insn;
+-    } si_fpqueue [16];
+-} qemu_siginfo_fpu_t;
+-
+-
+-struct target_signal_frame {
+-    struct sparc_stackf ss;
+-    __siginfo_t         info;
+-    abi_ulong           fpu_save;
+-    abi_ulong           insns[2] __attribute__ ((aligned (8)));
+-    abi_ulong           extramask[TARGET_NSIG_WORDS - 1];
+-    abi_ulong           extra_size; /* Should be 0 */
+-    qemu_siginfo_fpu_t fpu_state;
+-};
+-struct target_rt_signal_frame {
+-    struct sparc_stackf ss;
+-    siginfo_t           info;
+-    abi_ulong           regs[20];
+-    sigset_t            mask;
+-    abi_ulong           fpu_save;
+-    unsigned int        insns[2];
+-    stack_t             stack;
+-    unsigned int        extra_size; /* Should be 0 */
+-    qemu_siginfo_fpu_t  fpu_state;
+-};
+-
+-#define UREG_O0        16
+-#define UREG_O6        22
+-#define UREG_I0        0
+-#define UREG_I1        1
+-#define UREG_I2        2
+-#define UREG_I3        3
+-#define UREG_I4        4
+-#define UREG_I5        5
+-#define UREG_I6        6
+-#define UREG_I7        7
+-#define UREG_L0	       8
+-#define UREG_FP        UREG_I6
+-#define UREG_SP        UREG_O6
+-
+-static inline abi_ulong get_sigframe(struct target_sigaction *sa, 
+-                                     CPUSPARCState *env,
+-                                     unsigned long framesize)
 -{
--    CPUState *cs = CPU(s390_env_get_cpu(env));
--    int trapnr, n, sig;
--    target_siginfo_t info;
--    target_ulong addr;
--    abi_long ret;
+-    abi_ulong sp;
 -
--    while (1) {
--        cpu_exec_start(cs);
--        trapnr = cpu_exec(cs);
--        cpu_exec_end(cs);
--        process_queued_cpu_work(cs);
+-    sp = env->regwptr[UREG_FP];
 -
--        switch (trapnr) {
--        case EXCP_INTERRUPT:
--            /* Just indicate that signals should be handled asap.  */
--            break;
--
--        case EXCP_SVC:
--            n = env->int_svc_code;
--            if (!n) {
--                /* syscalls > 255 */
--                n = env->regs[1];
--            }
--            env->psw.addr += env->int_svc_ilen;
--            ret = do_syscall(env, n, env->regs[2], env->regs[3],
--                             env->regs[4], env->regs[5],
--                             env->regs[6], env->regs[7], 0, 0);
--            if (ret == -TARGET_ERESTARTSYS) {
--                env->psw.addr -= env->int_svc_ilen;
--            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
--                env->regs[2] = ret;
--            }
--            break;
--
--        case EXCP_DEBUG:
--            sig = gdb_handlesig(cs, TARGET_SIGTRAP);
--            if (sig) {
--                n = TARGET_TRAP_BRKPT;
--                goto do_signal_pc;
--            }
--            break;
--        case EXCP_PGM:
--            n = env->int_pgm_code;
--            switch (n) {
--            case PGM_OPERATION:
--            case PGM_PRIVILEGED:
--                sig = TARGET_SIGILL;
--                n = TARGET_ILL_ILLOPC;
--                goto do_signal_pc;
--            case PGM_PROTECTION:
--            case PGM_ADDRESSING:
--                sig = TARGET_SIGSEGV;
--                /* XXX: check env->error_code */
--                n = TARGET_SEGV_MAPERR;
--                addr = env->__excp_addr & S390X_FAIL_ADDR_MASK;
--                goto do_signal;
--            case PGM_EXECUTE:
--            case PGM_SPECIFICATION:
--            case PGM_SPECIAL_OP:
--            case PGM_OPERAND:
--            do_sigill_opn:
--                sig = TARGET_SIGILL;
--                n = TARGET_ILL_ILLOPN;
--                goto do_signal_pc;
--
--            case PGM_FIXPT_OVERFLOW:
--                sig = TARGET_SIGFPE;
--                n = TARGET_FPE_INTOVF;
--                goto do_signal_pc;
--            case PGM_FIXPT_DIVIDE:
--                sig = TARGET_SIGFPE;
--                n = TARGET_FPE_INTDIV;
--                goto do_signal_pc;
--
--            case PGM_DATA:
--                n = (env->fpc >> 8) & 0xff;
--                if (n == 0xff) {
--                    /* compare-and-trap */
--                    goto do_sigill_opn;
--                } else {
--                    /* An IEEE exception, simulated or otherwise.  */
--                    if (n & 0x80) {
--                        n = TARGET_FPE_FLTINV;
--                    } else if (n & 0x40) {
--                        n = TARGET_FPE_FLTDIV;
--                    } else if (n & 0x20) {
--                        n = TARGET_FPE_FLTOVF;
--                    } else if (n & 0x10) {
--                        n = TARGET_FPE_FLTUND;
--                    } else if (n & 0x08) {
--                        n = TARGET_FPE_FLTRES;
--                    } else {
--                        /* ??? Quantum exception; BFP, DFP error.  */
--                        goto do_sigill_opn;
--                    }
--                    sig = TARGET_SIGFPE;
--                    goto do_signal_pc;
--                }
--
--            default:
--                fprintf(stderr, "Unhandled program exception: %#x\n", n);
--                cpu_dump_state(cs, stderr, fprintf, 0);
--                exit(EXIT_FAILURE);
--            }
--            break;
--
--        do_signal_pc:
--            addr = env->psw.addr;
--        do_signal:
--            info.si_signo = sig;
--            info.si_errno = 0;
--            info.si_code = n;
--            info._sifields._sigfault._addr = addr;
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            break;
--
--        case EXCP_ATOMIC:
--            cpu_exec_step_atomic(cs);
--            break;
--        default:
--            fprintf(stderr, "Unhandled trap: 0x%x\n", trapnr);
--            cpu_dump_state(cs, stderr, fprintf, 0);
--            exit(EXIT_FAILURE);
+-    /* This is the X/Open sanctioned signal stack switching.  */
+-    if (sa->sa_flags & TARGET_SA_ONSTACK) {
+-        if (!on_sig_stack(sp)
+-                && !((target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size) & 7)) {
+-            sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
 -        }
--        process_pending_signals (env);
 -    }
+-    return sp - framesize;
 -}
 -
--#endif /* TARGET_S390X */
+-static int
+-setup___siginfo(__siginfo_t *si, CPUSPARCState *env, abi_ulong mask)
+-{
+-    int err = 0, i;
 -
- #ifdef TARGET_TILEGX
- 
- static void gen_sigill_reg(CPUTLGState *env)
-@@ -1720,15 +1583,6 @@ int main(int argc, char **argv, char **envp)
-         env->pc = regs->sepc;
-         env->gpr[xSP] = regs->sp;
-     }
--#elif defined(TARGET_S390X)
--    {
--            int i;
--            for (i = 0; i < 16; i++) {
--                env->regs[i] = regs->gprs[i];
--            }
--            env->psw.mask = regs->psw.mask;
--            env->psw.addr = regs->psw.addr;
+-    __put_user(env->psr, &si->si_regs.psr);
+-    __put_user(env->pc, &si->si_regs.pc);
+-    __put_user(env->npc, &si->si_regs.npc);
+-    __put_user(env->y, &si->si_regs.y);
+-    for (i=0; i < 8; i++) {
+-        __put_user(env->gregs[i], &si->si_regs.u_regs[i]);
 -    }
- #elif defined(TARGET_TILEGX)
-     {
-         int i;
-diff --git a/linux-user/s390x/cpu_loop.c b/linux-user/s390x/cpu_loop.c
-index b7700a5561..99f5f1594f 100644
---- a/linux-user/s390x/cpu_loop.c
-+++ b/linux-user/s390x/cpu_loop.c
-@@ -21,6 +21,145 @@
- #include "qemu.h"
- #include "cpu_loop-common.h"
+-    for (i=0; i < 8; i++) {
+-        __put_user(env->regwptr[UREG_I0 + i], &si->si_regs.u_regs[i+8]);
+-    }
+-    __put_user(mask, &si->si_mask);
+-    return err;
+-}
+-
+-#if 0
+-static int
+-setup_sigcontext(struct target_sigcontext *sc, /*struct _fpstate *fpstate,*/
+-                 CPUSPARCState *env, unsigned long mask)
+-{
+-    int err = 0;
+-
+-    __put_user(mask, &sc->sigc_mask);
+-    __put_user(env->regwptr[UREG_SP], &sc->sigc_sp);
+-    __put_user(env->pc, &sc->sigc_pc);
+-    __put_user(env->npc, &sc->sigc_npc);
+-    __put_user(env->psr, &sc->sigc_psr);
+-    __put_user(env->gregs[1], &sc->sigc_g1);
+-    __put_user(env->regwptr[UREG_O0], &sc->sigc_o0);
+-
+-    return err;
+-}
+-#endif
+-#define NF_ALIGNEDSZ  (((sizeof(struct target_signal_frame) + 7) & (~7)))
+-
+-static void setup_frame(int sig, struct target_sigaction *ka,
+-                        target_sigset_t *set, CPUSPARCState *env)
+-{
+-    abi_ulong sf_addr;
+-    struct target_signal_frame *sf;
+-    int sigframe_size, err, i;
+-
+-    /* 1. Make sure everything is clean */
+-    //synchronize_user_stack();
+-
+-    sigframe_size = NF_ALIGNEDSZ;
+-    sf_addr = get_sigframe(ka, env, sigframe_size);
+-    trace_user_setup_frame(env, sf_addr);
+-
+-    sf = lock_user(VERIFY_WRITE, sf_addr,
+-                   sizeof(struct target_signal_frame), 0);
+-    if (!sf) {
+-        goto sigsegv;
+-    }
+-#if 0
+-    if (invalid_frame_pointer(sf, sigframe_size))
+-        goto sigill_and_return;
+-#endif
+-    /* 2. Save the current process state */
+-    err = setup___siginfo(&sf->info, env, set->sig[0]);
+-    __put_user(0, &sf->extra_size);
+-
+-    //save_fpu_state(regs, &sf->fpu_state);
+-    //__put_user(&sf->fpu_state, &sf->fpu_save);
+-
+-    __put_user(set->sig[0], &sf->info.si_mask);
+-    for (i = 0; i < TARGET_NSIG_WORDS - 1; i++) {
+-        __put_user(set->sig[i + 1], &sf->extramask[i]);
+-    }
+-
+-    for (i = 0; i < 8; i++) {
+-        __put_user(env->regwptr[i + UREG_L0], &sf->ss.locals[i]);
+-    }
+-    for (i = 0; i < 8; i++) {
+-        __put_user(env->regwptr[i + UREG_I0], &sf->ss.ins[i]);
+-    }
+-    if (err)
+-        goto sigsegv;
+-
+-    /* 3. signal handler back-trampoline and parameters */
+-    env->regwptr[UREG_FP] = sf_addr;
+-    env->regwptr[UREG_I0] = sig;
+-    env->regwptr[UREG_I1] = sf_addr +
+-            offsetof(struct target_signal_frame, info);
+-    env->regwptr[UREG_I2] = sf_addr +
+-            offsetof(struct target_signal_frame, info);
+-
+-    /* 4. signal handler */
+-    env->pc = ka->_sa_handler;
+-    env->npc = (env->pc + 4);
+-    /* 5. return to kernel instructions */
+-    if (ka->ka_restorer) {
+-        env->regwptr[UREG_I7] = ka->ka_restorer;
+-    } else {
+-        uint32_t val32;
+-
+-        env->regwptr[UREG_I7] = sf_addr +
+-                offsetof(struct target_signal_frame, insns) - 2 * 4;
+-
+-        /* mov __NR_sigreturn, %g1 */
+-        val32 = 0x821020d8;
+-        __put_user(val32, &sf->insns[0]);
+-
+-        /* t 0x10 */
+-        val32 = 0x91d02010;
+-        __put_user(val32, &sf->insns[1]);
+-        if (err)
+-            goto sigsegv;
+-
+-        /* Flush instruction space. */
+-        // flush_sig_insns(current->mm, (unsigned long) &(sf->insns[0]));
+-        // tb_flush(env);
+-    }
+-    unlock_user(sf, sf_addr, sizeof(struct target_signal_frame));
+-    return;
+-#if 0
+-sigill_and_return:
+-    force_sig(TARGET_SIGILL);
+-#endif
+-sigsegv:
+-    unlock_user(sf, sf_addr, sizeof(struct target_signal_frame));
+-    force_sigsegv(sig);
+-}
+-
+-static void setup_rt_frame(int sig, struct target_sigaction *ka,
+-                           target_siginfo_t *info,
+-                           target_sigset_t *set, CPUSPARCState *env)
+-{
+-    fprintf(stderr, "setup_rt_frame: not implemented\n");
+-}
+-
+-long do_sigreturn(CPUSPARCState *env)
+-{
+-    abi_ulong sf_addr;
+-    struct target_signal_frame *sf;
+-    uint32_t up_psr, pc, npc;
+-    target_sigset_t set;
+-    sigset_t host_set;
+-    int err=0, i;
+-
+-    sf_addr = env->regwptr[UREG_FP];
+-    trace_user_do_sigreturn(env, sf_addr);
+-    if (!lock_user_struct(VERIFY_READ, sf, sf_addr, 1)) {
+-        goto segv_and_exit;
+-    }
+-
+-    /* 1. Make sure we are not getting garbage from the user */
+-
+-    if (sf_addr & 3)
+-        goto segv_and_exit;
+-
+-    __get_user(pc,  &sf->info.si_regs.pc);
+-    __get_user(npc, &sf->info.si_regs.npc);
+-
+-    if ((pc | npc) & 3) {
+-        goto segv_and_exit;
+-    }
+-
+-    /* 2. Restore the state */
+-    __get_user(up_psr, &sf->info.si_regs.psr);
+-
+-    /* User can only change condition codes and FPU enabling in %psr. */
+-    env->psr = (up_psr & (PSR_ICC /* | PSR_EF */))
+-            | (env->psr & ~(PSR_ICC /* | PSR_EF */));
+-
+-    env->pc = pc;
+-    env->npc = npc;
+-    __get_user(env->y, &sf->info.si_regs.y);
+-    for (i=0; i < 8; i++) {
+-        __get_user(env->gregs[i], &sf->info.si_regs.u_regs[i]);
+-    }
+-    for (i=0; i < 8; i++) {
+-        __get_user(env->regwptr[i + UREG_I0], &sf->info.si_regs.u_regs[i+8]);
+-    }
+-
+-    /* FIXME: implement FPU save/restore:
+-         * __get_user(fpu_save, &sf->fpu_save);
+-         * if (fpu_save)
+-         *        err |= restore_fpu_state(env, fpu_save);
+-         */
+-
+-    /* This is pretty much atomic, no amount locking would prevent
+-         * the races which exist anyways.
+-         */
+-    __get_user(set.sig[0], &sf->info.si_mask);
+-    for(i = 1; i < TARGET_NSIG_WORDS; i++) {
+-        __get_user(set.sig[i], &sf->extramask[i - 1]);
+-    }
+-
+-    target_to_host_sigset_internal(&host_set, &set);
+-    set_sigmask(&host_set);
+-
+-    if (err) {
+-        goto segv_and_exit;
+-    }
+-    unlock_user_struct(sf, sf_addr, 0);
+-    return -TARGET_QEMU_ESIGRETURN;
+-
+-segv_and_exit:
+-    unlock_user_struct(sf, sf_addr, 0);
+-    force_sig(TARGET_SIGSEGV);
+-    return -TARGET_QEMU_ESIGRETURN;
+-}
+-
+-long do_rt_sigreturn(CPUSPARCState *env)
+-{
+-    trace_user_do_rt_sigreturn(env, 0);
+-    fprintf(stderr, "do_rt_sigreturn: not implemented\n");
+-    return -TARGET_ENOSYS;
+-}
+-
+-#if defined(TARGET_SPARC64) && !defined(TARGET_ABI32)
+-#define SPARC_MC_TSTATE 0
+-#define SPARC_MC_PC 1
+-#define SPARC_MC_NPC 2
+-#define SPARC_MC_Y 3
+-#define SPARC_MC_G1 4
+-#define SPARC_MC_G2 5
+-#define SPARC_MC_G3 6
+-#define SPARC_MC_G4 7
+-#define SPARC_MC_G5 8
+-#define SPARC_MC_G6 9
+-#define SPARC_MC_G7 10
+-#define SPARC_MC_O0 11
+-#define SPARC_MC_O1 12
+-#define SPARC_MC_O2 13
+-#define SPARC_MC_O3 14
+-#define SPARC_MC_O4 15
+-#define SPARC_MC_O5 16
+-#define SPARC_MC_O6 17
+-#define SPARC_MC_O7 18
+-#define SPARC_MC_NGREG 19
+-
+-typedef abi_ulong target_mc_greg_t;
+-typedef target_mc_greg_t target_mc_gregset_t[SPARC_MC_NGREG];
+-
+-struct target_mc_fq {
+-    abi_ulong *mcfq_addr;
+-    uint32_t mcfq_insn;
+-};
+-
+-struct target_mc_fpu {
+-    union {
+-        uint32_t sregs[32];
+-        uint64_t dregs[32];
+-        //uint128_t qregs[16];
+-    } mcfpu_fregs;
+-    abi_ulong mcfpu_fsr;
+-    abi_ulong mcfpu_fprs;
+-    abi_ulong mcfpu_gsr;
+-    struct target_mc_fq *mcfpu_fq;
+-    unsigned char mcfpu_qcnt;
+-    unsigned char mcfpu_qentsz;
+-    unsigned char mcfpu_enab;
+-};
+-typedef struct target_mc_fpu target_mc_fpu_t;
+-
+-typedef struct {
+-    target_mc_gregset_t mc_gregs;
+-    target_mc_greg_t mc_fp;
+-    target_mc_greg_t mc_i7;
+-    target_mc_fpu_t mc_fpregs;
+-} target_mcontext_t;
+-
+-struct target_ucontext {
+-    struct target_ucontext *tuc_link;
+-    abi_ulong tuc_flags;
+-    target_sigset_t tuc_sigmask;
+-    target_mcontext_t tuc_mcontext;
+-};
+-
+-/* A V9 register window */
+-struct target_reg_window {
+-    abi_ulong locals[8];
+-    abi_ulong ins[8];
+-};
+-
+-#define TARGET_STACK_BIAS 2047
+-
+-/* {set, get}context() needed for 64-bit SparcLinux userland. */
+-void sparc64_set_context(CPUSPARCState *env)
+-{
+-    abi_ulong ucp_addr;
+-    struct target_ucontext *ucp;
+-    target_mc_gregset_t *grp;
+-    abi_ulong pc, npc, tstate;
+-    abi_ulong fp, i7, w_addr;
+-    unsigned int i;
+-
+-    ucp_addr = env->regwptr[UREG_I0];
+-    if (!lock_user_struct(VERIFY_READ, ucp, ucp_addr, 1)) {
+-        goto do_sigsegv;
+-    }
+-    grp  = &ucp->tuc_mcontext.mc_gregs;
+-    __get_user(pc, &((*grp)[SPARC_MC_PC]));
+-    __get_user(npc, &((*grp)[SPARC_MC_NPC]));
+-    if ((pc | npc) & 3) {
+-        goto do_sigsegv;
+-    }
+-    if (env->regwptr[UREG_I1]) {
+-        target_sigset_t target_set;
+-        sigset_t set;
+-
+-        if (TARGET_NSIG_WORDS == 1) {
+-            __get_user(target_set.sig[0], &ucp->tuc_sigmask.sig[0]);
+-        } else {
+-            abi_ulong *src, *dst;
+-            src = ucp->tuc_sigmask.sig;
+-            dst = target_set.sig;
+-            for (i = 0; i < TARGET_NSIG_WORDS; i++, dst++, src++) {
+-                __get_user(*dst, src);
+-            }
+-        }
+-        target_to_host_sigset_internal(&set, &target_set);
+-        set_sigmask(&set);
+-    }
+-    env->pc = pc;
+-    env->npc = npc;
+-    __get_user(env->y, &((*grp)[SPARC_MC_Y]));
+-    __get_user(tstate, &((*grp)[SPARC_MC_TSTATE]));
+-    env->asi = (tstate >> 24) & 0xff;
+-    cpu_put_ccr(env, tstate >> 32);
+-    cpu_put_cwp64(env, tstate & 0x1f);
+-    __get_user(env->gregs[1], (&(*grp)[SPARC_MC_G1]));
+-    __get_user(env->gregs[2], (&(*grp)[SPARC_MC_G2]));
+-    __get_user(env->gregs[3], (&(*grp)[SPARC_MC_G3]));
+-    __get_user(env->gregs[4], (&(*grp)[SPARC_MC_G4]));
+-    __get_user(env->gregs[5], (&(*grp)[SPARC_MC_G5]));
+-    __get_user(env->gregs[6], (&(*grp)[SPARC_MC_G6]));
+-    __get_user(env->gregs[7], (&(*grp)[SPARC_MC_G7]));
+-    __get_user(env->regwptr[UREG_I0], (&(*grp)[SPARC_MC_O0]));
+-    __get_user(env->regwptr[UREG_I1], (&(*grp)[SPARC_MC_O1]));
+-    __get_user(env->regwptr[UREG_I2], (&(*grp)[SPARC_MC_O2]));
+-    __get_user(env->regwptr[UREG_I3], (&(*grp)[SPARC_MC_O3]));
+-    __get_user(env->regwptr[UREG_I4], (&(*grp)[SPARC_MC_O4]));
+-    __get_user(env->regwptr[UREG_I5], (&(*grp)[SPARC_MC_O5]));
+-    __get_user(env->regwptr[UREG_I6], (&(*grp)[SPARC_MC_O6]));
+-    __get_user(env->regwptr[UREG_I7], (&(*grp)[SPARC_MC_O7]));
+-
+-    __get_user(fp, &(ucp->tuc_mcontext.mc_fp));
+-    __get_user(i7, &(ucp->tuc_mcontext.mc_i7));
+-
+-    w_addr = TARGET_STACK_BIAS+env->regwptr[UREG_I6];
+-    if (put_user(fp, w_addr + offsetof(struct target_reg_window, ins[6]),
+-                 abi_ulong) != 0) {
+-        goto do_sigsegv;
+-    }
+-    if (put_user(i7, w_addr + offsetof(struct target_reg_window, ins[7]),
+-                 abi_ulong) != 0) {
+-        goto do_sigsegv;
+-    }
+-    /* FIXME this does not match how the kernel handles the FPU in
+-     * its sparc64_set_context implementation. In particular the FPU
+-     * is only restored if fenab is non-zero in:
+-     *   __get_user(fenab, &(ucp->tuc_mcontext.mc_fpregs.mcfpu_enab));
+-     */
+-    __get_user(env->fprs, &(ucp->tuc_mcontext.mc_fpregs.mcfpu_fprs));
+-    {
+-        uint32_t *src = ucp->tuc_mcontext.mc_fpregs.mcfpu_fregs.sregs;
+-        for (i = 0; i < 64; i++, src++) {
+-            if (i & 1) {
+-                __get_user(env->fpr[i/2].l.lower, src);
+-            } else {
+-                __get_user(env->fpr[i/2].l.upper, src);
+-            }
+-        }
+-    }
+-    __get_user(env->fsr,
+-               &(ucp->tuc_mcontext.mc_fpregs.mcfpu_fsr));
+-    __get_user(env->gsr,
+-               &(ucp->tuc_mcontext.mc_fpregs.mcfpu_gsr));
+-    unlock_user_struct(ucp, ucp_addr, 0);
+-    return;
+-do_sigsegv:
+-    unlock_user_struct(ucp, ucp_addr, 0);
+-    force_sig(TARGET_SIGSEGV);
+-}
+-
+-void sparc64_get_context(CPUSPARCState *env)
+-{
+-    abi_ulong ucp_addr;
+-    struct target_ucontext *ucp;
+-    target_mc_gregset_t *grp;
+-    target_mcontext_t *mcp;
+-    abi_ulong fp, i7, w_addr;
+-    int err;
+-    unsigned int i;
+-    target_sigset_t target_set;
+-    sigset_t set;
+-
+-    ucp_addr = env->regwptr[UREG_I0];
+-    if (!lock_user_struct(VERIFY_WRITE, ucp, ucp_addr, 0)) {
+-        goto do_sigsegv;
+-    }
+-    
+-    mcp = &ucp->tuc_mcontext;
+-    grp = &mcp->mc_gregs;
+-
+-    /* Skip over the trap instruction, first. */
+-    env->pc = env->npc;
+-    env->npc += 4;
+-
+-    /* If we're only reading the signal mask then do_sigprocmask()
+-     * is guaranteed not to fail, which is important because we don't
+-     * have any way to signal a failure or restart this operation since
+-     * this is not a normal syscall.
+-     */
+-    err = do_sigprocmask(0, NULL, &set);
+-    assert(err == 0);
+-    host_to_target_sigset_internal(&target_set, &set);
+-    if (TARGET_NSIG_WORDS == 1) {
+-        __put_user(target_set.sig[0],
+-                   (abi_ulong *)&ucp->tuc_sigmask);
+-    } else {
+-        abi_ulong *src, *dst;
+-        src = target_set.sig;
+-        dst = ucp->tuc_sigmask.sig;
+-        for (i = 0; i < TARGET_NSIG_WORDS; i++, dst++, src++) {
+-            __put_user(*src, dst);
+-        }
+-        if (err)
+-            goto do_sigsegv;
+-    }
+-
+-    /* XXX: tstate must be saved properly */
+-    //    __put_user(env->tstate, &((*grp)[SPARC_MC_TSTATE]));
+-    __put_user(env->pc, &((*grp)[SPARC_MC_PC]));
+-    __put_user(env->npc, &((*grp)[SPARC_MC_NPC]));
+-    __put_user(env->y, &((*grp)[SPARC_MC_Y]));
+-    __put_user(env->gregs[1], &((*grp)[SPARC_MC_G1]));
+-    __put_user(env->gregs[2], &((*grp)[SPARC_MC_G2]));
+-    __put_user(env->gregs[3], &((*grp)[SPARC_MC_G3]));
+-    __put_user(env->gregs[4], &((*grp)[SPARC_MC_G4]));
+-    __put_user(env->gregs[5], &((*grp)[SPARC_MC_G5]));
+-    __put_user(env->gregs[6], &((*grp)[SPARC_MC_G6]));
+-    __put_user(env->gregs[7], &((*grp)[SPARC_MC_G7]));
+-    __put_user(env->regwptr[UREG_I0], &((*grp)[SPARC_MC_O0]));
+-    __put_user(env->regwptr[UREG_I1], &((*grp)[SPARC_MC_O1]));
+-    __put_user(env->regwptr[UREG_I2], &((*grp)[SPARC_MC_O2]));
+-    __put_user(env->regwptr[UREG_I3], &((*grp)[SPARC_MC_O3]));
+-    __put_user(env->regwptr[UREG_I4], &((*grp)[SPARC_MC_O4]));
+-    __put_user(env->regwptr[UREG_I5], &((*grp)[SPARC_MC_O5]));
+-    __put_user(env->regwptr[UREG_I6], &((*grp)[SPARC_MC_O6]));
+-    __put_user(env->regwptr[UREG_I7], &((*grp)[SPARC_MC_O7]));
+-
+-    w_addr = TARGET_STACK_BIAS+env->regwptr[UREG_I6];
+-    fp = i7 = 0;
+-    if (get_user(fp, w_addr + offsetof(struct target_reg_window, ins[6]),
+-                 abi_ulong) != 0) {
+-        goto do_sigsegv;
+-    }
+-    if (get_user(i7, w_addr + offsetof(struct target_reg_window, ins[7]),
+-                 abi_ulong) != 0) {
+-        goto do_sigsegv;
+-    }
+-    __put_user(fp, &(mcp->mc_fp));
+-    __put_user(i7, &(mcp->mc_i7));
+-
+-    {
+-        uint32_t *dst = ucp->tuc_mcontext.mc_fpregs.mcfpu_fregs.sregs;
+-        for (i = 0; i < 64; i++, dst++) {
+-            if (i & 1) {
+-                __put_user(env->fpr[i/2].l.lower, dst);
+-            } else {
+-                __put_user(env->fpr[i/2].l.upper, dst);
+-            }
+-        }
+-    }
+-    __put_user(env->fsr, &(mcp->mc_fpregs.mcfpu_fsr));
+-    __put_user(env->gsr, &(mcp->mc_fpregs.mcfpu_gsr));
+-    __put_user(env->fprs, &(mcp->mc_fpregs.mcfpu_fprs));
+-
+-    if (err)
+-        goto do_sigsegv;
+-    unlock_user_struct(ucp, ucp_addr, 1);
+-    return;
+-do_sigsegv:
+-    unlock_user_struct(ucp, ucp_addr, 1);
+-    force_sig(TARGET_SIGSEGV);
+-}
+-#endif
+-#elif defined(TARGET_MIPS) || defined(TARGET_MIPS64)
++#if defined(TARGET_MIPS) || defined(TARGET_MIPS64)
  
-+/* s390x masks the fault address it reports in si_addr for SIGSEGV and SIGBUS */
-+#define S390X_FAIL_ADDR_MASK -4096LL
+ # if defined(TARGET_ABI_MIPSO32)
+ struct target_sigcontext {
+diff --git a/linux-user/sparc/signal.c b/linux-user/sparc/signal.c
+index 02ca338b6c..c823e61cee 100644
+--- a/linux-user/sparc/signal.c
++++ b/linux-user/sparc/signal.c
+@@ -16,3 +16,609 @@
+  *  You should have received a copy of the GNU General Public License
+  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
++#include "qemu/osdep.h"
++#include "qemu.h"
++#include "target_signal.h"
++#include "signal-common.h"
++#include "linux-user/trace.h"
 +
-+void cpu_loop(CPUS390XState *env)
++#define __SUNOS_MAXWIN   31
++
++/* This is what SunOS does, so shall I. */
++struct target_sigcontext {
++    abi_ulong sigc_onstack;      /* state to restore */
++
++    abi_ulong sigc_mask;         /* sigmask to restore */
++    abi_ulong sigc_sp;           /* stack pointer */
++    abi_ulong sigc_pc;           /* program counter */
++    abi_ulong sigc_npc;          /* next program counter */
++    abi_ulong sigc_psr;          /* for condition codes etc */
++    abi_ulong sigc_g1;           /* User uses these two registers */
++    abi_ulong sigc_o0;           /* within the trampoline code. */
++
++    /* Now comes information regarding the users window set
++         * at the time of the signal.
++         */
++    abi_ulong sigc_oswins;       /* outstanding windows */
++
++    /* stack ptrs for each regwin buf */
++    char *sigc_spbuf[__SUNOS_MAXWIN];
++
++    /* Windows to restore after signal */
++    struct {
++        abi_ulong locals[8];
++        abi_ulong ins[8];
++    } sigc_wbuf[__SUNOS_MAXWIN];
++};
++/* A Sparc stack frame */
++struct sparc_stackf {
++    abi_ulong locals[8];
++    abi_ulong ins[8];
++    /* It's simpler to treat fp and callers_pc as elements of ins[]
++         * since we never need to access them ourselves.
++         */
++    char *structptr;
++    abi_ulong xargs[6];
++    abi_ulong xxargs[1];
++};
++
++typedef struct {
++    struct {
++        abi_ulong psr;
++        abi_ulong pc;
++        abi_ulong npc;
++        abi_ulong y;
++        abi_ulong u_regs[16]; /* globals and ins */
++    }               si_regs;
++    int             si_mask;
++} __siginfo_t;
++
++typedef struct {
++    abi_ulong  si_float_regs[32];
++    unsigned   long si_fsr;
++    unsigned   long si_fpqdepth;
++    struct {
++        unsigned long *insn_addr;
++        unsigned long insn;
++    } si_fpqueue [16];
++} qemu_siginfo_fpu_t;
++
++
++struct target_signal_frame {
++    struct sparc_stackf ss;
++    __siginfo_t         info;
++    abi_ulong           fpu_save;
++    abi_ulong           insns[2] __attribute__ ((aligned (8)));
++    abi_ulong           extramask[TARGET_NSIG_WORDS - 1];
++    abi_ulong           extra_size; /* Should be 0 */
++    qemu_siginfo_fpu_t fpu_state;
++};
++struct target_rt_signal_frame {
++    struct sparc_stackf ss;
++    siginfo_t           info;
++    abi_ulong           regs[20];
++    sigset_t            mask;
++    abi_ulong           fpu_save;
++    unsigned int        insns[2];
++    stack_t             stack;
++    unsigned int        extra_size; /* Should be 0 */
++    qemu_siginfo_fpu_t  fpu_state;
++};
++
++#define UREG_O0        16
++#define UREG_O6        22
++#define UREG_I0        0
++#define UREG_I1        1
++#define UREG_I2        2
++#define UREG_I3        3
++#define UREG_I4        4
++#define UREG_I5        5
++#define UREG_I6        6
++#define UREG_I7        7
++#define UREG_L0        8
++#define UREG_FP        UREG_I6
++#define UREG_SP        UREG_O6
++
++static inline abi_ulong get_sigframe(struct target_sigaction *sa, 
++                                     CPUSPARCState *env,
++                                     unsigned long framesize)
 +{
-+    CPUState *cs = CPU(s390_env_get_cpu(env));
-+    int trapnr, n, sig;
-+    target_siginfo_t info;
-+    target_ulong addr;
-+    abi_long ret;
++    abi_ulong sp;
 +
-+    while (1) {
-+        cpu_exec_start(cs);
-+        trapnr = cpu_exec(cs);
-+        cpu_exec_end(cs);
-+        process_queued_cpu_work(cs);
++    sp = env->regwptr[UREG_FP];
 +
-+        switch (trapnr) {
-+        case EXCP_INTERRUPT:
-+            /* Just indicate that signals should be handled asap.  */
-+            break;
-+
-+        case EXCP_SVC:
-+            n = env->int_svc_code;
-+            if (!n) {
-+                /* syscalls > 255 */
-+                n = env->regs[1];
-+            }
-+            env->psw.addr += env->int_svc_ilen;
-+            ret = do_syscall(env, n, env->regs[2], env->regs[3],
-+                             env->regs[4], env->regs[5],
-+                             env->regs[6], env->regs[7], 0, 0);
-+            if (ret == -TARGET_ERESTARTSYS) {
-+                env->psw.addr -= env->int_svc_ilen;
-+            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
-+                env->regs[2] = ret;
-+            }
-+            break;
-+
-+        case EXCP_DEBUG:
-+            sig = gdb_handlesig(cs, TARGET_SIGTRAP);
-+            if (sig) {
-+                n = TARGET_TRAP_BRKPT;
-+                goto do_signal_pc;
-+            }
-+            break;
-+        case EXCP_PGM:
-+            n = env->int_pgm_code;
-+            switch (n) {
-+            case PGM_OPERATION:
-+            case PGM_PRIVILEGED:
-+                sig = TARGET_SIGILL;
-+                n = TARGET_ILL_ILLOPC;
-+                goto do_signal_pc;
-+            case PGM_PROTECTION:
-+            case PGM_ADDRESSING:
-+                sig = TARGET_SIGSEGV;
-+                /* XXX: check env->error_code */
-+                n = TARGET_SEGV_MAPERR;
-+                addr = env->__excp_addr & S390X_FAIL_ADDR_MASK;
-+                goto do_signal;
-+            case PGM_EXECUTE:
-+            case PGM_SPECIFICATION:
-+            case PGM_SPECIAL_OP:
-+            case PGM_OPERAND:
-+            do_sigill_opn:
-+                sig = TARGET_SIGILL;
-+                n = TARGET_ILL_ILLOPN;
-+                goto do_signal_pc;
-+
-+            case PGM_FIXPT_OVERFLOW:
-+                sig = TARGET_SIGFPE;
-+                n = TARGET_FPE_INTOVF;
-+                goto do_signal_pc;
-+            case PGM_FIXPT_DIVIDE:
-+                sig = TARGET_SIGFPE;
-+                n = TARGET_FPE_INTDIV;
-+                goto do_signal_pc;
-+
-+            case PGM_DATA:
-+                n = (env->fpc >> 8) & 0xff;
-+                if (n == 0xff) {
-+                    /* compare-and-trap */
-+                    goto do_sigill_opn;
-+                } else {
-+                    /* An IEEE exception, simulated or otherwise.  */
-+                    if (n & 0x80) {
-+                        n = TARGET_FPE_FLTINV;
-+                    } else if (n & 0x40) {
-+                        n = TARGET_FPE_FLTDIV;
-+                    } else if (n & 0x20) {
-+                        n = TARGET_FPE_FLTOVF;
-+                    } else if (n & 0x10) {
-+                        n = TARGET_FPE_FLTUND;
-+                    } else if (n & 0x08) {
-+                        n = TARGET_FPE_FLTRES;
-+                    } else {
-+                        /* ??? Quantum exception; BFP, DFP error.  */
-+                        goto do_sigill_opn;
-+                    }
-+                    sig = TARGET_SIGFPE;
-+                    goto do_signal_pc;
-+                }
-+
-+            default:
-+                fprintf(stderr, "Unhandled program exception: %#x\n", n);
-+                cpu_dump_state(cs, stderr, fprintf, 0);
-+                exit(EXIT_FAILURE);
-+            }
-+            break;
-+
-+        do_signal_pc:
-+            addr = env->psw.addr;
-+        do_signal:
-+            info.si_signo = sig;
-+            info.si_errno = 0;
-+            info.si_code = n;
-+            info._sifields._sigfault._addr = addr;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+
-+        case EXCP_ATOMIC:
-+            cpu_exec_step_atomic(cs);
-+            break;
-+        default:
-+            fprintf(stderr, "Unhandled trap: 0x%x\n", trapnr);
-+            cpu_dump_state(cs, stderr, fprintf, 0);
-+            exit(EXIT_FAILURE);
++    /* This is the X/Open sanctioned signal stack switching.  */
++    if (sa->sa_flags & TARGET_SA_ONSTACK) {
++        if (!on_sig_stack(sp)
++                && !((target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size) & 7)) {
++            sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
 +        }
-+        process_pending_signals (env);
 +    }
++    return sp - framesize;
 +}
 +
- void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
- {
-+    int i;
-+    for (i = 0; i < 16; i++) {
-+        env->regs[i] = regs->gprs[i];
++static int
++setup___siginfo(__siginfo_t *si, CPUSPARCState *env, abi_ulong mask)
++{
++    int err = 0, i;
++
++    __put_user(env->psr, &si->si_regs.psr);
++    __put_user(env->pc, &si->si_regs.pc);
++    __put_user(env->npc, &si->si_regs.npc);
++    __put_user(env->y, &si->si_regs.y);
++    for (i=0; i < 8; i++) {
++        __put_user(env->gregs[i], &si->si_regs.u_regs[i]);
 +    }
-+    env->psw.mask = regs->psw.mask;
-+    env->psw.addr = regs->psw.addr;
++    for (i=0; i < 8; i++) {
++        __put_user(env->regwptr[UREG_I0 + i], &si->si_regs.u_regs[i+8]);
++    }
++    __put_user(mask, &si->si_mask);
++    return err;
++}
++
++#if 0
++static int
++setup_sigcontext(struct target_sigcontext *sc, /*struct _fpstate *fpstate,*/
++                 CPUSPARCState *env, unsigned long mask)
++{
++    int err = 0;
++
++    __put_user(mask, &sc->sigc_mask);
++    __put_user(env->regwptr[UREG_SP], &sc->sigc_sp);
++    __put_user(env->pc, &sc->sigc_pc);
++    __put_user(env->npc, &sc->sigc_npc);
++    __put_user(env->psr, &sc->sigc_psr);
++    __put_user(env->gregs[1], &sc->sigc_g1);
++    __put_user(env->regwptr[UREG_O0], &sc->sigc_o0);
++
++    return err;
++}
++#endif
++#define NF_ALIGNEDSZ  (((sizeof(struct target_signal_frame) + 7) & (~7)))
++
++void setup_frame(int sig, struct target_sigaction *ka,
++                 target_sigset_t *set, CPUSPARCState *env)
++{
++    abi_ulong sf_addr;
++    struct target_signal_frame *sf;
++    int sigframe_size, err, i;
++
++    /* 1. Make sure everything is clean */
++    //synchronize_user_stack();
++
++    sigframe_size = NF_ALIGNEDSZ;
++    sf_addr = get_sigframe(ka, env, sigframe_size);
++    trace_user_setup_frame(env, sf_addr);
++
++    sf = lock_user(VERIFY_WRITE, sf_addr,
++                   sizeof(struct target_signal_frame), 0);
++    if (!sf) {
++        goto sigsegv;
++    }
++#if 0
++    if (invalid_frame_pointer(sf, sigframe_size))
++        goto sigill_and_return;
++#endif
++    /* 2. Save the current process state */
++    err = setup___siginfo(&sf->info, env, set->sig[0]);
++    __put_user(0, &sf->extra_size);
++
++    //save_fpu_state(regs, &sf->fpu_state);
++    //__put_user(&sf->fpu_state, &sf->fpu_save);
++
++    __put_user(set->sig[0], &sf->info.si_mask);
++    for (i = 0; i < TARGET_NSIG_WORDS - 1; i++) {
++        __put_user(set->sig[i + 1], &sf->extramask[i]);
++    }
++
++    for (i = 0; i < 8; i++) {
++        __put_user(env->regwptr[i + UREG_L0], &sf->ss.locals[i]);
++    }
++    for (i = 0; i < 8; i++) {
++        __put_user(env->regwptr[i + UREG_I0], &sf->ss.ins[i]);
++    }
++    if (err)
++        goto sigsegv;
++
++    /* 3. signal handler back-trampoline and parameters */
++    env->regwptr[UREG_FP] = sf_addr;
++    env->regwptr[UREG_I0] = sig;
++    env->regwptr[UREG_I1] = sf_addr +
++            offsetof(struct target_signal_frame, info);
++    env->regwptr[UREG_I2] = sf_addr +
++            offsetof(struct target_signal_frame, info);
++
++    /* 4. signal handler */
++    env->pc = ka->_sa_handler;
++    env->npc = (env->pc + 4);
++    /* 5. return to kernel instructions */
++    if (ka->ka_restorer) {
++        env->regwptr[UREG_I7] = ka->ka_restorer;
++    } else {
++        uint32_t val32;
++
++        env->regwptr[UREG_I7] = sf_addr +
++                offsetof(struct target_signal_frame, insns) - 2 * 4;
++
++        /* mov __NR_sigreturn, %g1 */
++        val32 = 0x821020d8;
++        __put_user(val32, &sf->insns[0]);
++
++        /* t 0x10 */
++        val32 = 0x91d02010;
++        __put_user(val32, &sf->insns[1]);
++        if (err)
++            goto sigsegv;
++
++        /* Flush instruction space. */
++        // flush_sig_insns(current->mm, (unsigned long) &(sf->insns[0]));
++        // tb_flush(env);
++    }
++    unlock_user(sf, sf_addr, sizeof(struct target_signal_frame));
++    return;
++#if 0
++sigill_and_return:
++    force_sig(TARGET_SIGILL);
++#endif
++sigsegv:
++    unlock_user(sf, sf_addr, sizeof(struct target_signal_frame));
++    force_sigsegv(sig);
++}
++
++void setup_rt_frame(int sig, struct target_sigaction *ka,
++                    target_siginfo_t *info,
++                    target_sigset_t *set, CPUSPARCState *env)
++{
++    fprintf(stderr, "setup_rt_frame: not implemented\n");
++}
++
++long do_sigreturn(CPUSPARCState *env)
++{
++    abi_ulong sf_addr;
++    struct target_signal_frame *sf;
++    uint32_t up_psr, pc, npc;
++    target_sigset_t set;
++    sigset_t host_set;
++    int err=0, i;
++
++    sf_addr = env->regwptr[UREG_FP];
++    trace_user_do_sigreturn(env, sf_addr);
++    if (!lock_user_struct(VERIFY_READ, sf, sf_addr, 1)) {
++        goto segv_and_exit;
++    }
++
++    /* 1. Make sure we are not getting garbage from the user */
++
++    if (sf_addr & 3)
++        goto segv_and_exit;
++
++    __get_user(pc,  &sf->info.si_regs.pc);
++    __get_user(npc, &sf->info.si_regs.npc);
++
++    if ((pc | npc) & 3) {
++        goto segv_and_exit;
++    }
++
++    /* 2. Restore the state */
++    __get_user(up_psr, &sf->info.si_regs.psr);
++
++    /* User can only change condition codes and FPU enabling in %psr. */
++    env->psr = (up_psr & (PSR_ICC /* | PSR_EF */))
++            | (env->psr & ~(PSR_ICC /* | PSR_EF */));
++
++    env->pc = pc;
++    env->npc = npc;
++    __get_user(env->y, &sf->info.si_regs.y);
++    for (i=0; i < 8; i++) {
++        __get_user(env->gregs[i], &sf->info.si_regs.u_regs[i]);
++    }
++    for (i=0; i < 8; i++) {
++        __get_user(env->regwptr[i + UREG_I0], &sf->info.si_regs.u_regs[i+8]);
++    }
++
++    /* FIXME: implement FPU save/restore:
++         * __get_user(fpu_save, &sf->fpu_save);
++         * if (fpu_save)
++         *        err |= restore_fpu_state(env, fpu_save);
++         */
++
++    /* This is pretty much atomic, no amount locking would prevent
++         * the races which exist anyways.
++         */
++    __get_user(set.sig[0], &sf->info.si_mask);
++    for(i = 1; i < TARGET_NSIG_WORDS; i++) {
++        __get_user(set.sig[i], &sf->extramask[i - 1]);
++    }
++
++    target_to_host_sigset_internal(&host_set, &set);
++    set_sigmask(&host_set);
++
++    if (err) {
++        goto segv_and_exit;
++    }
++    unlock_user_struct(sf, sf_addr, 0);
++    return -TARGET_QEMU_ESIGRETURN;
++
++segv_and_exit:
++    unlock_user_struct(sf, sf_addr, 0);
++    force_sig(TARGET_SIGSEGV);
++    return -TARGET_QEMU_ESIGRETURN;
++}
++
++long do_rt_sigreturn(CPUSPARCState *env)
++{
++    trace_user_do_rt_sigreturn(env, 0);
++    fprintf(stderr, "do_rt_sigreturn: not implemented\n");
++    return -TARGET_ENOSYS;
++}
++
++#if defined(TARGET_SPARC64) && !defined(TARGET_ABI32)
++#define SPARC_MC_TSTATE 0
++#define SPARC_MC_PC 1
++#define SPARC_MC_NPC 2
++#define SPARC_MC_Y 3
++#define SPARC_MC_G1 4
++#define SPARC_MC_G2 5
++#define SPARC_MC_G3 6
++#define SPARC_MC_G4 7
++#define SPARC_MC_G5 8
++#define SPARC_MC_G6 9
++#define SPARC_MC_G7 10
++#define SPARC_MC_O0 11
++#define SPARC_MC_O1 12
++#define SPARC_MC_O2 13
++#define SPARC_MC_O3 14
++#define SPARC_MC_O4 15
++#define SPARC_MC_O5 16
++#define SPARC_MC_O6 17
++#define SPARC_MC_O7 18
++#define SPARC_MC_NGREG 19
++
++typedef abi_ulong target_mc_greg_t;
++typedef target_mc_greg_t target_mc_gregset_t[SPARC_MC_NGREG];
++
++struct target_mc_fq {
++    abi_ulong *mcfq_addr;
++    uint32_t mcfq_insn;
++};
++
++struct target_mc_fpu {
++    union {
++        uint32_t sregs[32];
++        uint64_t dregs[32];
++        //uint128_t qregs[16];
++    } mcfpu_fregs;
++    abi_ulong mcfpu_fsr;
++    abi_ulong mcfpu_fprs;
++    abi_ulong mcfpu_gsr;
++    struct target_mc_fq *mcfpu_fq;
++    unsigned char mcfpu_qcnt;
++    unsigned char mcfpu_qentsz;
++    unsigned char mcfpu_enab;
++};
++typedef struct target_mc_fpu target_mc_fpu_t;
++
++typedef struct {
++    target_mc_gregset_t mc_gregs;
++    target_mc_greg_t mc_fp;
++    target_mc_greg_t mc_i7;
++    target_mc_fpu_t mc_fpregs;
++} target_mcontext_t;
++
++struct target_ucontext {
++    struct target_ucontext *tuc_link;
++    abi_ulong tuc_flags;
++    target_sigset_t tuc_sigmask;
++    target_mcontext_t tuc_mcontext;
++};
++
++/* A V9 register window */
++struct target_reg_window {
++    abi_ulong locals[8];
++    abi_ulong ins[8];
++};
++
++#define TARGET_STACK_BIAS 2047
++
++/* {set, get}context() needed for 64-bit SparcLinux userland. */
++void sparc64_set_context(CPUSPARCState *env)
++{
++    abi_ulong ucp_addr;
++    struct target_ucontext *ucp;
++    target_mc_gregset_t *grp;
++    abi_ulong pc, npc, tstate;
++    abi_ulong fp, i7, w_addr;
++    unsigned int i;
++
++    ucp_addr = env->regwptr[UREG_I0];
++    if (!lock_user_struct(VERIFY_READ, ucp, ucp_addr, 1)) {
++        goto do_sigsegv;
++    }
++    grp  = &ucp->tuc_mcontext.mc_gregs;
++    __get_user(pc, &((*grp)[SPARC_MC_PC]));
++    __get_user(npc, &((*grp)[SPARC_MC_NPC]));
++    if ((pc | npc) & 3) {
++        goto do_sigsegv;
++    }
++    if (env->regwptr[UREG_I1]) {
++        target_sigset_t target_set;
++        sigset_t set;
++
++        if (TARGET_NSIG_WORDS == 1) {
++            __get_user(target_set.sig[0], &ucp->tuc_sigmask.sig[0]);
++        } else {
++            abi_ulong *src, *dst;
++            src = ucp->tuc_sigmask.sig;
++            dst = target_set.sig;
++            for (i = 0; i < TARGET_NSIG_WORDS; i++, dst++, src++) {
++                __get_user(*dst, src);
++            }
++        }
++        target_to_host_sigset_internal(&set, &target_set);
++        set_sigmask(&set);
++    }
++    env->pc = pc;
++    env->npc = npc;
++    __get_user(env->y, &((*grp)[SPARC_MC_Y]));
++    __get_user(tstate, &((*grp)[SPARC_MC_TSTATE]));
++    env->asi = (tstate >> 24) & 0xff;
++    cpu_put_ccr(env, tstate >> 32);
++    cpu_put_cwp64(env, tstate & 0x1f);
++    __get_user(env->gregs[1], (&(*grp)[SPARC_MC_G1]));
++    __get_user(env->gregs[2], (&(*grp)[SPARC_MC_G2]));
++    __get_user(env->gregs[3], (&(*grp)[SPARC_MC_G3]));
++    __get_user(env->gregs[4], (&(*grp)[SPARC_MC_G4]));
++    __get_user(env->gregs[5], (&(*grp)[SPARC_MC_G5]));
++    __get_user(env->gregs[6], (&(*grp)[SPARC_MC_G6]));
++    __get_user(env->gregs[7], (&(*grp)[SPARC_MC_G7]));
++    __get_user(env->regwptr[UREG_I0], (&(*grp)[SPARC_MC_O0]));
++    __get_user(env->regwptr[UREG_I1], (&(*grp)[SPARC_MC_O1]));
++    __get_user(env->regwptr[UREG_I2], (&(*grp)[SPARC_MC_O2]));
++    __get_user(env->regwptr[UREG_I3], (&(*grp)[SPARC_MC_O3]));
++    __get_user(env->regwptr[UREG_I4], (&(*grp)[SPARC_MC_O4]));
++    __get_user(env->regwptr[UREG_I5], (&(*grp)[SPARC_MC_O5]));
++    __get_user(env->regwptr[UREG_I6], (&(*grp)[SPARC_MC_O6]));
++    __get_user(env->regwptr[UREG_I7], (&(*grp)[SPARC_MC_O7]));
++
++    __get_user(fp, &(ucp->tuc_mcontext.mc_fp));
++    __get_user(i7, &(ucp->tuc_mcontext.mc_i7));
++
++    w_addr = TARGET_STACK_BIAS+env->regwptr[UREG_I6];
++    if (put_user(fp, w_addr + offsetof(struct target_reg_window, ins[6]),
++                 abi_ulong) != 0) {
++        goto do_sigsegv;
++    }
++    if (put_user(i7, w_addr + offsetof(struct target_reg_window, ins[7]),
++                 abi_ulong) != 0) {
++        goto do_sigsegv;
++    }
++    /* FIXME this does not match how the kernel handles the FPU in
++     * its sparc64_set_context implementation. In particular the FPU
++     * is only restored if fenab is non-zero in:
++     *   __get_user(fenab, &(ucp->tuc_mcontext.mc_fpregs.mcfpu_enab));
++     */
++    __get_user(env->fprs, &(ucp->tuc_mcontext.mc_fpregs.mcfpu_fprs));
++    {
++        uint32_t *src = ucp->tuc_mcontext.mc_fpregs.mcfpu_fregs.sregs;
++        for (i = 0; i < 64; i++, src++) {
++            if (i & 1) {
++                __get_user(env->fpr[i/2].l.lower, src);
++            } else {
++                __get_user(env->fpr[i/2].l.upper, src);
++            }
++        }
++    }
++    __get_user(env->fsr,
++               &(ucp->tuc_mcontext.mc_fpregs.mcfpu_fsr));
++    __get_user(env->gsr,
++               &(ucp->tuc_mcontext.mc_fpregs.mcfpu_gsr));
++    unlock_user_struct(ucp, ucp_addr, 0);
++    return;
++do_sigsegv:
++    unlock_user_struct(ucp, ucp_addr, 0);
++    force_sig(TARGET_SIGSEGV);
++}
++
++void sparc64_get_context(CPUSPARCState *env)
++{
++    abi_ulong ucp_addr;
++    struct target_ucontext *ucp;
++    target_mc_gregset_t *grp;
++    target_mcontext_t *mcp;
++    abi_ulong fp, i7, w_addr;
++    int err;
++    unsigned int i;
++    target_sigset_t target_set;
++    sigset_t set;
++
++    ucp_addr = env->regwptr[UREG_I0];
++    if (!lock_user_struct(VERIFY_WRITE, ucp, ucp_addr, 0)) {
++        goto do_sigsegv;
++    }
++    
++    mcp = &ucp->tuc_mcontext;
++    grp = &mcp->mc_gregs;
++
++    /* Skip over the trap instruction, first. */
++    env->pc = env->npc;
++    env->npc += 4;
++
++    /* If we're only reading the signal mask then do_sigprocmask()
++     * is guaranteed not to fail, which is important because we don't
++     * have any way to signal a failure or restart this operation since
++     * this is not a normal syscall.
++     */
++    err = do_sigprocmask(0, NULL, &set);
++    assert(err == 0);
++    host_to_target_sigset_internal(&target_set, &set);
++    if (TARGET_NSIG_WORDS == 1) {
++        __put_user(target_set.sig[0],
++                   (abi_ulong *)&ucp->tuc_sigmask);
++    } else {
++        abi_ulong *src, *dst;
++        src = target_set.sig;
++        dst = ucp->tuc_sigmask.sig;
++        for (i = 0; i < TARGET_NSIG_WORDS; i++, dst++, src++) {
++            __put_user(*src, dst);
++        }
++        if (err)
++            goto do_sigsegv;
++    }
++
++    /* XXX: tstate must be saved properly */
++    //    __put_user(env->tstate, &((*grp)[SPARC_MC_TSTATE]));
++    __put_user(env->pc, &((*grp)[SPARC_MC_PC]));
++    __put_user(env->npc, &((*grp)[SPARC_MC_NPC]));
++    __put_user(env->y, &((*grp)[SPARC_MC_Y]));
++    __put_user(env->gregs[1], &((*grp)[SPARC_MC_G1]));
++    __put_user(env->gregs[2], &((*grp)[SPARC_MC_G2]));
++    __put_user(env->gregs[3], &((*grp)[SPARC_MC_G3]));
++    __put_user(env->gregs[4], &((*grp)[SPARC_MC_G4]));
++    __put_user(env->gregs[5], &((*grp)[SPARC_MC_G5]));
++    __put_user(env->gregs[6], &((*grp)[SPARC_MC_G6]));
++    __put_user(env->gregs[7], &((*grp)[SPARC_MC_G7]));
++    __put_user(env->regwptr[UREG_I0], &((*grp)[SPARC_MC_O0]));
++    __put_user(env->regwptr[UREG_I1], &((*grp)[SPARC_MC_O1]));
++    __put_user(env->regwptr[UREG_I2], &((*grp)[SPARC_MC_O2]));
++    __put_user(env->regwptr[UREG_I3], &((*grp)[SPARC_MC_O3]));
++    __put_user(env->regwptr[UREG_I4], &((*grp)[SPARC_MC_O4]));
++    __put_user(env->regwptr[UREG_I5], &((*grp)[SPARC_MC_O5]));
++    __put_user(env->regwptr[UREG_I6], &((*grp)[SPARC_MC_O6]));
++    __put_user(env->regwptr[UREG_I7], &((*grp)[SPARC_MC_O7]));
++
++    w_addr = TARGET_STACK_BIAS+env->regwptr[UREG_I6];
++    fp = i7 = 0;
++    if (get_user(fp, w_addr + offsetof(struct target_reg_window, ins[6]),
++                 abi_ulong) != 0) {
++        goto do_sigsegv;
++    }
++    if (get_user(i7, w_addr + offsetof(struct target_reg_window, ins[7]),
++                 abi_ulong) != 0) {
++        goto do_sigsegv;
++    }
++    __put_user(fp, &(mcp->mc_fp));
++    __put_user(i7, &(mcp->mc_i7));
++
++    {
++        uint32_t *dst = ucp->tuc_mcontext.mc_fpregs.mcfpu_fregs.sregs;
++        for (i = 0; i < 64; i++, dst++) {
++            if (i & 1) {
++                __put_user(env->fpr[i/2].l.lower, dst);
++            } else {
++                __put_user(env->fpr[i/2].l.upper, dst);
++            }
++        }
++    }
++    __put_user(env->fsr, &(mcp->mc_fpregs.mcfpu_fsr));
++    __put_user(env->gsr, &(mcp->mc_fpregs.mcfpu_gsr));
++    __put_user(env->fprs, &(mcp->mc_fpregs.mcfpu_fprs));
++
++    if (err)
++        goto do_sigsegv;
++    unlock_user_struct(ucp, ucp_addr, 1);
++    return;
++do_sigsegv:
++    unlock_user_struct(ucp, ucp_addr, 1);
++    force_sig(TARGET_SIGSEGV);
++}
++#endif
+diff --git a/linux-user/sparc/target_signal.h b/linux-user/sparc/target_signal.h
+index e445e2b463..ea2c68c900 100644
+--- a/linux-user/sparc/target_signal.h
++++ b/linux-user/sparc/target_signal.h
+@@ -33,5 +33,9 @@ static inline abi_ulong get_sp_from_cpustate(CPUSPARCState *state)
+     return state->regwptr[UREG_FP];
  }
+ 
+-
++void setup_frame(int sig, struct target_sigaction *ka,
++                 target_sigset_t *set, CPUSPARCState *env);
++void setup_rt_frame(int sig, struct target_sigaction *ka,
++                    target_siginfo_t *info,
++                    target_sigset_t *set, CPUSPARCState *env);
+ #endif /* SPARC_TARGET_SIGNAL_H */
+diff --git a/linux-user/sparc64/signal.c b/linux-user/sparc64/signal.c
+index 02ca338b6c..c263eb0f08 100644
+--- a/linux-user/sparc64/signal.c
++++ b/linux-user/sparc64/signal.c
+@@ -16,3 +16,5 @@
+  *  You should have received a copy of the GNU General Public License
+  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
++#define SPARC_TARGET_SIGNAL_H /* to only include sparc64/target_signal.h */
++#include "../sparc/signal.c"
+diff --git a/linux-user/sparc64/target_signal.h b/linux-user/sparc64/target_signal.h
+index 4449457baf..7f10db9ede 100644
+--- a/linux-user/sparc64/target_signal.h
++++ b/linux-user/sparc64/target_signal.h
+@@ -33,5 +33,9 @@ static inline abi_ulong get_sp_from_cpustate(CPUSPARCState *state)
+     return state->regwptr[UREG_FP];
+ }
+ 
+-
++void setup_frame(int sig, struct target_sigaction *ka,
++                 target_sigset_t *set, CPUSPARCState *env);
++void setup_rt_frame(int sig, struct target_sigaction *ka,
++                    target_siginfo_t *info,
++                    target_sigset_t *set, CPUSPARCState *env);
+ #endif /* SPARC64_TARGET_SIGNAL_H */
 -- 
 2.14.3
