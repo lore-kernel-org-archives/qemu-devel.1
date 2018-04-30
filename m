@@ -1,49 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47523)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jl4312@columbia.edu>) id 1fDDJH-0001Oe-Q9
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 14:14:00 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fDDOI-00030n-Ep
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 14:19:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jl4312@columbia.edu>) id 1fDDJD-00042B-OF
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 14:13:59 -0400
-Received: from outprodmail01.cc.columbia.edu ([128.59.72.39]:34580)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jl4312@columbia.edu>) id 1fDDJD-000421-Ji
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 14:13:55 -0400
-Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
-	by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
-	w3UI9ZFA024491
-	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 14:13:54 -0400
-Received: from hazelnut (localhost.localdomain [127.0.0.1])
-	by hazelnut (Postfix) with ESMTP id A0BB66D
-	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 14:13:53 -0400 (EDT)
-Received: from sendprodmail02.cc.columbia.edu (sendprodmail02.cc.columbia.edu
-	[128.59.72.14]) by hazelnut (Postfix) with ESMTP id 767F281
-	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 14:13:53 -0400 (EDT)
-Received: from mail-wm0-f69.google.com (mail-wm0-f69.google.com [74.125.82.69])
-	by sendprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
-	w3UIDqdL009230
-	(version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 14:13:53 -0400
-Received: by mail-wm0-f69.google.com with SMTP id w74so5321873wmw.0
-	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 11:13:53 -0700 (PDT)
-Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com.
-	[74.125.82.50]) by smtp.gmail.com with ESMTPSA id
-	b43-v6sm4747070edc.34.2018.04.30.11.13.50 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 30 Apr 2018 11:13:50 -0700 (PDT)
-Received: by mail-wm0-f50.google.com with SMTP id i3so15626326wmf.3
-	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 11:13:50 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180430120941.741f31cb@w520.home>
-References: <CAHyh4xgMqsxCUOH-_p=DWVWpp0stxfwdfFo2s2cn1nmR2v5Siw@mail.gmail.com>
-	<CAHyh4xjzi5CK8+OJPpnr+F2ABpy5Jbbo1S4YR5ATi62LMRn+Pw@mail.gmail.com>
-	<20180430120941.741f31cb@w520.home>
-From: Jintack Lim <jintack@cs.columbia.edu>
-Date: Mon, 30 Apr 2018 14:13:49 -0400
-Message-ID: <CAHyh4xjaLUibVMRVfCc5_kyqhu=HYDfZXkcLRmWsoZ=KCyo+MQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] How to check if Vt-d is capable of
- posted-interrupt?
+	(envelope-from <pm215@archaic.org.uk>) id 1fDDOH-0007FU-E3
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 14:19:10 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41268)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1fDDOH-0007Ew-6C
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 14:19:09 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 30 Apr 2018 19:18:54 +0100
+Message-Id: <20180430181905.32327-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [RFC PATCH 00/11] iommu: add MemTxAttrs argument to
+ IOMMU translate function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -52,51 +23,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: iommu@lists.linux-foundation.org, QEMU Devel Mailing List <qemu-devel@nongnu.org>, KVM General <kvm@vger.kernel.org>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, Apr 30, 2018 at 2:09 PM, Alex Williamson
-<alex.williamson@redhat.com> wrote:
-> On Mon, 30 Apr 2018 13:44:23 -0400
-> Jintack Lim <jintack@cs.columbia.edu> wrote:
->
->> Add iommu mailing list since this question might be more related to iommu.
->>
->> On Mon, Apr 30, 2018 at 10:11 AM, Jintack Lim <jintack@cs.columbia.edu> wrote:
->> > Hi,
->> >
->> > I wonder how to check if Vt-d is capable of posted-interrupt? I'm
->> > using Intel E5-2630 v3.
->> >
->> > I was once told that APICv and posted-interrupt capability always come
->> > together. But it seems like my cpu support APICv
->> > (/sys/module/kvm_intel/parameters/enable_apicv is Y), but
->> > posted-interrupt capability is only shipped with the next generation
->> > of the cpu (E5-2600 v4, which is Broadwell).
->> >
->> > What would be an easy way to check this?
->
-> PI support is bit 59 in the capability register which is exposed
-> through sysfs at /sys/class/iommu/dmar*/intel-iommu/cap so you could do
-> something like:
->
-> # for i in $(find /sys/class/iommu/dmar* -type l); do echo -n "$i: "; echo $(( ( 0x$(cat $i/intel-iommu/cap) >> 59 ) & 1 )); done
->
+This is an RFC patchset because it's a little bit unmotivated
+and only lightly tested, but in principle it could be
+committed, so half-RFC-half-not :-)
 
-Thanks for a nice solution, Alex.
-It turns out my cpu doesn't have the PI capability.
-/sys/class/iommu/dmar0: 0
-/sys/class/iommu/dmar1: 0
+The Arm SMMU wants to know if the transaction it is handling
+is secure/nonsecure and user/privileged, because the iommu
+page tables can be configured by the guest to only allow
+transactions which satisfy those criteria. At the moment
+Eric's implementation ignores all that, because we don't
+provide the IOMMUMemoryRegion translate function with any
+memory transaction attribute information. This patchset fixes
+that by plumbing through transaction attributes.
 
-> I think the relationship between APICv and PI goes the other direction,
-> if you have PI, you probably have APICv.  Having APICv implies nothing
-> about having PI.  Thanks,
+Most of the patchset is just starting at the leaves of the calltree
+rooted at "flatview_do_translate()" and making callsites provide
+attributes where appropriate or plumbing through existing attribute
+information where it exists.  General principles of when I made a
+caller pass MEMTXATTRS_UNSPECIFIED and when I had it take an
+attrs value from further up:
+ * dma_memory_* functions all assume UNSPECIFIED (matching
+   the read/write/rw functions that already do that)
+ * cpu_physical_memory_* also all assume UNSPECIFIED,
+   following the pattern of existing functions in that family
+ * address_space_* take an attributes argument, by analogy
+   with existing functions in that family
+ * endpoints like target-specific code or vhost has to
+   provide attributes, but for all the targets affected here
+   they don't care about attributes and can use UNSPECIFIED
 
-Yeah, I think that makes sense.
+As well as the SMMU, I'm also thinking about using the IOMMU
+infrastructure for the v8M Memory Protection Controller
+(though that is a bit trickier as I also need it to support
+TCG execution in an IOMMU-controlled region, which is an
+orthogonal bit of work to attribute support).
 
-Thanks,
-Jintack
+Based-on: <20180430122404.10741-1-peter.maydell@linaro.org>
+("memory.h: Improve IOMMU related documentation") but
+only for textual reasons.
 
->
-> Alex
->
+thanks
+-- PMM
+
+Peter Maydell (11):
+  Make address_space_translate() take a MemTxAttrs argument
+  Make address_space_map() take a MemTxAttrs argument
+  Make address_space_access_valid() take a MemTxAttrs argument
+  Make flatview_extend_translation() take a MemTxAttrs argument
+  Make memory_region_access_valid() take a MemTxAttrs argument
+  Make MemoryRegion valid.accepts callback take a MemTxAttrs argument
+  Make flatview_access_valid() take a MemTxAttrs argument
+  Make flatview_translate() take a MemTxAttrs argument
+  Make address_space_get_iotlb_entry() take a MemTxAttrs argument
+  Make flatview_do_translate() take a MemTxAttrs argument
+  Add MemTxAttrs argument to IOMMU translate function
+
+ include/exec/memory-internal.h |  3 +-
+ include/exec/memory.h          | 26 +++++++-----
+ include/sysemu/dma.h           |  6 ++-
+ accel/tcg/translate-all.c      |  2 +-
+ exec.c                         | 73 ++++++++++++++++++++--------------
+ hw/alpha/typhoon.c             |  3 +-
+ hw/dma/rc4030.c                |  3 +-
+ hw/hppa/dino.c                 |  3 +-
+ hw/i386/amd_iommu.c            |  3 +-
+ hw/i386/intel_iommu.c          |  3 +-
+ hw/nvram/fw_cfg.c              | 12 ++++--
+ hw/ppc/spapr_iommu.c           |  3 +-
+ hw/s390x/s390-pci-bus.c        |  3 +-
+ hw/s390x/s390-pci-inst.c       |  3 +-
+ hw/scsi/esp.c                  |  3 +-
+ hw/sparc/sun4m_iommu.c         |  3 +-
+ hw/sparc64/sun4u_iommu.c       |  3 +-
+ hw/vfio/common.c               |  3 +-
+ hw/virtio/vhost.c              |  3 +-
+ hw/xen/xen_pt_msi.c            |  3 +-
+ memory.c                       | 15 ++++---
+ memory_ldst.inc.c              | 18 ++++-----
+ target/ppc/mmu-hash64.c        |  3 +-
+ target/riscv/helper.c          |  2 +-
+ target/s390x/diag.c            |  6 ++-
+ target/s390x/excp_helper.c     |  3 +-
+ target/s390x/mmu_helper.c      |  3 +-
+ target/s390x/sigp.c            |  3 +-
+ 28 files changed, 134 insertions(+), 83 deletions(-)
+
+-- 
+2.17.0
