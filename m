@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fDEzn-0003jo-MZ
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 16:02:00 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fDEzp-0003kf-2X
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 16:02:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fDEzm-0005sU-UY
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 16:01:59 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:40091)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fDEzo-0005tO-9B
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 16:02:01 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:33223)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1fDEzm-0005rz-Oi
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 16:01:58 -0400
-Received: by mail-wr0-x243.google.com with SMTP id v60-v6so9125600wrc.7
-	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 13:01:58 -0700 (PDT)
+	id 1fDEzo-0005so-3s
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 16:02:00 -0400
+Received: by mail-wr0-x241.google.com with SMTP id o4-v6so9128981wrm.0
+	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 13:01:59 -0700 (PDT)
 From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Mon, 30 Apr 2018 23:02:19 +0300
-Message-Id: <20180430200223.4119-4-marcel.apfelbaum@gmail.com>
+Date: Mon, 30 Apr 2018 23:02:20 +0300
+Message-Id: <20180430200223.4119-5-marcel.apfelbaum@gmail.com>
 In-Reply-To: <20180430200223.4119-1-marcel.apfelbaum@gmail.com>
 References: <20180430200223.4119-1-marcel.apfelbaum@gmail.com>
-Subject: [Qemu-devel] [PATCH 3/7] hw/rdma: Delete port's pkey table
+Subject: [Qemu-devel] [PATCH 4/7] hw/rdma: Fix possible out of bounds access
+ to GID table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,76 +32,59 @@ Cc: marcel.apfelbaum@gmail.com, yuval.shaia@oracle.com, peter.maydell@linaro.org
 
 From: Yuval Shaia <yuval.shaia@oracle.com>
 
-Support for PKEY is not yet implemented. Removing the unneeded table
-until a support will be added.
+Array size is MAX_PORT_GIDS, let's make sure the given index is in
+range.
 
+While there limit device table size to 1.
+
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 ---
- hw/rdma/rdma_rm_defs.h    |  3 +--
- hw/rdma/vmw/pvrdma_main.c | 15 ---------------
- 2 files changed, 1 insertion(+), 17 deletions(-)
+ hw/rdma/rdma_rm_defs.h   | 2 +-
+ hw/rdma/vmw/pvrdma_cmd.c | 8 ++++++--
+ 2 files changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
-index fc646da61f..45503f14e0 100644
+index 45503f14e0..4d22a20e4c 100644
 --- a/hw/rdma/rdma_rm_defs.h
 +++ b/hw/rdma/rdma_rm_defs.h
-@@ -21,7 +21,7 @@
+@@ -20,9 +20,9 @@
+ 
  #define MAX_PORTS             1
  #define MAX_PORT_GIDS         1
++#define MAX_GIDS              MAX_PORT_GIDS
  #define MAX_PORT_PKEYS        1
--#define MAX_PKEYS             1
-+#define MAX_PKEYS             MAX_PORT_PKEYS
- #define MAX_GIDS              2048
+ #define MAX_PKEYS             MAX_PORT_PKEYS
+-#define MAX_GIDS              2048
  #define MAX_UCS               512
  #define MAX_MR_SIZE           (1UL << 27)
-@@ -87,7 +87,6 @@ typedef struct RdmaRmQP {
- typedef struct RdmaRmPort {
-     union ibv_gid gid_tbl[MAX_PORT_GIDS];
-     enum ibv_port_state state;
--    int *pkey_tbl; /* TODO: Not yet supported */
- } RdmaRmPort;
+ #define MAX_QP                1024
+diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
+index f9dd78cb27..14255d609f 100644
+--- a/hw/rdma/vmw/pvrdma_cmd.c
++++ b/hw/rdma/vmw/pvrdma_cmd.c
+@@ -576,7 +576,7 @@ static int create_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
  
- typedef struct RdmaDeviceResources {
-diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-index c552248c90..994220b58e 100644
---- a/hw/rdma/vmw/pvrdma_main.c
-+++ b/hw/rdma/vmw/pvrdma_main.c
-@@ -275,15 +275,6 @@ static void init_dsr_dev_caps(PVRDMADev *dev)
-     pr_dbg("Initialized\n");
- }
+     pr_dbg("index=%d\n", cmd->index);
  
--static void free_ports(PVRDMADev *dev)
--{
--    int i;
--
--    for (i = 0; i < MAX_PORTS; i++) {
--        g_free(dev->rdma_dev_res.ports[i].gid_tbl);
--    }
--}
--
- static void init_ports(PVRDMADev *dev, Error **errp)
- {
-     int i;
-@@ -292,10 +283,6 @@ static void init_ports(PVRDMADev *dev, Error **errp)
- 
-     for (i = 0; i < MAX_PORTS; i++) {
-         dev->rdma_dev_res.ports[i].state = IBV_PORT_DOWN;
--
--        dev->rdma_dev_res.ports[i].pkey_tbl =
--            g_malloc0(sizeof(*dev->rdma_dev_res.ports[i].pkey_tbl) *
--                      MAX_PORT_PKEYS);
+-    if (cmd->index > MAX_PORT_GIDS) {
++    if (cmd->index >= MAX_PORT_GIDS) {
+         return -EINVAL;
      }
- }
  
-@@ -622,8 +609,6 @@ static void pvrdma_exit(PCIDevice *pdev)
+@@ -603,7 +603,11 @@ static int destroy_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
+ {
+     struct pvrdma_cmd_destroy_bind *cmd = &req->destroy_bind;
  
-     pvrdma_qp_ops_fini();
+-    pr_dbg("clear index %d\n", cmd->index);
++    pr_dbg("index=%d\n", cmd->index);
++
++    if (cmd->index >= MAX_PORT_GIDS) {
++        return -EINVAL;
++    }
  
--    free_ports(dev);
--
-     rdma_rm_fini(&dev->rdma_dev_res);
- 
-     rdma_backend_fini(&dev->backend_dev);
+     memset(dev->rdma_dev_res.ports[0].gid_tbl[cmd->index].raw, 0,
+            sizeof(dev->rdma_dev_res.ports[0].gid_tbl[cmd->index].raw));
 -- 
 2.14.3
