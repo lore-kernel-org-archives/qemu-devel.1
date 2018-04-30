@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fDBAL-0006Xp-SV
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 11:56:38 -0400
+	(envelope-from <prvs=6518dd5c5=roger.pau@citrix.com>)
+	id 1fDBE7-0000Zn-1E
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 12:00:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fDBAI-0001A9-Q8
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 11:56:37 -0400
-Date: Mon, 30 Apr 2018 18:56:24 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180430185609-mutt-send-email-mst@kernel.org>
-References: <1525073539-27991-1-git-send-email-thuth@redhat.com>
+	(envelope-from <prvs=6518dd5c5=roger.pau@citrix.com>)
+	id 1fDBE1-0002rk-RV
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 12:00:30 -0400
+Date: Mon, 30 Apr 2018 16:12:04 +0100
+From: Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
+Message-ID: <20180430151145.iyou5pisaclvvn3v@MacBook-Pro-de-Roger.local>
+References: <1525089699-13411-1-git-send-email-paul.durrant@citrix.com>
+	<1525089699-13411-3-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <1525073539-27991-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] trivial: Do not include pci.h if it is not
- necessary
+In-Reply-To: <1525089699-13411-3-git-send-email-paul.durrant@citrix.com>
+Subject: Re: [Qemu-devel] [Xen-devel] [PATCH 2/4] block/xen_disk: remove use
+ of grant map/unmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,58 +26,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>
+To: Paul Durrant <paul.durrant@citrix.com>
+Cc: xen-devel@lists.xenproject.org, qemu-block@nongnu.org, qemu-devel@nongnu.org, Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Max Reitz <mreitz@redhat.com>
 
-On Mon, Apr 30, 2018 at 09:32:19AM +0200, Thomas Huth wrote:
-> There is no need to include pci.h in these files.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+On Mon, Apr 30, 2018 at 01:01:37PM +0100, Paul Durrant wrote:
+> The grant copy operation was added to libxengnttab in Xen 4.8.0. If grant
+> copy is available then data from the guest will be copied rather than
+> mapped.
+> The xen_disk source can be significantly simplified by removing this now
+> redundant code.
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Hm, I know this is a PITA, but FreeBSD gntdev hasn't implemented the
+grant-copy operation yet.
 
-> ---
->  include/hw/ppc/ppc4xx.h            | 2 --
->  include/hw/virtio/virtio-balloon.h | 1 -
->  include/hw/virtio/virtio-gpu.h     | 1 -
->  3 files changed, 4 deletions(-)
-> 
-> diff --git a/include/hw/ppc/ppc4xx.h b/include/hw/ppc/ppc4xx.h
-> index cb0bb55..3a2a04c 100644
-> --- a/include/hw/ppc/ppc4xx.h
-> +++ b/include/hw/ppc/ppc4xx.h
-> @@ -25,8 +25,6 @@
->  #ifndef PPC4XX_H
->  #define PPC4XX_H
->  
-> -#include "hw/pci/pci.h"
-> -
->  /* PowerPC 4xx core initialization */
->  PowerPCCPU *ppc4xx_init(const char *cpu_model,
->                          clk_setup_t *cpu_clk, clk_setup_t *tb_clk,
-> diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
-> index 1ea13bd..e0df352 100644
-> --- a/include/hw/virtio/virtio-balloon.h
-> +++ b/include/hw/virtio/virtio-balloon.h
-> @@ -17,7 +17,6 @@
->  
->  #include "standard-headers/linux/virtio_balloon.h"
->  #include "hw/virtio/virtio.h"
-> -#include "hw/pci/pci.h"
->  
->  #define TYPE_VIRTIO_BALLOON "virtio-balloon-device"
->  #define VIRTIO_BALLOON(obj) \
-> diff --git a/include/hw/virtio/virtio-gpu.h b/include/hw/virtio/virtio-gpu.h
-> index 22ac3c2..79bb3fb 100644
-> --- a/include/hw/virtio/virtio-gpu.h
-> +++ b/include/hw/virtio/virtio-gpu.h
-> @@ -18,7 +18,6 @@
->  #include "ui/qemu-pixman.h"
->  #include "ui/console.h"
->  #include "hw/virtio/virtio.h"
-> -#include "hw/pci/pci.h"
->  #include "qemu/log.h"
->  
->  #include "standard-headers/linux/virtio_gpu.h"
-> -- 
-> 1.8.3.1
+I could try to implement it, but I can't make any promises on the time
+ATM, since I'm quite busy.
+
+Thanks, Roger.
