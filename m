@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53156)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fD67b-0003b9-QG
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 06:33:28 -0400
+	(envelope-from <berrange@redhat.com>) id 1fD69M-0004T1-Hu
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 06:35:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fD67Y-0003cT-Ht
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 06:33:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36608 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1fD69I-0004XM-9J
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 06:35:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34328 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fD67Y-0003c1-CC
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 06:33:24 -0400
-Date: Mon, 30 Apr 2018 11:33:12 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fD69I-0004X5-3a
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 06:35:12 -0400
+Date: Mon, 30 Apr 2018 11:35:06 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180430103312.GH3249@redhat.com>
+Message-ID: <20180430103506.GI3249@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
+	<d50e3a40-d7f3-4c9b-e930-4c2f4d6c8a53@redhat.com>
+	<CAFEAcA8wJuJ9464LadgjJOo-7ttdGYcfDQWALbkxBRJCr_knkg@mail.gmail.com>
+	<20180427210120.03d037b0@naga.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
+In-Reply-To: <20180427210120.03d037b0@naga.suse.cz>
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] release retrospective, next release timing,
  numbering
 List-Id: <qemu-devel.nongnu.org>
@@ -28,74 +32,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Michal =?utf-8?B?U3VjaMOhbmVr?= <msuchanek@suse.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Fri, Apr 27, 2018 at 04:51:03PM +0100, Peter Maydell wrote:
-> Hi; I usually let people forget about releases for a month or
-> so before bringing this topic up, but:
-> 
-> (1) do we want to call the next release 2.13, or something else?
-> There's no particular reason to bump to 3.0 except some combination of
->  * if we keep going like this we'll get up to 2.42, which starts to
->    get silly
->  * Linus-style "avoid being too predictable"
->  * triskaidekaphobia
-> but maybe we should anyway?
+On Fri, Apr 27, 2018 at 09:01:20PM +0200, Michal Such=C3=A1nek wrote:
+> On Fri, 27 Apr 2018 17:24:38 +0100
+> Peter Maydell <peter.maydell@linaro.org> wrote:
+>=20
+> > On 27 April 2018 at 17:17, Thomas Huth <thuth@redhat.com> wrote:
+> > > On 27.04.2018 17:51, Peter Maydell wrote: =20
+> > >> Hi; I usually let people forget about releases for a month or
+> > >> so before bringing this topic up, but:
+> > >>
+> > >> (1) do we want to call the next release 2.13, or something else?
+> > >> There's no particular reason to bump to 3.0 except some
+> > >> combination of
+> > >>  * if we keep going like this we'll get up to 2.42, which starts t=
+o
+> > >>    get silly
+> > >>  * Linus-style "avoid being too predictable"
+> > >>  * triskaidekaphobia =20
+> > >
+> > > and maybe:
+> > >
+> > >  * Celebrate 15 years of QEMU =20
+> >=20
+> > Oh, hey, I hadn't noticed that. That's as good a reason as
+> > any other!
+> >=20
+> > > By the way, just another crazy idea for v3.0 (i.e. feel free to
+> > > turn it down immediately ;-)): Since compilation and testing time
+> > > for QEMU is really huge, what do you think if we got rid of some
+> > > QEMU binaries? qemu-system-aarch64 is a superset of
+> > > qemu-system-arm, qemu-system-x86_64 is a superset of
+> > > qemu-system-i386 and qemu-system-ppc64 is a superset of
+> > > qemu-system-ppc (and qemu-system-ppcemb). Would be feasible to get
+> > > rid of the subset binaries with some work? (I think they were
+> > > especially useful on 32-bit machines in the past, but most people
+> > > are using 64-bit machines nowadays, aren't they?). =20
+> >=20
+> > I think Markus' backward-compatibility rubber chicken may prevent
+> > us from removing those executables...
+>=20
+> At least the PPC vs PPC64 default to different BIOS, machine type, etc.
+>=20
+> That could be achieved by a wrapper script around the 64bit binary I
+> suppose.
+>=20
+> Is there any reason why the 64bit emulator would not run on 32bit
+> system? The emulated 64bit system is .. emulated after all.
 
-I'm in favour of changnig the major version to 3.0, but when we do
-so we should also define a clear rule we can follow for major version
-bumps, so we don't have the same silly debate for how we pick 4.0,
-5.0 etc.
-
-Given, that we have a clear deprecation process now, my view is that
-we should formally declare that major version numbers changes are
-meaningless. As soon as you try to assign special meaning to major
-version changes, you open the door to endless debate about whether
-a particular set of changes is meaningful enough to justify the
-major version change, leading to eventually 2.42. 
-
-Two possible options
-
- a) Bump major version once a year, so we'll have 3.0, 3.1, 3.3,
-    4.0, 4.1, 4.2, 5.0, ...etc  We missed the first release this
-    year, so we would only have 3.0 and 3.1 this year.
-
- b) Bump major release when minor version gets double-digits.
-    eg 3.0, 3.1, ...., 3.9, 3.9, 4.0, ...., 4.9, 5.0...
-
-Personally I'd go for (a). If we do this, it doesn't preclude
-us from just happening to do some releases that are backwards
-incompatible. Our deprecation policy has provided us a way to
-have a backwards incompatible change in ANY release we make.
-We just have to ensure people are forewarned of what's coming.
-
-If it was an incredibly large & disruptive incompatible change,
-we might none the less choose to align its arrival with a major
-version bump. That's ok. We simply do not require that a major
-version change has to have a major incompatibility.
-
-> (3) retrospective, lessons learned &c
->  * please remember that if every single submaintainer submits
->    a pull request on the morning of an RC, it is physically
->    not possible for me to process all those pulls in time to
->    tag the RC that day. We had several RCs which got delayed
->    by a day because of this; please try to submit earlier
->    rather than later...
->  * provide your opinions here ?
-
-It is moderately rare that we have a huge new subsystem like RiscV
-enter tree during a release cycle. Given our experiance of this
-though, it is clear that when such new subsystems arrive, we need
-one or more existing maintainers to mentor the submitter wrt QEMU
-processes. We saw that is is unreasonable to expect a new comer
-to QEMU development to figure it all out for themselves, and Peter
-doesn't have the time to do this mentoring while also dealing with
-existing merge workload.
+I'm assuming thuat a qemu-system-x86_64  binary cannot use KVM to run
+on a 32-bit host kernel, even if it was only running a 32-bit guest ?
 
 Regards,
 Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
