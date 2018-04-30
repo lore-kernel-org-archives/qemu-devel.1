@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fD4q6-0006KO-Ar
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:11:23 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fD4q8-0006LN-V0
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:11:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fD4q2-0006BA-K9
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:11:18 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fD4q5-0006FV-1W
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:11:20 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon, 30 Apr 2018 11:10:17 +0200
-Message-Id: <20180430091037.13878-23-laurent@vivier.eu>
+Date: Mon, 30 Apr 2018 11:10:05 +0200
+Message-Id: <20180430091037.13878-11-laurent@vivier.eu>
 In-Reply-To: <20180430091037.13878-1-laurent@vivier.eu>
 References: <20180430091037.13878-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 22/42] linux-user: define
- TARGET_ARCH_HAS_SETUP_FRAME
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 10/42] linux-user: move openrisc signal.c parts
+ to openrisc directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,393 +26,475 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Cornelia Huck <cohuck@redhat.com>
 
-Instead of calling setup_frame() conditionally to a list of known targets,
-define TARGET_ARCH_HAS_SETUP_FRAME if the target provides the function
-and call it only if the macro is defined.
-
-Move declarations of setup_frame() and setup_rt_frame() to
-linux-user/signal-common.h
+No code change, only move code from signal.c to
+openrisc/signal.c, except adding includes and
+exporting setup_rt_frame().
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20180424192635.6027-21-laurent@vivier.eu>
+Message-Id: <20180424192635.6027-9-laurent@vivier.eu>
 ---
- linux-user/aarch64/target_signal.h    |  6 +-----
- linux-user/alpha/target_signal.h      |  6 +-----
- linux-user/arm/target_signal.h        |  6 +-----
- linux-user/cris/target_signal.h       |  6 +-----
- linux-user/hppa/target_signal.h       |  4 ----
- linux-user/i386/target_signal.h       |  6 +-----
- linux-user/m68k/target_signal.h       |  6 +-----
- linux-user/microblaze/target_signal.h |  6 +-----
- linux-user/mips/target_signal.h       |  8 ++------
- linux-user/mips64/target_signal.h     |  4 ----
- linux-user/nios2/target_signal.h      |  5 -----
- linux-user/openrisc/target_signal.h   |  4 ----
- linux-user/ppc/target_signal.h        |  6 +-----
- linux-user/riscv/target_signal.h      |  4 ----
- linux-user/s390x/target_signal.h      |  6 +-----
- linux-user/sh4/target_signal.h        |  7 +------
- linux-user/signal-common.h            |  7 +++++++
- linux-user/signal.c                   | 17 +++++++----------
- linux-user/sparc/target_signal.h      |  6 +-----
- linux-user/sparc64/target_signal.h    |  6 +-----
- linux-user/tilegx/target_signal.h     |  4 ----
- linux-user/x86_64/target_signal.h     |  4 ----
- linux-user/xtensa/target_signal.h     |  4 ----
- 23 files changed, 28 insertions(+), 110 deletions(-)
+ linux-user/openrisc/signal.c        | 213 ++++++++++++++++++++++++++++++++++++
+ linux-user/openrisc/target_signal.h |   4 +-
+ linux-user/signal.c                 | 211 -----------------------------------
+ 3 files changed, 216 insertions(+), 212 deletions(-)
 
-diff --git a/linux-user/aarch64/target_signal.h b/linux-user/aarch64/target_signal.h
-index af1f1320e2..0b7ae25120 100644
---- a/linux-user/aarch64/target_signal.h
-+++ b/linux-user/aarch64/target_signal.h
-@@ -26,9 +26,5 @@ static inline abi_ulong get_sp_from_cpustate(CPUARMState *state)
-    return state->xregs[31];
- }
- 
--void setup_frame(int sig, struct target_sigaction *ka,
--                 target_sigset_t *set, CPUARMState *env);
--void setup_rt_frame(int sig, struct target_sigaction *ka,
--                    target_siginfo_t *info, target_sigset_t *set,
--                    CPUARMState *env);
-+#define TARGET_ARCH_HAS_SETUP_FRAME
- #endif /* AARCH64_TARGET_SIGNAL_H */
-diff --git a/linux-user/alpha/target_signal.h b/linux-user/alpha/target_signal.h
-index 42343a1ae6..4e912e1cf9 100644
---- a/linux-user/alpha/target_signal.h
-+++ b/linux-user/alpha/target_signal.h
-@@ -55,9 +55,5 @@ static inline abi_ulong get_sp_from_cpustate(CPUAlphaState *state)
- #define TARGET_GEN_SUBRNG6     -24
- #define TARGET_GEN_SUBRNG7     -25
- 
--void setup_frame(int sig, struct target_sigaction *ka,
--                 target_sigset_t *set, CPUAlphaState *env);
--void setup_rt_frame(int sig, struct target_sigaction *ka,
--                    target_siginfo_t *info,
--                    target_sigset_t *set, CPUAlphaState *env);
-+#define TARGET_ARCH_HAS_SETUP_FRAME
- #endif /* ALPHA_TARGET_SIGNAL_H */
-diff --git a/linux-user/arm/target_signal.h b/linux-user/arm/target_signal.h
-index 4b542c324f..d6a03ec87d 100644
---- a/linux-user/arm/target_signal.h
-+++ b/linux-user/arm/target_signal.h
-@@ -26,9 +26,5 @@ static inline abi_ulong get_sp_from_cpustate(CPUARMState *state)
-    return state->regs[13];
- }
- 
--void setup_frame(int usig, struct target_sigaction *ka,
--                 target_sigset_t *set, CPUARMState *regs);
--void setup_rt_frame(int usig, struct target_sigaction *ka,
--                    target_siginfo_t *info,
--                    target_sigset_t *set, CPUARMState *env);
-+#define TARGET_ARCH_HAS_SETUP_FRAME
- #endif /* ARM_TARGET_SIGNAL_H */
-diff --git a/linux-user/cris/target_signal.h b/linux-user/cris/target_signal.h
-index 19c0d7b539..74ff2f3382 100644
---- a/linux-user/cris/target_signal.h
-+++ b/linux-user/cris/target_signal.h
-@@ -26,9 +26,5 @@ static inline abi_ulong get_sp_from_cpustate(CPUCRISState *state)
-     return state->regs[14];
- }
- 
--void setup_frame(int sig, struct target_sigaction *ka,
--                 target_sigset_t *set, CPUCRISState *env);
--void setup_rt_frame(int sig, struct target_sigaction *ka,
--                    target_siginfo_t *info,
--                     target_sigset_t *set, CPUCRISState *env);
-+#define TARGET_ARCH_HAS_SETUP_FRAME
- #endif /* CRIS_TARGET_SIGNAL_H */
-diff --git a/linux-user/hppa/target_signal.h b/linux-user/hppa/target_signal.h
-index f19aed93dd..f28b4bf6e8 100644
---- a/linux-user/hppa/target_signal.h
-+++ b/linux-user/hppa/target_signal.h
-@@ -25,8 +25,4 @@ static inline abi_ulong get_sp_from_cpustate(CPUHPPAState *state)
- {
-     return state->gr[30];
- }
--
--void setup_rt_frame(int sig, struct target_sigaction *ka,
--                    target_siginfo_t *info,
--                    target_sigset_t *set, CPUArchState *env);
- #endif /* HPPA_TARGET_SIGNAL_H */
-diff --git a/linux-user/i386/target_signal.h b/linux-user/i386/target_signal.h
-index ec5a3e3373..6ad4089482 100644
---- a/linux-user/i386/target_signal.h
-+++ b/linux-user/i386/target_signal.h
-@@ -26,9 +26,5 @@ static inline abi_ulong get_sp_from_cpustate(CPUX86State *state)
-     return state->regs[R_ESP];
- }
- 
--void setup_frame(int sig, struct target_sigaction *ka,
--                 target_sigset_t *set, CPUX86State *env);
--void setup_rt_frame(int sig, struct target_sigaction *ka,
--                    target_siginfo_t *info,
--                    target_sigset_t *set, CPUX86State *env);
-+#define TARGET_ARCH_HAS_SETUP_FRAME
- #endif /* I386_TARGET_SIGNAL_H */
-diff --git a/linux-user/m68k/target_signal.h b/linux-user/m68k/target_signal.h
-index 29e0c01191..ff303f2b3c 100644
---- a/linux-user/m68k/target_signal.h
-+++ b/linux-user/m68k/target_signal.h
-@@ -26,9 +26,5 @@ static inline abi_ulong get_sp_from_cpustate(CPUM68KState *state)
-     return state->aregs[7];
- }
- 
--void setup_frame(int sig, struct target_sigaction *ka,
--                 target_sigset_t *set, CPUM68KState *env);
--void setup_rt_frame(int sig, struct target_sigaction *ka,
--                    target_siginfo_t *info,
--                    target_sigset_t *set, CPUM68KState *env);
-+#define TARGET_ARCH_HAS_SETUP_FRAME
- #endif /* M68K_TARGET_SIGNAL_H */
-diff --git a/linux-user/microblaze/target_signal.h b/linux-user/microblaze/target_signal.h
-index 02c5cc56fa..9fe4048292 100644
---- a/linux-user/microblaze/target_signal.h
-+++ b/linux-user/microblaze/target_signal.h
-@@ -26,9 +26,5 @@ static inline abi_ulong get_sp_from_cpustate(CPUMBState *state)
-     return state->regs[1];
- }
- 
--void setup_frame(int sig, struct target_sigaction *ka,
--                 target_sigset_t *set, CPUMBState *env);
--void setup_rt_frame(int sig, struct target_sigaction *ka,
--                    target_siginfo_t *info,
--                    target_sigset_t *set, CPUMBState *env);
-+#define TARGET_ARCH_HAS_SETUP_FRAME
- #endif /* MICROBLAZE_TARGET_SIGNAL_H */
-diff --git a/linux-user/mips/target_signal.h b/linux-user/mips/target_signal.h
-index 22ab3e4a94..d36f5da0a0 100644
---- a/linux-user/mips/target_signal.h
-+++ b/linux-user/mips/target_signal.h
-@@ -26,12 +26,8 @@ static inline abi_ulong get_sp_from_cpustate(CPUMIPSState *state)
-     return state->active_tc.gpr[29];
- }
- 
--# if defined(TARGET_ABI_MIPSO32)
-+#if defined(TARGET_ABI_MIPSO32)
- /* compare linux/arch/mips/kernel/signal.c:setup_frame() */
--void setup_frame(int sig, struct target_sigaction * ka,
--                 target_sigset_t *set, CPUMIPSState *regs);
-+#define TARGET_ARCH_HAS_SETUP_FRAME
- #endif
--void setup_rt_frame(int sig, struct target_sigaction *ka,
--                    target_siginfo_t *info,
--                    target_sigset_t *set, CPUMIPSState *env);
- #endif /* MIPS_TARGET_SIGNAL_H */
-diff --git a/linux-user/mips64/target_signal.h b/linux-user/mips64/target_signal.h
-index 70dfe40978..c074e1592f 100644
---- a/linux-user/mips64/target_signal.h
-+++ b/linux-user/mips64/target_signal.h
-@@ -25,8 +25,4 @@ static inline abi_ulong get_sp_from_cpustate(CPUMIPSState *state)
- {
-     return state->active_tc.gpr[29];
- }
--
--void setup_rt_frame(int sig, struct target_sigaction *ka,
--                    target_siginfo_t *info,
--                    target_sigset_t *set, CPUMIPSState *env);
- #endif /* MIPS64_TARGET_SIGNAL_H */
-diff --git a/linux-user/nios2/target_signal.h b/linux-user/nios2/target_signal.h
-index aa78519025..f4db4d6d62 100644
---- a/linux-user/nios2/target_signal.h
-+++ b/linux-user/nios2/target_signal.h
-@@ -22,9 +22,4 @@ static inline abi_ulong get_sp_from_cpustate(CPUNios2State *state)
- {
-     return state->regs[R_SP];
- }
--
--void setup_rt_frame(int sig, struct target_sigaction *ka,
--                    target_siginfo_t *info,
--                    target_sigset_t *set,
--                    CPUNios2State *env);
- #endif /* TARGET_SIGNAL_H */
-diff --git a/linux-user/openrisc/target_signal.h b/linux-user/openrisc/target_signal.h
-index 6c47ddf74e..2a4e00b035 100644
---- a/linux-user/openrisc/target_signal.h
-+++ b/linux-user/openrisc/target_signal.h
-@@ -22,8 +22,4 @@ static inline abi_ulong get_sp_from_cpustate(CPUOpenRISCState *state)
- {
-     return cpu_get_gpr(state, 1);
- }
--
--void setup_rt_frame(int sig, struct target_sigaction *ka,
--                    target_siginfo_t *info,
--                    target_sigset_t *set, CPUOpenRISCState *env);
- #endif /* OPENRISC_TARGET_SIGNAL_H */
-diff --git a/linux-user/ppc/target_signal.h b/linux-user/ppc/target_signal.h
-index 5e293e3b03..e3bf1d2856 100644
---- a/linux-user/ppc/target_signal.h
-+++ b/linux-user/ppc/target_signal.h
-@@ -27,10 +27,6 @@ static inline abi_ulong get_sp_from_cpustate(CPUPPCState *state)
- }
- 
- #if !defined(TARGET_PPC64)
--void setup_frame(int sig, struct target_sigaction *ka,
--                 target_sigset_t *set, CPUPPCState *env);
-+#define TARGET_ARCH_HAS_SETUP_FRAME
- #endif
--void setup_rt_frame(int sig, struct target_sigaction *ka,
--                    target_siginfo_t *info,
--                    target_sigset_t *set, CPUPPCState *env);
- #endif /* PPC_TARGET_SIGNAL_H */
-diff --git a/linux-user/riscv/target_signal.h b/linux-user/riscv/target_signal.h
-index 6ac8a88de6..9dac002c0d 100644
---- a/linux-user/riscv/target_signal.h
-+++ b/linux-user/riscv/target_signal.h
-@@ -19,8 +19,4 @@ static inline abi_ulong get_sp_from_cpustate(CPURISCVState *state)
- {
-    return state->gpr[xSP];
- }
--
--void setup_rt_frame(int sig, struct target_sigaction *ka,
--                    target_siginfo_t *info,
--                    target_sigset_t *set, CPURISCVState *env);
- #endif /* TARGET_SIGNAL_H */
-diff --git a/linux-user/s390x/target_signal.h b/linux-user/s390x/target_signal.h
-index 9e3733bb38..4e99f8fadd 100644
---- a/linux-user/s390x/target_signal.h
-+++ b/linux-user/s390x/target_signal.h
-@@ -23,9 +23,5 @@ static inline abi_ulong get_sp_from_cpustate(CPUS390XState *state)
-    return state->regs[15];
- }
- 
--void setup_frame(int sig, struct target_sigaction *ka,
--                 target_sigset_t *set, CPUS390XState *env);
--void setup_rt_frame(int sig, struct target_sigaction *ka,
--                    target_siginfo_t *info,
--                    target_sigset_t *set, CPUS390XState *env);
-+#define TARGET_ARCH_HAS_SETUP_FRAME
- #endif /* S390X_TARGET_SIGNAL_H */
-diff --git a/linux-user/sh4/target_signal.h b/linux-user/sh4/target_signal.h
-index a2a93fa04a..e7b18a6db4 100644
---- a/linux-user/sh4/target_signal.h
-+++ b/linux-user/sh4/target_signal.h
-@@ -26,10 +26,5 @@ static inline abi_ulong get_sp_from_cpustate(CPUSH4State *state)
-     return state->gregs[15];
- }
- 
--void setup_frame(int sig, struct target_sigaction *ka,
--                 target_sigset_t *set, CPUSH4State *regs);
--void setup_rt_frame(int sig, struct target_sigaction *ka,
--                    target_siginfo_t *info,
--                    target_sigset_t *set, CPUSH4State *regs);
--
-+#define TARGET_ARCH_HAS_SETUP_FRAME
- #endif /* SH4_TARGET_SIGNAL_H */
-diff --git a/linux-user/signal-common.h b/linux-user/signal-common.h
-index 838b6e9198..fbb8d4365c 100644
---- a/linux-user/signal-common.h
-+++ b/linux-user/signal-common.h
-@@ -47,4 +47,11 @@ void tswap_siginfo(target_siginfo_t *tinfo,
- void set_sigmask(const sigset_t *set);
- void force_sig(int sig);
- void force_sigsegv(int oldsig);
-+#if defined(TARGET_ARCH_HAS_SETUP_FRAME)
-+void setup_frame(int sig, struct target_sigaction *ka,
-+                 target_sigset_t *set, CPUArchState *env);
+diff --git a/linux-user/openrisc/signal.c b/linux-user/openrisc/signal.c
+index 02ca338b6c..0276808b59 100644
+--- a/linux-user/openrisc/signal.c
++++ b/linux-user/openrisc/signal.c
+@@ -16,3 +16,216 @@
+  *  You should have received a copy of the GNU General Public License
+  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
++#include "qemu/osdep.h"
++#include "qemu.h"
++#include "target_signal.h"
++#include "signal-common.h"
++#include "linux-user/trace.h"
++
++struct target_sigcontext {
++    struct target_pt_regs regs;
++    abi_ulong oldmask;
++    abi_ulong usp;
++};
++
++struct target_ucontext {
++    abi_ulong tuc_flags;
++    abi_ulong tuc_link;
++    target_stack_t tuc_stack;
++    struct target_sigcontext tuc_mcontext;
++    target_sigset_t tuc_sigmask;   /* mask last for extensibility */
++};
++
++struct target_rt_sigframe {
++    abi_ulong pinfo;
++    uint64_t puc;
++    struct target_siginfo info;
++    struct target_sigcontext sc;
++    struct target_ucontext uc;
++    unsigned char retcode[16];  /* trampoline code */
++};
++
++/* This is the asm-generic/ucontext.h version */
++#if 0
++static int restore_sigcontext(CPUOpenRISCState *regs,
++                              struct target_sigcontext *sc)
++{
++    unsigned int err = 0;
++    unsigned long old_usp;
++
++    /* Alwys make any pending restarted system call return -EINTR */
++    current_thread_info()->restart_block.fn = do_no_restart_syscall;
++
++    /* restore the regs from &sc->regs (same as sc, since regs is first)
++     * (sc is already checked for VERIFY_READ since the sigframe was
++     *  checked in sys_sigreturn previously)
++     */
++
++    if (copy_from_user(regs, &sc, sizeof(struct target_pt_regs))) {
++        goto badframe;
++    }
++
++    /* make sure the U-flag is set so user-mode cannot fool us */
++
++    regs->sr &= ~SR_SM;
++
++    /* restore the old USP as it was before we stacked the sc etc.
++     * (we cannot just pop the sigcontext since we aligned the sp and
++     *  stuff after pushing it)
++     */
++
++    __get_user(old_usp, &sc->usp);
++    phx_signal("old_usp 0x%lx", old_usp);
++
++    __PHX__ REALLY           /* ??? */
++    wrusp(old_usp);
++    regs->gpr[1] = old_usp;
++
++    /* TODO: the other ports use regs->orig_XX to disable syscall checks
++     * after this completes, but we don't use that mechanism. maybe we can
++     * use it now ?
++     */
++
++    return err;
++
++badframe:
++    return 1;
++}
 +#endif
++
++/* Set up a signal frame.  */
++
++static void setup_sigcontext(struct target_sigcontext *sc,
++                             CPUOpenRISCState *regs,
++                             unsigned long mask)
++{
++    unsigned long usp = cpu_get_gpr(regs, 1);
++
++    /* copy the regs. they are first in sc so we can use sc directly */
++
++    /*copy_to_user(&sc, regs, sizeof(struct target_pt_regs));*/
++
++    /* Set the frametype to CRIS_FRAME_NORMAL for the execution of
++       the signal handler. The frametype will be restored to its previous
++       value in restore_sigcontext. */
++    /*regs->frametype = CRIS_FRAME_NORMAL;*/
++
++    /* then some other stuff */
++    __put_user(mask, &sc->oldmask);
++    __put_user(usp, &sc->usp);
++}
++
++static inline unsigned long align_sigframe(unsigned long sp)
++{
++    return sp & ~3UL;
++}
++
++static inline abi_ulong get_sigframe(struct target_sigaction *ka,
++                                     CPUOpenRISCState *regs,
++                                     size_t frame_size)
++{
++    unsigned long sp = cpu_get_gpr(regs, 1);
++    int onsigstack = on_sig_stack(sp);
++
++    /* redzone */
++    /* This is the X/Open sanctioned signal stack switching.  */
++    if ((ka->sa_flags & TARGET_SA_ONSTACK) != 0 && !onsigstack) {
++        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
++    }
++
++    sp = align_sigframe(sp - frame_size);
++
++    /*
++     * If we are on the alternate signal stack and would overflow it, don't.
++     * Return an always-bogus address instead so we will die with SIGSEGV.
++     */
++
++    if (onsigstack && !likely(on_sig_stack(sp))) {
++        return -1L;
++    }
++
++    return sp;
++}
++
 +void setup_rt_frame(int sig, struct target_sigaction *ka,
 +                    target_siginfo_t *info,
-+                    target_sigset_t *set, CPUArchState *env);
- #endif
++                    target_sigset_t *set, CPUOpenRISCState *env)
++{
++    int err = 0;
++    abi_ulong frame_addr;
++    unsigned long return_ip;
++    struct target_rt_sigframe *frame;
++    abi_ulong info_addr, uc_addr;
++
++    frame_addr = get_sigframe(ka, env, sizeof(*frame));
++    trace_user_setup_rt_frame(env, frame_addr);
++    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
++        goto give_sigsegv;
++    }
++
++    info_addr = frame_addr + offsetof(struct target_rt_sigframe, info);
++    __put_user(info_addr, &frame->pinfo);
++    uc_addr = frame_addr + offsetof(struct target_rt_sigframe, uc);
++    __put_user(uc_addr, &frame->puc);
++
++    if (ka->sa_flags & SA_SIGINFO) {
++        tswap_siginfo(&frame->info, info);
++    }
++
++    /*err |= __clear_user(&frame->uc, offsetof(ucontext_t, uc_mcontext));*/
++    __put_user(0, &frame->uc.tuc_flags);
++    __put_user(0, &frame->uc.tuc_link);
++    __put_user(target_sigaltstack_used.ss_sp,
++               &frame->uc.tuc_stack.ss_sp);
++    __put_user(sas_ss_flags(cpu_get_gpr(env, 1)),
++               &frame->uc.tuc_stack.ss_flags);
++    __put_user(target_sigaltstack_used.ss_size,
++               &frame->uc.tuc_stack.ss_size);
++    setup_sigcontext(&frame->sc, env, set->sig[0]);
++
++    /*err |= copy_to_user(frame->uc.tuc_sigmask, set, sizeof(*set));*/
++
++    /* trampoline - the desired return ip is the retcode itself */
++    return_ip = (unsigned long)&frame->retcode;
++    /* This is l.ori r11,r0,__NR_sigreturn, l.sys 1 */
++    __put_user(0xa960, (short *)(frame->retcode + 0));
++    __put_user(TARGET_NR_rt_sigreturn, (short *)(frame->retcode + 2));
++    __put_user(0x20000001, (unsigned long *)(frame->retcode + 4));
++    __put_user(0x15000000, (unsigned long *)(frame->retcode + 8));
++
++    if (err) {
++        goto give_sigsegv;
++    }
++
++    /* TODO what is the current->exec_domain stuff and invmap ? */
++
++    /* Set up registers for signal handler */
++    env->pc = (unsigned long)ka->_sa_handler; /* what we enter NOW */
++    cpu_set_gpr(env, 9, (unsigned long)return_ip);     /* what we enter LATER */
++    cpu_set_gpr(env, 3, (unsigned long)sig);           /* arg 1: signo */
++    cpu_set_gpr(env, 4, (unsigned long)&frame->info);  /* arg 2: (siginfo_t*) */
++    cpu_set_gpr(env, 5, (unsigned long)&frame->uc);    /* arg 3: ucontext */
++
++    /* actually move the usp to reflect the stacked frame */
++    cpu_set_gpr(env, 1, (unsigned long)frame);
++
++    return;
++
++give_sigsegv:
++    unlock_user_struct(frame, frame_addr, 1);
++    force_sigsegv(sig);
++}
++
++long do_sigreturn(CPUOpenRISCState *env)
++{
++    trace_user_do_sigreturn(env, 0);
++    fprintf(stderr, "do_sigreturn: not implemented\n");
++    return -TARGET_ENOSYS;
++}
++
++long do_rt_sigreturn(CPUOpenRISCState *env)
++{
++    trace_user_do_rt_sigreturn(env, 0);
++    fprintf(stderr, "do_rt_sigreturn: not implemented\n");
++    return -TARGET_ENOSYS;
++}
+diff --git a/linux-user/openrisc/target_signal.h b/linux-user/openrisc/target_signal.h
+index 95a733e15a..6c47ddf74e 100644
+--- a/linux-user/openrisc/target_signal.h
++++ b/linux-user/openrisc/target_signal.h
+@@ -23,5 +23,7 @@ static inline abi_ulong get_sp_from_cpustate(CPUOpenRISCState *state)
+     return cpu_get_gpr(state, 1);
+ }
+ 
+-
++void setup_rt_frame(int sig, struct target_sigaction *ka,
++                    target_siginfo_t *info,
++                    target_sigset_t *set, CPUOpenRISCState *env);
+ #endif /* OPENRISC_TARGET_SIGNAL_H */
 diff --git a/linux-user/signal.c b/linux-user/signal.c
-index 7f435c4606..a3022c2f04 100644
+index e943980ade..dd85209ef9 100644
 --- a/linux-user/signal.c
 +++ b/linux-user/signal.c
-@@ -873,18 +873,15 @@ static void handle_pending_signal(CPUArchState *cpu_env, int sig,
-         }
- #endif
-         /* prepare the stack frame of the virtual CPU */
--#if defined(TARGET_ABI_MIPSN32) || defined(TARGET_ABI_MIPSN64) \
--        || defined(TARGET_OPENRISC) || defined(TARGET_TILEGX) \
--        || defined(TARGET_PPC64) || defined(TARGET_HPPA) \
--        || defined(TARGET_NIOS2) || defined(TARGET_X86_64) \
--        || defined(TARGET_RISCV) || defined(TARGET_XTENSA)
--        /* These targets do not have traditional signals.  */
--        setup_rt_frame(sig, sa, &k->info, &target_old_set, cpu_env);
--#else
--        if (sa->sa_flags & TARGET_SA_SIGINFO)
-+#if defined(TARGET_ARCH_HAS_SETUP_FRAME)
-+        if (sa->sa_flags & TARGET_SA_SIGINFO) {
-             setup_rt_frame(sig, sa, &k->info, &target_old_set, cpu_env);
--        else
-+        } else {
-             setup_frame(sig, sa, &target_old_set, cpu_env);
-+        }
-+#else
-+        /* These targets do not have traditional signals.  */
-+        setup_rt_frame(sig, sa, &k->info, &target_old_set, cpu_env);
- #endif
-         if (sa->sa_flags & TARGET_SA_RESETHAND) {
-             sa->_sa_handler = TARGET_SIG_DFL;
-diff --git a/linux-user/sparc/target_signal.h b/linux-user/sparc/target_signal.h
-index ea2c68c900..467abea49e 100644
---- a/linux-user/sparc/target_signal.h
-+++ b/linux-user/sparc/target_signal.h
-@@ -33,9 +33,5 @@ static inline abi_ulong get_sp_from_cpustate(CPUSPARCState *state)
-     return state->regwptr[UREG_FP];
+@@ -2364,217 +2364,6 @@ badframe:
+     return -TARGET_QEMU_ESIGRETURN;
  }
  
--void setup_frame(int sig, struct target_sigaction *ka,
--                 target_sigset_t *set, CPUSPARCState *env);
--void setup_rt_frame(int sig, struct target_sigaction *ka,
--                    target_siginfo_t *info,
--                    target_sigset_t *set, CPUSPARCState *env);
-+#define TARGET_ARCH_HAS_SETUP_FRAME
- #endif /* SPARC_TARGET_SIGNAL_H */
-diff --git a/linux-user/sparc64/target_signal.h b/linux-user/sparc64/target_signal.h
-index 7f10db9ede..14b01d9632 100644
---- a/linux-user/sparc64/target_signal.h
-+++ b/linux-user/sparc64/target_signal.h
-@@ -33,9 +33,5 @@ static inline abi_ulong get_sp_from_cpustate(CPUSPARCState *state)
-     return state->regwptr[UREG_FP];
- }
+-#elif defined(TARGET_OPENRISC)
+-
+-struct target_sigcontext {
+-    struct target_pt_regs regs;
+-    abi_ulong oldmask;
+-    abi_ulong usp;
+-};
+-
+-struct target_ucontext {
+-    abi_ulong tuc_flags;
+-    abi_ulong tuc_link;
+-    target_stack_t tuc_stack;
+-    struct target_sigcontext tuc_mcontext;
+-    target_sigset_t tuc_sigmask;   /* mask last for extensibility */
+-};
+-
+-struct target_rt_sigframe {
+-    abi_ulong pinfo;
+-    uint64_t puc;
+-    struct target_siginfo info;
+-    struct target_sigcontext sc;
+-    struct target_ucontext uc;
+-    unsigned char retcode[16];  /* trampoline code */
+-};
+-
+-/* This is the asm-generic/ucontext.h version */
+-#if 0
+-static int restore_sigcontext(CPUOpenRISCState *regs,
+-                              struct target_sigcontext *sc)
+-{
+-    unsigned int err = 0;
+-    unsigned long old_usp;
+-
+-    /* Alwys make any pending restarted system call return -EINTR */
+-    current_thread_info()->restart_block.fn = do_no_restart_syscall;
+-
+-    /* restore the regs from &sc->regs (same as sc, since regs is first)
+-     * (sc is already checked for VERIFY_READ since the sigframe was
+-     *  checked in sys_sigreturn previously)
+-     */
+-
+-    if (copy_from_user(regs, &sc, sizeof(struct target_pt_regs))) {
+-        goto badframe;
+-    }
+-
+-    /* make sure the U-flag is set so user-mode cannot fool us */
+-
+-    regs->sr &= ~SR_SM;
+-
+-    /* restore the old USP as it was before we stacked the sc etc.
+-     * (we cannot just pop the sigcontext since we aligned the sp and
+-     *  stuff after pushing it)
+-     */
+-
+-    __get_user(old_usp, &sc->usp);
+-    phx_signal("old_usp 0x%lx", old_usp);
+-
+-    __PHX__ REALLY           /* ??? */
+-    wrusp(old_usp);
+-    regs->gpr[1] = old_usp;
+-
+-    /* TODO: the other ports use regs->orig_XX to disable syscall checks
+-     * after this completes, but we don't use that mechanism. maybe we can
+-     * use it now ?
+-     */
+-
+-    return err;
+-
+-badframe:
+-    return 1;
+-}
+-#endif
+-
+-/* Set up a signal frame.  */
+-
+-static void setup_sigcontext(struct target_sigcontext *sc,
+-                             CPUOpenRISCState *regs,
+-                             unsigned long mask)
+-{
+-    unsigned long usp = cpu_get_gpr(regs, 1);
+-
+-    /* copy the regs. they are first in sc so we can use sc directly */
+-
+-    /*copy_to_user(&sc, regs, sizeof(struct target_pt_regs));*/
+-
+-    /* Set the frametype to CRIS_FRAME_NORMAL for the execution of
+-       the signal handler. The frametype will be restored to its previous
+-       value in restore_sigcontext. */
+-    /*regs->frametype = CRIS_FRAME_NORMAL;*/
+-
+-    /* then some other stuff */
+-    __put_user(mask, &sc->oldmask);
+-    __put_user(usp, &sc->usp);
+-}
+-
+-static inline unsigned long align_sigframe(unsigned long sp)
+-{
+-    return sp & ~3UL;
+-}
+-
+-static inline abi_ulong get_sigframe(struct target_sigaction *ka,
+-                                     CPUOpenRISCState *regs,
+-                                     size_t frame_size)
+-{
+-    unsigned long sp = cpu_get_gpr(regs, 1);
+-    int onsigstack = on_sig_stack(sp);
+-
+-    /* redzone */
+-    /* This is the X/Open sanctioned signal stack switching.  */
+-    if ((ka->sa_flags & TARGET_SA_ONSTACK) != 0 && !onsigstack) {
+-        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
+-    }
+-
+-    sp = align_sigframe(sp - frame_size);
+-
+-    /*
+-     * If we are on the alternate signal stack and would overflow it, don't.
+-     * Return an always-bogus address instead so we will die with SIGSEGV.
+-     */
+-
+-    if (onsigstack && !likely(on_sig_stack(sp))) {
+-        return -1L;
+-    }
+-
+-    return sp;
+-}
+-
+-static void setup_rt_frame(int sig, struct target_sigaction *ka,
+-                           target_siginfo_t *info,
+-                           target_sigset_t *set, CPUOpenRISCState *env)
+-{
+-    int err = 0;
+-    abi_ulong frame_addr;
+-    unsigned long return_ip;
+-    struct target_rt_sigframe *frame;
+-    abi_ulong info_addr, uc_addr;
+-
+-    frame_addr = get_sigframe(ka, env, sizeof(*frame));
+-    trace_user_setup_rt_frame(env, frame_addr);
+-    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
+-        goto give_sigsegv;
+-    }
+-
+-    info_addr = frame_addr + offsetof(struct target_rt_sigframe, info);
+-    __put_user(info_addr, &frame->pinfo);
+-    uc_addr = frame_addr + offsetof(struct target_rt_sigframe, uc);
+-    __put_user(uc_addr, &frame->puc);
+-
+-    if (ka->sa_flags & SA_SIGINFO) {
+-        tswap_siginfo(&frame->info, info);
+-    }
+-
+-    /*err |= __clear_user(&frame->uc, offsetof(ucontext_t, uc_mcontext));*/
+-    __put_user(0, &frame->uc.tuc_flags);
+-    __put_user(0, &frame->uc.tuc_link);
+-    __put_user(target_sigaltstack_used.ss_sp,
+-               &frame->uc.tuc_stack.ss_sp);
+-    __put_user(sas_ss_flags(cpu_get_gpr(env, 1)),
+-               &frame->uc.tuc_stack.ss_flags);
+-    __put_user(target_sigaltstack_used.ss_size,
+-               &frame->uc.tuc_stack.ss_size);
+-    setup_sigcontext(&frame->sc, env, set->sig[0]);
+-
+-    /*err |= copy_to_user(frame->uc.tuc_sigmask, set, sizeof(*set));*/
+-
+-    /* trampoline - the desired return ip is the retcode itself */
+-    return_ip = (unsigned long)&frame->retcode;
+-    /* This is l.ori r11,r0,__NR_sigreturn, l.sys 1 */
+-    __put_user(0xa960, (short *)(frame->retcode + 0));
+-    __put_user(TARGET_NR_rt_sigreturn, (short *)(frame->retcode + 2));
+-    __put_user(0x20000001, (unsigned long *)(frame->retcode + 4));
+-    __put_user(0x15000000, (unsigned long *)(frame->retcode + 8));
+-
+-    if (err) {
+-        goto give_sigsegv;
+-    }
+-
+-    /* TODO what is the current->exec_domain stuff and invmap ? */
+-
+-    /* Set up registers for signal handler */
+-    env->pc = (unsigned long)ka->_sa_handler; /* what we enter NOW */
+-    cpu_set_gpr(env, 9, (unsigned long)return_ip);     /* what we enter LATER */
+-    cpu_set_gpr(env, 3, (unsigned long)sig);           /* arg 1: signo */
+-    cpu_set_gpr(env, 4, (unsigned long)&frame->info);  /* arg 2: (siginfo_t*) */
+-    cpu_set_gpr(env, 5, (unsigned long)&frame->uc);    /* arg 3: ucontext */
+-
+-    /* actually move the usp to reflect the stacked frame */
+-    cpu_set_gpr(env, 1, (unsigned long)frame);
+-
+-    return;
+-
+-give_sigsegv:
+-    unlock_user_struct(frame, frame_addr, 1);
+-    force_sigsegv(sig);
+-}
+-
+-long do_sigreturn(CPUOpenRISCState *env)
+-{
+-    trace_user_do_sigreturn(env, 0);
+-    fprintf(stderr, "do_sigreturn: not implemented\n");
+-    return -TARGET_ENOSYS;
+-}
+-
+-long do_rt_sigreturn(CPUOpenRISCState *env)
+-{
+-    trace_user_do_rt_sigreturn(env, 0);
+-    fprintf(stderr, "do_rt_sigreturn: not implemented\n");
+-    return -TARGET_ENOSYS;
+-}
+-/* TARGET_OPENRISC */
+-
+ #elif defined(TARGET_S390X)
  
--void setup_frame(int sig, struct target_sigaction *ka,
--                 target_sigset_t *set, CPUSPARCState *env);
--void setup_rt_frame(int sig, struct target_sigaction *ka,
--                    target_siginfo_t *info,
--                    target_sigset_t *set, CPUSPARCState *env);
-+#define TARGET_ARCH_HAS_SETUP_FRAME
- #endif /* SPARC64_TARGET_SIGNAL_H */
-diff --git a/linux-user/tilegx/target_signal.h b/linux-user/tilegx/target_signal.h
-index 132d7781fe..a74fa37aac 100644
---- a/linux-user/tilegx/target_signal.h
-+++ b/linux-user/tilegx/target_signal.h
-@@ -24,8 +24,4 @@ static inline abi_ulong get_sp_from_cpustate(CPUTLGState *state)
- {
-     return state->regs[TILEGX_R_SP];
- }
--
--void setup_rt_frame(int sig, struct target_sigaction *ka,
--                    target_siginfo_t *info,
--                    target_sigset_t *set, CPUArchState *env);
- #endif /* TILEGX_TARGET_SIGNAL_H */
-diff --git a/linux-user/x86_64/target_signal.h b/linux-user/x86_64/target_signal.h
-index 26f96944e5..6b01b5acb7 100644
---- a/linux-user/x86_64/target_signal.h
-+++ b/linux-user/x86_64/target_signal.h
-@@ -25,8 +25,4 @@ static inline abi_ulong get_sp_from_cpustate(CPUX86State *state)
- {
-     return state->regs[R_ESP];
- }
--
--void setup_rt_frame(int sig, struct target_sigaction *ka,
--                    target_siginfo_t *info,
--                    target_sigset_t *set, CPUX86State *env);
- #endif /* X86_64_TARGET_SIGNAL_H */
-diff --git a/linux-user/xtensa/target_signal.h b/linux-user/xtensa/target_signal.h
-index f6545903a4..4376b2e538 100644
---- a/linux-user/xtensa/target_signal.h
-+++ b/linux-user/xtensa/target_signal.h
-@@ -24,8 +24,4 @@ static inline abi_ulong get_sp_from_cpustate(CPUXtensaState *state)
- {
-     return state->regs[1];
- }
--
--void setup_rt_frame(int sig, struct target_sigaction *ka,
--                    target_siginfo_t *info,
--                    target_sigset_t *set, CPUXtensaState *env);
- #endif
+ #define __NUM_GPRS 16
 -- 
 2.14.3
