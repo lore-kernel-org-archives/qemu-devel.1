@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fDBqo-0005xv-QZ
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 12:40:31 -0400
+	(envelope-from <eblake@redhat.com>) id 1fDBuX-0006lc-DX
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 12:44:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fDBqn-0003uM-IW
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 12:40:30 -0400
+	(envelope-from <eblake@redhat.com>) id 1fDBuW-0006B3-L2
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 12:44:21 -0400
 References: <20180428144123.30333-1-mreitz@redhat.com>
-	<20180428144123.30333-5-mreitz@redhat.com>
+	<20180428144123.30333-6-mreitz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <eea123af-ec17-beb5-74b6-0fd81d22e138@redhat.com>
-Date: Mon, 30 Apr 2018 11:40:23 -0500
+Message-ID: <b9482f2c-31a8-9d94-9e02-357eb1c1d3d8@redhat.com>
+Date: Mon, 30 Apr 2018 11:44:04 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180428144123.30333-5-mreitz@redhat.com>
+In-Reply-To: <20180428144123.30333-6-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/5] iotests.py: Add qemu_io_silent
+Subject: Re: [Qemu-devel] [PATCH 5/5] iotests: Let 216 make use of qemu-io's
+ exit code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,14 +29,26 @@ To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
 On 04/28/2018 09:41 AM, Max Reitz wrote:
-> With qemu-io now returning a useful exit code, some tests may find it
-> sufficient to just query that instead of logging (and filtering) the
-> whole output.
+> As a showcase of how you can use qemu-io's exit code to determine
+> success or failure (same for qemu-img), this test is changed to use
+> qemu_io_silent() instead of qemu_io(), and to assert the exit code
+> instead of logging the filtered result.
+> 
+> One real advantage of this is that in case of an error, you get a
+> backtrace that helps you locate the issue in the test file quickly.
 > 
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->   tests/qemu-iotests/iotests.py | 9 +++++++++
->   1 file changed, 9 insertions(+)
+>   tests/qemu-iotests/216     | 23 ++++++++++++-----------
+>   tests/qemu-iotests/216.out | 17 ++---------------
+>   2 files changed, 14 insertions(+), 26 deletions(-)
+
+> -    qemu_img_pipe('create', '-f', iotests.imgfmt, base_img_path, '64M')
+> +    assert qemu_img('create', '-f', iotests.imgfmt, base_img_path, '64M') == 0
+
+Yeah, I can see how writing the setup for a test gets simpler when you 
+don't have to worry about logging and filtering the stuff that isn't the 
+heart of the test.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
