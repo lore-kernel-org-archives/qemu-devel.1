@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fD4qf-0006xW-V2
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:12:05 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fD4qs-00078f-UI
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:12:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fD4qT-0006dT-3D
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:11:53 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fD4qd-0006qX-Pd
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:12:06 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon, 30 Apr 2018 11:10:13 +0200
-Message-Id: <20180430091037.13878-19-laurent@vivier.eu>
+Date: Mon, 30 Apr 2018 11:10:18 +0200
+Message-Id: <20180430091037.13878-24-laurent@vivier.eu>
 In-Reply-To: <20180430091037.13878-1-laurent@vivier.eu>
 References: <20180430091037.13878-1-laurent@vivier.eu>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 18/42] linux-user: move i386/x86_64 signal.c
- parts to i386 directory
+Subject: [Qemu-devel] [PULL 23/42] linux-user: create a dummy per arch
+ cpu_loop.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,1244 +23,845 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Cornelia Huck <cohuck@redhat.com>
 
-No code change, only move code from signal.c to
-i386/signal.c, except adding includes and
-exporting setup_frame() and setup_rt_frame().
+Create a cpu_loop-common.h for future use by
+these new files and use it in the existing
+main.c
 
-x86_64/signal.c includes i386/signal.c
+Introduce target_cpu_copy_regs():
+declare the function in cpu_loop-common.h
+and an empty function for each target,
+to move all the cpu_loop prologues to this function.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20180424192635.6027-17-laurent@vivier.eu>
+Message-Id: <20180411185651.21351-2-laurent@vivier.eu>
 ---
- linux-user/i386/signal.c          | 584 ++++++++++++++++++++++++++++++++++++++
- linux-user/i386/target_signal.h   |   5 +
- linux-user/signal.c               | 582 +------------------------------------
- linux-user/x86_64/signal.c        |   2 +
- linux-user/x86_64/target_signal.h |   3 +
- 5 files changed, 595 insertions(+), 581 deletions(-)
+ linux-user/Makefile.objs         |  3 ++-
+ linux-user/aarch64/cpu_loop.c    | 26 ++++++++++++++++++++++++++
+ linux-user/alpha/cpu_loop.c      | 26 ++++++++++++++++++++++++++
+ linux-user/arm/cpu_loop.c        | 26 ++++++++++++++++++++++++++
+ linux-user/cpu_loop-common.h     | 37 +++++++++++++++++++++++++++++++++++++
+ linux-user/cris/cpu_loop.c       | 26 ++++++++++++++++++++++++++
+ linux-user/hppa/cpu_loop.c       | 26 ++++++++++++++++++++++++++
+ linux-user/i386/cpu_loop.c       | 26 ++++++++++++++++++++++++++
+ linux-user/m68k/cpu_loop.c       | 26 ++++++++++++++++++++++++++
+ linux-user/main.c                | 17 +++--------------
+ linux-user/microblaze/cpu_loop.c | 26 ++++++++++++++++++++++++++
+ linux-user/mips/cpu_loop.c       | 26 ++++++++++++++++++++++++++
+ linux-user/mips64/cpu_loop.c     | 26 ++++++++++++++++++++++++++
+ linux-user/nios2/cpu_loop.c      | 26 ++++++++++++++++++++++++++
+ linux-user/openrisc/cpu_loop.c   | 26 ++++++++++++++++++++++++++
+ linux-user/ppc/cpu_loop.c        | 26 ++++++++++++++++++++++++++
+ linux-user/riscv/cpu_loop.c      | 26 ++++++++++++++++++++++++++
+ linux-user/s390x/cpu_loop.c      | 26 ++++++++++++++++++++++++++
+ linux-user/sh4/cpu_loop.c        | 26 ++++++++++++++++++++++++++
+ linux-user/sparc/cpu_loop.c      | 26 ++++++++++++++++++++++++++
+ linux-user/sparc64/cpu_loop.c    | 26 ++++++++++++++++++++++++++
+ linux-user/tilegx/cpu_loop.c     | 26 ++++++++++++++++++++++++++
+ linux-user/x86_64/cpu_loop.c     | 26 ++++++++++++++++++++++++++
+ linux-user/xtensa/cpu_loop.c     | 26 ++++++++++++++++++++++++++
+ 24 files changed, 588 insertions(+), 15 deletions(-)
+ create mode 100644 linux-user/aarch64/cpu_loop.c
+ create mode 100644 linux-user/alpha/cpu_loop.c
+ create mode 100644 linux-user/arm/cpu_loop.c
+ create mode 100644 linux-user/cpu_loop-common.h
+ create mode 100644 linux-user/cris/cpu_loop.c
+ create mode 100644 linux-user/hppa/cpu_loop.c
+ create mode 100644 linux-user/i386/cpu_loop.c
+ create mode 100644 linux-user/m68k/cpu_loop.c
+ create mode 100644 linux-user/microblaze/cpu_loop.c
+ create mode 100644 linux-user/mips/cpu_loop.c
+ create mode 100644 linux-user/mips64/cpu_loop.c
+ create mode 100644 linux-user/nios2/cpu_loop.c
+ create mode 100644 linux-user/openrisc/cpu_loop.c
+ create mode 100644 linux-user/ppc/cpu_loop.c
+ create mode 100644 linux-user/riscv/cpu_loop.c
+ create mode 100644 linux-user/s390x/cpu_loop.c
+ create mode 100644 linux-user/sh4/cpu_loop.c
+ create mode 100644 linux-user/sparc/cpu_loop.c
+ create mode 100644 linux-user/sparc64/cpu_loop.c
+ create mode 100644 linux-user/tilegx/cpu_loop.c
+ create mode 100644 linux-user/x86_64/cpu_loop.c
+ create mode 100644 linux-user/xtensa/cpu_loop.c
 
-diff --git a/linux-user/i386/signal.c b/linux-user/i386/signal.c
-index 02ca338b6c..4a190e6435 100644
---- a/linux-user/i386/signal.c
-+++ b/linux-user/i386/signal.c
-@@ -16,3 +16,587 @@
-  *  You should have received a copy of the GNU General Public License
-  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
+diff --git a/linux-user/Makefile.objs b/linux-user/Makefile.objs
+index 811a7f5ce5..59a5c17354 100644
+--- a/linux-user/Makefile.objs
++++ b/linux-user/Makefile.objs
+@@ -1,6 +1,7 @@
+ obj-y = main.o syscall.o strace.o mmap.o signal.o \
+ 	elfload.o linuxload.o uaccess.o uname.o \
+-	safe-syscall.o $(TARGET_ABI_DIR)/signal.o
++	safe-syscall.o $(TARGET_ABI_DIR)/signal.o \
++        $(TARGET_ABI_DIR)/cpu_loop.o
+ 
+ obj-$(TARGET_HAS_BFLT) += flatload.o
+ obj-$(TARGET_I386) += vm86.o
+diff --git a/linux-user/aarch64/cpu_loop.c b/linux-user/aarch64/cpu_loop.c
+new file mode 100644
+index 0000000000..b7700a5561
+--- /dev/null
++++ b/linux-user/aarch64/cpu_loop.c
+@@ -0,0 +1,26 @@
++/*
++ *  qemu user cpu loop
++ *
++ *  Copyright (c) 2003-2008 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
 +#include "qemu/osdep.h"
 +#include "qemu.h"
-+#include "target_signal.h"
-+#include "signal-common.h"
-+#include "linux-user/trace.h"
++#include "cpu_loop-common.h"
 +
-+/* from the Linux kernel - /arch/x86/include/uapi/asm/sigcontext.h */
-+
-+struct target_fpreg {
-+    uint16_t significand[4];
-+    uint16_t exponent;
-+};
-+
-+struct target_fpxreg {
-+    uint16_t significand[4];
-+    uint16_t exponent;
-+    uint16_t padding[3];
-+};
-+
-+struct target_xmmreg {
-+    uint32_t element[4];
-+};
-+
-+struct target_fpstate_32 {
-+    /* Regular FPU environment */
-+    uint32_t cw;
-+    uint32_t sw;
-+    uint32_t tag;
-+    uint32_t ipoff;
-+    uint32_t cssel;
-+    uint32_t dataoff;
-+    uint32_t datasel;
-+    struct target_fpreg st[8];
-+    uint16_t  status;
-+    uint16_t  magic;          /* 0xffff = regular FPU data only */
-+
-+    /* FXSR FPU environment */
-+    uint32_t _fxsr_env[6];   /* FXSR FPU env is ignored */
-+    uint32_t mxcsr;
-+    uint32_t reserved;
-+    struct target_fpxreg fxsr_st[8]; /* FXSR FPU reg data is ignored */
-+    struct target_xmmreg xmm[8];
-+    uint32_t padding[56];
-+};
-+
-+struct target_fpstate_64 {
-+    /* FXSAVE format */
-+    uint16_t cw;
-+    uint16_t sw;
-+    uint16_t twd;
-+    uint16_t fop;
-+    uint64_t rip;
-+    uint64_t rdp;
-+    uint32_t mxcsr;
-+    uint32_t mxcsr_mask;
-+    uint32_t st_space[32];
-+    uint32_t xmm_space[64];
-+    uint32_t reserved[24];
-+};
-+
-+#ifndef TARGET_X86_64
-+# define target_fpstate target_fpstate_32
-+#else
-+# define target_fpstate target_fpstate_64
-+#endif
-+
-+struct target_sigcontext_32 {
-+    uint16_t gs, __gsh;
-+    uint16_t fs, __fsh;
-+    uint16_t es, __esh;
-+    uint16_t ds, __dsh;
-+    uint32_t edi;
-+    uint32_t esi;
-+    uint32_t ebp;
-+    uint32_t esp;
-+    uint32_t ebx;
-+    uint32_t edx;
-+    uint32_t ecx;
-+    uint32_t eax;
-+    uint32_t trapno;
-+    uint32_t err;
-+    uint32_t eip;
-+    uint16_t cs, __csh;
-+    uint32_t eflags;
-+    uint32_t esp_at_signal;
-+    uint16_t ss, __ssh;
-+    uint32_t fpstate; /* pointer */
-+    uint32_t oldmask;
-+    uint32_t cr2;
-+};
-+
-+struct target_sigcontext_64 {
-+    uint64_t r8;
-+    uint64_t r9;
-+    uint64_t r10;
-+    uint64_t r11;
-+    uint64_t r12;
-+    uint64_t r13;
-+    uint64_t r14;
-+    uint64_t r15;
-+
-+    uint64_t rdi;
-+    uint64_t rsi;
-+    uint64_t rbp;
-+    uint64_t rbx;
-+    uint64_t rdx;
-+    uint64_t rax;
-+    uint64_t rcx;
-+    uint64_t rsp;
-+    uint64_t rip;
-+
-+    uint64_t eflags;
-+
-+    uint16_t cs;
-+    uint16_t gs;
-+    uint16_t fs;
-+    uint16_t ss;
-+
-+    uint64_t err;
-+    uint64_t trapno;
-+    uint64_t oldmask;
-+    uint64_t cr2;
-+
-+    uint64_t fpstate; /* pointer */
-+    uint64_t padding[8];
-+};
-+
-+#ifndef TARGET_X86_64
-+# define target_sigcontext target_sigcontext_32
-+#else
-+# define target_sigcontext target_sigcontext_64
-+#endif
-+
-+/* see Linux/include/uapi/asm-generic/ucontext.h */
-+struct target_ucontext {
-+    abi_ulong         tuc_flags;
-+    abi_ulong         tuc_link;
-+    target_stack_t    tuc_stack;
-+    struct target_sigcontext tuc_mcontext;
-+    target_sigset_t   tuc_sigmask;  /* mask last for extensibility */
-+};
-+
-+#ifndef TARGET_X86_64
-+struct sigframe {
-+    abi_ulong pretcode;
-+    int sig;
-+    struct target_sigcontext sc;
-+    struct target_fpstate fpstate;
-+    abi_ulong extramask[TARGET_NSIG_WORDS-1];
-+    char retcode[8];
-+};
-+
-+struct rt_sigframe {
-+    abi_ulong pretcode;
-+    int sig;
-+    abi_ulong pinfo;
-+    abi_ulong puc;
-+    struct target_siginfo info;
-+    struct target_ucontext uc;
-+    struct target_fpstate fpstate;
-+    char retcode[8];
-+};
-+
-+#else
-+
-+struct rt_sigframe {
-+    abi_ulong pretcode;
-+    struct target_ucontext uc;
-+    struct target_siginfo info;
-+    struct target_fpstate fpstate;
-+};
-+
-+#endif
-+
++void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
++{
++}
+diff --git a/linux-user/alpha/cpu_loop.c b/linux-user/alpha/cpu_loop.c
+new file mode 100644
+index 0000000000..b7700a5561
+--- /dev/null
++++ b/linux-user/alpha/cpu_loop.c
+@@ -0,0 +1,26 @@
 +/*
-+ * Set up a signal frame.
++ *  qemu user cpu loop
++ *
++ *  Copyright (c) 2003-2008 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+/* XXX: save x87 state */
-+static void setup_sigcontext(struct target_sigcontext *sc,
-+        struct target_fpstate *fpstate, CPUX86State *env, abi_ulong mask,
-+        abi_ulong fpstate_addr)
++#include "qemu/osdep.h"
++#include "qemu.h"
++#include "cpu_loop-common.h"
++
++void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
 +{
-+    CPUState *cs = CPU(x86_env_get_cpu(env));
-+#ifndef TARGET_X86_64
-+    uint16_t magic;
-+
-+    /* already locked in setup_frame() */
-+    __put_user(env->segs[R_GS].selector, (unsigned int *)&sc->gs);
-+    __put_user(env->segs[R_FS].selector, (unsigned int *)&sc->fs);
-+    __put_user(env->segs[R_ES].selector, (unsigned int *)&sc->es);
-+    __put_user(env->segs[R_DS].selector, (unsigned int *)&sc->ds);
-+    __put_user(env->regs[R_EDI], &sc->edi);
-+    __put_user(env->regs[R_ESI], &sc->esi);
-+    __put_user(env->regs[R_EBP], &sc->ebp);
-+    __put_user(env->regs[R_ESP], &sc->esp);
-+    __put_user(env->regs[R_EBX], &sc->ebx);
-+    __put_user(env->regs[R_EDX], &sc->edx);
-+    __put_user(env->regs[R_ECX], &sc->ecx);
-+    __put_user(env->regs[R_EAX], &sc->eax);
-+    __put_user(cs->exception_index, &sc->trapno);
-+    __put_user(env->error_code, &sc->err);
-+    __put_user(env->eip, &sc->eip);
-+    __put_user(env->segs[R_CS].selector, (unsigned int *)&sc->cs);
-+    __put_user(env->eflags, &sc->eflags);
-+    __put_user(env->regs[R_ESP], &sc->esp_at_signal);
-+    __put_user(env->segs[R_SS].selector, (unsigned int *)&sc->ss);
-+
-+    cpu_x86_fsave(env, fpstate_addr, 1);
-+    fpstate->status = fpstate->sw;
-+    magic = 0xffff;
-+    __put_user(magic, &fpstate->magic);
-+    __put_user(fpstate_addr, &sc->fpstate);
-+
-+    /* non-iBCS2 extensions.. */
-+    __put_user(mask, &sc->oldmask);
-+    __put_user(env->cr[2], &sc->cr2);
-+#else
-+    __put_user(env->regs[R_EDI], &sc->rdi);
-+    __put_user(env->regs[R_ESI], &sc->rsi);
-+    __put_user(env->regs[R_EBP], &sc->rbp);
-+    __put_user(env->regs[R_ESP], &sc->rsp);
-+    __put_user(env->regs[R_EBX], &sc->rbx);
-+    __put_user(env->regs[R_EDX], &sc->rdx);
-+    __put_user(env->regs[R_ECX], &sc->rcx);
-+    __put_user(env->regs[R_EAX], &sc->rax);
-+
-+    __put_user(env->regs[8], &sc->r8);
-+    __put_user(env->regs[9], &sc->r9);
-+    __put_user(env->regs[10], &sc->r10);
-+    __put_user(env->regs[11], &sc->r11);
-+    __put_user(env->regs[12], &sc->r12);
-+    __put_user(env->regs[13], &sc->r13);
-+    __put_user(env->regs[14], &sc->r14);
-+    __put_user(env->regs[15], &sc->r15);
-+
-+    __put_user(cs->exception_index, &sc->trapno);
-+    __put_user(env->error_code, &sc->err);
-+    __put_user(env->eip, &sc->rip);
-+
-+    __put_user(env->eflags, &sc->eflags);
-+    __put_user(env->segs[R_CS].selector, &sc->cs);
-+    __put_user((uint16_t)0, &sc->gs);
-+    __put_user((uint16_t)0, &sc->fs);
-+    __put_user(env->segs[R_SS].selector, &sc->ss);
-+
-+    __put_user(mask, &sc->oldmask);
-+    __put_user(env->cr[2], &sc->cr2);
-+
-+    /* fpstate_addr must be 16 byte aligned for fxsave */
-+    assert(!(fpstate_addr & 0xf));
-+
-+    cpu_x86_fxsave(env, fpstate_addr);
-+    __put_user(fpstate_addr, &sc->fpstate);
-+#endif
 +}
-+
+diff --git a/linux-user/arm/cpu_loop.c b/linux-user/arm/cpu_loop.c
+new file mode 100644
+index 0000000000..b7700a5561
+--- /dev/null
++++ b/linux-user/arm/cpu_loop.c
+@@ -0,0 +1,26 @@
 +/*
-+ * Determine which stack to use..
++ *  qemu user cpu loop
++ *
++ *  Copyright (c) 2003-2008 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+static inline abi_ulong
-+get_sigframe(struct target_sigaction *ka, CPUX86State *env, size_t frame_size)
++#include "qemu/osdep.h"
++#include "qemu.h"
++#include "cpu_loop-common.h"
++
++void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
 +{
-+    unsigned long esp;
-+
-+    /* Default to using normal stack */
-+    esp = env->regs[R_ESP];
-+#ifdef TARGET_X86_64
-+    esp -= 128; /* this is the redzone */
-+#endif
-+
-+    /* This is the X/Open sanctioned signal stack switching.  */
-+    if (ka->sa_flags & TARGET_SA_ONSTACK) {
-+        if (sas_ss_flags(esp) == 0) {
-+            esp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
-+        }
-+    } else {
-+#ifndef TARGET_X86_64
-+        /* This is the legacy signal stack switching. */
-+        if ((env->segs[R_SS].selector & 0xffff) != __USER_DS &&
-+                !(ka->sa_flags & TARGET_SA_RESTORER) &&
-+                ka->sa_restorer) {
-+            esp = (unsigned long) ka->sa_restorer;
-+        }
-+#endif
-+    }
-+
-+#ifndef TARGET_X86_64
-+    return (esp - frame_size) & -8ul;
-+#else
-+    return ((esp - frame_size) & (~15ul)) - 8;
-+#endif
 +}
+diff --git a/linux-user/cpu_loop-common.h b/linux-user/cpu_loop-common.h
+new file mode 100644
+index 0000000000..ffe3fe9ad5
+--- /dev/null
++++ b/linux-user/cpu_loop-common.h
+@@ -0,0 +1,37 @@
++/*
++ *  qemu user cpu loop
++ *
++ *  Copyright (c) 2003-2008 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
 +
-+#ifndef TARGET_X86_64
-+/* compare linux/arch/i386/kernel/signal.c:setup_frame() */
-+void setup_frame(int sig, struct target_sigaction *ka,
-+                 target_sigset_t *set, CPUX86State *env)
++#ifndef CPU_LOOP_COMMON_H
++#define CPU_LOOP_COMMON_H
++
++#include "exec/log.h"
++
++#define EXCP_DUMP(env, fmt, ...)                                        \
++do {                                                                    \
++    CPUState *cs = ENV_GET_CPU(env);                                    \
++    fprintf(stderr, fmt , ## __VA_ARGS__);                              \
++    cpu_dump_state(cs, stderr, fprintf, 0);                             \
++    if (qemu_log_separate()) {                                          \
++        qemu_log(fmt, ## __VA_ARGS__);                                  \
++        log_cpu_state(cs, 0);                                           \
++    }                                                                   \
++} while (0)
++
++void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs);
++#endif
+diff --git a/linux-user/cris/cpu_loop.c b/linux-user/cris/cpu_loop.c
+new file mode 100644
+index 0000000000..b7700a5561
+--- /dev/null
++++ b/linux-user/cris/cpu_loop.c
+@@ -0,0 +1,26 @@
++/*
++ *  qemu user cpu loop
++ *
++ *  Copyright (c) 2003-2008 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu.h"
++#include "cpu_loop-common.h"
++
++void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
 +{
-+    abi_ulong frame_addr;
-+    struct sigframe *frame;
-+    int i;
-+
-+    frame_addr = get_sigframe(ka, env, sizeof(*frame));
-+    trace_user_setup_frame(env, frame_addr);
-+
-+    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0))
-+        goto give_sigsegv;
-+
-+    __put_user(sig, &frame->sig);
-+
-+    setup_sigcontext(&frame->sc, &frame->fpstate, env, set->sig[0],
-+            frame_addr + offsetof(struct sigframe, fpstate));
-+
-+    for(i = 1; i < TARGET_NSIG_WORDS; i++) {
-+        __put_user(set->sig[i], &frame->extramask[i - 1]);
-+    }
-+
-+    /* Set up to return from userspace.  If provided, use a stub
-+       already in userspace.  */
-+    if (ka->sa_flags & TARGET_SA_RESTORER) {
-+        __put_user(ka->sa_restorer, &frame->pretcode);
-+    } else {
-+        uint16_t val16;
-+        abi_ulong retcode_addr;
-+        retcode_addr = frame_addr + offsetof(struct sigframe, retcode);
-+        __put_user(retcode_addr, &frame->pretcode);
-+        /* This is popl %eax ; movl $,%eax ; int $0x80 */
-+        val16 = 0xb858;
-+        __put_user(val16, (uint16_t *)(frame->retcode+0));
-+        __put_user(TARGET_NR_sigreturn, (int *)(frame->retcode+2));
-+        val16 = 0x80cd;
-+        __put_user(val16, (uint16_t *)(frame->retcode+6));
-+    }
-+
-+    /* Set up registers for signal handler */
-+    env->regs[R_ESP] = frame_addr;
-+    env->eip = ka->_sa_handler;
-+
-+    cpu_x86_load_seg(env, R_DS, __USER_DS);
-+    cpu_x86_load_seg(env, R_ES, __USER_DS);
-+    cpu_x86_load_seg(env, R_SS, __USER_DS);
-+    cpu_x86_load_seg(env, R_CS, __USER_CS);
-+    env->eflags &= ~TF_MASK;
-+
-+    unlock_user_struct(frame, frame_addr, 1);
-+
-+    return;
-+
-+give_sigsegv:
-+    force_sigsegv(sig);
 +}
-+#endif
+diff --git a/linux-user/hppa/cpu_loop.c b/linux-user/hppa/cpu_loop.c
+new file mode 100644
+index 0000000000..b7700a5561
+--- /dev/null
++++ b/linux-user/hppa/cpu_loop.c
+@@ -0,0 +1,26 @@
++/*
++ *  qemu user cpu loop
++ *
++ *  Copyright (c) 2003-2008 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
 +
-+/* compare linux/arch/x86/kernel/signal.c:setup_rt_frame() */
-+void setup_rt_frame(int sig, struct target_sigaction *ka,
-+                    target_siginfo_t *info,
-+                    target_sigset_t *set, CPUX86State *env)
++#include "qemu/osdep.h"
++#include "qemu.h"
++#include "cpu_loop-common.h"
++
++void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
 +{
-+    abi_ulong frame_addr;
-+#ifndef TARGET_X86_64
-+    abi_ulong addr;
-+#endif
-+    struct rt_sigframe *frame;
-+    int i;
-+
-+    frame_addr = get_sigframe(ka, env, sizeof(*frame));
-+    trace_user_setup_rt_frame(env, frame_addr);
-+
-+    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0))
-+        goto give_sigsegv;
-+
-+    /* These fields are only in rt_sigframe on 32 bit */
-+#ifndef TARGET_X86_64
-+    __put_user(sig, &frame->sig);
-+    addr = frame_addr + offsetof(struct rt_sigframe, info);
-+    __put_user(addr, &frame->pinfo);
-+    addr = frame_addr + offsetof(struct rt_sigframe, uc);
-+    __put_user(addr, &frame->puc);
-+#endif
-+    if (ka->sa_flags & TARGET_SA_SIGINFO) {
-+        tswap_siginfo(&frame->info, info);
-+    }
-+
-+    /* Create the ucontext.  */
-+    __put_user(0, &frame->uc.tuc_flags);
-+    __put_user(0, &frame->uc.tuc_link);
-+    __put_user(target_sigaltstack_used.ss_sp, &frame->uc.tuc_stack.ss_sp);
-+    __put_user(sas_ss_flags(get_sp_from_cpustate(env)),
-+               &frame->uc.tuc_stack.ss_flags);
-+    __put_user(target_sigaltstack_used.ss_size,
-+               &frame->uc.tuc_stack.ss_size);
-+    setup_sigcontext(&frame->uc.tuc_mcontext, &frame->fpstate, env,
-+            set->sig[0], frame_addr + offsetof(struct rt_sigframe, fpstate));
-+
-+    for(i = 0; i < TARGET_NSIG_WORDS; i++) {
-+        __put_user(set->sig[i], &frame->uc.tuc_sigmask.sig[i]);
-+    }
-+
-+    /* Set up to return from userspace.  If provided, use a stub
-+       already in userspace.  */
-+#ifndef TARGET_X86_64
-+    if (ka->sa_flags & TARGET_SA_RESTORER) {
-+        __put_user(ka->sa_restorer, &frame->pretcode);
-+    } else {
-+        uint16_t val16;
-+        addr = frame_addr + offsetof(struct rt_sigframe, retcode);
-+        __put_user(addr, &frame->pretcode);
-+        /* This is movl $,%eax ; int $0x80 */
-+        __put_user(0xb8, (char *)(frame->retcode+0));
-+        __put_user(TARGET_NR_rt_sigreturn, (int *)(frame->retcode+1));
-+        val16 = 0x80cd;
-+        __put_user(val16, (uint16_t *)(frame->retcode+5));
-+    }
-+#else
-+    /* XXX: Would be slightly better to return -EFAULT here if test fails
-+       assert(ka->sa_flags & TARGET_SA_RESTORER); */
-+    __put_user(ka->sa_restorer, &frame->pretcode);
-+#endif
-+
-+    /* Set up registers for signal handler */
-+    env->regs[R_ESP] = frame_addr;
-+    env->eip = ka->_sa_handler;
-+
-+#ifndef TARGET_X86_64
-+    env->regs[R_EAX] = sig;
-+    env->regs[R_EDX] = (unsigned long)&frame->info;
-+    env->regs[R_ECX] = (unsigned long)&frame->uc;
-+#else
-+    env->regs[R_EAX] = 0;
-+    env->regs[R_EDI] = sig;
-+    env->regs[R_ESI] = (unsigned long)&frame->info;
-+    env->regs[R_EDX] = (unsigned long)&frame->uc;
-+#endif
-+
-+    cpu_x86_load_seg(env, R_DS, __USER_DS);
-+    cpu_x86_load_seg(env, R_ES, __USER_DS);
-+    cpu_x86_load_seg(env, R_CS, __USER_CS);
-+    cpu_x86_load_seg(env, R_SS, __USER_DS);
-+    env->eflags &= ~TF_MASK;
-+
-+    unlock_user_struct(frame, frame_addr, 1);
-+
-+    return;
-+
-+give_sigsegv:
-+    force_sigsegv(sig);
 +}
+diff --git a/linux-user/i386/cpu_loop.c b/linux-user/i386/cpu_loop.c
+new file mode 100644
+index 0000000000..b7700a5561
+--- /dev/null
++++ b/linux-user/i386/cpu_loop.c
+@@ -0,0 +1,26 @@
++/*
++ *  qemu user cpu loop
++ *
++ *  Copyright (c) 2003-2008 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
 +
-+static int
-+restore_sigcontext(CPUX86State *env, struct target_sigcontext *sc)
++#include "qemu/osdep.h"
++#include "qemu.h"
++#include "cpu_loop-common.h"
++
++void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
 +{
-+    unsigned int err = 0;
-+    abi_ulong fpstate_addr;
-+    unsigned int tmpflags;
-+
-+#ifndef TARGET_X86_64
-+    cpu_x86_load_seg(env, R_GS, tswap16(sc->gs));
-+    cpu_x86_load_seg(env, R_FS, tswap16(sc->fs));
-+    cpu_x86_load_seg(env, R_ES, tswap16(sc->es));
-+    cpu_x86_load_seg(env, R_DS, tswap16(sc->ds));
-+
-+    env->regs[R_EDI] = tswapl(sc->edi);
-+    env->regs[R_ESI] = tswapl(sc->esi);
-+    env->regs[R_EBP] = tswapl(sc->ebp);
-+    env->regs[R_ESP] = tswapl(sc->esp);
-+    env->regs[R_EBX] = tswapl(sc->ebx);
-+    env->regs[R_EDX] = tswapl(sc->edx);
-+    env->regs[R_ECX] = tswapl(sc->ecx);
-+    env->regs[R_EAX] = tswapl(sc->eax);
-+
-+    env->eip = tswapl(sc->eip);
-+#else
-+    env->regs[8] = tswapl(sc->r8);
-+    env->regs[9] = tswapl(sc->r9);
-+    env->regs[10] = tswapl(sc->r10);
-+    env->regs[11] = tswapl(sc->r11);
-+    env->regs[12] = tswapl(sc->r12);
-+    env->regs[13] = tswapl(sc->r13);
-+    env->regs[14] = tswapl(sc->r14);
-+    env->regs[15] = tswapl(sc->r15);
-+
-+    env->regs[R_EDI] = tswapl(sc->rdi);
-+    env->regs[R_ESI] = tswapl(sc->rsi);
-+    env->regs[R_EBP] = tswapl(sc->rbp);
-+    env->regs[R_EBX] = tswapl(sc->rbx);
-+    env->regs[R_EDX] = tswapl(sc->rdx);
-+    env->regs[R_EAX] = tswapl(sc->rax);
-+    env->regs[R_ECX] = tswapl(sc->rcx);
-+    env->regs[R_ESP] = tswapl(sc->rsp);
-+
-+    env->eip = tswapl(sc->rip);
-+#endif
-+
-+    cpu_x86_load_seg(env, R_CS, lduw_p(&sc->cs) | 3);
-+    cpu_x86_load_seg(env, R_SS, lduw_p(&sc->ss) | 3);
-+
-+    tmpflags = tswapl(sc->eflags);
-+    env->eflags = (env->eflags & ~0x40DD5) | (tmpflags & 0x40DD5);
-+    //          regs->orig_eax = -1;            /* disable syscall checks */
-+
-+    fpstate_addr = tswapl(sc->fpstate);
-+    if (fpstate_addr != 0) {
-+        if (!access_ok(VERIFY_READ, fpstate_addr,
-+                       sizeof(struct target_fpstate)))
-+            goto badframe;
-+#ifndef TARGET_X86_64
-+        cpu_x86_frstor(env, fpstate_addr, 1);
-+#else
-+        cpu_x86_fxrstor(env, fpstate_addr);
-+#endif
-+    }
-+
-+    return err;
-+badframe:
-+    return 1;
 +}
+diff --git a/linux-user/m68k/cpu_loop.c b/linux-user/m68k/cpu_loop.c
+new file mode 100644
+index 0000000000..b7700a5561
+--- /dev/null
++++ b/linux-user/m68k/cpu_loop.c
+@@ -0,0 +1,26 @@
++/*
++ *  qemu user cpu loop
++ *
++ *  Copyright (c) 2003-2008 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
 +
-+/* Note: there is no sigreturn on x86_64, there is only rt_sigreturn */
-+#ifndef TARGET_X86_64
-+long do_sigreturn(CPUX86State *env)
++#include "qemu/osdep.h"
++#include "qemu.h"
++#include "cpu_loop-common.h"
++
++void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
 +{
-+    struct sigframe *frame;
-+    abi_ulong frame_addr = env->regs[R_ESP] - 8;
-+    target_sigset_t target_set;
-+    sigset_t set;
-+    int i;
-+
-+    trace_user_do_sigreturn(env, frame_addr);
-+    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1))
-+        goto badframe;
-+    /* set blocked signals */
-+    __get_user(target_set.sig[0], &frame->sc.oldmask);
-+    for(i = 1; i < TARGET_NSIG_WORDS; i++) {
-+        __get_user(target_set.sig[i], &frame->extramask[i - 1]);
-+    }
-+
-+    target_to_host_sigset_internal(&set, &target_set);
-+    set_sigmask(&set);
-+
-+    /* restore registers */
-+    if (restore_sigcontext(env, &frame->sc))
-+        goto badframe;
-+    unlock_user_struct(frame, frame_addr, 0);
-+    return -TARGET_QEMU_ESIGRETURN;
-+
-+badframe:
-+    unlock_user_struct(frame, frame_addr, 0);
-+    force_sig(TARGET_SIGSEGV);
-+    return -TARGET_QEMU_ESIGRETURN;
 +}
-+#endif
-+
-+long do_rt_sigreturn(CPUX86State *env)
-+{
-+    abi_ulong frame_addr;
-+    struct rt_sigframe *frame;
-+    sigset_t set;
-+
-+    frame_addr = env->regs[R_ESP] - sizeof(abi_ulong);
-+    trace_user_do_rt_sigreturn(env, frame_addr);
-+    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1))
-+        goto badframe;
-+    target_to_host_sigset(&set, &frame->uc.tuc_sigmask);
-+    set_sigmask(&set);
-+
-+    if (restore_sigcontext(env, &frame->uc.tuc_mcontext)) {
-+        goto badframe;
-+    }
-+
-+    if (do_sigaltstack(frame_addr + offsetof(struct rt_sigframe, uc.tuc_stack), 0,
-+                       get_sp_from_cpustate(env)) == -EFAULT) {
-+        goto badframe;
-+    }
-+
-+    unlock_user_struct(frame, frame_addr, 0);
-+    return -TARGET_QEMU_ESIGRETURN;
-+
-+badframe:
-+    unlock_user_struct(frame, frame_addr, 0);
-+    force_sig(TARGET_SIGSEGV);
-+    return -TARGET_QEMU_ESIGRETURN;
-+}
-diff --git a/linux-user/i386/target_signal.h b/linux-user/i386/target_signal.h
-index 837e90fc4c..ec5a3e3373 100644
---- a/linux-user/i386/target_signal.h
-+++ b/linux-user/i386/target_signal.h
-@@ -26,4 +26,9 @@ static inline abi_ulong get_sp_from_cpustate(CPUX86State *state)
-     return state->regs[R_ESP];
- }
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 8907a84114..09045f877c 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -33,9 +33,9 @@
+ #include "qemu/timer.h"
+ #include "qemu/envlist.h"
+ #include "elf.h"
+-#include "exec/log.h"
+ #include "trace/control.h"
+ #include "target_elf.h"
++#include "cpu_loop-common.h"
  
-+void setup_frame(int sig, struct target_sigaction *ka,
-+                 target_sigset_t *set, CPUX86State *env);
-+void setup_rt_frame(int sig, struct target_sigaction *ka,
-+                    target_siginfo_t *info,
-+                    target_sigset_t *set, CPUX86State *env);
- #endif /* I386_TARGET_SIGNAL_H */
-diff --git a/linux-user/signal.c b/linux-user/signal.c
-index b9ad4c14a3..830f778262 100644
---- a/linux-user/signal.c
-+++ b/linux-user/signal.c
-@@ -803,587 +803,7 @@ int do_sigaction(int sig, const struct target_sigaction *act,
-     return ret;
- }
+ char *exec_path;
  
--#if defined(TARGET_I386)
--/* from the Linux kernel - /arch/x86/include/uapi/asm/sigcontext.h */
--
--struct target_fpreg {
--    uint16_t significand[4];
--    uint16_t exponent;
--};
--
--struct target_fpxreg {
--    uint16_t significand[4];
--    uint16_t exponent;
--    uint16_t padding[3];
--};
--
--struct target_xmmreg {
--    uint32_t element[4];
--};
--
--struct target_fpstate_32 {
--    /* Regular FPU environment */
--    uint32_t cw;
--    uint32_t sw;
--    uint32_t tag;
--    uint32_t ipoff;
--    uint32_t cssel;
--    uint32_t dataoff;
--    uint32_t datasel;
--    struct target_fpreg st[8];
--    uint16_t  status;
--    uint16_t  magic;          /* 0xffff = regular FPU data only */
--
--    /* FXSR FPU environment */
--    uint32_t _fxsr_env[6];   /* FXSR FPU env is ignored */
--    uint32_t mxcsr;
--    uint32_t reserved;
--    struct target_fpxreg fxsr_st[8]; /* FXSR FPU reg data is ignored */
--    struct target_xmmreg xmm[8];
--    uint32_t padding[56];
--};
--
--struct target_fpstate_64 {
--    /* FXSAVE format */
--    uint16_t cw;
--    uint16_t sw;
--    uint16_t twd;
--    uint16_t fop;
--    uint64_t rip;
--    uint64_t rdp;
--    uint32_t mxcsr;
--    uint32_t mxcsr_mask;
--    uint32_t st_space[32];
--    uint32_t xmm_space[64];
--    uint32_t reserved[24];
--};
--
--#ifndef TARGET_X86_64
--# define target_fpstate target_fpstate_32
--#else
--# define target_fpstate target_fpstate_64
--#endif
--
--struct target_sigcontext_32 {
--    uint16_t gs, __gsh;
--    uint16_t fs, __fsh;
--    uint16_t es, __esh;
--    uint16_t ds, __dsh;
--    uint32_t edi;
--    uint32_t esi;
--    uint32_t ebp;
--    uint32_t esp;
--    uint32_t ebx;
--    uint32_t edx;
--    uint32_t ecx;
--    uint32_t eax;
--    uint32_t trapno;
--    uint32_t err;
--    uint32_t eip;
--    uint16_t cs, __csh;
--    uint32_t eflags;
--    uint32_t esp_at_signal;
--    uint16_t ss, __ssh;
--    uint32_t fpstate; /* pointer */
--    uint32_t oldmask;
--    uint32_t cr2;
--};
--
--struct target_sigcontext_64 {
--    uint64_t r8;
--    uint64_t r9;
--    uint64_t r10;
--    uint64_t r11;
--    uint64_t r12;
--    uint64_t r13;
--    uint64_t r14;
--    uint64_t r15;
--
--    uint64_t rdi;
--    uint64_t rsi;
--    uint64_t rbp;
--    uint64_t rbx;
--    uint64_t rdx;
--    uint64_t rax;
--    uint64_t rcx;
--    uint64_t rsp;
--    uint64_t rip;
--
--    uint64_t eflags;
--
--    uint16_t cs;
--    uint16_t gs;
--    uint16_t fs;
--    uint16_t ss;
--
--    uint64_t err;
--    uint64_t trapno;
--    uint64_t oldmask;
--    uint64_t cr2;
--
--    uint64_t fpstate; /* pointer */
--    uint64_t padding[8];
--};
--
--#ifndef TARGET_X86_64
--# define target_sigcontext target_sigcontext_32
--#else
--# define target_sigcontext target_sigcontext_64
--#endif
--
--/* see Linux/include/uapi/asm-generic/ucontext.h */
--struct target_ucontext {
--    abi_ulong         tuc_flags;
--    abi_ulong         tuc_link;
--    target_stack_t    tuc_stack;
--    struct target_sigcontext tuc_mcontext;
--    target_sigset_t   tuc_sigmask;  /* mask last for extensibility */
--};
--
--#ifndef TARGET_X86_64
--struct sigframe {
--    abi_ulong pretcode;
--    int sig;
--    struct target_sigcontext sc;
--    struct target_fpstate fpstate;
--    abi_ulong extramask[TARGET_NSIG_WORDS-1];
--    char retcode[8];
--};
--
--struct rt_sigframe {
--    abi_ulong pretcode;
--    int sig;
--    abi_ulong pinfo;
--    abi_ulong puc;
--    struct target_siginfo info;
--    struct target_ucontext uc;
--    struct target_fpstate fpstate;
--    char retcode[8];
--};
--
--#else
--
--struct rt_sigframe {
--    abi_ulong pretcode;
--    struct target_ucontext uc;
--    struct target_siginfo info;
--    struct target_fpstate fpstate;
--};
--
--#endif
--
--/*
-- * Set up a signal frame.
-- */
--
--/* XXX: save x87 state */
--static void setup_sigcontext(struct target_sigcontext *sc,
--        struct target_fpstate *fpstate, CPUX86State *env, abi_ulong mask,
--        abi_ulong fpstate_addr)
--{
--    CPUState *cs = CPU(x86_env_get_cpu(env));
--#ifndef TARGET_X86_64
--    uint16_t magic;
--
--    /* already locked in setup_frame() */
--    __put_user(env->segs[R_GS].selector, (unsigned int *)&sc->gs);
--    __put_user(env->segs[R_FS].selector, (unsigned int *)&sc->fs);
--    __put_user(env->segs[R_ES].selector, (unsigned int *)&sc->es);
--    __put_user(env->segs[R_DS].selector, (unsigned int *)&sc->ds);
--    __put_user(env->regs[R_EDI], &sc->edi);
--    __put_user(env->regs[R_ESI], &sc->esi);
--    __put_user(env->regs[R_EBP], &sc->ebp);
--    __put_user(env->regs[R_ESP], &sc->esp);
--    __put_user(env->regs[R_EBX], &sc->ebx);
--    __put_user(env->regs[R_EDX], &sc->edx);
--    __put_user(env->regs[R_ECX], &sc->ecx);
--    __put_user(env->regs[R_EAX], &sc->eax);
--    __put_user(cs->exception_index, &sc->trapno);
--    __put_user(env->error_code, &sc->err);
--    __put_user(env->eip, &sc->eip);
--    __put_user(env->segs[R_CS].selector, (unsigned int *)&sc->cs);
--    __put_user(env->eflags, &sc->eflags);
--    __put_user(env->regs[R_ESP], &sc->esp_at_signal);
--    __put_user(env->segs[R_SS].selector, (unsigned int *)&sc->ss);
--
--    cpu_x86_fsave(env, fpstate_addr, 1);
--    fpstate->status = fpstate->sw;
--    magic = 0xffff;
--    __put_user(magic, &fpstate->magic);
--    __put_user(fpstate_addr, &sc->fpstate);
--
--    /* non-iBCS2 extensions.. */
--    __put_user(mask, &sc->oldmask);
--    __put_user(env->cr[2], &sc->cr2);
--#else
--    __put_user(env->regs[R_EDI], &sc->rdi);
--    __put_user(env->regs[R_ESI], &sc->rsi);
--    __put_user(env->regs[R_EBP], &sc->rbp);
--    __put_user(env->regs[R_ESP], &sc->rsp);
--    __put_user(env->regs[R_EBX], &sc->rbx);
--    __put_user(env->regs[R_EDX], &sc->rdx);
--    __put_user(env->regs[R_ECX], &sc->rcx);
--    __put_user(env->regs[R_EAX], &sc->rax);
--
--    __put_user(env->regs[8], &sc->r8);
--    __put_user(env->regs[9], &sc->r9);
--    __put_user(env->regs[10], &sc->r10);
--    __put_user(env->regs[11], &sc->r11);
--    __put_user(env->regs[12], &sc->r12);
--    __put_user(env->regs[13], &sc->r13);
--    __put_user(env->regs[14], &sc->r14);
--    __put_user(env->regs[15], &sc->r15);
--
--    __put_user(cs->exception_index, &sc->trapno);
--    __put_user(env->error_code, &sc->err);
--    __put_user(env->eip, &sc->rip);
--
--    __put_user(env->eflags, &sc->eflags);
--    __put_user(env->segs[R_CS].selector, &sc->cs);
--    __put_user((uint16_t)0, &sc->gs);
--    __put_user((uint16_t)0, &sc->fs);
--    __put_user(env->segs[R_SS].selector, &sc->ss);
--
--    __put_user(mask, &sc->oldmask);
--    __put_user(env->cr[2], &sc->cr2);
--
--    /* fpstate_addr must be 16 byte aligned for fxsave */
--    assert(!(fpstate_addr & 0xf));
--
--    cpu_x86_fxsave(env, fpstate_addr);
--    __put_user(fpstate_addr, &sc->fpstate);
--#endif
--}
--
--/*
-- * Determine which stack to use..
-- */
--
--static inline abi_ulong
--get_sigframe(struct target_sigaction *ka, CPUX86State *env, size_t frame_size)
--{
--    unsigned long esp;
--
--    /* Default to using normal stack */
--    esp = env->regs[R_ESP];
--#ifdef TARGET_X86_64
--    esp -= 128; /* this is the redzone */
--#endif
--
--    /* This is the X/Open sanctioned signal stack switching.  */
--    if (ka->sa_flags & TARGET_SA_ONSTACK) {
--        if (sas_ss_flags(esp) == 0) {
--            esp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
--        }
--    } else {
--#ifndef TARGET_X86_64
--        /* This is the legacy signal stack switching. */
--        if ((env->segs[R_SS].selector & 0xffff) != __USER_DS &&
--                !(ka->sa_flags & TARGET_SA_RESTORER) &&
--                ka->sa_restorer) {
--            esp = (unsigned long) ka->sa_restorer;
--        }
--#endif
--    }
--
--#ifndef TARGET_X86_64
--    return (esp - frame_size) & -8ul;
--#else
--    return ((esp - frame_size) & (~15ul)) - 8;
--#endif
--}
--
--#ifndef TARGET_X86_64
--/* compare linux/arch/i386/kernel/signal.c:setup_frame() */
--static void setup_frame(int sig, struct target_sigaction *ka,
--                        target_sigset_t *set, CPUX86State *env)
--{
--    abi_ulong frame_addr;
--    struct sigframe *frame;
--    int i;
--
--    frame_addr = get_sigframe(ka, env, sizeof(*frame));
--    trace_user_setup_frame(env, frame_addr);
--
--    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0))
--        goto give_sigsegv;
--
--    __put_user(sig, &frame->sig);
--
--    setup_sigcontext(&frame->sc, &frame->fpstate, env, set->sig[0],
--            frame_addr + offsetof(struct sigframe, fpstate));
--
--    for(i = 1; i < TARGET_NSIG_WORDS; i++) {
--        __put_user(set->sig[i], &frame->extramask[i - 1]);
--    }
--
--    /* Set up to return from userspace.  If provided, use a stub
--       already in userspace.  */
--    if (ka->sa_flags & TARGET_SA_RESTORER) {
--        __put_user(ka->sa_restorer, &frame->pretcode);
--    } else {
--        uint16_t val16;
--        abi_ulong retcode_addr;
--        retcode_addr = frame_addr + offsetof(struct sigframe, retcode);
--        __put_user(retcode_addr, &frame->pretcode);
--        /* This is popl %eax ; movl $,%eax ; int $0x80 */
--        val16 = 0xb858;
--        __put_user(val16, (uint16_t *)(frame->retcode+0));
--        __put_user(TARGET_NR_sigreturn, (int *)(frame->retcode+2));
--        val16 = 0x80cd;
--        __put_user(val16, (uint16_t *)(frame->retcode+6));
--    }
--
--    /* Set up registers for signal handler */
--    env->regs[R_ESP] = frame_addr;
--    env->eip = ka->_sa_handler;
--
--    cpu_x86_load_seg(env, R_DS, __USER_DS);
--    cpu_x86_load_seg(env, R_ES, __USER_DS);
--    cpu_x86_load_seg(env, R_SS, __USER_DS);
--    cpu_x86_load_seg(env, R_CS, __USER_CS);
--    env->eflags &= ~TF_MASK;
--
--    unlock_user_struct(frame, frame_addr, 1);
--
--    return;
--
--give_sigsegv:
--    force_sigsegv(sig);
--}
--#endif
--
--/* compare linux/arch/x86/kernel/signal.c:setup_rt_frame() */
--static void setup_rt_frame(int sig, struct target_sigaction *ka,
--                           target_siginfo_t *info,
--                           target_sigset_t *set, CPUX86State *env)
--{
--    abi_ulong frame_addr;
--#ifndef TARGET_X86_64
--    abi_ulong addr;
--#endif
--    struct rt_sigframe *frame;
--    int i;
--
--    frame_addr = get_sigframe(ka, env, sizeof(*frame));
--    trace_user_setup_rt_frame(env, frame_addr);
--
--    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0))
--        goto give_sigsegv;
--
--    /* These fields are only in rt_sigframe on 32 bit */
--#ifndef TARGET_X86_64
--    __put_user(sig, &frame->sig);
--    addr = frame_addr + offsetof(struct rt_sigframe, info);
--    __put_user(addr, &frame->pinfo);
--    addr = frame_addr + offsetof(struct rt_sigframe, uc);
--    __put_user(addr, &frame->puc);
--#endif
--    if (ka->sa_flags & TARGET_SA_SIGINFO) {
--        tswap_siginfo(&frame->info, info);
--    }
--
--    /* Create the ucontext.  */
--    __put_user(0, &frame->uc.tuc_flags);
--    __put_user(0, &frame->uc.tuc_link);
--    __put_user(target_sigaltstack_used.ss_sp, &frame->uc.tuc_stack.ss_sp);
--    __put_user(sas_ss_flags(get_sp_from_cpustate(env)),
--               &frame->uc.tuc_stack.ss_flags);
--    __put_user(target_sigaltstack_used.ss_size,
--               &frame->uc.tuc_stack.ss_size);
--    setup_sigcontext(&frame->uc.tuc_mcontext, &frame->fpstate, env,
--            set->sig[0], frame_addr + offsetof(struct rt_sigframe, fpstate));
--
--    for(i = 0; i < TARGET_NSIG_WORDS; i++) {
--        __put_user(set->sig[i], &frame->uc.tuc_sigmask.sig[i]);
--    }
--
--    /* Set up to return from userspace.  If provided, use a stub
--       already in userspace.  */
--#ifndef TARGET_X86_64
--    if (ka->sa_flags & TARGET_SA_RESTORER) {
--        __put_user(ka->sa_restorer, &frame->pretcode);
--    } else {
--        uint16_t val16;
--        addr = frame_addr + offsetof(struct rt_sigframe, retcode);
--        __put_user(addr, &frame->pretcode);
--        /* This is movl $,%eax ; int $0x80 */
--        __put_user(0xb8, (char *)(frame->retcode+0));
--        __put_user(TARGET_NR_rt_sigreturn, (int *)(frame->retcode+1));
--        val16 = 0x80cd;
--        __put_user(val16, (uint16_t *)(frame->retcode+5));
--    }
--#else
--    /* XXX: Would be slightly better to return -EFAULT here if test fails
--       assert(ka->sa_flags & TARGET_SA_RESTORER); */
--    __put_user(ka->sa_restorer, &frame->pretcode);
--#endif
--
--    /* Set up registers for signal handler */
--    env->regs[R_ESP] = frame_addr;
--    env->eip = ka->_sa_handler;
--
--#ifndef TARGET_X86_64
--    env->regs[R_EAX] = sig;
--    env->regs[R_EDX] = (unsigned long)&frame->info;
--    env->regs[R_ECX] = (unsigned long)&frame->uc;
--#else
--    env->regs[R_EAX] = 0;
--    env->regs[R_EDI] = sig;
--    env->regs[R_ESI] = (unsigned long)&frame->info;
--    env->regs[R_EDX] = (unsigned long)&frame->uc;
--#endif
--
--    cpu_x86_load_seg(env, R_DS, __USER_DS);
--    cpu_x86_load_seg(env, R_ES, __USER_DS);
--    cpu_x86_load_seg(env, R_CS, __USER_CS);
--    cpu_x86_load_seg(env, R_SS, __USER_DS);
--    env->eflags &= ~TF_MASK;
--
--    unlock_user_struct(frame, frame_addr, 1);
--
--    return;
--
--give_sigsegv:
--    force_sigsegv(sig);
--}
--
--static int
--restore_sigcontext(CPUX86State *env, struct target_sigcontext *sc)
--{
--    unsigned int err = 0;
--    abi_ulong fpstate_addr;
--    unsigned int tmpflags;
--
--#ifndef TARGET_X86_64
--    cpu_x86_load_seg(env, R_GS, tswap16(sc->gs));
--    cpu_x86_load_seg(env, R_FS, tswap16(sc->fs));
--    cpu_x86_load_seg(env, R_ES, tswap16(sc->es));
--    cpu_x86_load_seg(env, R_DS, tswap16(sc->ds));
--
--    env->regs[R_EDI] = tswapl(sc->edi);
--    env->regs[R_ESI] = tswapl(sc->esi);
--    env->regs[R_EBP] = tswapl(sc->ebp);
--    env->regs[R_ESP] = tswapl(sc->esp);
--    env->regs[R_EBX] = tswapl(sc->ebx);
--    env->regs[R_EDX] = tswapl(sc->edx);
--    env->regs[R_ECX] = tswapl(sc->ecx);
--    env->regs[R_EAX] = tswapl(sc->eax);
--
--    env->eip = tswapl(sc->eip);
--#else
--    env->regs[8] = tswapl(sc->r8);
--    env->regs[9] = tswapl(sc->r9);
--    env->regs[10] = tswapl(sc->r10);
--    env->regs[11] = tswapl(sc->r11);
--    env->regs[12] = tswapl(sc->r12);
--    env->regs[13] = tswapl(sc->r13);
--    env->regs[14] = tswapl(sc->r14);
--    env->regs[15] = tswapl(sc->r15);
--
--    env->regs[R_EDI] = tswapl(sc->rdi);
--    env->regs[R_ESI] = tswapl(sc->rsi);
--    env->regs[R_EBP] = tswapl(sc->rbp);
--    env->regs[R_EBX] = tswapl(sc->rbx);
--    env->regs[R_EDX] = tswapl(sc->rdx);
--    env->regs[R_EAX] = tswapl(sc->rax);
--    env->regs[R_ECX] = tswapl(sc->rcx);
--    env->regs[R_ESP] = tswapl(sc->rsp);
--
--    env->eip = tswapl(sc->rip);
--#endif
--
--    cpu_x86_load_seg(env, R_CS, lduw_p(&sc->cs) | 3);
--    cpu_x86_load_seg(env, R_SS, lduw_p(&sc->ss) | 3);
--
--    tmpflags = tswapl(sc->eflags);
--    env->eflags = (env->eflags & ~0x40DD5) | (tmpflags & 0x40DD5);
--    //		regs->orig_eax = -1;		/* disable syscall checks */
--
--    fpstate_addr = tswapl(sc->fpstate);
--    if (fpstate_addr != 0) {
--        if (!access_ok(VERIFY_READ, fpstate_addr,
--                       sizeof(struct target_fpstate)))
--            goto badframe;
--#ifndef TARGET_X86_64
--        cpu_x86_frstor(env, fpstate_addr, 1);
--#else
--        cpu_x86_fxrstor(env, fpstate_addr);
--#endif
--    }
--
--    return err;
--badframe:
--    return 1;
--}
--
--/* Note: there is no sigreturn on x86_64, there is only rt_sigreturn */
--#ifndef TARGET_X86_64
--long do_sigreturn(CPUX86State *env)
--{
--    struct sigframe *frame;
--    abi_ulong frame_addr = env->regs[R_ESP] - 8;
--    target_sigset_t target_set;
--    sigset_t set;
--    int i;
--
--    trace_user_do_sigreturn(env, frame_addr);
--    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1))
--        goto badframe;
--    /* set blocked signals */
--    __get_user(target_set.sig[0], &frame->sc.oldmask);
--    for(i = 1; i < TARGET_NSIG_WORDS; i++) {
--        __get_user(target_set.sig[i], &frame->extramask[i - 1]);
--    }
--
--    target_to_host_sigset_internal(&set, &target_set);
--    set_sigmask(&set);
--
--    /* restore registers */
--    if (restore_sigcontext(env, &frame->sc))
--        goto badframe;
--    unlock_user_struct(frame, frame_addr, 0);
--    return -TARGET_QEMU_ESIGRETURN;
--
--badframe:
--    unlock_user_struct(frame, frame_addr, 0);
--    force_sig(TARGET_SIGSEGV);
--    return -TARGET_QEMU_ESIGRETURN;
--}
--#endif
--
--long do_rt_sigreturn(CPUX86State *env)
--{
--    abi_ulong frame_addr;
--    struct rt_sigframe *frame;
--    sigset_t set;
--
--    frame_addr = env->regs[R_ESP] - sizeof(abi_ulong);
--    trace_user_do_rt_sigreturn(env, frame_addr);
--    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1))
--        goto badframe;
--    target_to_host_sigset(&set, &frame->uc.tuc_sigmask);
--    set_sigmask(&set);
--
--    if (restore_sigcontext(env, &frame->uc.tuc_mcontext)) {
--        goto badframe;
--    }
--
--    if (do_sigaltstack(frame_addr + offsetof(struct rt_sigframe, uc.tuc_stack), 0,
--                       get_sp_from_cpustate(env)) == -EFAULT) {
--        goto badframe;
--    }
--
--    unlock_user_struct(frame, frame_addr, 0);
--    return -TARGET_QEMU_ESIGRETURN;
--
--badframe:
--    unlock_user_struct(frame, frame_addr, 0);
--    force_sig(TARGET_SIGSEGV);
--    return -TARGET_QEMU_ESIGRETURN;
--}
--
--#elif defined(TARGET_SPARC)
-+#if defined(TARGET_SPARC)
+@@ -50,17 +50,6 @@ unsigned long mmap_min_addr;
+ unsigned long guest_base;
+ int have_guest_base;
  
- #define __SUNOS_MAXWIN   31
+-#define EXCP_DUMP(env, fmt, ...)                                        \
+-do {                                                                    \
+-    CPUState *cs = ENV_GET_CPU(env);                                    \
+-    fprintf(stderr, fmt , ## __VA_ARGS__);                              \
+-    cpu_dump_state(cs, stderr, fprintf, 0);                             \
+-    if (qemu_log_separate()) {                                          \
+-        qemu_log(fmt, ## __VA_ARGS__);                                  \
+-        log_cpu_state(cs, 0);                                           \
+-    }                                                                   \
+-} while (0)
+-
+ /*
+  * When running 32-on-64 we should make sure we can fit all of the possible
+  * guest address space into a contiguous chunk of virtual host memory.
+@@ -4736,6 +4725,8 @@ int main(int argc, char **argv, char **envp)
+     tcg_prologue_init(tcg_ctx);
+     tcg_region_init();
  
-diff --git a/linux-user/x86_64/signal.c b/linux-user/x86_64/signal.c
-index 02ca338b6c..a509a38045 100644
---- a/linux-user/x86_64/signal.c
-+++ b/linux-user/x86_64/signal.c
-@@ -16,3 +16,5 @@
-  *  You should have received a copy of the GNU General Public License
-  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
-+#define I386_TARGET_SIGNAL_H /* to only include x86_64/target_signal.h */
-+#include "../i386/signal.c"
-diff --git a/linux-user/x86_64/target_signal.h b/linux-user/x86_64/target_signal.h
-index 1e95f4a684..26f96944e5 100644
---- a/linux-user/x86_64/target_signal.h
-+++ b/linux-user/x86_64/target_signal.h
-@@ -26,4 +26,7 @@ static inline abi_ulong get_sp_from_cpustate(CPUX86State *state)
-     return state->regs[R_ESP];
- }
++    target_cpu_copy_regs(env, regs);
++
+ #if defined(TARGET_I386)
+     env->cr[0] = CR0_PG_MASK | CR0_WP_MASK | CR0_PE_MASK;
+     env->hflags |= HF_PE_MASK | HF_CPL_MASK;
+@@ -5125,8 +5116,6 @@ int main(int argc, char **argv, char **envp)
+         env->sregs[WINDOW_START] = regs->windowstart;
+         env->pc = regs->pc;
+     }
+-#else
+-#error unsupported target CPU
+ #endif
  
-+void setup_rt_frame(int sig, struct target_sigaction *ka,
-+                    target_siginfo_t *info,
-+                    target_sigset_t *set, CPUX86State *env);
- #endif /* X86_64_TARGET_SIGNAL_H */
+ #if defined(TARGET_ARM) || defined(TARGET_M68K)
+diff --git a/linux-user/microblaze/cpu_loop.c b/linux-user/microblaze/cpu_loop.c
+new file mode 100644
+index 0000000000..b7700a5561
+--- /dev/null
++++ b/linux-user/microblaze/cpu_loop.c
+@@ -0,0 +1,26 @@
++/*
++ *  qemu user cpu loop
++ *
++ *  Copyright (c) 2003-2008 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu.h"
++#include "cpu_loop-common.h"
++
++void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
++{
++}
+diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
+new file mode 100644
+index 0000000000..b7700a5561
+--- /dev/null
++++ b/linux-user/mips/cpu_loop.c
+@@ -0,0 +1,26 @@
++/*
++ *  qemu user cpu loop
++ *
++ *  Copyright (c) 2003-2008 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu.h"
++#include "cpu_loop-common.h"
++
++void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
++{
++}
+diff --git a/linux-user/mips64/cpu_loop.c b/linux-user/mips64/cpu_loop.c
+new file mode 100644
+index 0000000000..b7700a5561
+--- /dev/null
++++ b/linux-user/mips64/cpu_loop.c
+@@ -0,0 +1,26 @@
++/*
++ *  qemu user cpu loop
++ *
++ *  Copyright (c) 2003-2008 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu.h"
++#include "cpu_loop-common.h"
++
++void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
++{
++}
+diff --git a/linux-user/nios2/cpu_loop.c b/linux-user/nios2/cpu_loop.c
+new file mode 100644
+index 0000000000..b7700a5561
+--- /dev/null
++++ b/linux-user/nios2/cpu_loop.c
+@@ -0,0 +1,26 @@
++/*
++ *  qemu user cpu loop
++ *
++ *  Copyright (c) 2003-2008 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu.h"
++#include "cpu_loop-common.h"
++
++void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
++{
++}
+diff --git a/linux-user/openrisc/cpu_loop.c b/linux-user/openrisc/cpu_loop.c
+new file mode 100644
+index 0000000000..b7700a5561
+--- /dev/null
++++ b/linux-user/openrisc/cpu_loop.c
+@@ -0,0 +1,26 @@
++/*
++ *  qemu user cpu loop
++ *
++ *  Copyright (c) 2003-2008 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu.h"
++#include "cpu_loop-common.h"
++
++void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
++{
++}
+diff --git a/linux-user/ppc/cpu_loop.c b/linux-user/ppc/cpu_loop.c
+new file mode 100644
+index 0000000000..b7700a5561
+--- /dev/null
++++ b/linux-user/ppc/cpu_loop.c
+@@ -0,0 +1,26 @@
++/*
++ *  qemu user cpu loop
++ *
++ *  Copyright (c) 2003-2008 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu.h"
++#include "cpu_loop-common.h"
++
++void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
++{
++}
+diff --git a/linux-user/riscv/cpu_loop.c b/linux-user/riscv/cpu_loop.c
+new file mode 100644
+index 0000000000..b7700a5561
+--- /dev/null
++++ b/linux-user/riscv/cpu_loop.c
+@@ -0,0 +1,26 @@
++/*
++ *  qemu user cpu loop
++ *
++ *  Copyright (c) 2003-2008 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu.h"
++#include "cpu_loop-common.h"
++
++void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
++{
++}
+diff --git a/linux-user/s390x/cpu_loop.c b/linux-user/s390x/cpu_loop.c
+new file mode 100644
+index 0000000000..b7700a5561
+--- /dev/null
++++ b/linux-user/s390x/cpu_loop.c
+@@ -0,0 +1,26 @@
++/*
++ *  qemu user cpu loop
++ *
++ *  Copyright (c) 2003-2008 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu.h"
++#include "cpu_loop-common.h"
++
++void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
++{
++}
+diff --git a/linux-user/sh4/cpu_loop.c b/linux-user/sh4/cpu_loop.c
+new file mode 100644
+index 0000000000..b7700a5561
+--- /dev/null
++++ b/linux-user/sh4/cpu_loop.c
+@@ -0,0 +1,26 @@
++/*
++ *  qemu user cpu loop
++ *
++ *  Copyright (c) 2003-2008 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu.h"
++#include "cpu_loop-common.h"
++
++void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
++{
++}
+diff --git a/linux-user/sparc/cpu_loop.c b/linux-user/sparc/cpu_loop.c
+new file mode 100644
+index 0000000000..b7700a5561
+--- /dev/null
++++ b/linux-user/sparc/cpu_loop.c
+@@ -0,0 +1,26 @@
++/*
++ *  qemu user cpu loop
++ *
++ *  Copyright (c) 2003-2008 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu.h"
++#include "cpu_loop-common.h"
++
++void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
++{
++}
+diff --git a/linux-user/sparc64/cpu_loop.c b/linux-user/sparc64/cpu_loop.c
+new file mode 100644
+index 0000000000..b7700a5561
+--- /dev/null
++++ b/linux-user/sparc64/cpu_loop.c
+@@ -0,0 +1,26 @@
++/*
++ *  qemu user cpu loop
++ *
++ *  Copyright (c) 2003-2008 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu.h"
++#include "cpu_loop-common.h"
++
++void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
++{
++}
+diff --git a/linux-user/tilegx/cpu_loop.c b/linux-user/tilegx/cpu_loop.c
+new file mode 100644
+index 0000000000..b7700a5561
+--- /dev/null
++++ b/linux-user/tilegx/cpu_loop.c
+@@ -0,0 +1,26 @@
++/*
++ *  qemu user cpu loop
++ *
++ *  Copyright (c) 2003-2008 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu.h"
++#include "cpu_loop-common.h"
++
++void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
++{
++}
+diff --git a/linux-user/x86_64/cpu_loop.c b/linux-user/x86_64/cpu_loop.c
+new file mode 100644
+index 0000000000..b7700a5561
+--- /dev/null
++++ b/linux-user/x86_64/cpu_loop.c
+@@ -0,0 +1,26 @@
++/*
++ *  qemu user cpu loop
++ *
++ *  Copyright (c) 2003-2008 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu.h"
++#include "cpu_loop-common.h"
++
++void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
++{
++}
+diff --git a/linux-user/xtensa/cpu_loop.c b/linux-user/xtensa/cpu_loop.c
+new file mode 100644
+index 0000000000..b7700a5561
+--- /dev/null
++++ b/linux-user/xtensa/cpu_loop.c
+@@ -0,0 +1,26 @@
++/*
++ *  qemu user cpu loop
++ *
++ *  Copyright (c) 2003-2008 Fabrice Bellard
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu.h"
++#include "cpu_loop-common.h"
++
++void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
++{
++}
 -- 
 2.14.3
