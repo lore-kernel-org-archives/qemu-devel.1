@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fD5I8-000684-2U
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:40:16 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fD5OT-0003tM-Ln
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:46:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fD5I3-0004zU-Uk
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:40:15 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38184 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fD5I3-0004z1-Pb
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:40:11 -0400
-References: <87o9inxkd1.fsf@dusky.pond.sub.org>
-	<20180430065235.577-1-aik@ozlabs.ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c23d1ec1-51d7-d967-28a2-0df0f59e7480@redhat.com>
-Date: Mon, 30 Apr 2018 11:39:55 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fD5OS-0008Aa-SQ
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:46:49 -0400
+Received: from mail-ot0-x22b.google.com ([2607:f8b0:4003:c0f::22b]:35430)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fD5OS-0008AC-Lg
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:46:48 -0400
+Received: by mail-ot0-x22b.google.com with SMTP id h8-v6so8817618otb.2
+	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 02:46:48 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180430065235.577-1-aik@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu] qom: Document
- qom/device-list-properties implementation specific
+In-Reply-To: <767f617b-82fc-f256-e339-6927d0c7ba59@vivier.eu>
+References: <20180430080404.7323-1-christophe.lyon@st.com>
+	<CAFEAcA80NBYJ6BkTMsfBBZN91oJw3zE6A_a7uA2ESCkwb1Vgew@mail.gmail.com>
+	<CAKdteOZt45ohyve_cgK6uarEiNiVOL2vVs=+GzENzFjg_1MM-w@mail.gmail.com>
+	<CAFEAcA_Aoe0Jcyn0e6Eir5T+KXtVdfjz2c-+HrtVNtaxgmDYFw@mail.gmail.com>
+	<CAKdteOY3FyXokDoViQWTL++EQ79sxNOuCgZeAxxakAQj8p2H5g@mail.gmail.com>
+	<CAFEAcA-fOHNfBJnZfcPMj53v3Dc0anYptPcw7nyBBJBdFKUZpg@mail.gmail.com>
+	<767f617b-82fc-f256-e339-6927d0c7ba59@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 30 Apr 2018 10:46:27 +0100
+Message-ID: <CAFEAcA8c50N_32mru3Z-5QfMM5p5WzRqRjsuoqXnoD=552ifUg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [ARM/FDPIC v4 0/4] FDPIC ABI for ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +35,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: Christophe Lyon <christophe.lyon@linaro.org>, Christophe Lyon <christophe.lyon@st.com>, QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
 
-On 30/04/2018 08:52, Alexey Kardashevskiy wrote:
-> diff --git a/qapi/misc.json b/qapi/misc.json
-> index 5636f4a..399ec74 100644
-> --- a/qapi/misc.json
-> +++ b/qapi/misc.json
-> @@ -1491,6 +1491,10 @@
->  #
->  # List properties associated with a device.
->  #
-> +# Note: the handler creates a device object, enumerates properties and destroys
-> +# the object so it only lists properties defined in DeviceClass::props or
-> +# created by DeviceClass::init()/TypeInfo::instance_init().
-> +#
->  # @typename: the type name of a device
->  #
->  # Returns: a list of ObjectPropertyInfo describing a devices properties
-> @@ -1506,6 +1510,11 @@
->  #
->  # List properties associated with a QOM object.
->  #
-> +# Note: the handler creates an object, enumerates properties and destroys
-> +# the object so it only lists properties created in TypeInfo::instance_init().
-> +# Since the instance_init() callback of the device object adds
-> +# DeviceClass::props as object properties, they will be listed as well.
-> +#
+On 30 April 2018 at 10:28, Laurent Vivier <laurent@vivier.eu> wrote:
+> Le 30/04/2018 =C3=A0 11:12, Peter Maydell a =C3=A9crit :
+>> Great. Riku/Laurent -- I'm assuming you're going to take this set
+>> via the linux-user tree.
+>
+> I just sent a pull request without it...
+>
+> Do you prefer I update this one or I send another one later?
 
-This says what it does, but not why it is a problem.  Can you explain
-that to me as well?
+No, it can go into your next one I think. I see you've sent
+the signal.c refactoring, which this will conflict with,
+so either you or Christophe will need to rebase it anyway.
 
-Thanks,
-
-Paolo
+thanks
+-- PMM
