@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fD4xL-0004Wf-LX
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:18:48 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fD57M-00054T-7c
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:29:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fD4xH-0002KY-Jh
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:18:47 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50994 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fD4xH-0002Iw-Dg
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:18:43 -0400
-Date: Mon, 30 Apr 2018 10:18:33 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180430091833.GF3249@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1524666934-8064-1-git-send-email-lidongchen@tencent.com>
-	<1524666934-8064-5-git-send-email-lidongchen@tencent.com>
-	<20180426173641.GN2631@work-vm>
-	<CAOGPPbcPb4F2m_o4jPn2ELRK19=Yr=P+QRi4r_-eVhzmV0d5kA@mail.gmail.com>
-	<20180427091603.GD32172@redhat.com>
-	<CAOGPPbcG4-FiV1d134g5YA8z4cNrdzELED3rpR+NrJzc2OfwcA@mail.gmail.com>
+	(envelope-from <laurent@vivier.eu>) id 1fD57I-0007os-UP
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:29:08 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:59647)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fD57I-0007oM-Kh
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:29:04 -0400
+References: <20180430080404.7323-1-christophe.lyon@st.com>
+	<CAFEAcA80NBYJ6BkTMsfBBZN91oJw3zE6A_a7uA2ESCkwb1Vgew@mail.gmail.com>
+	<CAKdteOZt45ohyve_cgK6uarEiNiVOL2vVs=+GzENzFjg_1MM-w@mail.gmail.com>
+	<CAFEAcA_Aoe0Jcyn0e6Eir5T+KXtVdfjz2c-+HrtVNtaxgmDYFw@mail.gmail.com>
+	<CAKdteOY3FyXokDoViQWTL++EQ79sxNOuCgZeAxxakAQj8p2H5g@mail.gmail.com>
+	<CAFEAcA-fOHNfBJnZfcPMj53v3Dc0anYptPcw7nyBBJBdFKUZpg@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <767f617b-82fc-f256-e339-6927d0c7ba59@vivier.eu>
+Date: Mon, 30 Apr 2018 11:28:51 +0200
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-fOHNfBJnZfcPMj53v3Dc0anYptPcw7nyBBJBdFKUZpg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAOGPPbcG4-FiV1d134g5YA8z4cNrdzELED3rpR+NrJzc2OfwcA@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 4/5] migration: implement bi-directional
- RDMA QIOChannel
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [ARM/FDPIC v4 0/4] FDPIC ABI for ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,84 +32,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 858585 jemmy <jemmy858585@gmail.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Gal Shachaf <galsha@mellanox.com>, Aviad Yehezkel <aviadye@mellanox.com>, licq@mellanox.com, adido@mellanox.com, Lidong Chen <lidongchen@tencent.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Christophe Lyon <christophe.lyon@linaro.org>
+Cc: Christophe Lyon <christophe.lyon@st.com>, QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
 
-On Sat, Apr 28, 2018 at 12:16:36PM +0800, 858585 jemmy wrote:
-> On Fri, Apr 27, 2018 at 5:16 PM, Daniel P. Berrang=C3=A9 <berrange@redh=
-at.com> wrote:
-> so I prefer to add a lock for QEMUFile struct, like this:
->=20
-> int qemu_fclose(QEMUFile *f)
-> {
->     int ret;
->     qemu_fflush(f);
->     ret =3D qemu_file_get_error(f);
->=20
->     if (f->ops->close) {
-> +        qemu_mutex_lock(&f->lock);
->         int ret2 =3D f->ops->close(f->opaque);
-> +       qemu_mutex_unlock(&f->lock);
->         if (ret >=3D 0) {
->             ret =3D ret2;
->         }
->     }
+Le 30/04/2018 à 11:12, Peter Maydell a écrit :
+> On 30 April 2018 at 10:08, Christophe Lyon <christophe.lyon@linaro.org> wrote:
+>> On 30 April 2018 at 10:59, Peter Maydell <peter.maydell@linaro.org> wrote:
+>>> On 30 April 2018 at 09:40, Christophe Lyon <christophe.lyon@linaro.org> wrote:
+>>>> On 30 April 2018 at 10:11, Peter Maydell <peter.maydell@linaro.org> wrote:
+>>>>> On 30 April 2018 at 09:03, Christophe Lyon <christophe.lyon@st.com> wrote:
+>>>>>> Hello,
+>>>>>>
+>>>>>> This patch series implements the QEMU contribution of the FDPIC
+>>>>>> ABI for ARM targets.
+>>>>>
+>>>>> Hi; I definitely reviewed at least some of these patches,
+>>>>> but this respin seems to have lost all the reviewed-by tags?
+>>>>>
+>>>> Indeed, I failed to include them.
+>>>> Shall I send a v5 including these tags?
+>>>
+>>> No, but if you can check which ones should have them that would
+>>> be helpful.
+>>>
+>> OK, so all 4 patches have
+>> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>> (you added it to patch 3/4, provided I fixed the nits, which I did in v4).
+> 
+> Great. Riku/Laurent -- I'm assuming you're going to take this set
+> via the linux-user tree.
 
-That looks ok
+I just sent a pull request without it...
 
+Do you prefer I update this one or I send another one later?
 
-> >> > But is there nothing else to make the QIOChannel bidirectional?
-> >> >
-> >> > Also, a lot seems dependent on listen_id, can you explain how that=
-'s
-> >> > being used.
-> >>
-> >> The destination qemu is server side, so listen_id is not zero. the
-> >> source qemu is client side,
-> >> the listen_id is zero.
-> >> I use listen_id to determine whether qemu is destination or source.
-> >>
-> >> for the destination qemu, if write data to source, it need use the
-> >> return_path rdma, like this:
-> >>     if (rdma->listen_id) {
-> >>         rdma =3D rdma->return_path;
-> >>     }
-> >>
-> >> for the source qemu, if read data from destination, it also need use
-> >> the return_path rdma.
-> >>     if (!rdma->listen_id) {
-> >>         rdma =3D rdma->return_path;
-> >>     }
-> >
-> > This feels uncessarily complex to me. Why not just change QIOCHannelR=
-MDA
-> > struct, so that it has 2 RDMA context pointers eg
-> >
-> > struct QIOChannelRDMA {
-> >     QIOChannel parent;
-> >     RDMAContext *rdmain;
-> >     RDMAContext *rdmaout;
-> >     QEMUFile *file;
-> >     bool blocking; /* XXX we don't actually honour this yet */
-> > };
->=20
-> The reason is the parameter of some function is RDMAContext.
-> like qemu_rdma_accept, rdma_start_outgoing_migration.
-> It's easier to implement return path.
-
-I don't see that as an issue - qemu_fopen_rdma() function should be able
-to setup a pair of RDMAContext pointers when it creates the QIOChannelRDM=
-A
-struct. It just has to request the return path from the single RDMAContex=
-t
-it gets passed, and then set that on the QIOChannelRDMA struct.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Thanks,
+Laurent
