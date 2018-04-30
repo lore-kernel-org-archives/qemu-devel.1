@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fD4q0-0006Gb-PL
+	(envelope-from <laurent@vivier.eu>) id 1fD4pz-0006Fm-2j
 	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:11:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fD4px-00063j-8u
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:11:12 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fD4pv-000608-Mk
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:11:11 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon, 30 Apr 2018 11:10:04 +0200
-Message-Id: <20180430091037.13878-10-laurent@vivier.eu>
+Date: Mon, 30 Apr 2018 11:10:01 +0200
+Message-Id: <20180430091037.13878-7-laurent@vivier.eu>
 In-Reply-To: <20180430091037.13878-1-laurent@vivier.eu>
 References: <20180430091037.13878-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 09/42] linux-user: move nios2 signal.c parts to
- nios2 directory
+Subject: [Qemu-devel] [PULL 06/42] linux-user: move sh4 signal.c parts to
+ sh4 directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,24 +27,24 @@ To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Cornelia Huck <cohuck@redhat.com>
 
 No code change, only move code from signal.c to
-nios2/signal.c, except adding includes and
-exporting setup_rt_frame().
+sh4/signal.c, except adding includes and
+exporting setup_frame() and setup_rt_frame().
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20180424192635.6027-8-laurent@vivier.eu>
+Message-Id: <20180424192635.6027-5-laurent@vivier.eu>
 ---
- linux-user/nios2/signal.c        | 236 +++++++++++++++++++++++++++++++++++++++
- linux-user/nios2/target_signal.h |   4 +
- linux-user/signal.c              | 234 --------------------------------------
- 3 files changed, 240 insertions(+), 234 deletions(-)
+ linux-user/sh4/signal.c        | 332 +++++++++++++++++++++++++++++++++++++++++
+ linux-user/sh4/target_signal.h |   5 +
+ linux-user/signal.c            | 328 ----------------------------------------
+ 3 files changed, 337 insertions(+), 328 deletions(-)
 
-diff --git a/linux-user/nios2/signal.c b/linux-user/nios2/signal.c
-index 02ca338b6c..816eed90f1 100644
---- a/linux-user/nios2/signal.c
-+++ b/linux-user/nios2/signal.c
-@@ -16,3 +16,239 @@
+diff --git a/linux-user/sh4/signal.c b/linux-user/sh4/signal.c
+index 02ca338b6c..5ce182aff7 100644
+--- a/linux-user/sh4/signal.c
++++ b/linux-user/sh4/signal.c
+@@ -16,3 +16,335 @@
   *  You should have received a copy of the GNU General Public License
   *  along with this program; if not, see <http://www.gnu.org/licenses/>.
   */
@@ -54,492 +54,684 @@ index 02ca338b6c..816eed90f1 100644
 +#include "signal-common.h"
 +#include "linux-user/trace.h"
 +
-+#define MCONTEXT_VERSION 2
++/*
++ * code and data structures from linux kernel:
++ * include/asm-sh/sigcontext.h
++ * arch/sh/kernel/signal.c
++ */
 +
 +struct target_sigcontext {
-+    int version;
-+    unsigned long gregs[32];
++    target_ulong  oldmask;
++
++    /* CPU registers */
++    target_ulong  sc_gregs[16];
++    target_ulong  sc_pc;
++    target_ulong  sc_pr;
++    target_ulong  sc_sr;
++    target_ulong  sc_gbr;
++    target_ulong  sc_mach;
++    target_ulong  sc_macl;
++
++    /* FPU registers */
++    target_ulong  sc_fpregs[16];
++    target_ulong  sc_xfpregs[16];
++    unsigned int sc_fpscr;
++    unsigned int sc_fpul;
++    unsigned int sc_ownedfp;
 +};
++
++struct target_sigframe
++{
++    struct target_sigcontext sc;
++    target_ulong extramask[TARGET_NSIG_WORDS-1];
++    uint16_t retcode[3];
++};
++
 +
 +struct target_ucontext {
-+    abi_ulong tuc_flags;
-+    abi_ulong tuc_link;
++    target_ulong tuc_flags;
++    struct target_ucontext *tuc_link;
 +    target_stack_t tuc_stack;
 +    struct target_sigcontext tuc_mcontext;
-+    target_sigset_t tuc_sigmask;   /* mask last for extensibility */
++    target_sigset_t tuc_sigmask;        /* mask last for extensibility */
 +};
 +
-+struct target_rt_sigframe {
++struct target_rt_sigframe
++{
 +    struct target_siginfo info;
 +    struct target_ucontext uc;
++    uint16_t retcode[3];
 +};
 +
-+static unsigned long sigsp(unsigned long sp, struct target_sigaction *ka)
++
++#define MOVW(n)  (0x9300|((n)-2)) /* Move mem word at PC+n to R3 */
++#define TRAP_NOARG 0xc310         /* Syscall w/no args (NR in R3) SH3/4 */
++
++static abi_ulong get_sigframe(struct target_sigaction *ka,
++                              unsigned long sp, size_t frame_size)
 +{
-+    if (unlikely((ka->sa_flags & SA_ONSTACK)) && !sas_ss_flags(sp)) {
-+#ifdef CONFIG_STACK_GROWSUP
-+        return target_sigaltstack_used.ss_sp;
-+#else
-+        return target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
-+#endif
-+    }
-+    return sp;
-+}
-+
-+static int rt_setup_ucontext(struct target_ucontext *uc, CPUNios2State *env)
-+{
-+    unsigned long *gregs = uc->tuc_mcontext.gregs;
-+
-+    __put_user(MCONTEXT_VERSION, &uc->tuc_mcontext.version);
-+    __put_user(env->regs[1], &gregs[0]);
-+    __put_user(env->regs[2], &gregs[1]);
-+    __put_user(env->regs[3], &gregs[2]);
-+    __put_user(env->regs[4], &gregs[3]);
-+    __put_user(env->regs[5], &gregs[4]);
-+    __put_user(env->regs[6], &gregs[5]);
-+    __put_user(env->regs[7], &gregs[6]);
-+    __put_user(env->regs[8], &gregs[7]);
-+    __put_user(env->regs[9], &gregs[8]);
-+    __put_user(env->regs[10], &gregs[9]);
-+    __put_user(env->regs[11], &gregs[10]);
-+    __put_user(env->regs[12], &gregs[11]);
-+    __put_user(env->regs[13], &gregs[12]);
-+    __put_user(env->regs[14], &gregs[13]);
-+    __put_user(env->regs[15], &gregs[14]);
-+    __put_user(env->regs[16], &gregs[15]);
-+    __put_user(env->regs[17], &gregs[16]);
-+    __put_user(env->regs[18], &gregs[17]);
-+    __put_user(env->regs[19], &gregs[18]);
-+    __put_user(env->regs[20], &gregs[19]);
-+    __put_user(env->regs[21], &gregs[20]);
-+    __put_user(env->regs[22], &gregs[21]);
-+    __put_user(env->regs[23], &gregs[22]);
-+    __put_user(env->regs[R_RA], &gregs[23]);
-+    __put_user(env->regs[R_FP], &gregs[24]);
-+    __put_user(env->regs[R_GP], &gregs[25]);
-+    __put_user(env->regs[R_EA], &gregs[27]);
-+    __put_user(env->regs[R_SP], &gregs[28]);
-+
-+    return 0;
-+}
-+
-+static int rt_restore_ucontext(CPUNios2State *env, struct target_ucontext *uc,
-+                               int *pr2)
-+{
-+    int temp;
-+    abi_ulong off, frame_addr = env->regs[R_SP];
-+    unsigned long *gregs = uc->tuc_mcontext.gregs;
-+    int err;
-+
-+    /* Always make any pending restarted system calls return -EINTR */
-+    /* current->restart_block.fn = do_no_restart_syscall; */
-+
-+    __get_user(temp, &uc->tuc_mcontext.version);
-+    if (temp != MCONTEXT_VERSION) {
-+        return 1;
++    if ((ka->sa_flags & TARGET_SA_ONSTACK) && (sas_ss_flags(sp) == 0)) {
++        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
 +    }
 +
-+    /* restore passed registers */
-+    __get_user(env->regs[1], &gregs[0]);
-+    __get_user(env->regs[2], &gregs[1]);
-+    __get_user(env->regs[3], &gregs[2]);
-+    __get_user(env->regs[4], &gregs[3]);
-+    __get_user(env->regs[5], &gregs[4]);
-+    __get_user(env->regs[6], &gregs[5]);
-+    __get_user(env->regs[7], &gregs[6]);
-+    __get_user(env->regs[8], &gregs[7]);
-+    __get_user(env->regs[9], &gregs[8]);
-+    __get_user(env->regs[10], &gregs[9]);
-+    __get_user(env->regs[11], &gregs[10]);
-+    __get_user(env->regs[12], &gregs[11]);
-+    __get_user(env->regs[13], &gregs[12]);
-+    __get_user(env->regs[14], &gregs[13]);
-+    __get_user(env->regs[15], &gregs[14]);
-+    __get_user(env->regs[16], &gregs[15]);
-+    __get_user(env->regs[17], &gregs[16]);
-+    __get_user(env->regs[18], &gregs[17]);
-+    __get_user(env->regs[19], &gregs[18]);
-+    __get_user(env->regs[20], &gregs[19]);
-+    __get_user(env->regs[21], &gregs[20]);
-+    __get_user(env->regs[22], &gregs[21]);
-+    __get_user(env->regs[23], &gregs[22]);
-+    /* gregs[23] is handled below */
-+    /* Verify, should this be settable */
-+    __get_user(env->regs[R_FP], &gregs[24]);
-+    /* Verify, should this be settable */
-+    __get_user(env->regs[R_GP], &gregs[25]);
-+    /* Not really necessary no user settable bits */
-+    __get_user(temp, &gregs[26]);
-+    __get_user(env->regs[R_EA], &gregs[27]);
-+
-+    __get_user(env->regs[R_RA], &gregs[23]);
-+    __get_user(env->regs[R_SP], &gregs[28]);
-+
-+    off = offsetof(struct target_rt_sigframe, uc.tuc_stack);
-+    err = do_sigaltstack(frame_addr + off, 0, get_sp_from_cpustate(env));
-+    if (err == -EFAULT) {
-+        return 1;
-+    }
-+
-+    *pr2 = env->regs[2];
-+    return 0;
++    return (sp - frame_size) & -8ul;
 +}
 +
-+static void *get_sigframe(struct target_sigaction *ka, CPUNios2State *env,
-+                          size_t frame_size)
++/* Notice when we're in the middle of a gUSA region and reset.
++   Note that this will only occur for !parallel_cpus, as we will
++   translate such sequences differently in a parallel context.  */
++static void unwind_gusa(CPUSH4State *regs)
 +{
-+    unsigned long usp;
++    /* If the stack pointer is sufficiently negative, and we haven't
++       completed the sequence, then reset to the entry to the region.  */
++    /* ??? The SH4 kernel checks for and address above 0xC0000000.
++       However, the page mappings in qemu linux-user aren't as restricted
++       and we wind up with the normal stack mapped above 0xF0000000.
++       That said, there is no reason why the kernel should be allowing
++       a gUSA region that spans 1GB.  Use a tighter check here, for what
++       can actually be enabled by the immediate move.  */
++    if (regs->gregs[15] >= -128u && regs->pc < regs->gregs[0]) {
++        /* Reset the PC to before the gUSA region, as computed from
++           R0 = region end, SP = -(region size), plus one more for the
++           insn that actually initializes SP to the region size.  */
++        regs->pc = regs->gregs[0] + regs->gregs[15] - 2;
 +
-+    /* Default to using normal stack.  */
-+    usp = env->regs[R_SP];
++        /* Reset the SP to the saved version in R1.  */
++        regs->gregs[15] = regs->gregs[1];
++    }
++}
 +
-+    /* This is the X/Open sanctioned signal stack switching.  */
-+    usp = sigsp(usp, ka);
++static void setup_sigcontext(struct target_sigcontext *sc,
++                             CPUSH4State *regs, unsigned long mask)
++{
++    int i;
 +
-+    /* Verify, is it 32 or 64 bit aligned */
-+    return (void *)((usp - frame_size) & -8UL);
++#define COPY(x)         __put_user(regs->x, &sc->sc_##x)
++    COPY(gregs[0]); COPY(gregs[1]);
++    COPY(gregs[2]); COPY(gregs[3]);
++    COPY(gregs[4]); COPY(gregs[5]);
++    COPY(gregs[6]); COPY(gregs[7]);
++    COPY(gregs[8]); COPY(gregs[9]);
++    COPY(gregs[10]); COPY(gregs[11]);
++    COPY(gregs[12]); COPY(gregs[13]);
++    COPY(gregs[14]); COPY(gregs[15]);
++    COPY(gbr); COPY(mach);
++    COPY(macl); COPY(pr);
++    COPY(sr); COPY(pc);
++#undef COPY
++
++    for (i=0; i<16; i++) {
++        __put_user(regs->fregs[i], &sc->sc_fpregs[i]);
++    }
++    __put_user(regs->fpscr, &sc->sc_fpscr);
++    __put_user(regs->fpul, &sc->sc_fpul);
++
++    /* non-iBCS2 extensions.. */
++    __put_user(mask, &sc->oldmask);
++}
++
++static void restore_sigcontext(CPUSH4State *regs, struct target_sigcontext *sc)
++{
++    int i;
++
++#define COPY(x)         __get_user(regs->x, &sc->sc_##x)
++    COPY(gregs[0]); COPY(gregs[1]);
++    COPY(gregs[2]); COPY(gregs[3]);
++    COPY(gregs[4]); COPY(gregs[5]);
++    COPY(gregs[6]); COPY(gregs[7]);
++    COPY(gregs[8]); COPY(gregs[9]);
++    COPY(gregs[10]); COPY(gregs[11]);
++    COPY(gregs[12]); COPY(gregs[13]);
++    COPY(gregs[14]); COPY(gregs[15]);
++    COPY(gbr); COPY(mach);
++    COPY(macl); COPY(pr);
++    COPY(sr); COPY(pc);
++#undef COPY
++
++    for (i=0; i<16; i++) {
++        __get_user(regs->fregs[i], &sc->sc_fpregs[i]);
++    }
++    __get_user(regs->fpscr, &sc->sc_fpscr);
++    __get_user(regs->fpul, &sc->sc_fpul);
++
++    regs->tra = -1;         /* disable syscall checks */
++    regs->flags &= ~(DELAY_SLOT_MASK | GUSA_MASK);
++}
++
++void setup_frame(int sig, struct target_sigaction *ka,
++                 target_sigset_t *set, CPUSH4State *regs)
++{
++    struct target_sigframe *frame;
++    abi_ulong frame_addr;
++    int i;
++
++    unwind_gusa(regs);
++
++    frame_addr = get_sigframe(ka, regs->gregs[15], sizeof(*frame));
++    trace_user_setup_frame(regs, frame_addr);
++    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
++        goto give_sigsegv;
++    }
++
++    setup_sigcontext(&frame->sc, regs, set->sig[0]);
++
++    for (i = 0; i < TARGET_NSIG_WORDS - 1; i++) {
++        __put_user(set->sig[i + 1], &frame->extramask[i]);
++    }
++
++    /* Set up to return from userspace.  If provided, use a stub
++       already in userspace.  */
++    if (ka->sa_flags & TARGET_SA_RESTORER) {
++        regs->pr = (unsigned long) ka->sa_restorer;
++    } else {
++        /* Generate return code (system call to sigreturn) */
++        abi_ulong retcode_addr = frame_addr +
++                                 offsetof(struct target_sigframe, retcode);
++        __put_user(MOVW(2), &frame->retcode[0]);
++        __put_user(TRAP_NOARG, &frame->retcode[1]);
++        __put_user((TARGET_NR_sigreturn), &frame->retcode[2]);
++        regs->pr = (unsigned long) retcode_addr;
++    }
++
++    /* Set up registers for signal handler */
++    regs->gregs[15] = frame_addr;
++    regs->gregs[4] = sig; /* Arg for signal handler */
++    regs->gregs[5] = 0;
++    regs->gregs[6] = frame_addr += offsetof(typeof(*frame), sc);
++    regs->pc = (unsigned long) ka->_sa_handler;
++    regs->flags &= ~(DELAY_SLOT_MASK | GUSA_MASK);
++
++    unlock_user_struct(frame, frame_addr, 1);
++    return;
++
++give_sigsegv:
++    unlock_user_struct(frame, frame_addr, 1);
++    force_sigsegv(sig);
 +}
 +
 +void setup_rt_frame(int sig, struct target_sigaction *ka,
 +                    target_siginfo_t *info,
-+                    target_sigset_t *set,
-+                    CPUNios2State *env)
++                    target_sigset_t *set, CPUSH4State *regs)
 +{
 +    struct target_rt_sigframe *frame;
-+    int i, err = 0;
++    abi_ulong frame_addr;
++    int i;
 +
-+    frame = get_sigframe(ka, env, sizeof(*frame));
++    unwind_gusa(regs);
 +
-+    if (ka->sa_flags & SA_SIGINFO) {
-+        tswap_siginfo(&frame->info, info);
-+    }
-+
-+    /* Create the ucontext.  */
-+    __put_user(0, &frame->uc.tuc_flags);
-+    __put_user(0, &frame->uc.tuc_link);
-+    __put_user(target_sigaltstack_used.ss_sp, &frame->uc.tuc_stack.ss_sp);
-+    __put_user(sas_ss_flags(env->regs[R_SP]), &frame->uc.tuc_stack.ss_flags);
-+    __put_user(target_sigaltstack_used.ss_size, &frame->uc.tuc_stack.ss_size);
-+    err |= rt_setup_ucontext(&frame->uc, env);
-+    for (i = 0; i < TARGET_NSIG_WORDS; i++) {
-+        __put_user((abi_ulong)set->sig[i],
-+            (abi_ulong *)&frame->uc.tuc_sigmask.sig[i]);
-+    }
-+
-+    if (err) {
++    frame_addr = get_sigframe(ka, regs->gregs[15], sizeof(*frame));
++    trace_user_setup_rt_frame(regs, frame_addr);
++    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
 +        goto give_sigsegv;
 +    }
 +
-+    /* Set up to return from userspace; jump to fixed address sigreturn
-+       trampoline on kuser page.  */
-+    env->regs[R_RA] = (unsigned long) (0x1044);
++    tswap_siginfo(&frame->info, info);
++
++    /* Create the ucontext.  */
++    __put_user(0, &frame->uc.tuc_flags);
++    __put_user(0, (unsigned long *)&frame->uc.tuc_link);
++    __put_user((unsigned long)target_sigaltstack_used.ss_sp,
++               &frame->uc.tuc_stack.ss_sp);
++    __put_user(sas_ss_flags(regs->gregs[15]),
++               &frame->uc.tuc_stack.ss_flags);
++    __put_user(target_sigaltstack_used.ss_size,
++               &frame->uc.tuc_stack.ss_size);
++    setup_sigcontext(&frame->uc.tuc_mcontext,
++                     regs, set->sig[0]);
++    for(i = 0; i < TARGET_NSIG_WORDS; i++) {
++        __put_user(set->sig[i], &frame->uc.tuc_sigmask.sig[i]);
++    }
++
++    /* Set up to return from userspace.  If provided, use a stub
++       already in userspace.  */
++    if (ka->sa_flags & TARGET_SA_RESTORER) {
++        regs->pr = (unsigned long) ka->sa_restorer;
++    } else {
++        /* Generate return code (system call to sigreturn) */
++        abi_ulong retcode_addr = frame_addr +
++                                 offsetof(struct target_rt_sigframe, retcode);
++        __put_user(MOVW(2), &frame->retcode[0]);
++        __put_user(TRAP_NOARG, &frame->retcode[1]);
++        __put_user((TARGET_NR_rt_sigreturn), &frame->retcode[2]);
++        regs->pr = (unsigned long) retcode_addr;
++    }
 +
 +    /* Set up registers for signal handler */
-+    env->regs[R_SP] = (unsigned long) frame;
-+    env->regs[4] = (unsigned long) sig;
-+    env->regs[5] = (unsigned long) &frame->info;
-+    env->regs[6] = (unsigned long) &frame->uc;
-+    env->regs[R_EA] = (unsigned long) ka->_sa_handler;
++    regs->gregs[15] = frame_addr;
++    regs->gregs[4] = sig; /* Arg for signal handler */
++    regs->gregs[5] = frame_addr + offsetof(typeof(*frame), info);
++    regs->gregs[6] = frame_addr + offsetof(typeof(*frame), uc);
++    regs->pc = (unsigned long) ka->_sa_handler;
++    regs->flags &= ~(DELAY_SLOT_MASK | GUSA_MASK);
++
++    unlock_user_struct(frame, frame_addr, 1);
 +    return;
 +
 +give_sigsegv:
-+    if (sig == TARGET_SIGSEGV) {
-+        ka->_sa_handler = TARGET_SIG_DFL;
-+    }
++    unlock_user_struct(frame, frame_addr, 1);
 +    force_sigsegv(sig);
-+    return;
 +}
 +
-+long do_sigreturn(CPUNios2State *env)
++long do_sigreturn(CPUSH4State *regs)
 +{
-+    trace_user_do_sigreturn(env, 0);
-+    fprintf(stderr, "do_sigreturn: not implemented\n");
-+    return -TARGET_ENOSYS;
-+}
++    struct target_sigframe *frame;
++    abi_ulong frame_addr;
++    sigset_t blocked;
++    target_sigset_t target_set;
++    int i;
++    int err = 0;
 +
-+long do_rt_sigreturn(CPUNios2State *env)
-+{
-+    /* Verify, can we follow the stack back */
-+    abi_ulong frame_addr = env->regs[R_SP];
-+    struct target_rt_sigframe *frame;
-+    sigset_t set;
-+    int rval;
-+
++    frame_addr = regs->gregs[15];
++    trace_user_do_sigreturn(regs, frame_addr);
 +    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1)) {
 +        goto badframe;
 +    }
 +
-+    target_to_host_sigset(&set, &frame->uc.tuc_sigmask);
-+    do_sigprocmask(SIG_SETMASK, &set, NULL);
-+
-+    if (rt_restore_ucontext(env, &frame->uc, &rval)) {
-+        goto badframe;
++    __get_user(target_set.sig[0], &frame->sc.oldmask);
++    for(i = 1; i < TARGET_NSIG_WORDS; i++) {
++        __get_user(target_set.sig[i], &frame->extramask[i - 1]);
 +    }
 +
++    if (err)
++        goto badframe;
++
++    target_to_host_sigset_internal(&blocked, &target_set);
++    set_sigmask(&blocked);
++
++    restore_sigcontext(regs, &frame->sc);
++
 +    unlock_user_struct(frame, frame_addr, 0);
-+    return rval;
++    return -TARGET_QEMU_ESIGRETURN;
 +
 +badframe:
 +    unlock_user_struct(frame, frame_addr, 0);
 +    force_sig(TARGET_SIGSEGV);
-+    return 0;
++    return -TARGET_QEMU_ESIGRETURN;
 +}
-diff --git a/linux-user/nios2/target_signal.h b/linux-user/nios2/target_signal.h
-index 23a8267696..aa78519025 100644
---- a/linux-user/nios2/target_signal.h
-+++ b/linux-user/nios2/target_signal.h
-@@ -23,4 +23,8 @@ static inline abi_ulong get_sp_from_cpustate(CPUNios2State *state)
-     return state->regs[R_SP];
++
++long do_rt_sigreturn(CPUSH4State *regs)
++{
++    struct target_rt_sigframe *frame;
++    abi_ulong frame_addr;
++    sigset_t blocked;
++
++    frame_addr = regs->gregs[15];
++    trace_user_do_rt_sigreturn(regs, frame_addr);
++    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1)) {
++        goto badframe;
++    }
++
++    target_to_host_sigset(&blocked, &frame->uc.tuc_sigmask);
++    set_sigmask(&blocked);
++
++    restore_sigcontext(regs, &frame->uc.tuc_mcontext);
++
++    if (do_sigaltstack(frame_addr +
++                       offsetof(struct target_rt_sigframe, uc.tuc_stack),
++                       0, get_sp_from_cpustate(regs)) == -EFAULT) {
++        goto badframe;
++    }
++
++    unlock_user_struct(frame, frame_addr, 0);
++    return -TARGET_QEMU_ESIGRETURN;
++
++badframe:
++    unlock_user_struct(frame, frame_addr, 0);
++    force_sig(TARGET_SIGSEGV);
++    return -TARGET_QEMU_ESIGRETURN;
++}
+diff --git a/linux-user/sh4/target_signal.h b/linux-user/sh4/target_signal.h
+index cbf23b6a31..a2a93fa04a 100644
+--- a/linux-user/sh4/target_signal.h
++++ b/linux-user/sh4/target_signal.h
+@@ -26,5 +26,10 @@ static inline abi_ulong get_sp_from_cpustate(CPUSH4State *state)
+     return state->gregs[15];
  }
  
++void setup_frame(int sig, struct target_sigaction *ka,
++                 target_sigset_t *set, CPUSH4State *regs);
 +void setup_rt_frame(int sig, struct target_sigaction *ka,
 +                    target_siginfo_t *info,
-+                    target_sigset_t *set,
-+                    CPUNios2State *env);
- #endif /* TARGET_SIGNAL_H */
++                    target_sigset_t *set, CPUSH4State *regs);
+ 
+ #endif /* SH4_TARGET_SIGNAL_H */
 diff --git a/linux-user/signal.c b/linux-user/signal.c
-index 3f3fd05822..e943980ade 100644
+index c99eae15d6..5429c9aa38 100644
 --- a/linux-user/signal.c
 +++ b/linux-user/signal.c
-@@ -2364,240 +2364,6 @@ badframe:
+@@ -2364,334 +2364,6 @@ badframe:
      return -TARGET_QEMU_ESIGRETURN;
  }
  
--#elif defined(TARGET_NIOS2)
+-#elif defined(TARGET_SH4)
 -
--#define MCONTEXT_VERSION 2
+-/*
+- * code and data structures from linux kernel:
+- * include/asm-sh/sigcontext.h
+- * arch/sh/kernel/signal.c
+- */
 -
 -struct target_sigcontext {
--    int version;
--    unsigned long gregs[32];
+-    target_ulong  oldmask;
+-
+-    /* CPU registers */
+-    target_ulong  sc_gregs[16];
+-    target_ulong  sc_pc;
+-    target_ulong  sc_pr;
+-    target_ulong  sc_sr;
+-    target_ulong  sc_gbr;
+-    target_ulong  sc_mach;
+-    target_ulong  sc_macl;
+-
+-    /* FPU registers */
+-    target_ulong  sc_fpregs[16];
+-    target_ulong  sc_xfpregs[16];
+-    unsigned int sc_fpscr;
+-    unsigned int sc_fpul;
+-    unsigned int sc_ownedfp;
 -};
+-
+-struct target_sigframe
+-{
+-    struct target_sigcontext sc;
+-    target_ulong extramask[TARGET_NSIG_WORDS-1];
+-    uint16_t retcode[3];
+-};
+-
 -
 -struct target_ucontext {
--    abi_ulong tuc_flags;
--    abi_ulong tuc_link;
+-    target_ulong tuc_flags;
+-    struct target_ucontext *tuc_link;
 -    target_stack_t tuc_stack;
 -    struct target_sigcontext tuc_mcontext;
--    target_sigset_t tuc_sigmask;   /* mask last for extensibility */
+-    target_sigset_t tuc_sigmask;	/* mask last for extensibility */
 -};
 -
--struct target_rt_sigframe {
+-struct target_rt_sigframe
+-{
 -    struct target_siginfo info;
 -    struct target_ucontext uc;
+-    uint16_t retcode[3];
 -};
 -
--static unsigned long sigsp(unsigned long sp, struct target_sigaction *ka)
+-
+-#define MOVW(n)  (0x9300|((n)-2)) /* Move mem word at PC+n to R3 */
+-#define TRAP_NOARG 0xc310         /* Syscall w/no args (NR in R3) SH3/4 */
+-
+-static abi_ulong get_sigframe(struct target_sigaction *ka,
+-                              unsigned long sp, size_t frame_size)
 -{
--    if (unlikely((ka->sa_flags & SA_ONSTACK)) && !sas_ss_flags(sp)) {
--#ifdef CONFIG_STACK_GROWSUP
--        return target_sigaltstack_used.ss_sp;
--#else
--        return target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
--#endif
--    }
--    return sp;
--}
--
--static int rt_setup_ucontext(struct target_ucontext *uc, CPUNios2State *env)
--{
--    unsigned long *gregs = uc->tuc_mcontext.gregs;
--
--    __put_user(MCONTEXT_VERSION, &uc->tuc_mcontext.version);
--    __put_user(env->regs[1], &gregs[0]);
--    __put_user(env->regs[2], &gregs[1]);
--    __put_user(env->regs[3], &gregs[2]);
--    __put_user(env->regs[4], &gregs[3]);
--    __put_user(env->regs[5], &gregs[4]);
--    __put_user(env->regs[6], &gregs[5]);
--    __put_user(env->regs[7], &gregs[6]);
--    __put_user(env->regs[8], &gregs[7]);
--    __put_user(env->regs[9], &gregs[8]);
--    __put_user(env->regs[10], &gregs[9]);
--    __put_user(env->regs[11], &gregs[10]);
--    __put_user(env->regs[12], &gregs[11]);
--    __put_user(env->regs[13], &gregs[12]);
--    __put_user(env->regs[14], &gregs[13]);
--    __put_user(env->regs[15], &gregs[14]);
--    __put_user(env->regs[16], &gregs[15]);
--    __put_user(env->regs[17], &gregs[16]);
--    __put_user(env->regs[18], &gregs[17]);
--    __put_user(env->regs[19], &gregs[18]);
--    __put_user(env->regs[20], &gregs[19]);
--    __put_user(env->regs[21], &gregs[20]);
--    __put_user(env->regs[22], &gregs[21]);
--    __put_user(env->regs[23], &gregs[22]);
--    __put_user(env->regs[R_RA], &gregs[23]);
--    __put_user(env->regs[R_FP], &gregs[24]);
--    __put_user(env->regs[R_GP], &gregs[25]);
--    __put_user(env->regs[R_EA], &gregs[27]);
--    __put_user(env->regs[R_SP], &gregs[28]);
--
--    return 0;
--}
--
--static int rt_restore_ucontext(CPUNios2State *env, struct target_ucontext *uc,
--                               int *pr2)
--{
--    int temp;
--    abi_ulong off, frame_addr = env->regs[R_SP];
--    unsigned long *gregs = uc->tuc_mcontext.gregs;
--    int err;
--
--    /* Always make any pending restarted system calls return -EINTR */
--    /* current->restart_block.fn = do_no_restart_syscall; */
--
--    __get_user(temp, &uc->tuc_mcontext.version);
--    if (temp != MCONTEXT_VERSION) {
--        return 1;
+-    if ((ka->sa_flags & TARGET_SA_ONSTACK) && (sas_ss_flags(sp) == 0)) {
+-        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
 -    }
 -
--    /* restore passed registers */
--    __get_user(env->regs[1], &gregs[0]);
--    __get_user(env->regs[2], &gregs[1]);
--    __get_user(env->regs[3], &gregs[2]);
--    __get_user(env->regs[4], &gregs[3]);
--    __get_user(env->regs[5], &gregs[4]);
--    __get_user(env->regs[6], &gregs[5]);
--    __get_user(env->regs[7], &gregs[6]);
--    __get_user(env->regs[8], &gregs[7]);
--    __get_user(env->regs[9], &gregs[8]);
--    __get_user(env->regs[10], &gregs[9]);
--    __get_user(env->regs[11], &gregs[10]);
--    __get_user(env->regs[12], &gregs[11]);
--    __get_user(env->regs[13], &gregs[12]);
--    __get_user(env->regs[14], &gregs[13]);
--    __get_user(env->regs[15], &gregs[14]);
--    __get_user(env->regs[16], &gregs[15]);
--    __get_user(env->regs[17], &gregs[16]);
--    __get_user(env->regs[18], &gregs[17]);
--    __get_user(env->regs[19], &gregs[18]);
--    __get_user(env->regs[20], &gregs[19]);
--    __get_user(env->regs[21], &gregs[20]);
--    __get_user(env->regs[22], &gregs[21]);
--    __get_user(env->regs[23], &gregs[22]);
--    /* gregs[23] is handled below */
--    /* Verify, should this be settable */
--    __get_user(env->regs[R_FP], &gregs[24]);
--    /* Verify, should this be settable */
--    __get_user(env->regs[R_GP], &gregs[25]);
--    /* Not really necessary no user settable bits */
--    __get_user(temp, &gregs[26]);
--    __get_user(env->regs[R_EA], &gregs[27]);
--
--    __get_user(env->regs[R_RA], &gregs[23]);
--    __get_user(env->regs[R_SP], &gregs[28]);
--
--    off = offsetof(struct target_rt_sigframe, uc.tuc_stack);
--    err = do_sigaltstack(frame_addr + off, 0, get_sp_from_cpustate(env));
--    if (err == -EFAULT) {
--        return 1;
--    }
--
--    *pr2 = env->regs[2];
--    return 0;
+-    return (sp - frame_size) & -8ul;
 -}
 -
--static void *get_sigframe(struct target_sigaction *ka, CPUNios2State *env,
--                          size_t frame_size)
+-/* Notice when we're in the middle of a gUSA region and reset.
+-   Note that this will only occur for !parallel_cpus, as we will
+-   translate such sequences differently in a parallel context.  */
+-static void unwind_gusa(CPUSH4State *regs)
 -{
--    unsigned long usp;
+-    /* If the stack pointer is sufficiently negative, and we haven't
+-       completed the sequence, then reset to the entry to the region.  */
+-    /* ??? The SH4 kernel checks for and address above 0xC0000000.
+-       However, the page mappings in qemu linux-user aren't as restricted
+-       and we wind up with the normal stack mapped above 0xF0000000.
+-       That said, there is no reason why the kernel should be allowing
+-       a gUSA region that spans 1GB.  Use a tighter check here, for what
+-       can actually be enabled by the immediate move.  */
+-    if (regs->gregs[15] >= -128u && regs->pc < regs->gregs[0]) {
+-        /* Reset the PC to before the gUSA region, as computed from
+-           R0 = region end, SP = -(region size), plus one more for the
+-           insn that actually initializes SP to the region size.  */
+-        regs->pc = regs->gregs[0] + regs->gregs[15] - 2;
 -
--    /* Default to using normal stack.  */
--    usp = env->regs[R_SP];
+-        /* Reset the SP to the saved version in R1.  */
+-        regs->gregs[15] = regs->gregs[1];
+-    }
+-}
 -
--    /* This is the X/Open sanctioned signal stack switching.  */
--    usp = sigsp(usp, ka);
+-static void setup_sigcontext(struct target_sigcontext *sc,
+-                             CPUSH4State *regs, unsigned long mask)
+-{
+-    int i;
 -
--    /* Verify, is it 32 or 64 bit aligned */
--    return (void *)((usp - frame_size) & -8UL);
+-#define COPY(x)         __put_user(regs->x, &sc->sc_##x)
+-    COPY(gregs[0]); COPY(gregs[1]);
+-    COPY(gregs[2]); COPY(gregs[3]);
+-    COPY(gregs[4]); COPY(gregs[5]);
+-    COPY(gregs[6]); COPY(gregs[7]);
+-    COPY(gregs[8]); COPY(gregs[9]);
+-    COPY(gregs[10]); COPY(gregs[11]);
+-    COPY(gregs[12]); COPY(gregs[13]);
+-    COPY(gregs[14]); COPY(gregs[15]);
+-    COPY(gbr); COPY(mach);
+-    COPY(macl); COPY(pr);
+-    COPY(sr); COPY(pc);
+-#undef COPY
+-
+-    for (i=0; i<16; i++) {
+-        __put_user(regs->fregs[i], &sc->sc_fpregs[i]);
+-    }
+-    __put_user(regs->fpscr, &sc->sc_fpscr);
+-    __put_user(regs->fpul, &sc->sc_fpul);
+-
+-    /* non-iBCS2 extensions.. */
+-    __put_user(mask, &sc->oldmask);
+-}
+-
+-static void restore_sigcontext(CPUSH4State *regs, struct target_sigcontext *sc)
+-{
+-    int i;
+-
+-#define COPY(x)         __get_user(regs->x, &sc->sc_##x)
+-    COPY(gregs[0]); COPY(gregs[1]);
+-    COPY(gregs[2]); COPY(gregs[3]);
+-    COPY(gregs[4]); COPY(gregs[5]);
+-    COPY(gregs[6]); COPY(gregs[7]);
+-    COPY(gregs[8]); COPY(gregs[9]);
+-    COPY(gregs[10]); COPY(gregs[11]);
+-    COPY(gregs[12]); COPY(gregs[13]);
+-    COPY(gregs[14]); COPY(gregs[15]);
+-    COPY(gbr); COPY(mach);
+-    COPY(macl); COPY(pr);
+-    COPY(sr); COPY(pc);
+-#undef COPY
+-
+-    for (i=0; i<16; i++) {
+-        __get_user(regs->fregs[i], &sc->sc_fpregs[i]);
+-    }
+-    __get_user(regs->fpscr, &sc->sc_fpscr);
+-    __get_user(regs->fpul, &sc->sc_fpul);
+-
+-    regs->tra = -1;         /* disable syscall checks */
+-    regs->flags &= ~(DELAY_SLOT_MASK | GUSA_MASK);
+-}
+-
+-static void setup_frame(int sig, struct target_sigaction *ka,
+-                        target_sigset_t *set, CPUSH4State *regs)
+-{
+-    struct target_sigframe *frame;
+-    abi_ulong frame_addr;
+-    int i;
+-
+-    unwind_gusa(regs);
+-
+-    frame_addr = get_sigframe(ka, regs->gregs[15], sizeof(*frame));
+-    trace_user_setup_frame(regs, frame_addr);
+-    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
+-        goto give_sigsegv;
+-    }
+-
+-    setup_sigcontext(&frame->sc, regs, set->sig[0]);
+-
+-    for (i = 0; i < TARGET_NSIG_WORDS - 1; i++) {
+-        __put_user(set->sig[i + 1], &frame->extramask[i]);
+-    }
+-
+-    /* Set up to return from userspace.  If provided, use a stub
+-       already in userspace.  */
+-    if (ka->sa_flags & TARGET_SA_RESTORER) {
+-        regs->pr = (unsigned long) ka->sa_restorer;
+-    } else {
+-        /* Generate return code (system call to sigreturn) */
+-        abi_ulong retcode_addr = frame_addr +
+-                                 offsetof(struct target_sigframe, retcode);
+-        __put_user(MOVW(2), &frame->retcode[0]);
+-        __put_user(TRAP_NOARG, &frame->retcode[1]);
+-        __put_user((TARGET_NR_sigreturn), &frame->retcode[2]);
+-        regs->pr = (unsigned long) retcode_addr;
+-    }
+-
+-    /* Set up registers for signal handler */
+-    regs->gregs[15] = frame_addr;
+-    regs->gregs[4] = sig; /* Arg for signal handler */
+-    regs->gregs[5] = 0;
+-    regs->gregs[6] = frame_addr += offsetof(typeof(*frame), sc);
+-    regs->pc = (unsigned long) ka->_sa_handler;
+-    regs->flags &= ~(DELAY_SLOT_MASK | GUSA_MASK);
+-
+-    unlock_user_struct(frame, frame_addr, 1);
+-    return;
+-
+-give_sigsegv:
+-    unlock_user_struct(frame, frame_addr, 1);
+-    force_sigsegv(sig);
 -}
 -
 -static void setup_rt_frame(int sig, struct target_sigaction *ka,
 -                           target_siginfo_t *info,
--                           target_sigset_t *set,
--                           CPUNios2State *env)
+-                           target_sigset_t *set, CPUSH4State *regs)
 -{
 -    struct target_rt_sigframe *frame;
--    int i, err = 0;
+-    abi_ulong frame_addr;
+-    int i;
 -
--    frame = get_sigframe(ka, env, sizeof(*frame));
+-    unwind_gusa(regs);
 -
--    if (ka->sa_flags & SA_SIGINFO) {
--        tswap_siginfo(&frame->info, info);
--    }
--
--    /* Create the ucontext.  */
--    __put_user(0, &frame->uc.tuc_flags);
--    __put_user(0, &frame->uc.tuc_link);
--    __put_user(target_sigaltstack_used.ss_sp, &frame->uc.tuc_stack.ss_sp);
--    __put_user(sas_ss_flags(env->regs[R_SP]), &frame->uc.tuc_stack.ss_flags);
--    __put_user(target_sigaltstack_used.ss_size, &frame->uc.tuc_stack.ss_size);
--    err |= rt_setup_ucontext(&frame->uc, env);
--    for (i = 0; i < TARGET_NSIG_WORDS; i++) {
--        __put_user((abi_ulong)set->sig[i],
--            (abi_ulong *)&frame->uc.tuc_sigmask.sig[i]);
--    }
--
--    if (err) {
+-    frame_addr = get_sigframe(ka, regs->gregs[15], sizeof(*frame));
+-    trace_user_setup_rt_frame(regs, frame_addr);
+-    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
 -        goto give_sigsegv;
 -    }
 -
--    /* Set up to return from userspace; jump to fixed address sigreturn
--       trampoline on kuser page.  */
--    env->regs[R_RA] = (unsigned long) (0x1044);
+-    tswap_siginfo(&frame->info, info);
+-
+-    /* Create the ucontext.  */
+-    __put_user(0, &frame->uc.tuc_flags);
+-    __put_user(0, (unsigned long *)&frame->uc.tuc_link);
+-    __put_user((unsigned long)target_sigaltstack_used.ss_sp,
+-               &frame->uc.tuc_stack.ss_sp);
+-    __put_user(sas_ss_flags(regs->gregs[15]),
+-               &frame->uc.tuc_stack.ss_flags);
+-    __put_user(target_sigaltstack_used.ss_size,
+-               &frame->uc.tuc_stack.ss_size);
+-    setup_sigcontext(&frame->uc.tuc_mcontext,
+-                     regs, set->sig[0]);
+-    for(i = 0; i < TARGET_NSIG_WORDS; i++) {
+-        __put_user(set->sig[i], &frame->uc.tuc_sigmask.sig[i]);
+-    }
+-
+-    /* Set up to return from userspace.  If provided, use a stub
+-       already in userspace.  */
+-    if (ka->sa_flags & TARGET_SA_RESTORER) {
+-        regs->pr = (unsigned long) ka->sa_restorer;
+-    } else {
+-        /* Generate return code (system call to sigreturn) */
+-        abi_ulong retcode_addr = frame_addr +
+-                                 offsetof(struct target_rt_sigframe, retcode);
+-        __put_user(MOVW(2), &frame->retcode[0]);
+-        __put_user(TRAP_NOARG, &frame->retcode[1]);
+-        __put_user((TARGET_NR_rt_sigreturn), &frame->retcode[2]);
+-        regs->pr = (unsigned long) retcode_addr;
+-    }
 -
 -    /* Set up registers for signal handler */
--    env->regs[R_SP] = (unsigned long) frame;
--    env->regs[4] = (unsigned long) sig;
--    env->regs[5] = (unsigned long) &frame->info;
--    env->regs[6] = (unsigned long) &frame->uc;
--    env->regs[R_EA] = (unsigned long) ka->_sa_handler;
+-    regs->gregs[15] = frame_addr;
+-    regs->gregs[4] = sig; /* Arg for signal handler */
+-    regs->gregs[5] = frame_addr + offsetof(typeof(*frame), info);
+-    regs->gregs[6] = frame_addr + offsetof(typeof(*frame), uc);
+-    regs->pc = (unsigned long) ka->_sa_handler;
+-    regs->flags &= ~(DELAY_SLOT_MASK | GUSA_MASK);
+-
+-    unlock_user_struct(frame, frame_addr, 1);
 -    return;
 -
 -give_sigsegv:
--    if (sig == TARGET_SIGSEGV) {
--        ka->_sa_handler = TARGET_SIG_DFL;
--    }
+-    unlock_user_struct(frame, frame_addr, 1);
 -    force_sigsegv(sig);
--    return;
 -}
 -
--long do_sigreturn(CPUNios2State *env)
+-long do_sigreturn(CPUSH4State *regs)
 -{
--    trace_user_do_sigreturn(env, 0);
--    fprintf(stderr, "do_sigreturn: not implemented\n");
--    return -TARGET_ENOSYS;
--}
+-    struct target_sigframe *frame;
+-    abi_ulong frame_addr;
+-    sigset_t blocked;
+-    target_sigset_t target_set;
+-    int i;
+-    int err = 0;
 -
--long do_rt_sigreturn(CPUNios2State *env)
--{
--    /* Verify, can we follow the stack back */
--    abi_ulong frame_addr = env->regs[R_SP];
--    struct target_rt_sigframe *frame;
--    sigset_t set;
--    int rval;
--
+-    frame_addr = regs->gregs[15];
+-    trace_user_do_sigreturn(regs, frame_addr);
 -    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1)) {
 -        goto badframe;
 -    }
 -
--    target_to_host_sigset(&set, &frame->uc.tuc_sigmask);
--    do_sigprocmask(SIG_SETMASK, &set, NULL);
--
--    if (rt_restore_ucontext(env, &frame->uc, &rval)) {
--        goto badframe;
+-    __get_user(target_set.sig[0], &frame->sc.oldmask);
+-    for(i = 1; i < TARGET_NSIG_WORDS; i++) {
+-        __get_user(target_set.sig[i], &frame->extramask[i - 1]);
 -    }
 -
+-    if (err)
+-        goto badframe;
+-
+-    target_to_host_sigset_internal(&blocked, &target_set);
+-    set_sigmask(&blocked);
+-
+-    restore_sigcontext(regs, &frame->sc);
+-
 -    unlock_user_struct(frame, frame_addr, 0);
--    return rval;
+-    return -TARGET_QEMU_ESIGRETURN;
 -
 -badframe:
 -    unlock_user_struct(frame, frame_addr, 0);
 -    force_sig(TARGET_SIGSEGV);
--    return 0;
+-    return -TARGET_QEMU_ESIGRETURN;
 -}
--/* TARGET_NIOS2 */
 -
- #elif defined(TARGET_OPENRISC)
+-long do_rt_sigreturn(CPUSH4State *regs)
+-{
+-    struct target_rt_sigframe *frame;
+-    abi_ulong frame_addr;
+-    sigset_t blocked;
+-
+-    frame_addr = regs->gregs[15];
+-    trace_user_do_rt_sigreturn(regs, frame_addr);
+-    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1)) {
+-        goto badframe;
+-    }
+-
+-    target_to_host_sigset(&blocked, &frame->uc.tuc_sigmask);
+-    set_sigmask(&blocked);
+-
+-    restore_sigcontext(regs, &frame->uc.tuc_mcontext);
+-
+-    if (do_sigaltstack(frame_addr +
+-                       offsetof(struct target_rt_sigframe, uc.tuc_stack),
+-                       0, get_sp_from_cpustate(regs)) == -EFAULT) {
+-        goto badframe;
+-    }
+-
+-    unlock_user_struct(frame, frame_addr, 0);
+-    return -TARGET_QEMU_ESIGRETURN;
+-
+-badframe:
+-    unlock_user_struct(frame, frame_addr, 0);
+-    force_sig(TARGET_SIGSEGV);
+-    return -TARGET_QEMU_ESIGRETURN;
+-}
+ #elif defined(TARGET_MICROBLAZE)
  
  struct target_sigcontext {
 -- 
