@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fDDOP-00033Q-PT
+	(envelope-from <pm215@archaic.org.uk>) id 1fDDOQ-00033Z-BY
 	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 14:19:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fDDOM-0007JX-Qf
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 14:19:17 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41298)
+	(envelope-from <pm215@archaic.org.uk>) id 1fDDOP-0007L2-2a
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 14:19:18 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41306)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fDDOM-0007IT-I9
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 14:19:14 -0400
+	id 1fDDOO-0007JL-QY
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 14:19:17 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 30 Apr 2018 19:18:55 +0100
-Message-Id: <20180430181905.32327-2-peter.maydell@linaro.org>
+Date: Mon, 30 Apr 2018 19:19:05 +0100
+Message-Id: <20180430181905.32327-12-peter.maydell@linaro.org>
 In-Reply-To: <20180430181905.32327-1-peter.maydell@linaro.org>
 References: <20180430181905.32327-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [RFC PATCH 01/11] Make address_space_translate() take
- a MemTxAttrs argument
+Subject: [Qemu-devel] [RFC PATCH 11/11] Add MemTxAttrs argument to IOMMU
+ translate function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,191 +28,180 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@linaro.org, Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-As part of plumbing MemTxAttrs down to the IOMMU translate method,
-add MemTxAttrs as an argument to address_space_translate().
-Its callers either have an attrs value to hand, or don't care
-and can use MEMTXATTRS_UNSPECIFIED.
+Add a MemTxAttrs argument to the IOMMU translate function; this is
+necessary for IOMMU implementations that care about transaction
+attributes such as user/privileged or secure/nonsecure when
+deciding whether a transaction is permitted.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/exec/memory.h     |  4 +++-
- accel/tcg/translate-all.c |  2 +-
- exec.c                    |  6 ++++--
- hw/vfio/common.c          |  3 ++-
- memory_ldst.inc.c         | 18 +++++++++---------
- target/riscv/helper.c     |  2 +-
- 6 files changed, 20 insertions(+), 15 deletions(-)
+ include/exec/memory.h    | 3 ++-
+ exec.c                   | 2 +-
+ hw/alpha/typhoon.c       | 3 ++-
+ hw/dma/rc4030.c          | 3 ++-
+ hw/i386/amd_iommu.c      | 3 ++-
+ hw/i386/intel_iommu.c    | 3 ++-
+ hw/ppc/spapr_iommu.c     | 3 ++-
+ hw/s390x/s390-pci-bus.c  | 3 ++-
+ hw/sparc/sun4m_iommu.c   | 3 ++-
+ hw/sparc64/sun4u_iommu.c | 3 ++-
+ memory.c                 | 3 ++-
+ 11 files changed, 21 insertions(+), 11 deletions(-)
 
 diff --git a/include/exec/memory.h b/include/exec/memory.h
-index e62965a0c8..f416d1e985 100644
+index 16a82d9722..2c7dd4b373 100644
 --- a/include/exec/memory.h
 +++ b/include/exec/memory.h
-@@ -1909,6 +1909,7 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
-  * #MemoryRegion.
-  * @len: pointer to length
-  * @is_write: indicates the transfer direction
-+ * @attrs: memory attributes
-  */
- MemoryRegion *flatview_translate(FlatView *fv,
-                                  hwaddr addr, hwaddr *xlat,
-@@ -1916,7 +1917,8 @@ MemoryRegion *flatview_translate(FlatView *fv,
- 
- static inline MemoryRegion *address_space_translate(AddressSpace *as,
-                                                     hwaddr addr, hwaddr *xlat,
--                                                    hwaddr *len, bool is_write)
-+                                                    hwaddr *len, bool is_write,
-+                                                    MemTxAttrs attrs)
- {
-     return flatview_translate(address_space_to_flatview(as),
-                               addr, xlat, len, is_write);
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index f04a922ef7..52f7bd59a9 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -1679,7 +1679,7 @@ void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr, MemTxAttrs attrs)
-     hwaddr l = 1;
- 
-     rcu_read_lock();
--    mr = address_space_translate(as, addr, &addr, &l, false);
-+    mr = address_space_translate(as, addr, &addr, &l, false, attrs);
-     if (!(memory_region_is_ram(mr)
-           || memory_region_is_romd(mr))) {
-         rcu_read_unlock();
+@@ -221,9 +221,10 @@ typedef struct IOMMUMemoryRegionClass {
+      * @iommu: the IOMMUMemoryRegion
+      * @hwaddr: address to be translated within the memory region
+      * @flag: requested access permissions
++     * @attrs: memory transaction attributes
+      */
+     IOMMUTLBEntry (*translate)(IOMMUMemoryRegion *iommu, hwaddr addr,
+-                               IOMMUAccessFlags flag);
++                               IOMMUAccessFlags flag, MemTxAttrs attrs);
+     /* Returns minimum supported page size in bytes.
+      * If this method is not provided then the minimum is assumed to
+      * be TARGET_PAGE_SIZE.
 diff --git a/exec.c b/exec.c
-index df35e6dd85..a0f27b7b8c 100644
+index 9c6d9aae28..e346424172 100644
 --- a/exec.c
 +++ b/exec.c
-@@ -3287,7 +3287,8 @@ static inline void cpu_physical_memory_write_rom_internal(AddressSpace *as,
-     rcu_read_lock();
-     while (len > 0) {
-         l = len;
--        mr = address_space_translate(as, addr, &addr1, &l, true);
-+        mr = address_space_translate(as, addr, &addr1, &l, true,
-+                                     MEMTXATTRS_UNSPECIFIED);
+@@ -513,7 +513,7 @@ static MemoryRegionSection flatview_do_translate(FlatView *fv,
+         imrc = memory_region_get_iommu_class_nocheck(iommu_mr);
  
-         if (!(memory_region_is_ram(mr) ||
-               memory_region_is_romd(mr))) {
-@@ -3716,7 +3717,8 @@ bool cpu_physical_memory_is_io(hwaddr phys_addr)
+         iotlb = imrc->translate(iommu_mr, addr, is_write ?
+-                                IOMMU_WO : IOMMU_RO);
++                                IOMMU_WO : IOMMU_RO, attrs);
+         addr = ((iotlb.translated_addr & ~iotlb.addr_mask)
+                 | (addr & iotlb.addr_mask));
+         page_mask &= iotlb.addr_mask;
+diff --git a/hw/alpha/typhoon.c b/hw/alpha/typhoon.c
+index 6a40869488..49192ab24d 100644
+--- a/hw/alpha/typhoon.c
++++ b/hw/alpha/typhoon.c
+@@ -666,7 +666,8 @@ static bool window_translate(TyphoonWindow *win, hwaddr addr,
+    Pchip and generate a machine check interrupt.  */
+ static IOMMUTLBEntry typhoon_translate_iommu(IOMMUMemoryRegion *iommu,
+                                              hwaddr addr,
+-                                             IOMMUAccessFlags flag)
++                                             IOMMUAccessFlags flag,
++                                             MemTxAttrs attrs)
+ {
+     TyphoonPchip *pchip = container_of(iommu, TyphoonPchip, iommu);
+     IOMMUTLBEntry ret;
+diff --git a/hw/dma/rc4030.c b/hw/dma/rc4030.c
+index 5d4833eeca..89686ae7dc 100644
+--- a/hw/dma/rc4030.c
++++ b/hw/dma/rc4030.c
+@@ -491,7 +491,8 @@ static const MemoryRegionOps jazzio_ops = {
+ };
  
-     rcu_read_lock();
-     mr = address_space_translate(&address_space_memory,
--                                 phys_addr, &phys_addr, &l, false);
-+                                 phys_addr, &phys_addr, &l, false,
-+                                 MEMTXATTRS_UNSPECIFIED);
+ static IOMMUTLBEntry rc4030_dma_translate(IOMMUMemoryRegion *iommu, hwaddr addr,
+-                                          IOMMUAccessFlags flag)
++                                          IOMMUAccessFlags flag,
++                                          MemTxAttrs attrs)
+ {
+     rc4030State *s = container_of(iommu, rc4030State, dma_mr);
+     IOMMUTLBEntry ret = {
+diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
+index 63d46ff6ee..5f530b5fe6 100644
+--- a/hw/i386/amd_iommu.c
++++ b/hw/i386/amd_iommu.c
+@@ -991,7 +991,8 @@ static inline bool amdvi_is_interrupt_addr(hwaddr addr)
+ }
  
-     res = !(memory_region_is_ram(mr) || memory_region_is_romd(mr));
-     rcu_read_unlock();
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 07ffa0ba10..8e57265edf 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -324,7 +324,8 @@ static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
-      */
-     mr = address_space_translate(&address_space_memory,
-                                  iotlb->translated_addr,
--                                 &xlat, &len, writable);
-+                                 &xlat, &len, writable,
-+                                 MEMTXATTRS_UNSPECIFIED);
-     if (!memory_region_is_ram(mr)) {
-         error_report("iommu map to non memory area %"HWADDR_PRIx"",
-                      xlat);
-diff --git a/memory_ldst.inc.c b/memory_ldst.inc.c
-index 5dbff9cef8..860ba31ac8 100644
---- a/memory_ldst.inc.c
-+++ b/memory_ldst.inc.c
-@@ -33,7 +33,7 @@ static inline uint32_t glue(address_space_ldl_internal, SUFFIX)(ARG1_DECL,
-     bool release_lock = false;
+ static IOMMUTLBEntry amdvi_translate(IOMMUMemoryRegion *iommu, hwaddr addr,
+-                                     IOMMUAccessFlags flag)
++                                     IOMMUAccessFlags flag,
++                                     MemTxAttrs attrs)
+ {
+     AMDVIAddressSpace *as = container_of(iommu, AMDVIAddressSpace, iommu);
+     AMDVIState *s = as->iommu_state;
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index fb31de9416..483ff305f8 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -2282,7 +2282,8 @@ static void vtd_mem_write(void *opaque, hwaddr addr,
+ }
  
-     RCU_READ_LOCK();
--    mr = TRANSLATE(addr, &addr1, &l, false);
-+    mr = TRANSLATE(addr, &addr1, &l, false, attrs);
-     if (l < 4 || !IS_DIRECT(mr, false)) {
-         release_lock |= prepare_mmio_access(mr);
+ static IOMMUTLBEntry vtd_iommu_translate(IOMMUMemoryRegion *iommu, hwaddr addr,
+-                                         IOMMUAccessFlags flag)
++                                         IOMMUAccessFlags flag,
++                                         MemTxAttrs attrs)
+ {
+     VTDAddressSpace *vtd_as = container_of(iommu, VTDAddressSpace, iommu);
+     IntelIOMMUState *s = vtd_as->iommu_state;
+diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
+index aaa6010d5c..199612095a 100644
+--- a/hw/ppc/spapr_iommu.c
++++ b/hw/ppc/spapr_iommu.c
+@@ -112,7 +112,8 @@ static void spapr_tce_free_table(uint64_t *table, int fd, uint32_t nb_table)
+ /* Called from RCU critical section */
+ static IOMMUTLBEntry spapr_tce_translate_iommu(IOMMUMemoryRegion *iommu,
+                                                hwaddr addr,
+-                                               IOMMUAccessFlags flag)
++                                               IOMMUAccessFlags flag,
++                                               MemTxAttrs attrs)
+ {
+     sPAPRTCETable *tcet = container_of(iommu, sPAPRTCETable, iommu);
+     uint64_t tce;
+diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+index 10da87458e..77588c2355 100644
+--- a/hw/s390x/s390-pci-bus.c
++++ b/hw/s390x/s390-pci-bus.c
+@@ -484,7 +484,8 @@ uint16_t s390_guest_io_table_walk(uint64_t g_iota, hwaddr addr,
+ }
  
-@@ -127,7 +127,7 @@ static inline uint64_t glue(address_space_ldq_internal, SUFFIX)(ARG1_DECL,
-     bool release_lock = false;
+ static IOMMUTLBEntry s390_translate_iommu(IOMMUMemoryRegion *mr, hwaddr addr,
+-                                          IOMMUAccessFlags flag)
++                                          IOMMUAccessFlags flag,
++                                          MemTxAttrs attrs)
+ {
+     S390PCIIOMMU *iommu = container_of(mr, S390PCIIOMMU, iommu_mr);
+     S390IOTLBEntry *entry;
+diff --git a/hw/sparc/sun4m_iommu.c b/hw/sparc/sun4m_iommu.c
+index b677601fc6..f68bcade3c 100644
+--- a/hw/sparc/sun4m_iommu.c
++++ b/hw/sparc/sun4m_iommu.c
+@@ -282,7 +282,8 @@ static void iommu_bad_addr(IOMMUState *s, hwaddr addr,
+ /* Called from RCU critical section */
+ static IOMMUTLBEntry sun4m_translate_iommu(IOMMUMemoryRegion *iommu,
+                                            hwaddr addr,
+-                                           IOMMUAccessFlags flags)
++                                           IOMMUAccessFlags flags,
++                                           MemTxAttrs attrs)
+ {
+     IOMMUState *is = container_of(iommu, IOMMUState, iommu);
+     hwaddr page, pa;
+diff --git a/hw/sparc64/sun4u_iommu.c b/hw/sparc64/sun4u_iommu.c
+index eb3aaa87e6..7a5a588aed 100644
+--- a/hw/sparc64/sun4u_iommu.c
++++ b/hw/sparc64/sun4u_iommu.c
+@@ -73,7 +73,8 @@
+ /* Called from RCU critical section */
+ static IOMMUTLBEntry sun4u_translate_iommu(IOMMUMemoryRegion *iommu,
+                                            hwaddr addr,
+-                                           IOMMUAccessFlags flag)
++                                           IOMMUAccessFlags flag,
++                                           MemTxAttrs attrs)
+ {
+     IOMMUState *is = container_of(iommu, IOMMUState, iommu);
+     hwaddr baseaddr, offset;
+diff --git a/memory.c b/memory.c
+index a729c29862..dbb9718bea 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1832,7 +1832,8 @@ void memory_region_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
+     granularity = memory_region_iommu_get_min_page_size(iommu_mr);
  
-     RCU_READ_LOCK();
--    mr = TRANSLATE(addr, &addr1, &l, false);
-+    mr = TRANSLATE(addr, &addr1, &l, false, attrs);
-     if (l < 8 || !IS_DIRECT(mr, false)) {
-         release_lock |= prepare_mmio_access(mr);
- 
-@@ -219,7 +219,7 @@ uint32_t glue(address_space_ldub, SUFFIX)(ARG1_DECL,
-     bool release_lock = false;
- 
-     RCU_READ_LOCK();
--    mr = TRANSLATE(addr, &addr1, &l, false);
-+    mr = TRANSLATE(addr, &addr1, &l, false, attrs);
-     if (!IS_DIRECT(mr, false)) {
-         release_lock |= prepare_mmio_access(mr);
- 
-@@ -261,7 +261,7 @@ static inline uint32_t glue(address_space_lduw_internal, SUFFIX)(ARG1_DECL,
-     bool release_lock = false;
- 
-     RCU_READ_LOCK();
--    mr = TRANSLATE(addr, &addr1, &l, false);
-+    mr = TRANSLATE(addr, &addr1, &l, false, attrs);
-     if (l < 2 || !IS_DIRECT(mr, false)) {
-         release_lock |= prepare_mmio_access(mr);
- 
-@@ -356,7 +356,7 @@ void glue(address_space_stl_notdirty, SUFFIX)(ARG1_DECL,
-     bool release_lock = false;
- 
-     RCU_READ_LOCK();
--    mr = TRANSLATE(addr, &addr1, &l, true);
-+    mr = TRANSLATE(addr, &addr1, &l, true, attrs);
-     if (l < 4 || !IS_DIRECT(mr, true)) {
-         release_lock |= prepare_mmio_access(mr);
- 
-@@ -399,7 +399,7 @@ static inline void glue(address_space_stl_internal, SUFFIX)(ARG1_DECL,
-     bool release_lock = false;
- 
-     RCU_READ_LOCK();
--    mr = TRANSLATE(addr, &addr1, &l, true);
-+    mr = TRANSLATE(addr, &addr1, &l, true, attrs);
-     if (l < 4 || !IS_DIRECT(mr, true)) {
-         release_lock |= prepare_mmio_access(mr);
- 
-@@ -489,7 +489,7 @@ void glue(address_space_stb, SUFFIX)(ARG1_DECL,
-     bool release_lock = false;
- 
-     RCU_READ_LOCK();
--    mr = TRANSLATE(addr, &addr1, &l, true);
-+    mr = TRANSLATE(addr, &addr1, &l, true, attrs);
-     if (!IS_DIRECT(mr, true)) {
-         release_lock |= prepare_mmio_access(mr);
-         r = memory_region_dispatch_write(mr, addr1, val, 1, attrs);
-@@ -528,7 +528,7 @@ static inline void glue(address_space_stw_internal, SUFFIX)(ARG1_DECL,
-     bool release_lock = false;
- 
-     RCU_READ_LOCK();
--    mr = TRANSLATE(addr, &addr1, &l, true);
-+    mr = TRANSLATE(addr, &addr1, &l, true, attrs);
-     if (l < 2 || !IS_DIRECT(mr, true)) {
-         release_lock |= prepare_mmio_access(mr);
- 
-@@ -619,7 +619,7 @@ static void glue(address_space_stq_internal, SUFFIX)(ARG1_DECL,
-     bool release_lock = false;
- 
-     RCU_READ_LOCK();
--    mr = TRANSLATE(addr, &addr1, &l, true);
-+    mr = TRANSLATE(addr, &addr1, &l, true, attrs);
-     if (l < 8 || !IS_DIRECT(mr, true)) {
-         release_lock |= prepare_mmio_access(mr);
- 
-diff --git a/target/riscv/helper.c b/target/riscv/helper.c
-index 02cbcea2b7..d7023ad78e 100644
---- a/target/riscv/helper.c
-+++ b/target/riscv/helper.c
-@@ -210,7 +210,7 @@ restart:
-                 MemoryRegion *mr;
-                 hwaddr l = sizeof(target_ulong), addr1;
-                 mr = address_space_translate(cs->as, pte_addr,
--                    &addr1, &l, false);
-+                    &addr1, &l, false, MEMTXATTRS_UNSPECIFIED);
-                 if (memory_access_is_direct(mr, true)) {
-                     target_ulong *pte_pa =
-                         qemu_map_ram_ptr(mr->ram_block, addr1);
+     for (addr = 0; addr < memory_region_size(mr); addr += granularity) {
+-        iotlb = imrc->translate(iommu_mr, addr, IOMMU_NONE);
++        iotlb = imrc->translate(iommu_mr, addr, IOMMU_NONE,
++                                MEMTXATTRS_UNSPECIFIED);
+         if (iotlb.perm != IOMMU_NONE) {
+             n->notify(n, &iotlb);
+         }
 -- 
 2.17.0
