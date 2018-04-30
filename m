@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fDB9F-0005ke-W2
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 11:55:31 -0400
+	(envelope-from <mst@redhat.com>) id 1fDBAL-0006Xp-SV
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 11:56:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fDB9C-0000EM-Ti
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 11:55:30 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:50545)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fDB9C-0000DA-J7
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 11:55:26 -0400
-Received: by mail-wm0-x241.google.com with SMTP id t11so14031992wmt.0
-	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 08:55:26 -0700 (PDT)
-References: <20180425012300.14698-1-richard.henderson@linaro.org>
-	<20180425012300.14698-3-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180425012300.14698-3-richard.henderson@linaro.org>
-Date: Mon, 30 Apr 2018 16:55:23 +0100
-Message-ID: <87lgd44rkk.fsf@linaro.org>
+	(envelope-from <mst@redhat.com>) id 1fDBAI-0001A9-Q8
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 11:56:37 -0400
+Date: Mon, 30 Apr 2018 18:56:24 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180430185609-mutt-send-email-mst@kernel.org>
+References: <1525073539-27991-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/9] target/arm: Implement vector shifted
- FCVT for fp16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1525073539-27991-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] trivial: Do not include pci.h if it is not
+ necessary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,134 +23,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>
 
+On Mon, Apr 30, 2018 at 09:32:19AM +0200, Thomas Huth wrote:
+> There is no need to include pci.h in these files.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-> While we have some of the scalar paths for FCVT for fp16,
-> we failed to decode the fp16 version of these instructions.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  target/arm/translate-a64.c | 65 ++++++++++++++++++++++++++++++++--------=
-------
->  1 file changed, 46 insertions(+), 19 deletions(-)
->
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index c92e052686..e2d11998bd 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -7120,19 +7120,28 @@ static void handle_simd_shift_fpint_conv(DisasCon=
-text *s, bool is_scalar,
->                                           bool is_q, bool is_u,
->                                           int immh, int immb, int rn, int=
- rd)
->  {
-> -    bool is_double =3D extract32(immh, 3, 1);
->      int immhb =3D immh << 3 | immb;
-> -    int fracbits =3D (is_double ? 128 : 64) - immhb;
-> -    int pass;
-> +    int pass, size, fracbits;
->      TCGv_ptr tcg_fpstatus;
->      TCGv_i32 tcg_rmode, tcg_shift;
->
-> -    if (!extract32(immh, 2, 2)) {
-> -        unallocated_encoding(s);
-> -        return;
-> -    }
+>  include/hw/ppc/ppc4xx.h            | 2 --
+>  include/hw/virtio/virtio-balloon.h | 1 -
+>  include/hw/virtio/virtio-gpu.h     | 1 -
+>  3 files changed, 4 deletions(-)
+> 
+> diff --git a/include/hw/ppc/ppc4xx.h b/include/hw/ppc/ppc4xx.h
+> index cb0bb55..3a2a04c 100644
+> --- a/include/hw/ppc/ppc4xx.h
+> +++ b/include/hw/ppc/ppc4xx.h
+> @@ -25,8 +25,6 @@
+>  #ifndef PPC4XX_H
+>  #define PPC4XX_H
+>  
+> -#include "hw/pci/pci.h"
 > -
-> -    if (!is_scalar && !is_q && is_double) {
-> +    if (immh & 0x8) {
-> +        size =3D MO_64;
-> +        if (!is_scalar && !is_q) {
-> +            unallocated_encoding(s);
-> +            return;
-> +        }
-> +    } else if (immh & 0x4) {
-> +        size =3D MO_32;
-> +    } else if (immh & 0x2) {
-> +        size =3D MO_16;
-> +        if (!arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
-> +            unallocated_encoding(s);
-> +            return;
-> +        }
-> +    } else {
-> +        /* Should have split out AdvSIMD modified immediate earlier.  */
-> +        assert(immh =3D=3D 1);
->          unallocated_encoding(s);
->          return;
->      }
-> @@ -7144,11 +7153,12 @@ static void handle_simd_shift_fpint_conv(DisasCon=
-text *s, bool is_scalar,
->      assert(!(is_scalar && is_q));
->
->      tcg_rmode =3D tcg_const_i32(arm_rmode_to_sf(FPROUNDING_ZERO));
-> -    tcg_fpstatus =3D get_fpstatus_ptr(false);
-> +    tcg_fpstatus =3D get_fpstatus_ptr(size =3D=3D MO_16);
->      gen_helper_set_rmode(tcg_rmode, tcg_rmode, tcg_fpstatus);
-> +    fracbits =3D (16 << size) - immhb;
->      tcg_shift =3D tcg_const_i32(fracbits);
->
-> -    if (is_double) {
-> +    if (size =3D=3D 3) {
->          int maxpass =3D is_scalar ? 1 : 2;
->
->          for (pass =3D 0; pass < maxpass; pass++) {
-> @@ -7165,20 +7175,37 @@ static void handle_simd_shift_fpint_conv(DisasCon=
-text *s, bool is_scalar,
->          }
->          clear_vec_high(s, is_q, rd);
->      } else {
-> -        int maxpass =3D is_scalar ? 1 : is_q ? 4 : 2;
-> +        void (*fn)(TCGv_i32, TCGv_i32, TCGv_i32, TCGv_ptr);
-> +        int maxpass =3D is_scalar ? 1 : (8 << is_q >> size);
-
-brackets
-
-> +
-> +        switch (size) {
-> +        case MO_16:
-> +            if (is_u) {
-> +                fn =3D gen_helper_vfp_toulh;
-> +            } else {
-> +                fn =3D gen_helper_vfp_toslh;
-> +            }
-> +            break;
-> +        case MO_32:
-> +            if (is_u) {
-> +                fn =3D gen_helper_vfp_touls;
-> +            } else {
-> +                fn =3D gen_helper_vfp_tosls;
-> +            }
-> +            break;
-> +        default:
-> +            g_assert_not_reached();
-> +        }
-> +
->          for (pass =3D 0; pass < maxpass; pass++) {
->              TCGv_i32 tcg_op =3D tcg_temp_new_i32();
->
-> -            read_vec_element_i32(s, tcg_op, rn, pass, MO_32);
-> -            if (is_u) {
-> -                gen_helper_vfp_touls(tcg_op, tcg_op, tcg_shift, tcg_fpst=
-atus);
-> -            } else {
-> -                gen_helper_vfp_tosls(tcg_op, tcg_op, tcg_shift, tcg_fpst=
-atus);
-> -            }
-> +            read_vec_element_i32(s, tcg_op, rn, pass, size);
-> +            fn(tcg_op, tcg_op, tcg_shift, tcg_fpstatus);
->              if (is_scalar) {
->                  write_fp_sreg(s, rd, tcg_op);
->              } else {
-> -                write_vec_element_i32(s, tcg_op, rd, pass, MO_32);
-> +                write_vec_element_i32(s, tcg_op, rd, pass, size);
->              }
->              tcg_temp_free_i32(tcg_op);
->          }
-
-
---
-Alex Benn=C3=A9e
+>  /* PowerPC 4xx core initialization */
+>  PowerPCCPU *ppc4xx_init(const char *cpu_model,
+>                          clk_setup_t *cpu_clk, clk_setup_t *tb_clk,
+> diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
+> index 1ea13bd..e0df352 100644
+> --- a/include/hw/virtio/virtio-balloon.h
+> +++ b/include/hw/virtio/virtio-balloon.h
+> @@ -17,7 +17,6 @@
+>  
+>  #include "standard-headers/linux/virtio_balloon.h"
+>  #include "hw/virtio/virtio.h"
+> -#include "hw/pci/pci.h"
+>  
+>  #define TYPE_VIRTIO_BALLOON "virtio-balloon-device"
+>  #define VIRTIO_BALLOON(obj) \
+> diff --git a/include/hw/virtio/virtio-gpu.h b/include/hw/virtio/virtio-gpu.h
+> index 22ac3c2..79bb3fb 100644
+> --- a/include/hw/virtio/virtio-gpu.h
+> +++ b/include/hw/virtio/virtio-gpu.h
+> @@ -18,7 +18,6 @@
+>  #include "ui/qemu-pixman.h"
+>  #include "ui/console.h"
+>  #include "hw/virtio/virtio.h"
+> -#include "hw/pci/pci.h"
+>  #include "qemu/log.h"
+>  
+>  #include "standard-headers/linux/virtio_gpu.h"
+> -- 
+> 1.8.3.1
