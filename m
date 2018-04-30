@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fD57a-0005GZ-MH
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:29:23 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fD5I8-000684-2U
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:40:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fD57W-0007wj-NC
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:29:22 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58698 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1fD5I3-0004zU-Uk
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:40:15 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38184 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1fD57W-0007wV-IV
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:29:18 -0400
-Date: Mon, 30 Apr 2018 11:29:06 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180430112906.20101672.cohuck@redhat.com>
-In-Reply-To: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
-References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fD5I3-0004z1-Pb
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:40:11 -0400
+References: <87o9inxkd1.fsf@dusky.pond.sub.org>
+	<20180430065235.577-1-aik@ozlabs.ru>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c23d1ec1-51d7-d967-28a2-0df0f59e7480@redhat.com>
+Date: Mon, 30 Apr 2018 11:39:55 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20180430065235.577-1-aik@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] release retrospective, next release timing,
- numbering
+Subject: Re: [Qemu-devel] [PATCH qemu] qom: Document
+ qom/device-list-properties implementation specific
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,61 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Fri, 27 Apr 2018 16:51:03 +0100
-Peter Maydell <peter.maydell@linaro.org> wrote:
+On 30/04/2018 08:52, Alexey Kardashevskiy wrote:
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index 5636f4a..399ec74 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -1491,6 +1491,10 @@
+>  #
+>  # List properties associated with a device.
+>  #
+> +# Note: the handler creates a device object, enumerates properties and destroys
+> +# the object so it only lists properties defined in DeviceClass::props or
+> +# created by DeviceClass::init()/TypeInfo::instance_init().
+> +#
+>  # @typename: the type name of a device
+>  #
+>  # Returns: a list of ObjectPropertyInfo describing a devices properties
+> @@ -1506,6 +1510,11 @@
+>  #
+>  # List properties associated with a QOM object.
+>  #
+> +# Note: the handler creates an object, enumerates properties and destroys
+> +# the object so it only lists properties created in TypeInfo::instance_init().
+> +# Since the instance_init() callback of the device object adds
+> +# DeviceClass::props as object properties, they will be listed as well.
+> +#
 
-> Hi; I usually let people forget about releases for a month or
-> so before bringing this topic up, but:
-> 
-> (1) do we want to call the next release 2.13, or something else?
-> There's no particular reason to bump to 3.0 except some combination of
->  * if we keep going like this we'll get up to 2.42, which starts to
->    get silly
->  * Linus-style "avoid being too predictable"
->  * triskaidekaphobia
+This says what it does, but not why it is a problem.  Can you explain
+that to me as well?
 
-* avoiding that this discussion comes up every release :)
+Thanks,
 
-> but maybe we should anyway?
-
-v3.0 sounds fine to me.
-
-> 
-> (2) release timing:
->  * usual schedule would give us a next release mid-to-late August
->  * unless I can persuade Stefan to do the release management this
->    cycle we might need to wind that in by a couple of weeks so
->    it's definitely done by the middle of August, to avoid a clash
->    with a personal commitment
->  * so probably hardfreeze 10th July, softfreeze 3rd July
-
-August might be more of a vacation month than July, anyway? (Depending
-on where you live, I guess.)
-
-No objection from me.
-
-> 
-> (3) retrospective, lessons learned &c
->  * please remember that if every single submaintainer submits
->    a pull request on the morning of an RC, it is physically
->    not possible for me to process all those pulls in time to
->    tag the RC that day. We had several RCs which got delayed
->    by a day because of this; please try to submit earlier
->    rather than later...
-
-There seemed to have been several 'oh crap' issues that people wanted
-to get in asap, so that might account for it.
-
-On a related note: During the development phase, does it make more
-sense to collect stuff until you have a big pile of patches, or is it
-better (from an integration perspective) to do more frequent, smaller
-pull requests?
-
->  * provide your opinions here ?
-> 
-> thanks
-> -- PMM
-> 
+Paolo
