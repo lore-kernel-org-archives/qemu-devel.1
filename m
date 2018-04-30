@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fD4q3-0006Hn-0q
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:11:20 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fD4q1-0006HR-SH
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:11:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fD4pw-00062c-Rl
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:11:14 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fD4pz-00066g-CN
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:11:13 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon, 30 Apr 2018 11:09:58 +0200
-Message-Id: <20180430091037.13878-4-laurent@vivier.eu>
-In-Reply-To: <20180430091037.13878-1-laurent@vivier.eu>
-References: <20180430091037.13878-1-laurent@vivier.eu>
+Date: Mon, 30 Apr 2018 11:09:55 +0200
+Message-Id: <20180430091037.13878-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 03/42] linux-user: create a dummy per arch
- signal.c
+Subject: [Qemu-devel] [PULL 00/42] Linux user for 2.13 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,749 +23,192 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Cornelia Huck <cohuck@redhat.com>
 
-Create a signal-common.h for future use by these new files
-and use it in the existing signal.c
+The following changes since commit 6f0c4706b35dead265509115ddbd2a8d1af516c1:
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20180424192635.6027-2-laurent@vivier.eu>
----
- linux-user/Makefile.objs       |  2 +-
- linux-user/aarch64/signal.c    | 18 +++++++++++++++
- linux-user/alpha/signal.c      | 18 +++++++++++++++
- linux-user/arm/signal.c        | 18 +++++++++++++++
- linux-user/cris/signal.c       | 18 +++++++++++++++
- linux-user/hppa/signal.c       | 18 +++++++++++++++
- linux-user/i386/signal.c       | 18 +++++++++++++++
- linux-user/m68k/signal.c       | 18 +++++++++++++++
- linux-user/microblaze/signal.c | 18 +++++++++++++++
- linux-user/mips/signal.c       | 18 +++++++++++++++
- linux-user/mips64/signal.c     | 18 +++++++++++++++
- linux-user/nios2/signal.c      | 18 +++++++++++++++
- linux-user/openrisc/signal.c   | 18 +++++++++++++++
- linux-user/ppc/signal.c        | 18 +++++++++++++++
- linux-user/riscv/signal.c      | 18 +++++++++++++++
- linux-user/s390x/signal.c      | 18 +++++++++++++++
- linux-user/sh4/signal.c        | 18 +++++++++++++++
- linux-user/signal-common.h     | 50 ++++++++++++++++++++++++++++++++++++++++++
- linux-user/signal.c            | 41 ++++++++++------------------------
- linux-user/sparc/signal.c      | 18 +++++++++++++++
- linux-user/sparc64/signal.c    | 18 +++++++++++++++
- linux-user/tilegx/signal.c     | 18 +++++++++++++++
- linux-user/x86_64/signal.c     | 18 +++++++++++++++
- linux-user/xtensa/signal.c     | 18 +++++++++++++++
- 24 files changed, 440 insertions(+), 31 deletions(-)
+  Merge remote-tracking branch 'remotes/kraxel/tags/usb-20180427-pull-request' into staging (2018-04-27 12:27:59 +0100)
+
+are available in the Git repository at:
+
+  git://github.com/vivier/qemu.git tags/linux-user-for-2.13-pull-request
+
+for you to fetch changes up to 62aaa5146476911aea1fbe6fbf919d06bba8ab5d:
+
+  linux-user: Add ARM get_tls syscall support (2018-04-30 09:51:31 +0200)
+
+----------------------------------------------------------------
+Essentially moving code: move signal and cpu_loop arch specific
+functions under the linux-user/<arch> directory
+Add get_tls() syscall and update the patch to apply on 
+linux-user/arm/cpu_loop.c
+minor fix for RISC-V (uname) and getdents()
+----------------------------------------------------------------
+
+Alex Bennée (1):
+  linux-user: set minimum uname for RISC-V
+
+Christophe Lyon (1):
+  linux-user: Add ARM get_tls syscall support
+
+Laurent Vivier (39):
+  linux-user: create a dummy per arch signal.c
+  linux-user: move aarch64 signal.c parts to aarch64 directory
+  linux-user: move arm signal.c parts to arm directory
+  linux-user: move sh4 signal.c parts to sh4 directory
+  linux-user: move microblaze signal.c parts to microblaze directory
+  linux-user: move cris signal.c parts to cris directory
+  linux-user: move nios2 signal.c parts to nios2 directory
+  linux-user: move openrisc signal.c parts to openrisc directory
+  linux-user: move s390x signal.c parts to s390x directory
+  linux-user: move m68k signal.c parts to m68k directory
+  linux-user: move alpha signal.c parts to alpha directory
+  linux-user: move tilegx signal.c parts to tilegx directory
+  linux-user: move riscv signal.c parts to riscv directory
+  linux-user: move hppa signal.c parts to hppa directory
+  linux-user: move xtensa signal.c parts to xtensa directory
+  linux-user: move i386/x86_64 signal.c parts to i386 directory
+  linux-user: move sparc/sparc64 signal.c parts to sparc directory
+  linux-user: move mips/mips64 signal.c parts to mips directory
+  linux-user: move ppc/ppc64 signal.c parts to ppc directory
+  linux-user: define TARGET_ARCH_HAS_SETUP_FRAME
+  linux-user: create a dummy per arch cpu_loop.c
+  linux-user: move i386/x86_64 cpu loop to i386 directory
+  linux-user: move aarch64 cpu loop to aarch64 directory
+  linux-user: move arm cpu loop to arm directory
+  linux-user: move sparc/sparc64 cpu loop to sparc directory
+  linux-user: move ppc/ppc64 cpu loop to ppc directory
+  linux-user: move mips/mips64 cpu loop to mips directory
+  linux-user: move nios2 cpu loop to nios2 directory
+  linux-user: move openrisc cpu loop to openrisc directory
+  linux-user: move sh4 cpu loop to sh4 directory
+  linux-user: move cris cpu loop to cris directory
+  linux-user: move microblaze cpu loop to microblaze directory
+  linux-user: move m68k cpu loop to m68k directory
+  linux-user: move alpha cpu loop to alpha directory
+  linux-user: move s390x cpu loop to s390x directory
+  linux-user: move tilegx cpu loop to tilegx directory
+  linux-user: move riscv cpu loop to riscv directory
+  linux-user: move hppa cpu loop to hppa directory
+  linux-user: move xtensa cpu loop to xtensa directory
+
+Peter Maydell (1):
+  linux-user: Fix getdents emulation for 64 bit guest on 32 bit host
+
+ linux-user/Makefile.objs              |    3 +-
+ linux-user/aarch64/cpu_loop.c         |  182 +
+ linux-user/aarch64/signal.c           |  586 +++
+ linux-user/aarch64/target_signal.h    |    1 +
+ linux-user/alpha/cpu_loop.c           |  225 ++
+ linux-user/alpha/signal.c             |  280 ++
+ linux-user/alpha/target_signal.h      |    1 +
+ linux-user/arm/cpu_loop.c             |  459 +++
+ linux-user/arm/signal.c               |  772 ++++
+ linux-user/arm/target_signal.h        |    2 +-
+ linux-user/arm/target_syscall.h       |    1 +
+ linux-user/cpu_loop-common.h          |   37 +
+ linux-user/cris/cpu_loop.c            |  115 +
+ linux-user/cris/signal.c              |  189 +
+ linux-user/cris/target_signal.h       |    2 +-
+ linux-user/hppa/cpu_loop.c            |  211 ++
+ linux-user/hppa/signal.c              |  210 ++
+ linux-user/hppa/target_signal.h       |    1 -
+ linux-user/i386/cpu_loop.c            |  369 ++
+ linux-user/i386/signal.c              |  602 +++
+ linux-user/i386/target_signal.h       |    1 +
+ linux-user/m68k/cpu_loop.c            |  170 +
+ linux-user/m68k/signal.c              |  428 +++
+ linux-user/m68k/target_signal.h       |    2 +-
+ linux-user/main.c                     | 4440 +---------------------
+ linux-user/microblaze/cpu_loop.c      |  176 +
+ linux-user/microblaze/signal.c        |  248 ++
+ linux-user/microblaze/target_signal.h |    2 +-
+ linux-user/mips/cpu_loop.c            |  749 ++++
+ linux-user/mips/signal.c              |  400 ++
+ linux-user/mips/target_signal.h       |    5 +-
+ linux-user/mips64/cpu_loop.c          |   20 +
+ linux-user/mips64/signal.c            |   20 +
+ linux-user/mips64/target_signal.h     |    2 -
+ linux-user/nios2/cpu_loop.c           |  152 +
+ linux-user/nios2/signal.c             |  254 ++
+ linux-user/nios2/target_signal.h      |    1 -
+ linux-user/openrisc/cpu_loop.c        |  115 +
+ linux-user/openrisc/signal.c          |  231 ++
+ linux-user/openrisc/target_signal.h   |    2 -
+ linux-user/ppc/cpu_loop.c             |  579 +++
+ linux-user/ppc/signal.c               |  689 ++++
+ linux-user/ppc/target_signal.h        |    4 +-
+ linux-user/riscv/cpu_loop.c           |  118 +
+ linux-user/riscv/signal.c             |  218 ++
+ linux-user/riscv/target_signal.h      |    1 -
+ linux-user/riscv/target_syscall.h     |    2 +-
+ linux-user/s390x/cpu_loop.c           |  165 +
+ linux-user/s390x/signal.c             |  327 ++
+ linux-user/s390x/target_signal.h      |    2 +-
+ linux-user/sh4/cpu_loop.c             |  111 +
+ linux-user/sh4/signal.c               |  350 ++
+ linux-user/sh4/target_signal.h        |    2 +-
+ linux-user/signal-common.h            |   57 +
+ linux-user/signal.c                   | 6652 +--------------------------------
+ linux-user/sparc/cpu_loop.c           |  306 ++
+ linux-user/sparc/signal.c             |  624 ++++
+ linux-user/sparc/target_signal.h      |    2 +-
+ linux-user/sparc64/cpu_loop.c         |   20 +
+ linux-user/sparc64/signal.c           |   20 +
+ linux-user/sparc64/target_signal.h    |    2 +-
+ linux-user/syscall.c                  |   18 +-
+ linux-user/tilegx/cpu_loop.c          |  286 ++
+ linux-user/tilegx/signal.c            |  186 +
+ linux-user/tilegx/target_signal.h     |    2 -
+ linux-user/x86_64/cpu_loop.c          |   20 +
+ linux-user/x86_64/signal.c            |   20 +
+ linux-user/x86_64/target_signal.h     |    1 -
+ linux-user/xtensa/cpu_loop.c          |  267 ++
+ linux-user/xtensa/signal.c            |  268 ++
+ linux-user/xtensa/target_signal.h     |    1 -
+ 71 files changed, 11996 insertions(+), 10990 deletions(-)
+ create mode 100644 linux-user/aarch64/cpu_loop.c
  create mode 100644 linux-user/aarch64/signal.c
+ create mode 100644 linux-user/alpha/cpu_loop.c
  create mode 100644 linux-user/alpha/signal.c
+ create mode 100644 linux-user/arm/cpu_loop.c
  create mode 100644 linux-user/arm/signal.c
+ create mode 100644 linux-user/cpu_loop-common.h
+ create mode 100644 linux-user/cris/cpu_loop.c
  create mode 100644 linux-user/cris/signal.c
+ create mode 100644 linux-user/hppa/cpu_loop.c
  create mode 100644 linux-user/hppa/signal.c
+ create mode 100644 linux-user/i386/cpu_loop.c
  create mode 100644 linux-user/i386/signal.c
+ create mode 100644 linux-user/m68k/cpu_loop.c
  create mode 100644 linux-user/m68k/signal.c
+ create mode 100644 linux-user/microblaze/cpu_loop.c
  create mode 100644 linux-user/microblaze/signal.c
+ create mode 100644 linux-user/mips/cpu_loop.c
  create mode 100644 linux-user/mips/signal.c
+ create mode 100644 linux-user/mips64/cpu_loop.c
  create mode 100644 linux-user/mips64/signal.c
+ create mode 100644 linux-user/nios2/cpu_loop.c
  create mode 100644 linux-user/nios2/signal.c
+ create mode 100644 linux-user/openrisc/cpu_loop.c
  create mode 100644 linux-user/openrisc/signal.c
+ create mode 100644 linux-user/ppc/cpu_loop.c
  create mode 100644 linux-user/ppc/signal.c
+ create mode 100644 linux-user/riscv/cpu_loop.c
  create mode 100644 linux-user/riscv/signal.c
+ create mode 100644 linux-user/s390x/cpu_loop.c
  create mode 100644 linux-user/s390x/signal.c
+ create mode 100644 linux-user/sh4/cpu_loop.c
  create mode 100644 linux-user/sh4/signal.c
  create mode 100644 linux-user/signal-common.h
+ create mode 100644 linux-user/sparc/cpu_loop.c
  create mode 100644 linux-user/sparc/signal.c
+ create mode 100644 linux-user/sparc64/cpu_loop.c
  create mode 100644 linux-user/sparc64/signal.c
+ create mode 100644 linux-user/tilegx/cpu_loop.c
  create mode 100644 linux-user/tilegx/signal.c
+ create mode 100644 linux-user/x86_64/cpu_loop.c
  create mode 100644 linux-user/x86_64/signal.c
+ create mode 100644 linux-user/xtensa/cpu_loop.c
  create mode 100644 linux-user/xtensa/signal.c
 
-diff --git a/linux-user/Makefile.objs b/linux-user/Makefile.objs
-index 8c93058100..811a7f5ce5 100644
---- a/linux-user/Makefile.objs
-+++ b/linux-user/Makefile.objs
-@@ -1,6 +1,6 @@
- obj-y = main.o syscall.o strace.o mmap.o signal.o \
- 	elfload.o linuxload.o uaccess.o uname.o \
--	safe-syscall.o
-+	safe-syscall.o $(TARGET_ABI_DIR)/signal.o
- 
- obj-$(TARGET_HAS_BFLT) += flatload.o
- obj-$(TARGET_I386) += vm86.o
-diff --git a/linux-user/aarch64/signal.c b/linux-user/aarch64/signal.c
-new file mode 100644
-index 0000000000..02ca338b6c
---- /dev/null
-+++ b/linux-user/aarch64/signal.c
-@@ -0,0 +1,18 @@
-+/*
-+ *  Emulation of Linux signals
-+ *
-+ *  Copyright (c) 2003 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-diff --git a/linux-user/alpha/signal.c b/linux-user/alpha/signal.c
-new file mode 100644
-index 0000000000..02ca338b6c
---- /dev/null
-+++ b/linux-user/alpha/signal.c
-@@ -0,0 +1,18 @@
-+/*
-+ *  Emulation of Linux signals
-+ *
-+ *  Copyright (c) 2003 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-diff --git a/linux-user/arm/signal.c b/linux-user/arm/signal.c
-new file mode 100644
-index 0000000000..02ca338b6c
---- /dev/null
-+++ b/linux-user/arm/signal.c
-@@ -0,0 +1,18 @@
-+/*
-+ *  Emulation of Linux signals
-+ *
-+ *  Copyright (c) 2003 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-diff --git a/linux-user/cris/signal.c b/linux-user/cris/signal.c
-new file mode 100644
-index 0000000000..02ca338b6c
---- /dev/null
-+++ b/linux-user/cris/signal.c
-@@ -0,0 +1,18 @@
-+/*
-+ *  Emulation of Linux signals
-+ *
-+ *  Copyright (c) 2003 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-diff --git a/linux-user/hppa/signal.c b/linux-user/hppa/signal.c
-new file mode 100644
-index 0000000000..02ca338b6c
---- /dev/null
-+++ b/linux-user/hppa/signal.c
-@@ -0,0 +1,18 @@
-+/*
-+ *  Emulation of Linux signals
-+ *
-+ *  Copyright (c) 2003 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-diff --git a/linux-user/i386/signal.c b/linux-user/i386/signal.c
-new file mode 100644
-index 0000000000..02ca338b6c
---- /dev/null
-+++ b/linux-user/i386/signal.c
-@@ -0,0 +1,18 @@
-+/*
-+ *  Emulation of Linux signals
-+ *
-+ *  Copyright (c) 2003 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-diff --git a/linux-user/m68k/signal.c b/linux-user/m68k/signal.c
-new file mode 100644
-index 0000000000..02ca338b6c
---- /dev/null
-+++ b/linux-user/m68k/signal.c
-@@ -0,0 +1,18 @@
-+/*
-+ *  Emulation of Linux signals
-+ *
-+ *  Copyright (c) 2003 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-diff --git a/linux-user/microblaze/signal.c b/linux-user/microblaze/signal.c
-new file mode 100644
-index 0000000000..02ca338b6c
---- /dev/null
-+++ b/linux-user/microblaze/signal.c
-@@ -0,0 +1,18 @@
-+/*
-+ *  Emulation of Linux signals
-+ *
-+ *  Copyright (c) 2003 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-diff --git a/linux-user/mips/signal.c b/linux-user/mips/signal.c
-new file mode 100644
-index 0000000000..02ca338b6c
---- /dev/null
-+++ b/linux-user/mips/signal.c
-@@ -0,0 +1,18 @@
-+/*
-+ *  Emulation of Linux signals
-+ *
-+ *  Copyright (c) 2003 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-diff --git a/linux-user/mips64/signal.c b/linux-user/mips64/signal.c
-new file mode 100644
-index 0000000000..02ca338b6c
---- /dev/null
-+++ b/linux-user/mips64/signal.c
-@@ -0,0 +1,18 @@
-+/*
-+ *  Emulation of Linux signals
-+ *
-+ *  Copyright (c) 2003 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-diff --git a/linux-user/nios2/signal.c b/linux-user/nios2/signal.c
-new file mode 100644
-index 0000000000..02ca338b6c
---- /dev/null
-+++ b/linux-user/nios2/signal.c
-@@ -0,0 +1,18 @@
-+/*
-+ *  Emulation of Linux signals
-+ *
-+ *  Copyright (c) 2003 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-diff --git a/linux-user/openrisc/signal.c b/linux-user/openrisc/signal.c
-new file mode 100644
-index 0000000000..02ca338b6c
---- /dev/null
-+++ b/linux-user/openrisc/signal.c
-@@ -0,0 +1,18 @@
-+/*
-+ *  Emulation of Linux signals
-+ *
-+ *  Copyright (c) 2003 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-diff --git a/linux-user/ppc/signal.c b/linux-user/ppc/signal.c
-new file mode 100644
-index 0000000000..02ca338b6c
---- /dev/null
-+++ b/linux-user/ppc/signal.c
-@@ -0,0 +1,18 @@
-+/*
-+ *  Emulation of Linux signals
-+ *
-+ *  Copyright (c) 2003 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-diff --git a/linux-user/riscv/signal.c b/linux-user/riscv/signal.c
-new file mode 100644
-index 0000000000..02ca338b6c
---- /dev/null
-+++ b/linux-user/riscv/signal.c
-@@ -0,0 +1,18 @@
-+/*
-+ *  Emulation of Linux signals
-+ *
-+ *  Copyright (c) 2003 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-diff --git a/linux-user/s390x/signal.c b/linux-user/s390x/signal.c
-new file mode 100644
-index 0000000000..02ca338b6c
---- /dev/null
-+++ b/linux-user/s390x/signal.c
-@@ -0,0 +1,18 @@
-+/*
-+ *  Emulation of Linux signals
-+ *
-+ *  Copyright (c) 2003 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-diff --git a/linux-user/sh4/signal.c b/linux-user/sh4/signal.c
-new file mode 100644
-index 0000000000..02ca338b6c
---- /dev/null
-+++ b/linux-user/sh4/signal.c
-@@ -0,0 +1,18 @@
-+/*
-+ *  Emulation of Linux signals
-+ *
-+ *  Copyright (c) 2003 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-diff --git a/linux-user/signal-common.h b/linux-user/signal-common.h
-new file mode 100644
-index 0000000000..838b6e9198
---- /dev/null
-+++ b/linux-user/signal-common.h
-@@ -0,0 +1,50 @@
-+/*
-+ *  Emulation of Linux signals
-+ *
-+ *  Copyright (c) 2003 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef SIGNAL_COMMON_H
-+#define SIGNAL_COMMON_H
-+extern struct target_sigaltstack target_sigaltstack_used;
-+
-+static inline int on_sig_stack(unsigned long sp)
-+{
-+    return (sp - target_sigaltstack_used.ss_sp
-+            < target_sigaltstack_used.ss_size);
-+}
-+
-+static inline int sas_ss_flags(unsigned long sp)
-+{
-+    return (target_sigaltstack_used.ss_size == 0 ? SS_DISABLE
-+            : on_sig_stack(sp) ? SS_ONSTACK : 0);
-+}
-+
-+static inline void target_sigemptyset(target_sigset_t *set)
-+{
-+    memset(set, 0, sizeof(*set));
-+}
-+
-+void host_to_target_sigset_internal(target_sigset_t *d,
-+                                    const sigset_t *s);
-+void target_to_host_sigset_internal(sigset_t *d,
-+                                    const target_sigset_t *s);
-+void tswap_siginfo(target_siginfo_t *tinfo,
-+                   const target_siginfo_t *info);
-+void set_sigmask(const sigset_t *set);
-+void force_sig(int sig);
-+void force_sigsegv(int oldsig);
-+#endif
-diff --git a/linux-user/signal.c b/linux-user/signal.c
-index b283270391..0f956740ef 100644
---- a/linux-user/signal.c
-+++ b/linux-user/signal.c
-@@ -25,8 +25,9 @@
- #include "qemu-common.h"
- #include "target_signal.h"
- #include "trace.h"
-+#include "signal-common.h"
- 
--static struct target_sigaltstack target_sigaltstack_used = {
-+struct target_sigaltstack target_sigaltstack_used = {
-     .ss_sp = 0,
-     .ss_size = 0,
-     .ss_flags = TARGET_SS_DISABLE,
-@@ -82,18 +83,6 @@ static uint8_t host_to_target_signal_table[_NSIG] = {
- };
- static uint8_t target_to_host_signal_table[_NSIG];
- 
--static inline int on_sig_stack(unsigned long sp)
--{
--    return (sp - target_sigaltstack_used.ss_sp
--            < target_sigaltstack_used.ss_size);
--}
--
--static inline int sas_ss_flags(unsigned long sp)
--{
--    return (target_sigaltstack_used.ss_size == 0 ? SS_DISABLE
--            : on_sig_stack(sp) ? SS_ONSTACK : 0);
--}
--
- int host_to_target_signal(int sig)
- {
-     if (sig < 0 || sig >= _NSIG)
-@@ -108,11 +97,6 @@ int target_to_host_signal(int sig)
-     return target_to_host_signal_table[sig];
- }
- 
--static inline void target_sigemptyset(target_sigset_t *set)
--{
--    memset(set, 0, sizeof(*set));
--}
--
- static inline void target_sigaddset(target_sigset_t *set, int signum)
- {
-     signum--;
-@@ -127,8 +111,8 @@ static inline int target_sigismember(const target_sigset_t *set, int signum)
-     return ((set->sig[signum / TARGET_NSIG_BPW] & mask) != 0);
- }
- 
--static void host_to_target_sigset_internal(target_sigset_t *d,
--                                           const sigset_t *s)
-+void host_to_target_sigset_internal(target_sigset_t *d,
-+                                    const sigset_t *s)
- {
-     int i;
-     target_sigemptyset(d);
-@@ -149,8 +133,8 @@ void host_to_target_sigset(target_sigset_t *d, const sigset_t *s)
-         d->sig[i] = tswapal(d1.sig[i]);
- }
- 
--static void target_to_host_sigset_internal(sigset_t *d,
--                                           const target_sigset_t *s)
-+void target_to_host_sigset_internal(sigset_t *d,
-+                                    const target_sigset_t *s)
- {
-     int i;
-     sigemptyset(d);
-@@ -257,7 +241,7 @@ int do_sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
- /* Just set the guest's signal mask to the specified value; the
-  * caller is assumed to have called block_signals() already.
-  */
--static void set_sigmask(const sigset_t *set)
-+void set_sigmask(const sigset_t *set)
- {
-     TaskState *ts = (TaskState *)thread_cpu->opaque;
- 
-@@ -344,8 +328,8 @@ static inline void host_to_target_siginfo_noswap(target_siginfo_t *tinfo,
-     tinfo->si_code = deposit32(si_code, 16, 16, si_type);
- }
- 
--static void tswap_siginfo(target_siginfo_t *tinfo,
--                          const target_siginfo_t *info)
-+void tswap_siginfo(target_siginfo_t *tinfo,
-+                   const target_siginfo_t *info)
- {
-     int si_type = extract32(info->si_code, 16, 16);
-     int si_code = sextract32(info->si_code, 0, 16);
-@@ -515,7 +499,7 @@ void signal_init(void)
-  * also forces the signal to "not blocked, not ignored", but for QEMU
-  * that work is done in process_pending_signals().
-  */
--static void force_sig(int sig)
-+void force_sig(int sig)
- {
-     CPUState *cpu = thread_cpu;
-     CPUArchState *env = cpu->env_ptr;
-@@ -534,7 +518,7 @@ static void force_sig(int sig)
-  * at the point of failure.
-  */
- #if !defined(TARGET_RISCV)
--static void force_sigsegv(int oldsig)
-+void force_sigsegv(int oldsig)
- {
-     if (oldsig == SIGSEGV) {
-         /* Make sure we don't try to deliver the signal again; this will
-@@ -7301,9 +7285,6 @@ badframe:
-     force_sig(TARGET_SIGSEGV);
-     return -TARGET_QEMU_ESIGRETURN;
- }
--
--#else
--#error Target needs to add support for signal handling
- #endif
- 
- static void handle_pending_signal(CPUArchState *cpu_env, int sig,
-diff --git a/linux-user/sparc/signal.c b/linux-user/sparc/signal.c
-new file mode 100644
-index 0000000000..02ca338b6c
---- /dev/null
-+++ b/linux-user/sparc/signal.c
-@@ -0,0 +1,18 @@
-+/*
-+ *  Emulation of Linux signals
-+ *
-+ *  Copyright (c) 2003 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-diff --git a/linux-user/sparc64/signal.c b/linux-user/sparc64/signal.c
-new file mode 100644
-index 0000000000..02ca338b6c
---- /dev/null
-+++ b/linux-user/sparc64/signal.c
-@@ -0,0 +1,18 @@
-+/*
-+ *  Emulation of Linux signals
-+ *
-+ *  Copyright (c) 2003 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-diff --git a/linux-user/tilegx/signal.c b/linux-user/tilegx/signal.c
-new file mode 100644
-index 0000000000..02ca338b6c
---- /dev/null
-+++ b/linux-user/tilegx/signal.c
-@@ -0,0 +1,18 @@
-+/*
-+ *  Emulation of Linux signals
-+ *
-+ *  Copyright (c) 2003 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-diff --git a/linux-user/x86_64/signal.c b/linux-user/x86_64/signal.c
-new file mode 100644
-index 0000000000..02ca338b6c
---- /dev/null
-+++ b/linux-user/x86_64/signal.c
-@@ -0,0 +1,18 @@
-+/*
-+ *  Emulation of Linux signals
-+ *
-+ *  Copyright (c) 2003 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-diff --git a/linux-user/xtensa/signal.c b/linux-user/xtensa/signal.c
-new file mode 100644
-index 0000000000..02ca338b6c
---- /dev/null
-+++ b/linux-user/xtensa/signal.c
-@@ -0,0 +1,18 @@
-+/*
-+ *  Emulation of Linux signals
-+ *
-+ *  Copyright (c) 2003 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
 -- 
 2.14.3
