@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fD4qs-00078f-UI
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:12:10 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fD4qk-00073I-K7
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:12:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fD4qd-0006qX-Pd
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:12:06 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fD4qf-0006ry-OF
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:11:58 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon, 30 Apr 2018 11:10:18 +0200
-Message-Id: <20180430091037.13878-24-laurent@vivier.eu>
+Date: Mon, 30 Apr 2018 11:10:35 +0200
+Message-Id: <20180430091037.13878-41-laurent@vivier.eu>
 In-Reply-To: <20180430091037.13878-1-laurent@vivier.eu>
 References: <20180430091037.13878-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 23/42] linux-user: create a dummy per arch
- cpu_loop.c
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 40/42] linux-user: move hppa cpu loop to hppa
+ directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,845 +26,425 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Cornelia Huck <cohuck@redhat.com>
 
-Create a cpu_loop-common.h for future use by
-these new files and use it in the existing
-main.c
-
-Introduce target_cpu_copy_regs():
-declare the function in cpu_loop-common.h
-and an empty function for each target,
-to move all the cpu_loop prologues to this function.
+No code change, only move code from main.c to
+hppa/cpu_loop.c.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20180411185651.21351-2-laurent@vivier.eu>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20180411185651.21351-19-laurent@vivier.eu>
 ---
- linux-user/Makefile.objs         |  3 ++-
- linux-user/aarch64/cpu_loop.c    | 26 ++++++++++++++++++++++++++
- linux-user/alpha/cpu_loop.c      | 26 ++++++++++++++++++++++++++
- linux-user/arm/cpu_loop.c        | 26 ++++++++++++++++++++++++++
- linux-user/cpu_loop-common.h     | 37 +++++++++++++++++++++++++++++++++++++
- linux-user/cris/cpu_loop.c       | 26 ++++++++++++++++++++++++++
- linux-user/hppa/cpu_loop.c       | 26 ++++++++++++++++++++++++++
- linux-user/i386/cpu_loop.c       | 26 ++++++++++++++++++++++++++
- linux-user/m68k/cpu_loop.c       | 26 ++++++++++++++++++++++++++
- linux-user/main.c                | 17 +++--------------
- linux-user/microblaze/cpu_loop.c | 26 ++++++++++++++++++++++++++
- linux-user/mips/cpu_loop.c       | 26 ++++++++++++++++++++++++++
- linux-user/mips64/cpu_loop.c     | 26 ++++++++++++++++++++++++++
- linux-user/nios2/cpu_loop.c      | 26 ++++++++++++++++++++++++++
- linux-user/openrisc/cpu_loop.c   | 26 ++++++++++++++++++++++++++
- linux-user/ppc/cpu_loop.c        | 26 ++++++++++++++++++++++++++
- linux-user/riscv/cpu_loop.c      | 26 ++++++++++++++++++++++++++
- linux-user/s390x/cpu_loop.c      | 26 ++++++++++++++++++++++++++
- linux-user/sh4/cpu_loop.c        | 26 ++++++++++++++++++++++++++
- linux-user/sparc/cpu_loop.c      | 26 ++++++++++++++++++++++++++
- linux-user/sparc64/cpu_loop.c    | 26 ++++++++++++++++++++++++++
- linux-user/tilegx/cpu_loop.c     | 26 ++++++++++++++++++++++++++
- linux-user/x86_64/cpu_loop.c     | 26 ++++++++++++++++++++++++++
- linux-user/xtensa/cpu_loop.c     | 26 ++++++++++++++++++++++++++
- 24 files changed, 588 insertions(+), 15 deletions(-)
- create mode 100644 linux-user/aarch64/cpu_loop.c
- create mode 100644 linux-user/alpha/cpu_loop.c
- create mode 100644 linux-user/arm/cpu_loop.c
- create mode 100644 linux-user/cpu_loop-common.h
- create mode 100644 linux-user/cris/cpu_loop.c
- create mode 100644 linux-user/hppa/cpu_loop.c
- create mode 100644 linux-user/i386/cpu_loop.c
- create mode 100644 linux-user/m68k/cpu_loop.c
- create mode 100644 linux-user/microblaze/cpu_loop.c
- create mode 100644 linux-user/mips/cpu_loop.c
- create mode 100644 linux-user/mips64/cpu_loop.c
- create mode 100644 linux-user/nios2/cpu_loop.c
- create mode 100644 linux-user/openrisc/cpu_loop.c
- create mode 100644 linux-user/ppc/cpu_loop.c
- create mode 100644 linux-user/riscv/cpu_loop.c
- create mode 100644 linux-user/s390x/cpu_loop.c
- create mode 100644 linux-user/sh4/cpu_loop.c
- create mode 100644 linux-user/sparc/cpu_loop.c
- create mode 100644 linux-user/sparc64/cpu_loop.c
- create mode 100644 linux-user/tilegx/cpu_loop.c
- create mode 100644 linux-user/x86_64/cpu_loop.c
- create mode 100644 linux-user/xtensa/cpu_loop.c
+ linux-user/hppa/cpu_loop.c | 185 ++++++++++++++++++++++++++++++++++++++++++
+ linux-user/main.c          | 194 +--------------------------------------------
+ 2 files changed, 186 insertions(+), 193 deletions(-)
 
-diff --git a/linux-user/Makefile.objs b/linux-user/Makefile.objs
-index 811a7f5ce5..59a5c17354 100644
---- a/linux-user/Makefile.objs
-+++ b/linux-user/Makefile.objs
-@@ -1,6 +1,7 @@
- obj-y = main.o syscall.o strace.o mmap.o signal.o \
- 	elfload.o linuxload.o uaccess.o uname.o \
--	safe-syscall.o $(TARGET_ABI_DIR)/signal.o
-+	safe-syscall.o $(TARGET_ABI_DIR)/signal.o \
-+        $(TARGET_ABI_DIR)/cpu_loop.o
- 
- obj-$(TARGET_HAS_BFLT) += flatload.o
- obj-$(TARGET_I386) += vm86.o
-diff --git a/linux-user/aarch64/cpu_loop.c b/linux-user/aarch64/cpu_loop.c
-new file mode 100644
-index 0000000000..b7700a5561
---- /dev/null
-+++ b/linux-user/aarch64/cpu_loop.c
-@@ -0,0 +1,26 @@
-+/*
-+ *  qemu user cpu loop
-+ *
-+ *  Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu.h"
-+#include "cpu_loop-common.h"
-+
-+void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
-+{
-+}
-diff --git a/linux-user/alpha/cpu_loop.c b/linux-user/alpha/cpu_loop.c
-new file mode 100644
-index 0000000000..b7700a5561
---- /dev/null
-+++ b/linux-user/alpha/cpu_loop.c
-@@ -0,0 +1,26 @@
-+/*
-+ *  qemu user cpu loop
-+ *
-+ *  Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu.h"
-+#include "cpu_loop-common.h"
-+
-+void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
-+{
-+}
-diff --git a/linux-user/arm/cpu_loop.c b/linux-user/arm/cpu_loop.c
-new file mode 100644
-index 0000000000..b7700a5561
---- /dev/null
-+++ b/linux-user/arm/cpu_loop.c
-@@ -0,0 +1,26 @@
-+/*
-+ *  qemu user cpu loop
-+ *
-+ *  Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu.h"
-+#include "cpu_loop-common.h"
-+
-+void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
-+{
-+}
-diff --git a/linux-user/cpu_loop-common.h b/linux-user/cpu_loop-common.h
-new file mode 100644
-index 0000000000..ffe3fe9ad5
---- /dev/null
-+++ b/linux-user/cpu_loop-common.h
-@@ -0,0 +1,37 @@
-+/*
-+ *  qemu user cpu loop
-+ *
-+ *  Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef CPU_LOOP_COMMON_H
-+#define CPU_LOOP_COMMON_H
-+
-+#include "exec/log.h"
-+
-+#define EXCP_DUMP(env, fmt, ...)                                        \
-+do {                                                                    \
-+    CPUState *cs = ENV_GET_CPU(env);                                    \
-+    fprintf(stderr, fmt , ## __VA_ARGS__);                              \
-+    cpu_dump_state(cs, stderr, fprintf, 0);                             \
-+    if (qemu_log_separate()) {                                          \
-+        qemu_log(fmt, ## __VA_ARGS__);                                  \
-+        log_cpu_state(cs, 0);                                           \
-+    }                                                                   \
-+} while (0)
-+
-+void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs);
-+#endif
-diff --git a/linux-user/cris/cpu_loop.c b/linux-user/cris/cpu_loop.c
-new file mode 100644
-index 0000000000..b7700a5561
---- /dev/null
-+++ b/linux-user/cris/cpu_loop.c
-@@ -0,0 +1,26 @@
-+/*
-+ *  qemu user cpu loop
-+ *
-+ *  Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu.h"
-+#include "cpu_loop-common.h"
-+
-+void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
-+{
-+}
 diff --git a/linux-user/hppa/cpu_loop.c b/linux-user/hppa/cpu_loop.c
-new file mode 100644
-index 0000000000..b7700a5561
---- /dev/null
+index b7700a5561..0301c766c6 100644
+--- a/linux-user/hppa/cpu_loop.c
 +++ b/linux-user/hppa/cpu_loop.c
-@@ -0,0 +1,26 @@
-+/*
-+ *  qemu user cpu loop
-+ *
-+ *  Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu.h"
-+#include "cpu_loop-common.h"
-+
-+void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
+@@ -21,6 +21,191 @@
+ #include "qemu.h"
+ #include "cpu_loop-common.h"
+ 
++static abi_ulong hppa_lws(CPUHPPAState *env)
 +{
++    uint32_t which = env->gr[20];
++    abi_ulong addr = env->gr[26];
++    abi_ulong old = env->gr[25];
++    abi_ulong new = env->gr[24];
++    abi_ulong size, ret;
++
++    switch (which) {
++    default:
++        return -TARGET_ENOSYS;
++
++    case 0: /* elf32 atomic 32bit cmpxchg */
++        if ((addr & 3) || !access_ok(VERIFY_WRITE, addr, 4)) {
++            return -TARGET_EFAULT;
++        }
++        old = tswap32(old);
++        new = tswap32(new);
++        ret = atomic_cmpxchg((uint32_t *)g2h(addr), old, new);
++        ret = tswap32(ret);
++        break;
++
++    case 2: /* elf32 atomic "new" cmpxchg */
++        size = env->gr[23];
++        if (size >= 4) {
++            return -TARGET_ENOSYS;
++        }
++        if (((addr | old | new) & ((1 << size) - 1))
++            || !access_ok(VERIFY_WRITE, addr, 1 << size)
++            || !access_ok(VERIFY_READ, old, 1 << size)
++            || !access_ok(VERIFY_READ, new, 1 << size)) {
++            return -TARGET_EFAULT;
++        }
++        /* Note that below we use host-endian loads so that the cmpxchg
++           can be host-endian as well.  */
++        switch (size) {
++        case 0:
++            old = *(uint8_t *)g2h(old);
++            new = *(uint8_t *)g2h(new);
++            ret = atomic_cmpxchg((uint8_t *)g2h(addr), old, new);
++            ret = ret != old;
++            break;
++        case 1:
++            old = *(uint16_t *)g2h(old);
++            new = *(uint16_t *)g2h(new);
++            ret = atomic_cmpxchg((uint16_t *)g2h(addr), old, new);
++            ret = ret != old;
++            break;
++        case 2:
++            old = *(uint32_t *)g2h(old);
++            new = *(uint32_t *)g2h(new);
++            ret = atomic_cmpxchg((uint32_t *)g2h(addr), old, new);
++            ret = ret != old;
++            break;
++        case 3:
++            {
++                uint64_t o64, n64, r64;
++                o64 = *(uint64_t *)g2h(old);
++                n64 = *(uint64_t *)g2h(new);
++#ifdef CONFIG_ATOMIC64
++                r64 = atomic_cmpxchg__nocheck((uint64_t *)g2h(addr), o64, n64);
++                ret = r64 != o64;
++#else
++                start_exclusive();
++                r64 = *(uint64_t *)g2h(addr);
++                ret = 1;
++                if (r64 == o64) {
++                    *(uint64_t *)g2h(addr) = n64;
++                    ret = 0;
++                }
++                end_exclusive();
++#endif
++            }
++            break;
++        }
++        break;
++    }
++
++    env->gr[28] = ret;
++    return 0;
 +}
-diff --git a/linux-user/i386/cpu_loop.c b/linux-user/i386/cpu_loop.c
-new file mode 100644
-index 0000000000..b7700a5561
---- /dev/null
-+++ b/linux-user/i386/cpu_loop.c
-@@ -0,0 +1,26 @@
-+/*
-+ *  qemu user cpu loop
-+ *
-+ *  Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
 +
-+#include "qemu/osdep.h"
-+#include "qemu.h"
-+#include "cpu_loop-common.h"
-+
-+void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
++void cpu_loop(CPUHPPAState *env)
 +{
-+}
-diff --git a/linux-user/m68k/cpu_loop.c b/linux-user/m68k/cpu_loop.c
-new file mode 100644
-index 0000000000..b7700a5561
---- /dev/null
-+++ b/linux-user/m68k/cpu_loop.c
-@@ -0,0 +1,26 @@
-+/*
-+ *  qemu user cpu loop
-+ *
-+ *  Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
++    CPUState *cs = CPU(hppa_env_get_cpu(env));
++    target_siginfo_t info;
++    abi_ulong ret;
++    int trapnr;
 +
-+#include "qemu/osdep.h"
-+#include "qemu.h"
-+#include "cpu_loop-common.h"
++    while (1) {
++        cpu_exec_start(cs);
++        trapnr = cpu_exec(cs);
++        cpu_exec_end(cs);
++        process_queued_cpu_work(cs);
 +
-+void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
-+{
++        switch (trapnr) {
++        case EXCP_SYSCALL:
++            ret = do_syscall(env, env->gr[20],
++                             env->gr[26], env->gr[25],
++                             env->gr[24], env->gr[23],
++                             env->gr[22], env->gr[21], 0, 0);
++            switch (ret) {
++            default:
++                env->gr[28] = ret;
++                /* We arrived here by faking the gateway page.  Return.  */
++                env->iaoq_f = env->gr[31];
++                env->iaoq_b = env->gr[31] + 4;
++                break;
++            case -TARGET_ERESTARTSYS:
++            case -TARGET_QEMU_ESIGRETURN:
++                break;
++            }
++            break;
++        case EXCP_SYSCALL_LWS:
++            env->gr[21] = hppa_lws(env);
++            /* We arrived here by faking the gateway page.  Return.  */
++            env->iaoq_f = env->gr[31];
++            env->iaoq_b = env->gr[31] + 4;
++            break;
++        case EXCP_ITLB_MISS:
++        case EXCP_DTLB_MISS:
++        case EXCP_NA_ITLB_MISS:
++        case EXCP_NA_DTLB_MISS:
++        case EXCP_IMP:
++        case EXCP_DMP:
++        case EXCP_DMB:
++        case EXCP_PAGE_REF:
++        case EXCP_DMAR:
++        case EXCP_DMPI:
++            info.si_signo = TARGET_SIGSEGV;
++            info.si_errno = 0;
++            info.si_code = TARGET_SEGV_ACCERR;
++            info._sifields._sigfault._addr = env->cr[CR_IOR];
++            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            break;
++        case EXCP_UNALIGN:
++            info.si_signo = TARGET_SIGBUS;
++            info.si_errno = 0;
++            info.si_code = 0;
++            info._sifields._sigfault._addr = env->cr[CR_IOR];
++            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            break;
++        case EXCP_ILL:
++        case EXCP_PRIV_OPR:
++        case EXCP_PRIV_REG:
++            info.si_signo = TARGET_SIGILL;
++            info.si_errno = 0;
++            info.si_code = TARGET_ILL_ILLOPN;
++            info._sifields._sigfault._addr = env->iaoq_f;
++            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            break;
++        case EXCP_OVERFLOW:
++        case EXCP_COND:
++        case EXCP_ASSIST:
++            info.si_signo = TARGET_SIGFPE;
++            info.si_errno = 0;
++            info.si_code = 0;
++            info._sifields._sigfault._addr = env->iaoq_f;
++            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            break;
++        case EXCP_DEBUG:
++            trapnr = gdb_handlesig(cs, TARGET_SIGTRAP);
++            if (trapnr) {
++                info.si_signo = trapnr;
++                info.si_errno = 0;
++                info.si_code = TARGET_TRAP_BRKPT;
++                queue_signal(env, trapnr, QEMU_SI_FAULT, &info);
++            }
++            break;
++        case EXCP_INTERRUPT:
++            /* just indicate that signals should be handled asap */
++            break;
++        default:
++            g_assert_not_reached();
++        }
++        process_pending_signals(env);
++    }
 +}
++
+ void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
+ {
++    int i;
++    for (i = 1; i < 32; i++) {
++        env->gr[i] = regs->gr[i];
++    }
++    env->iaoq_f = regs->iaoq[0];
++    env->iaoq_b = regs->iaoq[1];
+ }
 diff --git a/linux-user/main.c b/linux-user/main.c
-index 8907a84114..09045f877c 100644
+index 834ec0bfe5..aa48b048a7 100644
 --- a/linux-user/main.c
 +++ b/linux-user/main.c
-@@ -33,9 +33,9 @@
- #include "qemu/timer.h"
- #include "qemu/envlist.h"
- #include "elf.h"
--#include "exec/log.h"
- #include "trace/control.h"
- #include "target_elf.h"
-+#include "cpu_loop-common.h"
- 
- char *exec_path;
- 
-@@ -50,17 +50,6 @@ unsigned long mmap_min_addr;
- unsigned long guest_base;
- int have_guest_base;
- 
--#define EXCP_DUMP(env, fmt, ...)                                        \
--do {                                                                    \
--    CPUState *cs = ENV_GET_CPU(env);                                    \
--    fprintf(stderr, fmt , ## __VA_ARGS__);                              \
--    cpu_dump_state(cs, stderr, fprintf, 0);                             \
--    if (qemu_log_separate()) {                                          \
--        qemu_log(fmt, ## __VA_ARGS__);                                  \
--        log_cpu_state(cs, 0);                                           \
--    }                                                                   \
--} while (0)
--
- /*
-  * When running 32-on-64 we should make sure we can fit all of the possible
-  * guest address space into a contiguous chunk of virtual host memory.
-@@ -4736,6 +4725,8 @@ int main(int argc, char **argv, char **envp)
-     tcg_prologue_init(tcg_ctx);
-     tcg_region_init();
- 
-+    target_cpu_copy_regs(env, regs);
-+
- #if defined(TARGET_I386)
-     env->cr[0] = CR0_PG_MASK | CR0_WP_MASK | CR0_PE_MASK;
-     env->hflags |= HF_PE_MASK | HF_CPL_MASK;
-@@ -5125,8 +5116,6 @@ int main(int argc, char **argv, char **envp)
-         env->sregs[WINDOW_START] = regs->windowstart;
-         env->pc = regs->pc;
+@@ -149,189 +149,6 @@ void fork_end(int child)
      }
--#else
--#error unsupported target CPU
- #endif
+ }
  
- #if defined(TARGET_ARM) || defined(TARGET_M68K)
-diff --git a/linux-user/microblaze/cpu_loop.c b/linux-user/microblaze/cpu_loop.c
-new file mode 100644
-index 0000000000..b7700a5561
---- /dev/null
-+++ b/linux-user/microblaze/cpu_loop.c
-@@ -0,0 +1,26 @@
-+/*
-+ *  qemu user cpu loop
-+ *
-+ *  Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu.h"
-+#include "cpu_loop-common.h"
-+
-+void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
-+{
-+}
-diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
-new file mode 100644
-index 0000000000..b7700a5561
---- /dev/null
-+++ b/linux-user/mips/cpu_loop.c
-@@ -0,0 +1,26 @@
-+/*
-+ *  qemu user cpu loop
-+ *
-+ *  Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu.h"
-+#include "cpu_loop-common.h"
-+
-+void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
-+{
-+}
-diff --git a/linux-user/mips64/cpu_loop.c b/linux-user/mips64/cpu_loop.c
-new file mode 100644
-index 0000000000..b7700a5561
---- /dev/null
-+++ b/linux-user/mips64/cpu_loop.c
-@@ -0,0 +1,26 @@
-+/*
-+ *  qemu user cpu loop
-+ *
-+ *  Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu.h"
-+#include "cpu_loop-common.h"
-+
-+void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
-+{
-+}
-diff --git a/linux-user/nios2/cpu_loop.c b/linux-user/nios2/cpu_loop.c
-new file mode 100644
-index 0000000000..b7700a5561
---- /dev/null
-+++ b/linux-user/nios2/cpu_loop.c
-@@ -0,0 +1,26 @@
-+/*
-+ *  qemu user cpu loop
-+ *
-+ *  Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu.h"
-+#include "cpu_loop-common.h"
-+
-+void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
-+{
-+}
-diff --git a/linux-user/openrisc/cpu_loop.c b/linux-user/openrisc/cpu_loop.c
-new file mode 100644
-index 0000000000..b7700a5561
---- /dev/null
-+++ b/linux-user/openrisc/cpu_loop.c
-@@ -0,0 +1,26 @@
-+/*
-+ *  qemu user cpu loop
-+ *
-+ *  Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu.h"
-+#include "cpu_loop-common.h"
-+
-+void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
-+{
-+}
-diff --git a/linux-user/ppc/cpu_loop.c b/linux-user/ppc/cpu_loop.c
-new file mode 100644
-index 0000000000..b7700a5561
---- /dev/null
-+++ b/linux-user/ppc/cpu_loop.c
-@@ -0,0 +1,26 @@
-+/*
-+ *  qemu user cpu loop
-+ *
-+ *  Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu.h"
-+#include "cpu_loop-common.h"
-+
-+void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
-+{
-+}
-diff --git a/linux-user/riscv/cpu_loop.c b/linux-user/riscv/cpu_loop.c
-new file mode 100644
-index 0000000000..b7700a5561
---- /dev/null
-+++ b/linux-user/riscv/cpu_loop.c
-@@ -0,0 +1,26 @@
-+/*
-+ *  qemu user cpu loop
-+ *
-+ *  Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu.h"
-+#include "cpu_loop-common.h"
-+
-+void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
-+{
-+}
-diff --git a/linux-user/s390x/cpu_loop.c b/linux-user/s390x/cpu_loop.c
-new file mode 100644
-index 0000000000..b7700a5561
---- /dev/null
-+++ b/linux-user/s390x/cpu_loop.c
-@@ -0,0 +1,26 @@
-+/*
-+ *  qemu user cpu loop
-+ *
-+ *  Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu.h"
-+#include "cpu_loop-common.h"
-+
-+void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
-+{
-+}
-diff --git a/linux-user/sh4/cpu_loop.c b/linux-user/sh4/cpu_loop.c
-new file mode 100644
-index 0000000000..b7700a5561
---- /dev/null
-+++ b/linux-user/sh4/cpu_loop.c
-@@ -0,0 +1,26 @@
-+/*
-+ *  qemu user cpu loop
-+ *
-+ *  Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu.h"
-+#include "cpu_loop-common.h"
-+
-+void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
-+{
-+}
-diff --git a/linux-user/sparc/cpu_loop.c b/linux-user/sparc/cpu_loop.c
-new file mode 100644
-index 0000000000..b7700a5561
---- /dev/null
-+++ b/linux-user/sparc/cpu_loop.c
-@@ -0,0 +1,26 @@
-+/*
-+ *  qemu user cpu loop
-+ *
-+ *  Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu.h"
-+#include "cpu_loop-common.h"
-+
-+void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
-+{
-+}
-diff --git a/linux-user/sparc64/cpu_loop.c b/linux-user/sparc64/cpu_loop.c
-new file mode 100644
-index 0000000000..b7700a5561
---- /dev/null
-+++ b/linux-user/sparc64/cpu_loop.c
-@@ -0,0 +1,26 @@
-+/*
-+ *  qemu user cpu loop
-+ *
-+ *  Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu.h"
-+#include "cpu_loop-common.h"
-+
-+void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
-+{
-+}
-diff --git a/linux-user/tilegx/cpu_loop.c b/linux-user/tilegx/cpu_loop.c
-new file mode 100644
-index 0000000000..b7700a5561
---- /dev/null
-+++ b/linux-user/tilegx/cpu_loop.c
-@@ -0,0 +1,26 @@
-+/*
-+ *  qemu user cpu loop
-+ *
-+ *  Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu.h"
-+#include "cpu_loop-common.h"
-+
-+void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
-+{
-+}
-diff --git a/linux-user/x86_64/cpu_loop.c b/linux-user/x86_64/cpu_loop.c
-new file mode 100644
-index 0000000000..b7700a5561
---- /dev/null
-+++ b/linux-user/x86_64/cpu_loop.c
-@@ -0,0 +1,26 @@
-+/*
-+ *  qemu user cpu loop
-+ *
-+ *  Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu.h"
-+#include "cpu_loop-common.h"
-+
-+void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
-+{
-+}
-diff --git a/linux-user/xtensa/cpu_loop.c b/linux-user/xtensa/cpu_loop.c
-new file mode 100644
-index 0000000000..b7700a5561
---- /dev/null
-+++ b/linux-user/xtensa/cpu_loop.c
-@@ -0,0 +1,26 @@
-+/*
-+ *  qemu user cpu loop
-+ *
-+ *  Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu.h"
-+#include "cpu_loop-common.h"
-+
-+void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
-+{
-+}
+-#ifdef TARGET_HPPA
+-
+-static abi_ulong hppa_lws(CPUHPPAState *env)
+-{
+-    uint32_t which = env->gr[20];
+-    abi_ulong addr = env->gr[26];
+-    abi_ulong old = env->gr[25];
+-    abi_ulong new = env->gr[24];
+-    abi_ulong size, ret;
+-
+-    switch (which) {
+-    default:
+-        return -TARGET_ENOSYS;
+-
+-    case 0: /* elf32 atomic 32bit cmpxchg */
+-        if ((addr & 3) || !access_ok(VERIFY_WRITE, addr, 4)) {
+-            return -TARGET_EFAULT;
+-        }
+-        old = tswap32(old);
+-        new = tswap32(new);
+-        ret = atomic_cmpxchg((uint32_t *)g2h(addr), old, new);
+-        ret = tswap32(ret);
+-        break;
+-
+-    case 2: /* elf32 atomic "new" cmpxchg */
+-        size = env->gr[23];
+-        if (size >= 4) {
+-            return -TARGET_ENOSYS;
+-        }
+-        if (((addr | old | new) & ((1 << size) - 1))
+-            || !access_ok(VERIFY_WRITE, addr, 1 << size)
+-            || !access_ok(VERIFY_READ, old, 1 << size)
+-            || !access_ok(VERIFY_READ, new, 1 << size)) {
+-            return -TARGET_EFAULT;
+-        }
+-        /* Note that below we use host-endian loads so that the cmpxchg
+-           can be host-endian as well.  */
+-        switch (size) {
+-        case 0:
+-            old = *(uint8_t *)g2h(old);
+-            new = *(uint8_t *)g2h(new);
+-            ret = atomic_cmpxchg((uint8_t *)g2h(addr), old, new);
+-            ret = ret != old;
+-            break;
+-        case 1:
+-            old = *(uint16_t *)g2h(old);
+-            new = *(uint16_t *)g2h(new);
+-            ret = atomic_cmpxchg((uint16_t *)g2h(addr), old, new);
+-            ret = ret != old;
+-            break;
+-        case 2:
+-            old = *(uint32_t *)g2h(old);
+-            new = *(uint32_t *)g2h(new);
+-            ret = atomic_cmpxchg((uint32_t *)g2h(addr), old, new);
+-            ret = ret != old;
+-            break;
+-        case 3:
+-            {
+-                uint64_t o64, n64, r64;
+-                o64 = *(uint64_t *)g2h(old);
+-                n64 = *(uint64_t *)g2h(new);
+-#ifdef CONFIG_ATOMIC64
+-                r64 = atomic_cmpxchg__nocheck((uint64_t *)g2h(addr), o64, n64);
+-                ret = r64 != o64;
+-#else
+-                start_exclusive();
+-                r64 = *(uint64_t *)g2h(addr);
+-                ret = 1;
+-                if (r64 == o64) {
+-                    *(uint64_t *)g2h(addr) = n64;
+-                    ret = 0;
+-                }
+-                end_exclusive();
+-#endif
+-            }
+-            break;
+-        }
+-        break;
+-    }
+-
+-    env->gr[28] = ret;
+-    return 0;
+-}
+-
+-void cpu_loop(CPUHPPAState *env)
+-{
+-    CPUState *cs = CPU(hppa_env_get_cpu(env));
+-    target_siginfo_t info;
+-    abi_ulong ret;
+-    int trapnr;
+-
+-    while (1) {
+-        cpu_exec_start(cs);
+-        trapnr = cpu_exec(cs);
+-        cpu_exec_end(cs);
+-        process_queued_cpu_work(cs);
+-
+-        switch (trapnr) {
+-        case EXCP_SYSCALL:
+-            ret = do_syscall(env, env->gr[20],
+-                             env->gr[26], env->gr[25],
+-                             env->gr[24], env->gr[23],
+-                             env->gr[22], env->gr[21], 0, 0);
+-            switch (ret) {
+-            default:
+-                env->gr[28] = ret;
+-                /* We arrived here by faking the gateway page.  Return.  */
+-                env->iaoq_f = env->gr[31];
+-                env->iaoq_b = env->gr[31] + 4;
+-                break;
+-            case -TARGET_ERESTARTSYS:
+-            case -TARGET_QEMU_ESIGRETURN:
+-                break;
+-            }
+-            break;
+-        case EXCP_SYSCALL_LWS:
+-            env->gr[21] = hppa_lws(env);
+-            /* We arrived here by faking the gateway page.  Return.  */
+-            env->iaoq_f = env->gr[31];
+-            env->iaoq_b = env->gr[31] + 4;
+-            break;
+-        case EXCP_ITLB_MISS:
+-        case EXCP_DTLB_MISS:
+-        case EXCP_NA_ITLB_MISS:
+-        case EXCP_NA_DTLB_MISS:
+-        case EXCP_IMP:
+-        case EXCP_DMP:
+-        case EXCP_DMB:
+-        case EXCP_PAGE_REF:
+-        case EXCP_DMAR:
+-        case EXCP_DMPI:
+-            info.si_signo = TARGET_SIGSEGV;
+-            info.si_errno = 0;
+-            info.si_code = TARGET_SEGV_ACCERR;
+-            info._sifields._sigfault._addr = env->cr[CR_IOR];
+-            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-            break;
+-        case EXCP_UNALIGN:
+-            info.si_signo = TARGET_SIGBUS;
+-            info.si_errno = 0;
+-            info.si_code = 0;
+-            info._sifields._sigfault._addr = env->cr[CR_IOR];
+-            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-            break;
+-        case EXCP_ILL:
+-        case EXCP_PRIV_OPR:
+-        case EXCP_PRIV_REG:
+-            info.si_signo = TARGET_SIGILL;
+-            info.si_errno = 0;
+-            info.si_code = TARGET_ILL_ILLOPN;
+-            info._sifields._sigfault._addr = env->iaoq_f;
+-            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-            break;
+-        case EXCP_OVERFLOW:
+-        case EXCP_COND:
+-        case EXCP_ASSIST:
+-            info.si_signo = TARGET_SIGFPE;
+-            info.si_errno = 0;
+-            info.si_code = 0;
+-            info._sifields._sigfault._addr = env->iaoq_f;
+-            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-            break;
+-        case EXCP_DEBUG:
+-            trapnr = gdb_handlesig(cs, TARGET_SIGTRAP);
+-            if (trapnr) {
+-                info.si_signo = trapnr;
+-                info.si_errno = 0;
+-                info.si_code = TARGET_TRAP_BRKPT;
+-                queue_signal(env, trapnr, QEMU_SI_FAULT, &info);
+-            }
+-            break;
+-        case EXCP_INTERRUPT:
+-            /* just indicate that signals should be handled asap */
+-            break;
+-        default:
+-            g_assert_not_reached();
+-        }
+-        process_pending_signals(env);
+-    }
+-}
+-
+-#endif /* TARGET_HPPA */
+-
+ #ifdef TARGET_XTENSA
+ 
+ static void xtensa_rfw(CPUXtensaState *env)
+@@ -1228,16 +1045,7 @@ int main(int argc, char **argv, char **envp)
+ 
+     target_cpu_copy_regs(env, regs);
+ 
+-#if defined(TARGET_HPPA)
+-    {
+-        int i;
+-        for (i = 1; i < 32; i++) {
+-            env->gr[i] = regs->gr[i];
+-        }
+-        env->iaoq_f = regs->iaoq[0];
+-        env->iaoq_b = regs->iaoq[1];
+-    }
+-#elif defined(TARGET_XTENSA)
++#if defined(TARGET_XTENSA)
+     {
+         int i;
+         for (i = 0; i < 16; ++i) {
 -- 
 2.14.3
