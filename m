@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fD57M-00054T-7c
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:29:09 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fD57a-0005GZ-MH
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:29:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fD57I-0007os-UP
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:29:08 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:59647)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fD57I-0007oM-Kh
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:29:04 -0400
-References: <20180430080404.7323-1-christophe.lyon@st.com>
-	<CAFEAcA80NBYJ6BkTMsfBBZN91oJw3zE6A_a7uA2ESCkwb1Vgew@mail.gmail.com>
-	<CAKdteOZt45ohyve_cgK6uarEiNiVOL2vVs=+GzENzFjg_1MM-w@mail.gmail.com>
-	<CAFEAcA_Aoe0Jcyn0e6Eir5T+KXtVdfjz2c-+HrtVNtaxgmDYFw@mail.gmail.com>
-	<CAKdteOY3FyXokDoViQWTL++EQ79sxNOuCgZeAxxakAQj8p2H5g@mail.gmail.com>
-	<CAFEAcA-fOHNfBJnZfcPMj53v3Dc0anYptPcw7nyBBJBdFKUZpg@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <767f617b-82fc-f256-e339-6927d0c7ba59@vivier.eu>
-Date: Mon, 30 Apr 2018 11:28:51 +0200
+	(envelope-from <cohuck@redhat.com>) id 1fD57W-0007wj-NC
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:29:22 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58698 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1fD57W-0007wV-IV
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:29:18 -0400
+Date: Mon, 30 Apr 2018 11:29:06 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180430112906.20101672.cohuck@redhat.com>
+In-Reply-To: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
+References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-fOHNfBJnZfcPMj53v3Dc0anYptPcw7nyBBJBdFKUZpg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [ARM/FDPIC v4 0/4] FDPIC ABI for ARM
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] release retrospective, next release timing,
+ numbering
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,39 +27,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Christophe Lyon <christophe.lyon@linaro.org>
-Cc: Christophe Lyon <christophe.lyon@st.com>, QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Le 30/04/2018 à 11:12, Peter Maydell a écrit :
-> On 30 April 2018 at 10:08, Christophe Lyon <christophe.lyon@linaro.org> wrote:
->> On 30 April 2018 at 10:59, Peter Maydell <peter.maydell@linaro.org> wrote:
->>> On 30 April 2018 at 09:40, Christophe Lyon <christophe.lyon@linaro.org> wrote:
->>>> On 30 April 2018 at 10:11, Peter Maydell <peter.maydell@linaro.org> wrote:
->>>>> On 30 April 2018 at 09:03, Christophe Lyon <christophe.lyon@st.com> wrote:
->>>>>> Hello,
->>>>>>
->>>>>> This patch series implements the QEMU contribution of the FDPIC
->>>>>> ABI for ARM targets.
->>>>>
->>>>> Hi; I definitely reviewed at least some of these patches,
->>>>> but this respin seems to have lost all the reviewed-by tags?
->>>>>
->>>> Indeed, I failed to include them.
->>>> Shall I send a v5 including these tags?
->>>
->>> No, but if you can check which ones should have them that would
->>> be helpful.
->>>
->> OK, so all 4 patches have
->> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
->> (you added it to patch 3/4, provided I fixed the nits, which I did in v4).
+On Fri, 27 Apr 2018 16:51:03 +0100
+Peter Maydell <peter.maydell@linaro.org> wrote:
+
+> Hi; I usually let people forget about releases for a month or
+> so before bringing this topic up, but:
 > 
-> Great. Riku/Laurent -- I'm assuming you're going to take this set
-> via the linux-user tree.
+> (1) do we want to call the next release 2.13, or something else?
+> There's no particular reason to bump to 3.0 except some combination of
+>  * if we keep going like this we'll get up to 2.42, which starts to
+>    get silly
+>  * Linus-style "avoid being too predictable"
+>  * triskaidekaphobia
 
-I just sent a pull request without it...
+* avoiding that this discussion comes up every release :)
 
-Do you prefer I update this one or I send another one later?
+> but maybe we should anyway?
 
-Thanks,
-Laurent
+v3.0 sounds fine to me.
+
+> 
+> (2) release timing:
+>  * usual schedule would give us a next release mid-to-late August
+>  * unless I can persuade Stefan to do the release management this
+>    cycle we might need to wind that in by a couple of weeks so
+>    it's definitely done by the middle of August, to avoid a clash
+>    with a personal commitment
+>  * so probably hardfreeze 10th July, softfreeze 3rd July
+
+August might be more of a vacation month than July, anyway? (Depending
+on where you live, I guess.)
+
+No objection from me.
+
+> 
+> (3) retrospective, lessons learned &c
+>  * please remember that if every single submaintainer submits
+>    a pull request on the morning of an RC, it is physically
+>    not possible for me to process all those pulls in time to
+>    tag the RC that day. We had several RCs which got delayed
+>    by a day because of this; please try to submit earlier
+>    rather than later...
+
+There seemed to have been several 'oh crap' issues that people wanted
+to get in asap, so that might account for it.
+
+On a related note: During the development phase, does it make more
+sense to collect stuff until you have a big pile of patches, or is it
+better (from an integration perspective) to do more frequent, smaller
+pull requests?
+
+>  * provide your opinions here ?
+> 
+> thanks
+> -- PMM
+> 
