@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fD5m0-0004vT-UY
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 06:11:10 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fD5mK-00055i-BX
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 06:11:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fD5lv-0003Gj-Sm
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 06:11:08 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39204 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fD5lv-0003Gb-N4
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 06:11:03 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 032EF406E8C3
-	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 10:11:00 +0000 (UTC)
-Date: Mon, 30 Apr 2018 11:10:50 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180430101050.GD4002@stefanha-x1.localdomain>
-References: <20180418090239.13090-1-peterx@redhat.com>
-	<20180418090239.13090-3-peterx@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fD5mJ-0003Sa-J8
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 06:11:28 -0400
+Received: from mail-oi0-x22a.google.com ([2607:f8b0:4003:c06::22a]:35911)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fD5mJ-0003SK-E3
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 06:11:27 -0400
+Received: by mail-oi0-x22a.google.com with SMTP id v2-v6so6956055oif.3
+	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 03:11:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="SO98HVl1bnMOfKZd"
-Content-Disposition: inline
-In-Reply-To: <20180418090239.13090-3-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] monitor: take mon_lock where proper
+In-Reply-To: <367ce2f5-a3b0-9e83-6c33-7924ae7aeb23@redhat.com>
+References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
+	<d50e3a40-d7f3-4c9b-e930-4c2f4d6c8a53@redhat.com>
+	<CAFEAcA8wJuJ9464LadgjJOo-7ttdGYcfDQWALbkxBRJCr_knkg@mail.gmail.com>
+	<062deb2a-35fc-319f-b159-3b58cbf910df@redhat.com>
+	<367ce2f5-a3b0-9e83-6c33-7924ae7aeb23@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 30 Apr 2018 11:11:06 +0100
+Message-ID: <CAFEAcA9-N2JekReO=HAHKgUcqtnUqnYUE=F5nmtBRhR=8e5gmA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] release retrospective, next release timing,
+ numbering
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,141 +33,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
+On 30 April 2018 at 11:06, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 27/04/2018 18:42, Thomas Huth wrote:
+>> On 27.04.2018 18:24, Peter Maydell wrote:
+>>> (In the utopian far future I'd like us to have just one QEMU
+>>> executable that could handle all architectures at once :-))
+>>
+>> Yes, that would be great ... but that's really distant future, I guess.
+>
+> Not _that_ impossible though.  Peter Crosthwaite had some initial
+> patches for multi-arch support.
 
---SO98HVl1bnMOfKZd
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+People have been making noises at me about wanting at least the
+initial "both an A profile and an M profile Arm core in one board"
+support, so it's possible that might float up to the top of my
+todo list at some point. (No promises!)
 
-On Wed, Apr 18, 2018 at 05:02:38PM +0800, Peter Xu wrote:
-> diff --git a/monitor.c b/monitor.c
-> index c93aa4e22b..f4951cafbc 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -306,16 +306,20 @@ void monitor_read_command(Monitor *mon, int show_pr=
-ompt)
->      if (!mon->rs)
->          return;
-> =20
-> +    qemu_mutex_lock(&mon->mon_lock);
->      readline_start(mon->rs, "(qemu) ", 0, monitor_command_cb, NULL);
->      if (show_prompt)
->          readline_show_prompt(mon->rs);
-> +    qemu_mutex_unlock(&mon->mon_lock);
->  }
-> =20
->  int monitor_read_password(Monitor *mon, ReadLineFunc *readline_func,
->                            void *opaque)
->  {
->      if (mon->rs) {
-> +        qemu_mutex_lock(&mon->mon_lock);
->          readline_start(mon->rs, "Password: ", 1, readline_func, opaque);
-> +        qemu_mutex_unlock(&mon->mon_lock);
->          /* prompt is printed on return from the command handler */
->          return 0;
->      } else {
-
-I'm not sure why the lock is being used around readline_start() and
-readline_show_prompt().  There are other readline_*() callers who do not
-take the lock, which is suspicious.
-
-Can you explain the purpose of this?
-
-> @@ -1308,8 +1312,7 @@ void qmp_qmp_capabilities(bool has_enable, QMPCapab=
-ilityList *enable,
->      cur_mon->qmp.commands =3D &qmp_commands;
->  }
-> =20
-> -/* set the current CPU defined by the user */
-> -int monitor_set_cpu(int cpu_index)
-> +static int monitor_set_cpu_locked(Monitor *mon, int cpu_index)
-
-This function requires the BQL since qemu_get_cpu() accesses the cpus
-list without acquiring qemu_cpu_list_lock.
-
-Two options:
-1. Document that monitor_set_cpu() must be called with the BQL held.
-2. Audit qemu_cpu_list_lock to check that it meets the out-of-band
-   monitor code requirements, document that qemu_cpu_list_lock code must
-   follow out-of-band monitor code requirements, and then take the lock.
-
-#1 is more practical since we will probably never need to call
-monitor_set_cpu() from out-of-band monitor code.  Anyway, in that case
-mon_lock is not needed unless there is a mon field that needs to be
-protected.
-
->  {
->      CPUState *cpu;
-> =20
-> @@ -1317,15 +1320,28 @@ int monitor_set_cpu(int cpu_index)
->      if (cpu =3D=3D NULL) {
->          return -1;
->      }
-> -    g_free(cur_mon->mon_cpu_path);
-> -    cur_mon->mon_cpu_path =3D object_get_canonical_path(OBJECT(cpu));
-> +    g_free(mon->mon_cpu_path);
-> +    mon->mon_cpu_path =3D object_get_canonical_path(OBJECT(cpu));
->      return 0;
->  }
-> =20
-> +/* set the current CPU defined by the user */
-> +int monitor_set_cpu(int cpu_index)
-> +{
-> +    int ret;
-> +
-> +    qemu_mutex_lock(&cur_mon->mon_lock);
-> +    ret =3D monitor_set_cpu_locked(cur_mon, cpu_index);
-> +    qemu_mutex_unlock(&cur_mon->mon_lock);
-> +
-> +    return ret;
-> +}
-> +
->  static CPUState *mon_get_cpu_sync(bool synchronize)
->  {
-
-This function calls monitor_set_cpu() so it must be called from the BQL.
-The locking changes are probably not needed.  This function just needs
-to be documented as BQL-only.
-
-> @@ -2239,6 +2258,7 @@ int monitor_get_fd(Monitor *mon, const char *fdname=
-, Error **errp)
->  {
->      mon_fd_t *monfd;
-> =20
-> +    qemu_mutex_lock(&mon->mon_lock);
->      QLIST_FOREACH(monfd, &mon->fds, next) {
->          int fd;
-> =20
-> @@ -2252,9 +2272,10 @@ int monitor_get_fd(Monitor *mon, const char *fdnam=
-e, Error **errp)
->          QLIST_REMOVE(monfd, next);
->          g_free(monfd->name);
->          g_free(monfd);
-> -
-> +        qemu_mutex_unlock(&mon->mon_lock);
->          return fd;
->      }
-> +    qemu_mutex_unlock(&mon->mon_lock);
-
-What about all the other mon->fds users?  They need to lock too,
-otherwise we will QLIST_REMOVE() an fd while they are accessing the
-list!
-
---SO98HVl1bnMOfKZd
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJa5uuqAAoJEJykq7OBq3PI2FMIAKjucAA5Q1rL2ZiUOsk5pbTi
-9A3e0WU4ckc3hrDjFh7ZZ8iHsjW7jgFejL8sTfd7dAlp8tGKOTnEJyrx+LXQRjYf
-3X5sJDrx+/brv6t9qAwM0buLeHuQG0fBq5G2CAfwLeaT9L2JCC0G/7xdk81jUjfF
-zk9v3FhRglCQLeNbOWJheQBXQtucJ56nXdJNbm6CZMTn75XACpwWcwiP6Kl6s7Vt
-SsTOliftwxu9BSnPKzBdByfPZYp666ux7ZmcRi6PqSN9xnWlPWmudbv2ZX+cTR/y
-kTcKWQq62A+BhVgif1mPXvXsAMiREnQA06YwauAux/KXXlULpm+ORfZVcmWDI7E=
-=rm98
------END PGP SIGNATURE-----
-
---SO98HVl1bnMOfKZd--
+thanks
+-- PMM
