@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fD79E-0003DR-ES
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 07:39:13 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fD7Nl-000868-Gp
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 07:54:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fD799-0007SM-Gb
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 07:39:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36936 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fD799-0007Rw-Cj
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 07:39:07 -0400
-Date: Mon, 30 Apr 2018 12:38:58 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180430113858.GH4002@stefanha-x1.localdomain>
-References: <20180427215314.23168-1-ross.zwisler@linux.intel.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fD7Nk-0004BD-Pz
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 07:54:13 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:33978)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fD7Nk-0004Aw-Jg
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 07:54:12 -0400
+Received: by mail-ot0-x243.google.com with SMTP id i5-v6so9151142oth.1
+	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 04:54:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="G44BJl3Aq1QbV/QL"
-Content-Disposition: inline
-In-Reply-To: <20180427215314.23168-1-ross.zwisler@linux.intel.com>
-Subject: Re: [Qemu-devel] [PATCH 1/3] nvdimm: fix typo in label-size
- definition
+In-Reply-To: <20180430091037.13878-1-laurent@vivier.eu>
+References: <20180430091037.13878-1-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 30 Apr 2018 12:53:51 +0100
+Message-ID: <CAFEAcA8FoNLxk=Ey01FXE1OXraz1+hoX7N_4zj0KmxPFcs54SQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/42] Linux user for 2.13 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ross Zwisler <ross.zwisler@linux.intel.com>
-Cc: Haozhong Zhang <haozhong.zhang@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, linux-nvdimm <linux-nvdimm@lists.01.org>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, Cornelia Huck <cohuck@redhat.com>
 
+On 30 April 2018 at 10:09, Laurent Vivier <laurent@vivier.eu> wrote:
+> The following changes since commit 6f0c4706b35dead265509115ddbd2a8d1af516c1:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/usb-20180427-pull-request' into staging (2018-04-27 12:27:59 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/vivier/qemu.git tags/linux-user-for-2.13-pull-request
+>
+> for you to fetch changes up to 62aaa5146476911aea1fbe6fbf919d06bba8ab5d:
+>
+>   linux-user: Add ARM get_tls syscall support (2018-04-30 09:51:31 +0200)
+>
+> ----------------------------------------------------------------
+> Essentially moving code: move signal and cpu_loop arch specific
+> functions under the linux-user/<arch> directory
+> Add get_tls() syscall and update the patch to apply on
+> linux-user/arm/cpu_loop.c
+> minor fix for RISC-V (uname) and getdents()
+> ----------------------------------------------------------------
 
---G44BJl3Aq1QbV/QL
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Applied, thanks.
 
-On Fri, Apr 27, 2018 at 03:53:12PM -0600, Ross Zwisler wrote:
-> Signed-off-by: Ross Zwisler <ross.zwisler@linux.intel.com>
-> Fixes: commit da6789c27c2e ("nvdimm: add a macro for property "label-size"")
-> Cc: Haozhong Zhang <haozhong.zhang@intel.com>
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  hw/mem/nvdimm.c         | 2 +-
->  include/hw/mem/nvdimm.h | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---G44BJl3Aq1QbV/QL
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJa5wBSAAoJEJykq7OBq3PIk/kH/RoW13NFOdFjOsF/XyAMK+iO
-Gs7ZV9VWu/1Mh/mR7SJkp0IXI9ugKD35Rwo+C9AWSBbecGs4FBkmgK8891OhAFLe
-yN5cNNcTJX3zUFxtMV3UwhfjIcsR3v5AJNC4g3hWaB0z3XvCeN9aXh6FUTMQPH2H
-6+eR3Tq3s3tTfC+BDAAMq1+xv2mlKmKa34pAWLpjrz9ui5mVVm//3cxc3HWlwErZ
-ae3a4IfwcguhD1M/gclnrtrJxyQUN5ZgX8+QqFrzhtw9SYL9FycXQ46anUt11NVM
-eKbux2EVi5z9kf15eP30pud2YmxkPtwDKFz50uW29jUM0lpON3Ja5741ivR5bKI=
-=Q9lk
------END PGP SIGNATURE-----
-
---G44BJl3Aq1QbV/QL--
+-- PMM
