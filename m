@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33408)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fD4qa-0006qU-21
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:11:53 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fD4qa-0006r3-J3
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:11:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fD4qU-0006fs-HH
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:11:47 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fD4qR-0006c2-Lo
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:11:48 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon, 30 Apr 2018 11:10:27 +0200
-Message-Id: <20180430091037.13878-33-laurent@vivier.eu>
+Date: Mon, 30 Apr 2018 11:10:09 +0200
+Message-Id: <20180430091037.13878-15-laurent@vivier.eu>
 In-Reply-To: <20180430091037.13878-1-laurent@vivier.eu>
 References: <20180430091037.13878-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 32/42] linux-user: move sh4 cpu loop to sh4
- directory
+Subject: [Qemu-devel] [PULL 14/42] linux-user: move tilegx signal.c parts to
+ tilegx directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,221 +26,385 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Cornelia Huck <cohuck@redhat.com>
 
-No code change, only move code from main.c to
-sh4/cpu_loop.c.
+No code change, only move code from signal.c to
+tilegx/signal.c, except adding includes and
+exporting setup_rt_frame().
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20180411185651.21351-11-laurent@vivier.eu>
+Message-Id: <20180424192635.6027-13-laurent@vivier.eu>
 ---
- linux-user/main.c         | 90 -----------------------------------------------
- linux-user/sh4/cpu_loop.c | 85 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 85 insertions(+), 90 deletions(-)
+ linux-user/signal.c               | 165 -------------------------------------
+ linux-user/tilegx/signal.c        | 168 ++++++++++++++++++++++++++++++++++++++
+ linux-user/tilegx/target_signal.h |   4 +-
+ 3 files changed, 171 insertions(+), 166 deletions(-)
 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index af26a17c46..d7fee3e3db 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -149,87 +149,6 @@ void fork_end(int child)
-     }
+diff --git a/linux-user/signal.c b/linux-user/signal.c
+index 7c2a963e7c..5a3e5bff5e 100644
+--- a/linux-user/signal.c
++++ b/linux-user/signal.c
+@@ -3032,171 +3032,6 @@ sigsegv:
+     return -TARGET_QEMU_ESIGRETURN;
  }
  
--#ifdef TARGET_SH4
--void cpu_loop(CPUSH4State *env)
+-#elif defined(TARGET_TILEGX)
+-
+-struct target_sigcontext {
+-    union {
+-        /* General-purpose registers.  */
+-        abi_ulong gregs[56];
+-        struct {
+-            abi_ulong __gregs[53];
+-            abi_ulong tp;        /* Aliases gregs[TREG_TP].  */
+-            abi_ulong sp;        /* Aliases gregs[TREG_SP].  */
+-            abi_ulong lr;        /* Aliases gregs[TREG_LR].  */
+-        };
+-    };
+-    abi_ulong pc;        /* Program counter.  */
+-    abi_ulong ics;       /* In Interrupt Critical Section?  */
+-    abi_ulong faultnum;  /* Fault number.  */
+-    abi_ulong pad[5];
+-};
+-
+-struct target_ucontext {
+-    abi_ulong tuc_flags;
+-    abi_ulong tuc_link;
+-    target_stack_t tuc_stack;
+-    struct target_sigcontext tuc_mcontext;
+-    target_sigset_t tuc_sigmask;   /* mask last for extensibility */
+-};
+-
+-struct target_rt_sigframe {
+-    unsigned char save_area[16]; /* caller save area */
+-    struct target_siginfo info;
+-    struct target_ucontext uc;
+-    abi_ulong retcode[2];
+-};
+-
+-#define INSN_MOVELI_R10_139  0x00045fe551483000ULL /* { moveli r10, 139 } */
+-#define INSN_SWINT1          0x286b180051485000ULL /* { swint1 } */
+-
+-
+-static void setup_sigcontext(struct target_sigcontext *sc,
+-                             CPUArchState *env, int signo)
 -{
--    CPUState *cs = CPU(sh_env_get_cpu(env));
--    int trapnr, ret;
--    target_siginfo_t info;
+-    int i;
 -
--    while (1) {
--        bool arch_interrupt = true;
--
--        cpu_exec_start(cs);
--        trapnr = cpu_exec(cs);
--        cpu_exec_end(cs);
--        process_queued_cpu_work(cs);
--
--        switch (trapnr) {
--        case 0x160:
--            env->pc += 2;
--            ret = do_syscall(env,
--                             env->gregs[3],
--                             env->gregs[4],
--                             env->gregs[5],
--                             env->gregs[6],
--                             env->gregs[7],
--                             env->gregs[0],
--                             env->gregs[1],
--                             0, 0);
--            if (ret == -TARGET_ERESTARTSYS) {
--                env->pc -= 2;
--            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
--                env->gregs[0] = ret;
--            }
--            break;
--        case EXCP_INTERRUPT:
--            /* just indicate that signals should be handled asap */
--            break;
--        case EXCP_DEBUG:
--            {
--                int sig;
--
--                sig = gdb_handlesig(cs, TARGET_SIGTRAP);
--                if (sig) {
--                    info.si_signo = sig;
--                    info.si_errno = 0;
--                    info.si_code = TARGET_TRAP_BRKPT;
--                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--                } else {
--                    arch_interrupt = false;
--                }
--            }
--            break;
--	case 0xa0:
--	case 0xc0:
--            info.si_signo = TARGET_SIGSEGV;
--            info.si_errno = 0;
--            info.si_code = TARGET_SEGV_MAPERR;
--            info._sifields._sigfault._addr = env->tea;
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--	    break;
--        case EXCP_ATOMIC:
--            cpu_exec_step_atomic(cs);
--            arch_interrupt = false;
--            break;
--        default:
--            printf ("Unhandled trap: 0x%x\n", trapnr);
--            cpu_dump_state(cs, stderr, fprintf, 0);
--            exit(EXIT_FAILURE);
--        }
--        process_pending_signals (env);
--
--        /* Most of the traps imply an exception or interrupt, which
--           implies an REI instruction has been executed.  Which means
--           that LDST (aka LOK_ADDR) should be cleared.  But there are
--           a few exceptions for traps internal to QEMU.  */
--        if (arch_interrupt) {
--            env->lock_addr = -1;
--        }
+-    for (i = 0; i < TILEGX_R_COUNT; ++i) {
+-        __put_user(env->regs[i], &sc->gregs[i]);
 -    }
+-
+-    __put_user(env->pc, &sc->pc);
+-    __put_user(0, &sc->ics);
+-    __put_user(signo, &sc->faultnum);
 -}
--#endif
 -
- #ifdef TARGET_CRIS
- void cpu_loop(CPUCRISState *env)
- {
-@@ -2361,15 +2280,6 @@ int main(int argc, char **argv, char **envp)
-         env->pc = regs->sepc;
-         env->gpr[xSP] = regs->sp;
-     }
--#elif defined(TARGET_SH4)
--    {
--        int i;
+-static void restore_sigcontext(CPUTLGState *env, struct target_sigcontext *sc)
+-{
+-    int i;
 -
--        for(i = 0; i < 16; i++) {
--            env->gregs[i] = regs->regs[i];
--        }
--        env->pc = regs->pc;
+-    for (i = 0; i < TILEGX_R_COUNT; ++i) {
+-        __get_user(env->regs[i], &sc->gregs[i]);
 -    }
- #elif defined(TARGET_ALPHA)
-     {
-         int i;
-diff --git a/linux-user/sh4/cpu_loop.c b/linux-user/sh4/cpu_loop.c
-index b7700a5561..418833ea25 100644
---- a/linux-user/sh4/cpu_loop.c
-+++ b/linux-user/sh4/cpu_loop.c
-@@ -21,6 +21,91 @@
- #include "qemu.h"
- #include "cpu_loop-common.h"
+-
+-    __get_user(env->pc, &sc->pc);
+-}
+-
+-static abi_ulong get_sigframe(struct target_sigaction *ka, CPUArchState *env,
+-                              size_t frame_size)
+-{
+-    unsigned long sp = env->regs[TILEGX_R_SP];
+-
+-    if (on_sig_stack(sp) && !likely(on_sig_stack(sp - frame_size))) {
+-        return -1UL;
+-    }
+-
+-    if ((ka->sa_flags & SA_ONSTACK) && !sas_ss_flags(sp)) {
+-        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
+-    }
+-
+-    sp -= frame_size;
+-    sp &= -16UL;
+-    return sp;
+-}
+-
+-static void setup_rt_frame(int sig, struct target_sigaction *ka,
+-                           target_siginfo_t *info,
+-                           target_sigset_t *set, CPUArchState *env)
+-{
+-    abi_ulong frame_addr;
+-    struct target_rt_sigframe *frame;
+-    unsigned long restorer;
+-
+-    frame_addr = get_sigframe(ka, env, sizeof(*frame));
+-    trace_user_setup_rt_frame(env, frame_addr);
+-    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
+-        goto give_sigsegv;
+-    }
+-
+-    /* Always write at least the signal number for the stack backtracer. */
+-    if (ka->sa_flags & TARGET_SA_SIGINFO) {
+-        /* At sigreturn time, restore the callee-save registers too. */
+-        tswap_siginfo(&frame->info, info);
+-        /* regs->flags |= PT_FLAGS_RESTORE_REGS; FIXME: we can skip it? */
+-    } else {
+-        __put_user(info->si_signo, &frame->info.si_signo);
+-    }
+-
+-    /* Create the ucontext.  */
+-    __put_user(0, &frame->uc.tuc_flags);
+-    __put_user(0, &frame->uc.tuc_link);
+-    __put_user(target_sigaltstack_used.ss_sp, &frame->uc.tuc_stack.ss_sp);
+-    __put_user(sas_ss_flags(env->regs[TILEGX_R_SP]),
+-               &frame->uc.tuc_stack.ss_flags);
+-    __put_user(target_sigaltstack_used.ss_size, &frame->uc.tuc_stack.ss_size);
+-    setup_sigcontext(&frame->uc.tuc_mcontext, env, info->si_signo);
+-
+-    if (ka->sa_flags & TARGET_SA_RESTORER) {
+-        restorer = (unsigned long) ka->sa_restorer;
+-    } else {
+-        __put_user(INSN_MOVELI_R10_139, &frame->retcode[0]);
+-        __put_user(INSN_SWINT1, &frame->retcode[1]);
+-        restorer = frame_addr + offsetof(struct target_rt_sigframe, retcode);
+-    }
+-    env->pc = (unsigned long) ka->_sa_handler;
+-    env->regs[TILEGX_R_SP] = (unsigned long) frame;
+-    env->regs[TILEGX_R_LR] = restorer;
+-    env->regs[0] = (unsigned long) sig;
+-    env->regs[1] = (unsigned long) &frame->info;
+-    env->regs[2] = (unsigned long) &frame->uc;
+-    /* regs->flags |= PT_FLAGS_CALLER_SAVES; FIXME: we can skip it? */
+-
+-    unlock_user_struct(frame, frame_addr, 1);
+-    return;
+-
+-give_sigsegv:
+-    force_sigsegv(sig);
+-}
+-
+-long do_rt_sigreturn(CPUTLGState *env)
+-{
+-    abi_ulong frame_addr = env->regs[TILEGX_R_SP];
+-    struct target_rt_sigframe *frame;
+-    sigset_t set;
+-
+-    trace_user_do_rt_sigreturn(env, frame_addr);
+-    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1)) {
+-        goto badframe;
+-    }
+-    target_to_host_sigset(&set, &frame->uc.tuc_sigmask);
+-    set_sigmask(&set);
+-
+-    restore_sigcontext(env, &frame->uc.tuc_mcontext);
+-    if (do_sigaltstack(frame_addr + offsetof(struct target_rt_sigframe,
+-                                             uc.tuc_stack),
+-                       0, env->regs[TILEGX_R_SP]) == -EFAULT) {
+-        goto badframe;
+-    }
+-
+-    unlock_user_struct(frame, frame_addr, 0);
+-    return -TARGET_QEMU_ESIGRETURN;
+-
+-
+- badframe:
+-    unlock_user_struct(frame, frame_addr, 0);
+-    force_sig(TARGET_SIGSEGV);
+-    return -TARGET_QEMU_ESIGRETURN;
+-}
+-
+ #elif defined(TARGET_RISCV)
  
-+void cpu_loop(CPUSH4State *env)
+ /* Signal handler invocation must be transparent for the code being
+diff --git a/linux-user/tilegx/signal.c b/linux-user/tilegx/signal.c
+index 02ca338b6c..8f54f54f95 100644
+--- a/linux-user/tilegx/signal.c
++++ b/linux-user/tilegx/signal.c
+@@ -16,3 +16,171 @@
+  *  You should have received a copy of the GNU General Public License
+  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
++#include "qemu/osdep.h"
++#include "qemu.h"
++#include "target_signal.h"
++#include "signal-common.h"
++#include "linux-user/trace.h"
++
++struct target_sigcontext {
++    union {
++        /* General-purpose registers.  */
++        abi_ulong gregs[56];
++        struct {
++            abi_ulong __gregs[53];
++            abi_ulong tp;        /* Aliases gregs[TREG_TP].  */
++            abi_ulong sp;        /* Aliases gregs[TREG_SP].  */
++            abi_ulong lr;        /* Aliases gregs[TREG_LR].  */
++        };
++    };
++    abi_ulong pc;        /* Program counter.  */
++    abi_ulong ics;       /* In Interrupt Critical Section?  */
++    abi_ulong faultnum;  /* Fault number.  */
++    abi_ulong pad[5];
++};
++
++struct target_ucontext {
++    abi_ulong tuc_flags;
++    abi_ulong tuc_link;
++    target_stack_t tuc_stack;
++    struct target_sigcontext tuc_mcontext;
++    target_sigset_t tuc_sigmask;   /* mask last for extensibility */
++};
++
++struct target_rt_sigframe {
++    unsigned char save_area[16]; /* caller save area */
++    struct target_siginfo info;
++    struct target_ucontext uc;
++    abi_ulong retcode[2];
++};
++
++#define INSN_MOVELI_R10_139  0x00045fe551483000ULL /* { moveli r10, 139 } */
++#define INSN_SWINT1          0x286b180051485000ULL /* { swint1 } */
++
++
++static void setup_sigcontext(struct target_sigcontext *sc,
++                             CPUArchState *env, int signo)
 +{
-+    CPUState *cs = CPU(sh_env_get_cpu(env));
-+    int trapnr, ret;
-+    target_siginfo_t info;
-+
-+    while (1) {
-+        bool arch_interrupt = true;
-+
-+        cpu_exec_start(cs);
-+        trapnr = cpu_exec(cs);
-+        cpu_exec_end(cs);
-+        process_queued_cpu_work(cs);
-+
-+        switch (trapnr) {
-+        case 0x160:
-+            env->pc += 2;
-+            ret = do_syscall(env,
-+                             env->gregs[3],
-+                             env->gregs[4],
-+                             env->gregs[5],
-+                             env->gregs[6],
-+                             env->gregs[7],
-+                             env->gregs[0],
-+                             env->gregs[1],
-+                             0, 0);
-+            if (ret == -TARGET_ERESTARTSYS) {
-+                env->pc -= 2;
-+            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
-+                env->gregs[0] = ret;
-+            }
-+            break;
-+        case EXCP_INTERRUPT:
-+            /* just indicate that signals should be handled asap */
-+            break;
-+        case EXCP_DEBUG:
-+            {
-+                int sig;
-+
-+                sig = gdb_handlesig(cs, TARGET_SIGTRAP);
-+                if (sig) {
-+                    info.si_signo = sig;
-+                    info.si_errno = 0;
-+                    info.si_code = TARGET_TRAP_BRKPT;
-+                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+                } else {
-+                    arch_interrupt = false;
-+                }
-+            }
-+            break;
-+        case 0xa0:
-+        case 0xc0:
-+            info.si_signo = TARGET_SIGSEGV;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_SEGV_MAPERR;
-+            info._sifields._sigfault._addr = env->tea;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+        case EXCP_ATOMIC:
-+            cpu_exec_step_atomic(cs);
-+            arch_interrupt = false;
-+            break;
-+        default:
-+            printf ("Unhandled trap: 0x%x\n", trapnr);
-+            cpu_dump_state(cs, stderr, fprintf, 0);
-+            exit(EXIT_FAILURE);
-+        }
-+        process_pending_signals (env);
-+
-+        /* Most of the traps imply an exception or interrupt, which
-+           implies an REI instruction has been executed.  Which means
-+           that LDST (aka LOK_ADDR) should be cleared.  But there are
-+           a few exceptions for traps internal to QEMU.  */
-+        if (arch_interrupt) {
-+            env->lock_addr = -1;
-+        }
-+    }
-+}
-+
- void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
- {
 +    int i;
 +
-+    for(i = 0; i < 16; i++) {
-+        env->gregs[i] = regs->regs[i];
++    for (i = 0; i < TILEGX_R_COUNT; ++i) {
++        __put_user(env->regs[i], &sc->gregs[i]);
 +    }
-+    env->pc = regs->pc;
++
++    __put_user(env->pc, &sc->pc);
++    __put_user(0, &sc->ics);
++    __put_user(signo, &sc->faultnum);
++}
++
++static void restore_sigcontext(CPUTLGState *env, struct target_sigcontext *sc)
++{
++    int i;
++
++    for (i = 0; i < TILEGX_R_COUNT; ++i) {
++        __get_user(env->regs[i], &sc->gregs[i]);
++    }
++
++    __get_user(env->pc, &sc->pc);
++}
++
++static abi_ulong get_sigframe(struct target_sigaction *ka, CPUArchState *env,
++                              size_t frame_size)
++{
++    unsigned long sp = env->regs[TILEGX_R_SP];
++
++    if (on_sig_stack(sp) && !likely(on_sig_stack(sp - frame_size))) {
++        return -1UL;
++    }
++
++    if ((ka->sa_flags & SA_ONSTACK) && !sas_ss_flags(sp)) {
++        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
++    }
++
++    sp -= frame_size;
++    sp &= -16UL;
++    return sp;
++}
++
++void setup_rt_frame(int sig, struct target_sigaction *ka,
++                    target_siginfo_t *info,
++                    target_sigset_t *set, CPUArchState *env)
++{
++    abi_ulong frame_addr;
++    struct target_rt_sigframe *frame;
++    unsigned long restorer;
++
++    frame_addr = get_sigframe(ka, env, sizeof(*frame));
++    trace_user_setup_rt_frame(env, frame_addr);
++    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
++        goto give_sigsegv;
++    }
++
++    /* Always write at least the signal number for the stack backtracer. */
++    if (ka->sa_flags & TARGET_SA_SIGINFO) {
++        /* At sigreturn time, restore the callee-save registers too. */
++        tswap_siginfo(&frame->info, info);
++        /* regs->flags |= PT_FLAGS_RESTORE_REGS; FIXME: we can skip it? */
++    } else {
++        __put_user(info->si_signo, &frame->info.si_signo);
++    }
++
++    /* Create the ucontext.  */
++    __put_user(0, &frame->uc.tuc_flags);
++    __put_user(0, &frame->uc.tuc_link);
++    __put_user(target_sigaltstack_used.ss_sp, &frame->uc.tuc_stack.ss_sp);
++    __put_user(sas_ss_flags(env->regs[TILEGX_R_SP]),
++               &frame->uc.tuc_stack.ss_flags);
++    __put_user(target_sigaltstack_used.ss_size, &frame->uc.tuc_stack.ss_size);
++    setup_sigcontext(&frame->uc.tuc_mcontext, env, info->si_signo);
++
++    if (ka->sa_flags & TARGET_SA_RESTORER) {
++        restorer = (unsigned long) ka->sa_restorer;
++    } else {
++        __put_user(INSN_MOVELI_R10_139, &frame->retcode[0]);
++        __put_user(INSN_SWINT1, &frame->retcode[1]);
++        restorer = frame_addr + offsetof(struct target_rt_sigframe, retcode);
++    }
++    env->pc = (unsigned long) ka->_sa_handler;
++    env->regs[TILEGX_R_SP] = (unsigned long) frame;
++    env->regs[TILEGX_R_LR] = restorer;
++    env->regs[0] = (unsigned long) sig;
++    env->regs[1] = (unsigned long) &frame->info;
++    env->regs[2] = (unsigned long) &frame->uc;
++    /* regs->flags |= PT_FLAGS_CALLER_SAVES; FIXME: we can skip it? */
++
++    unlock_user_struct(frame, frame_addr, 1);
++    return;
++
++give_sigsegv:
++    force_sigsegv(sig);
++}
++
++long do_rt_sigreturn(CPUTLGState *env)
++{
++    abi_ulong frame_addr = env->regs[TILEGX_R_SP];
++    struct target_rt_sigframe *frame;
++    sigset_t set;
++
++    trace_user_do_rt_sigreturn(env, frame_addr);
++    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1)) {
++        goto badframe;
++    }
++    target_to_host_sigset(&set, &frame->uc.tuc_sigmask);
++    set_sigmask(&set);
++
++    restore_sigcontext(env, &frame->uc.tuc_mcontext);
++    if (do_sigaltstack(frame_addr + offsetof(struct target_rt_sigframe,
++                                             uc.tuc_stack),
++                       0, env->regs[TILEGX_R_SP]) == -EFAULT) {
++        goto badframe;
++    }
++
++    unlock_user_struct(frame, frame_addr, 0);
++    return -TARGET_QEMU_ESIGRETURN;
++
++
++ badframe:
++    unlock_user_struct(frame, frame_addr, 0);
++    force_sig(TARGET_SIGSEGV);
++    return -TARGET_QEMU_ESIGRETURN;
++}
+diff --git a/linux-user/tilegx/target_signal.h b/linux-user/tilegx/target_signal.h
+index f64551a8cf..132d7781fe 100644
+--- a/linux-user/tilegx/target_signal.h
++++ b/linux-user/tilegx/target_signal.h
+@@ -25,5 +25,7 @@ static inline abi_ulong get_sp_from_cpustate(CPUTLGState *state)
+     return state->regs[TILEGX_R_SP];
  }
+ 
+-
++void setup_rt_frame(int sig, struct target_sigaction *ka,
++                    target_siginfo_t *info,
++                    target_sigset_t *set, CPUArchState *env);
+ #endif /* TILEGX_TARGET_SIGNAL_H */
 -- 
 2.14.3
