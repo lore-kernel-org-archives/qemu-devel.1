@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fDDOI-00030n-Ep
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 14:19:11 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fDDOJ-00030q-Hu
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 14:19:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fDDOH-0007FU-E3
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 14:19:10 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41268)
+	(envelope-from <pm215@archaic.org.uk>) id 1fDDOI-0007Gv-Mr
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 14:19:11 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41282)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fDDOH-0007Ew-6C
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 14:19:09 -0400
+	id 1fDDOI-0007Fb-HC
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 14:19:10 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 30 Apr 2018 19:18:54 +0100
-Message-Id: <20180430181905.32327-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [RFC PATCH 00/11] iommu: add MemTxAttrs argument to
- IOMMU translate function
+Date: Mon, 30 Apr 2018 19:18:58 +0100
+Message-Id: <20180430181905.32327-5-peter.maydell@linaro.org>
+In-Reply-To: <20180430181905.32327-1-peter.maydell@linaro.org>
+References: <20180430181905.32327-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [RFC PATCH 04/11] Make flatview_extend_translation()
+ take a MemTxAttrs argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,90 +28,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@linaro.org, Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-This is an RFC patchset because it's a little bit unmotivated
-and only lightly tested, but in principle it could be
-committed, so half-RFC-half-not :-)
+As part of plumbing MemTxAttrs down to the IOMMU translate method,
+add MemTxAttrs as an argument to flatview_extend_translation().
+Its callers either have an attrs value to hand, or don't care
+and can use MEMTXATTRS_UNSPECIFIED.
 
-The Arm SMMU wants to know if the transaction it is handling
-is secure/nonsecure and user/privileged, because the iommu
-page tables can be configured by the guest to only allow
-transactions which satisfy those criteria. At the moment
-Eric's implementation ignores all that, because we don't
-provide the IOMMUMemoryRegion translate function with any
-memory transaction attribute information. This patchset fixes
-that by plumbing through transaction attributes.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ exec.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Most of the patchset is just starting at the leaves of the calltree
-rooted at "flatview_do_translate()" and making callsites provide
-attributes where appropriate or plumbing through existing attribute
-information where it exists.  General principles of when I made a
-caller pass MEMTXATTRS_UNSPECIFIED and when I had it take an
-attrs value from further up:
- * dma_memory_* functions all assume UNSPECIFIED (matching
-   the read/write/rw functions that already do that)
- * cpu_physical_memory_* also all assume UNSPECIFIED,
-   following the pattern of existing functions in that family
- * address_space_* take an attributes argument, by analogy
-   with existing functions in that family
- * endpoints like target-specific code or vhost has to
-   provide attributes, but for all the targets affected here
-   they don't care about attributes and can use UNSPECIFIED
-
-As well as the SMMU, I'm also thinking about using the IOMMU
-infrastructure for the v8M Memory Protection Controller
-(though that is a bit trickier as I also need it to support
-TCG execution in an IOMMU-controlled region, which is an
-orthogonal bit of work to attribute support).
-
-Based-on: <20180430122404.10741-1-peter.maydell@linaro.org>
-("memory.h: Improve IOMMU related documentation") but
-only for textual reasons.
-
-thanks
--- PMM
-
-Peter Maydell (11):
-  Make address_space_translate() take a MemTxAttrs argument
-  Make address_space_map() take a MemTxAttrs argument
-  Make address_space_access_valid() take a MemTxAttrs argument
-  Make flatview_extend_translation() take a MemTxAttrs argument
-  Make memory_region_access_valid() take a MemTxAttrs argument
-  Make MemoryRegion valid.accepts callback take a MemTxAttrs argument
-  Make flatview_access_valid() take a MemTxAttrs argument
-  Make flatview_translate() take a MemTxAttrs argument
-  Make address_space_get_iotlb_entry() take a MemTxAttrs argument
-  Make flatview_do_translate() take a MemTxAttrs argument
-  Add MemTxAttrs argument to IOMMU translate function
-
- include/exec/memory-internal.h |  3 +-
- include/exec/memory.h          | 26 +++++++-----
- include/sysemu/dma.h           |  6 ++-
- accel/tcg/translate-all.c      |  2 +-
- exec.c                         | 73 ++++++++++++++++++++--------------
- hw/alpha/typhoon.c             |  3 +-
- hw/dma/rc4030.c                |  3 +-
- hw/hppa/dino.c                 |  3 +-
- hw/i386/amd_iommu.c            |  3 +-
- hw/i386/intel_iommu.c          |  3 +-
- hw/nvram/fw_cfg.c              | 12 ++++--
- hw/ppc/spapr_iommu.c           |  3 +-
- hw/s390x/s390-pci-bus.c        |  3 +-
- hw/s390x/s390-pci-inst.c       |  3 +-
- hw/scsi/esp.c                  |  3 +-
- hw/sparc/sun4m_iommu.c         |  3 +-
- hw/sparc64/sun4u_iommu.c       |  3 +-
- hw/vfio/common.c               |  3 +-
- hw/virtio/vhost.c              |  3 +-
- hw/xen/xen_pt_msi.c            |  3 +-
- memory.c                       | 15 ++++---
- memory_ldst.inc.c              | 18 ++++-----
- target/ppc/mmu-hash64.c        |  3 +-
- target/riscv/helper.c          |  2 +-
- target/s390x/diag.c            |  6 ++-
- target/s390x/excp_helper.c     |  3 +-
- target/s390x/mmu_helper.c      |  3 +-
- target/s390x/sigp.c            |  3 +-
- 28 files changed, 134 insertions(+), 83 deletions(-)
-
+diff --git a/exec.c b/exec.c
+index 87650dc7ed..e56c3442c7 100644
+--- a/exec.c
++++ b/exec.c
+@@ -3460,9 +3460,9 @@ bool address_space_access_valid(AddressSpace *as, hwaddr addr,
+ 
+ static hwaddr
+ flatview_extend_translation(FlatView *fv, hwaddr addr,
+-                                 hwaddr target_len,
+-                                 MemoryRegion *mr, hwaddr base, hwaddr len,
+-                                 bool is_write)
++                            hwaddr target_len,
++                            MemoryRegion *mr, hwaddr base, hwaddr len,
++                            bool is_write, MemTxAttrs attrs)
+ {
+     hwaddr done = 0;
+     hwaddr xlat;
+@@ -3539,7 +3539,7 @@ void *address_space_map(AddressSpace *as,
+ 
+     memory_region_ref(mr);
+     *plen = flatview_extend_translation(fv, addr, len, mr, xlat,
+-                                             l, is_write);
++                                        l, is_write, attrs);
+     ptr = qemu_ram_ptr_length(mr->ram_block, xlat, plen, true);
+     rcu_read_unlock();
+ 
 -- 
 2.17.0
