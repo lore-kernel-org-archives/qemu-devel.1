@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fD4qX-0006mu-3K
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:11:52 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fD4qT-0006j8-Lf
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:11:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fD4qP-0006a8-Id
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:11:44 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fD4qL-0006W5-E9
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:11:41 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon, 30 Apr 2018 11:10:29 +0200
-Message-Id: <20180430091037.13878-35-laurent@vivier.eu>
+Date: Mon, 30 Apr 2018 11:10:10 +0200
+Message-Id: <20180430091037.13878-16-laurent@vivier.eu>
 In-Reply-To: <20180430091037.13878-1-laurent@vivier.eu>
 References: <20180430091037.13878-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 34/42] linux-user: move microblaze cpu loop to
- microblaze directory
+Subject: [Qemu-devel] [PULL 15/42] linux-user: move riscv signal.c parts to
+ riscv directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,351 +26,448 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Cornelia Huck <cohuck@redhat.com>
 
-No code change, only move code from main.c to
-microblaze/cpu_loop.c.
+No code change, only move code from signal.c to
+riscv/signal.c, except adding includes and
+exporting setup_rt_frame().
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20180411185651.21351-13-laurent@vivier.eu>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20180424192635.6027-14-laurent@vivier.eu>
 ---
- linux-user/main.c                | 155 ---------------------------------------
- linux-user/microblaze/cpu_loop.c | 150 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 150 insertions(+), 155 deletions(-)
+ linux-user/riscv/signal.c        | 200 +++++++++++++++++++++++++++++++++++++++
+ linux-user/riscv/target_signal.h |   3 +
+ linux-user/signal.c              | 197 --------------------------------------
+ 3 files changed, 203 insertions(+), 197 deletions(-)
 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 9e01325d6a..9e49c8a30c 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -149,125 +149,6 @@ void fork_end(int child)
-     }
- }
- 
--#ifdef TARGET_MICROBLAZE
--void cpu_loop(CPUMBState *env)
--{
--    CPUState *cs = CPU(mb_env_get_cpu(env));
--    int trapnr, ret;
--    target_siginfo_t info;
--    
--    while (1) {
--        cpu_exec_start(cs);
--        trapnr = cpu_exec(cs);
--        cpu_exec_end(cs);
--        process_queued_cpu_work(cs);
--
--        switch (trapnr) {
--        case 0xaa:
--            {
--                info.si_signo = TARGET_SIGSEGV;
--                info.si_errno = 0;
--                /* XXX: check env->error_code */
--                info.si_code = TARGET_SEGV_MAPERR;
--                info._sifields._sigfault._addr = 0;
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            }
--            break;
--	case EXCP_INTERRUPT:
--	  /* just indicate that signals should be handled asap */
--	  break;
--        case EXCP_BREAK:
--            /* Return address is 4 bytes after the call.  */
--            env->regs[14] += 4;
--            env->sregs[SR_PC] = env->regs[14];
--            ret = do_syscall(env, 
--                             env->regs[12], 
--                             env->regs[5], 
--                             env->regs[6], 
--                             env->regs[7], 
--                             env->regs[8], 
--                             env->regs[9], 
--                             env->regs[10],
--                             0, 0);
--            if (ret == -TARGET_ERESTARTSYS) {
--                /* Wind back to before the syscall. */
--                env->sregs[SR_PC] -= 4;
--            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
--                env->regs[3] = ret;
--            }
--            /* All syscall exits result in guest r14 being equal to the
--             * PC we return to, because the kernel syscall exit "rtbd" does
--             * this. (This is true even for sigreturn(); note that r14 is
--             * not a userspace-usable register, as the kernel may clobber it
--             * at any point.)
--             */
--            env->regs[14] = env->sregs[SR_PC];
--            break;
--        case EXCP_HW_EXCP:
--            env->regs[17] = env->sregs[SR_PC] + 4;
--            if (env->iflags & D_FLAG) {
--                env->sregs[SR_ESR] |= 1 << 12;
--                env->sregs[SR_PC] -= 4;
--                /* FIXME: if branch was immed, replay the imm as well.  */
--            }
--
--            env->iflags &= ~(IMM_FLAG | D_FLAG);
--
--            switch (env->sregs[SR_ESR] & 31) {
--                case ESR_EC_DIVZERO:
--                    info.si_signo = TARGET_SIGFPE;
--                    info.si_errno = 0;
--                    info.si_code = TARGET_FPE_FLTDIV;
--                    info._sifields._sigfault._addr = 0;
--                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--                    break;
--                case ESR_EC_FPU:
--                    info.si_signo = TARGET_SIGFPE;
--                    info.si_errno = 0;
--                    if (env->sregs[SR_FSR] & FSR_IO) {
--                        info.si_code = TARGET_FPE_FLTINV;
--                    }
--                    if (env->sregs[SR_FSR] & FSR_DZ) {
--                        info.si_code = TARGET_FPE_FLTDIV;
--                    }
--                    info._sifields._sigfault._addr = 0;
--                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--                    break;
--                default:
--                    printf ("Unhandled hw-exception: 0x%x\n",
--                            env->sregs[SR_ESR] & ESR_EC_MASK);
--                    cpu_dump_state(cs, stderr, fprintf, 0);
--                    exit(EXIT_FAILURE);
--                    break;
--            }
--            break;
--        case EXCP_DEBUG:
--            {
--                int sig;
--
--                sig = gdb_handlesig(cs, TARGET_SIGTRAP);
--                if (sig)
--                  {
--                    info.si_signo = sig;
--                    info.si_errno = 0;
--                    info.si_code = TARGET_TRAP_BRKPT;
--                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--                  }
--            }
--            break;
--        case EXCP_ATOMIC:
--            cpu_exec_step_atomic(cs);
--            break;
--        default:
--            printf ("Unhandled trap: 0x%x\n", trapnr);
--            cpu_dump_state(cs, stderr, fprintf, 0);
--            exit(EXIT_FAILURE);
--        }
--        process_pending_signals (env);
--    }
--}
--#endif
--
- #ifdef TARGET_M68K
- 
- void cpu_loop(CPUM68KState *env)
-@@ -2169,42 +2050,6 @@ int main(int argc, char **argv, char **envp)
-         env->sr = regs->sr;
-         ts->sim_syscalls = 1;
-     }
--#elif defined(TARGET_MICROBLAZE)
--    {
--        env->regs[0] = regs->r0;
--        env->regs[1] = regs->r1;
--        env->regs[2] = regs->r2;
--        env->regs[3] = regs->r3;
--        env->regs[4] = regs->r4;
--        env->regs[5] = regs->r5;
--        env->regs[6] = regs->r6;
--        env->regs[7] = regs->r7;
--        env->regs[8] = regs->r8;
--        env->regs[9] = regs->r9;
--        env->regs[10] = regs->r10;
--        env->regs[11] = regs->r11;
--        env->regs[12] = regs->r12;
--        env->regs[13] = regs->r13;
--        env->regs[14] = regs->r14;
--        env->regs[15] = regs->r15;	    
--        env->regs[16] = regs->r16;	    
--        env->regs[17] = regs->r17;	    
--        env->regs[18] = regs->r18;	    
--        env->regs[19] = regs->r19;	    
--        env->regs[20] = regs->r20;	    
--        env->regs[21] = regs->r21;	    
--        env->regs[22] = regs->r22;	    
--        env->regs[23] = regs->r23;	    
--        env->regs[24] = regs->r24;	    
--        env->regs[25] = regs->r25;	    
--        env->regs[26] = regs->r26;	    
--        env->regs[27] = regs->r27;	    
--        env->regs[28] = regs->r28;	    
--        env->regs[29] = regs->r29;	    
--        env->regs[30] = regs->r30;	    
--        env->regs[31] = regs->r31;	    
--        env->sregs[SR_PC] = regs->pc;
--    }
- #elif defined(TARGET_RISCV)
-     {
-         env->pc = regs->sepc;
-diff --git a/linux-user/microblaze/cpu_loop.c b/linux-user/microblaze/cpu_loop.c
-index b7700a5561..5ffb83dea2 100644
---- a/linux-user/microblaze/cpu_loop.c
-+++ b/linux-user/microblaze/cpu_loop.c
-@@ -21,6 +21,156 @@
- #include "qemu.h"
- #include "cpu_loop-common.h"
- 
-+void cpu_loop(CPUMBState *env)
+diff --git a/linux-user/riscv/signal.c b/linux-user/riscv/signal.c
+index 02ca338b6c..718f3a5679 100644
+--- a/linux-user/riscv/signal.c
++++ b/linux-user/riscv/signal.c
+@@ -16,3 +16,203 @@
+  *  You should have received a copy of the GNU General Public License
+  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
++#include "qemu/osdep.h"
++#include "qemu.h"
++#include "target_signal.h"
++#include "signal-common.h"
++#include "linux-user/trace.h"
++
++/* Signal handler invocation must be transparent for the code being
++   interrupted. Complete CPU (hart) state is saved on entry and restored
++   before returning from the handler. Process sigmask is also saved to block
++   signals while the handler is running. The handler gets its own stack,
++   which also doubles as storage for the CPU state and sigmask.
++
++   The code below is qemu re-implementation of arch/riscv/kernel/signal.c */
++
++struct target_sigcontext {
++    abi_long pc;
++    abi_long gpr[31]; /* x0 is not present, so all offsets must be -1 */
++    uint64_t fpr[32];
++    uint32_t fcsr;
++}; /* cf. riscv-linux:arch/riscv/include/uapi/asm/ptrace.h */
++
++struct target_ucontext {
++    unsigned long uc_flags;
++    struct target_ucontext *uc_link;
++    target_stack_t uc_stack;
++    struct target_sigcontext uc_mcontext;
++    target_sigset_t uc_sigmask;
++};
++
++struct target_rt_sigframe {
++    uint32_t tramp[2]; /* not in kernel, which uses VDSO instead */
++    struct target_siginfo info;
++    struct target_ucontext uc;
++};
++
++static abi_ulong get_sigframe(struct target_sigaction *ka,
++                              CPURISCVState *regs, size_t framesize)
 +{
-+    CPUState *cs = CPU(mb_env_get_cpu(env));
-+    int trapnr, ret;
-+    target_siginfo_t info;
-+    
-+    while (1) {
-+        cpu_exec_start(cs);
-+        trapnr = cpu_exec(cs);
-+        cpu_exec_end(cs);
-+        process_queued_cpu_work(cs);
++    abi_ulong sp = regs->gpr[xSP];
++    int onsigstack = on_sig_stack(sp);
 +
-+        switch (trapnr) {
-+        case 0xaa:
-+            {
-+                info.si_signo = TARGET_SIGSEGV;
-+                info.si_errno = 0;
-+                /* XXX: check env->error_code */
-+                info.si_code = TARGET_SEGV_MAPERR;
-+                info._sifields._sigfault._addr = 0;
-+                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            }
-+            break;
-+        case EXCP_INTERRUPT:
-+          /* just indicate that signals should be handled asap */
-+          break;
-+        case EXCP_BREAK:
-+            /* Return address is 4 bytes after the call.  */
-+            env->regs[14] += 4;
-+            env->sregs[SR_PC] = env->regs[14];
-+            ret = do_syscall(env, 
-+                             env->regs[12], 
-+                             env->regs[5], 
-+                             env->regs[6], 
-+                             env->regs[7], 
-+                             env->regs[8], 
-+                             env->regs[9], 
-+                             env->regs[10],
-+                             0, 0);
-+            if (ret == -TARGET_ERESTARTSYS) {
-+                /* Wind back to before the syscall. */
-+                env->sregs[SR_PC] -= 4;
-+            } else if (ret != -TARGET_QEMU_ESIGRETURN) {
-+                env->regs[3] = ret;
-+            }
-+            /* All syscall exits result in guest r14 being equal to the
-+             * PC we return to, because the kernel syscall exit "rtbd" does
-+             * this. (This is true even for sigreturn(); note that r14 is
-+             * not a userspace-usable register, as the kernel may clobber it
-+             * at any point.)
-+             */
-+            env->regs[14] = env->sregs[SR_PC];
-+            break;
-+        case EXCP_HW_EXCP:
-+            env->regs[17] = env->sregs[SR_PC] + 4;
-+            if (env->iflags & D_FLAG) {
-+                env->sregs[SR_ESR] |= 1 << 12;
-+                env->sregs[SR_PC] -= 4;
-+                /* FIXME: if branch was immed, replay the imm as well.  */
-+            }
-+
-+            env->iflags &= ~(IMM_FLAG | D_FLAG);
-+
-+            switch (env->sregs[SR_ESR] & 31) {
-+                case ESR_EC_DIVZERO:
-+                    info.si_signo = TARGET_SIGFPE;
-+                    info.si_errno = 0;
-+                    info.si_code = TARGET_FPE_FLTDIV;
-+                    info._sifields._sigfault._addr = 0;
-+                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+                    break;
-+                case ESR_EC_FPU:
-+                    info.si_signo = TARGET_SIGFPE;
-+                    info.si_errno = 0;
-+                    if (env->sregs[SR_FSR] & FSR_IO) {
-+                        info.si_code = TARGET_FPE_FLTINV;
-+                    }
-+                    if (env->sregs[SR_FSR] & FSR_DZ) {
-+                        info.si_code = TARGET_FPE_FLTDIV;
-+                    }
-+                    info._sifields._sigfault._addr = 0;
-+                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+                    break;
-+                default:
-+                    printf ("Unhandled hw-exception: 0x%x\n",
-+                            env->sregs[SR_ESR] & ESR_EC_MASK);
-+                    cpu_dump_state(cs, stderr, fprintf, 0);
-+                    exit(EXIT_FAILURE);
-+                    break;
-+            }
-+            break;
-+        case EXCP_DEBUG:
-+            {
-+                int sig;
-+
-+                sig = gdb_handlesig(cs, TARGET_SIGTRAP);
-+                if (sig)
-+                  {
-+                    info.si_signo = sig;
-+                    info.si_errno = 0;
-+                    info.si_code = TARGET_TRAP_BRKPT;
-+                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+                  }
-+            }
-+            break;
-+        case EXCP_ATOMIC:
-+            cpu_exec_step_atomic(cs);
-+            break;
-+        default:
-+            printf ("Unhandled trap: 0x%x\n", trapnr);
-+            cpu_dump_state(cs, stderr, fprintf, 0);
-+            exit(EXIT_FAILURE);
-+        }
-+        process_pending_signals (env);
++    /* redzone */
++    /* This is the X/Open sanctioned signal stack switching.  */
++    if ((ka->sa_flags & TARGET_SA_ONSTACK) != 0 && !onsigstack) {
++        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
 +    }
++
++    sp -= framesize;
++    sp &= ~3UL; /* align sp on 4-byte boundary */
++
++    /* If we are on the alternate signal stack and would overflow it, don't.
++       Return an always-bogus address instead so we will die with SIGSEGV. */
++    if (onsigstack && !likely(on_sig_stack(sp))) {
++        return -1L;
++    }
++
++    return sp;
 +}
 +
- void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
- {
-+    env->regs[0] = regs->r0;
-+    env->regs[1] = regs->r1;
-+    env->regs[2] = regs->r2;
-+    env->regs[3] = regs->r3;
-+    env->regs[4] = regs->r4;
-+    env->regs[5] = regs->r5;
-+    env->regs[6] = regs->r6;
-+    env->regs[7] = regs->r7;
-+    env->regs[8] = regs->r8;
-+    env->regs[9] = regs->r9;
-+    env->regs[10] = regs->r10;
-+    env->regs[11] = regs->r11;
-+    env->regs[12] = regs->r12;
-+    env->regs[13] = regs->r13;
-+    env->regs[14] = regs->r14;
-+    env->regs[15] = regs->r15;
-+    env->regs[16] = regs->r16;
-+    env->regs[17] = regs->r17;
-+    env->regs[18] = regs->r18;
-+    env->regs[19] = regs->r19;
-+    env->regs[20] = regs->r20;
-+    env->regs[21] = regs->r21;
-+    env->regs[22] = regs->r22;
-+    env->regs[23] = regs->r23;
-+    env->regs[24] = regs->r24;
-+    env->regs[25] = regs->r25;
-+    env->regs[26] = regs->r26;
-+    env->regs[27] = regs->r27;
-+    env->regs[28] = regs->r28;
-+    env->regs[29] = regs->r29;
-+    env->regs[30] = regs->r30;
-+    env->regs[31] = regs->r31;
-+    env->sregs[SR_PC] = regs->pc;
++static void setup_sigcontext(struct target_sigcontext *sc, CPURISCVState *env)
++{
++    int i;
++
++    __put_user(env->pc, &sc->pc);
++
++    for (i = 1; i < 32; i++) {
++        __put_user(env->gpr[i], &sc->gpr[i - 1]);
++    }
++    for (i = 0; i < 32; i++) {
++        __put_user(env->fpr[i], &sc->fpr[i]);
++    }
++
++    uint32_t fcsr = csr_read_helper(env, CSR_FCSR); /*riscv_get_fcsr(env);*/
++    __put_user(fcsr, &sc->fcsr);
++}
++
++static void setup_ucontext(struct target_ucontext *uc,
++                           CPURISCVState *env, target_sigset_t *set)
++{
++    abi_ulong ss_sp = (target_ulong)target_sigaltstack_used.ss_sp;
++    abi_ulong ss_flags = sas_ss_flags(env->gpr[xSP]);
++    abi_ulong ss_size = target_sigaltstack_used.ss_size;
++
++    __put_user(0,    &(uc->uc_flags));
++    __put_user(0,    &(uc->uc_link));
++
++    __put_user(ss_sp,    &(uc->uc_stack.ss_sp));
++    __put_user(ss_flags, &(uc->uc_stack.ss_flags));
++    __put_user(ss_size,  &(uc->uc_stack.ss_size));
++
++    int i;
++    for (i = 0; i < TARGET_NSIG_WORDS; i++) {
++        __put_user(set->sig[i], &(uc->uc_sigmask.sig[i]));
++    }
++
++    setup_sigcontext(&uc->uc_mcontext, env);
++}
++
++static inline void install_sigtramp(uint32_t *tramp)
++{
++    __put_user(0x08b00893, tramp + 0);  /* li a7, 139 = __NR_rt_sigreturn */
++    __put_user(0x00000073, tramp + 1);  /* ecall */
++}
++
++void setup_rt_frame(int sig, struct target_sigaction *ka,
++                    target_siginfo_t *info,
++                    target_sigset_t *set, CPURISCVState *env)
++{
++    abi_ulong frame_addr;
++    struct target_rt_sigframe *frame;
++
++    frame_addr = get_sigframe(ka, env, sizeof(*frame));
++    trace_user_setup_rt_frame(env, frame_addr);
++
++    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
++        goto badframe;
++    }
++
++    setup_ucontext(&frame->uc, env, set);
++    tswap_siginfo(&frame->info, info);
++    install_sigtramp(frame->tramp);
++
++    env->pc = ka->_sa_handler;
++    env->gpr[xSP] = frame_addr;
++    env->gpr[xA0] = sig;
++    env->gpr[xA1] = frame_addr + offsetof(struct target_rt_sigframe, info);
++    env->gpr[xA2] = frame_addr + offsetof(struct target_rt_sigframe, uc);
++    env->gpr[xRA] = frame_addr + offsetof(struct target_rt_sigframe, tramp);
++
++    return;
++
++badframe:
++    unlock_user_struct(frame, frame_addr, 1);
++    if (sig == TARGET_SIGSEGV) {
++        ka->_sa_handler = TARGET_SIG_DFL;
++    }
++    force_sig(TARGET_SIGSEGV);
++}
++
++static void restore_sigcontext(CPURISCVState *env, struct target_sigcontext *sc)
++{
++    int i;
++
++    __get_user(env->pc, &sc->pc);
++
++    for (i = 1; i < 32; ++i) {
++        __get_user(env->gpr[i], &sc->gpr[i - 1]);
++    }
++    for (i = 0; i < 32; ++i) {
++        __get_user(env->fpr[i], &sc->fpr[i]);
++    }
++
++    uint32_t fcsr;
++    __get_user(fcsr, &sc->fcsr);
++    csr_write_helper(env, fcsr, CSR_FCSR);
++}
++
++static void restore_ucontext(CPURISCVState *env, struct target_ucontext *uc)
++{
++    sigset_t blocked;
++    target_sigset_t target_set;
++    int i;
++
++    target_sigemptyset(&target_set);
++    for (i = 0; i < TARGET_NSIG_WORDS; i++) {
++        __get_user(target_set.sig[i], &(uc->uc_sigmask.sig[i]));
++    }
++
++    target_to_host_sigset_internal(&blocked, &target_set);
++    set_sigmask(&blocked);
++
++    restore_sigcontext(env, &uc->uc_mcontext);
++}
++
++long do_rt_sigreturn(CPURISCVState *env)
++{
++    struct target_rt_sigframe *frame;
++    abi_ulong frame_addr;
++
++    frame_addr = env->gpr[xSP];
++    trace_user_do_sigreturn(env, frame_addr);
++    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1)) {
++        goto badframe;
++    }
++
++    restore_ucontext(env, &frame->uc);
++
++    if (do_sigaltstack(frame_addr + offsetof(struct target_rt_sigframe,
++            uc.uc_stack), 0, get_sp_from_cpustate(env)) == -EFAULT) {
++        goto badframe;
++    }
++
++    unlock_user_struct(frame, frame_addr, 0);
++    return -TARGET_QEMU_ESIGRETURN;
++
++badframe:
++    unlock_user_struct(frame, frame_addr, 0);
++    force_sig(TARGET_SIGSEGV);
++    return 0;
++}
+diff --git a/linux-user/riscv/target_signal.h b/linux-user/riscv/target_signal.h
+index ce77f752e3..6ac8a88de6 100644
+--- a/linux-user/riscv/target_signal.h
++++ b/linux-user/riscv/target_signal.h
+@@ -20,4 +20,7 @@ static inline abi_ulong get_sp_from_cpustate(CPURISCVState *state)
+    return state->gpr[xSP];
  }
+ 
++void setup_rt_frame(int sig, struct target_sigaction *ka,
++                    target_siginfo_t *info,
++                    target_sigset_t *set, CPURISCVState *env);
+ #endif /* TARGET_SIGNAL_H */
+diff --git a/linux-user/signal.c b/linux-user/signal.c
+index 5a3e5bff5e..b42fe4ff93 100644
+--- a/linux-user/signal.c
++++ b/linux-user/signal.c
+@@ -3032,203 +3032,6 @@ sigsegv:
+     return -TARGET_QEMU_ESIGRETURN;
+ }
+ 
+-#elif defined(TARGET_RISCV)
+-
+-/* Signal handler invocation must be transparent for the code being
+-   interrupted. Complete CPU (hart) state is saved on entry and restored
+-   before returning from the handler. Process sigmask is also saved to block
+-   signals while the handler is running. The handler gets its own stack,
+-   which also doubles as storage for the CPU state and sigmask.
+-
+-   The code below is qemu re-implementation of arch/riscv/kernel/signal.c */
+-
+-struct target_sigcontext {
+-    abi_long pc;
+-    abi_long gpr[31]; /* x0 is not present, so all offsets must be -1 */
+-    uint64_t fpr[32];
+-    uint32_t fcsr;
+-}; /* cf. riscv-linux:arch/riscv/include/uapi/asm/ptrace.h */
+-
+-struct target_ucontext {
+-    unsigned long uc_flags;
+-    struct target_ucontext *uc_link;
+-    target_stack_t uc_stack;
+-    struct target_sigcontext uc_mcontext;
+-    target_sigset_t uc_sigmask;
+-};
+-
+-struct target_rt_sigframe {
+-    uint32_t tramp[2]; /* not in kernel, which uses VDSO instead */
+-    struct target_siginfo info;
+-    struct target_ucontext uc;
+-};
+-
+-static abi_ulong get_sigframe(struct target_sigaction *ka,
+-                              CPURISCVState *regs, size_t framesize)
+-{
+-    abi_ulong sp = regs->gpr[xSP];
+-    int onsigstack = on_sig_stack(sp);
+-
+-    /* redzone */
+-    /* This is the X/Open sanctioned signal stack switching.  */
+-    if ((ka->sa_flags & TARGET_SA_ONSTACK) != 0 && !onsigstack) {
+-        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
+-    }
+-
+-    sp -= framesize;
+-    sp &= ~3UL; /* align sp on 4-byte boundary */
+-
+-    /* If we are on the alternate signal stack and would overflow it, don't.
+-       Return an always-bogus address instead so we will die with SIGSEGV. */
+-    if (onsigstack && !likely(on_sig_stack(sp))) {
+-        return -1L;
+-    }
+-
+-    return sp;
+-}
+-
+-static void setup_sigcontext(struct target_sigcontext *sc, CPURISCVState *env)
+-{
+-    int i;
+-
+-    __put_user(env->pc, &sc->pc);
+-
+-    for (i = 1; i < 32; i++) {
+-        __put_user(env->gpr[i], &sc->gpr[i - 1]);
+-    }
+-    for (i = 0; i < 32; i++) {
+-        __put_user(env->fpr[i], &sc->fpr[i]);
+-    }
+-
+-    uint32_t fcsr = csr_read_helper(env, CSR_FCSR); /*riscv_get_fcsr(env);*/
+-    __put_user(fcsr, &sc->fcsr);
+-}
+-
+-static void setup_ucontext(struct target_ucontext *uc,
+-                           CPURISCVState *env, target_sigset_t *set)
+-{
+-    abi_ulong ss_sp = (target_ulong)target_sigaltstack_used.ss_sp;
+-    abi_ulong ss_flags = sas_ss_flags(env->gpr[xSP]);
+-    abi_ulong ss_size = target_sigaltstack_used.ss_size;
+-
+-    __put_user(0,    &(uc->uc_flags));
+-    __put_user(0,    &(uc->uc_link));
+-
+-    __put_user(ss_sp,    &(uc->uc_stack.ss_sp));
+-    __put_user(ss_flags, &(uc->uc_stack.ss_flags));
+-    __put_user(ss_size,  &(uc->uc_stack.ss_size));
+-
+-    int i;
+-    for (i = 0; i < TARGET_NSIG_WORDS; i++) {
+-        __put_user(set->sig[i], &(uc->uc_sigmask.sig[i]));
+-    }
+-
+-    setup_sigcontext(&uc->uc_mcontext, env);
+-}
+-
+-static inline void install_sigtramp(uint32_t *tramp)
+-{
+-    __put_user(0x08b00893, tramp + 0);  /* li a7, 139 = __NR_rt_sigreturn */
+-    __put_user(0x00000073, tramp + 1);  /* ecall */
+-}
+-
+-static void setup_rt_frame(int sig, struct target_sigaction *ka,
+-                           target_siginfo_t *info,
+-                           target_sigset_t *set, CPURISCVState *env)
+-{
+-    abi_ulong frame_addr;
+-    struct target_rt_sigframe *frame;
+-
+-    frame_addr = get_sigframe(ka, env, sizeof(*frame));
+-    trace_user_setup_rt_frame(env, frame_addr);
+-
+-    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
+-        goto badframe;
+-    }
+-
+-    setup_ucontext(&frame->uc, env, set);
+-    tswap_siginfo(&frame->info, info);
+-    install_sigtramp(frame->tramp);
+-
+-    env->pc = ka->_sa_handler;
+-    env->gpr[xSP] = frame_addr;
+-    env->gpr[xA0] = sig;
+-    env->gpr[xA1] = frame_addr + offsetof(struct target_rt_sigframe, info);
+-    env->gpr[xA2] = frame_addr + offsetof(struct target_rt_sigframe, uc);
+-    env->gpr[xRA] = frame_addr + offsetof(struct target_rt_sigframe, tramp);
+-
+-    return;
+-
+-badframe:
+-    unlock_user_struct(frame, frame_addr, 1);
+-    if (sig == TARGET_SIGSEGV) {
+-        ka->_sa_handler = TARGET_SIG_DFL;
+-    }
+-    force_sig(TARGET_SIGSEGV);
+-}
+-
+-static void restore_sigcontext(CPURISCVState *env, struct target_sigcontext *sc)
+-{
+-    int i;
+-
+-    __get_user(env->pc, &sc->pc);
+-
+-    for (i = 1; i < 32; ++i) {
+-        __get_user(env->gpr[i], &sc->gpr[i - 1]);
+-    }
+-    for (i = 0; i < 32; ++i) {
+-        __get_user(env->fpr[i], &sc->fpr[i]);
+-    }
+-
+-    uint32_t fcsr;
+-    __get_user(fcsr, &sc->fcsr);
+-    csr_write_helper(env, fcsr, CSR_FCSR);
+-}
+-
+-static void restore_ucontext(CPURISCVState *env, struct target_ucontext *uc)
+-{
+-    sigset_t blocked;
+-    target_sigset_t target_set;
+-    int i;
+-
+-    target_sigemptyset(&target_set);
+-    for (i = 0; i < TARGET_NSIG_WORDS; i++) {
+-        __get_user(target_set.sig[i], &(uc->uc_sigmask.sig[i]));
+-    }
+-
+-    target_to_host_sigset_internal(&blocked, &target_set);
+-    set_sigmask(&blocked);
+-
+-    restore_sigcontext(env, &uc->uc_mcontext);
+-}
+-
+-long do_rt_sigreturn(CPURISCVState *env)
+-{
+-    struct target_rt_sigframe *frame;
+-    abi_ulong frame_addr;
+-
+-    frame_addr = env->gpr[xSP];
+-    trace_user_do_sigreturn(env, frame_addr);
+-    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1)) {
+-        goto badframe;
+-    }
+-
+-    restore_ucontext(env, &frame->uc);
+-
+-    if (do_sigaltstack(frame_addr + offsetof(struct target_rt_sigframe,
+-            uc.uc_stack), 0, get_sp_from_cpustate(env)) == -EFAULT) {
+-        goto badframe;
+-    }
+-
+-    unlock_user_struct(frame, frame_addr, 0);
+-    return -TARGET_QEMU_ESIGRETURN;
+-
+-badframe:
+-    unlock_user_struct(frame, frame_addr, 0);
+-    force_sig(TARGET_SIGSEGV);
+-    return 0;
+-}
+-
+ #elif defined(TARGET_HPPA)
+ 
+ struct target_sigcontext {
 -- 
 2.14.3
