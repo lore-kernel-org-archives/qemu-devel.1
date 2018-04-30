@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fDASK-00084s-V0
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 11:11:10 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fDAWE-0002Gq-Qd
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 11:15:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fDASH-0005wk-LS
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 11:11:08 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36800)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fDASH-0005wC-FK
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 11:11:05 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fDASD-0007yJ-PA
-	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 15:11:02 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 935A42E80E7
-	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 15:11:00 +0000 (UTC)
+	(envelope-from <mreitz@redhat.com>) id 1fDAWD-0001cW-V1
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 11:15:10 -0400
+References: <20180428144123.30333-1-mreitz@redhat.com>
+	<20180428144123.30333-3-mreitz@redhat.com>
+	<26182b94-a34a-ad71-255b-f18dd677efd6@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <829a7d2a-1202-c0ac-f3a2-b9de4afccff6@redhat.com>
+Date: Mon, 30 Apr 2018 17:14:54 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 30 Apr 2018 14:55:52 -0000
-From: Stefan Weil <1766841@bugs.launchpad.net>
-Reply-To: Bug 1766841 <1766841@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152465178789.21509.8085388028037824608.malonedeb@soybean.canonical.com>
-Message-Id: <152510015387.32626.14657835822417703398.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1766841] Re: QEMU 2.12 Running Problem in Windows
- 7 Installation
+In-Reply-To: <26182b94-a34a-ad71-255b-f18dd677efd6@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="nqGBwCsjFP1F4Njks4stBq6iAgUdjSN3q"
+Subject: Re: [Qemu-devel] [PATCH 2/5] qemu-io: Let command functions return
+ error code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,55 +26,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-** Changed in: qemu
-     Assignee: (unassigned) =3D> Stefan Weil (ubuntu-weilnetz)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--nqGBwCsjFP1F4Njks4stBq6iAgUdjSN3q
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <829a7d2a-1202-c0ac-f3a2-b9de4afccff6@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/5] qemu-io: Let command functions return
+ error code
+References: <20180428144123.30333-1-mreitz@redhat.com>
+ <20180428144123.30333-3-mreitz@redhat.com>
+ <26182b94-a34a-ad71-255b-f18dd677efd6@redhat.com>
+In-Reply-To: <26182b94-a34a-ad71-255b-f18dd677efd6@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-** Changed in: qemu
-       Status: New =3D> Confirmed
+On 2018-04-30 17:08, Eric Blake wrote:
+> On 04/28/2018 09:41 AM, Max Reitz wrote:
+>> This is basically what everything else in the qemu code base does, so =
+we
+>> can do it here, too.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>> =C2=A0 include/qemu-io.h |=C2=A0=C2=A0 4 +-
+>> =C2=A0 qemu-io-cmds.c=C2=A0=C2=A0=C2=A0 | 346
+>> ++++++++++++++++++++++++++++++++----------------------
+>> =C2=A0 qemu-io.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
+ 34 ++++--
+>> =C2=A0 3 files changed, 227 insertions(+), 157 deletions(-)
+>>
+>> diff --git a/include/qemu-io.h b/include/qemu-io.h
+>> index 06cdfbf660..380724ad59 100644
+>> --- a/include/qemu-io.h
+>> +++ b/include/qemu-io.h
+>> @@ -22,7 +22,7 @@
+>> =C2=A0 =C2=A0 #define CMD_FLAG_GLOBAL ((int)0x80000000) /* don't itera=
+te "args" */
+>> =C2=A0 -typedef void (*cfunc_t)(BlockBackend *blk, int argc, char **ar=
+gv);
+>> +typedef int (*cfunc_t)(BlockBackend *blk, int argc, char **argv);
+>=20
+> Quite a bit of churn on the definition here; squashing 1 and 2 might
+> make for a smaller patch.=C2=A0 But I agree that doing it this way (2
+> separate patches) forces us to audit (with the compiler's help) that al=
+l
+> callers are caught and adjusted to the new semantics.
+>=20
+> However, a comment before the typedef would be useful, so that writing =
+a
+> new command knows what semantics it must provide.=C2=A0 It can be as si=
+mple as:
+>=20
+> /* Implement a qemu-io command.
+> =C2=A0* Operate on @blk using @argc/@argv as the command's arguments, a=
+nd
+> =C2=A0* return 0 on success or negative errno on failure.
+> =C2=A0*/
 
--- =
+Yep, will do.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1766841
+> With a comment added,
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Title:
-  QEMU 2.12 Running Problem in Windows 7 Installation
+Thanks!
 
-Status in QEMU:
-  Confirmed
+Max
 
-Bug description:
-  QEMU Version: 2.12 (Binary installer qemu-w64-setup-20180424.exe  from St=
-efan Weil's website so I am not sure I should report it to Weil by email or=
- by this bug report system.)
-  Host System: Windows 7 64bit
-  Guest System: 9front 6350 (Codename=E2=80=9CCONTENTS, MAINTAINED, STABLE=
-=E2=80=9D, Release 2018/02/02)
 
-  QEMU Command:
-  qemu-system-x86_64 -usb -device usb-mouse -hda plan9.qcow2.img -cdrom 9fr=
-ont-6350.iso -boot d
 
-  QEMU warning: =
+--nqGBwCsjFP1F4Njks4stBq6iAgUdjSN3q
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  (qemu-system-x86_64.exe:8844): GdkPixbuf-WARNING **: Cannot open pixbuf l=
-oader module file 'D:\qemu\lib\gdk-pixbuf-2.0\2.10.0\loaders.cache': No suc=
-h file or directory
+-----BEGIN PGP SIGNATURE-----
 
-  This likely means that your installation is broken.
-  Try running the command
-    gdk-pixbuf-query-loaders > D:\qemu\lib\gdk-pixbuf-2.0\2.10.0\loaders.ca=
-che
-  to make things work again for the time being.
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlrnMu4ACgkQ9AfbAGHV
+z0ATXQf/Wm044U7g4giotWfD/RhWF8mKkkCHXulfyAB5fuQfcLxNRGyai5CII52J
++Xn3ubbVgyqQO0SbRfq9TuPDotcrXDrDs9HxOeyNzcfEBMh146LRV87Q8AWCsvOg
+HciPnf7oTiAUipz/RxSW3K8a3IX1Yz20ZTahzK/BCrV6dLaJfmyMR/iKGPTZ47Wp
+qbuvWshRndHvw2Ral1qEUelJNlw7ucATAOFUqS8sThdPfztNLWD+DTvZb200elmE
+caAdJ//AN0LykKZElOm25S5JNcAVp2+Xs7w0B4WnFGPtLcekFQVJMTSqePMq1a6x
+LpZG9Q1eMZHm/bYnIA8mHSlD/SI+Zg==
+=XzBs
+-----END PGP SIGNATURE-----
 
-  (qemu-system-x86_64.exe:8844): Gtk-WARNING **: Could not find the icon 'w=
-indow-minimize-symbolic-ltr'. The 'hicolor' theme was not found either, per=
-haps you need to install it.
-  You can get a copy from:
-          http://icon-theme.freedesktop.org/releases
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1766841/+subscriptions
+--nqGBwCsjFP1F4Njks4stBq6iAgUdjSN3q--
