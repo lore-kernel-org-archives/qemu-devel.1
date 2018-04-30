@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fD4qL-0006YX-6T
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:11:41 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fD4qK-0006YU-IA
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:11:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fD4qF-0006Qo-MW
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:11:33 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fD4qB-0006Mp-Br
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:11:32 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon, 30 Apr 2018 11:10:31 +0200
-Message-Id: <20180430091037.13878-37-laurent@vivier.eu>
+Date: Mon, 30 Apr 2018 11:10:15 +0200
+Message-Id: <20180430091037.13878-21-laurent@vivier.eu>
 In-Reply-To: <20180430091037.13878-1-laurent@vivier.eu>
 References: <20180430091037.13878-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 36/42] linux-user: move alpha cpu loop to alpha
- directory
+Subject: [Qemu-devel] [PULL 20/42] linux-user: move mips/mips64 signal.c
+ parts to mips directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,449 +26,847 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Cornelia Huck <cohuck@redhat.com>
 
-No code change, only move code from main.c to
-alpha/cpu_loop.c.
+No code change, only move code from signal.c to
+mips/signal.c, except adding includes and
+exporting setup_frame() and setup_rt_frame().
+
+mips64/signal.c includes mips/signal.c
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20180411185651.21351-15-laurent@vivier.eu>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20180424192635.6027-19-laurent@vivier.eu>
 ---
- linux-user/alpha/cpu_loop.c | 199 ++++++++++++++++++++++++++++++++++++++++++
- linux-user/main.c           | 204 --------------------------------------------
- 2 files changed, 199 insertions(+), 204 deletions(-)
+ linux-user/mips/signal.c          | 382 ++++++++++++++++++++++++++++++++++++++
+ linux-user/mips/target_signal.h   |   9 +-
+ linux-user/mips64/signal.c        |   2 +
+ linux-user/mips64/target_signal.h |   4 +-
+ linux-user/signal.c               | 381 +------------------------------------
+ 5 files changed, 396 insertions(+), 382 deletions(-)
 
-diff --git a/linux-user/alpha/cpu_loop.c b/linux-user/alpha/cpu_loop.c
-index b7700a5561..b87fcaea87 100644
---- a/linux-user/alpha/cpu_loop.c
-+++ b/linux-user/alpha/cpu_loop.c
-@@ -21,6 +21,205 @@
- #include "qemu.h"
- #include "cpu_loop-common.h"
- 
-+void cpu_loop(CPUAlphaState *env)
+diff --git a/linux-user/mips/signal.c b/linux-user/mips/signal.c
+index 02ca338b6c..adeb5a4241 100644
+--- a/linux-user/mips/signal.c
++++ b/linux-user/mips/signal.c
+@@ -16,3 +16,385 @@
+  *  You should have received a copy of the GNU General Public License
+  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
++#include "qemu/osdep.h"
++#include "qemu.h"
++#include "target_signal.h"
++#include "signal-common.h"
++#include "linux-user/trace.h"
++
++# if defined(TARGET_ABI_MIPSO32)
++struct target_sigcontext {
++    uint32_t   sc_regmask;     /* Unused */
++    uint32_t   sc_status;
++    uint64_t   sc_pc;
++    uint64_t   sc_regs[32];
++    uint64_t   sc_fpregs[32];
++    uint32_t   sc_ownedfp;     /* Unused */
++    uint32_t   sc_fpc_csr;
++    uint32_t   sc_fpc_eir;     /* Unused */
++    uint32_t   sc_used_math;
++    uint32_t   sc_dsp;         /* dsp status, was sc_ssflags */
++    uint32_t   pad0;
++    uint64_t   sc_mdhi;
++    uint64_t   sc_mdlo;
++    target_ulong   sc_hi1;         /* Was sc_cause */
++    target_ulong   sc_lo1;         /* Was sc_badvaddr */
++    target_ulong   sc_hi2;         /* Was sc_sigset[4] */
++    target_ulong   sc_lo2;
++    target_ulong   sc_hi3;
++    target_ulong   sc_lo3;
++};
++# else /* N32 || N64 */
++struct target_sigcontext {
++    uint64_t sc_regs[32];
++    uint64_t sc_fpregs[32];
++    uint64_t sc_mdhi;
++    uint64_t sc_hi1;
++    uint64_t sc_hi2;
++    uint64_t sc_hi3;
++    uint64_t sc_mdlo;
++    uint64_t sc_lo1;
++    uint64_t sc_lo2;
++    uint64_t sc_lo3;
++    uint64_t sc_pc;
++    uint32_t sc_fpc_csr;
++    uint32_t sc_used_math;
++    uint32_t sc_dsp;
++    uint32_t sc_reserved;
++};
++# endif /* O32 */
++
++struct sigframe {
++    uint32_t sf_ass[4];                 /* argument save space for o32 */
++    uint32_t sf_code[2];                        /* signal trampoline */
++    struct target_sigcontext sf_sc;
++    target_sigset_t sf_mask;
++};
++
++struct target_ucontext {
++    target_ulong tuc_flags;
++    target_ulong tuc_link;
++    target_stack_t tuc_stack;
++    target_ulong pad0;
++    struct target_sigcontext tuc_mcontext;
++    target_sigset_t tuc_sigmask;
++};
++
++struct target_rt_sigframe {
++    uint32_t rs_ass[4];               /* argument save space for o32 */
++    uint32_t rs_code[2];              /* signal trampoline */
++    struct target_siginfo rs_info;
++    struct target_ucontext rs_uc;
++};
++
++/* Install trampoline to jump back from signal handler */
++static inline int install_sigtramp(unsigned int *tramp,   unsigned int syscall)
 +{
-+    CPUState *cs = CPU(alpha_env_get_cpu(env));
-+    int trapnr;
-+    target_siginfo_t info;
-+    abi_long sysret;
++    int err = 0;
 +
-+    while (1) {
-+        bool arch_interrupt = true;
++    /*
++     * Set up the return code ...
++     *
++     *         li      v0, __NR__foo_sigreturn
++     *         syscall
++     */
 +
-+        cpu_exec_start(cs);
-+        trapnr = cpu_exec(cs);
-+        cpu_exec_end(cs);
-+        process_queued_cpu_work(cs);
++    __put_user(0x24020000 + syscall, tramp + 0);
++    __put_user(0x0000000c          , tramp + 1);
++    return err;
++}
 +
-+        switch (trapnr) {
-+        case EXCP_RESET:
-+            fprintf(stderr, "Reset requested. Exit\n");
-+            exit(EXIT_FAILURE);
-+            break;
-+        case EXCP_MCHK:
-+            fprintf(stderr, "Machine check exception. Exit\n");
-+            exit(EXIT_FAILURE);
-+            break;
-+        case EXCP_SMP_INTERRUPT:
-+        case EXCP_CLK_INTERRUPT:
-+        case EXCP_DEV_INTERRUPT:
-+            fprintf(stderr, "External interrupt. Exit\n");
-+            exit(EXIT_FAILURE);
-+            break;
-+        case EXCP_MMFAULT:
-+            info.si_signo = TARGET_SIGSEGV;
-+            info.si_errno = 0;
-+            info.si_code = (page_get_flags(env->trap_arg0) & PAGE_VALID
-+                            ? TARGET_SEGV_ACCERR : TARGET_SEGV_MAPERR);
-+            info._sifields._sigfault._addr = env->trap_arg0;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+        case EXCP_UNALIGN:
-+            info.si_signo = TARGET_SIGBUS;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_BUS_ADRALN;
-+            info._sifields._sigfault._addr = env->trap_arg0;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+        case EXCP_OPCDEC:
-+        do_sigill:
-+            info.si_signo = TARGET_SIGILL;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_ILL_ILLOPC;
-+            info._sifields._sigfault._addr = env->pc;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+        case EXCP_ARITH:
-+            info.si_signo = TARGET_SIGFPE;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_FPE_FLTINV;
-+            info._sifields._sigfault._addr = env->pc;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+        case EXCP_FEN:
-+            /* No-op.  Linux simply re-enables the FPU.  */
-+            break;
-+        case EXCP_CALL_PAL:
-+            switch (env->error_code) {
-+            case 0x80:
-+                /* BPT */
-+                info.si_signo = TARGET_SIGTRAP;
-+                info.si_errno = 0;
-+                info.si_code = TARGET_TRAP_BRKPT;
-+                info._sifields._sigfault._addr = env->pc;
-+                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+                break;
-+            case 0x81:
-+                /* BUGCHK */
-+                info.si_signo = TARGET_SIGTRAP;
-+                info.si_errno = 0;
-+                info.si_code = 0;
-+                info._sifields._sigfault._addr = env->pc;
-+                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+                break;
-+            case 0x83:
-+                /* CALLSYS */
-+                trapnr = env->ir[IR_V0];
-+                sysret = do_syscall(env, trapnr,
-+                                    env->ir[IR_A0], env->ir[IR_A1],
-+                                    env->ir[IR_A2], env->ir[IR_A3],
-+                                    env->ir[IR_A4], env->ir[IR_A5],
-+                                    0, 0);
-+                if (sysret == -TARGET_ERESTARTSYS) {
-+                    env->pc -= 4;
-+                    break;
-+                }
-+                if (sysret == -TARGET_QEMU_ESIGRETURN) {
-+                    break;
-+                }
-+                /* Syscall writes 0 to V0 to bypass error check, similar
-+                   to how this is handled internal to Linux kernel.
-+                   (Ab)use trapnr temporarily as boolean indicating error.  */
-+                trapnr = (env->ir[IR_V0] != 0 && sysret < 0);
-+                env->ir[IR_V0] = (trapnr ? -sysret : sysret);
-+                env->ir[IR_A3] = trapnr;
-+                break;
-+            case 0x86:
-+                /* IMB */
-+                /* ??? We can probably elide the code using page_unprotect
-+                   that is checking for self-modifying code.  Instead we
-+                   could simply call tb_flush here.  Until we work out the
-+                   changes required to turn off the extra write protection,
-+                   this can be a no-op.  */
-+                break;
-+            case 0x9E:
-+                /* RDUNIQUE */
-+                /* Handled in the translator for usermode.  */
-+                abort();
-+            case 0x9F:
-+                /* WRUNIQUE */
-+                /* Handled in the translator for usermode.  */
-+                abort();
-+            case 0xAA:
-+                /* GENTRAP */
-+                info.si_signo = TARGET_SIGFPE;
-+                switch (env->ir[IR_A0]) {
-+                case TARGET_GEN_INTOVF:
-+                    info.si_code = TARGET_FPE_INTOVF;
-+                    break;
-+                case TARGET_GEN_INTDIV:
-+                    info.si_code = TARGET_FPE_INTDIV;
-+                    break;
-+                case TARGET_GEN_FLTOVF:
-+                    info.si_code = TARGET_FPE_FLTOVF;
-+                    break;
-+                case TARGET_GEN_FLTUND:
-+                    info.si_code = TARGET_FPE_FLTUND;
-+                    break;
-+                case TARGET_GEN_FLTINV:
-+                    info.si_code = TARGET_FPE_FLTINV;
-+                    break;
-+                case TARGET_GEN_FLTINE:
-+                    info.si_code = TARGET_FPE_FLTRES;
-+                    break;
-+                case TARGET_GEN_ROPRAND:
-+                    info.si_code = 0;
-+                    break;
-+                default:
-+                    info.si_signo = TARGET_SIGTRAP;
-+                    info.si_code = 0;
-+                    break;
-+                }
-+                info.si_errno = 0;
-+                info._sifields._sigfault._addr = env->pc;
-+                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+                break;
-+            default:
-+                goto do_sigill;
-+            }
-+            break;
-+        case EXCP_DEBUG:
-+            info.si_signo = gdb_handlesig(cs, TARGET_SIGTRAP);
-+            if (info.si_signo) {
-+                info.si_errno = 0;
-+                info.si_code = TARGET_TRAP_BRKPT;
-+                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            } else {
-+                arch_interrupt = false;
-+            }
-+            break;
-+        case EXCP_INTERRUPT:
-+            /* Just indicate that signals should be handled asap.  */
-+            break;
-+        case EXCP_ATOMIC:
-+            cpu_exec_step_atomic(cs);
-+            arch_interrupt = false;
-+            break;
-+        default:
-+            printf ("Unhandled trap: 0x%x\n", trapnr);
-+            cpu_dump_state(cs, stderr, fprintf, 0);
-+            exit(EXIT_FAILURE);
-+        }
-+        process_pending_signals (env);
++static inline void setup_sigcontext(CPUMIPSState *regs,
++                                    struct target_sigcontext *sc)
++{
++    int i;
 +
-+        /* Most of the traps imply a transition through PALcode, which
-+           implies an REI instruction has been executed.  Which means
-+           that RX and LOCK_ADDR should be cleared.  But there are a
-+           few exceptions for traps internal to QEMU.  */
-+        if (arch_interrupt) {
-+            env->flags &= ~ENV_FLAG_RX_FLAG;
-+            env->lock_addr = -1;
-+        }
++    __put_user(exception_resume_pc(regs), &sc->sc_pc);
++    regs->hflags &= ~MIPS_HFLAG_BMASK;
++
++    __put_user(0, &sc->sc_regs[0]);
++    for (i = 1; i < 32; ++i) {
++        __put_user(regs->active_tc.gpr[i], &sc->sc_regs[i]);
++    }
++
++    __put_user(regs->active_tc.HI[0], &sc->sc_mdhi);
++    __put_user(regs->active_tc.LO[0], &sc->sc_mdlo);
++
++    /* Rather than checking for dsp existence, always copy.  The storage
++       would just be garbage otherwise.  */
++    __put_user(regs->active_tc.HI[1], &sc->sc_hi1);
++    __put_user(regs->active_tc.HI[2], &sc->sc_hi2);
++    __put_user(regs->active_tc.HI[3], &sc->sc_hi3);
++    __put_user(regs->active_tc.LO[1], &sc->sc_lo1);
++    __put_user(regs->active_tc.LO[2], &sc->sc_lo2);
++    __put_user(regs->active_tc.LO[3], &sc->sc_lo3);
++    {
++        uint32_t dsp = cpu_rddsp(0x3ff, regs);
++        __put_user(dsp, &sc->sc_dsp);
++    }
++
++    __put_user(1, &sc->sc_used_math);
++
++    for (i = 0; i < 32; ++i) {
++        __put_user(regs->active_fpu.fpr[i].d, &sc->sc_fpregs[i]);
 +    }
 +}
 +
- void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
- {
++static inline void
++restore_sigcontext(CPUMIPSState *regs, struct target_sigcontext *sc)
++{
 +    int i;
 +
-+    for(i = 0; i < 28; i++) {
-+        env->ir[i] = ((abi_ulong *)regs)[i];
++    __get_user(regs->CP0_EPC, &sc->sc_pc);
++
++    __get_user(regs->active_tc.HI[0], &sc->sc_mdhi);
++    __get_user(regs->active_tc.LO[0], &sc->sc_mdlo);
++
++    for (i = 1; i < 32; ++i) {
++        __get_user(regs->active_tc.gpr[i], &sc->sc_regs[i]);
 +    }
-+    env->ir[IR_SP] = regs->usp;
-+    env->pc = regs->pc;
- }
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 7c223a5629..37cf3a7d6f 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -149,200 +149,6 @@ void fork_end(int child)
-     }
++
++    __get_user(regs->active_tc.HI[1], &sc->sc_hi1);
++    __get_user(regs->active_tc.HI[2], &sc->sc_hi2);
++    __get_user(regs->active_tc.HI[3], &sc->sc_hi3);
++    __get_user(regs->active_tc.LO[1], &sc->sc_lo1);
++    __get_user(regs->active_tc.LO[2], &sc->sc_lo2);
++    __get_user(regs->active_tc.LO[3], &sc->sc_lo3);
++    {
++        uint32_t dsp;
++        __get_user(dsp, &sc->sc_dsp);
++        cpu_wrdsp(dsp, 0x3ff, regs);
++    }
++
++    for (i = 0; i < 32; ++i) {
++        __get_user(regs->active_fpu.fpr[i].d, &sc->sc_fpregs[i]);
++    }
++}
++
++/*
++ * Determine which stack to use..
++ */
++static inline abi_ulong
++get_sigframe(struct target_sigaction *ka, CPUMIPSState *regs, size_t frame_size)
++{
++    unsigned long sp;
++
++    /* Default to using normal stack */
++    sp = regs->active_tc.gpr[29];
++
++    /*
++     * FPU emulator may have its own trampoline active just
++     * above the user stack, 16-bytes before the next lowest
++     * 16 byte boundary.  Try to avoid trashing it.
++     */
++    sp -= 32;
++
++    /* This is the X/Open sanctioned signal stack switching.  */
++    if ((ka->sa_flags & TARGET_SA_ONSTACK) && (sas_ss_flags (sp) == 0)) {
++        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
++    }
++
++    return (sp - frame_size) & ~7;
++}
++
++static void mips_set_hflags_isa_mode_from_pc(CPUMIPSState *env)
++{
++    if (env->insn_flags & (ASE_MIPS16 | ASE_MICROMIPS)) {
++        env->hflags &= ~MIPS_HFLAG_M16;
++        env->hflags |= (env->active_tc.PC & 1) << MIPS_HFLAG_M16_SHIFT;
++        env->active_tc.PC &= ~(target_ulong) 1;
++    }
++}
++
++# if defined(TARGET_ABI_MIPSO32)
++/* compare linux/arch/mips/kernel/signal.c:setup_frame() */
++void setup_frame(int sig, struct target_sigaction * ka,
++                 target_sigset_t *set, CPUMIPSState *regs)
++{
++    struct sigframe *frame;
++    abi_ulong frame_addr;
++    int i;
++
++    frame_addr = get_sigframe(ka, regs, sizeof(*frame));
++    trace_user_setup_frame(regs, frame_addr);
++    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
++        goto give_sigsegv;
++    }
++
++    install_sigtramp(frame->sf_code, TARGET_NR_sigreturn);
++
++    setup_sigcontext(regs, &frame->sf_sc);
++
++    for(i = 0; i < TARGET_NSIG_WORDS; i++) {
++        __put_user(set->sig[i], &frame->sf_mask.sig[i]);
++    }
++
++    /*
++    * Arguments to signal handler:
++    *
++    *   a0 = signal number
++    *   a1 = 0 (should be cause)
++    *   a2 = pointer to struct sigcontext
++    *
++    * $25 and PC point to the signal handler, $29 points to the
++    * struct sigframe.
++    */
++    regs->active_tc.gpr[ 4] = sig;
++    regs->active_tc.gpr[ 5] = 0;
++    regs->active_tc.gpr[ 6] = frame_addr + offsetof(struct sigframe, sf_sc);
++    regs->active_tc.gpr[29] = frame_addr;
++    regs->active_tc.gpr[31] = frame_addr + offsetof(struct sigframe, sf_code);
++    /* The original kernel code sets CP0_EPC to the handler
++    * since it returns to userland using eret
++    * we cannot do this here, and we must set PC directly */
++    regs->active_tc.PC = regs->active_tc.gpr[25] = ka->_sa_handler;
++    mips_set_hflags_isa_mode_from_pc(regs);
++    unlock_user_struct(frame, frame_addr, 1);
++    return;
++
++give_sigsegv:
++    force_sigsegv(sig);
++}
++
++long do_sigreturn(CPUMIPSState *regs)
++{
++    struct sigframe *frame;
++    abi_ulong frame_addr;
++    sigset_t blocked;
++    target_sigset_t target_set;
++    int i;
++
++    frame_addr = regs->active_tc.gpr[29];
++    trace_user_do_sigreturn(regs, frame_addr);
++    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1))
++        goto badframe;
++
++    for(i = 0; i < TARGET_NSIG_WORDS; i++) {
++        __get_user(target_set.sig[i], &frame->sf_mask.sig[i]);
++    }
++
++    target_to_host_sigset_internal(&blocked, &target_set);
++    set_sigmask(&blocked);
++
++    restore_sigcontext(regs, &frame->sf_sc);
++
++#if 0
++    /*
++     * Don't let your children do this ...
++     */
++    __asm__ __volatile__(
++        "move\t$29, %0\n\t"
++        "j\tsyscall_exit"
++        :/* no outputs */
++        :"r" (&regs));
++    /* Unreached */
++#endif
++
++    regs->active_tc.PC = regs->CP0_EPC;
++    mips_set_hflags_isa_mode_from_pc(regs);
++    /* I am not sure this is right, but it seems to work
++    * maybe a problem with nested signals ? */
++    regs->CP0_EPC = 0;
++    return -TARGET_QEMU_ESIGRETURN;
++
++badframe:
++    force_sig(TARGET_SIGSEGV);
++    return -TARGET_QEMU_ESIGRETURN;
++}
++# endif /* O32 */
++
++void setup_rt_frame(int sig, struct target_sigaction *ka,
++                    target_siginfo_t *info,
++                    target_sigset_t *set, CPUMIPSState *env)
++{
++    struct target_rt_sigframe *frame;
++    abi_ulong frame_addr;
++    int i;
++
++    frame_addr = get_sigframe(ka, env, sizeof(*frame));
++    trace_user_setup_rt_frame(env, frame_addr);
++    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
++        goto give_sigsegv;
++    }
++
++    install_sigtramp(frame->rs_code, TARGET_NR_rt_sigreturn);
++
++    tswap_siginfo(&frame->rs_info, info);
++
++    __put_user(0, &frame->rs_uc.tuc_flags);
++    __put_user(0, &frame->rs_uc.tuc_link);
++    __put_user(target_sigaltstack_used.ss_sp, &frame->rs_uc.tuc_stack.ss_sp);
++    __put_user(target_sigaltstack_used.ss_size, &frame->rs_uc.tuc_stack.ss_size);
++    __put_user(sas_ss_flags(get_sp_from_cpustate(env)),
++               &frame->rs_uc.tuc_stack.ss_flags);
++
++    setup_sigcontext(env, &frame->rs_uc.tuc_mcontext);
++
++    for(i = 0; i < TARGET_NSIG_WORDS; i++) {
++        __put_user(set->sig[i], &frame->rs_uc.tuc_sigmask.sig[i]);
++    }
++
++    /*
++    * Arguments to signal handler:
++    *
++    *   a0 = signal number
++    *   a1 = pointer to siginfo_t
++    *   a2 = pointer to ucontext_t
++    *
++    * $25 and PC point to the signal handler, $29 points to the
++    * struct sigframe.
++    */
++    env->active_tc.gpr[ 4] = sig;
++    env->active_tc.gpr[ 5] = frame_addr
++                             + offsetof(struct target_rt_sigframe, rs_info);
++    env->active_tc.gpr[ 6] = frame_addr
++                             + offsetof(struct target_rt_sigframe, rs_uc);
++    env->active_tc.gpr[29] = frame_addr;
++    env->active_tc.gpr[31] = frame_addr
++                             + offsetof(struct target_rt_sigframe, rs_code);
++    /* The original kernel code sets CP0_EPC to the handler
++    * since it returns to userland using eret
++    * we cannot do this here, and we must set PC directly */
++    env->active_tc.PC = env->active_tc.gpr[25] = ka->_sa_handler;
++    mips_set_hflags_isa_mode_from_pc(env);
++    unlock_user_struct(frame, frame_addr, 1);
++    return;
++
++give_sigsegv:
++    unlock_user_struct(frame, frame_addr, 1);
++    force_sigsegv(sig);
++}
++
++long do_rt_sigreturn(CPUMIPSState *env)
++{
++    struct target_rt_sigframe *frame;
++    abi_ulong frame_addr;
++    sigset_t blocked;
++
++    frame_addr = env->active_tc.gpr[29];
++    trace_user_do_rt_sigreturn(env, frame_addr);
++    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1)) {
++        goto badframe;
++    }
++
++    target_to_host_sigset(&blocked, &frame->rs_uc.tuc_sigmask);
++    set_sigmask(&blocked);
++
++    restore_sigcontext(env, &frame->rs_uc.tuc_mcontext);
++
++    if (do_sigaltstack(frame_addr +
++                       offsetof(struct target_rt_sigframe, rs_uc.tuc_stack),
++                       0, get_sp_from_cpustate(env)) == -EFAULT)
++        goto badframe;
++
++    env->active_tc.PC = env->CP0_EPC;
++    mips_set_hflags_isa_mode_from_pc(env);
++    /* I am not sure this is right, but it seems to work
++    * maybe a problem with nested signals ? */
++    env->CP0_EPC = 0;
++    return -TARGET_QEMU_ESIGRETURN;
++
++badframe:
++    force_sig(TARGET_SIGSEGV);
++    return -TARGET_QEMU_ESIGRETURN;
++}
+diff --git a/linux-user/mips/target_signal.h b/linux-user/mips/target_signal.h
+index 8dd27cef35..22ab3e4a94 100644
+--- a/linux-user/mips/target_signal.h
++++ b/linux-user/mips/target_signal.h
+@@ -26,5 +26,12 @@ static inline abi_ulong get_sp_from_cpustate(CPUMIPSState *state)
+     return state->active_tc.gpr[29];
  }
  
--#ifdef TARGET_ALPHA
--void cpu_loop(CPUAlphaState *env)
+-
++# if defined(TARGET_ABI_MIPSO32)
++/* compare linux/arch/mips/kernel/signal.c:setup_frame() */
++void setup_frame(int sig, struct target_sigaction * ka,
++                 target_sigset_t *set, CPUMIPSState *regs);
++#endif
++void setup_rt_frame(int sig, struct target_sigaction *ka,
++                    target_siginfo_t *info,
++                    target_sigset_t *set, CPUMIPSState *env);
+ #endif /* MIPS_TARGET_SIGNAL_H */
+diff --git a/linux-user/mips64/signal.c b/linux-user/mips64/signal.c
+index 02ca338b6c..4ed0ed90b3 100644
+--- a/linux-user/mips64/signal.c
++++ b/linux-user/mips64/signal.c
+@@ -16,3 +16,5 @@
+  *  You should have received a copy of the GNU General Public License
+  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
++#define MIPS_TARGET_SIGNAL_H /* to only include mips64/target_signal.h */
++#include "../mips/signal.c"
+diff --git a/linux-user/mips64/target_signal.h b/linux-user/mips64/target_signal.h
+index 67ef5a18f4..70dfe40978 100644
+--- a/linux-user/mips64/target_signal.h
++++ b/linux-user/mips64/target_signal.h
+@@ -26,5 +26,7 @@ static inline abi_ulong get_sp_from_cpustate(CPUMIPSState *state)
+     return state->active_tc.gpr[29];
+ }
+ 
+-
++void setup_rt_frame(int sig, struct target_sigaction *ka,
++                    target_siginfo_t *info,
++                    target_sigset_t *set, CPUMIPSState *env);
+ #endif /* MIPS64_TARGET_SIGNAL_H */
+diff --git a/linux-user/signal.c b/linux-user/signal.c
+index 27c3769c5e..18acf6a4b0 100644
+--- a/linux-user/signal.c
++++ b/linux-user/signal.c
+@@ -803,386 +803,7 @@ int do_sigaction(int sig, const struct target_sigaction *act,
+     return ret;
+ }
+ 
+-#if defined(TARGET_MIPS) || defined(TARGET_MIPS64)
+-
+-# if defined(TARGET_ABI_MIPSO32)
+-struct target_sigcontext {
+-    uint32_t   sc_regmask;     /* Unused */
+-    uint32_t   sc_status;
+-    uint64_t   sc_pc;
+-    uint64_t   sc_regs[32];
+-    uint64_t   sc_fpregs[32];
+-    uint32_t   sc_ownedfp;     /* Unused */
+-    uint32_t   sc_fpc_csr;
+-    uint32_t   sc_fpc_eir;     /* Unused */
+-    uint32_t   sc_used_math;
+-    uint32_t   sc_dsp;         /* dsp status, was sc_ssflags */
+-    uint32_t   pad0;
+-    uint64_t   sc_mdhi;
+-    uint64_t   sc_mdlo;
+-    target_ulong   sc_hi1;         /* Was sc_cause */
+-    target_ulong   sc_lo1;         /* Was sc_badvaddr */
+-    target_ulong   sc_hi2;         /* Was sc_sigset[4] */
+-    target_ulong   sc_lo2;
+-    target_ulong   sc_hi3;
+-    target_ulong   sc_lo3;
+-};
+-# else /* N32 || N64 */
+-struct target_sigcontext {
+-    uint64_t sc_regs[32];
+-    uint64_t sc_fpregs[32];
+-    uint64_t sc_mdhi;
+-    uint64_t sc_hi1;
+-    uint64_t sc_hi2;
+-    uint64_t sc_hi3;
+-    uint64_t sc_mdlo;
+-    uint64_t sc_lo1;
+-    uint64_t sc_lo2;
+-    uint64_t sc_lo3;
+-    uint64_t sc_pc;
+-    uint32_t sc_fpc_csr;
+-    uint32_t sc_used_math;
+-    uint32_t sc_dsp;
+-    uint32_t sc_reserved;
+-};
+-# endif /* O32 */
+-
+-struct sigframe {
+-    uint32_t sf_ass[4];			/* argument save space for o32 */
+-    uint32_t sf_code[2];			/* signal trampoline */
+-    struct target_sigcontext sf_sc;
+-    target_sigset_t sf_mask;
+-};
+-
+-struct target_ucontext {
+-    target_ulong tuc_flags;
+-    target_ulong tuc_link;
+-    target_stack_t tuc_stack;
+-    target_ulong pad0;
+-    struct target_sigcontext tuc_mcontext;
+-    target_sigset_t tuc_sigmask;
+-};
+-
+-struct target_rt_sigframe {
+-    uint32_t rs_ass[4];               /* argument save space for o32 */
+-    uint32_t rs_code[2];              /* signal trampoline */
+-    struct target_siginfo rs_info;
+-    struct target_ucontext rs_uc;
+-};
+-
+-/* Install trampoline to jump back from signal handler */
+-static inline int install_sigtramp(unsigned int *tramp,   unsigned int syscall)
 -{
--    CPUState *cs = CPU(alpha_env_get_cpu(env));
--    int trapnr;
--    target_siginfo_t info;
--    abi_long sysret;
+-    int err = 0;
 -
--    while (1) {
--        bool arch_interrupt = true;
+-    /*
+-     * Set up the return code ...
+-     *
+-     *         li      v0, __NR__foo_sigreturn
+-     *         syscall
+-     */
 -
--        cpu_exec_start(cs);
--        trapnr = cpu_exec(cs);
--        cpu_exec_end(cs);
--        process_queued_cpu_work(cs);
+-    __put_user(0x24020000 + syscall, tramp + 0);
+-    __put_user(0x0000000c          , tramp + 1);
+-    return err;
+-}
 -
--        switch (trapnr) {
--        case EXCP_RESET:
--            fprintf(stderr, "Reset requested. Exit\n");
--            exit(EXIT_FAILURE);
--            break;
--        case EXCP_MCHK:
--            fprintf(stderr, "Machine check exception. Exit\n");
--            exit(EXIT_FAILURE);
--            break;
--        case EXCP_SMP_INTERRUPT:
--        case EXCP_CLK_INTERRUPT:
--        case EXCP_DEV_INTERRUPT:
--            fprintf(stderr, "External interrupt. Exit\n");
--            exit(EXIT_FAILURE);
--            break;
--        case EXCP_MMFAULT:
--            info.si_signo = TARGET_SIGSEGV;
--            info.si_errno = 0;
--            info.si_code = (page_get_flags(env->trap_arg0) & PAGE_VALID
--                            ? TARGET_SEGV_ACCERR : TARGET_SEGV_MAPERR);
--            info._sifields._sigfault._addr = env->trap_arg0;
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            break;
--        case EXCP_UNALIGN:
--            info.si_signo = TARGET_SIGBUS;
--            info.si_errno = 0;
--            info.si_code = TARGET_BUS_ADRALN;
--            info._sifields._sigfault._addr = env->trap_arg0;
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            break;
--        case EXCP_OPCDEC:
--        do_sigill:
--            info.si_signo = TARGET_SIGILL;
--            info.si_errno = 0;
--            info.si_code = TARGET_ILL_ILLOPC;
--            info._sifields._sigfault._addr = env->pc;
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            break;
--        case EXCP_ARITH:
--            info.si_signo = TARGET_SIGFPE;
--            info.si_errno = 0;
--            info.si_code = TARGET_FPE_FLTINV;
--            info._sifields._sigfault._addr = env->pc;
--            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            break;
--        case EXCP_FEN:
--            /* No-op.  Linux simply re-enables the FPU.  */
--            break;
--        case EXCP_CALL_PAL:
--            switch (env->error_code) {
--            case 0x80:
--                /* BPT */
--                info.si_signo = TARGET_SIGTRAP;
--                info.si_errno = 0;
--                info.si_code = TARGET_TRAP_BRKPT;
--                info._sifields._sigfault._addr = env->pc;
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--                break;
--            case 0x81:
--                /* BUGCHK */
--                info.si_signo = TARGET_SIGTRAP;
--                info.si_errno = 0;
--                info.si_code = 0;
--                info._sifields._sigfault._addr = env->pc;
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--                break;
--            case 0x83:
--                /* CALLSYS */
--                trapnr = env->ir[IR_V0];
--                sysret = do_syscall(env, trapnr,
--                                    env->ir[IR_A0], env->ir[IR_A1],
--                                    env->ir[IR_A2], env->ir[IR_A3],
--                                    env->ir[IR_A4], env->ir[IR_A5],
--                                    0, 0);
--                if (sysret == -TARGET_ERESTARTSYS) {
--                    env->pc -= 4;
--                    break;
--                }
--                if (sysret == -TARGET_QEMU_ESIGRETURN) {
--                    break;
--                }
--                /* Syscall writes 0 to V0 to bypass error check, similar
--                   to how this is handled internal to Linux kernel.
--                   (Ab)use trapnr temporarily as boolean indicating error.  */
--                trapnr = (env->ir[IR_V0] != 0 && sysret < 0);
--                env->ir[IR_V0] = (trapnr ? -sysret : sysret);
--                env->ir[IR_A3] = trapnr;
--                break;
--            case 0x86:
--                /* IMB */
--                /* ??? We can probably elide the code using page_unprotect
--                   that is checking for self-modifying code.  Instead we
--                   could simply call tb_flush here.  Until we work out the
--                   changes required to turn off the extra write protection,
--                   this can be a no-op.  */
--                break;
--            case 0x9E:
--                /* RDUNIQUE */
--                /* Handled in the translator for usermode.  */
--                abort();
--            case 0x9F:
--                /* WRUNIQUE */
--                /* Handled in the translator for usermode.  */
--                abort();
--            case 0xAA:
--                /* GENTRAP */
--                info.si_signo = TARGET_SIGFPE;
--                switch (env->ir[IR_A0]) {
--                case TARGET_GEN_INTOVF:
--                    info.si_code = TARGET_FPE_INTOVF;
--                    break;
--                case TARGET_GEN_INTDIV:
--                    info.si_code = TARGET_FPE_INTDIV;
--                    break;
--                case TARGET_GEN_FLTOVF:
--                    info.si_code = TARGET_FPE_FLTOVF;
--                    break;
--                case TARGET_GEN_FLTUND:
--                    info.si_code = TARGET_FPE_FLTUND;
--                    break;
--                case TARGET_GEN_FLTINV:
--                    info.si_code = TARGET_FPE_FLTINV;
--                    break;
--                case TARGET_GEN_FLTINE:
--                    info.si_code = TARGET_FPE_FLTRES;
--                    break;
--                case TARGET_GEN_ROPRAND:
--                    info.si_code = 0;
--                    break;
--                default:
--                    info.si_signo = TARGET_SIGTRAP;
--                    info.si_code = 0;
--                    break;
--                }
--                info.si_errno = 0;
--                info._sifields._sigfault._addr = env->pc;
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--                break;
--            default:
--                goto do_sigill;
--            }
--            break;
--        case EXCP_DEBUG:
--            info.si_signo = gdb_handlesig(cs, TARGET_SIGTRAP);
--            if (info.si_signo) {
--                info.si_errno = 0;
--                info.si_code = TARGET_TRAP_BRKPT;
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            } else {
--                arch_interrupt = false;
--            }
--            break;
--        case EXCP_INTERRUPT:
--            /* Just indicate that signals should be handled asap.  */
--            break;
--        case EXCP_ATOMIC:
--            cpu_exec_step_atomic(cs);
--            arch_interrupt = false;
--            break;
--        default:
--            printf ("Unhandled trap: 0x%x\n", trapnr);
--            cpu_dump_state(cs, stderr, fprintf, 0);
--            exit(EXIT_FAILURE);
--        }
--        process_pending_signals (env);
+-static inline void setup_sigcontext(CPUMIPSState *regs,
+-                                    struct target_sigcontext *sc)
+-{
+-    int i;
 -
--        /* Most of the traps imply a transition through PALcode, which
--           implies an REI instruction has been executed.  Which means
--           that RX and LOCK_ADDR should be cleared.  But there are a
--           few exceptions for traps internal to QEMU.  */
--        if (arch_interrupt) {
--            env->flags &= ~ENV_FLAG_RX_FLAG;
--            env->lock_addr = -1;
--        }
+-    __put_user(exception_resume_pc(regs), &sc->sc_pc);
+-    regs->hflags &= ~MIPS_HFLAG_BMASK;
+-
+-    __put_user(0, &sc->sc_regs[0]);
+-    for (i = 1; i < 32; ++i) {
+-        __put_user(regs->active_tc.gpr[i], &sc->sc_regs[i]);
+-    }
+-
+-    __put_user(regs->active_tc.HI[0], &sc->sc_mdhi);
+-    __put_user(regs->active_tc.LO[0], &sc->sc_mdlo);
+-
+-    /* Rather than checking for dsp existence, always copy.  The storage
+-       would just be garbage otherwise.  */
+-    __put_user(regs->active_tc.HI[1], &sc->sc_hi1);
+-    __put_user(regs->active_tc.HI[2], &sc->sc_hi2);
+-    __put_user(regs->active_tc.HI[3], &sc->sc_hi3);
+-    __put_user(regs->active_tc.LO[1], &sc->sc_lo1);
+-    __put_user(regs->active_tc.LO[2], &sc->sc_lo2);
+-    __put_user(regs->active_tc.LO[3], &sc->sc_lo3);
+-    {
+-        uint32_t dsp = cpu_rddsp(0x3ff, regs);
+-        __put_user(dsp, &sc->sc_dsp);
+-    }
+-
+-    __put_user(1, &sc->sc_used_math);
+-
+-    for (i = 0; i < 32; ++i) {
+-        __put_user(regs->active_fpu.fpr[i].d, &sc->sc_fpregs[i]);
 -    }
 -}
--#endif /* TARGET_ALPHA */
 -
- #ifdef TARGET_S390X
- 
- /* s390x masks the fault address it reports in si_addr for SIGSEGV and SIGBUS */
-@@ -1914,16 +1720,6 @@ int main(int argc, char **argv, char **envp)
-         env->pc = regs->sepc;
-         env->gpr[xSP] = regs->sp;
-     }
--#elif defined(TARGET_ALPHA)
--    {
--        int i;
+-static inline void
+-restore_sigcontext(CPUMIPSState *regs, struct target_sigcontext *sc)
+-{
+-    int i;
 -
--        for(i = 0; i < 28; i++) {
--            env->ir[i] = ((abi_ulong *)regs)[i];
--        }
--        env->ir[IR_SP] = regs->usp;
--        env->pc = regs->pc;
+-    __get_user(regs->CP0_EPC, &sc->sc_pc);
+-
+-    __get_user(regs->active_tc.HI[0], &sc->sc_mdhi);
+-    __get_user(regs->active_tc.LO[0], &sc->sc_mdlo);
+-
+-    for (i = 1; i < 32; ++i) {
+-        __get_user(regs->active_tc.gpr[i], &sc->sc_regs[i]);
 -    }
- #elif defined(TARGET_S390X)
-     {
-             int i;
+-
+-    __get_user(regs->active_tc.HI[1], &sc->sc_hi1);
+-    __get_user(regs->active_tc.HI[2], &sc->sc_hi2);
+-    __get_user(regs->active_tc.HI[3], &sc->sc_hi3);
+-    __get_user(regs->active_tc.LO[1], &sc->sc_lo1);
+-    __get_user(regs->active_tc.LO[2], &sc->sc_lo2);
+-    __get_user(regs->active_tc.LO[3], &sc->sc_lo3);
+-    {
+-        uint32_t dsp;
+-        __get_user(dsp, &sc->sc_dsp);
+-        cpu_wrdsp(dsp, 0x3ff, regs);
+-    }
+-
+-    for (i = 0; i < 32; ++i) {
+-        __get_user(regs->active_fpu.fpr[i].d, &sc->sc_fpregs[i]);
+-    }
+-}
+-
+-/*
+- * Determine which stack to use..
+- */
+-static inline abi_ulong
+-get_sigframe(struct target_sigaction *ka, CPUMIPSState *regs, size_t frame_size)
+-{
+-    unsigned long sp;
+-
+-    /* Default to using normal stack */
+-    sp = regs->active_tc.gpr[29];
+-
+-    /*
+-     * FPU emulator may have its own trampoline active just
+-     * above the user stack, 16-bytes before the next lowest
+-     * 16 byte boundary.  Try to avoid trashing it.
+-     */
+-    sp -= 32;
+-
+-    /* This is the X/Open sanctioned signal stack switching.  */
+-    if ((ka->sa_flags & TARGET_SA_ONSTACK) && (sas_ss_flags (sp) == 0)) {
+-        sp = target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
+-    }
+-
+-    return (sp - frame_size) & ~7;
+-}
+-
+-static void mips_set_hflags_isa_mode_from_pc(CPUMIPSState *env)
+-{
+-    if (env->insn_flags & (ASE_MIPS16 | ASE_MICROMIPS)) {
+-        env->hflags &= ~MIPS_HFLAG_M16;
+-        env->hflags |= (env->active_tc.PC & 1) << MIPS_HFLAG_M16_SHIFT;
+-        env->active_tc.PC &= ~(target_ulong) 1;
+-    }
+-}
+-
+-# if defined(TARGET_ABI_MIPSO32)
+-/* compare linux/arch/mips/kernel/signal.c:setup_frame() */
+-static void setup_frame(int sig, struct target_sigaction * ka,
+-                        target_sigset_t *set, CPUMIPSState *regs)
+-{
+-    struct sigframe *frame;
+-    abi_ulong frame_addr;
+-    int i;
+-
+-    frame_addr = get_sigframe(ka, regs, sizeof(*frame));
+-    trace_user_setup_frame(regs, frame_addr);
+-    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
+-        goto give_sigsegv;
+-    }
+-
+-    install_sigtramp(frame->sf_code, TARGET_NR_sigreturn);
+-
+-    setup_sigcontext(regs, &frame->sf_sc);
+-
+-    for(i = 0; i < TARGET_NSIG_WORDS; i++) {
+-        __put_user(set->sig[i], &frame->sf_mask.sig[i]);
+-    }
+-
+-    /*
+-    * Arguments to signal handler:
+-    *
+-    *   a0 = signal number
+-    *   a1 = 0 (should be cause)
+-    *   a2 = pointer to struct sigcontext
+-    *
+-    * $25 and PC point to the signal handler, $29 points to the
+-    * struct sigframe.
+-    */
+-    regs->active_tc.gpr[ 4] = sig;
+-    regs->active_tc.gpr[ 5] = 0;
+-    regs->active_tc.gpr[ 6] = frame_addr + offsetof(struct sigframe, sf_sc);
+-    regs->active_tc.gpr[29] = frame_addr;
+-    regs->active_tc.gpr[31] = frame_addr + offsetof(struct sigframe, sf_code);
+-    /* The original kernel code sets CP0_EPC to the handler
+-    * since it returns to userland using eret
+-    * we cannot do this here, and we must set PC directly */
+-    regs->active_tc.PC = regs->active_tc.gpr[25] = ka->_sa_handler;
+-    mips_set_hflags_isa_mode_from_pc(regs);
+-    unlock_user_struct(frame, frame_addr, 1);
+-    return;
+-
+-give_sigsegv:
+-    force_sigsegv(sig);
+-}
+-
+-long do_sigreturn(CPUMIPSState *regs)
+-{
+-    struct sigframe *frame;
+-    abi_ulong frame_addr;
+-    sigset_t blocked;
+-    target_sigset_t target_set;
+-    int i;
+-
+-    frame_addr = regs->active_tc.gpr[29];
+-    trace_user_do_sigreturn(regs, frame_addr);
+-    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1))
+-        goto badframe;
+-
+-    for(i = 0; i < TARGET_NSIG_WORDS; i++) {
+-        __get_user(target_set.sig[i], &frame->sf_mask.sig[i]);
+-    }
+-
+-    target_to_host_sigset_internal(&blocked, &target_set);
+-    set_sigmask(&blocked);
+-
+-    restore_sigcontext(regs, &frame->sf_sc);
+-
+-#if 0
+-    /*
+-     * Don't let your children do this ...
+-     */
+-    __asm__ __volatile__(
+-   	"move\t$29, %0\n\t"
+-   	"j\tsyscall_exit"
+-   	:/* no outputs */
+-   	:"r" (&regs));
+-    /* Unreached */
+-#endif
+-
+-    regs->active_tc.PC = regs->CP0_EPC;
+-    mips_set_hflags_isa_mode_from_pc(regs);
+-    /* I am not sure this is right, but it seems to work
+-    * maybe a problem with nested signals ? */
+-    regs->CP0_EPC = 0;
+-    return -TARGET_QEMU_ESIGRETURN;
+-
+-badframe:
+-    force_sig(TARGET_SIGSEGV);
+-    return -TARGET_QEMU_ESIGRETURN;
+-}
+-# endif /* O32 */
+-
+-static void setup_rt_frame(int sig, struct target_sigaction *ka,
+-                           target_siginfo_t *info,
+-                           target_sigset_t *set, CPUMIPSState *env)
+-{
+-    struct target_rt_sigframe *frame;
+-    abi_ulong frame_addr;
+-    int i;
+-
+-    frame_addr = get_sigframe(ka, env, sizeof(*frame));
+-    trace_user_setup_rt_frame(env, frame_addr);
+-    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
+-        goto give_sigsegv;
+-    }
+-
+-    install_sigtramp(frame->rs_code, TARGET_NR_rt_sigreturn);
+-
+-    tswap_siginfo(&frame->rs_info, info);
+-
+-    __put_user(0, &frame->rs_uc.tuc_flags);
+-    __put_user(0, &frame->rs_uc.tuc_link);
+-    __put_user(target_sigaltstack_used.ss_sp, &frame->rs_uc.tuc_stack.ss_sp);
+-    __put_user(target_sigaltstack_used.ss_size, &frame->rs_uc.tuc_stack.ss_size);
+-    __put_user(sas_ss_flags(get_sp_from_cpustate(env)),
+-               &frame->rs_uc.tuc_stack.ss_flags);
+-
+-    setup_sigcontext(env, &frame->rs_uc.tuc_mcontext);
+-
+-    for(i = 0; i < TARGET_NSIG_WORDS; i++) {
+-        __put_user(set->sig[i], &frame->rs_uc.tuc_sigmask.sig[i]);
+-    }
+-
+-    /*
+-    * Arguments to signal handler:
+-    *
+-    *   a0 = signal number
+-    *   a1 = pointer to siginfo_t
+-    *   a2 = pointer to ucontext_t
+-    *
+-    * $25 and PC point to the signal handler, $29 points to the
+-    * struct sigframe.
+-    */
+-    env->active_tc.gpr[ 4] = sig;
+-    env->active_tc.gpr[ 5] = frame_addr
+-                             + offsetof(struct target_rt_sigframe, rs_info);
+-    env->active_tc.gpr[ 6] = frame_addr
+-                             + offsetof(struct target_rt_sigframe, rs_uc);
+-    env->active_tc.gpr[29] = frame_addr;
+-    env->active_tc.gpr[31] = frame_addr
+-                             + offsetof(struct target_rt_sigframe, rs_code);
+-    /* The original kernel code sets CP0_EPC to the handler
+-    * since it returns to userland using eret
+-    * we cannot do this here, and we must set PC directly */
+-    env->active_tc.PC = env->active_tc.gpr[25] = ka->_sa_handler;
+-    mips_set_hflags_isa_mode_from_pc(env);
+-    unlock_user_struct(frame, frame_addr, 1);
+-    return;
+-
+-give_sigsegv:
+-    unlock_user_struct(frame, frame_addr, 1);
+-    force_sigsegv(sig);
+-}
+-
+-long do_rt_sigreturn(CPUMIPSState *env)
+-{
+-    struct target_rt_sigframe *frame;
+-    abi_ulong frame_addr;
+-    sigset_t blocked;
+-
+-    frame_addr = env->active_tc.gpr[29];
+-    trace_user_do_rt_sigreturn(env, frame_addr);
+-    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1)) {
+-        goto badframe;
+-    }
+-
+-    target_to_host_sigset(&blocked, &frame->rs_uc.tuc_sigmask);
+-    set_sigmask(&blocked);
+-
+-    restore_sigcontext(env, &frame->rs_uc.tuc_mcontext);
+-
+-    if (do_sigaltstack(frame_addr +
+-                       offsetof(struct target_rt_sigframe, rs_uc.tuc_stack),
+-                       0, get_sp_from_cpustate(env)) == -EFAULT)
+-        goto badframe;
+-
+-    env->active_tc.PC = env->CP0_EPC;
+-    mips_set_hflags_isa_mode_from_pc(env);
+-    /* I am not sure this is right, but it seems to work
+-    * maybe a problem with nested signals ? */
+-    env->CP0_EPC = 0;
+-    return -TARGET_QEMU_ESIGRETURN;
+-
+-badframe:
+-    force_sig(TARGET_SIGSEGV);
+-    return -TARGET_QEMU_ESIGRETURN;
+-}
+-
+-#elif defined(TARGET_PPC)
++#if defined(TARGET_PPC)
+ 
+ /* Size of dummy stack frame allocated when calling signal handler.
+    See arch/powerpc/include/asm/ptrace.h.  */
 -- 
 2.14.3
