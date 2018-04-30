@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fD5YO-0003gz-Hd
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:57:05 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fD5cb-0007Cw-5q
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 06:01:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fD5YL-0005HH-DB
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:57:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58964 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fD5YL-0005Gz-7f
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 05:57:01 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D3CFE4023457
-	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 09:56:57 +0000 (UTC)
-Date: Mon, 30 Apr 2018 10:56:49 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180430095649.GC4002@stefanha-x1.localdomain>
-References: <20180418090239.13090-1-peterx@redhat.com>
-	<20180418090239.13090-2-peterx@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fD5ca-00070b-Ey
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 06:01:25 -0400
+Received: from mail-oi0-x22a.google.com ([2607:f8b0:4003:c06::22a]:37520)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fD5ca-00070C-8t
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 06:01:24 -0400
+Received: by mail-oi0-x22a.google.com with SMTP id f63-v6so6942174oic.4
+	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 03:01:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="yLVHuoLXiP9kZBkt"
-Content-Disposition: inline
-In-Reply-To: <20180418090239.13090-2-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] monitor: rename out_lock to mon_lock
+In-Reply-To: <20180430112906.20101672.cohuck@redhat.com>
+References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
+	<20180430112906.20101672.cohuck@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 30 Apr 2018 11:01:03 +0100
+Message-ID: <CAFEAcA8=5h=A3hyrUk8LQ8RzAJ+vgG8uwBYHtmOV8mueJumrqw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] release retrospective, next release timing,
+ numbering
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,66 +30,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
+On 30 April 2018 at 10:29, Cornelia Huck <cohuck@redhat.com> wrote:
+> On a related note: During the development phase, does it make more
+> sense to collect stuff until you have a big pile of patches, or is it
+> better (from an integration perspective) to do more frequent, smaller
+> pull requests?
 
---yLVHuoLXiP9kZBkt
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Generally my preference is for more smaller requests:
+ * it means that patches from contributors get into master faster
+ * the bigger the pull request the more likely that something in it
+   will fail a build test and result in a delay for the whole lot
 
-On Wed, Apr 18, 2018 at 05:02:37PM +0800, Peter Xu wrote:
-> The out_lock was only protecting out buffers.  In the future the monitor
-> code will start to run in multiple threads.  We turn it into a bigger
-> lock to protect not only the out buffer but also all the rest.  We split
-> this lock until necessary.  So far I don't see a reason to complicate
-> lock usage for monitors.
->=20
-> Since at it, arrange the Monitor struct a bit.
->=20
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  monitor.c | 39 ++++++++++++++++++---------------------
->  1 file changed, 18 insertions(+), 21 deletions(-)
->=20
-> diff --git a/monitor.c b/monitor.c
-> index 39f8ee17ba..c93aa4e22b 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -202,20 +202,17 @@ typedef struct {
-> =20
->  struct Monitor {
->      CharBackend chr;
-> +    /* We can't access guest memory when holding the lock */
-> +    QemuMutex mon_lock;
+My rule of thumb for target-arm pull requests is to send one
+if my queue gets up to 10 or so patches or if it's been two weeks
+since the last one, I think. (I'm not saying 2 weeks is a limit
+on how often to send -- it's just about where my personal
+tradeoff between how long I hold onto things and how frequently
+I want to do the test-and-send-pullreq work is set.)
 
-Please document which field this lock protects.  For example, outbuf and
-out_watch need a comment.
-
->      int reset_seen;
->      int flags;
->      int suspend_cnt;            /* Needs to be accessed atomically */
->      bool skip_flush;
->      bool use_io_thr;
-> -
-> -    /* We can't access guest memory when holding the lock */
-> -    QemuMutex out_lock;
->      QString *outbuf;
->      guint out_watch;
-
---yLVHuoLXiP9kZBkt
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJa5uhhAAoJEJykq7OBq3PIwC4H/A0ISQFk6Dkoh0Rcg2goEqHX
-F90prjBaV/2Tc7x8vUjqZWrrbs06Hr0sTt/y8rSW2c2vbBAhxufAvjFU+sOMBw6e
-KB9HXHOaLKPXwxSDUKSGtnLPWRyw45SFm0bm64uQseQIZeuY2u83//gSgZ/UjC1s
-/g7jboU7rxZ8/W8AbEbYh5Hmotnh6ZqsjIvHbb5VW6LCNy5jzCulwb1rmjSif7A0
-NQW1vlq3LKFefusv/GiOqPwgzV2dMvOBUcIGY6dPa9SpXLdKGc6LOlsR6aIYaV7O
-N3Gk08o2TW6aB5y2zHn1OQwe9h6jIR38oxHvdVfhZZpiHg8rv/XGrvWaDQwpQ9M=
-=sv7Z
------END PGP SIGNATURE-----
-
---yLVHuoLXiP9kZBkt--
+thanks
+-- PMM
