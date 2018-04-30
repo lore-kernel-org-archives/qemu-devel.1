@@ -1,28 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1fD9Be-0005Cy-2K
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 09:49:51 -0400
+	(envelope-from <jl4312@columbia.edu>) id 1fD9Wz-0003YB-So
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 10:11:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1fD9BZ-0006H0-6I
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 09:49:50 -0400
-Received: from mail-bl2nam02on0061.outbound.protection.outlook.com
-	([104.47.38.61]:48817
-	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <edgari@xilinx.com>) id 1fD9BY-0006GX-RO
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 09:49:45 -0400
-Date: Mon, 30 Apr 2018 15:49:29 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Message-ID: <20180430134929.edf3vsx4csvsydxi@toto>
-References: <20180213040809.26021-1-f4bug@amsat.org>
-	<20180213040809.26021-21-f4bug@amsat.org>
-	<CAFEAcA_r2WNVEkE5-p+VuH8f1XnDzHMkUNgNSMrV1ZTkHv4=AQ@mail.gmail.com>
+	(envelope-from <jl4312@columbia.edu>) id 1fD9Wv-0002DZ-Tn
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 10:11:53 -0400
+Received: from outprodmail02.cc.columbia.edu ([128.59.72.51]:33484)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jl4312@columbia.edu>) id 1fD9Wv-00028m-P8
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 10:11:49 -0400
+Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
+	by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
+	w3UE8Y9i023530
+	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 10:11:43 -0400
+Received: from hazelnut (localhost.localdomain [127.0.0.1])
+	by hazelnut (Postfix) with ESMTP id DE7D17E
+	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 10:11:43 -0400 (EDT)
+Received: from sendprodmail02.cc.columbia.edu (sendprodmail02.cc.columbia.edu
+	[128.59.72.14]) by hazelnut (Postfix) with ESMTP id C7F6880
+	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 10:11:43 -0400 (EDT)
+Received: from mail-wm0-f69.google.com (mail-wm0-f69.google.com [74.125.82.69])
+	by sendprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
+	w3UEBgxo050851
+	(version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 10:11:43 -0400
+Received: by mail-wm0-f69.google.com with SMTP id 70so3092816wmb.2
+	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 07:11:43 -0700 (PDT)
+Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com.
+	[74.125.82.44]) by smtp.gmail.com with ESMTPSA id
+	q6-v6sm4480716edb.66.2018.04.30.07.11.40 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 30 Apr 2018 07:11:41 -0700 (PDT)
+Received: by mail-wm0-f44.google.com with SMTP id i3so14418434wmf.3
+	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 07:11:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <CAFEAcA_r2WNVEkE5-p+VuH8f1XnDzHMkUNgNSMrV1ZTkHv4=AQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v13 20/30] sdbus: add trace events
+From: Jintack Lim <jintack@cs.columbia.edu>
+Date: Mon, 30 Apr 2018 10:11:39 -0400
+Message-ID: <CAHyh4xgMqsxCUOH-_p=DWVWpp0stxfwdfFo2s2cn1nmR2v5Siw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] How to check if Vt-d is capable of posted-interrupt?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,70 +47,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Fam Zheng <famz@redhat.com>
-
-On Fri, Apr 27, 2018 at 12:55:21PM +0100, Peter Maydell wrote:
-> On 13 February 2018 at 04:07, Philippe Mathieu-Daud=E9 <f4bug@amsat.org> =
-wrote:
-> > Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> > Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
->=20
-> > @@ -39,6 +45,7 @@ int sdbus_do_command(SDBus *sdbus, SDRequest *req, ui=
-nt8_t *response)
-> >  {
-> >      SDState *card =3D get_card(sdbus);
-> >
-> > +    trace_sdbus_command(sdbus_name(sdbus), req->cmd, req->arg, req->cr=
-c);
-> >      if (card) {
-> >          SDCardClass *sc =3D SD_CARD_GET_CLASS(card);
->=20
-> Hi -- as a result of this trace event being added, we now get
-> warnings from Coverity that it might use uninitialized data
-> (CID1386074, CID1390571, CID1386072, CID1386076). This is because not
-> all of our SD
-> controllers bother to initialize req->crc, because up til now
-> nothing in the SD code looks at it. (I think at least bcm2835_sdhost.c
-> sdhci.c and ssi-sd.c do this).
->=20
-> Could you have a look at this, please? I think there are
-> three plausible lines of approach:
->=20
-> (1) just don't bother to trace the CRC field
-> (2) make bcm2835_sdhost.c, sdhci.c, ssi-sd.c set crc to 0 like
-> omap and pxa2xx already do
+To: QEMU Devel Mailing List <qemu-devel@nongnu.org>, KVM General <kvm@vger.kernel.org>
 
 Hi,
 
-Philippe, any opinion here?
+I wonder how to check if Vt-d is capable of posted-interrupt? I'm
+using Intel E5-2630 v3.
 
-Otherwise I suggest we do #2 right away to avoid the warnings
-until someone cares enough to implement #3...
+I was once told that APICv and posted-interrupt capability always come
+together. But it seems like my cpu support APICv
+(/sys/module/kvm_intel/parameters/enable_apicv is Y), but
+posted-interrupt capability is only shipped with the next generation
+of the cpu (E5-2600 v4, which is Broadwell).
 
-Cheers,
-Edgar
+What would be an easy way to check this?
 
-
-
-> (3) "proper" implementation of CRC, so that an sd controller
-> can either (a) mark the SDRequest as "no CRC" and have
-> sd_req_crc_validate() always pass, or (b) mark the SDRequest
-> as having a CRC and have sd_req_crc_validate() actually
-> do the check which it currently stubs out with "return 0"
->=20
-> (3 is because it doesn't seem very sensible to spend time
-> calculating a CRC just to test it against a CRC calculated
-> a little bit later on; but we don't really want to drop the
-> CRC stuff entirely because on some controllers like
-> milkymist-memcard.c the CRC byte comes from the guest and
-> we'd ideally like to check it.)
->=20
-> I don't have a strong preference for which of 1/2/3 we do.
->=20
-> PS: CID1005332 is the coverity issue for "sd_req_crc_validate
-> stubs out its check code with 'return 0' leaving a line of
-> unreachable code".
->=20
-> thanks
-> -- PMM
+Thanks,
+Jintack
