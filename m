@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fDSFN-0005or-Dm
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 06:10:58 -0400
+	(envelope-from <berrange@redhat.com>) id 1fDSG5-0006BK-L1
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 06:11:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fDSFI-0002T1-Dh
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 06:10:57 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:33623)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fDSFI-0002Sj-2v
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 06:10:52 -0400
-Received: by mail-wr0-x242.google.com with SMTP id o4-v6so10407601wrm.0
-	for <qemu-devel@nongnu.org>; Tue, 01 May 2018 03:10:51 -0700 (PDT)
-References: <20180425012300.14698-1-richard.henderson@linaro.org>
-	<20180425012300.14698-4-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180425012300.14698-4-richard.henderson@linaro.org>
-Date: Tue, 01 May 2018 11:10:49 +0100
-Message-ID: <87tvrradp2.fsf@linaro.org>
+	(envelope-from <berrange@redhat.com>) id 1fDSG1-0002k5-JT
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 06:11:41 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39100 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fDSG1-0002jq-DU
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 06:11:37 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3C66E40150FA
+	for <qemu-devel@nongnu.org>; Tue,  1 May 2018 10:11:34 +0000 (UTC)
+Date: Tue, 1 May 2018 11:11:27 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180501101127.GK5708@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180430185943.35714-1-dgilbert@redhat.com>
+	<20180501100035.GJ5708@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180501100035.GJ5708@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/9] target/arm: Fix float16 to/from int16
+Subject: Re: [Qemu-devel] [PATCH] Migration+TLS: Fix crash due to double
+ cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,136 +36,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: pkrempa@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com, quintela@redhat.com
+
+On Tue, May 01, 2018 at 11:00:35AM +0100, Daniel P. Berrang=C3=A9 wrote:
+> On Mon, Apr 30, 2018 at 07:59:43PM +0100, Dr. David Alan Gilbert (git) =
+wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> >=20
+> > During a TLS connect we see:
+> >   migration_channel_connect calls
+> >   migration_tls_channel_connect
+> >   (calls after TLS setup)
+> >   migration_channel_connect
+> >=20
+> > My previous error handling fix made migration_channel_connect
+> > call migrate_fd_connect in all cases; unfortunately the above
+> > means it gets called twice and crashes doing double cleanup.
+> >=20
+> > Fixes: 688a3dcba98
+>=20
+> This fixes the crash, but we're still seeing error messages duplicated
+>=20
+> (qemu) migrate_set_parameter tls-creds tls0
+> (qemu) migrate tcp:localhost:9000
+> qemu-system-x86_64: Certificate does not match the hostname localhost
+> qemu-system-x86_64: Certificate does not match the hostname localhost
+>=20
+> git bisect points to 688a3dcba98 as the cause of these double
+> errors still.
+
+FYI the stack traces look like this..
+
+The first error message is printed in this context:
+
+#0  0x0000555555bb6c20 in error_report (fmt=3D0x555555d0d77e "%s") at uti=
+l/qemu-error.c:273
+#1  0x0000555555bb5fa5 in error_report_err (err=3D0x55555749cb00) at util=
+/error.c:228
+#2  0x0000555555a6d1f8 in migrate_fd_cleanup (opaque=3Dopaque@entry=3D0x5=
+555569925a0) at migration/migration.c:1106
+#3  0x0000555555a6e2aa in migrate_fd_connect (s=3Ds@entry=3D0x5555569925a=
+0, error_in=3D0x55555768de80) at migration/migration.c:2387
+#4  0x0000555555a6f8e7 in migration_channel_connect (s=3Ds@entry=3D0x5555=
+569925a0, ioc=3Dioc@entry=3D0x555557e1de10, hostname=3Dhostname@entry=3D0=
+x0, error=3D<optimized out>) at migration/channel.c:83
+#5  0x0000555555a6f2d6 in migration_tls_outgoing_handshake (task=3D<optim=
+ized out>, opaque=3D0x5555569925a0) at migration/tls.c:124
+#6  0x0000555555b6d2b2 in qio_task_complete (task=3Dtask@entry=3D0x555557=
+6ae620) at io/task.c:142
+#7  0x0000555555b68c74 in qio_channel_tls_handshake_task (ioc=3Dioc@entry=
+=3D0x555557e1de10, task=3Dtask@entry=3D0x5555576ae620) at io/channel-tls.=
+c:171
+#8  0x0000555555b6975a in qio_channel_tls_handshake (ioc=3Dioc@entry=3D0x=
+555557e1de10, func=3Dfunc@entry=3D0x555555a6f250 <migration_tls_outgoing_=
+handshake>, opaque=3Dopaque@entry=3D0x5555569925a0, destroy=3Ddestroy@ent=
+ry=3D0x0) at io/channel-tls.c:215
+#9  0x0000555555a6f6ac in migration_tls_channel_connect (s=3Ds@entry=3D0x=
+5555569925a0, ioc=3Dioc@entry=3D0x555556a01000, hostname=3Dhostname@entry=
+=3D0x555556bc0c30 "localhost", errp=3Derrp@entry=3D0x7fffffffd778) at mig=
+ration/tls.c:159
+#10 0x0000555555a6f967 in migration_channel_connect (s=3D0x5555569925a0, =
+ioc=3Dioc@entry=3D0x555556a01000, hostname=3D0x555556bc0c30 "localhost", =
+error=3D<optimized out>) at migration/channel.c:73
+#11 0x0000555555a6e5f4 in socket_outgoing_migration (task=3D<optimized ou=
+t>, opaque=3D0x555556cc7de0) at migration/socket.c:85
+#12 0x0000555555b6d2b2 in qio_task_complete (task=3Dtask@entry=3D0x555557=
+6ce3b0) at io/task.c:142
+#13 0x0000555555b6d3a2 in gio_task_thread_result (opaque=3D0x5555578eff50=
+) at io/task.c:88
+#14 0x00007ffff5da1577 in g_idle_dispatch () at /lib64/libglib-2.0.so.0
+#15 0x00007ffff5da4b77 in g_main_context_dispatch () at /lib64/libglib-2.=
+0.so.0
+#16 0x0000555555baf677 in glib_pollfds_poll () at util/main-loop.c:214
+#17 0x0000555555baf677 in os_host_main_loop_wait (timeout=3D<optimized ou=
+t>) at util/main-loop.c:261
+#18 0x0000555555baf677 in main_loop_wait (nonblocking=3D<optimized out>) =
+at util/main-loop.c:515
+#19 0x00005555557b9157 in main_loop () at vl.c:1935
+#20 0x00005555557b9157 in main (argc=3D<optimized out>, argv=3D<optimized=
+ out>, envp=3D<optimized out>) at vl.c:4767
 
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+The second error message is printed in this context:
 
-> The instruction "ucvtf v0.4h, v04h, #2", with input 0x8000u,
-> overflows the intermediate float16 to infinity before we have a
-> chance to scale the output.  Use float64 as the intermediate type
-> so that no input argument (uint32_t in this case) can overflow
-> or round before scaling.  Given the declared argument, the signed
-> int32_t function has the same problem.
->
-> When converting from float16 to integer, using u/int32_t instead
-> of u/int16_t means that the bounding is incorrect.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  target/arm/helper.h        |  4 ++--
->  target/arm/helper.c        | 53 ++++++++++++++++++++++++++++++++++++++++=
-++++--
->  target/arm/translate-a64.c |  4 ++--
->  3 files changed, 55 insertions(+), 6 deletions(-)
->
-> diff --git a/target/arm/helper.h b/target/arm/helper.h
-> index b3ae394b4f..eafd5d746b 100644
-> --- a/target/arm/helper.h
-> +++ b/target/arm/helper.h
-> @@ -149,8 +149,8 @@ DEF_HELPER_3(vfp_toshd_round_to_zero, i64, f64, i32, =
-ptr)
->  DEF_HELPER_3(vfp_tosld_round_to_zero, i64, f64, i32, ptr)
->  DEF_HELPER_3(vfp_touhd_round_to_zero, i64, f64, i32, ptr)
->  DEF_HELPER_3(vfp_tould_round_to_zero, i64, f64, i32, ptr)
-> -DEF_HELPER_3(vfp_toulh, i32, f16, i32, ptr)
-> -DEF_HELPER_3(vfp_toslh, i32, f16, i32, ptr)
-> +DEF_HELPER_3(vfp_touhh, i32, f16, i32, ptr)
-> +DEF_HELPER_3(vfp_toshh, i32, f16, i32, ptr)
->  DEF_HELPER_3(vfp_toshs, i32, f32, i32, ptr)
->  DEF_HELPER_3(vfp_tosls, i32, f32, i32, ptr)
->  DEF_HELPER_3(vfp_tosqs, i64, f32, i32, ptr)
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index ea09510599..743f34bd0a 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -11409,11 +11409,60 @@ VFP_CONV_FIX_A64(sq, s, 32, 64, int64)
->  VFP_CONV_FIX(uh, s, 32, 32, uint16)
->  VFP_CONV_FIX(ul, s, 32, 32, uint32)
->  VFP_CONV_FIX_A64(uq, s, 32, 64, uint64)
-> -VFP_CONV_FIX_A64(sl, h, 16, 32, int32)
-> -VFP_CONV_FIX_A64(ul, h, 16, 32, uint32)
-> +
->  #undef VFP_CONV_FIX
->  #undef VFP_CONV_FIX_FLOAT
->  #undef VFP_CONV_FLOAT_FIX_ROUND
-> +#undef VFP_CONV_FIX_A64
-> +
-> +/* Conversion to/from f16 can overflow to infinity before/after scaling.
-> + * Therefore we convert to f64 (which does not round), scale,
-> + * and then convert f64 to f16 (which may round).
-> + */
-> +
-> +static float16 do_postscale_fp16(float64 f, int shift, float_status *fps=
-t)
-> +{
-> +    return float64_to_float16(float64_scalbn(f, -shift, fpst), true, fps=
-t);
-> +}
-> +
-> +float16 HELPER(vfp_sltoh)(uint32_t x, uint32_t shift, void *fpst)
-> +{
-> +    return do_postscale_fp16(int32_to_float64(x, fpst), shift, fpst);
-> +}
-> +
-> +float16 HELPER(vfp_ultoh)(uint32_t x, uint32_t shift, void *fpst)
-> +{
-> +    return do_postscale_fp16(uint32_to_float64(x, fpst), shift, fpst);
-> +}
-> +
-> +static float64 do_prescale_fp16(float16 f, int shift, float_status *fpst)
-> +{
-> +    if (unlikely(float16_is_any_nan(f))) {
-> +        float_raise(float_flag_invalid, fpst);
-> +        return 0;
-> +    } else {
-> +        int old_exc_flags =3D get_float_exception_flags(fpst);
-> +        float64 ret;
-> +
-> +        ret =3D float16_to_float64(f, true, fpst);
-> +        ret =3D float64_scalbn(ret, shift, fpst);
-> +        old_exc_flags |=3D get_float_exception_flags(fpst)
-> +            & float_flag_input_denormal;
-> +        set_float_exception_flags(old_exc_flags, fpst);
-> +
-> +        return ret;
-> +    }
-> +}
-> +
-> +uint32_t HELPER(vfp_toshh)(float16 x, uint32_t shift, void *fpst)
-> +{
-> +    return float64_to_int16(do_prescale_fp16(x, shift, fpst), fpst);
-> +}
-> +
-> +uint32_t HELPER(vfp_touhh)(float16 x, uint32_t shift, void *fpst)
-> +{
-> +    return float64_to_uint16(do_prescale_fp16(x, shift, fpst), fpst);
-> +}
->
->  /* Set the current fp rounding mode and return the old one.
->   * The argument is a softfloat float_round_ value.
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index e2d11998bd..b27892d971 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -7181,9 +7181,9 @@ static void handle_simd_shift_fpint_conv(DisasConte=
-xt *s, bool is_scalar,
->          switch (size) {
->          case MO_16:
->              if (is_u) {
-> -                fn =3D gen_helper_vfp_toulh;
-> +                fn =3D gen_helper_vfp_touhh;
->              } else {
-> -                fn =3D gen_helper_vfp_toslh;
-> +                fn =3D gen_helper_vfp_toshh;
->              }
->              break;
->          case MO_32:
+#0  0x0000555555bb6c20 in error_report (fmt=3Dfmt@entry=3D0x555555d0d77e =
+"%s") at util/qemu-error.c:273
+#1  0x0000555555904035 in hmp_migrate_status_cb (opaque=3D0x555556bc0ba0)=
+ at hmp.c:1909
+#2  0x0000555555baefac in timerlist_run_timers (timer_list=3D0x555556a0d7=
+60) at util/qemu-timer.c:536
+#3  0x0000555555baf1b7 in qemu_clock_run_timers (type=3DQEMU_CLOCK_REALTI=
+ME) at util/qemu-timer.c:547
+#4  0x0000555555baf1b7 in qemu_clock_run_all_timers () at util/qemu-timer=
+.c:662
+#5  0x0000555555baf69a in main_loop_wait (nonblocking=3D<optimized out>) =
+at util/main-loop.c:521
+#6  0x00005555557b9157 in main_loop () at vl.c:1935
+#7  0x00005555557b9157 in main (argc=3D<optimized out>, argv=3D<optimized=
+ out>, envp=3D<optimized out>) at vl.c:4767
 
 
---
-Alex Benn=C3=A9e
+The second stack trace is the error reporting context that I added origin=
+ally
+in
+
+  commit d59ce6f34434bf47a9b26138c908650bf9a24be1
+  Author: Daniel P. Berrange <berrange@redhat.com>
+  Date:   Wed Apr 27 11:05:00 2016 +0100
+
+    migration: add reporting of errors for outgoing migration
+
+
+So the first stack trace is the new duplicate.
+
+Which error reporting context is "better" though, I don't know ?
+
+My patch was based on the view that, although alot of code uses error_rep=
+ort,
+long term all migration would eventually need to be able to filter an
+'Error *errp' back up the stack, so that we can pass it back to QMP / HMP=
+ via
+'info migrate' / query-migrate. So I decided to leave the error_report_er=
+r
+call to the hmp.c code, as long term that's the only place that would nee=
+d
+to print to the console.
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
