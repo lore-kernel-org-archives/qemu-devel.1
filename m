@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fDWj6-0003NF-Lm
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 10:57:58 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fDWlt-0004Yn-Ud
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 11:00:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fDWj2-0002V4-Mc
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 10:57:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47964 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fDWj2-0002Uy-HB
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 10:57:52 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 294A78DC3F
-	for <qemu-devel@nongnu.org>; Tue,  1 May 2018 14:57:47 +0000 (UTC)
-Date: Tue, 1 May 2018 16:57:39 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180501165739.4a680341@redhat.com>
-In-Reply-To: <f62a4655-2d55-dfc7-e332-3da3ce379c56@redhat.com>
-References: <1524841523-95513-1-git-send-email-imammedo@redhat.com>
-	<1524841523-95513-6-git-send-email-imammedo@redhat.com>
-	<f62a4655-2d55-dfc7-e332-3da3ce379c56@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fDWls-0003Se-Mj
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 11:00:50 -0400
+Received: from mail-ot0-x234.google.com ([2607:f8b0:4003:c0f::234]:39948)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fDWls-0003Ri-Gc
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 11:00:48 -0400
+Received: by mail-ot0-x234.google.com with SMTP id n1-v6so13201998otf.7
+	for <qemu-devel@nongnu.org>; Tue, 01 May 2018 08:00:48 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 05/11] qapi: introduce new cmd option
- "allowed-in-preconfig"
+In-Reply-To: <a660c604-5e6e-29c7-ed3f-47e40de8da1b@redhat.com>
+References: <20180501101907.22638-1-peter.maydell@linaro.org>
+	<a660c604-5e6e-29c7-ed3f-47e40de8da1b@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 1 May 2018 16:00:26 +0100
+Message-ID: <CAFEAcA_+gu3fWW9jNwT9DM5Yh2OFgehVDOnckAVACFPouzp58A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] memory.h: Improve IOMMU related
+ documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,193 +30,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, pkrempa@redhat.com, ehabkost@redhat.com, Peter Xu <peterx@redhat.com>, armbru@redhat.com
+To: Auger Eric <eric.auger@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Paolo Bonzini <pbonzini@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, "patches@linaro.org" <patches@linaro.org>
 
-On Fri, 27 Apr 2018 17:05:30 -0500
-Eric Blake <eblake@redhat.com> wrote:
+On 1 May 2018 at 15:32, Auger Eric <eric.auger@redhat.com> wrote:
+> Hi Peter,
+>
+> On 05/01/2018 12:19 PM, Peter Maydell wrote:
+>> Add more detail to the documentation for memory_region_init_iommu()
+>> and other IOMMU-related functions and data structures.
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>> v1 -> v2 changes:
+>>  * documented replay method
+>>  * added note about wanting RCU or big qemu lock while calling
+>>    translate
 
-> On 04/27/2018 10:05 AM, Igor Mammedov wrote:
-> > New option will be used to allow commands, which are prepared/need
-> > to run, during preconfig state. Other commands that should be able
-> > to run in preconfig state, should be ameded to not expect machine  
-> 
-> s/ameded/amended/
-> 
-> > in initialized state or deal with it.
-> > 
-> > For compatibility reasons, commands that don't use new flag
-> > 'allowed-in-preconfig' explicitly are not permitted to run in
-> > preconfig state but allowed in all other states like they used
-> > to be.
-> > 
-> > Within this patch allow following commands in preconfig state:
-> >    qmp_capabilities
-> >    query-qmp-schema
-> >    query-commands
-> >    query-command-line-options
-> >    query-status
-> >    exit-preconfig
-> > to allow qmp connection, basic introspection and moving to the next
-> > state.
-> > 
-> > PS:
-> > set-numa-node and query-hotpluggable-cpus will be enabled later in
-> > a separate patches.
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> > v6:
-> >   * exclude 'cont' command from preconfig enabled, in favor of
-> >     exit-preconfig command
-> >   * makr exit-preconfig with allowed-in-preconfig=true  
-> 
-> s/makr/mark/ (not that the changelog matters to git...)
-> 
-> 
-> > +++ b/docs/devel/qapi-code-gen.txt
-> > @@ -559,7 +559,7 @@ following example objects:
-> >  Usage: { 'command': STRING, '*data': COMPLEX-TYPE-NAME-OR-DICT,
-> >           '*returns': TYPE-NAME, '*boxed': true,
-> >           '*gen': false, '*success-response': false,
-> > -         '*allow-oob': true }
-> > +         '*allow-oob': true, '*allowed-in-preconfig': true }  
-> 
-> Bikeshedding - is it worth naming this just 'allow-preconfig', for a bit
-> more similarity to 'allow-oob'?  It's less typing, and still conveys the
-> same amount of information (allow preconfig to use this command).
-Since I'll need to respin anyways, lets got with shorter name
+Hi; thanks for the review. I have some followup questions where
+my understanding of the IOMMU is weak...
 
-> 
-> >  
-> >  Commands are defined by using a dictionary containing several members,
-> >  where three members are most common.  The 'command' member is a
-> > @@ -683,6 +683,14 @@ OOB command handlers must satisfy the following conditions:
-> >  
-> >  If in doubt, do not implement OOB execution support.
-> >  
-> > +A command may use optional 'allowed-in-preconfig' key to permit
-> > +its execution at early runtime configuration stage (preconfig runstate).
-> > +If not specified then a command defaults to 'allowed-in-preconfig: false'.  
-> 
-> Unusual spelling for JSON:
->  s/'allowed-in-preconfig: false'/'allowed-in-preconfig':false/
-> 
-> and of course, additional tweaks here and in other patches if you like
-> my bikeshedding for a shorter name.
-> 
-> > +
-> > +An example of declaring preconfig enabled command:  
-> 
-> Might read better as:
-> An example of declaring a command that is enabled during preconfig:
-> 
-> > + { 'command': 'qmp_capabilities',
-> > +   'allowed-in-preconfig': true }
-> > +
-> >  === Events ===
-> >  
-> >  Usage: { 'event': STRING, '*data': COMPLEX-TYPE-NAME-OR-DICT,
-> > diff --git a/monitor.c b/monitor.c
-> > index 0ffdf1d..e5e60dc 100644
-> > --- a/monitor.c
-> > +++ b/monitor.c
-> > @@ -1183,7 +1183,7 @@ static void monitor_init_qmp_commands(void)
-> >  
-> >      qmp_register_command(&qmp_commands, "query-qmp-schema",
-> >                           qmp_query_qmp_schema,
-> > -                         QCO_NO_OPTIONS);
-> > +                         QCO_ALLOWED_IN_PRECONFIG);  
-> 
-> I understand why query-qmp-schema is special cased (because it uses
-> 'gen':false in QAPI), but...
-> 
-> >      qmp_register_command(&qmp_commands, "device_add", qmp_device_add,
-> >                           QCO_NO_OPTIONS);
-> >      qmp_register_command(&qmp_commands, "netdev_add", qmp_netdev_add,
-> > @@ -1193,7 +1193,8 @@ static void monitor_init_qmp_commands(void)
-> >  
-> >      QTAILQ_INIT(&qmp_cap_negotiation_commands);
-> >      qmp_register_command(&qmp_cap_negotiation_commands, "qmp_capabilities",
-> > -                         qmp_marshal_qmp_capabilities, QCO_NO_OPTIONS);
-> > +                         qmp_marshal_qmp_capabilities,
-> > +                         QCO_ALLOWED_IN_PRECONFIG);  
-> 
-> ...why are we still special-casing the registration of qmp_capabilities
-> here...
-> 
-> >  }
-> >  
-> >  static bool qmp_cap_enabled(Monitor *mon, QMPCapability cap)
-> > diff --git a/qapi/introspect.json b/qapi/introspect.json
-> > index c7f67b7..8036154 100644
-> > --- a/qapi/introspect.json
-> > +++ b/qapi/introspect.json
-> > @@ -262,13 +262,16 @@
-> >  # @allow-oob: whether the command allows out-of-band execution.
-> >  #             (Since: 2.12)
-> >  #
-> > +# @allowed-in-preconfig: command can be executed in preconfig runstate,
-> > +#                        default: 'false' (Since 2.13)
-> > +#  
-> 
-> If we like the bikeshedding on the QAPI spelling, I think it also
-> applies to the introspection spelling.
-> 
-> 
-> > +++ b/qapi/misc.json
-> > @@ -35,7 +35,8 @@
-> >  #
-> >  ##
-> >  { 'command': 'qmp_capabilities',
-> > -  'data': { '*enable': [ 'QMPCapability' ] } }
-> > +  'data': { '*enable': [ 'QMPCapability' ] },
-> > +  'allowed-in-preconfig': true }  
-> 
-> ...should't this be good enough to get qmp_capabilities registered?  Hmm
-> - maybe that's an independent cleanup (and it might be missed fallout
-> from Peter Xu's OOB work).
-> 
-> 
-> > +++ b/scripts/qapi/common.py  
-> 
-> > @@ -1422,7 +1423,7 @@ class QAPISchemaAlternateType(QAPISchemaType):
-> >  
-> >  class QAPISchemaCommand(QAPISchemaEntity):
-> >      def __init__(self, name, info, doc, arg_type, ret_type,
-> > -                 gen, success_response, boxed, allow_oob):
-> > +                 gen, success_response, boxed, allow_oob, allowed_in_preconfig):  
-> 
-> Borderline long line; I'd wrap it (except that if you use the shorter
-> name allow_preconfig, then there's not a long line issue).
-> 
-> > +++ b/scripts/qapi/doc.py
-> > @@ -226,8 +226,8 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaVisitor):
-> >                                 name=doc.symbol,
-> >                                 body=texi_entity(doc, 'Members')))
-> >  
-> > -    def visit_command(self, name, info, arg_type, ret_type,
-> > -                      gen, success_response, boxed, allow_oob):
-> > +    def visit_command(self, name, info, arg_type, ret_type, gen,
-> > +                      success_response, boxed, allow_oob, allowed_in_preconfig):
-> >          doc = self.cur_doc
-> >          if boxed:
-> >              body = texi_body(doc)  
-> 
-> It's nice that introspection covers whether a command is allowed during
-> preconfig; but wouldn't it also be nice if the documentation also
-> mentioned this attribute?  (Hmm, partly my fault for missing during
-> review of OOB that the same can be said about documentation of allow_oob
-> - so you were just copying existing practice)
-yep, it's pretty much copypast.
-Could you point to a place/example commit that adds documentation?
+>>  include/exec/memory.h | 96 +++++++++++++++++++++++++++++++++++++++----
+>>  1 file changed, 87 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/include/exec/memory.h b/include/exec/memory.h
+>> index 4402ba6c0d..997598c664 100644
+>> --- a/include/exec/memory.h
+>> +++ b/include/exec/memory.h
+>> @@ -194,29 +194,95 @@ enum IOMMUMemoryRegionAttr {
+>>      IOMMU_ATTR_SPAPR_TCE_FD
+>>  };
+>>
+>> +/**
+>> + * IOMMUMemoryRegionClass:
+>> + *
+>> + * All IOMMU implementations need to subclass TYPE_IOMMU_MEMORY_REGION
+>> + * and provide implementations of at least some of the methods here
+>> + * to handle requests to the memory region.
+> of at least the @translate method. Others are optional?
 
-> Overall looks reasonable to me, but see my notes elsewhere in the series
-> about hoisting this earlier in the series while still keeping things
-> compiling (perhaps by splitting the introduction of
-> QCO_ALLOWED_IN_PRECONFIG from the introduction of --preconfig on the
-> command line).
-I'll fix the rest of comments and reshuffle series as you suggest here
-and in previous review comments.
+Yes, that's probably a bit smoother wording.
 
-Thanks!
+>  The minimum requirement
+>> + * is a @translate method.
+
+>> + */
+>>  typedef struct IOMMUMemoryRegionClass {
+>>      /* private */
+>>      struct DeviceClass parent_class;
+>>
+>>      /*
+>>       * Return a TLB entry that contains a given address. Flag should
+>> -     * be the access permission of this translation operation. We can
+>> -     * set flag to IOMMU_NONE to mean that we don't need any
+>> -     * read/write permission checks, like, when for region replay.
+>> +     * be the access permission of this translation operation. The
+>> +     * flag may be set to IOMMU_NONE to mean that we don't need any
+>> +     * read/write permission checks; this is used by the default
+>> +     * implementation of memory_region_iommu_replay(). (See the documentation
+>> +     * of the replay method below for more details.)
+>> +     *
+>> +     * Once the IOMMU has returned a TLB entry, it must notify
+>> +     * the IOMMU's users if that TLB entry changes, using
+>> +     * memory_region_notify_iommu() (or, if necessary, by calling
+>> +     * memory_region_notify_one() for each registered notifier).
+> if caching mode is set (VFIO integration), On the first guest map
+> (invalidation on map), the IOMMU must replay the mapping (notify VFIO)
+> to get the 1st stage of the physical IOMMU programmed. At that moment
+> the IOMMU may not have returned any TLB entry.
+
+I'm afraid you've lost me. What is caching mode, how do you set it,
+how does the IOMMU replay the mapping? More concretely, what change
+needs to be made to this text?
+
+> Maybe it is worth to define the term "IOMMU user", ie. someone who
+> registered an IOMMU notifier? In case the IOMMU is used without
+> vhost/VFIO, there is no registered notifier, however the IOMMU is "used".
+
+I was using "IOMMU user" here in a fairly loose sense to mean anybody
+using these interfaces (ie the code "outside" of the IOMMU implementation).
+
+Maybe we should fix this by removing this paragraph and putting something
+in the introductory "All IOMMU implementations need ..." instead as a
+general description of the IOMMU's responsibilities regarding notifiers.
+
+>> +     *
+>> +     * The returned information remains valid while the caller is
+>> +     * holding the big QEMU lock or is inside an RCU critical section;
+>> +     * if the caller wishes to cache the mapping beyond that it must
+>> +     * register an IOMMU notifier so it can invalidate its cached
+>> +     * information when the IOMMU mapping changes..
+>> +     *
+>> +     * @iommu: the IOMMUMemoryRegion
+>> +     * @hwaddr: address to be translated within the memory region
+>> +     * @flag: requested access permissions
+>>       */
+>>      IOMMUTLBEntry (*translate)(IOMMUMemoryRegion *iommu, hwaddr addr,
+>>                                 IOMMUAccessFlags flag);
+>> -    /* Returns minimum supported page size */
+>> +    /* Returns minimum supported page size in bytes.
+>> +     * If this method is not provided then the minimum is assumed to
+>> +     * be TARGET_PAGE_SIZE.
+>> +     *
+>> +     * @iommu: the IOMMUMemoryRegion
+>> +     */
+>>      uint64_t (*get_min_page_size)(IOMMUMemoryRegion *iommu);
+>> -    /* Called when IOMMU Notifier flag changed */
+>> +    /* Called when IOMMU Notifier flag changes (ie when the set of
+>> +     * events which IOMMU users are requesting notification for changes).
+>> +     * Optional method -- need not be provided if the IOMMU does not
+>> +     * need to know exactly which events must be notified.
+>> +     *
+>> +     * @iommu: the IOMMUMemoryRegion
+>> +     * @old_flags: events which previously needed to be notified
+>> +     * @new_flags: events which now need to be notified
+>> +     */
+>>      void (*notify_flag_changed)(IOMMUMemoryRegion *iommu,
+>>                                  IOMMUNotifierFlag old_flags,
+>>                                  IOMMUNotifierFlag new_flags);
+>> -    /* Set this up to provide customized IOMMU replay function */
+>> +    /* Called to handle memory_region_iommu_replay().
+>> +     *
+>> +     * The default implementation of memory_region_iommu_replay() is to
+>> +     * call the IOMMU translate method for every page in the address space
+>> +     * with flag == IOMMU_NONE
+> generally meaning invalidation?
+
+The flags argument is something I find a bit confusing overall --
+what does it mean to put a transaction through an IOMMU that
+isn't either a read transaction or a write transaction? Do we
+use IOMMU_NONE for anything except this special purpose "I am
+the default replay implementation and just want to cause notifiers
+to be called" ?
+
+>  and then call the notifier if translate
+> I think possibly we could have several notifiers?
+
+This method takes one notifier pointer and is responsible
+for notifying it and only it, I think.
+
+>> +     * returns valid mapping
+> a valid mapping?
+
+Yes.
+
+> . If this method is implemented then it
+>> +     * overrides the default behaviour, and must provide the full semantics
+>> +     * of memory_region_iommu_replay(), by calling @notifier for every
+>> +     * translation present in the IOMMU.
+> by first invalidating the whole range and then calling @notifier for
+> every valid mapping?
+
+Wait, why do we have to invalidate anything? I thought replay was
+purely a "tell the notifier about the current state of the IOMMU"
+function?
+
+>> +     *
+>> +     * Optional method -- an IOMMU only needs to provide this method
+>> +     * if the default is inefficient or produces undesirable side effects.
+>> +     *
+>> +     * Note: this is not related to record-and-replay functionality.
+> The record-and-replay functionality is not obvious to me.
+
+This is just a note to say "this is not anything to do with what the
+rest of the codebase calls 'replay', it's just an in-retrospect
+poorly chosen method name, so don't confuse the two".
+
+>> +     */
+>>      void (*replay)(IOMMUMemoryRegion *iommu, IOMMUNotifier *notifier);
+
+thanks
+-- PMM
