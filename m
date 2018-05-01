@@ -1,35 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fDcY5-0005uW-Sj
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 17:10:58 -0400
+	(envelope-from <eblake@redhat.com>) id 1fDcau-0006lF-KT
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 17:13:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fDcY3-0000dw-8C
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 17:10:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38032)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fDcY3-0000dX-29
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 17:10:55 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fDcY1-0006kR-VZ
-	for <qemu-devel@nongnu.org>; Tue, 01 May 2018 21:10:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id ED81D2E80C9
-	for <qemu-devel@nongnu.org>; Tue,  1 May 2018 21:10:53 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 01 May 2018 21:04:44 -0000
-From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Reply-To: Bug 1768246 <1768246@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152518111080.22177.382728353135880212.malonedeb@soybean.canonical.com>
-	<87fu3b9ytz.fsf@linaro.org>
-Message-Id: <62e7854a-d325-2a06-8296-04ae500a9c41@physik.fu-berlin.de>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1768246] [NEW] cpu-exec.c:648:
- cpu_loop_exec_tb: Assertion `use_icount' failed.
+	(envelope-from <eblake@redhat.com>) id 1fDcas-0001YS-HR
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 17:13:51 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Tue,  1 May 2018 16:13:32 -0500
+Message-Id: <20180501211336.986372-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/4] Support larger NBD_CMD_WRITE_ZEROES
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,65 +18,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, edgar.kaziakhmedov@virtuozzo.com, vsementsov@virtuozzo.com
 
-On 05/01/2018 05:31 PM, Alex Benn=C3=A9e wrote:
->> Haven't bi-sected the issue yet, but will do so later.
-> =
+This is my counterproposal for:
+https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg02107.html
+where Edgar pointed out that NBD write zero requests are rather
+inefficient because the NBD spec was ambiguous on whether we could
+exceed an advertised maximum request size even when the command
+carries no payload, and so for maximum compatibility with unknown
+NBD partners, we erred on the conservative side.
 
-> Hmm that's ominous - arguably the assert should be inside the
-> CONFIG_USER but I'm not sure how you get to the point where icount isn't
-> < 0 after receiving a TB_EXIT_REQUESTED.
+The NBD spec has since been improved to mention that a client can
+try a larger WRITE_ZEROES if it is prepared to handle an EINVAL, and
+that a server should not hang up on overlarge requests that did not
+include a payload.  But in the process it was pointed out that even
+better would be improving the spec to advertise both limits (the
+READ/WRITE payload limit, and the larger TRIM/ZERO limit), as done
+in this series.
 
-git bisect yielded this:
+With this in place, qemu as both NBD client and server can send
+zero requests up to BDRV_REQUEST_MAX_BYTES (nearly 2G) in length,
+rather than having to subdivide the request into 32M chunks.
 
-4834871bc95b67343248100e2a75ae0d287bc08b is the first bad commit
-commit 4834871bc95b67343248100e2a75ae0d287bc08b
-Author: Richard Henderson <rth@twiddle.net>
-Date:   Thu Sep 7 11:50:54 2017 -0700
+This series is experimental until the NBD spec is actually modified
+to document the feature added here; but that modification will be
+easier now that I have a proof-of-concept implementation.
 
-    target/sh4: Convert to DisasJumpType
+Eric Blake (4):
+  nbd: Prepare for additional block sizing info
+  nbd/client: Refactor in preparation for more limits
+  nbd/client: Support requests of additional block sizing info
+  nbd/server: Support requests of additional block sizing info
 
-    Signed-off-by: Richard Henderson <rth@twiddle.net>
-    Message-Id: <20170907185057.23421-3-richard.henderson@linaro.org>
-    [aurel32: fix whitespace]
-    Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+ include/block/nbd.h |   8 +++-
+ block/nbd.c         |  15 +++++-
+ nbd/client.c        | 135 +++++++++++++++++++++++++++++++++++++++++++++++-----
+ nbd/common.c        |   4 ++
+ nbd/server.c        |  30 ++++++++++++
+ nbd/trace-events    |   4 ++
+ 6 files changed, 181 insertions(+), 15 deletions(-)
 
-:040000 040000 6e0e67cc5d0eb5ef461510d314c6af43eecc08bb
-aa3399c893c49e6fafda157181cf10f8fbcd0a72 M      target
-
--- =
-
- .''`.  John Paul Adrian Glaubitz
-: :' :  Debian Developer - glaubitz@debian.org
-`. `'   Freie Universitaet Berlin - glaubitz@physik.fu-berlin.de
-  `-    GPG: 62FF 8A75 84E0 2956 9546  0006 7426 3B37 F5B5 F913
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1768246
-
-Title:
-  cpu-exec.c:648: cpu_loop_exec_tb: Assertion `use_icount' failed.
-
-Status in QEMU:
-  New
-
-Bug description:
-  OpenJDK no longer works on qemu-sh4, it previously did after #1735384
-  was fixed.
-
-  Crash indicates an assertion failure:
-
-  (sid-sh4-sbuild)root@nofan:/# java --version
-  qemu-sh4-static: /root/qemu/accel/tcg/cpu-exec.c:648: cpu_loop_exec_tb: A=
-ssertion `use_icount' failed.
-  qemu: uncaught target signal 6 (Aborted) - core dumped
-  Aborted
-  (sid-sh4-sbuild)root@nofan:/#
-
-  Haven't bi-sected the issue yet, but will do so later.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1768246/+subscriptions
+-- 
+2.14.3
