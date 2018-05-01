@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1fDWBC-0004v2-Lu
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 10:22:56 -0400
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1fDWBC-0004v0-LI
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 10:22:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1fDWB9-00035M-UO
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1fDWB9-00034P-6r
 	for qemu-devel@nongnu.org; Tue, 01 May 2018 10:22:54 -0400
-Received: from mail.uni-paderborn.de ([131.234.142.9]:51918)
+Received: from mail.uni-paderborn.de ([131.234.142.9]:51874)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
-	id 1fDWB9-000347-Nh
+	id 1fDWB8-000333-SR
 	for qemu-devel@nongnu.org; Tue, 01 May 2018 10:22:51 -0400
 From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Date: Tue,  1 May 2018 16:22:14 +0200
-Message-Id: <20180501142222.19154-5-kbastian@mail.uni-paderborn.de>
-In-Reply-To: <20180501142222.19154-1-kbastian@mail.uni-paderborn.de>
-References: <20180501142222.19154-1-kbastian@mail.uni-paderborn.de>
-Subject: [Qemu-devel] [RFC PATCH 04/12] tests/tcg/tricore: Add bmerge test
+Date: Tue,  1 May 2018 16:22:10 +0200
+Message-Id: <20180501142222.19154-1-kbastian@mail.uni-paderborn.de>
+Subject: [Qemu-devel] [RFC PATCH 00/12] tests/tcg: Add TriCore tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,89 +25,86 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: alex.bennee@linaro.org
 
-Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
----
- tests/tcg/tricore/Makefile      |  1 +
- tests/tcg/tricore/macros.h      | 24 ++++++++++++++++++++++++
- tests/tcg/tricore/test_bmerge.S |  8 ++++++++
- 3 files changed, 33 insertions(+)
- create mode 100644 tests/tcg/tricore/test_bmerge.S
+Hi Alex,
 
-diff --git a/tests/tcg/tricore/Makefile b/tests/tcg/tricore/Makefile
-index a0e1f4b20d..34c91dccf5 100644
---- a/tests/tcg/tricore/Makefile
-+++ b/tests/tcg/tricore/Makefile
-@@ -9,6 +9,7 @@ SIM = ../../../tricore-softmmu/qemu-system-tricore
- SIMFLAGS = -M tricore_testboard -nographic -kernel
- 
- TESTCASES += test_abs.tst
-+TESTCASES += test_bmerge.tst
- 
- all: build
- 
-diff --git a/tests/tcg/tricore/macros.h b/tests/tcg/tricore/macros.h
-index 76c133132a..52aa936c56 100644
---- a/tests/tcg/tricore/macros.h
-+++ b/tests/tcg/tricore/macros.h
-@@ -8,7 +8,10 @@
- #define TESTDEV_ADDR 0xf0000000
- /* Register definitions */
- #define DREG_RS1 %d0
-+#define DREG_RS2 %d1
- #define DREG_CALC_RESULT %d1
-+#define DREG_CALC_PSW %d2
-+#define DREG_CORRECT_PSW %d3
- #define DREG_TEMP_LI %d10
- #define DREG_TEMP %d11
- #define DREG_TEST_NUM %d14
-@@ -24,6 +27,17 @@ test_ ## num:                                     \
-     mov DREG_TEST_NUM, num;                       \
-     jne testreg, DREG_CORRECT_RESULT, fail        \
- 
-+#define TEST_CASE_PSW(num, testreg, correct, correct_psw, code...) \
-+test_ ## num:                                                      \
-+    code;                                                          \
-+    LI(DREG_CORRECT_RESULT, correct)                               \
-+    mov DREG_TEST_NUM, num;                                        \
-+    jne testreg, DREG_CORRECT_RESULT, fail;                        \
-+    mfcr DREG_CALC_PSW, $psw;                                      \
-+    LI(DREG_CORRECT_PSW, correct_psw)                              \
-+    mov DREG_TEST_NUM, num;                                        \
-+    jne DREG_CALC_PSW, DREG_CORRECT_PSW, fail;
-+
- /* Actual test case type
-  * e.g inst %dX, %dY      -> TEST_D_D
-  *     inst %dX, %dY, %dZ -> TEST_D_DD
-@@ -35,6 +49,16 @@ test_ ## num:                                     \
-     insn DREG_CALC_RESULT, DREG_RS1;          \
-     )
- 
-+#define TEST_D_DD_PSW(insn, num, result, psw, rs1, rs2) \
-+    TEST_CASE_PSW(num, DREG_CALC_RESULT, result, psw,   \
-+    LI(DREG_RS1, rs1);                                  \
-+    LI(DREG_RS2, rs2);                                  \
-+    rstv;                                               \
-+    insn DREG_CALC_RESULT, DREG_RS1, DREG_RS2;          \
-+    )
-+
-+
-+
- /* Pass/Fail handling part */
- #define TEST_PASSFAIL                       \
-         j pass;                             \
-diff --git a/tests/tcg/tricore/test_bmerge.S b/tests/tcg/tricore/test_bmerge.S
-new file mode 100644
-index 0000000000..8a0fa6d3f6
---- /dev/null
-+++ b/tests/tcg/tricore/test_bmerge.S
-@@ -0,0 +1,8 @@
-+#include "macros.h"
-+.text
-+.global _start
-+_start:
-+    TEST_D_DD_PSW(bmerge, 1, 0x555557f7, 0x00000b80, 0x0000001d, 0x0000ffff)
-+
-+    TEST_PASSFAIL
-+
--- 
+I finally came around converting some of my TriCore regression tests into actual
+tests, that don't require the proprietary Infineon simulator.
+
+These tests are heavily inspired by the riscv-tests [1]. I add macros that
+allow easy testing of single asm instructions.
+
+e.g. for add %d1, %d2, %d3 this looks like
+          insn test_num res  rs1  rs2
+           v      v      v    v    v
+TEST_D_DD(add,    1,    0x3, 0x1, 0x2)
+
+Each of the macros generates code that loads the operands into registers,
+executes the instruction, and finally checks if the result is as expected.
+If the expected result does not match, a guest fail handler is called, that
+writes the test_num to a testdev. This testdev takes the test_num and returns it
+as an status code using exit(). If all tests pass, we jump to a pass handler,
+that writes 0 to the testdev.
+
+Unfortunately, I didn't add any switch to run this automatically on 'make check'
+or similar, since there is no obvious way to integrate the tricore-binutils [2].
+
+You can find the full tree here:
+https://github.com/bkoppelmann/qemu/tree/tcg-tests-tricore
+
+Cheers,
+Bastian
+
+[1] https://github.com/riscv/riscv-tests
+[2] https://github.com/bkoppelmann/tricore-binutils
+
+Bastian Koppelmann (12):
+  hw/tricore: Add testdevice for tests in tests/tcg/
+  tests/tcg/tricore: Add build infrastructure
+  tests/tcg/tricore: Add macros to easily create tests and first test
+    'abs'
+  tests/tcg/tricore: Add bmerge test
+  tests/tcg/tricore: Add clz test
+  tests/tcg/tricore: Add dvstep test
+  tests/tcg/tricore: Add fadd test
+  tests/tcg/tricore: Add fmul test
+  tests/tcg/tricore: Add ftoi test
+  tests/tcg/tricore: Add madd test
+  tests/tcg/tricore: Add msub test
+  tests/tcg/tricore: Add muls test
+
+ hw/tricore/Makefile.objs                |   1 +
+ hw/tricore/tricore_testboard.c          |   8 ++
+ hw/tricore/tricore_testdevice.c         |  81 ++++++++++++++++++++
+ include/hw/tricore/tricore_testdevice.h |  38 ++++++++++
+ tests/tcg/tricore/Makefile              |  41 ++++++++++
+ tests/tcg/tricore/link.ld               |  60 +++++++++++++++
+ tests/tcg/tricore/macros.h              | 129 ++++++++++++++++++++++++++++++++
+ tests/tcg/tricore/test_abs.S            |   8 ++
+ tests/tcg/tricore/test_bmerge.S         |   8 ++
+ tests/tcg/tricore/test_clz.S            |   9 +++
+ tests/tcg/tricore/test_dvstep.S         |  15 ++++
+ tests/tcg/tricore/test_fadd.S           |  16 ++++
+ tests/tcg/tricore/test_fmul.S           |   8 ++
+ tests/tcg/tricore/test_ftoi.S           |  10 +++
+ tests/tcg/tricore/test_madd.S           |  11 +++
+ tests/tcg/tricore/test_msub.S           |   9 +++
+ tests/tcg/tricore/test_muls.S           |   9 +++
+ 17 files changed, 461 insertions(+)
+ create mode 100644 hw/tricore/tricore_testdevice.c
+ create mode 100644 include/hw/tricore/tricore_testdevice.h
+ create mode 100644 tests/tcg/tricore/Makefile
+ create mode 100644 tests/tcg/tricore/link.ld
+ create mode 100644 tests/tcg/tricore/macros.h
+ create mode 100644 tests/tcg/tricore/test_abs.S
+ create mode 100644 tests/tcg/tricore/test_bmerge.S
+ create mode 100644 tests/tcg/tricore/test_clz.S
+ create mode 100644 tests/tcg/tricore/test_dvstep.S
+ create mode 100644 tests/tcg/tricore/test_fadd.S
+ create mode 100644 tests/tcg/tricore/test_fmul.S
+ create mode 100644 tests/tcg/tricore/test_ftoi.S
+ create mode 100644 tests/tcg/tricore/test_madd.S
+ create mode 100644 tests/tcg/tricore/test_msub.S
+ create mode 100644 tests/tcg/tricore/test_muls.S
+
+--
 2.11.0
