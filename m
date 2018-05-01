@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45656)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fDLbH-00070j-4I
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 23:05:08 -0400
+	id 1fDLiB-00087g-Vv
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 23:12:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fDLbD-0001UJ-63
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 23:05:07 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:38522)
+	id 1fDLi7-0004KK-Vt
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 23:12:15 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:35825)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fDLbD-0001U1-1X
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 23:05:03 -0400
-Received: by mail-qk0-x244.google.com with SMTP id b39so8133509qkb.5
-	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 20:05:02 -0700 (PDT)
+	id 1fDLi7-0004K7-RU
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 23:12:11 -0400
+Received: by mail-qt0-x243.google.com with SMTP id f5-v6so58859qth.2
+	for <qemu-devel@nongnu.org>; Mon, 30 Apr 2018 20:12:11 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20180430200223.4119-1-marcel.apfelbaum@gmail.com>
-	<20180430200223.4119-3-marcel.apfelbaum@gmail.com>
+References: <20180430170156.1860-1-laurent@vivier.eu>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <00227645-5568-c8ac-5c50-c2ed246ad3da@amsat.org>
-Date: Tue, 1 May 2018 00:04:48 -0300
+Message-ID: <e051ffeb-fee1-2f20-d011-6b6f9b5181ab@amsat.org>
+Date: Tue, 1 May 2018 00:11:56 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180430200223.4119-3-marcel.apfelbaum@gmail.com>
+In-Reply-To: <20180430170156.1860-1-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/7] hw/rdma: Fix possible usage of a NULL
- pointer
+Subject: Re: [Qemu-devel] [PATCH 1/2] m68k: Fix floatx80_lognp1 (Coverity
+ CID1390587)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,34 +35,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, yuval.shaia@oracle.com
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
 
-On 04/30/2018 05:02 PM, Marcel Apfelbaum wrote:
-> Coverity CID 1390586; The cq handle is provided by the guest
-> and cannot be trusted to be previuosly allocated.
-> Fix it by exiting the completion flow.
+On 04/30/2018 02:01 PM, Laurent Vivier wrote:
+> return the result of packFloatx80() instead of
+> dropping it.
+
+             (missed in 4b5c65b8f02).
+
 > 
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  hw/rdma/vmw/pvrdma_qp_ops.c | 1 +
->  1 file changed, 1 insertion(+)
+>  target/m68k/softfloat.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.c
-> index 750ade6c31..99bb51111e 100644
-> --- a/hw/rdma/vmw/pvrdma_qp_ops.c
-> +++ b/hw/rdma/vmw/pvrdma_qp_ops.c
-> @@ -216,6 +216,7 @@ void pvrdma_cq_poll(RdmaDeviceResources *dev_res, uint32_t cq_handle)
->      cq = rdma_rm_get_cq(dev_res, cq_handle);
->      if (!cq) {
->          pr_dbg("Invalid CQ# %d\n", cq_handle);
-> +        return;
->      }
->  
->      rdma_backend_poll_cq(dev_res, &cq->backend_cq);
+> diff --git a/target/m68k/softfloat.c b/target/m68k/softfloat.c
+> index dffb371c71..2c069a5efb 100644
+> --- a/target/m68k/softfloat.c
+> +++ b/target/m68k/softfloat.c
+> @@ -334,7 +334,8 @@ floatx80 floatx80_lognp1(floatx80 a, float_status *status)
+>      if (aSign && aExp >= one_exp) {
+>          if (aExp == one_exp && aSig == one_sig) {
+>              float_raise(float_flag_divbyzero, status);
+> -            packFloatx80(aSign, floatx80_infinity.high, floatx80_infinity.low);
+> +            return packFloatx80(aSign, floatx80_infinity.high,
+> +                                floatx80_infinity.low);
+>          }
+>          float_raise(float_flag_invalid, status);
+>          return floatx80_default_nan(status);
 > 
