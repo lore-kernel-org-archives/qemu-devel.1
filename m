@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fDcau-0006lF-KT
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 17:13:53 -0400
+	(envelope-from <eblake@redhat.com>) id 1fDcav-0006m2-VC
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 17:13:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fDcas-0001YS-HR
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 17:13:51 -0400
+	(envelope-from <eblake@redhat.com>) id 1fDcau-0001Zx-Re
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 17:13:53 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Tue,  1 May 2018 16:13:32 -0500
-Message-Id: <20180501211336.986372-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/4] Support larger NBD_CMD_WRITE_ZEROES
+Date: Tue,  1 May 2018 16:13:33 -0500
+Message-Id: <20180501211336.986372-2-eblake@redhat.com>
+In-Reply-To: <20180501211336.986372-1-eblake@redhat.com>
+References: <20180501211336.986372-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/4] nbd: Prepare for additional block sizing
+ info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,45 +21,65 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, edgar.kaziakhmedov@virtuozzo.com, vsementsov@virtuozzo.com
+Cc: qemu-block@nongnu.org, edgar.kaziakhmedov@virtuozzo.com, vsementsov@virtuozzo.com, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-This is my counterproposal for:
-https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg02107.html
-where Edgar pointed out that NBD write zero requests are rather
-inefficient because the NBD spec was ambiguous on whether we could
-exceed an advertised maximum request size even when the command
-carries no payload, and so for maximum compatibility with unknown
-NBD partners, we erred on the conservative side.
+The NBD spec is clarifying [1] that a server may want to advertise
+different limits for READ/WRITE (in our case, 32M) than for
+TRIM/ZERO (in our case, nearly 4G).  Add the constants and name
+lookups for new NBD_INFO_ fields used during handshake to convey
+this additional information.  Note that the NBD spec already
+requires servers to ignore unknown requests from the client, and
+for clients to ignore unknown gratuitous responses sent from
+the server.
 
-The NBD spec has since been improved to mention that a client can
-try a larger WRITE_ZEROES if it is prepared to handle an EINVAL, and
-that a server should not hang up on overlarge requests that did not
-include a payload.  But in the process it was pointed out that even
-better would be improving the spec to advertise both limits (the
-READ/WRITE payload limit, and the larger TRIM/ZERO limit), as done
-in this series.
+[1] https://lists.debian.org/nbd/2018/03/msg00048.html
 
-With this in place, qemu as both NBD client and server can send
-zero requests up to BDRV_REQUEST_MAX_BYTES (nearly 2G) in length,
-rather than having to subdivide the request into 32M chunks.
+Signed-off-by: Eric Blake <eblake@redhat.com>
 
-This series is experimental until the NBD spec is actually modified
-to document the feature added here; but that modification will be
-easier now that I have a proof-of-concept implementation.
+---
 
-Eric Blake (4):
-  nbd: Prepare for additional block sizing info
-  nbd/client: Refactor in preparation for more limits
-  nbd/client: Support requests of additional block sizing info
-  nbd/server: Support requests of additional block sizing info
+The given URL for the NBD spec was v3; it will change to be a v4
+version of that patch in part to point back to this qemu commit
+as a proof of implementation.
+---
+ include/block/nbd.h | 4 +++-
+ nbd/common.c        | 4 ++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
- include/block/nbd.h |   8 +++-
- block/nbd.c         |  15 +++++-
- nbd/client.c        | 135 +++++++++++++++++++++++++++++++++++++++++++++++-----
- nbd/common.c        |   4 ++
- nbd/server.c        |  30 ++++++++++++
- nbd/trace-events    |   4 ++
- 6 files changed, 181 insertions(+), 15 deletions(-)
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index fcdcd545023..cbf51628f78 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -1,5 +1,5 @@
+ /*
+- *  Copyright (C) 2016-2017 Red Hat, Inc.
++ *  Copyright (C) 2016-2018 Red Hat, Inc.
+  *  Copyright (C) 2005  Anthony Liguori <anthony@codemonkey.ws>
+  *
+  *  Network Block Device
+@@ -180,6 +180,8 @@ typedef struct NBDExtent {
+ #define NBD_INFO_NAME           1
+ #define NBD_INFO_DESCRIPTION    2
+ #define NBD_INFO_BLOCK_SIZE     3
++#define NBD_INFO_TRIM_SIZE      4
++#define NBD_INFO_ZERO_SIZE      5
 
+ /* Request flags, sent from client to server during transmission phase */
+ #define NBD_CMD_FLAG_FUA        (1 << 0) /* 'force unit access' during write */
+diff --git a/nbd/common.c b/nbd/common.c
+index 8c95c1d606e..840c91d5ca4 100644
+--- a/nbd/common.c
++++ b/nbd/common.c
+@@ -129,6 +129,10 @@ const char *nbd_info_lookup(uint16_t info)
+         return "description";
+     case NBD_INFO_BLOCK_SIZE:
+         return "block size";
++    case NBD_INFO_TRIM_SIZE:
++        return "trim size";
++    case NBD_INFO_ZERO_SIZE:
++        return "zero size";
+     default:
+         return "<unknown>";
+     }
 -- 
 2.14.3
