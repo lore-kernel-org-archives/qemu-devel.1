@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fDeAY-00073I-Ah
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 18:54:47 -0400
+	(envelope-from <eblake@redhat.com>) id 1fDeil-0004aE-8C
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 19:30:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fDeAV-0003g4-7d
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 18:54:46 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:45595)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fDeAV-0003fp-2k
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 18:54:43 -0400
-Received: by mail-qt0-x241.google.com with SMTP id j42-v6so16207369qtj.12
-	for <qemu-devel@nongnu.org>; Tue, 01 May 2018 15:54:42 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1525043888-90983-1-git-send-email-mjc@sifive.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f068146e-f715-9399-7596-6305e036fc67@amsat.org>
-Date: Tue, 1 May 2018 19:54:38 -0300
+	(envelope-from <eblake@redhat.com>) id 1fDeik-0008BE-Ad
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 19:30:07 -0400
+References: <20180501220509.14152-1-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6a375bc6-12c8-648b-288b-d256ab040825@redhat.com>
+Date: Tue, 1 May 2018 18:29:52 -0500
 MIME-Version: 1.0
-In-Reply-To: <1525043888-90983-1-git-send-email-mjc@sifive.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180501220509.14152-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] RISC-V: Fix missing break statement in
- disassembler
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/2] block/mirror: Make cancel always
+ cancel pre-READY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,38 +24,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, patches@groups.riscv.org
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
 
-On 04/29/2018 08:18 PM, Michael Clark wrote:
-> This fixes an issue when disassembling rv128 c.sqsp,
-> where the code erroneously fell through to c.swsp.
-> 
-> Cc: Palmer Dabbelt <palmer@sifive.com>
-> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Michael Clark <mjc@sifive.com>
+On 05/01/2018 05:05 PM, Max Reitz wrote:
+> Currently, you cannot cancel a mirror job without the @force flag set.
+> This is intentional once source and target are in sync, but probably no=
+t
+> so much before that happens.  The main reason for me thinking this is
+> because it is an undocumented change in 2.12.0 in respect to 2.11.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Yeah, that definitely feels like a regression worth fixing.
 
-> ---
->  disas/riscv.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/disas/riscv.c b/disas/riscv.c
-> index 74ad16eacdd3..ea19f6fbe2b1 100644
-> --- a/disas/riscv.c
-> +++ b/disas/riscv.c
-> @@ -1470,8 +1470,9 @@ static void decode_inst_opcode(rv_decode *dec, rv_isa isa)
->              if (isa == rv128) {
->                  op = rv_op_c_sqsp;
->              } else {
-> -                op = rv_op_c_fsdsp; break;
-> +                op = rv_op_c_fsdsp;
->              }
-> +            break;
->          case 6: op = rv_op_c_swsp; break;
->          case 7:
->              if (isa == rv32) {
-> 
+>=20
+> (b76e4458b1eb3c32e9824fe6aa51f67d2b251748 only notes a behavior change
+>   after READY, but not before.)
+>=20
+>=20
+> This series depends on Stefan=E2=80=99s patch =E2=80=9Cblock/mirror: ho=
+nor ratelimit
+> again=E2=80=9D (which is in Jeff=E2=80=99s queue).
+>=20
+> Based-on: <20180424123527.19168-1-stefanha@redhat.com>
+>=20
+
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
