@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fDWlt-0004Yn-Ud
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 11:00:51 -0400
+	(envelope-from <Matthew.Fortune@mips.com>) id 1fDWrz-0006KZ-1l
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 11:07:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fDWls-0003Se-Mj
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 11:00:50 -0400
-Received: from mail-ot0-x234.google.com ([2607:f8b0:4003:c0f::234]:39948)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fDWls-0003Ri-Gc
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 11:00:48 -0400
-Received: by mail-ot0-x234.google.com with SMTP id n1-v6so13201998otf.7
-	for <qemu-devel@nongnu.org>; Tue, 01 May 2018 08:00:48 -0700 (PDT)
+	(envelope-from <Matthew.Fortune@mips.com>) id 1fDWrv-00063x-MJ
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 11:07:07 -0400
+Received: from 9pmail.ess.barracuda.com ([64.235.150.224]:53481)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Matthew.Fortune@mips.com>)
+	id 1fDWrv-00062l-GB
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 11:07:03 -0400
+From: Matthew Fortune <Matthew.Fortune@mips.com>
+Date: Tue, 1 May 2018 15:07:14 +0000
+Message-ID: <02284e13e9c541cda32051204e64fa66@mips.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <a660c604-5e6e-29c7-ed3f-47e40de8da1b@redhat.com>
-References: <20180501101907.22638-1-peter.maydell@linaro.org>
-	<a660c604-5e6e-29c7-ed3f-47e40de8da1b@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 1 May 2018 16:00:26 +0100
-Message-ID: <CAFEAcA_+gu3fWW9jNwT9DM5Yh2OFgehVDOnckAVACFPouzp58A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] memory.h: Improve IOMMU related
- documentation
+Subject: [Qemu-devel] Introducing a nanoMIPS port for QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,174 +26,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Paolo Bonzini <pbonzini@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, "patches@linaro.org" <patches@linaro.org>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Yongbok Kim <Yongbok.Kim@mips.com>, Stefan Markovic <Stefan.Markovic@mips.com>, Aleksandar Rikalo <Aleksandar.Rikalo@mips.com>, Dimitrije Nikolic <Dimitrije.Nikolic@mips.com>, James Hogan <James.Hogan@mips.com>, Paul Burton <Paul.Burton@mips.com>
 
-On 1 May 2018 at 15:32, Auger Eric <eric.auger@redhat.com> wrote:
-> Hi Peter,
->
-> On 05/01/2018 12:19 PM, Peter Maydell wrote:
->> Add more detail to the documentation for memory_region_init_iommu()
->> and other IOMMU-related functions and data structures.
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->> v1 -> v2 changes:
->>  * documented replay method
->>  * added note about wanting RCU or big qemu lock while calling
->>    translate
+Earlier today MIPS Tech announced the latest generation of the MIPS family =
+of
+architectures called nanoMIPS [1]. As part of the development we have been
+designing all the open source tools necessary to support the architecture a=
+nd,
+thanks to the speed with which we were able to prototype, we have also been
+using these tools to shape the architecture along the way. This has led to =
+some
+really interesting improvements in the tools, which MIPS would like to
+contribute back to the community. While doing this work many of us have bee=
+n
+unable to contribute to the community as actively as we would have liked, w=
+e
+are therefore very grateful for the community support given to the MIPS
+architecture over the last 18 months. This announcement has a general
+introduction at the start, so if you have already read it for one of the ot=
+her
+tools, you can skip down to the information specific to QEMU.
 
-Hi; thanks for the review. I have some followup questions where
-my understanding of the IOMMU is weak...
+For anyone who knows the MIPS architecture you may well wonder why we are
+introducing another major variant and the question is perfectly valid. We d=
+o
+admittedly have quite a few: MIPS I through MIPS IV, MIPS32 and MIPS64 thro=
+ugh
+to MIPS32R6 and MIPS64R6, MIPS16e, MIPS16e2, microMIPSR3 and microMIPSR6. E=
+ach
+of these serves (or served) a purpose and there is a high level of synergy
+between all of them. In general, they build upon the previous and there is =
+a
+high level of compatibility, even when switching to a new encoding like mov=
+ing
+from MIPS to microMIPS. The switch to MIPS32R6/MIPS64R6 was a major shift i=
+n
+the way the architecture innovated and drew more on the original theory of =
+the
+architecture, where evolution was not expected to be limited by binary
+compatibility. MIPS Release 6 removed instructions and did create some very
+minor incompatibility but is also much cleaner to implement from a
+micro-architecture perspective. We have taken this idea much further with
+nanoMIPS and reimagined the instruction set, by drawing on all the experien=
+ce
+gained from previous designs. Hopefully others will find it as interesting =
+as
+we do.
 
->>  include/exec/memory.h | 96 +++++++++++++++++++++++++++++++++++++++----
->>  1 file changed, 87 insertions(+), 9 deletions(-)
->>
->> diff --git a/include/exec/memory.h b/include/exec/memory.h
->> index 4402ba6c0d..997598c664 100644
->> --- a/include/exec/memory.h
->> +++ b/include/exec/memory.h
->> @@ -194,29 +194,95 @@ enum IOMMUMemoryRegionAttr {
->>      IOMMU_ATTR_SPAPR_TCE_FD
->>  };
->>
->> +/**
->> + * IOMMUMemoryRegionClass:
->> + *
->> + * All IOMMU implementations need to subclass TYPE_IOMMU_MEMORY_REGION
->> + * and provide implementations of at least some of the methods here
->> + * to handle requests to the memory region.
-> of at least the @translate method. Others are optional?
+The major driving force behind the nanoMIPS architecture was to achieve
+outstanding code density, while also balancing out hardware and software de=
+sign
+cost. As background MIPS has two compressed ISA variants: MIPS16e, which ca=
+nnot
+exist without also implementing MIPS32, and microMIPS, which can exist on i=
+ts
+own. Since MIPS16e has specific limits that cannot be engineered around, we
+chose to use an approach similar to the microMIPS design.
 
-Yes, that's probably a bit smoother wording.
+nanoMIPS has a variable-length compressed instruction set that is completel=
+y
+standalone from the other MIPS ISAs. It is designed to compress the highest
+frequency instructions to 16-bits, and use 48-bit instructions to efficient=
+ly
+encode 32-bit constants into the instruction stream. There is also a wider
+range of 32-bit instructions, which merge carefully chosen high frequency
+instruction sequences into single operations creating more flexible address=
+ing
+modes such as indexed and scaled indexed addressing, branch compare with
+immediate and macro style instructions. The macro like instructions compres=
+s
+prologue and epilogue sequences, as well as a small number of high frequenc=
+y
+instruction pairs like two move instructions or a move and function call.
+nanoMIPS also totally eliminates branch delay slots which follows a precede=
+nt
+set by microMIPSR6.
 
->  The minimum requirement
->> + * is a @translate method.
+To get the best from a new ISA we also re-engineered the ABI and created a =
+new
+symbiotic relationship between the ISA and ABI that pushes code density and
+performance further still. The ABI creates a fully link time relaxable mode=
+l,
+which enables us to squeeze every last byte out of the code image even when
+deferring final addressing mode and layout decisions to link time. We have =
+been
+mindful of MIPS heritage and ensured that while open to any possible change=
+, we
+also have minimal impact when porting code from MIPS to nanoMIPS, and have
+plenty of support to achieve source compatibility between the two.
 
->> + */
->>  typedef struct IOMMUMemoryRegionClass {
->>      /* private */
->>      struct DeviceClass parent_class;
->>
->>      /*
->>       * Return a TLB entry that contains a given address. Flag should
->> -     * be the access permission of this translation operation. We can
->> -     * set flag to IOMMU_NONE to mean that we don't need any
->> -     * read/write permission checks, like, when for region replay.
->> +     * be the access permission of this translation operation. The
->> +     * flag may be set to IOMMU_NONE to mean that we don't need any
->> +     * read/write permission checks; this is used by the default
->> +     * implementation of memory_region_iommu_replay(). (See the documentation
->> +     * of the replay method below for more details.)
->> +     *
->> +     * Once the IOMMU has returned a TLB entry, it must notify
->> +     * the IOMMU's users if that TLB entry changes, using
->> +     * memory_region_notify_iommu() (or, if necessary, by calling
->> +     * memory_region_notify_one() for each registered notifier).
-> if caching mode is set (VFIO integration), On the first guest map
-> (invalidation on map), the IOMMU must replay the mapping (notify VFIO)
-> to get the 1st stage of the physical IOMMU programmed. At that moment
-> the IOMMU may not have returned any TLB entry.
+The net effect of these changes leads to an average code size reduction of =
+20%
+relative to microMIPSR6. This compression could well be one of the best
+achieved by GNU tools for any RISC ISA. Comparing the ISA in terms of numbe=
+r of
+instructions to issue vs microMIPS we also see a reduction of between 8% an=
+d
+11% of dynamic instruction count.
 
-I'm afraid you've lost me. What is caching mode, how do you set it,
-how does the IOMMU replay the mapping? More concretely, what change
-needs to be made to this text?
+Below we dig into some technical specifics for QEMU; we welcome any feedbac=
+k
+and questions as we start to look at rebasing this work to the trunk/master
+and formally submitting it. nanoMIPS pre-built toolchains and source code
+tarballs are available at:
 
-> Maybe it is worth to define the term "IOMMU user", ie. someone who
-> registered an IOMMU notifier? In case the IOMMU is used without
-> vhost/VFIO, there is no registered notifier, however the IOMMU is "used".
+http://codescape.mips.com/components/toolchain/nanomips/2018.04-02/
 
-I was using "IOMMU user" here in a fairly loose sense to mean anybody
-using these interfaces (ie the code "outside" of the IOMMU implementation).
+QEMU specific details
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-Maybe we should fix this by removing this paragraph and putting something
-in the introductory "All IOMMU implementations need ..." instead as a
-general description of the IOMMU's responsibilities regarding notifiers.
+The nanoMIPS QEMU port borrows a significant amount of logic from the MIPS
+port. Most instructions in nanoMIPS exist in one of the other MIPS ISAs, wh=
+ich
+allows the new decoder to hook into existing logic. Some of the more
+interesting technical changes include:
 
->> +     *
->> +     * The returned information remains valid while the caller is
->> +     * holding the big QEMU lock or is inside an RCU critical section;
->> +     * if the caller wishes to cache the mapping beyond that it must
->> +     * register an IOMMU notifier so it can invalidate its cached
->> +     * information when the IOMMU mapping changes..
->> +     *
->> +     * @iommu: the IOMMUMemoryRegion
->> +     * @hwaddr: address to be translated within the memory region
->> +     * @flag: requested access permissions
->>       */
->>      IOMMUTLBEntry (*translate)(IOMMUMemoryRegion *iommu, hwaddr addr,
->>                                 IOMMUAccessFlags flag);
->> -    /* Returns minimum supported page size */
->> +    /* Returns minimum supported page size in bytes.
->> +     * If this method is not provided then the minimum is assumed to
->> +     * be TARGET_PAGE_SIZE.
->> +     *
->> +     * @iommu: the IOMMUMemoryRegion
->> +     */
->>      uint64_t (*get_min_page_size)(IOMMUMemoryRegion *iommu);
->> -    /* Called when IOMMU Notifier flag changed */
->> +    /* Called when IOMMU Notifier flag changes (ie when the set of
->> +     * events which IOMMU users are requesting notification for changes).
->> +     * Optional method -- need not be provided if the IOMMU does not
->> +     * need to know exactly which events must be notified.
->> +     *
->> +     * @iommu: the IOMMUMemoryRegion
->> +     * @old_flags: events which previously needed to be notified
->> +     * @new_flags: events which now need to be notified
->> +     */
->>      void (*notify_flag_changed)(IOMMUMemoryRegion *iommu,
->>                                  IOMMUNotifierFlag old_flags,
->>                                  IOMMUNotifierFlag new_flags);
->> -    /* Set this up to provide customized IOMMU replay function */
->> +    /* Called to handle memory_region_iommu_replay().
->> +     *
->> +     * The default implementation of memory_region_iommu_replay() is to
->> +     * call the IOMMU translate method for every page in the address space
->> +     * with flag == IOMMU_NONE
-> generally meaning invalidation?
+- The Unified Hosting Interface (UHI) for semihosting is supported and,
+  in-keeping with the aims of the interface, the same ABI is used with nano=
+MIPS
+  as MIPS
+- Linux user-mode support has been updated significantly, compared to MIPS,=
+ to
+  follow the new nanoMIPS ABI which utilizes most of the generic syscall an=
+d
+  signal infrastructure from the Linux kernel
 
-The flags argument is something I find a bit confusing overall --
-what does it mean to put a transaction through an IOMMU that
-isn't either a read transaction or a write transaction? Do we
-use IOMMU_NONE for anything except this special purpose "I am
-the default replay implementation and just want to cause notifiers
-to be called" ?
+The QEMU build targets for nanoMIPS are nanomips-softmmu and
+nanomips-linux-user, rather than the existing mips targets, because nanoMIP=
+S is
+not designed for use alongside any other MIPS ISA.
 
->  and then call the notifier if translate
-> I think possibly we could have several notifiers?
+QEMU contributors:
 
-This method takes one notifier pointer and is responsible
-for notifying it and only it, I think.
+- QEMU
+  Yongbok Kim, Stefan Markovic, Aleksandar Rikalo, Dimitrije Nikolic
+  Aleksandra Karadzic, Matthew Fortune, Paul Burton, James Hogan
 
->> +     * returns valid mapping
-> a valid mapping?
-
-Yes.
-
-> . If this method is implemented then it
->> +     * overrides the default behaviour, and must provide the full semantics
->> +     * of memory_region_iommu_replay(), by calling @notifier for every
->> +     * translation present in the IOMMU.
-> by first invalidating the whole range and then calling @notifier for
-> every valid mapping?
-
-Wait, why do we have to invalidate anything? I thought replay was
-purely a "tell the notifier about the current state of the IOMMU"
-function?
-
->> +     *
->> +     * Optional method -- an IOMMU only needs to provide this method
->> +     * if the default is inefficient or produces undesirable side effects.
->> +     *
->> +     * Note: this is not related to record-and-replay functionality.
-> The record-and-replay functionality is not obvious to me.
-
-This is just a note to say "this is not anything to do with what the
-rest of the codebase calls 'replay', it's just an in-retrospect
-poorly chosen method name, so don't confuse the two".
-
->> +     */
->>      void (*replay)(IOMMUMemoryRegion *iommu, IOMMUNotifier *notifier);
-
-thanks
--- PMM
+[1] https://www.mips.com/press/new-mips-i7200-processor-core-delivers-unmat=
+ched-performance-and-efficiency-for-advanced-lte5g-communications-and-netwo=
+rking-ic-designs/
