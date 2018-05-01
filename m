@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([208.118.235.92]:42935)
+Received: from eggs.gnu.org ([208.118.235.92]:46981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fDXOH-0007rD-4p
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 11:40:30 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fDXUq-0003F9-Hi
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 11:47:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fDXOG-0005iA-AS
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 11:40:29 -0400
-References: <20180428163442.6238-1-mreitz@redhat.com>
-	<20180428163442.6238-3-mreitz@redhat.com>
-	<f2529cb3-1ef0-3608-0b91-18026e523a46@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <ee0e3380-23ad-5c5c-ef52-8a9cfcddc5c5@redhat.com>
-Date: Tue, 1 May 2018 17:40:05 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1fDXUl-0001Ls-MA
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 11:47:16 -0400
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:39657)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fDXUl-0001L6-9M
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 11:47:11 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id f8so9110979wmc.4
+	for <qemu-devel@nongnu.org>; Tue, 01 May 2018 08:47:11 -0700 (PDT)
+References: <20180425012300.14698-1-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180425012300.14698-1-richard.henderson@linaro.org>
+Date: Tue, 01 May 2018 16:47:08 +0100
+Message-ID: <87d0yf9y4j.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <f2529cb3-1ef0-3608-0b91-18026e523a46@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="wAL6qP4by6XOUf8ZyOrkabzHKy9LFEXiH"
-Subject: Re: [Qemu-devel] [PATCH 2/2] iotests: Repairing error during
- snapshot deletion
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/9] target/arm: Fixups for
+ ARM_FEATURE_V8_FP16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,82 +30,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wAL6qP4by6XOUf8ZyOrkabzHKy9LFEXiH
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <ee0e3380-23ad-5c5c-ef52-8a9cfcddc5c5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] iotests: Repairing error during snapshot
- deletion
-References: <20180428163442.6238-1-mreitz@redhat.com>
- <20180428163442.6238-3-mreitz@redhat.com>
- <f2529cb3-1ef0-3608-0b91-18026e523a46@redhat.com>
-In-Reply-To: <f2529cb3-1ef0-3608-0b91-18026e523a46@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2018-04-30 18:01, Eric Blake wrote:
-> On 04/28/2018 11:34 AM, Max Reitz wrote:
->> This adds a test for an I/O error during snapshot deletion, and maybe
->> more importantly, for how to repair the resulting image.=C2=A0 If the
->> snapshot has been deleted before the error occurs, the only negative
->> result will be leaked clusters -- and those should be repairable with
->> qemu-img check -r leaks.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->> =C2=A0 tests/qemu-iotests/217=C2=A0=C2=A0=C2=A0=C2=A0 | 89
->> ++++++++++++++++++++++++++++++++++++++++++++++
->> =C2=A0 tests/qemu-iotests/217.out | 42 ++++++++++++++++++++++
->> =C2=A0 tests/qemu-iotests/group=C2=A0=C2=A0 |=C2=A0 1 +
->> =C2=A0 3 files changed, 132 insertions(+)
->> =C2=A0 create mode 100755 tests/qemu-iotests/217
->> =C2=A0 create mode 100644 tests/qemu-iotests/217.out
->>
->=20
->> +
->> +# Internal snapshots are (currently) impossible with refcount_bits=3D=
-1
->> +_unsupported_imgopts 'refcount_bits=3D1[^0-9]'
->> +
->=20
-> And even if they are made possible (by cloning clusters instead of
-> incrementing refcounts), you STILL need a refcount > 1 to test the
-> particular repair functionality just fixed.
-
-Ah, right...
-
-> Up to you if you want to reword that comment a bit.
-
-Yes, will do.  ("This test needs clusters with at least a refcount of 2
-so that OFLAG_COPIED is not set.  refcount_bits=3D1 is therefore
-unsupported.")
-
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-(As always,) thanks!
-
-Max
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
 
---wAL6qP4by6XOUf8ZyOrkabzHKy9LFEXiH
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Richard Henderson <richard.henderson@linaro.org> writes:
 
------BEGIN PGP SIGNATURE-----
+> When running the gcc testsuite with current aarch64-linux-user,
+> the testsuite detects the presence of the fp16 extension and
+> enables lots of extra tests for builtins.
+>
+> Quite a few of these new tests fail because we missed implementing
+> some instructions.  We really should go back and verify that nothing
+> else is missing from this (rather large) extension.
+>
+> In addition, it tests some edge conditions on data that show flaws
+> in the way we were performing integer<->fp conversion; particularly
+> with respect to scaled conversion.
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlroilUACgkQ9AfbAGHV
-z0BzlQgAvqOtOp2jV3W6EmFCnic8XUw+CcZDrzuoDIRSPwhEbYUxZGGYPhSNFcgj
-tdX27L0pDLX8GK8WtAdejEckmuzxvkSe35D4bNTMetXp7uEAyLXtXysOBd+U86M2
-Ou9Wyl/a37BK5cn0wHr93JLp4mQBzNYVBdDBIJADi2AfubPhvO+xCjNsqLVegfnH
-ftTGnTsi4iDQijKdO94yGzK+CCysZrImeAFfy2dClH6wmYcnlP82B14vJ4iS/wTz
-rNZaj4rlzpwpaaXZjqi05BBvX+qQ89RIZckL8sujr8ArfpS+JuIHwrDc2c/oA3xF
-v5UX9OE8NxxEpRXcxKwtkufKaMT5Tg==
-=JTTy
------END PGP SIGNATURE-----
+I've finished reviewing this patch set.
 
---wAL6qP4by6XOUf8ZyOrkabzHKy9LFEXiH--
+> PS: FWIW, this was written against my tgt-arm-sve-9 tree, since I
+> was trying to test sve as generated by gcc.  I don't *think* there
+> are any dependencies on any of the sve patches, but I didn't check.
+
+They aren't.
+
+>
+> PPS: There are two more failures that might be qemu fp16 failures,
+> but those are SIGSEGV.  This patch set cures all of the SIGILL and
+> (subsequent) SIGABRT type failures within the testsuite.
+
+I've also pushed the fix to sqrt_f16 (passing cpu_env rather than fpst).
+Are you happy rolling my fixes into your v2?
+
+>
+>
+> Richard Henderson (9):
+>   target/arm: Implement vector shifted SCVF/UCVF for fp16
+>   target/arm: Implement vector shifted FCVT for fp16
+>   target/arm: Fix float16 to/from int16
+>   target/arm: Clear SVE high bits for FMOV
+>   target/arm: Implement FMOV (general) for fp16
+>   target/arm: Implement FCVT (scalar,integer) for fp16
+>   target/arm: Implement FCVT (scalar,fixed-point) for fp16
+>   target/arm: Implement FP data-processing (2 source) for fp16
+>   target/arm: Implement FP data-processing (3 source) for fp16
+>
+>  target/arm/helper.h        |   6 +
+>  target/arm/helper.c        |  87 ++++++++++-
+>  target/arm/translate-a64.c | 371 +++++++++++++++++++++++++++++++++++++--=
+------
+>  3 files changed, 399 insertions(+), 65 deletions(-)
+
+
+--
+Alex Benn=C3=A9e
