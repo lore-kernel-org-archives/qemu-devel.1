@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34804)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fDSWz-0001LT-2Z
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 06:29:09 -0400
+	(envelope-from <prvs=6529cf07e=wei.liu2@citrix.com>)
+	id 1fDSXy-000208-Ox
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 06:30:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fDSWy-0001qt-4l
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 06:29:08 -0400
-Received: from mail-oi0-x231.google.com ([2607:f8b0:4003:c06::231]:41458)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fDSWx-0001qc-Vs
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 06:29:08 -0400
-Received: by mail-oi0-x231.google.com with SMTP id 11-v6so9737354ois.8
-	for <qemu-devel@nongnu.org>; Tue, 01 May 2018 03:29:07 -0700 (PDT)
+	(envelope-from <prvs=6529cf07e=wei.liu2@citrix.com>)
+	id 1fDSXx-0002EY-Gm
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 06:30:10 -0400
+Date: Tue, 1 May 2018 11:29:59 +0100
+From: Wei Liu <wei.liu2@citrix.com>
+Message-ID: <20180501102959.maktlnyz4vxmuvdq@citrix.com>
+References: <1525089699-13411-1-git-send-email-paul.durrant@citrix.com>
+	<1525089699-13411-3-git-send-email-paul.durrant@citrix.com>
+	<20180430151145.iyou5pisaclvvn3v@MacBook-Pro-de-Roger.local>
+	<dfeffd8d0d9f46fbbed1abb2bdaccd27@AMSPEX02CL03.citrite.net>
+	<20180430152826.puhl4lzvbdpdmomj@MacBook-Pro-de-Roger.local>
+	<8579bd8e6cbf4dd598df66a85d07e524@AMSPEX02CL03.citrite.net>
 MIME-Version: 1.0
-In-Reply-To: <8f27190a-3875-2eea-4138-172e590f4eb2@gmail.com>
-References: <1fa7369f-9c6d-73c6-77e1-7911a9538d82@gmail.com>
-	<87vac7adz2.fsf@linaro.org>
-	<8f27190a-3875-2eea-4138-172e590f4eb2@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 1 May 2018 11:28:46 +0100
-Message-ID: <CAFEAcA-XVP-z2==XJk265KG8N-3ECVuZ3ubFuVO7O0_RxssBcA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Translation block identification.
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <8579bd8e6cbf4dd598df66a85d07e524@AMSPEX02CL03.citrite.net>
+Subject: Re: [Qemu-devel] [Xen-devel] [PATCH 2/4] block/xen_disk: remove use
+ of grant map/unmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,19 +30,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Rafael Kioji <rafaelkioji@gmail.com>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Paul Durrant <Paul.Durrant@citrix.com>
+Cc: Roger Pau Monne <roger.pau@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Wei Liu <wei.liu2@citrix.com>
 
-On 1 May 2018 at 11:20, Rafael Kioji <rafaelkioji@gmail.com> wrote:
-> This logging flag prints what I want. But I really wanted is to get this
-> info inside the QEMU source code. Why am I not able to lookup the symbols in
-> the translator.c file the way I showed?
+On Mon, Apr 30, 2018 at 03:30:02PM +0000, Paul Durrant wrote:
+> > -----Original Message-----
+> > From: Roger Pau Monne
+> > Sent: 30 April 2018 16:28
+> > To: Paul Durrant <Paul.Durrant@citrix.com>
+> > Cc: xen-devel@lists.xenproject.org; qemu-block@nongnu.org; qemu-
+> > devel@nongnu.org; Anthony Perard <anthony.perard@citrix.com>; Kevin
+> > Wolf <kwolf@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>; Max
+> > Reitz <mreitz@redhat.com>
+> > Subject: Re: [Xen-devel] [PATCH 2/4] block/xen_disk: remove use of grant
+> > map/unmap
+> > 
+> > On Mon, Apr 30, 2018 at 04:16:52PM +0100, Paul Durrant wrote:
+> > > > -----Original Message-----
+> > > > From: Roger Pau Monne
+> > > > Sent: 30 April 2018 16:12
+> > > > To: Paul Durrant <Paul.Durrant@citrix.com>
+> > > > Cc: xen-devel@lists.xenproject.org; qemu-block@nongnu.org; qemu-
+> > > > devel@nongnu.org; Anthony Perard <anthony.perard@citrix.com>;
+> > Kevin
+> > > > Wolf <kwolf@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>;
+> > Max
+> > > > Reitz <mreitz@redhat.com>
+> > > > Subject: Re: [Xen-devel] [PATCH 2/4] block/xen_disk: remove use of
+> > grant
+> > > > map/unmap
+> > > >
+> > > > On Mon, Apr 30, 2018 at 01:01:37PM +0100, Paul Durrant wrote:
+> > > > > The grant copy operation was added to libxengnttab in Xen 4.8.0. If
+> > grant
+> > > > > copy is available then data from the guest will be copied rather than
+> > > > > mapped.
+> > > > > The xen_disk source can be significantly simplified by removing this
+> > now
+> > > > > redundant code.
+> > > >
+> > > > Hm, I know this is a PITA, but FreeBSD gntdev hasn't implemented the
+> > > > grant-copy operation yet.
+> > > >
+> > > > I could try to implement it, but I can't make any promises on the time
+> > > > ATM, since I'm quite busy.
+> > > >
+> > >
+> > > I guess we could carry a compat patch in QEMU that implements grant copy
+> > by doing a map/memcpy/unmap , but QEMU feels like the wrong place for
+> > that. I could try putting together a similar patch for the freebsd.c component
+> > of libxengnttab in the xen source rather than it simply failing with ENOSYS as
+> > it does now. Would either of those help?
+> > 
+> > Maybe this could be implemented in gnttab_core.c, so it can also be
+> > used by MiniOS and Linux versions not supporting the copy ioctl as a
+> > fallback?
+> 
+> That sounds like a reasonable idea. I'll put something together so that it can go in early in 4.12.
+> 
 
-The -d in_asm logging is just using lookup_symbol() (eg for arm
-I think it's in arm_tr_disas_log() that that particular logging
-is done), so if it works when it's called by the existing QEMU code
-but not in your modification then it sounds like there's an
-error in your modification somewhere.
+This will not work if XSM disallows grant map but allows grant copy.
+Not sure how important that is.
 
-thanks
--- PMM
+Wei.
+
+>   Paul
+> 
+> > 
+> > Roger.
+> 
+> _______________________________________________
+> Xen-devel mailing list
+> Xen-devel@lists.xenproject.org
+> https://lists.xenproject.org/mailman/listinfo/xen-devel
