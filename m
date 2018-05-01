@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47231)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fDRCc-0006Dc-CO
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 05:04:08 -0400
+	(envelope-from <rafaelkioji@gmail.com>) id 1fDRak-0005qc-Nc
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 05:28:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fDRCb-0001H5-Bt
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 05:04:02 -0400
-Received: from mail-ot0-x232.google.com ([2607:f8b0:4003:c0f::232]:44762)
+	(envelope-from <rafaelkioji@gmail.com>) id 1fDRag-0005rM-Nr
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 05:28:58 -0400
+Received: from mail-pf0-x22f.google.com ([2607:f8b0:400e:c00::22f]:45202)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fDRCb-0001Gs-5N
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 05:04:01 -0400
-Received: by mail-ot0-x232.google.com with SMTP id g7-v6so12354388otj.11
-	for <qemu-devel@nongnu.org>; Tue, 01 May 2018 02:04:01 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rafaelkioji@gmail.com>)
+	id 1fDRag-0005qu-GP
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 05:28:54 -0400
+Received: by mail-pf0-x22f.google.com with SMTP id c10so8772654pfi.12
+	for <qemu-devel@nongnu.org>; Tue, 01 May 2018 02:28:54 -0700 (PDT)
+Received: from [143.89.131.93] (eepc93.ee.ust.hk. [143.89.131.93])
+	by smtp.googlemail.com with ESMTPSA id
+	p6sm14604794pfg.157.2018.05.01.02.28.50 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 01 May 2018 02:28:51 -0700 (PDT)
+From: Rafael Kioji <rafaelkioji@gmail.com>
+Message-ID: <1fa7369f-9c6d-73c6-77e1-7911a9538d82@gmail.com>
+Date: Tue, 1 May 2018 17:28:44 +0800
 MIME-Version: 1.0
-In-Reply-To: <9a5497c5-555e-c556-f14c-570fb385ae17@amsat.org>
-References: <20180213040809.26021-1-f4bug@amsat.org>
-	<20180213040809.26021-21-f4bug@amsat.org>
-	<CAFEAcA_r2WNVEkE5-p+VuH8f1XnDzHMkUNgNSMrV1ZTkHv4=AQ@mail.gmail.com>
-	<20180430134929.edf3vsx4csvsydxi@toto>
-	<9a5497c5-555e-c556-f14c-570fb385ae17@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 1 May 2018 10:03:40 +0100
-Message-ID: <CAFEAcA8Oy=z_EfGPgWNyHMOqry=8ziEtbQXfT8qNZtrQExv9rw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v13 20/30] sdbus: add trace events
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: [Qemu-devel] Translation block identification.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,45 +33,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Fam Zheng <famz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 1 May 2018 at 04:35, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote=
-:
-> On 04/30/2018 10:49 AM, Edgar E. Iglesias wrote:
->> On Fri, Apr 27, 2018 at 12:55:21PM +0100, Peter Maydell wrote:
->>> On 13 February 2018 at 04:07, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.=
-org> wrote:
->>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>>> Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
->>>
->>>> @@ -39,6 +45,7 @@ int sdbus_do_command(SDBus *sdbus, SDRequest *req, u=
-int8_t *response)
->>>>  {
->>>>      SDState *card =3D get_card(sdbus);
->>>>
->>>> +    trace_sdbus_command(sdbus_name(sdbus), req->cmd, req->arg, req->c=
-rc);
->>>>      if (card) {
->>>>          SDCardClass *sc =3D SD_CARD_GET_CLASS(card);
->>>
->>> Hi -- as a result of this trace event being added, we now get
->>> warnings from Coverity that it might use uninitialized data
->>> (CID1386074, CID1390571, CID1386072, CID1386076). This is because not
->>> all of our SD
->>> controllers bother to initialize req->crc, because up til now
->>> nothing in the SD code looks at it. (I think at least bcm2835_sdhost.c
->>> sdhci.c and ssi-sd.c do this).
->
-> I was pretty sure we ran Coverity before the stable release :|
-> Maybe they added new 'uninitialized data' checks recently.
+Dear all,
 
-No, we didn't get a coverity run for a long time (a combination
-of Scan being down and then requiring a new version of the local
-build tools, which we didn't realize because the website didn't
-give a useful error message for that case). So this most recent
-run has brought up a pile of accumulated issues since about
-mid-february.
+During translation how can I identify what is the basic block of the 
+guest code? I wanted to know whether the block being translated is the 
+beginning of a function and get its name.
 
-thanks
--- PMM
+My current approach involves looking up the symbol associated with the 
+first PC of the translation block. But no symbol is ever found. What I 
+did was to add the following code in the function "translator_loop" at 
+"accel/tcg/translator.c":
+
+     printf("sym: %lu %s\n", tb->pc, lookup_symbol(tb->pc));
+
+The function lookup_symbol is defined in the file "./disas.c". I am 
+compiling my application with symbols (-g). My target arch is ARM.
+
+Thanks!
+
+
+Kind regards,
+Rafael
