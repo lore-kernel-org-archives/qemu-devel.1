@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39206)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fDVMj-0006N7-KM
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 09:30:46 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fDVQK-0007KF-5e
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 09:34:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fDVMg-0005H4-HX
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 09:30:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34764)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fDVMg-0005Gu-9Q
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 09:30:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fDVMf-0001pr-Bg
-	for <qemu-devel@nongnu.org>; Tue, 01 May 2018 13:30:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4111C2E80CB
-	for <qemu-devel@nongnu.org>; Tue,  1 May 2018 13:30:41 +0000 (UTC)
+	(envelope-from <imammedo@redhat.com>) id 1fDVQJ-00073d-Cq
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 09:34:28 -0400
+Date: Tue, 1 May 2018 15:34:11 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180501153411.7ca32d92@redhat.com>
+In-Reply-To: <CAFEAcA8iq9gJuC=ODK7wY_3m4B66o0LqJi9aK2PEfHha4q68nA@mail.gmail.com>
+References: <1525176522-200354-1-git-send-email-imammedo@redhat.com>
+	<1525176522-200354-5-git-send-email-imammedo@redhat.com>
+	<CAFEAcA8iq9gJuC=ODK7wY_3m4B66o0LqJi9aK2PEfHha4q68nA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 01 May 2018 13:25:10 -0000
-From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Reply-To: Bug 1768246 <1768246@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <152518111080.22177.382728353135880212.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1768246] [NEW] cpu-exec.c:648: cpu_loop_exec_tb:
- Assertion `use_icount' failed.
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 4/5] arm: boot: set boot_info starting
+ from first_cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,54 +25,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Eric Auger <eric.auger@redhat.com>
 
-Public bug reported:
+On Tue, 1 May 2018 13:19:12 +0100
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
-OpenJDK no longer works on qemu-sh4, it previously did after #1735384
-was fixed.
+> On 1 May 2018 at 13:08, Igor Mammedov <imammedo@redhat.com> wrote:
+> > even though nothing is currently broken, make sure that boot_info
+> > is set on all CPUs.
+> >
+> > Ref:
+> > "Message-ID: <CAFEAcA_NMWuA8WSs3cNeY6xX1kerO_uAcN_3=fK02BEhHJW86g@mail.gmail.com>"  
+> 
+> Can you include the rationale in the commit message rather
+> than just pointing to a message-id, please?
+sure,
+I'll post it  reply here.
 
-Crash indicates an assertion failure:
+BTW: I'm expecting this being merged through ARM tree 
 
-(sid-sh4-sbuild)root@nofan:/# java --version
-qemu-sh4-static: /root/qemu/accel/tcg/cpu-exec.c:648: cpu_loop_exec_tb: Ass=
-ertion `use_icount' failed.
-qemu: uncaught target signal 6 (Aborted) - core dumped
-Aborted
-(sid-sh4-sbuild)root@nofan:/#
-
-Haven't bi-sected the issue yet, but will do so later.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1768246
-
-Title:
-  cpu-exec.c:648: cpu_loop_exec_tb: Assertion `use_icount' failed.
-
-Status in QEMU:
-  New
-
-Bug description:
-  OpenJDK no longer works on qemu-sh4, it previously did after #1735384
-  was fixed.
-
-  Crash indicates an assertion failure:
-
-  (sid-sh4-sbuild)root@nofan:/# java --version
-  qemu-sh4-static: /root/qemu/accel/tcg/cpu-exec.c:648: cpu_loop_exec_tb: A=
-ssertion `use_icount' failed.
-  qemu: uncaught target signal 6 (Aborted) - core dumped
-  Aborted
-  (sid-sh4-sbuild)root@nofan:/#
-
-  Haven't bi-sected the issue yet, but will do so later.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1768246/+subscriptions
+> >
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > --  
+> 
+> Otherwise
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> 
+> thanks
+> -- PMM
