@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46678)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fDXfL-0000fK-Je
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 11:58:12 -0400
+	(envelope-from <clg@kaod.org>) id 1fDXgk-0001od-Jv
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 11:59:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fDXfF-0001Ow-Re
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 11:58:07 -0400
-References: <20180501154654.943782-1-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <6747056a-f73f-273a-3f4f-3cab3081b587@virtuozzo.com>
-Date: Tue, 1 May 2018 18:55:18 +0300
+	(envelope-from <clg@kaod.org>) id 1fDXgg-0002Jw-Gw
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 11:59:34 -0400
+Received: from 9.mo68.mail-out.ovh.net ([46.105.78.111]:53072)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fDXgg-0002B5-9u
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 11:59:30 -0400
+Received: from player157.ha.ovh.net (unknown [10.109.120.58])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 7C6BAE0BAC
+	for <qemu-devel@nongnu.org>; Tue,  1 May 2018 17:59:20 +0200 (CEST)
+References: <20180417071722.9399-1-david@gibson.dropbear.id.au>
+	<20180417071722.9399-4-david@gibson.dropbear.id.au>
+	<a01bebe8-85b7-f2b4-3675-401367471204@kaod.org>
+	<20180426064600.GI8800@umbus.fritz.box>
+	<5f09ca4d-3c01-7e89-fa87-6340060cf579@kaod.org>
+	<20180501063939.GB2520@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <4854f0a6-21f6-f0ed-f3dc-04c948f6734c@kaod.org>
+Date: Tue, 1 May 2018 17:59:14 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180501154654.943782-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20180501063939.GB2520@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] nbd/client: Fix error messages during
- NBD_INFO_BLOCK_SIZE
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH for-2.13 03/10] target/ppc:
+ Remove unnecessary initialization of LPCR_UPRT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,61 +36,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-01.05.2018 18:46, Eric Blake wrote:
-> A missing space makes for poor error messages.  Also, we missed
-> diagnosing a server that sends a maximum block size less than
-> the minimum.
->
-> Fixes: 081dd1fe
-> CC: qemu-stable@nongnu.org
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+On 05/01/2018 08:39 AM, David Gibson wrote:
+> On Thu, Apr 26, 2018 at 09:20:11AM +0200, C=E9dric Le Goater wrote:
+>> On 04/26/2018 08:46 AM, David Gibson wrote:
+>>> On Wed, Apr 25, 2018 at 11:52:18AM +0200, C=E9dric Le Goater wrote:
+>>>> On 04/17/2018 09:17 AM, David Gibson wrote:
+>>>>> In cpu_ppc_set_papr() the UPRT and GTSE bits of the LPCR are initia=
+lized
+>>>>> based on on ppc64_radix_guest().  Which seems reasonable, except th=
+at
+>>>>> ppc64_radix_guest() is based on spapr->patb_entry which is only set=
+ up
+>>>>> in spapr_machine_reset, called much later than cpu_ppc_set_papr().
+>>>>>
+>>>>> So the initialization here is pointless.  The base cpu initializati=
+on
+>>>>> already sets a value that's good enough until the guest uses an hca=
+ll to
+>>>>> configure it's preferred MMU mode.
+>>>>>
+>>>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>>>>> ---
+>>>>>  target/ppc/translate_init.c | 16 ----------------
+>>>>>  1 file changed, 16 deletions(-)
+>>>>>
+>>>>> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_ini=
+t.c
+>>>>> index bb79d23b50..14f346f441 100644
+>>>>> --- a/target/ppc/translate_init.c
+>>>>> +++ b/target/ppc/translate_init.c
+>>>>> @@ -8897,22 +8897,6 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVi=
+rtualHypervisor *vhyp)
+>>>>>      lpcr->default_value &=3D ~LPCR_RMLS;
+>>>>>      lpcr->default_value |=3D 1ull << LPCR_RMLS_SHIFT;
+>>>>> =20
+>>>>> -    if (env->mmu_model =3D=3D POWERPC_MMU_3_00) {
+>>>>> -        /* By default we choose legacy mode and switch to new hash=
+ or radix
+>>>>> -         * when a register process table hcall is made. So disable=
+ process
+>>>>> -         * tables and guest translation shootdown by default
+>>>>> -         *
+>>>>> -         * Hot-plugged CPUs inherit from the guest radix setting u=
+nder
+>>>>> -         * KVM but not under TCG. Update the default LPCR to keep =
+new
+>>>>> -         * CPUs in sync when radix is enabled.
+>>>>> -         */
+>>>>
+>>>>
+>>>> This is breaking CPU hotplug under TCG. Should we reintroduce the sa=
+me=20
+>>>> settings in spapr_cpu_reset() now ?
+>>>
+>>> Sod.  Yeah, this code is important for the hotplug case.
+>>>
+>>> But, no, I don't think it should go into reset, I think it should go
+>>> into the rtas start-cpu path; it only makes sense for secondary CPUs.
+>>
+>> yes. I will send a fix.
+>=20
+> Not sure if this is still on your radar, but if it is, don't bother.
+> I've already made a fix (along with various others) and will be
+> posting soonish.
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+As you reverted the changes in the ppc-2.13 branch, I postponed the
+changes. Go ahead.=20
 
-> ---
->   nbd/client.c | 10 ++++++++--
->   1 file changed, 8 insertions(+), 2 deletions(-)
->
-> diff --git a/nbd/client.c b/nbd/client.c
-> index 7f35b5c3232..7b3caa90ec2 100644
-> --- a/nbd/client.c
-> +++ b/nbd/client.c
-> @@ -436,7 +436,7 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
->               be32_to_cpus(&info->min_block);
->               if (!is_power_of_2(info->min_block)) {
->                   error_setg(errp, "server minimum block size %" PRId32
-> -                           "is not a power of two", info->min_block);
-> +                           " is not a power of two", info->min_block);
->                   nbd_send_opt_abort(ioc);
->                   return -1;
->               }
-> @@ -451,7 +451,7 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
->               if (!is_power_of_2(info->opt_block) ||
->                   info->opt_block < info->min_block) {
->                   error_setg(errp, "server preferred block size %" PRId32
-> -                           "is not valid", info->opt_block);
-> +                           " is not valid", info->opt_block);
->                   nbd_send_opt_abort(ioc);
->                   return -1;
->               }
-> @@ -462,6 +462,12 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
->                   return -1;
->               }
->               be32_to_cpus(&info->max_block);
-> +            if (info->max_block < info->min_block) {
-> +                error_setg(errp, "server maximum block size %" PRId32
-> +                           " is not valid", info->max_block);
-> +                nbd_send_opt_abort(ioc);
-> +                return -1;
-> +            }
->               trace_nbd_opt_go_info_block_size(info->min_block, info->opt_block,
->                                                info->max_block);
->               break;
+Thanks,
 
-
--- 
-Best regards,
-Vladimir
+C.=20
