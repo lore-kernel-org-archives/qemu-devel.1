@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59562)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fDYbN-0001Og-Rj
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 12:58:06 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fDYbO-0001Os-6K
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 12:58:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fDYbM-0005s9-SI
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 12:58:05 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fDYbN-0005sS-3o
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 12:58:06 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Tue,  1 May 2018 18:57:48 +0200
-Message-Id: <20180501165750.19242-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/2] qemu-img: Special post-backing convert
- handle
+Date: Tue,  1 May 2018 18:57:49 +0200
+Message-Id: <20180501165750.19242-2-mreitz@redhat.com>
+In-Reply-To: <20180501165750.19242-1-mreitz@redhat.com>
+References: <20180501165750.19242-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/2] qemu-img: Special post-backing convert
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,60 +23,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-This is the issue:
+Currently, qemu-img convert writes zeroes when it reads zeroes.
+Sometimes it does not because the target is initialized to zeroes
+anyway, so we do not need to overwrite (and thus potentially allocate)
+it.  This is never the case for targets with backing files, though.  But
+even them may have an area that is initialized to zeroes, and that is
+the area past the end of the backing file (if that is shorter than the
+overlay).
 
-$ qemu-img create -f qcow2 base.qcow2 512M
-Formatting 'base.qcow2', fmt=qcow2 size=536870912 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-$ qemu-img create -f qcow2 -b base.qcow2 source.qcow2 1G
-Formatting 'source.qcow2', fmt=qcow2 size=1073741824 backing_file=base.qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-$ qemu-img convert -O qcow2 -B base.qcow2 -o compat=0.10 \
-    source.qcow2 target.qcow2
-$ qemu-img info target.qcow2
-image: target.qcow2
-file format: qcow2
-virtual size: 1.0G (1073741824 bytes)
-disk size: 512M    <-------------------- this here
-cluster_size: 65536
-backing file: base.qcow2
-Format specific information:
-    compat: 0.10
-    refcount bits: 16
-$ qemu-img map target.qcow2
-Offset          Length          Mapped to       File
-0x20000000      0x20000000      0x50000         target.qcow2
-
-So qemu-img convert sees that source.qcow2 contains only zeroes past the
-end of base.qcow2 -- but that is not the backing file, so it will
-explicitly write zeroes to target.qcow2.  But that file is compat=0.10,
-so it does not support efficient zero writes and will actually fill that
-area with real zeroes.  Hence the mapping, hence the disk size.
-
-However, we don't need to write zeroes to an image when it is
-initialized to zeroes -- which the current qemu-img code says doesn't
-happen for target images with backing files.  But it does happen when
-the target backing file is shorter than the target image, then the area
-past the end of the backing file may indeed read as zeroes and we don't
-need to write anything there.
-
-So the first patch in this series makes qemu-img convert detect that
-case and handle zeroes past the end of the backing file as "fall back to
-the backing file" (because that means zeroes, at least if unallocated
-areas read as zeroes (which I presume they have to for formats
-supporting backing files, but better be safe than sorry)), and the
-second adds an iotest.
-
+So if the target format's unallocated blocks are zero and there is a gap
+between the target's backing file's end and the target's end, we do not
+have to explicitly write zeroes there.
 
 Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1527898
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ qemu-img.c | 26 +++++++++++++++++++++++++-
+ 1 file changed, 25 insertions(+), 1 deletion(-)
 
-
-Max Reitz (2):
-  qemu-img: Special post-backing convert handling
-  iotests: Test post-backing convert target behavior
-
- qemu-img.c                 | 26 +++++++++++++++++++++++++-
- tests/qemu-iotests/122     | 42 ++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/122.out | 18 ++++++++++++++++++
- 3 files changed, 85 insertions(+), 1 deletion(-)
-
+diff --git a/qemu-img.c b/qemu-img.c
+index 855fa52514..5365afbd13 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -1542,7 +1542,9 @@ typedef struct ImgConvertState {
+     BlockBackend *target;
+     bool has_zero_init;
+     bool compressed;
++    bool unallocated_blocks_are_zero;
+     bool target_has_backing;
++    int64_t target_backing_sectors; /* negative if unknown */
+     bool wr_in_order;
+     int min_sparse;
+     size_t cluster_sectors;
+@@ -1571,12 +1573,23 @@ static int convert_iteration_sectors(ImgConvertState *s, int64_t sector_num)
+ {
+     int64_t src_cur_offset;
+     int ret, n, src_cur;
++    bool post_backing_zero = false;
+ 
+     convert_select_part(s, sector_num, &src_cur, &src_cur_offset);
+ 
+     assert(s->total_sectors > sector_num);
+     n = MIN(s->total_sectors - sector_num, BDRV_REQUEST_MAX_SECTORS);
+ 
++    if (s->target_backing_sectors >= 0) {
++        if (sector_num >= s->target_backing_sectors) {
++            post_backing_zero = s->unallocated_blocks_are_zero;
++        } else if (sector_num + n > s->target_backing_sectors) {
++            /* Split requests around target_backing_sectors (because
++             * starting from there, zeros are handled differently) */
++            n = s->target_backing_sectors - sector_num;
++        }
++    }
++
+     if (s->sector_next_status <= sector_num) {
+         int64_t count = n * BDRV_SECTOR_SIZE;
+ 
+@@ -1598,7 +1611,7 @@ static int convert_iteration_sectors(ImgConvertState *s, int64_t sector_num)
+         n = DIV_ROUND_UP(count, BDRV_SECTOR_SIZE);
+ 
+         if (ret & BDRV_BLOCK_ZERO) {
+-            s->status = BLK_ZERO;
++            s->status = post_backing_zero ? BLK_BACKING_FILE : BLK_ZERO;
+         } else if (ret & BDRV_BLOCK_DATA) {
+             s->status = BLK_DATA;
+         } else {
+@@ -2319,6 +2332,16 @@ static int img_convert(int argc, char **argv)
+         }
+     }
+ 
++    if (s.target_has_backing) {
++        /* Errors are treated as "backing length unknown" (which means
++         * s.target_backing_sectors has to be negative, which it will
++         * be automatically).  The backing file length is used only
++         * for optimizations, so such a case is not fatal. */
++        s.target_backing_sectors = bdrv_nb_sectors(out_bs->backing->bs);
++    } else {
++        s.target_backing_sectors = -1;
++    }
++
+     ret = bdrv_get_info(out_bs, &bdi);
+     if (ret < 0) {
+         if (s.compressed) {
+@@ -2328,6 +2351,7 @@ static int img_convert(int argc, char **argv)
+     } else {
+         s.compressed = s.compressed || bdi.needs_compressed_writes;
+         s.cluster_sectors = bdi.cluster_size / BDRV_SECTOR_SIZE;
++        s.unallocated_blocks_are_zero = bdi.unallocated_blocks_are_zero;
+     }
+ 
+     ret = convert_do_copy(&s);
 -- 
 2.14.3
