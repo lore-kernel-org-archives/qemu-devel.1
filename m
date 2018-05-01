@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53327)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fDJab-0008GD-Up
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 20:56:19 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fDJnc-0001XJ-Qe
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 21:09:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fDJaa-0001Cv-Ic
-	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 20:56:18 -0400
-References: <20180419164642.9536-1-f4bug@amsat.org>
-	<20180419164642.9536-3-f4bug@amsat.org>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <35f1a36e-e5a8-cf49-7b87-417b8fbf6068@redhat.com>
-Date: Mon, 30 Apr 2018 20:56:04 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fDJnY-0005jo-Qq
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 21:09:44 -0400
+Received: from ozlabs.org ([203.11.71.1]:33841)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1fDJnY-0005XI-2L
+	for qemu-devel@nongnu.org; Mon, 30 Apr 2018 21:09:40 -0400
+Date: Tue, 1 May 2018 11:01:02 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180501010102.GA2520@umbus.fritz.box>
+References: <20180430122404.10741-1-peter.maydell@linaro.org>
+	<c1c3c88f-75c6-44f2-684c-d9d179bb128c@redhat.com>
+	<CAFEAcA-frhSPZePsQJy8DJTpFX0iFw52ND_VK8Z=hGz-v1A_jA@mail.gmail.com>
+	<6c90618c-ec1b-7a73-5a76-b98fe5df589a@redhat.com>
+	<CAFEAcA9R5Ycq0aT3pCe1mdrmqAM2dVUjJ=MSJuN5+a+crvxzMw@mail.gmail.com>
+	<20180430082835.32835889@w520.home>
 MIME-Version: 1.0
-In-Reply-To: <20180419164642.9536-3-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 2/7] avocado: Update python scripts to
- upstream codebase
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="bg08WKrSYDhXBjb5"
+Content-Disposition: inline
+In-Reply-To: <20180430082835.32835889@w520.home>
+Subject: Re: [Qemu-devel] [PATCH] memory.h: Improve IOMMU related
+ documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,209 +33,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Zheng Xiang <xiang.zheng@linaro.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, qemu-devel@nongnu.org, Alistair Francis <alistair23@gmail.com>, Max Reitz <mreitz@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-On 04/19/2018 12:46 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> QEMUMachine arguments member is called '_args'.
+
+--bg08WKrSYDhXBjb5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Apr 30, 2018 at 08:28:35AM -0600, Alex Williamson wrote:
+> On Mon, 30 Apr 2018 14:35:20 +0100
+> Peter Maydell <peter.maydell@linaro.org> wrote:
 >=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  scripts/qemu.py                    | 14 +++++++-------
->  tests/avocado/avocado_qemu/test.py | 12 ++++++------
->  tests/qemu-iotests/iotests.py      | 28 ++++++++++++++--------------
->  3 files changed, 27 insertions(+), 27 deletions(-)
+> > On 30 April 2018 at 14:08, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > > On 30/04/2018 14:57, Peter Maydell wrote: =20
+> > >> On 30 April 2018 at 13:54, Paolo Bonzini <pbonzini@redhat.com> wrote=
+: =20
+> > >>> On 30/04/2018 14:24, Peter Maydell wrote: =20
+> > >>>> -    /* Set this up to provide customized IOMMU replay function */
+> > >>>> +    /* Set this up to provide customized IOMMU replay function.
+> > >>>> +     * Optional method.
+> > >>>> +     */
+> > >>>>      void (*replay)(IOMMUMemoryRegion *iommu, IOMMUNotifier *notif=
+ier); =20
+> > >>>
+> > >>> replay is needed if you want to support IOMMU notifiers.  After
+> > >>> memory_region_register_iommu_notifier you're only notified about fu=
+ture
+> > >>> changes to the mappings; memory_region_iommu_replay calls the replay
+> > >>> method so that the IOMMUNotifier is called for each existing mappin=
+g. =20
+> > >>
+> > >> Is it then unrelated to record-and-replay ? That's what I guessed
+> > >> it was for... Also, some IOMMUs (eg spapr_iommu.c) seem to support
+> > >> notifiers but don't implement it. =20
+> > >
+> > > Yes, it's completely unrelated.  I have no idea why spapr_iommu.c
+> > > doesn't need it, so I am CCing the sPAPR and VFIO experts... =20
+> >=20
+> > There does seem to be a default implementation in
+> > memory_region_iommu_replay(), maybe that is sufficient for spapr?
 >=20
-> diff --git a/scripts/qemu.py b/scripts/qemu.py
-> index bd66620f45..0eecc44d09 100644
-> --- a/scripts/qemu.py
-> +++ b/scripts/qemu.py
-> @@ -81,7 +81,7 @@ class QEMUMachine(object):
->          self._qemu_log_file =3D None
->          self._popen =3D None
->          self._binary =3D binary
-> -        self.args =3D list(args)     # Force copy args in case we modi=
-fy them
-> +        self._args =3D list(args)     # Force copy args in case we mod=
-ify them
->          self._wrapper =3D wrapper
->          self._events =3D []
->          self._iolog =3D None
-> @@ -109,8 +109,8 @@ class QEMUMachine(object):
->      # This can be used to add an unused monitor instance.
->      def add_monitor_telnet(self, ip, port):
->          args =3D 'tcp:%s:%d,server,nowait,telnet' % (ip, port)
-> -        self.args.append('-monitor')
-> -        self.args.append(args)
-> +        self._args.append('-monitor')
-> +        self._args.append(args)
-> =20
->      def add_fd(self, fd, fdset, opaque, opts=3D''):
->          '''Pass a file descriptor to the VM'''
-> @@ -120,8 +120,8 @@ class QEMUMachine(object):
->          if opts:
->              options.append(opts)
-> =20
-> -        self.args.append('-add-fd')
-> -        self.args.append(','.join(options))
-> +        self._args.append('-add-fd')
-> +        self._args.append(','.join(options))
->          return self
-> =20
->      def send_fd_scm(self, fd_file_path):
-> @@ -184,7 +184,7 @@ class QEMUMachine(object):
->                  '-display', 'none', '-vga', 'none']
-> =20
->      def _create_console(self, console_address):
-> -        for item in self.args:
-> +        for item in self._args:
->              for option in ['isa-serial', 'spapr-vty', 'sclpconsole']:
->                  if option in item:
->                      return []
-> @@ -274,7 +274,7 @@ class QEMUMachine(object):
->          bargs =3D self._base_args()
->          bargs.extend(self._create_console(console_address))
->          self._qemu_full_args =3D (self._wrapper + [self._binary] +
-> -                                bargs + self.args)
-> +                                bargs + self._args)
->          self._popen =3D subprocess.Popen(self._qemu_full_args,
->                                         stdin=3Ddevnull,
->                                         stdout=3Dself._qemu_log_file,
-> diff --git a/tests/avocado/avocado_qemu/test.py b/tests/avocado/avocado=
-_qemu/test.py
-> index 5a08dace45..1ead917014 100644
-> --- a/tests/avocado/avocado_qemu/test.py
-> +++ b/tests/avocado/avocado_qemu/test.py
-> @@ -297,8 +297,8 @@ class _VM(qemu.QEMUMachine):
->          port =3D self.ports.find_free_port()
->          newvm =3D _VM(self.qemu_dst_bin, self._arch, username=3Dself.u=
-sername,
->                      password=3Dself.password)
-> -        newvm.args =3D self.args
-> -        newvm.args.extend(['-incoming', 'tcp:0:%s' % port])
-> +        newvm._args =3D self._args
-> +        newvm._args.extend(['-incoming', 'tcp:0:%s' % port])
->          newvm.username =3D self.username
->          newvm.password =3D self.password
-> =20
-> @@ -329,7 +329,7 @@ class _VM(qemu.QEMUMachine):
->          :param extra: Extra parameters to the -drive option
->          """
->          file_option =3D 'file=3D%s' % path
-> -        for item in self.args:
-> +        for item in self._args:
->              if file_option in item:
->                  logging.error('Image %s already present', path)
->                  return
-> @@ -340,7 +340,7 @@ class _VM(qemu.QEMUMachine):
->          if snapshot:
->              file_option +=3D ',snapshot=3Don'
-> =20
-> -        self.args.extend(['-drive', file_option])
-> +        self._args.extend(['-drive', file_option])
-> =20
->          if username is not None:
->              self.username =3D username
-> @@ -387,7 +387,7 @@ class _VM(qemu.QEMUMachine):
->          process.run("%s -output %s -volid cidata -joliet -rock %s %s" =
-%
->                      (geniso_bin, iso_path, metadata_path, userdata_pat=
-h))
-> =20
-> -        self.args.extend(['-cdrom', iso_path])
-> +        self._args.extend(['-cdrom', iso_path])
-> =20
->  class QemuTest(Test):
-> =20
-> @@ -415,4 +415,4 @@ class QemuTest(Test):
->          if machine_kvm_type is not None:
->              machine +=3D "kvm-type=3D%s," % machine_kvm_type
->          if machine:
-> -            self.vm.args.extend(['-machine', machine])
-> +            self.vm._args.extend(['-machine', machine])
-> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests=
-.py
-> index a2e4f03743..b25d48a91b 100644
-> --- a/tests/qemu-iotests/iotests.py
-> +++ b/tests/qemu-iotests/iotests.py
-> @@ -293,18 +293,18 @@ class VM(qtest.QEMUQtestMachine):
->          self._num_drives =3D 0
-> =20
->      def add_object(self, opts):
-> -        self.args.append('-object')
-> -        self.args.append(opts)
-> +        self._args.append('-object')
-> +        self._args.append(opts)
->          return self
-> =20
->      def add_device(self, opts):
-> -        self.args.append('-device')
-> -        self.args.append(opts)
-> +        self._args.append('-device')
-> +        self._args.append(opts)
->          return self
-> =20
->      def add_drive_raw(self, opts):
-> -        self.args.append('-drive')
-> -        self.args.append(opts)
-> +        self._args.append('-drive')
-> +        self._args.append(opts)
->          return self
-> =20
->      def add_drive(self, path, opts=3D'', interface=3D'virtio', format=3D=
-imgfmt):
-> @@ -322,27 +322,27 @@ class VM(qtest.QEMUQtestMachine):
-> =20
->          if format =3D=3D 'luks' and 'key-secret' not in opts:
->              # default luks support
-> -            if luks_default_secret_object not in self.args:
-> +            if luks_default_secret_object not in self._args:
->                  self.add_object(luks_default_secret_object)
-> =20
->              options.append(luks_default_key_secret_opt)
-> =20
-> -        self.args.append('-drive')
-> -        self.args.append(','.join(options))
-> +        self._args.append('-drive')
-> +        self._args.append(','.join(options))
->          self._num_drives +=3D 1
->          return self
-> =20
->      def add_blockdev(self, opts):
-> -        self.args.append('-blockdev')
-> +        self._args.append('-blockdev')
->          if isinstance(opts, str):
-> -            self.args.append(opts)
-> +            self._args.append(opts)
->          else:
-> -            self.args.append(','.join(opts))
-> +            self._args.append(','.join(opts))
->          return self
-> =20
->      def add_incoming(self, addr):
-> -        self.args.append('-incoming')
-> -        self.args.append(addr)
-> +        self._args.append('-incoming')
-> +        self._args.append(addr)
->          return self
-> =20
->      def pause_drive(self, drive, event=3DNone):
+> AIUI, the default implementation is used by spapr, it was added here:
 >=20
+> commit a788f227ef7bd2912fcaacdfe13d13ece2998149
+> Author: David Gibson <david@gibson.dropbear.id.au>
+> Date:   Wed Sep 30 12:13:55 2015 +1000
+>=20
+>     memory: Allow replay of IOMMU mapping notifications
+>    =20
+>     When we have guest visible IOMMUs, we allow notifiers to be registered
+>     which will be informed of all changes to IOMMU mappings.  This is use=
+d by
+>     vfio to keep the host IOMMU mappings in sync with guest IOMMU mapping=
+s.
+>    =20
+>     However, unlike with a memory region listener, an iommu notifier won'=
+t be
+>     told about any mappings which already exist in the (guest) IOMMU at t=
+he
+>     time it is registered.  This can cause problems if hotplugging a VFIO
+>     device onto a guest bus which had existing guest IOMMU mappings, but =
+didn't
+>     previously have an VFIO devices (and hence no host IOMMU mappings).
+>    =20
+>     This adds a memory_region_iommu_replay() function to handle this case=
+=2E  It
+>     replays any existing mappings in an IOMMU memory region to a specified
+>     notifier.  Because the IOMMU memory region doesn't internally remembe=
+r the
+>     granularity of the guest IOMMU it has a small hack where the caller m=
+ust
+>     specify a granularity at which to replay mappings.
+>    =20
+>     If there are finer mappings in the guest IOMMU these will be reported=
+ in
+>     the iotlb structures passed to the notifier which it must handle (pro=
+bably
+>     causing it to flag an error).  This isn't new - the VFIO iommu notifi=
+er
+>     must already handle notifications about guest IOMMU mappings too short
+>     for it to represent in the host IOMMU.
+>    =20
+>     Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>     Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+>     Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+>     Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+>=20
+> VT-d emulation then needed its own replay and that hook was later added
+> here:
 
-Well, this is basically a revert of parts of this patch:
+Yes, that's right.  We actually introduced the replay for spapr's
+benefit, initially with just the default implementation not a hook.
+When x86 needed it, the default implementation although correct, was
+grossly inefficient so the hook was added.
 
-  https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg03446.html
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-There was some previous discussions on this topic, basically regarding
-two conflicting points:
+--bg08WKrSYDhXBjb5
+Content-Type: application/pgp-signature; name="signature.asc"
 
-1) The fact that other instances of scripts.qemu.QEMUMachine (such as
-the _VM instances created by avocado_qemu.tests.QemuTest) need access to
-the QEMU args;
+-----BEGIN PGP SIGNATURE-----
 
-2) That attributes prefixed with (single) underscore should only be
-accessed by code in the class itself.
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrnvEsACgkQbDjKyiDZ
+s5LAqg/9FGxL4ugz3bXOxQnSYohR5dVsE5v01waV0A1X66CB7fvtHTq+NzDJWHkt
+tNuaX3n4HZBjFfPbn+B1O6OYStxcRdDwu53RFbzEBJQ0LDs+IS/MrB41tsR8mi9E
+MHDgwDpjkpad6HbWdWPcnUmT6qKuTc5JqaHqWyLCj+jj1yT+eyrTI2qgFlOfz2xT
+G4kLKufKuNuTxzaTIZkk4oxqDs71CwAXQn2sklsLSIS4D0cqeJw19VW/4XMxQbr9
+7wk1oO8LPA1wjswLlTl+pCQiSdM+54e5Y7EIkh5/CLItEKajcGjna0OImM0em+tE
+b8PPVRlNJI3JxOpuilGDuclQTGTzgveqfBHH2h/CYyQSZ+TG76o7CNiKo+fdZOPX
+NelU9w7JSPephswG60Z5iZq7qR8ShO/mKePbp4NL+rRdExH9JHy4LMECErVabmed
+M4xH0xKNZ9loJ68VlMhrhORJmkA9O2S3mk2+BlezTMtuHo9ttQ4RcTEG4GJmBQR/
+gefYd+JRbKIOlk0CBVjTwCSlqT5MuqqAn3qQZzj3ANqfd/CEANhj/ajkQAZFGan1
+n5fepuUcQTbyEyqDXbtgcQMoNeX8MPdVdoUuwR5tzGul9+npFYPygUu2e54ija+L
+LIns+9ZLjdJO2gCnr9WCfa7pOdqQEsugKpOMncNKiLDQf5vqSHI=
+=m8Jk
+-----END PGP SIGNATURE-----
 
-The discussion then orbited around the usefulness (or not) of a "dumb"
-wrapper for a list.  For the record, I'm in favor of exposing the list
-directly, until/if some extra functionality is needed.
+--bg08WKrSYDhXBjb5--
