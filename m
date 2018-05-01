@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fDSkt-0005Il-BJ
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 06:43:32 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fDSlj-0005iE-IF
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 06:44:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fDSkq-0008Dv-6Q
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 06:43:31 -0400
-Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:34235)
+	(envelope-from <alex.bennee@linaro.org>) id 1fDSlg-00008a-8m
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 06:44:23 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:40619)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fDSkp-0008DQ-UO
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 06:43:28 -0400
-Received: by mail-wr0-x229.google.com with SMTP id p18-v6so10480213wrm.1
-	for <qemu-devel@nongnu.org>; Tue, 01 May 2018 03:43:27 -0700 (PDT)
-References: <1fa7369f-9c6d-73c6-77e1-7911a9538d82@gmail.com>
-	<87vac7adz2.fsf@linaro.org>
-	<8f27190a-3875-2eea-4138-172e590f4eb2@gmail.com>
+	id 1fDSlg-000083-38
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 06:44:20 -0400
+Received: by mail-wm0-x242.google.com with SMTP id j5so18487257wme.5
+	for <qemu-devel@nongnu.org>; Tue, 01 May 2018 03:44:19 -0700 (PDT)
+References: <20180425012300.14698-1-richard.henderson@linaro.org>
+	<20180425012300.14698-5-richard.henderson@linaro.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <8f27190a-3875-2eea-4138-172e590f4eb2@gmail.com>
-Date: Tue, 01 May 2018 11:43:25 +0100
-Message-ID: <87sh7bac6q.fsf@linaro.org>
+In-reply-to: <20180425012300.14698-5-richard.henderson@linaro.org>
+Date: Tue, 01 May 2018 11:44:17 +0100
+Message-ID: <87r2mvac5a.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Translation block identification.
+Subject: Re: [Qemu-devel] [PATCH 4/9] target/arm: Clear SVE high bits for
+ FMOV
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +31,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Rafael Kioji <rafaelkioji@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
 
-Rafael Kioji <rafaelkioji@gmail.com> writes:
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-> This logging flag prints what I want. But I really wanted is to get
-> this info inside the QEMU source code. Why am I not able to lookup the
-> symbols in the translator.c file the way I showed?
-
-Without a failing patch it's hard to say, after all the working
-disassembly is called at the bottom of translator_loop():
-
-  ops->disas_log(db, cpu);
-
+> Use write_fp_dreg and clear_vec_high to zero the bits
+> that need zeroing for these cases.
 >
-> Kind regards,
-> Rafael
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/translate-a64.c | 17 +++++------------
+>  1 file changed, 5 insertions(+), 12 deletions(-)
 >
-> On 5/1/2018 6:04 PM, Alex Benn=C3=A9e wrote:
->> Rafael Kioji <rafaelkioji@gmail.com> writes:
->>
->>> Dear all,
->>>
->>> During translation how can I identify what is the basic block of the
->>> guest code? I wanted to know whether the block being translated is the
->>> beginning of a function and get its name.
->>>
->>> My current approach involves looking up the symbol associated with the
->>> first PC of the translation block. But no symbol is ever found. What I
->>> did was to add the following code in the function "translator_loop" at
->>> "accel/tcg/translator.c":
->>>
->>>   printf("sym: %lu %s\n", tb->pc, lookup_symbol(tb->pc));
->>>
->>> The function lookup_symbol is defined in the file "./disas.c". I am
->>> compiling my application with symbols (-g). My target arch is ARM.
->> If you run QEMU with the debug flags you should see name resolution for
->> each basic block. e.g.
->>
->>    qemu-arm -d in_asm prog
->>
->> --
->> Alex Benn=C3=A9e
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index b27892d971..f2241d8174 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -5356,31 +5356,24 @@ static void handle_fmov(DisasContext *s, int rd, =
+int rn, int type, bool itof)
+>
+>      if (itof) {
+>          TCGv_i64 tcg_rn =3D cpu_reg(s, rn);
+> +        TCGv_i64 tmp;
+>
+>          switch (type) {
+>          case 0:
+> -        {
+>              /* 32 bit */
+> -            TCGv_i64 tmp =3D tcg_temp_new_i64();
+> +            tmp =3D tcg_temp_new_i64();
+>              tcg_gen_ext32u_i64(tmp, tcg_rn);
+> -            tcg_gen_st_i64(tmp, cpu_env, fp_reg_offset(s, rd, MO_64));
+> -            tcg_gen_movi_i64(tmp, 0);
+> -            tcg_gen_st_i64(tmp, cpu_env, fp_reg_hi_offset(s, rd));
+> +            write_fp_dreg(s, rd, tmp);
+>              tcg_temp_free_i64(tmp);
+>              break;
+> -        }
+>          case 1:
+> -        {
+>              /* 64 bit */
+> -            TCGv_i64 tmp =3D tcg_const_i64(0);
+> -            tcg_gen_st_i64(tcg_rn, cpu_env, fp_reg_offset(s, rd, MO_64));
+> -            tcg_gen_st_i64(tmp, cpu_env, fp_reg_hi_offset(s, rd));
+> -            tcg_temp_free_i64(tmp);
+> +            write_fp_dreg(s, rd, tcg_rn);
+>              break;
+> -        }
+>          case 2:
+>              /* 64 bit to top half. */
+>              tcg_gen_st_i64(tcg_rn, cpu_env, fp_reg_hi_offset(s, rd));
+> +            clear_vec_high(s, true, rd);
+
+I was going to suggest maybe a write_fp_dreg_hi() helper here but there
+are only a couple of cases so:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+>              break;
+>          }
+>      } else {
 
 
 --
