@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fDSlj-0005iE-IF
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 06:44:24 -0400
+	(envelope-from <rafaelkioji@gmail.com>) id 1fDSog-0006sr-So
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 06:47:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fDSlg-00008a-8m
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 06:44:23 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:40619)
+	(envelope-from <rafaelkioji@gmail.com>) id 1fDSod-0001fY-Pu
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 06:47:26 -0400
+Received: from mail-pf0-x22a.google.com ([2607:f8b0:400e:c00::22a]:43476)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fDSlg-000083-38
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 06:44:20 -0400
-Received: by mail-wm0-x242.google.com with SMTP id j5so18487257wme.5
-	for <qemu-devel@nongnu.org>; Tue, 01 May 2018 03:44:19 -0700 (PDT)
-References: <20180425012300.14698-1-richard.henderson@linaro.org>
-	<20180425012300.14698-5-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180425012300.14698-5-richard.henderson@linaro.org>
-Date: Tue, 01 May 2018 11:44:17 +0100
-Message-ID: <87r2mvac5a.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <rafaelkioji@gmail.com>)
+	id 1fDSod-0001fL-J1
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 06:47:23 -0400
+Received: by mail-pf0-x22a.google.com with SMTP id j11so8875859pff.10
+	for <qemu-devel@nongnu.org>; Tue, 01 May 2018 03:47:23 -0700 (PDT)
+References: <1fa7369f-9c6d-73c6-77e1-7911a9538d82@gmail.com>
+	<87vac7adz2.fsf@linaro.org>
+	<8f27190a-3875-2eea-4138-172e590f4eb2@gmail.com>
+	<CAFEAcA-XVP-z2==XJk265KG8N-3ECVuZ3ubFuVO7O0_RxssBcA@mail.gmail.com>
+From: Rafael Kioji <rafaelkioji@gmail.com>
+Message-ID: <ee6f3065-2a80-aad9-e835-5be84f2d0bd5@gmail.com>
+Date: Tue, 1 May 2018 18:47:13 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/9] target/arm: Clear SVE high bits for
- FMOV
+In-Reply-To: <CAFEAcA-XVP-z2==XJk265KG8N-3ECVuZ3ubFuVO7O0_RxssBcA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] Translation block identification.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,69 +33,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
+Solved. The reason I was not able to get the symbols is because logging 
+has to be enabled, otherwise the symbols are not loaded. In "elfload.c" 
+there is the condition:
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+> if (qemu_log_enabled()) {
+>     load_symbols(ehdr, image_fd, load_bias);
+> }
 
-> Use write_fp_dreg and clear_vec_high to zero the bits
-> that need zeroing for these cases.
+Thanks!
+
+Kind regards,
+Rafael
+
+On 5/1/2018 6:28 PM, Peter Maydell wrote:
+> On 1 May 2018 at 11:20, Rafael Kioji <rafaelkioji@gmail.com> wrote:
+>> This logging flag prints what I want. But I really wanted is to get this
+>> info inside the QEMU source code. Why am I not able to lookup the symbols in
+>> the translator.c file the way I showed?
+> The -d in_asm logging is just using lookup_symbol() (eg for arm
+> I think it's in arm_tr_disas_log() that that particular logging
+> is done), so if it works when it's called by the existing QEMU code
+> but not in your modification then it sounds like there's an
+> error in your modification somewhere.
 >
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/translate-a64.c | 17 +++++------------
->  1 file changed, 5 insertions(+), 12 deletions(-)
->
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index b27892d971..f2241d8174 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -5356,31 +5356,24 @@ static void handle_fmov(DisasContext *s, int rd, =
-int rn, int type, bool itof)
->
->      if (itof) {
->          TCGv_i64 tcg_rn =3D cpu_reg(s, rn);
-> +        TCGv_i64 tmp;
->
->          switch (type) {
->          case 0:
-> -        {
->              /* 32 bit */
-> -            TCGv_i64 tmp =3D tcg_temp_new_i64();
-> +            tmp =3D tcg_temp_new_i64();
->              tcg_gen_ext32u_i64(tmp, tcg_rn);
-> -            tcg_gen_st_i64(tmp, cpu_env, fp_reg_offset(s, rd, MO_64));
-> -            tcg_gen_movi_i64(tmp, 0);
-> -            tcg_gen_st_i64(tmp, cpu_env, fp_reg_hi_offset(s, rd));
-> +            write_fp_dreg(s, rd, tmp);
->              tcg_temp_free_i64(tmp);
->              break;
-> -        }
->          case 1:
-> -        {
->              /* 64 bit */
-> -            TCGv_i64 tmp =3D tcg_const_i64(0);
-> -            tcg_gen_st_i64(tcg_rn, cpu_env, fp_reg_offset(s, rd, MO_64));
-> -            tcg_gen_st_i64(tmp, cpu_env, fp_reg_hi_offset(s, rd));
-> -            tcg_temp_free_i64(tmp);
-> +            write_fp_dreg(s, rd, tcg_rn);
->              break;
-> -        }
->          case 2:
->              /* 64 bit to top half. */
->              tcg_gen_st_i64(tcg_rn, cpu_env, fp_reg_hi_offset(s, rd));
-> +            clear_vec_high(s, true, rd);
-
-I was going to suggest maybe a write_fp_dreg_hi() helper here but there
-are only a couple of cases so:
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
->              break;
->          }
->      } else {
-
-
---
-Alex Benn=C3=A9e
+> thanks
+> -- PMM
