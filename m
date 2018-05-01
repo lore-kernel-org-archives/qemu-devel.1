@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fDa7V-0008Kg-Vg
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 14:35:22 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fDaDb-0001SZ-Vp
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 14:41:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fDa7S-0007gV-NG
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 14:35:21 -0400
-Received: from mail-pf0-x229.google.com ([2607:f8b0:400e:c00::229]:40236)
+	(envelope-from <richard.henderson@linaro.org>) id 1fDaDY-0002i3-Q8
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 14:41:39 -0400
+Received: from mail-pg0-x22c.google.com ([2607:f8b0:400e:c05::22c]:36964)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fDa7S-0007fK-AR
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 14:35:18 -0400
-Received: by mail-pf0-x229.google.com with SMTP id f189so9678779pfa.7
-	for <qemu-devel@nongnu.org>; Tue, 01 May 2018 11:35:17 -0700 (PDT)
-References: <20180425012300.14698-1-richard.henderson@linaro.org>
-	<87d0yf9y4j.fsf@linaro.org>
+	id 1fDaDY-0002hg-IF
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 14:41:36 -0400
+Received: by mail-pg0-x22c.google.com with SMTP id a13-v6so8837762pgu.4
+	for <qemu-devel@nongnu.org>; Tue, 01 May 2018 11:41:36 -0700 (PDT)
+References: <1525043888-90983-1-git-send-email-mjc@sifive.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <60b1a0ff-3126-1607-c38a-866beaead798@linaro.org>
-Date: Tue, 1 May 2018 11:35:12 -0700
+Message-ID: <d2446c1c-0142-37ae-9f43-ddb48d7a29b9@linaro.org>
+Date: Tue, 1 May 2018 11:41:32 -0700
 MIME-Version: 1.0
-In-Reply-To: <87d0yf9y4j.fsf@linaro.org>
+In-Reply-To: <1525043888-90983-1-git-send-email-mjc@sifive.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 0/9] target/arm: Fixups for
- ARM_FEATURE_V8_FP16
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] RISC-V: Fix missing break statement in
+ disassembler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,17 +31,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, patches@groups.riscv.org
 
-On 05/01/2018 08:47 AM, Alex Bennée wrote:
-> I've also pushed the fix to sqrt_f16 (passing cpu_env rather than fpst).
+On 04/29/2018 04:18 PM, Michael Clark wrote:
+> This fixes an issue when disassembling rv128 c.sqsp,
+> where the code erroneously fell through to c.swsp.
+> 
+> Cc: Palmer Dabbelt <palmer@sifive.com>
+> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Michael Clark <mjc@sifive.com>
+> ---
+>  disas/riscv.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-Oops.
-
-> Are you happy rolling my fixes into your v2?
-
-Yes, I can do that.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
 r~
