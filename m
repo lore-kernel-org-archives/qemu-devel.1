@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fDVlI-0003Pn-Bx
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 09:56:09 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fDVlJ-0003Qt-DO
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 09:56:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fDVlH-00080L-Is
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 09:56:08 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fDVlI-00081A-MA
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 09:56:09 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue,  1 May 2018 15:55:43 +0200
-Message-Id: <20180501135547.12414-1-laurent@vivier.eu>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 0/4] M68k for 2.13 patches
+Date: Tue,  1 May 2018 15:55:47 +0200
+Message-Id: <20180501135547.12414-5-laurent@vivier.eu>
+In-Reply-To: <20180501135547.12414-1-laurent@vivier.eu>
+References: <20180501135547.12414-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PULL 4/4] hw/m68k/mcf5208: Fix trivial typo in board
+ description
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,37 +23,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-trivial@nongnu.org, Laurent Vivier <laurent@vivier.eu>, Thomas Huth <huth@tuxfamily.org>, Michael Tokarev <mjt@tls.msk.ru>
 
-The following changes since commit c2c768500f17fc8cdcfa44d169f089953bb22748:
+From: Thomas Huth <huth@tuxfamily.org>
 
-  Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-2.13-pull-request' into staging (2018-04-30 10:43:41 +0100)
+It's the MCF5208 evaluation board, not the MCF5206 eval board.
 
-are available in the Git repository at:
+Signed-off-by: Thomas Huth <huth@tuxfamily.org>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20180429094002.3293c9de@thl530.multi.box>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ hw/m68k/mcf5208.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  git://github.com/vivier/qemu-m68k.git tags/m68k-for-2.13-pull-request
-
-for you to fetch changes up to 83dc62f6ed6b4f2afce71d579a630441cca0957c:
-
-  hw/m68k/mcf5208: Fix trivial typo in board description (2018-05-01 15:37:54 +0200)
-
-----------------------------------------------------------------
-Some fixes for m68k CPU emulation
-including the trivial one from Thomas for mcf5208 (m68k hardware)
-----------------------------------------------------------------
-
-Laurent Vivier (2):
-  m68k: Fix floatx80_lognp1 (Coverity CID1390587)
-  m68k: remove dead code (Coverity CID1390617)
-
-Pavel Dovgalyuk (1):
-  m68k: fix subx mem, mem instruction
-
-Thomas Huth (1):
-  hw/m68k/mcf5208: Fix trivial typo in board description
-
- hw/m68k/mcf5208.c       |  2 +-
- target/m68k/softfloat.c | 46 ++++++++++++++++------------------------------
- target/m68k/translate.c |  4 ++--
- 3 files changed, 19 insertions(+), 33 deletions(-)
-
+diff --git a/hw/m68k/mcf5208.c b/hw/m68k/mcf5208.c
+index 7aca58542e..ae3dcc98c3 100644
+--- a/hw/m68k/mcf5208.c
++++ b/hw/m68k/mcf5208.c
+@@ -315,7 +315,7 @@ static void mcf5208evb_init(MachineState *machine)
+ 
+ static void mcf5208evb_machine_init(MachineClass *mc)
+ {
+-    mc->desc = "MCF5206EVB";
++    mc->desc = "MCF5208EVB";
+     mc->init = mcf5208evb_init;
+     mc->is_default = 1;
+     mc->default_cpu_type = M68K_CPU_TYPE_NAME("m5208");
 -- 
 2.14.3
