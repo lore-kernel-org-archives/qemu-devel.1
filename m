@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fDR8X-0003Xm-Ov
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 04:59:50 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fDR8U-0003UO-Ur
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 04:59:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fDR8W-0007sV-M9
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 04:59:49 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fDR8T-0007ok-Nf
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 04:59:47 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41356)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fDR8W-0007mW-Fo
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 04:59:48 -0400
+	id 1fDR8T-0007mW-Fk
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 04:59:45 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue,  1 May 2018 09:59:35 +0100
-Message-Id: <20180501085939.6201-9-peter.maydell@linaro.org>
+Date: Tue,  1 May 2018 09:59:31 +0100
+Message-Id: <20180501085939.6201-5-peter.maydell@linaro.org>
 In-Reply-To: <20180501085939.6201-1-peter.maydell@linaro.org>
 References: <20180501085939.6201-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [RFC PATCH v2 08/12] Make flatview_access_valid() take
- a MemTxAttrs argument
+Subject: [Qemu-devel] [RFC PATCH v2 04/12] Make address_space_access_valid()
+ take a MemTxAttrs argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,64 +29,130 @@ To: qemu-devel@nongnu.org
 Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Eric Auger <eric.auger@redhat.com>
 
 As part of plumbing MemTxAttrs down to the IOMMU translate method,
-add MemTxAttrs as an argument to flatview_access_valid().
-Its callers now all have an attrs value to hand, so we can
-correct our earlier temporary use of MEMTXATTRS_UNSPECIFIED.
+add MemTxAttrs as an argument to address_space_access_valid().
+Its callers either have an attrs value to hand, or don't care
+and can use MEMTXATTRS_UNSPECIFIED.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- exec.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+ include/exec/memory.h      | 4 +++-
+ include/sysemu/dma.h       | 3 ++-
+ exec.c                     | 3 ++-
+ target/s390x/diag.c        | 6 ++++--
+ target/s390x/excp_helper.c | 3 ++-
+ target/s390x/mmu_helper.c  | 3 ++-
+ target/s390x/sigp.c        | 3 ++-
+ 7 files changed, 17 insertions(+), 8 deletions(-)
 
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 1af4e3cd5b..eb1ceace27 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -1938,8 +1938,10 @@ static inline MemoryRegion *address_space_translate(AddressSpace *as,
+  * @addr: address within that address space
+  * @len: length of the area to be checked
+  * @is_write: indicates the transfer direction
++ * @attrs: memory attributes
+  */
+-bool address_space_access_valid(AddressSpace *as, hwaddr addr, int len, bool is_write);
++bool address_space_access_valid(AddressSpace *as, hwaddr addr, int len,
++                                bool is_write, MemTxAttrs attrs);
+ 
+ /* address_space_map: map a physical memory region into a host virtual address
+  *
+diff --git a/include/sysemu/dma.h b/include/sysemu/dma.h
+index 0d73902634..5da3c4e3c5 100644
+--- a/include/sysemu/dma.h
++++ b/include/sysemu/dma.h
+@@ -77,7 +77,8 @@ static inline bool dma_memory_valid(AddressSpace *as,
+                                     DMADirection dir)
+ {
+     return address_space_access_valid(as, addr, len,
+-                                      dir == DMA_DIRECTION_FROM_DEVICE);
++                                      dir == DMA_DIRECTION_FROM_DEVICE,
++                                      MEMTXATTRS_UNSPECIFIED);
+ }
+ 
+ static inline int dma_memory_rw_relaxed(AddressSpace *as, dma_addr_t addr,
 diff --git a/exec.c b/exec.c
-index 3ceeb0643f..0eef4702a5 100644
+index eb6471abfe..87650dc7ed 100644
 --- a/exec.c
 +++ b/exec.c
-@@ -2662,7 +2662,7 @@ static MemTxResult flatview_read(FlatView *fv, hwaddr addr,
- static MemTxResult flatview_write(FlatView *fv, hwaddr addr, MemTxAttrs attrs,
-                                   const uint8_t *buf, int len);
- static bool flatview_access_valid(FlatView *fv, hwaddr addr, int len,
--                                  bool is_write);
-+                                  bool is_write, MemTxAttrs attrs);
- 
- static MemTxResult subpage_read(void *opaque, hwaddr addr, uint64_t *data,
-                                 unsigned len, MemTxAttrs attrs)
-@@ -2738,7 +2738,7 @@ static bool subpage_accepts(void *opaque, hwaddr addr,
- #endif
- 
-     return flatview_access_valid(subpage->fv, addr + subpage->base,
--                                 len, is_write);
-+                                 len, is_write, attrs);
+@@ -3445,7 +3445,8 @@ static bool flatview_access_valid(FlatView *fv, hwaddr addr, int len,
  }
  
- static const MemoryRegionOps subpage_ops = {
-@@ -3426,7 +3426,7 @@ static void cpu_notify_map_clients(void)
- }
- 
- static bool flatview_access_valid(FlatView *fv, hwaddr addr, int len,
--                                  bool is_write)
-+                                  bool is_write, MemTxAttrs attrs)
+ bool address_space_access_valid(AddressSpace *as, hwaddr addr,
+-                                int len, bool is_write)
++                                int len, bool is_write,
++                                MemTxAttrs attrs)
  {
-     MemoryRegion *mr;
-     hwaddr l, xlat;
-@@ -3437,8 +3437,7 @@ static bool flatview_access_valid(FlatView *fv, hwaddr addr, int len,
-         if (!memory_access_is_direct(mr, is_write)) {
-             l = memory_access_size(mr, l, addr);
-             /* When our callers all have attrs we'll pass them through here */
--            if (!memory_region_access_valid(mr, xlat, l, is_write,
--                                            MEMTXATTRS_UNSPECIFIED)) {
-+            if (!memory_region_access_valid(mr, xlat, l, is_write, attrs)) {
-                 return false;
-             }
+     FlatView *fv;
+     bool result;
+diff --git a/target/s390x/diag.c b/target/s390x/diag.c
+index a755837ad5..6ab473e7b6 100644
+--- a/target/s390x/diag.c
++++ b/target/s390x/diag.c
+@@ -140,7 +140,8 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
+             return;
          }
-@@ -3458,7 +3457,7 @@ bool address_space_access_valid(AddressSpace *as, hwaddr addr,
+         if (!address_space_access_valid(&address_space_memory, addr,
+-                                        sizeof(IplParameterBlock), false)) {
++                                        sizeof(IplParameterBlock), false,
++                                        MEMTXATTRS_UNSPECIFIED)) {
+             s390_program_interrupt(env, PGM_ADDRESSING, ILEN_AUTO, ra);
+             return;
+         }
+@@ -169,7 +170,8 @@ out:
+             return;
+         }
+         if (!address_space_access_valid(&address_space_memory, addr,
+-                                        sizeof(IplParameterBlock), true)) {
++                                        sizeof(IplParameterBlock), true,
++                                        MEMTXATTRS_UNSPECIFIED)) {
+             s390_program_interrupt(env, PGM_ADDRESSING, ILEN_AUTO, ra);
+             return;
+         }
+diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
+index dfee221111..f0ce60cff2 100644
+--- a/target/s390x/excp_helper.c
++++ b/target/s390x/excp_helper.c
+@@ -120,7 +120,8 @@ int s390_cpu_handle_mmu_fault(CPUState *cs, vaddr orig_vaddr, int size,
  
-     rcu_read_lock();
-     fv = address_space_to_flatview(as);
--    result = flatview_access_valid(fv, addr, len, is_write);
-+    result = flatview_access_valid(fv, addr, len, is_write, attrs);
-     rcu_read_unlock();
-     return result;
- }
+     /* check out of RAM access */
+     if (!address_space_access_valid(&address_space_memory, raddr,
+-                                    TARGET_PAGE_SIZE, rw)) {
++                                    TARGET_PAGE_SIZE, rw,
++                                    MEMTXATTRS_UNSPECIFIED)) {
+         DPRINTF("%s: raddr %" PRIx64 " > ram_size %" PRIx64 "\n", __func__,
+                 (uint64_t)raddr, (uint64_t)ram_size);
+         trigger_pgm_exception(env, PGM_ADDRESSING, ILEN_AUTO);
+diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
+index a25deef5dd..145b62a7ef 100644
+--- a/target/s390x/mmu_helper.c
++++ b/target/s390x/mmu_helper.c
+@@ -461,7 +461,8 @@ static int translate_pages(S390CPU *cpu, vaddr addr, int nr_pages,
+             return ret;
+         }
+         if (!address_space_access_valid(&address_space_memory, pages[i],
+-                                        TARGET_PAGE_SIZE, is_write)) {
++                                        TARGET_PAGE_SIZE, is_write,
++                                        MEMTXATTRS_UNSPECIFIED)) {
+             trigger_access_exception(env, PGM_ADDRESSING, ILEN_AUTO, 0);
+             return -EFAULT;
+         }
+diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
+index aff1530c82..c1f9245797 100644
+--- a/target/s390x/sigp.c
++++ b/target/s390x/sigp.c
+@@ -280,7 +280,8 @@ static void sigp_set_prefix(CPUState *cs, run_on_cpu_data arg)
+     cpu_synchronize_state(cs);
+ 
+     if (!address_space_access_valid(&address_space_memory, addr,
+-                                    sizeof(struct LowCore), false)) {
++                                    sizeof(struct LowCore), false,
++                                    MEMTXATTRS_UNSPECIFIED)) {
+         set_sigp_status(si, SIGP_STAT_INVALID_PARAMETER);
+         return;
+     }
 -- 
 2.17.0
