@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <airlied@redhat.com>) id 1fDbq0-0002n7-5Q
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 16:25:25 -0400
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1fDc5O-0005lY-Fc
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 16:41:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <airlied@redhat.com>) id 1fDbpu-0004sq-TJ
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 16:25:24 -0400
-Received: from mail-ua0-f176.google.com ([209.85.217.176]:46499)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <airlied@redhat.com>) id 1fDbpu-0004sT-NB
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 16:25:18 -0400
-Received: by mail-ua0-f176.google.com with SMTP id e8so5860338uam.13
-	for <qemu-devel@nongnu.org>; Tue, 01 May 2018 13:25:17 -0700 (PDT)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1fDc5K-0003nE-Cj
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 16:41:18 -0400
+Received: from hera.aquilenet.fr ([185.233.100.1]:47944)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1fDc5K-0003kM-6H
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 16:41:14 -0400
+Date: Tue, 1 May 2018 22:41:11 +0200
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20180501204110.t2suo47pgiktopsa@var.youpi.perso.aquilenet.fr>
+References: <20180316062822.15425-1-famz@redhat.com>
+	<20180316062822.15425-2-famz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180501161509.28517.344.stgit@gimli.home>
-References: <20180501161509.28517.344.stgit@gimli.home>
-From: David Airlie <airlied@redhat.com>
-Date: Wed, 2 May 2018 06:25:16 +1000
-Message-ID: <CAMwc25p+3ugAHz14shv_Dyo8LmJzf=dNJXH53RMyS4kAD0qvag@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/3] Update linux-headers to v4.17-rc3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180316062822.15425-2-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.13 v3 1/2] slirp: Add "query-usernet"
+ QMP command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,26 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, mst@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>
 
-On Wed, May 2, 2018 at 2:25 AM, Alex Williamson <alex.williamson@redhat.com>
-wrote:
+Hello,
 
-> This series is based on Michael's series moving kvm_para.h out to
-> standard headers, which resolves the conflict in definitions of
-> KVM_HINTS_DEDICATED between QEMU and kernel.
->
-> Additionally, this series moves the definition of
-> VIRTIO_GPU_CAPSET_VIRGL2 into QEMU code as the definition does not
-> exist in the upstream header and it seems unreasonable to expect
-> anyone wanting to update headers should manually resolve this
-> conflict.
->
+I'm sorry I didn't find the time to have a look at it before.
 
-I thought the headers went qemu->linux which is why I never pushed this to
-Linux.
+In general it looks good, just a few things:
 
-Happy to have a patch in the kernel that adds this.
+Samuel
 
-Dave.
+Fam Zheng, le ven. 16 mars 2018 14:28:21 +0800, a ecrit:
+> +        if (!net_hub_id_for_client(&s->nc, &vlan)) {
+
+That makes me think that IIUC, we shouldn't call them vlan, as mentioned
+in the recent vlan->hub renaming patches.
+
+> +{ 'struct': 'UsernetInfo',
+> +  'data': {
+> +    'id':              'str',
+> +    'vlan':            'int',
+
+and here as well, I guess.
+
+> +void slirp_connection_info(Slirp *slirp, Monitor *mon)
+> +{
+> +    const char *state;
+> +    char buf[64];
+> +    UsernetInfo info = { };
+> +    UsernetConnectionList *cl;
+> +
+> +    monitor_printf(mon, "  Protocol[State]    FD  Source Address  Port   "
+> +                        "Dest. Address  Port RecvQ SendQ\n");
+> +
+> +    usernet_get_info(slirp, &info);
+
+Mmm, I don't see the content of info being freed here?
+
+Samuel
