@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fDaDb-0001SZ-Vp
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 14:41:40 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fDaFM-0002YV-HQ
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 14:43:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fDaDY-0002i3-Q8
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 14:41:39 -0400
-Received: from mail-pg0-x22c.google.com ([2607:f8b0:400e:c05::22c]:36964)
+	(envelope-from <richard.henderson@linaro.org>) id 1fDaFJ-0003Qk-CY
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 14:43:28 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:38438)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fDaDY-0002hg-IF
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 14:41:36 -0400
-Received: by mail-pg0-x22c.google.com with SMTP id a13-v6so8837762pgu.4
-	for <qemu-devel@nongnu.org>; Tue, 01 May 2018 11:41:36 -0700 (PDT)
-References: <1525043888-90983-1-git-send-email-mjc@sifive.com>
+	id 1fDaFJ-0003QZ-6A
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 14:43:25 -0400
+Received: by mail-pg0-x244.google.com with SMTP id n9-v6so8839685pgq.5
+	for <qemu-devel@nongnu.org>; Tue, 01 May 2018 11:43:25 -0700 (PDT)
+References: <20180429235840.16659-1-lvivier@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <d2446c1c-0142-37ae-9f43-ddb48d7a29b9@linaro.org>
-Date: Tue, 1 May 2018 11:41:32 -0700
+Message-ID: <46927e99-c504-fd3f-cc8e-98f08ef75efb@linaro.org>
+Date: Tue, 1 May 2018 11:43:21 -0700
 MIME-Version: 1.0
-In-Reply-To: <1525043888-90983-1-git-send-email-mjc@sifive.com>
+In-Reply-To: <20180429235840.16659-1-lvivier@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] RISC-V: Fix missing break statement in
- disassembler
+Subject: Re: [Qemu-devel] [PATCH v3] tcg: workaround branch instruction
+ overflow in tcg_out_qemu_ld/st
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,23 +31,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, patches@groups.riscv.org
+To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>
 
-On 04/29/2018 04:18 PM, Michael Clark wrote:
-> This fixes an issue when disassembling rv128 c.sqsp,
-> where the code erroneously fell through to c.swsp.
+On 04/29/2018 04:58 PM, Laurent Vivier wrote:
+> ppc64 uses a BC instruction to call the tcg_out_qemu_ld/st
+> slow path. BC instruction uses a relative address encoded
+> on 14 bits.
 > 
-> Cc: Palmer Dabbelt <palmer@sifive.com>
-> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Michael Clark <mjc@sifive.com>
+> The slow path functions are added at the end of the generated
+> instructions buffer, in the reverse order of the callers.
+> So more we have slow path functions more the distance between
+> the caller (BC) and the function increases.
+> 
+> This patch changes the behavior to generate the functions in
+> the same order of the callers.
+> 
+> Fixes: 15fa08f845 ("tcg: Dynamically allocate TCGOps")
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 > ---
->  disas/riscv.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Thanks, applied to tcg-next.
 
 
 r~
