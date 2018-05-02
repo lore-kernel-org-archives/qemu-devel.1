@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1fDxB9-0000NZ-8S
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 15:12:40 -0400
+	(envelope-from <eblake@redhat.com>) id 1fDxdN-0006Ek-N0
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 15:41:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1fDxB5-0001lB-08
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 15:12:39 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:46176)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1fDxB4-0001jl-Je
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 15:12:34 -0400
-In-Reply-To: <0P8400M5O5RWWW30@mr11p00im-asmtp003.me.com>
-References: <0P8400M5O5RWWW30@mr11p00im-asmtp003.me.com>
+	(envelope-from <eblake@redhat.com>) id 1fDxdK-0000kz-JD
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 15:41:49 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55552 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fDxdK-0000kF-C5
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 15:41:46 -0400
+References: <20180502073034.15141-1-famz@redhat.com>
+	<20180502073034.15141-2-famz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <60f2d927-9846-7da2-7067-62f0167a2b58@redhat.com>
+Date: Wed, 2 May 2018 14:41:34 -0500
 MIME-Version: 1.0
-From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Date: Wed, 02 May 2018 22:12:30 +0300
-Message-ID: <8b1f4516-b85e-4d6f-af45-98136fb3b481@ispras.ru>
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v3 00/30] replay additions
+In-Reply-To: <20180502073034.15141-2-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] slirp: Add "query-usernet" QMP
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,34 +29,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dominique Fuchs <d.fuchs91@icloud.com>
-Cc: dovgaluk@ispras.ru, QEMU Developers <qemu-devel@nongnu.org>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-I used --disable-capstone for building under Windows=2E
+On 05/02/2018 02:30 AM, Fam Zheng wrote:
+> HMP "info usernet" has been available but it isn't ideal for programmed
+> use cases. This closes the gap in QMP by adding a counterpart
+> "query-usernet" command. It is basically translated from
+> the HMP slirp_connection_info() loop, which now calls the QMP
+> implementation and prints the data, just like other HMP info_* commands.
+> 
+> The TCPS_* macros are now defined as a QAPI enum.
+> 
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
 
-=E2=81=A3=D0=9E=D1=
-=82=D0=BF=D1=80=D0=B0=D0=B2=D0=BB=D0=B5=D0=BD=D0=BE =D1=81 =D0=BF=D0=BE=D0=
-=BC=D0=BE=D1=89=D1=8C=D1=8E BlueMail =E2=80=8B
+> +##
+> +# @UsernetInfo:
+> +#
+> +# SLIRP usernet information.
+> +#
+> +# Since: 2.13
+> +##
+> +{ 'struct': 'UsernetInfo',
+> +  'data': {
+> +    'id':              'str',
+> +    'hub':             'int',
+> +    'connections':     ['UsernetConnection']
+> +} }
+> +
+> +##
+> +# @query-usernet:
+> +#
+> +# Return SLIRP network information.
+> +#
+> +# Since: 2.13
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "query-usernet", "arguments": { } }
+> +# <- { "return": [
+> +#         {
+> +#             "promiscuous": true,
+> +#             "name": "vnet0"
 
-=D0=9D=D0=B0 2 =D0=9C=D0=B0=
-=D0=B9 2018 =D0=B3=2E, 21:24, =D0=B2 21:24, Dominique Fuchs <d=2Efuchs91@ic=
-loud=2Ecom> =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BB:=D0=BF>C:\msys64\min=
-gw64\bin\ar=2Eexe: creating libfdt/libfdt=2Ea
->make[1]: *** No rule to make=
- target
->=E2=80=9E/home/Dominique/qemu/capstone/capstone=2Elib=E2=80=9C=2E =
- Stop=2E
->make: *** [Makefile:503: subdir-capstone] Error 2
->
->I just stumb=
-led across the same error while building qemu 2=2E12 on
->MSYS2/mingw64, whi=
-ch led me to this conversation from january=2E
->According to this list, the=
-re was no final solution to this, as this
->still happens in build chain for=
- 2=2E12 and no further comments were
->made=2E Did I miss something elsewher=
-e?
->
->Dominique Fuchs
+That example looks wrong; I'm expecting 'id', 'hub', and another array 
+'connections'.
+
+> +#         }
+> +#       ]
+> +#    }
+> +#
+> +##
+> +{ 'command': 'query-usernet',
+> +  'returns': ['UsernetInfo'] }
+
+Other than the botched example, the qapi additions look okay to me.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
