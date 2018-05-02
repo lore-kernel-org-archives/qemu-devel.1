@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54888)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1fDxtF-00043F-68
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 15:58:19 -0400
+	(envelope-from <frasse.iglesias@gmail.com>) id 1fDxtx-0004Mc-Uf
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 15:59:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1fDxt8-0004bx-MJ
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 15:58:13 -0400
-Received: from mail-pg0-x235.google.com ([2607:f8b0:400e:c05::235]:44047)
+	(envelope-from <frasse.iglesias@gmail.com>) id 1fDxtr-0004vU-BX
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 15:58:58 -0400
+Received: from mail-pf0-x235.google.com ([2607:f8b0:400e:c00::235]:47098)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
-	id 1fDxt8-0004bP-6B
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 15:58:06 -0400
-Received: by mail-pg0-x235.google.com with SMTP id 82-v6so11391776pge.11
-	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 12:58:05 -0700 (PDT)
+	id 1fDxtq-0004uk-Qf
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 15:58:51 -0400
+Received: by mail-pf0-x235.google.com with SMTP id p12so12673028pff.13
+	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 12:58:50 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180430132740.GB21103@xhdsaipava40.xilinx.com>
+In-Reply-To: <20180430134216.dmwcefxekakbmthg@toto>
 References: <20180429004329.21067-1-frasse.iglesias@gmail.com>
 	<20180429004329.21067-2-frasse.iglesias@gmail.com>
-	<20180430132740.GB21103@xhdsaipava40.xilinx.com>
+	<20180430134216.dmwcefxekakbmthg@toto>
 From: francisco iglesias <frasse.iglesias@gmail.com>
-Date: Wed, 2 May 2018 21:58:03 +0200
-Message-ID: <CAAYMZQt7AaPh4XXeeBGNhgHUmuDkXk8E=_7UyY899+7z-15smQ@mail.gmail.com>
+Date: Wed, 2 May 2018 21:58:49 +0200
+Message-ID: <CAAYMZQvLWA7siSMJr4a8T9v8vnCe0gQYRM++_99BkwYbkbj7Og@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] [PATCH v1 1/2] xlnx-zdma: Add a model of the
  Xilinx ZynqMP generic DMA
@@ -31,16 +31,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Edgar Iglesias <edgari@xilinx.com>, alistair@alistair23.me, Alistair Francis <alistair23@gmail.com>, Francisco Iglesias <francisco.iglesias@feimtech.se>, Peter Maydell <peter.maydell@linaro.org>
+To: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Edgar Iglesias <edgari@xilinx.com>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, alistair@alistair23.me, Alistair Francis <alistair23@gmail.com>, Francisco Iglesias <francisco.iglesias@feimtech.se>, Peter Maydell <peter.maydell@linaro.org>
 
-On 30 April 2018 at 15:27, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+On 30 April 2018 at 15:42, Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 wrote:
 
-> Hi Francisco,
->
 > On Sun, Apr 29, 2018 at 02:43:28AM +0200, Francisco Iglesias wrote:
 > > Add a model of the generic DMA found on Xilinx ZynqMP.
+>
+>
+> Hi Francisco,
+>
+> I think we need to look at the VMStateDescription, some state
+> seems to be missing...
+>
+> Cheers,
+> Edgar
+>
+
+Hi Edgar,
+
+I'll look into this an attempt to correct it in v2!
+
+Thank you,
+Best regards,
+Francisco Iglesias
+
+
+>
+>
 > >
 > > Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
 > > Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
@@ -676,8 +696,6 @@ wrote:
 > > +
 > > +        if (s->state == PAUSED &&
 > > +            ARRAY_FIELD_EX32(s->regs, ZDMA_CH_CTRL0, CONT)) {
-> We can clear the CONT, if dma is beeing unpaused.
->
 > > +            if (ARRAY_FIELD_EX32(s->regs, ZDMA_CH_CTRL0, CONT_ADDR) ==
 > 1) {
 > > +                zdma_update_descr_addr_from_start(s);
@@ -689,25 +707,6 @@ wrote:
 > > +            }
 > > +        } else {
 > > +            zdma_update_descr_addr_from_start(s);
-> Need to look more here, looks like we are running down and processing
-> descriptors when channel is paused.
->
-> Thanks
-> Sai Pavan
->
-
-Hi Sai,
-
-I see what you mean and will attempt to correct this in the next version
-(v2)!
-
-Thank you,
-Best regards,
-Francisco Iglesias
-
-
-
->
 > > +        }
 > > +        zdma_set_state(s, ENABLED);
 > > +    } else {
