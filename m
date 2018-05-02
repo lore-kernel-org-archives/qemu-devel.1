@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fDpHi-0005XJ-4E
+	(envelope-from <bounces@canonical.com>) id 1fDpHi-0005XK-4L
 	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:46:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fDpHe-0002JT-3n
+	(envelope-from <bounces@canonical.com>) id 1fDpHe-0002Jj-JS
 	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:46:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60914)
+Received: from indium.canonical.com ([91.189.90.7]:60940)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fDpHd-0002Ix-Ts
+	id 1fDpHe-0002JA-Cv
 	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:46:50 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fDpHc-0001cI-O9
-	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 10:46:48 +0000
+	id 1fDpHd-0001cm-Bw
+	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 10:46:49 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AF52B2E80C7
-	for <qemu-devel@nongnu.org>; Wed,  2 May 2018 10:46:48 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 4CBB72E80C9
+	for <qemu-devel@nongnu.org>; Wed,  2 May 2018 10:46:49 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 02 May 2018 10:34:53 -0000
-From: Thomas Huth <1315257@bugs.launchpad.net>
-Reply-To: Bug 1315257 <1315257@bugs.launchpad.net>
+Date: Wed, 02 May 2018 10:34:04 -0000
+From: Thomas Huth <1314667@bugs.launchpad.net>
+Reply-To: Bug 1314667 <1314667@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20140502062449.18994.92954.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152525729320.2091.10333677657885780043.malone@gac.canonical.com>
+References: <20140430150437.26914.15156.malonedeb@gac.canonical.com>
+Message-Id: <152525724467.2035.14357626679001054971.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1315257] Re: QEMU get black screen when adjust
- resolution in full screen mode.
+Subject: [Qemu-devel] [Bug 1314667] Re: PMPrebUSB - appcrash of qemu in
+ Win-7-64bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,7 +40,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 
 Looking through old bug tickets... can you still reproduce this issue
-with the latest version of QEMU? Or could we close this ticket nowadays?
+with the latest (64-bit) version of QEMU? Or could we close this ticket
+nowadays?
 
 ** Changed in: qemu
        Status: New =3D> Incomplete
@@ -49,73 +50,67 @@ with the latest version of QEMU? Or could we close this ticket nowadays?
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1315257
+https://bugs.launchpad.net/bugs/1314667
 
 Title:
-  QEMU get black screen when adjust resolution in full screen mode.
+  PMPrebUSB - appcrash of qemu in Win-7-64bit
 
 Status in QEMU:
   Incomplete
 
 Bug description:
-  Description:
-  QEMU cause X11 error when adjust resolution in full screen mode or start =
-QEMU with "-full-screen".
+  I am not sure if this issue is a bug of qemu or by Win-7.
+  I want to test in advance with QEMU the ability if my USB-Rescue-Drive is =
 
-  Additional info:
-  * host OS infomation
-      Archlinux 64bit
-  * gest OS infomation
-      Windows XP SP3 32bit
-  * Archlinux package version(s)
-  qemu 1.7.1-1
-  cinnamon 2.2.3-3
-  sdl 1.2.15-5
-  xf86-video-ati 1:7.3.0-1
-  xf86-video-fbdev 0.4.4-2
-  xf86-video-modesetting 0.8.1-2
-  xf86-video-vesa 2.3.2-4
-  xorg-server 1.15.1-1
+  booting correctly. I have Win-7-64 and run qemu v.o.15.1.0 out of the ins=
+talled RMPrepUSB v.2.1.719 =
 
-  * error output in Xterm
-  X Error of failed request:  BadValue (integer parameter out of range for =
-operation)
-    Major opcode of failed request:  153 (XFree86-VidModeExtension)
-    Minor opcode of failed request:  10 (XF86VidModeSwitchToMode)
-    Value in failed request:  0x2c2
-    Serial number of failed request:  412
-    Current serial number in output stream:  414
+  program. The settings for the preparation of my USB drive were FAT32 boot=
+ as
+  HD, bootloader WinPE/Win-7/Vista, set for running iso-files directly in %=
+_ISO
+  \MAINMENU\Hiren=E2=80=99sBootCD.iso. When I run Qemu I get the messages i=
+n the cmd starting window it says:
 
-  * Xorg log output
-      *with the command "grep EE /var/log/Xorg.0.log"
-          (WW) warning, (EE) error, (NI) not implemented, (??) unknown.
-  [  7726.317] Initializing built-in extension MIT-SCREEN-SAVER
-      *with the command "grep WW /var/log/Xorg.0.log"
-          (WW) warning, (EE) error, (NI) not implemented, (??) unknown.
-  [  7726.314] (WW) `fonts.dir' not found (or not valid) in "/usr/share/fon=
-ts/misc/".
-  [  7726.314] (WW) `fonts.dir' not found (or not valid) in "/usr/share/fon=
-ts/100dpi/".
-  [  7726.314] (WW) `fonts.dir' not found (or not valid) in "/usr/share/fon=
-ts/75dpi/".
-  [  7726.316] (WW) Open ACPI failed (/var/run/acpid.socket) (No such file =
-or directory)
-  [  7726.334] (WW) Falling back to old probe method for modesetting
-  [  7726.334] (WW) Falling back to old probe method for fbdev
-  [  7726.335] (WW) Falling back to old probe method for vesa
+  Administrator: RMPrepUSB QEMU Launcher
+  **************************************
+  EXECUTING "C:\Program Files (x86)\RMPrepUSB\qemu\STARTFROMUSB.cmd"
+  DRIVE NUMBER=3D3
+  MEMORY SIZE=3D1000
+  HARD DISK IMAGE=3Dharddisk.img
+  NOWRITE=3D
+  Found OS=3DVISTA_OR_LATER
+  Sending command Start_VM.exe 3 500 qemu.exe -L . -name "RMPrepUSB Emulati=
+on =
 
-  Steps to reproduce:
-  1.Start QEMU with the command:
-      qemu-system-i386 -enable-kvm -machine type=3Dpc,accel=3Dkvm -rtc base=
-=3Dlocaltime -nodefaults -no-quit -usbdevice tablet -cpu host -smp 2 -m 1G =
--vga std -soundhw ac97 -net nic,model=3Dvirtio -net bridge,br=3Dvirbr0 -dri=
-ve if=3Dvirtio,index=3D0,media=3Ddisk,format=3Draw,cache=3Dnone,file=3D/hom=
-e/user/VM/WinXP.img
-  2.Press ctl + alt + f to full screen.
-  3.Adjust resolution in guest OS.
-  or
-  1.Make sure the guest OS resolution is not the same as host OS.
-  2.Start QEMU with parameter "-full-screen".
+  Session  RAM=3D1000MB VirtualHDD=3Dharddisk.i
+  lt+LCtrl)" -boot c -m 1000 -drive file=3D\\.
+  \PhysicalDrive3,if=3Dide,index=3D0,media=3Ddisk -hdb harddisk.img to shel=
+l...
+
+  Win-7: in the second window appears:
+  ***********************************
+  -->qemu funktioniert nicht mehr
+  Problemsignatur:
+    Problemereignisname:	APPCRASH
+    Anwendungsname:	qemu.exe
+    Anwendungsversion:	0.15.1.0
+    Anwendungszeitstempel:	4f478c16
+    Fehlermodulname:	qemu.exe
+    Fehlermodulversion:	0.15.1.0
+    Fehlermodulzeitstempel:	4f478c16
+    Ausnahmecode:	40000015
+    Ausnahmeoffset:	00053b06
+    Betriebsystemversion:	6.1.7601.2.1.0.256.48
+    Gebietsschema-ID:	1031
+    Zusatzinformation 1:	bf8d
+    Zusatzinformation 2:	bf8d49108a2e5a0707fc48438e01652a
+    Zusatzinformation 3:	b0f1
+    Zusatzinformation 4:	b0f155b0f1de9c5eb22bd6d100737cbe
+
+  If somebody can understand that behaviour I appreciate everybodies help. =
+Thank you with regards
+  H.O.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1315257/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1314667/+subscriptions
