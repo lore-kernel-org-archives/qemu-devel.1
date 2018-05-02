@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fDqW3-0000EO-0L
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 08:05:51 -0400
+	(envelope-from <berrange@redhat.com>) id 1fDqXW-0001JY-Fg
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 08:07:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fDqVz-0001Ao-1P
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 08:05:46 -0400
-Received: from mail-oi0-x235.google.com ([2607:f8b0:4003:c06::235]:40463)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fDqVy-0001Ah-Oq
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 08:05:42 -0400
-Received: by mail-oi0-x235.google.com with SMTP id c203-v6so12679186oib.7
-	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 05:05:42 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1fDqXR-0001wg-Hz
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 08:07:18 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53880 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fDqXR-0001wF-BI
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 08:07:13 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9E1D3722E1
+	for <qemu-devel@nongnu.org>; Wed,  2 May 2018 12:07:12 +0000 (UTC)
+Date: Wed, 2 May 2018 13:07:05 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180502120705.GP3308@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180430185943.35714-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180502115844.GO3308@redhat.com>
-References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
-	<d50e3a40-d7f3-4c9b-e930-4c2f4d6c8a53@redhat.com>
-	<CAFEAcA8wJuJ9464LadgjJOo-7ttdGYcfDQWALbkxBRJCr_knkg@mail.gmail.com>
-	<062deb2a-35fc-319f-b159-3b58cbf910df@redhat.com>
-	<20180502115844.GO3308@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 2 May 2018 13:05:21 +0100
-Message-ID: <CAFEAcA-e_=08658O8E3CAmYXvBbNWmznnhfMLUW+MXnxb_vKfQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180430185943.35714-1-dgilbert@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] release retrospective, next release timing,
- numbering
+Subject: Re: [Qemu-devel] [PATCH] Migration+TLS: Fix crash due to double
+ cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,48 +35,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, pkrempa@redhat.com, quintela@redhat.com, peterx@redhat.com
 
-On 2 May 2018 at 12:58, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote=
-:
-> I'm curious what is the compelling benefit of having a single fat QEMU
-> binary that included all archiectures at once ?
+On Mon, Apr 30, 2018 at 07:59:43PM +0100, Dr. David Alan Gilbert (git) wr=
+ote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>=20
+> During a TLS connect we see:
+>   migration_channel_connect calls
+>   migration_tls_channel_connect
+>   (calls after TLS setup)
+>   migration_channel_connect
+>=20
+> My previous error handling fix made migration_channel_connect
+> call migrate_fd_connect in all cases; unfortunately the above
+> means it gets called twice and crashes doing double cleanup.
+>=20
+> Fixes: 688a3dcba98
+>=20
+> Reported-by: Peter Krempa <pkrempa@redhat.com>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  migration/channel.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 
-The motivation is "I want to model a board with an SoC that has
-both Arm cores and Microblaze cores". One binary seems the most
-sensible way to do that, since otherwise we'd end up with some
-huge multiplication of binaries for all the possible architecture
-combinations. It also would reduce the number of times we end up
-recompiling and shipping any particular PCI device. From the
-perspective of QEMU as emulation environment, it's a nice
-simplification.
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-> From a security POV I find it desirable for us to go in the other directi=
-on
-> away from monolithic binaries that include everything. We've started that
-> work with turning various pieces of QEMU into loadable modules. In the fu=
-ture
-> we might see some pieces being moved into completely separate binaries. e=
-g we
-> could have a core QEMU binary and separate binaries for GTK, SPICE, VNC, =
-etc
-> frontends.
->
-> If each target architecture could be a loadable module, it might be
-> acceptable, but I wouldn't much like the idea of having every architectur=
-e
-> compiled into a single binary. Distros like to build every QEMU feature,
-> but users reasonably don't want to expand their attack surface by having
-> all features installed, so being able to install packages for each target
-> arch separately is a compelling benefit of current set of QEMU per-target
-> binaries that I wouldn't want to loose.
+I've satisfied myself that the double error reporting is not going to
+cause any functional harm, so that's less urgent to fix.
 
-Well, we already have issues with that where for instance
-qemu-system-aarch64 has a lot of device models that the
-typical KVM VM doesn't need. More modularity might help
-(though we have shied away from having devices be modules
-in the past).
+>=20
+> diff --git a/migration/channel.c b/migration/channel.c
+> index c5eaf0fa0e..7a32b5aca4 100644
+> --- a/migration/channel.c
+> +++ b/migration/channel.c
+> @@ -71,6 +71,15 @@ void migration_channel_connect(MigrationState *s,
+>              !object_dynamic_cast(OBJECT(ioc),
+>                                   TYPE_QIO_CHANNEL_TLS)) {
+>              migration_tls_channel_connect(s, ioc, hostname, &error);
+> +
+> +            if (!error) {
+> +                /* tls_channel_connect will call back to this
+> +                 * function after the TLS handshake,
+> +                 * so we mustn't call migrate_fd_connect until then
+> +                 */
+> +
+> +                return;
+> +            }
+>          } else {
+>              QEMUFile *f =3D qemu_fopen_channel_output(ioc);
+> =20
+> --=20
+> 2.17.0
+>=20
 
-thanks
--- PMM
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
