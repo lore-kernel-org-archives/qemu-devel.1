@@ -1,15 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47391)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fDzMZ-0007Tp-QV
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 17:32:36 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fDzMb-0007Vk-J3
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 17:32:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fDzMY-0000Lz-IA
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 17:32:35 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fDzMa-0000NA-FI
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 17:32:37 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed,  2 May 2018 23:32:12 +0200
-Message-Id: <20180502213219.7842-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [RFC 0/7] block: Try to use correctly typed blockdev
- options
+Date: Wed,  2 May 2018 23:32:16 +0200
+Message-Id: <20180502213219.7842-5-mreitz@redhat.com>
+In-Reply-To: <20180502213219.7842-1-mreitz@redhat.com>
+References: <20180502213219.7842-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [RFC 4/7] block: Add bdrv_open_string_opts()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,94 +22,145 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-(Sorry, Markus, sorry, Kevin, if this series makes you angry.)
+This function is to be used by callers that cannot guarantee that all
+values in @options are correctly typed.  In the future, we would like
+this function to be gone, of course, but for now it at least lets us
+begin a proper separation of legacy interfaces.
 
-The subject says it all, I think.  The original issue I was assigned to
-solve is this:
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ include/block/block.h |  2 ++
+ block.c               | 84 +++++++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 83 insertions(+), 3 deletions(-)
 
-    $ ./qemu-img info --image-opts driver=null-co,size=42
-    image: json:{"driver": "null-co", "size": "42"}
-    [...]
-
-As you can see, "size" gets a string value in the json:{} object
-although it is an integer, according to the QAPI schema.  (Buglink:
-https://bugzilla.redhat.com/show_bug.cgi?id=1534396)
-
-My first approach to fix this was to try to pipe the full_open_options
-dict generated in bdrv_refresh_filename() through a keyval input visitor
-and then an output visitor (which would have depended on my filename
-series).  This did not work out because bs->options (where all of the
-reconstructed options come from) may either be correctly typed or not,
-and keyval chokes on non-string values.  I could have probably converted
-bs->options to fully string values before trying to pipe it through
-keyval, but I decided I didn't like that very much.  (I suppose I can be
-convinced otherwise, though.)
-
-So I decided to venture into the territory of what we actually want at
-some point: Correctly typed bs->options.  Or, rather, in the end we want
-bs->options to be BlockdevOptions, but let's not be too hasty here.
-
-So it turns out that with really just a bit of work we can separate the
-interfaces that generate correctly typed options (e.g. blockdev-add)
-from the ones that generate pure string-valued options (e.g. qemu-img
---image-opts) rather well.  Once we have done that, we can pipe all of
-the pure string options through keyval and back to get correctly typed
-options.
-
-So far the theory.  Now, in practice we of course have pitfalls, and
-those are not addressed by this series, which is the main reason this is
-an RFC.
-
-The first pitfall (I can see...) is that json:{} allows you to specify
-mixed options -- some values are incorrectly strings, others are
-non-strings.  keyval cannot cope with that, so the result after this
-series is that those options end up in bs->options just like that.  I
-suppose we could just forbid that mixed-typed case, though, and call it
-a bug fix.
-
-The second problem (and I think the big reason why we have not
-approached this issue so far) is that there are options which you can
-give as strings, but which are not covered by the schema.  In such a
-case, the input visitor will reject the QDict and we will just use it
-as-is, that is, full of strings.  Now that is not what we want in the
-end, of course -- we want everything to be converted into something that
-is covered by the schema.
-
-My reasoning for sending this series anyway is that it doesn't make
-things worse (bs->options is a mess already, you can never be certain
-that it contains correctly typed values or just strings or both), and
-that it at least gives a starting point from which we can continue on.
-After this series, we have a clear separation between the interfaces
-that use purely string values and the ones that provide correct typing
-(well, and json:{}).
-
-Oh, and it fixes the above BZ for the more common cases.
-
-
-Max Reitz (7):
-  qdict: Add qdict_set_default_bool()
-  block: Let change-medium add detect-zeroes as bool
-  block: Make use of qdict_set_default_bool()
-  block: Add bdrv_open_string_opts()
-  block: Add blk_new_open_string_opts()
-  block: Use {blk_new,bdrv}_open_string_opts()
-  iotests: Test internal option typing
-
- include/block/block.h          |  2 +
- include/qapi/qmp/qdict.h       |  1 +
- include/sysemu/block-backend.h |  2 +
- block.c                        | 96 ++++++++++++++++++++++++++++++++++++++----
- block/block-backend.c          | 30 ++++++++++++-
- block/vvfat.c                  |  4 +-
- blockdev.c                     | 33 ++++++++++-----
- qemu-img.c                     |  3 +-
- qemu-io.c                      |  2 +-
- qemu-nbd.c                     |  2 +-
- qobject/qdict.c                | 13 ++++++
- tests/test-replication.c       |  6 +--
- tests/qemu-iotests/089         | 12 ++++++
- tests/qemu-iotests/089.out     |  5 +++
- 14 files changed, 183 insertions(+), 28 deletions(-)
-
+diff --git a/include/block/block.h b/include/block/block.h
+index 3894edda9d..5335fa8c20 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -261,6 +261,8 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
+                            const char *bdref_key, Error **errp);
+ BlockDriverState *bdrv_open(const char *filename, const char *reference,
+                             QDict *options, int flags, Error **errp);
++BlockDriverState *bdrv_open_string_opts(const char *filename, QDict *options,
++                                        int flags, Error **errp);
+ BlockDriverState *bdrv_new_open_driver(BlockDriver *drv, const char *node_name,
+                                        int flags, Error **errp);
+ BlockReopenQueue *bdrv_reopen_queue(BlockReopenQueue *bs_queue,
+diff --git a/block.c b/block.c
+index 8a8d9c02a9..1969fa303f 100644
+--- a/block.c
++++ b/block.c
+@@ -35,6 +35,7 @@
+ #include "qapi/qmp/qjson.h"
+ #include "qapi/qmp/qnull.h"
+ #include "qapi/qmp/qstring.h"
++#include "qapi/qobject-input-visitor.h"
+ #include "qapi/qobject-output-visitor.h"
+ #include "qapi/qapi-visit-block-core.h"
+ #include "sysemu/block-backend.h"
+@@ -77,6 +78,8 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+                                            const BdrvChildRole *child_role,
+                                            Error **errp);
+ 
++static QDict *bdrv_type_blockdev_opts(QDict *options);
++
+ /* If non-zero, use only whitelisted block drivers */
+ static int use_bdrv_whitelist;
+ 
+@@ -1465,9 +1468,7 @@ static QDict *parse_json_filename(const char *filename, Error **errp)
+         return NULL;
+     }
+ 
+-    qdict_flatten(options);
+-
+-    return options;
++    return bdrv_type_blockdev_opts(options);
+ }
+ 
+ static void parse_json_protocol(QDict *options, const char **pfilename,
+@@ -2801,6 +2802,83 @@ BlockDriverState *bdrv_open(const char *filename, const char *reference,
+                              NULL, errp);
+ }
+ 
++/*
++ * Take a blockdev @options QDict and convert its values to the
++ * correct type.  This function takes ownership of @options.
++ *
++ * On both success and failure, @options is flattened.  On success,
++ * its refcount is decreased and a new well typed flattened QDict is
++ * returned.  On failure, @options is returned.
++ *
++ * TODO: Currently, this function cannot cope with partially typed
++ * dicts.  If everything is typed correctly, the keyval visitor will
++ * complain and we will return the original @options -- which is
++ * correct.  If all values are strings, the visitor will convert them
++ * to the correct type (if possible).  But if both are mixed, the
++ * visitor will fail and the partially typed @options is returned.  In
++ * practice, this should only be an issue with json:{} filenames,
++ * though.
++ *
++ * TODO: If @options does not conform to the schema, that should be a
++ * real error.
++ *
++ * TODO: Ideally, bdrv_open() should take BlockdevOptions, and the BDS
++ * should only contain BlockdevOptions.  But this is not possible
++ * until this function really rejects anything it does not recognize
++ * (without breaking existing interfaces).
++ */
++static QDict *bdrv_type_blockdev_opts(QDict *options)
++{
++    Visitor *v;
++    BlockdevOptions *blockdev_options = NULL;
++    QObject *typed_opts, *crumpled_opts = NULL;
++    Error *local_err = NULL;
++
++    if (!options) {
++        return NULL;
++    }
++
++    qdict_flatten(options);
++    crumpled_opts = qdict_crumple(options, &local_err);
++    if (local_err) {
++        goto done;
++    }
++
++    v = qobject_input_visitor_new_keyval(crumpled_opts);
++    visit_type_BlockdevOptions(v, NULL, &blockdev_options, &local_err);
++    visit_free(v);
++    if (local_err) {
++        goto done;
++    }
++
++    v = qobject_output_visitor_new(&typed_opts);
++    visit_type_BlockdevOptions(v, NULL, &blockdev_options, &local_err);
++    if (!local_err) {
++        visit_complete(v, &typed_opts);
++    }
++    visit_free(v);
++    if (local_err) {
++        goto done;
++    }
++
++    QDECREF(options);
++    options = qobject_to(QDict, typed_opts);
++    qdict_flatten(options);
++
++done:
++    error_free(local_err);
++    qapi_free_BlockdevOptions(blockdev_options);
++    qobject_decref(crumpled_opts);
++    return options;
++}
++
++BlockDriverState *bdrv_open_string_opts(const char *filename, QDict *options,
++                                        int flags, Error **errp)
++{
++    return bdrv_open_inherit(filename, NULL, bdrv_type_blockdev_opts(options),
++                             flags, NULL, NULL, errp);
++}
++
+ /*
+  * Adds a BlockDriverState to a simple queue for an atomic, transactional
+  * reopen of multiple devices.
 -- 
 2.14.3
