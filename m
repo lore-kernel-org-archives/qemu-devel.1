@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fDmR3-0002Id-Hf
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 03:44:22 -0400
+	(envelope-from <peterx@redhat.com>) id 1fDmRC-0002S2-9y
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 03:44:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fDmR2-0007xS-Qf
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 03:44:21 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44776 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fDmR9-00080q-3t
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 03:44:30 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44782 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fDmR2-0007u2-LV
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 03:44:20 -0400
-Date: Wed, 2 May 2018 09:44:03 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180502074403.yh5weukbjgqsvp7n@sirius.home.kraxel.org>
-References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
-	<20180430103312.GH3249@redhat.com>
-	<20180430132107.0a37704d.cohuck@redhat.com>
-	<ac216b06-9469-addd-b5a1-3a3a89fd0782@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ac216b06-9469-addd-b5a1-3a3a89fd0782@redhat.com>
-Subject: Re: [Qemu-devel] release retrospective, next release timing,
- numbering
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fDmR8-00080X-Uo
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 03:44:27 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 79861407574E
+	for <qemu-devel@nongnu.org>; Wed,  2 May 2018 07:44:26 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Wed,  2 May 2018 15:44:17 +0800
+Message-Id: <20180502074421.3762-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/4] monitor: let Monitor be thread safe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,24 +27,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-  Hi,
+v3:
+- add comment for fields that are protected by monitor lock [Stefan]
+- drop most of patch 2, only keep the protections for mon->fds [Stefan]
+- add one trivial patch to add some more comments for either readline
+  and cpu_get/cpu_set [Stefan]
+- add protection for monitor_fdset_get_fd() [Stefan]
 
-> > If we bump the major version each year anyway, why not go the whole way
-> > and use 2018.1, 2018.2, ... (or even <year>.<month>)? The nice thing
-> > about that is that you can see at a glance when the release took place.
-> 
-> ... or simply drop the first two digits and call them 18.1, 18.2, ...?
+v2:
+- cc correct people... sorry.
 
-We could also drop the major/minor scheme altogether (as they are
-meaningless anyway) and just go for YYMM, i.e. 1808 (for a august
-release).
+Stefan reported this problem that in the future we might start to have
+more threads operating on the same Monitor object.  This seris try to
+add fundamental support for it.
 
-If we go for a time-based numbering scheme:  I'd prefer the year being
-part of the version number, for the same reason Thomas mentioned above:
-It makes it easy to see when a particular version was released.
+Please review.  Thanks,
 
-cheers,
-  Gerd
+Peter Xu (4):
+  monitor: rename out_lock to mon_lock
+  monitor: protect mon->fds with mon_lock
+  monitor: more comments on lock-free fleids/funcs
+  monitor: add lock to protect mon_fdsets
+
+ monitor.c | 132 ++++++++++++++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 95 insertions(+), 37 deletions(-)
+
+-- 
+2.14.3
