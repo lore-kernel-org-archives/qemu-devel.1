@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fDzpk-0003eE-I8
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 18:02:45 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fDzq1-0003ow-NW
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 18:03:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fDzpg-0002vB-KE
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 18:02:44 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:38876)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fDzpg-0002uA-DE
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 18:02:40 -0400
-Received: by mail-pf0-x241.google.com with SMTP id o76so12937907pfi.5
-	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 15:02:40 -0700 (PDT)
-References: <20180502215730.28162-1-laurent@vivier.eu>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <4584ea82-1975-c2b4-ad00-82fc50406220@linaro.org>
-Date: Wed, 2 May 2018 15:02:36 -0700
+	(envelope-from <mreitz@redhat.com>) id 1fDzq0-00031q-Qm
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 18:03:01 -0400
+References: <20180502202051.15493-1-mreitz@redhat.com>
+	<20180502202051.15493-3-mreitz@redhat.com>
+	<eeef06be-6c71-df6a-6aeb-8a7c23316dee@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <ca5f1a91-84fe-d11b-f805-c7a8aca84cc3@redhat.com>
+Date: Thu, 3 May 2018 00:02:44 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180502215730.28162-1-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4] linux-user: remove useless padding in
- flock64 structure
+In-Reply-To: <eeef06be-6c71-df6a-6aeb-8a7c23316dee@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ZLB9pTsXUgoPCOw0c5RWRzPFqlSZAmNen"
+Subject: Re: [Qemu-devel] [PATCH 2/3] qemu-img: Use only string options in
+ img_open_opts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,71 +26,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-On 05/02/2018 02:57 PM, Laurent Vivier wrote:
-> Since commit 8efb2ed5ec ("linux-user: Correct signedness of
-> target_flock l_start and l_len fields"), flock64 structure uses
-> abi_llong for l_start and l_len in place of "unsigned long long"
-> this should force them to be aligned accordingly to the target
-> rules. So we can remove the padding field and the QEMU_PACKED
-> attribute.
-> 
-> I have compared the result of the following program before and
-> after the change:
-> 
->     cat -> flock64_dump  <<EOF
->     p/d sizeof(struct target_flock64)
->     p/d &((struct target_flock64 *)0)->l_type
->     p/d &((struct target_flock64 *)0)->l_whence
->     p/d &((struct target_flock64 *)0)->l_start
->     p/d &((struct target_flock64 *)0)->l_len
->     p/d &((struct target_flock64 *)0)->l_pid
->     quit
->     EOF
-> 
->     for file in build/all/*-linux-user/qemu-* ; do
->     echo $file
->     gdb -batch -nx -x flock64_dump $file 2> /dev/null
->     done
-> 
-> The sizeof() changes because we remove the QEMU_PACKED.
-> The new size is 32 (except for i386 and m68k) and this is
-> the real size of "struct flock64" on the target architecture.
-> 
-> The following architectures differ:
-> aarch64_be, aarch64, alpha, armeb, arm, cris, hppa, nios2, or1k,
-> riscv32, riscv64, s390x.
-> 
-> For a subset of these architectures, I have checked with the following
-> program the new structure is the correct one:
-> 
->   #include <stdio.h>
->   #define __USE_LARGEFILE64
->   #include <fcntl.h>
-> 
->   int main(void)
->   {
-> 	  printf("struct flock64 %d\n", sizeof(struct flock64));
-> 	  printf("l_type %d\n", &((struct flock64 *)0)->l_type);
-> 	  printf("l_whence %d\n", &((struct flock64 *)0)->l_whence);
-> 	  printf("l_start %d\n", &((struct flock64 *)0)->l_start);
-> 	  printf("l_len %d\n", &((struct flock64 *)0)->l_len);
-> 	  printf("l_pid %d\n", &((struct flock64 *)0)->l_pid);
->   }
-> 
-> [I have checked aarch64, alpha, hppa, s390x]
-> 
-> For ARM, the target_flock64 becomes the EABI definition, so we need to
-> define the OABI one in place of the EABI one and use it when it is
-> needed.
-> 
-> I have also fixed the alignment value for sh4 (to align llong on 4 bytes)
-> (see c2e3dee6e0 "linux-user: Define target alignment size")
-> [We should check alignment properties for cris, nios2 and or1k]
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ZLB9pTsXUgoPCOw0c5RWRzPFqlSZAmNen
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org,
+ Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>
+Message-ID: <ca5f1a91-84fe-d11b-f805-c7a8aca84cc3@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] qemu-img: Use only string options in
+ img_open_opts
+References: <20180502202051.15493-1-mreitz@redhat.com>
+ <20180502202051.15493-3-mreitz@redhat.com>
+ <eeef06be-6c71-df6a-6aeb-8a7c23316dee@redhat.com>
+In-Reply-To: <eeef06be-6c71-df6a-6aeb-8a7c23316dee@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+On 2018-05-03 00:00, Eric Blake wrote:
+> On 05/02/2018 03:20 PM, Max Reitz wrote:
+>> img_open_opts() takes a QemuOpts and converts them to a QDict, so all
+>> values therein are strings.=C2=A0 Then it may try to call qdict_get_bo=
+ol(),
+>> however, which will fail with a segmentation fault every time:
+>=20
+> I have no idea if it's worth fixing qdict_get_bool() to at least not
+> segfault when called on a non-bool Dict member (but what should it
+> return, true or false? or should it abort() for at least a cleaner
+> failure than a segfault?)
+
+There's qdict_get_try_bool() which returns a default.  For testing
+whether the member is a bool I suppose you can use
+qdict_to(QBool, qdict_get(qdict, member)).
+
+Max
+
+> But in the meantime, your fix is correct.
+>=20
+>>
+>> $ ./qemu-img info -U --image-opts \
+>> =C2=A0=C2=A0=C2=A0=C2=A0 driver=3Dfile,filename=3D/dev/null,force-shar=
+e=3Doff
+>> [1]=C2=A0=C2=A0=C2=A0 27869 segmentation fault (core dumped)=C2=A0 ./q=
+emu-img info -U
+>> --image-opts driver=3Dfile,filename=3D/dev/null,force-share=3Doff
+>>
+>> Fix this by using qdict_get_str() and comparing the value as a string.=
+
+>> Also, when adding a force-share value to the QDict, add it as a string=
+
+>> so it fits the rest of the dict.
+>>
+>> Cc: qemu-stable@nongnu.org
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>> =C2=A0 qemu-img.c | 4 ++--
+>> =C2=A0 1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>=20
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
 
 
-r~
+
+--ZLB9pTsXUgoPCOw0c5RWRzPFqlSZAmNen
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlrqNYQACgkQ9AfbAGHV
+z0BbXwf8C3hpYbt+J2DFo7ImwdMe4nR4pGKm+w8lxvUqgbIsc9PgBBIt9uLlDcq3
+zL6xYt7d0o8h/Qgy1Lint99VYYjqXhzxts9QWxC58xNAMM3WxbyOC//IOORJEnZ7
+tmtRLl7kqjG9FXuXu1tFU950KJCOf9DZg01d5PGw/nhvWfRqRNqztgenVgldvZHG
+D7fQN7QFxmvNacv1bx5peQN2MGoTC0vTz0e0Xb+npKIpO5qoNzx59/JSWyt2djQr
+m1DPtuzN9Hr5FlXB5HGI1RwzjrszVUN7oPeq7xis/IhO6X8QOAlN+D5ZlhAK55xt
+ugkq83S5mQMp+3Jw/q0OVFAKLGBCKw==
+=liio
+-----END PGP SIGNATURE-----
+
+--ZLB9pTsXUgoPCOw0c5RWRzPFqlSZAmNen--
