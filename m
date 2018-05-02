@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fDqI9-0003hK-2m
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 07:51:25 -0400
+	(envelope-from <lvivier@redhat.com>) id 1fDqIB-0003i0-OA
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 07:51:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fDqI8-0003xJ-C2
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 07:51:25 -0400
-Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:35020)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fDqI8-0003ww-5l
+	(envelope-from <lvivier@redhat.com>) id 1fDqI8-0003xZ-Pj
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 07:51:27 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53064 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1fDqI8-0003wN-In
 	for qemu-devel@nongnu.org; Wed, 02 May 2018 07:51:24 -0400
-Received: by mail-oi0-x233.google.com with SMTP id a6-v6so12652696oia.2
-	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 04:51:24 -0700 (PDT)
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DC03A8DC4C
+	for <qemu-devel@nongnu.org>; Wed,  2 May 2018 11:51:19 +0000 (UTC)
+References: <20180425111940.1030-1-quintela@redhat.com>
+	<20180425111940.1030-6-quintela@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <69de7600-8b82-3830-abf2-1fcc565887e8@redhat.com>
+Date: Wed, 2 May 2018 13:51:13 +0200
 MIME-Version: 1.0
-In-Reply-To: <987b683f-e05e-780a-40cf-68b6b8d0641f@redhat.com>
-References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
-	<d50e3a40-d7f3-4c9b-e930-4c2f4d6c8a53@redhat.com>
-	<CAFEAcA8wJuJ9464LadgjJOo-7ttdGYcfDQWALbkxBRJCr_knkg@mail.gmail.com>
-	<20180427210120.03d037b0@naga.suse.cz>
-	<70cb944b-269c-2969-4727-b889298ece30@linaro.org>
-	<987b683f-e05e-780a-40cf-68b6b8d0641f@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 2 May 2018 12:51:02 +0100
-Message-ID: <CAFEAcA9SKhjHLnX6p51eG9Qs6ke3QahgTwRAH0=mFUBJBZYYng@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] release retrospective, next release timing,
- numbering
+In-Reply-To: <20180425111940.1030-6-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 5/8] tests: Migration ppc now inlines
+ its program
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,29 +35,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Michal_Such=C3=A1nek?= <msuchanek@suse.de>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, peterx@redhat.com
 
-On 2 May 2018 at 11:41, Laszlo Ersek <lersek@redhat.com> wrote:
-> What about guest RAM size (more precisely, guest-phys address space)?
->
-> The x86_64 target might want to use tens of GBs of guest-phys address
-> space, e.g. for cold-plugged RAM, for DIMM hotplug, for 64-bit PCI MMIO
-> aperture. To my understanding, all of those have to be expressed with
-> host virtual addresses in the QEMU process (regardless of TCG vs. KVM).
-> But on a 32-bit host, the QEMU process only has 4GB HVA space.
+On 25/04/2018 13:19, Juan Quintela wrote:
+> No need to write it to a file.  Just need a proper firmware O:-)
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> CC: Laurent Vivier <lvivier@redhat.com>
+> ---
+>  tests/migration-test.c | 41 +++++------------------------------------
+>  1 file changed, 5 insertions(+), 36 deletions(-)
 
-I think the situation there would be unchanged -- on a 32 bit
-host the ramaddr type is 32 bits (unless Xen is configured into
-the binary!) regardless of the guest architecture size, and the
-limit on RAM size is 2GB, and the hwaddr is 64 bits regardless
-of guest architecture size. That wouldn't change whether we had
-a single executable or split ones for 32 and 64 bit targets.
-You can have more than 4GB of guest physical address space
-(we don't map that into the host address space), but there's
-a 2GB RAM limit (because we do map all the RAM blocks); these
-limits currently apply equally to qemu-system-i386 and
-qemu-system_x86-64.
-
-thanks
--- PMM
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
