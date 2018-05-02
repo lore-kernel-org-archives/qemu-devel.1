@@ -1,18 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ilg@livius.net>) id 1fDmix-0003X8-PS
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 04:03:01 -0400
+	(envelope-from <thuth@redhat.com>) id 1fDmto-0006Hg-FK
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 04:14:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ilg@livius.net>) id 1fDmix-0003qc-0s
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 04:02:51 -0400
-Received: from mail-yw0-x22e.google.com ([2607:f8b0:4002:c05::22e]:38431)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ilg@livius.net>) id 1fDmiw-0003qN-SS
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 04:02:50 -0400
-Received: by mail-yw0-x22e.google.com with SMTP id y123-v6so4274397ywa.5
-	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 01:02:50 -0700 (PDT)
-From: Liviu Ionescu <ilg@livius.net>
-In-Reply-To: <20180502075904.GF3308@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1fDmtk-0002Sj-EN
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 04:14:04 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42128 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fDmtk-0002Re-8s
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 04:14:00 -0400
 References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
 	<20180430103312.GH3249@redhat.com>
 	<20180430132107.0a37704d.cohuck@redhat.com>
@@ -20,10 +16,14 @@ References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
 	<20180502093326.2fbec55f.cohuck@redhat.com>
 	<CAG7hfcKo62hpq-qkVE8_+pR1R6uQKcG_FuNuNo1yGqGV-6oazQ@mail.gmail.com>
 	<20180502075904.GF3308@redhat.com>
+	<CAG7hfcKEiNfLR0xW6b2FPFAN1L4xs81ozPXZAZAs=+Wzs6Q2Vw@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <de11d2a4-3bd0-42e3-5bff-79c160e9c5df@redhat.com>
+Date: Wed, 2 May 2018 10:13:40 +0200
 MIME-Version: 1.0
-Date: Wed, 2 May 2018 01:02:49 -0700
-Message-ID: <CAG7hfcKEiNfLR0xW6b2FPFAN1L4xs81ozPXZAZAs=+Wzs6Q2Vw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAG7hfcKEiNfLR0xW6b2FPFAN1L4xs81ozPXZAZAs=+Wzs6Q2Vw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] release retrospective, next release timing,
  numbering
@@ -35,20 +35,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: Liviu Ionescu <ilg@livius.net>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 2 May 2018 at 10:59:07, Daniel P. Berrang=C3=A9 (berrange@redhat.com) wr=
-ote:
+On 02.05.2018 10:02, Liviu Ionescu wrote:
+> On 2 May 2018 at 10:59:07, Daniel P. Berrang=C3=A9 (berrange@redhat.com=
+) wrote:
+>=20
+>> Our deprecation policy lets us include incompatible
+>> changes in *any* release.
+>=20
+> can you elaborate on this?
+>=20
+> where is this policy defined?
 
-> Our deprecation policy lets us include incompatible
-> changes in *any* release.
+https://qemu.weilnetz.de/doc/qemu-doc.html#Deprecated-features
 
-can you elaborate on this?
+It took quite a while to get a consensus on that policy, so I don't
+think that we want to sacrifice that for semver.
 
-where is this policy defined?
-
-
-thank you,
-
-Liviu
+ Thomas
