@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fDsDU-0003EY-HQ
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 09:54:45 -0400
+	(envelope-from <clg@kaod.org>) id 1fDsFC-0004C8-BX
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 09:56:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fDsDT-0002G9-9G
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 09:54:44 -0400
-References: <f41972e8-0ae2-7c1d-a66a-499a841080e3@redhat.com>
-	<13d95529-d61e-fc30-ffd4-f1ef93edad40@redhat.com>
-	<CAKv+Gu-JWfDCApNcw_mpx+y2i+Hkn_Ow3NN_U84ybgOSD_0JOQ@mail.gmail.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <0c121886-f40a-6682-267c-dfa3bfb195d0@redhat.com>
-Date: Wed, 2 May 2018 15:54:25 +0200
+	(envelope-from <clg@kaod.org>) id 1fDsF6-0003Jm-Ii
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 09:56:30 -0400
+Received: from 9.mo173.mail-out.ovh.net ([46.105.72.44]:52204)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fDsF6-0003HP-Bc
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 09:56:24 -0400
+Received: from player694.ha.ovh.net (unknown [10.109.105.31])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 82D67BE55B
+	for <qemu-devel@nongnu.org>; Wed,  2 May 2018 15:56:22 +0200 (CEST)
+References: <20180423101433.17759-1-clg@kaod.org>
+	<CAFEAcA_1q4+kKunX6_d9N3+6tUFGJRRc5biqn5TqDDmh09-kiw@mail.gmail.com>
+	<e2d6b0b9-2402-4c34-305e-ae61ebe10df4@kaod.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <707c783c-0c82-4916-c8b9-0a4d93364386@kaod.org>
+Date: Wed, 2 May 2018 15:56:12 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAKv+Gu-JWfDCApNcw_mpx+y2i+Hkn_Ow3NN_U84ybgOSD_0JOQ@mail.gmail.com>
+In-Reply-To: <e2d6b0b9-2402-4c34-305e-ae61ebe10df4@kaod.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Expand ECAM region in machvirt 2_13?
+Subject: Re: [Qemu-devel] [PATCH v2] timer/aspeed: fix vmstate version id
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,95 +32,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Auger Eric <eric.auger@redhat.com>, qemu list <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>
 
-On 05/02/18 14:34, Ard Biesheuvel wrote:
-> On 2 May 2018 at 13:31, Laszlo Ersek <lersek@redhat.com> wrote:
->> On 05/01/18 17:59, Auger Eric wrote:
->>> Hi,
->>>
->>> I would like to resume the discussion on extending the number of PCI
->>> buses to 256 (as in Q35) as a follow-up of past discussions:
->>> https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg03631.html.
->>>
->>> With the current 16MB ECAM region we are limited to 16 PCIe busses.
->>>
->>> Could we envision to have a 256MB ECAM region and move it to another
->>> location beyond 256GB, in virt2_13 machine type?
->>>
->>> Current ECAM range within [0x3f000000, 0x40000000] would be kept
->>> unchanged for legacy and when vms->highmem is set to false.
->>> Migration from <2_13 to >=2_13 would be allowed whereas migration
->>> from >=2.13 to <2.13 wouldn't.
->>
->> If I understand correctly, the idea is to *move* the current one
->> range, if the virt machine type is >= 2.13 and highmem is set to true
->> (which is the default IIUC, from 2.12 onward).
->>
->> For 64-bit (AARCH64) ArmVirtQemu, that should work fine. The firmware
->> takes the ECAM base and size from the "pci-host-ecam-generic" DT
->> node, property "reg", uint64_t elements #0 and #1. (Sorry if this
->> isn't exact DT lingo, I'm paraphrasing the firmware source code.) If
->> the QEMU patch just changes the values, that should work
->> transparently.
->>
->> For 32-bit (ARM) ArmVirtQemu, this change (the new ECAM default)
->> could be a problem. PCI stuff in the firmware wouldn't work unless
->> people specified highmem=off on the QEMU command line.
->>
->> Now, I notice highmen defaults to "on" starting with 2.12 even for
->> "qemu-system-arm -M virt", not just "qemu-system-aarch64 -M virt", so
->> why doesn't that already cause a problem with PCI in the 32-bit guest
->> fw?
->>
->> Because, currently "highmen" only controls the presence of the 64-bit
->> PCI MMIO aperture for BAR allocation; it has no effect on config
->> space. And if the 64-bit PCI MMIO aperture is exposed to the 32-bit
->> guest firmware, the latter simply ignores the former, and works with
->> the 32-bit aperture solely (which is always there).
->>
->> So, for "qemu-system-arm -M virt" compatibility, I think we might
->> need a separate machine type property, which should default to "on"
->> only on qemu-system-aarch64 (if such distinctions are allowed).
->>
->> Of course, I can't tell if the 32-bit ArmVirtQemu firmware is
->> possible to run on "qemu-system-aarch64 -M virt". (I think it is; I
->> recall something something about ARMv8 having ARMv7 compat, but I
->> don't remember ever trying.) If that's the case, then even the above
->> suggestion won't work, because it would break 32-bit guest fw that
->> the user has run (for whatever reason) on "qemu-system-aarch64 -M
->> virt". In this case, I believe we can't just change the contents of
->> the current "pci-host-ecam-generic" node, but we should implement
->> some structural DTB addition that old firmware will simply not
->> notice, while new (64-bit) firmware will specifically look for (and
->> prefer over the old DT stuff).
->>
->> Ard, what's your take? (Sorry if you've already followed up, my email
->> processing lags.)
->>
->
-> Do we have any examples of ACPI platforms where the config space is
-> mapped above 4 GB? I'd like to make sure that all existing code copes
-> with that before even considering it.
+> for a romulus-bmc machine, which uses a ARM1176 CPU, you can download this
+> image :
+> 
+>    https://openpower.xyz/job/openbmc-build/distro=ubuntu,target=romulus/lastSuccessfulBuild/artifact/deploy/images/romulus/flash-romulus
+> 
+> but migration fails :
+> 
+>   qemu-system-arm: error while loading state for instance 0x0 of device 'cpu'
+> 
+> There seems to be an issue while reading the CPACR reg.
 
-Well, we could consider this virtual machine feature a way to root out
-any 64-bit bugs that lurk in code that consumes ECAM :) That would help
-physical platforms. It means that we shouldn't enable the feature by
-default, in 2.13 at least.
+With a brutal setting of CPACR in cpu_reset, the romulus-bmc machine 
+migrates. What would be a more appropriate approach ? 
 
-Anyway, I've just checked my oldie A3 Mustang for this (it uses UEFI and
-ACPI), and surprisingly, it does put the ECAM range above 4GB:
+Thanks,
 
-[    0.000000] ACPI: MCFG 0x00000043FA690000 00003C (v01 APM    XGENE    00000002 INTL 20140724)
-[    0.088654] ACPI: MCFG table detected, 1 entries
-[    0.126613] acpi PNP0A08:00: MCFG quirk: ECAM at [mem 0xe0d0000000-0xe0dfffffff] for [bus 00-ff] with xgene_v1_pcie_ecam_ops
-[    0.127552] acpi PNP0A08:00: [Firmware Bug]: ECAM area [mem 0xe0d0000000-0xe0dfffffff] not reserved in ACPI namespace
-[    0.127601] acpi PNP0A08:00: ECAM at [mem 0xe0d0000000-0xe0dfffffff] for [bus 00-ff]
+C.  
 
-The base address is 899 GB + 256 MB.
 
-My kernel is 4.11.0-44.6.1.el7a.aarch64.
-
-Thanks
-Laszlo
+@@ -166,6 +166,23 @@ static void arm_cpu_reset(CPUState *s)
+ #if defined(CONFIG_USER_ONLY)
+         /* Userspace expects access to cp10 and cp11 for FP/Neon */
+         env->cp15.cpacr_el1 = deposit64(env->cp15.cpacr_el1, 20, 4, 0xf);
++#else
++        env->cp15.cpacr_el1 = 0;
++        if (arm_feature(env, ARM_FEATURE_VFP)) {
++            if (!arm_feature(env, ARM_FEATURE_NEON)) {
++                /* ASEDIS [31] bit is RAO/WI */
++                env->cp15.cpacr_el1 |= (1ull << 31);
++            }
++
++            /* VFPv3 and upwards with NEON implement 32 double precision
++             * registers (D0-D31).
++             */
++            if (!arm_feature(env, ARM_FEATURE_NEON) ||
++                    !arm_feature(env, ARM_FEATURE_VFP3)) {
++                /* D32DIS [30] is RAO/WI if D16-31 are not implemented. */
++                env->cp15.cpacr_el1 |= (1ull << 30);
++            }
++        }
+ #endif
+     }
