@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fDqyn-0002L2-7T
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 08:35:32 -0400
+	(envelope-from <armbru@redhat.com>) id 1fDqzY-0002wT-0a
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 08:36:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fDqyj-00056P-46
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 08:35:29 -0400
-References: <20180501220509.14152-1-mreitz@redhat.com>
-	<20180501220509.14152-2-mreitz@redhat.com>
-	<b61ec864-3f92-d945-af4b-d14260f23ce9@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <a3590eb3-49c2-2b59-fba8-8032bbeb94ac@redhat.com>
-Date: Wed, 2 May 2018 14:35:07 +0200
+	(envelope-from <armbru@redhat.com>) id 1fDqzU-0005b2-Tu
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 08:36:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46242 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fDqzU-0005aa-P8
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 08:36:12 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <87o9inxkd1.fsf@dusky.pond.sub.org>
+	<20180430065235.577-1-aik@ozlabs.ru>
+	<c23d1ec1-51d7-d967-28a2-0df0f59e7480@redhat.com>
+	<d15dfc3e-b33b-f0a9-971a-0f40bbffcdf4@ozlabs.ru>
+	<87muxi8t2b.fsf@dusky.pond.sub.org>
+	<6c49e4ab-bb40-cf20-629a-2fc5c19d8585@redhat.com>
+	<87o9hy5re9.fsf@dusky.pond.sub.org>
+	<2fc4e700-9222-8785-efc3-f2749be298ab@redhat.com>
+Date: Wed, 02 May 2018 14:36:10 +0200
+In-Reply-To: <2fc4e700-9222-8785-efc3-f2749be298ab@redhat.com> (Paolo
+	Bonzini's message of "Wed, 2 May 2018 11:47:45 +0200")
+Message-ID: <8760462q11.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <b61ec864-3f92-d945-af4b-d14260f23ce9@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="QhSAEKRuzuafQOF8qpVk4hYBCVZY3D3RI"
-Subject: Re: [Qemu-devel] [PATCH 1/2] block/mirror: Make cancel always
- cancel pre-READY
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH qemu] qom: Document
+ qom/device-list-properties implementation specific
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,104 +34,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-stable <qemu-stable@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---QhSAEKRuzuafQOF8qpVk4hYBCVZY3D3RI
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>,
- John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org,
- qemu-stable <qemu-stable@nongnu.org>
-Message-ID: <a3590eb3-49c2-2b59-fba8-8032bbeb94ac@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] block/mirror: Make cancel always cancel
- pre-READY
-References: <20180501220509.14152-1-mreitz@redhat.com>
- <20180501220509.14152-2-mreitz@redhat.com>
- <b61ec864-3f92-d945-af4b-d14260f23ce9@redhat.com>
-In-Reply-To: <b61ec864-3f92-d945-af4b-d14260f23ce9@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-On 2018-05-02 01:31, Eric Blake wrote:
-> On 05/01/2018 05:05 PM, Max Reitz wrote:
->> Commit b76e4458b1eb3c32e9824fe6aa51f67d2b251748 made the mirror block
->> job respect block-job-cancel's @force flag: With that flag set, it wou=
-ld
->> now always really cancel, even post-READY.
->>
->> Unfortunately, it had a side effect: Without that flag set, it would n=
-ow
->> never cancel, not even before READY.=C2=A0 Considering that is an
->> incompatible change and not noted anywhere in the commit or the
->> description of block-job-cancel's @force parameter, this seems
->> unintentional and we should revert to the previous behavior, which is =
-to
->> immediately cancel the job when block-job-cancel is called before sour=
-ce
->> and target are in sync (i.e. before the READY event).
->>
->> Cc: qemu-stable@nongnu.org
->=20
-> Actually adding that in cc on this reply.
+> On 02/05/2018 11:38, Markus Armbruster wrote:
+>>>>> It probably is not unless someone adds properties in realize() callback,
+>>>> Now work that into the doc comment, please :)
+>>> Are there any examples?
+>> There must be examples where instances of the same type have different
+>> properties, or else our design decision to create properties dynamically
+>> was inane.
+>
+> Buses for example create properties at runtime to link a parent to its
+> children.  These properties are created when a child device appears;
+> this is different from creating properties in or the realize() callback,
+> or upon setting other properties.
+>
+> The purpose of this command is to tell people/tools what they can pass
+> to -device/-object/device_add/object_add, so the real question is
+> whether there are cases where it falls short of that purpose.
+>
+> If not,
 
-Thanks, I knew I was going to forget...
+Do we have to be certain?  Or would "we don't think so" be enough?
 
-Max
+>         maybe the wording for the .json file could be something like:
+>
+>   Objects can create properties at runtime, for example to describe
+>   links between different devices and/or objects.  These properties
+>   are not included in the output of this command.
 
->> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1572856
->> Reported-by: Yanan Fu <yfu@redhat.com>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->> =C2=A0 block/mirror.c | 4 +++-
->> =C2=A0 1 file changed, 3 insertions(+), 1 deletion(-)
->=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->=20
->>
->> diff --git a/block/mirror.c b/block/mirror.c
->> index 7bfad6e844..003f957b12 100644
->> --- a/block/mirror.c
->> +++ b/block/mirror.c
->> @@ -874,7 +874,9 @@ static void coroutine_fn mirror_run(void *opaque)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 trace_mirror_be=
-fore_sleep(s, cnt, s->synced, delay_ns);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 block_job_sleep=
-_ns(&s->common, delay_ns);
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (block_job_is_cancelled=
-(&s->common) && s->common.force) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (block_job_is_cancelled=
-(&s->common) &&
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (!=
-s->synced || s->common.force))
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 break;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->last_pause_n=
-s =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
->>
->=20
+Not bad.
 
+In theory, objects can also create properties in response to non-default
+configuration, and these would also not be included.  Objects could even
+create a property with the same name, but different type or description.
+Arguably capital-letter Bad Ideas, but nothing prevents such misuse.
 
+Since I'm in a generous mood, I'd rate the thing at Rusty API level 4
+"Follow common convention and you'll get it right."
 
---QhSAEKRuzuafQOF8qpVk4hYBCVZY3D3RI
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+https://ozlabs.org/~rusty/index.cgi/tech/2008-03-30.html
+https://ozlabs.org/~rusty/index.cgi/tech/2008-04-01.html
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlrpsHsACgkQ9AfbAGHV
-z0AToQf7BQ+UPnRZObWeE3jJJO747kJbvsuVYsbYv8YU35EthPffNAI/O//ivXqy
-lITdKjc94WE/tXSL+sAnh1Zh8SBASNBfah3lg1TmHhyyFA7BLTziPmR8HrAZ+Bic
-tHJy8jDWBaFcaf917DwBrJAjfJ4bHM6z0RcT7qi8pYYz3/8IBJAR1rJMwzyiVd8K
-1y+mQRszi0hUFoACprcuXMB1UGyAGLlJyT7gflHQiH+RbfROueFCxMuoPaCjQWFR
-nqV3Oi0KHF+pf2i7xaPwrje7N0PdQPyWALiMJn28mFL1HnB1saYX+OETPXhMrQsI
-6YdsnVc/LGuyRYe7jLKUcMQNM8L7Qg==
-=ZCfE
------END PGP SIGNATURE-----
-
---QhSAEKRuzuafQOF8qpVk4hYBCVZY3D3RI--
+If dynamic properties are really just for internal use, as you seem to
+suggest in Message-ID:
+<c1d40d88-1c80-2bbd-c28c-613b7fe8d45e@redhat.com>, then we should've had
+the common sense to unambiguously separate them from the user-facing
+properties.  Can we still do that?
