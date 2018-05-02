@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fDmQz-0002CO-LG
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 03:44:18 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fDmR3-0002Id-Hf
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 03:44:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fDmQw-0007tS-89
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 03:44:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35236 helo=mx1.redhat.com)
+	(envelope-from <kraxel@redhat.com>) id 1fDmR2-0007xS-Qf
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 03:44:21 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44776 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fDmQw-0007sT-4m
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 03:44:14 -0400
-References: <20180316062822.15425-1-famz@redhat.com>
-	<20180316062822.15425-2-famz@redhat.com>
-	<20180501204110.t2suo47pgiktopsa@var.youpi.perso.aquilenet.fr>
-	<20180502072859.GA15438@lemon.usersys.redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <363615e0-22b3-6fca-c90a-2a6ce205c609@redhat.com>
-Date: Wed, 2 May 2018 09:44:08 +0200
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fDmR2-0007u2-LV
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 03:44:20 -0400
+Date: Wed, 2 May 2018 09:44:03 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180502074403.yh5weukbjgqsvp7n@sirius.home.kraxel.org>
+References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
+	<20180430103312.GH3249@redhat.com>
+	<20180430132107.0a37704d.cohuck@redhat.com>
+	<ac216b06-9469-addd-b5a1-3a3a89fd0782@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180502072859.GA15438@lemon.usersys.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.13 v3 1/2] slirp: Add "query-usernet"
- QMP command
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ac216b06-9469-addd-b5a1-3a3a89fd0782@redhat.com>
+Subject: Re: [Qemu-devel] release retrospective, next release timing,
+ numbering
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +30,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Markus Armbruster <armbru@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 02.05.2018 09:29, Fam Zheng wrote:
-> On Tue, 05/01 22:41, Samuel Thibault wrote:
->> Hello,
->>
->> I'm sorry I didn't find the time to have a look at it before.
->>
->> In general it looks good, just a few things:
->>
->> Samuel
->>
->> Fam Zheng, le ven. 16 mars 2018 14:28:21 +0800, a ecrit:
->>> +        if (!net_hub_id_for_client(&s->nc, &vlan)) {
->>
->> That makes me think that IIUC, we shouldn't call them vlan, as mention=
-ed
->> in the recent vlan->hub renaming patches.
->>
->>> +{ 'struct': 'UsernetInfo',
->>> +  'data': {
->>> +    'id':              'str',
->>> +    'vlan':            'int',
->>
->> and here as well, I guess.
->=20
-> OK, so rename this to hub? (I'm not familiar with the naming issue you =
-pointed
-> out).
+  Hi,
 
-Yes, please rename it to "hub". See:
+> > If we bump the major version each year anyway, why not go the whole way
+> > and use 2018.1, 2018.2, ... (or even <year>.<month>)? The nice thing
+> > about that is that you can see at a glance when the release took place.
+> 
+> ... or simply drop the first two digits and call them 18.1, 18.2, ...?
 
-https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg05448.html
+We could also drop the major/minor scheme altogether (as they are
+meaningless anyway) and just go for YYMM, i.e. 1808 (for a august
+release).
 
- Thomas
+If we go for a time-based numbering scheme:  I'd prefer the year being
+part of the version number, for the same reason Thomas mentioned above:
+It makes it easy to see when a particular version was released.
+
+cheers,
+  Gerd
