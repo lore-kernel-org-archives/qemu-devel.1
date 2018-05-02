@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fDpvq-0007B5-LH
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 07:28:24 -0400
+	(envelope-from <lersek@redhat.com>) id 1fDpzK-0008Bb-FH
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 07:31:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fDpvn-0008OT-I5
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 07:28:22 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51826 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fDpvn-0008O1-BS
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 07:28:19 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C410142F09EB
-	for <qemu-devel@nongnu.org>; Wed,  2 May 2018 11:28:18 +0000 (UTC)
-Date: Wed, 2 May 2018 19:28:10 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180502112810.GA2321@xz-mi>
-References: <20180502100422.8688-1-peterx@redhat.com>
-	<20180502100422.8688-3-peterx@redhat.com>
-	<20180502111506.GC2679@work-vm>
+	(envelope-from <lersek@redhat.com>) id 1fDpzJ-00028l-GY
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 07:31:58 -0400
+References: <f41972e8-0ae2-7c1d-a66a-499a841080e3@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <13d95529-d61e-fc30-ffd4-f1ef93edad40@redhat.com>
+Date: Wed, 2 May 2018 13:31:47 +0200
 MIME-Version: 1.0
+In-Reply-To: <f41972e8-0ae2-7c1d-a66a-499a841080e3@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180502111506.GC2679@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v4 2/4] monitor: protect mon->fds with
- mon_lock
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Expand ECAM region in machvirt 2_13?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,124 +23,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Auger Eric <eric.auger@redhat.com>, qemu list <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Andrew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-On Wed, May 02, 2018 at 12:15:07PM +0100, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > mon->fds were protected by BQL.  Now protect it by mon_lock so that it
-> > can even be used in monitor iothread.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  monitor.c | 11 ++++++++++-
-> >  1 file changed, 10 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/monitor.c b/monitor.c
-> > index 48882d28ae..9f361ec21e 100644
-> > --- a/monitor.c
-> > +++ b/monitor.c
-> > @@ -213,7 +213,6 @@ struct Monitor {
-> >      BlockCompletionFunc *password_completion_cb;
-> >      void *password_opaque;
-> >      mon_cmd_t *cmd_table;
-> > -    QLIST_HEAD(,mon_fd_t) fds;
-> >      QTAILQ_ENTRY(Monitor) entry;
-> >  
-> >      /*
-> > @@ -225,6 +224,7 @@ struct Monitor {
-> >      /*
-> >       * Fields that are protected by the per-monitor lock.
-> >       */
-> > +    QLIST_HEAD(, mon_fd_t) fds;
-> >      QString *outbuf;
-> >      guint out_watch;
-> >      /* Read under either BQL or mon_lock, written with BQL+mon_lock.  */
-> > @@ -2207,6 +2207,7 @@ void qmp_getfd(const char *fdname, Error **errp)
-> >          return;
-> >      }
-> >  
-> > +    qemu_mutex_lock(&cur_mon->mon_lock);
-> >      QLIST_FOREACH(monfd, &cur_mon->fds, next) {
-> >          if (strcmp(monfd->name, fdname) != 0) {
-> >              continue;
-> > @@ -2214,6 +2215,7 @@ void qmp_getfd(const char *fdname, Error **errp)
-> >  
-> >          close(monfd->fd);
-> >          monfd->fd = fd;
-> > +        qemu_mutex_unlock(&cur_mon->mon_lock);
+On 05/01/18 17:59, Auger Eric wrote:
+> Hi,
 > 
-> Why is it safe to have a close() in a mon_lock'd region?
-> We've got to make sure everything that happens in it is non-blocking.
-
-Hmm indeed.  Let me move that close() out of the critical section. I
-think I need to touch up below [1] too since it'll has similar
-problem.
-
-I'll wait for some more comments to repost.  Thanks,
-
+> I would like to resume the discussion on extending the number of PCI
+> buses to 256 (as in Q35) as a follow-up of past discussions:
+> https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg03631.html.
 > 
-> Dave
+> With the current 16MB ECAM region we are limited to 16 PCIe busses.
 > 
-> >          return;
-> >      }
-> >  
-> > @@ -2222,12 +2224,14 @@ void qmp_getfd(const char *fdname, Error **errp)
-> >      monfd->fd = fd;
-> >  
-> >      QLIST_INSERT_HEAD(&cur_mon->fds, monfd, next);
-> > +    qemu_mutex_unlock(&cur_mon->mon_lock);
-> >  }
-> >  
-> >  void qmp_closefd(const char *fdname, Error **errp)
-> >  {
-> >      mon_fd_t *monfd;
-> >  
-> > +    qemu_mutex_lock(&cur_mon->mon_lock);
-> >      QLIST_FOREACH(monfd, &cur_mon->fds, next) {
-> >          if (strcmp(monfd->name, fdname) != 0) {
-> >              continue;
-> > @@ -2237,9 +2241,11 @@ void qmp_closefd(const char *fdname, Error **errp)
-> >          close(monfd->fd);
-> >          g_free(monfd->name);
-> >          g_free(monfd);
-> > +        qemu_mutex_unlock(&cur_mon->mon_lock);
+> Could we envision to have a 256MB ECAM region and move it to another
+> location beyond 256GB, in virt2_13 machine type?
+> 
+> Current ECAM range within [0x3f000000, 0x40000000]
+> would be kept unchanged for legacy and when vms->highmem is set to false.
+> Migration from <2_13 to >=2_13 would be allowed whereas migration from
+>> =2.13 to <2.13 wouldn't.
 
-[1]
+If I understand correctly, the idea is to *move* the current one range,
+if the virt machine type is >= 2.13 and highmem is set to true (which is
+the default IIUC, from 2.12 onward).
 
-> >          return;
-> >      }
-> >  
-> > +    qemu_mutex_unlock(&cur_mon->mon_lock);
-> >      error_setg(errp, QERR_FD_NOT_FOUND, fdname);
-> >  }
-> >  
-> > @@ -2247,6 +2253,7 @@ int monitor_get_fd(Monitor *mon, const char *fdname, Error **errp)
-> >  {
-> >      mon_fd_t *monfd;
-> >  
-> > +    qemu_mutex_lock(&mon->mon_lock);
-> >      QLIST_FOREACH(monfd, &mon->fds, next) {
-> >          int fd;
-> >  
-> > @@ -2260,10 +2267,12 @@ int monitor_get_fd(Monitor *mon, const char *fdname, Error **errp)
-> >          QLIST_REMOVE(monfd, next);
-> >          g_free(monfd->name);
-> >          g_free(monfd);
-> > +        qemu_mutex_unlock(&mon->mon_lock);
-> >  
-> >          return fd;
-> >      }
-> >  
-> > +    qemu_mutex_unlock(&mon->mon_lock);
-> >      error_setg(errp, "File descriptor named '%s' has not been found", fdname);
-> >      return -1;
-> >  }
-> > -- 
-> > 2.14.3
-> > 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+For 64-bit (AARCH64) ArmVirtQemu, that should work fine. The firmware
+takes the ECAM base and size from the "pci-host-ecam-generic" DT node,
+property "reg", uint64_t elements #0 and #1. (Sorry if this isn't exact
+DT lingo, I'm paraphrasing the firmware source code.) If the QEMU patch
+just changes the values, that should work transparently.
 
--- 
-Peter Xu
+For 32-bit (ARM) ArmVirtQemu, this change (the new ECAM default) could
+be a problem. PCI stuff in the firmware wouldn't work unless people
+specified highmem=off on the QEMU command line.
+
+Now, I notice highmen defaults to "on" starting with 2.12 even for
+"qemu-system-arm -M virt", not just "qemu-system-aarch64 -M virt", so
+why doesn't that already cause a problem with PCI in the 32-bit guest fw?
+
+Because, currently "highmen" only controls the presence of the 64-bit
+PCI MMIO aperture for BAR allocation; it has no effect on config space.
+And if the 64-bit PCI MMIO aperture is exposed to the 32-bit guest
+firmware, the latter simply ignores the former, and works with the
+32-bit aperture solely (which is always there).
+
+So, for "qemu-system-arm -M virt" compatibility, I think we might need a
+separate machine type property, which should default to "on" only on
+qemu-system-aarch64 (if such distinctions are allowed).
+
+Of course, I can't tell if the 32-bit ArmVirtQemu firmware is possible
+to run on "qemu-system-aarch64 -M virt". (I think it is; I recall
+something something about ARMv8 having ARMv7 compat, but I don't
+remember ever trying.) If that's the case, then even the above
+suggestion won't work, because it would break 32-bit guest fw that the
+user has run (for whatever reason) on "qemu-system-aarch64 -M virt". In
+this case, I believe we can't just change the contents of the current
+"pci-host-ecam-generic" node, but we should implement some structural
+DTB addition that old firmware will simply not notice, while new
+(64-bit) firmware will specifically look for (and prefer over the old DT
+stuff).
+
+Ard, what's your take? (Sorry if you've already followed up, my email
+processing lags.)
+
+Thanks
+Laszlo
