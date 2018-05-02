@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fDzMc-0007X5-JY
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 17:32:41 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fDzMh-0007cp-Dz
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 17:32:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fDzMb-0000OC-Ml
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 17:32:38 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fDzMg-0000Py-GD
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 17:32:43 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed,  2 May 2018 23:32:17 +0200
-Message-Id: <20180502213219.7842-6-mreitz@redhat.com>
+Date: Wed,  2 May 2018 23:32:19 +0200
+Message-Id: <20180502213219.7842-8-mreitz@redhat.com>
 In-Reply-To: <20180502213219.7842-1-mreitz@redhat.com>
 References: <20180502213219.7842-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [RFC 5/7] block: Add blk_new_open_string_opts()
+Subject: [Qemu-devel] [RFC 7/7] iotests: Test internal option typing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,81 +22,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-This is an interface to bdrv_open_string_opts().
+It would be nice if qemu used the correct types for blockdev options
+internally, even if the user specified string values (either through
+-drive or by being not so nice and using json:{} with string values).
+This patch adds a test verifying that fact.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/sysemu/block-backend.h |  2 ++
- block/block-backend.c          | 30 +++++++++++++++++++++++++++++-
- 2 files changed, 31 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/089     | 12 ++++++++++++
+ tests/qemu-iotests/089.out |  5 +++++
+ 2 files changed, 17 insertions(+)
 
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
-index 92ab624fac..1ad002fa7e 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -79,6 +79,8 @@ typedef struct BlockBackendPublic {
- BlockBackend *blk_new(uint64_t perm, uint64_t shared_perm);
- BlockBackend *blk_new_open(const char *filename, const char *reference,
-                            QDict *options, int flags, Error **errp);
-+BlockBackend *blk_new_open_string_opts(const char *filename, QDict *options,
-+                                       int flags, Error **errp);
- int blk_get_refcnt(BlockBackend *blk);
- void blk_ref(BlockBackend *blk);
- void blk_unref(BlockBackend *blk);
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 89f47b00ea..fd3024602a 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -105,6 +105,11 @@ static const AIOCBInfo block_backend_aiocb_info = {
- static void drive_info_del(DriveInfo *dinfo);
- static BlockBackend *bdrv_first_blk(BlockDriverState *bs);
+diff --git a/tests/qemu-iotests/089 b/tests/qemu-iotests/089
+index aa1ba4a98e..640ecbfa2a 100755
+--- a/tests/qemu-iotests/089
++++ b/tests/qemu-iotests/089
+@@ -145,6 +145,18 @@ $QEMU_IO -c "open -o driver=qcow2 json:{\"file.filename\":\"$TEST_IMG\"}" \
+ $QEMU_IO -c "open -o driver=qcow2 json:{\"driver\":\"raw\",\"file.filename\":\"$TEST_IMG\"}" \
+          -c "info" 2>&1 | _filter_img_info
  
-+static BlockBackend *blk_do_new_open(const char *filename,
-+                                     const char *reference, QDict *options,
-+                                     int flags, bool string_opts,
-+                                     Error **errp);
++echo
++echo "=== Testing option typing ==="
++echo
 +
- /* All BlockBackends */
- static QTAILQ_HEAD(, BlockBackend) block_backends =
-     QTAILQ_HEAD_INITIALIZER(block_backends);
-@@ -348,6 +353,24 @@ BlockBackend *blk_new(uint64_t perm, uint64_t shared_perm)
-  */
- BlockBackend *blk_new_open(const char *filename, const char *reference,
-                            QDict *options, int flags, Error **errp)
-+{
-+    return blk_do_new_open(filename, reference, options, flags, false, errp);
-+}
++# json:{} accepts both strings and correctly typed values (even mixed,
++# although we probably do not want to support that...), but when
++# creating a json:{} filename, it should be correctly typed.
++# Therefore, both of these should make the "size" value an integer.
 +
-+/*
-+ * Like blk_new_open(), but accepts an @options QDict where some (or
-+ * all) values are strings instead of their correct type.
-+ */
-+BlockBackend *blk_new_open_string_opts(const char *filename, QDict *options,
-+                                       int flags, Error **errp)
-+{
-+    return blk_do_new_open(filename, NULL, options, flags, true, errp);
-+}
++TEST_IMG="json:{'driver': 'null-co', 'size':  42 }" _img_info | grep '^image'
++TEST_IMG="json:{'driver': 'null-co', 'size': '42'}" _img_info | grep '^image'
 +
-+static BlockBackend *blk_do_new_open(const char *filename,
-+                                     const char *reference, QDict *options,
-+                                     int flags, bool string_opts,
-+                                     Error **errp)
- {
-     BlockBackend *blk;
-     BlockDriverState *bs;
-@@ -372,7 +395,12 @@ BlockBackend *blk_new_open(const char *filename, const char *reference,
-     }
  
-     blk = blk_new(perm, BLK_PERM_ALL);
--    bs = bdrv_open(filename, reference, options, flags, errp);
-+    if (string_opts) {
-+        assert(!reference);
-+        bs = bdrv_open_string_opts(filename, options, flags, errp);
-+    } else {
-+        bs = bdrv_open(filename, reference, options, flags, errp);
-+    }
-     if (!bs) {
-         blk_unref(blk);
-         return NULL;
+ # success, all done
+ echo "*** done"
+diff --git a/tests/qemu-iotests/089.out b/tests/qemu-iotests/089.out
+index 89e3e4340a..d880fd76f7 100644
+--- a/tests/qemu-iotests/089.out
++++ b/tests/qemu-iotests/089.out
+@@ -49,4 +49,9 @@ vm state offset: 512 MiB
+ format name: IMGFMT
+ cluster size: 64 KiB
+ vm state offset: 512 MiB
++
++=== Testing option typing ===
++
++image: json:{"driver": "null-co", "size": 42}
++image: json:{"driver": "null-co", "size": 42}
+ *** done
 -- 
 2.14.3
