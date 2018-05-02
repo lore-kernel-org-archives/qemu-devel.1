@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37396)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fDlKx-0001fT-PX
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 02:34:00 -0400
+	(envelope-from <armbru@redhat.com>) id 1fDlL8-0001nJ-Hb
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 02:34:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fDlKu-0005AX-P1
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 02:33:59 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38050 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fDlL5-0005Fs-Gj
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 02:34:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38058 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fDlKu-0005AD-Iz
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 02:33:56 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 01CA38DC34
-	for <qemu-devel@nongnu.org>; Wed,  2 May 2018 06:33:51 +0000 (UTC)
-Date: Wed, 2 May 2018 14:33:35 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180502063335.GB32728@xz-mi>
-References: <20180418090239.13090-1-peterx@redhat.com>
-	<20180418090239.13090-2-peterx@redhat.com>
-	<20180430095649.GC4002@stefanha-x1.localdomain>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fDlL5-0005FN-Ba
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 02:34:07 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <87o9inxkd1.fsf@dusky.pond.sub.org>
+	<20180430065235.577-1-aik@ozlabs.ru>
+	<c23d1ec1-51d7-d967-28a2-0df0f59e7480@redhat.com>
+	<d15dfc3e-b33b-f0a9-971a-0f40bbffcdf4@ozlabs.ru>
+Date: Wed, 02 May 2018 08:34:04 +0200
+In-Reply-To: <d15dfc3e-b33b-f0a9-971a-0f40bbffcdf4@ozlabs.ru> (Alexey
+	Kardashevskiy's message of "Wed, 2 May 2018 11:26:22 +1000")
+Message-ID: <87muxi8t2b.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180430095649.GC4002@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] monitor: rename out_lock to mon_lock
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH qemu] qom: Document
+ qom/device-list-properties implementation specific
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,39 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On Mon, Apr 30, 2018 at 10:56:49AM +0100, Stefan Hajnoczi wrote:
-> On Wed, Apr 18, 2018 at 05:02:37PM +0800, Peter Xu wrote:
-> > The out_lock was only protecting out buffers.  In the future the monitor
-> > code will start to run in multiple threads.  We turn it into a bigger
-> > lock to protect not only the out buffer but also all the rest.  We split
-> > this lock until necessary.  So far I don't see a reason to complicate
-> > lock usage for monitors.
-> > 
-> > Since at it, arrange the Monitor struct a bit.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  monitor.c | 39 ++++++++++++++++++---------------------
-> >  1 file changed, 18 insertions(+), 21 deletions(-)
-> > 
-> > diff --git a/monitor.c b/monitor.c
-> > index 39f8ee17ba..c93aa4e22b 100644
-> > --- a/monitor.c
-> > +++ b/monitor.c
-> > @@ -202,20 +202,17 @@ typedef struct {
-> >  
-> >  struct Monitor {
-> >      CharBackend chr;
-> > +    /* We can't access guest memory when holding the lock */
-> > +    QemuMutex mon_lock;
-> 
-> Please document which field this lock protects.  For example, outbuf and
-> out_watch need a comment.
+Alexey Kardashevskiy <aik@ozlabs.ru> writes:
 
-Sure!
+> On 30/4/18 7:39 pm, Paolo Bonzini wrote:
+>> On 30/04/2018 08:52, Alexey Kardashevskiy wrote:
+>>> diff --git a/qapi/misc.json b/qapi/misc.json
+>>> index 5636f4a..399ec74 100644
+>>> --- a/qapi/misc.json
+>>> +++ b/qapi/misc.json
+>>> @@ -1491,6 +1491,10 @@
+>>>  #
+>>>  # List properties associated with a device.
+>>>  #
+>>> +# Note: the handler creates a device object, enumerates properties and destroys
+>>> +# the object so it only lists properties defined in DeviceClass::props or
+>>> +# created by DeviceClass::init()/TypeInfo::instance_init().
+>>> +#
+>>>  # @typename: the type name of a device
+>>>  #
+>>>  # Returns: a list of ObjectPropertyInfo describing a devices properties
+>>> @@ -1506,6 +1510,11 @@
+>>>  #
+>>>  # List properties associated with a QOM object.
+>>>  #
+>>> +# Note: the handler creates an object, enumerates properties and destroys
+>>> +# the object so it only lists properties created in TypeInfo::instance_init().
+>>> +# Since the instance_init() callback of the device object adds
+>>> +# DeviceClass::props as object properties, they will be listed as well.
+>>> +#
+>> 
+>> This says what it does, but not why it is a problem.  Can you explain
+>> that to me as well?
+>
+>
+> It probably is not unless someone adds properties in realize() callback, if
+> this happens, the user would probably expect to see these in these commands
+> but he/she won't.
 
--- 
-Peter Xu
+Now work that into the doc comment, please :)
