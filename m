@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34690)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fDpHi-0005XK-4L
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:46:55 -0400
+	(envelope-from <peterx@redhat.com>) id 1fDpIk-0006DB-R3
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:47:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fDpHe-0002Jj-JS
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:46:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60940)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fDpHe-0002JA-Cv
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:46:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fDpHd-0001cm-Bw
-	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 10:46:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4CBB72E80C9
-	for <qemu-devel@nongnu.org>; Wed,  2 May 2018 10:46:49 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 02 May 2018 10:34:04 -0000
-From: Thomas Huth <1314667@bugs.launchpad.net>
-Reply-To: Bug 1314667 <1314667@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140430150437.26914.15156.malonedeb@gac.canonical.com>
-Message-Id: <152525724467.2035.14357626679001054971.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1314667] Re: PMPrebUSB - appcrash of qemu in
- Win-7-64bit
+	(envelope-from <peterx@redhat.com>) id 1fDpIh-0002gk-NI
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:47:58 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42472 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fDpIh-0002gD-Ds
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:47:55 -0400
+From: Peter Xu <peterx@redhat.com>
+Date: Wed,  2 May 2018 18:47:17 +0800
+Message-Id: <20180502104740.12123-2-peterx@redhat.com>
+In-Reply-To: <20180502104740.12123-1-peterx@redhat.com>
+References: <20180502104740.12123-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v8 01/24] migration: let incoming side use
+ thread context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,79 +25,82 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Looking through old bug tickets... can you still reproduce this issue
-with the latest (64-bit) version of QEMU? Or could we close this ticket
-nowadays?
+The old incoming migration is running in main thread and default
+gcontext.  With the new qio_channel_add_watch_full() we can now let it
+run in the thread's own gcontext (if there is one).
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Currently this patch does nothing alone.  But when any of the incoming
+migration is run in another iothread (e.g., the upcoming migrate-recover
+command), this patch will bind the incoming logic to the iothread
+instead of the main thread (which may already get page faulted and
+hanged).
 
--- =
+RDMA is not considered for now since it's not even using the QIO watch
+framework at all.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1314667
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ migration/exec.c   | 9 ++++-----
+ migration/fd.c     | 9 ++++-----
+ migration/socket.c | 7 ++++---
+ 3 files changed, 12 insertions(+), 13 deletions(-)
 
-Title:
-  PMPrebUSB - appcrash of qemu in Win-7-64bit
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  I am not sure if this issue is a bug of qemu or by Win-7.
-  I want to test in advance with QEMU the ability if my USB-Rescue-Drive is =
-
-  booting correctly. I have Win-7-64 and run qemu v.o.15.1.0 out of the ins=
-talled RMPrepUSB v.2.1.719 =
-
-  program. The settings for the preparation of my USB drive were FAT32 boot=
- as
-  HD, bootloader WinPE/Win-7/Vista, set for running iso-files directly in %=
-_ISO
-  \MAINMENU\Hiren=E2=80=99sBootCD.iso. When I run Qemu I get the messages i=
-n the cmd starting window it says:
-
-  Administrator: RMPrepUSB QEMU Launcher
-  **************************************
-  EXECUTING "C:\Program Files (x86)\RMPrepUSB\qemu\STARTFROMUSB.cmd"
-  DRIVE NUMBER=3D3
-  MEMORY SIZE=3D1000
-  HARD DISK IMAGE=3Dharddisk.img
-  NOWRITE=3D
-  Found OS=3DVISTA_OR_LATER
-  Sending command Start_VM.exe 3 500 qemu.exe -L . -name "RMPrepUSB Emulati=
-on =
-
-  Session  RAM=3D1000MB VirtualHDD=3Dharddisk.i
-  lt+LCtrl)" -boot c -m 1000 -drive file=3D\\.
-  \PhysicalDrive3,if=3Dide,index=3D0,media=3Ddisk -hdb harddisk.img to shel=
-l...
-
-  Win-7: in the second window appears:
-  ***********************************
-  -->qemu funktioniert nicht mehr
-  Problemsignatur:
-    Problemereignisname:	APPCRASH
-    Anwendungsname:	qemu.exe
-    Anwendungsversion:	0.15.1.0
-    Anwendungszeitstempel:	4f478c16
-    Fehlermodulname:	qemu.exe
-    Fehlermodulversion:	0.15.1.0
-    Fehlermodulzeitstempel:	4f478c16
-    Ausnahmecode:	40000015
-    Ausnahmeoffset:	00053b06
-    Betriebsystemversion:	6.1.7601.2.1.0.256.48
-    Gebietsschema-ID:	1031
-    Zusatzinformation 1:	bf8d
-    Zusatzinformation 2:	bf8d49108a2e5a0707fc48438e01652a
-    Zusatzinformation 3:	b0f1
-    Zusatzinformation 4:	b0f155b0f1de9c5eb22bd6d100737cbe
-
-  If somebody can understand that behaviour I appreciate everybodies help. =
-Thank you with regards
-  H.O.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1314667/+subscriptions
+diff --git a/migration/exec.c b/migration/exec.c
+index 0bc5a427dd..9d0f82f1f0 100644
+--- a/migration/exec.c
++++ b/migration/exec.c
+@@ -65,9 +65,8 @@ void exec_start_incoming_migration(const char *command, Error **errp)
+     }
+ 
+     qio_channel_set_name(ioc, "migration-exec-incoming");
+-    qio_channel_add_watch(ioc,
+-                          G_IO_IN,
+-                          exec_accept_incoming_migration,
+-                          NULL,
+-                          NULL);
++    qio_channel_add_watch_full(ioc, G_IO_IN,
++                               exec_accept_incoming_migration,
++                               NULL, NULL,
++                               g_main_context_get_thread_default());
+ }
+diff --git a/migration/fd.c b/migration/fd.c
+index cd06182d1e..9a380bbbc4 100644
+--- a/migration/fd.c
++++ b/migration/fd.c
+@@ -66,9 +66,8 @@ void fd_start_incoming_migration(const char *infd, Error **errp)
+     }
+ 
+     qio_channel_set_name(QIO_CHANNEL(ioc), "migration-fd-incoming");
+-    qio_channel_add_watch(ioc,
+-                          G_IO_IN,
+-                          fd_accept_incoming_migration,
+-                          NULL,
+-                          NULL);
++    qio_channel_add_watch_full(ioc, G_IO_IN,
++                               fd_accept_incoming_migration,
++                               NULL, NULL,
++                               g_main_context_get_thread_default());
+ }
+diff --git a/migration/socket.c b/migration/socket.c
+index 122d8ccfbe..8d4cf76295 100644
+--- a/migration/socket.c
++++ b/migration/socket.c
+@@ -160,9 +160,10 @@ static void socket_start_incoming_migration(SocketAddress *saddr,
+         return;
+     }
+ 
+-    qio_net_listener_set_client_func(listener,
+-                                     socket_accept_incoming_migration,
+-                                     NULL, NULL);
++    qio_net_listener_set_client_func_full(listener,
++                                          socket_accept_incoming_migration,
++                                          NULL, NULL,
++                                          g_main_context_get_thread_default());
+ }
+ 
+ void tcp_start_incoming_migration(const char *host_port, Error **errp)
+-- 
+2.14.3
