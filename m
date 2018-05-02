@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fDpJ5-0006V0-PX
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:48:20 -0400
+	(envelope-from <peterx@redhat.com>) id 1fDpJA-0006ZS-UE
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:48:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fDpJ2-0002r7-ME
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:48:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49680 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fDpJ9-0002uM-LX
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:48:24 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49818 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fDpJ2-0002qq-FV
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:48:16 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fDpJ9-0002tu-EY
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:48:23 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Wed,  2 May 2018 18:47:23 +0800
-Message-Id: <20180502104740.12123-8-peterx@redhat.com>
+Date: Wed,  2 May 2018 18:47:25 +0800
+Message-Id: <20180502104740.12123-10-peterx@redhat.com>
 In-Reply-To: <20180502104740.12123-1-peterx@redhat.com>
 References: <20180502104740.12123-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 07/24] qmp: hmp: add migrate "resume" option
+Subject: [Qemu-devel] [PATCH v8 09/24] migration: new state
+ "postcopy-recover"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,92 +27,164 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-It will be used when we want to resume one paused migration.
+Introducing new migration state "postcopy-recover". If a migration
+procedure is paused and the connection is rebuilt afterward
+successfully, we'll switch the source VM state from "postcopy-paused" to
+the new state "postcopy-recover", then we'll do the resume logic in the
+migration thread (along with the return path thread).
+
+This patch only do the state switch on source side. Another following up
+patch will handle the state switching on destination side using the same
+status bit.
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- qapi/migration.json   | 5 ++++-
- hmp.c                 | 4 +++-
- migration/migration.c | 2 +-
- hmp-commands.hx       | 7 ++++---
- 4 files changed, 12 insertions(+), 6 deletions(-)
+ qapi/migration.json   |  4 ++-
+ migration/migration.c | 76 ++++++++++++++++++++++++++++++++++++++-------------
+ 2 files changed, 60 insertions(+), 20 deletions(-)
 
 diff --git a/qapi/migration.json b/qapi/migration.json
-index 97891aec89..17b78c9938 100644
+index 17b78c9938..25a6776af6 100644
 --- a/qapi/migration.json
 +++ b/qapi/migration.json
-@@ -1031,6 +1031,8 @@
- # @detach: this argument exists only for compatibility reasons and
- #          is ignored by QEMU
+@@ -91,6 +91,8 @@
  #
-+# @resume: resume one paused migration, default "off". (since 2.12)
+ # @postcopy-paused: during postcopy but paused. (since 2.12)
+ #
++# @postcopy-recover: trying to recover from a paused postcopy. (since 2.11)
 +#
- # Returns: nothing on success
+ # @completed: migration is finished.
  #
- # Since: 0.14.0
-@@ -1052,7 +1054,8 @@
- #
- ##
- { 'command': 'migrate',
--  'data': {'uri': 'str', '*blk': 'bool', '*inc': 'bool', '*detach': 'bool' } }
-+  'data': {'uri': 'str', '*blk': 'bool', '*inc': 'bool',
-+           '*detach': 'bool', '*resume': 'bool' } }
+ # @failed: some error occurred during migration process.
+@@ -109,7 +111,7 @@
+ { 'enum': 'MigrationStatus',
+   'data': [ 'none', 'setup', 'cancelling', 'cancelled',
+             'active', 'postcopy-active', 'postcopy-paused',
+-            'completed', 'failed', 'colo',
++            'postcopy-recover', 'completed', 'failed', 'colo',
+             'pre-switchover', 'device' ] }
  
  ##
- # @migrate-incoming:
-diff --git a/hmp.c b/hmp.c
-index 898e25f3e1..59d5341590 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1919,10 +1919,12 @@ void hmp_migrate(Monitor *mon, const QDict *qdict)
-     bool detach = qdict_get_try_bool(qdict, "detach", false);
-     bool blk = qdict_get_try_bool(qdict, "blk", false);
-     bool inc = qdict_get_try_bool(qdict, "inc", false);
-+    bool resume = qdict_get_try_bool(qdict, "resume", false);
-     const char *uri = qdict_get_str(qdict, "uri");
-     Error *err = NULL;
- 
--    qmp_migrate(uri, !!blk, blk, !!inc, inc, false, false, &err);
-+    qmp_migrate(uri, !!blk, blk, !!inc, inc,
-+                false, false, true, resume, &err);
-     if (err) {
-         hmp_handle_error(mon, &err);
-         return;
 diff --git a/migration/migration.c b/migration/migration.c
-index 9d184b3f36..9faf22d3ae 100644
+index 78b0046e59..304e8bf2af 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -1408,7 +1408,7 @@ bool migration_is_blocked(Error **errp)
+@@ -572,6 +572,7 @@ static bool migration_is_setup_or_active(int state)
+     case MIGRATION_STATUS_ACTIVE:
+     case MIGRATION_STATUS_POSTCOPY_ACTIVE:
+     case MIGRATION_STATUS_POSTCOPY_PAUSED:
++    case MIGRATION_STATUS_POSTCOPY_RECOVER:
+     case MIGRATION_STATUS_SETUP:
+     case MIGRATION_STATUS_PRE_SWITCHOVER:
+     case MIGRATION_STATUS_DEVICE:
+@@ -653,6 +654,7 @@ static void fill_source_migration_info(MigrationInfo *info)
+     case MIGRATION_STATUS_PRE_SWITCHOVER:
+     case MIGRATION_STATUS_DEVICE:
+     case MIGRATION_STATUS_POSTCOPY_PAUSED:
++    case MIGRATION_STATUS_POSTCOPY_RECOVER:
+          /* TODO add some postcopy stats */
+         info->has_status = true;
+         info->has_total_time = true;
+@@ -2313,6 +2315,13 @@ typedef enum MigThrError {
+     MIG_THR_ERR_FATAL = 2,
+ } MigThrError;
  
- void qmp_migrate(const char *uri, bool has_blk, bool blk,
-                  bool has_inc, bool inc, bool has_detach, bool detach,
--                 Error **errp)
-+                 bool has_resume, bool resume, Error **errp)
++/* Return zero if success, or <0 for error */
++static int postcopy_do_resume(MigrationState *s)
++{
++    /* TODO: do the resume logic */
++    return 0;
++}
++
+ /*
+  * We don't return until we are in a safe state to continue current
+  * postcopy migration.  Returns MIG_THR_ERR_RECOVERED if recovered, or
+@@ -2321,29 +2330,55 @@ typedef enum MigThrError {
+ static MigThrError postcopy_pause(MigrationState *s)
  {
-     Error *local_err = NULL;
-     MigrationState *s = migrate_get_current();
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 35d862a5d2..078ded20cd 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -897,13 +897,14 @@ ETEXI
+     assert(s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE);
+-    migrate_set_state(&s->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
+-                      MIGRATION_STATUS_POSTCOPY_PAUSED);
  
-     {
-         .name       = "migrate",
--        .args_type  = "detach:-d,blk:-b,inc:-i,uri:s",
--        .params     = "[-d] [-b] [-i] uri",
-+        .args_type  = "detach:-d,blk:-b,inc:-i,resume:-r,uri:s",
-+        .params     = "[-d] [-b] [-i] [-r] uri",
-         .help       = "migrate to URI (using -d to not wait for completion)"
- 		      "\n\t\t\t -b for migration without shared storage with"
- 		      " full copy of disk\n\t\t\t -i for migration without "
- 		      "shared storage with incremental copy of disk "
--		      "(base image shared between src and destination)",
-+		      "(base image shared between src and destination)"
-+                      "\n\t\t\t -r to resume a paused migration",
-         .cmd        = hmp_migrate,
-     },
+-    /* Current channel is possibly broken. Release it. */
+-    assert(s->to_dst_file);
+-    qemu_file_shutdown(s->to_dst_file);
+-    qemu_fclose(s->to_dst_file);
+-    s->to_dst_file = NULL;
++    while (true) {
++        migrate_set_state(&s->state, s->state,
++                          MIGRATION_STATUS_POSTCOPY_PAUSED);
+ 
+-    error_report("Detected IO failure for postcopy. "
+-                 "Migration paused.");
++        /* Current channel is possibly broken. Release it. */
++        assert(s->to_dst_file);
++        qemu_file_shutdown(s->to_dst_file);
++        qemu_fclose(s->to_dst_file);
++        s->to_dst_file = NULL;
+ 
+-    /*
+-     * We wait until things fixed up. Then someone will setup the
+-     * status back for us.
+-     */
+-    while (s->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
+-        qemu_sem_wait(&s->postcopy_pause_sem);
+-    }
++        error_report("Detected IO failure for postcopy. "
++                     "Migration paused.");
+ 
+-    trace_postcopy_pause_continued();
++        /*
++         * We wait until things fixed up. Then someone will setup the
++         * status back for us.
++         */
++        while (s->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
++            qemu_sem_wait(&s->postcopy_pause_sem);
++        }
++
++        if (s->state == MIGRATION_STATUS_POSTCOPY_RECOVER) {
++            /* Woken up by a recover procedure. Give it a shot */
+ 
+-    return MIG_THR_ERR_RECOVERED;
++            /*
++             * Firstly, let's wake up the return path now, with a new
++             * return path channel.
++             */
++            qemu_sem_post(&s->postcopy_pause_rp_sem);
++
++            /* Do the resume logic */
++            if (postcopy_do_resume(s) == 0) {
++                /* Let's continue! */
++                trace_postcopy_pause_continued();
++                return MIG_THR_ERR_RECOVERED;
++            } else {
++                /*
++                 * Something wrong happened during the recovery, let's
++                 * pause again. Pause is always better than throwing
++                 * data away.
++                 */
++                continue;
++            }
++        } else {
++            /* This is not right... Time to quit. */
++            return MIG_THR_ERR_FATAL;
++        }
++    }
+ }
+ 
+ static MigThrError migration_detect_error(MigrationState *s)
+@@ -2663,7 +2698,10 @@ void migrate_fd_connect(MigrationState *s, Error *error_in)
+     }
+ 
+     if (resume) {
+-        /* TODO: do the resume logic */
++        /* Wakeup the main migration thread to do the recovery */
++        migrate_set_state(&s->state, MIGRATION_STATUS_POSTCOPY_PAUSED,
++                          MIGRATION_STATUS_POSTCOPY_RECOVER);
++        qemu_sem_post(&s->postcopy_pause_sem);
+         return;
+     }
  
 -- 
 2.14.3
