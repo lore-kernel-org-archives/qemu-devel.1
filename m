@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fDw7a-0007D6-48
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 14:04:55 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fDwBn-0008Rn-K4
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 14:09:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fDw7Y-0001fe-N9
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 14:04:54 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44368 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fDw7Y-0001em-3y
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 14:04:52 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5D86A7D83F
-	for <qemu-devel@nongnu.org>; Wed,  2 May 2018 18:04:51 +0000 (UTC)
-Date: Wed, 2 May 2018 19:04:48 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180502180447.GM2679@work-vm>
-References: <20180425112723.1111-1-quintela@redhat.com>
-	<20180425112723.1111-12-quintela@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1fDwBm-0003w0-96
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 14:09:15 -0400
+References: <20180421165423.30759-1-mreitz@redhat.com>
+	<20180421165423.30759-3-mreitz@redhat.com>
+	<c1b70360-a112-2d7c-33df-0ed5ec0ec3f9@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <496ae9da-458d-1308-48ae-17326586b670@redhat.com>
+Date: Wed, 2 May 2018 20:08:59 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180425112723.1111-12-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v12 11/21] migration: Create multifd packet
+In-Reply-To: <c1b70360-a112-2d7c-33df-0ed5ec0ec3f9@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="vYiGJIMlqgqJe2AzgJLjRfG5ogvlGKOqm"
+Subject: Re: [Qemu-devel] [PATCH 2/7] block: Add Error parameter to
+ bdrv_amend_options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,244 +26,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> We still don't put anything there.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  migration/ram.c | 137 +++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 136 insertions(+), 1 deletion(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index b19300992e..804c83ed89 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -412,6 +412,17 @@ typedef struct {
->      uint8_t id;
->  } __attribute__((packed)) MultiFDInit_t;
->  
-> +typedef struct {
-> +    uint32_t magic;
-> +    uint32_t version;
-> +    uint32_t flags;
-> +    uint32_t size;
-> +    uint32_t used;
-> +    uint32_t seq;
-> +    char ramblock[256];
-> +    uint64_t offset[];
-> +} __attribute__((packed)) MultiFDPacket_t;
-> +
->  typedef struct {
->      /* number of used pages */
->      uint32_t used;
-> @@ -446,6 +457,14 @@ typedef struct {
->      bool quit;
->      /* array of pages to sent */
->      MultiFDPages_t *pages;
-> +    /* packet allocated len */
-> +    uint32_t packet_len;
-> +    /* pointer to the packet */
-> +    MultiFDPacket_t *packet;
-> +    /* multifd flags for each packet */
-> +    uint32_t flags;
-> +    /* global number of generated multifd packets */
-> +    uint32_t seq;
->  }  MultiFDSendParams;
->  
->  typedef struct {
-> @@ -468,6 +487,14 @@ typedef struct {
->      bool quit;
->      /* array of pages to receive */
->      MultiFDPages_t *pages;
-> +    /* packet allocated len */
-> +    uint32_t packet_len;
-> +    /* pointer to the packet */
-> +    MultiFDPacket_t *packet;
-> +    /* multifd flags for each packet */
-> +    uint32_t flags;
-> +    /* global number of generated multifd packets */
-> +    uint32_t seq;
->  } MultiFDRecvParams;
->  
->  static int multifd_send_initial_packet(MultiFDSendParams *p, Error **errp)
-> @@ -552,6 +579,91 @@ static void multifd_pages_clear(MultiFDPages_t *pages)
->      g_free(pages);
->  }
->  
-> +static void multifd_send_fill_packet(MultiFDSendParams *p)
-> +{
-> +    MultiFDPacket_t *packet = p->packet;
-> +    int i;
-> +
-> +    packet->magic = cpu_to_be32(MULTIFD_MAGIC);
-> +    packet->version = cpu_to_be32(MULTIFD_VERSION);
-> +    packet->flags = cpu_to_be32(p->flags);
-> +    packet->size = cpu_to_be32(migrate_multifd_page_count());
-> +    packet->used = cpu_to_be32(p->pages->used);
-> +    packet->seq = cpu_to_be32(p->seq);
-> +
-> +    if (p->pages->block) {
-> +        strncpy(packet->ramblock, p->pages->block->idstr, 256);
-> +    }
-> +
-> +    for (i = 0; i < p->pages->used; i++) {
-> +        packet->offset[i] = cpu_to_be64(p->pages->offset[i]);
-> +    }
-> +}
-> +
-> +static int multifd_recv_unfill_packet(MultiFDRecvParams *p, Error **errp)
-> +{
-> +    MultiFDPacket_t *packet = p->packet;
-> +    RAMBlock *block;
-> +    int i;
-> +
-> +    /* ToDo: We can't use it until we haven't received a message */
-> +    return 0;
-> +
-> +    be32_to_cpus(&packet->magic);
-> +    if (packet->magic != MULTIFD_MAGIC) {
-> +        error_setg(errp, "multifd: received packet "
-> +                   "version %d and expected version %d",
-> +                   packet->magic, MULTIFD_VERSION);
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vYiGJIMlqgqJe2AzgJLjRfG5ogvlGKOqm
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <496ae9da-458d-1308-48ae-17326586b670@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/7] block: Add Error parameter to
+ bdrv_amend_options
+References: <20180421165423.30759-1-mreitz@redhat.com>
+ <20180421165423.30759-3-mreitz@redhat.com>
+ <c1b70360-a112-2d7c-33df-0ed5ec0ec3f9@redhat.com>
+In-Reply-To: <c1b70360-a112-2d7c-33df-0ed5ec0ec3f9@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-That's mixing magic and version. (Magic's as %x please)
+On 2018-05-02 19:52, Eric Blake wrote:
+> On 04/21/2018 11:54 AM, Max Reitz wrote:
+>> Looking at the qcow2 code that is riddled with error_report() calls,
+>> this is really how it should have been from the start.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>=20
+>> +++ b/block/qcow2.c
+>> @@ -4049,7 +4049,8 @@ static int qcow2_load_vmstate(BlockDriverState
+>> *bs, QEMUIOVector *qiov,
+>> =C2=A0=C2=A0 * have to be removed.
+>> =C2=A0=C2=A0 */
+>> =C2=A0 static int qcow2_downgrade(BlockDriverState *bs, int target_ver=
+sion,
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 BlockDriverAmendStatusCB *status_cb, void
+>> *cb_opaque)
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 BlockDriverAmendStatusCB *status_cb, void
+>> *cb_opaque,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 Error **errp)
+>> =C2=A0 {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BDRVQcow2State *s =3D bs->opaque;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int current_version =3D s->qcow_version=
+;
+>> @@ -4058,13 +4059,17 @@ static int qcow2_downgrade(BlockDriverState
+>> *bs, int target_version,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (target_version =3D=3D current_versi=
+on) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else if (target_version > current_ver=
+sion) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "Cannot d=
+owngrade an image from version %i
+>> to %i",
+>=20
+> %i is unusual compared to %d, but as they do the same, I won't make you=
 
-> +        return -1;
-> +    }
-> +
-> +    be32_to_cpus(&packet->version);
-> +    if (packet->version != MULTIFD_VERSION) {
-> +        error_setg(errp, "multifd: received packet "
-> +                   "version %d and expected version %d",
-> +                   packet->version, MULTIFD_VERSION);
-> +        return -1;
-> +    }
-> +
-> +    p->flags = be32_to_cpu(packet->flags);
-> +
-> +    be32_to_cpus(&packet->size);
-> +    if (packet->size > migrate_multifd_page_count()) {
-> +        error_setg(errp, "multifd: received packet "
-> +                   "with size %d and expected maximum size %d",
-> +                   packet->size, migrate_multifd_page_count()) ;
-> +        return -1;
-> +    }
-> +
-> +    p->pages->used = be32_to_cpu(packet->used);
-> +    if (p->pages->used > packet->size) {
-> +        error_setg(errp, "multifd: received packet "
-> +                   "with size %d and expected maximum size %d",
-> +                   p->pages->used, packet->size) ;
-> +        return -1;
-> +    }
-> +
-> +    p->seq = be32_to_cpu(packet->seq);
-> +
-> +    if (p->pages->used) {
-> +        block = qemu_ram_block_by_name(packet->ramblock);
+> change it, if we keep it.=C2=A0 That said, this function is static; and=
+ the
+> lone caller qcow2_amend_options is already doing sanity checks, right?
+> (Yes - it does qemu_opt_get(opts, BLOCK_OPT_COMPAT_LEVEL), and then
+> validates that the user's information is in range, which already filter=
+s
+> out everything but v2 and v3; then _this_ function is called exactly fo=
+r
+> 3 downto 2).=C2=A0 So this should be an assert() instead of an error me=
+ssage.
 
-Do you need to ensure that packet->ramblock is a terminated string
-first?
+OK, I'll change it to an assertion.
 
-> +        if (!block) {
-> +            error_setg(errp, "multifd: unknown ram block %s",
-> +                       packet->ramblock);
-> +            return -1;
-> +        }
-> +    }
-> +
-> +    for (i = 0; i < p->pages->used; i++) {
-> +        ram_addr_t offset = be64_to_cpu(packet->offset[i]);
-> +
-> +        p->pages->iov[i].iov_base = block->host + offset;
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 current_version, target_version);=
 
-I think that needs validating to ensure that the source didn't
-send us junk and cause us to overwrite after the end of block->host
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EINVAL;=
 
-> +        p->pages->iov[i].iov_len = TARGET_PAGE_SIZE;
-> +    }
-> +
-> +    return 0;
-> +}
-> +
->  struct {
->      MultiFDSendParams *params;
->      /* number of created threads */
-> @@ -607,6 +719,9 @@ int multifd_save_cleanup(Error **errp)
->          p->name = NULL;
->          multifd_pages_clear(p->pages);
->          p->pages = NULL;
-> +        p->packet_len = 0;
-> +        g_free(p->packet);
-> +        p->packet = NULL;
->      }
->      g_free(multifd_send_state->params);
->      multifd_send_state->params = NULL;
-> @@ -628,6 +743,7 @@ static void *multifd_send_thread(void *opaque)
->  
->      while (true) {
->          qemu_mutex_lock(&p->mutex);
-> +        multifd_send_fill_packet(p);
->          if (p->quit) {
->              qemu_mutex_unlock(&p->mutex);
->              break;
-> @@ -692,6 +808,9 @@ int multifd_save_setup(void)
->          p->quit = false;
->          p->id = i;
->          multifd_pages_init(&p->pages, page_count);
-> +        p->packet_len = sizeof(MultiFDPacket_t)
-> +                      + sizeof(ram_addr_t) * page_count;
-> +        p->packet = g_malloc0(p->packet_len);
->          p->name = g_strdup_printf("multifdsend_%d", i);
->          socket_send_channel_create(multifd_new_send_channel_async, p);
->      }
-> @@ -751,6 +870,9 @@ int multifd_load_cleanup(Error **errp)
->          p->name = NULL;
->          multifd_pages_clear(p->pages);
->          p->pages = NULL;
-> +        p->packet_len = 0;
-> +        g_free(p->packet);
-> +        p->packet = NULL;
->      }
->      g_free(multifd_recv_state->params);
->      multifd_recv_state->params = NULL;
-> @@ -763,10 +885,20 @@ int multifd_load_cleanup(Error **errp)
->  static void *multifd_recv_thread(void *opaque)
->  {
->      MultiFDRecvParams *p = opaque;
-> +    Error *local_err = NULL;
-> +    int ret;
->  
->      while (true) {
->          qemu_mutex_lock(&p->mutex);
-> -        if (p->quit) {
-> +        if (false)  {
-> +            /* ToDo: Packet reception goes here */
-> +
-> +            ret = multifd_recv_unfill_packet(p, &local_err);
-> +            qemu_mutex_unlock(&p->mutex);
-> +            if (ret) {
-> +                break;
-> +            }
-> +        } else if (p->quit) {
->              qemu_mutex_unlock(&p->mutex);
->              break;
->          }
-> @@ -803,6 +935,9 @@ int multifd_load_setup(void)
->          p->quit = false;
->          p->id = i;
->          multifd_pages_init(&p->pages, page_count);
-> +        p->packet_len = sizeof(MultiFDPacket_t)
-> +                      + sizeof(ram_addr_t) * page_count;
-> +        p->packet = g_malloc0(p->packet_len);
->          p->name = g_strdup_printf("multifdrecv_%d", i);
->      }
->      return 0;
-> -- 
-> 2.17.0
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else if (target_version !=3D 2) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "Cannot d=
+owngrade an image to version %i
+>> (only "
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "target version 2 is supported)",=
+ target_version);
+>=20
+> And again.
+>=20
+>> @@ -4072,6 +4077,8 @@ static int qcow2_downgrade(BlockDriverState *bs,=
+
+>> int target_version,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (s->incompatible_features & QCOW2_IN=
+COMPAT_DIRTY) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D qcow2_m=
+ark_clean(bs);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 er=
+ror_setg(errp, "Failed to make the image clean: %s",
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 strerror(=
+-ret));
+>=20
+> error_setg_errno(), please.
+
+Right, forgot we had that...
+
+>> @@ -4094,6 +4103,8 @@ static int qcow2_downgrade(BlockDriverState *bs,=
+
+>> int target_version,
+>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D qcow2_expand_zero_cluste=
+rs(bs, status_cb, cb_opaque);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "Failed t=
+o turn zero into data clusters: %s",
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 strerror(-ret));
+>=20
+> and again
+>=20
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return ret;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> =C2=A0 @@ -4101,6 +4112,8 @@ static int qcow2_downgrade(BlockDriverSta=
+te
+>> *bs, int target_version,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D qcow2_update_header(bs);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->qcow_version=
+ =3D current_version;
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "Failed t=
+o update the image header: %s",
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 strerror(-ret));
+>=20
+> etc.=C2=A0 I'll quit pointing it out, but there are more.
+>=20
+>> @@ -4293,18 +4311,17 @@ static int
+>> qcow2_amend_options(BlockDriverState *bs, QemuOpts *opts,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int refcount_or=
+der =3D ctz32(refcount_bits);
+>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (new_=
+version < 3 && refcount_bits !=3D 16) {
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 er=
+ror_report("Different refcount widths than 16 bits
+>> require "
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ "compatibility level 1.1 or above (use
+>> compat=3D1.1 or "
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ "greater)");
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 er=
+ror_setg(errp, "Different refcount widths than 16 bits
+>> require "
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "compatib=
+ility level 1.1 or above (use
+>> compat=3D1.1 or "
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "greater)=
+");
+>=20
+> Not your fault, but that reads poorly.=C2=A0 Better would be:
+>=20
+> Refcount widths other than 16 bits require compatibility level 1.1 or a=
+bove
+
+Sure it's my fault, I wrote this in the first place. :-)
+
+Max
+
+>> +++ b/qemu-img.c
+>> @@ -3730,10 +3730,10 @@ static int img_amend(int argc, char **argv)
+>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* In case the driver does not c=
+all amend_status_cb() */
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_progress_print(0.f, 0);
+>> -=C2=A0=C2=A0=C2=A0 ret =3D bdrv_amend_options(bs, opts, &amend_status=
+_cb, NULL);
+>> +=C2=A0=C2=A0=C2=A0 ret =3D bdrv_amend_options(bs, opts, &amend_status=
+_cb, NULL, &err);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_progress_print(100.f, 0);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("Error while =
+amending options: %s",
+>> strerror(-ret));
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report_err(err);
+>=20
+> Definitely nicer, but does change various outputs; glad you fixed
+> iotests to match.
+>=20
+> Overall a nice patch, looking forward to v2.
+>=20
+
+
+
+--vYiGJIMlqgqJe2AzgJLjRfG5ogvlGKOqm
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlrp/rsACgkQ9AfbAGHV
+z0B7GggAmnNJphKMpDcY/P3HvlUlpH3M2QsSnXiRryhMt4a0Hzh6zBQh7gequu92
+C0JEWLCoiGeFAFl3xLWCNpUrTe3ANNs0BSZkmMIGGhWLP/gR2wip5CQ6ldwqTLU1
+7oaQK13E+eOpAvoFpUqrkzTBneNjc/y7vSDfq/1G0i4gOz0zAg1PtzeoeueGjQE3
+KqptqnLHPCktzE1ASzGM14AbJe8PoxsES9wT0R3wGY8uUVpyUcZogOkWmoX95ytq
+6hlCsQHYwV+U+wr+jxgU0vMHPzOdUHrSRcdcCm5EI1U4fuqlTV0ui5QRsHS4A3Tz
+Ho9q5LyKg70A10505oNfZiT0r+6ByQ==
+=XTGf
+-----END PGP SIGNATURE-----
+
+--vYiGJIMlqgqJe2AzgJLjRfG5ogvlGKOqm--
