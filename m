@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fDhnZ-0007WZ-HM
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 22:47:18 -0400
+	(envelope-from <peterx@redhat.com>) id 1fDi3I-0001iI-B3
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 23:03:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fDhnW-000494-EE
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 22:47:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51584 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fDi3D-0003WP-Pj
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 23:03:32 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43754 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fDhnW-00046r-8G
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 22:47:14 -0400
-Date: Wed, 2 May 2018 10:46:53 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fDi3D-0003Vm-E3
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 23:03:27 -0400
+Date: Wed, 2 May 2018 11:03:09 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180502024653.GB25938@xz-mi>
-References: <20180428081045.8878-1-xiaoguangrong@tencent.com>
+Message-ID: <20180502030309.GC25938@xz-mi>
+References: <20180426091519.26934-1-xiaoguangrong@tencent.com>
+	<32eaad8e-35a0-5240-37a2-4242b7890ab9@redhat.com>
+	<a14b1b5b-4f0c-c085-35b8-9539afa5091f@gmail.com>
+	<20180427093135.GC13269@xz-mi>
+	<2f84ab90-2b9c-9888-e6e2-9114ae046078@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180428081045.8878-1-xiaoguangrong@tencent.com>
-Subject: Re: [Qemu-devel] [PATCH] migration: fix saving normal page even if
- it's been compressed
+In-Reply-To: <2f84ab90-2b9c-9888-e6e2-9114ae046078@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] migration: introduce decompress-error-check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +30,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: guangrong.xiao@gmail.com
-Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: Xiao Guangrong <guangrong.xiao@gmail.com>
+Cc: Eric Blake <eblake@redhat.com>, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, kvm@vger.kernel.org, Xiao Guangrong <xiaoguangrong@tencent.com>, qemu-devel@nongnu.org, dgilbert@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn
 
-On Sat, Apr 28, 2018 at 04:10:45PM +0800, guangrong.xiao@gmail.com wrote:
-> From: Xiao Guangrong <xiaoguangrong@tencent.com>
+On Fri, Apr 27, 2018 at 06:40:09PM +0800, Xiao Guangrong wrote:
 > 
-> Fix the bug introduced by da3f56cb2e767016 (migration: remove
-> ram_save_compressed_page()), It should be 'return' rather than
-> 'res'
 > 
-> Sorry for this stupid mistake :(
+> On 04/27/2018 05:31 PM, Peter Xu wrote:
+> > On Fri, Apr 27, 2018 at 11:15:37AM +0800, Xiao Guangrong wrote:
+> > > 
+> > > 
+> > > On 04/26/2018 10:01 PM, Eric Blake wrote:
+> > > > On 04/26/2018 04:15 AM, guangrong.xiao@gmail.com wrote:
+> > > > > From: Xiao Guangrong <xiaoguangrong@tencent.com>
+> > > > > 
+> > > > > QEMU 2.13 enables strict check for compression & decompression to
+> > > > > make the migration more robuster, that depends on the source to fix
+> > > > 
+> > > > s/robuster/robust/
+> > > > 
+> > > 
+> > > Will fix, thank you for pointing it out.
+> > > 
+> > > > > the internal design which triggers the unexpected error conditions
+> > > > 
+> > > > 2.13 hasn't been released yet.  Why do we need a knob to explicitly turn
+> > > > off strict checking?  Can we not instead make 2.13 automatically smart
+> > > > enough to tell if the incoming stream is coming from an older qemu
+> > > > (which might fail if the strict checks are enabled) vs. a newer qemu
+> > > > (the sender gave us what we need to ensure the strict checks are
+> > > > worthwhile)?
+> > > > 
+> > > 
+> > > Really smart.
+> > > 
+> > > How about introduce a new command, MIG_CMD_DECOMPRESS_ERR_CHECK,
+> > > the destination will do strict check if got this command (i.e, new
+> > > QEMU is running on the source), otherwise, turn the check off.
+> > 
+> > Why not we just introduce a compat bit for that?  I mean something
+> > like: 15c3850325 ("migration: move skip_section_footers",
+> > 2017-06-28).  Then we turn that check bit off for <=2.12.
+> > 
+> > Would that work?
 > 
-> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+> I am afraid it can not. :(
+> 
+> The compat bit only impacts local behavior, however, in this case, we
+> need the source QEMU to tell the destination if it supports strict
+> error check.
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+My understanding is that the new compat bit will only take effect when
+at destination.
 
-So is that only a performance degradation without this fix (since
-AFAIU the compressing pages will be sent twice)?  Thanks,
+I'm not sure I'm thinking that correctly. I'll give some examples.
 
-> ---
->  migration/ram.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 01cc815410..699546cc43 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -1490,7 +1490,7 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
->       * CPU resource.
->       */
->      if (block == rs->last_sent_block && save_page_use_compression(rs)) {
-> -        res = compress_page_with_multi_thread(rs, block, offset);
-> +        return compress_page_with_multi_thread(rs, block, offset);
->      }
->  
->      return ram_save_page(rs, pss, last_stage);
-> -- 
-> 2.14.3
-> 
+When we migrate from <2.12 to 2.13, on 2.13 QEMU we'll possibly with
+(using q35 as example, always) "-M pc-q35-2.12" to make the migration
+work, so this will let the destination QEMU stop checking
+decompressing errors.  IMHO that's what we want so it's fine (forward
+migration).
+
+When we migrate from 2.13 to <2.12, on 2.12 it'll always skip checking
+decompression errors, so it's fine too even if we don't send some
+compress-errored pages.
+
+Then, would this mean that the compat bit could work too just like
+this patch?  AFAIU the compat bit idea is very similar to current
+patch, however we don't really need a new parameter to make things
+complicated, we just let old QEMUs behave differently and
+automatically, then user won't need to worry about manually specify
+that parameter.
+
+Thanks,
 
 -- 
 Peter Xu
