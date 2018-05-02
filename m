@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35179)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fDpJy-0007Co-Fy
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:49:17 -0400
+	(envelope-from <peterx@redhat.com>) id 1fDpK1-0007GC-Rb
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:49:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fDpJx-0003Ck-Ev
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:49:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44650 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fDpK0-0003Fo-Uc
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:49:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42630 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fDpJx-0003CH-69
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:49:13 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fDpK0-0003FI-Mn
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:49:16 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Wed,  2 May 2018 18:47:38 +0800
-Message-Id: <20180502104740.12123-23-peterx@redhat.com>
+Date: Wed,  2 May 2018 18:47:39 +0800
+Message-Id: <20180502104740.12123-24-peterx@redhat.com>
 In-Reply-To: <20180502104740.12123-1-peterx@redhat.com>
 References: <20180502104740.12123-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 22/24] migration: introduce lock for
- to_dst_file
+Subject: [Qemu-devel] [PATCH v8 23/24] migration/qmp: add command
+ migrate-pause
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,115 +27,86 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Let's introduce a lock for that QEMUFile since we are going to operate
-on it in multiple threads.
+It pauses an ongoing migration.  Currently it only supports postcopy.
+Note that this command will work on either side of the migration.
+Basically when we trigger this on one side, it'll interrupt the other
+side as well since the other side will get notified on the disconnect
+event.
+
+However, it's still possible that the other side is not notified, for
+example, when the network is totally broken, or due to some firewall
+configuration changes.  In that case, we will also need to run the same
+command on the other side so both sides will go into the paused state.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/migration.h |  6 ++++++
- migration/channel.c   |  3 ++-
- migration/migration.c | 22 +++++++++++++++++++---
- 3 files changed, 27 insertions(+), 4 deletions(-)
+ qapi/migration.json   | 16 ++++++++++++++++
+ migration/migration.c | 29 +++++++++++++++++++++++++++++
+ 2 files changed, 45 insertions(+)
 
-diff --git a/migration/migration.h b/migration/migration.h
-index 012bcd352b..f6b9e774f9 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -114,6 +114,12 @@ struct MigrationState
-     QemuThread thread;
-     QEMUBH *cleanup_bh;
-     QEMUFile *to_dst_file;
-+    /*
-+     * Protects to_dst_file pointer.  We need to make sure we won't
-+     * yield or hang during the critical section, since this lock will
-+     * be used in OOB command handler.
-+     */
-+    QemuMutex qemu_file_lock;
- 
-     /* bytes already send at the beggining of current interation */
-     uint64_t iteration_initial_bytes;
-diff --git a/migration/channel.c b/migration/channel.c
-index c5eaf0fa0e..716192bf75 100644
---- a/migration/channel.c
-+++ b/migration/channel.c
-@@ -74,8 +74,9 @@ void migration_channel_connect(MigrationState *s,
-         } else {
-             QEMUFile *f = qemu_fopen_channel_output(ioc);
- 
-+            qemu_mutex_lock(&s->qemu_file_lock);
-             s->to_dst_file = f;
--
-+            qemu_mutex_unlock(&s->qemu_file_lock);
-         }
-     }
-     migrate_fd_connect(s, error);
+diff --git a/qapi/migration.json b/qapi/migration.json
+index a1c2c238ab..bf403d2dd2 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -1211,3 +1211,19 @@
+ ##
+ { 'command': 'migrate-recover', 'data': { 'uri': 'str' },
+   'allow-oob': true }
++
++##
++# @migrate-pause:
++#
++# Pause a migration.  Currently it only supports postcopy.
++#
++# Returns: nothing.
++#
++# Example:
++#
++# -> { "execute": "migrate-pause" }
++# <- { "return": {} }
++#
++# Since: 2.12
++##
++{ 'command': 'migrate-pause', 'allow-oob': true }
 diff --git a/migration/migration.c b/migration/migration.c
-index 03d1fc7bc3..25f26052d2 100644
+index 25f26052d2..03e4950976 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -1229,6 +1229,7 @@ static void migrate_fd_cleanup(void *opaque)
- 
-     if (s->to_dst_file) {
-         Error *local_err = NULL;
-+        QEMUFile *tmp;
- 
-         trace_migrate_fd_cleanup();
-         qemu_mutex_unlock_iothread();
-@@ -1241,8 +1242,15 @@ static void migrate_fd_cleanup(void *opaque)
-         if (multifd_save_cleanup(&local_err) != 0) {
-             error_report_err(local_err);
-         }
--        qemu_fclose(s->to_dst_file);
-+        qemu_mutex_lock(&s->qemu_file_lock);
-+        tmp = s->to_dst_file;
-         s->to_dst_file = NULL;
-+        qemu_mutex_unlock(&s->qemu_file_lock);
-+        /*
-+         * Close the file handle without the lock to make sure the
-+         * critical section won't block for long.
-+         */
-+        qemu_fclose(tmp);
-     }
- 
-     assert((s->state != MIGRATION_STATUS_ACTIVE) &&
-@@ -2526,14 +2534,20 @@ static MigThrError postcopy_pause(MigrationState *s)
-     assert(s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE);
- 
-     while (true) {
-+        QEMUFile *file;
-+
-         migrate_set_state(&s->state, s->state,
-                           MIGRATION_STATUS_POSTCOPY_PAUSED);
- 
-         /* Current channel is possibly broken. Release it. */
-         assert(s->to_dst_file);
--        qemu_file_shutdown(s->to_dst_file);
--        qemu_fclose(s->to_dst_file);
-+        qemu_mutex_lock(&s->qemu_file_lock);
-+        file = s->to_dst_file;
-         s->to_dst_file = NULL;
-+        qemu_mutex_unlock(&s->qemu_file_lock);
-+
-+        qemu_file_shutdown(file);
-+        qemu_fclose(file);
- 
-         error_report("Detected IO failure for postcopy. "
-                      "Migration paused.");
-@@ -3002,6 +3016,7 @@ static void migration_instance_finalize(Object *obj)
-     MigrationParameters *params = &ms->parameters;
- 
-     qemu_mutex_destroy(&ms->error_mutex);
-+    qemu_mutex_destroy(&ms->qemu_file_lock);
-     g_free(params->tls_hostname);
-     g_free(params->tls_creds);
-     qemu_sem_destroy(&ms->pause_sem);
-@@ -3041,6 +3056,7 @@ static void migration_instance_init(Object *obj)
-     qemu_sem_init(&ms->postcopy_pause_sem, 0);
-     qemu_sem_init(&ms->postcopy_pause_rp_sem, 0);
-     qemu_sem_init(&ms->rp_state.rp_sem, 0);
-+    qemu_mutex_init(&ms->qemu_file_lock);
+@@ -1502,6 +1502,35 @@ void qmp_migrate_recover(const char *uri, Error **errp)
+     qemu_start_incoming_migration(uri, errp);
  }
  
- /*
++void qmp_migrate_pause(Error **errp)
++{
++    MigrationState *ms = migrate_get_current();
++    MigrationIncomingState *mis = migration_incoming_get_current();
++    int ret;
++
++    if (ms->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
++        /* Source side, during postcopy */
++        qemu_mutex_lock(&ms->qemu_file_lock);
++        ret = qemu_file_shutdown(ms->to_dst_file);
++        qemu_mutex_unlock(&ms->qemu_file_lock);
++        if (ret) {
++            error_setg(errp, "Failed to pause source migration");
++        }
++        return;
++    }
++
++    if (mis->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
++        ret = qemu_file_shutdown(mis->from_src_file);
++        if (ret) {
++            error_setg(errp, "Failed to pause destination migration");
++        }
++        return;
++    }
++
++    error_setg(errp, "migrate-pause is currently only supported "
++               "during postcopy-active state");
++}
++
+ bool migration_is_blocked(Error **errp)
+ {
+     if (qemu_savevm_state_blocked(errp)) {
 -- 
 2.14.3
