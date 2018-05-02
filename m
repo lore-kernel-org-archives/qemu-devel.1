@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fDi3I-0001iI-B3
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 23:03:33 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fDiQt-0004r0-TL
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 23:27:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fDi3D-0003WP-Pj
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 23:03:32 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43754 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fDi3D-0003Vm-E3
-	for qemu-devel@nongnu.org; Tue, 01 May 2018 23:03:27 -0400
-Date: Wed, 2 May 2018 11:03:09 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180502030309.GC25938@xz-mi>
-References: <20180426091519.26934-1-xiaoguangrong@tencent.com>
-	<32eaad8e-35a0-5240-37a2-4242b7890ab9@redhat.com>
-	<a14b1b5b-4f0c-c085-35b8-9539afa5091f@gmail.com>
-	<20180427093135.GC13269@xz-mi>
-	<2f84ab90-2b9c-9888-e6e2-9114ae046078@gmail.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1fDiQq-0006fs-O2
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 23:27:55 -0400
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:44797)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fDiQq-0006eg-Bi
+	for qemu-devel@nongnu.org; Tue, 01 May 2018 23:27:52 -0400
+Received: by mail-pg0-x241.google.com with SMTP id 82-v6so9589800pge.11
+	for <qemu-devel@nongnu.org>; Tue, 01 May 2018 20:27:52 -0700 (PDT)
+References: <20180501235332.31245-1-laurent@vivier.eu>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <573362f2-a00c-0bf6-59e2-6dd4aa143e16@linaro.org>
+Date: Tue, 1 May 2018 20:27:46 -0700
 MIME-Version: 1.0
+In-Reply-To: <20180501235332.31245-1-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <2f84ab90-2b9c-9888-e6e2-9114ae046078@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] migration: introduce decompress-error-check
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: remove useless padding in
+ flock64 structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,79 +31,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <guangrong.xiao@gmail.com>
-Cc: Eric Blake <eblake@redhat.com>, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, kvm@vger.kernel.org, Xiao Guangrong <xiaoguangrong@tencent.com>, qemu-devel@nongnu.org, dgilbert@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>
 
-On Fri, Apr 27, 2018 at 06:40:09PM +0800, Xiao Guangrong wrote:
+On 05/01/2018 04:53 PM, Laurent Vivier wrote:
+> Since commit 8efb2ed5ec ("linux-user: Correct signedness of
+> target_flock l_start and l_len fields"), flock64 structure uses
+> abi_llong for l_start and l_len in place of "unsigned long long"
+> this should force them to be aligned accordingly to the target
+> rules. So we can remove the padding field and the QEMU_PACKED
+> attribute.
 > 
+> I have compared the result of the following program before and
+> after the change:
 > 
-> On 04/27/2018 05:31 PM, Peter Xu wrote:
-> > On Fri, Apr 27, 2018 at 11:15:37AM +0800, Xiao Guangrong wrote:
-> > > 
-> > > 
-> > > On 04/26/2018 10:01 PM, Eric Blake wrote:
-> > > > On 04/26/2018 04:15 AM, guangrong.xiao@gmail.com wrote:
-> > > > > From: Xiao Guangrong <xiaoguangrong@tencent.com>
-> > > > > 
-> > > > > QEMU 2.13 enables strict check for compression & decompression to
-> > > > > make the migration more robuster, that depends on the source to fix
-> > > > 
-> > > > s/robuster/robust/
-> > > > 
-> > > 
-> > > Will fix, thank you for pointing it out.
-> > > 
-> > > > > the internal design which triggers the unexpected error conditions
-> > > > 
-> > > > 2.13 hasn't been released yet.  Why do we need a knob to explicitly turn
-> > > > off strict checking?  Can we not instead make 2.13 automatically smart
-> > > > enough to tell if the incoming stream is coming from an older qemu
-> > > > (which might fail if the strict checks are enabled) vs. a newer qemu
-> > > > (the sender gave us what we need to ensure the strict checks are
-> > > > worthwhile)?
-> > > > 
-> > > 
-> > > Really smart.
-> > > 
-> > > How about introduce a new command, MIG_CMD_DECOMPRESS_ERR_CHECK,
-> > > the destination will do strict check if got this command (i.e, new
-> > > QEMU is running on the source), otherwise, turn the check off.
-> > 
-> > Why not we just introduce a compat bit for that?  I mean something
-> > like: 15c3850325 ("migration: move skip_section_footers",
-> > 2017-06-28).  Then we turn that check bit off for <=2.12.
-> > 
-> > Would that work?
+>     cat -> flock64_dump  <<EOF
+>     p/d sizeof(struct target_flock64)
+>     p/d &((struct target_flock64 *)0)->l_type
+>     p/d &((struct target_flock64 *)0)->l_whence
+>     p/d &((struct target_flock64 *)0)->l_start
+>     p/d &((struct target_flock64 *)0)->l_len
+>     p/d &((struct target_flock64 *)0)->l_pid
+>     quit
+>     EOF
 > 
-> I am afraid it can not. :(
+>     for file in build/all/*-linux-user/qemu-* ; do
+>     echo $file
+>     gdb -batch -nx -x flock64_dump $file 2> /dev/null
+>     done
 > 
-> The compat bit only impacts local behavior, however, in this case, we
-> need the source QEMU to tell the destination if it supports strict
-> error check.
+> The sizeof() changes because we remove the QEMU_PACKED.
+> The new size is 32 (except for i386 and m68k) and this is
+> the real size of "struct flock64" on the target architecture.
+> 
+> The following architectures differ:
+> aarch64_be, aarch64, alpha, armeb, arm, cris, hppa, nios2, or1k,
+> riscv32, riscv64, s390x.
+> 
+> For a subset of these architectures, I have checked with the following
+> program the new structure is the correct one:
+> 
+>   #include <stdio.h>
+>   #define __USE_LARGEFILE64
+>   #include <fcntl.h>
+> 
+>   int main(void)
+>   {
+> 	  printf("struct flock64 %d\n", sizeof(struct flock64));
+> 	  printf("l_type %d\n", &((struct flock64 *)0)->l_type);
+> 	  printf("l_whence %d\n", &((struct flock64 *)0)->l_whence);
+> 	  printf("l_start %d\n", &((struct flock64 *)0)->l_start);
+> 	  printf("l_len %d\n", &((struct flock64 *)0)->l_len);
+> 	  printf("l_pid %d\n", &((struct flock64 *)0)->l_pid);
+>   }
+> 
+> [I have checked aarch64, alpha, arm, s390x]
+> 
+> I have also fixed the alignment value for sh4 (to align llong on 4 bytes)
+> (see c2e3dee6e0 "linux-user: Define target alignment size")
 
-My understanding is that the new compat bit will only take effect when
-at destination.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-I'm not sure I'm thinking that correctly. I'll give some examples.
 
-When we migrate from <2.12 to 2.13, on 2.13 QEMU we'll possibly with
-(using q35 as example, always) "-M pc-q35-2.12" to make the migration
-work, so this will let the destination QEMU stop checking
-decompressing errors.  IMHO that's what we want so it's fine (forward
-migration).
-
-When we migrate from 2.13 to <2.12, on 2.12 it'll always skip checking
-decompression errors, so it's fine too even if we don't send some
-compress-errored pages.
-
-Then, would this mean that the compat bit could work too just like
-this patch?  AFAIU the compat bit idea is very similar to current
-patch, however we don't really need a new parameter to make things
-complicated, we just let old QEMUs behave differently and
-automatically, then user won't need to worry about manually specify
-that parameter.
-
-Thanks,
-
--- 
-Peter Xu
+r~
