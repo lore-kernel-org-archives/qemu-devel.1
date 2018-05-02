@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fE02k-0000ni-Fp
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 18:16:15 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fE02n-0000ov-8X
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 18:16:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fE02j-0007z5-CF
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 18:16:10 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:39710)
+	(envelope-from <richard.henderson@linaro.org>) id 1fE02l-00082D-T8
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 18:16:13 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:40974)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fE02j-0007y3-5M
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 18:16:09 -0400
-Received: by mail-pf0-x243.google.com with SMTP id z9so12955726pfe.6
-	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 15:16:09 -0700 (PDT)
+	id 1fE02l-000812-M7
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 18:16:11 -0400
+Received: by mail-pg0-x244.google.com with SMTP id m21-v6so11628372pgv.8
+	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 15:16:11 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  2 May 2018 15:15:48 -0700
-Message-Id: <20180502221552.3873-11-richard.henderson@linaro.org>
+Date: Wed,  2 May 2018 15:15:50 -0700
+Message-Id: <20180502221552.3873-13-richard.henderson@linaro.org>
 In-Reply-To: <20180502221552.3873-1-richard.henderson@linaro.org>
 References: <20180502221552.3873-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 10/14] target/arm: Implement FP
- data-processing (3 source) for fp16
+Subject: [Qemu-devel] [PATCH v2 12/14] target/arm: Implement FCSEL for fp16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,82 +30,84 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org, qemu-stable@nongnu.org
+Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-stable@nongnu.org
 
-We missed all of the scalar fp16 fma operations.
+From: Alex Bennée <alex.bennee@linaro.org>
+
+These were missed out from the rest of the half-precision work.
 
 Cc: qemu-stable@nongnu.org
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+[rth: Fix erroneous check vs type]
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-a64.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
+ target/arm/translate-a64.c | 31 +++++++++++++++++++++++++------
+ 1 file changed, 25 insertions(+), 6 deletions(-)
 
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index d7a49ef2e4..9322b0d896 100644
+index f0aca20771..1ea5185f14 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -5240,6 +5240,44 @@ static void handle_fp_3src_double(DisasContext *s, bool o0, bool o1,
-     tcg_temp_free_i64(tcg_res);
- }
+@@ -4666,15 +4666,34 @@ static void disas_fp_csel(DisasContext *s, uint32_t insn)
+     unsigned int mos, type, rm, cond, rn, rd;
+     TCGv_i64 t_true, t_false, t_zero;
+     DisasCompare64 c;
++    TCGMemOp sz;
  
-+/* Floating-point data-processing (3 source) - half precision */
-+static void handle_fp_3src_half(DisasContext *s, bool o0, bool o1,
-+                                int rd, int rn, int rm, int ra)
-+{
-+    TCGv_i32 tcg_op1, tcg_op2, tcg_op3;
-+    TCGv_i32 tcg_res = tcg_temp_new_i32();
-+    TCGv_ptr fpst = get_fpstatus_ptr(true);
-+
-+    tcg_op1 = read_fp_hreg(s, rn);
-+    tcg_op2 = read_fp_hreg(s, rm);
-+    tcg_op3 = read_fp_hreg(s, ra);
-+
-+    /* These are fused multiply-add, and must be done as one
-+     * floating point operation with no rounding between the
-+     * multiplication and addition steps.
-+     * NB that doing the negations here as separate steps is
-+     * correct : an input NaN should come out with its sign bit
-+     * flipped if it is a negated-input.
-+     */
-+    if (o1 == true) {
-+        tcg_gen_xori_i32(tcg_op3, tcg_op3, 0x8000);
+     mos = extract32(insn, 29, 3);
+-    type = extract32(insn, 22, 2); /* 0 = single, 1 = double */
++    type = extract32(insn, 22, 2);
+     rm = extract32(insn, 16, 5);
+     cond = extract32(insn, 12, 4);
+     rn = extract32(insn, 5, 5);
+     rd = extract32(insn, 0, 5);
+ 
+-    if (mos || type > 1) {
++    if (mos) {
++        unallocated_encoding(s);
++        return;
 +    }
 +
-+    if (o0 != o1) {
-+        tcg_gen_xori_i32(tcg_op1, tcg_op1, 0x8000);
-+    }
-+
-+    gen_helper_advsimd_muladdh(tcg_res, tcg_op1, tcg_op2, tcg_op3, fpst);
-+
-+    write_fp_sreg(s, rd, tcg_res);
-+
-+    tcg_temp_free_ptr(fpst);
-+    tcg_temp_free_i32(tcg_op1);
-+    tcg_temp_free_i32(tcg_op2);
-+    tcg_temp_free_i32(tcg_op3);
-+    tcg_temp_free_i32(tcg_res);
-+}
-+
- /* Floating point data-processing (3 source)
-  *   31  30  29 28       24 23  22  21  20  16  15  14  10 9    5 4    0
-  * +---+---+---+-----------+------+----+------+----+------+------+------+
-@@ -5269,6 +5307,16 @@ static void disas_fp_3src(DisasContext *s, uint32_t insn)
-         }
-         handle_fp_3src_double(s, o0, o1, rd, rn, rm, ra);
-         break;
-+    case 3:
-+        if (!arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
-+            unallocated_encoding(s);
-+            return;
-+        }
-+        if (!fp_access_check(s)) {
-+            return;
-+        }
-+        handle_fp_3src_half(s, o0, o1, rd, rn, rm, ra);
++    switch(type) {
++    case 0:
++        sz = MO_32;
 +        break;
-     default:
++    case 1:
++        sz = MO_64;
++        break;
++    case 3:
++        sz = MO_16;
++        if (arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
++            break;
++        }
++        /* fallthru */
++    default:
          unallocated_encoding(s);
+         return;
      }
+@@ -4683,11 +4702,11 @@ static void disas_fp_csel(DisasContext *s, uint32_t insn)
+         return;
+     }
+ 
+-    /* Zero extend sreg inputs to 64 bits now.  */
++    /* Zero extend sreg & hreg inputs to 64 bits now.  */
+     t_true = tcg_temp_new_i64();
+     t_false = tcg_temp_new_i64();
+-    read_vec_element(s, t_true, rn, 0, type ? MO_64 : MO_32);
+-    read_vec_element(s, t_false, rm, 0, type ? MO_64 : MO_32);
++    read_vec_element(s, t_true, rn, 0, sz);
++    read_vec_element(s, t_false, rm, 0, sz);
+ 
+     a64_test_cc(&c, cond);
+     t_zero = tcg_const_i64(0);
+@@ -4696,7 +4715,7 @@ static void disas_fp_csel(DisasContext *s, uint32_t insn)
+     tcg_temp_free_i64(t_false);
+     a64_free_cc(&c);
+ 
+-    /* Note that sregs write back zeros to the high bits,
++    /* Note that sregs & hregs write back zeros to the high bits,
+        and we've already done the zero-extension.  */
+     write_fp_dreg(s, rd, t_true);
+     tcg_temp_free_i64(t_true);
 -- 
 2.14.3
