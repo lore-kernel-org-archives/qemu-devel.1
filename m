@@ -1,20 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59707)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fDnBD-0004YR-Ef
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 04:32:04 -0400
+	(envelope-from <christophe.lyon@linaro.org>) id 1fDnHM-0006Bv-89
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 04:38:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fDnBA-0008Vp-D6
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 04:32:03 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180427192852.15013-1-lersek@redhat.com>
-Date: Wed, 02 May 2018 10:31:51 +0200
-In-Reply-To: <20180427192852.15013-1-lersek@redhat.com> (Laszlo Ersek's
-	message of "Fri, 27 Apr 2018 21:28:47 +0200")
-Message-ID: <87muxi791k.fsf@dusky.pond.sub.org>
+	(envelope-from <christophe.lyon@linaro.org>) id 1fDnHL-0004z6-5F
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 04:38:24 -0400
+Received: from mail-ua0-x22b.google.com ([2607:f8b0:400c:c08::22b]:38651)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <christophe.lyon@linaro.org>)
+	id 1fDnHK-0004yc-UL
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 04:38:23 -0400
+Received: by mail-ua0-x22b.google.com with SMTP id y8so8940667ual.5
+	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 01:38:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 0/5] qapi: introduce the SysEmuTarget
- enumeration
+In-Reply-To: <b263ba48-8ac1-5493-b772-57bac4fbf2eb@vivier.eu>
+References: <20180430080404.7323-1-christophe.lyon@st.com>
+	<CAFEAcA80NBYJ6BkTMsfBBZN91oJw3zE6A_a7uA2ESCkwb1Vgew@mail.gmail.com>
+	<CAKdteOZt45ohyve_cgK6uarEiNiVOL2vVs=+GzENzFjg_1MM-w@mail.gmail.com>
+	<CAFEAcA_Aoe0Jcyn0e6Eir5T+KXtVdfjz2c-+HrtVNtaxgmDYFw@mail.gmail.com>
+	<CAKdteOY3FyXokDoViQWTL++EQ79sxNOuCgZeAxxakAQj8p2H5g@mail.gmail.com>
+	<CAFEAcA-fOHNfBJnZfcPMj53v3Dc0anYptPcw7nyBBJBdFKUZpg@mail.gmail.com>
+	<767f617b-82fc-f256-e339-6927d0c7ba59@vivier.eu>
+	<CAFEAcA8c50N_32mru3Z-5QfMM5p5WzRqRjsuoqXnoD=552ifUg@mail.gmail.com>
+	<b263ba48-8ac1-5493-b772-57bac4fbf2eb@vivier.eu>
+From: Christophe Lyon <christophe.lyon@linaro.org>
+Date: Wed, 2 May 2018 10:38:21 +0200
+Message-ID: <CAKdteOYhESWtEZwjeeeTeiubKympYiTb8xNU+pZa+2xF0pp_yg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [ARM/FDPIC v4 0/4] FDPIC ABI for ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,7 +37,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, qemu-stable@nongnu.org, Viktor VM Mihajlovski <mihajlov@linux.vnet.ibm.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Christophe Lyon <christophe.lyon@st.com>, QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
 
-Applied to qapi-next, thanks!
+On 30 April 2018 at 14:03, Laurent Vivier <laurent@vivier.eu> wrote:
+> Le 30/04/2018 =C3=A0 11:46, Peter Maydell a =C3=A9crit :
+>> On 30 April 2018 at 10:28, Laurent Vivier <laurent@vivier.eu> wrote:
+>>> Le 30/04/2018 =C3=A0 11:12, Peter Maydell a =C3=A9crit :
+>>>> Great. Riku/Laurent -- I'm assuming you're going to take this set
+>>>> via the linux-user tree.
+>>>
+>>> I just sent a pull request without it...
+>>>
+>>> Do you prefer I update this one or I send another one later?
+>>
+>> No, it can go into your next one I think. I see you've sent
+>> the signal.c refactoring, which this will conflict with,
+>> so either you or Christophe will need to rebase it anyway.
+>>
+>> thanks
+>> -- PMM
+>>
+>
+> OK, I've rebased the series on top of the new master and applied to my
+> branch linux-user-for-2.13
+> (see https://github.com/vivier/qemu/tree/linux-user-for-2.13)
+>
+
+For the record, I ran a smoke test with this branch and my small
+example with a signal handler worked as expected.
+
+Thanks,
+
+Christophe
+
+> Thanks,
+> Laurent
