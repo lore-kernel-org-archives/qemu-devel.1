@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fDpJs-00077a-PI
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:49:09 -0400
+	(envelope-from <peterx@redhat.com>) id 1fDpJu-00078x-7a
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:49:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fDpJp-000397-Ko
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:49:08 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49840 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fDpJt-0003As-CG
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:49:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42042 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fDpJp-00038l-GG
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:49:05 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fDpJt-0003AX-7I
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:49:09 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Wed,  2 May 2018 18:47:36 +0800
-Message-Id: <20180502104740.12123-21-peterx@redhat.com>
+Date: Wed,  2 May 2018 18:47:37 +0800
+Message-Id: <20180502104740.12123-22-peterx@redhat.com>
 In-Reply-To: <20180502104740.12123-1-peterx@redhat.com>
 References: <20180502104740.12123-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 20/24] qmp/migration: new command
- migrate-recover
+Subject: [Qemu-devel] [PATCH v8 21/24] hmp/migration: add migrate_recover
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,108 +27,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-The first allow-oob=true command.  It's used on destination side when
-the postcopy migration is paused and ready for a recovery.  After
-execution, a new migration channel will be established for postcopy to
-continue.
+Sister command to migrate-recover in QMP.
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- qapi/migration.json   | 20 ++++++++++++++++++++
- migration/migration.h |  1 +
- migration/migration.c | 24 ++++++++++++++++++++++++
- migration/savevm.c    |  3 +++
- 4 files changed, 48 insertions(+)
+ hmp.h           |  1 +
+ hmp.c           | 10 ++++++++++
+ hmp-commands.hx | 13 +++++++++++++
+ 3 files changed, 24 insertions(+)
 
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 25a6776af6..a1c2c238ab 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -1191,3 +1191,23 @@
- # Since: 2.9
- ##
- { 'command': 'xen-colo-do-checkpoint' }
-+
-+##
-+# @migrate-recover:
-+#
-+# Provide a recovery migration stream URI.
-+#
-+# @uri: the URI to be used for the recovery of migration stream.
-+#
-+# Returns: nothing.
-+#
-+# Example:
-+#
-+# -> { "execute": "migrate-recover",
-+#      "arguments": { "uri": "tcp:192.168.1.200:12345" } }
-+# <- { "return": {} }
-+#
-+# Since: 2.12
-+##
-+{ 'command': 'migrate-recover', 'data': { 'uri': 'str' },
-+  'allow-oob': true }
-diff --git a/migration/migration.h b/migration/migration.h
-index 2f0dc34ae9..012bcd352b 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -77,6 +77,7 @@ struct MigrationIncomingState {
-     struct PostcopyBlocktimeContext *blocktime_ctx;
- 
-     /* notify PAUSED postcopy incoming migrations to try to continue */
-+    bool postcopy_recover_triggered;
-     QemuSemaphore postcopy_pause_sem_dst;
-     QemuSemaphore postcopy_pause_sem_fault;
- };
-diff --git a/migration/migration.c b/migration/migration.c
-index c059579fee..03d1fc7bc3 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1470,6 +1470,30 @@ void qmp_migrate_incoming(const char *uri, Error **errp)
-     once = false;
+diff --git a/hmp.h b/hmp.h
+index 4e2ec375b0..b6b56c8161 100644
+--- a/hmp.h
++++ b/hmp.h
+@@ -68,6 +68,7 @@ void hmp_info_snapshots(Monitor *mon, const QDict *qdict);
+ void hmp_migrate_cancel(Monitor *mon, const QDict *qdict);
+ void hmp_migrate_continue(Monitor *mon, const QDict *qdict);
+ void hmp_migrate_incoming(Monitor *mon, const QDict *qdict);
++void hmp_migrate_recover(Monitor *mon, const QDict *qdict);
+ void hmp_migrate_set_downtime(Monitor *mon, const QDict *qdict);
+ void hmp_migrate_set_speed(Monitor *mon, const QDict *qdict);
+ void hmp_migrate_set_capability(Monitor *mon, const QDict *qdict);
+diff --git a/hmp.c b/hmp.c
+index 59d5341590..4ac2126969 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1517,6 +1517,16 @@ void hmp_migrate_incoming(Monitor *mon, const QDict *qdict)
+     hmp_handle_error(mon, &err);
  }
  
-+void qmp_migrate_recover(const char *uri, Error **errp)
++void hmp_migrate_recover(Monitor *mon, const QDict *qdict)
 +{
-+    MigrationIncomingState *mis = migration_incoming_get_current();
++    Error *err = NULL;
++    const char *uri = qdict_get_str(qdict, "uri");
 +
-+    if (mis->state != MIGRATION_STATUS_POSTCOPY_PAUSED) {
-+        error_setg(errp, "Migrate recover can only be run "
-+                   "when postcopy is paused.");
-+        return;
-+    }
++    qmp_migrate_recover(uri, &err);
 +
-+    if (atomic_cmpxchg(&mis->postcopy_recover_triggered,
-+                       false, true) == true) {
-+        error_setg(errp, "Migrate recovery is triggered already");
-+        return;
-+    }
-+
-+    /*
-+     * Note that this call will never start a real migration; it will
-+     * only re-setup the migration stream and poke existing migration
-+     * to continue using that newly established channel.
-+     */
-+    qemu_start_incoming_migration(uri, errp);
++    hmp_handle_error(mon, &err);
 +}
 +
- bool migration_is_blocked(Error **errp)
+ /* Kept for backwards compatibility */
+ void hmp_migrate_set_downtime(Monitor *mon, const QDict *qdict)
  {
-     if (qemu_savevm_state_blocked(errp)) {
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 8e7653badc..4251125831 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -2190,6 +2190,9 @@ static bool postcopy_pause_incoming(MigrationIncomingState *mis)
- {
-     trace_postcopy_pause_incoming();
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 078ded20cd..8facba7b4d 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -957,7 +957,20 @@ STEXI
+ @findex migrate_incoming
+ Continue an incoming migration using the @var{uri} (that has the same syntax
+ as the -incoming option).
++ETEXI
  
-+    /* Clear the triggered bit to allow one recovery */
-+    mis->postcopy_recover_triggered = false;
++    {
++        .name       = "migrate_recover",
++        .args_type  = "uri:s",
++        .params     = "uri",
++        .help       = "Continue a paused incoming postcopy migration",
++        .cmd        = hmp_migrate_recover,
++    },
 +
-     migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
-                       MIGRATION_STATUS_POSTCOPY_PAUSED);
++STEXI
++@item migrate_recover @var{uri}
++@findex migrate_recover
++Continue a paused incoming postcopy migration using the @var{uri}.
+ ETEXI
  
+     {
 -- 
 2.14.3
