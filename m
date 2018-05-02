@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1fDncM-0002JD-He
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:00:13 -0400
+	(envelope-from <bounces@canonical.com>) id 1fDndU-0002xj-CM
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:01:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1fDncL-00017h-8p
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:00:06 -0400
-Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:45236)
+	(envelope-from <bounces@canonical.com>) id 1fDndP-0001q3-HU
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:01:16 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59222)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1fDncH-00014s-6h
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:00:05 -0400
-Received: by mail-io0-x242.google.com with SMTP id c9-v6so10235024iob.12
-	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 02:00:01 -0700 (PDT)
-References: <20180502044557.21035-1-aik@ozlabs.ru>
-	<20180502063706.GD3517@umbus.fritz.box>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <43ff86df-7368-3857-1443-2cbde839039b@ozlabs.ru>
-Date: Wed, 2 May 2018 18:59:53 +1000
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fDndP-0001ph-As
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:01:11 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fDndN-0001Kj-TN
+	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 09:01:09 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id DD58D2E80C8
+	for <qemu-devel@nongnu.org>; Wed,  2 May 2018 09:01:09 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180502063706.GD3517@umbus.fritz.box>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH qemu] vfio/spapr: Allow backing bigger
- guest IOMMU pages with smaller physical pages
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 02 May 2018 08:49:08 -0000
+From: YVT <1768295@bugs.launchpad.net>
+Reply-To: Bug 1768295 <1768295@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152519164359.6413.12582240325876567028.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152525094872.22067.18194781953869212452.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1768295] Re: VLLDM/VLSTM trigger UsageFault in
+ the Secure Mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,181 +37,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 2/5/18 4:37 pm, David Gibson wrote:
-> On Wed, May 02, 2018 at 02:45:57PM +1000, Alexey Kardashevskiy wrote:
->> At the moment the PPC64/pseries guest only supports 4K/64K/16M IOMMU
->> pages and POWER8 CPU supports the exact same set of page size so
->> so far things worked fine.
->>
->> However POWER9 supports different set of sizes - 4K/64K/2M/1G and
->> the last two - 2M and 1G - are not even allowed in the paravirt interface
->> (RTAS DDW) so we always end up using 64K IOMMU pages, although we could
->> back guest's 16MB IOMMU pages with 2MB pages on the host.
->>
->> This stores the supported host IOMMU page sizes in VFIOContainer and uses
->> this later when creating a new DMA window.
->>
->> There should be no behavioral changes on platforms other than pseries.
->>
->> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> 
-> What will happen if you try to use this on an older kernel without
-> your mismatching pagesize changes?
+I attached a ZIP file containing a set of binary images that reproduces
+the problem.
 
-I tried 1GB huge pages and "-global spapr-pci-host-bridge.pgsz=0x1011000"
-or 0x41011000.
+Secure.elf and NonSecure.elf contain codes that run in the Secure/Non-
+Secure mode, respectively. They must be loaded simultaneously by using
+the generic loader:
 
-With or without this change and kernel change, the P9 host says:
+    $ qemu-system-arm -device loader,file=3DSecure.elf -kernel
+NonSecure.elf -machine mps2-an505 -nographic -s -cpu cortex-m33
 
-pci 0001:01     : [PE# fd] Disabling 64-bit DMA bypass
+The problematic instructions are located in 0x10000064
+<__gnu_cmse_nonsecure_call> of Secure.elf. The program runs successfully
+and outputs some message via UART0 if they are replaced with NOPs, as
+shown below:
 
-pci 0001:01     : [PE# fd] Removing DMA window #0
-
-pci 0001:01     : [PE# fd] Setting up window#0 0..3fffffff pg=1000
-
-pci 0001:01     : [PE# fd] Setting up window#1
-800000000000000..800001fffffffff pg=1000000
-pci 0001:01     : [PE# fd] Failed to configure TCE table, err -1
-
-pci 0001:01     : [PE# fd] Removing DMA window #1
+    $ qemu-system-arm -device loader,file=3DSecure-patched.elf -kernel NonS=
+ecure.elf -machine mps2-an505 -nographic -s -cpu cortex-m33
+    I'm running in the Non-Secure mode.
 
 
-Which is a failure from opal_pci_map_pe_dma_window().
+** Attachment added: "An505BasicApp.zip"
+   https://bugs.launchpad.net/qemu/+bug/1768295/+attachment/5131902/+files/=
+An505BasicApp.zip
 
-QEMU calls hw_error:
+-- =
 
-xhci_hcd 0000:00:00.0: xHCI Host Controller
-xhci_hcd 0000:00:00.0: new USB bus registered, assigned bus number 1
-xhci_hcd 0000:00:00.0: node is /pci@800000020000000/usb@0
-5700@1525248659.671888:spapr_iommu_ddw_query buid=0x800000020000000
-addr=0x0, 1 windows available, max window size=0x800000
-00, mask=0x7
-xhci_hcd 0000:00:00.0: ibm,query-pe-dma-windows(2026) 0 8000000 20000000
-returned 0
-5700@1525248659.672138:spapr_iommu_new_table liobn=0x80000001
-table=0x7fffb9080000 fd=26
-qemu-system-ppc64: Failed to create a window, ret = -1 (Operation not
-permitted)
-qemu: hardware error: vfio: DMA mapping failed, unable to continue
-CPU #0:
-NIP 000000000daf0010   LR 000000000000c11c CTR c00000000fe80000 XER
-0000000020040000 CPU#0
-MSR 0000000002001000 HID0 0000000000000000  HF 8000000000000000 iidx 3 didx 3
-TB 00000000 00000000 DECR 00000000
-GPR00 8000000002001031 c00000007e503230 c0000000013a1f00 000000000000f000
-GPR04 00000000014007d0 000000000daf0000 0000000002001000 8000000002001033
-GPR08 0000000000000000 8000000000002933 000000000000000c 000000000daf0000
-GPR12 0000000000008000 c00000000fe80000 c00000000000def8 0000000008000000
-GPR16 0000000000000000 0000000020000000 000000000000001f 0000000000000000
-GPR20 c00000007e034440 0000000000000018 c000000009164900 c00000007fffab78
-GPR24 c0000000012e6768 c000000001529394 0000000000000001 0000000000000005
-GPR28 0000000000002027 c0000000014007b0 c00000007e50351c 0000000000000004
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1768295
 
+Title:
+  VLLDM/VLSTM trigger UsageFault in the Secure Mode
 
+Status in QEMU:
+  New
 
+Bug description:
+  The VLLDM/VLSTM instructions trigger UsageFault when they are supposed
+  to behave as NOP.
 
-aaand I found a bug below...
+  Version: =
 
+  $ qemu-system-arm --version                                              =
+                                 QEMU emulator version 2.11.93
 
-> 
->> ---
->>  include/hw/vfio/vfio-common.h |  1 +
->>  hw/vfio/common.c              |  3 +++
->>  hw/vfio/spapr.c               | 15 ++++++++++++++-
->>  3 files changed, 18 insertions(+), 1 deletion(-)
->>
->> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
->> index d936014..dd8d0d3 100644
->> --- a/include/hw/vfio/vfio-common.h
->> +++ b/include/hw/vfio/vfio-common.h
->> @@ -83,6 +83,7 @@ typedef struct VFIOContainer {
->>      unsigned iommu_type;
->>      int error;
->>      bool initialized;
->> +    unsigned long pgsizes;
->>      /*
->>       * This assumes the host IOMMU can support only a single
->>       * contiguous IOVA window.  We may need to generalize that in
->> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
->> index 07ffa0b..15ddef2 100644
->> --- a/hw/vfio/common.c
->> +++ b/hw/vfio/common.c
->> @@ -1103,6 +1103,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
->>              info.iova_pgsizes = 4096;
->>          }
->>          vfio_host_win_add(container, 0, (hwaddr)-1, info.iova_pgsizes);
->> +        container->pgsizes = info.iova_pgsizes;
->>      } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_IOMMU) ||
->>                 ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_v2_IOMMU)) {
->>          struct vfio_iommu_spapr_tce_info info;
->> @@ -1167,6 +1168,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
->>          }
->>  
->>          if (v2) {
->> +            container->pgsizes = info.ddw.pgsizes;
->>              /*
->>               * There is a default window in just created container.
->>               * To make region_add/del simpler, we better remove this
->> @@ -1181,6 +1183,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
->>              }
->>          } else {
->>              /* The default table uses 4K pages */
->> +            container->pgsizes = 0x1000;
->>              vfio_host_win_add(container, info.dma32_window_start,
->>                                info.dma32_window_start +
->>                                info.dma32_window_size - 1,
->> diff --git a/hw/vfio/spapr.c b/hw/vfio/spapr.c
->> index 259397c..9637ed5 100644
->> --- a/hw/vfio/spapr.c
->> +++ b/hw/vfio/spapr.c
->> @@ -144,11 +144,24 @@ int vfio_spapr_create_window(VFIOContainer *container,
->>  {
->>      int ret;
->>      IOMMUMemoryRegion *iommu_mr = IOMMU_MEMORY_REGION(section->mr);
->> -    unsigned pagesize = memory_region_iommu_get_min_page_size(iommu_mr);
->> +    uint64_t pagesize = memory_region_iommu_get_min_page_size(iommu_mr);
->>      unsigned entries, pages;
->>      struct vfio_iommu_spapr_tce_create create = { .argsz = sizeof(create) };
->>  
->>      /*
->> +     * The host might not support the guest supported IOMMU page size,
->> +     * so we will use smaller physical IOMMU pages to back them.
->> +     */
->> +    pagesize = 1ULL << ctz64(container->pgsizes & (pagesize | (pagesize - 1)));
+  VLLDM and VLSTM are instructions newly added to ARMv8-M Mainline
+  Profile. Although they are FP instructions and the FP support of the M
+  profile is not implemented by QEMU, the Armv8-M Architecture Reference
+  Manual specifies that they should behave as NOP even in this case:
 
+  C2.4.268 VLLDM:
 
+  > If the Floating-point Extension is not implemented, this instruction
+  is available in Secure state, but behaves as a NOP.
 
-... and here is a bug - must be:
+  C2.4.269 VLSTM:
 
-pagesize = 1ULL << (63 - clz64(container->pgsizes &
-                               (pagesize | (pagesize - 1))));
+  > If the Floating-point Extension is not implemented, this instruction
+  is available in Secure state, but behaves as a NOP.
 
+  VLLDM and VLSTM are generated automatically by the compiler to save
+  and restore the floating point registers (in a lazy manner) during a
+  Non-Secure function call. An example is shown below:
 
-With the original version, it picked 4K page size, created a huge window
-with 4K pages but KVM VFIO device did not attach to LIOBN because of page
-size mismatch (guest sees 16M, vfio sees 4K) so actual TCE table remained
-empty and EEH happened (and recovered later after killing QEMU).
+  10000064 <__gnu_cmse_nonsecure_call>:
+  10000064:       e92d 4fe0       stmdb   sp!, {r5, r6, r7, r8, r9, sl, fp,=
+ lr}
+  10000068:       4627            mov     r7, r4
+  1000006a:       46a0            mov     r8, r4
+  1000006c:       46a1            mov     r9, r4
+  1000006e:       46a2            mov     sl, r4
+  10000070:       46a3            mov     fp, r4
+  10000072:       46a4            mov     ip, r4
+  10000074:       b0a2            sub     sp, #136        ; 0x88
+  10000076:       ec2d 0a00       vlstm   sp
+  1000007a:       f384 8800       msr     CPSR_f, r4
+  1000007e:       4625            mov     r5, r4
+  10000080:       4626            mov     r6, r4
+  10000082:       47a4            blxns   r4
+  10000084:       ec3d 0a00       vlldm   sp
+  10000088:       b022            add     sp, #136        ; 0x88
+  1000008a:       e8bd 8fe0       ldmia.w sp!, {r5, r6, r7, r8, r9, sl, fp,=
+ pc}
 
-
-
-
->> +    if (!pagesize) {
->> +        error_report("Host doesn't support page size 0x%"PRIx64
->> +                     ", the supported mask is 0x%lx",
->> +                     memory_region_iommu_get_min_page_size(iommu_mr),
->> +                     container->pgsizes);
->> +        return -EINVAL;
->> +    }
->> +
->> +    /*
->>       * FIXME: For VFIO iommu types which have KVM acceleration to
->>       * avoid bouncing all map/unmaps through qemu this way, this
->>       * would be the right place to wire that up (tell the KVM
-> 
-
-
--- 
-Alexey
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1768295/+subscriptions
