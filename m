@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38379)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fDlOh-000395-7G
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 02:37:52 -0400
+	(envelope-from <peterx@redhat.com>) id 1fDloT-0007Pn-8I
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 03:04:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fDlOd-000767-GJ
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 02:37:51 -0400
-Date: Wed, 2 May 2018 16:37:06 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180502063706.GD3517@umbus.fritz.box>
-References: <20180502044557.21035-1-aik@ozlabs.ru>
+	(envelope-from <peterx@redhat.com>) id 1fDloN-0001Ch-C8
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 03:04:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34586 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fDloN-0001By-25
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 03:04:23 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CF793406C773
+	for <qemu-devel@nongnu.org>; Wed,  2 May 2018 07:04:11 +0000 (UTC)
+Date: Wed, 2 May 2018 15:04:02 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180502070402.GC32728@xz-mi>
+References: <20180418090239.13090-1-peterx@redhat.com>
+	<20180418090239.13090-3-peterx@redhat.com>
+	<20180430101050.GD4002@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="C+ts3FVlLX8+P6JN"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180502044557.21035-1-aik@ozlabs.ru>
-Subject: Re: [Qemu-devel] [PATCH qemu] vfio/spapr: Allow backing bigger
- guest IOMMU pages with smaller physical pages
+In-Reply-To: <20180430101050.GD4002@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] monitor: take mon_lock where proper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,145 +34,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
+On Mon, Apr 30, 2018 at 11:10:50AM +0100, Stefan Hajnoczi wrote:
+> On Wed, Apr 18, 2018 at 05:02:38PM +0800, Peter Xu wrote:
+> > diff --git a/monitor.c b/monitor.c
+> > index c93aa4e22b..f4951cafbc 100644
+> > --- a/monitor.c
+> > +++ b/monitor.c
+> > @@ -306,16 +306,20 @@ void monitor_read_command(Monitor *mon, int show_prompt)
+> >      if (!mon->rs)
+> >          return;
+> >  
+> > +    qemu_mutex_lock(&mon->mon_lock);
+> >      readline_start(mon->rs, "(qemu) ", 0, monitor_command_cb, NULL);
+> >      if (show_prompt)
+> >          readline_show_prompt(mon->rs);
+> > +    qemu_mutex_unlock(&mon->mon_lock);
+> >  }
+> >  
+> >  int monitor_read_password(Monitor *mon, ReadLineFunc *readline_func,
+> >                            void *opaque)
+> >  {
+> >      if (mon->rs) {
+> > +        qemu_mutex_lock(&mon->mon_lock);
+> >          readline_start(mon->rs, "Password: ", 1, readline_func, opaque);
+> > +        qemu_mutex_unlock(&mon->mon_lock);
+> >          /* prompt is printed on return from the command handler */
+> >          return 0;
+> >      } else {
+> 
+> I'm not sure why the lock is being used around readline_start() and
+> readline_show_prompt().  There are other readline_*() callers who do not
+> take the lock, which is suspicious.
+> 
+> Can you explain the purpose of this?
+> 
+> > @@ -1308,8 +1312,7 @@ void qmp_qmp_capabilities(bool has_enable, QMPCapabilityList *enable,
+> >      cur_mon->qmp.commands = &qmp_commands;
+> >  }
+> >  
+> > -/* set the current CPU defined by the user */
+> > -int monitor_set_cpu(int cpu_index)
+> > +static int monitor_set_cpu_locked(Monitor *mon, int cpu_index)
+> 
+> This function requires the BQL since qemu_get_cpu() accesses the cpus
+> list without acquiring qemu_cpu_list_lock.
+> 
+> Two options:
+> 1. Document that monitor_set_cpu() must be called with the BQL held.
+> 2. Audit qemu_cpu_list_lock to check that it meets the out-of-band
+>    monitor code requirements, document that qemu_cpu_list_lock code must
+>    follow out-of-band monitor code requirements, and then take the lock.
+> 
+> #1 is more practical since we will probably never need to call
+> monitor_set_cpu() from out-of-band monitor code.  Anyway, in that case
+> mon_lock is not needed unless there is a mon field that needs to be
+> protected.
 
---C+ts3FVlLX8+P6JN
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+You are right.
 
-On Wed, May 02, 2018 at 02:45:57PM +1000, Alexey Kardashevskiy wrote:
-> At the moment the PPC64/pseries guest only supports 4K/64K/16M IOMMU
-> pages and POWER8 CPU supports the exact same set of page size so
-> so far things worked fine.
->=20
-> However POWER9 supports different set of sizes - 4K/64K/2M/1G and
-> the last two - 2M and 1G - are not even allowed in the paravirt interface
-> (RTAS DDW) so we always end up using 64K IOMMU pages, although we could
-> back guest's 16MB IOMMU pages with 2MB pages on the host.
->=20
-> This stores the supported host IOMMU page sizes in VFIOContainer and uses
-> this later when creating a new DMA window.
->=20
-> There should be no behavioral changes on platforms other than pseries.
->=20
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+After a second thought I think readline is not needed to be protected.
+IMHO it's only used in parsing phase, so actually we don't have
+multi-threading issue with that (parsing is either happening in main
+thread only, or monitor iothread only).
 
-What will happen if you try to use this on an older kernel without
-your mismatching pagesize changes?
+So I'll drop all the readline_* protections, and add a comment for
+monitor_set_cpu() on BQL.
 
-> ---
->  include/hw/vfio/vfio-common.h |  1 +
->  hw/vfio/common.c              |  3 +++
->  hw/vfio/spapr.c               | 15 ++++++++++++++-
->  3 files changed, 18 insertions(+), 1 deletion(-)
->=20
-> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> index d936014..dd8d0d3 100644
-> --- a/include/hw/vfio/vfio-common.h
-> +++ b/include/hw/vfio/vfio-common.h
-> @@ -83,6 +83,7 @@ typedef struct VFIOContainer {
->      unsigned iommu_type;
->      int error;
->      bool initialized;
-> +    unsigned long pgsizes;
->      /*
->       * This assumes the host IOMMU can support only a single
->       * contiguous IOVA window.  We may need to generalize that in
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index 07ffa0b..15ddef2 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -1103,6 +1103,7 @@ static int vfio_connect_container(VFIOGroup *group,=
- AddressSpace *as,
->              info.iova_pgsizes =3D 4096;
->          }
->          vfio_host_win_add(container, 0, (hwaddr)-1, info.iova_pgsizes);
-> +        container->pgsizes =3D info.iova_pgsizes;
->      } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_IOMMU) ||
->                 ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_v2_IOMMU))=
- {
->          struct vfio_iommu_spapr_tce_info info;
-> @@ -1167,6 +1168,7 @@ static int vfio_connect_container(VFIOGroup *group,=
- AddressSpace *as,
->          }
-> =20
->          if (v2) {
-> +            container->pgsizes =3D info.ddw.pgsizes;
->              /*
->               * There is a default window in just created container.
->               * To make region_add/del simpler, we better remove this
-> @@ -1181,6 +1183,7 @@ static int vfio_connect_container(VFIOGroup *group,=
- AddressSpace *as,
->              }
->          } else {
->              /* The default table uses 4K pages */
-> +            container->pgsizes =3D 0x1000;
->              vfio_host_win_add(container, info.dma32_window_start,
->                                info.dma32_window_start +
->                                info.dma32_window_size - 1,
-> diff --git a/hw/vfio/spapr.c b/hw/vfio/spapr.c
-> index 259397c..9637ed5 100644
-> --- a/hw/vfio/spapr.c
-> +++ b/hw/vfio/spapr.c
-> @@ -144,11 +144,24 @@ int vfio_spapr_create_window(VFIOContainer *contain=
-er,
->  {
->      int ret;
->      IOMMUMemoryRegion *iommu_mr =3D IOMMU_MEMORY_REGION(section->mr);
-> -    unsigned pagesize =3D memory_region_iommu_get_min_page_size(iommu_mr=
-);
-> +    uint64_t pagesize =3D memory_region_iommu_get_min_page_size(iommu_mr=
-);
->      unsigned entries, pages;
->      struct vfio_iommu_spapr_tce_create create =3D { .argsz =3D sizeof(cr=
-eate) };
-> =20
->      /*
-> +     * The host might not support the guest supported IOMMU page size,
-> +     * so we will use smaller physical IOMMU pages to back them.
-> +     */
-> +    pagesize =3D 1ULL << ctz64(container->pgsizes & (pagesize | (pagesiz=
-e - 1)));
-> +    if (!pagesize) {
-> +        error_report("Host doesn't support page size 0x%"PRIx64
-> +                     ", the supported mask is 0x%lx",
-> +                     memory_region_iommu_get_min_page_size(iommu_mr),
-> +                     container->pgsizes);
-> +        return -EINVAL;
-> +    }
-> +
-> +    /*
->       * FIXME: For VFIO iommu types which have KVM acceleration to
->       * avoid bouncing all map/unmaps through qemu this way, this
->       * would be the right place to wire that up (tell the KVM
+> 
+> >  {
+> >      CPUState *cpu;
+> >  
+> > @@ -1317,15 +1320,28 @@ int monitor_set_cpu(int cpu_index)
+> >      if (cpu == NULL) {
+> >          return -1;
+> >      }
+> > -    g_free(cur_mon->mon_cpu_path);
+> > -    cur_mon->mon_cpu_path = object_get_canonical_path(OBJECT(cpu));
+> > +    g_free(mon->mon_cpu_path);
+> > +    mon->mon_cpu_path = object_get_canonical_path(OBJECT(cpu));
+> >      return 0;
+> >  }
+> >  
+> > +/* set the current CPU defined by the user */
+> > +int monitor_set_cpu(int cpu_index)
+> > +{
+> > +    int ret;
+> > +
+> > +    qemu_mutex_lock(&cur_mon->mon_lock);
+> > +    ret = monitor_set_cpu_locked(cur_mon, cpu_index);
+> > +    qemu_mutex_unlock(&cur_mon->mon_lock);
+> > +
+> > +    return ret;
+> > +}
+> > +
+> >  static CPUState *mon_get_cpu_sync(bool synchronize)
+> >  {
+> 
+> This function calls monitor_set_cpu() so it must be called from the BQL.
+> The locking changes are probably not needed.  This function just needs
+> to be documented as BQL-only.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Yes.  Will do.
 
---C+ts3FVlLX8+P6JN
-Content-Type: application/pgp-signature; name="signature.asc"
+> 
+> > @@ -2239,6 +2258,7 @@ int monitor_get_fd(Monitor *mon, const char *fdname, Error **errp)
+> >  {
+> >      mon_fd_t *monfd;
+> >  
+> > +    qemu_mutex_lock(&mon->mon_lock);
+> >      QLIST_FOREACH(monfd, &mon->fds, next) {
+> >          int fd;
+> >  
+> > @@ -2252,9 +2272,10 @@ int monitor_get_fd(Monitor *mon, const char *fdname, Error **errp)
+> >          QLIST_REMOVE(monfd, next);
+> >          g_free(monfd->name);
+> >          g_free(monfd);
+> > -
+> > +        qemu_mutex_unlock(&mon->mon_lock);
+> >          return fd;
+> >      }
+> > +    qemu_mutex_unlock(&mon->mon_lock);
+> 
+> What about all the other mon->fds users?  They need to lock too,
+> otherwise we will QLIST_REMOVE() an fd while they are accessing the
+> list!
 
------BEGIN PGP SIGNATURE-----
+Indeed!  I think I'll drop most of this patch, only add protection for
+mon->fds, and add those comments that you suggested.  They make sense
+to me.  Thanks,
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrpXI0ACgkQbDjKyiDZ
-s5J9shAAidqMm7mOzprfffNesgSQOMV+l8wKvxaolKtDQMWJkaUIthD1zqNl+LBl
-uArXJbN5C4USKw5qFNaoPSOrYJEx/X9/bgg1w6IPg4qlY0RjZtai45ow2V9JdCCk
-QGAQfirKSgLp3oT/Gn2Nvbf97dFf40jzuxPTd9UgmxMdCP48xO8vSX4OQb9ScrGz
-61ZxnEnLaHnX+Y3ZI5fvzZvDRZkBJj7t/NcFMyiibgLRTHnlOX0JuWZ+zkOXqyyc
-Z+VPFdoWNYc1XUWAEkYy0KTggZsTJScZyn7ZL6GuA0G97Z+/wo1XniIoMt7S+kEc
-vX107QSSz2XB1WeVLA7QvZarephKKlyoR49hABpTtQIV8P3jPd6Ry0hs1MgFNyKa
-i6ofFLV2XkJoIYOcmcAOmwePUfxw6witlqIVKdT7XBqQoXMVJ4abfLU4PMDNWkFH
-gqhnHSLvytHf3LYsxEie0GhvrQe6pLLuRLmTSlJwnUCpp6wwS4ApT3mQosSHDMnn
-BmGGkfp3EEtR0Qo9vBHC3cPwsAaTgmtp09ibMJo7xydDi2wCddIgodfXvQT82iKx
-pRKL2w4BcjA9uOL+Y6wTxmvNLBSrItFcwKj1nVqQWSa2GAWOG77Dg/SlHrAeVj22
-7KxG/kfRNJpM2ThqU5SQs8phTTPwPHBIKBd2PZPaWwdtgPm7FEc=
-=vv/u
------END PGP SIGNATURE-----
-
---C+ts3FVlLX8+P6JN--
+-- 
+Peter Xu
