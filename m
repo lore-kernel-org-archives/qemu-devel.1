@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1fDo2b-0004lx-10
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:27:14 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1fDo8j-00074n-NW
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:33:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1fDo2X-0007GX-SF
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:27:12 -0400
-Received: from mail.uni-paderborn.de ([131.234.142.9]:59488)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
-	id 1fDo2X-0007Et-DY
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:27:09 -0400
-References: <20180501142222.19154-1-kbastian@mail.uni-paderborn.de>
-	<20180501142222.19154-3-kbastian@mail.uni-paderborn.de>
-	<04b2ae36-e7ec-3b78-5443-09fe25d2ebb3@amsat.org>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <d620b0e6-36d4-722d-d049-46957f02c797@mail.uni-paderborn.de>
-Date: Wed, 2 May 2018 11:26:55 +0200
+	(envelope-from <aik@ozlabs.ru>) id 1fDo8g-0001gH-JE
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:33:33 -0400
+Received: from mail-io0-x233.google.com ([2607:f8b0:4001:c06::233]:43220)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1fDo8g-0001fy-8z
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:33:30 -0400
+Received: by mail-io0-x233.google.com with SMTP id t23-v6so16678675ioc.10
+	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 02:33:30 -0700 (PDT)
+References: <87o9inxkd1.fsf@dusky.pond.sub.org>
+	<20180430065235.577-1-aik@ozlabs.ru>
+	<c23d1ec1-51d7-d967-28a2-0df0f59e7480@redhat.com>
+	<d15dfc3e-b33b-f0a9-971a-0f40bbffcdf4@ozlabs.ru>
+	<87muxi8t2b.fsf@dusky.pond.sub.org>
+	<6c49e4ab-bb40-cf20-629a-2fc5c19d8585@redhat.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <6a553611-7bbb-98dd-6dfb-0ef6f53e4dec@ozlabs.ru>
+Date: Wed, 2 May 2018 19:33:21 +1000
 MIME-Version: 1.0
-In-Reply-To: <04b2ae36-e7ec-3b78-5443-09fe25d2ebb3@amsat.org>
+In-Reply-To: <6c49e4ab-bb40-cf20-629a-2fc5c19d8585@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH 02/12] tests/tcg/tricore: Add build
- infrastructure
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu] qom: Document
+ qom/device-list-properties implementation specific
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,83 +35,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, David Brenken <david.brenken@efs-auto.de>, Florian Artmeier <florian.artmeier@efs-auto.de>, Georg Hofstetter <georg.hofstetter@efs-auto.de>
+To: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Hi Phil,
-
-On 05/02/2018 02:41 AM, Philippe Mathieu-Daudé wrote:
-> Hi Bastian,
-> 
-> On 05/01/2018 11:22 AM, Bastian Koppelmann wrote:
->> this includes the Makefile and linker script to build all the tests.
+On 2/5/18 7:11 pm, Paolo Bonzini wrote:
+> On 02/05/2018 08:34, Markus Armbruster wrote:
+>> Alexey Kardashevskiy <aik@ozlabs.ru> writes:
 >>
->> Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
->> ---
->>  tests/tcg/tricore/Makefile | 30 +++++++++++++++++++++++
->>  tests/tcg/tricore/link.ld  | 60 ++++++++++++++++++++++++++++++++++++++++++++++
->>  2 files changed, 90 insertions(+)
->>  create mode 100644 tests/tcg/tricore/Makefile
->>  create mode 100644 tests/tcg/tricore/link.ld
+>>> On 30/4/18 7:39 pm, Paolo Bonzini wrote:
+>>>> On 30/04/2018 08:52, Alexey Kardashevskiy wrote:
+>>>>> diff --git a/qapi/misc.json b/qapi/misc.json
+>>>>> index 5636f4a..399ec74 100644
+>>>>> --- a/qapi/misc.json
+>>>>> +++ b/qapi/misc.json
+>>>>> @@ -1491,6 +1491,10 @@
+>>>>>  #
+>>>>>  # List properties associated with a device.
+>>>>>  #
+>>>>> +# Note: the handler creates a device object, enumerates properties and destroys
+>>>>> +# the object so it only lists properties defined in DeviceClass::props or
+>>>>> +# created by DeviceClass::init()/TypeInfo::instance_init().
+>>>>> +#
+>>>>>  # @typename: the type name of a device
+>>>>>  #
+>>>>>  # Returns: a list of ObjectPropertyInfo describing a devices properties
+>>>>> @@ -1506,6 +1510,11 @@
+>>>>>  #
+>>>>>  # List properties associated with a QOM object.
+>>>>>  #
+>>>>> +# Note: the handler creates an object, enumerates properties and destroys
+>>>>> +# the object so it only lists properties created in TypeInfo::instance_init().
+>>>>> +# Since the instance_init() callback of the device object adds
+>>>>> +# DeviceClass::props as object properties, they will be listed as well.
+>>>>> +#
+>>>>
+>>>> This says what it does, but not why it is a problem.  Can you explain
+>>>> that to me as well?
+>>>
+>>> It probably is not unless someone adds properties in realize() callback,
 >>
->> diff --git a/tests/tcg/tricore/Makefile b/tests/tcg/tricore/Makefile
->> new file mode 100644
->> index 0000000000..8c168d1062
->> --- /dev/null
->> +++ b/tests/tcg/tricore/Makefile
->> @@ -0,0 +1,30 @@
->> +AS := tricore-as
->> +LD := tricore-ld
->> +HOST_CC = gcc
->> +
->> +LDFLAGS = -Tlink.ld
->> +ASFLAGS =
->> +
->> +SIM = ../../../tricore-softmmu/qemu-system-tricore
->> +SIMFLAGS = -M tricore_testboard -nographic -kernel
+>> Now work that into the doc comment, please :)
 > 
-> I applied this on upstream QEMU (26bd8d98c4b32).
+> Are there any examples?  If not, that belongs in a comment in the code
+
+
+There are roughly 400 of realize(), this is will take a bit of time :)
+imho what it does belongs to .json, why it does exactly that belongs to the
+git commit log. I'll walk through the realize() hook though, educate
+myself, at least :)
+
+
+> rather than the QAPI doc comment.  If yes, then the doc comment should
+> include one.
 > 
-> I suppose you are doing in-tree build, since this doesn't work with> out-of-tree builds (see the $SIM relative path).
-
-Ooops, this is mostly copied from tests/tcg/xtensa :)
-
+> Paolo
 > 
-> I then get:
-> 
-> tricore-softmmu/qemu-system-tricore -M tricore_testboard -nographic
-> -kests/tcg/tricore/test_muls.tst -d in_asm
-> QEMU 2.12.50 monitor - type 'help' for more information
-> (qemu) QEMU 2.12.50 monitor - type 'help' for more information
-> (qemu) IN:
-> 0x80000000:  qemu-system-tricore: function cpu_get_phys_page_attrs_debug
-> not implemented, aborting
 
-This is odd. I'll try to reproduce it.
 
-[...]
-> http://lists.nongnu.org/archive/html/qemu-devel/2018-05/msg00151.html
-> (which you can build with 'make docker-image-debian-tricore-cross', I
-> didn't try to merge your series over Alex's tcg-testing one)
-
-Thanks for creating this docker image, you helped me a great deal :)
-
-[...]
->> +
->> +all: build
->> +
->> +%.pS: %.S
->> +	$(HOST_CC) -E -o $@ $<
->> +
->> +%.o: %.pS
->> +	$(AS) $(ASFLAGS) -o $@ $<
->> +
->> +%.tst: %.o link.ld
->> +	$(LD) $(LDFLAGS) $< -o $@
-> 
-> Those rules did not work for me:
-
-I assume make uses the built-in rules. Can you try $ make --no-builtin-rules?
-
-Cheers,
-Bastian
+-- 
+Alexey
