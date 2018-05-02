@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fE02i-0000kf-G7
+	(envelope-from <richard.henderson@linaro.org>) id 1fE02m-0000op-4C
 	for qemu-devel@nongnu.org; Wed, 02 May 2018 18:16:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fE02g-0007w5-FB
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 18:16:08 -0400
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:34998)
+	(envelope-from <richard.henderson@linaro.org>) id 1fE02k-00080e-MG
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 18:16:12 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:42516)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fE02g-0007ve-A5
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 18:16:06 -0400
-Received: by mail-pg0-x244.google.com with SMTP id j11-v6so11635426pgf.2
-	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 15:16:06 -0700 (PDT)
+	id 1fE02k-0007zz-DV
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 18:16:10 -0400
+Received: by mail-pf0-x244.google.com with SMTP id p14so1579385pfh.9
+	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 15:16:10 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  2 May 2018 15:15:46 -0700
-Message-Id: <20180502221552.3873-9-richard.henderson@linaro.org>
+Date: Wed,  2 May 2018 15:15:49 -0700
+Message-Id: <20180502221552.3873-12-richard.henderson@linaro.org>
 In-Reply-To: <20180502221552.3873-1-richard.henderson@linaro.org>
 References: <20180502221552.3873-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 08/14] target/arm: Introduce and use
- read_fp_hreg
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 11/14] target/arm: Implement FCMP for fp16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,90 +30,215 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org, qemu-stable@nongnu.org
+Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-stable@nongnu.org
+
+From: Alex Bennée <alex.bennee@linaro.org>
+
+These where missed out from the rest of the half-precision work.
 
 Cc: qemu-stable@nongnu.org
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+[rth: Diagnose lack of FP16 before fp_access_check]
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-a64.c | 30 ++++++++++++++----------------
- 1 file changed, 14 insertions(+), 16 deletions(-)
+ target/arm/helper-a64.h    |  2 ++
+ target/arm/helper-a64.c    | 10 ++++++
+ target/arm/translate-a64.c | 88 +++++++++++++++++++++++++++++++++++++---------
+ 3 files changed, 83 insertions(+), 17 deletions(-)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index e19d97e8f1..8c63d5e743 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -614,6 +614,14 @@ static TCGv_i32 read_fp_sreg(DisasContext *s, int reg)
-     return v;
+diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
+index ef4ddfe9d8..5c0b9bd799 100644
+--- a/target/arm/helper-a64.h
++++ b/target/arm/helper-a64.h
+@@ -19,6 +19,8 @@
+ DEF_HELPER_FLAGS_2(udiv64, TCG_CALL_NO_RWG_SE, i64, i64, i64)
+ DEF_HELPER_FLAGS_2(sdiv64, TCG_CALL_NO_RWG_SE, s64, s64, s64)
+ DEF_HELPER_FLAGS_1(rbit64, TCG_CALL_NO_RWG_SE, i64, i64)
++DEF_HELPER_3(vfp_cmph_a64, i64, f16, f16, ptr)
++DEF_HELPER_3(vfp_cmpeh_a64, i64, f16, f16, ptr)
+ DEF_HELPER_3(vfp_cmps_a64, i64, f32, f32, ptr)
+ DEF_HELPER_3(vfp_cmpes_a64, i64, f32, f32, ptr)
+ DEF_HELPER_3(vfp_cmpd_a64, i64, f64, f64, ptr)
+diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+index afb25ad20c..35df07adb9 100644
+--- a/target/arm/helper-a64.c
++++ b/target/arm/helper-a64.c
+@@ -85,6 +85,16 @@ static inline uint32_t float_rel_to_flags(int res)
+     return flags;
  }
  
-+static TCGv_i32 read_fp_hreg(DisasContext *s, int reg)
++uint64_t HELPER(vfp_cmph_a64)(float16 x, float16 y, void *fp_status)
 +{
-+    TCGv_i32 v = tcg_temp_new_i32();
-+
-+    tcg_gen_ld16u_i32(v, cpu_env, fp_reg_offset(s, reg, MO_16));
-+    return v;
++    return float_rel_to_flags(float16_compare_quiet(x, y, fp_status));
 +}
 +
- /* Clear the bits above an N-bit vector, for N = (is_q ? 128 : 64).
-  * If SVE is not enabled, then there are only 128 bits in the vector.
-  */
-@@ -4644,11 +4652,9 @@ static void disas_fp_csel(DisasContext *s, uint32_t insn)
- static void handle_fp_1src_half(DisasContext *s, int opcode, int rd, int rn)
++uint64_t HELPER(vfp_cmpeh_a64)(float16 x, float16 y, void *fp_status)
++{
++    return float_rel_to_flags(float16_compare(x, y, fp_status));
++}
++
+ uint64_t HELPER(vfp_cmps_a64)(float32 x, float32 y, void *fp_status)
  {
-     TCGv_ptr fpst = NULL;
--    TCGv_i32 tcg_op = tcg_temp_new_i32();
-+    TCGv_i32 tcg_op = read_fp_hreg(s, rn);
-     TCGv_i32 tcg_res = tcg_temp_new_i32();
+     return float_rel_to_flags(float32_compare_quiet(x, y, fp_status));
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 9322b0d896..f0aca20771 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -4475,14 +4475,14 @@ static void disas_data_proc_reg(DisasContext *s, uint32_t insn)
+     }
+ }
  
--    read_vec_element_i32(s, tcg_op, rn, 0, MO_16);
--
-     switch (opcode) {
-     case 0x0: /* FMOV */
-         tcg_gen_mov_i32(tcg_res, tcg_op);
-@@ -7543,13 +7549,10 @@ static void disas_simd_scalar_three_reg_diff(DisasContext *s, uint32_t insn)
-         tcg_temp_free_i64(tcg_op2);
-         tcg_temp_free_i64(tcg_res);
+-static void handle_fp_compare(DisasContext *s, bool is_double,
++static void handle_fp_compare(DisasContext *s, int size,
+                               unsigned int rn, unsigned int rm,
+                               bool cmp_with_zero, bool signal_all_nans)
+ {
+     TCGv_i64 tcg_flags = tcg_temp_new_i64();
+-    TCGv_ptr fpst = get_fpstatus_ptr(false);
++    TCGv_ptr fpst = get_fpstatus_ptr(size == MO_16);
+ 
+-    if (is_double) {
++    if (size == MO_64) {
+         TCGv_i64 tcg_vn, tcg_vm;
+ 
+         tcg_vn = read_fp_dreg(s, rn);
+@@ -4499,19 +4499,35 @@ static void handle_fp_compare(DisasContext *s, bool is_double,
+         tcg_temp_free_i64(tcg_vn);
+         tcg_temp_free_i64(tcg_vm);
      } else {
--        TCGv_i32 tcg_op1 = tcg_temp_new_i32();
--        TCGv_i32 tcg_op2 = tcg_temp_new_i32();
-+        TCGv_i32 tcg_op1 = read_fp_hreg(s, rn);
-+        TCGv_i32 tcg_op2 = read_fp_hreg(s, rm);
-         TCGv_i64 tcg_res = tcg_temp_new_i64();
+-        TCGv_i32 tcg_vn, tcg_vm;
++        TCGv_i32 tcg_vn = tcg_temp_new_i32();
++        TCGv_i32 tcg_vm = tcg_temp_new_i32();
  
--        read_vec_element_i32(s, tcg_op1, rn, 0, MO_16);
--        read_vec_element_i32(s, tcg_op2, rm, 0, MO_16);
--
-         gen_helper_neon_mull_s16(tcg_res, tcg_op1, tcg_op2);
-         gen_helper_neon_addl_saturate_s32(tcg_res, cpu_env, tcg_res, tcg_res);
+-        tcg_vn = read_fp_sreg(s, rn);
++        read_vec_element_i32(s, tcg_vn, rn, 0, size);
+         if (cmp_with_zero) {
+-            tcg_vm = tcg_const_i32(0);
++            tcg_gen_movi_i32(tcg_vm, 0);
+         } else {
+-            tcg_vm = read_fp_sreg(s, rm);
++            read_vec_element_i32(s, tcg_vm, rm, 0, size);
+         }
+-        if (signal_all_nans) {
+-            gen_helper_vfp_cmpes_a64(tcg_flags, tcg_vn, tcg_vm, fpst);
+-        } else {
+-            gen_helper_vfp_cmps_a64(tcg_flags, tcg_vn, tcg_vm, fpst);
++
++        switch (size) {
++        case MO_32:
++            if (signal_all_nans) {
++                gen_helper_vfp_cmpes_a64(tcg_flags, tcg_vn, tcg_vm, fpst);
++            } else {
++                gen_helper_vfp_cmps_a64(tcg_flags, tcg_vn, tcg_vm, fpst);
++            }
++            break;
++        case MO_16:
++            if (signal_all_nans) {
++                gen_helper_vfp_cmpeh_a64(tcg_flags, tcg_vn, tcg_vm, fpst);
++            } else {
++                gen_helper_vfp_cmph_a64(tcg_flags, tcg_vn, tcg_vm, fpst);
++            }
++            break;
++        default:
++            g_assert_not_reached();
+         }
++
+         tcg_temp_free_i32(tcg_vn);
+         tcg_temp_free_i32(tcg_vm);
+     }
+@@ -4532,16 +4548,35 @@ static void handle_fp_compare(DisasContext *s, bool is_double,
+ static void disas_fp_compare(DisasContext *s, uint32_t insn)
+ {
+     unsigned int mos, type, rm, op, rn, opc, op2r;
++    int size;
  
-@@ -8090,13 +8093,10 @@ static void disas_simd_scalar_three_reg_same_fp16(DisasContext *s,
+     mos = extract32(insn, 29, 3);
+-    type = extract32(insn, 22, 2); /* 0 = single, 1 = double */
++    type = extract32(insn, 22, 2);
+     rm = extract32(insn, 16, 5);
+     op = extract32(insn, 14, 2);
+     rn = extract32(insn, 5, 5);
+     opc = extract32(insn, 3, 2);
+     op2r = extract32(insn, 0, 3);
  
-     fpst = get_fpstatus_ptr(true);
- 
--    tcg_op1 = tcg_temp_new_i32();
--    tcg_op2 = tcg_temp_new_i32();
-+    tcg_op1 = read_fp_hreg(s, rn);
-+    tcg_op2 = read_fp_hreg(s, rm);
-     tcg_res = tcg_temp_new_i32();
- 
--    read_vec_element_i32(s, tcg_op1, rn, 0, MO_16);
--    read_vec_element_i32(s, tcg_op2, rm, 0, MO_16);
--
-     switch (fpopcode) {
-     case 0x03: /* FMULX */
-         gen_helper_advsimd_mulxh(tcg_res, tcg_op1, tcg_op2, fpst);
-@@ -12015,11 +12015,9 @@ static void disas_simd_two_reg_misc_fp16(DisasContext *s, uint32_t insn)
+-    if (mos || op || op2r || type > 1) {
++    if (mos || op || op2r) {
++        unallocated_encoding(s);
++        return;
++    }
++
++    switch (type) {
++    case 0:
++        size = MO_32;
++        break;
++    case 1:
++        size = MO_64;
++        break;
++    case 3:
++        size = MO_16;
++        if (arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
++            break;
++        }
++        /* fallthru */
++    default:
+         unallocated_encoding(s);
+         return;
+     }
+@@ -4550,7 +4585,7 @@ static void disas_fp_compare(DisasContext *s, uint32_t insn)
+         return;
      }
  
-     if (is_scalar) {
--        TCGv_i32 tcg_op = tcg_temp_new_i32();
-+        TCGv_i32 tcg_op = read_fp_hreg(s, rn);
-         TCGv_i32 tcg_res = tcg_temp_new_i32();
+-    handle_fp_compare(s, type, rn, rm, opc & 1, opc & 2);
++    handle_fp_compare(s, size, rn, rm, opc & 1, opc & 2);
+ }
  
--        read_vec_element_i32(s, tcg_op, rn, 0, MO_16);
--
-         switch (fpop) {
-         case 0x1a: /* FCVTNS */
-         case 0x1b: /* FCVTMS */
+ /* Floating point conditional compare
+@@ -4564,16 +4599,35 @@ static void disas_fp_ccomp(DisasContext *s, uint32_t insn)
+     unsigned int mos, type, rm, cond, rn, op, nzcv;
+     TCGv_i64 tcg_flags;
+     TCGLabel *label_continue = NULL;
++    int size;
+ 
+     mos = extract32(insn, 29, 3);
+-    type = extract32(insn, 22, 2); /* 0 = single, 1 = double */
++    type = extract32(insn, 22, 2);
+     rm = extract32(insn, 16, 5);
+     cond = extract32(insn, 12, 4);
+     rn = extract32(insn, 5, 5);
+     op = extract32(insn, 4, 1);
+     nzcv = extract32(insn, 0, 4);
+ 
+-    if (mos || type > 1) {
++    if (mos) {
++        unallocated_encoding(s);
++        return;
++    }
++
++    switch (type) {
++    case 0:
++        size = MO_32;
++        break;
++    case 1:
++        size = MO_64;
++        break;
++    case 3:
++        size = MO_16;
++        if (arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
++            break;
++        }
++        /* fallthru */
++    default:
+         unallocated_encoding(s);
+         return;
+     }
+@@ -4594,7 +4648,7 @@ static void disas_fp_ccomp(DisasContext *s, uint32_t insn)
+         gen_set_label(label_match);
+     }
+ 
+-    handle_fp_compare(s, type, rn, rm, false, op);
++    handle_fp_compare(s, size, rn, rm, false, op);
+ 
+     if (cond < 0x0e) {
+         gen_set_label(label_continue);
 -- 
 2.14.3
