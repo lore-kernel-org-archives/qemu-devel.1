@@ -1,29 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fDn0V-0000JU-HV
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 04:21:00 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1fDn2C-00012I-ML
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 04:22:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fDn0R-0007o2-GP
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 04:20:59 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37144 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fDn0R-0007nc-BT
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 04:20:55 -0400
-References: <20180316062822.15425-1-famz@redhat.com>
-	<20180316062822.15425-2-famz@redhat.com>
-	<20180501204110.t2suo47pgiktopsa@var.youpi.perso.aquilenet.fr>
-	<20180502072859.GA15438@lemon.usersys.redhat.com>
-	<20180502074517.lcohz6sqgbspzp62@var.youpi.perso.aquilenet.fr>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <34dfc6e4-ecee-4713-c8a0-f4d6ec462d59@redhat.com>
-Date: Wed, 2 May 2018 10:20:37 +0200
+	(envelope-from <borntraeger@de.ibm.com>) id 1fDn29-00012D-IJ
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 04:22:44 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49678
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1fDn29-0000zP-BB
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 04:22:41 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w4284liU031536
+	for <qemu-devel@nongnu.org>; Wed, 2 May 2018 04:22:38 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2hq84cc23q-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 04:22:38 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Wed, 2 May 2018 09:22:36 +0100
+References: <1524734910-17970-1-git-send-email-thuth@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Wed, 2 May 2018 10:22:32 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180502074517.lcohz6sqgbspzp62@var.youpi.perso.aquilenet.fr>
+In-Reply-To: <1524734910-17970-1-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.13 v3 1/2] slirp: Add "query-usernet"
- QMP command
+Content-Transfer-Encoding: 7bit
+Message-Id: <15488134-b65b-a66f-d47f-e1675249b878@de.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 0/3] pc-bios/s390-ccw: Some
+ few network boot improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,42 +43,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@ens-lyon.org>, Fam Zheng <famz@redhat.com>
-Cc: Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Markus Armbruster <armbru@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Cc: Farhan Ali <alifm@linux.ibm.com>, Collin Walling <walling@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
 
-On 02.05.2018 09:45, Samuel Thibault wrote:
-> Fam Zheng, le mer. 02 mai 2018 15:29:36 +0800, a ecrit:
->> On Tue, 05/01 22:41, Samuel Thibault wrote:
->>> I'm sorry I didn't find the time to have a look at it before.
->>>
->>> In general it looks good, just a few things:
->>>
->>> Samuel
->>>
->>> Fam Zheng, le ven. 16 mars 2018 14:28:21 +0800, a ecrit:
->>>> +        if (!net_hub_id_for_client(&s->nc, &vlan)) {
->>>
->>> That makes me think that IIUC, we shouldn't call them vlan, as mentio=
-ned
->>> in the recent vlan->hub renaming patches.
->>>
->>>> +{ 'struct': 'UsernetInfo',
->>>> +  'data': {
->>>> +    'id':              'str',
->>>> +    'vlan':            'int',
->>>
->>> and here as well, I guess.
->>
->> OK, so rename this to hub? (I'm not familiar with the naming issue you=
- pointed
->> out).
->=20
-> I am not either :)
 
-The problem is that when people read the term "vlan", they think
-automatically of some kind of wrapped IP packets like in IEEE
-802.1Q. But that's not what QEMU is doing here, it rather simulates a
-virtual hub. So to avoid this confusion, we should use the term "hub" in
-QEMU instead.
 
- Thomas
+On 04/26/2018 11:28 AM, Thomas Huth wrote:
+> Note: I've decided to removed the pxelinux.cfg patches from this series
+> for now, since full pxelinux support requires to parse some additional
+> DHCP options (see https://tools.ietf.org/html/rfc5071), and for this, the
+> SLOF libnet code needs to be changed first. So I guess I first have to
+> implement pxelinux.cfg support for PPC, too, which will likely take a
+> little bit longer...
+> Thus to keep this series short and reviewable, and to avoid that the other
+> patches bit-rot on my hard disk, I've now only included the patches that
+> are not related to pxelinux.cfg.
+> 
+> The first patch is just a minor code refactoring which should not have
+> any visible impact, but makes the following patches easier.
+> 
+> The second patch makes sure that we leave the machine in a sane state
+> before jumping into the Linux kernel - i.e. the netboot firmware now
+> resets the machine with diag308, too, just like the main s390-ccw
+> is doing it already.
+> 
+> Patch 3 adds support for loading kernels via .INS configuration files.
+> You can find these .INS config files on ISO images, so with this patch,
+> it should be possible to boot if the TFTP server is configured to use
+> the contents of such an ISO image.
+> 
+> v4:
+>  - s/uninit/release/ in the title of the first patch
+>  - Set schid of the network device in 184
+>  - Jump to 0x10000 start address if S390EP magic is available
+> 
+> Thomas Huth (3):
+>   pc-bios/s390-ccw/net: Split up net_load() into init, load and release
+>     parts
+>   pc-bios/s390-ccw/net: Use diag308 to reset machine before jumping to
+>     the OS
+>   pc-bios/s390-ccw/net: Add support for .INS config files
+> 
+>  pc-bios/s390-ccw/Makefile    |   4 +-
+>  pc-bios/s390-ccw/bootmap.c   |  63 +---------------
+>  pc-bios/s390-ccw/bootmap.h   |   4 --
+>  pc-bios/s390-ccw/jump2ipl.c  |  91 +++++++++++++++++++++++
+>  pc-bios/s390-ccw/netboot.mak |   3 +-
+>  pc-bios/s390-ccw/netmain.c   | 168 +++++++++++++++++++++++++++++++++++--------
+>  pc-bios/s390-ccw/s390-ccw.h  |   4 ++
+>  7 files changed, 240 insertions(+), 97 deletions(-)
+>  create mode 100644 pc-bios/s390-ccw/jump2ipl.c
+> 
+
+
+Not looked into all details but the general idea and patches
+
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
