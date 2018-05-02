@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fEMKC-0005Vb-Jo
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 18:03:44 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fEMa0-0001wq-Kv
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 18:20:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fEMKB-0002Cs-DC
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 18:03:40 -0400
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:33900)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1fEMKB-0002B9-4t
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 18:03:39 -0400
-Received: by mail-lf0-x242.google.com with SMTP id h4-v6so28205255lfc.1
-	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 15:03:38 -0700 (PDT)
+	(envelope-from <no-reply@patchew.org>) id 1fEMZx-0006nF-FN
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 18:20:00 -0400
+Resent-Message-Id: <E1fEMZx-0006nF-FN@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21014)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fEMZx-0006kH-3q
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 18:19:57 -0400
+In-Reply-To: <20180502221552.3873-1-richard.henderson@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152530040552.2448.9571284396230949836@71c20359a636>
 MIME-Version: 1.0
-References: <20180503091922.28733-1-edgar.iglesias@gmail.com>
-	<20180503091922.28733-30-edgar.iglesias@gmail.com>
-In-Reply-To: <20180503091922.28733-30-edgar.iglesias@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 03 May 2018 22:03:12 +0000
-Message-ID: <CAKmqyKMHcDXfaJyipFMKYbN=rRM9S8dWY=KJ6b03v26N5vf8vA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 29/29] target-microblaze: Allow address
- sizes between 32 and 64 bits
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 2 May 2018 15:33:26 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 00/14] target/arm: Fixups for
+ ARM_FEATURE_V8_FP16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +29,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Edgar Iglesias <edgar.iglesias@gmail.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, Francisco Iglesias <frasse.iglesias@gmail.com>, Alistair Francis <alistair@alistair23.me>, Richard Henderson <richard.henderson@linaro.org>
+To: richard.henderson@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org
 
-On Thu, May 3, 2018 at 2:38 AM Edgar E. Iglesias <edgar.iglesias@gmail.com>
-wrote:
-
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-
-> Allow address sizes between 32 and 64 bits.
-
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-
-Alistair
-
-> ---
->   target/microblaze/cpu.c | 5 ++---
->   1 file changed, 2 insertions(+), 3 deletions(-)
-
-> diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
-> index d0649fdaaa..8c1f850ab1 100644
-> --- a/target/microblaze/cpu.c
-> +++ b/target/microblaze/cpu.c
-> @@ -155,9 +155,8 @@ static void mb_cpu_realizefn(DeviceState *dev, Error
-**errp)
->           return;
->       }
-
-> -    if (cpu->cfg.addr_size != 32) {
-> -        error_setg(errp, "addr-size %d is out of range. "
-> -                   "Only 32bit is supported.",
-> +    if (cpu->cfg.addr_size < 32 || cpu->cfg.addr_size > 64) {
-> +        error_setg(errp, "addr-size %d is out of range (32 - 64)",
->                      cpu->cfg.addr_size);
->           return;
->       }
-> --
-> 2.14.1
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNTAyMjIxNTUyLjM4NzMtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8u
+b3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMDAvMTRdIHRhcmdldC9hcm06IEZp
+eHVwcyBmb3IgQVJNX0ZFQVRVUkVfVjhfRlAxNgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
+IS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNF
+Li4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0
+IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2Nh
+bCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0l
+SCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hl
+Y2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4i
+CiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0
+Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAg
+ICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVO
+RCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQK
+RnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWdd
+ICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDUwMjIyMTU1Mi4zODczLTEtcmljaGFyZC5oZW5k
+ZXJzb25AbGluYXJvLm9yZyAtPiBwYXRjaGV3LzIwMTgwNTAyMjIxNTUyLjM4NzMtMS1yaWNoYXJk
+LmhlbmRlcnNvbkBsaW5hcm8ub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMGFm
+NjgzN2I0OCB0YXJnZXQvYXJtOiBGaXggc3FydF9mMTYgZXhjZXB0aW9uIHJhaXNpbmcKYzc0MGI1
+OTRlZiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgRk1PViAoaW1tZWRpYXRlKSBmb3IgZnAxNgo5ODY5
+OTQxYzU4IHRhcmdldC9hcm06IEltcGxlbWVudCBGQ1NFTCBmb3IgZnAxNgoyZjlhZjE0M2U1IHRh
+cmdldC9hcm06IEltcGxlbWVudCBGQ01QIGZvciBmcDE2CmQ3ZmQ4NzQ3NTcgdGFyZ2V0L2FybTog
+SW1wbGVtZW50IEZQIGRhdGEtcHJvY2Vzc2luZyAoMyBzb3VyY2UpIGZvciBmcDE2CmJkNjkzYjE5
+ZjQgdGFyZ2V0L2FybTogSW1wbGVtZW50IEZQIGRhdGEtcHJvY2Vzc2luZyAoMiBzb3VyY2UpIGZv
+ciBmcDE2CmE3YzFmZjdmMzEgdGFyZ2V0L2FybTogSW50cm9kdWNlIGFuZCB1c2UgcmVhZF9mcF9o
+cmVnCjVjMmRmY2UzYjMgdGFyZ2V0L2FybTogSW1wbGVtZW50IEZDVlQgKHNjYWxhciwgZml4ZWQt
+cG9pbnQpIGZvciBmcDE2CmVjZTUzM2ZhYWQgdGFyZ2V0L2FybTogSW1wbGVtZW50IEZDVlQgKHNj
+YWxhciwgaW50ZWdlcikgZm9yIGZwMTYKMWQ4MTUzMTU4MSB0YXJnZXQvYXJtOiBJbXBsZW1lbnQg
+Rk1PViAoZ2VuZXJhbCkgZm9yIGZwMTYKZDNlNDdmZDg2YiB0YXJnZXQvYXJtOiBDbGVhciBTVkUg
+aGlnaCBiaXRzIGZvciBGTU9WCmI4NTMwZDY2YjMgdGFyZ2V0L2FybTogRml4IGZsb2F0MTYgdG8v
+ZnJvbSBpbnQxNgo5NjQ1MWY4ZmVmIHRhcmdldC9hcm06IEltcGxlbWVudCB2ZWN0b3Igc2hpZnRl
+ZCBGQ1ZUIGZvciBmcDE2CmYzZDFiOGRiNWQgdGFyZ2V0L2FybTogSW1wbGVtZW50IHZlY3RvciBz
+aGlmdGVkIFNDVkYvVUNWRiBmb3IgZnAxNgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcg
+UEFUQ0ggMS8xNDogdGFyZ2V0L2FybTogSW1wbGVtZW50IHZlY3RvciBzaGlmdGVkIFNDVkYvVUNW
+RiBmb3IgZnAxNi4uLgpDaGVja2luZyBQQVRDSCAyLzE0OiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQg
+dmVjdG9yIHNoaWZ0ZWQgRkNWVCBmb3IgZnAxNi4uLgpDaGVja2luZyBQQVRDSCAzLzE0OiB0YXJn
+ZXQvYXJtOiBGaXggZmxvYXQxNiB0by9mcm9tIGludDE2Li4uCkVSUk9SOiBzcGFjZXMgcmVxdWly
+ZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojNDU6IEZJTEU6IHRhcmdldC9hcm0vaGVscGVy
+LmM6MTE0MzQ6CitzdGF0aWMgZmxvYXQxNiBkb19wb3N0c2NhbGVfZnAxNihmbG9hdDY0IGYsIGlu
+dCBzaGlmdCwgZmxvYXRfc3RhdHVzICpmcHN0KQogICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMSBlcnJv
+cnMsIDAgd2FybmluZ3MsIDgzIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHBy
+b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
+cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
+biBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDQvMTQ6IHRhcmdldC9hcm06IENsZWFyIFNW
+RSBoaWdoIGJpdHMgZm9yIEZNT1YuLi4KQ2hlY2tpbmcgUEFUQ0ggNS8xNDogdGFyZ2V0L2FybTog
+SW1wbGVtZW50IEZNT1YgKGdlbmVyYWwpIGZvciBmcDE2Li4uCkNoZWNraW5nIFBBVENIIDYvMTQ6
+IHRhcmdldC9hcm06IEltcGxlbWVudCBGQ1ZUIChzY2FsYXIsIGludGVnZXIpIGZvciBmcDE2Li4u
+CkNoZWNraW5nIFBBVENIIDcvMTQ6IHRhcmdldC9hcm06IEltcGxlbWVudCBGQ1ZUIChzY2FsYXIs
+IGZpeGVkLXBvaW50KSBmb3IgZnAxNi4uLgpDaGVja2luZyBQQVRDSCA4LzE0OiB0YXJnZXQvYXJt
+OiBJbnRyb2R1Y2UgYW5kIHVzZSByZWFkX2ZwX2hyZWcuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8xNDog
+dGFyZ2V0L2FybTogSW1wbGVtZW50IEZQIGRhdGEtcHJvY2Vzc2luZyAoMiBzb3VyY2UpIGZvciBm
+cDE2Li4uCkNoZWNraW5nIFBBVENIIDEwLzE0OiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgRlAgZGF0
+YS1wcm9jZXNzaW5nICgzIHNvdXJjZSkgZm9yIGZwMTYuLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMTQ6
+IHRhcmdldC9hcm06IEltcGxlbWVudCBGQ01QIGZvciBmcDE2Li4uCkNoZWNraW5nIFBBVENIIDEy
+LzE0OiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgRkNTRUwgZm9yIGZwMTYuLi4KRVJST1I6IHNwYWNl
+IHJlcXVpcmVkIGJlZm9yZSB0aGUgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzQxOiBGSUxFOiB0YXJn
+ZXQvYXJtL3RyYW5zbGF0ZS1hNjQuYzo0NjgzOgorICAgIHN3aXRjaCh0eXBlKSB7Cgp0b3RhbDog
+MSBlcnJvcnMsIDAgd2FybmluZ3MsIDU4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDEzLzE0OiB0YXJnZXQvYXJtOiBJ
+bXBsZW1lbnQgRk1PViAoaW1tZWRpYXRlKSBmb3IgZnAxNi4uLgpDaGVja2luZyBQQVRDSCAxNC8x
+NDogdGFyZ2V0L2FybTogRml4IHNxcnRfZjE2IGV4Y2VwdGlvbiByYWlzaW5nLi4uCj09PSBPVVRQ
+VVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwg
+Z2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10u
+ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
