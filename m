@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fDvs3-0005X3-0L
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 13:48:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1fDvvW-0000sQ-L4
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 13:52:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fDvs1-0004DB-Tk
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 13:48:51 -0400
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:42989)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fDvs1-0004Cg-O6
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 13:48:49 -0400
-Received: by mail-pf0-x242.google.com with SMTP id p14so1025530pfh.9
-	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 10:48:49 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  2 May 2018 10:48:42 -0700
-Message-Id: <20180502174842.16253-4-richard.henderson@linaro.org>
-In-Reply-To: <20180502174842.16253-1-richard.henderson@linaro.org>
-References: <20180502174842.16253-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 5/5] tcg: workaround branch instruction overflow
- in tcg_out_qemu_ld/st
+	(envelope-from <eblake@redhat.com>) id 1fDvvV-0005xu-Kg
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 13:52:26 -0400
+References: <20180421165423.30759-1-mreitz@redhat.com>
+	<20180421165423.30759-3-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c1b70360-a112-2d7c-33df-0ed5ec0ec3f9@redhat.com>
+Date: Wed, 2 May 2018 12:52:13 -0500
+MIME-Version: 1.0
+In-Reply-To: <20180421165423.30759-3-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/7] block: Add Error parameter to
+ bdrv_amend_options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,91 +25,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Laurent Vivier <lvivier@redhat.com>, qemu-stable@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-From: Laurent Vivier <lvivier@redhat.com>
+On 04/21/2018 11:54 AM, Max Reitz wrote:
+> Looking at the qcow2 code that is riddled with error_report() calls,
+> this is really how it should have been from the start.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
 
-ppc64 uses a BC instruction to call the tcg_out_qemu_ld/st
-slow path. BC instruction uses a relative address encoded
-on 14 bits.
+> +++ b/block/qcow2.c
+> @@ -4049,7 +4049,8 @@ static int qcow2_load_vmstate(BlockDriverState *bs, QEMUIOVector *qiov,
+>    * have to be removed.
+>    */
+>   static int qcow2_downgrade(BlockDriverState *bs, int target_version,
+> -                           BlockDriverAmendStatusCB *status_cb, void *cb_opaque)
+> +                           BlockDriverAmendStatusCB *status_cb, void *cb_opaque,
+> +                           Error **errp)
+>   {
+>       BDRVQcow2State *s = bs->opaque;
+>       int current_version = s->qcow_version;
+> @@ -4058,13 +4059,17 @@ static int qcow2_downgrade(BlockDriverState *bs, int target_version,
+>       if (target_version == current_version) {
+>           return 0;
+>       } else if (target_version > current_version) {
+> +        error_setg(errp, "Cannot downgrade an image from version %i to %i",
 
-The slow path functions are added at the end of the generated
-instructions buffer, in the reverse order of the callers.
-So more we have slow path functions more the distance between
-the caller (BC) and the function increases.
+%i is unusual compared to %d, but as they do the same, I won't make you 
+change it, if we keep it.  That said, this function is static; and the 
+lone caller qcow2_amend_options is already doing sanity checks, right? 
+(Yes - it does qemu_opt_get(opts, BLOCK_OPT_COMPAT_LEVEL), and then 
+validates that the user's information is in range, which already filters 
+out everything but v2 and v3; then _this_ function is called exactly for 
+3 downto 2).  So this should be an assert() instead of an error message.
 
-This patch changes the behavior to generate the functions in
-the same order of the callers.
 
-Cc: qemu-stable@nongnu.org
-Fixes: 15fa08f845 ("tcg: Dynamically allocate TCGOps")
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-Message-Id: <20180429235840.16659-1-lvivier@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- tcg/tcg.h          | 2 +-
- tcg/tcg-ldst.inc.c | 8 ++++----
- tcg/tcg.c          | 2 +-
- 3 files changed, 6 insertions(+), 6 deletions(-)
+> +                   current_version, target_version);
+>           return -EINVAL;
+>       } else if (target_version != 2) {
+> +        error_setg(errp, "Cannot downgrade an image to version %i (only "
+> +                   "target version 2 is supported)", target_version);
 
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index eb0d4f6ca7..75fbad128b 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -699,7 +699,7 @@ struct TCGContext {
- 
-     /* These structures are private to tcg-target.inc.c.  */
- #ifdef TCG_TARGET_NEED_LDST_LABELS
--    struct TCGLabelQemuLdst *ldst_labels;
-+    QSIMPLEQ_HEAD(ldst_labels, TCGLabelQemuLdst) ldst_labels;
- #endif
- #ifdef TCG_TARGET_NEED_POOL_LABELS
-     struct TCGLabelPoolData *pool_labels;
-diff --git a/tcg/tcg-ldst.inc.c b/tcg/tcg-ldst.inc.c
-index 0e14cf4357..47f41b921b 100644
---- a/tcg/tcg-ldst.inc.c
-+++ b/tcg/tcg-ldst.inc.c
-@@ -30,7 +30,7 @@ typedef struct TCGLabelQemuLdst {
-     TCGReg datahi_reg;      /* reg index for high word to be loaded or stored */
-     tcg_insn_unit *raddr;   /* gen code addr of the next IR of qemu_ld/st IR */
-     tcg_insn_unit *label_ptr[2]; /* label pointers to be updated */
--    struct TCGLabelQemuLdst *next;
-+    QSIMPLEQ_ENTRY(TCGLabelQemuLdst) next;
- } TCGLabelQemuLdst;
- 
- 
-@@ -46,7 +46,7 @@ static bool tcg_out_ldst_finalize(TCGContext *s)
-     TCGLabelQemuLdst *lb;
- 
-     /* qemu_ld/st slow paths */
--    for (lb = s->ldst_labels; lb != NULL; lb = lb->next) {
-+    QSIMPLEQ_FOREACH(lb, &s->ldst_labels, next) {
-         if (lb->is_ld) {
-             tcg_out_qemu_ld_slow_path(s, lb);
-         } else {
-@@ -72,7 +72,7 @@ static inline TCGLabelQemuLdst *new_ldst_label(TCGContext *s)
- {
-     TCGLabelQemuLdst *l = tcg_malloc(sizeof(*l));
- 
--    l->next = s->ldst_labels;
--    s->ldst_labels = l;
-+    QSIMPLEQ_INSERT_TAIL(&s->ldst_labels, l, next);
-+
-     return l;
- }
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index b5e706bc49..551caf1c53 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -3297,7 +3297,7 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
-     s->code_ptr = tb->tc.ptr;
- 
- #ifdef TCG_TARGET_NEED_LDST_LABELS
--    s->ldst_labels = NULL;
-+    QSIMPLEQ_INIT(&s->ldst_labels);
- #endif
- #ifdef TCG_TARGET_NEED_POOL_LABELS
-     s->pool_labels = NULL;
+And again.
+
+> @@ -4072,6 +4077,8 @@ static int qcow2_downgrade(BlockDriverState *bs, int target_version,
+>       if (s->incompatible_features & QCOW2_INCOMPAT_DIRTY) {
+>           ret = qcow2_mark_clean(bs);
+>           if (ret < 0) {
+> +            error_setg(errp, "Failed to make the image clean: %s",
+> +                       strerror(-ret));
+
+error_setg_errno(), please.
+
+
+> @@ -4094,6 +4103,8 @@ static int qcow2_downgrade(BlockDriverState *bs, int target_version,
+>   
+>       ret = qcow2_expand_zero_clusters(bs, status_cb, cb_opaque);
+>       if (ret < 0) {
+> +        error_setg(errp, "Failed to turn zero into data clusters: %s",
+> +                   strerror(-ret));
+
+and again
+
+>           return ret;
+>       }
+>   
+> @@ -4101,6 +4112,8 @@ static int qcow2_downgrade(BlockDriverState *bs, int target_version,
+>       ret = qcow2_update_header(bs);
+>       if (ret < 0) {
+>           s->qcow_version = current_version;
+> +        error_setg(errp, "Failed to update the image header: %s",
+> +                   strerror(-ret));
+
+etc.  I'll quit pointing it out, but there are more.
+
+> @@ -4293,18 +4311,17 @@ static int qcow2_amend_options(BlockDriverState *bs, QemuOpts *opts,
+>           int refcount_order = ctz32(refcount_bits);
+>   
+>           if (new_version < 3 && refcount_bits != 16) {
+> -            error_report("Different refcount widths than 16 bits require "
+> -                         "compatibility level 1.1 or above (use compat=1.1 or "
+> -                         "greater)");
+> +            error_setg(errp, "Different refcount widths than 16 bits require "
+> +                       "compatibility level 1.1 or above (use compat=1.1 or "
+> +                       "greater)");
+
+Not your fault, but that reads poorly.  Better would be:
+
+Refcount widths other than 16 bits require compatibility level 1.1 or above
+
+> +++ b/qemu-img.c
+> @@ -3730,10 +3730,10 @@ static int img_amend(int argc, char **argv)
+>   
+>       /* In case the driver does not call amend_status_cb() */
+>       qemu_progress_print(0.f, 0);
+> -    ret = bdrv_amend_options(bs, opts, &amend_status_cb, NULL);
+> +    ret = bdrv_amend_options(bs, opts, &amend_status_cb, NULL, &err);
+>       qemu_progress_print(100.f, 0);
+>       if (ret < 0) {
+> -        error_report("Error while amending options: %s", strerror(-ret));
+> +        error_report_err(err);
+
+Definitely nicer, but does change various outputs; glad you fixed 
+iotests to match.
+
+Overall a nice patch, looking forward to v2.
+
 -- 
-2.14.3
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
