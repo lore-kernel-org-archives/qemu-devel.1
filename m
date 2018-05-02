@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35249)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fDpK5-0007JU-3h
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:49:23 -0400
+	(envelope-from <bounces@canonical.com>) id 1fDpLo-0000Yn-Gh
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:51:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fDpK4-0003H8-7J
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:49:21 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49862 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fDpK4-0003Gp-1D
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:49:20 -0400
-From: Peter Xu <peterx@redhat.com>
-Date: Wed,  2 May 2018 18:47:40 +0800
-Message-Id: <20180502104740.12123-25-peterx@redhat.com>
-In-Reply-To: <20180502104740.12123-1-peterx@redhat.com>
-References: <20180502104740.12123-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 24/24] migration/hmp: add migrate_pause
- command
+	(envelope-from <bounces@canonical.com>) id 1fDpLl-0004F0-Cz
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:51:08 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34550)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fDpLl-0004DM-6C
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:51:05 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fDpLj-00029W-Hc
+	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 10:51:03 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 839552E80D2
+	for <qemu-devel@nongnu.org>; Wed,  2 May 2018 10:51:03 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 02 May 2018 10:37:20 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1751422 <1751422@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151945759115.32735.10228929932246006018.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152525744041.2035.17997406575847496911.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1751422] Re: some instructions translate error in
+ x86
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,74 +38,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Wrapper for QMP command "migrate-pause".
+We shouldn't really have let this expire, the submitter has a patch
+attached to the bug.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- hmp.h           |  1 +
- hmp.c           |  9 +++++++++
- hmp-commands.hx | 14 ++++++++++++++
- 3 files changed, 24 insertions(+)
+Yabi: do you have a simple test program which fails without this patch
+and works with it? If so can you attach it to the bug ?
 
-diff --git a/hmp.h b/hmp.h
-index b6b56c8161..20f27439d3 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -69,6 +69,7 @@ void hmp_migrate_cancel(Monitor *mon, const QDict *qdict);
- void hmp_migrate_continue(Monitor *mon, const QDict *qdict);
- void hmp_migrate_incoming(Monitor *mon, const QDict *qdict);
- void hmp_migrate_recover(Monitor *mon, const QDict *qdict);
-+void hmp_migrate_pause(Monitor *mon, const QDict *qdict);
- void hmp_migrate_set_downtime(Monitor *mon, const QDict *qdict);
- void hmp_migrate_set_speed(Monitor *mon, const QDict *qdict);
- void hmp_migrate_set_capability(Monitor *mon, const QDict *qdict);
-diff --git a/hmp.c b/hmp.c
-index 4ac2126969..35a23d8cb8 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1527,6 +1527,15 @@ void hmp_migrate_recover(Monitor *mon, const QDict *qdict)
-     hmp_handle_error(mon, &err);
- }
- 
-+void hmp_migrate_pause(Monitor *mon, const QDict *qdict)
-+{
-+    Error *err = NULL;
-+
-+    qmp_migrate_pause(&err);
-+
-+    hmp_handle_error(mon, &err);
-+}
-+
- /* Kept for backwards compatibility */
- void hmp_migrate_set_downtime(Monitor *mon, const QDict *qdict)
- {
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 8facba7b4d..579d501bd4 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -971,6 +971,20 @@ STEXI
- @item migrate_recover @var{uri}
- @findex migrate_recover
- Continue a paused incoming postcopy migration using the @var{uri}.
-+ETEXI
-+
-+    {
-+        .name       = "migrate_pause",
-+        .args_type  = "",
-+        .params     = "",
-+        .help       = "Pause an ongoing migration (postcopy-only)",
-+        .cmd        = hmp_migrate_pause,
-+    },
-+
-+STEXI
-+@item migrate_pause
-+@findex migrate_pause
-+Pause an ongoing migration.  Currently it only supports postcopy.
- ETEXI
- 
-     {
--- 
-2.14.3
+
+** Changed in: qemu
+       Status: Expired =3D> New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1751422
+
+Title:
+  some instructions translate error in x86
+
+Status in QEMU:
+  New
+
+Bug description:
+  There is some instructions translation error on target i386 in many versi=
+ons, such as 2.11.1, 2.10.2, 2.7.1 and so on.
+  The error translation instructions include les, lds. I has got a patch, b=
+ut I have no idea how to apply it.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1751422/+subscriptions
