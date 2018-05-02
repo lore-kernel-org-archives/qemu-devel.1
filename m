@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1fDsfD-0006s6-4h
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 10:23:24 -0400
+	(envelope-from <jcody@redhat.com>) id 1fDsnE-0001As-Tu
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 10:31:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1fDsfA-0000yH-8j
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 10:23:23 -0400
-Received: from mail-it0-x22f.google.com ([2607:f8b0:4001:c0b::22f]:33070)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
-	id 1fDsfA-0000y1-20
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 10:23:20 -0400
-Received: by mail-it0-x22f.google.com with SMTP id t7-v6so8454396itf.0
-	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 07:23:19 -0700 (PDT)
+	(envelope-from <jcody@redhat.com>) id 1fDsn9-0004Pq-Lj
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 10:31:40 -0400
+Date: Wed, 2 May 2018 10:31:14 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180502143114.GA22414@localhost.localdomain>
+References: <20180501220509.14152-1-mreitz@redhat.com>
+	<20180501220509.14152-3-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <0c121886-f40a-6682-267c-dfa3bfb195d0@redhat.com>
-References: <f41972e8-0ae2-7c1d-a66a-499a841080e3@redhat.com>
-	<13d95529-d61e-fc30-ffd4-f1ef93edad40@redhat.com>
-	<CAKv+Gu-JWfDCApNcw_mpx+y2i+Hkn_Ow3NN_U84ybgOSD_0JOQ@mail.gmail.com>
-	<0c121886-f40a-6682-267c-dfa3bfb195d0@redhat.com>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Wed, 2 May 2018 16:23:18 +0200
-Message-ID: <CAKv+Gu-pN4ZR3Yu+81661ZEnekD42F=QaBMvUK=3thxa4fLgnw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Expand ECAM region in machvirt 2_13?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180501220509.14152-3-mreitz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] iotests: Add test for cancelling a
+ mirror job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,110 +24,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Auger Eric <eric.auger@redhat.com>, qemu list <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
 
-On 2 May 2018 at 15:54, Laszlo Ersek <lersek@redhat.com> wrote:
-> On 05/02/18 14:34, Ard Biesheuvel wrote:
->> On 2 May 2018 at 13:31, Laszlo Ersek <lersek@redhat.com> wrote:
->>> On 05/01/18 17:59, Auger Eric wrote:
->>>> Hi,
->>>>
->>>> I would like to resume the discussion on extending the number of PCI
->>>> buses to 256 (as in Q35) as a follow-up of past discussions:
->>>> https://lists.gnu.org/archive/html/qemu-devel/2018-01/msg03631.html.
->>>>
->>>> With the current 16MB ECAM region we are limited to 16 PCIe busses.
->>>>
->>>> Could we envision to have a 256MB ECAM region and move it to another
->>>> location beyond 256GB, in virt2_13 machine type?
->>>>
->>>> Current ECAM range within [0x3f000000, 0x40000000] would be kept
->>>> unchanged for legacy and when vms->highmem is set to false.
->>>> Migration from <2_13 to >=2_13 would be allowed whereas migration
->>>> from >=2.13 to <2.13 wouldn't.
->>>
->>> If I understand correctly, the idea is to *move* the current one
->>> range, if the virt machine type is >= 2.13 and highmem is set to true
->>> (which is the default IIUC, from 2.12 onward).
->>>
->>> For 64-bit (AARCH64) ArmVirtQemu, that should work fine. The firmware
->>> takes the ECAM base and size from the "pci-host-ecam-generic" DT
->>> node, property "reg", uint64_t elements #0 and #1. (Sorry if this
->>> isn't exact DT lingo, I'm paraphrasing the firmware source code.) If
->>> the QEMU patch just changes the values, that should work
->>> transparently.
->>>
->>> For 32-bit (ARM) ArmVirtQemu, this change (the new ECAM default)
->>> could be a problem. PCI stuff in the firmware wouldn't work unless
->>> people specified highmem=off on the QEMU command line.
->>>
->>> Now, I notice highmen defaults to "on" starting with 2.12 even for
->>> "qemu-system-arm -M virt", not just "qemu-system-aarch64 -M virt", so
->>> why doesn't that already cause a problem with PCI in the 32-bit guest
->>> fw?
->>>
->>> Because, currently "highmen" only controls the presence of the 64-bit
->>> PCI MMIO aperture for BAR allocation; it has no effect on config
->>> space. And if the 64-bit PCI MMIO aperture is exposed to the 32-bit
->>> guest firmware, the latter simply ignores the former, and works with
->>> the 32-bit aperture solely (which is always there).
->>>
->>> So, for "qemu-system-arm -M virt" compatibility, I think we might
->>> need a separate machine type property, which should default to "on"
->>> only on qemu-system-aarch64 (if such distinctions are allowed).
->>>
->>> Of course, I can't tell if the 32-bit ArmVirtQemu firmware is
->>> possible to run on "qemu-system-aarch64 -M virt". (I think it is; I
->>> recall something something about ARMv8 having ARMv7 compat, but I
->>> don't remember ever trying.) If that's the case, then even the above
->>> suggestion won't work, because it would break 32-bit guest fw that
->>> the user has run (for whatever reason) on "qemu-system-aarch64 -M
->>> virt". In this case, I believe we can't just change the contents of
->>> the current "pci-host-ecam-generic" node, but we should implement
->>> some structural DTB addition that old firmware will simply not
->>> notice, while new (64-bit) firmware will specifically look for (and
->>> prefer over the old DT stuff).
->>>
->>> Ard, what's your take? (Sorry if you've already followed up, my email
->>> processing lags.)
->>>
->>
->> Do we have any examples of ACPI platforms where the config space is
->> mapped above 4 GB? I'd like to make sure that all existing code copes
->> with that before even considering it.
->
-> Well, we could consider this virtual machine feature a way to root out
-> any 64-bit bugs that lurk in code that consumes ECAM :) That would help
-> physical platforms. It means that we shouldn't enable the feature by
-> default, in 2.13 at least.
->
-> Anyway, I've just checked my oldie A3 Mustang for this (it uses UEFI and
-> ACPI), and surprisingly, it does put the ECAM range above 4GB:
->
-> [    0.000000] ACPI: MCFG 0x00000043FA690000 00003C (v01 APM    XGENE    00000002 INTL 20140724)
-> [    0.088654] ACPI: MCFG table detected, 1 entries
-> [    0.126613] acpi PNP0A08:00: MCFG quirk: ECAM at [mem 0xe0d0000000-0xe0dfffffff] for [bus 00-ff] with xgene_v1_pcie_ecam_ops
-> [    0.127552] acpi PNP0A08:00: [Firmware Bug]: ECAM area [mem 0xe0d0000000-0xe0dfffffff] not reserved in ACPI namespace
-> [    0.127601] acpi PNP0A08:00: ECAM at [mem 0xe0d0000000-0xe0dfffffff] for [bus 00-ff]
->
-> The base address is 899 GB + 256 MB.
->
-> My kernel is 4.11.0-44.6.1.el7a.aarch64.
->
+On Wed, May 02, 2018 at 12:05:09AM +0200, Max Reitz wrote:
+> We already have an extensive mirror test (041) which does cover
+> cancelling a mirror job, especially after it has emitted the READY
+> event.  However, it does not check what exact events are emitted after
+> block-job-cancel is executed.  More importantly, it does not use
+> throttling to ensure that it covers the case of block-job-cancel before
+> READY.
+> 
+> It would be possible to add this case to 041, but considering it is
+> already our largest test file, it makes sense to create a new file for
+> these cases.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/qemu-iotests/218     | 138 +++++++++++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/218.out |  30 ++++++++++
+>  tests/qemu-iotests/group   |   1 +
 
-Interesting. So Linux deals with that fine. How about the missing
-PNP0C02 device:
+Minor conflict in group, but nothing that I can't sort out when applying.
 
-Device (RES0)
-{
-   Name (_CID, "PNP0C02")
-   Name (_CRS, ResourceTemplate () {
-     Memory32Fixed (ReadWrite, 0x... , 0x1000000)
-   })
-}
-
-Anyone care to venture a guess how one expresses this, given that
-Memory64Fixed does not appear to exist?
-
-(Perhaps our QEMU code only needs a minor tweak here, but I honestly don't know)
+>  3 files changed, 169 insertions(+)
+>  create mode 100755 tests/qemu-iotests/218
+>  create mode 100644 tests/qemu-iotests/218.out
+> 
+> diff --git a/tests/qemu-iotests/218 b/tests/qemu-iotests/218
+> new file mode 100755
+> index 0000000000..92c331b6fb
+> --- /dev/null
+> +++ b/tests/qemu-iotests/218
+> @@ -0,0 +1,138 @@
+> +#!/usr/bin/env python
+> +#
+> +# This test covers what happens when a mirror block job is cancelled
+> +# in various phases of its existence.
+> +#
+> +# Note that this test only checks the emitted events (i.e.
+> +# BLOCK_JOB_COMPLETED vs. BLOCK_JOB_CANCELLED), it does not compare
+> +# whether the target is in sync with the source when the
+> +# BLOCK_JOB_COMPLETED event occurs.  This is covered by other tests
+> +# (such as 041).
+> +#
+> +# Copyright (C) 2018 Red Hat, Inc.
+> +#
+> +# This program is free software; you can redistribute it and/or modify
+> +# it under the terms of the GNU General Public License as published by
+> +# the Free Software Foundation; either version 2 of the License, or
+> +# (at your option) any later version.
+> +#
+> +# This program is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +# GNU General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU General Public License
+> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> +#
+> +# Creator/Owner: Max Reitz <mreitz@redhat.com>
+> +
+> +import iotests
+> +from iotests import log
+> +
+> +iotests.verify_platform(['linux'])
+> +
+> +
+> +# Launches the VM, adds two null-co nodes (source and target), and
+> +# starts a blockdev-mirror job on them.
+> +#
+> +# Either both or none of speed and buf_size must be given.
+> +
+> +def start_mirror(vm, speed=None, buf_size=None):
+> +    vm.launch()
+> +
+> +    ret = vm.qmp('blockdev-add',
+> +                     node_name='source',
+> +                     driver='null-co',
+> +                     size=1048576)
+> +    assert ret['return'] == {}
+> +
+> +    ret = vm.qmp('blockdev-add',
+> +                     node_name='target',
+> +                     driver='null-co',
+> +                     size=1048576)
+> +    assert ret['return'] == {}
+> +
+> +    if speed is not None:
+> +        ret = vm.qmp('blockdev-mirror',
+> +                         job_id='mirror',
+> +                         device='source',
+> +                         target='target',
+> +                         sync='full',
+> +                         speed=speed,
+> +                         buf_size=buf_size)
+> +    else:
+> +        ret = vm.qmp('blockdev-mirror',
+> +                         job_id='mirror',
+> +                         device='source',
+> +                         target='target',
+> +                         sync='full')
+> +
+> +    assert ret['return'] == {}
+> +
+> +
+> +log('')
+> +log('=== Cancel mirror job before convergence ===')
+> +log('')
+> +
+> +log('--- force=false ---')
+> +log('')
+> +
+> +with iotests.VM() as vm:
+> +    # Low speed so it does not converge
+> +    start_mirror(vm, 65536, 65536)
+> +
+> +    log('Cancelling job')
+> +    log(vm.qmp('block-job-cancel', device='mirror', force=False))
+> +
+> +    log(vm.event_wait('BLOCK_JOB_CANCELLED'),
+> +        filters=[iotests.filter_qmp_event])
+> +
+> +log('')
+> +log('--- force=true ---')
+> +log('')
+> +
+> +with iotests.VM() as vm:
+> +    # Low speed so it does not converge
+> +    start_mirror(vm, 65536, 65536)
+> +
+> +    log('Cancelling job')
+> +    log(vm.qmp('block-job-cancel', device='mirror', force=True))
+> +
+> +    log(vm.event_wait('BLOCK_JOB_CANCELLED'),
+> +        filters=[iotests.filter_qmp_event])
+> +
+> +
+> +log('')
+> +log('=== Cancel mirror job after convergence ===')
+> +log('')
+> +
+> +log('--- force=false ---')
+> +log('')
+> +
+> +with iotests.VM() as vm:
+> +    start_mirror(vm)
+> +
+> +    log(vm.event_wait('BLOCK_JOB_READY'),
+> +        filters=[iotests.filter_qmp_event])
+> +
+> +    log('Cancelling job')
+> +    log(vm.qmp('block-job-cancel', device='mirror', force=False))
+> +
+> +    log(vm.event_wait('BLOCK_JOB_COMPLETED'),
+> +        filters=[iotests.filter_qmp_event])
+> +
+> +log('')
+> +log('--- force=true ---')
+> +log('')
+> +
+> +with iotests.VM() as vm:
+> +    start_mirror(vm)
+> +
+> +    log(vm.event_wait('BLOCK_JOB_READY'),
+> +        filters=[iotests.filter_qmp_event])
+> +
+> +    log('Cancelling job')
+> +    log(vm.qmp('block-job-cancel', device='mirror', force=True))
+> +
+> +    log(vm.event_wait('BLOCK_JOB_CANCELLED'),
+> +        filters=[iotests.filter_qmp_event])
+> diff --git a/tests/qemu-iotests/218.out b/tests/qemu-iotests/218.out
+> new file mode 100644
+> index 0000000000..7dbf78e682
+> --- /dev/null
+> +++ b/tests/qemu-iotests/218.out
+> @@ -0,0 +1,30 @@
+> +
+> +=== Cancel mirror job before convergence ===
+> +
+> +--- force=false ---
+> +
+> +Cancelling job
+> +{u'return': {}}
+> +{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'device': u'mirror', u'type': u'mirror', u'speed': 65536, u'len': 1048576, u'offset': 65536}, u'event': u'BLOCK_JOB_CANCELLED'}
+> +
+> +--- force=true ---
+> +
+> +Cancelling job
+> +{u'return': {}}
+> +{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'device': u'mirror', u'type': u'mirror', u'speed': 65536, u'len': 1048576, u'offset': 65536}, u'event': u'BLOCK_JOB_CANCELLED'}
+> +
+> +=== Cancel mirror job after convergence ===
+> +
+> +--- force=false ---
+> +
+> +{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'device': u'mirror', u'type': u'mirror', u'speed': 0, u'len': 1048576, u'offset': 1048576}, u'event': u'BLOCK_JOB_READY'}
+> +Cancelling job
+> +{u'return': {}}
+> +{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'device': u'mirror', u'type': u'mirror', u'speed': 0, u'len': 1048576, u'offset': 1048576}, u'event': u'BLOCK_JOB_COMPLETED'}
+> +
+> +--- force=true ---
+> +
+> +{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'device': u'mirror', u'type': u'mirror', u'speed': 0, u'len': 1048576, u'offset': 1048576}, u'event': u'BLOCK_JOB_READY'}
+> +Cancelling job
+> +{u'return': {}}
+> +{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'device': u'mirror', u'type': u'mirror', u'speed': 0, u'len': 1048576, u'offset': 1048576}, u'event': u'BLOCK_JOB_CANCELLED'}
+> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+> index 2edc377370..cc8cd8cc8e 100644
+> --- a/tests/qemu-iotests/group
+> +++ b/tests/qemu-iotests/group
+> @@ -215,3 +215,4 @@
+>  214 rw auto
+>  215 rw auto quick
+>  216 rw auto quick
+> +218 rw auto quick
+> -- 
+> 2.14.3
+> 
