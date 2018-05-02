@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fDmiT-0003JN-Ic
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 04:02:27 -0400
+	(envelope-from <ilg@livius.net>) id 1fDmix-0003X8-PS
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 04:03:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fDmiP-0003X7-FB
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 04:02:21 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45240 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fDmiP-0003Wt-AT
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 04:02:17 -0400
-Date: Wed, 2 May 2018 09:02:00 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180502080200.GG3308@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+	(envelope-from <ilg@livius.net>) id 1fDmix-0003qc-0s
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 04:02:51 -0400
+Received: from mail-yw0-x22e.google.com ([2607:f8b0:4002:c05::22e]:38431)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ilg@livius.net>) id 1fDmiw-0003qN-SS
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 04:02:50 -0400
+Received: by mail-yw0-x22e.google.com with SMTP id y123-v6so4274397ywa.5
+	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 01:02:50 -0700 (PDT)
+From: Liviu Ionescu <ilg@livius.net>
+In-Reply-To: <20180502075904.GF3308@redhat.com>
 References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
 	<20180430103312.GH3249@redhat.com>
 	<20180430132107.0a37704d.cohuck@redhat.com>
 	<ac216b06-9469-addd-b5a1-3a3a89fd0782@redhat.com>
-	<20180502074403.yh5weukbjgqsvp7n@sirius.home.kraxel.org>
+	<20180502093326.2fbec55f.cohuck@redhat.com>
+	<CAG7hfcKo62hpq-qkVE8_+pR1R6uQKcG_FuNuNo1yGqGV-6oazQ@mail.gmail.com>
+	<20180502075904.GF3308@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180502074403.yh5weukbjgqsvp7n@sirius.home.kraxel.org>
+Date: Wed, 2 May 2018 01:02:49 -0700
+Message-ID: <CAG7hfcKEiNfLR0xW6b2FPFAN1L4xs81ozPXZAZAs=+Wzs6Q2Vw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] release retrospective, next release timing,
  numbering
 List-Id: <qemu-devel.nongnu.org>
@@ -32,29 +35,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-On Wed, May 02, 2018 at 09:44:03AM +0200, Gerd Hoffmann wrote:
->   Hi,
-> 
-> > > If we bump the major version each year anyway, why not go the whole way
-> > > and use 2018.1, 2018.2, ... (or even <year>.<month>)? The nice thing
-> > > about that is that you can see at a glance when the release took place.
-> > 
-> > ... or simply drop the first two digits and call them 18.1, 18.2, ...?
+On 2 May 2018 at 10:59:07, Daniel P. Berrang=C3=A9 (berrange@redhat.com) wr=
+ote:
 
-> We could also drop the major/minor scheme altogether (as they are
-> meaningless anyway) and just go for YYMM, i.e. 1808 (for a august
-> release).
+> Our deprecation policy lets us include incompatible
+> changes in *any* release.
 
-I don't much like that - it'll lead to a wierd progression of numbers
-where we'll be constantly the rationale re-explaining to people who
-want to know why we've jumped from 1808 to 1902 to 1905 etc
+can you elaborate on this?
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+where is this policy defined?
+
+
+thank you,
+
+Liviu
