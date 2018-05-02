@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fDoM8-000404-Tu
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:47:25 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fDoMi-0004WC-CU
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:48:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fDoM4-0008Ox-Il
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:47:24 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:54195)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fDoM3-0008OE-Qb
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:47:20 -0400
-Received: by mail-wm0-x242.google.com with SMTP id a67so14046265wmf.3
-	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 02:47:19 -0700 (PDT)
-References: <20180501180455.11214-1-richard.henderson@linaro.org>
-	<20180501180455.11214-3-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180501180455.11214-3-richard.henderson@linaro.org>
-Date: Wed, 02 May 2018 10:47:17 +0100
-Message-ID: <878t929yoq.fsf@linaro.org>
+	(envelope-from <pbonzini@redhat.com>) id 1fDoMd-0000DW-FZ
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:48:00 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48584 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fDoMd-0000Cv-6M
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:47:55 -0400
+References: <87o9inxkd1.fsf@dusky.pond.sub.org>
+	<20180430065235.577-1-aik@ozlabs.ru>
+	<c23d1ec1-51d7-d967-28a2-0df0f59e7480@redhat.com>
+	<d15dfc3e-b33b-f0a9-971a-0f40bbffcdf4@ozlabs.ru>
+	<87muxi8t2b.fsf@dusky.pond.sub.org>
+	<6c49e4ab-bb40-cf20-629a-2fc5c19d8585@redhat.com>
+	<87o9hy5re9.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2fc4e700-9222-8785-efc3-f2749be298ab@redhat.com>
+Date: Wed, 2 May 2018 11:47:45 +0200
 MIME-Version: 1.0
+In-Reply-To: <87o9hy5re9.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 2/2] target/arm: Tidy condition
- in disas_simd_two_reg_misc
+Subject: Re: [Qemu-devel] [PATCH qemu] qom: Document
+ qom/device-list-properties implementation specific
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +34,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
 
+On 02/05/2018 11:38, Markus Armbruster wrote:
+>>>> It probably is not unless someone adds properties in realize() callb=
+ack,
+>>> Now work that into the doc comment, please :)
+>> Are there any examples?
+> There must be examples where instances of the same type have different
+> properties, or else our design decision to create properties dynamicall=
+y
+> was inane.
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Buses for example create properties at runtime to link a parent to its
+children.  These properties are created when a child device appears;
+this is different from creating properties in or the realize() callback,
+or upon setting other properties.
 
-> Path analysis shows that size =3D=3D 3 && !is_q has been eliminated.
->
-> Fixes: Coverity CID1385853
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+The purpose of this command is to tell people/tools what they can pass
+to -device/-object/device_add/object_add, so the real question is
+whether there are cases where it falls short of that purpose.
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+If not, maybe the wording for the .json file could be something like:
 
-> ---
->  target/arm/translate-a64.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 97950dce1a..6d49f30b4a 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -11473,7 +11473,11 @@ static void disas_simd_two_reg_misc(DisasContext=
- *s, uint32_t insn)
->          /* All 64-bit element operations can be shared with scalar 2misc=
- */
->          int pass;
->
-> -        for (pass =3D 0; pass < (is_q ? 2 : 1); pass++) {
-> +        /* Coverity claims (size =3D=3D 3 && !is_q) has been eliminated
-> +         * from all paths leading to here.
-> +         */
-> +        tcg_debug_assert(is_q);
-> +        for (pass =3D 0; pass < 2; pass++) {
->              TCGv_i64 tcg_op =3D tcg_temp_new_i64();
->              TCGv_i64 tcg_res =3D tcg_temp_new_i64();
+  Objects can create properties at runtime, for example to describe
+  links between different devices and/or objects.  These properties
+  are not included in the output of this command.
 
-
---
-Alex Benn=C3=A9e
+Paolo
