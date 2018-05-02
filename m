@@ -1,34 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47410)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fDjL5-0003gx-9c
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 00:26:00 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1fDjf1-00064G-H3
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 00:46:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fDjL2-0007TW-6Z
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 00:25:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45812)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fDjL2-0007RZ-0G
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 00:25:56 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fDjKv-0001yi-PI
-	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 04:25:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6B14D2E80EC
-	for <qemu-devel@nongnu.org>; Wed,  2 May 2018 04:25:47 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 02 May 2018 04:17:19 -0000
-From: Launchpad Bug Tracker <1751422@bugs.launchpad.net>
-Reply-To: Bug 1751422 <1751422@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151945759115.32735.10228929932246006018.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152523464107.21776.9310116090588358413.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1751422] Re: some instructions translate error in
- x86
+	(envelope-from <aik@ozlabs.ru>) id 1fDjey-0000TW-GU
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 00:46:35 -0400
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Date: Wed,  2 May 2018 14:45:57 +1000
+Message-Id: <20180502044557.21035-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [PATCH qemu] vfio/spapr: Allow backing bigger guest
+ IOMMU pages with smaller physical pages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,29 +19,98 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+At the moment the PPC64/pseries guest only supports 4K/64K/16M IOMMU
+pages and POWER8 CPU supports the exact same set of page size so
+so far things worked fine.
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+However POWER9 supports different set of sizes - 4K/64K/2M/1G and
+the last two - 2M and 1G - are not even allowed in the paravirt interface
+(RTAS DDW) so we always end up using 64K IOMMU pages, although we could
+back guest's 16MB IOMMU pages with 2MB pages on the host.
 
--- =
+This stores the supported host IOMMU page sizes in VFIOContainer and uses
+this later when creating a new DMA window.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1751422
+There should be no behavioral changes on platforms other than pseries.
 
-Title:
-  some instructions translate error in x86
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+ include/hw/vfio/vfio-common.h |  1 +
+ hw/vfio/common.c              |  3 +++
+ hw/vfio/spapr.c               | 15 ++++++++++++++-
+ 3 files changed, 18 insertions(+), 1 deletion(-)
 
-Status in QEMU:
-  Expired
-
-Bug description:
-  There is some instructions translation error on target i386 in many versi=
-ons, such as 2.11.1, 2.10.2, 2.7.1 and so on.
-  The error translation instructions include les, lds. I has got a patch, b=
-ut I have no idea how to apply it.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1751422/+subscriptions
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index d936014..dd8d0d3 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -83,6 +83,7 @@ typedef struct VFIOContainer {
+     unsigned iommu_type;
+     int error;
+     bool initialized;
++    unsigned long pgsizes;
+     /*
+      * This assumes the host IOMMU can support only a single
+      * contiguous IOVA window.  We may need to generalize that in
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 07ffa0b..15ddef2 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -1103,6 +1103,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+             info.iova_pgsizes = 4096;
+         }
+         vfio_host_win_add(container, 0, (hwaddr)-1, info.iova_pgsizes);
++        container->pgsizes = info.iova_pgsizes;
+     } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_IOMMU) ||
+                ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_v2_IOMMU)) {
+         struct vfio_iommu_spapr_tce_info info;
+@@ -1167,6 +1168,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+         }
+ 
+         if (v2) {
++            container->pgsizes = info.ddw.pgsizes;
+             /*
+              * There is a default window in just created container.
+              * To make region_add/del simpler, we better remove this
+@@ -1181,6 +1183,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+             }
+         } else {
+             /* The default table uses 4K pages */
++            container->pgsizes = 0x1000;
+             vfio_host_win_add(container, info.dma32_window_start,
+                               info.dma32_window_start +
+                               info.dma32_window_size - 1,
+diff --git a/hw/vfio/spapr.c b/hw/vfio/spapr.c
+index 259397c..9637ed5 100644
+--- a/hw/vfio/spapr.c
++++ b/hw/vfio/spapr.c
+@@ -144,11 +144,24 @@ int vfio_spapr_create_window(VFIOContainer *container,
+ {
+     int ret;
+     IOMMUMemoryRegion *iommu_mr = IOMMU_MEMORY_REGION(section->mr);
+-    unsigned pagesize = memory_region_iommu_get_min_page_size(iommu_mr);
++    uint64_t pagesize = memory_region_iommu_get_min_page_size(iommu_mr);
+     unsigned entries, pages;
+     struct vfio_iommu_spapr_tce_create create = { .argsz = sizeof(create) };
+ 
+     /*
++     * The host might not support the guest supported IOMMU page size,
++     * so we will use smaller physical IOMMU pages to back them.
++     */
++    pagesize = 1ULL << ctz64(container->pgsizes & (pagesize | (pagesize - 1)));
++    if (!pagesize) {
++        error_report("Host doesn't support page size 0x%"PRIx64
++                     ", the supported mask is 0x%lx",
++                     memory_region_iommu_get_min_page_size(iommu_mr),
++                     container->pgsizes);
++        return -EINVAL;
++    }
++
++    /*
+      * FIXME: For VFIO iommu types which have KVM acceleration to
+      * avoid bouncing all map/unmaps through qemu this way, this
+      * would be the right place to wire that up (tell the KVM
+-- 
+2.11.0
