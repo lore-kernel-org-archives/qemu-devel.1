@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55272)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fDzq1-0003ow-NW
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 18:03:02 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fE02Z-0000ao-DA
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 18:16:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fDzq0-00031q-Qm
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 18:03:01 -0400
-References: <20180502202051.15493-1-mreitz@redhat.com>
-	<20180502202051.15493-3-mreitz@redhat.com>
-	<eeef06be-6c71-df6a-6aeb-8a7c23316dee@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <ca5f1a91-84fe-d11b-f805-c7a8aca84cc3@redhat.com>
-Date: Thu, 3 May 2018 00:02:44 +0200
+	(envelope-from <richard.henderson@linaro.org>) id 1fE02W-0007nk-CN
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 18:15:59 -0400
+Received: from mail-pg0-x231.google.com ([2607:f8b0:400e:c05::231]:37874)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fE02W-0007nJ-6F
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 18:15:56 -0400
+Received: by mail-pg0-x231.google.com with SMTP id a13-v6so11633294pgu.4
+	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 15:15:56 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Wed,  2 May 2018 15:15:38 -0700
+Message-Id: <20180502221552.3873-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <eeef06be-6c71-df6a-6aeb-8a7c23316dee@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ZLB9pTsXUgoPCOw0c5RWRzPFqlSZAmNen"
-Subject: Re: [Qemu-devel] [PATCH 2/3] qemu-img: Use only string options in
- img_open_opts
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 00/14] target/arm: Fixups for
+ ARM_FEATURE_V8_FP16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,87 +28,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ZLB9pTsXUgoPCOw0c5RWRzPFqlSZAmNen
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org,
- Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>
-Message-ID: <ca5f1a91-84fe-d11b-f805-c7a8aca84cc3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/3] qemu-img: Use only string options in
- img_open_opts
-References: <20180502202051.15493-1-mreitz@redhat.com>
- <20180502202051.15493-3-mreitz@redhat.com>
- <eeef06be-6c71-df6a-6aeb-8a7c23316dee@redhat.com>
-In-Reply-To: <eeef06be-6c71-df6a-6aeb-8a7c23316dee@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+When running the gcc testsuite with current aarch64-linux-user,
+the testsuite detects the presence of the fp16 extension and
+enables lots of extra tests for builtins.
 
-On 2018-05-03 00:00, Eric Blake wrote:
-> On 05/02/2018 03:20 PM, Max Reitz wrote:
->> img_open_opts() takes a QemuOpts and converts them to a QDict, so all
->> values therein are strings.=C2=A0 Then it may try to call qdict_get_bo=
-ol(),
->> however, which will fail with a segmentation fault every time:
->=20
-> I have no idea if it's worth fixing qdict_get_bool() to at least not
-> segfault when called on a non-bool Dict member (but what should it
-> return, true or false? or should it abort() for at least a cleaner
-> failure than a segfault?)
+Quite a few of these new tests fail because we missed implementing
+some instructions.  We really should go back and verify that nothing
+else is missing from this (rather large) extension.
 
-There's qdict_get_try_bool() which returns a default.  For testing
-whether the member is a bool I suppose you can use
-qdict_to(QBool, qdict_get(qdict, member)).
+In addition, it tests some edge conditions on data that show flaws
+in the way we were performing integer<->fp conversion; particularly
+with respect to scaled conversion.
 
-Max
-
-> But in the meantime, your fix is correct.
->=20
->>
->> $ ./qemu-img info -U --image-opts \
->> =C2=A0=C2=A0=C2=A0=C2=A0 driver=3Dfile,filename=3D/dev/null,force-shar=
-e=3Doff
->> [1]=C2=A0=C2=A0=C2=A0 27869 segmentation fault (core dumped)=C2=A0 ./q=
-emu-img info -U
->> --image-opts driver=3Dfile,filename=3D/dev/null,force-share=3Doff
->>
->> Fix this by using qdict_get_str() and comparing the value as a string.=
-
->> Also, when adding a force-share value to the QDict, add it as a string=
-
->> so it fits the rest of the dict.
->>
->> Cc: qemu-stable@nongnu.org
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->> =C2=A0 qemu-img.c | 4 ++--
->> =C2=A0 1 file changed, 2 insertions(+), 2 deletions(-)
->>
->=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->=20
+Changes since v1:
+  * Rebased vs master instead of tgt-arm-sve-9.
+  * Alex did some additional digging through the ARM xhtml
+    and came up with some additional missing instructions.
+  * Everything cc'd to qemu-stable.
 
 
+r~
 
---ZLB9pTsXUgoPCOw0c5RWRzPFqlSZAmNen
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+Alex Bennée (4):
+  target/arm: Implement FCMP for fp16
+  target/arm: Implement FCSEL for fp16
+  target/arm: Implement FMOV (immediate) for fp16
+  target/arm: Fix sqrt_f16 exception raising
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlrqNYQACgkQ9AfbAGHV
-z0BbXwf8C3hpYbt+J2DFo7ImwdMe4nR4pGKm+w8lxvUqgbIsc9PgBBIt9uLlDcq3
-zL6xYt7d0o8h/Qgy1Lint99VYYjqXhzxts9QWxC58xNAMM3WxbyOC//IOORJEnZ7
-tmtRLl7kqjG9FXuXu1tFU950KJCOf9DZg01d5PGw/nhvWfRqRNqztgenVgldvZHG
-D7fQN7QFxmvNacv1bx5peQN2MGoTC0vTz0e0Xb+npKIpO5qoNzx59/JSWyt2djQr
-m1DPtuzN9Hr5FlXB5HGI1RwzjrszVUN7oPeq7xis/IhO6X8QOAlN+D5ZlhAK55xt
-ugkq83S5mQMp+3Jw/q0OVFAKLGBCKw==
-=liio
------END PGP SIGNATURE-----
+Richard Henderson (10):
+  target/arm: Implement vector shifted SCVF/UCVF for fp16
+  target/arm: Implement vector shifted FCVT for fp16
+  target/arm: Fix float16 to/from int16
+  target/arm: Clear SVE high bits for FMOV
+  target/arm: Implement FMOV (general) for fp16
+  target/arm: Implement FCVT (scalar,integer) for fp16
+  target/arm: Implement FCVT (scalar,fixed-point) for fp16
+  target/arm: Introduce and use read_fp_hreg
+  target/arm: Implement FP data-processing (2 source) for fp16
+  target/arm: Implement FP data-processing (3 source) for fp16
 
---ZLB9pTsXUgoPCOw0c5RWRzPFqlSZAmNen--
+ target/arm/helper-a64.h    |   2 +
+ target/arm/helper.h        |   6 +
+ target/arm/helper-a64.c    |  10 +
+ target/arm/helper.c        |  87 +++++++-
+ target/arm/translate-a64.c | 535 ++++++++++++++++++++++++++++++++++++---------
+ 5 files changed, 532 insertions(+), 108 deletions(-)
+
+-- 
+2.14.3
