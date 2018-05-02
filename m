@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52348)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1fDoVO-0000ho-LM
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:56:59 -0400
+	(envelope-from <peterx@redhat.com>) id 1fDocy-0002A0-Uo
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:04:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1fDoVL-0005FK-I0
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:56:58 -0400
-Received: from mel.act-europe.fr ([194.98.77.210]:42327
-	helo=smtp.eu.adacore.com)
+	(envelope-from <peterx@redhat.com>) id 1fDocv-0008Ga-Oy
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:04:48 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60984 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
-	id 1fDoVL-0005E3-9P
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:56:55 -0400
-References: <20180419131051.11249-1-kraxel@redhat.com>
-	<20180419131051.11249-5-kraxel@redhat.com>
-	<833e23a9-4899-2a95-c4b1-027d437e2ef7@adacore.com>
-	<20180425130525.omdcdwvcpclk7xsu@sirius.home.kraxel.org>
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <9baf8882-0458-0865-d712-aa2d723c3c78@adacore.com>
-Date: Wed, 2 May 2018 11:56:48 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180425130525.omdcdwvcpclk7xsu@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/4] audio/hda: detect output buffer
- overruns and underruns
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fDocv-0008GB-KY
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:04:45 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 41B5781A88C4
+	for <qemu-devel@nongnu.org>; Wed,  2 May 2018 10:04:41 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Wed,  2 May 2018 18:04:18 +0800
+Message-Id: <20180502100422.8688-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 0/4] monitor: let Monitor be thread safe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,34 +27,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, martin@schrodt.org
+To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Hi Gerd,
+v4:
+- fix a s/cur_mon/mon/ typo
 
-Sorry I didn't had time to try that yet.
+v3:
+- add comment for fields that are protected by monitor lock [Stefan]
+- drop most of patch 2, only keep the protections for mon->fds [Stefan]
+- add one trivial patch to add some more comments for either readline
+  and cpu_get/cpu_set [Stefan]
+- add protection for monitor_fdset_get_fd() [Stefan]
 
-I'll try today!
+v2:
+- cc correct people... sorry.
 
-Thanks,
-Fred
+Stefan reported this problem that in the future we might start to have
+more threads operating on the same Monitor object.  This seris try to
+add fundamental support for it.
 
-On 04/25/2018 03:05 PM, Gerd Hoffmann wrote:
-> On Mon, Apr 23, 2018 at 11:31:34AM +0200, KONRAD Frederic wrote:
->>
->>
->> On 04/19/2018 03:10 PM, Gerd Hoffmann wrote:
->>> If some event caused some larger playback hickup the fine-grained timer
->>> adjust isn't able to recover.  Use a buffer overruns and underruns as
->>> indicator for that.  Reset timer adjust logic in case we detected one.
->>
->> It seems that this patch causes big lockup of my Win10 KVM guest
->> when it tries to output a sound.
->> The three previous patches improved considerably the audio
->> output though!
-> 
-> Can you try drop the "underrun" chunks, keeping only the "overrun"?
-> 
-> thanks,
->    Gerd
-> 
+Please review.  Thanks,
+
+Peter Xu (4):
+  monitor: rename out_lock to mon_lock
+  monitor: protect mon->fds with mon_lock
+  monitor: more comments on lock-free fleids/funcs
+  monitor: add lock to protect mon_fdsets
+
+ monitor.c | 132 ++++++++++++++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 95 insertions(+), 37 deletions(-)
+
+-- 
+2.14.3
