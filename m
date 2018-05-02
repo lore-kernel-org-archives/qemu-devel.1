@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33487)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fDt81-0007Ko-Qn
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 10:53:11 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fDtCJ-0001yW-0z
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 10:57:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fDt7x-0004uU-TZ
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 10:53:09 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:33581)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fDt7x-0004tl-JV
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 10:53:05 -0400
-References: <20180501235332.31245-1-laurent@vivier.eu>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <74260378-1d6c-4b99-1184-78f873c1eb76@vivier.eu>
-Date: Wed, 2 May 2018 16:52:52 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1fDtCF-00076v-5Q
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 10:57:35 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58150 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fDtCE-00076O-Vx
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 10:57:31 -0400
+Date: Wed, 2 May 2018 15:57:13 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180502145713.GE2679@work-vm>
+References: <20180426091519.26934-1-xiaoguangrong@tencent.com>
+	<32eaad8e-35a0-5240-37a2-4242b7890ab9@redhat.com>
+	<a14b1b5b-4f0c-c085-35b8-9539afa5091f@gmail.com>
+	<20180427093135.GC13269@xz-mi>
+	<2f84ab90-2b9c-9888-e6e2-9114ae046078@gmail.com>
+	<20180502030309.GC25938@xz-mi>
 MIME-Version: 1.0
-In-Reply-To: <20180501235332.31245-1-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: remove useless padding in
- flock64 structure
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180502030309.GC25938@xz-mi>
+Subject: Re: [Qemu-devel] [PATCH] migration: introduce decompress-error-check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,132 +31,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <richard.henderson@linaro.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: Xiao Guangrong <guangrong.xiao@gmail.com>, Eric Blake <eblake@redhat.com>, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, kvm@vger.kernel.org, Xiao Guangrong <xiaoguangrong@tencent.com>, qemu-devel@nongnu.org, wei.w.wang@intel.com, jiang.biao2@zte.com.cn
 
-Le 02/05/2018 à 01:53, Laurent Vivier a écrit :
-> Since commit 8efb2ed5ec ("linux-user: Correct signedness of
-> target_flock l_start and l_len fields"), flock64 structure uses
-> abi_llong for l_start and l_len in place of "unsigned long long"
-> this should force them to be aligned accordingly to the target
-> rules. So we can remove the padding field and the QEMU_PACKED
-> attribute.
+* Peter Xu (peterx@redhat.com) wrote:
+> On Fri, Apr 27, 2018 at 06:40:09PM +0800, Xiao Guangrong wrote:
+> > 
+> > 
+> > On 04/27/2018 05:31 PM, Peter Xu wrote:
+> > > On Fri, Apr 27, 2018 at 11:15:37AM +0800, Xiao Guangrong wrote:
+> > > > 
+> > > > 
+> > > > On 04/26/2018 10:01 PM, Eric Blake wrote:
+> > > > > On 04/26/2018 04:15 AM, guangrong.xiao@gmail.com wrote:
+> > > > > > From: Xiao Guangrong <xiaoguangrong@tencent.com>
+> > > > > > 
+> > > > > > QEMU 2.13 enables strict check for compression & decompression to
+> > > > > > make the migration more robuster, that depends on the source to fix
+> > > > > 
+> > > > > s/robuster/robust/
+> > > > > 
+> > > > 
+> > > > Will fix, thank you for pointing it out.
+> > > > 
+> > > > > > the internal design which triggers the unexpected error conditions
+> > > > > 
+> > > > > 2.13 hasn't been released yet.  Why do we need a knob to explicitly turn
+> > > > > off strict checking?  Can we not instead make 2.13 automatically smart
+> > > > > enough to tell if the incoming stream is coming from an older qemu
+> > > > > (which might fail if the strict checks are enabled) vs. a newer qemu
+> > > > > (the sender gave us what we need to ensure the strict checks are
+> > > > > worthwhile)?
+> > > > > 
+> > > > 
+> > > > Really smart.
+> > > > 
+> > > > How about introduce a new command, MIG_CMD_DECOMPRESS_ERR_CHECK,
+> > > > the destination will do strict check if got this command (i.e, new
+> > > > QEMU is running on the source), otherwise, turn the check off.
+> > > 
+> > > Why not we just introduce a compat bit for that?  I mean something
+> > > like: 15c3850325 ("migration: move skip_section_footers",
+> > > 2017-06-28).  Then we turn that check bit off for <=2.12.
+> > > 
+> > > Would that work?
+> > 
+> > I am afraid it can not. :(
+> > 
+> > The compat bit only impacts local behavior, however, in this case, we
+> > need the source QEMU to tell the destination if it supports strict
+> > error check.
 > 
-> I have compared the result of the following program before and
-> after the change:
+> My understanding is that the new compat bit will only take effect when
+> at destination.
 > 
->     cat -> flock64_dump  <<EOF
->     p/d sizeof(struct target_flock64)
->     p/d &((struct target_flock64 *)0)->l_type
->     p/d &((struct target_flock64 *)0)->l_whence
->     p/d &((struct target_flock64 *)0)->l_start
->     p/d &((struct target_flock64 *)0)->l_len
->     p/d &((struct target_flock64 *)0)->l_pid
->     quit
->     EOF
+> I'm not sure I'm thinking that correctly. I'll give some examples.
 > 
->     for file in build/all/*-linux-user/qemu-* ; do
->     echo $file
->     gdb -batch -nx -x flock64_dump $file 2> /dev/null
->     done
+> When we migrate from <2.12 to 2.13, on 2.13 QEMU we'll possibly with
+> (using q35 as example, always) "-M pc-q35-2.12" to make the migration
+> work, so this will let the destination QEMU stop checking
+> decompressing errors.  IMHO that's what we want so it's fine (forward
+> migration).
 > 
-> The sizeof() changes because we remove the QEMU_PACKED.
-> The new size is 32 (except for i386 and m68k) and this is
-> the real size of "struct flock64" on the target architecture.
+> When we migrate from 2.13 to <2.12, on 2.12 it'll always skip checking
+> decompression errors, so it's fine too even if we don't send some
+> compress-errored pages.
 > 
-> The following architectures differ:
-> aarch64_be, aarch64, alpha, armeb, arm, cris, hppa, nios2, or1k,
-> riscv32, riscv64, s390x.
-> 
-> For a subset of these architectures, I have checked with the following
-> program the new structure is the correct one:
-> 
->   #include <stdio.h>
->   #define __USE_LARGEFILE64
->   #include <fcntl.h>
-> 
->   int main(void)
->   {
-> 	  printf("struct flock64 %d\n", sizeof(struct flock64));
-> 	  printf("l_type %d\n", &((struct flock64 *)0)->l_type);
-> 	  printf("l_whence %d\n", &((struct flock64 *)0)->l_whence);
-> 	  printf("l_start %d\n", &((struct flock64 *)0)->l_start);
-> 	  printf("l_len %d\n", &((struct flock64 *)0)->l_len);
-> 	  printf("l_pid %d\n", &((struct flock64 *)0)->l_pid);
->   }
-> 
-> [I have checked aarch64, alpha, arm, s390x]
-> 
-> I have also fixed the alignment value for sh4 (to align llong on 4 bytes)
-> (see c2e3dee6e0 "linux-user: Define target alignment size")
-> 
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->  include/exec/user/abitypes.h |  2 +-
->  linux-user/syscall_defs.h    | 23 ++++++++---------------
->  2 files changed, 9 insertions(+), 16 deletions(-)
-> 
-> diff --git a/include/exec/user/abitypes.h b/include/exec/user/abitypes.h
-> index ba188608c2..743b8bb9ea 100644
-> --- a/include/exec/user/abitypes.h
-> +++ b/include/exec/user/abitypes.h
-> @@ -15,7 +15,7 @@
->  #define ABI_LLONG_ALIGNMENT 2
->  #endif
->  
-> -#if defined(TARGET_I386) && !defined(TARGET_X86_64)
-> +#if (defined(TARGET_I386) && !defined(TARGET_X86_64)) || defined(TARGET_SH4)
->  #define ABI_LLONG_ALIGNMENT 4
->  #endif
->  
-> diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-> index 23f5bccf0e..df3847bc16 100644
-> --- a/linux-user/syscall_defs.h
-> +++ b/linux-user/syscall_defs.h
-> @@ -2649,28 +2649,21 @@ struct target_flock {
->  };
->  
->  struct target_flock64 {
-> -    short  l_type;
-> -    short  l_whence;
-> -#if defined(TARGET_PPC) || defined(TARGET_X86_64) || defined(TARGET_MIPS) \
-> -    || defined(TARGET_SPARC) || defined(TARGET_HPPA) \
-> -    || defined(TARGET_MICROBLAZE) || defined(TARGET_TILEGX) \
-> -    || defined(TARGET_XTENSA)
-> -    int __pad;
-> -#endif
-> +    abi_short l_type;
-> +    abi_short l_whence;
->      abi_llong l_start;
->      abi_llong l_len;
-> -    int  l_pid;
-> -} QEMU_PACKED;
-> +    abi_int   l_pid;
-> +};
->  
->  #ifdef TARGET_ARM
->  struct target_eabi_flock64 {
-> -    short  l_type;
-> -    short  l_whence;
-> -    int __pad;
-> +    abi_short l_type;
-> +    abi_short l_whence;
->      abi_llong l_start;
->      abi_llong l_len;
-> -    int  l_pid;
-> -} QEMU_PACKED;
-> +    abi_int   l_pid;
-> +};
->  #endif
->  
->  struct target_f_owner_ex {
-> 
+> Then, would this mean that the compat bit could work too just like
+> this patch?  AFAIU the compat bit idea is very similar to current
+> patch, however we don't really need a new parameter to make things
+> complicated, we just let old QEMUs behave differently and
+> automatically, then user won't need to worry about manually specify
+> that parameter.
 
-I think my change breaks the ARM OABI: in QEMU, OABI uses target_flock64
-and in  kernel it uses oabi_flock64 which uses "__attribute__
-((packed,aligned(4)));".
-While in kernel EABI uses the standard flock64 structure and in QEMU
-arm_eabi_flock64...
+I think you're saying just to wire it to the machine type for receive;
+that would work and would be fairly simple, although wouldn't provide
+the protection when going from new->new using an old machine type.
 
-Thanks,
-Laurent
+Dave
+
+> Thanks,
+> 
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
