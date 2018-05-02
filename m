@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fDvcI-0006zR-2s
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 13:32:35 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fDvcr-0007G4-6x
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 13:33:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fDvcD-0005Ca-4V
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 13:32:34 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59524 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fDvcC-0005CJ-VL
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 13:32:29 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 04057406C78D
-	for <qemu-devel@nongnu.org>; Wed,  2 May 2018 17:32:25 +0000 (UTC)
-Date: Wed, 2 May 2018 18:32:16 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180502173215.GK2679@work-vm>
-References: <20180425112723.1111-1-quintela@redhat.com>
-	<20180425112723.1111-10-quintela@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1fDvcm-0005Sy-AV
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 13:33:09 -0400
+Received: from mail-pg0-x22e.google.com ([2607:f8b0:400e:c05::22e]:40100)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fDvcm-0005ST-2i
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 13:33:04 -0400
+Received: by mail-pg0-x22e.google.com with SMTP id l2-v6so11122764pgc.7
+	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 10:33:03 -0700 (PDT)
+References: <20180502171853.25332-1-laurent@vivier.eu>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <96dc17ed-6e44-032d-0b28-f9ef855f5e73@linaro.org>
+Date: Wed, 2 May 2018 10:33:00 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180425112723.1111-10-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v12 09/21] migration: Define
- MultifdRecvParams sooner
+In-Reply-To: <20180502171853.25332-1-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] linux-user: remove useless padding in
+ flock64 structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,95 +31,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Once there, we don't need the struct names anywhere, just the
-> typedefs.  And now also document all fields.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+On 05/02/2018 10:18 AM, Laurent Vivier wrote:
+> +#if defined(TARGET_ARM) && defined(TARGET_ABI32)
+> +struct target_oabi_flock64 {
+> +    abi_short l_type;
+> +    abi_short l_whence;
+>      abi_llong l_start;
+>      abi_llong l_len;
+> -    int  l_pid;
+> +    abi_int   l_pid;
+>  } QEMU_PACKED;
+>  #endif
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Is it possible to move this to linux-user/arm/target_structs.h?
 
-> ---
->  migration/ram.c | 46 +++++++++++++++++++++++++++++++---------------
->  1 file changed, 31 insertions(+), 15 deletions(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 1aab392d8f..ffefa73099 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -412,17 +412,45 @@ typedef struct {
->      uint8_t id;
->  } __attribute__((packed)) MultiFDInit_t;
->  
-> -struct MultiFDSendParams {
-> +typedef struct {
-> +    /* this fields are not changed once the thread is created */
-> +    /* channel number */
->      uint8_t id;
-> +    /* channel thread name */
->      char *name;
-> +    /* channel thread id */
->      QemuThread thread;
-> +    /* communication channel */
->      QIOChannel *c;
-> +    /* sem where to wait for more work */
->      QemuSemaphore sem;
-> +    /* this mutex protects the following parameters */
->      QemuMutex mutex;
-> +    /* is this channel thread running */
->      bool running;
-> +    /* should this thread finish */
->      bool quit;
-> -};
-> -typedef struct MultiFDSendParams MultiFDSendParams;
-> +}  MultiFDSendParams;
-> +
-> +typedef struct {
-> +    /* this fields are not changed once the thread is created */
-> +    /* channel number */
-> +    uint8_t id;
-> +    /* channel thread name */
-> +    char *name;
-> +    /* channel thread id */
-> +    QemuThread thread;
-> +    /* communication channel */
-> +    QIOChannel *c;
-> +    /* sem where to wait for more work */
-> +    QemuSemaphore sem;
-> +    /* this mutex protects the following parameters */
-> +    QemuMutex mutex;
-> +    /* is this channel thread running */
-> +    bool running;
-> +    /* should this thread finish */
-> +    bool quit;
-> +} MultiFDRecvParams;
->  
->  static int multifd_send_initial_packet(MultiFDSendParams *p, Error **errp)
->  {
-> @@ -619,18 +647,6 @@ int multifd_save_setup(void)
->      return 0;
->  }
->  
-> -struct MultiFDRecvParams {
-> -    uint8_t id;
-> -    char *name;
-> -    QemuThread thread;
-> -    QIOChannel *c;
-> -    QemuSemaphore sem;
-> -    QemuMutex mutex;
-> -    bool running;
-> -    bool quit;
-> -};
-> -typedef struct MultiFDRecvParams MultiFDRecvParams;
-> -
->  struct {
->      MultiFDRecvParams *params;
->      /* number of created threads */
-> -- 
-> 2.17.0
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Otherwise it all looks ok.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
