@@ -1,39 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <muriloo@linux.ibm.com>) id 1fDyxi-0000w1-SH
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 17:06:55 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fDzMa-0007Ur-Qk
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 17:32:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <muriloo@linux.ibm.com>) id 1fDyxf-0008V4-B4
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 17:06:54 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37470)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <muriloo@linux.ibm.com>)
-	id 1fDyxe-0008Tm-W9
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 17:06:51 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w42L5wWC126368
-	for <qemu-devel@nongnu.org>; Wed, 2 May 2018 17:06:48 -0400
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2hqmcy19r7-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 17:06:47 -0400
-Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <muriloo@linux.ibm.com>;
-	Wed, 2 May 2018 17:06:46 -0400
-Date: Wed, 2 May 2018 18:06:38 -0300
-From: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
-References: <20180419062917.31486-1-david@gibson.dropbear.id.au>
-	<20180419062917.31486-2-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180419062917.31486-2-david@gibson.dropbear.id.au>
-Message-Id: <20180502210637.GA27693@kermit-br-ibm-com>
-Subject: Re: [Qemu-devel] [RFC for-2.13 1/7] spapr: Maximum (HPT) pagesize
- property
+	(envelope-from <mreitz@redhat.com>) id 1fDzMZ-0000Mo-MG
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 17:32:36 -0400
+From: Max Reitz <mreitz@redhat.com>
+Date: Wed,  2 May 2018 23:32:15 +0200
+Message-Id: <20180502213219.7842-4-mreitz@redhat.com>
+In-Reply-To: <20180502213219.7842-1-mreitz@redhat.com>
+References: <20180502213219.7842-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [RFC 3/7] block: Make use of qdict_set_default_bool()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,158 +19,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: groug@kaod.org, abologna@redhat.com, aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Thu, Apr 19, 2018 at 04:29:11PM +1000, David Gibson wrote:
-> The way the POWER Hash Page Table (HPT) MMU is virtualized by KVM HV means
-> that every page that the guest puts in the pagetables must be truly
-> physically contiguous, not just GPA-contiguous.  In effect this means that
-> an HPT guest can't use any pagesizes greater than the host page size used
-> to back its memory.
-> 
-> At present we handle this by changing what we advertise to the guest based
-> on the backing pagesizes.  This is pretty bad, because it means the guest
-> sees a different environment depending on what should be host configuration
-> details.
-> 
-> As a start on fixing this, we add a new capability parameter to the pseries
-> machine type which gives the maximum allowed pagesizes for an HPT guest (as
-> a shift).  For now we just create and validate the parameter without making
-> it do anything.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/ppc/spapr.c         |  1 +
->  hw/ppc/spapr_caps.c    | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  include/hw/ppc/spapr.h |  4 +++-
->  3 files changed, 57 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index bdf72e1e89..36e41aff71 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -3876,6 +3876,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
->      smc->default_caps.caps[SPAPR_CAP_CFPC] = SPAPR_CAP_BROKEN;
->      smc->default_caps.caps[SPAPR_CAP_SBBC] = SPAPR_CAP_BROKEN;
->      smc->default_caps.caps[SPAPR_CAP_IBS] = SPAPR_CAP_BROKEN;
-> +    smc->default_caps.caps[SPAPR_CAP_HPT_MPS] = 16; /* Allow 64kiB pages */
->      spapr_caps_add_properties(smc, &error_abort);
->  }
->  
-> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> index 531e145114..cbc41f5b20 100644
-> --- a/hw/ppc/spapr_caps.c
-> +++ b/hw/ppc/spapr_caps.c
-> @@ -27,6 +27,7 @@
->  #include "qapi/visitor.h"
->  #include "sysemu/hw_accel.h"
->  #include "target/ppc/cpu.h"
-> +#include "target/ppc/mmu-hash64.h"
->  #include "cpu-models.h"
->  #include "kvm_ppc.h"
->  
-> @@ -142,6 +143,39 @@ out:
->      g_free(val);
->  }
->  
-> +static void spapr_cap_get_int(Object *obj, Visitor *v, const char *name,
-> +                               void *opaque, Error **errp)
-> +{
-> +    sPAPRCapabilityInfo *cap = opaque;
-> +    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
-> +    int64_t value = spapr_get_cap(spapr, cap->index);
-> +
-> +    visit_type_int(v, name, &value, errp);
-> +}
-> +
-> +static void spapr_cap_set_int(Object *obj, Visitor *v, const char *name,
-> +                               void *opaque, Error **errp)
-> +{
-> +    sPAPRCapabilityInfo *cap = opaque;
-> +    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
-> +    int64_t value;
-> +    Error *local_err = NULL;
-> +
-> +    visit_type_int(v, name, &value, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +
-> +    if ((value < 0) || (value > 255)) {
-> +        error_setg(errp, "Value for %s out of range (0..255)", name);
-> +        return;
-> +    }
-> +
-> +    spapr->cmd_line_caps[cap->index] = true;
-> +    spapr->eff.caps[cap->index] = value;
-> +}
-> +
+When dealing with blockdev option QDicts that contain purely string
+values, it is not really advisable to break that by adding non-string
+values.  But it does make sense to use the correct type for QDicts that
+may contain non-string values already, so do that.
 
-Hi, David.
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ block.c       | 12 ++++++------
+ block/vvfat.c |  4 ++--
+ blockdev.c    | 23 ++++++++++++++++-------
+ 3 files changed, 24 insertions(+), 15 deletions(-)
 
-Do you think uint8_t would fit better for spapr_[gs]et_int() functions?
-
-Perhaps renaming them to spapr_[gs]set_int8() and calling
-visit_type_int8() instead.
-
-Cheers
-Murilo
-
->  static void cap_htm_apply(sPAPRMachineState *spapr, uint8_t val, Error **errp)
->  {
->      if (!val) {
-> @@ -265,6 +299,16 @@ static void cap_safe_indirect_branch_apply(sPAPRMachineState *spapr,
->  
->  #define VALUE_DESC_TRISTATE     " (broken, workaround, fixed)"
->  
-> +static void cap_hpt_mps_apply(sPAPRMachineState *spapr,
-> +                              uint8_t val, Error **errp)
-> +{
-> +    if (val < 12) {
-> +        error_setg(errp, "Require at least 4kiB pages (cap-hpt-mps >= 12)");
-> +    } else if (val < 16) {
-> +        warn_report("Many PAPR guests require 64kiB pages (cap-hpt-mps >= 16)");
-> +    }
-> +}
-> +
->  sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
->      [SPAPR_CAP_HTM] = {
->          .name = "htm",
-> @@ -324,6 +368,15 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
->          .possible = &cap_ibs_possible,
->          .apply = cap_safe_indirect_branch_apply,
->      },
-> +    [SPAPR_CAP_HPT_MPS] = {
-> +        .name = "hpt-mps",
-> +        .description = "Maximum page shift for Hash Page Table guests (12, 16, 24, 34)",
-> +        .index = SPAPR_CAP_HPT_MPS,
-> +        .get = spapr_cap_get_int,
-> +        .set = spapr_cap_set_int,
-> +        .type = "int",
-> +        .apply = cap_hpt_mps_apply,
-> +    },
->  };
->  
->  static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index d60b7c6d7a..60ed3a5657 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -66,8 +66,10 @@ typedef enum {
->  #define SPAPR_CAP_SBBC                  0x04
->  /* Indirect Branch Serialisation */
->  #define SPAPR_CAP_IBS                   0x05
-> +/* HPT Maximum Page Shift */
-> +#define SPAPR_CAP_HPT_MPS               0x06
->  /* Num Caps */
-> -#define SPAPR_CAP_NUM                   (SPAPR_CAP_IBS + 1)
-> +#define SPAPR_CAP_NUM                   (SPAPR_CAP_HPT_MPS + 1)
->  
->  /*
->   * Capability Values
-> -- 
-> 2.14.3
-> 
-> 
+diff --git a/block.c b/block.c
+index a2caadf0a0..8a8d9c02a9 100644
+--- a/block.c
++++ b/block.c
+@@ -856,8 +856,8 @@ static void bdrv_temp_snapshot_options(int *child_flags, QDict *child_options,
+     *child_flags = (parent_flags & ~BDRV_O_SNAPSHOT) | BDRV_O_TEMPORARY;
+ 
+     /* For temporary files, unconditional cache=unsafe is fine */
+-    qdict_set_default_str(child_options, BDRV_OPT_CACHE_DIRECT, "off");
+-    qdict_set_default_str(child_options, BDRV_OPT_CACHE_NO_FLUSH, "on");
++    qdict_set_default_bool(child_options, BDRV_OPT_CACHE_DIRECT, false);
++    qdict_set_default_bool(child_options, BDRV_OPT_CACHE_NO_FLUSH, true);
+ 
+     /* Copy the read-only option from the parent */
+     qdict_copy_default(child_options, parent_options, BDRV_OPT_READ_ONLY);
+@@ -1005,7 +1005,7 @@ static void bdrv_backing_options(int *child_flags, QDict *child_options,
+     qdict_copy_default(child_options, parent_options, BDRV_OPT_FORCE_SHARE);
+ 
+     /* backing files always opened read-only */
+-    qdict_set_default_str(child_options, BDRV_OPT_READ_ONLY, "on");
++    qdict_set_default_bool(child_options, BDRV_OPT_READ_ONLY, true);
+     flags &= ~BDRV_O_COPY_ON_READ;
+ 
+     /* snapshot=on is handled on the top layer */
+@@ -2440,9 +2440,9 @@ BlockDriverState *bdrv_open_blockdev_ref(BlockdevRef *ref, Error **errp)
+         /* bdrv_open_inherit() defaults to the values in bdrv_flags (for
+          * compatibility with other callers) rather than what we want as the
+          * real defaults. Apply the defaults here instead. */
+-        qdict_set_default_str(qdict, BDRV_OPT_CACHE_DIRECT, "off");
+-        qdict_set_default_str(qdict, BDRV_OPT_CACHE_NO_FLUSH, "off");
+-        qdict_set_default_str(qdict, BDRV_OPT_READ_ONLY, "off");
++        qdict_set_default_bool(qdict, BDRV_OPT_CACHE_DIRECT, false);
++        qdict_set_default_bool(qdict, BDRV_OPT_CACHE_NO_FLUSH, false);
++        qdict_set_default_bool(qdict, BDRV_OPT_READ_ONLY, false);
+     }
+ 
+     bs = bdrv_open_inherit(NULL, reference, qdict, 0, NULL, NULL, errp);
+diff --git a/block/vvfat.c b/block/vvfat.c
+index 1569783b0f..177b179ed2 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -3128,8 +3128,8 @@ static BlockDriver vvfat_write_target = {
+ static void vvfat_qcow_options(int *child_flags, QDict *child_options,
+                                int parent_flags, QDict *parent_options)
+ {
+-    qdict_set_default_str(child_options, BDRV_OPT_READ_ONLY, "off");
+-    qdict_set_default_str(child_options, BDRV_OPT_CACHE_NO_FLUSH, "on");
++    qdict_set_default_bool(child_options, BDRV_OPT_READ_ONLY, false);
++    qdict_set_default_bool(child_options, BDRV_OPT_CACHE_NO_FLUSH, true);
+ }
+ 
+ static const BdrvChildRole child_vvfat_qcow = {
+diff --git a/blockdev.c b/blockdev.c
+index 76f811c415..9d4955f23e 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -645,17 +645,26 @@ err_no_opts:
+     return NULL;
+ }
+ 
+-/* Takes the ownership of bs_opts */
+-static BlockDriverState *bds_tree_init(QDict *bs_opts, Error **errp)
++/* Takes the ownership of bs_opts.
++ * If @string_opts is true, @bs_opts contains purely string values.
++ * Otherwise, all values are correctly typed. */
++static BlockDriverState *bds_tree_init(QDict *bs_opts, bool string_opts,
++                                       Error **errp)
+ {
+     int bdrv_flags = 0;
+ 
+     /* bdrv_open() defaults to the values in bdrv_flags (for compatibility
+      * with other callers) rather than what we want as the real defaults.
+      * Apply the defaults here instead. */
+-    qdict_set_default_str(bs_opts, BDRV_OPT_CACHE_DIRECT, "off");
+-    qdict_set_default_str(bs_opts, BDRV_OPT_CACHE_NO_FLUSH, "off");
+-    qdict_set_default_str(bs_opts, BDRV_OPT_READ_ONLY, "off");
++    if (string_opts) {
++        qdict_set_default_str(bs_opts, BDRV_OPT_CACHE_DIRECT, "off");
++        qdict_set_default_str(bs_opts, BDRV_OPT_CACHE_NO_FLUSH, "off");
++        qdict_set_default_str(bs_opts, BDRV_OPT_READ_ONLY, "off");
++    } else {
++        qdict_set_default_bool(bs_opts, BDRV_OPT_CACHE_DIRECT, false);
++        qdict_set_default_bool(bs_opts, BDRV_OPT_CACHE_NO_FLUSH, false);
++        qdict_set_default_bool(bs_opts, BDRV_OPT_READ_ONLY, false);
++    }
+ 
+     if (runstate_check(RUN_STATE_INMIGRATE)) {
+         bdrv_flags |= BDRV_O_INACTIVE;
+@@ -4027,7 +4036,7 @@ void hmp_drive_add_node(Monitor *mon, const char *optstr)
+         goto out;
+     }
+ 
+-    BlockDriverState *bs = bds_tree_init(qdict, &local_err);
++    BlockDriverState *bs = bds_tree_init(qdict, true, &local_err);
+     if (!bs) {
+         error_report_err(local_err);
+         goto out;
+@@ -4063,7 +4072,7 @@ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
+         goto fail;
+     }
+ 
+-    bs = bds_tree_init(qdict, errp);
++    bs = bds_tree_init(qdict, false, errp);
+     if (!bs) {
+         goto fail;
+     }
+-- 
+2.14.3
