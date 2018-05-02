@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fDvmY-0003r4-Mq
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 13:43:11 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fDvrF-00050I-91
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 13:48:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fDvmU-00029T-PQ
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 13:43:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51102)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1fDvmU-00028i-I3
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 13:43:06 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A0F333003A38
-	for <qemu-devel@nongnu.org>; Wed,  2 May 2018 17:43:03 +0000 (UTC)
-Date: Wed, 2 May 2018 11:42:57 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180502114257.54564d60@w520.home>
-In-Reply-To: <CAMwc25p+3ugAHz14shv_Dyo8LmJzf=dNJXH53RMyS4kAD0qvag@mail.gmail.com>
-References: <20180501161509.28517.344.stgit@gimli.home>
-	<CAMwc25p+3ugAHz14shv_Dyo8LmJzf=dNJXH53RMyS4kAD0qvag@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/3] Update linux-headers to v4.17-rc3
+	(envelope-from <richard.henderson@linaro.org>) id 1fDvrB-0003pr-CY
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 13:48:01 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:46082)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fDvrB-0003pJ-5A
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 13:47:57 -0400
+Received: by mail-pf0-x244.google.com with SMTP id p12so12389906pff.13
+	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 10:47:56 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Wed,  2 May 2018 10:47:48 -0700
+Message-Id: <20180502174753.16133-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PULL 0/5] TCG queued patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,35 +24,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Airlie <airlied@redhat.com>
-Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, mst@redhat.com
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On Wed, 2 May 2018 06:25:16 +1000
-David Airlie <airlied@redhat.com> wrote:
+The first tcg pull for 2.13/3.0.  Two of these are candidates
+for cherry-picking into stable.
 
-> On Wed, May 2, 2018 at 2:25 AM, Alex Williamson <alex.williamson@redhat.com>
-> wrote:
-> 
-> > This series is based on Michael's series moving kvm_para.h out to
-> > standard headers, which resolves the conflict in definitions of
-> > KVM_HINTS_DEDICATED between QEMU and kernel.
-> >
-> > Additionally, this series moves the definition of
-> > VIRTIO_GPU_CAPSET_VIRGL2 into QEMU code as the definition does not
-> > exist in the upstream header and it seems unreasonable to expect
-> > anyone wanting to update headers should manually resolve this
-> > conflict.
-> >  
-> 
-> I thought the headers went qemu->linux which is why I never pushed this to
-> Linux.
-> 
-> Happy to have a patch in the kernel that adds this.
 
-Yea, it's the other direction, the file in QEMU is updated from the
-uapi header in the kernel.  I'd submit a kernel patch, but I have no
-idea what VIRTIO_GPU_CAPSET_VIRGL2 signifies, so it's probably best
-that it be submitted by someone who can write a meaningful commitlog.
-Thanks,
+r~
 
-Alex
+
+The following changes since commit 26bd8d98c4b3284a4c6fe3b67c98b1edd00e9beb:
+
+  Merge remote-tracking branch 'remotes/vivier/tags/m68k-for-2.13-pull-request' into staging (2018-05-01 15:26:06 +0100)
+
+are available in the Git repository at:
+
+  git://github.com/rth7680/qemu.git tags/pull-tcg-20180502
+
+for you to fetch changes up to 6001f7729e12dd1d810291e4cbf83cee8e07441d:
+
+  tcg: workaround branch instruction overflow in tcg_out_qemu_ld/st (2018-05-01 11:56:55 -0700)
+
+----------------------------------------------------------------
+Queued TCG patches
+
+----------------------------------------------------------------
+Henry Wertz (1):
+      tcg/arm: Fix memory barrier encoding
+
+Laurent Vivier (1):
+      tcg: workaround branch instruction overflow in tcg_out_qemu_ld/st
+
+Richard Henderson (3):
+      tcg: Document INDEX_mul[us]h_*
+      tcg: Allow wider vectors for cmp and mul
+      tcg: Improve TCGv_ptr support
+
+ tcg/tcg-op.h             | 91 +++++++++++++++++++++++++++++++++++++-----------
+ tcg/tcg.h                | 88 +++++++++++++++++++++++++++++-----------------
+ target/hppa/translate.c  | 16 ++-------
+ tcg/arm/tcg-target.inc.c |  4 +--
+ tcg/tcg-ldst.inc.c       |  8 ++---
+ tcg/tcg-op-vec.c         |  8 ++---
+ tcg/tcg.c                | 33 ++----------------
+ tcg/README               |  8 +++++
+ 8 files changed, 150 insertions(+), 106 deletions(-)
