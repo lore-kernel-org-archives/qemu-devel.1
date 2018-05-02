@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1fDoPX-0006Pq-5K
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:50:55 -0400
+	(envelope-from <peterx@redhat.com>) id 1fDoRq-0007wd-SP
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:53:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1fDoPS-0001WJ-Ck
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:50:55 -0400
-Received: from mail.uni-paderborn.de ([131.234.142.9]:37006)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
-	id 1fDoPS-0001Vl-0s
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:50:50 -0400
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-References: <20180501142222.19154-1-kbastian@mail.uni-paderborn.de>
-	<20180501142222.19154-3-kbastian@mail.uni-paderborn.de>
-	<04b2ae36-e7ec-3b78-5443-09fe25d2ebb3@amsat.org>
-	<d620b0e6-36d4-722d-d049-46957f02c797@mail.uni-paderborn.de>
-Message-ID: <dfe02f14-c8a7-a328-0bd9-ae623fffeacc@mail.uni-paderborn.de>
-Date: Wed, 2 May 2018 11:50:32 +0200
+	(envelope-from <peterx@redhat.com>) id 1fDoRn-00039G-PZ
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:53:18 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42100 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fDoRn-00038t-JK
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 05:53:15 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 23069EFF31
+	for <qemu-devel@nongnu.org>; Wed,  2 May 2018 09:53:15 +0000 (UTC)
+Date: Wed, 2 May 2018 17:53:08 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180502095308.GA4005@xz-mi>
+References: <20180502074421.3762-1-peterx@redhat.com>
+	<20180502074421.3762-3-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <d620b0e6-36d4-722d-d049-46957f02c797@mail.uni-paderborn.de>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 02/12] tests/tcg/tricore: Add build
- infrastructure
+Content-Disposition: inline
+In-Reply-To: <20180502074421.3762-3-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/4] monitor: protect mon->fds with
+ mon_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,26 +34,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: Florian Artmeier <florian.artmeier@efs-auto.de>, David Brenken <david.brenken@efs-auto.de>, qemu-devel@nongnu.org, Georg Hofstetter <georg.hofstetter@efs-auto.de>
+To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 05/02/2018 11:26 AM, Bastian Koppelmann wrote:
-> Hi Phil,
+On Wed, May 02, 2018 at 03:44:19PM +0800, Peter Xu wrote:
+> mon->fds were protected by BQL.  Now protect it by mon_lock so that it
+> can even be used in monitor iothread.
 > 
-[...]
->> I then get:
->>
->> tricore-softmmu/qemu-system-tricore -M tricore_testboard -nographic
->> -kests/tcg/tricore/test_muls.tst -d in_asm
->> QEMU 2.12.50 monitor - type 'help' for more information
->> (qemu) QEMU 2.12.50 monitor - type 'help' for more information
->> (qemu) IN:
->> 0x80000000:  qemu-system-tricore: function cpu_get_phys_page_attrs_debug
->> not implemented, aborting
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  monitor.c | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
 > 
-> This is odd. I'll try to reproduce it.
+> diff --git a/monitor.c b/monitor.c
+> index 48882d28ae..176d3ecc04 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -213,7 +213,6 @@ struct Monitor {
+>      BlockCompletionFunc *password_completion_cb;
+>      void *password_opaque;
+>      mon_cmd_t *cmd_table;
+> -    QLIST_HEAD(,mon_fd_t) fds;
+>      QTAILQ_ENTRY(Monitor) entry;
+>  
+>      /*
+> @@ -225,6 +224,7 @@ struct Monitor {
+>      /*
+>       * Fields that are protected by the per-monitor lock.
+>       */
+> +    QLIST_HEAD(, mon_fd_t) fds;
+>      QString *outbuf;
+>      guint out_watch;
+>      /* Read under either BQL or mon_lock, written with BQL+mon_lock.  */
+> @@ -2207,6 +2207,7 @@ void qmp_getfd(const char *fdname, Error **errp)
+>          return;
+>      }
+>  
+> +    qemu_mutex_lock(&cur_mon->mon_lock);
+>      QLIST_FOREACH(monfd, &cur_mon->fds, next) {
+>          if (strcmp(monfd->name, fdname) != 0) {
+>              continue;
+> @@ -2214,6 +2215,7 @@ void qmp_getfd(const char *fdname, Error **errp)
+>  
+>          close(monfd->fd);
+>          monfd->fd = fd;
+> +        qemu_mutex_unlock(&cur_mon->mon_lock);
+>          return;
+>      }
+>  
+> @@ -2222,12 +2224,14 @@ void qmp_getfd(const char *fdname, Error **errp)
+>      monfd->fd = fd;
+>  
+>      QLIST_INSERT_HEAD(&cur_mon->fds, monfd, next);
+> +    qemu_mutex_unlock(&cur_mon->mon_lock);
+>  }
+>  
+>  void qmp_closefd(const char *fdname, Error **errp)
+>  {
+>      mon_fd_t *monfd;
+>  
+> +    qemu_mutex_lock(&cur_mon->mon_lock);
+>      QLIST_FOREACH(monfd, &cur_mon->fds, next) {
+>          if (strcmp(monfd->name, fdname) != 0) {
+>              continue;
+> @@ -2237,9 +2241,11 @@ void qmp_closefd(const char *fdname, Error **errp)
+>          close(monfd->fd);
+>          g_free(monfd->name);
+>          g_free(monfd);
+> +        qemu_mutex_unlock(&cur_mon->mon_lock);
+>          return;
+>      }
+>  
+> +    qemu_mutex_unlock(&cur_mon->mon_lock);
+>      error_setg(errp, QERR_FD_NOT_FOUND, fdname);
+>  }
+>  
+> @@ -2247,6 +2253,7 @@ int monitor_get_fd(Monitor *mon, const char *fdname, Error **errp)
+>  {
+>      mon_fd_t *monfd;
+>  
+> +    qemu_mutex_lock(&cur_mon->mon_lock);
 
-It looks like this is due to -d in_asm. I'll sent fix this in a different patchset.
+No; this should be mon->mon_lock but not cur_mon's.  Actually all
+three places in the function.
 
-Cheers,
-Bastian
+I'll repost.  Sorry!
+
+>      QLIST_FOREACH(monfd, &mon->fds, next) {
+>          int fd;
+>  
+> @@ -2260,10 +2267,12 @@ int monitor_get_fd(Monitor *mon, const char *fdname, Error **errp)
+>          QLIST_REMOVE(monfd, next);
+>          g_free(monfd->name);
+>          g_free(monfd);
+> +        qemu_mutex_unlock(&cur_mon->mon_lock);
+>  
+>          return fd;
+>      }
+>  
+> +    qemu_mutex_unlock(&cur_mon->mon_lock);
+>      error_setg(errp, "File descriptor named '%s' has not been found", fdname);
+>      return -1;
+>  }
+> -- 
+> 2.14.3
+> 
+
+-- 
+Peter Xu
