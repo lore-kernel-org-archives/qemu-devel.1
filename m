@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fDwyn-0005kq-Tj
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 14:59:54 -0400
+	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1fDxB9-0000NZ-8S
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 15:12:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fDwyl-0004ae-Cx
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 14:59:54 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33246 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fDwyl-0004aU-8U
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 14:59:51 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C1A834023112
-	for <qemu-devel@nongnu.org>; Wed,  2 May 2018 18:59:50 +0000 (UTC)
-Date: Wed, 2 May 2018 19:59:43 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180502185943.GO2679@work-vm>
-References: <20180425112723.1111-1-quintela@redhat.com>
-	<20180425112723.1111-14-quintela@redhat.com>
+	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1fDxB5-0001lB-08
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 15:12:39 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:46176)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1fDxB4-0001jl-Je
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 15:12:34 -0400
+In-Reply-To: <0P8400M5O5RWWW30@mr11p00im-asmtp003.me.com>
+References: <0P8400M5O5RWWW30@mr11p00im-asmtp003.me.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180425112723.1111-14-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v12 13/21] migration: Calculate transferred
- ram correctly
+From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Date: Wed, 02 May 2018 22:12:30 +0300
+Message-ID: <8b1f4516-b85e-4d6f-af45-98136fb3b481@ispras.ru>
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v3 00/30] replay additions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,61 +27,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Dominique Fuchs <d.fuchs91@icloud.com>
+Cc: dovgaluk@ispras.ru, QEMU Developers <qemu-devel@nongnu.org>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> On multifd we send data from more places that main channel.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  migration/migration.c | 11 +++++++++--
->  1 file changed, 9 insertions(+), 2 deletions(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 9b510a809a..75d30661e9 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -2246,12 +2246,19 @@ static void migration_update_counters(MigrationState *s,
->  {
->      uint64_t transferred, time_spent;
->      double bandwidth;
-> +    uint64_t now;
->  
->      if (current_time < s->iteration_start_time + BUFFER_DELAY) {
->          return;
->      }
->  
-> -    transferred = qemu_ftell(s->to_dst_file) - s->iteration_initial_bytes;
-> +    if (migrate_use_multifd()) {
-> +        now = ram_counters.normal * qemu_target_page_size()
-> +            + qemu_ftell(s->to_dst_file);
+I used --disable-capstone for building under Windows=2E
 
-OK, can I just confirm, the 'multifd packets' go over the main fd, and
-just the pags are going over the other fd's?  In which case this is
-right; but if the headers are going over the other fd's as well then
-this is wrong.
+=E2=81=A3=D0=9E=D1=
+=82=D0=BF=D1=80=D0=B0=D0=B2=D0=BB=D0=B5=D0=BD=D0=BE =D1=81 =D0=BF=D0=BE=D0=
+=BC=D0=BE=D1=89=D1=8C=D1=8E BlueMail =E2=80=8B
 
-Dave
-
-> +    } else {
-> +        now = qemu_ftell(s->to_dst_file);
-> +    }
-> +    transferred = now - s->iteration_initial_bytes;
->      time_spent = current_time - s->iteration_start_time;
->      bandwidth = (double)transferred / time_spent;
->      s->threshold_size = bandwidth * s->parameters.downtime_limit;
-> @@ -2271,7 +2278,7 @@ static void migration_update_counters(MigrationState *s,
->      qemu_file_reset_rate_limit(s->to_dst_file);
->  
->      s->iteration_start_time = current_time;
-> -    s->iteration_initial_bytes = qemu_ftell(s->to_dst_file);
-> +    s->iteration_initial_bytes = now;
->  
->      trace_migrate_transferred(transferred, time_spent,
->                                bandwidth, s->threshold_size);
-> -- 
-> 2.17.0
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+=D0=9D=D0=B0 2 =D0=9C=D0=B0=
+=D0=B9 2018 =D0=B3=2E, 21:24, =D0=B2 21:24, Dominique Fuchs <d=2Efuchs91@ic=
+loud=2Ecom> =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BB:=D0=BF>C:\msys64\min=
+gw64\bin\ar=2Eexe: creating libfdt/libfdt=2Ea
+>make[1]: *** No rule to make=
+ target
+>=E2=80=9E/home/Dominique/qemu/capstone/capstone=2Elib=E2=80=9C=2E =
+ Stop=2E
+>make: *** [Makefile:503: subdir-capstone] Error 2
+>
+>I just stumb=
+led across the same error while building qemu 2=2E12 on
+>MSYS2/mingw64, whi=
+ch led me to this conversation from january=2E
+>According to this list, the=
+re was no final solution to this, as this
+>still happens in build chain for=
+ 2=2E12 and no further comments were
+>made=2E Did I miss something elsewher=
+e?
+>
+>Dominique Fuchs
