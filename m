@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fDwbV-0003xp-Gz
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 14:35:50 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fDwba-0003zY-0q
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 14:35:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fDwbR-0000HR-GU
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 14:35:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60768 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fDwbR-0000Gw-AC
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 14:35:45 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A2B05402291E
-	for <qemu-devel@nongnu.org>; Wed,  2 May 2018 18:35:41 +0000 (UTC)
-Date: Wed, 2 May 2018 19:35:34 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180502183533.GN2679@work-vm>
-References: <20180425112723.1111-1-quintela@redhat.com>
-	<20180425112723.1111-13-quintela@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1fDwbZ-0000KT-38
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 14:35:54 -0400
+References: <20180421165423.30759-1-mreitz@redhat.com>
+	<20180421165423.30759-8-mreitz@redhat.com>
+	<563e34b7-2b97-da1a-9e38-784608197b89@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <c5e4a284-2d3e-4a89-6010-be0875fe8ce1@redhat.com>
+Date: Wed, 2 May 2018 20:35:46 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180425112723.1111-13-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v12 12/21] migration: Add multifd traces
- for start/end thread
+In-Reply-To: <563e34b7-2b97-da1a-9e38-784608197b89@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="xaxxu7YwBN1aURXZrwuk8RFCEwdOyIwrN"
+Subject: Re: [Qemu-devel] [PATCH 7/7] iotests: Rework 113
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,128 +25,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> We want to know how many pages/packets each channel has sent.  Add
-> counters for those.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  migration/ram.c        | 20 ++++++++++++++++++++
->  migration/trace-events |  4 ++++
->  2 files changed, 24 insertions(+)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 804c83ed89..0f1340b4e3 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -465,6 +465,10 @@ typedef struct {
->      uint32_t flags;
->      /* global number of generated multifd packets */
->      uint32_t seq;
-> +    /* packets sent through this channel */
-> +    uint32_t num_packets;
-> +    /* pages sent through this channel */
-> +    uint32_t num_pages;
->  }  MultiFDSendParams;
->  
->  typedef struct {
-> @@ -495,6 +499,10 @@ typedef struct {
->      uint32_t flags;
->      /* global number of generated multifd packets */
->      uint32_t seq;
-> +    /* packets sent through this channel */
-> +    uint32_t num_packets;
-> +    /* pages sent through this channel */
-> +    uint32_t num_pages;
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--xaxxu7YwBN1aURXZrwuk8RFCEwdOyIwrN
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <c5e4a284-2d3e-4a89-6010-be0875fe8ce1@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 7/7] iotests: Rework 113
+References: <20180421165423.30759-1-mreitz@redhat.com>
+ <20180421165423.30759-8-mreitz@redhat.com>
+ <563e34b7-2b97-da1a-9e38-784608197b89@redhat.com>
+In-Reply-To: <563e34b7-2b97-da1a-9e38-784608197b89@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Doesn't the comment for 'mutex' say 'protects the following parameters'
-(added in 09/21) ?  In which case....
+On 2018-05-02 20:24, Eric Blake wrote:
+> On 04/21/2018 11:54 AM, Max Reitz wrote:
+>> This test case has been broken since 398e6ad014df261d (roughly half a
+>> year).=C2=A0 qemu-img amend requires its output image to be R/W, so it=
+ opens
+>> it as such; the node is then turned into an read-only node automatical=
+ly
+>> which is now accompanied by a warning, however.=C2=A0 This warning has=
+ not
+>> been part of the reference output.
+>>
+>=20
+>> The reason nobody has noticed the breakage until now of course is the
+>> fact that nobody runs the iotests for nbd+bochs.=C2=A0 There actually =
+was
+>> never any reason to set the protocol to "nbd" but because that was
+>> technically correct; functionally it made no difference.=C2=A0 So that=
+ is the
+>> first thing we are going to change: Make the protocol "file" instead s=
+o
+>> that people might actually notice breakage here.
+>=20
+> There's probably several tests that fail with an explicit pairing of nb=
+d
+> as protocol + explicit format (I'm guilty of usually testing either the=
 
->  } MultiFDRecvParams;
->  
->  static int multifd_send_initial_packet(MultiFDSendParams *p, Error **errp)
-> @@ -737,9 +745,13 @@ static void *multifd_send_thread(void *opaque)
->      MultiFDSendParams *p = opaque;
->      Error *local_err = NULL;
->  
-> +    trace_multifd_send_thread_start(p->id);
-> +
->      if (multifd_send_initial_packet(p, &local_err) < 0) {
->          goto out;
->      }
-> +    /* initial packet */
-> +    p->num_packets = 1;
+> format './check -qcow2' or the protocol './check -nbd', and not
+> combining the two).
+>=20
+>> So with this test now being a raw test, we can rework the amend test
+>> case to use raw instead.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>> =C2=A0 tests/qemu-iotests/113=C2=A0=C2=A0=C2=A0=C2=A0 | 19 +++++++++--=
+--------
+>> =C2=A0 tests/qemu-iotests/113.out |=C2=A0 7 ++++---
+>> =C2=A0 2 files changed, 13 insertions(+), 13 deletions(-)
+>>
+>> diff --git a/tests/qemu-iotests/113 b/tests/qemu-iotests/113
+>> index 19b68b2727..4e09810905 100755
+>> --- a/tests/qemu-iotests/113
+>> +++ b/tests/qemu-iotests/113
+>> @@ -38,16 +38,17 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+>> =C2=A0 . ./common.rc
+>> =C2=A0 . ./common.filter
+>> =C2=A0 -# We can only test one format here because we need its sample =
+file
+>> -_supported_fmt bochs
+>> -_supported_proto nbd
+>> +# Some of these test cases use bochs, but others do use raw, so this
+>> +# is only half a lie.
+>> +_supported_fmt raw
+>> +_supported_proto file
+>=20
+> Naive question - can we pass a list to _supported_fmt/_supported_proto,=
 
-That's writing to num_packets before the mutex is taken.
+> in which case the test runs under both elements of the list?=C2=A0 That=
+ is,
+> I'm wondering if:
+>=20
+> _supported_fmt raw bochs
+> _supported_proto file nbd
+>=20
+> gives us any additional coverage (theoretically 4 times the testing
+> possibilities - but if the rest of the test hard-codes a particular
+> format or protocol then it might not actually execute a different
+> combination).
 
->  
->      while (true) {
->          qemu_mutex_lock(&p->mutex);
-> @@ -761,6 +773,8 @@ out:
->      p->running = false;
->      qemu_mutex_unlock(&p->mutex);
->  
-> +    trace_multifd_send_thread_end(p->id, p->num_packets, p->num_pages);
-> +
+Well, anyone who's going to run any of these combinations is probably
+going to run raw+file as well.  You could argue that if someone changes
+something about NBD, they might just run raw+nbd; but then again, this
+test doesn't really test nbd at all.  In fact, it just tests qemu-img
+(we simply need a format that does not support image creation, but it's
+not like we actually do anything with that format).  Same for bochs.
 
-and should this happen before they're released (OK, it's only a trace)
+(And I think anyone who wants to test qemu-img is indeed going to run
+the raw+file tests.)
 
->      return NULL;
->  }
->  
-> @@ -888,6 +902,8 @@ static void *multifd_recv_thread(void *opaque)
->      Error *local_err = NULL;
->      int ret;
->  
-> +    trace_multifd_recv_thread_start(p->id);
-> +
->      while (true) {
->          qemu_mutex_lock(&p->mutex);
->          if (false)  {
-> @@ -910,6 +926,8 @@ static void *multifd_recv_thread(void *opaque)
->      p->running = false;
->      qemu_mutex_unlock(&p->mutex);
->  
-> +    trace_multifd_recv_thread_end(p->id, p->num_packets, p->num_pages);
-> +
->      return NULL;
->  }
->  
-> @@ -975,6 +993,8 @@ void multifd_recv_new_channel(QIOChannel *ioc)
->      }
->      p->c = ioc;
->      object_ref(OBJECT(ioc));
-> +    /* initial packet */
-> +    p->num_packets = 1;
+But see my reply to John, I think the best way would be if tests like
+these could be just run in "default" mode without forcing some
+format/protocol combination on them.
 
-OK, the receive side here is different.
+Max
 
->      p->running = true;
->      qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
-> diff --git a/migration/trace-events b/migration/trace-events
-> index a180d7b008..e480eb050e 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -77,6 +77,10 @@ ram_load_postcopy_loop(uint64_t addr, int flags) "@%" PRIx64 " %x"
->  ram_postcopy_send_discard_bitmap(void) ""
->  ram_save_page(const char *rbname, uint64_t offset, void *host) "%s: offset: 0x%" PRIx64 " host: %p"
->  ram_save_queue_pages(const char *rbname, size_t start, size_t len) "%s: start: 0x%zx len: 0x%zx"
-> +multifd_send_thread_start(uint8_t id) "%d"
-> +multifd_send_thread_end(uint8_t id, uint32_t packets, uint32_t pages) "channel %d packets %d pages %d"
-> +multifd_recv_thread_start(uint8_t id) "%d"
-> +multifd_recv_thread_end(uint8_t id, uint32_t packets, uint32_t pages) "channel %d packets %d pages %d"
 
-Please put the m's before the r's
+--xaxxu7YwBN1aURXZrwuk8RFCEwdOyIwrN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Dave
+-----BEGIN PGP SIGNATURE-----
 
->  # migration/migration.c
->  await_return_path_close_on_source_close(void) ""
-> -- 
-> 2.17.0
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlrqBQIACgkQ9AfbAGHV
+z0C80wf/eQabw0HM8UFC0ZXfTkO3+0o5PeIvHkNec6/iG8o14uxguhRWmZQ4WuWF
+LmbayjAUQ1PNCvnswsDYsioRtS8GpEDGBDW3HJnEvp5H+R7C1vRPOegghbq8Wf7z
+gBxKeQD49D9J2dEHgqFy3NWq7yO8o+3c+HR+XTfCLnFrxCAFGYvB1vNrXPlg8inU
+kJB/9KCLmv+lIAGdYU9pqNtCfac52UX3yitQnOWR8tOMD7pHXUnjBVQ0MnoPLImw
+dtWQ51CSvBAaqLS8bA8CmzdtrQHcavPTiuXq+G12rY5Kt4suJPYNBIXzD/YEzx37
+7Z1beDpZDnZIGyl29C8EUQH/2WRMWQ==
+=lpf6
+-----END PGP SIGNATURE-----
+
+--xaxxu7YwBN1aURXZrwuk8RFCEwdOyIwrN--
