@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tiwei.bie@intel.com>) id 1fDp3i-0002DM-E4
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:32:28 -0400
+	(envelope-from <lersek@redhat.com>) id 1fDpCY-0003gA-SK
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:41:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tiwei.bie@intel.com>) id 1fDp3e-0004cd-CA
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:32:26 -0400
-Received: from mga06.intel.com ([134.134.136.31]:63599)
+	(envelope-from <lersek@redhat.com>) id 1fDpCV-0008U2-P8
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:41:34 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42038 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1fDp2y-0004Jk-Bh
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:32:22 -0400
-Date: Wed, 2 May 2018 18:32:13 +0800
-From: Tiwei Bie <tiwei.bie@intel.com>
-Message-ID: <20180502103213.yuyaiig5rovpuy2m@debian>
-References: <20180412151232.17506-1-tiwei.bie@intel.com>
-	<20180412151232.17506-7-tiwei.bie@intel.com>
-	<20180418192154-mutt-send-email-mst@kernel.org>
-	<20180419111439.i6gfhnept6wy7uzp@debian>
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fDpCV-0008TU-LG
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 06:41:31 -0400
+References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
+	<d50e3a40-d7f3-4c9b-e930-4c2f4d6c8a53@redhat.com>
+	<CAFEAcA8wJuJ9464LadgjJOo-7ttdGYcfDQWALbkxBRJCr_knkg@mail.gmail.com>
+	<20180427210120.03d037b0@naga.suse.cz>
+	<70cb944b-269c-2969-4727-b889298ece30@linaro.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <987b683f-e05e-780a-40cf-68b6b8d0641f@redhat.com>
+Date: Wed, 2 May 2018 12:41:21 +0200
 MIME-Version: 1.0
+In-Reply-To: <70cb944b-269c-2969-4727-b889298ece30@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180419111439.i6gfhnept6wy7uzp@debian>
-Subject: Re: [Qemu-devel] [PATCH v3 6/6] vhost-user: support registering
- external host notifiers
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] release retrospective, next release timing,
+ numbering
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,367 +32,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: jasowang@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com
+To: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Michal_Such=c3=a1nek?= <msuchanek@suse.de>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Thu, Apr 19, 2018 at 07:14:39PM +0800, Tiwei Bie wrote:
-> On Wed, Apr 18, 2018 at 07:34:06PM +0300, Michael S. Tsirkin wrote:
-> > On Thu, Apr 12, 2018 at 11:12:32PM +0800, Tiwei Bie wrote:
-> > > This patch introduces VHOST_USER_PROTOCOL_F_HOST_NOTIFIER.
-> > > With this feature negotiated, vhost-user backend can register
-> > > memory region based host notifiers. And it will allow the guest
-> > > driver in the VM to notify the hardware accelerator at the
-> > > vhost-user backend directly.
-> > > 
-> > > Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
-> > 
-> > Overall I think we can merge this approach, but I have two main concerns
-> > about this:
-> > 
-> > 1. Testing. Most people do not have the virtio hardware
-> >    so how to make sure this does not bit rot?
-> > 
-> >    I have an idea: add an option like this to libvhost-user.
-> >    Naturally libvhost-user can not get notified about a write
-> >    to an mmapped area, but it can write a special value there
-> >    (e.g. all-ones?) and then poll it to detect VQ # writes.
-> > 
-> >    Then include a vhost user bridge test with an option like this.
-> > 
-> >    I'd like to see a patch doing this.
-> 
-> Sure, I'll do it. Thanks for the suggestion!
-> 
-> > 
-> > 2. Memory barriers. Right now after updating the avail idx,
-> >    virtio does smp_wmb() and then the MMIO write.
-> >    Normal hardware drivers do wmb() which is an sfence.
-> >    Can a PCI device read bypass index write and see a stale
-> >    index value?
-> 
-> It depends on arch's memory model. Cunming will provide
-> more details about this later.
-> 
-> >    To make virtio pci do wmb() we would need a new feature bit.
-> >    Alternatively I guess we could maybe look at subsystem vendor/device id.
-> > 
-> >    I'd like to see a patch doing one of these things.
-> 
-> We prefer to add a new feature bit as it's a more robust
-> way to do this. I'll send out some patches soon.
-> 
-> Thank you very much! :)
+On 04/29/18 16:56, Richard Henderson wrote:
+> On 04/27/2018 02:01 PM, Michal Such=C3=A1nek wrote:
+>> Is there any reason why the 64bit emulator would not run on 32bit
+>> system? The emulated 64bit system is .. emulated after all.
+>=20
+> It does run, but it requires that the 32-bit host perform double-word
+> arithmetic to emulate the 64-bit guest.  When the 64-bit guest is reall=
+y a
+> 32-bit guest in disguise, this carries a performance penalty.
+>=20
+> If we ever stop caring about 32-bit hosts, the question becomes moot.
 
-Hi Michael,
+What about guest RAM size (more precisely, guest-phys address space)?
 
-It seems that we have started to merge patches for QEMU 2.13.
-Currently, all your concerns about this patch set have been
-addressed or WIP. Do you think it's possible to get this patch
-set merged first? Or do you have any other concerns? Thanks!
+The x86_64 target might want to use tens of GBs of guest-phys address
+space, e.g. for cold-plugged RAM, for DIMM hotplug, for 64-bit PCI MMIO
+aperture. To my understanding, all of those have to be expressed with
+host virtual addresses in the QEMU process (regardless of TCG vs. KVM).
+But on a 32-bit host, the QEMU process only has 4GB HVA space.
 
-Best regards,
-Tiwei Bie
-
-
-> 
-> Best regards,
-> Tiwei Bie
-> 
-> > 
-> > Thanks!
-> > 
-> > > ---
-> > >  docs/interop/vhost-user.txt    |  33 +++++++++++
-> > >  hw/virtio/vhost-user.c         | 123 +++++++++++++++++++++++++++++++++++++++++
-> > >  include/hw/virtio/vhost-user.h |   8 +++
-> > >  3 files changed, 164 insertions(+)
-> > > 
-> > > diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-> > > index 534caab18a..9e57b36b20 100644
-> > > --- a/docs/interop/vhost-user.txt
-> > > +++ b/docs/interop/vhost-user.txt
-> > > @@ -132,6 +132,16 @@ Depending on the request type, payload can be:
-> > >     Payload: Size bytes array holding the contents of the virtio
-> > >         device's configuration space
-> > >  
-> > > + * Vring area description
-> > > +   -----------------------
-> > > +   | u64 | size | offset |
-> > > +   -----------------------
-> > > +
-> > > +   u64: a 64-bit integer contains vring index and flags
-> > > +   Size: a 64-bit size of this area
-> > > +   Offset: a 64-bit offset of this area from the start of the
-> > > +       supplied file descriptor
-> > > +
-> > >  In QEMU the vhost-user message is implemented with the following struct:
-> > >  
-> > >  typedef struct VhostUserMsg {
-> > > @@ -146,6 +156,7 @@ typedef struct VhostUserMsg {
-> > >          VhostUserLog log;
-> > >          struct vhost_iotlb_msg iotlb;
-> > >          VhostUserConfig config;
-> > > +        VhostUserVringArea area;
-> > >      };
-> > >  } QEMU_PACKED VhostUserMsg;
-> > >  
-> > > @@ -380,6 +391,7 @@ Protocol features
-> > >  #define VHOST_USER_PROTOCOL_F_CRYPTO_SESSION 7
-> > >  #define VHOST_USER_PROTOCOL_F_PAGEFAULT      8
-> > >  #define VHOST_USER_PROTOCOL_F_CONFIG         9
-> > > +#define VHOST_USER_PROTOCOL_F_HOST_NOTIFIER  10
-> > >  
-> > >  Master message types
-> > >  --------------------
-> > > @@ -777,6 +789,27 @@ Slave message types
-> > >       the VHOST_USER_NEED_REPLY flag, master must respond with zero when
-> > >       operation is successfully completed, or non-zero otherwise.
-> > >  
-> > > + * VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG
-> > > +
-> > > +      Id: 3
-> > > +      Equivalent ioctl: N/A
-> > > +      Slave payload: vring area description
-> > > +      Master payload: N/A
-> > > +
-> > > +      Sets host notifier for a specified queue. The queue index is contained
-> > > +      in the u64 field of the vring area description. The host notifier is
-> > > +      described by the file descriptor (typically it's a VFIO device fd) which
-> > > +      is passed as ancillary data and the size (which is mmap size and should
-> > > +      be the same as host page size) and offset (which is mmap offset) carried
-> > > +      in the vring area description. QEMU can mmap the file descriptor based
-> > > +      on the size and offset to get a memory range. Registering a host notifier
-> > > +      means mapping this memory range to the VM as the specified queue's notify
-> > > +      MMIO region. Slave sends this request to tell QEMU to de-register the
-> > > +      existing notifier if any and register the new notifier if the request is
-> > > +      sent with a file descriptor.
-> > > +      This request should be sent only when VHOST_USER_PROTOCOL_F_HOST_NOTIFIER
-> > > +      protocol feature has been successfully negotiated.
-> > > +
-> > >  VHOST_USER_PROTOCOL_F_REPLY_ACK:
-> > >  -------------------------------
-> > >  The original vhost-user specification only demands replies for certain
-> > > diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-> > > index 791e0a4763..1cd9c7276b 100644
-> > > --- a/hw/virtio/vhost-user.c
-> > > +++ b/hw/virtio/vhost-user.c
-> > > @@ -13,6 +13,7 @@
-> > >  #include "hw/virtio/vhost.h"
-> > >  #include "hw/virtio/vhost-user.h"
-> > >  #include "hw/virtio/vhost-backend.h"
-> > > +#include "hw/virtio/virtio.h"
-> > >  #include "hw/virtio/virtio-net.h"
-> > >  #include "chardev/char-fe.h"
-> > >  #include "sysemu/kvm.h"
-> > > @@ -48,6 +49,7 @@ enum VhostUserProtocolFeature {
-> > >      VHOST_USER_PROTOCOL_F_CRYPTO_SESSION = 7,
-> > >      VHOST_USER_PROTOCOL_F_PAGEFAULT = 8,
-> > >      VHOST_USER_PROTOCOL_F_CONFIG = 9,
-> > > +    VHOST_USER_PROTOCOL_F_HOST_NOTIFIER = 10,
-> > >      VHOST_USER_PROTOCOL_F_MAX
-> > >  };
-> > >  
-> > > @@ -92,6 +94,7 @@ typedef enum VhostUserSlaveRequest {
-> > >      VHOST_USER_SLAVE_NONE = 0,
-> > >      VHOST_USER_SLAVE_IOTLB_MSG = 1,
-> > >      VHOST_USER_SLAVE_CONFIG_CHANGE_MSG = 2,
-> > > +    VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG = 3,
-> > >      VHOST_USER_SLAVE_MAX
-> > >  }  VhostUserSlaveRequest;
-> > >  
-> > > @@ -136,6 +139,12 @@ static VhostUserConfig c __attribute__ ((unused));
-> > >                                     + sizeof(c.size) \
-> > >                                     + sizeof(c.flags))
-> > >  
-> > > +typedef struct VhostUserVringArea {
-> > > +    uint64_t u64;
-> > > +    uint64_t size;
-> > > +    uint64_t offset;
-> > > +} VhostUserVringArea;
-> > > +
-> > >  typedef struct {
-> > >      VhostUserRequest request;
-> > >  
-> > > @@ -157,6 +166,7 @@ typedef union {
-> > >          struct vhost_iotlb_msg iotlb;
-> > >          VhostUserConfig config;
-> > >          VhostUserCryptoSession session;
-> > > +        VhostUserVringArea area;
-> > >  } VhostUserPayload;
-> > >  
-> > >  typedef struct VhostUserMsg {
-> > > @@ -638,9 +648,37 @@ static int vhost_user_set_vring_num(struct vhost_dev *dev,
-> > >      return vhost_set_vring(dev, VHOST_USER_SET_VRING_NUM, ring);
-> > >  }
-> > >  
-> > > +static void vhost_user_host_notifier_restore(struct vhost_dev *dev,
-> > > +                                             int queue_idx)
-> > > +{
-> > > +    struct vhost_user *u = dev->opaque;
-> > > +    VhostUserHostNotifier *n = &u->user->notifier[queue_idx];
-> > > +    VirtIODevice *vdev = dev->vdev;
-> > > +
-> > > +    if (n->addr && !n->set) {
-> > > +        virtio_queue_set_host_notifier_mr(vdev, queue_idx, &n->mr, true);
-> > > +        n->set = true;
-> > > +    }
-> > > +}
-> > > +
-> > > +static void vhost_user_host_notifier_remove(struct vhost_dev *dev,
-> > > +                                            int queue_idx)
-> > > +{
-> > > +    struct vhost_user *u = dev->opaque;
-> > > +    VhostUserHostNotifier *n = &u->user->notifier[queue_idx];
-> > > +    VirtIODevice *vdev = dev->vdev;
-> > > +
-> > > +    if (n->addr && n->set) {
-> > > +        virtio_queue_set_host_notifier_mr(vdev, queue_idx, &n->mr, false);
-> > > +        n->set = false;
-> > > +    }
-> > > +}
-> > > +
-> > >  static int vhost_user_set_vring_base(struct vhost_dev *dev,
-> > >                                       struct vhost_vring_state *ring)
-> > >  {
-> > > +    vhost_user_host_notifier_restore(dev, ring->index);
-> > > +
-> > >      return vhost_set_vring(dev, VHOST_USER_SET_VRING_BASE, ring);
-> > >  }
-> > >  
-> > > @@ -674,6 +712,8 @@ static int vhost_user_get_vring_base(struct vhost_dev *dev,
-> > >          .hdr.size = sizeof(msg.payload.state),
-> > >      };
-> > >  
-> > > +    vhost_user_host_notifier_remove(dev, ring->index);
-> > > +
-> > >      if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
-> > >          return -1;
-> > >      }
-> > > @@ -847,6 +887,76 @@ static int vhost_user_slave_handle_config_change(struct vhost_dev *dev)
-> > >      return ret;
-> > >  }
-> > >  
-> > > +static int vhost_user_slave_handle_vring_host_notifier(struct vhost_dev *dev,
-> > > +                                                       VhostUserVringArea *area,
-> > > +                                                       int fd)
-> > > +{
-> > > +    int queue_idx = area->u64 & VHOST_USER_VRING_IDX_MASK;
-> > > +    size_t page_size = qemu_real_host_page_size;
-> > > +    struct vhost_user *u = dev->opaque;
-> > > +    VhostUserState *user = u->user;
-> > > +    VirtIODevice *vdev = dev->vdev;
-> > > +    VhostUserHostNotifier *n;
-> > > +    int ret = 0;
-> > > +    void *addr;
-> > > +    char *name;
-> > > +
-> > > +    if (!virtio_has_feature(dev->protocol_features,
-> > > +                            VHOST_USER_PROTOCOL_F_HOST_NOTIFIER) ||
-> > > +        vdev == NULL || queue_idx >= virtio_get_num_queues(vdev)) {
-> > > +        ret = -1;
-> > > +        goto out;
-> > > +    }
-> > > +
-> > > +    n = &user->notifier[queue_idx];
-> > > +
-> > > +    if (n->addr) {
-> > > +        virtio_queue_set_host_notifier_mr(vdev, queue_idx, &n->mr, false);
-> > > +        object_unparent(OBJECT(&n->mr));
-> > > +        munmap(n->addr, page_size);
-> > > +        n->addr = NULL;
-> > > +    }
-> > > +
-> > > +    if (area->u64 & VHOST_USER_VRING_NOFD_MASK) {
-> > > +        goto out;
-> > > +    }
-> > > +
-> > > +    /* Sanity check. */
-> > > +    if (area->size != page_size) {
-> > > +        ret = -1;
-> > > +        goto out;
-> > > +    }
-> > > +
-> > > +    addr = mmap(NULL, page_size, PROT_READ | PROT_WRITE, MAP_SHARED,
-> > > +                fd, area->offset);
-> > > +    if (addr == MAP_FAILED) {
-> > > +        ret = -1;
-> > > +        goto out;
-> > > +    }
-> > > +
-> > > +    name = g_strdup_printf("vhost-user/host-notifier@%p mmaps[%d]",
-> > > +                           user, queue_idx);
-> > > +    memory_region_init_ram_device_ptr(&n->mr, OBJECT(vdev), name,
-> > > +                                      page_size, addr);
-> > > +    g_free(name);
-> > > +
-> > > +    if (virtio_queue_set_host_notifier_mr(vdev, queue_idx, &n->mr, true)) {
-> > > +        munmap(addr, page_size);
-> > > +        ret = -1;
-> > > +        goto out;
-> > > +    }
-> > > +
-> > > +    n->addr = addr;
-> > > +    n->set = true;
-> > > +
-> > > +out:
-> > > +    /* Always close the fd. */
-> > > +    if (fd != -1) {
-> > > +        close(fd);
-> > > +    }
-> > > +    return ret;
-> > > +}
-> > > +
-> > >  static void slave_read(void *opaque)
-> > >  {
-> > >      struct vhost_dev *dev = opaque;
-> > > @@ -913,6 +1023,10 @@ static void slave_read(void *opaque)
-> > >      case VHOST_USER_SLAVE_CONFIG_CHANGE_MSG :
-> > >          ret = vhost_user_slave_handle_config_change(dev);
-> > >          break;
-> > > +    case VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG:
-> > > +        ret = vhost_user_slave_handle_vring_host_notifier(dev, &payload.area,
-> > > +                                                          fd);
-> > > +        break;
-> > >      default:
-> > >          error_report("Received unexpected msg type.");
-> > >          if (fd != -1) {
-> > > @@ -1641,6 +1755,15 @@ VhostUserState *vhost_user_init(void)
-> > >  
-> > >  void vhost_user_cleanup(VhostUserState *user)
-> > >  {
-> > > +    int i;
-> > > +
-> > > +    for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
-> > > +        if (user->notifier[i].addr) {
-> > > +            object_unparent(OBJECT(&user->notifier[i].mr));
-> > > +            munmap(user->notifier[i].addr, qemu_real_host_page_size);
-> > > +            user->notifier[i].addr = NULL;
-> > > +        }
-> > > +    }
-> > >  }
-> > >  
-> > >  const VhostOps user_ops = {
-> > > diff --git a/include/hw/virtio/vhost-user.h b/include/hw/virtio/vhost-user.h
-> > > index eb8bc0d90d..fd660393a0 100644
-> > > --- a/include/hw/virtio/vhost-user.h
-> > > +++ b/include/hw/virtio/vhost-user.h
-> > > @@ -9,9 +9,17 @@
-> > >  #define HW_VIRTIO_VHOST_USER_H
-> > >  
-> > >  #include "chardev/char-fe.h"
-> > > +#include "hw/virtio/virtio.h"
-> > > +
-> > > +typedef struct VhostUserHostNotifier {
-> > > +    MemoryRegion mr;
-> > > +    void *addr;
-> > > +    bool set;
-> > > +} VhostUserHostNotifier;
-> > >  
-> > >  typedef struct VhostUserState {
-> > >      CharBackend *chr;
-> > > +    VhostUserHostNotifier notifier[VIRTIO_QUEUE_MAX];
-> > >  } VhostUserState;
-> > >  
-> > >  VhostUserState *vhost_user_init(void);
-> > > -- 
-> > > 2.11.0
+Thanks
+Laszlo
