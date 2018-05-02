@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fDsp8-0002IP-OJ
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 10:33:39 -0400
+	(envelope-from <thuth@redhat.com>) id 1fDsp5-0002Fw-NO
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 10:33:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fDsp7-00050Z-Oe
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 10:33:38 -0400
+	(envelope-from <thuth@redhat.com>) id 1fDsp2-0004y6-Kr
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 10:33:35 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Wed,  2 May 2018 16:33:22 +0200
-Message-Id: <1525271609-2142-4-git-send-email-thuth@redhat.com>
-In-Reply-To: <1525271609-2142-1-git-send-email-thuth@redhat.com>
-References: <1525271609-2142-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PULL SUBSYSTEM s390x 03/10] pc-bios/s390-ccw: fix
- loadparm initialization and int conversion
+Date: Wed,  2 May 2018 16:33:19 +0200
+Message-Id: <1525271609-2142-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PULL SUBSYSTEM s390x 00/10] s390-ccw firmware update
+ - not for master
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,92 +21,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 Cc: qemu-s390x@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>
 
-From: Collin Walling <walling@linux.ibm.com>
+This PULL request is not for master.
 
-Rename the loadparm char array in main.c to loadparm_str and
-increased the size by one byte to account for a null termination
-when converting the loadparm string to an int  via atoui. We
-also allow the boot menu to be enabled when loadparm is set to
-an empty string or a series of spaces.
 
-Signed-off-by: Collin Walling <walling@linux.ibm.com>
-Reported-by: Vasily Gorbik <gor@linux.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/s390x/ipl.c          |  4 ++++
- pc-bios/s390-ccw/main.c | 14 +++++++-------
- 2 files changed, 11 insertions(+), 7 deletions(-)
+ Hi Cornelia,
 
-diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index fb554ab..150f6c0 100644
---- a/hw/s390x/ipl.c
-+++ b/hw/s390x/ipl.c
-@@ -373,6 +373,10 @@ int s390_ipl_set_loadparm(uint8_t *loadparm)
-             loadparm[i] = ascii2ebcdic[(uint8_t) lp[i]];
-         }
- 
-+        if (i < 8) {
-+            memset(loadparm + i, 0x40, 8 - i); /* fill with EBCDIC spaces */
-+        }
-+
-         g_free(lp);
-         return 0;
-     }
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index 9d9f8cf..26f9adf 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -15,11 +15,11 @@
- char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
- static SubChannelId blk_schid = { .one = 1 };
- IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
--static char loadparm[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-+static char loadparm_str[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
- QemuIplParameters qipl;
- 
- #define LOADPARM_PROMPT "PROMPT  "
--#define LOADPARM_EMPTY  "........"
-+#define LOADPARM_EMPTY  "        "
- #define BOOT_MENU_FLAG_MASK (QIPL_FLAG_BM_OPTS_CMD | QIPL_FLAG_BM_OPTS_ZIPL)
- 
- /*
-@@ -45,7 +45,7 @@ void panic(const char *string)
- 
- unsigned int get_loadparm_index(void)
- {
--    return atoui(loadparm);
-+    return atoui(loadparm_str);
- }
- 
- static bool find_dev(Schib *schib, int dev_no)
-@@ -80,13 +80,13 @@ static bool find_dev(Schib *schib, int dev_no)
- 
- static void menu_setup(void)
- {
--    if (memcmp(loadparm, LOADPARM_PROMPT, 8) == 0) {
-+    if (memcmp(loadparm_str, LOADPARM_PROMPT, 8) == 0) {
-         menu_set_parms(QIPL_FLAG_BM_OPTS_CMD, 0);
-         return;
-     }
- 
-     /* If loadparm was set to any other value, then do not enable menu */
--    if (memcmp(loadparm, LOADPARM_EMPTY, 8) != 0) {
-+    if (memcmp(loadparm_str, LOADPARM_EMPTY, 8) != 0) {
-         return;
-     }
- 
-@@ -116,8 +116,8 @@ static void virtio_setup(void)
-      */
-     enable_mss_facility();
- 
--    sclp_get_loadparm_ascii(loadparm);
--    memcpy(ldp + 10, loadparm, 8);
-+    sclp_get_loadparm_ascii(loadparm_str);
-+    memcpy(ldp + 10, loadparm_str, 8);
-     sclp_print(ldp);
- 
-     memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
--- 
-1.8.3.1
+the following changes since commit 052888f043bacb18231046045b1f9cd946703170:
+
+  hw/s390x: Allow to configure the consoles with the "-serial" parameter (2018-04-30 10:48:29 +0200)
+
+are available in the git repository at:
+
+  https://github.com/huth/qemu.git tags/s390x-2018-05-02
+
+for you to fetch changes up to 312185cf35b5d8454a84c337ef9aadade877fb88:
+
+  pc-bios/s390: Update firmware images (2018-05-02 15:42:57 +0200)
+
+----------------------------------------------------------------
+s390-ccw firmware updates:
+- Improvements to the boot menu (can now handle non-sequential entries)
+- s390-netboot now resets the machine before jumping into the OS kernel
+- s390-netboot now supports indirect loading via .INS files
+- some other minor fixes and clean-ups
+----------------------------------------------------------------
+
+Collin Walling (4):
+      pc-bios/s390-ccw: rename MAX_TABLE_ENTRIES to MAX_BOOT_ENTRIES
+      pc-bios/s390-ccw: fix loadparm initialization and int conversion
+      pc-bios/s390-ccw: fix non-sequential boot entries (eckd)
+      pc-bios/s390-ccw: fix non-sequential boot entries (enum)
+
+Cornelia Huck (1):
+      s390-ccw: force diag 308 subcode to unsigned long
+
+Thomas Huth (5):
+      pc-bios/s390-ccw: size_t should be unsigned
+      pc-bios/s390-ccw/net: Split up net_load() into init, load and release parts
+      pc-bios/s390-ccw/net: Use diag308 to reset machine before jumping to the OS
+      pc-bios/s390-ccw/net: Add support for .INS config files
+      pc-bios/s390: Update firmware images
+
+ hw/s390x/ipl.c               |   4 ++
+ pc-bios/s390-ccw.img         | Bin 30520 -> 34568 bytes
+ pc-bios/s390-ccw/Makefile    |   4 +-
+ pc-bios/s390-ccw/bootmap.c   |  79 +++-----------------
+ pc-bios/s390-ccw/bootmap.h   |   6 --
+ pc-bios/s390-ccw/iplb.h      |   3 +-
+ pc-bios/s390-ccw/jump2ipl.c  |  91 +++++++++++++++++++++++
+ pc-bios/s390-ccw/libc.c      |   2 +-
+ pc-bios/s390-ccw/libc.h      |   2 +-
+ pc-bios/s390-ccw/main.c      |  14 ++--
+ pc-bios/s390-ccw/menu.c      |  58 ++++++++++-----
+ pc-bios/s390-ccw/netboot.mak |   3 +-
+ pc-bios/s390-ccw/netmain.c   | 168 +++++++++++++++++++++++++++++++++++--------
+ pc-bios/s390-ccw/s390-ccw.h  |   8 ++-
+ pc-bios/s390-netboot.img     | Bin 83856 -> 87872 bytes
+ 15 files changed, 307 insertions(+), 135 deletions(-)
+ create mode 100644 pc-bios/s390-ccw/jump2ipl.c
