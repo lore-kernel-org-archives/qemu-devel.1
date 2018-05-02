@@ -1,37 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fDphi-0002np-3X
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 07:13:47 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fDpj9-00040Z-3p
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 07:15:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fDphe-0005jr-5T
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 07:13:46 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54014
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fDphe-0005hr-0I
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 07:13:42 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w42BADWP067490
-	for <qemu-devel@nongnu.org>; Wed, 2 May 2018 07:13:35 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2hq6syne7t-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 07:13:34 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Wed, 2 May 2018 12:13:33 +0100
-From: Greg Kurz <groug@kaod.org>
-Date: Wed,  2 May 2018 13:13:18 +0200
-In-Reply-To: <20180502111318.129888-1-groug@kaod.org>
-References: <20180502111318.129888-1-groug@kaod.org>
+	(envelope-from <dgilbert@redhat.com>) id 1fDpj5-000687-6d
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 07:15:15 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42982 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fDpj5-00067p-0J
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 07:15:11 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A97154022909
+	for <qemu-devel@nongnu.org>; Wed,  2 May 2018 11:15:10 +0000 (UTC)
+Date: Wed, 2 May 2018 12:15:07 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180502111506.GC2679@work-vm>
+References: <20180502100422.8688-1-peterx@redhat.com>
+	<20180502100422.8688-3-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <20180502111318.129888-2-groug@kaod.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/1] 9p: add trace event for v9fs_setattr()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180502100422.8688-3-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 2/4] monitor: protect mon->fds with
+ mon_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,62 +34,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Don't print the tv_nsec part of atime and mtime, to stay below the 10
-argument limit of trace events.
+* Peter Xu (peterx@redhat.com) wrote:
+> mon->fds were protected by BQL.  Now protect it by mon_lock so that it
+> can even be used in monitor iothread.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  monitor.c | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
+> 
+> diff --git a/monitor.c b/monitor.c
+> index 48882d28ae..9f361ec21e 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -213,7 +213,6 @@ struct Monitor {
+>      BlockCompletionFunc *password_completion_cb;
+>      void *password_opaque;
+>      mon_cmd_t *cmd_table;
+> -    QLIST_HEAD(,mon_fd_t) fds;
+>      QTAILQ_ENTRY(Monitor) entry;
+>  
+>      /*
+> @@ -225,6 +224,7 @@ struct Monitor {
+>      /*
+>       * Fields that are protected by the per-monitor lock.
+>       */
+> +    QLIST_HEAD(, mon_fd_t) fds;
+>      QString *outbuf;
+>      guint out_watch;
+>      /* Read under either BQL or mon_lock, written with BQL+mon_lock.  */
+> @@ -2207,6 +2207,7 @@ void qmp_getfd(const char *fdname, Error **errp)
+>          return;
+>      }
+>  
+> +    qemu_mutex_lock(&cur_mon->mon_lock);
+>      QLIST_FOREACH(monfd, &cur_mon->fds, next) {
+>          if (strcmp(monfd->name, fdname) != 0) {
+>              continue;
+> @@ -2214,6 +2215,7 @@ void qmp_getfd(const char *fdname, Error **errp)
+>  
+>          close(monfd->fd);
+>          monfd->fd = fd;
+> +        qemu_mutex_unlock(&cur_mon->mon_lock);
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
----
- hw/9pfs/9p.c         | 5 +++++
- hw/9pfs/trace-events | 2 ++
- 2 files changed, 7 insertions(+)
+Why is it safe to have a close() in a mon_lock'd region?
+We've got to make sure everything that happens in it is non-blocking.
 
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index 48fa48e72074..d74302deeba5 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -1195,6 +1195,10 @@ static void coroutine_fn v9fs_setattr(void *opaque=
-)
-         goto out_nofid;
-     }
-=20
-+    trace_v9fs_setattr(pdu->tag, pdu->id, fid,
-+                       v9iattr.valid, v9iattr.mode, v9iattr.uid, v9iattr=
-.gid,
-+                       v9iattr.size, v9iattr.atime_sec, v9iattr.mtime_se=
-c);
-+
-     fidp =3D get_fid(pdu, fid);
-     if (fidp =3D=3D NULL) {
-         err =3D -EINVAL;
-@@ -1259,6 +1263,7 @@ static void coroutine_fn v9fs_setattr(void *opaque)
-         }
-     }
-     err =3D offset;
-+    trace_v9fs_setattr_return(pdu->tag, pdu->id);
- out:
-     put_fid(pdu, fidp);
- out_nofid:
-diff --git a/hw/9pfs/trace-events b/hw/9pfs/trace-events
-index 1aee350c42f1..881e4c4dd80b 100644
---- a/hw/9pfs/trace-events
-+++ b/hw/9pfs/trace-events
-@@ -46,3 +46,5 @@ v9fs_xattrwalk_return(uint16_t tag, uint8_t id, int64_t=
- size) "tag %d id %d size
- v9fs_xattrcreate(uint16_t tag, uint8_t id, int32_t fid, char* name, uint=
-64_t size, int flags) "tag %d id %d fid %d name %s size %"PRIu64" flags %=
-d"
- v9fs_readlink(uint16_t tag, uint8_t id, int32_t fid) "tag %d id %d fid %=
-d"
- v9fs_readlink_return(uint16_t tag, uint8_t id, char* target) "tag %d id =
-%d name %s"
-+v9fs_setattr(uint16_t tag, uint8_t id, int32_t fid, int32_t valid, int32=
-_t mode, int32_t uid, int32_t gid, int64_t size, int64_t atime_sec, int64=
-_t mtime_sec) "tag %u id %u fid %d iattr=3D{valid %d mode %d uid %d gid %=
-d size %"PRId64" atime=3D%"PRId64" mtime=3D%"PRId64" }"
-+v9fs_setattr_return(uint16_t tag, uint8_t id) "tag %u id %u"
---=20
-2.14.3
+Dave
+
+>          return;
+>      }
+>  
+> @@ -2222,12 +2224,14 @@ void qmp_getfd(const char *fdname, Error **errp)
+>      monfd->fd = fd;
+>  
+>      QLIST_INSERT_HEAD(&cur_mon->fds, monfd, next);
+> +    qemu_mutex_unlock(&cur_mon->mon_lock);
+>  }
+>  
+>  void qmp_closefd(const char *fdname, Error **errp)
+>  {
+>      mon_fd_t *monfd;
+>  
+> +    qemu_mutex_lock(&cur_mon->mon_lock);
+>      QLIST_FOREACH(monfd, &cur_mon->fds, next) {
+>          if (strcmp(monfd->name, fdname) != 0) {
+>              continue;
+> @@ -2237,9 +2241,11 @@ void qmp_closefd(const char *fdname, Error **errp)
+>          close(monfd->fd);
+>          g_free(monfd->name);
+>          g_free(monfd);
+> +        qemu_mutex_unlock(&cur_mon->mon_lock);
+>          return;
+>      }
+>  
+> +    qemu_mutex_unlock(&cur_mon->mon_lock);
+>      error_setg(errp, QERR_FD_NOT_FOUND, fdname);
+>  }
+>  
+> @@ -2247,6 +2253,7 @@ int monitor_get_fd(Monitor *mon, const char *fdname, Error **errp)
+>  {
+>      mon_fd_t *monfd;
+>  
+> +    qemu_mutex_lock(&mon->mon_lock);
+>      QLIST_FOREACH(monfd, &mon->fds, next) {
+>          int fd;
+>  
+> @@ -2260,10 +2267,12 @@ int monitor_get_fd(Monitor *mon, const char *fdname, Error **errp)
+>          QLIST_REMOVE(monfd, next);
+>          g_free(monfd->name);
+>          g_free(monfd);
+> +        qemu_mutex_unlock(&mon->mon_lock);
+>  
+>          return fd;
+>      }
+>  
+> +    qemu_mutex_unlock(&mon->mon_lock);
+>      error_setg(errp, "File descriptor named '%s' has not been found", fdname);
+>      return -1;
+>  }
+> -- 
+> 2.14.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
