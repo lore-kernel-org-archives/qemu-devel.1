@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fECjF-0001Sl-8X
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 07:48:54 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fEClN-0002j7-UX
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 07:51:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fECjA-00038N-SG
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 07:48:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58760 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fECjA-00037j-IF
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 07:48:48 -0400
-References: <1525346320-24553-1-git-send-email-paul.durrant@citrix.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1b7ac8b6-df19-c6e2-bc6d-587c60e20207@redhat.com>
-Date: Thu, 3 May 2018 13:48:43 +0200
+	(envelope-from <dgibson@ozlabs.org>) id 1fEClJ-0004D0-Ph
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 07:51:06 -0400
+Date: Thu, 3 May 2018 17:35:41 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180503073541.GZ13229@umbus.fritz.box>
+References: <20180503071037.31834-1-david@gibson.dropbear.id.au>
+	<2bd5d47b-5561-fa4a-4277-6ef026ff8749@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1525346320-24553-1-git-send-email-paul.durrant@citrix.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] xen-hvm: stop faking I/O to access PCI
- config space
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="xd76R9tHJzDpbIo0"
+Content-Disposition: inline
+In-Reply-To: <2bd5d47b-5561-fa4a-4277-6ef026ff8749@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] spapr: Remove support for explicitly
+ allocated RMAs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,216 +25,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
-Cc: Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: groug@kaod.org, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On 03/05/2018 13:18, Paul Durrant wrote:
-> This patch removes the current hackery where IOREQ_TYPE_PCI_CONFIG
-> reqyests are handled by faking PIO to 0xcf8 and 0xcfc and replaces it
-> with direct calls to pci_host_config_read/write_common().
-> Doing so necessitates mapping BDFs to PCIDevices but maintaining a simple
-> QLIST in xen_device_realize/unrealize() will suffice.
 
-No objection!
+--xd76R9tHJzDpbIo0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
+On Thu, May 03, 2018 at 09:19:34AM +0200, Thomas Huth wrote:
+> On 03.05.2018 09:10, David Gibson wrote:
+> > Current POWER cpus allow for a VRMA, a special mapping which describes a
+> > guest's view of memory when in real mode (MMU off, from the guest's poi=
+nt
+> > of view).  Older cpus didn't have that which meant that to support a gu=
+est
+> > a special host-contiguous region of memory was needed to give the guest=
+ its
+> > Real Mode Area (RMA).
+> >=20
+> > KVM used to provide special calls to allocate a contiguous RMA for those
+> > cases.  This was useful in the early days of KVM on Power to allow it t=
+o be
+> > tested on PowerPC 970 chips as used in Macintosh G5 machines.  Now, tho=
+se
+> > machines are so old as to be almost irrelevant.
+>=20
+> I still got my YDL PowerStation somewhere in a corner ... but well,
+> true, I haven't turned on its power since a year or two... or three...
+>=20
+> > The normal qemu deprecation process would require this to be marked
+> > deprecated then removed in 2 releases.  However, this can only be used
+> > with corresponding support in the host kernel - which was dropped
+> > years ago (in c17b98cf "KVM: PPC: Book3S HV: Remove code for PPC970
+> > processors" of 2014-12-03 to be precise).  Therefore it should be ok
+> > to drop this immediately.
+>=20
+> OK, fair.
+>=20
+> > Just to be clear this only affects *KVM* guests with PowerPC 970, and t=
+hose
+> > already require an ancient host kernel.  TCG guests with PowerPC 970 sh=
+ould
+> > still work.
+>=20
+> Just to be sure: kvm-pr will continue to work on a 970 host, right? In
+> that case:
 
-Paolo
+Yes, KVM PR should be fine.  Not that I've tested, but I see no reason
+it would break.  I'll clarify that in the message.
 
-> NOTE: whilst config space accesses are currently limited to
->       PCI_CONFIG_SPACE_SIZE, this patch paves the way to increasing the
->       limit to PCIE_CONFIG_SPACE_SIZE when Xen gains the ability to
->       emulate MCFG table accesses.
-> 
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-> --
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Marcel Apfelbaum <marcel@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  hw/i386/xen/trace-events |   2 +
->  hw/i386/xen/xen-hvm.c    | 101 +++++++++++++++++++++++++++++++++++++----------
->  2 files changed, 83 insertions(+), 20 deletions(-)
-> 
-> diff --git a/hw/i386/xen/trace-events b/hw/i386/xen/trace-events
-> index 8dab7bc..f576f1b 100644
-> --- a/hw/i386/xen/trace-events
-> +++ b/hw/i386/xen/trace-events
-> @@ -15,6 +15,8 @@ cpu_ioreq_pio(void *req, uint32_t dir, uint32_t df, uint32_t data_is_ptr, uint64
->  cpu_ioreq_pio_read_reg(void *req, uint64_t data, uint64_t addr, uint32_t size) "I/O=%p pio read reg data=0x%"PRIx64" port=0x%"PRIx64" size=%d"
->  cpu_ioreq_pio_write_reg(void *req, uint64_t data, uint64_t addr, uint32_t size) "I/O=%p pio write reg data=0x%"PRIx64" port=0x%"PRIx64" size=%d"
->  cpu_ioreq_move(void *req, uint32_t dir, uint32_t df, uint32_t data_is_ptr, uint64_t addr, uint64_t data, uint32_t count, uint32_t size) "I/O=%p copy dir=%d df=%d ptr=%d port=0x%"PRIx64" data=0x%"PRIx64" count=%d size=%d"
-> +cpu_ioreq_config_read(void *req, uint32_t sbdf, uint32_t reg, uint32_t size, uint32_t data) "I/O=%p sbdf=0x%x reg=%u size=%u data=0x%x"
-> +cpu_ioreq_config_write(void *req, uint32_t sbdf, uint32_t reg, uint32_t size, uint32_t data) "I/O=%p sbdf=0x%x reg=%u size=%u data=0x%x"
->  
->  # xen-mapcache.c
->  xen_map_cache(uint64_t phys_addr) "want 0x%"PRIx64
-> diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-> index caa563b..c139d29 100644
-> --- a/hw/i386/xen/xen-hvm.c
-> +++ b/hw/i386/xen/xen-hvm.c
-> @@ -12,6 +12,7 @@
->  
->  #include "cpu.h"
->  #include "hw/pci/pci.h"
-> +#include "hw/pci/pci_host.h"
->  #include "hw/i386/pc.h"
->  #include "hw/i386/apic-msidef.h"
->  #include "hw/xen/xen_common.h"
-> @@ -86,6 +87,12 @@ typedef struct XenPhysmap {
->      QLIST_ENTRY(XenPhysmap) list;
->  } XenPhysmap;
->  
-> +typedef struct XenPciDevice {
-> +    PCIDevice *pci_dev;
-> +    uint32_t sbdf;
-> +    QLIST_ENTRY(XenPciDevice) entry;
-> +} XenPciDevice;
-> +
->  typedef struct XenIOState {
->      ioservid_t ioservid;
->      shared_iopage_t *shared_page;
-> @@ -105,6 +112,7 @@ typedef struct XenIOState {
->      struct xs_handle *xenstore;
->      MemoryListener memory_listener;
->      MemoryListener io_listener;
-> +    QLIST_HEAD(, XenPciDevice) dev_list;
->      DeviceListener device_listener;
->      QLIST_HEAD(, XenPhysmap) physmap;
->      hwaddr free_phys_offset;
-> @@ -569,6 +577,12 @@ static void xen_device_realize(DeviceListener *listener,
->  
->      if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
->          PCIDevice *pci_dev = PCI_DEVICE(dev);
-> +        XenPciDevice *xendev = g_new(XenPciDevice, 1);
-> +
-> +        xendev->pci_dev = pci_dev;
-> +        xendev->sbdf = PCI_BUILD_BDF(pci_dev_bus_num(pci_dev),
-> +                                     pci_dev->devfn);
-> +        QLIST_INSERT_HEAD(&state->dev_list, xendev, entry);
->  
->          xen_map_pcidev(xen_domid, state->ioservid, pci_dev);
->      }
-> @@ -581,8 +595,17 @@ static void xen_device_unrealize(DeviceListener *listener,
->  
->      if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
->          PCIDevice *pci_dev = PCI_DEVICE(dev);
-> +        XenPciDevice *xendev, *next;
->  
->          xen_unmap_pcidev(xen_domid, state->ioservid, pci_dev);
-> +
-> +        QLIST_FOREACH_SAFE(xendev, &state->dev_list, entry, next) {
-> +            if (xendev->pci_dev == pci_dev) {
-> +                QLIST_REMOVE(xendev, entry);
-> +                g_free(xendev);
-> +                break;
-> +            }
-> +        }
->      }
->  }
->  
-> @@ -903,6 +926,61 @@ static void cpu_ioreq_move(ioreq_t *req)
->      }
->  }
->  
-> +static void cpu_ioreq_config(XenIOState *state, ioreq_t *req)
-> +{
-> +    uint32_t sbdf = req->addr >> 32;
-> +    uint32_t reg = req->addr;
-> +    XenPciDevice *xendev;
-> +
-> +    if (req->size > sizeof(uint32_t)) {
-> +        hw_error("PCI config access: bad size (%u)", req->size);
-> +    }
-> +
-> +    QLIST_FOREACH(xendev, &state->dev_list, entry) {
-> +        unsigned int i;
-> +
-> +        if (xendev->sbdf != sbdf) {
-> +            continue;
-> +        }
-> +
-> +        if (req->dir == IOREQ_READ) {
-> +            if (!req->data_is_ptr) {
-> +                req->data = pci_host_config_read_common(
-> +                    xendev->pci_dev, reg, PCI_CONFIG_SPACE_SIZE,
-> +                    req->size);
-> +                trace_cpu_ioreq_config_read(req, sbdf, reg, req->size,
-> +                                            req->data);
-> +            } else {
-> +                for (i = 0; i < req->count; i++) {
-> +                    uint32_t tmp;
-> +
-> +                    tmp = pci_host_config_read_common(
-> +                        xendev->pci_dev, reg, PCI_CONFIG_SPACE_SIZE,
-> +                        req->size);
-> +                    write_phys_req_item(req->data, req, i, &tmp);
-> +                }
-> +            }
-> +        } else if (req->dir == IOREQ_WRITE) {
-> +            if (!req->data_is_ptr) {
-> +                trace_cpu_ioreq_config_write(req, sbdf, reg, req->size,
-> +                                             req->data);
-> +                pci_host_config_write_common(
-> +                    xendev->pci_dev, reg, PCI_CONFIG_SPACE_SIZE, req->data,
-> +                    req->size);
-> +            } else {
-> +                for (i = 0; i < req->count; i++) {
-> +                    uint32_t tmp = 0;
-> +
-> +                    read_phys_req_item(req->data, req, i, &tmp);
-> +                    pci_host_config_write_common(
-> +                        xendev->pci_dev, reg, PCI_CONFIG_SPACE_SIZE, tmp,
-> +                        req->size);
-> +                }
-> +            }
-> +        }
-> +    }
-> +}
-> +
->  static void regs_to_cpu(vmware_regs_t *vmport_regs, ioreq_t *req)
->  {
->      X86CPU *cpu;
-> @@ -975,27 +1053,9 @@ static void handle_ioreq(XenIOState *state, ioreq_t *req)
->          case IOREQ_TYPE_INVALIDATE:
->              xen_invalidate_map_cache();
->              break;
-> -        case IOREQ_TYPE_PCI_CONFIG: {
-> -            uint32_t sbdf = req->addr >> 32;
-> -            uint32_t val;
-> -
-> -            /* Fake a write to port 0xCF8 so that
-> -             * the config space access will target the
-> -             * correct device model.
-> -             */
-> -            val = (1u << 31) |
-> -                  ((req->addr & 0x0f00) << 16) |
-> -                  ((sbdf & 0xffff) << 8) |
-> -                  (req->addr & 0xfc);
-> -            do_outp(0xcf8, 4, val);
-> -
-> -            /* Now issue the config space access via
-> -             * port 0xCFC
-> -             */
-> -            req->addr = 0xcfc | (req->addr & 0x03);
-> -            cpu_ioreq_pio(req);
-> +        case IOREQ_TYPE_PCI_CONFIG:
-> +            cpu_ioreq_config(state, req);
->              break;
-> -        }
->          default:
->              hw_error("Invalid ioreq type 0x%x\n", req->type);
->      }
-> @@ -1366,6 +1426,7 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
->      memory_listener_register(&state->io_listener, &address_space_io);
->  
->      state->device_listener = xen_device_listener;
-> +    QLIST_INIT(&state->dev_list);
->      device_listener_register(&state->device_listener);
->  
->      /* Initialize backend core & drivers */
-> 
+> Acked-by: Thomas Huth <thuth@redhat.com>
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--xd76R9tHJzDpbIo0
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrqu8oACgkQbDjKyiDZ
+s5L+rRAAvLSCxFZz7Lo+2COkiPXZMaZ5Xkg7tSrJqu//2ZSFQCty4SfM7WNvF+iD
+s6d8yMAcig+xez+g5sJ2sSo9EO0cTLV7WUj29oRv9G0FVgo8rlRk3cgSYk/f4um9
+J84p6KKDKX3m8n7N7BDN0czPBuWp1IJswbZ/l4q8EC81OywhsHNMRvozj4yVk8dc
+1+Hv/+1jwqsNoTeEuhqyNfYpNRaLGM1uMObwLlnBB4h+crDuJFvFgjKGhQVcs0/k
+CoImrJJOFyOlMAJ0mSYdnbQlH6VLnD9s9d7aWnLXvz6nIi72NioeRAtQnipr3rwH
+hG100LvF/7phzN0kFLC7eX6HFVmpEKfROI80vTIWijg01yDBOTr0vyv0ODw2hMv2
+i7DQfVMmR4cSAoecw52MbpbG723Ba5ovu9osdHTxlIk024154mhDspa00i+seHzn
+HampLSkHB9wz7/pZfsSHWVcz4t9nO3DekqyiNFMjRwsV74MfDga6K7PstHGz1vZR
+lqilK1PD/RVqu+ng0EEPNqzQxyNMvhKlXgLUEbvMFqv8zROLSSke+eeyIq1DcLU2
+4q5bCHqxuzQVS4Yq3um9VbDPVaJ96/LLxwz77/NFjqzgnoiXgeqjbq0dXO6PMqYr
+nWiIoeqki2iAbGoxkQEth/Q98UfbNvpjoVJuRyHmLgVb5OprVWQ=
+=DLm4
+-----END PGP SIGNATURE-----
+
+--xd76R9tHJzDpbIo0--
