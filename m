@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fEATk-0004zP-Gy
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:24:45 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fEAVL-0006XN-Mt
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:26:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fEATj-00073z-Ev
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:24:44 -0400
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:43277)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fEATj-00073l-AA
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:24:43 -0400
-Received: by mail-ot0-x242.google.com with SMTP id y10-v6so19826235otg.10
-	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 02:24:43 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1fEAVI-0007xa-HS
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:26:23 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58434 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1fEAVI-0007xG-Dj
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:26:20 -0400
+Date: Thu, 3 May 2018 11:26:16 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180503112616.08e795f8.cohuck@redhat.com>
+In-Reply-To: <20180503090727.GC11382@redhat.com>
+References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
+	<20180430103312.GH3249@redhat.com>
+	<20180430132107.0a37704d.cohuck@redhat.com>
+	<ac216b06-9469-addd-b5a1-3a3a89fd0782@redhat.com>
+	<20180502074403.yh5weukbjgqsvp7n@sirius.home.kraxel.org>
+	<20180502080200.GG3308@redhat.com>
+	<20180503072100.GA5301@stefanha-x1.localdomain>
+	<20180503090727.GC11382@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180503090532.3113-1-joel@jms.id.au>
-References: <20180503090532.3113-1-joel@jms.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 3 May 2018 10:24:22 +0100
-Message-ID: <CAFEAcA_dP5QRrZoX8P67xjNVpv7QssnMP9yd5sXqAEu2tQ5Lww@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/2] arm: Add nRF51 SoC and micro:bit
- machine
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] release retrospective, next release timing,
+ numbering
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +34,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Joel Stanley <joel@jms.id.au>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>, Jim Mussared <jim.mussared@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>
+To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 3 May 2018 at 10:05, Joel Stanley <joel@jms.id.au> wrote:
-> Hello,
->
-> This short series implements a minimal definition of the Nordic
-> Semiconductor nRF51, a Cortex-M0 ARM SoC, and the BBC micro:bit, a
-> machine that will use this SoC.
->
-> This work will serve as the base for our Google Summer of Code and
-> Outreachy interns who will work on implementing a number of features on
-> top of this base.
->
-> I've tested this with a microbit micropython firmware, and checked that
-> it starts running by looking at it with gdb.
->
-> I chose to keep the nrf51 and the microbit seperate, to not confuse the
-> peripherals that are on the microbit but are not part of the nrf51, and
-> vice versa.
->
-> Please review!
+On Thu, 3 May 2018 10:07:27 +0100
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
 
-Hi; thanks for this patchset. I've done some quick overview review.
-It looks broadly ok but there are some details which don't follow
-our current preferences/practices for board and SoC models (we have
-a lot of legacy code in the codebase that follows older approaches
-or is just buggy, so it can be hard to get those right. The mps2
-boards and the iotkit SoC are the most recent I've written so
-probably not a bad pattern to look at.)
-We should probably not put this into master until we've got at least
-the cortex-m0 model, though.
+> On Thu, May 03, 2018 at 08:21:00AM +0100, Stefan Hajnoczi wrote:
+> > On Wed, May 02, 2018 at 09:02:00AM +0100, Daniel P. Berrang=C3=A9 wrote=
+: =20
+> > > On Wed, May 02, 2018 at 09:44:03AM +0200, Gerd Hoffmann wrote: =20
+> > > >   Hi,
+> > > >  =20
+> > > > > > If we bump the major version each year anyway, why not go the w=
+hole way
+> > > > > > and use 2018.1, 2018.2, ... (or even <year>.<month>)? The nice =
+thing
+> > > > > > about that is that you can see at a glance when the release too=
+k place. =20
+> > > > >=20
+> > > > > ... or simply drop the first two digits and call them 18.1, 18.2,=
+ ...? =20
+> > >  =20
+> > > > We could also drop the major/minor scheme altogether (as they are
+> > > > meaningless anyway) and just go for YYMM, i.e. 1808 (for a august
+> > > > release). =20
+> > >=20
+> > > I don't much like that - it'll lead to a wierd progression of numbers
+> > > where we'll be constantly the rationale re-explaining to people who
+> > > want to know why we've jumped from 1808 to 1902 to 1905 etc =20
+> >=20
+> > I don't see an issue with time-based numbering schemes.  Ubuntu made it
+> > popular and other projects (like DPDK) are doing the same thing now.
+> >=20
+> > The convention is YY.MM though, not YYMM. =20
+>=20
+> It feels like we've got quite a strong backing for time based versioning
+> amongst people replying here. I'd be happy with YY.MM
 
-thanks
--- PMM
+FWIW, both YY.MM and YYYY.MM look fine to me.
