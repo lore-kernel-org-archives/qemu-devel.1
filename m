@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60052)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fEN9r-0001L0-Az
+	(envelope-from <jsnow@redhat.com>) id 1fEN9r-0001LU-UK
 	for qemu-devel@nongnu.org; Thu, 03 May 2018 18:57:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fEN9q-0005sm-F3
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 18:57:03 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fEN9r-0005tx-57
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 18:57:04 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Thu,  3 May 2018 18:56:43 -0400
-Message-Id: <20180503225648.13153-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/5] qemu-img: make subcommand usage docstrings
- consistent
+Date: Thu,  3 May 2018 18:56:44 -0400
+Message-Id: <20180503225648.13153-2-jsnow@redhat.com>
+In-Reply-To: <20180503225648.13153-1-jsnow@redhat.com>
+References: <20180503225648.13153-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/5] qemu-img-commands.hx: argument ordering
+ fixups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,30 +23,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: qemu-trivial@nongnu.org, John Snow <jsnow@redhat.com>
 
-I'm working on a project to attempt to autogenerate all of this, but
-until then let's just do a bit of the usual kinds of tidying.
+The TEXI and string versions are actually identical, except for markup.
+We can probably automate this... but make the ordering the same until
+then.
 
-________________________________________________________________________________
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ qemu-img-cmds.hx | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-For convenience, this branch is available at:
-https://github.com/jnsnow/qemu.git branch trivial-qemu-img
-https://github.com/jnsnow/qemu/tree/trivial-qemu-img
-
-This version is tagged trivial-qemu-img-v1:
-https://github.com/jnsnow/qemu/releases/tag/trivial-qemu-img-v1
-
-John Snow (5):
-  qemu-img-commands.hx: argument ordering fixups
-  qemu-img.texi: fix command ordering
-  qemu-img: remove references to GEN_DOCS
-  qemu-img: Make documentation between .texi and .hx consistent
-  qemu-img-cmds.hx: add passive-aggressive note
-
- qemu-img-cmds.hx       | 13 +++++----
- qemu-img.c             |  2 --
- qemu-img.texi          | 78 ++++++++++++++++++++++++++------------------------
- qemu-options-wrapper.h |  1 -
- 4 files changed, 48 insertions(+), 46 deletions(-)
-
+diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+index 2fe31893cf..8bcefcafe9 100644
+--- a/qemu-img-cmds.hx
++++ b/qemu-img-cmds.hx
+@@ -23,13 +23,13 @@ STEXI
+ ETEXI
+ 
+ DEF("check", img_check,
+-    "check [-q] [--object objectdef] [--image-opts] [-f fmt] [--output=ofmt] [-r [leaks | all]] [-T src_cache] [-U] filename")
++    "check [--object objectdef] [--image-opts] [-q] [-f fmt] [--output=ofmt] [-r [leaks | all]] [-T src_cache] [-U] filename")
+ STEXI
+ @item check [--object @var{objectdef}] [--image-opts] [-q] [-f @var{fmt}] [--output=@var{ofmt}] [-r [leaks | all]] [-T @var{src_cache}] [-U] @var{filename}
+ ETEXI
+ 
+ DEF("commit", img_commit,
+-    "commit [-q] [--object objectdef] [--image-opts] [-f fmt] [-t cache] [-b base] [-d] [-p] filename")
++    "commit [--object objectdef] [--image-opts] [-q] [-f fmt] [-t cache] [-b base] [-d] [-p] filename")
+ STEXI
+ @item commit [--object @var{objectdef}] [--image-opts] [-q] [-f @var{fmt}] [-t @var{cache}] [-b @var{base}] [-d] [-p] @var{filename}
+ ETEXI
+@@ -47,7 +47,7 @@ STEXI
+ ETEXI
+ 
+ DEF("create", img_create,
+-    "create [-q] [--object objectdef] [-f fmt] [-b backing_file] [-F backing_fmt] [-u] [-o options] filename [size]")
++    "create [--object objectdef] [-q] [-f fmt] [-b backing_file] [-F backing_fmt] [-u] [-o options] filename [size]")
+ STEXI
+ @item create [--object @var{objectdef}] [-q] [-f @var{fmt}] [-b @var{backing_file}] [-F @var{backing_fmt}] [-u] [-o @var{options}] @var{filename} [@var{size}]
+ ETEXI
 -- 
 2.14.3
