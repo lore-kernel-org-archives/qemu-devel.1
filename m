@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1fEJmV-00025T-JE
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 15:20:44 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fEJv9-0005Sm-Q5
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 15:29:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1fEJmR-0000g8-MN
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 15:20:43 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53272 helo=mx1.redhat.com)
+	(envelope-from <ehabkost@redhat.com>) id 1fEJv6-0004id-Ln
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 15:29:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:5665)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1fEJmR-0000du-GE
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 15:20:39 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4E6A081B0068
-	for <qemu-devel@nongnu.org>; Thu,  3 May 2018 19:20:36 +0000 (UTC)
-From: Bandan <bsd@redhat.com>
-Date: Thu,  3 May 2018 15:20:27 -0400
-Message-Id: <20180503192028.14353-2-bsd@redhat.com>
-In-Reply-To: <20180503192028.14353-1-bsd@redhat.com>
-References: <20180503192028.14353-1-bsd@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/2] usb-mtp: Add some NULL checks for issues
- pointed out by coverity
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fEJv6-0004iN-Ed
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 15:29:36 -0400
+Date: Thu, 3 May 2018 16:29:30 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180503192930.GE25013@localhost.localdomain>
+References: <20180425153343.24023-1-alex.bennee@linaro.org>
+	<cb41b3a5-0e3b-f30b-a02c-1cc333d38ab1@redhat.com>
+	<87604ekl0c.fsf@linaro.org>
+	<2f69532c-8651-ef67-0910-1fad91808608@redhat.com>
+	<874ljxlseb.fsf@linaro.org>
+	<2d9d341e-008e-1f84-7a20-5956b4506db3@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <2d9d341e-008e-1f84-7a20-5956b4506db3@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH] hw/core: expand description of
+ null-machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +33,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Marcel Apfelbaum <marcel@redhat.com>, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Bandan Das <bsd@redhat.com>
+On Thu, Apr 26, 2018 at 08:53:29PM +0200, Thomas Huth wrote:
+> On 26.04.2018 20:44, Alex Benn=E9e wrote:
+> >=20
+> > Thomas Huth <thuth@redhat.com> writes:
+> >=20
+> >> On 26.04.2018 18:09, Alex Benn=E9e wrote:
+> >>>
+> >>> Thomas Huth <thuth@redhat.com> writes:
+> >>>
+> >>>> On 25.04.2018 17:33, Alex Benn=E9e wrote:
+> >>>>> People following old instructions for QEMU get the message "No ma=
+chine
+> >>>>> specified, and there is no default" and run -machine help to pick=
+ a
+> >>>>> new machine. Lay people might consider the null-machine to be suc=
+h a
+> >>>>> basic starting point but they won't get far. This leads to confus=
+ion,
+> >>>>> see https://bugs.launchpad.net/qemu/+bug/1766896 as an example.
+> >>>>>
+> >>>>> I'm open to better words - I figured "THIS PROBABLY ISN'T WHAT YO=
+U
+> >>>>> WANT" seemed less helpful though.
+> >>>>>
+> >>>>> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> >>>>> ---
+> >>>>>  hw/core/null-machine.c | 2 +-
+> >>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>>>>
+> >>>>> diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
+> >>>>> index cde4d3eb57..72f0815045 100644
+> >>>>> --- a/hw/core/null-machine.c
+> >>>>> +++ b/hw/core/null-machine.c
+> >>>>> @@ -50,7 +50,7 @@ static void machine_none_init(MachineState *mch=
+)
+> >>>>>
+> >>>>>  static void machine_none_machine_init(MachineClass *mc)
+> >>>>>  {
+> >>>>> -    mc->desc =3D "empty machine";
+> >>>>> +    mc->desc =3D "empty machine (for probing/QMP)";
+>=20
+> Actually, thinking about this again, what about something like:
+>=20
+>  "empty machine (for experts only)"
+>=20
+> or:
+>=20
+>  "empty machine (use only if you know what you are doing)"
+>=20
+> or something similar?
 
-CID 1390578: In usb_mtp_write_metadata, parent can never be NULL but
-just in case, add an assert
-CID 1390592: Check for o->format only if o !=NULL
-CID 1390604: Check s->data_out != NULL in usb_mtp_handle_data
+I think a note like this would be a good idea, but it would be
+even better if we actually document the purpose and caveats of
+-machine none on the man page.
 
-Signed-off-by: Bandan Das <bsd@redhat.com>
----
- hw/usb/dev-mtp.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-index 6ecf70a79b..24cff640c0 100644
---- a/hw/usb/dev-mtp.c
-+++ b/hw/usb/dev-mtp.c
-@@ -1446,8 +1446,7 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
-             if (o == NULL) {
-                 usb_mtp_queue_result(s, RES_INVALID_OBJECT_HANDLE, c->trans,
-                                      0, 0, 0, 0);
--            }
--            if (o->format != FMT_ASSOCIATION) {
-+            } else if (o->format != FMT_ASSOCIATION) {
-                 usb_mtp_queue_result(s, RES_INVALID_PARENT_OBJECT, c->trans,
-                                      0, 0, 0, 0);
-             }
-@@ -1660,6 +1659,7 @@ static void usb_mtp_write_metadata(MTPState *s)
-     uint32_t next_handle = s->next_handle;
- 
-     assert(!s->write_pending);
-+    assert(p != NULL);
- 
-     utf16_to_str(dataset->length, dataset->filename, filename);
- 
-@@ -1838,7 +1838,7 @@ static void usb_mtp_handle_data(USBDevice *dev, USBPacket *p)
-             p->status = USB_RET_STALL;
-             return;
-         }
--        if (s->data_out && !s->data_out->first) {
-+        if ((s->data_out != NULL) && !s->data_out->first) {
-             container_type = TYPE_DATA;
-         } else {
-             usb_packet_copy(p, &container, sizeof(container));
--- 
-2.11.0
+--=20
+Eduardo
