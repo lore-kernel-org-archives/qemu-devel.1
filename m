@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fEDe5-0000Lf-27
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 08:47:38 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fEDgF-0001H3-BD
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 08:49:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fEDe4-0005y5-Ap
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 08:47:37 -0400
-References: <20180423084518.2426-1-armbru@redhat.com>
-	<20180423130219.GD6630@localhost.localdomain>
-	<87d0ydorv6.fsf@dusky.pond.sub.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <29e37e65-ba08-4464-79cf-2238bc74e9e8@redhat.com>
-Date: Thu, 3 May 2018 14:47:25 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fEDgD-0006o0-86
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 08:49:51 -0400
+Received: from mail-oi0-x22e.google.com ([2607:f8b0:4003:c06::22e]:37658)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fEDgD-0006nW-2k
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 08:49:49 -0400
+Received: by mail-oi0-x22e.google.com with SMTP id w123-v6so6960540oia.4
+	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 05:49:48 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87d0ydorv6.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] cpus: Fix event order on resume of stopped
- guest
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 3 May 2018 13:49:27 +0100
+Message-ID: <CAFEAcA87nQZLG493hSPb__zwKHVMsSNaS_qhY2EPghzTvJ9fwg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] does a device model need to call
+ qemu_chr_fe_accept_input() in its reset method?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,40 +27,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
 
-On 03/05/2018 14:17, Markus Armbruster wrote:
->>> 4. Connect to the QMP socket e.g. like this:
->>>    $ socat UNIX:/your/qmp/socket READLINE,history=$HOME/.qmp_history,prompt='QMP> '
->>>
->>>    Issue QMP command 'qmp_capabilities':
->>>    QMP> { "execute": "qmp_capabilities" }
->>>
->>> 5. Boot the guest.
->>>
->>> 6. In the guest, write to the scratch disk, e.g. like this:
->>>
->>>    # dd if=/dev/zero of=/dev/vdb count=1
->>>
->>>    Do double-check the device specified with of= is actually the
->>>    scratch device!
->>>
->>> 7. Issue QMP command 'cont':
->>>    QMP> { "execute": "cont" }
->>>
->>> After step 6, I get a BLOCK_IO_ERROR event followed by a STOP event.  Good.
->>>
->>> After step 7, I get BLOCK_IO_ERROR, then RESUME, then STOP.  Not so
->>> good; I'd expect RESUME, then BLOCK_IO_ERROR, then STOP.
->> Do you want to rephrase this in the form of a script for qemu-iotests?
->>
->> I suppose the 'dd' line can be replaced by a 'qemu-io' monitor command.
-> Uh, can it?  With qemu-io, the write doesn't stop the guest, because it
-> bypasses the device model, and thus blk_error_action().  I'm not aware
-> of ways to make qemu-iotests write via a device model.  I'm afraid we
-> need a full-fledged qtest.  Better ideas?
+Hi; I noticed that one of our UART models, hw/char/cadence_uart.c,
+calls qemu_chr_fe_accept_input() in its reset method. This sort
+of makes sense, since device reset is a state transition from
+"I'm in a state where I've previously said I can't accept input"
+to "I'm in a state where I can accept input". However, it looks
+like none of the other UARTs do this.
 
-Yeah, using virtio-blk-test sounds like a good idea.
+Is this a bug in our other UARTs, or does the chardev framework
+guarantee to forget about 'nope' responses from the fd_can_read
+callback on system reset?
 
-Paolo
+thanks
+-- PMM
