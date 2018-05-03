@@ -1,17 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fE7dL-0007cH-U8
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 02:22:29 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1fE7dl-0007uA-7s
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 02:22:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fE7dH-0002bQ-82
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 02:22:27 -0400
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  3 May 2018 16:21:39 +1000
-Message-Id: <20180503062145.17899-3-david@gibson.dropbear.id.au>
-In-Reply-To: <20180503062145.17899-1-david@gibson.dropbear.id.au>
-References: <20180503062145.17899-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCH 2/8] spapr: Clean up rtas_start_cpu() &
- rtas_stop_self()
+	(envelope-from <aik@ozlabs.ru>) id 1fE7dg-0002oh-BA
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 02:22:53 -0400
+Received: from mail-it0-x235.google.com ([2607:f8b0:4001:c0b::235]:51132)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1fE7dg-0002oJ-3k
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 02:22:48 -0400
+Received: by mail-it0-x235.google.com with SMTP id p3-v6so20585190itc.0
+	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 23:22:48 -0700 (PDT)
+References: <87o9inxkd1.fsf@dusky.pond.sub.org>
+	<20180430065235.577-1-aik@ozlabs.ru>
+	<c23d1ec1-51d7-d967-28a2-0df0f59e7480@redhat.com>
+	<d15dfc3e-b33b-f0a9-971a-0f40bbffcdf4@ozlabs.ru>
+	<87muxi8t2b.fsf@dusky.pond.sub.org>
+	<6c49e4ab-bb40-cf20-629a-2fc5c19d8585@redhat.com>
+	<6a553611-7bbb-98dd-6dfb-0ef6f53e4dec@ozlabs.ru>
+	<c1d40d88-1c80-2bbd-c28c-613b7fe8d45e@redhat.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <20c40fb6-b2d1-1b9c-46bf-dce93bfccc56@ozlabs.ru>
+Date: Thu, 3 May 2018 16:22:41 +1000
+MIME-Version: 1.0
+In-Reply-To: <c1d40d88-1c80-2bbd-c28c-613b7fe8d45e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu] qom: Document
+ qom/device-list-properties implementation specific
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,144 +37,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: groug@kaod.org, clg@kaod.org
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+To: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-This makes several minor cleanups to these functions:
-  * Follow usual convention of an early exit on error, rather than having
-    most of the body in an if
-  * Clearer naming of cpu and cpu_.  Now callcpu is the cpu from which the
-    RTAS call is invoked, newcpu is the cpu which we're starting
-  * Use cpu_synchronize_state() instead of kvm_cpu_synchronize_state()
-    directly
-  * Remove pointless comment describing what cpu_synchronize_state() does
-  * Use ppc_store_lpcr() instead of directly writing the register field
+On 2/5/18 7:50 pm, Paolo Bonzini wrote:
+> On 02/05/2018 11:33, Alexey Kardashevskiy wrote:
+>>>>>>> +# Note: the handler creates an object, enumerates properties and destroys
+>>>>>>> +# the object so it only lists properties created in TypeInfo::instance_init().
+>>>>>>> +# Since the instance_init() callback of the device object adds
+>>>>>>> +# DeviceClass::props as object properties, they will be listed as well.
+>>
+>> There are roughly 400 of realize(), this is will take a bit of time :)
+>> imho what it does belongs to .json, why it does exactly that belongs to the
+>> git commit log. I'll walk through the realize() hook though, educate
+>> myself, at least :)
+> 
+> Cheer up, there are only 300 callers of object_property_add_* (apart
+> from object_property_add_child which is generally not an issue).  You
+> could look at those instead. :)
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/spapr_rtas.c | 66 ++++++++++++++++++++++-----------------------
- 1 file changed, 32 insertions(+), 34 deletions(-)
+I did not have to go too far for an example:
 
-diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-index 0ec5fa4cfe..b251c130cb 100644
---- a/hw/ppc/spapr_rtas.c
-+++ b/hw/ppc/spapr_rtas.c
-@@ -32,7 +32,7 @@
- #include "hw/qdev.h"
- #include "sysemu/device_tree.h"
- #include "sysemu/cpus.h"
--#include "sysemu/kvm.h"
-+#include "sysemu/hw_accel.h"
- 
- #include "hw/ppc/spapr.h"
- #include "hw/ppc/spapr_vio.h"
-@@ -45,6 +45,7 @@
- #include "qemu/cutils.h"
- #include "trace.h"
- #include "hw/ppc/fdt.h"
-+#include "target/ppc/mmu-hash64.h"
- 
- static void rtas_display_character(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                                    uint32_t token, uint32_t nargs,
-@@ -140,13 +141,15 @@ static void spapr_cpu_set_endianness(PowerPCCPU *cpu)
-     }
- }
- 
--static void rtas_start_cpu(PowerPCCPU *cpu_, sPAPRMachineState *spapr,
-+static void rtas_start_cpu(PowerPCCPU *callcpu, sPAPRMachineState *spapr,
-                            uint32_t token, uint32_t nargs,
-                            target_ulong args,
-                            uint32_t nret, target_ulong rets)
- {
-     target_ulong id, start, r3;
--    PowerPCCPU *cpu;
-+    PowerPCCPU *newcpu;
-+    CPUPPCState *env;
-+    PowerPCCPUClass *pcc;
- 
-     if (nargs != 3 || nret != 1) {
-         rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-@@ -157,41 +160,37 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPAPRMachineState *spapr,
-     start = rtas_ld(args, 1);
-     r3 = rtas_ld(args, 2);
- 
--    cpu = spapr_find_cpu(id);
--    if (cpu != NULL) {
--        CPUState *cs = CPU(cpu);
--        CPUPPCState *env = &cpu->env;
--        PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
-+    newcpu = spapr_find_cpu(id);
-+    if (!newcpu) {
-+        /* Didn't find a matching cpu */
-+        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-+        return;
-+    }
- 
--        if (!cs->halted) {
--            rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
--            return;
--        }
-+    env = &newcpu->env;
-+    pcc = POWERPC_CPU_GET_CLASS(newcpu);
- 
--        /* This will make sure qemu state is up to date with kvm, and
--         * mark it dirty so our changes get flushed back before the
--         * new cpu enters */
--        kvm_cpu_synchronize_state(cs);
-+    if (!CPU(newcpu)->halted) {
-+        rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
-+        return;
-+    }
- 
--        env->msr = (1ULL << MSR_SF) | (1ULL << MSR_ME);
-+    cpu_synchronize_state(CPU(newcpu));
- 
--        /* Enable Power-saving mode Exit Cause exceptions for the new CPU */
--        env->spr[SPR_LPCR] |= pcc->lpcr_pm;
-+    env->msr = (1ULL << MSR_SF) | (1ULL << MSR_ME);
-+    spapr_cpu_set_endianness(newcpu);
-+    spapr_cpu_update_tb_offset(newcpu);
-+    /* Enable Power-saving mode Exit Cause exceptions for the new CPU */
-+    ppc_store_lpcr(newcpu, env->spr[SPR_LPCR] | pcc->lpcr_pm);
- 
--        env->nip = start;
--        env->gpr[3] = r3;
--        cs->halted = 0;
--        spapr_cpu_set_endianness(cpu);
--        spapr_cpu_update_tb_offset(cpu);
-+    env->nip = start;
-+    env->gpr[3] = r3;
- 
--        qemu_cpu_kick(cs);
-+    CPU(newcpu)->halted = 0;
- 
--        rtas_st(rets, 0, RTAS_OUT_SUCCESS);
--        return;
--    }
-+    qemu_cpu_kick(CPU(newcpu));
- 
--    /* Didn't find a matching cpu */
--    rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-+    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
- }
- 
- static void rtas_stop_self(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-@@ -203,13 +202,12 @@ static void rtas_stop_self(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-     CPUPPCState *env = &cpu->env;
-     PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
- 
--    cs->halted = 1;
--    qemu_cpu_kick(cs);
--
-     /* Disable Power-saving mode Exit Cause exceptions for the CPU.
-      * This could deliver an interrupt on a dying CPU and crash the
-      * guest */
--    env->spr[SPR_LPCR] &= ~pcc->lpcr_pm;
-+    ppc_store_lpcr(cpu, env->spr[SPR_LPCR] & ~pcc->lpcr_pm);
-+    cs->halted = 1;
-+    qemu_cpu_kick(cs);
- }
- 
- static inline int sysparm_st(target_ulong addr, target_ulong len,
--- 
-2.17.0
+piix4_pm_realize() calls piix4_pm_add_propeties() and acpi_pcihp_init() and
+piix4_acpi_system_hot_add_init() and these guys create
+bool/uint8_ptr/uint16_ptr/uint32_ptr properties:
+
+
+
+hw/acpi/piix4.c|477| object_property_add_uint8_ptr(OBJECT(s),
+ACPI_PM_PROP_ACPI_ENABLE_CMD,
+hw/acpi/piix4.c|479| object_property_add_uint8_ptr(OBJECT(s),
+ACPI_PM_PROP_ACPI_DISABLE_CMD,
+hw/acpi/piix4.c|481| object_property_add_uint32_ptr(OBJECT(s),
+ACPI_PM_PROP_GPE0_BLK,
+hw/acpi/piix4.c|483| object_property_add_uint32_ptr(OBJECT(s),
+ACPI_PM_PROP_GPE0_BLK_LEN,
+hw/acpi/piix4.c|485| object_property_add_uint16_ptr(OBJECT(s),
+ACPI_PM_PROP_SCI_INT,
+hw/acpi/piix4.c|487| object_property_add_uint32_ptr(OBJECT(s),
+ACPI_PM_PROP_PM_IO_BASE,
+hw/acpi/piix4.c|642| object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
+
+
+
+> Seriously, I think the problem with the comment is only that the reader
+> most likely doesn't care about instance_init() or props, as those are
+> QEMU implementation details.
+So I am putting the chunk below (cut-n-pasted from this thread) for each
+command (i.e. twice) instead of my stuff and repost?
+
+===
+  Objects can create properties at runtime, for example to describe
+  links between different devices and/or objects. These properties
+  are not included in the output of this command.
+===
+
+
+
+
+--
+Alexey
