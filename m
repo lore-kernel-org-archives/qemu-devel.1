@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fEBRh-0006AS-05
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 06:26:41 -0400
+	(envelope-from <berto@igalia.com>) id 1fEBXH-0007n9-OP
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 06:32:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fEBRg-0007Ce-5D
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 06:26:40 -0400
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:40016)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fEBRg-0007CN-0n
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 06:26:40 -0400
-Received: by mail-ot0-x242.google.com with SMTP id n1-v6so20033023otf.7
-	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 03:26:39 -0700 (PDT)
+	(envelope-from <berto@igalia.com>) id 1fEBXE-0000b5-LW
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 06:32:27 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <aab201a7-ef3f-8152-cc37-85ae7e106a5e@redhat.com>
+References: <20180412170711.GA6240@igalia.com>
+	<1695266a-47ac-1f6d-49d1-bdfb81e0e345@redhat.com>
+	<w517ep7gpsz.fsf@maestria.local.igalia.com>
+	<ee24e79d-b37e-ac8f-c349-b0fa637ba2a6@redhat.com>
+	<w51bmegjzp4.fsf@maestria.local.igalia.com>
+	<216e7398-0bc3-4822-d4b0-e0267c714abb@redhat.com>
+	<w5136zjsar5.fsf@maestria.local.igalia.com>
+	<bc26c382-458f-5a86-de59-3945397fbcac@redhat.com>
+	<w51wowvqu65.fsf@maestria.local.igalia.com>
+	<b3ec832d-202b-db93-a163-3d63a4d36326@redhat.com>
+	<w51h8nqcijb.fsf@maestria.local.igalia.com>
+	<aab201a7-ef3f-8152-cc37-85ae7e106a5e@redhat.com>
+Date: Thu, 03 May 2018 12:32:21 +0200
+Message-ID: <w51bmdx6nd6.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <874ljp9h2z.fsf@linaro.org>
-References: <1524153386-3550-1-git-send-email-abdallah.bouassida@lauterbach.com>
-	<1524153386-3550-4-git-send-email-abdallah.bouassida@lauterbach.com>
-	<874ljp9h2z.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 3 May 2018 11:26:18 +0100
-Message-ID: <CAFEAcA8QoZdiCxRic9Ztekyi-e5hGwUSPUrbUmW_d2B9vJgYEg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 3/3] target/arm: Add the XML dynamic
- generation
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC] Intermediate block mirroring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,50 +32,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Khaled Jmal <khaled.jmal@lauterbach.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 3 May 2018 at 11:19, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+On Wed 02 May 2018 04:12:49 PM CEST, Max Reitz wrote:
+> On 2018-05-02 15:07, Alberto Garcia wrote:
+>> On Wed 25 Apr 2018 04:03:22 PM CEST, Max Reitz wrote:
+>>>>> But the question stands whether we need simple node replacement when
+>>>>> we want bdrv_reopen() anyway.  In addition, we don't need just
+>>>>> replacement, we also need addition and removal (e.g. for backing
+>>>>> files or quorum children) -- and especially in the case of quorum,
+>>>>> that is going to be a pain (mostly naming the children).
+>>>>>
+>>>>> With bdrv_reopen(), we can just require the user to respecify all
+>>>>> children, so we don't run into the issue of how to name things at
+>>>>> least.
+>>>>
+>>>> So in this example, if you want to replace [B] with [E] you would
+>>>> reopen [C] specifying the new backing file?
+>>>>
+>>>>    [A] <- [B] <- [C] <- [D]
+>>>>
+>>>>           [E]
+>>>
+>>> You can just use child node name references like in blockdev-add.
+>> 
+>> Were the (more or less) exact requirements of QMP blockdev-reopen
+>> discussed? How is it different from qemu-io's "reopen" command? What are
+>> the options that you can and can not change?
 >
-> Abdallah Bouassida <abdallah.bouassida@lauterbach.com> writes:
->
->> Generate an XML description for the cp-regs.
->> Register these regs with the gdb_register_coprocessor().
->> Add arm_gdb_get_sysreg() to use it as a callback to read those regs.
->> Add a dummy arm_gdb_set_sysreg().
->>
->> Signed-off-by: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
->> ---
->>  gdbstub.c            | 10 +++++++
->>  include/qom/cpu.h    |  5 +++-
->>  target/arm/cpu.c     |  1 +
->>  target/arm/cpu.h     | 26 ++++++++++++++++++
->>  target/arm/gdbstub.c | 76 +++++++++++++++++++++++++++++++++++++++++++++=
-+++++++
->>  target/arm/helper.c  | 26 ++++++++++++++++++
->>  6 files changed, 143 insertions(+), 1 deletion(-)
->>
->> diff --git a/gdbstub.c b/gdbstub.c
->> index a76b2fa..4b56a43 100644
->> --- a/gdbstub.c
->> +++ b/gdbstub.c
->> @@ -674,6 +674,16 @@ static const char *get_feature_xml(const char *p, c=
-onst char **newp,
->>          }
->>          return target_xml;
->>      }
->> +    if (cc->gdb_get_dynamic_xml) {
->> +        CPUState *cpu =3D first_cpu;
->> +        char *xmlname =3D g_strndup(p, len);
->> +        const char *xml =3D cc->gdb_get_dynamic_xml(cpu, xmlname);
->
-> Last time I asked:
->
-> "although I'm confused as to why you need to g_strdup the string. You
-> already have p and its not like gdb_get_dynamic_xml couldn't dup the
-> string if it needed to (which it doesn't seem to)."
+> I can't quite remember, I'm afraid.  I think it was supposed to be
+> pretty much qemu-io's reopen (so just bdrv_reopen()).  I suppose you
+> cannot change the driver (obviously) or probably the node name,
+> because either would result in the node being replaced by a completely
+> new one.
 
-...and the answer is still the same: p is not NUL terminated.
+I was testing qemu-io's reopen and it didn't seem like you could change
+the backing chain at all, so this would probably need to do more things.
 
-thanks
--- PMM
+> Other than that, it probably depends on what the block driver
+> supports, but ideally you should be able to change everything.
+
+I agree.
+
+>> Also, you could replace an element in the backing chain using reopen,
+>> but can you replace a node that is not a backing image of another
+>> one?
+>
+> Node replacement only makes sense if the node is used as the child of
+> something.  Otherwise it's just a blockdev-add + blockdev-del.
+
+But how do you do blockdev-del of a root node if it's being used by the
+guest?
+
+> But it doesn't have to be in a backing chain, of course.  It would
+> work for Quorum children, too.
+
+Sure, I meant "child" when I said "backing image" :-)
+
+>> With QMP blockdev-replace you could use the existing blockdev-add
+>> command and create an arbitrary tree and then simply do
+>> blockdev-replace so I suppose that for some use cases at least it
+>> would be pretty straightforward.
+>
+> You can do the same with reopen.  Just use a reference for the child
+> name.
+
+Yes, yes, I agree. I mean that the implementation with blockdev-replace
+seems much simpler.
+
+Although there are cases where blockdev-replace would probably not work,
+e.g. if you want to change the options of an image opened in read-write
+mode. In this case you cannot open the image again with the new options
+and replace the old with the new one because of the image locks. So you
+would need to reopen the image instead.
+
+Berto
