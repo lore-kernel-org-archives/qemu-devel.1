@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54976)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fEDqX-0006QU-Hs
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 09:00:35 -0400
+	(envelope-from <renyime@gmail.com>) id 1fEDwh-0002N9-4M
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 09:06:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fEDqT-0004Dh-H8
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 09:00:29 -0400
-Received: from mail-ot0-x229.google.com ([2607:f8b0:4003:c0f::229]:41521)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fEDqS-0004DF-Rk
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 09:00:24 -0400
-Received: by mail-ot0-x229.google.com with SMTP id t1-v6so20491405oth.8
-	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 06:00:24 -0700 (PDT)
+	(envelope-from <renyime@gmail.com>) id 1fEDwZ-0008Al-4D
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 09:06:51 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180502174753.16133-1-richard.henderson@linaro.org>
-References: <20180502174753.16133-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 3 May 2018 14:00:03 +0100
-Message-ID: <CAFEAcA9X3GTVVxjKB7Z_Lkm6d0kLw2-p747UAmNeXsh-Z-7TLA@mail.gmail.com>
+References: <1525268093-531-1-git-send-email-ivanren@tencent.com>
+	<bc77a1b2-27f3-21a0-8d82-b930bdf033a5@redhat.com>
+In-Reply-To: <bc77a1b2-27f3-21a0-8d82-b930bdf033a5@redhat.com>
+From: =?UTF-8?B?5Y+25q6L6aOO?= <renyime@gmail.com>
+Date: Thu, 03 May 2018 13:06:31 +0000
+Message-ID: <CA+6E1=kp+xYKEc0Xz8tj8M0r4nGb8PG+vxvxm=cDTEGCEsDTPg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/5] TCG queued patches
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: return allocated size for block
+ device with qcow2 format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +24,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: eblake@redhat.com
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-On 2 May 2018 at 18:47, Richard Henderson <richard.henderson@linaro.org> wrote:
-> The first tcg pull for 2.13/3.0.  Two of these are candidates
-> for cherry-picking into stable.
->
->
-> r~
->
->
-> The following changes since commit 26bd8d98c4b3284a4c6fe3b67c98b1edd00e9beb:
->
->   Merge remote-tracking branch 'remotes/vivier/tags/m68k-for-2.13-pull-request' into staging (2018-05-01 15:26:06 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/rth7680/qemu.git tags/pull-tcg-20180502
->
-> for you to fetch changes up to 6001f7729e12dd1d810291e4cbf83cee8e07441d:
->
->   tcg: workaround branch instruction overflow in tcg_out_qemu_ld/st (2018-05-01 11:56:55 -0700)
->
-> ----------------------------------------------------------------
-> Queued TCG patches
->
+Thanks for your review, Eric.
+Yes, the wr_highest_offset can tell the end offset at runtime, and
+write_threshold similar to it. But in my situation, I need to know
+the allocated end without a vm running.
 
-Applied, thanks.
+Eric Blake <eblake@redhat.com> =E4=BA=8E2018=E5=B9=B45=E6=9C=882=E6=97=A5=
+=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=8810:02=E5=86=99=E9=81=93=EF=BC=9A
 
--- PMM
+> On 05/02/2018 08:34 AM, Ivan Ren wrote:
+> > qemu-img info with a block device which has a qcow2 format always
+> > return 0 for disk size, and this can not reflect the qcow2 size
+> > and the used space of the block device. This patch return the
+> > allocated size of qcow2 as the disk size.
+>
+> How does this differ from what qemu can already give you at runtime via
+> the wr_highest_offset property in BlockDeviceStats, and related to the
+> write_threshold ('block-set-write-threshold command,
+> BLOCK_WRITE_THRESHOLD event)?  Is there any code we can reuse, rather
+> than writing something from scratch?
+>
+> >
+> > Signed-off-by: Ivan Ren <ivanren@tencent.com>
+> > ---
+> >   block/qcow2-bitmap.c |  69 +++++++++++++++++
+> >   block/qcow2.c        | 212
+> +++++++++++++++++++++++++++++++++++++++++++++++++++
+> >   block/qcow2.h        |  42 ++++++++++
+> >   3 files changed, 323 insertions(+)
+> >
+>
+> --
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+>
