@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60217)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fEM2R-0001bj-1K
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:45:22 -0400
+	(envelope-from <alistair23@gmail.com>) id 1fEM2q-0001yf-QG
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:45:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fEM2O-00045C-He
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:45:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53132)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1fEM2N-00042j-GN
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:45:16 -0400
-From: Alex Williamson <alex.williamson@redhat.com>
-Date: Thu, 03 May 2018 15:45:13 -0600
-Message-ID: <20180503214513.2749.30627.stgit@gimli.home>
-In-Reply-To: <20180503213458.2749.28566.stgit@gimli.home>
-References: <20180503213458.2749.28566.stgit@gimli.home>
+	(envelope-from <alistair23@gmail.com>) id 1fEM2p-0004iw-Uh
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:45:44 -0400
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:41916)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1fEM2p-0004hD-NO
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:45:43 -0400
+Received: by mail-lf0-x244.google.com with SMTP id o123-v6so28112533lfe.8
+	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 14:45:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v3 6/6] vfio/quirks: Enable ioeventfd quirks to
- be handled by vfio directly
+References: <20180503091922.28733-1-edgar.iglesias@gmail.com>
+	<20180503091922.28733-19-edgar.iglesias@gmail.com>
+In-Reply-To: <20180503091922.28733-19-edgar.iglesias@gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 03 May 2018 21:45:16 +0000
+Message-ID: <CAKmqyKOT_ZPYZSic9QdyyyujaW=8i=cjg+x+thn3VjXtoJyVNg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 18/29] target-microblaze: dec_msr: Reuse
+ more code when reg-decoding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,166 +30,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kvm@vger.kernel.org, eric.auger@redhat.com, peterx@redhat.com
+To: Edgar Iglesias <edgar.iglesias@gmail.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, Francisco Iglesias <frasse.iglesias@gmail.com>, Alistair Francis <alistair@alistair23.me>, Richard Henderson <richard.henderson@linaro.org>
 
-With vfio ioeventfd support, we can program vfio-pci to perform a
-specified BAR write when an eventfd is triggered.  This allows the
-KVM ioeventfd to be wired directly to vfio-pci, entirely avoiding
-userspace handling for these events.  On the same micro-benchmark
-where the ioeventfd got us to almost 90% of performance versus
-disabling the GeForce quirks, this gets us to within 95%.
+On Thu, May 3, 2018 at 2:40 AM Edgar E. Iglesias <edgar.iglesias@gmail.com>
+wrote:
 
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- hw/vfio/pci-quirks.c |   53 +++++++++++++++++++++++++++++++++++++++++++-------
- hw/vfio/pci.c        |    2 ++
- hw/vfio/pci.h        |    2 ++
- hw/vfio/trace-events |    2 +-
- 4 files changed, 51 insertions(+), 8 deletions(-)
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-index f7886487744e..061259b86b71 100644
---- a/hw/vfio/pci-quirks.c
-+++ b/hw/vfio/pci-quirks.c
-@@ -16,6 +16,7 @@
- #include "qemu/range.h"
- #include "qapi/error.h"
- #include "qapi/visitor.h"
-+#include <sys/ioctl.h>
- #include "hw/nvram/fw_cfg.h"
- #include "pci.h"
- #include "trace.h"
-@@ -287,12 +288,33 @@ static VFIOQuirk *vfio_quirk_alloc(int nr_mem)
-     return quirk;
- }
- 
--static void vfio_ioeventfd_exit(VFIOIOEventFD *ioeventfd)
-+static void vfio_ioeventfd_exit(VFIOPCIDevice *vdev, VFIOIOEventFD *ioeventfd)
- {
-     QLIST_REMOVE(ioeventfd, next);
-     memory_region_del_eventfd(ioeventfd->mr, ioeventfd->addr, ioeventfd->size,
-                               true, ioeventfd->data, &ioeventfd->e);
--    qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e), NULL, NULL, NULL);
-+
-+    if (ioeventfd->vfio) {
-+        struct vfio_device_ioeventfd vfio_ioeventfd;
-+
-+        vfio_ioeventfd.argsz = sizeof(vfio_ioeventfd);
-+        vfio_ioeventfd.flags = ioeventfd->size;
-+        vfio_ioeventfd.data = ioeventfd->data;
-+        vfio_ioeventfd.offset = ioeventfd->region->fd_offset +
-+                                ioeventfd->region_addr;
-+        vfio_ioeventfd.fd = -1;
-+
-+        if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_IOEVENTFD, &vfio_ioeventfd)) {
-+            error_report("Failed to remove vfio ioeventfd for %s+0x%"
-+                         HWADDR_PRIx"[%d]:0x%"PRIx64" (%m)",
-+                         memory_region_name(ioeventfd->mr), ioeventfd->addr,
-+                         ioeventfd->size, ioeventfd->data);
-+        }
-+    } else {
-+        qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e),
-+                            NULL, NULL, NULL);
-+    }
-+
-     event_notifier_cleanup(&ioeventfd->e);
-     trace_vfio_ioeventfd_exit(memory_region_name(ioeventfd->mr),
-                               (uint64_t)ioeventfd->addr, ioeventfd->size,
-@@ -306,7 +328,7 @@ static void vfio_drop_dynamic_eventfds(VFIOPCIDevice *vdev, VFIOQuirk *quirk)
- 
-     QLIST_FOREACH_SAFE(ioeventfd, &quirk->ioeventfds, next, tmp) {
-         if (ioeventfd->dynamic) {
--            vfio_ioeventfd_exit(ioeventfd);
-+            vfio_ioeventfd_exit(vdev, ioeventfd);
-         }
-     }
- }
-@@ -359,12 +381,29 @@ static VFIOIOEventFD *vfio_ioeventfd_init(VFIOPCIDevice *vdev,
-     ioeventfd->region = region;
-     ioeventfd->region_addr = region_addr;
- 
--    qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e),
--                        vfio_ioeventfd_handler, NULL, ioeventfd);
-+    if (!vdev->no_vfio_ioeventfd) {
-+        struct vfio_device_ioeventfd vfio_ioeventfd;
-+
-+        vfio_ioeventfd.argsz = sizeof(vfio_ioeventfd);
-+        vfio_ioeventfd.flags = ioeventfd->size;
-+        vfio_ioeventfd.data = ioeventfd->data;
-+        vfio_ioeventfd.offset = ioeventfd->region->fd_offset +
-+                                ioeventfd->region_addr;
-+        vfio_ioeventfd.fd = event_notifier_get_fd(&ioeventfd->e);
-+
-+        ioeventfd->vfio = !ioctl(vdev->vbasedev.fd,
-+                                 VFIO_DEVICE_IOEVENTFD, &vfio_ioeventfd);
-+    }
-+
-+    if (!ioeventfd->vfio) {
-+        qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e),
-+                            vfio_ioeventfd_handler, NULL, ioeventfd);
-+    }
-+
-     memory_region_add_eventfd(ioeventfd->mr, ioeventfd->addr, ioeventfd->size,
-                               true, ioeventfd->data, &ioeventfd->e);
-     trace_vfio_ioeventfd_init(memory_region_name(mr), (uint64_t)addr,
--                              size, data);
-+                              size, data, ioeventfd->vfio);
- 
-     return ioeventfd;
- }
-@@ -1827,7 +1866,7 @@ void vfio_bar_quirk_exit(VFIOPCIDevice *vdev, int nr)
- 
-     QLIST_FOREACH(quirk, &bar->quirks, next) {
-         while (!QLIST_EMPTY(&quirk->ioeventfds)) {
--            vfio_ioeventfd_exit(QLIST_FIRST(&quirk->ioeventfds));
-+            vfio_ioeventfd_exit(vdev, QLIST_FIRST(&quirk->ioeventfds));
-         }
- 
-         for (i = 0; i < quirk->nr_mem; i++) {
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index ba1239551115..84e27c7bb2d1 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -3177,6 +3177,8 @@ static Property vfio_pci_dev_properties[] = {
-                      no_geforce_quirks, false),
-     DEFINE_PROP_BOOL("x-no-kvm-ioeventfd", VFIOPCIDevice, no_kvm_ioeventfd,
-                      false),
-+    DEFINE_PROP_BOOL("x-no-vfio-ioeventfd", VFIOPCIDevice, no_vfio_ioeventfd,
-+                     false),
-     DEFINE_PROP_UINT32("x-pci-vendor-id", VFIOPCIDevice, vendor_id, PCI_ANY_ID),
-     DEFINE_PROP_UINT32("x-pci-device-id", VFIOPCIDevice, device_id, PCI_ANY_ID),
-     DEFINE_PROP_UINT32("x-pci-sub-vendor-id", VFIOPCIDevice,
-diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-index a4ac583fbd6e..52b065421a68 100644
---- a/hw/vfio/pci.h
-+++ b/hw/vfio/pci.h
-@@ -34,6 +34,7 @@ typedef struct VFIOIOEventFD {
-     VFIORegion *region;
-     hwaddr region_addr;
-     bool dynamic; /* Added runtime, removed on device reset */
-+    bool vfio;
- } VFIOIOEventFD;
- 
- typedef struct VFIOQuirk {
-@@ -163,6 +164,7 @@ typedef struct VFIOPCIDevice {
-     bool no_kvm_msix;
-     bool no_geforce_quirks;
-     bool no_kvm_ioeventfd;
-+    bool no_vfio_ioeventfd;
-     VFIODisplay *dpy;
- } VFIOPCIDevice;
- 
-diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-index f8f97d1ff90c..d2a74952e389 100644
---- a/hw/vfio/trace-events
-+++ b/hw/vfio/trace-events
-@@ -79,7 +79,7 @@ vfio_quirk_ati_bonaire_reset_done(const char *name) "%s"
- vfio_quirk_ati_bonaire_reset(const char *name) "%s"
- vfio_ioeventfd_exit(const char *name, uint64_t addr, unsigned size, uint64_t data) "%s+0x%"PRIx64"[%d]:0x%"PRIx64
- vfio_ioeventfd_handler(const char *name, uint64_t addr, unsigned size, uint64_t data) "%s+0x%"PRIx64"[%d] -> 0x%"PRIx64
--vfio_ioeventfd_init(const char *name, uint64_t addr, unsigned size, uint64_t data) "%s+0x%"PRIx64"[%d]:0x%"PRIx64
-+vfio_ioeventfd_init(const char *name, uint64_t addr, unsigned size, uint64_t data, bool vfio) "%s+0x%"PRIx64"[%d]:0x%"PRIx64" vfio:%d"
- vfio_pci_igd_bar4_write(const char *name, uint32_t index, uint32_t data, uint32_t base) "%s [0x%03x] 0x%08x -> 0x%08x"
- vfio_pci_igd_bdsm_enabled(const char *name, int size) "%s %dMB"
- vfio_pci_igd_opregion_enabled(const char *name) "%s"
+> Reuse more code when decoding register numbers.
+
+> No functional changes.
+
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+
+Alistair
+
+> ---
+>   target/microblaze/translate.c | 38 +++++++++-----------------------------
+>   1 file changed, 9 insertions(+), 29 deletions(-)
+
+> diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
+> index d2788451fe..05449fb941 100644
+> --- a/target/microblaze/translate.c
+> +++ b/target/microblaze/translate.c
+> @@ -531,11 +531,9 @@ static void dec_msr(DisasContext *dc)
+>               case 1:
+>                   msr_write(dc, cpu_R[dc->ra]);
+>                   break;
+> -            case 0x3:
+> -                tcg_gen_mov_i32(cpu_SR[SR_EAR], cpu_R[dc->ra]);
+> -                break;
+> -            case 0x5:
+> -                tcg_gen_mov_i32(cpu_SR[SR_ESR], cpu_R[dc->ra]);
+> +            case SR_EAR:
+> +            case SR_ESR:
+> +                tcg_gen_mov_i32(cpu_SR[sr], cpu_R[dc->ra]);
+>                   break;
+>               case 0x7:
+>                   tcg_gen_andi_i32(cpu_SR[SR_FSR], cpu_R[dc->ra], 31);
+> @@ -562,17 +560,11 @@ static void dec_msr(DisasContext *dc)
+>               case 1:
+>                   msr_read(dc, cpu_R[dc->rd]);
+>                   break;
+> -            case 0x3:
+> -                tcg_gen_mov_i32(cpu_R[dc->rd], cpu_SR[SR_EAR]);
+> -                break;
+> -            case 0x5:
+> -                tcg_gen_mov_i32(cpu_R[dc->rd], cpu_SR[SR_ESR]);
+> -                break;
+> -             case 0x7:
+> -                tcg_gen_mov_i32(cpu_R[dc->rd], cpu_SR[SR_FSR]);
+> -                break;
+> -            case 0xb:
+> -                tcg_gen_mov_i32(cpu_R[dc->rd], cpu_SR[SR_BTR]);
+> +            case SR_EAR:
+> +            case SR_ESR:
+> +            case SR_FSR:
+> +            case SR_BTR:
+> +                tcg_gen_mov_i32(cpu_R[dc->rd], cpu_SR[sr]);
+>                   break;
+>               case 0x800:
+>                   tcg_gen_ld_i32(cpu_R[dc->rd],
+> @@ -582,19 +574,7 @@ static void dec_msr(DisasContext *dc)
+>                   tcg_gen_ld_i32(cpu_R[dc->rd],
+>                                  cpu_env, offsetof(CPUMBState, shr));
+>                   break;
+> -            case 0x2000:
+> -            case 0x2001:
+> -            case 0x2002:
+> -            case 0x2003:
+> -            case 0x2004:
+> -            case 0x2005:
+> -            case 0x2006:
+> -            case 0x2007:
+> -            case 0x2008:
+> -            case 0x2009:
+> -            case 0x200a:
+> -            case 0x200b:
+> -            case 0x200c:
+> +            case 0x2000 ... 0x200c:
+>                   rn = sr & 0xf;
+>                   tcg_gen_ld_i32(cpu_R[dc->rd],
+>                                 cpu_env, offsetof(CPUMBState,
+pvr.regs[rn]));
+> --
+> 2.14.1
