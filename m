@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1fEFz9-0004Tp-HZ
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:17:32 -0400
+	(envelope-from <david@redhat.com>) id 1fEG2C-0006qz-5v
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:20:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1fEFz5-0003Db-D2
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:17:31 -0400
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Date: Thu,  3 May 2018 17:17:14 +0200
-Message-Id: <1525360636-18229-2-git-send-email-frederic.konrad@adacore.com>
-In-Reply-To: <1525360636-18229-1-git-send-email-frederic.konrad@adacore.com>
-References: <1525360636-18229-1-git-send-email-frederic.konrad@adacore.com>
-Subject: [Qemu-devel] [PATCH V2 1/3] riscv: spike: allow base == 0
+	(envelope-from <david@redhat.com>) id 1fEG2B-0004Xg-4i
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:20:40 -0400
+References: <20180502125221.4877-1-cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <72d0bc42-ee4f-9743-26d4-677765f17ec4@redhat.com>
+Date: Thu, 3 May 2018 17:20:35 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180502125221.4877-1-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] s390-ccw: force diag 308
+ subcode to unsigned long
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,56 +24,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-stable@nongnu.org
-Cc: mjc@sifive.com, kbastian@mail.uni-paderborn.de, f4bug@amsat.org, peter.maydell@linaro.org, frederic.konrad@adacore.com
+To: Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
-The sanity check on base doesn't allow htif to be mapped @0. Check if the
-symbol exists instead so we can map it where we want.
+On 02.05.2018 14:52, Cornelia Huck wrote:
+> We currently pass an integer as the subcode parameter. However,
+> the upper bits of the register containing the subcode need to
+> be 0, which is not guaranteed unless we explicitly specify the
+> subcode to be an unsigned long value.
+> 
+> Fixes: d046c51dad3 ("pc-bios/s390-ccw: Get device address via diag 308/6")
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  pc-bios/s390-ccw/iplb.h | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/pc-bios/s390-ccw/iplb.h b/pc-bios/s390-ccw/iplb.h
+> index 5357a36d51..ded20c834e 100644
+> --- a/pc-bios/s390-ccw/iplb.h
+> +++ b/pc-bios/s390-ccw/iplb.h
+> @@ -101,10 +101,11 @@ static inline bool manage_iplb(IplParameterBlock *iplb, bool store)
+>  {
+>      register unsigned long addr asm("0") = (unsigned long) iplb;
+>      register unsigned long rc asm("1") = 0;
+> +    unsigned long subcode = store ? 6 : 5;
+>  
+>      asm volatile ("diag %0,%2,0x308\n"
+>                    : "+d" (addr), "+d" (rc)
+> -                  : "d" (store ? 6 : 5)
+> +                  : "d" (subcode)
+>                    : "memory", "cc");
+>      return rc == 0x01;
+>  }
+> 
 
-Reviewed-by: Michael Clark <mjc@sifive.com>
-Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
----
-V1 -> V2:
-  * Check that both symbols are set as suggested by Michael.
----
- hw/riscv/riscv_htif.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/hw/riscv/riscv_htif.c b/hw/riscv/riscv_htif.c
-index 3e17f30..be252ec 100644
---- a/hw/riscv/riscv_htif.c
-+++ b/hw/riscv/riscv_htif.c
-@@ -41,17 +41,20 @@
-     } while (0)
- 
- static uint64_t fromhost_addr, tohost_addr;
-+static int address_symbol_set;
- 
- void htif_symbol_callback(const char *st_name, int st_info, uint64_t st_value,
--    uint64_t st_size)
-+                          uint64_t st_size)
- {
-     if (strcmp("fromhost", st_name) == 0) {
-+        address_symbol_set |= 1;
-         fromhost_addr = st_value;
-         if (st_size != 8) {
-             error_report("HTIF fromhost must be 8 bytes");
-             exit(1);
-         }
-     } else if (strcmp("tohost", st_name) == 0) {
-+        address_symbol_set |= 2;
-         tohost_addr = st_value;
-         if (st_size != 8) {
-             error_report("HTIF tohost must be 8 bytes");
-@@ -248,7 +251,7 @@ HTIFState *htif_mm_init(MemoryRegion *address_space, MemoryRegion *main_mem,
-     qemu_chr_fe_init(&s->chr, chr, &error_abort);
-     qemu_chr_fe_set_handlers(&s->chr, htif_can_recv, htif_recv, htif_event,
-         htif_be_change, s, NULL, true);
--    if (base) {
-+    if (address_symbol_set == 3) {
-         memory_region_init_io(&s->mmio, NULL, &htif_mm_ops, s,
-                             TYPE_HTIF_UART, size);
-         memory_region_add_subregion(address_space, base, &s->mmio);
 -- 
-1.8.3.1
+
+Thanks,
+
+David / dhildenb
