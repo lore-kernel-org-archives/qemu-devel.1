@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fEKoR-0000kv-Tf
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:26:49 -0400
+	(envelope-from <mst@redhat.com>) id 1fEKqx-0002zO-Ie
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:29:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fEKoQ-0000Ik-1d
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:26:47 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:33020)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1fEKoP-0000IP-Hc
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:26:45 -0400
-Received: by mail-lf0-x244.google.com with SMTP id m18-v6so27874447lfb.0
-	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 13:26:45 -0700 (PDT)
+	(envelope-from <mst@redhat.com>) id 1fEKqw-0002I8-HQ
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:29:23 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55446 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fEKqw-0002Gu-8Z
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:29:22 -0400
+Date: Thu, 3 May 2018 23:29:13 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180503232542-mutt-send-email-mst@kernel.org>
+References: <1525376963-79623-1-git-send-email-mst@redhat.com>
+	<1525376963-79623-6-git-send-email-mst@redhat.com>
+	<5fbe4232-ca1a-5e0c-437c-8b63cf83c510@redhat.com>
+	<20180503230505-mutt-send-email-mst@kernel.org>
+	<c4f0bb7a-f5db-383b-60fd-683dd65de7f8@redhat.com>
 MIME-Version: 1.0
-References: <20180503091922.28733-1-edgar.iglesias@gmail.com>
-	<20180503091922.28733-14-edgar.iglesias@gmail.com>
-In-Reply-To: <20180503091922.28733-14-edgar.iglesias@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 03 May 2018 20:26:18 +0000
-Message-ID: <CAKmqyKPS8FzGP3wmfXbh9tGPHeup_ECCHGpH+FWp=TaFj3Mvpw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 13/29] target-microblaze: Use TCGv for
- load/store addresses
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c4f0bb7a-f5db-383b-60fd-683dd65de7f8@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 05/67] migration: drop an unused include,
+ add a used one
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,332 +31,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Edgar Iglesias <edgar.iglesias@gmail.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, Francisco Iglesias <frasse.iglesias@gmail.com>, Alistair Francis <alistair@alistair23.me>, Richard Henderson <richard.henderson@linaro.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Thu, May 3, 2018 at 2:26 AM Edgar E. Iglesias <edgar.iglesias@gmail.com>
-wrote:
+On Thu, May 03, 2018 at 03:18:47PM -0500, Eric Blake wrote:
+> On 05/03/2018 03:15 PM, Michael S. Tsirkin wrote:
+> > On Thu, May 03, 2018 at 03:02:59PM -0500, Eric Blake wrote:
+> > > On 05/03/2018 02:50 PM, Michael S. Tsirkin wrote:
+> > > > we just need a struct name, let's add a forward
+> > > > declaration instead of an include.
+> > > 
+> > > Reasonable.
+> > > 
+> > > > 
+> > > > We also use size_t, so add stddef.h
+> > > 
+> > > Why? osdep.h already does this, and ALL .c files that use include/ should be
+> > > including osdep.h prior to any other in-tree .h file.  So size_t should
+> > > already be in scope by the time this header is included.
+> > 
+> > It seemed cleaner to have the file self-contained.
+> > OK, I will drop this.
+> > There's a small number of files which do not include qemu/osdep.h.
+> > Might be worth fixing.
+> 
+> scripts/clean-includes is already supposed to fix these.
+> 
+> There are a few .c files exempt from including osdep.h, but in general,
+> those files should probably also not be including anything from include/.
 
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Here's a list from a quick grep.
+Most of them probably get osdep.h indirectly.
 
-> Use TCGv for load/store addresses, allowing for future
-> computation of 64-bit load/store address.
 
-> No functional change.
++contrib/libvhost-user/libvhost-user.c
++hw/rdma/rdma_utils.c
++libuser/trace.c
++target/mips/translate_init.c
++target/ppc/mfrom_table.c
++target/ppc/translate/dfp-impl.inc.c
++target/ppc/translate/dfp-ops.inc.c
++target/ppc/translate/fp-impl.inc.c
++target/ppc/translate/fp-ops.inc.c
++target/ppc/translate/spe-impl.inc.c
++target/ppc/translate/spe-ops.inc.c
++target/ppc/translate/vmx-impl.inc.c
++target/ppc/translate/vmx-ops.inc.c
++target/ppc/translate/vsx-impl.inc.c
++target/ppc/translate/vsx-ops.inc.c
++target/s390x/gen-features.c
++target/xtensa/core-dc232b/gdb-config.inc.c
++target/xtensa/core-dc233c/gdb-config.inc.c
++target/xtensa/core-de212/gdb-config.inc.c
++target/xtensa/core-sample_controller/gdb-config.inc.c
++tcg/aarch64/tcg-target.inc.c
++tcg/arm/tcg-target.inc.c
++tcg/i386/tcg-target.inc.c
++tcg/mips/tcg-target.inc.c
++tcg/ppc/tcg-target.inc.c
++tcg/s390/tcg-target.inc.c
++tcg/sparc/tcg-target.inc.c
++tcg/tcg-ldst.inc.c
++tcg/tcg-pool.inc.c
++tcg/tci/tcg-target.inc.c
++tests/multiboot/libc.c
++tests/multiboot/mmap.c
++tests/multiboot/modules.c
 
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+lots of files under tests/tcg
 
-Acked-by: Alistair Francis <alistair.francis@wdc.com>
++tests/test-qapi-event.c
++tests/test-qapi-types.c
++tests/test-qapi-visit.c
++tests/test-qmp-introspect.c
++tests/test-qmp-marshal.c
 
-Alistair
++ui/keycodemapdb/tests/stdc.c
 
-> ---
->   target/microblaze/cpu.h       |  2 +-
->   target/microblaze/helper.h    |  4 +--
->   target/microblaze/op_helper.c | 11 +++---
->   target/microblaze/translate.c | 78
-++++++++++++++++++++++++-------------------
->   4 files changed, 53 insertions(+), 42 deletions(-)
 
-> diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-> index 2304c24b7d..1593496997 100644
-> --- a/target/microblaze/cpu.h
-> +++ b/target/microblaze/cpu.h
-> @@ -250,7 +250,7 @@ struct CPUMBState {
-
->       /* lwx/swx reserved address */
->   #define RES_ADDR_NONE 0xffffffff /* Use 0xffffffff to indicate no
-reservation */
-> -    uint32_t res_addr;
-> +    target_ulong res_addr;
->       uint32_t res_val;
-
->       /* Internal flags.  */
-> diff --git a/target/microblaze/helper.h b/target/microblaze/helper.h
-> index 71a6c0858d..ce70353936 100644
-> --- a/target/microblaze/helper.h
-> +++ b/target/microblaze/helper.h
-> @@ -29,8 +29,8 @@ DEF_HELPER_2(mmu_read, i32, env, i32)
->   DEF_HELPER_3(mmu_write, void, env, i32, i32)
->   #endif
-
-> -DEF_HELPER_5(memalign, void, env, i32, i32, i32, i32)
-> -DEF_HELPER_2(stackprot, void, env, i32)
-> +DEF_HELPER_5(memalign, void, env, tl, i32, i32, i32)
-> +DEF_HELPER_2(stackprot, void, env, tl)
-
->   DEF_HELPER_2(get, i32, i32, i32)
->   DEF_HELPER_3(put, void, i32, i32, i32)
-> diff --git a/target/microblaze/op_helper.c b/target/microblaze/op_helper.c
-> index 1b4fe796e7..f5e851e38d 100644
-> --- a/target/microblaze/op_helper.c
-> +++ b/target/microblaze/op_helper.c
-> @@ -439,12 +439,14 @@ uint32_t helper_pcmpbf(uint32_t a, uint32_t b)
->       return 0;
->   }
-
-> -void helper_memalign(CPUMBState *env, uint32_t addr, uint32_t dr,
-uint32_t wr,
-> +void helper_memalign(CPUMBState *env, target_ulong addr,
-> +                     uint32_t dr, uint32_t wr,
->                        uint32_t mask)
->   {
->       if (addr & mask) {
->               qemu_log_mask(CPU_LOG_INT,
-> -                          "unaligned access addr=%x mask=%x, wr=%d
-dr=r%d\n",
-> +                          "unaligned access addr=" TARGET_FMT_lx
-> +                          " mask=%x, wr=%d dr=r%d\n",
->                             addr, mask, wr, dr);
->               env->sregs[SR_EAR] = addr;
->               env->sregs[SR_ESR] = ESR_EC_UNALIGNED_DATA | (wr << 10) \
-> @@ -459,10 +461,11 @@ void helper_memalign(CPUMBState *env, uint32_t
-addr, uint32_t dr, uint32_t wr,
->       }
->   }
-
-> -void helper_stackprot(CPUMBState *env, uint32_t addr)
-> +void helper_stackprot(CPUMBState *env, target_ulong addr)
->   {
->       if (addr < env->slr || addr > env->shr) {
-> -        qemu_log_mask(CPU_LOG_INT, "Stack protector violation at %x %x
-%x\n",
-> +        qemu_log_mask(CPU_LOG_INT, "Stack protector violation at "
-> +                      TARGET_FMT_lx " %x %x\n",
->                         addr, env->slr, env->shr);
->           env->sregs[SR_EAR] = addr;
->           env->sregs[SR_ESR] = ESR_EC_STACKPROT;
-> diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-> index 5cc53eb035..c971fe3b72 100644
-> --- a/target/microblaze/translate.c
-> +++ b/target/microblaze/translate.c
-> @@ -59,7 +59,7 @@ static TCGv_i32 env_imm;
->   static TCGv_i32 env_btaken;
->   static TCGv_i32 env_btarget;
->   static TCGv_i32 env_iflags;
-> -static TCGv_i32 env_res_addr;
-> +static TCGv env_res_addr;
->   static TCGv_i32 env_res_val;
-
->   #include "exec/gen-icount.h"
-> @@ -848,11 +848,12 @@ static void dec_imm(DisasContext *dc)
->       dc->clear_imm = 0;
->   }
-
-> -static inline void compute_ldst_addr(DisasContext *dc, TCGv_i32 t)
-> +static inline void compute_ldst_addr(DisasContext *dc, TCGv t)
->   {
->       bool extimm = dc->tb_flags & IMM_FLAG;
->       /* Should be set to true if r1 is used by loadstores.  */
->       bool stackprot = false;
-> +    TCGv_i32 t32;
-
->       /* All load/stores use ra.  */
->       if (dc->ra == 1 && dc->cpu->cfg.stackprot) {
-> @@ -863,10 +864,10 @@ static inline void compute_ldst_addr(DisasContext
-*dc, TCGv_i32 t)
->       if (!dc->type_b) {
->           /* If any of the regs is r0, return the value of the other reg.
-  */
->           if (dc->ra == 0) {
-> -            tcg_gen_mov_i32(t, cpu_R[dc->rb]);
-> +            tcg_gen_extu_i32_tl(t, cpu_R[dc->rb]);
->               return;
->           } else if (dc->rb == 0) {
-> -            tcg_gen_mov_i32(t, cpu_R[dc->ra]);
-> +            tcg_gen_extu_i32_tl(t, cpu_R[dc->ra]);
->               return;
->           }
-
-> @@ -874,7 +875,10 @@ static inline void compute_ldst_addr(DisasContext
-*dc, TCGv_i32 t)
->               stackprot = true;
->           }
-
-> -        tcg_gen_add_i32(t, cpu_R[dc->ra], cpu_R[dc->rb]);
-> +        t32 = tcg_temp_new_i32();
-> +        tcg_gen_add_i32(t32, cpu_R[dc->ra], cpu_R[dc->rb]);
-> +        tcg_gen_extu_i32_tl(t, t32);
-> +        tcg_temp_free_i32(t32);
-
->           if (stackprot) {
->               gen_helper_stackprot(cpu_env, t);
-> @@ -882,16 +886,19 @@ static inline void compute_ldst_addr(DisasContext
-*dc, TCGv_i32 t)
->           return;
->       }
->       /* Immediate.  */
-> +    t32 = tcg_temp_new_i32();
->       if (!extimm) {
->           if (dc->imm == 0) {
-> -            tcg_gen_mov_i32(t, cpu_R[dc->ra]);
-> -            return;
-> +            tcg_gen_mov_i32(t32, cpu_R[dc->ra]);
-> +        } else {
-> +            tcg_gen_movi_i32(t32, (int32_t)((int16_t)dc->imm));
-> +            tcg_gen_add_i32(t32, cpu_R[dc->ra], t32);
->           }
-> -        tcg_gen_movi_i32(t, (int32_t)((int16_t)dc->imm));
-> -        tcg_gen_add_i32(t, cpu_R[dc->ra], t);
->       } else {
-> -        tcg_gen_add_i32(t, cpu_R[dc->ra], *(dec_alu_op_b(dc)));
-> +        tcg_gen_add_i32(t32, cpu_R[dc->ra], *(dec_alu_op_b(dc)));
->       }
-> +    tcg_gen_extu_i32_tl(t, t32);
-> +    tcg_temp_free_i32(t32);
-
->       if (stackprot) {
->           gen_helper_stackprot(cpu_env, t);
-> @@ -901,7 +908,8 @@ static inline void compute_ldst_addr(DisasContext
-*dc, TCGv_i32 t)
-
->   static void dec_load(DisasContext *dc)
->   {
-> -    TCGv_i32 v, addr;
-> +    TCGv_i32 v;
-> +    TCGv addr;
->       unsigned int size;
->       bool rev = false, ex = false;
->       TCGMemOp mop;
-> @@ -928,7 +936,7 @@ static void dec_load(DisasContext *dc)
->                                                           ex ? "x" : "");
-
->       t_sync_flags(dc);
-> -    addr = tcg_temp_new_i32();
-> +    addr = tcg_temp_new();
->       compute_ldst_addr(dc, addr);
-
->       /*
-> @@ -946,20 +954,20 @@ static void dec_load(DisasContext *dc)
->                      01 -> 10
->                      10 -> 10
->                      11 -> 00 */
-> -                TCGv_i32 low = tcg_temp_new_i32();
-> +                TCGv low = tcg_temp_new();
-
-> -                tcg_gen_andi_i32(low, addr, 3);
-> -                tcg_gen_sub_i32(low, tcg_const_i32(3), low);
-> -                tcg_gen_andi_i32(addr, addr, ~3);
-> -                tcg_gen_or_i32(addr, addr, low);
-> -                tcg_temp_free_i32(low);
-> +                tcg_gen_andi_tl(low, addr, 3);
-> +                tcg_gen_sub_tl(low, tcg_const_tl(3), low);
-> +                tcg_gen_andi_tl(addr, addr, ~3);
-> +                tcg_gen_or_tl(addr, addr, low);
-> +                tcg_temp_free(low);
->                   break;
->               }
-
->               case 2:
->                   /* 00 -> 10
->                      10 -> 00.  */
-> -                tcg_gen_xori_i32(addr, addr, 2);
-> +                tcg_gen_xori_tl(addr, addr, 2);
->                   break;
->               default:
->                   cpu_abort(CPU(dc->cpu), "Invalid reverse size\n");
-> @@ -969,7 +977,7 @@ static void dec_load(DisasContext *dc)
-
->       /* lwx does not throw unaligned access errors, so force alignment */
->       if (ex) {
-> -        tcg_gen_andi_i32(addr, addr, ~3);
-> +        tcg_gen_andi_tl(addr, addr, ~3);
->       }
-
->       /* If we get a fault on a dslot, the jmpstate better be in sync.  */
-> @@ -992,7 +1000,7 @@ static void dec_load(DisasContext *dc)
->       }
-
->       if (ex) {
-> -        tcg_gen_mov_i32(env_res_addr, addr);
-> +        tcg_gen_mov_tl(env_res_addr, addr);
->           tcg_gen_mov_i32(env_res_val, v);
->       }
->       if (dc->rd) {
-> @@ -1005,12 +1013,12 @@ static void dec_load(DisasContext *dc)
->           write_carryi(dc, 0);
->       }
-
-> -    tcg_temp_free_i32(addr);
-> +    tcg_temp_free(addr);
->   }
-
->   static void dec_store(DisasContext *dc)
->   {
-> -    TCGv_i32 addr;
-> +    TCGv addr;
->       TCGLabel *swx_skip = NULL;
->       unsigned int size;
->       bool rev = false, ex = false;
-> @@ -1040,18 +1048,18 @@ static void dec_store(DisasContext *dc)
->       /* If we get a fault on a dslot, the jmpstate better be in sync.  */
->       sync_jmpstate(dc);
->       /* SWX needs a temp_local.  */
-> -    addr = ex ? tcg_temp_local_new_i32() : tcg_temp_new_i32();
-> +    addr = ex ? tcg_temp_local_new() : tcg_temp_new();
->       compute_ldst_addr(dc, addr);
-
->       if (ex) { /* swx */
->           TCGv_i32 tval;
-
->           /* swx does not throw unaligned access errors, so force
-alignment */
-> -        tcg_gen_andi_i32(addr, addr, ~3);
-> +        tcg_gen_andi_tl(addr, addr, ~3);
-
->           write_carryi(dc, 1);
->           swx_skip = gen_new_label();
-> -        tcg_gen_brcond_i32(TCG_COND_NE, env_res_addr, addr, swx_skip);
-> +        tcg_gen_brcond_tl(TCG_COND_NE, env_res_addr, addr, swx_skip);
-
->           /* Compare the value loaded at lwx with current contents of
->              the reserved location.
-> @@ -1075,13 +1083,13 @@ static void dec_store(DisasContext *dc)
->                      01 -> 10
->                      10 -> 10
->                      11 -> 00 */
-> -                TCGv_i32 low = tcg_temp_new_i32();
-> +                TCGv low = tcg_temp_new();
-
-> -                tcg_gen_andi_i32(low, addr, 3);
-> -                tcg_gen_sub_i32(low, tcg_const_i32(3), low);
-> -                tcg_gen_andi_i32(addr, addr, ~3);
-> -                tcg_gen_or_i32(addr, addr, low);
-> -                tcg_temp_free_i32(low);
-> +                tcg_gen_andi_tl(low, addr, 3);
-> +                tcg_gen_sub_tl(low, tcg_const_tl(3), low);
-> +                tcg_gen_andi_tl(addr, addr, ~3);
-> +                tcg_gen_or_tl(addr, addr, low);
-> +                tcg_temp_free(low);
->                   break;
->               }
-
-> @@ -1089,7 +1097,7 @@ static void dec_store(DisasContext *dc)
->                   /* 00 -> 10
->                      10 -> 00.  */
->                   /* Force addr into the temp.  */
-> -                tcg_gen_xori_i32(addr, addr, 2);
-> +                tcg_gen_xori_tl(addr, addr, 2);
->                   break;
->               default:
->                   cpu_abort(CPU(dc->cpu), "Invalid reverse size\n");
-> @@ -1116,7 +1124,7 @@ static void dec_store(DisasContext *dc)
->           gen_set_label(swx_skip);
->       }
-
-> -    tcg_temp_free_i32(addr);
-> +    tcg_temp_free(addr);
->   }
-
->   static inline void eval_cc(DisasContext *dc, unsigned int cc,
-> @@ -1834,7 +1842,7 @@ void mb_tcg_init(void)
->       env_btaken = tcg_global_mem_new_i32(cpu_env,
->                        offsetof(CPUMBState, btaken),
->                        "btaken");
-> -    env_res_addr = tcg_global_mem_new_i32(cpu_env,
-> +    env_res_addr = tcg_global_mem_new(cpu_env,
->                        offsetof(CPUMBState, res_addr),
->                        "res_addr");
->       env_res_val = tcg_global_mem_new_i32(cpu_env,
-> --
-> 2.14.1
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
