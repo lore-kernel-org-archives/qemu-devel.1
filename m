@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33646)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fE72T-0003SI-Gv
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 01:44:22 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fE73p-0004su-Qy
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 01:45:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fE72Q-0000cy-Be
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 01:44:21 -0400
-Date: Thu, 3 May 2018 15:39:44 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fE73o-0001U8-M9
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 01:45:45 -0400
+Date: Thu, 3 May 2018 15:45:34 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180503053944.GS13229@umbus.fritz.box>
+Message-ID: <20180503054534.GU13229@umbus.fritz.box>
 References: <20180419124331.3915-1-clg@kaod.org>
-	<20180419124331.3915-7-clg@kaod.org>
-	<20180426071129.GJ8800@umbus.fritz.box>
-	<9273a240-6518-155f-ed78-79abe53761e3@kaod.org>
-	<4e3ece34-2373-c887-affe-f793b585599a@kaod.org>
+	<20180419124331.3915-8-clg@kaod.org>
+	<20180426072501.GK8800@umbus.fritz.box>
+	<312cdfe7-bc6b-3eed-588e-a71ce1385988@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="kVhvBuyIzNBvw9vr"
+	protocol="application/pgp-signature"; boundary="MjBORTcaENZKFEO1"
 Content-Disposition: inline
-In-Reply-To: <4e3ece34-2373-c887-affe-f793b585599a@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v3 06/35] spapr/xive: introduce a XIVE
- interrupt presenter model
+In-Reply-To: <312cdfe7-bc6b-3eed-588e-a71ce1385988@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v3 07/35] spapr/xive: introduce the XIVE
+ Event Queues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,70 +31,60 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---kVhvBuyIzNBvw9vr
+--MjBORTcaENZKFEO1
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 26, 2018 at 07:15:29PM +0200, C=E9dric Le Goater wrote:
-> On 04/26/2018 11:27 AM, C=E9dric Le Goater wrote:
-> > On 04/26/2018 09:11 AM, David Gibson wrote:
-> >> On Thu, Apr 19, 2018 at 02:43:02PM +0200, C=E9dric Le Goater wrote:
-[snip]
-> >>> +static void xive_tm_os_write(void *opaque, hwaddr offset,
-> >>> +                                   uint64_t value, unsigned size)
-> >>> +{
-> >>> +    PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
-> >>> +    XiveNVT *nvt =3D XIVE_NVT(cpu->intc);
-> >>> +    int i;
-> >>> +
-> >>> +    if (offset >=3D TM_SPC_ACK_EBB) {
-> >>> +        xive_tm_write_special(nvt, offset, value, size);
-> >>> +        return;
-> >>> +    }
-> >>> +
-> >>> +    if (TM_RING(offset) !=3D TM_QW1_OS) {
+On Thu, Apr 26, 2018 at 11:48:06AM +0200, C=E9dric Le Goater wrote:
+> On 04/26/2018 09:25 AM, David Gibson wrote:
+> > On Thu, Apr 19, 2018 at 02:43:03PM +0200, C=E9dric Le Goater wrote:
+> >> The Event Queue Descriptor (EQD) table is an internal table of the
+> >> XIVE routing sub-engine. It specifies on which Event Queue the event
+> >> data should be posted when an exception occurs (later on pulled by the
+> >> OS) and which Virtual Processor to notify.
+> >=20
+> > Uhhh.. I thought the IVT said which queue and vp to notify, and the
+> > EQD gave metadata for event queues.
+>=20
+> yes. the above poorly written. The Event Queue Descriptor contains the
+> guest address of the event queue in which the data is written. I will=20
+> rephrase.     =20
+>=20
+> The IVT contains IVEs which indeed define for an IRQ which EQ to notify=
+=20
+> and what data to push on the queue.=20
+> =20
+> >> The Event Queue is a much
+> >> more complex structure but we start with a simple model for the sPAPR
+> >> machine.
 > >>
-> >> Why have this if you have separate OS and user regions as you appear
-> >> to do below?
+> >> There is one XiveEQ per priority and these are stored under the XIVE
+> >> virtualization presenter (sPAPRXiveNVT). EQs are simply indexed with :
+> >>
+> >>        (server << 3) | (priority & 0x7)
+> >>
+> >> This is not in the XIVE architecture but as the EQ index is never
+> >> exposed to the guest, in the hcalls nor in the device tree, we are
+> >> free to use what fits best the current model.
+>=20
+> This EQ indexing is important to notice because it will also show up=20
+> in KVM to build the IVE from the KVM irq state.
+
+Ok, are you saying that while this combined EQ index will never appear
+in guest <-> host interfaces, it might show up in qemu <-> KVM
+interfaces?
+
+> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 > >=20
-> > This is another problem we are trying to solve.=20
-> >=20
-> > The registers a CPU can access depends on the TIMA view it is using.=20
-> > The OS TIMA view only sees the OS ring registers. The HV view sees all.=
-=20
+> > Is the EQD actually modifiable by a guest?  Or are the settings of the
+> > EQs fixed by PAPR?
 >=20
-> So, I gave a deeper look at the specs and I understood a little more=20
-> details of the concepts behind. You need to do frequent round-trips=20
-> to this document ... =20
->=20
-> These registers are accessible through four aligned pages, each exposing=
-=20
-> a different view of the registers. First page (page address ending=20
-> in 0b00) gives access to the entire context and is reserved for the=20
-> ring 0 security monitor. The second (page address ending in 0b01)=20
-> is for the hypervisor, ring 1. The third (page address ending in 0b10)=20
-> is for the operating system, ring 2. The fourth (page address ending=20
-> in 0b11) is for user level, ring 3.
->=20
-> The sPAPR machine runs at the OS privilege and therefore can only=20
-> accesses the OS and the User rings, 2 and 3. The others are for
-> hypervisor levels.
+> The guest uses the H_INT_SET_QUEUE_CONFIG hcall to define the address
+> of the event queue for a couple prio/server.
 
-Ok, that much is what I thought.  What I'm less clear on is what each
-page looks like compared to the others.  Previously I thought each one
-had the same registers, just manipulating the corresponding ring.  Are
-you saying instead that each ring's page basically has a subset of the
-registers in the next most privileged page?
-
-> I will try to come with a better implementation of the model and
-> make sure the ring numbers are respected. I am not sure we should=20
-> have only one memory region or four distinct ones with their
-> own ops. There are some differences in the load/store of each view.
-
-Right.  I'm not clear at this point if that's for good reasons, or
-just because IBM's hardware designers don't seem to have gotten the
-hang of Don't Repeat Yourself.
+Ok, so the EQD can be modified by the guest.  In which case we need to
+work out what object owns it, since it'll need to migrate it.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -103,24 +92,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---kVhvBuyIzNBvw9vr
+--MjBORTcaENZKFEO1
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrqoKAACgkQbDjKyiDZ
-s5K/EQ/6ArKejVwxFguqKAqJw+tTTVaNhrnLvBxYpDU/vBUeHg6J1djjg0/fzjZl
-hw6Lt+dOm4pryNojsYMcW597BhiQqJz9oYH9gE5LVfBb7dzBW68lmvtz/uwJKveW
-IvNJ4EyQr9JzwhqReFQQ04VoDAf7zNntV8qNRgTEQLu6ecN8wXXWsjUcKc4Rqyjm
-yn8CXsCFsJHkNgutSIPLzpR/mOUDJWQU7clAGP2McDIIcpb3o7/oulL20hzO2pBJ
-DEb6DH+2eDLECUFOOTeqsJgm1esEjnQbIY2MrQEIbPNpEsBeEoXujUi0MJwlprR6
-ABH2wcdYvmCfzc1Q9tQvUqhXkuZeQvm6OFkSl9oU4jG46zlBPWrNL3KvTzdoBj8r
-Z5RaIaxx6N73hPU+/UyXA7DesYIOjj5bPShrhyTnafP7azUYHd+k/LoVx9szXeZJ
-zflIY64KAELXPN3e474SB+ZD4JjDuCHYACtITxJDKjJZSkUw5ZtwI6nMpWDUecmU
-foyJoGzGB1wL8LHey/1PRLKQdDA6CRiZtDuAmoqCf6dZATiRYCjSrZtyLKvn3T1V
-Lxuse7Lp2soN5iJqqaRJru69f3CiYudOGy6+EbgKFS805+z+kvaOUrwb19syyNc/
-ZfQCRm1BC0Xv52c0drAs461bYeY3KueuwL257MTixoN/KuX4LD4=
-=eB3I
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrqof4ACgkQbDjKyiDZ
+s5ImgBAArE9+FqfKGy5HtklyAMJN/LDsbhn2Q0t1WDV37UvGcjpAj9ERivqT1A8x
+HnT+yzRsLPSQvjHD6CfnmnVGDhl/mttx23tMEMb7cBEcot20ZgxQ19cK1HbTOE8n
+UozJvjdXpneKrHtH7MQ2PRhSVqa2g+P7/eWRLJXj/eyPCMe3+QLpsznczNCrLvJS
+zdxlWYOwFnf75tK/ComNTlWbxDCMHrtMBqGwMh0EyHtNgxTZdaVuwTUMI1DzyT3V
+FmVM/juEZH2DGQv59DorUhYvcZLT7qsOFdiKU9ZzcsMKQtwijlQn226DQ/pg+b+o
+t5A2Gh/IWYazlhkEhiZkvytwRddx7nEQnxRTuNA0uc/wkI/fRN2mtV5Do39eRL0U
+jlFWG4sbND6IspRLsaDgvOHeQdkyzJlC8IcrrZ2JQIDBswYdSA4HzaFPKK1mM+2D
+X0G62sOPkyRTb+W36mNSnbSezxqN74CMbEMsYwhieGUHGk7NAPmk0Jx3P//zBvyc
+4PhpRQmPqnNpYWvmv6ZNMzoOXyU+ECiUsklKn3NbNp57in0hHXpaZlHe4A/25hkj
+LACUzv43hpJ35NG25CCOXB/XI9tATA4bjSBmFJY0VT5Efzlowe4Px4bKDDNhLRSc
+vSvXXgp/59tBVMRpZ3bXs4rLqK44NnU+oKiMJbRcfhhptvkkLog=
+=cUfI
 -----END PGP SIGNATURE-----
 
---kVhvBuyIzNBvw9vr--
+--MjBORTcaENZKFEO1--
