@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fEARS-00032Z-9J
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:22:23 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fEATk-0004zP-Gy
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:24:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fEARO-0006EN-AV
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:22:22 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35896 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fEARO-0006E8-46
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:22:18 -0400
-References: <AADFC41AFE54684AB9EE6CBC0274A5D19113B5D2@SHSMSX101.ccr.corp.intel.com>
-	<20180427072810.GB13269@xz-mi>
-	<AADFC41AFE54684AB9EE6CBC0274A5D19113C1C9@SHSMSX101.ccr.corp.intel.com>
-	<20180427095527.GE13269@xz-mi> <20180427114029.GF13269@xz-mi>
-	<AADFC41AFE54684AB9EE6CBC0274A5D19113D318@SHSMSX101.ccr.corp.intel.com>
-	<20180503060442.GB2378@xz-mi>
-	<547a97a1-0ac0-21b2-af00-036b795b06cc@redhat.com>
-	<20180503072828.GA29580@xz-mi>
-	<8cbed1d0-1f4e-db6d-bd83-1042f724827a@redhat.com>
-	<20180503075302.GC29580@xz-mi>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <f933ba4d-a025-7c94-69c6-d21f408eb729@redhat.com>
-Date: Thu, 3 May 2018 17:22:03 +0800
+	(envelope-from <peter.maydell@linaro.org>) id 1fEATj-00073z-Ev
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:24:44 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:43277)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fEATj-00073l-AA
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:24:43 -0400
+Received: by mail-ot0-x242.google.com with SMTP id y10-v6so19826235otg.10
+	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 02:24:43 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180503075302.GC29580@xz-mi>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 08/10] intel-iommu: maintain per-device
- iova ranges
+In-Reply-To: <20180503090532.3113-1-joel@jms.id.au>
+References: <20180503090532.3113-1-joel@jms.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 3 May 2018 10:24:22 +0100
+Message-ID: <CAFEAcA_dP5QRrZoX8P67xjNVpv7QssnMP9yd5sXqAEu2tQ5Lww@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 0/2] arm: Add nRF51 SoC and micro:bit
+ machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,66 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Jintack Lim <jintack@cs.columbia.edu>, "Tian, Kevin" <kevin.tian@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: Joel Stanley <joel@jms.id.au>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>, Jim Mussared <jim.mussared@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>
 
-
-
-On 2018=E5=B9=B405=E6=9C=8803=E6=97=A5 15:53, Peter Xu wrote:
-> On Thu, May 03, 2018 at 03:43:35PM +0800, Jason Wang wrote:
->>
->> On 2018=E5=B9=B405=E6=9C=8803=E6=97=A5 15:28, Peter Xu wrote:
->>> On Thu, May 03, 2018 at 03:20:11PM +0800, Jason Wang wrote:
->>>> On 2018=E5=B9=B405=E6=9C=8803=E6=97=A5 14:04, Peter Xu wrote:
->>>>> IMHO the guest can't really detect this, but it'll found that the
->>>>> device is not working functionally if it's doing something like wha=
-t
->>>>> Jason has mentioned.
->>>>>
->>>>> Actually now I have had an idea if we really want to live well even
->>>>> with Jason's example: maybe we'll need to identify PSI/DSI.  For DS=
-I,
->>>>> we don't remap for mapped pages; for PSI, we unmap and remap the
->>>>> mapped pages.  That'll complicate the stuff a bit, but it should
->>>>> satisfy all the people.
->>>>>
->>>>> Thanks,
->>>> So it looks like there will be still unnecessary unamps.
->>> Could I ask what do you mean by "unecessary unmaps"?
->> It's for "for PSI, we unmap and remap the mapped pages". So for the fi=
-rst
->> "unmap" how do you know it was really necessary without knowing the st=
-ate of
->> current shadow page table?
-> I don't.  Could I just unmap it anyway?  Say, now the guest _modified_
-> the PTE already.  Yes I think it's following the spec, but it is
-> really _unsafe_.  We can know that from what it has done already.
-> Then I really think a unmap+map would be good enough for us...  After
-> all that behavior can cause DMA error even on real hardwares.  It can
-> never tell.
-
-I mean for following case:
-
-1) guest maps A1 (iova) to XXX
-2) guest maps A2 (A1 + 4K) (iova) to YYY
-3) guest maps A3 (A1 + 8K) (iova) to ZZZ
-4) guest unmaps A2 and A2, for reducing the number of PSIs, it can=20
-invalidate A1 with a range of 2M
-
-If this is allowed by spec, looks like A1 will be unmaped and mapped.
-
-Thanks
-
+On 3 May 2018 at 10:05, Joel Stanley <joel@jms.id.au> wrote:
+> Hello,
 >
->>>> How about record the mappings in the tree too?
->>> As I mentioned, for L1 guest (e.g., DPDK applications running in L1)
->>> it'll be fine.  But I'm just afraid we will have other use cases, lik=
-e
->>> the L2 guests. That might need tons of the mapping entries in the
->>> worst case scenario.
->>>
->> Yes, but that's the price of shadow page tables.
-> So that's why I would like to propose this mergable interval tree.  It
-> might greatly reduce the price if we can reach a consensus on how we
-> should treat those strange-behaved guest OSs.  Thanks,
+> This short series implements a minimal definition of the Nordic
+> Semiconductor nRF51, a Cortex-M0 ARM SoC, and the BBC micro:bit, a
+> machine that will use this SoC.
 >
+> This work will serve as the base for our Google Summer of Code and
+> Outreachy interns who will work on implementing a number of features on
+> top of this base.
+>
+> I've tested this with a microbit micropython firmware, and checked that
+> it starts running by looking at it with gdb.
+>
+> I chose to keep the nrf51 and the microbit seperate, to not confuse the
+> peripherals that are on the microbit but are not part of the nrf51, and
+> vice versa.
+>
+> Please review!
+
+Hi; thanks for this patchset. I've done some quick overview review.
+It looks broadly ok but there are some details which don't follow
+our current preferences/practices for board and SoC models (we have
+a lot of legacy code in the codebase that follows older approaches
+or is just buggy, so it can be hard to get those right. The mps2
+boards and the iotkit SoC are the most recent I've written so
+probably not a bad pattern to look at.)
+We should probably not put this into master until we've got at least
+the cortex-m0 model, though.
+
+thanks
+-- PMM
