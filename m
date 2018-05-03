@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fEC8g-0008HS-MV
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 07:11:10 -0400
+	(envelope-from <prvs=65480b38c=Paul.Durrant@citrix.com>)
+	id 1fECGB-0001Wa-T7
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 07:18:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fEC8d-0001xJ-G3
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 07:11:06 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36194)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fEC8d-0001xB-9B
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 07:11:03 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fEC8c-0006PB-8r
-	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 11:11:02 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 25C7E2E80C8
-	for <qemu-devel@nongnu.org>; Thu,  3 May 2018 11:11:02 +0000 (UTC)
+	(envelope-from <prvs=65480b38c=Paul.Durrant@citrix.com>)
+	id 1fECG8-0004aj-MV
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 07:18:51 -0400
+Received: from smtp03.citrix.com ([162.221.156.55]:54160)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <prvs=65480b38c=Paul.Durrant@citrix.com>)
+	id 1fECG8-0004Zd-B0
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 07:18:48 -0400
+From: Paul Durrant <paul.durrant@citrix.com>
+Date: Thu, 3 May 2018 12:18:40 +0100
+Message-ID: <1525346320-24553-1-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 03 May 2018 11:00:01 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1768295 <1768295@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152519164359.6413.12582240325876567028.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152534520170.2179.8957865104572832750.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1768295] Re: VLLDM/VLSTM trigger UsageFault in
- the Secure Mode
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] xen-hvm: stop faking I/O to access PCI config
+ space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,74 +27,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
+Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-Submitted this patch for review which should fix this bug:
-https://patchwork.ozlabs.org/patch/907959/
+This patch removes the current hackery where IOREQ_TYPE_PCI_CONFIG
+reqyests are handled by faking PIO to 0xcf8 and 0xcfc and replaces it
+with direct calls to pci_host_config_read/write_common().
+Doing so necessitates mapping BDFs to PCIDevices but maintaining a simple
+QLIST in xen_device_realize/unrealize() will suffice.
 
+NOTE: whilst config space accesses are currently limited to
+      PCI_CONFIG_SPACE_SIZE, this patch paves the way to increasing the
+      limit to PCIE_CONFIG_SPACE_SIZE when Xen gains the ability to
+      emulate MCFG table accesses.
 
-** Changed in: qemu
-       Status: New =3D> In Progress
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+--
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+---
+ hw/i386/xen/trace-events |   2 +
+ hw/i386/xen/xen-hvm.c    | 101 +++++++++++++++++++++++++++++++++++++----------
+ 2 files changed, 83 insertions(+), 20 deletions(-)
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1768295
-
-Title:
-  VLLDM/VLSTM trigger UsageFault in the Secure Mode
-
-Status in QEMU:
-  In Progress
-
-Bug description:
-  The VLLDM/VLSTM instructions trigger UsageFault when they are supposed
-  to behave as NOP.
-
-  Version: =
-
-  $ qemu-system-arm --version                                              =
-                                 QEMU emulator version 2.11.93
-
-  VLLDM and VLSTM are instructions newly added to ARMv8-M Mainline
-  Profile. Although they are FP instructions and the FP support of the M
-  profile is not implemented by QEMU, the Armv8-M Architecture Reference
-  Manual specifies that they should behave as NOP even in this case:
-
-  C2.4.268 VLLDM:
-
-  > If the Floating-point Extension is not implemented, this instruction
-  is available in Secure state, but behaves as a NOP.
-
-  C2.4.269 VLSTM:
-
-  > If the Floating-point Extension is not implemented, this instruction
-  is available in Secure state, but behaves as a NOP.
-
-  VLLDM and VLSTM are generated automatically by the compiler to save
-  and restore the floating point registers (in a lazy manner) during a
-  Non-Secure function call. An example is shown below:
-
-  10000064 <__gnu_cmse_nonsecure_call>:
-  10000064:       e92d 4fe0       stmdb   sp!, {r5, r6, r7, r8, r9, sl, fp,=
- lr}
-  10000068:       4627            mov     r7, r4
-  1000006a:       46a0            mov     r8, r4
-  1000006c:       46a1            mov     r9, r4
-  1000006e:       46a2            mov     sl, r4
-  10000070:       46a3            mov     fp, r4
-  10000072:       46a4            mov     ip, r4
-  10000074:       b0a2            sub     sp, #136        ; 0x88
-  10000076:       ec2d 0a00       vlstm   sp
-  1000007a:       f384 8800       msr     CPSR_f, r4
-  1000007e:       4625            mov     r5, r4
-  10000080:       4626            mov     r6, r4
-  10000082:       47a4            blxns   r4
-  10000084:       ec3d 0a00       vlldm   sp
-  10000088:       b022            add     sp, #136        ; 0x88
-  1000008a:       e8bd 8fe0       ldmia.w sp!, {r5, r6, r7, r8, r9, sl, fp,=
- pc}
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1768295/+subscriptions
+diff --git a/hw/i386/xen/trace-events b/hw/i386/xen/trace-events
+index 8dab7bc..f576f1b 100644
+--- a/hw/i386/xen/trace-events
++++ b/hw/i386/xen/trace-events
+@@ -15,6 +15,8 @@ cpu_ioreq_pio(void *req, uint32_t dir, uint32_t df, uint32_t data_is_ptr, uint64
+ cpu_ioreq_pio_read_reg(void *req, uint64_t data, uint64_t addr, uint32_t size) "I/O=%p pio read reg data=0x%"PRIx64" port=0x%"PRIx64" size=%d"
+ cpu_ioreq_pio_write_reg(void *req, uint64_t data, uint64_t addr, uint32_t size) "I/O=%p pio write reg data=0x%"PRIx64" port=0x%"PRIx64" size=%d"
+ cpu_ioreq_move(void *req, uint32_t dir, uint32_t df, uint32_t data_is_ptr, uint64_t addr, uint64_t data, uint32_t count, uint32_t size) "I/O=%p copy dir=%d df=%d ptr=%d port=0x%"PRIx64" data=0x%"PRIx64" count=%d size=%d"
++cpu_ioreq_config_read(void *req, uint32_t sbdf, uint32_t reg, uint32_t size, uint32_t data) "I/O=%p sbdf=0x%x reg=%u size=%u data=0x%x"
++cpu_ioreq_config_write(void *req, uint32_t sbdf, uint32_t reg, uint32_t size, uint32_t data) "I/O=%p sbdf=0x%x reg=%u size=%u data=0x%x"
+ 
+ # xen-mapcache.c
+ xen_map_cache(uint64_t phys_addr) "want 0x%"PRIx64
+diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+index caa563b..c139d29 100644
+--- a/hw/i386/xen/xen-hvm.c
++++ b/hw/i386/xen/xen-hvm.c
+@@ -12,6 +12,7 @@
+ 
+ #include "cpu.h"
+ #include "hw/pci/pci.h"
++#include "hw/pci/pci_host.h"
+ #include "hw/i386/pc.h"
+ #include "hw/i386/apic-msidef.h"
+ #include "hw/xen/xen_common.h"
+@@ -86,6 +87,12 @@ typedef struct XenPhysmap {
+     QLIST_ENTRY(XenPhysmap) list;
+ } XenPhysmap;
+ 
++typedef struct XenPciDevice {
++    PCIDevice *pci_dev;
++    uint32_t sbdf;
++    QLIST_ENTRY(XenPciDevice) entry;
++} XenPciDevice;
++
+ typedef struct XenIOState {
+     ioservid_t ioservid;
+     shared_iopage_t *shared_page;
+@@ -105,6 +112,7 @@ typedef struct XenIOState {
+     struct xs_handle *xenstore;
+     MemoryListener memory_listener;
+     MemoryListener io_listener;
++    QLIST_HEAD(, XenPciDevice) dev_list;
+     DeviceListener device_listener;
+     QLIST_HEAD(, XenPhysmap) physmap;
+     hwaddr free_phys_offset;
+@@ -569,6 +577,12 @@ static void xen_device_realize(DeviceListener *listener,
+ 
+     if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+         PCIDevice *pci_dev = PCI_DEVICE(dev);
++        XenPciDevice *xendev = g_new(XenPciDevice, 1);
++
++        xendev->pci_dev = pci_dev;
++        xendev->sbdf = PCI_BUILD_BDF(pci_dev_bus_num(pci_dev),
++                                     pci_dev->devfn);
++        QLIST_INSERT_HEAD(&state->dev_list, xendev, entry);
+ 
+         xen_map_pcidev(xen_domid, state->ioservid, pci_dev);
+     }
+@@ -581,8 +595,17 @@ static void xen_device_unrealize(DeviceListener *listener,
+ 
+     if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+         PCIDevice *pci_dev = PCI_DEVICE(dev);
++        XenPciDevice *xendev, *next;
+ 
+         xen_unmap_pcidev(xen_domid, state->ioservid, pci_dev);
++
++        QLIST_FOREACH_SAFE(xendev, &state->dev_list, entry, next) {
++            if (xendev->pci_dev == pci_dev) {
++                QLIST_REMOVE(xendev, entry);
++                g_free(xendev);
++                break;
++            }
++        }
+     }
+ }
+ 
+@@ -903,6 +926,61 @@ static void cpu_ioreq_move(ioreq_t *req)
+     }
+ }
+ 
++static void cpu_ioreq_config(XenIOState *state, ioreq_t *req)
++{
++    uint32_t sbdf = req->addr >> 32;
++    uint32_t reg = req->addr;
++    XenPciDevice *xendev;
++
++    if (req->size > sizeof(uint32_t)) {
++        hw_error("PCI config access: bad size (%u)", req->size);
++    }
++
++    QLIST_FOREACH(xendev, &state->dev_list, entry) {
++        unsigned int i;
++
++        if (xendev->sbdf != sbdf) {
++            continue;
++        }
++
++        if (req->dir == IOREQ_READ) {
++            if (!req->data_is_ptr) {
++                req->data = pci_host_config_read_common(
++                    xendev->pci_dev, reg, PCI_CONFIG_SPACE_SIZE,
++                    req->size);
++                trace_cpu_ioreq_config_read(req, sbdf, reg, req->size,
++                                            req->data);
++            } else {
++                for (i = 0; i < req->count; i++) {
++                    uint32_t tmp;
++
++                    tmp = pci_host_config_read_common(
++                        xendev->pci_dev, reg, PCI_CONFIG_SPACE_SIZE,
++                        req->size);
++                    write_phys_req_item(req->data, req, i, &tmp);
++                }
++            }
++        } else if (req->dir == IOREQ_WRITE) {
++            if (!req->data_is_ptr) {
++                trace_cpu_ioreq_config_write(req, sbdf, reg, req->size,
++                                             req->data);
++                pci_host_config_write_common(
++                    xendev->pci_dev, reg, PCI_CONFIG_SPACE_SIZE, req->data,
++                    req->size);
++            } else {
++                for (i = 0; i < req->count; i++) {
++                    uint32_t tmp = 0;
++
++                    read_phys_req_item(req->data, req, i, &tmp);
++                    pci_host_config_write_common(
++                        xendev->pci_dev, reg, PCI_CONFIG_SPACE_SIZE, tmp,
++                        req->size);
++                }
++            }
++        }
++    }
++}
++
+ static void regs_to_cpu(vmware_regs_t *vmport_regs, ioreq_t *req)
+ {
+     X86CPU *cpu;
+@@ -975,27 +1053,9 @@ static void handle_ioreq(XenIOState *state, ioreq_t *req)
+         case IOREQ_TYPE_INVALIDATE:
+             xen_invalidate_map_cache();
+             break;
+-        case IOREQ_TYPE_PCI_CONFIG: {
+-            uint32_t sbdf = req->addr >> 32;
+-            uint32_t val;
+-
+-            /* Fake a write to port 0xCF8 so that
+-             * the config space access will target the
+-             * correct device model.
+-             */
+-            val = (1u << 31) |
+-                  ((req->addr & 0x0f00) << 16) |
+-                  ((sbdf & 0xffff) << 8) |
+-                  (req->addr & 0xfc);
+-            do_outp(0xcf8, 4, val);
+-
+-            /* Now issue the config space access via
+-             * port 0xCFC
+-             */
+-            req->addr = 0xcfc | (req->addr & 0x03);
+-            cpu_ioreq_pio(req);
++        case IOREQ_TYPE_PCI_CONFIG:
++            cpu_ioreq_config(state, req);
+             break;
+-        }
+         default:
+             hw_error("Invalid ioreq type 0x%x\n", req->type);
+     }
+@@ -1366,6 +1426,7 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
+     memory_listener_register(&state->io_listener, &address_space_io);
+ 
+     state->device_listener = xen_device_listener;
++    QLIST_INIT(&state->dev_list);
+     device_listener_register(&state->device_listener);
+ 
+     /* Initialize backend core & drivers */
+-- 
+2.1.4
