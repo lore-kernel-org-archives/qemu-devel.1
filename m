@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43544)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fEJhd-0000gx-SD
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 15:15:43 -0400
+	(envelope-from <bsd@redhat.com>) id 1fEJmV-00025U-Jn
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 15:20:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fEJhZ-00070G-L6
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 15:15:41 -0400
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:46493)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fEJhZ-0006zh-F9
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 15:15:37 -0400
-Received: by mail-pg0-x244.google.com with SMTP id z4-v6so13781463pgu.13
-	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 12:15:37 -0700 (PDT)
-References: <20180503091922.28733-1-edgar.iglesias@gmail.com>
-	<20180503091922.28733-30-edgar.iglesias@gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <19bcc9e5-c3c8-9177-3bad-e00e8f86671d@linaro.org>
-Date: Thu, 3 May 2018 12:15:33 -0700
-MIME-Version: 1.0
-In-Reply-To: <20180503091922.28733-30-edgar.iglesias@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 29/29] target-microblaze: Allow address
- sizes between 32 and 64 bits
+	(envelope-from <bsd@redhat.com>) id 1fEJmR-0000ft-LX
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 15:20:43 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53268 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1fEJmR-0000dt-G9
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 15:20:39 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3326681B006D
+	for <qemu-devel@nongnu.org>; Thu,  3 May 2018 19:20:34 +0000 (UTC)
+From: Bandan <bsd@redhat.com>
+Date: Thu,  3 May 2018 15:20:26 -0400
+Message-Id: <20180503192028.14353-1-bsd@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/2] Minor MTP fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,20 +27,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, sai.pavan.boddu@xilinx.com, alistair@alistair23.me, frasse.iglesias@gmail.com, edgar.iglesias@xilinx.com
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com
 
-On 05/03/2018 02:19 AM, Edgar E. Iglesias wrote:
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-> 
-> Allow address sizes between 32 and 64 bits.
-> 
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> ---
->  target/microblaze/cpu.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
+Minor MTP fixes. The first patch adds some checks/asserts for issues
+reported by Coverity and the second fixes a bug where the readonly flag
+is ignored if "desc" is specified.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Bandan Das (2):
+  usb-mtp: Add some NULL checks for issues pointed out by coverity
+  usb-mtp: Unconditionally check for the readonly bit
 
+ hw/usb/dev-mtp.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-r~
+-- 
+2.11.0
