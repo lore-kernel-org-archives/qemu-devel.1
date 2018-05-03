@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56468)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fEFX1-0007Ge-Eh
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 10:48:28 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fEFXG-0007Ne-B5
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 10:48:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fEFWy-000760-Ba
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 10:48:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46152)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1fEFWy-00074G-3H
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 10:48:24 -0400
-Date: Thu, 3 May 2018 08:48:16 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180503084816.072d59a9@w520.home>
-In-Reply-To: <dbe7f81f-4301-62fe-34e6-0a1f2094da57@redhat.com>
-References: <20180501162901.28940.1075.stgit@gimli.home>
-	<20180501164332.28940.40383.stgit@gimli.home>
-	<dbe7f81f-4301-62fe-34e6-0a1f2094da57@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1fEFXD-0007GK-8R
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 10:48:42 -0400
+Date: Thu, 3 May 2018 16:48:27 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180503164827.672675a8.cohuck@redhat.com>
+In-Reply-To: <1525271609-2142-1-git-send-email-thuth@redhat.com>
+References: <1525271609-2142-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] vfio/quirks: ioeventfd quirk
- acceleration
+Subject: Re: [Qemu-devel] [PULL SUBSYSTEM s390x 00/10] s390-ccw firmware
+ update - not for master
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,75 +23,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: qemu-devel@nongnu.org, peterx@redhat.com, kvm@vger.kernel.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>
 
-On Thu, 3 May 2018 16:33:25 +0200
-Auger Eric <eric.auger@redhat.com> wrote:
-> > +    if (!vdev->no_kvm_ioeventfd &&
-> > +        addr > PCI_STD_HEADER_SIZEOF && last->added < MAX_DYN_IOEVENTFD + 1) {  
-> nit: <= MAX_DYN_IOEVENTFD?
+On Wed,  2 May 2018 16:33:19 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-Done, also the addr test should be >=, it doesn't make sense to exclude
-the first byte after the standard capabilities, though for this quirk
-we know we're looking well above this.
+> This PULL request is not for master.
+> 
+> 
+>  Hi Cornelia,
+> 
+> the following changes since commit 052888f043bacb18231046045b1f9cd946703170:
+> 
+>   hw/s390x: Allow to configure the consoles with the "-serial" parameter (2018-04-30 10:48:29 +0200)
+> 
+> are available in the git repository at:
+> 
+>   https://github.com/huth/qemu.git tags/s390x-2018-05-02
+> 
+> for you to fetch changes up to 312185cf35b5d8454a84c337ef9aadade877fb88:
+> 
+>   pc-bios/s390: Update firmware images (2018-05-02 15:42:57 +0200)
+> 
+> ----------------------------------------------------------------
+> s390-ccw firmware updates:
+> - Improvements to the boot menu (can now handle non-sequential entries)
+> - s390-netboot now resets the machine before jumping into the OS kernel
+> - s390-netboot now supports indirect loading via .INS files
+> - some other minor fixes and clean-ups
+> ----------------------------------------------------------------
+> 
+> Collin Walling (4):
+>       pc-bios/s390-ccw: rename MAX_TABLE_ENTRIES to MAX_BOOT_ENTRIES
+>       pc-bios/s390-ccw: fix loadparm initialization and int conversion
+>       pc-bios/s390-ccw: fix non-sequential boot entries (eckd)
+>       pc-bios/s390-ccw: fix non-sequential boot entries (enum)
+> 
+> Cornelia Huck (1):
+>       s390-ccw: force diag 308 subcode to unsigned long
+> 
+> Thomas Huth (5):
+>       pc-bios/s390-ccw: size_t should be unsigned
+>       pc-bios/s390-ccw/net: Split up net_load() into init, load and release parts
+>       pc-bios/s390-ccw/net: Use diag308 to reset machine before jumping to the OS
+>       pc-bios/s390-ccw/net: Add support for .INS config files
+>       pc-bios/s390: Update firmware images
+> 
+>  hw/s390x/ipl.c               |   4 ++
+>  pc-bios/s390-ccw.img         | Bin 30520 -> 34568 bytes
+>  pc-bios/s390-ccw/Makefile    |   4 +-
+>  pc-bios/s390-ccw/bootmap.c   |  79 +++-----------------
+>  pc-bios/s390-ccw/bootmap.h   |   6 --
+>  pc-bios/s390-ccw/iplb.h      |   3 +-
+>  pc-bios/s390-ccw/jump2ipl.c  |  91 +++++++++++++++++++++++
+>  pc-bios/s390-ccw/libc.c      |   2 +-
+>  pc-bios/s390-ccw/libc.h      |   2 +-
+>  pc-bios/s390-ccw/main.c      |  14 ++--
+>  pc-bios/s390-ccw/menu.c      |  58 ++++++++++-----
+>  pc-bios/s390-ccw/netboot.mak |   3 +-
+>  pc-bios/s390-ccw/netmain.c   | 168 +++++++++++++++++++++++++++++++++++--------
+>  pc-bios/s390-ccw/s390-ccw.h  |   8 ++-
+>  pc-bios/s390-netboot.img     | Bin 83856 -> 87872 bytes
+>  15 files changed, 307 insertions(+), 135 deletions(-)
+>  create mode 100644 pc-bios/s390-ccw/jump2ipl.c
 
-> > +        if (addr != last->addr || data != last->data || size != last->size) {
-> > +            last->addr = addr;
-> > +            last->data = data;
-> > +            last->size = size;
-> > +            last->hits = 1;
-> > +        } else if (++last->hits >= HITS_FOR_IOEVENTFD) {
-> > +            if (last->added < MAX_DYN_IOEVENTFD) {
-> > +                VFIOIOEventFD *ioeventfd;
-> > +                ioeventfd = vfio_ioeventfd_init(vdev, mirror->mem, addr, size,
-> > +                                        data, &vdev->bars[mirror->bar].region,
-> > +                                        mirror->offset + addr, true);
-> > +                if (ioeventfd) {
-> > +                    VFIOQuirk *quirk;
-> > +
-> > +                    QLIST_FOREACH(quirk,
-> > +                                  &vdev->bars[mirror->bar].quirks, next) {
-> > +                        if (quirk->data == mirror) {
-> > +                            QLIST_INSERT_HEAD(&quirk->ioeventfds,
-> > +                                              ioeventfd, next);
-> > +                            break;
-> > +                        }
-> > +                    }
-> > +
-> > +                    assert(quirk != NULL); /* Check not found */
-> > +
-> > +                    last->added++;
-> > +                }
-> > +            } else {
-> > +                last->added++;
-> > +
-> > +                error_report("NVIDIA ioeventfd queue full for %s, unable to "
-> > +                             "accelerate 0x%"HWADDR_PRIx", data 0x%"PRIx64", "
-> > +                             "size %u", vdev->vbasedev.name, addr, data, size);  
-> nit: warn_report?
-
-Done
-
-... 
-> > +typedef struct VFIOIOEventFD {
-> > +    QLIST_ENTRY(VFIOIOEventFD) next;
-> > +    MemoryRegion *mr;
-> > +    hwaddr addr;
-> > +    unsigned size;
-> > +    uint64_t data;
-> > +    EventNotifier e;
-> > +    VFIORegion *region;
-> > +    hwaddr region_addr;
-> > +    bool match_data;
-> > +    bool dynamic;  
-> maybe the "dynamic" semantics may be docuemnted in the code and not only
-> in the commit message.
-
-Done, added
-
-/* Added runtime, removed on device reset */
-
-Thanks!
-
-Alex
+Thanks, pulled.
