@@ -1,27 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fEF0P-0007lN-Rj
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 10:14:46 -0400
+	(envelope-from <berrange@redhat.com>) id 1fEF25-0000Je-KG
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 10:16:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fEF0O-0005z7-Np
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 10:14:45 -0400
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:39706)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fEF0O-0005yu-Ij
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 10:14:44 -0400
-Received: by mail-ot0-x241.google.com with SMTP id l12-v6so20797433oth.6
-	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 07:14:44 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1fEF21-0006mU-MJ
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 10:16:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46388 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fEF21-0006kv-Dv
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 10:16:25 -0400
+Date: Thu, 3 May 2018 15:16:10 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180503141610.GC11382@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180430103312.GH3249@redhat.com>
+	<20180430132107.0a37704d.cohuck@redhat.com>
+	<ac216b06-9469-addd-b5a1-3a3a89fd0782@redhat.com>
+	<20180502074403.yh5weukbjgqsvp7n@sirius.home.kraxel.org>
+	<20180502080200.GG3308@redhat.com>
+	<20180503072100.GA5301@stefanha-x1.localdomain>
+	<20180503090727.GC11382@redhat.com>
+	<CAFEAcA8=mZf8RbQX2-swbUBkoT=RYSVx-oRA2UpzJCqvgGF+KQ@mail.gmail.com>
+	<20180503134321.pp736ou25pdwvslm@sirius.home.kraxel.org>
+	<d9203797-be4a-3cd7-c718-56fa41f60310@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180427002651.28356-8-richard.henderson@linaro.org>
-References: <20180427002651.28356-1-richard.henderson@linaro.org>
-	<20180427002651.28356-8-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 3 May 2018 15:14:23 +0100
-Message-ID: <CAFEAcA9iEoMonBRZ8d1005q71bU6CyKEjorHb2towDNUYvmBaQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 7/9] target/arm: Fill in
- disas_ldst_atomic
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <d9203797-be4a-3cd7-c718-56fa41f60310@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] release retrospective, next release timing,
+ numbering
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,108 +38,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 27 April 2018 at 01:26, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> This implements all of the v8.1-Atomics instructions except
-> for compare-and-swap, which is decoded elsewhere.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/translate-a64.c | 38 ++++++++++++++++++++++++++++++++++++--
->  1 file changed, 36 insertions(+), 2 deletions(-)
->
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 0706c8c394..6ed7627d79 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -84,6 +84,7 @@ typedef void NeonGenOneOpFn(TCGv_i64, TCGv_i64);
->  typedef void CryptoTwoOpFn(TCGv_ptr, TCGv_ptr);
->  typedef void CryptoThreeOpIntFn(TCGv_ptr, TCGv_ptr, TCGv_i32);
->  typedef void CryptoThreeOpFn(TCGv_ptr, TCGv_ptr, TCGv_ptr);
-> +typedef void AtomicThreeOpFn(TCGv_i64, TCGv_i64, TCGv_i64, TCGArg, TCGMemOp);
->
->  /* Note that the gvec expanders operate on offsets + sizes.  */
->  typedef void GVecGen2Fn(unsigned, uint32_t, uint32_t, uint32_t, uint32_t);
-> @@ -2772,6 +2773,8 @@ static void disas_ldst_atomic(DisasContext *s, uint32_t insn,
->      int rn = extract32(insn, 5, 5);
->      int o3_opc = extract32(insn, 12, 4);
->      int feature = ARM_FEATURE_V8_ATOMICS;
-> +    TCGv_i64 tcg_rn, tcg_rs;
-> +    AtomicThreeOpFn *fn;
->
->      if (is_vector) {
->          unallocated_encoding(s);
-> @@ -2779,14 +2782,32 @@ static void disas_ldst_atomic(DisasContext *s, uint32_t insn,
->      }
->      switch (o3_opc) {
->      case 000: /* LDADD */
-> +        fn = tcg_gen_atomic_fetch_add_i64;
-> +        break;
->      case 001: /* LDCLR */
-> +        fn = tcg_gen_atomic_fetch_and_i64;
-> +        break;
->      case 002: /* LDEOR */
-> +        fn = tcg_gen_atomic_fetch_xor_i64;
-> +        break;
->      case 003: /* LDSET */
-> +        fn = tcg_gen_atomic_fetch_or_i64;
-> +        break;
->      case 004: /* LDSMAX */
-> +        fn = tcg_gen_atomic_fetch_smax_i64;
-> +        break;
->      case 005: /* LDSMIN */
-> +        fn = tcg_gen_atomic_fetch_smin_i64;
-> +        break;
->      case 006: /* LDUMAX */
-> +        fn = tcg_gen_atomic_fetch_umax_i64;
-> +        break;
->      case 007: /* LDUMIN */
-> +        fn = tcg_gen_atomic_fetch_umin_i64;
-> +        break;
->      case 010: /* SWP */
-> +        fn = tcg_gen_atomic_xchg_i64;
-> +        break;
->      default:
->          unallocated_encoding(s);
->          return;
-> @@ -2796,8 +2817,21 @@ static void disas_ldst_atomic(DisasContext *s, uint32_t insn,
->          return;
->      }
->
-> -    (void)rs;
-> -    (void)rn;
-> +    if (rn == 31) {
-> +        gen_check_sp_alignment(s);
-> +    }
-> +    tcg_rn = cpu_reg_sp(s, rn);
-> +    tcg_rs = read_cpu_reg(s, rs, false);
-> +
-> +    if (o3_opc == 1) { /* LDCLR */
-> +        tcg_gen_not_i64(tcg_rs, tcg_rs);
-> +    }
-> +
-> +    /* The tcg atomic primitives are all full barriers.  Therefore we
-> +     * can ignore the Acquire and Release bits of this instruction.
-> +     */
-> +    fn(cpu_reg(s, rt), tcg_rn, tcg_rs, get_mem_index(s),
-> +       s->be_data | size | MO_ALIGN);
+On Thu, May 03, 2018 at 04:06:19PM +0200, Thomas Huth wrote:
+> On 03.05.2018 15:43, Gerd Hoffmann wrote:
+> > On Thu, May 03, 2018 at 10:26:40AM +0100, Peter Maydell wrote:
+> >> On 3 May 2018 at 10:07, Daniel P. Berrang=C3=A9 <berrange@redhat.com=
+> wrote:
+> >>> On Thu, May 03, 2018 at 08:21:00AM +0100, Stefan Hajnoczi wrote:
+> >>>> I don't see an issue with time-based numbering schemes.  Ubuntu ma=
+de it
+> >>>> popular and other projects (like DPDK) are doing the same thing no=
+w.
+> >>>>
+> >>>> The convention is YY.MM though, not YYMM.
+> >>>
+> >>> It feels like we've got quite a strong backing for time based versi=
+oning
+> >>> amongst people replying here. I'd be happy with YY.MM
+> >>
+> >> I'm not hugely in favour mostly because I don't much like
+> >> changing version numbering formats -- does it really gain
+> >> us anything? But I guess it's a bit of a bikeshed-colour question.
+> >=20
+> > Well, major/minor numbers don't mean anything.  So I think it makes
+> > sense to give them a meaning, and given we do time-based releases it
+> > surely makes sense to use a time-based scheme.  Major indicating the
+> > year is the obvious and common choice here.  Various variants are in
+> > use:
+> >=20
+> >   (a) major equals year, minor equals month (ubuntu style).
+> >   (b) major equals year, minor counts up (mesa style).
+> >   (c) major is bumped each year, but doesn't equal year (libvirt styl=
+e).
+> >=20
+> > If we don't want give them a meaning, how about:
+> >=20
+> >   (d) just drop the minor and count up major each release (systemd st=
+yle)?
+> >=20
+> > My personal preference would be (a) or (b), because it is easy to see
+> > when a version was released.  (b) looks more like a classic version
+> > number, we would have 18.0, 18.1, ... instead of 18.04, 18.08, ...
+>=20
+> I'd really would like to avoid variant (a) ... otherwise people will
+> confuse 18.1.1 and 18.11 (aka. 18.11.0) again...
 
-Does this definitely do the arithmetic operation at the datatype
-size and not the _i64 size ? (It makes a difference for example
-with LDEORB if Rs has high bits set: the result should always
-have [31:8] zero.)
+We could keep major =3D=3D year, minor =3D=3D nth release of $year. eg 18=
+.1,
+18.2, 18.3 for the 1st, 2nd and 3rd releases of 2018. Still makes it
+fairly clear what timeframe each was released in, without having to
+follow month numbers.
 
-Still missing LDAPR*, but otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
->  }
->
->  /* Load/store register (all forms) */
-> --
-> 2.14.3
-
-thanks
--- PMM
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
