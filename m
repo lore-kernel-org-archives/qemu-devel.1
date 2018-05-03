@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48245)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fEF25-0000Jf-NC
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 10:16:39 -0400
+	(envelope-from <clg@kaod.org>) id 1fEF2V-0000XG-Br
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 10:16:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fEF20-0006lq-P7
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 10:16:29 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38704 helo=mx1.redhat.com)
+	(envelope-from <clg@kaod.org>) id 1fEF2P-0006w7-Iw
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 10:16:55 -0400
+Received: from 1.mo2.mail-out.ovh.net ([46.105.63.121]:33227)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1fEF20-0006kw-IU
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 10:16:24 -0400
-Date: Thu, 3 May 2018 16:16:14 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180503161614.1a963491.cohuck@redhat.com>
-In-Reply-To: <d9203797-be4a-3cd7-c718-56fa41f60310@redhat.com>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fEF2P-0006vh-C2
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 10:16:49 -0400
+Received: from player714.ha.ovh.net (unknown [10.109.108.1])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id C15A912F68B
+	for <qemu-devel@nongnu.org>; Thu,  3 May 2018 16:16:47 +0200 (CEST)
 References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
-	<20180430103312.GH3249@redhat.com>
-	<20180430132107.0a37704d.cohuck@redhat.com>
-	<ac216b06-9469-addd-b5a1-3a3a89fd0782@redhat.com>
-	<20180502074403.yh5weukbjgqsvp7n@sirius.home.kraxel.org>
-	<20180502080200.GG3308@redhat.com>
-	<20180503072100.GA5301@stefanha-x1.localdomain>
-	<20180503090727.GC11382@redhat.com>
-	<CAFEAcA8=mZf8RbQX2-swbUBkoT=RYSVx-oRA2UpzJCqvgGF+KQ@mail.gmail.com>
-	<20180503134321.pp736ou25pdwvslm@sirius.home.kraxel.org>
-	<d9203797-be4a-3cd7-c718-56fa41f60310@redhat.com>
+	<d50e3a40-d7f3-4c9b-e930-4c2f4d6c8a53@redhat.com>
+	<CAFEAcA8wJuJ9464LadgjJOo-7ttdGYcfDQWALbkxBRJCr_knkg@mail.gmail.com>
+	<062deb2a-35fc-319f-b159-3b58cbf910df@redhat.com>
+	<20180502115844.GO3308@redhat.com>
+	<CAFEAcA-e_=08658O8E3CAmYXvBbNWmznnhfMLUW+MXnxb_vKfQ@mail.gmail.com>
+	<20180503093329.GF11382@redhat.com>
+	<8af696b5-3985-ffd6-43fb-2bcbfe0d0493@redhat.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <222ee475-9eb5-8887-819a-7b093fc269b1@kaod.org>
+Date: Thu, 3 May 2018 16:16:41 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <8af696b5-3985-ffd6-43fb-2bcbfe0d0493@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] release retrospective, next release timing,
  numbering
@@ -37,51 +38,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>, Greg Kurz <groug@kaod.org>
 
-On Thu, 3 May 2018 16:06:19 +0200
-Thomas Huth <thuth@redhat.com> wrote:
-
-> On 03.05.2018 15:43, Gerd Hoffmann wrote:
-> > On Thu, May 03, 2018 at 10:26:40AM +0100, Peter Maydell wrote: =20
-> >> On 3 May 2018 at 10:07, Daniel P. Berrang=C3=A9 <berrange@redhat.com> =
-wrote: =20
-> >>> On Thu, May 03, 2018 at 08:21:00AM +0100, Stefan Hajnoczi wrote: =20
-> >>>> I don't see an issue with time-based numbering schemes.  Ubuntu made=
- it
-> >>>> popular and other projects (like DPDK) are doing the same thing now.
-> >>>>
-> >>>> The convention is YY.MM though, not YYMM. =20
-> >>>
-> >>> It feels like we've got quite a strong backing for time based version=
-ing
-> >>> amongst people replying here. I'd be happy with YY.MM =20
-> >>
-> >> I'm not hugely in favour mostly because I don't much like
-> >> changing version numbering formats -- does it really gain
-> >> us anything? But I guess it's a bit of a bikeshed-colour question. =20
-> >=20
-> > Well, major/minor numbers don't mean anything.  So I think it makes
-> > sense to give them a meaning, and given we do time-based releases it
-> > surely makes sense to use a time-based scheme.  Major indicating the
-> > year is the obvious and common choice here.  Various variants are in
-> > use:
-> >=20
-> >   (a) major equals year, minor equals month (ubuntu style).
-> >   (b) major equals year, minor counts up (mesa style).
-> >   (c) major is bumped each year, but doesn't equal year (libvirt style).
-> >=20
-> > If we don't want give them a meaning, how about:
-> >=20
-> >   (d) just drop the minor and count up major each release (systemd styl=
-e)?
-> >=20
-> > My personal preference would be (a) or (b), because it is easy to see
-> > when a version was released.  (b) looks more like a classic version
-> > number, we would have 18.0, 18.1, ... instead of 18.04, 18.08, ... =20
+On 05/03/2018 11:42 AM, Thomas Huth wrote:
+> On 03.05.2018 11:33, Daniel P. Berrang=C3=A9 wrote:
+>> On Wed, May 02, 2018 at 01:05:21PM +0100, Peter Maydell wrote:
+>>> On 2 May 2018 at 12:58, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
+ wrote:
+>>>> I'm curious what is the compelling benefit of having a single fat QE=
+MU
+>>>> binary that included all archiectures at once ?
+>>>
+>>> The motivation is "I want to model a board with an SoC that has
+>>> both Arm cores and Microblaze cores". One binary seems the most
+>>> sensible way to do that, since otherwise we'd end up with some
+>>> huge multiplication of binaries for all the possible architecture
+>>> combinations. It also would reduce the number of times we end up
+>>> recompiling and shipping any particular PCI device. From the
+>>> perspective of QEMU as emulation environment, it's a nice
+>>> simplification.
+>>
+>> Ah that's interesting - should have known there was wierd hardware
+>> like that out there :-)
 >=20
-> I'd really would like to avoid variant (a) ... otherwise people will
-> confuse 18.1.1 and 18.11 (aka. 18.11.0) again...
+> It's not that weird. A lot of "normal" machines have a service processo=
+r
+> (aka. BMC - board management controller) on board - and this service
+> processor is completely different to the main CPU. For example, the mai=
+n
+> CPU could be an x86 or PPC, and the service processor is an embedded AR=
+M
+> chip. To emulate a complete board, you'd need both CPU types in one QEM=
+U
+> binary. Or you need to come up with some fancy interface between two
+> QEMU instances...
 
-Just use YYYY instead of YY :)
+like a QEMU chardev backend to implement an IPMI BT interface between=20
+a QEMU Aspeed SoC machine and a QEMU PowerNV machine ? It works :) But,
+you need real HW to find timing issues ...
+
+They are plenty of other "wires" to fully model an OpenPower system,=20
+LPC, MBOX, etc. The dialogues between the ppc64 host firmware and=20
+the BMC firmware are very diverse.=20
+
+Coming back to the initial motivation that Peter pointed out, would
+the goal to be able to run vcpus of different architectures ? It would
+certainly be interesting to model a platform, specially if we can=20
+synchronize the execution in some ways and find timing issues.
+
+
+C.
