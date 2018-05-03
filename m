@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1fEFz7-0004SU-42
+	(envelope-from <frederic.konrad@adacore.com>) id 1fEFz7-0004SW-Fl
 	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:17:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1fEFz5-0003Ds-Mp
+	(envelope-from <frederic.konrad@adacore.com>) id 1fEFz6-0003EG-CF
 	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:17:29 -0400
 From: KONRAD Frederic <frederic.konrad@adacore.com>
-Date: Thu,  3 May 2018 17:17:15 +0200
-Message-Id: <1525360636-18229-3-git-send-email-frederic.konrad@adacore.com>
+Date: Thu,  3 May 2018 17:17:16 +0200
+Message-Id: <1525360636-18229-4-git-send-email-frederic.konrad@adacore.com>
 In-Reply-To: <1525360636-18229-1-git-send-email-frederic.konrad@adacore.com>
 References: <1525360636-18229-1-git-send-email-frederic.konrad@adacore.com>
-Subject: [Qemu-devel] [PATCH V2 2/3] riscv: htif: increase the priority of
- the htif subregion
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH V2 3/3] riscv: requires libfdt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,70 +25,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-stable@nongnu.org
 Cc: mjc@sifive.com, kbastian@mail.uni-paderborn.de, f4bug@amsat.org, peter.maydell@linaro.org, frederic.konrad@adacore.com
 
-The htif device is supposed to be mapped over an other subregion. So increase
-its priority to one to avoid any conflict.
+When compiling on a machine without libfdt installed the configure script
+should try to get libfdt from the git or should die because otherwise
+CONFIG_LIBFDT is not set and the build process end in an error in the lin=
+k
+phase.. eg:
 
-Here is the output of info mtree:
+hw/riscv/virt.o: In function `riscv_virt_board_init':
+qemu/src/hw/riscv/virt.c:317: undefined reference to `qemu_fdt_setprop_ce=
+ll'
+qemu/src/hw/riscv/virt.c:319: undefined reference to `qemu_fdt_setprop_ce=
+ll'
+qemu/src/hw/riscv/virt.c:345: undefined reference to `qemu_fdt_dumpdtb'
+collect2: error: ld returned 1 exit status
+make[1]: *** [qemu-system-riscv64] Error 1
+make: *** [subdir-riscv64-softmmu] Error 2
 
-Before:
-(qemu) info mtree
- address-space: memory
-   0000000000000000-ffffffffffffffff (prio 0, i/o): system
-     0000000000000000-000000000000000f (prio 0, i/o): riscv.htif.uart
-     0000000000000000-0000000000011fff (prio 0, ram): riscv.spike.bootrom
-     0000000002000000-000000000200ffff (prio 0, i/o): riscv.sifive.clint
-     0000000080000000-0000000087ffffff (prio 0, ram): riscv.spike.ram
-
- address-space: I/O
-   0000000000000000-000000000000ffff (prio 0, i/o): io
-
- address-space: cpu-memory-0
-   0000000000000000-ffffffffffffffff (prio 0, i/o): system
-     0000000000000000-000000000000000f (prio 0, i/o): riscv.htif.uart
-     0000000000000000-0000000000011fff (prio 0, ram): riscv.spike.bootrom
-     0000000002000000-000000000200ffff (prio 0, i/o): riscv.sifive.clint
-     0000000080000000-0000000087ffffff (prio 0, ram): riscv.spike.ram
-
-After:
- (qemu) info mtree
- address-space: memory
-   0000000000000000-ffffffffffffffff (prio 0, i/o): system
-     0000000000000000-000000000000000f (prio 1, i/o): riscv.htif.uart
-     0000000000000000-0000000000011fff (prio 0, ram): riscv.spike.bootrom
-     0000000002000000-000000000200ffff (prio 0, i/o): riscv.sifive.clint
-     0000000080000000-0000000087ffffff (prio 0, ram): riscv.spike.ram
-
- address-space: I/O
-   0000000000000000-000000000000ffff (prio 0, i/o): io
-
- address-space: cpu-memory-0
-   0000000000000000-ffffffffffffffff (prio 0, i/o): system
-     0000000000000000-000000000000000f (prio 1, i/o): riscv.htif.uart
-     0000000000000000-0000000000011fff (prio 0, ram): riscv.spike.bootrom
-     0000000002000000-000000000200ffff (prio 0, i/o): riscv.sifive.clint
-     0000000080000000-0000000087ffffff (prio 0, ram): riscv.spike.ram
-
+Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Michael Clark <mjc@sifive.com>
 Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
----
- hw/riscv/riscv_htif.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/hw/riscv/riscv_htif.c b/hw/riscv/riscv_htif.c
-index be252ec..f735129 100644
---- a/hw/riscv/riscv_htif.c
-+++ b/hw/riscv/riscv_htif.c
-@@ -253,8 +253,9 @@ HTIFState *htif_mm_init(MemoryRegion *address_space, MemoryRegion *main_mem,
-         htif_be_change, s, NULL, true);
-     if (address_symbol_set == 3) {
-         memory_region_init_io(&s->mmio, NULL, &htif_mm_ops, s,
--                            TYPE_HTIF_UART, size);
--        memory_region_add_subregion(address_space, base, &s->mmio);
-+                              TYPE_HTIF_UART, size);
-+        memory_region_add_subregion_overlap(address_space, base,
-+                                            &s->mmio, 1);
-     }
- 
-     return s;
--- 
+---
+V1 -> V2:
+  * Requires libfdt for riscv*-softmmu instead of riscv64-softmmu only.
+---
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index 1443422..479e9a7 100755
+--- a/configure
++++ b/configure
+@@ -3761,7 +3761,7 @@ fi
+ fdt_required=3Dno
+ for target in $target_list; do
+   case $target in
+-    aarch64*-softmmu|arm*-softmmu|ppc*-softmmu|microblaze*-softmmu|mips6=
+4el-softmmu)
++    aarch64*-softmmu|arm*-softmmu|ppc*-softmmu|microblaze*-softmmu|mips6=
+4el-softmmu|riscv*-softmmu)
+       fdt_required=3Dyes
+     ;;
+   esac
+--=20
 1.8.3.1
