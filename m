@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fEM9P-00073O-2q
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:52:32 -0400
+	(envelope-from <alistair23@gmail.com>) id 1fEMBK-0000Jy-4w
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:54:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fEM9L-0004XB-Nn
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:52:31 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:59585)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fEM9L-0004V7-Bv
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:52:27 -0400
-References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
-	<20180501122436.GA14803@stefanha-x1.localdomain>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <bdccdec2-b4dd-6a7f-282e-91885c5749c8@vivier.eu>
-Date: Thu, 3 May 2018 23:52:20 +0200
+	(envelope-from <alistair23@gmail.com>) id 1fEMBJ-0006p2-00
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:54:30 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:45723)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1fEMBI-0006nQ-H4
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:54:28 -0400
+Received: by mail-lf0-x243.google.com with SMTP id y14-v6so27788688lfy.12
+	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 14:54:28 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180501122436.GA14803@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Wl1zQ6eSq93BHPMnnluuEpiVsqiRwcl8q"
-Subject: Re: [Qemu-devel] release retrospective, next release timing,
- numbering
+References: <20180503091922.28733-1-edgar.iglesias@gmail.com>
+	<20180503091922.28733-27-edgar.iglesias@gmail.com>
+In-Reply-To: <20180503091922.28733-27-edgar.iglesias@gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 03 May 2018 21:54:01 +0000
+Message-ID: <CAKmqyKPJh=AtnAfAavfgzTJKxk5TRLwuT1LQpCuWRFxwaUTyuA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 26/29] target-microblaze: mmu: Prepare
+ for 64-bit addresses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +30,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Edgar Iglesias <edgar.iglesias@gmail.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, Francisco Iglesias <frasse.iglesias@gmail.com>, Alistair Francis <alistair@alistair23.me>, Richard Henderson <richard.henderson@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Wl1zQ6eSq93BHPMnnluuEpiVsqiRwcl8q
-From: Laurent Vivier <laurent@vivier.eu>
-To: Stefan Hajnoczi <stefanha@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
-Message-ID: <bdccdec2-b4dd-6a7f-282e-91885c5749c8@vivier.eu>
-Subject: Re: [Qemu-devel] release retrospective, next release timing,
- numbering
-References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
- <20180501122436.GA14803@stefanha-x1.localdomain>
-In-Reply-To: <20180501122436.GA14803@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, May 3, 2018 at 2:44 AM Edgar E. Iglesias <edgar.iglesias@gmail.com>
+wrote:
 
-Le 01/05/2018 =C3=A0 14:24, Stefan Hajnoczi a =C3=A9crit=C2=A0:
-> On Fri, Apr 27, 2018 at 04:51:03PM +0100, Peter Maydell wrote:
->> (2) release timing:
->>  * usual schedule would give us a next release mid-to-late August
->>  * unless I can persuade Stefan to do the release management this
->>    cycle we might need to wind that in by a couple of weeks so
->>    it's definitely done by the middle of August, to avoid a clash
->>    with a personal commitment
->=20
-> I will be offline mid-August to mid-September, sorry.  Someone else can=
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-> volunteer to do the release.
->=20
->> (3) retrospective, lessons learned &c
->>  * please remember that if every single submaintainer submits
->>    a pull request on the morning of an RC, it is physically
->>    not possible for me to process all those pulls in time to
->>    tag the RC that day. We had several RCs which got delayed
->>    by a day because of this; please try to submit earlier
->>    rather than later...
->>  * provide your opinions here ?
->=20
-> Paolo asked sub-maintainers to include changelogs in pull request
-> messages.  This will make it easy to collate the QEMU 3.0 changelog jus=
-t
-> from the merge commits.  I think it's a good idea.
+> Prepare for 64-bit addresses.
+> This makes no functional difference as the upper parts of
+> the 64-bit addresses are not yet reachable.
 
-BTW, is there a way to have "git publish --pull-request" opens
-automatically an editor with the cover letter?
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> ---
+>   target/microblaze/mmu.c | 14 +++++++-------
+>   target/microblaze/mmu.h |  6 +++---
+>   2 files changed, 10 insertions(+), 10 deletions(-)
 
-I've just forgot to fill the entry in my last pull request...
+> diff --git a/target/microblaze/mmu.c b/target/microblaze/mmu.c
+> index 231803ceea..a379968618 100644
+> --- a/target/microblaze/mmu.c
+> +++ b/target/microblaze/mmu.c
+> @@ -81,16 +81,16 @@ unsigned int mmu_translate(struct microblaze_mmu *mmu,
+>   {
+>       unsigned int i, hit = 0;
+>       unsigned int tlb_ex = 0, tlb_wr = 0, tlb_zsel;
+> -    unsigned int tlb_size;
+> -    uint32_t tlb_tag, tlb_rpn, mask, t0;
+> +    uint64_t tlb_tag, tlb_rpn, mask;
+> +    uint32_t tlb_size, t0;
 
-Thanks,
-Laurent
+>       lu->err = ERR_MISS;
+>       for (i = 0; i < ARRAY_SIZE(mmu->rams[RAM_TAG]); i++) {
+> -        uint32_t t, d;
+> +        uint64_t t, d;
 
+>           /* Lookup and decode.  */
+>           t = mmu->rams[RAM_TAG][i];
+> -        D(qemu_log("TLB %d valid=%d\n", i, t & TLB_VALID));
+> +        D(qemu_log("TLB %d valid=%" PRId64 "\n", i, t & TLB_VALID));
 
---Wl1zQ6eSq93BHPMnnluuEpiVsqiRwcl8q
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+While touching this it's probably worth updating to use qemu_log_mask with
+the MMU mask instead of the D() macro.
 
------BEGIN PGP SIGNATURE-----
+Alistair
 
-iQIzBAEBCAAdFiEEzS913cjjpNwuT1Fz8ww4vT8vvjwFAlrrhJQACgkQ8ww4vT8v
-vjy9Lw/+JIonFPFbh6els+bda9nC1/52MD+9nMxe2TcXiVM+CuF8dZnadzwElZr4
-wOKer9/BAPgiXFvH8JJba4Uowb/rH1sP1Tq9vWIMBVO91IrIP1EDEgpkPS7+SFnt
-K/PFkjToT8hiXWLiTZNv4DpQrjQ9d/s+DzBo2bK5D7Wz+03ahQlhDjXi5RFEYjm0
-iVrXS6VdeC3OXmwrWbBgOKjG1KHKjdTV6wGg144g0a8/cY7/23Ciw7z2n28uHARz
-sOOWUQg3LqNoCh5J+Kdvy8gQorsiO0cFS6WawxtxuokG7uEON12M5NeDvMfA/TXp
-5EFU/BEOCjEA5NcE4vn86MQ7PTvuf34d8rX44t4rrXN26esCGPRoCkyuRf5ZOF24
-a2JY5DLJrYsv3krB3RV7o3NZsmbwnAswaEW1gdXfmt0WeRRoQEKC6N93fwWYBKXz
-gqRo9mOq9RbJpcZjMe6Ew3dfCgstSbQAloiHmkOO20D78gDsIue8yTOwlNZUm3I0
-Tmx/G3arYbjcnNn4Dzf8eUEKNCOfY1g42QMDp7YQpWLAtZL4bn2QGVw2k9llpUW9
-KU4tD5ClGkJ7GRv1HLP/O2CLvT/yN/kQ14VuALhtWYptMnY+J8KnjrS28D0cg4tm
-Q+YftWwrJl0/pNNTwE10CwNx5rSlPQBoz+cCnHsvfw5OQMpL/QI=
-=FLBH
------END PGP SIGNATURE-----
+>           if (t & TLB_VALID) {
+>               tlb_size = tlb_decode_size((t & TLB_PAGESZ_MASK) >> 7);
+>               if (tlb_size < TARGET_PAGE_SIZE) {
+> @@ -98,10 +98,10 @@ unsigned int mmu_translate(struct microblaze_mmu *mmu,
+>                   abort();
+>               }
 
---Wl1zQ6eSq93BHPMnnluuEpiVsqiRwcl8q--
+> -            mask = ~(tlb_size - 1);
+> +            mask = ~((uint64_t)tlb_size - 1);
+>               tlb_tag = t & TLB_EPN_MASK;
+>               if ((vaddr & mask) != (tlb_tag & mask)) {
+> -                D(qemu_log("TLB %d vaddr=%x != tag=%x\n",
+> +                D(qemu_log("TLB %d vaddr=%" PRIx64 " != tag=%" PRIx64
+"\n",
+>                              i, vaddr & mask, tlb_tag & mask));
+>                   continue;
+>               }
+> @@ -173,7 +173,7 @@ unsigned int mmu_translate(struct microblaze_mmu *mmu,
+>           }
+>       }
+>   done:
+> -    D(qemu_log("MMU vaddr=%x rw=%d tlb_wr=%d tlb_ex=%d hit=%d\n",
+> +    D(qemu_log("MMU vaddr=%" PRIx64 " rw=%d tlb_wr=%d tlb_ex=%d
+hit=%d\n",
+>                 vaddr, rw, tlb_wr, tlb_ex, hit));
+>       return hit;
+>   }
+> diff --git a/target/microblaze/mmu.h b/target/microblaze/mmu.h
+> index 624becfded..1714caf82e 100644
+> --- a/target/microblaze/mmu.h
+> +++ b/target/microblaze/mmu.h
+> @@ -28,7 +28,7 @@
+>   #define RAM_TAG      0
+
+>   /* Tag portion */
+> -#define TLB_EPN_MASK          0xFFFFFC00 /* Effective Page Number */
+> +#define TLB_EPN_MASK          MAKE_64BIT_MASK(10, 64 - 10)
+>   #define TLB_PAGESZ_MASK       0x00000380
+>   #define TLB_PAGESZ(x)         (((x) & 0x7) << 7)
+>   #define PAGESZ_1K             0
+> @@ -42,7 +42,7 @@
+>   #define TLB_VALID             0x00000040 /* Entry is valid */
+
+>   /* Data portion */
+> -#define TLB_RPN_MASK          0xFFFFFC00 /* Real Page Number */
+> +#define TLB_RPN_MASK          MAKE_64BIT_MASK(10, 64 - 10)
+>   #define TLB_PERM_MASK         0x00000300
+>   #define TLB_EX                0x00000200 /* Instruction execution
+allowed */
+>   #define TLB_WR                0x00000100 /* Writes permitted */
+> @@ -63,7 +63,7 @@
+>   struct microblaze_mmu
+>   {
+>       /* Data and tag brams.  */
+> -    uint32_t rams[2][TLB_ENTRIES];
+> +    uint64_t rams[2][TLB_ENTRIES];
+>       /* We keep a separate ram for the tids to avoid the 48 bit tag
+width.  */
+>       uint8_t tids[TLB_ENTRIES];
+>       /* Control flops.  */
+> --
+> 2.14.1
