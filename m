@@ -1,20 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1fEG5n-0000fD-WA
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:24:24 -0400
+	(envelope-from <alifm@linux.ibm.com>) id 1fEG6m-0001eN-3g
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:25:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1fEG5n-0005oi-7s
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:24:23 -0400
-References: <1525360636-18229-1-git-send-email-frederic.konrad@adacore.com>
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <937f65c3-0aa8-6d9a-ef74-871e0274dec4@adacore.com>
-Date: Thu, 3 May 2018 17:24:20 +0200
+	(envelope-from <alifm@linux.ibm.com>) id 1fEG6h-0006PE-4J
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:25:24 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37082
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1fEG6g-0006NV-VO
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:25:19 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w43FKvbL117655
+	for <qemu-devel@nongnu.org>; Thu, 3 May 2018 11:25:16 -0400
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2hr3s7v3j1-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 11:25:15 -0400
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
+	Thu, 3 May 2018 09:25:15 -0600
+References: <20180502125221.4877-1-cohuck@redhat.com>
+From: Farhan Ali <alifm@linux.ibm.com>
+Date: Thu, 3 May 2018 11:25:08 -0400
 MIME-Version: 1.0
-In-Reply-To: <1525360636-18229-1-git-send-email-frederic.konrad@adacore.com>
+In-Reply-To: <20180502125221.4877-1-cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V2 0/3] riscv: some little fix.
+Message-Id: <cbe7b21c-639c-aa64-4777-03d0aa793ac8@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] s390-ccw: force diag 308 subcode to
+ unsigned long
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,31 +42,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-stable@nongnu.org
-Cc: kbastian@mail.uni-paderborn.de, mjc@sifive.com, f4bug@amsat.org, peter.maydell@linaro.org
+To: Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
-s/fix/fixes in the subject :/
 
-Fred
 
-On 05/03/2018 05:17 PM, KONRAD Frederic wrote:
-> Hi all,
+On 05/02/2018 08:52 AM, Cornelia Huck wrote:
+> We currently pass an integer as the subcode parameter. However,
+> the upper bits of the register containing the subcode need to
+> be 0, which is not guaranteed unless we explicitly specify the
+> subcode to be an unsigned long value.
 > 
-> Here are some fixes for RISCV.
-> 
-> The two firsts allow to map the HTIF @0x00000000.
-> The third one requires fdt to be present on the build machine so the build
-> doesn't end with a linker error.
-> 
-> Thanks,
-> Fred
-> 
-> KONRAD Frederic (3):
->    riscv: spike: allow base == 0
->    riscv: htif: increase the priority of the htif subregion
->    riscv: requires libfdt
-> 
->   configure             |  2 +-
->   hw/riscv/riscv_htif.c | 12 ++++++++----
->   2 files changed, 9 insertions(+), 5 deletions(-)
-> 
+> Fixes: d046c51dad3 ("pc-bios/s390-ccw: Get device address via diag 308/6")
+> Cc:qemu-stable@nongnu.org
+> Signed-off-by: Cornelia Huck<cohuck@redhat.com>
+
+Sorry for my ignorance, but is there a C standard that says upper bits 
+of an int is not guaranteed to be 0?
+
+Thanks
+Farhan
