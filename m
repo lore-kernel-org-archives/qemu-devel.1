@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58166)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fEFbq-0001rn-Gy
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 10:53:27 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fEFdY-0002nc-Pk
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 10:55:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fEFbn-0000vH-Es
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 10:53:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40284 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1fEFdV-0001Mo-NB
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 10:55:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57734 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fEFbn-0000vD-9y
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 10:53:23 -0400
-References: <20180503012546.2170-1-famz@redhat.com>
-	<20180503012546.2170-2-famz@redhat.com>
-	<20180503091216.GD11382@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <38bb4fbe-481e-b859-c4bc-bcdb9dba0957@redhat.com>
-Date: Thu, 3 May 2018 09:53:18 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fEFdV-0001Mc-H0
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 10:55:09 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F25394270961
+	for <qemu-devel@nongnu.org>; Thu,  3 May 2018 14:55:08 +0000 (UTC)
+Date: Thu, 3 May 2018 15:55:02 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180503145501.GH2660@work-vm>
+References: <20180425112723.1111-1-quintela@redhat.com>
+	<20180425112723.1111-19-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180503091216.GD11382@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 1/2] slirp: Add "query-usernet" QMP
- command
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180425112723.1111-19-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v12 18/21] migration: Start sending messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +33,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>
-Cc: Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Samuel Thibault <samuel.thibault@ens-lyon.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-On 05/03/2018 04:12 AM, Daniel P. Berrang=C3=A9 wrote:
-> On Thu, May 03, 2018 at 09:25:45AM +0800, Fam Zheng wrote:
->> HMP "info usernet" has been available but it isn't ideal for programme=
-d
->> use cases. This closes the gap in QMP by adding a counterpart
->> "query-usernet" command. It is basically translated from
->> the HMP slirp_connection_info() loop, which now calls the QMP
->> implementation and prints the data, just like other HMP info_* command=
-s.
->>
->> The TCPS_* macros are now defined as a QAPI enum.
->>
->> Signed-off-by: Fam Zheng <famz@redhat.com>
->=20
+* Juan Quintela (quintela@redhat.com) wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  migration/ram.c | 30 ++++++++++++++++++++++++------
+>  1 file changed, 24 insertions(+), 6 deletions(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 862ec53d32..9adbaa81f9 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -625,9 +625,6 @@ static int multifd_recv_unfill_packet(MultiFDRecvParams *p, Error **errp)
+>      RAMBlock *block;
+>      int i;
+>  
+> -    /* ToDo: We can't use it until we haven't received a message */
+> -    return 0;
+> -
+>      be32_to_cpus(&packet->magic);
+>      if (packet->magic != MULTIFD_MAGIC) {
+>          error_setg(errp, "multifd: received packet "
+> @@ -851,6 +848,7 @@ static void *multifd_send_thread(void *opaque)
+>  {
+>      MultiFDSendParams *p = opaque;
+>      Error *local_err = NULL;
+> +    int ret;
+>  
+>      trace_multifd_send_thread_start(p->id);
+>  
+> @@ -878,10 +876,18 @@ static void *multifd_send_thread(void *opaque)
+>  
+>              trace_multifd_send(p->id, seq, used, flags);
+>  
+> -            /* ToDo: send packet here */
+> +            ret = qio_channel_write_all(p->c, (void *)p->packet,
+> +                                        p->packet_len, &local_err);
+> +            if (ret != 0) {
+> +                break;
+> +            }
+> +
+> +            ret = qio_channel_writev_all(p->c, p->pages->iov, used, &local_err);
+> +            if (ret != 0) {
+> +                break;
+> +            }
+>  
+>              qemu_mutex_lock(&p->mutex);
+> -            p->flags = 0;
 
->> +##
->> +{ 'enum': 'TCPS',
->=20
-> I'd suggest avoiding the abbreviation, IOW use  TCPState as
-> the name. Yes that will require changnig the constants in
-> the SLIRP code, but that's worthwhile to get this QAPI
-> naming clearer IMHO.
->=20
-> I wonder if we should have a common prefix too eg UsernetTCPState
-> as this is a global QAPI namespace after all .
+What's this change?
 
-You could also use
+Other than that looks OK.
 
-{ 'enum': 'UsernetTCPState', 'prefix': 'TCPS', ...
+Dave
 
-for minimizing code churn (if 'prefix' is present, that overrides what=20
-the generator would use for enum values); although I'm not sure if that=20
-is any better (we haven't used 'prefix' much, and Markus wasn't the=20
-biggest fan of it in the first place, as it is more of a hack).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+>              p->pending_job--;
+>              qemu_mutex_unlock(&p->mutex);
+>  
+> @@ -1091,7 +1097,14 @@ static void *multifd_recv_thread(void *opaque)
+>              uint32_t flags;
+>              qemu_mutex_unlock(&p->mutex);
+>  
+> -            /* ToDo: recv packet here */
+> +            ret = qio_channel_read_all_eof(p->c, (void *)p->packet,
+> +                                           p->packet_len, &local_err);
+> +            if (ret == 0) {   /* EOF */
+> +                break;
+> +            }
+> +            if (ret == -1) {   /* Error */
+> +                break;
+> +            }
+>  
+>              qemu_mutex_lock(&p->mutex);
+>              ret = multifd_recv_unfill_packet(p, &local_err);
+> @@ -1108,6 +1121,11 @@ static void *multifd_recv_thread(void *opaque)
+>              p->num_pages += used;
+>              qemu_mutex_unlock(&p->mutex);
+>  
+> +            ret = qio_channel_readv_all(p->c, p->pages->iov, used, &local_err);
+> +            if (ret != 0) {
+> +                break;
+> +            }
+> +
+>              if (flags & MULTIFD_FLAG_SYNC) {
+>                  qemu_sem_post(&multifd_recv_state->sem_sync);
+>                  qemu_sem_wait(&p->sem_sync);
+> -- 
+> 2.17.0
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
