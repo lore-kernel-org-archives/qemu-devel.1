@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fE7MW-00039R-Sa
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 02:05:06 -0400
+	(envelope-from <clg@kaod.org>) id 1fE7PQ-00040v-JU
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 02:08:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fE7MT-00031L-NC
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 02:05:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56854 helo=mx1.redhat.com)
+	(envelope-from <clg@kaod.org>) id 1fE7PN-00053q-DR
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 02:08:04 -0400
+Received: from 20.mo4.mail-out.ovh.net ([46.105.33.73]:36483)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fE7MT-00031B-HH
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 02:05:01 -0400
-Date: Thu, 3 May 2018 14:04:42 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180503060442.GB2378@xz-mi>
-References: <20180425045129.17449-1-peterx@redhat.com>
-	<20180425045129.17449-9-peterx@redhat.com>
-	<2b05e076-0af9-0ee9-c076-7acc29714913@redhat.com>
-	<AADFC41AFE54684AB9EE6CBC0274A5D19113B5D2@SHSMSX101.ccr.corp.intel.com>
-	<20180427072810.GB13269@xz-mi>
-	<AADFC41AFE54684AB9EE6CBC0274A5D19113C1C9@SHSMSX101.ccr.corp.intel.com>
-	<20180427095527.GE13269@xz-mi> <20180427114029.GF13269@xz-mi>
-	<AADFC41AFE54684AB9EE6CBC0274A5D19113D318@SHSMSX101.ccr.corp.intel.com>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fE7PN-00053D-7B
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 02:08:01 -0400
+Received: from player714.ha.ovh.net (unknown [10.109.108.61])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id AD55C16AAC8
+	for <qemu-devel@nongnu.org>; Thu,  3 May 2018 08:07:59 +0200 (CEST)
+References: <20180419124331.3915-1-clg@kaod.org>
+	<20180419124331.3915-8-clg@kaod.org>
+	<20180426072501.GK8800@umbus.fritz.box>
+	<312cdfe7-bc6b-3eed-588e-a71ce1385988@kaod.org>
+	<20180503054534.GU13229@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <cf8ab4bd-8704-aa3f-a4c2-5f459c7dddd4@kaod.org>
+Date: Thu, 3 May 2018 08:07:54 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19113D318@SHSMSX101.ccr.corp.intel.com>
-Subject: Re: [Qemu-devel] [PATCH 08/10] intel-iommu: maintain per-device
- iova ranges
+In-Reply-To: <20180503054534.GU13229@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 07/35] spapr/xive: introduce the XIVE
+ Event Queues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,98 +35,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: Jason Wang <jasowang@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On Fri, Apr 27, 2018 at 11:37:24PM +0000, Tian, Kevin wrote:
+On 05/03/2018 07:45 AM, David Gibson wrote:
+> On Thu, Apr 26, 2018 at 11:48:06AM +0200, C=E9dric Le Goater wrote:
+>> On 04/26/2018 09:25 AM, David Gibson wrote:
+>>> On Thu, Apr 19, 2018 at 02:43:03PM +0200, C=E9dric Le Goater wrote:
+>>>> The Event Queue Descriptor (EQD) table is an internal table of the
+>>>> XIVE routing sub-engine. It specifies on which Event Queue the event
+>>>> data should be posted when an exception occurs (later on pulled by t=
+he
+>>>> OS) and which Virtual Processor to notify.
+>>>
+>>> Uhhh.. I thought the IVT said which queue and vp to notify, and the
+>>> EQD gave metadata for event queues.
+>>
+>> yes. the above poorly written. The Event Queue Descriptor contains the
+>> guest address of the event queue in which the data is written. I will=20
+>> rephrase.     =20
+>>
+>> The IVT contains IVEs which indeed define for an IRQ which EQ to notif=
+y=20
+>> and what data to push on the queue.=20
+>> =20
+>>>> The Event Queue is a much
+>>>> more complex structure but we start with a simple model for the sPAP=
+R
+>>>> machine.
+>>>>
+>>>> There is one XiveEQ per priority and these are stored under the XIVE
+>>>> virtualization presenter (sPAPRXiveNVT). EQs are simply indexed with=
+ :
+>>>>
+>>>>        (server << 3) | (priority & 0x7)
+>>>>
+>>>> This is not in the XIVE architecture but as the EQ index is never
+>>>> exposed to the guest, in the hcalls nor in the device tree, we are
+>>>> free to use what fits best the current model.
+>>
+>> This EQ indexing is important to notice because it will also show up=20
+>> in KVM to build the IVE from the KVM irq state.
+>=20
+> Ok, are you saying that while this combined EQ index will never appear
+> in guest <-> host interfaces,=20
 
-[...]
+Indeed.
 
-> > Self NAK on this...
-> > 
-> > More than half of the whole series tries to solve the solo problem
-> > that we unmapped some pages that were already mapped, which proved
-> > to
-> > be wrong.  Now if we squash the change we will do the same wrong
-> > thing, so we'll still have a very small window that the remapped page
-> > be missing from a device's POV.
-> > 
-> > Now to solve this I suppose we'll need to cache every translation then
-> > we can know whether a mapping has changed, and we only remap when it
-> > really has changed.  But I'm afraid that can be a big amount of data
-> > for nested guests.  For a most common 4G L2 guest, I think the worst
-> > case (e.g., no huge page at all, no continuous pages) is 4G/4K=1M
-> > entries in that tree.
-> 
-> I think one key factor to think about is the effect of PSI. From
-> VT-d spec, all internal caches (IOTLB entries, paging-structure
-> cache entries, etc.) associated with specified address range
-> must be flushed accordingly, i.e. no cache on stale mapping.
-> Now per-device iova ranges is new type of cache introduced
-> by Qemu VT-d. It doesn't cache actual mapping but its purpose
-> is to decide whether to notify VFIO for updated mapping. In
-> this manner if we don't differentiate whether an entry is
-> for stale mapping, looks the definition of PSI is broken.
-> 
-> ask another question. In reality how much improvement this
-> patch can bring, i.e. is it usual to see guest map on an already
-> mapped region, or unmap an already unmapped region?
+> it might show up in qemu <-> KVM interfaces?
 
-The funny thing is that there is actually no MAP/UNMAP flag for
-PSI/DSI.  For either MAP/UNMAP, guest send one PSI for that range, or
-even a DSI (Domain Selective Invalidations).
+Not directly but it is part of the IVE as the IVE_EQ_INDEX field. When
+dumped, it has to be built in some ways, compatible with the emulated=20
+mode in QEMU.=20
 
-This patch will mostly be helpful not really for PSIs, but for DSI.
-Please have a look on Issue (4) that I mentioned in the cover letter.
-This patch is the core part to solve that DMA error problem.
+>>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>>>
+>>> Is the EQD actually modifiable by a guest?  Or are the settings of th=
+e
+>>> EQs fixed by PAPR?
+>>
+>> The guest uses the H_INT_SET_QUEUE_CONFIG hcall to define the address
+>> of the event queue for a couple prio/server.
+>=20
+> Ok, so the EQD can be modified by the guest.  In which case we need to
+> work out what object owns it, since it'll need to migrate it.
 
-An example is that we can get DSI for a domain that already have
-existing mappings. In QEMU, we handle DSI as a whole-range PSI, so
-before this patch we will unmap those already mapped pages then remap
-all of them.  However we can't map the same page again, so we cache
-what we have mapped here.
+Indeed. The EQD are CPU related as there is one EQD per couple (cpu,=20
+priority). The KVM patchset dumps/restores the eight XiveEQ struct=20
+using per cpu ioctls. The EQ in the OS RAM is marked dirty at that
+stage.
 
-> 
-> > 
-> > Is it really worth it to solve this possibly-buggy-guest-OS problem
-> > with such a overhead?  I don't know..
-> 
-> If adding overhead removes the benefit of this patch, then 
-> definitely not a good thing.
-
-For the problem that we are going to solve, this patch is not really a
-beneficial one, but fixes a critical bug.  Again, please refer to the
-issue (4) of the cover letter for that 3ms window problem.
-
-> 
-> > 
-> > I'm not sure whether it's still acceptable that we put this issue
-> > aside.  We should know that normal OSs should not do this, and if they
-> > do, IMHO it proves a buggy OS already (so even from hardware POV we
-> > allow this, from software POV it should still be problematic), then
-> > it'll have problem for sure, but only within the VM itself, and it
-> > won't affect other VMs or the host.  That sounds still reasonable to
-> > me so far.
-> 
-> As said earlier, what I'm worried is whether there is a way to
-> detect such case when your assumption is violated. usually
-> emulation can choose to not implement all the features which
-> are supported on the real device, but it's done in a way that
-> non-supported features/behaviors can be reported to guest
-> (based on spec definition) thus guest knows the expectation
-> from the emulated device...
-
-IMHO the guest can't really detect this, but it'll found that the
-device is not working functionally if it's doing something like what
-Jason has mentioned.
-
-Actually now I have had an idea if we really want to live well even
-with Jason's example: maybe we'll need to identify PSI/DSI.  For DSI,
-we don't remap for mapped pages; for PSI, we unmap and remap the
-mapped pages.  That'll complicate the stuff a bit, but it should
-satisfy all the people.
-
-Thanks,
-
--- 
-Peter Xu
+C.=20
