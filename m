@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44861)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fEKbM-0005sF-DV
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:13:17 -0400
+	(envelope-from <mst@redhat.com>) id 1fEKdM-00085d-ME
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:15:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fEKbL-0005dM-B1
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:13:16 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:32936)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1fEKbL-0005bZ-3H
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:13:15 -0400
-Received: by mail-lf0-x243.google.com with SMTP id m18-v6so27822862lfb.0
-	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 13:13:15 -0700 (PDT)
+	(envelope-from <mst@redhat.com>) id 1fEKdJ-0007eC-5y
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:15:20 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36412 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fEKdJ-0007dy-1F
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:15:17 -0400
+Date: Thu, 3 May 2018 23:15:08 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180503230505-mutt-send-email-mst@kernel.org>
+References: <1525376963-79623-1-git-send-email-mst@redhat.com>
+	<1525376963-79623-6-git-send-email-mst@redhat.com>
+	<5fbe4232-ca1a-5e0c-437c-8b63cf83c510@redhat.com>
 MIME-Version: 1.0
-References: <20180503091922.28733-1-edgar.iglesias@gmail.com>
-	<20180503091922.28733-9-edgar.iglesias@gmail.com>
-In-Reply-To: <20180503091922.28733-9-edgar.iglesias@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 03 May 2018 20:12:48 +0000
-Message-ID: <CAKmqyKNKO8y98ZEiGt9i1w6fPbYspeZ8Rvjp3+8uUTGWdfwK7A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 08/29] target-microblaze: Remove USE_MMU
- PVR checks
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5fbe4232-ca1a-5e0c-437c-8b63cf83c510@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 05/67] migration: drop an unused include,
+ add a used one
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Edgar Iglesias <edgar.iglesias@gmail.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, Francisco Iglesias <frasse.iglesias@gmail.com>, Alistair Francis <alistair@alistair23.me>, Richard Henderson <richard.henderson@linaro.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Thu, May 3, 2018 at 2:31 AM Edgar E. Iglesias <edgar.iglesias@gmail.com>
-wrote:
+On Thu, May 03, 2018 at 03:02:59PM -0500, Eric Blake wrote:
+> On 05/03/2018 02:50 PM, Michael S. Tsirkin wrote:
+> > we just need a struct name, let's add a forward
+> > declaration instead of an include.
+> 
+> Reasonable.
+> 
+> > 
+> > We also use size_t, so add stddef.h
+> 
+> Why? osdep.h already does this, and ALL .c files that use include/ should be
+> including osdep.h prior to any other in-tree .h file.  So size_t should
+> already be in scope by the time this header is included.
 
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+It seemed cleaner to have the file self-contained.
+OK, I will drop this.
+There's a small number of files which do not include qemu/osdep.h.
+Might be worth fixing.
 
-> We already have a CPU property to control if a core has
-> an MMU or not. Remove USE_MMU PVR checks in favor of
-> looking at the property.
-
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-
-Alistair
-
-> ---
->   target/microblaze/helper.c | 12 +-----------
->   1 file changed, 1 insertion(+), 11 deletions(-)
-
-> diff --git a/target/microblaze/helper.c b/target/microblaze/helper.c
-> index 387d4aca5a..a9f4ca93e3 100644
-> --- a/target/microblaze/helper.c
-> +++ b/target/microblaze/helper.c
-> @@ -54,21 +54,11 @@ int mb_cpu_handle_mmu_fault(CPUState *cs, vaddr
-address, int size, int rw,
->       MicroBlazeCPU *cpu = MICROBLAZE_CPU(cs);
->       CPUMBState *env = &cpu->env;
->       unsigned int hit;
-> -    unsigned int mmu_available;
->       int r = 1;
->       int prot;
-
-> -    mmu_available = 0;
-> -    if (cpu->cfg.use_mmu) {
-> -        mmu_available = 1;
-> -        if ((cpu->cfg.pvr == C_PVR_FULL) &&
-> -            (env->pvr.regs[11] & PVR11_USE_MMU) != PVR11_USE_MMU) {
-> -            mmu_available = 0;
-> -        }
-> -    }
-> -
->       /* Translate if the MMU is available and enabled.  */
-> -    if (mmu_available && (env->sregs[SR_MSR] & MSR_VM)) {
-> +    if (cpu->cfg.use_mmu && (env->sregs[SR_MSR] & MSR_VM)) {
->           uint32_t vaddr, paddr;
->           struct microblaze_mmu_lookup lu;
-
-> --
-> 2.14.1
+> > 
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> >   include/migration/vmstate.h | 4 +++-
+> >   migration/savevm.c          | 1 +
+> >   2 files changed, 4 insertions(+), 1 deletion(-)
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
