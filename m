@@ -1,39 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1fEG6m-0001eN-3g
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:25:25 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fEGE4-0004UY-5S
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:32:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1fEG6h-0006PE-4J
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:25:24 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37082
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1fEG6g-0006NV-VO
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:25:19 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w43FKvbL117655
-	for <qemu-devel@nongnu.org>; Thu, 3 May 2018 11:25:16 -0400
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2hr3s7v3j1-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 11:25:15 -0400
-Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
-	Thu, 3 May 2018 09:25:15 -0600
-References: <20180502125221.4877-1-cohuck@redhat.com>
-From: Farhan Ali <alifm@linux.ibm.com>
-Date: Thu, 3 May 2018 11:25:08 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fEGE0-0003mq-7z
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:32:56 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52114 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fEGE0-0003mU-3L
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:32:52 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4F43A406C743
+	for <qemu-devel@nongnu.org>; Thu,  3 May 2018 15:32:48 +0000 (UTC)
+Date: Thu, 3 May 2018 16:32:41 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180503153240.GK2660@work-vm>
+References: <20180425112723.1111-1-quintela@redhat.com>
+	<87sh7jy0gc.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <20180502125221.4877-1-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <cbe7b21c-639c-aa64-4777-03d0aa793ac8@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] s390-ccw: force diag 308 subcode to
- unsigned long
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87sh7jy0gc.fsf@secure.mitica>
+Subject: Re: [Qemu-devel] [PATCH v12 00/21] Multifd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,23 +33,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, qemu-stable@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-
-
-On 05/02/2018 08:52 AM, Cornelia Huck wrote:
-> We currently pass an integer as the subcode parameter. However,
-> the upper bits of the register containing the subcode need to
-> be 0, which is not guaranteed unless we explicitly specify the
-> subcode to be an unsigned long value.
+* Juan Quintela (quintela@redhat.com) wrote:
+> Juan Quintela <quintela@redhat.com> wrote:
+> > Hi
+> >
+> >
+> > [v12]
+> >
+> > Big news, it is not RFC anymore, it works reliabely for me.
+> >
+> > Changes:
+> > - Locknig changed completely (several times)
+> > - We now send  all pages through the channels.  In a 2GB guest with 1 disk and a network card, the amount of data send for RAM was 80KB.
+> > - This is not optimized yet, but it shouws clear improvements over precopy.  testing over localhost networking I can guet:
+> >   - 2 VCPUs guest
+> >   - 2GB RAM
+> >   - runn stress --vm 4 --vm 500GB (i.e. dirtying 2GB or RAM each second)
+> >
+> >   - Total time: precopy ~50seconds, multifd  around 11seconds
+> >   - Bandwidth usage is around 273MB/s vs 71MB/s on the same hardware
+> >
+> > This is very preleminary testing, will send more numbers when I got them.  But looks promissing.
+> >
+> > Things that will be improved later:
+> > - Initial synchronization is too slow (around 1s)
+> > - We synchronize all threads after each RAM section, we can move to only
+> >   synchronize them after we have done a bitmap syncrhronization
+> > - We can improve bitmap walking (but that is independent of multifd)
 > 
-> Fixes: d046c51dad3 ("pc-bios/s390-ccw: Get device address via diag 308/6")
-> Cc:qemu-stable@nongnu.org
-> Signed-off-by: Cornelia Huck<cohuck@redhat.com>
+> I forgot to put there that on the last 4 patches, I have not been able
+> to split them in a way that:
+> - is logical for review
+> - works for multifd tests in all versions
+> 
+> So, I ended trynig to get the "logical" viewe, and it works after the
+> last patch.  Why is that?
+> - Before I am able to transmit data, I need to be able to
+>   end/synchronize the different channels
+> - To finish channels in case of error, I just close the channels
+>   But I can't opet then yet.
+> 
+> I have to think if I can come with a simpler way to split it, but you
+> can also consider that the  last 3-4 patches are a single one.
 
-Sorry for my ignorance, but is there a C standard that says upper bits 
-of an int is not guaranteed to be 0?
+I think most of the last few can be flattened into earlier patches;
+I'd prefer it rather than having patches that add stuff and then they
+get reworked/removed later.
 
-Thanks
-Farhan
+I don't think it matters that the order of the last few doesn't work
+until the end; since it didn't work at the beginning, it doesn't matter
+until the end of the series.
+
+Dave
+
+> Later, Juan.
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
