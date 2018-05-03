@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33077)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fELVw-0005od-6D
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:11:45 -0400
+	(envelope-from <groug@kaod.org>) id 1fELaY-0001G5-0j
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:16:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fELVu-0002qk-Is
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:11:44 -0400
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:42876)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1fELVu-0002pO-6X
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:11:42 -0400
-Received: by mail-lf0-x242.google.com with SMTP id u21-v6so28026146lfu.9
-	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 14:11:42 -0700 (PDT)
+	(envelope-from <groug@kaod.org>) id 1fELaU-0008JF-TS
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:16:29 -0400
+Received: from 5.mo173.mail-out.ovh.net ([46.105.40.148]:56259)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fELaU-0008Hy-Mp
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:16:26 -0400
+Received: from player691.ha.ovh.net (unknown [10.109.122.88])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 1BC57BDEF3
+	for <qemu-devel@nongnu.org>; Thu,  3 May 2018 23:16:24 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Thu, 03 May 2018 23:16:10 +0200
+Message-ID: <152538217073.223014.17347204768561945420.stgit@bahia.lan>
 MIME-Version: 1.0
-References: <1524699938-6764-1-git-send-email-mjc@sifive.com>
-	<1524699938-6764-29-git-send-email-mjc@sifive.com>
-In-Reply-To: <1524699938-6764-29-git-send-email-mjc@sifive.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 03 May 2018 21:11:15 +0000
-Message-ID: <CAKmqyKNe+CbGBJrQRTbc_1spe3w5X0cdmu-C44XW4K=vwKjzYA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v8 28/35] RISC-V: Implement atomic mip/sip
- CSR updates
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH 0/3] spapr: fix backward migration from POWER9
+ to POWER8 hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,129 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, palmer@sifive.com, Alistair Francis <Alistair.Francis@wdc.com>, patches@groups.riscv.org
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-On Wed, Apr 25, 2018 at 5:14 PM Michael Clark <mjc@sifive.com> wrote:
+Hi,
 
-> Use the new CSR read/modify/write interface to implement
-> atomic updates to mip/sip.
+It is expected to be able to migrate a guest started with
 
-> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Cc: Palmer Dabbelt <palmer@sifive.com>
-> Cc: Alistair Francis <Alistair.Francis@wdc.com>
-> Signed-off-by: Michael Clark <mjc@sifive.com>
+     -machine max-cpu-compat=power8
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+from a POWER9 host to a POWER8 host. It works with recent QEMU versions,
+but it is badly broken if the destination runs QEMU 2.7 or older.
 
-Alistair
+This can cause problems in cloud environments that still have systems with
+older QEMU versions, eg, hosts running ubuntu LTS 16.04.4 (QEMU 2.5) which
+are likely to stay around until admins could transition to some newer OS.
 
-> ---
->   target/riscv/csr.c | 56
-+++++++++++++++++++++++++++---------------------------
->   1 file changed, 28 insertions(+), 28 deletions(-)
+This series was lightly tested, but the patches are simple enough, so I'm
+confident they shouldn't break anything :)
 
-> diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-> index a424867..c704545 100644
-> --- a/target/riscv/csr.c
-> +++ b/target/riscv/csr.c
-> @@ -491,25 +491,31 @@ static int write_mbadaddr(CPURISCVState *env, int
-csrno, target_ulong val)
->       return 0;
->   }
+Please review as I'd like these to go to QEMU 2.11.2 as well.
 
-> -static int read_mip(CPURISCVState *env, int csrno, target_ulong *val)
-> -{
-> -    *val = atomic_read(&env->mip);
-> -    return 0;
-> -}
-> -
-> -static int write_mip(CPURISCVState *env, int csrno, target_ulong val)
-> +static int rmw_mip(CPURISCVState *env, int csrno, target_ulong
-*ret_value,
-> +                   target_ulong new_value, target_ulong write_mask)
->   {
->       RISCVCPU *cpu = riscv_env_get_cpu(env);
-> +    target_ulong mask = write_mask & delegable_ints;
-> +    uint32_t old_mip;
-> +
-> +    /* We can't allow the supervisor to control SEIP as this would allow
-the
-> +     * supervisor to clear a pending external interrupt which will
-result in
-> +     * lost a interrupt in the case a PLIC is attached. The SEIP bit
-must be
-> +     * hardware controlled when a PLIC is attached. This should be an
-option
-> +     * for CPUs with software-delegated Supervisor External Interrupts.
-*/
-> +    mask &= ~MIP_SEIP;
-> +
-> +    if (mask) {
-> +        qemu_mutex_lock_iothread();
-> +        old_mip = riscv_cpu_update_mip(cpu, mask, (new_value & mask));
-> +        qemu_mutex_unlock_iothread();
-> +    } else {
-> +        old_mip = atomic_read(&env->mip);
-> +    }
+--
+Greg
 
-> -    /*
-> -     * csrs, csrc on mip.SEIP is not decomposable into separate read and
-> -     * write steps, so a different implementation is needed
-> -     */
-> -
-> -    qemu_mutex_lock_iothread();
-> -    riscv_cpu_update_mip(cpu, MIP_SSIP | MIP_STIP,
-> -                         (val & (MIP_SSIP | MIP_STIP)));
-> -    qemu_mutex_unlock_iothread();
-> +    if (ret_value) {
-> +        *ret_value = old_mip;
-> +    }
+---
 
->       return 0;
->   }
-> @@ -627,17 +633,11 @@ static int write_sbadaddr(CPURISCVState *env, int
-csrno, target_ulong val)
->       return 0;
->   }
+Greg Kurz (3):
+      target/ppc: always set PPC_MEM_TLBIE in pre 2.8 migration hack
+      spapr: don't migrate "spapr_option_vector_ov5_cas" to pre 2.8 machines
+      spapr: don't advertise radix GTSE if max-compat-cpu < power9
 
-> -static int read_sip(CPURISCVState *env, int csrno, target_ulong *val)
-> -{
-> -    *val = atomic_read(&env->mip) & env->mideleg;
-> -    return 0;
-> -}
-> -
-> -static int write_sip(CPURISCVState *env, int csrno, target_ulong val)
-> +static int rmw_sip(CPURISCVState *env, int csrno, target_ulong
-*ret_value,
-> +                   target_ulong new_value, target_ulong write_mask)
->   {
-> -    target_ulong newval = (atomic_read(&env->mip) & ~env->mideleg)
-> -                          | (val & env->mideleg);
-> -    return write_mip(env, CSR_MIP, newval);
-> +    return rmw_mip(env, CSR_MSTATUS, ret_value, new_value,
-> +                   write_mask & env->mideleg);
->   }
 
->   /* Supervisor Protection and Translation */
-> @@ -819,7 +819,7 @@ static const riscv_csr_operations csr_ops[0xfff] = {
->       [CSR_MEPC] =                { read_mepc,        write_mepc        },
->       [CSR_MCAUSE] =              { read_mcause,      write_mcause      },
->       [CSR_MBADADDR] =            { read_mbadaddr,    write_mbadaddr    },
-> -    [CSR_MIP] =                 { read_mip,         write_mip         },
-> +    [CSR_MIP] =                 { NULL,     NULL,     rmw_mip         },
-
->       /* Supervisor Trap Setup */
->       [CSR_SSTATUS] =             { read_sstatus,     write_sstatus     },
-> @@ -832,7 +832,7 @@ static const riscv_csr_operations csr_ops[0xfff] = {
->       [CSR_SEPC] =                { read_sepc,        write_sepc        },
->       [CSR_SCAUSE] =              { read_scause,      write_scause      },
->       [CSR_SBADADDR] =            { read_sbadaddr,    write_sbadaddr    },
-> -    [CSR_SIP] =                 { read_sip,         write_sip         },
-> +    [CSR_SIP] =                 { NULL,     NULL,     rmw_sip         },
-
->       /* Supervisor Protection and Translation */
->       [CSR_SATP] =                { read_satp,        write_satp        },
-> --
-> 2.7.0
+ hw/ppc/spapr.c       |   19 +++++++++++++------
+ target/ppc/machine.c |    5 +++++
+ 2 files changed, 18 insertions(+), 6 deletions(-)
