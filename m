@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43030)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fED67-0002KK-1f
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 08:12:32 -0400
+	(envelope-from <armbru@redhat.com>) id 1fEDBX-0003lW-PK
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 08:18:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fED63-0007Rp-T4
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 08:12:31 -0400
-Date: Thu, 3 May 2018 21:59:09 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180503115909.GA13229@umbus.fritz.box>
-References: <20180503062145.17899-1-david@gibson.dropbear.id.au>
-	<20180503062145.17899-9-david@gibson.dropbear.id.au>
-	<0d815d7c-42de-c89e-4481-21b32e04ed7c@kaod.org>
+	(envelope-from <armbru@redhat.com>) id 1fEDBT-0001wc-OY
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 08:18:07 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180423084518.2426-1-armbru@redhat.com>
+	<20180423130219.GD6630@localhost.localdomain>
+Date: Thu, 03 May 2018 14:17:49 +0200
+In-Reply-To: <20180423130219.GD6630@localhost.localdomain> (Kevin Wolf's
+	message of "Mon, 23 Apr 2018 15:02:19 +0200")
+Message-ID: <87d0ydorv6.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="SLk8PSyqxe/ugcCT"
-Content-Disposition: inline
-In-Reply-To: <0d815d7c-42de-c89e-4481-21b32e04ed7c@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 8/8] spapr: Clean up handling of LPCR
- power-saving exit bits
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] cpus: Fix event order on resume of stopped
+ guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,80 +24,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
+Kevin Wolf <kwolf@redhat.com> writes:
 
---SLk8PSyqxe/ugcCT
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Am 23.04.2018 um 10:45 hat Markus Armbruster geschrieben:
+>> When resume of a stopped guest immediately runs into block device
+>> errors, the BLOCK_IO_ERROR event is sent before the RESUME event.
+>> 
+>> Reproducer:
+>> 
+>> 1. Create a scratch image
+>>    $ dd if=/dev/zero of=scratch.img bs=1M count=100
+>> 
+>>    Size doesn't actually matter.
+>> 
+>> 2. Prepare blkdebug configuration:
+>> 
+>>    $ cat >blkdebug.conf <<EOF
+>>    [inject-error]
+>>    event = "write_aio"
+>>    errno = "5"
+>>    EOF
+>> 
+>>    Note that errno 5 is EIO.
+>> 
+>> 3. Run a guest with an additional scratch disk, i.e. with additional
+>>    arguments
+>>    -drive if=none,id=scratch-drive,format=raw,werror=stop,file=blkdebug:blkdebug.conf:scratch.img
+>>    -device virtio-blk-pci,id=scratch,drive=scratch-drive
+>> 
+>>    The blkdebug part makes all writes to the scratch drive fail with
+>>    EIO.  The werror=stop pauses the guest on write errors.
+>> 
+>> 4. Connect to the QMP socket e.g. like this:
+>>    $ socat UNIX:/your/qmp/socket READLINE,history=$HOME/.qmp_history,prompt='QMP> '
+>> 
+>>    Issue QMP command 'qmp_capabilities':
+>>    QMP> { "execute": "qmp_capabilities" }
+>> 
+>> 5. Boot the guest.
+>> 
+>> 6. In the guest, write to the scratch disk, e.g. like this:
+>> 
+>>    # dd if=/dev/zero of=/dev/vdb count=1
+>> 
+>>    Do double-check the device specified with of= is actually the
+>>    scratch device!
+>> 
+>> 7. Issue QMP command 'cont':
+>>    QMP> { "execute": "cont" }
+>> 
+>> After step 6, I get a BLOCK_IO_ERROR event followed by a STOP event.  Good.
+>> 
+>> After step 7, I get BLOCK_IO_ERROR, then RESUME, then STOP.  Not so
+>> good; I'd expect RESUME, then BLOCK_IO_ERROR, then STOP.
+>
+> Do you want to rephrase this in the form of a script for qemu-iotests?
+>
+> I suppose the 'dd' line can be replaced by a 'qemu-io' monitor command.
 
-On Thu, May 03, 2018 at 09:47:18AM +0200, C=E9dric Le Goater wrote:
-> On 05/03/2018 08:21 AM, David Gibson wrote:
-> > To prevent spurious wakeups on cpus that are supposed to be disabled, we
-> > need to clear the LPCR bits which control certain wakeup events.
-> > spapr_cpu_reset() has separate cases here for boot and non-boot (initia=
-lly
-> > inactive) cpus.  rtas_start_cpu() then turns the LPCR bits on when the
-> > non-boot cpus are activated.
-> >=20
-> > But explicit checks against first_cpu are not how we usually do things:
-> > instead spapr_cpu_reset() generally sets things up for non-boot (inacti=
-ve)
-> > cpus, then spapr_machine_reset() and/or rtas_start_cpu() override as
-> > necessary.
-> >=20
-> > So, do that instead.  Because the LPCR activation is identical for boot
-> > cpus and non-boot cpus just activated with rtas_start_cpu() we can put =
-the
-> > code common in spapr_cpu_set_entry_state().
->=20
-> This is much nicer.
->=20
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->=20
-> Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
->=20
-> and for the patchset :
->=20
-> Tested-by: C=E9dric Le Goater <clg@kaod.org>
->=20
-> under KVM & TCG with cpu hotplug and unplug.
-
-Thanks.  I've folded the series into ppc-for-2.13.
-
-> There is still a spapr_cpu_reset() call under spapr_cpu_init().
-> Is that on purpose ?
-
-Sort of.  I'd still like to remove it, but figuring out how to do so
-safely is going to take a bit longer.  Well, probably quite a lot
-longer, since I doubt I'll get it done before I go away.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---SLk8PSyqxe/ugcCT
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrq+YoACgkQbDjKyiDZ
-s5JnPQ/9HienOKF4i36vCFEGiX48mObk2JGGwXQ4yryd4oJ8go40tGqMm8K3jJ4K
-nzUT5gldjNjEjs9ZOYpN059pv78unkooWfvKY1UIyAGNvtx/8TOwvD2MNWEmi7uc
-JrlnVX9mfjGoJwlUg1iKuLwwTQxUzcUt9qEqoepFCLRrDwnK1U5nmOTXOrsnAN3o
-xYe7eaftaa6bl57dHBOK7FYhDVK8Q/LGrX13RGhcgKMCw9AwVjVl3WxIROlwQQ69
-3AWgJRDx8Lfnvi4NL91WAT6ED4S4rf1g2KU0YbQzGUsXrgIRRCdPTo0qt7TmYsRQ
-Lixz4KCBqPeTry+gDlqAQ7iQvWS3dDTYqzaEpuI+cTtNHUFdJTGdIKXtXi0lgF+2
-L5v7ZrZWQ7rjdal5xvwxU1ZCymDKUQAAL6bKwd2efNY8VJtQY6t+qA2g1bNyYZOX
-eLip/M2hB4/A8YnNSfGDsYDw269EsNTbF3i/tomlqxYBpZG648480Q1y+IaDt2LP
-SBLxE3Pjep2pdLRdrBpCD5C+59xkWjpbzPVctQjlUC4UyXrrLB/bIVLRiap6R8Bx
-dzawbbMqlW9jBfqUrUDtJBt8appezttX9xT+2C1FMmUjm/rb/BhsO6jrrVSlLk4/
-05oOt2IzRKVrgBOjE62gXze8Gge/Oq8JqqATXvKstqBG+IJmuuc=
-=+/yl
------END PGP SIGNATURE-----
-
---SLk8PSyqxe/ugcCT--
+Uh, can it?  With qemu-io, the write doesn't stop the guest, because it
+bypasses the device model, and thus blk_error_action().  I'm not aware
+of ways to make qemu-iotests write via a device model.  I'm afraid we
+need a full-fledged qtest.  Better ideas?
