@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47565)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fEDQQ-0008U4-5Q
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 08:33:31 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fEDRW-0000VG-B1
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 08:34:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fEDQN-000065-1l
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 08:33:30 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20180503122241.GA6140@localhost.localdomain>
-References: <w517ep7gpsz.fsf@maestria.local.igalia.com>
-	<ee24e79d-b37e-ac8f-c349-b0fa637ba2a6@redhat.com>
-	<w51bmegjzp4.fsf@maestria.local.igalia.com>
-	<216e7398-0bc3-4822-d4b0-e0267c714abb@redhat.com>
-	<w5136zjsar5.fsf@maestria.local.igalia.com>
-	<bc26c382-458f-5a86-de59-3945397fbcac@redhat.com>
-	<w51wowvqu65.fsf@maestria.local.igalia.com>
-	<b3ec832d-202b-db93-a163-3d63a4d36326@redhat.com>
-	<w51h8nqcijb.fsf@maestria.local.igalia.com>
-	<aab201a7-ef3f-8152-cc37-85ae7e106a5e@redhat.com>
-	<20180503122241.GA6140@localhost.localdomain>
-Date: Thu, 03 May 2018 14:33:24 +0200
-Message-ID: <w518t907wbv.fsf@maestria.local.igalia.com>
+	(envelope-from <stefanha@redhat.com>) id 1fEDRV-0000MI-Ik
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 08:34:38 -0400
+Date: Thu, 3 May 2018 11:28:19 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180503102819.GE5301@stefanha-x1.localdomain>
+References: <20180418030424.28980-1-famz@redhat.com>
+	<20180418030424.28980-7-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC] Intermediate block mirroring
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Qz2CZ664xQdCRdPu"
+Content-Disposition: inline
+In-Reply-To: <20180418030424.28980-7-famz@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 6/7] block-backend: Add
+ blk_co_copy_range
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,35 +25,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Thu 03 May 2018 02:22:41 PM CEST, Kevin Wolf wrote:
-> Am 02.05.2018 um 16:12 hat Max Reitz geschrieben:
->> On 2018-05-02 15:07, Alberto Garcia wrote:
->> > Were the (more or less) exact requirements of QMP blockdev-reopen
->> > discussed? How is it different from qemu-io's "reopen" command? What are
->> > the options that you can and can not change?
->> 
->> I can't quite remember, I'm afraid.  I think it was supposed to be
->> pretty much qemu-io's reopen (so just bdrv_reopen()).  I suppose you
->> cannot change the driver (obviously) or probably the node name, because
->> either would result in the node being replaced by a completely new one.
->> 
->> Other than that, it probably depends on what the block driver supports,
->> but ideally you should be able to change everything.
->
-> Honestly the design of bdrv_reopen() is quite broken because of the way
-> it tries to maintain old options if they aren't specified, and guesses
-> what you might mean when you add flags to the mix. The exact semantics
-> are quite complicated and I'd rather avoid them in a stable API.
->
-> A clean QMP command would probably apply the same defaults as
-> blockdev-add, so you just get to specify the full options again.
 
-Ok, so the end result would be more or less equivalent to "open the new
-block device with blockdev-add and the user-specified options, then
-replace the old one with the new one", but implemented with reopen
-instead of open + replace.
+--Qz2CZ664xQdCRdPu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Berto
+On Wed, Apr 18, 2018 at 11:04:23AM +0800, Fam Zheng wrote:
+> It's a BlockBackend wrapper of the BDS interface.
+>=20
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  block/block-backend.c          | 9 +++++++++
+>  include/sysemu/block-backend.h | 4 ++++
+>  2 files changed, 13 insertions(+)
+>=20
+> diff --git a/block/block-backend.c b/block/block-backend.c
+> index 681b240b12..2a984b1864 100644
+> --- a/block/block-backend.c
+> +++ b/block/block-backend.c
+> @@ -2217,3 +2217,12 @@ void blk_unregister_buf(BlockBackend *blk, void *h=
+ost)
+>  {
+>      bdrv_unregister_buf(blk_bs(blk), host);
+>  }
+> +
+> +int coroutine_fn blk_co_copy_range(BlockBackend *blk_in, int64_t off_in,
+> +                                   BlockBackend *blk_out, int64_t off_ou=
+t,
+> +                                   int bytes, BdrvRequestFlags flags)
+> +{
+> +    return bdrv_co_copy_range(blk_in->root, off_in,
+> +                              blk_out->root, off_out,
+> +                              bytes, flags);
+> +}
+
+What happens if either ->root field is NULL?
+
+--Qz2CZ664xQdCRdPu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJa6uRDAAoJEJykq7OBq3PIf78IAI8t2ZPTawTPApwnx9yWEFw0
+bTKtEWaKudnErpTIL3PVD9p72VcBeUNyVwaGp/AfG5z6h0hmlTt8aifbOF7atAxa
+eRjsjL7Yx7lIyGr+RCLFl62sIcBy7ArygrjwCMT3U1wCvPQEMnFgaK1nILyRPP7+
+nvqbgnB+KtyCROPnbwubzj0/n9Zs0TmgPl91BhP2zfXg6xesCDHBbszl9/M/gLod
+IMqLSWidn5T2NKJt6H+A1CIJ3sdRHgQFfy5radsDGp6YNap+o/Ae/FafhAn10X/a
+vdKIzi6njYy81bTY4rJwS6XXUHixltylkIAmj14KHpES0pFfOHfWhtmb5+k8dnM=
+=cWjl
+-----END PGP SIGNATURE-----
+
+--Qz2CZ664xQdCRdPu--
