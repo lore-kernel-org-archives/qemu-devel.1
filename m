@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fE84r-000658-Mu
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 02:50:54 -0400
+	(envelope-from <armbru@redhat.com>) id 1fE8Jn-0002c9-NM
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 03:06:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fE84o-0002Mw-Ja
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 02:50:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37390 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fE8Ji-0000ic-N0
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 03:06:19 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50410 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fE84o-0002L7-ER
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 02:50:50 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fE8Ji-0000iD-Ic
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 03:06:14 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 54118406E973
-	for <qemu-devel@nongnu.org>; Thu,  3 May 2018 06:50:49 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8E6818185951
+	for <qemu-devel@nongnu.org>; Thu,  3 May 2018 07:06:08 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
 References: <1525281868-24747-1-git-send-email-thuth@redhat.com>
-	<1525281868-24747-2-git-send-email-thuth@redhat.com>
-Date: Thu, 03 May 2018 08:50:48 +0200
-In-Reply-To: <1525281868-24747-2-git-send-email-thuth@redhat.com> (Thomas
-	Huth's message of "Wed, 2 May 2018 19:24:25 +0200")
-Message-ID: <87bmdxtepj.fsf@dusky.pond.sub.org>
+	<1525281868-24747-5-git-send-email-thuth@redhat.com>
+Date: Thu, 03 May 2018 09:06:03 +0200
+In-Reply-To: <1525281868-24747-5-git-send-email-thuth@redhat.com> (Thomas
+	Huth's message of "Wed, 2 May 2018 19:24:28 +0200")
+Message-ID: <877eolte04.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/4] qemu-options: Remove remainders of the
- -tdf option
+Subject: Re: [Qemu-devel] [PATCH 4/4] qemu-options: Remove deprecated -no-kvm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,37 +38,19 @@ Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
 Thomas Huth <thuth@redhat.com> writes:
 
-> The -tdf options has been removed with d07aa197c5a1556449361a0cbb5108e2,
-> but apparently I forgot to remove the corresponding two lines from
-> qemu-options.hx.
+> We've never documented this option in our qemu-doc, so unless the users
+> used qemu-kvm before, they never should never have been aware of this
+
+You're serious about "never", aren't you?  ;->
+
+> option. It's been marked as deprecated in the source code since a long
+
+s/since/for/
+
+> time already, and officially marked as deprecated in the documentation
+> since QEMU v2.10, so it should be fine to remove this now.
 >
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  qemu-options.hx | 3 ---
->  1 file changed, 3 deletions(-)
->
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index c611766..44daa10 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -3924,9 +3924,6 @@ DEF("no-kvm-pit-reinjection", 0, QEMU_OPTION_no_kvm_pit_reinjection,
->  HXCOMM Deprecated by -machine kernel_irqchip=on|off property
->  DEF("no-kvm-irqchip", 0, QEMU_OPTION_no_kvm_irqchip, "", QEMU_ARCH_I386)
->  
-> -HXCOMM Deprecated (ignored)
-> -DEF("tdf", 0, QEMU_OPTION_tdf,"", QEMU_ARCH_ALL)
-> -
->  DEF("msg", HAS_ARG, QEMU_OPTION_msg,
->      "-msg timestamp[=on|off]\n"
->      "                change the format of messages\n"
 
-Makes me wonder what happens when you specify --tdf.  Aha: nothing.
-Why?  main() passes unknown options to os_parse_cmd_args(), which
-happily ignores them.  Its function comment "return 0 if option handled,
--1 otherwise" is bogus.  Needs cleanup.  Separate patch, not necessarily
-in this series.
-
-Suggest to mention in your commit message that --tdf is silently
-ignored.  Feel free to also point out the need for cleanup there.
-
+With the commit message touched up:
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
