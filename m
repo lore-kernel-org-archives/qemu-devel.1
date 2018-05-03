@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fE4YK-0006t5-V3
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 23:05:05 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fE4hJ-0000ya-6K
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 23:14:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fE4YH-0003hC-Nb
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 23:05:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37044)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fE4YH-0003gO-Hr
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 23:05:01 -0400
-Date: Thu, 3 May 2018 00:04:57 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180503030457.GB25013@localhost.localdomain>
-References: <1525406253-54846-1-git-send-email-jingqi.liu@intel.com>
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fE4hE-0006uy-5a
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 23:14:21 -0400
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:44803)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
+	id 1fE4hD-0006st-Tw
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 23:14:16 -0400
+Received: by mail-pf0-x241.google.com with SMTP id q22so13491972pff.11
+	for <qemu-devel@nongnu.org>; Wed, 02 May 2018 20:14:15 -0700 (PDT)
+References: <20180428081045.8878-1-xiaoguangrong@tencent.com>
+	<20180502024653.GB25938@xz-mi>
+From: Xiao Guangrong <guangrong.xiao@gmail.com>
+Message-ID: <6e4363d3-3d66-547f-a374-fb82fb890607@gmail.com>
+Date: Thu, 3 May 2018 11:13:40 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1525406253-54846-1-git-send-email-jingqi.liu@intel.com>
-Subject: Re: [Qemu-devel] [PATCH] x86/cpu: Enable CLDEMOTE(Demote Cache
- Line) cpu feature
+In-Reply-To: <20180502024653.GB25938@xz-mi>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] migration: fix saving normal page even if
+ it's been compressed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +32,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jingqi Liu <jingqi.liu@intel.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
+To: Peter Xu <peterx@redhat.com>
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On Fri, May 04, 2018 at 11:57:33AM +0800, Jingqi Liu wrote:
-> The CLDEMOTE instruction hints to hardware that the cache line that
-> contains the linear address should be moved("demoted") from
-> the cache(s) closest to the processor core to a level more distant
-> from the processor core. This may accelerate subsequent accesses
-> to the line by other cores in the same coherence domain,
-> especially if the line was written by the core that demotes the line.
-> 
-> Intel Snow Ridge has added new cpu feature, CLDEMOTE.
-> The new cpu feature needs to be exposed to guest VM.
-> 
-> The bit definition:
-> CPUID.(EAX=7,ECX=0):ECX[bit 25] CLDEMOTE
-> 
-> The release document ref below link:
-> https://software.intel.com/sites/default/files/managed/c5/15/\
-> architecture-instruction-set-extensions-programming-reference.pdf
-> 
-> Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
 
-Thanks.  Do you have a pointer to the corresponding
-GET_SUPPORTED_CPUID patch in KVM?
 
--- 
-Eduardo
+On 05/02/2018 10:46 AM, Peter Xu wrote:
+> On Sat, Apr 28, 2018 at 04:10:45PM +0800, guangrong.xiao@gmail.com wrote:
+>> From: Xiao Guangrong <xiaoguangrong@tencent.com>
+>>
+>> Fix the bug introduced by da3f56cb2e767016 (migration: remove
+>> ram_save_compressed_page()), It should be 'return' rather than
+>> 'res'
+>>
+>> Sorry for this stupid mistake :(
+>>
+>> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+> 
+> Reviewed-by: Peter Xu <peterx@redhat.com>
+> 
+> So is that only a performance degradation without this fix (since
+> AFAIU the compressing pages will be sent twice)?  Thanks,
+
+Yes, that's why we did not detect it in our test.　:(
