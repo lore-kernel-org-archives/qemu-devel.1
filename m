@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=65480b38c=Paul.Durrant@citrix.com>)
-	id 1fECGB-0001Wa-T7
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 07:18:57 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fECJl-0003HX-IP
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 07:22:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=65480b38c=Paul.Durrant@citrix.com>)
-	id 1fECG8-0004aj-MV
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 07:18:51 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:54160)
+	(envelope-from <imammedo@redhat.com>) id 1fECJi-00077O-6l
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 07:22:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36916 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=65480b38c=Paul.Durrant@citrix.com>)
-	id 1fECG8-0004Zd-B0
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 07:18:48 -0400
-From: Paul Durrant <paul.durrant@citrix.com>
-Date: Thu, 3 May 2018 12:18:40 +0100
-Message-ID: <1525346320-24553-1-git-send-email-paul.durrant@citrix.com>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fECJi-00076K-1T
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 07:22:30 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6BAA47CBBA
+	for <qemu-devel@nongnu.org>; Thu,  3 May 2018 11:22:24 +0000 (UTC)
+Date: Thu, 3 May 2018 13:22:18 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180503132218.0335c3a8@redhat.com>
+In-Reply-To: <20180501152910.GG32129@redhat.com>
+References: <1524841523-95513-1-git-send-email-imammedo@redhat.com>
+	<1524841523-95513-6-git-send-email-imammedo@redhat.com>
+	<20180501152910.GG32129@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] xen-hvm: stop faking I/O to access PCI config
- space
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 05/11] qapi: introduce new cmd option
+ "allowed-in-preconfig"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,210 +35,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, pkrempa@redhat.com, ehabkost@redhat.com, armbru@redhat.com
 
-This patch removes the current hackery where IOREQ_TYPE_PCI_CONFIG
-reqyests are handled by faking PIO to 0xcf8 and 0xcfc and replaces it
-with direct calls to pci_host_config_read/write_common().
-Doing so necessitates mapping BDFs to PCIDevices but maintaining a simple
-QLIST in xen_device_realize/unrealize() will suffice.
+On Tue, 1 May 2018 16:29:10 +0100
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
 
-NOTE: whilst config space accesses are currently limited to
-      PCI_CONFIG_SPACE_SIZE, this patch paves the way to increasing the
-      limit to PCIE_CONFIG_SPACE_SIZE when Xen gains the ability to
-      emulate MCFG table accesses.
+> On Fri, Apr 27, 2018 at 05:05:17PM +0200, Igor Mammedov wrote:
+> > New option will be used to allow commands, which are prepared/need
+> > to run, during preconfig state. Other commands that should be able
+> > to run in preconfig state, should be ameded to not expect machine
+> > in initialized state or deal with it.
+> >=20
+> > For compatibility reasons, commands that don't use new flag
+> > 'allowed-in-preconfig' explicitly are not permitted to run in
+> > preconfig state but allowed in all other states like they used
+> > to be.
+> >=20
+> > Within this patch allow following commands in preconfig state:
+> >    qmp_capabilities
+> >    query-qmp-schema
+> >    query-commands
+> >    query-command-line-options
+> >    query-status
+> >    exit-preconfig
+> > to allow qmp connection, basic introspection and moving to the next
+> > state. =20
+>=20
+> Looking at what libvirt sends to QEMU before 'cont', when -S is used,
+> we have a lot of differences. In order, libvirt does something like
+> this on guest startup:
+I took a quick look at these commands in QEMU
 
-Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
---
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
----
- hw/i386/xen/trace-events |   2 +
- hw/i386/xen/xen-hvm.c    | 101 +++++++++++++++++++++++++++++++++++++----------
- 2 files changed, 83 insertions(+), 20 deletions(-)
+> "qmp_capabilities"
+this is preconfig enabled within this series
 
-diff --git a/hw/i386/xen/trace-events b/hw/i386/xen/trace-events
-index 8dab7bc..f576f1b 100644
---- a/hw/i386/xen/trace-events
-+++ b/hw/i386/xen/trace-events
-@@ -15,6 +15,8 @@ cpu_ioreq_pio(void *req, uint32_t dir, uint32_t df, uint32_t data_is_ptr, uint64
- cpu_ioreq_pio_read_reg(void *req, uint64_t data, uint64_t addr, uint32_t size) "I/O=%p pio read reg data=0x%"PRIx64" port=0x%"PRIx64" size=%d"
- cpu_ioreq_pio_write_reg(void *req, uint64_t data, uint64_t addr, uint32_t size) "I/O=%p pio write reg data=0x%"PRIx64" port=0x%"PRIx64" size=%d"
- cpu_ioreq_move(void *req, uint32_t dir, uint32_t df, uint32_t data_is_ptr, uint64_t addr, uint64_t data, uint32_t count, uint32_t size) "I/O=%p copy dir=%d df=%d ptr=%d port=0x%"PRIx64" data=0x%"PRIx64" count=%d size=%d"
-+cpu_ioreq_config_read(void *req, uint32_t sbdf, uint32_t reg, uint32_t size, uint32_t data) "I/O=%p sbdf=0x%x reg=%u size=%u data=0x%x"
-+cpu_ioreq_config_write(void *req, uint32_t sbdf, uint32_t reg, uint32_t size, uint32_t data) "I/O=%p sbdf=0x%x reg=%u size=%u data=0x%x"
- 
- # xen-mapcache.c
- xen_map_cache(uint64_t phys_addr) "want 0x%"PRIx64
-diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-index caa563b..c139d29 100644
---- a/hw/i386/xen/xen-hvm.c
-+++ b/hw/i386/xen/xen-hvm.c
-@@ -12,6 +12,7 @@
- 
- #include "cpu.h"
- #include "hw/pci/pci.h"
-+#include "hw/pci/pci_host.h"
- #include "hw/i386/pc.h"
- #include "hw/i386/apic-msidef.h"
- #include "hw/xen/xen_common.h"
-@@ -86,6 +87,12 @@ typedef struct XenPhysmap {
-     QLIST_ENTRY(XenPhysmap) list;
- } XenPhysmap;
- 
-+typedef struct XenPciDevice {
-+    PCIDevice *pci_dev;
-+    uint32_t sbdf;
-+    QLIST_ENTRY(XenPciDevice) entry;
-+} XenPciDevice;
-+
- typedef struct XenIOState {
-     ioservid_t ioservid;
-     shared_iopage_t *shared_page;
-@@ -105,6 +112,7 @@ typedef struct XenIOState {
-     struct xs_handle *xenstore;
-     MemoryListener memory_listener;
-     MemoryListener io_listener;
-+    QLIST_HEAD(, XenPciDevice) dev_list;
-     DeviceListener device_listener;
-     QLIST_HEAD(, XenPhysmap) physmap;
-     hwaddr free_phys_offset;
-@@ -569,6 +577,12 @@ static void xen_device_realize(DeviceListener *listener,
- 
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-         PCIDevice *pci_dev = PCI_DEVICE(dev);
-+        XenPciDevice *xendev = g_new(XenPciDevice, 1);
-+
-+        xendev->pci_dev = pci_dev;
-+        xendev->sbdf = PCI_BUILD_BDF(pci_dev_bus_num(pci_dev),
-+                                     pci_dev->devfn);
-+        QLIST_INSERT_HEAD(&state->dev_list, xendev, entry);
- 
-         xen_map_pcidev(xen_domid, state->ioservid, pci_dev);
-     }
-@@ -581,8 +595,17 @@ static void xen_device_unrealize(DeviceListener *listener,
- 
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-         PCIDevice *pci_dev = PCI_DEVICE(dev);
-+        XenPciDevice *xendev, *next;
- 
-         xen_unmap_pcidev(xen_domid, state->ioservid, pci_dev);
-+
-+        QLIST_FOREACH_SAFE(xendev, &state->dev_list, entry, next) {
-+            if (xendev->pci_dev == pci_dev) {
-+                QLIST_REMOVE(xendev, entry);
-+                g_free(xendev);
-+                break;
-+            }
-+        }
-     }
- }
- 
-@@ -903,6 +926,61 @@ static void cpu_ioreq_move(ioreq_t *req)
-     }
- }
- 
-+static void cpu_ioreq_config(XenIOState *state, ioreq_t *req)
-+{
-+    uint32_t sbdf = req->addr >> 32;
-+    uint32_t reg = req->addr;
-+    XenPciDevice *xendev;
-+
-+    if (req->size > sizeof(uint32_t)) {
-+        hw_error("PCI config access: bad size (%u)", req->size);
-+    }
-+
-+    QLIST_FOREACH(xendev, &state->dev_list, entry) {
-+        unsigned int i;
-+
-+        if (xendev->sbdf != sbdf) {
-+            continue;
-+        }
-+
-+        if (req->dir == IOREQ_READ) {
-+            if (!req->data_is_ptr) {
-+                req->data = pci_host_config_read_common(
-+                    xendev->pci_dev, reg, PCI_CONFIG_SPACE_SIZE,
-+                    req->size);
-+                trace_cpu_ioreq_config_read(req, sbdf, reg, req->size,
-+                                            req->data);
-+            } else {
-+                for (i = 0; i < req->count; i++) {
-+                    uint32_t tmp;
-+
-+                    tmp = pci_host_config_read_common(
-+                        xendev->pci_dev, reg, PCI_CONFIG_SPACE_SIZE,
-+                        req->size);
-+                    write_phys_req_item(req->data, req, i, &tmp);
-+                }
-+            }
-+        } else if (req->dir == IOREQ_WRITE) {
-+            if (!req->data_is_ptr) {
-+                trace_cpu_ioreq_config_write(req, sbdf, reg, req->size,
-+                                             req->data);
-+                pci_host_config_write_common(
-+                    xendev->pci_dev, reg, PCI_CONFIG_SPACE_SIZE, req->data,
-+                    req->size);
-+            } else {
-+                for (i = 0; i < req->count; i++) {
-+                    uint32_t tmp = 0;
-+
-+                    read_phys_req_item(req->data, req, i, &tmp);
-+                    pci_host_config_write_common(
-+                        xendev->pci_dev, reg, PCI_CONFIG_SPACE_SIZE, tmp,
-+                        req->size);
-+                }
-+            }
-+        }
-+    }
-+}
-+
- static void regs_to_cpu(vmware_regs_t *vmport_regs, ioreq_t *req)
- {
-     X86CPU *cpu;
-@@ -975,27 +1053,9 @@ static void handle_ioreq(XenIOState *state, ioreq_t *req)
-         case IOREQ_TYPE_INVALIDATE:
-             xen_invalidate_map_cache();
-             break;
--        case IOREQ_TYPE_PCI_CONFIG: {
--            uint32_t sbdf = req->addr >> 32;
--            uint32_t val;
--
--            /* Fake a write to port 0xCF8 so that
--             * the config space access will target the
--             * correct device model.
--             */
--            val = (1u << 31) |
--                  ((req->addr & 0x0f00) << 16) |
--                  ((sbdf & 0xffff) << 8) |
--                  (req->addr & 0xfc);
--            do_outp(0xcf8, 4, val);
--
--            /* Now issue the config space access via
--             * port 0xCFC
--             */
--            req->addr = 0xcfc | (req->addr & 0x03);
--            cpu_ioreq_pio(req);
-+        case IOREQ_TYPE_PCI_CONFIG:
-+            cpu_ioreq_config(state, req);
-             break;
--        }
-         default:
-             hw_error("Invalid ioreq type 0x%x\n", req->type);
-     }
-@@ -1366,6 +1426,7 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
-     memory_listener_register(&state->io_listener, &address_space_io);
- 
-     state->device_listener = xen_device_listener;
-+    QLIST_INIT(&state->dev_list);
-     device_listener_register(&state->device_listener);
- 
-     /* Initialize backend core & drivers */
--- 
-2.1.4
+> "query-migrate-capabilities"
+> "migrate-set-capabilities"
+it could be possible to make it work at preconfig time,
+but we probably need to fix -incoming mess first
+(as David pointed out it's possible to postpone switching to
+inmigrate runstate but needs some work done to make it
+actually happen)
+
+> "query-chardev"
+could be enabled at preconfig with some behavioral change,
+namely, frontend-open field would report false at preconfig time
+
+> "qom-list"
+> "qom-get"
+> "qom-get"
+Above depends on whether being queried object exits at
+preconfig time, so possibility of using commands should be
+evaluated separately for each use case.
+Could you point out to relevant objects that libvirt
+uses with these commands and why it's needed?
+
+> "query-hotpluggable-cpus"
+preconfig enabled within this series, so that
+libvirt could get cpus layout for configuring numa
+(it should work for x86 and spapr, and later with AR
+once CPU hotplug is enabled there)
+
+> "query-iothreads"
+both -object and monitor_init_globals() are done before machine_init
+so it should be possible make it work at preconfig
+
+> "balloon"
+> "query-balloon"
+These are depend on initialized machine and -device balloon processed
+What's the reasons for libvirt to use it at -S pause instead of
+using -device on CLI for adding balloon device?
+
+> "query-cpus"
+That one probably won't be possible as it needs initialized machine
+or at least 'machine_init() + -device' processed first.
+Why libvirt does need it to start VM?
+
+Above 3 commands and possibly others could be made usable
+with --preconfig in case we implement steps between
+  machine_run_board_init() ... qdev_machine_creation_done()
+as qmp commands like: qmp_initialize_board(), enable device_add,
+etc. and move earlier the steps from there that don't really
+depend on being created machine.=20
+
+> "cont"
+>=20
+> So --preconfig looks like it cannot be used for anything libvirt currently
+> does during guest startup. This would force us to use the new set-numa-no=
+de
+> command right at the start, even though this is possibly not a time when
+> libvirt is actually ready to set the numa node in QEMU.
+set_numa_node at preconfig time was made with libvirt in mind
+so this should work, Peter is just waiting on it being merged
+before he would coding libvirt support for it.
+
+> This kind of code
+> ordering constraint QEMU will put on libvirt is why I really don't like
+> the idea of having multiple startup phases where you can only use certain
+> commands in certain phases.
+I've even implemented fixing up built machine at -S pause point
+for the sake of experiment [1] at he cost of an extra machine reset
+per every set-numa-node command, but even if it would work for numa,
+is really not good approach, rather fragile and won't scale, we would
+be just piling one hack on another.
+Hopefully we would be able to make enough commands preconfig enabled
+to start VM without need for -S.
+
+> Regards,
+> Daniel
+[1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg502794.html
