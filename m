@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fEAOg-0000eQ-Ay
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:19:31 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fEAOi-0000fi-04
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:19:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fEAOf-0004wy-3P
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:19:30 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:39272)
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fEAOh-0004xz-4q
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:19:31 -0400
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:42889)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1fEAOe-0004wi-Rd
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:19:29 -0400
-Received: by mail-lf0-x243.google.com with SMTP id j193-v6so24916587lfg.6
-	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 02:19:28 -0700 (PDT)
+	id 1fEAOg-0004xL-Se
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:19:31 -0400
+Received: by mail-lf0-x241.google.com with SMTP id u21-v6so24909449lfu.9
+	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 02:19:30 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Thu,  3 May 2018 11:18:55 +0200
-Message-Id: <20180503091922.28733-3-edgar.iglesias@gmail.com>
+Date: Thu,  3 May 2018 11:18:56 +0200
+Message-Id: <20180503091922.28733-4-edgar.iglesias@gmail.com>
 In-Reply-To: <20180503091922.28733-1-edgar.iglesias@gmail.com>
 References: <20180503091922.28733-1-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v1 02/29] target-microblaze: dec_store: Use
- bool instead of unsigned int
+Subject: [Qemu-devel] [PATCH v1 03/29] target-microblaze: compute_ldst_addr:
+ Use bool instead of int
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,38 +32,44 @@ Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, sai.pavan.boddu@xili
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Use bool instead of unsigned int to represent flags.
-Also, use extract32 instead of open coding the bit extract.
-
+Use bool instead of int to represent flags.
 No functional change.
 
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- target/microblaze/translate.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ target/microblaze/translate.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 33f21aa5b7..6fe679ca6d 100644
+index 6fe679ca6d..9232b42a8a 100644
 --- a/target/microblaze/translate.c
 +++ b/target/microblaze/translate.c
-@@ -1027,14 +1027,15 @@ static void dec_store(DisasContext *dc)
- {
-     TCGv t, *addr, swx_addr;
-     TCGLabel *swx_skip = NULL;
--    unsigned int size, rev = 0, ex = 0;
-+    unsigned int size;
-+    bool rev = false, ex = false;
-     TCGMemOp mop;
+@@ -845,13 +845,13 @@ static void dec_imm(DisasContext *dc)
  
-     mop = dc->opcode & 3;
-     size = 1 << mop;
-     if (!dc->type_b) {
--        rev = (dc->ir >> 9) & 1;
--        ex = (dc->ir >> 10) & 1;
-+        rev = extract32(dc->ir, 9, 1);
-+        ex = extract32(dc->ir, 10, 1);
+ static inline TCGv *compute_ldst_addr(DisasContext *dc, TCGv *t)
+ {
+-    unsigned int extimm = dc->tb_flags & IMM_FLAG;
+-    /* Should be set to one if r1 is used by loadstores.  */
+-    int stackprot = 0;
++    bool extimm = dc->tb_flags & IMM_FLAG;
++    /* Should be set to true if r1 is used by loadstores.  */
++    bool stackprot = false;
+ 
+     /* All load/stores use ra.  */
+     if (dc->ra == 1 && dc->cpu->cfg.stackprot) {
+-        stackprot = 1;
++        stackprot = true;
      }
-     mop |= MO_TE;
-     if (rev) {
+ 
+     /* Treat the common cases first.  */
+@@ -864,7 +864,7 @@ static inline TCGv *compute_ldst_addr(DisasContext *dc, TCGv *t)
+         }
+ 
+         if (dc->rb == 1 && dc->cpu->cfg.stackprot) {
+-            stackprot = 1;
++            stackprot = true;
+         }
+ 
+         *t = tcg_temp_new();
 -- 
 2.14.1
