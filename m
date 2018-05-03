@@ -1,14 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fEGGS-0005af-CW
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:35:28 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fEGPC-0007Ga-WD
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:44:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fEGGM-0004mq-P1
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:35:24 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu,  3 May 2018 17:35:09 +0200
-Message-Id: <20180503153509.22223-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH] sheepdog: Fix sd_co_create_opts() memory leaks
+	(envelope-from <cohuck@redhat.com>) id 1fEGP9-0000yZ-S4
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:44:27 -0400
+Date: Thu, 3 May 2018 17:44:12 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180503174412.359494fb.cohuck@redhat.com>
+In-Reply-To: <cbe7b21c-639c-aa64-4777-03d0aa793ac8@linux.ibm.com>
+References: <20180502125221.4877-1-cohuck@redhat.com>
+	<cbe7b21c-639c-aa64-4777-03d0aa793ac8@linux.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] s390-ccw: force diag 308 subcode to
+ unsigned long
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,48 +24,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+To: Farhan Ali <alifm@linux.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
-Both the option string for the 'redundancy' option and the
-SheepdogRedundancy object that is created accordingly could be leaked in
-error paths. This fixes the memory leaks.
+On Thu, 3 May 2018 11:25:08 -0400
+Farhan Ali <alifm@linux.ibm.com> wrote:
 
-Reported by Coverity (CID 1390614 and 1390641).
+> On 05/02/2018 08:52 AM, Cornelia Huck wrote:
+> > We currently pass an integer as the subcode parameter. However,
+> > the upper bits of the register containing the subcode need to
+> > be 0, which is not guaranteed unless we explicitly specify the
+> > subcode to be an unsigned long value.
+> > 
+> > Fixes: d046c51dad3 ("pc-bios/s390-ccw: Get device address via diag 308/6")
+> > Cc:qemu-stable@nongnu.org
+> > Signed-off-by: Cornelia Huck<cohuck@redhat.com>  
+> 
+> Sorry for my ignorance, but is there a C standard that says upper bits 
+> of an int is not guaranteed to be 0?
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block/sheepdog.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index a2f26efc0e..6ec647e558 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -1987,6 +1987,7 @@ static SheepdogRedundancy *parse_redundancy_str(const char *opt)
-     } else {
-         ret = qemu_strtol(n2, NULL, 10, &parity);
-         if (ret < 0) {
-+            g_free(redundancy);
-             return NULL;
-         }
- 
-@@ -2183,7 +2184,7 @@ static int coroutine_fn sd_co_create_opts(const char *filename, QemuOpts *opts,
-     QDict *qdict, *location_qdict;
-     QObject *crumpled;
-     Visitor *v;
--    const char *redundancy;
-+    char *redundancy;
-     Error *local_err = NULL;
-     int ret;
- 
-@@ -2253,6 +2254,7 @@ static int coroutine_fn sd_co_create_opts(const char *filename, QemuOpts *opts,
- fail:
-     qapi_free_BlockdevCreateOptions(create_options);
-     QDECREF(qdict);
-+    g_free(redundancy);
-     return ret;
- }
- 
--- 
-2.13.6
+The value (5 resp. 6) is small enough to fit into a regular integer,
+and the compiler generated a lhi for the load, which did not change any
+upper values that might have been in the register previously. Telling
+the compiler to treat the value as an unsigned long makes it generate a
+lghi.
