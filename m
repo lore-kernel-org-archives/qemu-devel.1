@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57040)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fE8XW-0003Sv-T3
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 03:20:31 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fE8Y5-0003r0-Np
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 03:21:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fE8XS-0005yo-GX
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 03:20:30 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38452 helo=mx1.redhat.com)
+	(envelope-from <stefanha@redhat.com>) id 1fE8Y4-0006aF-TJ
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 03:21:05 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44794 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fE8XS-0005yD-C4
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 03:20:26 -0400
-References: <20180425045129.17449-1-peterx@redhat.com>
-	<20180425045129.17449-9-peterx@redhat.com>
-	<2b05e076-0af9-0ee9-c076-7acc29714913@redhat.com>
-	<AADFC41AFE54684AB9EE6CBC0274A5D19113B5D2@SHSMSX101.ccr.corp.intel.com>
-	<20180427072810.GB13269@xz-mi>
-	<AADFC41AFE54684AB9EE6CBC0274A5D19113C1C9@SHSMSX101.ccr.corp.intel.com>
-	<20180427095527.GE13269@xz-mi> <20180427114029.GF13269@xz-mi>
-	<AADFC41AFE54684AB9EE6CBC0274A5D19113D318@SHSMSX101.ccr.corp.intel.com>
-	<20180503060442.GB2378@xz-mi>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <547a97a1-0ac0-21b2-af00-036b795b06cc@redhat.com>
-Date: Thu, 3 May 2018 15:20:11 +0800
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fE8Y4-0006Zq-Na
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 03:21:04 -0400
+Date: Thu, 3 May 2018 08:21:00 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180503072100.GA5301@stefanha-x1.localdomain>
+References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
+	<20180430103312.GH3249@redhat.com>
+	<20180430132107.0a37704d.cohuck@redhat.com>
+	<ac216b06-9469-addd-b5a1-3a3a89fd0782@redhat.com>
+	<20180502074403.yh5weukbjgqsvp7n@sirius.home.kraxel.org>
+	<20180502080200.GG3308@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180503060442.GB2378@xz-mi>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 08/10] intel-iommu: maintain per-device
- iova ranges
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="0F1p//8PRICkK4MW"
+Content-Disposition: inline
+In-Reply-To: <20180502080200.GG3308@redhat.com>
+Subject: Re: [Qemu-devel] release retrospective, next release timing,
+ numbering
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,25 +33,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, "Tian, Kevin" <kevin.tian@intel.com>
-Cc: Jintack Lim <jintack@cs.columbia.edu>, Alex Williamson <alex.williamson@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
 
+--0F1p//8PRICkK4MW
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 2018=E5=B9=B405=E6=9C=8803=E6=97=A5 14:04, Peter Xu wrote:
-> IMHO the guest can't really detect this, but it'll found that the
-> device is not working functionally if it's doing something like what
-> Jason has mentioned.
->
-> Actually now I have had an idea if we really want to live well even
-> with Jason's example: maybe we'll need to identify PSI/DSI.  For DSI,
-> we don't remap for mapped pages; for PSI, we unmap and remap the
-> mapped pages.  That'll complicate the stuff a bit, but it should
-> satisfy all the people.
->
-> Thanks,
+On Wed, May 02, 2018 at 09:02:00AM +0100, Daniel P. Berrang=E9 wrote:
+> On Wed, May 02, 2018 at 09:44:03AM +0200, Gerd Hoffmann wrote:
+> >   Hi,
+> >=20
+> > > > If we bump the major version each year anyway, why not go the whole=
+ way
+> > > > and use 2018.1, 2018.2, ... (or even <year>.<month>)? The nice thing
+> > > > about that is that you can see at a glance when the release took pl=
+ace.
+> > >=20
+> > > ... or simply drop the first two digits and call them 18.1, 18.2, ...?
+>=20
+> > We could also drop the major/minor scheme altogether (as they are
+> > meaningless anyway) and just go for YYMM, i.e. 1808 (for a august
+> > release).
+>=20
+> I don't much like that - it'll lead to a wierd progression of numbers
+> where we'll be constantly the rationale re-explaining to people who
+> want to know why we've jumped from 1808 to 1902 to 1905 etc
 
-So it looks like there will be still unnecessary unamps. How about=20
-record the mappings in the tree too?
+I don't see an issue with time-based numbering schemes.  Ubuntu made it
+popular and other projects (like DPDK) are doing the same thing now.
 
-Thanks
+The convention is YY.MM though, not YYMM.
+
+Stefan
+
+--0F1p//8PRICkK4MW
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJa6rhcAAoJEJykq7OBq3PIgpYH/RRTvMrNf1wTdOZRUiB5UYMn
+SEUDvcg2uP5zIHPYapTj87fNrzI254WPxeqcgamoSNW948+hsVsJlGqfaU1O+K1S
+QkMjjat8NENi2LfyZ1sIN3txjc6kCW1b8aI3oAg6I/cC199jhxGUUtNs5dzg5YEK
+m1SfkWXNEfTwml47Inc9d5qVQZN4flyk6RR6bp0WixXpXvE5KMBuH18CtUG797Dm
+VNMsv75Yt7M+bZUNsFnPknniQ6PVFW9L+NzcMO/qXkoMXHQeoVve2z0Mf6jpcp2J
+gqOWos3mHoTJOjtQPDb1WX04k+9aNl2mYvYN2vcFgBgFT0ruB2DhZl0ZME/g4ZE=
+=pHbZ
+-----END PGP SIGNATURE-----
+
+--0F1p//8PRICkK4MW--
