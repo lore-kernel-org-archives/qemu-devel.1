@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fEIqd-00029P-1J
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 14:20:58 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fEIqg-0002Ce-B6
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 14:20:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fEIqc-0008K2-2H
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 14:20:55 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:39811)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fEIqf-0008LH-2v
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 14:20:58 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:39810)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1fEIqb-0008JV-Rp
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 14:20:53 -0400
-Received: by mail-wm0-x244.google.com with SMTP id f8-v6so469694wmc.4
-	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 11:20:53 -0700 (PDT)
+	id 1fEIqe-0008L0-Rb
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 14:20:56 -0400
+Received: by mail-wm0-x242.google.com with SMTP id f8-v6so469927wmc.4
+	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 11:20:56 -0700 (PDT)
 From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Thu,  3 May 2018 21:21:23 +0300
-Message-Id: <20180503182125.20310-7-marcel.apfelbaum@gmail.com>
+Date: Thu,  3 May 2018 21:21:25 +0300
+Message-Id: <20180503182125.20310-9-marcel.apfelbaum@gmail.com>
 In-Reply-To: <20180503182125.20310-1-marcel.apfelbaum@gmail.com>
 References: <20180503182125.20310-1-marcel.apfelbaum@gmail.com>
-Subject: [Qemu-devel] [PULL 6/8] hw/rdma: Delete duplicate definition of
- MAX_RM_TBL_NAME
+Subject: [Qemu-devel] [PULL 8/8] MAINTAINERS: update Marcel Apfelbaum email
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +29,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcel.apfelbaum@gmail.com, yuval.shaia@oracle.com, peter.maydell@linaro.org, f4bug@amsat.org
 
-From: Yuval Shaia <yuval.shaia@oracle.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
 
-By a mistake this constant was defined twice - remove the duplication.
+Use my gmail account for maintainer tasks.
 
-Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-Id: <20180430200223.4119-7-marcel.apfelbaum@gmail.com>
+Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+Message-Id: <20180426084523.10565-1-marcel@redhat.com>
+Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
 ---
- hw/rdma/rdma_rm.c      | 2 --
- hw/rdma/rdma_rm_defs.h | 4 ++--
- 2 files changed, 2 insertions(+), 4 deletions(-)
+ MAINTAINERS | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
-index 51a47d7292..415da15efe 100644
---- a/hw/rdma/rdma_rm.c
-+++ b/hw/rdma/rdma_rm.c
-@@ -21,8 +21,6 @@
- #include "rdma_backend.h"
- #include "rdma_rm.h"
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 24b70169bc..459e3594e1 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -909,7 +909,7 @@ X86 Machines
+ ------------
+ PC
+ M: Michael S. Tsirkin <mst@redhat.com>
+-M: Marcel Apfelbaum <marcel@redhat.com>
++M: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+ S: Supported
+ F: include/hw/i386/
+ F: hw/i386/
+@@ -959,7 +959,7 @@ F: include/hw/timer/mc146818rtc*
  
--#define MAX_RM_TBL_NAME 16
--
- /* Page directory and page tables */
- #define PG_DIR_SZ { TARGET_PAGE_SIZE / sizeof(__u64) }
- #define PG_TBL_SZ { TARGET_PAGE_SIZE / sizeof(__u64) }
-diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
-index 4d22a20e4c..226011176d 100644
---- a/hw/rdma/rdma_rm_defs.h
-+++ b/hw/rdma/rdma_rm_defs.h
-@@ -34,9 +34,9 @@
- #define MAX_QP_INIT_RD_ATOM   16
- #define MAX_AH                64
+ Machine core
+ M: Eduardo Habkost <ehabkost@redhat.com>
+-M: Marcel Apfelbaum <marcel@redhat.com>
++M: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+ S: Supported
+ F: hw/core/machine.c
+ F: hw/core/null-machine.c
+@@ -1033,7 +1033,7 @@ F: hw/ipack/
  
--#define MAX_RMRESTBL_NAME_SZ 16
-+#define MAX_RM_TBL_NAME 16
- typedef struct RdmaRmResTbl {
--    char name[MAX_RMRESTBL_NAME_SZ];
-+    char name[MAX_RM_TBL_NAME];
-     QemuMutex lock;
-     unsigned long *bitmap;
-     size_t tbl_sz;
+ PCI
+ M: Michael S. Tsirkin <mst@redhat.com>
+-M: Marcel Apfelbaum <marcel@redhat.com>
++M: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+ S: Supported
+ F: include/hw/pci/*
+ F: hw/misc/pci-testdev.c
+@@ -2075,7 +2075,7 @@ F: docs/block-replication.txt
+ 
+ PVRDMA
+ M: Yuval Shaia <yuval.shaia@oracle.com>
+-M: Marcel Apfelbaum <marcel@redhat.com>
++M: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+ S: Maintained
+ F: hw/rdma/*
+ F: hw/rdma/vmw/*
 -- 
 2.14.3
