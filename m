@@ -1,17 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50508)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fEGUk-0000y3-60
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:50:14 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fEGWK-0002Di-JO
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:51:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fEGUg-0003pU-RM
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:50:10 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Thu,  3 May 2018 17:49:36 +0200
-Message-Id: <20180503154936.18946-9-david@redhat.com>
-In-Reply-To: <20180503154936.18946-1-david@redhat.com>
-References: <20180503154936.18946-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 8/8] memory-device: factor out (un)assign
- into default resource handler
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fEGWJ-0004xq-77
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:51:48 -0400
+References: <20180501211336.986372-1-eblake@redhat.com>
+	<20180501211336.986372-4-eblake@redhat.com>
+	<26f63bd9-4f91-fd46-631c-5f12c04fc9e0@virtuozzo.com>
+	<49fac5ae-4a46-65bf-e889-b5bf979391f3@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <85b6f51d-5c7e-f9d6-1002-422e10b66960@virtuozzo.com>
+Date: Thu, 3 May 2018 18:51:34 +0300
+MIME-Version: 1.0
+In-Reply-To: <49fac5ae-4a46-65bf-e889-b5bf979391f3@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 3/4] nbd/client: Support requests of
+ additional block sizing info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,315 +27,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, edgar.kaziakhmedov@virtuozzo.com, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-This moves the remaining bits into the default resource handler. The
-pc-dimm remainings are limited to slot and migration handling.
+03.05.2018 17:49, Eric Blake wrote:
+> On 05/03/2018 04:17 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> 02.05.2018 00:13, Eric Blake wrote:
+>>> The NBD spec is clarifying [1] that a server may want to advertise
+>>> different limits for READ/WRITE (in our case, 32M) than for
+>>> TRIM/ZERO (in our case, nearly 4G).=C2=A0 Implement the client
+>>> side support for these alternate limits, by always requesting
+>>> the new information (a compliant server must ignore the
+>>> request if it is unknown), and by validating anything reported
+>>> by the server before populating the block layer limits.
+>>>
+>>> [1] https://lists.debian.org/nbd/2018/03/msg00048.html
+>>>
+>>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>>
+>
+>>> +++ b/nbd/client.c
+>>> @@ -337,16 +337,18 @@ static int nbd_opt_go(QIOChannel *ioc, const=20
+>>> char *wantname,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 info->flags =3D 0;
+>>>
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 trace_nbd_opt_go_start(wantname);
+>>> -=C2=A0=C2=A0=C2=A0 buf =3D g_malloc(4 + len + 2 + 2 * info->request_si=
+zes + 1);
+>>> +=C2=A0=C2=A0=C2=A0 buf =3D g_malloc(4 + len + 2 + 3 * 2 * info->reques=
+t_sizes + 1);
+>>
+>> Hmm, what "+1" means?
+>
+> Doesn't appear to be necessary, but a little slop never hurts. Better=20
+> might be struct-ifying things rather than open-coding offsets, or even=20
+> using a vectored approach rather than requiring a single buffer.=C2=A0 Bu=
+t=20
+> if useful, that's refactoring that is independent of this patch, while=20
+> this is just demonstrating the bare minimum implementation of the new=20
+> feature.
+>
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 stl_be_p(buf, len);
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 memcpy(buf + 4, wantname, len);
+>>> -=C2=A0=C2=A0=C2=A0 /* At most one request, everything else up to serve=
+r */
+>>> -=C2=A0=C2=A0=C2=A0 stw_be_p(buf + 4 + len, info->request_sizes);
+>>> +=C2=A0=C2=A0=C2=A0 /* Either 0 or 3 requests, everything else up to se=
+rver */
+>>> +=C2=A0=C2=A0=C2=A0 stw_be_p(buf + 4 + len, 3 * info->request_sizes);
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (info->request_sizes) {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 stw_be_p(buf + 4=
+ + len + 2, NBD_INFO_BLOCK_SIZE);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 stw_be_p(buf + 4 + len + 2 =
++ 2, NBD_INFO_TRIM_SIZE);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 stw_be_p(buf + 4 + len + 2 =
++ 2 + 2, NBD_INFO_ZERO_SIZE);
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error =3D nbd_send_option_request(ioc, N=
+BD_OPT_GO,
+>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 4 + len =
++ 2 + 2 *=20
+>>> info->request_sizes,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 4 + len =
++ 2 + 3 * 2 *=20
+>>> info->request_sizes,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 buf, errp);
+>>
+>> magic chunk) Change looks correct. Is it worth introducing a buf_len=20
+>> variable, to
+>> not retype it?
+>
+> And increment as we go?=C2=A0 Yeah, it might make things more legible.
+>
+>
+>>> + be32_to_cpus(&info->max_trim);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if =
+(!info->min_trim || !info->max_trim ||
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 (info->max_trim !=3D UINT32_MAX &&
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 !QEMU_IS_ALIGNED(info->max_trim, info->min_trim=
+))) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "server trim sizes %" PRIu32 "/%"=20
+>>> PRIu32
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 " are not valid", info->min_trim,=20
+>>> info->max_trim);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 nbd_send_opt_abort(ioc);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 return -1;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>
+>> Didn't you forget to check that min_trim is a power of two?
+>
+> Nope. The NBD spec wording specifically uses "The minimum trim size=20
+> SHOULD be a power of 2, and MUST be at least as large as the preferred=20
+> block size advertised in `NBD_INFO_BLOCK_SIZE`", in part because there=20
+> ARE existing hardware iscsi devices that have an advertised=20
+> preferred/maximum trim size of exactly 15 megabytes (you can request=20
+> smaller trims 1M at a time, and the device then caches things to=20
+> eventually report unmapped slices at a 15M boundary).=C2=A0 For more=20
+> information on this odd hardware, look in the qemu logs for the Dell=20
+> Equallogic device, such as commit 3482b9bc.
 
-Compatibility to old machines on x86 should be guaranteed by using the
-newly introduced machine class function for enforcing alignment of
-DIMMs.
+Ok. Interesting, thank you.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/core/machine.c              | 20 +++++++++++++++++
- hw/i386/pc.c                   | 16 +-------------
- hw/mem/memory-device.c         | 50 +++++++++++++++++++++++++++++++++++-------
- hw/mem/pc-dimm.c               | 31 +-------------------------
- hw/mem/trace-events            |  4 +++-
- hw/ppc/spapr.c                 |  5 ++---
- include/hw/mem/memory-device.h |  9 +++-----
- include/hw/mem/pc-dimm.h       |  3 +--
- 8 files changed, 73 insertions(+), 65 deletions(-)
+>
+> Since the NBD 'min trim' is advisory, and merely telling the client=20
+> the ideal alignments to use for a trim most likely to have an effect=20
+> (on Equallogic, a 1M trim by itself might not trim anything unless=20
+> neighboring areas are also trimmed, while an aligned 15M trim is=20
+> immediately observable), an NBD server wrapping such an iscsi device=20
+> may prefer to mirror the hardware's preferred alignment of 15M, rather=20
+> than inventing a minimum alignment of 1M, in what it advertises in=20
+> NBD_INFO_TRIM_SIZE.
+>
+> And maybe I should tweak the NBD spec addition to call things=20
+> "preferred trim/zero" rather than "min trim/zero", if that makes=20
+> things any easier to grasp on first read, and better matches the iscsi=20
+> concept.
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index e763501c66..7fc1a6bc5e 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -549,11 +549,31 @@ out:
- static void machine_resource_handler_assign(ResourceHandler *rh,
-                                             DeviceState *dev, Error **errp)
- {
-+    MachineState *ms = MACHINE(rh);
-+    Error *local_err = NULL;
-+
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
-+        MemoryDeviceState *md = MEMORY_DEVICE(dev);
-+
-+        memory_device_assign(ms, md, &local_err);
-+        if (local_err) {
-+            goto out;
-+        }
-+    }
-+out:
-+    error_propagate(errp, local_err);
- }
- 
- static void machine_resource_handler_unassign(ResourceHandler *rh,
-                                               DeviceState *dev)
- {
-+    MachineState *ms = MACHINE(rh);
-+
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
-+        MemoryDeviceState *md = MEMORY_DEVICE(dev);
-+
-+        memory_device_unassign(ms, md);
-+    }
- }
- 
- static void machine_class_init(ObjectClass *oc, void *data)
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 9405e28cfa..385f18bb53 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1681,22 +1681,8 @@ static void pc_dimm_plug(HotplugHandler *hotplug_dev,
-     HotplugHandlerClass *hhc;
-     Error *local_err = NULL;
-     PCMachineState *pcms = PC_MACHINE(hotplug_dev);
--    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
--    PCDIMMDevice *dimm = PC_DIMM(dev);
--    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
--    MemoryRegion *mr;
--    uint64_t align = TARGET_PAGE_SIZE;
-     bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
- 
--    mr = ddc->get_memory_region(dimm, &local_err);
--    if (local_err) {
--        goto out;
--    }
--
--    if (memory_region_get_alignment(mr) && pcmc->enforce_aligned_dimm) {
--        align = memory_region_get_alignment(mr);
--    }
--
-     /*
-      * When -no-acpi is used with Q35 machine type, no ACPI is built,
-      * but pcms->acpi_dev is still created. Check !acpi_enabled in
-@@ -1714,7 +1700,7 @@ static void pc_dimm_plug(HotplugHandler *hotplug_dev,
-         goto out;
-     }
- 
--    pc_dimm_memory_plug(dev, MACHINE(pcms), align, &local_err);
-+    pc_dimm_memory_plug(dev, MACHINE(pcms), &local_err);
-     if (local_err) {
-         goto out;
-     }
-diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
-index aa04e0c962..f7f19f6ed2 100644
---- a/hw/mem/memory-device.c
-+++ b/hw/mem/memory-device.c
-@@ -17,6 +17,8 @@
- #include "qemu/range.h"
- #include "hw/virtio/vhost.h"
- #include "sysemu/kvm.h"
-+#include "trace.h"
-+
- 
- static gint memory_device_addr_sort(gconstpointer a, gconstpointer b)
- {
-@@ -68,9 +70,10 @@ static int memory_device_used_region_size(Object *obj, void *opaque)
-     return 0;
- }
- 
--uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t *hint,
--                                     uint64_t align, uint64_t size,
--                                     Error **errp)
-+static uint64_t memory_device_get_free_addr(MachineState *ms,
-+                                            const uint64_t *hint,
-+                                            uint64_t align, uint64_t size,
-+                                            Error **errp)
- {
-     uint64_t address_space_start, address_space_end;
-     uint64_t used_region_size = 0;
-@@ -237,22 +240,53 @@ void memory_device_pre_assign(MachineState *ms,
-     }
- }
- 
--void memory_device_plug_region(MachineState *ms, MemoryRegion *mr,
--                               uint64_t addr)
-+void memory_device_assign(MachineState *ms, MemoryDeviceState *md,
-+                          Error **errp)
- {
--    /* we expect a previous call to memory_device_get_free_addr() */
-+    const MachineClass *mc = MACHINE_GET_CLASS(ms);
-+    const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(md);
-+    const uint64_t size = mdc->get_region_size(md);
-+    MemoryRegion *mr = mdc->get_memory_region(md);
-+    uint64_t addr = mdc->get_addr(md);
-+    uint64_t align = memory_region_get_alignment(mr);
-+
-+    /* we expect a previous call to memory_device_pre_assign */
-     g_assert(ms->device_memory);
- 
-+    /* our device might have stronger alignment requirements */
-+    if (mdc->get_align) {
-+        align = MAX(align, mdc->get_align(md));
-+    }
-+
-+    /* for compat handling, some alignment has to be enforced for DIMMs */
-+    if (mc->enforce_memory_device_align) {
-+        /* align unchanged if nothing is to be enforced */
-+        mc->enforce_memory_device_align(mc, md, &align);
-+    }
-+
-+    addr = memory_device_get_free_addr(ms, !addr ? NULL : &addr, align,
-+                                       size, errp);
-+    if (*errp) {
-+        return;
-+    }
-+    trace_memory_device_assign_address(addr);
-+    mdc->set_addr(md, addr);
-+
-     memory_region_add_subregion(&ms->device_memory->mr,
-                                 addr - ms->device_memory->base, mr);
- }
- 
--void memory_device_unplug_region(MachineState *ms, MemoryRegion *mr)
-+void memory_device_unassign(MachineState *ms, MemoryDeviceState *md)
- {
--    /* we expect a previous call to memory_device_get_free_addr() */
-+    const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(md);
-+    MemoryRegion *mr = mdc->get_memory_region(md);
-+
-+    /* we expect a previous call to memory_device_pre_assign */
-     g_assert(ms->device_memory);
- 
-     memory_region_del_subregion(&ms->device_memory->mr, mr);
-+    trace_memory_device_unassign_address(mdc->get_addr(md));
-+    mdc->set_addr(md, 0);
- }
- 
- static const TypeInfo memory_device_info = {
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index 7ab9e77747..9c5eb1fb16 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -32,39 +32,13 @@ typedef struct pc_dimms_capacity {
-      Error    **errp;
- } pc_dimms_capacity;
- 
--void pc_dimm_memory_plug(DeviceState *dev, MachineState *machine,
--                         uint64_t align, Error **errp)
-+void pc_dimm_memory_plug(DeviceState *dev, MachineState *machine, Error **errp)
- {
-     int slot;
-     PCDIMMDevice *dimm = PC_DIMM(dev);
-     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-     MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm);
-     Error *local_err = NULL;
--    MemoryRegion *mr;
--    uint64_t addr;
--
--    mr = ddc->get_memory_region(dimm, &local_err);
--    if (local_err) {
--        goto out;
--    }
--
--    addr = object_property_get_uint(OBJECT(dimm),
--                                    PC_DIMM_ADDR_PROP, &local_err);
--    if (local_err) {
--        goto out;
--    }
--
--    addr = memory_device_get_free_addr(machine, !addr ? NULL : &addr, align,
--                                       memory_region_size(mr), &local_err);
--    if (local_err) {
--        goto out;
--    }
--
--    object_property_set_uint(OBJECT(dev), addr, PC_DIMM_ADDR_PROP, &local_err);
--    if (local_err) {
--        goto out;
--    }
--    trace_mhp_pc_dimm_assigned_address(addr);
- 
-     slot = object_property_get_int(OBJECT(dev), PC_DIMM_SLOT_PROP, &local_err);
-     if (local_err) {
-@@ -82,7 +56,6 @@ void pc_dimm_memory_plug(DeviceState *dev, MachineState *machine,
-     }
-     trace_mhp_pc_dimm_assigned_slot(slot);
- 
--    memory_device_plug_region(machine, mr, addr);
-     vmstate_register_ram(vmstate_mr, dev);
- 
- out:
-@@ -94,9 +67,7 @@ void pc_dimm_memory_unplug(DeviceState *dev, MachineState *machine)
-     PCDIMMDevice *dimm = PC_DIMM(dev);
-     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-     MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm);
--    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
- 
--    memory_device_unplug_region(machine, mr);
-     vmstate_unregister_ram(vmstate_mr, dev);
- }
- 
-diff --git a/hw/mem/trace-events b/hw/mem/trace-events
-index e150dcc497..930b6aa6ea 100644
---- a/hw/mem/trace-events
-+++ b/hw/mem/trace-events
-@@ -2,4 +2,6 @@
- 
- # hw/mem/pc-dimm.c
- mhp_pc_dimm_assigned_slot(int slot) "%d"
--mhp_pc_dimm_assigned_address(uint64_t addr) "0x%"PRIx64
-+# hw/mem/memory-device.c
-+memory_device_assign_address(uint64_t addr) "0x%"PRIx64
-+memory_device_unassign_address(uint64_t addr) "0x%"PRIx64
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 428f6c79c5..818e7232d8 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3162,16 +3162,15 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     PCDIMMDevice *dimm = PC_DIMM(dev);
-     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-     MemoryRegion *mr;
--    uint64_t align, size, addr;
-+    uint64_t size, addr;
- 
-     mr = ddc->get_memory_region(dimm, &local_err);
-     if (local_err) {
-         goto out;
-     }
--    align = memory_region_get_alignment(mr);
-     size = memory_region_size(mr);
- 
--    pc_dimm_memory_plug(dev, MACHINE(ms), align, &local_err);
-+    pc_dimm_memory_plug(dev, MACHINE(ms), &local_err);
-     if (local_err) {
-         goto out;
-     }
-diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
-index edbd964ac7..6cedbaf747 100644
---- a/include/hw/mem/memory-device.h
-+++ b/include/hw/mem/memory-device.h
-@@ -49,11 +49,8 @@ MemoryDeviceInfoList *qmp_memory_device_list(void);
- uint64_t get_plugged_memory_size(void);
- void memory_device_pre_assign(MachineState *ms,
-                               const MemoryDeviceState *md, Error **errp);
--uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t *hint,
--                                     uint64_t align, uint64_t size,
--                                     Error **errp);
--void memory_device_plug_region(MachineState *ms, MemoryRegion *mr,
--                               uint64_t addr);
--void memory_device_unplug_region(MachineState *ms, MemoryRegion *mr);
-+void memory_device_assign(MachineState *ms, MemoryDeviceState *md,
-+                          Error **errp);
-+void memory_device_unassign(MachineState *ms, MemoryDeviceState *md);
- 
- #endif
-diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-index 627c8601d9..006c80fb2e 100644
---- a/include/hw/mem/pc-dimm.h
-+++ b/include/hw/mem/pc-dimm.h
-@@ -78,7 +78,6 @@ typedef struct PCDIMMDeviceClass {
- 
- int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
- 
--void pc_dimm_memory_plug(DeviceState *dev, MachineState *machine,
--                         uint64_t align, Error **errp);
-+void pc_dimm_memory_plug(DeviceState *dev, MachineState *machine, Error **errp);
- void pc_dimm_memory_unplug(DeviceState *dev, MachineState *machine);
- #endif
--- 
-2.14.3
+good idea. and it will better correspond to pref_block for=20
+INFO_BLOCK_SIZE, as they are compared with it.
+
+>
+>>
+>> hmm, so, now nbd_opt_go() is full of very-very similar code parts,=20
+>> which may worth some refactoring now or in future.
+>>
+>> Are we going to add similar limits for BLOCK_STATUS? and for CACHE? I=20
+>> have an idea: why not to make an universal option for it in
+>> protocol? Something like
+>>
+>> option INFO_CMD_SIZE:
+>> =C2=A0=C2=A0 uint16_t command
+>> =C2=A0=C2=A0 uint32_t min_block
+>> =C2=A0=C2=A0 uint32_t max_block
+>>
+>> and server can send several such options. Most of semantics for these=20
+>> additional limits are common, so it will simplify both documentation
+>> and realization..
+>>
+>> I'll copy this to nbd thread and it is better to discuss it in it.
+>
+> Yep, I've followed up on that thread, but will post a v2 of this=20
+> proposal along those lines.
+>
+
+
+--=20
+Best regards,
+Vladimir
