@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55820)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fEAQd-0002Pe-Ff
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:21:32 -0400
+	(envelope-from <jasowang@redhat.com>) id 1fEARS-00032Z-9J
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:22:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fEAQY-0005ny-HI
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:21:31 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:41336)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fEAQY-0005nf-CF
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:21:26 -0400
-Received: by mail-oi0-x242.google.com with SMTP id 11-v6so15456660ois.8
-	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 02:21:26 -0700 (PDT)
+	(envelope-from <jasowang@redhat.com>) id 1fEARO-0006EN-AV
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:22:22 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35896 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fEARO-0006E8-46
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:22:18 -0400
+References: <AADFC41AFE54684AB9EE6CBC0274A5D19113B5D2@SHSMSX101.ccr.corp.intel.com>
+	<20180427072810.GB13269@xz-mi>
+	<AADFC41AFE54684AB9EE6CBC0274A5D19113C1C9@SHSMSX101.ccr.corp.intel.com>
+	<20180427095527.GE13269@xz-mi> <20180427114029.GF13269@xz-mi>
+	<AADFC41AFE54684AB9EE6CBC0274A5D19113D318@SHSMSX101.ccr.corp.intel.com>
+	<20180503060442.GB2378@xz-mi>
+	<547a97a1-0ac0-21b2-af00-036b795b06cc@redhat.com>
+	<20180503072828.GA29580@xz-mi>
+	<8cbed1d0-1f4e-db6d-bd83-1042f724827a@redhat.com>
+	<20180503075302.GC29580@xz-mi>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <f933ba4d-a025-7c94-69c6-d21f408eb729@redhat.com>
+Date: Thu, 3 May 2018 17:22:03 +0800
 MIME-Version: 1.0
-In-Reply-To: <20180503090532.3113-3-joel@jms.id.au>
-References: <20180503090532.3113-1-joel@jms.id.au>
-	<20180503090532.3113-3-joel@jms.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 3 May 2018 10:21:04 +0100
-Message-ID: <CAFEAcA_mwf5VtQiH1UKXJyWd78wdm4=DCCGRB4t8db-QsgOAiA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 2/2] arm: Add BBC micro:bit machine
+In-Reply-To: <20180503075302.GC29580@xz-mi>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 08/10] intel-iommu: maintain per-device
+ iova ranges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +37,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Joel Stanley <joel@jms.id.au>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>, Jim Mussared <jim.mussared@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: Jintack Lim <jintack@cs.columbia.edu>, "Tian, Kevin" <kevin.tian@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 
-On 3 May 2018 at 10:05, Joel Stanley <joel@jms.id.au> wrote:
-> This adds the base for a machine model of the BBC micro:bit:
+
+
+On 2018=E5=B9=B405=E6=9C=8803=E6=97=A5 15:53, Peter Xu wrote:
+> On Thu, May 03, 2018 at 03:43:35PM +0800, Jason Wang wrote:
+>>
+>> On 2018=E5=B9=B405=E6=9C=8803=E6=97=A5 15:28, Peter Xu wrote:
+>>> On Thu, May 03, 2018 at 03:20:11PM +0800, Jason Wang wrote:
+>>>> On 2018=E5=B9=B405=E6=9C=8803=E6=97=A5 14:04, Peter Xu wrote:
+>>>>> IMHO the guest can't really detect this, but it'll found that the
+>>>>> device is not working functionally if it's doing something like wha=
+t
+>>>>> Jason has mentioned.
+>>>>>
+>>>>> Actually now I have had an idea if we really want to live well even
+>>>>> with Jason's example: maybe we'll need to identify PSI/DSI.  For DS=
+I,
+>>>>> we don't remap for mapped pages; for PSI, we unmap and remap the
+>>>>> mapped pages.  That'll complicate the stuff a bit, but it should
+>>>>> satisfy all the people.
+>>>>>
+>>>>> Thanks,
+>>>> So it looks like there will be still unnecessary unamps.
+>>> Could I ask what do you mean by "unecessary unmaps"?
+>> It's for "for PSI, we unmap and remap the mapped pages". So for the fi=
+rst
+>> "unmap" how do you know it was really necessary without knowing the st=
+ate of
+>> current shadow page table?
+> I don't.  Could I just unmap it anyway?  Say, now the guest _modified_
+> the PTE already.  Yes I think it's following the spec, but it is
+> really _unsafe_.  We can know that from what it has done already.
+> Then I really think a unmap+map would be good enough for us...  After
+> all that behavior can cause DMA error even on real hardwares.  It can
+> never tell.
+
+I mean for following case:
+
+1) guest maps A1 (iova) to XXX
+2) guest maps A2 (A1 + 4K) (iova) to YYY
+3) guest maps A3 (A1 + 8K) (iova) to ZZZ
+4) guest unmaps A2 and A2, for reducing the number of PSIs, it can=20
+invalidate A1 with a range of 2M
+
+If this is allowed by spec, looks like A1 will be unmaped and mapped.
+
+Thanks
+
 >
->   https://en.wikipedia.org/wiki/Micro_Bit
+>>>> How about record the mappings in the tree too?
+>>> As I mentioned, for L1 guest (e.g., DPDK applications running in L1)
+>>> it'll be fine.  But I'm just afraid we will have other use cases, lik=
+e
+>>> the L2 guests. That might need tons of the mapping entries in the
+>>> worst case scenario.
+>>>
+>> Yes, but that's the price of shadow page tables.
+> So that's why I would like to propose this mergable interval tree.  It
+> might greatly reduce the price if we can reach a consensus on how we
+> should treat those strange-behaved guest OSs.  Thanks,
 >
-> This is a system with a nRF51 SoC containing the main processor, with
-> various peripherals on board.
->
-> Signed-off-by: Joel Stanley <joel@jms.id.au>
-> ---
->  hw/arm/Makefile.objs |  2 +-
->  hw/arm/microbit.c    | 33 +++++++++++++++++++++++++++++++++
->  2 files changed, 34 insertions(+), 1 deletion(-)
->  create mode 100644 hw/arm/microbit.c
->
-> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-> index 1d7211850454..c01e7a1e39fb 100644
-> --- a/hw/arm/Makefile.objs
-> +++ b/hw/arm/Makefile.objs
-> @@ -35,4 +35,4 @@ obj-$(CONFIG_MPS2) += mps2-tz.o
->  obj-$(CONFIG_MSF2) += msf2-soc.o msf2-som.o
->  obj-$(CONFIG_IOTKIT) += iotkit.o
->  obj-$(CONFIG_FSL_IMX7) += fsl-imx7.o mcimx7d-sabre.o
-> -obj-$(CONFIG_NRF51_SOC) += nrf51_soc.o
-> +obj-$(CONFIG_NRF51_SOC) += nrf51_soc.o microbit.o
-> diff --git a/hw/arm/microbit.c b/hw/arm/microbit.c
-> new file mode 100644
-> index 000000000000..b61d0747fe56
-> --- /dev/null
-> +++ b/hw/arm/microbit.c
-> @@ -0,0 +1,33 @@
-> +/*
-> + * BBC micro:bit machine
-> + *
-> + * Copyright 2018 Joel Stanley <joel@jms.id.au>
-> + *
-> + * This code is licensed under the GPL version 2 or later.  See
-> + * the COPYING file in the top-level directory.
-
-Is there a datasheet URL? If so this is a good place to give it.
-
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "hw/boards.h"
-> +
-> +#include "hw/arm/nrf51_soc.h"
-> +
-> +static void microbit_init(MachineState *machine)
-> +{
-> +    DeviceState *dev;
-> +
-> +    dev = qdev_create(NULL, TYPE_NRF51_SOC);
-> +    if (machine->kernel_filename) {
-> +        qdev_prop_set_string(dev, "kernel-filename", machine->kernel_filename);
-> +    }
-> +    object_property_set_bool(OBJECT(dev), true, "realized", &error_fatal);
-> +}
-> +
-> +static void microbit_machine_init(MachineClass *mc)
-> +{
-> +    mc->desc = "BBC micro:bit";
-> +    mc->init = microbit_init;
-> +    mc->ignore_memory_transaction_failures = true;
-
-ignore_memory_transaction_failures is a flag for legacy machine
-models only; please don't set it for a new board model.
-(Instead, just provide stubs via unimplemented_device for
-any devices or areas of memory that need to exist for
-guest code to run.)
-
-thanks
--- PMM
