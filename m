@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40780)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fE7cB-0006dq-Uv
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 02:21:16 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fE7cs-00074y-2Y
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 02:21:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fE7c7-00029Y-CQ
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 02:21:15 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49124 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fE7c7-00029P-75
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 02:21:11 -0400
-Date: Thu, 3 May 2018 14:21:00 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180503062100.GG15438@lemon.usersys.redhat.com>
-References: <20180430124651.10340-1-stefanha@redhat.com>
-	<152509298983.2409.13656791008049355574@71c20359a636>
-	<20180501130406.GD14803@stefanha-x1.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180501130406.GD14803@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] checkpatch: backport UTF-8 fixes
- and MAINTAINERS check
+	(envelope-from <dgibson@ozlabs.org>) id 1fE7cq-0002On-9A
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 02:21:58 -0400
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Thu,  3 May 2018 16:21:43 +1000
+Message-Id: <20180503062145.17899-7-david@gibson.dropbear.id.au>
+In-Reply-To: <20180503062145.17899-1-david@gibson.dropbear.id.au>
+References: <20180503062145.17899-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PATCH 6/8] target/ppc: Delay initialization of
+ LPCR_UPRT for secondary cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +20,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, thuth@redhat.com, armbru@redhat.com, marcandre.lureau@gmail.com
+To: groug@kaod.org, clg@kaod.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-On Tue, 05/01 14:04, Stefan Hajnoczi wrote:
-> On Mon, Apr 30, 2018 at 05:56:30AM -0700, no-reply@patchew.org wrote:
-> > === OUTPUT BEGIN ===
-> > Checking PATCH 1/5: checkpatch: add a --strict check for utf-8 in commit logs...
-> > WARNING: line over 80 characters
-> > #101: FILE: scripts/checkpatch.pl:1420:
-> > +			WARN("8-bit UTF-8 used in possible commit log\n" . $herecurr);
-> > 
-> > total: 0 errors, 1 warnings, 66 lines checked
-> > 
-> > Your patch has style problems, please review.  If any of these errors
-> > are false positives report them to the maintainer, see
-> > CHECKPATCH in MAINTAINERS.
-> > Checking PATCH 2/5: checkpatch: check utf-8 content from a commit log when it's missing from charset...
-> > Checking PATCH 3/5: checkpatch: ignore email headers better...
-> > Checking PATCH 4/5: checkpatch: emit a warning on file add/move/delete...
-> > WARNING: line over 80 characters
-> > #46: FILE: scripts/checkpatch.pl:1397:
-> > +		     ($line =~ /\{\s*([\w\/\.\-]*)\s*\=\>\s*([\w\/\.\-]*)\s*\}/ &&
-> > 
-> > ERROR: line over 90 characters
-> > #49: FILE: scripts/checkpatch.pl:1400:
-> > +			WARN("added, moved or deleted file(s), does MAINTAINERS need updating?\n" . $herecurr);
-> > 
-> > total: 1 errors, 1 warnings, 24 lines checked
-> > 
-> > Your patch has style problems, please review.  If any of these errors
-> > are false positives report them to the maintainer, see
-> > CHECKPATCH in MAINTAINERS.
-> > 
-> > Checking PATCH 5/5: checkpatch: reduce MAINTAINERS update message frequency...
-> > === OUTPUT END ===
-> 
-> If there are no objections I'd like to keep this in sync with upstream,
-> and error messages are exempt from the 80 char limit to aid grepping.
+In cpu_ppc_set_papr() the UPRT and GTSE bits of the LPCR default value are
+initialized based on on ppc64_radix_guest().  Which seems reasonable,
+except that ppc64_radix_guest() is based on spapr->patb_entry which is
+only set up in spapr_machine_reset, called _after_ cpu_ppc_set_papr() for
+boot cpus.  Well, and the fact that modifying the SPR default value for an
+instance rather than a class is kind of yucky.
 
-Yeah, I actually like such exceptions for message strings constants in general.
+The initialization here is really only necessary or valid for
+hotplugged cpus; the base cpu initialization already sets a value
+that's good enough for the boot cpus until the guest uses an hcall to
+configure it's preferred MMU mode.
 
-Fam
+So, move this initialization to the rtas_start_cpu() path, at which point
+ppc64_radix_guest() will have a sensible value, to make sure secondary cpus
+come up in an MMU mode matching the existing cpus.
+
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/ppc/spapr_rtas.c         | 12 ++++++++++++
+ target/ppc/translate_init.c | 16 ----------------
+ 2 files changed, 12 insertions(+), 16 deletions(-)
+
+diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+index 840d198a8d..652233bdf1 100644
+--- a/hw/ppc/spapr_rtas.c
++++ b/hw/ppc/spapr_rtas.c
+@@ -47,6 +47,7 @@
+ #include "trace.h"
+ #include "hw/ppc/fdt.h"
+ #include "target/ppc/mmu-hash64.h"
++#include "target/ppc/mmu-book3s-v3.h"
+ 
+ static void rtas_display_character(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+                                    uint32_t token, uint32_t nargs,
+@@ -165,6 +166,17 @@ static void rtas_start_cpu(PowerPCCPU *callcpu, sPAPRMachineState *spapr,
+     if (!pcc->interrupts_big_endian(callcpu)) {
+         lpcr |= LPCR_ILE;
+     }
++    if (env->mmu_model == POWERPC_MMU_3_00) {
++        /*
++         * New cpus are expected to start in the same radix/hash mode
++         * as the existing CPUs
++         */
++        if (ppc64_radix_guest(callcpu)) {
++            lpcr |= LPCR_UPRT | LPCR_GTSE;
++        } else {
++            lpcr &= ~(LPCR_UPRT | LPCR_GTSE);
++        }
++    }
+     ppc_store_lpcr(newcpu, lpcr);
+ 
+     /*
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 3fd380dad6..d92a84c622 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -8914,22 +8914,6 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp)
+     lpcr->default_value &= ~LPCR_RMLS;
+     lpcr->default_value |= 1ull << LPCR_RMLS_SHIFT;
+ 
+-    if (env->mmu_model == POWERPC_MMU_3_00) {
+-        /* By default we choose legacy mode and switch to new hash or radix
+-         * when a register process table hcall is made. So disable process
+-         * tables and guest translation shootdown by default
+-         *
+-         * Hot-plugged CPUs inherit from the guest radix setting under
+-         * KVM but not under TCG. Update the default LPCR to keep new
+-         * CPUs in sync when radix is enabled.
+-         */
+-        if (ppc64_radix_guest(cpu)) {
+-            lpcr->default_value |= LPCR_UPRT | LPCR_GTSE;
+-        } else {
+-            lpcr->default_value &= ~(LPCR_UPRT | LPCR_GTSE);
+-        }
+-    }
+-
+     /* Only enable Power-saving mode Exit Cause exceptions on the boot
+      * CPU. The RTAS command start-cpu will enable them on secondaries.
+      */
+-- 
+2.17.0
