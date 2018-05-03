@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fELHg-0002wG-A2
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:57:03 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fELJL-0004M3-7b
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:58:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fELHd-0005Jr-7D
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:57:00 -0400
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:39178)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1fELHc-0005EP-NA
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:56:57 -0400
-Received: by mail-lf0-x242.google.com with SMTP id j193-v6so27972764lfg.6
-	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 13:56:56 -0700 (PDT)
+	(envelope-from <no-reply@patchew.org>) id 1fELJI-0007F3-L7
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:58:43 -0400
+Resent-Message-Id: <E1fELJI-0007F3-L7@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21047)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fELJI-00076s-Aj
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:58:40 -0400
+In-Reply-To: <1525376963-79623-1-git-send-email-mst@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152538109981.2487.307613257303377035@71c20359a636>
 MIME-Version: 1.0
-References: <1524699938-6764-1-git-send-email-mjc@sifive.com>
-	<1524699938-6764-27-git-send-email-mjc@sifive.com>
-In-Reply-To: <1524699938-6764-27-git-send-email-mjc@sifive.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 03 May 2018 20:56:29 +0000
-Message-ID: <CAKmqyKPQbxEVNHSM7EC2NbkPfLoFy9cCJxGn9VCbxAKkf-3AtA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v8 26/35] RISC-V: Update CSR and interrupt
- definitions
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 3 May 2018 13:58:20 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 00/67] include path cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,796 +28,347 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, palmer@sifive.com, Alistair Francis <Alistair.Francis@wdc.com>, patches@groups.riscv.org
+To: mst@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org
 
-On Wed, Apr 25, 2018 at 5:02 PM Michael Clark <mjc@sifive.com> wrote:
-
-> * Add user-mode CSR defininitions.
-> * Reorder CSR definitions to match the specification.
-> * Change H mode interrupt comment to 'reserved'.
-> * Remove unused X_COP interrupt.
-> * Add user-mode and core-level interrupts.
-> * Remove erroneous until comemnts on machine mode interrupts.
-> * Move together paging mode and page table bit definitions.
-> * Move together interrupt and exception cause definitions.
-
-> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Cc: Palmer Dabbelt <palmer@sifive.com>
-> Cc: Alistair Francis <Alistair.Francis@wdc.com>
-> Signed-off-by: Michael Clark <mjc@sifive.com>
-
-I didn't check the values, but this looks sane.
-
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-
-Alistair
-
-> ---
->   target/riscv/cpu_bits.h  | 692
-+++++++++++++++++++++++++----------------------
->   target/riscv/op_helper.c |   4 +-
->   2 files changed, 376 insertions(+), 320 deletions(-)
-
-> diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
-> index 12b4757..878de62 100644
-> --- a/target/riscv/cpu_bits.h
-> +++ b/target/riscv/cpu_bits.h
-> @@ -6,242 +6,283 @@
->                    (((target_ulong)(val) * ((mask) & ~((mask) << 1))) & \
->                    (target_ulong)(mask)))
-
-> -#define PGSHIFT 12
-> -
-> -#define FSR_RD_SHIFT 5
-> -#define FSR_RD   (0x7 << FSR_RD_SHIFT)
-> -
-> -#define FPEXC_NX 0x01
-> -#define FPEXC_UF 0x02
-> -#define FPEXC_OF 0x04
-> -#define FPEXC_DZ 0x08
-> -#define FPEXC_NV 0x10
-> -
-> -#define FSR_AEXC_SHIFT 0
-> -#define FSR_NVA  (FPEXC_NV << FSR_AEXC_SHIFT)
-> -#define FSR_OFA  (FPEXC_OF << FSR_AEXC_SHIFT)
-> -#define FSR_UFA  (FPEXC_UF << FSR_AEXC_SHIFT)
-> -#define FSR_DZA  (FPEXC_DZ << FSR_AEXC_SHIFT)
-> -#define FSR_NXA  (FPEXC_NX << FSR_AEXC_SHIFT)
-> -#define FSR_AEXC (FSR_NVA | FSR_OFA | FSR_UFA | FSR_DZA | FSR_NXA)
-> -
-> -/* CSR numbers */
-> -#define CSR_FFLAGS 0x1
-> -#define CSR_FRM 0x2
-> -#define CSR_FCSR 0x3
-> -#define CSR_CYCLE 0xc00
-> -#define CSR_TIME 0xc01
-> -#define CSR_INSTRET 0xc02
-> -#define CSR_HPMCOUNTER3 0xc03
-> -#define CSR_HPMCOUNTER4 0xc04
-> -#define CSR_HPMCOUNTER5 0xc05
-> -#define CSR_HPMCOUNTER6 0xc06
-> -#define CSR_HPMCOUNTER7 0xc07
-> -#define CSR_HPMCOUNTER8 0xc08
-> -#define CSR_HPMCOUNTER9 0xc09
-> -#define CSR_HPMCOUNTER10 0xc0a
-> -#define CSR_HPMCOUNTER11 0xc0b
-> -#define CSR_HPMCOUNTER12 0xc0c
-> -#define CSR_HPMCOUNTER13 0xc0d
-> -#define CSR_HPMCOUNTER14 0xc0e
-> -#define CSR_HPMCOUNTER15 0xc0f
-> -#define CSR_HPMCOUNTER16 0xc10
-> -#define CSR_HPMCOUNTER17 0xc11
-> -#define CSR_HPMCOUNTER18 0xc12
-> -#define CSR_HPMCOUNTER19 0xc13
-> -#define CSR_HPMCOUNTER20 0xc14
-> -#define CSR_HPMCOUNTER21 0xc15
-> -#define CSR_HPMCOUNTER22 0xc16
-> -#define CSR_HPMCOUNTER23 0xc17
-> -#define CSR_HPMCOUNTER24 0xc18
-> -#define CSR_HPMCOUNTER25 0xc19
-> -#define CSR_HPMCOUNTER26 0xc1a
-> -#define CSR_HPMCOUNTER27 0xc1b
-> -#define CSR_HPMCOUNTER28 0xc1c
-> -#define CSR_HPMCOUNTER29 0xc1d
-> -#define CSR_HPMCOUNTER30 0xc1e
-> -#define CSR_HPMCOUNTER31 0xc1f
-> -#define CSR_SSTATUS 0x100
-> -#define CSR_SIE 0x104
-> -#define CSR_STVEC 0x105
-> -#define CSR_SCOUNTEREN 0x106
-> -#define CSR_SSCRATCH 0x140
-> -#define CSR_SEPC 0x141
-> -#define CSR_SCAUSE 0x142
-> -#define CSR_SBADADDR 0x143
-> -#define CSR_SIP 0x144
-> -#define CSR_SPTBR 0x180
-> -#define CSR_SATP 0x180
-> -#define CSR_MSTATUS 0x300
-> -#define CSR_MISA 0x301
-> -#define CSR_MEDELEG 0x302
-> -#define CSR_MIDELEG 0x303
-> -#define CSR_MIE 0x304
-> -#define CSR_MTVEC 0x305
-> -#define CSR_MCOUNTEREN 0x306
-> -#define CSR_MSCRATCH 0x340
-> -#define CSR_MEPC 0x341
-> -#define CSR_MCAUSE 0x342
-> -#define CSR_MBADADDR 0x343
-> -#define CSR_MIP 0x344
-> -#define CSR_PMPCFG0 0x3a0
-> -#define CSR_PMPCFG1 0x3a1
-> -#define CSR_PMPCFG2 0x3a2
-> -#define CSR_PMPCFG3 0x3a3
-> -#define CSR_PMPADDR0 0x3b0
-> -#define CSR_PMPADDR1 0x3b1
-> -#define CSR_PMPADDR2 0x3b2
-> -#define CSR_PMPADDR3 0x3b3
-> -#define CSR_PMPADDR4 0x3b4
-> -#define CSR_PMPADDR5 0x3b5
-> -#define CSR_PMPADDR6 0x3b6
-> -#define CSR_PMPADDR7 0x3b7
-> -#define CSR_PMPADDR8 0x3b8
-> -#define CSR_PMPADDR9 0x3b9
-> -#define CSR_PMPADDR10 0x3ba
-> -#define CSR_PMPADDR11 0x3bb
-> -#define CSR_PMPADDR12 0x3bc
-> -#define CSR_PMPADDR13 0x3bd
-> -#define CSR_PMPADDR14 0x3be
-> -#define CSR_PMPADDR15 0x3bf
-> -#define CSR_TSELECT 0x7a0
-> -#define CSR_TDATA1 0x7a1
-> -#define CSR_TDATA2 0x7a2
-> -#define CSR_TDATA3 0x7a3
-> -#define CSR_DCSR 0x7b0
-> -#define CSR_DPC 0x7b1
-> -#define CSR_DSCRATCH 0x7b2
-> -#define CSR_MCYCLE 0xb00
-> -#define CSR_MINSTRET 0xb02
-> -#define CSR_MHPMCOUNTER3 0xb03
-> -#define CSR_MHPMCOUNTER4 0xb04
-> -#define CSR_MHPMCOUNTER5 0xb05
-> -#define CSR_MHPMCOUNTER6 0xb06
-> -#define CSR_MHPMCOUNTER7 0xb07
-> -#define CSR_MHPMCOUNTER8 0xb08
-> -#define CSR_MHPMCOUNTER9 0xb09
-> -#define CSR_MHPMCOUNTER10 0xb0a
-> -#define CSR_MHPMCOUNTER11 0xb0b
-> -#define CSR_MHPMCOUNTER12 0xb0c
-> -#define CSR_MHPMCOUNTER13 0xb0d
-> -#define CSR_MHPMCOUNTER14 0xb0e
-> -#define CSR_MHPMCOUNTER15 0xb0f
-> -#define CSR_MHPMCOUNTER16 0xb10
-> -#define CSR_MHPMCOUNTER17 0xb11
-> -#define CSR_MHPMCOUNTER18 0xb12
-> -#define CSR_MHPMCOUNTER19 0xb13
-> -#define CSR_MHPMCOUNTER20 0xb14
-> -#define CSR_MHPMCOUNTER21 0xb15
-> -#define CSR_MHPMCOUNTER22 0xb16
-> -#define CSR_MHPMCOUNTER23 0xb17
-> -#define CSR_MHPMCOUNTER24 0xb18
-> -#define CSR_MHPMCOUNTER25 0xb19
-> -#define CSR_MHPMCOUNTER26 0xb1a
-> -#define CSR_MHPMCOUNTER27 0xb1b
-> -#define CSR_MHPMCOUNTER28 0xb1c
-> -#define CSR_MHPMCOUNTER29 0xb1d
-> -#define CSR_MHPMCOUNTER30 0xb1e
-> -#define CSR_MHPMCOUNTER31 0xb1f
-> -#define CSR_MUCOUNTEREN 0x320
-> -#define CSR_MSCOUNTEREN 0x321
-> -#define CSR_MHPMEVENT3 0x323
-> -#define CSR_MHPMEVENT4 0x324
-> -#define CSR_MHPMEVENT5 0x325
-> -#define CSR_MHPMEVENT6 0x326
-> -#define CSR_MHPMEVENT7 0x327
-> -#define CSR_MHPMEVENT8 0x328
-> -#define CSR_MHPMEVENT9 0x329
-> -#define CSR_MHPMEVENT10 0x32a
-> -#define CSR_MHPMEVENT11 0x32b
-> -#define CSR_MHPMEVENT12 0x32c
-> -#define CSR_MHPMEVENT13 0x32d
-> -#define CSR_MHPMEVENT14 0x32e
-> -#define CSR_MHPMEVENT15 0x32f
-> -#define CSR_MHPMEVENT16 0x330
-> -#define CSR_MHPMEVENT17 0x331
-> -#define CSR_MHPMEVENT18 0x332
-> -#define CSR_MHPMEVENT19 0x333
-> -#define CSR_MHPMEVENT20 0x334
-> -#define CSR_MHPMEVENT21 0x335
-> -#define CSR_MHPMEVENT22 0x336
-> -#define CSR_MHPMEVENT23 0x337
-> -#define CSR_MHPMEVENT24 0x338
-> -#define CSR_MHPMEVENT25 0x339
-> -#define CSR_MHPMEVENT26 0x33a
-> -#define CSR_MHPMEVENT27 0x33b
-> -#define CSR_MHPMEVENT28 0x33c
-> -#define CSR_MHPMEVENT29 0x33d
-> -#define CSR_MHPMEVENT30 0x33e
-> -#define CSR_MHPMEVENT31 0x33f
-> -#define CSR_MVENDORID 0xf11
-> -#define CSR_MARCHID 0xf12
-> -#define CSR_MIMPID 0xf13
-> -#define CSR_MHARTID 0xf14
-> -#define CSR_CYCLEH 0xc80
-> -#define CSR_TIMEH 0xc81
-> -#define CSR_INSTRETH 0xc82
-> -#define CSR_HPMCOUNTER3H 0xc83
-> -#define CSR_HPMCOUNTER4H 0xc84
-> -#define CSR_HPMCOUNTER5H 0xc85
-> -#define CSR_HPMCOUNTER6H 0xc86
-> -#define CSR_HPMCOUNTER7H 0xc87
-> -#define CSR_HPMCOUNTER8H 0xc88
-> -#define CSR_HPMCOUNTER9H 0xc89
-> -#define CSR_HPMCOUNTER10H 0xc8a
-> -#define CSR_HPMCOUNTER11H 0xc8b
-> -#define CSR_HPMCOUNTER12H 0xc8c
-> -#define CSR_HPMCOUNTER13H 0xc8d
-> -#define CSR_HPMCOUNTER14H 0xc8e
-> -#define CSR_HPMCOUNTER15H 0xc8f
-> -#define CSR_HPMCOUNTER16H 0xc90
-> -#define CSR_HPMCOUNTER17H 0xc91
-> -#define CSR_HPMCOUNTER18H 0xc92
-> -#define CSR_HPMCOUNTER19H 0xc93
-> -#define CSR_HPMCOUNTER20H 0xc94
-> -#define CSR_HPMCOUNTER21H 0xc95
-> -#define CSR_HPMCOUNTER22H 0xc96
-> -#define CSR_HPMCOUNTER23H 0xc97
-> -#define CSR_HPMCOUNTER24H 0xc98
-> -#define CSR_HPMCOUNTER25H 0xc99
-> -#define CSR_HPMCOUNTER26H 0xc9a
-> -#define CSR_HPMCOUNTER27H 0xc9b
-> -#define CSR_HPMCOUNTER28H 0xc9c
-> -#define CSR_HPMCOUNTER29H 0xc9d
-> -#define CSR_HPMCOUNTER30H 0xc9e
-> -#define CSR_HPMCOUNTER31H 0xc9f
-> -#define CSR_MCYCLEH 0xb80
-> -#define CSR_MINSTRETH 0xb82
-> -#define CSR_MHPMCOUNTER3H 0xb83
-> -#define CSR_MHPMCOUNTER4H 0xb84
-> -#define CSR_MHPMCOUNTER5H 0xb85
-> -#define CSR_MHPMCOUNTER6H 0xb86
-> -#define CSR_MHPMCOUNTER7H 0xb87
-> -#define CSR_MHPMCOUNTER8H 0xb88
-> -#define CSR_MHPMCOUNTER9H 0xb89
-> -#define CSR_MHPMCOUNTER10H 0xb8a
-> -#define CSR_MHPMCOUNTER11H 0xb8b
-> -#define CSR_MHPMCOUNTER12H 0xb8c
-> -#define CSR_MHPMCOUNTER13H 0xb8d
-> -#define CSR_MHPMCOUNTER14H 0xb8e
-> -#define CSR_MHPMCOUNTER15H 0xb8f
-> -#define CSR_MHPMCOUNTER16H 0xb90
-> -#define CSR_MHPMCOUNTER17H 0xb91
-> -#define CSR_MHPMCOUNTER18H 0xb92
-> -#define CSR_MHPMCOUNTER19H 0xb93
-> -#define CSR_MHPMCOUNTER20H 0xb94
-> -#define CSR_MHPMCOUNTER21H 0xb95
-> -#define CSR_MHPMCOUNTER22H 0xb96
-> -#define CSR_MHPMCOUNTER23H 0xb97
-> -#define CSR_MHPMCOUNTER24H 0xb98
-> -#define CSR_MHPMCOUNTER25H 0xb99
-> -#define CSR_MHPMCOUNTER26H 0xb9a
-> -#define CSR_MHPMCOUNTER27H 0xb9b
-> -#define CSR_MHPMCOUNTER28H 0xb9c
-> -#define CSR_MHPMCOUNTER29H 0xb9d
-> -#define CSR_MHPMCOUNTER30H 0xb9e
-> -#define CSR_MHPMCOUNTER31H 0xb9f
-> -
-> -/* mstatus bits */
-> +/* Floating point round mode */
-> +#define FSR_RD_SHIFT        5
-> +#define FSR_RD              (0x7 << FSR_RD_SHIFT)
-> +
-> +/* Floating point accrued exception flags */
-> +#define FPEXC_NX            0x01
-> +#define FPEXC_UF            0x02
-> +#define FPEXC_OF            0x04
-> +#define FPEXC_DZ            0x08
-> +#define FPEXC_NV            0x10
-> +
-> +/* Floating point status register bits */
-> +#define FSR_AEXC_SHIFT      0
-> +#define FSR_NVA             (FPEXC_NV << FSR_AEXC_SHIFT)
-> +#define FSR_OFA             (FPEXC_OF << FSR_AEXC_SHIFT)
-> +#define FSR_UFA             (FPEXC_UF << FSR_AEXC_SHIFT)
-> +#define FSR_DZA             (FPEXC_DZ << FSR_AEXC_SHIFT)
-> +#define FSR_NXA             (FPEXC_NX << FSR_AEXC_SHIFT)
-> +#define FSR_AEXC            (FSR_NVA | FSR_OFA | FSR_UFA | FSR_DZA |
-FSR_NXA)
-> +
-> +/* Control and Status Registers */
-> +
-> +/* User Trap Setup */
-> +#define CSR_USTATUS         0x000
-> +#define CSR_UIE             0x004
-> +#define CSR_UTVEC           0x005
-> +
-> +/* User Trap Handling */
-> +#define CSR_USCRATCH        0x040
-> +#define CSR_UEPC            0x041
-> +#define CSR_UCAUSE          0x042
-> +#define CSR_UTVAL           0x043
-> +#define CSR_UIP             0x044
-> +
-> +/* User Floating-Point CSRs */
-> +#define CSR_FFLAGS          0x001
-> +#define CSR_FRM             0x002
-> +#define CSR_FCSR            0x003
-> +
-> +/* User Timers and Counters */
-> +#define CSR_CYCLE           0xc00
-> +#define CSR_TIME            0xc01
-> +#define CSR_INSTRET         0xc02
-> +#define CSR_HPMCOUNTER3     0xc03
-> +#define CSR_HPMCOUNTER4     0xc04
-> +#define CSR_HPMCOUNTER5     0xc05
-> +#define CSR_HPMCOUNTER6     0xc06
-> +#define CSR_HPMCOUNTER7     0xc07
-> +#define CSR_HPMCOUNTER8     0xc08
-> +#define CSR_HPMCOUNTER9     0xc09
-> +#define CSR_HPMCOUNTER10    0xc0a
-> +#define CSR_HPMCOUNTER11    0xc0b
-> +#define CSR_HPMCOUNTER12    0xc0c
-> +#define CSR_HPMCOUNTER13    0xc0d
-> +#define CSR_HPMCOUNTER14    0xc0e
-> +#define CSR_HPMCOUNTER15    0xc0f
-> +#define CSR_HPMCOUNTER16    0xc10
-> +#define CSR_HPMCOUNTER17    0xc11
-> +#define CSR_HPMCOUNTER18    0xc12
-> +#define CSR_HPMCOUNTER19    0xc13
-> +#define CSR_HPMCOUNTER20    0xc14
-> +#define CSR_HPMCOUNTER21    0xc15
-> +#define CSR_HPMCOUNTER22    0xc16
-> +#define CSR_HPMCOUNTER23    0xc17
-> +#define CSR_HPMCOUNTER24    0xc18
-> +#define CSR_HPMCOUNTER25    0xc19
-> +#define CSR_HPMCOUNTER26    0xc1a
-> +#define CSR_HPMCOUNTER27    0xc1b
-> +#define CSR_HPMCOUNTER28    0xc1c
-> +#define CSR_HPMCOUNTER29    0xc1d
-> +#define CSR_HPMCOUNTER30    0xc1e
-> +#define CSR_HPMCOUNTER31    0xc1f
-> +#define CSR_CYCLEH          0xc80
-> +#define CSR_TIMEH           0xc81
-> +#define CSR_INSTRETH        0xc82
-> +#define CSR_HPMCOUNTER3H    0xc83
-> +#define CSR_HPMCOUNTER4H    0xc84
-> +#define CSR_HPMCOUNTER5H    0xc85
-> +#define CSR_HPMCOUNTER6H    0xc86
-> +#define CSR_HPMCOUNTER7H    0xc87
-> +#define CSR_HPMCOUNTER8H    0xc88
-> +#define CSR_HPMCOUNTER9H    0xc89
-> +#define CSR_HPMCOUNTER10H   0xc8a
-> +#define CSR_HPMCOUNTER11H   0xc8b
-> +#define CSR_HPMCOUNTER12H   0xc8c
-> +#define CSR_HPMCOUNTER13H   0xc8d
-> +#define CSR_HPMCOUNTER14H   0xc8e
-> +#define CSR_HPMCOUNTER15H   0xc8f
-> +#define CSR_HPMCOUNTER16H   0xc90
-> +#define CSR_HPMCOUNTER17H   0xc91
-> +#define CSR_HPMCOUNTER18H   0xc92
-> +#define CSR_HPMCOUNTER19H   0xc93
-> +#define CSR_HPMCOUNTER20H   0xc94
-> +#define CSR_HPMCOUNTER21H   0xc95
-> +#define CSR_HPMCOUNTER22H   0xc96
-> +#define CSR_HPMCOUNTER23H   0xc97
-> +#define CSR_HPMCOUNTER24H   0xc98
-> +#define CSR_HPMCOUNTER25H   0xc99
-> +#define CSR_HPMCOUNTER26H   0xc9a
-> +#define CSR_HPMCOUNTER27H   0xc9b
-> +#define CSR_HPMCOUNTER28H   0xc9c
-> +#define CSR_HPMCOUNTER29H   0xc9d
-> +#define CSR_HPMCOUNTER30H   0xc9e
-> +#define CSR_HPMCOUNTER31H   0xc9f
-> +
-> +/* Machine Timers and Counters */
-> +#define CSR_MCYCLE          0xb00
-> +#define CSR_MINSTRET        0xb02
-> +#define CSR_MCYCLEH         0xb80
-> +#define CSR_MINSTRETH       0xb82
-> +
-> +/* Machine Information Registers */
-> +#define CSR_MVENDORID       0xf11
-> +#define CSR_MARCHID         0xf12
-> +#define CSR_MIMPID          0xf13
-> +#define CSR_MHARTID         0xf14
-> +
-> +/* Machine Trap Setup */
-> +#define CSR_MSTATUS         0x300
-> +#define CSR_MISA            0x301
-> +#define CSR_MEDELEG         0x302
-> +#define CSR_MIDELEG         0x303
-> +#define CSR_MIE             0x304
-> +#define CSR_MTVEC           0x305
-> +#define CSR_MCOUNTEREN      0x306
-> +
-> +/* Legacy Counter Setup (priv v1.9.1) */
-> +#define CSR_MUCOUNTEREN     0x320
-> +#define CSR_MSCOUNTEREN     0x321
-> +
-> +/* Machine Trap Handling */
-> +#define CSR_MSCRATCH        0x340
-> +#define CSR_MEPC            0x341
-> +#define CSR_MCAUSE          0x342
-> +#define CSR_MBADADDR        0x343
-> +#define CSR_MIP             0x344
-> +
-> +/* Supervisor Trap Setup */
-> +#define CSR_SSTATUS         0x100
-> +#define CSR_SIE             0x104
-> +#define CSR_STVEC           0x105
-> +#define CSR_SCOUNTEREN      0x106
-> +
-> +/* Supervisor Trap Handling */
-> +#define CSR_SSCRATCH        0x140
-> +#define CSR_SEPC            0x141
-> +#define CSR_SCAUSE          0x142
-> +#define CSR_SBADADDR        0x143
-> +#define CSR_SIP             0x144
-> +
-> +/* Supervisor Protection and Translation */
-> +#define CSR_SPTBR           0x180
-> +#define CSR_SATP            0x180
-> +
-> +/* Physical Memory Protection */
-> +#define CSR_PMPCFG0         0x3a0
-> +#define CSR_PMPCFG1         0x3a1
-> +#define CSR_PMPCFG2         0x3a2
-> +#define CSR_PMPCFG3         0x3a3
-> +#define CSR_PMPADDR0        0x3b0
-> +#define CSR_PMPADDR1        0x3b1
-> +#define CSR_PMPADDR2        0x3b2
-> +#define CSR_PMPADDR3        0x3b3
-> +#define CSR_PMPADDR4        0x3b4
-> +#define CSR_PMPADDR5        0x3b5
-> +#define CSR_PMPADDR6        0x3b6
-> +#define CSR_PMPADDR7        0x3b7
-> +#define CSR_PMPADDR8        0x3b8
-> +#define CSR_PMPADDR9        0x3b9
-> +#define CSR_PMPADDR10       0x3ba
-> +#define CSR_PMPADDR11       0x3bb
-> +#define CSR_PMPADDR12       0x3bc
-> +#define CSR_PMPADDR13       0x3bd
-> +#define CSR_PMPADDR14       0x3be
-> +#define CSR_PMPADDR15       0x3bf
-> +
-> +/* Debug/Trace Registers (shared with Debug Mode) */
-> +#define CSR_TSELECT         0x7a0
-> +#define CSR_TDATA1          0x7a1
-> +#define CSR_TDATA2          0x7a2
-> +#define CSR_TDATA3          0x7a3
-> +
-> +/* Debug Mode Registers */
-> +#define CSR_DCSR            0x7b0
-> +#define CSR_DPC             0x7b1
-> +#define CSR_DSCRATCH        0x7b2
-> +
-> +/* Performance Counters */
-> +#define CSR_MHPMCOUNTER3    0xb03
-> +#define CSR_MHPMCOUNTER4    0xb04
-> +#define CSR_MHPMCOUNTER5    0xb05
-> +#define CSR_MHPMCOUNTER6    0xb06
-> +#define CSR_MHPMCOUNTER7    0xb07
-> +#define CSR_MHPMCOUNTER8    0xb08
-> +#define CSR_MHPMCOUNTER9    0xb09
-> +#define CSR_MHPMCOUNTER10   0xb0a
-> +#define CSR_MHPMCOUNTER11   0xb0b
-> +#define CSR_MHPMCOUNTER12   0xb0c
-> +#define CSR_MHPMCOUNTER13   0xb0d
-> +#define CSR_MHPMCOUNTER14   0xb0e
-> +#define CSR_MHPMCOUNTER15   0xb0f
-> +#define CSR_MHPMCOUNTER16   0xb10
-> +#define CSR_MHPMCOUNTER17   0xb11
-> +#define CSR_MHPMCOUNTER18   0xb12
-> +#define CSR_MHPMCOUNTER19   0xb13
-> +#define CSR_MHPMCOUNTER20   0xb14
-> +#define CSR_MHPMCOUNTER21   0xb15
-> +#define CSR_MHPMCOUNTER22   0xb16
-> +#define CSR_MHPMCOUNTER23   0xb17
-> +#define CSR_MHPMCOUNTER24   0xb18
-> +#define CSR_MHPMCOUNTER25   0xb19
-> +#define CSR_MHPMCOUNTER26   0xb1a
-> +#define CSR_MHPMCOUNTER27   0xb1b
-> +#define CSR_MHPMCOUNTER28   0xb1c
-> +#define CSR_MHPMCOUNTER29   0xb1d
-> +#define CSR_MHPMCOUNTER30   0xb1e
-> +#define CSR_MHPMCOUNTER31   0xb1f
-> +#define CSR_MHPMEVENT3      0x323
-> +#define CSR_MHPMEVENT4      0x324
-> +#define CSR_MHPMEVENT5      0x325
-> +#define CSR_MHPMEVENT6      0x326
-> +#define CSR_MHPMEVENT7      0x327
-> +#define CSR_MHPMEVENT8      0x328
-> +#define CSR_MHPMEVENT9      0x329
-> +#define CSR_MHPMEVENT10     0x32a
-> +#define CSR_MHPMEVENT11     0x32b
-> +#define CSR_MHPMEVENT12     0x32c
-> +#define CSR_MHPMEVENT13     0x32d
-> +#define CSR_MHPMEVENT14     0x32e
-> +#define CSR_MHPMEVENT15     0x32f
-> +#define CSR_MHPMEVENT16     0x330
-> +#define CSR_MHPMEVENT17     0x331
-> +#define CSR_MHPMEVENT18     0x332
-> +#define CSR_MHPMEVENT19     0x333
-> +#define CSR_MHPMEVENT20     0x334
-> +#define CSR_MHPMEVENT21     0x335
-> +#define CSR_MHPMEVENT22     0x336
-> +#define CSR_MHPMEVENT23     0x337
-> +#define CSR_MHPMEVENT24     0x338
-> +#define CSR_MHPMEVENT25     0x339
-> +#define CSR_MHPMEVENT26     0x33a
-> +#define CSR_MHPMEVENT27     0x33b
-> +#define CSR_MHPMEVENT28     0x33c
-> +#define CSR_MHPMEVENT29     0x33d
-> +#define CSR_MHPMEVENT30     0x33e
-> +#define CSR_MHPMEVENT31     0x33f
-> +#define CSR_MHPMCOUNTER3H   0xb83
-> +#define CSR_MHPMCOUNTER4H   0xb84
-> +#define CSR_MHPMCOUNTER5H   0xb85
-> +#define CSR_MHPMCOUNTER6H   0xb86
-> +#define CSR_MHPMCOUNTER7H   0xb87
-> +#define CSR_MHPMCOUNTER8H   0xb88
-> +#define CSR_MHPMCOUNTER9H   0xb89
-> +#define CSR_MHPMCOUNTER10H  0xb8a
-> +#define CSR_MHPMCOUNTER11H  0xb8b
-> +#define CSR_MHPMCOUNTER12H  0xb8c
-> +#define CSR_MHPMCOUNTER13H  0xb8d
-> +#define CSR_MHPMCOUNTER14H  0xb8e
-> +#define CSR_MHPMCOUNTER15H  0xb8f
-> +#define CSR_MHPMCOUNTER16H  0xb90
-> +#define CSR_MHPMCOUNTER17H  0xb91
-> +#define CSR_MHPMCOUNTER18H  0xb92
-> +#define CSR_MHPMCOUNTER19H  0xb93
-> +#define CSR_MHPMCOUNTER20H  0xb94
-> +#define CSR_MHPMCOUNTER21H  0xb95
-> +#define CSR_MHPMCOUNTER22H  0xb96
-> +#define CSR_MHPMCOUNTER23H  0xb97
-> +#define CSR_MHPMCOUNTER24H  0xb98
-> +#define CSR_MHPMCOUNTER25H  0xb99
-> +#define CSR_MHPMCOUNTER26H  0xb9a
-> +#define CSR_MHPMCOUNTER27H  0xb9b
-> +#define CSR_MHPMCOUNTER28H  0xb9c
-> +#define CSR_MHPMCOUNTER29H  0xb9d
-> +#define CSR_MHPMCOUNTER30H  0xb9e
-> +#define CSR_MHPMCOUNTER31H  0xb9f
-> +
-> +/* mstatus CSR bits */
->   #define MSTATUS_UIE         0x00000001
->   #define MSTATUS_SIE         0x00000002
->   #define MSTATUS_HIE         0x00000004
-> @@ -276,7 +317,7 @@
->   #define MSTATUS_SD MSTATUS64_SD
->   #endif
-
-> -/* sstatus bits */
-> +/* sstatus CSR bits */
->   #define SSTATUS_UIE         0x00000001
->   #define SSTATUS_SIE         0x00000002
->   #define SSTATUS_UPIE        0x00000010
-> @@ -297,83 +338,71 @@
->   #define SSTATUS_SD SSTATUS64_SD
->   #endif
-
-> -/* irqs */
-> -#define MIP_SSIP            (1 << IRQ_S_SOFT)
-> -#define MIP_HSIP            (1 << IRQ_H_SOFT)
-> -#define MIP_MSIP            (1 << IRQ_M_SOFT)
-> -#define MIP_STIP            (1 << IRQ_S_TIMER)
-> -#define MIP_HTIP            (1 << IRQ_H_TIMER)
-> -#define MIP_MTIP            (1 << IRQ_M_TIMER)
-> -#define MIP_SEIP            (1 << IRQ_S_EXT)
-> -#define MIP_HEIP            (1 << IRQ_H_EXT)
-> -#define MIP_MEIP            (1 << IRQ_M_EXT)
-> -
-> -#define SIP_SSIP            MIP_SSIP
-> -#define SIP_STIP            MIP_STIP
-> -#define SIP_SEIP            MIP_SEIP
-> -
-> +/* Privilege modes */
->   #define PRV_U 0
->   #define PRV_S 1
->   #define PRV_H 2
->   #define PRV_M 3
-
-> -/* privileged ISA 1.9.1 VM modes (mstatus.vm) */
-> -#define VM_1_09_MBARE 0
-> -#define VM_1_09_MBB   1
-> -#define VM_1_09_MBBID 2
-> -#define VM_1_09_SV32  8
-> -#define VM_1_09_SV39  9
-> -#define VM_1_09_SV48  10
-> -
-> -/* privileged ISA 1.10.0 VM modes (satp.mode) */
-> -#define VM_1_10_MBARE 0
-> -#define VM_1_10_SV32  1
-> -#define VM_1_10_SV39  8
-> -#define VM_1_10_SV48  9
-> -#define VM_1_10_SV57  10
-> -#define VM_1_10_SV64  11
-> -
-> -/* privileged ISA interrupt causes */
-> -#define IRQ_U_SOFT      0  /* since: priv-1.10 */
-> -#define IRQ_S_SOFT      1
-> -#define IRQ_H_SOFT      2  /* until: priv-1.9.1 */
-> -#define IRQ_M_SOFT      3  /* until: priv-1.9.1 */
-> -#define IRQ_U_TIMER     4  /* since: priv-1.10 */
-> -#define IRQ_S_TIMER     5
-> -#define IRQ_H_TIMER     6  /* until: priv-1.9.1 */
-> -#define IRQ_M_TIMER     7  /* until: priv-1.9.1 */
-> -#define IRQ_U_EXT       8  /* since: priv-1.10 */
-> -#define IRQ_S_EXT       9
-> -#define IRQ_H_EXT       10 /* until: priv-1.9.1 */
-> -#define IRQ_M_EXT       11 /* until: priv-1.9.1 */
-> -#define IRQ_X_COP       12 /* non-standard */
-> -
-> -/* Default addresses */
-> -#define DEFAULT_RSTVEC     0x00001000
-> -
-> -/* RV32 satp field masks */
-> -#define SATP32_MODE 0x80000000
-> -#define SATP32_ASID 0x7fc00000
-> -#define SATP32_PPN  0x003fffff
-> -
-> -/* RV64 satp field masks */
-> -#define SATP64_MODE 0xF000000000000000ULL
-> -#define SATP64_ASID 0x0FFFF00000000000ULL
-> -#define SATP64_PPN  0x00000FFFFFFFFFFFULL
-> +/* RV32 satp CSR field masks */
-> +#define SATP32_MODE         0x80000000
-> +#define SATP32_ASID         0x7fc00000
-> +#define SATP32_PPN          0x003fffff
-> +
-> +/* RV64 satp CSR field masks */
-> +#define SATP64_MODE         0xF000000000000000ULL
-> +#define SATP64_ASID         0x0FFFF00000000000ULL
-> +#define SATP64_PPN          0x00000FFFFFFFFFFFULL
-
->   #if defined(TARGET_RISCV32)
-> -#define SATP_MODE SATP32_MODE
-> -#define SATP_ASID SATP32_ASID
-> -#define SATP_PPN  SATP32_PPN
-> +#define SATP_MODE           SATP32_MODE
-> +#define SATP_ASID           SATP32_ASID
-> +#define SATP_PPN            SATP32_PPN
->   #endif
->   #if defined(TARGET_RISCV64)
-> -#define SATP_MODE SATP64_MODE
-> -#define SATP_ASID SATP64_ASID
-> -#define SATP_PPN  SATP64_PPN
-> +#define SATP_MODE           SATP64_MODE
-> +#define SATP_ASID           SATP64_ASID
-> +#define SATP_PPN            SATP64_PPN
->   #endif
-
-> -/* RISCV Exception Codes */
-> -#define EXCP_NONE                       -1 /* not a real RISCV exception
-code */
-> +/* VM modes (mstatus.vm) privileged ISA 1.9.1 */
-> +#define VM_1_09_MBARE       0
-> +#define VM_1_09_MBB         1
-> +#define VM_1_09_MBBID       2
-> +#define VM_1_09_SV32        8
-> +#define VM_1_09_SV39        9
-> +#define VM_1_09_SV48        10
-> +
-> +/* VM modes (satp.mode) privileged ISA 1.10 */
-> +#define VM_1_10_MBARE       0
-> +#define VM_1_10_SV32        1
-> +#define VM_1_10_SV39        8
-> +#define VM_1_10_SV48        9
-> +#define VM_1_10_SV57        10
-> +#define VM_1_10_SV64        11
-> +
-> +/* Page table entry (PTE) fields */
-> +#define PTE_V               0x001 /* Valid */
-> +#define PTE_R               0x002 /* Read */
-> +#define PTE_W               0x004 /* Write */
-> +#define PTE_X               0x008 /* Execute */
-> +#define PTE_U               0x010 /* User */
-> +#define PTE_G               0x020 /* Global */
-> +#define PTE_A               0x040 /* Accessed */
-> +#define PTE_D               0x080 /* Dirty */
-> +#define PTE_SOFT            0x300 /* Reserved for Software */
-> +
-> +/* Page table PPN shift amount */
-> +#define PTE_PPN_SHIFT       10
-> +
-> +/* Leaf page shift amount */
-> +#define PGSHIFT             12
-> +
-> +/* Default Reset Vector adress */
-> +#define DEFAULT_RSTVEC      0x1000
-> +
-> +/* Exception causes */
-> +#define EXCP_NONE                          -1 /* sentinel value */
->   #define RISCV_EXCP_INST_ADDR_MIS           0x0
->   #define RISCV_EXCP_INST_ACCESS_FAULT       0x1
->   #define RISCV_EXCP_ILLEGAL_INST            0x2
-> @@ -382,9 +411,7 @@
->   #define RISCV_EXCP_LOAD_ACCESS_FAULT       0x5
->   #define RISCV_EXCP_STORE_AMO_ADDR_MIS      0x6
->   #define RISCV_EXCP_STORE_AMO_ACCESS_FAULT  0x7
-> -#define RISCV_EXCP_U_ECALL                 0x8 /* for convenience,
-report all
-> -                                                  ECALLs as this, handler
-> -                                                  fixes */
-> +#define RISCV_EXCP_U_ECALL                 0x8
->   #define RISCV_EXCP_S_ECALL                 0x9
->   #define RISCV_EXCP_H_ECALL                 0xa
->   #define RISCV_EXCP_M_ECALL                 0xb
-> @@ -395,15 +422,44 @@
->   #define RISCV_EXCP_INT_FLAG                0x80000000
->   #define RISCV_EXCP_INT_MASK                0x7fffffff
-
-> -/* page table entry (PTE) fields */
-> -#define PTE_V     0x001 /* Valid */
-> -#define PTE_R     0x002 /* Read */
-> -#define PTE_W     0x004 /* Write */
-> -#define PTE_X     0x008 /* Execute */
-> -#define PTE_U     0x010 /* User */
-> -#define PTE_G     0x020 /* Global */
-> -#define PTE_A     0x040 /* Accessed */
-> -#define PTE_D     0x080 /* Dirty */
-> -#define PTE_SOFT  0x300 /* Reserved for Software */
-> -
-> -#define PTE_PPN_SHIFT 10
-> +/* Interrupt causes */
-> +#define IRQ_U_SOFT                         0
-> +#define IRQ_S_SOFT                         1
-> +#define IRQ_H_SOFT                         2  /* reserved */
-> +#define IRQ_M_SOFT                         3
-> +#define IRQ_U_TIMER                        4
-> +#define IRQ_S_TIMER                        5
-> +#define IRQ_H_TIMER                        6  /* reserved */
-> +#define IRQ_M_TIMER                        7
-> +#define IRQ_U_EXT                          8
-> +#define IRQ_S_EXT                          9
-> +#define IRQ_H_EXT                          10 /* reserved */
-> +#define IRQ_M_EXT                          11
-> +#define IRQ_U_CORE                         12
-> +#define IRQ_S_CORE                         13
-> +#define IRQ_H_CORE                         14 /* reserved */
-> +#define IRQ_M_CORE                         15
-> +
-> +/* mip masks */
-> +#define MIP_USIP                           (1 << IRQ_U_SOFT)
-> +#define MIP_SSIP                           (1 << IRQ_S_SOFT)
-> +#define MIP_HSIP                           (1 << IRQ_H_SOFT)
-> +#define MIP_MSIP                           (1 << IRQ_M_SOFT)
-> +#define MIP_UTIP                           (1 << IRQ_U_TIMER)
-> +#define MIP_STIP                           (1 << IRQ_S_TIMER)
-> +#define MIP_HTIP                           (1 << IRQ_H_TIMER)
-> +#define MIP_MTIP                           (1 << IRQ_M_TIMER)
-> +#define MIP_UEIP                           (1 << IRQ_U_EXT)
-> +#define MIP_SEIP                           (1 << IRQ_S_EXT)
-> +#define MIP_HEIP                           (1 << IRQ_H_EXT)
-> +#define MIP_MEIP                           (1 << IRQ_M_EXT)
-> +#define MIP_UCIP                           (1 << IRQ_U_CORE)
-> +#define MIP_SCIP                           (1 << IRQ_S_CORE)
-> +#define MIP_HCIP                           (1 << IRQ_H_CORE)
-> +#define MIP_MCIP                           (1 << IRQ_M_CORE)
-> +
-> +/* sip masks */
-> +#define SIP_SSIP                           MIP_SSIP
-> +#define SIP_STIP                           MIP_STIP
-> +#define SIP_SEIP                           MIP_SEIP
-> +#define SIP_SCIP                           MIP_SCIP
-> diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
-> index 4b4d62b..9375331 100644
-> --- a/target/riscv/op_helper.c
-> +++ b/target/riscv/op_helper.c
-> @@ -90,8 +90,8 @@ void csr_write_helper(CPURISCVState *env, target_ulong
-val_to_write,
->           target_ulong csrno)
->   {
->   #ifndef CONFIG_USER_ONLY
-> -    uint64_t delegable_ints = MIP_SSIP | MIP_STIP | MIP_SEIP | (1 <<
-IRQ_X_COP);
-> -    uint64_t all_ints = delegable_ints | MIP_MSIP | MIP_MTIP;
-> +    uint64_t delegable_ints = MIP_SSIP | MIP_STIP | MIP_SEIP | MIP_SCIP;
-> +    uint64_t all_ints = delegable_ints | MIP_MSIP | MIP_MTIP | MIP_MCIP;
->   #endif
-
->       switch (csrno) {
-> --
-> 2.7.0
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MjUzNzY5NjMtNzk2MjMtMS1naXQtc2VuZC1lbWFpbC1tc3RAcmVkaGF0LmNv
+bQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAwLzY3XSBpbmNsdWRlIHBhdGggY2xlYW51
+cAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0
+b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0K
+CmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBj
+IGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdp
+dCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9y
+bWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAg
+ICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpl
+eGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIx
+ZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0
+Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8xNTI1
+Mzc2OTYzLTc5NjIzLTEtZ2l0LXNlbmQtZW1haWwtbXN0QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8x
+NTI1Mzc2OTYzLTc5NjIzLTEtZ2l0LXNlbmQtZW1haWwtbXN0QHJlZGhhdC5jb20KU3dpdGNoZWQg
+dG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpkZGE5NjQ3ZDcwIG1ha2U6IHNpbXBsaWZ5IHNvdXJjZSBp
+bmNsdWRlIHBhdGgKYjE1OGE3MTlmMyBsaW51eC11c2VyOiBhZGQgaW5jbHVkZSBkaXJlY3Rvcnkg
+aGVhZGVyCmIyYWU5ODQ0YzEgdGNnOiB1c2UgaW5jbHVkZSAidHJhbnNsYXRlLWFsbC5oIiBjb25z
+aXN0ZW50bHkKMzYxM2VjMTQ1MyB0YXJnZXQvczM5MHg6IGFkZCBpbmNsdWRlIGRpcmVjdG9yeSBo
+ZWFkZXIKZDAwOTEwYWZiMSBody9zMzkweDogdXNlIHRhcmdldCBoZWFkZXJzIGV4cGxpY2l0bHkK
+MTk0ZjZmOTk3NCBrdm06IHVzZSBpbmNsdWRlICJrdm1fcHBjLmgiIGNvbnNpc3RlbnRseQoyNTY1
+ODFjMWJlIGh3L25ldDogYWRkIGluY2x1ZGUgZGlyZWN0b3J5IGhlYWRlcgo0NDBlMTRiODhhIGh3
+L3MzOTB4OiBhZGQgaW5jbHVkZSBkaXJlY3RvcnkgaGVhZGVycwo4NGE4MWNiZGU1IGh3L3BwYzog
+YWRkIHRhcmdldCBoZWFkZXJzIGV4cGxpY2l0bHkKODdiZWJlZjYxMyB0YXJnZXQvcmlzY3Y6IGFk
+ZCBpbmNsdWRlIGRpcmVjdG9yeSBoZWFkZXIKZDAyY2NjYzIyMSBrdm06IHVzZSBpbmNsdWRlICJr
+dm1faTM4Ni5oIiBjb25zaXN0ZW50bHkKZjk1NDNlYTlkOCB0Y2c6IHVzZSBpbmNsdWRlICJ0Y2ct
+Z3ZlYy1kZXNjLmguaCIgY29uc2lzdGVudGx5CjUyYTc2ODVmNmYgYW1kX2lvbW11OiBhZGQgaW5j
+bHVkZSBkaXJlY3RvcnkgaGVhZGVyCjE4Yjk2NmE4ZmUgYW1kX2lvbW11OiBhZGQgaW5jbHVkZSBk
+aXJlY3RvcnkgaGVhZGVyCjFmODQxYmVjZTUgdGFyZ2V0L3BwYzogYWRkIGluY2x1ZGUgZGlyZWN0
+b3J5IGhlYWRlcnMKM2Q2OTQ1YmQ2YiB0YXJnZXQvYXJtOiBhZGQgaW5jbHVkZSBkaXJlY3Rvcnkg
+aGVhZGVycwo4NjNiYjAzYzVhIGh5cGVydjogYWRkIGluY2x1ZGUgZGlyZWN0b3J5IGhlYWRlcgox
+MDExMDY5ODg2IGhtcDogYWRkIGluY2x1ZGUgZGlyZWN0b3J5IGhlYWRlcgo1ZjFiZTgzYjBmIGt2
+bV9YWFg6IGFkZCBpbmNsdWRlIGRpcmVjdG9yeSBoZWFkZXJzCmE0ZjQ1YTAwMTIgdmlydGlvLXBj
+aTogYWRkIGluY2x1ZGUgZGlyZWN0b3J5IGhlYWRlcgo4ZTJmMmU0NzFlIHRjZy1vcDogdXNlIGlu
+Y2x1ZGUgInRjZy5oIiBjb25zaXN0ZW50bHkKZDljNDFlNTc4ZSBjcHUtcW9tOiBhZGQgaW5jbHVk
+ZSBkaXJlY3RvcnkgaGVhZGVycwpjZTE3YzQxMjAwIHRjZzogYWRkIGluY2x1ZGUgZGlyZWN0b3J5
+IGhlYWRlcnMKMTY5MDE4OWI1ZSB0Y2ctbGRzdC5pbmMuYzogcmVwbGFjZSBjb21tYW5kIGxpbmUg
+ZmxhZ3Mgd2l0aCBwcmVwcm9jZXNzb3IKNTE0M2JjMTQ1ZSB0cmFuc2xhdGUtYWxsOiBhZGQgaW5j
+bHVkZSBkaXJlY3RvcnkgaGVhZGVyCmNkMDc0ZDJiMmMgdGNnOiB1c2UgaW5jbHVkZSAidGNnLmgi
+IGNvbnNpc3RlbnRseQozNDE4YmYzMDczIHRjZy1wb29sLmluYy5jOiByZXBsYWNlIGNvbW1hbmQg
+bGluZSBmbGFncyB3aXRoIHByZXByb2Nlc3Nvcgo2NTNlOTNmZWZlIHRyYWNlOiBhZGQgaW5jbHVk
+ZSBkaXJlY3RvcnkgaGVhZGVycwo3NmUyMDdiZmIxIHRhcmdldDogcmVwbGFjZSBjb21tYW5kIGxp
+bmUgZmxhZ3Mgd2l0aCBwcmVwcm9jZXNzb3IKODFkOTU5MmM0NCBoZWxwZXI6IHJlcGxhY2UgY29t
+bWFuZCBsaW5lIGZsYWdzIHdpdGggcHJlcHJvY2Vzc29yCjI4N2EzYTg1YWEgdGNnOiBhZGQgaW5j
+bHVkZSBkaXJlY3RvcnkgaGVhZGVycwowOTEyZGJiNzBlIG1pZ3JhdGlvbjogYWRkIGluY2x1ZGUg
+ZGlyZWN0b3J5IGhlYWRlcnMKZTIzNGEyZjBhMyBody91c2I6IGFkZCBpbmNsdWRlIGRpcmVjdG9y
+eSBoZWFkZXIKMDg1NWFkNzQzMiBody9wcGM6IGFkZCBpbmNsdWRlIGRpcmVjdG9yeSBoZWFkZXJz
+CmJmZjViZjI2ZDYgaHcvbmV0OiBhZGQgaW5jbHVkZSBkaXJlY3RvcnkgaGVhZGVyCjUyMzg5NzE0
+MmYgdWk6IGFkZCBpbmNsdWRlIGRpcmVjdG9yeSBoZWFkZXIKYTg2YTgwYmQyOCB0YXJnZXQvY3Jp
+czogYWRkIGluY2x1ZGUgZGlyZWN0b3J5IGhlYWRlcgpiYzM1YjZjOWE5IGF1ZGlvOiBhZGQgaW5j
+bHVkZSBkaXJlY3RvcnkgaGVhZGVyCmM1YzQ5Nzk1Y2EgZnNkZXY6IGFkZCBpbmNsdWRlIGRpcmVj
+dG9yeSBoZWFkZXJzCjIxODRkYTI0ODcgOXBmczogYWRkIGluY2x1ZGUgZGlyZWN0b3J5IGhlYWRl
+cnMKY2ViZDBlNmQ1ZCByZXBsaWNhdGlvbjogYWRkIGluY2x1ZGUgZGlyZWN0b3J5IGhlYWRlcgo3
+ZmQ2YTQzZTljIGNwdTogcmVwbGFjZSBjb21tYW5kIGxpbmUgZmxhZ3Mgd2l0aCBwcmVwcm9jZXNz
+b3IKOGQ1OTAwMjgwYSBhcmNoX2luaXQ6IHNvcnQgYXJjaGl0ZWN0dXJlcwo1ZjNiZTJmMTZmIG5l
+dDogYWRkIGluY2x1ZGUgZGlyZWN0b3J5IGhlYWRlcnMKMjZlNjg4OTQ3YiBzbGlycDogYWRkIGlu
+Y2x1ZGUgZGlyZWN0b3J5IGhlYWRlcnMKNjc3YjVhNTIyMiB1aTogdXNlIGxvY2FsIHBhdGggZm9y
+IGxvY2FsIGhlYWRlcnMKYTJlOWQ3YjZkMCB0cmFjZTogdXNlIGxvY2FsIHBhdGggZm9yIGxvY2Fs
+IGhlYWRlcnMKYWI4ZTExZGJiMSB0ZXN0czogcmVsYXRpdmUgaW5jbHVkZSBmb3IgY2hpbGQgZGly
+ZWN0b3J5CjI1MDU5NjE4NjIgeHRlbnNhOiByZWxhdGl2ZSBpbmNsdWRlIGZvciBwYXJlbnQgZGly
+ZWN0b3J5CjA1NjFmNDY1YTkgcWdhOiB1c2UgbG9jYWwgcGF0aCBmb3IgbG9jYWwgaGVhZGVycwpm
+MDJlMTQ5Njg1IGNvbG86IHVzZSBsb2NhbCBwYXRoIGZvciBsb2NhbCBoZWFkZXJzCmY2M2ZmMWMx
+ZTUgbWlncmF0aW9uOiB1c2UgbG9jYWwgcGF0aCBmb3IgbG9jYWwgaGVhZGVycwowZTI5NDJlMzdh
+IHVzYjogdXNlIGxvY2FsIHBhdGggZm9yIGxvY2FsIGhlYWRlcnMKYTE3MDcwYWNmMSBzZDogZml4
+IHVwIGluY2x1ZGUKODA0ZWYwM2ZiOSB2aG9zdC1zY3NpOiBkcm9wIGFuIHVudXNlZCBpbmNsdWRl
+CmVkZWQ3OWI3YzUgcHBjOiB1c2UgbG9jYWwgcGF0aCBmb3IgbG9jYWwgaGVhZGVycwplMzUyZWQz
+NmM1IHJvY2tlcjogZHJvcCBhbiB1bnVzZWQgaW5jbHVkZQozMDNhM2Q0MDcyIGUxMDAwZTogdXNl
+IGxvY2FsIHBhdGggZm9yIGxvY2FsIGhlYWRlcnMKNGRmMDkxNmU1YyBpb2FwaWM6IGZpeCB1cCBp
+bmNsdWRlcwo0ZjUzM2NlMjVhIGlkZTogdXNlIGxvY2FsIHBhdGggZm9yIGxvY2FsIGhlYWRlcnMK
+M2FkMDNjNjc5ZCBkaXNwbGF5OiB1c2UgbG9jYWwgcGF0aCBmb3IgbG9jYWwgaGVhZGVycwplNTZj
+YjJhYjdjIHRyYWNlOiB1c2UgbG9jYWwgcGF0aCBmb3IgbG9jYWwgaGVhZGVycwo3MTFlNmZlOGY4
+IG1pZ3JhdGlvbjogZHJvcCBhbiB1bnVzZWQgaW5jbHVkZSwgYWRkIGEgdXNlZCBvbmUKZmRiYzBl
+NDVjMCBzMzkweDogZHJvcCBhbiB1bnVzZWQgaW5jbHVkZQphYmQ5YmJlNWVhIGhwcGE6IHVzZSBs
+b2NhbCBwYXRoIGZvciBsb2NhbCBoZWFkZXJzCjZjZTJlZDk2YzcgY3J5cHRvOiB1c2UgbG9jYWwg
+cGF0aCBmb3IgbG9jYWwgaGVhZGVycwpkNWNkODg3NjZjIGJsb2NrOiB1c2UgbG9jYWwgcGF0aCBm
+b3IgbG9jYWwgaGVhZGVycwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS82
+NzogYmxvY2s6IHVzZSBsb2NhbCBwYXRoIGZvciBsb2NhbCBoZWFkZXJzLi4uCkNoZWNraW5nIFBB
+VENIIDIvNjc6IGNyeXB0bzogdXNlIGxvY2FsIHBhdGggZm9yIGxvY2FsIGhlYWRlcnMuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMy82NzogaHBwYTogdXNlIGxvY2FsIHBhdGggZm9yIGxvY2FsIGhlYWRlcnMu
+Li4KQ2hlY2tpbmcgUEFUQ0ggNC82NzogczM5MHg6IGRyb3AgYW4gdW51c2VkIGluY2x1ZGUuLi4K
+Q2hlY2tpbmcgUEFUQ0ggNS82NzogbWlncmF0aW9uOiBkcm9wIGFuIHVudXNlZCBpbmNsdWRlLCBh
+ZGQgYSB1c2VkIG9uZS4uLgpDaGVja2luZyBQQVRDSCA2LzY3OiB0cmFjZTogdXNlIGxvY2FsIHBh
+dGggZm9yIGxvY2FsIGhlYWRlcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggNy82NzogZGlzcGxheTogdXNl
+IGxvY2FsIHBhdGggZm9yIGxvY2FsIGhlYWRlcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggOC82NzogaWRl
+OiB1c2UgbG9jYWwgcGF0aCBmb3IgbG9jYWwgaGVhZGVycy4uLgpDaGVja2luZyBQQVRDSCA5LzY3
+OiBpb2FwaWM6IGZpeCB1cCBpbmNsdWRlcy4uLgpDaGVja2luZyBQQVRDSCAxMC82NzogZTEwMDBl
+OiB1c2UgbG9jYWwgcGF0aCBmb3IgbG9jYWwgaGVhZGVycy4uLgpDaGVja2luZyBQQVRDSCAxMS82
+Nzogcm9ja2VyOiBkcm9wIGFuIHVudXNlZCBpbmNsdWRlLi4uCkNoZWNraW5nIFBBVENIIDEyLzY3
+OiBwcGM6IHVzZSBsb2NhbCBwYXRoIGZvciBsb2NhbCBoZWFkZXJzLi4uCkNoZWNraW5nIFBBVENI
+IDEzLzY3OiB2aG9zdC1zY3NpOiBkcm9wIGFuIHVudXNlZCBpbmNsdWRlLi4uCkNoZWNraW5nIFBB
+VENIIDE0LzY3OiBzZDogZml4IHVwIGluY2x1ZGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTUvNjc6IHVz
+YjogdXNlIGxvY2FsIHBhdGggZm9yIGxvY2FsIGhlYWRlcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTYv
+Njc6IG1pZ3JhdGlvbjogdXNlIGxvY2FsIHBhdGggZm9yIGxvY2FsIGhlYWRlcnMuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMTcvNjc6IGNvbG86IHVzZSBsb2NhbCBwYXRoIGZvciBsb2NhbCBoZWFkZXJzLi4u
+CkNoZWNraW5nIFBBVENIIDE4LzY3OiBxZ2E6IHVzZSBsb2NhbCBwYXRoIGZvciBsb2NhbCBoZWFk
+ZXJzLi4uCkNoZWNraW5nIFBBVENIIDE5LzY3OiB4dGVuc2E6IHJlbGF0aXZlIGluY2x1ZGUgZm9y
+IHBhcmVudCBkaXJlY3RvcnkuLi4KQ2hlY2tpbmcgUEFUQ0ggMjAvNjc6IHRlc3RzOiByZWxhdGl2
+ZSBpbmNsdWRlIGZvciBjaGlsZCBkaXJlY3RvcnkuLi4KQ2hlY2tpbmcgUEFUQ0ggMjEvNjc6IHRy
+YWNlOiB1c2UgbG9jYWwgcGF0aCBmb3IgbG9jYWwgaGVhZGVycy4uLgpDaGVja2luZyBQQVRDSCAy
+Mi82NzogdWk6IHVzZSBsb2NhbCBwYXRoIGZvciBsb2NhbCBoZWFkZXJzLi4uCkNoZWNraW5nIFBB
+VENIIDIzLzY3OiBzbGlycDogYWRkIGluY2x1ZGUgZGlyZWN0b3J5IGhlYWRlcnMuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMjQvNjc6IG5ldDogYWRkIGluY2x1ZGUgZGlyZWN0b3J5IGhlYWRlcnMuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMjUvNjc6IGFyY2hfaW5pdDogc29ydCBhcmNoaXRlY3R1cmVzLi4uCkNoZWNr
+aW5nIFBBVENIIDI2LzY3OiBjcHU6IHJlcGxhY2UgY29tbWFuZCBsaW5lIGZsYWdzIHdpdGggcHJl
+cHJvY2Vzc29yLi4uCkNoZWNraW5nIFBBVENIIDI3LzY3OiByZXBsaWNhdGlvbjogYWRkIGluY2x1
+ZGUgZGlyZWN0b3J5IGhlYWRlci4uLgpDaGVja2luZyBQQVRDSCAyOC82NzogOXBmczogYWRkIGlu
+Y2x1ZGUgZGlyZWN0b3J5IGhlYWRlcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMjkvNjc6IGZzZGV2OiBh
+ZGQgaW5jbHVkZSBkaXJlY3RvcnkgaGVhZGVycy4uLgpDaGVja2luZyBQQVRDSCAzMC82NzogYXVk
+aW86IGFkZCBpbmNsdWRlIGRpcmVjdG9yeSBoZWFkZXIuLi4KQ2hlY2tpbmcgUEFUQ0ggMzEvNjc6
+IHRhcmdldC9jcmlzOiBhZGQgaW5jbHVkZSBkaXJlY3RvcnkgaGVhZGVyLi4uCkNoZWNraW5nIFBB
+VENIIDMyLzY3OiB1aTogYWRkIGluY2x1ZGUgZGlyZWN0b3J5IGhlYWRlci4uLgpDaGVja2luZyBQ
+QVRDSCAzMy82NzogaHcvbmV0OiBhZGQgaW5jbHVkZSBkaXJlY3RvcnkgaGVhZGVyLi4uCkNoZWNr
+aW5nIFBBVENIIDM0LzY3OiBody9wcGM6IGFkZCBpbmNsdWRlIGRpcmVjdG9yeSBoZWFkZXJzLi4u
+CkNoZWNraW5nIFBBVENIIDM1LzY3OiBody91c2I6IGFkZCBpbmNsdWRlIGRpcmVjdG9yeSBoZWFk
+ZXIuLi4KQ2hlY2tpbmcgUEFUQ0ggMzYvNjc6IG1pZ3JhdGlvbjogYWRkIGluY2x1ZGUgZGlyZWN0
+b3J5IGhlYWRlcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMzcvNjc6IHRjZzogYWRkIGluY2x1ZGUgZGly
+ZWN0b3J5IGhlYWRlcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMzgvNjc6IGhlbHBlcjogcmVwbGFjZSBj
+b21tYW5kIGxpbmUgZmxhZ3Mgd2l0aCBwcmVwcm9jZXNzb3IuLi4KQ2hlY2tpbmcgUEFUQ0ggMzkv
+Njc6IHRhcmdldDogcmVwbGFjZSBjb21tYW5kIGxpbmUgZmxhZ3Mgd2l0aCBwcmVwcm9jZXNzb3Iu
+Li4KRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnLycgKGN0eDpWeFYpCiMzNDog
+RklMRTogaW5jbHVkZS90YXJnZXQtZGlyLmg6MTQ6CisjZGVmaW5lIFRBUkdFVF9ESVJfUFJFRklY
+IC4uL3RhcmdldC9hbHBoYQogICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBz
+cGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJy8nIChjdHg6VnhWKQojMzQ6IEZJTEU6IGluY2x1
+ZGUvdGFyZ2V0LWRpci5oOjE0OgorI2RlZmluZSBUQVJHRVRfRElSX1BSRUZJWCAuLi90YXJnZXQv
+YWxwaGEKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IE1hY3Jv
+cyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwoj
+MzQ6IEZJTEU6IGluY2x1ZGUvdGFyZ2V0LWRpci5oOjE0OgorI2RlZmluZSBUQVJHRVRfRElSX1BS
+RUZJWCAuLi90YXJnZXQvYWxwaGEKCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQg
+Jy8nIChjdHg6VnhWKQojMzY6IEZJTEU6IGluY2x1ZGUvdGFyZ2V0LWRpci5oOjE2OgorI2RlZmlu
+ZSBUQVJHRVRfRElSX1BSRUZJWCAuLi90YXJnZXQvYXJtCiAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnLycgKGN0eDpWeFYp
+CiMzNjogRklMRTogaW5jbHVkZS90YXJnZXQtZGlyLmg6MTY6CisjZGVmaW5lIFRBUkdFVF9ESVJf
+UFJFRklYIC4uL3RhcmdldC9hcm0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+XgoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBp
+biBwYXJlbnRoZXNpcwojMzY6IEZJTEU6IGluY2x1ZGUvdGFyZ2V0LWRpci5oOjE2OgorI2RlZmlu
+ZSBUQVJHRVRfRElSX1BSRUZJWCAuLi90YXJnZXQvYXJtCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVk
+IGFyb3VuZCB0aGF0ICcvJyAoY3R4OlZ4VikKIzM4OiBGSUxFOiBpbmNsdWRlL3RhcmdldC1kaXIu
+aDoxODoKKyNkZWZpbmUgVEFSR0VUX0RJUl9QUkVGSVggLi4vdGFyZ2V0L2NyaXMKICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0
+ICcvJyAoY3R4OlZ4VikKIzM4OiBGSUxFOiBpbmNsdWRlL3RhcmdldC1kaXIuaDoxODoKKyNkZWZp
+bmUgVEFSR0VUX0RJUl9QUkVGSVggLi4vdGFyZ2V0L2NyaXMKICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgXgoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3Vs
+ZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMzg6IEZJTEU6IGluY2x1ZGUvdGFyZ2V0LWRp
+ci5oOjE4OgorI2RlZmluZSBUQVJHRVRfRElSX1BSRUZJWCAuLi90YXJnZXQvY3JpcwoKRVJST1I6
+IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnLycgKGN0eDpWeFYpCiM0MDogRklMRTogaW5j
+bHVkZS90YXJnZXQtZGlyLmg6MjA6CisjZGVmaW5lIFRBUkdFVF9ESVJfUFJFRklYIC4uL3Rhcmdl
+dC9ocHBhCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1
+aXJlZCBhcm91bmQgdGhhdCAnLycgKGN0eDpWeFYpCiM0MDogRklMRTogaW5jbHVkZS90YXJnZXQt
+ZGlyLmg6MjA6CisjZGVmaW5lIFRBUkdFVF9ESVJfUFJFRklYIC4uL3RhcmdldC9ocHBhCiAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBNYWNyb3Mgd2l0aCBjb21w
+bGV4IHZhbHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMKIzQwOiBGSUxFOiBp
+bmNsdWRlL3RhcmdldC1kaXIuaDoyMDoKKyNkZWZpbmUgVEFSR0VUX0RJUl9QUkVGSVggLi4vdGFy
+Z2V0L2hwcGEKCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJy8nIChjdHg6VnhW
+KQojNDI6IEZJTEU6IGluY2x1ZGUvdGFyZ2V0LWRpci5oOjIyOgorI2RlZmluZSBUQVJHRVRfRElS
+X1BSRUZJWCAuLi90YXJnZXQvaTM4NgogICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVS
+Uk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJy8nIChjdHg6VnhWKQojNDI6IEZJTEU6
+IGluY2x1ZGUvdGFyZ2V0LWRpci5oOjIyOgorI2RlZmluZSBUQVJHRVRfRElSX1BSRUZJWCAuLi90
+YXJnZXQvaTM4NgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjog
+TWFjcm9zIHdpdGggY29tcGxleCB2YWx1ZXMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhl
+c2lzCiM0MjogRklMRTogaW5jbHVkZS90YXJnZXQtZGlyLmg6MjI6CisjZGVmaW5lIFRBUkdFVF9E
+SVJfUFJFRklYIC4uL3RhcmdldC9pMzg2CgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0
+aGF0ICcvJyAoY3R4OlZ4VikKIzQ0OiBGSUxFOiBpbmNsdWRlL3RhcmdldC1kaXIuaDoyNDoKKyNk
+ZWZpbmUgVEFSR0VUX0RJUl9QUkVGSVggLi4vdGFyZ2V0L2xtMzIKICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcvJyAoY3R4
+OlZ4VikKIzQ0OiBGSUxFOiBpbmNsdWRlL3RhcmdldC1kaXIuaDoyNDoKKyNkZWZpbmUgVEFSR0VU
+X0RJUl9QUkVGSVggLi4vdGFyZ2V0L2xtMzIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgXgoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNs
+b3NlZCBpbiBwYXJlbnRoZXNpcwojNDQ6IEZJTEU6IGluY2x1ZGUvdGFyZ2V0LWRpci5oOjI0Ogor
+I2RlZmluZSBUQVJHRVRfRElSX1BSRUZJWCAuLi90YXJnZXQvbG0zMgoKRVJST1I6IHNwYWNlcyBy
+ZXF1aXJlZCBhcm91bmQgdGhhdCAnLycgKGN0eDpWeFYpCiM0NjogRklMRTogaW5jbHVkZS90YXJn
+ZXQtZGlyLmg6MjY6CisjZGVmaW5lIFRBUkdFVF9ESVJfUFJFRklYIC4uL3RhcmdldC9tNjhrCiAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91
+bmQgdGhhdCAnLycgKGN0eDpWeFYpCiM0NjogRklMRTogaW5jbHVkZS90YXJnZXQtZGlyLmg6MjY6
+CisjZGVmaW5lIFRBUkdFVF9ESVJfUFJFRklYIC4uL3RhcmdldC9tNjhrCiAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBNYWNyb3Mgd2l0aCBjb21wbGV4IHZhbHVl
+cyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMKIzQ2OiBGSUxFOiBpbmNsdWRlL3Rh
+cmdldC1kaXIuaDoyNjoKKyNkZWZpbmUgVEFSR0VUX0RJUl9QUkVGSVggLi4vdGFyZ2V0L202OGsK
+CkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJy8nIChjdHg6VnhWKQojNDg6IEZJ
+TEU6IGluY2x1ZGUvdGFyZ2V0LWRpci5oOjI4OgorI2RlZmluZSBUQVJHRVRfRElSX1BSRUZJWCAu
+Li90YXJnZXQvbWljcm9ibGF6ZQogICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9S
+OiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJy8nIChjdHg6VnhWKQojNDg6IEZJTEU6IGlu
+Y2x1ZGUvdGFyZ2V0LWRpci5oOjI4OgorI2RlZmluZSBUQVJHRVRfRElSX1BSRUZJWCAuLi90YXJn
+ZXQvbWljcm9ibGF6ZQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJP
+UjogTWFjcm9zIHdpdGggY29tcGxleCB2YWx1ZXMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIHBhcmVu
+dGhlc2lzCiM0ODogRklMRTogaW5jbHVkZS90YXJnZXQtZGlyLmg6Mjg6CisjZGVmaW5lIFRBUkdF
+VF9ESVJfUFJFRklYIC4uL3RhcmdldC9taWNyb2JsYXplCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVk
+IGFyb3VuZCB0aGF0ICcvJyAoY3R4OlZ4VikKIzUwOiBGSUxFOiBpbmNsdWRlL3RhcmdldC1kaXIu
+aDozMDoKKyNkZWZpbmUgVEFSR0VUX0RJUl9QUkVGSVggLi4vdGFyZ2V0L21pcHMKICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0
+ICcvJyAoY3R4OlZ4VikKIzUwOiBGSUxFOiBpbmNsdWRlL3RhcmdldC1kaXIuaDozMDoKKyNkZWZp
+bmUgVEFSR0VUX0RJUl9QUkVGSVggLi4vdGFyZ2V0L21pcHMKICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgXgoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3Vs
+ZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNTA6IEZJTEU6IGluY2x1ZGUvdGFyZ2V0LWRp
+ci5oOjMwOgorI2RlZmluZSBUQVJHRVRfRElSX1BSRUZJWCAuLi90YXJnZXQvbWlwcwoKRVJST1I6
+IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnLycgKGN0eDpWeFYpCiM1MjogRklMRTogaW5j
+bHVkZS90YXJnZXQtZGlyLmg6MzI6CisjZGVmaW5lIFRBUkdFVF9ESVJfUFJFRklYIC4uL3Rhcmdl
+dC9tb3hpZQogICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVx
+dWlyZWQgYXJvdW5kIHRoYXQgJy8nIChjdHg6VnhWKQojNTI6IEZJTEU6IGluY2x1ZGUvdGFyZ2V0
+LWRpci5oOjMyOgorI2RlZmluZSBUQVJHRVRfRElSX1BSRUZJWCAuLi90YXJnZXQvbW94aWUKICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IE1hY3JvcyB3aXRoIGNv
+bXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojNTI6IEZJTEU6
+IGluY2x1ZGUvdGFyZ2V0LWRpci5oOjMyOgorI2RlZmluZSBUQVJHRVRfRElSX1BSRUZJWCAuLi90
+YXJnZXQvbW94aWUKCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJy8nIChjdHg6
+VnhWKQojNTQ6IEZJTEU6IGluY2x1ZGUvdGFyZ2V0LWRpci5oOjM0OgorI2RlZmluZSBUQVJHRVRf
+RElSX1BSRUZJWCAuLi90YXJnZXQvbmlvczIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICBe
+CgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcvJyAoY3R4OlZ4VikKIzU0OiBG
+SUxFOiBpbmNsdWRlL3RhcmdldC1kaXIuaDozNDoKKyNkZWZpbmUgVEFSR0VUX0RJUl9QUkVGSVgg
+Li4vdGFyZ2V0L25pb3MyCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVS
+Uk9SOiBNYWNyb3Mgd2l0aCBjb21wbGV4IHZhbHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gcGFy
+ZW50aGVzaXMKIzU0OiBGSUxFOiBpbmNsdWRlL3RhcmdldC1kaXIuaDozNDoKKyNkZWZpbmUgVEFS
+R0VUX0RJUl9QUkVGSVggLi4vdGFyZ2V0L25pb3MyCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFy
+b3VuZCB0aGF0ICcvJyAoY3R4OlZ4VikKIzU2OiBGSUxFOiBpbmNsdWRlL3RhcmdldC1kaXIuaDoz
+NjoKKyNkZWZpbmUgVEFSR0VUX0RJUl9QUkVGSVggLi4vdGFyZ2V0L29wZW5yaXNjCiAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhh
+dCAnLycgKGN0eDpWeFYpCiM1NjogRklMRTogaW5jbHVkZS90YXJnZXQtZGlyLmg6MzY6CisjZGVm
+aW5lIFRBUkdFVF9ESVJfUFJFRklYIC4uL3RhcmdldC9vcGVucmlzYwogICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogTWFjcm9zIHdpdGggY29tcGxleCB2YWx1ZXMg
+c2hvdWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lzCiM1NjogRklMRTogaW5jbHVkZS90YXJn
+ZXQtZGlyLmg6MzY6CisjZGVmaW5lIFRBUkdFVF9ESVJfUFJFRklYIC4uL3RhcmdldC9vcGVucmlz
+YwoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnLycgKGN0eDpWeFYpCiM1ODog
+RklMRTogaW5jbHVkZS90YXJnZXQtZGlyLmg6Mzg6CisjZGVmaW5lIFRBUkdFVF9ESVJfUFJFRklY
+IC4uL3RhcmdldC9wcGMKICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3Bh
+Y2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcvJyAoY3R4OlZ4VikKIzU4OiBGSUxFOiBpbmNsdWRl
+L3RhcmdldC1kaXIuaDozODoKKyNkZWZpbmUgVEFSR0VUX0RJUl9QUkVGSVggLi4vdGFyZ2V0L3Bw
+YwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogTWFjcm9zIHdp
+dGggY29tcGxleCB2YWx1ZXMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lzCiM1ODog
+RklMRTogaW5jbHVkZS90YXJnZXQtZGlyLmg6Mzg6CisjZGVmaW5lIFRBUkdFVF9ESVJfUFJFRklY
+IC4uL3RhcmdldC9wcGMKCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJy8nIChj
+dHg6VnhWKQojNjA6IEZJTEU6IGluY2x1ZGUvdGFyZ2V0LWRpci5oOjQwOgorI2RlZmluZSBUQVJH
+RVRfRElSX1BSRUZJWCAuLi90YXJnZXQvcmlzY3YKICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcvJyAoY3R4OlZ4VikKIzYw
+OiBGSUxFOiBpbmNsdWRlL3RhcmdldC1kaXIuaDo0MDoKKyNkZWZpbmUgVEFSR0VUX0RJUl9QUkVG
+SVggLi4vdGFyZ2V0L3Jpc2N2CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4K
+CkVSUk9SOiBNYWNyb3Mgd2l0aCBjb21wbGV4IHZhbHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4g
+cGFyZW50aGVzaXMKIzYwOiBGSUxFOiBpbmNsdWRlL3RhcmdldC1kaXIuaDo0MDoKKyNkZWZpbmUg
+VEFSR0VUX0RJUl9QUkVGSVggLi4vdGFyZ2V0L3Jpc2N2CgpFUlJPUjogc3BhY2VzIHJlcXVpcmVk
+IGFyb3VuZCB0aGF0ICcvJyAoY3R4OlZ4VikKIzYyOiBGSUxFOiBpbmNsdWRlL3RhcmdldC1kaXIu
+aDo0MjoKKyNkZWZpbmUgVEFSR0VUX0RJUl9QUkVGSVggLi4vdGFyZ2V0L3MzOTB4CiAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhh
+dCAnLycgKGN0eDpWeFYpCiM2MjogRklMRTogaW5jbHVkZS90YXJnZXQtZGlyLmg6NDI6CisjZGVm
+aW5lIFRBUkdFVF9ESVJfUFJFRklYIC4uL3RhcmdldC9zMzkweAogICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBeCgpFUlJPUjogTWFjcm9zIHdpdGggY29tcGxleCB2YWx1ZXMgc2hv
+dWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lzCiM2MjogRklMRTogaW5jbHVkZS90YXJnZXQt
+ZGlyLmg6NDI6CisjZGVmaW5lIFRBUkdFVF9ESVJfUFJFRklYIC4uL3RhcmdldC9zMzkweAoKRVJS
+T1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnLycgKGN0eDpWeFYpCiM2NDogRklMRTog
+aW5jbHVkZS90YXJnZXQtZGlyLmg6NDQ6CisjZGVmaW5lIFRBUkdFVF9ESVJfUFJFRklYIC4uL3Rh
+cmdldC9zaDQKICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJl
+cXVpcmVkIGFyb3VuZCB0aGF0ICcvJyAoY3R4OlZ4VikKIzY0OiBGSUxFOiBpbmNsdWRlL3Rhcmdl
+dC1kaXIuaDo0NDoKKyNkZWZpbmUgVEFSR0VUX0RJUl9QUkVGSVggLi4vdGFyZ2V0L3NoNAogICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogTWFjcm9zIHdpdGggY29t
+cGxleCB2YWx1ZXMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lzCiM2NDogRklMRTog
+aW5jbHVkZS90YXJnZXQtZGlyLmg6NDQ6CisjZGVmaW5lIFRBUkdFVF9ESVJfUFJFRklYIC4uL3Rh
+cmdldC9zaDQKCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJy8nIChjdHg6VnhW
+KQojNjY6IEZJTEU6IGluY2x1ZGUvdGFyZ2V0LWRpci5oOjQ2OgorI2RlZmluZSBUQVJHRVRfRElS
+X1BSRUZJWCAuLi90YXJnZXQvc3BhcmMKICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpF
+UlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcvJyAoY3R4OlZ4VikKIzY2OiBGSUxF
+OiBpbmNsdWRlL3RhcmdldC1kaXIuaDo0NjoKKyNkZWZpbmUgVEFSR0VUX0RJUl9QUkVGSVggLi4v
+dGFyZ2V0L3NwYXJjCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9S
+OiBNYWNyb3Mgd2l0aCBjb21wbGV4IHZhbHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50
+aGVzaXMKIzY2OiBGSUxFOiBpbmNsdWRlL3RhcmdldC1kaXIuaDo0NjoKKyNkZWZpbmUgVEFSR0VU
+X0RJUl9QUkVGSVggLi4vdGFyZ2V0L3NwYXJjCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3Vu
+ZCB0aGF0ICcvJyAoY3R4OlZ4VikKIzY4OiBGSUxFOiBpbmNsdWRlL3RhcmdldC1kaXIuaDo0ODoK
+KyNkZWZpbmUgVEFSR0VUX0RJUl9QUkVGSVggLi4vdGFyZ2V0L3VuaWNvcmUzMgogICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQg
+Jy8nIChjdHg6VnhWKQojNjg6IEZJTEU6IGluY2x1ZGUvdGFyZ2V0LWRpci5oOjQ4OgorI2RlZmlu
+ZSBUQVJHRVRfRElSX1BSRUZJWCAuLi90YXJnZXQvdW5pY29yZTMyCiAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBNYWNyb3Mgd2l0aCBjb21wbGV4IHZhbHVlcyBz
+aG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMKIzY4OiBGSUxFOiBpbmNsdWRlL3Rhcmdl
+dC1kaXIuaDo0ODoKKyNkZWZpbmUgVEFSR0VUX0RJUl9QUkVGSVggLi4vdGFyZ2V0L3VuaWNvcmUz
+MgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnLycgKGN0eDpWeFYpCiM3MDog
+RklMRTogaW5jbHVkZS90YXJnZXQtZGlyLmg6NTA6CisjZGVmaW5lIFRBUkdFVF9ESVJfUFJFRklY
+IC4uL3RhcmdldC90aWxlZ3gKICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjog
+c3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcvJyAoY3R4OlZ4VikKIzcwOiBGSUxFOiBpbmNs
+dWRlL3RhcmdldC1kaXIuaDo1MDoKKyNkZWZpbmUgVEFSR0VUX0RJUl9QUkVGSVggLi4vdGFyZ2V0
+L3RpbGVneAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogTWFj
+cm9zIHdpdGggY29tcGxleCB2YWx1ZXMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lz
+CiM3MDogRklMRTogaW5jbHVkZS90YXJnZXQtZGlyLmg6NTA6CisjZGVmaW5lIFRBUkdFVF9ESVJf
+UFJFRklYIC4uL3RhcmdldC90aWxlZ3gKCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRo
+YXQgJy8nIChjdHg6VnhWKQojNzI6IEZJTEU6IGluY2x1ZGUvdGFyZ2V0LWRpci5oOjUyOgorI2Rl
+ZmluZSBUQVJHRVRfRElSX1BSRUZJWCAuLi90YXJnZXQvdHJpY29yZQogICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJy8nIChj
+dHg6VnhWKQojNzI6IEZJTEU6IGluY2x1ZGUvdGFyZ2V0LWRpci5oOjUyOgorI2RlZmluZSBUQVJH
+RVRfRElSX1BSRUZJWCAuLi90YXJnZXQvdHJpY29yZQogICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBeCgpFUlJPUjogTWFjcm9zIHdpdGggY29tcGxleCB2YWx1ZXMgc2hvdWxkIGJl
+IGVuY2xvc2VkIGluIHBhcmVudGhlc2lzCiM3MjogRklMRTogaW5jbHVkZS90YXJnZXQtZGlyLmg6
+NTI6CisjZGVmaW5lIFRBUkdFVF9ESVJfUFJFRklYIC4uL3RhcmdldC90cmljb3JlCgpFUlJPUjog
+c3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcvJyAoY3R4OlZ4VikKIzc0OiBGSUxFOiBpbmNs
+dWRlL3RhcmdldC1kaXIuaDo1NDoKKyNkZWZpbmUgVEFSR0VUX0RJUl9QUkVGSVggLi4vdGFyZ2V0
+L3h0ZW5zYQogICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVx
+dWlyZWQgYXJvdW5kIHRoYXQgJy8nIChjdHg6VnhWKQojNzQ6IEZJTEU6IGluY2x1ZGUvdGFyZ2V0
+LWRpci5oOjU0OgorI2RlZmluZSBUQVJHRVRfRElSX1BSRUZJWCAuLi90YXJnZXQveHRlbnNhCiAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBNYWNyb3Mgd2l0aCBj
+b21wbGV4IHZhbHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMKIzc0OiBGSUxF
+OiBpbmNsdWRlL3RhcmdldC1kaXIuaDo1NDoKKyNkZWZpbmUgVEFSR0VUX0RJUl9QUkVGSVggLi4v
+dGFyZ2V0L3h0ZW5zYQoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnLycgKGN0
+eDpWeFYpCiM4MTogRklMRTogaW5jbHVkZS90YXJnZXQtZGlyLmg6NjE6CisjZGVmaW5lIFRBUkdF
+VF9ESVIoZmlsZSkgVEFSR0VUX0RJUl9TVFJJTkcoVEFSR0VUX0RJUl9QUkVGSVgvZmlsZSkKICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IF4KCnRvdGFsOiA2NCBlcnJvcnMsIDAgd2FybmluZ3MsIDYzIGxpbmVzIGNoZWNrZWQKCllvdXIg
+cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDQwLzY3OiB0
+cmFjZTogYWRkIGluY2x1ZGUgZGlyZWN0b3J5IGhlYWRlcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggNDEv
+Njc6IHRjZy1wb29sLmluYy5jOiByZXBsYWNlIGNvbW1hbmQgbGluZSBmbGFncyB3aXRoIHByZXBy
+b2Nlc3Nvci4uLgpDaGVja2luZyBQQVRDSCA0Mi82NzogdGNnOiB1c2UgaW5jbHVkZSAidGNnLmgi
+IGNvbnNpc3RlbnRseS4uLgpDaGVja2luZyBQQVRDSCA0My82NzogdHJhbnNsYXRlLWFsbDogYWRk
+IGluY2x1ZGUgZGlyZWN0b3J5IGhlYWRlci4uLgpDaGVja2luZyBQQVRDSCA0NC82NzogdGNnLWxk
+c3QuaW5jLmM6IHJlcGxhY2UgY29tbWFuZCBsaW5lIGZsYWdzIHdpdGggcHJlcHJvY2Vzc29yLi4u
+CkNoZWNraW5nIFBBVENIIDQ1LzY3OiB0Y2c6IGFkZCBpbmNsdWRlIGRpcmVjdG9yeSBoZWFkZXJz
+Li4uCkNoZWNraW5nIFBBVENIIDQ2LzY3OiBjcHUtcW9tOiBhZGQgaW5jbHVkZSBkaXJlY3Rvcnkg
+aGVhZGVycy4uLgpDaGVja2luZyBQQVRDSCA0Ny82NzogdGNnLW9wOiB1c2UgaW5jbHVkZSAidGNn
+LmgiIGNvbnNpc3RlbnRseS4uLgpDaGVja2luZyBQQVRDSCA0OC82NzogdmlydGlvLXBjaTogYWRk
+IGluY2x1ZGUgZGlyZWN0b3J5IGhlYWRlci4uLgpDaGVja2luZyBQQVRDSCA0OS82Nzoga3ZtX1hY
+WDogYWRkIGluY2x1ZGUgZGlyZWN0b3J5IGhlYWRlcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggNTAvNjc6
+IGhtcDogYWRkIGluY2x1ZGUgZGlyZWN0b3J5IGhlYWRlci4uLgpDaGVja2luZyBQQVRDSCA1MS82
+NzogaHlwZXJ2OiBhZGQgaW5jbHVkZSBkaXJlY3RvcnkgaGVhZGVyLi4uCkNoZWNraW5nIFBBVENI
+IDUyLzY3OiB0YXJnZXQvYXJtOiBhZGQgaW5jbHVkZSBkaXJlY3RvcnkgaGVhZGVycy4uLgpDaGVj
+a2luZyBQQVRDSCA1My82NzogdGFyZ2V0L3BwYzogYWRkIGluY2x1ZGUgZGlyZWN0b3J5IGhlYWRl
+cnMuLi4KQ2hlY2tpbmcgUEFUQ0ggNTQvNjc6IGFtZF9pb21tdTogYWRkIGluY2x1ZGUgZGlyZWN0
+b3J5IGhlYWRlci4uLgpDaGVja2luZyBQQVRDSCA1NS82NzogYW1kX2lvbW11OiBhZGQgaW5jbHVk
+ZSBkaXJlY3RvcnkgaGVhZGVyLi4uCkNoZWNraW5nIFBBVENIIDU2LzY3OiB0Y2c6IHVzZSBpbmNs
+dWRlICJ0Y2ctZ3ZlYy1kZXNjLmguaCIgY29uc2lzdGVudGx5Li4uCkNoZWNraW5nIFBBVENIIDU3
+LzY3OiBrdm06IHVzZSBpbmNsdWRlICJrdm1faTM4Ni5oIiBjb25zaXN0ZW50bHkuLi4KQ2hlY2tp
+bmcgUEFUQ0ggNTgvNjc6IHRhcmdldC9yaXNjdjogYWRkIGluY2x1ZGUgZGlyZWN0b3J5IGhlYWRl
+ci4uLgpDaGVja2luZyBQQVRDSCA1OS82NzogaHcvcHBjOiBhZGQgdGFyZ2V0IGhlYWRlcnMgZXhw
+bGljaXRseS4uLgpDaGVja2luZyBQQVRDSCA2MC82NzogaHcvczM5MHg6IGFkZCBpbmNsdWRlIGRp
+cmVjdG9yeSBoZWFkZXJzLi4uCkNoZWNraW5nIFBBVENIIDYxLzY3OiBody9uZXQ6IGFkZCBpbmNs
+dWRlIGRpcmVjdG9yeSBoZWFkZXIuLi4KQ2hlY2tpbmcgUEFUQ0ggNjIvNjc6IGt2bTogdXNlIGlu
+Y2x1ZGUgImt2bV9wcGMuaCIgY29uc2lzdGVudGx5Li4uCkNoZWNraW5nIFBBVENIIDYzLzY3OiBo
+dy9zMzkweDogdXNlIHRhcmdldCBoZWFkZXJzIGV4cGxpY2l0bHkuLi4KQ2hlY2tpbmcgUEFUQ0gg
+NjQvNjc6IHRhcmdldC9zMzkweDogYWRkIGluY2x1ZGUgZGlyZWN0b3J5IGhlYWRlci4uLgpDaGVj
+a2luZyBQQVRDSCA2NS82NzogdGNnOiB1c2UgaW5jbHVkZSAidHJhbnNsYXRlLWFsbC5oIiBjb25z
+aXN0ZW50bHkuLi4KQ2hlY2tpbmcgUEFUQ0ggNjYvNjc6IGxpbnV4LXVzZXI6IGFkZCBpbmNsdWRl
+IGRpcmVjdG9yeSBoZWFkZXIuLi4KQ2hlY2tpbmcgUEFUQ0ggNjcvNjc6IG1ha2U6IHNpbXBsaWZ5
+IHNvdXJjZSBpbmNsdWRlIHBhdGguLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
+ZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
+eSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
+ayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
