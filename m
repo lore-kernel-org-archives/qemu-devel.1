@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fEGUY-0000m8-PW
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:50:01 -0400
+	(envelope-from <david@redhat.com>) id 1fEGUb-0000p5-DA
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:50:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fEGUX-0003kl-SQ
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:49:58 -0400
+	(envelope-from <david@redhat.com>) id 1fEGUa-0003lr-6M
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 11:50:01 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Thu,  3 May 2018 17:49:33 +0200
-Message-Id: <20180503154936.18946-6-david@redhat.com>
+Date: Thu,  3 May 2018 17:49:34 +0200
+Message-Id: <20180503154936.18946-7-david@redhat.com>
 In-Reply-To: <20180503154936.18946-1-david@redhat.com>
 References: <20180503154936.18946-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 5/8] pc-dimm: implement new memory device
- functions
+Subject: [Qemu-devel] [PATCH v1 6/8] machine: introduce
+ enforce_memory_device_align() and add it for pc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,69 +23,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
 
-Implement the new functions, we don't have to care about alignment for
-these DIMMs right now, so leave that function unimplemented.
+For compat handling, we'll have to ask the machine class if a certain
+memory device has alignment requirements when assigning resource to
+a memory device. This will only be required for PC for now, PPC is fine
+(and will be handled via the alignment of the memory region).
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/mem/pc-dimm.c               | 22 ++++++++++++++++++++++
- include/hw/mem/memory-device.h |  4 ++--
- 2 files changed, 24 insertions(+), 2 deletions(-)
+ hw/i386/pc.c        | 15 +++++++++++++++
+ include/hw/boards.h |  8 ++++++++
+ 2 files changed, 23 insertions(+)
 
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index 12da89d562..7ab9e77747 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -244,6 +244,26 @@ static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
-     return dimm->addr;
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index ffcd7b85d9..9405e28cfa 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -2332,6 +2332,20 @@ static void x86_nmi(NMIState *n, int cpu_index, Error **errp)
+     }
  }
  
-+static void pc_dimm_md_set_addr(MemoryDeviceState *md, uint64_t addr)
++static void pc_machine_enforce_memory_device_align(const MachineClass *mc,
++                                                   const MemoryDeviceState *md,
++                                                   uint64_t *align)
 +{
-+    PCDIMMDevice *dimm = PC_DIMM(md);
++    const PCMachineClass *pcmc = PC_MACHINE_CLASS(mc);
 +
-+    dimm->addr = addr;
++    if (object_dynamic_cast(OBJECT(md), TYPE_PC_DIMM)) {
++        /* compat handling: force to TARGET_PAGE_SIZE */
++        if (!pcmc->enforce_aligned_dimm) {
++            *align = TARGET_PAGE_SIZE;
++        }
++    }
 +}
 +
-+static MemoryRegion *pc_dimm_md_get_memory_region(MemoryDeviceState *md)
-+{
-+    PCDIMMDevice *dimm = PC_DIMM(md);
-+
-+    const PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(md);
-+    MemoryRegion *mr;
-+
-+    mr = ddc->get_memory_region(dimm, &error_abort);
-+    g_assert(mr);
-+
-+    return mr;
-+}
-+
- static uint64_t pc_dimm_md_get_region_size(const MemoryDeviceState *md)
+ static void pc_machine_class_init(ObjectClass *oc, void *data)
  {
-     /* dropping const here is fine as we don't touch the memory region */
-@@ -304,6 +324,8 @@ static void pc_dimm_class_init(ObjectClass *oc, void *data)
-     ddc->get_vmstate_memory_region = pc_dimm_get_vmstate_memory_region;
+     MachineClass *mc = MACHINE_CLASS(oc);
+@@ -2371,6 +2385,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+     hc->unplug = pc_machine_device_unplug_cb;
+     nc->nmi_monitor_handler = x86_nmi;
+     mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
++    mc->enforce_memory_device_align = pc_machine_enforce_memory_device_align;
  
-     mdc->get_addr = pc_dimm_md_get_addr;
-+    mdc->set_addr = pc_dimm_md_set_addr;
-+    mdc->get_memory_region = pc_dimm_md_get_memory_region;
-     /* for a dimm plugged_size == region_size */
-     mdc->get_plugged_size = pc_dimm_md_get_region_size;
-     mdc->get_region_size = pc_dimm_md_get_region_size;
-diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
-index e43ce1c8d3..e10f2e854a 100644
---- a/include/hw/mem/memory-device.h
-+++ b/include/hw/mem/memory-device.h
-@@ -34,8 +34,8 @@ typedef struct MemoryDeviceClass {
+     object_class_property_add(oc, PC_MACHINE_DEVMEM_REGION_SIZE, "int",
+         pc_machine_get_device_memory_region_size, NULL,
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index ff5142d7c2..db66f2e2d9 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -9,6 +9,7 @@
+ #include "qom/object.h"
+ #include "qom/cpu.h"
+ #include "hw/resource-handler.h"
++#include "hw/mem/memory-device.h"
  
-     /* required functions that have to be implemented */
-     uint64_t (*get_addr)(const MemoryDeviceState *md);
--    uint64_t (*set_addr)(MemoryDeviceState *md);
--    MemoryRegion * (*get_memory_region)(MemoryDeviceState *md);
-+    void (*set_addr)(MemoryDeviceState *md, uint64_t addr);
-+    MemoryRegion *(*get_memory_region)(MemoryDeviceState *md);
-     uint64_t (*get_plugged_size)(const MemoryDeviceState *md);
-     uint64_t (*get_region_size)(const MemoryDeviceState *md);
-     void (*fill_device_info)(const MemoryDeviceState *md,
+ /**
+  * memory_region_allocate_system_memory - Allocate a board's main memory
+@@ -163,6 +164,10 @@ typedef struct {
+  *    should instead use "unimplemented-device" for all memory ranges where
+  *    the guest will attempt to probe for a device that QEMU doesn't
+  *    implement and a stub device is required.
++ * @enforce_memory_device_align:
++ *    For some memory devices (e.g. DIMMs), alignment has to be enforced for
++ *    compat handling by the machine. This function will only modify the
++ *    asignment if it needs to be enforced.
+  */
+ struct MachineClass {
+     /*< private >*/
+@@ -221,6 +226,9 @@ struct MachineClass {
+                                                          unsigned cpu_index);
+     const CPUArchIdList *(*possible_cpu_arch_ids)(MachineState *machine);
+     int64_t (*get_default_cpu_node_id)(const MachineState *ms, int idx);
++    void (*enforce_memory_device_align)(const MachineClass *mc,
++                                        const MemoryDeviceState *md,
++                                        uint64_t *align);
+ };
+ 
+ /**
 -- 
 2.14.3
