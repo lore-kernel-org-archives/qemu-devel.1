@@ -1,14 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53241)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fEBvi-0004YK-Vr
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 06:57:44 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fEBxO-0005fK-Cp
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 06:59:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fEBvh-0004lr-S8
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 06:57:43 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu,  3 May 2018 11:57:30 +0100
-Message-Id: <20180503105730.5958-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] target/arm: Implement v8M VLLDM and VLSTM
+	(envelope-from <laurent@vivier.eu>) id 1fEBxJ-0005bn-JU
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 06:59:26 -0400
+References: <5aeae35ea760c_20132ae99f421c0c59611@hookshot-fe-265448d.cp1-iad.github.net.mail>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <41143fbe-baef-2959-7a96-c6434c82754a@vivier.eu>
+Date: Thu, 3 May 2018 12:59:16 +0200
+MIME-Version: 1.0
+In-Reply-To: <5aeae35ea760c_20132ae99f421c0c59611@hookshot-fe-265448d.cp1-iad.github.net.mail>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-commits] [qemu/qemu] 8f9c64: 9p: add trace
+ event for v9fs_setattr()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,54 +24,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, qemu-stable@nongnu.org
+To: qemu-commits@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Anthony Liguori <anthony@codemonkey.ws>
 
-For v8M the instructions VLLDM and VLSTM support lazy saving
-and restoring of the secure floating-point registers. Even
-if the floating point extension is not implemented, these
-instructions must act as NOPs in Secure state, so they can
-be used as part of the secure-to-nonsecure call sequence.
+Le 03/05/2018 à 12:24, GitHub a écrit :
+...
+> Compare: https://github.com/qemu/qemu/compare/26bd8d98c4b3...98bae9c4afb4
+>       **NOTE:** This service been marked for deprecation: https://developer.github.com/changes/2018-04-25-github-services-deprecation/
+> 
+>       Functionality will be removed from GitHub.com on January 31st, 2019.
+> 
 
-Fixes: https://bugs.launchpad.net/qemu/+bug/1768295
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-Worth cc'ing stable on this one because gcc and clang will
-emit this insn when calling functions with the cmse_nonsecure_call
-attribute.
+Does someone take care of the qemu-commits@nongnu.org mailing-list?
 
- target/arm/translate.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+I think it has originally been set by Anthony Liguori.
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 9bc2ce1a0b..ad208867a7 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -10795,8 +10795,23 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-         /* Coprocessor.  */
-         if (arm_dc_feature(s, ARM_FEATURE_M)) {
-             /* We don't currently implement M profile FP support,
--             * so this entire space should give a NOCP fault.
-+             * so this entire space should give a NOCP fault, with
-+             * the exception of the v8M VLLDM and VLSTM insns, which
-+             * must be NOPs in Secure state and UNDEF in Nonsecure state.
-              */
-+            if (arm_dc_feature(s, ARM_FEATURE_V8) &&
-+                (insn & 0xffa00f00) == 0xec200a00) {
-+                /* 0b1110_1100_0x1x_xxxx_xxxx_1010_xxxx_xxxx
-+                 *  - VLLDM, VLSTM
-+                 * We choose to UNDEF if the RAZ bits are non-zero.
-+                 */
-+                if (!s->v8m_secure || (insn & 0x0040f0ff)) {
-+                    goto illegal_op;
-+                }
-+                /* Just NOP since FP support is not implemented */
-+                break;
-+            }
-+            /* All other insns: NOCP */
-             gen_exception_insn(s, 4, EXCP_NOCP, syn_uncategorized(),
-                                default_exception_el(s));
-             break;
--- 
-2.17.0
+Thanks,
+Laurent
