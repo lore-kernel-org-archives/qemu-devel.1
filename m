@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ross.zwisler@linux.intel.com>) id 1fEMaK-0002B1-18
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 18:20:20 -0400
+	(envelope-from <eblake@redhat.com>) id 1fEMgU-0003zP-TC
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 18:26:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ross.zwisler@linux.intel.com>) id 1fEMaG-0007Au-SY
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 18:20:20 -0400
-Received: from mga06.intel.com ([134.134.136.31]:32159)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ross.zwisler@linux.intel.com>)
-	id 1fEMaG-000783-J6
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 18:20:16 -0400
-Date: Thu, 3 May 2018 16:20:13 -0600
-From: Ross Zwisler <ross.zwisler@linux.intel.com>
-Message-ID: <20180503222013.GA23376@linux.intel.com>
-References: <20180427215314.23168-1-ross.zwisler@linux.intel.com>
-	<20180430113858.GH4002@stefanha-x1.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180430113858.GH4002@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH 1/3] nvdimm: fix typo in label-size
- definition
+	(envelope-from <eblake@redhat.com>) id 1fEMgT-0005xF-Rm
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 18:26:42 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Thu,  3 May 2018 17:26:26 -0500
+Message-Id: <20180503222626.1303410-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH] nbd/client: Relax handling of large
+ NBD_CMD_BLOCK_STATUS reply
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,28 +18,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Ross Zwisler <ross.zwisler@linux.intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, linux-nvdimm <linux-nvdimm@lists.01.org>
+To: qemu-devel@nongnu.org
+Cc: vsementsov@virtuozzo.com, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-On Mon, Apr 30, 2018 at 12:38:58PM +0100, Stefan Hajnoczi wrote:
-> On Fri, Apr 27, 2018 at 03:53:12PM -0600, Ross Zwisler wrote:
-> > Signed-off-by: Ross Zwisler <ross.zwisler@linux.intel.com>
-> > Fixes: commit da6789c27c2e ("nvdimm: add a macro for property "label-size"")
-> > Cc: Haozhong Zhang <haozhong.zhang@intel.com>
-> > Cc: Michael S. Tsirkin <mst@redhat.com>
-> > Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> > ---
-> >  hw/mem/nvdimm.c         | 2 +-
-> >  include/hw/mem/nvdimm.h | 2 +-
-> >  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+The NBD spec is proposing a relaxation of NBD_CMD_BLOCK_STATUS
+where a server may have the final extent per context give a
+length beyond the original request, if it can easily prove that
+subsequent bytes have the same status, on the grounds that a
+client can take advantage of this information for fewer block
+status requests.  Since qemu 2.12 as a client always sends
+NBD_CMD_FLAG_REQ_ONE, and rejects a server that sends extra
+length, the upstream NBD spec will probably limit this behavior
+to clients that don't request REQ_ONE semantics; but it doesn't
+hurt to relax qemu to always be permissive of this server
+behavior, even if it continues to use REQ_ONE.
 
-Thank you for the review.
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ block/nbd-client.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-This is my first QEMU submission - do I need to do anything else to get this
-merged (create a pull request somewhere), or do I just wait for a maintainer
-to pull it in?
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index e7caf49fbb4..25d34631fe7 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -259,14 +259,18 @@ static int nbd_parse_blockstatus_payload(NBDClientSession *client,
 
-Thanks,
-- Ross
+     if (extent->length == 0 ||
+         (client->info.min_block && !QEMU_IS_ALIGNED(extent->length,
+-                                                    client->info.min_block)) ||
+-        extent->length > orig_length)
+-    {
++                                                    client->info.min_block))) {
+         error_setg(errp, "Protocol error: server sent status chunk with "
+                    "invalid length");
+         return -EINVAL;
+     }
+
++    /* The server is allowed to send us extra information on the final
++     * extent; just clamp it to the length we requested. */
++    if (extent->length > orig_length) {
++        extent->length == orig_length;
++    }
++
+     return 0;
+ }
+
+-- 
+2.14.3
