@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fEM21-00019G-0h
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:44:57 -0400
+	(envelope-from <alistair23@gmail.com>) id 1fEM26-0001DF-Ff
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:44:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fEM1z-0003XN-LQ
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:44:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41600)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1fEM1z-0003VY-Dl
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:44:51 -0400
-From: Alex Williamson <alex.williamson@redhat.com>
-Date: Thu, 03 May 2018 15:44:49 -0600
-Message-ID: <20180503214449.2749.56975.stgit@gimli.home>
-In-Reply-To: <20180503213458.2749.28566.stgit@gimli.home>
-References: <20180503213458.2749.28566.stgit@gimli.home>
+	(envelope-from <alistair23@gmail.com>) id 1fEM25-0003dV-7l
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:44:58 -0400
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:36244)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1fEM24-0003cp-VV
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:44:57 -0400
+Received: by mail-lf0-x242.google.com with SMTP id w8-v6so28159943lfe.3
+	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 14:44:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v3 3/6] vfio/quirks: Add common quirk alloc
- helper
+References: <20180503091922.28733-1-edgar.iglesias@gmail.com>
+	<20180503091922.28733-18-edgar.iglesias@gmail.com>
+In-Reply-To: <20180503091922.28733-18-edgar.iglesias@gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 03 May 2018 21:44:29 +0000
+Message-ID: <CAKmqyKNyXyL_5JWsbNHY_3GmDUBWBDHDwhTnB55iaOHmsmLALQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 17/29] target-microblaze: dec_msr: Use
+ bool and extract32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,141 +30,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kvm@vger.kernel.org, eric.auger@redhat.com, peterx@redhat.com
+To: Edgar Iglesias <edgar.iglesias@gmail.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, Francisco Iglesias <frasse.iglesias@gmail.com>, Alistair Francis <alistair@alistair23.me>, Richard Henderson <richard.henderson@linaro.org>
 
-This will later be used to include list initialization.
+On Thu, May 3, 2018 at 2:32 AM Edgar E. Iglesias <edgar.iglesias@gmail.com>
+wrote:
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- hw/vfio/pci-quirks.c |   48 +++++++++++++++++++++---------------------------
- 1 file changed, 21 insertions(+), 27 deletions(-)
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-index e5779a7ad35b..cc3a74ed992a 100644
---- a/hw/vfio/pci-quirks.c
-+++ b/hw/vfio/pci-quirks.c
-@@ -275,6 +275,15 @@ static const MemoryRegionOps vfio_ati_3c3_quirk = {
-     .endianness = DEVICE_LITTLE_ENDIAN,
- };
- 
-+static VFIOQuirk *vfio_quirk_alloc(int nr_mem)
-+{
-+    VFIOQuirk *quirk = g_new0(VFIOQuirk, 1);
-+    quirk->mem = g_new0(MemoryRegion, nr_mem);
-+    quirk->nr_mem = nr_mem;
-+
-+    return quirk;
-+}
-+
- static void vfio_vga_probe_ati_3c3_quirk(VFIOPCIDevice *vdev)
- {
-     VFIOQuirk *quirk;
-@@ -288,9 +297,7 @@ static void vfio_vga_probe_ati_3c3_quirk(VFIOPCIDevice *vdev)
-         return;
-     }
- 
--    quirk = g_malloc0(sizeof(*quirk));
--    quirk->mem = g_new0(MemoryRegion, 1);
--    quirk->nr_mem = 1;
-+    quirk = vfio_quirk_alloc(1);
- 
-     memory_region_init_io(quirk->mem, OBJECT(vdev), &vfio_ati_3c3_quirk, vdev,
-                           "vfio-ati-3c3-quirk", 1);
-@@ -323,9 +330,7 @@ static void vfio_probe_ati_bar4_quirk(VFIOPCIDevice *vdev, int nr)
-         return;
-     }
- 
--    quirk = g_malloc0(sizeof(*quirk));
--    quirk->mem = g_new0(MemoryRegion, 2);
--    quirk->nr_mem = 2;
-+    quirk = vfio_quirk_alloc(2);
-     window = quirk->data = g_malloc0(sizeof(*window) +
-                                      sizeof(VFIOConfigWindowMatch));
-     window->vdev = vdev;
-@@ -371,10 +376,9 @@ static void vfio_probe_ati_bar2_quirk(VFIOPCIDevice *vdev, int nr)
-         return;
-     }
- 
--    quirk = g_malloc0(sizeof(*quirk));
-+    quirk = vfio_quirk_alloc(1);
-     mirror = quirk->data = g_malloc0(sizeof(*mirror));
--    mirror->mem = quirk->mem = g_new0(MemoryRegion, 1);
--    quirk->nr_mem = 1;
-+    mirror->mem = quirk->mem;
-     mirror->vdev = vdev;
-     mirror->offset = 0x4000;
-     mirror->bar = nr;
-@@ -548,10 +552,8 @@ static void vfio_vga_probe_nvidia_3d0_quirk(VFIOPCIDevice *vdev)
-         return;
-     }
- 
--    quirk = g_malloc0(sizeof(*quirk));
-+    quirk = vfio_quirk_alloc(2);
-     quirk->data = data = g_malloc0(sizeof(*data));
--    quirk->mem = g_new0(MemoryRegion, 2);
--    quirk->nr_mem = 2;
-     data->vdev = vdev;
- 
-     memory_region_init_io(&quirk->mem[0], OBJECT(vdev), &vfio_nvidia_3d4_quirk,
-@@ -667,9 +669,7 @@ static void vfio_probe_nvidia_bar5_quirk(VFIOPCIDevice *vdev, int nr)
-         return;
-     }
- 
--    quirk = g_malloc0(sizeof(*quirk));
--    quirk->mem = g_new0(MemoryRegion, 4);
--    quirk->nr_mem = 4;
-+    quirk = vfio_quirk_alloc(4);
-     bar5 = quirk->data = g_malloc0(sizeof(*bar5) +
-                                    (sizeof(VFIOConfigWindowMatch) * 2));
-     window = &bar5->window;
-@@ -762,10 +762,9 @@ static void vfio_probe_nvidia_bar0_quirk(VFIOPCIDevice *vdev, int nr)
-         return;
-     }
- 
--    quirk = g_malloc0(sizeof(*quirk));
-+    quirk = vfio_quirk_alloc(1);
-     mirror = quirk->data = g_malloc0(sizeof(*mirror));
--    mirror->mem = quirk->mem = g_new0(MemoryRegion, 1);
--    quirk->nr_mem = 1;
-+    mirror->mem = quirk->mem;
-     mirror->vdev = vdev;
-     mirror->offset = 0x88000;
-     mirror->bar = nr;
-@@ -781,10 +780,9 @@ static void vfio_probe_nvidia_bar0_quirk(VFIOPCIDevice *vdev, int nr)
- 
-     /* The 0x1800 offset mirror only seems to get used by legacy VGA */
-     if (vdev->vga) {
--        quirk = g_malloc0(sizeof(*quirk));
-+        quirk = vfio_quirk_alloc(1);
-         mirror = quirk->data = g_malloc0(sizeof(*mirror));
--        mirror->mem = quirk->mem = g_new0(MemoryRegion, 1);
--        quirk->nr_mem = 1;
-+        mirror->mem = quirk->mem;
-         mirror->vdev = vdev;
-         mirror->offset = 0x1800;
-         mirror->bar = nr;
-@@ -945,9 +943,7 @@ static void vfio_probe_rtl8168_bar2_quirk(VFIOPCIDevice *vdev, int nr)
-         return;
-     }
- 
--    quirk = g_malloc0(sizeof(*quirk));
--    quirk->mem = g_new0(MemoryRegion, 2);
--    quirk->nr_mem = 2;
-+    quirk = vfio_quirk_alloc(2);
-     quirk->data = rtl = g_malloc0(sizeof(*rtl));
-     rtl->vdev = vdev;
- 
-@@ -1507,9 +1503,7 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
-     }
- 
-     /* Setup our quirk to munge GTT addresses to the VM allocated buffer */
--    quirk = g_malloc0(sizeof(*quirk));
--    quirk->mem = g_new0(MemoryRegion, 2);
--    quirk->nr_mem = 2;
-+    quirk = vfio_quirk_alloc(2);
-     igd = quirk->data = g_malloc0(sizeof(*igd));
-     igd->vdev = vdev;
-     igd->index = ~0;
+> Use bool and extract32 to represent the to, clr and
+> clrset flags.
+
+> No functional change.
+
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+
+Alistair
+
+> ---
+>   target/microblaze/translate.c | 15 +++++++++------
+>   1 file changed, 9 insertions(+), 6 deletions(-)
+
+> diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
+> index 3029e0e873..d2788451fe 100644
+> --- a/target/microblaze/translate.c
+> +++ b/target/microblaze/translate.c
+> @@ -458,17 +458,20 @@ static void dec_msr(DisasContext *dc)
+>   {
+>       CPUState *cs = CPU(dc->cpu);
+>       TCGv_i32 t0, t1;
+> -    unsigned int sr, to, rn;
+> +    unsigned int sr, rn;
+> +    bool to, clrset;
+
+> -    sr = dc->imm & ((1 << 14) - 1);
+> -    to = dc->imm & (1 << 14);
+> +    sr = extract32(dc->imm, 0, 14);
+> +    to = extract32(dc->imm, 14, 1);
+> +    clrset = extract32(dc->imm, 15, 1) == 0;
+>       dc->type_b = 1;
+> -    if (to)
+> +    if (to) {
+>           dc->cpustate_changed = 1;
+> +    }
+
+>       /* msrclr and msrset.  */
+> -    if (!(dc->imm & (1 << 15))) {
+> -        unsigned int clr = dc->ir & (1 << 16);
+> +    if (clrset) {
+> +        bool clr = extract32(dc->ir, 16, 1);
+
+>           LOG_DIS("msr%s r%d imm=%x\n", clr ? "clr" : "set",
+>                   dc->rd, dc->imm);
+> --
+> 2.14.1
