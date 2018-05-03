@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54869)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fEAOg-0000eN-A7
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fEAOg-0000eM-A6
 	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:19:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fEAOd-0004wU-LO
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fEAOc-0004vi-A2
 	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:19:30 -0400
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:39271)
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:45439)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1fEAOd-0004vv-DB
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:19:27 -0400
-Received: by mail-lf0-x242.google.com with SMTP id j193-v6so24916484lfg.6
-	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 02:19:27 -0700 (PDT)
+	id 1fEAOc-0004vM-1T
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:19:26 -0400
+Received: by mail-lf0-x244.google.com with SMTP id y14-v6so24547619lfy.12
+	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 02:19:25 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Thu,  3 May 2018 11:18:54 +0200
-Message-Id: <20180503091922.28733-2-edgar.iglesias@gmail.com>
-In-Reply-To: <20180503091922.28733-1-edgar.iglesias@gmail.com>
-References: <20180503091922.28733-1-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v1 01/29] target-microblaze: dec_load: Use bool
- instead of unsigned int
+Date: Thu,  3 May 2018 11:18:53 +0200
+Message-Id: <20180503091922.28733-1-edgar.iglesias@gmail.com>
+Subject: [Qemu-devel] [PATCH v1 00/29] target-microblaze: Add support for
+ Extended Addressing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,36 +30,63 @@ Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, sai.pavan.boddu@xili
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Use bool instead of unsigned int to represent flags.
-No functional change.
+This series adds support for Extended Addressing to our MicroBlaze
+models. It adds both the non-MMU load/store EA and the extended MMU
+addressing.
 
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
----
- target/microblaze/translate.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+There are several ways to implement this but since there are further
+64-bit extensions in the pipe, I've chosen to convert the cpu_SR
+special regs to 64-bit. Both non-EA and EA enabled cores run out of
+the same build with TARGET_LONG_BITS=64.
 
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 100883e2cc..33f21aa5b7 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -897,14 +897,15 @@ static inline TCGv *compute_ldst_addr(DisasContext *dc, TCGv *t)
- static void dec_load(DisasContext *dc)
- {
-     TCGv t, v, *addr;
--    unsigned int size, rev = 0, ex = 0;
-+    unsigned int size;
-+    bool rev = false, ex = false;
-     TCGMemOp mop;
- 
-     mop = dc->opcode & 3;
-     size = 1 << mop;
-     if (!dc->type_b) {
--        rev = (dc->ir >> 9) & 1;
--        ex = (dc->ir >> 10) & 1;
-+        rev = extract32(dc->ir, 9, 1);
-+        ex = extract32(dc->ir, 10, 1);
-     }
-     mop |= MO_TE;
-     if (rev) {
+Comments?
+
+Thanks & Best regards,
+Edgar
+
+
+Edgar E. Iglesias (29):
+  target-microblaze: dec_load: Use bool instead of unsigned int
+  target-microblaze: dec_store: Use bool instead of unsigned int
+  target-microblaze: compute_ldst_addr: Use bool instead of int
+  target-microblaze: Fallback to our latest CPU version
+  target-microblaze: Correct special register array sizes
+  target-microblaze: Correct the PVR array size
+  target-microblaze: Tighten up TCGv_i32 vs TCGv type usage
+  target-microblaze: Remove USE_MMU PVR checks
+  target-microblaze: Conditionalize setting of PVR11_USE_MMU
+  target-microblaze: Bypass MMU with MMU_NOMMU_IDX
+  target-microblaze: Make compute_ldst_addr always use a temp
+  target-microblaze: Remove pointer indirection for ld/st addresses
+  target-microblaze: Use TCGv for load/store addresses
+  target-microblaze: Name special registers we support
+  target-microblaze: Break out trap_userspace()
+  target-microblaze: Break out trap_illegal()
+  target-microblaze: dec_msr: Use bool and extract32
+  target-microblaze: dec_msr: Reuse more code when reg-decoding
+  target-microblaze: dec_msr: Fix MTS to FSR
+  target-microblaze: Make special registers 64-bit
+  target-microblaze: Setup for 64bit addressing
+  target-microblaze: Add Extended Addressing
+  target-microblaze: Implement MFSE EAR
+  target-microblaze: mmu: Add R_TBLX_MISS macros
+  target-microblaze: mmu: Remove unused register state
+  target-microblaze: mmu: Prepare for 64-bit addresses
+  target-microblaze: mmu: Add a configurable output address mask
+  target-microblaze: Add support for extended access to TLBLO
+  target-microblaze: Allow address sizes between 32 and 64 bits
+
+ configure                        |   1 +
+ linux-user/microblaze/cpu_loop.c |   4 +-
+ target/microblaze/cpu.c          |  30 +-
+ target/microblaze/cpu.h          |  16 +-
+ target/microblaze/helper.c       |  30 +-
+ target/microblaze/helper.h       |   8 +-
+ target/microblaze/mmu.c          |  48 ++-
+ target/microblaze/mmu.h          |  17 +-
+ target/microblaze/op_helper.c    |  28 +-
+ target/microblaze/translate.c    | 874 +++++++++++++++++++--------------------
+ 10 files changed, 534 insertions(+), 522 deletions(-)
+
 -- 
 2.14.1
