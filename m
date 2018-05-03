@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40949)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fE9N0-0007Ao-TL
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 04:13:43 -0400
+	(envelope-from <peterx@redhat.com>) id 1fE9PL-00080K-QF
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 04:16:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fE9Mv-0001IU-UX
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 04:13:42 -0400
-Received: from mail-pg0-x22b.google.com ([2607:f8b0:400e:c05::22b]:35893)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1fE9Mv-0001IC-Oh
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 04:13:37 -0400
-Received: by mail-pg0-x22b.google.com with SMTP id z129-v6so8398732pgz.3
-	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 01:13:37 -0700 (PDT)
-From: Xiao Guangrong <guangrong.xiao@gmail.com>
+	(envelope-from <peterx@redhat.com>) id 1fE9PH-0002qc-4w
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 04:16:07 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33244 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fE9PH-0002ps-0U
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 04:16:03 -0400
+Date: Thu, 3 May 2018 16:15:45 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180503081545.GD29580@xz-mi>
 References: <20180503080611.23834-1-xiaoguangrong@tencent.com>
-Message-ID: <bc21ed25-a6cd-63e3-f943-c1963da54480@gmail.com>
-Date: Thu, 3 May 2018 16:13:01 +0800
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 In-Reply-To: <20180503080611.23834-1-xiaoguangrong@tencent.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH v2] migration: introduce
  decompress-error-check
 List-Id: <qemu-devel.nongnu.org>
@@ -31,10 +27,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redhat.com, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>, Eric Blake <eblake@redhat.com>
+To: guangrong.xiao@gmail.com
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On 05/03/2018 04:06 PM, guangrong.xiao@gmail.com wrote:
+On Thu, May 03, 2018 at 04:06:11PM +0800, guangrong.xiao@gmail.com wrote:
 > From: Xiao Guangrong <xiaoguangrong@tencent.com>
 > 
 > QEMU 2.13 enables strict check for compression & decompression to
@@ -46,13 +42,11 @@ On 05/03/2018 04:06 PM, guangrong.xiao@gmail.com wrote:
 > destination which is the default behavior of the machine type
 > which is older than 2.13, alternately, the strict check can be
 > enabled explicitly as followings:
->        -M pc-q35-2.11 -global migration.decompress-error-check=true
+>       -M pc-q35-2.11 -global migration.decompress-error-check=true
 > 
+> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-[ CC: Eric ]
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-Hi, Dave, Eric, Peter,
-
-Could you please have a look if it is good to you guys.
-
-Thanks!
+-- 
+Peter Xu
