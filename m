@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fE7cs-00074z-2r
+	(envelope-from <dgibson@ozlabs.org>) id 1fE7cs-00074w-2T
 	for qemu-devel@nongnu.org; Thu, 03 May 2018 02:21:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fE7cq-0002Os-9j
+	(envelope-from <dgibson@ozlabs.org>) id 1fE7cq-0002Oe-7C
 	for qemu-devel@nongnu.org; Thu, 03 May 2018 02:21:58 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu,  3 May 2018 16:21:45 +1000
-Message-Id: <20180503062145.17899-9-david@gibson.dropbear.id.au>
+Date: Thu,  3 May 2018 16:21:42 +1000
+Message-Id: <20180503062145.17899-6-david@gibson.dropbear.id.au>
 In-Reply-To: <20180503062145.17899-1-david@gibson.dropbear.id.au>
 References: <20180503062145.17899-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCH 8/8] spapr: Clean up handling of LPCR
- power-saving exit bits
+Subject: [Qemu-devel] [PATCH 5/8] spapr: Clean up LPCR updates from
+ hypercalls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,91 +23,143 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: groug@kaod.org, clg@kaod.org
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-To prevent spurious wakeups on cpus that are supposed to be disabled, we
-need to clear the LPCR bits which control certain wakeup events.
-spapr_cpu_reset() has separate cases here for boot and non-boot (initially
-inactive) cpus.  rtas_start_cpu() then turns the LPCR bits on when the
-non-boot cpus are activated.
+There are several places in spapr_hcall.c where we need to update the LPCR
+value on all CPUs.  We do this with the set_spr() helper.  That's not
+really correct because this directly sets the SPR value, without going
+through the ppc_store_lpcr() helper which may need to update state based
+on the LPCR change.
 
-But explicit checks against first_cpu are not how we usually do things:
-instead spapr_cpu_reset() generally sets things up for non-boot (inactive)
-cpus, then spapr_machine_reset() and/or rtas_start_cpu() override as
-necessary.
-
-So, do that instead.  Because the LPCR activation is identical for boot
-cpus and non-boot cpus just activated with rtas_start_cpu() we can put the
-code common in spapr_cpu_set_entry_state().
+In fact, set_spr() is only ever used for the LPCR, so replace it with an
+explicit LPCR updated which uses the right low-level helper.  While we're
+there, move the CPU_FOREACH() which was in every one of the callers into
+the new helper: set_all_lpcrs().
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_cpu_core.c | 22 +++++++---------------
- hw/ppc/spapr_rtas.c     |  2 +-
- 2 files changed, 8 insertions(+), 16 deletions(-)
+ hw/ppc/spapr_hcall.c | 50 ++++++++++++++++++--------------------------
+ 1 file changed, 20 insertions(+), 30 deletions(-)
 
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index a52ddade5e..f3e9b879b2 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -54,28 +54,17 @@ static void spapr_cpu_reset(void *opaque)
-      * Clearing VPM0 will also cause us to use RMOR in mmu-hash64.c for
-      * real mode accesses, which thankfully defaults to 0 and isn't
-      * accessible in guest mode.
-+     *
-+     * Disable Power-saving mode Exit Cause exceptions for the CPU, so
-+     * we don't get spurious wakups before an RTAS start-cpu call.
-      */
--    lpcr &= ~(LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_KBV);
-+    lpcr &= ~(LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_KBV | pcc->lpcr_pm);
-     lpcr |= LPCR_LPES0 | LPCR_LPES1;
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 16bccdd5c0..ca9702e667 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -15,32 +15,35 @@
+ #include "hw/ppc/spapr_ovec.h"
+ #include "mmu-book3s-v3.h"
  
-     /* Set RMLS to the max (ie, 16G) */
-     lpcr &= ~LPCR_RMLS;
-     lpcr |= 1ull << LPCR_RMLS_SHIFT;
+-struct SPRSyncState {
+-    int spr;
++struct LPCRSyncState {
+     target_ulong value;
+     target_ulong mask;
+ };
  
--    /* Only enable Power-saving mode Exit Cause exceptions on the boot
--     * CPU. The RTAS command start-cpu will enable them on secondaries.
--     */
--    if (cs == first_cpu) {
--        lpcr |= pcc->lpcr_pm;
--    }
--
--    /* Disable Power-saving mode Exit Cause exceptions for the CPU.
--     * This can cause issues when rebooting the guest if a secondary
--     * is awaken */
--    if (cs != first_cpu) {
--        lpcr &= ~pcc->lpcr_pm;
--    }
--
-     ppc_store_lpcr(cpu, lpcr);
- 
-     /* Set a full AMOR so guest can use the AMR as it sees fit */
-@@ -84,11 +73,14 @@ static void spapr_cpu_reset(void *opaque)
- 
- void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, target_ulong r3)
+-static void do_spr_sync(CPUState *cs, run_on_cpu_data arg)
++static void do_lpcr_sync(CPUState *cs, run_on_cpu_data arg)
  {
-+    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
+-    struct SPRSyncState *s = arg.host_ptr;
++    struct LPCRSyncState *s = arg.host_ptr;
+     PowerPCCPU *cpu = POWERPC_CPU(cs);
      CPUPPCState *env = &cpu->env;
++    target_ulong lpcr;
  
-     env->nip = nip;
-     env->gpr[3] = r3;
-     CPU(cpu)->halted = 0;
-+    /* Enable Power-saving mode Exit Cause exceptions */
-+    ppc_store_lpcr(cpu, env->spr[SPR_LPCR] | pcc->lpcr_pm);
+     cpu_synchronize_state(cs);
+-    env->spr[s->spr] &= ~s->mask;
+-    env->spr[s->spr] |= s->value;
++    lpcr = env->spr[SPR_LPCR];
++    lpcr &= ~s->mask;
++    lpcr |= s->value;
++    ppc_store_lpcr(cpu, lpcr);
  }
  
- static void spapr_cpu_destroy(PowerPCCPU *cpu)
-diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-index 652233bdf1..7f9738daed 100644
---- a/hw/ppc/spapr_rtas.c
-+++ b/hw/ppc/spapr_rtas.c
-@@ -162,7 +162,7 @@ static void rtas_start_cpu(PowerPCCPU *callcpu, sPAPRMachineState *spapr,
-     env->msr = (1ULL << MSR_SF) | (1ULL << MSR_ME);
+-static void set_spr(CPUState *cs, int spr, target_ulong value,
+-                    target_ulong mask)
++static void set_all_lpcrs(target_ulong value, target_ulong mask)
+ {
+-    struct SPRSyncState s = {
+-        .spr = spr,
++    CPUState *cs;
++    struct LPCRSyncState s = {
+         .value = value,
+         .mask = mask
+     };
+-    run_on_cpu(cs, do_spr_sync, RUN_ON_CPU_HOST_PTR(&s));
++    CPU_FOREACH(cs) {
++        run_on_cpu(cs, do_lpcr_sync, RUN_ON_CPU_HOST_PTR(&s));
++    }
+ }
  
-     /* Enable Power-saving mode Exit Cause exceptions for the new CPU */
--    lpcr = env->spr[SPR_LPCR] | pcc->lpcr_pm;
-+    lpcr = env->spr[SPR_LPCR];
-     if (!pcc->interrupts_big_endian(callcpu)) {
-         lpcr |= LPCR_ILE;
+ static bool has_spr(PowerPCCPU *cpu, int spr)
+@@ -1235,8 +1238,6 @@ static target_ulong h_set_mode_resource_le(PowerPCCPU *cpu,
+                                            target_ulong value1,
+                                            target_ulong value2)
+ {
+-    CPUState *cs;
+-
+     if (value1) {
+         return H_P3;
      }
+@@ -1246,16 +1247,12 @@ static target_ulong h_set_mode_resource_le(PowerPCCPU *cpu,
+ 
+     switch (mflags) {
+     case H_SET_MODE_ENDIAN_BIG:
+-        CPU_FOREACH(cs) {
+-            set_spr(cs, SPR_LPCR, 0, LPCR_ILE);
+-        }
++        set_all_lpcrs(0, LPCR_ILE);
+         spapr_pci_switch_vga(true);
+         return H_SUCCESS;
+ 
+     case H_SET_MODE_ENDIAN_LITTLE:
+-        CPU_FOREACH(cs) {
+-            set_spr(cs, SPR_LPCR, LPCR_ILE, LPCR_ILE);
+-        }
++        set_all_lpcrs(LPCR_ILE, LPCR_ILE);
+         spapr_pci_switch_vga(false);
+         return H_SUCCESS;
+     }
+@@ -1268,7 +1265,6 @@ static target_ulong h_set_mode_resource_addr_trans_mode(PowerPCCPU *cpu,
+                                                         target_ulong value1,
+                                                         target_ulong value2)
+ {
+-    CPUState *cs;
+     PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
+ 
+     if (!(pcc->insns_flags2 & PPC2_ISA207S)) {
+@@ -1285,9 +1281,7 @@ static target_ulong h_set_mode_resource_addr_trans_mode(PowerPCCPU *cpu,
+         return H_UNSUPPORTED_FLAG;
+     }
+ 
+-    CPU_FOREACH(cs) {
+-        set_spr(cs, SPR_LPCR, mflags << LPCR_AIL_SHIFT, LPCR_AIL);
+-    }
++    set_all_lpcrs(mflags << LPCR_AIL_SHIFT, LPCR_AIL);
+ 
+     return H_SUCCESS;
+ }
+@@ -1364,7 +1358,6 @@ static target_ulong h_register_process_table(PowerPCCPU *cpu,
+                                              target_ulong opcode,
+                                              target_ulong *args)
+ {
+-    CPUState *cs;
+     target_ulong flags = args[0];
+     target_ulong proc_tbl = args[1];
+     target_ulong page_size = args[2];
+@@ -1422,12 +1415,9 @@ static target_ulong h_register_process_table(PowerPCCPU *cpu,
+     spapr->patb_entry = cproc; /* Save new process table */
+ 
+     /* Update the UPRT and GTSE bits in the LPCR for all cpus */
+-    CPU_FOREACH(cs) {
+-        set_spr(cs, SPR_LPCR,
+-                ((flags & (FLAG_RADIX | FLAG_HASH_PROC_TBL)) ? LPCR_UPRT : 0) |
+-                ((flags & FLAG_GTSE) ? LPCR_GTSE : 0),
+-                LPCR_UPRT | LPCR_GTSE);
+-    }
++    set_all_lpcrs(((flags & (FLAG_RADIX | FLAG_HASH_PROC_TBL)) ? LPCR_UPRT : 0) |
++                  ((flags & FLAG_GTSE) ? LPCR_GTSE : 0),
++                  LPCR_UPRT | LPCR_GTSE);
+ 
+     if (kvm_enabled()) {
+         return kvmppc_configure_v3_mmu(cpu, flags & FLAG_RADIX,
 -- 
 2.17.0
