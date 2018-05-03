@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fEL6K-0000gN-Q6
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:45:18 -0400
+	(envelope-from <alistair23@gmail.com>) id 1fELAV-0003t4-Th
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:49:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fEL6J-0001sX-W7
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:45:16 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56056 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fEL6J-0001rq-Rz
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:45:15 -0400
-References: <1525376963-79623-1-git-send-email-mst@redhat.com>
-	<1525376963-79623-6-git-send-email-mst@redhat.com>
-	<5fbe4232-ca1a-5e0c-437c-8b63cf83c510@redhat.com>
-	<20180503230505-mutt-send-email-mst@kernel.org>
-	<c4f0bb7a-f5db-383b-60fd-683dd65de7f8@redhat.com>
-	<20180503232542-mutt-send-email-mst@kernel.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1c48254a-1b86-c60e-e491-47e171a37638@redhat.com>
-Date: Thu, 3 May 2018 15:45:08 -0500
+	(envelope-from <alistair23@gmail.com>) id 1fELAU-0006Xp-Id
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:49:35 -0400
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:43908)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1fELAU-0006WO-51
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:49:34 -0400
+Received: by mail-lf0-x241.google.com with SMTP id g12-v6so27944442lfb.10
+	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 13:49:33 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180503232542-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 05/67] migration: drop an unused include,
- add a used one
+References: <1524699938-6764-1-git-send-email-mjc@sifive.com>
+	<1524699938-6764-14-git-send-email-mjc@sifive.com>
+In-Reply-To: <1524699938-6764-14-git-send-email-mjc@sifive.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 03 May 2018 20:49:06 +0000
+Message-ID: <CAKmqyKMMxPS3bnhMQZSBMj4G-r=V8-sfDgBvikz_=o6WKyrNvA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v8 13/35] RISC-V: Improve page table walker
+ spec compliance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,77 +30,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Michael Clark <mjc@sifive.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, palmer@sifive.com, Alistair Francis <Alistair.Francis@wdc.com>, patches@groups.riscv.org
 
-On 05/03/2018 03:29 PM, Michael S. Tsirkin wrote:
+On Wed, Apr 25, 2018 at 4:50 PM Michael Clark <mjc@sifive.com> wrote:
 
->>
->> There are a few .c files exempt from including osdep.h, but in general,
->> those files should probably also not be including anything from include/.
-> 
-> Here's a list from a quick grep.
-> Most of them probably get osdep.h indirectly.
-> 
-> 
-> +contrib/libvhost-user/libvhost-user.c
+> - Inline PTE_TABLE check for better readability
+> - Change access checks from ternary operator to if
+> - Improve readibility of User page U mode and SUM test
+> - Disallow non U mode from fetching from User pages
+> - Add reserved PTE flag check: W or W|X
+> - Add misaligned PPN check
+> - Set READ protection for PTE X flag and mstatus.mxr
+> - Use memory_region_is_ram in pte update
 
-contrib may or may not be exempt; but it's not in the whitelist.
+> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> Cc: Palmer Dabbelt <palmer@sifive.com>
+> Cc: Alistair Francis <Alistair.Francis@wdc.com>
+> Signed-off-by: Michael Clark <mjc@sifive.com>
 
-> +hw/rdma/rdma_utils.c
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Probably a bug; looks like a recently added file.
+Alistair
 
-> +libuser/trace.c
+> ---
+>   target/riscv/cpu_bits.h |  2 --
+>   target/riscv/helper.c   | 64
+++++++++++++++++++++++++++++++++++---------------
+>   2 files changed, 45 insertions(+), 21 deletions(-)
 
-Huh? I don't see this file in git.
+> diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
+> index 64aa097..12b4757 100644
+> --- a/target/riscv/cpu_bits.h
+> +++ b/target/riscv/cpu_bits.h
+> @@ -407,5 +407,3 @@
+>   #define PTE_SOFT  0x300 /* Reserved for Software */
 
-> +target/mips/translate_init.c
-> +target/ppc/mfrom_table.c
+>   #define PTE_PPN_SHIFT 10
+> -
+> -#define PTE_TABLE(PTE) (((PTE) & (PTE_V | PTE_R | PTE_W | PTE_X)) ==
+PTE_V)
+> diff --git a/target/riscv/helper.c b/target/riscv/helper.c
+> index 02cbcea..459fc97 100644
+> --- a/target/riscv/helper.c
+> +++ b/target/riscv/helper.c
+> @@ -185,16 +185,39 @@ restart:
+>   #endif
+>           target_ulong ppn = pte >> PTE_PPN_SHIFT;
 
-Probably bugs.
+> -        if (PTE_TABLE(pte)) { /* next level of page table */
+> +        if (!(pte & PTE_V)) {
+> +            /* Invalid PTE */
+> +            return TRANSLATE_FAIL;
+> +        } else if (!(pte & (PTE_R | PTE_W | PTE_X))) {
+> +            /* Inner PTE, continue walking */
+>               base = ppn << PGSHIFT;
+> -        } else if ((pte & PTE_U) ? (mode == PRV_S) && !sum : !(mode ==
+PRV_S)) {
+> -            break;
+> -        } else if (!(pte & PTE_V) || (!(pte & PTE_R) && (pte & PTE_W))) {
+> -            break;
+> -        } else if (access_type == MMU_INST_FETCH ? !(pte & PTE_X) :
+> -                  access_type == MMU_DATA_LOAD ?  !(pte & PTE_R) &&
+> -                  !(mxr && (pte & PTE_X)) : !((pte & PTE_R) && (pte &
+PTE_W))) {
+> -            break;
+> +        } else if ((pte & (PTE_R | PTE_W | PTE_X)) == PTE_W) {
+> +            /* Reserved leaf PTE flags: PTE_W */
+> +            return TRANSLATE_FAIL;
+> +        } else if ((pte & (PTE_R | PTE_W | PTE_X)) == (PTE_W | PTE_X)) {
+> +            /* Reserved leaf PTE flags: PTE_W + PTE_X */
+> +            return TRANSLATE_FAIL;
+> +        } else if ((pte & PTE_U) && ((mode != PRV_U) &&
+> +                   (!sum || access_type == MMU_INST_FETCH))) {
+> +            /* User PTE flags when not U mode and mstatus.SUM is not set,
+> +               or the access type is an instruction fetch */
+> +            return TRANSLATE_FAIL;
+> +        } else if (!(pte & PTE_U) && (mode != PRV_S)) {
+> +            /* Supervisor PTE flags when not S mode */
+> +            return TRANSLATE_FAIL;
+> +        } else if (ppn & ((1ULL << ptshift) - 1)) {
+> +            /* Misasligned PPN */
+> +            return TRANSLATE_FAIL;
+> +        } else if (access_type == MMU_DATA_LOAD && !((pte & PTE_R) ||
+> +                   ((pte & PTE_X) && mxr))) {
+> +            /* Read access check failed */
+> +            return TRANSLATE_FAIL;
+> +        } else if (access_type == MMU_DATA_STORE && !(pte & PTE_W)) {
+> +            /* Write access check failed */
+> +            return TRANSLATE_FAIL;
+> +        } else if (access_type == MMU_INST_FETCH && !(pte & PTE_X)) {
+> +            /* Fetch access check failed */
+> +            return TRANSLATE_FAIL;
+>           } else {
+>               /* if necessary, set accessed and dirty bits. */
+>               target_ulong updated_pte = pte | PTE_A |
+> @@ -202,16 +225,19 @@ restart:
 
-> +target/ppc/translate/dfp-impl.inc.c
+>               /* Page table updates need to be atomic with MTTCG enabled */
+>               if (updated_pte != pte) {
+> -                /* if accessed or dirty bits need updating, and the PTE
+is
+> -                 * in RAM, then we do so atomically with a compare and
+swap.
+> -                 * if the PTE is in IO space, then it can't be updated.
+> -                 * if the PTE changed, then we must re-walk the page
+table
+> -                   as the PTE is no longer valid */
+> +                /*
+> +                 * - if accessed or dirty bits need updating, and the
+PTE is
+> +                 *   in RAM, then we do so atomically with a compare and
+swap.
+> +                 * - if the PTE is in IO space or ROM, then it can't be
+updated
+> +                 *   and we return TRANSLATE_FAIL.
+> +                 * - if the PTE changed by the time we went to update
+it, then
+> +                 *   it is no longer valid and we must re-walk the page
+table.
+> +                 */
+>                   MemoryRegion *mr;
+>                   hwaddr l = sizeof(target_ulong), addr1;
+>                   mr = address_space_translate(cs->as, pte_addr,
+>                       &addr1, &l, false);
+> -                if (memory_access_is_direct(mr, true)) {
+> +                if (memory_region_is_ram(mr)) {
+>                       target_ulong *pte_pa =
+>                           qemu_map_ram_ptr(mr->ram_block, addr1);
+>   #if TCG_OVERSIZED_GUEST
+> @@ -239,15 +265,15 @@ restart:
+>               target_ulong vpn = addr >> PGSHIFT;
+>               *physical = (ppn | (vpn & ((1L << ptshift) - 1))) << PGSHIFT;
 
-This, and all other .inc.c, are indeed picking it up indirectly (by the 
-master .c that is including these secondary .c), so they are exempt. 
-They are whitelisted by the script via the shell case statement.
-
-> +target/s390x/gen-features.c
-
-Possibly a bug.
-
-> +tests/multiboot/libc.c
-> +tests/multiboot/mmap.c
-> +tests/multiboot/modules.c
-
-Exempt, per the XDIRREGEX in scripts/clean-includes
-
-> 
-> lots of files under tests/tcg
-
-Also exempt.
-
-> 
-> +tests/test-qapi-event.c
-
-Huh? That starts with #include "qemu/osdep.h".  But it's not a file 
-under version control.  In fact, it's stale leftovers (it used to be 
-generated by that name, but now we generate tests/test-qapi-events.c.
-
-> +tests/test-qapi-types.c
-> +tests/test-qapi-visit.c
-> +tests/test-qmp-introspect.c
-> +tests/test-qmp-marshal.c
-
-Again, how are you flagging these generated files?
-
-> 
-> +ui/keycodemapdb/tests/stdc.c
-
-Exempt, since it's in a submodule.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> -            if ((pte & PTE_R)) {
+> +            /* set permissions on the TLB entry */
+> +            if ((pte & PTE_R) || ((pte & PTE_X) && mxr)) {
+>                   *prot |= PAGE_READ;
+>               }
+>               if ((pte & PTE_X)) {
+>                   *prot |= PAGE_EXEC;
+>               }
+> -           /* only add write permission on stores or if the page
+> -              is already dirty, so that we don't miss further
+> -              page table walks to update the dirty bit */
+> +            /* add write permission on stores or if the page is already
+dirty,
+> +               so that we TLB miss on later writes to update the dirty
+bit */
+>               if ((pte & PTE_W) &&
+>                       (access_type == MMU_DATA_STORE || (pte & PTE_D))) {
+>                   *prot |= PAGE_WRITE;
+> --
+> 2.7.0
