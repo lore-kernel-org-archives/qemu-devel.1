@@ -1,30 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fECoS-0003o8-T9
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 07:54:17 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fECqZ-0005BU-S7
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 07:56:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fECoN-0005gq-4x
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 07:54:16 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:33270)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fECoM-0005fk-Tu
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 07:54:11 -0400
-Received: by mail-wr0-x244.google.com with SMTP id o4-v6so17284555wrm.0
-	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 04:54:10 -0700 (PDT)
-References: <1524153386-3550-1-git-send-email-abdallah.bouassida@lauterbach.com>
-	<1524153386-3550-4-git-send-email-abdallah.bouassida@lauterbach.com>
-	<874ljp9h2z.fsf@linaro.org>
-	<CAFEAcA8QoZdiCxRic9Ztekyi-e5hGwUSPUrbUmW_d2B9vJgYEg@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA8QoZdiCxRic9Ztekyi-e5hGwUSPUrbUmW_d2B9vJgYEg@mail.gmail.com>
-Date: Thu, 03 May 2018 12:54:08 +0100
-Message-ID: <8736z99cpr.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 3/3] target/arm: Add the XML dynamic
- generation
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fECqY-0006yv-Q0
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 07:56:27 -0400
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Date: Thu,  3 May 2018 13:56:20 +0200
+Message-Id: <20180503115620.10596-3-edgar.iglesias@gmail.com>
+In-Reply-To: <20180503115620.10596-1-edgar.iglesias@gmail.com>
+References: <20180503115620.10596-1-edgar.iglesias@gmail.com>
+Subject: [Qemu-devel] [PATCH v1 2/2] xlnx-zynqmp: Swap Cortex-R5 for
+ Cortex-R5F
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,60 +20,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Khaled Jmal <khaled.jmal@lauterbach.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org, frederic.konrad@adacore.com, sai.pavan.boddu@xilinx.com, alistair@alistair23.me, frasse.iglesias@gmail.com, edgar.iglesias@xilinx.com
 
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+The ZynqMP has Cortex-R5Fs with the optional FPU enabled.
 
-> On 3 May 2018 at 11:19, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
->>
->> Abdallah Bouassida <abdallah.bouassida@lauterbach.com> writes:
->>
->>> Generate an XML description for the cp-regs.
->>> Register these regs with the gdb_register_coprocessor().
->>> Add arm_gdb_get_sysreg() to use it as a callback to read those regs.
->>> Add a dummy arm_gdb_set_sysreg().
->>>
->>> Signed-off-by: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
->>> ---
->>>  gdbstub.c            | 10 +++++++
->>>  include/qom/cpu.h    |  5 +++-
->>>  target/arm/cpu.c     |  1 +
->>>  target/arm/cpu.h     | 26 ++++++++++++++++++
->>>  target/arm/gdbstub.c | 76 ++++++++++++++++++++++++++++++++++++++++++++=
-++++++++
->>>  target/arm/helper.c  | 26 ++++++++++++++++++
->>>  6 files changed, 143 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/gdbstub.c b/gdbstub.c
->>> index a76b2fa..4b56a43 100644
->>> --- a/gdbstub.c
->>> +++ b/gdbstub.c
->>> @@ -674,6 +674,16 @@ static const char *get_feature_xml(const char *p, =
-const char **newp,
->>>          }
->>>          return target_xml;
->>>      }
->>> +    if (cc->gdb_get_dynamic_xml) {
->>> +        CPUState *cpu =3D first_cpu;
->>> +        char *xmlname =3D g_strndup(p, len);
->>> +        const char *xml =3D cc->gdb_get_dynamic_xml(cpu, xmlname);
->>
->> Last time I asked:
->>
->> "although I'm confused as to why you need to g_strdup the string. You
->> already have p and its not like gdb_get_dynamic_xml couldn't dup the
->> string if it needed to (which it doesn't seem to)."
->
-> ...and the answer is still the same: p is not NUL terminated.
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+---
+ hw/arm/xlnx-zynqmp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Ahh I missed that reply...
-
->
-> thanks
-> -- PMM
-
-
---
-Alex Benn=C3=A9e
+diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+index 505253e0d2..efeb53c732 100644
+--- a/hw/arm/xlnx-zynqmp.c
++++ b/hw/arm/xlnx-zynqmp.c
+@@ -116,7 +116,7 @@ static void xlnx_zynqmp_create_rpu(XlnxZynqMPState *s, const char *boot_cpu,
+         char *name;
+ 
+         object_initialize(&s->rpu_cpu[i], sizeof(s->rpu_cpu[i]),
+-                          "cortex-r5-" TYPE_ARM_CPU);
++                          "cortex-r5f-" TYPE_ARM_CPU);
+         object_property_add_child(OBJECT(s), "rpu-cpu[*]",
+                                   OBJECT(&s->rpu_cpu[i]), &error_abort);
+ 
+-- 
+2.14.1
