@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fEEWH-0005PP-Ct
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 09:43:42 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fEEmO-0002LD-6J
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 10:00:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fEEWE-0001K5-2K
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 09:43:37 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54532 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fEEWD-0001Jh-UA
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 09:43:33 -0400
-Date: Thu, 3 May 2018 15:43:21 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180503134321.pp736ou25pdwvslm@sirius.home.kraxel.org>
-References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
-	<20180430103312.GH3249@redhat.com>
-	<20180430132107.0a37704d.cohuck@redhat.com>
-	<ac216b06-9469-addd-b5a1-3a3a89fd0782@redhat.com>
-	<20180502074403.yh5weukbjgqsvp7n@sirius.home.kraxel.org>
-	<20180502080200.GG3308@redhat.com>
-	<20180503072100.GA5301@stefanha-x1.localdomain>
-	<20180503090727.GC11382@redhat.com>
-	<CAFEAcA8=mZf8RbQX2-swbUBkoT=RYSVx-oRA2UpzJCqvgGF+KQ@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fEEmJ-0007UK-Ul
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 10:00:16 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:33190)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fEEmJ-0007T3-Nk
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 10:00:11 -0400
+Received: by mail-ot0-x242.google.com with SMTP id l22-v6so20741538otj.0
+	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 07:00:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8=mZf8RbQX2-swbUBkoT=RYSVx-oRA2UpzJCqvgGF+KQ@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] release retrospective, next release timing,
- numbering
+In-Reply-To: <20180427002651.28356-7-richard.henderson@linaro.org>
+References: <20180427002651.28356-1-richard.henderson@linaro.org>
+	<20180427002651.28356-7-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 3 May 2018 14:59:49 +0100
+Message-ID: <CAFEAcA_trFkyHOofragLEKpsNP67t4-3ZbSyCAgU2nYG75Zg5A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 6/9] target/arm: Introduce
+ ARM_FEATURE_V8_ATOMICS and initial decode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,45 +30,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On Thu, May 03, 2018 at 10:26:40AM +0100, Peter Maydell wrote:
-> On 3 May 2018 at 10:07, Daniel P. Berrang=E9 <berrange@redhat.com> wrot=
-e:
-> > On Thu, May 03, 2018 at 08:21:00AM +0100, Stefan Hajnoczi wrote:
-> >> I don't see an issue with time-based numbering schemes.  Ubuntu made=
- it
-> >> popular and other projects (like DPDK) are doing the same thing now.
-> >>
-> >> The convention is YY.MM though, not YYMM.
-> >
-> > It feels like we've got quite a strong backing for time based version=
-ing
-> > amongst people replying here. I'd be happy with YY.MM
->=20
-> I'm not hugely in favour mostly because I don't much like
-> changing version numbering formats -- does it really gain
-> us anything? But I guess it's a bit of a bikeshed-colour question.
+On 27 April 2018 at 01:26, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> The insns in the ARMv8.1-Atomics are added to the existing
+> load/store exclusive and load/store reg opcode spaces.
+> Rearrange the top-level decoders for these to accomodate.
+> The Atomics insns themselves still generate Unallocated.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+> +    case 0x4: /* LDXR */
+> +    case 0x5: /* LDAXR */
+> +        if (rn == 31) {
+> +            gen_check_sp_alignment(s);
+>          }
+> -    } else {
+> -        TCGv_i64 tcg_rt = cpu_reg(s, rt);
+> -        bool iss_sf = disas_ldst_compute_iss_sf(size, false, 0);
+> +        tcg_addr = read_cpu_reg_sp(s, rn, 1);
+> +        s->is_ldex = true;
+> +        gen_load_exclusive(s, rt, rt2, tcg_addr, size, false);
+> +        if (is_lasr) {
+> +            tcg_gen_mb(TCG_MO_ALL | TCG_BAR_LDAQ);
+> +        }
+> +        return;
+>
+> +    case 0x9: /* STLR */
+>          /* Generate ISS for non-exclusive accesses including LASR.  */
+> -        if (is_store) {
+> +        if (rn == 31) {
+> +            gen_check_sp_alignment(s);
+> +        }
+> +        tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
+> +        tcg_addr = read_cpu_reg_sp(s, rn, 1);
+> +        do_gpr_st(s, cpu_reg(s, rt), tcg_addr, size, true, rt,
+> +                  disas_ldst_compute_iss_sf(size, false, 0), is_lasr);
+> +        return;
+> +
+> +    case 0xd: /* LDARB */
 
-Well, major/minor numbers don't mean anything.  So I think it makes
-sense to give them a meaning, and given we do time-based releases it
-surely makes sense to use a time-based scheme.  Major indicating the
-year is the obvious and common choice here.  Various variants are in
-use:
+should be /* LDAR */ to match lack of size suffixes on other
+comments in the switch ?
 
-  (a) major equals year, minor equals month (ubuntu style).
-  (b) major equals year, minor counts up (mesa style).
-  (c) major is bumped each year, but doesn't equal year (libvirt style).
+> +        /* Generate ISS for non-exclusive accesses including LASR.  */
+> +        if (rn == 31) {
+> +            gen_check_sp_alignment(s);
+> +        }
+> +        tcg_addr = read_cpu_reg_sp(s, rn, 1);
+> +        do_gpr_ld(s, cpu_reg(s, rt), tcg_addr, size, false, false, true, rt,
+> +                  disas_ldst_compute_iss_sf(size, false, 0), is_lasr);
+> +        tcg_gen_mb(TCG_MO_ALL | TCG_BAR_LDAQ);
+> +        return;
+> +
+> +    case 0x2: case 0x3: /* CASP / STXP */
+> +        if (size & 2) { /* STXP / STLXP */
+> +            if (rn == 31) {
+> +                gen_check_sp_alignment(s);
+> +            }
+>              if (is_lasr) {
+>                  tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
+>              }
+> -            do_gpr_st(s, tcg_rt, tcg_addr, size,
+> -                      true, rt, iss_sf, is_lasr);
+> -        } else {
+> -            do_gpr_ld(s, tcg_rt, tcg_addr, size, false, false,
+> -                      true, rt, iss_sf, is_lasr);
+> +            tcg_addr = read_cpu_reg_sp(s, rn, 1);
+> +            gen_store_exclusive(s, rs, rt, rt2, tcg_addr, size, true);
+> +            return;
+> +        }
+> +        /* CASP / CASPL */
+> +        break;
+> +
+> +    case 0x6: case 0x7: /* CASP / LDXP */
+> +        if (size & 2) { /* LDXP / LDAXP */
+> +            if (rn == 31) {
+> +                gen_check_sp_alignment(s);
+> +            }
+> +            tcg_addr = read_cpu_reg_sp(s, rn, 1);
+> +            s->is_ldex = true;
+> +            gen_load_exclusive(s, rt, rt2, tcg_addr, size, true);
+>              if (is_lasr) {
+>                  tcg_gen_mb(TCG_MO_ALL | TCG_BAR_LDAQ);
+>              }
+> +            return;
+>          }
+> +        /* CASPA / CASPAL */
+> +        break;
+> +
+> +    case 0xa: /* CAS */
+> +    case 0xb: /* CASL */
+> +    case 0xe: /* CASA */
+> +    case 0xf: /* CASAL */
+> +        break;
+>      }
+> +    unallocated_encoding(s);
+>  }
+>
+>  /*
+> @@ -2715,6 +2751,55 @@ static void disas_ldst_reg_unsigned_imm(DisasContext *s, uint32_t insn,
+>      }
+>  }
+>
+> +/* Atomic memory operations
+> + *
+> + *  31  30      27  26    24    22  21   16   15    12    10    5     0
+> + * +------+-------+---+-----+-----+---+----+----+-----+-----+----+-----+
+> + * | size | 1 1 1 | V | 0 0 | A R | 1 | Rs | o3 | opc | 0 0 | Rn |  Rt |
+> + * +------+-------+---+-----+-----+--------+----+-----+-----+----+-----+
+> + *
+> + * Rt: the result register
+> + * Rn: base address or SP
+> + * Rs: the source register for the operation
+> + * V: vector flag (always 0 as of v8.3)
+> + * A: acquire flag
+> + * R: release flag
+> + */
+> +static void disas_ldst_atomic(DisasContext *s, uint32_t insn,
+> +                              int size, int rt, bool is_vector)
+> +{
+> +    int rs = extract32(insn, 16, 5);
+> +    int rn = extract32(insn, 5, 5);
+> +    int o3_opc = extract32(insn, 12, 4);
+> +    int feature = ARM_FEATURE_V8_ATOMICS;
+> +
+> +    if (is_vector) {
+> +        unallocated_encoding(s);
+> +        return;
+> +    }
+> +    switch (o3_opc) {
+> +    case 000: /* LDADD */
+> +    case 001: /* LDCLR */
+> +    case 002: /* LDEOR */
+> +    case 003: /* LDSET */
+> +    case 004: /* LDSMAX */
+> +    case 005: /* LDSMIN */
+> +    case 006: /* LDUMAX */
+> +    case 007: /* LDUMIN */
+> +    case 010: /* SWP */
 
-If we don't want give them a meaning, how about:
+I can see why you've used octal constants here, but I think they're
+probably going to be more confusing than helpful since they're
+so rare in our codebase.
 
-  (d) just drop the minor and count up major each release (systemd style)=
-?
+What about LDAPRB, LDAPRH, LDAPR (which are o3_opc == 0b1100) ?
 
-My personal preference would be (a) or (b), because it is easy to see
-when a version was released.  (b) looks more like a classic version
-number, we would have 18.0, 18.1, ... instead of 18.04, 18.08, ...
+> +    default:
+> +        unallocated_encoding(s);
+> +        return;
+> +    }
+> +    if (!arm_dc_feature(s, feature)) {
+> +        unallocated_encoding(s);
+> +        return;
+> +    }
+> +
+> +    (void)rs;
+> +    (void)rn;
+> +}
 
-cheers,
-  Gerd
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
