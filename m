@@ -1,17 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51964)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1fEABc-0002Gt-P0
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:06:03 -0400
+	(envelope-from <berrange@redhat.com>) id 1fEADG-0003MU-JQ
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:07:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1fEABb-0008Rp-N6
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:06:00 -0400
-Sender: "joel.stan@gmail.com" <joel.stan@gmail.com>
-From: Joel Stanley <joel@jms.id.au>
-Date: Thu,  3 May 2018 18:35:32 +0930
-Message-Id: <20180503090532.3113-3-joel@jms.id.au>
-In-Reply-To: <20180503090532.3113-1-joel@jms.id.au>
-References: <20180503090532.3113-1-joel@jms.id.au>
-Subject: [Qemu-devel] [PATCH 2/2] arm: Add BBC micro:bit machine
+	(envelope-from <berrange@redhat.com>) id 1fEADB-0000JY-Cx
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:07:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35514 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fEADB-0000JK-9K
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:07:37 -0400
+Date: Thu, 3 May 2018 10:07:27 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180503090727.GC11382@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
+	<20180430103312.GH3249@redhat.com>
+	<20180430132107.0a37704d.cohuck@redhat.com>
+	<ac216b06-9469-addd-b5a1-3a3a89fd0782@redhat.com>
+	<20180502074403.yh5weukbjgqsvp7n@sirius.home.kraxel.org>
+	<20180502080200.GG3308@redhat.com>
+	<20180503072100.GA5301@stefanha-x1.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180503072100.GA5301@stefanha-x1.localdomain>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] release retrospective, next release timing,
+ numbering
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,71 +35,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Andrew Jeffery <andrew@aj.id.au>, Jim Mussared <jim.mussared@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-This adds the base for a machine model of the BBC micro:bit:
+On Thu, May 03, 2018 at 08:21:00AM +0100, Stefan Hajnoczi wrote:
+> On Wed, May 02, 2018 at 09:02:00AM +0100, Daniel P. Berrang=C3=A9 wrote=
+:
+> > On Wed, May 02, 2018 at 09:44:03AM +0200, Gerd Hoffmann wrote:
+> > >   Hi,
+> > >=20
+> > > > > If we bump the major version each year anyway, why not go the w=
+hole way
+> > > > > and use 2018.1, 2018.2, ... (or even <year>.<month>)? The nice =
+thing
+> > > > > about that is that you can see at a glance when the release too=
+k place.
+> > > >=20
+> > > > ... or simply drop the first two digits and call them 18.1, 18.2,=
+ ...?
+> >=20
+> > > We could also drop the major/minor scheme altogether (as they are
+> > > meaningless anyway) and just go for YYMM, i.e. 1808 (for a august
+> > > release).
+> >=20
+> > I don't much like that - it'll lead to a wierd progression of numbers
+> > where we'll be constantly the rationale re-explaining to people who
+> > want to know why we've jumped from 1808 to 1902 to 1905 etc
+>=20
+> I don't see an issue with time-based numbering schemes.  Ubuntu made it
+> popular and other projects (like DPDK) are doing the same thing now.
+>=20
+> The convention is YY.MM though, not YYMM.
 
-  https://en.wikipedia.org/wiki/Micro_Bit
+It feels like we've got quite a strong backing for time based versioning
+amongst people replying here. I'd be happy with YY.MM
 
-This is a system with a nRF51 SoC containing the main processor, with
-various peripherals on board.
-
-Signed-off-by: Joel Stanley <joel@jms.id.au>
----
- hw/arm/Makefile.objs |  2 +-
- hw/arm/microbit.c    | 33 +++++++++++++++++++++++++++++++++
- 2 files changed, 34 insertions(+), 1 deletion(-)
- create mode 100644 hw/arm/microbit.c
-
-diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index 1d7211850454..c01e7a1e39fb 100644
---- a/hw/arm/Makefile.objs
-+++ b/hw/arm/Makefile.objs
-@@ -35,4 +35,4 @@ obj-$(CONFIG_MPS2) += mps2-tz.o
- obj-$(CONFIG_MSF2) += msf2-soc.o msf2-som.o
- obj-$(CONFIG_IOTKIT) += iotkit.o
- obj-$(CONFIG_FSL_IMX7) += fsl-imx7.o mcimx7d-sabre.o
--obj-$(CONFIG_NRF51_SOC) += nrf51_soc.o
-+obj-$(CONFIG_NRF51_SOC) += nrf51_soc.o microbit.o
-diff --git a/hw/arm/microbit.c b/hw/arm/microbit.c
-new file mode 100644
-index 000000000000..b61d0747fe56
---- /dev/null
-+++ b/hw/arm/microbit.c
-@@ -0,0 +1,33 @@
-+/*
-+ * BBC micro:bit machine
-+ *
-+ * Copyright 2018 Joel Stanley <joel@jms.id.au>
-+ *
-+ * This code is licensed under the GPL version 2 or later.  See
-+ * the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "hw/boards.h"
-+
-+#include "hw/arm/nrf51_soc.h"
-+
-+static void microbit_init(MachineState *machine)
-+{
-+    DeviceState *dev;
-+
-+    dev = qdev_create(NULL, TYPE_NRF51_SOC);
-+    if (machine->kernel_filename) {
-+        qdev_prop_set_string(dev, "kernel-filename", machine->kernel_filename);
-+    }
-+    object_property_set_bool(OBJECT(dev), true, "realized", &error_fatal);
-+}
-+
-+static void microbit_machine_init(MachineClass *mc)
-+{
-+    mc->desc = "BBC micro:bit";
-+    mc->init = microbit_init;
-+    mc->ignore_memory_transaction_failures = true;
-+}
-+DEFINE_MACHINE("microbit", microbit_machine_init);
--- 
-2.17.0
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
