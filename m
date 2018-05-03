@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54810)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fELwo-0004jF-Bz
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:39:32 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fELwo-0004jE-9r
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:39:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fELwk-00055v-CZ
+	(envelope-from <laurent@vivier.eu>) id 1fELwk-00055M-2r
 	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:39:30 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:58883)
+Received: from mout.kundenserver.de ([212.227.17.13]:43853)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fELwk-000542-35
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:39:26 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fELwj-00052N-OW
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 17:39:25 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu,  3 May 2018 23:38:58 +0200
-Message-Id: <20180503213903.30335-2-laurent@vivier.eu>
-In-Reply-To: <20180503213903.30335-1-laurent@vivier.eu>
-References: <20180503213903.30335-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 1/6] Remove CONFIG_USE_FDPIC.
+Date: Thu,  3 May 2018 23:38:57 +0200
+Message-Id: <20180503213903.30335-1-laurent@vivier.eu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 0/6] Linux user for 2.13 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,126 +25,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>, Christophe Lyon <christophe.lyon@st.com>
+Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
 
-From: Christophe Lyon <christophe.lyon@st.com>
+The following changes since commit 59255887e6cafeff747250d2613003a41d1d9dff:
 
-We want to avoid code disabled by default, because it ends up less
-tested. This patch removes all instances of #ifdef CONFIG_USE_FDPIC,
-most of which can be safely kept. For the ones that should be
-conditionally executed, we define elf_is_fdpic(). Without this patch,
-defining CONFIG_USE_FDPIC would prevent QEMU from building precisely
-because elf_is_fdpic is not defined.
+  Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20180502' into staging (2018-05-03 11:25:14 +0100)
 
-Signed-off-by: Christophe Lyon <christophe.lyon@st.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Message-Id: <20180430080404.7323-2-christophe.lyon@st.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/elfload.c | 18 +++++++-----------
- linux-user/qemu.h    |  4 ++--
- 2 files changed, 9 insertions(+), 13 deletions(-)
+are available in the Git repository at:
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index c77ed1bb01..bbe93b03b6 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -1681,7 +1681,12 @@ static void zero_bss(abi_ulong elf_bss, abi_ulong last_bss, int prot)
-     }
- }
- 
--#ifdef CONFIG_USE_FDPIC
-+/* Default implementation, always false.  */
-+static int elf_is_fdpic(struct elfhdr *exec)
-+{
-+    return 0;
-+}
-+
- static abi_ulong loader_build_fdpic_loadmap(struct image_info *info, abi_ulong sp)
- {
-     uint16_t n;
-@@ -1706,7 +1711,6 @@ static abi_ulong loader_build_fdpic_loadmap(struct image_info *info, abi_ulong s
- 
-     return sp;
- }
--#endif
- 
- static abi_ulong create_elf_tables(abi_ulong p, int argc, int envc,
-                                    struct elfhdr *exec,
-@@ -1725,7 +1729,6 @@ static abi_ulong create_elf_tables(abi_ulong p, int argc, int envc,
- 
-     sp = p;
- 
--#ifdef CONFIG_USE_FDPIC
-     /* Needs to be before we load the env/argc/... */
-     if (elf_is_fdpic(exec)) {
-         /* Need 4 byte alignment for these structs */
-@@ -1737,7 +1740,6 @@ static abi_ulong create_elf_tables(abi_ulong p, int argc, int envc,
-             sp = loader_build_fdpic_loadmap(interp_info, sp);
-         }
-     }
--#endif
- 
-     u_platform = 0;
-     k_platform = ELF_PLATFORM;
-@@ -2153,10 +2155,8 @@ static void load_elf_image(const char *image_name, int image_fd,
-     }
-     bswap_phdr(phdr, ehdr->e_phnum);
- 
--#ifdef CONFIG_USE_FDPIC
-     info->nsegs = 0;
-     info->pt_dynamic_addr = 0;
--#endif
- 
-     mmap_lock();
- 
-@@ -2173,9 +2173,7 @@ static void load_elf_image(const char *image_name, int image_fd,
-             if (a > hiaddr) {
-                 hiaddr = a;
-             }
--#ifdef CONFIG_USE_FDPIC
-             ++info->nsegs;
--#endif
-         }
-     }
- 
-@@ -2200,8 +2198,7 @@ static void load_elf_image(const char *image_name, int image_fd,
-     }
-     load_bias = load_addr - loaddr;
- 
--#ifdef CONFIG_USE_FDPIC
--    {
-+    if (elf_is_fdpic(ehdr)) {
-         struct elf32_fdpic_loadseg *loadsegs = info->loadsegs =
-             g_malloc(sizeof(*loadsegs) * info->nsegs);
- 
-@@ -2219,7 +2216,6 @@ static void load_elf_image(const char *image_name, int image_fd,
-             }
-         }
-     }
--#endif
- 
-     info->load_bias = load_bias;
-     info->load_addr = load_addr;
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index 192a0d2fef..da3b51724c 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -51,13 +51,13 @@ struct image_info {
-         abi_ulong       file_string;
-         uint32_t        elf_flags;
- 	int		personality;
--#ifdef CONFIG_USE_FDPIC
-+
-+        /* The fields below are used in FDPIC mode.  */
-         abi_ulong       loadmap_addr;
-         uint16_t        nsegs;
-         void           *loadsegs;
-         abi_ulong       pt_dynamic_addr;
-         struct image_info *other_info;
--#endif
- };
- 
- #ifdef TARGET_I386
+  git://github.com/vivier/qemu.git tags/linux-user-for-2.13-pull-request
+
+for you to fetch changes up to 7f254c5cb80bc478794a4c3d7fe5d503b033be13:
+
+  linux-user: remove useless padding in flock64 structure (2018-05-03 18:40:19 +0200)
+
+----------------------------------------------------------------
+
+----------------------------------------------------------------
+
+Christophe Lyon (4):
+  Remove CONFIG_USE_FDPIC.
+  linux-user: ARM-FDPIC: Identify ARM FDPIC binaries
+  linux-user: ARM-FDPIC: Add support of FDPIC for ARM.
+  linux-user: ARM-FDPIC: Add support for signals for FDPIC targets
+
+Laurent Vivier (2):
+  linux-user: introduce target_sigsp() and target_save_altstack()
+  linux-user: remove useless padding in flock64 structure
+
+ include/elf.h                   |   1 +
+ include/exec/user/abitypes.h    |   2 +-
+ linux-user/aarch64/signal.c     |  13 +----
+ linux-user/alpha/signal.c       |  17 ++----
+ linux-user/arm/signal.c         | 122 ++++++++++++++++++++++++++++++----------
+ linux-user/arm/target_structs.h |   7 +++
+ linux-user/elfload.c            |  54 ++++++++++++++----
+ linux-user/hppa/signal.c        |  14 ++---
+ linux-user/i386/signal.c        |  12 +---
+ linux-user/m68k/signal.c        |  15 +----
+ linux-user/microblaze/signal.c  |   4 +-
+ linux-user/mips/signal.c        |  15 +----
+ linux-user/nios2/signal.c       |  21 +------
+ linux-user/openrisc/signal.c    |  14 +----
+ linux-user/ppc/signal.c         |  15 +----
+ linux-user/qemu.h               |  13 ++++-
+ linux-user/riscv/signal.c       |  28 +++------
+ linux-user/s390x/signal.c       |  12 +---
+ linux-user/sh4/signal.c         |  11 +---
+ linux-user/signal-common.h      |  15 ++---
+ linux-user/signal.c             |  32 +++++++++++
+ linux-user/sparc/signal.c       |  28 ++++++---
+ linux-user/syscall.c            |  14 ++---
+ linux-user/syscall_defs.h       |  25 ++------
+ linux-user/tilegx/signal.c      |  13 +----
+ linux-user/xtensa/signal.c      |  15 ++---
+ 26 files changed, 271 insertions(+), 261 deletions(-)
+
 -- 
 2.14.3
