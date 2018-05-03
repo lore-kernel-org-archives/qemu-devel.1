@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fEKTJ-0006ri-J7
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:04:58 -0400
+	(envelope-from <alistair23@gmail.com>) id 1fEKUS-0007vy-Mv
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:06:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fEKTI-00073k-L2
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:04:57 -0400
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:39872)
+	(envelope-from <alistair23@gmail.com>) id 1fEKUR-0008Om-Lb
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:06:08 -0400
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:35639)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1fEKTI-00072l-DY
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:04:56 -0400
-Received: by mail-lf0-x242.google.com with SMTP id j193-v6so27778726lfg.6
-	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 13:04:56 -0700 (PDT)
+	id 1fEKUR-0008NY-CK
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 16:06:07 -0400
+Received: by mail-lf0-x244.google.com with SMTP id y72-v6so14037365lfd.2
+	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 13:06:07 -0700 (PDT)
 MIME-Version: 1.0
 References: <20180503091922.28733-1-edgar.iglesias@gmail.com>
-	<20180503091922.28733-4-edgar.iglesias@gmail.com>
-In-Reply-To: <20180503091922.28733-4-edgar.iglesias@gmail.com>
+	<20180503091922.28733-5-edgar.iglesias@gmail.com>
+In-Reply-To: <20180503091922.28733-5-edgar.iglesias@gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 03 May 2018 20:04:29 +0000
-Message-ID: <CAKmqyKNAUk8J8vQqkBsMPVxJkGkjOV+7OcfTp+3=Erw87cfQxQ@mail.gmail.com>
+Date: Thu, 03 May 2018 20:05:40 +0000
+Message-ID: <CAKmqyKP-w5=Xs7_FioCnL_KLeMyi57wEeFzjDtOxV3mRsNLoSA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 03/29] target-microblaze:
- compute_ldst_addr: Use bool instead of int
+Subject: Re: [Qemu-devel] [PATCH v1 04/29] target-microblaze: Fallback to
+ our latest CPU version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,13 +33,17 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Edgar Iglesias <edgar.iglesias@gmail.com>
 Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, Francisco Iglesias <frasse.iglesias@gmail.com>, Alistair Francis <alistair@alistair23.me>, Richard Henderson <richard.henderson@linaro.org>
 
-On Thu, May 3, 2018 at 2:19 AM Edgar E. Iglesias <edgar.iglesias@gmail.com>
+On Thu, May 3, 2018 at 2:25 AM Edgar E. Iglesias <edgar.iglesias@gmail.com>
 wrote:
 
 > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-> Use bool instead of int to represent flags.
-> No functional change.
+> Today, when running QEMU in linux-user or with boards that don't
+> select a specific CPU version, we treat it as an invalid version
+> and log a message.
+
+> Instead, if no specific version was selected, fallback to our
+> latest CPU version.
 
 > Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
@@ -48,40 +52,44 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->   target/microblaze/translate.c | 10 +++++-----
->   1 file changed, 5 insertions(+), 5 deletions(-)
+>   target/microblaze/cpu.c | 9 +++++++--
+>   1 file changed, 7 insertions(+), 2 deletions(-)
 
-> diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-> index 6fe679ca6d..9232b42a8a 100644
-> --- a/target/microblaze/translate.c
-> +++ b/target/microblaze/translate.c
-> @@ -845,13 +845,13 @@ static void dec_imm(DisasContext *dc)
+> diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
+> index 4dc1404800..06476f6efc 100644
+> --- a/target/microblaze/cpu.c
+> +++ b/target/microblaze/cpu.c
+> @@ -72,6 +72,9 @@ static const struct {
+>       {NULL, 0},
+>   };
 
->   static inline TCGv *compute_ldst_addr(DisasContext *dc, TCGv *t)
+> +/* If no specific version gets selected, default to the following.  */
+> +#define DEFAULT_CPU_VERSION "10.0"
+> +
+>   static void mb_cpu_set_pc(CPUState *cs, vaddr value)
 >   {
-> -    unsigned int extimm = dc->tb_flags & IMM_FLAG;
-> -    /* Should be set to one if r1 is used by loadstores.  */
-> -    int stackprot = 0;
-> +    bool extimm = dc->tb_flags & IMM_FLAG;
-> +    /* Should be set to true if r1 is used by loadstores.  */
-> +    bool stackprot = false;
+>       MicroBlazeCPU *cpu = MICROBLAZE_CPU(cs);
+> @@ -141,6 +144,7 @@ static void mb_cpu_realizefn(DeviceState *dev, Error
+**errp)
+>       MicroBlazeCPU *cpu = MICROBLAZE_CPU(cs);
+>       CPUMBState *env = &cpu->env;
+>       uint8_t version_code = 0;
+> +    const char *version;
+>       int i = 0;
+>       Error *local_err = NULL;
 
->       /* All load/stores use ra.  */
->       if (dc->ra == 1 && dc->cpu->cfg.stackprot) {
-> -        stackprot = 1;
-> +        stackprot = true;
->       }
+> @@ -162,8 +166,9 @@ static void mb_cpu_realizefn(DeviceState *dev, Error
+**errp)
+>                           | PVR2_FPU_EXC_MASK \
+>                           | 0;
 
->       /* Treat the common cases first.  */
-> @@ -864,7 +864,7 @@ static inline TCGv *compute_ldst_addr(DisasContext
-*dc, TCGv *t)
+> -    for (i = 0; mb_cpu_lookup[i].name && cpu->cfg.version; i++) {
+> -        if (strcmp(mb_cpu_lookup[i].name, cpu->cfg.version) == 0) {
+> +    version = cpu->cfg.version ? cpu->cfg.version : DEFAULT_CPU_VERSION;
+> +    for (i = 0; mb_cpu_lookup[i].name && version; i++) {
+> +        if (strcmp(mb_cpu_lookup[i].name, version) == 0) {
+>               version_code = mb_cpu_lookup[i].version_id;
+>               break;
 >           }
-
->           if (dc->rb == 1 && dc->cpu->cfg.stackprot) {
-> -            stackprot = 1;
-> +            stackprot = true;
->           }
-
->           *t = tcg_temp_new();
 > --
 > 2.14.1
