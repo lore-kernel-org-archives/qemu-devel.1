@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fECvc-00005p-Rn
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 08:01:46 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fED67-0002KK-1f
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 08:12:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fECvX-0001n7-0P
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 08:01:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43040 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fECvW-0001mr-R7
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 08:01:34 -0400
-Date: Thu, 3 May 2018 20:01:20 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180503120120.GG29580@xz-mi>
-References: <20180427095527.GE13269@xz-mi> <20180427114029.GF13269@xz-mi>
-	<AADFC41AFE54684AB9EE6CBC0274A5D19113D318@SHSMSX101.ccr.corp.intel.com>
-	<20180503060442.GB2378@xz-mi>
-	<547a97a1-0ac0-21b2-af00-036b795b06cc@redhat.com>
-	<20180503072828.GA29580@xz-mi>
-	<8cbed1d0-1f4e-db6d-bd83-1042f724827a@redhat.com>
-	<20180503075302.GC29580@xz-mi>
-	<f933ba4d-a025-7c94-69c6-d21f408eb729@redhat.com>
-	<20180503095359.GE29580@xz-mi>
+	(envelope-from <dgibson@ozlabs.org>) id 1fED63-0007Rp-T4
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 08:12:31 -0400
+Date: Thu, 3 May 2018 21:59:09 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180503115909.GA13229@umbus.fritz.box>
+References: <20180503062145.17899-1-david@gibson.dropbear.id.au>
+	<20180503062145.17899-9-david@gibson.dropbear.id.au>
+	<0d815d7c-42de-c89e-4481-21b32e04ed7c@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="SLk8PSyqxe/ugcCT"
 Content-Disposition: inline
-In-Reply-To: <20180503095359.GE29580@xz-mi>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 08/10] intel-iommu: maintain per-device
- iova ranges
+In-Reply-To: <0d815d7c-42de-c89e-4481-21b32e04ed7c@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 8/8] spapr: Clean up handling of LPCR
+ power-saving exit bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,83 +26,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Jintack Lim <jintack@cs.columbia.edu>, "Tian, Kevin" <kevin.tian@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com
 
-On Thu, May 03, 2018 at 05:53:59PM +0800, Peter Xu wrote:
-> On Thu, May 03, 2018 at 05:22:03PM +0800, Jason Wang wrote:
-> >=20
-> >=20
-> > On 2018=E5=B9=B405=E6=9C=8803=E6=97=A5 15:53, Peter Xu wrote:
-> > > On Thu, May 03, 2018 at 03:43:35PM +0800, Jason Wang wrote:
-> > > >=20
-> > > > On 2018=E5=B9=B405=E6=9C=8803=E6=97=A5 15:28, Peter Xu wrote:
-> > > > > On Thu, May 03, 2018 at 03:20:11PM +0800, Jason Wang wrote:
-> > > > > > On 2018=E5=B9=B405=E6=9C=8803=E6=97=A5 14:04, Peter Xu wrote:
-> > > > > > > IMHO the guest can't really detect this, but it'll found th=
-at the
-> > > > > > > device is not working functionally if it's doing something =
-like what
-> > > > > > > Jason has mentioned.
-> > > > > > >=20
-> > > > > > > Actually now I have had an idea if we really want to live w=
-ell even
-> > > > > > > with Jason's example: maybe we'll need to identify PSI/DSI.=
-  For DSI,
-> > > > > > > we don't remap for mapped pages; for PSI, we unmap and rema=
-p the
-> > > > > > > mapped pages.  That'll complicate the stuff a bit, but it s=
-hould
-> > > > > > > satisfy all the people.
-> > > > > > >=20
-> > > > > > > Thanks,
-> > > > > > So it looks like there will be still unnecessary unamps.
-> > > > > Could I ask what do you mean by "unecessary unmaps"?
-> > > > It's for "for PSI, we unmap and remap the mapped pages". So for t=
-he first
-> > > > "unmap" how do you know it was really necessary without knowing t=
-he state of
-> > > > current shadow page table?
-> > > I don't.  Could I just unmap it anyway?  Say, now the guest _modifi=
-ed_
-> > > the PTE already.  Yes I think it's following the spec, but it is
-> > > really _unsafe_.  We can know that from what it has done already.
-> > > Then I really think a unmap+map would be good enough for us...  Aft=
-er
-> > > all that behavior can cause DMA error even on real hardwares.  It c=
-an
-> > > never tell.
-> >=20
-> > I mean for following case:
-> >=20
-> > 1) guest maps A1 (iova) to XXX
-> > 2) guest maps A2 (A1 + 4K) (iova) to YYY
-> > 3) guest maps A3 (A1 + 8K) (iova) to ZZZ
-> > 4) guest unmaps A2 and A2, for reducing the number of PSIs, it can
-> > invalidate A1 with a range of 2M
-> >=20
-> > If this is allowed by spec, looks like A1 will be unmaped and mapped.
->=20
-> My follow-up patch won't survive with this one but the original patch
-> will work.
->=20
-> Jason and I discussed a bit on IRC on this matter.  Here's the
-> conclusion we got: for now we use my original patch (which solves
-> everything except PTE modifications).  We mark that modify-PTE problem
-> as TODO. Then at least we can have the nested device assignment work
-> well on known OSs first.
 
-Here just to mention that we actually have no way to emulate a PTE
-modification procedure.  The problem is that we can never atomically
-modify a PTE on the host with Linux, either via VFIO interface or even
-directly using IOMMU API in kernel.  To be more specific to our use
-case - VFIO provides VFIO_IOMMU_MAP_DMA and VFIO_IOMMU_UNMAP_DMA, but
-it never provides VFIO_IOMMU_MODIFY_DMA to modify a PTE atomically.
-It means that even if we know the PTE has changed, then we can only
-unmap it and remap.  It'll still have the same "invalid window"
-problem we have discussed since during unmap and remap the page is
-invalid (while from guest POV it should never, since the PTE
-modification is atomic).
+--SLk8PSyqxe/ugcCT
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, May 03, 2018 at 09:47:18AM +0200, C=E9dric Le Goater wrote:
+> On 05/03/2018 08:21 AM, David Gibson wrote:
+> > To prevent spurious wakeups on cpus that are supposed to be disabled, we
+> > need to clear the LPCR bits which control certain wakeup events.
+> > spapr_cpu_reset() has separate cases here for boot and non-boot (initia=
+lly
+> > inactive) cpus.  rtas_start_cpu() then turns the LPCR bits on when the
+> > non-boot cpus are activated.
+> >=20
+> > But explicit checks against first_cpu are not how we usually do things:
+> > instead spapr_cpu_reset() generally sets things up for non-boot (inacti=
+ve)
+> > cpus, then spapr_machine_reset() and/or rtas_start_cpu() override as
+> > necessary.
+> >=20
+> > So, do that instead.  Because the LPCR activation is identical for boot
+> > cpus and non-boot cpus just activated with rtas_start_cpu() we can put =
+the
+> > code common in spapr_cpu_set_entry_state().
+>=20
+> This is much nicer.
+>=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>=20
+> Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
+>=20
+> and for the patchset :
+>=20
+> Tested-by: C=E9dric Le Goater <clg@kaod.org>
+>=20
+> under KVM & TCG with cpu hotplug and unplug.
+
+Thanks.  I've folded the series into ppc-for-2.13.
+
+> There is still a spapr_cpu_reset() call under spapr_cpu_init().
+> Is that on purpose ?
+
+Sort of.  I'd still like to remove it, but figuring out how to do so
+safely is going to take a bit longer.  Well, probably quite a lot
+longer, since I doubt I'll get it done before I go away.
 
 --=20
-Peter Xu
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--SLk8PSyqxe/ugcCT
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrq+YoACgkQbDjKyiDZ
+s5JnPQ/9HienOKF4i36vCFEGiX48mObk2JGGwXQ4yryd4oJ8go40tGqMm8K3jJ4K
+nzUT5gldjNjEjs9ZOYpN059pv78unkooWfvKY1UIyAGNvtx/8TOwvD2MNWEmi7uc
+JrlnVX9mfjGoJwlUg1iKuLwwTQxUzcUt9qEqoepFCLRrDwnK1U5nmOTXOrsnAN3o
+xYe7eaftaa6bl57dHBOK7FYhDVK8Q/LGrX13RGhcgKMCw9AwVjVl3WxIROlwQQ69
+3AWgJRDx8Lfnvi4NL91WAT6ED4S4rf1g2KU0YbQzGUsXrgIRRCdPTo0qt7TmYsRQ
+Lixz4KCBqPeTry+gDlqAQ7iQvWS3dDTYqzaEpuI+cTtNHUFdJTGdIKXtXi0lgF+2
+L5v7ZrZWQ7rjdal5xvwxU1ZCymDKUQAAL6bKwd2efNY8VJtQY6t+qA2g1bNyYZOX
+eLip/M2hB4/A8YnNSfGDsYDw269EsNTbF3i/tomlqxYBpZG648480Q1y+IaDt2LP
+SBLxE3Pjep2pdLRdrBpCD5C+59xkWjpbzPVctQjlUC4UyXrrLB/bIVLRiap6R8Bx
+dzawbbMqlW9jBfqUrUDtJBt8appezttX9xT+2C1FMmUjm/rb/BhsO6jrrVSlLk4/
+05oOt2IzRKVrgBOjE62gXze8Gge/Oq8JqqATXvKstqBG+IJmuuc=
+=+/yl
+-----END PGP SIGNATURE-----
+
+--SLk8PSyqxe/ugcCT--
