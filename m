@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55115)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fEAP0-0000w5-32
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:19:51 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fEAP2-0000xl-6o
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:19:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fEAOw-00053y-48
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:19:50 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:46727)
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fEAP0-00055W-Ok
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:19:52 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:40833)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1fEAOv-00053S-Sb
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:19:46 -0400
-Received: by mail-lf0-x243.google.com with SMTP id v85-v6so24888137lfa.13
-	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 02:19:45 -0700 (PDT)
+	id 1fEAP0-000558-D4
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 05:19:50 -0400
+Received: by mail-lf0-x243.google.com with SMTP id j16-v6so24917085lfb.7
+	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 02:19:50 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Thu,  3 May 2018 11:19:05 +0200
-Message-Id: <20180503091922.28733-13-edgar.iglesias@gmail.com>
+Date: Thu,  3 May 2018 11:19:08 +0200
+Message-Id: <20180503091922.28733-16-edgar.iglesias@gmail.com>
 In-Reply-To: <20180503091922.28733-1-edgar.iglesias@gmail.com>
 References: <20180503091922.28733-1-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v1 12/29] target-microblaze: Remove pointer
- indirection for ld/st addresses
+Subject: [Qemu-devel] [PATCH v1 15/29] target-microblaze: Break out
+ trap_userspace()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,89 +32,192 @@ Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, sai.pavan.boddu@xili
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
+Break out trap_userspace() to avoid open coding it everywhere.
+For privileged insns, we now always stop translation of the
+current insn for cores without exceptions.
+
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- target/microblaze/translate.c | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+ target/microblaze/translate.c | 76 +++++++++++++++----------------------------
+ 1 file changed, 27 insertions(+), 49 deletions(-)
 
 diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index daed0b7e1f..5cc53eb035 100644
+index 57cd00ab3e..c0e8879416 100644
 --- a/target/microblaze/translate.c
 +++ b/target/microblaze/translate.c
-@@ -848,7 +848,7 @@ static void dec_imm(DisasContext *dc)
-     dc->clear_imm = 0;
+@@ -179,6 +179,22 @@ static void write_carryi(DisasContext *dc, bool carry)
+     tcg_temp_free_i32(t0);
  }
  
--static inline void compute_ldst_addr(DisasContext *dc, TCGv_i32 *t)
-+static inline void compute_ldst_addr(DisasContext *dc, TCGv_i32 t)
- {
-     bool extimm = dc->tb_flags & IMM_FLAG;
-     /* Should be set to true if r1 is used by loadstores.  */
-@@ -863,10 +863,10 @@ static inline void compute_ldst_addr(DisasContext *dc, TCGv_i32 *t)
-     if (!dc->type_b) {
-         /* If any of the regs is r0, return the value of the other reg.  */
-         if (dc->ra == 0) {
--            tcg_gen_mov_i32(*t, cpu_R[dc->rb]);
-+            tcg_gen_mov_i32(t, cpu_R[dc->rb]);
++/*
++ * Returns true if the insn is illegal in userspace.
++ * If exceptions are enabled, an exception is raised.
++ */
++static bool trap_userspace(DisasContext *dc, bool cond)
++{
++    int mem_index = cpu_mmu_index(&dc->cpu->env, false);
++    bool cond_user = cond && mem_index == MMU_USER_IDX;
++
++    if (cond_user && (dc->tb_flags & MSR_EE_FLAG)) {
++        tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
++        t_gen_raise_exception(dc, EXCP_HW_EXCP);
++    }
++    return cond_user;
++}
++
+ /* True if ALU operand b is a small immediate that may deserve
+    faster treatment.  */
+ static inline int dec_alu_op_b_is_small_imm(DisasContext *dc)
+@@ -432,7 +448,6 @@ static void dec_msr(DisasContext *dc)
+     CPUState *cs = CPU(dc->cpu);
+     TCGv_i32 t0, t1;
+     unsigned int sr, to, rn;
+-    int mem_index = cpu_mmu_index(&dc->cpu->env, false);
+ 
+     sr = dc->imm & ((1 << 14) - 1);
+     to = dc->imm & (1 << 14);
+@@ -452,10 +467,7 @@ static void dec_msr(DisasContext *dc)
              return;
-         } else if (dc->rb == 0) {
--            tcg_gen_mov_i32(*t, cpu_R[dc->ra]);
-+            tcg_gen_mov_i32(t, cpu_R[dc->ra]);
+         }
+ 
+-        if ((dc->tb_flags & MSR_EE_FLAG)
+-            && mem_index == MMU_USER_IDX && (dc->imm != 4 && dc->imm != 0)) {
+-            tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
+-            t_gen_raise_exception(dc, EXCP_HW_EXCP);
++        if (trap_userspace(dc, dc->imm != 4 && dc->imm != 0)) {
              return;
          }
  
-@@ -874,27 +874,27 @@ static inline void compute_ldst_addr(DisasContext *dc, TCGv_i32 *t)
-             stackprot = true;
-         }
- 
--        tcg_gen_add_i32(*t, cpu_R[dc->ra], cpu_R[dc->rb]);
-+        tcg_gen_add_i32(t, cpu_R[dc->ra], cpu_R[dc->rb]);
- 
-         if (stackprot) {
--            gen_helper_stackprot(cpu_env, *t);
-+            gen_helper_stackprot(cpu_env, t);
-         }
+@@ -480,13 +492,8 @@ static void dec_msr(DisasContext *dc)
          return;
      }
-     /* Immediate.  */
-     if (!extimm) {
-         if (dc->imm == 0) {
--            tcg_gen_mov_i32(*t, cpu_R[dc->ra]);
-+            tcg_gen_mov_i32(t, cpu_R[dc->ra]);
-             return;
-         }
--        tcg_gen_movi_i32(*t, (int32_t)((int16_t)dc->imm));
--        tcg_gen_add_i32(*t, cpu_R[dc->ra], *t);
-+        tcg_gen_movi_i32(t, (int32_t)((int16_t)dc->imm));
-+        tcg_gen_add_i32(t, cpu_R[dc->ra], t);
-     } else {
--        tcg_gen_add_i32(*t, cpu_R[dc->ra], *(dec_alu_op_b(dc)));
-+        tcg_gen_add_i32(t, cpu_R[dc->ra], *(dec_alu_op_b(dc)));
+ 
+-    if (to) {
+-        if ((dc->tb_flags & MSR_EE_FLAG)
+-             && mem_index == MMU_USER_IDX) {
+-            tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
+-            t_gen_raise_exception(dc, EXCP_HW_EXCP);
+-            return;
+-        }
++    if (trap_userspace(dc, to)) {
++        return;
      }
  
-     if (stackprot) {
--        gen_helper_stackprot(cpu_env, *t);
-+        gen_helper_stackprot(cpu_env, t);
+ #if !defined(CONFIG_USER_ONLY)
+@@ -738,7 +745,6 @@ static void dec_bit(DisasContext *dc)
+     CPUState *cs = CPU(dc->cpu);
+     TCGv_i32 t0;
+     unsigned int op;
+-    int mem_index = cpu_mmu_index(&dc->cpu->env, false);
+ 
+     op = dc->ir & ((1 << 9) - 1);
+     switch (op) {
+@@ -784,22 +790,12 @@ static void dec_bit(DisasContext *dc)
+         case 0x76:
+             /* wdc.  */
+             LOG_DIS("wdc r%d\n", dc->ra);
+-            if ((dc->tb_flags & MSR_EE_FLAG)
+-                 && mem_index == MMU_USER_IDX) {
+-                tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
+-                t_gen_raise_exception(dc, EXCP_HW_EXCP);
+-                return;
+-            }
++            trap_userspace(dc, true);
+             break;
+         case 0x68:
+             /* wic.  */
+             LOG_DIS("wic r%d\n", dc->ra);
+-            if ((dc->tb_flags & MSR_EE_FLAG)
+-                 && mem_index == MMU_USER_IDX) {
+-                tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
+-                t_gen_raise_exception(dc, EXCP_HW_EXCP);
+-                return;
+-            }
++            trap_userspace(dc, true);
+             break;
+         case 0xe0:
+             if ((dc->tb_flags & MSR_EE_FLAG)
+@@ -1199,7 +1195,6 @@ static void dec_bcc(DisasContext *dc)
+ static void dec_br(DisasContext *dc)
+ {
+     unsigned int dslot, link, abs, mbar;
+-    int mem_index = cpu_mmu_index(&dc->cpu->env, false);
+ 
+     dslot = dc->ir & (1 << 20);
+     abs = dc->ir & (1 << 19);
+@@ -1254,9 +1249,7 @@ static void dec_br(DisasContext *dc)
+             if (!(dc->tb_flags & IMM_FLAG) && (dc->imm == 8 || dc->imm == 0x18))
+                 t_gen_raise_exception(dc, EXCP_BREAK);
+             if (dc->imm == 0) {
+-                if ((dc->tb_flags & MSR_EE_FLAG) && mem_index == MMU_USER_IDX) {
+-                    tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
+-                    t_gen_raise_exception(dc, EXCP_HW_EXCP);
++                if (trap_userspace(dc, true)) {
+                     return;
+                 }
+ 
+@@ -1331,12 +1324,15 @@ static inline void do_rte(DisasContext *dc)
+ static void dec_rts(DisasContext *dc)
+ {
+     unsigned int b_bit, i_bit, e_bit;
+-    int mem_index = cpu_mmu_index(&dc->cpu->env, false);
+ 
+     i_bit = dc->ir & (1 << 21);
+     b_bit = dc->ir & (1 << 22);
+     e_bit = dc->ir & (1 << 23);
+ 
++    if (trap_userspace(dc, i_bit || b_bit || e_bit)) {
++        return;
++    }
++
+     dc->delayed_branch = 2;
+     dc->tb_flags |= D_FLAG;
+     tcg_gen_st_i32(tcg_const_i32(dc->type_b && (dc->tb_flags & IMM_FLAG)),
+@@ -1344,27 +1340,12 @@ static void dec_rts(DisasContext *dc)
+ 
+     if (i_bit) {
+         LOG_DIS("rtid ir=%x\n", dc->ir);
+-        if ((dc->tb_flags & MSR_EE_FLAG)
+-             && mem_index == MMU_USER_IDX) {
+-            tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
+-            t_gen_raise_exception(dc, EXCP_HW_EXCP);
+-        }
+         dc->tb_flags |= DRTI_FLAG;
+     } else if (b_bit) {
+         LOG_DIS("rtbd ir=%x\n", dc->ir);
+-        if ((dc->tb_flags & MSR_EE_FLAG)
+-             && mem_index == MMU_USER_IDX) {
+-            tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
+-            t_gen_raise_exception(dc, EXCP_HW_EXCP);
+-        }
+         dc->tb_flags |= DRTB_FLAG;
+     } else if (e_bit) {
+         LOG_DIS("rted ir=%x\n", dc->ir);
+-        if ((dc->tb_flags & MSR_EE_FLAG)
+-             && mem_index == MMU_USER_IDX) {
+-            tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
+-            t_gen_raise_exception(dc, EXCP_HW_EXCP);
+-        }
+         dc->tb_flags |= DRTE_FLAG;
+     } else
+         LOG_DIS("rts ir=%x\n", dc->ir);
+@@ -1503,16 +1484,13 @@ static void dec_null(DisasContext *dc)
+ /* Insns connected to FSL or AXI stream attached devices.  */
+ static void dec_stream(DisasContext *dc)
+ {
+-    int mem_index = cpu_mmu_index(&dc->cpu->env, false);
+     TCGv_i32 t_id, t_ctrl;
+     int ctrl;
+ 
+     LOG_DIS("%s%s imm=%x\n", dc->rd ? "get" : "put",
+             dc->type_b ? "" : "d", dc->imm);
+ 
+-    if ((dc->tb_flags & MSR_EE_FLAG) && (mem_index == MMU_USER_IDX)) {
+-        tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
+-        t_gen_raise_exception(dc, EXCP_HW_EXCP);
++    if (trap_userspace(dc, true)) {
+         return;
      }
-     return;
- }
-@@ -929,7 +929,7 @@ static void dec_load(DisasContext *dc)
  
-     t_sync_flags(dc);
-     addr = tcg_temp_new_i32();
--    compute_ldst_addr(dc, &addr);
-+    compute_ldst_addr(dc, addr);
- 
-     /*
-      * When doing reverse accesses we need to do two things.
-@@ -1041,7 +1041,7 @@ static void dec_store(DisasContext *dc)
-     sync_jmpstate(dc);
-     /* SWX needs a temp_local.  */
-     addr = ex ? tcg_temp_local_new_i32() : tcg_temp_new_i32();
--    compute_ldst_addr(dc, &addr);
-+    compute_ldst_addr(dc, addr);
- 
-     if (ex) { /* swx */
-         TCGv_i32 tval;
 -- 
 2.14.1
