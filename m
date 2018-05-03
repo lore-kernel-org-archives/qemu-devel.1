@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fE9Q6-0000C0-7c
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 04:16:55 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fE9TW-0001UH-Eb
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 04:20:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fE9Q4-0003QY-Mp
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 04:16:54 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180502213219.7842-1-mreitz@redhat.com>
-Date: Thu, 03 May 2018 10:16:44 +0200
-In-Reply-To: <20180502213219.7842-1-mreitz@redhat.com> (Max Reitz's message of
-	"Wed, 2 May 2018 23:32:12 +0200")
-Message-ID: <871setrw5v.fsf@dusky.pond.sub.org>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fE9TV-00059X-Cc
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 04:20:26 -0400
+References: <20180501211336.986372-1-eblake@redhat.com>
+	<20180501211336.986372-2-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <0e8a0cd5-3ab8-fbe4-8c3a-35a1e94841dc@virtuozzo.com>
+Date: Thu, 3 May 2018 11:20:11 +0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC 0/7] block: Try to use correctly typed
- blockdev options
+In-Reply-To: <20180501211336.986372-2-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 1/4] nbd: Prepare for additional block
+ sizing info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,97 +25,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, edgar.kaziakhmedov@virtuozzo.com, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Max Reitz <mreitz@redhat.com> writes:
-
-> (Sorry, Markus, sorry, Kevin, if this series makes you angry.)
-
-Anger?  Nah.  Gallows humor :)
-
-> The subject says it all, I think.  The original issue I was assigned to
-> solve is this:
+02.05.2018 00:13, Eric Blake wrote:
+> The NBD spec is clarifying [1] that a server may want to advertise
+> different limits for READ/WRITE (in our case, 32M) than for
+> TRIM/ZERO (in our case, nearly 4G).  Add the constants and name
+> lookups for new NBD_INFO_ fields used during handshake to convey
+> this additional information.  Note that the NBD spec already
+> requires servers to ignore unknown requests from the client, and
+> for clients to ignore unknown gratuitous responses sent from
+> the server.
 >
->     $ ./qemu-img info --image-opts driver=null-co,size=42
->     image: json:{"driver": "null-co", "size": "42"}
->     [...]
+> [1] https://lists.debian.org/nbd/2018/03/msg00048.html
 >
-> As you can see, "size" gets a string value in the json:{} object
-> although it is an integer, according to the QAPI schema.  (Buglink:
-> https://bugzilla.redhat.com/show_bug.cgi?id=1534396)
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+
+
+Reviewed-by:=C2=A0 Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
 >
-> My first approach to fix this was to try to pipe the full_open_options
-> dict generated in bdrv_refresh_filename() through a keyval input visitor
-> and then an output visitor (which would have depended on my filename
-> series).  This did not work out because bs->options (where all of the
-> reconstructed options come from) may either be correctly typed or not,
-> and keyval chokes on non-string values.  I could have probably converted
-> bs->options to fully string values before trying to pipe it through
-> keyval, but I decided I didn't like that very much.  (I suppose I can be
-> convinced otherwise, though.)
-
-See also thread
-
-    [RFC][BROKEN] rbd: Allow configuration of authentication scheme"
-    Message-Id: <20180405170619.20480-1-kwolf@redhat.com>
-    https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg00618.html
-
-in particular the qdict_stringify_entries() proposal and its discussion.
-
-> So I decided to venture into the territory of what we actually want at
-> some point: Correctly typed bs->options.  Or, rather, in the end we want
-> bs->options to be BlockdevOptions, but let's not be too hasty here.
+> ---
 >
-> So it turns out that with really just a bit of work we can separate the
-> interfaces that generate correctly typed options (e.g. blockdev-add)
-> from the ones that generate pure string-valued options (e.g. qemu-img
-> --image-opts) rather well.  Once we have done that, we can pipe all of
-> the pure string options through keyval and back to get correctly typed
-> options.
+> The given URL for the NBD spec was v3; it will change to be a v4
+> version of that patch in part to point back to this qemu commit
+> as a proof of implementation.
+> ---
+>   include/block/nbd.h | 4 +++-
+>   nbd/common.c        | 4 ++++
+>   2 files changed, 7 insertions(+), 1 deletion(-)
 >
-> So far the theory.  Now, in practice we of course have pitfalls, and
-> those are not addressed by this series, which is the main reason this is
-> an RFC.
+> diff --git a/include/block/nbd.h b/include/block/nbd.h
+> index fcdcd545023..cbf51628f78 100644
+> --- a/include/block/nbd.h
+> +++ b/include/block/nbd.h
+> @@ -1,5 +1,5 @@
+>   /*
+> - *  Copyright (C) 2016-2017 Red Hat, Inc.
+> + *  Copyright (C) 2016-2018 Red Hat, Inc.
+>    *  Copyright (C) 2005  Anthony Liguori <anthony@codemonkey.ws>
+>    *
+>    *  Network Block Device
+> @@ -180,6 +180,8 @@ typedef struct NBDExtent {
+>   #define NBD_INFO_NAME           1
+>   #define NBD_INFO_DESCRIPTION    2
+>   #define NBD_INFO_BLOCK_SIZE     3
+> +#define NBD_INFO_TRIM_SIZE      4
+> +#define NBD_INFO_ZERO_SIZE      5
 >
-> The first pitfall (I can see...) is that json:{} allows you to specify
-> mixed options -- some values are incorrectly strings, others are
-> non-strings.  keyval cannot cope with that, so the result after this
-> series is that those options end up in bs->options just like that.  I
-> suppose we could just forbid that mixed-typed case, though, and call it
-> a bug fix.
+>   /* Request flags, sent from client to server during transmission phase =
+*/
+>   #define NBD_CMD_FLAG_FUA        (1 << 0) /* 'force unit access' during =
+write */
+> diff --git a/nbd/common.c b/nbd/common.c
+> index 8c95c1d606e..840c91d5ca4 100644
+> --- a/nbd/common.c
+> +++ b/nbd/common.c
+> @@ -129,6 +129,10 @@ const char *nbd_info_lookup(uint16_t info)
+>           return "description";
+>       case NBD_INFO_BLOCK_SIZE:
+>           return "block size";
+> +    case NBD_INFO_TRIM_SIZE:
+> +        return "trim size";
+> +    case NBD_INFO_ZERO_SIZE:
+> +        return "zero size";
+>       default:
+>           return "<unknown>";
+>       }
 
-Related: QMP device_add and netdev_add convert their arguments from
-QDict to QemuOpts with qemu_opts_from_qdict(), and therefore accept
-string in addition to number / bool.  If I remember correctly, Eric
-Blake's patches to QAPIfy netdev_add got stuck because they didn't
-replicate that behavior.
 
-I think we should reject inappropriate strings.  If we think nobody's
-relying on it, we can call it a bug and just fix it.  If we don't dare,
-we need to go through the deprecation ritual.  We should've done that
-long ago, but better now than never.
-
-Same for json:{}.
-
-> The second problem (and I think the big reason why we have not
-> approached this issue so far) is that there are options which you can
-> give as strings, but which are not covered by the schema.  In such a
-> case, the input visitor will reject the QDict and we will just use it
-> as-is, that is, full of strings.  Now that is not what we want in the
-> end, of course -- we want everything to be converted into something that
-> is covered by the schema.
-
-Can you give an example?
-
-> My reasoning for sending this series anyway is that it doesn't make
-> things worse (bs->options is a mess already, you can never be certain
-> that it contains correctly typed values or just strings or both), and
-> that it at least gives a starting point from which we can continue on.
-> After this series, we have a clear separation between the interfaces
-> that use purely string values and the ones that provide correct typing
-> (well, and json:{}).
->
-> Oh, and it fixes the above BZ for the more common cases.
-
-"for the more common cases", ha!
+--=20
+Best regards,
+Vladimir
