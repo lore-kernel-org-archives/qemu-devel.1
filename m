@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49234)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fE3hT-00026v-Kg
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 22:10:29 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fE3mC-0003E2-TA
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 22:15:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fE3hQ-0005p5-5b
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 22:10:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48114 helo=mx1.redhat.com)
+	(envelope-from <dgibson@ozlabs.org>) id 1fE3m9-0000Ro-NF
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 22:15:20 -0400
+Received: from ozlabs.org ([203.11.71.1]:40895)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fE3hP-0005on-Vo
-	for qemu-devel@nongnu.org; Wed, 02 May 2018 22:10:24 -0400
-Date: Thu, 3 May 2018 10:10:10 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180503021010.GC8239@xz-mi>
-References: <20180426091519.26934-1-xiaoguangrong@tencent.com>
-	<32eaad8e-35a0-5240-37a2-4242b7890ab9@redhat.com>
-	<a14b1b5b-4f0c-c085-35b8-9539afa5091f@gmail.com>
-	<20180427093135.GC13269@xz-mi>
-	<2f84ab90-2b9c-9888-e6e2-9114ae046078@gmail.com>
-	<20180502030309.GC25938@xz-mi> <20180502145713.GE2679@work-vm>
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1fE3m8-0000Os-VE
+	for qemu-devel@nongnu.org; Wed, 02 May 2018 22:15:17 -0400
+Date: Thu, 3 May 2018 12:14:42 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180503021442.GH13229@umbus.fritz.box>
+References: <20180417132317.6910-1-bala24@linux.vnet.ibm.com>
+	<20180417132317.6910-2-bala24@linux.vnet.ibm.com>
+	<20180418005550.GC2317@umbus.fritz.box>
+	<20180418005726.GD2317@umbus.fritz.box>
+	<20180418064641.GA12871@9.122.211.20>
+	<20180418083632.GB2710@work-vm>
+	<20180419044452.GA11708@9.122.211.20>
+	<20180419114817.GM2317@umbus.fritz.box>
+	<20180421191249.GA775@9.122.211.20>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="0XhtP95kHFp3KGBe"
 Content-Disposition: inline
-In-Reply-To: <20180502145713.GE2679@work-vm>
-Subject: Re: [Qemu-devel] [PATCH] migration: introduce decompress-error-check
+In-Reply-To: <20180421191249.GA775@9.122.211.20>
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] migration: calculate
+ expected_downtime with ram_bytes_remaining()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,98 +36,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Xiao Guangrong <guangrong.xiao@gmail.com>, Eric Blake <eblake@redhat.com>, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, kvm@vger.kernel.org, Xiao Guangrong <xiaoguangrong@tencent.com>, qemu-devel@nongnu.org, wei.w.wang@intel.com, jiang.biao2@zte.com.cn
+To: Balamuruhan S <bala24@linux.vnet.ibm.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, quintela@redhat.com, qemu-devel@nongnu.org
 
-On Wed, May 02, 2018 at 03:57:13PM +0100, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > On Fri, Apr 27, 2018 at 06:40:09PM +0800, Xiao Guangrong wrote:
-> > > 
-> > > 
-> > > On 04/27/2018 05:31 PM, Peter Xu wrote:
-> > > > On Fri, Apr 27, 2018 at 11:15:37AM +0800, Xiao Guangrong wrote:
-> > > > > 
-> > > > > 
-> > > > > On 04/26/2018 10:01 PM, Eric Blake wrote:
-> > > > > > On 04/26/2018 04:15 AM, guangrong.xiao@gmail.com wrote:
-> > > > > > > From: Xiao Guangrong <xiaoguangrong@tencent.com>
-> > > > > > > 
-> > > > > > > QEMU 2.13 enables strict check for compression & decompression to
-> > > > > > > make the migration more robuster, that depends on the source to fix
-> > > > > > 
-> > > > > > s/robuster/robust/
-> > > > > > 
-> > > > > 
-> > > > > Will fix, thank you for pointing it out.
-> > > > > 
-> > > > > > > the internal design which triggers the unexpected error conditions
-> > > > > > 
-> > > > > > 2.13 hasn't been released yet.  Why do we need a knob to explicitly turn
-> > > > > > off strict checking?  Can we not instead make 2.13 automatically smart
-> > > > > > enough to tell if the incoming stream is coming from an older qemu
-> > > > > > (which might fail if the strict checks are enabled) vs. a newer qemu
-> > > > > > (the sender gave us what we need to ensure the strict checks are
-> > > > > > worthwhile)?
-> > > > > > 
-> > > > > 
-> > > > > Really smart.
-> > > > > 
-> > > > > How about introduce a new command, MIG_CMD_DECOMPRESS_ERR_CHECK,
-> > > > > the destination will do strict check if got this command (i.e, new
-> > > > > QEMU is running on the source), otherwise, turn the check off.
-> > > > 
-> > > > Why not we just introduce a compat bit for that?  I mean something
-> > > > like: 15c3850325 ("migration: move skip_section_footers",
-> > > > 2017-06-28).  Then we turn that check bit off for <=2.12.
-> > > > 
-> > > > Would that work?
-> > > 
-> > > I am afraid it can not. :(
-> > > 
-> > > The compat bit only impacts local behavior, however, in this case, we
-> > > need the source QEMU to tell the destination if it supports strict
-> > > error check.
-> > 
-> > My understanding is that the new compat bit will only take effect when
-> > at destination.
-> > 
-> > I'm not sure I'm thinking that correctly. I'll give some examples.
-> > 
-> > When we migrate from <2.12 to 2.13, on 2.13 QEMU we'll possibly with
-> > (using q35 as example, always) "-M pc-q35-2.12" to make the migration
-> > work, so this will let the destination QEMU stop checking
-> > decompressing errors.  IMHO that's what we want so it's fine (forward
-> > migration).
-> > 
-> > When we migrate from 2.13 to <2.12, on 2.12 it'll always skip checking
-> > decompression errors, so it's fine too even if we don't send some
-> > compress-errored pages.
-> > 
-> > Then, would this mean that the compat bit could work too just like
-> > this patch?  AFAIU the compat bit idea is very similar to current
-> > patch, however we don't really need a new parameter to make things
-> > complicated, we just let old QEMUs behave differently and
-> > automatically, then user won't need to worry about manually specify
-> > that parameter.
-> 
-> I think you're saying just to wire it to the machine type for receive;
-> that would work and would be fairly simple, although wouldn't provide
-> the protection when going from new->new using an old machine type.
 
-Yes.  But actually we can still leverage the protection even with
-new->new and old machine types - we just need to explicitly override
-that parameter on both sides (instead of explicitly disalbe that on
-old ones):
+--0XhtP95kHFp3KGBe
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-  -M pc-q35-2.12 -global migration.x-error-decompress-check=true
+On Sun, Apr 22, 2018 at 12:42:49AM +0530, Balamuruhan S wrote:
+> On Thu, Apr 19, 2018 at 09:48:17PM +1000, David Gibson wrote:
+> > On Thu, Apr 19, 2018 at 10:14:52AM +0530, Balamuruhan S wrote:
+> > > On Wed, Apr 18, 2018 at 09:36:33AM +0100, Dr. David Alan Gilbert wrot=
+e:
+> > > > * Balamuruhan S (bala24@linux.vnet.ibm.com) wrote:
+[snip]
+> > That said, I thought a bunch about this a bunch, and I think there is
+> > a case to be made for it - although it's a lot more subtle than what's
+> > been suggested so far.
+> >=20
+> > So.  AFAICT the estimate of page dirty rate is based on the assumption
+> > that page dirties are independent of each other - one page is as
+> > likely to be dirtied as any other.  If we don't make that assumption,
+> > I don't see how we can really have an estimate as a single number.
+> >=20
+> > But if that's the assumption, then predicting downtime based on it is
+> > futile: if the dirty rate is less than bandwidth, we can wait long
+> > enough and make the downtime as small as we want.  If the dirty rate
+> > is higher than bandwidth, then we don't converge and no downtime short
+> > of (ram size / bandwidth) will be sufficient.
+> >=20
+> > The only way a predicted downtime makes any sense is if we assume that
+> > although the "instantaneous" dirty rate is high, the pages being
+> > dirtied are within a working set that's substantially smaller than the
+> > full RAM size.  In that case the expected down time becomes (working
+> > set size / bandwidth).
+>=20
+> Thank you Dave and David for such a nice explanation and for your time.
+>=20
+> I thought about it after the explanation given by you and Dave, so in
+> expected downtime we are trying to predict downtime based on some
+> values at that instant, so we need to use that value and integrate it.
 
-After all the user already specified "-M pc-q35-2.12" explicitly
-rather than using the default 2.13 one, I would consider he/she an
-advanced user.  Then IMHO it would be acceptable to make this explicit
-too when the user really wants that.
+No, not really.  The problem is that as you accumulate dirties over a
+longer interval, you'll get more duplicate dirties, which means you'll
+get a lower effective value than simply integrating the results over
+shorter intervals.
 
-(Will that happen a lot when people still use old machine types even
- if they are creating new VMs?)
+> 1. we are currently using bandwidth but actually I think we have to use
+> rate of change of bandwidth, because bandwidth is not constant always.
 
--- 
-Peter Xu
+Again, not really.  It's true that bandwidth isn't necessarily
+constant, but in most cases it will be pretty close.  The real noise
+here is coming in the dirty rate.
+
+> 2. we are using dirty_pages_rate and as Dave suggested,
+>=20
+> when we enter an iteration with 'Db' bytes dirty we should be
+> considering ['Db' + Dr * iteration time of previous one], where for the f=
+irst
+> iteration, iteration time of previous would be 0.
+>=20
+> 3. As you have said, that ram_bytes_remaining / bandwidth is the time to
+> transfer all RAM, so this should be the limit for our integration. when
+> we calculate for any instant it would be 0 to ram_bytes_remaining /
+> bandwidth at that instant.
+>=20
+> Regards,
+> Bala
+>=20
+> >=20
+> > Predicting downtime as (ram_bytes_remaining / bandwidth) is
+> > essentially always wrong early in the migration, although it will be a
+> > poor upper bound - it will basically give you the time to transfer all
+> > RAM.
+> >=20
+> > For a nicely converging migration it will also be wrong (but an upper
+> > bound) until it isn't: it will gradually decrease until it dips below
+> > the requested downtime threshold, at which point the migration
+> > completes.
+> >=20
+> > For a diverging migration with a working set, as discussed above,
+> > ram_bytes_remaining will eventually converge on (roughly) the size of
+> > that working set - it won't dip (much) below that, because we can't
+> > keep up with the dirties within that working set.  At that point this
+> > does become a reasonable estimate of the necessary downtime in order
+> > to get the migration to complete, which I believe is the point of the
+> > value.
+> >=20
+> > So the question is: for the purposes of this value, is a gross
+> > overestimate that gradually approaches a reasonable value good enough?
+> >=20
+> > An estimate that would get closer, quicker would be (ram dirtied in
+> > interval) / bandwidth.  Where (ram dirtied in interval) is a measure
+> > of total ram dirtied over some measurement interval - only counting a
+> > page once if its dirtied multiple times during the interval.  And
+> > obviously you'd want some sort of averaging on that.  I think that
+> > would be a bit of a pain to measure, though.
+> >=20
+>=20
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--0XhtP95kHFp3KGBe
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrqcJIACgkQbDjKyiDZ
+s5J2oBAA2SdE2I6wrTLl/rYS4QdfWSJlqttRSPBMaBl7EE39mIgmVnhjUwWNRo4r
+AqnHM+/6GfhkKVO+HyB2VUcg/TbelK82bjMLtD9SD92oN7HCDBzI3Plrb8jS1AGK
+AFFVUq/EH7D+6ZwqTTppuqvKbFD0TJsj7RPNC0vchY2so2eQjyIl8TVFSnN8m/gX
+Rqjd7H4TyO3WpbS6w4MNmv8qZRmH3yBNjFNYQKw7jzyLVERTkWdcMZ0an5UgSuTj
+YCLHaPyRDfD4zaVnr8ceG8ThKbu6VMRhJOsfjw9VR08Ep1xNN0qV85ZSj2dMtxDA
+g/C9Nqao/dUOH2pRpxMxqU/mZ3CYw22xKqAkWHYRfLFhYlKBJHpWUXw6jgLyLJQH
+oeL+WbVFy3Fdlmfw+qDIArzjLyQpxK8hpXMBaKqtUSYlUgDEqEe+f/9IkD+CHzss
+WL5hbh0fjniihdpB4c3sA1aCdVaFZmZygP1rX1+byOT4JqA1I3PHe5xy4KnchJjV
+yV7zJiduXmiEIB776HaCQB43Pzr1LcaVzpBrGjv4LPy6t/YkZcqtzYcWBVE1u8DZ
+ofUItnTYW4INEd9UdnuomF8q/uXUhL/OsuVPI4Oo1LisUpovbRY5sog8+6pGagPD
+vtwwg+nKcKf1hdhQs05gqCddeyBjhLKcD1AqdTWoF00oAFUC1F4=
+=vaaI
+-----END PGP SIGNATURE-----
+
+--0XhtP95kHFp3KGBe--
