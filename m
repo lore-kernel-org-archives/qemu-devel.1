@@ -1,29 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42870)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fETjp-0005LE-B7
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:58:38 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fETkp-00061U-G4
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:59:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fETjl-0005hD-EN
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:58:37 -0400
-Received: from 6.mo6.mail-out.ovh.net ([87.98.177.69]:49642)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fETjl-0005fH-6U
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:58:33 -0400
-Received: from player750.ha.ovh.net (unknown [10.109.122.70])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 79EEE158D84
-	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 07:58:31 +0200 (CEST)
-Date: Fri, 4 May 2018 07:58:21 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180504075821.0e0cbdc6@bahia.lan>
-In-Reply-To: <20180504001102.GH13229@umbus.fritz.box>
-References: <152538217073.223014.17347204768561945420.stgit@bahia.lan>
-	<20180504001102.GH13229@umbus.fritz.box>
+	(envelope-from <dgibson@ozlabs.org>) id 1fETko-0007JF-G9
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:59:39 -0400
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Fri,  4 May 2018 15:59:13 +1000
+Message-Id: <20180504055930.3786-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	boundary="Sig_/OE0ro/LYX=_ead5hmeY36gp";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH 0/3] spapr: fix backward migration from
- POWER9 to POWER8 hosts
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/17] ppc-for-2.13 queue 20180504
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,69 +20,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Laurent Vivier <lvivier@redhat.com>, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-stable@nongnu.org
+To: peter.maydell@linaro.org
+Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
---Sig_/OE0ro/LYX=_ead5hmeY36gp
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+The following changes since commit 59255887e6cafeff747250d2613003a41d1d9d=
+ff:
 
-On Fri, 4 May 2018 10:11:02 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+  Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20180502' into =
+staging (2018-05-03 11:25:14 +0100)
 
-> On Thu, May 03, 2018 at 11:16:10PM +0200, Greg Kurz wrote:
-> > Hi,
-> >=20
-> > It is expected to be able to migrate a guest started with
-> >=20
-> >      -machine max-cpu-compat=3Dpower8
-> >=20
-> > from a POWER9 host to a POWER8 host. It works with recent QEMU versions,
-> > but it is badly broken if the destination runs QEMU 2.7 or older.
-> >=20
-> > This can cause problems in cloud environments that still have systems w=
-ith
-> > older QEMU versions, eg, hosts running ubuntu LTS 16.04.4 (QEMU 2.5) wh=
-ich
-> > are likely to stay around until admins could transition to some newer O=
-S.
-> >=20
-> > This series was lightly tested, but the patches are simple enough, so I=
-'m
-> > confident they shouldn't break anything :)
-> >=20
-> > Please review as I'd like these to go to QEMU 2.11.2 as well. =20
->=20
-> Applied to ppc-for-2.13.  As you say, these should probably go to the
-> 2.12 and 2.11 stable trees too.
->=20
+are available in the Git repository at:
 
-Cc'ing qemu-stable then
+  git://github.com/dgibson/qemu.git tags/ppc-for-2.13-20180504
 
-Cheers,
+for you to fetch changes up to 0550b1206a91d66051a21441a02c4ff126b531fe:
 
---
-Greg
+  spapr: don't advertise radix GTSE if max-compat-cpu < power9 (2018-05-0=
+4 15:00:37 +1000)
 
---Sig_/OE0ro/LYX=_ead5hmeY36gp
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+----------------------------------------------------------------
+ppc patch queue 2018-05-04
 
------BEGIN PGP SIGNATURE-----
+Second patch of patches for qemu-2.13 (or whatever the version ends up
+being called).  Highlights are:
+  * Preliminary patches for POWER9 hash MMU support for powernv
+  * A number of cleanups fo pseries startup and LPCR handling
+  * Remove support for explicitly allocated RMAs (which require kernel
+    support that's been gone for 3+ years)
+  * Some mac_newworld cleanups
+  * A few bugfixes
 
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlrr9n0ACgkQcdTV5YIv
-c9bnIw//Ss43H0nKFd7gPYucH8NALKzHQ9R7zDrsx3rnF8T3FfwJWMT4NG9F8UZL
-KcGtNVauC3iKt4BbNPLLI2GXiKilZy0iBbOdtyQwRMKgVH436rArp+Z3ozvMroPj
-MEqGaSegfp/DESYFZxSinhhrO442IzKojl4SxVoJBq/TGwy0G64xEhOBtGxz9Jb0
-K9mqhKodP4csQkgx10f2bETWzmrTCiuKe3Rb8GAy9KmmguDfCmpTfTiGHyO9tRCb
-UXD4d0fdHpvovH8y/bwLCLCsbjQ4yLf6OmoaHcMR7oUlwQx409MsJuL+RRi2G1Te
-brW44610mUy7FIyWJnxszV0CpLiqjQxC8EPr9zdwCncm7ZDQlXgLCsKTu/jTGd2o
-jImRuXpWzXE6v5KUG0pPDw4F5a7LKSDNwB4wQauTFWyr3qVRnLmybrJkQWxoRjmg
-SMZeIpRYb4LPs1tAqNAcsGoG293kXqVbKgUeMwvy87oKEqsbuE1Gf3IWlLeoYzVy
-hDFJ38js6OwK/Om4mXDKAjKVDrzaaBsyq39VuNwkb6C1opqdhI36V2MQKh/3sBVR
-UH+3RFD/yzofFQ8phKdD254M666A47q2+qKp/oGizjS7mIfquYi1nWVLFvbrMHy8
-8wKhAMeb2/QTzw6Z0n7+a3Muzcov4cY5F+yxTT+L0bsGzo532HQ=
-=9cTt
------END PGP SIGNATURE-----
+----------------------------------------------------------------
+C=C3=A9dric Le Goater (2):
+      target/ppc: return a nil HPT base address on sPAPR machines
+      target/ppc: add basic support for PTCR on POWER9
 
---Sig_/OE0ro/LYX=_ead5hmeY36gp--
+David Gibson (9):
+      spapr: Remove support for explicitly allocated RMAs
+      target/ppc: Add ppc_store_lpcr() helper
+      spapr: Clean up rtas_start_cpu() & rtas_stop_self()
+      spapr: Remove unhelpful helpers from rtas_start_cpu()
+      spapr: Make a helper to set up cpu entry point state
+      spapr: Clean up LPCR updates from hypercalls
+      target/ppc: Delay initialization of LPCR_UPRT for secondary cpus
+      spapr: Move PAPR mode cpu setup fully to spapr code
+      spapr: Clean up handling of LPCR power-saving exit bits
+
+Greg Kurz (3):
+      target/ppc: always set PPC_MEM_TLBIE in pre 2.8 migration hack
+      spapr: don't migrate "spapr_option_vector_ov5_cas" to pre 2.8 machi=
+nes
+      spapr: don't advertise radix GTSE if max-compat-cpu < power9
+
+Mark Cave-Ayland (3):
+      uninorth: create new uninorth device
+      mac_newworld: remove pics IRQ array and wire up macio to OpenPIC di=
+rectly
+      mac_newworld: move wiring of macio IRQs to macio_newworld_realize()
+
+ hw/misc/macio/macio.c           |  39 +++++++++------
+ hw/pci-host/trace-events        |   2 +
+ hw/pci-host/uninorth.c          |  58 +++++++++++++++++++++
+ hw/ppc/mac.h                    |   9 ++++
+ hw/ppc/mac_newworld.c           |  56 +++------------------
+ hw/ppc/spapr.c                  |  84 ++++++++++++-------------------
+ hw/ppc/spapr_cpu_core.c         |  47 ++++++++++++++---
+ hw/ppc/spapr_hcall.c            |  50 ++++++++-----------
+ hw/ppc/spapr_rtas.c             | 108 ++++++++++++++++++++--------------=
+------
+ hw/ppc/trace-events             |   4 --
+ include/hw/misc/macio/macio.h   |   1 -
+ include/hw/pci-host/uninorth.h  |  11 ++++
+ include/hw/ppc/spapr_cpu_core.h |   3 ++
+ target/ppc/cpu.h                |   4 +-
+ target/ppc/helper.h             |   1 +
+ target/ppc/kvm.c                |  46 ++---------------
+ target/ppc/kvm_ppc.h            |   6 ---
+ target/ppc/machine.c            |   5 ++
+ target/ppc/misc_helper.c        |  12 +++++
+ target/ppc/mmu-book3s-v3.h      |   6 +++
+ target/ppc/mmu-hash64.c         |  15 ++++--
+ target/ppc/mmu-hash64.h         |   6 ++-
+ target/ppc/mmu_helper.c         |  29 +++++++++++
+ target/ppc/translate.c          |   3 ++
+ target/ppc/translate_init.c     |  80 +++++++----------------------
+ 25 files changed, 355 insertions(+), 330 deletions(-)
