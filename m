@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fETkr-00062i-Mo
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:59:43 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fETks-00063E-BC
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:59:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fETkq-0007NC-ME
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:59:41 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fETkq-0007Ng-PM
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:59:42 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  4 May 2018 15:59:21 +1000
-Message-Id: <20180504055930.3786-9-david@gibson.dropbear.id.au>
+Date: Fri,  4 May 2018 15:59:19 +1000
+Message-Id: <20180504055930.3786-7-david@gibson.dropbear.id.au>
 In-Reply-To: <20180504055930.3786-1-david@gibson.dropbear.id.au>
 References: <20180504055930.3786-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 08/17] spapr: Clean up LPCR updates from
- hypercalls
+Subject: [Qemu-devel] [PULL 06/17] spapr: Remove unhelpful helpers from
+ rtas_start_cpu()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,156 +26,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-There are several places in spapr_hcall.c where we need to update the LPC=
-R
-value on all CPUs.  We do this with the set_spr() helper.  That's not
-really correct because this directly sets the SPR value, without going
-through the ppc_store_lpcr() helper which may need to update state based
-on the LPCR change.
+rtas_start_cpu() calls spapr_cpu_update_tb_offset() and
+spapr_cpu_set_endianness() to initialize certain things in the new cpu's
+state.  This is the only caller of those helpers, and they're each only
+a few lines long, so we might as well just fold them into the caller.
 
-In fact, set_spr() is only ever used for the LPCR, so replace it with an
-explicit LPCR updated which uses the right low-level helper.  While we're
-there, move the CPU_FOREACH() which was in every one of the callers into
-the new helper: set_all_lpcrs().
+In addition, those helpers initialize state on the new cpu to match that =
+of
+the first cpu.  That will generally work, but might be at least logically
+incorrect if the first cpu has been set offline by the guest.  So, instea=
+d
+base the state on that of the cpu invoking the RTAS call, which is
+obviously active already.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Tested-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr_hcall.c | 50 ++++++++++++++++++--------------------------
- 1 file changed, 20 insertions(+), 30 deletions(-)
+ hw/ppc/spapr_rtas.c | 38 ++++++++++++++------------------------
+ 1 file changed, 14 insertions(+), 24 deletions(-)
 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 16bccdd5c0..ca9702e667 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -15,32 +15,35 @@
- #include "hw/ppc/spapr_ovec.h"
- #include "mmu-book3s-v3.h"
+diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+index b251c130cb..df073447c5 100644
+--- a/hw/ppc/spapr_rtas.c
++++ b/hw/ppc/spapr_rtas.c
+@@ -120,27 +120,6 @@ static void rtas_query_cpu_stopped_state(PowerPCCPU =
+*cpu_,
+     rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
+ }
 =20
--struct SPRSyncState {
--    int spr;
-+struct LPCRSyncState {
-     target_ulong value;
-     target_ulong mask;
- };
-=20
--static void do_spr_sync(CPUState *cs, run_on_cpu_data arg)
-+static void do_lpcr_sync(CPUState *cs, run_on_cpu_data arg)
- {
--    struct SPRSyncState *s =3D arg.host_ptr;
-+    struct LPCRSyncState *s =3D arg.host_ptr;
-     PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-     CPUPPCState *env =3D &cpu->env;
+-/*
+- * Set the timebase offset of the CPU to that of first CPU.
+- * This helps hotplugged CPU to have the correct timebase offset.
+- */
+-static void spapr_cpu_update_tb_offset(PowerPCCPU *cpu)
+-{
+-    PowerPCCPU *fcpu =3D POWERPC_CPU(first_cpu);
+-
+-    cpu->env.tb_env->tb_offset =3D fcpu->env.tb_env->tb_offset;
+-}
+-
+-static void spapr_cpu_set_endianness(PowerPCCPU *cpu)
+-{
+-    PowerPCCPU *fcpu =3D POWERPC_CPU(first_cpu);
+-    PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(fcpu);
+-
+-    if (!pcc->interrupts_big_endian(fcpu)) {
+-        cpu->env.spr[SPR_LPCR] |=3D LPCR_ILE;
+-    }
+-}
+-
+ static void rtas_start_cpu(PowerPCCPU *callcpu, sPAPRMachineState *spapr=
+,
+                            uint32_t token, uint32_t nargs,
+                            target_ulong args,
+@@ -150,6 +129,7 @@ static void rtas_start_cpu(PowerPCCPU *callcpu, sPAPR=
+MachineState *spapr,
+     PowerPCCPU *newcpu;
+     CPUPPCState *env;
+     PowerPCCPUClass *pcc;
 +    target_ulong lpcr;
 =20
-     cpu_synchronize_state(cs);
--    env->spr[s->spr] &=3D ~s->mask;
--    env->spr[s->spr] |=3D s->value;
-+    lpcr =3D env->spr[SPR_LPCR];
-+    lpcr &=3D ~s->mask;
-+    lpcr |=3D s->value;
-+    ppc_store_lpcr(cpu, lpcr);
- }
+     if (nargs !=3D 3 || nret !=3D 1) {
+         rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
+@@ -178,10 +158,20 @@ static void rtas_start_cpu(PowerPCCPU *callcpu, sPA=
+PRMachineState *spapr,
+     cpu_synchronize_state(CPU(newcpu));
 =20
--static void set_spr(CPUState *cs, int spr, target_ulong value,
--                    target_ulong mask)
-+static void set_all_lpcrs(target_ulong value, target_ulong mask)
- {
--    struct SPRSyncState s =3D {
--        .spr =3D spr,
-+    CPUState *cs;
-+    struct LPCRSyncState s =3D {
-         .value =3D value,
-         .mask =3D mask
-     };
--    run_on_cpu(cs, do_spr_sync, RUN_ON_CPU_HOST_PTR(&s));
-+    CPU_FOREACH(cs) {
-+        run_on_cpu(cs, do_lpcr_sync, RUN_ON_CPU_HOST_PTR(&s));
+     env->msr =3D (1ULL << MSR_SF) | (1ULL << MSR_ME);
+-    spapr_cpu_set_endianness(newcpu);
+-    spapr_cpu_update_tb_offset(newcpu);
++
+     /* Enable Power-saving mode Exit Cause exceptions for the new CPU */
+-    ppc_store_lpcr(newcpu, env->spr[SPR_LPCR] | pcc->lpcr_pm);
++    lpcr =3D env->spr[SPR_LPCR] | pcc->lpcr_pm;
++    if (!pcc->interrupts_big_endian(callcpu)) {
++        lpcr |=3D LPCR_ILE;
 +    }
- }
++    ppc_store_lpcr(newcpu, lpcr);
++
++    /*
++     * Set the timebase offset of the new CPU to that of the invoking
++     * CPU.  This helps hotplugged CPU to have the correct timebase
++     * offset.
++     */
++    newcpu->env.tb_env->tb_offset =3D callcpu->env.tb_env->tb_offset;
 =20
- static bool has_spr(PowerPCCPU *cpu, int spr)
-@@ -1235,8 +1238,6 @@ static target_ulong h_set_mode_resource_le(PowerPCC=
-PU *cpu,
-                                            target_ulong value1,
-                                            target_ulong value2)
- {
--    CPUState *cs;
--
-     if (value1) {
-         return H_P3;
-     }
-@@ -1246,16 +1247,12 @@ static target_ulong h_set_mode_resource_le(PowerP=
-CCPU *cpu,
-=20
-     switch (mflags) {
-     case H_SET_MODE_ENDIAN_BIG:
--        CPU_FOREACH(cs) {
--            set_spr(cs, SPR_LPCR, 0, LPCR_ILE);
--        }
-+        set_all_lpcrs(0, LPCR_ILE);
-         spapr_pci_switch_vga(true);
-         return H_SUCCESS;
-=20
-     case H_SET_MODE_ENDIAN_LITTLE:
--        CPU_FOREACH(cs) {
--            set_spr(cs, SPR_LPCR, LPCR_ILE, LPCR_ILE);
--        }
-+        set_all_lpcrs(LPCR_ILE, LPCR_ILE);
-         spapr_pci_switch_vga(false);
-         return H_SUCCESS;
-     }
-@@ -1268,7 +1265,6 @@ static target_ulong h_set_mode_resource_addr_trans_=
-mode(PowerPCCPU *cpu,
-                                                         target_ulong val=
-ue1,
-                                                         target_ulong val=
-ue2)
- {
--    CPUState *cs;
-     PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
-=20
-     if (!(pcc->insns_flags2 & PPC2_ISA207S)) {
-@@ -1285,9 +1281,7 @@ static target_ulong h_set_mode_resource_addr_trans_=
-mode(PowerPCCPU *cpu,
-         return H_UNSUPPORTED_FLAG;
-     }
-=20
--    CPU_FOREACH(cs) {
--        set_spr(cs, SPR_LPCR, mflags << LPCR_AIL_SHIFT, LPCR_AIL);
--    }
-+    set_all_lpcrs(mflags << LPCR_AIL_SHIFT, LPCR_AIL);
-=20
-     return H_SUCCESS;
- }
-@@ -1364,7 +1358,6 @@ static target_ulong h_register_process_table(PowerP=
-CCPU *cpu,
-                                              target_ulong opcode,
-                                              target_ulong *args)
- {
--    CPUState *cs;
-     target_ulong flags =3D args[0];
-     target_ulong proc_tbl =3D args[1];
-     target_ulong page_size =3D args[2];
-@@ -1422,12 +1415,9 @@ static target_ulong h_register_process_table(Power=
-PCCPU *cpu,
-     spapr->patb_entry =3D cproc; /* Save new process table */
-=20
-     /* Update the UPRT and GTSE bits in the LPCR for all cpus */
--    CPU_FOREACH(cs) {
--        set_spr(cs, SPR_LPCR,
--                ((flags & (FLAG_RADIX | FLAG_HASH_PROC_TBL)) ? LPCR_UPRT=
- : 0) |
--                ((flags & FLAG_GTSE) ? LPCR_GTSE : 0),
--                LPCR_UPRT | LPCR_GTSE);
--    }
-+    set_all_lpcrs(((flags & (FLAG_RADIX | FLAG_HASH_PROC_TBL)) ? LPCR_UP=
-RT : 0) |
-+                  ((flags & FLAG_GTSE) ? LPCR_GTSE : 0),
-+                  LPCR_UPRT | LPCR_GTSE);
-=20
-     if (kvm_enabled()) {
-         return kvmppc_configure_v3_mmu(cpu, flags & FLAG_RADIX,
+     env->nip =3D start;
+     env->gpr[3] =3D r3;
 --=20
 2.17.0
