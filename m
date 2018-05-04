@@ -1,39 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1fEcDz-0005qv-TB
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 11:02:25 -0400
+	(envelope-from <berrange@redhat.com>) id 1fEcG0-0006fl-QJ
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 11:04:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1fEcDy-0000wI-Lv
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 11:02:19 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40920
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fEcDy-0000lR-H9
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 11:02:18 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w44ExrLw015972
-	for <qemu-devel@nongnu.org>; Fri, 4 May 2018 11:02:14 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2hrqpspge1-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 11:02:13 -0400
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Fri, 4 May 2018 16:02:11 +0100
-References: <20180504131605.22816-1-cohuck@redhat.com>
-From: Halil Pasic <pasic@linux.ibm.com>
-Date: Fri, 4 May 2018 17:02:07 +0200
+	(envelope-from <berrange@redhat.com>) id 1fEcFv-0003KL-3R
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 11:04:24 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50988 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fEcFu-0003Hd-Vt
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 11:04:19 -0400
+Date: Fri, 4 May 2018 16:04:07 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180504150407.GS29999@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <1525376963-79623-1-git-send-email-mst@redhat.com>
+	<1525376963-79623-28-git-send-email-mst@redhat.com>
+	<20180504092924.GE29999@redhat.com>
+	<20180504174256-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180504131605.22816-1-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <3597f256-cc9d-c1a2-9fa1-b8d2d1d3d3d7@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] s390x/css: disabled subchannels cannot be
- status pending
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180504174256-mutt-send-email-mst@kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 27/67] replication: add include directory
+ header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,94 +32,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, eblake@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org
 
-Could we somehow get 'fix' or something similar into the title?
+On Fri, May 04, 2018 at 05:52:39PM +0300, Michael S. Tsirkin wrote:
+> On Fri, May 04, 2018 at 10:29:24AM +0100, Daniel P. Berrang=C3=A9 wrote=
+:
+> > On Thu, May 03, 2018 at 10:51:05PM +0300, Michael S. Tsirkin wrote:
+> > > This way it is easier to find using standard rules.
+> > >=20
+> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > > ---
+> > >  include/replication.h | 1 +
+> > >  1 file changed, 1 insertion(+)
+> > >  create mode 100644 include/replication.h
+> > >=20
+> > > diff --git a/include/replication.h b/include/replication.h
+> > > new file mode 100644
+> > > index 0000000..2f40e8e
+> > > --- /dev/null
+> > > +++ b/include/replication.h
+> > > @@ -0,0 +1 @@
+> > > +#include_next "../replication.h"
+> >=20
+> > I think this is really crazy. If we want the headers to be accessible
+> > via the include/ directory, lets move them to the include/ directory,
+> > not create wrappers that point back to the source directory.
+> >=20
+> > Regards,
+> > Daniel
+>=20
+> True. I did that initially. However I think maintainers should do this
+> otherwise this amounts to moving internal headers to include/ wholesale=
+.
 
-Also do we need cc stable for this? I guess this is broken
-for a while now.
-
-On 05/04/2018 03:16 PM, Cornelia Huck wrote:
-> The 3270 code will try to post an attention interrupt when the
-> 3270 emulator (e.g. x3270) attaches. If the guest has not yet
-> enabled the subchannel for the 3270 device, we will give it a
-> spurious status during msch when it does so later.
-
-Maybe something like 'The spurious status will preclude the successful
-execution of msch (e.g. when the guest later tries to enable
-the subchannel).' I had difficulties getting your sentence right-away.
-
-> 
-> To fix this, just don't do anything in css_conditional_io_interrupt()
-> if the subchannel is not enabled. The 3270 code will work fine with
-> that, and the other user of this function (virtio-ccw) never
-> attempts to post an interrupt for a disabled device to begin with.
-> 
-
-And I guess vfio-ccw is also unaffected, as the passed through
-stuff is going to handle this correctly on the lower levels.
-
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-
-Overall I agree with the patch.
-
-Acked-by: Halil Pasic <pasic@linux.ibm.com>
-
-> ---
->   hw/s390x/css.c | 8 ++++++++
->   1 file changed, 8 insertions(+)
-> 
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index 301bf1772f..56c3fa8c89 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -616,6 +616,14 @@ void css_inject_io_interrupt(SubchDev *sch)
->   
->   void css_conditional_io_interrupt(SubchDev *sch)
-
-Loosely related:
-What is the semantic difference between css_inject_io_interrupt and
-this css_conditional_io_interrup? The css_conditional_io_interrupt
-could be 'unsolicited' or 'virtio notification'. This function also
-relies on the serialization of io instructions or?
-
-Also there is this paragraph to be considered if this is indeed
-about unsolicited:
-"""
-The subchannel and device status associated with
-an unsolicited interruption condition is never merged
-with that of any currently existing interruption condi-
-tion. If the subchannel is currently status pending, the
-unsolicited interruption condition is held in abeyance
-in either the channel subsystem or the device, as
-appropriate, until the status-pending condition has
-been cleared.
-"""
-
-
->   {
-> +    /*
-> +     * If the subchannel is not enabled, it is not made status pending
-> +     * (see PoP p. 16-17, "Status Control").
-> +     */
-
-In not sure about the reference. We usually don't do that or? And the page
-number may change. I would probably just drop the PoP reference.
-
-> +    if (!(sch->curr_status.pmcw.flags & PMCW_FLAGS_MASK_ENA)) {
-> +        return;
-> +    }
-> +
-
-We don't have a scenario where the guest is expected to do some 'recovery'
-after being educated about some condition by the means of an alert-status,
-do we?
-
-I also wonder if this is the right place to handle the problem. The
-3870 also manipulates scsw.dstat before calling this. And I'm not sure
-where/if is that cleared, or if it's OK to leave it set...
+Your change amounts the very same thing IMHO. A #include will find the
+"internal" header via include/... If the header is currently used from
+outside its source dir, then it is defacto not an internal header any
+more, so we should just move it.  If some subset of the header is
+internal, the maintainer can decide to separate the internal vs shared
+bits later if desired.
 
 Regards,
-Halil
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
