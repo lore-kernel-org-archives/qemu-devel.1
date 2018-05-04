@@ -1,36 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58249)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fEdIb-00042v-VJ
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:11:11 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fEdIt-0004Gl-0F
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:11:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fEdIa-0000MK-MD
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:11:09 -0400
-Received: from mail-qt0-x22e.google.com ([2607:f8b0:400d:c0d::22e]:33050)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fEdIa-0000LI-G7
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:11:08 -0400
-Received: by mail-qt0-x22e.google.com with SMTP id e8-v6so23132907qth.0
-	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 09:11:08 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180213040809.26021-1-f4bug@amsat.org>
-	<20180213040809.26021-21-f4bug@amsat.org>
-	<CAFEAcA_r2WNVEkE5-p+VuH8f1XnDzHMkUNgNSMrV1ZTkHv4=AQ@mail.gmail.com>
-	<20180430134929.edf3vsx4csvsydxi@toto>
-	<9a5497c5-555e-c556-f14c-570fb385ae17@amsat.org>
-	<CAFEAcA8Oy=z_EfGPgWNyHMOqry=8ziEtbQXfT8qNZtrQExv9rw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <25ecb20c-0535-38e3-38df-32add6902890@amsat.org>
-Date: Fri, 4 May 2018 13:11:00 -0300
+	(envelope-from <mreitz@redhat.com>) id 1fEdIr-0000ey-W7
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:11:26 -0400
+From: Max Reitz <mreitz@redhat.com>
+References: <20180502213219.7842-1-mreitz@redhat.com>
+	<871setrw5v.fsf@dusky.pond.sub.org>
+	<2efd29b6-de41-2896-7a9f-021e12214f0e@redhat.com>
+Message-ID: <b83088e2-13d0-eada-59c0-6fc48fe18c87@redhat.com>
+Date: Fri, 4 May 2018 18:11:13 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8Oy=z_EfGPgWNyHMOqry=8ziEtbQXfT8qNZtrQExv9rw@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha512;
+In-Reply-To: <2efd29b6-de41-2896-7a9f-021e12214f0e@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="Wjgz2jeXoNnhUVY8KmfJvd8TV4W06Gr2G"
-Subject: Re: [Qemu-devel] [PATCH v13 20/30] sdbus: add trace events
+	boundary="9OxVTrzzA8LfaURFfTSNLIrClTyl7y5s3"
+Subject: Re: [Qemu-devel] [RFC 0/7] block: Try to use correctly typed
+ blockdev options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,102 +26,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, Fam Zheng <famz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Wjgz2jeXoNnhUVY8KmfJvd8TV4W06Gr2G
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Alistair Francis <alistair.francis@xilinx.com>, Fam Zheng <famz@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
-Message-ID: <25ecb20c-0535-38e3-38df-32add6902890@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH v13 20/30] sdbus: add trace events
-References: <20180213040809.26021-1-f4bug@amsat.org>
- <20180213040809.26021-21-f4bug@amsat.org>
- <CAFEAcA_r2WNVEkE5-p+VuH8f1XnDzHMkUNgNSMrV1ZTkHv4=AQ@mail.gmail.com>
- <20180430134929.edf3vsx4csvsydxi@toto>
- <9a5497c5-555e-c556-f14c-570fb385ae17@amsat.org>
- <CAFEAcA8Oy=z_EfGPgWNyHMOqry=8ziEtbQXfT8qNZtrQExv9rw@mail.gmail.com>
-In-Reply-To: <CAFEAcA8Oy=z_EfGPgWNyHMOqry=8ziEtbQXfT8qNZtrQExv9rw@mail.gmail.com>
+--9OxVTrzzA8LfaURFfTSNLIrClTyl7y5s3
+From: Max Reitz <mreitz@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
+Message-ID: <b83088e2-13d0-eada-59c0-6fc48fe18c87@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 0/7] block: Try to use correctly typed blockdev
+ options
+References: <20180502213219.7842-1-mreitz@redhat.com>
+ <871setrw5v.fsf@dusky.pond.sub.org>
+ <2efd29b6-de41-2896-7a9f-021e12214f0e@redhat.com>
+In-Reply-To: <2efd29b6-de41-2896-7a9f-021e12214f0e@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Hi Peter, Edgar,
+On 2018-05-04 17:53, Max Reitz wrote:
 
-On 05/01/2018 06:03 AM, Peter Maydell wrote:
-> On 1 May 2018 at 04:35, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> w=
-rote:
->> On 04/30/2018 10:49 AM, Edgar E. Iglesias wrote:
->>> On Fri, Apr 27, 2018 at 12:55:21PM +0100, Peter Maydell wrote:
->>>> On 13 February 2018 at 04:07, Philippe Mathieu-Daud=C3=A9 <f4bug@ams=
-at.org> wrote:
->>>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>>>> Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
->>>>
->>>>> @@ -39,6 +45,7 @@ int sdbus_do_command(SDBus *sdbus, SDRequest *req=
-, uint8_t *response)
->>>>>  {
->>>>>      SDState *card =3D get_card(sdbus);
->>>>>
->>>>> +    trace_sdbus_command(sdbus_name(sdbus), req->cmd, req->arg, req=
-->crc);
->>>>>      if (card) {
->>>>>          SDCardClass *sc =3D SD_CARD_GET_CLASS(card);
->>>>
->>>> Hi -- as a result of this trace event being added, we now get
->>>> warnings from Coverity that it might use uninitialized data
->>>> (CID1386074, CID1390571, CID1386072, CID1386076). This is because no=
-t
->>>> all of our SD
->>>> controllers bother to initialize req->crc, because up til now
->>>> nothing in the SD code looks at it. (I think at least bcm2835_sdhost=
-=2Ec
->>>> sdhci.c and ssi-sd.c do this).
->>
->> I was pretty sure we ran Coverity before the stable release :|
->> Maybe they added new 'uninitialized data' checks recently.
+[...]
+
+> So if you use it the "proper" way:
 >=20
-> No, we didn't get a coverity run for a long time (a combination
-> of Scan being down and then requiring a new version of the local
-> build tools, which we didn't realize because the website didn't
-> give a useful error message for that case). So this most recent
-> run has brought up a pile of accumulated issues since about
-> mid-february.
+> $ x86_64-softmmu/qemu-system-x86_64 -nodefaults \
+>     -drive if=3Dnone,driver=3Draw,file=3Dblkdebug::null-co://,file.alig=
+n=3D512 \
+>     -monitor stdio
+> QEMU 2.12.50 monitor - type 'help' for more information
+> (qemu) info block
+> none0 (#block238): json:{"driver": "raw", "file": {"image": {"driver":
+> "null-co"}, "driver": "blkdebug", "align": "512"}} (raw)
+>=20
+> Well... Looks like the same issue, but it's different, actually.
+> blkdebug_parse_filename() only adds "x-image" after the conversion to
+> BlockdevOptions and back, so that can't be the thing that breaks the
+> conversion here.  No, the thing here is the "filename" option which is
+> not something that blkdebug supports according to the QAPI schema...
 
-I sent a fix for those here:
-http://lists.nongnu.org/archive/html/qemu-devel/2018-05/msg01130.html
+[...]
 
-I went to the Coverity dashboard to update the Triage information but
-the 'apply' box appears grey so I can not update those CIDs.
+> Option 3: Keep doing what this series did.  Find out why "filename" is
+> an option in the QDict in the first place, because I would have assumed=
 
-Regards,
+> that you need to specify it as the @filename parameter of bdrv_open()
+> instead of through the QDict.
 
-Phil.
+Solved the mystery.  The issue isn't "filename" in the QDict (it
+actually isn't there), but the fact that -drive allows you to leave out
+so many essential options.  In the above command line, for instance, I
+left out file.driver and file.image.driver.  Both are derived by
+bdrv_open(), but are not set at the point where I'm trying to do the typi=
+ng.
+
+(And this gets better with something like -drive file=3Dfoo.img where eve=
+n
+file.filename needs to be derived.  Or -drive file=3Dnbd://localhost,
+where it's not even file.filename but file.server.*, which comes from
+nbd_parse_filename()...)
+
+Sooo...  Guess I'll go to option #1.
+
+(And in the long run, I suppose we need to pull out the whole
+"derivation infrastructure" which includes probing and
+bdrv_parse_filename() and do the conversion to BlockdevOptions afterwards=
+=2E)
+
+Max
 
 
---Wjgz2jeXoNnhUVY8KmfJvd8TV4W06Gr2G
+--9OxVTrzzA8LfaURFfTSNLIrClTyl7y5s3
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlrshhcACgkQ4+MsLN6t
-wN7eIA//cF8sKb+BqBhdqhCqOOLbxUgy2lWiYAJf0ND/uGVRvpfzxOlqxWHzyIKQ
-dm7weY09KkpOPiUCFFqXwWB//FJUBNkeoZakX7YgAC6WXuZC40SuFetc95FZNekR
-zSg44RPyZdTTMlM6sPvfhtv90p+KLdpOCoFATULiYIh5GaYJ+OlmqGf+RceMoENe
-C/QdeFUD/FTMWmR4pfUcmaId9YdBBBDW6ueFqYlhv5eB1aObpzO60/hwMjprHUYK
-J4dmiD/22rA27s3quGeJeG2CA/RMOkeON2Cx41q73bI7YqSRmEw7UkO9C9TCvPA/
-GQNjDdpgLKfw5BhNNVqCm9LoPL999ZsYxupy4igcfaimjwvlPJNwbE6tMSYPHRt1
-7taPZ5rcz7WFVYVvZLVnfrejtrsCh4ZjRuYTiP7l1EInGTqEOZoBJLIrI4cmx47L
-3hgcMILYs6DgNqaoj+Y39EewAIg9b6h6CYXYrpYB+IYQ1/ap7GGTl+TMO3ep5zJR
-vfwMLsCR70Cwdg1hHXJ0a9BbgIcrnhrqryzFVk2pxZJuCLxsX2SEK4w2tjGU6gp7
-9g3Cty5+zVp1+asr8ep1JG6sxETxPG6EdLgvOj2WgCpxhSRV7kNemuIPeG0634rA
-IVV9MmXYbbE6iiBbCc8JNtzqz+Q+aQ/l9MfX79hVC6m8Fc966No=
-=2VDY
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlrshiEACgkQ9AfbAGHV
+z0BPewgAszR3+nL+5qlbB+kXvZ3L0C7VasZFAYlYdy95yOt7wfSahaNnZbgrI0YN
+j84ddLl5koZNoHCH8YgLhtG2ZP1N5+gz7OfH5pIXtdEhvoGCX1q+dsHGiAlr6TOO
+zguPxW7RN1Idr0OooBMms58csCCFRIh1a84dRFww/sNRUl93+lkln2c4gtwbo2r1
+9N/LKwltWbefIJeOx3gefttWwcLanFnhKC2yeMgmoN82kuyHZX0qmcqkswV/K6YU
+FQ8UVJJuUIbwT6oequSHuayj72wpUxK3cHvbU6Pdp2qZKqkAR3Y4eaOlG3j/UXHL
+6tdfbn3PB+wqGkVGCvq7j1i4vyev/w==
+=bRvO
 -----END PGP SIGNATURE-----
 
---Wjgz2jeXoNnhUVY8KmfJvd8TV4W06Gr2G--
+--9OxVTrzzA8LfaURFfTSNLIrClTyl7y5s3--
