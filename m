@@ -1,17 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fEanV-00072R-My
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 09:30:54 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fEap6-0008Cd-N1
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 09:32:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fEanU-0003Sb-Qa
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 09:30:53 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Fri,  4 May 2018 08:30:31 -0500
-Message-Id: <20180504133034.1328397-2-eblake@redhat.com>
-In-Reply-To: <20180504133034.1328397-1-eblake@redhat.com>
-References: <20180504133034.1328397-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 1/4] nbd/client: fix
- nbd_negotiate_simple_meta_context
+	(envelope-from <peter.maydell@linaro.org>) id 1fEap1-0004uu-TN
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 09:32:32 -0400
+Received: from mail-oi0-x22d.google.com ([2607:f8b0:4003:c06::22d]:33968)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fEap1-0004uL-Oc
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 09:32:27 -0400
+Received: by mail-oi0-x22d.google.com with SMTP id l1-v6so19133294oii.1
+	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 06:32:27 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180504152658.3537707a.cohuck@redhat.com>
+References: <1525376963-79623-1-git-send-email-mst@redhat.com>
+	<1525376963-79623-61-git-send-email-mst@redhat.com>
+	<20180504091007.55405a6a.cohuck@redhat.com>
+	<be79d6dd-beaa-ba6f-2990-b5e91139411b@redhat.com>
+	<20180504152658.3537707a.cohuck@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 4 May 2018 14:32:06 +0100
+Message-ID: <CAFEAcA_xZZ5=oa-rA0=qh2-wxrt14KqH38rdg_OVLrqoTfzA9Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] cover letter cc's [was: [PATCH 60/67] hw/s390x:
+ add include directory headers]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,46 +33,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, qemu-s390x <qemu-s390x@nongnu.org>, git@vger.kernel.org
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On 4 May 2018 at 14:26, Cornelia Huck <cohuck@redhat.com> wrote:
+> On Fri, 4 May 2018 08:07:53 -0500
+> Eric Blake <eblake@redhat.com> wrote:
+>> On the other hand, cc'ing all recipients for a largely mechanical patch
+>> series that was split into 67 parts, in part because it touches so many
+>> different maintainers' areas, may make the cover letter have so many
+>> recipients that various mail gateways start rejecting it as potential spam.
+>
+> Yes, large cross-subsystem patch series make this painful.
 
-Initialize received variable. Otherwise, is is possible for server to
-answer without any contexts, but we will set context_id to something
-random (received_id is not initialized too) and return 1, which is
-wrong.
+My solution is to either (a) avoid them or (b) not bother cc'ing
+people (except people I think might be interested in reviewing
+cross-subsystem patchsets like Eric ;-))...
 
-To solve it, just initialize received to false. Initialize received_id
-too, just to make all possible checkers happy.
-
-Bug was introduced in 78a33ab58782efdb206de14 "nbd: BLOCK_STATUS for
-standard get_block_status function: client part" with the whole
-function.
-
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20180427142002.21930-2-vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-CC: qemu-stable@nongnu.org
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- nbd/client.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/nbd/client.c b/nbd/client.c
-index b9e175d1c27..7f35b5c3232 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -613,8 +613,8 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
- {
-     int ret;
-     NBDOptionReply reply;
--    uint32_t received_id;
--    bool received;
-+    uint32_t received_id = 0;
-+    bool received = false;
-     uint32_t export_len = strlen(export);
-     uint32_t context_len = strlen(context);
-     uint32_t data_len = sizeof(export_len) + export_len +
--- 
-2.14.3
+thanks
+-- PMM
