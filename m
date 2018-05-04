@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fEd8O-0003VY-7T
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:00:38 -0400
+	(envelope-from <berrange@redhat.com>) id 1fEd8P-0003Wl-TC
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:00:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fEd8M-0001yh-MW
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:00:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40286 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1fEd8N-00020A-Sp
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:00:37 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53990 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fEd8M-0001y1-40
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:00:34 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fEd8N-0001z1-Gv
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:00:35 -0400
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Fri,  4 May 2018 17:00:24 +0100
-Message-Id: <20180504160026.14017-2-berrange@redhat.com>
+Date: Fri,  4 May 2018 17:00:25 +0100
+Message-Id: <20180504160026.14017-3-berrange@redhat.com>
 In-Reply-To: <20180504160026.14017-1-berrange@redhat.com>
 References: <20180504160026.14017-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 1/3] qemu-doc: provide details of supported
- build platforms
+Subject: [Qemu-devel] [PATCH 2/3] glib: bump min required glib library
+ version to 2.42
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,135 +30,498 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Olaf Hering <olaf@aepfle.de>, Stefan Hajnoczi <stefanha@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-Describe the policy the project uses to decide which OS are supported as
-build platforms. This will:
+Per supported platforms doc, the various min glib on relevant distros is:
 
-  - Allow maintainers to determine when the minimum version of a 3rd
-    party piece of software can be increased without negatively
-    impacting supported platforms.
+  RHEL-7: 2.50.3
+  Debian (Stretch): 2.50.3
+  Debian (Jessie): 2.42.1
+  OpenBSD (Ports): 2.54.3
+  FreeBSD (Ports): 2.50.3
+  OpenSUSE Leap 15: 2.54.3
+  Ubuntu (Xenial): 2.48.0
+  macOS (Homebrew): 2.56.0
 
-  - Allow tailoring of CI environments to match the intended supported
-    build platforms.
+This suggests that a minimum glib of 2.42 is a reasonable target
 
 Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- qemu-doc.texi | 68 +++++++++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
- 1 file changed, 68 insertions(+)
+ configure               |   6 +-
+ include/glib-compat.h   | 319 ------------------------------------------=
+------
+ tests/test-qmp-event.c  |   2 +-
+ tests/tpm-emu.h         |   4 +-
+ tests/vhost-user-test.c |   4 +-
+ trace/simple.c          |   6 +-
+ 6 files changed, 9 insertions(+), 332 deletions(-)
 
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index 5813d27615..d44b778764 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -39,6 +39,7 @@
- * QEMU User space emulator::
- * Implementation notes::
- * Deprecated features::
-+* Supported build platforms::
- * License::
- * Index::
- @end menu
-@@ -2976,6 +2977,73 @@ The ``xlnx-zcu102'' machine has the same features =
-and capabilites in QEMU.
- In order to prevent QEMU from automatically opening an image's backing
- chain, use ``"backing": null'' instead.
+diff --git a/configure b/configure
+index 1443422e83..e5d2f625a7 100755
+--- a/configure
++++ b/configure
+@@ -3392,11 +3392,7 @@ fi
+ ##########################################
+ # glib support probe
 =20
-+@node Supported build platforms
-+@appendix Supported build platforms
-+
-+QEMU aims to support building and executing on multiple host OS platform=
-s.
-+This appendix outlines which platforms are the major build targets. Thes=
-e
-+platforms are used as the basis for deciding upon the minimum required
-+versions of 3rd party software QEMU depends on. The supported platforms
-+are the targets for automated testing performed by the project when patc=
-hes
-+are submitted for review, and tested before and after merge.
-+
-+If a platform is not listed here, it does not imply that QEMU won't work=
-.
-+If an unlisted platform has comparable software versions to a listed pla=
-tform,
-+there is every expectation that it will work. Bug reports are welcome fo=
-r
-+problems encountered on unlisted platforms unless they are clearly older
-+vintage than what is described here.
-+
-+Note that when considering software versions shipped in distros as suppo=
-rt
-+targets, QEMU considers only the version number, and assumes the feature=
-s in
-+that distro match the upstream release with the same version. In other w=
-ords,
-+if a distro backports extra features to the software in their distro, QE=
-MU
-+upstream code will not add explicit support for those backports, unless =
-the
-+feature is auto-detectable in a manner that works for the upstream relea=
-ses
-+too.
-+
-+The Repology site @url{https://repology.org} is a useful resource to ide=
-ntify
-+currently shipped versions of software in various operating systems, tho=
-ugh
-+it does not cover all distros listed below.
-+
-+@section Linux OS
-+
-+For distributions with frequent, short-lifetime releases, the project wi=
-ll
-+aim to support all versions that are not end of life by their respective
-+vendors. For the purposes of identifying supported software versions, th=
-e
-+project will look at Fedora, Ubuntu, and openSUSE distros. Other short-
-+lifetime distros will be assumed to ship similar software versions.
-+
-+For distributions with long-lifetime releases, the project will aim to s=
-upport
-+the most recent major version at all times. Support for the previous maj=
-or
-+version will be dropped 2 years after the new major version is released.=
- For
-+the purposes of identifying supported software versions, the project wil=
-l look
-+at RHEL, Debian, Ubuntu LTS, and SLES distros. Other long-lifetime distr=
-os will
-+be assumed to ship similar software versions.
-+
-+@section Windows
-+
-+The project supports building with current versions of the MinGW toolcha=
-in,
-+hosted on Linux.
-+
-+@section macOS
-+
-+The project supports building with the two most recent versions of macOS=
-, with
-+the current homebrew package set available.
-+
-+@section FreeBSD
-+
-+The project aims to support the all the versions which are not end of li=
-fe.
-+
-+@section NetBSD
-+
-+The project aims to support the most recent major version at all times. =
-Support
-+for the previous major version will be dropped 2 years after the new maj=
-or
-+version is released.
-+
-+@section OpenBSD
-+
-+The project aims to support the all the versions which are not end of li=
-fe.
-+
- @node License
- @appendix License
+-if test "$mingw32" =3D yes; then
+-    glib_req_ver=3D2.30
+-else
+-    glib_req_ver=3D2.22
+-fi
++glib_req_ver=3D2.42
+ glib_modules=3Dgthread-2.0
+ if test "$modules" =3D yes; then
+     glib_modules=3D"$glib_modules gmodule-export-2.0"
+diff --git a/include/glib-compat.h b/include/glib-compat.h
+index c49cf87196..3b340ab33c 100644
+--- a/include/glib-compat.h
++++ b/include/glib-compat.h
+@@ -18,27 +18,6 @@
 =20
+ #include <glib.h>
+=20
+-/* GLIB version compatibility flags */
+-#if !GLIB_CHECK_VERSION(2, 26, 0)
+-#define G_TIME_SPAN_SECOND              (G_GINT64_CONSTANT(1000000))
+-#endif
+-
+-#if !GLIB_CHECK_VERSION(2, 28, 0)
+-static inline gint64 qemu_g_get_monotonic_time(void)
+-{
+-    /* g_get_monotonic_time() is best-effort so we can use the wall cloc=
+k as a
+-     * fallback.
+-     */
+-
+-    GTimeVal time;
+-    g_get_current_time(&time);
+-
+-    return time.tv_sec * G_TIME_SPAN_SECOND + time.tv_usec;
+-}
+-/* work around distro backports of this interface */
+-#define g_get_monotonic_time() qemu_g_get_monotonic_time()
+-#endif
+-
+ #if defined(_WIN32) && !GLIB_CHECK_VERSION(2, 50, 0)
+ /*
+  * g_poll has a problem on Windows when using
+@@ -48,228 +27,6 @@ static inline gint64 qemu_g_get_monotonic_time(void)
+ gint g_poll_fixed(GPollFD *fds, guint nfds, gint timeout);
+ #endif
+=20
+-#if !GLIB_CHECK_VERSION(2, 30, 0)
+-/* Not a 100% compatible implementation, but good enough for most
+- * cases. Placeholders are only supported at the end of the
+- * template. */
+-static inline gchar *qemu_g_dir_make_tmp(gchar const *tmpl, GError **err=
+or)
+-{
+-    gchar *path =3D g_build_filename(g_get_tmp_dir(), tmpl ?: ".XXXXXX",=
+ NULL);
+-
+-    if (mkdtemp(path) !=3D NULL) {
+-        return path;
+-    }
+-    /* Error occurred, clean up. */
+-    g_set_error(error, G_FILE_ERROR, g_file_error_from_errno(errno),
+-                "mkdtemp() failed");
+-    g_free(path);
+-    return NULL;
+-}
+-#define g_dir_make_tmp(tmpl, error) qemu_g_dir_make_tmp(tmpl, error)
+-#endif /* glib 2.30 */
+-
+-#if !GLIB_CHECK_VERSION(2, 31, 0)
+-/* before glib-2.31, GMutex and GCond was dynamic-only (there was a sepa=
+rate
+- * GStaticMutex, but it didn't work with condition variables).
+- *
+- * Our implementation uses GOnce to fake a static implementation that do=
+es
+- * not require separate initialization.
+- * We need to rename the types to avoid passing our CompatGMutex/CompatG=
+Cond
+- * by mistake to a function that expects GMutex/GCond.  However, for eas=
+e
+- * of use we keep the GLib function names.  GLib uses macros for the
+- * implementation, we use inline functions instead and undefine the macr=
+os.
+- */
+-
+-typedef struct CompatGMutex {
+-    GOnce once;
+-} CompatGMutex;
+-
+-typedef struct CompatGCond {
+-    GOnce once;
+-} CompatGCond;
+-
+-static inline gpointer do_g_mutex_new(gpointer unused)
+-{
+-    return (gpointer) g_mutex_new();
+-}
+-
+-static inline void g_mutex_init(CompatGMutex *mutex)
+-{
+-    mutex->once =3D (GOnce) G_ONCE_INIT;
+-}
+-
+-static inline void g_mutex_clear(CompatGMutex *mutex)
+-{
+-    g_assert(mutex->once.status !=3D G_ONCE_STATUS_PROGRESS);
+-    if (mutex->once.retval) {
+-        g_mutex_free((GMutex *) mutex->once.retval);
+-    }
+-    mutex->once =3D (GOnce) G_ONCE_INIT;
+-}
+-
+-static inline void (g_mutex_lock)(CompatGMutex *mutex)
+-{
+-    g_once(&mutex->once, do_g_mutex_new, NULL);
+-    g_mutex_lock((GMutex *) mutex->once.retval);
+-}
+-#undef g_mutex_lock
+-
+-static inline gboolean (g_mutex_trylock)(CompatGMutex *mutex)
+-{
+-    g_once(&mutex->once, do_g_mutex_new, NULL);
+-    return g_mutex_trylock((GMutex *) mutex->once.retval);
+-}
+-#undef g_mutex_trylock
+-
+-
+-static inline void (g_mutex_unlock)(CompatGMutex *mutex)
+-{
+-    g_mutex_unlock((GMutex *) mutex->once.retval);
+-}
+-#undef g_mutex_unlock
+-
+-static inline gpointer do_g_cond_new(gpointer unused)
+-{
+-    return (gpointer) g_cond_new();
+-}
+-
+-static inline void g_cond_init(CompatGCond *cond)
+-{
+-    cond->once =3D (GOnce) G_ONCE_INIT;
+-}
+-
+-static inline void g_cond_clear(CompatGCond *cond)
+-{
+-    g_assert(cond->once.status !=3D G_ONCE_STATUS_PROGRESS);
+-    if (cond->once.retval) {
+-        g_cond_free((GCond *) cond->once.retval);
+-    }
+-    cond->once =3D (GOnce) G_ONCE_INIT;
+-}
+-
+-static inline void (g_cond_wait)(CompatGCond *cond, CompatGMutex *mutex)
+-{
+-    g_assert(mutex->once.status !=3D G_ONCE_STATUS_PROGRESS);
+-    g_once(&cond->once, do_g_cond_new, NULL);
+-    g_cond_wait((GCond *) cond->once.retval, (GMutex *) mutex->once.retv=
+al);
+-}
+-#undef g_cond_wait
+-
+-static inline void (g_cond_broadcast)(CompatGCond *cond)
+-{
+-    g_once(&cond->once, do_g_cond_new, NULL);
+-    g_cond_broadcast((GCond *) cond->once.retval);
+-}
+-#undef g_cond_broadcast
+-
+-static inline void (g_cond_signal)(CompatGCond *cond)
+-{
+-    g_once(&cond->once, do_g_cond_new, NULL);
+-    g_cond_signal((GCond *) cond->once.retval);
+-}
+-#undef g_cond_signal
+-
+-static inline gboolean (g_cond_timed_wait)(CompatGCond *cond,
+-                                           CompatGMutex *mutex,
+-                                           GTimeVal *time)
+-{
+-    g_assert(mutex->once.status !=3D G_ONCE_STATUS_PROGRESS);
+-    g_once(&cond->once, do_g_cond_new, NULL);
+-    return g_cond_timed_wait((GCond *) cond->once.retval,
+-                             (GMutex *) mutex->once.retval, time);
+-}
+-#undef g_cond_timed_wait
+-
+-/* This is not a macro, because it didn't exist until 2.32.  */
+-static inline gboolean g_cond_wait_until(CompatGCond *cond, CompatGMutex=
+ *mutex,
+-                                         gint64 end_time)
+-{
+-    GTimeVal time;
+-
+-    /* Convert from monotonic to CLOCK_REALTIME.  */
+-    end_time -=3D g_get_monotonic_time();
+-    g_get_current_time(&time);
+-    end_time +=3D time.tv_sec * G_TIME_SPAN_SECOND + time.tv_usec;
+-
+-    time.tv_sec =3D end_time / G_TIME_SPAN_SECOND;
+-    time.tv_usec =3D end_time % G_TIME_SPAN_SECOND;
+-    return g_cond_timed_wait(cond, mutex, &time);
+-}
+-
+-/* before 2.31 there was no g_thread_new() */
+-static inline GThread *g_thread_new(const char *name,
+-                                    GThreadFunc func, gpointer data)
+-{
+-    GThread *thread =3D g_thread_create(func, data, TRUE, NULL);
+-    if (!thread) {
+-        g_error("creating thread");
+-    }
+-    return thread;
+-}
+-#else
+-#define CompatGMutex GMutex
+-#define CompatGCond GCond
+-#endif /* glib 2.31 */
+-
+-#if !GLIB_CHECK_VERSION(2, 32, 0)
+-/* Beware, function returns gboolean since 2.39.2, see GLib commit 91019=
+15 */
+-static inline void g_hash_table_add(GHashTable *hash_table, gpointer key=
+)
+-{
+-    g_hash_table_replace(hash_table, key, key);
+-}
+-
+-static inline gboolean g_hash_table_contains(GHashTable *hash_table,
+-                                             gpointer key)
+-{
+-    return g_hash_table_lookup_extended(hash_table, key, NULL, NULL);
+-}
+-#define G_SOURCE_CONTINUE TRUE
+-#define G_SOURCE_REMOVE FALSE
+-#endif
+-
+-#ifndef g_assert_true
+-#define g_assert_true(expr)                                             =
+       \
+-    do {                                                                =
+       \
+-        if (G_LIKELY(expr)) {                                           =
+       \
+-        } else {                                                        =
+       \
+-            g_assertion_message(G_LOG_DOMAIN, __FILE__, __LINE__, G_STRF=
+UNC,   \
+-                                "'" #expr "' should be TRUE");          =
+       \
+-        }                                                               =
+       \
+-    } while (0)
+-#endif
+-
+-#ifndef g_assert_false
+-#define g_assert_false(expr)                                            =
+       \
+-    do {                                                                =
+       \
+-        if (G_LIKELY(!(expr))) {                                        =
+       \
+-        } else {                                                        =
+       \
+-            g_assertion_message(G_LOG_DOMAIN, __FILE__, __LINE__, G_STRF=
+UNC,   \
+-                                "'" #expr "' should be FALSE");         =
+       \
+-        }                                                               =
+       \
+-    } while (0)
+-#endif
+-
+-#ifndef g_assert_null
+-#define g_assert_null(expr)                                             =
+       \
+-    do {                                                                =
+       \
+-        if (G_LIKELY((expr) =3D=3D NULL)) {                             =
+           \
+-        } else {                                                        =
+       \
+-            g_assertion_message(G_LOG_DOMAIN, __FILE__, __LINE__, G_STRF=
+UNC,   \
+-                                "'" #expr "' should be NULL");          =
+       \
+-        }                                                               =
+       \
+-    } while (0)
+-#endif
+-
+-#ifndef g_assert_nonnull
+-#define g_assert_nonnull(expr)                                          =
+       \
+-    do {                                                                =
+       \
+-        if (G_LIKELY((expr) !=3D NULL)) {                               =
+         \
+-        } else {                                                        =
+       \
+-            g_assertion_message(G_LOG_DOMAIN, __FILE__, __LINE__, G_STRF=
+UNC,   \
+-                                "'" #expr "' should not be NULL");      =
+       \
+-        }                                                               =
+       \
+-    } while (0)
+-#endif
+=20
+ #ifndef g_assert_cmpmem
+ #define g_assert_cmpmem(m1, l1, m2, l2)                                 =
+       \
+@@ -288,80 +45,4 @@ static inline gboolean g_hash_table_contains(GHashTab=
+le *hash_table,
+     } while (0)
+ #endif
+=20
+-#if !GLIB_CHECK_VERSION(2, 28, 0)
+-static inline void g_list_free_full(GList *list, GDestroyNotify free_fun=
+c)
+-{
+-    GList *l;
+-
+-    for (l =3D list; l; l =3D l->next) {
+-        free_func(l->data);
+-    }
+-
+-    g_list_free(list);
+-}
+-
+-static inline void g_slist_free_full(GSList *list, GDestroyNotify free_f=
+unc)
+-{
+-    GSList *l;
+-
+-    for (l =3D list; l; l =3D l->next) {
+-        free_func(l->data);
+-    }
+-
+-    g_slist_free(list);
+-}
+-#endif
+-
+-#if !GLIB_CHECK_VERSION(2, 26, 0)
+-static inline void g_source_set_name(GSource *source, const char *name)
+-{
+-    /* This is just a debugging aid, so leaving it a no-op */
+-}
+-static inline void g_source_set_name_by_id(guint tag, const char *name)
+-{
+-    /* This is just a debugging aid, so leaving it a no-op */
+-}
+-#endif
+-
+-#if !GLIB_CHECK_VERSION(2, 36, 0)
+-/* Always fail.  This will not include error_report output in the test l=
+og,
+- * sending it instead to stderr.
+- */
+-#define g_test_initialized() (0)
+-#endif
+-#if !GLIB_CHECK_VERSION(2, 38, 0)
+-#ifdef CONFIG_HAS_GLIB_SUBPROCESS_TESTS
+-#error schizophrenic detection of glib subprocess testing
+-#endif
+-#define g_test_subprocess() (0)
+-#endif
+-
+-
+-#if !GLIB_CHECK_VERSION(2, 34, 0)
+-static inline void
+-g_test_add_data_func_full(const char *path,
+-                          gpointer data,
+-                          gpointer fn,
+-                          gpointer data_free_func)
+-{
+-#if GLIB_CHECK_VERSION(2, 26, 0)
+-    /* back-compat casts, remove this once we can require new-enough gli=
+b */
+-    g_test_add_vtable(path, 0, data, NULL,
+-                      (GTestFixtureFunc)fn, (GTestFixtureFunc) data_free=
+_func);
+-#else
+-    /* back-compat casts, remove this once we can require new-enough gli=
+b */
+-    g_test_add_vtable(path, 0, data, NULL,
+-                      (void (*)(void)) fn, (void (*)(void)) data_free_fu=
+nc);
+-#endif
+-}
+-#endif
+-
+-/* Small compat shim from glib 2.32 */
+-#ifndef G_SOURCE_CONTINUE
+-#define G_SOURCE_CONTINUE TRUE
+-#endif
+-#ifndef G_SOURCE_REMOVE
+-#define G_SOURCE_REMOVE FALSE
+-#endif
+-
+ #endif
+diff --git a/tests/test-qmp-event.c b/tests/test-qmp-event.c
+index bb1036615f..963fe47ce3 100644
+--- a/tests/test-qmp-event.c
++++ b/tests/test-qmp-event.c
+@@ -32,7 +32,7 @@ typedef struct QDictCmpData {
+ } QDictCmpData;
+=20
+ TestEventData *test_event_data;
+-static CompatGMutex test_event_lock;
++static GMutex test_event_lock;
+=20
+ /* Only compares bool, int, string */
+ static
+diff --git a/tests/tpm-emu.h b/tests/tpm-emu.h
+index ef4bfa8800..08f902485e 100644
+--- a/tests/tpm-emu.h
++++ b/tests/tpm-emu.h
+@@ -24,8 +24,8 @@ struct tpm_hdr {
+ } QEMU_PACKED;
+=20
+ typedef struct TestState {
+-    CompatGMutex data_mutex;
+-    CompatGCond data_cond;
++    GMutex data_mutex;
++    GCond data_cond;
+     SocketAddress *addr;
+     QIOChannel *tpm_ioc;
+     GThread *emu_tpm_thread;
+diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+index 61d997253c..b4bc38acc0 100644
+--- a/tests/vhost-user-test.c
++++ b/tests/vhost-user-test.c
+@@ -150,8 +150,8 @@ typedef struct TestServer {
+     int fds_num;
+     int fds[VHOST_MEMORY_MAX_NREGIONS];
+     VhostUserMemory memory;
+-    CompatGMutex data_mutex;
+-    CompatGCond data_cond;
++    GMutex data_mutex;
++    GCond data_cond;
+     int log_fd;
+     uint64_t rings;
+     bool test_fail;
+diff --git a/trace/simple.c b/trace/simple.c
+index e82018d923..65e558126d 100644
+--- a/trace/simple.c
++++ b/trace/simple.c
+@@ -36,9 +36,9 @@
+  * Trace records are written out by a dedicated thread.  The thread wait=
+s for
+  * records to become available, writes them out, and then waits again.
+  */
+-static CompatGMutex trace_lock;
+-static CompatGCond trace_available_cond;
+-static CompatGCond trace_empty_cond;
++static GMuttex trace_lock;
++static GCond trace_available_cond;
++static GCond trace_empty_cond;
+=20
+ static bool trace_available;
+ static bool trace_writeout_enabled;
 --=20
 2.14.3
