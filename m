@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45476)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fEfTQ-0007Sf-K6
+	(envelope-from <richard.henderson@linaro.org>) id 1fEfTQ-0007Si-Lc
 	for qemu-devel@nongnu.org; Fri, 04 May 2018 14:30:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fEfTO-00013Z-Pk
+	(envelope-from <richard.henderson@linaro.org>) id 1fEfTN-00011T-G9
 	for qemu-devel@nongnu.org; Fri, 04 May 2018 14:30:28 -0400
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:33876)
+Received: from mail-pf0-x22f.google.com ([2607:f8b0:400e:c00::22f]:46336)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fEfTO-000127-KB
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 14:30:26 -0400
-Received: by mail-pg0-x244.google.com with SMTP id g20-v6so9292611pgv.1
-	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 11:30:26 -0700 (PDT)
+	id 1fEfTN-0000zn-8M
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 14:30:25 -0400
+Received: by mail-pf0-x22f.google.com with SMTP id p12so18055026pff.13
+	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 11:30:25 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  4 May 2018 11:30:12 -0700
-Message-Id: <20180504183021.19318-2-richard.henderson@linaro.org>
-In-Reply-To: <20180504183021.19318-1-richard.henderson@linaro.org>
-References: <20180504183021.19318-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 01/10] tcg: Introduce helpers for integer
- min/max
+Date: Fri,  4 May 2018 11:30:11 -0700
+Message-Id: <20180504183021.19318-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v2 00/10] target/arm: Implement v8.1-Atomics
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,122 +27,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org
 
-These operations are re-invented by several targets so far.
-Several supported hosts have insns for these, so place the
-expanders out-of-line for a future introduction of tcg opcodes.
+This implements the Atomics extension, which is mandatory for v8.1.
+While testing the v8.2-SVE extension, I've run into issues with the
+GCC testsuite expecting this to exist.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- tcg/tcg-op.h | 16 ++++++++++++++++
- tcg/tcg-op.c | 40 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 56 insertions(+)
+Missing is the wiring up of the system registers to indicate that
+the extension exists, but we have no system CPU model that would
+exercise such a setting.
 
-diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-index 5d2c91a1b6..0451e2752e 100644
---- a/tcg/tcg-op.h
-+++ b/tcg/tcg-op.h
-@@ -324,6 +324,10 @@ void tcg_gen_ext8u_i32(TCGv_i32 ret, TCGv_i32 arg);
- void tcg_gen_ext16u_i32(TCGv_i32 ret, TCGv_i32 arg);
- void tcg_gen_bswap16_i32(TCGv_i32 ret, TCGv_i32 arg);
- void tcg_gen_bswap32_i32(TCGv_i32 ret, TCGv_i32 arg);
-+void tcg_gen_smin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
-+void tcg_gen_smax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
-+void tcg_gen_umin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
-+void tcg_gen_umax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
- 
- static inline void tcg_gen_discard_i32(TCGv_i32 arg)
- {
-@@ -517,6 +521,10 @@ void tcg_gen_ext32u_i64(TCGv_i64 ret, TCGv_i64 arg);
- void tcg_gen_bswap16_i64(TCGv_i64 ret, TCGv_i64 arg);
- void tcg_gen_bswap32_i64(TCGv_i64 ret, TCGv_i64 arg);
- void tcg_gen_bswap64_i64(TCGv_i64 ret, TCGv_i64 arg);
-+void tcg_gen_smin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
-+void tcg_gen_smax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
-+void tcg_gen_umin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
-+void tcg_gen_umax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
- 
- #if TCG_TARGET_REG_BITS == 64
- static inline void tcg_gen_discard_i64(TCGv_i64 arg)
-@@ -1025,6 +1033,10 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
- #define tcg_gen_mulu2_tl tcg_gen_mulu2_i64
- #define tcg_gen_muls2_tl tcg_gen_muls2_i64
- #define tcg_gen_mulsu2_tl tcg_gen_mulsu2_i64
-+#define tcg_gen_smin_tl tcg_gen_smin_i64
-+#define tcg_gen_umin_tl tcg_gen_umin_i64
-+#define tcg_gen_smax_tl tcg_gen_smax_i64
-+#define tcg_gen_umax_tl tcg_gen_umax_i64
- #define tcg_gen_atomic_cmpxchg_tl tcg_gen_atomic_cmpxchg_i64
- #define tcg_gen_atomic_xchg_tl tcg_gen_atomic_xchg_i64
- #define tcg_gen_atomic_fetch_add_tl tcg_gen_atomic_fetch_add_i64
-@@ -1123,6 +1135,10 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
- #define tcg_gen_mulu2_tl tcg_gen_mulu2_i32
- #define tcg_gen_muls2_tl tcg_gen_muls2_i32
- #define tcg_gen_mulsu2_tl tcg_gen_mulsu2_i32
-+#define tcg_gen_smin_tl tcg_gen_smin_i32
-+#define tcg_gen_umin_tl tcg_gen_umin_i32
-+#define tcg_gen_smax_tl tcg_gen_smax_i32
-+#define tcg_gen_umax_tl tcg_gen_umax_i32
- #define tcg_gen_atomic_cmpxchg_tl tcg_gen_atomic_cmpxchg_i32
- #define tcg_gen_atomic_xchg_tl tcg_gen_atomic_xchg_i32
- #define tcg_gen_atomic_fetch_add_tl tcg_gen_atomic_fetch_add_i32
-diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-index 34b96d68f3..5b82c3be8d 100644
---- a/tcg/tcg-op.c
-+++ b/tcg/tcg-op.c
-@@ -1033,6 +1033,26 @@ void tcg_gen_bswap32_i32(TCGv_i32 ret, TCGv_i32 arg)
-     }
- }
- 
-+void tcg_gen_smin_i32(TCGv_i32 ret, TCGv_i32 a, TCGv_i32 b)
-+{
-+    tcg_gen_movcond_i32(TCG_COND_LT, ret, a, b, a, b);
-+}
-+
-+void tcg_gen_umin_i32(TCGv_i32 ret, TCGv_i32 a, TCGv_i32 b)
-+{
-+    tcg_gen_movcond_i32(TCG_COND_LTU, ret, a, b, a, b);
-+}
-+
-+void tcg_gen_smax_i32(TCGv_i32 ret, TCGv_i32 a, TCGv_i32 b)
-+{
-+    tcg_gen_movcond_i32(TCG_COND_LT, ret, a, b, b, a);
-+}
-+
-+void tcg_gen_umax_i32(TCGv_i32 ret, TCGv_i32 a, TCGv_i32 b)
-+{
-+    tcg_gen_movcond_i32(TCG_COND_LTU, ret, a, b, b, a);
-+}
-+
- /* 64-bit ops */
- 
- #if TCG_TARGET_REG_BITS == 32
-@@ -2438,6 +2458,26 @@ void tcg_gen_mulsu2_i64(TCGv_i64 rl, TCGv_i64 rh, TCGv_i64 arg1, TCGv_i64 arg2)
-     tcg_temp_free_i64(t2);
- }
- 
-+void tcg_gen_smin_i64(TCGv_i64 ret, TCGv_i64 a, TCGv_i64 b)
-+{
-+    tcg_gen_movcond_i64(TCG_COND_LT, ret, a, b, a, b);
-+}
-+
-+void tcg_gen_umin_i64(TCGv_i64 ret, TCGv_i64 a, TCGv_i64 b)
-+{
-+    tcg_gen_movcond_i64(TCG_COND_LTU, ret, a, b, a, b);
-+}
-+
-+void tcg_gen_smax_i64(TCGv_i64 ret, TCGv_i64 a, TCGv_i64 b)
-+{
-+    tcg_gen_movcond_i64(TCG_COND_LT, ret, a, b, b, a);
-+}
-+
-+void tcg_gen_umax_i64(TCGv_i64 ret, TCGv_i64 a, TCGv_i64 b)
-+{
-+    tcg_gen_movcond_i64(TCG_COND_LTU, ret, a, b, b, a);
-+}
-+
- /* Size changing operations.  */
- 
- void tcg_gen_extrl_i64_i32(TCGv_i32 ret, TCGv_i64 arg)
+Changes since v2:
+  * New patch to use a helper macro for opposite-endian
+    atomic_fetch_add and atomic_add_fetch, as suggested
+    by pm215.
+  * Introduce ARM_FEATURE_V8_1 and define ARM_FEATURE_V8_ATOMICS
+    in terms of that, reinforcing the mandatory nature of
+    the extension.
+  * Typo fix in patch 8.
+
+
+Peter, do you want to take the whole thing into target-arm.next,
+or have it split?  We have a review and an ack for the riscv and
+xtensa patches.
+
+
+r~
+
+
+Richard Henderson (10):
+  tcg: Introduce helpers for integer min/max
+  target/arm: Use new min/max expanders
+  target/xtensa: Use new min/max expanders
+  tcg: Introduce atomic helpers for integer min/max
+  tcg: Use GEN_ATOMIC_HELPER_FN for opposite endian atomic add
+  target/riscv: Use new atomic min/max expanders
+  target/arm: Introduce ARM_FEATURE_V8_ATOMICS and initial decode
+  target/arm: Fill in disas_ldst_atomic
+  target/arm: Implement CAS and CASP
+  target/arm: Enable ARM_FEATURE_V8_ATOMICS for user-only
+
+ accel/tcg/atomic_template.h | 112 ++++++++-----
+ accel/tcg/tcg-runtime.h     |   8 +
+ target/arm/cpu.h            |   2 +
+ target/arm/helper-a64.h     |   2 +
+ tcg/tcg-op.h                |  50 ++++++
+ tcg/tcg.h                   |   8 +
+ linux-user/elfload.c        |   1 +
+ target/arm/cpu64.c          |   1 +
+ target/arm/helper-a64.c     |  43 +++++
+ target/arm/translate-a64.c  | 375 +++++++++++++++++++++++++++++++++++---------
+ target/riscv/translate.c    |  72 +++------
+ target/xtensa/translate.c   |  50 ++++--
+ tcg/tcg-op.c                |  48 ++++++
+ 13 files changed, 587 insertions(+), 185 deletions(-)
+
 -- 
 2.14.3
