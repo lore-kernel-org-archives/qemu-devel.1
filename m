@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55384)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fEd8Q-0003XW-OL
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:00:42 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fEdEA-0008JY-5G
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:06:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fEd8P-00021n-Bc
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:00:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36222 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fEd8P-00021E-5H
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:00:37 -0400
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Fri,  4 May 2018 17:00:26 +0100
-Message-Id: <20180504160026.14017-4-berrange@redhat.com>
-In-Reply-To: <20180504160026.14017-1-berrange@redhat.com>
-References: <20180504160026.14017-1-berrange@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fEdE9-0004lP-DD
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:06:34 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:43945)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fEdE9-0004l4-8X
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:06:33 -0400
+Received: by mail-ot0-x241.google.com with SMTP id y10-v6so25021590otg.10
+	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 09:06:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 3/3] glib: enforce the minimum required version
- and warn about old APIs
+In-Reply-To: <9cf54353-2e76-dcb0-04d7-b64c65d39b5f@linaro.org>
+References: <20180427002651.28356-1-richard.henderson@linaro.org>
+	<20180427002651.28356-9-richard.henderson@linaro.org>
+	<CAFEAcA_ZaP8Wxe3P+5SKpmQxzJqOEQxnKcdh7StGytOi9iR0yg@mail.gmail.com>
+	<9cf54353-2e76-dcb0-04d7-b64c65d39b5f@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 4 May 2018 17:06:12 +0100
+Message-ID: <CAFEAcA8_S_eG3ouh2JE8tugfoWj_2EJPssqtbys_jeJp3D+AQQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 8/9] target/arm: Implement CAS and CASP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,101 +31,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Olaf Hering <olaf@aepfle.de>, Stefan Hajnoczi <stefanha@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-There are two useful macros that can be defined before including
-glib.h that are related to the min required glib version
+On 3 May 2018 at 18:32, Richard Henderson <richard.henderson@linaro.org> wrote:
+> On 05/03/2018 07:55 AM, Peter Maydell wrote:
+>>> +        /* If compare equal, write back new data, else write back old data.  */
+>>> +        tcg_gen_movcond_i64(TCG_COND_NE, c1, c2, zero, t1, d1);
+>>> +        tcg_gen_movcond_i64(TCG_COND_NE, c2, c2, zero, t2, d2);
+>>> +        tcg_gen_qemu_st_i64(c1, addr, memidx, MO_64 | s->be_data);
+>>> +        tcg_gen_qemu_st_i64(c2, a2, memidx, MO_64 | s->be_data);
+>>
+>> I think this has the wrong behaviour if you do a CASP-with-mismatched-value
+>> to read-only memory -- architecturally this should fail the comparison
+>> and return the memory value in registers, it's not allowed to do a
+>> memory write and take a data abort because the memory isn't writable.
+>
+> If this is true [...]
 
- - GLIB_VERSION_MIN_REQUIRED
+Fortunately it turns out that it is not true. In the pseudocode,
+the CAS accesses are made with an acctype of either AccType_ORDEREDRW
+or AccType_ATOMICRW, and when this gets down into the translation table
+walk code AArch64.CheckPermission() handles those access types
+specially and generates a permission fault on !r || !w, so will fault
+the read part of the read-modify-write.
 
-   When this is defined, if code uses an API that was deprecated
-   in this version, or older, a compiler warning will be emitted.
-   This alerts maintainers to update their code to whatever new
-   replacement API is now recommended best practice.
+I wouldn't be too surprised if we get the ESR_ELx WnR bit wrong
+for this (it is supposed to be "0 if a plain read would fault,
+otherwise 1"), but let's not worry about that for now...
 
- - GLIB_VERSION_MAX_ALLOWED
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-   When this is defined, if code uses an API that was introduced
-   in a version that is newer than the declared version, a compiler
-   warning will be emitted. This alerts maintainers if new code
-   accidentally uses functionality that won't be available on some
-   supported platforms.
-
-The GLIB_VERSION_MAX_ALLOWED constant makes it a bit harder to opt
-in to using specific new APIs with a GLIB_CHECK_VERSION conditional.
-To workaround this Pragmas can be used to temporarily turn off the
--Wdeprecated-declarations compiler warning, while a static inline
-compat function is implemented. Nothing needs that at this time,
-so just illustrate it in a comment for benefit of future changes.
-
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- include/glib-compat.h | 49 +++++++++++++++++++++++++++++++++++++++++++++=
-++++
- 1 file changed, 49 insertions(+)
-
-diff --git a/include/glib-compat.h b/include/glib-compat.h
-index 3b340ab33c..d066f6d257 100644
---- a/include/glib-compat.h
-+++ b/include/glib-compat.h
-@@ -16,8 +16,57 @@
- #ifndef QEMU_GLIB_COMPAT_H
- #define QEMU_GLIB_COMPAT_H
-=20
-+/* Ask for warnings for anything that was marked deprecated in
-+ * the defined version, or before. It is a candidate for rewrite.
-+ */
-+#define GLIB_VERSION_MIN_REQUIRED GLIB_VERSION_2_42
-+
-+/* Ask for warnings if code tries to use function that did not
-+ * exist in the defined version. These risk breaking builds
-+ */
-+#define GLIB_VERSION_MAX_ALLOWED GLIB_VERSION_2_42
-+
- #include <glib.h>
-=20
-+/*
-+ * Note that because of the GLIB_VERSION_MAX_ALLOWED constant
-+ * above, allowing use of functions from newer GLib via this
-+ * compat header needs a little trickery to prevent warnings
-+ * being emitted.
-+ *
-+ * Consider a function from newer glib-X.Y that we want to use
-+ *
-+ *    int g_foo(const char *wibble)
-+ *
-+ * We must define a static inline function with the same
-+ * signature that does what we need, but with a "_qemu"
-+ * suffix eg
-+ *
-+ * _Pragma("GCC diagnostic push")
-+ * _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
-+ * static inline void g_foo_qemu(const char *wibble)
-+ * {
-+ *     #if GLIB_CHECK_VERSION(X, Y, 0)
-+ *        g_foo(wibble)
-+ *     #else
-+ *        g_something_equivalent_in_older_glib(wibble);
-+ *     #endif
-+ * }
-+ * _Pragma("GCC diagnostic pop")
-+ *
-+ * The Pragma calls turn off -Wdeprecated-declarations,
-+ * ensuring this wrapper function impl doesn't trigger the
-+ * compiler warning about using too new glib APIs. Finally
-+ * we can do
-+ *
-+ *   #define g_foo(a) g_foo_qemu(a)
-+ *
-+ * So now the code elsewhere in QEMU, which *does* have the
-+ * -Wdeprecated-declarations warning active, can call
-+ * g_foo(...) as normal, without generating warnings.
-+ */
-+
-+
- #if defined(_WIN32) && !GLIB_CHECK_VERSION(2, 50, 0)
- /*
-  * g_poll has a problem on Windows when using
---=20
-2.14.3
+thanks
+-- PMM
