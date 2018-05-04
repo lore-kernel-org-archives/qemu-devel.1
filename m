@@ -1,38 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1fEf2c-0008GH-4o
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 14:02:47 -0400
+	(envelope-from <eblake@redhat.com>) id 1fEfJA-00042i-4y
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 14:19:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1fEf2X-000287-6u
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 14:02:46 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45730)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
-	id 1fEf2W-00027N-TB
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 14:02:41 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w44I0GNA089373
-	for <qemu-devel@nongnu.org>; Fri, 4 May 2018 14:02:39 -0400
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2hrr01mcfj-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 14:02:38 -0400
-Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
-	Fri, 4 May 2018 14:02:37 -0400
+	(envelope-from <eblake@redhat.com>) id 1fEfJ6-0001MA-53
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 14:19:52 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54806 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fEfJ5-0001Iz-VA
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 14:19:48 -0400
 References: <1525445354-16233-1-git-send-email-walling@linux.ibm.com>
 	<7e9e9dfd-795b-47f2-453a-59bf65f28229@redhat.com>
-From: Collin Walling <walling@linux.ibm.com>
-Date: Fri, 4 May 2018 14:02:34 -0400
+	<7274b001-02f2-6584-ea0a-c3d0f96d46b8@linux.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <89dc884d-97af-4922-bd69-1cb7308399d8@redhat.com>
+Date: Fri, 4 May 2018 13:19:37 -0500
 MIME-Version: 1.0
-In-Reply-To: <7e9e9dfd-795b-47f2-453a-59bf65f28229@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <7274b001-02f2-6584-ea0a-c3d0f96d46b8@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Message-Id: <7274b001-02f2-6584-ea0a-c3d0f96d46b8@linux.ibm.com>
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH] monitor: report entirety of hmp command on
  error
 List-Id: <qemu-devel.nongnu.org>
@@ -43,125 +30,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org
 
-T24gMDUvMDQvMjAxOCAxMToxOSBBTSwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMDUvMDQv
-MjAxOCAwOTo0OSBBTSwgQ29sbGluIFdhbGxpbmcgd3JvdGU6DQo+PiBXaGVuIGEgdXNlciBp
-bmNvcnJlY3RseSBwcm92aWRlcyBhbiBobXAgY29tbWFuZCwgYW4gZXJyb3IgcmVzcG9uc2Ug
-d2lsbCBiZQ0KPj4gcHJpbnRlZCB0aGF0IHByb21wdHMgdGhlIHVzZXIgdG8gdHJ5ICJoZWxw
-IDxjb21tYW5kIG5hbWU+Ii4gSG93ZXZlciwgd2hlbg0KPj4gdGhlIGNvbW1hbmQgY29udGFp
-bnMgbXVsdGlwbGUgcGFydHMgZS5nLiAiaW5mbyBza2V5cyIsIG9ubHkgdGhlIGxhc3QNCj4+
-IHdoaXRlc3BhY2UgZGVsaW1pdGVkIHN0cmluZyB3aWxsIGJlIHJlcG9ydGVkIChpbiB0aGlz
-IGV4YW1wbGUgImluZm8iIHdpbGwNCj4+IGJlIGRyb3BwZWQgYW5kIHRoZSBtZXNzYWdlIHdp
-bGwgcmVhZCAiVHJ5ICJoZWxwIHNrZXlzIiBmb3IgbW9yZSBpbmZvcm1hdGlvbiIsDQo+PiB3
-aGljaCBpcyBpbmNvcnJlY3QpLg0KPiANCj4gV2hhdCdzIHRoZSBleGFjdCBmb3JtdWxhIGZv
-ciByZXByb2R1Y2luZyB0aGlzP8KgIEkgdHJpZWQ6DQo+IA0KPiAkIC4veDg2XzY0LXNvZnRt
-bXUvcWVtdS1zeXN0ZW0teDg2XzY0IC1ub2RlZmF1bHRzIC1ub2dyYXBoaWMgLS1tb25pdG9y
-IHN0ZGlvDQo+IFFFTVUgMi4xMi41MCBtb25pdG9yIC0gdHlwZSAnaGVscCcgZm9yIG1vcmUg
-aW5mb3JtYXRpb24NCj4gKHFlbXUpIGluZm8gc2tleXMNCj4gdW5rbm93biBjb21tYW5kOiAn
-aW5mbyBza2V5cycNCj4gDQo+IE9oLCBJIHNlZSBub3c6DQo+IA0KPiAocWVtdSkgaW5mbyB1
-dWlkIGJsYWgNCj4gdXVpZDogZXh0cmFuZW91cyBjaGFyYWN0ZXJzIGF0IHRoZSBlbmQgb2Yg
-bGluZQ0KPiBUcnkgImhlbHAgdXVpZCIgZm9yIG1vcmUgaW5mb3JtYXRpb24NCj4gKHFlbXUp
-IGhlbHAgdXVpZA0KPiAocWVtdSkNCj4gDQo+IFlvdSdsbCB3YW50IHRvIHVwZGF0ZSB5b3Vy
-IGNvbW1pdCBtZXNzYWdlIHRvIGRvY3VtZW50IHNvbWV0aGluZyB0aGF0IGlzIHJlcHJvZHVj
-aWJsZSAoeW91IG1heSBiZSBhZGRpbmcgYW4gJ2luZm8gc2tleXMnLCBidXQgdW50aWwgdGhh
-dCBpcyBpbiwgaXQgZG9lc24ndCBtYWtlIGEgZ29vZCBleGFtcGxlKS4NCj4gDQo+Pg0KPj4g
-TGV0J3MgY29ycmVjdCB0aGlzIGJ5IGNhcHR1cmluZyB0aGUgZnVsbCBuYW1lIG9mIHRoZSBj
-b21tYW5kIGFzIHdlIHJlY3Vyc2UNCj4+IHRocm91Z2ggdGhlIGZ1bmN0aW9uIG1vbml0b3Jf
-cGFyc2VfY29tbWFuZC4NCj4+DQo+PiBSZXBvcnRlZC1ieTogTWlraGFpbCBGb2tpbiA8Zm9r
-aW5AZGUuaWJtLmNvbT4NCj4+IFNpZ25lZC1vZmYtYnk6IENvbGxpbiBXYWxsaW5nIDx3YWxs
-aW5nQGxpbnV4LmlibS5jb20+DQo+PiAtLS0NCj4+IMKgIG1vbml0b3IuYyB8IDE1ICsrKysr
-KysrKysrLS0tLQ0KPj4gwqAgMSBmaWxlIGNoYW5nZWQsIDExIGluc2VydGlvbnMoKyksIDQg
-ZGVsZXRpb25zKC0pDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL21vbml0b3IuYyBiL21vbml0b3Iu
-Yw0KPj4gaW5kZXggMzlmOGVlMS4uZDQ4NDRiNCAxMDA2NDQNCj4+IC0tLSBhL21vbml0b3Iu
-Yw0KPj4gKysrIGIvbW9uaXRvci5jDQo+PiBAQCAtMjk2NCw3ICsyOTY0LDggQEAgc3RhdGlj
-IGNvbnN0IG1vbl9jbWRfdCAqc2VhcmNoX2Rpc3BhdGNoX3RhYmxlKGNvbnN0IG1vbl9jbWRf
-dCAqZGlzcF90YWJsZSwNCj4+IMKgIHN0YXRpYyBjb25zdCBtb25fY21kX3QgKm1vbml0b3Jf
-cGFyc2VfY29tbWFuZChNb25pdG9yICptb24sDQo+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgIGNvbnN0IGNoYXIgKmNtZHBfc3RhcnQsDQo+PiDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNvbnN0IGNoYXIgKipjbWRwLA0K
-Pj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBtb25fY21kX3QgKnRh
-YmxlKQ0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBtb25fY21k
-X3QgKnRhYmxlLA0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBj
-aGFyICpmdWxsbmFtZSkNCj4gDQo+IFVtbSwgaG93IGlzIGZ1bGxuYW1lIGFueSBiZXR0ZXIg
-dGhhbiBjbWRwX3N0YXJ0IHRoYXQgd2UgYWxyZWFkeSBoYXZlPw0KPiANCj4+IMKgIHsNCj4+
-IMKgwqDCoMKgwqAgY29uc3QgY2hhciAqcDsNCj4+IMKgwqDCoMKgwqAgY29uc3QgbW9uX2Nt
-ZF90ICpjbWQ7DQo+PiBAQCAtMjk4NywxMCArMjk4OCwxNCBAQCBzdGF0aWMgY29uc3QgbW9u
-X2NtZF90ICptb25pdG9yX3BhcnNlX2NvbW1hbmQoTW9uaXRvciAqbW9uLA0KPj4gwqDCoMKg
-wqDCoMKgwqDCoMKgIHArKzsNCj4+IMKgwqDCoMKgwqAgfQ0KPj4gwqAgK8KgwqDCoCBzdHJu
-Y2F0KGZ1bGxuYW1lLCBjbWRuYW1lLCBzdHJsZW4oY21kbmFtZSkpOw0KPiANCj4gZ2NjIDgg
-aXMgcGlja2llciBhYm91dCB1c2luZyBzdHJuY2F0KCkgW3BlcmhhcHMgdG9vIHBpY2t5IC0g
-c2VlIGh0dHBzOi8vZ2NjLmdudS5vcmcvYnVnemlsbGEvc2hvd19idWcuY2dpP2lkPTg1NjAy
-XSwgYnV0IGl0IGlzIGdlbmVyYWxseSBOT1QgdGhlIGZ1bmN0aW9uIHlvdSB3YW50IHRvIGJl
-IHVzaW5nLg0KPiANCj4+ICsNCj4+IMKgwqDCoMKgwqAgKmNtZHAgPSBwOw0KPj4gwqDCoMKg
-wqDCoCAvKiBzZWFyY2ggc3ViIGNvbW1hbmQgKi8NCj4+IMKgwqDCoMKgwqAgaWYgKGNtZC0+
-c3ViX3RhYmxlICE9IE5VTEwgJiYgKnAgIT0gJ1wwJykgew0KPj4gLcKgwqDCoMKgwqDCoMKg
-IHJldHVybiBtb25pdG9yX3BhcnNlX2NvbW1hbmQobW9uLCBjbWRwX3N0YXJ0LCBjbWRwLCBj
-bWQtPnN1Yl90YWJsZSk7DQo+PiArwqDCoMKgwqDCoMKgwqAgc3RybmNhdChmdWxsbmFtZSwg
-IiAiLCAxKTsNCj4+ICvCoMKgwqDCoMKgwqDCoCByZXR1cm4gbW9uaXRvcl9wYXJzZV9jb21t
-YW5kKG1vbiwgY21kcF9zdGFydCwgY21kcCwgY21kLT5zdWJfdGFibGUsDQo+PiArwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgIGZ1bGxuYW1lKTsNCj4gDQo+IFNlZSwgeW91J3JlIHJlY29uc3RydWN0
-aW5nIGEgY29tbWFuZCBpbnRvIGZ1bGxuYW1lLCB3aGljaCBhbHJlYWR5IG1hdGNoZXMgdGhl
-IG9yaWdpbmFsIGNvbW1hbmQgaW4gY21kcF9zdGFydCwgc28gSSBzZWUgbm8gcmVhc29uIHRv
-IGNoYW5nZSB0aGUgc2lnbmF0dXJlLg0KPiANCj4+IMKgwqDCoMKgwqAgfQ0KPj4gwqAgwqDC
-oMKgwqDCoCByZXR1cm4gY21kOw0KPj4gQEAgLTMzNzEsMTAgKzMzNzYsMTIgQEAgc3RhdGlj
-IHZvaWQgaGFuZGxlX2htcF9jb21tYW5kKE1vbml0b3IgKm1vbiwgY29uc3QgY2hhciAqY21k
-bGluZSkNCj4+IMKgIHsNCj4+IMKgwqDCoMKgwqAgUURpY3QgKnFkaWN0Ow0KPj4gwqDCoMKg
-wqDCoCBjb25zdCBtb25fY21kX3QgKmNtZDsNCj4+ICvCoMKgwqAgY2hhciBmdWxsbmFtZVsy
-NTZdOw0KPiANCj4gRVdXVy4gRG9uJ3QgZG8gdGhhdC7CoCBZb3UgYXJlIGp1c3QgQVNLSU5H
-IGZvciBhIGJ1ZmZlciBvdmVyZmxvdyBleHBsb2l0IHRoYXQgcHJpbnRzIHRoZSB3cm9uZyB0
-aGluZyBvciBjYXVzZXMgYSBzZWN1cml0eSBob2xlLCB3aGVuIEkgaW50ZW50aW9uYWxseSB0
-eXBlIGEgc3VwZXItbG9uZyBnYXJiYWdlIGNvbW1hbmQgaW50byBITVAuDQo+IA0KPj4gwqAg
-wqDCoMKgwqDCoCB0cmFjZV9oYW5kbGVfaG1wX2NvbW1hbmQobW9uLCBjbWRsaW5lKTsNCj4+
-IMKgIC3CoMKgwqAgY21kID0gbW9uaXRvcl9wYXJzZV9jb21tYW5kKG1vbiwgY21kbGluZSwg
-JmNtZGxpbmUsIG1vbi0+Y21kX3RhYmxlKTsNCj4+ICvCoMKgwqAgY21kID0gbW9uaXRvcl9w
-YXJzZV9jb21tYW5kKG1vbiwgY21kbGluZSwgJmNtZGxpbmUsIG1vbi0+Y21kX3RhYmxlLA0K
-Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgIGZ1bGxuYW1lKTsNCj4gDQo+IE5vdGUgdGhhdCBldmVuIHdpdGhvdXQg
-eW91ciBwYXRjaCwgdGhpcyBjYWxsIHVwZGF0ZXMgJ2NtZGxpbmUnIHRvIHBvaW50IHRvIHRo
-ZSBwb3NpdGlvbiB3aXRoaW4gdGhlIG9yaWdpbmFsIHN0cmluZyAoYWx0aG91Z2ggdGhhdCBw
-b3NpdGlvbiBoYXMgYWxyZWFkeSBza2lwcGVkIHNwYWNlcykuDQo+IA0KPj4gwqDCoMKgwqDC
-oCBpZiAoIWNtZCkgew0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgIHJldHVybjsNCj4+IMKgwqDC
-oMKgwqAgfQ0KPj4gQEAgLTMzODIsNyArMzM4OSw3IEBAIHN0YXRpYyB2b2lkIGhhbmRsZV9o
-bXBfY29tbWFuZChNb25pdG9yICptb24sIGNvbnN0IGNoYXIgKmNtZGxpbmUpDQo+PiDCoMKg
-wqDCoMKgIHFkaWN0ID0gbW9uaXRvcl9wYXJzZV9hcmd1bWVudHMobW9uLCAmY21kbGluZSwg
-Y21kKTsNCj4+IMKgwqDCoMKgwqAgaWYgKCFxZGljdCkgew0KPj4gwqDCoMKgwqDCoMKgwqDC
-oMKgIG1vbml0b3JfcHJpbnRmKG1vbiwgIlRyeSBcImhlbHAgJXNcIiBmb3IgbW9yZSBpbmZv
-cm1hdGlvblxuIiwNCj4+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoCBjbWQtPm5hbWUpOw0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgIGZ1bGxuYW1lKTsNCj4gDQo+IFNvIHJhdGhlciB0aGFuIHRyeWlu
-ZyB0byByZWNvbnN0cnVjdCBhIHN0cmluZywgeW91IGNvdWxkIHJldXNlIHdoYXQgeW91IGFs
-cmVhZHkgaGF2ZS7CoCBUaGlzIGlzIGEgc2hvcnRlciBwYXRjaCB0aGF0IEkgdGhpbmsgYWNj
-b21wbGlzaGVzIHRoZSBzYW1lIGdvYWw6DQo+IA0KPiBkaWZmIC0tZ2l0IGkvbW9uaXRvci5j
-IHcvbW9uaXRvci5jDQo+IGluZGV4IDM5ZjhlZTE3YmE3Li4zODczNmIzYTIwZCAxMDA2NDQN
-Cj4gLS0tIGkvbW9uaXRvci5jDQo+ICsrKyB3L21vbml0b3IuYw0KPiBAQCAtMzM3MSw2ICsz
-MzcxLDcgQEAgc3RhdGljIHZvaWQgaGFuZGxlX2htcF9jb21tYW5kKE1vbml0b3IgKm1vbiwg
-Y29uc3QgY2hhciAqY21kbGluZSkNCj4gwqB7DQo+IMKgwqDCoMKgIFFEaWN0ICpxZGljdDsN
-Cj4gwqDCoMKgwqAgY29uc3QgbW9uX2NtZF90ICpjbWQ7DQo+ICvCoMKgwqAgY29uc3QgY2hh
-ciAqY21kX3N0YXJ0ID0gY21kbGluZTsNCj4gDQo+IMKgwqDCoMKgIHRyYWNlX2hhbmRsZV9o
-bXBfY29tbWFuZChtb24sIGNtZGxpbmUpOw0KPiANCj4gQEAgLTMzODEsOCArMzM4MiwxMSBA
-QCBzdGF0aWMgdm9pZCBoYW5kbGVfaG1wX2NvbW1hbmQoTW9uaXRvciAqbW9uLCBjb25zdCBj
-aGFyICpjbWRsaW5lKQ0KPiANCj4gwqDCoMKgwqAgcWRpY3QgPSBtb25pdG9yX3BhcnNlX2Fy
-Z3VtZW50cyhtb24sICZjbWRsaW5lLCBjbWQpOw0KPiDCoMKgwqDCoCBpZiAoIXFkaWN0KSB7
-DQo+IC3CoMKgwqDCoMKgwqDCoCBtb25pdG9yX3ByaW50Zihtb24sICJUcnkgXCJoZWxwICVz
-XCIgZm9yIG1vcmUgaW5mb3JtYXRpb25cbiIsDQo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBjbWQtPm5hbWUpOw0KPiArwqDCoMKgwqDCoMKgwqAg
-d2hpbGUgKGNtZGxpbmUgPiBjbWRfc3RhcnQgJiYgcWVtdV9pc3NwYWNlKGNtZGxpbmVbLTFd
-KSkgew0KPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBjbWRsaW5lLS07DQo+ICvCoMKgwqDC
-oMKgwqDCoCB9DQo+ICvCoMKgwqDCoMKgwqDCoCBtb25pdG9yX3ByaW50Zihtb24sICJUcnkg
-XCJoZWxwICUuKnNcIiBmb3IgbW9yZSBpbmZvcm1hdGlvblxuIiwNCj4gK8KgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIChpbnQpKGNtZGxpbmUgLSBjbWRf
-c3RhcnQpLCBjbWRfc3RhcnQpOw0KPiDCoMKgwqDCoMKgwqDCoMKgIHJldHVybjsNCj4gwqDC
-oMKgwqAgfQ0KPiANCj4gDQo+IA0KDQpWZXJ5IGludGVyZXN0aW5nLi4uIHlvdSBtYW5hZ2Vk
-IHRvIHJldXNlIHdoYXQgd2FzIGluIGNtZGxpbmUgd2l0aG91dCBwcmludGluZyBhbnl0aGlu
-ZyBleHRyYW5lb3VzIHRoYXQNCnRoZSB1c2VyIG1pZ2h0IGhhdmUgcHJvdmlkZWQuLi4gbmlj
-ZWx5IGRvbmUhDQoNCllvdXIgcHJpbnQgc3RhdGVtZW50IGlzIGludHJpZ3VpbmcgdG8gbWUu
-Li4gSSdtIG5vdCBlbnRpcmVseSBzdXJlIGhvdyBpdCB3b3Jrcy4NCg0KSG93IHdvdWxkIHlv
-dSBsaWtlIHRvIG1vdmUgZm9yd2FyZCB3aXRoIHRoaXMgcGF0Y2g/DQoNCi0tIA0KUmVzcGVj
-dGZ1bGx5LA0KLSBDb2xsaW4gV2FsbGluZw0KDQo=
+On 05/04/2018 01:02 PM, Collin Walling wrote:
+
+>> So rather than trying to reconstruct a string, you could reuse what yo=
+u already have.=C2=A0 This is a shorter patch that I think accomplishes t=
+he same goal:
+>>
+>> diff --git i/monitor.c w/monitor.c
+>> index 39f8ee17ba7..38736b3a20d 100644
+>> --- i/monitor.c
+>> +++ w/monitor.c
+>> @@ -3371,6 +3371,7 @@ static void handle_hmp_command(Monitor *mon, con=
+st char *cmdline)
+>>  =C2=A0{
+>>  =C2=A0=C2=A0=C2=A0=C2=A0 QDict *qdict;
+>>  =C2=A0=C2=A0=C2=A0=C2=A0 const mon_cmd_t *cmd;
+>> +=C2=A0=C2=A0=C2=A0 const char *cmd_start =3D cmdline;
+>>
+>>  =C2=A0=C2=A0=C2=A0=C2=A0 trace_handle_hmp_command(mon, cmdline);
+>>
+>> @@ -3381,8 +3382,11 @@ static void handle_hmp_command(Monitor *mon, co=
+nst char *cmdline)
+>>
+>>  =C2=A0=C2=A0=C2=A0=C2=A0 qdict =3D monitor_parse_arguments(mon, &cmdl=
+ine, cmd);
+>>  =C2=A0=C2=A0=C2=A0=C2=A0 if (!qdict) {
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 monitor_printf(mon, "Try \=
+"help %s\" for more information\n",
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cmd->name=
+);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 while (cmdline > cmd_start=
+ && qemu_isspace(cmdline[-1])) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cm=
+dline--;
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 monitor_printf(mon, "Try \=
+"help %.*s\" for more information\n",
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (int)(cmd=
+line - cmd_start), cmd_start);
+>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>>  =C2=A0=C2=A0=C2=A0=C2=A0 }
+>>
+>>
+>>
+>=20
+> Very interesting... you managed to reuse what was in cmdline without pr=
+inting anything extraneous that
+> the user might have provided... nicely done!
+>=20
+> Your print statement is intriguing to me... I'm not entirely sure how i=
+t works.
+
+The format specifiers in printf are %[flags][width][.precision]format.=20
+So I'm requesting a precision-limited string print (which says the=20
+maximum number of characters to print, rather than the usual semantics=20
+of printing until the trailing NUL is found), and the precision of .*=20
+(instead of a more typical .1 or similar) says that the precision will=20
+be an int argument to printf rather than inline (the width argument can=20
+also be passed via *).  The cast to int is annoyingly part of the=20
+specification (subtracting two pointers within a string results in a=20
+ptrdiff_t, but on 64-bit platforms, ptrdiff_t and int are not equally=20
+handled through vararg functions).  And that exact style of printf()=20
+magic was already in use in monitor_parse_command() that your patch=20
+attempt was touching (see where cmdp_start is used).  And if you really=20
+want weird, 'man 3 printf' states that "%.*s" is equivalent to=20
+"%2$.*1$s" (the $ syntax is for cases cases where you need to consume=20
+printf arguments out-of-order, often when dealing with translated strings=
+).
+
+>=20
+> How would you like to move forward with this patch?
+
+I'm more than happy to let you post a v2 of the patch, incorporating the=20
+ideas you just learned from me.  (Or, if you do nothing, then in a week=20
+or so, I'll probably notice the patch is still sitting unapplied in my=20
+local repository and submit it myself - but then I wouldn't be helping=20
+the qemu community grow...)
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
