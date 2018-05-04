@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51460)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fEkFf-0005qR-Ao
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 19:36:37 -0400
+	(envelope-from <alistair23@gmail.com>) id 1fEkO0-0007e3-SY
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 19:45:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fEkFa-0007qv-Pm
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 19:36:35 -0400
-Resent-Message-Id: <E1fEkFa-0007qv-Pm@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21099)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fEkFa-0007nj-Gr
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 19:36:30 -0400
-In-Reply-To: <20180504074207.22634-1-famz@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152542019271.2502.11957748187759069388@71c20359a636>
+	(envelope-from <alistair23@gmail.com>) id 1fEkNx-000651-4a
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 19:45:12 -0400
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:34723)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1fEkNw-00063e-MZ
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 19:45:09 -0400
+Received: by mail-lf0-x242.google.com with SMTP id h4-v6so33167697lfc.1
+	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 16:45:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 4 May 2018 00:49:54 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v6 0/4] slirp: Add query-usernet QMP command
+References: <1524699938-6764-1-git-send-email-mjc@sifive.com>
+	<1524699938-6764-12-git-send-email-mjc@sifive.com>
+	<CAKmqyKMuc9tAaxtCBEn3MSUiuCdhgR0D0=TY=R-8VXhfG_Z+zA@mail.gmail.com>
+	<CAHNT7NvCpM7woViXm=D3sDzZh5_wFj_4gB_5N2SF2FW+ZrHOLA@mail.gmail.com>
+	<CAHNT7NtAGjJuV9WG-wfuB6tt5u0OHT_bEXYrTNkxjPmUcDRzjw@mail.gmail.com>
+	<CAKmqyKOvKtV9ygXVCksWU9xOskm+KNH+amBA=1c3KQc-rkvbGQ@mail.gmail.com>
+	<CAHNT7NvQ5aXvJofPBcL3iaEsBD=W7CTSuyJ5oo54XL9bnjNS+w@mail.gmail.com>
+In-Reply-To: <CAHNT7NvQ5aXvJofPBcL3iaEsBD=W7CTSuyJ5oo54XL9bnjNS+w@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 04 May 2018 23:44:41 +0000
+Message-ID: <CAKmqyKOe3xEuMNttQOuu=Dn2_tf4qHK39k0Mn-ZE0tQ5B-+N_w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v8 11/35] RISC-V: Mark ROM read-only after
+ copying in code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,189 +35,591 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com
-Cc: qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org, jasowang@redhat.com, f4bug@amsat.org, armbru@redhat.com, jan.kiszka@siemens.com, alex.bennee@linaro.org
+To: Michael Clark <mjc@sifive.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, palmer@sifive.com, Alistair Francis <Alistair.Francis@wdc.com>, patches@groups.riscv.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNTA0MDc0MjA3LjIyNjM0LTEtZmFtekByZWRoYXQuY29tClN1YmplY3Q6
-IFtRZW11LWRldmVsXSBbUEFUQ0ggdjYgMC80XSBzbGlycDogQWRkIHF1ZXJ5LXVzZXJuZXQgUU1Q
-IGNvbW1hbmQKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFz
-ZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0w
-CgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2Nh
-bCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlz
-dG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4p
-Igpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3Rh
-bDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAk
-YyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsg
-dGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkK
-ZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhj
-ZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIu
-Y29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNo
-ZXcvMjAxODA1MDQwNzQyMDcuMjI2MzQtMS1mYW16QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4
-MDUwNDA3NDIwNy4yMjYzNC0xLWZhbXpAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFu
-Y2ggJ3Rlc3QnCmMwOGU2ZTNhN2YgdGVzdHM6IFVzZSBxdWVyeS11c2VybmV0IGluc3RlYWQgb2Yg
-J2luZm8gdXNlcm5ldCcKYzQ5M2E2OTI2NyBzbGlycDogQWRkICJxdWVyeS11c2VybmV0IiBRTVAg
-Y29tbWFuZAo1MTUwZTQ0NWI0IHNsaXJwOiBVc2UgUUFQSSBlbnVtIHRvIHJlcGxhY2UgVENQU18q
-IG1hY3JvcwowZjNiMWEyNDBiIHFhcGk6IEludHJvZHVjZSBVc2VybmV0VGNwU3RhdGUKCj09PSBP
-VVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNDogcWFwaTogSW50cm9kdWNlIFVzZXJu
-ZXRUY3BTdGF0ZS4uLgpDaGVja2luZyBQQVRDSCAyLzQ6IHNsaXJwOiBVc2UgUUFQSSBlbnVtIHRv
-IHJlcGxhY2UgVENQU18qIG1hY3Jvcy4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVy
-IHVzZSB0YWJzCiMxMTI6IEZJTEU6IHNsaXJwL3RjcF9pbnB1dC5jOjg4OgorXkkgICAgKHRwKS0+
-dF9zdGF0ZSA9PSBVU0VSTkVUX1RDUF9TVEFURV9FU1RBQkxJU0hFRCkgeyBcJAoKRVJST1I6IGNv
-ZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTIxOiBGSUxFOiBzbGlycC90Y3BfaW5w
-dXQuYzoxOTM6CiteSWlmICh0cC0+dF9zdGF0ZSA9PSBVU0VSTkVUX1RDUF9TVEFURV9TWU5fUkVD
-RUlWRUQgJiYgdGktPnRpX2xlbikkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVz
-ZSB0YWJzCiMxMzA6IEZJTEU6IHNsaXJwL3RjcF9pbnB1dC5jOjQ2MDoKK15JICB0cC0+dF9zdGF0
-ZSA9IFVTRVJORVRfVENQX1NUQVRFX0xJU1RFTjskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxk
-IG5ldmVyIHVzZSB0YWJzCiMxMzk6IEZJTEU6IHNsaXJwL3RjcF9pbnB1dC5jOjQ3NjoKK15JaWYg
-KHRwLT50X3N0YXRlID09IFVTRVJORVRfVENQX1NUQVRFX0NMT1NFRCkkCgpFUlJPUjogYnJhY2Vz
-IHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMxMzk6IEZJ
-TEU6IHNsaXJwL3RjcF9pbnB1dC5jOjQ3NjoKKwlpZiAodHAtPnRfc3RhdGUgPT0gVVNFUk5FVF9U
-Q1BfU1RBVEVfQ0xPU0VEKQpbLi4uXQoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1
-c2UgdGFicwojMTQ4OiBGSUxFOiBzbGlycC90Y3BfaW5wdXQuYzo0OTU6CiteSWlmIChvcHRwICYm
-IHRwLT50X3N0YXRlICE9IFVTRVJORVRfVENQX1NUQVRFX0xJU1RFTikkCgpFUlJPUjogYnJhY2Vz
-IHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMxNDg6IEZJ
-TEU6IHNsaXJwL3RjcF9pbnB1dC5jOjQ5NToKKwlpZiAob3B0cCAmJiB0cC0+dF9zdGF0ZSAhPSBV
-U0VSTkVUX1RDUF9TVEFURV9MSVNURU4pClsuLi5dCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxk
-IG5ldmVyIHVzZSB0YWJzCiMxNTc6IEZJTEU6IHNsaXJwL3RjcF9pbnB1dC5jOjUxNjoKK15JaWYg
-KHRwLT50X3N0YXRlID09IFVTRVJORVRfVENQX1NUQVRFX0VTVEFCTElTSEVEICYmJAoKRVJST1I6
-IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTY2OiBGSUxFOiBzbGlycC90Y3Bf
-aW5wdXQuYzo2MTg6CiteSWNhc2UgVVNFUk5FVF9UQ1BfU1RBVEVfTElTVEVOOiB7JAoKRVJST1I6
-IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTc1OiBGSUxFOiBzbGlycC90Y3Bf
-aW5wdXQuYzo3Mjk6CiteSSAgICB0cC0+dF9zdGF0ZSA9IFVTRVJORVRfVENQX1NUQVRFX1NZTl9S
-RUNFSVZFRDskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxODQ6
-IEZJTEU6IHNsaXJwL3RjcF9pbnB1dC5jOjc2MzoKK15JICB0cC0+dF9zdGF0ZSA9IFVTRVJORVRf
-VENQX1NUQVRFX1NZTl9SRUNFSVZFRDskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVy
-IHVzZSB0YWJzCiMxODg6IEZJTEU6IHNsaXJwL3RjcF9pbnB1dC5jOjc2NjoKK15JfSAvKiBjYXNl
-IFVTRVJORVRfVENQX1NUQVRFX0xJU1RFTiAqLyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQg
-bmV2ZXIgdXNlIHRhYnMKIzE5NzogRklMRTogc2xpcnAvdGNwX2lucHV0LmM6NzgwOgorXkljYXNl
-IFVTRVJORVRfVENQX1NUQVRFX1NZTl9TRU5UOiQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQg
-bmV2ZXIgdXNlIHRhYnMKIzIwNjogRklMRTogc2xpcnAvdGNwX2lucHV0LmM6ODA3OgorXkleSV5J
-dHAtPnRfc3RhdGUgPSBVU0VSTkVUX1RDUF9TVEFURV9FU1RBQkxJU0hFRDskCgpFUlJPUjogY29k
-ZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMyMTU6IEZJTEU6IHNsaXJwL3RjcF9pbnB1
-dC5jOjgxODoKK15JXkleSXRwLT50X3N0YXRlID0gVVNFUk5FVF9UQ1BfU1RBVEVfU1lOX1JFQ0VJ
-VkVEOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzIyNDogRklM
-RTogc2xpcnAvdGNwX2lucHV0LmM6ODg4OgorXkkgICAgdHAtPnRfc3RhdGUgPiBVU0VSTkVUX1RD
-UF9TVEFURV9DTE9TRV9XQUlUICYmIHRpLT50aV9sZW4pIHskCgpFUlJPUjogY29kZSBpbmRlbnQg
-c2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMyMzM6IEZJTEU6IHNsaXJwL3RjcF9pbnB1dC5jOjkwNzoK
-K15JXkleSSAgICB0cC0+dF9zdGF0ZSA9PSBVU0VSTkVUX1RDUF9TVEFURV9USU1FX1dBSVQgJiYk
-CgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMyNDc6IEZJTEU6IHNs
-aXJwL3RjcF9pbnB1dC5jOjk0MzoKK15JY2FzZSBVU0VSTkVUX1RDUF9TVEFURV9TWU5fUkVDRUlW
-RUQ6JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjQ4OiBGSUxF
-OiBzbGlycC90Y3BfaW5wdXQuYzo5NDQ6CiteSWNhc2UgVVNFUk5FVF9UQ1BfU1RBVEVfRVNUQUJM
-SVNIRUQ6JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjQ5OiBG
-SUxFOiBzbGlycC90Y3BfaW5wdXQuYzo5NDU6CiteSWNhc2UgVVNFUk5FVF9UQ1BfU1RBVEVfRklO
-X1dBSVRfMTokCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMyNTA6
-IEZJTEU6IHNsaXJwL3RjcF9pbnB1dC5jOjk0NjoKK15JY2FzZSBVU0VSTkVUX1RDUF9TVEFURV9G
-SU5fV0FJVF8yOiQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzI1
-MTogRklMRTogc2xpcnAvdGNwX2lucHV0LmM6OTQ3OgorXkljYXNlIFVTRVJORVRfVENQX1NUQVRF
-X0NMT1NFX1dBSVQ6JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwoj
-MjUyOiBGSUxFOiBzbGlycC90Y3BfaW5wdXQuYzo5NDg6CiteSV5JdHAtPnRfc3RhdGUgPSBVU0VS
-TkVUX1RDUF9TVEFURV9DTE9TRUQ7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1
-c2UgdGFicwojMjU5OiBGSUxFOiBzbGlycC90Y3BfaW5wdXQuYzo5NTI6CiteSWNhc2UgVVNFUk5F
-VF9UQ1BfU1RBVEVfQ0xPU0lORzokCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVz
-ZSB0YWJzCiMyNjA6IEZJTEU6IHNsaXJwL3RjcF9pbnB1dC5jOjk1MzoKK15JY2FzZSBVU0VSTkVU
-X1RDUF9TVEFURV9MQVNUX0FDSzokCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVz
-ZSB0YWJzCiMyNjE6IEZJTEU6IHNsaXJwL3RjcF9pbnB1dC5jOjk1NDoKK15JY2FzZSBVU0VSTkVU
-X1RDUF9TVEFURV9USU1FX1dBSVQ6JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1
-c2UgdGFicwojMjcwOiBGSUxFOiBzbGlycC90Y3BfaW5wdXQuYzo5ODI6CiteSWNhc2UgVVNFUk5F
-VF9UQ1BfU1RBVEVfU1lOX1JFQ0VJVkVEOiQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2
-ZXIgdXNlIHRhYnMKIzI3NjogRklMRTogc2xpcnAvdGNwX2lucHV0LmM6OTg3OgorXkleSXRwLT50
-X3N0YXRlID0gVVNFUk5FVF9UQ1BfU1RBVEVfRVNUQUJMSVNIRUQ7JAoKRVJST1I6IGNvZGUgaW5k
-ZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjg1OiBGSUxFOiBzbGlycC90Y3BfaW5wdXQuYzox
-MDA3OgorXkleSSAgICB0cC0+dF9zdGF0ZSA9IFVTRVJORVRfVENQX1NUQVRFX0ZJTl9XQUlUXzE7
-JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzAwOiBGSUxFOiBz
-bGlycC90Y3BfaW5wdXQuYzoxMDI3OgorXkljYXNlIFVTRVJORVRfVENQX1NUQVRFX0VTVEFCTElT
-SEVEOiQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzMwMTogRklM
-RTogc2xpcnAvdGNwX2lucHV0LmM6MTAyODoKK15JY2FzZSBVU0VSTkVUX1RDUF9TVEFURV9GSU5f
-V0FJVF8xOiQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzMwMjog
-RklMRTogc2xpcnAvdGNwX2lucHV0LmM6MTAyOToKK15JY2FzZSBVU0VSTkVUX1RDUF9TVEFURV9G
-SU5fV0FJVF8yOiQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzMw
-MzogRklMRTogc2xpcnAvdGNwX2lucHV0LmM6MTAzMDoKK15JY2FzZSBVU0VSTkVUX1RDUF9TVEFU
-RV9DTE9TRV9XQUlUOiQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMK
-IzMwNDogRklMRTogc2xpcnAvdGNwX2lucHV0LmM6MTAzMToKK15JY2FzZSBVU0VSTkVUX1RDUF9T
-VEFURV9DTE9TSU5HOiQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMK
-IzMwNTogRklMRTogc2xpcnAvdGNwX2lucHV0LmM6MTAzMjoKK15JY2FzZSBVU0VSTkVUX1RDUF9T
-VEFURV9MQVNUX0FDSzokCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJz
-CiMzMDY6IEZJTEU6IHNsaXJwL3RjcF9pbnB1dC5jOjEwMzM6CiteSWNhc2UgVVNFUk5FVF9UQ1Bf
-U1RBVEVfVElNRV9XQUlUOiQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRh
-YnMKIzMxNTogRklMRTogc2xpcnAvdGNwX2lucHV0LmM6MTE2NDoKK15JXkljYXNlIFVTRVJORVRf
-VENQX1NUQVRFX0ZJTl9XQUlUXzE6JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1
-c2UgdGFicwojMzI0OiBGSUxFOiBzbGlycC90Y3BfaW5wdXQuYzoxMTc2OgorXkleSV5JXkl0cC0+
-dF9zdGF0ZSA9IFVTRVJORVRfVENQX1NUQVRFX0ZJTl9XQUlUXzI7JAoKRVJST1I6IGNvZGUgaW5k
-ZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzMzOiBGSUxFOiBzbGlycC90Y3BfaW5wdXQuYzox
-MTg2OgorXkleSWNhc2UgVVNFUk5FVF9UQ1BfU1RBVEVfQ0xPU0lORzokCgpFUlJPUjogY29kZSBp
-bmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzMzY6IEZJTEU6IHNsaXJwL3RjcF9pbnB1dC5j
-OjExODg6CiteSV5JXkleSXRwLT50X3N0YXRlID0gVVNFUk5FVF9UQ1BfU1RBVEVfVElNRV9XQUlU
-OyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzM0NTogRklMRTog
-c2xpcnAvdGNwX2lucHV0LmM6MTIwMDoKK15JXkljYXNlIFVTRVJORVRfVENQX1NUQVRFX0xBU1Rf
-QUNLOiQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzM1NDogRklM
-RTogc2xpcnAvdGNwX2lucHV0LmM6MTIxMjoKK15JXkljYXNlIFVTRVJORVRfVENQX1NUQVRFX1RJ
-TUVfV0FJVDokCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzYzOiBGSUxFOiBz
-bGlycC90Y3BfaW5wdXQuYzoxMzIwOgorCQkJICogd2lsbCBnb3QgdG8gVVNFUk5FVF9UQ1BfU1RB
-VEVfTEFTVF9BQ0ssIGFuZCB1c2UgdGNwX291dHB1dCgpCgpFUlJPUjogY29kZSBpbmRlbnQgc2hv
-dWxkIG5ldmVyIHVzZSB0YWJzCiMzNjM6IEZJTEU6IHNsaXJwL3RjcF9pbnB1dC5jOjEzMjA6Cite
-SV5JXkkgKiB3aWxsIGdvdCB0byBVU0VSTkVUX1RDUF9TVEFURV9MQVNUX0FDSywgYW5kIHVzZSB0
-Y3Bfb3V0cHV0KCkkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMz
-NzM6IEZJTEU6IHNsaXJwL3RjcF9pbnB1dC5jOjEzMzQ6CiteSV5JY2FzZSBVU0VSTkVUX1RDUF9T
-VEFURV9TWU5fUkVDRUlWRUQ6JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2Ug
-dGFicwojMzc0OiBGSUxFOiBzbGlycC90Y3BfaW5wdXQuYzoxMzM1OgorXkleSWNhc2UgVVNFUk5F
-VF9UQ1BfU1RBVEVfRVNUQUJMSVNIRUQ6JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZl
-ciB1c2UgdGFicwojMzc3OiBGSUxFOiBzbGlycC90Y3BfaW5wdXQuYzoxMzM3OgorXkleSSAgICB0
-cC0+dF9zdGF0ZSA9IFVTRVJORVRfVENQX1NUQVRFX0xBU1RfQUNLOyQKCkVSUk9SOiBjb2RlIGlu
-ZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzM4MDogRklMRTogc2xpcnAvdGNwX2lucHV0LmM6
-MTMzOToKK15JXkkgICAgdHAtPnRfc3RhdGUgPSBVU0VSTkVUX1RDUF9TVEFURV9DTE9TRV9XQUlU
-OyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzM4OTogRklMRTog
-c2xpcnAvdGNwX2lucHV0LmM6MTM0NjoKK15JXkljYXNlIFVTRVJORVRfVENQX1NUQVRFX0ZJTl9X
-QUlUXzE6JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzkwOiBG
-SUxFOiBzbGlycC90Y3BfaW5wdXQuYzoxMzQ3OgorXkleSV5JdHAtPnRfc3RhdGUgPSBVU0VSTkVU
-X1RDUF9TVEFURV9DTE9TSU5HOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNl
-IHRhYnMKIzQwMDogRklMRTogc2xpcnAvdGNwX2lucHV0LmM6MTM1NToKK15JXkljYXNlIFVTRVJO
-RVRfVENQX1NUQVRFX0ZJTl9XQUlUXzI6JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZl
-ciB1c2UgdGFicwojNDAxOiBGSUxFOiBzbGlycC90Y3BfaW5wdXQuYzoxMzU2OgorXkleSV5JdHAt
-PnRfc3RhdGUgPSBVU0VSTkVUX1RDUF9TVEFURV9USU1FX1dBSVQ7JAoKRVJST1I6IGNvZGUgaW5k
-ZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDEwOiBGSUxFOiBzbGlycC90Y3BfaW5wdXQuYzox
-MzY0OgorXkleSWNhc2UgVVNFUk5FVF9UQ1BfU1RBVEVfVElNRV9XQUlUOiQKCkVSUk9SOiBjb2Rl
-IGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQzMTogRklMRTogc2xpcnAvdGNwX3N1YnIu
-YzoyODY6CiteSXRwLT50X3N0YXRlID0gVVNFUk5FVF9UQ1BfU1RBVEVfQ0xPU0VEOyQKCkVSUk9S
-OiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQ0MDogRklMRTogc2xpcnAvdGNw
-X3N1YnIuYzozMDU6CiteSV5JdHAtPnRfc3RhdGUgPSBVU0VSTkVUX1RDUF9TVEFURV9DTE9TRUQ7
-JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDUyOiBGSUxFOiBz
-bGlycC90Y3Bfc3Vici5jOjM3NToKK15JY2FzZSBVU0VSTkVUX1RDUF9TVEFURV9DTE9TRUQ6JAoK
-RVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDUzOiBGSUxFOiBzbGly
-cC90Y3Bfc3Vici5jOjM3NjoKK15JY2FzZSBVU0VSTkVUX1RDUF9TVEFURV9MSVNURU46JAoKRVJS
-T1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDU0OiBGSUxFOiBzbGlycC90
-Y3Bfc3Vici5jOjM3NzoKK15JY2FzZSBVU0VSTkVUX1RDUF9TVEFURV9TWU5fU0VOVDokCgpFUlJP
-UjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0NTU6IEZJTEU6IHNsaXJwL3Rj
-cF9zdWJyLmM6Mzc4OgorXkleSXRwLT50X3N0YXRlID0gVVNFUk5FVF9UQ1BfU1RBVEVfQ0xPU0VE
-OyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQ2MjogRklMRTog
-c2xpcnAvdGNwX3N1YnIuYzozODI6CiteSWNhc2UgVVNFUk5FVF9UQ1BfU1RBVEVfU1lOX1JFQ0VJ
-VkVEOiQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQ2MzogRklM
-RTogc2xpcnAvdGNwX3N1YnIuYzozODM6CiteSWNhc2UgVVNFUk5FVF9UQ1BfU1RBVEVfRVNUQUJM
-SVNIRUQ6JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDY0OiBG
-SUxFOiBzbGlycC90Y3Bfc3Vici5jOjM4NDoKK15JXkl0cC0+dF9zdGF0ZSA9IFVTRVJORVRfVENQ
-X1NUQVRFX0ZJTl9XQUlUXzE7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2Ug
-dGFicwojNDY5OiBGSUxFOiBzbGlycC90Y3Bfc3Vici5jOjM4NzoKK15JY2FzZSBVU0VSTkVUX1RD
-UF9TVEFURV9DTE9TRV9XQUlUOiQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNl
-IHRhYnMKIzQ3MDogRklMRTogc2xpcnAvdGNwX3N1YnIuYzozODg6CiteSV5JdHAtPnRfc3RhdGUg
-PSBVU0VSTkVUX1RDUF9TVEFURV9MQVNUX0FDSzskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxk
-IG5ldmVyIHVzZSB0YWJzCiM1MDA6IEZJTEU6IHNsaXJwL3RjcF90aW1lci5jOjEzOToKK15JXklp
-ZiAodHAtPnRfc3RhdGUgIT0gVVNFUk5FVF9UQ1BfU1RBVEVfVElNRV9XQUlUICYmJAoKRVJST1I6
-IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNTA5OiBGSUxFOiBzbGlycC90Y3Bf
-dGltZXIuYzoyNjM6CiteSV5JaWYgKHRwLT50X3N0YXRlIDwgVVNFUk5FVF9UQ1BfU1RBVEVfRVNU
-QUJMSVNIRUQpJAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzUxMzogRklMRTog
-c2xpcnAvdGNwX3RpbWVyLmM6MjY2OgorCQlpZiAoKFNPX09QVElPTlMpICYmIHRwLT50X3N0YXRl
-IDw9IFVTRVJORVRfVENQX1NUQVRFX0NMT1NFX1dBSVQpIHsKCkVSUk9SOiBjb2RlIGluZGVudCBz
-aG91bGQgbmV2ZXIgdXNlIHRhYnMKIzUxMzogRklMRTogc2xpcnAvdGNwX3RpbWVyLmM6MjY2Ogor
-XkleSWlmICgoU09fT1BUSU9OUykgJiYgdHAtPnRfc3RhdGUgPD0gVVNFUk5FVF9UQ1BfU1RBVEVf
-Q0xPU0VfV0FJVCkgeyQKCnRvdGFsOiA2NiBlcnJvcnMsIDIgd2FybmluZ3MsIDQ0NCBsaW5lcyBj
-aGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQ
-QVRDSCAzLzQ6IHNsaXJwOiBBZGQgInF1ZXJ5LXVzZXJuZXQiIFFNUCBjb21tYW5kLi4uCkNoZWNr
-aW5nIFBBVENIIDQvNDogdGVzdHM6IFVzZSBxdWVyeS11c2VybmV0IGluc3RlYWQgb2YgJ2luZm8g
-dXNlcm5ldCcuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
-Y29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
-LWRldmVsQHJlZGhhdC5jb20=
+On Thu, May 3, 2018 at 6:45 PM Michael Clark <mjc@sifive.com> wrote:
+
+
+
+> On Sat, Apr 28, 2018 at 4:17 AM, Alistair Francis <alistair23@gmail.com>
+wrote:
+
+>> On Thu, Apr 26, 2018 at 10:34 PM Michael Clark <mjc@sifive.com> wrote:
+
+
+
+>> > On Fri, Apr 27, 2018 at 5:22 PM, Michael Clark <mjc@sifive.com> wrote:
+
+
+
+>> >> On Fri, Apr 27, 2018 at 4:48 AM, Alistair Francis <
+alistair23@gmail.com>
+>> wrote:
+
+>> >>> On Wed, Apr 25, 2018 at 5:03 PM Michael Clark <mjc@sifive.com> wrote:
+
+>> >>> > The sifive_u machine already marks its ROM readonly. This fixes
+>> >>> > the remaining boards. This commit also makes all boards use
+>> >>> > mask_rom as the variable name for the ROM. This change also
+>> >>> > makes space for the maximum device tree size size and adds
+>> >>> > an explicit bounds check and error message.
+
+>> >>> > Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+>> >>> > Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+>> >>> > Cc: Palmer Dabbelt <palmer@sifive.com>
+>> >>> > Cc: Alistair Francis <Alistair.Francis@wdc.com>
+>> >>> > Signed-off-by: Michael Clark <mjc@sifive.com>
+>> >>> > ---
+>> >>> >   hw/riscv/sifive_e.c     | 20 +++++++---------
+>> >>> >   hw/riscv/sifive_u.c     | 46 ++++++++++++++++++-----------------
+>> >>> >   hw/riscv/spike.c        | 64
+>> >>> ++++++++++++++++++++++++++++---------------------
+>> >>> >   hw/riscv/virt.c         | 38 +++++++++++++++--------------
+>> >>> >   include/hw/riscv/virt.h |  4 ++++
+>> >>> >   5 files changed, 93 insertions(+), 79 deletions(-)
+
+>> >>> > diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+>> >>> > index 39e4cb4..0c8b8e9 100644
+>> >>> > --- a/hw/riscv/sifive_e.c
+>> >>> > +++ b/hw/riscv/sifive_e.c
+>> >>> > @@ -74,14 +74,6 @@ static const struct MemmapEntry {
+>> >>> >       [SIFIVE_E_DTIM] =     { 0x80000000,     0x4000 }
+>> >>> >   };
+
+>> >>> > -static void copy_le32_to_phys(hwaddr pa, uint32_t *rom, size_t
+len)
+>> >>> > -{
+>> >>> > -    int i;
+>> >>> > -    for (i = 0; i < (len >> 2); i++) {
+>> >>> > -        stl_phys(&address_space_memory, pa + (i << 2), rom[i]);
+>> >>> > -    }
+>> >>> > -}
+>> >>> > -
+>> >>> >   static uint64_t load_kernel(const char *kernel_filename)
+>> >>> >   {
+>> >>> >       uint64_t kernel_entry, kernel_high;
+>> >>> > @@ -112,6 +104,7 @@ static void riscv_sifive_e_init(MachineState
+>> *machine)
+>> >>> >       MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+>> >>> >       MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+>> >>> >       MemoryRegion *xip_mem = g_new(MemoryRegion, 1);
+>> >>> > +    int i;
+
+>> >>> >       /* Initialize SOC */
+>> >>> >       object_initialize(&s->soc, sizeof(s->soc),
+>> TYPE_RISCV_HART_ARRAY);
+>> >>> > @@ -131,7 +124,7 @@ static void riscv_sifive_e_init(MachineState
+>> *machine)
+>> >>> >           memmap[SIFIVE_E_DTIM].base, main_mem);
+
+>> >>> >       /* Mask ROM */
+>> >>> > -    memory_region_init_ram(mask_rom, NULL, "riscv.sifive.e.mrom",
+>> >>> > +    memory_region_init_rom(mask_rom, NULL, "riscv.sifive.e.mrom",
+>> >>> >           memmap[SIFIVE_E_MROM].size, &error_fatal);
+>> >>> >       memory_region_add_subregion(sys_mem,
+>> >>> >           memmap[SIFIVE_E_MROM].base, mask_rom);
+>> >>> > @@ -185,9 +178,12 @@ static void riscv_sifive_e_init(MachineState
+>> >>> *machine)
+>> >>> >           0x00028067,        /* 0x1004: jr      t0 */
+>> >>> >       };
+
+>> >>> > -    /* copy in the reset vector */
+>> >>> > -    copy_le32_to_phys(memmap[SIFIVE_E_MROM].base, reset_vec,
+>> >>> sizeof(reset_vec));
+>> >>> > -    memory_region_set_readonly(mask_rom, true);
+>> >>> > +    /* copy in the reset vector in little_endian byte order */
+>> >>> > +    for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
+>> >>> > +        reset_vec[i] = cpu_to_le32(reset_vec[i]);
+>> >>> > +    }
+>> >>> > +    rom_add_blob_fixed_as("mrom.reset", reset_vec,
+sizeof(reset_vec),
+>> >>> > +                          memmap[SIFIVE_E_MROM].base,
+>> >>> &address_space_memory);
+
+>> >>> >       if (machine->kernel_filename) {
+>> >>> >           load_kernel(machine->kernel_filename);
+>> >>> > diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+>> >>> > index 115618b..11ba4c3 100644
+>> >>> > --- a/hw/riscv/sifive_u.c
+>> >>> > +++ b/hw/riscv/sifive_u.c
+>> >>> > @@ -52,7 +52,7 @@ static const struct MemmapEntry {
+>> >>> >       hwaddr size;
+>> >>> >   } sifive_u_memmap[] = {
+>> >>> >       [SIFIVE_U_DEBUG] =    {        0x0,      0x100 },
+>> >>> > -    [SIFIVE_U_MROM] =     {     0x1000,     0x2000 },
+>> >>> > +    [SIFIVE_U_MROM] =     {     0x1000,    0x11000 },
+>> >>> >       [SIFIVE_U_CLINT] =    {  0x2000000,    0x10000 },
+>> >>> >       [SIFIVE_U_PLIC] =     {  0xc000000,  0x4000000 },
+>> >>> >       [SIFIVE_U_UART0] =    { 0x10013000,     0x1000 },
+>> >>> > @@ -60,14 +60,6 @@ static const struct MemmapEntry {
+>> >>> >       [SIFIVE_U_DRAM] =     { 0x80000000,        0x0 },
+>> >>> >   };
+
+>> >>> > -static void copy_le32_to_phys(hwaddr pa, uint32_t *rom, size_t
+len)
+>> >>> > -{
+>> >>> > -    int i;
+>> >>> > -    for (i = 0; i < (len >> 2); i++) {
+>> >>> > -        stl_phys(&address_space_memory, pa + (i << 2), rom[i]);
+>> >>> > -    }
+>> >>> > -}
+>> >>> > -
+>> >>> >   static uint64_t load_kernel(const char *kernel_filename)
+>> >>> >   {
+>> >>> >       uint64_t kernel_entry, kernel_high;
+>> >>> > @@ -221,9 +213,10 @@ static void riscv_sifive_u_init(MachineState
+>> >>> *machine)
+>> >>> >       const struct MemmapEntry *memmap = sifive_u_memmap;
+
+>> >>> >       SiFiveUState *s = g_new0(SiFiveUState, 1);
+>> >>> > -    MemoryRegion *sys_memory = get_system_memory();
+>> >>> > +    MemoryRegion *system_memory = get_system_memory();
+>> >>> >       MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+>> >>> > -    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
+>> >>> > +    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+>> >>> > +    int i;
+
+>> >>> >       /* Initialize SOC */
+>> >>> >       object_initialize(&s->soc, sizeof(s->soc),
+>> TYPE_RISCV_HART_ARRAY);
+>> >>> > @@ -239,17 +232,17 @@ static void riscv_sifive_u_init(MachineState
+>> >>> *machine)
+>> >>> >       /* register RAM */
+>> >>> >       memory_region_init_ram(main_mem, NULL, "riscv.sifive.u.ram",
+>> >>> >                              machine->ram_size, &error_fatal);
+>> >>> > -    memory_region_add_subregion(sys_memory,
+>> memmap[SIFIVE_U_DRAM].base,
+>> >>> > +    memory_region_add_subregion(system_memory,
+>> >>> memmap[SIFIVE_U_DRAM].base,
+>> >>> >           main_mem);
+
+>> >>> >       /* create device tree */
+>> >>> >       create_fdt(s, memmap, machine->ram_size,
+>> machine->kernel_cmdline);
+
+>> >>> >       /* boot rom */
+>> >>> > -    memory_region_init_ram(boot_rom, NULL, "riscv.sifive.u.mrom",
+>> >>> > -                           memmap[SIFIVE_U_MROM].base,
+&error_fatal);
+>> >>> > -    memory_region_set_readonly(boot_rom, true);
+>> >>> > -    memory_region_add_subregion(sys_memory, 0x0, boot_rom);
+>> >>> > +    memory_region_init_rom(mask_rom, NULL, "riscv.sifive.u.mrom",
+>> >>> > +                           memmap[SIFIVE_U_MROM].size,
+&error_fatal);
+>> >>> > +    memory_region_add_subregion(system_memory,
+>> >>> memmap[SIFIVE_U_MROM].base,
+>> >>> > +                                mask_rom);
+
+>> >>> >       if (machine->kernel_filename) {
+>> >>> >           load_kernel(machine->kernel_filename);
+>> >>> > @@ -272,13 +265,22 @@ static void riscv_sifive_u_init(MachineState
+>> >>> *machine)
+>> >>> >                                          /* dtb: */
+>> >>> >       };
+
+>> >>> > -    /* copy in the reset vector */
+>> >>> > -    copy_le32_to_phys(memmap[SIFIVE_U_MROM].base, reset_vec,
+>> >>> sizeof(reset_vec));
+>> >>> > +    /* copy in the reset vector in little_endian byte order */
+>> >>> > +    for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
+>> >>> > +        reset_vec[i] = cpu_to_le32(reset_vec[i]);
+>> >>> > +    }
+>> >>> > +    rom_add_blob_fixed_as("mrom.reset", reset_vec,
+sizeof(reset_vec),
+>> >>> > +                          memmap[SIFIVE_U_MROM].base,
+>> >>> &address_space_memory);
+
+>> >>> >       /* copy in the device tree */
+>> >>> > +    if (s->fdt_size >= memmap[SIFIVE_U_MROM].size -
+>> sizeof(reset_vec)) {
+>> >>> > +        error_report("qemu: not enough space to store
+device-tree");
+>> >>> > +        exit(1);
+>> >>> > +    }
+>> >>> >       qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
+>> >>> > -    cpu_physical_memory_write(memmap[SIFIVE_U_MROM].base +
+>> >>> > -        sizeof(reset_vec), s->fdt, s->fdt_size);
+>> >>> > +    rom_add_blob_fixed_as("mrom.fdt", s->fdt, s->fdt_size,
+>> >>> > +                          memmap[SIFIVE_U_MROM].base +
+>> sizeof(reset_vec),
+>> >>> > +                          &address_space_memory);
+
+>> >>> >       /* MMIO */
+>> >>> >       s->plic = sifive_plic_create(memmap[SIFIVE_U_PLIC].base,
+>> >>> > @@ -292,9 +294,9 @@ static void riscv_sifive_u_init(MachineState
+>> *machine)
+>> >>> >           SIFIVE_U_PLIC_CONTEXT_BASE,
+>> >>> >           SIFIVE_U_PLIC_CONTEXT_STRIDE,
+>> >>> >           memmap[SIFIVE_U_PLIC].size);
+>> >>> > -    sifive_uart_create(sys_memory, memmap[SIFIVE_U_UART0].base,
+>> >>> > +    sifive_uart_create(system_memory, memmap[SIFIVE_U_UART0].base,
+>> >>> >           serial_hds[0],
+>> SIFIVE_PLIC(s->plic)->irqs[SIFIVE_U_UART0_IRQ]);
+>> >>> > -    /* sifive_uart_create(sys_memory, memmap[SIFIVE_U_UART1].base,
+>> >>> > +    /* sifive_uart_create(system_memory,
+memmap[SIFIVE_U_UART1].base,
+>> >>> >           serial_hds[1],
+>> SIFIVE_PLIC(s->plic)->irqs[SIFIVE_U_UART1_IRQ]);
+>> >>> */
+>> >>> >       sifive_clint_create(memmap[SIFIVE_U_CLINT].base,
+>> >>> >           memmap[SIFIVE_U_CLINT].size, smp_cpus,
+>> >>> > diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+>> >>> > index 3f6bd0a..d1dbe6b 100644
+>> >>> > --- a/hw/riscv/spike.c
+>> >>> > +++ b/hw/riscv/spike.c
+>> >>> > @@ -46,19 +46,11 @@ static const struct MemmapEntry {
+>> >>> >       hwaddr base;
+>> >>> >       hwaddr size;
+>> >>> >   } spike_memmap[] = {
+>> >>> > -    [SPIKE_MROM] =     {     0x1000,     0x2000 },
+>> >>> > +    [SPIKE_MROM] =     {     0x1000,    0x11000 },
+>> >>> >       [SPIKE_CLINT] =    {  0x2000000,    0x10000 },
+>> >>> >       [SPIKE_DRAM] =     { 0x80000000,        0x0 },
+>> >>> >   };
+
+>> >>> > -static void copy_le32_to_phys(hwaddr pa, uint32_t *rom, size_t
+len)
+>> >>> > -{
+>> >>> > -    int i;
+>> >>> > -    for (i = 0; i < (len >> 2); i++) {
+>> >>> > -        stl_phys(&address_space_memory, pa + (i << 2), rom[i]);
+>> >>> > -    }
+>> >>> > -}
+>> >>> > -
+>> >>> >   static uint64_t load_kernel(const char *kernel_filename)
+>> >>> >   {
+>> >>> >       uint64_t kernel_entry, kernel_high;
+>> >>> > @@ -173,7 +165,8 @@ static void
+spike_v1_10_0_board_init(MachineState
+>> >>> *machine)
+>> >>> >       SpikeState *s = g_new0(SpikeState, 1);
+>> >>> >       MemoryRegion *system_memory = get_system_memory();
+>> >>> >       MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+>> >>> > -    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
+>> >>> > +    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+>> >>> > +    int i;
+
+>> >>> >       /* Initialize SOC */
+>> >>> >       object_initialize(&s->soc, sizeof(s->soc),
+>> TYPE_RISCV_HART_ARRAY);
+>> >>> > @@ -196,9 +189,10 @@ static void
+spike_v1_10_0_board_init(MachineState
+>> >>> *machine)
+>> >>> >       create_fdt(s, memmap, machine->ram_size,
+>> machine->kernel_cmdline);
+
+>> >>> >       /* boot rom */
+>> >>> > -    memory_region_init_ram(boot_rom, NULL, "riscv.spike.bootrom",
+>> >>> > -                           s->fdt_size + 0x2000, &error_fatal);
+>> >>> > -    memory_region_add_subregion(system_memory, 0x0, boot_rom);
+>> >>> > +    memory_region_init_rom(mask_rom, NULL, "riscv.spike.mrom",
+>> >>> > +                           memmap[SPIKE_MROM].size, &error_fatal);
+>> >>> > +    memory_region_add_subregion(system_memory,
+>> memmap[SPIKE_MROM].base,
+>> >>> > +                                mask_rom);
+
+>> >>> >       if (machine->kernel_filename) {
+>> >>> >           load_kernel(machine->kernel_filename);
+>> >>> > @@ -221,16 +215,25 @@ static void
+>> spike_v1_10_0_board_init(MachineState
+>> >>> *machine)
+>> >>> >                                        /* dtb: */
+>> >>> >       };
+
+>> >>> > -    /* copy in the reset vector */
+>> >>> > -    copy_le32_to_phys(memmap[SPIKE_MROM].base, reset_vec,
+>> >>> sizeof(reset_vec));
+>> >>> > +    /* copy in the reset vector in little_endian byte order */
+>> >>> > +    for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
+>> >>> > +        reset_vec[i] = cpu_to_le32(reset_vec[i]);
+>> >>> > +    }
+>> >>> > +    rom_add_blob_fixed_as("mrom.reset", reset_vec,
+sizeof(reset_vec),
+>> >>> > +                          memmap[SPIKE_MROM].base,
+>> >>> &address_space_memory);
+
+>> >>> >       /* copy in the device tree */
+>> >>> > +    if (s->fdt_size >= memmap[SPIKE_MROM].size -
+sizeof(reset_vec)) {
+>> >>> > +        error_report("qemu: not enough space to store
+device-tree");
+>> >>> > +        exit(1);
+>> >>> > +    }
+>> >>> >       qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
+>> >>> > -    cpu_physical_memory_write(memmap[SPIKE_MROM].base +
+>> >>> sizeof(reset_vec),
+>> >>> > -        s->fdt, s->fdt_size);
+>> >>> > +    rom_add_blob_fixed_as("mrom.fdt", s->fdt, s->fdt_size,
+>> >>> > +                          memmap[SPIKE_MROM].base +
+>> sizeof(reset_vec),
+>> >>> > +                          &address_space_memory);
+
+>> >>> >       /* initialize HTIF using symbols found in load_kernel */
+>> >>> > -    htif_mm_init(system_memory, boot_rom, &s->soc.harts[0].env,
+>> >>> serial_hds[0]);
+>> >>> > +    htif_mm_init(system_memory, mask_rom, &s->soc.harts[0].env,
+>> >>> serial_hds[0]);
+
+>> >>> >       /* Core Local Interruptor (timer and IPI) */
+>> >>> >       sifive_clint_create(memmap[SPIKE_CLINT].base,
+>> >>> memmap[SPIKE_CLINT].size,
+>> >>> > @@ -244,7 +247,8 @@ static void
+spike_v1_09_1_board_init(MachineState
+>> >>> *machine)
+>> >>> >       SpikeState *s = g_new0(SpikeState, 1);
+>> >>> >       MemoryRegion *system_memory = get_system_memory();
+>> >>> >       MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+>> >>> > -    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
+>> >>> > +    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+>> >>> > +    int i;
+
+>> >>> >       /* Initialize SOC */
+>> >>> >       object_initialize(&s->soc, sizeof(s->soc),
+>> TYPE_RISCV_HART_ARRAY);
+>> >>> > @@ -264,9 +268,10 @@ static void
+spike_v1_09_1_board_init(MachineState
+>> >>> *machine)
+>> >>> >           main_mem);
+
+>> >>> >       /* boot rom */
+>> >>> > -    memory_region_init_ram(boot_rom, NULL, "riscv.spike.bootrom",
+>> >>> > -                           0x40000, &error_fatal);
+>> >>> > -    memory_region_add_subregion(system_memory, 0x0, boot_rom);
+>> >>> > +    memory_region_init_rom(mask_rom, NULL, "riscv.spike.mrom",
+>> >>> > +                           memmap[SPIKE_MROM].size, &error_fatal);
+>> >>> > +    memory_region_add_subregion(system_memory,
+>> memmap[SPIKE_MROM].base,
+>> >>> > +                                mask_rom);
+
+>> >>> >       if (machine->kernel_filename) {
+>> >>> >           load_kernel(machine->kernel_filename);
+>> >>> > @@ -319,15 +324,20 @@ static void
+>> spike_v1_09_1_board_init(MachineState
+>> >>> *machine)
+>> >>> >       g_free(isa);
+>> >>> >       size_t config_string_len = strlen(config_string);
+
+>> >>> > -    /* copy in the reset vector */
+>> >>> > -    copy_le32_to_phys(memmap[SPIKE_MROM].base, reset_vec,
+>> >>> sizeof(reset_vec));
+>> >>> > +    /* copy in the reset vector in little_endian byte order */
+>> >>> > +    for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
+>> >>> > +        reset_vec[i] = cpu_to_le32(reset_vec[i]);
+>> >>> > +    }
+>> >>> > +    rom_add_blob_fixed_as("mrom.reset", reset_vec,
+sizeof(reset_vec),
+>> >>> > +                          memmap[SPIKE_MROM].base,
+>> >>> &address_space_memory);
+
+>> >>> >       /* copy in the config string */
+>> >>> > -    cpu_physical_memory_write(memmap[SPIKE_MROM].base +
+>> >>> sizeof(reset_vec),
+>> >>> > -        config_string, config_string_len);
+>> >>> > +    rom_add_blob_fixed_as("mrom.reset", config_string,
+>> config_string_len,
+>> >>> > +                          memmap[SPIKE_MROM].base +
+>> sizeof(reset_vec),
+>> >>> > +                          &address_space_memory);
+
+>> >>> >       /* initialize HTIF using symbols found in load_kernel */
+>> >>> > -    htif_mm_init(system_memory, boot_rom, &s->soc.harts[0].env,
+>> >>> serial_hds[0]);
+>> >>> > +    htif_mm_init(system_memory, mask_rom, &s->soc.harts[0].env,
+>> >>> serial_hds[0]);
+
+>> >>> >       /* Core Local Interruptor (timer and IPI) */
+>> >>> >       sifive_clint_create(memmap[SPIKE_CLINT].base,
+>> >>> memmap[SPIKE_CLINT].size,
+>> >>> > diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+>> >>> > index 090befe..20c509d 100644
+>> >>> > --- a/hw/riscv/virt.c
+>> >>> > +++ b/hw/riscv/virt.c
+>> >>> > @@ -45,8 +45,8 @@ static const struct MemmapEntry {
+>> >>> >       hwaddr size;
+>> >>> >   } virt_memmap[] = {
+>> >>> >       [VIRT_DEBUG] =    {        0x0,      0x100 },
+>> >>> > -    [VIRT_MROM] =     {     0x1000,     0x2000 },
+>> >>> > -    [VIRT_TEST] =     {     0x4000,     0x1000 },
+>> >>> > +    [VIRT_MROM] =     {     0x1000,    0x11000 },
+>> >>> > +    [VIRT_TEST] =     {   0x100000,     0x1000 },
+>> >>> >       [VIRT_CLINT] =    {  0x2000000,    0x10000 },
+>> >>> >       [VIRT_PLIC] =     {  0xc000000,  0x4000000 },
+>> >>> >       [VIRT_UART0] =    { 0x10000000,      0x100 },
+>> >>> > @@ -54,14 +54,6 @@ static const struct MemmapEntry {
+>> >>> >       [VIRT_DRAM] =     { 0x80000000,        0x0 },
+>> >>> >   };
+
+>> >>> > -static void copy_le32_to_phys(hwaddr pa, uint32_t *rom, size_t
+len)
+>> >>> > -{
+>> >>> > -    int i;
+>> >>> > -    for (i = 0; i < (len >> 2); i++) {
+>> >>> > -        stl_phys(&address_space_memory, pa + (i << 2), rom[i]);
+>> >>> > -    }
+>> >>> > -}
+>> >>> > -
+>> >>> >   static uint64_t load_kernel(const char *kernel_filename)
+>> >>> >   {
+>> >>> >       uint64_t kernel_entry, kernel_high;
+>> >>> > @@ -272,7 +264,7 @@ static void riscv_virt_board_init(MachineState
+>> >>> *machine)
+>> >>> >       RISCVVirtState *s = g_new0(RISCVVirtState, 1);
+>> >>> >       MemoryRegion *system_memory = get_system_memory();
+>> >>> >       MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+>> >>> > -    MemoryRegion *boot_rom = g_new(MemoryRegion, 1);
+>> >>> > +    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+>> >>> >       char *plic_hart_config;
+>> >>> >       size_t plic_hart_config_len;
+>> >>> >       int i;
+>> >>> > @@ -299,9 +291,10 @@ static void riscv_virt_board_init(MachineState
+>> >>> *machine)
+>> >>> >       fdt = create_fdt(s, memmap, machine->ram_size,
+>> >>> machine->kernel_cmdline);
+
+>> >>> >       /* boot rom */
+>> >>> > -    memory_region_init_ram(boot_rom, NULL,
+>> "riscv_virt_board.bootrom",
+>> >>> > -                           s->fdt_size + 0x2000, &error_fatal);
+>> >>> > -    memory_region_add_subregion(system_memory, 0x0, boot_rom);
+>> >>> > +    memory_region_init_rom(mask_rom, NULL,
+"riscv_virt_board.mrom",
+>> >>> > +                           memmap[VIRT_MROM].size, &error_fatal);
+>> >>> > +    memory_region_add_subregion(system_memory,
+>> memmap[VIRT_MROM].base,
+>> >>> > +                                mask_rom);
+
+>> >>> >       if (machine->kernel_filename) {
+>> >>> >           uint64_t kernel_entry =
+>> load_kernel(machine->kernel_filename);
+>> >>> > @@ -335,13 +328,22 @@ static void
+riscv_virt_board_init(MachineState
+>> >>> *machine)
+>> >>> >                                        /* dtb: */
+>> >>> >       };
+
+>> >>> > -    /* copy in the reset vector */
+>> >>> > -    copy_le32_to_phys(memmap[VIRT_MROM].base, reset_vec,
+>> >>> sizeof(reset_vec));
+>> >>> > +    /* copy in the reset vector in little_endian byte order */
+>> >>> > +    for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
+>> >>> > +        reset_vec[i] = cpu_to_le32(reset_vec[i]);
+>> >>> > +    }
+>> >>> > +    rom_add_blob_fixed_as("mrom.reset", reset_vec,
+sizeof(reset_vec),
+>> >>> > +                          memmap[VIRT_MROM].base,
+>> &address_space_memory);
+
+>> >>> >       /* copy in the device tree */
+>> >>> > +    if (s->fdt_size >= memmap[VIRT_MROM].size -
+sizeof(reset_vec)) {
+>> >>> > +        error_report("qemu: not enough space to store
+device-tree");
+>> >>> > +        exit(1);
+>> >>> > +    }
+>> >>> >       qemu_fdt_dumpdtb(s->fdt, s->fdt_size);
+>> >>> > -    cpu_physical_memory_write(memmap[VIRT_MROM].base +
+>> sizeof(reset_vec),
+>> >>> > -        s->fdt, s->fdt_size);
+>> >>> > +    rom_add_blob_fixed_as("mrom.fdt", s->fdt, s->fdt_size,
+>> >>> > +                          memmap[VIRT_MROM].base +
+sizeof(reset_vec),
+>> >>> > +                          &address_space_memory);
+
+>> >>> >       /* create PLIC hart topology configuration string */
+>> >>> >       plic_hart_config_len = (strlen(VIRT_PLIC_HART_CONFIG) + 1) *
+>> >>> smp_cpus;
+>> >>> > diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
+>> >>> > index 91163d6..6f2668e 100644
+>> >>> > --- a/include/hw/riscv/virt.h
+>> >>> > +++ b/include/hw/riscv/virt.h
+>> >>> > @@ -19,6 +19,10 @@
+>> >>> >   #ifndef HW_RISCV_VIRT_H
+>> >>> >   #define HW_RISCV_VIRT_H
+
+>> >>> > +#define TYPE_RISCV_VIRT_BOARD "riscv.virt"
+>> >>> > +#define VIRT(obj) \
+>> >>> > +    OBJECT_CHECK(RISCVVirtState, (obj), TYPE_RISCV_VIRT_BOARD)
+>> >>> > +
+
+>> >>> This should be in a seperate patch.
+
+
+>> >> I'll shift that chunk into "Remove unused class definitions".
+
+
+>> > Actually we to need to drop this chunk as the unused check macros were
+>> removed from machine state structs in "Remove unused class definitions".
+>> Somehow the chunk made it into this patch. Likely a rebase issue.
+
+>> > It's probably best that we add what we need back in the QOM SOC
+refactor
+>> on-top of the this series, or at least after the first set of patches are
+>> merged...
+
+>> > I think that's what you were planning to do anyway.
+
+>> Yeah, that works. So just remove it from this series.
+
+
+> After rebasing I had to change this patch because of this patch which
+increases the default device tree size to 1MiB. This is not controllable by
+the user and we don't know how big the resultant device-tree is. It could
+be < 8KiB in our case.
+
+> -
+https://git.qemu.org/?p=qemu.git;a=commit;h=14ec3cbd7c1e31dca4d23f028100c8f43e156573
+
+> I studied ftd and used public interfaces and a mechanism consistent with
+the fdt resize functions to calculate the size. As far as I can tell it is
+accurate and covers exactly to the end of the uint32 terminator. I needed
+this because our ROMs are currently small.
+
+> Peter, this is the patch that changes our ROMs from RAM to ROM using
+memory_region_init_rom and rom_add_blob_fixed_as (as per hw/arm/boot.c),
+and it also adds a truncation warning, so that we actually know what size
+the device-tree is, given our ROMs are currently much smaller than 1MiB.
+That is why we needed a method that tells us how big the device tree
+actually is.
+
+> BTW I'm actually suspicious of 'fdt_resize' here:
+
+> -
+https://git.qemu.org/?p=dtc.git;a=blob;f=libfdt/fdt_sw.c;h=6d33cc29d0224d9fc6307607ef7563df944da2d3
+
+> as it doesn't check that 'bufsize' has enough space for the header and
+terminator, although that's potentially a dtc bug. I read dtc to make sure
+the method we use to calculate the size was accurate. There probably should
+be a method in dtc as we rely on some implementation details, however they
+are quite simple and we can get: sizeof(header) + sizeof(structs) +
+sizeof(strings) + terminator using public APIs and basic knowledge of the
+serialised device-tree form.
+
+> Anyway, here is the rebased version of this patch using the new
+'qemu_fdt_totalsize' method in the patch I just sent.
+
+> -
+https://github.com/riscv/riscv-qemu/commit/a65f6e0447d6e32d75f64ba31df5f20d529d0489
+
+> I have a feeling this is the patch that fixes sifive_u. Did you bisect
+which patch in the series fixed sifive_u?
+
+I agree, I think this is the patch.
+
+No, I havent' bisected it. I didn't think there was much point, but if we
+want patches backported to stable I guess there is. I'll dig into it.
+
+
+> I have to send a pull for the reviewed patches which I can do today, but
+this is one of the patches that is early in the series that does not yet
+have Reviewed-by. When I split the series this patch would be in a second
+series that i'll have to link to the pull in patchew (using the method
+Peter mentioned) or wait until the pull is accepted.
+
+Great, let's get the first part of the series merged. It'd be nice to send
+out the next version of the second part while the PR is being merged.
+
+Alistair
+
+
+> Michael.
