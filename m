@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fEaRU-00062p-KB
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 09:08:14 -0400
+	(envelope-from <eblake@redhat.com>) id 1fEaTR-0006hR-S6
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 09:10:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fEaRP-0006Q4-U8
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 09:08:08 -0400
-References: <1525376963-79623-1-git-send-email-mst@redhat.com>
-	<1525376963-79623-61-git-send-email-mst@redhat.com>
-	<20180504091007.55405a6a.cohuck@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1fEaTM-00009F-6V
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 09:10:09 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50904 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fEaTM-00008y-1E
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 09:10:04 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B2DCF4270963
+	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 13:10:03 +0000 (UTC)
+References: <20180504095346.14159-1-dgilbert@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <be79d6dd-beaa-ba6f-2990-b5e91139411b@redhat.com>
-Date: Fri, 4 May 2018 08:07:53 -0500
+Message-ID: <71760a5e-1904-b179-6d0c-dbef0aa21778@redhat.com>
+Date: Fri, 4 May 2018 08:09:58 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180504091007.55405a6a.cohuck@redhat.com>
+In-Reply-To: <20180504095346.14159-1-dgilbert@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] cover letter cc's [was: [PATCH 60/67] hw/s390x: add
- include directory headers]
+Subject: Re: [Qemu-devel] [PATCH] libvhost-user: Send messages with no data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,40 +33,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, qemu-s390x@nongnu.org, git@vger.kernel.org
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com, marcandre.lureau@redhat.com
 
-[adding a cross-post to the git mailing list]
-
-On 05/04/2018 02:10 AM, Cornelia Huck wrote:
-> On Thu, 3 May 2018 22:51:40 +0300
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+On 05/04/2018 04:53 AM, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > 
->> This way they are easier to find using standard rules.
->>
->> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->> ---
-...
+> The response to a VHOST_USER_POSTCOPY_ADVISE contains a fd but doesn't
 
-> [Goes to find cover letter to figure out what this is all about.
-> *Please*, cc: people on the cover letter so they can see immediately
-> what this is trying to do!]
+s/a fd/an fd/ ? Depends on whether you pronounce it "eff-dee" or 
+"file-descriptor".
 
-Is there an EASY way to make 'git format-patch --cover-letter $commitid' 
-(and git send-email, by extension) automatically search for all cc's any 
-any of the N/M patches, and auto-cc ALL of those recipients on the 0/N 
-cover letter?  And if that is not something easily built into git 
-format-patch directly, is it something that can easily be added to 
-sendemail.cccmd?  This is not the first time that someone has complained 
-that automatic cc's are not sending the cover letter context to a 
-particular maintainer interested (and auto-cc'd) in only a subset of an 
-overall series.
+> actually contain any data.   FIx vu_message_write so that it doesn't
 
-On the other hand, cc'ing all recipients for a largely mechanical patch 
-series that was split into 67 parts, in part because it touches so many 
-different maintainers' areas, may make the cover letter have so many 
-recipients that various mail gateways start rejecting it as potential spam.
+s/FIx/Fix/
 
+> do a 0-byte write() call, since this was ending up with rc=0
+> that was confusing the error handling code.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>   contrib/libvhost-user/libvhost-user.c | 16 +++++++++-------
+>   1 file changed, 9 insertions(+), 7 deletions(-)
+> 
 -- 
 Eric Blake, Principal Software Engineer
 Red Hat, Inc.           +1-919-301-3266
