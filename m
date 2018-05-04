@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45481)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fEfTQ-0007Si-Lc
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 14:30:29 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fEfTR-0007Sk-K7
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 14:30:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fEfTN-00011T-G9
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 14:30:28 -0400
-Received: from mail-pf0-x22f.google.com ([2607:f8b0:400e:c00::22f]:46336)
+	(envelope-from <richard.henderson@linaro.org>) id 1fEfTQ-00014h-De
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 14:30:29 -0400
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:40582)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fEfTN-0000zn-8M
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 14:30:25 -0400
-Received: by mail-pf0-x22f.google.com with SMTP id p12so18055026pff.13
-	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 11:30:25 -0700 (PDT)
+	id 1fEfTQ-00014J-5n
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 14:30:28 -0400
+Received: by mail-pg0-x241.google.com with SMTP id l2-v6so15967712pgc.7
+	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 11:30:28 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  4 May 2018 11:30:11 -0700
-Message-Id: <20180504183021.19318-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 00/10] target/arm: Implement v8.1-Atomics
+Date: Fri,  4 May 2018 11:30:13 -0700
+Message-Id: <20180504183021.19318-3-richard.henderson@linaro.org>
+In-Reply-To: <20180504183021.19318-1-richard.henderson@linaro.org>
+References: <20180504183021.19318-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v2 02/10] target/arm: Use new min/max expanders
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +29,107 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org
 
-This implements the Atomics extension, which is mandatory for v8.1.
-While testing the v8.2-SVE extension, I've run into issues with the
-GCC testsuite expecting this to exist.
+The generic expanders replace nearly identical code in the translator.
 
-Missing is the wiring up of the system registers to indicate that
-the extension exists, but we have no system CPU model that would
-exercise such a setting.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/translate-a64.c | 46 ++++++++++++++--------------------------------
+ 1 file changed, 14 insertions(+), 32 deletions(-)
 
-Changes since v2:
-  * New patch to use a helper macro for opposite-endian
-    atomic_fetch_add and atomic_add_fetch, as suggested
-    by pm215.
-  * Introduce ARM_FEATURE_V8_1 and define ARM_FEATURE_V8_ATOMICS
-    in terms of that, reinforcing the mandatory nature of
-    the extension.
-  * Typo fix in patch 8.
-
-
-Peter, do you want to take the whole thing into target-arm.next,
-or have it split?  We have a review and an ack for the riscv and
-xtensa patches.
-
-
-r~
-
-
-Richard Henderson (10):
-  tcg: Introduce helpers for integer min/max
-  target/arm: Use new min/max expanders
-  target/xtensa: Use new min/max expanders
-  tcg: Introduce atomic helpers for integer min/max
-  tcg: Use GEN_ATOMIC_HELPER_FN for opposite endian atomic add
-  target/riscv: Use new atomic min/max expanders
-  target/arm: Introduce ARM_FEATURE_V8_ATOMICS and initial decode
-  target/arm: Fill in disas_ldst_atomic
-  target/arm: Implement CAS and CASP
-  target/arm: Enable ARM_FEATURE_V8_ATOMICS for user-only
-
- accel/tcg/atomic_template.h | 112 ++++++++-----
- accel/tcg/tcg-runtime.h     |   8 +
- target/arm/cpu.h            |   2 +
- target/arm/helper-a64.h     |   2 +
- tcg/tcg-op.h                |  50 ++++++
- tcg/tcg.h                   |   8 +
- linux-user/elfload.c        |   1 +
- target/arm/cpu64.c          |   1 +
- target/arm/helper-a64.c     |  43 +++++
- target/arm/translate-a64.c  | 375 +++++++++++++++++++++++++++++++++++---------
- target/riscv/translate.c    |  72 +++------
- target/xtensa/translate.c   |  50 ++++--
- tcg/tcg-op.c                |  48 ++++++
- 13 files changed, 587 insertions(+), 185 deletions(-)
-
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index bff4e13bf6..d916fea3a3 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -6021,15 +6021,18 @@ static void disas_simd_across_lanes(DisasContext *s, uint32_t insn)
+                 tcg_gen_add_i64(tcg_res, tcg_res, tcg_elt);
+                 break;
+             case 0x0a: /* SMAXV / UMAXV */
+-                tcg_gen_movcond_i64(is_u ? TCG_COND_GEU : TCG_COND_GE,
+-                                    tcg_res,
+-                                    tcg_res, tcg_elt, tcg_res, tcg_elt);
++                if (is_u) {
++                    tcg_gen_umax_i64(tcg_res, tcg_res, tcg_elt);
++                } else {
++                    tcg_gen_smax_i64(tcg_res, tcg_res, tcg_elt);
++                }
+                 break;
+             case 0x1a: /* SMINV / UMINV */
+-                tcg_gen_movcond_i64(is_u ? TCG_COND_LEU : TCG_COND_LE,
+-                                    tcg_res,
+-                                    tcg_res, tcg_elt, tcg_res, tcg_elt);
+-                break;
++                if (is_u) {
++                    tcg_gen_umin_i64(tcg_res, tcg_res, tcg_elt);
++                } else {
++                    tcg_gen_smin_i64(tcg_res, tcg_res, tcg_elt);
++                }
+                 break;
+             default:
+                 g_assert_not_reached();
+@@ -9931,27 +9934,6 @@ static void disas_simd_3same_logic(DisasContext *s, uint32_t insn)
+     }
+ }
+ 
+-/* Helper functions for 32 bit comparisons */
+-static void gen_max_s32(TCGv_i32 res, TCGv_i32 op1, TCGv_i32 op2)
+-{
+-    tcg_gen_movcond_i32(TCG_COND_GE, res, op1, op2, op1, op2);
+-}
+-
+-static void gen_max_u32(TCGv_i32 res, TCGv_i32 op1, TCGv_i32 op2)
+-{
+-    tcg_gen_movcond_i32(TCG_COND_GEU, res, op1, op2, op1, op2);
+-}
+-
+-static void gen_min_s32(TCGv_i32 res, TCGv_i32 op1, TCGv_i32 op2)
+-{
+-    tcg_gen_movcond_i32(TCG_COND_LE, res, op1, op2, op1, op2);
+-}
+-
+-static void gen_min_u32(TCGv_i32 res, TCGv_i32 op1, TCGv_i32 op2)
+-{
+-    tcg_gen_movcond_i32(TCG_COND_LEU, res, op1, op2, op1, op2);
+-}
+-
+ /* Pairwise op subgroup of C3.6.16.
+  *
+  * This is called directly or via the handle_3same_float for float pairwise
+@@ -10051,7 +10033,7 @@ static void handle_simd_3same_pair(DisasContext *s, int is_q, int u, int opcode,
+                 static NeonGenTwoOpFn * const fns[3][2] = {
+                     { gen_helper_neon_pmax_s8, gen_helper_neon_pmax_u8 },
+                     { gen_helper_neon_pmax_s16, gen_helper_neon_pmax_u16 },
+-                    { gen_max_s32, gen_max_u32 },
++                    { tcg_gen_smax_i32, tcg_gen_umax_i32 },
+                 };
+                 genfn = fns[size][u];
+                 break;
+@@ -10061,7 +10043,7 @@ static void handle_simd_3same_pair(DisasContext *s, int is_q, int u, int opcode,
+                 static NeonGenTwoOpFn * const fns[3][2] = {
+                     { gen_helper_neon_pmin_s8, gen_helper_neon_pmin_u8 },
+                     { gen_helper_neon_pmin_s16, gen_helper_neon_pmin_u16 },
+-                    { gen_min_s32, gen_min_u32 },
++                    { tcg_gen_smin_i32, tcg_gen_umin_i32 },
+                 };
+                 genfn = fns[size][u];
+                 break;
+@@ -10516,7 +10498,7 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
+                 static NeonGenTwoOpFn * const fns[3][2] = {
+                     { gen_helper_neon_max_s8, gen_helper_neon_max_u8 },
+                     { gen_helper_neon_max_s16, gen_helper_neon_max_u16 },
+-                    { gen_max_s32, gen_max_u32 },
++                    { tcg_gen_smax_i32, tcg_gen_umax_i32 },
+                 };
+                 genfn = fns[size][u];
+                 break;
+@@ -10527,7 +10509,7 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
+                 static NeonGenTwoOpFn * const fns[3][2] = {
+                     { gen_helper_neon_min_s8, gen_helper_neon_min_u8 },
+                     { gen_helper_neon_min_s16, gen_helper_neon_min_u16 },
+-                    { gen_min_s32, gen_min_u32 },
++                    { tcg_gen_smin_i32, tcg_gen_umin_i32 },
+                 };
+                 genfn = fns[size][u];
+                 break;
 -- 
 2.14.3
