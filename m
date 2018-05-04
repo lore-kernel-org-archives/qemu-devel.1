@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fEguu-0004FU-JK
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 16:02:57 -0400
+	(envelope-from <mst@redhat.com>) id 1fEgyx-0005Mp-De
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 16:07:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fEgur-0004q0-H0
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 16:02:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57836 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1fEgyu-0000fq-8B
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 16:07:07 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58024 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fEgur-0004pj-BU
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 16:02:53 -0400
-References: <20180504160026.14017-1-berrange@redhat.com>
-	<20180504160026.14017-3-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b7050902-496b-3196-a12c-a4069712e34f@redhat.com>
-Date: Fri, 4 May 2018 15:02:41 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fEgyu-0000e9-21
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 16:07:04 -0400
+Date: Fri, 4 May 2018 23:07:01 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180504230626-mutt-send-email-mst@kernel.org>
+References: <1525451445-5131-1-git-send-email-jonathan.helman@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20180504160026.14017-3-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/3] glib: bump min required glib library
- version to 2.42
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1525451445-5131-1-git-send-email-jonathan.helman@oracle.com>
+Subject: Re: [Qemu-devel] [PATCH] virtio-balloon: fix internal stat name
+ array to match Linux kernel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,46 +27,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Olaf Hering <olaf@aepfle.de>, Stefan Hajnoczi <stefanha@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>
+To: Jonathan Helman <jonathan.helman@oracle.com>
+Cc: jasowang@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, Rob Gardner <rob.gardner@oracle.com>, Thomas Tai <thomas.tai@oracle.com>
 
-On 05/04/2018 11:00 AM, Daniel P. Berrang=C3=A9 wrote:
-> Per supported platforms doc, the various min glib on relevant distros i=
-s:
->=20
->    RHEL-7: 2.50.3
->    Debian (Stretch): 2.50.3
->    Debian (Jessie): 2.42.1
->    OpenBSD (Ports): 2.54.3
->    FreeBSD (Ports): 2.50.3
->    OpenSUSE Leap 15: 2.54.3
->    Ubuntu (Xenial): 2.48.0
->    macOS (Homebrew): 2.56.0
->=20
+On Fri, May 04, 2018 at 09:30:45AM -0700, Jonathan Helman wrote:
+> The Linux kernel commit b40000325044 ("virtio_balloon: add array
+> of stat names") defines an array of stat name strings for consumers
+> of the virtio interface to use via the virtio_balloon.h header
+> file, rather than requiring each consumer to define its own. But at
+> present, the stat names defined in this array by the Linux kernel
+> do not match up with those defined internally by QEMU. This patch
+> fixes this inconsistency by changing the QEMU stat names to match
+> those defined by the Linux kernel.
+> 
+> Signed-off-by: Jonathan Helman <jonathan.helman@oracle.com>
+> Cc: Rob Gardner <rob.gardner@oracle.com>
+> Cc: Thomas Tai <thomas.tai@oracle.com>
 
-Worth listing mingw in this list (at least the cross-compile environment=20
-that docker tests from Fedora)?
+So pls import the header from Linux so we can stop maintaining it
+in QEMU.
 
-> This suggests that a minimum glib of 2.42 is a reasonable target
->=20
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 > ---
-
-> +++ b/trace/simple.c
-> @@ -36,9 +36,9 @@
->    * Trace records are written out by a dedicated thread.  The thread w=
-aits for
->    * records to become available, writes them out, and then waits again=
-.
->    */
-> -static CompatGMutex trace_lock;
-> -static CompatGCond trace_available_cond;
-> -static CompatGCond trace_empty_cond;
-> +static GMuttex trace_lock;
-
-As pointed out by patchew, this is a typo.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+>  docs/virtio-balloon-stats.txt | 4 ++--
+>  hw/virtio/virtio-balloon.c    | 4 ++--
+>  2 files changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/docs/virtio-balloon-stats.txt b/docs/virtio-balloon-stats.txt
+> index 9985e1d..7c69fdb 100644
+> --- a/docs/virtio-balloon-stats.txt
+> +++ b/docs/virtio-balloon-stats.txt
+> @@ -34,8 +34,8 @@ which will return a dictionary containing:
+>        - stat-total-memory
+>        - stat-available-memory
+>        - stat-disk-caches
+> -      - stat-htlb-pgalloc
+> -      - stat-htlb-pgfail
+> +      - stat-hugetlb-allocations
+> +      - stat-hugetlb-failures
+>  
+>    o A key named last-update, which contains the last stats update
+>      timestamp in seconds. Since this timestamp is generated by the host,
+> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+> index 1f7a87f..8421d9f 100644
+> --- a/hw/virtio/virtio-balloon.c
+> +++ b/hw/virtio/virtio-balloon.c
+> @@ -52,8 +52,8 @@ static const char *balloon_stat_names[] = {
+>     [VIRTIO_BALLOON_S_MEMTOT] = "stat-total-memory",
+>     [VIRTIO_BALLOON_S_AVAIL] = "stat-available-memory",
+>     [VIRTIO_BALLOON_S_CACHES] = "stat-disk-caches",
+> -   [VIRTIO_BALLOON_S_HTLB_PGALLOC] = "stat-htlb-pgalloc",
+> -   [VIRTIO_BALLOON_S_HTLB_PGFAIL] = "stat-htlb-pgfail",
+> +   [VIRTIO_BALLOON_S_HTLB_PGALLOC] = "stat-hugetlb-allocations",
+> +   [VIRTIO_BALLOON_S_HTLB_PGFAIL] = "stat-hugetlb-failures",
+>     [VIRTIO_BALLOON_S_NR] = NULL
+>  };
+>  
+> -- 
+> 1.8.3.1
+> 
+> Based-on: <1524799751-151698-5-git-send-email-mst@redhat.com>
+> ([PULL 4/4] virtio-balloon: add hugetlb page allocation counts)
