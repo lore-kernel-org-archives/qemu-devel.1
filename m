@@ -1,44 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1fEc2L-00028G-1Y
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 10:50:18 -0400
+	(envelope-from <mst@redhat.com>) id 1fEc4o-0002tM-HH
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 10:52:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1fEc2H-0006L7-Ux
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 10:50:17 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58112)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
-	id 1fEc2H-0006Jm-Ls
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 10:50:13 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w44Eo75k075438
-	for <qemu-devel@nongnu.org>; Fri, 4 May 2018 10:50:11 -0400
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2hrqemeejw-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 10:50:10 -0400
-Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
-	Fri, 4 May 2018 10:50:09 -0400
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
-	[9.57.199.109])
-	by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	w44Eo5Af49479866
-	for <qemu-devel@nongnu.org>; Fri, 4 May 2018 14:50:05 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E0410112040
-	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 10:49:53 -0400 (EDT)
-Received: from collin-ThinkPad-W541.ibm.com (unknown [9.80.203.234])
-	by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP id C3521112034
-	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 10:49:53 -0400 (EDT)
-From: Collin Walling <walling@linux.ibm.com>
-Date: Fri,  4 May 2018 10:49:14 -0400
-Message-Id: <1525445354-16233-1-git-send-email-walling@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH] monitor: report entirety of hmp command on
- error
+	(envelope-from <mst@redhat.com>) id 1fEc4l-0000Wp-FU
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 10:52:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43658)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fEc4l-0000WK-9F
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 10:52:47 -0400
+Date: Fri, 4 May 2018 17:52:39 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180504174256-mutt-send-email-mst@kernel.org>
+References: <1525376963-79623-1-git-send-email-mst@redhat.com>
+	<1525376963-79623-28-git-send-email-mst@redhat.com>
+	<20180504092924.GE29999@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180504092924.GE29999@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 27/67] replication: add include directory
+ header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,76 +30,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, eblake@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org
 
-When a user incorrectly provides an hmp command, an error response will be 
-printed that prompts the user to try "help <command name>". However, when
-the command contains multiple parts e.g. "info skeys", only the last 
-whitespace delimited string will be reported (in this example "info" will 
-be dropped and the message will read "Try "help skeys" for more information",
-which is incorrect).
+On Fri, May 04, 2018 at 10:29:24AM +0100, Daniel P. Berrang=E9 wrote:
+> On Thu, May 03, 2018 at 10:51:05PM +0300, Michael S. Tsirkin wrote:
+> > This way it is easier to find using standard rules.
+> >=20
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> >  include/replication.h | 1 +
+> >  1 file changed, 1 insertion(+)
+> >  create mode 100644 include/replication.h
+> >=20
+> > diff --git a/include/replication.h b/include/replication.h
+> > new file mode 100644
+> > index 0000000..2f40e8e
+> > --- /dev/null
+> > +++ b/include/replication.h
+> > @@ -0,0 +1 @@
+> > +#include_next "../replication.h"
+>=20
+> I think this is really crazy. If we want the headers to be accessible
+> via the include/ directory, lets move them to the include/ directory,
+> not create wrappers that point back to the source directory.
+>=20
+> Regards,
+> Daniel
 
-Let's correct this by capturing the full name of the command as we recurse 
-through the function monitor_parse_command.
+True. I did that initially. However I think maintainers should do this
+otherwise this amounts to moving internal headers to include/ wholesale.
 
-Reported-by: Mikhail Fokin <fokin@de.ibm.com>
-Signed-off-by: Collin Walling <walling@linux.ibm.com>
----
- monitor.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+At least this patch will stop proliferation of new headers in source
+directories.
 
-diff --git a/monitor.c b/monitor.c
-index 39f8ee1..d4844b4 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -2964,7 +2964,8 @@ static const mon_cmd_t *search_dispatch_table(const mon_cmd_t *disp_table,
- static const mon_cmd_t *monitor_parse_command(Monitor *mon,
-                                               const char *cmdp_start,
-                                               const char **cmdp,
--                                              mon_cmd_t *table)
-+                                              mon_cmd_t *table,
-+                                              char *fullname)
- {
-     const char *p;
-     const mon_cmd_t *cmd;
-@@ -2987,10 +2988,14 @@ static const mon_cmd_t *monitor_parse_command(Monitor *mon,
-         p++;
-     }
- 
-+    strncat(fullname, cmdname, strlen(cmdname));
-+
-     *cmdp = p;
-     /* search sub command */
-     if (cmd->sub_table != NULL && *p != '\0') {
--        return monitor_parse_command(mon, cmdp_start, cmdp, cmd->sub_table);
-+        strncat(fullname, " ", 1);
-+        return monitor_parse_command(mon, cmdp_start, cmdp, cmd->sub_table,
-+                                     fullname);
-     }
- 
-     return cmd;
-@@ -3371,10 +3376,12 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline)
- {
-     QDict *qdict;
-     const mon_cmd_t *cmd;
-+    char fullname[256];
- 
-     trace_handle_hmp_command(mon, cmdline);
- 
--    cmd = monitor_parse_command(mon, cmdline, &cmdline, mon->cmd_table);
-+    cmd = monitor_parse_command(mon, cmdline, &cmdline, mon->cmd_table,
-+                                fullname);
-     if (!cmd) {
-         return;
-     }
-@@ -3382,7 +3389,7 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline)
-     qdict = monitor_parse_arguments(mon, &cmdline, cmd);
-     if (!qdict) {
-         monitor_printf(mon, "Try \"help %s\" for more information\n",
--                       cmd->name);
-+                       fullname);
-         return;
-     }
- 
--- 
-2.7.4
+And with these patches external headers in source directory are
+easy to identify.
+
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
+ange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange=
+.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
+ange :|
