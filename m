@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fEe5G-00054t-AC
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 13:01:27 -0400
+	(envelope-from <bounces@canonical.com>) id 1fEdc4-0004MK-KG
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:31:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fEe5F-0003iK-GI
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 13:01:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51318 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fEe5F-0003hm-D1
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 13:01:25 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E5ABD406C749
-	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 17:01:24 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-Date: Fri,  4 May 2018 19:01:10 +0200
-Message-Id: <1525453270-23074-6-git-send-email-thuth@redhat.com>
-In-Reply-To: <1525453270-23074-1-git-send-email-thuth@redhat.com>
-References: <1525453270-23074-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 5/5] qemu-options: Remove deprecated -no-kvm
+	(envelope-from <bounces@canonical.com>) id 1fEdc0-0007vm-Kh
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:31:16 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43354)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fEdc0-0007uJ-Ep
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:31:12 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fEdbv-0007kt-UY
+	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 16:31:08 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 3D54C2E81DE
+	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 16:30:57 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 04 May 2018 16:19:48 -0000
+From: Dan Streetman <dan.streetman@canonical.com>
+Reply-To: Bug 1769053 <1769053@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152541524728.557.4600864098110042577.malonedeb@gac.canonical.com>
+Message-Id: <152545078863.2035.10548904017158137407.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1769053] Re: Cannot start a guest with more than
+ 1TB of RAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +37,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc: berrange@redhat.com, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
 
-We've never documented this option in our qemu-doc, so apart from the users
-that already used the old qemu-kvm fork before, most users should not be
-aware of this option at all. It's been marked as deprecated in the source
-code for a long time already, and officially marked as deprecated in the
-documentation since QEMU v2.10, so it should be fine to remove this now.
+And with non-massive mem (so the guest actually boots up), the guest
+does show only 40 bits of phys mem addressing, so qemu will definitely
+have to increase that to be able to provide >1TB of phys mem to the
+guest (assuming qemu doesn't adjust that dynamically based on the total
+mem provided to the guest)
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- qemu-doc.texi   | 5 -----
- qemu-options.hx | 3 ---
- vl.c            | 4 ----
- 3 files changed, 12 deletions(-)
+ubuntu@largemem:~$ grep -m 1 'address sizes' /proc/cpuinfo =
 
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index 9db156b..b6e0a18 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -2786,11 +2786,6 @@ which is the default.
- 
- @section System emulator command line arguments
- 
--@subsection -no-kvm (since 1.3.0)
--
--The ``-no-kvm'' argument is now a synonym for setting
--``-machine accel=tcg''.
--
- @subsection -vnc tls (since 2.5.0)
- 
- The ``-vnc tls'' argument is now a synonym for setting
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 870a363..d77a968 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3914,9 +3914,6 @@ STEXI
- Enable FIPS 140-2 compliance mode.
- ETEXI
- 
--HXCOMM Deprecated by -machine accel=tcg property
--DEF("no-kvm", 0, QEMU_OPTION_no_kvm, "", QEMU_ARCH_I386)
--
- DEF("msg", HAS_ARG, QEMU_OPTION_msg,
-     "-msg timestamp[=on|off]\n"
-     "                change the format of messages\n"
-diff --git a/vl.c b/vl.c
-index d8c3b09..2ac41e2 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3696,10 +3696,6 @@ int main(int argc, char **argv, char **envp)
-                     exit(1);
-                 }
-                 break;
--             case QEMU_OPTION_no_kvm:
--                olist = qemu_find_opts("machine");
--                qemu_opts_parse_noisily(olist, "accel=tcg", false);
--                break;
-             case QEMU_OPTION_accel:
-                 accel_opts = qemu_opts_parse_noisily(qemu_find_opts("accel"),
-                                                      optarg, true);
--- 
-1.8.3.1
+address sizes	: 40 bits physical, 48 bits virtual
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1769053
+
+Title:
+  Cannot start a guest with more than 1TB of RAM
+
+Status in QEMU:
+  Incomplete
+Status in qemu package in Ubuntu:
+  Incomplete
+
+Bug description:
+  Attempting to start a KVM guest with more than 1TB of RAM fails.
+
+  It looks like we might need some extra patches:
+  https://lists.gnu.org/archive/html/qemu-discuss/2017-12/msg00005.html
+
+  ProblemType: Bug
+  DistroRelease: Ubuntu 18.04
+  Package: qemu-system-x86 1:2.11+dfsg-1ubuntu7
+  ProcVersionSignature: Ubuntu 4.15.0-20.21-generic 4.15.17
+  Uname: Linux 4.15.0-20-generic x86_64
+  ApportVersion: 2.20.9-0ubuntu7
+  Architecture: amd64
+  CurrentDesktop: Unity:Unity7:ubuntu
+  Date: Fri May  4 16:21:14 2018
+  InstallationDate: Installed on 2017-04-05 (393 days ago)
+  InstallationMedia: Ubuntu 16.10 "Yakkety Yak" - Release amd64 (20161012.2)
+  MachineType: Dell Inc. XPS 13 9360
+  ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.15.0-20-generic root=3D/dev/ma=
+pper/ubuntu--vg-root ro quiet splash transparent_hugepage=3Dmadvise vt.hand=
+off=3D1
+  SourcePackage: qemu
+  UpgradeStatus: Upgraded to bionic on 2018-04-30 (3 days ago)
+  dmi.bios.date: 02/26/2018
+  dmi.bios.vendor: Dell Inc.
+  dmi.bios.version: 2.6.2
+  dmi.board.name: 0PF86Y
+  dmi.board.vendor: Dell Inc.
+  dmi.board.version: A00
+  dmi.chassis.type: 9
+  dmi.chassis.vendor: Dell Inc.
+  dmi.modalias: dmi:bvnDellInc.:bvr2.6.2:bd02/26/2018:svnDellInc.:pnXPS1393=
+60:pvr:rvnDellInc.:rn0PF86Y:rvrA00:cvnDellInc.:ct9:cvr:
+  dmi.product.family: XPS
+  dmi.product.name: XPS 13 9360
+  dmi.sys.vendor: Dell Inc.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1769053/+subscriptions
