@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fEVVf-00086W-6Y
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 03:52:08 -0400
+	(envelope-from <bounces@canonical.com>) id 1fEVZi-0001ZG-IJ
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 03:56:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fEVVd-0007If-Tb
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 03:52:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38610 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1fEVVd-0007I7-O9
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 03:52:05 -0400
-References: <20180503213458.2749.28566.stgit@gimli.home>
-	<20180503214513.2749.30627.stgit@gimli.home>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <0700cc1f-ea20-c01d-5c6a-3e3fb1439730@redhat.com>
-Date: Fri, 4 May 2018 09:51:56 +0200
+	(envelope-from <bounces@canonical.com>) id 1fEVZe-0001u2-Jv
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 03:56:18 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42226)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fEVZe-0001tB-DR
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 03:56:14 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fEVZc-0006tI-S6
+	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 07:56:12 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D0AB92E80C9
+	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 07:56:12 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180503214513.2749.30627.stgit@gimli.home>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 6/6] vfio/quirks: Enable ioeventfd
- quirks to be handled by vfio directly
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 04 May 2018 07:44:10 -0000
+From: ChristianEhrhardt <1769053@bugs.launchpad.net>
+Reply-To: Bug 1769053 <1769053@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152541524728.557.4600864098110042577.malonedeb@gac.canonical.com>
+Message-Id: <152541985049.7362.15270731972917808461.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1769053] Re: Cannot start a guest with more than
+ 1TB of RAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,175 +37,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
-Cc: kvm@vger.kernel.org, peterx@redhat.com
+To: qemu-devel@nongnu.org
 
-Hi,
+Hi Daniel,
+might I ask what you expect now?
 
-On 05/03/2018 11:45 PM, Alex Williamson wrote:
-> With vfio ioeventfd support, we can program vfio-pci to perform a
-> specified BAR write when an eventfd is triggered.  This allows the
-> KVM ioeventfd to be wired directly to vfio-pci, entirely avoiding
-> userspace handling for these events.  On the same micro-benchmark
-> where the ioeventfd got us to almost 90% of performance versus
-> disabling the GeForce quirks, this gets us to within 95%.
-> 
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+The changes to seabios are not even upstream yet in git://git.seabios.org/s=
+eabios.git
+The changes to qemu are neither upstream in git://git.qemu.org/qemu.git
 
-Thanks
+The changes linked also are for a qemu way++ back in time (like pre trusty)=
+, so they just don't apply. Some of these changes are handled already, but =
+different like the second qemu change of above mail is in qemu since "6c7c3=
+c21 x86: implement la57 paging mode" which is qemu >=3D2.9.
+That said - this one I could track, maybe the other changes are also upstre=
+am but in a way different form.
 
-Eric
-> ---
->  hw/vfio/pci-quirks.c |   53 +++++++++++++++++++++++++++++++++++++++++++-------
->  hw/vfio/pci.c        |    2 ++
->  hw/vfio/pci.h        |    2 ++
->  hw/vfio/trace-events |    2 +-
->  4 files changed, 51 insertions(+), 8 deletions(-)
-> 
-> diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-> index f7886487744e..061259b86b71 100644
-> --- a/hw/vfio/pci-quirks.c
-> +++ b/hw/vfio/pci-quirks.c
-> @@ -16,6 +16,7 @@
->  #include "qemu/range.h"
->  #include "qapi/error.h"
->  #include "qapi/visitor.h"
-> +#include <sys/ioctl.h>
->  #include "hw/nvram/fw_cfg.h"
->  #include "pci.h"
->  #include "trace.h"
-> @@ -287,12 +288,33 @@ static VFIOQuirk *vfio_quirk_alloc(int nr_mem)
->      return quirk;
->  }
->  
-> -static void vfio_ioeventfd_exit(VFIOIOEventFD *ioeventfd)
-> +static void vfio_ioeventfd_exit(VFIOPCIDevice *vdev, VFIOIOEventFD *ioeventfd)
->  {
->      QLIST_REMOVE(ioeventfd, next);
->      memory_region_del_eventfd(ioeventfd->mr, ioeventfd->addr, ioeventfd->size,
->                                true, ioeventfd->data, &ioeventfd->e);
-> -    qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e), NULL, NULL, NULL);
-> +
-> +    if (ioeventfd->vfio) {
-> +        struct vfio_device_ioeventfd vfio_ioeventfd;
-> +
-> +        vfio_ioeventfd.argsz = sizeof(vfio_ioeventfd);
-> +        vfio_ioeventfd.flags = ioeventfd->size;
-> +        vfio_ioeventfd.data = ioeventfd->data;
-> +        vfio_ioeventfd.offset = ioeventfd->region->fd_offset +
-> +                                ioeventfd->region_addr;
-> +        vfio_ioeventfd.fd = -1;
-> +
-> +        if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_IOEVENTFD, &vfio_ioeventfd)) {
-> +            error_report("Failed to remove vfio ioeventfd for %s+0x%"
-> +                         HWADDR_PRIx"[%d]:0x%"PRIx64" (%m)",
-> +                         memory_region_name(ioeventfd->mr), ioeventfd->addr,
-> +                         ioeventfd->size, ioeventfd->data);
-> +        }
-> +    } else {
-> +        qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e),
-> +                            NULL, NULL, NULL);
-> +    }
-> +
->      event_notifier_cleanup(&ioeventfd->e);
->      trace_vfio_ioeventfd_exit(memory_region_name(ioeventfd->mr),
->                                (uint64_t)ioeventfd->addr, ioeventfd->size,
-> @@ -306,7 +328,7 @@ static void vfio_drop_dynamic_eventfds(VFIOPCIDevice *vdev, VFIOQuirk *quirk)
->  
->      QLIST_FOREACH_SAFE(ioeventfd, &quirk->ioeventfds, next, tmp) {
->          if (ioeventfd->dynamic) {
-> -            vfio_ioeventfd_exit(ioeventfd);
-> +            vfio_ioeventfd_exit(vdev, ioeventfd);
->          }
->      }
->  }
-> @@ -359,12 +381,29 @@ static VFIOIOEventFD *vfio_ioeventfd_init(VFIOPCIDevice *vdev,
->      ioeventfd->region = region;
->      ioeventfd->region_addr = region_addr;
->  
-> -    qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e),
-> -                        vfio_ioeventfd_handler, NULL, ioeventfd);
-> +    if (!vdev->no_vfio_ioeventfd) {
-> +        struct vfio_device_ioeventfd vfio_ioeventfd;
-> +
-> +        vfio_ioeventfd.argsz = sizeof(vfio_ioeventfd);
-> +        vfio_ioeventfd.flags = ioeventfd->size;
-> +        vfio_ioeventfd.data = ioeventfd->data;
-> +        vfio_ioeventfd.offset = ioeventfd->region->fd_offset +
-> +                                ioeventfd->region_addr;
-> +        vfio_ioeventfd.fd = event_notifier_get_fd(&ioeventfd->e);
-> +
-> +        ioeventfd->vfio = !ioctl(vdev->vbasedev.fd,
-> +                                 VFIO_DEVICE_IOEVENTFD, &vfio_ioeventfd);
-> +    }
-> +
-> +    if (!ioeventfd->vfio) {
-> +        qemu_set_fd_handler(event_notifier_get_fd(&ioeventfd->e),
-> +                            vfio_ioeventfd_handler, NULL, ioeventfd);
-> +    }
-> +
->      memory_region_add_eventfd(ioeventfd->mr, ioeventfd->addr, ioeventfd->size,
->                                true, ioeventfd->data, &ioeventfd->e);
->      trace_vfio_ioeventfd_init(memory_region_name(mr), (uint64_t)addr,
-> -                              size, data);
-> +                              size, data, ioeventfd->vfio);
->  
->      return ioeventfd;
->  }
-> @@ -1827,7 +1866,7 @@ void vfio_bar_quirk_exit(VFIOPCIDevice *vdev, int nr)
->  
->      QLIST_FOREACH(quirk, &bar->quirks, next) {
->          while (!QLIST_EMPTY(&quirk->ioeventfds)) {
-> -            vfio_ioeventfd_exit(QLIST_FIRST(&quirk->ioeventfds));
-> +            vfio_ioeventfd_exit(vdev, QLIST_FIRST(&quirk->ioeventfds));
->          }
->  
->          for (i = 0; i < quirk->nr_mem; i++) {
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index ba1239551115..84e27c7bb2d1 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -3177,6 +3177,8 @@ static Property vfio_pci_dev_properties[] = {
->                       no_geforce_quirks, false),
->      DEFINE_PROP_BOOL("x-no-kvm-ioeventfd", VFIOPCIDevice, no_kvm_ioeventfd,
->                       false),
-> +    DEFINE_PROP_BOOL("x-no-vfio-ioeventfd", VFIOPCIDevice, no_vfio_ioeventfd,
-> +                     false),
->      DEFINE_PROP_UINT32("x-pci-vendor-id", VFIOPCIDevice, vendor_id, PCI_ANY_ID),
->      DEFINE_PROP_UINT32("x-pci-device-id", VFIOPCIDevice, device_id, PCI_ANY_ID),
->      DEFINE_PROP_UINT32("x-pci-sub-vendor-id", VFIOPCIDevice,
-> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-> index a4ac583fbd6e..52b065421a68 100644
-> --- a/hw/vfio/pci.h
-> +++ b/hw/vfio/pci.h
-> @@ -34,6 +34,7 @@ typedef struct VFIOIOEventFD {
->      VFIORegion *region;
->      hwaddr region_addr;
->      bool dynamic; /* Added runtime, removed on device reset */
-> +    bool vfio;
->  } VFIOIOEventFD;
->  
->  typedef struct VFIOQuirk {
-> @@ -163,6 +164,7 @@ typedef struct VFIOPCIDevice {
->      bool no_kvm_msix;
->      bool no_geforce_quirks;
->      bool no_kvm_ioeventfd;
-> +    bool no_vfio_ioeventfd;
->      VFIODisplay *dpy;
->  } VFIOPCIDevice;
->  
-> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-> index f8f97d1ff90c..d2a74952e389 100644
-> --- a/hw/vfio/trace-events
-> +++ b/hw/vfio/trace-events
-> @@ -79,7 +79,7 @@ vfio_quirk_ati_bonaire_reset_done(const char *name) "%s"
->  vfio_quirk_ati_bonaire_reset(const char *name) "%s"
->  vfio_ioeventfd_exit(const char *name, uint64_t addr, unsigned size, uint64_t data) "%s+0x%"PRIx64"[%d]:0x%"PRIx64
->  vfio_ioeventfd_handler(const char *name, uint64_t addr, unsigned size, uint64_t data) "%s+0x%"PRIx64"[%d] -> 0x%"PRIx64
-> -vfio_ioeventfd_init(const char *name, uint64_t addr, unsigned size, uint64_t data) "%s+0x%"PRIx64"[%d]:0x%"PRIx64
-> +vfio_ioeventfd_init(const char *name, uint64_t addr, unsigned size, uint64_t data, bool vfio) "%s+0x%"PRIx64"[%d]:0x%"PRIx64" vfio:%d"
->  vfio_pci_igd_bar4_write(const char *name, uint32_t index, uint32_t data, uint32_t base) "%s [0x%03x] 0x%08x -> 0x%08x"
->  vfio_pci_igd_bdsm_enabled(const char *name, int size) "%s %dMB"
->  vfio_pci_igd_opregion_enabled(const char *name) "%s"
-> 
+At least for myself I currently have no >1TB system to even try this -
+well I have done this on s390x and there it works fine already but you
+need x86 here.
+
+Even when all of the above would be resolved, the mail above states that
+even if those are applied they still have issues when going >1TB.
+
+I think you'd need a clear this is what I tried and this is what fails
+with a setup as simple as possible. If it fails in Ubuntu we can build a
+latest upstream build for you and if failing there we can work with
+upstream to resolve properly. From there we can think about the
+backportability of those changes. But the suggested "hey there are these
+patches, won't work.
+
+Please don't get me wrong (I want to help), but so far this appears to me s=
+o far as a suggestion of a set of non-upstreamed, non-applicable, non-testa=
+ble, non-working changes.
+We need to better sort out how to handle this which is why I ask what you e=
+xpect to happen now.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1769053
+
+Title:
+  Cannot start a guest with more than 1TB of RAM
+
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  New
+
+Bug description:
+  Attempting to start a KVM guest with more than 1TB of RAM fails.
+
+  It looks like we might need some extra patches:
+  https://lists.gnu.org/archive/html/qemu-discuss/2017-12/msg00005.html
+
+  ProblemType: Bug
+  DistroRelease: Ubuntu 18.04
+  Package: qemu-system-x86 1:2.11+dfsg-1ubuntu7
+  ProcVersionSignature: Ubuntu 4.15.0-20.21-generic 4.15.17
+  Uname: Linux 4.15.0-20-generic x86_64
+  ApportVersion: 2.20.9-0ubuntu7
+  Architecture: amd64
+  CurrentDesktop: Unity:Unity7:ubuntu
+  Date: Fri May  4 16:21:14 2018
+  InstallationDate: Installed on 2017-04-05 (393 days ago)
+  InstallationMedia: Ubuntu 16.10 "Yakkety Yak" - Release amd64 (20161012.2)
+  MachineType: Dell Inc. XPS 13 9360
+  ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.15.0-20-generic root=3D/dev/ma=
+pper/ubuntu--vg-root ro quiet splash transparent_hugepage=3Dmadvise vt.hand=
+off=3D1
+  SourcePackage: qemu
+  UpgradeStatus: Upgraded to bionic on 2018-04-30 (3 days ago)
+  dmi.bios.date: 02/26/2018
+  dmi.bios.vendor: Dell Inc.
+  dmi.bios.version: 2.6.2
+  dmi.board.name: 0PF86Y
+  dmi.board.vendor: Dell Inc.
+  dmi.board.version: A00
+  dmi.chassis.type: 9
+  dmi.chassis.vendor: Dell Inc.
+  dmi.modalias: dmi:bvnDellInc.:bvr2.6.2:bd02/26/2018:svnDellInc.:pnXPS1393=
+60:pvr:rvnDellInc.:rn0PF86Y:rvrA00:cvnDellInc.:ct9:cvr:
+  dmi.product.family: XPS
+  dmi.product.name: XPS 13 9360
+  dmi.sys.vendor: Dell Inc.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1769053/+subscriptions
