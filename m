@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fEanU-00071J-Fa
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 09:30:53 -0400
+	(envelope-from <eblake@redhat.com>) id 1fEanV-00072R-My
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 09:30:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fEanR-0003Ot-AA
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 09:30:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1fEanU-0003Sb-Qa
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 09:30:53 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Fri,  4 May 2018 08:30:34 -0500
-Message-Id: <20180504133034.1328397-5-eblake@redhat.com>
+Date: Fri,  4 May 2018 08:30:31 -0500
+Message-Id: <20180504133034.1328397-2-eblake@redhat.com>
 In-Reply-To: <20180504133034.1328397-1-eblake@redhat.com>
 References: <20180504133034.1328397-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 4/4] nbd/client: Relax handling of large
- NBD_CMD_BLOCK_STATUS reply
+Subject: [Qemu-devel] [PULL 1/4] nbd/client: fix
+ nbd_negotiate_simple_meta_context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,53 +21,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-The NBD spec is proposing a relaxation of NBD_CMD_BLOCK_STATUS
-where a server may have the final extent per context give a
-length beyond the original request, if it can easily prove that
-subsequent bytes have the same status, on the grounds that a
-client can take advantage of this information for fewer block
-status requests.  Since qemu 2.12 as a client always sends
-NBD_CMD_FLAG_REQ_ONE, and rejects a server that sends extra
-length, the upstream NBD spec will probably limit this behavior
-to clients that don't request REQ_ONE semantics; but it doesn't
-hurt to relax qemu to always be permissive of this server
-behavior, even if it continues to use REQ_ONE.
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
+Initialize received variable. Otherwise, is is possible for server to
+answer without any contexts, but we will set context_id to something
+random (received_id is not initialized too) and return 1, which is
+wrong.
+
+To solve it, just initialize received to false. Initialize received_id
+too, just to make all possible checkers happy.
+
+Bug was introduced in 78a33ab58782efdb206de14 "nbd: BLOCK_STATUS for
+standard get_block_status function: client part" with the whole
+function.
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-Id: <20180427142002.21930-2-vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 CC: qemu-stable@nongnu.org
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180503222626.1303410-1-eblake@redhat.com>
-Reviewed-by:  Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/nbd-client.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ nbd/client.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index e7caf49fbb4..8d69eaaa32f 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -259,14 +259,18 @@ static int nbd_parse_blockstatus_payload(NBDClientSession *client,
-
-     if (extent->length == 0 ||
-         (client->info.min_block && !QEMU_IS_ALIGNED(extent->length,
--                                                    client->info.min_block)) ||
--        extent->length > orig_length)
--    {
-+                                                    client->info.min_block))) {
-         error_setg(errp, "Protocol error: server sent status chunk with "
-                    "invalid length");
-         return -EINVAL;
-     }
-
-+    /* The server is allowed to send us extra information on the final
-+     * extent; just clamp it to the length we requested. */
-+    if (extent->length > orig_length) {
-+        extent->length = orig_length;
-+    }
-+
-     return 0;
- }
-
+diff --git a/nbd/client.c b/nbd/client.c
+index b9e175d1c27..7f35b5c3232 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -613,8 +613,8 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
+ {
+     int ret;
+     NBDOptionReply reply;
+-    uint32_t received_id;
+-    bool received;
++    uint32_t received_id = 0;
++    bool received = false;
+     uint32_t export_len = strlen(export);
+     uint32_t context_len = strlen(context);
+     uint32_t data_len = sizeof(export_len) + export_len +
 -- 
 2.14.3
