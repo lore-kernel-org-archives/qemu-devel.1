@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fEVim-0005az-3b
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:05:41 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fEVmr-0000gd-Nt
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:09:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fEVii-0002AM-8t
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:05:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49870 helo=mx1.redhat.com)
+	(envelope-from <stefanha@redhat.com>) id 1fEVmq-0006M5-RE
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:09:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49946 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fEVii-00029n-1u
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:05:36 -0400
-Date: Fri, 4 May 2018 10:05:33 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180504100533.3d0de9e5@redhat.com>
-In-Reply-To: <CAFEAcA8TOLjW7aEniG4EhBPF-_mCWWzdJL58SjC915Ket2PfZw@mail.gmail.com>
-References: <1525176522-200354-5-git-send-email-imammedo@redhat.com>
-	<1525182297-205763-1-git-send-email-imammedo@redhat.com>
-	<CAFEAcA8TOLjW7aEniG4EhBPF-_mCWWzdJL58SjC915Ket2PfZw@mail.gmail.com>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fEVmq-0006Kb-Kz
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:09:52 -0400
+Date: Fri, 4 May 2018 09:09:50 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180504080950.GA18897@stefanha-x1.localdomain>
+References: <1525376963-79623-1-git-send-email-mst@redhat.com>
+	<1525376963-79623-22-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 4/5] arm: boot: set boot_info starting
- from first_cpu
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="jRHKVT23PllUwdXP"
+Content-Disposition: inline
+In-Reply-To: <1525376963-79623-22-git-send-email-mst@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 21/67] trace: use local path for local
+ headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, eblake@redhat.com, berrange@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org
 
-On Thu, 3 May 2018 16:03:09 +0100
-Peter Maydell <peter.maydell@linaro.org> wrote:
 
-> On 1 May 2018 at 14:44, Igor Mammedov <imammedo@redhat.com> wrote:
-> > Even though nothing is currently broken (since all boards
-> > use first_cpu as boot cpu), make sure that boot_info is set
-> > on all CPUs.
-> > If some board would like support heterogenuos setup (i.e.
-> > init boot_info on subset of CPUs) in future, it should add
-> > a reasonable API to do it, instead of starting assigning
-> > boot_info from some CPU and till the end of present CPUs
-> > list.  
-> 
-> It's a bit confusing to only send one patch rather than the
-> whole set -- our automated patch application and testing
-> tooling gets confused. I noticed this one by chance because
-> I was skimming the commit log for v3 and noticed that it was
-> missing this text. If the change had been in code rather than
-> in the commit message I would probably not have picked it up...
-I wanted to not to spam too much list with respin of whole series
-for commit message fixup, sending fixed up vX as reply is usually
-ok for x86 trees but it's up to a maintainer preference.
-Next time for fixups, I'll respin whole series if it's intended
-to go via ARM tree.
+--jRHKVT23PllUwdXP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> thanks
-> -- PMM
+On Thu, May 03, 2018 at 10:50:59PM +0300, Michael S. Tsirkin wrote:
+> When pulling in headers that are in the same directory as C file (as
+> opposed to one in include/), we should use its relative path, without a
+> directory. Directory based path works more or less by accident.
+>=20
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  trace/qmp.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--jRHKVT23PllUwdXP
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJa7BVOAAoJEJykq7OBq3PI3TcIAIU/97nt8YoXYXTBPyCJmDfR
+yPrT1HPnKt1K4fqxknUCKE4lR/QyqAwEhPowRLB6yari3zlDQ3TnHDBFwU0QS2WY
+BqToMXj/3hmVVAiierbpT90lC4WOzMzw9xSMVS8uyCymmXfPnw6erMY6reX1hmpx
+2C7IGbdk3PSU3Ndetl49noMedwz3+hy+NSn2/34goijfQGRY1tT8mVf0agLEQjH5
+704MDwoyVzJdtlYHc0qh2KJtPFqPFmc6YcWDWioWYvMKX4uCUwGKV7jCdM9DcMio
+7sqqCsuGegjUu1swgaZdZyfYbA+l8+aROMC4aG+TMheeb9bjE1DN8K+0vJfQt7s=
+=ga26
+-----END PGP SIGNATURE-----
+
+--jRHKVT23PllUwdXP--
