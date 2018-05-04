@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fETku-00065D-1Z
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:59:46 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fETkw-00069T-Mj
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:59:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fETks-0007Qd-8P
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:59:44 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fETku-0007Xy-Us
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:59:46 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  4 May 2018 15:59:24 +1000
-Message-Id: <20180504055930.3786-12-david@gibson.dropbear.id.au>
+Date: Fri,  4 May 2018 15:59:30 +1000
+Message-Id: <20180504055930.3786-18-david@gibson.dropbear.id.au>
 In-Reply-To: <20180504055930.3786-1-david@gibson.dropbear.id.au>
 References: <20180504055930.3786-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 11/17] spapr: Clean up handling of LPCR
- power-saving exit bits
+Subject: [Qemu-devel] [PULL 17/17] spapr: don't advertise radix GTSE if
+ max-compat-cpu < power9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,99 +23,68 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-To prevent spurious wakeups on cpus that are supposed to be disabled, we
-need to clear the LPCR bits which control certain wakeup events.
-spapr_cpu_reset() has separate cases here for boot and non-boot (initiall=
-y
-inactive) cpus.  rtas_start_cpu() then turns the LPCR bits on when the
-non-boot cpus are activated.
+From: Greg Kurz <groug@kaod.org>
 
-But explicit checks against first_cpu are not how we usually do things:
-instead spapr_cpu_reset() generally sets things up for non-boot (inactive=
-)
-cpus, then spapr_machine_reset() and/or rtas_start_cpu() override as
-necessary.
+On a POWER9 host, if a guest runs in pre POWER9 compat mode, it necessarily
+uses the hash MMU mode. In this case, we shouldn't advertise radix GTSE in
+the ibm,arch-vec-5-platform-support DT property as the current code does.
+The first reason is that it doesn't make sense, and the second one is that
+causes the CAS-negotiated options subsection to be migrated. This breaks
+backward migration to QEMU 2.7 and older versions on POWER8 hosts:
 
-So, do that instead.  Because the LPCR activation is identical for boot
-cpus and non-boot cpus just activated with rtas_start_cpu() we can put th=
-e
-code common in spapr_cpu_set_entry_state().
+qemu-system-ppc64: error while loading state for instance 0x0 of device
+ 'spapr'
+qemu-system-ppc64: load of migration failed: No such file or directory
 
+This patch hence initialize CPUs a bit earlier so that we can check the
+requested compat mode, and don't set OV5_MMU_RADIX_GTSE for power8 and
+older.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Tested-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/ppc/spapr_cpu_core.c | 22 +++++++---------------
- hw/ppc/spapr_rtas.c     |  2 +-
- 2 files changed, 8 insertions(+), 16 deletions(-)
+ hw/ppc/spapr.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index a52ddade5e..f3e9b879b2 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -54,28 +54,17 @@ static void spapr_cpu_reset(void *opaque)
-      * Clearing VPM0 will also cause us to use RMOR in mmu-hash64.c for
-      * real mode accesses, which thankfully defaults to 0 and isn't
-      * accessible in guest mode.
-+     *
-+     * Disable Power-saving mode Exit Cause exceptions for the CPU, so
-+     * we don't get spurious wakups before an RTAS start-cpu call.
-      */
--    lpcr &=3D ~(LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_KBV);
-+    lpcr &=3D ~(LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_KBV | pcc->lpcr_=
-pm);
-     lpcr |=3D LPCR_LPES0 | LPCR_LPES1;
-=20
-     /* Set RMLS to the max (ie, 16G) */
-     lpcr &=3D ~LPCR_RMLS;
-     lpcr |=3D 1ull << LPCR_RMLS_SHIFT;
-=20
--    /* Only enable Power-saving mode Exit Cause exceptions on the boot
--     * CPU. The RTAS command start-cpu will enable them on secondaries.
--     */
--    if (cs =3D=3D first_cpu) {
--        lpcr |=3D pcc->lpcr_pm;
--    }
--
--    /* Disable Power-saving mode Exit Cause exceptions for the CPU.
--     * This can cause issues when rebooting the guest if a secondary
--     * is awaken */
--    if (cs !=3D first_cpu) {
--        lpcr &=3D ~pcc->lpcr_pm;
--    }
--
-     ppc_store_lpcr(cpu, lpcr);
-=20
-     /* Set a full AMOR so guest can use the AMR as it sees fit */
-@@ -84,11 +73,14 @@ static void spapr_cpu_reset(void *opaque)
-=20
- void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, target=
-_ulong r3)
- {
-+    PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
-     CPUPPCState *env =3D &cpu->env;
-=20
-     env->nip =3D nip;
-     env->gpr[3] =3D r3;
-     CPU(cpu)->halted =3D 0;
-+    /* Enable Power-saving mode Exit Cause exceptions */
-+    ppc_store_lpcr(cpu, env->spr[SPR_LPCR] | pcc->lpcr_pm);
- }
-=20
- static void spapr_cpu_destroy(PowerPCCPU *cpu)
-diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-index 652233bdf1..7f9738daed 100644
---- a/hw/ppc/spapr_rtas.c
-+++ b/hw/ppc/spapr_rtas.c
-@@ -162,7 +162,7 @@ static void rtas_start_cpu(PowerPCCPU *callcpu, sPAPR=
-MachineState *spapr,
-     env->msr =3D (1ULL << MSR_SF) | (1ULL << MSR_ME);
-=20
-     /* Enable Power-saving mode Exit Cause exceptions for the new CPU */
--    lpcr =3D env->spr[SPR_LPCR] | pcc->lpcr_pm;
-+    lpcr =3D env->spr[SPR_LPCR];
-     if (!pcc->interrupts_big_endian(callcpu)) {
-         lpcr |=3D LPCR_ILE;
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 19997f66c0..32ab3c43b6 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2512,6 +2512,7 @@ static void spapr_machine_init(MachineState *machine)
+     long load_limit, fw_size;
+     char *filename;
+     Error *resize_hpt_err = NULL;
++    PowerPCCPU *first_ppc_cpu;
+ 
+     msi_nonbroken = true;
+ 
+@@ -2592,11 +2593,6 @@ static void spapr_machine_init(MachineState *machine)
      }
---=20
+ 
+     spapr_ovec_set(spapr->ov5, OV5_FORM1_AFFINITY);
+-    if (!kvm_enabled() || kvmppc_has_cap_mmu_radix()) {
+-        /* KVM and TCG always allow GTSE with radix... */
+-        spapr_ovec_set(spapr->ov5, OV5_MMU_RADIX_GTSE);
+-    }
+-    /* ... but not with hash (currently). */
+ 
+     /* advertise support for dedicated HP event source to guests */
+     if (spapr->use_hotplug_event_source) {
+@@ -2614,6 +2610,15 @@ static void spapr_machine_init(MachineState *machine)
+     /* init CPUs */
+     spapr_init_cpus(spapr);
+ 
++    first_ppc_cpu = POWERPC_CPU(first_cpu);
++    if ((!kvm_enabled() || kvmppc_has_cap_mmu_radix()) &&
++        ppc_check_compat(first_ppc_cpu, CPU_POWERPC_LOGICAL_3_00, 0,
++                         spapr->max_compat_pvr)) {
++        /* KVM and TCG always allow GTSE with radix... */
++        spapr_ovec_set(spapr->ov5, OV5_MMU_RADIX_GTSE);
++    }
++    /* ... but not with hash (currently). */
++
+     if (kvm_enabled()) {
+         /* Enable H_LOGICAL_CI_* so SLOF can talk to in-kernel devices */
+         kvmppc_enable_logical_ci_hcalls();
+-- 
 2.17.0
