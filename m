@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fERHP-0001WY-09
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 23:21:08 -0400
+	(envelope-from <alistair23@gmail.com>) id 1fERP5-00032n-HN
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 23:29:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fERHL-0005jn-PP
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 23:21:06 -0400
-Resent-Message-Id: <E1fERHL-0005jn-PP@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21071)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fERHL-0005jF-Fr
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 23:21:03 -0400
-In-Reply-To: <20180504030811.28111-1-peterx@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152540403226.2487.4650651377020838066@71c20359a636>
+	(envelope-from <alistair23@gmail.com>) id 1fERP2-00024I-BD
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 23:29:03 -0400
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:47064)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1fERP1-00021X-V3
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 23:29:00 -0400
+Received: by mail-lf0-f66.google.com with SMTP id v85-v6so28884612lfa.13
+	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 20:28:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 3 May 2018 20:20:33 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 00/10] intel-iommu: nested vIOMMU,
- cleanups, bug fixes
+References: <cover.1519856998.git.alistair.francis@xilinx.com>
+	<c11bf012dbb789aa9e467cfaee1d8b9a10357282.1519856998.git.alistair.francis@xilinx.com>
+	<ba5cd8bd-8c4c-3b18-7e7f-bf7ea351c0cd@amsat.org>
+In-Reply-To: <ba5cd8bd-8c4c-3b18-7e7f-bf7ea351c0cd@amsat.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Fri, 04 May 2018 03:28:32 +0000
+Message-ID: <CAKmqyKNOSqFD=cMxOigMzPehp7J9g=mACcDT84tA3_x1SUx-pg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] hw/gpio: Add the xlnx-pmu-iomod-gpo
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,59 +32,311 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peterx@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, kevin.tian@intel.com, mst@redhat.com, jasowang@redhat.com, alex.williamson@redhat.com, jintack@cs.columbia.edu
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Edgar Iglesias <edgar.iglesias@gmail.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNTA0MDMwODExLjI4MTExLTEtcGV0ZXJ4QHJlZGhhdC5jb20KU3ViamVj
-dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwMC8xMF0gaW50ZWwtaW9tbXU6IG5lc3RlZCB2SU9N
-TVUsIGNsZWFudXBzLCBidWcgZml4ZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
-L2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwg
-d2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1y
-ZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5n
-IFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAg
-aWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
-IC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkK
-ICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09
-CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20g
-aHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAg
-ICAgICAgICAgIHBhdGNoZXcvMjAxODA1MDMyMTM0NTguMjc0OS4yODU2Ni5zdGdpdEBnaW1saS5o
-b21lIC0+IHBhdGNoZXcvMjAxODA1MDMyMTM0NTguMjc0OS4yODU2Ni5zdGdpdEBnaW1saS5ob21l
-CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxODA1MDQwMzA4MTEuMjgxMTEt
-MS1wZXRlcnhAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwNTA0MDMwODExLjI4MTExLTEtcGV0
-ZXJ4QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo1NWI2YzZiMWY1
-IGludGVsLWlvbW11OiByZW1vdmUgbm90aWZ5X3VubWFwIGZvciBwYWdlIHdhbGsKNzJmZmU5MzE0
-YSBpbnRlbC1pb21tdTogZG9uJ3QgdW5tYXAgYWxsIGZvciBzaGFkb3cgcGFnZSB0YWJsZQo3YmI2
-NjM2ODJiIGludGVsLWlvbW11OiBtYWludGFpbiBwZXItZGV2aWNlIGlvdmEgcmFuZ2VzCmU3Nzky
-MWU2M2YgdXRpbDogaW1wbGVtZW50IHNpbXBsZSBpbnRlcnZhbCB0cmVlIGxvZ2ljCjM1NjQ4OWNk
-NTkgaW50ZWwtaW9tbXU6IHBhc3MgaW4gYWRkcmVzcyBzcGFjZSB3aGVuIHBhZ2Ugd2FsawoyN2Zj
-ZDMwNjJmIGludGVsLWlvbW11OiBpbnRyb2R1Y2UgdnRkX3BhZ2Vfd2Fsa19pbmZvCjk1M2E2ZGI2
-NjYgaW50ZWwtaW9tbXU6IG9ubHkgZG8gcGFnZSB3YWxrIGZvciBNQVAgbm90aWZpZXJzCjBjY2Zl
-ZGMxZTcgaW50ZWwtaW9tbXU6IGFkZCBpb21tdSBsb2NrCjQ3YTI5ZmQxNjUgaW50ZWwtaW9tbXU6
-IHJlbW92ZSBJbnRlbElPTU1VTm90aWZpZXJOb2RlCmFhY2Q1NTJkM2EgaW50ZWwtaW9tbXU6IHNl
-bmQgUFNJIGFsd2F5cyBldmVuIGlmIGFjcm9zcyBQREVzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpD
-aGVja2luZyBQQVRDSCAxLzEwOiBpbnRlbC1pb21tdTogc2VuZCBQU0kgYWx3YXlzIGV2ZW4gaWYg
-YWNyb3NzIFBERXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xMDogaW50ZWwtaW9tbXU6IHJlbW92ZSBJ
-bnRlbElPTU1VTm90aWZpZXJOb2RlLi4uCkNoZWNraW5nIFBBVENIIDMvMTA6IGludGVsLWlvbW11
-OiBhZGQgaW9tbXUgbG9jay4uLgpDaGVja2luZyBQQVRDSCA0LzEwOiBpbnRlbC1pb21tdTogb25s
-eSBkbyBwYWdlIHdhbGsgZm9yIE1BUCBub3RpZmllcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggNS8xMDog
-aW50ZWwtaW9tbXU6IGludHJvZHVjZSB2dGRfcGFnZV93YWxrX2luZm8uLi4KQ2hlY2tpbmcgUEFU
-Q0ggNi8xMDogaW50ZWwtaW9tbXU6IHBhc3MgaW4gYWRkcmVzcyBzcGFjZSB3aGVuIHBhZ2Ugd2Fs
-ay4uLgpDaGVja2luZyBQQVRDSCA3LzEwOiB1dGlsOiBpbXBsZW1lbnQgc2ltcGxlIGludGVydmFs
-IHRyZWUgbG9naWMuLi4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBu
-YW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojNTY6IEZJTEU6IGluY2x1ZGUvcWVtdS9pbnRl
-cnZhbC10cmVlLmg6MzM6Cit0eXBlZGVmIGdib29sZWFuICgqaXRfdHJlZV9pdGVyYXRvcikoSVRW
-YWx1ZSBzdGFydCwgSVRWYWx1ZSBlbmQpOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAz
-NDMgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
-ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
-IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoK
-Q2hlY2tpbmcgUEFUQ0ggOC8xMDogaW50ZWwtaW9tbXU6IG1haW50YWluIHBlci1kZXZpY2UgaW92
-YSByYW5nZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8xMDogaW50ZWwtaW9tbXU6IGRvbid0IHVubWFw
-IGFsbCBmb3Igc2hhZG93IHBhZ2UgdGFibGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMTA6IGludGVs
-LWlvbW11OiByZW1vdmUgbm90aWZ5X3VubWFwIGZvciBwYWdlIHdhbGsuLi4KPT09IE9VVFBVVCBF
-TkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5l
-cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxl
-YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Thu, Mar 1, 2018 at 9:02 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
+>
+wrote:
+
+> Hi Alistair,
+
+> On 02/28/2018 07:32 PM, Alistair Francis wrote:
+> > Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> > ---
+> >
+> >  include/hw/gpio/xlnx-pmu-iomod-gp.h |  52 +++++++++++++
+> >  hw/gpio/xlnx-pmu-iomod-gp.c         | 150
+++++++++++++++++++++++++++++++++++++
+> >  hw/gpio/Makefile.objs               |   2 +
+> >  3 files changed, 204 insertions(+)
+> >  create mode 100644 include/hw/gpio/xlnx-pmu-iomod-gp.h
+> >  create mode 100644 hw/gpio/xlnx-pmu-iomod-gp.c
+> >
+> > diff --git a/include/hw/gpio/xlnx-pmu-iomod-gp.h
+b/include/hw/gpio/xlnx-pmu-iomod-gp.h
+> > new file mode 100644
+> > index 0000000000..0ee162829b
+> > --- /dev/null
+> > +++ b/include/hw/gpio/xlnx-pmu-iomod-gp.h
+> > @@ -0,0 +1,52 @@
+> > +/*
+> > + * QEMU model of Xilinx I/O Module GPO
+> > + *
+> > + * Copyright (c) 2013 Xilinx Inc
+> > + * Written by Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> > + *
+> > + * Permission is hereby granted, free of charge, to any person
+obtaining a copy
+> > + * of this software and associated documentation files (the
+"Software"), to deal
+> > + * in the Software without restriction, including without limitation
+the rights
+> > + * to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell
+> > + * copies of the Software, and to permit persons to whom the Software
+is
+> > + * furnished to do so, subject to the following conditions:
+> > + *
+> > + * The above copyright notice and this permission notice shall be
+included in
+> > + * all copies or substantial portions of the Software.
+> > + *
+> > + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR
+> > + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY,
+> > + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL
+> > + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+OR OTHER
+> > + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM,
+> > + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN
+> > + * THE SOFTWARE.
+> > + */
+> > +
+> > +#ifndef HW_XLNX_ZYNQMP_IOMOD_GPIO_H
+> > +#define HW_XLNX_ZYNQMP_IOMOD_GPIO_H
+
+> Maybe HW_XLNX_IOMOD_GPIO_H is enough (removing ZYNQMP), or
+> HW_XLNX_PMU_IOMOD_GPIO_H is a better naming (using PMU).
+> (comment valid for the whole file).
+
+That opens up a possibility of future conflicts. I think the ZynqMP should
+stay in there.
+
+
+> > +
+> > +#include "qemu/osdep.h"
+> > +
+> > +#define TYPE_XLNX_ZYNQMP_IOMOD_GPIO "xlnx.pmu_iomodule_gpio"
+> > +
+> > +#define XLNX_ZYNQMP_IOMOD_GPIO(obj) \
+> > +     OBJECT_CHECK(XlnxPMUIOGPIO, (obj), TYPE_XLNX_ZYNQMP_IOMOD_GPIO)
+> > +
+> > +#define XLNX_ZYNQMP_IOMOD_GPIO_R_MAX (0x00 + 1)
+> > +
+> > +typedef struct XlnxPMUIOGPIO {
+> > +    SysBusDevice parent_obj;
+> > +    MemoryRegion iomem;
+> > +
+> > +    uint32_t size;
+> > +
+> > +    /* GPO */
+> > +    uint32_t init;
+> > +    qemu_irq outputs[32];
+
+> Can you add a definition such XLNX_(PMU_)IOMOD_GPIO_COUNT?
+
+Done.
+
+
+> > +
+> > +    uint32_t regs[XLNX_ZYNQMP_IOMOD_GPIO_R_MAX];
+> > +    RegisterInfo regs_info[XLNX_ZYNQMP_IOMOD_GPIO_R_MAX];
+> > +} XlnxPMUIOGPIO;
+> > +
+> > +#endif /* HW_XLNX_ZYNQMP_IOMOD_GPIO_H */
+> > diff --git a/hw/gpio/xlnx-pmu-iomod-gp.c b/hw/gpio/xlnx-pmu-iomod-gp.c
+> > new file mode 100644
+> > index 0000000000..0e45a89b44
+> > --- /dev/null
+> > +++ b/hw/gpio/xlnx-pmu-iomod-gp.c
+> > @@ -0,0 +1,150 @@
+> > +/*
+> > + * QEMU model of Xilinx I/O Module GPO
+> > + *
+> > + * Copyright (c) 2013 Xilinx Inc
+> > + * Written by Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> > + *
+> > + * Permission is hereby granted, free of charge, to any person
+obtaining a copy
+> > + * of this software and associated documentation files (the
+"Software"), to deal
+> > + * in the Software without restriction, including without limitation
+the rights
+> > + * to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell
+> > + * copies of the Software, and to permit persons to whom the Software
+is
+> > + * furnished to do so, subject to the following conditions:
+> > + *
+> > + * The above copyright notice and this permission notice shall be
+included in
+> > + * all copies or substantial portions of the Software.
+> > + *
+> > + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR
+> > + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY,
+> > + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL
+> > + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+OR OTHER
+> > + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM,
+> > + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN
+> > + * THE SOFTWARE.
+> > + */
+> > +
+> > +#include "qemu/osdep.h"
+> > +#include "hw/sysbus.h"
+> > +#include "hw/register.h"
+> > +#include "qemu/log.h"
+> > +#include "hw/gpio/xlnx-pmu-iomod-gp.h"
+> > +
+> > +#ifndef XLNX_ZYNQMP_IOMOD_GPIO_DEBUG
+> > +#define XLNX_ZYNQMP_IOMOD_GPIO_DEBUG 0
+> > +#endif
+> > +
+> > +REG32(GPO0, 0x00)
+> > +
+> > +static void xlnx_iomod_gpio_gpo0_prew(RegisterInfo *reg, uint64_t
+value)
+> > +{
+> > +    XlnxPMUIOGPIO *s =3D XLNX_ZYNQMP_IOMOD_GPIO(reg->opaque);
+> > +    unsigned int i;
+> > +
+> > +    for (i =3D 0; i < s->size; i++) {
+> > +        bool flag =3D !!(value & (1 << i));
+> > +        qemu_set_irq(s->outputs[i], flag);
+
+> I thought this was available: qemu_set_irqs(s->outputs, value, s->size);
+
+I don't see anything called that.
+
+
+> Maybe shorter:
+
+>             qemu_set_irq(s->outputs[i], extract64(flag, i, 1);
+
+I like the variable, it makes adding debug statements easier :)
+
+Alistair
+
+
+> > +    }
+> > +}
+> > +
+> > +static uint64_t xlnx_iomod_gpio_gpo0_postr(RegisterInfo *reg, uint64_t
+value)
+> > +{
+> > +    return 0;
+> > +}
+> > +
+> > +static const RegisterAccessInfo xlnx_iomod_gpio_regs_info[] =3D {
+> > +    {   .name =3D "GPO0",  .addr =3D A_GPO0,
+> > +        .post_write =3D xlnx_iomod_gpio_gpo0_prew,
+> > +        .post_read =3D xlnx_iomod_gpio_gpo0_postr,
+> > +    }
+> > +};
+> > +
+> > +static void xlnx_iomod_gpio_reset(DeviceState *dev)
+> > +{
+> > +    XlnxPMUIOGPIO *s =3D XLNX_ZYNQMP_IOMOD_GPIO(dev);
+> > +    int i;
+> > +
+> > +    for (i =3D 0; i < ARRAY_SIZE(s->regs_info); ++i) {
+> > +        register_reset(&s->regs_info[i]);
+> > +    }
+> > +
+> > +    xlnx_iomod_gpio_gpo0_prew(&s->regs_info[R_GPO0], s->init);
+> > +}
+> > +
+> > +static const MemoryRegionOps xlnx_iomod_gpio_ops =3D {
+> > +    .read =3D register_read_memory,
+> > +    .write =3D register_write_memory,
+> > +    .endianness =3D DEVICE_LITTLE_ENDIAN,
+> > +    .valid =3D {
+> > +        .min_access_size =3D 4,
+> > +        .max_access_size =3D 4,
+> > +    },
+> > +};
+> > +
+> > +static void xlnx_iomod_gpio_realize(DeviceState *dev, Error **errp)
+> > +{
+> > +    XlnxPMUIOGPIO *s =3D XLNX_ZYNQMP_IOMOD_GPIO(dev);
+> > +
+> > +    assert(s->size <=3D 32);
+
+> XLNX_(PMU_)IOMOD_GPIO_COUNT?
+
+> > +    qdev_init_gpio_out(dev, s->outputs, s->size);
+> > +}
+> > +
+> > +static void xlnx_iomod_gpio_init(Object *obj)
+> > +{
+> > +    XlnxPMUIOGPIO *s =3D XLNX_ZYNQMP_IOMOD_GPIO(obj);
+> > +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
+> > +    RegisterInfoArray *reg_array;
+> > +
+> > +    memory_region_init(&s->iomem, obj, TYPE_XLNX_ZYNQMP_IOMOD_GPIO,
+> > +                       XLNX_ZYNQMP_IOMOD_GPIO_R_MAX * 4);
+> > +    reg_array =3D
+> > +        register_init_block32(DEVICE(obj), xlnx_iomod_gpio_regs_info,
+> > +                              ARRAY_SIZE(xlnx_iomod_gpio_regs_info),
+> > +                              s->regs_info, s->regs,
+> > +                              &xlnx_iomod_gpio_ops,
+> > +                              XLNX_ZYNQMP_IOMOD_GPIO_DEBUG,
+> > +                              XLNX_ZYNQMP_IOMOD_GPIO_R_MAX * 4);
+> > +    memory_region_add_subregion(&s->iomem,
+> > +                                0x0,
+> > +                                &reg_array->mem);
+> > +    sysbus_init_mmio(sbd, &s->iomem);
+> > +}
+> > +
+> > +static const VMStateDescription vmstate_xlnx_iomod_gpio =3D {
+> > +    .name =3D TYPE_XLNX_ZYNQMP_IOMOD_GPIO,
+> > +    .version_id =3D 1,
+> > +    .minimum_version_id =3D 1,
+> > +    .fields =3D (VMStateField[]) {
+> > +        VMSTATE_END_OF_LIST(),
+> > +    }
+> > +};
+> > +
+> > +static Property xlnx_iomod_gpio_properties[] =3D {
+> > +    DEFINE_PROP_UINT32("size", XlnxPMUIOGPIO, size, 0),
+> > +    DEFINE_PROP_UINT32("gpo-init", XlnxPMUIOGPIO, init, 0),
+> > +    DEFINE_PROP_END_OF_LIST(),
+> > +};
+> > +
+> > +static void xlnx_iomod_gpio_class_init(ObjectClass *klass, void *data)
+> > +{
+> > +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> > +
+> > +    dc->reset =3D xlnx_iomod_gpio_reset;
+> > +    dc->realize =3D xlnx_iomod_gpio_realize;
+> > +    dc->props =3D xlnx_iomod_gpio_properties;
+> > +    dc->vmsd =3D &vmstate_xlnx_iomod_gpio;
+> > +}
+> > +
+> > +static const TypeInfo xlnx_iomod_gpio_info =3D {
+> > +    .name          =3D TYPE_XLNX_ZYNQMP_IOMOD_GPIO,
+> > +    .parent        =3D TYPE_SYS_BUS_DEVICE,
+> > +    .instance_size =3D sizeof(XlnxPMUIOGPIO),
+> > +    .class_init    =3D xlnx_iomod_gpio_class_init,
+> > +    .instance_init =3D xlnx_iomod_gpio_init,
+> > +};
+> > +
+> > +static void xlnx_iomod_gpio_register_types(void)
+> > +{
+> > +    type_register_static(&xlnx_iomod_gpio_info);
+> > +}
+> > +
+> > +type_init(xlnx_iomod_gpio_register_types)
+> > diff --git a/hw/gpio/Makefile.objs b/hw/gpio/Makefile.objs
+> > index fa0a72e6d0..4cefadee85 100644
+> > --- a/hw/gpio/Makefile.objs
+> > +++ b/hw/gpio/Makefile.objs
+> > @@ -8,3 +8,5 @@ common-obj-$(CONFIG_GPIO_KEY) +=3D gpio_key.o
+> >  obj-$(CONFIG_OMAP) +=3D omap_gpio.o
+> >  obj-$(CONFIG_IMX) +=3D imx_gpio.o
+> >  obj-$(CONFIG_RASPI) +=3D bcm2835_gpio.o
+> > +
+> > +obj-$(CONFIG_XLNX_ZYNQMP) +=3D xlnx-pmu-iomod-gp.o
+> >
+
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
