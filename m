@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fEhKJ-0000uB-0a
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 16:29:12 -0400
+	(envelope-from <berrange@redhat.com>) id 1fEhlr-0005Tf-V8
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 16:57:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fEhKE-00005d-HC
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 16:29:11 -0400
-Resent-Message-Id: <E1fEhKE-00005d-HC@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21022)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fEhKE-00005C-8T
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 16:29:06 -0400
-In-Reply-To: <20180504183021.19318-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152545938432.2517.12001663154128338152@71c20359a636>
+	(envelope-from <berrange@redhat.com>) id 1fEhlo-00083Q-QV
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 16:57:40 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50912 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fEhlo-000830-M2
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 16:57:36 -0400
+Date: Fri, 4 May 2018 21:57:21 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180504205721.GA30250@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180504160026.14017-1-berrange@redhat.com>
+	<20180504214006.17217d00.olaf@aepfle.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 4 May 2018 11:43:05 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 00/10] target/arm: Implement v8.1-Atomics
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180504214006.17217d00.olaf@aepfle.de>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/3] Document intent for supported build
+ platforms and bump min glib to 2.42
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +30,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org
+To: Olaf Hering <olaf@aepfle.de>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNTA0MTgzMDIxLjE5MzE4LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
-Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyIDAwLzEwXSB0YXJnZXQvYXJtOiBJ
-bXBsZW1lbnQgdjguMS1BdG9taWNzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
-YXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdj
-IC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
-YWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2
-ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQ
-QVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlm
-ICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAt
-LW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAg
-ICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
-VXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0
-dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAg
-ICAgICAgICBwYXRjaGV3LzIwMTgwNTA0MTcxNTQwLjI1ODEzLTEtcGV0ZXIubWF5ZGVsbEBsaW5h
-cm8ub3JnIC0+IHBhdGNoZXcvMjAxODA1MDQxNzE1NDAuMjU4MTMtMS1wZXRlci5tYXlkZWxsQGxp
-bmFyby5vcmcKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDUwNDE4MzAy
-MS4xOTMxOC0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE4MDUw
-NDE4MzAyMS4xOTMxOC0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcKU3dpdGNoZWQgdG8g
-YSBuZXcgYnJhbmNoICd0ZXN0Jwo4NTI3OGJhNTE0IHRhcmdldC9hcm06IEVuYWJsZSBBUk1fRkVB
-VFVSRV9WOF9BVE9NSUNTIGZvciB1c2VyLW9ubHkKOTRiZGNiYTU1YiB0YXJnZXQvYXJtOiBJbXBs
-ZW1lbnQgQ0FTIGFuZCBDQVNQCjYyZjQyMzE5Y2YgdGFyZ2V0L2FybTogRmlsbCBpbiBkaXNhc19s
-ZHN0X2F0b21pYwo4ZDI5MDQ5MDA2IHRhcmdldC9hcm06IEludHJvZHVjZSBBUk1fRkVBVFVSRV9W
-OF9BVE9NSUNTIGFuZCBpbml0aWFsIGRlY29kZQpmYWVjMWRiZTVhIHRhcmdldC9yaXNjdjogVXNl
-IG5ldyBhdG9taWMgbWluL21heCBleHBhbmRlcnMKMWZhMGJhYTI3MSB0Y2c6IFVzZSBHRU5fQVRP
-TUlDX0hFTFBFUl9GTiBmb3Igb3Bwb3NpdGUgZW5kaWFuIGF0b21pYyBhZGQKYmI5ZTZiNWNkYiB0
-Y2c6IEludHJvZHVjZSBhdG9taWMgaGVscGVycyBmb3IgaW50ZWdlciBtaW4vbWF4CmIwYzM3NzUw
-ZjcgdGFyZ2V0L3h0ZW5zYTogVXNlIG5ldyBtaW4vbWF4IGV4cGFuZGVycwozMzczMTk2ZTk4IHRh
-cmdldC9hcm06IFVzZSBuZXcgbWluL21heCBleHBhbmRlcnMKMzg3MDZjZTYzNCB0Y2c6IEludHJv
-ZHVjZSBoZWxwZXJzIGZvciBpbnRlZ2VyIG1pbi9tYXgKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNo
-ZWNraW5nIFBBVENIIDEvMTA6IHRjZzogSW50cm9kdWNlIGhlbHBlcnMgZm9yIGludGVnZXIgbWlu
-L21heC4uLgpDaGVja2luZyBQQVRDSCAyLzEwOiB0YXJnZXQvYXJtOiBVc2UgbmV3IG1pbi9tYXgg
-ZXhwYW5kZXJzLi4uCkNoZWNraW5nIFBBVENIIDMvMTA6IHRhcmdldC94dGVuc2E6IFVzZSBuZXcg
-bWluL21heCBleHBhbmRlcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8xMDogdGNnOiBJbnRyb2R1Y2Ug
-YXRvbWljIGhlbHBlcnMgZm9yIGludGVnZXIgbWluL21heC4uLgpFUlJPUjogbWVtb3J5IGJhcnJp
-ZXIgd2l0aG91dCBjb21tZW50CiM1NjogRklMRTogYWNjZWwvdGNnL2F0b21pY190ZW1wbGF0ZS5o
-OjEzNzoKKyAgICBzbXBfbWIoKTsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgXAoKRVJST1I6IG1lbW9yeSBiYXJyaWVyIHdpdGhvdXQgY29tbWVu
-dAojOTY6IEZJTEU6IGFjY2VsL3RjZy9hdG9taWNfdGVtcGxhdGUuaDoyODU6CisgICAgc21wX21i
-KCk7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IFwKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMjM2IGxpbmVzIGNoZWNrZWQKCllvdXIg
-cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDUvMTA6IHRj
-ZzogVXNlIEdFTl9BVE9NSUNfSEVMUEVSX0ZOIGZvciBvcHBvc2l0ZSBlbmRpYW4gYXRvbWljIGFk
-ZC4uLgpDaGVja2luZyBQQVRDSCA2LzEwOiB0YXJnZXQvcmlzY3Y6IFVzZSBuZXcgYXRvbWljIG1p
-bi9tYXggZXhwYW5kZXJzLi4uCkNoZWNraW5nIFBBVENIIDcvMTA6IHRhcmdldC9hcm06IEludHJv
-ZHVjZSBBUk1fRkVBVFVSRV9WOF9BVE9NSUNTIGFuZCBpbml0aWFsIGRlY29kZS4uLgpDaGVja2lu
-ZyBQQVRDSCA4LzEwOiB0YXJnZXQvYXJtOiBGaWxsIGluIGRpc2FzX2xkc3RfYXRvbWljLi4uCkNo
-ZWNraW5nIFBBVENIIDkvMTA6IHRhcmdldC9hcm06IEltcGxlbWVudCBDQVMgYW5kIENBU1AuLi4K
-Q2hlY2tpbmcgUEFUQ0ggMTAvMTA6IHRhcmdldC9hcm06IEVuYWJsZSBBUk1fRkVBVFVSRV9WOF9B
-VE9NSUNTIGZvciB1c2VyLW9ubHkuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
-ZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
-eSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
-ayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Fri, May 04, 2018 at 09:40:06PM +0200, Olaf Hering wrote:
+> Am Fri,  4 May 2018 17:00:23 +0100
+> schrieb Daniel P. Berrang=C3=A9 <berrange@redhat.com>:
+>=20
+> >   - I suggested following libvirt's lead in writing a policy for how
+> >     we pick supported OS targets to inform maintainers when min versi=
+ons
+> >     can be increased.
+>=20
+> Since Xen depends on qemu, it also means that SLE11 will disappear
+> silently for them.
+
+There's still option of using existing QEMU versions on old distros, or
+building a new parallel installed glib to support new QEMU, if old distro
+support is needed.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
