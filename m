@@ -1,34 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fEdbS-0003gG-O1
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:30:39 -0400
+	(envelope-from <jonathan.helman@oracle.com>) id 1fEdbz-0004JH-HP
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:31:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fEdbP-0007Nj-IE
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:30:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40918)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fEdbP-0007MG-DA
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:30:35 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fEdbM-0007ra-0M
-	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 16:30:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 579322E821F
-	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 16:20:43 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 04 May 2018 16:10:28 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1769053 <1769053@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152541524728.557.4600864098110042577.malonedeb@gac.canonical.com>
-Message-Id: <152545022859.32662.6592355801614970193.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1769053] Re: Cannot start a guest with more than
- 1TB of RAM
+	(envelope-from <jonathan.helman@oracle.com>) id 1fEdbw-0007tU-C2
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:31:11 -0400
+Received: from hqdc-proxy-mwg11-o.oracle.com ([148.87.23.14]:58638
+	helo=jhdev.us.oracle.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <jonathan.helman@oracle.com>) id 1fEdbw-0007sO-6C
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:31:08 -0400
+From: Jonathan Helman <jonathan.helman@oracle.com>
+Date: Fri,  4 May 2018 09:30:45 -0700
+Message-Id: <1525451445-5131-1-git-send-email-jonathan.helman@oracle.com>
+Subject: [Qemu-devel] [PATCH] virtio-balloon: fix internal stat name array
+ to match Linux kernel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,74 +22,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: mst@redhat.com
+Cc: jasowang@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, Jonathan Helman <jonathan.helman@oracle.com>, Rob Gardner <rob.gardner@oracle.com>, Thomas Tai <thomas.tai@oracle.com>
 
-Interesting; I thought this was supposed to work.
-I know we (RH) have some downstream patches for >1TB RAM, but the last I'd =
-heard they weren't supposed to be necessary any more, except for compatibil=
-ity with old versions.
+The Linux kernel commit b40000325044 ("virtio_balloon: add array
+of stat names") defines an array of stat name strings for consumers
+of the virtio interface to use via the virtio_balloon.h header
+file, rather than requiring each consumer to define its own. But at
+present, the stat names defined in this array by the Linux kernel
+do not match up with those defined internally by QEMU. This patch
+fixes this inconsistency by changing the QEMU stat names to match
+those defined by the Linux kernel.
 
-It's probably worth checking the guest view fo the CPUs physical address bi=
-ts and making sure it's no bigger than the host (phys-bits=3Dn or host-phys=
--bits=3Dtrue on the -cpu)
-QEMU often defaults to 40 bits and things get confusing.
+Signed-off-by: Jonathan Helman <jonathan.helman@oracle.com>
+Cc: Rob Gardner <rob.gardner@oracle.com>
+Cc: Thomas Tai <thomas.tai@oracle.com>
+---
+ docs/virtio-balloon-stats.txt | 4 ++--
+ hw/virtio/virtio-balloon.c    | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-Note also you can do some 1TB+ tests on smaller machines as long as they
-have a large enough address size on the host CPUs.  Tricks like adding
-empty hot-plug DIMM slots leaving a 1TB hole can tickle some bugs.
-Even adding 1TB of swap to your host and being careful with your guest
-can work :-)
+diff --git a/docs/virtio-balloon-stats.txt b/docs/virtio-balloon-stats.txt
+index 9985e1d..7c69fdb 100644
+--- a/docs/virtio-balloon-stats.txt
++++ b/docs/virtio-balloon-stats.txt
+@@ -34,8 +34,8 @@ which will return a dictionary containing:
+       - stat-total-memory
+       - stat-available-memory
+       - stat-disk-caches
+-      - stat-htlb-pgalloc
+-      - stat-htlb-pgfail
++      - stat-hugetlb-allocations
++      - stat-hugetlb-failures
+ 
+   o A key named last-update, which contains the last stats update
+     timestamp in seconds. Since this timestamp is generated by the host,
+diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+index 1f7a87f..8421d9f 100644
+--- a/hw/virtio/virtio-balloon.c
++++ b/hw/virtio/virtio-balloon.c
+@@ -52,8 +52,8 @@ static const char *balloon_stat_names[] = {
+    [VIRTIO_BALLOON_S_MEMTOT] = "stat-total-memory",
+    [VIRTIO_BALLOON_S_AVAIL] = "stat-available-memory",
+    [VIRTIO_BALLOON_S_CACHES] = "stat-disk-caches",
+-   [VIRTIO_BALLOON_S_HTLB_PGALLOC] = "stat-htlb-pgalloc",
+-   [VIRTIO_BALLOON_S_HTLB_PGFAIL] = "stat-htlb-pgfail",
++   [VIRTIO_BALLOON_S_HTLB_PGALLOC] = "stat-hugetlb-allocations",
++   [VIRTIO_BALLOON_S_HTLB_PGFAIL] = "stat-hugetlb-failures",
+    [VIRTIO_BALLOON_S_NR] = NULL
+ };
+ 
+-- 
+1.8.3.1
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1769053
-
-Title:
-  Cannot start a guest with more than 1TB of RAM
-
-Status in QEMU:
-  Incomplete
-Status in qemu package in Ubuntu:
-  Incomplete
-
-Bug description:
-  Attempting to start a KVM guest with more than 1TB of RAM fails.
-
-  It looks like we might need some extra patches:
-  https://lists.gnu.org/archive/html/qemu-discuss/2017-12/msg00005.html
-
-  ProblemType: Bug
-  DistroRelease: Ubuntu 18.04
-  Package: qemu-system-x86 1:2.11+dfsg-1ubuntu7
-  ProcVersionSignature: Ubuntu 4.15.0-20.21-generic 4.15.17
-  Uname: Linux 4.15.0-20-generic x86_64
-  ApportVersion: 2.20.9-0ubuntu7
-  Architecture: amd64
-  CurrentDesktop: Unity:Unity7:ubuntu
-  Date: Fri May  4 16:21:14 2018
-  InstallationDate: Installed on 2017-04-05 (393 days ago)
-  InstallationMedia: Ubuntu 16.10 "Yakkety Yak" - Release amd64 (20161012.2)
-  MachineType: Dell Inc. XPS 13 9360
-  ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.15.0-20-generic root=3D/dev/ma=
-pper/ubuntu--vg-root ro quiet splash transparent_hugepage=3Dmadvise vt.hand=
-off=3D1
-  SourcePackage: qemu
-  UpgradeStatus: Upgraded to bionic on 2018-04-30 (3 days ago)
-  dmi.bios.date: 02/26/2018
-  dmi.bios.vendor: Dell Inc.
-  dmi.bios.version: 2.6.2
-  dmi.board.name: 0PF86Y
-  dmi.board.vendor: Dell Inc.
-  dmi.board.version: A00
-  dmi.chassis.type: 9
-  dmi.chassis.vendor: Dell Inc.
-  dmi.modalias: dmi:bvnDellInc.:bvr2.6.2:bd02/26/2018:svnDellInc.:pnXPS1393=
-60:pvr:rvnDellInc.:rn0PF86Y:rvrA00:cvnDellInc.:ct9:cvr:
-  dmi.product.family: XPS
-  dmi.product.name: XPS 13 9360
-  dmi.sys.vendor: Dell Inc.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1769053/+subscriptions
+Based-on: <1524799751-151698-5-git-send-email-mst@redhat.com>
+([PULL 4/4] virtio-balloon: add hugetlb page allocation counts)
