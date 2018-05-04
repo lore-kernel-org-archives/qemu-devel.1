@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57013)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fEURq-00029q-Rt
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 02:44:08 -0400
+	(envelope-from <groug@kaod.org>) id 1fEUjA-0006iG-Ko
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 03:02:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fEURn-0003bN-NX
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 02:44:06 -0400
-Received: from 3.mo69.mail-out.ovh.net ([188.165.52.203]:44154)
+	(envelope-from <groug@kaod.org>) id 1fEUj7-0006YA-Ix
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 03:02:00 -0400
+Received: from 8.mo1.mail-out.ovh.net ([178.33.110.239]:51474)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fEURn-0003aZ-DA
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 02:44:03 -0400
-Received: from player691.ha.ovh.net (unknown [10.109.120.17])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id B362915062
-	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 08:44:01 +0200 (CEST)
-Date: Fri, 4 May 2018 08:43:53 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fEUj7-0006Uw-C6
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 03:01:57 -0400
+Received: from player691.ha.ovh.net (unknown [10.109.120.118])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 18638F3439
+	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 09:01:55 +0200 (CEST)
+Date: Fri, 4 May 2018 09:01:45 +0200
 From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180504084353.1b64d73b@bahia.lan>
-In-Reply-To: <20180504050020.GU13229@umbus.fritz.box>
-References: <20180503062145.17899-1-david@gibson.dropbear.id.au>
-	<20180503062145.17899-4-david@gibson.dropbear.id.au>
-	<20180503183416.1170da6b@bahia.lan>
-	<20180504050020.GU13229@umbus.fritz.box>
+Message-ID: <20180504090145.3859e638@bahia.lan>
+In-Reply-To: <20180504063719.GC13229@umbus.fritz.box>
+References: <152538217073.223014.17347204768561945420.stgit@bahia.lan>
+	<20180504001102.GH13229@umbus.fritz.box>
+	<20180504075821.0e0cbdc6@bahia.lan>
+	<20180504063719.GC13229@umbus.fritz.box>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	boundary="Sig_/Y4CG4F2xpUXwpEwYyE4JSZx";
+	boundary="Sig_/M9YIB2TkI9+k+MsXhi2V+La";
 	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH 3/8] spapr: Remove unhelpful helpers from
- rtas_start_cpu()
+Subject: Re: [Qemu-devel] [PATCH 0/3] spapr: fix backward migration from
+ POWER9 to POWER8 hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,170 +35,81 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: David Gibson <david@gibson.dropbear.id.au>
-Cc: clg@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Laurent Vivier <lvivier@redhat.com>, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-stable@nongnu.org
 
---Sig_/Y4CG4F2xpUXwpEwYyE4JSZx
+--Sig_/M9YIB2TkI9+k+MsXhi2V+La
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 4 May 2018 15:00:20 +1000
+On Fri, 4 May 2018 16:37:19 +1000
 David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> On Thu, May 03, 2018 at 06:34:16PM +0200, Greg Kurz wrote:
-> > On Thu,  3 May 2018 16:21:40 +1000
+> On Fri, May 04, 2018 at 07:58:21AM +0200, Greg Kurz wrote:
+> > On Fri, 4 May 2018 10:11:02 +1000
 > > David Gibson <david@gibson.dropbear.id.au> wrote:
 > >  =20
-> > > rtas_start_cpu() calls spapr_cpu_update_tb_offset() and
-> > > spapr_cpu_set_endianness() to initialize certain things in the new cp=
-u's
-> > > state.  This is the only caller of those helpers, and they're each on=
-ly
-> > > a few lines long, so we might as well just fold them into the caller.
+> > > On Thu, May 03, 2018 at 11:16:10PM +0200, Greg Kurz wrote: =20
+> > > > Hi,
+> > > >=20
+> > > > It is expected to be able to migrate a guest started with
+> > > >=20
+> > > >      -machine max-cpu-compat=3Dpower8
+> > > >=20
+> > > > from a POWER9 host to a POWER8 host. It works with recent QEMU vers=
+ions,
+> > > > but it is badly broken if the destination runs QEMU 2.7 or older.
+> > > >=20
+> > > > This can cause problems in cloud environments that still have syste=
+ms with
+> > > > older QEMU versions, eg, hosts running ubuntu LTS 16.04.4 (QEMU 2.5=
+) which
+> > > > are likely to stay around until admins could transition to some new=
+er OS.
+> > > >=20
+> > > > This series was lightly tested, but the patches are simple enough, =
+so I'm
+> > > > confident they shouldn't break anything :)
+> > > >=20
+> > > > Please review as I'd like these to go to QEMU 2.11.2 as well.   =20
 > > >=20
-> > > In addition, those helpers initialize state on the new cpu to match t=
-hat of
-> > > the first cpu.  That will generally work, but might be at least logic=
-ally
-> > > incorrect if the first cpu has been set offline by the guest.  So, in=
-stead
-> > > base the state on that of the cpu invoking the RTAS call, which is
-> > > obviously active already.
+> > > Applied to ppc-for-2.13.  As you say, these should probably go to the
+> > > 2.12 and 2.11 stable trees too.
 > > >  =20
 > >=20
-> > Much better indeed !
-> >  =20
-> > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > > ---
-> > >  hw/ppc/spapr_rtas.c | 38 ++++++++++++++------------------------
-> > >  1 file changed, 14 insertions(+), 24 deletions(-)
-> > >=20
-> > > diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-> > > index b251c130cb..df073447c5 100644
-> > > --- a/hw/ppc/spapr_rtas.c
-> > > +++ b/hw/ppc/spapr_rtas.c
-> > > @@ -120,27 +120,6 @@ static void rtas_query_cpu_stopped_state(PowerPC=
-CPU *cpu_,
-> > >      rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-> > >  }
-> > > =20
-> > > -/*
-> > > - * Set the timebase offset of the CPU to that of first CPU.
-> > > - * This helps hotplugged CPU to have the correct timebase offset.
-> > > - */
-> > > -static void spapr_cpu_update_tb_offset(PowerPCCPU *cpu)
-> > > -{
-> > > -    PowerPCCPU *fcpu =3D POWERPC_CPU(first_cpu);
-> > > -
-> > > -    cpu->env.tb_env->tb_offset =3D fcpu->env.tb_env->tb_offset;
-> > > -}
-> > > -
-> > > -static void spapr_cpu_set_endianness(PowerPCCPU *cpu)
-> > > -{
-> > > -    PowerPCCPU *fcpu =3D POWERPC_CPU(first_cpu);
-> > > -    PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(fcpu);
-> > > -
-> > > -    if (!pcc->interrupts_big_endian(fcpu)) {
-> > > -        cpu->env.spr[SPR_LPCR] |=3D LPCR_ILE;
-> > > -    }
-> > > -}
-> > > -
-> > >  static void rtas_start_cpu(PowerPCCPU *callcpu, sPAPRMachineState *s=
-papr,
-> > >                             uint32_t token, uint32_t nargs,
-> > >                             target_ulong args,
-> > > @@ -150,6 +129,7 @@ static void rtas_start_cpu(PowerPCCPU *callcpu, s=
-PAPRMachineState *spapr,
-> > >      PowerPCCPU *newcpu;
-> > >      CPUPPCState *env;
-> > >      PowerPCCPUClass *pcc;
-> > > +    target_ulong lpcr;
-> > > =20
-> > >      if (nargs !=3D 3 || nret !=3D 1) {
-> > >          rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-> > > @@ -178,10 +158,20 @@ static void rtas_start_cpu(PowerPCCPU *callcpu,=
- sPAPRMachineState *spapr,
-> > >      cpu_synchronize_state(CPU(newcpu));
-> > > =20
-> > >      env->msr =3D (1ULL << MSR_SF) | (1ULL << MSR_ME);
-> > > -    spapr_cpu_set_endianness(newcpu);
-> > > -    spapr_cpu_update_tb_offset(newcpu);
-> > > +
-> > >      /* Enable Power-saving mode Exit Cause exceptions for the new CP=
-U */
-> > > -    ppc_store_lpcr(newcpu, env->spr[SPR_LPCR] | pcc->lpcr_pm);
-> > > +    lpcr =3D env->spr[SPR_LPCR] | pcc->lpcr_pm;
-> > > +    if (!pcc->interrupts_big_endian(callcpu)) {
-> > > +        lpcr |=3D LPCR_ILE;
-> > > +    }
-> > > +    ppc_store_lpcr(newcpu, lpcr);
-> > > +
-> > > +    /*
-> > > +     * Set the timebase offset of the new CPU to that of the invoking
-> > > +     * CPU.  This helps hotplugged CPU to have the correct timebase =
-=20
-> >                ^
-> > Extraneous space here =20
+> > Cc'ing qemu-stable then =20
 >=20
-> Oh my, the can of worms you've opened with that apparently innocuous
-> comment :)
->     https://en.wikipedia.org/wiki/Sentence_spacing#Controversy
+> Thanks.  I'm about to go on leave, so I won't be around to shepherd
+> these into the stable trees any time soon.
 >=20
 
-Ha ha ! I now have an impression of deja-vu, probably on this very same
-list :D
+No problem. I'll take care of that with Mike.
 
-> tl;dr: I have a habit of putting a double space after full stops.  The
-> merits of that are highly debatable, but there it is.
->=20
+Have a good *disconnected as much as possible* holiday ! :)
 
-Sure, I'll try to remember that the so-called French spacing doesn't
-rule the world... yet ;)
+Cheers,
 
+--
+Greg
 
-> > > +     * offset.
-> > > +     */
-> > > +    newcpu->env.tb_env->tb_offset =3D callcpu->env.tb_env->tb_offset;
-> > >   =20
-> >=20
-> > Maybe use env-> instead of newcpu->env. ? =20
->=20
-> That is better, but I'm already most of the way through my
-> pre-pull-request testing, so I don't want to risk any code changes
-> (although I still fold the new R-bs into the commit messages).
->=20
-
-Understandable.
-
-> >=20
-> > Anyway,
-> >=20
-> > Reviewed-by: Greg Kurz <groug@kaod.org>
-> >  =20
-> > >      env->nip =3D start;
-> > >      env->gpr[3] =3D r3; =20
-> >  =20
->=20
-
-
---Sig_/Y4CG4F2xpUXwpEwYyE4JSZx
+--Sig_/M9YIB2TkI9+k+MsXhi2V+La
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlrsASkACgkQcdTV5YIv
-c9al7w//a0A0qKy2xgXjIjQ87jBLYjeiMaMTcNkMr8L7ZcMMe+TySGWQwlvUIp1+
-biusVR1wdiXlVo6V27rzdkOzwW/mpfb6LXQJFkjUaFKL5MTGOkNuwin5FxHbeXoe
-datEsHvQLxYppGxigPXWrJjTUfTkOui/fNuni+RuRpoonWXXUgfYVxbz/QEEf+Am
-E+w9B3lIY0fn1uNJJpaNBU0f5B/KF5sDXTFkyMOSW8Ig0fyT9bFrFaeoKn8d15wt
-bSDMY6Ph73PWypPN/wszweOIVELPAXuvBz20YfKynGKRHsCaA7/8z76AFFx+JD3T
-V2evzzFyEu8Q+m4FWdigLmqp5QV0pekB+WxfD7R3H4kVE8uIwUGjo3e3K9k9kK5L
-Vv0/i74ilj8WB8USfK4mX7G7M9zGX15uu/SccXL8RA25kalx8vY88GR6potjKFie
-RVh75vB1XJUSp/NppkiN+rR2LSFKALnTmp6mIRPit7lhXvJZ/c/4G/tqwgAP734S
-VnsiRYiJLFuA59KF31HCaU/jroC6IBR7e7s5yA4j5kTx/uQxjVQhFiwnmYbf/zxR
-YHpQTOcjpeDsQBYIj8U2uA+BB9nIBDiaDcbjmAAE0fKjVtZM/Ampjv9S4I6cIPhB
-I0h1/rPwivToD+4nkLbU6oP1BV7Vq5SGx97s43uf9mvPy68fIGY=
-=jfSF
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlrsBVkACgkQcdTV5YIv
+c9YDZxAAyGYUqdX9LnId6AA8D8o+xyOfd9KOPbJhng6Z1vL4JIxJ4XNSoAqPND4d
+SZZq3w+sBGnWEzmDxRgdayjwGBLy6diCeydTli6/UAHX5xL6TgYByWKd/9dX5TPd
+4SnYCDmZ1HAiPEiejjTqpxcUoZIuWmb9FUG3WDQZ5t8FQO61AYv2HtOMUowBgZoB
+lOsy7/vYCwxehYkf/sdofVgYJhou/DQp8T2ClepVMaGM8a1TUV/t7pZir5VVEeXy
+qy3GCQoPu8eMCB9DKBe2h8W0tDmoO0Hp1MTjgo+VDPscH+Eb9UuYlm/8zHv4+O5u
+8yxni9zOFTHmNdvgClraVq5C3fkmjlu6Xgmg/s+RhulJVOLQ1MvkUYoQEgnFWwC9
+3+5CK5NRWc1BpsZBk+7jgL1zDnpI3Ck8bX/rmkVd2j3JQi0gP2plVBKMJ49ocsu3
+JQPjRO3gy2blzZdvFbfttWSRCsQbcNWfcBezdLC8mgmSQ5ZX3j78ShBBKBHW8TOG
+02tUpMGV/2K3AZB92bWpY8aOSA1msxUF7P+mdBS9dq7oos3isSfh4pt5/rkxyk24
+yKBIrxtgKWWeCQ0REqFpOlT6Y6ZcngR8rp920dQ8JWHHV6opIZTfFItqkf1/TEeB
+K/OW3kkR/Ep45QsONBRK5ZN4N9iRjYeJYfVHa0zEKlZ7P1vlGYQ=
+=+XEr
 -----END PGP SIGNATURE-----
 
---Sig_/Y4CG4F2xpUXwpEwYyE4JSZx--
+--Sig_/M9YIB2TkI9+k+MsXhi2V+La--
