@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fERCH-0007bv-Bk
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 23:15:50 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fERHP-0001WY-09
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 23:21:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fERCG-0001mY-9A
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 23:15:49 -0400
-Date: Fri, 4 May 2018 13:15:38 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180504031538.GQ13229@umbus.fritz.box>
-References: <1525376963-79623-1-git-send-email-mst@redhat.com>
-	<1525376963-79623-63-git-send-email-mst@redhat.com>
-	<20180504001701.GL13229@umbus.fritz.box>
-	<20180504054007-mutt-send-email-mst@kernel.org>
+	(envelope-from <no-reply@patchew.org>) id 1fERHL-0005jn-PP
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 23:21:06 -0400
+Resent-Message-Id: <E1fERHL-0005jn-PP@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21071)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fERHL-0005jF-Fr
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 23:21:03 -0400
+In-Reply-To: <20180504030811.28111-1-peterx@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152540403226.2487.4650651377020838066@71c20359a636>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="lYtTbTuCUQxZgETo"
-Content-Disposition: inline
-In-Reply-To: <20180504054007-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH 62/67] kvm: use include "kvm_ppc.h"
- consistently
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 3 May 2018 20:20:33 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 00/10] intel-iommu: nested vIOMMU,
+ cleanups, bug fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,88 +29,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, berrange@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
+To: peterx@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, kevin.tian@intel.com, mst@redhat.com, jasowang@redhat.com, alex.williamson@redhat.com, jintack@cs.columbia.edu
 
-
---lYtTbTuCUQxZgETo
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, May 04, 2018 at 05:44:02AM +0300, Michael S. Tsirkin wrote:
-> On Fri, May 04, 2018 at 10:17:01AM +1000, David Gibson wrote:
-> > On Thu, May 03, 2018 at 10:51:42PM +0300, Michael S. Tsirkin wrote:
-> > > Some places include kvm_ppc.h, others target/ppc/kvm_ppc.h.
-> > > Let's be consistent.
-> > >=20
-> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> >=20
-> > One of your earlier patches in this series moved to using a full
-> > target/ppc/whatever.h for includers outside target/ppc itself.  So I'm
-> > not sure why you're standardizing on the short form here.
->=20
-> It's not a short form. The specific header is kvm_ppc.h.
-
-I don't see what you're getting at.  Just a couple of lines below in
-the context we have #include "target/ppc/mmu-hash64.h".  That's in
-exactly the same directory as kvm_ppc.h - which does it get the path,
-but this one doesn't?
-
-> That's how
-> most files used it so I selected a location minimizing the churn.
->=20
-> I also don't know why is it kvm_ppc.h and not just kvm.h.
-
-Neither do I, it was like that when I started work on qemu and I've
-never had a compelling reason to change it.
-
->=20
-> > > ---
-> > >  hw/ppc/spapr_cpu_core.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > >=20
-> > > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> > > index 94afeb3..312d6ed 100644
-> > > --- a/hw/ppc/spapr_cpu_core.c
-> > > +++ b/hw/ppc/spapr_cpu_core.c
-> > > @@ -15,7 +15,7 @@
-> > >  #include "qapi/error.h"
-> > >  #include "sysemu/cpus.h"
-> > >  #include "sysemu/kvm.h"
-> > > -#include "target/ppc/kvm_ppc.h"
-> > > +#include "kvm_ppc.h"
-> > >  #include "hw/ppc/ppc.h"
-> > >  #include "target/ppc/mmu-hash64.h"
-> > >  #include "sysemu/numa.h"
-> >=20
->=20
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---lYtTbTuCUQxZgETo
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrr0FkACgkQbDjKyiDZ
-s5IAfRAAlWO61dfSnAwItbSOiGP6vCuR9erpspWdH9yIrUNKWaZxI8np3xicTcy2
-1ztGUOgp7CuWGwQS5I4o6znzOHelGeSmxn1/uIsYKExG+4T2zhvQAFHlHG+GEzyb
-1MNprV/JlY+yMtMYVqExoOfciERMc+oDKtlXV6OSYG+Y7RpjNgU5nxu/cT4dkedm
-u33OBQ1kpfIrCvjUjwMkxLoz0djkTGqKPRfQqCpPmpGSOAVbmB7yJG4kPQx0eEgp
-UTkL5SSMilINaXvEdWoYmbp54ID9c0HAy+ZkB7LY255xkCciLzC5RZTw7HW19zNl
-kNwdiizNmrui5WGzNGXUVUsjGfTECogECFnuMqIuyvxGFOdiy1h4nL0ia7RfGi7D
-v/SOSPRuvdVbNWSSzDCsZyEMekj+q62JpqRlJxLKFGM3OHQXnuSxIZs+nPqzLSJb
-94I54jxelftI40OrQB/wIyGSN6z1M6tabw3L36yOS8PbO5A5Aca7p7kT1pEM6PC/
-wNf2nyzJZOMuXRrB+I2xJgzHhU3CZ6h5IfpOngRFzK0yGYa/dbfvtuZrJ46rDQ2t
-xZtflX1xSv4azQ4KojVLbm7lLbolQQ3lCXwM9n6y5HzUp6EUQPoiHMIcPhMOrkCY
-04GnEwx8IWwP/IQNYFn9SNU3kOdJKMLtkxeW2wOVb1XRhvSDhZA=
-=ERZq
------END PGP SIGNATURE-----
-
---lYtTbTuCUQxZgETo--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNTA0MDMwODExLjI4MTExLTEtcGV0ZXJ4QHJlZGhhdC5jb20KU3ViamVj
+dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwMC8xMF0gaW50ZWwtaW9tbXU6IG5lc3RlZCB2SU9N
+TVUsIGNsZWFudXBzLCBidWcgZml4ZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
+L2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwg
+d2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdp
+dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1y
+ZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5n
+IFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAg
+aWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
+IC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkK
+ICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09
+CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20g
+aHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAg
+ICAgICAgICAgIHBhdGNoZXcvMjAxODA1MDMyMTM0NTguMjc0OS4yODU2Ni5zdGdpdEBnaW1saS5o
+b21lIC0+IHBhdGNoZXcvMjAxODA1MDMyMTM0NTguMjc0OS4yODU2Ni5zdGdpdEBnaW1saS5ob21l
+CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxODA1MDQwMzA4MTEuMjgxMTEt
+MS1wZXRlcnhAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwNTA0MDMwODExLjI4MTExLTEtcGV0
+ZXJ4QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo1NWI2YzZiMWY1
+IGludGVsLWlvbW11OiByZW1vdmUgbm90aWZ5X3VubWFwIGZvciBwYWdlIHdhbGsKNzJmZmU5MzE0
+YSBpbnRlbC1pb21tdTogZG9uJ3QgdW5tYXAgYWxsIGZvciBzaGFkb3cgcGFnZSB0YWJsZQo3YmI2
+NjM2ODJiIGludGVsLWlvbW11OiBtYWludGFpbiBwZXItZGV2aWNlIGlvdmEgcmFuZ2VzCmU3Nzky
+MWU2M2YgdXRpbDogaW1wbGVtZW50IHNpbXBsZSBpbnRlcnZhbCB0cmVlIGxvZ2ljCjM1NjQ4OWNk
+NTkgaW50ZWwtaW9tbXU6IHBhc3MgaW4gYWRkcmVzcyBzcGFjZSB3aGVuIHBhZ2Ugd2FsawoyN2Zj
+ZDMwNjJmIGludGVsLWlvbW11OiBpbnRyb2R1Y2UgdnRkX3BhZ2Vfd2Fsa19pbmZvCjk1M2E2ZGI2
+NjYgaW50ZWwtaW9tbXU6IG9ubHkgZG8gcGFnZSB3YWxrIGZvciBNQVAgbm90aWZpZXJzCjBjY2Zl
+ZGMxZTcgaW50ZWwtaW9tbXU6IGFkZCBpb21tdSBsb2NrCjQ3YTI5ZmQxNjUgaW50ZWwtaW9tbXU6
+IHJlbW92ZSBJbnRlbElPTU1VTm90aWZpZXJOb2RlCmFhY2Q1NTJkM2EgaW50ZWwtaW9tbXU6IHNl
+bmQgUFNJIGFsd2F5cyBldmVuIGlmIGFjcm9zcyBQREVzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpD
+aGVja2luZyBQQVRDSCAxLzEwOiBpbnRlbC1pb21tdTogc2VuZCBQU0kgYWx3YXlzIGV2ZW4gaWYg
+YWNyb3NzIFBERXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xMDogaW50ZWwtaW9tbXU6IHJlbW92ZSBJ
+bnRlbElPTU1VTm90aWZpZXJOb2RlLi4uCkNoZWNraW5nIFBBVENIIDMvMTA6IGludGVsLWlvbW11
+OiBhZGQgaW9tbXUgbG9jay4uLgpDaGVja2luZyBQQVRDSCA0LzEwOiBpbnRlbC1pb21tdTogb25s
+eSBkbyBwYWdlIHdhbGsgZm9yIE1BUCBub3RpZmllcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggNS8xMDog
+aW50ZWwtaW9tbXU6IGludHJvZHVjZSB2dGRfcGFnZV93YWxrX2luZm8uLi4KQ2hlY2tpbmcgUEFU
+Q0ggNi8xMDogaW50ZWwtaW9tbXU6IHBhc3MgaW4gYWRkcmVzcyBzcGFjZSB3aGVuIHBhZ2Ugd2Fs
+ay4uLgpDaGVja2luZyBQQVRDSCA3LzEwOiB1dGlsOiBpbXBsZW1lbnQgc2ltcGxlIGludGVydmFs
+IHRyZWUgbG9naWMuLi4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBu
+YW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojNTY6IEZJTEU6IGluY2x1ZGUvcWVtdS9pbnRl
+cnZhbC10cmVlLmg6MzM6Cit0eXBlZGVmIGdib29sZWFuICgqaXRfdHJlZV9pdGVyYXRvcikoSVRW
+YWx1ZSBzdGFydCwgSVRWYWx1ZSBlbmQpOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAz
+NDMgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
+ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
+IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoK
+Q2hlY2tpbmcgUEFUQ0ggOC8xMDogaW50ZWwtaW9tbXU6IG1haW50YWluIHBlci1kZXZpY2UgaW92
+YSByYW5nZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8xMDogaW50ZWwtaW9tbXU6IGRvbid0IHVubWFw
+IGFsbCBmb3Igc2hhZG93IHBhZ2UgdGFibGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMTA6IGludGVs
+LWlvbW11OiByZW1vdmUgbm90aWZ5X3VubWFwIGZvciBwYWdlIHdhbGsuLi4KPT09IE9VVFBVVCBF
+TkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5l
+cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxl
+YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
