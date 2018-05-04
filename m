@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fEV63-0004Pa-Ae
+	(envelope-from <cohuck@redhat.com>) id 1fEV63-0004Pb-AU
 	for qemu-devel@nongnu.org; Fri, 04 May 2018 03:25:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fEV62-0007JQ-3f
+	(envelope-from <cohuck@redhat.com>) id 1fEV60-0007HE-HB
 	for qemu-devel@nongnu.org; Fri, 04 May 2018 03:25:39 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri,  4 May 2018 09:25:07 +0200
-Message-Id: <20180504072514.8450-9-cohuck@redhat.com>
+Date: Fri,  4 May 2018 09:25:06 +0200
+Message-Id: <20180504072514.8450-8-cohuck@redhat.com>
 In-Reply-To: <20180504072514.8450-1-cohuck@redhat.com>
 References: <20180504072514.8450-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 08/15] pc-bios/s390-ccw: fix loadparm
- initialization and int conversion
+Subject: [Qemu-devel] [PULL 07/15] pc-bios/s390-ccw: rename
+ MAX_TABLE_ENTRIES to MAX_BOOT_ENTRIES
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,90 +25,78 @@ Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.d
 
 From: Collin Walling <walling@linux.ibm.com>
 
-Rename the loadparm char array in main.c to loadparm_str and
-increased the size by one byte to account for a null termination
-when converting the loadparm string to an int  via atoui. We
-also allow the boot menu to be enabled when loadparm is set to
-an empty string or a series of spaces.
+The MAX_TABLE_ENTRIES constant has a name that is too generic. As we
+want to declare a limit for boot menu entries, let's rename it to a more
+fitting MAX_BOOT_ENTRIES and set its value to 31 (30 boot entries and
+1 default entry). Also we move it from bootmap.h to s390-ccw.h to make
+it available for menu.c in a later patch.
 
 Signed-off-by: Collin Walling <walling@linux.ibm.com>
-Reported-by: Vasily Gorbik <gor@linux.ibm.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/s390x/ipl.c          |  4 ++++
- pc-bios/s390-ccw/main.c | 14 +++++++-------
- 2 files changed, 11 insertions(+), 7 deletions(-)
+ pc-bios/s390-ccw/bootmap.c  | 6 +++---
+ pc-bios/s390-ccw/bootmap.h  | 2 --
+ pc-bios/s390-ccw/s390-ccw.h | 2 ++
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index fb554ab156..150f6c0582 100644
---- a/hw/s390x/ipl.c
-+++ b/hw/s390x/ipl.c
-@@ -373,6 +373,10 @@ int s390_ipl_set_loadparm(uint8_t *loadparm)
-             loadparm[i] = ascii2ebcdic[(uint8_t) lp[i]];
+diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+index 9287b7a70f..b767fa2afc 100644
+--- a/pc-bios/s390-ccw/bootmap.c
++++ b/pc-bios/s390-ccw/bootmap.c
+@@ -297,7 +297,7 @@ static void run_eckd_boot_script(block_number_t bmt_block_nr,
+     }
+ 
+     debug_print_int("loadparm", loadparm);
+-    IPL_assert(loadparm <= MAX_TABLE_ENTRIES, "loadparm value greater than"
++    IPL_assert(loadparm < MAX_BOOT_ENTRIES, "loadparm value greater than"
+                " maximum number of boot entries allowed");
+ 
+     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+@@ -585,7 +585,7 @@ static void ipl_scsi(void)
+     read_block(mbr->pt.blockno, sec, "Error reading Program Table");
+     IPL_assert(magic_match(sec, ZIPL_MAGIC), "No zIPL magic in PT");
+ 
+-    while (program_table_entries <= MAX_TABLE_ENTRIES) {
++    while (program_table_entries < MAX_BOOT_ENTRIES) {
+         if (!prog_table->entry[program_table_entries].scsi.blockno) {
+             break;
          }
+@@ -600,7 +600,7 @@ static void ipl_scsi(void)
+     }
  
-+        if (i < 8) {
-+            memset(loadparm + i, 0x40, 8 - i); /* fill with EBCDIC spaces */
-+        }
+     debug_print_int("loadparm", loadparm);
+-    IPL_assert(loadparm <= MAX_TABLE_ENTRIES, "loadparm value greater than"
++    IPL_assert(loadparm < MAX_BOOT_ENTRIES, "loadparm value greater than"
+                " maximum number of boot entries allowed");
+ 
+     zipl_run(&prog_table->entry[loadparm].scsi); /* no return */
+diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
+index 07eb600b00..732c1112ce 100644
+--- a/pc-bios/s390-ccw/bootmap.h
++++ b/pc-bios/s390-ccw/bootmap.h
+@@ -57,8 +57,6 @@ typedef union BootMapPointer {
+     ExtEckdBlockPtr xeckd;
+ } __attribute__ ((packed)) BootMapPointer;
+ 
+-#define MAX_TABLE_ENTRIES  30
+-
+ /* aka Program Table */
+ typedef struct BootMapTable {
+     uint8_t magic[4];
+diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
+index fd18da22c6..2c9e6017b7 100644
+--- a/pc-bios/s390-ccw/s390-ccw.h
++++ b/pc-bios/s390-ccw/s390-ccw.h
+@@ -94,6 +94,8 @@ bool menu_is_enabled_zipl(void);
+ int menu_get_enum_boot_index(int entries);
+ bool menu_is_enabled_enum(void);
+ 
++#define MAX_BOOT_ENTRIES  31
 +
-         g_free(lp);
-         return 0;
-     }
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index 9d9f8cf4d3..26f9adf84a 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -15,11 +15,11 @@
- char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
- static SubChannelId blk_schid = { .one = 1 };
- IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
--static char loadparm[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-+static char loadparm_str[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
- QemuIplParameters qipl;
- 
- #define LOADPARM_PROMPT "PROMPT  "
--#define LOADPARM_EMPTY  "........"
-+#define LOADPARM_EMPTY  "        "
- #define BOOT_MENU_FLAG_MASK (QIPL_FLAG_BM_OPTS_CMD | QIPL_FLAG_BM_OPTS_ZIPL)
- 
- /*
-@@ -45,7 +45,7 @@ void panic(const char *string)
- 
- unsigned int get_loadparm_index(void)
+ static inline void fill_hex(char *out, unsigned char val)
  {
--    return atoui(loadparm);
-+    return atoui(loadparm_str);
- }
- 
- static bool find_dev(Schib *schib, int dev_no)
-@@ -80,13 +80,13 @@ static bool find_dev(Schib *schib, int dev_no)
- 
- static void menu_setup(void)
- {
--    if (memcmp(loadparm, LOADPARM_PROMPT, 8) == 0) {
-+    if (memcmp(loadparm_str, LOADPARM_PROMPT, 8) == 0) {
-         menu_set_parms(QIPL_FLAG_BM_OPTS_CMD, 0);
-         return;
-     }
- 
-     /* If loadparm was set to any other value, then do not enable menu */
--    if (memcmp(loadparm, LOADPARM_EMPTY, 8) != 0) {
-+    if (memcmp(loadparm_str, LOADPARM_EMPTY, 8) != 0) {
-         return;
-     }
- 
-@@ -116,8 +116,8 @@ static void virtio_setup(void)
-      */
-     enable_mss_facility();
- 
--    sclp_get_loadparm_ascii(loadparm);
--    memcpy(ldp + 10, loadparm, 8);
-+    sclp_get_loadparm_ascii(loadparm_str);
-+    memcpy(ldp + 10, loadparm_str, 8);
-     sclp_print(ldp);
- 
-     memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
+     const char hex[] = "0123456789abcdef";
 -- 
 2.14.3
