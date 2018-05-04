@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42106)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fETfx-0003s9-BR
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:54:38 -0400
+	(envelope-from <groug@kaod.org>) id 1fETjp-0005LE-B7
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:58:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fETft-0001mQ-6s
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:54:37 -0400
-Received: from 7.mo6.mail-out.ovh.net ([46.105.59.196]:57916)
+	(envelope-from <groug@kaod.org>) id 1fETjl-0005hD-EN
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:58:37 -0400
+Received: from 6.mo6.mail-out.ovh.net ([87.98.177.69]:49642)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fETft-0001kr-0R
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:54:33 -0400
-Received: from player691.ha.ovh.net (unknown [10.109.108.111])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id CCDEC157F24
-	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 07:54:29 +0200 (CEST)
-Date: Fri, 4 May 2018 07:54:19 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fETjl-0005fH-6U
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:58:33 -0400
+Received: from player750.ha.ovh.net (unknown [10.109.122.70])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 79EEE158D84
+	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 07:58:31 +0200 (CEST)
+Date: Fri, 4 May 2018 07:58:21 +0200
 From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180504075419.4eb70618@bahia.lan>
-In-Reply-To: <20180504001223.GI13229@umbus.fritz.box>
+Message-ID: <20180504075821.0e0cbdc6@bahia.lan>
+In-Reply-To: <20180504001102.GH13229@umbus.fritz.box>
 References: <152538217073.223014.17347204768561945420.stgit@bahia.lan>
-	<152538218900.223014.9011319433623501285.stgit@bahia.lan>
-	<20180504001223.GI13229@umbus.fritz.box>
+	<20180504001102.GH13229@umbus.fritz.box>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	boundary="Sig_/o5W=5hGAtUiMt4JfBvKLBdx";
+	boundary="Sig_/OE0ro/LYX=_ead5hmeY36gp";
 	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH 1/3] target/ppc: always set PPC_MEM_TLBIE
- in pre 2.8 migration hack
+Subject: Re: [Qemu-devel] [PATCH 0/3] spapr: fix backward migration from
+ POWER9 to POWER8 hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,93 +33,68 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Laurent Vivier <lvivier@redhat.com>, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Laurent Vivier <lvivier@redhat.com>, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-stable@nongnu.org
 
---Sig_/o5W=5hGAtUiMt4JfBvKLBdx
+--Sig_/OE0ro/LYX=_ead5hmeY36gp
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 4 May 2018 10:12:23 +1000
+On Fri, 4 May 2018 10:11:02 +1000
 David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> On Thu, May 03, 2018 at 11:16:29PM +0200, Greg Kurz wrote:
-> > The pseries-2.7 and older machine types require CPUPPCState::insns_flags
-> > to be strictly equal between source and destination. This checking is
-> > abusive and breaks migration of KVM guests when the host CPU models
-> > are different, even if they are compatible enough to allow the guest
-> > to run transparently. This buggy behaviour was fixed for pseries-2.8
-> > and we added some hacks to allow backward migration of older machine
-> > types. These hacks assume that the CPU belongs to the POWER8 family,
-> > which was true for most KVM based setup we cared about at the time.
-> > But now POWER9 systems are coming, and backward migration of pre 2.8
-> > guests running in POWER8 architected mode from a POWER9 host to a
-> > POWER8 host is broken:
+> On Thu, May 03, 2018 at 11:16:10PM +0200, Greg Kurz wrote:
+> > Hi,
 > >=20
-> > qemu-system-ppc64: error while loading state for instance 0x0 of device
-> >  'cpu'
-> > qemu-system-ppc64: load of migration failed: Invalid argument
+> > It is expected to be able to migrate a guest started with
 > >=20
-> > This happens because POWER9 doesn't set PPC_MEM_TLBIE in insns_flags,
-> > while POWER8 does. Let's force PPC_MEM_TLBIE in the migration hack to
-> > fix the issue. This is an acceptable hack because these old machine
-> > types only support CPU models that do set PPC_MEM_TLBIE.
+> >      -machine max-cpu-compat=3Dpower8
 > >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> >  target/ppc/machine.c |    5 +++++
-> >  1 file changed, 5 insertions(+)
+> > from a POWER9 host to a POWER8 host. It works with recent QEMU versions,
+> > but it is badly broken if the destination runs QEMU 2.7 or older.
 > >=20
-> > diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-> > index 3d6434a006fa..ba1b9e531f97 100644
-> > --- a/target/ppc/machine.c
-> > +++ b/target/ppc/machine.c
-> > @@ -212,6 +212,11 @@ static int cpu_pre_save(void *opaque)
-> >              ;
-> >          cpu->mig_msr_mask =3D env->msr_mask & ~metamask;
-> >          cpu->mig_insns_flags =3D env->insns_flags & insns_compat_mask;
-> > +        /* CPU models supported by old machines all have PPC_MEM_TLBIE,
-> > +         * so we set it unconditionally to allow backward migration fr=
-om
-> > +         * a POWER9 host to a POWER8 host. =20
+> > This can cause problems in cloud environments that still have systems w=
+ith
+> > older QEMU versions, eg, hosts running ubuntu LTS 16.04.4 (QEMU 2.5) wh=
+ich
+> > are likely to stay around until admins could transition to some newer O=
+S.
+> >=20
+> > This series was lightly tested, but the patches are simple enough, so I=
+'m
+> > confident they shouldn't break anything :)
+> >=20
+> > Please review as I'd like these to go to QEMU 2.11.2 as well. =20
 >=20
-> So.. the comment's slightly misleading.  This code is common to all
-> cpus, not just those used on pseries, so across that set it's not
-> really accurate.  But pseries is the only machine we support migration
-> to/from old versions with so it doesn't really matter.
+> Applied to ppc-for-2.13.  As you say, these should probably go to the
+> 2.12 and 2.11 stable trees too.
 >=20
 
-Oh... I was assuming that we only supported migration for pseries
-machine, irrespective of the versions.
+Cc'ing qemu-stable then
 
-> > +         */
-> > +        cpu->mig_insns_flags |=3D PPC_MEM_TLBIE;
-> >          cpu->mig_insns_flags2 =3D env->insns_flags2 & insns_compat_mas=
-k2;
-> >          cpu->mig_nb_BATs =3D env->nb_BATs;
-> >      }
-> >  =20
->=20
+Cheers,
 
+--
+Greg
 
---Sig_/o5W=5hGAtUiMt4JfBvKLBdx
+--Sig_/OE0ro/LYX=_ead5hmeY36gp
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlrr9YsACgkQcdTV5YIv
-c9aBlhAAoP8HjM8xnsGYvsVEUWcG1YHu3WN1WbO8cJt9FSep24IpDSkfHA+k6NWk
-hWaxF9ZAZfdLtPZEA6LkyurchDL4hUBoPp8+wAsGkXwTPcuHKQBoph2Gu/qskyn9
-dfTBO2DNcBu66k7MjUlsZCWO2XafLYCv3xVnHpFpcI8GDIK2XAO6kLpG0Psnv9ZF
-SGoCnCBHPT6yg3srK1JdYiue4hz3RG2hJ/C/8cSGAzaegzAafeJFt+M45B2HxmvU
-mO7EfWbnP0lUkcsUsh86uHxpS4Q2z6SHP/smmfdBoQOOU1pTrkHQ4N4VxbLZ/td4
-TK+J/tFhS1Tqoe81WAnQjUZ4nY2KRS7tKjsO7oVraxJuE7amzbVMAVtngj7hOui1
-pgikStM3xanz0Ril97oRfu4NguSMF5hpuBtsBNXmAnDaTvyMKgFZYDmbRnjJvTY8
-RgjbWt4M+y58p9TsH1yE+xSfS/Zao2b/9p3Rj5VjaJq+SqonollM6Ym/npety8+8
-7QdGJbpcbOs8AjbLiInpH+rsBtjeLcvNskVRKDLxKvXV0Vn0UJsEC6l968L8/7vg
-/N2bvweSiNQWWJBA6DvTJoJpDjI4rMC8I9XvnVB3LFqFHwk6/b//UyzCyVNWC44s
-JKl6DTKrTb+6kgCOjYKJIAAEzCIt5bnln3J7k68xCbc6NJACaG4=
-=9tIK
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlrr9n0ACgkQcdTV5YIv
+c9bnIw//Ss43H0nKFd7gPYucH8NALKzHQ9R7zDrsx3rnF8T3FfwJWMT4NG9F8UZL
+KcGtNVauC3iKt4BbNPLLI2GXiKilZy0iBbOdtyQwRMKgVH436rArp+Z3ozvMroPj
+MEqGaSegfp/DESYFZxSinhhrO442IzKojl4SxVoJBq/TGwy0G64xEhOBtGxz9Jb0
+K9mqhKodP4csQkgx10f2bETWzmrTCiuKe3Rb8GAy9KmmguDfCmpTfTiGHyO9tRCb
+UXD4d0fdHpvovH8y/bwLCLCsbjQ4yLf6OmoaHcMR7oUlwQx409MsJuL+RRi2G1Te
+brW44610mUy7FIyWJnxszV0CpLiqjQxC8EPr9zdwCncm7ZDQlXgLCsKTu/jTGd2o
+jImRuXpWzXE6v5KUG0pPDw4F5a7LKSDNwB4wQauTFWyr3qVRnLmybrJkQWxoRjmg
+SMZeIpRYb4LPs1tAqNAcsGoG293kXqVbKgUeMwvy87oKEqsbuE1Gf3IWlLeoYzVy
+hDFJ38js6OwK/Om4mXDKAjKVDrzaaBsyq39VuNwkb6C1opqdhI36V2MQKh/3sBVR
+UH+3RFD/yzofFQ8phKdD254M666A47q2+qKp/oGizjS7mIfquYi1nWVLFvbrMHy8
+8wKhAMeb2/QTzw6Z0n7+a3Muzcov4cY5F+yxTT+L0bsGzo532HQ=
+=9cTt
 -----END PGP SIGNATURE-----
 
---Sig_/o5W=5hGAtUiMt4JfBvKLBdx--
+--Sig_/OE0ro/LYX=_ead5hmeY36gp--
