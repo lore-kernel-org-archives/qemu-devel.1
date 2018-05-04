@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fEX9o-0005bx-Io
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 05:37:41 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fEXPb-0000Ol-QC
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 05:54:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fEX9l-00072H-EJ
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 05:37:40 -0400
-Received: from 2.mo2.mail-out.ovh.net ([188.165.53.149]:46550)
+	(envelope-from <dgilbert@redhat.com>) id 1fEXPW-0003p3-VV
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 05:53:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34930 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fEX9l-000700-7J
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 05:37:37 -0400
-Received: from player750.ha.ovh.net (unknown [10.109.108.84])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 60F46131386
-	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 11:37:35 +0200 (CEST)
-Date: Fri, 4 May 2018 11:37:24 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180504113724.64b7b1c0@bahia.lan>
-In-Reply-To: <20180504042044.10318-1-mdroth@linux.vnet.ibm.com>
-References: <20180504042044.10318-1-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc: only save guest
- timebase once after stopping
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fEXPW-0003oB-RB
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 05:53:54 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CE25240858CD
+	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 09:53:50 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Fri,  4 May 2018 10:53:46 +0100
+Message-Id: <20180504095346.14159-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH] libvhost-user: Send messages with no data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,104 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, qemu-stable@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org, mst@redhat.com, marcandre.lureau@redhat.com
 
-On Thu,  3 May 2018 23:20:44 -0500
-Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-> In some cases (e.g. spapr) we record guest timebase after qmp_stop()
-> via a runstate hook so we can restore it on qmp_cont(). If a migration
-> occurs in between those events we end up saving it again, this time
-> based on the current timebase the guest would be seeing had it been
-> running. This has the effect of advancing the guest timebase while
-> it is stopped, which is not what the code intends.
-> 
+The response to a VHOST_USER_POSTCOPY_ADVISE contains a fd but doesn't
+actually contain any data.   FIx vu_message_write so that it doesn't
+do a 0-byte write() call, since this was ending up with rc=0
+that was confusing the error handling code.
 
-Hi Mike,
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ contrib/libvhost-user/libvhost-user.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
-The current behavior was introduced by:
-
-commit 42043e4f1241eeb77f87f5816b5cf0b6e9583ed7
-Author: Laurent Vivier <lvivier@redhat.com>
-Date:   Fri Jan 27 13:24:58 2017 +0100
-
-    spapr: clock should count only if vm is running
-
-and we have this in the changelog:
-
-    We keep timebase_pre_save to reduce the clock difference on
-    migration like in:
-        6053a86 kvmclock: reduce kvmclock difference on migration
-
-
-So your patch totally negates ^^ ? Also, I can't see a case where
-timebase_save() could be called from vmstate_save_state() while the
-VM is running, ie, you could drop timebase_pre_save()... or am I
-*probably* missing something ?
-
-> Other than simple jumps in time, this has been seen to trigger what
-> appear to be RCU-related crashes in recent kernels when the advance
-> exceeds rcu_cpu_stall_timeout, and it can be triggered by fairly
-> common operations such as `virsh migrate ... --timeout 60`.
-> 
-> Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Cc: Laurent Vivier <lvivier@redhat.com>
-> Cc: qemu-ppc@nongnu.org
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> ---
->  hw/ppc/ppc.c         | 12 ++++++++++++
->  target/ppc/cpu-qom.h |  1 +
->  2 files changed, 13 insertions(+)
-> 
-> diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
-> index ec4be25f49..ff0a107864 100644
-> --- a/hw/ppc/ppc.c
-> +++ b/hw/ppc/ppc.c
-> @@ -865,6 +865,15 @@ static void timebase_save(PPCTimebase *tb)
->      uint64_t ticks = cpu_get_host_ticks();
->      PowerPCCPU *first_ppc_cpu = POWERPC_CPU(first_cpu);
->  
-> +    /* since we generally save timebase just after the guest
-> +     * has stopped, avoid trying to save it again since we will
-> +     * end up advancing it by the amount of ticks that have
-> +     * elapsed in the host since the initial save
-> +     */
-> +    if (tb->saved) {
-> +        return;
-> +    }
-> +
->      if (!first_ppc_cpu->env.tb_env) {
->          error_report("No timebase object");
->          return;
-> @@ -877,6 +886,7 @@ static void timebase_save(PPCTimebase *tb)
->       * there is no need to update it from KVM here
->       */
->      tb->guest_timebase = ticks + first_ppc_cpu->env.tb_env->tb_offset;
-> +    tb->saved = true;
->  }
->  
->  static void timebase_load(PPCTimebase *tb)
-> @@ -908,6 +918,8 @@ static void timebase_load(PPCTimebase *tb)
->                          &pcpu->env.tb_env->tb_offset);
->  #endif
->      }
-> +
-> +    tb->saved = false;
->  }
->  
->  void cpu_ppc_clock_vm_state_change(void *opaque, int running,
-> diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-> index deaa46a14b..ec2dbcdcae 100644
-> --- a/target/ppc/cpu-qom.h
-> +++ b/target/ppc/cpu-qom.h
-> @@ -210,6 +210,7 @@ typedef struct PowerPCCPUClass {
->  typedef struct PPCTimebase {
->      uint64_t guest_timebase;
->      int64_t time_of_the_day_ns;
-> +    bool saved;
->  } PPCTimebase;
->  
->  extern const struct VMStateDescription vmstate_ppc_timebase;
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+index beeed0c43f..54e643d871 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -323,13 +323,15 @@ vu_message_write(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
+         rc = sendmsg(conn_fd, &msg, 0);
+     } while (rc < 0 && (errno == EINTR || errno == EAGAIN));
+ 
+-    do {
+-        if (vmsg->data) {
+-            rc = write(conn_fd, vmsg->data, vmsg->size);
+-        } else {
+-            rc = write(conn_fd, p + VHOST_USER_HDR_SIZE, vmsg->size);
+-        }
+-    } while (rc < 0 && (errno == EINTR || errno == EAGAIN));
++    if (vmsg->size) {
++        do {
++            if (vmsg->data) {
++                rc = write(conn_fd, vmsg->data, vmsg->size);
++            } else {
++                rc = write(conn_fd, p + VHOST_USER_HDR_SIZE, vmsg->size);
++            }
++        } while (rc < 0 && (errno == EINTR || errno == EAGAIN));
++    }
+ 
+     if (rc <= 0) {
+         vu_panic(dev, "Error while writing: %s", strerror(errno));
+-- 
+2.17.0
