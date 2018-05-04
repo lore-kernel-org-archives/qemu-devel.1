@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fEe25-0003ab-Fi
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:58:10 -0400
+	(envelope-from <thuth@redhat.com>) id 1fEe5E-00054Y-LT
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 13:01:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fEe20-0001h7-Fe
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:58:09 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:42729)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fEe20-0001gp-An
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:58:04 -0400
-Received: by mail-qt0-x244.google.com with SMTP id c2-v6so28183840qtn.9
-	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 09:58:04 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180504155918.21287-1-f4bug@amsat.org>
-	<20180504155918.21287-16-f4bug@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <fd5e8ebc-4dc8-901d-0f04-d6fa07439062@amsat.org>
-Date: Fri, 4 May 2018 13:57:58 -0300
-MIME-Version: 1.0
-In-Reply-To: <20180504155918.21287-16-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 15/20] sdcard: Add SDFrame136 struct and
- 136-bit SD response frames functions
+	(envelope-from <thuth@redhat.com>) id 1fEe5D-0003g0-T1
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 13:01:24 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51316 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fEe5D-0003fT-Of
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 13:01:23 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 49BDB406C776
+	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 17:01:23 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+Date: Fri,  4 May 2018 19:01:09 +0200
+Message-Id: <1525453270-23074-5-git-send-email-thuth@redhat.com>
+In-Reply-To: <1525453270-23074-1-git-send-email-thuth@redhat.com>
+References: <1525453270-23074-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 4/5] qemu-options: Remove deprecated
+ -no-kvm-irqchip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,119 +30,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alistair Francis <alistair@alistair23.me>
+To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: berrange@redhat.com, Markus Armbruster <armbru@redhat.com>
 
-On 05/04/2018 12:59 PM, Philippe Mathieu-Daudé wrote:
-> The 'read CID/CSD register' request returns a 136-bit frame
-> containing those 128-bit registers.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  include/hw/sd/sd.h     | 29 +++++++++++++++++++++++++++++
->  hw/sd/sdmmc-internal.c | 15 +++++++++++++++
->  2 files changed, 44 insertions(+)
-> 
-> diff --git a/include/hw/sd/sd.h b/include/hw/sd/sd.h
-> index 13de1b30c3..c76be51b32 100644
-> --- a/include/hw/sd/sd.h
-> +++ b/include/hw/sd/sd.h
-> @@ -91,6 +91,17 @@ typedef struct SDFrame48 {
->      uint8_t crc;
->  } SDFrame48;
->  
-> +/**
-> + * SDFrame136: 136 bits CID or CSD responses
-> + *
-> + * @content: CID or CSD register
-> + * @crc:     7-bit CRC checksum
-> + */
-> +typedef struct SDFrame136 {
-> +    uint8_t content[15];
-> +    uint8_t crc;
-> +} SDFrame136;
-> +
->  typedef struct SDFrame48 SDRequest;
->  
->  typedef struct SDState SDState;
-> @@ -193,6 +204,14 @@ void sd_prepare_frame48(SDFrame48 *frame, uint8_t cmd, uint32_t arg,
->   */
->  void sd_update_frame48_checksum(SDFrame48 *frame, bool is_response);
->  
-> +/**
-> + * sd_update_frame136_checksum:
-> + * @frame: the #SDFrame136 to verify
-> + *
-> + * Update the 16-bit CRC checksum of a SD 136-bit frame.
+We've never documented this option in our qemu-doc, so apart from the users
+that already used the old qemu-kvm fork before, most users should not be
+aware of this option at all. It's been marked as deprecated in the source
+code for a long time already, and officially marked as deprecated in the
+documentation since QEMU v2.10, so it should be fine to remove this now.
 
-Oops this should be:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ qemu-doc.texi   | 5 -----
+ qemu-options.hx | 3 ---
+ vl.c            | 5 -----
+ 3 files changed, 13 deletions(-)
 
-    "Update the 7-bit CRC checksum of a SD 136-bit frame."
-
-> + */
-> +void sd_update_frame136_checksum(SDFrame136 *frame);
-> +
->  /**
->   * sd_verify_frame48_checksum:
->   * @frame: the #SDFrame48 to verify
-> @@ -204,6 +223,16 @@ void sd_update_frame48_checksum(SDFrame48 *frame, bool is_response);
->   */
->  bool sd_verify_frame48_checksum(SDFrame48 *frame, bool is_response);
->  
-> +/**
-> + * sd_verify_frame136_checksum:
-> + * @frame: the #SDFrame48 to verify
-> + *
-> + * Verify the 16-bit CRC checksum of a SD 136-bit frame.
-
-And:
-
-    "Verify the 7-bit CRC checksum of a SD 136-bit frame."
-
-> + *
-> + * Returns: A boolean indicating whether the frame 16-bit CRC is correct.
-> + */
-> +bool sd_verify_frame136_checksum(SDFrame136 *frame);
-> +
->  /* Legacy functions to be used only by non-qdevified callers */
->  SDState *sd_init(BlockBackend *bs, bool is_spi);
->  int sd_do_command(SDState *sd, SDRequest *req,
-> diff --git a/hw/sd/sdmmc-internal.c b/hw/sd/sdmmc-internal.c
-> index c990cc9e8e..68350a2304 100644
-> --- a/hw/sd/sdmmc-internal.c
-> +++ b/hw/sd/sdmmc-internal.c
-> @@ -117,6 +117,11 @@ static uint8_t sd_calc_frame48_crc7(uint8_t cmd, uint32_t arg, bool is_response)
->      return sd_crc7(buffer, sizeof(buffer));
->  }
->  
-> +static uint8_t sd_calc_frame136_crc7(SDFrame136 *frame)
-> +{
-> +    return (sd_crc7(frame->content, sizeof(frame->content)) << 1) | 1;
-> +}
-> +
->  bool sd_verify_frame48_checksum(SDFrame48 *frame, bool is_response)
->  {
->      uint8_t crc = sd_calc_frame48_crc7(frame->cmd, frame->arg, is_response);
-> @@ -124,11 +129,21 @@ bool sd_verify_frame48_checksum(SDFrame48 *frame, bool is_response)
->      return crc == frame->crc;
->  }
->  
-> +bool sd_verify_frame136_checksum(SDFrame136 *frame)
-> +{
-> +    return sd_calc_frame136_crc7(frame) == frame->crc;
-> +}
-> +
->  void sd_update_frame48_checksum(SDFrame48 *frame, bool is_response)
->  {
->      frame->crc = sd_calc_frame48_crc7(frame->cmd, frame->arg, is_response);
->  }
->  
-> +void sd_update_frame136_checksum(SDFrame136 *frame)
-> +{
-> +    frame->crc = (sd_crc7(frame->content, sizeof(frame->content)) << 1) | 1;
-> +}
-> +
->  void sd_prepare_frame48(SDFrame48 *frame, uint8_t cmd, uint32_t arg,
->                          bool is_response, bool gen_crc)
->  {
-> 
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 2047ba5..9db156b 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -2786,11 +2786,6 @@ which is the default.
+ 
+ @section System emulator command line arguments
+ 
+-@subsection -no-kvm-irqchip (since 1.3.0)
+-
+-The ``-no-kvm-irqchip'' argument is now a synonym for
+-setting ``-machine kernel_irqchip=off''.
+-
+ @subsection -no-kvm (since 1.3.0)
+ 
+ The ``-no-kvm'' argument is now a synonym for setting
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 9c0d60d..870a363 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3917,9 +3917,6 @@ ETEXI
+ HXCOMM Deprecated by -machine accel=tcg property
+ DEF("no-kvm", 0, QEMU_OPTION_no_kvm, "", QEMU_ARCH_I386)
+ 
+-HXCOMM Deprecated by -machine kernel_irqchip=on|off property
+-DEF("no-kvm-irqchip", 0, QEMU_OPTION_no_kvm_irqchip, "", QEMU_ARCH_I386)
+-
+ DEF("msg", HAS_ARG, QEMU_OPTION_msg,
+     "-msg timestamp[=on|off]\n"
+     "                change the format of messages\n"
+diff --git a/vl.c b/vl.c
+index bbe94ba..d8c3b09 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3149,11 +3149,6 @@ int main(int argc, char **argv, char **envp)
+                 exit(1);
+             }
+             switch(popt->index) {
+-            case QEMU_OPTION_no_kvm_irqchip: {
+-                olist = qemu_find_opts("machine");
+-                qemu_opts_parse_noisily(olist, "kernel_irqchip=off", false);
+-                break;
+-            }
+             case QEMU_OPTION_cpu:
+                 /* hw initialization will check this */
+                 cpu_model = optarg;
+-- 
+1.8.3.1
