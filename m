@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43295)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fETku-00066K-Gd
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:59:47 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fETkv-00068e-R5
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:59:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fETkr-0007Pw-Qt
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:59:44 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fETkt-0007UP-Mz
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:59:45 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  4 May 2018 15:59:25 +1000
-Message-Id: <20180504055930.3786-13-david@gibson.dropbear.id.au>
+Date: Fri,  4 May 2018 15:59:26 +1000
+Message-Id: <20180504055930.3786-14-david@gibson.dropbear.id.au>
 In-Reply-To: <20180504055930.3786-1-david@gibson.dropbear.id.au>
 References: <20180504055930.3786-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 12/17] uninorth: create new uninorth device
+Subject: [Qemu-devel] [PULL 13/17] mac_newworld: remove pics IRQ array and
+ wire up macio to OpenPIC directly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,233 +25,96 @@ Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, lv
 
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Commit 4e46dcdbd3 "PPC: Newworld: Add uninorth token register" added a TO=
-DO
-which was to convert the uninorth registers hack to a proper device. Move
-these registers to a new uninorth device, removing the old hacks from
-mac_newworld.c.
+Introduce constants for the pre-defined New World IRQs to help keep things
+readable.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/pci-host/trace-events       |  2 ++
- hw/pci-host/uninorth.c         | 58 ++++++++++++++++++++++++++++++++++
- hw/ppc/mac_newworld.c          | 41 ++++--------------------
- hw/ppc/trace-events            |  4 ---
- include/hw/pci-host/uninorth.h | 11 +++++++
- 5 files changed, 77 insertions(+), 39 deletions(-)
+ hw/ppc/mac.h          |  9 +++++++++
+ hw/ppc/mac_newworld.c | 29 +++++++++++++++--------------
+ 2 files changed, 24 insertions(+), 14 deletions(-)
 
-diff --git a/hw/pci-host/trace-events b/hw/pci-host/trace-events
-index 341a87a702..dd7a398e96 100644
---- a/hw/pci-host/trace-events
-+++ b/hw/pci-host/trace-events
-@@ -18,3 +18,5 @@ unin_set_irq(int irq_num, int level) "setting INT %d =3D=
- %d"
- unin_get_config_reg(uint32_t reg, uint32_t addr, uint32_t retval) "conve=
-rted config space accessor 0x%"PRIx32 "/0x%"PRIx32 " -> 0x%"PRIx32
- unin_data_write(uint64_t addr, unsigned len, uint64_t val) "write addr 0=
-x%"PRIx64 " len %d val 0x%"PRIx64
- unin_data_read(uint64_t addr, unsigned len, uint64_t val) "read addr 0x%=
-"PRIx64 " len %d val 0x%"PRIx64
-+unin_write(uint64_t addr, uint64_t value) "addr=3D0x%" PRIx64 " val=3D0x=
-%"PRIx64
-+unin_read(uint64_t addr, uint64_t value) "addr=3D0x%" PRIx64 " val=3D0x%=
-"PRIx64
-diff --git a/hw/pci-host/uninorth.c b/hw/pci-host/uninorth.c
-index fada0ffd5f..ba76b84dbc 100644
---- a/hw/pci-host/uninorth.c
-+++ b/hw/pci-host/uninorth.c
-@@ -519,6 +519,62 @@ static const TypeInfo pci_unin_internal_info =3D {
-     .class_init    =3D pci_unin_internal_class_init,
- };
-=20
-+/* UniN device */
-+static void unin_write(void *opaque, hwaddr addr, uint64_t value,
-+                       unsigned size)
-+{
-+    trace_unin_write(addr, value);
-+    if (addr =3D=3D 0x0) {
-+        *(int *)opaque =3D value;
-+    }
-+}
+diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
+index 892dd03789..22a7efbed6 100644
+--- a/hw/ppc/mac.h
++++ b/hw/ppc/mac.h
+@@ -56,6 +56,15 @@
+ #define OLDWORLD_IDE1_IRQ      0xe
+ #define OLDWORLD_IDE1_DMA_IRQ  0x3
+ 
++/* New World IRQs */
++#define NEWWORLD_CUDA_IRQ      0x19
++#define NEWWORLD_ESCCB_IRQ     0x24
++#define NEWWORLD_ESCCA_IRQ     0x25
++#define NEWWORLD_IDE0_IRQ      0xd
++#define NEWWORLD_IDE0_DMA_IRQ  0x2
++#define NEWWORLD_IDE1_IRQ      0xe
++#define NEWWORLD_IDE1_DMA_IRQ  0x3
 +
-+static uint64_t unin_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    uint32_t value;
-+
-+    value =3D 0;
-+    switch (addr) {
-+    case 0:
-+        value =3D *(int *)opaque;
-+    }
-+
-+    trace_unin_read(addr, value);
-+
-+    return value;
-+}
-+
-+static const MemoryRegionOps unin_ops =3D {
-+    .read =3D unin_read,
-+    .write =3D unin_write,
-+    .endianness =3D DEVICE_BIG_ENDIAN,
-+};
-+
-+static void unin_init(Object *obj)
-+{
-+    UNINState *s =3D UNI_NORTH(obj);
-+    SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
-+
-+    memory_region_init_io(&s->mem, obj, &unin_ops, &s->token, "unin", 0x=
-1000);
-+
-+    sysbus_init_mmio(sbd, &s->mem);
-+}
-+
-+static void unin_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+
-+    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-+}
-+
-+static const TypeInfo unin_info =3D {
-+    .name          =3D TYPE_UNI_NORTH,
-+    .parent        =3D TYPE_SYS_BUS_DEVICE,
-+    .instance_size =3D sizeof(UNINState),
-+    .instance_init =3D unin_init,
-+    .class_init    =3D unin_class_init,
-+};
-+
- static void unin_register_types(void)
- {
-     type_register_static(&unin_main_pci_host_info);
-@@ -530,6 +586,8 @@ static void unin_register_types(void)
-     type_register_static(&pci_u3_agp_info);
-     type_register_static(&pci_unin_agp_info);
-     type_register_static(&pci_unin_internal_info);
-+
-+    type_register_static(&unin_info);
- }
-=20
- type_init(unin_register_types)
+ /* MacIO */
+ #define TYPE_MACIO_IDE "macio-ide"
+ #define MACIO_IDE(obj) OBJECT_CHECK(MACIOIDEState, (obj), TYPE_MACIO_IDE)
 diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-index 29bd3838bf..9a382f992d 100644
+index 9a382f992d..6a070f13bd 100644
 --- a/hw/ppc/mac_newworld.c
 +++ b/hw/ppc/mac_newworld.c
-@@ -82,36 +82,6 @@
-=20
- #define NDRV_VGA_FILENAME "qemu_vga.ndrv"
-=20
--/* UniN device */
--static void unin_write(void *opaque, hwaddr addr, uint64_t value,
--                       unsigned size)
--{
--    trace_mac99_uninorth_write(addr, value);
--    if (addr =3D=3D 0x0) {
--        *(int*)opaque =3D value;
--    }
--}
--
--static uint64_t unin_read(void *opaque, hwaddr addr, unsigned size)
--{
--    uint32_t value;
--
--    value =3D 0;
--    switch (addr) {
--    case 0:
--        value =3D *(int*)opaque;
--    }
--
--    trace_mac99_uninorth_read(addr, value);
--
--    return value;
--}
--
--static const MemoryRegionOps unin_ops =3D {
--    .read =3D unin_read,
--    .write =3D unin_write,
--    .endianness =3D DEVICE_NATIVE_ENDIAN,
--};
-=20
- static void fw_cfg_boot_set(void *opaque, const char *boot_device,
-                             Error **errp)
-@@ -145,7 +115,6 @@ static void ppc_core99_init(MachineState *machine)
-     CPUPPCState *env =3D NULL;
+@@ -114,7 +114,7 @@ static void ppc_core99_init(MachineState *machine)
+     PowerPCCPU *cpu = NULL;
+     CPUPPCState *env = NULL;
      char *filename;
-     qemu_irq *pic, **openpic_irqs;
--    MemoryRegion *unin_memory =3D g_new(MemoryRegion, 1);
+-    qemu_irq *pic, **openpic_irqs;
++    qemu_irq **openpic_irqs;
      int linux_boot, i, j, k;
-     MemoryRegion *ram =3D g_new(MemoryRegion, 1), *bios =3D g_new(Memory=
-Region, 1);
-     hwaddr kernel_base, initrd_base, cmdline_base =3D 0;
-@@ -164,7 +133,6 @@ static void ppc_core99_init(MachineState *machine)
-     int machine_arch;
-     SysBusDevice *s;
-     DeviceState *dev, *pic_dev;
--    int *token =3D g_new(int, 1);
-     hwaddr nvram_addr =3D 0xFFF04000;
-     uint64_t tbfreq;
-=20
-@@ -272,9 +240,12 @@ static void ppc_core99_init(MachineState *machine)
+     MemoryRegion *ram = g_new(MemoryRegion, 1), *bios = g_new(MemoryRegion, 1);
+     hwaddr kernel_base, initrd_base, cmdline_base = 0;
+@@ -291,8 +291,6 @@ static void ppc_core99_init(MachineState *machine)
          }
      }
-=20
--    /* UniN init: XXX should be a real device */
--    memory_region_init_io(unin_memory, NULL, &unin_ops, token, "unin", 0=
-x1000);
--    memory_region_add_subregion(get_system_memory(), 0xf8000000, unin_me=
-mory);
-+    /* UniN init */
-+    dev =3D qdev_create(NULL, TYPE_UNI_NORTH);
-+    qdev_init_nofail(dev);
-+    s =3D SYS_BUS_DEVICE(dev);
-+    memory_region_add_subregion(get_system_memory(), 0xf8000000,
-+                                sysbus_mmio_get_region(s, 0));
-=20
-     openpic_irqs =3D g_malloc0(smp_cpus * sizeof(qemu_irq *));
-     openpic_irqs[0] =3D
-diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
-index 66ec7eda6e..dc5e65aee9 100644
---- a/hw/ppc/trace-events
-+++ b/hw/ppc/trace-events
-@@ -92,10 +92,6 @@ rs6000mc_size_read(uint32_t addr, uint32_t val) "read =
-addr=3D0x%x val=3D0x%x"
- rs6000mc_size_write(uint32_t addr, uint32_t val) "write addr=3D0x%x val=3D=
-0x%x"
- rs6000mc_parity_read(uint32_t addr, uint32_t val) "read addr=3D0x%x val=3D=
-0x%x"
-=20
--# hw/ppc/mac_newworld.c
--mac99_uninorth_write(uint64_t addr, uint64_t value) "addr=3D0x%" PRIx64 =
-" val=3D0x%"PRIx64
--mac99_uninorth_read(uint64_t addr, uint64_t value) "addr=3D0x%" PRIx64 "=
- val=3D0x%"PRIx64
+ 
+-    pic = g_new0(qemu_irq, 64);
 -
- # hw/ppc/ppc4xx_pci.c
- ppc4xx_pci_map_irq(int32_t devfn, int irq_num, int slot) "devfn 0x%x irq=
- %d -> %d"
- ppc4xx_pci_set_irq(int irq_num) "PCI irq %d"
-diff --git a/include/hw/pci-host/uninorth.h b/include/hw/pci-host/uninort=
-h.h
-index f0e6836c76..f6654bad9b 100644
---- a/include/hw/pci-host/uninorth.h
-+++ b/include/hw/pci-host/uninorth.h
-@@ -53,4 +53,15 @@ typedef struct UNINHostState {
-     MemoryRegion pci_io;
- } UNINHostState;
-=20
-+typedef struct UNINState {
-+    SysBusDevice parent_obj;
-+
-+    MemoryRegion mem;
-+    int token[1];
-+} UNINState;
-+
-+#define TYPE_UNI_NORTH "uni-north"
-+#define UNI_NORTH(obj) \
-+    OBJECT_CHECK(UNINState, (obj), TYPE_UNI_NORTH)
-+
- #endif /* UNINORTH_H */
---=20
+     pic_dev = qdev_create(NULL, TYPE_OPENPIC);
+     qdev_prop_set_uint32(pic_dev, "model", OPENPIC_MODEL_KEYLARGO);
+     qdev_init_nofail(pic_dev);
+@@ -304,10 +302,6 @@ static void ppc_core99_init(MachineState *machine)
+         }
+     }
+ 
+-    for (i = 0; i < 64; i++) {
+-        pic[i] = qdev_get_gpio_in(pic_dev, i);
+-    }
+-
+     if (PPC_INPUT(env) == PPC_FLAGS_INPUT_970) {
+         /* 970 gets a U3 bus */
+         /* Uninorth AGP bus */
+@@ -381,13 +375,20 @@ static void ppc_core99_init(MachineState *machine)
+     /* MacIO */
+     macio = NEWWORLD_MACIO(pci_create(pci_bus, -1, TYPE_NEWWORLD_MACIO));
+     dev = DEVICE(macio);
+-    qdev_connect_gpio_out(dev, 0, pic[0x19]); /* CUDA */
+-    qdev_connect_gpio_out(dev, 1, pic[0x24]); /* ESCC-B */
+-    qdev_connect_gpio_out(dev, 2, pic[0x25]); /* ESCC-A */
+-    qdev_connect_gpio_out(dev, 3, pic[0x0d]); /* IDE */
+-    qdev_connect_gpio_out(dev, 4, pic[0x02]); /* IDE DMA */
+-    qdev_connect_gpio_out(dev, 5, pic[0x0e]); /* IDE */
+-    qdev_connect_gpio_out(dev, 6, pic[0x03]); /* IDE DMA */
++    qdev_connect_gpio_out(dev, 0,
++        qdev_get_gpio_in(pic_dev, NEWWORLD_CUDA_IRQ));
++    qdev_connect_gpio_out(dev, 1,
++        qdev_get_gpio_in(pic_dev, NEWWORLD_ESCCB_IRQ));
++    qdev_connect_gpio_out(dev, 2,
++        qdev_get_gpio_in(pic_dev, NEWWORLD_ESCCA_IRQ));
++    qdev_connect_gpio_out(dev, 3,
++        qdev_get_gpio_in(pic_dev, NEWWORLD_IDE0_IRQ));
++    qdev_connect_gpio_out(dev, 4,
++        qdev_get_gpio_in(pic_dev, NEWWORLD_IDE0_DMA_IRQ));
++    qdev_connect_gpio_out(dev, 5,
++        qdev_get_gpio_in(pic_dev, NEWWORLD_IDE1_IRQ));
++    qdev_connect_gpio_out(dev, 6,
++        qdev_get_gpio_in(pic_dev, NEWWORLD_IDE1_DMA_IRQ));
+     qdev_prop_set_uint64(dev, "frequency", tbfreq);
+     object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
+                              &error_abort);
+-- 
 2.17.0
