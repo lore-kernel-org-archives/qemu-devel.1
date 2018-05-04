@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54327)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <renyime@gmail.com>) id 1fEd5r-00011v-Hn
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 11:58:01 -0400
+	(envelope-from <lvivier@redhat.com>) id 1fEd79-0001y0-6v
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 11:59:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <renyime@gmail.com>) id 1fEd5q-0000Ph-EB
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 11:57:59 -0400
+	(envelope-from <lvivier@redhat.com>) id 1fEd76-000181-5Q
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 11:59:19 -0400
+References: <20180504042044.10318-1-mdroth@linux.vnet.ibm.com>
+	<20180504113724.64b7b1c0@bahia.lan>
+	<152543629398.15508.17426624020859105239@sif>
+	<20180504155028.75f1ad45@bahia.lan>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <8f8e9939-fae0-46dd-87b6-b461d3ce89af@redhat.com>
+Date: Fri, 4 May 2018 17:59:04 +0200
 MIME-Version: 1.0
-References: <1525268093-531-1-git-send-email-ivanren@tencent.com>
-	<bc77a1b2-27f3-21a0-8d82-b930bdf033a5@redhat.com>
-	<CA+6E1=kp+xYKEc0Xz8tj8M0r4nGb8PG+vxvxm=cDTEGCEsDTPg@mail.gmail.com>
-	<325f0743-7fca-0aab-c0f2-1ab46f94864b@redhat.com>
-In-Reply-To: <325f0743-7fca-0aab-c0f2-1ab46f94864b@redhat.com>
-From: Ivan Ren <renyime@gmail.com>
-Date: Fri, 04 May 2018 15:57:45 +0000
-Message-ID: <CA+6E1==3AYrwy2zu=caUM6hWKqgfXB-qnTf9u6TX0rcCtiS4JQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qemu-img: return allocated size for block
- device with qcow2 format
+In-Reply-To: <20180504155028.75f1ad45@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc: only save guest
+ timebase once after stopping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,58 +27,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mreitz@redhat.com
-Cc: eblake@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org
+To: Greg Kurz <groug@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-stable@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>
 
-> Yeah, well, then you use qemu-img check to repair it.  The refcount
-> structure is there to know which clusters are allocated, so we should
-> use it when we want to know that and not assume it's broken.  If the
-> user thinks it may be broken, they are free to run qemu-img check to
-check.
+On 04/05/2018 15:50, Greg Kurz wrote:
+> On Fri, 04 May 2018 07:18:13 -0500
+> Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+> 
+>> Quoting Greg Kurz (2018-05-04 04:37:24)
+>>> On Thu,  3 May 2018 23:20:44 -0500
+>>> Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+>>>   
+>>>> In some cases (e.g. spapr) we record guest timebase after qmp_stop()
+>>>> via a runstate hook so we can restore it on qmp_cont(). If a migration
+>>>> occurs in between those events we end up saving it again, this time
+>>>> based on the current timebase the guest would be seeing had it been
+>>>> running. This has the effect of advancing the guest timebase while
+>>>> it is stopped, which is not what the code intends.
+>>>>   
+>>>
+>>> Hi Mike,
+>>>
+>>> The current behavior was introduced by:
+>>>
+>>> commit 42043e4f1241eeb77f87f5816b5cf0b6e9583ed7
+>>> Author: Laurent Vivier <lvivier@redhat.com>
+>>> Date:   Fri Jan 27 13:24:58 2017 +0100
+>>>
+>>>     spapr: clock should count only if vm is running
+>>>
+>>> and we have this in the changelog:
+>>>
+>>>     We keep timebase_pre_save to reduce the clock difference on
+>>>     migration like in:
+>>>         6053a86 kvmclock: reduce kvmclock difference on migration
+>>>
+>>>
+>>> So your patch totally negates ^^ ? Also, I can't see a case where  
+>>
+>> Yah... this is a bit confusing. On one hand, the patch/summary is clearly
+>> trying to avoid the guest time from advancing while it is stopped, which
+>> is in the spirit of this patch. But at the same time it is trying to
+>> compensate for loss of time (relative to host) due to downtime window.
+>>
+> 
+> Yeah... not sure why Laurent decided to address both in the same patch...
+> maybe just because we already had the pre_save hook ?
 
-Yea, it is right. It makes things easy.
+Well, it seemed to be a good idea to do like it is done for x86 [1]
 
+But I think you should remove the timebase_pre_save() function (and the
+comment) instead of adding a new flag.
 
-> Oh, I've just seen that your patch doesn't even get the allocated size,
-> it actually determines the highest allocated offset.  Well, those are
-> two different things.  You should not return this value via
-> qcow2_get_allocated_file_size().  I'm not sure where it should go
-> (probably wr_highest_offset?) and how it should be presented in
-> qemu-img, though.
->
-> Also note that bdrv_get_allocated_file_size() is called by QMP's
-> query-named-block-nodes and query-block, both of which are online
-> synchronous functions.  It should not take a long time, specifically it
-> should not scan the whole qcow2 file.
+Thanks,
+Laurent
 
-Yes, My original idea was to get the highest allocated offset on the block
-device and regard it as currently max allocated size(ignore the hole lower
-than it).
-Through the discuss, I think it is better to count how many clusters with
-non-0 refcount as the real allocated size.
-I'll try to get a new version patch to implement this.
-
-On Fri, May 4, 2018 at 10:35 PM Max Reitz <mreitz@redhat.com> wrote:
-
-> On 2018-05-03 15:06, =E5=8F=B6=E6=AE=8B=E9=A3=8E wrote:
-> >
-> > Thanks for your review, Eric.
-> > Yes, the wr_highest_offset can tell the end offset at runtime, and
-> > write_threshold similar to it. But in my situation, I need to know
-> > the allocated end without a vm running.
->
-> Oh, I've just seen that your patch doesn't even get the allocated size,
-> it actually determines the highest allocated offset.  Well, those are
-> two different things.  You should not return this value via
-> qcow2_get_allocated_file_size().  I'm not sure where it should go
-> (probably wr_highest_offset?) and how it should be presented in
-> qemu-img, though.
->
-> Also note that bdrv_get_allocated_file_size() is called by QMP's
-> query-named-block-nodes and query-block, both of which are online
-> synchronous functions.  It should not take a long time, specifically it
-> should not scan the whole qcow2 file.
->
-> Max
->
->
+[1] the idea was proposed by Paolo:
+https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg05862.html
