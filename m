@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fEd8E-0003Ne-B8
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:00:32 -0400
+	(envelope-from <berrange@redhat.com>) id 1fEd8M-0003Tp-0X
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:00:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fEd8D-0001sE-Kw
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:00:26 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:46618)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fEd8D-0001s4-H6
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:00:25 -0400
-Received: by mail-qk0-x241.google.com with SMTP id s70so16972874qks.13
-	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 09:00:25 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri,  4 May 2018 12:59:18 -0300
-Message-Id: <20180504155918.21287-21-f4bug@amsat.org>
-In-Reply-To: <20180504155918.21287-1-f4bug@amsat.org>
-References: <20180504155918.21287-1-f4bug@amsat.org>
+	(envelope-from <berrange@redhat.com>) id 1fEd8K-0001x8-Lk
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:00:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58024 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fEd8K-0001wY-FL
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:00:32 -0400
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Fri,  4 May 2018 17:00:23 +0100
+Message-Id: <20180504160026.14017-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 20/20] sdcard: Add
- test_sd_verify_cksum_frame48() qtest
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/3] Document intent for supported build
+ platforms and bump min glib to 2.42
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,61 +25,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alistair Francis <alistair@alistair23.me>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Olaf Hering <olaf@aepfle.de>, Stefan Hajnoczi <stefanha@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- tests/sdcard-test.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+This short series is a followup the discussions around min glib version
+when Olaf found we had accidentally increased the min glib by using a
+newer function:
 
-diff --git a/tests/sdcard-test.c b/tests/sdcard-test.c
-index c51e8095b6..fa45188e48 100644
---- a/tests/sdcard-test.c
-+++ b/tests/sdcard-test.c
-@@ -47,6 +47,8 @@ static void test_sd_request_frame_crc7(void)
-     /* CMD2 ALL_SEND_CID */
-     sd_prepare_request48(&frame, 2, 0);
-     g_assert_cmphex(frame.crc, ==, 0x4d >> 1);
-+
-+    g_assert_true(sd_verify_frame48_checksum(&frame, false));
- }
- 
- static void test_sd_response_frame48_crc7(void)
-@@ -64,6 +66,8 @@ static void test_sd_response_frame48_crc7(void)
-     /* response to CMD3 SEND_RELATIVE_ADDR (Relative Card Address is 0xb368) */
-     sd_prepare_response48(&frame, 3, 0xb3680500);
-     g_assert_cmphex(frame.crc, ==, 0x0c);
-+
-+    g_assert_true(sd_verify_frame48_checksum(&frame, true));
- }
- 
- static void test_sd_response_frame136_crc7(void)
-@@ -87,6 +91,17 @@ static void test_sd_data_frame_crc16(void)
-     g_assert_cmphex(frame.crc, ==, 0x7fa1);
- }
- 
-+static void test_sd_verify_cksum_frame48(void)
-+{
-+    SDFrame48 frame;
-+
-+    sd_prepare_request48(&frame, 42, 0x12345678);
-+    g_assert_true(sd_verify_frame48_checksum(&frame, false));
-+
-+    sd_prepare_response48(&frame, 69, 0x98765432);
-+    g_assert_true(sd_verify_frame48_checksum(&frame, true));
-+}
-+
- int main(int argc, char *argv[])
- {
-     g_test_init(&argc, &argv, NULL);
-@@ -95,6 +110,7 @@ int main(int argc, char *argv[])
-     qtest_add_func("sd/resp48_crc7", test_sd_response_frame48_crc7);
-     qtest_add_func("sd/resp136_crc7", test_sd_response_frame136_crc7);
-     qtest_add_func("sd/data_crc16", test_sd_data_frame_crc16);
-+    qtest_add_func("sd/verify_cksum_frame48", test_sd_verify_cksum_frame48);
- 
-     return g_test_run();
- }
--- 
-2.17.0
+  https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg02699.html
+
+Some key points from that thread
+
+  - Although we have a docker job that tries to test the min glib
+    version is adhered to, that's only run post-build, not by Peter's
+    merge tests, nor by patchew.
+
+  - The docker min glib test failed to detect the problem anyway
+    because RHEL had backported the symbol in question.
+
+  - The docker min glib test only builds with certain configure
+    options so isn't foolproof.
+
+  - The modern distros we implicitly care about have way newer glib
+    than 2.22
+
+  - Peter's OS-X build host previously had 2.22, but after switching
+    from fink to homebrew now has 2.56
+
+  - I suggested following libvirt's lead in writing a policy for how
+    we pick supported OS targets to inform maintainers when min versions
+    can be increased.
+
+This series writes such a document largely based on one I wrote for
+libvirt with a few changes, largely around OS-X and *BSD. Note it
+is not meant to be an exhaustive list of distros we'll build on, rather
+a representative selection, so that we can identify the range of 3rd
+party library versions we need to care about. So if your favourite
+distro is missing, dont be alarmed, as it probably ships similar
+vintage software to one of those listed - if not feel free to suggest
+additions.
+
+Based on that doc and https://repology.org/metapackage/glib/versions,
+I identified that we could feasibly set min glib to 2.42. Note that
+this would be dropping RHEL-6 as a build host (RHEL-6.0 came out in
+2010 so that's reasonable to drop IMHO). It would still cover 2 major
+Debian versions and 2 most recent Ubuntu LTS (16.04, 18.04, but *not*
+14.04). This min glib lets us remove almost all our compat code.
+
+Most interestingly, thanks tothe new min version being greater than
+2.32, we can now use GLIB_VERSION_MAX_ALLOWED to validate the correct
+API usage according to our min version:
+
+  https://developer.gnome.org/glib/stable/glib-Version-Information.html#G=
+LIB-VERSION-MAX-ALLOWED:CAPS
+
+This means that *all* our CI jobs & developer builds will be enforcing
+the min version, so means very many more conditionally built features
+will get their build validated against min glib version. This would
+do a much better job of catching mistakes than our min-glib docker
+job, making that obsolete.
+
+Daniel P. Berrang=C3=A9 (3):
+  qemu-doc: provide details of supported build platforms
+  glib: bump min required glib library version to 2.42
+  glib: enforce the minimum required version and warn about old APIs
+
+ configure               |   6 +-
+ include/glib-compat.h   | 362 ++++++------------------------------------=
+------
+ qemu-doc.texi           |  68 +++++++++
+ tests/test-qmp-event.c  |   2 +-
+ tests/tpm-emu.h         |   4 +-
+ tests/vhost-user-test.c |   4 +-
+ trace/simple.c          |   6 +-
+ 7 files changed, 123 insertions(+), 329 deletions(-)
+
+--=20
+2.14.3
