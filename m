@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fEdby-0004IY-G5
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:31:11 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fEe8Z-0007TR-CT
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 13:04:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fEdbv-0007sh-AX
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:31:10 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43034)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fEdbv-0007rf-3u
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:31:07 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fEdbr-0007mc-Pm
-	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 16:31:03 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9D5152E82AB
-	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 16:30:52 +0000 (UTC)
+	(envelope-from <dgilbert@redhat.com>) id 1fEe8V-0005mP-Ak
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 13:04:51 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60390 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fEe8V-0005m4-3a
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 13:04:47 -0400
+Date: Fri, 4 May 2018 18:04:43 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180504170442.GA2612@work-vm>
+References: <1525445354-16233-1-git-send-email-walling@linux.ibm.com>
+	<7e9e9dfd-795b-47f2-453a-59bf65f28229@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 04 May 2018 16:14:55 -0000
-From: Dan Streetman <dan.streetman@canonical.com>
-Reply-To: Bug 1769053 <1769053@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152541524728.557.4600864098110042577.malonedeb@gac.canonical.com>
-Message-Id: <152545049600.16365.5404441524188179392.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1769053] Re: Cannot start a guest with more than
- 1TB of RAM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7e9e9dfd-795b-47f2-453a-59bf65f28229@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] monitor: report entirety of hmp command on
+ error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,82 +28,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org
 
-You don't need a >1TB host to spin up a >1TB guest.  Unless you're using
-pci passthru (and/or SRIOV), or something else that requires qemu to
-alloc and pin all guest mem, you can simply overcommit; normal guests
-don't require mem pre-allocation or pinning.
-
-On your host do this to allow overcommitting such a large amount (this
-allows 16T but can be adjusted as needed):
-
-$ echo $[ 16 * 1024 * 1024 * 1024 ] | sudo tee /proc/sys/vm/overcommit_kbyt=
-es =
-
-17179869184
-$ echo 1 | sudo tee /proc/sys/vm/overcommit_memory =
-
-1
-
-
-Then just virsh edit your guest to use >1TB, e.g.:
-
-  <memory unit=3D'GiB'>1500</memory>
+* Eric Blake (eblake@redhat.com) wrote:
+> On 05/04/2018 09:49 AM, Collin Walling wrote:
+> > When a user incorrectly provides an hmp command, an error response will be
+> > printed that prompts the user to try "help <command name>". However, when
+> > the command contains multiple parts e.g. "info skeys", only the last
+> > whitespace delimited string will be reported (in this example "info" will
+> > be dropped and the message will read "Try "help skeys" for more information",
+> > which is incorrect).
+> 
+> What's the exact formula for reproducing this?  I tried:
+> 
+> $ ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic --monitor stdio
+> QEMU 2.12.50 monitor - type 'help' for more information
+> (qemu) info skeys
+> unknown command: 'info skeys'
 
 
-And of course, stop and restart the guest to pick up the xml change.
+Ah, so I fixed the 'info skeys' case in 250b8197640
+and that ended up using cmdp_start
 
--- =
+> Oh, I see now:
+> 
+> (qemu) info uuid blah
+> uuid: extraneous characters at the end of line
+> Try "help uuid" for more information
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1769053
+Yep that's fair that needs fixing.
 
-Title:
-  Cannot start a guest with more than 1TB of RAM
+Dave
 
-Status in QEMU:
-  Incomplete
-Status in qemu package in Ubuntu:
-  Incomplete
+> (qemu) help uuid
+> (qemu)
 
-Bug description:
-  Attempting to start a KVM guest with more than 1TB of RAM fails.
-
-  It looks like we might need some extra patches:
-  https://lists.gnu.org/archive/html/qemu-discuss/2017-12/msg00005.html
-
-  ProblemType: Bug
-  DistroRelease: Ubuntu 18.04
-  Package: qemu-system-x86 1:2.11+dfsg-1ubuntu7
-  ProcVersionSignature: Ubuntu 4.15.0-20.21-generic 4.15.17
-  Uname: Linux 4.15.0-20-generic x86_64
-  ApportVersion: 2.20.9-0ubuntu7
-  Architecture: amd64
-  CurrentDesktop: Unity:Unity7:ubuntu
-  Date: Fri May  4 16:21:14 2018
-  InstallationDate: Installed on 2017-04-05 (393 days ago)
-  InstallationMedia: Ubuntu 16.10 "Yakkety Yak" - Release amd64 (20161012.2)
-  MachineType: Dell Inc. XPS 13 9360
-  ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.15.0-20-generic root=3D/dev/ma=
-pper/ubuntu--vg-root ro quiet splash transparent_hugepage=3Dmadvise vt.hand=
-off=3D1
-  SourcePackage: qemu
-  UpgradeStatus: Upgraded to bionic on 2018-04-30 (3 days ago)
-  dmi.bios.date: 02/26/2018
-  dmi.bios.vendor: Dell Inc.
-  dmi.bios.version: 2.6.2
-  dmi.board.name: 0PF86Y
-  dmi.board.vendor: Dell Inc.
-  dmi.board.version: A00
-  dmi.chassis.type: 9
-  dmi.chassis.vendor: Dell Inc.
-  dmi.modalias: dmi:bvnDellInc.:bvr2.6.2:bd02/26/2018:svnDellInc.:pnXPS1393=
-60:pvr:rvnDellInc.:rn0PF86Y:rvrA00:cvnDellInc.:ct9:cvr:
-  dmi.product.family: XPS
-  dmi.product.name: XPS 13 9360
-  dmi.sys.vendor: Dell Inc.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1769053/+subscriptions
+> You'll want to update your commit message to document something that is
+> reproducible (you may be adding an 'info skeys', but until that is in, it
+> doesn't make a good example).
+> 
+> > 
+> > Let's correct this by capturing the full name of the command as we recurse
+> > through the function monitor_parse_command.
+> > 
+> > Reported-by: Mikhail Fokin <fokin@de.ibm.com>
+> > Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> > ---
+> >   monitor.c | 15 +++++++++++----
+> >   1 file changed, 11 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/monitor.c b/monitor.c
+> > index 39f8ee1..d4844b4 100644
+> > --- a/monitor.c
+> > +++ b/monitor.c
+> > @@ -2964,7 +2964,8 @@ static const mon_cmd_t *search_dispatch_table(const mon_cmd_t *disp_table,
+> >   static const mon_cmd_t *monitor_parse_command(Monitor *mon,
+> >                                                 const char *cmdp_start,
+> >                                                 const char **cmdp,
+> > -                                              mon_cmd_t *table)
+> > +                                              mon_cmd_t *table,
+> > +                                              char *fullname)
+> 
+> Umm, how is fullname any better than cmdp_start that we already have?
+> 
+> >   {
+> >       const char *p;
+> >       const mon_cmd_t *cmd;
+> > @@ -2987,10 +2988,14 @@ static const mon_cmd_t *monitor_parse_command(Monitor *mon,
+> >           p++;
+> >       }
+> > +    strncat(fullname, cmdname, strlen(cmdname));
+> 
+> gcc 8 is pickier about using strncat() [perhaps too picky - see
+> https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85602], but it is generally NOT
+> the function you want to be using.
+> 
+> > +
+> >       *cmdp = p;
+> >       /* search sub command */
+> >       if (cmd->sub_table != NULL && *p != '\0') {
+> > -        return monitor_parse_command(mon, cmdp_start, cmdp, cmd->sub_table);
+> > +        strncat(fullname, " ", 1);
+> > +        return monitor_parse_command(mon, cmdp_start, cmdp, cmd->sub_table,
+> > +                                     fullname);
+> 
+> See, you're reconstructing a command into fullname, which already matches
+> the original command in cmdp_start, so I see no reason to change the
+> signature.
+> 
+> >       }
+> >       return cmd;
+> > @@ -3371,10 +3376,12 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline)
+> >   {
+> >       QDict *qdict;
+> >       const mon_cmd_t *cmd;
+> > +    char fullname[256];
+> 
+> EWWW. Don't do that.  You are just ASKING for a buffer overflow exploit that
+> prints the wrong thing or causes a security hole, when I intentionally type
+> a super-long garbage command into HMP.
+> 
+> >       trace_handle_hmp_command(mon, cmdline);
+> > -    cmd = monitor_parse_command(mon, cmdline, &cmdline, mon->cmd_table);
+> > +    cmd = monitor_parse_command(mon, cmdline, &cmdline, mon->cmd_table,
+> > +                                fullname);
+> 
+> Note that even without your patch, this call updates 'cmdline' to point to
+> the position within the original string (although that position has already
+> skipped spaces).
+> 
+> >       if (!cmd) {
+> >           return;
+> >       }
+> > @@ -3382,7 +3389,7 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline)
+> >       qdict = monitor_parse_arguments(mon, &cmdline, cmd);
+> >       if (!qdict) {
+> >           monitor_printf(mon, "Try \"help %s\" for more information\n",
+> > -                       cmd->name);
+> > +                       fullname);
+> 
+> So rather than trying to reconstruct a string, you could reuse what you
+> already have.  This is a shorter patch that I think accomplishes the same
+> goal:
+> 
+> diff --git i/monitor.c w/monitor.c
+> index 39f8ee17ba7..38736b3a20d 100644
+> --- i/monitor.c
+> +++ w/monitor.c
+> @@ -3371,6 +3371,7 @@ static void handle_hmp_command(Monitor *mon, const
+> char *cmdline)
+>  {
+>      QDict *qdict;
+>      const mon_cmd_t *cmd;
+> +    const char *cmd_start = cmdline;
+> 
+>      trace_handle_hmp_command(mon, cmdline);
+> 
+> @@ -3381,8 +3382,11 @@ static void handle_hmp_command(Monitor *mon, const
+> char *cmdline)
+> 
+>      qdict = monitor_parse_arguments(mon, &cmdline, cmd);
+>      if (!qdict) {
+> -        monitor_printf(mon, "Try \"help %s\" for more information\n",
+> -                       cmd->name);
+> +        while (cmdline > cmd_start && qemu_isspace(cmdline[-1])) {
+> +            cmdline--;
+> +        }
+> +        monitor_printf(mon, "Try \"help %.*s\" for more information\n",
+> +                       (int)(cmdline - cmd_start), cmd_start);
+>          return;
+>      }
+> 
+> 
+> 
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
