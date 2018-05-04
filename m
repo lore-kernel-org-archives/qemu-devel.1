@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fEViK-00058C-D7
+	(envelope-from <armbru@redhat.com>) id 1fEViK-00058U-J0
 	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:05:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fEViC-0001WF-BM
+	(envelope-from <armbru@redhat.com>) id 1fEViC-0001XA-IG
 	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:05:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49854 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38884 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fEViC-0001Ur-1T
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fEViC-0001Us-34
 	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:05:04 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 249018182D1E
-	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 08:04:59 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-129.ams2.redhat.com
-	[10.36.116.129])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 01A5B83B88
-	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 08:04:56 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 612824270963
+	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 08:05:00 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  4 May 2018 10:04:45 +0200
-Message-Id: <20180504080454.11014-2-armbru@redhat.com>
+Date: Fri,  4 May 2018 10:04:54 +0200
+Message-Id: <20180504080454.11014-11-armbru@redhat.com>
 In-Reply-To: <20180504080454.11014-1-armbru@redhat.com>
 References: <20180504080454.11014-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 01/10] qobject: Use qobject_to() instead of type
- cast
+Subject: [Qemu-devel] [PULL 10/10] qapi: deprecate CpuInfoFast.arch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,41 +30,71 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Laszlo Ersek <lersek@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>
 
-The proper way to convert from (abstract) QObject to a (concrete)
-subtype is qobject_to().  Look for offenders that type cast instead:
+From: Laszlo Ersek <lersek@redhat.com>
 
-    $ git-grep '(Q[A-Z][a-z]* \*)'
-    hmp.c:    qmp_device_add((QDict *)qdict, NULL, &err);
-    include/qapi/qmp/qobject.h:        return (QObject *)obj;
-    qobject/qobject.c:static void (*qdestroy[QTYPE__MAX])(QObject *) =3D =
-{
-    tests/check-qdict.c:    dst =3D (QDict *)qdict_crumple(src, &error_ab=
-ort);
+The TARGET_BASE_ARCH values from "configure" don't all map to the
+@CpuInfoArch enum constants; in particular "s390x" from the former does
+not match @s390 in the latter. Clients are known to rely on the @s390
+constant specifically, so we can't change it silently. Instead, deprecate
+the @CpuInfoFast.@arch member (in favor of @CpuInfoFast.@target) using the
+regular deprecation process.
 
-The first two cast away const, the third isn't a type cast.  Fix the
-fourth.
+(No deprecation reminder is added to sysemu_target_to_cpuinfo_arch(): once
+@CpuInfoFast.@arch is removed, the assignment expression that calls
+sysemu_target_to_cpuinfo_arch() from qmp_query_cpus_fast() will have to
+disappear; in turn the static function left without callers will also
+break the build, thus it'll have to go.)
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20180426152805.8469-1-armbru@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+Message-Id: <20180427192852.15013-6-lersek@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/check-qdict.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ qapi/misc.json | 8 ++++----
+ qemu-doc.texi  | 5 +++++
+ 2 files changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/tests/check-qdict.c b/tests/check-qdict.c
-index 2e73c2f86e..08d4303e6a 100644
---- a/tests/check-qdict.c
-+++ b/tests/check-qdict.c
-@@ -657,7 +657,7 @@ static void qdict_crumple_test_empty(void)
-=20
-     src =3D qdict_new();
-=20
--    dst =3D (QDict *)qdict_crumple(src, &error_abort);
-+    dst =3D qobject_to(QDict, qdict_crumple(src, &error_abort));
-=20
-     g_assert_cmpint(qdict_size(dst), =3D=3D, 0);
-=20
---=20
+diff --git a/qapi/misc.json b/qapi/misc.json
+index fa4eec7b6b..f5988cc0b5 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -558,11 +558,11 @@
+ # @props: properties describing to which node/socket/core/thread
+ #         virtual CPU belongs to, provided if supported by board
+ #
+-# @arch: base architecture of the cpu
++# @arch: base architecture of the cpu; deprecated since 2.13.0 in favor
++#        of @target
+ #
+-# @target: the QEMU system emulation target, which is more specific than
+-#          @arch and determines which additional fields will be listed
+-#          (since 2.13)
++# @target: the QEMU system emulation target, which determines which
++#          additional fields will be listed (since 2.13)
+ #
+ # Since: 2.12
+ #
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 5813d27615..0ed0f19e6b 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -2949,6 +2949,11 @@ from qcow2 images.
+ 
+ The ``query-cpus'' command is replaced by the ``query-cpus-fast'' command.
+ 
++@subsection query-cpus-fast "arch" output member (since 2.13.0)
++
++The ``arch'' output member of the ``query-cpus-fast'' command is
++replaced by the ``target'' output member.
++
+ @section System emulator devices
+ 
+ @subsection ivshmem (since 2.6.0)
+-- 
 2.13.6
