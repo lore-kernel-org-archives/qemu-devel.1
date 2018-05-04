@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fESzf-0000N7-Hv
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:10:56 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fET8N-0003BZ-9y
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:19:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fESzb-00053t-C8
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:10:55 -0400
-Date: Fri, 4 May 2018 15:01:43 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fET8J-0004Od-7j
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:19:55 -0400
+Date: Fri, 4 May 2018 15:19:40 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180504050143.GV13229@umbus.fritz.box>
-References: <20180503062145.17899-1-david@gibson.dropbear.id.au>
-	<20180503062145.17899-3-david@gibson.dropbear.id.au>
-	<20180503171331.037e5917@bahia.lan>
+Message-ID: <20180504051940.GW13229@umbus.fritz.box>
+References: <20180419124331.3915-1-clg@kaod.org>
+	<20180419124331.3915-8-clg@kaod.org>
+	<20180426072501.GK8800@umbus.fritz.box>
+	<312cdfe7-bc6b-3eed-588e-a71ce1385988@kaod.org>
+	<20180503054534.GU13229@umbus.fritz.box>
+	<cf8ab4bd-8704-aa3f-a4c2-5f459c7dddd4@kaod.org>
+	<20180503062559.GW13229@umbus.fritz.box>
+	<20cd899d-47be-f9a3-736b-bf3bcd10cfad@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="V8Y3+xXnhQGsvjWT"
+	protocol="application/pgp-signature"; boundary="SuGb6p5JEpzYJdwO"
 Content-Disposition: inline
-In-Reply-To: <20180503171331.037e5917@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 2/8] spapr: Clean up rtas_start_cpu() &
- rtas_stop_self()
+In-Reply-To: <20cd899d-47be-f9a3-736b-bf3bcd10cfad@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v3 07/35] spapr/xive: introduce the XIVE
+ Event Queues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,182 +31,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: clg@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---V8Y3+xXnhQGsvjWT
-Content-Type: text/plain; charset=us-ascii
+--SuGb6p5JEpzYJdwO
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 03, 2018 at 05:13:31PM +0200, Greg Kurz wrote:
-> On Thu,  3 May 2018 16:21:39 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
+On Thu, May 03, 2018 at 04:37:29PM +0200, C=E9dric Le Goater wrote:
+> On 05/03/2018 08:25 AM, David Gibson wrote:
+> > On Thu, May 03, 2018 at 08:07:54AM +0200, C=E9dric Le Goater wrote:
+> >> On 05/03/2018 07:45 AM, David Gibson wrote:
+> >>> On Thu, Apr 26, 2018 at 11:48:06AM +0200, C=E9dric Le Goater wrote:
+> >>>> On 04/26/2018 09:25 AM, David Gibson wrote:
+> >>>>> On Thu, Apr 19, 2018 at 02:43:03PM +0200, C=E9dric Le Goater wrote:
+> >>>>>> The Event Queue Descriptor (EQD) table is an internal table of the
+> >>>>>> XIVE routing sub-engine. It specifies on which Event Queue the eve=
+nt
+> >>>>>> data should be posted when an exception occurs (later on pulled by=
+ the
+> >>>>>> OS) and which Virtual Processor to notify.
+> >>>>>
+> >>>>> Uhhh.. I thought the IVT said which queue and vp to notify, and the
+> >>>>> EQD gave metadata for event queues.
+> >>>>
+> >>>> yes. the above poorly written. The Event Queue Descriptor contains t=
+he
+> >>>> guest address of the event queue in which the data is written. I wil=
+l=20
+> >>>> rephrase.     =20
+> >>>>
+> >>>> The IVT contains IVEs which indeed define for an IRQ which EQ to not=
+ify=20
+> >>>> and what data to push on the queue.=20
+> >>>> =20
+> >>>>>> The Event Queue is a much
+> >>>>>> more complex structure but we start with a simple model for the sP=
+APR
+> >>>>>> machine.
+> >>>>>>
+> >>>>>> There is one XiveEQ per priority and these are stored under the XI=
+VE
+> >>>>>> virtualization presenter (sPAPRXiveNVT). EQs are simply indexed wi=
+th :
+> >>>>>>
+> >>>>>>        (server << 3) | (priority & 0x7)
+> >>>>>>
+> >>>>>> This is not in the XIVE architecture but as the EQ index is never
+> >>>>>> exposed to the guest, in the hcalls nor in the device tree, we are
+> >>>>>> free to use what fits best the current model.
+> >>>>
+> >>>> This EQ indexing is important to notice because it will also show up=
+=20
+> >>>> in KVM to build the IVE from the KVM irq state.
+> >>>
+> >>> Ok, are you saying that while this combined EQ index will never appear
+> >>> in guest <-> host interfaces,=20
+> >>
+> >> Indeed.
+> >>
+> >>> it might show up in qemu <-> KVM interfaces?
+> >>
+> >> Not directly but it is part of the IVE as the IVE_EQ_INDEX field. When
+> >> dumped, it has to be built in some ways, compatible with the emulated=
+=20
+> >> mode in QEMU.=20
+> >=20
+> > Hrm.  But is the exact IVE contents visible to qemu (for a PAPR
+> > guest)? =20
 >=20
-> > This makes several minor cleanups to these functions:
-> >   * Follow usual convention of an early exit on error, rather than havi=
-ng
-> >     most of the body in an if
-> >   * Clearer naming of cpu and cpu_.  Now callcpu is the cpu from which =
+> The guest only uses hcalls which arguments are :
+> =20
+> 	- cpu numbers,
+> 	- priority numbers from defined ranges,=20
+> 	- logical interrupt numbers. =20
+> 	- physical address of the EQ=20
+>=20
+> The visible parts for the guest of the IVE are the 'priority', the 'cpu',=
+=20
+> and the 'eisn', which is the effective IRQ number the guest is assigning=
+=20
+> to the source. The 'eisn" will be pushed in the EQ.
+
+Ok.
+
+> The IVE EQ index is not visible.
+
+Good.
+
+> > I would have thought the qemu <-> KVM interfaces would have
+> > abstracted this the same way the guest <-> KVM interfaces do.  > Or is =
+there a reason not to?
+>=20
+> It is practical to dump 64bit IVEs directly from KVM into the QEMU=20
+> internal structures because it fits the emulated mode without doing=20
+> any translation ... This might be seen as a shortcut. You will tell=20
+> me when you reach the KVM part.  =20
+
+Ugh.. exposing to qemu the raw IVEs sounds like a bad idea to me.
+When we migrate, we're going to have to assign the guest (server,
+priority) tuples to host EQ indicies, and I think it makes more sense
+to do that in KVM and hide the raw indices from qemu than to have qemu
+mangle them explicitly on migration.
+
+> >>>>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> >>>>>
+> >>>>> Is the EQD actually modifiable by a guest?  Or are the settings of =
 the
-> >     RTAS call is invoked, newcpu is the cpu which we're starting
-> >   * Use cpu_synchronize_state() instead of kvm_cpu_synchronize_state()
-> >     directly
-> >   * Remove pointless comment describing what cpu_synchronize_state() do=
-es
-> >   * Use ppc_store_lpcr() instead of directly writing the register field
+> >>>>> EQs fixed by PAPR?
+> >>>>
+> >>>> The guest uses the H_INT_SET_QUEUE_CONFIG hcall to define the address
+> >>>> of the event queue for a couple prio/server.
+> >>>
+> >>> Ok, so the EQD can be modified by the guest.  In which case we need to
+> >>> work out what object owns it, since it'll need to migrate it.
+> >>
+> >> Indeed. The EQD are CPU related as there is one EQD per couple (cpu,=
+=20
+> >> priority). The KVM patchset dumps/restores the eight XiveEQ struct=20
+> >> using per cpu ioctls. The EQ in the OS RAM is marked dirty at that
+> >> stage.
 > >=20
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
-> >  hw/ppc/spapr_rtas.c | 66 ++++++++++++++++++++++-----------------------
-> >  1 file changed, 32 insertions(+), 34 deletions(-)
-> >=20
-> > diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-> > index 0ec5fa4cfe..b251c130cb 100644
-> > --- a/hw/ppc/spapr_rtas.c
-> > +++ b/hw/ppc/spapr_rtas.c
-> > @@ -32,7 +32,7 @@
-> >  #include "hw/qdev.h"
-> >  #include "sysemu/device_tree.h"
-> >  #include "sysemu/cpus.h"
-> > -#include "sysemu/kvm.h"
-> > +#include "sysemu/hw_accel.h"
-> > =20
-> >  #include "hw/ppc/spapr.h"
-> >  #include "hw/ppc/spapr_vio.h"
-> > @@ -45,6 +45,7 @@
-> >  #include "qemu/cutils.h"
-> >  #include "trace.h"
-> >  #include "hw/ppc/fdt.h"
-> > +#include "target/ppc/mmu-hash64.h"
-> > =20
-> >  static void rtas_display_character(PowerPCCPU *cpu, sPAPRMachineState =
-*spapr,
-> >                                     uint32_t token, uint32_t nargs,
-> > @@ -140,13 +141,15 @@ static void spapr_cpu_set_endianness(PowerPCCPU *=
-cpu)
-> >      }
-> >  }
-> > =20
-> > -static void rtas_start_cpu(PowerPCCPU *cpu_, sPAPRMachineState *spapr,
-> > +static void rtas_start_cpu(PowerPCCPU *callcpu, sPAPRMachineState *spa=
-pr,
-> >                             uint32_t token, uint32_t nargs,
-> >                             target_ulong args,
-> >                             uint32_t nret, target_ulong rets)
-> >  {
-> >      target_ulong id, start, r3;
-> > -    PowerPCCPU *cpu;
-> > +    PowerPCCPU *newcpu;
-> > +    CPUPPCState *env;
-> > +    PowerPCCPUClass *pcc;
-> > =20
-> >      if (nargs !=3D 3 || nret !=3D 1) {
-> >          rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-> > @@ -157,41 +160,37 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPAP=
-RMachineState *spapr,
-> >      start =3D rtas_ld(args, 1);
-> >      r3 =3D rtas_ld(args, 2);
-> > =20
-> > -    cpu =3D spapr_find_cpu(id);
-> > -    if (cpu !=3D NULL) {
-> > -        CPUState *cs =3D CPU(cpu);
+> > To make sure I'm clear: for PAPR there's a strict relationship between
+> > EQD and CPU (one EQD for each (cpu, priority) tuple). =20
 >=20
-> The function ends up with four invocations of CPU(newcpu), ie, we'll
-> go down the full type checking path four times. Not very painful since
-> rtas_start_cpu() is not a hot path, but it would certainly not hurt
-> to do it only once like the current code does.
+> Yes.
 >=20
-> Anyway, with or without this change:
+> > But for powernv that's not the case, right? =20
+>=20
+> It is.
 
-Ah, yeah, I was thinking of CPU() as a trivial offset, and forgot it
-also did type checking.
+Uh.. I don't think either of us phrased that well, I'm still not sure
+which way you're answering that.
 
-Eh, as you say it's not a hot path and I don't really want to
-introduce a fourth cpu parameter/variable so let's leave it as is.
+> > AIUI the mapping of EQs to cpus was configurable, is that right?
+>=20
+> Each cpu has 8 EQD. Same for virtual cpus.
+
+Hmm.. but is that 8 EQD per cpu something built into the hardware, or
+just a convention of how the host kernel and OPAL operate?
 
 >=20
-> Reviewed-by: Greg Kurz <groug@kaod.org>
+> I am not sure what you understood before ? It is surely something
+> I wrote, my XIVE understanding is still making progress.
 >=20
-> > -        CPUPPCState *env =3D &cpu->env;
-> > -        PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
-> > +    newcpu =3D spapr_find_cpu(id);
-> > +    if (!newcpu) {
-> > +        /* Didn't find a matching cpu */
-> > +        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-> > +        return;
-> > +    }
-> > =20
-> > -        if (!cs->halted) {
-> > -            rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
-> > -            return;
-> > -        }
-> > +    env =3D &newcpu->env;
-> > +    pcc =3D POWERPC_CPU_GET_CLASS(newcpu);
-> > =20
-> > -        /* This will make sure qemu state is up to date with kvm, and
-> > -         * mark it dirty so our changes get flushed back before the
-> > -         * new cpu enters */
-> > -        kvm_cpu_synchronize_state(cs);
-> > +    if (!CPU(newcpu)->halted) {
-> > +        rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
-> > +        return;
-> > +    }
-> > =20
-> > -        env->msr =3D (1ULL << MSR_SF) | (1ULL << MSR_ME);
-> > +    cpu_synchronize_state(CPU(newcpu));
-> > =20
-> > -        /* Enable Power-saving mode Exit Cause exceptions for the new =
-CPU */
-> > -        env->spr[SPR_LPCR] |=3D pcc->lpcr_pm;
-> > +    env->msr =3D (1ULL << MSR_SF) | (1ULL << MSR_ME);
-> > +    spapr_cpu_set_endianness(newcpu);
-> > +    spapr_cpu_update_tb_offset(newcpu);
-> > +    /* Enable Power-saving mode Exit Cause exceptions for the new CPU =
-*/
-> > +    ppc_store_lpcr(newcpu, env->spr[SPR_LPCR] | pcc->lpcr_pm);
-> > =20
-> > -        env->nip =3D start;
-> > -        env->gpr[3] =3D r3;
-> > -        cs->halted =3D 0;
-> > -        spapr_cpu_set_endianness(cpu);
-> > -        spapr_cpu_update_tb_offset(cpu);
-> > +    env->nip =3D start;
-> > +    env->gpr[3] =3D r3;
-> > =20
-> > -        qemu_cpu_kick(cs);
-> > +    CPU(newcpu)->halted =3D 0;
-> > =20
-> > -        rtas_st(rets, 0, RTAS_OUT_SUCCESS);
-> > -        return;
-> > -    }
-> > +    qemu_cpu_kick(CPU(newcpu));
-> > =20
-> > -    /* Didn't find a matching cpu */
-> > -    rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-> > +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
-> >  }
-> > =20
-> >  static void rtas_stop_self(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-> > @@ -203,13 +202,12 @@ static void rtas_stop_self(PowerPCCPU *cpu, sPAPR=
-MachineState *spapr,
-> >      CPUPPCState *env =3D &cpu->env;
-> >      PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
-> > =20
-> > -    cs->halted =3D 1;
-> > -    qemu_cpu_kick(cs);
-> > -
-> >      /* Disable Power-saving mode Exit Cause exceptions for the CPU.
-> >       * This could deliver an interrupt on a dying CPU and crash the
-> >       * guest */
-> > -    env->spr[SPR_LPCR] &=3D ~pcc->lpcr_pm;
-> > +    ppc_store_lpcr(cpu, env->spr[SPR_LPCR] & ~pcc->lpcr_pm);
-> > +    cs->halted =3D 1;
-> > +    qemu_cpu_kick(cs);
-> >  }
-> > =20
-> >  static inline int sysparm_st(target_ulong addr, target_ulong len,
+>=20
+> C.
 >=20
 
 --=20
@@ -210,24 +187,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---V8Y3+xXnhQGsvjWT
+--SuGb6p5JEpzYJdwO
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrr6TcACgkQbDjKyiDZ
-s5IfsRAAnn4Sd0/+mzxWdwPhhs8LwBeq8M2LAKN/IGHAOOt8gMeb06i2vqN6qLSI
-pEGyqtd2ogJvubpev8qVi8M2pSTUHd07Ik0WvsLmxvala9mwvUM5TBWEsQlwczwU
-2yoXHejV/BW+un+WVF/Q3NEoyfUqmWfrwsPCx/+Zhn07Ak/4k+SBfrjnrbC7Yi09
-JdR0Ma7S5fSmGSlXOBxuteSscRmKE03iXbD2hKoi5L46DJCEhjkaEytSbdhefkGI
-0r7gvnk7K3Gz+slC/zawSjgZyRO92D8/C9FO+xyaTd1FI3SHfWTmvLFnNTB8iaXE
-CzNzGxtTEbh5LT9Qij6KqW212VcbZVZ1nVyscf0JKjq8TyrE+bPvPaOmGXBTi0Tk
-wbFrZLtsy2ZcxSe92qdKNP3Ovv4sLBlhDJejNIrJJNvriNCMzJ3HfhUf+D5LWDsT
-nrAO6yWCKm6Ik11vmCf3jIz44Q/sS3uP4AxS5ulv1W2o181gdHMiFA3HD8mXWrAR
-yseDVX+XT4zy44rPEoA9R8h07q4b7p5o5KpV2TEp8rb3f3bii5WatIc6z1UJlJhW
-ndZjXx/zghxAiCi7Ik7+ue3p1vYcj8mVx8lZ/VKQQRHk+3GpwNkbyLS4Ug9ngw4W
-lcwVXLF2zXYT1AjXVpFUQPSVgy3+RO4VOswQAWg/TDfIe+3K1dM=
-=4X+d
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrr7WkACgkQbDjKyiDZ
+s5LLxhAArDrWzMWVbspFpW0knF0SQP40tH8YiXkzmXdQFsfyCyUZzbj2qthlyZYm
+DdgoIz9NfbFN8dgJiT7YUA2EPtgoFeIVO1f7+P075dwl/Mk9+NwXrtpR+ysJ3wD1
+m+cji/LKBG5sUshXLZ+3omd/CHBW3xFA0ZLWOkCg4e3kxNH6un/zTj08e313inGY
+cA8PlYoo80KTeiDqvEDrdSJodDyo7TPZAyEEJUHBvdnzMB5Q+31hehXVsC15SoYf
+ePftGCNR2/psxg6vbnPIU6qTUF79LqqjEPEOwr/Hkf7WYkQXzI5X+4bB5sMWARG9
+gT1YByG+UaZLCtPoAtkk93YXVJYmSi6lxlDBEIPRWp554F92FOZ1eWO5u+ub5/bG
+4BugAuUCX6RRwRq9LdAWmoIxNBFEewVju7e/L1hxme4bZXHNnVuNYShwdnstuchS
+H3AGvTWL+GGfwUxvlRqj8oWTicyrgNqKbrLhrGQnHRBuxSpZjQKNHYZj0Tlou5R2
+qcz16dmMY10peFpLeDg4nGZynqisRD6JdeC4OqKKydeTvmlFMSO/Cf2eFnYTXT2O
+Tcwnnb76OxeUf3jz4DjtQVd8Lek1tjn3g9VFT2mbXDfgV/FOznkzjmy+Hg37mPmV
+d1ILlv3iSTtAHuA5g69WcDm1I5umUjDuSaugPrj8oIS5PBixLnk=
+=d3A7
 -----END PGP SIGNATURE-----
 
---V8Y3+xXnhQGsvjWT--
+--SuGb6p5JEpzYJdwO--
