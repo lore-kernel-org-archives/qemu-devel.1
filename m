@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43868)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fETmP-0007jA-Gg
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 02:01:23 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fEUEp-0006FP-3h
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 02:30:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fETmL-00026Y-Cl
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 02:01:17 -0400
-Date: Fri, 4 May 2018 16:01:01 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fEUEo-00018L-35
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 02:30:39 -0400
+Date: Fri, 4 May 2018 16:30:27 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180504060101.GY13229@umbus.fritz.box>
-References: <152538217073.223014.17347204768561945420.stgit@bahia.lan>
-	<152538218900.223014.9011319433623501285.stgit@bahia.lan>
-	<20180504001223.GI13229@umbus.fritz.box>
-	<20180504075419.4eb70618@bahia.lan>
+Message-ID: <20180504063027.GA13229@umbus.fritz.box>
+References: <20180419062917.31486-1-david@gibson.dropbear.id.au>
+	<20180419062917.31486-4-david@gibson.dropbear.id.au>
+	<20180503155709.GA32363@kermit-br-ibm-com.br.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="BzhqTaE66jeIVBY0"
+	protocol="application/pgp-signature"; boundary="1mpN54+oXr72ab9j"
 Content-Disposition: inline
-In-Reply-To: <20180504075419.4eb70618@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 1/3] target/ppc: always set PPC_MEM_TLBIE
- in pre 2.8 migration hack
+In-Reply-To: <20180503155709.GA32363@kermit-br-ibm-com.br.ibm.com>
+Subject: Re: [Qemu-devel] [RFC for-2.13 3/7] target/ppc: Add
+ ppc_hash64_filter_pagesizes()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,88 +26,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Laurent Vivier <lvivier@redhat.com>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>
+To: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+Cc: groug@kaod.org, abologna@redhat.com, aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
 
 
---BzhqTaE66jeIVBY0
+--1mpN54+oXr72ab9j
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 04, 2018 at 07:54:19AM +0200, Greg Kurz wrote:
-> On Fri, 4 May 2018 10:12:23 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Thu, May 03, 2018 at 11:16:29PM +0200, Greg Kurz wrote:
-> > > The pseries-2.7 and older machine types require CPUPPCState::insns_fl=
-ags
-> > > to be strictly equal between source and destination. This checking is
-> > > abusive and breaks migration of KVM guests when the host CPU models
-> > > are different, even if they are compatible enough to allow the guest
-> > > to run transparently. This buggy behaviour was fixed for pseries-2.8
-> > > and we added some hacks to allow backward migration of older machine
-> > > types. These hacks assume that the CPU belongs to the POWER8 family,
-> > > which was true for most KVM based setup we cared about at the time.
-> > > But now POWER9 systems are coming, and backward migration of pre 2.8
-> > > guests running in POWER8 architected mode from a POWER9 host to a
-> > > POWER8 host is broken:
-> > >=20
-> > > qemu-system-ppc64: error while loading state for instance 0x0 of devi=
-ce
-> > >  'cpu'
-> > > qemu-system-ppc64: load of migration failed: Invalid argument
-> > >=20
-> > > This happens because POWER9 doesn't set PPC_MEM_TLBIE in insns_flags,
-> > > while POWER8 does. Let's force PPC_MEM_TLBIE in the migration hack to
-> > > fix the issue. This is an acceptable hack because these old machine
-> > > types only support CPU models that do set PPC_MEM_TLBIE.
-> > >=20
-> > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > > ---
-> > >  target/ppc/machine.c |    5 +++++
-> > >  1 file changed, 5 insertions(+)
-> > >=20
-> > > diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-> > > index 3d6434a006fa..ba1b9e531f97 100644
-> > > --- a/target/ppc/machine.c
-> > > +++ b/target/ppc/machine.c
-> > > @@ -212,6 +212,11 @@ static int cpu_pre_save(void *opaque)
-> > >              ;
-> > >          cpu->mig_msr_mask =3D env->msr_mask & ~metamask;
-> > >          cpu->mig_insns_flags =3D env->insns_flags & insns_compat_mas=
-k;
-> > > +        /* CPU models supported by old machines all have PPC_MEM_TLB=
-IE,
-> > > +         * so we set it unconditionally to allow backward migration =
-=66rom
-> > > +         * a POWER9 host to a POWER8 host. =20
+On Thu, May 03, 2018 at 12:57:09PM -0300, Murilo Opsfelder Araujo wrote:
+> On Thu, Apr 19, 2018 at 04:29:13PM +1000, David Gibson wrote:
+> > The paravirtualized PAPR platform sometimes needs to restrict the guest=
+ to
+> > using only some of the page sizes actually supported by the host's MMU.
+> > At the moment this is handled in KVM specific code, but for consistency=
+ we
+> > want to apply the same limitations to all accelerators.
 > >=20
-> > So.. the comment's slightly misleading.  This code is common to all
-> > cpus, not just those used on pseries, so across that set it's not
-> > really accurate.  But pseries is the only machine we support migration
-> > to/from old versions with so it doesn't really matter.
->=20
-> Oh... I was assuming that we only supported migration for pseries
-> machine, irrespective of the versions.
-
-Actually, that's probably true.  Although there are a couple where it
-might just about work.  pseries is *definitely* the only one that we
-properly check and care about cross-version compatibility though.
-
-
->=20
-> > > +         */
-> > > +        cpu->mig_insns_flags |=3D PPC_MEM_TLBIE;
-> > >          cpu->mig_insns_flags2 =3D env->insns_flags2 & insns_compat_m=
-ask2;
-> > >          cpu->mig_nb_BATs =3D env->nb_BATs;
-> > >      }
-> > >  =20
+> > This makes a start on this by providing a helper function in the cpu co=
+de
+> > to allow platform code to remove some of the cpu's page size definitions
+> > via a caller supplied callback.
 > >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+> >  target/ppc/mmu-hash64.c | 59 +++++++++++++++++++++++++++++++++++++++++=
+++++++++
+> >  target/ppc/mmu-hash64.h |  3 +++
+> >  2 files changed, 62 insertions(+)
+> >=20
+> > diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+> > index a1db20e3a8..b6e62864fd 100644
+> > --- a/target/ppc/mmu-hash64.c
+> > +++ b/target/ppc/mmu-hash64.c
+> > @@ -1165,3 +1165,62 @@ const PPCHash64Options ppc_hash64_opts_POWER7 =
+=3D {
+> >          },
+> >      }
+> >  };
+> > +
+> > +void ppc_hash64_filter_pagesizes(PowerPCCPU *cpu,
+> > +                                 bool (*cb)(void *, uint32_t, uint32_t=
+),
+> > +                                 void *opaque)
+> > +{
+> > +    PPCHash64Options *opts =3D cpu->hash64_opts;
+> > +    int i;
+> > +    int n =3D 0;
+> > +    bool ci_largepage =3D false;
+> > +
+> > +    assert(opts);
+> > +
+> > +    n =3D 0;
+> > +    for (i =3D 0; i < ARRAY_SIZE(opts->sps); i++) {
+> > +        PPCHash64SegmentPageSizes *sps =3D &opts->sps[i];
+> > +        int j;
+> > +        int m =3D 0;
+> > +
+> > +        assert(n <=3D i);
+> > +
+> > +        if (!sps->page_shift) {
+> > +            break;
+> > +        }
+> > +
+> > +        for (j =3D 0; j < ARRAY_SIZE(sps->enc); j++) {
+> > +            PPCHash64PageSize *ps =3D &sps->enc[j];
+> > +
+> > +            assert(m <=3D j);
+> > +            if (!ps->page_shift) {
+> > +                break;
+> > +            }
+> > +
+> > +            if (cb(opaque, sps->page_shift, ps->page_shift)) {
+> > +                if (ps->page_shift =3D=3D 16) {
+> > +                    ci_largepage =3D true;
+> > +                }
+> > +                sps->enc[m++] =3D *ps;
+> > +            }
 >=20
+> Hi, David.
+>=20
+> Is it possible that both sps->page_shift and ps->page_shift value 24?
+> This seems to be a true case for spapr_pagesize_cb(), if I'm reading
+> correctly.
 
+Yes, that's possible; in fact, typical.
 
+> Shouldn't ci_largepage also be set to true when ps->page_shift =3D=3D
+> 24?
+
+Ah.. yeah.. in order to match the existing logic this should be >=3D
+16.  I've changed it in my draft.
+
+Of course, I doubt that any guest would attempt to use 16MiB IO pages,
+so I'm not sure it really matters, but.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -116,24 +128,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---BzhqTaE66jeIVBY0
+--1mpN54+oXr72ab9j
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrr9xoACgkQbDjKyiDZ
-s5Ia4A//VzqX/iGlZh8AR28PCx0uNaAmMkMFZ7E54HMGHrnOOwPYeRSjEEB/Vn1O
-8evqMHGiRMYcoupG3Nb1iSEyJro1OsGVGtRJFRsAnZoV7diY/hYRqbynp5eyB7qg
-TeHYZZtl63Z3qPsTQEmHjoktXZsF90IkYsBA00rPQkA9+ZO9jxKHUEtXrLUM4Bk9
-E/Su53FzXbVCVDl/ngg2ZstcoF0pPT73kjPRGzyC+0d8bDg+P2POb+TdVa4wcQKy
-viH9nnZ5JRwNzzEn6ZrVW5Lebjvs/cDK0gMw4laoo6i02WLvtIPrNlzc0LSSjG8x
-hXxVOwrnBktfGVm+7mrt/w1uHMiuMFVxAGUydHs7f6AWyHbX+qKY0UfeW0GhI3ip
-Hnk65kO0eJg8D6lhBOvpFD2AC+KyRjObGexvPh0oD9K/MerB8C08av1QJbm4ZDdV
-ofhq2QXBkhM2OWSV33/+O55mx8kEU1PLCYBwalNTL3Jdbmy0d6cUPOafynJKjtb+
-f3UUxOqRHyU4ML9Ao70JhS0sjw+fbDTlxJ3GN0KlNEQXEaT+7rabugpb27tBUvsb
-D0mb3WF6OCInbQbCB7zTJRjhI8GKM7Z5km3TH2CpFozA4Zo07H4rTyDK8GGRZduY
-1UbeRcucDiTzacWaAKAcI5QSIhMy+ZqTfGI20+TbVwTxyGLLQs8=
-=ZRYd
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrr/gMACgkQbDjKyiDZ
+s5KpQw//ZOpnDEwLniKmdi6PZlX1+n3PKPTtW0Ec931wY2IBDYbnd4clplfL3oI1
+h76b+yr5LEIT1kp8Lb0HHHPcrJdj7J45vbhxT0hAHZetNSDRauQHUxvHgm37OvtU
+9N7KidO7uRUXPYk8O+tNrXAT/iutD7XWcBTTZXKo9qb3iqyMOnKrLP6btNh/hLyU
+5hbVIhqAmMjvDf2hDsjZew6agZlJwI6TS/VRZAruRTCvpnwmkckwsOytaUpKQ4pX
+IvAZG3KgbN1xYYMTWVWG1iSwVf+R8fTWZJD/H92XyB38X3trzoD9Eq+px8JPG7WJ
+J4ntuiG2XQ/NKvGUxNKcLNGLCn36FZcfSHieLNVQtksxgJo+lIkZ+OmzgS8iROfs
+QLepjuRw2YkrwBhJkXX3ou6FCrDpiEwykGr2xBdajTl1MhlgDTNyy1tUDBv3xglA
+Fle/RRg/RI+ncg6YQKvh056A5NWbp3kTlbhX3O0Qbx7u+4TdcU6HDmESVXpy2VvZ
+1ZlM9CihuPh7vZbEMsmuTDnIdJVIUMF7jafoOvqbE6l2VI/rgtO+oVxMPeuOFmo+
+yOyFESkHBmEuYxBO95QiG//qFyx2lC90DXjKDxX4FMR/OFMv6lj7KGeHY+3M7bzB
+B8vR8NoVtLNudUzIbnVUZWk49+zVZLq+RmHpq/PFhEZe9PB0u/k=
+=Uxj/
 -----END PGP SIGNATURE-----
 
---BzhqTaE66jeIVBY0--
+--1mpN54+oXr72ab9j--
