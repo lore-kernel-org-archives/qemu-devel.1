@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fETkr-00062W-AB
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:59:42 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fETkn-0007HX-Ez
+	(envelope-from <dgibson@ozlabs.org>) id 1fETkq-00061i-4G
 	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:59:41 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1fETko-0007JP-Ho
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:59:40 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  4 May 2018 15:59:14 +1000
-Message-Id: <20180504055930.3786-2-david@gibson.dropbear.id.au>
+Date: Fri,  4 May 2018 15:59:16 +1000
+Message-Id: <20180504055930.3786-4-david@gibson.dropbear.id.au>
 In-Reply-To: <20180504055930.3786-1-david@gibson.dropbear.id.au>
 References: <20180504055930.3786-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 01/17] target/ppc: return a nil HPT base address
- on sPAPR machines
+Subject: [Qemu-devel] [PULL 03/17] spapr: Remove support for explicitly
+ allocated RMAs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,35 +23,221 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+Current POWER cpus allow for a VRMA, a special mapping which describes a
+guest's view of memory when in real mode (MMU off, from the guest's point
+of view).  Older cpus didn't have that which meant that to support a guest
+a special host-contiguous region of memory was needed to give the guest its
+Real Mode Area (RMA).
 
-commit e57ca75ce3b2 ("target/ppc: Manage external HPT via virtual
-hypervisor") exported a set of methods to manipulate the HPT from the
-core hash MMU. But SPR_SDR1 is still used under some circumstances to
-get the base address of the HPT, which is incorrect for the sPAPR
-machines.
+KVM used to provide special calls to allocate a contiguous RMA for those
+cases.  This was useful in the early days of KVM on Power to allow it to be
+tested on PowerPC 970 chips as used in Macintosh G5 machines.  Now, those
+machines are so old as to be almost irrelevant.
 
-Only the logging should be impacted.
+The normal qemu deprecation process would require this to be marked
+deprecated then removed in 2 releases.  However, this can only be used
+with corresponding support in the host kernel - which was dropped
+years ago (in c17b98cf "KVM: PPC: Book3S HV: Remove code for PPC970
+processors" of 2014-12-03 to be precise).  Therefore it should be ok
+to drop this immediately.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Just to be clear this only affects *KVM HV* guests with PowerPC 970,
+and those already require an ancient host kernel.  TCG and KVM PR
+guests with PowerPC 970 should still work.
+
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Acked-by: Thomas Huth <thuth@redhat.com>
 ---
- target/ppc/mmu-hash64.h | 3 +++
- 1 file changed, 3 insertions(+)
+ hw/ppc/spapr.c       | 61 ++++++++++++++------------------------------
+ target/ppc/kvm.c     | 42 ------------------------------
+ target/ppc/kvm_ppc.h |  6 -----
+ 3 files changed, 19 insertions(+), 90 deletions(-)
 
-diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
-index d5fc03441d..f6349ccdb3 100644
---- a/target/ppc/mmu-hash64.h
-+++ b/target/ppc/mmu-hash64.h
-@@ -102,6 +102,9 @@ void ppc_hash64_finalize(PowerPCCPU *cpu);
-=20
- static inline hwaddr ppc_hash64_hpt_base(PowerPCCPU *cpu)
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index b35aff5d81..ed9b6a9535 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2508,9 +2508,6 @@ static void spapr_machine_init(MachineState *machine)
+     int i;
+     MemoryRegion *sysmem = get_system_memory();
+     MemoryRegion *ram = g_new(MemoryRegion, 1);
+-    MemoryRegion *rma_region;
+-    void *rma = NULL;
+-    hwaddr rma_alloc_size;
+     hwaddr node0_size = spapr_node0_size(machine);
+     long load_limit, fw_size;
+     char *filename;
+@@ -2549,40 +2546,28 @@ static void spapr_machine_init(MachineState *machine)
+         exit(1);
+     }
+ 
+-    /* Allocate RMA if necessary */
+-    rma_alloc_size = kvmppc_alloc_rma(&rma);
++    spapr->rma_size = node0_size;
+ 
+-    if (rma_alloc_size == -1) {
+-        error_report("Unable to create RMA");
+-        exit(1);
++    /* With KVM, we don't actually know whether KVM supports an
++     * unbounded RMA (PR KVM) or is limited by the hash table size
++     * (HV KVM using VRMA), so we always assume the latter
++     *
++     * In that case, we also limit the initial allocations for RTAS
++     * etc... to 256M since we have no way to know what the VRMA size
++     * is going to be as it depends on the size of the hash table
++     * which isn't determined yet.
++     */
++    if (kvm_enabled()) {
++        spapr->vrma_adjust = 1;
++        spapr->rma_size = MIN(spapr->rma_size, 0x10000000);
+     }
+ 
+-    if (rma_alloc_size && (rma_alloc_size < node0_size)) {
+-        spapr->rma_size = rma_alloc_size;
+-    } else {
+-        spapr->rma_size = node0_size;
+-
+-        /* With KVM, we don't actually know whether KVM supports an
+-         * unbounded RMA (PR KVM) or is limited by the hash table size
+-         * (HV KVM using VRMA), so we always assume the latter
+-         *
+-         * In that case, we also limit the initial allocations for RTAS
+-         * etc... to 256M since we have no way to know what the VRMA size
+-         * is going to be as it depends on the size of the hash table
+-         * isn't determined yet.
+-         */
+-        if (kvm_enabled()) {
+-            spapr->vrma_adjust = 1;
+-            spapr->rma_size = MIN(spapr->rma_size, 0x10000000);
+-        }
+-
+-        /* Actually we don't support unbounded RMA anymore since we
+-         * added proper emulation of HV mode. The max we can get is
+-         * 16G which also happens to be what we configure for PAPR
+-         * mode so make sure we don't do anything bigger than that
+-         */
+-        spapr->rma_size = MIN(spapr->rma_size, 0x400000000ull);
+-    }
++    /* Actually we don't support unbounded RMA anymore since we added
++     * proper emulation of HV mode. The max we can get is 16G which
++     * also happens to be what we configure for PAPR mode so make sure
++     * we don't do anything bigger than that
++     */
++    spapr->rma_size = MIN(spapr->rma_size, 0x400000000ull);
+ 
+     if (spapr->rma_size > node0_size) {
+         error_report("Numa node 0 has to span the RMA (%#08"HWADDR_PRIx")",
+@@ -2643,14 +2628,6 @@ static void spapr_machine_init(MachineState *machine)
+                                          machine->ram_size);
+     memory_region_add_subregion(sysmem, 0, ram);
+ 
+-    if (rma_alloc_size && rma) {
+-        rma_region = g_new(MemoryRegion, 1);
+-        memory_region_init_ram_ptr(rma_region, NULL, "ppc_spapr.rma",
+-                                   rma_alloc_size, rma);
+-        vmstate_register_ram_global(rma_region);
+-        memory_region_add_subregion(sysmem, 0, rma_region);
+-    }
+-
+     /* initialize hotplug memory address space */
+     if (machine->ram_size < machine->maxram_size) {
+         ram_addr_t hotplug_mem_size = machine->maxram_size - machine->ram_size;
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 6de59c5b21..e8be10a9a8 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -72,7 +72,6 @@ static int cap_segstate;
+ static int cap_booke_sregs;
+ static int cap_ppc_smt;
+ static int cap_ppc_smt_possible;
+-static int cap_ppc_rma;
+ static int cap_spapr_tce;
+ static int cap_spapr_tce_64;
+ static int cap_spapr_multitce;
+@@ -133,7 +132,6 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     cap_segstate = kvm_check_extension(s, KVM_CAP_PPC_SEGSTATE);
+     cap_booke_sregs = kvm_check_extension(s, KVM_CAP_PPC_BOOKE_SREGS);
+     cap_ppc_smt_possible = kvm_vm_check_extension(s, KVM_CAP_PPC_SMT_POSSIBLE);
+-    cap_ppc_rma = kvm_check_extension(s, KVM_CAP_PPC_RMA);
+     cap_spapr_tce = kvm_check_extension(s, KVM_CAP_SPAPR_TCE);
+     cap_spapr_tce_64 = kvm_check_extension(s, KVM_CAP_SPAPR_TCE_64);
+     cap_spapr_multitce = kvm_check_extension(s, KVM_CAP_SPAPR_MULTITCE);
+@@ -2159,52 +2157,12 @@ void kvmppc_hint_smt_possible(Error **errp)
+ 
+ 
+ #ifdef TARGET_PPC64
+-off_t kvmppc_alloc_rma(void **rma)
+-{
+-    off_t size;
+-    int fd;
+-    struct kvm_allocate_rma ret;
+-
+-    /* If cap_ppc_rma == 0, contiguous RMA allocation is not supported
+-     * if cap_ppc_rma == 1, contiguous RMA allocation is supported, but
+-     *                      not necessary on this hardware
+-     * if cap_ppc_rma == 2, contiguous RMA allocation is needed on this hardware
+-     *
+-     * FIXME: We should allow the user to force contiguous RMA
+-     * allocation in the cap_ppc_rma==1 case.
+-     */
+-    if (cap_ppc_rma < 2) {
+-        return 0;
+-    }
+-
+-    fd = kvm_vm_ioctl(kvm_state, KVM_ALLOCATE_RMA, &ret);
+-    if (fd < 0) {
+-        fprintf(stderr, "KVM: Error on KVM_ALLOCATE_RMA: %s\n",
+-                strerror(errno));
+-        return -1;
+-    }
+-
+-    size = MIN(ret.rma_size, 256ul << 20);
+-
+-    *rma = mmap(NULL, size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+-    if (*rma == MAP_FAILED) {
+-        fprintf(stderr, "KVM: Error mapping RMA: %s\n", strerror(errno));
+-        return -1;
+-    };
+-
+-    return size;
+-}
+-
+ uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift)
  {
-+    if (cpu->vhyp) {
-+        return 0;
-+    }
-     return cpu->env.spr[SPR_SDR1] & SDR_64_HTABORG;
+     struct kvm_ppc_smmu_info info;
+     long rampagesize, best_page_shift;
+     int i;
+ 
+-    if (cap_ppc_rma >= 2) {
+-        return current_size;
+-    }
+-
+     /* Find the largest hardware supported page size that's less than
+      * or equal to the (logical) backing page size of guest RAM */
+     kvm_get_smmu_info(POWERPC_CPU(first_cpu), &info);
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index 4d2789eef6..e2840e1d33 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -37,7 +37,6 @@ target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu,
+                                      bool radix, bool gtse,
+                                      uint64_t proc_tbl);
+ #ifndef CONFIG_USER_ONLY
+-off_t kvmppc_alloc_rma(void **rma);
+ bool kvmppc_spapr_use_multitce(void);
+ int kvmppc_spapr_enable_inkernel_multitce(void);
+ void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
+@@ -188,11 +187,6 @@ static inline target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu,
  }
-=20
---=20
+ 
+ #ifndef CONFIG_USER_ONLY
+-static inline off_t kvmppc_alloc_rma(void **rma)
+-{
+-    return 0;
+-}
+-
+ static inline bool kvmppc_spapr_use_multitce(void)
+ {
+     return false;
+-- 
 2.17.0
