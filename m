@@ -1,26 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fEeyM-0006ty-Ly
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 13:58:23 -0400
+	(envelope-from <walling@linux.ibm.com>) id 1fEf2c-0008GH-4o
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 14:02:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fEeyL-000733-Pd
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 13:58:22 -0400
-Received: from mail-ot0-x229.google.com ([2607:f8b0:4003:c0f::229]:36051)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fEeyL-00072r-Gr
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 13:58:21 -0400
-Received: by mail-ot0-x229.google.com with SMTP id m11-v6so19246927otf.3
-	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 10:58:21 -0700 (PDT)
+	(envelope-from <walling@linux.ibm.com>) id 1fEf2X-000287-6u
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 14:02:46 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45730)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
+	id 1fEf2W-00027N-TB
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 14:02:41 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w44I0GNA089373
+	for <qemu-devel@nongnu.org>; Fri, 4 May 2018 14:02:39 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2hrr01mcfj-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 14:02:38 -0400
+Received: from localhost
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
+	Fri, 4 May 2018 14:02:37 -0400
+References: <1525445354-16233-1-git-send-email-walling@linux.ibm.com>
+	<7e9e9dfd-795b-47f2-453a-59bf65f28229@redhat.com>
+From: Collin Walling <walling@linux.ibm.com>
+Date: Fri, 4 May 2018 14:02:34 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180504171540.25813-1-peter.maydell@linaro.org>
-References: <20180504171540.25813-1-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 4 May 2018 18:58:00 +0100
-Message-ID: <CAFEAcA8byYVNaQDttBtN5SjO3Bih1gZ2YtBiAuFnTLEvaV3qnQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/24] target-arm queue
+In-Reply-To: <7e9e9dfd-795b-47f2-453a-59bf65f28229@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Message-Id: <7274b001-02f2-6584-ea0a-c3d0f96d46b8@linux.ibm.com>
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] [PATCH] monitor: report entirety of hmp command on
+ error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,88 +43,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>, Eric Auger <eric.auger@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 
-On 4 May 2018 at 18:15, Peter Maydell <peter.maydell@linaro.org> wrote:
-> target-arm queue: Eric's SMMUv3 patchset, and an array
-> of minor bugfixes and improvements from various others.
->
-> thanks
-> -- PMM
->
-> The following changes since commit c8b7e627b4269a3bc3ae41d9f420547a47e6d9=
-b9:
->
->   Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2018-05-04' i=
-nto staging (2018-05-04 14:42:46 +0100)
->
-> are available in the Git repository at:
->
->   git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-=
-20180504
->
-> for you to fetch changes up to 5680740c92993e9b3f3e011f2a2c394070e33f56:
->
->   hw/arm/virt: Introduce the iommu option (2018-05-04 18:05:52 +0100)
->
-> ----------------------------------------------------------------
-> target-arm queue:
->  * Emulate the SMMUv3 (IOMMU); one will be created in the 'virt' board
->    if the commandline includes "-machine iommu=3Dsmmuv3"
->  * target/arm: Implement v8M VLLDM and VLSTM
->  * hw/arm: Don't fail qtest due to missing SD card in -nodefaults mode
->  * Some fixes to silence Coverity false-positives
->  * arm: boot: set boot_info starting from first_cpu
->    (fixes a technical bug not visible in practice)
->  * hw/net/smc91c111: Convert away from old_mmio
->  * hw/usb/tusb6010: Convert away from old_mmio
->  * hw/char/cmsdk-apb-uart.c: Accept more input after character read
->  * target/arm: Make MPUIR write-ignored on OMAP, StrongARM
->  * hw/arm/virt: Add linux,pci-domain property
-
-Oops, 32-bit compile failures for format string issues;
-
-hw/arm/trace.h: In function =E2=80=98_nocheck__trace_smmu_ptw_level=E2=80=
-=99:
-hw/arm/trace.h:215:18: error: format =E2=80=98%lx=E2=80=99 expects argument=
- of type
-=E2=80=98long unsigned int=E2=80=99, but argument 7 has type =E2=80=98size_=
-t {aka unsigned
-int}=E2=80=99 [-Werror=3Dformat=3D]
-         qemu_log("%d@%zd.%06zd:smmu_ptw_level " "level=3D%d
-iova=3D0x%"PRIx64" subpage_sz=3D0x%lx baseaddr=3D0x%"PRIx64" offset=3D%d =
-=3D>
-pte=3D0x%"PRIx64 "\n",
-                  ^
-hw/arm/trace.h: In function =E2=80=98_nocheck__trace_smmuv3_write_mmio_idr=
-=E2=80=99:
-hw/arm/trace.h:606:18: error: format =E2=80=98%lx=E2=80=99 expects argument=
- of type
-=E2=80=98long unsigned int=E2=80=99, but argument 5 has type =E2=80=98uint6=
-4_t {aka long long
-unsigned int}=E2=80=99 [-Werror=3Dformat=3D]
-         qemu_log("%d@%zd.%06zd:smmuv3_write_mmio_idr " "write to
-RO/Unimpl reg 0x%lx val64:0x%lx" "\n",
-                  ^
-hw/arm/trace.h:606:18: error: format =E2=80=98%lx=E2=80=99 expects argument=
- of type
-=E2=80=98long unsigned int=E2=80=99, but argument 6 has type =E2=80=98uint6=
-4_t {aka long long
-unsigned int}=E2=80=99 [-Werror=3Dformat=3D]
-hw/arm/trace.h: In function =E2=80=98_nocheck__trace_smmuv3_find_ste_2lvl=
-=E2=80=99:
-hw/arm/trace.h:721:18: error: format =E2=80=98%lx=E2=80=99 expects argument=
- of type
-=E2=80=98long unsigned int=E2=80=99, but argument 5 has type =E2=80=98uint6=
-4_t {aka long long
-unsigned int}=E2=80=99 [-Werror=3Dformat=3D]
-         qemu_log("%d@%zd.%06zd:smmuv3_find_ste_2lvl "
-"strtab_base:0x%lx l1ptr:0x%"PRIx64" l1_off:0x%x, l2ptr:0x%"PRIx64"
-l2_off:0x%x max_l2_ste:%d" "\n",
-                  ^
-
-size_t arguments need %zx, not %lx, and uint64_t arguments need
-%"PRIx64", not %lx. I'll squash in the changes to the relevant patches.
-
-thanks
--- PMM
+T24gMDUvMDQvMjAxOCAxMToxOSBBTSwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMDUvMDQv
+MjAxOCAwOTo0OSBBTSwgQ29sbGluIFdhbGxpbmcgd3JvdGU6DQo+PiBXaGVuIGEgdXNlciBp
+bmNvcnJlY3RseSBwcm92aWRlcyBhbiBobXAgY29tbWFuZCwgYW4gZXJyb3IgcmVzcG9uc2Ug
+d2lsbCBiZQ0KPj4gcHJpbnRlZCB0aGF0IHByb21wdHMgdGhlIHVzZXIgdG8gdHJ5ICJoZWxw
+IDxjb21tYW5kIG5hbWU+Ii4gSG93ZXZlciwgd2hlbg0KPj4gdGhlIGNvbW1hbmQgY29udGFp
+bnMgbXVsdGlwbGUgcGFydHMgZS5nLiAiaW5mbyBza2V5cyIsIG9ubHkgdGhlIGxhc3QNCj4+
+IHdoaXRlc3BhY2UgZGVsaW1pdGVkIHN0cmluZyB3aWxsIGJlIHJlcG9ydGVkIChpbiB0aGlz
+IGV4YW1wbGUgImluZm8iIHdpbGwNCj4+IGJlIGRyb3BwZWQgYW5kIHRoZSBtZXNzYWdlIHdp
+bGwgcmVhZCAiVHJ5ICJoZWxwIHNrZXlzIiBmb3IgbW9yZSBpbmZvcm1hdGlvbiIsDQo+PiB3
+aGljaCBpcyBpbmNvcnJlY3QpLg0KPiANCj4gV2hhdCdzIHRoZSBleGFjdCBmb3JtdWxhIGZv
+ciByZXByb2R1Y2luZyB0aGlzP8KgIEkgdHJpZWQ6DQo+IA0KPiAkIC4veDg2XzY0LXNvZnRt
+bXUvcWVtdS1zeXN0ZW0teDg2XzY0IC1ub2RlZmF1bHRzIC1ub2dyYXBoaWMgLS1tb25pdG9y
+IHN0ZGlvDQo+IFFFTVUgMi4xMi41MCBtb25pdG9yIC0gdHlwZSAnaGVscCcgZm9yIG1vcmUg
+aW5mb3JtYXRpb24NCj4gKHFlbXUpIGluZm8gc2tleXMNCj4gdW5rbm93biBjb21tYW5kOiAn
+aW5mbyBza2V5cycNCj4gDQo+IE9oLCBJIHNlZSBub3c6DQo+IA0KPiAocWVtdSkgaW5mbyB1
+dWlkIGJsYWgNCj4gdXVpZDogZXh0cmFuZW91cyBjaGFyYWN0ZXJzIGF0IHRoZSBlbmQgb2Yg
+bGluZQ0KPiBUcnkgImhlbHAgdXVpZCIgZm9yIG1vcmUgaW5mb3JtYXRpb24NCj4gKHFlbXUp
+IGhlbHAgdXVpZA0KPiAocWVtdSkNCj4gDQo+IFlvdSdsbCB3YW50IHRvIHVwZGF0ZSB5b3Vy
+IGNvbW1pdCBtZXNzYWdlIHRvIGRvY3VtZW50IHNvbWV0aGluZyB0aGF0IGlzIHJlcHJvZHVj
+aWJsZSAoeW91IG1heSBiZSBhZGRpbmcgYW4gJ2luZm8gc2tleXMnLCBidXQgdW50aWwgdGhh
+dCBpcyBpbiwgaXQgZG9lc24ndCBtYWtlIGEgZ29vZCBleGFtcGxlKS4NCj4gDQo+Pg0KPj4g
+TGV0J3MgY29ycmVjdCB0aGlzIGJ5IGNhcHR1cmluZyB0aGUgZnVsbCBuYW1lIG9mIHRoZSBj
+b21tYW5kIGFzIHdlIHJlY3Vyc2UNCj4+IHRocm91Z2ggdGhlIGZ1bmN0aW9uIG1vbml0b3Jf
+cGFyc2VfY29tbWFuZC4NCj4+DQo+PiBSZXBvcnRlZC1ieTogTWlraGFpbCBGb2tpbiA8Zm9r
+aW5AZGUuaWJtLmNvbT4NCj4+IFNpZ25lZC1vZmYtYnk6IENvbGxpbiBXYWxsaW5nIDx3YWxs
+aW5nQGxpbnV4LmlibS5jb20+DQo+PiAtLS0NCj4+IMKgIG1vbml0b3IuYyB8IDE1ICsrKysr
+KysrKysrLS0tLQ0KPj4gwqAgMSBmaWxlIGNoYW5nZWQsIDExIGluc2VydGlvbnMoKyksIDQg
+ZGVsZXRpb25zKC0pDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL21vbml0b3IuYyBiL21vbml0b3Iu
+Yw0KPj4gaW5kZXggMzlmOGVlMS4uZDQ4NDRiNCAxMDA2NDQNCj4+IC0tLSBhL21vbml0b3Iu
+Yw0KPj4gKysrIGIvbW9uaXRvci5jDQo+PiBAQCAtMjk2NCw3ICsyOTY0LDggQEAgc3RhdGlj
+IGNvbnN0IG1vbl9jbWRfdCAqc2VhcmNoX2Rpc3BhdGNoX3RhYmxlKGNvbnN0IG1vbl9jbWRf
+dCAqZGlzcF90YWJsZSwNCj4+IMKgIHN0YXRpYyBjb25zdCBtb25fY21kX3QgKm1vbml0b3Jf
+cGFyc2VfY29tbWFuZChNb25pdG9yICptb24sDQo+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgIGNvbnN0IGNoYXIgKmNtZHBfc3RhcnQsDQo+PiDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNvbnN0IGNoYXIgKipjbWRwLA0K
+Pj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBtb25fY21kX3QgKnRh
+YmxlKQ0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBtb25fY21k
+X3QgKnRhYmxlLA0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBj
+aGFyICpmdWxsbmFtZSkNCj4gDQo+IFVtbSwgaG93IGlzIGZ1bGxuYW1lIGFueSBiZXR0ZXIg
+dGhhbiBjbWRwX3N0YXJ0IHRoYXQgd2UgYWxyZWFkeSBoYXZlPw0KPiANCj4+IMKgIHsNCj4+
+IMKgwqDCoMKgwqAgY29uc3QgY2hhciAqcDsNCj4+IMKgwqDCoMKgwqAgY29uc3QgbW9uX2Nt
+ZF90ICpjbWQ7DQo+PiBAQCAtMjk4NywxMCArMjk4OCwxNCBAQCBzdGF0aWMgY29uc3QgbW9u
+X2NtZF90ICptb25pdG9yX3BhcnNlX2NvbW1hbmQoTW9uaXRvciAqbW9uLA0KPj4gwqDCoMKg
+wqDCoMKgwqDCoMKgIHArKzsNCj4+IMKgwqDCoMKgwqAgfQ0KPj4gwqAgK8KgwqDCoCBzdHJu
+Y2F0KGZ1bGxuYW1lLCBjbWRuYW1lLCBzdHJsZW4oY21kbmFtZSkpOw0KPiANCj4gZ2NjIDgg
+aXMgcGlja2llciBhYm91dCB1c2luZyBzdHJuY2F0KCkgW3BlcmhhcHMgdG9vIHBpY2t5IC0g
+c2VlIGh0dHBzOi8vZ2NjLmdudS5vcmcvYnVnemlsbGEvc2hvd19idWcuY2dpP2lkPTg1NjAy
+XSwgYnV0IGl0IGlzIGdlbmVyYWxseSBOT1QgdGhlIGZ1bmN0aW9uIHlvdSB3YW50IHRvIGJl
+IHVzaW5nLg0KPiANCj4+ICsNCj4+IMKgwqDCoMKgwqAgKmNtZHAgPSBwOw0KPj4gwqDCoMKg
+wqDCoCAvKiBzZWFyY2ggc3ViIGNvbW1hbmQgKi8NCj4+IMKgwqDCoMKgwqAgaWYgKGNtZC0+
+c3ViX3RhYmxlICE9IE5VTEwgJiYgKnAgIT0gJ1wwJykgew0KPj4gLcKgwqDCoMKgwqDCoMKg
+IHJldHVybiBtb25pdG9yX3BhcnNlX2NvbW1hbmQobW9uLCBjbWRwX3N0YXJ0LCBjbWRwLCBj
+bWQtPnN1Yl90YWJsZSk7DQo+PiArwqDCoMKgwqDCoMKgwqAgc3RybmNhdChmdWxsbmFtZSwg
+IiAiLCAxKTsNCj4+ICvCoMKgwqDCoMKgwqDCoCByZXR1cm4gbW9uaXRvcl9wYXJzZV9jb21t
+YW5kKG1vbiwgY21kcF9zdGFydCwgY21kcCwgY21kLT5zdWJfdGFibGUsDQo+PiArwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgIGZ1bGxuYW1lKTsNCj4gDQo+IFNlZSwgeW91J3JlIHJlY29uc3RydWN0
+aW5nIGEgY29tbWFuZCBpbnRvIGZ1bGxuYW1lLCB3aGljaCBhbHJlYWR5IG1hdGNoZXMgdGhl
+IG9yaWdpbmFsIGNvbW1hbmQgaW4gY21kcF9zdGFydCwgc28gSSBzZWUgbm8gcmVhc29uIHRv
+IGNoYW5nZSB0aGUgc2lnbmF0dXJlLg0KPiANCj4+IMKgwqDCoMKgwqAgfQ0KPj4gwqAgwqDC
+oMKgwqDCoCByZXR1cm4gY21kOw0KPj4gQEAgLTMzNzEsMTAgKzMzNzYsMTIgQEAgc3RhdGlj
+IHZvaWQgaGFuZGxlX2htcF9jb21tYW5kKE1vbml0b3IgKm1vbiwgY29uc3QgY2hhciAqY21k
+bGluZSkNCj4+IMKgIHsNCj4+IMKgwqDCoMKgwqAgUURpY3QgKnFkaWN0Ow0KPj4gwqDCoMKg
+wqDCoCBjb25zdCBtb25fY21kX3QgKmNtZDsNCj4+ICvCoMKgwqAgY2hhciBmdWxsbmFtZVsy
+NTZdOw0KPiANCj4gRVdXVy4gRG9uJ3QgZG8gdGhhdC7CoCBZb3UgYXJlIGp1c3QgQVNLSU5H
+IGZvciBhIGJ1ZmZlciBvdmVyZmxvdyBleHBsb2l0IHRoYXQgcHJpbnRzIHRoZSB3cm9uZyB0
+aGluZyBvciBjYXVzZXMgYSBzZWN1cml0eSBob2xlLCB3aGVuIEkgaW50ZW50aW9uYWxseSB0
+eXBlIGEgc3VwZXItbG9uZyBnYXJiYWdlIGNvbW1hbmQgaW50byBITVAuDQo+IA0KPj4gwqAg
+wqDCoMKgwqDCoCB0cmFjZV9oYW5kbGVfaG1wX2NvbW1hbmQobW9uLCBjbWRsaW5lKTsNCj4+
+IMKgIC3CoMKgwqAgY21kID0gbW9uaXRvcl9wYXJzZV9jb21tYW5kKG1vbiwgY21kbGluZSwg
+JmNtZGxpbmUsIG1vbi0+Y21kX3RhYmxlKTsNCj4+ICvCoMKgwqAgY21kID0gbW9uaXRvcl9w
+YXJzZV9jb21tYW5kKG1vbiwgY21kbGluZSwgJmNtZGxpbmUsIG1vbi0+Y21kX3RhYmxlLA0K
+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgIGZ1bGxuYW1lKTsNCj4gDQo+IE5vdGUgdGhhdCBldmVuIHdpdGhvdXQg
+eW91ciBwYXRjaCwgdGhpcyBjYWxsIHVwZGF0ZXMgJ2NtZGxpbmUnIHRvIHBvaW50IHRvIHRo
+ZSBwb3NpdGlvbiB3aXRoaW4gdGhlIG9yaWdpbmFsIHN0cmluZyAoYWx0aG91Z2ggdGhhdCBw
+b3NpdGlvbiBoYXMgYWxyZWFkeSBza2lwcGVkIHNwYWNlcykuDQo+IA0KPj4gwqDCoMKgwqDC
+oCBpZiAoIWNtZCkgew0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgIHJldHVybjsNCj4+IMKgwqDC
+oMKgwqAgfQ0KPj4gQEAgLTMzODIsNyArMzM4OSw3IEBAIHN0YXRpYyB2b2lkIGhhbmRsZV9o
+bXBfY29tbWFuZChNb25pdG9yICptb24sIGNvbnN0IGNoYXIgKmNtZGxpbmUpDQo+PiDCoMKg
+wqDCoMKgIHFkaWN0ID0gbW9uaXRvcl9wYXJzZV9hcmd1bWVudHMobW9uLCAmY21kbGluZSwg
+Y21kKTsNCj4+IMKgwqDCoMKgwqAgaWYgKCFxZGljdCkgew0KPj4gwqDCoMKgwqDCoMKgwqDC
+oMKgIG1vbml0b3JfcHJpbnRmKG1vbiwgIlRyeSBcImhlbHAgJXNcIiBmb3IgbW9yZSBpbmZv
+cm1hdGlvblxuIiwNCj4+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoCBjbWQtPm5hbWUpOw0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgIGZ1bGxuYW1lKTsNCj4gDQo+IFNvIHJhdGhlciB0aGFuIHRyeWlu
+ZyB0byByZWNvbnN0cnVjdCBhIHN0cmluZywgeW91IGNvdWxkIHJldXNlIHdoYXQgeW91IGFs
+cmVhZHkgaGF2ZS7CoCBUaGlzIGlzIGEgc2hvcnRlciBwYXRjaCB0aGF0IEkgdGhpbmsgYWNj
+b21wbGlzaGVzIHRoZSBzYW1lIGdvYWw6DQo+IA0KPiBkaWZmIC0tZ2l0IGkvbW9uaXRvci5j
+IHcvbW9uaXRvci5jDQo+IGluZGV4IDM5ZjhlZTE3YmE3Li4zODczNmIzYTIwZCAxMDA2NDQN
+Cj4gLS0tIGkvbW9uaXRvci5jDQo+ICsrKyB3L21vbml0b3IuYw0KPiBAQCAtMzM3MSw2ICsz
+MzcxLDcgQEAgc3RhdGljIHZvaWQgaGFuZGxlX2htcF9jb21tYW5kKE1vbml0b3IgKm1vbiwg
+Y29uc3QgY2hhciAqY21kbGluZSkNCj4gwqB7DQo+IMKgwqDCoMKgIFFEaWN0ICpxZGljdDsN
+Cj4gwqDCoMKgwqAgY29uc3QgbW9uX2NtZF90ICpjbWQ7DQo+ICvCoMKgwqAgY29uc3QgY2hh
+ciAqY21kX3N0YXJ0ID0gY21kbGluZTsNCj4gDQo+IMKgwqDCoMKgIHRyYWNlX2hhbmRsZV9o
+bXBfY29tbWFuZChtb24sIGNtZGxpbmUpOw0KPiANCj4gQEAgLTMzODEsOCArMzM4MiwxMSBA
+QCBzdGF0aWMgdm9pZCBoYW5kbGVfaG1wX2NvbW1hbmQoTW9uaXRvciAqbW9uLCBjb25zdCBj
+aGFyICpjbWRsaW5lKQ0KPiANCj4gwqDCoMKgwqAgcWRpY3QgPSBtb25pdG9yX3BhcnNlX2Fy
+Z3VtZW50cyhtb24sICZjbWRsaW5lLCBjbWQpOw0KPiDCoMKgwqDCoCBpZiAoIXFkaWN0KSB7
+DQo+IC3CoMKgwqDCoMKgwqDCoCBtb25pdG9yX3ByaW50Zihtb24sICJUcnkgXCJoZWxwICVz
+XCIgZm9yIG1vcmUgaW5mb3JtYXRpb25cbiIsDQo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBjbWQtPm5hbWUpOw0KPiArwqDCoMKgwqDCoMKgwqAg
+d2hpbGUgKGNtZGxpbmUgPiBjbWRfc3RhcnQgJiYgcWVtdV9pc3NwYWNlKGNtZGxpbmVbLTFd
+KSkgew0KPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBjbWRsaW5lLS07DQo+ICvCoMKgwqDC
+oMKgwqDCoCB9DQo+ICvCoMKgwqDCoMKgwqDCoCBtb25pdG9yX3ByaW50Zihtb24sICJUcnkg
+XCJoZWxwICUuKnNcIiBmb3IgbW9yZSBpbmZvcm1hdGlvblxuIiwNCj4gK8KgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIChpbnQpKGNtZGxpbmUgLSBjbWRf
+c3RhcnQpLCBjbWRfc3RhcnQpOw0KPiDCoMKgwqDCoMKgwqDCoMKgIHJldHVybjsNCj4gwqDC
+oMKgwqAgfQ0KPiANCj4gDQo+IA0KDQpWZXJ5IGludGVyZXN0aW5nLi4uIHlvdSBtYW5hZ2Vk
+IHRvIHJldXNlIHdoYXQgd2FzIGluIGNtZGxpbmUgd2l0aG91dCBwcmludGluZyBhbnl0aGlu
+ZyBleHRyYW5lb3VzIHRoYXQNCnRoZSB1c2VyIG1pZ2h0IGhhdmUgcHJvdmlkZWQuLi4gbmlj
+ZWx5IGRvbmUhDQoNCllvdXIgcHJpbnQgc3RhdGVtZW50IGlzIGludHJpZ3VpbmcgdG8gbWUu
+Li4gSSdtIG5vdCBlbnRpcmVseSBzdXJlIGhvdyBpdCB3b3Jrcy4NCg0KSG93IHdvdWxkIHlv
+dSBsaWtlIHRvIG1vdmUgZm9yd2FyZCB3aXRoIHRoaXMgcGF0Y2g/DQoNCi0tIA0KUmVzcGVj
+dGZ1bGx5LA0KLSBDb2xsaW4gV2FsbGluZw0KDQo=
