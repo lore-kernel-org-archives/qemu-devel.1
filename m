@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fEkCs-0004G1-SO
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 19:33:43 -0400
+	(envelope-from <alistair23@gmail.com>) id 1fEkEF-00056f-NM
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 19:35:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fEkCr-0006ZA-OK
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 19:33:42 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:34677)
+	(envelope-from <alistair23@gmail.com>) id 1fEkEE-00079z-Q5
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 19:35:07 -0400
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:37623)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1fEkCr-0006Yl-GW
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 19:33:41 -0400
-Received: by mail-lf0-x243.google.com with SMTP id h4-v6so33146440lfc.1
-	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 16:33:41 -0700 (PDT)
+	id 1fEkEE-00079Z-IH
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 19:35:06 -0400
+Received: by mail-lf0-x242.google.com with SMTP id b23-v6so33109988lfg.4
+	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 16:35:06 -0700 (PDT)
 MIME-Version: 1.0
 References: <20180504155918.21287-1-f4bug@amsat.org>
-	<20180504155918.21287-7-f4bug@amsat.org>
-In-Reply-To: <20180504155918.21287-7-f4bug@amsat.org>
+	<20180504155918.21287-9-f4bug@amsat.org>
+In-Reply-To: <20180504155918.21287-9-f4bug@amsat.org>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 04 May 2018 23:33:14 +0000
-Message-ID: <CAKmqyKNa7sHFOD=3dpvND0EtLrakpeChuka=-TsgrcP2okB06Q@mail.gmail.com>
+Date: Fri, 04 May 2018 23:34:39 +0000
+Message-ID: <CAKmqyKNdfLhzM-YTPfX-yfmUs5gUDXydXwLpf66gO0oTqTh1hQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 06/20] sdcard: Add a "validate-crc" property
+Subject: Re: [Qemu-devel] [PATCH 08/20] sdcard: Fix sd_crc*() style
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,26 +31,14 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Alistair Francis <alistair@alistair23.me>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Michael Walle <michael@walle.cc>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair@alistair23.me>, Stefan Hajnoczi <stefanha@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-On Fri, May 4, 2018 at 9:00 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
+On Fri, May 4, 2018 at 9:03 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
 >
 wrote:
 
-> Since not all modelled controllers use the CRC verification (which is
-> somehow expensive), let the controller have a configurable property
-> to enable verification.
-
-> So far only the Milkymist controller uses it.
-
-> This silent the Coverity warning:
-
->    "Code block is unreachable because of the syntactic structure of the
-code (CWE-561)"
-
-> and fixes the following issue:
-
-> - CID1005332 (hw/sd/sd.c::sd_req_crc_validate) Structurally dead code
+> Fix style to keep patchew/checkpatch happy when moving this code
+> in the next patch.
 
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
@@ -59,71 +47,50 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->   hw/sd/milkymist-memcard.c |  1 +
->   hw/sd/sd.c                | 12 ++++++++----
->   2 files changed, 9 insertions(+), 4 deletions(-)
+>   hw/sd/sd.c | 16 ++++++++++------
+>   1 file changed, 10 insertions(+), 6 deletions(-)
 
-> diff --git a/hw/sd/milkymist-memcard.c b/hw/sd/milkymist-memcard.c
-> index d8cbb7b681..04babc092f 100644
-> --- a/hw/sd/milkymist-memcard.c
-> +++ b/hw/sd/milkymist-memcard.c
-> @@ -278,6 +278,7 @@ static void milkymist_memcard_realize(DeviceState
-*dev, Error **errp)
->       blk =3D dinfo ? blk_by_legacy_dinfo(dinfo) : NULL;
->       carddev =3D qdev_create(&s->sdbus.qbus, TYPE_SD_CARD);
->       qdev_prop_set_drive(carddev, "drive", blk, &err);
-> +    object_property_set_bool(OBJECT(carddev), true, "validate-crc",
-&err);
->       object_property_set_bool(OBJECT(carddev), true, "realized", &err);
->       if (err) {
->           error_setg(errp, "failed to init SD card: %s",
-error_get_pretty(err));
 > diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-> index be75e118c0..801ddc2cb5 100644
+> index 3708ec1d72..a28ef8de5e 100644
 > --- a/hw/sd/sd.c
 > +++ b/hw/sd/sd.c
-> @@ -93,6 +93,7 @@ struct SDState {
->       /* Configurable properties */
->       BlockBackend *blk;
->       bool spi;
-> +    bool validate_crc;
+> @@ -243,12 +243,14 @@ static uint8_t sd_crc7(const void *message, size_t
+width)
+>       uint8_t shift_reg =3D 0x00;
+>       const uint8_t *msg =3D (const uint8_t *)message;
 
->       uint32_t mode;    /* current card mode, one of SDCardModes */
->       int32_t state;    /* current card state, one of SDCardStates */
-> @@ -496,10 +497,12 @@ static bool sd_verify_frame48_checksum(SDFrame48
-*frame)
->       return crc =3D=3D frame->crc;
->   }
-
-> -static int sd_req_crc_validate(SDRequest *req)
-> +static bool sd_req_crc_validate(SDState *sd, SDRequest *req)
->   {
-> -    return 0;
-> -    return !sd_verify_frame48_checksum(req); /* TODO */
-> +    if (sd->validate_crc) {
-> +        return sd_verify_frame48_checksum(req);
+> -    for (i =3D 0; i < width; i ++, msg ++)
+> -        for (bit =3D 7; bit >=3D 0; bit --) {
+> +    for (i =3D 0; i < width; i++, msg++) {
+> +        for (bit =3D 7; bit >=3D 0; bit--) {
+>               shift_reg <<=3D 1;
+> -            if ((shift_reg >> 7) ^ ((*msg >> bit) & 1))
+> +            if ((shift_reg >> 7) ^ ((*msg >> bit) & 1)) {
+>                   shift_reg ^=3D 0x89;
+> +            }
+>           }
 > +    }
-> +    return true;
+
+>       return shift_reg;
 >   }
+> @@ -260,12 +262,14 @@ static uint16_t sd_crc16(const void *message,
+size_t width)
+>       const uint16_t *msg =3D (const uint16_t *)message;
+>       width <<=3D 1;
 
->   static void sd_update_frame48_checksum(SDFrame48 *frame)
-> @@ -1685,7 +1688,7 @@ int sd_do_command(SDState *sd, SDRequest *req,
->           return 0;
->       }
+> -    for (i =3D 0; i < width; i ++, msg ++)
+> -        for (bit =3D 15; bit >=3D 0; bit --) {
+> +    for (i =3D 0; i < width; i++, msg++) {
+> +        for (bit =3D 15; bit >=3D 0; bit--) {
+>               shift_reg <<=3D 1;
+> -            if ((shift_reg >> 15) ^ ((*msg >> bit) & 1))
+> +            if ((shift_reg >> 15) ^ ((*msg >> bit) & 1)) {
+>                   shift_reg ^=3D 0x1011;
+> +            }
+>           }
+> +    }
 
-> -    if (sd_req_crc_validate(req)) {
-> +    if (!sd_req_crc_validate(sd, req)) {
->           sd->card_status |=3D COM_CRC_ERROR;
->           rtype =3D sd_illegal;
->           goto send_response;
-> @@ -2134,6 +2137,7 @@ static Property sd_properties[] =3D {
->        * board to ensure that ssi transfers only occur when the chip sele=
-ct
->        * is asserted.  */
->       DEFINE_PROP_BOOL("spi", SDState, spi, false),
-> +    DEFINE_PROP_BOOL("validate-crc", SDState, validate_crc, false),
->       DEFINE_PROP_END_OF_LIST()
->   };
-
+>       return shift_reg;
+>   }
 > --
 > 2.17.0
