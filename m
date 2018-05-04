@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fEap6-0008Cd-N1
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 09:32:40 -0400
+	(envelope-from <thuth@redhat.com>) id 1fEawE-0004iT-2F
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 09:39:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fEap1-0004uu-TN
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 09:32:32 -0400
-Received: from mail-oi0-x22d.google.com ([2607:f8b0:4003:c06::22d]:33968)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fEap1-0004uL-Oc
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 09:32:27 -0400
-Received: by mail-oi0-x22d.google.com with SMTP id l1-v6so19133294oii.1
-	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 06:32:27 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1fEawA-0001gr-UR
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 09:39:54 -0400
+References: <20180504131605.22816-1-cohuck@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <1655b27f-5e41-faf4-ad91-8f19d4dc340e@redhat.com>
+Date: Fri, 4 May 2018 15:39:40 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180504152658.3537707a.cohuck@redhat.com>
-References: <1525376963-79623-1-git-send-email-mst@redhat.com>
-	<1525376963-79623-61-git-send-email-mst@redhat.com>
-	<20180504091007.55405a6a.cohuck@redhat.com>
-	<be79d6dd-beaa-ba6f-2990-b5e91139411b@redhat.com>
-	<20180504152658.3537707a.cohuck@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 4 May 2018 14:32:06 +0100
-Message-ID: <CAFEAcA_xZZ5=oa-rA0=qh2-wxrt14KqH38rdg_OVLrqoTfzA9Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] cover letter cc's [was: [PATCH 60/67] hw/s390x:
- add include directory headers]
+In-Reply-To: <20180504131605.22816-1-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] s390x/css: disabled subchannels cannot be
+ status pending
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,22 +24,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, qemu-s390x <qemu-s390x@nongnu.org>, git@vger.kernel.org
+To: Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>
+Cc: Halil Pasic <pasic@linux.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On 4 May 2018 at 14:26, Cornelia Huck <cohuck@redhat.com> wrote:
-> On Fri, 4 May 2018 08:07:53 -0500
-> Eric Blake <eblake@redhat.com> wrote:
->> On the other hand, cc'ing all recipients for a largely mechanical patch
->> series that was split into 67 parts, in part because it touches so many
->> different maintainers' areas, may make the cover letter have so many
->> recipients that various mail gateways start rejecting it as potential spam.
->
-> Yes, large cross-subsystem patch series make this painful.
+On 04.05.2018 15:16, Cornelia Huck wrote:
+> The 3270 code will try to post an attention interrupt when the
+> 3270 emulator (e.g. x3270) attaches. If the guest has not yet
+> enabled the subchannel for the 3270 device, we will give it a
+> spurious status during msch when it does so later.
+> 
+> To fix this, just don't do anything in css_conditional_io_interrupt()
+> if the subchannel is not enabled. The 3270 code will work fine with
+> that, and the other user of this function (virtio-ccw) never
+> attempts to post an interrupt for a disabled device to begin with.
+> 
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  hw/s390x/css.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> index 301bf1772f..56c3fa8c89 100644
+> --- a/hw/s390x/css.c
+> +++ b/hw/s390x/css.c
+> @@ -616,6 +616,14 @@ void css_inject_io_interrupt(SubchDev *sch)
+>  
+>  void css_conditional_io_interrupt(SubchDev *sch)
+>  {
+> +    /*
+> +     * If the subchannel is not enabled, it is not made status pending
+> +     * (see PoP p. 16-17, "Status Control").
+> +     */
+> +    if (!(sch->curr_status.pmcw.flags & PMCW_FLAGS_MASK_ENA)) {
+> +        return;
+> +    }
+> +
+>      /*
+>       * If the subchannel is not currently status pending, make it pending
+>       * with alert status.
+> 
 
-My solution is to either (a) avoid them or (b) not bother cc'ing
-people (except people I think might be interested in reviewing
-cross-subsystem patchsets like Eric ;-))...
-
-thanks
--- PMM
+Tested-by: Thomas Huth <thuth@redhat.com>
