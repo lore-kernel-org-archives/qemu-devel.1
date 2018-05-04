@@ -1,35 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fEbVA-0006eN-2l
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 10:16:04 -0400
+	(envelope-from <david@redhat.com>) id 1fEbbq-0000bZ-0o
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 10:22:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fEbV6-0007TQ-Oy
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 10:16:00 -0400
-Received: from 4.mo69.mail-out.ovh.net ([46.105.42.102]:50975)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fEbV6-0007Sn-E4
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 10:15:56 -0400
-Received: from player714.ha.ovh.net (unknown [10.109.122.75])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id DE26E141BA
-	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 16:15:54 +0200 (CEST)
-References: <20180419124331.3915-1-clg@kaod.org>
-	<20180419124331.3915-7-clg@kaod.org>
-	<20180426071129.GJ8800@umbus.fritz.box>
-	<9273a240-6518-155f-ed78-79abe53761e3@kaod.org>
-	<4e3ece34-2373-c887-affe-f793b585599a@kaod.org>
-	<20180503053944.GS13229@umbus.fritz.box>
-	<e1ab26c9-013f-c645-c89f-dbd36f139d0e@kaod.org>
-	<20180504044416.GS13229@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <bab301fe-8ab9-c47c-96aa-1d8575320d97@kaod.org>
-Date: Fri, 4 May 2018 16:15:50 +0200
+	(envelope-from <david@redhat.com>) id 1fEbbm-0004Vn-L7
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 10:22:54 -0400
+References: <20180503154936.18946-1-david@redhat.com>
+	<20180503154936.18946-3-david@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <e9b92ec2-da4d-531f-4cc0-01eaedfea1e4@redhat.com>
+Date: Fri, 4 May 2018 16:22:39 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180504044416.GS13229@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20180503154936.18946-3-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 06/35] spapr/xive: introduce a XIVE
- interrupt presenter model
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 2/8] qdev: introduce ResourceHandler as
+ a first-stage hotplug handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,164 +25,365 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>
 
-On 05/04/2018 06:44 AM, David Gibson wrote:
-> On Thu, May 03, 2018 at 05:10:48PM +0200, C=E9dric Le Goater wrote:
->> On 05/03/2018 07:39 AM, David Gibson wrote:
->>> On Thu, Apr 26, 2018 at 07:15:29PM +0200, C=E9dric Le Goater wrote:
->>>> On 04/26/2018 11:27 AM, C=E9dric Le Goater wrote:
->>>>> On 04/26/2018 09:11 AM, David Gibson wrote:
->>>>>> On Thu, Apr 19, 2018 at 02:43:02PM +0200, C=E9dric Le Goater wrote=
-:
->>> [snip]
->>>>>>> +static void xive_tm_os_write(void *opaque, hwaddr offset,
->>>>>>> +                                   uint64_t value, unsigned size=
-)
->>>>>>> +{
->>>>>>> +    PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
->>>>>>> +    XiveNVT *nvt =3D XIVE_NVT(cpu->intc);
->>>>>>> +    int i;
->>>>>>> +
->>>>>>> +    if (offset >=3D TM_SPC_ACK_EBB) {
->>>>>>> +        xive_tm_write_special(nvt, offset, value, size);
->>>>>>> +        return;
->>>>>>> +    }
->>>>>>> +
->>>>>>> +    if (TM_RING(offset) !=3D TM_QW1_OS) {
->>>>>>
->>>>>> Why have this if you have separate OS and user regions as you appe=
-ar
->>>>>> to do below?
->>>>>
->>>>> This is another problem we are trying to solve.=20
->>>>>
->>>>> The registers a CPU can access depends on the TIMA view it is using=
-.=20
->>>>> The OS TIMA view only sees the OS ring registers. The HV view sees =
-all.=20
->>>>
->>>> So, I gave a deeper look at the specs and I understood a little more=
-=20
->>>> details of the concepts behind. You need to do frequent round-trips=20
->>>> to this document ... =20
->>>>
->>>> These registers are accessible through four aligned pages, each expo=
-sing=20
->>>> a different view of the registers. First page (page address ending=20
->>>> in 0b00) gives access to the entire context and is reserved for the=20
->>>> ring 0 security monitor. The second (page address ending in 0b01)=20
->>>> is for the hypervisor, ring 1. The third (page address ending in 0b1=
-0)=20
->>>> is for the operating system, ring 2. The fourth (page address ending=
-=20
->>>> in 0b11) is for user level, ring 3.
->>>>
->>>> The sPAPR machine runs at the OS privilege and therefore can only=20
->>>> accesses the OS and the User rings, 2 and 3. The others are for
->>>> hypervisor levels.
->>>
->>> Ok, that much is what I thought.  What I'm less clear on is what each
->>> page looks like compared to the others.  Previously I thought each on=
-e
->>> had the same registers,=20
->>
->> yes.
->>
->>> just manipulating the corresponding ring. =20
->>
->> no.=20
->>
->>> Are you saying instead that each ring's page basically has a subset=20
->>> of the registers in the next most privileged page?
->>
->> That's the idea.=20
->=20
-> Ah, ok.
->=20
->> The registers are defined as follow :
->>
->> 	QW-0 User     =20
->> 	QW-1 O/S     =20
->> 	QW-2 Pool  =20
->> 	QW-3 Physical=20
->>
->> and the pages :
->>
->> - 0006030203180000 security monitor=20
->>   can access all registers=20
->>
->> - 0006030203190000 hv
->>   can access all registers minus the secure regs
->>
->> - 00060302031a0000 os
->>   can access some of the OS (QW1) and User (QW0) registers
->> =20
->> - 00060302031b0000 user
->>   can access NSR reg of User (QW0) registers
->=20
-> I can see two reasonable ways of doing this:
->=20
-> A)
->=20
-> Have a single set of read/write functions.  These implement all the
-> registers but take a "privilege level" parameter which controls which
-> will actually work.  Those could then be wired up in one of two ways:
->=20
->   A1) Single memory region.  The accessor derives the priv level from
->   the relevant address bits, before masking it down to a single
->   register page.  Then, as above
+On 03.05.2018 17:49, David Hildenbrand wrote:
+> Hotplug handlers usually do 3 things:
+> 1. Allocate some resources for a new device
+> 2. Make the new device visible for the guest
+> 3. Notify the guest about the new device
+> 
+> While 2. and 3. are only ever performed once for a device, there
+> might be various resources to allocate. E.g. a MemoryDevice could be
+> exposed via Virtio. The proxy device hotplug handler (e.g. virtio-pci,
+> virtio-ccw) takes care of exposing the device to the guest. However,
+> we also have to allocate system resources, like a portion in guest
+> physical address space, which is to be handled by the machine.
+> 
+> One key difference between a hotplug handler and a resource handler is
+> that resource handlers have no "unplug_request". There is no
+> communication with the guest (this is done by a "hotplug" handler). So
+> conceptually, they are different.
+> 
+> For now we live with the assumption, that - in additon to the existing
+> hotplug handler which can do some resource asignment - at most one
+> resource handler is necessary.
+> 
+> We might even later decide to have multiple resource handlers for a
+> specific device (e.g. one for each interface they implement). For now,
+> this design is sufficient.
+> 
+> Resource handlers have to run before the hotplug handler runs (esp
+> before exposing the device to the guest).
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/core/Makefile.objs         |  1 +
+>  hw/core/qdev.c                | 41 ++++++++++++++++++++++++++++++-
+>  hw/core/resource-handler.c    | 57 +++++++++++++++++++++++++++++++++++++++++++
+>  include/hw/boards.h           |  9 +++++++
+>  include/hw/resource-handler.h | 46 ++++++++++++++++++++++++++++++++++
+>  5 files changed, 153 insertions(+), 1 deletion(-)
+>  create mode 100644 hw/core/resource-handler.c
+>  create mode 100644 include/hw/resource-handler.h
+> 
+> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+> index eb88ca979e..7474387fcd 100644
+> --- a/hw/core/Makefile.objs
+> +++ b/hw/core/Makefile.objs
+> @@ -6,6 +6,7 @@ common-obj-$(CONFIG_SOFTMMU) += fw-path-provider.o
+>  # irq.o needed for qdev GPIO handling:
+>  common-obj-y += irq.o
+>  common-obj-y += hotplug.o
+> +common-obj-y += resource-handler.o
+>  common-obj-$(CONFIG_SOFTMMU) += nmi.o
+>  
+>  common-obj-$(CONFIG_EMPTY_SLOT) += empty_slot.o
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index f6f92473b8..042e275884 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -35,6 +35,7 @@
+>  #include "qemu/error-report.h"
+>  #include "qemu/option.h"
+>  #include "hw/hotplug.h"
+> +#include "hw/resource-handler.h"
+>  #include "hw/boards.h"
+>  #include "hw/sysbus.h"
+>  
+> @@ -271,6 +272,17 @@ HotplugHandler *qdev_get_hotplug_handler(DeviceState *dev)
+>      return hotplug_ctrl;
+>  }
+>  
+> +static ResourceHandler *qdev_get_resource_handler(DeviceState *dev)
+> +{
+> +    MachineState *ms = MACHINE(qdev_get_machine());
+> +    MachineClass *mc = MACHINE_GET_CLASS(ms);
+> +
+> +    if (mc->get_resource_handler) {
+> +            return mc->get_resource_handler(ms, dev);
+> +    }
+> +    return NULL;
+> +}
+> +
+>  static int qdev_reset_one(DeviceState *dev, void *opaque)
+>  {
+>      device_reset(dev);
+> @@ -814,6 +826,7 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+>  {
+>      DeviceState *dev = DEVICE(obj);
+>      DeviceClass *dc = DEVICE_GET_CLASS(dev);
+> +    ResourceHandler *resource_ctrl;
+>      HotplugHandler *hotplug_ctrl;
+>      BusState *bus;
+>      Error *local_err = NULL;
+> @@ -825,6 +838,8 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+>          return;
+>      }
+>  
+> +    resource_ctrl = qdev_get_resource_handler(dev);
+> +
+>      if (value && !dev->realized) {
+>          if (!check_only_migratable(obj, &local_err)) {
+>              goto fail;
+> @@ -840,6 +855,13 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+>              g_free(name);
+>          }
+>  
+> +        if (resource_ctrl) {
+> +            resource_handler_pre_assign(resource_ctrl, dev, &local_err);
+> +            if (local_err != NULL) {
+> +                goto fail;
+> +            }
+> +        }
+> +
+>          hotplug_ctrl = qdev_get_hotplug_handler(dev);
+>          if (hotplug_ctrl) {
+>              hotplug_handler_pre_plug(hotplug_ctrl, dev, &local_err);
+> @@ -858,12 +880,19 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+>  
+>          DEVICE_LISTENER_CALL(realize, Forward, dev);
+>  
+> +        if (resource_ctrl) {
+> +            resource_handler_assign(resource_ctrl, dev, &local_err);
+> +            if (local_err != NULL) {
+> +                goto post_realize_fail;
+> +            }
+> +        }
+> +
+>          if (hotplug_ctrl) {
+>              hotplug_handler_plug(hotplug_ctrl, dev, &local_err);
+>          }
+>  
+>          if (local_err != NULL) {
+> -            goto post_realize_fail;
+> +            goto post_assign_fail;
+>          }
+>  
+>          /*
+> @@ -903,6 +932,11 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+>          if (qdev_get_vmsd(dev)) {
+>              vmstate_unregister(dev, qdev_get_vmsd(dev), dev);
+>          }
+> +
+> +        if (resource_ctrl) {
+> +            resource_handler_unassign(resource_ctrl, dev);
+> +        }
+> +
+>          if (dc->unrealize) {
+>              local_errp = local_err ? NULL : &local_err;
+>              dc->unrealize(dev, local_errp);
+> @@ -928,6 +962,11 @@ child_realize_fail:
+>          vmstate_unregister(dev, qdev_get_vmsd(dev), dev);
+>      }
+>  
+> +post_assign_fail:
+> +    if (resource_ctrl) {
+> +        resource_handler_unassign(resource_ctrl, dev);
+> +    }
+> +
+>  post_realize_fail:
+>      g_free(dev->canonical_path);
+>      dev->canonical_path = NULL;
+> diff --git a/hw/core/resource-handler.c b/hw/core/resource-handler.c
+> new file mode 100644
+> index 0000000000..0a1ff0e66a
+> --- /dev/null
+> +++ b/hw/core/resource-handler.c
+> @@ -0,0 +1,57 @@
+> +/*
+> + * Resource handler interface.
+> + *
+> + * Copyright (c) 2018 Red Hat Inc.
+> + *
+> + * Authors:
+> + *  David Hildenbrand <david@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "hw/resource-handler.h"
+> +#include "qemu/module.h"
+> +
+> +void resource_handler_pre_assign(ResourceHandler *rh,
+> +                                 const DeviceState *dev, Error **errp)
+> +{
+> +    ResourceHandlerClass *rhc = RESOURCE_HANDLER_GET_CLASS(rh);
+> +
+> +    if (rhc->pre_assign) {
+> +        rhc->pre_assign(rh, dev, errp);
+> +    }
+> +}
+> +
+> +void resource_handler_assign(ResourceHandler *rh, DeviceState *dev,
+> +                             Error **errp)
+> +{
+> +    ResourceHandlerClass *rhc = RESOURCE_HANDLER_GET_CLASS(rh);
+> +
+> +    if (rhc->assign) {
+> +        rhc->assign(rh, dev, errp);
+> +    }
+> +}
+> +
+> +void resource_handler_unassign(ResourceHandler *rh, DeviceState *dev)
+> +{
+> +    ResourceHandlerClass *rhc = RESOURCE_HANDLER_GET_CLASS(rh);
+> +
+> +    if (rhc->unassign) {
+> +        rhc->unassign(rh, dev);
+> +    }
+> +}
+> +
+> +static const TypeInfo resource_handler_info = {
+> +    .name          = TYPE_RESOURCE_HANDLER,
+> +    .parent        = TYPE_INTERFACE,
+> +    .class_size = sizeof(ResourceHandlerClass),
+> +};
+> +
+> +static void resource_handler_register_types(void)
+> +{
+> +    type_register_static(&resource_handler_info);
+> +}
+> +
+> +type_init(resource_handler_register_types)
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index 8748964e6f..ff5142d7c2 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -8,6 +8,7 @@
+>  #include "hw/qdev.h"
+>  #include "qom/object.h"
+>  #include "qom/cpu.h"
+> +#include "hw/resource-handler.h"
+>  
+>  /**
+>   * memory_region_allocate_system_memory - Allocate a board's main memory
+> @@ -115,6 +116,12 @@ typedef struct {
+>   *    of HotplugHandler object, which handles hotplug operation
+>   *    for a given @dev. It may return NULL if @dev doesn't require
+>   *    any actions to be performed by hotplug handler.
+> + * @get_resource_handler: this function is called when a new device is
+> + *                        about to be hotplugged. If defined, it returns pointer
+> + *                        to an instance of ResourceHandler object, which
+> + *                        handles resource asignment for a given @dev. It
+> + *                        may return NULL if @dev doesn't require any actions
+> + *                        to be performed by a resource handler.
+>   * @cpu_index_to_instance_props:
+>   *    used to provide @cpu_index to socket/core/thread number mapping, allowing
+>   *    legacy code to perform maping from cpu_index to topology properties
+> @@ -208,6 +215,8 @@ struct MachineClass {
+>  
+>      HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
+>                                             DeviceState *dev);
+> +    ResourceHandler *(*get_resource_handler)(MachineState *machine,
+> +                                             const DeviceState *dev);
+>      CpuInstanceProperties (*cpu_index_to_instance_props)(MachineState *machine,
+>                                                           unsigned cpu_index);
+>      const CPUArchIdList *(*possible_cpu_arch_ids)(MachineState *machine);
+> diff --git a/include/hw/resource-handler.h b/include/hw/resource-handler.h
+> new file mode 100644
+> index 0000000000..3eda1bec5c
+> --- /dev/null
+> +++ b/include/hw/resource-handler.h
+> @@ -0,0 +1,46 @@
+> +/*
+> + * Resource handler interface.
+> + *
+> + * Copyright (c) 2018 Red Hat Inc.
+> + *
+> + * Authors:
+> + *  David Hildenbrand <david@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef RESOURCE_HANDLER_H
+> +#define RESOURCE_HANDLER_H
+> +
+> +#include "qom/object.h"
+> +
+> +#define TYPE_RESOURCE_HANDLER "resource-handler"
+> +
+> +#define RESOURCE_HANDLER_CLASS(klass) \
+> +    OBJECT_CLASS_CHECK(ResourceHandlerClass, (klass), TYPE_RESOURCE_HANDLER)
+> +#define RESOURCE_HANDLER_GET_CLASS(obj) \
+> +    OBJECT_GET_CLASS(ResourceHandlerClass, (obj), TYPE_RESOURCE_HANDLER)
+> +#define RESOURCE_HANDLER(obj) \
+> +    INTERFACE_CHECK(ResourceHandler, (obj), TYPE_RESOURCE_HANDLER)
+> +
+> +typedef struct ResourceHandler {
+> +    Object Parent;
+> +} ResourceHandler;
+> +
+> +typedef struct ResourceHandlerClass {
+> +    InterfaceClass parent;
+> +
+> +    void (*pre_assign)(ResourceHandler *rh, const DeviceState *dev,
+> +                       Error **errp);
+> +    void (*assign)(ResourceHandler *rh, DeviceState *dev, Error **errp);
+> +    void (*unassign)(ResourceHandler *rh, DeviceState *dev);
+> +} ResourceHandlerClass;
+> +
+> +void resource_handler_pre_assign(ResourceHandler *rh, const DeviceState *dev,
+> +                                 Error **errp);
+> +void resource_handler_assign(ResourceHandler *rh, DeviceState *dev,
+> +                             Error **errp);
+> +void resource_handler_unassign(ResourceHandler *rh, DeviceState *dev);
+> +
+> +#endif /* RESOURCE_HANDLER_H */
+> 
 
-Yes. That's the goal behind the page ordering :
+I did the following changes to make it pass "make check".
 
-page address ending in 0b00 : ring 0, security monitor=20
-page address ending in 0b01 : ring 1, hypervisor=20
-page address ending in 0b10 : ring 2, operating system =20
-page address ending in 0b11 : ring 3, user level
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 042e275884..efa59b9d1e 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -274,12 +274,18 @@ HotplugHandler
+*qdev_get_hotplug_handler(DeviceState *dev)
 
-I don't why the registers are ordered the other way around though.
+ static ResourceHandler *qdev_get_resource_handler(DeviceState *dev)
+ {
+-    MachineState *ms = MACHINE(qdev_get_machine());
+-    MachineClass *mc = MACHINE_GET_CLASS(ms);
++    MachineState *ms;
++    MachineClass *mc;
++    Object *m_obj = qdev_get_machine();
 
-That's would be the direction to take for the emulated mode, I think.
-It covers well the PowerNV (4 pages) and the sPAPR case (2 pages),=20
-in each case, the machine IC controller decides how much pages to map.
-The memory region ops do the rest.
+-    if (mc->get_resource_handler) {
+-            return mc->get_resource_handler(ms, dev);
++    if (object_dynamic_cast(m_obj, TYPE_MACHINE)) {
++        ms = MACHINE(m_obj);
++        mc = MACHINE_GET_CLASS(ms);
++        if (mc->get_resource_handler) {
++                return mc->get_resource_handler(ms, dev);
++        }
+     }
++
+     return NULL;
+ }
 
-For KVM, we need to populate the VMA with the host TIMA page associated=20
-with ring 2 (OS) and then ring 3 (USER).=20
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 3b9a5e31a2..45c64bee64 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -645,6 +645,7 @@ tests/atomic_add-bench$(EXESUF):
+tests/atomic_add-bench.o $(test-util-obj-y)
 
-This option looks better overall. I will see how ugly it gets with the im=
-plementation.
+ tests/test-qdev-global-props$(EXESUF): tests/test-qdev-global-props.o \
+        hw/core/qdev.o hw/core/qdev-properties.o hw/core/hotplug.o\
++       hw/core/resource-handler.o \
+        hw/core/bus.o \
+        hw/core/irq.o \
+        hw/core/fw-path-provider.o \
 
-C.
 
+-- 
 
->   A2) Multiple memory regions with the same accessor functions but
->   different opaque pointer.  The accessor gets the priv level from
->   its opaque pointer, then the address is just within a single ring's
->   page.
->
-> B)
->=20
-> Separate memory regions with separate accessors.  The ring-0 accessor
-> implements the ring-0 registers, then calls the ring-1 accessor
-> function for everything else.  ring-1 calls ring-2 and so forth.
->
->> On sPAPR, we can remap the os/user pages to some other base address=20
->> but we should keep the same page offset.
->=20
-> Sure.
->=20
->>
->>
->>>> I will try to come with a better implementation of the model and
->>>> make sure the ring numbers are respected. I am not sure we should=20
->>>> have only one memory region or four distinct ones with their
->>>> own ops. There are some differences in the load/store of each view.
->>>
->>> Right.  I'm not clear at this point if that's for good reasons, or
->>> just because IBM's hardware designers don't seem to have gotten the
->>> hang of Don't Repeat Yourself.
->>>
->>
->=20
+Thanks,
+
+David / dhildenb
