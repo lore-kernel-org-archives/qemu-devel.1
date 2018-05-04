@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1fEd79-0001y0-6v
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 11:59:20 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fEd7N-0002OB-FV
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 11:59:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1fEd76-000181-5Q
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 11:59:19 -0400
-References: <20180504042044.10318-1-mdroth@linux.vnet.ibm.com>
-	<20180504113724.64b7b1c0@bahia.lan>
-	<152543629398.15508.17426624020859105239@sif>
-	<20180504155028.75f1ad45@bahia.lan>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <8f8e9939-fae0-46dd-87b6-b461d3ce89af@redhat.com>
-Date: Fri, 4 May 2018 17:59:04 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fEd7H-0001Ka-LC
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 11:59:33 -0400
+Received: from mail-qt0-x231.google.com ([2607:f8b0:400d:c0d::231]:38580)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fEd7H-0001K4-GL
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 11:59:27 -0400
+Received: by mail-qt0-x231.google.com with SMTP id m9-v6so7208395qtb.5
+	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 08:59:27 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Fri,  4 May 2018 12:58:58 -0300
+Message-Id: <20180504155918.21287-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20180504155028.75f1ad45@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc: only save guest
- timebase once after stopping
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 00/20] sdcard: proper implementation of CRC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,60 +31,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-stable@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alistair Francis <alistair@alistair23.me>
 
-On 04/05/2018 15:50, Greg Kurz wrote:
-> On Fri, 04 May 2018 07:18:13 -0500
-> Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
-> 
->> Quoting Greg Kurz (2018-05-04 04:37:24)
->>> On Thu,  3 May 2018 23:20:44 -0500
->>> Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
->>>   
->>>> In some cases (e.g. spapr) we record guest timebase after qmp_stop()
->>>> via a runstate hook so we can restore it on qmp_cont(). If a migration
->>>> occurs in between those events we end up saving it again, this time
->>>> based on the current timebase the guest would be seeing had it been
->>>> running. This has the effect of advancing the guest timebase while
->>>> it is stopped, which is not what the code intends.
->>>>   
->>>
->>> Hi Mike,
->>>
->>> The current behavior was introduced by:
->>>
->>> commit 42043e4f1241eeb77f87f5816b5cf0b6e9583ed7
->>> Author: Laurent Vivier <lvivier@redhat.com>
->>> Date:   Fri Jan 27 13:24:58 2017 +0100
->>>
->>>     spapr: clock should count only if vm is running
->>>
->>> and we have this in the changelog:
->>>
->>>     We keep timebase_pre_save to reduce the clock difference on
->>>     migration like in:
->>>         6053a86 kvmclock: reduce kvmclock difference on migration
->>>
->>>
->>> So your patch totally negates ^^ ? Also, I can't see a case where  
->>
->> Yah... this is a bit confusing. On one hand, the patch/summary is clearly
->> trying to avoid the guest time from advancing while it is stopped, which
->> is in the spirit of this patch. But at the same time it is trying to
->> compensate for loss of time (relative to host) due to downtime window.
->>
-> 
-> Yeah... not sure why Laurent decided to address both in the same patch...
-> maybe just because we already had the pre_save hook ?
+Hi,
 
-Well, it seemed to be a good idea to do like it is done for x86 [1]
+This series emerged after last Coverity scan and Peter suggestion in:
+http://lists.nongnu.org/archive/html/qemu-devel/2018-04/msg05046.html
 
-But I think you should remove the timebase_pre_save() function (and the
-comment) instead of adding a new flag.
+    (3) "proper" implementation of CRC, so that an sd controller
+    can either (a) mark the SDRequest as "no CRC" and have
+    sd_req_crc_validate() always pass, or (b) mark the SDRequest
+    as having a CRC and have sd_req_crc_validate() actually
+    do the check which it currently stubs out with "return 0"
 
-Thanks,
-Laurent
+- Coverity issues fixed (up to patch 6)
+- crc16 now works
+- new functions documented
+- qtests added
 
-[1] the idea was proposed by Paolo:
-https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg05862.html
+Regards,
+
+Phil.
+
+Philippe Mathieu-Daudé (20):
+  sdcard: Use the ldst API
+  sdcard: Extract sd_calc_frame48_crc7() from sd_req_crc_validate()
+  sdcard: Rename the SDRequest as SDFrame48
+  sdcard: Add sd_prepare_request[_with_crc]()
+  sdcard: Use the sd_prepare_request*() functions
+  sdcard: Add a "validate-crc" property
+  sdcard: Constify sd_crc*()'s message argument
+  sdcard: Fix sd_crc*() style
+  sdcard: Expose sd_crc*() functions for QTest use
+  sdcard: Expose sd_prepare_request*() functions for QTest use
+  sdcard: Add test_sd_request_frame_crc7() qtest (request command CRC7)
+  sdcard: Let sd_frame48_crc7_calc() work on response frames
+  sdcard: Expose sd_prepare_frame48() for QTest use
+  sdcard: Add test_sd_response_frame48_crc7 qtest (command response CRC7)
+  sdcard: Add SDFrame136 struct and 136-bit SD response frames functions
+  sdcard: Add test_sd_response_frame136_crc7() qtest
+  sdcard: Add SDFrameData struct and data frame checksum functions
+  sdcard: Fix sd_crc16()
+  sdcard: Add test_sd_data_frame_crc16() qtest
+  sdcard: Add test_sd_verify_cksum_frame48() qtest
+
+ hw/sd/sdmmc-internal.h    |  24 +++++++
+ include/hw/sd/sd.h        | 136 +++++++++++++++++++++++++++++++++++++-
+ hw/sd/bcm2835_sdhost.c    |   3 +-
+ hw/sd/milkymist-memcard.c |   9 ++-
+ hw/sd/omap_mmc.c          |   4 +-
+ hw/sd/pxa2xx_mmci.c       |   4 +-
+ hw/sd/sd.c                |  48 +++-----------
+ hw/sd/sdhci.c             |   6 +-
+ hw/sd/sdmmc-internal.c    | 114 ++++++++++++++++++++++++++++++++
+ hw/sd/ssi-sd.c            |   6 +-
+ tests/sdcard-test.c       | 116 ++++++++++++++++++++++++++++++++
+ tests/Makefile.include    |   2 +
+ 12 files changed, 409 insertions(+), 63 deletions(-)
+ create mode 100644 tests/sdcard-test.c
+
+-- 
+2.17.0
