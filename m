@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35990)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fEgM0-00020W-Fu
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 15:26:53 -0400
+	(envelope-from <olaf@aepfle.de>) id 1fEgZ5-0000vP-BV
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 15:40:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fEgLv-0006yH-Iy
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 15:26:52 -0400
-Date: Fri, 4 May 2018 16:26:35 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180504192635.GA4903@localhost.localdomain>
-References: <20180423165126.15441-1-david@redhat.com>
-	<20180423165126.15441-3-david@redhat.com>
+	(envelope-from <olaf@aepfle.de>) id 1fEgZ4-0003bH-KG
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 15:40:23 -0400
+Received: from mo6-p01-ob.smtp.rzone.de ([2a01:238:20a:202:5301::5]:18952)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <olaf@aepfle.de>) id 1fEgZ4-0003Xy-0M
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 15:40:22 -0400
+Date: Fri, 4 May 2018 21:40:06 +0200
+From: Olaf Hering <olaf@aepfle.de>
+Message-ID: <20180504214006.17217d00.olaf@aepfle.de>
+In-Reply-To: <20180504160026.14017-1-berrange@redhat.com>
+References: <20180504160026.14017-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180423165126.15441-3-david@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 02/11] machine: make MemoryHotplugState
- accessible via the machine
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/xJTTqV05620li4Afw1xeRmr";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH 0/3] Document intent for supported build
+ platforms and bump min glib to 2.42
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,80 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-On Mon, Apr 23, 2018 at 06:51:17PM +0200, David Hildenbrand wrote:
-[...]
-> +    /* always allocate the device memory information */
-> +    machine->device_memory = g_malloc(sizeof(*machine->device_memory));
-[...]
-> -    /* initialize hotplug memory address space */
-> +    /* always allocate the device memory information */
-> +    machine->device_memory = g_malloc(sizeof(*machine->device_memory));
+--Sig_/xJTTqV05620li4Afw1xeRmr
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-This makes QEMU crash because machine->device_memory->base is initialized with
-garbage:
+Am Fri,  4 May 2018 17:00:23 +0100
+schrieb Daniel P. Berrang=C3=A9 <berrange@redhat.com>:
 
-#1  0x00007fffef30a8f8 in abort () at /lib64/libc.so.6
-#2  0x00007fffef302026 in __assert_fail_base () at /lib64/libc.so.6
-#3  0x00007fffef3020d2 in  () at /lib64/libc.so.6
-#4  0x0000555555833483 in int128_get64 (a=<optimized out>) at .../qemu-build/include/qemu/int128.h:22
-#5  0x0000555555837c2e in memory_region_size (a=<optimized out>) at .../qemu-build/memory.c:1735
-#6  0x0000555555837c2e in memory_region_size (mr=<optimized out>) at .../qemu-build/memory.c:1739
-#7  0x00005555558a2b14 in pc_memory_init (pcms=pcms@entry=0x555556850050, system_memory=system_memory@entry=0x555556851e00, rom_memory=rom_memory@entry=0x5555568b8120, ram_memory=ram_memory@entry=0x7fffffffd630)
-    at .../qemu-build/hw/i386/pc.c:1440
-#8  0x00005555558a5a73 in pc_init1 (machine=0x555556850050, pci_type=0x555555cb6fd0 "i440FX", host_type=0x555555c43e41 "i440FX-pcihost") at .../qemu-build/hw/i386/pc_piix.c:179
-#9  0x00005555559abbda in machine_run_board_init (machine=0x555556850050) at .../qemu-build/hw/core/machine.c:829
-#10 0x00005555557dc515 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at .../qemu-build/vl.c:4563
+>   - I suggested following libvirt's lead in writing a policy for how
+>     we pick supported OS targets to inform maintainers when min versions
+>     can be increased.
 
+Since Xen depends on qemu, it also means that SLE11 will disappear silently=
+ for them.
 
-I will squash the following fixup:
+Olaf
 
->From 6216fdb28476ed21c4ced4672003c9c7cb0e04d2 Mon Sep 17 00:00:00 2001
-From: David Hildenbrand <david@redhat.com>
-Date: Fri, 4 May 2018 15:54:46 +0200
-Subject: [PATCH] memory-device: fix device_memory creation on pc and spapr
+--Sig_/xJTTqV05620li4Afw1xeRmr
+Content-Type: application/pgp-signature
+Content-Description: Digitale Signatur von OpenPGP
 
-We have to inititalize the struct to 0. Otherwise, without "maxmem",
-the content is undefined, which might result in random asserts
-striking when e.g. reading out the size of the contained memory region.
+-----BEGIN PGP SIGNATURE-----
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/i386/pc.c   | 2 +-
- hw/ppc/spapr.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+iF0EARECAB0WIQSkRyP6Rn//f03pRUBdQqD6ppg2fgUCWuy3FgAKCRBdQqD6ppg2
+fn04AJ9CQXAbu89PLmBDf/Pc7ssOlEWZSACff8j1fuT4yp57W+VB9EZhfwWe5Uc=
+=dpbC
+-----END PGP SIGNATURE-----
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index ffcd7b85d9..868893d0a1 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1372,7 +1372,7 @@ void pc_memory_init(PCMachineState *pcms,
-     }
- 
-     /* always allocate the device memory information */
--    machine->device_memory = g_malloc(sizeof(*machine->device_memory));
-+    machine->device_memory = g_malloc0(sizeof(*machine->device_memory));
- 
-     /* initialize device memory address space */
-     if (pcmc->has_reserved_memory &&
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index ef05075232..a1abcba6ad 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2637,7 +2637,7 @@ static void spapr_machine_init(MachineState *machine)
-     memory_region_add_subregion(sysmem, 0, ram);
- 
-     /* always allocate the device memory information */
--    machine->device_memory = g_malloc(sizeof(*machine->device_memory));
-+    machine->device_memory = g_malloc0(sizeof(*machine->device_memory));
- 
-     /* initialize hotplug memory address space */
-     if (machine->ram_size < machine->maxram_size) {
--- 
-2.14.3
-
-
--- 
-Eduardo
+--Sig_/xJTTqV05620li4Afw1xeRmr--
