@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fEVnM-0001IX-Bg
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:10:25 -0400
+	(envelope-from <abdallah.bouassida@lauterbach.com>)
+	id 1fEVpv-0003VG-Et
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:13:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fEVnJ-0006xQ-79
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:10:24 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59690 helo=mx1.redhat.com)
+	(envelope-from <abdallah.bouassida@lauterbach.com>)
+	id 1fEVps-0002AI-BK
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:13:03 -0400
+Received: from smtp1.lauterbach.com ([62.154.241.196]:55503)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fEVnI-0006wj-Rd
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:10:20 -0400
-Date: Fri, 4 May 2018 09:10:11 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180504081011.GB18897@stefanha-x1.localdomain>
-References: <1525376963-79623-1-git-send-email-mst@redhat.com>
-	<1525376963-79623-7-git-send-email-mst@redhat.com>
+	(Exim 4.71) (envelope-from <abdallah.bouassida@lauterbach.com>)
+	id 1fEVps-0001pq-1P
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:13:00 -0400
+References: <1524153386-3550-1-git-send-email-abdallah.bouassida@lauterbach.com>
+	<87zi1g8qrd.fsf@linaro.org>
+From: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+Message-ID: <21a8cd56-b57a-31d9-36ac-131bd5996be0@lauterbach.com>
+Date: Fri, 4 May 2018 09:12:42 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="4SFOXa2GPu3tIq4H"
-Content-Disposition: inline
-In-Reply-To: <1525376963-79623-7-git-send-email-mst@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 06/67] trace: use local path for local
- headers
+In-Reply-To: <87zi1g8qrd.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v6 0/3] target/arm: Add a dynamic
+ XML-description of the cp-registers to GDB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +32,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, berrange@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org, khaled.jmal@lauterbach.com
 
 
---4SFOXa2GPu3tIq4H
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Abdallah Bouassida <abdallah.bouassida@lauterbach.com> writes:
+>
+>> The previous version:
+>> http://patchwork.ozlabs.org/project/qemu-devel/list/?series=33714
+> I was trying to do some testing but I was finding it very hard to do at
+> gdb kept throwing up errors like:
+>
+> (gdb) x/10i $pc
+> => 0xffffff8008097760 <check_and_switch_context>:       Cannot access memory at address 0xffffff8008097760
+> Detaching from program: /home/alex/lsrc/qemu/kernel-v8-plain.build/vmlinux, Remote target
+> Ending remote debugging.
+>
+> However this seems to be the same on master as well so I wonder there is
+> a regression somewhere.
+>
+> What was the last QEMU master commit you've tested these patches on?
+> I'll do some more digging tomorrow.
+It was:
+    commit 0e87fdc966d05f4e5ad868034fcd8ee2a08ca62d
+    Author: Peter Maydell <peter.maydell@linaro.org>
+    Date:   Wed Apr 4 20:37:20 2018 +0100
+        Update version for v2.12.0-rc2 release
 
-On Thu, May 03, 2018 at 10:50:28PM +0300, Michael S. Tsirkin wrote:
-> When pulling in headers that are in the same directory as C file (as
-> opposed to one in include/), we should use its relative path, without a
-> directory. Directory based path works more or less by accident.
->=20
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  trace/control.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---4SFOXa2GPu3tIq4H
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJa7BVjAAoJEJykq7OBq3PIvAAIAICfs/NUfZnK57k7EBKWJ0Nf
-ihmzSxZYZwT3l+HBmedKak8zlCQHjk5r82oXI7JvG/QmS7vhrt0lbChse+1jubYN
-Pzw5iVf7jQZYStCFp/HcIcqt0rra//vICVQYeT3tySH4/1mR9rSwjXHlRiNZ47hN
-sJ8k/MVI4C2VQKYouJ/blhGBmLvoBFwMsZUkWJudBW1kbszr0tTLfEsyaiZx+aCG
-IYf7AXc4cQgX4J8g0YJ5DN0lmAkatWz6QwW9knhMfrfRzqm/FPdL+lDoZmzUvxHq
-bum0UE126UeIKSDMezTH0v1PhdHn/KwWoQ7IJCRPEwKxbDio47EX4UZ9sS1ZsAY=
-=Mv9e
------END PGP SIGNATURE-----
-
---4SFOXa2GPu3tIq4H--
+Best regards,
+Abdallah
