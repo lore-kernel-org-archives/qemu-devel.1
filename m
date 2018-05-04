@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fEViI-00053q-Fb
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:05:11 -0400
+	(envelope-from <armbru@redhat.com>) id 1fEViF-00050W-Gp
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:05:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fEViC-0001Wf-Fg
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:05:10 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58732 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fEViC-0001Wp-Gt
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:05:07 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38888 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fEViC-0001Uq-2D
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fEViC-0001Uw-2G
 	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:05:04 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 292254040856
-	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 08:04:59 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6EE5F4270968
+	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 08:05:00 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  4 May 2018 10:04:46 +0200
-Message-Id: <20180504080454.11014-3-armbru@redhat.com>
+Date: Fri,  4 May 2018 10:04:53 +0200
+Message-Id: <20180504080454.11014-10-armbru@redhat.com>
 In-Reply-To: <20180504080454.11014-1-armbru@redhat.com>
 References: <20180504080454.11014-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 02/10] qobject: Ensure base is at offset 0
+Subject: [Qemu-devel] [PULL 09/10] qapi: discriminate CpuInfoFast on
+ SysEmuTarget, not CpuInfoArch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,61 +31,232 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
 
-All QObject types have the base QObject as their first field. This
-allows the simplification of qobject_to().
+Add a new field @target (of type @SysEmuTarget) to the output of the
+@query-cpus-fast command, which provides more information about the
+emulation target than the field @arch (of type @CpuInfoArch). Make @target
+the new discriminator for the @CpuInfoFast return structure. Keep @arch
+for compatibility.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180419150145.24795-2-marcandre.lureau@redhat.com>
+Message-Id: <20180427192852.15013-5-lersek@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
-[Commit message paragraph on type casts dropped, to avoid giving the
-impression type casting would be okay]
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- include/qapi/qmp/qobject.h | 5 ++---
- qobject/qobject.c          | 9 +++++++++
- 2 files changed, 11 insertions(+), 3 deletions(-)
+ cpus.c         | 87 ++++++++++++++++++++++++++++++++++++++++++----------------
+ qapi/misc.json | 62 +++++++++++++++++++++++++++++++----------
+ 2 files changed, 110 insertions(+), 39 deletions(-)
 
-diff --git a/include/qapi/qmp/qobject.h b/include/qapi/qmp/qobject.h
-index e022707578..5206ff9ee1 100644
---- a/include/qapi/qmp/qobject.h
-+++ b/include/qapi/qmp/qobject.h
-@@ -61,9 +61,8 @@ struct QObject {
- QEMU_BUILD_BUG_MSG(QTYPE__MAX !=3D 7,
-                    "The QTYPE_CAST_TO_* list needs to be extended");
-=20
--#define qobject_to(type, obj) ({ \
--    QObject *_tmp =3D qobject_check_type(obj, glue(QTYPE_CAST_TO_, type)=
-); \
--    _tmp ? container_of(_tmp, type, base) : (type *)NULL; })
-+#define qobject_to(type, obj)                                       \
-+    ((type *)qobject_check_type(obj, glue(QTYPE_CAST_TO_, type)))
-=20
- /* Initialize an object to default values */
- static inline void qobject_init(QObject *obj, QType type)
-diff --git a/qobject/qobject.c b/qobject/qobject.c
-index 23600aa1c1..87649c5be5 100644
---- a/qobject/qobject.c
-+++ b/qobject/qobject.c
-@@ -16,6 +16,15 @@
- #include "qapi/qmp/qlist.h"
- #include "qapi/qmp/qstring.h"
-=20
-+QEMU_BUILD_BUG_MSG(
-+    offsetof(QNull, base) !=3D 0 ||
-+    offsetof(QNum, base) !=3D 0 ||
-+    offsetof(QString, base) !=3D 0 ||
-+    offsetof(QDict, base) !=3D 0 ||
-+    offsetof(QList, base) !=3D 0 ||
-+    offsetof(QBool, base) !=3D 0,
-+    "base qobject must be at offset 0");
+diff --git a/cpus.c b/cpus.c
+index 60563a6d54..5bcd3ecf38 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -2187,6 +2187,59 @@ CpuInfoList *qmp_query_cpus(Error **errp)
+     return head;
+ }
+ 
++static CpuInfoArch sysemu_target_to_cpuinfo_arch(SysEmuTarget target)
++{
++    /*
++     * The @SysEmuTarget -> @CpuInfoArch mapping below is based on the
++     * TARGET_ARCH -> TARGET_BASE_ARCH mapping in the "configure" script.
++     */
++    switch (target) {
++    case SYS_EMU_TARGET_I386:
++    case SYS_EMU_TARGET_X86_64:
++        return CPU_INFO_ARCH_X86;
 +
- static void (*qdestroy[QTYPE__MAX])(QObject *) =3D {
-     [QTYPE_NONE] =3D NULL,               /* No such object exists */
-     [QTYPE_QNULL] =3D NULL,              /* qnull_ is indestructible */
---=20
++    case SYS_EMU_TARGET_PPC:
++    case SYS_EMU_TARGET_PPCEMB:
++    case SYS_EMU_TARGET_PPC64:
++        return CPU_INFO_ARCH_PPC;
++
++    case SYS_EMU_TARGET_SPARC:
++    case SYS_EMU_TARGET_SPARC64:
++        return CPU_INFO_ARCH_SPARC;
++
++    case SYS_EMU_TARGET_MIPS:
++    case SYS_EMU_TARGET_MIPSEL:
++    case SYS_EMU_TARGET_MIPS64:
++    case SYS_EMU_TARGET_MIPS64EL:
++        return CPU_INFO_ARCH_MIPS;
++
++    case SYS_EMU_TARGET_TRICORE:
++        return CPU_INFO_ARCH_TRICORE;
++
++    case SYS_EMU_TARGET_S390X:
++        return CPU_INFO_ARCH_S390;
++
++    case SYS_EMU_TARGET_RISCV32:
++    case SYS_EMU_TARGET_RISCV64:
++        return CPU_INFO_ARCH_RISCV;
++
++    default:
++        return CPU_INFO_ARCH_OTHER;
++    }
++}
++
++static void cpustate_to_cpuinfo_s390(CpuInfoS390 *info, const CPUState *cpu)
++{
++#ifdef TARGET_S390X
++    S390CPU *s390_cpu = S390_CPU(cpu);
++    CPUS390XState *env = &s390_cpu->env;
++
++    info->cpu_state = env->cpu_state;
++#else
++    abort();
++#endif
++}
++
+ /*
+  * fast means: we NEVER interrupt vCPU threads to retrieve
+  * information from KVM.
+@@ -2196,11 +2249,9 @@ CpuInfoFastList *qmp_query_cpus_fast(Error **errp)
+     MachineState *ms = MACHINE(qdev_get_machine());
+     MachineClass *mc = MACHINE_GET_CLASS(ms);
+     CpuInfoFastList *head = NULL, *cur_item = NULL;
++    SysEmuTarget target = qapi_enum_parse(&SysEmuTarget_lookup, TARGET_NAME,
++                                          -1, &error_abort);
+     CPUState *cpu;
+-#if defined(TARGET_S390X)
+-    S390CPU *s390_cpu;
+-    CPUS390XState *env;
+-#endif
+ 
+     CPU_FOREACH(cpu) {
+         CpuInfoFastList *info = g_malloc0(sizeof(*info));
+@@ -2218,26 +2269,14 @@ CpuInfoFastList *qmp_query_cpus_fast(Error **errp)
+             info->value->props = props;
+         }
+ 
+-#if defined(TARGET_I386)
+-        info->value->arch = CPU_INFO_ARCH_X86;
+-#elif defined(TARGET_PPC)
+-        info->value->arch = CPU_INFO_ARCH_PPC;
+-#elif defined(TARGET_SPARC)
+-        info->value->arch = CPU_INFO_ARCH_SPARC;
+-#elif defined(TARGET_MIPS)
+-        info->value->arch = CPU_INFO_ARCH_MIPS;
+-#elif defined(TARGET_TRICORE)
+-        info->value->arch = CPU_INFO_ARCH_TRICORE;
+-#elif defined(TARGET_S390X)
+-        s390_cpu = S390_CPU(cpu);
+-        env = &s390_cpu->env;
+-        info->value->arch = CPU_INFO_ARCH_S390;
+-        info->value->u.s390.cpu_state = env->cpu_state;
+-#elif defined(TARGET_RISCV)
+-        info->value->arch = CPU_INFO_ARCH_RISCV;
+-#else
+-        info->value->arch = CPU_INFO_ARCH_OTHER;
+-#endif
++        info->value->arch = sysemu_target_to_cpuinfo_arch(target);
++        info->value->target = target;
++        if (target == SYS_EMU_TARGET_S390X) {
++            cpustate_to_cpuinfo_s390(&info->value->u.s390x, cpu);
++        } else {
++            /* do nothing for @CpuInfoOther */
++        }
++
+         if (!cur_item) {
+             head = cur_item = info;
+         } else {
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 460866cf54..fa4eec7b6b 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -558,25 +558,55 @@
+ # @props: properties describing to which node/socket/core/thread
+ #         virtual CPU belongs to, provided if supported by board
+ #
+-# @arch: architecture of the cpu, which determines which additional fields
+-#        will be listed
++# @arch: base architecture of the cpu
++#
++# @target: the QEMU system emulation target, which is more specific than
++#          @arch and determines which additional fields will be listed
++#          (since 2.13)
+ #
+ # Since: 2.12
+ #
+ ##
+-{ 'union': 'CpuInfoFast',
+-  'base': {'cpu-index': 'int', 'qom-path': 'str',
+-           'thread-id': 'int', '*props': 'CpuInstanceProperties',
+-           'arch': 'CpuInfoArch' },
+-  'discriminator': 'arch',
+-  'data': { 'x86': 'CpuInfoOther',
+-            'sparc': 'CpuInfoOther',
+-            'ppc': 'CpuInfoOther',
+-            'mips': 'CpuInfoOther',
+-            'tricore': 'CpuInfoOther',
+-            's390': 'CpuInfoS390',
+-            'riscv': 'CpuInfoOther',
+-            'other': 'CpuInfoOther' } }
++{ 'union'         : 'CpuInfoFast',
++  'base'          : { 'cpu-index'    : 'int',
++                      'qom-path'     : 'str',
++                      'thread-id'    : 'int',
++                      '*props'       : 'CpuInstanceProperties',
++                      'arch'         : 'CpuInfoArch',
++                      'target'       : 'SysEmuTarget' },
++  'discriminator' : 'target',
++  'data'          : { 'aarch64'      : 'CpuInfoOther',
++                      'alpha'        : 'CpuInfoOther',
++                      'arm'          : 'CpuInfoOther',
++                      'cris'         : 'CpuInfoOther',
++                      'hppa'         : 'CpuInfoOther',
++                      'i386'         : 'CpuInfoOther',
++                      'lm32'         : 'CpuInfoOther',
++                      'm68k'         : 'CpuInfoOther',
++                      'microblaze'   : 'CpuInfoOther',
++                      'microblazeel' : 'CpuInfoOther',
++                      'mips'         : 'CpuInfoOther',
++                      'mips64'       : 'CpuInfoOther',
++                      'mips64el'     : 'CpuInfoOther',
++                      'mipsel'       : 'CpuInfoOther',
++                      'moxie'        : 'CpuInfoOther',
++                      'nios2'        : 'CpuInfoOther',
++                      'or1k'         : 'CpuInfoOther',
++                      'ppc'          : 'CpuInfoOther',
++                      'ppc64'        : 'CpuInfoOther',
++                      'ppcemb'       : 'CpuInfoOther',
++                      'riscv32'      : 'CpuInfoOther',
++                      'riscv64'      : 'CpuInfoOther',
++                      's390x'        : 'CpuInfoS390',
++                      'sh4'          : 'CpuInfoOther',
++                      'sh4eb'        : 'CpuInfoOther',
++                      'sparc'        : 'CpuInfoOther',
++                      'sparc64'      : 'CpuInfoOther',
++                      'tricore'      : 'CpuInfoOther',
++                      'unicore32'    : 'CpuInfoOther',
++                      'x86_64'       : 'CpuInfoOther',
++                      'xtensa'       : 'CpuInfoOther',
++                      'xtensaeb'     : 'CpuInfoOther' } }
+ 
+ ##
+ # @query-cpus-fast:
+@@ -602,6 +632,7 @@
+ #             },
+ #             "qom-path": "/machine/unattached/device[0]",
+ #             "arch":"x86",
++#             "target":"x86_64",
+ #             "cpu-index": 0
+ #         },
+ #         {
+@@ -613,6 +644,7 @@
+ #             },
+ #             "qom-path": "/machine/unattached/device[2]",
+ #             "arch":"x86",
++#             "target":"x86_64",
+ #             "cpu-index": 1
+ #         }
+ #     ]
+-- 
 2.13.6
