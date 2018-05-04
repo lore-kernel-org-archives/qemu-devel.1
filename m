@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fETSd-00006F-Bo
+	(envelope-from <richard.henderson@linaro.org>) id 1fETSa-00006A-Lj
 	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:40:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fETSc-0004uj-M8
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:40:51 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:35836)
+	(envelope-from <richard.henderson@linaro.org>) id 1fETSZ-0004rg-9a
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:40:48 -0400
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:43683)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fETSc-0004uF-Gw
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:40:50 -0400
-Received: by mail-pg0-x241.google.com with SMTP id j11-v6so14728807pgf.2
-	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 22:40:50 -0700 (PDT)
+	id 1fETSZ-0004qq-1e
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:40:47 -0400
+Received: by mail-pf0-x242.google.com with SMTP id j20so2262684pff.10
+	for <qemu-devel@nongnu.org>; Thu, 03 May 2018 22:40:46 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu,  3 May 2018 22:40:30 -0700
-Message-Id: <20180504054030.24527-14-richard.henderson@linaro.org>
+Date: Thu,  3 May 2018 22:40:27 -0700
+Message-Id: <20180504054030.24527-11-richard.henderson@linaro.org>
 In-Reply-To: <20180504054030.24527-1-richard.henderson@linaro.org>
 References: <20180504054030.24527-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 13/13] target/openrisc: Merge
- disas_openrisc_insn
+Subject: [Qemu-devel] [PATCH 10/13] target/openrisc: Convert dec_comp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,48 +31,180 @@ Cc: Stafford Horne <shorne@gmail.com>
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/openrisc/translate.c | 15 ++++++---------
- 1 file changed, 6 insertions(+), 9 deletions(-)
+ target/openrisc/translate.c  | 120 +++++++++++++++++++++----------------------
+ target/openrisc/insns.decode |  15 ++++++
+ 2 files changed, 73 insertions(+), 62 deletions(-)
 
 diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-index 66e493220e..3866106bf6 100644
+index 548e0230b3..2c15b2713f 100644
 --- a/target/openrisc/translate.c
 +++ b/target/openrisc/translate.c
-@@ -1373,14 +1373,6 @@ static bool trans_lf_sfle_s(DisasContext *dc, arg_ab *a, uint32_t insn)
+@@ -1048,74 +1048,74 @@ static bool trans_l_macrc(DisasContext *dc, arg_l_macrc *a, uint32_t insn)
      return true;
  }
  
--static void disas_openrisc_insn(DisasContext *dc, OpenRISCCPU *cpu)
--{
--    uint32_t insn = cpu_ldl_code(&cpu->env, dc->pc);
--    if (!decode(dc, insn)) {
--        gen_illegal_exception(dc);
--    }
--}
--
- void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
+-static void dec_comp(DisasContext *dc, uint32_t insn)
++static bool trans_l_sfeq(DisasContext *dc, arg_ab *a, TCGCond cond)
  {
-     CPUOpenRISCState *env = cs->env_ptr;
-@@ -1388,6 +1380,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-     struct DisasContext ctx, *dc = &ctx;
-     uint32_t pc_start;
-     uint32_t next_page_start;
-+    uint32_t insn;
-     int num_insns;
-     int max_insns;
+-    uint32_t op0;
+-    uint32_t ra, rb;
++    LOG_DIS("l.sfeq r%d, r%d\n", a->a, a->b);
++    tcg_gen_setcond_tl(TCG_COND_EQ, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
  
-@@ -1449,7 +1442,11 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-         if (num_insns == max_insns && (tb_cflags(tb) & CF_LAST_IO)) {
-             gen_io_start();
-         }
--        disas_openrisc_insn(dc, cpu);
+-    op0 = extract32(insn, 21, 5);
+-    ra = extract32(insn, 16, 5);
+-    rb = extract32(insn, 11, 5);
++static bool trans_l_sfne(DisasContext *dc, arg_ab *a, TCGCond cond)
++{
++    LOG_DIS("l.sfne r%d, r%d\n", a->a, a->b);
++    tcg_gen_setcond_tl(TCG_COND_NE, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
+ 
+-    /* unsigned integers  */
+-    tcg_gen_ext32u_tl(cpu_R[ra], cpu_R[ra]);
+-    tcg_gen_ext32u_tl(cpu_R[rb], cpu_R[rb]);
++static bool trans_l_sfgtu(DisasContext *dc, arg_ab *a, TCGCond cond)
++{
++    LOG_DIS("l.sfgtu r%d, r%d\n", a->a, a->b);
++    tcg_gen_setcond_tl(TCG_COND_GTU, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
+ 
+-    switch (op0) {
+-    case 0x0:    /* l.sfeq */
+-        LOG_DIS("l.sfeq  r%d, r%d\n", ra, rb);
+-        tcg_gen_setcond_tl(TCG_COND_EQ, cpu_sr_f, cpu_R[ra], cpu_R[rb]);
+-        break;
++static bool trans_l_sfgeu(DisasContext *dc, arg_ab *a, TCGCond cond)
++{
++    LOG_DIS("l.sfgeu r%d, r%d\n", a->a, a->b);
++    tcg_gen_setcond_tl(TCG_COND_GEU, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
+ 
+-    case 0x1:    /* l.sfne */
+-        LOG_DIS("l.sfne  r%d, r%d\n", ra, rb);
+-        tcg_gen_setcond_tl(TCG_COND_NE, cpu_sr_f, cpu_R[ra], cpu_R[rb]);
+-        break;
++static bool trans_l_sfltu(DisasContext *dc, arg_ab *a, TCGCond cond)
++{
++    LOG_DIS("l.sfltu r%d, r%d\n", a->a, a->b);
++    tcg_gen_setcond_tl(TCG_COND_LTU, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
+ 
+-    case 0x2:    /* l.sfgtu */
+-        LOG_DIS("l.sfgtu  r%d, r%d\n", ra, rb);
+-        tcg_gen_setcond_tl(TCG_COND_GTU, cpu_sr_f, cpu_R[ra], cpu_R[rb]);
+-        break;
++static bool trans_l_sfleu(DisasContext *dc, arg_ab *a, TCGCond cond)
++{
++    LOG_DIS("l.sfleu r%d, r%d\n", a->a, a->b);
++    tcg_gen_setcond_tl(TCG_COND_LEU, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
+ 
+-    case 0x3:    /* l.sfgeu */
+-        LOG_DIS("l.sfgeu  r%d, r%d\n", ra, rb);
+-        tcg_gen_setcond_tl(TCG_COND_GEU, cpu_sr_f, cpu_R[ra], cpu_R[rb]);
+-        break;
++static bool trans_l_sfgts(DisasContext *dc, arg_ab *a, TCGCond cond)
++{
++    LOG_DIS("l.sfgts r%d, r%d\n", a->a, a->b);
++    tcg_gen_setcond_tl(TCG_COND_GT, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
+ 
+-    case 0x4:    /* l.sfltu */
+-        LOG_DIS("l.sfltu  r%d, r%d\n", ra, rb);
+-        tcg_gen_setcond_tl(TCG_COND_LTU, cpu_sr_f, cpu_R[ra], cpu_R[rb]);
+-        break;
++static bool trans_l_sfges(DisasContext *dc, arg_ab *a, TCGCond cond)
++{
++    LOG_DIS("l.sfges r%d, r%d\n", a->a, a->b);
++    tcg_gen_setcond_tl(TCG_COND_GE, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
+ 
+-    case 0x5:    /* l.sfleu */
+-        LOG_DIS("l.sfleu  r%d, r%d\n", ra, rb);
+-        tcg_gen_setcond_tl(TCG_COND_LEU, cpu_sr_f, cpu_R[ra], cpu_R[rb]);
+-        break;
++static bool trans_l_sflts(DisasContext *dc, arg_ab *a, TCGCond cond)
++{
++    LOG_DIS("l.sflts r%d, r%d\n", a->a, a->b);
++    tcg_gen_setcond_tl(TCG_COND_LT, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
+ 
+-    case 0xa:    /* l.sfgts */
+-        LOG_DIS("l.sfgts  r%d, r%d\n", ra, rb);
+-        tcg_gen_setcond_tl(TCG_COND_GT, cpu_sr_f, cpu_R[ra], cpu_R[rb]);
+-        break;
+-
+-    case 0xb:    /* l.sfges */
+-        LOG_DIS("l.sfges  r%d, r%d\n", ra, rb);
+-        tcg_gen_setcond_tl(TCG_COND_GE, cpu_sr_f, cpu_R[ra], cpu_R[rb]);
+-        break;
+-
+-    case 0xc:    /* l.sflts */
+-        LOG_DIS("l.sflts  r%d, r%d\n", ra, rb);
+-        tcg_gen_setcond_tl(TCG_COND_LT, cpu_sr_f, cpu_R[ra], cpu_R[rb]);
+-        break;
+-
+-    case 0xd:    /* l.sfles */
+-        LOG_DIS("l.sfles  r%d, r%d\n", ra, rb);
+-        tcg_gen_setcond_tl(TCG_COND_LE, cpu_sr_f, cpu_R[ra], cpu_R[rb]);
+-        break;
+-
+-    default:
+-        gen_illegal_exception(dc);
+-        break;
+-    }
++static bool trans_l_sfles(DisasContext *dc, arg_ab *a, TCGCond cond)
++{
++    LOG_DIS("l.sfles r%d, r%d\n", a->a, a->b);
++    tcg_gen_setcond_tl(TCG_COND_LE, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
++    return true;
+ }
+ 
+ static void dec_compi(DisasContext *dc, uint32_t insn)
+@@ -1478,10 +1478,6 @@ static void disas_openrisc_insn(DisasContext *dc, OpenRISCCPU *cpu)
+         dec_float(dc, insn);
+         break;
+ 
+-    case 0x39:
+-        dec_comp(dc, insn);
+-        break;
+-
+     default:
+         gen_illegal_exception(dc);
+         break;
+diff --git a/target/openrisc/insns.decode b/target/openrisc/insns.decode
+index 84f71c13b3..29d28ff5be 100644
+--- a/target/openrisc/insns.decode
++++ b/target/openrisc/insns.decode
+@@ -139,3 +139,18 @@ l_slli          101110 d:5 a:5 -------- 00 l:6
+ l_srli          101110 d:5 a:5 -------- 01 l:6
+ l_srai          101110 d:5 a:5 -------- 10 l:6
+ l_rori          101110 d:5 a:5 -------- 11 l:6
 +
-+        insn = cpu_ldl_code(&cpu->env, dc->pc);
-+        if (!decode(dc, insn)) {
-+            gen_illegal_exception(dc);
-+        }
-         dc->pc = dc->pc + 4;
- 
-         /* delay slot */
++####
++# Compare Instructions
++####
++
++l_sfeq          111001 00000 a:5 b:5 -----------
++l_sfne          111001 00001 a:5 b:5 -----------
++l_sfgtu         111001 00010 a:5 b:5 -----------
++l_sfgeu         111001 00011 a:5 b:5 -----------
++l_sfltu         111001 00100 a:5 b:5 -----------
++l_sfleu         111001 00101 a:5 b:5 -----------
++l_sfgts         111001 01010 a:5 b:5 -----------
++l_sfges         111001 01011 a:5 b:5 -----------
++l_sflts         111001 01100 a:5 b:5 -----------
++l_sfles         111001 01101 a:5 b:5 -----------
 -- 
 2.14.3
