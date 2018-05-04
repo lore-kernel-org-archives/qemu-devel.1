@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fEcUd-0002wK-U2
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 11:19:33 -0400
+	(envelope-from <prvs=655ddeee3=Paul.Durrant@citrix.com>)
+	id 1fEcWh-0003f7-Vz
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 11:21:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fEcUZ-0004Ys-JO
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 11:19:31 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51848 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fEcUZ-0004Yc-Ay
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 11:19:27 -0400
-References: <1525445354-16233-1-git-send-email-walling@linux.ibm.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7e9e9dfd-795b-47f2-453a-59bf65f28229@redhat.com>
-Date: Fri, 4 May 2018 10:19:18 -0500
-MIME-Version: 1.0
-In-Reply-To: <1525445354-16233-1-git-send-email-walling@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(envelope-from <prvs=655ddeee3=Paul.Durrant@citrix.com>)
+	id 1fEcWg-0005lw-LP
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 11:21:39 -0400
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Fri, 4 May 2018 15:21:29 +0000
+Message-ID: <80fb47d07ec1483f889319885c8869e9@AMSPEX02CL03.citrite.net>
+References: <1525442134-20488-1-git-send-email-paul.durrant@citrix.com>
+	<1525442134-20488-8-git-send-email-paul.durrant@citrix.com>
+In-Reply-To: <1525442134-20488-8-git-send-email-paul.durrant@citrix.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] monitor: report entirety of hmp command on
- error
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 7/8] xen_disk: use a single entry iovec
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,154 +26,228 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org
+To: Paul Durrant <Paul.Durrant@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 05/04/2018 09:49 AM, Collin Walling wrote:
-> When a user incorrectly provides an hmp command, an error response will be
-> printed that prompts the user to try "help <command name>". However, when
-> the command contains multiple parts e.g. "info skeys", only the last
-> whitespace delimited string will be reported (in this example "info" will
-> be dropped and the message will read "Try "help skeys" for more information",
-> which is incorrect).
-
-What's the exact formula for reproducing this?  I tried:
-
-$ ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic --monitor stdio
-QEMU 2.12.50 monitor - type 'help' for more information
-(qemu) info skeys
-unknown command: 'info skeys'
-
-Oh, I see now:
-
-(qemu) info uuid blah
-uuid: extraneous characters at the end of line
-Try "help uuid" for more information
-(qemu) help uuid
-(qemu)
-
-You'll want to update your commit message to document something that is 
-reproducible (you may be adding an 'info skeys', but until that is in, 
-it doesn't make a good example).
-
-> 
-> Let's correct this by capturing the full name of the command as we recurse
-> through the function monitor_parse_command.
-> 
-> Reported-by: Mikhail Fokin <fokin@de.ibm.com>
-> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> -----Original Message-----
+> From: Paul Durrant [mailto:paul.durrant@citrix.com]
+> Sent: 04 May 2018 14:56
+> To: xen-devel@lists.xenproject.org; qemu-block@nongnu.org; qemu-
+> devel@nongnu.org
+> Cc: Paul Durrant <Paul.Durrant@citrix.com>; Stefano Stabellini
+> <sstabellini@kernel.org>; Anthony Perard <anthony.perard@citrix.com>;
+> Kevin Wolf <kwolf@redhat.com>; Max Reitz <mreitz@redhat.com>
+> Subject: [PATCH v2 7/8] xen_disk: use a single entry iovec
+>=20
+> Since xen_disk now always copies data to and from a guest there is no nee=
+d
+> to maintain a vector entry corresponding to every page of a request.
+> This means there is less per-request state to maintain so the ioreq
+> structure can shrink significantly.
+>=20
+> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 > ---
->   monitor.c | 15 +++++++++++----
->   1 file changed, 11 insertions(+), 4 deletions(-)
-> 
-> diff --git a/monitor.c b/monitor.c
-> index 39f8ee1..d4844b4 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -2964,7 +2964,8 @@ static const mon_cmd_t *search_dispatch_table(const mon_cmd_t *disp_table,
->   static const mon_cmd_t *monitor_parse_command(Monitor *mon,
->                                                 const char *cmdp_start,
->                                                 const char **cmdp,
-> -                                              mon_cmd_t *table)
-> +                                              mon_cmd_t *table,
-> +                                              char *fullname)
+> Cc: Stefano Stabellini <sstabellini@kernel.org>
+> Cc: Anthony Perard <anthony.perard@citrix.com>
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: Max Reitz <mreitz@redhat.com>
+>=20
+> v2:
+>  - Re-based
 
-Umm, how is fullname any better than cmdp_start that we already have?
+Unfortunately I managed to drop a hunk during rebase and so this patch is a=
+ctually broken. I'll send a rectified v3 shortly.
 
->   {
->       const char *p;
->       const mon_cmd_t *cmd;
-> @@ -2987,10 +2988,14 @@ static const mon_cmd_t *monitor_parse_command(Monitor *mon,
->           p++;
->       }
->   
-> +    strncat(fullname, cmdname, strlen(cmdname));
+  Paul
 
-gcc 8 is pickier about using strncat() [perhaps too picky - see 
-https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85602], but it is generally 
-NOT the function you want to be using.
-
-> +
->       *cmdp = p;
->       /* search sub command */
->       if (cmd->sub_table != NULL && *p != '\0') {
-> -        return monitor_parse_command(mon, cmdp_start, cmdp, cmd->sub_table);
-> +        strncat(fullname, " ", 1);
-> +        return monitor_parse_command(mon, cmdp_start, cmdp, cmd->sub_table,
-> +                                     fullname);
-
-See, you're reconstructing a command into fullname, which already 
-matches the original command in cmdp_start, so I see no reason to change 
-the signature.
-
->       }
->   
->       return cmd;
-> @@ -3371,10 +3376,12 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline)
->   {
->       QDict *qdict;
->       const mon_cmd_t *cmd;
-> +    char fullname[256];
-
-EWWW. Don't do that.  You are just ASKING for a buffer overflow exploit 
-that prints the wrong thing or causes a security hole, when I 
-intentionally type a super-long garbage command into HMP.
-
->   
->       trace_handle_hmp_command(mon, cmdline);
->   
-> -    cmd = monitor_parse_command(mon, cmdline, &cmdline, mon->cmd_table);
-> +    cmd = monitor_parse_command(mon, cmdline, &cmdline, mon->cmd_table,
-> +                                fullname);
-
-Note that even without your patch, this call updates 'cmdline' to point 
-to the position within the original string (although that position has 
-already skipped spaces).
-
->       if (!cmd) {
->           return;
->       }
-> @@ -3382,7 +3389,7 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline)
->       qdict = monitor_parse_arguments(mon, &cmdline, cmd);
->       if (!qdict) {
->           monitor_printf(mon, "Try \"help %s\" for more information\n",
-> -                       cmd->name);
-> +                       fullname);
-
-So rather than trying to reconstruct a string, you could reuse what you 
-already have.  This is a shorter patch that I think accomplishes the 
-same goal:
-
-diff --git i/monitor.c w/monitor.c
-index 39f8ee17ba7..38736b3a20d 100644
---- i/monitor.c
-+++ w/monitor.c
-@@ -3371,6 +3371,7 @@ static void handle_hmp_command(Monitor *mon, const 
-char *cmdline)
-  {
-      QDict *qdict;
-      const mon_cmd_t *cmd;
-+    const char *cmd_start = cmdline;
-
-      trace_handle_hmp_command(mon, cmdline);
-
-@@ -3381,8 +3382,11 @@ static void handle_hmp_command(Monitor *mon, 
-const char *cmdline)
-
-      qdict = monitor_parse_arguments(mon, &cmdline, cmd);
-      if (!qdict) {
--        monitor_printf(mon, "Try \"help %s\" for more information\n",
--                       cmd->name);
-+        while (cmdline > cmd_start && qemu_isspace(cmdline[-1])) {
-+            cmdline--;
-+        }
-+        monitor_printf(mon, "Try \"help %.*s\" for more information\n",
-+                       (int)(cmdline - cmd_start), cmd_start);
-          return;
-      }
-
-
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> ---
+>  hw/block/xen_disk.c | 71 ++++++++++++++---------------------------------=
+------
+>  1 file changed, 18 insertions(+), 53 deletions(-)
+>=20
+> diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
+> index 28be8b6..230961f 100644
+> --- a/hw/block/xen_disk.c
+> +++ b/hw/block/xen_disk.c
+> @@ -46,13 +46,10 @@ struct ioreq {
+>      /* parsed request */
+>      off_t               start;
+>      QEMUIOVector        v;
+> +    void                *buf;
+> +    size_t              size;
+>      int                 presync;
+>=20
+> -    /* grant mapping */
+> -    uint32_t            refs[BLKIF_MAX_SEGMENTS_PER_REQUEST];
+> -    void                *page[BLKIF_MAX_SEGMENTS_PER_REQUEST];
+> -    void                *pages;
+> -
+>      /* aio status */
+>      int                 aio_inflight;
+>      int                 aio_errors;
+> @@ -110,12 +107,10 @@ static void ioreq_reset(struct ioreq *ioreq)
+>      memset(&ioreq->req, 0, sizeof(ioreq->req));
+>      ioreq->status =3D 0;
+>      ioreq->start =3D 0;
+> +    ioreq->buf =3D NULL;
+> +    ioreq->size =3D 0;
+>      ioreq->presync =3D 0;
+>=20
+> -    memset(ioreq->refs, 0, sizeof(ioreq->refs));
+> -    memset(ioreq->page, 0, sizeof(ioreq->page));
+> -    ioreq->pages =3D NULL;
+> -
+>      ioreq->aio_inflight =3D 0;
+>      ioreq->aio_errors =3D 0;
+>=20
+> @@ -138,7 +133,7 @@ static struct ioreq *ioreq_start(struct XenBlkDev
+> *blkdev)
+>          ioreq =3D g_malloc0(sizeof(*ioreq));
+>          ioreq->blkdev =3D blkdev;
+>          blkdev->requests_total++;
+> -        qemu_iovec_init(&ioreq->v, BLKIF_MAX_SEGMENTS_PER_REQUEST);
+> +        qemu_iovec_init(&ioreq->v, 1);
+>      } else {
+>          /* get one from freelist */
+>          ioreq =3D QLIST_FIRST(&blkdev->freelist);
+> @@ -183,7 +178,6 @@ static void ioreq_release(struct ioreq *ioreq, bool
+> finish)
+>  static int ioreq_parse(struct ioreq *ioreq)
+>  {
+>      struct XenBlkDev *blkdev =3D ioreq->blkdev;
+> -    uintptr_t mem;
+>      size_t len;
+>      int i;
+>=20
+> @@ -230,13 +224,10 @@ static int ioreq_parse(struct ioreq *ioreq)
+>              goto err;
+>          }
+>=20
+> -        ioreq->refs[i]   =3D ioreq->req.seg[i].gref;
+> -
+> -        mem =3D ioreq->req.seg[i].first_sect * blkdev->file_blk;
+>          len =3D (ioreq->req.seg[i].last_sect - ioreq->req.seg[i].first_s=
+ect + 1) *
+> blkdev->file_blk;
+> -        qemu_iovec_add(&ioreq->v, (void*)mem, len);
+> +        ioreq->size +=3D len;
+>      }
+> -    if (ioreq->start + ioreq->v.size > blkdev->file_size) {
+> +    if (ioreq->start + ioreq->size > blkdev->file_size) {
+>          xen_pv_printf(&blkdev->xendev, 0, "error: access beyond end of
+> file\n");
+>          goto err;
+>      }
+> @@ -247,35 +238,6 @@ err:
+>      return -1;
+>  }
+>=20
+> -static void ioreq_free_copy_buffers(struct ioreq *ioreq)
+> -{
+> -    int i;
+> -
+> -    for (i =3D 0; i < ioreq->v.niov; i++) {
+> -        ioreq->page[i] =3D NULL;
+> -    }
+> -
+> -    qemu_vfree(ioreq->pages);
+> -}
+> -
+> -static int ioreq_init_copy_buffers(struct ioreq *ioreq)
+> -{
+> -    int i;
+> -
+> -    if (ioreq->v.niov =3D=3D 0) {
+> -        return 0;
+> -    }
+> -
+> -    ioreq->pages =3D qemu_memalign(XC_PAGE_SIZE, ioreq->v.niov *
+> XC_PAGE_SIZE);
+> -
+> -    for (i =3D 0; i < ioreq->v.niov; i++) {
+> -        ioreq->page[i] =3D ioreq->pages + i * XC_PAGE_SIZE;
+> -        ioreq->v.iov[i].iov_base =3D ioreq->page[i];
+> -    }
+> -
+> -    return 0;
+> -}
+> -
+>  static int ioreq_grant_copy(struct ioreq *ioreq)
+>  {
+>      struct XenBlkDev *blkdev =3D ioreq->blkdev;
+> @@ -284,6 +246,7 @@ static int ioreq_grant_copy(struct ioreq *ioreq)
+>      int i, count, rc;
+>      int64_t file_blk =3D ioreq->blkdev->file_blk;
+>      bool to_domain =3D (ioreq->req.operation =3D=3D BLKIF_OP_READ);
+> +    void *virt =3D ioreq->buf;
+>=20
+>      if (ioreq->v.niov =3D=3D 0) {
+>          return 0;
+> @@ -293,16 +256,17 @@ static int ioreq_grant_copy(struct ioreq *ioreq)
+>=20
+>      for (i =3D 0; i < count; i++) {
+>          if (to_domain) {
+> -            segs[i].dest.foreign.ref =3D ioreq->refs[i];
+> +            segs[i].dest.foreign.ref =3D ioreq->req.seg[i].gref;
+>              segs[i].dest.foreign.offset =3D ioreq->req.seg[i].first_sect=
+ * file_blk;
+> -            segs[i].source.virt =3D ioreq->v.iov[i].iov_base;
+> +            segs[i].source.virt =3D virt;
+>          } else {
+> -            segs[i].source.foreign.ref =3D ioreq->refs[i];
+> +            segs[i].source.foreign.ref =3D ioreq->req.seg[i].gref;
+>              segs[i].source.foreign.offset =3D ioreq->req.seg[i].first_se=
+ct * file_blk;
+> -            segs[i].dest.virt =3D ioreq->v.iov[i].iov_base;
+> +            segs[i].dest.virt =3D virt;
+>          }
+>          segs[i].len =3D (ioreq->req.seg[i].last_sect
+>                         - ioreq->req.seg[i].first_sect + 1) * file_blk;
+> +        virt +=3D segs[i].len;
+>      }
+>=20
+>      rc =3D xen_be_copy_grant_refs(xendev, to_domain, segs, count);
+> @@ -314,6 +278,7 @@ static int ioreq_grant_copy(struct ioreq *ioreq)
+>          return -1;
+>      }
+>=20
+> +    qemu_iovec_add(&ioreq->v, ioreq->buf, ioreq->size);
+>      return rc;
+>  }
+>=20
+> @@ -348,14 +313,14 @@ static void qemu_aio_complete(void *opaque, int
+> ret)
+>          if (ret =3D=3D 0) {
+>              ioreq_grant_copy(ioreq);
+>          }
+> -        ioreq_free_copy_buffers(ioreq);
+> +        qemu_vfree(ioreq->buf);
+>          break;
+>      case BLKIF_OP_WRITE:
+>      case BLKIF_OP_FLUSH_DISKCACHE:
+>          if (!ioreq->req.nr_segments) {
+>              break;
+>          }
+> -        ioreq_free_copy_buffers(ioreq);
+> +        qemu_vfree(ioreq->buf);
+>          break;
+>      default:
+>          break;
+> @@ -423,12 +388,12 @@ static int ioreq_runio_qemu_aio(struct ioreq
+> *ioreq)
+>  {
+>      struct XenBlkDev *blkdev =3D ioreq->blkdev;
+>=20
+> -    ioreq_init_copy_buffers(ioreq);
+> +    ioreq->buf =3D qemu_memalign(XC_PAGE_SIZE, ioreq->size);
+>      if (ioreq->req.nr_segments &&
+>          (ioreq->req.operation =3D=3D BLKIF_OP_WRITE ||
+>           ioreq->req.operation =3D=3D BLKIF_OP_FLUSH_DISKCACHE) &&
+>          ioreq_grant_copy(ioreq)) {
+> -        ioreq_free_copy_buffers(ioreq);
+> +        qemu_vfree(ioreq->buf);
+>          goto err;
+>      }
+>=20
+> --
+> 2.1.4
