@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fEW2b-0003R5-H6
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:26:11 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fEW5h-0004i8-Ci
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:29:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fEW2W-0007XJ-IY
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:26:09 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33374)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fEW2W-0007WK-Cf
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:26:04 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fEW2S-0005nU-Td
-	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 08:26:01 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AE3442E818A
-	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 08:25:59 +0000 (UTC)
+	(envelope-from <stefanha@redhat.com>) id 1fEW5e-000185-74
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:29:21 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59174 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fEW5e-00017Q-02
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:29:18 -0400
+Date: Fri, 4 May 2018 09:29:10 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180504082910.GD18897@stefanha-x1.localdomain>
+References: <d50e3a40-d7f3-4c9b-e930-4c2f4d6c8a53@redhat.com>
+	<CAFEAcA8wJuJ9464LadgjJOo-7ttdGYcfDQWALbkxBRJCr_knkg@mail.gmail.com>
+	<062deb2a-35fc-319f-b159-3b58cbf910df@redhat.com>
+	<20180502115844.GO3308@redhat.com>
+	<CAFEAcA-e_=08658O8E3CAmYXvBbNWmznnhfMLUW+MXnxb_vKfQ@mail.gmail.com>
+	<20180503093329.GF11382@redhat.com>
+	<8af696b5-3985-ffd6-43fb-2bcbfe0d0493@redhat.com>
+	<222ee475-9eb5-8887-819a-7b093fc269b1@kaod.org>
+	<20180503180240.GC13789@stefanha-x1.localdomain>
+	<20180503185040.GC2671@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 04 May 2018 08:12:04 -0000
-From: ChristianEhrhardt <1769053@bugs.launchpad.net>
-Reply-To: Bug 1769053 <1769053@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152541524728.557.4600864098110042577.malonedeb@gac.canonical.com>
-Message-Id: <152542152429.6753.13045970347499587385.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1769053] Re: Cannot start a guest with more than
- 1TB of RAM
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Q0rSlbzrZN6k9QnT"
+Content-Disposition: inline
+In-Reply-To: <20180503185040.GC2671@work-vm>
+Subject: Re: [Qemu-devel] release retrospective, next release timing,
+ numbering
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,67 +37,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>, Greg Kurz <groug@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Thanks for your clarification Daniel, I'll mark both tasks incomplete
-then until you come back with that data.
 
-** Changed in: qemu (Ubuntu)
-       Status: New =3D> Incomplete
+--Q0rSlbzrZN6k9QnT
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+On Thu, May 03, 2018 at 07:50:41PM +0100, Dr. David Alan Gilbert wrote:
+> * Stefan Hajnoczi (stefanha@redhat.com) wrote:
+> > On Thu, May 03, 2018 at 04:16:41PM +0200, C=E9dric Le Goater wrote:
+> > > Coming back to the initial motivation that Peter pointed out, would
+> > > the goal to be able to run vcpus of different architectures ? It would
+> > > certainly be interesting to model a platform, specially if we can=20
+> > > synchronize the execution in some ways and find timing issues.
+> >=20
+> > Yes, there is demand for heterogenous guests.  People have worked on
+> > this problem in the past but nothing mergeable came out of it.
+> >=20
+> > The main issue with a monolithic binary is that today, QEMU builds
+> > target-specific object files (see Makefile.target).  That means the same
+> > C source file is recompiled for each target with different #defines.  We
+> > cannot easily link these "duplicate" object files into a single binary
+> > because the symbol names would collide.
+> >=20
+> > It would be necessary to refactor target-specific #ifdefs.  Here is a
+> > trivial example from arch_init.c:
+> >=20
+> >   #ifdef TARGET_SPARC
+> >   int graphic_width =3D 1024;
+> >   int graphic_height =3D 768;
+> >   int graphic_depth =3D 8;
+> >   #else
+> >   int graphic_width =3D 800;
+> >   int graphic_height =3D 600;
+> >   int graphic_depth =3D 32;
+> >   #endif
+> >=20
+> > This can be converted into a runtime check:
+> >=20
+> >   static void init_graphic_resolution(void)
+> >   {
+> >       if (arch_type =3D=3D QEMU_ARCH_SPARC) {
+> >           graphic_width =3D 1024;
+> >           graphic_height =3D 768;
+> >           graphic_depth =3D 8;
+> >       } else {
+> >           graphic_width =3D 800;
+> >           graphic_height =3D 600;
+> >           graphic_depth =3D 32;
+> >       }
+> >   }
+> >   target_init(init_graphic_resolution)
+> >=20
+> > I'm assuming target_init() registers functions that will be called once
+> > arch_type has been set.
+> >=20
+> > Of course the meaning of arch_type in a heterogenous system is different
+> > since there can be multiple CPUs.  It would mean the overall board (e.g.
+> > a SPARC machine).  But that is a separate issue and can only be
+> > addressed once target-specific files have been eliminated.
+> >=20
+> > I also want to point out that a monolithic binary is totally orthogonal
+> > to modularity (reducing attack surface, reducing dependencies).  These
+> > two issues do not conflict with each other.  We could have a single
+> > "qemu-softmmu" binary that dynamically loads needed machine types, CPU,
+> > and emulated devices.  That way the monolithic binary can do everything
+> > but is still minimal.
+> >=20
+> > So to clarify, three separate steps:
+> >=20
+> > 1. Get rid of target-specific #ifdefs
+> > 2a. Modular QEMU, single binary
+> > 2b. Heterogenous QEMU
+> >=20
+> > 2a and 2b are independent but both depend on 1.
+>=20
+> (1) may not be required, if those ifdef's are in target-specific
+> builds; but that does require that any target-specific stuff goes
+> through a well defined interface to be a loadable module and not
+> have a zillion overlapping symbols.
 
--- =
+Right, there are many cases that I omitted and the arch_init.c example
+was the simplest case.  Each instance needs to be handled on a
+case-by-case basis.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1769053
+We may need to keep multiple copies of object code.  Byteswapping is an
+example of this:
 
-Title:
-  Cannot start a guest with more than 1TB of RAM
+  #if defined(HOST_WORDS_BIGENDIAN) !=3D defined(TARGET_WORDS_BIGENDIAN)
+  #define BSWAP_NEEDED
+  #endif
 
-Status in QEMU:
-  Incomplete
-Status in qemu package in Ubuntu:
-  Incomplete
+Adding runtime endianness checks to all guest memory accesses could
+impact performance.  This is why everything that includes cpu.h is
+currently per-target.
 
-Bug description:
-  Attempting to start a KVM guest with more than 1TB of RAM fails.
+This work is no small task but I think it's necessary.  The starting
+point for anyone who'd like to contribute:
 
-  It looks like we might need some extra patches:
-  https://lists.gnu.org/archive/html/qemu-discuss/2017-12/msg00005.html
+Look at obj-y files in the makefiles.  These are the target-specific
+object files that need to be investigated.  Everything already in
+common-obj-y is only built once and can be ignored.
 
-  ProblemType: Bug
-  DistroRelease: Ubuntu 18.04
-  Package: qemu-system-x86 1:2.11+dfsg-1ubuntu7
-  ProcVersionSignature: Ubuntu 4.15.0-20.21-generic 4.15.17
-  Uname: Linux 4.15.0-20-generic x86_64
-  ApportVersion: 2.20.9-0ubuntu7
-  Architecture: amd64
-  CurrentDesktop: Unity:Unity7:ubuntu
-  Date: Fri May  4 16:21:14 2018
-  InstallationDate: Installed on 2017-04-05 (393 days ago)
-  InstallationMedia: Ubuntu 16.10 "Yakkety Yak" - Release amd64 (20161012.2)
-  MachineType: Dell Inc. XPS 13 9360
-  ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.15.0-20-generic root=3D/dev/ma=
-pper/ubuntu--vg-root ro quiet splash transparent_hugepage=3Dmadvise vt.hand=
-off=3D1
-  SourcePackage: qemu
-  UpgradeStatus: Upgraded to bionic on 2018-04-30 (3 days ago)
-  dmi.bios.date: 02/26/2018
-  dmi.bios.vendor: Dell Inc.
-  dmi.bios.version: 2.6.2
-  dmi.board.name: 0PF86Y
-  dmi.board.vendor: Dell Inc.
-  dmi.board.version: A00
-  dmi.chassis.type: 9
-  dmi.chassis.vendor: Dell Inc.
-  dmi.modalias: dmi:bvnDellInc.:bvr2.6.2:bd02/26/2018:svnDellInc.:pnXPS1393=
-60:pvr:rvnDellInc.:rn0PF86Y:rvrA00:cvnDellInc.:ct9:cvr:
-  dmi.product.family: XPS
-  dmi.product.name: XPS 13 9360
-  dmi.sys.vendor: Dell Inc.
+Stefan
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1769053/+subscriptions
+--Q0rSlbzrZN6k9QnT
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJa7BnWAAoJEJykq7OBq3PIuXAH/0n2vdPCfZS0pi+FRUASToet
+mmnH4wFNMdxKq8vONBobGEz8T4heUPaOD1c38yFoF6KdE9q/LCLpdow1HOppiqxj
+leOfq721jjQI9xWuTVpxpX1VTQs3qN5QfIJBOLPHo38hkBUIUI8jqbBeGRrc5ePc
+3zN9ylT+03zz/KX+OCgIeSI2DVZlwJ42C/VVJ3V48llAC9e0ig9fF0bHJLx6Pavr
+/vMcwLtA1x/+/ItMbOSV0MhP41q9FXaMn4q9XiBoMoFXC2usJkMwFl0XUQRgrDa9
+JEbXHLNbLTYt5OhHGuhuof6nzx/CrADB3xTwBOoRqMbHD7d3dRHTrezSQvDBLRY=
+=BoUN
+-----END PGP SIGNATURE-----
+
+--Q0rSlbzrZN6k9QnT--
