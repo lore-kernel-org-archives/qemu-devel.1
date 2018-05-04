@@ -1,32 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38135)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fEc7z-0004HL-Iv
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 10:56:08 -0400
+	(envelope-from <pasic@linux.ibm.com>) id 1fEcDz-0005qv-TB
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 11:02:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fEc7w-0002wR-Cw
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 10:56:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55240 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fEc7w-0002wC-7j
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 10:56:04 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 605EC42EF0F7
-	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 14:56:03 +0000 (UTC)
-References: <1525326658-3078-1-git-send-email-thuth@redhat.com>
-	<87k1slot93.fsf@dusky.pond.sub.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <54f1bb8c-c61e-557a-952d-92ba1297e818@redhat.com>
-Date: Fri, 4 May 2018 16:55:57 +0200
+	(envelope-from <pasic@linux.ibm.com>) id 1fEcDy-0000wI-Lv
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 11:02:19 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40920
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fEcDy-0000lR-H9
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 11:02:18 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w44ExrLw015972
+	for <qemu-devel@nongnu.org>; Fri, 4 May 2018 11:02:14 -0400
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2hrqpspge1-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 11:02:13 -0400
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Fri, 4 May 2018 16:02:11 +0100
+References: <20180504131605.22816-1-cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.ibm.com>
+Date: Fri, 4 May 2018 17:02:07 +0200
 MIME-Version: 1.0
-In-Reply-To: <87k1slot93.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180504131605.22816-1-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] net: Silence 'has no peer' messages in
- testing mode
+Message-Id: <3597f256-cc9d-c1a2-9fa1-b8d2d1d3d3d7@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] s390x/css: disabled subchannels cannot be
+ status pending
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,52 +42,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On 03.05.2018 13:47, Markus Armbruster wrote:
-> Thomas Huth <thuth@redhat.com> writes:
+Could we somehow get 'fix' or something similar into the title?
+
+Also do we need cc stable for this? I guess this is broken
+for a while now.
+
+On 05/04/2018 03:16 PM, Cornelia Huck wrote:
+> The 3270 code will try to post an attention interrupt when the
+> 3270 emulator (e.g. x3270) attaches. If the guest has not yet
+> enabled the subchannel for the 3270 device, we will give it a
+> spurious status during msch when it does so later.
+
+Maybe something like 'The spurious status will preclude the successful
+execution of msch (e.g. when the guest later tries to enable
+the subchannel).' I had difficulties getting your sentence right-away.
+
 > 
->> When running qtests with -nodefaults, we are not interested in
->> these 'XYZ has no peer' messages.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  net/net.c | 13 +++++++------
->>  1 file changed, 7 insertions(+), 6 deletions(-)
->>
->> diff --git a/net/net.c b/net/net.c
->> index 29f8398..58bf85e 100644
->> --- a/net/net.c
->> +++ b/net/net.c
->> @@ -1427,12 +1427,13 @@ void net_check_clients(void)
->>  
->>      net_hub_check_clients();
->>  
->> -    QTAILQ_FOREACH(nc, &net_clients, next) {
->> -        if (!nc->peer) {
->> -            warn_report("%s %s has no peer",
->> -                        nc->info->type == NET_CLIENT_DRIVER_NIC
->> -                        ? "nic" : "netdev",
->> -                        nc->name);
->> +    if (!qtest_enabled() || nd_table[0].used) {
+> To fix this, just don't do anything in css_conditional_io_interrupt()
+> if the subchannel is not enabled. The 3270 code will work fine with
+> that, and the other user of this function (virtio-ccw) never
+> attempts to post an interrupt for a disabled device to begin with.
 > 
-> I understand the !qtest_enabled part, but not the nd_table[0].used
-> part.  Can you explain?
 
-Sure: I want to silence the message in qtest mode with -nodefaults.
-qtest mode enabled means qtest_enabled() returns true.
--nodefaults enabled means nd_table[0].used is set to false.
-So silence the message if qtest_enabled() && !nd_table[0].used.
-Negates to: Print the message if !qtest_enabled || nd_table[0].used.
+And I guess vfio-ccw is also unaffected, as the passed through
+stuff is going to handle this correctly on the lower levels.
 
->> +        QTAILQ_FOREACH(nc, &net_clients, next) {
->> +            if (!nc->peer) {
->> +                warn_report("%s %s has no peer",
->> +                            nc->info->type == NET_CLIENT_DRIVER_NIC
->> +                            ? "nic" : "netdev", nc->name);
->> +            }
->>          }
->>      }
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 
- Thomas
+Overall I agree with the patch.
+
+Acked-by: Halil Pasic <pasic@linux.ibm.com>
+
+> ---
+>   hw/s390x/css.c | 8 ++++++++
+>   1 file changed, 8 insertions(+)
+> 
+> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> index 301bf1772f..56c3fa8c89 100644
+> --- a/hw/s390x/css.c
+> +++ b/hw/s390x/css.c
+> @@ -616,6 +616,14 @@ void css_inject_io_interrupt(SubchDev *sch)
+>   
+>   void css_conditional_io_interrupt(SubchDev *sch)
+
+Loosely related:
+What is the semantic difference between css_inject_io_interrupt and
+this css_conditional_io_interrup? The css_conditional_io_interrupt
+could be 'unsolicited' or 'virtio notification'. This function also
+relies on the serialization of io instructions or?
+
+Also there is this paragraph to be considered if this is indeed
+about unsolicited:
+"""
+The subchannel and device status associated with
+an unsolicited interruption condition is never merged
+with that of any currently existing interruption condi-
+tion. If the subchannel is currently status pending, the
+unsolicited interruption condition is held in abeyance
+in either the channel subsystem or the device, as
+appropriate, until the status-pending condition has
+been cleared.
+"""
+
+
+>   {
+> +    /*
+> +     * If the subchannel is not enabled, it is not made status pending
+> +     * (see PoP p. 16-17, "Status Control").
+> +     */
+
+In not sure about the reference. We usually don't do that or? And the page
+number may change. I would probably just drop the PoP reference.
+
+> +    if (!(sch->curr_status.pmcw.flags & PMCW_FLAGS_MASK_ENA)) {
+> +        return;
+> +    }
+> +
+
+We don't have a scenario where the guest is expected to do some 'recovery'
+after being educated about some condition by the means of an alert-status,
+do we?
+
+I also wonder if this is the right place to handle the problem. The
+3870 also manipulates scsw.dstat before calling this. And I'm not sure
+where/if is that cleared, or if it's OK to leave it set...
+
+Regards,
+Halil
