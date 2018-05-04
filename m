@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39888)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fEdc4-0004MK-KG
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:31:19 -0400
+	(envelope-from <emanuele.giuseppe.esposito@usi.ch>)
+	id 1fEdkF-00030D-0p
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:39:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fEdc0-0007vm-Kh
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:31:16 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43354)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fEdc0-0007uJ-Ep
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:31:12 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fEdbv-0007kt-UY
-	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 16:31:08 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3D54C2E81DE
-	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 16:30:57 +0000 (UTC)
+	(envelope-from <emanuele.giuseppe.esposito@usi.ch>)
+	id 1fEdkB-0006cn-SP
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:39:43 -0400
+Received: from mail-he1eur01on0052.outbound.protection.outlook.com
+	([104.47.0.52]:22464
+	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <emanuele.giuseppe.esposito@usi.ch>)
+	id 1fEdkB-0006VP-6o
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:39:39 -0400
+From: Emanuele Giuseppe Esposito <emanuele.giuseppe.esposito@usi.ch>
+Date: Fri, 4 May 2018 16:39:32 +0000
+Message-ID: <VI1PR05MB44457ABF0BD18DF5F02F8CE0AE860@VI1PR05MB4445.eurprd05.prod.outlook.com>
+Content-Language: en-US
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 04 May 2018 16:19:48 -0000
-From: Dan Streetman <dan.streetman@canonical.com>
-Reply-To: Bug 1769053 <1769053@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152541524728.557.4600864098110042577.malonedeb@gac.canonical.com>
-Message-Id: <152545078863.2035.10548904017158137407.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1769053] Re: Cannot start a guest with more than
- 1TB of RAM
+Subject: [Qemu-devel] GSoC intro: Emanuele working on Qtest Driver Framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,68 +30,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-And with non-massive mem (so the guest actually boots up), the guest
-does show only 40 bits of phys mem addressing, so qemu will definitely
-have to increase that to be able to provide >1TB of phys mem to the
-guest (assuming qemu doesn't adjust that dynamically based on the total
-mem provided to the guest)
+Hello,
+my name is Emanuele and I am one of the students selected to participate at=
+ the Google Summer of Code with QEMU.
+I'll work on the current test driver framework and will try to improve it (=
+i.e. automatically detect devices and run tests based on the targeted archi=
+tecture). More info can be found at https://wiki.qemu.org/Features/qtest_dr=
+iver_framework.
+My mentors will be Paolo Bonzini and Laurent Vivier.
 
-ubuntu@largemem:~$ grep -m 1 'address sizes' /proc/cpuinfo =
+I am currently studying Computer Science in Lugano, at Universita' della Sv=
+izzera Italiana (USI), and will graduate in June.
+I'm looking forward to working in this community!
 
-address sizes	: 40 bits physical, 48 bits virtual
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1769053
-
-Title:
-  Cannot start a guest with more than 1TB of RAM
-
-Status in QEMU:
-  Incomplete
-Status in qemu package in Ubuntu:
-  Incomplete
-
-Bug description:
-  Attempting to start a KVM guest with more than 1TB of RAM fails.
-
-  It looks like we might need some extra patches:
-  https://lists.gnu.org/archive/html/qemu-discuss/2017-12/msg00005.html
-
-  ProblemType: Bug
-  DistroRelease: Ubuntu 18.04
-  Package: qemu-system-x86 1:2.11+dfsg-1ubuntu7
-  ProcVersionSignature: Ubuntu 4.15.0-20.21-generic 4.15.17
-  Uname: Linux 4.15.0-20-generic x86_64
-  ApportVersion: 2.20.9-0ubuntu7
-  Architecture: amd64
-  CurrentDesktop: Unity:Unity7:ubuntu
-  Date: Fri May  4 16:21:14 2018
-  InstallationDate: Installed on 2017-04-05 (393 days ago)
-  InstallationMedia: Ubuntu 16.10 "Yakkety Yak" - Release amd64 (20161012.2)
-  MachineType: Dell Inc. XPS 13 9360
-  ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.15.0-20-generic root=3D/dev/ma=
-pper/ubuntu--vg-root ro quiet splash transparent_hugepage=3Dmadvise vt.hand=
-off=3D1
-  SourcePackage: qemu
-  UpgradeStatus: Upgraded to bionic on 2018-04-30 (3 days ago)
-  dmi.bios.date: 02/26/2018
-  dmi.bios.vendor: Dell Inc.
-  dmi.bios.version: 2.6.2
-  dmi.board.name: 0PF86Y
-  dmi.board.vendor: Dell Inc.
-  dmi.board.version: A00
-  dmi.chassis.type: 9
-  dmi.chassis.vendor: Dell Inc.
-  dmi.modalias: dmi:bvnDellInc.:bvr2.6.2:bd02/26/2018:svnDellInc.:pnXPS1393=
-60:pvr:rvnDellInc.:rn0PF86Y:rvrA00:cvnDellInc.:ct9:cvr:
-  dmi.product.family: XPS
-  dmi.product.name: XPS 13 9360
-  dmi.sys.vendor: Dell Inc.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1769053/+subscriptions
+Emanuele
