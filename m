@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35990)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=655ddeee3=Paul.Durrant@citrix.com>)
-	id 1fEgLY-0001Zh-IC
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 15:26:26 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fEgM0-00020W-Fu
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 15:26:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=655ddeee3=Paul.Durrant@citrix.com>)
-	id 1fEgLW-0006ox-KH
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 15:26:24 -0400
-From: Paul Durrant <paul.durrant@citrix.com>
-Date: Fri, 4 May 2018 20:26:07 +0100
-Message-ID: <1525461967-32174-9-git-send-email-paul.durrant@citrix.com>
-In-Reply-To: <1525461967-32174-1-git-send-email-paul.durrant@citrix.com>
-References: <1525461967-32174-1-git-send-email-paul.durrant@citrix.com>
+	(envelope-from <ehabkost@redhat.com>) id 1fEgLv-0006yH-Iy
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 15:26:52 -0400
+Date: Fri, 4 May 2018 16:26:35 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180504192635.GA4903@localhost.localdomain>
+References: <20180423165126.15441-1-david@redhat.com>
+	<20180423165126.15441-3-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 8/8] xen_disk: be consistent with use of
- xendev and blkdev->xendev
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180423165126.15441-3-david@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 02/11] machine: make MemoryHotplugState
+ accessible via the machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,324 +24,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: xen-devel@lists.xenproject.org, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-Certain functions in xen_disk are called with a pointer to xendev
-(struct XenDevice *). They then use continer_of() to acces the surrounding
-blkdev (struct XenBlkDev) but then in various places use &blkdev->xendev
-when use of the original xendev pointer is shorter to express and clearly
-equivalent.
+On Mon, Apr 23, 2018 at 06:51:17PM +0200, David Hildenbrand wrote:
+[...]
+> +    /* always allocate the device memory information */
+> +    machine->device_memory = g_malloc(sizeof(*machine->device_memory));
+[...]
+> -    /* initialize hotplug memory address space */
+> +    /* always allocate the device memory information */
+> +    machine->device_memory = g_malloc(sizeof(*machine->device_memory));
 
-This patch is a purely cosmetic patch which makes sure there is a xendev
-pointer on stack for any function where the pointer is need on multiple
-occasions modified those functions to use it consistently.
+This makes QEMU crash because machine->device_memory->base is initialized with
+garbage:
 
-Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+#1  0x00007fffef30a8f8 in abort () at /lib64/libc.so.6
+#2  0x00007fffef302026 in __assert_fail_base () at /lib64/libc.so.6
+#3  0x00007fffef3020d2 in  () at /lib64/libc.so.6
+#4  0x0000555555833483 in int128_get64 (a=<optimized out>) at .../qemu-build/include/qemu/int128.h:22
+#5  0x0000555555837c2e in memory_region_size (a=<optimized out>) at .../qemu-build/memory.c:1735
+#6  0x0000555555837c2e in memory_region_size (mr=<optimized out>) at .../qemu-build/memory.c:1739
+#7  0x00005555558a2b14 in pc_memory_init (pcms=pcms@entry=0x555556850050, system_memory=system_memory@entry=0x555556851e00, rom_memory=rom_memory@entry=0x5555568b8120, ram_memory=ram_memory@entry=0x7fffffffd630)
+    at .../qemu-build/hw/i386/pc.c:1440
+#8  0x00005555558a5a73 in pc_init1 (machine=0x555556850050, pci_type=0x555555cb6fd0 "i440FX", host_type=0x555555c43e41 "i440FX-pcihost") at .../qemu-build/hw/i386/pc_piix.c:179
+#9  0x00005555559abbda in machine_run_board_init (machine=0x555556850050) at .../qemu-build/hw/core/machine.c:829
+#10 0x00005555557dc515 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at .../qemu-build/vl.c:4563
+
+
+I will squash the following fixup:
+
+>From 6216fdb28476ed21c4ced4672003c9c7cb0e04d2 Mon Sep 17 00:00:00 2001
+From: David Hildenbrand <david@redhat.com>
+Date: Fri, 4 May 2018 15:54:46 +0200
+Subject: [PATCH] memory-device: fix device_memory creation on pc and spapr
+
+We have to inititalize the struct to 0. Otherwise, without "maxmem",
+the content is undefined, which might result in random asserts
+striking when e.g. reading out the size of the contained memory region.
+
+Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
+ hw/i386/pc.c   | 2 +-
+ hw/ppc/spapr.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-v2:
- - Re-based
----
- hw/block/xen_disk.c | 90 +++++++++++++++++++++++++++--------------------------
- 1 file changed, 46 insertions(+), 44 deletions(-)
-
-diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
-index 28651c5..9fbc0cd 100644
---- a/hw/block/xen_disk.c
-+++ b/hw/block/xen_disk.c
-@@ -178,10 +178,11 @@ static void ioreq_release(struct ioreq *ioreq, bool finish)
- static int ioreq_parse(struct ioreq *ioreq)
- {
-     struct XenBlkDev *blkdev = ioreq->blkdev;
-+    struct XenDevice *xendev = &blkdev->xendev;
-     size_t len;
-     int i;
- 
--    xen_pv_printf(&blkdev->xendev, 3,
-+    xen_pv_printf(xendev, 3,
-                   "op %d, nr %d, handle %d, id %" PRId64 ", sector %" PRId64 "\n",
-                   ioreq->req.operation, ioreq->req.nr_segments,
-                   ioreq->req.handle, ioreq->req.id, ioreq->req.sector_number);
-@@ -199,28 +200,28 @@ static int ioreq_parse(struct ioreq *ioreq)
-     case BLKIF_OP_DISCARD:
-         return 0;
-     default:
--        xen_pv_printf(&blkdev->xendev, 0, "error: unknown operation (%d)\n",
-+        xen_pv_printf(xendev, 0, "error: unknown operation (%d)\n",
-                       ioreq->req.operation);
-         goto err;
-     };
- 
-     if (ioreq->req.operation != BLKIF_OP_READ && blkdev->mode[0] != 'w') {
--        xen_pv_printf(&blkdev->xendev, 0, "error: write req for ro device\n");
-+        xen_pv_printf(xendev, 0, "error: write req for ro device\n");
-         goto err;
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index ffcd7b85d9..868893d0a1 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1372,7 +1372,7 @@ void pc_memory_init(PCMachineState *pcms,
      }
  
-     ioreq->start = ioreq->req.sector_number * blkdev->file_blk;
-     for (i = 0; i < ioreq->req.nr_segments; i++) {
-         if (i == BLKIF_MAX_SEGMENTS_PER_REQUEST) {
--            xen_pv_printf(&blkdev->xendev, 0, "error: nr_segments too big\n");
-+            xen_pv_printf(xendev, 0, "error: nr_segments too big\n");
-             goto err;
-         }
-         if (ioreq->req.seg[i].first_sect > ioreq->req.seg[i].last_sect) {
--            xen_pv_printf(&blkdev->xendev, 0, "error: first > last sector\n");
-+            xen_pv_printf(xendev, 0, "error: first > last sector\n");
-             goto err;
-         }
-         if (ioreq->req.seg[i].last_sect * BLOCK_SIZE >= XC_PAGE_SIZE) {
--            xen_pv_printf(&blkdev->xendev, 0, "error: page crossing\n");
-+            xen_pv_printf(xendev, 0, "error: page crossing\n");
-             goto err;
-         }
+     /* always allocate the device memory information */
+-    machine->device_memory = g_malloc(sizeof(*machine->device_memory));
++    machine->device_memory = g_malloc0(sizeof(*machine->device_memory));
  
-@@ -228,7 +229,7 @@ static int ioreq_parse(struct ioreq *ioreq)
-         ioreq->size += len;
-     }
-     if (ioreq->start + ioreq->size > blkdev->file_size) {
--        xen_pv_printf(&blkdev->xendev, 0, "error: access beyond end of file\n");
-+        xen_pv_printf(xendev, 0, "error: access beyond end of file\n");
-         goto err;
-     }
-     return 0;
-@@ -244,7 +245,7 @@ static int ioreq_grant_copy(struct ioreq *ioreq)
-     struct XenDevice *xendev = &blkdev->xendev;
-     XenGrantCopySegment segs[BLKIF_MAX_SEGMENTS_PER_REQUEST];
-     int i, count, rc;
--    int64_t file_blk = ioreq->blkdev->file_blk;
-+    int64_t file_blk = blkdev->file_blk;
-     bool to_domain = (ioreq->req.operation == BLKIF_OP_READ);
-     void *virt = ioreq->buf;
+     /* initialize device memory address space */
+     if (pcmc->has_reserved_memory &&
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index ef05075232..a1abcba6ad 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2637,7 +2637,7 @@ static void spapr_machine_init(MachineState *machine)
+     memory_region_add_subregion(sysmem, 0, ram);
  
-@@ -272,7 +273,7 @@ static int ioreq_grant_copy(struct ioreq *ioreq)
-     rc = xen_be_copy_grant_refs(xendev, to_domain, segs, count);
+     /* always allocate the device memory information */
+-    machine->device_memory = g_malloc(sizeof(*machine->device_memory));
++    machine->device_memory = g_malloc0(sizeof(*machine->device_memory));
  
-     if (rc) {
--        xen_pv_printf(&ioreq->blkdev->xendev, 0,
-+        xen_pv_printf(xendev, 0,
-                       "failed to copy data %d\n", rc);
-         ioreq->aio_errors++;
-         return -1;
-@@ -287,11 +288,12 @@ static void qemu_aio_complete(void *opaque, int ret)
- {
-     struct ioreq *ioreq = opaque;
-     struct XenBlkDev *blkdev = ioreq->blkdev;
-+    struct XenDevice *xendev = &blkdev->xendev;
- 
-     aio_context_acquire(blkdev->ctx);
- 
-     if (ret != 0) {
--        xen_pv_printf(&blkdev->xendev, 0, "%s I/O error\n",
-+        xen_pv_printf(xendev, 0, "%s I/O error\n",
-                       ioreq->req.operation == BLKIF_OP_READ ? "read" : "write");
-         ioreq->aio_errors++;
-     }
-@@ -625,16 +627,17 @@ static void blk_alloc(struct XenDevice *xendev)
- 
- static void blk_parse_discard(struct XenBlkDev *blkdev)
- {
-+    struct XenDevice *xendev = &blkdev->xendev;
-     int enable;
- 
-     blkdev->feature_discard = true;
- 
--    if (xenstore_read_be_int(&blkdev->xendev, "discard-enable", &enable) == 0) {
-+    if (xenstore_read_be_int(xendev, "discard-enable", &enable) == 0) {
-         blkdev->feature_discard = !!enable;
-     }
- 
-     if (blkdev->feature_discard) {
--        xenstore_write_be_int(&blkdev->xendev, "feature-discard", 1);
-+        xenstore_write_be_int(xendev, "feature-discard", 1);
-     }
- }
- 
-@@ -649,7 +652,7 @@ static int blk_init(struct XenDevice *xendev)
-     /* read xenstore entries */
-     if (blkdev->params == NULL) {
-         char *h = NULL;
--        blkdev->params = xenstore_read_be_str(&blkdev->xendev, "params");
-+        blkdev->params = xenstore_read_be_str(xendev, "params");
-         if (blkdev->params != NULL) {
-             h = strchr(blkdev->params, ':');
-         }
-@@ -669,18 +672,18 @@ static int blk_init(struct XenDevice *xendev)
-         blkdev->fileproto = "vpc";
-     }
-     if (blkdev->mode == NULL) {
--        blkdev->mode = xenstore_read_be_str(&blkdev->xendev, "mode");
-+        blkdev->mode = xenstore_read_be_str(xendev, "mode");
-     }
-     if (blkdev->type == NULL) {
--        blkdev->type = xenstore_read_be_str(&blkdev->xendev, "type");
-+        blkdev->type = xenstore_read_be_str(xendev, "type");
-     }
-     if (blkdev->dev == NULL) {
--        blkdev->dev = xenstore_read_be_str(&blkdev->xendev, "dev");
-+        blkdev->dev = xenstore_read_be_str(xendev, "dev");
-     }
-     if (blkdev->devtype == NULL) {
--        blkdev->devtype = xenstore_read_be_str(&blkdev->xendev, "device-type");
-+        blkdev->devtype = xenstore_read_be_str(xendev, "device-type");
-     }
--    directiosafe = xenstore_read_be_str(&blkdev->xendev, "direct-io-safe");
-+    directiosafe = xenstore_read_be_str(xendev, "direct-io-safe");
-     blkdev->directiosafe = (directiosafe && atoi(directiosafe));
- 
-     /* do we have all we need? */
-@@ -706,10 +709,10 @@ static int blk_init(struct XenDevice *xendev)
-     /* fill info
-      * blk_connect supplies sector-size and sectors
-      */
--    xenstore_write_be_int(&blkdev->xendev, "feature-flush-cache", 1);
--    xenstore_write_be_int(&blkdev->xendev, "info", info);
-+    xenstore_write_be_int(xendev, "feature-flush-cache", 1);
-+    xenstore_write_be_int(xendev, "info", info);
- 
--    xenstore_write_be_int(&blkdev->xendev, "max-ring-page-order",
-+    xenstore_write_be_int(xendev, "max-ring-page-order",
-                           MAX_RING_PAGE_ORDER);
- 
-     blk_parse_discard(blkdev);
-@@ -761,7 +764,7 @@ static int blk_connect(struct XenDevice *xendev)
-     }
- 
-     /* init qemu block driver */
--    index = (blkdev->xendev.dev - 202 * 256) / 16;
-+    index = (xendev->dev - 202 * 256) / 16;
-     blkdev->dinfo = drive_get(IF_XEN, 0, index);
-     if (!blkdev->dinfo) {
-         Error *local_err = NULL;
-@@ -773,11 +776,11 @@ static int blk_connect(struct XenDevice *xendev)
-         }
- 
-         /* setup via xenbus -> create new block driver instance */
--        xen_pv_printf(&blkdev->xendev, 2, "create new bdrv (xenbus setup)\n");
-+        xen_pv_printf(xendev, 2, "create new bdrv (xenbus setup)\n");
-         blkdev->blk = blk_new_open(blkdev->filename, NULL, options,
-                                    qflags, &local_err);
-         if (!blkdev->blk) {
--            xen_pv_printf(&blkdev->xendev, 0, "error: %s\n",
-+            xen_pv_printf(xendev, 0, "error: %s\n",
-                           error_get_pretty(local_err));
-             error_free(local_err);
-             return -1;
-@@ -785,11 +788,11 @@ static int blk_connect(struct XenDevice *xendev)
-         blk_set_enable_write_cache(blkdev->blk, !writethrough);
-     } else {
-         /* setup via qemu cmdline -> already setup for us */
--        xen_pv_printf(&blkdev->xendev, 2,
-+        xen_pv_printf(xendev, 2,
-                       "get configured bdrv (cmdline setup)\n");
-         blkdev->blk = blk_by_legacy_dinfo(blkdev->dinfo);
-         if (blk_is_read_only(blkdev->blk) && !readonly) {
--            xen_pv_printf(&blkdev->xendev, 0, "Unexpected read-only drive");
-+            xen_pv_printf(xendev, 0, "Unexpected read-only drive");
-             blkdev->blk = NULL;
-             return -1;
-         }
-@@ -802,7 +805,7 @@ static int blk_connect(struct XenDevice *xendev)
-     if (blkdev->file_size < 0) {
-         BlockDriverState *bs = blk_bs(blkdev->blk);
-         const char *drv_name = bs ? bdrv_get_format_name(bs) : NULL;
--        xen_pv_printf(&blkdev->xendev, 1, "blk_getlength: %d (%s) | drv %s\n",
-+        xen_pv_printf(xendev, 1, "blk_getlength: %d (%s) | drv %s\n",
-                       (int)blkdev->file_size, strerror(-blkdev->file_size),
-                       drv_name ?: "-");
-         blkdev->file_size = 0;
-@@ -814,15 +817,15 @@ static int blk_connect(struct XenDevice *xendev)
-                   blkdev->file_size, blkdev->file_size >> 20);
- 
-     /* Fill in number of sector size and number of sectors */
--    xenstore_write_be_int(&blkdev->xendev, "sector-size", blkdev->file_blk);
--    xenstore_write_be_int64(&blkdev->xendev, "sectors",
-+    xenstore_write_be_int(xendev, "sector-size", blkdev->file_blk);
-+    xenstore_write_be_int64(xendev, "sectors",
-                             blkdev->file_size / blkdev->file_blk);
- 
--    if (xenstore_read_fe_int(&blkdev->xendev, "ring-page-order",
-+    if (xenstore_read_fe_int(xendev, "ring-page-order",
-                              &order) == -1) {
-         blkdev->nr_ring_ref = 1;
- 
--        if (xenstore_read_fe_int(&blkdev->xendev, "ring-ref",
-+        if (xenstore_read_fe_int(xendev, "ring-ref",
-                                  &ring_ref) == -1) {
-             return -1;
-         }
-@@ -839,7 +842,7 @@ static int blk_connect(struct XenDevice *xendev)
-                 return -1;
-             }
- 
--            if (xenstore_read_fe_int(&blkdev->xendev, key,
-+            if (xenstore_read_fe_int(xendev, key,
-                                      &ring_ref) == -1) {
-                 g_free(key);
-                 return -1;
-@@ -854,18 +857,18 @@ static int blk_connect(struct XenDevice *xendev)
-         return -1;
-     }
- 
--    if (xenstore_read_fe_int(&blkdev->xendev, "event-channel",
--                             &blkdev->xendev.remote_port) == -1) {
-+    if (xenstore_read_fe_int(xendev, "event-channel",
-+                             &xendev->remote_port) == -1) {
-         return -1;
-     }
- 
--    if (!blkdev->xendev.protocol) {
-+    if (!xendev->protocol) {
-         blkdev->protocol = BLKIF_PROTOCOL_NATIVE;
--    } else if (strcmp(blkdev->xendev.protocol, XEN_IO_PROTO_ABI_NATIVE) == 0) {
-+    } else if (strcmp(xendev->protocol, XEN_IO_PROTO_ABI_NATIVE) == 0) {
-         blkdev->protocol = BLKIF_PROTOCOL_NATIVE;
--    } else if (strcmp(blkdev->xendev.protocol, XEN_IO_PROTO_ABI_X86_32) == 0) {
-+    } else if (strcmp(xendev->protocol, XEN_IO_PROTO_ABI_X86_32) == 0) {
-         blkdev->protocol = BLKIF_PROTOCOL_X86_32;
--    } else if (strcmp(blkdev->xendev.protocol, XEN_IO_PROTO_ABI_X86_64) == 0) {
-+    } else if (strcmp(xendev->protocol, XEN_IO_PROTO_ABI_X86_64) == 0) {
-         blkdev->protocol = BLKIF_PROTOCOL_X86_64;
-     } else {
-         blkdev->protocol = BLKIF_PROTOCOL_NATIVE;
-@@ -896,7 +899,6 @@ static int blk_connect(struct XenDevice *xendev)
-     max_grants = blkdev->nr_ring_ref;
- 
-     xen_be_set_max_grant_refs(xendev, max_grants);
--
-     blkdev->sring = xen_be_map_grant_refs(xendev, blkdev->ring_ref,
-                                           blkdev->nr_ring_ref,
-                                           PROT_READ | PROT_WRITE);
-@@ -929,12 +931,12 @@ static int blk_connect(struct XenDevice *xendev)
- 
-     blk_set_aio_context(blkdev->blk, blkdev->ctx);
- 
--    xen_be_bind_evtchn(&blkdev->xendev);
-+    xen_be_bind_evtchn(xendev);
- 
--    xen_pv_printf(&blkdev->xendev, 1, "ok: proto %s, nr-ring-ref %u, "
-+    xen_pv_printf(xendev, 1, "ok: proto %s, nr-ring-ref %u, "
-                   "remote port %d, local port %d\n",
--                  blkdev->xendev.protocol, blkdev->nr_ring_ref,
--                  blkdev->xendev.remote_port, blkdev->xendev.local_port);
-+                  xendev->protocol, blkdev->nr_ring_ref,
-+                  xendev->remote_port, xendev->local_port);
-     return 0;
- }
- 
-@@ -952,7 +954,7 @@ static void blk_disconnect(struct XenDevice *xendev)
-         blk_unref(blkdev->blk);
-         blkdev->blk = NULL;
-     }
--    xen_pv_unbind_evtchn(&blkdev->xendev);
-+    xen_pv_unbind_evtchn(xendev);
- 
-     aio_context_release(blkdev->ctx);
- 
+     /* initialize hotplug memory address space */
+     if (machine->ram_size < machine->maxram_size) {
 -- 
-2.1.4
+2.14.3
+
+
+-- 
+Eduardo
