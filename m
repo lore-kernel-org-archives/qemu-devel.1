@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fEdQA-0002UP-Vq
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:19:00 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fEdaA-0002Sv-An
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:29:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fEdQ9-0006R4-RD
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:18:58 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1525326811-3233-1-git-send-email-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e25a5a9f-9738-18b2-c30d-890bf136dd46@amsat.org>
-Date: Fri, 4 May 2018 13:18:50 -0300
+	(envelope-from <peter.maydell@linaro.org>) id 1fEda9-0006Fs-0z
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:29:18 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:34499)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fEda8-0006EY-Su
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 12:29:16 -0400
+Received: by mail-ot0-x243.google.com with SMTP id i5-v6so13455964otf.1
+	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 09:29:16 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1525326811-3233-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] hw/arm: Don't fail qtest due to
- missing SD card in -nodefaults mode
+In-Reply-To: <CAFEAcA9nG0_Eq1QWsCJMA6TKbZ_tf6mXWCVTrkxrFO5-UkmEvw@mail.gmail.com>
+References: <1525176522-200354-1-git-send-email-imammedo@redhat.com>
+	<CAFEAcA9nG0_Eq1QWsCJMA6TKbZ_tf6mXWCVTrkxrFO5-UkmEvw@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 4 May 2018 17:28:55 +0100
+Message-ID: <CAFEAcA-6nkVOEBc59H0mcgnRy9ifPRoRjUrvJ_4Gcr94GdjuSQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] arm: isolate and clean up dtb
+ generation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,127 +30,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, Andrzej Zaborowski <balrogg@gmail.com>, Markus Armbruster <armbru@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Eric Auger <eric.auger@redhat.com>
 
-On 05/03/2018 02:53 AM, Thomas Huth wrote:
-> When running omap1/2 or pxa2xx based ARM machines with -nodefaults,
-> they bail out immediately complaining about a "missing SecureDigital
-> device". That's not how the "default" devices in vl.c are meant to
-> work - it should be possible for a board to also start up without
-> default devices. So let's turn the error message and exit() into
-> a warning instead.
+On 3 May 2018 at 16:03, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 1 May 2018 at 13:08, Igor Mammedov <imammedo@redhat.com> wrote:
+>>
+>> Changelog v2->v3:
+>>    * drop already merged patches
+>>        'arm: always start from  first_cpu when registering loader cpu reset callback'
+>>        'ppc: e500: switch E500 based  machines to full machine definition'
+>>    * add small not related cleanup
+>>        'arm: boot: set boot_info starting from first_cpu'
+>>    * add extra suggested patch
+>>        'make sure that we aren't overwriting mc->get_hotplug_handler by accident'
+>>    * make sure that dtb_limit initialized to 0
+>>    * drop stale comment
+>>    * drop not needed line movement
+>>    * drop not needed extra new line
+>> Changelog v1->v2:
+>>    * drop "arm: reuse  arm_boot_address_space() in armv7m_load_kernel()"
+>>    * move "arm: always start from first_cpu  when registering loader cpu reset callback"
+>>      at the begigning of series and rebase
+>>    * add "ppc: e500: switch E500 based machines to full  machine definition"
+>>      and rebase 4/5 on top of it
+>>    * fixup typo in virt_machine_get_hotpug_handler() name
+>>    * add doc comment to skip_dtb_autoload field
+>>    * 1-2/5 are queued in respective arm/ppc trees and are included for series
+>>      completness so it would be easier to test, I expect series to go through
+>>      arm tree
+>>
+>
+> Applied to target-arm.next, thanks.
 
-Ideally we'd QOM'ify them.
+Doing further testing within target-arm.next shows that this series (and
+specifically patch 3/5) causes segfaults for the "no DTB provided" case.
 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+$ gdb --args ./build/x86/arm-softmmu/qemu-system-arm -M vexpress-a15
+-kernel /dev/null
+GNU gdb (Ubuntu 7.11.1-0ubuntu1~16.5) 7.11.1
+[...]
+(gdb) r
+[...]
+Thread 1 "qemu-system-arm" received signal SIGSEGV, Segmentation fault.
+0x0000000000000000 in ?? ()
+(gdb) bt
+#0  0x0000000000000000 in  ()
+#1  0x000055555596565e in arm_load_dtb (addr=0, binfo=0x5555566dec00
+<a15_daughterboard>, addr_limit=0, as=0x555556fa08a0) at
+/home/petmay01/linaro/qemu-from-laptop/qemu/hw/arm/boot.c:515
+#2  0x0000555555966d7f in arm_load_kernel (cpu=0x7ffff7fd6010,
+info=0x5555566dec00 <a15_daughterboard>)
+    at /home/petmay01/linaro/qemu-from-laptop/qemu/hw/arm/boot.c:1156
+#3  0x0000555555986f5b in vexpress_common_init (machine=0x555556e04060)
+    at /home/petmay01/linaro/qemu-from-laptop/qemu/hw/arm/vexpress.c:707
+#4  0x0000555555b10341 in machine_run_board_init (machine=0x555556e04060)
+    at /home/petmay01/linaro/qemu-from-laptop/qemu/hw/core/machine.c:829
+#5  0x0000555555a4cbab in main (argc=5, argv=0x7fffffffe448,
+envp=0x7fffffffe478)
+    at /home/petmay01/linaro/qemu-from-laptop/qemu/vl.c:4624
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+arm_load_dtb() is trying to call the binfo->get_dtb() hook and is not
+handling the case where it is NULL (which it is on pretty much every
+board except "virt").
 
-> ---
->  hw/arm/omap1.c  |  8 ++++----
->  hw/arm/omap2.c  |  8 ++++----
->  hw/arm/pxa2xx.c | 15 +++++++--------
->  3 files changed, 15 insertions(+), 16 deletions(-)
-> 
-> diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
-> index 24673ab..e54c1f8 100644
-> --- a/hw/arm/omap1.c
-> +++ b/hw/arm/omap1.c
-> @@ -30,6 +30,7 @@
->  #include "hw/arm/soc_dma.h"
->  #include "sysemu/block-backend.h"
->  #include "sysemu/blockdev.h"
-> +#include "sysemu/qtest.h"
->  #include "qemu/range.h"
->  #include "hw/sysbus.h"
->  #include "qemu/cutils.h"
-> @@ -3987,12 +3988,11 @@ struct omap_mpu_state_s *omap310_mpu_init(MemoryRegion *system_memory,
->                                  omap_findclk(s, "dpll3"));
->  
->      dinfo = drive_get(IF_SD, 0, 0);
-> -    if (!dinfo) {
-> -        error_report("missing SecureDigital device");
-> -        exit(1);
-> +    if (!dinfo && !qtest_enabled()) {
-> +        warn_report("missing SecureDigital device");
->      }
->      s->mmc = omap_mmc_init(0xfffb7800, system_memory,
-> -                           blk_by_legacy_dinfo(dinfo),
-> +                           dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
->                             qdev_get_gpio_in(s->ih[1], OMAP_INT_OQN),
->                             &s->drq[OMAP_DMA_MMC_TX],
->                      omap_findclk(s, "mmc_ck"));
-> diff --git a/hw/arm/omap2.c b/hw/arm/omap2.c
-> index 8066353..b8d0910 100644
-> --- a/hw/arm/omap2.c
-> +++ b/hw/arm/omap2.c
-> @@ -25,6 +25,7 @@
->  #include "cpu.h"
->  #include "sysemu/block-backend.h"
->  #include "sysemu/blockdev.h"
-> +#include "sysemu/qtest.h"
->  #include "hw/boards.h"
->  #include "hw/hw.h"
->  #include "hw/arm/arm.h"
-> @@ -2486,12 +2487,11 @@ struct omap_mpu_state_s *omap2420_mpu_init(MemoryRegion *sysmem,
->                               s->drq[OMAP24XX_DMA_GPMC]);
->  
->      dinfo = drive_get(IF_SD, 0, 0);
-> -    if (!dinfo) {
-> -        error_report("missing SecureDigital device");
-> -        exit(1);
-> +    if (!dinfo && !qtest_enabled()) {
-> +        warn_report("missing SecureDigital device");
->      }
->      s->mmc = omap2_mmc_init(omap_l4tao(s->l4, 9),
-> -                    blk_by_legacy_dinfo(dinfo),
-> +                    dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
->                      qdev_get_gpio_in(s->ih[0], OMAP_INT_24XX_MMC_IRQ),
->                      &s->drq[OMAP24XX_DMA_MMC1_TX],
->                      omap_findclk(s, "mmc_fclk"), omap_findclk(s, "mmc_iclk"));
-> diff --git a/hw/arm/pxa2xx.c b/hw/arm/pxa2xx.c
-> index 928a043..a2803fd 100644
-> --- a/hw/arm/pxa2xx.c
-> +++ b/hw/arm/pxa2xx.c
-> @@ -21,6 +21,7 @@
->  #include "chardev/char-fe.h"
->  #include "sysemu/block-backend.h"
->  #include "sysemu/blockdev.h"
-> +#include "sysemu/qtest.h"
->  #include "qemu/cutils.h"
->  
->  static struct {
-> @@ -2095,12 +2096,11 @@ PXA2xxState *pxa270_init(MemoryRegion *address_space,
->      s->gpio = pxa2xx_gpio_init(0x40e00000, s->cpu, s->pic, 121);
->  
->      dinfo = drive_get(IF_SD, 0, 0);
-> -    if (!dinfo) {
-> -        error_report("missing SecureDigital device");
-> -        exit(1);
-> +    if (!dinfo && !qtest_enabled()) {
-> +        warn_report("missing SecureDigital device");
->      }
->      s->mmc = pxa2xx_mmci_init(address_space, 0x41100000,
-> -                    blk_by_legacy_dinfo(dinfo),
-> +                    dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
->                      qdev_get_gpio_in(s->pic, PXA2XX_PIC_MMC),
->                      qdev_get_gpio_in(s->dma, PXA2XX_RX_RQ_MMCI),
->                      qdev_get_gpio_in(s->dma, PXA2XX_TX_RQ_MMCI));
-> @@ -2220,12 +2220,11 @@ PXA2xxState *pxa255_init(MemoryRegion *address_space, unsigned int sdram_size)
->      s->gpio = pxa2xx_gpio_init(0x40e00000, s->cpu, s->pic, 85);
->  
->      dinfo = drive_get(IF_SD, 0, 0);
-> -    if (!dinfo) {
-> -        error_report("missing SecureDigital device");
-> -        exit(1);
-> +    if (!dinfo && !qtest_enabled()) {
-> +        warn_report("missing SecureDigital device");
->      }
->      s->mmc = pxa2xx_mmci_init(address_space, 0x41100000,
-> -                    blk_by_legacy_dinfo(dinfo),
-> +                    dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
->                      qdev_get_gpio_in(s->pic, PXA2XX_PIC_MMC),
->                      qdev_get_gpio_in(s->dma, PXA2XX_RX_RQ_MMCI),
->                      qdev_get_gpio_in(s->dma, PXA2XX_TX_RQ_MMCI));
-> 
+(You get a segfault with an actual guest kernel as well; I just used
+/dev/null here as an easy no-dependencies-required repro case.)
+
+I've left patch 4 in target-arm.next as that was a standalone bugfix,
+but have dropped the rest of the series for now.
+
+thanks
+-- PMM
