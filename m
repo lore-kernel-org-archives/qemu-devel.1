@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43391)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fETkx-0006AO-9Q
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:59:49 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fETkr-00062V-AG
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:59:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fETku-0007WM-At
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:59:47 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fETkn-0007He-Fm
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 01:59:41 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  4 May 2018 15:59:27 +1000
-Message-Id: <20180504055930.3786-15-david@gibson.dropbear.id.au>
+Date: Fri,  4 May 2018 15:59:17 +1000
+Message-Id: <20180504055930.3786-5-david@gibson.dropbear.id.au>
 In-Reply-To: <20180504055930.3786-1-david@gibson.dropbear.id.au>
 References: <20180504055930.3786-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 14/17] mac_newworld: move wiring of macio IRQs
- to macio_newworld_realize()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 04/17] target/ppc: Add ppc_store_lpcr() helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,133 +23,117 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, lvivier@redhat.com, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+There are some fields in the cpu state which need to be updated when the
+LPCR register is changed, which is done by ppc_hash64_update_rmls() and
+ppc_hash64_update_vrma().  Code which alters env->spr[SPR_LPCR] needs to
+call them afterwards to make sure the state is up to date.
 
-Since the macio device has a link to the PIC device, we can now wire up the
-IRQs directly via qdev GPIOs rather than having to use an intermediate array.
+That's easy to get wrong.  The normal way of dealing with sitautions like
+that is to use a helper which both updates the basic register value and t=
+he
+derived state.
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+So, do that.
+
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Tested-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/misc/macio/macio.c         | 39 +++++++++++++++++++++--------------
- hw/ppc/mac_newworld.c         | 14 -------------
- include/hw/misc/macio/macio.h |  1 -
- 3 files changed, 23 insertions(+), 31 deletions(-)
+ target/ppc/mmu-hash64.c     | 15 +++++++++++----
+ target/ppc/mmu-hash64.h     |  3 +--
+ target/ppc/translate_init.c |  6 +-----
+ 3 files changed, 13 insertions(+), 11 deletions(-)
 
-diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
-index dac7bcd15e..79621eb879 100644
---- a/hw/misc/macio/macio.c
-+++ b/hw/misc/macio/macio.c
-@@ -279,11 +279,10 @@ static void macio_newworld_realize(PCIDevice *d, Error **errp)
+diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+index 7e0adecfd9..a1db20e3a8 100644
+--- a/target/ppc/mmu-hash64.c
++++ b/target/ppc/mmu-hash64.c
+@@ -942,7 +942,7 @@ void ppc_hash64_tlb_flush_hpte(PowerPCCPU *cpu, targe=
+t_ulong ptex,
+     cpu->env.tlb_need_flush =3D TLB_NEED_GLOBAL_FLUSH | TLB_NEED_LOCAL_F=
+LUSH;
+ }
+=20
+-void ppc_hash64_update_rmls(PowerPCCPU *cpu)
++static void ppc_hash64_update_rmls(PowerPCCPU *cpu)
  {
-     MacIOState *s = MACIO(d);
-     NewWorldMacIOState *ns = NEWWORLD_MACIO(d);
-+    DeviceState *pic_dev = DEVICE(ns->pic);
-     Error *err = NULL;
-     SysBusDevice *sysbus_dev;
-     MemoryRegion *timer_memory = NULL;
--    int i;
--    int cur_irq = 0;
- 
-     macio_common_realize(d, &err);
-     if (err) {
-@@ -292,11 +291,14 @@ static void macio_newworld_realize(PCIDevice *d, Error **errp)
+     CPUPPCState *env =3D &cpu->env;
+     uint64_t lpcr =3D env->spr[SPR_LPCR];
+@@ -977,7 +977,7 @@ void ppc_hash64_update_rmls(PowerPCCPU *cpu)
      }
- 
-     sysbus_dev = SYS_BUS_DEVICE(&s->cuda);
--    sysbus_connect_irq(sysbus_dev, 0, ns->irqs[cur_irq++]);
-+    sysbus_connect_irq(sysbus_dev, 0, qdev_get_gpio_in(pic_dev,
-+                                                       NEWWORLD_CUDA_IRQ));
- 
-     sysbus_dev = SYS_BUS_DEVICE(&s->escc);
--    sysbus_connect_irq(sysbus_dev, 0, ns->irqs[cur_irq++]);
--    sysbus_connect_irq(sysbus_dev, 1, ns->irqs[cur_irq++]);
-+    sysbus_connect_irq(sysbus_dev, 0, qdev_get_gpio_in(pic_dev,
-+                                                       NEWWORLD_ESCCB_IRQ));
-+    sysbus_connect_irq(sysbus_dev, 1, qdev_get_gpio_in(pic_dev,
-+                                                       NEWWORLD_ESCCA_IRQ));
- 
-     /* OpenPIC */
-     sysbus_dev = SYS_BUS_DEVICE(ns->pic);
-@@ -304,15 +306,22 @@ static void macio_newworld_realize(PCIDevice *d, Error **errp)
-                                 sysbus_mmio_get_region(sysbus_dev, 0));
- 
-     /* IDE buses */
--    for (i = 0; i < ARRAY_SIZE(ns->ide); i++) {
--        qemu_irq irq0 = ns->irqs[cur_irq++];
--        qemu_irq irq1 = ns->irqs[cur_irq++];
--
--        macio_realize_ide(s, &ns->ide[i], irq0, irq1, 0x16 + (i * 4), &err);
--        if (err) {
--            error_propagate(errp, err);
--            return;
--        }
-+    macio_realize_ide(s, &ns->ide[0],
-+                      qdev_get_gpio_in(pic_dev, NEWWORLD_IDE0_IRQ),
-+                      qdev_get_gpio_in(pic_dev, NEWWORLD_IDE0_DMA_IRQ),
-+                      0x16, &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
+ }
+=20
+-void ppc_hash64_update_vrma(PowerPCCPU *cpu)
++static void ppc_hash64_update_vrma(PowerPCCPU *cpu)
+ {
+     CPUPPCState *env =3D &cpu->env;
+     const PPCHash64SegmentPageSizes *sps =3D NULL;
+@@ -1028,9 +1028,9 @@ void ppc_hash64_update_vrma(PowerPCCPU *cpu)
+     slb->sps =3D sps;
+ }
+=20
+-void helper_store_lpcr(CPUPPCState *env, target_ulong val)
++void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong val)
+ {
+-    PowerPCCPU *cpu =3D ppc_env_get_cpu(env);
++    CPUPPCState *env =3D &cpu->env;
+     uint64_t lpcr =3D 0;
+=20
+     /* Filter out bits */
+@@ -1096,6 +1096,13 @@ void helper_store_lpcr(CPUPPCState *env, target_ul=
+ong val)
+     ppc_hash64_update_vrma(cpu);
+ }
+=20
++void helper_store_lpcr(CPUPPCState *env, target_ulong val)
++{
++    PowerPCCPU *cpu =3D ppc_env_get_cpu(env);
 +
-+    macio_realize_ide(s, &ns->ide[1],
-+                      qdev_get_gpio_in(pic_dev, NEWWORLD_IDE1_IRQ),
-+                      qdev_get_gpio_in(pic_dev, NEWWORLD_IDE1_DMA_IRQ),
-+                      0x1a, &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-     }
- 
-     /* Timer */
-@@ -328,8 +337,6 @@ static void macio_newworld_init(Object *obj)
-     NewWorldMacIOState *ns = NEWWORLD_MACIO(obj);
-     int i;
- 
--    qdev_init_gpio_out(DEVICE(obj), ns->irqs, ARRAY_SIZE(ns->irqs));
++    ppc_store_lpcr(cpu, val);
++}
++
+ void ppc_hash64_init(PowerPCCPU *cpu)
+ {
+     CPUPPCState *env =3D &cpu->env;
+diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
+index f6349ccdb3..53dcec5b93 100644
+--- a/target/ppc/mmu-hash64.h
++++ b/target/ppc/mmu-hash64.h
+@@ -17,8 +17,7 @@ void ppc_hash64_tlb_flush_hpte(PowerPCCPU *cpu,
+                                target_ulong pte0, target_ulong pte1);
+ unsigned ppc_hash64_hpte_page_shift_noslb(PowerPCCPU *cpu,
+                                           uint64_t pte0, uint64_t pte1);
+-void ppc_hash64_update_vrma(PowerPCCPU *cpu);
+-void ppc_hash64_update_rmls(PowerPCCPU *cpu);
++void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong val);
+ void ppc_hash64_init(PowerPCCPU *cpu);
+ void ppc_hash64_finalize(PowerPCCPU *cpu);
+ #endif
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index c83c910a29..3fd380dad6 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -8940,15 +8940,11 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVirtual=
+Hypervisor *vhyp)
+     /* We should be followed by a CPU reset but update the active value
+      * just in case...
+      */
+-    env->spr[SPR_LPCR] =3D lpcr->default_value;
++    ppc_store_lpcr(cpu, lpcr->default_value);
+=20
+     /* Set a full AMOR so guest can use the AMR as it sees fit */
+     env->spr[SPR_AMOR] =3D amor->default_value =3D 0xffffffffffffffffull=
+;
+=20
+-    /* Update some env bits based on new LPCR value */
+-    ppc_hash64_update_rmls(cpu);
+-    ppc_hash64_update_vrma(cpu);
 -
-     object_property_add_link(obj, "pic", TYPE_OPENPIC,
-                              (Object **) &ns->pic,
-                              qdev_prop_allow_set_link_before_realize,
-diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-index 6a070f13bd..744acdfd2e 100644
---- a/hw/ppc/mac_newworld.c
-+++ b/hw/ppc/mac_newworld.c
-@@ -375,20 +375,6 @@ static void ppc_core99_init(MachineState *machine)
-     /* MacIO */
-     macio = NEWWORLD_MACIO(pci_create(pci_bus, -1, TYPE_NEWWORLD_MACIO));
-     dev = DEVICE(macio);
--    qdev_connect_gpio_out(dev, 0,
--        qdev_get_gpio_in(pic_dev, NEWWORLD_CUDA_IRQ));
--    qdev_connect_gpio_out(dev, 1,
--        qdev_get_gpio_in(pic_dev, NEWWORLD_ESCCB_IRQ));
--    qdev_connect_gpio_out(dev, 2,
--        qdev_get_gpio_in(pic_dev, NEWWORLD_ESCCA_IRQ));
--    qdev_connect_gpio_out(dev, 3,
--        qdev_get_gpio_in(pic_dev, NEWWORLD_IDE0_IRQ));
--    qdev_connect_gpio_out(dev, 4,
--        qdev_get_gpio_in(pic_dev, NEWWORLD_IDE0_DMA_IRQ));
--    qdev_connect_gpio_out(dev, 5,
--        qdev_get_gpio_in(pic_dev, NEWWORLD_IDE1_IRQ));
--    qdev_connect_gpio_out(dev, 6,
--        qdev_get_gpio_in(pic_dev, NEWWORLD_IDE1_DMA_IRQ));
-     qdev_prop_set_uint64(dev, "frequency", tbfreq);
-     object_property_set_link(OBJECT(macio), OBJECT(pic_dev), "pic",
-                              &error_abort);
-diff --git a/include/hw/misc/macio/macio.h b/include/hw/misc/macio/macio.h
-index 64a2584a77..838eaf1db0 100644
---- a/include/hw/misc/macio/macio.h
-+++ b/include/hw/misc/macio/macio.h
-@@ -71,7 +71,6 @@ typedef struct NewWorldMacIOState {
-     /*< public >*/
- 
-     OpenPICState *pic;
--    qemu_irq irqs[7];
-     MACIOIDEState ide[2];
- } NewWorldMacIOState;
- 
--- 
+     /* Tell KVM that we're in PAPR mode */
+     if (kvm_enabled()) {
+         kvmppc_set_papr(cpu);
+--=20
 2.17.0
