@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fER5W-0001iD-9c
-	for qemu-devel@nongnu.org; Thu, 03 May 2018 23:08:51 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fER5V-0005YP-3o
+	(envelope-from <peterx@redhat.com>) id 1fER5V-0001h8-3G
 	for qemu-devel@nongnu.org; Thu, 03 May 2018 23:08:50 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48264 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fER5U-0005Xj-UX
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <peterx@redhat.com>) id 1fER5R-0005UI-0F
 	for qemu-devel@nongnu.org; Thu, 03 May 2018 23:08:49 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55760 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fER5Q-0005Tt-R7
+	for qemu-devel@nongnu.org; Thu, 03 May 2018 23:08:44 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Fri,  4 May 2018 11:08:05 +0800
-Message-Id: <20180504030811.28111-5-peterx@redhat.com>
+Date: Fri,  4 May 2018 11:08:04 +0800
+Message-Id: <20180504030811.28111-4-peterx@redhat.com>
 In-Reply-To: <20180504030811.28111-1-peterx@redhat.com>
 References: <20180504030811.28111-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 04/10] intel-iommu: only do page walk for
- MAP notifiers
+Subject: [Qemu-devel] [PATCH v2 03/10] intel-iommu: add iommu lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,108 +26,203 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Tian Kevin <kevin.tian@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>
 
-For UNMAP-only IOMMU notifiers, we don't really need to walk the page
-tables.  Fasten that procedure by skipping the page table walk.  That
-should boost performance for UNMAP-only notifiers like vhost.
+Add a per-iommu big lock to protect IOMMU status.  Currently the only
+thing to be protected is the IOTLB/context cache, since that can be
+accessed even without BQL, e.g., in IO dataplane.
 
+Note that we don't need to protect device page tables since that's fully
+controlled by the guest kernel.  However there is still possibility that
+malicious drivers will program the device to not obey the rule.  In that
+case QEMU can't really do anything useful, instead the guest itself will
+be responsible for all uncertainties.
+
+Reported-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- include/hw/i386/intel_iommu.h |  2 ++
+ include/hw/i386/intel_iommu.h |  6 +++++
  hw/i386/intel_iommu.c         | 43 +++++++++++++++++++++++++++++++----
- 2 files changed, 40 insertions(+), 5 deletions(-)
+ 2 files changed, 44 insertions(+), 5 deletions(-)
 
 diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-index ee517704e7..9e0a6c1c6a 100644
+index 220697253f..ee517704e7 100644
 --- a/include/hw/i386/intel_iommu.h
 +++ b/include/hw/i386/intel_iommu.h
-@@ -93,6 +93,8 @@ struct VTDAddressSpace {
-     IntelIOMMUState *iommu_state;
-     VTDContextCacheEntry context_cache_entry;
-     QLIST_ENTRY(VTDAddressSpace) next;
-+    /* Superset of notifier flags that this address space has */
-+    IOMMUNotifierFlag notifier_flags;
+@@ -300,6 +300,12 @@ struct IntelIOMMUState {
+     OnOffAuto intr_eim;             /* Toggle for EIM cabability */
+     bool buggy_eim;                 /* Force buggy EIM unless eim=off */
+     uint8_t aw_bits;                /* Host/IOVA address width (in bits) */
++
++    /*
++     * Protects IOMMU states in general.  Currently it protects the
++     * per-IOMMU IOTLB cache, and context entry cache in VTDAddressSpace.
++     */
++    QemuMutex iommu_lock;
  };
  
- struct VTDBus {
+ /* Find the VTD Address space associated with the given bus pointer,
 diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 112971638d..9a418abfb6 100644
+index 5987b48d43..112971638d 100644
 --- a/hw/i386/intel_iommu.c
 +++ b/hw/i386/intel_iommu.c
-@@ -138,6 +138,12 @@ static inline void vtd_iommu_unlock(IntelIOMMUState *s)
-     qemu_mutex_unlock(&s->iommu_lock);
+@@ -128,6 +128,16 @@ static uint64_t vtd_set_clear_mask_quad(IntelIOMMUState *s, hwaddr addr,
+     return new_val;
  }
  
-+/* Whether the address space needs to notify new mappings */
-+static inline gboolean vtd_as_notify_mappings(VTDAddressSpace *as)
++static inline void vtd_iommu_lock(IntelIOMMUState *s)
 +{
-+    return as->notifier_flags & IOMMU_NOTIFIER_MAP;
++    qemu_mutex_lock(&s->iommu_lock);
++}
++
++static inline void vtd_iommu_unlock(IntelIOMMUState *s)
++{
++    qemu_mutex_unlock(&s->iommu_lock);
 +}
 +
  /* GHashTable functions */
  static gboolean vtd_uint64_equal(gconstpointer v1, gconstpointer v2)
  {
-@@ -1433,14 +1439,35 @@ static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
-     VTDAddressSpace *vtd_as;
-     VTDContextEntry ce;
-     int ret;
-+    hwaddr size = (1 << am) * VTD_PAGE_SIZE;
- 
-     QLIST_FOREACH(vtd_as, &(s->notifiers_list), next) {
-         ret = vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
-                                        vtd_as->devfn, &ce);
-         if (!ret && domain_id == VTD_CONTEXT_ENTRY_DID(ce.hi)) {
--            vtd_page_walk(&ce, addr, addr + (1 << am) * VTD_PAGE_SIZE,
--                          vtd_page_invalidate_notify_hook,
--                          (void *)&vtd_as->iommu, true, s->aw_bits);
-+            if (vtd_as_notify_mappings(vtd_as)) {
-+                /*
-+                 * For MAP-inclusive notifiers, we need to walk the
-+                 * page table to sync the shadow page table.
-+                 */
-+                vtd_page_walk(&ce, addr, addr + size,
-+                              vtd_page_invalidate_notify_hook,
-+                              (void *)&vtd_as->iommu, true, s->aw_bits);
-+            } else {
-+                /*
-+                 * For UNMAP-only notifiers, we don't need to walk the
-+                 * page tables.  We just deliver the PSI down to
-+                 * invalidate caches.
-+                 */
-+                IOMMUTLBEntry entry = {
-+                    .target_as = &address_space_memory,
-+                    .iova = addr,
-+                    .translated_addr = 0,
-+                    .addr_mask = size - 1,
-+                    .perm = IOMMU_NONE,
-+                };
-+                memory_region_notify_iommu(&vtd_as->iommu, entry);
-+            }
-         }
-     }
+@@ -172,7 +182,7 @@ static gboolean vtd_hash_remove_by_page(gpointer key, gpointer value,
  }
-@@ -2380,6 +2407,9 @@ static void vtd_iommu_notify_flag_changed(IOMMUMemoryRegion *iommu,
-         exit(1);
+ 
+ /* Reset all the gen of VTDAddressSpace to zero and set the gen of
+- * IntelIOMMUState to 1.
++ * IntelIOMMUState to 1.  Must be with IOMMU lock held.
+  */
+ static void vtd_reset_context_cache(IntelIOMMUState *s)
+ {
+@@ -197,12 +207,19 @@ static void vtd_reset_context_cache(IntelIOMMUState *s)
+     s->context_cache_gen = 1;
+ }
+ 
+-static void vtd_reset_iotlb(IntelIOMMUState *s)
++static void vtd_reset_iotlb_locked(IntelIOMMUState *s)
+ {
+     assert(s->iotlb);
+     g_hash_table_remove_all(s->iotlb);
+ }
+ 
++static void vtd_reset_iotlb(IntelIOMMUState *s)
++{
++    vtd_iommu_lock(s);
++    vtd_reset_iotlb_locked(s);
++    vtd_iommu_unlock(s);
++}
++
+ static uint64_t vtd_get_iotlb_key(uint64_t gfn, uint16_t source_id,
+                                   uint32_t level)
+ {
+@@ -215,6 +232,7 @@ static uint64_t vtd_get_iotlb_gfn(hwaddr addr, uint32_t level)
+     return (addr & vtd_slpt_level_page_mask(level)) >> VTD_PAGE_SHIFT_4K;
+ }
+ 
++/* Must be with IOMMU lock held */
+ static VTDIOTLBEntry *vtd_lookup_iotlb(IntelIOMMUState *s, uint16_t source_id,
+                                        hwaddr addr)
+ {
+@@ -235,6 +253,7 @@ out:
+     return entry;
+ }
+ 
++/* Must be with IOMMU lock held */
+ static void vtd_update_iotlb(IntelIOMMUState *s, uint16_t source_id,
+                              uint16_t domain_id, hwaddr addr, uint64_t slpte,
+                              uint8_t access_flags, uint32_t level)
+@@ -246,7 +265,7 @@ static void vtd_update_iotlb(IntelIOMMUState *s, uint16_t source_id,
+     trace_vtd_iotlb_page_update(source_id, addr, slpte, domain_id);
+     if (g_hash_table_size(s->iotlb) >= VTD_IOTLB_MAX_SIZE) {
+         trace_vtd_iotlb_reset("iotlb exceeds size limit");
+-        vtd_reset_iotlb(s);
++        vtd_reset_iotlb_locked(s);
      }
  
-+    /* Update per-address-space notifier flags */
-+    vtd_as->notifier_flags = new;
+     entry->gfn = gfn;
+@@ -1106,7 +1125,7 @@ static bool vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
+     IntelIOMMUState *s = vtd_as->iommu_state;
+     VTDContextEntry ce;
+     uint8_t bus_num = pci_bus_num(bus);
+-    VTDContextCacheEntry *cc_entry = &vtd_as->context_cache_entry;
++    VTDContextCacheEntry *cc_entry;
+     uint64_t slpte, page_mask;
+     uint32_t level;
+     uint16_t source_id = vtd_make_source_id(bus_num, devfn);
+@@ -1123,6 +1142,10 @@ static bool vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
+      */
+     assert(!vtd_is_interrupt_addr(addr));
+ 
++    vtd_iommu_lock(s);
 +
-     if (old == IOMMU_NOTIFIER_NONE) {
-         /* Insert new ones */
-         QLIST_INSERT_HEAD(&s->notifiers_list, vtd_as, next);
-@@ -2890,8 +2920,11 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
-                                   PCI_FUNC(vtd_as->devfn),
-                                   VTD_CONTEXT_ENTRY_DID(ce.hi),
-                                   ce.hi, ce.lo);
--        vtd_page_walk(&ce, 0, ~0ULL, vtd_replay_hook, (void *)n, false,
--                      s->aw_bits);
-+        if (vtd_as_notify_mappings(vtd_as)) {
-+            /* This is required only for MAP typed notifiers */
-+            vtd_page_walk(&ce, 0, ~0ULL, vtd_replay_hook, (void *)n, false,
-+                          s->aw_bits);
-+        }
-     } else {
-         trace_vtd_replay_ce_invalid(bus_n, PCI_SLOT(vtd_as->devfn),
-                                     PCI_FUNC(vtd_as->devfn));
++    cc_entry = &vtd_as->context_cache_entry;
++
+     /* Try to fetch slpte form IOTLB */
+     iotlb_entry = vtd_lookup_iotlb(s, source_id, addr);
+     if (iotlb_entry) {
+@@ -1182,7 +1205,7 @@ static bool vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
+          * IOMMU region can be swapped back.
+          */
+         vtd_pt_enable_fast_path(s, source_id);
+-
++        vtd_iommu_unlock(s);
+         return true;
+     }
+ 
+@@ -1203,6 +1226,7 @@ static bool vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
+     vtd_update_iotlb(s, source_id, VTD_CONTEXT_ENTRY_DID(ce.hi), addr, slpte,
+                      access_flags, level);
+ out:
++    vtd_iommu_unlock(s);
+     entry->iova = addr & page_mask;
+     entry->translated_addr = vtd_get_slpte_addr(slpte, s->aw_bits) & page_mask;
+     entry->addr_mask = ~page_mask;
+@@ -1210,6 +1234,7 @@ out:
+     return true;
+ 
+ error:
++    vtd_iommu_unlock(s);
+     entry->iova = 0;
+     entry->translated_addr = 0;
+     entry->addr_mask = 0;
+@@ -1258,10 +1283,13 @@ static void vtd_iommu_replay_all(IntelIOMMUState *s)
+ static void vtd_context_global_invalidate(IntelIOMMUState *s)
+ {
+     trace_vtd_inv_desc_cc_global();
++    /* Protects context cache */
++    vtd_iommu_lock(s);
+     s->context_cache_gen++;
+     if (s->context_cache_gen == VTD_CONTEXT_CACHE_GEN_MAX) {
+         vtd_reset_context_cache(s);
+     }
++    vtd_iommu_unlock(s);
+     vtd_switch_address_space_all(s);
+     /*
+      * From VT-d spec 6.5.2.1, a global context entry invalidation
+@@ -1377,8 +1405,10 @@ static void vtd_iotlb_domain_invalidate(IntelIOMMUState *s, uint16_t domain_id)
+ 
+     trace_vtd_inv_desc_iotlb_domain(domain_id);
+ 
++    vtd_iommu_lock(s);
+     g_hash_table_foreach_remove(s->iotlb, vtd_hash_remove_by_domain,
+                                 &domain_id);
++    vtd_iommu_unlock(s);
+ 
+     QLIST_FOREACH(vtd_as, &s->notifiers_list, next) {
+         if (!vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
+@@ -1426,7 +1456,9 @@ static void vtd_iotlb_page_invalidate(IntelIOMMUState *s, uint16_t domain_id,
+     info.domain_id = domain_id;
+     info.addr = addr;
+     info.mask = ~((1 << am) - 1);
++    vtd_iommu_lock(s);
+     g_hash_table_foreach_remove(s->iotlb, vtd_hash_remove_by_page, &info);
++    vtd_iommu_unlock(s);
+     vtd_iotlb_page_invalidate_notify(s, domain_id, addr, am);
+ }
+ 
+@@ -3072,6 +3104,7 @@ static void vtd_realize(DeviceState *dev, Error **errp)
+     }
+ 
+     QLIST_INIT(&s->notifiers_list);
++    qemu_mutex_init(&s->iommu_lock);
+     memset(s->vtd_as_by_bus_num, 0, sizeof(s->vtd_as_by_bus_num));
+     memory_region_init_io(&s->csrmem, OBJECT(s), &vtd_mem_ops, s,
+                           "intel_iommu", DMAR_REG_SIZE);
 -- 
 2.17.0
