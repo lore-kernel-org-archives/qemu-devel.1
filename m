@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fEhoM-0006Pv-Op
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 17:00:16 -0400
+	(envelope-from <mst@redhat.com>) id 1fEiPq-0003Zx-UE
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 17:38:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fEhoJ-0000y2-47
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 17:00:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60740 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fEhoI-0000xg-V8
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 17:00:11 -0400
-Date: Fri, 4 May 2018 22:00:01 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180504210001.GB30250@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180504160026.14017-1-berrange@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1fEiPn-0003vO-2B
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 17:38:58 -0400
+Date: Sat, 5 May 2018 00:38:46 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180505003653-mutt-send-email-mst@kernel.org>
+References: <1525376963-79623-1-git-send-email-mst@redhat.com>
+	<1525376963-79623-61-git-send-email-mst@redhat.com>
+	<20180504091007.55405a6a.cohuck@redhat.com>
+	<be79d6dd-beaa-ba6f-2990-b5e91139411b@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180504160026.14017-1-berrange@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/3] Document intent for supported build
- platforms and bump min glib to 2.42
+In-Reply-To: <be79d6dd-beaa-ba6f-2990-b5e91139411b@redhat.com>
+Subject: Re: [Qemu-devel] cover letter cc's [was: [PATCH 60/67] hw/s390x:
+ add include directory headers]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,96 +26,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Olaf Hering <olaf@aepfle.de>, Stefan Hajnoczi <stefanha@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, berrange@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, qemu-s390x@nongnu.org, git@vger.kernel.org
 
-CC'ing xen-devel in case Xen maintainers have a need for something that
-will that conflict with this proposal wrt supported build platforms.
+On Fri, May 04, 2018 at 08:07:53AM -0500, Eric Blake wrote:
+> [adding a cross-post to the git mailing list]
+> 
+> On 05/04/2018 02:10 AM, Cornelia Huck wrote:
+> > On Thu, 3 May 2018 22:51:40 +0300
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > 
+> > > This way they are easier to find using standard rules.
+> > > 
+> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > > ---
+> ...
+> 
+> > [Goes to find cover letter to figure out what this is all about.
+> > *Please*, cc: people on the cover letter so they can see immediately
+> > what this is trying to do!]
+> 
+> Is there an EASY way to make 'git format-patch --cover-letter $commitid'
+> (and git send-email, by extension) automatically search for all cc's any any
+> of the N/M patches, and auto-cc ALL of those recipients on the 0/N cover
+> letter?  And if that is not something easily built into git format-patch
+> directly, is it something that can easily be added to sendemail.cccmd?  This
+> is not the first time that someone has complained that automatic cc's are
+> not sending the cover letter context to a particular maintainer interested
+> (and auto-cc'd) in only a subset of an overall series.
+> 
+> On the other hand, cc'ing all recipients for a largely mechanical patch
+> series that was split into 67 parts, in part because it touches so many
+> different maintainers' areas, may make the cover letter have so many
+> recipients that various mail gateways start rejecting it as potential spam.
 
-On Fri, May 04, 2018 at 05:00:23PM +0100, Daniel P. Berrang=C3=A9 wrote:
-> This short series is a followup the discussions around min glib version
-> when Olaf found we had accidentally increased the min glib by using a
-> newer function:
->=20
->   https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg02699.html
->=20
-> Some key points from that thread
->=20
->   - Although we have a docker job that tries to test the min glib
->     version is adhered to, that's only run post-build, not by Peter's
->     merge tests, nor by patchew.
->=20
->   - The docker min glib test failed to detect the problem anyway
->     because RHEL had backported the symbol in question.
->=20
->   - The docker min glib test only builds with certain configure
->     options so isn't foolproof.
->=20
->   - The modern distros we implicitly care about have way newer glib
->     than 2.22
->=20
->   - Peter's OS-X build host previously had 2.22, but after switching
->     from fink to homebrew now has 2.56
->=20
->   - I suggested following libvirt's lead in writing a policy for how
->     we pick supported OS targets to inform maintainers when min version=
-s
->     can be increased.
->=20
-> This series writes such a document largely based on one I wrote for
-> libvirt with a few changes, largely around OS-X and *BSD. Note it
-> is not meant to be an exhaustive list of distros we'll build on, rather
-> a representative selection, so that we can identify the range of 3rd
-> party library versions we need to care about. So if your favourite
-> distro is missing, dont be alarmed, as it probably ships similar
-> vintage software to one of those listed - if not feel free to suggest
-> additions.
->=20
-> Based on that doc and https://repology.org/metapackage/glib/versions,
-> I identified that we could feasibly set min glib to 2.42. Note that
-> this would be dropping RHEL-6 as a build host (RHEL-6.0 came out in
-> 2010 so that's reasonable to drop IMHO). It would still cover 2 major
-> Debian versions and 2 most recent Ubuntu LTS (16.04, 18.04, but *not*
-> 14.04). This min glib lets us remove almost all our compat code.
->=20
-> Most interestingly, thanks tothe new min version being greater than
-> 2.32, we can now use GLIB_VERSION_MAX_ALLOWED to validate the correct
-> API usage according to our min version:
->=20
->   https://developer.gnome.org/glib/stable/glib-Version-Information.html=
-#GLIB-VERSION-MAX-ALLOWED:CAPS
->=20
-> This means that *all* our CI jobs & developer builds will be enforcing
-> the min version, so means very many more conditionally built features
-> will get their build validated against min glib version. This would
-> do a much better job of catching mistakes than our min-glib docker
-> job, making that obsolete.
->=20
-> Daniel P. Berrang=C3=A9 (3):
->   qemu-doc: provide details of supported build platforms
->   glib: bump min required glib library version to 2.42
->   glib: enforce the minimum required version and warn about old APIs
->=20
->  configure               |   6 +-
->  include/glib-compat.h   | 362 ++++++----------------------------------=
---------
->  qemu-doc.texi           |  68 +++++++++
->  tests/test-qmp-event.c  |   2 +-
->  tests/tpm-emu.h         |   4 +-
->  tests/vhost-user-test.c |   4 +-
->  trace/simple.c          |   6 +-
->  7 files changed, 123 insertions(+), 329 deletions(-)
->=20
-> --=20
-> 2.14.3
->=20
+I do this sometimes (pipe to this script):
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+grep -e ^Signed-off-by -e ^Acked -e ^Reported -e ^Tested -e ^Cc | sed 's/.*<//'| sed 's/>.*//'|sort | uniq | sed 's/^/Cc: /'
+
+
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
