@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fEPUX-000239-Rt
+	(envelope-from <dgibson@ozlabs.org>) id 1fEPUX-000238-Rr
 	for qemu-devel@nongnu.org; Thu, 03 May 2018 21:26:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fEPUU-0004AS-OG
+	(envelope-from <dgibson@ozlabs.org>) id 1fEPUU-0004BA-V4
 	for qemu-devel@nongnu.org; Thu, 03 May 2018 21:26:33 -0400
-Date: Fri, 4 May 2018 10:02:42 +1000
+Date: Fri, 4 May 2018 10:15:27 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180504000242.GF13229@umbus.fritz.box>
-References: <20180503202441.26293-1-mark.cave-ayland@ilande.co.uk>
-	<20180503202441.26293-2-mark.cave-ayland@ilande.co.uk>
+Message-ID: <20180504001527.GJ13229@umbus.fritz.box>
+References: <20180416085512.4011-1-bharata@linux.vnet.ibm.com>
+	<20180417011427.GE20551@umbus.fritz.box>
+	<20180417090909.GB3942@in.ibm.com>
+	<20180418033344.GF2317@umbus.fritz.box>
+	<20180503143421.30dd2b67@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="XSfi1pJWPNAvuBPy"
+	protocol="application/pgp-signature"; boundary="D85EWoRcDXv1uhH1"
 Content-Disposition: inline
-In-Reply-To: <20180503202441.26293-2-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH 1/3] uninorth: create new uninorth device
+In-Reply-To: <20180503143421.30dd2b67@bahia.lan>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v3] spapr: Support ibm,
+ dynamic-memory-v2 property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,248 +28,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Greg Kurz <groug@kaod.org>
+Cc: Bharata B Rao <bharata@linux.vnet.ibm.com>, nfont@linux.vnet.ibm.com, mwb@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, imammedo@redhat.com
 
 
---XSfi1pJWPNAvuBPy
-Content-Type: text/plain; charset=iso-8859-1
+--D85EWoRcDXv1uhH1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 03, 2018 at 09:24:39PM +0100, Mark Cave-Ayland wrote:
-> Commit 4e46dcdbd3 "PPC: Newworld: Add uninorth token register" added a TO=
-DO
-> which was to convert the uninorth registers hack to a proper device. Move
-> these registers to a new uninorth device, removing the old hacks from
-> mac_newworld.c.
+On Thu, May 03, 2018 at 02:34:21PM +0200, Greg Kurz wrote:
+> On Wed, 18 Apr 2018 13:33:44 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
 >=20
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> ---
->  hw/pci-host/trace-events       |  2 ++
->  hw/pci-host/uninorth.c         | 58 ++++++++++++++++++++++++++++++++++++=
-++++++
->  hw/ppc/mac_newworld.c          | 41 +++++------------------------
->  hw/ppc/trace-events            |  4 ---
->  include/hw/pci-host/uninorth.h | 11 ++++++++
->  5 files changed, 77 insertions(+), 39 deletions(-)
+> > On Tue, Apr 17, 2018 at 02:39:09PM +0530, Bharata B Rao wrote:
+> > > On Tue, Apr 17, 2018 at 11:14:27AM +1000, David Gibson wrote: =20
+> > > > >  static void spapr_machine_2_12_class_options(MachineClass *mc)
+> > > > > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> > > > > index d60b7c6d7a..5e044c44af 100644
+> > > > > --- a/include/hw/ppc/spapr.h
+> > > > > +++ b/include/hw/ppc/spapr.h
+> > > > > @@ -149,6 +149,7 @@ struct sPAPRMachineState {
+> > > > >      sPAPROptionVector *ov5;         /* QEMU-supported option vec=
+tors */
+> > > > >      sPAPROptionVector *ov5_cas;     /* negotiated (via CAS) opti=
+on vectors */
+> > > > >      uint32_t max_compat_pvr;
+> > > > > +    bool use_ibm_dynamic_memory_v2; =20
+> > > >=20
+> > > > TBH, I'm not really sure we even need to adjust this by machine typ=
+e. =20
+> > >=20
+> > > There are other similar features controlled by ov5 bits that
+> > > are also determined by machine type version:
+> > >=20
+> > > Memory hotplug support -- sPAPRMachineClass.dr_lmb_enabled
+> > > Dedicated HP event support -- sPAPRMachineState.use_hotplug_event_sou=
+rce =20
+> >=20
+> > As for user settability the issue isn't that it's set by ov5, but what
+> > the effect of the feature is.  Those other features alter runtime
+> > hypervisor behaviour and that behaviour has to remain the same across
+> > a migration.  Therefore we have to keep the behaviour consistent for
+> > old machine types.
+> >=20
+> > This feature affects only boot time behaviour.  It has a similar
+> > effect to what a firmware update might, on real hardware.  Furthermore
+> > the way CAS and the device tree work, this is vanishingly unlikely to
+> > break existing guests.
+> >=20
 >=20
-> diff --git a/hw/pci-host/trace-events b/hw/pci-host/trace-events
-> index 341a87a702..dd7a398e96 100644
-> --- a/hw/pci-host/trace-events
-> +++ b/hw/pci-host/trace-events
-> @@ -18,3 +18,5 @@ unin_set_irq(int irq_num, int level) "setting INT %d =
-=3D %d"
->  unin_get_config_reg(uint32_t reg, uint32_t addr, uint32_t retval) "conve=
-rted config space accessor 0x%"PRIx32 "/0x%"PRIx32 " -> 0x%"PRIx32
->  unin_data_write(uint64_t addr, unsigned len, uint64_t val) "write addr 0=
-x%"PRIx64 " len %d val 0x%"PRIx64
->  unin_data_read(uint64_t addr, unsigned len, uint64_t val) "read addr 0x%=
-"PRIx64 " len %d val 0x%"PRIx64
-> +unin_write(uint64_t addr, uint64_t value) "addr=3D0x%" PRIx64 " val=3D0x=
-%"PRIx64
-> +unin_read(uint64_t addr, uint64_t value) "addr=3D0x%" PRIx64 " val=3D0x%=
-"PRIx64
-> diff --git a/hw/pci-host/uninorth.c b/hw/pci-host/uninorth.c
-> index fada0ffd5f..ba76b84dbc 100644
-> --- a/hw/pci-host/uninorth.c
-> +++ b/hw/pci-host/uninorth.c
-> @@ -519,6 +519,62 @@ static const TypeInfo pci_unin_internal_info =3D {
->      .class_init    =3D pci_unin_internal_class_init,
->  };
-> =20
-> +/* UniN device */
-> +static void unin_write(void *opaque, hwaddr addr, uint64_t value,
-> +                       unsigned size)
-> +{
-> +    trace_unin_write(addr, value);
-> +    if (addr =3D=3D 0x0) {
-> +        *(int *)opaque =3D value;
-> +    }
-> +}
-> +
-> +static uint64_t unin_read(void *opaque, hwaddr addr, unsigned size)
-> +{
-> +    uint32_t value;
-> +
-> +    value =3D 0;
-> +    switch (addr) {
-> +    case 0:
-> +        value =3D *(int *)opaque;
-> +    }
-> +
-> +    trace_unin_read(addr, value);
-> +
-> +    return value;
-> +}
-> +
-> +static const MemoryRegionOps unin_ops =3D {
-> +    .read =3D unin_read,
-> +    .write =3D unin_write,
-> +    .endianness =3D DEVICE_BIG_ENDIAN,
+> The logic in spapr_ov5_cas_needed() assumes that pre 2.8 machine types on=
+ly
+> expose OV5_FORM1_AFFINITY and OV5_DRCONF_MEMORY to guests. Adding OV5_DRM=
+EM_V2
+> unconditionally breaks this assumption and backward migration to pre 2.8 =
+QEMU
+> versions because they don't expect the "spapr_option_vector_ov5_cas" subs=
+ection.
+>=20
+> This can cause problems in cloud environments that still have systems with
+> older QEMU versions, eg, hosts running ubuntu LTS 16.04.4 (QEMU 2.5) whic=
+h are
+> likely to stay around until admins could transition to some newer OS.
 
-This should really declare allowed / implemented sizes, but that can
-be a later followup, since this is basically just code motion.
+Ah, good point.
 
-> +};
-> +
-> +static void unin_init(Object *obj)
-> +{
-> +    UNINState *s =3D UNI_NORTH(obj);
-> +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
-> +
-> +    memory_region_init_io(&s->mem, obj, &unin_ops, &s->token, "unin", 0x=
-1000);
-> +
-> +    sysbus_init_mmio(sbd, &s->mem);
-> +}
-> +
-> +static void unin_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> +
-> +    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-> +}
-> +
-> +static const TypeInfo unin_info =3D {
-> +    .name          =3D TYPE_UNI_NORTH,
-> +    .parent        =3D TYPE_SYS_BUS_DEVICE,
-> +    .instance_size =3D sizeof(UNINState),
-> +    .instance_init =3D unin_init,
-> +    .class_init    =3D unin_class_init,
-> +};
-> +
->  static void unin_register_types(void)
->  {
->      type_register_static(&unin_main_pci_host_info);
-> @@ -530,6 +586,8 @@ static void unin_register_types(void)
->      type_register_static(&pci_u3_agp_info);
->      type_register_static(&pci_unin_agp_info);
->      type_register_static(&pci_unin_internal_info);
-> +
-> +    type_register_static(&unin_info);
->  }
-> =20
->  type_init(unin_register_types)
-> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-> index 29bd3838bf..9a382f992d 100644
-> --- a/hw/ppc/mac_newworld.c
-> +++ b/hw/ppc/mac_newworld.c
-> @@ -82,36 +82,6 @@
-> =20
->  #define NDRV_VGA_FILENAME "qemu_vga.ndrv"
-> =20
-> -/* UniN device */
-> -static void unin_write(void *opaque, hwaddr addr, uint64_t value,
-> -                       unsigned size)
-> -{
-> -    trace_mac99_uninorth_write(addr, value);
-> -    if (addr =3D=3D 0x0) {
-> -        *(int*)opaque =3D value;
-> -    }
-> -}
-> -
-> -static uint64_t unin_read(void *opaque, hwaddr addr, unsigned size)
-> -{
-> -    uint32_t value;
-> -
-> -    value =3D 0;
-> -    switch (addr) {
-> -    case 0:
-> -        value =3D *(int*)opaque;
-> -    }
-> -
-> -    trace_mac99_uninorth_read(addr, value);
-> -
-> -    return value;
-> -}
-> -
-> -static const MemoryRegionOps unin_ops =3D {
-> -    .read =3D unin_read,
-> -    .write =3D unin_write,
-> -    .endianness =3D DEVICE_NATIVE_ENDIAN,
-> -};
-> =20
->  static void fw_cfg_boot_set(void *opaque, const char *boot_device,
->                              Error **errp)
-> @@ -145,7 +115,6 @@ static void ppc_core99_init(MachineState *machine)
->      CPUPPCState *env =3D NULL;
->      char *filename;
->      qemu_irq *pic, **openpic_irqs;
-> -    MemoryRegion *unin_memory =3D g_new(MemoryRegion, 1);
->      int linux_boot, i, j, k;
->      MemoryRegion *ram =3D g_new(MemoryRegion, 1), *bios =3D g_new(Memory=
-Region, 1);
->      hwaddr kernel_base, initrd_base, cmdline_base =3D 0;
-> @@ -164,7 +133,6 @@ static void ppc_core99_init(MachineState *machine)
->      int machine_arch;
->      SysBusDevice *s;
->      DeviceState *dev, *pic_dev;
-> -    int *token =3D g_new(int, 1);
->      hwaddr nvram_addr =3D 0xFFF04000;
->      uint64_t tbfreq;
-> =20
-> @@ -272,9 +240,12 @@ static void ppc_core99_init(MachineState *machine)
->          }
->      }
-> =20
-> -    /* UniN init: XXX should be a real device */
-> -    memory_region_init_io(unin_memory, NULL, &unin_ops, token, "unin", 0=
-x1000);
-> -    memory_region_add_subregion(get_system_memory(), 0xf8000000, unin_me=
-mory);
-> +    /* UniN init */
-> +    dev =3D qdev_create(NULL, TYPE_UNI_NORTH);
-> +    qdev_init_nofail(dev);
-> +    s =3D SYS_BUS_DEVICE(dev);
-> +    memory_region_add_subregion(get_system_memory(), 0xf8000000,
-> +                                sysbus_mmio_get_region(s, 0));
-> =20
->      openpic_irqs =3D g_malloc0(smp_cpus * sizeof(qemu_irq *));
->      openpic_irqs[0] =3D
-> diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
-> index 66ec7eda6e..dc5e65aee9 100644
-> --- a/hw/ppc/trace-events
-> +++ b/hw/ppc/trace-events
-> @@ -92,10 +92,6 @@ rs6000mc_size_read(uint32_t addr, uint32_t val) "read =
-addr=3D0x%x val=3D0x%x"
->  rs6000mc_size_write(uint32_t addr, uint32_t val) "write addr=3D0x%x val=
-=3D0x%x"
->  rs6000mc_parity_read(uint32_t addr, uint32_t val) "read addr=3D0x%x val=
-=3D0x%x"
-> =20
-> -# hw/ppc/mac_newworld.c
-> -mac99_uninorth_write(uint64_t addr, uint64_t value) "addr=3D0x%" PRIx64 =
-" val=3D0x%"PRIx64
-> -mac99_uninorth_read(uint64_t addr, uint64_t value) "addr=3D0x%" PRIx64 "=
- val=3D0x%"PRIx64
-> -
->  # hw/ppc/ppc4xx_pci.c
->  ppc4xx_pci_map_irq(int32_t devfn, int irq_num, int slot) "devfn 0x%x irq=
- %d -> %d"
->  ppc4xx_pci_set_irq(int irq_num) "PCI irq %d"
-> diff --git a/include/hw/pci-host/uninorth.h b/include/hw/pci-host/uninort=
-h.h
-> index f0e6836c76..f6654bad9b 100644
-> --- a/include/hw/pci-host/uninorth.h
-> +++ b/include/hw/pci-host/uninorth.h
-> @@ -53,4 +53,15 @@ typedef struct UNINHostState {
->      MemoryRegion pci_io;
->  } UNINHostState;
-> =20
-> +typedef struct UNINState {
-> +    SysBusDevice parent_obj;
-> +
-> +    MemoryRegion mem;
-> +    int token[1];
-> +} UNINState;
-> +
-> +#define TYPE_UNI_NORTH "uni-north"
-> +#define UNI_NORTH(obj) \
-> +    OBJECT_CHECK(UNINState, (obj), TYPE_UNI_NORTH)
-> +
->  #endif /* UNINORTH_H */
+> > > Are you saying that presence of ibm,dynamic-memory-v2 probably should=
+n't
+> > > be dependent on machine type ? =20
+> >=20
+> > Yes, I am.
+> >=20
+>=20
+> I agree but we should also not put it in the migration stream then, like =
+we
+> already do for OV5_FORM1_AFFINITY and OV5_DRCONF_MEMORY.
+>=20
+> I've spotted another backward migration breakage wrt old, but still
+> in use, QEMU versions. I'll send a series for both issues ASAP, so
+> that it has a chance to land in QEMU 2.11.2.
+
+Thanks.  I've merged your patch for 2.13 now.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -273,24 +117,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---XSfi1pJWPNAvuBPy
+--D85EWoRcDXv1uhH1
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrroyAACgkQbDjKyiDZ
-s5IFyBAA3zmL2ox/b6CniZRvG/WFVXwiVm+PcvAYNjNfX2kIEmUbbDUIvETCTKyr
-ENoBW2bJFAwbuqTg4jajZcIMytGBh+Gx/cmj0LpsPL2/x0VXCCxl7CKUn2CKR5mn
-I492l4Wp0d84eObdFDnTSiVQURNDlYdyslJ/+kBCKmKKctFrDWMzxOAjeHiPDxDj
-UwSCVlOlnBSP6gILH+z8ovMuu0NS5X6YCMMYeNb2WS0ZdGwugY9O9voo/7HGVnAO
-bhxM+R4dG9TYX7ngF2tEKfkNzG9n6mYGJbPNSNBJjYATTu2o3WxmmPoWIFeKP6hN
-rC3KTKY/FbLpTbU9yucoB4k3Hn3cn49igufO6+UBciBUCW1dKBU13YSwM8G3hXkA
-FoxO2ue9jYsjnJYEBJAz8724kXeeU/ilZpgk3QbKOTuqUlWdGAgqawy7eNtjw0ln
-5DntQNTs7TBVzyh39h4Dm7PBmTNNvwEViXIiRUsIT1VBiew2jI5sKEVgG/Rxy903
-f/eTA5J5nxdCoX7HjzDF5tacmjQNazOvUO9S4CyQ7rdWfYIYFl15xpMz5Jz06Rno
-wu0PZwAyqWiAhxiwOcdsyG8nYBQFxXhjRKG8Wv3ZNEXsrBqIfgD+CO+TwIRRKmA1
-3dZhHMr78BICPuu43uN0MOCIVCB4mG5zBvIioI3W22lTkcIXMlY=
-=SDH0
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrrph4ACgkQbDjKyiDZ
+s5K6QRAAyMp3IsMS94P99+d3EYcQSfw9/Lm6VCEZmS1ikdRQcgdlY0wZ5MS/1QeN
+UbcdLQhMupUUQpzhrD6K+SWE1PsxUQxihfCPLQoWJ5sCyVR6GKrrlPdR8t/m0v8b
+IHE9Xm00/9QG5qTFEGyvh1HIBSzLSdG95N76f2L2nUAid2lRv2ed0ClXxJgrZgeE
+YEsGK4bOCDNMqWohwG/vvW+ZCqP5YgOAP2L3SbtyCY5q5hnLM8Z/hqy6jciwSk8y
+56c0vrDleLpQaDL7yUkiNjTijWJzr1+s41IRUM+aqurfArJIYxXYAfYfbSUjOsFM
+XbbxCZUJwPkrm+ly0zUK5VMPnFqofnw5svQcICI736j8/OO1eMhbCSq0lLp5B0Cj
+ENPO90tci8L0qWA27YphAEi6zqxWVqxx5xb09SAVQidjlH3n7M93yKUz+8N5BcD/
+Ztj2CFwR2gPCg/0b5I31/JlM8AUHHQVAve4cxCqk8wp+0GvD5g5hhGwxWIvcTlR+
+V5JdfQ45SiMTHmolLQX/7knwiZrHavxD3UqqlcDD9cmnJX8RR67GQO/Cjm53fGvh
+K7D7ot8qexpr4+H6J97paMi73AMbVg2V8qdnl1mAkFK905fqf6YXsAy+xiGgwl2+
+AkTWJdnvZfrJ+5rISzZHdP4Xe54udU7SL8RdH5QsdIZ9aFDv7dA=
+=Rrxi
 -----END PGP SIGNATURE-----
 
---XSfi1pJWPNAvuBPy--
+--D85EWoRcDXv1uhH1--
