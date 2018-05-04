@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fEVMV-0001gp-5Y
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 03:42:41 -0400
+	(envelope-from <famz@redhat.com>) id 1fEVMh-0001rE-Vo
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 03:42:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fEVMS-0007x2-Ln
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 03:42:39 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49014 helo=mx1.redhat.com)
+	(envelope-from <famz@redhat.com>) id 1fEVMd-00085w-0r
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 03:42:52 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58348 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fEVMS-0007w4-GW
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 03:42:36 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fEVMc-00085C-Qr
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 03:42:46 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri,  4 May 2018 15:42:05 +0800
-Message-Id: <20180504074207.22634-3-famz@redhat.com>
+Date: Fri,  4 May 2018 15:42:06 +0800
+Message-Id: <20180504074207.22634-4-famz@redhat.com>
 In-Reply-To: <20180504074207.22634-1-famz@redhat.com>
 References: <20180504074207.22634-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 2/4] slirp: Use QAPI enum to replace TCPS_*
- macros
+Subject: [Qemu-devel] [PATCH v6 3/4] slirp: Add "query-usernet" QMP command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,522 +26,482 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, berrange@redhat.com, Fam Zheng <famz@redhat.com>, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-This is a mechanical patch that does search-and-replace and adding
-necessary "#include" for pulling in the QAPI enum definition. The string
-lookup could use the QAPI helper, and is left for the next patch.
+HMP "info usernet" has been available but it isn't ideal for programmed
+use cases. This closes the gap in QMP by adding a counterpart
+"query-usernet" command. It is basically translated from
+the HMP slirp_connection_info() loop, which now calls the QMP
+implementation and prints the data, just like other HMP info_* commands.
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- slirp/misc.c      |  23 ++++++------
- slirp/tcp.h       |  21 ++---------
- slirp/tcp_input.c | 103 +++++++++++++++++++++++++++---------------------------
- slirp/tcp_subr.c  |  25 ++++++-------
- slirp/tcp_timer.c |   7 ++--
- 5 files changed, 84 insertions(+), 95 deletions(-)
+ net/slirp.c      |  26 ++++++++
+ qapi/net.json    | 180 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ slirp/libslirp.h |   2 +
+ slirp/misc.c     | 158 ++++++++++++++++++++++++++++++++++--------------
+ 4 files changed, 321 insertions(+), 45 deletions(-)
 
-diff --git a/slirp/misc.c b/slirp/misc.c
-index 260187b6b6..ee617bc3c4 100644
---- a/slirp/misc.c
-+++ b/slirp/misc.c
-@@ -11,6 +11,7 @@
+diff --git a/net/slirp.c b/net/slirp.c
+index 8991816bbf..9c48a882ec 100644
+--- a/net/slirp.c
++++ b/net/slirp.c
+@@ -36,6 +36,7 @@
  #include "monitor/monitor.h"
  #include "qemu/error-report.h"
- #include "qemu/main-loop.h"
+ #include "qemu/sockets.h"
++#include "slirp/slirp.h"
+ #include "slirp/libslirp.h"
+ #include "slirp/ip6.h"
+ #include "chardev/char-fe.h"
+@@ -43,6 +44,7 @@
+ #include "qemu/cutils.h"
+ #include "qapi/error.h"
+ #include "qapi/qmp/qdict.h"
 +#include "qapi/qapi-commands-net.h"
  
- #ifdef DEBUG
- int slirp_debug = DBG_CALL|DBG_MISC|DBG_ERROR;
-@@ -208,17 +209,17 @@ fork_exec(struct socket *so, const char *ex, int do_pty)
- void slirp_connection_info(Slirp *slirp, Monitor *mon)
+ static int get_str_sep(char *buf, int buf_size, const char **pp, int sep)
  {
-     const char * const tcpstates[] = {
--        [TCPS_CLOSED]       = "CLOSED",
--        [TCPS_LISTEN]       = "LISTEN",
--        [TCPS_SYN_SENT]     = "SYN_SENT",
--        [TCPS_SYN_RECEIVED] = "SYN_RCVD",
--        [TCPS_ESTABLISHED]  = "ESTABLISHED",
--        [TCPS_CLOSE_WAIT]   = "CLOSE_WAIT",
--        [TCPS_FIN_WAIT_1]   = "FIN_WAIT_1",
--        [TCPS_CLOSING]      = "CLOSING",
--        [TCPS_LAST_ACK]     = "LAST_ACK",
--        [TCPS_FIN_WAIT_2]   = "FIN_WAIT_2",
--        [TCPS_TIME_WAIT]    = "TIME_WAIT",
-+        [USERNET_TCP_STATE_CLOSED]       = "CLOSED",
-+        [USERNET_TCP_STATE_LISTEN]       = "LISTEN",
-+        [USERNET_TCP_STATE_SYN_SENT]     = "SYN_SENT",
-+        [USERNET_TCP_STATE_SYN_RECEIVED] = "SYN_RCVD",
-+        [USERNET_TCP_STATE_ESTABLISHED]  = "ESTABLISHED",
-+        [USERNET_TCP_STATE_CLOSE_WAIT]   = "CLOSE_WAIT",
-+        [USERNET_TCP_STATE_FIN_WAIT_1]   = "FIN_WAIT_1",
-+        [USERNET_TCP_STATE_CLOSING]      = "CLOSING",
-+        [USERNET_TCP_STATE_LAST_ACK]     = "LAST_ACK",
-+        [USERNET_TCP_STATE_FIN_WAIT_2]   = "FIN_WAIT_2",
-+        [USERNET_TCP_STATE_TIME_WAIT]    = "TIME_WAIT",
-     };
+@@ -864,6 +866,30 @@ static int slirp_guestfwd(SlirpState *s, const char *config_str,
+     return -1;
+ }
+ 
++UsernetInfoList *qmp_query_usernet(Error **errp)
++{
++    SlirpState *s;
++    UsernetInfoList *list = NULL;
++    UsernetInfoList **p = &list;
++
++    QTAILQ_FOREACH(s, &slirp_stacks, entry) {
++        int hub;
++        UsernetInfoList *il = g_new0(UsernetInfoList, 1);
++        UsernetInfo *info = il->value = g_new0(UsernetInfo, 1);
++
++        info->id = g_strdup(s->nc.name);
++        if (!net_hub_id_for_client(&s->nc, &hub)) {
++            info->hub = hub;
++        } else {
++            info->hub = -1;
++        }
++        usernet_get_info(s->slirp, info);
++        *p = il;
++        p = &il->next;
++    }
++    return list;
++}
++
+ void hmp_info_usernet(Monitor *mon, const QDict *qdict)
+ {
+     SlirpState *s;
+diff --git a/qapi/net.json b/qapi/net.json
+index fcddce62d6..3cdcda125d 100644
+--- a/qapi/net.json
++++ b/qapi/net.json
+@@ -723,3 +723,183 @@
+     'time-wait',
+     'none'
+    ] }
++
++##
++# @UsernetTCPConnection:
++#
++# SLIRP TCP information.
++#
++# @state: tcp connection state
++#
++# @hostfwd: whether this connection has host port forwarding
++#
++# @fd: the file descriptor of the connection
++#
++# @src-addr: source address of host port forwarding
++#
++# @src-port: source port of host port forwarding
++#
++# @dest-addr: destination address of host port forwarding
++#
++# @dest-port: destination port of host port forwarding
++#
++# @recv-buffered: number of bytes queued in the receive buffer
++#
++# @send-buffered: number of bytes queued in the send buffer
++#
++# Since: 2.13
++##
++{ 'struct': 'UsernetTCPConnection',
++  'data': {
++    'state': 'UsernetTcpState',
++    'hostfwd': 'bool',
++    'fd': 'int',
++    'src-addr': 'str',
++    'src-port': 'int',
++    'dest-addr': 'str',
++    'dest-port': 'int',
++    'recv-buffered': 'int',
++    'send-buffered': 'int'
++  } }
++
++##
++# @UsernetUDPConnection:
++#
++# SLIRP UDP information.
++#
++# @hostfwd: whether this connection has host port forwarding
++#
++# @expire-time-ms: time in microseconds after which this connection will expire
++#
++# @fd: the file descriptor of the connection
++#
++# @src-addr: source address of host port forwarding
++#
++# @src-port: source port of host port forwarding
++#
++# @dest-addr: destination address of host port forwarding
++#
++# @dest-port: destination port of host port forwarding
++#
++# @recv-buffered: number of bytes queued in the receive buffer
++#
++# @send-buffered: number of bytes queued in the send buffer
++#
++# Since: 2.13
++##
++{ 'struct': 'UsernetUDPConnection',
++  'data': {
++    'hostfwd': 'bool',
++    'expire-time-ms': 'int',
++    'fd': 'int',
++    'src-addr': 'str',
++    'src-port': 'int',
++    'dest-addr': 'str',
++    'dest-port': 'int',
++    'recv-buffered': 'int',
++    'send-buffered': 'int'
++    } }
++
++##
++# @UsernetICMPConnection:
++#
++# SLIRP ICMP information.
++#
++# @expire-time-ms: time in microseconds after which this connection will expire
++#
++# @fd: the file descriptor of the connection
++#
++# @src-addr: source address of host port forwarding
++#
++# @dest-addr: destination address of host port forwarding
++#
++# @recv-buffered: number of bytes queued in the receive buffer
++#
++# @send-buffered: number of bytes queued in the send buffer
++#
++# Since: 2.13
++##
++{ 'struct': 'UsernetICMPConnection',
++  'data': {
++    'expire-time-ms': 'int',
++    'fd': 'int',
++    'src-addr': 'str',
++    'dest-addr': 'str',
++    'recv-buffered': 'int',
++    'send-buffered': 'int'
++    } }
++
++##
++# @UsernetType:
++#
++# Available netdev drivers.
++#
++# Since: 2.13
++##
++{ 'enum': 'UsernetType',
++  'data': [ 'tcp', 'udp', 'icmp' ] }
++
++##
++# @UsernetConnection:
++#
++# SLIRP usernet connection information.
++#
++# Since: 2.13
++##
++{ 'union': 'UsernetConnection',
++  'discriminator': 'type',
++  'base': { 'type': 'UsernetType' },
++  'data': {
++    'tcp':     'UsernetTCPConnection',
++    'udp':     'UsernetUDPConnection',
++    'icmp':    'UsernetICMPConnection'
++    } }
++
++##
++# @UsernetInfo:
++#
++# SLIRP usernet information.
++#
++# Since: 2.13
++##
++{ 'struct': 'UsernetInfo',
++  'data': {
++    'id':              'str',
++    'hub':             'int',
++    'connections':     ['UsernetConnection']
++} }
++
++##
++# @query-usernet:
++#
++# Return SLIRP network information.
++#
++# Since: 2.13
++#
++# Example:
++#
++# -> { "execute": "query-usernet", "arguments": { } }
++# <- { "return": [
++#      {
++#        "hub": -1,
++#        "connections": [
++#          {
++#            "dest-addr": "10.0.2.15",
++#            "recv-buffered": 0,
++#            "src-port": 10022,
++#            "state": "closed",
++#            "fd": 16,
++#            "src-addr": "*",
++#            "send-buffered": 0,
++#            "dest-port": 22,
++#            "type": "tcp",
++#            "hostfwd": true
++#          }
++#        ],
++#        "id": "vnet"
++#      }
++#   ]}
++#
++##
++{ 'command': 'query-usernet',
++  'returns': ['UsernetInfo'] }
+diff --git a/slirp/libslirp.h b/slirp/libslirp.h
+index 540b3e5903..3ba361ea41 100644
+--- a/slirp/libslirp.h
++++ b/slirp/libslirp.h
+@@ -2,6 +2,7 @@
+ #define LIBSLIRP_H
+ 
+ #include "qemu-common.h"
++#include "qapi/qapi-commands-net.h"
+ 
+ typedef struct Slirp Slirp;
+ 
+@@ -37,6 +38,7 @@ int slirp_add_exec(Slirp *slirp, int do_pty, const void *args,
+                    struct in_addr *guest_addr, int guest_port);
+ 
+ void slirp_connection_info(Slirp *slirp, Monitor *mon);
++void usernet_get_info(Slirp *slirp, UsernetInfo *info);
+ 
+ void slirp_socket_recv(Slirp *slirp, struct in_addr guest_addr,
+                        int guest_port, const uint8_t *buf, int size);
+diff --git a/slirp/misc.c b/slirp/misc.c
+index ee617bc3c4..1d310d7d1f 100644
+--- a/slirp/misc.c
++++ b/slirp/misc.c
+@@ -206,39 +206,28 @@ fork_exec(struct socket *so, const char *ex, int do_pty)
+ }
+ #endif
+ 
+-void slirp_connection_info(Slirp *slirp, Monitor *mon)
++void usernet_get_info(Slirp *slirp, UsernetInfo *info)
+ {
+-    const char * const tcpstates[] = {
+-        [USERNET_TCP_STATE_CLOSED]       = "CLOSED",
+-        [USERNET_TCP_STATE_LISTEN]       = "LISTEN",
+-        [USERNET_TCP_STATE_SYN_SENT]     = "SYN_SENT",
+-        [USERNET_TCP_STATE_SYN_RECEIVED] = "SYN_RCVD",
+-        [USERNET_TCP_STATE_ESTABLISHED]  = "ESTABLISHED",
+-        [USERNET_TCP_STATE_CLOSE_WAIT]   = "CLOSE_WAIT",
+-        [USERNET_TCP_STATE_FIN_WAIT_1]   = "FIN_WAIT_1",
+-        [USERNET_TCP_STATE_CLOSING]      = "CLOSING",
+-        [USERNET_TCP_STATE_LAST_ACK]     = "LAST_ACK",
+-        [USERNET_TCP_STATE_FIN_WAIT_2]   = "FIN_WAIT_2",
+-        [USERNET_TCP_STATE_TIME_WAIT]    = "TIME_WAIT",
+-    };
      struct in_addr dst_addr;
      struct sockaddr_in src;
-diff --git a/slirp/tcp.h b/slirp/tcp.h
-index 174d3d960c..f766e684e6 100644
---- a/slirp/tcp.h
-+++ b/slirp/tcp.h
-@@ -133,24 +133,9 @@ struct tcphdr {
- 
- #define TCP_NSTATES     11
- 
--#define TCPS_CLOSED             0       /* closed */
--#define TCPS_LISTEN             1       /* listening for connection */
--#define TCPS_SYN_SENT           2       /* active, have sent syn */
--#define TCPS_SYN_RECEIVED       3       /* have send and received syn */
--/* states < TCPS_ESTABLISHED are those where connections not established */
--#define TCPS_ESTABLISHED        4       /* established */
--#define TCPS_CLOSE_WAIT         5       /* rcvd fin, waiting for close */
--/* states > TCPS_CLOSE_WAIT are those where user has closed */
--#define TCPS_FIN_WAIT_1         6       /* have closed, sent fin */
--#define TCPS_CLOSING            7       /* closed xchd FIN; await FIN ACK */
--#define TCPS_LAST_ACK           8       /* had fin and close; await FIN ACK */
--/* states > TCPS_CLOSE_WAIT && < TCPS_FIN_WAIT_2 await ACK of FIN */
--#define TCPS_FIN_WAIT_2         9       /* have closed, fin is acked */
--#define TCPS_TIME_WAIT          10      /* in 2*msl quiet wait after close */
+     socklen_t src_len;
+     uint16_t dst_port;
+     struct socket *so;
+-    const char *state;
+-    char buf[20];
 -
--#define TCPS_HAVERCVDSYN(s)     ((s) >= TCPS_SYN_RECEIVED)
--#define TCPS_HAVEESTABLISHED(s) ((s) >= TCPS_ESTABLISHED)
--#define TCPS_HAVERCVDFIN(s)     ((s) >= TCPS_TIME_WAIT)
-+#define TCPS_HAVERCVDSYN(s)     ((s) >= USERNET_TCP_STATE_SYN_RECEIVED)
-+#define TCPS_HAVEESTABLISHED(s) ((s) >= USERNET_TCP_STATE_ESTABLISHED)
-+#define TCPS_HAVERCVDFIN(s)     ((s) >= USERNET_TCP_STATE_TIME_WAIT)
+-    monitor_printf(mon, "  Protocol[State]    FD  Source Address  Port   "
+-                        "Dest. Address  Port RecvQ SendQ\n");
++    UsernetConnectionList **p_next = &info->connections;
  
- /*
-  * TCP sequence numbers are 32 bit integers operated
-diff --git a/slirp/tcp_input.c b/slirp/tcp_input.c
-index 07bcbdb2dd..c8b0c9db03 100644
---- a/slirp/tcp_input.c
-+++ b/slirp/tcp_input.c
-@@ -41,6 +41,7 @@
- #include "qemu/osdep.h"
- #include "slirp.h"
- #include "ip_icmp.h"
-+#include "qapi/qapi-commands-net.h"
+     for (so = slirp->tcb.so_next; so != &slirp->tcb; so = so->so_next) {
++        UsernetConnection *conn = g_new0(UsernetConnection, 1);
++        UsernetTCPConnection *tcp = &conn->u.tcp;
++        UsernetConnectionList *list = g_new0(UsernetConnectionList, 1);
++
++        list->value = conn;
+         if (so->so_state & SS_HOSTFWD) {
+-            state = "HOST_FORWARD";
++            tcp->hostfwd = true;
++            tcp->state = so->so_tcpcb->t_state;
+         } else if (so->so_tcpcb) {
+-            state = tcpstates[so->so_tcpcb->t_state];
++            tcp->state = so->so_tcpcb->t_state;
+         } else {
+-            state = "NONE";
++            tcp->state = USERNET_TCP_STATE_NONE;
+         }
+         if (so->so_state & (SS_HOSTFWD | SS_INCOMING)) {
+             src_len = sizeof(src);
+@@ -251,46 +240,125 @@ void slirp_connection_info(Slirp *slirp, Monitor *mon)
+             dst_addr = so->so_faddr;
+             dst_port = so->so_fport;
+         }
+-        snprintf(buf, sizeof(buf), "  TCP[%s]", state);
+-        monitor_printf(mon, "%-19s %3d %15s %5d ", buf, so->s,
+-                       src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "*",
+-                       ntohs(src.sin_port));
+-        monitor_printf(mon, "%15s %5d %5d %5d\n",
+-                       inet_ntoa(dst_addr), ntohs(dst_port),
+-                       so->so_rcv.sb_cc, so->so_snd.sb_cc);
++        tcp->fd = so->s;
++        tcp->src_addr =
++            g_strdup(src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "*");
++        tcp->src_port = ntohs(src.sin_port);
++        tcp->dest_addr = g_strdup(inet_ntoa(dst_addr));
++        tcp->dest_port = ntohs(dst_port);
++        tcp->recv_buffered = so->so_rcv.sb_cc;
++        tcp->send_buffered = so->so_snd.sb_cc;
++        *p_next = list;
++        p_next = &list->next;
+     }
+-
+     for (so = slirp->udb.so_next; so != &slirp->udb; so = so->so_next) {
++        UsernetConnection *conn = g_new0(UsernetConnection, 1);
++        UsernetUDPConnection *udp = &conn->u.udp;
++        UsernetConnectionList *list = g_new0(UsernetConnectionList, 1);
++
++        list->value = conn;
+         if (so->so_state & SS_HOSTFWD) {
+-            snprintf(buf, sizeof(buf), "  UDP[HOST_FORWARD]");
++            udp->hostfwd = true;
+             src_len = sizeof(src);
+             getsockname(so->s, (struct sockaddr *)&src, &src_len);
+             dst_addr = so->so_laddr;
+             dst_port = so->so_lport;
+         } else {
+-            snprintf(buf, sizeof(buf), "  UDP[%d sec]",
+-                         (so->so_expire - curtime) / 1000);
++            udp->expire_time_ms = so->so_expire - curtime;
+             src.sin_addr = so->so_laddr;
+             src.sin_port = so->so_lport;
+             dst_addr = so->so_faddr;
+             dst_port = so->so_fport;
+         }
+-        monitor_printf(mon, "%-19s %3d %15s %5d ", buf, so->s,
+-                       src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "*",
+-                       ntohs(src.sin_port));
+-        monitor_printf(mon, "%15s %5d %5d %5d\n",
+-                       inet_ntoa(dst_addr), ntohs(dst_port),
+-                       so->so_rcv.sb_cc, so->so_snd.sb_cc);
++        udp->fd = so->s;
++        udp->src_addr =
++            g_strdup(src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "*");
++        udp->src_port = ntohs(src.sin_port);
++        udp->dest_addr = g_strdup(inet_ntoa(dst_addr));
++        udp->dest_port = ntohs(dst_port);
++        udp->recv_buffered = so->so_rcv.sb_cc;
++        udp->send_buffered = so->so_snd.sb_cc;
++        *p_next = list;
++        p_next = &list->next;
+     }
  
- #define	TCPREXMTTHRESH 3
- 
-@@ -64,7 +65,7 @@
- #define TCP_REASS(tp, ti, m, so, flags) {\
-        if ((ti)->ti_seq == (tp)->rcv_nxt && \
-            tcpfrag_list_empty(tp) && \
--           (tp)->t_state == TCPS_ESTABLISHED) {\
-+           (tp)->t_state == USERNET_TCP_STATE_ESTABLISHED) {\
-                if (ti->ti_flags & TH_PUSH) \
-                        tp->t_flags |= TF_ACKNOW; \
-                else \
-@@ -84,7 +85,7 @@
- #define	TCP_REASS(tp, ti, m, so, flags) { \
- 	if ((ti)->ti_seq == (tp)->rcv_nxt && \
-         tcpfrag_list_empty(tp) && \
--	    (tp)->t_state == TCPS_ESTABLISHED) { \
-+	    (tp)->t_state == USERNET_TCP_STATE_ESTABLISHED) { \
- 		tp->t_flags |= TF_DELACK; \
- 		(tp)->rcv_nxt += (ti)->ti_len; \
- 		flags = (ti)->ti_flags & TH_FIN; \
-@@ -189,7 +190,7 @@ present:
- 	ti = tcpfrag_list_first(tp);
- 	if (tcpfrag_list_end(ti, tp) || ti->ti_seq != tp->rcv_nxt)
- 		return (0);
--	if (tp->t_state == TCPS_SYN_RECEIVED && ti->ti_len)
-+	if (tp->t_state == USERNET_TCP_STATE_SYN_RECEIVED && ti->ti_len)
- 		return (0);
- 	do {
- 		tp->rcv_nxt += ti->ti_len;
-@@ -456,7 +457,7 @@ findso:
- 	  }
- 
- 	  tp = sototcpcb(so);
--	  tp->t_state = TCPS_LISTEN;
-+	  tp->t_state = USERNET_TCP_STATE_LISTEN;
- 	}
- 
-         /*
-@@ -472,7 +473,7 @@ findso:
- 	/* XXX Should never fail */
-         if (tp == NULL)
- 		goto dropwithreset;
--	if (tp->t_state == TCPS_CLOSED)
-+	if (tp->t_state == USERNET_TCP_STATE_CLOSED)
- 		goto drop;
- 
- 	tiwin = ti->ti_win;
-@@ -491,7 +492,7 @@ findso:
- 	 * Process options if not in LISTEN state,
- 	 * else do it below (after getting remote address).
- 	 */
--	if (optp && tp->t_state != TCPS_LISTEN)
-+	if (optp && tp->t_state != USERNET_TCP_STATE_LISTEN)
- 		tcp_dooptions(tp, (u_char *)optp, optlen, ti);
- 
- 	/*
-@@ -512,7 +513,7 @@ findso:
- 	 * eg: the tiwin == tp->snd_wnd prevents many more
- 	 * predictions.. with no *real* advantage..
- 	 */
--	if (tp->t_state == TCPS_ESTABLISHED &&
-+	if (tp->t_state == USERNET_TCP_STATE_ESTABLISHED &&
- 	    (tiflags & (TH_SYN|TH_FIN|TH_RST|TH_URG|TH_ACK)) == TH_ACK &&
- 	    ti->ti_seq == tp->rcv_nxt &&
- 	    tiwin && tiwin == tp->snd_wnd &&
-@@ -614,7 +615,7 @@ findso:
- 	 * Enter SYN_RECEIVED state, and process any other fields of this
- 	 * segment in this state.
- 	 */
--	case TCPS_LISTEN: {
-+	case USERNET_TCP_STATE_LISTEN: {
- 
- 	  if (tiflags & TH_RST)
- 	    goto drop;
-@@ -725,7 +726,7 @@ findso:
- 	    so->so_m = m;
- 	    so->so_ti = ti;
- 	    tp->t_timer[TCPT_KEEP] = TCPTV_KEEP_INIT;
--	    tp->t_state = TCPS_SYN_RECEIVED;
-+	    tp->t_state = USERNET_TCP_STATE_SYN_RECEIVED;
- 	    /*
- 	     * Initialize receive sequence numbers now so that we can send a
- 	     * valid RST if the remote end rejects our connection.
-@@ -759,10 +760,10 @@ findso:
- 	  tcp_sendseqinit(tp);
- 	  tcp_rcvseqinit(tp);
- 	  tp->t_flags |= TF_ACKNOW;
--	  tp->t_state = TCPS_SYN_RECEIVED;
-+	  tp->t_state = USERNET_TCP_STATE_SYN_RECEIVED;
- 	  tp->t_timer[TCPT_KEEP] = TCPTV_KEEP_INIT;
- 	  goto trimthenstep6;
--	} /* case TCPS_LISTEN */
-+	} /* case USERNET_TCP_STATE_LISTEN */
- 
- 	/*
- 	 * If the state is SYN_SENT:
-@@ -776,7 +777,7 @@ findso:
- 	 *	arrange for segment to be acked (eventually)
- 	 *	continue processing rest of data/controls, beginning with URG
- 	 */
--	case TCPS_SYN_SENT:
-+	case USERNET_TCP_STATE_SYN_SENT:
- 		if ((tiflags & TH_ACK) &&
- 		    (SEQ_LEQ(ti->ti_ack, tp->iss) ||
- 		     SEQ_GT(ti->ti_ack, tp->snd_max)))
-@@ -803,7 +804,7 @@ findso:
- 		tp->t_flags |= TF_ACKNOW;
- 		if (tiflags & TH_ACK && SEQ_GT(tp->snd_una, tp->iss)) {
- 			soisfconnected(so);
--			tp->t_state = TCPS_ESTABLISHED;
-+			tp->t_state = USERNET_TCP_STATE_ESTABLISHED;
- 
- 			(void) tcp_reass(tp, (struct tcpiphdr *)0,
- 				(struct mbuf *)0);
-@@ -814,7 +815,7 @@ findso:
- 			if (tp->t_rtt)
- 				tcp_xmit_timer(tp, tp->t_rtt);
- 		} else
--			tp->t_state = TCPS_SYN_RECEIVED;
-+			tp->t_state = USERNET_TCP_STATE_SYN_RECEIVED;
- 
- trimthenstep6:
- 		/*
-@@ -884,7 +885,7 @@ trimthenstep6:
- 	 * user processes are gone, then RST the other end.
- 	 */
- 	if ((so->so_state & SS_NOFDREF) &&
--	    tp->t_state > TCPS_CLOSE_WAIT && ti->ti_len) {
-+	    tp->t_state > USERNET_TCP_STATE_CLOSE_WAIT && ti->ti_len) {
- 		tp = tcp_close(tp);
- 		goto dropwithreset;
- 	}
-@@ -903,7 +904,7 @@ trimthenstep6:
- 			 * are above the previous ones.
- 			 */
- 			if (tiflags & TH_SYN &&
--			    tp->t_state == TCPS_TIME_WAIT &&
-+			    tp->t_state == USERNET_TCP_STATE_TIME_WAIT &&
- 			    SEQ_GT(ti->ti_seq, tp->rcv_nxt)) {
- 				iss = tp->rcv_nxt + TCP_ISSINCR;
- 				tp = tcp_close(tp);
-@@ -939,18 +940,18 @@ trimthenstep6:
- 	 */
- 	if (tiflags&TH_RST) switch (tp->t_state) {
- 
--	case TCPS_SYN_RECEIVED:
--	case TCPS_ESTABLISHED:
--	case TCPS_FIN_WAIT_1:
--	case TCPS_FIN_WAIT_2:
--	case TCPS_CLOSE_WAIT:
--		tp->t_state = TCPS_CLOSED;
-+	case USERNET_TCP_STATE_SYN_RECEIVED:
-+	case USERNET_TCP_STATE_ESTABLISHED:
-+	case USERNET_TCP_STATE_FIN_WAIT_1:
-+	case USERNET_TCP_STATE_FIN_WAIT_2:
-+	case USERNET_TCP_STATE_CLOSE_WAIT:
-+		tp->t_state = USERNET_TCP_STATE_CLOSED;
-                 tcp_close(tp);
- 		goto drop;
- 
--	case TCPS_CLOSING:
--	case TCPS_LAST_ACK:
--	case TCPS_TIME_WAIT:
-+	case USERNET_TCP_STATE_CLOSING:
-+	case USERNET_TCP_STATE_LAST_ACK:
-+	case USERNET_TCP_STATE_TIME_WAIT:
-                 tcp_close(tp);
- 		goto drop;
- 	}
-@@ -978,12 +979,12 @@ trimthenstep6:
- 	 * ESTABLISHED state and continue processing, otherwise
- 	 * send an RST.  una<=ack<=max
- 	 */
--	case TCPS_SYN_RECEIVED:
-+	case USERNET_TCP_STATE_SYN_RECEIVED:
- 
- 		if (SEQ_GT(tp->snd_una, ti->ti_ack) ||
- 		    SEQ_GT(ti->ti_ack, tp->snd_max))
- 			goto dropwithreset;
--		tp->t_state = TCPS_ESTABLISHED;
-+		tp->t_state = USERNET_TCP_STATE_ESTABLISHED;
- 		/*
- 		 * The sent SYN is ack'ed with our sequence number +1
- 		 * The first data byte already in the buffer will get
-@@ -1003,7 +1004,7 @@ trimthenstep6:
- 		    so->so_state |= SS_NOFDREF; /* CTL_CMD */
- 		  } else {
- 		    needoutput = 1;
--		    tp->t_state = TCPS_FIN_WAIT_1;
-+		    tp->t_state = USERNET_TCP_STATE_FIN_WAIT_1;
- 		  }
- 		} else {
- 		  soisfconnected(so);
-@@ -1023,13 +1024,13 @@ trimthenstep6:
- 	 * data from the retransmission queue.  If this ACK reflects
- 	 * more up to date window information we update our window information.
- 	 */
--	case TCPS_ESTABLISHED:
--	case TCPS_FIN_WAIT_1:
--	case TCPS_FIN_WAIT_2:
--	case TCPS_CLOSE_WAIT:
--	case TCPS_CLOSING:
--	case TCPS_LAST_ACK:
--	case TCPS_TIME_WAIT:
-+	case USERNET_TCP_STATE_ESTABLISHED:
-+	case USERNET_TCP_STATE_FIN_WAIT_1:
-+	case USERNET_TCP_STATE_FIN_WAIT_2:
-+	case USERNET_TCP_STATE_CLOSE_WAIT:
-+	case USERNET_TCP_STATE_CLOSING:
-+	case USERNET_TCP_STATE_LAST_ACK:
-+	case USERNET_TCP_STATE_TIME_WAIT:
- 
- 		if (SEQ_LEQ(ti->ti_ack, tp->snd_una)) {
- 			if (ti->ti_len == 0 && tiwin == tp->snd_wnd) {
-@@ -1160,7 +1161,7 @@ trimthenstep6:
- 		 * for the ESTABLISHED state if our FIN is now acknowledged
- 		 * then enter FIN_WAIT_2.
- 		 */
--		case TCPS_FIN_WAIT_1:
-+		case USERNET_TCP_STATE_FIN_WAIT_1:
- 			if (ourfinisacked) {
- 				/*
- 				 * If we can't receive any more
-@@ -1172,7 +1173,7 @@ trimthenstep6:
- 				if (so->so_state & SS_FCANTRCVMORE) {
- 					tp->t_timer[TCPT_2MSL] = TCP_MAXIDLE;
- 				}
--				tp->t_state = TCPS_FIN_WAIT_2;
-+				tp->t_state = USERNET_TCP_STATE_FIN_WAIT_2;
- 			}
- 			break;
- 
-@@ -1182,9 +1183,9 @@ trimthenstep6:
- 		 * then enter the TIME-WAIT state, otherwise ignore
- 		 * the segment.
- 		 */
--		case TCPS_CLOSING:
-+		case USERNET_TCP_STATE_CLOSING:
- 			if (ourfinisacked) {
--				tp->t_state = TCPS_TIME_WAIT;
-+				tp->t_state = USERNET_TCP_STATE_TIME_WAIT;
- 				tcp_canceltimers(tp);
- 				tp->t_timer[TCPT_2MSL] = 2 * TCPTV_MSL;
- 			}
-@@ -1196,7 +1197,7 @@ trimthenstep6:
- 		 * If our FIN is now acknowledged, delete the TCB,
- 		 * enter the closed state and return.
- 		 */
--		case TCPS_LAST_ACK:
-+		case USERNET_TCP_STATE_LAST_ACK:
- 			if (ourfinisacked) {
-                                 tcp_close(tp);
- 				goto drop;
-@@ -1208,7 +1209,7 @@ trimthenstep6:
- 		 * is a retransmission of the remote FIN.  Acknowledge
- 		 * it and restart the finack timer.
- 		 */
--		case TCPS_TIME_WAIT:
-+		case USERNET_TCP_STATE_TIME_WAIT:
- 			tp->t_timer[TCPT_2MSL] = 2 * TCPTV_MSL;
- 			goto dropafterack;
- 		}
-@@ -1316,7 +1317,7 @@ dodata:
-                          * Shutdown the socket if there is no rx data in the
- 			 * buffer.
- 			 * soread() is called on completion of shutdown() and
--			 * will got to TCPS_LAST_ACK, and use tcp_output()
-+			 * will got to USERNET_TCP_STATE_LAST_ACK, and use tcp_output()
- 			 * to send the FIN.
- 			 */
- 			sofwdrain(so);
-@@ -1330,20 +1331,20 @@ dodata:
- 		 * In SYN_RECEIVED and ESTABLISHED STATES
- 		 * enter the CLOSE_WAIT state.
- 		 */
--		case TCPS_SYN_RECEIVED:
--		case TCPS_ESTABLISHED:
-+		case USERNET_TCP_STATE_SYN_RECEIVED:
-+		case USERNET_TCP_STATE_ESTABLISHED:
- 		  if(so->so_emu == EMU_CTL)        /* no shutdown on socket */
--		    tp->t_state = TCPS_LAST_ACK;
-+		    tp->t_state = USERNET_TCP_STATE_LAST_ACK;
- 		  else
--		    tp->t_state = TCPS_CLOSE_WAIT;
-+		    tp->t_state = USERNET_TCP_STATE_CLOSE_WAIT;
- 		  break;
- 
- 	 	/*
- 		 * If still in FIN_WAIT_1 STATE FIN has not been acked so
- 		 * enter the CLOSING state.
- 		 */
--		case TCPS_FIN_WAIT_1:
--			tp->t_state = TCPS_CLOSING;
-+		case USERNET_TCP_STATE_FIN_WAIT_1:
-+			tp->t_state = USERNET_TCP_STATE_CLOSING;
- 			break;
- 
- 	 	/*
-@@ -1351,8 +1352,8 @@ dodata:
- 		 * starting the time-wait timer, turning off the other
- 		 * standard timers.
- 		 */
--		case TCPS_FIN_WAIT_2:
--			tp->t_state = TCPS_TIME_WAIT;
-+		case USERNET_TCP_STATE_FIN_WAIT_2:
-+			tp->t_state = USERNET_TCP_STATE_TIME_WAIT;
- 			tcp_canceltimers(tp);
- 			tp->t_timer[TCPT_2MSL] = 2 * TCPTV_MSL;
- 			break;
-@@ -1360,7 +1361,7 @@ dodata:
- 		/*
- 		 * In TIME_WAIT state restart the 2 MSL time_wait timer.
- 		 */
--		case TCPS_TIME_WAIT:
-+		case USERNET_TCP_STATE_TIME_WAIT:
- 			tp->t_timer[TCPT_2MSL] = 2 * TCPTV_MSL;
- 			break;
- 		}
-diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
-index da0d53743f..8dd5a70044 100644
---- a/slirp/tcp_subr.c
-+++ b/slirp/tcp_subr.c
-@@ -40,6 +40,7 @@
- 
- #include "qemu/osdep.h"
- #include "slirp.h"
-+#include "qapi/qapi-commands-net.h"
- 
- /* patchable/settable parameters for tcp */
- /* Don't do rfc1323 performance enhancements */
-@@ -282,7 +283,7 @@ tcp_newtcpcb(struct socket *so)
- 
- 	tp->snd_cwnd = TCP_MAXWIN << TCP_MAX_WINSHIFT;
- 	tp->snd_ssthresh = TCP_MAXWIN << TCP_MAX_WINSHIFT;
--	tp->t_state = TCPS_CLOSED;
-+	tp->t_state = USERNET_TCP_STATE_CLOSED;
- 
- 	so->so_tcpcb = tp;
- 
-@@ -301,7 +302,7 @@ struct tcpcb *tcp_drop(struct tcpcb *tp, int err)
- 	DEBUG_ARG("errno = %d", errno);
- 
- 	if (TCPS_HAVERCVDSYN(tp->t_state)) {
--		tp->t_state = TCPS_CLOSED;
-+		tp->t_state = USERNET_TCP_STATE_CLOSED;
- 		(void) tcp_output(tp);
- 	}
- 	return (tcp_close(tp));
-@@ -371,20 +372,20 @@ tcp_sockclosed(struct tcpcb *tp)
- 
- 	switch (tp->t_state) {
- 
--	case TCPS_CLOSED:
--	case TCPS_LISTEN:
--	case TCPS_SYN_SENT:
--		tp->t_state = TCPS_CLOSED;
-+	case USERNET_TCP_STATE_CLOSED:
-+	case USERNET_TCP_STATE_LISTEN:
-+	case USERNET_TCP_STATE_SYN_SENT:
-+		tp->t_state = USERNET_TCP_STATE_CLOSED;
- 		tp = tcp_close(tp);
- 		break;
- 
--	case TCPS_SYN_RECEIVED:
--	case TCPS_ESTABLISHED:
--		tp->t_state = TCPS_FIN_WAIT_1;
-+	case USERNET_TCP_STATE_SYN_RECEIVED:
-+	case USERNET_TCP_STATE_ESTABLISHED:
-+		tp->t_state = USERNET_TCP_STATE_FIN_WAIT_1;
- 		break;
- 
--	case TCPS_CLOSE_WAIT:
--		tp->t_state = TCPS_LAST_ACK;
-+	case USERNET_TCP_STATE_CLOSE_WAIT:
-+		tp->t_state = USERNET_TCP_STATE_LAST_ACK;
- 		break;
- 	}
- 	tcp_output(tp);
-@@ -513,7 +514,7 @@ void tcp_connect(struct socket *inso)
- 
-     tcp_template(tp);
- 
--    tp->t_state = TCPS_SYN_SENT;
-+    tp->t_state = USERNET_TCP_STATE_SYN_SENT;
-     tp->t_timer[TCPT_KEEP] = TCPTV_KEEP_INIT;
-     tp->iss = slirp->tcp_iss;
-     slirp->tcp_iss += TCP_ISSINCR/2;
-diff --git a/slirp/tcp_timer.c b/slirp/tcp_timer.c
-index 52ef5f9100..d45dfe2da8 100644
---- a/slirp/tcp_timer.c
-+++ b/slirp/tcp_timer.c
-@@ -32,6 +32,7 @@
- 
- #include "qemu/osdep.h"
- #include "slirp.h"
-+#include "qapi/qapi-commands-net.h"
- 
- static struct tcpcb *tcp_timers(register struct tcpcb *tp, int timer);
- 
-@@ -135,7 +136,7 @@ tcp_timers(register struct tcpcb *tp, int timer)
- 	 * control block.  Otherwise, check again in a bit.
- 	 */
- 	case TCPT_2MSL:
--		if (tp->t_state != TCPS_TIME_WAIT &&
-+		if (tp->t_state != USERNET_TCP_STATE_TIME_WAIT &&
- 		    tp->t_idle <= TCP_MAXIDLE)
- 			tp->t_timer[TCPT_2MSL] = TCPTV_KEEPINTVL;
- 		else
-@@ -259,10 +260,10 @@ tcp_timers(register struct tcpcb *tp, int timer)
- 	 * or drop connection if idle for too long.
- 	 */
- 	case TCPT_KEEP:
--		if (tp->t_state < TCPS_ESTABLISHED)
-+		if (tp->t_state < USERNET_TCP_STATE_ESTABLISHED)
- 			goto dropit;
- 
--		if ((SO_OPTIONS) && tp->t_state <= TCPS_CLOSE_WAIT) {
-+		if ((SO_OPTIONS) && tp->t_state <= USERNET_TCP_STATE_CLOSE_WAIT) {
- 		    	if (tp->t_idle >= TCPTV_KEEP_IDLE + TCP_MAXIDLE)
- 				goto dropit;
- 			/*
+     for (so = slirp->icmp.so_next; so != &slirp->icmp; so = so->so_next) {
+-        snprintf(buf, sizeof(buf), "  ICMP[%d sec]",
+-                     (so->so_expire - curtime) / 1000);
++        UsernetConnection *conn = g_new0(UsernetConnection, 1);
++        UsernetICMPConnection *icmp = &conn->u.icmp;
++        UsernetConnectionList *list = g_new0(UsernetConnectionList, 1);
++
++        icmp->expire_time_ms = so->so_expire - curtime;
+         src.sin_addr = so->so_laddr;
+         dst_addr = so->so_faddr;
+-        monitor_printf(mon, "%-19s %3d %15s  -    ", buf, so->s,
+-                       src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "*");
+-        monitor_printf(mon, "%15s  -    %5d %5d\n", inet_ntoa(dst_addr),
+-                       so->so_rcv.sb_cc, so->so_snd.sb_cc);
++        icmp->fd = so->s;
++        icmp->src_addr =
++            g_strdup(src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "*");
++        icmp->dest_addr = g_strdup(inet_ntoa(dst_addr));
++        icmp->recv_buffered = so->so_rcv.sb_cc;
++        icmp->send_buffered = so->so_snd.sb_cc;
++        *p_next = list;
++        p_next = &list->next;
+     }
+ }
++
++
++void slirp_connection_info(Slirp *slirp, Monitor *mon)
++{
++    const char *state;
++    char buf[64];
++    UsernetInfo *info = g_new0(UsernetInfo, 1);
++    UsernetConnectionList *cl;
++
++    monitor_printf(mon, "  Protocol[State]    FD  Source Address  Port   "
++                        "Dest. Address  Port RecvQ SendQ\n");
++
++    usernet_get_info(slirp, info);
++    for (cl = info->connections; cl && cl->value; cl = cl->next) {
++        UsernetConnection *conn = cl->value;
++
++        if (conn->type == USERNET_TYPE_TCP) {
++            UsernetTCPConnection *tcp = &conn->u.tcp;
++
++            if (tcp->hostfwd) {
++                state = "HOST_FORWARD";
++            } else {
++                state = UsernetTcpState_str(tcp->state);
++            }
++            snprintf(buf, sizeof(buf), "  TCP[%s]", state);
++            monitor_printf(mon, "%-19s %3" PRId64 " %15s %5" PRId64 " ",
++                           buf, tcp->fd,
++                           tcp->src_addr, tcp->src_port);
++            monitor_printf(mon, "%15s %5" PRId64 " %5" PRId64 " %5" PRId64 "\n",
++                           tcp->dest_addr, tcp->dest_port,
++                           tcp->recv_buffered, tcp->send_buffered);
++        } else if (conn->type == USERNET_TYPE_UDP) {
++            UsernetUDPConnection *udp = &conn->u.udp;
++
++            if (udp->hostfwd) {
++                snprintf(buf, sizeof(buf), "  UDP[HOST_FORWARD]");
++            } else {
++                snprintf(buf, sizeof(buf), "  UDP[%" PRId64 " sec]",
++                         udp->expire_time_ms / 1000);
++            }
++            monitor_printf(mon, "%-19s %3" PRId64 " %15s %5" PRId64 " ",
++                           buf, udp->fd,
++                           udp->src_addr, udp->src_port);
++            monitor_printf(mon, "%15s %5" PRId64 " %5" PRId64 " %5" PRId64 "\n",
++                           udp->dest_addr, udp->dest_port,
++                           udp->recv_buffered, udp->send_buffered);
++        } else {
++            UsernetICMPConnection *icmp = &conn->u.icmp;
++
++            assert(conn->type == USERNET_TYPE_ICMP);
++            snprintf(buf, sizeof(buf), "  ICMP[%" PRId64 " sec]",
++                     icmp->expire_time_ms / 1000);
++            monitor_printf(mon, "%-19s %3" PRId64 " %15s  -    ", buf, icmp->fd,
++                           icmp->src_addr);
++            monitor_printf(mon, "%15s  -    %5" PRId64 " %5" PRId64 "\n",
++                           icmp->dest_addr,
++                           icmp->recv_buffered, icmp->send_buffered);
++        }
++    }
++
++    qapi_free_UsernetInfo(info);
++}
 -- 
 2.14.3
