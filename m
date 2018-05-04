@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fEiiH-0003Fu-8F
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 17:58:02 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fEiiX-0003NX-13
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 17:58:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fEiiE-0003u9-67
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 17:58:01 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54050 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1fEiiT-00041k-Ul
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 17:58:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43566 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fEiiE-0003tB-0r
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 17:57:58 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fEiiT-00041N-Ob
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 17:58:13 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3A28A8190282
-	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 21:57:56 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 46B2B42BE1C9
+	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 21:58:13 +0000 (UTC)
 References: <1525453270-23074-1-git-send-email-thuth@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f7756c7c-338a-a719-7135-aa7a53a62c4c@redhat.com>
-Date: Fri, 4 May 2018 23:57:53 +0200
+Message-ID: <eb76eb48-d622-01bd-bd2c-1e0ce61f640f@redhat.com>
+Date: Fri, 4 May 2018 23:58:10 +0200
 MIME-Version: 1.0
 In-Reply-To: <1525453270-23074-1-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
@@ -57,12 +57,16 @@ On 04/05/2018 19:01, Thomas Huth wrote:
 >   qemu-options: Remove deprecated -no-kvm-pit-reinjection
 >   qemu-options: Remove deprecated -no-kvm-irqchip
 >   qemu-options: Remove deprecated -no-kvm
+> 
+>  include/qemu-common.h |  2 +-
+>  os-posix.c            |  6 +++++-
+>  os-win32.c            |  4 ++--
+>  qemu-doc.texi         | 15 ---------------
+>  qemu-options.hx       | 13 -------------
+>  vl.c                  | 26 ++++----------------------
+>  6 files changed, 12 insertions(+), 54 deletions(-)
+> 
 
-I'm not that sure anymore about -no-kvm.  It can come in handy for
-distros (*cough* RHEL *cough) that only ship a qemu-kvm binary with
-default accelerator "-machine accel=kvm:tcg".
-
-Yeah, "-accel tcg" is only a few characters later, but it is a
-relatively recent addition.
+Queued patches 1-4 waiting for more discussion, thanks.
 
 Paolo
