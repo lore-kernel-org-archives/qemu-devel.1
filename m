@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44465)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=6553081d8=Alistair.Francis@wdc.com>)
-	id 1fEh5f-0006jC-FD
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 16:14:05 -0400
+	id 1fEh5U-0006iB-2E
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 16:13:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=6553081d8=Alistair.Francis@wdc.com>)
-	id 1fEh5c-0006xR-6a
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 16:14:03 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:29065)
+	id 1fEh5Q-0006or-Mj
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 16:13:51 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:20893)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
 	(envelope-from <prvs=6553081d8=Alistair.Francis@wdc.com>)
-	id 1fEh5b-0006wD-PC
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 16:14:00 -0400
+	id 1fEh5Q-0006nd-5A
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 16:13:48 -0400
 From: Alistair Francis <alistair.francis@wdc.com>
-Date: Fri,  4 May 2018 13:13:47 -0700
-Message-Id: <18aa905475ab9a2dd5d8b7cd04cd037bb01a4e64.1525464177.git.alistair.francis@wdc.com>
+Date: Fri,  4 May 2018 13:13:30 -0700
+Message-Id: <5655a2ca4e77ca8a0ac7b83b011449989e013981.1525464177.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1525464177.git.alistair.francis@wdc.com>
 References: <cover.1525464177.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v1 4/4] hw/riscv/sifive_e: Create a E31 SoC
- object
+Subject: [Qemu-devel] [PATCH v1 3/4] hw/riscv/sifive_u: Connect the Cadence
+ GEM Ethernet device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,177 +32,127 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: alistair.francis@wdc.com, alistair23@gmail.com, palmer@sifive.com, mjc@sifive.com
 
+Connect the Cadence GEM ethernet device. This also requires us to
+expose the plic interrupt lines.
+
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- hw/riscv/sifive_e.c         | 97 +++++++++++++++++++++++++++----------
- include/hw/riscv/sifive_e.h | 16 +++++-
- 2 files changed, 86 insertions(+), 27 deletions(-)
+ default-configs/riscv32-softmmu.mak |  1 +
+ default-configs/riscv64-softmmu.mak |  1 +
+ hw/riscv/sifive_u.c                 | 29 +++++++++++++++++++++++++++++
+ include/hw/riscv/sifive_u.h         |  6 +++++-
+ 4 files changed, 36 insertions(+), 1 deletion(-)
 
-diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-index e4ecb7aa4b..0ab5e3ca45 100644
---- a/hw/riscv/sifive_e.c
-+++ b/hw/riscv/sifive_e.c
-@@ -102,18 +102,12 @@ static void riscv_sifive_e_init(MachineState *machine)
-     SiFiveEState *s = g_new0(SiFiveEState, 1);
-     MemoryRegion *sys_mem = get_system_memory();
-     MemoryRegion *main_mem = g_new(MemoryRegion, 1);
--    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
--    MemoryRegion *xip_mem = g_new(MemoryRegion, 1);
-     int i;
+diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
+index f9e742120c..9a1c42e8b2 100644
+--- a/default-configs/riscv32-softmmu.mak
++++ b/default-configs/riscv32-softmmu.mak
+@@ -2,3 +2,4 @@
  
--    /* Initialize SOC */
--    object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
-+    /* Initialize SoC */
-+    object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_E31_SOC);
-     object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
-                               &error_abort);
--    object_property_set_str(OBJECT(&s->soc), SIFIVE_E_CPU, "cpu-type",
--                            &error_abort);
--    object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
--                            &error_abort);
-     object_property_set_bool(OBJECT(&s->soc), true, "realized",
-                             &error_abort);
+ CONFIG_SERIAL=y
+ CONFIG_VIRTIO=y
++CONFIG_CADENCE=y
+diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
+index f9e742120c..9a1c42e8b2 100644
+--- a/default-configs/riscv64-softmmu.mak
++++ b/default-configs/riscv64-softmmu.mak
+@@ -2,3 +2,4 @@
  
-@@ -123,11 +117,57 @@ static void riscv_sifive_e_init(MachineState *machine)
-     memory_region_add_subregion(sys_mem,
-         memmap[SIFIVE_E_DTIM].base, main_mem);
+ CONFIG_SERIAL=y
+ CONFIG_VIRTIO=y
++CONFIG_CADENCE=y
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 4924f92262..e4c7539b89 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -58,8 +58,11 @@ static const struct MemmapEntry {
+     [SIFIVE_U_UART0] =    { 0x10013000,     0x1000 },
+     [SIFIVE_U_UART1] =    { 0x10023000,     0x1000 },
+     [SIFIVE_U_DRAM] =     { 0x80000000,        0x0 },
++    [SIFIVE_U_GEM] =      { 0x100900FC,     0x1000 },
+ };
  
-+    /* Mask ROM reset vector */
-+    uint32_t reset_vec[2] = {
-+        0x204002b7,        /* 0x1000: lui     t0,0x20400 */
-+        0x00028067,        /* 0x1004: jr      t0 */
-+    };
++#define GEM_REVISION        0x10070109
 +
-+    /* copy in the reset vector in little_endian byte order */
-+    for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
-+        reset_vec[i] = cpu_to_le32(reset_vec[i]);
-+    }
-+    rom_add_blob_fixed_as("mrom.reset", reset_vec, sizeof(reset_vec),
-+                          memmap[SIFIVE_E_MROM].base, &address_space_memory);
+ static uint64_t load_kernel(const char *kernel_filename)
+ {
+     uint64_t kernel_entry, kernel_high;
+@@ -294,6 +297,9 @@ static void riscv_sifive_u54_init(Object *obj)
+                            memmap[SIFIVE_U_MROM].size, &error_fatal);
+     memory_region_add_subregion(system_memory, memmap[SIFIVE_U_MROM].base,
+                                 mask_rom);
 +
-+    if (machine->kernel_filename) {
-+        load_kernel(machine->kernel_filename);
-+    }
-+}
-+
-+static void riscv_sifive_e31_init(Object *obj)
-+{
-+    const struct MemmapEntry *memmap = sifive_e_memmap;
-+
-+    SiFiveE31State *s = RISCV_E31_SOC(obj);
-+    MemoryRegion *sys_mem = get_system_memory();
-+    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
-+
-+    object_initialize(&s->cpus, sizeof(s->cpus), TYPE_RISCV_HART_ARRAY);
-+    object_property_add_child(obj, "cpus", OBJECT(&s->cpus),
-+                              &error_abort);
-+    object_property_set_str(OBJECT(&s->cpus), SIFIVE_E_CPU, "cpu-type",
-+                            &error_abort);
-+    object_property_set_int(OBJECT(&s->cpus), smp_cpus, "num-harts",
-+                            &error_abort);
-+
-     /* Mask ROM */
-     memory_region_init_rom(mask_rom, NULL, "riscv.sifive.e.mrom",
-         memmap[SIFIVE_E_MROM].size, &error_fatal);
-     memory_region_add_subregion(sys_mem,
-         memmap[SIFIVE_E_MROM].base, mask_rom);
-+}
-+
-+static void riscv_sifive_e31_realize(DeviceState *dev, Error **errp)
-+{
-+    const struct MemmapEntry *memmap = sifive_e_memmap;
-+
-+    SiFiveE31State *s = RISCV_E31_SOC(dev);
-+    MemoryRegion *sys_mem = get_system_memory();
-+    MemoryRegion *xip_mem = g_new(MemoryRegion, 1);
-+
-+    object_property_set_bool(OBJECT(&s->cpus), true, "realized",
-+                            &error_abort);
- 
-     /* MMIO */
-     s->plic = sifive_plic_create(memmap[SIFIVE_E_PLIC].base,
-@@ -171,23 +211,6 @@ static void riscv_sifive_e_init(MachineState *machine)
-         memmap[SIFIVE_E_XIP].size, &error_fatal);
-     memory_region_set_readonly(xip_mem, true);
-     memory_region_add_subregion(sys_mem, memmap[SIFIVE_E_XIP].base, xip_mem);
--
--    /* Mask ROM reset vector */
--    uint32_t reset_vec[2] = {
--        0x204002b7,        /* 0x1000: lui     t0,0x20400 */
--        0x00028067,        /* 0x1004: jr      t0 */
--    };
--
--    /* copy in the reset vector in little_endian byte order */
--    for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
--        reset_vec[i] = cpu_to_le32(reset_vec[i]);
--    }
--    rom_add_blob_fixed_as("mrom.reset", reset_vec, sizeof(reset_vec),
--                          memmap[SIFIVE_E_MROM].base, &address_space_memory);
--
--    if (machine->kernel_filename) {
--        load_kernel(machine->kernel_filename);
--    }
++    object_initialize(&s->gem, sizeof(s->gem), TYPE_CADENCE_GEM);
++    qdev_set_parent_bus(DEVICE(&s->gem), sysbus_get_default());
  }
  
- static void riscv_sifive_e_machine_init(MachineClass *mc)
-@@ -198,3 +221,27 @@ static void riscv_sifive_e_machine_init(MachineClass *mc)
+ static void riscv_sifive_u54_realize(DeviceState *dev, Error **errp)
+@@ -301,6 +307,10 @@ static void riscv_sifive_u54_realize(DeviceState *dev, Error **errp)
+     SiFiveU54State *s = RISCV_U54_SOC(dev);
+     const struct MemmapEntry *memmap = sifive_u_memmap;
+     MemoryRegion *system_memory = get_system_memory();
++    qemu_irq plic_gpios[SIFIVE_U_PLIC_NUM_SOURCES];
++    int i;
++    Error *err = NULL;
++    NICInfo *nd = &nd_table[0];
+ 
+     object_property_set_bool(OBJECT(&s->cpus), true, "realized",
+                              &error_abort);
+@@ -324,6 +334,25 @@ static void riscv_sifive_u54_realize(DeviceState *dev, Error **errp)
+     sifive_clint_create(memmap[SIFIVE_U_CLINT].base,
+         memmap[SIFIVE_U_CLINT].size, smp_cpus,
+         SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
++
++    for (i = 0; i < SIFIVE_U_PLIC_NUM_SOURCES; i++) {
++        plic_gpios[i] = qdev_get_gpio_in(DEVICE(s->plic), i);
++    }
++
++    if (nd->used) {
++        qemu_check_nic_model(nd, TYPE_CADENCE_GEM);
++        qdev_set_nic_properties(DEVICE(&s->gem), nd);
++    }
++    object_property_set_int(OBJECT(&s->gem), GEM_REVISION, "revision",
++                            &error_abort);
++    object_property_set_bool(OBJECT(&s->gem), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gem), 0, memmap[SIFIVE_U_GEM].base);
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->gem), 0,
++                       plic_gpios[53]);
  }
  
- DEFINE_MACHINE("sifive_e", riscv_sifive_e_machine_init)
-+
-+static void riscv_sifive_e31_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+
-+    dc->realize = riscv_sifive_e31_realize;
-+    /* Reason: Uses serial_hds in realize function, thus can't be used twice */
-+    dc->user_creatable = false;
-+}
-+
-+static const TypeInfo riscv_sifive_e31_type_info = {
-+    .name = TYPE_RISCV_E31_SOC,
-+    .parent = TYPE_DEVICE,
-+    .instance_size = sizeof(SiFiveE31State),
-+    .instance_init = riscv_sifive_e31_init,
-+    .class_init = riscv_sifive_e31_class_init,
-+};
-+
-+static void riscv_sifive_e31_register_types(void)
-+{
-+    type_register_static(&riscv_sifive_e31_type_info);
-+}
-+
-+type_init(riscv_sifive_e31_register_types)
-diff --git a/include/hw/riscv/sifive_e.h b/include/hw/riscv/sifive_e.h
-index 12ad6d2ebb..5cb19cd564 100644
---- a/include/hw/riscv/sifive_e.h
-+++ b/include/hw/riscv/sifive_e.h
-@@ -19,13 +19,25 @@
- #ifndef HW_SIFIVE_E_H
- #define HW_SIFIVE_E_H
+ static void riscv_sifive_u_machine_init(MachineClass *mc)
+diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+index 0f8bdd8fab..d40d851999 100644
+--- a/include/hw/riscv/sifive_u.h
++++ b/include/hw/riscv/sifive_u.h
+@@ -19,6 +19,8 @@
+ #ifndef HW_SIFIVE_U_H
+ #define HW_SIFIVE_U_H
  
--typedef struct SiFiveEState {
-+#define TYPE_RISCV_E31_SOC "riscv.sifive.e31"
-+#define RISCV_E31_SOC(obj) \
-+    OBJECT_CHECK(SiFiveE31State, (obj), TYPE_RISCV_E31_SOC)
++#include "hw/net/cadence_gem.h"
 +
-+typedef struct SiFiveE31State {
-     /*< private >*/
-     SysBusDevice parent_obj;
- 
+ #define TYPE_RISCV_U54_SOC "riscv.sifive.u54"
+ #define RISCV_U54_SOC(obj) \
+     OBJECT_CHECK(SiFiveU54State, (obj), TYPE_RISCV_U54_SOC)
+@@ -30,6 +32,7 @@ typedef struct SiFiveU54State {
      /*< public >*/
--    RISCVHartArrayState soc;
-+    RISCVHartArrayState cpus;
+     RISCVHartArrayState cpus;
      DeviceState *plic;
-+} SiFiveE31State;
-+
-+typedef struct SiFiveEState {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+
-+    /*< public >*/
-+    SiFiveE31State soc;
- } SiFiveEState;
++    CadenceGEMState gem;
+ } SiFiveU54State;
+ 
+ typedef struct SiFiveUState {
+@@ -49,7 +52,8 @@ enum {
+     SIFIVE_U_PLIC,
+     SIFIVE_U_UART0,
+     SIFIVE_U_UART1,
+-    SIFIVE_U_DRAM
++    SIFIVE_U_DRAM,
++    SIFIVE_U_GEM
+ };
  
  enum {
 -- 
