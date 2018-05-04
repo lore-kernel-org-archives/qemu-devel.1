@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33131)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fEWEw-0006tz-0X
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:38:55 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fEWEv-0006tS-FJ
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:38:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fEWEu-0002Uz-Gu
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:38:54 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42556 helo=mx1.redhat.com)
+	(envelope-from <imammedo@redhat.com>) id 1fEWEt-0002TT-Dg
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:38:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59864 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fEWEu-0002UK-BT
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:38:52 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fEWEt-0002T1-76
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 04:38:51 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E8872722C3
-	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 08:38:51 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id CE47540858E0
+	for <qemu-devel@nongnu.org>; Fri,  4 May 2018 08:38:50 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Fri,  4 May 2018 10:37:44 +0200
-Message-Id: <1525423069-61903-7-git-send-email-imammedo@redhat.com>
+Date: Fri,  4 May 2018 10:37:43 +0200
+Message-Id: <1525423069-61903-6-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1525423069-61903-1-git-send-email-imammedo@redhat.com>
 References: <1525423069-61903-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 06/11] tests: qapi-schema tests for
- allow-preconfig
+Subject: [Qemu-devel] [PATCH v7 05/11] qapi: introduce new cmd option
+ "allowed-in-preconfig"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,211 +33,376 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, ehabkost@redhat.com, pkrempa@redhat.com, armbru@redhat.com
 
-use new allow-preconfig parameter in tests and make sure that
-the QAPISchema can parse allow-preconfig correctly
+New option will be used to allow commands, which are prepared/need
+to run, during preconfig state. Other commands that should be able
+to run in preconfig state, should be amended to not expect machine
+in initialized state or deal with it.
+
+For compatibility reasons, commands that don't use new flag
+'allowed-in-preconfig' explicitly are not permitted to run in
+preconfig state but allowed in all other states like they used
+to be.
+
+Within this patch allow following commands in preconfig state:
+   qmp_capabilities
+   query-qmp-schema
+   query-commands
+   query-command-line-options
+   query-status
+   exit-preconfig
+to allow qmp connection, basic introspection and moving to the next
+state.
+
+PS:
+set-numa-node and query-hotpluggable-cpus will be enabled later in
+a separate patches.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-v7:
-  * s/allowed_in_preconfig/allow_preconfig/
-  * squash in "tests: add allow-preconfig-test for qapi-schema"
-  * reuse an-oob-command for allow-preconfig test and rename it to test-flags-command
 ---
- tests/Makefile.include                      |  1 +
- tests/qapi-schema/allow-preconfig-test.err  |  1 +
- tests/qapi-schema/allow-preconfig-test.exit |  1 +
- tests/qapi-schema/allow-preconfig-test.json |  2 ++
- tests/qapi-schema/allow-preconfig-test.out  |  0
- tests/qapi-schema/doc-good.out              |  4 ++--
- tests/qapi-schema/ident-with-escape.out     |  2 +-
- tests/qapi-schema/indented-expr.out         |  4 ++--
- tests/qapi-schema/qapi-schema-test.json     |  4 ++--
- tests/qapi-schema/qapi-schema-test.out      | 22 +++++++++++-----------
- tests/qapi-schema/test-qapi.py              |  4 ++--
- tests/test-qmp-cmds.c                       |  2 +-
- 12 files changed, 26 insertions(+), 21 deletions(-)
- create mode 100644 tests/qapi-schema/allow-preconfig-test.err
- create mode 100644 tests/qapi-schema/allow-preconfig-test.exit
- create mode 100644 tests/qapi-schema/allow-preconfig-test.json
- create mode 100644 tests/qapi-schema/allow-preconfig-test.out
+v7:
+  - (Eric Blake <eblake@redhat.com>)
+    * s/allowed-in-preconfig/allow-preconfig/
+    * s/allowed_in_preconfig/allow_preconfig/
+    * move here QCO_ALLOWED_IN_PRECONFIG declaration from
+       'cli: add --preconfig option'
+      and put this patch before it as well
+    * s/QCO_ALLOWED_IN_PRECONFIG/QCO_ALLOW_PRECONFIG/
+    * wording fixes in doc
+v6:
+  * exclude 'cont' command from preconfig enabled, in favor of
+    exit-preconfig command
+  * mark exit-preconfig with allowed-in-preconfig=true
+v5:
+  * allow query-command-line-options in preconfig state
+  * rebase on top of OOB changes that's now in master
+  * spelling/wording fixups
+  * make sure that allowed-in-preconfig could be set only to True
+  * move out QCO_ALLOWED_IN_PRECONFIG check in do_qmp_dispatch() to
+    earlier 'cli: add -preconfig option' patch
+v4:
+  * replaces complex "universal" approach
+     "[PATCH v3 5/9] QAPI: allow to specify valid runstates  per command"
+    with a simpler new command flag "allowed-in-preconfig".
+    (Eric Blake <eblake@redhat.com>)
+---
+ include/qapi/qmp/dispatch.h    |  1 +
+ docs/devel/qapi-code-gen.txt   | 10 +++++++++-
+ monitor.c                      |  5 ++---
+ qapi/introspect.json           |  5 ++++-
+ qapi/misc.json                 |  9 ++++++---
+ qapi/run-state.json            |  3 ++-
+ scripts/qapi/commands.py       | 11 +++++++----
+ scripts/qapi/common.py         | 18 +++++++++++-------
+ scripts/qapi/doc.py            |  4 ++--
+ scripts/qapi/introspect.py     |  7 ++++---
+ tests/qapi-schema/test-qapi.py |  4 ++--
+ 11 files changed, 50 insertions(+), 27 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 3b9a5e3..74ed400 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -524,6 +524,7 @@ qapi-schema += missing-type.json
- qapi-schema += nested-struct-data.json
- qapi-schema += non-objects.json
- qapi-schema += oob-test.json
-+qapi-schema += allow-preconfig-test.json
- qapi-schema += pragma-doc-required-crap.json
- qapi-schema += pragma-extra-junk.json
- qapi-schema += pragma-name-case-whitelist-crap.json
-diff --git a/tests/qapi-schema/allow-preconfig-test.err b/tests/qapi-schema/allow-preconfig-test.err
-new file mode 100644
-index 0000000..700d583
---- /dev/null
-+++ b/tests/qapi-schema/allow-preconfig-test.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/allow-preconfig-test.json:2: 'allow-preconfig' of command 'allow-preconfig-test' should only use true value
-diff --git a/tests/qapi-schema/allow-preconfig-test.exit b/tests/qapi-schema/allow-preconfig-test.exit
-new file mode 100644
-index 0000000..d00491f
---- /dev/null
-+++ b/tests/qapi-schema/allow-preconfig-test.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/allow-preconfig-test.json b/tests/qapi-schema/allow-preconfig-test.json
-new file mode 100644
-index 0000000..d9f0e91
---- /dev/null
-+++ b/tests/qapi-schema/allow-preconfig-test.json
-@@ -0,0 +1,2 @@
-+# Check against allow-preconfig illegal value
-+{ 'command': 'allow-preconfig-test', 'allow-preconfig': 'some-string' }
-diff --git a/tests/qapi-schema/allow-preconfig-test.out b/tests/qapi-schema/allow-preconfig-test.out
-new file mode 100644
-index 0000000..e69de29
-diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.out
-index 63058b1..9c8a483 100644
---- a/tests/qapi-schema/doc-good.out
-+++ b/tests/qapi-schema/doc-good.out
-@@ -28,9 +28,9 @@ object q_obj_cmd-arg
-     member arg2: str optional=True
-     member arg3: bool optional=False
- command cmd q_obj_cmd-arg -> Object
--   gen=True success_response=True boxed=False oob=False
-+   gen=True success_response=True boxed=False oob=False preconfig=False
- command cmd-boxed Object -> None
--   gen=True success_response=True boxed=True oob=False
-+   gen=True success_response=True boxed=True oob=False preconfig=False
- doc freeform
-     body=
- = Section
-diff --git a/tests/qapi-schema/ident-with-escape.out b/tests/qapi-schema/ident-with-escape.out
-index 82213aa..24c976f 100644
---- a/tests/qapi-schema/ident-with-escape.out
-+++ b/tests/qapi-schema/ident-with-escape.out
-@@ -5,4 +5,4 @@ module ident-with-escape.json
- object q_obj_fooA-arg
-     member bar1: str optional=False
- command fooA q_obj_fooA-arg -> None
--   gen=True success_response=True boxed=False oob=False
-+   gen=True success_response=True boxed=False oob=False preconfig=False
-diff --git a/tests/qapi-schema/indented-expr.out b/tests/qapi-schema/indented-expr.out
-index 862678f..bd8a486 100644
---- a/tests/qapi-schema/indented-expr.out
-+++ b/tests/qapi-schema/indented-expr.out
-@@ -3,6 +3,6 @@ enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool']
-     prefix QTYPE
- module indented-expr.json
- command eins None -> None
--   gen=True success_response=True boxed=False oob=False
-+   gen=True success_response=True boxed=False oob=False preconfig=False
- command zwei None -> None
--   gen=True success_response=True boxed=False oob=False
-+   gen=True success_response=True boxed=False oob=False preconfig=False
-diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/qapi-schema-test.json
-index 06e30f4..46c7282 100644
---- a/tests/qapi-schema/qapi-schema-test.json
-+++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -139,8 +139,8 @@
- { 'command': 'boxed-struct', 'boxed': true, 'data': 'UserDefZero' }
- { 'command': 'boxed-union', 'data': 'UserDefNativeListUnion', 'boxed': true }
+diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
+index ffb4652..b366bb4 100644
+--- a/include/qapi/qmp/dispatch.h
++++ b/include/qapi/qmp/dispatch.h
+@@ -23,6 +23,7 @@ typedef enum QmpCommandOptions
+     QCO_NO_OPTIONS            =  0x0,
+     QCO_NO_SUCCESS_RESP       =  (1U << 0),
+     QCO_ALLOW_OOB             =  (1U << 1),
++    QCO_ALLOW_PRECONFIG       =  (1U << 2),
+ } QmpCommandOptions;
  
--# Smoke test on Out-Of-Band
--{ 'command': 'an-oob-command', 'allow-oob': true }
-+# Smoke test on Out-Of-Band and allow-preconfig-test
-+{ 'command': 'test-flags-command', 'allow-oob': true, 'allow-preconfig': true }
+ typedef struct QmpCommand
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index a569d24..0f9fbea 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -559,7 +559,7 @@ following example objects:
+ Usage: { 'command': STRING, '*data': COMPLEX-TYPE-NAME-OR-DICT,
+          '*returns': TYPE-NAME, '*boxed': true,
+          '*gen': false, '*success-response': false,
+-         '*allow-oob': true }
++         '*allow-oob': true, '*allow-preconfig': true }
  
- # For testing integer range flattening in opts-visitor. The following schema
- # corresponds to the option format:
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/qapi-schema-test.out
-index 467577d..542a19c 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -16,7 +16,7 @@ object Empty1
- object Empty2
-     base Empty1
- command user_def_cmd0 Empty2 -> Empty2
--   gen=True success_response=True boxed=False oob=False
-+   gen=True success_response=True boxed=False oob=False preconfig=False
- enum QEnumTwo ['value1', 'value2']
-     prefix QENUM_TWO
- object UserDefOne
-@@ -143,31 +143,31 @@ object UserDefNativeListUnion
-     case sizes: q_obj_sizeList-wrapper
-     case any: q_obj_anyList-wrapper
- command user_def_cmd None -> None
--   gen=True success_response=True boxed=False oob=False
-+   gen=True success_response=True boxed=False oob=False preconfig=False
- object q_obj_user_def_cmd1-arg
-     member ud1a: UserDefOne optional=False
- command user_def_cmd1 q_obj_user_def_cmd1-arg -> None
--   gen=True success_response=True boxed=False oob=False
-+   gen=True success_response=True boxed=False oob=False preconfig=False
- object q_obj_user_def_cmd2-arg
-     member ud1a: UserDefOne optional=False
-     member ud1b: UserDefOne optional=True
- command user_def_cmd2 q_obj_user_def_cmd2-arg -> UserDefTwo
--   gen=True success_response=True boxed=False oob=False
-+   gen=True success_response=True boxed=False oob=False preconfig=False
- object q_obj_guest-get-time-arg
-     member a: int optional=False
-     member b: int optional=True
- command guest-get-time q_obj_guest-get-time-arg -> int
--   gen=True success_response=True boxed=False oob=False
-+   gen=True success_response=True boxed=False oob=False preconfig=False
- object q_obj_guest-sync-arg
-     member arg: any optional=False
- command guest-sync q_obj_guest-sync-arg -> any
--   gen=True success_response=True boxed=False oob=False
-+   gen=True success_response=True boxed=False oob=False preconfig=False
- command boxed-struct UserDefZero -> None
--   gen=True success_response=True boxed=True oob=False
-+   gen=True success_response=True boxed=True oob=False preconfig=False
- command boxed-union UserDefNativeListUnion -> None
--   gen=True success_response=True boxed=True oob=False
--command an-oob-command None -> None
--   gen=True success_response=True boxed=False oob=True
-+   gen=True success_response=True boxed=True oob=False preconfig=False
-+command test-flags-command None -> None
-+   gen=True success_response=True boxed=False oob=True preconfig=True
- object UserDefOptions
-     member i64: intList optional=True
-     member u64: uint64List optional=True
-@@ -231,4 +231,4 @@ object q_obj___org.qemu_x-command-arg
-     member c: __org.qemu_x-Union2 optional=False
-     member d: __org.qemu_x-Alt optional=False
- command __org.qemu_x-command q_obj___org.qemu_x-command-arg -> __org.qemu_x-Union1
--   gen=True success_response=True boxed=False oob=False
-+   gen=True success_response=True boxed=False oob=False preconfig=False
-diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi.py
-index 89b92ed..4512a41 100644
---- a/tests/qapi-schema/test-qapi.py
-+++ b/tests/qapi-schema/test-qapi.py
-@@ -45,8 +45,8 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
-                       success_response, boxed, allow_oob, allow_preconfig):
-         print('command %s %s -> %s' % \
-               (name, arg_type and arg_type.name, ret_type and ret_type.name))
--        print('   gen=%s success_response=%s boxed=%s oob=%s' % \
--              (gen, success_response, boxed, allow_oob))
-+        print('   gen=%s success_response=%s boxed=%s oob=%s preconfig=%s' % \
-+              (gen, success_response, boxed, allow_oob, allow_preconfig))
+ Commands are defined by using a dictionary containing several members,
+ where three members are most common.  The 'command' member is a
+@@ -683,6 +683,14 @@ OOB command handlers must satisfy the following conditions:
+ 
+ If in doubt, do not implement OOB execution support.
+ 
++A command may use optional 'allow-preconfig' key to permit its execution
++at early runtime configuration stage (preconfig runstate).
++If not specified then a command defaults to 'allow-preconfig': false
++
++An example of declaring a command that is enabled during preconfig:
++ { 'command': 'qmp_capabilities',
++   'allow-preconfig': true }
++
+ === Events ===
+ 
+ Usage: { 'event': STRING, '*data': COMPLEX-TYPE-NAME-OR-DICT,
+diff --git a/monitor.c b/monitor.c
+index 0ffdf1d..0dc3fdb 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1182,8 +1182,7 @@ static void monitor_init_qmp_commands(void)
+     qmp_init_marshal(&qmp_commands);
+ 
+     qmp_register_command(&qmp_commands, "query-qmp-schema",
+-                         qmp_query_qmp_schema,
+-                         QCO_NO_OPTIONS);
++                         qmp_query_qmp_schema, QCO_ALLOW_PRECONFIG);
+     qmp_register_command(&qmp_commands, "device_add", qmp_device_add,
+                          QCO_NO_OPTIONS);
+     qmp_register_command(&qmp_commands, "netdev_add", qmp_netdev_add,
+@@ -1193,7 +1192,7 @@ static void monitor_init_qmp_commands(void)
+ 
+     QTAILQ_INIT(&qmp_cap_negotiation_commands);
+     qmp_register_command(&qmp_cap_negotiation_commands, "qmp_capabilities",
+-                         qmp_marshal_qmp_capabilities, QCO_NO_OPTIONS);
++                         qmp_marshal_qmp_capabilities, QCO_ALLOW_PRECONFIG);
+ }
+ 
+ static bool qmp_cap_enabled(Monitor *mon, QMPCapability cap)
+diff --git a/qapi/introspect.json b/qapi/introspect.json
+index c7f67b7..e8a833a 100644
+--- a/qapi/introspect.json
++++ b/qapi/introspect.json
+@@ -262,13 +262,16 @@
+ # @allow-oob: whether the command allows out-of-band execution.
+ #             (Since: 2.12)
+ #
++# @allow-preconfig: command can be executed in preconfig runstate,
++#                   default: false (Since 2.13)
++#
+ # TODO: @success-response (currently irrelevant, because it's QGA, not QMP)
+ #
+ # Since: 2.5
+ ##
+ { 'struct': 'SchemaInfoCommand',
+   'data': { 'arg-type': 'str', 'ret-type': 'str',
+-            'allow-oob': 'bool' } }
++            'allow-oob': 'bool', 'allow-preconfig': 'bool' } }
+ 
+ ##
+ # @SchemaInfoEvent:
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 5636f4a..5c8be28 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -35,7 +35,8 @@
+ #
+ ##
+ { 'command': 'qmp_capabilities',
+-  'data': { '*enable': [ 'QMPCapability' ] } }
++  'data': { '*enable': [ 'QMPCapability' ] },
++  'allow-preconfig': true }
+ 
+ ##
+ # @QMPCapability:
+@@ -153,7 +154,8 @@
+ # Note: This example has been shortened as the real response is too long.
+ #
+ ##
+-{ 'command': 'query-commands', 'returns': ['CommandInfo'] }
++{ 'command': 'query-commands', 'returns': ['CommandInfo'],
++  'allow-preconfig': true }
+ 
+ ##
+ # @LostTickPolicy:
+@@ -2614,7 +2616,8 @@
+ #
+ ##
+ {'command': 'query-command-line-options', 'data': { '*option': 'str' },
+- 'returns': ['CommandLineOptionInfo'] }
++ 'returns': ['CommandLineOptionInfo'],
++ 'allow-preconfig': true }
+ 
+ ##
+ # @X86CPURegister32:
+diff --git a/qapi/run-state.json b/qapi/run-state.json
+index 9694a9f..444b252 100644
+--- a/qapi/run-state.json
++++ b/qapi/run-state.json
+@@ -94,7 +94,8 @@
+ #                  "status": "running" } }
+ #
+ ##
+-{ 'command': 'query-status', 'returns': 'StatusInfo' }
++{ 'command': 'query-status', 'returns': 'StatusInfo',
++  'allow-preconfig': true }
+ 
+ ##
+ # @SHUTDOWN:
+diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
+index 0c5da3a..3b0867c 100644
+--- a/scripts/qapi/commands.py
++++ b/scripts/qapi/commands.py
+@@ -193,13 +193,15 @@ out:
+     return ret
+ 
+ 
+-def gen_register_command(name, success_response, allow_oob):
++def gen_register_command(name, success_response, allow_oob, allow_preconfig):
+     options = []
+ 
+     if not success_response:
+         options += ['QCO_NO_SUCCESS_RESP']
+     if allow_oob:
+         options += ['QCO_ALLOW_OOB']
++    if allow_preconfig:
++        options += ['QCO_ALLOW_PRECONFIG']
+ 
+     if not options:
+         options = ['QCO_NO_OPTIONS']
+@@ -275,8 +277,8 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds);
+                        c_prefix=c_name(self._prefix, protect=False)))
+         genc.add(gen_registry(self._regy, self._prefix))
+ 
+-    def visit_command(self, name, info, arg_type, ret_type,
+-                      gen, success_response, boxed, allow_oob):
++    def visit_command(self, name, info, arg_type, ret_type, gen,
++                      success_response, boxed, allow_oob, allow_preconfig):
+         if not gen:
+             return
+         self._genh.add(gen_command_decl(name, arg_type, boxed, ret_type))
+@@ -285,7 +287,8 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds);
+             self._genc.add(gen_marshal_output(ret_type))
+         self._genh.add(gen_marshal_decl(name))
+         self._genc.add(gen_marshal(name, arg_type, boxed, ret_type))
+-        self._regy += gen_register_command(name, success_response, allow_oob)
++        self._regy += gen_register_command(name, success_response, allow_oob,
++                                           allow_preconfig)
+ 
+ 
+ def gen_commands(schema, output_dir, prefix):
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index 3e14bc4..454f9ee 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -872,7 +872,8 @@ def check_keys(expr_elem, meta, required, optional=[]):
+             raise QAPISemError(info,
+                                "'%s' of %s '%s' should only use false value"
+                                % (key, meta, name))
+-        if (key == 'boxed' or key == 'allow-oob') and value is not True:
++        if (key == 'boxed' or key == 'allow-oob' or
++            key == 'allow-preconfig') and value is not True:
+             raise QAPISemError(info,
+                                "'%s' of %s '%s' should only use true value"
+                                % (key, meta, name))
+@@ -922,7 +923,7 @@ def check_exprs(exprs):
+             meta = 'command'
+             check_keys(expr_elem, 'command', [],
+                        ['data', 'returns', 'gen', 'success-response',
+-                        'boxed', 'allow-oob'])
++                        'boxed', 'allow-oob', 'allow-preconfig'])
+         elif 'event' in expr:
+             meta = 'event'
+             check_keys(expr_elem, 'event', [], ['data', 'boxed'])
+@@ -1044,8 +1045,8 @@ class QAPISchemaVisitor(object):
+     def visit_alternate_type(self, name, info, variants):
+         pass
+ 
+-    def visit_command(self, name, info, arg_type, ret_type,
+-                      gen, success_response, boxed, allow_oob):
++    def visit_command(self, name, info, arg_type, ret_type, gen,
++                      success_response, boxed, allow_oob, allow_preconfig):
+         pass
  
      def visit_event(self, name, info, arg_type, boxed):
-         print('event %s %s' % (name, arg_type and arg_type.name))
-diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
-index db690cc..3714271 100644
---- a/tests/test-qmp-cmds.c
-+++ b/tests/test-qmp-cmds.c
-@@ -16,7 +16,7 @@ void qmp_user_def_cmd(Error **errp)
- {
- }
+@@ -1422,7 +1423,7 @@ class QAPISchemaAlternateType(QAPISchemaType):
  
--void qmp_an_oob_command(Error **errp)
-+void qmp_test_flags_command(Error **errp)
- {
- }
+ class QAPISchemaCommand(QAPISchemaEntity):
+     def __init__(self, name, info, doc, arg_type, ret_type,
+-                 gen, success_response, boxed, allow_oob):
++                 gen, success_response, boxed, allow_oob, allow_preconfig):
+         QAPISchemaEntity.__init__(self, name, info, doc)
+         assert not arg_type or isinstance(arg_type, str)
+         assert not ret_type or isinstance(ret_type, str)
+@@ -1434,6 +1435,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
+         self.success_response = success_response
+         self.boxed = boxed
+         self.allow_oob = allow_oob
++        self.allow_preconfig = allow_preconfig
  
+     def check(self, schema):
+         if self._arg_type_name:
+@@ -1458,7 +1460,8 @@ class QAPISchemaCommand(QAPISchemaEntity):
+         visitor.visit_command(self.name, self.info,
+                               self.arg_type, self.ret_type,
+                               self.gen, self.success_response,
+-                              self.boxed, self.allow_oob)
++                              self.boxed, self.allow_oob,
++                              self.allow_preconfig)
+ 
+ 
+ class QAPISchemaEvent(QAPISchemaEntity):
+@@ -1678,6 +1681,7 @@ class QAPISchema(object):
+         success_response = expr.get('success-response', True)
+         boxed = expr.get('boxed', False)
+         allow_oob = expr.get('allow-oob', False)
++        allow_preconfig = expr.get('allow-preconfig', False)
+         if isinstance(data, OrderedDict):
+             data = self._make_implicit_object_type(
+                 name, info, doc, 'arg', self._make_members(data, info))
+@@ -1686,7 +1690,7 @@ class QAPISchema(object):
+             rets = self._make_array_type(rets[0], info)
+         self._def_entity(QAPISchemaCommand(name, info, doc, data, rets,
+                                            gen, success_response,
+-                                           boxed, allow_oob))
++                                           boxed, allow_oob, allow_preconfig))
+ 
+     def _def_event(self, expr, info, doc):
+         name = expr['event']
+diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
+index 9b312b2..b563084 100644
+--- a/scripts/qapi/doc.py
++++ b/scripts/qapi/doc.py
+@@ -226,8 +226,8 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaVisitor):
+                                name=doc.symbol,
+                                body=texi_entity(doc, 'Members')))
+ 
+-    def visit_command(self, name, info, arg_type, ret_type,
+-                      gen, success_response, boxed, allow_oob):
++    def visit_command(self, name, info, arg_type, ret_type, gen,
++                      success_response, boxed, allow_oob, allow_preconfig):
+         doc = self.cur_doc
+         if boxed:
+             body = texi_body(doc)
+diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+index f9e67e8..5b6c72c 100644
+--- a/scripts/qapi/introspect.py
++++ b/scripts/qapi/introspect.py
+@@ -171,14 +171,15 @@ const QLitObject %(c_name)s = %(c_string)s;
+                        {'members': [{'type': self._use_type(m.type)}
+                                     for m in variants.variants]})
+ 
+-    def visit_command(self, name, info, arg_type, ret_type,
+-                      gen, success_response, boxed, allow_oob):
++    def visit_command(self, name, info, arg_type, ret_type, gen,
++                      success_response, boxed, allow_oob, allow_preconfig):
+         arg_type = arg_type or self._schema.the_empty_object_type
+         ret_type = ret_type or self._schema.the_empty_object_type
+         self._gen_qlit(name, 'command',
+                        {'arg-type': self._use_type(arg_type),
+                         'ret-type': self._use_type(ret_type),
+-                        'allow-oob': allow_oob})
++                        'allow-oob': allow_oob,
++                        'allow-preconfig': allow_preconfig})
+ 
+     def visit_event(self, name, info, arg_type, boxed):
+         arg_type = arg_type or self._schema.the_empty_object_type
+diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi.py
+index c1a144b..89b92ed 100644
+--- a/tests/qapi-schema/test-qapi.py
++++ b/tests/qapi-schema/test-qapi.py
+@@ -41,8 +41,8 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
+         print('alternate %s' % name)
+         self._print_variants(variants)
+ 
+-    def visit_command(self, name, info, arg_type, ret_type,
+-                      gen, success_response, boxed, allow_oob):
++    def visit_command(self, name, info, arg_type, ret_type, gen,
++                      success_response, boxed, allow_oob, allow_preconfig):
+         print('command %s %s -> %s' % \
+               (name, arg_type and arg_type.name, ret_type and ret_type.name))
+         print('   gen=%s success_response=%s boxed=%s oob=%s' % \
 -- 
 2.7.4
