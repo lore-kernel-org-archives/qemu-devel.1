@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fEjSD-0005ev-Nb
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 18:45:31 -0400
+	(envelope-from <mjc@sifive.com>) id 1fEjcP-0007U8-2R
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 18:56:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fEjS9-0006uU-WC
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 18:45:29 -0400
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:38195)
+	(envelope-from <mjc@sifive.com>) id 1fEjcM-00069z-At
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 18:56:01 -0400
+Received: from mail-oi0-x234.google.com ([2607:f8b0:4003:c06::234]:33317)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fEjS9-0006tW-Qg
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 18:45:25 -0400
-Received: by mail-pg0-x244.google.com with SMTP id n9-v6so16359797pgq.5
-	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 15:45:25 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  4 May 2018 15:45:21 -0700
-Message-Id: <20180504224521.7801-1-richard.henderson@linaro.org>
-In-Reply-To: <20180504183021.19318-1-richard.henderson@linaro.org>
-References: <20180504183021.19318-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 08/10] target/arm: Fill in disas_ldst_atomic
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fEjcM-00069b-1l
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 18:55:58 -0400
+Received: by mail-oi0-x234.google.com with SMTP id k5-v6so13722662oiw.0
+	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 15:55:57 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <107c154303a7f08c452199df250c274f40d274ec.1525464177.git.alistair.francis@wdc.com>
+References: <cover.1525464177.git.alistair.francis@wdc.com>
+	<107c154303a7f08c452199df250c274f40d274ec.1525464177.git.alistair.francis@wdc.com>
+From: Michael Clark <mjc@sifive.com>
+Date: Sat, 5 May 2018 10:55:56 +1200
+Message-ID: <CAHNT7NuaUV8jX8p6yjEXNYqtRHmYPSFFN23xr=Lr=-fnMneBZw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 1/4] hw/riscv/sifive_u: Create a U54 SoC
+ object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,98 +29,268 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
+To: Alistair Francis <alistair.francis@wdc.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair23@gmail.com>, Palmer Dabbelt <palmer@sifive.com>
 
-This implements all of the v8.1-Atomics instructions except
-for compare-and-swap, which is decoded elsewhere.
+On Sat, May 5, 2018 at 8:12 AM, Alistair Francis <alistair.francis@wdc.com>
+wrote:
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
-v3: Do not zero-extend X[s] via the third parameter to read_cpu_reg.
+> Create a SiFive Unleashed U54 SoC and use that in the sifive_u machine.
+>
+> We leave the SoC, RAM, device tree and reset/fdt loading as part of the
+> machine. All the other device creation has been moved to the SoC.
+>
 
----
- target/arm/translate-a64.c | 38 ++++++++++++++++++++++++++++++++++++--
- 1 file changed, 36 insertions(+), 2 deletions(-)
+There is a tiny problem that we will have to resolve with renaming,
+otherwise we will end up with lots of SOCs that are the essentially same
+with a different CPU.
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 6acad791e6..c13858a690 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -84,6 +84,7 @@ typedef void NeonGenOneOpFn(TCGv_i64, TCGv_i64);
- typedef void CryptoTwoOpFn(TCGv_ptr, TCGv_ptr);
- typedef void CryptoThreeOpIntFn(TCGv_ptr, TCGv_ptr, TCGv_i32);
- typedef void CryptoThreeOpFn(TCGv_ptr, TCGv_ptr, TCGv_ptr);
-+typedef void AtomicThreeOpFn(TCGv_i64, TCGv_i64, TCGv_i64, TCGArg, TCGMemOp);
- 
- /* Note that the gvec expanders operate on offsets + sizes.  */
- typedef void GVecGen2Fn(unsigned, uint32_t, uint32_t, uint32_t, uint32_t);
-@@ -2772,6 +2773,8 @@ static void disas_ldst_atomic(DisasContext *s, uint32_t insn,
-     int rn = extract32(insn, 5, 5);
-     int o3_opc = extract32(insn, 12, 4);
-     int feature = ARM_FEATURE_V8_ATOMICS;
-+    TCGv_i64 tcg_rn, tcg_rs;
-+    AtomicThreeOpFn *fn;
- 
-     if (is_vector) {
-         unallocated_encoding(s);
-@@ -2779,14 +2782,32 @@ static void disas_ldst_atomic(DisasContext *s, uint32_t insn,
-     }
-     switch (o3_opc) {
-     case 000: /* LDADD */
-+        fn = tcg_gen_atomic_fetch_add_i64;
-+        break;
-     case 001: /* LDCLR */
-+        fn = tcg_gen_atomic_fetch_and_i64;
-+        break;
-     case 002: /* LDEOR */
-+        fn = tcg_gen_atomic_fetch_xor_i64;
-+        break;
-     case 003: /* LDSET */
-+        fn = tcg_gen_atomic_fetch_or_i64;
-+        break;
-     case 004: /* LDSMAX */
-+        fn = tcg_gen_atomic_fetch_smax_i64;
-+        break;
-     case 005: /* LDSMIN */
-+        fn = tcg_gen_atomic_fetch_smin_i64;
-+        break;
-     case 006: /* LDUMAX */
-+        fn = tcg_gen_atomic_fetch_umax_i64;
-+        break;
-     case 007: /* LDUMIN */
-+        fn = tcg_gen_atomic_fetch_umin_i64;
-+        break;
-     case 010: /* SWP */
-+        fn = tcg_gen_atomic_xchg_i64;
-+        break;
-     default:
-         unallocated_encoding(s);
-         return;
-@@ -2796,8 +2817,21 @@ static void disas_ldst_atomic(DisasContext *s, uint32_t insn,
-         return;
-     }
- 
--    (void)rs;
--    (void)rn;
-+    if (rn == 31) {
-+        gen_check_sp_alignment(s);
-+    }
-+    tcg_rn = cpu_reg_sp(s, rn);
-+    tcg_rs = read_cpu_reg(s, rs, true);
-+
-+    if (o3_opc == 1) { /* LDCLR */
-+        tcg_gen_not_i64(tcg_rs, tcg_rs);
-+    }
-+
-+    /* The tcg atomic primitives are all full barriers.  Therefore we
-+     * can ignore the Acquire and Release bits of this instruction.
-+     */
-+    fn(cpu_reg(s, rt), tcg_rn, tcg_rs, get_mem_index(s),
-+       s->be_data | size | MO_ALIGN);
- }
- 
- /* Load/store register (all forms) */
--- 
-2.14.3
+There is an intention to add a HiFive1 and HiFiveU board in the future
+however we were very explicit in renaming sifive_e300 and sifive_u500 to
+sifive_e and sifive_u.
+
+If you read the code more closely you'll notice that we instantiate the
+sifive_u board with a U34 if 32-bit and a U54 if 64-bit.
+
+#if defined(TARGET_RISCV32)
+#define SIFIVE_U_CPU TYPE_RISCV_CPU_SIFIVE_U34
+#elif defined(TARGET_RISCV64)
+#define SIFIVE_U_CPU TYPE_RISCV_CPU_SIFIVE_U54
+#endif
+
+The rationale is that sifive_e and sifive_u can eventually be customized to
+represent different configurations of SiFive Core IP. We won't want to end
+up hardcoding specific models in sifive_e or sifive_u
+
+SiFive have been talking internally about having sifive_e and sifive_u
+reconfigurable, possibly even to the extend where we can configure with a
+memory map. This is somewhat consistent with what SiFive do internally as
+the FE310 and FU540 are configurations generated by a core generator.
+
+Now comes the question of whether its the right time to add a 'hifive1' or
+'hifiveu' machine. I don't think it is immediately necessary. The thought
+being that we would be able to give a configuration string of file to sifive_u
+e.g. "e51,u54,u54,u54". There is a different between the U54 and the U54-MC
+which has an E51 core for management tasks. The PLIC has already been
+written with this in mind, and is re-configurable to support the U54-MC
+memory layout.
+
+In anycase. The change is simply to use sifive_u_soc or sifive_u without
+the 54 (given it configures with a U34 in 32-bit like the sifive_e
+configures with an E51 in 64-bit mode, both valid configurations)
+
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>  hw/riscv/sifive_u.c         | 90 ++++++++++++++++++++++++++++---------
+>  include/hw/riscv/sifive_u.h | 16 ++++++-
+>  2 files changed, 82 insertions(+), 24 deletions(-)
+>
+> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> index 9f3d184b72..4924f92262 100644
+> --- a/hw/riscv/sifive_u.c
+> +++ b/hw/riscv/sifive_u.c
+> @@ -114,10 +114,10 @@ static void create_fdt(SiFiveUState *s, const struct
+> MemmapEntry *memmap,
+>      qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
+>      qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
+>
+> -    for (cpu = s->soc.num_harts - 1; cpu >= 0; cpu--) {
+> +    for (cpu = s->soc.cpus.num_harts - 1; cpu >= 0; cpu--) {
+>          nodename = g_strdup_printf("/cpus/cpu@%d", cpu);
+>          char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller",
+> cpu);
+> -        char *isa = riscv_isa_string(&s->soc.harts[cpu]);
+> +        char *isa = riscv_isa_string(&s->soc.cpus.harts[cpu]);
+>          qemu_fdt_add_subnode(fdt, nodename);
+>          qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
+>                                SIFIVE_U_CLOCK_FREQ);
+> @@ -138,8 +138,8 @@ static void create_fdt(SiFiveUState *s, const struct
+> MemmapEntry *memmap,
+>          g_free(nodename);
+>      }
+>
+> -    cells =  g_new0(uint32_t, s->soc.num_harts * 4);
+> -    for (cpu = 0; cpu < s->soc.num_harts; cpu++) {
+> +    cells =  g_new0(uint32_t, s->soc.cpus.num_harts * 4);
+> +    for (cpu = 0; cpu < s->soc.cpus.num_harts; cpu++) {
+>          nodename =
+>              g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+>          uint32_t intc_phandle = qemu_fdt_get_phandle(fdt, nodename);
+> @@ -157,12 +157,12 @@ static void create_fdt(SiFiveUState *s, const struct
+> MemmapEntry *memmap,
+>          0x0, memmap[SIFIVE_U_CLINT].base,
+>          0x0, memmap[SIFIVE_U_CLINT].size);
+>      qemu_fdt_setprop(fdt, nodename, "interrupts-extended",
+> -        cells, s->soc.num_harts * sizeof(uint32_t) * 4);
+> +        cells, s->soc.cpus.num_harts * sizeof(uint32_t) * 4);
+>      g_free(cells);
+>      g_free(nodename);
+>
+> -    cells =  g_new0(uint32_t, s->soc.num_harts * 4);
+> -    for (cpu = 0; cpu < s->soc.num_harts; cpu++) {
+> +    cells =  g_new0(uint32_t, s->soc.cpus.num_harts * 4);
+> +    for (cpu = 0; cpu < s->soc.cpus.num_harts; cpu++) {
+>          nodename =
+>              g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+>          uint32_t intc_phandle = qemu_fdt_get_phandle(fdt, nodename);
+> @@ -179,7 +179,7 @@ static void create_fdt(SiFiveUState *s, const struct
+> MemmapEntry *memmap,
+>      qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv,plic0");
+>      qemu_fdt_setprop(fdt, nodename, "interrupt-controller", NULL, 0);
+>      qemu_fdt_setprop(fdt, nodename, "interrupts-extended",
+> -        cells, s->soc.num_harts * sizeof(uint32_t) * 4);
+> +        cells, s->soc.cpus.num_harts * sizeof(uint32_t) * 4);
+>      qemu_fdt_setprop_cells(fdt, nodename, "reg",
+>          0x0, memmap[SIFIVE_U_PLIC].base,
+>          0x0, memmap[SIFIVE_U_PLIC].size);
+> @@ -215,17 +215,12 @@ static void riscv_sifive_u_init(MachineState
+> *machine)
+>      SiFiveUState *s = g_new0(SiFiveUState, 1);
+>      MemoryRegion *system_memory = get_system_memory();
+>      MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+> -    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+>      int i;
+>
+> -    /* Initialize SOC */
+> -    object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_HART_ARRAY);
+> +    /* Initialize SoC */
+> +    object_initialize(&s->soc, sizeof(s->soc), TYPE_RISCV_U54_SOC);
+>      object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
+>                                &error_abort);
+> -    object_property_set_str(OBJECT(&s->soc), SIFIVE_U_CPU, "cpu-type",
+> -                            &error_abort);
+> -    object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
+> -                            &error_abort);
+>      object_property_set_bool(OBJECT(&s->soc), true, "realized",
+>                              &error_abort);
+>
+> @@ -233,17 +228,11 @@ static void riscv_sifive_u_init(MachineState
+> *machine)
+>      memory_region_init_ram(main_mem, NULL, "riscv.sifive.u.ram",
+>                             machine->ram_size, &error_fatal);
+>      memory_region_add_subregion(system_memory,
+> memmap[SIFIVE_U_DRAM].base,
+> -        main_mem);
+> +                                main_mem);
+>
+>      /* create device tree */
+>      create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
+>
+> -    /* boot rom */
+> -    memory_region_init_rom(mask_rom, NULL, "riscv.sifive.u.mrom",
+> -                           memmap[SIFIVE_U_MROM].size, &error_fatal);
+> -    memory_region_add_subregion(system_memory,
+> memmap[SIFIVE_U_MROM].base,
+> -                                mask_rom);
+> -
+>      if (machine->kernel_filename) {
+>          load_kernel(machine->kernel_filename);
+>      }
+> @@ -282,6 +271,39 @@ static void riscv_sifive_u_init(MachineState
+> *machine)
+>      rom_add_blob_fixed_as("mrom.fdt", s->fdt, s->fdt_size,
+>                            memmap[SIFIVE_U_MROM].base + sizeof(reset_vec),
+>                            &address_space_memory);
+> +}
+> +
+> +static void riscv_sifive_u54_init(Object *obj)
+> +{
+> +    const struct MemmapEntry *memmap = sifive_u_memmap;
+> +
+> +    SiFiveU54State *s = RISCV_U54_SOC(obj);
+> +    MemoryRegion *system_memory = get_system_memory();
+> +    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
+> +
+> +    object_initialize(&s->cpus, sizeof(s->cpus), TYPE_RISCV_HART_ARRAY);
+> +    object_property_add_child(obj, "cpus", OBJECT(&s->cpus),
+> +                              &error_abort);
+> +    object_property_set_str(OBJECT(&s->cpus), SIFIVE_U_CPU, "cpu-type",
+> +                            &error_abort);
+> +    object_property_set_int(OBJECT(&s->cpus), smp_cpus, "num-harts",
+> +                            &error_abort);
+> +
+> +    /* boot rom */
+> +    memory_region_init_rom(mask_rom, NULL, "riscv.sifive.u.mrom",
+> +                           memmap[SIFIVE_U_MROM].size, &error_fatal);
+> +    memory_region_add_subregion(system_memory,
+> memmap[SIFIVE_U_MROM].base,
+> +                                mask_rom);
+> +}
+> +
+> +static void riscv_sifive_u54_realize(DeviceState *dev, Error **errp)
+> +{
+> +    SiFiveU54State *s = RISCV_U54_SOC(dev);
+> +    const struct MemmapEntry *memmap = sifive_u_memmap;
+> +    MemoryRegion *system_memory = get_system_memory();
+> +
+> +    object_property_set_bool(OBJECT(&s->cpus), true, "realized",
+> +                             &error_abort);
+>
+>      /* MMIO */
+>      s->plic = sifive_plic_create(memmap[SIFIVE_U_PLIC].base,
+> @@ -312,3 +334,27 @@ static void riscv_sifive_u_machine_init(MachineClass
+> *mc)
+>  }
+>
+>  DEFINE_MACHINE("sifive_u", riscv_sifive_u_machine_init)
+> +
+> +static void riscv_sifive_u54_class_init(ObjectClass *oc, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(oc);
+> +
+> +    dc->realize = riscv_sifive_u54_realize;
+> +    /* Reason: Uses serial_hds in realize function, thus can't be used
+> twice */
+> +    dc->user_creatable = false;
+> +}
+> +
+> +static const TypeInfo riscv_sifive_u54_type_info = {
+> +    .name = TYPE_RISCV_U54_SOC,
+> +    .parent = TYPE_DEVICE,
+> +    .instance_size = sizeof(SiFiveU54State),
+> +    .instance_init = riscv_sifive_u54_init,
+> +    .class_init = riscv_sifive_u54_class_init,
+> +};
+> +
+> +static void riscv_sifive_u54_register_types(void)
+> +{
+> +    type_register_static(&riscv_sifive_u54_type_info);
+> +}
+> +
+> +type_init(riscv_sifive_u54_register_types)
+> diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+> index 94a390566e..0f8bdd8fab 100644
+> --- a/include/hw/riscv/sifive_u.h
+> +++ b/include/hw/riscv/sifive_u.h
+> @@ -19,13 +19,25 @@
+>  #ifndef HW_SIFIVE_U_H
+>  #define HW_SIFIVE_U_H
+>
+> -typedef struct SiFiveUState {
+> +#define TYPE_RISCV_U54_SOC "riscv.sifive.u54"
+> +#define RISCV_U54_SOC(obj) \
+> +    OBJECT_CHECK(SiFiveU54State, (obj), TYPE_RISCV_U54_SOC)
+> +
+> +typedef struct SiFiveU54State {
+>      /*< private >*/
+>      SysBusDevice parent_obj;
+>
+>      /*< public >*/
+> -    RISCVHartArrayState soc;
+> +    RISCVHartArrayState cpus;
+>      DeviceState *plic;
+> +} SiFiveU54State;
+> +
+> +typedef struct SiFiveUState {
+> +    /*< private >*/
+> +    SysBusDevice parent_obj;
+> +
+> +    /*< public >*/
+> +    SiFiveU54State soc;
+>      void *fdt;
+>      int fdt_size;
+>  } SiFiveUState;
+> --
+> 2.17.0
+>
+>
