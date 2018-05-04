@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fEV69-0004Xj-TS
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 03:25:48 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fEV6C-0004Zs-Di
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 03:25:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fEV68-0007Si-HV
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 03:25:45 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fEV6A-0007Uj-5z
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 03:25:48 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri,  4 May 2018 09:25:10 +0200
-Message-Id: <20180504072514.8450-12-cohuck@redhat.com>
+Date: Fri,  4 May 2018 09:25:11 +0200
+Message-Id: <20180504072514.8450-13-cohuck@redhat.com>
 In-Reply-To: <20180504072514.8450-1-cohuck@redhat.com>
 References: <20180504072514.8450-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 11/15] pc-bios/s390-ccw/net: Split up net_load()
- into init, load and release parts
+Subject: [Qemu-devel] [PULL 12/15] pc-bios/s390-ccw/net: Use diag308 to
+ reset machine before jumping to the OS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,175 +25,313 @@ Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.d
 
 From: Thomas Huth <thuth@redhat.com>
 
-When we want to support pxelinux-style network booting later, we've got
-to do several TFTP transfers - and we do not want to apply for a new IP
-address via DHCP each time. So split up net_load into three parts:
+The netboot firmware so far simply jumped directly into the OS kernel
+after the download has been completed. This, however, bears the risk
+that the virtio-net device still might be active in the background and
+incoming packets are still placed into the buffers - which could destroy
+memory of the now-running Linux kernel in case it did not take over the
+device fast enough. Also the SCLP console is not put into a well-defined
+state here. We should hand over the system in a clean state when jumping
+into the kernel, so let's use the same mechanism as it's done in the
+main s390-ccw firmware and reset the machine with diag308 into a clean
+state before jumping into the OS kernel code. To be able to share the
+code with the main s390-ccw firmware, the related functions are now
+extracted from bootmap.c into a new file called jump2ipl.c.
 
-1. net_init(), which initializes virtio-net, gets an IP address via DHCP
-   and prints out the related information.
-
-2. The tftp_load call is now moved directly into the main() function
-
-3. A new net_release() function which should tear down the network stack
-   before we are done in the firmware.
-
-This will make it easier to extend the code in the next patches.
+Since we now also set the boot device schid at address 184 for the network
+boot device, this patch also slightly changes the way how we detect the
+entry points for non-ELF binary images: The code now looks for the "S390EP"
+magic first and then jumps to 0x10000 in case it has been found. This is
+necessary for booting from network devices, since the normal kernel code
+(where the PSW at ddress 0 points to) tries to do a block load from the
+boot device. This of course fails for a virtio-net device and causes the
+kernel to abort with a panic-PSW silently.
 
 Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/netmain.c | 63 +++++++++++++++++++++++++++-------------------
- 1 file changed, 37 insertions(+), 26 deletions(-)
+ pc-bios/s390-ccw/Makefile    |  4 +-
+ pc-bios/s390-ccw/bootmap.c   | 63 +-----------------------------
+ pc-bios/s390-ccw/bootmap.h   |  4 --
+ pc-bios/s390-ccw/jump2ipl.c  | 91 ++++++++++++++++++++++++++++++++++++++++++++
+ pc-bios/s390-ccw/netboot.mak |  3 +-
+ pc-bios/s390-ccw/netmain.c   | 11 +++++-
+ pc-bios/s390-ccw/s390-ccw.h  |  4 ++
+ 7 files changed, 111 insertions(+), 69 deletions(-)
+ create mode 100644 pc-bios/s390-ccw/jump2ipl.c
 
-diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
-index d86d46b03f..8fa9e6c945 100644
---- a/pc-bios/s390-ccw/netmain.c
-+++ b/pc-bios/s390-ccw/netmain.c
-@@ -128,13 +128,13 @@ static void seed_rng(uint8_t mac[])
-     srand(seed);
- }
+diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
+index 1712c2d95d..439e3cc9c9 100644
+--- a/pc-bios/s390-ccw/Makefile
++++ b/pc-bios/s390-ccw/Makefile
+@@ -9,7 +9,9 @@ $(call set-vpath, $(SRC_PATH)/pc-bios/s390-ccw)
  
--static int tftp_load(filename_ip_t *fnip, void *buffer, int len,
--                     unsigned int retries, int ip_vers)
-+static int tftp_load(filename_ip_t *fnip, void *buffer, int len)
- {
-     tftp_err_t tftp_err;
-     int rc;
+ .PHONY : all clean build-all
  
--    rc = tftp(fnip, buffer, len, retries, &tftp_err, 1, 1428, ip_vers);
-+    rc = tftp(fnip, buffer, len, DEFAULT_TFTP_RETRIES, &tftp_err, 1, 1428,
-+              ip_version);
+-OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o libc.o menu.o
++OBJECTS = start.o main.o bootmap.o jump2ipl.o sclp.o menu.o \
++	  virtio.o virtio-scsi.o virtio-blkdev.o libc.o
++
+ QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS))
+ QEMU_CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -msoft-float
+ QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
+diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+index e41e715624..7aef65ab67 100644
+--- a/pc-bios/s390-ccw/bootmap.c
++++ b/pc-bios/s390-ccw/bootmap.c
+@@ -29,14 +29,6 @@
+ /* Scratch space */
+ static uint8_t sec[MAX_SECTOR_SIZE*4] __attribute__((__aligned__(PAGE_SIZE)));
  
-     if (rc > 0) {
-         printf("  TFTP: Received %s (%d KBytes)\n", fnip->filename,
-@@ -199,20 +199,19 @@ static int tftp_load(filename_ip_t *fnip, void *buffer, int len,
-     return rc;
- }
- 
--static int net_load(char *buffer, int len)
-+static int net_init(filename_ip_t *fn_ip)
- {
--    filename_ip_t fn_ip;
-     uint8_t mac[6];
-     int rc;
- 
--    memset(&fn_ip, 0, sizeof(filename_ip_t));
-+    memset(fn_ip, 0, sizeof(filename_ip_t));
- 
-     rc = virtio_net_init(mac);
-     if (rc < 0) {
-         puts("Could not initialize network device");
-         return -101;
-     }
--    fn_ip.fd = rc;
-+    fn_ip->fd = rc;
- 
-     printf("  Using MAC address: %02x:%02x:%02x:%02x:%02x:%02x\n",
-            mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-@@ -220,10 +219,10 @@ static int net_load(char *buffer, int len)
-     set_mac_address(mac);    /* init ethernet layer */
-     seed_rng(mac);
- 
--    rc = dhcp(&fn_ip, DEFAULT_BOOT_RETRIES);
-+    rc = dhcp(fn_ip, DEFAULT_BOOT_RETRIES);
-     if (rc >= 0) {
-         if (ip_version == 4) {
--            set_ipv4_address(fn_ip.own_ip);
-+            set_ipv4_address(fn_ip->own_ip);
-         }
-     } else {
-         puts("Could not get IP address");
-@@ -232,18 +231,18 @@ static int net_load(char *buffer, int len)
- 
-     if (ip_version == 4) {
-         printf("  Using IPv4 address: %d.%d.%d.%d\n",
--              (fn_ip.own_ip >> 24) & 0xFF, (fn_ip.own_ip >> 16) & 0xFF,
--              (fn_ip.own_ip >>  8) & 0xFF, fn_ip.own_ip & 0xFF);
-+              (fn_ip->own_ip >> 24) & 0xFF, (fn_ip->own_ip >> 16) & 0xFF,
-+              (fn_ip->own_ip >>  8) & 0xFF, fn_ip->own_ip & 0xFF);
-     } else if (ip_version == 6) {
-         char ip6_str[40];
--        ipv6_to_str(fn_ip.own_ip6.addr, ip6_str);
-+        ipv6_to_str(fn_ip->own_ip6.addr, ip6_str);
-         printf("  Using IPv6 address: %s\n", ip6_str);
-     }
- 
-     if (rc == -2) {
-         printf("ARP request to TFTP server (%d.%d.%d.%d) failed\n",
--               (fn_ip.server_ip >> 24) & 0xFF, (fn_ip.server_ip >> 16) & 0xFF,
--               (fn_ip.server_ip >>  8) & 0xFF, fn_ip.server_ip & 0xFF);
-+               (fn_ip->server_ip >> 24) & 0xFF, (fn_ip->server_ip >> 16) & 0xFF,
-+               (fn_ip->server_ip >>  8) & 0xFF, fn_ip->server_ip & 0xFF);
-         return -102;
-     }
-     if (rc == -4 || rc == -3) {
-@@ -251,28 +250,31 @@ static int net_load(char *buffer, int len)
-         return -107;
-     }
- 
-+    printf("  Using TFTP server: ");
-     if (ip_version == 4) {
--        printf("  Requesting file \"%s\" via TFTP from %d.%d.%d.%d\n",
--               fn_ip.filename,
--               (fn_ip.server_ip >> 24) & 0xFF, (fn_ip.server_ip >> 16) & 0xFF,
--               (fn_ip.server_ip >>  8) & 0xFF, fn_ip.server_ip & 0xFF);
-+        printf("%d.%d.%d.%d\n",
-+               (fn_ip->server_ip >> 24) & 0xFF, (fn_ip->server_ip >> 16) & 0xFF,
-+               (fn_ip->server_ip >>  8) & 0xFF, fn_ip->server_ip & 0xFF);
-     } else if (ip_version == 6) {
-         char ip6_str[40];
--        printf("  Requesting file \"%s\" via TFTP from ", fn_ip.filename);
--        ipv6_to_str(fn_ip.server_ip6.addr, ip6_str);
-+        ipv6_to_str(fn_ip->server_ip6.addr, ip6_str);
-         printf("%s\n", ip6_str);
-     }
- 
--    /* Do the TFTP load and print error message if necessary */
--    rc = tftp_load(&fn_ip, buffer, len, DEFAULT_TFTP_RETRIES, ip_version);
+-typedef struct ResetInfo {
+-    uint32_t ipl_mask;
+-    uint32_t ipl_addr;
+-    uint32_t ipl_continue;
+-} ResetInfo;
 -
--    if (ip_version == 4) {
--        dhcp_send_release(fn_ip.fd);
-+    if (strlen((char *)fn_ip->filename) > 0) {
-+        printf("  Bootfile name: '%s'\n", fn_ip->filename);
-     }
+-static ResetInfo save;
+-
+ const uint8_t el_torito_magic[] = "EL TORITO SPECIFICATION"
+                                   "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
  
-     return rc;
+@@ -57,53 +49,6 @@ static inline bool is_iso_vd_valid(IsoVolDesc *vd)
+            vd->type <= VOL_DESC_TYPE_PARTITION;
  }
  
-+static void net_release(filename_ip_t *fn_ip)
+-static void jump_to_IPL_2(void)
+-{
+-    ResetInfo *current = 0;
+-
+-    void (*ipl)(void) = (void *) (uint64_t) current->ipl_continue;
+-    *current = save;
+-    ipl(); /* should not return */
+-}
+-
+-static void jump_to_IPL_code(uint64_t address)
+-{
+-    /* store the subsystem information _after_ the bootmap was loaded */
+-    write_subsystem_identification();
+-
+-    /* prevent unknown IPL types in the guest */
+-    if (iplb.pbt == S390_IPL_TYPE_QEMU_SCSI) {
+-        iplb.pbt = S390_IPL_TYPE_CCW;
+-        set_iplb(&iplb);
+-    }
+-
+-    /*
+-     * The IPL PSW is at address 0. We also must not overwrite the
+-     * content of non-BIOS memory after we loaded the guest, so we
+-     * save the original content and restore it in jump_to_IPL_2.
+-     */
+-    ResetInfo *current = 0;
+-
+-    save = *current;
+-    current->ipl_addr = (uint32_t) (uint64_t) &jump_to_IPL_2;
+-    current->ipl_continue = address & 0x7fffffff;
+-
+-    debug_print_int("set IPL addr to", current->ipl_continue);
+-
+-    /* Ensure the guest output starts fresh */
+-    sclp_print("\n");
+-
+-    /*
+-     * HACK ALERT.
+-     * We use the load normal reset to keep r15 unchanged. jump_to_IPL_2
+-     * can then use r15 as its stack pointer.
+-     */
+-    asm volatile("lghi 1,1\n\t"
+-                 "diag 1,1,0x308\n\t"
+-                 : : : "1", "memory");
+-    panic("\n! IPL returns !\n");
+-}
+-
+ /***********************************************************************
+  * IPL an ECKD DASD (CDL or LDL/CMS format)
+  */
+@@ -729,13 +674,7 @@ static void load_iso_bc_entry(IsoBcSection *load)
+                         (void *)((uint64_t)bswap16(s.load_segment)),
+                         blks_to_load);
+ 
+-    /* Trying to get PSW at zero address */
+-    if (*((uint64_t *)0) & IPL_PSW_MASK) {
+-        jump_to_IPL_code((*((uint64_t *)0)) & 0x7fffffff);
+-    }
+-
+-    /* Try default linux start address */
+-    jump_to_IPL_code(KERN_IMAGE_START);
++    jump_to_low_kernel();
+ }
+ 
+ static uint32_t find_iso_bc(void)
+diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
+index 732c1112ce..a085212077 100644
+--- a/pc-bios/s390-ccw/bootmap.h
++++ b/pc-bios/s390-ccw/bootmap.h
+@@ -353,10 +353,6 @@ static inline uint32_t iso_733_to_u32(uint64_t x)
+ #define ISO_SECTOR_SIZE 2048
+ /* El Torito specifies boot image size in 512 byte blocks */
+ #define ET_SECTOR_SHIFT 2
+-#define KERN_IMAGE_START 0x010000UL
+-#define PSW_MASK_64 0x0000000100000000ULL
+-#define PSW_MASK_32 0x0000000080000000ULL
+-#define IPL_PSW_MASK (PSW_MASK_32 | PSW_MASK_64)
+ 
+ #define ISO_PRIMARY_VD_SECTOR 16
+ 
+diff --git a/pc-bios/s390-ccw/jump2ipl.c b/pc-bios/s390-ccw/jump2ipl.c
+new file mode 100644
+index 0000000000..266f1502b9
+--- /dev/null
++++ b/pc-bios/s390-ccw/jump2ipl.c
+@@ -0,0 +1,91 @@
++/*
++ * QEMU s390-ccw firmware - jump to IPL code
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or (at
++ * your option) any later version. See the COPYING file in the top-level
++ * directory.
++ */
++
++#include "libc.h"
++#include "s390-ccw.h"
++
++#define KERN_IMAGE_START 0x010000UL
++#define PSW_MASK_64 0x0000000100000000ULL
++#define PSW_MASK_32 0x0000000080000000ULL
++#define IPL_PSW_MASK (PSW_MASK_32 | PSW_MASK_64)
++
++typedef struct ResetInfo {
++    uint32_t ipl_mask;
++    uint32_t ipl_addr;
++    uint32_t ipl_continue;
++} ResetInfo;
++
++static ResetInfo save;
++
++static void jump_to_IPL_2(void)
 +{
-+    if (ip_version == 4) {
-+        dhcp_send_release(fn_ip->fd);
-+    }
++    ResetInfo *current = 0;
++
++    void (*ipl)(void) = (void *) (uint64_t) current->ipl_continue;
++    *current = save;
++    ipl(); /* should not return */
 +}
 +
- void panic(const char *string)
- {
-     sclp_print(string);
-@@ -344,6 +346,7 @@ static void virtio_setup(void)
- 
- void main(void)
- {
-+    filename_ip_t fn_ip;
-     int rc;
- 
-     sclp_setup();
-@@ -351,7 +354,15 @@ void main(void)
- 
-     virtio_setup();
- 
--    rc = net_load(NULL, (long)_start);
-+    rc = net_init(&fn_ip);
-+    if (rc) {
-+        panic("Network initialization failed. Halting.\n");
++void jump_to_IPL_code(uint64_t address)
++{
++    /* store the subsystem information _after_ the bootmap was loaded */
++    write_subsystem_identification();
++
++    /* prevent unknown IPL types in the guest */
++    if (iplb.pbt == S390_IPL_TYPE_QEMU_SCSI) {
++        iplb.pbt = S390_IPL_TYPE_CCW;
++        set_iplb(&iplb);
 +    }
 +
-+    rc = tftp_load(&fn_ip, NULL, (long)_start);
++    /*
++     * The IPL PSW is at address 0. We also must not overwrite the
++     * content of non-BIOS memory after we loaded the guest, so we
++     * save the original content and restore it in jump_to_IPL_2.
++     */
++    ResetInfo *current = 0;
 +
-+    net_release(&fn_ip);
++    save = *current;
++    current->ipl_addr = (uint32_t) (uint64_t) &jump_to_IPL_2;
++    current->ipl_continue = address & 0x7fffffff;
 +
++    debug_print_int("set IPL addr to", current->ipl_continue);
++
++    /* Ensure the guest output starts fresh */
++    sclp_print("\n");
++
++    /*
++     * HACK ALERT.
++     * We use the load normal reset to keep r15 unchanged. jump_to_IPL_2
++     * can then use r15 as its stack pointer.
++     */
++    asm volatile("lghi 1,1\n\t"
++                 "diag 1,1,0x308\n\t"
++                 : : : "1", "memory");
++    panic("\n! IPL returns !\n");
++}
++
++void jump_to_low_kernel(void)
++{
++    /*
++     * If it looks like a Linux binary, i.e. there is the "S390EP" magic from
++     * arch/s390/kernel/head.S here, then let's jump to the well-known Linux
++     * kernel start address (when jumping to the PSW-at-zero address instead,
++     * the kernel startup code fails when we booted from a network device).
++     */
++    if (!memcmp((char *)0x10008, "S390EP", 6)) {
++        jump_to_IPL_code(KERN_IMAGE_START);
++    }
++
++    /* Trying to get PSW at zero address */
++    if (*((uint64_t *)0) & IPL_PSW_MASK) {
++        jump_to_IPL_code((*((uint64_t *)0)) & 0x7fffffff);
++    }
++
++    /* No other option left, so use the Linux kernel start address */
++    jump_to_IPL_code(KERN_IMAGE_START);
++}
+diff --git a/pc-bios/s390-ccw/netboot.mak b/pc-bios/s390-ccw/netboot.mak
+index a25d238144..4f64128c6c 100644
+--- a/pc-bios/s390-ccw/netboot.mak
++++ b/pc-bios/s390-ccw/netboot.mak
+@@ -1,7 +1,8 @@
+ 
+ SLOF_DIR := $(SRC_PATH)/roms/SLOF
+ 
+-NETOBJS := start.o sclp.o virtio.o virtio-net.o netmain.o libnet.a libc.a
++NETOBJS := start.o sclp.o virtio.o virtio-net.o jump2ipl.o netmain.o \
++	   libnet.a libc.a
+ 
+ LIBC_INC := -nostdinc -I$(SLOF_DIR)/lib/libc/include
+ LIBNET_INC := -I$(SLOF_DIR)/lib/libnet
+diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
+index 8fa9e6c945..69a82c0d56 100644
+--- a/pc-bios/s390-ccw/netmain.c
++++ b/pc-bios/s390-ccw/netmain.c
+@@ -283,6 +283,15 @@ void panic(const char *string)
+     }
+ }
+ 
++void write_subsystem_identification(void)
++{
++    SubChannelId *schid = (SubChannelId *) 184;
++    uint32_t *zeroes = (uint32_t *) 188;
++
++    *schid = net_schid;
++    *zeroes = 0;
++}
++
+ static bool find_net_dev(Schib *schib, int dev_no)
+ {
+     int i, r;
+@@ -365,7 +374,7 @@ void main(void)
+ 
      if (rc > 0) {
          sclp_print("Network loading done, starting kernel...\n");
-         asm volatile (" lpsw 0(%0) " : : "r"(0) : "memory");
+-        asm volatile (" lpsw 0(%0) " : : "r"(0) : "memory");
++        jump_to_low_kernel();
+     }
+ 
+     panic("Failed to load OS from network\n");
+diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
+index a1bdb4cc2a..9828aa233d 100644
+--- a/pc-bios/s390-ccw/s390-ccw.h
++++ b/pc-bios/s390-ccw/s390-ccw.h
+@@ -87,6 +87,10 @@ ulong get_second(void);
+ /* bootmap.c */
+ void zipl_load(void);
+ 
++/* jump2ipl.c */
++void jump_to_IPL_code(uint64_t address);
++void jump_to_low_kernel(void);
++
+ /* menu.c */
+ void menu_set_parms(uint8_t boot_menu_flag, uint32_t boot_menu_timeout);
+ int menu_get_zipl_boot_index(const char *menu_data);
 -- 
 2.14.3
