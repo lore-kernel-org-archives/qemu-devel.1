@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35746)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=655ddeee3=Paul.Durrant@citrix.com>)
-	id 1fEgLT-0001U0-E1
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 15:26:20 -0400
+	id 1fEgLU-0001U4-0m
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 15:26:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=655ddeee3=Paul.Durrant@citrix.com>)
-	id 1fEgLP-0006hL-12
+	id 1fEgLP-0006hX-7O
 	for qemu-devel@nongnu.org; Fri, 04 May 2018 15:26:19 -0400
 From: Paul Durrant <paul.durrant@citrix.com>
-Date: Fri, 4 May 2018 20:25:59 +0100
-Message-ID: <1525461967-32174-1-git-send-email-paul.durrant@citrix.com>
+Date: Fri, 4 May 2018 20:26:00 +0100
+Message-ID: <1525461967-32174-2-git-send-email-paul.durrant@citrix.com>
+In-Reply-To: <1525461967-32174-1-git-send-email-paul.durrant@citrix.com>
+References: <1525461967-32174-1-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 0/8] xen_disk: legacy code removal and
- cleanup
+Subject: [Qemu-devel] [PATCH v3 1/8] xen_backend: add grant table helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,51 +24,225 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: xen-devel@lists.xenproject.org, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Anthony Perard <anthony.perard@citrix.com>, Gerd Hoffmann <kraxel@redhat.com>, Greg Kurz <groug@kaod.org>, Jason Wang <jasowang@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
+Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
 
-The grant copy operation was added to libxengnttab in Xen 4.8.0 (released
-nearly 18 months ago) but the xen_disk PV backend QEMU is still carrying
-a significant amount of code purely to remain compatible with older
-versions of Xen.
+This patch adds grant table helper functions to the xen_backend code to
+localize error reporting and use of xen_domid.
 
-As can be inferred from the diff stats below, removing this support for
-older versions of Xen from QEMU reduces the size of the xen_disk source by
-around 320 lines (~25%).
- 
-This versionseries maintains compatibility with older Xen, and OS
-not supporting the grant copy operation, by adding an emulation of it
-into the xen_backend code. Thus xen_disk can be simplified without
-regressing support for any environment. This series also performs
-general cleanup of the code by introducing and consistently using
-helper functions for calling into libxenttab.
+The patch also defers the call to xengnttab_open() until just before the
+initialise method in XenDevOps is invoked. This method is responsible for
+mapping the shared ring. No prior method requires access to the grant table.
 
-Paul Durrant (8):
-  xen_backend: add grant table helpers
-  xen_disk: remove open-coded use of libxengnttab
-  xen: remove other open-coded use of libxengnttab
-  xen_backend: add an emulation of grant copy
-  xen_disk: remove use of grant map/unmap
-  xen_backend: make the xen_feature_grant_copy flag private
-  xen_disk: use a single entry iovec
-  xen_disk: be consistent with use of xendev and blkdev->xendev
-
- hw/9pfs/xen-9p-backend.c     |  32 ++-
- hw/block/xen_disk.c          | 614 +++++++------------------------------------
- hw/char/xen_console.c        |   9 +-
- hw/net/xen_nic.c             |  34 ++-
- hw/usb/xen-usb.c             |  37 ++-
- hw/xen/xen_backend.c         | 178 ++++++++++++-
- include/hw/xen/xen_backend.h |  34 ++-
- 7 files changed, 351 insertions(+), 587 deletions(-)
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 ---
-Cc: Anthony Perard <anthony.perard@citrix.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Greg Kurz <groug@kaod.org>
-Cc: Jason Wang <jasowang@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>
 
+v2:
+ - New in v2
+---
+ hw/xen/xen_backend.c         | 123 ++++++++++++++++++++++++++++++++++++++-----
+ include/hw/xen/xen_backend.h |  33 ++++++++++++
+ 2 files changed, 144 insertions(+), 12 deletions(-)
+
+diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
+index 7445b50..50412d6 100644
+--- a/hw/xen/xen_backend.c
++++ b/hw/xen/xen_backend.c
+@@ -106,6 +106,103 @@ int xen_be_set_state(struct XenDevice *xendev, enum xenbus_state state)
+     return 0;
+ }
+ 
++void xen_be_set_max_grant_refs(struct XenDevice *xendev,
++                               unsigned int nr_refs)
++{
++    assert(xendev->ops->flags & DEVOPS_FLAG_NEED_GNTDEV);
++
++    if (xengnttab_set_max_grants(xendev->gnttabdev, nr_refs)) {
++        xen_pv_printf(xendev, 0, "xengnttab_set_max_grants failed: %s\n",
++                      strerror(errno));
++    }
++}
++
++void *xen_be_map_grant_refs(struct XenDevice *xendev, uint32_t *refs,
++                            unsigned int nr_refs, int prot)
++{
++    void *ptr;
++
++    assert(xendev->ops->flags & DEVOPS_FLAG_NEED_GNTDEV);
++
++    ptr = xengnttab_map_domain_grant_refs(xendev->gnttabdev, nr_refs,
++                                          xen_domid, refs, prot);
++    if (!ptr) {
++        xen_pv_printf(xendev, 0,
++                      "xengnttab_map_domain_grant_refs failed: %s\n",
++                      strerror(errno));
++    }
++
++    return ptr;
++}
++
++void xen_be_unmap_grant_refs(struct XenDevice *xendev, void *ptr,
++                             unsigned int nr_refs)
++{
++    assert(xendev->ops->flags & DEVOPS_FLAG_NEED_GNTDEV);
++
++    if (xengnttab_unmap(xendev->gnttabdev, ptr, nr_refs)) {
++        xen_pv_printf(xendev, 0, "xengnttab_unmap failed: %s\n",
++                      strerror(errno));
++    }
++}
++
++int xen_be_copy_grant_refs(struct XenDevice *xendev,
++                           bool to_domain,
++                           XenGrantCopySegment segs[],
++                           unsigned int nr_segs)
++{
++    xengnttab_grant_copy_segment_t *xengnttab_segs;
++    unsigned int i;
++    int rc;
++
++    assert(xendev->ops->flags & DEVOPS_FLAG_NEED_GNTDEV);
++
++    xengnttab_segs = g_new0(xengnttab_grant_copy_segment_t, nr_segs);
++
++    for (i = 0; i < nr_segs; i++) {
++        XenGrantCopySegment *seg = &segs[i];
++        xengnttab_grant_copy_segment_t *xengnttab_seg = &xengnttab_segs[i];
++
++        if (to_domain) {
++            xengnttab_seg->flags = GNTCOPY_dest_gref;
++            xengnttab_seg->dest.foreign.domid = xen_domid;
++            xengnttab_seg->dest.foreign.ref = seg->dest.foreign.ref;
++            xengnttab_seg->dest.foreign.offset = seg->dest.foreign.offset;
++            xengnttab_seg->source.virt = seg->source.virt;
++        } else {
++            xengnttab_seg->flags = GNTCOPY_source_gref;
++            xengnttab_seg->source.foreign.domid = xen_domid;
++            xengnttab_seg->source.foreign.ref = seg->source.foreign.ref;
++            xengnttab_seg->source.foreign.offset =
++                seg->source.foreign.offset;
++            xengnttab_seg->dest.virt = seg->dest.virt;
++        }
++
++        xengnttab_seg->len = seg->len;
++    }
++
++    rc = xengnttab_grant_copy(xendev->gnttabdev, nr_segs, xengnttab_segs);
++
++    if (rc) {
++        xen_pv_printf(xendev, 0, "xengnttab_copy failed: %s\n",
++                      strerror(errno));
++    }
++
++    for (i = 0; i < nr_segs; i++) {
++        xengnttab_grant_copy_segment_t *xengnttab_seg =
++            &xengnttab_segs[i];
++
++        if (xengnttab_seg->status != GNTST_okay) {
++            xen_pv_printf(xendev, 0, "segment[%u] status: %d\n", i,
++                          xengnttab_seg->status);
++            rc = -1;
++        }
++    }
++
++    g_free(xengnttab_segs);
++    return rc;
++}
++
+ /*
+  * get xen backend device, allocate a new one if it doesn't exist.
+  */
+@@ -149,18 +246,6 @@ static struct XenDevice *xen_be_get_xendev(const char *type, int dom, int dev,
+     }
+     qemu_set_cloexec(xenevtchn_fd(xendev->evtchndev));
+ 
+-    if (ops->flags & DEVOPS_FLAG_NEED_GNTDEV) {
+-        xendev->gnttabdev = xengnttab_open(NULL, 0);
+-        if (xendev->gnttabdev == NULL) {
+-            xen_pv_printf(NULL, 0, "can't open gnttab device\n");
+-            xenevtchn_close(xendev->evtchndev);
+-            qdev_unplug(DEVICE(xendev), NULL);
+-            return NULL;
+-        }
+-    } else {
+-        xendev->gnttabdev = NULL;
+-    }
+-
+     xen_pv_insert_xendev(xendev);
+ 
+     if (xendev->ops->alloc) {
+@@ -322,6 +407,16 @@ static int xen_be_try_initialise(struct XenDevice *xendev)
+         }
+     }
+ 
++    if (xendev->ops->flags & DEVOPS_FLAG_NEED_GNTDEV) {
++        xendev->gnttabdev = xengnttab_open(NULL, 0);
++        if (xendev->gnttabdev == NULL) {
++            xen_pv_printf(NULL, 0, "can't open gnttab device\n");
++            return -1;
++        }
++    } else {
++        xendev->gnttabdev = NULL;
++    }
++
+     if (xendev->ops->initialise) {
+         rc = xendev->ops->initialise(xendev);
+     }
+@@ -369,6 +464,10 @@ static void xen_be_disconnect(struct XenDevice *xendev, enum xenbus_state state)
+         xendev->ops->disconnect) {
+         xendev->ops->disconnect(xendev);
+     }
++    if (xendev->gnttabdev) {
++        xengnttab_close(xendev->gnttabdev);
++        xendev->gnttabdev = NULL;
++    }
+     if (xendev->be_state != state) {
+         xen_be_set_state(xendev, state);
+     }
+diff --git a/include/hw/xen/xen_backend.h b/include/hw/xen/xen_backend.h
+index 3a27692..29bf1c3 100644
+--- a/include/hw/xen/xen_backend.h
++++ b/include/hw/xen/xen_backend.h
+@@ -42,6 +42,39 @@ void xen_be_register_common(void);
+ int xen_be_register(const char *type, struct XenDevOps *ops);
+ int xen_be_set_state(struct XenDevice *xendev, enum xenbus_state state);
+ int xen_be_bind_evtchn(struct XenDevice *xendev);
++void xen_be_set_max_grant_refs(struct XenDevice *xendev,
++                               unsigned int nr_refs);
++void *xen_be_map_grant_refs(struct XenDevice *xendev, uint32_t *refs,
++                            unsigned int nr_refs, int prot);
++void xen_be_unmap_grant_refs(struct XenDevice *xendev, void *ptr,
++                             unsigned int nr_refs);
++
++typedef struct XenGrantCopySegment {
++    union {
++        void *virt;
++        struct {
++            uint32_t ref;
++            off_t offset;
++        } foreign;
++    } source, dest;
++    size_t len;
++} XenGrantCopySegment;
++
++int xen_be_copy_grant_refs(struct XenDevice *xendev,
++                           bool to_domain, XenGrantCopySegment segs[],
++                           unsigned int nr_segs);
++
++static inline void *xen_be_map_grant_ref(struct XenDevice *xendev,
++                                         uint32_t ref, int prot)
++{
++    return xen_be_map_grant_refs(xendev, &ref, 1, prot);
++}
++
++static inline void xen_be_unmap_grant_ref(struct XenDevice *xendev,
++                                          void *ptr)
++{
++    return xen_be_unmap_grant_refs(xendev, ptr, 1);
++}
+ 
+ /* actual backend drivers */
+ extern struct XenDevOps xen_console_ops;      /* xen_console.c     */
 -- 
 2.1.4
