@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35867)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=655ddeee3=Paul.Durrant@citrix.com>)
-	id 1fEgLU-0001U7-18
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 15:26:21 -0400
+	id 1fEgLX-0001YZ-Uh
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 15:26:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=655ddeee3=Paul.Durrant@citrix.com>)
-	id 1fEgLP-0006hl-Hw
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 15:26:19 -0400
+	id 1fEgLW-0006oj-9y
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 15:26:23 -0400
 From: Paul Durrant <paul.durrant@citrix.com>
-Date: Fri, 4 May 2018 20:26:03 +0100
-Message-ID: <1525461967-32174-5-git-send-email-paul.durrant@citrix.com>
+Date: Fri, 4 May 2018 20:26:02 +0100
+Message-ID: <1525461967-32174-4-git-send-email-paul.durrant@citrix.com>
 In-Reply-To: <1525461967-32174-1-git-send-email-paul.durrant@citrix.com>
 References: <1525461967-32174-1-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 4/8] xen_backend: add an emulation of grant
- copy
+Subject: [Qemu-devel] [PATCH v3 3/8] xen: remove other open-coded use of
+ libxengnttab
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,95 +25,293 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: xen-devel@lists.xenproject.org, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
+Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Greg Kurz <groug@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-Not all Xen environments support the xengnttab_grant_copy() operation.
-E.g. where the OS is FreeBSD or Xen is older than 4.8.0.
-
-This patch introduces an emulation of that operation using
-xengnttab_map_domain_grant_refs() and memcpy() for those environments.
+Now that helpers are available in xen_backend, use them throughout all
+Xen PV backends.
 
 Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 ---
 Cc: Stefano Stabellini <sstabellini@kernel.org>
 Cc: Anthony Perard <anthony.perard@citrix.com>
+Cc: Greg Kurz <groug@kaod.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
 v2:
  - New in v2
 ---
- hw/xen/xen_backend.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
+ hw/9pfs/xen-9p-backend.c | 32 +++++++++++++++-----------------
+ hw/char/xen_console.c    |  9 ++++-----
+ hw/net/xen_nic.c         | 34 +++++++++++++++-------------------
+ hw/usb/xen-usb.c         | 37 +++++++++++++++++--------------------
+ 4 files changed, 51 insertions(+), 61 deletions(-)
 
-diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
-index 50412d6..3c3fc2c 100644
---- a/hw/xen/xen_backend.c
-+++ b/hw/xen/xen_backend.c
-@@ -146,6 +146,55 @@ void xen_be_unmap_grant_refs(struct XenDevice *xendev, void *ptr,
+diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+index 95e50c4..6026780 100644
+--- a/hw/9pfs/xen-9p-backend.c
++++ b/hw/9pfs/xen-9p-backend.c
+@@ -331,14 +331,14 @@ static int xen_9pfs_free(struct XenDevice *xendev)
+ 
+     for (i = 0; i < xen_9pdev->num_rings; i++) {
+         if (xen_9pdev->rings[i].data != NULL) {
+-            xengnttab_unmap(xen_9pdev->xendev.gnttabdev,
+-                    xen_9pdev->rings[i].data,
+-                    (1 << xen_9pdev->rings[i].ring_order));
++            xen_be_unmap_grant_refs(&xen_9pdev->xendev,
++                                    xen_9pdev->rings[i].data,
++                                    (1 << xen_9pdev->rings[i].ring_order));
+         }
+         if (xen_9pdev->rings[i].intf != NULL) {
+-            xengnttab_unmap(xen_9pdev->xendev.gnttabdev,
+-                    xen_9pdev->rings[i].intf,
+-                    1);
++            xen_be_unmap_grant_refs(&xen_9pdev->xendev,
++                                    xen_9pdev->rings[i].intf,
++                                    1);
+         }
+         if (xen_9pdev->rings[i].bh != NULL) {
+             qemu_bh_delete(xen_9pdev->rings[i].bh);
+@@ -390,11 +390,10 @@ static int xen_9pfs_connect(struct XenDevice *xendev)
+         }
+         g_free(str);
+ 
+-        xen_9pdev->rings[i].intf =  xengnttab_map_grant_ref(
+-                xen_9pdev->xendev.gnttabdev,
+-                xen_9pdev->xendev.dom,
+-                xen_9pdev->rings[i].ref,
+-                PROT_READ | PROT_WRITE);
++        xen_9pdev->rings[i].intf =
++            xen_be_map_grant_ref(&xen_9pdev->xendev,
++                                 xen_9pdev->rings[i].ref,
++                                 PROT_READ | PROT_WRITE);
+         if (!xen_9pdev->rings[i].intf) {
+             goto out;
+         }
+@@ -403,12 +402,11 @@ static int xen_9pfs_connect(struct XenDevice *xendev)
+             goto out;
+         }
+         xen_9pdev->rings[i].ring_order = ring_order;
+-        xen_9pdev->rings[i].data = xengnttab_map_domain_grant_refs(
+-                xen_9pdev->xendev.gnttabdev,
+-                (1 << ring_order),
+-                xen_9pdev->xendev.dom,
+-                xen_9pdev->rings[i].intf->ref,
+-                PROT_READ | PROT_WRITE);
++        xen_9pdev->rings[i].data =
++            xen_be_map_grant_refs(&xen_9pdev->xendev,
++                                  xen_9pdev->rings[i].intf->ref,
++                                  (1 << ring_order),
++                                  PROT_READ | PROT_WRITE);
+         if (!xen_9pdev->rings[i].data) {
+             goto out;
+         }
+diff --git a/hw/char/xen_console.c b/hw/char/xen_console.c
+index bdfaa40..8b4b4bf 100644
+--- a/hw/char/xen_console.c
++++ b/hw/char/xen_console.c
+@@ -233,12 +233,11 @@ static int con_initialise(struct XenDevice *xendev)
+     if (!xendev->dev) {
+         xen_pfn_t mfn = con->ring_ref;
+         con->sring = xenforeignmemory_map(xen_fmem, con->xendev.dom,
+-                                          PROT_READ|PROT_WRITE,
++                                          PROT_READ | PROT_WRITE,
+                                           1, &mfn, NULL);
+     } else {
+-        con->sring = xengnttab_map_grant_ref(xendev->gnttabdev, con->xendev.dom,
+-                                             con->ring_ref,
+-                                             PROT_READ|PROT_WRITE);
++        con->sring = xen_be_map_grant_ref(xendev, con->ring_ref,
++                                          PROT_READ | PROT_WRITE);
+     }
+     if (!con->sring)
+ 	return -1;
+@@ -267,7 +266,7 @@ static void con_disconnect(struct XenDevice *xendev)
+         if (!xendev->dev) {
+             xenforeignmemory_unmap(xen_fmem, con->sring, 1);
+         } else {
+-            xengnttab_unmap(xendev->gnttabdev, con->sring, 1);
++            xen_be_unmap_grant_ref(xendev, con->sring);
+         }
+         con->sring = NULL;
+     }
+diff --git a/hw/net/xen_nic.c b/hw/net/xen_nic.c
+index 20c43a6..73d6f1b 100644
+--- a/hw/net/xen_nic.c
++++ b/hw/net/xen_nic.c
+@@ -160,9 +160,8 @@ static void net_tx_packets(struct XenNetDev *netdev)
+                           (txreq.flags & NETTXF_more_data)      ? " more_data"      : "",
+                           (txreq.flags & NETTXF_extra_info)     ? " extra_info"     : "");
+ 
+-            page = xengnttab_map_grant_ref(netdev->xendev.gnttabdev,
+-                                           netdev->xendev.dom,
+-                                           txreq.gref, PROT_READ);
++            page = xen_be_map_grant_refs(&netdev->xendev,
++                                         &txreq.gref, 1, PROT_READ);
+             if (page == NULL) {
+                 xen_pv_printf(&netdev->xendev, 0,
+                               "error: tx gref dereference failed (%d)\n",
+@@ -183,7 +182,7 @@ static void net_tx_packets(struct XenNetDev *netdev)
+                 qemu_send_packet(qemu_get_queue(netdev->nic),
+                                  page + txreq.offset, txreq.size);
+             }
+-            xengnttab_unmap(netdev->xendev.gnttabdev, page, 1);
++            xen_be_unmap_grant_ref(&netdev->xendev, page);
+             net_tx_response(netdev, &txreq, NETIF_RSP_OKAY);
+         }
+         if (!netdev->tx_work) {
+@@ -254,9 +253,8 @@ static ssize_t net_rx_packet(NetClientState *nc, const uint8_t *buf, size_t size
+     memcpy(&rxreq, RING_GET_REQUEST(&netdev->rx_ring, rc), sizeof(rxreq));
+     netdev->rx_ring.req_cons = ++rc;
+ 
+-    page = xengnttab_map_grant_ref(netdev->xendev.gnttabdev,
+-                                   netdev->xendev.dom,
+-                                   rxreq.gref, PROT_WRITE);
++    page = xen_be_map_grant_refs(&netdev->xendev, &rxreq.gref, 1,
++                                 PROT_WRITE);
+     if (page == NULL) {
+         xen_pv_printf(&netdev->xendev, 0,
+                       "error: rx gref dereference failed (%d)\n",
+@@ -265,7 +263,7 @@ static ssize_t net_rx_packet(NetClientState *nc, const uint8_t *buf, size_t size
+         return -1;
+     }
+     memcpy(page + NET_IP_ALIGN, buf, size);
+-    xengnttab_unmap(netdev->xendev.gnttabdev, page, 1);
++    xen_be_unmap_grant_ref(&netdev->xendev, page);
+     net_rx_response(netdev, &rxreq, NETIF_RSP_OKAY, NET_IP_ALIGN, size, 0);
+ 
+     return size;
+@@ -338,19 +336,17 @@ static int net_connect(struct XenDevice *xendev)
+         return -1;
+     }
+ 
+-    netdev->txs = xengnttab_map_grant_ref(netdev->xendev.gnttabdev,
+-                                          netdev->xendev.dom,
+-                                          netdev->tx_ring_ref,
+-                                          PROT_READ | PROT_WRITE);
++    netdev->txs = xen_be_map_grant_ref(&netdev->xendev,
++                                       netdev->tx_ring_ref,
++                                       PROT_READ | PROT_WRITE);
+     if (!netdev->txs) {
+         return -1;
+     }
+-    netdev->rxs = xengnttab_map_grant_ref(netdev->xendev.gnttabdev,
+-                                          netdev->xendev.dom,
+-                                          netdev->rx_ring_ref,
+-                                          PROT_READ | PROT_WRITE);
++    netdev->rxs = xen_be_map_grant_ref(&netdev->xendev,
++                                       netdev->rx_ring_ref,
++                                       PROT_READ | PROT_WRITE);
+     if (!netdev->rxs) {
+-        xengnttab_unmap(netdev->xendev.gnttabdev, netdev->txs, 1);
++        xen_be_unmap_grant_ref(&netdev->xendev, netdev->txs);
+         netdev->txs = NULL;
+         return -1;
+     }
+@@ -375,11 +371,11 @@ static void net_disconnect(struct XenDevice *xendev)
+     xen_pv_unbind_evtchn(&netdev->xendev);
+ 
+     if (netdev->txs) {
+-        xengnttab_unmap(netdev->xendev.gnttabdev, netdev->txs, 1);
++        xen_be_unmap_grant_ref(&netdev->xendev, netdev->txs);
+         netdev->txs = NULL;
+     }
+     if (netdev->rxs) {
+-        xengnttab_unmap(netdev->xendev.gnttabdev, netdev->rxs, 1);
++        xen_be_unmap_grant_ref(&netdev->xendev, netdev->rxs);
+         netdev->rxs = NULL;
      }
  }
+diff --git a/hw/usb/xen-usb.c b/hw/usb/xen-usb.c
+index b3a90c0..5b2e21e 100644
+--- a/hw/usb/xen-usb.c
++++ b/hw/usb/xen-usb.c
+@@ -173,8 +173,9 @@ static int usbback_gnttab_map(struct usbback_req *usbback_req)
+         for (i = 0; i < usbback_req->nr_buffer_segs; i++) {
+             ref[i] = usbback_req->req.seg[i].gref;
+         }
+-        usbback_req->buffer = xengnttab_map_domain_grant_refs(xendev->gnttabdev,
+-            usbback_req->nr_buffer_segs, xendev->dom, ref, prot);
++        usbback_req->buffer =
++            xen_be_map_grant_refs(xendev, ref, usbback_req->nr_buffer_segs,
++                                  prot);
  
-+static int compat_copy_grant_refs(struct XenDevice *xendev,
-+                                  bool to_domain,
-+                                  XenGrantCopySegment segs[],
-+                                  unsigned int nr_segs)
-+{
-+    uint32_t *refs = g_new(uint32_t, nr_segs);
-+    int prot = to_domain ? PROT_WRITE : PROT_READ;
-+    void *pages;
-+    unsigned int i;
-+
-+    for (i = 0; i < nr_segs; i++) {
-+        XenGrantCopySegment *seg = &segs[i];
-+
-+        refs[i] = to_domain ?
-+            seg->dest.foreign.ref : seg->source.foreign.ref;
-+    }
-+
-+    pages = xengnttab_map_domain_grant_refs(xendev->gnttabdev, nr_segs,
-+                                            xen_domid, refs, prot);
-+    if (!pages) {
-+        xen_pv_printf(xendev, 0,
-+                      "xengnttab_map_domain_grant_refs failed: %s\n",
-+                      strerror(errno));
-+        g_free(refs);
-+        return -1;
-+    }
-+
-+    for (i = 0; i < nr_segs; i++) {
-+        XenGrantCopySegment *seg = &segs[i];
-+        void *page = pages + (i * XC_PAGE_SIZE);
-+
-+        if (to_domain) {
-+            memcpy(page + seg->dest.foreign.offset, seg->source.virt,
-+                   seg->len);
-+        } else {
-+            memcpy(seg->dest.virt, page + seg->source.foreign.offset,
-+                   seg->len);
-+        }
-+    }
-+
-+    if (xengnttab_unmap(xendev->gnttabdev, pages, nr_segs)) {
-+        xen_pv_printf(xendev, 0, "xengnttab_unmap failed: %s\n",
-+                      strerror(errno));
-+    }
-+
-+    g_free(refs);
-+    return 0;
-+}
-+
- int xen_be_copy_grant_refs(struct XenDevice *xendev,
-                            bool to_domain,
-                            XenGrantCopySegment segs[],
-@@ -157,6 +206,10 @@ int xen_be_copy_grant_refs(struct XenDevice *xendev,
+         if (!usbback_req->buffer) {
+             return -ENOMEM;
+@@ -206,8 +207,9 @@ static int usbback_gnttab_map(struct usbback_req *usbback_req)
+     for (i = 0; i < usbback_req->nr_extra_segs; i++) {
+         ref[i] = usbback_req->req.seg[i + usbback_req->req.nr_buffer_segs].gref;
+     }
+-    usbback_req->isoc_buffer = xengnttab_map_domain_grant_refs(
+-         xendev->gnttabdev, usbback_req->nr_extra_segs, xendev->dom, ref, prot);
++    usbback_req->isoc_buffer =
++        xen_be_map_grant_refs(xendev, ref, usbback_req->nr_extra_segs,
++                              prot);
  
-     assert(xendev->ops->flags & DEVOPS_FLAG_NEED_GNTDEV);
+     if (!usbback_req->isoc_buffer) {
+         return -ENOMEM;
+@@ -291,14 +293,14 @@ static void usbback_do_response(struct usbback_req *usbback_req, int32_t status,
+     }
  
-+    if (!xen_feature_grant_copy) {
-+        return compat_copy_grant_refs(xendev, to_domain, segs, nr_segs);
-+    }
-+
-     xengnttab_segs = g_new0(xengnttab_grant_copy_segment_t, nr_segs);
+     if (usbback_req->buffer) {
+-        xengnttab_unmap(xendev->gnttabdev, usbback_req->buffer,
+-                        usbback_req->nr_buffer_segs);
++        xen_be_unmap_grant_refs(xendev, usbback_req->buffer,
++                                usbback_req->nr_buffer_segs);
+         usbback_req->buffer = NULL;
+     }
  
-     for (i = 0; i < nr_segs; i++) {
+     if (usbback_req->isoc_buffer) {
+-        xengnttab_unmap(xendev->gnttabdev, usbback_req->isoc_buffer,
+-                        usbback_req->nr_extra_segs);
++        xen_be_unmap_grant_refs(xendev, usbback_req->isoc_buffer,
++                                usbback_req->nr_extra_segs);
+         usbback_req->isoc_buffer = NULL;
+     }
+ 
+@@ -834,11 +836,11 @@ static void usbback_disconnect(struct XenDevice *xendev)
+     xen_pv_unbind_evtchn(xendev);
+ 
+     if (usbif->urb_sring) {
+-        xengnttab_unmap(xendev->gnttabdev, usbif->urb_sring, 1);
++        xen_be_unmap_grant_ref(xendev, usbif->urb_sring);
+         usbif->urb_sring = NULL;
+     }
+     if (usbif->conn_sring) {
+-        xengnttab_unmap(xendev->gnttabdev, usbif->conn_sring, 1);
++        xen_be_unmap_grant_ref(xendev, usbif->conn_sring);
+         usbif->conn_sring = NULL;
+     }
+ 
+@@ -877,12 +879,10 @@ static int usbback_connect(struct XenDevice *xendev)
+         return -1;
+     }
+ 
+-    usbif->urb_sring = xengnttab_map_grant_ref(xendev->gnttabdev, xendev->dom,
+-                                               urb_ring_ref,
+-                                               PROT_READ | PROT_WRITE);
+-    usbif->conn_sring = xengnttab_map_grant_ref(xendev->gnttabdev, xendev->dom,
+-                                                conn_ring_ref,
+-                                                PROT_READ | PROT_WRITE);
++    usbif->urb_sring = xen_be_map_grant_ref(xendev, urb_ring_ref,
++                                            PROT_READ | PROT_WRITE);
++    usbif->conn_sring = xen_be_map_grant_ref(xendev, conn_ring_ref,
++                                             PROT_READ | PROT_WRITE);
+     if (!usbif->urb_sring || !usbif->conn_sring) {
+         xen_pv_printf(xendev, 0, "error mapping rings\n");
+         usbback_disconnect(xendev);
+@@ -1024,10 +1024,7 @@ static void usbback_alloc(struct XenDevice *xendev)
+ 
+     /* max_grants: for each request and for the rings (request and connect). */
+     max_grants = USBIF_MAX_SEGMENTS_PER_REQUEST * USB_URB_RING_SIZE + 2;
+-    if (xengnttab_set_max_grants(xendev->gnttabdev, max_grants) < 0) {
+-        xen_pv_printf(xendev, 0, "xengnttab_set_max_grants failed: %s\n",
+-                      strerror(errno));
+-    }
++    xen_be_set_max_grant_refs(xendev, max_grants);
+ }
+ 
+ static int usbback_free(struct XenDevice *xendev)
 -- 
 2.1.4
