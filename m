@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fEeJK-0005pg-PI
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 13:16:01 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fEeJL-0005qk-Nb
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 13:16:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fEeJI-0000lu-8l
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 13:15:58 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41492)
+	(envelope-from <pm215@archaic.org.uk>) id 1fEeJK-0000oq-D8
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 13:15:59 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41498)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fEeJH-0000gu-SX
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 13:15:56 -0400
+	id 1fEeJK-0000nV-4V
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 13:15:58 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fEeJG-00037k-VC
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 18:15:54 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fEeJJ-00039J-8S
+	for qemu-devel@nongnu.org; Fri, 04 May 2018 18:15:57 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  4 May 2018 18:15:35 +0100
-Message-Id: <20180504171540.25813-20-peter.maydell@linaro.org>
+Date: Fri,  4 May 2018 18:15:38 +0100
+Message-Id: <20180504171540.25813-23-peter.maydell@linaro.org>
 In-Reply-To: <20180504171540.25813-1-peter.maydell@linaro.org>
 References: <20180504171540.25813-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 19/24] hw/arm/smmuv3: Implement translate
- callback
+Subject: [Qemu-devel] [PULL 22/24] hw/arm/virt: Add SMMUv3 to the virt board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,584 +29,173 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Eric Auger <eric.auger@redhat.com>
+From: Prem Mallappa <prem.mallappa@broadcom.com>
 
-This patch implements the IOMMU Memory Region translate()
-callback. Most of the code relates to the translation
-configuration decoding and check (STE, CD).
+Add code to instantiate an smmuv3 in virt machine. A new iommu
+integer member is introduced in VirtMachineState to store the type
+of the iommu in use.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
-Message-id: 1524665762-31355-10-git-send-email-eric.auger@redhat.com
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 1524665762-31355-13-git-send-email-eric.auger@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/smmuv3-internal.h | 160 +++++++++++++++++
- hw/arm/smmuv3.c          | 358 +++++++++++++++++++++++++++++++++++++++
- hw/arm/trace-events      |   9 +
- 3 files changed, 527 insertions(+)
+ include/hw/arm/virt.h | 10 +++++++
+ hw/arm/virt.c         | 64 ++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 73 insertions(+), 1 deletion(-)
 
-diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
-index 2d50300a56..a9d714b56e 100644
---- a/hw/arm/smmuv3-internal.h
-+++ b/hw/arm/smmuv3-internal.h
-@@ -458,4 +458,164 @@ typedef struct SMMUEventInfo {
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index ba0c1a4faa..886372cdbb 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -38,6 +38,7 @@
  
- void smmuv3_record_event(SMMUv3State *s, SMMUEventInfo *event);
+ #define NUM_GICV2M_SPIS       64
+ #define NUM_VIRTIO_TRANSPORTS 32
++#define NUM_SMMU_IRQS          4
  
-+/* Configuration Data */
+ #define ARCH_GICV3_MAINT_IRQ  9
+ 
+@@ -59,6 +60,7 @@ enum {
+     VIRT_GIC_V2M,
+     VIRT_GIC_ITS,
+     VIRT_GIC_REDIST,
++    VIRT_SMMU,
+     VIRT_UART,
+     VIRT_MMIO,
+     VIRT_RTC,
+@@ -74,6 +76,12 @@ enum {
+     VIRT_SECURE_MEM,
+ };
+ 
++typedef enum VirtIOMMUType {
++    VIRT_IOMMU_NONE,
++    VIRT_IOMMU_SMMUV3,
++    VIRT_IOMMU_VIRTIO,
++} VirtIOMMUType;
 +
-+/* STE Level 1 Descriptor */
-+typedef struct STEDesc {
-+    uint32_t word[2];
-+} STEDesc;
-+
-+/* CD Level 1 Descriptor */
-+typedef struct CDDesc {
-+    uint32_t word[2];
-+} CDDesc;
-+
-+/* Stream Table Entry(STE) */
-+typedef struct STE {
-+    uint32_t word[16];
-+} STE;
-+
-+/* Context Descriptor(CD) */
-+typedef struct CD {
-+    uint32_t word[16];
-+} CD;
-+
-+/* STE fields */
-+
-+#define STE_VALID(x)   extract32((x)->word[0], 0, 1)
-+
-+#define STE_CONFIG(x)  extract32((x)->word[0], 1, 3)
-+#define STE_CFG_S1_ENABLED(config) (config & 0x1)
-+#define STE_CFG_S2_ENABLED(config) (config & 0x2)
-+#define STE_CFG_ABORT(config)      (!(config & 0x4))
-+#define STE_CFG_BYPASS(config)     (config == 0x4)
-+
-+#define STE_S1FMT(x)       extract32((x)->word[0], 4 , 2)
-+#define STE_S1CDMAX(x)     extract32((x)->word[1], 27, 5)
-+#define STE_S1STALLD(x)    extract32((x)->word[2], 27, 1)
-+#define STE_EATS(x)        extract32((x)->word[2], 28, 2)
-+#define STE_STRW(x)        extract32((x)->word[2], 30, 2)
-+#define STE_S2VMID(x)      extract32((x)->word[4], 0 , 16)
-+#define STE_S2T0SZ(x)      extract32((x)->word[5], 0 , 6)
-+#define STE_S2SL0(x)       extract32((x)->word[5], 6 , 2)
-+#define STE_S2TG(x)        extract32((x)->word[5], 14, 2)
-+#define STE_S2PS(x)        extract32((x)->word[5], 16, 3)
-+#define STE_S2AA64(x)      extract32((x)->word[5], 19, 1)
-+#define STE_S2HD(x)        extract32((x)->word[5], 24, 1)
-+#define STE_S2HA(x)        extract32((x)->word[5], 25, 1)
-+#define STE_S2S(x)         extract32((x)->word[5], 26, 1)
-+#define STE_CTXPTR(x)                                           \
-+    ({                                                          \
-+        unsigned long addr;                                     \
-+        addr = (uint64_t)extract32((x)->word[1], 0, 16) << 32;  \
-+        addr |= (uint64_t)((x)->word[0] & 0xffffffc0);          \
-+        addr;                                                   \
-+    })
-+
-+#define STE_S2TTB(x)                                            \
-+    ({                                                          \
-+        unsigned long addr;                                     \
-+        addr = (uint64_t)extract32((x)->word[7], 0, 16) << 32;  \
-+        addr |= (uint64_t)((x)->word[6] & 0xfffffff0);          \
-+        addr;                                                   \
-+    })
-+
-+static inline int oas2bits(int oas_field)
-+{
-+    switch (oas_field) {
-+    case 0:
-+        return 32;
-+    case 1:
-+        return 36;
-+    case 2:
-+        return 40;
-+    case 3:
-+        return 42;
-+    case 4:
-+        return 44;
-+    case 5:
-+        return 48;
-+    }
-+    return -1;
-+}
-+
-+static inline int pa_range(STE *ste)
-+{
-+    int oas_field = MIN(STE_S2PS(ste), SMMU_IDR5_OAS);
-+
-+    if (!STE_S2AA64(ste)) {
-+        return 40;
-+    }
-+
-+    return oas2bits(oas_field);
-+}
-+
-+#define MAX_PA(ste) ((1 << pa_range(ste)) - 1)
-+
-+/* CD fields */
-+
-+#define CD_VALID(x)   extract32((x)->word[0], 30, 1)
-+#define CD_ASID(x)    extract32((x)->word[1], 16, 16)
-+#define CD_TTB(x, sel)                                      \
-+    ({                                                      \
-+        uint64_t hi, lo;                                    \
-+        hi = extract32((x)->word[(sel) * 2 + 3], 0, 19);    \
-+        hi <<= 32;                                          \
-+        lo = (x)->word[(sel) * 2 + 2] & ~0xfULL;            \
-+        hi | lo;                                            \
-+    })
-+
-+#define CD_TSZ(x, sel)   extract32((x)->word[0], (16 * (sel)) + 0, 6)
-+#define CD_TG(x, sel)    extract32((x)->word[0], (16 * (sel)) + 6, 2)
-+#define CD_EPD(x, sel)   extract32((x)->word[0], (16 * (sel)) + 14, 1)
-+#define CD_ENDI(x)       extract32((x)->word[0], 15, 1)
-+#define CD_IPS(x)        extract32((x)->word[1], 0 , 3)
-+#define CD_TBI(x)        extract32((x)->word[1], 6 , 2)
-+#define CD_HD(x)         extract32((x)->word[1], 10 , 1)
-+#define CD_HA(x)         extract32((x)->word[1], 11 , 1)
-+#define CD_S(x)          extract32((x)->word[1], 12, 1)
-+#define CD_R(x)          extract32((x)->word[1], 13, 1)
-+#define CD_A(x)          extract32((x)->word[1], 14, 1)
-+#define CD_AARCH64(x)    extract32((x)->word[1], 9 , 1)
-+
-+#define CDM_VALID(x)    ((x)->word[0] & 0x1)
-+
-+static inline int is_cd_valid(SMMUv3State *s, STE *ste, CD *cd)
-+{
-+    return CD_VALID(cd);
-+}
-+
-+/**
-+ * tg2granule - Decodes the CD translation granule size field according
-+ * to the ttbr in use
-+ * @bits: TG0/1 fields
-+ * @ttbr: ttbr index in use
-+ */
-+static inline int tg2granule(int bits, int ttbr)
-+{
-+    switch (bits) {
-+    case 0:
-+        return ttbr ? 0  : 12;
-+    case 1:
-+        return ttbr ? 14 : 16;
-+    case 2:
-+        return ttbr ? 12 : 14;
-+    case 3:
-+        return ttbr ? 16 :  0;
-+    default:
-+        return 0;
-+    }
-+}
-+
-+static inline uint64_t l1std_l2ptr(STEDesc *desc)
-+{
-+    uint64_t hi, lo;
-+
-+    hi = desc->word[1];
-+    lo = desc->word[0] & ~0x1fULL;
-+    return hi << 32 | lo;
-+}
-+
-+#define L1STD_SPAN(stm) (extract32((stm)->word[0], 0, 4))
-+
- #endif
-diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
-index cfce013ac5..d896834764 100644
---- a/hw/arm/smmuv3.c
-+++ b/hw/arm/smmuv3.c
-@@ -271,6 +271,361 @@ static void smmuv3_init_regs(SMMUv3State *s)
-     s->sid_split = 0;
+ typedef struct MemMapEntry {
+     hwaddr base;
+     hwaddr size;
+@@ -97,6 +105,7 @@ typedef struct {
+     bool its;
+     bool virt;
+     int32_t gic_version;
++    VirtIOMMUType iommu;
+     struct arm_boot_info bootinfo;
+     const MemMapEntry *memmap;
+     const int *irqmap;
+@@ -106,6 +115,7 @@ typedef struct {
+     uint32_t clock_phandle;
+     uint32_t gic_phandle;
+     uint32_t msi_phandle;
++    uint32_t iommu_phandle;
+     int psci_conduit;
+ } VirtMachineState;
+ 
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index dc0c0335a2..b085f0b9b4 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -58,6 +58,7 @@
+ #include "hw/smbios/smbios.h"
+ #include "qapi/visitor.h"
+ #include "standard-headers/linux/input.h"
++#include "hw/arm/smmuv3.h"
+ 
+ #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+@@ -141,6 +142,7 @@ static const MemMapEntry a15memmap[] = {
+     [VIRT_FW_CFG] =             { 0x09020000, 0x00000018 },
+     [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
+     [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
++    [VIRT_SMMU] =               { 0x09050000, 0x00020000 },
+     [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
+     /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
+     [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
+@@ -161,6 +163,7 @@ static const int a15irqmap[] = {
+     [VIRT_SECURE_UART] = 8,
+     [VIRT_MMIO] = 16, /* ...to 16 + NUM_VIRTIO_TRANSPORTS - 1 */
+     [VIRT_GIC_V2M] = 48, /* ...to 48 + NUM_GICV2M_SPIS - 1 */
++    [VIRT_SMMU] = 74,    /* ...to 74 + NUM_SMMU_IRQS - 1 */
+     [VIRT_PLATFORM_BUS] = 112, /* ...to 112 + PLATFORM_BUS_NUM_IRQS -1 */
+ };
+ 
+@@ -942,7 +945,57 @@ static void create_pcie_irq_map(const VirtMachineState *vms,
+                            0x7           /* PCI irq */);
  }
  
-+static int smmu_get_ste(SMMUv3State *s, dma_addr_t addr, STE *buf,
-+                        SMMUEventInfo *event)
+-static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
++static void create_smmu(const VirtMachineState *vms, qemu_irq *pic,
++                        PCIBus *bus)
 +{
-+    int ret;
-+
-+    trace_smmuv3_get_ste(addr);
-+    /* TODO: guarantee 64-bit single-copy atomicity */
-+    ret = dma_memory_read(&address_space_memory, addr,
-+                          (void *)buf, sizeof(*buf));
-+    if (ret != MEMTX_OK) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "Cannot fetch pte at address=0x%"PRIx64"\n", addr);
-+        event->type = SMMU_EVT_F_STE_FETCH;
-+        event->u.f_ste_fetch.addr = addr;
-+        return -EINVAL;
-+    }
-+    return 0;
-+
-+}
-+
-+/* @ssid > 0 not supported yet */
-+static int smmu_get_cd(SMMUv3State *s, STE *ste, uint32_t ssid,
-+                       CD *buf, SMMUEventInfo *event)
-+{
-+    dma_addr_t addr = STE_CTXPTR(ste);
-+    int ret;
-+
-+    trace_smmuv3_get_cd(addr);
-+    /* TODO: guarantee 64-bit single-copy atomicity */
-+    ret = dma_memory_read(&address_space_memory, addr,
-+                           (void *)buf, sizeof(*buf));
-+    if (ret != MEMTX_OK) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "Cannot fetch pte at address=0x%"PRIx64"\n", addr);
-+        event->type = SMMU_EVT_F_CD_FETCH;
-+        event->u.f_ste_fetch.addr = addr;
-+        return -EINVAL;
-+    }
-+    return 0;
-+}
-+
-+/* Returns <0 if the caller has no need to continue the translation */
-+static int decode_ste(SMMUv3State *s, SMMUTransCfg *cfg,
-+                      STE *ste, SMMUEventInfo *event)
-+{
-+    uint32_t config;
-+    int ret = -EINVAL;
-+
-+    if (!STE_VALID(ste)) {
-+        goto bad_ste;
-+    }
-+
-+    config = STE_CONFIG(ste);
-+
-+    if (STE_CFG_ABORT(config)) {
-+        cfg->aborted = true; /* abort but don't record any event */
-+        return ret;
-+    }
-+
-+    if (STE_CFG_BYPASS(config)) {
-+        cfg->bypassed = true;
-+        return ret;
-+    }
-+
-+    if (STE_CFG_S2_ENABLED(config)) {
-+        qemu_log_mask(LOG_UNIMP, "SMMUv3 does not support stage 2 yet\n");
-+        goto bad_ste;
-+    }
-+
-+    if (STE_S1CDMAX(ste) != 0) {
-+        qemu_log_mask(LOG_UNIMP,
-+                      "SMMUv3 does not support multiple context descriptors yet\n");
-+        goto bad_ste;
-+    }
-+
-+    if (STE_S1STALLD(ste)) {
-+        qemu_log_mask(LOG_UNIMP,
-+                      "SMMUv3 S1 stalling fault model not allowed yet\n");
-+        goto bad_ste;
-+    }
-+    return 0;
-+
-+bad_ste:
-+    event->type = SMMU_EVT_C_BAD_STE;
-+    return -EINVAL;
-+}
-+
-+/**
-+ * smmu_find_ste - Return the stream table entry associated
-+ * to the sid
-+ *
-+ * @s: smmuv3 handle
-+ * @sid: stream ID
-+ * @ste: returned stream table entry
-+ * @event: handle to an event info
-+ *
-+ * Supports linear and 2-level stream table
-+ * Return 0 on success, -EINVAL otherwise
-+ */
-+static int smmu_find_ste(SMMUv3State *s, uint32_t sid, STE *ste,
-+                         SMMUEventInfo *event)
-+{
-+    dma_addr_t addr;
-+    int ret;
-+
-+    trace_smmuv3_find_ste(sid, s->features, s->sid_split);
-+    /* Check SID range */
-+    if (sid > (1 << SMMU_IDR1_SIDSIZE)) {
-+        event->type = SMMU_EVT_C_BAD_STREAMID;
-+        return -EINVAL;
-+    }
-+    if (s->features & SMMU_FEATURE_2LVL_STE) {
-+        int l1_ste_offset, l2_ste_offset, max_l2_ste, span;
-+        dma_addr_t strtab_base, l1ptr, l2ptr;
-+        STEDesc l1std;
-+
-+        strtab_base = s->strtab_base & SMMU_BASE_ADDR_MASK;
-+        l1_ste_offset = sid >> s->sid_split;
-+        l2_ste_offset = sid & ((1 << s->sid_split) - 1);
-+        l1ptr = (dma_addr_t)(strtab_base + l1_ste_offset * sizeof(l1std));
-+        /* TODO: guarantee 64-bit single-copy atomicity */
-+        ret = dma_memory_read(&address_space_memory, l1ptr,
-+                              (uint8_t *)&l1std, sizeof(l1std));
-+        if (ret != MEMTX_OK) {
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "Could not read L1PTR at 0X%"PRIx64"\n", l1ptr);
-+            event->type = SMMU_EVT_F_STE_FETCH;
-+            event->u.f_ste_fetch.addr = l1ptr;
-+            return -EINVAL;
-+        }
-+
-+        span = L1STD_SPAN(&l1std);
-+
-+        if (!span) {
-+            /* l2ptr is not valid */
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "invalid sid=%d (L1STD span=0)\n", sid);
-+            event->type = SMMU_EVT_C_BAD_STREAMID;
-+            return -EINVAL;
-+        }
-+        max_l2_ste = (1 << span) - 1;
-+        l2ptr = l1std_l2ptr(&l1std);
-+        trace_smmuv3_find_ste_2lvl(s->strtab_base, l1ptr, l1_ste_offset,
-+                                   l2ptr, l2_ste_offset, max_l2_ste);
-+        if (l2_ste_offset > max_l2_ste) {
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "l2_ste_offset=%d > max_l2_ste=%d\n",
-+                          l2_ste_offset, max_l2_ste);
-+            event->type = SMMU_EVT_C_BAD_STE;
-+            return -EINVAL;
-+        }
-+        addr = l2ptr + l2_ste_offset * sizeof(*ste);
-+    } else {
-+        addr = s->strtab_base + sid * sizeof(*ste);
-+    }
-+
-+    if (smmu_get_ste(s, addr, ste, event)) {
-+        return -EINVAL;
-+    }
-+
-+    return 0;
-+}
-+
-+static int decode_cd(SMMUTransCfg *cfg, CD *cd, SMMUEventInfo *event)
-+{
-+    int ret = -EINVAL;
++    char *node;
++    const char compat[] = "arm,smmu-v3";
++    int irq =  vms->irqmap[VIRT_SMMU];
 +    int i;
++    hwaddr base = vms->memmap[VIRT_SMMU].base;
++    hwaddr size = vms->memmap[VIRT_SMMU].size;
++    const char irq_names[] = "eventq\0priq\0cmdq-sync\0gerror";
++    DeviceState *dev;
 +
-+    if (!CD_VALID(cd) || !CD_AARCH64(cd)) {
-+        goto bad_cd;
-+    }
-+    if (!CD_A(cd)) {
-+        goto bad_cd; /* SMMU_IDR0.TERM_MODEL == 1 */
-+    }
-+    if (CD_S(cd)) {
-+        goto bad_cd; /* !STE_SECURE && SMMU_IDR0.STALL_MODEL == 1 */
-+    }
-+    if (CD_HA(cd) || CD_HD(cd)) {
-+        goto bad_cd; /* HTTU = 0 */
++    if (vms->iommu != VIRT_IOMMU_SMMUV3 || !vms->iommu_phandle) {
++        return;
 +    }
 +
-+    /* we support only those at the moment */
-+    cfg->aa64 = true;
-+    cfg->stage = 1;
++    dev = qdev_create(NULL, "arm-smmuv3");
 +
-+    cfg->oas = oas2bits(CD_IPS(cd));
-+    cfg->oas = MIN(oas2bits(SMMU_IDR5_OAS), cfg->oas);
-+    cfg->tbi = CD_TBI(cd);
-+    cfg->asid = CD_ASID(cd);
-+
-+    trace_smmuv3_decode_cd(cfg->oas);
-+
-+    /* decode data dependent on TT */
-+    for (i = 0; i <= 1; i++) {
-+        int tg, tsz;
-+        SMMUTransTableInfo *tt = &cfg->tt[i];
-+
-+        cfg->tt[i].disabled = CD_EPD(cd, i);
-+        if (cfg->tt[i].disabled) {
-+            continue;
-+        }
-+
-+        tsz = CD_TSZ(cd, i);
-+        if (tsz < 16 || tsz > 39) {
-+            goto bad_cd;
-+        }
-+
-+        tg = CD_TG(cd, i);
-+        tt->granule_sz = tg2granule(tg, i);
-+        if ((tt->granule_sz != 12 && tt->granule_sz != 16) || CD_ENDI(cd)) {
-+            goto bad_cd;
-+        }
-+
-+        tt->tsz = tsz;
-+        tt->ttb = CD_TTB(cd, i);
-+        if (tt->ttb & ~(MAKE_64BIT_MASK(0, cfg->oas))) {
-+            goto bad_cd;
-+        }
-+        trace_smmuv3_decode_cd_tt(i, tt->tsz, tt->ttb, tt->granule_sz);
++    object_property_set_link(OBJECT(dev), OBJECT(bus), "primary-bus",
++                             &error_abort);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
++    for (i = 0; i < NUM_SMMU_IRQS; i++) {
++        sysbus_connect_irq(SYS_BUS_DEVICE(dev), i, pic[irq + i]);
 +    }
 +
-+    event->record_trans_faults = CD_R(cd);
++    node = g_strdup_printf("/smmuv3@%" PRIx64, base);
++    qemu_fdt_add_subnode(vms->fdt, node);
++    qemu_fdt_setprop(vms->fdt, node, "compatible", compat, sizeof(compat));
++    qemu_fdt_setprop_sized_cells(vms->fdt, node, "reg", 2, base, 2, size);
 +
-+    return 0;
++    qemu_fdt_setprop_cells(vms->fdt, node, "interrupts",
++            GIC_FDT_IRQ_TYPE_SPI, irq    , GIC_FDT_IRQ_FLAGS_EDGE_LO_HI,
++            GIC_FDT_IRQ_TYPE_SPI, irq + 1, GIC_FDT_IRQ_FLAGS_EDGE_LO_HI,
++            GIC_FDT_IRQ_TYPE_SPI, irq + 2, GIC_FDT_IRQ_FLAGS_EDGE_LO_HI,
++            GIC_FDT_IRQ_TYPE_SPI, irq + 3, GIC_FDT_IRQ_FLAGS_EDGE_LO_HI);
 +
-+bad_cd:
-+    event->type = SMMU_EVT_C_BAD_CD;
-+    return ret;
++    qemu_fdt_setprop(vms->fdt, node, "interrupt-names", irq_names,
++                     sizeof(irq_names));
++
++    qemu_fdt_setprop_cell(vms->fdt, node, "clocks", vms->clock_phandle);
++    qemu_fdt_setprop_string(vms->fdt, node, "clock-names", "apb_pclk");
++    qemu_fdt_setprop(vms->fdt, node, "dma-coherent", NULL, 0);
++
++    qemu_fdt_setprop_cell(vms->fdt, node, "#iommu-cells", 1);
++
++    qemu_fdt_setprop_cell(vms->fdt, node, "phandle", vms->iommu_phandle);
++    g_free(node);
 +}
 +
-+/**
-+ * smmuv3_decode_config - Prepare the translation configuration
-+ * for the @mr iommu region
-+ * @mr: iommu memory region the translation config must be prepared for
-+ * @cfg: output translation configuration which is populated through
-+ *       the different configuration decoding steps
-+ * @event: must be zero'ed by the caller
-+ *
-+ * return < 0 if the translation needs to be aborted (@event is filled
-+ * accordingly). Return 0 otherwise.
-+ */
-+static int smmuv3_decode_config(IOMMUMemoryRegion *mr, SMMUTransCfg *cfg,
-+                                SMMUEventInfo *event)
-+{
-+    SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
-+    uint32_t sid = smmu_get_sid(sdev);
-+    SMMUv3State *s = sdev->smmu;
-+    int ret = -EINVAL;
-+    STE ste;
-+    CD cd;
-+
-+    if (smmu_find_ste(s, sid, &ste, event)) {
-+        return ret;
-+    }
-+
-+    if (decode_ste(s, cfg, &ste, event)) {
-+        return ret;
-+    }
-+
-+    if (smmu_get_cd(s, &ste, 0 /* ssid */, &cd, event)) {
-+        return ret;
-+    }
-+
-+    return decode_cd(cfg, &cd, event);
-+}
-+
-+static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
-+                                      IOMMUAccessFlags flag)
-+{
-+    SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
-+    SMMUv3State *s = sdev->smmu;
-+    uint32_t sid = smmu_get_sid(sdev);
-+    SMMUEventInfo event = {.type = SMMU_EVT_OK, .sid = sid};
-+    SMMUPTWEventInfo ptw_info = {};
-+    SMMUTransCfg cfg = {};
-+    IOMMUTLBEntry entry = {
-+        .target_as = &address_space_memory,
-+        .iova = addr,
-+        .translated_addr = addr,
-+        .addr_mask = ~(hwaddr)0,
-+        .perm = IOMMU_NONE,
-+    };
-+    int ret = 0;
-+
-+    if (!smmu_enabled(s)) {
-+        goto out;
-+    }
-+
-+    ret = smmuv3_decode_config(mr, &cfg, &event);
-+    if (ret) {
-+        goto out;
-+    }
-+
-+    if (cfg.aborted) {
-+        goto out;
-+    }
-+
-+    ret = smmu_ptw(&cfg, addr, flag, &entry, &ptw_info);
-+    if (ret) {
-+        switch (ptw_info.type) {
-+        case SMMU_PTW_ERR_WALK_EABT:
-+            event.type = SMMU_EVT_F_WALK_EABT;
-+            event.u.f_walk_eabt.addr = addr;
-+            event.u.f_walk_eabt.rnw = flag & 0x1;
-+            event.u.f_walk_eabt.class = 0x1;
-+            event.u.f_walk_eabt.addr2 = ptw_info.addr;
-+            break;
-+        case SMMU_PTW_ERR_TRANSLATION:
-+            if (event.record_trans_faults) {
-+                event.type = SMMU_EVT_F_TRANSLATION;
-+                event.u.f_translation.addr = addr;
-+                event.u.f_translation.rnw = flag & 0x1;
-+            }
-+            break;
-+        case SMMU_PTW_ERR_ADDR_SIZE:
-+            if (event.record_trans_faults) {
-+                event.type = SMMU_EVT_F_ADDR_SIZE;
-+                event.u.f_addr_size.addr = addr;
-+                event.u.f_addr_size.rnw = flag & 0x1;
-+            }
-+            break;
-+        case SMMU_PTW_ERR_ACCESS:
-+            if (event.record_trans_faults) {
-+                event.type = SMMU_EVT_F_ACCESS;
-+                event.u.f_access.addr = addr;
-+                event.u.f_access.rnw = flag & 0x1;
-+            }
-+            break;
-+        case SMMU_PTW_ERR_PERMISSION:
-+            if (event.record_trans_faults) {
-+                event.type = SMMU_EVT_F_PERMISSION;
-+                event.u.f_permission.addr = addr;
-+                event.u.f_permission.rnw = flag & 0x1;
-+            }
-+            break;
-+        default:
-+            g_assert_not_reached();
-+        }
-+    }
-+out:
-+    if (ret) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s translation failed for iova=0x%"PRIx64"(%d)\n",
-+                      mr->parent_obj.name, addr, ret);
-+        entry.perm = IOMMU_NONE;
-+        smmuv3_record_event(s, &event);
-+    } else if (!cfg.aborted) {
-+        entry.perm = flag;
-+        trace_smmuv3_translate(mr->parent_obj.name, sid, addr,
-+                               entry.translated_addr, entry.perm);
-+    }
-+
-+    return entry;
-+}
-+
- static int smmuv3_cmdq_consume(SMMUv3State *s)
++static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
  {
-     SMMUCmdError cmd_error = SMMU_CERROR_NONE;
-@@ -795,6 +1150,9 @@ static void smmuv3_class_init(ObjectClass *klass, void *data)
- static void smmuv3_iommu_memory_region_class_init(ObjectClass *klass,
-                                                   void *data)
- {
-+    IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_CLASS(klass);
+     hwaddr base_mmio = vms->memmap[VIRT_PCIE_MMIO].base;
+     hwaddr size_mmio = vms->memmap[VIRT_PCIE_MMIO].size;
+@@ -1056,6 +1109,15 @@ static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
+     qemu_fdt_setprop_cell(vms->fdt, nodename, "#interrupt-cells", 1);
+     create_pcie_irq_map(vms, vms->gic_phandle, irq, nodename);
+ 
++    if (vms->iommu) {
++        vms->iommu_phandle = qemu_fdt_alloc_phandle(vms->fdt);
 +
-+    imrc->translate = smmuv3_translate;
++        create_smmu(vms, pic, pci->bus);
++
++        qemu_fdt_setprop_cells(vms->fdt, nodename, "iommu-map",
++                               0x0, vms->iommu_phandle, 0x0, 0x10000);
++    }
++
+     g_free(nodename);
  }
  
- static const TypeInfo smmuv3_type_info = {
-diff --git a/hw/arm/trace-events b/hw/arm/trace-events
-index 9936e10bdf..d7273bdccb 100644
---- a/hw/arm/trace-events
-+++ b/hw/arm/trace-events
-@@ -30,3 +30,12 @@ smmuv3_write_mmio_idr(uint64_t addr, uint64_t val) "write to RO/Unimpl reg 0x%lx
- smmuv3_write_mmio_evtq_cons_bef_clear(uint32_t prod, uint32_t cons, uint8_t prod_wrap, uint8_t cons_wrap) "Before clearing interrupt prod:0x%x cons:0x%x prod.w:%d cons.w:%d"
- smmuv3_write_mmio_evtq_cons_after_clear(uint32_t prod, uint32_t cons, uint8_t prod_wrap, uint8_t cons_wrap) "after clearing interrupt prod:0x%x cons:0x%x prod.w:%d cons.w:%d"
- smmuv3_record_event(const char *type, uint32_t sid) "%s sid=%d"
-+smmuv3_find_ste(uint16_t sid, uint32_t features, uint16_t sid_split) "SID:0x%x features:0x%x, sid_split:0x%x"
-+smmuv3_find_ste_2lvl(uint64_t strtab_base, uint64_t l1ptr, int l1_ste_offset, uint64_t l2ptr, int l2_ste_offset, int max_l2_ste) "strtab_base:0x%lx l1ptr:0x%"PRIx64" l1_off:0x%x, l2ptr:0x%"PRIx64" l2_off:0x%x max_l2_ste:%d"
-+smmuv3_get_ste(uint64_t addr) "STE addr: 0x%"PRIx64
-+smmuv3_translate_bypass(const char *n, uint16_t sid, uint64_t addr, bool is_write) "%s sid=%d bypass iova:0x%"PRIx64" is_write=%d"
-+smmuv3_translate_in(uint16_t sid, int pci_bus_num, uint64_t strtab_base) "SID:0x%x bus:%d strtab_base:0x%"PRIx64
-+smmuv3_get_cd(uint64_t addr) "CD addr: 0x%"PRIx64
-+smmuv3_translate(const char *n, uint16_t sid, uint64_t iova, uint64_t translated, int perm) "%s sid=%d iova=0x%"PRIx64" translated=0x%"PRIx64" perm=0x%x"
-+smmuv3_decode_cd(uint32_t oas) "oas=%d"
-+smmuv3_decode_cd_tt(int i, uint32_t tsz, uint64_t ttb, uint32_t granule_sz) "TT[%d]:tsz:%d ttb:0x%"PRIx64" granule_sz:%d"
 -- 
 2.17.0
