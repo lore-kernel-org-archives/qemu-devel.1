@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <renyime@gmail.com>) id 1fErxH-0004kz-R8
-	for qemu-devel@nongnu.org; Sat, 05 May 2018 03:50:09 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fEugK-0000qN-8t
+	for qemu-devel@nongnu.org; Sat, 05 May 2018 06:44:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <renyime@gmail.com>) id 1fErxD-00036S-Tm
-	for qemu-devel@nongnu.org; Sat, 05 May 2018 03:50:07 -0400
-From: Ivan Ren <renyime@gmail.com>
-Date: Sat,  5 May 2018 15:49:37 +0800
-Message-Id: <1525506577-1946-1-git-send-email-ivanren@tencent.com>
-Subject: [Qemu-devel] [PATCH v2] qemu-img: return allocated size for block
- device with qcow2 format
+	(envelope-from <peter.maydell@linaro.org>) id 1fEugJ-0005FV-7j
+	for qemu-devel@nongnu.org; Sat, 05 May 2018 06:44:48 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:46109)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fEugJ-0005Ev-24
+	for qemu-devel@nongnu.org; Sat, 05 May 2018 06:44:47 -0400
+Received: by mail-ot0-x241.google.com with SMTP id t1-v6so27185886ott.13
+	for <qemu-devel@nongnu.org>; Sat, 05 May 2018 03:44:46 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1525396794-17042-1-git-send-email-mjc@sifive.com>
+References: <1525396794-17042-1-git-send-email-mjc@sifive.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 5 May 2018 11:44:25 +0100
+Message-ID: <CAFEAcA-U8U6Q4KWEC7bNt9sUkr8jdPLKaGnFmvQbWaTbWT4qAw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] device_tree: Add qemu_fdt_totalsize
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,95 +29,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kwolf@redhat.com, mreitz@redhat.com
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Michael Clark <mjc@sifive.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>, Alistair Francis <alistair.francis@wdc.com>, David Gibson <david@gibson.dropbear.id.au>
 
-qemu-img info with a block device which has a qcow2 format always
-return 0 for disk size, and this can not reflect the qcow2 size
-and the used space of the block device. This patch return the
-allocated size of qcow2 as the disk size.
+cc'ing David -- is this the best way to do this?
 
-Signed-off-by: Ivan Ren <ivanren@tencent.com>
----
- block/qcow2.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 54 insertions(+)
+(It would be nicer if libfdt would just dynamically
+reallocate the buffer as needed, and then tell you
+the final size, rather than having to specify a
+maximum buffer size up front, but given the API we
+have a "tell me how big this thing actually is"
+function seems reasonable. I'm just surprised we
+need to know so much about the DT internals to do it.)
 
-This version differs from the previous:
-(1).Accumulate all non-0 refcount cluster as the allocated size instead the
-highest offset.
-(2).Simplify the implementation by just check the refcount info.
+thanks
+-- PMM
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index ef68772..e64469a 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -4493,6 +4493,59 @@ static QemuOptsList qcow2_create_opts = {
-     }
- };
- 
-+/* Get allocated space of qcow2, aligned to cluster_size */
-+static int64_t qcow2_get_allocated_size(BlockDriverState *bs)
-+{
-+    int64_t allocated_cluster_count = 0;
-+    uint64_t refcount;
-+    int64_t i, j, begin_index, end_index;
-+
-+    BDRVQcow2State *s = bs->opaque;
-+
-+    /* Traverse refcount table */
-+    for (i = 0; i < s->refcount_table_size; i++) {
-+        if (s->refcount_table[i] & REFT_OFFSET_MASK) {
-+            begin_index = i * s->refcount_block_size;
-+            end_index = begin_index + s->refcount_block_size;
-+            for (j = begin_index; j < end_index; j++) {
-+                if (qcow2_get_refcount(bs, j, &refcount) < 0) {
-+                    continue;
-+                }
-+                if (refcount > 0) {
-+                    allocated_cluster_count++;
-+                }
-+            }
-+        }
-+
-+    }
-+
-+    return allocated_cluster_count * s->cluster_size;
-+}
-+
-+static int64_t qcow2_get_allocated_file_size(BlockDriverState *bs)
-+{
-+    int64_t ret = 0;
-+
-+    /* Get through bs->file first */
-+    if (bs->file) {
-+        ret = bdrv_get_allocated_file_size(bs->file->bs);
-+    }
-+
-+    /*
-+     * If ret < 0, some error may happen to the underlying media, return the
-+     * error directly.
-+     * If ret == 0, means length get from bs->file is 0, which is impossible
-+     * for a normal file because of the qcow2 header. In this case, the
-+     * underlying media may be a block device or anything else that can't
-+     * return a suitable size. So we get the allocated size of qcow2 instead.
-+     */
-+    if (!ret) {
-+        ret = qcow2_get_allocated_size(bs);
-+    }
-+
-+    return ret;
-+}
-+
- BlockDriver bdrv_qcow2 = {
-     .format_name        = "qcow2",
-     .instance_size      = sizeof(BDRVQcow2State),
-@@ -4516,6 +4569,7 @@ BlockDriver bdrv_qcow2 = {
-     .bdrv_co_pwrite_zeroes  = qcow2_co_pwrite_zeroes,
-     .bdrv_co_pdiscard       = qcow2_co_pdiscard,
-     .bdrv_truncate          = qcow2_truncate,
-+    .bdrv_get_allocated_file_size = qcow2_get_allocated_file_size,
-     .bdrv_co_pwritev_compressed = qcow2_co_pwritev_compressed,
-     .bdrv_make_empty        = qcow2_make_empty,
- 
--- 
-1.8.3.1
+On 4 May 2018 at 02:19, Michael Clark <mjc@sifive.com> wrote:
+> Currently the device-tree create_device_tree function
+> returns the size of the allocated device tree buffer
+> however there is no way to get the actual amount of
+> buffer space used by the device-tree.
+>
+> 14ec3cbd7c1e31dca4d23f028100c8f43e156573 increases
+> the FDT_MAX_SIZE to 1 MiB. This creates an issue
+> for boards that have less than 1 MiB in their ROM
+> for device tree. While cpu_physical_memory_write
+> will not write past the end of a buffer there is
+> and a board is aware of its ROM buffer size, so
+> can use min(fdt_size,rom_size); this provides no
+> indication as to whether the device-tree may be
+> truncated. qemu_fdt_totalsize allows a board to
+> check that a dynamically created device tree will
+> fit within its alloted ROM space.
+>
+> Add qemu_fdt_totalsize which uses the logic and
+> public APIs from libfdt to calculate the device
+> size: struct_offset + struct_size + strings_size
+> + terminator.
+>
+> Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+> Cc: Alexander Graf <agraf@suse.de>
+> Cc: Alistair Francis <Alistair.Francis@wdc.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  device_tree.c                | 6 ++++++
+>  include/sysemu/device_tree.h | 6 ++++++
+>  2 files changed, 12 insertions(+)
+>
+> diff --git a/device_tree.c b/device_tree.c
+> index 52c3358a5583..3a2166d61f37 100644
+> --- a/device_tree.c
+> +++ b/device_tree.c
+> @@ -215,6 +215,12 @@ void *load_device_tree_from_sysfs(void)
+>
+>  #endif /* CONFIG_LINUX */
+>
+> +size_t qemu_fdt_totalsize(void *fdt)
+> +{
+> +    return fdt_off_dt_struct(fdt) + fdt_size_dt_struct(fdt) +
+> +           fdt_size_dt_strings(fdt) + sizeof(uint32_t) /* terminator */;
+> +}
+> +
+>  static int findnode_nofail(void *fdt, const char *node_path)
+>  {
+>      int offset;
+> diff --git a/include/sysemu/device_tree.h b/include/sysemu/device_tree.h
+> index e22e5bec9c3f..4af232dfdc65 100644
+> --- a/include/sysemu/device_tree.h
+> +++ b/include/sysemu/device_tree.h
+> @@ -26,6 +26,12 @@ void *load_device_tree_from_sysfs(void);
+>  #endif
+>
+>  /**
+> + * qemu_fdt_total_size: returns the size required to store the current
+> + * device tree versus the buffer size returned by create_device_tree
+> + */
+> +size_t qemu_fdt_totalsize(void *fdt);
+> +
+> +/**
+>   * qemu_fdt_node_path: return the paths of nodes matching a given
+>   * name and compat string
+>   * @fdt: pointer to the dt blob
+> --
+> 2.7.0
