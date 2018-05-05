@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fEom0-0001C4-Jn
-	for qemu-devel@nongnu.org; Sat, 05 May 2018 00:26:18 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fEosZ-0002FB-8J
+	for qemu-devel@nongnu.org; Sat, 05 May 2018 00:33:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fEolx-0007oB-CV
-	for qemu-devel@nongnu.org; Sat, 05 May 2018 00:26:16 -0400
-Date: Sat, 5 May 2018 14:26:04 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fEosX-0002XF-M7
+	for qemu-devel@nongnu.org; Sat, 05 May 2018 00:33:03 -0400
+Date: Sat, 5 May 2018 14:29:44 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180505042604.GJ13229@umbus.fritz.box>
+Message-ID: <20180505042944.GL13229@umbus.fritz.box>
 References: <20180419124331.3915-1-clg@kaod.org>
-	<20180419124331.3915-5-clg@kaod.org>
-	<20180424065131.GQ19804@umbus.fritz.box>
-	<5def5bbb-9842-0121-e889-014ba88fd4c5@kaod.org>
-	<20180426042002.GF8800@umbus.fritz.box>
-	<660d1e36-b269-0202-7ac5-570479bb4083@kaod.org>
-	<20180503052205.GQ13229@umbus.fritz.box>
-	<a671a058-ab56-6a97-d172-7fa22dca1f25@kaod.org>
-	<20180504033325.GR13229@umbus.fritz.box>
-	<504aeada-4eb9-3969-a3a0-a0e03d9d19b8@kaod.org>
+	<20180419124331.3915-8-clg@kaod.org>
+	<20180426072501.GK8800@umbus.fritz.box>
+	<312cdfe7-bc6b-3eed-588e-a71ce1385988@kaod.org>
+	<20180503054534.GU13229@umbus.fritz.box>
+	<cf8ab4bd-8704-aa3f-a4c2-5f459c7dddd4@kaod.org>
+	<20180503062559.GW13229@umbus.fritz.box>
+	<20cd899d-47be-f9a3-736b-bf3bcd10cfad@kaod.org>
+	<20180504051940.GW13229@umbus.fritz.box>
+	<9cc1092b-6312-aa6c-1fcd-8e6e7756aab7@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="qWV9ymU6UYcl1Snp"
+	protocol="application/pgp-signature"; boundary="2HnjjwBZJnP787BF"
 Content-Disposition: inline
-In-Reply-To: <504aeada-4eb9-3969-a3a0-a0e03d9d19b8@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v3 04/35] spapr/xive: introduce a XIVE
- interrupt controller for sPAPR
+In-Reply-To: <9cc1092b-6312-aa6c-1fcd-8e6e7756aab7@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v3 07/35] spapr/xive: introduce the XIVE
+ Event Queues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,159 +37,230 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---qWV9ymU6UYcl1Snp
+--2HnjjwBZJnP787BF
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 04, 2018 at 03:05:08PM +0200, C=E9dric Le Goater wrote:
-> On 05/04/2018 05:33 AM, David Gibson wrote:
-> > On Thu, May 03, 2018 at 06:50:09PM +0200, C=E9dric Le Goater wrote:
-> >> On 05/03/2018 07:22 AM, David Gibson wrote:
-> >>> On Thu, Apr 26, 2018 at 12:43:29PM +0200, C=E9dric Le Goater wrote:
-> >>>> On 04/26/2018 06:20 AM, David Gibson wrote:
-> >>>>> On Tue, Apr 24, 2018 at 11:46:04AM +0200, C=E9dric Le Goater wrote:
-> >>>>>> On 04/24/2018 08:51 AM, David Gibson wrote:
-> >>>>>>> On Thu, Apr 19, 2018 at 02:43:00PM +0200, C=E9dric Le Goater wrot=
+On Fri, May 04, 2018 at 03:29:02PM +0200, C=E9dric Le Goater wrote:
+> On 05/04/2018 07:19 AM, David Gibson wrote:
+> > On Thu, May 03, 2018 at 04:37:29PM +0200, C=E9dric Le Goater wrote:
+> >> On 05/03/2018 08:25 AM, David Gibson wrote:
+> >>> On Thu, May 03, 2018 at 08:07:54AM +0200, C=E9dric Le Goater wrote:
+> >>>> On 05/03/2018 07:45 AM, David Gibson wrote:
+> >>>>> On Thu, Apr 26, 2018 at 11:48:06AM +0200, C=E9dric Le Goater wrote:
+> >>>>>> On 04/26/2018 09:25 AM, David Gibson wrote:
+> >>>>>>> On Thu, Apr 19, 2018 at 02:43:03PM +0200, C=E9dric Le Goater wrot=
 e:
-> >>>>>>>> sPAPRXive is a model for the XIVE interrupt controller device of=
- the
-> >>>>>>>> sPAPR machine. It holds the routing XIVE table, the Interrupt
-> >>>>>>>> Virtualization Entry (IVE) table which associates interrupt sour=
-ce
-> >>>>>>>> numbers with targets.
-> >>>>>>>>
-> >>>>>>>> Also extend the XiveFabric with an accessor to the IVT. This wil=
-l be
-> >>>>>>>> needed by the routing algorithm.
-> >>>>>>>>
-> >>>>>>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> >>>>>>>> ---
-> >>>>>>>>
-> >>>>>>>>  May be should introduce a XiveRouter model to hold the IVT. To =
-be
-> >>>>>>>>  discussed.
-> >>>>>>>
-> >>>>>>> Yeah, maybe.  Am I correct in thinking that on pnv there could be=
- more
-> >>>>>>> than one XiveRouter?
-> >>>>>>
-> >>>>>> There is only one, the main IC.=20
-> >>>>>
-> >>>>> Ok, that's what I thought originally.  In that case some of the stu=
-ff
-> >>>>> in the patches really doesn't make sense to me.
-> >>>>
-> >>>> well, there is one IC per chip on powernv, but we haven't reach that=
- part
-> >>>> yet.
-> >>>
-> >>> Hmm.  There's some things we can delay dealing with, but I don't think
-> >>> this is one of them.  I think we need to understand how multichip is
-> >>> going to work in order to come up with a sane architecture.  Otherwise
-> >>> I fear we'll end up with something that we either need to horribly
-> >>> bastardize for multichip, or have to rework things dramatically
-> >>> leading to migration nightmares.
-> >>
-> >> So, it is all controlled by MMIO, so we should be fine on that part.=
-=20
-> >> As for the internal tables, they are all configured by firmware, using
-> >> a chip identifier (block). I need to check how the remote XIVE are=20
-> >> accessed. I think this is by MMIO.=20
-> >=20
-> > Right, but for powernv we execute OPAL inside the VM, rather than
-> > emulating its effects.  So we still need to model the actual hardware
-> > interfaces.  OPAL hides the details from the kernel, but not from us
-> > on the other side.
->=20
-> Yes. This is the case in the current model. I took a look today and
-> I have a few fixes for the MMIO layout for P9 chips which I will send.
->=20
-> As for XIVE, the model needs to be a little more  complex to support=20
-> VSD_MODE_FORWARD tables which describe how to forward a notification
-> to another XIVE IC on another chip. They contain an address on which=20
-> to load, This is another hop in the notification chain. =20
-
-Ah, ok.  So is that mode and address configured in the (bare metal)
-IVT as well?  Or is that a different piece of configuration?
-
-> >> I haven't looked at multichip XIVE support but I am not too worried as=
-=20
-> >> the framework is already in place for the machine.
-> >> =20
-> >>>>>>> If we did have a XiveRouter, I'm not sure we'd need the XiveFabric
-> >>>>>>> interface, possibly its methods could just be class methods of
-> >>>>>>> XiveRouter.
-> >>>>>>
-> >>>>>> Yes. We could introduce a XiveRouter to share the ivt table betwee=
-n=20
-> >>>>>> the sPAPRXive and the PnvXIVE models, the interrupt controllers of
-> >>>>>> the machines. Methods would provide way to get the ivt/eq/nvt
-> >>>>>> objects required for routing. I need to add a set_eq() to push the
-> >>>>>> EQ data.
-> >>>>>
-> >>>>> Hrm.  Well, to add some more clarity, let's say the XiveRouter is t=
+> >>>>>>>> The Event Queue Descriptor (EQD) table is an internal table of t=
 he
-> >>>>> object which owns the IVT. =20
+> >>>>>>>> XIVE routing sub-engine. It specifies on which Event Queue the e=
+vent
+> >>>>>>>> data should be posted when an exception occurs (later on pulled =
+by the
+> >>>>>>>> OS) and which Virtual Processor to notify.
+> >>>>>>>
+> >>>>>>> Uhhh.. I thought the IVT said which queue and vp to notify, and t=
+he
+> >>>>>>> EQD gave metadata for event queues.
+> >>>>>>
+> >>>>>> yes. the above poorly written. The Event Queue Descriptor contains=
+ the
+> >>>>>> guest address of the event queue in which the data is written. I w=
+ill=20
+> >>>>>> rephrase.     =20
+> >>>>>>
+> >>>>>> The IVT contains IVEs which indeed define for an IRQ which EQ to n=
+otify=20
+> >>>>>> and what data to push on the queue.=20
+> >>>>>> =20
+> >>>>>>>> The Event Queue is a much
+> >>>>>>>> more complex structure but we start with a simple model for the =
+sPAPR
+> >>>>>>>> machine.
+> >>>>>>>>
+> >>>>>>>> There is one XiveEQ per priority and these are stored under the =
+XIVE
+> >>>>>>>> virtualization presenter (sPAPRXiveNVT). EQs are simply indexed =
+with :
+> >>>>>>>>
+> >>>>>>>>        (server << 3) | (priority & 0x7)
+> >>>>>>>>
+> >>>>>>>> This is not in the XIVE architecture but as the EQ index is never
+> >>>>>>>> exposed to the guest, in the hcalls nor in the device tree, we a=
+re
+> >>>>>>>> free to use what fits best the current model.
+> >>>>>>
+> >>>>>> This EQ indexing is important to notice because it will also show =
+up=20
+> >>>>>> in KVM to build the IVE from the KVM irq state.
+> >>>>>
+> >>>>> Ok, are you saying that while this combined EQ index will never app=
+ear
+> >>>>> in guest <-> host interfaces,=20
 > >>>>
-> >>>> OK. that would be a model with some state and not an interface.
-> >>>
-> >>> Yes.  For papr variant it would have the whole IVT contents as its
-> >>> state.  For the powernv, just the registers telling it where to find
-> >>> the IVT in RAM.
-> >>>
-> >>>>> It may or may not do other stuff as well.
+> >>>> Indeed.
 > >>>>
-> >>>> Its only task would be to do the final event routing: get the IVE,
-> >>>> get the EQ, push the EQ DATA in the OS event queue, notify the CPU.
+> >>>>> it might show up in qemu <-> KVM interfaces?
+> >>>>
+> >>>> Not directly but it is part of the IVE as the IVE_EQ_INDEX field. Wh=
+en
+> >>>> dumped, it has to be built in some ways, compatible with the emulate=
+d=20
+> >>>> mode in QEMU.=20
 > >>>
-> >>> That seems like a lot of steps.  Up to push the EQ DATA, certainly.
-> >>> And I guess it'll have to ping an NVT somehow, but I'm not sure it
-> >>> should know about CPUs as such.
+> >>> Hrm.  But is the exact IVE contents visible to qemu (for a PAPR
+> >>> guest)? =20
 > >>
-> >> For PowerNV, the concept could be generalized, yes. An NVT can=20
-> >> contain the interrupt state of a logical server but the common=20
-> >> case is baremetal without guests for QEMU and so we have a NVT=20
-> >> per cpu.=20
+> >> The guest only uses hcalls which arguments are :
+> >> =20
+> >> 	- cpu numbers,
+> >> 	- priority numbers from defined ranges,=20
+> >> 	- logical interrupt numbers. =20
+> >> 	- physical address of the EQ=20
+> >>
+> >> The visible parts for the guest of the IVE are the 'priority', the 'cp=
+u',=20
+> >> and the 'eisn', which is the effective IRQ number the guest is assigni=
+ng=20
+> >> to the source. The 'eisn" will be pushed in the EQ.
 > >=20
-> > Hmm.  We eventually want to support a kernel running guests under
-> > qemu/powernv though, right? =20
->=20
-> arg. an emulated hypervisor ! OK let's say this is a long term goal :)=20
->=20
-> > So even if we don't allow it right now,
-> > we don't want allowing that to require major surgery to our
-> > architecture.
->=20
-> That I agree on.=20
->=20
-> >> PowerNV will have some limitation but we can make it better than=20
-> >> today for sure. It boots.
-> >>
-> >> We can improve some of the NVT notification process, the way NVT=20
-> >> are matched eventually. may be support remote engines if the
-> >> NVT is not local. I have not looked at the details.
-> >>
-> >>> I'm not sure at this stage what should own the EQD table.
-> >>
-> >> The EQDT is in RAM.
+> > Ok.
 > >=20
-> > Not for spapr, it's not. =20
+> >> The IVE EQ index is not visible.
+> >=20
+> > Good.
+> >=20
+> >>> I would have thought the qemu <-> KVM interfaces would have
+> >>> abstracted this the same way the guest <-> KVM interfaces do.  > Or i=
+s there a reason not to?
+> >>
+> >> It is practical to dump 64bit IVEs directly from KVM into the QEMU=20
+> >> internal structures because it fits the emulated mode without doing=20
+> >> any translation ... This might be seen as a shortcut. You will tell=20
+> >> me when you reach the KVM part.  =20
+> >=20
+> > Ugh.. exposing to qemu the raw IVEs sounds like a bad idea to me.
 >=20
-> yeah ok. It's in QEMU/KVM.
->=20
-> > And even when it is in RAM, something needs
-> > to own the register that gives its base address.
->=20
-> It's more complex than registers on powernv. There is a procedure
-> to define the XIVE tables using XIVE table descriptors which contain
-> their characteristics, size, indirect vs. indirect, local vs remote.
-> OPAL/skiboot defines all these to configure the HW, and the model
-> necessarily needs to support the same interface. This is the case
-> for a single chip.
+> You definitely need to in QEMU in emulation mode. The whole routing=20
+> relies on it.=20
 
-Ah, ok.  So there's some sort of IVTD.  Also in RAM?  Eventually there
-must be a register giving the base address of the IVTD, yes?
+I'm not exactly sure what you mean by "emulation mode" here.  Above,
+I'm talking specifically about a KVM HV, PAPR guest.
+
+> > When we migrate, we're going to have to assign the guest (server,
+> > priority) tuples to host EQ indicies, and I think it makes more sense
+> > to do that in KVM and hide the raw indices from qemu than to have qemu
+> > mangle them explicitly on migration.
+>=20
+> We will need some mangling mechanism for the KVM ioctls saving and
+> restoring state. This is very similar to XICS.=20
+> =20
+> >>>>>>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> >>>>>>>
+> >>>>>>> Is the EQD actually modifiable by a guest?  Or are the settings o=
+f the
+> >>>>>>> EQs fixed by PAPR?
+> >>>>>>
+> >>>>>> The guest uses the H_INT_SET_QUEUE_CONFIG hcall to define the addr=
+ess
+> >>>>>> of the event queue for a couple prio/server.
+> >>>>>
+> >>>>> Ok, so the EQD can be modified by the guest.  In which case we need=
+ to
+> >>>>> work out what object owns it, since it'll need to migrate it.
+> >>>>
+> >>>> Indeed. The EQD are CPU related as there is one EQD per couple (cpu,=
+=20
+> >>>> priority). The KVM patchset dumps/restores the eight XiveEQ struct=
+=20
+> >>>> using per cpu ioctls. The EQ in the OS RAM is marked dirty at that
+> >>>> stage.
+> >>>
+> >>> To make sure I'm clear: for PAPR there's a strict relationship between
+> >>> EQD and CPU (one EQD for each (cpu, priority) tuple). =20
+> >>
+> >> Yes.
+> >>
+> >>> But for powernv that's not the case, right? =20
+> >>
+> >> It is.
+> >=20
+> > Uh.. I don't think either of us phrased that well, I'm still not sure
+> > which way you're answering that.
+>=20
+> there's a strict relationship between EQD and CPU (one EQD for each (cpu,=
+ priority) tuple) in spapr and in powernv.
+
+For powernv that seems to be contradicted by what you say below.
+AFAICT there might be a strict association at the host kernel or even
+the OPAL level, but not at the hardware level.
+
+> >>> AIUI the mapping of EQs to cpus was configurable, is that right?
+> >>
+> >> Each cpu has 8 EQD. Same for virtual cpus.
+> >=20
+> > Hmm.. but is that 8 EQD per cpu something built into the hardware, or
+> > just a convention of how the host kernel and OPAL operate?
+>=20
+> It's not in the HW, it is used by the HW to route the notification.=20
+> The EQD contains the EQ characteristics :
+>=20
+> * functional bits :
+>   - valid bit
+>   - enqueue bit, to update OS in RAM EQ or not
+>   - unconditional notification
+>   - backlog
+>   - escalation
+>   - ...
+> * OS EQ fields=20
+>   - physical address
+>   - entry index
+>   - toggle bit
+> * NVT fields
+>   - block/chip
+>   - index
+> * etc.
+>=20
+> It's a big structure : 8 words.
+
+Ok.  So yeah, the cpu association of the EQ is there in the NVT
+fields, not baked into the hardware.
+
+> The EQD table is allocated by OPAL/skiboot and fed to the HW for
+> its use. The OS powernv uses OPAL calls  configure the EQD with its=20
+> needs :=20
+>=20
+> int64_t opal_xive_set_queue_info(uint64_t vp, uint32_t prio,
+> 				 uint64_t qpage,
+> 				 uint64_t qsize,
+> 				 uint64_t qflags);
+>=20
+>=20
+> sPAPR uses an hcall :
+>=20
+> static long plpar_int_set_queue_config(unsigned long flags,
+> 				       unsigned long target,
+> 				       unsigned long priority,
+> 				       unsigned long qpage,
+> 				       unsigned long qsize)
+>=20
+>=20
+> but it is translated in an OPAL call in KVM.
+>=20
+> C.
+>=20
+> =20
+> > =20
+> >>
+> >> I am not sure what you understood before ? It is surely something
+> >> I wrote, my XIVE understanding is still making progress.
+> >>
+> >>
+> >> C.
+> >>
+> >=20
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -197,24 +268,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---qWV9ymU6UYcl1Snp
+--2HnjjwBZJnP787BF
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrtMlwACgkQbDjKyiDZ
-s5LdGRAAtkjvaA7mK2JGdjLwn+VYpvdXwSmtj08W1rXC80o4xz4wFmMvsonE+xQi
-RwXfkja1h8O8d2qPsT4qPLnQUdE0YDqpaX6YC1WUDn9Wi5NdYBVqJjOIdvrblIDX
-2/KO4HXFFvUCh6q+4MsSbozfNYuGXC5pO3Rggl6nL6v+mtYmJgX5C80C6W/ye1S0
-2QW3oZ8u1J8HLQJsbVZnktN0oc3ZeL3kWHMFi4yQfVP2PdOuB7osD01d2ZPlM8fA
-v3eHsNVDeqlhY4IvpEokRTkKubpbIUBkAINEy0a6k+0+J4kDQK8eDd0yjdutaURT
-BQnBvZL+ciqCMoGdzP5OhNDbLipzW8459zyIS+ff4uLKI0pueCf+CKBl9L6tH263
-YQoT9HtZWhFyyGKy9NpmR3cF5AnELQuMDOP3hUY5j9odWahG0wx83TT8bAUBcVAf
-G1gtdWORfNc8gcCOGj5/xBlS/vlKzKi4YEACUbeXYkolsHW/+WMSfGvUQ5pvGJyL
-20aHiccydeHfma0JGNM11NzpGPI5lFiG82JMfbaLVKDpcpmW/BpSNxLEKLxVnT7n
-+V1V4/eRPwu8GLedBu/Ab1ZqOG4eG0+d+VWpVU2LEmxRmAqv486ByQPEMwlXSxxG
-76Frj5ShfULoRn6rJ3SNBnIkltbciUnQI/bLxz/WS8DBdKRTUdk=
-=3an+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrtMzgACgkQbDjKyiDZ
+s5L0GQ//fFiBAYq+4SsM2B7zCT/VlzZSAImqvRL5Y+05K0WPZ9aDx92+bNhgU6E4
+lDcEv2H8rWEXdgBAnQ0DRZpf81uJGwPc5dLiXGbme3JXLrPOXtieMtWEMJW5GPtL
+SjMp0TJGQG1/Ns32We7jLScfgWj43dwq4F/3bvT5mlpICH/kYc8jqkJbPojNjkkS
+bPzQ3xJq4+TeTiSVoDWTW/GQIKxbXmLkipB1SZKhl3VD7Ythb1MHB0NF/AQcnX6E
+zQ3jBVMNFCMB5jfzOmUMyBX0+t2hqOXfCYCkAASnRmrgNHg+HAwaVxE+a6VOwZfU
+QJxU+jDDuZGZPp2/zmqv5iHLxuSt2QEYBD0h6LAj9CraE7IIMg7nj72ZIYOfvb3e
+BIjuyAHxWthDrr7crarrxp8OfnmNBLjjAaSP3i6hFOyR2p0aHasfPOADEF88GU5w
+XSGNRuenXGr42irhSt1iKnL5t3FxjAD+A4eUT4uhuv9nkca/5dZpEBIiUB7xbwGx
+tK6cVnGLbuod/XjEpckVaNmsgpVoYSPxVuNdFhjtRIcFWDy0Fjv6W+sF9qKNOrEa
+4ADxJLpejn3XTHg+NvHPdtg3+LI7ok7d+QXRfgsgZgURsfBCf4Z6IZhbpFWVVzTE
+j/2YpYf1IuRuwv9VQassTzSoDHQ0ItF9yBNWnyVIjc6/A4P+Lfc=
+=bMZ0
 -----END PGP SIGNATURE-----
 
---qWV9ymU6UYcl1Snp--
+--2HnjjwBZJnP787BF--
