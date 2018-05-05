@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1fF6k5-0004D6-0M
-	for qemu-devel@nongnu.org; Sat, 05 May 2018 19:37:32 -0400
+	(envelope-from <mjc@sifive.com>) id 1fF6k9-0004Es-Dt
+	for qemu-devel@nongnu.org; Sat, 05 May 2018 19:37:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1fF6k1-0003oe-6g
-	for qemu-devel@nongnu.org; Sat, 05 May 2018 19:37:29 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:39477)
+	(envelope-from <mjc@sifive.com>) id 1fF6k8-0003sG-F0
+	for qemu-devel@nongnu.org; Sat, 05 May 2018 19:37:33 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:43428)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fF6k1-0003oI-1J
-	for qemu-devel@nongnu.org; Sat, 05 May 2018 19:37:25 -0400
-Received: by mail-pg0-x242.google.com with SMTP id e1-v6so6431881pga.6
-	for <qemu-devel@nongnu.org>; Sat, 05 May 2018 16:37:24 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fF6k8-0003ru-8a
+	for qemu-devel@nongnu.org; Sat, 05 May 2018 19:37:32 -0400
+Received: by mail-pf0-x243.google.com with SMTP id j20so5775137pff.10
+	for <qemu-devel@nongnu.org>; Sat, 05 May 2018 16:37:32 -0700 (PDT)
 From: Michael Clark <mjc@sifive.com>
-Date: Sun,  6 May 2018 11:35:15 +1200
-Message-Id: <1525563325-62963-11-git-send-email-mjc@sifive.com>
+Date: Sun,  6 May 2018 11:35:17 +1200
+Message-Id: <1525563325-62963-13-git-send-email-mjc@sifive.com>
 In-Reply-To: <1525563325-62963-1-git-send-email-mjc@sifive.com>
 References: <1525563325-62963-1-git-send-email-mjc@sifive.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 10/20] RISC-V: Remove EM_RISCV ELF_MACHINE
- indirection
+Subject: [Qemu-devel] [PULL 12/20] RISC-V: Update E and I extension order
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,87 +26,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: patches@groups.riscv.org, Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>
+Cc: patches@groups.riscv.org, Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>
 
-Pointless indirection. Other ports use EM_ constants directly.
+Section 22.8 Subset Naming Convention of the RISC-V ISA Specification
+defines the canonical order for extensions in the ISA string. It is
+silent on the position of the E extension however E is a substitute
+for I so it must come early in the extension list order. A comment
+is added to state E and I are mutually exclusive, as the E extension
+will be added to the RISC-V port in the future.
 
 Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
 Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: Palmer Dabbelt <palmer@sifive.com>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>
 Signed-off-by: Michael Clark <mjc@sifive.com>
-Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- hw/riscv/sifive_e.c | 2 +-
- hw/riscv/sifive_u.c | 2 +-
- hw/riscv/spike.c    | 2 +-
- hw/riscv/virt.c     | 2 +-
- target/riscv/cpu.h  | 1 -
- 5 files changed, 4 insertions(+), 5 deletions(-)
+ target/riscv/cpu.c | 2 +-
+ target/riscv/cpu.h | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-index 22dc526713c2..6fa223818502 100644
---- a/hw/riscv/sifive_e.c
-+++ b/hw/riscv/sifive_e.c
-@@ -88,7 +88,7 @@ static uint64_t load_kernel(const char *kernel_filename)
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 5a527fbba0bd..4e5a56d4e312 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -26,7 +26,7 @@
  
-     if (load_elf(kernel_filename, NULL, NULL,
-                  &kernel_entry, NULL, &kernel_high,
--                 0, ELF_MACHINE, 1, 0) < 0) {
-+                 0, EM_RISCV, 1, 0) < 0) {
-         error_report("qemu: could not load kernel '%s'", kernel_filename);
-         exit(1);
-     }
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 5bb495ab9a6c..84afed4c3b0e 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -74,7 +74,7 @@ static uint64_t load_kernel(const char *kernel_filename)
+ /* RISC-V CPU definitions */
  
-     if (load_elf(kernel_filename, NULL, NULL,
-                  &kernel_entry, NULL, &kernel_high,
--                 0, ELF_MACHINE, 1, 0) < 0) {
-+                 0, EM_RISCV, 1, 0) < 0) {
-         error_report("qemu: could not load kernel '%s'", kernel_filename);
-         exit(1);
-     }
-diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
-index 44eab94e17ef..9e18c618bfbb 100644
---- a/hw/riscv/spike.c
-+++ b/hw/riscv/spike.c
-@@ -64,7 +64,7 @@ static uint64_t load_kernel(const char *kernel_filename)
-     uint64_t kernel_entry, kernel_high;
+-static const char riscv_exts[26] = "IMAFDQECLBJTPVNSUHKORWXYZG";
++static const char riscv_exts[26] = "IEMAFDQCLBJTPVNSUHKORWXYZG";
  
-     if (load_elf_ram_sym(kernel_filename, NULL, NULL,
--            &kernel_entry, NULL, &kernel_high, 0, ELF_MACHINE, 1, 0,
-+            &kernel_entry, NULL, &kernel_high, 0, EM_RISCV, 1, 0,
-             NULL, true, htif_symbol_callback) < 0) {
-         error_report("qemu: could not load kernel '%s'", kernel_filename);
-         exit(1);
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index 88b9ad509315..7ef9ba26debc 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -68,7 +68,7 @@ static uint64_t load_kernel(const char *kernel_filename)
- 
-     if (load_elf(kernel_filename, NULL, NULL,
-                  &kernel_entry, NULL, &kernel_high,
--                 0, ELF_MACHINE, 1, 0) < 0) {
-+                 0, EM_RISCV, 1, 0) < 0) {
-         error_report("qemu: could not load kernel '%s'", kernel_filename);
-         exit(1);
-     }
+ const char * const riscv_int_regnames[] = {
+   "zero", "ra  ", "sp  ", "gp  ", "tp  ", "t0  ", "t1  ", "t2  ",
 diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index 41e06ac0f91d..9871e6feb1de 100644
+index 9871e6feb1de..1dcbdbe6f77d 100644
 --- a/target/riscv/cpu.h
 +++ b/target/riscv/cpu.h
-@@ -34,7 +34,6 @@
+@@ -71,6 +71,7 @@
+ #define RV(x) ((target_ulong)1 << (x - 'A'))
  
- #define TCG_GUEST_DEFAULT_MO 0
- 
--#define ELF_MACHINE EM_RISCV
- #define CPUArchState struct CPURISCVState
- 
- #include "qemu-common.h"
+ #define RVI RV('I')
++#define RVE RV('E') /* E and I are mutually exclusive */
+ #define RVM RV('M')
+ #define RVA RV('A')
+ #define RVF RV('F')
 -- 
 2.7.0
