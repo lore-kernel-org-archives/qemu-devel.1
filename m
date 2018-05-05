@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54180)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1fF6jY-0003mk-AH
-	for qemu-devel@nongnu.org; Sat, 05 May 2018 19:36:57 -0400
+	(envelope-from <mjc@sifive.com>) id 1fF6jY-0003ml-SY
+	for qemu-devel@nongnu.org; Sat, 05 May 2018 19:36:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1fF6jT-0003Ve-Uy
+	(envelope-from <mjc@sifive.com>) id 1fF6jX-0003X5-5P
 	for qemu-devel@nongnu.org; Sat, 05 May 2018 19:36:56 -0400
-Received: from mail-pg0-x236.google.com ([2607:f8b0:400e:c05::236]:44997)
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:46606)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fF6jT-0003Un-Oy
-	for qemu-devel@nongnu.org; Sat, 05 May 2018 19:36:51 -0400
-Received: by mail-pg0-x236.google.com with SMTP id 82-v6so17771093pge.11
-	for <qemu-devel@nongnu.org>; Sat, 05 May 2018 16:36:51 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fF6jW-0003Wu-Td
+	for qemu-devel@nongnu.org; Sat, 05 May 2018 19:36:55 -0400
+Received: by mail-pf0-x242.google.com with SMTP id p12so20070389pff.13
+	for <qemu-devel@nongnu.org>; Sat, 05 May 2018 16:36:54 -0700 (PDT)
 From: Michael Clark <mjc@sifive.com>
-Date: Sun,  6 May 2018 11:35:05 +1200
-Message-Id: <1525563325-62963-1-git-send-email-mjc@sifive.com>
+Date: Sun,  6 May 2018 11:35:06 +1200
+Message-Id: <1525563325-62963-2-git-send-email-mjc@sifive.com>
+In-Reply-To: <1525563325-62963-1-git-send-email-mjc@sifive.com>
+References: <1525563325-62963-1-git-send-email-mjc@sifive.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 00/20] RISC-V: QEMU 2.13 Privileged ISA
- emulation updates
+Subject: [Qemu-devel] [PULL 01/20] RISC-V: Replace hardcoded constants with
+ enum values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,88 +29,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc: patches@groups.riscv.org, Michael Clark <mjc@sifive.com>, Alistair Francis <alistair.francis@xilinx.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+To: qemu-devel@nongnu.org
+Cc: patches@groups.riscv.org, Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>
 
-The following changes since commit c8b7e627b4269a3bc3ae41d9f420547a47e6d9b9:
+The RISC-V device-tree code has a number of hard-coded
+constants and this change moves them into header enums.
 
-  Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2018-05-04' into staging (2018-05-04 14:42:46 +0100)
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Signed-off-by: Michael Clark <mjc@sifive.com>
+Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ hw/riscv/sifive_clint.c         | 9 +++------
+ hw/riscv/sifive_u.c             | 6 ++++--
+ hw/riscv/spike.c                | 6 ++++--
+ hw/riscv/virt.c                 | 6 ++++--
+ include/hw/riscv/sifive_clint.h | 4 ++++
+ include/hw/riscv/sifive_u.h     | 4 ++++
+ include/hw/riscv/spike.h        | 4 ++++
+ include/hw/riscv/virt.h         | 4 ++++
+ 8 files changed, 31 insertions(+), 12 deletions(-)
 
-are available in the git repository at:
-
-  https://github.com/riscv/riscv-qemu.git tags/riscv-qemu-2.13-pull-20180506
-
-for you to fetch changes up to 5aec3247c190f10654250203a1742490ae7343a2:
-
-  RISC-V: Mark ROM read-only after copying in code (2018-05-06 10:54:21 +1200)
-
-----------------------------------------------------------------
-RISC-V: QEMU 2.13 Privileged ISA emulation updates
-
-Several code cleanups, minor specification conformance changes,
-fixes to make ROM read-only and add device-tree size checks.
-
-* Honour privileged ISA v1.10 counter enable CSRs.
-* Implements WARL behavior for CSRs that don't support writes
-  * Past behavior of raising traps was non-conformant
-    with the RISC-V Privileged ISA Specification v1.10.
-* Allow S-mode access to sstatus.MXR when priv ISA >= v1.10
-* Sets mtval/stval to zero on exceptions without addresses
-  * Past behavior of leaving the last value was non-conformant
-    with the RISC-V Privileged ISA Specition v1.10. mtval/stval
-    must be set on all exceptions; to zero if not supported.
-* Make ROMs read-only and implement device-tree size checks
-  * Uses memory_region_init_rom and rom_add_blob_fixed_as
-* Adds hexidecimal instruction bytes to disassembly output.
-* Fixes missing break statement for rv128 disassembly.
-* Several code cleanups
-  * Replacing hard-coded constants with enums
-  * Dead-code elimination
-
-This is an incremental pull that contains 20 reviewed changes out
-of 38 changes currently queued in the qemu-2.13-for-upstream branch.
-
-----------------------------------------------------------------
-Michael Clark (20):
-      RISC-V: Replace hardcoded constants with enum values
-      RISC-V: Make virt board description match spike
-      RISC-V: Use ROM base address and size from memmap
-      RISC-V: Remove identity_translate from load_elf
-      RISC-V: Remove unused class definitions
-      RISC-V: Include instruction hex in disassembly
-      RISC-V: Fix missing break statement in disassembler
-      RISC-V: Make some header guards more specific
-      RISC-V: Make virt header comment title consistent
-      RISC-V: Remove EM_RISCV ELF_MACHINE indirection
-      RISC-V: Remove erroneous comment from translate.c
-      RISC-V: Update E and I extension order
-      RISC-V: Hardwire satp to 0 for no-mmu case
-      RISC-V: Clear mtval/stval on exceptions without info
-      RISC-V: Allow S-mode mxr access when priv ISA >= v1.10
-      RISC-V: Use [ms]counteren CSRs when priv ISA >= v1.10
-      RISC-V: Add mcycle/minstret support for -icount auto
-      RISC-V: Make mtvec/stvec ignore vectored traps
-      RISC-V: No traps on writes to misa,minstret,mcycle
-      RISC-V: Mark ROM read-only after copying in code
-
- disas/riscv.c                   |  42 ++++++------
- hw/riscv/riscv_hart.c           |   6 --
- hw/riscv/sifive_clint.c         |   9 +--
- hw/riscv/sifive_e.c             |  54 +++------------
- hw/riscv/sifive_u.c             |  91 ++++++++++---------------
- hw/riscv/spike.c                | 104 +++++++++++++----------------
- hw/riscv/virt.c                 |  85 +++++++++---------------
- include/hw/riscv/sifive_clint.h |   4 ++
- include/hw/riscv/sifive_e.h     |   5 --
- include/hw/riscv/sifive_u.h     |   9 ++-
- include/hw/riscv/spike.h        |  15 ++---
- include/hw/riscv/virt.h         |  17 ++---
- target/riscv/cpu.c              |   2 +-
- target/riscv/cpu.h              |   8 +--
- target/riscv/helper.c           |   8 +++
- target/riscv/op_helper.c        | 143 +++++++++++++++++++++++++++++-----------
- target/riscv/translate.c        |   3 +-
- 17 files changed, 287 insertions(+), 318 deletions(-)
-
+diff --git a/hw/riscv/sifive_clint.c b/hw/riscv/sifive_clint.c
+index 4893453b70bf..7cc606e06546 100644
+--- a/hw/riscv/sifive_clint.c
++++ b/hw/riscv/sifive_clint.c
+@@ -26,13 +26,10 @@
+ #include "hw/riscv/sifive_clint.h"
+ #include "qemu/timer.h"
+ 
+-/* See: riscv-pk/machine/sbi_entry.S and arch/riscv/kernel/time.c */
+-#define TIMER_FREQ (10 * 1000 * 1000)
+-
+ static uint64_t cpu_riscv_read_rtc(void)
+ {
+-    return muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL), TIMER_FREQ,
+-                    NANOSECONDS_PER_SECOND);
++    return muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
++        SIFIVE_CLINT_TIMEBASE_FREQ, NANOSECONDS_PER_SECOND);
+ }
+ 
+ /*
+@@ -59,7 +56,7 @@ static void sifive_clint_write_timecmp(RISCVCPU *cpu, uint64_t value)
+     diff = cpu->env.timecmp - rtc_r;
+     /* back to ns (note args switched in muldiv64) */
+     next = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+-        muldiv64(diff, NANOSECONDS_PER_SECOND, TIMER_FREQ);
++        muldiv64(diff, NANOSECONDS_PER_SECOND, SIFIVE_CLINT_TIMEBASE_FREQ);
+     timer_mod(cpu->env.timer, next);
+ }
+ 
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 66616bacd77c..1bd2bde9b871 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -122,7 +122,8 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+     g_free(nodename);
+ 
+     qemu_fdt_add_subnode(fdt, "/cpus");
+-    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency", 10000000);
++    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency",
++        SIFIVE_CLINT_TIMEBASE_FREQ);
+     qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
+     qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
+ 
+@@ -131,7 +132,8 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+         char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+         char *isa = riscv_isa_string(&s->soc.harts[cpu]);
+         qemu_fdt_add_subnode(fdt, nodename);
+-        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency", 1000000000);
++        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
++                              SIFIVE_U_CLOCK_FREQ);
+         qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
+         qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
+         qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
+diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+index 62857e4fa0b8..ae82f4eb6341 100644
+--- a/hw/riscv/spike.c
++++ b/hw/riscv/spike.c
+@@ -115,7 +115,8 @@ static void create_fdt(SpikeState *s, const struct MemmapEntry *memmap,
+     g_free(nodename);
+ 
+     qemu_fdt_add_subnode(fdt, "/cpus");
+-    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency", 10000000);
++    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency",
++        SIFIVE_CLINT_TIMEBASE_FREQ);
+     qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
+     qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
+ 
+@@ -124,7 +125,8 @@ static void create_fdt(SpikeState *s, const struct MemmapEntry *memmap,
+         char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+         char *isa = riscv_isa_string(&s->soc.harts[cpu]);
+         qemu_fdt_add_subnode(fdt, nodename);
+-        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency", 1000000000);
++        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
++                              SPIKE_CLOCK_FREQ);
+         qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
+         qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
+         qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index 4f69eb2cff7a..2480dad11f08 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -145,7 +145,8 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
+     g_free(nodename);
+ 
+     qemu_fdt_add_subnode(fdt, "/cpus");
+-    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency", 10000000);
++    qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency",
++                          SIFIVE_CLINT_TIMEBASE_FREQ);
+     qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
+     qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
+ 
+@@ -155,7 +156,8 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
+         char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+         char *isa = riscv_isa_string(&s->soc.harts[cpu]);
+         qemu_fdt_add_subnode(fdt, nodename);
+-        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency", 1000000000);
++        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
++                              VIRT_CLOCK_FREQ);
+         qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
+         qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
+         qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
+diff --git a/include/hw/riscv/sifive_clint.h b/include/hw/riscv/sifive_clint.h
+index aaa2a58c6e96..e2865be1d18b 100644
+--- a/include/hw/riscv/sifive_clint.h
++++ b/include/hw/riscv/sifive_clint.h
+@@ -47,4 +47,8 @@ enum {
+     SIFIVE_TIME_BASE    = 0xBFF8
+ };
+ 
++enum {
++    SIFIVE_CLINT_TIMEBASE_FREQ = 10000000
++};
++
+ #endif
+diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+index 662e8a1c1a90..be38aa09da20 100644
+--- a/include/hw/riscv/sifive_u.h
++++ b/include/hw/riscv/sifive_u.h
+@@ -50,6 +50,10 @@ enum {
+     SIFIVE_U_UART1_IRQ = 4
+ };
+ 
++enum {
++    SIFIVE_U_CLOCK_FREQ = 1000000000
++};
++
+ #define SIFIVE_U_PLIC_HART_CONFIG "MS"
+ #define SIFIVE_U_PLIC_NUM_SOURCES 127
+ #define SIFIVE_U_PLIC_NUM_PRIORITIES 7
+diff --git a/include/hw/riscv/spike.h b/include/hw/riscv/spike.h
+index cb55a14d30cc..d85a64e33d86 100644
+--- a/include/hw/riscv/spike.h
++++ b/include/hw/riscv/spike.h
+@@ -42,6 +42,10 @@ enum {
+     SPIKE_DRAM
+ };
+ 
++enum {
++    SPIKE_CLOCK_FREQ = 1000000000
++};
++
+ #if defined(TARGET_RISCV32)
+ #define SPIKE_V1_09_1_CPU TYPE_RISCV_CPU_RV32GCSU_V1_09_1
+ #define SPIKE_V1_10_0_CPU TYPE_RISCV_CPU_RV32GCSU_V1_10_0
+diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
+index 7525647e6303..2fbe808da5f6 100644
+--- a/include/hw/riscv/virt.h
++++ b/include/hw/riscv/virt.h
+@@ -55,6 +55,10 @@ enum {
+     VIRTIO_NDEV = 10
+ };
+ 
++enum {
++    VIRT_CLOCK_FREQ = 1000000000
++};
++
+ #define VIRT_PLIC_HART_CONFIG "MS"
+ #define VIRT_PLIC_NUM_SOURCES 127
+ #define VIRT_PLIC_NUM_PRIORITIES 7
 -- 
 2.7.0
