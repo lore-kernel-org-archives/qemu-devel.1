@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fEmqD-0000Y0-1W
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 22:22:30 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fEoXx-00060x-79
+	for qemu-devel@nongnu.org; Sat, 05 May 2018 00:11:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fEmq8-0003AP-Uz
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 22:22:28 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:44419)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fEmq8-0003A6-Pk
-	for qemu-devel@nongnu.org; Fri, 04 May 2018 22:22:24 -0400
-Received: by mail-qk0-x243.google.com with SMTP id z8so18122610qki.11
-	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 19:22:24 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180504155918.21287-1-f4bug@amsat.org>
-	<20180504155918.21287-18-f4bug@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <d611dc36-e429-eb13-a2ec-573b0bb06413@amsat.org>
-Date: Fri, 4 May 2018 23:22:17 -0300
+	(envelope-from <dgibson@ozlabs.org>) id 1fEoXw-0001Xi-2A
+	for qemu-devel@nongnu.org; Sat, 05 May 2018 00:11:45 -0400
+Date: Sat, 5 May 2018 12:20:52 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180505022052.GG13229@umbus.fritz.box>
+References: <cover.1525423550.git.balaton@eik.bme.hu>
+	<39f72851afe39e24596a4aa328f4e9672cd37fd8.1525423550.git.balaton@eik.bme.hu>
 MIME-Version: 1.0
-In-Reply-To: <20180504155918.21287-18-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 17/20] sdcard: Add SDFrameData struct and
- data frame checksum functions
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="BRF4e1IEQp0HoEFj"
+Content-Disposition: inline
+In-Reply-To: <39f72851afe39e24596a4aa328f4e9672cd37fd8.1525423550.git.balaton@eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH] ppc440_pcix: Fix a typo in setting a
+ register (Coverity CID1390577)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,108 +25,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alistair Francis <alistair@alistair23.me>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>
 
-On 05/04/2018 12:59 PM, Philippe Mathieu-Daudé wrote:
-> The block transfers data frames are upto 512 bytes and use a 16-bit CRC.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+--BRF4e1IEQp0HoEFj
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, May 04, 2018 at 10:45:50AM +0200, BALATON Zoltan wrote:
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+
+Applied to ppc-for-2.13.  There won't be a pull request until after
+I'm back from holidays in a month, though. Sorry.
+
 > ---
->  include/hw/sd/sd.h     | 29 +++++++++++++++++++++++++++++
->  hw/sd/sdmmc-internal.c | 10 ++++++++++
->  2 files changed, 39 insertions(+)
-> 
-> diff --git a/include/hw/sd/sd.h b/include/hw/sd/sd.h
-> index c76be51b32..6bf9daf559 100644
-> --- a/include/hw/sd/sd.h
-> +++ b/include/hw/sd/sd.h
-> @@ -102,6 +102,17 @@ typedef struct SDFrame136 {
->      uint8_t crc;
->  } SDFrame136;
->  
-> +/**
-> + * SDFrameData: 512 bytes block transfers
-> + *
-> + * @content: block data
-> + * @crc:     16-bit CRC checksum
-> + */
-> +typedef struct SDFrameData {
-> +    uint8_t content[512];
-> +    uint16_t crc;
-> +} SDFrameData;
-> +
->  typedef struct SDFrame48 SDRequest;
->  
->  typedef struct SDState SDState;
-> @@ -212,6 +223,14 @@ void sd_update_frame48_checksum(SDFrame48 *frame, bool is_response);
->   */
->  void sd_update_frame136_checksum(SDFrame136 *frame);
->  
-> +/**
-> + * sd_update_framedata_checksum:
-> + * @frame: the #SDFrameData to verify
-> + *
-> + * Update the 16-bit CRC checksum of a SD data frame (up to 512 bytes).
-> + */
-> +void sd_update_framedata_checksum(SDFrameData *frame);
+>  hw/ppc/ppc440_pcix.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/hw/ppc/ppc440_pcix.c b/hw/ppc/ppc440_pcix.c
+> index b1307e6..d8af04b 100644
+> --- a/hw/ppc/ppc440_pcix.c
+> +++ b/hw/ppc/ppc440_pcix.c
+> @@ -257,7 +257,7 @@ static void ppc440_pcix_reg_write4(void *opaque, hwad=
+dr addr,
+>          break;
+>      case PCIX0_PIM2SAL:
+>          s->pim[2].sa &=3D 0xffffffff00000000ULL;
+> -        s->pim[2].sa =3D val;
+> +        s->pim[2].sa |=3D val;
+>          ppc440_pcix_update_pim(s, 2);
+>          break;
+>      case PCIX0_PIM2LAL:
 
-Since the frame size is variable, this function needs a size_t argument.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-> +
->  /**
->   * sd_verify_frame48_checksum:
->   * @frame: the #SDFrame48 to verify
-> @@ -233,6 +252,16 @@ bool sd_verify_frame48_checksum(SDFrame48 *frame, bool is_response);
->   */
->  bool sd_verify_frame136_checksum(SDFrame136 *frame);
->  
-> +/**
-> + * sd_verify_framedata_checksum:
-> + * @frame: the #SDFrameData to verify
-> + *
-> + * Verify the 16-bit CRC checksum of a SD data frame.
-> + *
-> + * Returns: A boolean indicating whether the frame 16-bit CRC is correct.
-> + */
-> +bool sd_verify_framedata_checksum(SDFrameData *frame);
+--BRF4e1IEQp0HoEFj
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Ditto.
+-----BEGIN PGP SIGNATURE-----
 
-> +
->  /* Legacy functions to be used only by non-qdevified callers */
->  SDState *sd_init(BlockBackend *bs, bool is_spi);
->  int sd_do_command(SDState *sd, SDRequest *req,
-> diff --git a/hw/sd/sdmmc-internal.c b/hw/sd/sdmmc-internal.c
-> index 68350a2304..0e82e69d99 100644
-> --- a/hw/sd/sdmmc-internal.c
-> +++ b/hw/sd/sdmmc-internal.c
-> @@ -134,6 +134,11 @@ bool sd_verify_frame136_checksum(SDFrame136 *frame)
->      return sd_calc_frame136_crc7(frame) == frame->crc;
->  }
->  
-> +bool sd_verify_framedata_checksum(SDFrameData *frame)
-> +{
-> +    return sd_crc16(frame->content, sizeof(frame->content)) == frame->crc;
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlrtFQIACgkQbDjKyiDZ
+s5JooBAA2j2hlFMAgCxFJjyq0qPWWTMrxsyb63W/B7lgTnRKmJnwMDPhHyBpBWQT
+Vx0S6g/nMZFiWhOazdiThhiTyGp+758IM6QfNzgifPuVKa41yNhjndnOVciTZhbm
+6vsKseIBP58JPK8WBM2yRdzhkWa7qAxNmzhGIo1VMW3HiTMICsyy3VDRuVvdTjjv
+Gqxvyq8Te0JZi5HSGC0GPcOh1Hej5i2+Nykr6eA+j92agQaCBM1PsA3DEsYVrgae
+94X+QS7Oc7t7IuF8acP7eDdD+R8lCPwl8b1KyUEcNJveLQTVgyibksXtYgCUahfs
+HCFw/F8sFX6/2XVSeu1LCNkfvzeHFujRSH208mZPAkzmmRQFPgviDUC491mRUYui
+x0MINQoZ9lqZ86Zjt2EeL3t6uX4X4ZY0lJxMO5OiO2t9JEbqy8UY5RRyU4Ptb/+G
+5YUvzZViOD/YUDORbFafyKydwMCC3PiQQ6B+URri/qC/Sz0wGkDwRuVRdJGuItnL
+6VEyIdQNX7WCOY5cDjwfoVoBaCkW7RWGx/71uBtJ5p/e++VeGF1Kz6TUhY576nVE
+oGrPMBUnBFhKHhigvbfGJDcspi+ua8VDOGHgm30lv+McZzPGU5q/p8Z+WqNQhGd+
+Cc/IMf2lEa1tUQYkkaVWMgqNq7ZiKkAER34NW6VYO1a9i+Olmj4=
+=lZ78
+-----END PGP SIGNATURE-----
 
-I'll probably replace sizeof(frame->content) by a 'length' argument,
-or add a 'length' member to SDFrameData.
-
-> +}
-> +
->  void sd_update_frame48_checksum(SDFrame48 *frame, bool is_response)
->  {
->      frame->crc = sd_calc_frame48_crc7(frame->cmd, frame->arg, is_response);
-> @@ -144,6 +149,11 @@ void sd_update_frame136_checksum(SDFrame136 *frame)
->      frame->crc = (sd_crc7(frame->content, sizeof(frame->content)) << 1) | 1;
->  }
->  
-> +void sd_update_framedata_checksum(SDFrameData *frame)
-> +{
-> +    frame->crc = sd_crc16(frame->content, sizeof(frame->content));
-> +}
-> +
->  void sd_prepare_frame48(SDFrame48 *frame, uint8_t cmd, uint32_t arg,
->                          bool is_response, bool gen_crc)
->  {
-> 
+--BRF4e1IEQp0HoEFj--
