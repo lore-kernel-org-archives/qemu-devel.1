@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fEx9E-00027D-2x
-	for qemu-devel@nongnu.org; Sat, 05 May 2018 09:22:48 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fEx9b-0002Iy-BA
+	for qemu-devel@nongnu.org; Sat, 05 May 2018 09:23:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fEx99-00037M-Bj
-	for qemu-devel@nongnu.org; Sat, 05 May 2018 09:22:48 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:36832)
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fEx9W-0003W8-Ep
+	for qemu-devel@nongnu.org; Sat, 05 May 2018 09:23:11 -0400
+Received: from mail-lf0-x235.google.com ([2a00:1450:4010:c07::235]:35781)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1fEx99-000367-3b
-	for qemu-devel@nongnu.org; Sat, 05 May 2018 09:22:43 -0400
-Received: by mail-lf0-x243.google.com with SMTP id w8-v6so34677487lfe.3
-	for <qemu-devel@nongnu.org>; Sat, 05 May 2018 06:22:43 -0700 (PDT)
-Date: Sat, 5 May 2018 15:22:40 +0200
+	id 1fEx9W-0003VF-5l
+	for qemu-devel@nongnu.org; Sat, 05 May 2018 09:23:06 -0400
+Received: by mail-lf0-x235.google.com with SMTP id y72-v6so20885240lfd.2
+	for <qemu-devel@nongnu.org>; Sat, 05 May 2018 06:23:06 -0700 (PDT)
+Date: Sat, 5 May 2018 15:23:03 +0200
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20180505132240.goq3tg673deoksaw@toto>
+Message-ID: <20180505132303.z3hz32trwe5t6ofx@toto>
 References: <20180503091922.28733-1-edgar.iglesias@gmail.com>
-	<20180503091922.28733-21-edgar.iglesias@gmail.com>
-	<448d1eaa-2ce9-6ce9-ea98-3d00e091f320@linaro.org>
+	<20180503091922.28733-23-edgar.iglesias@gmail.com>
+	<fc4ccd4e-d0b5-61d9-68ef-fb1feb6c3841@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <448d1eaa-2ce9-6ce9-ea98-3d00e091f320@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v1 20/29] target-microblaze: Make special
- registers 64-bit
+In-Reply-To: <fc4ccd4e-d0b5-61d9-68ef-fb1feb6c3841@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v1 22/29] target-microblaze: Add Extended
+ Addressing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,37 +35,13 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Richard Henderson <richard.henderson@linaro.org>
 Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, sai.pavan.boddu@xilinx.com, alistair@alistair23.me, frasse.iglesias@gmail.com, edgar.iglesias@xilinx.com
 
-On Thu, May 03, 2018 at 12:03:19PM -0700, Richard Henderson wrote:
+On Thu, May 03, 2018 at 12:12:40PM -0700, Richard Henderson wrote:
 > On 05/03/2018 02:19 AM, Edgar E. Iglesias wrote:
-> > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-> > 
-> > Extend special registers to 64-bits. This is in preparation for
-> > MFSE/MTSE, moves to and from extended special registers.
-> > 
-> > Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> > +    trap_userspace(dc, ea);
 > 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> 
-> > @@ -1124,13 +1125,13 @@ static inline void eval_cc(DisasContext *dc, unsigned int cc,
-> >      }
-> >  }
-> >  
-> > -static void eval_cond_jmp(DisasContext *dc, TCGv_i32 pc_true, TCGv_i32 pc_false)
-> > +static void eval_cond_jmp(DisasContext *dc, TCGv_i32 pc_true, TCGv_i64 pc_false)
-> >  {
-> >      TCGLabel *l1 = gen_new_label();
-> >      /* Conditional jmp.  */
-> > -    tcg_gen_mov_i32(cpu_SR[SR_PC], pc_false);
-> > +    tcg_gen_mov_i64(cpu_SR[SR_PC], pc_false);
-> >      tcg_gen_brcondi_i32(TCG_COND_EQ, env_btaken, 0, l1);
-> > -    tcg_gen_mov_i32(cpu_SR[SR_PC], pc_true);
-> > +    tcg_gen_extu_i32_i64(cpu_SR[SR_PC], pc_true);
-> >      gen_set_label(l1);
-> >  }
-> 
-> For future cleanup, this should use tcg_gen_movcond_i32.
+> Missing if (...) return?
 
-Thanks, I've added a follow-up patch in v2 that cleans this up.
+Yup, fixed in v2.
 
-Cheers,
+Thanks,
 Edgar
