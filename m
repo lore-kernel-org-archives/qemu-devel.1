@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43616)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fEq4C-0004A3-CF
-	for qemu-devel@nongnu.org; Sat, 05 May 2018 01:49:09 -0400
+	(envelope-from <renyime@gmail.com>) id 1fErxH-0004kz-R8
+	for qemu-devel@nongnu.org; Sat, 05 May 2018 03:50:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fEq49-0001mP-91
-	for qemu-devel@nongnu.org; Sat, 05 May 2018 01:49:08 -0400
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:35888)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fEq49-0001la-2u
-	for qemu-devel@nongnu.org; Sat, 05 May 2018 01:49:05 -0400
-Received: by mail-pg0-x243.google.com with SMTP id z129-v6so12613748pgz.3
-	for <qemu-devel@nongnu.org>; Fri, 04 May 2018 22:49:04 -0700 (PDT)
-Date: Sat, 5 May 2018 14:49:01 +0900
-From: Stafford Horne <shorne@gmail.com>
-Message-ID: <20180505054901.GO4501@lianli.shorne-pla.net>
-References: <20180504054030.24527-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180504054030.24527-1-richard.henderson@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 00/13] target/openrisc: Convert to
- decodetree.py
+	(envelope-from <renyime@gmail.com>) id 1fErxD-00036S-Tm
+	for qemu-devel@nongnu.org; Sat, 05 May 2018 03:50:07 -0400
+From: Ivan Ren <renyime@gmail.com>
+Date: Sat,  5 May 2018 15:49:37 +0800
+Message-Id: <1525506577-1946-1-git-send-email-ivanren@tencent.com>
+Subject: [Qemu-devel] [PATCH v2] qemu-img: return allocated size for block
+ device with qcow2 format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +18,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: kwolf@redhat.com, mreitz@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Thu, May 03, 2018 at 10:40:17PM -0700, Richard Henderson wrote:
-> While the openrisc decode isn't particularly complicated,
-> the result, I think, is still cleaner.
+qemu-img info with a block device which has a qcow2 format always
+return 0 for disk size, and this can not reflect the qcow2 size
+and the used space of the block device. This patch return the
+allocated size of qcow2 as the disk size.
 
-Hi Richard,
+Signed-off-by: Ivan Ren <ivanren@tencent.com>
+---
+ block/qcow2.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 54 insertions(+)
 
-I agree this does look clean, thanks for doing this.
+This version differs from the previous:
+(1).Accumulate all non-0 refcount cluster as the allocated size instead the
+highest offset.
+(2).Simplify the implementation by just check the refcount info.
 
-I reviewed all and everything seems good, do you plan to send the PR during the
-merge window?
-
--Stafford
-
-> 
-> r~
-> 
-> 
-> Richard Henderson (13):
->   target-openrisc: Write back result before FPE exception
->   target/openrisc: Start conversion to decodetree.py
->   target/openrisc: Convert branch insns
->   target/openrisc: Convert memory insns
->   target/openrisc: Convert remainder of dec_misc insns
->   target/openrisc: Convert dec_calc
->   target/openrisc: Convert dec_mac
->   target/openrisc: Convert dec_logic
->   target/openrisc: Convert dec_M
->   target/openrisc: Convert dec_comp
->   target/openrisc: Convert dec_compi
->   target/openrisc: Convert dec_float
->   target/openrisc: Merge disas_openrisc_insn
-> 
->  target/openrisc/helper.h      |   25 +-
->  target/openrisc/fpu_helper.c  |  250 ++----
->  target/openrisc/translate.c   | 1847 +++++++++++++++++++----------------------
->  target/openrisc/Makefile.objs |    9 +
->  target/openrisc/insns.decode  |  189 +++++
->  5 files changed, 1110 insertions(+), 1210 deletions(-)
->  create mode 100644 target/openrisc/insns.decode
-> 
-> -- 
-> 2.14.3
-> 
+diff --git a/block/qcow2.c b/block/qcow2.c
+index ef68772..e64469a 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -4493,6 +4493,59 @@ static QemuOptsList qcow2_create_opts = {
+     }
+ };
+ 
++/* Get allocated space of qcow2, aligned to cluster_size */
++static int64_t qcow2_get_allocated_size(BlockDriverState *bs)
++{
++    int64_t allocated_cluster_count = 0;
++    uint64_t refcount;
++    int64_t i, j, begin_index, end_index;
++
++    BDRVQcow2State *s = bs->opaque;
++
++    /* Traverse refcount table */
++    for (i = 0; i < s->refcount_table_size; i++) {
++        if (s->refcount_table[i] & REFT_OFFSET_MASK) {
++            begin_index = i * s->refcount_block_size;
++            end_index = begin_index + s->refcount_block_size;
++            for (j = begin_index; j < end_index; j++) {
++                if (qcow2_get_refcount(bs, j, &refcount) < 0) {
++                    continue;
++                }
++                if (refcount > 0) {
++                    allocated_cluster_count++;
++                }
++            }
++        }
++
++    }
++
++    return allocated_cluster_count * s->cluster_size;
++}
++
++static int64_t qcow2_get_allocated_file_size(BlockDriverState *bs)
++{
++    int64_t ret = 0;
++
++    /* Get through bs->file first */
++    if (bs->file) {
++        ret = bdrv_get_allocated_file_size(bs->file->bs);
++    }
++
++    /*
++     * If ret < 0, some error may happen to the underlying media, return the
++     * error directly.
++     * If ret == 0, means length get from bs->file is 0, which is impossible
++     * for a normal file because of the qcow2 header. In this case, the
++     * underlying media may be a block device or anything else that can't
++     * return a suitable size. So we get the allocated size of qcow2 instead.
++     */
++    if (!ret) {
++        ret = qcow2_get_allocated_size(bs);
++    }
++
++    return ret;
++}
++
+ BlockDriver bdrv_qcow2 = {
+     .format_name        = "qcow2",
+     .instance_size      = sizeof(BDRVQcow2State),
+@@ -4516,6 +4569,7 @@ BlockDriver bdrv_qcow2 = {
+     .bdrv_co_pwrite_zeroes  = qcow2_co_pwrite_zeroes,
+     .bdrv_co_pdiscard       = qcow2_co_pdiscard,
+     .bdrv_truncate          = qcow2_truncate,
++    .bdrv_get_allocated_file_size = qcow2_get_allocated_file_size,
+     .bdrv_co_pwritev_compressed = qcow2_co_pwritev_compressed,
+     .bdrv_make_empty        = qcow2_make_empty,
+ 
+-- 
+1.8.3.1
