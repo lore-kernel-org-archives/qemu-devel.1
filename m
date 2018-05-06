@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fFLEj-0005ca-2h
-	for qemu-devel@nongnu.org; Sun, 06 May 2018 11:06:06 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fFM5P-0003fN-Rh
+	for qemu-devel@nongnu.org; Sun, 06 May 2018 12:00:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fFLEe-0007Xt-2V
-	for qemu-devel@nongnu.org; Sun, 06 May 2018 11:06:05 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:37343)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1fFLEd-0007Vo-SM
-	for qemu-devel@nongnu.org; Sun, 06 May 2018 11:05:59 -0400
-Received: by mail-pf0-x243.google.com with SMTP id e9so16872963pfi.4
-	for <qemu-devel@nongnu.org>; Sun, 06 May 2018 08:05:59 -0700 (PDT)
-From: Lidong Chen <jemmy858585@gmail.com>
-Date: Sun,  6 May 2018 22:54:59 +0800
-Message-Id: <1525618499-1560-2-git-send-email-lidongchen@tencent.com>
-In-Reply-To: <1525618499-1560-1-git-send-email-lidongchen@tencent.com>
-References: <1525618499-1560-1-git-send-email-lidongchen@tencent.com>
-Subject: [Qemu-devel] [PATCH 2/2] migration: not wait
- RDMA_CM_EVENT_DISCONNECTED event after rdma_disconnect
+	(envelope-from <eric.auger@redhat.com>) id 1fFM5L-0002us-S2
+	for qemu-devel@nongnu.org; Sun, 06 May 2018 12:00:31 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43016 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1fFM5L-0002sk-LR
+	for qemu-devel@nongnu.org; Sun, 06 May 2018 12:00:27 -0400
+References: <20180504171540.25813-1-peter.maydell@linaro.org>
+	<CAFEAcA8byYVNaQDttBtN5SjO3Bih1gZ2YtBiAuFnTLEvaV3qnQ@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <f771377e-605e-de7e-a300-1d80c3d66968@redhat.com>
+Date: Sun, 6 May 2018 18:00:15 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA8byYVNaQDttBtN5SjO3Bih1gZ2YtBiAuFnTLEvaV3qnQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/24] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,88 +28,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com, dgilbert@redhat.com
-Cc: qemu-devel@nongnu.org, galsha@mellanox.com, aviadye@mellanox.com, adido@mellanox.com, Lidong Chen <lidongchen@tencent.com>
+To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-When cancel migration during RDMA precopy, the source qemu main thread hangs sometime.
+Hi Peter,
 
-The backtrace is:
-    (gdb) bt
-    #0  0x00007f249eabd43d in write () from /lib64/libpthread.so.0
-    #1  0x00007f24a1ce98e4 in rdma_get_cm_event (channel=0x4675d10, event=0x7ffe2f643dd0) at src/cma.c:2189
-    #2  0x00000000007b6166 in qemu_rdma_cleanup (rdma=0x6784000) at migration/rdma.c:2296
-    #3  0x00000000007b7cae in qio_channel_rdma_close (ioc=0x3bfcc30, errp=0x0) at migration/rdma.c:2999
-    #4  0x00000000008db60e in qio_channel_close (ioc=0x3bfcc30, errp=0x0) at io/channel.c:273
-    #5  0x00000000007a8765 in channel_close (opaque=0x3bfcc30) at migration/qemu-file-channel.c:98
-    #6  0x00000000007a71f9 in qemu_fclose (f=0x527c000) at migration/qemu-file.c:334
-    #7  0x0000000000795b96 in migrate_fd_cleanup (opaque=0x3b46280) at migration/migration.c:1162
-    #8  0x000000000093a71b in aio_bh_call (bh=0x3db7a20) at util/async.c:90
-    #9  0x000000000093a7b2 in aio_bh_poll (ctx=0x3b121c0) at util/async.c:118
-    #10 0x000000000093f2ad in aio_dispatch (ctx=0x3b121c0) at util/aio-posix.c:436
-    #11 0x000000000093ab41 in aio_ctx_dispatch (source=0x3b121c0, callback=0x0, user_data=0x0)
-        at util/async.c:261
-    #12 0x00007f249f73c7aa in g_main_context_dispatch () from /lib64/libglib-2.0.so.0
-    #13 0x000000000093dc5e in glib_pollfds_poll () at util/main-loop.c:215
-    #14 0x000000000093dd4e in os_host_main_loop_wait (timeout=28000000) at util/main-loop.c:263
-    #15 0x000000000093de05 in main_loop_wait (nonblocking=0) at util/main-loop.c:522
-    #16 0x00000000005bc6a5 in main_loop () at vl.c:1944
-    #17 0x00000000005c39b5 in main (argc=56, argv=0x7ffe2f6443f8, envp=0x3ad0030) at vl.c:4752
+On 05/04/2018 07:58 PM, Peter Maydell wrote:
+> On 4 May 2018 at 18:15, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> target-arm queue: Eric's SMMUv3 patchset, and an array
+>> of minor bugfixes and improvements from various others.
+>>
+>> thanks
+>> -- PMM
+>>
+>> The following changes since commit c8b7e627b4269a3bc3ae41d9f420547a47e=
+6d9b9:
+>>
+>>   Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2018-05-04=
+' into staging (2018-05-04 14:42:46 +0100)
+>>
+>> are available in the Git repository at:
+>>
+>>   git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-a=
+rm-20180504
+>>
+>> for you to fetch changes up to 5680740c92993e9b3f3e011f2a2c394070e33f5=
+6:
+>>
+>>   hw/arm/virt: Introduce the iommu option (2018-05-04 18:05:52 +0100)
+>>
+>> ----------------------------------------------------------------
+>> target-arm queue:
+>>  * Emulate the SMMUv3 (IOMMU); one will be created in the 'virt' board
+>>    if the commandline includes "-machine iommu=3Dsmmuv3"
+>>  * target/arm: Implement v8M VLLDM and VLSTM
+>>  * hw/arm: Don't fail qtest due to missing SD card in -nodefaults mode
+>>  * Some fixes to silence Coverity false-positives
+>>  * arm: boot: set boot_info starting from first_cpu
+>>    (fixes a technical bug not visible in practice)
+>>  * hw/net/smc91c111: Convert away from old_mmio
+>>  * hw/usb/tusb6010: Convert away from old_mmio
+>>  * hw/char/cmsdk-apb-uart.c: Accept more input after character read
+>>  * target/arm: Make MPUIR write-ignored on OMAP, StrongARM
+>>  * hw/arm/virt: Add linux,pci-domain property
+>=20
+> Oops, 32-bit compile failures for format string issues;
+>=20
+> hw/arm/trace.h: In function =E2=80=98_nocheck__trace_smmu_ptw_level=E2=80=
+=99:
+> hw/arm/trace.h:215:18: error: format =E2=80=98%lx=E2=80=99 expects argu=
+ment of type
+> =E2=80=98long unsigned int=E2=80=99, but argument 7 has type =E2=80=98s=
+ize_t {aka unsigned
+> int}=E2=80=99 [-Werror=3Dformat=3D]
+>          qemu_log("%d@%zd.%06zd:smmu_ptw_level " "level=3D%d
+> iova=3D0x%"PRIx64" subpage_sz=3D0x%lx baseaddr=3D0x%"PRIx64" offset=3D%=
+d =3D>
+> pte=3D0x%"PRIx64 "\n",
+>                   ^
+> hw/arm/trace.h: In function =E2=80=98_nocheck__trace_smmuv3_write_mmio_=
+idr=E2=80=99:
+> hw/arm/trace.h:606:18: error: format =E2=80=98%lx=E2=80=99 expects argu=
+ment of type
+> =E2=80=98long unsigned int=E2=80=99, but argument 5 has type =E2=80=98u=
+int64_t {aka long long
+> unsigned int}=E2=80=99 [-Werror=3Dformat=3D]
+>          qemu_log("%d@%zd.%06zd:smmuv3_write_mmio_idr " "write to
+> RO/Unimpl reg 0x%lx val64:0x%lx" "\n",
+>                   ^
+> hw/arm/trace.h:606:18: error: format =E2=80=98%lx=E2=80=99 expects argu=
+ment of type
+> =E2=80=98long unsigned int=E2=80=99, but argument 6 has type =E2=80=98u=
+int64_t {aka long long
+> unsigned int}=E2=80=99 [-Werror=3Dformat=3D]
+> hw/arm/trace.h: In function =E2=80=98_nocheck__trace_smmuv3_find_ste_2l=
+vl=E2=80=99:
+> hw/arm/trace.h:721:18: error: format =E2=80=98%lx=E2=80=99 expects argu=
+ment of type
+> =E2=80=98long unsigned int=E2=80=99, but argument 5 has type =E2=80=98u=
+int64_t {aka long long
+> unsigned int}=E2=80=99 [-Werror=3Dformat=3D]
+>          qemu_log("%d@%zd.%06zd:smmuv3_find_ste_2lvl "
+> "strtab_base:0x%lx l1ptr:0x%"PRIx64" l1_off:0x%x, l2ptr:0x%"PRIx64"
+> l2_off:0x%x max_l2_ste:%d" "\n",
+>                   ^
+>=20
+> size_t arguments need %zx, not %lx, and uint64_t arguments need
+> %"PRIx64", not %lx. I'll squash in the changes to the relevant patches.
 
-It does not get the RDMA_CM_EVENT_DISCONNECTED event after rdma_disconnect sometime.
-I do not find out the root cause why not get RDMA_CM_EVENT_DISCONNECTED event, but
-it can be reproduced if not invoke ibv_dereg_mr to release all ram blocks which fixed
-in previous patch.
+OK. Thank you for taking this in charge!
 
-Anyway, it should not invoke rdma_get_cm_event in main thread, and the event channel
-is also destroyed in qemu_rdma_cleanup.
-
-Signed-off-by: Lidong Chen <lidongchen@tencent.com>
----
- migration/rdma.c       | 12 ++----------
- migration/trace-events |  1 -
- 2 files changed, 2 insertions(+), 11 deletions(-)
-
-diff --git a/migration/rdma.c b/migration/rdma.c
-index 0dd4033..92e4d30 100644
---- a/migration/rdma.c
-+++ b/migration/rdma.c
-@@ -2275,8 +2275,7 @@ static int qemu_rdma_write(QEMUFile *f, RDMAContext *rdma,
- 
- static void qemu_rdma_cleanup(RDMAContext *rdma)
- {
--    struct rdma_cm_event *cm_event;
--    int ret, idx;
-+    int idx;
- 
-     if (rdma->cm_id && rdma->connected) {
-         if ((rdma->error_state ||
-@@ -2290,14 +2289,7 @@ static void qemu_rdma_cleanup(RDMAContext *rdma)
-             qemu_rdma_post_send_control(rdma, NULL, &head);
-         }
- 
--        ret = rdma_disconnect(rdma->cm_id);
--        if (!ret) {
--            trace_qemu_rdma_cleanup_waiting_for_disconnect();
--            ret = rdma_get_cm_event(rdma->channel, &cm_event);
--            if (!ret) {
--                rdma_ack_cm_event(cm_event);
--            }
--        }
-+        rdma_disconnect(rdma->cm_id);
-         trace_qemu_rdma_cleanup_disconnect();
-         rdma->connected = false;
-     }
-diff --git a/migration/trace-events b/migration/trace-events
-index d6be74b..64573ff 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -125,7 +125,6 @@ qemu_rdma_accept_pin_state(bool pin) "%d"
- qemu_rdma_accept_pin_verbsc(void *verbs) "Verbs context after listen: %p"
- qemu_rdma_block_for_wrid_miss(const char *wcompstr, int wcomp, const char *gcompstr, uint64_t req) "A Wanted wrid %s (%d) but got %s (%" PRIu64 ")"
- qemu_rdma_cleanup_disconnect(void) ""
--qemu_rdma_cleanup_waiting_for_disconnect(void) ""
- qemu_rdma_close(void) ""
- qemu_rdma_connect_pin_all_requested(void) ""
- qemu_rdma_connect_pin_all_outcome(bool pin) "%d"
--- 
-1.8.3.1
+Eric
+>=20
+> thanks
+> -- PMM
+>=20
