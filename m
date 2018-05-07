@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fFklV-0006RL-Du
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 14:21:38 -0400
+	(envelope-from <thomas.tai@oracle.com>) id 1fFl5T-0003Yx-PR
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 14:42:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fFklU-0008AW-77
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 14:21:37 -0400
-Date: Mon, 7 May 2018 15:21:26 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180507182126.GC25013@localhost.localdomain>
-References: <1521452376-25099-1-git-send-email-thuth@redhat.com>
-	<87bme62nu0.fsf@dusky.pond.sub.org>
-	<068649bc-1546-6fc5-3e41-63512196cbf8@redhat.com>
-	<20180427003215.GU29865@localhost.localdomain>
-	<87o9i5uplt.fsf@dusky.pond.sub.org>
-	<20180507135330.GS25013@localhost.localdomain>
-	<87h8njtnok.fsf@dusky.pond.sub.org>
+	(envelope-from <thomas.tai@oracle.com>) id 1fFl5Q-000164-JJ
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 14:42:15 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:60146)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thomas.tai@oracle.com>)
+	id 1fFl5Q-00015S-8i
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 14:42:12 -0400
+References: <1525451445-5131-1-git-send-email-jonathan.helman@oracle.com>
+	<20180504230626-mutt-send-email-mst@kernel.org>
+From: Thomas Tai <thomas.tai@oracle.com>
+Message-ID: <b49ffa87-7b5f-9ba5-5c75-a180790d8de6@oracle.com>
+Date: Mon, 7 May 2018 14:42:04 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87h8njtnok.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [RFC PATCH] tests/device-introspect: Test devices
- with all machines, not only with "none"
+In-Reply-To: <20180504230626-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] virtio-balloon: fix internal stat name
+ array to match Linux kernel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,89 +30,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>, Jonathan Helman <jonathan.helman@oracle.com>
+Cc: jasowang@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, Rob Gardner <rob.gardner@oracle.com>
 
-On Mon, May 07, 2018 at 06:50:35PM +0200, Markus Armbruster wrote:
-> Eduardo Habkost <ehabkost@redhat.com> writes:
-> 
-> > On Fri, Apr 27, 2018 at 08:31:58AM +0200, Markus Armbruster wrote:
-> >> Eduardo Habkost <ehabkost@redhat.com> writes:
-> >> 
-> >> > On Thu, Apr 26, 2018 at 05:20:25PM +0200, Thomas Huth wrote:
-> >> >> On 26.04.2018 13:45, Markus Armbruster wrote:
-> >> >> > Thomas Huth <thuth@redhat.com> writes:
-> >> >> [...]
-> >> >> >> @@ -260,6 +263,26 @@ static void test_abstract_interfaces(void)
-> >> >> >>      qtest_end();
-> >> >> >>  }
-> >> >> >>  
-> >> >> >> +static void add_machine_test_case(const char *mname)
-> >> >> >> +{
-> >> >> >> +    char *path, *args;
-> >> >> >> +
-> >> >> >> +    /* Ignore blacklisted machines */
-> >> >> >> +    if (g_str_equal("xenfv", mname) || g_str_equal("xenpv", mname)) {
-> >> >> >> +        return;
-> >> >> >> +    }
-> >> >> >> +
-> >> >> >> +    path = g_strdup_printf("device/introspect/concrete-defaults-%s", mname);
-> >> >> >> +    args = g_strdup_printf("-machine %s", mname);
-> >> >> >> +    qtest_add_data_func(path, args, test_device_intro_concrete);
-> >> >> > 
-> >> >> > This runs test_device_intro_concrete() with "-machine M" for all machine
-> >> >> > types M, in SPEED=slow mode.
-> >> >> > 
-> >> >> >> +    g_free(path);
-> >> >> >> +
-> >> >> >> +    path = g_strdup_printf("device/introspect/concrete-nodefaults-%s", mname);
-> >> >> >> +    args = g_strdup_printf("-nodefaults -machine %s", mname);
-> >> >> >> +    qtest_add_data_func(path, args, test_device_intro_concrete);
-> >> >> > 
-> >> >> > This runs test_device_intro_concrete() with "-nodefaults -machine M" for
-> >> >> > all machine types M, in SPEED=slow mode.
-> >> >> > 
-> >> >> > Has "without -nodefaults" exposed additional bugs?
-> >> >> 
-> >> >> After testing this with all machines, I had to discover that
-> >> >> "-nodefaults" does not work so easily: A lot of the embedded machines
-> >> >> (especially the ARM machines) simply refuse to work with "-nodefaults"
-> >> >> and exit immediately instead. E.g.:
-> >> >> 
-> >> >> $ arm-softmmu/qemu-system-arm -nodefaults -nographic -M n810,accel=qtest
-> >> >> qemu-system-arm: missing SecureDigital device
-> >> 
-> >> These are all bugs.  --nodefaults is supposed to suppress *optional*
-> >> devices, not mandatory ones.
-> >
-> > I'm not sure I understand the requirements.  What exactly is the
-> > definition of "mandatory"?
-> >
-> > A machine created by "qemu-system-x86_64 -machine pc -nodefaults"
-> > is useless because it has no any device to boot from.  How is
-> > that different from a n810 machine not booting because there's no
-> > SD device?
-> 
-> I propose:
-> 
-> * Stuff that's required for QEMU to run is not suppressed by -nodefaults
-> 
-> * Stuff that a real machine has soldered on is also not suppressed
-> 
-> * Stuff that can be pulled out of a real machine may be suppressed, even
->   when that means the guest won't run
 
-Makes sense to me.  It looks like the only obstacle for
-tests/device-introspect and device-crash-test is the first rule.
-"Guest won't boot" isn't a problem, but "QEMU won't run" is.
 
-The first rule is easily testable, too: running
-"$QEMU -machine $MACHINE -nodefaults" and not having a working
-QMP monitor should be reported as a bug by automated tests.
+On 2018-05-04 04:07 PM, Michael S. Tsirkin wrote:
+> On Fri, May 04, 2018 at 09:30:45AM -0700, Jonathan Helman wrote:
+>> The Linux kernel commit b40000325044 ("virtio_balloon: add array
+>> of stat names") defines an array of stat name strings for consumers
+>> of the virtio interface to use via the virtio_balloon.h header
+>> file, rather than requiring each consumer to define its own. But at
+>> present, the stat names defined in this array by the Linux kernel
+>> do not match up with those defined internally by QEMU. This patch
+>> fixes this inconsistency by changing the QEMU stat names to match
+>> those defined by the Linux kernel.
+>>
+>> Signed-off-by: Jonathan Helman <jonathan.helman@oracle.com>
+>> Cc: Rob Gardner <rob.gardner@oracle.com>
+>> Cc: Thomas Tai <thomas.tai@oracle.com>
+> 
+> So pls import the header from Linux so we can stop maintaining it
+> in QEMU.
 
-Do we have an up-to-date list of machines that break this rule?
-We can add this to
-<https://wiki.qemu.org/Contribute/BiteSizedTasks>.
+Hi Michael,
+Thank you for your comment. Because Jonathan left the company last week, 
+I hope to pick up what he left over. As far as the importing the header 
+file, please let me look into it and get back to you.
 
--- 
-Eduardo
+Thank you,
+Thomas
+
+
+> 
+>> ---
+>>   docs/virtio-balloon-stats.txt | 4 ++--
+>>   hw/virtio/virtio-balloon.c    | 4 ++--
+>>   2 files changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/docs/virtio-balloon-stats.txt b/docs/virtio-balloon-stats.txt
+>> index 9985e1d..7c69fdb 100644
+>> --- a/docs/virtio-balloon-stats.txt
+>> +++ b/docs/virtio-balloon-stats.txt
+>> @@ -34,8 +34,8 @@ which will return a dictionary containing:
+>>         - stat-total-memory
+>>         - stat-available-memory
+>>         - stat-disk-caches
+>> -      - stat-htlb-pgalloc
+>> -      - stat-htlb-pgfail
+>> +      - stat-hugetlb-allocations
+>> +      - stat-hugetlb-failures
+>>   
+>>     o A key named last-update, which contains the last stats update
+>>       timestamp in seconds. Since this timestamp is generated by the host,
+>> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+>> index 1f7a87f..8421d9f 100644
+>> --- a/hw/virtio/virtio-balloon.c
+>> +++ b/hw/virtio/virtio-balloon.c
+>> @@ -52,8 +52,8 @@ static const char *balloon_stat_names[] = {
+>>      [VIRTIO_BALLOON_S_MEMTOT] = "stat-total-memory",
+>>      [VIRTIO_BALLOON_S_AVAIL] = "stat-available-memory",
+>>      [VIRTIO_BALLOON_S_CACHES] = "stat-disk-caches",
+>> -   [VIRTIO_BALLOON_S_HTLB_PGALLOC] = "stat-htlb-pgalloc",
+>> -   [VIRTIO_BALLOON_S_HTLB_PGFAIL] = "stat-htlb-pgfail",
+>> +   [VIRTIO_BALLOON_S_HTLB_PGALLOC] = "stat-hugetlb-allocations",
+>> +   [VIRTIO_BALLOON_S_HTLB_PGFAIL] = "stat-hugetlb-failures",
+>>      [VIRTIO_BALLOON_S_NR] = NULL
+>>   };
+>>   
+>> -- 
+>> 1.8.3.1
+>>
+>> Based-on: <1524799751-151698-5-git-send-email-mst@redhat.com>
+>> ([PULL 4/4] virtio-balloon: add hugetlb page allocation counts)
