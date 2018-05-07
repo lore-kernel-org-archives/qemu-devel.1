@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fFgk0-0002ZE-Rw
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 10:03:52 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fFglr-0003IE-9v
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 10:05:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fFgjw-0005Xq-UR
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 10:03:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58620)
+	(envelope-from <kwolf@redhat.com>) id 1fFgln-0006BZ-Bc
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 10:05:43 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60216 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fFgjw-0005Xi-On
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 10:03:44 -0400
-Date: Mon, 7 May 2018 11:03:29 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180507140329.GW25013@localhost.localdomain>
-References: <20180420181951.7252-1-ehabkost@redhat.com>
-	<20180420181951.7252-14-ehabkost@redhat.com>
-	<20180430130246.GB10576@stefanha-x1.localdomain>
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1fFgln-0006Ao-8L
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 10:05:39 -0400
+Date: Mon, 7 May 2018 16:05:27 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180507140527.GA4716@localhost.localdomain>
+References: <ac216b06-9469-addd-b5a1-3a3a89fd0782@redhat.com>
+	<20180502074403.yh5weukbjgqsvp7n@sirius.home.kraxel.org>
+	<20180502080200.GG3308@redhat.com>
+	<20180503072100.GA5301@stefanha-x1.localdomain>
+	<20180503090727.GC11382@redhat.com>
+	<CAFEAcA8=mZf8RbQX2-swbUBkoT=RYSVx-oRA2UpzJCqvgGF+KQ@mail.gmail.com>
+	<20180503134321.pp736ou25pdwvslm@sirius.home.kraxel.org>
+	<20180504132023.GA5098@localhost.localdomain>
+	<c2207b0b-889a-e39f-2f55-640118e2d755@linaro.org>
+	<69fd5755-d1f0-b69a-fabb-3134fccaa4a5@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180430130246.GB10576@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [RFC 13/24] avocado_qemu: Functional test for
- RHBZ#1431939
+In-Reply-To: <69fd5755-d1f0-b69a-fabb-3134fccaa4a5@redhat.com>
+Subject: Re: [Qemu-devel] release retrospective, next release timing,
+ numbering
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +36,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, Amador Pahim <apahim@redhat.com>, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Alistair Francis <alistair23@gmail.com>, Cleber Rosa <crosa@redhat.com>, Fam Zheng <famz@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Mon, Apr 30, 2018 at 02:02:46PM +0100, Stefan Hajnoczi wrote:
-> On Fri, Apr 20, 2018 at 03:19:40PM -0300, Eduardo Habkost wrote:
-> > +    def test_hotplug_memory_default_policy(self):
-> > +        """
-> > +        According to the RHBZ1431939, the issue is 'host nodes'
-> > +        returning '128'. It should return empty value when memory
-> > +        hotplug default policy is used.
-> > +
-> > +        Fixed in commit d81d857f4421d205395d55200425daa6591c28a5.
-> > +        :avocado: tags=RHBZ1431939
-> > +        """
-> > +
-> > +        cmd = 'object_add memory-backend-ram,id=mem1,size=1G'
-> > +        res = self.vm.qmp('human-monitor-command', command_line=cmd)
-> > +        self.assertEqual('', res['return'])
+Am 07.05.2018 um 07:33 hat Thomas Huth geschrieben:
+> On 04.05.2018 19:30, Richard Henderson wrote:
+> > On 05/04/2018 06:20 AM, Kevin Wolf wrote:
+> >> I'm not sure what the exact systemd model is, but as we came to the
+> >> conclusion that there is no semantic difference between major and minor
+> >> version number for QEMU, I'd just merge them.
+> >>
+> >> This would result in 3.0 for the next release, 3.1 etc. would be stable
+> >> releases, and the December release would be 4.0.
+> >>
+> >> It feels like the minimal change to fix our existing versioning scheme.
+> > 
+> > This is very similar to what GCC started to use at version 5.
+> > 
+> >     https://gcc.gnu.org/develop.html#num_scheme
+> > 
+> > I do think it makes sense to drop minor versions, leaving only major +
+> > patchlevel (which then appears to be minor version).
 > 
-> General question about QMP test coding style:
-> 
-> What happens if res['return'] does not exist because the QMP command
-> failed?
-> 
-> I tend to use dict.get() to prevent KeyError.  That way the
-> assertEqual() will fail instead of an unhandled KeyError in the test
-> code.
+> We're currently also using the patch level for marking developing
+> version (x.y.50) and release candidates (x.y.9r) ... we should also
+> think of a way how we want to map that to a new numbering scheme. If we
+> do it the GCC way, I guess the x.0 release will be the development
+> "versions"? But the release candidates? Do we still need a third number
+> for doing those (3.0.1 = rc1, 3.0.2 = rc2, ...)?
 
-It looks like vm.command() would be appropriate on most cases, as
-it will check for errors and return res['result'] automatically.
+Nothing stops you from using 3.50, 3.91, etc. like we always did.
 
-vm.qmp() seems to be useful only if you really don't want an
-exception to be raised in case of QMP errors.
-
-Maybe we should rename .qmp() to .raw_qmp() to discourage people
-from using it.
-
--- 
-Eduardo
+Kevin
