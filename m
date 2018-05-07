@@ -1,20 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38810)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fFjYi-00071z-Uw
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 13:04:22 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fFjYk-000759-QV
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 13:04:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fFjYe-00083y-CL
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 13:04:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46029)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fFjYe-00083Y-4Y
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 13:04:16 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon,  7 May 2018 14:03:14 -0300
-Message-Id: <20180507170315.11497-12-ehabkost@redhat.com>
-In-Reply-To: <20180507170315.11497-1-ehabkost@redhat.com>
-References: <20180507170315.11497-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 11/12] vl: allow 'maxmem' without 'slot'
+	(envelope-from <peter.maydell@linaro.org>) id 1fFjYk-0008AR-2E
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 13:04:22 -0400
+Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:43315)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fFjYj-00089e-Tn
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 13:04:22 -0400
+Received: by mail-oi0-x233.google.com with SMTP id p62-v6so25762891oie.10
+	for <qemu-devel@nongnu.org>; Mon, 07 May 2018 10:04:21 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <87h8njtnok.fsf@dusky.pond.sub.org>
+References: <1521452376-25099-1-git-send-email-thuth@redhat.com>
+	<87bme62nu0.fsf@dusky.pond.sub.org>
+	<068649bc-1546-6fc5-3e41-63512196cbf8@redhat.com>
+	<20180427003215.GU29865@localhost.localdomain>
+	<87o9i5uplt.fsf@dusky.pond.sub.org>
+	<20180507135330.GS25013@localhost.localdomain>
+	<87h8njtnok.fsf@dusky.pond.sub.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 7 May 2018 18:04:00 +0100
+Message-ID: <CAFEAcA_Hmrr4v3HW17WyCFz=dmfLMqZCyu4fGpFqcsfocUKetQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [RFC PATCH] tests/device-introspect:
+ Test devices with all machines, not only with "none"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,78 +35,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, David Hildenbrand <david@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-From: David Hildenbrand <david@redhat.com>
+On 7 May 2018 at 17:50, Markus Armbruster <armbru@redhat.com> wrote:
+> I propose:
+>
+> * Stuff that's required for QEMU to run is not suppressed by -nodefaults
+>
+> * Stuff that a real machine has soldered on is also not suppressed
+>
+> * Stuff that can be pulled out of a real machine may be suppressed, even
+>   when that means the guest won't run
+>
+> Does that make some sense?
 
-We will be able to have memory devices (e.g. virtio) not requiring the
-slot parameter (e.g. not exposed via ACPI). We still need the maxmem
-parameter to setup a proper memory region for device memory. And some
-architectures (e.g. s390x) will have to set up the maximum possible guest
-address space size based on the maxmem parameter.
+We might also want
+ * Stuff that you can't add back in with an appropriate command line
+   argument is not suppressed
 
-As far as I can see, all code (pc.c,spapr.c,ACPI code) should handle
-!slots just fine, even though maxmem is set.
+though we might optimistically hope that the category is empty :-)
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20180423165126.15441-12-david@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- vl.c | 19 ++++---------------
- 1 file changed, 4 insertions(+), 15 deletions(-)
-
-diff --git a/vl.c b/vl.c
-index 806eec2ef6..12e31d1aa9 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2868,7 +2868,6 @@ static void set_memory_options(uint64_t *ram_slots, ram_addr_t *maxram_size,
- {
-     uint64_t sz;
-     const char *mem_str;
--    const char *maxmem_str, *slots_str;
-     const ram_addr_t default_ram_size = mc->default_ram_size;
-     QemuOpts *opts = qemu_find_opts_singleton("memory");
-     Location loc;
-@@ -2914,9 +2913,7 @@ static void set_memory_options(uint64_t *ram_slots, ram_addr_t *maxram_size,
-     qemu_opt_set_number(opts, "size", ram_size, &error_abort);
-     *maxram_size = ram_size;
- 
--    maxmem_str = qemu_opt_get(opts, "maxmem");
--    slots_str = qemu_opt_get(opts, "slots");
--    if (maxmem_str && slots_str) {
-+    if (qemu_opt_get(opts, "maxmem")) {
-         uint64_t slots;
- 
-         sz = qemu_opt_get_size(opts, "maxmem", 0);
-@@ -2927,13 +2924,7 @@ static void set_memory_options(uint64_t *ram_slots, ram_addr_t *maxram_size,
-                          "the initial memory size (0x" RAM_ADDR_FMT ")",
-                          sz, ram_size);
-             exit(EXIT_FAILURE);
--        } else if (sz > ram_size) {
--            if (!slots) {
--                error_report("invalid value of -m option: maxmem was "
--                             "specified, but no hotplug slots were specified");
--                exit(EXIT_FAILURE);
--            }
--        } else if (slots) {
-+        } else if (slots && sz == ram_size) {
-             error_report("invalid value of -m option maxmem: "
-                          "memory slots were specified but maximum memory size "
-                          "(0x%" PRIx64 ") is equal to the initial memory size "
-@@ -2943,10 +2934,8 @@ static void set_memory_options(uint64_t *ram_slots, ram_addr_t *maxram_size,
- 
-         *maxram_size = sz;
-         *ram_slots = slots;
--    } else if ((!maxmem_str && slots_str) ||
--            (maxmem_str && !slots_str)) {
--        error_report("invalid -m option value: missing "
--                "'%s' option", slots_str ? "maxmem" : "slots");
-+    } else if (qemu_opt_get(opts, "slots")) {
-+        error_report("invalid -m option value: missing 'maxmem' option");
-         exit(EXIT_FAILURE);
-     }
- 
--- 
-2.14.3
+thanks
+-- PMM
