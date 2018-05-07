@@ -1,17 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <leandro.lupori@gmail.com>) id 1fFjNq-0001oQ-F3
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 12:53:07 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fFjSn-00046s-BA
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 12:58:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <leandro.lupori@gmail.com>) id 1fFjNn-0005EW-Bv
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 12:53:06 -0400
-From: luporl <leandro.lupori@gmail.com>
-Date: Mon,  7 May 2018 13:52:42 -0300
-Message-Id: <20180507165242.46502-1-leandro.lupori@gmail.com>
-In-Reply-To: <20180507180835.4b7b9222@bahia.lan>
-References: <20180507180835.4b7b9222@bahia.lan>
-Subject: [Qemu-devel] [PATCH v3] target/ppc: Allow PIR read in privileged
- mode
+	(envelope-from <pbonzini@redhat.com>) id 1fFjSk-0002mB-AN
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 12:58:13 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53078 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fFjSk-0002lj-5N
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 12:58:10 -0400
+References: <20180411115036.31832-1-vkuznets@redhat.com>
+	<877eomtssk.fsf@vitty.brq.redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2cb9716d-e5bf-7bd7-e217-8c2d090a2564@redhat.com>
+Date: Mon, 7 May 2018 18:57:58 +0200
+MIME-Version: 1.0
+In-Reply-To: <877eomtssk.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 0/1] i386/kvm: TSC page clocksource for
+ Hyper-V-on-KVM fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,45 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: luporl <leandro.lupori@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
+To: Vitaly Kuznetsov <vkuznets@redhat.com>, qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>
 
-According to PowerISA, the PIR register should be readable in privileged
-mode also, not only in hypervisor privileged mode.
+On 02/05/2018 09:34, Vitaly Kuznetsov wrote:
+> Vitaly Kuznetsov <vkuznets@redhat.com> writes:
+> 
+>> Changes since v4:
+>> - Rebase on top of Roman's patches.
+>> - Drop PATCH2 as it is no longer needed (after adding explicit
+>>   hv_frequencies).
+>>
+>> Previously, Ladi was working on enabling TSC page clocksource for nested
+>> Hyper-V-on-KVM workloads. He found out that if Hyper-V frequency MSRs are
+>> exposed to L1 as well as INVTSC flag Hyper-V enables TSC page clocksource
+>> to its guests. Qemu doesn't pass INVTSC by default as it is a migration
+>> blocker.
+>>
+>> I found out there's a different way to make Hyper-V like us: expose
+>> Reenlightenment MSRs to it. KVM doesn't fully support the feature as
+>> we're still unable to migrate nested environments but rudimentary support
+>> we have there is enough.
+>>
+>> Enable Hyper-V reenlightenment MSRs to make things work.
+>>
+> 
+> Gentle ping :-)
+> 
+> With Roman's Reviewed-by:, is there anything else needed from me to get
+> this accepted?
+> 
+> Thanks!
+> 
 
-PowerISA 3.0 - 4.3.3 Processor Identification Register
+Queued, thanks.
 
-"Read access to the PIR is privileged; write access is not provided."
-
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>
-Cc: qemu-ppc@nongnu.org
-Signed-off-by: Leandro Lupori <leandro.lupori@gmail.com>
-Reviewed-by: Jose Ricardo Ziviani <joserz@linux.ibm.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
----
-Changes in v2:
-- added my Signed-off-by, maintainers CC and Jose's Reviewed-by tags
-
-Changes in v3:
-- added subsystem name, version tag and summary of changes
-- added the section of PowerISA that describes PIR access privileges
-
- target/ppc/translate_init.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index a72be6d121..7b56e3ffb9 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -7816,7 +7816,7 @@ static void gen_spr_book3s_ids(CPUPPCState *env)
-     /* Processor identification */
-     spr_register_hv(env, SPR_PIR, "PIR",
-                  SPR_NOACCESS, SPR_NOACCESS,
--                 SPR_NOACCESS, SPR_NOACCESS,
-+                 &spr_read_generic, SPR_NOACCESS,
-                  &spr_read_generic, NULL,
-                  0x00000000);
-     spr_register_hv(env, SPR_HID0, "HID0",
--- 
-2.11.0
+Paolo
