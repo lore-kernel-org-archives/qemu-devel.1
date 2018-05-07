@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hsp.cat7@gmail.com>) id 1fFmgz-0006gr-FH
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 16:25:06 -0400
+	(envelope-from <alistair23@gmail.com>) id 1fFmjG-000833-8S
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 16:27:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hsp.cat7@gmail.com>) id 1fFmgy-0008D8-I7
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 16:25:05 -0400
+	(envelope-from <alistair23@gmail.com>) id 1fFmjF-0001HJ-6Q
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 16:27:26 -0400
+Received: from mail-lf0-x229.google.com ([2a00:1450:4010:c07::229]:38118)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1fFmjE-0001Fv-Vx
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 16:27:25 -0400
+Received: by mail-lf0-x229.google.com with SMTP id f18-v6so16901582lfc.5
+	for <qemu-devel@nongnu.org>; Mon, 07 May 2018 13:27:24 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <539d5d61-8d58-0ffc-e56a-a3ddec5cea86@redhat.com>
-References: <CABLmASE-AqqfVEZ5Q-vWBuXRTHTHhW9=c5f2PRZ34tVCMiRfdg@mail.gmail.com>
-	<539d5d61-8d58-0ffc-e56a-a3ddec5cea86@redhat.com>
-From: Howard Spoelstra <hsp.cat7@gmail.com>
-Date: Mon, 7 May 2018 22:25:01 +0200
-Message-ID: <CABLmASG6GLixmciH7Q-Q7=yQDZEbp0=wyUtb+v91CJY2un9gMQ@mail.gmail.com>
+In-Reply-To: <CAHNT7NuaUV8jX8p6yjEXNYqtRHmYPSFFN23xr=Lr=-fnMneBZw@mail.gmail.com>
+References: <cover.1525464177.git.alistair.francis@wdc.com>
+	<107c154303a7f08c452199df250c274f40d274ec.1525464177.git.alistair.francis@wdc.com>
+	<CAHNT7NuaUV8jX8p6yjEXNYqtRHmYPSFFN23xr=Lr=-fnMneBZw@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 7 May 2018 13:26:52 -0700
+Message-ID: <CAKmqyKP=d36zZkBnSmUXbC0QY=keQ0VMrOJvxX52y57rb1YekQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Compilation error for qemu-system-ppc on Fedora 28
+Subject: Re: [Qemu-devel] [PATCH v1 1/4] hw/riscv/sifive_u: Create a U54 SoC
+ object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,32 +31,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>
+To: Michael Clark <mjc@sifive.com>
+Cc: Alistair Francis <alistair.francis@wdc.com>, QEMU Developers <qemu-devel@nongnu.org>, Palmer Dabbelt <palmer@sifive.com>
 
-On Mon, May 7, 2018 at 7:51 PM, Eric Blake <eblake@redhat.com> wrote:
-> On 05/06/2018 05:56 AM, Howard Spoelstra wrote:
->>
->> Hi all,
->>
->> I get these errors compiling qemu-system-ppc on Fedora 28, gcc 8.0.1:
->>
->> /home/hsp/src/qemu-master/hw/ppc/e500.c: In function
->> =E2=80=98ppce500_load_device_tree=E2=80=99:
->> /home/hsp/src/qemu-master/hw/ppc/e500.c:442:37: error: =E2=80=98/pic@=E2=
-=80=99
->> directive output may be truncated writing 5 bytes into a region of
->> size between 1 and 128 [-Werror=3Dformat-truncation=3D]
->>       snprintf(mpic, sizeof(mpic), "%s/pic@%llx", soc,
->> MPC8544_MPIC_REGS_OFFSET);
->>                                       ^~~~~
+On Fri, May 4, 2018 at 3:55 PM, Michael Clark <mjc@sifive.com> wrote:
 >
 >
-> Looks like this fixes it:
-> https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg01359.html
+> On Sat, May 5, 2018 at 8:12 AM, Alistair Francis <alistair.francis@wdc.com>
+> wrote:
+>>
+>> Create a SiFive Unleashed U54 SoC and use that in the sifive_u machine.
+>>
+>> We leave the SoC, RAM, device tree and reset/fdt loading as part of the
+>> machine. All the other device creation has been moved to the SoC.
 >
+>
+> There is a tiny problem that we will have to resolve with renaming,
+> otherwise we will end up with lots of SOCs that are the essentially same
+> with a different CPU.
+>
+> There is an intention to add a HiFive1 and HiFiveU board in the future
+> however we were very explicit in renaming sifive_e300 and sifive_u500 to
+> sifive_e and sifive_u.
+>
+> If you read the code more closely you'll notice that we instantiate the
+> sifive_u board with a U34 if 32-bit and a U54 if 64-bit.
+>
+> #if defined(TARGET_RISCV32)
+> #define SIFIVE_U_CPU TYPE_RISCV_CPU_SIFIVE_U34
+> #elif defined(TARGET_RISCV64)
+> #define SIFIVE_U_CPU TYPE_RISCV_CPU_SIFIVE_U54
+> #endif
+>
+> The rationale is that sifive_e and sifive_u can eventually be customized to
+> represent different configurations of SiFive Core IP. We won't want to end
+> up hardcoding specific models in sifive_e or sifive_u
+>
+> SiFive have been talking internally about having sifive_e and sifive_u
+> reconfigurable, possibly even to the extend where we can configure with a
+> memory map. This is somewhat consistent with what SiFive do internally as
+> the FE310 and FU540 are configurations generated by a core generator.
+>
+> Now comes the question of whether its the right time to add a 'hifive1' or
+> 'hifiveu' machine. I don't think it is immediately necessary. The thought
+> being that we would be able to give a configuration string of file to
+> sifive_u e.g. "e51,u54,u54,u54". There is a different between the U54 and
+> the U54-MC which has an E51 core for management tasks. The PLIC has already
+> been written with this in mind, and is re-configurable to support the U54-MC
+> memory layout.
 
-Yes it does. I already did let Greg know, but forget to reply to all. Thank=
-s.
+Aren't the E51, U54, U54-MC, etc. all different SoCs? So doesn't it
+make sense to break out the SoCs and then in future the user can
+specify the SoC for the machine/board when they start QEMU?
 
-Best, Howard
+Alistair
+
+>
+> In anycase. The change is simply to use sifive_u_soc or sifive_u without the
+> 54 (given it configures with a U34 in 32-bit like the sifive_e configures
+> with an E51 in 64-bit mode, both valid configurations)
+>
