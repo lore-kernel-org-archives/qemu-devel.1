@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35486)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35496)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1fFpMy-0008AR-I2
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 19:16:37 -0400
+	(envelope-from <mjc@sifive.com>) id 1fFpMz-0008Aa-8M
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 19:16:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1fFpMw-0006mf-2F
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 19:16:36 -0400
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:35651)
+	(envelope-from <mjc@sifive.com>) id 1fFpMy-0006qv-Cs
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 19:16:37 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:37500)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fFpMv-0006m0-Ry
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 19:16:33 -0400
-Received: by mail-pg0-x243.google.com with SMTP id j11-v6so20313821pgf.2
-	for <qemu-devel@nongnu.org>; Mon, 07 May 2018 16:16:33 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fFpMy-0006pu-6s
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 19:16:36 -0400
+Received: by mail-pg0-x244.google.com with SMTP id a13-v6so20315976pgu.4
+	for <qemu-devel@nongnu.org>; Mon, 07 May 2018 16:16:36 -0700 (PDT)
 From: Michael Clark <mjc@sifive.com>
-Date: Tue,  8 May 2018 11:14:51 +1200
-Message-Id: <1525734893-10299-2-git-send-email-mjc@sifive.com>
+Date: Tue,  8 May 2018 11:14:52 +1200
+Message-Id: <1525734893-10299-3-git-send-email-mjc@sifive.com>
 In-Reply-To: <1525734893-10299-1-git-send-email-mjc@sifive.com>
 References: <1525734893-10299-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PULL 1/3] riscv: spike: allow base == 0
+Subject: [Qemu-devel] [PULL 2/3] riscv: htif: increase the priority of the
+ htif subregion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +31,71 @@ Cc: patches@groups.riscv.org, KONRAD Frederic <frederic.konrad@adacore.com>
 
 From: KONRAD Frederic <frederic.konrad@adacore.com>
 
-The sanity check on base doesn't allow htif to be mapped @0. Check if the
-symbol exists instead so we can map it where we want.
+The htif device is supposed to be mapped over an other subregion. So increase
+its priority to one to avoid any conflict.
+
+Here is the output of info mtree:
+
+Before:
+(qemu) info mtree
+ address-space: memory
+   0000000000000000-ffffffffffffffff (prio 0, i/o): system
+     0000000000000000-000000000000000f (prio 0, i/o): riscv.htif.uart
+     0000000000000000-0000000000011fff (prio 0, ram): riscv.spike.bootrom
+     0000000002000000-000000000200ffff (prio 0, i/o): riscv.sifive.clint
+     0000000080000000-0000000087ffffff (prio 0, ram): riscv.spike.ram
+
+ address-space: I/O
+   0000000000000000-000000000000ffff (prio 0, i/o): io
+
+ address-space: cpu-memory-0
+   0000000000000000-ffffffffffffffff (prio 0, i/o): system
+     0000000000000000-000000000000000f (prio 0, i/o): riscv.htif.uart
+     0000000000000000-0000000000011fff (prio 0, ram): riscv.spike.bootrom
+     0000000002000000-000000000200ffff (prio 0, i/o): riscv.sifive.clint
+     0000000080000000-0000000087ffffff (prio 0, ram): riscv.spike.ram
+
+After:
+ (qemu) info mtree
+ address-space: memory
+   0000000000000000-ffffffffffffffff (prio 0, i/o): system
+     0000000000000000-000000000000000f (prio 1, i/o): riscv.htif.uart
+     0000000000000000-0000000000011fff (prio 0, ram): riscv.spike.bootrom
+     0000000002000000-000000000200ffff (prio 0, i/o): riscv.sifive.clint
+     0000000080000000-0000000087ffffff (prio 0, ram): riscv.spike.ram
+
+ address-space: I/O
+   0000000000000000-000000000000ffff (prio 0, i/o): io
+
+ address-space: cpu-memory-0
+   0000000000000000-ffffffffffffffff (prio 0, i/o): system
+     0000000000000000-000000000000000f (prio 1, i/o): riscv.htif.uart
+     0000000000000000-0000000000011fff (prio 0, ram): riscv.spike.bootrom
+     0000000002000000-000000000200ffff (prio 0, i/o): riscv.sifive.clint
+     0000000080000000-0000000087ffffff (prio 0, ram): riscv.spike.ram
 
 Reviewed-by: Michael Clark <mjc@sifive.com>
 Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
-
-Message-Id: <1525360636-18229-2-git-send-email-frederic.konrad@adacore.com>
+Message-Id: <1525360636-18229-3-git-send-email-frederic.konrad@adacore.com>
 ---
- hw/riscv/riscv_htif.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ hw/riscv/riscv_htif.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/hw/riscv/riscv_htif.c b/hw/riscv/riscv_htif.c
-index 3e17f3025106..be252ec8cce9 100644
+index be252ec8cce9..f73512941fb6 100644
 --- a/hw/riscv/riscv_htif.c
 +++ b/hw/riscv/riscv_htif.c
-@@ -41,17 +41,20 @@
-     } while (0)
- 
- static uint64_t fromhost_addr, tohost_addr;
-+static int address_symbol_set;
- 
- void htif_symbol_callback(const char *st_name, int st_info, uint64_t st_value,
--    uint64_t st_size)
-+                          uint64_t st_size)
- {
-     if (strcmp("fromhost", st_name) == 0) {
-+        address_symbol_set |= 1;
-         fromhost_addr = st_value;
-         if (st_size != 8) {
-             error_report("HTIF fromhost must be 8 bytes");
-             exit(1);
-         }
-     } else if (strcmp("tohost", st_name) == 0) {
-+        address_symbol_set |= 2;
-         tohost_addr = st_value;
-         if (st_size != 8) {
-             error_report("HTIF tohost must be 8 bytes");
-@@ -248,7 +251,7 @@ HTIFState *htif_mm_init(MemoryRegion *address_space, MemoryRegion *main_mem,
-     qemu_chr_fe_init(&s->chr, chr, &error_abort);
-     qemu_chr_fe_set_handlers(&s->chr, htif_can_recv, htif_recv, htif_event,
+@@ -253,8 +253,9 @@ HTIFState *htif_mm_init(MemoryRegion *address_space, MemoryRegion *main_mem,
          htif_be_change, s, NULL, true);
--    if (base) {
-+    if (address_symbol_set == 3) {
+     if (address_symbol_set == 3) {
          memory_region_init_io(&s->mmio, NULL, &htif_mm_ops, s,
-                             TYPE_HTIF_UART, size);
-         memory_region_add_subregion(address_space, base, &s->mmio);
+-                            TYPE_HTIF_UART, size);
+-        memory_region_add_subregion(address_space, base, &s->mmio);
++                              TYPE_HTIF_UART, size);
++        memory_region_add_subregion_overlap(address_space, base,
++                                            &s->mmio, 1);
+     }
+ 
+     return s;
 -- 
 2.7.0
