@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fFbiv-0002Hc-3r
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 04:42:26 -0400
+	(envelope-from <groug@kaod.org>) id 1fFc2U-00059z-Ha
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 05:02:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fFbir-0007qB-UC
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 04:42:21 -0400
-References: <20180423165126.15441-1-david@redhat.com>
-	<20180423165126.15441-3-david@redhat.com>
-	<20180504192635.GA4903@localhost.localdomain>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <8e64551c-8a52-2287-6d52-4264fbf3b31f@redhat.com>
-Date: Mon, 7 May 2018 10:42:09 +0200
+	(envelope-from <groug@kaod.org>) id 1fFc2R-0003PZ-FC
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 05:02:34 -0400
+Received: from 13.mo3.mail-out.ovh.net ([188.165.33.202]:60046)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fFc2R-0003KK-5O
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 05:02:31 -0400
+Received: from player762.ha.ovh.net (unknown [10.109.105.99])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 73A551B6AF9
+	for <qemu-devel@nongnu.org>; Mon,  7 May 2018 11:02:22 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Mon, 07 May 2018 11:02:09 +0200
+Message-ID: <152568372989.443627.900708381919207053.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20180504192635.GA4903@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 02/11] machine: make
- MemoryHotplugState accessible via the machine
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] ppc: e500: use g_strdup_printf() instead of
+ snprintf()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,84 +28,228 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Pankaj Gupta <pagupta@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>, Howard Spoelstra <hsp.cat7@gmail.com>
 
-On 04.05.2018 21:26, Eduardo Habkost wrote:
-> On Mon, Apr 23, 2018 at 06:51:17PM +0200, David Hildenbrand wrote:
-> [...]
->> +    /* always allocate the device memory information */
->> +    machine->device_memory = g_malloc(sizeof(*machine->device_memory));
-> [...]
->> -    /* initialize hotplug memory address space */
->> +    /* always allocate the device memory information */
->> +    machine->device_memory = g_malloc(sizeof(*machine->device_memory));
-> 
-> This makes QEMU crash because machine->device_memory->base is initialized with
-> garbage:
-> 
-> #1  0x00007fffef30a8f8 in abort () at /lib64/libc.so.6
-> #2  0x00007fffef302026 in __assert_fail_base () at /lib64/libc.so.6
-> #3  0x00007fffef3020d2 in  () at /lib64/libc.so.6
-> #4  0x0000555555833483 in int128_get64 (a=<optimized out>) at .../qemu-build/include/qemu/int128.h:22
-> #5  0x0000555555837c2e in memory_region_size (a=<optimized out>) at .../qemu-build/memory.c:1735
-> #6  0x0000555555837c2e in memory_region_size (mr=<optimized out>) at .../qemu-build/memory.c:1739
-> #7  0x00005555558a2b14 in pc_memory_init (pcms=pcms@entry=0x555556850050, system_memory=system_memory@entry=0x555556851e00, rom_memory=rom_memory@entry=0x5555568b8120, ram_memory=ram_memory@entry=0x7fffffffd630)
->     at .../qemu-build/hw/i386/pc.c:1440
-> #8  0x00005555558a5a73 in pc_init1 (machine=0x555556850050, pci_type=0x555555cb6fd0 "i440FX", host_type=0x555555c43e41 "i440FX-pcihost") at .../qemu-build/hw/i386/pc_piix.c:179
-> #9  0x00005555559abbda in machine_run_board_init (machine=0x555556850050) at .../qemu-build/hw/core/machine.c:829
-> #10 0x00005555557dc515 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at .../qemu-build/vl.c:4563
-> 
-> 
-> I will squash the following fixup:
-> 
-> From 6216fdb28476ed21c4ced4672003c9c7cb0e04d2 Mon Sep 17 00:00:00 2001
-> From: David Hildenbrand <david@redhat.com>
-> Date: Fri, 4 May 2018 15:54:46 +0200
-> Subject: [PATCH] memory-device: fix device_memory creation on pc and spapr
-> 
-> We have to inititalize the struct to 0. Otherwise, without "maxmem",
-> the content is undefined, which might result in random asserts
-> striking when e.g. reading out the size of the contained memory region.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/i386/pc.c   | 2 +-
->  hw/ppc/spapr.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index ffcd7b85d9..868893d0a1 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1372,7 +1372,7 @@ void pc_memory_init(PCMachineState *pcms,
->      }
->  
->      /* always allocate the device memory information */
-> -    machine->device_memory = g_malloc(sizeof(*machine->device_memory));
-> +    machine->device_memory = g_malloc0(sizeof(*machine->device_memory));
->  
->      /* initialize device memory address space */
->      if (pcmc->has_reserved_memory &&
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index ef05075232..a1abcba6ad 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2637,7 +2637,7 @@ static void spapr_machine_init(MachineState *machine)
->      memory_region_add_subregion(sysmem, 0, ram);
->  
->      /* always allocate the device memory information */
-> -    machine->device_memory = g_malloc(sizeof(*machine->device_memory));
-> +    machine->device_memory = g_malloc0(sizeof(*machine->device_memory));
->  
->      /* initialize hotplug memory address space */
->      if (machine->ram_size < machine->maxram_size) {
-> 
+qemu-system-ppc fails to build with GCC 8.0.1:
 
-Perfect, thanks Eduardo!
+/home/hsp/src/qemu-master/hw/ppc/e500.c: In function =E2=80=98ppce500_loa=
+d_device_tree=E2=80=99:
+/home/hsp/src/qemu-master/hw/ppc/e500.c:442:37: error: =E2=80=98/pic@=E2=80=
+=99
+directive output may be truncated writing 5 bytes into a region of
+size between 1 and 128 [-Werror=3Dformat-truncation=3D]
+     snprintf(mpic, sizeof(mpic), "%s/pic@%llx", soc, MPC8544_MPIC_REGS_O=
+FFSET);
+                                     ^~~~~
+In file included from /usr/include/stdio.h:862,
+                 from /home/hsp/src/qemu-master/include/qemu/osdep.h:68,
+                 from /home/hsp/src/qemu-master/hw/ppc/e500.c:17:
+/usr/include/bits/stdio2.h:64:10: note: =E2=80=98__builtin___snprintf_chk=
+=E2=80=99
+output between 11 and 138 bytes into a destination of size 128
+   return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVEL - 1,
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        __bos (__s), __fmt, __va_arg_pack ());
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/hsp/src/qemu-master/hw/ppc/e500.c:470:39: error:
+=E2=80=98/global-utilities@=E2=80=99 directive output may be truncated wr=
+iting 18
+bytes into a region of size between 1 and 128
+[-Werror=3Dformat-truncation=3D]
+     snprintf(gutil, sizeof(gutil), "%s/global-utilities@%llx", soc,
+                                       ^~~~~~~~~~~~~~~~~~
+In file included from /usr/include/stdio.h:862,
+                 from /home/hsp/src/qemu-master/include/qemu/osdep.h:68,
+                 from /home/hsp/src/qemu-master/hw/ppc/e500.c:17:
+/usr/include/bits/stdio2.h:64:10: note: =E2=80=98__builtin___snprintf_chk=
+=E2=80=99
+output between 24 and 151 bytes into a destination of size 128
+   return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVEL - 1,
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        __bos (__s), __fmt, __va_arg_pack ());
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/hsp/src/qemu-master/hw/ppc/e500.c:477:36: error: =E2=80=98/msi@=E2=80=
+=99
+directive output may be truncated writing 5 bytes into a region of
+size between 0 and 127 [-Werror=3Dformat-truncation=3D]
+     snprintf(msi, sizeof(msi), "/%s/msi@%llx", soc, MPC8544_MSI_REGS_OFF=
+SET);
+                                    ^~~~~
+In file included from /usr/include/stdio.h:862,
+                 from /home/hsp/src/qemu-master/include/qemu/osdep.h:68,
+                 from /home/hsp/src/qemu-master/hw/ppc/e500.c:17:
+/usr/include/bits/stdio2.h:64:10: note: =E2=80=98__builtin___snprintf_chk=
+=E2=80=99
+output between 12 and 139 bytes into a destination of size 128
+   return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVEL - 1,
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        __bos (__s), __fmt, __va_arg_pack ());
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--- 
+Fix this by converting e500 to use g_strdup_printf()+g_free() instead
+of snprintf(). This is done globally, even for call sites that don't
+break build, since this is the preferred practice in QEMU.
 
-Thanks,
+Reported-by: Howard Spoelstra <hsp.cat7@gmail.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/ppc/e500.c |   39 +++++++++++++++++++++++----------------
+ 1 file changed, 23 insertions(+), 16 deletions(-)
 
-David / dhildenb
+diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+index 3e0923cfba7d..748a8d213b25 100644
+--- a/hw/ppc/e500.c
++++ b/hw/ppc/e500.c
+@@ -106,9 +106,9 @@ static void dt_serial_create(void *fdt, unsigned long=
+ long offset,
+                              const char *soc, const char *mpic,
+                              const char *alias, int idx, bool defcon)
+ {
+-    char ser[128];
++    char *ser;
+=20
+-    snprintf(ser, sizeof(ser), "%s/serial@%llx", soc, offset);
++    ser =3D g_strdup_printf("%s/serial@%llx", soc, offset);
+     qemu_fdt_add_subnode(fdt, ser);
+     qemu_fdt_setprop_string(fdt, ser, "device_type", "serial");
+     qemu_fdt_setprop_string(fdt, ser, "compatible", "ns16550");
+@@ -129,6 +129,7 @@ static void dt_serial_create(void *fdt, unsigned long=
+ long offset,
+         qemu_fdt_setprop_string(fdt, "/chosen", "linux,stdout-path", ser=
+);
+         qemu_fdt_setprop_string(fdt, "/chosen", "stdout-path", ser);
+     }
++    g_free(ser);
+ }
+=20
+ static void create_dt_mpc8xxx_gpio(void *fdt, const char *soc, const cha=
+r *mpic)
+@@ -285,13 +286,13 @@ static int ppce500_load_device_tree(PPCE500MachineS=
+tate *pms,
+     uint32_t tb_freq =3D 400000000;
+     int i;
+     char compatible_sb[] =3D "fsl,mpc8544-immr\0simple-bus";
+-    char soc[128];
+-    char mpic[128];
++    char *soc;
++    char *mpic;
+     uint32_t mpic_ph;
+     uint32_t msi_ph;
+-    char gutil[128];
+-    char pci[128];
+-    char msi[128];
++    char *gutil;
++    char *pci;
++    char *msi;
+     uint32_t *pci_map =3D NULL;
+     int len;
+     uint32_t pci_ranges[14] =3D
+@@ -391,7 +392,7 @@ static int ppce500_load_device_tree(PPCE500MachineSta=
+te *pms,
+        the first node as boot node and be happy */
+     for (i =3D smp_cpus - 1; i >=3D 0; i--) {
+         CPUState *cpu;
+-        char cpu_name[128];
++        char *cpu_name;
+         uint64_t cpu_release_addr =3D pmc->spin_base + (i * 0x20);
+=20
+         cpu =3D qemu_get_cpu(i);
+@@ -400,7 +401,7 @@ static int ppce500_load_device_tree(PPCE500MachineSta=
+te *pms,
+         }
+         env =3D cpu->env_ptr;
+=20
+-        snprintf(cpu_name, sizeof(cpu_name), "/cpus/PowerPC,8544@%x", i)=
+;
++        cpu_name =3D g_strdup_printf("/cpus/PowerPC,8544@%x", i);
+         qemu_fdt_add_subnode(fdt, cpu_name);
+         qemu_fdt_setprop_cell(fdt, cpu_name, "clock-frequency", clock_fr=
+eq);
+         qemu_fdt_setprop_cell(fdt, cpu_name, "timebase-frequency", tb_fr=
+eq);
+@@ -422,11 +423,12 @@ static int ppce500_load_device_tree(PPCE500MachineS=
+tate *pms,
+         } else {
+             qemu_fdt_setprop_string(fdt, cpu_name, "status", "okay");
+         }
++        g_free(cpu_name);
+     }
+=20
+     qemu_fdt_add_subnode(fdt, "/aliases");
+     /* XXX These should go into their respective devices' code */
+-    snprintf(soc, sizeof(soc), "/soc@%"PRIx64, pmc->ccsrbar_base);
++    soc =3D g_strdup_printf("/soc@%"PRIx64, pmc->ccsrbar_base);
+     qemu_fdt_add_subnode(fdt, soc);
+     qemu_fdt_setprop_string(fdt, soc, "device_type", "soc");
+     qemu_fdt_setprop(fdt, soc, "compatible", compatible_sb,
+@@ -439,7 +441,7 @@ static int ppce500_load_device_tree(PPCE500MachineSta=
+te *pms,
+     /* XXX should contain a reasonable value */
+     qemu_fdt_setprop_cell(fdt, soc, "bus-frequency", 0);
+=20
+-    snprintf(mpic, sizeof(mpic), "%s/pic@%llx", soc, MPC8544_MPIC_REGS_O=
+FFSET);
++    mpic =3D g_strdup_printf("%s/pic@%llx", soc, MPC8544_MPIC_REGS_OFFSE=
+T);
+     qemu_fdt_add_subnode(fdt, mpic);
+     qemu_fdt_setprop_string(fdt, mpic, "device_type", "open-pic");
+     qemu_fdt_setprop_string(fdt, mpic, "compatible", "fsl,mpic");
+@@ -467,14 +469,15 @@ static int ppce500_load_device_tree(PPCE500MachineS=
+tate *pms,
+                          soc, mpic, "serial0", 0, true);
+     }
+=20
+-    snprintf(gutil, sizeof(gutil), "%s/global-utilities@%llx", soc,
+-             MPC8544_UTIL_OFFSET);
++    gutil =3D g_strdup_printf("%s/global-utilities@%llx", soc,
++                            MPC8544_UTIL_OFFSET);
+     qemu_fdt_add_subnode(fdt, gutil);
+     qemu_fdt_setprop_string(fdt, gutil, "compatible", "fsl,mpc8544-guts"=
+);
+     qemu_fdt_setprop_cells(fdt, gutil, "reg", MPC8544_UTIL_OFFSET, 0x100=
+0);
+     qemu_fdt_setprop(fdt, gutil, "fsl,has-rstcr", NULL, 0);
++    g_free(gutil);
+=20
+-    snprintf(msi, sizeof(msi), "/%s/msi@%llx", soc, MPC8544_MSI_REGS_OFF=
+SET);
++    msi =3D g_strdup_printf("/%s/msi@%llx", soc, MPC8544_MSI_REGS_OFFSET=
+);
+     qemu_fdt_add_subnode(fdt, msi);
+     qemu_fdt_setprop_string(fdt, msi, "compatible", "fsl,mpic-msi");
+     qemu_fdt_setprop_cells(fdt, msi, "reg", MPC8544_MSI_REGS_OFFSET, 0x2=
+00);
+@@ -492,9 +495,10 @@ static int ppce500_load_device_tree(PPCE500MachineSt=
+ate *pms,
+         0xe7, 0x0);
+     qemu_fdt_setprop_cell(fdt, msi, "phandle", msi_ph);
+     qemu_fdt_setprop_cell(fdt, msi, "linux,phandle", msi_ph);
++    g_free(msi);
+=20
+-    snprintf(pci, sizeof(pci), "/pci@%llx",
+-             pmc->ccsrbar_base + MPC8544_PCI_REGS_OFFSET);
++    pci =3D g_strdup_printf("/pci@%llx",
++                          pmc->ccsrbar_base + MPC8544_PCI_REGS_OFFSET);
+     qemu_fdt_add_subnode(fdt, pci);
+     qemu_fdt_setprop_cell(fdt, pci, "cell-index", 0);
+     qemu_fdt_setprop_string(fdt, pci, "compatible", "fsl,mpc8540-pci");
+@@ -522,14 +526,17 @@ static int ppce500_load_device_tree(PPCE500MachineS=
+tate *pms,
+     qemu_fdt_setprop_cell(fdt, pci, "#size-cells", 2);
+     qemu_fdt_setprop_cell(fdt, pci, "#address-cells", 3);
+     qemu_fdt_setprop_string(fdt, "/aliases", "pci0", pci);
++    g_free(pci);
+=20
+     if (pmc->has_mpc8xxx_gpio) {
+         create_dt_mpc8xxx_gpio(fdt, soc, mpic);
+     }
++    g_free(soc);
+=20
+     if (pmc->has_platform_bus) {
+         platform_bus_create_devtree(pmc, fdt, mpic);
+     }
++    g_free(mpic);
+=20
+     pmc->fixup_devtree(fdt);
+=20
