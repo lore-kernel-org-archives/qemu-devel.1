@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45607)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fFgZ7-0006xd-FU
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 09:52:34 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fFgaJ-0007mf-Ah
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 09:53:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fFgZ2-0006If-HZ
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 09:52:33 -0400
-Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:33727)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1fFgZ2-0006Ht-C8
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 09:52:28 -0400
-Received: by mail-io0-x242.google.com with SMTP id e78-v6so33785881iod.0
-	for <qemu-devel@nongnu.org>; Mon, 07 May 2018 06:52:28 -0700 (PDT)
-From: Lidong Chen <jemmy858585@gmail.com>
-Date: Mon,  7 May 2018 21:52:16 +0800
-Message-Id: <1525701137-9384-1-git-send-email-lidongchen@tencent.com>
-Subject: [Qemu-devel] [PATCH 1/2] migration: implement io_set_aio_fd_handler
- function for RDMA QIOChannel
+	(envelope-from <ehabkost@redhat.com>) id 1fFgaI-0007Ly-Gt
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 09:53:47 -0400
+Date: Mon, 7 May 2018 10:53:30 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180507135330.GS25013@localhost.localdomain>
+References: <1521452376-25099-1-git-send-email-thuth@redhat.com>
+	<87bme62nu0.fsf@dusky.pond.sub.org>
+	<068649bc-1546-6fc5-3e41-63512196cbf8@redhat.com>
+	<20180427003215.GU29865@localhost.localdomain>
+	<87o9i5uplt.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87o9i5uplt.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [RFC PATCH] tests/device-introspect: Test devices
+ with all machines, not only with "none"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,73 +27,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com, dgilbert@redhat.com, berrange@redhat.com
-Cc: qemu-devel@nongnu.org, galsha@mellanox.com, aviadye@mellanox.com, adido@mellanox.com, Lidong Chen <lidongchen@tencent.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-if qio_channel_rdma_readv return QIO_CHANNEL_ERR_BLOCK, the destination qemu
-crash.
+On Fri, Apr 27, 2018 at 08:31:58AM +0200, Markus Armbruster wrote:
+> Eduardo Habkost <ehabkost@redhat.com> writes:
+> 
+> > On Thu, Apr 26, 2018 at 05:20:25PM +0200, Thomas Huth wrote:
+> >> On 26.04.2018 13:45, Markus Armbruster wrote:
+> >> > Thomas Huth <thuth@redhat.com> writes:
+> >> [...]
+> >> >> @@ -260,6 +263,26 @@ static void test_abstract_interfaces(void)
+> >> >>      qtest_end();
+> >> >>  }
+> >> >>  
+> >> >> +static void add_machine_test_case(const char *mname)
+> >> >> +{
+> >> >> +    char *path, *args;
+> >> >> +
+> >> >> +    /* Ignore blacklisted machines */
+> >> >> +    if (g_str_equal("xenfv", mname) || g_str_equal("xenpv", mname)) {
+> >> >> +        return;
+> >> >> +    }
+> >> >> +
+> >> >> +    path = g_strdup_printf("device/introspect/concrete-defaults-%s", mname);
+> >> >> +    args = g_strdup_printf("-machine %s", mname);
+> >> >> +    qtest_add_data_func(path, args, test_device_intro_concrete);
+> >> > 
+> >> > This runs test_device_intro_concrete() with "-machine M" for all machine
+> >> > types M, in SPEED=slow mode.
+> >> > 
+> >> >> +    g_free(path);
+> >> >> +
+> >> >> +    path = g_strdup_printf("device/introspect/concrete-nodefaults-%s", mname);
+> >> >> +    args = g_strdup_printf("-nodefaults -machine %s", mname);
+> >> >> +    qtest_add_data_func(path, args, test_device_intro_concrete);
+> >> > 
+> >> > This runs test_device_intro_concrete() with "-nodefaults -machine M" for
+> >> > all machine types M, in SPEED=slow mode.
+> >> > 
+> >> > Has "without -nodefaults" exposed additional bugs?
+> >> 
+> >> After testing this with all machines, I had to discover that
+> >> "-nodefaults" does not work so easily: A lot of the embedded machines
+> >> (especially the ARM machines) simply refuse to work with "-nodefaults"
+> >> and exit immediately instead. E.g.:
+> >> 
+> >> $ arm-softmmu/qemu-system-arm -nodefaults -nographic -M n810,accel=qtest
+> >> qemu-system-arm: missing SecureDigital device
+> 
+> These are all bugs.  --nodefaults is supposed to suppress *optional*
+> devices, not mandatory ones.
 
-The backtrace is:
-(gdb) bt
-    #0  0x0000000000000000 in ?? ()
-    #1  0x00000000008db50e in qio_channel_set_aio_fd_handler (ioc=0x38111e0, ctx=0x3726080,
-        io_read=0x8db841 <qio_channel_restart_read>, io_write=0x0, opaque=0x38111e0) at io/channel.c:
-    #2  0x00000000008db952 in qio_channel_set_aio_fd_handlers (ioc=0x38111e0) at io/channel.c:438
-    #3  0x00000000008dbab4 in qio_channel_yield (ioc=0x38111e0, condition=G_IO_IN) at io/channel.c:47
-    #4  0x00000000007a870b in channel_get_buffer (opaque=0x38111e0, buf=0x440c038 "", pos=0, size=327
-        at migration/qemu-file-channel.c:83
-    #5  0x00000000007a70f6 in qemu_fill_buffer (f=0x440c000) at migration/qemu-file.c:299
-    #6  0x00000000007a79d0 in qemu_peek_byte (f=0x440c000, offset=0) at migration/qemu-file.c:562
-    #7  0x00000000007a7a22 in qemu_get_byte (f=0x440c000) at migration/qemu-file.c:575
-    #8  0x00000000007a7c78 in qemu_get_be32 (f=0x440c000) at migration/qemu-file.c:655
-    #9  0x00000000007a0508 in qemu_loadvm_state (f=0x440c000) at migration/savevm.c:2126
-    #10 0x0000000000794141 in process_incoming_migration_co (opaque=0x0) at migration/migration.c:366
-    #11 0x000000000095c598 in coroutine_trampoline (i0=84033984, i1=0) at util/coroutine-ucontext.c:1
-    #12 0x00007f9c0db56d40 in ?? () from /lib64/libc.so.6
-    #13 0x00007f96fe858760 in ?? ()
-    #14 0x0000000000000000 in ?? ()
+I'm not sure I understand the requirements.  What exactly is the
+definition of "mandatory"?
 
-RDMA QIOChannel not implement io_set_aio_fd_handler. so
-qio_channel_set_aio_fd_handler will access NULL pointer.
+A machine created by "qemu-system-x86_64 -machine pc -nodefaults"
+is useless because it has no any device to boot from.  How is
+that different from a n810 machine not booting because there's no
+SD device?
 
-Signed-off-by: Lidong Chen <lidongchen@tencent.com>
----
- migration/rdma.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
-
-diff --git a/migration/rdma.c b/migration/rdma.c
-index 92e4d30..dfa4f77 100644
---- a/migration/rdma.c
-+++ b/migration/rdma.c
-@@ -2963,6 +2963,21 @@ static GSource *qio_channel_rdma_create_watch(QIOChannel *ioc,
-     return source;
- }
- 
-+static void qio_channel_rdma_set_aio_fd_handler(QIOChannel *ioc,
-+                                                  AioContext *ctx,
-+                                                  IOHandler *io_read,
-+                                                  IOHandler *io_write,
-+                                                  void *opaque)
-+{
-+    QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
-+    if (io_read) {
-+        aio_set_fd_handler(ctx, rioc->rdmain->comp_channel->fd,
-+                           false, io_read, io_write, NULL, opaque);
-+    } else {
-+        aio_set_fd_handler(ctx, rioc->rdmaout->comp_channel->fd,
-+                           false, io_read, io_write, NULL, opaque);
-+    }
-+}
- 
- static int qio_channel_rdma_close(QIOChannel *ioc,
-                                   Error **errp)
-@@ -3822,6 +3837,7 @@ static void qio_channel_rdma_class_init(ObjectClass *klass,
-     ioc_klass->io_set_blocking = qio_channel_rdma_set_blocking;
-     ioc_klass->io_close = qio_channel_rdma_close;
-     ioc_klass->io_create_watch = qio_channel_rdma_create_watch;
-+    ioc_klass->io_set_aio_fd_handler = qio_channel_rdma_set_aio_fd_handler;
- }
- 
- static const TypeInfo qio_channel_rdma_info = {
 -- 
-1.8.3.1
+Eduardo
