@@ -1,36 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fFYmL-0007e2-7n
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 01:33:42 -0400
+	(envelope-from <armbru@redhat.com>) id 1fFYqU-0000K6-ME
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 01:37:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fFYmH-0002xL-8j
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 01:33:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50140 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fFYqQ-00052Q-Kv
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 01:37:58 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48604 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fFYmH-0002vs-3w
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 01:33:37 -0400
-References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
-	<20180430103312.GH3249@redhat.com>
-	<20180430132107.0a37704d.cohuck@redhat.com>
-	<ac216b06-9469-addd-b5a1-3a3a89fd0782@redhat.com>
-	<20180502074403.yh5weukbjgqsvp7n@sirius.home.kraxel.org>
-	<20180502080200.GG3308@redhat.com>
-	<20180503072100.GA5301@stefanha-x1.localdomain>
-	<20180503090727.GC11382@redhat.com>
-	<CAFEAcA8=mZf8RbQX2-swbUBkoT=RYSVx-oRA2UpzJCqvgGF+KQ@mail.gmail.com>
-	<20180503134321.pp736ou25pdwvslm@sirius.home.kraxel.org>
-	<20180504132023.GA5098@localhost.localdomain>
-	<c2207b0b-889a-e39f-2f55-640118e2d755@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <69fd5755-d1f0-b69a-fabb-3134fccaa4a5@redhat.com>
-Date: Mon, 7 May 2018 07:33:24 +0200
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fFYqQ-0004yt-GT
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 01:37:54 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D79CC406C76D
+	for <qemu-devel@nongnu.org>; Mon,  7 May 2018 05:37:48 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <1525453270-23074-1-git-send-email-thuth@redhat.com>
+	<f7756c7c-338a-a719-7135-aa7a53a62c4c@redhat.com>
+Date: Mon, 07 May 2018 07:37:47 +0200
+In-Reply-To: <f7756c7c-338a-a719-7135-aa7a53a62c4c@redhat.com> (Paolo
+	Bonzini's message of "Fri, 4 May 2018 23:57:53 +0200")
+Message-ID: <87wowgyqj8.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <c2207b0b-889a-e39f-2f55-640118e2d755@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] release retrospective, next release timing,
- numbering
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] Removal of deprecated -no-kvm*
+ options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,35 +34,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-On 04.05.2018 19:30, Richard Henderson wrote:
-> On 05/04/2018 06:20 AM, Kevin Wolf wrote:
->> I'm not sure what the exact systemd model is, but as we came to the
->> conclusion that there is no semantic difference between major and mino=
-r
->> version number for QEMU, I'd just merge them.
->>
->> This would result in 3.0 for the next release, 3.1 etc. would be stabl=
-e
->> releases, and the December release would be 4.0.
->>
->> It feels like the minimal change to fix our existing versioning scheme=
-.
->=20
-> This is very similar to what GCC started to use at version 5.
->=20
->     https://gcc.gnu.org/develop.html#num_scheme
->=20
-> I do think it makes sense to drop minor versions, leaving only major +
-> patchlevel (which then appears to be minor version).
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-We're currently also using the patch level for marking developing
-version (x.y.50) and release candidates (x.y.9r) ... we should also
-think of a way how we want to map that to a new numbering scheme. If we
-do it the GCC way, I guess the x.0 release will be the development
-"versions"? But the release candidates? Do we still need a third number
-for doing those (3.0.1 =3D rc1, 3.0.2 =3D rc2, ...)?
+> On 04/05/2018 19:01, Thomas Huth wrote:
+>> The -no-kvm* options are a remainder of the ancient "qemu-kvm"
+>> fork. They have never been officially documented in our qemu-doc,
+>> they have been marked as deprecated in the sources since a very
+>> long time, and we've marked them as deprecated in our qemu-doc
+>> since QEMU v2.10. So far I haven't seen any complaints that we
+>> should keep them, so it's time to remove these old parameters now.
+>> 
+>> While I'm at it, this patch series also removes a left-over from
+>> the "-tdf" option (which has been removed with QEMU v2.12) and
+>> fixes a deficiency in the option parsing code that has been
+>> revealed by the remainder of the "-tdf" option.
+>> 
+>> Thomas Huth (5):
+>>   qemu-options: Remove remainders of the -tdf option
+>>   qemu-options: Bail out on unsupported options instead of silently
+>>     ignoring them
+>>   qemu-options: Remove deprecated -no-kvm-pit-reinjection
+>>   qemu-options: Remove deprecated -no-kvm-irqchip
+>>   qemu-options: Remove deprecated -no-kvm
+>
+> I'm not that sure anymore about -no-kvm.  It can come in handy for
+> distros (*cough* RHEL *cough) that only ship a qemu-kvm binary with
+> default accelerator "-machine accel=kvm:tcg".
+>
+> Yeah, "-accel tcg" is only a few characters later, but it is a
+> relatively recent addition.
 
- Thomas
+2012 is "relatively recent" in the alternate RHEL universe, perhaps :)
+
+
+Author: Jan Kiszka <jan.kiszka@siemens.com>
+Date:   Fri Oct 5 14:51:45 2012 -0300
+
+    Emulate qemu-kvms -no-kvm option
+    
+    Releases of qemu-kvm will be interrupted at qemu 1.3.0.
+    Users should switch to plain qemu releases.
+    To avoid breaking scenarios which are setup with command line
+    options specific to qemu-kvm, port these switches from qemu-kvm
+    to qemu.git.
+    
+    Port -no-kvm option.
+    
+    Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
+
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 628bd44591..fe8f15c541 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -2888,6 +2888,9 @@ STEXI
+ Enable FIPS 140-2 compliance mode.
+ ETEXI
+ 
++HXCOMM Deprecated by -machine accel=tcg property
++DEF("no-kvm", HAS_ARG, QEMU_OPTION_no_kvm, "", QEMU_ARCH_I386)
++
+ HXCOMM Deprecated by kvm-pit driver properties
+ DEF("no-kvm-pit-reinjection", HAS_ARG, QEMU_OPTION_no_kvm_pit_reinjection,
+     "", QEMU_ARCH_I386)
+diff --git a/vl.c b/vl.c
+index cd7c0fbd52..b39f22ed35 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3171,6 +3171,10 @@ int main(int argc, char **argv, char **envp)
+                     machine = machine_parse(optarg);
+                 }
+                 break;
++             case QEMU_OPTION_no_kvm:
++                olist = qemu_find_opts("machine");
++                qemu_opts_parse(olist, "accel=tcg", 0);
++                break;
+             case QEMU_OPTION_no_kvm_pit: {
+                 fprintf(stderr, "Warning: KVM PIT can no longer be disabled "
+                                 "separately.\n");
