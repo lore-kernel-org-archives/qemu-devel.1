@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54424)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fFmTc-0002I0-53
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 16:11:17 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fFmf9-0005MQ-3c
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 16:23:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fFmTX-00010t-W4
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 16:11:16 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49450)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fFmTX-00010I-MF
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 16:11:11 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fFmTW-0005hn-Ji
-	for <qemu-devel@nongnu.org>; Mon, 07 May 2018 20:11:10 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8EC572E80C8
-	for <qemu-devel@nongnu.org>; Mon,  7 May 2018 20:11:10 +0000 (UTC)
+	(envelope-from <ehabkost@redhat.com>) id 1fFmf5-00078U-QF
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 16:23:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45744)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fFmf5-00078E-Hb
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 16:23:07 -0400
+Date: Mon, 7 May 2018 17:22:56 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180507202256.GG13350@localhost.localdomain>
+References: <1524760009-24710-1-git-send-email-babu.moger@amd.com>
+	<1524760009-24710-4-git-send-email-babu.moger@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 07 May 2018 19:53:27 -0000
-From: Thomas Huth <1405385@bugs.launchpad.net>
-Reply-To: Bug 1405385 <1405385@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20141224102108.30804.4332.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152572280760.21807.10059474199515911043.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1405385] Re: QEMU crashes when virtio network
- cards are used together with e1000 network cards
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1524760009-24710-4-git-send-email-babu.moger@amd.com>
+Subject: Re: [Qemu-devel] [PATCH v7 3/9] i386: Initialize cache information
+ for EPYC family processors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,173 +28,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Babu Moger <babu.moger@amd.com>
+Cc: mst@redhat.com, marcel@redhat.com, pbonzini@redhat.com, rth@twiddle.net, mtosatti@redhat.com, geoff@hostfission.com, kash@tripleback.net, qemu-devel@nongnu.org, kvm@vger.kernel.org
 
-Looking through old bug tickets... Bram, can you still reproduce this
-issue with the latest version of QEMU? Or could we close this ticket
-nowadays?
+On Thu, Apr 26, 2018 at 11:26:43AM -0500, Babu Moger wrote:
+> Initialize pre-determined cache information for EPYC processors.
+> 
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> Tested-by: Geoffrey McRae <geoff@hostfission.com>
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Assuming that the cache information below was validated by people
+from AMD, patch looks good to me.
 
--- =
+> ---
+>  target/i386/cpu.c | 96 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 96 insertions(+)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index a518a0f..5d88363 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -2302,6 +2302,54 @@ static X86CPUDefinition builtin_x86_defs[] = {
+>              CPUID_6_EAX_ARAT,
+>          .xlevel = 0x8000000A,
+>          .model_id = "AMD EPYC Processor",
+> +        .cache_info.valid = 1,
+> +        .cache_info.l1d_cache = {
+> +            .type = DCACHE,
+> +            .level = 1,
+> +            .size = 32 * KiB,
+> +            .line_size = 64,
+> +            .associativity = 8,
+> +            .partitions = 1,
+> +            .sets = 64,
+> +            .lines_per_tag = 1,
+> +            .self_init = 1,
+> +            .no_invd_sharing = true,
+> +        },
+> +        .cache_info.l1i_cache = {
+> +            .type = ICACHE,
+> +            .level = 1,
+> +            .size = 64 * KiB,
+> +            .line_size = 64,
+> +            .associativity = 4,
+> +            .partitions = 1,
+> +            .sets = 256,
+> +            .lines_per_tag = 1,
+> +            .self_init = 1,
+> +            .no_invd_sharing = true,
+> +        },
+> +        .cache_info.l2_cache = {
+> +            .type = UNIFIED_CACHE,
+> +            .level = 2,
+> +            .size = 512 * KiB,
+> +            .line_size = 64,
+> +            .associativity = 8,
+> +            .partitions = 1,
+> +            .sets = 1024,
+> +            .lines_per_tag = 1,
+> +        },
+> +        .cache_info.l3_cache = {
+> +            .type = UNIFIED_CACHE,
+> +            .level = 3,
+> +            .size = 8 * MiB,
+> +            .line_size = 64,
+> +            .associativity = 16,
+> +            .partitions = 1,
+> +            .sets = 8192,
+> +            .lines_per_tag = 1,
+> +            .self_init = true,
+> +            .inclusive = true,
+> +            .complex_indexing = true,
+> +        },
+>      },
+>      {
+>          .name = "EPYC-IBPB",
+> @@ -2348,6 +2396,54 @@ static X86CPUDefinition builtin_x86_defs[] = {
+>              CPUID_6_EAX_ARAT,
+>          .xlevel = 0x8000000A,
+>          .model_id = "AMD EPYC Processor (with IBPB)",
+> +        .cache_info.valid = 1,
+> +        .cache_info.l1d_cache = {
+> +            .type = DCACHE,
+> +            .level = 1,
+> +            .size = 32 * KiB,
+> +            .line_size = 64,
+> +            .associativity = 8,
+> +            .partitions = 1,
+> +            .sets = 64,
+> +            .lines_per_tag = 1,
+> +            .self_init = 1,
+> +            .no_invd_sharing = true,
+> +        },
+> +        .cache_info.l1i_cache = {
+> +            .type = ICACHE,
+> +            .level = 1,
+> +            .size = 64 * KiB,
+> +            .line_size = 64,
+> +            .associativity = 4,
+> +            .partitions = 1,
+> +            .sets = 256,
+> +            .lines_per_tag = 1,
+> +            .self_init = 1,
+> +            .no_invd_sharing = true,
+> +        },
+> +        .cache_info.l2_cache = {
+> +            .type = UNIFIED_CACHE,
+> +            .level = 2,
+> +            .size = 512 * KiB,
+> +            .line_size = 64,
+> +            .associativity = 8,
+> +            .partitions = 1,
+> +            .sets = 1024,
+> +            .lines_per_tag = 1,
+> +        },
+> +        .cache_info.l3_cache = {
+> +            .type = UNIFIED_CACHE,
+> +            .level = 3,
+> +            .size = 8 * MiB,
+> +            .line_size = 64,
+> +            .associativity = 16,
+> +            .partitions = 1,
+> +            .sets = 8192,
+> +            .lines_per_tag = 1,
+> +            .self_init = true,
+> +            .inclusive = true,
+> +            .complex_indexing = true,
+> +        },
+>      },
+>  };
+>  
+> -- 
+> 2.7.4
+> 
+> 
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1405385
-
-Title:
-  QEMU crashes when virtio network cards are used together with e1000
-  network cards
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  QEMU version: QEMU emulator version 2.2.50, Copyright (c) 2003-2008 Fabri=
-ce Bellard
-  QEMU GIT version: ab0302ee764fd702465aef6d88612cdff4302809
-  Configure flags: ./configure --enable-kvm --prefix=3D/opt/qemu-devel
-  Linux version: Ubuntu 14.04.1 LTS
-  Kernel version: 3.13.0-43-generic #72-Ubuntu SMP Mon Dec 8 19:35:06 UTC 2=
-014 x86_64 x86_64 x86_64 GNU/Linux
-
-  Problem:
-
-          QEMU crashes when using one (or more) virtio network cards
-  together with one (or more) e1000 (and possibly others) network cards
-  when those cards are bound to a linux bridge. When the cards are *not*
-  bound to a bridge QEMU does not crash.
-
-  Bridge configuration:
-
-  	iface bridge0 inet dhcp
-  	bridge_ports eth1
-  	bridge_stp off
-  	bridge_fd 0
-
-  Start-up command (including binding the network cards to the bridge +
-  strace logging):
-
-  ./qemu-system-x86_64 -daemonize -smp 1 -m 128 -vnc 0.0.0.0:0 \
-  -netdev tap,id=3Dtap_1,script=3Dno,downscript=3Dno,ifname=3Dnet_1_1,vhost=
-=3Don \
-  -device virtio-net-pci,bootindex=3D1,id=3Dnic_1,netdev=3Dtap_1,mac=3D02:1=
-6:3F:00:00:FA \
-  -netdev tap,id=3Dtap_2,script=3Dno,downscript=3Dno,ifname=3Dnet_1_2 \
-  -device e1000,bootindex=3D2,id=3Dnic_2,netdev=3Dtap_2,mac=3D02:16:3F:00:0=
-0:FB; \
-  brctl addif bridge0 net_1_1; \
-  brctl addif bridge0 net_1_2; \
-  ifconfig net_1_1 0.0.0.0 up; \
-  ifconfig net_1_2 0.0.0.0 up; \
-  sleep 2; \
-  strace -p `ps x |grep qemu-system-x86_64 |grep -v grep|awk '{print $1}'` =
--o /tmp/qemu-devel-trace.txt =
-
-
-  Kernel log:
-
-  Dec 24 11:12:08 bramws kernel: [12466.885581] device net_1_1 entered prom=
-iscuous mode
-  Dec 24 11:12:08 bramws kernel: [12466.886238] device net_1_2 entered prom=
-iscuous mode
-  Dec 24 11:12:08 bramws kernel: [12466.887084] bridge0: port 2(net_1_1) en=
-tered forwarding state
-  Dec 24 11:12:08 bramws kernel: [12466.887089] bridge0: port 2(net_1_1) en=
-tered forwarding state
-  Dec 24 11:12:08 bramws kernel: [12466.888940] bridge0: port 3(net_1_2) en=
-tered forwarding state
-  Dec 24 11:12:08 bramws kernel: [12466.888947] bridge0: port 3(net_1_2) en=
-tered forwarding state
-  Dec 24 11:12:29 bramws kernel: [12488.026376] bridge0: port 2(net_1_1) en=
-tered disabled state
-  Dec 24 11:12:29 bramws kernel: [12488.026820] device net_1_1 left promisc=
-uous mode
-  Dec 24 11:12:29 bramws kernel: [12488.026832] bridge0: port 2(net_1_1) en=
-tered disabled state
-  Dec 24 11:12:29 bramws kernel: [12488.049636] bridge0: port 3(net_1_2) en=
-tered disabled state
-  Dec 24 11:12:29 bramws kernel: [12488.050058] device net_1_2 left promisc=
-uous mode
-  Dec 24 11:12:29 bramws kernel: [12488.050074] bridge0: port 3(net_1_2) en=
-tered disabled state
-
-  Strace log: (full log attached)
-
-  ppoll([{fd=3D13, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D7, events=3DPOLL=
-IN|POLLERR|POLLHUP}, {fd=3D12, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D3, e=
-vents=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D6, events=3DPOLLIN}, {fd=3D5, events=
-=3DPOLLIN}], 6, {0, 28646613}, NULL, 8) =3D 0 (Timeout)
-  write(5, "\1\0\0\0\0\0\0\0", 8)         =3D 8
-  ppoll([{fd=3D13, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D7, events=3DPOLL=
-IN|POLLERR|POLLHUP}, {fd=3D12, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D3, e=
-vents=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D6, events=3DPOLLIN}, {fd=3D5, events=
-=3DPOLLIN}], 6, {0, 10899760}, NULL, 8) =3D 1 ([{fd=3D5, revents=3DPOLLIN}]=
-, left {0, 10895457})
-  write(6, "\1\0\0\0\0\0\0\0", 8)         =3D 8
-  read(5, "\1\0\0\0\0\0\0\0", 512)        =3D 8
-  write(6, "\1\0\0\0\0\0\0\0", 8)         =3D 8
-  ppoll([{fd=3D13, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D7, events=3DPOLL=
-IN|POLLERR|POLLHUP}, {fd=3D12, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D3, e=
-vents=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D6, events=3DPOLLIN}, {fd=3D5, events=
-=3DPOLLIN}], 6, {0, 0}, NULL, 8) =3D 1 ([{fd=3D6, revents=3DPOLLIN}], left =
-{0, 0})
-  ppoll([{fd=3D13, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D7, events=3DPOLL=
-IN|POLLERR|POLLHUP}, {fd=3D12, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D3, e=
-vents=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D6, events=3DPOLLIN}, {fd=3D5, events=
-=3DPOLLIN}], 6, {0, 0}, NULL, 8) =3D 1 ([{fd=3D6, revents=3DPOLLIN}], left =
-{0, 0})
-  read(6, "\2\0\0\0\0\0\0\0", 16)         =3D 8
-  ppoll([{fd=3D13, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D7, events=3DPOLL=
-IN|POLLERR|POLLHUP}, {fd=3D12, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D3, e=
-vents=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D6, events=3DPOLLIN}, {fd=3D5, events=
-=3DPOLLIN}], 6, {0, 0}, NULL, 8) =3D 0 (Timeout)
-  read(6, 0x7fff697320e0, 16)             =3D -1 EAGAIN (Resource temporari=
-ly unavailable)
-  ppoll([{fd=3D13, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D7, events=3DPOLL=
-IN|POLLERR|POLLHUP}, {fd=3D12, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D3, e=
-vents=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D6, events=3DPOLLIN}, {fd=3D5, events=
-=3DPOLLIN}], 6, {0, 9570429}, NULL, 8) =3D 0 (Timeout)
-  futex(0x7f011c8ef094, FUTEX_CMP_REQUEUE_PRIVATE, 1, 2147483647, 0x7f011aa=
-a0860, 224) =3D 1
-  write(5, "\1\0\0\0\0\0\0\0", 8)         =3D 8
-  write(5, "\1\0\0\0\0\0\0\0", 8)         =3D 8
-  futex(0x7f011aaa0860, FUTEX_WAKE_PRIVATE, 1) =3D 1
-  ppoll([{fd=3D13, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D7, events=3DPOLL=
-IN|POLLERR|POLLHUP}, {fd=3D12, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D3, e=
-vents=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D6, events=3DPOLLIN}, {fd=3D5, events=
-=3DPOLLIN}], 6, {0, 54463396}, NULL, 8) =3D 1 ([{fd=3D5, revents=3DPOLLIN}]=
-, left {0, 54459649})
-  tgkill(7779, 7784, SIGUSR1)             =3D 0
-  futex(0x7f011aaa0824, FUTEX_CMP_REQUEUE_PRIVATE, 1, 2147483647, 0x7f011aa=
-a0860, 1650) =3D 1
-  write(6, "\1\0\0\0\0\0\0\0", 8)         =3D 8
-  read(5, "\2\0\0\0\0\0\0\0", 512)        =3D 8
-  write(6, "\1\0\0\0\0\0\0\0", 8)         =3D 8
-  ppoll([{fd=3D13, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D7, events=3DPOLL=
-IN|POLLERR|POLLHUP}, {fd=3D12, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D3, e=
-vents=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D6, events=3DPOLLIN}, {fd=3D5, events=
-=3DPOLLIN}], 6, {0, 0}, NULL, 8) =3D 1 ([{fd=3D6, revents=3DPOLLIN}], left =
-{0, 0})
-  ppoll([{fd=3D13, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D7, events=3DPOLL=
-IN|POLLERR|POLLHUP}, {fd=3D12, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D3, e=
-vents=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D6, events=3DPOLLIN}, {fd=3D5, events=
-=3DPOLLIN}], 6, {0, 0}, NULL, 8) =3D 1 ([{fd=3D6, revents=3DPOLLIN}], left =
-{0, 0})
-  read(6, "\2\0\0\0\0\0\0\0", 16)         =3D 8
-  ppoll([{fd=3D13, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D7, events=3DPOLL=
-IN|POLLERR|POLLHUP}, {fd=3D12, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D3, e=
-vents=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D6, events=3DPOLLIN}, {fd=3D5, events=
-=3DPOLLIN}], 6, {0, 0}, NULL, 8) =3D 0 (Timeout)
-  read(6, 0x7fff697320e0, 16)             =3D -1 EAGAIN (Resource temporari=
-ly unavailable)
-  futex(0x7f011aaa0860, FUTEX_WAKE_PRIVATE, 1) =3D 1
-  ppoll([{fd=3D13, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D7, events=3DPOLL=
-IN|POLLERR|POLLHUP}, {fd=3D12, events=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D3, e=
-vents=3DPOLLIN|POLLERR|POLLHUP}, {fd=3D6, events=3DPOLLIN}, {fd=3D5, events=
-=3DPOLLIN}], 6, {0, 53843633}, NULL, 8 <unfinished ...>
-  +++ killed by SIGABRT +++
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1405385/+subscriptions
+-- 
+Eduardo
