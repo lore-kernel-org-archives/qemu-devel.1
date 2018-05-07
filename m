@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fFhPT-0003jc-BD
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 10:46:41 -0400
+	(envelope-from <geoff@hostfission.com>) id 1fFhfV-0006w4-0Y
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 11:03:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fFhPQ-0008VO-7F
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 10:46:39 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36246 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fFhPQ-0008Uw-2P
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 10:46:36 -0400
-Date: Mon, 7 May 2018 16:46:26 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180507144626.kqywdikvkcinskbm@sirius.home.kraxel.org>
-References: <20180507131759.A3F8F381908@moya.office.hostfission.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180507131759.A3F8F381908@moya.office.hostfission.com>
-Subject: Re: [Qemu-devel] [PATCHv2 1/2] ps2: Clear the PS/2 queue and obey
- disable
+	(envelope-from <geoff@hostfission.com>) id 1fFhfT-0008W5-NF
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 11:03:13 -0400
+Received: from mail1.hostfission.com ([139.99.139.48]:51174)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <geoff@hostfission.com>) id 1fFhfT-0008UT-5c
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 11:03:11 -0400
+From: Geoffrey McRae <geoff@hostfission.com>
+Date: Mon, 7 May 2018 23:13:12 +1000
+Message-Id: <20180507150310.2FEA0381924@moya.office.hostfission.com>
+Subject: [Qemu-devel] [PATCHv3 2/2] ps2: Fix mouse stream corruption due to
+ lost data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,41 +22,275 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Geoffrey McRae <geoff@hostfission.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 
-  Hi,
+This fixes an issue by adding bounds checking to multi-byte packets
+where the PS/2 mouse data stream may become corrupted due to data being
+discarded when the PS/2 ringbuffer is full.
 
-> This allows guest's to correctly reinitialize and identify the mouse
-> should the guest decide to re-scan or reset during mouse input events.
-> 
-> When the guest sends the "Identify" command, due to the PC's hardware
-> architecutre it is impossible to reliably determine the response from
-> the command amongst other streaming data, such as mouse or keyboard
-> events. Standard practice is for the guest to disable the device and
-> then issue the identify command, so this must be obeyed.
-> 
-> Signed-off-by: Geoffrey McRae <geoff@hostfission.com>
-> ---
->  hw/input/ps2.c | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/hw/input/ps2.c b/hw/input/ps2.c
-> index 06f5d2ac4a..f84a8f5179 100644
-> --- a/hw/input/ps2.c
-> +++ b/hw/input/ps2.c
-> @@ -232,6 +232,9 @@ static void ps2_keyboard_event(DeviceState *dev, QemuConsole *src,
->      uint16_t keycode = 0;
->      int mod;
->  
-> +    if (!s->scan_enabled)
-> +        return;
+Interrupts for Multi-byte responses are postponed until the final byte
+has been queued.
 
-qemu code style wants braces here.
-See CODING_STYLE.
-You can use scripts/checkpatch.pl for codestyle checks.
+These changes fix a bug where windows guests drop the mouse device
+entirely requring the guest to be restarted.
 
-Code looks fine (both patches) now.
+Signed-off-by: Geoffrey McRae <geoff@hostfission.com>
+---
+ hw/input/ps2.c         | 124 +++++++++++++++++++++++++++++++++++++------------
+ include/hw/input/ps2.h |   5 ++
+ 2 files changed, 100 insertions(+), 29 deletions(-)
 
-cheers,
-  Gerd
+diff --git a/hw/input/ps2.c b/hw/input/ps2.c
+index 4abc8cecdd..8244020c1f 100644
+--- a/hw/input/ps2.c
++++ b/hw/input/ps2.c
+@@ -188,16 +188,64 @@ static void ps2_reset_queue(PS2State *s)
+     q->count = 0;
+ }
+ 
+-void ps2_queue(PS2State *s, int b)
++void ps2_queue_noirq(PS2State *s, int b)
+ {
+     PS2Queue *q = &s->queue;
+ 
+-    if (q->count >= PS2_QUEUE_SIZE - 1)
++    if (q->count == PS2_QUEUE_SIZE) {
+         return;
++    }
++
+     q->data[q->wptr] = b;
+     if (++q->wptr == PS2_QUEUE_SIZE)
+         q->wptr = 0;
+     q->count++;
++}
++
++void ps2_raise_irq(PS2State *s)
++{
++    s->update_irq(s->update_arg, 1);
++}
++
++void ps2_queue(PS2State *s, int b)
++{
++    ps2_queue_noirq(s, b);
++    s->update_irq(s->update_arg, 1);
++}
++
++void ps2_queue_2(PS2State *s, int b1, int b2)
++{
++    if (PS2_QUEUE_SIZE - s->queue.count < 2) {
++        return;
++    }
++
++    ps2_queue_noirq(s, b1);
++    ps2_queue_noirq(s, b2);
++    s->update_irq(s->update_arg, 1);
++}
++
++void ps2_queue_3(PS2State *s, int b1, int b2, int b3)
++{
++    if (PS2_QUEUE_SIZE - s->queue.count < 3) {
++        return;
++    }
++
++    ps2_queue_noirq(s, b1);
++    ps2_queue_noirq(s, b2);
++    ps2_queue_noirq(s, b3);
++    s->update_irq(s->update_arg, 1);
++}
++
++void ps2_queue_4(PS2State *s, int b1, int b2, int b3, int b4)
++{
++    if (PS2_QUEUE_SIZE - s->queue.count < 4) {
++        return;
++    }
++
++    ps2_queue_noirq(s, b1);
++    ps2_queue_noirq(s, b2);
++    ps2_queue_noirq(s, b3);
++    ps2_queue_noirq(s, b4);
+     s->update_irq(s->update_arg, 1);
+ }
+ 
+@@ -501,13 +549,17 @@ void ps2_write_keyboard(void *opaque, int val)
+             ps2_queue(&s->common, KBD_REPLY_RESEND);
+             break;
+         case KBD_CMD_GET_ID:
+-            ps2_queue(&s->common, KBD_REPLY_ACK);
+             /* We emulate a MF2 AT keyboard here */
+-            ps2_queue(&s->common, KBD_REPLY_ID);
+             if (s->translate)
+-                ps2_queue(&s->common, 0x41);
++                ps2_queue_3(&s->common,
++                    KBD_REPLY_ACK,
++                    KBD_REPLY_ID,
++                    0x41);
+             else
+-                ps2_queue(&s->common, 0x83);
++                ps2_queue_3(&s->common,
++                    KBD_REPLY_ACK,
++                    KBD_REPLY_ID,
++                    0x83);
+             break;
+         case KBD_CMD_ECHO:
+             ps2_queue(&s->common, KBD_CMD_ECHO);
+@@ -534,8 +586,9 @@ void ps2_write_keyboard(void *opaque, int val)
+             break;
+         case KBD_CMD_RESET:
+             ps2_reset_keyboard(s);
+-            ps2_queue(&s->common, KBD_REPLY_ACK);
+-            ps2_queue(&s->common, KBD_REPLY_POR);
++            ps2_queue_2(&s->common,
++                KBD_REPLY_ACK,
++                KBD_REPLY_POR);
+             break;
+         default:
+             ps2_queue(&s->common, KBD_REPLY_RESEND);
+@@ -544,8 +597,11 @@ void ps2_write_keyboard(void *opaque, int val)
+         break;
+     case KBD_CMD_SCANCODE:
+         if (val == 0) {
+-            ps2_queue(&s->common, KBD_REPLY_ACK);
+-            ps2_put_keycode(s, s->scancode_set);
++            if (s->common.queue.count <= PS2_QUEUE_SIZE - 2)
++            {
++                ps2_queue(&s->common, KBD_REPLY_ACK);
++                ps2_put_keycode(s, s->scancode_set);
++            }
+         } else if (val >= 1 && val <= 3) {
+             s->scancode_set = val;
+             ps2_queue(&s->common, KBD_REPLY_ACK);
+@@ -577,11 +633,15 @@ void ps2_keyboard_set_translation(void *opaque, int mode)
+     s->translate = mode;
+ }
+ 
+-static void ps2_mouse_send_packet(PS2MouseState *s)
++static int ps2_mouse_send_packet(PS2MouseState *s)
+ {
+     unsigned int b;
+     int dx1, dy1, dz1;
+ 
++    const int needed = 3 + (s->mouse_type - 2);
++    if (PS2_QUEUE_SIZE - s->common.queue.count < needed)
++        return 0;
++
+     dx1 = s->mouse_dx;
+     dy1 = s->mouse_dy;
+     dz1 = s->mouse_dz;
+@@ -595,9 +655,9 @@ static void ps2_mouse_send_packet(PS2MouseState *s)
+     else if (dy1 < -127)
+         dy1 = -127;
+     b = 0x08 | ((dx1 < 0) << 4) | ((dy1 < 0) << 5) | (s->mouse_buttons & 0x07);
+-    ps2_queue(&s->common, b);
+-    ps2_queue(&s->common, dx1 & 0xff);
+-    ps2_queue(&s->common, dy1 & 0xff);
++    ps2_queue_noirq(&s->common, b);
++    ps2_queue_noirq(&s->common, dx1 & 0xff);
++    ps2_queue_noirq(&s->common, dy1 & 0xff);
+     /* extra byte for IMPS/2 or IMEX */
+     switch(s->mouse_type) {
+     default:
+@@ -607,7 +667,7 @@ static void ps2_mouse_send_packet(PS2MouseState *s)
+             dz1 = 127;
+         else if (dz1 < -127)
+                 dz1 = -127;
+-        ps2_queue(&s->common, dz1 & 0xff);
++        ps2_queue_noirq(&s->common, dz1 & 0xff);
+         break;
+     case 4:
+         if (dz1 > 7)
+@@ -615,15 +675,19 @@ static void ps2_mouse_send_packet(PS2MouseState *s)
+         else if (dz1 < -7)
+             dz1 = -7;
+         b = (dz1 & 0x0f) | ((s->mouse_buttons & 0x18) << 1);
+-        ps2_queue(&s->common, b);
++        ps2_queue_noirq(&s->common, b);
+         break;
+     }
+ 
++    ps2_raise_irq(&s->common);
++
+     trace_ps2_mouse_send_packet(s, dx1, dy1, dz1, b);
+     /* update deltas */
+     s->mouse_dx -= dx1;
+     s->mouse_dy -= dy1;
+     s->mouse_dz -= dz1;
++
++    return 1;
+ }
+ 
+ static void ps2_mouse_event(DeviceState *dev, QemuConsole *src,
+@@ -687,10 +751,9 @@ static void ps2_mouse_sync(DeviceState *dev)
+         qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER);
+     }
+     if (!(s->mouse_status & MOUSE_STATUS_REMOTE)) {
+-        while (s->common.queue.count < PS2_QUEUE_SIZE - 4) {
+-            /* if not remote, send event. Multiple events are sent if
+-               too big deltas */
+-            ps2_mouse_send_packet(s);
++        /* if not remote, send event. Multiple events are sent if
++           too big deltas */
++        while(ps2_mouse_send_packet(s)) {
+             if (s->mouse_dx == 0 && s->mouse_dy == 0 && s->mouse_dz == 0)
+                 break;
+         }
+@@ -749,8 +812,9 @@ void ps2_write_mouse(void *opaque, int val)
+             ps2_queue(&s->common, AUX_ACK);
+             break;
+         case AUX_GET_TYPE:
+-            ps2_queue(&s->common, AUX_ACK);
+-            ps2_queue(&s->common, s->mouse_type);
++            ps2_queue_2(&s->common,
++                AUX_ACK,
++                s->mouse_type);
+             break;
+         case AUX_SET_RES:
+         case AUX_SET_SAMPLE:
+@@ -758,10 +822,11 @@ void ps2_write_mouse(void *opaque, int val)
+             ps2_queue(&s->common, AUX_ACK);
+             break;
+         case AUX_GET_SCALE:
+-            ps2_queue(&s->common, AUX_ACK);
+-            ps2_queue(&s->common, s->mouse_status);
+-            ps2_queue(&s->common, s->mouse_resolution);
+-            ps2_queue(&s->common, s->mouse_sample_rate);
++            ps2_queue_4(&s->common,
++                AUX_ACK,
++                s->mouse_status,
++                s->mouse_resolution,
++                s->mouse_sample_rate);
+             break;
+         case AUX_POLL:
+             ps2_queue(&s->common, AUX_ACK);
+@@ -787,9 +852,10 @@ void ps2_write_mouse(void *opaque, int val)
+             s->mouse_status = 0;
+             s->mouse_type = 0;
+             ps2_reset_queue(&s->common);
+-            ps2_queue(&s->common, AUX_ACK);
+-            ps2_queue(&s->common, 0xaa);
+-            ps2_queue(&s->common, s->mouse_type);
++            ps2_queue_3(&s->common,
++                AUX_ACK,
++                0xaa,
++                s->mouse_type);
+             break;
+         default:
+             break;
+diff --git a/include/hw/input/ps2.h b/include/hw/input/ps2.h
+index 94709b8502..213aa16aa3 100644
+--- a/include/hw/input/ps2.h
++++ b/include/hw/input/ps2.h
+@@ -37,7 +37,12 @@ void *ps2_mouse_init(void (*update_irq)(void *, int), void *update_arg);
+ void ps2_write_mouse(void *, int val);
+ void ps2_write_keyboard(void *, int val);
+ uint32_t ps2_read_data(PS2State *s);
++void ps2_queue_noirq(PS2State *s, int b);
++void ps2_raise_irq(PS2State *s);
+ void ps2_queue(PS2State *s, int b);
++void ps2_queue_2(PS2State *s, int b1, int b2);
++void ps2_queue_3(PS2State *s, int b1, int b2, int b3);
++void ps2_queue_4(PS2State *s, int b1, int b2, int b3, int b4);
+ void ps2_keyboard_set_translation(void *opaque, int mode);
+ void ps2_mouse_fake_event(void *opaque);
+ 
+-- 
+2.14.2
