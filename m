@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43022)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fFlac-0002Il-H4
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 15:14:27 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fFlcG-0003IJ-CA
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 15:16:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fFlaY-0006Yl-1j
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 15:14:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46568)
+	(envelope-from <ehabkost@redhat.com>) id 1fFlcC-0007lW-Cf
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 15:16:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48868)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fFlaX-0006Xf-Sa
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 15:14:21 -0400
-Date: Mon, 7 May 2018 16:14:13 -0300
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fFlcC-0007lF-4W
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 15:16:04 -0400
+Date: Mon, 7 May 2018 16:15:55 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180507191413.GC13350@localhost.localdomain>
+Message-ID: <20180507191555.GD13350@localhost.localdomain>
 References: <1524760009-24710-1-git-send-email-babu.moger@amd.com>
-	<1524760009-24710-5-git-send-email-babu.moger@amd.com>
+	<1524760009-24710-6-git-send-email-babu.moger@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1524760009-24710-5-git-send-email-babu.moger@amd.com>
-Subject: Re: [Qemu-devel] [PATCH v7 4/9] i386: Add new property to control
- cache info
+In-Reply-To: <1524760009-24710-6-git-send-email-babu.moger@amd.com>
+Subject: Re: [Qemu-devel] [PATCH v7 5/9] i386: Use the statically loaded
+ cache definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,41 +31,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Babu Moger <babu.moger@amd.com>
 Cc: mst@redhat.com, marcel@redhat.com, pbonzini@redhat.com, rth@twiddle.net, mtosatti@redhat.com, geoff@hostfission.com, kash@tripleback.net, qemu-devel@nongnu.org, kvm@vger.kernel.org
 
-On Thu, Apr 26, 2018 at 11:26:44AM -0500, Babu Moger wrote:
-> This will be used to control the cache information.
-> By default new information will be displayed. If user
-> passes "-cpu legacy-cache" then older information will
-> be displayed even if the hardware supports new information.
-> It will be "on" for machine type "pc-q35-2.10" for compatibility.
+On Thu, Apr 26, 2018 at 11:26:45AM -0500, Babu Moger wrote:
+> Use the statically loaded cache definitions if available
+> and legacy-cache parameter is not set.
 > 
 > Signed-off-by: Babu Moger <babu.moger@amd.com>
 > Tested-by: Geoffrey McRae <geoff@hostfission.com>
+
+Looks good, but I suggest squashing this with patch 4/9.
+
+Additional suggestion below:
+
 > ---
->  include/hw/i386/pc.h | 4 ++++
->  target/i386/cpu.c    | 1 +
->  target/i386/cpu.h    | 5 +++++
->  3 files changed, 10 insertions(+)
+>  target/i386/cpu.c | 22 +++++++++++++++++-----
+>  1 file changed, 17 insertions(+), 5 deletions(-)
 > 
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index ffee841..d904a3c 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -327,6 +327,10 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
->          .driver   = "q35-pcihost",\
->          .property = "x-pci-hole64-fix",\
->          .value    = "off",\
-> +    },{\
-> +        .driver   = TYPE_X86_CPU,\
-> +        .property = "legacy-cache",\
-> +        .value    = "on",\
->      },
->  
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index a27b658..56d2f0b 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -3941,8 +3941,13 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>                 (L1_ITLB_2M_ASSOC <<  8) | (L1_ITLB_2M_ENTRIES);
+>          *ebx = (L1_DTLB_4K_ASSOC << 24) | (L1_DTLB_4K_ENTRIES << 16) | \
+>                 (L1_ITLB_4K_ASSOC <<  8) | (L1_ITLB_4K_ENTRIES);
+> -        *ecx = encode_cache_cpuid80000005(&l1d_cache_amd);
+> -        *edx = encode_cache_cpuid80000005(&l1i_cache_amd);
 
-Looks good, except that we now need pc-*-2.13 machines, and this
-should be moved to PC_COMPAT_2_12.
+We could rename l1*_cache_amd and l2_cache_amd to
+"legacy_*_cache_amd", to make it clear they are just legacy cache
+settings.
 
-Also, I suggest squashing this with patch 5/9, and applying it
-before patch 3/9.
+> +        if (env->cache_info.valid && !cpu->legacy_cache) {
+> +            *ecx = encode_cache_cpuid80000005(&env->cache_info.l1d_cache);
+> +            *edx = encode_cache_cpuid80000005(&env->cache_info.l1i_cache);
+> +        } else {
+> +            *ecx = encode_cache_cpuid80000005(&l1d_cache_amd);
+> +            *edx = encode_cache_cpuid80000005(&l1i_cache_amd);
+> +        }
+>          break;
+>      case 0x80000006:
+>          /* cache info (L2 cache) */
+> @@ -3958,9 +3963,16 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>                 (L2_DTLB_4K_ENTRIES << 16) | \
+>                 (AMD_ENC_ASSOC(L2_ITLB_4K_ASSOC) << 12) | \
+>                 (L2_ITLB_4K_ENTRIES);
+> -        encode_cache_cpuid80000006(&l2_cache_amd,
+> -                                   cpu->enable_l3_cache ? &l3_cache : NULL,
+> -                                   ecx, edx);
+> +        if (env->cache_info.valid && !cpu->legacy_cache) {
+> +            encode_cache_cpuid80000006(&env->cache_info.l2_cache,
+> +                                       cpu->enable_l3_cache ?
+> +                                       &env->cache_info.l3_cache : NULL,
+> +                                       ecx, edx);
+> +        } else {
+> +            encode_cache_cpuid80000006(&l2_cache_amd,
+> +                                       cpu->enable_l3_cache ? &l3_cache : NULL,
+> +                                       ecx, edx);
+> +        }
+>          break;
+>      case 0x80000007:
+>          *eax = 0;
+> -- 
+> 2.7.4
+> 
+> 
 
 -- 
 Eduardo
