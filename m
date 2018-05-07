@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fFpjW-00063G-H9
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 19:39:55 -0400
+	(envelope-from <Babu.Moger@amd.com>) id 1fFpo6-0006ta-EM
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 19:44:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fFpjS-00047v-JM
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 19:39:54 -0400
-Received: from mail-by2nam01on0067.outbound.protection.outlook.com
-	([104.47.34.67]:2409
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
+	(envelope-from <Babu.Moger@amd.com>) id 1fFpo2-0006rP-FQ
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 19:44:38 -0400
+Received: from mail-bl2nam02on0058.outbound.protection.outlook.com
+	([104.47.38.58]:9504
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fFpjS-00045y-8H
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 19:39:50 -0400
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fFpo2-0006r5-9w
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 19:44:34 -0400
 From: "Moger, Babu" <Babu.Moger@amd.com>
-Date: Mon, 7 May 2018 23:39:45 +0000
-Message-ID: <BL0PR12MB2468EFDC6A05DB20E253E965959B0@BL0PR12MB2468.namprd12.prod.outlook.com>
+Date: Mon, 7 May 2018 23:44:31 +0000
+Message-ID: <BL0PR12MB2468B701C4DF796ABF9EAD3D959B0@BL0PR12MB2468.namprd12.prod.outlook.com>
 References: <1524760009-24710-1-git-send-email-babu.moger@amd.com>
-	<1524760009-24710-6-git-send-email-babu.moger@amd.com>
-	<20180507193732.GE13350@localhost.localdomain>
-In-Reply-To: <20180507193732.GE13350@localhost.localdomain>
+	<1524760009-24710-8-git-send-email-babu.moger@amd.com>
+	<20180507193944.GF13350@localhost.localdomain>
+In-Reply-To: <20180507193944.GF13350@localhost.localdomain>
 Content-Language: en-US
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v7 5/9] i386: Use the statically loaded
- cache definitions
+Subject: Re: [Qemu-devel] [PATCH v7 7/9] i386: Add support for
+ CPUID_8000_001E for AMD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,89 +39,77 @@ Cc: "mst@redhat.com" <mst@redhat.com>, "marcel@redhat.com" <marcel@redhat.com>, 
 
 > -----Original Message-----
 > From: Eduardo Habkost [mailto:ehabkost@redhat.com]
-> Sent: Monday, May 7, 2018 2:38 PM
+> Sent: Monday, May 7, 2018 2:40 PM
 > To: Moger, Babu <Babu.Moger@amd.com>
 > Cc: mst@redhat.com; marcel@redhat.com; pbonzini@redhat.com;
 > rth@twiddle.net; mtosatti@redhat.com; geoff@hostfission.com;
 > kash@tripleback.net; qemu-devel@nongnu.org; kvm@vger.kernel.org
-> Subject: Re: [Qemu-devel] [PATCH v7 5/9] i386: Use the statically loaded
-> cache definitions
+> Subject: Re: [Qemu-devel] [PATCH v7 7/9] i386: Add support for
+> CPUID_8000_001E for AMD
 >=20
-> On Thu, Apr 26, 2018 at 11:26:45AM -0500, Babu Moger wrote:
-> > Use the statically loaded cache definitions if available
-> > and legacy-cache parameter is not set.
+> On Thu, Apr 26, 2018 at 11:26:47AM -0500, Babu Moger wrote:
+> > Populate threads/core_id/apic_ids/socket_id when CPUID_EXT3_TOPOEXT
+> > feature is supported. This is required to support hyperthreading featur=
+e
+> > on AMD CPUs. This is supported via CPUID_8000_001E extended functions.
 > >
 > > Signed-off-by: Babu Moger <babu.moger@amd.com>
 > > Tested-by: Geoffrey McRae <geoff@hostfission.com>
->=20
-> Now that I'm looking at the rest of the code, this seems
-> incomplete:
->=20
-> What about CPUID[2], CPUID[4]?  They are still referring to the
-> old legacy cache structs.
-
-There is no change in CPUID[2], CPUID[4] behavior. It is intel specific. It=
- did not change. So, we don't need to change that.
-In case it changes in future, we can add it later. AMD does not use CPUID[2=
-] and CPUID[4].
-
->=20
-> If their corresponding code isn't updated to use env->cache_info,
-> those leaves will be inconsistent with CPUID[0x8000005] and
-> CPUID[0x80000006].
->=20
 > > ---
-> >  target/i386/cpu.c | 22 +++++++++++++++++-----
-> >  1 file changed, 17 insertions(+), 5 deletions(-)
+> >  target/i386/cpu.c | 14 ++++++++++++++
+> >  1 file changed, 14 insertions(+)
 > >
 > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > index a27b658..56d2f0b 100644
+> > index 1024b09..1b15023 100644
 > > --- a/target/i386/cpu.c
 > > +++ b/target/i386/cpu.c
-> > @@ -3941,8 +3941,13 @@ void cpu_x86_cpuid(CPUX86State *env,
+> > @@ -315,6 +315,12 @@ static uint32_t
+> encode_cache_cpuid80000005(CPUCacheInfo *cache)
+> >                           (((CORES_IN_CMPLX - 1) * 2) + 1)  : \
+> >                           (CORES_IN_CMPLX - 1))
+> >
+> > +/* Definitions used on CPUID Leaf 0x8000001E */
+> > +#define EXTENDED_APIC_ID(threads, socket_id, core_id, thread_id) \
+> > +                        ((threads) ? \
+> > +                         ((socket_id << 6) | (core_id << 1) | thread_i=
+d) : \
+> > +                         ((socket_id << 6) | core_id))
+>=20
+> I suggest moving this to i386/topology.h.
+
+
+Ok. Will do that.
+
+>=20
+>=20
+> > +
+> >  /*
+> >   * Encode cache info for CPUID[0x80000006].ECX and
+> CPUID[0x80000006].EDX
+> >   * @l3 can be NULL.
+> > @@ -4105,6 +4111,14 @@ void cpu_x86_cpuid(CPUX86State *env,
 > uint32_t index, uint32_t count,
-> >                 (L1_ITLB_2M_ASSOC <<  8) | (L1_ITLB_2M_ENTRIES);
-> >          *ebx =3D (L1_DTLB_4K_ASSOC << 24) | (L1_DTLB_4K_ENTRIES << 16)=
- | \
-> >                 (L1_ITLB_4K_ASSOC <<  8) | (L1_ITLB_4K_ENTRIES);
-> > -        *ecx =3D encode_cache_cpuid80000005(&l1d_cache_amd);
-> > -        *edx =3D encode_cache_cpuid80000005(&l1i_cache_amd);
-> > +        if (env->cache_info.valid && !cpu->legacy_cache) {
-> > +            *ecx =3D encode_cache_cpuid80000005(&env-
-> >cache_info.l1d_cache);
-> > +            *edx =3D encode_cache_cpuid80000005(&env-
-> >cache_info.l1i_cache);
-> > +        } else {
-> > +            *ecx =3D encode_cache_cpuid80000005(&l1d_cache_amd);
-> > +            *edx =3D encode_cache_cpuid80000005(&l1i_cache_amd);
-> > +        }
+> >              break;
+> >          }
 > >          break;
-> >      case 0x80000006:
-> >          /* cache info (L2 cache) */
-> > @@ -3958,9 +3963,16 @@ void cpu_x86_cpuid(CPUX86State *env,
-> uint32_t index, uint32_t count,
-> >                 (L2_DTLB_4K_ENTRIES << 16) | \
-> >                 (AMD_ENC_ASSOC(L2_ITLB_4K_ASSOC) << 12) | \
-> >                 (L2_ITLB_4K_ENTRIES);
-> > -        encode_cache_cpuid80000006(&l2_cache_amd,
-> > -                                   cpu->enable_l3_cache ? &l3_cache : =
-NULL,
-> > -                                   ecx, edx);
-> > +        if (env->cache_info.valid && !cpu->legacy_cache) {
-> > +            encode_cache_cpuid80000006(&env->cache_info.l2_cache,
-> > +                                       cpu->enable_l3_cache ?
-> > +                                       &env->cache_info.l3_cache : NUL=
-L,
-> > +                                       ecx, edx);
-> > +        } else {
-> > +            encode_cache_cpuid80000006(&l2_cache_amd,
-> > +                                       cpu->enable_l3_cache ? &l3_cach=
-e : NULL,
-> > +                                       ecx, edx);
-> > +        }
-> >          break;
-> >      case 0x80000007:
-> >          *eax =3D 0;
+> > +    case 0x8000001E:
+> > +        assert(cpu->core_id <=3D 255);
+>=20
+> Where's the code that ensures this assert() line can't be
+> triggered by any command-line configuration?
+
+I did not understand this. Can you please elaborate. Thanks=20
+
+>=20
+> > +        *eax =3D EXTENDED_APIC_ID((cs->nr_threads - 1),
+> > +               cpu->socket_id, cpu->core_id, cpu->thread_id);
+> > +        *ebx =3D (cs->nr_threads - 1) << 8 | cpu->core_id;
+> > +        *ecx =3D cpu->socket_id;
+> > +        *edx =3D 0;
+> > +        break;
+> >      case 0xC0000000:
+> >          *eax =3D env->cpuid_xlevel2;
+> >          *ebx =3D 0;
 > > --
 > > 2.7.4
 > >
