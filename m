@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thomas.tai@oracle.com>) id 1fFl5T-0003Yx-PR
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 14:42:16 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fFl8Y-0004Y7-Oz
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 14:45:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thomas.tai@oracle.com>) id 1fFl5Q-000164-JJ
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 14:42:15 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:60146)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thomas.tai@oracle.com>)
-	id 1fFl5Q-00015S-8i
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 14:42:12 -0400
-References: <1525451445-5131-1-git-send-email-jonathan.helman@oracle.com>
-	<20180504230626-mutt-send-email-mst@kernel.org>
-From: Thomas Tai <thomas.tai@oracle.com>
-Message-ID: <b49ffa87-7b5f-9ba5-5c75-a180790d8de6@oracle.com>
-Date: Mon, 7 May 2018 14:42:04 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fFl8V-0002iD-Hs
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 14:45:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47382)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fFl8V-0002hd-CI
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 14:45:23 -0400
+Date: Mon, 7 May 2018 15:45:20 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180507184520.GD25013@localhost.localdomain>
+References: <1525406253-54846-1-git-send-email-jingqi.liu@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20180504230626-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] virtio-balloon: fix internal stat name
- array to match Linux kernel
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1525406253-54846-1-git-send-email-jingqi.liu@intel.com>
+Subject: Re: [Qemu-devel] [PATCH] x86/cpu: Enable CLDEMOTE(Demote Cache
+ Line) cpu feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,76 +27,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jonathan Helman <jonathan.helman@oracle.com>
-Cc: jasowang@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, Rob Gardner <rob.gardner@oracle.com>
+To: Jingqi Liu <jingqi.liu@intel.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
 
-
-
-On 2018-05-04 04:07 PM, Michael S. Tsirkin wrote:
-> On Fri, May 04, 2018 at 09:30:45AM -0700, Jonathan Helman wrote:
->> The Linux kernel commit b40000325044 ("virtio_balloon: add array
->> of stat names") defines an array of stat name strings for consumers
->> of the virtio interface to use via the virtio_balloon.h header
->> file, rather than requiring each consumer to define its own. But at
->> present, the stat names defined in this array by the Linux kernel
->> do not match up with those defined internally by QEMU. This patch
->> fixes this inconsistency by changing the QEMU stat names to match
->> those defined by the Linux kernel.
->>
->> Signed-off-by: Jonathan Helman <jonathan.helman@oracle.com>
->> Cc: Rob Gardner <rob.gardner@oracle.com>
->> Cc: Thomas Tai <thomas.tai@oracle.com>
+On Fri, May 04, 2018 at 11:57:33AM +0800, Jingqi Liu wrote:
+> The CLDEMOTE instruction hints to hardware that the cache line that
+> contains the linear address should be moved("demoted") from
+> the cache(s) closest to the processor core to a level more distant
+> from the processor core. This may accelerate subsequent accesses
+> to the line by other cores in the same coherence domain,
+> especially if the line was written by the core that demotes the line.
 > 
-> So pls import the header from Linux so we can stop maintaining it
-> in QEMU.
-
-Hi Michael,
-Thank you for your comment. Because Jonathan left the company last week, 
-I hope to pick up what he left over. As far as the importing the header 
-file, please let me look into it and get back to you.
-
-Thank you,
-Thomas
-
-
+> Intel Snow Ridge has added new cpu feature, CLDEMOTE.
+> The new cpu feature needs to be exposed to guest VM.
 > 
->> ---
->>   docs/virtio-balloon-stats.txt | 4 ++--
->>   hw/virtio/virtio-balloon.c    | 4 ++--
->>   2 files changed, 4 insertions(+), 4 deletions(-)
->>
->> diff --git a/docs/virtio-balloon-stats.txt b/docs/virtio-balloon-stats.txt
->> index 9985e1d..7c69fdb 100644
->> --- a/docs/virtio-balloon-stats.txt
->> +++ b/docs/virtio-balloon-stats.txt
->> @@ -34,8 +34,8 @@ which will return a dictionary containing:
->>         - stat-total-memory
->>         - stat-available-memory
->>         - stat-disk-caches
->> -      - stat-htlb-pgalloc
->> -      - stat-htlb-pgfail
->> +      - stat-hugetlb-allocations
->> +      - stat-hugetlb-failures
->>   
->>     o A key named last-update, which contains the last stats update
->>       timestamp in seconds. Since this timestamp is generated by the host,
->> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
->> index 1f7a87f..8421d9f 100644
->> --- a/hw/virtio/virtio-balloon.c
->> +++ b/hw/virtio/virtio-balloon.c
->> @@ -52,8 +52,8 @@ static const char *balloon_stat_names[] = {
->>      [VIRTIO_BALLOON_S_MEMTOT] = "stat-total-memory",
->>      [VIRTIO_BALLOON_S_AVAIL] = "stat-available-memory",
->>      [VIRTIO_BALLOON_S_CACHES] = "stat-disk-caches",
->> -   [VIRTIO_BALLOON_S_HTLB_PGALLOC] = "stat-htlb-pgalloc",
->> -   [VIRTIO_BALLOON_S_HTLB_PGFAIL] = "stat-htlb-pgfail",
->> +   [VIRTIO_BALLOON_S_HTLB_PGALLOC] = "stat-hugetlb-allocations",
->> +   [VIRTIO_BALLOON_S_HTLB_PGFAIL] = "stat-hugetlb-failures",
->>      [VIRTIO_BALLOON_S_NR] = NULL
->>   };
->>   
->> -- 
->> 1.8.3.1
->>
->> Based-on: <1524799751-151698-5-git-send-email-mst@redhat.com>
->> ([PULL 4/4] virtio-balloon: add hugetlb page allocation counts)
+> The bit definition:
+> CPUID.(EAX=7,ECX=0):ECX[bit 25] CLDEMOTE
+> 
+> The release document ref below link:
+> https://software.intel.com/sites/default/files/managed/c5/15/\
+> architecture-instruction-set-extensions-programming-reference.pdf
+> 
+> Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
+
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+
+Queued, thanks.
+
+> ---
+>  target/i386/cpu.c | 2 +-
+>  target/i386/cpu.h | 1 +
+>  2 files changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index ec1efd3..d5a5abf 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -483,7 +483,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+>              "avx512bitalg", NULL, "avx512-vpopcntdq", NULL,
+>              "la57", NULL, NULL, NULL,
+>              NULL, NULL, "rdpid", NULL,
+> -            NULL, NULL, NULL, NULL,
+> +            NULL, "cldemote", NULL, NULL,
+>              NULL, NULL, NULL, NULL,
+>          },
+>          .cpuid_eax = 7,
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 0c3f514..3ef90e0 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -678,6 +678,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+>  #define CPUID_7_0_ECX_AVX512_VPOPCNTDQ (1U << 14) /* POPCNT for vectors of DW/QW */
+>  #define CPUID_7_0_ECX_LA57     (1U << 16)
+>  #define CPUID_7_0_ECX_RDPID    (1U << 22)
+> +#define CPUID_7_0_ECX_CLDEMOTE (1U << 25)  /* CLDEMOTE Instruction */
+>  
+>  #define CPUID_7_0_EDX_AVX512_4VNNIW (1U << 2) /* AVX512 Neural Network Instructions */
+>  #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply Accumulation Single Precision */
+> -- 
+> 1.8.3.1
+> 
+> 
+
+-- 
+Eduardo
