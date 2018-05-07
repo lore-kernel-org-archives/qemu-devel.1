@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fFaUh-0003uP-0M
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 03:23:37 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fFavx-0007ik-IK
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 03:51:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fFaUf-0001tH-Mn
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 03:23:35 -0400
-Date: Mon, 7 May 2018 15:23:15 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180507072315.GA22503@lemon.usersys.redhat.com>
-References: <20180420220913.27000-1-mreitz@redhat.com>
-	<20180420220913.27000-3-mreitz@redhat.com>
-	<20180427062221.GD4217@lemon.usersys.redhat.com>
-	<9801ca35-b050-d482-f482-f1364bf07e1c@redhat.com>
-	<20180503064552.GJ15438@lemon.usersys.redhat.com>
-	<829af997-251b-d0e9-fb76-4ada1c3dd340@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1fFavw-0002DJ-MP
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 03:51:45 -0400
+Date: Mon, 7 May 2018 09:51:26 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180507095126.2fd146b7@redhat.com>
+In-Reply-To: <CAFEAcA-6nkVOEBc59H0mcgnRy9ifPRoRjUrvJ_4Gcr94GdjuSQ@mail.gmail.com>
+References: <1525176522-200354-1-git-send-email-imammedo@redhat.com>
+	<CAFEAcA9nG0_Eq1QWsCJMA6TKbZ_tf6mXWCVTrkxrFO5-UkmEvw@mail.gmail.com>
+	<CAFEAcA-6nkVOEBc59H0mcgnRy9ifPRoRjUrvJ_4Gcr94GdjuSQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <829af997-251b-d0e9-fb76-4ada1c3dd340@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/3] block/file-posix: File locking during
- creation
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] arm: isolate and clean up dtb
+ generation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,120 +25,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Eric Auger <eric.auger@redhat.com>
 
-On Fri, 05/04 15:45, Max Reitz wrote:
-> On 2018-05-03 08:45, Fam Zheng wrote:
-> > On Sat, 04/28 13:03, Max Reitz wrote:
-> >> On 2018-04-27 08:22, Fam Zheng wrote:
-> >>> On Sat, 04/21 00:09, Max Reitz wrote:
-> >>>> When creating a file, we should take the WRITE and RESIZE permissions.
-> >>>> We do not need either for the creation itself, but we do need them for
-> >>>> clearing and resizing it.  So we can take the proper permissions by
-> >>>> replacing O_TRUNC with an explicit truncation to 0, and by taking the
-> >>>> appropriate file locks between those two steps.
-> >>>>
-> >>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> >>>> ---
-> >>>>  block/file-posix.c | 41 +++++++++++++++++++++++++++++++++++++++--
-> >>>>  1 file changed, 39 insertions(+), 2 deletions(-)
-> >>>>
-> >>>> diff --git a/block/file-posix.c b/block/file-posix.c
-> >>>> index c98a4a1556..ed7932d6e8 100644
-> >>>> --- a/block/file-posix.c
-> >>>> +++ b/block/file-posix.c
-> >>>> @@ -1992,6 +1992,7 @@ static int raw_co_create(BlockdevCreateOptions *options, Error **errp)
-> >>>>  {
-> >>>>      BlockdevCreateOptionsFile *file_opts;
-> >>>>      int fd;
-> >>>> +    int perm, shared;
-> >>>>      int result = 0;
-> >>>>  
-> >>>>      /* Validate options and set default values */
-> >>>> @@ -2006,14 +2007,48 @@ static int raw_co_create(BlockdevCreateOptions *options, Error **errp)
-> >>>>      }
-> >>>>  
-> >>>>      /* Create file */
-> >>>> -    fd = qemu_open(file_opts->filename, O_RDWR | O_CREAT | O_TRUNC | O_BINARY,
-> >>>> -                   0644);
-> >>>> +    fd = qemu_open(file_opts->filename, O_RDWR | O_CREAT | O_BINARY, 0644);
-> >>>>      if (fd < 0) {
-> >>>>          result = -errno;
-> >>>>          error_setg_errno(errp, -result, "Could not create file");
-> >>>>          goto out;
-> >>>>      }
-> >>>>  
-> >>>> +    /* Take permissions: We want to discard everything, so we need
-> >>>> +     * BLK_PERM_WRITE; and truncation to the desired size requires
-> >>>> +     * BLK_PERM_RESIZE.
-> >>>> +     * On the other hand, we cannot share the RESIZE permission
-> >>>> +     * because we promise that after this function, the file has the
-> >>>> +     * size given in the options.  If someone else were to resize it
-> >>>> +     * concurrently, we could not guarantee that. */
-> >>>
-> >>> Strictly speaking, we do close(fd) before this function returns so the lock is
-> >>> lost and race can happen.
+On Fri, 4 May 2018 17:28:55 +0100
+Peter Maydell <peter.maydell@linaro.org> wrote:
+
+> On 3 May 2018 at 16:03, Peter Maydell <peter.maydell@linaro.org> wrote:
+> > On 1 May 2018 at 13:08, Igor Mammedov <imammedo@redhat.com> wrote:  
 > >>
-> >> Right, but then creation from the perspective of file-posix is over.  We
-> >> are going to reopen the file for formatting, but that is just a normal
-> >> bdrv_open() so it will automatically be locked, no?
-> > 
-> > After this function close() but before the following bdrv_open(), another
-> > process can sneak in and steal the lock. So we cannot guarantee the RESIZE lock
-> > does what we really want.
+> >> Changelog v2->v3:
+> >>    * drop already merged patches
+> >>        'arm: always start from  first_cpu when registering loader cpu reset callback'
+> >>        'ppc: e500: switch E500 based  machines to full machine definition'
+> >>    * add small not related cleanup
+> >>        'arm: boot: set boot_info starting from first_cpu'
+> >>    * add extra suggested patch
+> >>        'make sure that we aren't overwriting mc->get_hotplug_handler by accident'
+> >>    * make sure that dtb_limit initialized to 0
+> >>    * drop stale comment
+> >>    * drop not needed line movement
+> >>    * drop not needed extra new line
+> >> Changelog v1->v2:
+> >>    * drop "arm: reuse  arm_boot_address_space() in armv7m_load_kernel()"
+> >>    * move "arm: always start from first_cpu  when registering loader cpu reset callback"
+> >>      at the begigning of series and rebase
+> >>    * add "ppc: e500: switch E500 based machines to full  machine definition"
+> >>      and rebase 4/5 on top of it
+> >>    * fixup typo in virt_machine_get_hotpug_handler() name
+> >>    * add doc comment to skip_dtb_autoload field
+> >>    * 1-2/5 are queued in respective arm/ppc trees and are included for series
+> >>      completness so it would be easier to test, I expect series to go through
+> >>      arm tree
+> >>  
+> >
+> > Applied to target-arm.next, thanks.  
 > 
-> Right, but I'd argue that is not the purpose of the lock.  If someone
-> wants the file (or then rather the node) to be a certain size, they'd
-> have to call bdrv_getlength() on it to check.
+> Doing further testing within target-arm.next shows that this series (and
+> specifically patch 3/5) causes segfaults for the "no DTB provided" case.
 > 
-> But indeed you're right in that not sharing the RESIZE is hypocritical
-> considering it actually doesn't promise anything.
-> 
-> Anyway, let's consider the issues.  For formatting the file, this
-> behavior is OK because since Kevin's x-blockdev-create series format
-> drivers always truncate the file during formatting (that is, once they
-> have opened the file), and not during creation, so that part is secured.
-> 
-> But we do have issues with e.g. drive-mirror, where we create an image
-> and then open it.  The opened image may have a different size than what
-> we wanted to create.  Now in this case I wouldn't consider this a big
-> problem because drive-mirror is basically deprecated anyway, so there is
-> no reason to waste resources here; and this applies to all of the QMP
-> commands that create images and then open them automatically.
-> 
-> In the future, we want users to use blockdev-create and then
-> blockdev-add in two separate steps.  Then it's up to the user to realize
-> that the blockdev-add'ed node may have a different length then what they
-> wanted to achieve in blockdev-create.  Actually, it may just differ
-> altogether, I don't think qemu is going to make any promises on the
-> state of the image in the interim.
-> 
-> So...  I suppose there aren't any real issues with not being able to
-> promise that the image has the intended length immediately after
-> creating it.  So I guess we can indeed share RESIZE.
-> 
-> But OTOH, it definitely does not feel right to me to share RESIZE.  We
-> definitely do not want other parties to resize the image while we create it.
-> 
-> So I guess what I would like to do is keep RESIZE not shared and add a
-> note after the comment:
-> 
-> > Note that after this function, we can no longer guarantee that the
-> > file is not touched by a third party, so it may be resized then.
-> 
-> Ideally, we'd want the lock to stay active until blockdev-create or
-> qemu-img create returns, but I don't think that is really worth it.  If
-> there is a race condition between raw_co_create() returning and those
-> commands returning (and we don't have a format layer to correct things),
-> then I can't imagine that it couldn't bite you after those commands have
-> returned.  (And after those commands, it isn't our problem anymore anyway.)
+> $ gdb --args ./build/x86/arm-softmmu/qemu-system-arm -M vexpress-a15
+[...]
 
-Yes, what you said makes total sense to me. Having a comment and _not_ sharing
-RESIZE seems the most reasonable.
+> arm_load_dtb() is trying to call the binfo->get_dtb() hook and is not
+> handling the case where it is NULL (which it is on pretty much every
+> board except "virt").
+> 
+> (You get a segfault with an actual guest kernel as well; I just used
+> /dev/null here as an easy no-dependencies-required repro case.)
+> 
+> I've left patch 4 in target-arm.next as that was a standalone bugfix,
+> but have dropped the rest of the series for now.
 
-Technically we could extend the API to be able to hold the fd after
-blockdev-create returns by introducing an explicit blockdev-create-cleanup
-command, but like you said it is probably not worth it.
+Fix is really trivial, I've lost have_dtb() guard, while consolidating
+multiple load_dtb() calls into one.
+I'll respin v4 shortly with fixed 3/5.
 
-Fam
+
+> thanks
+> -- PMM
