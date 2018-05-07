@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fFd7u-0007Xx-9a
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 06:12:15 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fFdDQ-0000u1-Ft
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 06:17:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fFd7p-0006S5-A6
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 06:12:14 -0400
-Date: Mon, 7 May 2018 12:12:03 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180507121203.01ef4abd.cohuck@redhat.com>
-In-Reply-To: <3597f256-cc9d-c1a2-9fa1-b8d2d1d3d3d7@linux.ibm.com>
-References: <20180504131605.22816-1-cohuck@redhat.com>
-	<3597f256-cc9d-c1a2-9fa1-b8d2d1d3d3d7@linux.ibm.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fFdDP-0002d5-KP
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 06:17:56 -0400
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:35000)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fFdDP-0002cP-FO
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 06:17:55 -0400
+Received: by mail-ot0-x244.google.com with SMTP id h8-v6so31358282otb.2
+	for <qemu-devel@nongnu.org>; Mon, 07 May 2018 03:17:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] s390x/css: disabled subchannels cannot be
- status pending
+In-Reply-To: <20180507101013.32736-1-kraxel@redhat.com>
+References: <20180507101013.32736-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 7 May 2018 11:17:34 +0100
+Message-ID: <CAFEAcA-a74RLKXi=v7w-8v9h6A_QFSKeNxK64AvCYKxc_VN+uA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] vga: print friendly error message in case
+ multiple vga devices are added
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,129 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, 4 May 2018 17:02:07 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
+On 7 May 2018 at 11:10, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> ... to a virtual machine.  Without that we fail a ramblock register
+> sanity check, leading to a abort(), which isn't exactly user friendly.
+>
+> https://bugzilla.redhat.com/show_bug.cgi?id=1206037
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  hw/display/vga.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>
+> diff --git a/hw/display/vga.c b/hw/display/vga.c
+> index 72181330b8..328b6413ad 100644
+> --- a/hw/display/vga.c
+> +++ b/hw/display/vga.c
+> @@ -2184,6 +2184,14 @@ void vga_common_init(VGACommonState *s, Object *obj, bool global_vmstate)
+>      }
+>      s->vbe_size_mask = s->vbe_size - 1;
+>
+> +    if (global_vmstate) {
+> +        static int have_vga;
+> +        if (have_vga) {
+> +            error_report("only one vga device is supported");
+> +            exit(1);
+> +        }
+> +        have_vga = true;
+> +    }
+>      s->is_vbe_vmstate = 1;
+>      memory_region_init_ram_nomigrate(&s->vram, obj, "vga.vram", s->vram_size,
+>                             &error_fatal);
+> --
+> 2.9.3
+>
 
-> Could we somehow get 'fix' or something similar into the title?
+This seems like a bit of an irritating reason to refuse to
+allow multiple VGA devices though, since we could make
+them work by having the vmstate be not-global. Which is
+exactly what it ought to be -- we're only defaulting to
+"use global" here for migration compatibility, I think.
+Since multiple VGA devices didn't work before, there's
+no old configs we need to migrate from, and so I think
+we could just say "the second and subsequent VGA devices
+get non-global ram vmstate" ?
 
-Frankly, I have no idea how to do so in a readable way.
-
-> 
-> Also do we need cc stable for this? I guess this is broken
-> for a while now.
-
-The function has been like that since its introduction, but only 3270
-tries to do something on non-enabled subchannels, and this is the
-easiest place to fence it off. Stable probably doesn't hurt.
-
-> 
-> On 05/04/2018 03:16 PM, Cornelia Huck wrote:
-> > The 3270 code will try to post an attention interrupt when the
-> > 3270 emulator (e.g. x3270) attaches. If the guest has not yet
-> > enabled the subchannel for the 3270 device, we will give it a
-> > spurious status during msch when it does so later.  
-> 
-> Maybe something like 'The spurious status will preclude the successful
-> execution of msch (e.g. when the guest later tries to enable
-> the subchannel).' I had difficulties getting your sentence right-away.
-
-I would have problems parsing your sentence :)
-
-"..., we will present a spurious cc 1 (status pending) when it uses
-msch on it later on, e.g. when trying to enable the subchannel."
-
-?
-
-> 
-> > 
-> > To fix this, just don't do anything in css_conditional_io_interrupt()
-> > if the subchannel is not enabled. The 3270 code will work fine with
-> > that, and the other user of this function (virtio-ccw) never
-> > attempts to post an interrupt for a disabled device to begin with.
-> >   
-> 
-> And I guess vfio-ccw is also unaffected, as the passed through
-> stuff is going to handle this correctly on the lower levels.
-
-Yes, vfio-ccw does not use this code path at all.
-
-> 
-> > Reported-by: Thomas Huth <thuth@redhat.com>
-> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>  
-> 
-> Overall I agree with the patch.
-> 
-> Acked-by: Halil Pasic <pasic@linux.ibm.com>
-> 
-> > ---
-> >   hw/s390x/css.c | 8 ++++++++
-> >   1 file changed, 8 insertions(+)
-> > 
-> > diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> > index 301bf1772f..56c3fa8c89 100644
-> > --- a/hw/s390x/css.c
-> > +++ b/hw/s390x/css.c
-> > @@ -616,6 +616,14 @@ void css_inject_io_interrupt(SubchDev *sch)
-> >   
-> >   void css_conditional_io_interrupt(SubchDev *sch)  
-> 
-> Loosely related:
-> What is the semantic difference between css_inject_io_interrupt and
-> this css_conditional_io_interrup? The css_conditional_io_interrupt
-> could be 'unsolicited' or 'virtio notification'. This function also
-> relies on the serialization of io instructions or?
-
-I introduced the "conditional interrupt" function to inject virtio
-notifications. 3270 started using this interface later on. I had not
-intended it to be a "generic unsolicited interrupt" interface.
-
-> 
-> Also there is this paragraph to be considered if this is indeed
-> about unsolicited:
-> """
-> The subchannel and device status associated with
-> an unsolicited interruption condition is never merged
-> with that of any currently existing interruption condi-
-> tion. If the subchannel is currently status pending, the
-> unsolicited interruption condition is held in abeyance
-> in either the channel subsystem or the device, as
-> appropriate, until the status-pending condition has
-> been cleared.
-> """
-> 
-> 
-> >   {
-> > +    /*
-> > +     * If the subchannel is not enabled, it is not made status pending
-> > +     * (see PoP p. 16-17, "Status Control").
-> > +     */  
-> 
-> In not sure about the reference. We usually don't do that or? And the page
-> number may change. I would probably just drop the PoP reference.
-
-I did not spot it immediately, that's why I added it.
-
-> 
-> > +    if (!(sch->curr_status.pmcw.flags & PMCW_FLAGS_MASK_ENA)) {
-> > +        return;
-> > +    }
-> > +  
-> 
-> We don't have a scenario where the guest is expected to do some 'recovery'
-> after being educated about some condition by the means of an alert-status,
-> do we?
-
-As said, this function was initially introduced for virtio
-notifications, not as a generic interface.
-
-> 
-> I also wonder if this is the right place to handle the problem. The
-> 3870 also manipulates scsw.dstat before calling this. And I'm not sure
-> where/if is that cleared, or if it's OK to leave it set...
-
-It's the easiest way to fix this. 3270 probably wants some review
-regarding its interaction with the css as well, but that's something
-for another day.
+thanks
+-- PMM
