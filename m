@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51374)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fFkNv-0003Xv-Vz
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 13:57:16 -0400
+	(envelope-from <eblake@redhat.com>) id 1fFkUx-0005ey-K9
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 14:04:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fFkNs-0006bs-Md
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 13:57:16 -0400
-References: <20180507095539.19584-1-kraxel@redhat.com>
-	<20180507095539.19584-3-kraxel@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1fFkUt-00041c-0U
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 14:04:31 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45530 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fFkUs-00041R-Sv
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 14:04:26 -0400
+References: <20180507033214.19219-1-zyimin@linux.ibm.com>
+	<20180507033214.19219-2-zyimin@linux.ibm.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <8ad7c756-856d-c5aa-8796-7047caa48856@redhat.com>
-Date: Mon, 7 May 2018 12:57:09 -0500
+Message-ID: <e4041508-c6ba-5e83-8bd8-50a4bd996009@redhat.com>
+Date: Mon, 7 May 2018 13:04:17 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180507095539.19584-3-kraxel@redhat.com>
+In-Reply-To: <20180507033214.19219-2-zyimin@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] ui: switch trivial displays to qapi
- parser
+Subject: Re: [Qemu-devel] [PATCH 1/1] sandbox: avoid to compile options if
+ CONFIG_SECCOMP undefined
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,20 +29,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Yi Min Zhao <zyimin@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: otubo@redhat.com, fiuczy@linux.ibm.com, jtomko@redhat.com, borntraeger@de.ibm.com, jferlan@redhat.com
 
-On 05/07/2018 04:55 AM, Gerd Hoffmann wrote:
-> Drop the option-less display types (egl-headless, curses, none) from
-> parse_display(), so they'll be handled by parse_display_qapi().
+On 05/06/2018 10:32 PM, Yi Min Zhao wrote:
+
+In the subject line: s/avoid to compile/avoid compiling/
+
+> If CONFIG_SECCOMP is undefined, the option 'elevatorprivileges' remains
+
+s/elevator/elevate/
+
+> complied. This would make libvirt set the corresponding capability and
+
+s/complied/compiled/
+
+> then trigger the guest startup fails. So let's wrap the options with
+> CONFIG_SECCOMP.
 > 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> Signed-off-by: Yi Min Zhao <zyimin@linux.ibm.com>
 > ---
->   vl.c | 6 ------
->   1 file changed, 6 deletions(-)
+>   vl.c | 2 ++
+>   1 file changed, 2 insertions(+)
 > 
+> diff --git a/vl.c b/vl.c
+> index fce1fd12d8..cb07b19c02 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -268,6 +268,7 @@ static QemuOptsList qemu_sandbox_opts = {
+>               .name = "enable",
+>               .type = QEMU_OPT_BOOL,
+>           },
+> +#ifdef CONFIG_SECCOMP
+>           {
+>               .name = "obsolete",
+>               .type = QEMU_OPT_STRING,
+> @@ -284,6 +285,7 @@ static QemuOptsList qemu_sandbox_opts = {
+>               .name = "resourcecontrol",
+>               .type = QEMU_OPT_STRING,
+>           },
+> +#endif
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+The commit message mentions only 'elevateprivileges' (once the typo is 
+fixed), but you are also crippling 'obsolete', 'spawn', and 
+'resourcecontrol'.  Perhaps the commit message should call that out 
+better?  Or, since libvirt is looking at just 'elevateprivileges', per 
+this line in libvirt's qemu_capabilities.c:
+
+src/qemu/qemu_capabilities.c:    { "sandbox", "elevateprivileges", 
+QEMU_CAPS_SECCOMP_BLACKLIST },
+
+is it sufficient to just mask out that one option?
 
 -- 
 Eric Blake, Principal Software Engineer
