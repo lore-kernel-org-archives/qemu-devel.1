@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fFcjH-0003p6-F5
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 05:46:52 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fFcot-0008HV-4m
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 05:52:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fFcjG-000670-Nj
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 05:46:47 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45828 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fFcjG-00066Y-JC
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 05:46:46 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fFcor-0002wj-Ot
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 05:52:35 -0400
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon,  7 May 2018 11:46:38 +0200
-Message-Id: <20180507094642.5909-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 0/4] audio/hda: improve windows guest audio
- quality.
+Date: Mon,  7 May 2018 11:52:25 +0200
+Message-Id: <20180507095225.11659-2-kraxel@redhat.com>
+In-Reply-To: <20180507095225.11659-1-kraxel@redhat.com>
+References: <20180507095225.11659-1-kraxel@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 1/1] qxl: fix local renderer crash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,24 +23,37 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: martin@schrodt.org, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-stable@nongnu.org
 
-Based on a patch by Martin Schrodt.
+Make sure we only ask the spice local renderer for display updates in
+case we have a valid primary surface.  Without that spice is confused
+and throws errors in case a display update request (triggered by
+screendump for example) happens in parallel to a mode switch and hits
+the race window where the old primary surface is gone and the new isn't
+establisted yet.
 
-v3: rebase to latest master, solve compat.h conflict.
-v2: drop underrun detection, handle overruns only.
+Cc: qemu-stable@nongnu.org
+Fixes: https://bugzilla.redhat.com//show_bug.cgi?id=3D1567733
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-id: 20180427115528.345-1-kraxel@redhat.com
+---
+ hw/display/qxl-render.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Gerd Hoffmann (4):
-  audio/hda: create millisecond timers that handle IO
-  audio/hda: turn some dprintfs into trace points
-  audio/hda: tweak timer adjust logic
-  audio/hda: detect output buffer overruns
-
- include/hw/compat.h   |   7 +-
- hw/audio/hda-codec.c  | 287 ++++++++++++++++++++++++++++++++++++++++++++------
- hw/audio/intel-hda.c  |   7 --
- hw/audio/trace-events |   6 ++
- 4 files changed, 268 insertions(+), 39 deletions(-)
-
--- 
+diff --git a/hw/display/qxl-render.c b/hw/display/qxl-render.c
+index e7ac4f8789..c62b9a5e75 100644
+--- a/hw/display/qxl-render.c
++++ b/hw/display/qxl-render.c
+@@ -169,7 +169,8 @@ void qxl_render_update(PCIQXLDevice *qxl)
+=20
+     qemu_mutex_lock(&qxl->ssd.lock);
+=20
+-    if (!runstate_is_running() || !qxl->guest_primary.commands) {
++    if (!runstate_is_running() || !qxl->guest_primary.commands ||
++        qxl->mode =3D=3D QXL_MODE_UNDEFINED) {
+         qxl_render_update_area_unlocked(qxl);
+         qemu_mutex_unlock(&qxl->ssd.lock);
+         return;
+--=20
 2.9.3
