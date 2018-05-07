@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fFaMK-0002bF-FA
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 03:14:57 -0400
+	(envelope-from <famz@redhat.com>) id 1fFaUh-0003uP-0M
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 03:23:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fFaMH-0006FO-BA
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 03:14:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54530 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fFaMH-0006FD-5t
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 03:14:53 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 426B0416F7BC
-	for <qemu-devel@nongnu.org>; Mon,  7 May 2018 07:14:49 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <1525326658-3078-1-git-send-email-thuth@redhat.com>
-	<87k1slot93.fsf@dusky.pond.sub.org>
-	<54f1bb8c-c61e-557a-952d-92ba1297e818@redhat.com>
-Date: Mon, 07 May 2018 09:14:43 +0200
-In-Reply-To: <54f1bb8c-c61e-557a-952d-92ba1297e818@redhat.com> (Thomas Huth's
-	message of "Fri, 4 May 2018 16:55:57 +0200")
-Message-ID: <87in80ym1o.fsf@dusky.pond.sub.org>
+	(envelope-from <famz@redhat.com>) id 1fFaUf-0001tH-Mn
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 03:23:35 -0400
+Date: Mon, 7 May 2018 15:23:15 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180507072315.GA22503@lemon.usersys.redhat.com>
+References: <20180420220913.27000-1-mreitz@redhat.com>
+	<20180420220913.27000-3-mreitz@redhat.com>
+	<20180427062221.GD4217@lemon.usersys.redhat.com>
+	<9801ca35-b050-d482-f482-f1364bf07e1c@redhat.com>
+	<20180503064552.GJ15438@lemon.usersys.redhat.com>
+	<829af997-251b-d0e9-fb76-4ada1c3dd340@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] net: Silence 'has no peer' messages in
- testing mode
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <829af997-251b-d0e9-fb76-4ada1c3dd340@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] block/file-posix: File locking during
+ creation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,103 +28,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-Thomas Huth <thuth@redhat.com> writes:
+On Fri, 05/04 15:45, Max Reitz wrote:
+> On 2018-05-03 08:45, Fam Zheng wrote:
+> > On Sat, 04/28 13:03, Max Reitz wrote:
+> >> On 2018-04-27 08:22, Fam Zheng wrote:
+> >>> On Sat, 04/21 00:09, Max Reitz wrote:
+> >>>> When creating a file, we should take the WRITE and RESIZE permissions.
+> >>>> We do not need either for the creation itself, but we do need them for
+> >>>> clearing and resizing it.  So we can take the proper permissions by
+> >>>> replacing O_TRUNC with an explicit truncation to 0, and by taking the
+> >>>> appropriate file locks between those two steps.
+> >>>>
+> >>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> >>>> ---
+> >>>>  block/file-posix.c | 41 +++++++++++++++++++++++++++++++++++++++--
+> >>>>  1 file changed, 39 insertions(+), 2 deletions(-)
+> >>>>
+> >>>> diff --git a/block/file-posix.c b/block/file-posix.c
+> >>>> index c98a4a1556..ed7932d6e8 100644
+> >>>> --- a/block/file-posix.c
+> >>>> +++ b/block/file-posix.c
+> >>>> @@ -1992,6 +1992,7 @@ static int raw_co_create(BlockdevCreateOptions *options, Error **errp)
+> >>>>  {
+> >>>>      BlockdevCreateOptionsFile *file_opts;
+> >>>>      int fd;
+> >>>> +    int perm, shared;
+> >>>>      int result = 0;
+> >>>>  
+> >>>>      /* Validate options and set default values */
+> >>>> @@ -2006,14 +2007,48 @@ static int raw_co_create(BlockdevCreateOptions *options, Error **errp)
+> >>>>      }
+> >>>>  
+> >>>>      /* Create file */
+> >>>> -    fd = qemu_open(file_opts->filename, O_RDWR | O_CREAT | O_TRUNC | O_BINARY,
+> >>>> -                   0644);
+> >>>> +    fd = qemu_open(file_opts->filename, O_RDWR | O_CREAT | O_BINARY, 0644);
+> >>>>      if (fd < 0) {
+> >>>>          result = -errno;
+> >>>>          error_setg_errno(errp, -result, "Could not create file");
+> >>>>          goto out;
+> >>>>      }
+> >>>>  
+> >>>> +    /* Take permissions: We want to discard everything, so we need
+> >>>> +     * BLK_PERM_WRITE; and truncation to the desired size requires
+> >>>> +     * BLK_PERM_RESIZE.
+> >>>> +     * On the other hand, we cannot share the RESIZE permission
+> >>>> +     * because we promise that after this function, the file has the
+> >>>> +     * size given in the options.  If someone else were to resize it
+> >>>> +     * concurrently, we could not guarantee that. */
+> >>>
+> >>> Strictly speaking, we do close(fd) before this function returns so the lock is
+> >>> lost and race can happen.
+> >>
+> >> Right, but then creation from the perspective of file-posix is over.  We
+> >> are going to reopen the file for formatting, but that is just a normal
+> >> bdrv_open() so it will automatically be locked, no?
+> > 
+> > After this function close() but before the following bdrv_open(), another
+> > process can sneak in and steal the lock. So we cannot guarantee the RESIZE lock
+> > does what we really want.
+> 
+> Right, but I'd argue that is not the purpose of the lock.  If someone
+> wants the file (or then rather the node) to be a certain size, they'd
+> have to call bdrv_getlength() on it to check.
+> 
+> But indeed you're right in that not sharing the RESIZE is hypocritical
+> considering it actually doesn't promise anything.
+> 
+> Anyway, let's consider the issues.  For formatting the file, this
+> behavior is OK because since Kevin's x-blockdev-create series format
+> drivers always truncate the file during formatting (that is, once they
+> have opened the file), and not during creation, so that part is secured.
+> 
+> But we do have issues with e.g. drive-mirror, where we create an image
+> and then open it.  The opened image may have a different size than what
+> we wanted to create.  Now in this case I wouldn't consider this a big
+> problem because drive-mirror is basically deprecated anyway, so there is
+> no reason to waste resources here; and this applies to all of the QMP
+> commands that create images and then open them automatically.
+> 
+> In the future, we want users to use blockdev-create and then
+> blockdev-add in two separate steps.  Then it's up to the user to realize
+> that the blockdev-add'ed node may have a different length then what they
+> wanted to achieve in blockdev-create.  Actually, it may just differ
+> altogether, I don't think qemu is going to make any promises on the
+> state of the image in the interim.
+> 
+> So...  I suppose there aren't any real issues with not being able to
+> promise that the image has the intended length immediately after
+> creating it.  So I guess we can indeed share RESIZE.
+> 
+> But OTOH, it definitely does not feel right to me to share RESIZE.  We
+> definitely do not want other parties to resize the image while we create it.
+> 
+> So I guess what I would like to do is keep RESIZE not shared and add a
+> note after the comment:
+> 
+> > Note that after this function, we can no longer guarantee that the
+> > file is not touched by a third party, so it may be resized then.
+> 
+> Ideally, we'd want the lock to stay active until blockdev-create or
+> qemu-img create returns, but I don't think that is really worth it.  If
+> there is a race condition between raw_co_create() returning and those
+> commands returning (and we don't have a format layer to correct things),
+> then I can't imagine that it couldn't bite you after those commands have
+> returned.  (And after those commands, it isn't our problem anymore anyway.)
 
-> On 03.05.2018 13:47, Markus Armbruster wrote:
->> Thomas Huth <thuth@redhat.com> writes:
->> 
->>> When running qtests with -nodefaults, we are not interested in
->>> these 'XYZ has no peer' messages.
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  net/net.c | 13 +++++++------
->>>  1 file changed, 7 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/net/net.c b/net/net.c
->>> index 29f8398..58bf85e 100644
->>> --- a/net/net.c
->>> +++ b/net/net.c
->>> @@ -1427,12 +1427,13 @@ void net_check_clients(void)
->>>  
->>>      net_hub_check_clients();
->>>  
->>> -    QTAILQ_FOREACH(nc, &net_clients, next) {
->>> -        if (!nc->peer) {
->>> -            warn_report("%s %s has no peer",
->>> -                        nc->info->type == NET_CLIENT_DRIVER_NIC
->>> -                        ? "nic" : "netdev",
->>> -                        nc->name);
->>> +    if (!qtest_enabled() || nd_table[0].used) {
->> 
->> I understand the !qtest_enabled part, but not the nd_table[0].used
->> part.  Can you explain?
->
-> Sure: I want to silence the message in qtest mode with -nodefaults.
-> qtest mode enabled means qtest_enabled() returns true.
-> -nodefaults enabled means nd_table[0].used is set to false.
+Yes, what you said makes total sense to me. Having a comment and _not_ sharing
+RESIZE seems the most reasonable.
 
-.used is initialized to false, and becomes true on successful
-net_init_nic() / net_param_nic().
+Technically we could extend the API to be able to hold the fd after
+blockdev-create returns by introducing an explicit blockdev-create-cleanup
+command, but like you said it is probably not worth it.
 
-The connection to -nodefaults is this:
-
-    if (default_net) {
-        QemuOptsList *net = qemu_find_opts("net");
-        qemu_opts_set(net, NULL, "type", "nic", &error_abort);
-#ifdef CONFIG_SLIRP
-        qemu_opts_set(net, NULL, "type", "user", &error_abort);
-#endif
-    }
-
-When default_net is true, we effectively add -net nic".  It is true
-unless the user specifies any of -nodefaults, -netdev, -nic, -net.  So,
-with the default nic, nd_table[0].used is true.  It's also true with
-non-default nics specified with convenience options.
-
-> So silence the message if qtest_enabled() && !nd_table[0].used.
-
-Thus, silence the message if qtesting and the user specified -nodefaults
-and didn't add nics with convenience options.
-
-Two (possibly confused) questions:
-
-1. The user can add nics without convenience options:
-
-    $ upstream-qemu -display none -nodefaults -device e1000
-    upstream-qemu: warning: nic e1000.0 has no peer
-
-   Shouldn't we silence the warning then, too?
-
-2. We already have code to silence the warning:
-
-    /* Don't warn about the default network setup that you get if
-     * no command line -net or -netdev options are specified. There
-     * are two cases that we would otherwise complain about:
-     * (1) board doesn't support a NIC but the implicit "-net nic"
-     * requested one
-     * (2) CONFIG_SLIRP not set, in which case the implicit "-net nic"
-     * sets up a nic that isn't connected to anything.
-     */
-    if (!default_net) {
-        net_check_clients();
-    }
-
-   Is it a good idea to split the logic between net_check_clients() and
-   its caller?
-
-> Negates to: Print the message if !qtest_enabled || nd_table[0].used.
->
->>> +        QTAILQ_FOREACH(nc, &net_clients, next) {
->>> +            if (!nc->peer) {
->>> +                warn_report("%s %s has no peer",
->>> +                            nc->info->type == NET_CLIENT_DRIVER_NIC
->>> +                            ? "nic" : "netdev", nc->name);
->>> +            }
->>>          }
->>>      }
->
->  Thomas
+Fam
