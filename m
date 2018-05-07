@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fFiK4-0006Ob-It
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 11:45:12 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fFiK4-0006Oc-JG
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 11:45:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fFiK0-0005ps-4I
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fFiJz-0005pJ-JY
 	for qemu-devel@nongnu.org; Mon, 07 May 2018 11:45:08 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon,  7 May 2018 18:44:58 +0300
-Message-Id: <20180507154458.73945-6-vsementsov@virtuozzo.com>
+Date: Mon,  7 May 2018 18:44:55 +0300
+Message-Id: <20180507154458.73945-3-vsementsov@virtuozzo.com>
 In-Reply-To: <20180507154458.73945-1-vsementsov@virtuozzo.com>
 References: <20180507154458.73945-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 5/5] block/nbd-client: don't check ioc
+Subject: [Qemu-devel] [PATCH 2/5] block/nbd: move connection code from
+ block/nbd to block/nbd-client
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,61 +23,172 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-We have several paranoiac checks for ioc != NULL. But ioc may become
-NULL only on close, which should not happen during requests handling.
-Also, we check ioc only sometimes, not after each yield, which is
-inconsistent. Let's drop these checks.
+Keep all connection code in one file, to be able to implement reconnect
+in further patches.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/nbd-client.c | 14 +-------------
- 1 file changed, 1 insertion(+), 13 deletions(-)
+ block/nbd-client.h |  2 +-
+ block/nbd-client.c | 37 +++++++++++++++++++++++++++++++++++--
+ block/nbd.c        | 41 ++---------------------------------------
+ 3 files changed, 38 insertions(+), 42 deletions(-)
 
+diff --git a/block/nbd-client.h b/block/nbd-client.h
+index 0ece76e5af..a93f2114b9 100644
+--- a/block/nbd-client.h
++++ b/block/nbd-client.h
+@@ -41,7 +41,7 @@ typedef struct NBDClientSession {
+ NBDClientSession *nbd_get_client_session(BlockDriverState *bs);
+ 
+ int nbd_client_init(BlockDriverState *bs,
+-                    QIOChannelSocket *sock,
++                    SocketAddress *saddr,
+                     const char *export_name,
+                     QCryptoTLSCreds *tlscreds,
+                     const char *hostname,
 diff --git a/block/nbd-client.c b/block/nbd-client.c
-index dd712c59b3..87d90d9026 100644
+index 9b9a82fef1..6ff505c4b8 100644
 --- a/block/nbd-client.c
 +++ b/block/nbd-client.c
-@@ -51,10 +51,6 @@ static void nbd_teardown_connection(BlockDriverState *bs)
- {
-     NBDClientSession *client = nbd_get_client_session(bs);
- 
--    if (!client->ioc) { /* Already closed */
--        return;
--    }
--
-     /* finish any pending coroutines */
-     qio_channel_shutdown(client->ioc,
-                          QIO_CHANNEL_SHUTDOWN_BOTH,
-@@ -150,10 +146,6 @@ static int nbd_co_send_request(BlockDriverState *bs,
-         rc = -EIO;
-         goto err;
-     }
--    if (!s->ioc) {
--        rc = -EPIPE;
--        goto err;
--    }
- 
-     if (qiov) {
-         qio_channel_set_cork(s->ioc, true);
-@@ -426,7 +418,7 @@ static coroutine_fn int nbd_co_do_receive_one_chunk(
-     s->requests[i].receiving = true;
-     qemu_coroutine_yield();
-     s->requests[i].receiving = false;
--    if (!s->ioc || s->quit) {
-+    if (s->quit) {
-         error_setg(errp, "Connection closed");
-         return -EIO;
-     }
-@@ -967,10 +959,6 @@ void nbd_client_close(BlockDriverState *bs)
-     NBDClientSession *client = nbd_get_client_session(bs);
-     NBDRequest request = { .type = NBD_CMD_DISC };
- 
--    if (client->ioc == NULL) {
--        return;
--    }
--
-     nbd_send_request(client->ioc, &request);
- 
+@@ -976,8 +976,31 @@ void nbd_client_close(BlockDriverState *bs)
      nbd_teardown_connection(bs);
+ }
+ 
++static QIOChannelSocket *nbd_establish_connection(SocketAddress *saddr,
++                                                  Error **errp)
++{
++    QIOChannelSocket *sioc;
++    Error *local_err = NULL;
++
++    sioc = qio_channel_socket_new();
++    qio_channel_set_name(QIO_CHANNEL(sioc), "nbd-client");
++
++    qio_channel_socket_connect_sync(sioc,
++                                    saddr,
++                                    &local_err);
++    if (local_err) {
++        object_unref(OBJECT(sioc));
++        error_propagate(errp, local_err);
++        return NULL;
++    }
++
++    qio_channel_set_delay(QIO_CHANNEL(sioc), false);
++
++    return sioc;
++}
++
+ int nbd_client_init(BlockDriverState *bs,
+-                    QIOChannelSocket *sioc,
++                    SocketAddress *saddr,
+                     const char *export,
+                     QCryptoTLSCreds *tlscreds,
+                     const char *hostname,
+@@ -986,6 +1009,15 @@ int nbd_client_init(BlockDriverState *bs,
+     NBDClientSession *client = nbd_get_client_session(bs);
+     int ret;
+ 
++    /* establish TCP connection, return error if it fails
++     * TODO: Configurable retry-until-timeout behaviour.
++     */
++    QIOChannelSocket *sioc = nbd_establish_connection(saddr, errp);
++
++    if (!sioc) {
++        return -ECONNREFUSED;
++    }
++
+     /* NBD handshake */
+     logout("session init %s\n", export);
+     qio_channel_set_blocking(QIO_CHANNEL(sioc), true, NULL);
+@@ -998,12 +1030,14 @@ int nbd_client_init(BlockDriverState *bs,
+                                 &client->ioc, &client->info, errp);
+     if (ret < 0) {
+         logout("Failed to negotiate with the NBD server\n");
++        object_unref(OBJECT(sioc));
+         return ret;
+     }
+     if (client->info.flags & NBD_FLAG_READ_ONLY &&
+         !bdrv_is_read_only(bs)) {
+         error_setg(errp,
+                    "request for write access conflicts with read-only export");
++        object_unref(OBJECT(sioc));
+         return -EACCES;
+     }
+     if (client->info.flags & NBD_FLAG_SEND_FUA) {
+@@ -1017,7 +1051,6 @@ int nbd_client_init(BlockDriverState *bs,
+     qemu_co_mutex_init(&client->send_mutex);
+     qemu_co_queue_init(&client->free_sema);
+     client->sioc = sioc;
+-    object_ref(OBJECT(client->sioc));
+ 
+     if (!client->ioc) {
+         client->ioc = QIO_CHANNEL(sioc);
+diff --git a/block/nbd.c b/block/nbd.c
+index 3e1693cc55..5d9faea18f 100644
+--- a/block/nbd.c
++++ b/block/nbd.c
+@@ -305,30 +305,6 @@ NBDClientSession *nbd_get_client_session(BlockDriverState *bs)
+     return &s->client;
+ }
+ 
+-static QIOChannelSocket *nbd_establish_connection(SocketAddress *saddr,
+-                                                  Error **errp)
+-{
+-    QIOChannelSocket *sioc;
+-    Error *local_err = NULL;
+-
+-    sioc = qio_channel_socket_new();
+-    qio_channel_set_name(QIO_CHANNEL(sioc), "nbd-client");
+-
+-    qio_channel_socket_connect_sync(sioc,
+-                                    saddr,
+-                                    &local_err);
+-    if (local_err) {
+-        object_unref(OBJECT(sioc));
+-        error_propagate(errp, local_err);
+-        return NULL;
+-    }
+-
+-    qio_channel_set_delay(QIO_CHANNEL(sioc), false);
+-
+-    return sioc;
+-}
+-
+-
+ static QCryptoTLSCreds *nbd_get_tls_creds(const char *id, Error **errp)
+ {
+     Object *obj;
+@@ -398,7 +374,6 @@ static int nbd_open(BlockDriverState *bs, QDict *options, int flags,
+     BDRVNBDState *s = bs->opaque;
+     QemuOpts *opts = NULL;
+     Error *local_err = NULL;
+-    QIOChannelSocket *sioc = NULL;
+     QCryptoTLSCreds *tlscreds = NULL;
+     const char *hostname = NULL;
+     int ret = -EINVAL;
+@@ -438,22 +413,10 @@ static int nbd_open(BlockDriverState *bs, QDict *options, int flags,
+         hostname = s->saddr->u.inet.host;
+     }
+ 
+-    /* establish TCP connection, return error if it fails
+-     * TODO: Configurable retry-until-timeout behaviour.
+-     */
+-    sioc = nbd_establish_connection(s->saddr, errp);
+-    if (!sioc) {
+-        ret = -ECONNREFUSED;
+-        goto error;
+-    }
+-
+     /* NBD handshake */
+-    ret = nbd_client_init(bs, sioc, s->export,
+-                          tlscreds, hostname, errp);
++    ret = nbd_client_init(bs, s->saddr, s->export, tlscreds, hostname, errp);
++
+  error:
+-    if (sioc) {
+-        object_unref(OBJECT(sioc));
+-    }
+     if (tlscreds) {
+         object_unref(OBJECT(tlscreds));
+     }
 -- 
 2.11.1
