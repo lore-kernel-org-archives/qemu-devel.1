@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45915)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fFgaJ-0007mf-Ah
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 09:53:48 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fFgk0-0002ZE-Rw
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 10:03:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fFgaI-0007Ly-Gt
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 09:53:47 -0400
-Date: Mon, 7 May 2018 10:53:30 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1fFgjw-0005Xq-UR
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 10:03:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58620)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fFgjw-0005Xi-On
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 10:03:44 -0400
+Date: Mon, 7 May 2018 11:03:29 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180507135330.GS25013@localhost.localdomain>
-References: <1521452376-25099-1-git-send-email-thuth@redhat.com>
-	<87bme62nu0.fsf@dusky.pond.sub.org>
-	<068649bc-1546-6fc5-3e41-63512196cbf8@redhat.com>
-	<20180427003215.GU29865@localhost.localdomain>
-	<87o9i5uplt.fsf@dusky.pond.sub.org>
+Message-ID: <20180507140329.GW25013@localhost.localdomain>
+References: <20180420181951.7252-1-ehabkost@redhat.com>
+	<20180420181951.7252-14-ehabkost@redhat.com>
+	<20180430130246.GB10576@stefanha-x1.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87o9i5uplt.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [RFC PATCH] tests/device-introspect: Test devices
- with all machines, not only with "none"
+In-Reply-To: <20180430130246.GB10576@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [RFC 13/24] avocado_qemu: Functional test for
+ RHBZ#1431939
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,65 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, Amador Pahim <apahim@redhat.com>, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Alistair Francis <alistair23@gmail.com>, Cleber Rosa <crosa@redhat.com>, Fam Zheng <famz@redhat.com>
 
-On Fri, Apr 27, 2018 at 08:31:58AM +0200, Markus Armbruster wrote:
-> Eduardo Habkost <ehabkost@redhat.com> writes:
+On Mon, Apr 30, 2018 at 02:02:46PM +0100, Stefan Hajnoczi wrote:
+> On Fri, Apr 20, 2018 at 03:19:40PM -0300, Eduardo Habkost wrote:
+> > +    def test_hotplug_memory_default_policy(self):
+> > +        """
+> > +        According to the RHBZ1431939, the issue is 'host nodes'
+> > +        returning '128'. It should return empty value when memory
+> > +        hotplug default policy is used.
+> > +
+> > +        Fixed in commit d81d857f4421d205395d55200425daa6591c28a5.
+> > +        :avocado: tags=RHBZ1431939
+> > +        """
+> > +
+> > +        cmd = 'object_add memory-backend-ram,id=mem1,size=1G'
+> > +        res = self.vm.qmp('human-monitor-command', command_line=cmd)
+> > +        self.assertEqual('', res['return'])
 > 
-> > On Thu, Apr 26, 2018 at 05:20:25PM +0200, Thomas Huth wrote:
-> >> On 26.04.2018 13:45, Markus Armbruster wrote:
-> >> > Thomas Huth <thuth@redhat.com> writes:
-> >> [...]
-> >> >> @@ -260,6 +263,26 @@ static void test_abstract_interfaces(void)
-> >> >>      qtest_end();
-> >> >>  }
-> >> >>  
-> >> >> +static void add_machine_test_case(const char *mname)
-> >> >> +{
-> >> >> +    char *path, *args;
-> >> >> +
-> >> >> +    /* Ignore blacklisted machines */
-> >> >> +    if (g_str_equal("xenfv", mname) || g_str_equal("xenpv", mname)) {
-> >> >> +        return;
-> >> >> +    }
-> >> >> +
-> >> >> +    path = g_strdup_printf("device/introspect/concrete-defaults-%s", mname);
-> >> >> +    args = g_strdup_printf("-machine %s", mname);
-> >> >> +    qtest_add_data_func(path, args, test_device_intro_concrete);
-> >> > 
-> >> > This runs test_device_intro_concrete() with "-machine M" for all machine
-> >> > types M, in SPEED=slow mode.
-> >> > 
-> >> >> +    g_free(path);
-> >> >> +
-> >> >> +    path = g_strdup_printf("device/introspect/concrete-nodefaults-%s", mname);
-> >> >> +    args = g_strdup_printf("-nodefaults -machine %s", mname);
-> >> >> +    qtest_add_data_func(path, args, test_device_intro_concrete);
-> >> > 
-> >> > This runs test_device_intro_concrete() with "-nodefaults -machine M" for
-> >> > all machine types M, in SPEED=slow mode.
-> >> > 
-> >> > Has "without -nodefaults" exposed additional bugs?
-> >> 
-> >> After testing this with all machines, I had to discover that
-> >> "-nodefaults" does not work so easily: A lot of the embedded machines
-> >> (especially the ARM machines) simply refuse to work with "-nodefaults"
-> >> and exit immediately instead. E.g.:
-> >> 
-> >> $ arm-softmmu/qemu-system-arm -nodefaults -nographic -M n810,accel=qtest
-> >> qemu-system-arm: missing SecureDigital device
+> General question about QMP test coding style:
 > 
-> These are all bugs.  --nodefaults is supposed to suppress *optional*
-> devices, not mandatory ones.
+> What happens if res['return'] does not exist because the QMP command
+> failed?
+> 
+> I tend to use dict.get() to prevent KeyError.  That way the
+> assertEqual() will fail instead of an unhandled KeyError in the test
+> code.
 
-I'm not sure I understand the requirements.  What exactly is the
-definition of "mandatory"?
+It looks like vm.command() would be appropriate on most cases, as
+it will check for errors and return res['result'] automatically.
 
-A machine created by "qemu-system-x86_64 -machine pc -nodefaults"
-is useless because it has no any device to boot from.  How is
-that different from a n810 machine not booting because there's no
-SD device?
+vm.qmp() seems to be useful only if you really don't want an
+exception to be raised in case of QMP errors.
+
+Maybe we should rename .qmp() to .raw_qmp() to discourage people
+from using it.
 
 -- 
 Eduardo
