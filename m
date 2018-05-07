@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fFkYs-0008OV-Dh
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 14:08:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1fFkb8-0001zw-H9
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 14:10:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fFkYr-0005v9-Hq
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 14:08:34 -0400
-References: <20180507154458.73945-1-vsementsov@virtuozzo.com>
-	<20180507154458.73945-6-vsementsov@virtuozzo.com>
+	(envelope-from <eblake@redhat.com>) id 1fFkb3-0007Bf-TL
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 14:10:54 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33808 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fFkb3-0007BT-OK
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 14:10:49 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9F3648DC4E
+	for <qemu-devel@nongnu.org>; Mon,  7 May 2018 18:10:45 +0000 (UTC)
+References: <20180507101013.32736-1-kraxel@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <d061f619-d1f7-57be-d8f0-0792ca64504a@redhat.com>
-Date: Mon, 7 May 2018 13:08:24 -0500
+Message-ID: <1c74cdf2-defc-0969-87c9-f1ef6432e50e@redhat.com>
+Date: Mon, 7 May 2018 13:10:40 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180507154458.73945-6-vsementsov@virtuozzo.com>
+In-Reply-To: <20180507101013.32736-1-kraxel@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 5/5] block/nbd-client: don't check ioc
+Subject: Re: [Qemu-devel] [PATCH] vga: print friendly error message in case
+ multiple vga devices are added
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,23 +34,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
-On 05/07/2018 10:44 AM, Vladimir Sementsov-Ogievskiy wrote:
-> We have several paranoiac checks for ioc != NULL. But ioc may become
-> NULL only on close, which should not happen during requests handling.
-> Also, we check ioc only sometimes, not after each yield, which is
-> inconsistent. Let's drop these checks.
-
-Can (or even should) any of these be replaced by asserts that ioc is not 
-NULL?
-
+On 05/07/2018 05:10 AM, Gerd Hoffmann wrote:
+> ... to a virtual machine.  Without that we fail a ramblock register
+> sanity check, leading to a abort(), which isn't exactly user friendly.
 > 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> https://bugzilla.redhat.com/show_bug.cgi?id=1206037
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 > ---
->   block/nbd-client.c | 14 +-------------
->   1 file changed, 1 insertion(+), 13 deletions(-)
+>   hw/display/vga.c | 8 ++++++++
+>   1 file changed, 8 insertions(+)
+> 
+
+>   
+> +    if (global_vmstate) {
+> +        static int have_vga;
+
+It looks funny to declare this as int,
+
+> +        if (have_vga) {
+> +            error_report("only one vga device is supported");
+> +            exit(1);
+> +        }
+> +        have_vga = true;
+
+but to treat it as bool.  Why not just declare it as bool to begin with?
 
 -- 
 Eric Blake, Principal Software Engineer
