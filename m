@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fFjXw-0006L4-5S
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 13:03:34 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fFjXx-0006Lv-8A
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 13:03:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fFjXn-0007Lp-5F
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 13:03:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53510)
+	(envelope-from <ehabkost@redhat.com>) id 1fFjXu-0007UQ-2U
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 13:03:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50956)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fFjXm-0007LM-Sb
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 13:03:23 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fFjXt-0007Tn-QA
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 13:03:30 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon,  7 May 2018 14:03:04 -0300
-Message-Id: <20180507170315.11497-2-ehabkost@redhat.com>
+Date: Mon,  7 May 2018 14:03:05 -0300
+Message-Id: <20180507170315.11497-3-ehabkost@redhat.com>
 In-Reply-To: <20180507170315.11497-1-ehabkost@redhat.com>
 References: <20180507170315.11497-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 01/12] pc-dimm: factor out MemoryDevice interface
+Subject: [Qemu-devel] [PULL 02/12] machine: make MemoryHotplugState
+ accessible via the machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,550 +29,401 @@ Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, David Hildenbrand <david@redh
 
 From: David Hildenbrand <david@redhat.com>
 
-On the qmp level, we already have the concept of memory devices:
-    "query-memory-devices"
-Right now, we only support NVDIMM and PCDIMM.
+Let's allow to query the MemoryHotplugState directly from the machine.
+If the pointer is NULL, the machine does not support memory devices. If
+the pointer is !NULL, the machine supports memory devices and the
+data structure contains information about the applicable physical
+guest address space region.
 
-We want to map other devices later into the address space of the guest.
-Such device could e.g. be virtio devices. These devices will have a
-guest memory range assigned but won't be exposed via e.g. ACPI. We want
-to make them look like memory device, but not glued to pc-dimm.
+This allows us to generically detect if a certain machine has support
+for memory devices, and to generically manage it (find free address
+range, plug/unplug a memory region).
 
-Especially, it will not always be possible to have TYPE_PC_DIMM as a parent
-class (e.g. virtio devices). Let's use an interface instead. As a first
-part, convert handling of
-- qmp_pc_dimm_device_list
-- get_plugged_memory_size
-to our new model. plug/unplug stuff etc. will follow later.
+We will rename "MemoryHotplugState" to something more meaningful
+("DeviceMemory") after we completed factoring out the pc-dimm code into
+MemoryDevice code.
 
-A memory device will have to provide the following functions:
-- get_addr(): Necessary, as the property "addr" can e.g. not be used for
-              virtio devices (already defined).
-- get_plugged_size(): The amount this device offers to the guest as of
-                      now.
-- get_region_size(): Because this can later on be bigger than the
-                     plugged size.
-- fill_device_info(): Fill MemoryDeviceInfo, e.g. for qmp.
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20180423165126.15441-2-david@redhat.com>
+Message-Id: <20180423165126.15441-3-david@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+[ehabkost: rebased series, solved conflicts at spapr.c]
+[ehabkost: squashed fix to use g_malloc0()]
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/hw/mem/memory-device.h               |  45 ++++++++++
- include/hw/mem/pc-dimm.h                     |   2 -
- hw/i386/acpi-build.c                         |   3 +-
- hw/mem/memory-device.c                       | 120 +++++++++++++++++++++++++++
- hw/mem/pc-dimm.c                             | 120 ++++++++++++++-------------
- hw/ppc/spapr.c                               |   3 +-
- hw/ppc/spapr_hcall.c                         |   1 +
- numa.c                                       |   3 +-
- qmp.c                                        |   4 +-
- stubs/{qmp_pc_dimm.c => qmp_memory_device.c} |   4 +-
- hw/mem/Makefile.objs                         |   1 +
- stubs/Makefile.objs                          |   2 +-
- 12 files changed, 242 insertions(+), 66 deletions(-)
- create mode 100644 include/hw/mem/memory-device.h
- create mode 100644 hw/mem/memory-device.c
- rename stubs/{qmp_pc_dimm.c => qmp_memory_device.c} (61%)
+ include/hw/boards.h      | 12 ++++++++++++
+ include/hw/i386/pc.h     |  1 -
+ include/hw/mem/pc-dimm.h | 12 +-----------
+ include/hw/ppc/spapr.h   |  1 -
+ hw/i386/acpi-build.c     |  2 +-
+ hw/i386/pc.c             | 35 ++++++++++++++++++++---------------
+ hw/ppc/spapr.c           | 43 ++++++++++++++++++++++++-------------------
+ hw/ppc/spapr_hcall.c     |  2 +-
+ hw/ppc/spapr_rtas_ddw.c  |  2 +-
+ 9 files changed, 60 insertions(+), 50 deletions(-)
 
-diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
-new file mode 100644
-index 0000000000..31f64cbab2
---- /dev/null
-+++ b/include/hw/mem/memory-device.h
-@@ -0,0 +1,45 @@
-+/*
-+ * Memory Device Interface
-+ *
-+ * Copyright (c) 2018 Red Hat, Inc.
-+ *
-+ * Authors:
-+ *  David Hildenbrand <david@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 5c5eee55e6..e27c28b514 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -213,6 +213,17 @@ struct MachineClass {
+     int64_t (*get_default_cpu_node_id)(const MachineState *ms, int idx);
+ };
+ 
++/**
++ * MemoryHotplugState:
++ * @base: address in guest physical address space where the memory
++ * address space for memory devices starts
++ * @mr: address space container for memory devices
 + */
++typedef struct MemoryHotplugState {
++    hwaddr base;
++    MemoryRegion mr;
++} MemoryHotplugState;
 +
-+#ifndef MEMORY_DEVICE_H
-+#define MEMORY_DEVICE_H
-+
-+#include "qom/object.h"
-+#include "hw/qdev.h"
-+
-+#define TYPE_MEMORY_DEVICE "memory-device"
-+
-+#define MEMORY_DEVICE_CLASS(klass) \
-+     OBJECT_CLASS_CHECK(MemoryDeviceClass, (klass), TYPE_MEMORY_DEVICE)
-+#define MEMORY_DEVICE_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(MemoryDeviceClass, (obj), TYPE_MEMORY_DEVICE)
-+#define MEMORY_DEVICE(obj) \
-+     INTERFACE_CHECK(MemoryDeviceState, (obj), TYPE_MEMORY_DEVICE)
-+
-+typedef struct MemoryDeviceState {
-+    Object parent_obj;
-+} MemoryDeviceState;
-+
-+typedef struct MemoryDeviceClass {
-+    InterfaceClass parent_class;
-+
-+    uint64_t (*get_addr)(const MemoryDeviceState *md);
-+    uint64_t (*get_plugged_size)(const MemoryDeviceState *md);
-+    uint64_t (*get_region_size)(const MemoryDeviceState *md);
-+    void (*fill_device_info)(const MemoryDeviceState *md,
-+                             MemoryDeviceInfo *info);
-+} MemoryDeviceClass;
-+
-+MemoryDeviceInfoList *qmp_memory_device_list(void);
-+uint64_t get_plugged_memory_size(void);
-+
-+#endif
+ /**
+  * MachineState:
+  */
+@@ -243,6 +254,7 @@ struct MachineState {
+     bool enforce_config_section;
+     bool enable_graphics;
+     char *memory_encryption;
++    MemoryHotplugState *device_memory;
+ 
+     ram_addr_t ram_size;
+     ram_addr_t maxram_size;
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index ffee8413f0..07b596ee76 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -32,7 +32,6 @@ struct PCMachineState {
+     /* <public> */
+ 
+     /* State for other subsystems/APIs: */
+-    MemoryHotplugState hotplug_memory;
+     Notifier machine_done;
+ 
+     /* Pointers to devices and objects: */
 diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-index 1fc479281c..e88073321f 100644
+index e88073321f..8bda37adab 100644
 --- a/include/hw/mem/pc-dimm.h
 +++ b/include/hw/mem/pc-dimm.h
-@@ -93,9 +93,7 @@ uint64_t pc_dimm_get_free_addr(uint64_t address_space_start,
- 
- int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
- 
--MemoryDeviceInfoList *qmp_pc_dimm_device_list(void);
- uint64_t pc_existing_dimms_capacity(Error **errp);
--uint64_t get_plugged_memory_size(void);
- void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
-                          MemoryRegion *mr, uint64_t align, Error **errp);
- void pc_dimm_memory_unplug(DeviceState *dev, MemoryHotplugState *hpms,
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index c634dcad1d..624e955e29 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -46,6 +46,7 @@
- #include "hw/acpi/vmgenid.h"
- #include "sysemu/tpm_backend.h"
- #include "hw/timer/mc146818rtc_regs.h"
-+#include "hw/mem/memory-device.h"
- #include "sysemu/numa.h"
- 
- /* Supported chipsets: */
-@@ -2253,7 +2254,7 @@ build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
- static void build_srat_hotpluggable_memory(GArray *table_data, uint64_t base,
-                                            uint64_t len, int default_node)
- {
--    MemoryDeviceInfoList *info_list = qmp_pc_dimm_device_list();
-+    MemoryDeviceInfoList *info_list = qmp_memory_device_list();
-     MemoryDeviceInfoList *info;
-     MemoryDeviceInfo *mi;
-     PCDIMMDeviceInfo *di;
-diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
-new file mode 100644
-index 0000000000..6cbdaf99f3
---- /dev/null
-+++ b/hw/mem/memory-device.c
-@@ -0,0 +1,120 @@
-+/*
-+ * Memory Device Interface
-+ *
-+ * Copyright ProfitBricks GmbH 2012
-+ * Copyright (C) 2014 Red Hat Inc
-+ * Copyright (c) 2018 Red Hat Inc
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/mem/memory-device.h"
-+#include "hw/qdev.h"
-+#include "qapi/error.h"
+@@ -19,6 +19,7 @@
+ #include "exec/memory.h"
+ #include "sysemu/hostmem.h"
+ #include "hw/qdev.h"
 +#include "hw/boards.h"
-+#include "qemu/range.h"
-+
-+static gint memory_device_addr_sort(gconstpointer a, gconstpointer b)
-+{
-+    const MemoryDeviceState *md_a = MEMORY_DEVICE(a);
-+    const MemoryDeviceState *md_b = MEMORY_DEVICE(b);
-+    const MemoryDeviceClass *mdc_a = MEMORY_DEVICE_GET_CLASS(a);
-+    const MemoryDeviceClass *mdc_b = MEMORY_DEVICE_GET_CLASS(b);
-+    const uint64_t addr_a = mdc_a->get_addr(md_a);
-+    const uint64_t addr_b = mdc_b->get_addr(md_b);
-+
-+    if (addr_a > addr_b) {
-+        return 1;
-+    } else if (addr_a < addr_b) {
-+        return -1;
-+    }
-+    return 0;
-+}
-+
-+static int memory_device_build_list(Object *obj, void *opaque)
-+{
-+    GSList **list = opaque;
-+
-+    if (object_dynamic_cast(obj, TYPE_MEMORY_DEVICE)) {
-+        DeviceState *dev = DEVICE(obj);
-+        if (dev->realized) { /* only realized memory devices matter */
-+            *list = g_slist_insert_sorted(*list, dev, memory_device_addr_sort);
-+        }
-+    }
-+
-+    object_child_foreach(obj, memory_device_build_list, opaque);
-+    return 0;
-+}
-+
-+MemoryDeviceInfoList *qmp_memory_device_list(void)
-+{
-+    GSList *devices = NULL, *item;
-+    MemoryDeviceInfoList *list = NULL, *prev = NULL;
-+
-+    object_child_foreach(qdev_get_machine(), memory_device_build_list,
-+                         &devices);
-+
-+    for (item = devices; item; item = g_slist_next(item)) {
-+        const MemoryDeviceState *md = MEMORY_DEVICE(item->data);
-+        const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(item->data);
-+        MemoryDeviceInfoList *elem = g_new0(MemoryDeviceInfoList, 1);
-+        MemoryDeviceInfo *info = g_new0(MemoryDeviceInfo, 1);
-+
-+        mdc->fill_device_info(md, info);
-+
-+        elem->value = info;
-+        elem->next = NULL;
-+        if (prev) {
-+            prev->next = elem;
-+        } else {
-+            list = elem;
-+        }
-+        prev = elem;
-+    }
-+
-+    g_slist_free(devices);
-+
-+    return list;
-+}
-+
-+static int memory_device_plugged_size(Object *obj, void *opaque)
-+{
-+    uint64_t *size = opaque;
-+
-+    if (object_dynamic_cast(obj, TYPE_MEMORY_DEVICE)) {
-+        const DeviceState *dev = DEVICE(obj);
-+        const MemoryDeviceState *md = MEMORY_DEVICE(obj);
-+        const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(obj);
-+
-+        if (dev->realized) {
-+            *size += mdc->get_plugged_size(md);
-+        }
-+    }
-+
-+    object_child_foreach(obj, memory_device_plugged_size, opaque);
-+    return 0;
-+}
-+
-+uint64_t get_plugged_memory_size(void)
-+{
-+    uint64_t size = 0;
-+
-+    memory_device_plugged_size(qdev_get_machine(), &size);
-+
-+    return size;
-+}
-+
-+static const TypeInfo memory_device_info = {
-+    .name          = TYPE_MEMORY_DEVICE,
-+    .parent        = TYPE_INTERFACE,
-+    .class_size = sizeof(MemoryDeviceClass),
-+};
-+
-+static void memory_device_register_types(void)
-+{
-+    type_register_static(&memory_device_info);
-+}
-+
-+type_init(memory_device_register_types)
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index 51350d9c2d..ef330628c1 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -21,6 +21,7 @@
- #include "qemu/osdep.h"
- #include "hw/mem/pc-dimm.h"
- #include "hw/mem/nvdimm.h"
-+#include "hw/mem/memory-device.h"
- #include "qapi/error.h"
- #include "qemu/config-file.h"
- #include "qapi/visitor.h"
-@@ -158,11 +159,6 @@ uint64_t pc_existing_dimms_capacity(Error **errp)
-     return cap.size;
- }
  
--uint64_t get_plugged_memory_size(void)
--{
--    return pc_existing_dimms_capacity(&error_abort);
--}
--
- static int pc_dimm_slot2bitmap(Object *obj, void *opaque)
- {
-     unsigned long *bitmap = opaque;
-@@ -238,57 +234,6 @@ static int pc_dimm_built_list(Object *obj, void *opaque)
-     return 0;
- }
+ #define TYPE_PC_DIMM "pc-dimm"
+ #define PC_DIMM(obj) \
+@@ -75,17 +76,6 @@ typedef struct PCDIMMDeviceClass {
+     MemoryRegion *(*get_vmstate_memory_region)(PCDIMMDevice *dimm);
+ } PCDIMMDeviceClass;
  
--MemoryDeviceInfoList *qmp_pc_dimm_device_list(void)
--{
--    GSList *dimms = NULL, *item;
--    MemoryDeviceInfoList *list = NULL, *prev = NULL;
--
--    object_child_foreach(qdev_get_machine(), pc_dimm_built_list, &dimms);
--
--    for (item = dimms; item; item = g_slist_next(item)) {
--        PCDIMMDevice *dimm = PC_DIMM(item->data);
--        Object *obj = OBJECT(dimm);
--        MemoryDeviceInfoList *elem = g_new0(MemoryDeviceInfoList, 1);
--        MemoryDeviceInfo *info = g_new0(MemoryDeviceInfo, 1);
--        PCDIMMDeviceInfo *di = g_new0(PCDIMMDeviceInfo, 1);
--        bool is_nvdimm = object_dynamic_cast(obj, TYPE_NVDIMM);
--        DeviceClass *dc = DEVICE_GET_CLASS(obj);
--        DeviceState *dev = DEVICE(obj);
--
--        if (dev->id) {
--            di->has_id = true;
--            di->id = g_strdup(dev->id);
--        }
--        di->hotplugged = dev->hotplugged;
--        di->hotpluggable = dc->hotpluggable;
--        di->addr = dimm->addr;
--        di->slot = dimm->slot;
--        di->node = dimm->node;
--        di->size = object_property_get_uint(obj, PC_DIMM_SIZE_PROP, NULL);
--        di->memdev = object_get_canonical_path(OBJECT(dimm->hostmem));
--
--        if (!is_nvdimm) {
--            info->u.dimm.data = di;
--            info->type = MEMORY_DEVICE_INFO_KIND_DIMM;
--        } else {
--            info->u.nvdimm.data = di;
--            info->type = MEMORY_DEVICE_INFO_KIND_NVDIMM;
--        }
--        elem->value = info;
--        elem->next = NULL;
--        if (prev) {
--            prev->next = elem;
--        } else {
--            list = elem;
--        }
--        prev = elem;
--    }
--
--    g_slist_free(dimms);
--
--    return list;
--}
+-/**
+- * MemoryHotplugState:
+- * @base: address in guest physical address space where hotplug memory
+- * address space begins.
+- * @mr: hotplug memory address space container
+- */
+-typedef struct MemoryHotplugState {
+-    hwaddr base;
+-    MemoryRegion mr;
+-} MemoryHotplugState;
 -
  uint64_t pc_dimm_get_free_addr(uint64_t address_space_start,
                                 uint64_t address_space_size,
                                 uint64_t *hint, uint64_t align, uint64_t size,
-@@ -445,10 +390,63 @@ static MemoryRegion *pc_dimm_get_vmstate_memory_region(PCDIMMDevice *dimm)
-     return host_memory_backend_get_memory(dimm->hostmem, &error_abort);
- }
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index d60b7c6d7a..56ff02d32a 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -162,7 +162,6 @@ struct sPAPRMachineState {
  
-+static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
-+{
-+    const PCDIMMDevice *dimm = PC_DIMM(md);
-+
-+    return dimm->addr;
-+}
-+
-+static uint64_t pc_dimm_md_get_region_size(const MemoryDeviceState *md)
-+{
-+    /* dropping const here is fine as we don't touch the memory region */
-+    PCDIMMDevice *dimm = PC_DIMM(md);
-+    const PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(md);
-+    MemoryRegion *mr;
-+
-+    mr = ddc->get_memory_region(dimm, &error_abort);
-+    if (!mr) {
-+        return 0;
-+    }
-+
-+    return memory_region_size(mr);
-+}
-+
-+static void pc_dimm_md_fill_device_info(const MemoryDeviceState *md,
-+                                        MemoryDeviceInfo *info)
-+{
-+    PCDIMMDeviceInfo *di = g_new0(PCDIMMDeviceInfo, 1);
-+    const DeviceClass *dc = DEVICE_GET_CLASS(md);
-+    const PCDIMMDevice *dimm = PC_DIMM(md);
-+    const DeviceState *dev = DEVICE(md);
-+
-+    if (dev->id) {
-+        di->has_id = true;
-+        di->id = g_strdup(dev->id);
-+    }
-+    di->hotplugged = dev->hotplugged;
-+    di->hotpluggable = dc->hotpluggable;
-+    di->addr = dimm->addr;
-+    di->slot = dimm->slot;
-+    di->node = dimm->node;
-+    di->size = object_property_get_uint(OBJECT(dimm), PC_DIMM_SIZE_PROP,
-+                                        NULL);
-+    di->memdev = object_get_canonical_path(OBJECT(dimm->hostmem));
-+
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
-+        info->u.nvdimm.data = di;
-+        info->type = MEMORY_DEVICE_INFO_KIND_NVDIMM;
-+    } else {
-+        info->u.dimm.data = di;
-+        info->type = MEMORY_DEVICE_INFO_KIND_DIMM;
-+    }
-+}
-+
- static void pc_dimm_class_init(ObjectClass *oc, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(oc);
-     PCDIMMDeviceClass *ddc = PC_DIMM_CLASS(oc);
-+    MemoryDeviceClass *mdc = MEMORY_DEVICE_CLASS(oc);
+     /*< public >*/
+     char *kvm_type;
+-    MemoryHotplugState hotplug_memory;
  
-     dc->realize = pc_dimm_realize;
-     dc->unrealize = pc_dimm_unrealize;
-@@ -457,6 +455,12 @@ static void pc_dimm_class_init(ObjectClass *oc, void *data)
+     const char *icp_type;
  
-     ddc->get_memory_region = pc_dimm_get_memory_region;
-     ddc->get_vmstate_memory_region = pc_dimm_get_vmstate_memory_region;
-+
-+    mdc->get_addr = pc_dimm_md_get_addr;
-+    /* for a dimm plugged_size == region_size */
-+    mdc->get_plugged_size = pc_dimm_md_get_region_size;
-+    mdc->get_region_size = pc_dimm_md_get_region_size;
-+    mdc->fill_device_info = pc_dimm_md_fill_device_info;
- }
- 
- static TypeInfo pc_dimm_info = {
-@@ -466,6 +470,10 @@ static TypeInfo pc_dimm_info = {
-     .instance_init = pc_dimm_init,
-     .class_init    = pc_dimm_class_init,
-     .class_size    = sizeof(PCDIMMDeviceClass),
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_MEMORY_DEVICE },
-+        { }
-+    },
- };
- 
- static void pc_dimm_register_types(void)
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 32ab3c43b6..640a66a21a 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -74,6 +74,7 @@
- #include "hw/compat.h"
- #include "qemu/cutils.h"
- #include "hw/ppc/spapr_cpu_core.h"
-+#include "hw/mem/memory-device.h"
- 
- #include <libfdt.h>
- 
-@@ -887,7 +888,7 @@ static int spapr_populate_drconf_memory(sPAPRMachineState *spapr, void *fdt)
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 624e955e29..b1eddeb204 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2411,7 +2411,7 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+      * providing _PXM method if necessary.
+      */
+     if (hotplugabble_address_space_size) {
+-        build_srat_hotpluggable_memory(table_data, pcms->hotplug_memory.base,
++        build_srat_hotpluggable_memory(table_data, machine->device_memory->base,
+                                        hotplugabble_address_space_size,
+                                        pcms->numa_nodes - 1);
+     }
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index b297a5d63b..0aa7885798 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1371,6 +1371,9 @@ void pc_memory_init(PCMachineState *pcms,
+         exit(EXIT_FAILURE);
      }
  
-     /* ibm,dynamic-memory or ibm,dynamic-memory-v2 */
--    dimms = qmp_pc_dimm_device_list();
-+    dimms = qmp_memory_device_list();
-     if (spapr_ovec_test(spapr->ov5_cas, OV5_DRMEM_V2)) {
-         ret = spapr_populate_drmem_v2(spapr, fdt, offset, dimms);
++    /* always allocate the device memory information */
++    machine->device_memory = g_malloc0(sizeof(*machine->device_memory));
++
+     /* initialize hotplug memory address space */
+     if (pcmc->has_reserved_memory &&
+         (machine->ram_size < machine->maxram_size)) {
+@@ -1390,7 +1393,7 @@ void pc_memory_init(PCMachineState *pcms,
+             exit(EXIT_FAILURE);
+         }
+ 
+-        pcms->hotplug_memory.base =
++        machine->device_memory->base =
+             ROUND_UP(0x100000000ULL + pcms->above_4g_mem_size, 1ULL << 30);
+ 
+         if (pcmc->enforce_aligned_dimm) {
+@@ -1398,17 +1401,17 @@ void pc_memory_init(PCMachineState *pcms,
+             hotplug_mem_size += (1ULL << 30) * machine->ram_slots;
+         }
+ 
+-        if ((pcms->hotplug_memory.base + hotplug_mem_size) <
++        if ((machine->device_memory->base + hotplug_mem_size) <
+             hotplug_mem_size) {
+             error_report("unsupported amount of maximum memory: " RAM_ADDR_FMT,
+                          machine->maxram_size);
+             exit(EXIT_FAILURE);
+         }
+ 
+-        memory_region_init(&pcms->hotplug_memory.mr, OBJECT(pcms),
++        memory_region_init(&machine->device_memory->mr, OBJECT(pcms),
+                            "hotplug-memory", hotplug_mem_size);
+-        memory_region_add_subregion(system_memory, pcms->hotplug_memory.base,
+-                                    &pcms->hotplug_memory.mr);
++        memory_region_add_subregion(system_memory, machine->device_memory->base,
++                                    &machine->device_memory->mr);
+     }
+ 
+     /* Initialize PC system firmware */
+@@ -1429,13 +1432,13 @@ void pc_memory_init(PCMachineState *pcms,
+ 
+     rom_set_fw(fw_cfg);
+ 
+-    if (pcmc->has_reserved_memory && pcms->hotplug_memory.base) {
++    if (pcmc->has_reserved_memory && machine->device_memory->base) {
+         uint64_t *val = g_malloc(sizeof(*val));
+         PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+-        uint64_t res_mem_end = pcms->hotplug_memory.base;
++        uint64_t res_mem_end = machine->device_memory->base;
+ 
+         if (!pcmc->broken_reserved_end) {
+-            res_mem_end += memory_region_size(&pcms->hotplug_memory.mr);
++            res_mem_end += memory_region_size(&machine->device_memory->mr);
+         }
+         *val = cpu_to_le64(ROUND_UP(res_mem_end, 0x1ULL << 30));
+         fw_cfg_add_file(fw_cfg, "etc/reserved-memory-end", val, sizeof(*val));
+@@ -1462,12 +1465,13 @@ uint64_t pc_pci_hole64_start(void)
+ {
+     PCMachineState *pcms = PC_MACHINE(qdev_get_machine());
+     PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
++    MachineState *ms = MACHINE(pcms);
+     uint64_t hole64_start = 0;
+ 
+-    if (pcmc->has_reserved_memory && pcms->hotplug_memory.base) {
+-        hole64_start = pcms->hotplug_memory.base;
++    if (pcmc->has_reserved_memory && ms->device_memory->base) {
++        hole64_start = ms->device_memory->base;
+         if (!pcmc->broken_reserved_end) {
+-            hole64_start += memory_region_size(&pcms->hotplug_memory.mr);
++            hole64_start += memory_region_size(&ms->device_memory->mr);
+         }
      } else {
+         hole64_start = 0x100000000ULL + pcms->above_4g_mem_size;
+@@ -1711,7 +1715,8 @@ static void pc_dimm_plug(HotplugHandler *hotplug_dev,
+         goto out;
+     }
+ 
+-    pc_dimm_memory_plug(dev, &pcms->hotplug_memory, mr, align, &local_err);
++    pc_dimm_memory_plug(dev, MACHINE(pcms)->device_memory, mr, align,
++                        &local_err);
+     if (local_err) {
+         goto out;
+     }
+@@ -1779,7 +1784,7 @@ static void pc_dimm_unplug(HotplugHandler *hotplug_dev,
+         goto out;
+     }
+ 
+-    pc_dimm_memory_unplug(dev, &pcms->hotplug_memory, mr);
++    pc_dimm_memory_unplug(dev, MACHINE(pcms)->device_memory, mr);
+     object_unparent(OBJECT(dev));
+ 
+  out:
+@@ -2072,8 +2077,8 @@ pc_machine_get_hotplug_memory_region_size(Object *obj, Visitor *v,
+                                           const char *name, void *opaque,
+                                           Error **errp)
+ {
+-    PCMachineState *pcms = PC_MACHINE(obj);
+-    int64_t value = memory_region_size(&pcms->hotplug_memory.mr);
++    MachineState *ms = MACHINE(obj);
++    int64_t value = memory_region_size(&ms->device_memory->mr);
+ 
+     visit_type_int(v, name, &value, errp);
+ }
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 640a66a21a..30d634a8a3 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -703,13 +703,14 @@ spapr_get_drconf_cell(uint32_t seq_lmbs, uint64_t base_addr,
+ static int spapr_populate_drmem_v2(sPAPRMachineState *spapr, void *fdt,
+                                    int offset, MemoryDeviceInfoList *dimms)
+ {
++    MachineState *machine = MACHINE(spapr);
+     uint8_t *int_buf, *cur_index, buf_len;
+     int ret;
+     uint64_t lmb_size = SPAPR_MEMORY_BLOCK_SIZE;
+     uint64_t addr, cur_addr, size;
+-    uint32_t nr_boot_lmbs = (spapr->hotplug_memory.base / lmb_size);
+-    uint64_t mem_end = spapr->hotplug_memory.base +
+-                       memory_region_size(&spapr->hotplug_memory.mr);
++    uint32_t nr_boot_lmbs = (machine->device_memory->base / lmb_size);
++    uint64_t mem_end = machine->device_memory->base +
++                       memory_region_size(&machine->device_memory->mr);
+     uint32_t node, nr_entries = 0;
+     sPAPRDRConnector *drc;
+     DrconfCellQueue *elem, *next;
+@@ -724,7 +725,7 @@ static int spapr_populate_drmem_v2(sPAPRMachineState *spapr, void *fdt,
+     QSIMPLEQ_INSERT_TAIL(&drconf_queue, elem, entry);
+     nr_entries++;
+ 
+-    cur_addr = spapr->hotplug_memory.base;
++    cur_addr = machine->device_memory->base;
+     for (info = dimms; info; info = info->next) {
+         PCDIMMDeviceInfo *di = info->value->u.dimm.data;
+ 
+@@ -787,11 +788,12 @@ static int spapr_populate_drmem_v2(sPAPRMachineState *spapr, void *fdt,
+ static int spapr_populate_drmem_v1(sPAPRMachineState *spapr, void *fdt,
+                                    int offset, MemoryDeviceInfoList *dimms)
+ {
++    MachineState *machine = MACHINE(spapr);
+     int i, ret;
+     uint64_t lmb_size = SPAPR_MEMORY_BLOCK_SIZE;
+-    uint32_t hotplug_lmb_start = spapr->hotplug_memory.base / lmb_size;
+-    uint32_t nr_lmbs = (spapr->hotplug_memory.base +
+-                       memory_region_size(&spapr->hotplug_memory.mr)) /
++    uint32_t hotplug_lmb_start = machine->device_memory->base / lmb_size;
++    uint32_t nr_lmbs = (machine->device_memory->base +
++                       memory_region_size(&machine->device_memory->mr)) /
+                        lmb_size;
+     uint32_t *int_buf, *cur_index, buf_len;
+ 
+@@ -1034,8 +1036,8 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr, void *fdt)
+     GString *hypertas = g_string_sized_new(256);
+     GString *qemu_hypertas = g_string_sized_new(256);
+     uint32_t refpoints[] = { cpu_to_be32(0x4), cpu_to_be32(0x4) };
+-    uint64_t max_hotplug_addr = spapr->hotplug_memory.base +
+-        memory_region_size(&spapr->hotplug_memory.mr);
++    uint64_t max_hotplug_addr = MACHINE(spapr)->device_memory->base +
++        memory_region_size(&MACHINE(spapr)->device_memory->mr);
+     uint32_t lrdr_capacity[] = {
+         cpu_to_be32(max_hotplug_addr >> 32),
+         cpu_to_be32(max_hotplug_addr & 0xffffffff),
+@@ -2297,7 +2299,7 @@ static void spapr_create_lmb_dr_connectors(sPAPRMachineState *spapr)
+     for (i = 0; i < nr_lmbs; i++) {
+         uint64_t addr;
+ 
+-        addr = i * lmb_size + spapr->hotplug_memory.base;
++        addr = i * lmb_size + machine->device_memory->base;
+         spapr_dr_connector_new(OBJECT(spapr), TYPE_SPAPR_DRC_LMB,
+                                addr / lmb_size);
+     }
+@@ -2634,6 +2636,9 @@ static void spapr_machine_init(MachineState *machine)
+                                          machine->ram_size);
+     memory_region_add_subregion(sysmem, 0, ram);
+ 
++    /* always allocate the device memory information */
++    machine->device_memory = g_malloc0(sizeof(*machine->device_memory));
++
+     /* initialize hotplug memory address space */
+     if (machine->ram_size < machine->maxram_size) {
+         ram_addr_t hotplug_mem_size = machine->maxram_size - machine->ram_size;
+@@ -2655,12 +2660,12 @@ static void spapr_machine_init(MachineState *machine)
+             exit(1);
+         }
+ 
+-        spapr->hotplug_memory.base = ROUND_UP(machine->ram_size,
++        machine->device_memory->base = ROUND_UP(machine->ram_size,
+                                               SPAPR_HOTPLUG_MEM_ALIGN);
+-        memory_region_init(&spapr->hotplug_memory.mr, OBJECT(spapr),
++        memory_region_init(&machine->device_memory->mr, OBJECT(spapr),
+                            "hotplug-memory", hotplug_mem_size);
+-        memory_region_add_subregion(sysmem, spapr->hotplug_memory.base,
+-                                    &spapr->hotplug_memory.mr);
++        memory_region_add_subregion(sysmem, machine->device_memory->base,
++                                    &machine->device_memory->mr);
+     }
+ 
+     if (smc->dr_lmb_enabled) {
+@@ -3148,7 +3153,7 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     align = memory_region_get_alignment(mr);
+     size = memory_region_size(mr);
+ 
+-    pc_dimm_memory_plug(dev, &ms->hotplug_memory, mr, align, &local_err);
++    pc_dimm_memory_plug(dev, MACHINE(ms)->device_memory, mr, align, &local_err);
+     if (local_err) {
+         goto out;
+     }
+@@ -3169,7 +3174,7 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     return;
+ 
+ out_unplug:
+-    pc_dimm_memory_unplug(dev, &ms->hotplug_memory, mr);
++    pc_dimm_memory_unplug(dev, MACHINE(ms)->device_memory, mr);
+ out:
+     error_propagate(errp, local_err);
+ }
+@@ -3309,7 +3314,7 @@ void spapr_lmb_release(DeviceState *dev)
+      * Now that all the LMBs have been removed by the guest, call the
+      * pc-dimm unplug handler to cleanup up the pc-dimm device.
+      */
+-    pc_dimm_memory_unplug(dev, &spapr->hotplug_memory, mr);
++    pc_dimm_memory_unplug(dev, MACHINE(spapr)->device_memory, mr);
+     object_unparent(OBJECT(dev));
+     spapr_pending_dimm_unplugs_remove(spapr, ds);
+ }
+@@ -4265,8 +4270,8 @@ static void phb_placement_2_7(sPAPRMachineState *spapr, uint32_t index,
+         /* Can't just use maxram_size, because there may be an
+          * alignment gap between normal and hotpluggable memory
+          * regions */
+-        ram_top = spapr->hotplug_memory.base +
+-            memory_region_size(&spapr->hotplug_memory.mr);
++        ram_top = MACHINE(spapr)->device_memory->base +
++            memory_region_size(&MACHINE(spapr)->device_memory->mr);
+     }
+ 
+     phb0_base = QEMU_ALIGN_UP(ram_top, phb0_alignment);
 diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index ca9702e667..5f6e6249ba 100644
+index 5f6e6249ba..52b8f40955 100644
 --- a/hw/ppc/spapr_hcall.c
 +++ b/hw/ppc/spapr_hcall.c
-@@ -14,6 +14,7 @@
- #include "kvm_ppc.h"
- #include "hw/ppc/spapr_ovec.h"
- #include "mmu-book3s-v3.h"
-+#include "hw/mem/memory-device.h"
- 
- struct LPCRSyncState {
-     target_ulong value;
-diff --git a/numa.c b/numa.c
-index 78a869e598..70b150e73a 100644
---- a/numa.c
-+++ b/numa.c
-@@ -36,6 +36,7 @@
- #include "hw/boards.h"
- #include "sysemu/hostmem.h"
- #include "hw/mem/pc-dimm.h"
-+#include "hw/mem/memory-device.h"
- #include "qemu/option.h"
- #include "qemu/config-file.h"
- #include "qemu/cutils.h"
-@@ -521,7 +522,7 @@ void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owner,
- 
- static void numa_stat_memory_devices(NumaNodeMem node_mem[])
+@@ -67,7 +67,7 @@ static inline bool valid_ptex(PowerPCCPU *cpu, target_ulong ptex)
+ static bool is_ram_address(sPAPRMachineState *spapr, hwaddr addr)
  {
--    MemoryDeviceInfoList *info_list = qmp_pc_dimm_device_list();
-+    MemoryDeviceInfoList *info_list = qmp_memory_device_list();
-     MemoryDeviceInfoList *info;
-     PCDIMMDeviceInfo     *pcdimm_info;
+     MachineState *machine = MACHINE(spapr);
+-    MemoryHotplugState *hpms = &spapr->hotplug_memory;
++    MemoryHotplugState *hpms = machine->device_memory;
  
-diff --git a/qmp.c b/qmp.c
-index 9e95b889ff..25fdc9a5b2 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -39,7 +39,7 @@
- #include "qapi/qobject-input-visitor.h"
- #include "hw/boards.h"
- #include "qom/object_interfaces.h"
--#include "hw/mem/pc-dimm.h"
-+#include "hw/mem/memory-device.h"
- #include "hw/acpi/acpi_dev_interface.h"
+     if (addr < machine->ram_size) {
+         return true;
+diff --git a/hw/ppc/spapr_rtas_ddw.c b/hw/ppc/spapr_rtas_ddw.c
+index 177dcffc9b..d3666c1921 100644
+--- a/hw/ppc/spapr_rtas_ddw.c
++++ b/hw/ppc/spapr_rtas_ddw.c
+@@ -122,7 +122,7 @@ static void rtas_ibm_query_pe_dma_window(PowerPCCPU *cpu,
+     if (machine->ram_size == machine->maxram_size) {
+         max_window_size = machine->ram_size;
+     } else {
+-        MemoryHotplugState *hpms = &spapr->hotplug_memory;
++        MemoryHotplugState *hpms = machine->device_memory;
  
- NameInfo *qmp_query_name(Error **errp)
-@@ -731,7 +731,7 @@ void qmp_object_del(const char *id, Error **errp)
- 
- MemoryDeviceInfoList *qmp_query_memory_devices(Error **errp)
- {
--    return qmp_pc_dimm_device_list();
-+    return qmp_memory_device_list();
- }
- 
- ACPIOSTInfoList *qmp_query_acpi_ospm_status(Error **errp)
-diff --git a/stubs/qmp_pc_dimm.c b/stubs/qmp_memory_device.c
-similarity index 61%
-rename from stubs/qmp_pc_dimm.c
-rename to stubs/qmp_memory_device.c
-index b6b2cca89e..85ff8f2d7e 100644
---- a/stubs/qmp_pc_dimm.c
-+++ b/stubs/qmp_memory_device.c
-@@ -1,8 +1,8 @@
- #include "qemu/osdep.h"
- #include "qom/object.h"
--#include "hw/mem/pc-dimm.h"
-+#include "hw/mem/memory-device.h"
- 
--MemoryDeviceInfoList *qmp_pc_dimm_device_list(void)
-+MemoryDeviceInfoList *qmp_memory_device_list(void)
- {
-    return NULL;
- }
-diff --git a/hw/mem/Makefile.objs b/hw/mem/Makefile.objs
-index f12f8b97a2..10be4df2a2 100644
---- a/hw/mem/Makefile.objs
-+++ b/hw/mem/Makefile.objs
-@@ -1,2 +1,3 @@
- common-obj-$(CONFIG_MEM_HOTPLUG) += pc-dimm.o
-+common-obj-$(CONFIG_MEM_HOTPLUG) += memory-device.o
- common-obj-$(CONFIG_NVDIMM) += nvdimm.o
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 2d59d84091..53d3f32cb2 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -34,7 +34,7 @@ stub-obj-y += uuid.o
- stub-obj-y += vm-stop.o
- stub-obj-y += vmstate.o
- stub-obj-$(CONFIG_WIN32) += fd-register.o
--stub-obj-y += qmp_pc_dimm.o
-+stub-obj-y += qmp_memory_device.o
- stub-obj-y += target-monitor-defs.o
- stub-obj-y += target-get-monitor-def.o
- stub-obj-y += pc_madt_cpu_entry.o
+         max_window_size = hpms->base + memory_region_size(&hpms->mr);
+     }
 -- 
 2.14.3
