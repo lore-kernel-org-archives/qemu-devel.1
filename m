@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fFpcC-0004YI-Q2
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 19:32:22 -0400
+	(envelope-from <Babu.Moger@amd.com>) id 1fFpjW-00063G-H9
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 19:39:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fFpc8-0008Hg-Sr
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 19:32:20 -0400
-Received: from mail-sn1nam01on0048.outbound.protection.outlook.com
-	([104.47.32.48]:43008
-	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	(envelope-from <Babu.Moger@amd.com>) id 1fFpjS-00047v-JM
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 19:39:54 -0400
+Received: from mail-by2nam01on0067.outbound.protection.outlook.com
+	([104.47.34.67]:2409
+	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fFpc8-0008HI-Kc
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 19:32:16 -0400
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fFpjS-00045y-8H
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 19:39:50 -0400
 From: "Moger, Babu" <Babu.Moger@amd.com>
-Date: Mon, 7 May 2018 23:32:13 +0000
-Message-ID: <BL0PR12MB2468D754AD6B7A74ADD1BEE6959B0@BL0PR12MB2468.namprd12.prod.outlook.com>
+Date: Mon, 7 May 2018 23:39:45 +0000
+Message-ID: <BL0PR12MB2468EFDC6A05DB20E253E965959B0@BL0PR12MB2468.namprd12.prod.outlook.com>
 References: <1524760009-24710-1-git-send-email-babu.moger@amd.com>
 	<1524760009-24710-6-git-send-email-babu.moger@amd.com>
-	<20180507191555.GD13350@localhost.localdomain>
-In-Reply-To: <20180507191555.GD13350@localhost.localdomain>
+	<20180507193732.GE13350@localhost.localdomain>
+In-Reply-To: <20180507193732.GE13350@localhost.localdomain>
 Content-Language: en-US
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
@@ -36,9 +36,10 @@ To: Eduardo Habkost <ehabkost@redhat.com>
 Cc: "mst@redhat.com" <mst@redhat.com>, "marcel@redhat.com" <marcel@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "geoff@hostfission.com" <geoff@hostfission.com>, "kash@tripleback.net" <kash@tripleback.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 
 
+
 > -----Original Message-----
 > From: Eduardo Habkost [mailto:ehabkost@redhat.com]
-> Sent: Monday, May 7, 2018 2:16 PM
+> Sent: Monday, May 7, 2018 2:38 PM
 > To: Moger, Babu <Babu.Moger@amd.com>
 > Cc: mst@redhat.com; marcel@redhat.com; pbonzini@redhat.com;
 > rth@twiddle.net; mtosatti@redhat.com; geoff@hostfission.com;
@@ -53,12 +54,21 @@ Cc: "mst@redhat.com" <mst@redhat.com>, "marcel@redhat.com" <marcel@redhat.com>, 
 > > Signed-off-by: Babu Moger <babu.moger@amd.com>
 > > Tested-by: Geoffrey McRae <geoff@hostfission.com>
 >=20
-> Looks good, but I suggest squashing this with patch 4/9.
+> Now that I'm looking at the rest of the code, this seems
+> incomplete:
+>=20
+> What about CPUID[2], CPUID[4]?  They are still referring to the
+> old legacy cache structs.
 
-Ok. Sure.
+There is no change in CPUID[2], CPUID[4] behavior. It is intel specific. It=
+ did not change. So, we don't need to change that.
+In case it changes in future, we can add it later. AMD does not use CPUID[2=
+] and CPUID[4].
 
 >=20
-> Additional suggestion below:
+> If their corresponding code isn't updated to use env->cache_info,
+> those leaves will be inconsistent with CPUID[0x8000005] and
+> CPUID[0x80000006].
 >=20
 > > ---
 > >  target/i386/cpu.c | 22 +++++++++++++++++-----
@@ -76,14 +86,6 @@ Ok. Sure.
 > >                 (L1_ITLB_4K_ASSOC <<  8) | (L1_ITLB_4K_ENTRIES);
 > > -        *ecx =3D encode_cache_cpuid80000005(&l1d_cache_amd);
 > > -        *edx =3D encode_cache_cpuid80000005(&l1i_cache_amd);
->=20
-> We could rename l1*_cache_amd and l2_cache_amd to
-> "legacy_*_cache_amd", to make it clear they are just legacy cache
-> settings.
-
-Ok. We can do that.
-
->=20
 > > +        if (env->cache_info.valid && !cpu->legacy_cache) {
 > > +            *ecx =3D encode_cache_cpuid80000005(&env-
 > >cache_info.l1d_cache);
