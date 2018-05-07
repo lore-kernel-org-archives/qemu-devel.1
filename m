@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <geoff@hostfission.com>) id 1fFhfX-0006wC-55
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 11:03:19 -0400
+	(envelope-from <tomeu.vizoso@gmail.com>) id 1fFgPo-0004Mm-J0
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 09:42:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <geoff@hostfission.com>) id 1fFhfN-0008Nj-QE
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 11:03:15 -0400
-Received: from mail1.hostfission.com ([139.99.139.48]:51160)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <geoff@hostfission.com>) id 1fFhfN-0008M2-Ea
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 11:03:05 -0400
-From: Geoffrey McRae <geoff@hostfission.com>
-Date: Mon, 7 May 2018 23:01:46 +1000
-Message-Id: <20180507150303.7486B381924@moya.office.hostfission.com>
-Subject: [Qemu-devel] [PATCHv3 1/2] ps2: Clear the PS/2 queue and obey
- disable
+	(envelope-from <tomeu.vizoso@gmail.com>) id 1fFgPl-00006A-Gv
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 09:42:56 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:35443)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tomeu.vizoso@gmail.com>)
+	id 1fFgPl-00005z-9T
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 09:42:53 -0400
+Received: by mail-wm0-x244.google.com with SMTP id o78-v6so15564184wmg.0
+	for <qemu-devel@nongnu.org>; Mon, 07 May 2018 06:42:52 -0700 (PDT)
+Sender: Tomeu Vizoso <tomeu.vizoso@gmail.com>
+From: Tomeu Vizoso <tomeu.vizoso@collabora.com>
+Date: Mon,  7 May 2018 15:42:37 +0200
+Message-Id: <20180507134237.14996-1-tomeu.vizoso@collabora.com>
+Subject: [Qemu-devel] [PATCH] ui/gtk: Only try to initialize EGL/X11 if
+ GtkGlArea failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,57 +26,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Tomeu Vizoso <tomeu.vizoso@collabora.com>
 
-This allows guest's to correctly reinitialize and identify the mouse
-should the guest decide to re-scan or reset during mouse input events.
+The commit referenced below changed the logic by causing the gtk-egl
+backend to be initialized regardless of whether GtkGlArea initialization
+succeeded. This causes eglInitialize to crash in Wayland systems without
+XWayland.
 
-When the guest sends the "Identify" command, due to the PC's hardware
-architecutre it is impossible to reliably determine the response from
-the command amongst other streaming data, such as mouse or keyboard
-events. Standard practice is for the guest to disable the device and
-then issue the identify command, so this must be obeyed.
+This patch restores the previous logic.
 
-Signed-off-by: Geoffrey McRae <geoff@hostfission.com>
+Fixes: 4c70280592f5 ("ui/gtk: use GtkGlArea on wayland only")
+Signed-off-by: Tomeu Vizoso <tomeu.vizoso@collabora.com>
 ---
- hw/input/ps2.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ ui/gtk.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/input/ps2.c b/hw/input/ps2.c
-index 06f5d2ac4a..4abc8cecdd 100644
---- a/hw/input/ps2.c
-+++ b/hw/input/ps2.c
-@@ -232,6 +232,11 @@ static void ps2_keyboard_event(DeviceState *dev, QemuConsole *src,
-     uint16_t keycode = 0;
-     int mod;
- 
-+    /* do not process events while disabled to prevent stream corruption */
-+    if (!s->scan_enabled) {
-+        return;
-+    }
-+
-     qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER);
-     assert(evt->type == INPUT_EVENT_KIND_KEY);
-     qcode = qemu_input_key_value_to_qcode(key->key);
-@@ -673,6 +678,11 @@ static void ps2_mouse_sync(DeviceState *dev)
- {
-     PS2MouseState *s = (PS2MouseState *)dev;
- 
-+    /* do not sync while disabled to prevent stream corruption */
-+    if (!(s->mouse_status & MOUSE_STATUS_ENABLED)) {
-+        return;
-+    }
-+
-     if (s->mouse_buttons) {
-         qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER);
-     }
-@@ -776,6 +786,7 @@ void ps2_write_mouse(void *opaque, int val)
-             s->mouse_resolution = 2;
-             s->mouse_status = 0;
-             s->mouse_type = 0;
-+            ps2_reset_queue(&s->common);
-             ps2_queue(&s->common, AUX_ACK);
-             ps2_queue(&s->common, 0xaa);
-             ps2_queue(&s->common, s->mouse_type);
+diff --git a/ui/gtk.c b/ui/gtk.c
+index ef5bc42094a3..72e2e246244d 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -2448,7 +2448,7 @@ static void early_gtk_display_init(DisplayOptions *opts)
+         if (GDK_IS_WAYLAND_DISPLAY(gdk_display_get_default())) {
+             gtk_use_gl_area = true;
+             gtk_gl_area_init();
+-        }
++        } else
+ #endif
+         {
+             gtk_egl_init();
 -- 
-2.14.2
+2.17.0
