@@ -1,38 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33799)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fFjLn-0000Cm-Ms
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 12:51:00 -0400
+	(envelope-from <thuth@redhat.com>) id 1fFjLv-0000J9-VV
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 12:51:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fFjLk-00020s-LN
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 12:50:59 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57688 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1fFjLs-000291-V0
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 12:51:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42680 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fFjLk-00020V-H8
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 12:50:56 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 11AFA84257
-	for <qemu-devel@nongnu.org>; Mon,  7 May 2018 16:50:56 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <1525453270-23074-1-git-send-email-thuth@redhat.com>
-	<f7756c7c-338a-a719-7135-aa7a53a62c4c@redhat.com>
-	<87wowgyqj8.fsf@dusky.pond.sub.org>
-	<32c5b770-3bbf-e9d2-ea78-023986ba828f@redhat.com>
-	<87sh73yk3z.fsf@dusky.pond.sub.org>
-	<ff5d2f93-8629-bc78-73a5-c3af38409647@redhat.com>
-	<87tvrjvfuf.fsf@dusky.pond.sub.org>
-	<c8ed2b21-2440-177f-1d25-f20ebdc840d3@redhat.com>
-Date: Mon, 07 May 2018 18:50:54 +0200
-In-Reply-To: <c8ed2b21-2440-177f-1d25-f20ebdc840d3@redhat.com> (Paolo
-	Bonzini's message of "Mon, 7 May 2018 14:44:42 +0200")
-Message-ID: <87d0y7tno1.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fFjLs-00028O-RU
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 12:51:04 -0400
+References: <20180430132107.0a37704d.cohuck@redhat.com>
+	<ac216b06-9469-addd-b5a1-3a3a89fd0782@redhat.com>
+	<20180502074403.yh5weukbjgqsvp7n@sirius.home.kraxel.org>
+	<20180502080200.GG3308@redhat.com>
+	<20180503072100.GA5301@stefanha-x1.localdomain>
+	<20180503090727.GC11382@redhat.com>
+	<CAFEAcA8=mZf8RbQX2-swbUBkoT=RYSVx-oRA2UpzJCqvgGF+KQ@mail.gmail.com>
+	<20180503134321.pp736ou25pdwvslm@sirius.home.kraxel.org>
+	<d9203797-be4a-3cd7-c718-56fa41f60310@redhat.com>
+	<20180503141610.GC11382@redhat.com> <20180507133830.GA18277@paraplu>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <de3e5f9e-30c1-f82c-2900-b3a0ab209ed9@redhat.com>
+Date: Mon, 7 May 2018 18:51:01 +0200
 MIME-Version: 1.0
+In-Reply-To: <20180507133830.GA18277@paraplu>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] Removal of deprecated -no-kvm*
- options
+Subject: Re: [Qemu-devel] release retrospective, next release timing,
+ numbering
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,40 +37,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: Kashyap Chamarthy <kchamart@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On 07.05.2018 15:38, Kashyap Chamarthy wrote:
+> On Thu, May 03, 2018 at 03:16:10PM +0100, Daniel P. Berrang=C3=A9 wrote=
+:
+>> On Thu, May 03, 2018 at 04:06:19PM +0200, Thomas Huth wrote:
+>>> On 03.05.2018 15:43, Gerd Hoffmann wrote:
+>=20
+> [...]
+>=20
+>>>>   (a) major equals year, minor equals month (ubuntu style).
+>>>>   (b) major equals year, minor counts up (mesa style).
+>>>>   (c) major is bumped each year, but doesn't equal year (libvirt sty=
+le).
+>>>>
+>>>> If we don't want give them a meaning, how about:
+>>>>
+>>>>   (d) just drop the minor and count up major each release (systemd s=
+tyle)?
+>>>>
+>>>> My personal preference would be (a) or (b), because it is easy to se=
+e
+>>>> when a version was released.  (b) looks more like a classic version
+>>>> number, we would have 18.0, 18.1, ... instead of 18.04, 18.08, ...
+>>>
+>>> I'd really would like to avoid variant (a) ... otherwise people will
+>>> confuse 18.1.1 and 18.11 (aka. 18.11.0) again...
+>>
+>> We could keep major =3D=3D year, minor =3D=3D nth release of $year. eg=
+ 18.1,
+>> 18.2, 18.3 for the 1st, 2nd and 3rd releases of 2018. Still makes it
+>> fairly clear what timeframe each was released in, without having to
+>> follow month numbers.
+>=20
+> FWIW, the above option sounds simplest to explain so far.
 
-> On 07/05/2018 13:56, Markus Armbruster wrote:
->> Adding more and more ways to do the same stuff does not improve an
->> interface.  Interface design needs to be *opinionated*.  If we decide
->> -machine accel=3Dtcg isn't a nice interface, by all means create a better
->> one, but as replacement[*], not as addition.
->>=20
->> Furthermore:
->>=20
->>     tcg: add options for enabling MTTCG
->>=20
->>     We know there will be cases where MTTCG won't work until additional =
-work
->>     is done in the front/back ends to support. It will however be useful=
- to
->>     be able to turn it on.
->>=20
->>     As a result MTTCG will default to off unless the combination is
->>     supported. However the user can turn it on for the sake of testing.
->>=20
->>     Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
->>     [AJB: move to -accel tcg,thread=3Dmulti|single, defaults]
->>     Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>     Reviewed-by: Richard Henderson <rth@twiddle.net>
->>=20
->> I'm sorry, but this us sub-par.  Yes, the commit is also about "enabling
->> MTTCG", but it also adds a new way to select accelerators, without ever
->> spelling that out.  It should've been split, and properly described.
->
-> Perhaps we can deprecate "-M accel" then, and also while we're at it
-> move kernel_irqchip from -machine to "-accel kvm" where it belongs?
+No, there are some drawbacks when the major version equals the year, see
+here:
 
-Sounds good to me.
+https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg01092.html
+
+and:
+
+https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg00560.html
+
+ Thomas
