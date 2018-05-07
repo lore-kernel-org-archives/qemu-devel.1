@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fFgZ7-0006xe-FT
+	(envelope-from <jemmy858585@gmail.com>) id 1fFgZ7-0006xd-FU
 	for qemu-devel@nongnu.org; Mon, 07 May 2018 09:52:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fFgZ4-0006Kq-EY
+	(envelope-from <jemmy858585@gmail.com>) id 1fFgZ2-0006If-HZ
 	for qemu-devel@nongnu.org; Mon, 07 May 2018 09:52:33 -0400
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:39817)
+Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:33727)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1fFgZ4-0006KK-99
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 09:52:30 -0400
-Received: by mail-io0-x244.google.com with SMTP id r9-v6so33755658iod.6
-	for <qemu-devel@nongnu.org>; Mon, 07 May 2018 06:52:30 -0700 (PDT)
+	id 1fFgZ2-0006Ht-C8
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 09:52:28 -0400
+Received: by mail-io0-x242.google.com with SMTP id e78-v6so33785881iod.0
+	for <qemu-devel@nongnu.org>; Mon, 07 May 2018 06:52:28 -0700 (PDT)
 From: Lidong Chen <jemmy858585@gmail.com>
-Date: Mon,  7 May 2018 21:52:17 +0800
-Message-Id: <1525701137-9384-2-git-send-email-lidongchen@tencent.com>
-In-Reply-To: <1525701137-9384-1-git-send-email-lidongchen@tencent.com>
-References: <1525701137-9384-1-git-send-email-lidongchen@tencent.com>
-Subject: [Qemu-devel] [PATCH 2/2] migration: invoke qio_channel_yield only
- when qemu_in_coroutine()
+Date: Mon,  7 May 2018 21:52:16 +0800
+Message-Id: <1525701137-9384-1-git-send-email-lidongchen@tencent.com>
+Subject: [Qemu-devel] [PATCH 1/2] migration: implement io_set_aio_fd_handler
+ function for RDMA QIOChannel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +28,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: quintela@redhat.com, dgilbert@redhat.com, berrange@redhat.com
 Cc: qemu-devel@nongnu.org, galsha@mellanox.com, aviadye@mellanox.com, adido@mellanox.com, Lidong Chen <lidongchen@tencent.com>
 
-when qio_channel_read return QIO_CHANNEL_ERR_BLOCK, the source qemu crash.
+if qio_channel_rdma_readv return QIO_CHANNEL_ERR_BLOCK, the destination qemu
+crash.
 
 The backtrace is:
-    (gdb) bt
-    #0  0x00007fb20aba91d7 in raise () from /lib64/libc.so.6
-    #1  0x00007fb20abaa8c8 in abort () from /lib64/libc.so.6
-    #2  0x00007fb20aba2146 in __assert_fail_base () from /lib64/libc.so.6
-    #3  0x00007fb20aba21f2 in __assert_fail () from /lib64/libc.so.6
-    #4  0x00000000008dba2d in qio_channel_yield (ioc=0x22f9e20, condition=G_IO_IN) at io/channel.c:460
-    #5  0x00000000007a870b in channel_get_buffer (opaque=0x22f9e20, buf=0x3d54038 "", pos=0, size=32768)
+(gdb) bt
+    #0  0x0000000000000000 in ?? ()
+    #1  0x00000000008db50e in qio_channel_set_aio_fd_handler (ioc=0x38111e0, ctx=0x3726080,
+        io_read=0x8db841 <qio_channel_restart_read>, io_write=0x0, opaque=0x38111e0) at io/channel.c:
+    #2  0x00000000008db952 in qio_channel_set_aio_fd_handlers (ioc=0x38111e0) at io/channel.c:438
+    #3  0x00000000008dbab4 in qio_channel_yield (ioc=0x38111e0, condition=G_IO_IN) at io/channel.c:47
+    #4  0x00000000007a870b in channel_get_buffer (opaque=0x38111e0, buf=0x440c038 "", pos=0, size=327
         at migration/qemu-file-channel.c:83
-    #6  0x00000000007a70f6 in qemu_fill_buffer (f=0x3d54000) at migration/qemu-file.c:299
-    #7  0x00000000007a79d0 in qemu_peek_byte (f=0x3d54000, offset=0) at migration/qemu-file.c:562
-    #8  0x00000000007a7a22 in qemu_get_byte (f=0x3d54000) at migration/qemu-file.c:575
-    #9  0x00000000007a7c46 in qemu_get_be16 (f=0x3d54000) at migration/qemu-file.c:647
-    #10 0x0000000000796db7 in source_return_path_thread (opaque=0x2242280) at migration/migration.c:1794
-    #11 0x00000000009428fa in qemu_thread_start (args=0x3e58420) at util/qemu-thread-posix.c:504
-    #12 0x00007fb20af3ddc5 in start_thread () from /lib64/libpthread.so.0
-    #13 0x00007fb20ac6b74d in clone () from /lib64/libc.so.6
+    #5  0x00000000007a70f6 in qemu_fill_buffer (f=0x440c000) at migration/qemu-file.c:299
+    #6  0x00000000007a79d0 in qemu_peek_byte (f=0x440c000, offset=0) at migration/qemu-file.c:562
+    #7  0x00000000007a7a22 in qemu_get_byte (f=0x440c000) at migration/qemu-file.c:575
+    #8  0x00000000007a7c78 in qemu_get_be32 (f=0x440c000) at migration/qemu-file.c:655
+    #9  0x00000000007a0508 in qemu_loadvm_state (f=0x440c000) at migration/savevm.c:2126
+    #10 0x0000000000794141 in process_incoming_migration_co (opaque=0x0) at migration/migration.c:366
+    #11 0x000000000095c598 in coroutine_trampoline (i0=84033984, i1=0) at util/coroutine-ucontext.c:1
+    #12 0x00007f9c0db56d40 in ?? () from /lib64/libc.so.6
+    #13 0x00007f96fe858760 in ?? ()
+    #14 0x0000000000000000 in ?? ()
 
-This patch fixed by invoke qio_channel_yield only when qemu_in_coroutine().
+RDMA QIOChannel not implement io_set_aio_fd_handler. so
+qio_channel_set_aio_fd_handler will access NULL pointer.
 
 Signed-off-by: Lidong Chen <lidongchen@tencent.com>
 ---
- migration/qemu-file-channel.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ migration/rdma.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/migration/qemu-file-channel.c b/migration/qemu-file-channel.c
-index e202d73..8e639eb 100644
---- a/migration/qemu-file-channel.c
-+++ b/migration/qemu-file-channel.c
-@@ -49,7 +49,11 @@ static ssize_t channel_writev_buffer(void *opaque,
-         ssize_t len;
-         len = qio_channel_writev(ioc, local_iov, nlocal_iov, NULL);
-         if (len == QIO_CHANNEL_ERR_BLOCK) {
--            qio_channel_wait(ioc, G_IO_OUT);
-+            if (qemu_in_coroutine()) {
-+                qio_channel_yield(ioc, G_IO_OUT);
-+            } else {
-+                qio_channel_wait(ioc, G_IO_OUT);
-+            }
-             continue;
-         }
-         if (len < 0) {
-@@ -80,7 +84,11 @@ static ssize_t channel_get_buffer(void *opaque,
-         ret = qio_channel_read(ioc, (char *)buf, size, NULL);
-         if (ret < 0) {
-             if (ret == QIO_CHANNEL_ERR_BLOCK) {
--                qio_channel_yield(ioc, G_IO_IN);
-+                if (qemu_in_coroutine()) {
-+                    qio_channel_yield(ioc, G_IO_IN);
-+                } else {
-+                    qio_channel_wait(ioc, G_IO_IN);
-+                }
-             } else {
-                 /* XXX handle Error * object */
-                 return -EIO;
+diff --git a/migration/rdma.c b/migration/rdma.c
+index 92e4d30..dfa4f77 100644
+--- a/migration/rdma.c
++++ b/migration/rdma.c
+@@ -2963,6 +2963,21 @@ static GSource *qio_channel_rdma_create_watch(QIOChannel *ioc,
+     return source;
+ }
+ 
++static void qio_channel_rdma_set_aio_fd_handler(QIOChannel *ioc,
++                                                  AioContext *ctx,
++                                                  IOHandler *io_read,
++                                                  IOHandler *io_write,
++                                                  void *opaque)
++{
++    QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
++    if (io_read) {
++        aio_set_fd_handler(ctx, rioc->rdmain->comp_channel->fd,
++                           false, io_read, io_write, NULL, opaque);
++    } else {
++        aio_set_fd_handler(ctx, rioc->rdmaout->comp_channel->fd,
++                           false, io_read, io_write, NULL, opaque);
++    }
++}
+ 
+ static int qio_channel_rdma_close(QIOChannel *ioc,
+                                   Error **errp)
+@@ -3822,6 +3837,7 @@ static void qio_channel_rdma_class_init(ObjectClass *klass,
+     ioc_klass->io_set_blocking = qio_channel_rdma_set_blocking;
+     ioc_klass->io_close = qio_channel_rdma_close;
+     ioc_klass->io_create_watch = qio_channel_rdma_create_watch;
++    ioc_klass->io_set_aio_fd_handler = qio_channel_rdma_set_aio_fd_handler;
+ }
+ 
+ static const TypeInfo qio_channel_rdma_info = {
 -- 
 1.8.3.1
