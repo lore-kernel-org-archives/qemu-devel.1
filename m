@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fG21k-0006Af-EM
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:47:33 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fG239-0007Mm-8f
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:49:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fG21g-000593-Fk
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:47:32 -0400
-Date: Tue, 8 May 2018 14:47:22 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180508144722.57f2aeb7.cohuck@redhat.com>
-In-Reply-To: <20180508144608.4c4e8180.cohuck@redhat.com>
-References: <1525782303-16940-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<1525782303-16940-7-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<20180508144608.4c4e8180.cohuck@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1fG235-00067D-9G
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:48:59 -0400
+Resent-Message-Id: <E1fG235-00067D-9G@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21102)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fG235-00065O-0Y
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:48:55 -0400
+In-Reply-To: <1525782303-16940-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152578369374.2619.9448703930561096387@71c20359a636>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 6/6] MAINTAINERS: add entries for AP
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 8 May 2018 05:48:15 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v5 0/6] s390x: vfio-ap: guest dedicated
+ crypto adapters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,66 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
+To: akrowiak@linux.vnet.ibm.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, mjrosato@linux.vnet.ibm.com, peter.maydell@linaro.org, pasic@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, eskultet@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, cohuck@redhat.com, heiko.carstens@de.ibm.com, alex.williamson@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, jjherne@linux.vnet.ibm.com, schwidefsky@de.ibm.com, pbonzini@redhat.com, bjsdjshi@linux.vnet.ibm.com, eric.auger@redhat.com, rth@twiddle.net
 
-On Tue, 8 May 2018 14:46:08 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
-
-> On Tue,  8 May 2018 08:25:03 -0400
-> Tony Krowiak <akrowiak@linux.vnet.ibm.com> wrote:
-> 
-> > Added entries for the s390 adjunct processor (AP) support.
-> > 
-> > Signed-off-by: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-> > ---
-> >  MAINTAINERS |   14 ++++++++++++++
-> >  1 files changed, 14 insertions(+), 0 deletions(-)
-> > 
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index 459e359..c9e8d7b 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -82,6 +82,7 @@ S390
-> >  M: Cornelia Huck <cohuck@redhat.com>
-> >  S: Supported
-> >  F: default-configs/s390x-softmmu.mak
-> > +F: docs/vfio-ap.txt
-> >  F: gdb-xml/s390*.xml
-> >  F: hw/char/sclp*.[hc]
-> >  F: hw/char/terminal3270.c
-> > @@ -89,6 +90,7 @@ F: hw/intc/s390_flic.c
-> >  F: hw/intc/s390_flic_kvm.c
-> >  F: hw/s390x/
-> >  F: hw/vfio/ccw.c
-> > +F: hw/vfio/ap.c
-> >  F: hw/watchdog/wdt_diag288.c
-> >  F: include/hw/s390x/
-> >  F: include/hw/watchdog/wdt_diag288.h
-> > @@ -1152,6 +1154,18 @@ F: include/hw/s390x/s390-ccw.h
-> >  T: git git://github.com/cohuck/qemu.git s390-next
-> >  L: qemu-s390x@nongnu.org
-> >  
-> > +vfio-ap
-> > +M: Christian Borntraeger <borntraeger@de.ibm.com>
-> > +M: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-> > +M: Halil Pasic <pasic@linux.vnet.ibm.com>
-> > +M: Pierre Morel <pmorel@linux.vnet.ibm.com>  
-> 
-> Dumb question: Aren't you folks dropping the 'vnet' part in the future?
-> 
-> > +S: Maintained
-
-Oh, and don't you want to make this 'Supported' (as for the other s390x
-entries)?
-
-> > +F: hw/vfio/ap.c
-> > +F: hw/s390x/ap-device.c
-> > +F: include/hw/s390x/ap-device.h
-> > +F: docs/vfio-ap.txt
-> > +L: qemu-s390x@nongnu.org
-> > +
-> >  vhost
-> >  M: Michael S. Tsirkin <mst@redhat.com>
-> >  S: Supported  
-> 
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MjU3ODIzMDMtMTY5NDAtMS1naXQtc2VuZC1lbWFpbC1ha3Jvd2lha0BsaW51
+eC52bmV0LmlibS5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2NSAwLzZdIHMzOTB4
+OiB2ZmlvLWFwOiBndWVzdCBkZWRpY2F0ZWQgY3J5cHRvIGFkYXB0ZXJzCgo9PT0gVEVTVCBTQ1JJ
+UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAt
+LW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQg
+bG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRv
+CiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9y
+bWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Nj
+cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQog
+ICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0g
+VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
+NDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVt
+dQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzE1MjU3ODIzMDMtMTY5NDAtMS1n
+aXQtc2VuZC1lbWFpbC1ha3Jvd2lha0BsaW51eC52bmV0LmlibS5jb20gLT4gcGF0Y2hldy8xNTI1
+NzgyMzAzLTE2OTQwLTEtZ2l0LXNlbmQtZW1haWwtYWtyb3dpYWtAbGludXgudm5ldC5pYm0uY29t
+ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYTk5ZThlYmQ1MSBNQUlOVEFJTkVSUzog
+YWRkIGVudHJpZXMgZm9yIEFQCjgxM2MwOWVmN2UgczM5MDogZG9jOiBkZXRhaWxlZCBzcGVjaWZp
+Y2F0aW9ucyBmb3IgQVAgdmlydHVhbGl6YXRpb24KNDIxN2ZiNDNjYSBzMzkweC92ZmlvOiBhcDog
+SW50cm9kdWNlIFZGSU8gQVAgZGV2aWNlCjliNDk0MDg4ZDkgczM5MHgvY3B1bW9kZWw6IFNldCB1
+cCBDUFUgbW9kZWwgZm9yIEFQIGRldmljZSBzdXBwb3J0CjZlZjZjNGNkYzIgczM5MHgvYXA6IGJh
+c2UgQWRqdW5jdCBQcm9jZXNzb3IgKEFQKSBvYmplY3QKYjI4M2JjYzg4MSBsaW51eC1oZWFkZXJz
+OiBsaW51eCBoZWFkZXIgdXBkYXRlcyBmb3IgQVAgc3VwcG9ydAoKPT09IE9VVFBVVCBCRUdJTiA9
+PT0KQ2hlY2tpbmcgUEFUQ0ggMS82OiBsaW51eC1oZWFkZXJzOiBsaW51eCBoZWFkZXIgdXBkYXRl
+cyBmb3IgQVAgc3VwcG9ydC4uLgpDaGVja2luZyBQQVRDSCAyLzY6IHMzOTB4L2FwOiBiYXNlIEFk
+anVuY3QgUHJvY2Vzc29yIChBUCkgb2JqZWN0Li4uCkNoZWNraW5nIFBBVENIIDMvNjogczM5MHgv
+Y3B1bW9kZWw6IFNldCB1cCBDUFUgbW9kZWwgZm9yIEFQIGRldmljZSBzdXBwb3J0Li4uCldBUk5J
+Tkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0NzogRklMRTogdGFyZ2V0L3MzOTB4L2NwdV9m
+ZWF0dXJlcy5jOjQzOgorICAgIEZFQVRfSU5JVCgiYXBxY2kiLCBTMzkwX0ZFQVRfVFlQRV9TVEZM
+LCAxMiwgIlF1ZXJ5IEFQIENvbmZpZ3VyYXRpb24gZmFjaWxpdHkiKSwKCkVSUk9SOiBsaW5lIG92
+ZXIgOTAgY2hhcmFjdGVycwojNTA6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzo0
+NjoKKyAgICBGRUFUX0lOSVQoImFwZnQiLCBTMzkwX0ZFQVRfVFlQRV9TVEZMLCAxNSwgIkFkanVu
+Y3QgUHJvY2Vzc29yIEZhY2lsaXRpZXMgVGVzdCBmYWNpbGl0eSIpLAoKdG90YWw6IDEgZXJyb3Jz
+LCAxIHdhcm5pbmdzLCA1OCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9i
+bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
+c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
+TUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA0LzY6IHMzOTB4L3ZmaW86IGFwOiBJbnRyb2R1
+Y2UgVkZJTyBBUCBkZXZpY2UuLi4KQ2hlY2tpbmcgUEFUQ0ggNS82OiBzMzkwOiBkb2M6IGRldGFp
+bGVkIHNwZWNpZmljYXRpb25zIGZvciBBUCB2aXJ0dWFsaXphdGlvbi4uLgpDaGVja2luZyBQQVRD
+SCA2LzY6IE1BSU5UQUlORVJTOiBhZGQgZW50cmllcyBmb3IgQVAuLi4KPT09IE9VVFBVVCBFTkQg
+PT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0
+ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
+IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
