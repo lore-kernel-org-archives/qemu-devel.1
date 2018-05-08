@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fG44j-0000Fj-7j
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:58:46 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fG44j-0000Gf-Um
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:58:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fG44f-0001Wt-2m
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:58:45 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fG44f-0001XK-Ib
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:58:46 -0400
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Tue,  8 May 2018 17:58:10 +0300
-Message-Id: <1525791496-125188-4-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Tue,  8 May 2018 17:58:11 +0300
+Message-Id: <1525791496-125188-5-git-send-email-anton.nefedov@virtuozzo.com>
 In-Reply-To: <1525791496-125188-1-git-send-email-anton.nefedov@virtuozzo.com>
 References: <1525791496-125188-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v9 3/9] quorum: set supported write/zero flags
+Subject: [Qemu-devel] [PATCH v9 4/9] block: introduce BDRV_REQ_ALLOCATE flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,63 +24,114 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, den@virtuozzo.com, berto@igalia.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
----
- block/quorum.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+The flag is supposed to indicate that the region of the disk image has
+to be sufficiently allocated so it reads as zeroes.
 
-diff --git a/block/quorum.c b/block/quorum.c
-index a5051da..26e7d78 100644
---- a/block/quorum.c
-+++ b/block/quorum.c
-@@ -867,6 +867,20 @@ static QemuOptsList quorum_runtime_opts = {
-     },
- };
+The call with the flag set must return -ENOTSUP if allocation cannot
+be done efficiently.
+This has to be made sure of by both
+  - the drivers that support the flag
+  - and the common block layer (so it will not fall back to any slowpath
+    (like writing zero buffers) in case the driver does not support
+    the flag).
+
+Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+---
+ include/block/block.h     |  8 +++++++-
+ include/block/block_int.h |  2 +-
+ block/io.c                | 18 ++++++++++++++++--
+ 3 files changed, 24 insertions(+), 4 deletions(-)
+
+diff --git a/include/block/block.h b/include/block/block.h
+index cdec363..097feca 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -53,9 +53,15 @@ typedef enum {
+     BDRV_REQ_NO_SERIALISING     = 0x8,
+     BDRV_REQ_FUA                = 0x10,
+     BDRV_REQ_WRITE_COMPRESSED   = 0x20,
++    /* The BDRV_REQ_ALLOCATE flag is used to indicate that the driver has to
++     * efficiently allocate the space so it reads as zeroes, or return an error.
++     * If this flag is set then BDRV_REQ_ZERO_WRITE must also be set.
++     * This flag cannot be set together with BDRV_REQ_MAY_UNMAP.
++     */
++    BDRV_REQ_ALLOCATE           = 0x40,
  
-+static void quorum_set_supported_flags(BlockDriverState *bs)
-+{
-+    BDRVQuorumState *s = bs->opaque;
-+    int i;
-+
-+    bs->supported_write_flags = BDRV_REQ_FUA;
-+    bs->supported_zero_flags  = BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP;
-+
-+    for (i = 0; i < s->num_children; i++) {
-+        bs->supported_write_flags &= s->children[i]->bs->supported_write_flags;
-+        bs->supported_zero_flags  &= s->children[i]->bs->supported_zero_flags;
-+    }
-+}
-+
- static int quorum_open(BlockDriverState *bs, QDict *options, int flags,
-                        Error **errp)
- {
-@@ -961,6 +975,8 @@ static int quorum_open(BlockDriverState *bs, QDict *options, int flags,
+     /* Mask of valid flags */
+-    BDRV_REQ_MASK               = 0x3f,
++    BDRV_REQ_MASK               = 0x7f,
+ } BdrvRequestFlags;
+ 
+ typedef struct BlockSizes {
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index c4dd1d4..7145823 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -661,7 +661,7 @@ struct BlockDriverState {
+     /* Flags honored during pwrite (so far: BDRV_REQ_FUA) */
+     unsigned int supported_write_flags;
+     /* Flags honored during pwrite_zeroes (so far: BDRV_REQ_FUA,
+-     * BDRV_REQ_MAY_UNMAP) */
++     * BDRV_REQ_MAY_UNMAP, BDRV_REQ_ALLOCATE) */
+     unsigned int supported_zero_flags;
+ 
+     /* the following member gives a name to every node on the bs graph. */
+diff --git a/block/io.c b/block/io.c
+index bd9a19a..660702a 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -1417,7 +1417,7 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
+             assert(!bs->supported_zero_flags);
+         }
+ 
+-        if (ret == -ENOTSUP) {
++        if (ret == -ENOTSUP && !(flags & BDRV_REQ_ALLOCATE)) {
+             /* Fall back to bounce buffer if write zeroes is unsupported */
+             BdrvRequestFlags write_flags = flags & ~BDRV_REQ_ZERO_WRITE;
+ 
+@@ -1510,7 +1510,9 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
+         !(flags & BDRV_REQ_ZERO_WRITE) && drv->bdrv_co_pwrite_zeroes &&
+         qemu_iovec_is_zero(qiov)) {
+         flags |= BDRV_REQ_ZERO_WRITE;
+-        if (bs->detect_zeroes == BLOCKDEV_DETECT_ZEROES_OPTIONS_UNMAP) {
++        if (bs->detect_zeroes == BLOCKDEV_DETECT_ZEROES_OPTIONS_UNMAP &&
++            !(flags & BDRV_REQ_ALLOCATE))
++        {
+             flags |= BDRV_REQ_MAY_UNMAP;
+         }
      }
-     s->next_child_index = s->num_children;
+@@ -1586,6 +1588,9 @@ static int coroutine_fn bdrv_co_do_zero_pwritev(BdrvChild *child,
  
-+    quorum_set_supported_flags(bs);
+     assert(flags & BDRV_REQ_ZERO_WRITE);
+     if (head_padding_bytes || tail_padding_bytes) {
++        if (flags & BDRV_REQ_ALLOCATE) {
++            return -ENOTSUP;
++        }
+         buf = qemu_blockalign(bs, align);
+         iov = (struct iovec) {
+             .iov_base   = buf,
+@@ -1671,6 +1676,9 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
+     bool use_local_qiov = false;
+     int ret;
+ 
++    assert(!((flags & BDRV_REQ_ALLOCATE) && (flags & BDRV_REQ_MAY_UNMAP)));
++    assert(!((flags & BDRV_REQ_ALLOCATE) && !(flags & BDRV_REQ_ZERO_WRITE)));
 +
-     g_free(opened);
-     goto exit;
+     trace_bdrv_co_pwritev(child->bs, offset, bytes, flags);
  
-@@ -1029,6 +1045,8 @@ static void quorum_add_child(BlockDriverState *bs, BlockDriverState *child_bs,
-     s->children = g_renew(BdrvChild *, s->children, s->num_children + 1);
-     s->children[s->num_children++] = child;
+     if (!bs->drv) {
+@@ -1815,6 +1823,12 @@ int coroutine_fn bdrv_co_pwrite_zeroes(BdrvChild *child, int64_t offset,
+ {
+     trace_bdrv_co_pwrite_zeroes(child->bs, offset, bytes, flags);
  
-+    quorum_set_supported_flags(bs);
++    if ((flags & BDRV_REQ_ALLOCATE) &&
++        !(child->bs->supported_zero_flags & BDRV_REQ_ALLOCATE))
++    {
++        return -ENOTSUP;
++    }
 +
- out:
-     bdrv_drained_end(bs);
- }
-@@ -1064,6 +1082,8 @@ static void quorum_del_child(BlockDriverState *bs, BdrvChild *child,
-     bdrv_unref_child(bs, child);
- 
-     bdrv_drained_end(bs);
-+
-+    quorum_set_supported_flags(bs);
- }
- 
- static void quorum_refresh_filename(BlockDriverState *bs, QDict *options)
+     if (!(child->bs->open_flags & BDRV_O_UNMAP)) {
+         flags &= ~BDRV_REQ_MAY_UNMAP;
+     }
 -- 
 2.7.4
