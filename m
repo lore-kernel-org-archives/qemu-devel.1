@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42477)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fG8Ps-0005U1-3q
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 15:36:53 -0400
+	(envelope-from <nathan.gauer@gmail.com>) id 1fG8Px-0005XH-OY
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 15:36:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fG8Pp-0001Sv-5t
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 15:36:52 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:35461)
+	(envelope-from <nathan.gauer@gmail.com>) id 1fG8Pu-0001Wu-J0
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 15:36:57 -0400
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:53361)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fG8Po-0001SK-Vx
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 15:36:49 -0400
-Received: by mail-pg0-x241.google.com with SMTP id j11-v6so21597727pgf.2
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 12:36:48 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue,  8 May 2018 12:36:45 -0700
-Message-Id: <20180508193645.3960-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH] tcg: Limit the number of ops in a TB
+	(Exim 4.71) (envelope-from <nathan.gauer@gmail.com>)
+	id 1fG8Pu-0001WW-DB
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 15:36:54 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id a67so20556658wmf.3
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 12:36:54 -0700 (PDT)
+Received: from [192.168.103.152] ([163.5.55.18])
+	by smtp.gmail.com with ESMTPSA id
+	v14-v6sm5226969edi.91.2018.05.08.12.36.51 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 08 May 2018 12:36:52 -0700 (PDT)
+From: =?UTF-8?Q?Nathan_Gau=c3=abr?= <nathan.gauer@gmail.com>
+Message-ID: <1df54af2-cd34-be64-bc43-f55f7ddeacdc@gmail.com>
+Date: Tue, 8 May 2018 21:36:51 +0200
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel]  GSoC Intro: Vulkan-ize VirGL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,78 +34,19 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, laurent@vivier.eu, qemu-stable@nongnu.org
 
-In 6001f7729e12 we partially attempt to address the branch
-displacement overflow caused by 15fa08f845.
+Hi,
 
-However, gcc/testsuite/gcc.target/aarch64/advsimd-intrinsics/vqtbX.c
-is a testcase that contains a TB so large as to overflow anyway.
-The limit here of 8000 ops produces a maximum output TB size of
-24112 bytes on a ppc64le host with that test case.  This is still
-much less than the maximum forward branch distance of 32764 bytes.
+I'm Nathan Gauër, a french student in computer science.
+For this year's Google Summer of Code, I've been selected to work on
+the Vulkan support for Virgl3D. The nature of this project makes the
+roadmap a bit blurry, but hopefully, we will get somewhere soon.
+My mentor will be Marc-André Lureau.
 
-Cc: qemu-stable@nongnu.org
-Fixes: 15fa08f845 ("tcg: Dynamically allocate TCGOps")
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- tcg/tcg.h | 8 +++++++-
- tcg/tcg.c | 3 +++
- 2 files changed, 10 insertions(+), 1 deletion(-)
+For the one curious about this project, here is the main website:
+https://virgil3d.github.io
 
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 75fbad128b..88378be310 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -655,6 +655,7 @@ struct TCGContext {
-     int nb_globals;
-     int nb_temps;
-     int nb_indirects;
-+    int nb_ops;
- 
-     /* goto_tb support */
-     tcg_insn_unit *code_buf;
-@@ -844,7 +845,12 @@ static inline TCGOp *tcg_last_op(void)
- /* Test for whether to terminate the TB for using too many opcodes.  */
- static inline bool tcg_op_buf_full(void)
- {
--    return false;
-+    /* This is not a hard limit, it merely stops translation when
-+     * we have produced "enough" opcodes.  We want to limit TB size
-+     * such that a RISC host can reasonably use a 16-bit signed
-+     * branch within the TB.
-+     */
-+    return tcg_ctx->nb_ops >= 8000;
- }
- 
- /* pool based memory allocation */
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 551caf1c53..6eeebe0624 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -866,6 +866,7 @@ void tcg_func_start(TCGContext *s)
-     /* No temps have been previously allocated for size or locality.  */
-     memset(s->free_temps, 0, sizeof(s->free_temps));
- 
-+    s->nb_ops = 0;
-     s->nb_labels = 0;
-     s->current_frame_offset = s->frame_start;
- 
-@@ -1956,6 +1957,7 @@ void tcg_op_remove(TCGContext *s, TCGOp *op)
- {
-     QTAILQ_REMOVE(&s->ops, op, link);
-     QTAILQ_INSERT_TAIL(&s->free_ops, op, link);
-+    s->nb_ops--;
- 
- #ifdef CONFIG_PROFILER
-     atomic_set(&s->prof.del_op_count, s->prof.del_op_count + 1);
-@@ -1975,6 +1977,7 @@ static TCGOp *tcg_op_alloc(TCGOpcode opc)
-     }
-     memset(op, 0, offsetof(TCGOp, link));
-     op->opc = opc;
-+    s->nb_ops++;
- 
-     return op;
- }
+Kind regards,
+
 -- 
-2.17.0
+Nathan Gauër
