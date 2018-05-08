@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fGAtB-0003Bk-2W
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 18:15:18 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fGAtG-0003H4-5c
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 18:15:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fGAtA-0001XG-4J
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 18:15:17 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:33425)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fGAtE-0001bM-LT
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 18:15:22 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:53768)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fGAt9-0001Wo-U9
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 18:15:16 -0400
-Received: by mail-wm0-x243.google.com with SMTP id x12-v6so20840838wmc.0
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 15:15:15 -0700 (PDT)
+	id 1fGAtE-0001ad-Fh
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 18:15:20 -0400
+Received: by mail-wm0-x244.google.com with SMTP id a67so21143935wmf.3
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 15:15:20 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed,  9 May 2018 00:14:38 +0200
-Message-Id: <1525817687-34620-22-git-send-email-pbonzini@redhat.com>
+Date: Wed,  9 May 2018 00:14:42 +0200
+Message-Id: <1525817687-34620-26-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1525817687-34620-1-git-send-email-pbonzini@redhat.com>
 References: <1525817687-34620-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 21/30] qemu-options: Remove deprecated
- -no-kvm-irqchip
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 25/30] configure: Really use local libfdt if the
+ system one is too old
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +32,101 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-We've never documented this option in our qemu-doc, so apart from the users
-that already used the old qemu-kvm fork before, most users should not be
-aware of this option at all. It's been marked as deprecated in the source
-code for a long time already, and officially marked as deprecated in the
-documentation since QEMU v2.10, so it should be fine to remove this now.
+QEMU requires libfdt version >= 1.4.2.
+If the host has an older libfdt installed, the configure script will use
+a (git cloned) local version.
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1525453270-23074-5-git-send-email-thuth@redhat.com>
+Example with Debian 8:
+    $ dpkg-query --showformat='${Version}\n' --show libfdt-dev
+    1.4.0+dfsg-1
+    $ ./configure
+    [...]
+    fdt support       yes          # from git submodule 'dtc'
+
+If this case occurs, the linker will have 2 different libfdt available in
+the library search path. The default behavior is to search the system path
+first, then the local path.
+
+Even if the configure script noticed the libfdt is too old and clone a more
+recent locally, when linking the system library is selected first, and the
+link process eventually fails:
+
+      LINK    mips64el-softmmu/qemu-system-mips64el
+    ../hw/core/loader-fit.o: In function `load_fit':
+    /root/src/github.com/philmd/qemu/hw/core/loader-fit.c:278: undefined reference to `fdt_first_subnode'
+    /root/src/github.com/philmd/qemu/hw/core/loader-fit.c:286: undefined reference to `fdt_next_subnode'
+    /root/src/github.com/philmd/qemu/hw/core/loader-fit.c:277: undefined reference to `fdt_first_subnode'
+    collect2: error: ld returned 1 exit status
+    Makefile:201: recipe for target 'qemu-system-mips64el' failed
+    make[1]: *** [qemu-system-mips64el] Error 1
+
+QEMU already uses a kludge to enforce local CFLAGS before system ones for
+libpixman and libfdt, add a similar kludge for the LDFLAGS to enforce using
+the local libfdt.
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20180415230522.24404-2-f4bug@amsat.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- qemu-doc.texi   | 5 -----
- qemu-options.hx | 3 ---
- vl.c            | 5 -----
- 3 files changed, 13 deletions(-)
+ configure | 6 +++++-
+ rules.mak | 2 +-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index 85a7a39..bde542b 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -2786,11 +2786,6 @@ which is the default.
+diff --git a/configure b/configure
+index 3ff4d77..43756dc 100755
+--- a/configure
++++ b/configure
+@@ -3800,7 +3800,8 @@ EOF
+               symlink "$source_path/dtc/scripts" "dtc/scripts"
+           fi
+           fdt_cflags="-I\$(SRC_PATH)/dtc/libfdt"
+-          fdt_libs="-L\$(BUILD_DIR)/dtc/libfdt $fdt_libs"
++          fdt_ldflags="-L\$(BUILD_DIR)/dtc/libfdt"
++          fdt_libs="$fdt_libs"
+       elif test "$fdt" = "yes" ; then
+           # Not a git build & no libfdt found, prompt for system install
+           error_exit "DTC (libfdt) version >= 1.4.2 not present." \
+@@ -5742,6 +5743,7 @@ echo_version() {
  
- @section System emulator command line arguments
+ # prepend pixman and ftd flags after all config tests are done
+ QEMU_CFLAGS="$pixman_cflags $fdt_cflags $QEMU_CFLAGS"
++QEMU_LDFLAGS="$fdt_ldflags $QEMU_LDFLAGS"
+ libs_softmmu="$pixman_libs $libs_softmmu"
  
--@subsection -no-kvm-irqchip (since 1.3.0)
--
--The ``-no-kvm-irqchip'' argument is now a synonym for
--setting ``-machine kernel_irqchip=off''.
--
- @subsection -no-kvm (since 1.3.0)
+ echo "Install prefix    $prefix"
+@@ -5772,6 +5774,7 @@ echo "ARFLAGS           $ARFLAGS"
+ echo "CFLAGS            $CFLAGS"
+ echo "QEMU_CFLAGS       $QEMU_CFLAGS"
+ echo "LDFLAGS           $LDFLAGS"
++echo "QEMU_LDFLAGS      $QEMU_LDFLAGS"
+ echo "make              $make"
+ echo "install           $install"
+ echo "python            $python"
+@@ -6706,6 +6709,7 @@ else
+ fi
+ echo "LDFLAGS=$LDFLAGS" >> $config_host_mak
+ echo "LDFLAGS_NOPIE=$LDFLAGS_NOPIE" >> $config_host_mak
++echo "QEMU_LDFLAGS=$QEMU_LDFLAGS" >> $config_host_mak
+ echo "LD_REL_FLAGS=$LD_REL_FLAGS" >> $config_host_mak
+ echo "LD_I386_EMULATION=$ld_i386_emulation" >> $config_host_mak
+ echo "LIBS+=$LIBS" >> $config_host_mak
+diff --git a/rules.mak b/rules.mak
+index 93a0702..04c7f74 100644
+--- a/rules.mak
++++ b/rules.mak
+@@ -73,7 +73,7 @@ expand-objs = $(strip $(sort $(filter %.o,$1)) \
+ # must link with the C++ compiler, not the plain C compiler.
+ LINKPROG = $(or $(CXX),$(CC))
  
- The ``-no-kvm'' argument is now a synonym for setting
-diff --git a/qemu-options.hx b/qemu-options.hx
-index dfff698..b2fefd1 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3914,9 +3914,6 @@ ETEXI
- HXCOMM Deprecated by -machine accel=tcg property
- DEF("no-kvm", 0, QEMU_OPTION_no_kvm, "", QEMU_ARCH_I386)
+-LINK = $(call quiet-command, $(LINKPROG) $(QEMU_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@ \
++LINK = $(call quiet-command, $(LINKPROG) $(QEMU_LDFLAGS) $(QEMU_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@ \
+        $(call process-archive-undefs, $1) \
+        $(version-obj-y) $(call extract-libs,$1) $(LIBS),"LINK","$(TARGET_DIR)$@")
  
--HXCOMM Deprecated by -machine kernel_irqchip=on|off property
--DEF("no-kvm-irqchip", 0, QEMU_OPTION_no_kvm_irqchip, "", QEMU_ARCH_I386)
--
- DEF("msg", HAS_ARG, QEMU_OPTION_msg,
-     "-msg timestamp[=on|off]\n"
-     "                change the format of messages\n"
-diff --git a/vl.c b/vl.c
-index 23d55a4..b9f6b42 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3138,11 +3138,6 @@ int main(int argc, char **argv, char **envp)
-                 exit(1);
-             }
-             switch(popt->index) {
--            case QEMU_OPTION_no_kvm_irqchip: {
--                olist = qemu_find_opts("machine");
--                qemu_opts_parse_noisily(olist, "kernel_irqchip=off", false);
--                break;
--            }
-             case QEMU_OPTION_cpu:
-                 /* hw initialization will check this */
-                 cpu_model = optarg;
 -- 
 1.8.3.1
