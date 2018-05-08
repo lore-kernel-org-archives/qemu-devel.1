@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fG30O-0001gq-Vo
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:50:13 -0400
+	(envelope-from <thuth@redhat.com>) id 1fG30S-0001lR-5F
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:50:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fG30L-0000MA-OY
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:50:13 -0400
-Date: Tue, 8 May 2018 15:50:02 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180508155002.6e4c5613.cohuck@redhat.com>
-In-Reply-To: <1525376963-79623-65-git-send-email-mst@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1fG30R-0000RF-AA
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:50:16 -0400
 References: <1525376963-79623-1-git-send-email-mst@redhat.com>
-	<1525376963-79623-65-git-send-email-mst@redhat.com>
+	<1525376963-79623-5-git-send-email-mst@redhat.com>
+	<b3620ea6-0805-ccec-3bd5-11dc30bc2569@redhat.com>
+	<20180508152349.15ad26d0.cohuck@redhat.com>
+	<bc3f13f6-56fd-058d-d717-508b7034d437@redhat.com>
+	<20180508154538.1b55f721.cohuck@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <b335f5ae-a99e-310c-edb2-65755a2ca51a@redhat.com>
+Date: Tue, 8 May 2018 15:50:10 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20180508154538.1b55f721.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 64/67] target/s390x: add include directory
- header
+Subject: Re: [Qemu-devel] [PATCH 04/67] s390x: drop an unused include
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,26 +28,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, berrange@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, qemu-s390x@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, David Hildenbrand <david@redhat.com>
 
-On Thu, 3 May 2018 22:51:45 +0300
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
-
-> This way it is easier to find using standard rules.
+On 08.05.2018 15:45, Cornelia Huck wrote:
+> On Tue, 8 May 2018 15:38:03 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
 > 
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  include/target/s390x/cpu_models.h | 1 +
->  1 file changed, 1 insertion(+)
->  create mode 100644 include/target/s390x/cpu_models.h
+>> On 08.05.2018 15:23, Cornelia Huck wrote:
+>>> On Fri, 4 May 2018 02:24:12 +0200
+>>> Thomas Huth <thuth@redhat.com> wrote:
+>>>   
+>>>> On 03.05.2018 21:50, Michael S. Tsirkin wrote:  
+>>>>> we just need a struct name, let's add a forward
+>>>>> declaration instead of an include.
+>>>>>
+>>>>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>>>>> ---
+>>>>>  include/hw/s390x/sclp.h | 3 ++-
+>>>>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
+>>>>> index f9db243..6e65150 100644
+>>>>> --- a/include/hw/s390x/sclp.h
+>>>>> +++ b/include/hw/s390x/sclp.h
+>>>>> @@ -16,7 +16,8 @@
+>>>>>  
+>>>>>  #include "hw/sysbus.h"
+>>>>>  #include "hw/qdev.h"
+>>>>> -#include "target/s390x/cpu-qom.h"
+>>>>> +
+>>>>> +typedef struct CPUS390XState CPUS390XState;    
+>>>>
+>>>> IIRC you have to use include/qemu/typedefs.h instead to avoid trouble
+>>>> with older versions of GCC.  
+>>>
+>>> Hm, I'm wondering why we do the typedef in cpu-qom.h, while other
+>>> architectures do it in their cpu.h.  
+>>
+>> See:
+>>
+>> commit ef2974cc270d51959ce90df6b4d4d41635d7a603
+>> Author: David Hildenbrand <david@redhat.com>
+>> Date:   Wed Sep 13 15:24:02 2017 +0200
+>>
+>>     target/s390x: move some s390x typedefs to cpu-qom.h
+>>     
+>>     This allows us to drop inclusion of cpu_models.h in cpu-qom.h, and
+>>     prepares for using cpu-qom.h as a s390 specific version of typedefs.h
+>>     
+>>     Signed-off-by: David Hildenbrand <david@redhat.com>
+>>     Message-Id: <20170913132417.24384-8-david@redhat.com>
+>>     Reviewed-by: Thomas Huth <thuth@redhat.com>
+>>     Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>>
+>>  Thomas
 > 
-> diff --git a/include/target/s390x/cpu_models.h b/include/target/s390x/cpu_models.h
-> new file mode 100644
-> index 0000000..f66ea19
-> --- /dev/null
-> +++ b/include/target/s390x/cpu_models.h
-> @@ -0,0 +1 @@
-> +#include_next "../target/s390x/cpu_models.h"
+> Gargh, this is all very confusing...
 
-FWIW, I don't like this any better than the other one.
+If you'd ask me, I'd say we should get rid of the typedefs and do it the
+Linux kernel way and enforce using "struct xyz" everywhere, then you
+also do not have this problem with typedefs.h anymore ... but well, so
+far it seems as I'm still part of a minority with this opinion here.
+
+ Thomas
