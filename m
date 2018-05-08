@@ -1,16 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fG35H-0004BA-V3
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:55:17 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fG35J-0004DA-WE
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:55:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fG35B-0001y7-WE
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:55:15 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fG35E-00021W-5j
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:55:17 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue,  8 May 2018 14:54:35 +0100
-Message-Id: <20180508135436.30140-2-stefanha@redhat.com>
-In-Reply-To: <20180508135436.30140-1-stefanha@redhat.com>
-References: <20180508135436.30140-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/2] qemu-iotests: reduce chance of races in
+Date: Tue,  8 May 2018 14:54:34 +0100
+Message-Id: <20180508135436.30140-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/2] qemu-iotests: post-QEMU 2.12 fixes for
  185
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -21,71 +19,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Commit 8565c3ab537e78f3e69977ec2c609dc9417a806e ("qemu-iotests: fix
-185") identified a race condition in a sub-test.
+v2:
+ * Rebase onto Jeff's block tree to get mirror ratelimit fix [Jeff, Vladimir]
+ * Update comments in 185 since drain no longer causes a spurious iteration
 
-Similar issues also affect the other sub-tests.  If disk I/O completes
-quickly, it races with the QMP 'quit' command.  This causes spurious
-test failures because QMP events are emitted in an unpredictable order.
+The 185 qemu-iotests test case was in a bad state for the QEMU 2.12 release.
+We fudged the expected test output to make it pass, except for
+non-deterministic behavior.
 
-This test relies on QEMU internals and there is no QMP API for getting
-deterministic behavior needed to make this test 100% reliable.  At the
-same time, the test is useful and it would be a shame to remove it.
+These patches get us back to pre-QEMU 2.12.  Notably the offsets reported in
+block job events now correspond to smaller buffer sizes because the job doesn't
+iterate during drain.
 
-Add sleep 0.5 to reduce the chance of races.  This is not a real fix but
-appears to reduce spurious failures in practice.
+It's worth mentioning that the test case is still non-deterministic.  For more
+on that, see the first patch.
 
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- tests/qemu-iotests/185 | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+Stefan Hajnoczi (2):
+  qemu-iotests: reduce chance of races in 185
+  blockjob: do not cancel timer in resume
 
-diff --git a/tests/qemu-iotests/185 b/tests/qemu-iotests/185
-index 298d88d04e..975404c99d 100755
---- a/tests/qemu-iotests/185
-+++ b/tests/qemu-iotests/185
-@@ -118,6 +118,9 @@ _send_qemu_cmd $h \
-                       'speed': 65536 } }" \
-     "return"
- 
-+# If we don't sleep here 'quit' command races with disk I/O
-+sleep 0.5
-+
- _send_qemu_cmd $h "{ 'execute': 'quit' }" "return"
- wait=1 _cleanup_qemu
- 
-@@ -137,6 +140,9 @@ _send_qemu_cmd $h \
-                       'speed': 65536 } }" \
-     "return"
- 
-+# If we don't sleep here 'quit' command races with disk I/O
-+sleep 0.5
-+
- _send_qemu_cmd $h "{ 'execute': 'quit' }" "return"
- wait=1 _cleanup_qemu
- 
-@@ -183,6 +189,9 @@ _send_qemu_cmd $h \
-                       'speed': 65536 } }" \
-     "return"
- 
-+# If we don't sleep here 'quit' command races with disk I/O
-+sleep 0.5
-+
- _send_qemu_cmd $h "{ 'execute': 'quit' }" "return"
- wait=1 _cleanup_qemu
- 
-@@ -201,6 +210,9 @@ _send_qemu_cmd $h \
-                       'speed': 65536 } }" \
-     "return"
- 
-+# If we don't sleep here 'quit' command races with disk I/O
-+sleep 0.5
-+
- _send_qemu_cmd $h "{ 'execute': 'quit' }" "return"
- wait=1 _cleanup_qemu
- 
+ blockjob.c                 | 22 +++++++++++++++-------
+ tests/qemu-iotests/185     | 17 +++++++++++++----
+ tests/qemu-iotests/185.out | 12 +++++-------
+ 3 files changed, 33 insertions(+), 18 deletions(-)
+
 -- 
 2.14.3
