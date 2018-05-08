@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60837)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fG7ln-0001LY-Uh
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 14:55:28 -0400
+	(envelope-from <eblake@redhat.com>) id 1fG7m1-0001Oy-Mj
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 14:55:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fG7lk-0002nF-Kf
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 14:55:27 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:38806)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fG7lk-0002mg-F1
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 14:55:24 -0400
-Received: by mail-pf0-x241.google.com with SMTP id o76so24392319pfi.5
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 11:55:24 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue,  8 May 2018 11:55:20 -0700
-Message-Id: <20180508185520.23757-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH] target/m68k: Fix build Werror with gcc 8.0.1
+	(envelope-from <eblake@redhat.com>) id 1fG7lx-0002st-3A
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 14:55:40 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33890 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fG7lw-0002se-T7
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 14:55:37 -0400
+References: <20180508163639.7138-1-laurent@vivier.eu>
+	<CAMo8BfJg3P=xxdZpkyj6yayHh5ce7z2VKFru=o8DkcVQOBc-Zw@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e6818e2c-62b8-0c42-be22-d8ea9bc50b03@redhat.com>
+Date: Tue, 8 May 2018 13:55:22 -0500
+MIME-Version: 1.0
+In-Reply-To: <CAMo8BfJg3P=xxdZpkyj6yayHh5ce7z2VKFru=o8DkcVQOBc-Zw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: fix convertion of
+ flock/flock64 l_type field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,47 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Laurent Vivier <laurent@vivier.eu>
+To: Max Filippov <jcmvbkbc@gmail.com>, Laurent Vivier <laurent@vivier.eu>
+Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-devel <qemu-devel@nongnu.org>
 
-Fedora 28 ships with the released gcc 8.
+On 05/08/2018 12:08 PM, Max Filippov wrote:
+> On Tue, May 8, 2018 at 9:36 AM, Laurent Vivier <laurent@vivier.eu> wrote:
 
-The Werror stems from the compiler finding a path through the second
-switch via a missing default case in which src1 is uninitialized, and
-not being able to prove that the missing default case is unreachable
-due to the first switch.
+In the subject, s/convertion/conversion/
 
-Simplify the second switch to merge default with OS_LONG,
-which returns directly.  This removes the unreachable path.
+>> As l_type values (F_RDLCK, F_WRLCK, F_UNLCK, F_EXLCK, F_SHLCK)
+>> are not bitmasks, we can't use target_to_host_bitmask() and
+>> host_to_target_bitmask() to convert them.
+>>
+>> Introduce target_to_host_flock() and host_to_target_flock()
+>> to convert values between host and target.
+>>
 
-Cc: Laurent Vivier <laurent@vivier.eu>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/m68k/translate.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+>> +static unsigned int host_to_target_flock(unsigned int type)
+>> +{
+>> +    switch (type) {
+>> +#define TRANSTBL_CONVERT(a) case a: return TARGET_##a;
+>> +    TRANSTBL_CONVERT(F_RDLCK)
+>> +    TRANSTBL_CONVERT(F_WRLCK)
+>> +    TRANSTBL_CONVERT(F_UNLCK)
+>> +    TRANSTBL_CONVERT(F_EXLCK)
+>> +    TRANSTBL_CONVERT(F_SHLCK)
+>> +#undef  TRANSTBL_CONVERT
+>> +    }
+>> +    return type;
+>> +}
+>>
+> 
+> There's a duplication. Wouldn't it be better if it was done like the following:
+> 
+> #define FLOCK_TRANSTBL \
+>      switch (type) {
+>      TRANSTBL_CONVERT(F_RDLCK) \
 
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index e407ba2db3..44a0ac4e2e 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -2297,7 +2297,7 @@ DISAS_INSN(arith_im)
-         im = tcg_const_i32(read_im32(env, s));
-         break;
-     default:
--       abort();
-+        g_assert_not_reached();
-     }
- 
-     if (with_SR) {
-@@ -2317,7 +2317,8 @@ DISAS_INSN(arith_im)
-             }
-             src1 = gen_get_sr(s);
-             break;
--        case OS_LONG:
-+        default:
-+            /* OS_LONG; others already g_assert_not_reached.  */
-             disas_undef(env, s, insn);
-             return;
-         }
+If you do this, I'd lean towards omitting the trailing ; from 
+TRANSTBL_CONVERT() and sticking it in FLOCK_TRANSTBL instead (it looks 
+weird to see a statement-like macro called without a ';').
+
 -- 
-2.17.0
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
