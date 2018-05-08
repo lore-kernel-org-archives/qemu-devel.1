@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54169)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fFyqS-0003NV-V2
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 05:23:42 -0400
+	(envelope-from <groug@kaod.org>) id 1fFz1D-0006Lf-FE
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 05:34:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fFyqN-0006DE-WA
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 05:23:40 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:46130)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fFyqN-0006Cx-NM
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 05:23:35 -0400
-Received: by mail-wr0-x242.google.com with SMTP id a12-v6so638491wrn.13
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 02:23:35 -0700 (PDT)
-Date: Tue, 8 May 2018 10:23:31 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180508092331.GA19710@stefanha-x1.localdomain>
-References: <1520930033-18885-1-git-send-email-junyan.he@intel.com>
+	(envelope-from <groug@kaod.org>) id 1fFz19-0001xd-GF
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 05:34:47 -0400
+Received: from 9.mo173.mail-out.ovh.net ([46.105.72.44]:35959)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fFz19-0001tH-A8
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 05:34:43 -0400
+Received: from player762.ha.ovh.net (unknown [10.109.120.62])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 60956C07B4
+	for <qemu-devel@nongnu.org>; Tue,  8 May 2018 11:34:32 +0200 (CEST)
+Date: Tue, 8 May 2018 11:34:25 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180508113425.003c5031@bahia.lan>
+In-Reply-To: <71b68bd5-e50b-3baa-3f72-f6af78db4e2e@redhat.com>
+References: <152568372989.443627.900708381919207053.stgit@bahia.lan>
+	<71b68bd5-e50b-3baa-3f72-f6af78db4e2e@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="SLDf9lqlvOQaIe6s"
-Content-Disposition: inline
-In-Reply-To: <1520930033-18885-1-git-send-email-junyan.he@intel.com>
-Subject: Re: [Qemu-devel] [PATCH 00/10] RFC: Optimize nvdimm kind memory for
- snapshot.
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] ppc: e500: use g_strdup_printf() instead
+ of snprintf()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,114 +31,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: junyan.he@intel.com
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, crosthwaite.peter@gmail.com, quintela@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, rth@twiddle.net
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Howard Spoelstra <hsp.cat7@gmail.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
+On Mon, 7 May 2018 12:53:45 -0500
+Eric Blake <eblake@redhat.com> wrote:
 
---SLDf9lqlvOQaIe6s
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Mar 13, 2018 at 04:33:43PM +0800, junyan.he@intel.com wrote:
-> From: Junyan He <junyan.he@intel.com>
+> On 05/07/2018 04:02 AM, Greg Kurz wrote:
+> > qemu-system-ppc fails to build with GCC 8.0.1:
+> >=20
+> > /home/hsp/src/qemu-master/hw/ppc/e500.c: In function =E2=80=98ppce500_l=
+oad_device_tree=E2=80=99:
+> > /home/hsp/src/qemu-master/hw/ppc/e500.c:442:37: error: =E2=80=98/pic@=
+=E2=80=99
+> > directive output may be truncated writing 5 bytes into a region of
+> > size between 1 and 128 [-Werror=3Dformat-truncation=3D]
+> >       snprintf(mpic, sizeof(mpic), "%s/pic@%llx", soc, MPC8544_MPIC_REG=
+S_OFFSET);
+> >                                       ^~~~~ =20
 >=20
-> The nvdimm size is huge, sometimes it is more than 256G or even more.
-> This is a huge burden for snapshot saving. One snapshot point with
-> nvdimm may occupy more than 50G disk space even with compression
-> enabled.
-> We need to introduce dependent snapshot manner to solve this problem.
-
-What is the status of this patch series?
-
-Kevin and Juan: Review is needed from the qcow2 and migration maintainers.
-
-This patch series adds a function to clone qcow2 snapshots (sharing
-clusters via the refcount) and then uses it to snapshot NVDIMM contents
-incrementally during savevm.  This way only dirty NVDIMM clusters need
-to be written into the qcow2 file, saving a lot of space and time.  The
-drawback is that dirty memory logging needs to be enabled while the
-guest is running.
-
-The approach makes sense to me and could be used for other migration
-state beyond NVDIMM in the future.  I think it's worth iterating this
-patch series and merging it.
-
-It was difficult for me to understand some of the English.  Do you have
-a colleague who can review the English and suggest how to rephrase the
-text?
-
-I didn't found the "snapshot dependency" name unclear.  I suggest
-calling the new API .bdrv_snapshot_clone().  This makes it clear that a
-new snapshot is created based on an existing one.
-
-New APIs are missing doc comments.  Please document the functions,
-arguments, and the return values - especially for extern functions
-(those declared in header files).
-
-> The first snapshot point should always be saved completely, and enable
-> dirty log trace after saving for nvdimm memory region. The later snapshot
-> point should add the reference to previous snapshot's nvdimm data and
-> just saving dirty pages. This can save a lot of disk and time if the
-> snapshot operations are triggered frequently.
-> We add save_snapshot_dependency functions to QCOW2 file system firstly, t=
-he
-> later snapshot will add reference to previous dependent snapshot's data
-> cluster. There is an alignment problem here, the dependent data should
-> always be cluster aligned. We need to add some padding data when saving
-> the snapshot to make it always cluster aligned.
-> The logic between nvdimm and ram for snapshot saving is a little confused
-> now, we need to exclude nvdimm kind memory region from ram list and the
-> dirty log tracing setting is also not very clear. Maybe we can separate t=
-he
-> snapshot saving from the migration logic later to make code clean.
-> In theory, this kind of manner can apply to any kind of memory. But becau=
-se
-> it need to turn dirty log trace on, the performance may decline. So we ju=
-st
-> enable it for nvdimm kind memory firstly.
+> >=20
+> > Fix this by converting e500 to use g_strdup_printf()+g_free() instead
+> > of snprintf(). This is done globally, even for call sites that don't
+> > break build, since this is the preferred practice in QEMU.
+> >=20
+> > Reported-by: Howard Spoelstra <hsp.cat7@gmail.com>
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >   hw/ppc/e500.c |   39 +++++++++++++++++++++++----------------
+> >   1 file changed, 23 insertions(+), 16 deletions(-)
+> >  =20
 >=20
-> Signed-off-by: Junyan He <junyan.he@intel.com>
-> ---
-> Makefile.target              |    1 +
-> block/qcow2-snapshot.c       |  154 ++++++++++++++++++++++
-> block/qcow2.c                |    2 +
-> block/qcow2.h                |    7 +
-> block/snapshot.c             |   45 +++++++
-> exec.c                       |    7 +
-> hw/ppc/spapr.c               |    2 +-
-> hw/s390x/s390-stattrib.c     |    2 +-
-> include/block/block_int.h    |    9 ++
-> include/block/snapshot.h     |    7 +
-> include/exec/memory.h        |    9 ++
-> include/exec/ram_addr.h      |    2 +
-> include/migration/misc.h     |    4 +
-> include/migration/register.h |    2 +-
-> include/migration/snapshot.h |    3 +
-> memory.c                     |   18 ++-
-> migration/block.c            |    2 +-
-> migration/nvdimm.c           | 1033 +++++++++++++++++++++++++++++++++++++=
-++++++++++++++++++++
-> migration/qemu-file.c        |   61 +++++++++
-> migration/qemu-file.h        |   14 ++
-> migration/ram.c              |   19 ++-
-> migration/savevm.c           |   62 ++++++++-
-> vl.c                         |    1 +
-> 23 files changed, 1452 insertions(+), 14 deletions(-)
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 >=20
 
---SLDf9lqlvOQaIe6s
-Content-Type: application/pgp-signature; name="signature.asc"
+Hi Peter,
 
------BEGIN PGP SIGNATURE-----
+David said the next pull request for ppc would happen in a month. This
+patch fixes an annoying build break with recent GCC, and it already
+got two positive reviews, is it possible to have it merged upstream ?
 
-iQEcBAEBAgAGBQJa8WyTAAoJEJykq7OBq3PIGgoH/3zzLWVnNcWmJo4QfAgCoq9R
-fpERQ/2REIlfhgUdJAEKtKvesyyIF6UbsyewELNkDyzfulsBPGlbivUtJ9MwpwK1
-+l1AwLPbcFv/KpKs8WDYggvszmdnHFCygIBV4bNtUIuzKGvKbIj0PqNB7qoKqMx/
-QWDlIaQFXatO4JMDDg51cL4DCoytDEl/ZP8y8Hv6S3QCflesGDqwHj/R0sisvALC
-MOVQJ3QqhnjnobAFRamDaXd5/1Re3YazQAlrZC08to3VEEVi6agQ2WhSUhGmCjqV
-05LP1KslB69mrnsVgPGXn6tGhDIgunxtcya6BpbYV3ZJU+MIiygwNCGkWOqJaa0=
-=Qn7h
------END PGP SIGNATURE-----
+Cheers,
 
---SLDf9lqlvOQaIe6s--
+--
+Greg
