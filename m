@@ -1,15 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <renyime@gmail.com>) id 1fG1iT-0005JT-V2
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:27:39 -0400
+	(envelope-from <quintela@redhat.com>) id 1fG1n6-0008JX-Ug
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:32:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <renyime@gmail.com>) id 1fG1iS-0008I7-UX
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:27:37 -0400
-From: Ivan Ren <renyime@gmail.com>
-Date: Tue,  8 May 2018 20:27:21 +0800
-Message-Id: <1525782441-2224-1-git-send-email-ivanren@tencent.com>
-Subject: [Qemu-devel] [PATCH] qcow2: fix preallocation with metadata on bare
- block device
+	(envelope-from <quintela@redhat.com>) id 1fG1n2-0002Ea-C3
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:32:24 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43232 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fG1n2-0002E1-8Z
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:32:20 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <1525701137-9384-1-git-send-email-lidongchen@tencent.com> (Lidong
+	Chen's message of "Mon, 7 May 2018 21:52:16 +0800")
+References: <1525701137-9384-1-git-send-email-lidongchen@tencent.com>
+Reply-To: quintela@redhat.com
+Date: Tue, 08 May 2018 14:34:30 +0200
+Message-ID: <87bmdq8gx5.fsf@secure.laptop>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/2] migration: implement
+ io_set_aio_fd_handler function for RDMA QIOChannel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,109 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mreitz@redhat.com, kwolf@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Lidong Chen <jemmy858585@gmail.com>
+Cc: dgilbert@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org, galsha@mellanox.com, aviadye@mellanox.com, adido@mellanox.com, Lidong Chen <lidongchen@tencent.com>
 
-Create a qcow2 directly on bare block device with
-"-o preallocation=metadata" option. When read this qcow2, it will
-return dirty data of block device. This patch add QCOW_OFLAG_ZERO
-for all preallocated l2 entry if the underlying device is a bare
-block device.
+Lidong Chen <jemmy858585@gmail.com> wrote:
+> if qio_channel_rdma_readv return QIO_CHANNEL_ERR_BLOCK, the destination qemu
+> crash.
+>
+> The backtrace is:
+> (gdb) bt
+>     #0  0x0000000000000000 in ?? ()
+>     #1  0x00000000008db50e in qio_channel_set_aio_fd_handler (ioc=0x38111e0, ctx=0x3726080,
+>         io_read=0x8db841 <qio_channel_restart_read>, io_write=0x0, opaque=0x38111e0) at io/channel.c:
+>     #2  0x00000000008db952 in qio_channel_set_aio_fd_handlers (ioc=0x38111e0) at io/channel.c:438
+>     #3  0x00000000008dbab4 in qio_channel_yield (ioc=0x38111e0, condition=G_IO_IN) at io/channel.c:47
+>     #4  0x00000000007a870b in channel_get_buffer (opaque=0x38111e0, buf=0x440c038 "", pos=0, size=327
+>         at migration/qemu-file-channel.c:83
+>     #5  0x00000000007a70f6 in qemu_fill_buffer (f=0x440c000) at migration/qemu-file.c:299
+>     #6  0x00000000007a79d0 in qemu_peek_byte (f=0x440c000, offset=0) at migration/qemu-file.c:562
+>     #7  0x00000000007a7a22 in qemu_get_byte (f=0x440c000) at migration/qemu-file.c:575
+>     #8  0x00000000007a7c78 in qemu_get_be32 (f=0x440c000) at migration/qemu-file.c:655
+>     #9  0x00000000007a0508 in qemu_loadvm_state (f=0x440c000) at migration/savevm.c:2126
+>     #10 0x0000000000794141 in process_incoming_migration_co (opaque=0x0) at migration/migration.c:366
+>     #11 0x000000000095c598 in coroutine_trampoline (i0=84033984, i1=0) at util/coroutine-ucontext.c:1
+>     #12 0x00007f9c0db56d40 in ?? () from /lib64/libc.so.6
+>     #13 0x00007f96fe858760 in ?? ()
+>     #14 0x0000000000000000 in ?? ()
+>
+> RDMA QIOChannel not implement io_set_aio_fd_handler. so
+> qio_channel_set_aio_fd_handler will access NULL pointer.
+>
+> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
 
-Signed-off-by: Ivan Ren <ivanren@tencent.com>
----
- block/qcow2-cluster.c |  5 +++--
- block/qcow2.c         | 19 ++++++++++++++++---
- block/qcow2.h         |  3 ++-
- 3 files changed, 21 insertions(+), 6 deletions(-)
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 1aee726..b9e0ceb 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -919,7 +919,8 @@ fail:
-     return ret;
- }
- 
--int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
-+int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m,
-+                                uint64_t flags)
- {
-     BDRVQcow2State *s = bs->opaque;
-     int i, j = 0, l2_index, ret;
-@@ -969,7 +970,7 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
-         }
- 
-         l2_slice[l2_index + i] = cpu_to_be64((cluster_offset +
--                    (i << s->cluster_bits)) | QCOW_OFLAG_COPIED);
-+                    (i << s->cluster_bits)) | QCOW_OFLAG_COPIED | flags);
-      }
- 
- 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 2f36e63..093735c 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2044,7 +2044,7 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
-         while (l2meta != NULL) {
-             QCowL2Meta *next;
- 
--            ret = qcow2_alloc_cluster_link_l2(bs, l2meta);
-+            ret = qcow2_alloc_cluster_link_l2(bs, l2meta, 0);
-             if (ret < 0) {
-                 goto fail;
-             }
-@@ -2534,6 +2534,7 @@ static void coroutine_fn preallocate_co(void *opaque)
-     uint64_t host_offset = 0;
-     unsigned int cur_bytes;
-     int ret;
-+    struct stat st;
-     QCowL2Meta *meta;
- 
-     qemu_co_mutex_lock(&s->lock);
-@@ -2552,7 +2553,19 @@ static void coroutine_fn preallocate_co(void *opaque)
-         while (meta) {
-             QCowL2Meta *next = meta->next;
- 
--            ret = qcow2_alloc_cluster_link_l2(bs, meta);
-+            /* Check the underlying device type.
-+             * If the underlying device is a block device, we add
-+             * QCOW_OFLAG_ZERO for all preallocated l2 entry to ignore dirty
-+             * data on block device.
-+             * If the underlying device can't be used with stat(return < 0),
-+             * treat it as a regular file.
-+             */
-+            if (stat(bs->filename, &st) < 0 || !S_ISBLK(st.st_mode)) {
-+                ret = qcow2_alloc_cluster_link_l2(bs, meta, 0);
-+            } else {
-+                ret = qcow2_alloc_cluster_link_l2(bs, meta, QCOW_OFLAG_ZERO);
-+            }
-+
-             if (ret < 0) {
-                 qcow2_free_any_clusters(bs, meta->alloc_offset,
-                                         meta->nb_clusters, QCOW2_DISCARD_NEVER);
-@@ -3458,7 +3471,7 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
-             };
-             qemu_co_queue_init(&allocation.dependent_requests);
- 
--            ret = qcow2_alloc_cluster_link_l2(bs, &allocation);
-+            ret = qcow2_alloc_cluster_link_l2(bs, &allocation, 0);
-             if (ret < 0) {
-                 error_setg_errno(errp, -ret, "Failed to update L2 tables");
-                 qcow2_free_clusters(bs, host_offset,
-diff --git a/block/qcow2.h b/block/qcow2.h
-index adf5c39..9a59602 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -617,7 +617,8 @@ uint64_t qcow2_alloc_compressed_cluster_offset(BlockDriverState *bs,
-                                          uint64_t offset,
-                                          int compressed_size);
- 
--int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m);
-+int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m,
-+                                uint64_t flags);
- int qcow2_cluster_discard(BlockDriverState *bs, uint64_t offset,
-                           uint64_t bytes, enum qcow2_discard_type type,
-                           bool full_discard);
--- 
-1.8.3.1
+queued
