@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fG3hD-0000Ag-Ik
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:34:35 -0400
+	(envelope-from <eblake@redhat.com>) id 1fG3oa-0001Pw-5C
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:42:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fG3hA-0007q4-HD
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:34:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44238 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fG3hA-0007pf-D8
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:34:24 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180502104740.12123-2-peterx@redhat.com> (Peter Xu's message of
-	"Wed, 2 May 2018 18:47:17 +0800")
-References: <20180502104740.12123-1-peterx@redhat.com>
-	<20180502104740.12123-2-peterx@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Tue, 08 May 2018 16:36:26 +0200
-Message-ID: <87y3gu6wph.fsf@secure.laptop>
+	(envelope-from <eblake@redhat.com>) id 1fG3oX-0002Dl-21
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:42:04 -0400
+References: <1514187226.13662.28.camel@intel.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6e792b9f-2281-e8db-0410-c4c3468ffc90@redhat.com>
+Date: Tue, 8 May 2018 09:41:40 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v8 01/24] migration: let incoming side use
- thread context
+In-Reply-To: <1514187226.13662.28.camel@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Some question about savem/qcow2 incremental
+ snapshot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,24 +24,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: He Junyan <junyan.he@intel.com>, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>, qemu block <qemu-block@nongnu.org>
 
-Peter Xu <peterx@redhat.com> wrote:
-> The old incoming migration is running in main thread and default
-> gcontext.  With the new qio_channel_add_watch_full() we can now let it
-> run in the thread's own gcontext (if there is one).
->
-> Currently this patch does nothing alone.  But when any of the incoming
-> migration is run in another iothread (e.g., the upcoming migrate-recover
-> command), this patch will bind the incoming logic to the iothread
-> instead of the main thread (which may already get page faulted and
-> hanged).
->
-> RDMA is not considered for now since it's not even using the QIO watch
-> framework at all.
->
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+On 12/25/2017 01:33 AM, He Junyan wrote:
+> hi all:
+>=20
+> I am now focusing on snapshot optimization for Intel NVDimm kind
+> memory. Different from the normal memory, the NVDimm may be 128G, 256G
+> or even more for just one guest, and its speed is slower than the
+> normal memory. So sometimes it may take several minutes to complete
+> just one snapshot saving. Even with compression enabled, the=C2=A0snaps=
+hot
+> point may consume more than 30G disk space.
+> We decide to add incremental kind snapshot saving to resolve this. Just
+> store difference between snapshot points to save time and disk space.
+> But the current snapshot/save_vm framework seems not to support this.
+> We need to add snapshot dependency and extra operations when we LOAD
+> and DELETE the snapshot point.
+> Is that possible to modify the savevm framework and add some
+> incremental snapshot support to QCOW2 format?
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+In general, the list has tended to focus on external snapshots rather=20
+than internal; where persistent bitmaps have been the proposed mechanism=20
+for tracking incremental differences between snapshots.  But yes, it is=20
+certainly feasible that patches to improve internal snapshots to take=20
+advantage of incremental relationships may prove useful.  You will need=20
+to document all enhancements to the qcow2 file format and get that=20
+approved first, as interoperability demands that others reading the same=20
+spec would be able to interpret the image you create that is utilizing=20
+an internal snapshot with an incremental diff.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
