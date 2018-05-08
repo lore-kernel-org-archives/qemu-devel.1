@@ -1,26 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fFzNX-0004En-4T
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 05:57:51 -0400
+	(envelope-from <bounces@canonical.com>) id 1fFzad-0008Bf-GT
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:11:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fFzNU-0003Y8-0H
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 05:57:51 -0400
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:46697)
+	(envelope-from <bounces@canonical.com>) id 1fFzaX-0000do-U3
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:11:23 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59328)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fFzNT-0003X7-P5
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 05:57:47 -0400
-Received: by mail-wr0-x22d.google.com with SMTP id a12-v6so748295wrn.13
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 02:57:47 -0700 (PDT)
-Date: Tue, 8 May 2018 10:57:45 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180508095745.GC19710@stefanha-x1.localdomain>
-References: <1524894864-7492-1-git-send-email-jianjay.zhou@huawei.com>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fFzaX-0000dL-K2
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:11:17 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fFzaV-00085E-22
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 10:11:15 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 046622E80D6
+	for <qemu-devel@nongnu.org>; Tue,  8 May 2018 10:11:15 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="gr/z0/N6AeWAPJVB"
-Content-Disposition: inline
-In-Reply-To: <1524894864-7492-1-git-send-email-jianjay.zhou@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH] backends/cryptodev: fix coverity issue
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 08 May 2018 09:57:34 -0000
+From: ChristianEhrhardt <1769053@bugs.launchpad.net>
+Reply-To: Bug 1769053 <1769053@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152541524728.557.4600864098110042577.malonedeb@gac.canonical.com>
+	<152568921469.6485.15990399219355923244.malone@chaenomeles.canonical.com>
+	<20180508083722.GB2500@work-vm>
+Message-Id: <CAATJJ0LEGg1AZbfDjfA_SvWonA5VO-xd5XtG4t4cDTRz4ZyR8g@mail.gmail.com>
+Errors-To: bounces@canonical.com
+Subject: Re: [Qemu-devel] [Bug 1769053] Re: Cannot start a guest with more
+ than 1TB of RAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +39,255 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jay Zhou <jianjay.zhou@huawei.com>
-Cc: qemu-devel@nongnu.org, wangxinxin.wang@huawei.com, arei.gonglei@huawei.com, weidong.huang@huawei.com, mst@redhat.com
+To: qemu-devel@nongnu.org
+
+On Tue, May 8, 2018 at 10:37 AM, Dr. David Alan Gilbert <dgilbert@redhat.com
+> wrote:
+
+> * ChristianEhrhardt (1769053@bugs.launchpad.net) wrote:
+> > > Interesting; I thought this was supposed to work.
+> >
+> > Exactly that was my thought when triaging it initially
+> > Furthermore I assume people working la57 (https://lwn.net/Articles/
+> 730925/) and such ran tests on much bigger sizes.
+>
+> I assume so, but I've not looked at the detail of that.
+>
+> > > Ah right Dan, if you're seeing the 40 bits physical in the guest you
+> > definitely need to try the flags I suggest in comment 6; host-phys-
+> > bits=3Dtrue should work for you.
+> >
+> > I tested Bionic to be at least on libvirt 4.0 / qemu 2.11.1 when we want
+> > to check things under the "supposed to work now" flag.
+> >
+> > Defaults:
+> > Host:  address sizes   : 46 bits physical, 48 bits virtual
+> > Guest: address sizes   : 40 bits physical, 48 bits virtual
+> >
+> > I ensured that with option -cpu host,host-phys-bits=3Dtrue set I
+> successfully get what my host can provide in the guest:
+> > Guest: address sizes   : 46 bits physical, 48 bits virtual
+> >
+> > Starting a guest with that >1TB (that would be mostly on swap if needed)
+> works just fine as expected. Here ~1063 GB from /proc/meminfo
+> > MemTotal:       1114676492 kB
+>
+> OK, good - that suggests there's nothing missing.
+> We enable host-phys-bits=3Dtrue by default I think (in our machine type?)
+>
+
+Interesting approach, I see your comment about that already in [1] when it
+was added.
+I didn't realize some machine types were setting this already - I assume it
+isn't the general default for migratebility to other hosts (like our 36/39
+bit laptops).
+
+I assume "we" in this context are RedHat downstream changes to the (some)
+machine type(s)?
+I see the benefit for huge guests to work without setting those properties,
+but I wonder if that caused you trouble in regard to migrations?
+
+[1]: https://patchwork.kernel.org/patch/9223999/
 
 
---gr/z0/N6AeWAPJVB
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> > I also checked a more compatible approach like -cpu qemu64,phys-bits=3D=
+42
+> > and that works as well.
+> >
+> > IMHO - if anything - one could argue that libvirt/qemu could be smarter
+> > about e.g. auto adding those arguments (or print a warning) when
+> > crossing a certain memory size.
+>
+> The problem is there are a whole bunch of things that are hard to deal
+> with:
+>   a) Cheaper CPUs tend to have smaller phys-bits even in the same
+> generation; e.g. my laptop is still 36 bits, a lot are 39 bits.  I think
+> the same is true of the Xeon E3-.... family.   It makes it hard to know
+> what to pick when you're going to allow migration.
+>
+>   b) Reasoning about the total address size range is difficult; you've
+> got to take into account PCI address space and hot plug space etc
+> to know where the upper edge is.
+>
 
-On Sat, Apr 28, 2018 at 01:54:24PM +0800, Jay Zhou wrote:
-> This patch removes the dead code, which fixes Coverity (CID 1390600) issu=
-e.
->=20
-> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
-> ---
->  backends/cryptodev-vhost-user.c | 5 -----
->  1 file changed, 5 deletions(-)
+I agree that checking the total address size might have too much false
+positives for all the complexities around "estimating" that size.
+/me is giving up this idea :-)
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---gr/z0/N6AeWAPJVB
-Content-Type: application/pgp-signature; name="signature.asc"
+> Dave
+>
+> > So for now I'd stick to the "actually works" summary and keep the status
+> > to incomplete.
+> >
+> > --
+> > You received this bug notification because you are subscribed to the bug
+> > report.
+> > https://bugs.launchpad.net/bugs/1769053
+> >
+> > Title:
+> >   Cannot start a guest with more than 1TB of RAM
+> >
+> > Status in QEMU:
+> >   Incomplete
+> > Status in qemu package in Ubuntu:
+> >   Incomplete
+> >
+> > Bug description:
+> >   Attempting to start a KVM guest with more than 1TB of RAM fails.
+> >
+> >   It looks like we might need some extra patches:
+> >   https://lists.gnu.org/archive/html/qemu-discuss/2017-12/msg00005.html
+> >
+> >   ProblemType: Bug
+> >   DistroRelease: Ubuntu 18.04
+> >   Package: qemu-system-x86 1:2.11+dfsg-1ubuntu7
+> >   ProcVersionSignature: Ubuntu 4.15.0-20.21-generic 4.15.17
+> >   Uname: Linux 4.15.0-20-generic x86_64
+> >   ApportVersion: 2.20.9-0ubuntu7
+> >   Architecture: amd64
+> >   CurrentDesktop: Unity:Unity7:ubuntu
+> >   Date: Fri May  4 16:21:14 2018
+> >   InstallationDate: Installed on 2017-04-05 (393 days ago)
+> >   InstallationMedia: Ubuntu 16.10 "Yakkety Yak" - Release amd64
+> (20161012.2)
+> >   MachineType: Dell Inc. XPS 13 9360
+> >   ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.15.0-20-generic
+> root=3D/dev/mapper/ubuntu--vg-root ro quiet splash
+> transparent_hugepage=3Dmadvise vt.handoff=3D1
+> >   SourcePackage: qemu
+> >   UpgradeStatus: Upgraded to bionic on 2018-04-30 (3 days ago)
+> >   dmi.bios.date: 02/26/2018
+> >   dmi.bios.vendor: Dell Inc.
+> >   dmi.bios.version: 2.6.2
+> >   dmi.board.name: 0PF86Y
+> >   dmi.board.vendor: Dell Inc.
+> >   dmi.board.version: A00
+> >   dmi.chassis.type: 9
+> >   dmi.chassis.vendor: Dell Inc.
+> >   dmi.modalias: dmi:bvnDellInc.:bvr2.6.2:bd02/26/2018:svnDellInc.:
+> pnXPS139360:pvr:rvnDellInc.:rn0PF86Y:rvrA00:cvnDellInc.:ct9:cvr:
+> >   dmi.product.family: XPS
+> >   dmi.product.name: XPS 13 9360
+> >   dmi.sys.vendor: Dell Inc.
+> >
+> > To manage notifications about this bug go to:
+> > https://bugs.launchpad.net/qemu/+bug/1769053/+subscriptions
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+> --
+> You received this bug notification because you are a member of Ubuntu
+> Virtualisation team, which is subscribed to qemu in Ubuntu.
+> https://bugs.launchpad.net/bugs/1769053
+>
+> Title:
+>   Cannot start a guest with more than 1TB of RAM
+>
+> Status in QEMU:
+>   Incomplete
+> Status in qemu package in Ubuntu:
+>   Incomplete
+>
+> Bug description:
+>   Attempting to start a KVM guest with more than 1TB of RAM fails.
+>
+>   It looks like we might need some extra patches:
+>   https://lists.gnu.org/archive/html/qemu-discuss/2017-12/msg00005.html
+>
+>   ProblemType: Bug
+>   DistroRelease: Ubuntu 18.04
+>   Package: qemu-system-x86 1:2.11+dfsg-1ubuntu7
+>   ProcVersionSignature: Ubuntu 4.15.0-20.21-generic 4.15.17
+>   Uname: Linux 4.15.0-20-generic x86_64
+>   ApportVersion: 2.20.9-0ubuntu7
+>   Architecture: amd64
+>   CurrentDesktop: Unity:Unity7:ubuntu
+>   Date: Fri May  4 16:21:14 2018
+>   InstallationDate: Installed on 2017-04-05 (393 days ago)
+>   InstallationMedia: Ubuntu 16.10 "Yakkety Yak" - Release amd64
+> (20161012.2)
+>   MachineType: Dell Inc. XPS 13 9360
+>   ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.15.0-20-generic
+> root=3D/dev/mapper/ubuntu--vg-root ro quiet splash
+> transparent_hugepage=3Dmadvise vt.handoff=3D1
+>   SourcePackage: qemu
+>   UpgradeStatus: Upgraded to bionic on 2018-04-30 (3 days ago)
+>   dmi.bios.date: 02/26/2018
+>   dmi.bios.vendor: Dell Inc.
+>   dmi.bios.version: 2.6.2
+>   dmi.board.name: 0PF86Y
+>   dmi.board.vendor: Dell Inc.
+>   dmi.board.version: A00
+>   dmi.chassis.type: 9
+>   dmi.chassis.vendor: Dell Inc.
+>   dmi.modalias: dmi:bvnDellInc.:bvr2.6.2:bd02/26/2018:svnDellInc.:
+> pnXPS139360:pvr:rvnDellInc.:rn0PF86Y:rvrA00:cvnDellInc.:ct9:cvr:
+>   dmi.product.family: XPS
+>   dmi.product.name: XPS 13 9360
+>   dmi.sys.vendor: Dell Inc.
+>
+> To manage notifications about this bug go to:
+> https://bugs.launchpad.net/qemu/+bug/1769053/+subscriptions
+>
 
------BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJa8XSZAAoJEJykq7OBq3PIEPgIAKvOZVai0dmnUxjUbLV3AQrH
-hr0Elee1BHpwNJbbTwjJXqP0zQfZNuBZhdjZTy1htCpem9B5uVi6jDSIwxa5R4lT
-UY/RdW6mSQTke+5mSsExxkkf7Gak8ZL01n+NDOsY5s28u26psdVzOFNBuF2k1RF/
-YKXrol7N7J9OIfnh/Bt+PRP2k9uIjWPdeiR3gu0Gc83O6BtfihxH2QBaVB3Cr/6i
-h6085+LbrW1dYHbfjqNwsHcBquSml12jYv6K+KPCzQzCzkt8PzWbDsaD2A10OeFV
-zglsJiQXHc8i57qqNxun7VEBHIg2EPYwR2bpLaw0aeJb5XdWANPU4on5+JGdnF4=
-=rLRv
------END PGP SIGNATURE-----
+-- =
 
---gr/z0/N6AeWAPJVB--
+Christian Ehrhardt
+Software Engineer, Ubuntu Server
+Canonical Ltd
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1769053
+
+Title:
+  Cannot start a guest with more than 1TB of RAM
+
+Status in QEMU:
+  Incomplete
+Status in qemu package in Ubuntu:
+  Incomplete
+
+Bug description:
+  Attempting to start a KVM guest with more than 1TB of RAM fails.
+
+  It looks like we might need some extra patches:
+  https://lists.gnu.org/archive/html/qemu-discuss/2017-12/msg00005.html
+
+  ProblemType: Bug
+  DistroRelease: Ubuntu 18.04
+  Package: qemu-system-x86 1:2.11+dfsg-1ubuntu7
+  ProcVersionSignature: Ubuntu 4.15.0-20.21-generic 4.15.17
+  Uname: Linux 4.15.0-20-generic x86_64
+  ApportVersion: 2.20.9-0ubuntu7
+  Architecture: amd64
+  CurrentDesktop: Unity:Unity7:ubuntu
+  Date: Fri May  4 16:21:14 2018
+  InstallationDate: Installed on 2017-04-05 (393 days ago)
+  InstallationMedia: Ubuntu 16.10 "Yakkety Yak" - Release amd64 (20161012.2)
+  MachineType: Dell Inc. XPS 13 9360
+  ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.15.0-20-generic root=3D/dev/ma=
+pper/ubuntu--vg-root ro quiet splash transparent_hugepage=3Dmadvise vt.hand=
+off=3D1
+  SourcePackage: qemu
+  UpgradeStatus: Upgraded to bionic on 2018-04-30 (3 days ago)
+  dmi.bios.date: 02/26/2018
+  dmi.bios.vendor: Dell Inc.
+  dmi.bios.version: 2.6.2
+  dmi.board.name: 0PF86Y
+  dmi.board.vendor: Dell Inc.
+  dmi.board.version: A00
+  dmi.chassis.type: 9
+  dmi.chassis.vendor: Dell Inc.
+  dmi.modalias: dmi:bvnDellInc.:bvr2.6.2:bd02/26/2018:svnDellInc.:pnXPS1393=
+60:pvr:rvnDellInc.:rn0PF86Y:rvrA00:cvnDellInc.:ct9:cvr:
+  dmi.product.family: XPS
+  dmi.product.name: XPS 13 9360
+  dmi.sys.vendor: Dell Inc.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1769053/+subscriptions
