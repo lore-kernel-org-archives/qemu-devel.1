@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fG6Te-0000BP-L7
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 13:32:39 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fG6Th-0000EW-Dc
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 13:32:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fG6Td-0005Z0-NY
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 13:32:38 -0400
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:33007)
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fG6Tg-0005a5-PW
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 13:32:41 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:46696)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1fG6Td-0005Yb-GK
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 13:32:37 -0400
-Received: by mail-lf0-x241.google.com with SMTP id m18-v6so47060288lfb.0
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 10:32:37 -0700 (PDT)
+	id 1fG6Tg-0005Zj-IK
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 13:32:40 -0400
+Received: by mail-lf0-x243.google.com with SMTP id x7-v6so12048149lff.13
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 10:32:40 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Tue,  8 May 2018 19:31:43 +0200
-Message-Id: <20180508173152.29327-28-edgar.iglesias@gmail.com>
+Date: Tue,  8 May 2018 19:31:45 +0200
+Message-Id: <20180508173152.29327-30-edgar.iglesias@gmail.com>
 In-Reply-To: <20180508173152.29327-1-edgar.iglesias@gmail.com>
 References: <20180508173152.29327-1-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 27/36] target-microblaze: mmu: Add a
- configurable output address mask
+Subject: [Qemu-devel] [PATCH v2 29/36] target-microblaze: Allow address
+ sizes between 32 and 64 bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,52 +32,30 @@ Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, frederic.konrad@adac
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Add a configurable output address mask, used to mimic the
-configurable physical address bit width.
+Allow address sizes between 32 and 64 bits.
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- target/microblaze/cpu.c | 1 +
- target/microblaze/mmu.c | 1 +
- target/microblaze/mmu.h | 1 +
- 3 files changed, 3 insertions(+)
+ target/microblaze/cpu.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
-index 2b3f8fa374..d0649fdaaa 100644
+index d0649fdaaa..8c1f850ab1 100644
 --- a/target/microblaze/cpu.c
 +++ b/target/microblaze/cpu.c
-@@ -128,6 +128,7 @@ static void mb_cpu_reset(CPUState *s)
-     env->mmu.c_mmu = 3;
-     env->mmu.c_mmu_tlb_access = 3;
-     env->mmu.c_mmu_zones = 16;
-+    env->mmu.c_addr_mask = MAKE_64BIT_MASK(0, cpu->cfg.addr_size);
- #endif
- }
+@@ -155,9 +155,8 @@ static void mb_cpu_realizefn(DeviceState *dev, Error **errp)
+         return;
+     }
  
-diff --git a/target/microblaze/mmu.c b/target/microblaze/mmu.c
-index a379968618..166c79908c 100644
---- a/target/microblaze/mmu.c
-+++ b/target/microblaze/mmu.c
-@@ -164,6 +164,7 @@ unsigned int mmu_translate(struct microblaze_mmu *mmu,
-             tlb_rpn = d & TLB_RPN_MASK;
- 
-             lu->vaddr = tlb_tag;
-+            lu->paddr = tlb_rpn & mmu->c_addr_mask;
-             lu->paddr = tlb_rpn;
-             lu->size = tlb_size;
-             lu->err = ERR_HIT;
-diff --git a/target/microblaze/mmu.h b/target/microblaze/mmu.h
-index 1714caf82e..9fbdf38f36 100644
---- a/target/microblaze/mmu.h
-+++ b/target/microblaze/mmu.h
-@@ -72,6 +72,7 @@ struct microblaze_mmu
-     int c_mmu;
-     int c_mmu_tlb_access;
-     int c_mmu_zones;
-+    uint64_t c_addr_mask; /* Mask to apply to physical addresses.  */
- };
- 
- struct microblaze_mmu_lookup
+-    if (cpu->cfg.addr_size != 32) {
+-        error_setg(errp, "addr-size %d is out of range. "
+-                   "Only 32bit is supported.",
++    if (cpu->cfg.addr_size < 32 || cpu->cfg.addr_size > 64) {
++        error_setg(errp, "addr-size %d is out of range (32 - 64)",
+                    cpu->cfg.addr_size);
+         return;
+     }
 -- 
 2.14.1
