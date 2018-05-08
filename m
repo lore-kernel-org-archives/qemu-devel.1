@@ -1,22 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43401)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fG08k-00073e-Su
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:46:40 -0400
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fG09A-0007Ec-Ef
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:47:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fG08j-0004np-Tz
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:46:38 -0400
-Date: Tue, 8 May 2018 12:46:23 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180508104623.GA4065@localhost.localdomain>
-References: <20180427162312.18583-1-stefanha@redhat.com>
-	<20180508103232.GI19710@stefanha-x1.localdomain>
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fG095-0004uX-3y
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:47:03 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59816)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <akrowiak@linux.vnet.ibm.com>)
+	id 1fG094-0004uA-SF
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:46:59 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w48AeEGI079788
+	for <qemu-devel@nongnu.org>; Tue, 8 May 2018 06:46:57 -0400
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2hu6wfhdt4-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 06:46:57 -0400
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <akrowiak@linux.vnet.ibm.com>;
+	Tue, 8 May 2018 06:46:55 -0400
+References: <1523819244-29954-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<1523819244-29954-4-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<819cba2d-32d7-6a5c-978f-1c6aa04872fa@linux.vnet.ibm.com>
+	<bf3ac9e4-1f53-0372-450d-1a84f780d25e@linux.vnet.ibm.com>
+	<204d8b6e-0068-d8de-ebe6-2598d136997d@linux.ibm.com>
+From: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+Date: Tue, 8 May 2018 06:46:48 -0400
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="BXVAT5kNtrzKuDFl"
-Content-Disposition: inline
-In-Reply-To: <20180508103232.GI19710@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 0/2] block/file-posix:
- allow -drive cache.direct=off live migration
+In-Reply-To: <204d8b6e-0068-d8de-ebe6-2598d136997d@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Message-Id: <6bcce046-0019-02e2-b394-5751bd439530@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v4 3/5] s390x/cpumodel: Set up CPU model
+ for AP device support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,101 +46,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, Fam Zheng <famz@redhat.com>, Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Halil Pasic <pasic@linux.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: mjrosato@linux.vnet.ibm.com, peter.maydell@linaro.org, alifm@linux.vnet.ibm.com, eskultet@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, cohuck@redhat.com, heiko.carstens@de.ibm.com, alex.williamson@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, jjherne@linux.vnet.ibm.com, schwidefsky@de.ibm.com, pbonzini@redhat.com, bjsdjshi@linux.vnet.ibm.com, eric.auger@redhat.com, rth@twiddle.net
 
+On 04/22/2018 12:01 PM, Halil Pasic wrote:
+>
+>
+> On 04/22/2018 05:43 PM, Tony Krowiak wrote:
+>>>> +    FEAT_INIT_MISC("ap", "AP facilities installed"),
+>>>
+>>> Why plural ('facilities')? Would not s/facilities/instructions be 
+>>> more end-user
+>>> friendly?
+>>
+>> It's a matter of opinion. I prefer facilities because AP is comprised 
+>> of not only
+>> instructions, but also AP processors.
+>
+> Please elaborate. You mean processors like AP cards? If yes what if 
+> the matrix is
+> empty (e.g. the state we decided is the default when no further action 
+> is taken
+> (assign queues to the vfio-ap kernel driver, set up an mdev, -device 
+> vfio-ap on
+> qemu cmd line))?
+>
+> I just wanted to point out that this plural is very vague. Not 
+> speaking about that
+> QCI should be an AP facility too, but is not included in this 
+> 'features' and is not
+> covered by this cpu model feature. It has it's own cpu model feature 
+> and even a
+> dedicated STFLE bit.
 
---BXVAT5kNtrzKuDFl
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+FYI, I decided to take your suggestion and go with 'AP instructions 
+installed'.
 
-Am 08.05.2018 um 12:32 hat Stefan Hajnoczi geschrieben:
-> On Fri, Apr 27, 2018 at 05:23:10PM +0100, Stefan Hajnoczi wrote:
-> > v2:
-> >  * Add comment on !__linux__ situation [Fam]
-> >  * Add file-posix.c x-check-cache-dropped=3Don|off option [DaveG, Kevin]
-> >=20
-> > file-posix.c only supports shared storage live migration with -drive
-> > cache.direct=3Doff due to cache consistency issues.  There are two main=
- shared
-> > storage configurations: files on NFS and host block devices on SAN LUNs.
-> >=20
-> > The problem is that QEMU starts on the destination host before the sour=
-ce host
-> > has written everything out to the disk.  The page cache on the destinat=
-ion host
-> > may contain stale data read when QEMU opened the image file (before mig=
-ration
-> > handover).  Using O_DIRECT avoids this problem but prevents users from =
-taking
-> > advantage of the host page cache.
-> >=20
-> > Although cache=3Dnone is the recommended setting for virtualization use=
- cases,
-> > there are scenarios where cache=3Dwriteback makes sense.  If the guest =
-has much
-> > less RAM than the host or many guests share the same backing file, then=
- the
-> > host page cache can significantly improve disk I/O performance.
-> >=20
-> > This patch series implements .bdrv_co_invalidate_cache() for block/file=
--posix.c
-> > on Linux so that shared storage live migration works.  I have sent it a=
-s an RFC
-> > because cache consistency is not binary, there are corner cases which I=
-'ve
-> > described in the actual patch, and this may require more discussion.
-> >=20
-> > Regarding NFS, QEMU relies on O_DIRECT rather than the close-to-open
-> > consistency model (see nfs(5)), which is the basic guarantee provided b=
-y NFS.
-> > After this patch cache consistency is no longer provided by O_DIRECT.
-> >=20
-> > This patch series relies on fdatasync(2) (source) +
-> > posix_fadvise(POSIX_FADV_DONTNEED) (destination) instead.  I believe it=
- is safe
-> > for both NFS and SAN LUNs.  Maybe we should use fsync(2) instead of
-> > fdatasync(2) so that NFS has up-to-date inode metadata?
-> >=20
-> > Stefan Hajnoczi (2):
-> >   block/file-posix: implement bdrv_co_invalidate_cache() on Linux
-> >   block/file-posix: add x-check-page-cache=3Don|off option
-> >=20
-> >  qapi/block-core.json |   7 ++-
-> >  block/file-posix.c   | 146 +++++++++++++++++++++++++++++++++++++++++++=
-+++++++-
-> >  2 files changed, 150 insertions(+), 3 deletions(-)
->=20
-> Kevin: Are you happy with this series?
-
-Yes, I think I am.
-
-I'm still kind of concerned about misleading people into believing that
-cache=3Dwriteback + live migration is generally safe when it's only in
-special cases, but that's not really a concern about the code, but about
-how we communicate the feature.
-
-Kevin
-
---BXVAT5kNtrzKuDFl
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJa8X//AAoJEH8JsnLIjy/WCS0P/1AdQjepzUNrMRnAqwdbTuJu
-u+Wm47AT0MvGj1ZOZWm5IJ269q2dZBx/OFsEHXrA5+ZWP+v/SSYiNc3Hf56LcBkd
-UiMxqCUOsG4IdlCGDcqMRHWeCOQhOafQyVad+VFhXfNUKXTd0qzbykvJ3PfO9NQ3
-k/LrnVntXzszJJEdzAgQTDZhfLLsAJXuup4vnyopDOha7FcOOGAfvlcORmjhLRAM
-JUZxa4+Wqlu54SnMJyUyqKmnHT+D/74PrjY5Gtd46wCYN+G/S8srXubxQ0LE68fI
-GXqJfGTsCjv01pBvUWnf8U0aK2DIbMh3GkcEn8dj7OTH9UGXHWY0jPBkE7bBkVJT
-SObvFZERX7YDEgsiP4WwPRrstTm7y4obJ3itdnVoyA03buNFT2BrK1YZb5FAMwe1
-eLV4WH06vIO2NPbYGNGvTUDOdVo88SEcBdRRi3jdEg2fwdrkTTveGONRqkHRoqSw
-KfT0WpVrWL2ldZWtBuBwSC43R6qeKRVZY6eM/yM0jztUoKXnO9D8bgC+MBn5Hj1Y
-4OzVjsmQ++ysToKjdmNdTX/eB19Zr5m3hsEJyR98h2oRxXDJtH4gBDsIdgd/dHiT
-KnwDiAACDVbyAEkkCsFz/thYhsJXYAVhuOi88A1WJygkYxmEOv2UUIbMDdmEPKXG
-05XuDW07JCRNMI4ySOlA
-=GtBt
------END PGP SIGNATURE-----
-
---BXVAT5kNtrzKuDFl--
+>
+>
+> Regards,
+> Halil
