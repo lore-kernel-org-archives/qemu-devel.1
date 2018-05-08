@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44086)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fG6TP-0008Mz-7B
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 13:32:24 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fG6TM-0008KO-LR
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 13:32:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fG6TO-0005R4-BM
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 13:32:23 -0400
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:41349)
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fG6TL-0005Pj-DG
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 13:32:20 -0400
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:42697)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1fG6TO-0005Qn-32
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 13:32:22 -0400
-Received: by mail-lf0-x241.google.com with SMTP id o123-v6so47032100lfe.8
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 10:32:21 -0700 (PDT)
+	id 1fG6TL-0005P4-1j
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 13:32:19 -0400
+Received: by mail-lf0-x244.google.com with SMTP id u21-v6so47043536lfu.9
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 10:32:18 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Tue,  8 May 2018 19:31:33 +0200
-Message-Id: <20180508173152.29327-18-edgar.iglesias@gmail.com>
+Date: Tue,  8 May 2018 19:31:31 +0200
+Message-Id: <20180508173152.29327-16-edgar.iglesias@gmail.com>
 In-Reply-To: <20180508173152.29327-1-edgar.iglesias@gmail.com>
 References: <20180508173152.29327-1-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 17/36] target-microblaze: dec_msr: Use bool
- and extract32
+Subject: [Qemu-devel] [PATCH v2 15/36] target-microblaze: Break out
+ trap_userspace()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,48 +32,193 @@ Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, frederic.konrad@adac
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Use bool and extract32 to represent the to, clr and
-clrset flags.
+Break out trap_userspace() to avoid open coding it everywhere.
+For privileged insns, we now always stop translation of the
+current insn for cores without exceptions.
 
-No functional change.
-
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- target/microblaze/translate.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+ target/microblaze/translate.c | 76 +++++++++++++++----------------------------
+ 1 file changed, 27 insertions(+), 49 deletions(-)
 
 diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 4290fb2eaf..0593aff692 100644
+index 6cc92d09c9..c363619785 100644
 --- a/target/microblaze/translate.c
 +++ b/target/microblaze/translate.c
-@@ -458,17 +458,20 @@ static void dec_msr(DisasContext *dc)
- {
+@@ -179,6 +179,22 @@ static void write_carryi(DisasContext *dc, bool carry)
+     tcg_temp_free_i32(t0);
+ }
+ 
++/*
++ * Returns true if the insn is illegal in userspace.
++ * If exceptions are enabled, an exception is raised.
++ */
++static bool trap_userspace(DisasContext *dc, bool cond)
++{
++    int mem_index = cpu_mmu_index(&dc->cpu->env, false);
++    bool cond_user = cond && mem_index == MMU_USER_IDX;
++
++    if (cond_user && (dc->tb_flags & MSR_EE_FLAG)) {
++        tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
++        t_gen_raise_exception(dc, EXCP_HW_EXCP);
++    }
++    return cond_user;
++}
++
+ /* True if ALU operand b is a small immediate that may deserve
+    faster treatment.  */
+ static inline int dec_alu_op_b_is_small_imm(DisasContext *dc)
+@@ -432,7 +448,6 @@ static void dec_msr(DisasContext *dc)
      CPUState *cs = CPU(dc->cpu);
      TCGv_i32 t0, t1;
--    unsigned int sr, to, rn;
-+    unsigned int sr, rn;
-+    bool to, clrset;
+     unsigned int sr, to, rn;
+-    int mem_index = cpu_mmu_index(&dc->cpu->env, false);
  
--    sr = dc->imm & ((1 << 14) - 1);
--    to = dc->imm & (1 << 14);
-+    sr = extract32(dc->imm, 0, 14);
-+    to = extract32(dc->imm, 14, 1);
-+    clrset = extract32(dc->imm, 15, 1) == 0;
-     dc->type_b = 1;
--    if (to)
-+    if (to) {
-         dc->cpustate_changed = 1;
+     sr = dc->imm & ((1 << 14) - 1);
+     to = dc->imm & (1 << 14);
+@@ -452,10 +467,7 @@ static void dec_msr(DisasContext *dc)
+             return;
+         }
+ 
+-        if ((dc->tb_flags & MSR_EE_FLAG)
+-            && mem_index == MMU_USER_IDX && (dc->imm != 4 && dc->imm != 0)) {
+-            tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
+-            t_gen_raise_exception(dc, EXCP_HW_EXCP);
++        if (trap_userspace(dc, dc->imm != 4 && dc->imm != 0)) {
+             return;
+         }
+ 
+@@ -480,13 +492,8 @@ static void dec_msr(DisasContext *dc)
+         return;
+     }
+ 
+-    if (to) {
+-        if ((dc->tb_flags & MSR_EE_FLAG)
+-             && mem_index == MMU_USER_IDX) {
+-            tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
+-            t_gen_raise_exception(dc, EXCP_HW_EXCP);
+-            return;
+-        }
++    if (trap_userspace(dc, to)) {
++        return;
+     }
+ 
+ #if !defined(CONFIG_USER_ONLY)
+@@ -738,7 +745,6 @@ static void dec_bit(DisasContext *dc)
+     CPUState *cs = CPU(dc->cpu);
+     TCGv_i32 t0;
+     unsigned int op;
+-    int mem_index = cpu_mmu_index(&dc->cpu->env, false);
+ 
+     op = dc->ir & ((1 << 9) - 1);
+     switch (op) {
+@@ -784,22 +790,12 @@ static void dec_bit(DisasContext *dc)
+         case 0x76:
+             /* wdc.  */
+             LOG_DIS("wdc r%d\n", dc->ra);
+-            if ((dc->tb_flags & MSR_EE_FLAG)
+-                 && mem_index == MMU_USER_IDX) {
+-                tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
+-                t_gen_raise_exception(dc, EXCP_HW_EXCP);
+-                return;
+-            }
++            trap_userspace(dc, true);
+             break;
+         case 0x68:
+             /* wic.  */
+             LOG_DIS("wic r%d\n", dc->ra);
+-            if ((dc->tb_flags & MSR_EE_FLAG)
+-                 && mem_index == MMU_USER_IDX) {
+-                tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
+-                t_gen_raise_exception(dc, EXCP_HW_EXCP);
+-                return;
+-            }
++            trap_userspace(dc, true);
+             break;
+         case 0xe0:
+             if ((dc->tb_flags & MSR_EE_FLAG)
+@@ -1199,7 +1195,6 @@ static void dec_bcc(DisasContext *dc)
+ static void dec_br(DisasContext *dc)
+ {
+     unsigned int dslot, link, abs, mbar;
+-    int mem_index = cpu_mmu_index(&dc->cpu->env, false);
+ 
+     dslot = dc->ir & (1 << 20);
+     abs = dc->ir & (1 << 19);
+@@ -1254,9 +1249,7 @@ static void dec_br(DisasContext *dc)
+             if (!(dc->tb_flags & IMM_FLAG) && (dc->imm == 8 || dc->imm == 0x18))
+                 t_gen_raise_exception(dc, EXCP_BREAK);
+             if (dc->imm == 0) {
+-                if ((dc->tb_flags & MSR_EE_FLAG) && mem_index == MMU_USER_IDX) {
+-                    tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
+-                    t_gen_raise_exception(dc, EXCP_HW_EXCP);
++                if (trap_userspace(dc, true)) {
+                     return;
+                 }
+ 
+@@ -1331,12 +1324,15 @@ static inline void do_rte(DisasContext *dc)
+ static void dec_rts(DisasContext *dc)
+ {
+     unsigned int b_bit, i_bit, e_bit;
+-    int mem_index = cpu_mmu_index(&dc->cpu->env, false);
+ 
+     i_bit = dc->ir & (1 << 21);
+     b_bit = dc->ir & (1 << 22);
+     e_bit = dc->ir & (1 << 23);
+ 
++    if (trap_userspace(dc, i_bit || b_bit || e_bit)) {
++        return;
 +    }
++
+     dc->delayed_branch = 2;
+     dc->tb_flags |= D_FLAG;
+     tcg_gen_st_i32(tcg_const_i32(dc->type_b && (dc->tb_flags & IMM_FLAG)),
+@@ -1344,27 +1340,12 @@ static void dec_rts(DisasContext *dc)
  
-     /* msrclr and msrset.  */
--    if (!(dc->imm & (1 << 15))) {
--        unsigned int clr = dc->ir & (1 << 16);
-+    if (clrset) {
-+        bool clr = extract32(dc->ir, 16, 1);
+     if (i_bit) {
+         LOG_DIS("rtid ir=%x\n", dc->ir);
+-        if ((dc->tb_flags & MSR_EE_FLAG)
+-             && mem_index == MMU_USER_IDX) {
+-            tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
+-            t_gen_raise_exception(dc, EXCP_HW_EXCP);
+-        }
+         dc->tb_flags |= DRTI_FLAG;
+     } else if (b_bit) {
+         LOG_DIS("rtbd ir=%x\n", dc->ir);
+-        if ((dc->tb_flags & MSR_EE_FLAG)
+-             && mem_index == MMU_USER_IDX) {
+-            tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
+-            t_gen_raise_exception(dc, EXCP_HW_EXCP);
+-        }
+         dc->tb_flags |= DRTB_FLAG;
+     } else if (e_bit) {
+         LOG_DIS("rted ir=%x\n", dc->ir);
+-        if ((dc->tb_flags & MSR_EE_FLAG)
+-             && mem_index == MMU_USER_IDX) {
+-            tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
+-            t_gen_raise_exception(dc, EXCP_HW_EXCP);
+-        }
+         dc->tb_flags |= DRTE_FLAG;
+     } else
+         LOG_DIS("rts ir=%x\n", dc->ir);
+@@ -1503,16 +1484,13 @@ static void dec_null(DisasContext *dc)
+ /* Insns connected to FSL or AXI stream attached devices.  */
+ static void dec_stream(DisasContext *dc)
+ {
+-    int mem_index = cpu_mmu_index(&dc->cpu->env, false);
+     TCGv_i32 t_id, t_ctrl;
+     int ctrl;
  
-         LOG_DIS("msr%s r%d imm=%x\n", clr ? "clr" : "set",
-                 dc->rd, dc->imm);
+     LOG_DIS("%s%s imm=%x\n", dc->rd ? "get" : "put",
+             dc->type_b ? "" : "d", dc->imm);
+ 
+-    if ((dc->tb_flags & MSR_EE_FLAG) && (mem_index == MMU_USER_IDX)) {
+-        tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
+-        t_gen_raise_exception(dc, EXCP_HW_EXCP);
++    if (trap_userspace(dc, true)) {
+         return;
+     }
+ 
 -- 
 2.14.1
