@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fG44l-0000Id-Rj
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:58:50 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fG44q-0000MH-Eq
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:58:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fG44h-0001Z3-DF
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:58:47 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fG44m-0001dT-4L
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:58:52 -0400
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Tue,  8 May 2018 17:58:13 +0300
-Message-Id: <1525791496-125188-7-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Tue,  8 May 2018 17:58:16 +0300
+Message-Id: <1525791496-125188-10-git-send-email-anton.nefedov@virtuozzo.com>
 In-Reply-To: <1525791496-125188-1-git-send-email-anton.nefedov@virtuozzo.com>
 References: <1525791496-125188-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v9 6/9] file-posix: support BDRV_REQ_ALLOCATE
+Subject: [Qemu-devel] [PATCH v9 9/9] iotest 134: test cluster-misaligned
+ encrypted write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,51 +25,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, den@virtuozzo.com, berto@igalia.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-Current write_zeroes implementation is good enough to satisfy this flag too
+COW (even empty/zero) areas require encryption too
 
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block/file-posix.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/134     |  9 +++++++++
+ tests/qemu-iotests/134.out | 10 ++++++++++
+ 2 files changed, 19 insertions(+)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 3794c00..3795e1c 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -560,7 +560,10 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
-     }
-     if (S_ISREG(st.st_mode)) {
-         s->discard_zeroes = true;
-+#ifdef CONFIG_FALLOCATE
-         s->has_fallocate = true;
-+        bs->supported_zero_flags |= BDRV_REQ_ALLOCATE;
-+#endif
-     }
-     if (S_ISBLK(st.st_mode)) {
- #ifdef BLKDISCARDZEROES
-@@ -595,10 +598,11 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
- #ifdef CONFIG_XFS
-     if (platform_test_xfs_fd(s->fd)) {
-         s->is_xfs = true;
-+        bs->supported_zero_flags |= BDRV_REQ_ALLOCATE;
-     }
- #endif
+diff --git a/tests/qemu-iotests/134 b/tests/qemu-iotests/134
+index 9914415..6083ae4 100755
+--- a/tests/qemu-iotests/134
++++ b/tests/qemu-iotests/134
+@@ -59,6 +59,15 @@ echo "== reading whole image =="
+ $QEMU_IO --object $SECRET -c "read 0 $size" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
  
--    bs->supported_zero_flags = s->discard_zeroes ? BDRV_REQ_MAY_UNMAP : 0;
-+    bs->supported_zero_flags |= s->discard_zeroes ? BDRV_REQ_MAY_UNMAP : 0;
-     ret = 0;
- fail:
-     if (filename && (bdrv_flags & BDRV_O_TEMPORARY)) {
-@@ -1416,6 +1420,10 @@ static ssize_t handle_aiocb_write_zeroes(RawPosixAIOData *aiocb)
-         }
-         s->has_fallocate = false;
-     }
+ echo
++echo "== rewriting cluster part =="
++$QEMU_IO --object $SECRET -c "write -P 0xb 512 512" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
 +
-+    if (!s->has_fallocate) {
-+        aiocb->bs->supported_zero_flags &= ~BDRV_REQ_ALLOCATE;
-+    }
- #endif
++echo
++echo "== verify pattern =="
++$QEMU_IO --object $SECRET -c "read -P 0 0 512"  --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
++$QEMU_IO --object $SECRET -c "read -P 0xb 512 512"  --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
++
++echo
+ echo "== rewriting whole image =="
+ $QEMU_IO --object $SECRET -c "write -P 0xa 0 $size" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
  
-     return -ENOTSUP;
+diff --git a/tests/qemu-iotests/134.out b/tests/qemu-iotests/134.out
+index 972be49..09d46f6 100644
+--- a/tests/qemu-iotests/134.out
++++ b/tests/qemu-iotests/134.out
+@@ -5,6 +5,16 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption=on encrypt.
+ read 134217728/134217728 bytes at offset 0
+ 128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
++== rewriting cluster part ==
++wrote 512/512 bytes at offset 512
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++== verify pattern ==
++read 512/512 bytes at offset 0
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 512/512 bytes at offset 512
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
+ == rewriting whole image ==
+ wrote 134217728/134217728 bytes at offset 0
+ 128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
 -- 
 2.7.4
