@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51964)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fG2Px-0001na-N8
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:12:34 -0400
+	(envelope-from <thuth@redhat.com>) id 1fG2Wu-0004GS-D0
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:19:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fG2Pt-00010Q-QQ
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:12:33 -0400
-References: <1525376963-79623-1-git-send-email-mst@redhat.com>
-	<1525376963-79623-17-git-send-email-mst@redhat.com>
-	<87wowe8hiw.fsf@secure.laptop>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <66f76f0b-6153-711e-6ebd-cacaeb0032fc@redhat.com>
-Date: Tue, 8 May 2018 08:12:14 -0500
+	(envelope-from <thuth@redhat.com>) id 1fG2Wr-0004Co-Oi
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:19:44 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33204 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fG2Wr-0004CW-K6
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:19:41 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E6D8681A88A2
+	for <qemu-devel@nongnu.org>; Tue,  8 May 2018 13:19:30 +0000 (UTC)
+References: <1525326658-3078-1-git-send-email-thuth@redhat.com>
+	<87k1slot93.fsf@dusky.pond.sub.org>
+	<54f1bb8c-c61e-557a-952d-92ba1297e818@redhat.com>
+	<87in80ym1o.fsf@dusky.pond.sub.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <9d66d071-324f-5d33-547d-901f497cb497@redhat.com>
+Date: Tue, 8 May 2018 15:19:24 +0200
 MIME-Version: 1.0
-In-Reply-To: <87wowe8hiw.fsf@secure.laptop>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <87in80ym1o.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 16/67] migration: use local path for local
- headers
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] net: Silence 'has no peer' messages in
+ testing mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,38 +37,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
 
-On 05/08/2018 07:21 AM, Juan Quintela wrote:
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
->> When pulling in headers that are in the same directory as C file (as
->> opposed to one in include/), we should use its relative path, without a
->> directory. Directory based path works more or less by accident.
-> 
-> No, it is not by accident.
-> qemu-version.h and config-host.h are on the root directory.  I could
-> agree with moving them.
-> 
+On 07.05.2018 09:14, Markus Armbruster wrote:
+[...]
+> Two (possibly confused) questions:
+>=20
+> 1. The user can add nics without convenience options:
+>=20
+>     $ upstream-qemu -display none -nodefaults -device e1000
+>     upstream-qemu: warning: nic e1000.0 has no peer
+>=20
+>    Shouldn't we silence the warning then, too?
 
->> -#include "migration/qemu-file.h"
->> +#include "qemu-file.h"
-> 
-> Substitite for "./qemu-file.h"?
-> 
-> My wonder here is what happens if we end with a file with the same name in
-> two places.
+No, since that is certainly a mis-configuration in that case. Why would
+a user want to add a NIC without host backend?
 
-We already have at least:
+> 2. We already have code to silence the warning:
+>=20
+>     /* Don't warn about the default network setup that you get if
+>      * no command line -net or -netdev options are specified. There
+>      * are two cases that we would otherwise complain about:
+>      * (1) board doesn't support a NIC but the implicit "-net nic"
+>      * requested one
+>      * (2) CONFIG_SLIRP not set, in which case the implicit "-net nic"
+>      * sets up a nic that isn't connected to anything.
+>      */
+>     if (!default_net) {
+>         net_check_clients();
+>     }
+>=20
+>    Is it a good idea to split the logic between net_check_clients() and
+>    its caller?
 
-include/qapi/qmp/qjson.h
-migration/qjson.h
+Hmm, it's likely nicer to keep everything in one place. Since
+"default_net" is only available in vl.c, I think the checks should go
+there... so I'll rework my patch accordingly.
 
-so it's not necessarily a theoretical question (things work now, but 
-renaming one or the other header may be in order as part of 
-consolidating everything into the /include hierarchy)
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+ Thomas
