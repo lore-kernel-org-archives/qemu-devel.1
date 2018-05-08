@@ -1,23 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59238)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fG2wL-0007JS-Gg
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:46:02 -0400
+	(envelope-from <pasic@linux.ibm.com>) id 1fG2xV-0007yM-52
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:47:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fG2wH-0007hK-DV
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:46:01 -0400
-Date: Tue, 8 May 2018 15:45:38 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180508154538.1b55f721.cohuck@redhat.com>
-In-Reply-To: <bc3f13f6-56fd-058d-d717-508b7034d437@redhat.com>
-References: <1525376963-79623-1-git-send-email-mst@redhat.com>
-	<1525376963-79623-5-git-send-email-mst@redhat.com>
-	<b3620ea6-0805-ccec-3bd5-11dc30bc2569@redhat.com>
-	<20180508152349.15ad26d0.cohuck@redhat.com>
-	<bc3f13f6-56fd-058d-d717-508b7034d437@redhat.com>
+	(envelope-from <pasic@linux.ibm.com>) id 1fG2xR-0008DG-1s
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:47:13 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32974
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fG2xQ-0008D5-RY
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:47:08 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w48DeAu2105042
+	for <qemu-devel@nongnu.org>; Tue, 8 May 2018 09:47:08 -0400
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2hua5m1qg8-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 09:47:07 -0400
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Tue, 8 May 2018 14:47:06 +0100
+References: <1525782303-16940-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<1525782303-16940-7-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<20180508144608.4c4e8180.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.ibm.com>
+Date: Tue, 8 May 2018 15:47:01 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20180508144608.4c4e8180.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 04/67] s390x: drop an unused include
+Message-Id: <e8e66bb4-f9bf-7674-c2f4-6dc10edb737b@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v5 6/6] MAINTAINERS: add entries for AP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,61 +43,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, David Hildenbrand <david@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>, Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+Cc: mjrosato@linux.vnet.ibm.com, alex.williamson@redhat.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, david@redhat.com, peter.maydell@linaro.org, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, heiko.carstens@de.ibm.com, qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, jjherne@linux.vnet.ibm.com, schwidefsky@de.ibm.com, pbonzini@redhat.com, bjsdjshi@linux.vnet.ibm.com, eric.auger@redhat.com, rth@twiddle.net
 
-On Tue, 8 May 2018 15:38:03 +0200
-Thomas Huth <thuth@redhat.com> wrote:
 
-> On 08.05.2018 15:23, Cornelia Huck wrote:
-> > On Fri, 4 May 2018 02:24:12 +0200
-> > Thomas Huth <thuth@redhat.com> wrote:
-> >   
-> >> On 03.05.2018 21:50, Michael S. Tsirkin wrote:  
-> >>> we just need a struct name, let's add a forward
-> >>> declaration instead of an include.
-> >>>
-> >>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> >>> ---
-> >>>  include/hw/s390x/sclp.h | 3 ++-
-> >>>  1 file changed, 2 insertions(+), 1 deletion(-)
-> >>>
-> >>> diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
-> >>> index f9db243..6e65150 100644
-> >>> --- a/include/hw/s390x/sclp.h
-> >>> +++ b/include/hw/s390x/sclp.h
-> >>> @@ -16,7 +16,8 @@
-> >>>  
-> >>>  #include "hw/sysbus.h"
-> >>>  #include "hw/qdev.h"
-> >>> -#include "target/s390x/cpu-qom.h"
-> >>> +
-> >>> +typedef struct CPUS390XState CPUS390XState;    
-> >>
-> >> IIRC you have to use include/qemu/typedefs.h instead to avoid trouble
-> >> with older versions of GCC.  
-> > 
-> > Hm, I'm wondering why we do the typedef in cpu-qom.h, while other
-> > architectures do it in their cpu.h.  
+
+On 05/08/2018 02:46 PM, Cornelia Huck wrote:
+> On Tue,  8 May 2018 08:25:03 -0400
+> Tony Krowiak <akrowiak@linux.vnet.ibm.com> wrote:
 > 
-> See:
+>> Added entries for the s390 adjunct processor (AP) support.
+>>
+>> Signed-off-by: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+>> ---
+>>   MAINTAINERS |   14 ++++++++++++++
+>>   1 files changed, 14 insertions(+), 0 deletions(-)
+
+[..]
+
+>> +M: Christian Borntraeger <borntraeger@de.ibm.com>
+>> +M: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+>> +M: Halil Pasic <pasic@linux.vnet.ibm.com>
+>> +M: Pierre Morel <pmorel@linux.vnet.ibm.com>
 > 
-> commit ef2974cc270d51959ce90df6b4d4d41635d7a603
-> Author: David Hildenbrand <david@redhat.com>
-> Date:   Wed Sep 13 15:24:02 2017 +0200
-> 
->     target/s390x: move some s390x typedefs to cpu-qom.h
->     
->     This allows us to drop inclusion of cpu_models.h in cpu-qom.h, and
->     prepares for using cpu-qom.h as a s390 specific version of typedefs.h
->     
->     Signed-off-by: David Hildenbrand <david@redhat.com>
->     Message-Id: <20170913132417.24384-8-david@redhat.com>
->     Reviewed-by: Thomas Huth <thuth@redhat.com>
->     Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> 
->  Thomas
-> 
+> Dumb question: Aren't you folks dropping the 'vnet' part in the future?
 > 
 
-Gargh, this is all very confusing...
+Not dumb at all. Please drop 'vnet' (at least for me).
+
+[..]
