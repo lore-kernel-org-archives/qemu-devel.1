@@ -1,26 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58525)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fG2sW-0005n0-7f
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:42:05 -0400
+	(envelope-from <pasic@linux.ibm.com>) id 1fG2sw-00060X-GN
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:42:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fG2sV-0006fw-FH
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:42:04 -0400
-Received: from mail-ot0-x234.google.com ([2607:f8b0:4003:c0f::234]:45476)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fG2sV-0006fd-91
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:42:03 -0400
-Received: by mail-ot0-x234.google.com with SMTP id 15-v6so21283698otn.12
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 06:42:02 -0700 (PDT)
+	(envelope-from <pasic@linux.ibm.com>) id 1fG2ss-0006p8-E1
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:42:30 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43602
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fG2ss-0006oo-60
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:42:26 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w48De8ZM104979
+	for <qemu-devel@nongnu.org>; Tue, 8 May 2018 09:42:24 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2hua5m1f89-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 09:42:23 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Tue, 8 May 2018 14:42:22 +0100
+References: <20180507155130.21085-1-cohuck@redhat.com>
+	<20180507155130.21085-3-cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.ibm.com>
+Date: Tue, 8 May 2018 15:42:17 +0200
 MIME-Version: 1.0
-In-Reply-To: <65983efd-e68f-76f5-bfb1-a8d14045df76@amsat.org>
-References: <65983efd-e68f-76f5-bfb1-a8d14045df76@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 8 May 2018 14:41:41 +0100
-Message-ID: <CAFEAcA9npKPEEXXekw+eahJfopn5+7Cf40Ltrh9tbPPvN-GOog@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] tpm_emu_test_wait_cond: code should not be reached
+In-Reply-To: <20180507155130.21085-3-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <388a5b5e-7ba1-4510-d2d3-88e2cc32ae94@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] s390x/ccw: make sure all ccw devices
+ are properly reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +43,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>
+Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On 8 May 2018 at 13:41, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote=
-:
-> Hi,
->
-> Travis CI hit this error testing commit 853f8ca13cd6d256:
->
-> $ clang --version
-> Apple LLVM version 8.1.0 (clang-802.0.42)
-> Target: x86_64-apple-darwin16.7.0
->
-> $ ./configure
-> C compiler        clang
-> host CPU          x86_64
-> ...
-> TPM support       yes
-> libssh2 support   no
-> TPM passthrough   no
-> TPM emulator      yes
->
->   GTESTER check-qtest-i386
-> Unexpected error in qio_channel_socket_readv() at io/channel-socket.c:494=
-:
-> **
-> ERROR:tests/tpm-emu.c:27:tpm_emu_test_wait_cond: code should not be reach=
-ed
-> make: *** [check-qtest-i386] Error 1
-> make: *** Waiting for unfinished jobs....
->
-> see https://travis-ci.org/qemu/qemu/jobs/376289241
 
-I see this on my OSX test box from time to time as well.
 
-thanks
--- PMM
+On 05/07/2018 05:51 PM, Cornelia Huck wrote:
+> Thomas reported that the subchannel for a  3270 device that ended up
+> in a broken state (status pending even though not enabled) did not
+> get out of that state even after a reboot (which involves a subsytem
+> reset). The reason for this is that the 3270 device did not define
+> a reset handler.
+> 
+> Let's fix this by introducing a base reset handler (set up for all
+> ccw devices) that resets the subchannel and have virtio-ccw call
+> its virtio-specific reset procedure in addition to that.
+> 
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Suggested-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+
+Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+
+The 'all' from the subject is actually 'all except maybe vfio-ccw'
+AFAIU.
+
+[..]
