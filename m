@@ -1,28 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fFz1D-0006Lf-FE
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 05:34:49 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fFzB4-0000Fp-7U
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 05:44:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fFz19-0001xd-GF
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 05:34:47 -0400
-Received: from 9.mo173.mail-out.ovh.net ([46.105.72.44]:35959)
+	(envelope-from <dgilbert@redhat.com>) id 1fFzB0-0006mf-8W
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 05:44:58 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35214 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fFz19-0001tH-A8
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 05:34:43 -0400
-Received: from player762.ha.ovh.net (unknown [10.109.120.62])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 60956C07B4
-	for <qemu-devel@nongnu.org>; Tue,  8 May 2018 11:34:32 +0200 (CEST)
-Date: Tue, 8 May 2018 11:34:25 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180508113425.003c5031@bahia.lan>
-In-Reply-To: <71b68bd5-e50b-3baa-3f72-f6af78db4e2e@redhat.com>
-References: <152568372989.443627.900708381919207053.stgit@bahia.lan>
-	<71b68bd5-e50b-3baa-3f72-f6af78db4e2e@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fFzB0-0006mL-2M
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 05:44:54 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D2194406C740
+	for <qemu-devel@nongnu.org>; Tue,  8 May 2018 09:44:52 +0000 (UTC)
+Date: Tue, 8 May 2018 10:44:40 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180508094439.GE2500@work-vm>
+References: <908f1079-385f-24d3-99ad-152ecd6b01d2@redhat.com>
+	<20180424153154.05e79de7@redhat.com>
+	<1046685642.22350584.1524635112123.JavaMail.zimbra@redhat.com>
+	<20180425152356.46ee7e04@redhat.com>
+	<709141862.22620677.1524664609218.JavaMail.zimbra@redhat.com>
+	<20180425172639.3e4d8ca1@redhat.com>
+	<212695685.22833607.1524728271984.JavaMail.zimbra@redhat.com>
+	<20180504111323.7cb4c7c8@redhat.com>
+	<20180504122651.GC2611@work-vm>
+	<20180507101228.0d7b7b66@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] ppc: e500: use g_strdup_printf() instead
- of snprintf()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180507101228.0d7b7b66@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] virtio-pmem: should we make it
+ migratable???
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,47 +42,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Howard Spoelstra <hsp.cat7@gmail.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Pankaj Gupta <pagupta@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, eblake@redhat.com, stefanha@redhat.com
 
-On Mon, 7 May 2018 12:53:45 -0500
-Eric Blake <eblake@redhat.com> wrote:
+* Igor Mammedov (imammedo@redhat.com) wrote:
+> On Fri, 4 May 2018 13:26:51 +0100
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> 
+> > * Igor Mammedov (imammedo@redhat.com) wrote:
+> > > On Thu, 26 Apr 2018 03:37:51 -0400 (EDT)
+> > > Pankaj Gupta <pagupta@redhat.com> wrote:
+> > > 
+> > > trimming CC list to keep people that might be interested in the topic
+> > > and renaming thread to reflect it.
+> > >   
+> > > > > > > > > > >> +
+> > > > > > > > > > >> +    memory_region_add_subregion(&hpms->mr, addr - hpms->base,
+> > > > > > > > > > >> mr);    
+> > > > > > > > > > > missing vmstate registration?    
+> > > > > > > > > > 
+> > > > > > > > > > Missed this one: To be called by the caller. Important because e.g.
+> > > > > > > > > > for
+> > > > > > > > > > virtio-pmem we don't want this (I assume :) ).    
+> > > > > > > > > if pmem isn't on shared storage, then We'd probably want to migrate
+> > > > > > > > > it as well, otherwise target would experience data loss.
+> > > > > > > > > Anyways, I'd just reat it as normal RAM in migration case    
+> > > > > > > > 
+> > > > > > > > Main difference between RAM and pmem it acts like combination of RAM
+> > > > > > > > and
+> > > > > > > > disk.
+> > > > > > > > Saying this, in normal use-case size would be 100 GB's - few TB's
+> > > > > > > > range.
+> > > > > > > > I am not sure we really want to migrate it for non-shared storage
+> > > > > > > > use-case.    
+> > > > > > > with non shared storage you'd have to migrate it target host but
+> > > > > > > with shared storage it might be possible to flush it and use directly
+> > > > > > > from target host. That probably won't work right out of box and would
+> > > > > > > need some sort of synchronization between src/dst hosts.    
+> > > > > > 
+> > > > > > Shared storage should work out of the box.
+> > > > > > Only thing is data in destination
+> > > > > > host will be cache cold and existing pages in cache should be invalidated
+> > > > > > first.
+> > > > > > But if we migrate entire fake DAX RAMstate it will populate destination
+> > > > > > host page
+> > > > > > cache including pages while were idle in source host. This would
+> > > > > > unnecessarily
+> > > > > > create entropy in destination host.
+> > > > > > 
+> > > > > > To me this feature don't make much sense. Problem which we are solving is:
+> > > > > > Efficiently use guest RAM.    
+> > > > > What would live migration handover flow look like in case of
+> > > > > guest constantly dirting memory provided by virtio-pmem and
+> > > > > and sometimes issuing async flush req along with it?    
+> > > > 
+> > > > Dirty entire pmem (disk) at once not a usual scenario. Some part of disk/pmem
+> > > > would get dirty and we need to handle that. I just want to say moving entire
+> > > > pmem (disk) is not efficient solution because we are using this solution to
+> > > > manage guest memory efficiently. Otherwise it will be like any block device copy
+> > > > with non-shared storage.     
+> > > not sure if we can use block layer analogy here.
+> > >   
+> > > > > > > The same applies to nv/pc-dimm as well, as backend file easily could be
+> > > > > > > on pmem storage as well.    
+> > > > > > 
+> > > > > > Are you saying backing file is in actual actual nvdimm hardware? we don't
+> > > > > > need
+> > > > > > emulation at all.    
+> > > > > depends on if file is on DAX filesystem, but your argument about
+> > > > > migrating huge 100Gb- TB's range applies in this case as well.
+> > > > >     
+> > > > > >     
+> > > > > > > 
+> > > > > > > Maybe for now we should migrate everything so it would work in case of
+> > > > > > > non shared NVDIMM on host. And then later add migration-less capability
+> > > > > > > to all of them.    
+> > > > > > 
+> > > > > > not sure I agree.    
+> > > > > So would you inhibit migration in case of non shared backend storage,
+> > > > > to avoid loosing data since they aren't migrated?    
+> > > > 
+> > > > I am just thinking what features we want to support with pmem. And live migration
+> > > > with shared storage is the one which comes to my mind.
+> > > > 
+> > > > If live migration with non-shared storage is what we want to support (I don't know
+> > > > yet) we can add this? Even with shared storage it would copy entire pmem state?  
+> > > Perhaps we should register vmstate like for normal ram and use something similar to
+> > >   http://lists.gnu.org/archive/html/qemu-devel/2018-04/msg00003.html this
+> > > to skip shared memory on migration.
+> > > In this case we could use this for pc-dimms as well.
+> > > 
+> > > David,
+> > >  what's your take on it?  
+> > 
+> > My feel is that something is going to have to migrate it, I'm just not
+> > sure how.
+> > So let me just check I understand:
+> >   a) It's potentially huge
+> yep, assume it could be in storage quarantines (100s of Gb)
+> 
+> >   b) It's a RAMBlock
+> it is
 
-> On 05/07/2018 04:02 AM, Greg Kurz wrote:
-> > qemu-system-ppc fails to build with GCC 8.0.1:
-> >=20
-> > /home/hsp/src/qemu-master/hw/ppc/e500.c: In function =E2=80=98ppce500_l=
-oad_device_tree=E2=80=99:
-> > /home/hsp/src/qemu-master/hw/ppc/e500.c:442:37: error: =E2=80=98/pic@=
-=E2=80=99
-> > directive output may be truncated writing 5 bytes into a region of
-> > size between 1 and 128 [-Werror=3Dformat-truncation=3D]
-> >       snprintf(mpic, sizeof(mpic), "%s/pic@%llx", soc, MPC8544_MPIC_REG=
-S_OFFSET);
-> >                                       ^~~~~ =20
->=20
-> >=20
-> > Fix this by converting e500 to use g_strdup_printf()+g_free() instead
-> > of snprintf(). This is done globally, even for call sites that don't
-> > break build, since this is the preferred practice in QEMU.
-> >=20
-> > Reported-by: Howard Spoelstra <hsp.cat7@gmail.com>
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> >   hw/ppc/e500.c |   39 +++++++++++++++++++++++----------------
-> >   1 file changed, 23 insertions(+), 16 deletions(-)
-> >  =20
->=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->=20
+Well, the good news is migration is going to try and migrate it.
+The bad news is migration is going to try and migrate it.
 
-Hi Peter,
+> >   c) It's backed by ????
+> >      c1) Something machine local - i.e. a physical lump of flash in a
+> >          socket rather than something sharable by machines?
+> it's backed by memory-backend-foo, so it could be really anything (RAM,
+> file on local or shared storage, file descriptor)
 
-David said the next pull request for ppc would happen in a month. This
-patch fixes an annoying build break with recent GCC, and it already
-got two positive reviews, is it possible to have it merged upstream ?
+OK, something is going to have to know whether it's on shared storage or
+not and do something different in the two cases.   If it's shared
+storage then we need to find a way to stop migration trying to migrate
+it, because migrating data to the other host when both hosts are really
+backed by the same thing ends up with a corrupt mess; we've had block
+storage do that when they don't realise they're on an NFS share.
+There are a few patches on the list to exclude migration from some
+RAMBlock's, so we can build on that once we figure out how we know
+if it's shared or not.
 
-Cheers,
+If it is shared, then we've also got to worry about consistency to
+ensure that the last few writes on the source make it to the destination
+before the destination starts, that the destination hasn't cached
+any old stuff, and that a failing migraiton lands back on the source
+without the destination having changed anything.
 
+> >   d) It can potentially be rapidly changing as the guest writes to it?
+> it's sort of like NVDIMM but without NVDIMM interface, it uses virtio to
+> to force flushing instead. Otherwise it's directly mapped into guest
+> address space, so guest can do anything with it including fast dirtying.
+
+OK.
+
+Getting Postcopy to work with it might be a solution; but depending what
+the underlying fd looks like will probably need some kernel changes to
+get userfaultfd to work on it.
+Postcopy on huge memories should work, but watch out for downtime
+due to sending the discard bitmaps.
+
+(cc'd in Eric and Stefan)
+
+Dave
+
+> 
+> > Dave
+> > 
+> > > > Thanks,
+> > > > Pankaj
+> > > >    
+> > > > > 
+> > > > >     
+> > > > > > > > One reason why nvdimm added vmstate info could be: still there would be
+> > > > > > > > transient
+> > > > > > > > writes in memory with fake DAX and there is no way(till now) to flush
+> > > > > > > > the
+> > > > > > > > guest
+> > > > > > > > writes. But with virtio-pmem we can flush such writes before migration
+> > > > > > > > and
+> > > > > > > > automatically
+> > > > > > > > at destination host with shared disk we will have updated data.    
+> > > > > > > nvdimm has concept of flush address hint (may be not implemented in qemu
+> > > > > > > yet)
+> > > > > > > but it can flush. The only reason I'm buying into virtio-mem idea
+> > > > > > > is that would allow async flush queues which would reduce number
+> > > > > > > of vmexits.    
+> > > > > > 
+> > > > > > Thats correct.
+> > > > > > 
+> > > > > > Thanks,
+> > > > > > Pankaj
+> > > > > > 
+> > > > > >      
+> > > > > 
+> > > > > 
+> > > > >     
+> > > >   
+> > >   
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
 --
-Greg
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
