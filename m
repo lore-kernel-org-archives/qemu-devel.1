@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fG8ny-0000le-HQ
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 16:01:47 -0400
+	(envelope-from <jcmvbkbc@gmail.com>) id 1fG8uM-0003FL-6x
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 16:08:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fG8nx-0002TG-Nn
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 16:01:46 -0400
-References: <20180508144358.13530-1-f4bug@amsat.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <a7107f6c-0e51-3c9a-ff64-524d0be6d28a@vivier.eu>
-Date: Tue, 8 May 2018 22:01:27 +0200
+	(envelope-from <jcmvbkbc@gmail.com>) id 1fG8uL-0004h9-Du
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 16:08:22 -0400
+Received: from mail-yw0-x241.google.com ([2607:f8b0:4002:c05::241]:40597)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1fG8uL-0004h3-8U
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 16:08:21 -0400
+Received: by mail-yw0-x241.google.com with SMTP id p144-v6so10049994ywg.7
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 13:08:21 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180508144358.13530-1-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] docker: Fix trivial typo
+In-Reply-To: <20180508194026.1281-3-laurent@vivier.eu>
+References: <20180508194026.1281-1-laurent@vivier.eu>
+	<20180508194026.1281-3-laurent@vivier.eu>
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Tue, 8 May 2018 13:08:20 -0700
+Message-ID: <CAMo8BfLpnEpFPowLtXwT7N7bfPiv26Ot4Xoryg_+k6Qrs86U4A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 2/5] linux-user: fix flock/flock64 padding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,27 +28,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>, "open list:Trivial patches" <qemu-trivial@nongnu.org>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
 
-Le 08/05/2018 à 16:43, Philippe Mathieu-Daudé a écrit :
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On Tue, May 8, 2018 at 12:40 PM, Laurent Vivier <laurent@vivier.eu> wrote:
+> include/uapi/asm-generic/fcntl.h insert a padding macro at
+> the end of the structures flock and flock64.
+>
+> This macro is defined to "short __unused;" on sparc,
+> and "long pad[4]" on mips.
+>
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 > ---
->  tests/docker/Makefile.include | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-> index de87341528..ef1a3e62eb 100644
-> --- a/tests/docker/Makefile.include
-> +++ b/tests/docker/Makefile.include
-> @@ -46,7 +46,7 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
->  
->  docker-image-debian-powerpc-cross: EXTRA_FILES:=$(SRC_PATH)/tests/docker/dockerfiles/debian-apt-fake.sh
->  
-> -# Enforce dependancies for composite images
-> +# Enforce dependencies for composite images
->  docker-image-debian: docker-image-debian9
->  docker-image-debian8-mxe: docker-image-debian8
->  docker-image-debian-amd64: docker-image-debian9
-> 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+>  linux-user/syscall_defs.h | 16 +++++++++++++---
+>  1 file changed, 13 insertions(+), 3 deletions(-)
+
+Reviewed-by: Max Filippov <jcmvbkbc@gmail.com>
+
+-- 
+Thanks.
+-- Max
