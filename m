@@ -1,41 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fG0Uo-0007Vv-Gc
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 07:09:27 -0400
+	(envelope-from <thuth@redhat.com>) id 1fG0YI-0000Si-HV
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 07:13:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fG0Ul-00042C-5J
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 07:09:26 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60736
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1fG0Uk-00041J-W2
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 07:09:23 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w48B89MW108743
-	for <qemu-devel@nongnu.org>; Tue, 8 May 2018 07:09:19 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2huarng2mn-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 07:09:18 -0400
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 8 May 2018 12:09:17 +0100
+	(envelope-from <thuth@redhat.com>) id 1fG0YD-0005XS-Fx
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 07:13:02 -0400
 References: <1525774672-11913-1-git-send-email-thuth@redhat.com>
 	<20180508124454.1b4a5799.cohuck@redhat.com>
 	<7c0e5b23-ef92-141c-ae57-4928fc2962f2@redhat.com>
 	<20180508130652.4cf57b8e.cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 8 May 2018 13:09:12 +0200
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <c63070b6-3c98-b77e-87d5-a0eb4ee5603c@redhat.com>
+Date: Tue, 8 May 2018 13:12:48 +0200
 MIME-Version: 1.0
 In-Reply-To: <20180508130652.4cf57b8e.cohuck@redhat.com>
-Content-Language: en-US
-Message-Id: <7c7dace5-2da9-50f8-47af-f7d617c23cb2@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH] pc-bios/s390-ccw: struct tpi_info must be
  declared as aligned(4)
 List-Id: <qemu-devel.nongnu.org>
@@ -46,12 +27,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
 
-
-
-On 05/08/2018 01:06 PM, Cornelia Huck wrote:
+On 08.05.2018 13:06, Cornelia Huck wrote:
 > On Tue, 8 May 2018 12:49:59 +0200
 > Thomas Huth <thuth@redhat.com> wrote:
 > 
@@ -106,4 +85,10 @@ On 05/08/2018 01:06 PM, Cornelia Huck wrote:
 > Related question: Should this be cc:stable (without a rebuild)? The
 > same logic as for the just-merged e500 patch probably applies.
 
-Ack. Compile warnings/errors qualify for stable I think.
+Since the stable releases are normally not built with -Werror, I think
+it's ok to not include it there. OTOH it also does not hurt and silences
+an annoying warning, and in case somebody tries to build a stable
+release with -Werror, it also fixes the build there. So why not, please
+add a "Cc: stable" when you pick up the patch.
+
+ Thomas
