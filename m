@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43015)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fG1ny-0000RS-IQ
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:33:24 -0400
+	(envelope-from <quintela@redhat.com>) id 1fG1p5-0001EB-Vf
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:34:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fG1nu-0002hM-Jh
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:33:18 -0400
-Date: Tue, 8 May 2018 13:33:06 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180508123306.GM19710@stefanha-x1.localdomain>
-References: <5aeae35ea760c_20132ae99f421c0c59611@hookshot-fe-265448d.cp1-iad.github.net.mail>
-	<41143fbe-baef-2959-7a96-c6434c82754a@vivier.eu>
+	(envelope-from <quintela@redhat.com>) id 1fG1p2-0003Jr-K0
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:34:28 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33382 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fG1p2-0003J7-G8
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:34:24 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <1525701137-9384-2-git-send-email-lidongchen@tencent.com> (Lidong
+	Chen's message of "Mon, 7 May 2018 21:52:17 +0800")
+References: <1525701137-9384-1-git-send-email-lidongchen@tencent.com>
+	<1525701137-9384-2-git-send-email-lidongchen@tencent.com>
+Reply-To: quintela@redhat.com
+Date: Tue, 08 May 2018 14:36:30 +0200
+Message-ID: <877eoe8gtt.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="EOHJn1TVIJfeVXv2"
-Content-Disposition: inline
-In-Reply-To: <41143fbe-baef-2959-7a96-c6434c82754a@vivier.eu>
-Subject: Re: [Qemu-devel] [Qemu-commits] [qemu/qemu] 8f9c64: 9p: add trace
- event for v9fs_setattr()
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 2/2] migration: invoke qio_channel_yield
+ only when qemu_in_coroutine()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-commits@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>, Anthony Liguori <anthony@codemonkey.ws>
+To: Lidong Chen <jemmy858585@gmail.com>
+Cc: dgilbert@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org, galsha@mellanox.com, aviadye@mellanox.com, adido@mellanox.com, Lidong Chen <lidongchen@tencent.com>
 
+Lidong Chen <jemmy858585@gmail.com> wrote:
+> when qio_channel_read return QIO_CHANNEL_ERR_BLOCK, the source qemu crash.
+>
+> The backtrace is:
+>     (gdb) bt
+>     #0  0x00007fb20aba91d7 in raise () from /lib64/libc.so.6
+>     #1  0x00007fb20abaa8c8 in abort () from /lib64/libc.so.6
+>     #2  0x00007fb20aba2146 in __assert_fail_base () from /lib64/libc.so.6
+>     #3  0x00007fb20aba21f2 in __assert_fail () from /lib64/libc.so.6
+>     #4  0x00000000008dba2d in qio_channel_yield (ioc=0x22f9e20, condition=G_IO_IN) at io/channel.c:460
+>     #5  0x00000000007a870b in channel_get_buffer (opaque=0x22f9e20, buf=0x3d54038 "", pos=0, size=32768)
+>         at migration/qemu-file-channel.c:83
+>     #6  0x00000000007a70f6 in qemu_fill_buffer (f=0x3d54000) at migration/qemu-file.c:299
+>     #7  0x00000000007a79d0 in qemu_peek_byte (f=0x3d54000, offset=0) at migration/qemu-file.c:562
+>     #8  0x00000000007a7a22 in qemu_get_byte (f=0x3d54000) at migration/qemu-file.c:575
+>     #9  0x00000000007a7c46 in qemu_get_be16 (f=0x3d54000) at migration/qemu-file.c:647
+>     #10 0x0000000000796db7 in source_return_path_thread (opaque=0x2242280) at migration/migration.c:1794
+>     #11 0x00000000009428fa in qemu_thread_start (args=0x3e58420) at util/qemu-thread-posix.c:504
+>     #12 0x00007fb20af3ddc5 in start_thread () from /lib64/libpthread.so.0
+>     #13 0x00007fb20ac6b74d in clone () from /lib64/libc.so.6
+>
+> This patch fixed by invoke qio_channel_yield only when qemu_in_coroutine().
+>
+> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
 
---EOHJn1TVIJfeVXv2
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 
-On Thu, May 03, 2018 at 12:59:16PM +0200, Laurent Vivier wrote:
-> Le 03/05/2018 =E0 12:24, GitHub a =E9crit=A0:
-> ...
-> > Compare: https://github.com/qemu/qemu/compare/26bd8d98c4b3...98bae9c4af=
-b4
-> >       **NOTE:** This service been marked for deprecation: https://devel=
-oper.github.com/changes/2018-04-25-github-services-deprecation/
-> >=20
-> >       Functionality will be removed from GitHub.com on January 31st, 20=
-19.
-> >=20
->=20
-> Does someone take care of the qemu-commits@nongnu.org mailing-list?
->=20
-> I think it has originally been set by Anthony Liguori.
+queued
 
-Yes, I think so too.  Thanks for the advance notice.  There might be no
-one who relies on the commits mailing list.  I suggest we remove the
-mailing list if no one needs it - better than having a dead archive that
-might cause confusion.
+> -            qio_channel_wait(ioc, G_IO_OUT);
+> +            if (qemu_in_coroutine()) {
+> +                qio_channel_yield(ioc, G_IO_OUT);
+> +            } else {
+> +                qio_channel_wait(ioc, G_IO_OUT);
+> +            }
 
-Stefan
+Dan, once that I am here, shouldn't this code be inside
+qio_channel_wait()?  Or have a function that does it?
 
---EOHJn1TVIJfeVXv2
-Content-Type: application/pgp-signature; name="signature.asc"
+qio_channel_readv_all_eof() and qio_channel_writev_all() already have to use it.
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJa8ZkCAAoJEJykq7OBq3PIoqsH/1q7VuVtSFT1sm8yWOVBpc0Y
-B5wpdMddsPCVDBhD0xIHJEbVRjlNExQCetvwht2a6LQ7PocjKmXVXSV8W+Ew1yak
-goTvabCP7YyXvX5I4q4XgSh8BO0+cjoqW1558RhlIlGxsQ0RMYCv6Z0vJCsuQdYo
-3X2MjjCJ6YVbA19ndLKvmOOm+2H5hv1Vz+MHqDF5SwwdjsIRrLOYVKnA6cqzGnii
-8mtJXDTNk847OBxk6PrJl9y/wnT1aL9ocsTi4uF98FVtnlZK7KYKFqwNMhTXnq9w
-0zTN1i9agzJ5wk7tg2rL3berhatj7KHshJFcjFCXXjAvAw6nRJjq7MgL96KhFTw=
-=PGfp
------END PGP SIGNATURE-----
-
---EOHJn1TVIJfeVXv2--
+Just wondering.
