@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fG361-0004i3-Cd
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:56:07 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fG39W-0007SP-9u
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:59:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fG35y-0002M4-4X
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:56:01 -0400
-Date: Tue, 8 May 2018 15:55:51 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180508155551.7cea014f.cohuck@redhat.com>
-In-Reply-To: <2a6f6a2a-ddaf-27ae-de04-581dcc67fdd0@linux.ibm.com>
-References: <20180507155130.21085-1-cohuck@redhat.com>
-	<2a6f6a2a-ddaf-27ae-de04-581dcc67fdd0@linux.ibm.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fG39U-0003Pg-Kv
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:59:38 -0400
+Received: from mail-ot0-x235.google.com ([2607:f8b0:4003:c0f::235]:34208)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fG39U-0003PI-GY
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:59:36 -0400
+Received: by mail-ot0-x235.google.com with SMTP id i5-v6so24490782otf.1
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 06:59:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/2] s390x: reset handling for ccw devices
+In-Reply-To: <87tvriv0yz.fsf@linaro.org>
+References: <20180504100547.14621-1-peter.maydell@linaro.org>
+	<87tvriv0yz.fsf@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 8 May 2018 14:59:15 +0100
+Message-ID: <CAFEAcA99c1XNdCNs3aNwzvZJFOtmVX22kU-twDuFMLYy8an=qA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] softfloat: Handle default NaN mode after
+ pickNaNMulAdd, not before
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,57 +31,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, qemu-stable <qemu-stable@nongnu.org>
 
-On Tue, 8 May 2018 15:29:50 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
+On 8 May 2018 at 12:30, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+>
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>
+>> It is implementation defined whether a multiply-add of
+>> (0,inf,qnan) or (inf,0,qnan) raises InvalidaOperation or
+>> not, so we let the target-specific pickNaNMulAdd function
+>> handle this. This means that we must do the "return the
+>> default NaN in default NaN mode" check after the call,
+>> not before. Correct the ordering, and restore the comment
+>> from the old propagateFloat64MulAddNaN() that warned about
+>> this corner case.
+>>
+>> This fixes a regression from 2.11 for Arm guests where we would
+>> incorrectly fail to set the Invalid flag for these cases.
+>>
+>> Cc: qemu-stable@nongnu.org
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>
+> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-> On 05/07/2018 05:51 PM, Cornelia Huck wrote:
-> > On Friday, Thomas noticed some problems with 3270 devices. One result
-> > was "s390x/css: disabled subchannels cannot be status pending", but
-> > a reboot did not cure the previous broken status. Turns out that 3270
-> > devices are missing a reset handler.
-> > 
-> > This series cleans up reset handling a bit and makes sure that the base
-> > ccw device class provides a subchannel reset handler. I'm currently
-> > not sure what we should do with vfio-ccw, so the behaviour there is
-> > left unchanged.  
-> 
-> Had a look, and LGTM (will tag separately) modulo what follows here. I'm
-> a bit concerned about vfio-ccw not being made compliant to this new
-> he reset of CCWDeviceClass is taking care of resetting the subchannel data
-> structures. This feels like introducing a common abstraction
-> to me, but then some things bother me.
+Thanks; applied to target-arm.next.
 
-We are having a common abstraction that can be overwritten by any
-specialized implementation - and this is what vfio-ccw is doing,
-therefore nothing changes for it.
-
-> In particular the the pim, the lpm and the pam set in css_reset_sch
-> seems to suit only devices that use the virtual chp. That
-> is it ain't suits any CCWDevice instance.
-
-Yes, we need to revisit this code and split out what makes sense and
-what doesn't. For now, we only have virtual devices and vfio-ccw, so
-we're fine. It even might make sense to keep them separate in the
-future, as having a virtual device and one only mirroring some state in
-QEMU sound like they want to be handled differently.
-
-> 
-> Do you plan to tackle vfio-ccw reset?
-
-It's on my to-do list (which is sadly quite crowded...)
-
-> 
-> > 
-> > Cornelia Huck (2):
-> >    virtio-ccw: common reset handler
-> >    s390x/ccw: make sure all ccw devices are properly reset
-> > 
-> >   hw/s390x/ccw-device.c |  8 ++++++++
-> >   hw/s390x/virtio-ccw.c | 20 ++++++--------------
-> >   hw/s390x/virtio-ccw.h |  1 +
-> >   3 files changed, 15 insertions(+), 14 deletions(-)
-> >   
-> 
+-- PMM
