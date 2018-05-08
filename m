@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59538)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fG4KI-0006dd-U3
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:14:54 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fG4KM-0006hY-U9
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:14:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fG4KE-00089U-86
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:14:50 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:37977)
+	(envelope-from <richard.henderson@linaro.org>) id 1fG4KK-0008Fs-9T
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:14:54 -0400
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:35145)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fG4KD-00088k-WD
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:14:46 -0400
-Received: by mail-pf0-x243.google.com with SMTP id o76so24120276pfi.5
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 08:14:45 -0700 (PDT)
+	id 1fG4KK-0008Ex-4m
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:14:52 -0400
+Received: by mail-pl0-x241.google.com with SMTP id i5-v6so2416543plt.2
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 08:14:52 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue,  8 May 2018 08:14:31 -0700
-Message-Id: <20180508151437.4232-5-richard.henderson@linaro.org>
+Date: Tue,  8 May 2018 08:14:35 -0700
+Message-Id: <20180508151437.4232-9-richard.henderson@linaro.org>
 In-Reply-To: <20180508151437.4232-1-richard.henderson@linaro.org>
 References: <20180508151437.4232-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 04/10] tcg: Introduce atomic helpers for
- integer min/max
+Subject: [Qemu-devel] [PATCH v3 08/10] target/arm: Fill in disas_ldst_atomic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,286 +29,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Given that this atomic operation will be used by both risc-v
-and aarch64, let's not duplicate code across the two targets.
+This implements all of the v8.1-Atomics instructions except
+for compare-and-swap, which is decoded elsewhere.
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- accel/tcg/atomic_template.h | 71 +++++++++++++++++++++++++++++++++++++
- accel/tcg/tcg-runtime.h     |  8 +++++
- tcg/tcg-op.h                | 34 ++++++++++++++++++
- tcg/tcg.h                   |  8 +++++
- tcg/tcg-op.c                |  8 +++++
- 5 files changed, 129 insertions(+)
+ target/arm/translate-a64.c | 38 ++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 36 insertions(+), 2 deletions(-)
 
-diff --git a/accel/tcg/atomic_template.h b/accel/tcg/atomic_template.h
-index e022df4571..2489dd3ec1 100644
---- a/accel/tcg/atomic_template.h
-+++ b/accel/tcg/atomic_template.h
-@@ -25,18 +25,22 @@
- #elif DATA_SIZE == 8
- # define SUFFIX     q
- # define DATA_TYPE  uint64_t
-+# define SDATA_TYPE int64_t
- # define BSWAP      bswap64
- #elif DATA_SIZE == 4
- # define SUFFIX     l
- # define DATA_TYPE  uint32_t
-+# define SDATA_TYPE int32_t
- # define BSWAP      bswap32
- #elif DATA_SIZE == 2
- # define SUFFIX     w
- # define DATA_TYPE  uint16_t
-+# define SDATA_TYPE int16_t
- # define BSWAP      bswap16
- #elif DATA_SIZE == 1
- # define SUFFIX     b
- # define DATA_TYPE  uint8_t
-+# define SDATA_TYPE int8_t
- # define BSWAP
- #else
- # error unsupported data size
-@@ -118,6 +122,39 @@ GEN_ATOMIC_HELPER(or_fetch)
- GEN_ATOMIC_HELPER(xor_fetch)
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 6acad791e6..c13858a690 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -84,6 +84,7 @@ typedef void NeonGenOneOpFn(TCGv_i64, TCGv_i64);
+ typedef void CryptoTwoOpFn(TCGv_ptr, TCGv_ptr);
+ typedef void CryptoThreeOpIntFn(TCGv_ptr, TCGv_ptr, TCGv_i32);
+ typedef void CryptoThreeOpFn(TCGv_ptr, TCGv_ptr, TCGv_ptr);
++typedef void AtomicThreeOpFn(TCGv_i64, TCGv_i64, TCGv_i64, TCGArg, TCGMemOp);
  
- #undef GEN_ATOMIC_HELPER
-+
-+/* These helpers are, as a whole, full barriers.  Within the helper,
-+ * the leading barrier is explicit and the trailing barrier is within
-+ * cmpxchg primitive.
-+ */
-+#define GEN_ATOMIC_HELPER_FN(X, FN, XDATA_TYPE, RET)                \
-+ABI_TYPE ATOMIC_NAME(X)(CPUArchState *env, target_ulong addr,       \
-+                        ABI_TYPE xval EXTRA_ARGS)                   \
-+{                                                                   \
-+    ATOMIC_MMU_DECLS;                                               \
-+    XDATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;                          \
-+    XDATA_TYPE cmp, old, new, val = xval;                           \
-+    smp_mb();                                                       \
-+    cmp = atomic_read__nocheck(haddr);                              \
-+    do {                                                            \
-+        old = cmp; new = FN(old, val);                              \
-+        cmp = atomic_cmpxchg__nocheck(haddr, old, new);             \
-+    } while (cmp != old);                                           \
-+    ATOMIC_MMU_CLEANUP;                                             \
-+    return RET;                                                     \
-+}
-+
-+GEN_ATOMIC_HELPER_FN(fetch_smin, MIN, SDATA_TYPE, old)
-+GEN_ATOMIC_HELPER_FN(fetch_umin, MIN,  DATA_TYPE, old)
-+GEN_ATOMIC_HELPER_FN(fetch_smax, MAX, SDATA_TYPE, old)
-+GEN_ATOMIC_HELPER_FN(fetch_umax, MAX,  DATA_TYPE, old)
-+
-+GEN_ATOMIC_HELPER_FN(smin_fetch, MIN, SDATA_TYPE, new)
-+GEN_ATOMIC_HELPER_FN(umin_fetch, MIN,  DATA_TYPE, new)
-+GEN_ATOMIC_HELPER_FN(smax_fetch, MAX, SDATA_TYPE, new)
-+GEN_ATOMIC_HELPER_FN(umax_fetch, MAX,  DATA_TYPE, new)
-+
-+#undef GEN_ATOMIC_HELPER_FN
- #endif /* DATA SIZE >= 16 */
+ /* Note that the gvec expanders operate on offsets + sizes.  */
+ typedef void GVecGen2Fn(unsigned, uint32_t, uint32_t, uint32_t, uint32_t);
+@@ -2772,6 +2773,8 @@ static void disas_ldst_atomic(DisasContext *s, uint32_t insn,
+     int rn = extract32(insn, 5, 5);
+     int o3_opc = extract32(insn, 12, 4);
+     int feature = ARM_FEATURE_V8_ATOMICS;
++    TCGv_i64 tcg_rn, tcg_rs;
++    AtomicThreeOpFn *fn;
  
- #undef END
-@@ -233,6 +270,39 @@ ABI_TYPE ATOMIC_NAME(add_fetch)(CPUArchState *env, target_ulong addr,
-         ldo = ldn;
+     if (is_vector) {
+         unallocated_encoding(s);
+@@ -2779,14 +2782,32 @@ static void disas_ldst_atomic(DisasContext *s, uint32_t insn,
      }
+     switch (o3_opc) {
+     case 000: /* LDADD */
++        fn = tcg_gen_atomic_fetch_add_i64;
++        break;
+     case 001: /* LDCLR */
++        fn = tcg_gen_atomic_fetch_and_i64;
++        break;
+     case 002: /* LDEOR */
++        fn = tcg_gen_atomic_fetch_xor_i64;
++        break;
+     case 003: /* LDSET */
++        fn = tcg_gen_atomic_fetch_or_i64;
++        break;
+     case 004: /* LDSMAX */
++        fn = tcg_gen_atomic_fetch_smax_i64;
++        break;
+     case 005: /* LDSMIN */
++        fn = tcg_gen_atomic_fetch_smin_i64;
++        break;
+     case 006: /* LDUMAX */
++        fn = tcg_gen_atomic_fetch_umax_i64;
++        break;
+     case 007: /* LDUMIN */
++        fn = tcg_gen_atomic_fetch_umin_i64;
++        break;
+     case 010: /* SWP */
++        fn = tcg_gen_atomic_xchg_i64;
++        break;
+     default:
+         unallocated_encoding(s);
+         return;
+@@ -2796,8 +2817,21 @@ static void disas_ldst_atomic(DisasContext *s, uint32_t insn,
+         return;
+     }
+ 
+-    (void)rs;
+-    (void)rn;
++    if (rn == 31) {
++        gen_check_sp_alignment(s);
++    }
++    tcg_rn = cpu_reg_sp(s, rn);
++    tcg_rs = read_cpu_reg(s, rs, true);
++
++    if (o3_opc == 1) { /* LDCLR */
++        tcg_gen_not_i64(tcg_rs, tcg_rs);
++    }
++
++    /* The tcg atomic primitives are all full barriers.  Therefore we
++     * can ignore the Acquire and Release bits of this instruction.
++     */
++    fn(cpu_reg(s, rt), tcg_rn, tcg_rs, get_mem_index(s),
++       s->be_data | size | MO_ALIGN);
  }
-+
-+/* These helpers are, as a whole, full barriers.  Within the helper,
-+ * the leading barrier is explicit and the trailing barrier is within
-+ * cmpxchg primitive.
-+ */
-+#define GEN_ATOMIC_HELPER_FN(X, FN, XDATA_TYPE, RET)                \
-+ABI_TYPE ATOMIC_NAME(X)(CPUArchState *env, target_ulong addr,       \
-+                        ABI_TYPE xval EXTRA_ARGS)                   \
-+{                                                                   \
-+    ATOMIC_MMU_DECLS;                                               \
-+    XDATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;                          \
-+    XDATA_TYPE ldo, ldn, old, new, val = xval;                      \
-+    smp_mb();                                                       \
-+    ldn = atomic_read__nocheck(haddr);                              \
-+    do {                                                            \
-+        ldo = ldn; old = BSWAP(ldo); new = FN(old, val);            \
-+        ldn = atomic_cmpxchg__nocheck(haddr, ldo, BSWAP(new));      \
-+    } while (ldo != ldn);                                           \
-+    ATOMIC_MMU_CLEANUP;                                             \
-+    return RET;                                                     \
-+}
-+
-+GEN_ATOMIC_HELPER_FN(fetch_smin, MIN, SDATA_TYPE, old)
-+GEN_ATOMIC_HELPER_FN(fetch_umin, MIN,  DATA_TYPE, old)
-+GEN_ATOMIC_HELPER_FN(fetch_smax, MAX, SDATA_TYPE, old)
-+GEN_ATOMIC_HELPER_FN(fetch_umax, MAX,  DATA_TYPE, old)
-+
-+GEN_ATOMIC_HELPER_FN(smin_fetch, MIN, SDATA_TYPE, new)
-+GEN_ATOMIC_HELPER_FN(umin_fetch, MIN,  DATA_TYPE, new)
-+GEN_ATOMIC_HELPER_FN(smax_fetch, MAX, SDATA_TYPE, new)
-+GEN_ATOMIC_HELPER_FN(umax_fetch, MAX,  DATA_TYPE, new)
-+
-+#undef GEN_ATOMIC_HELPER_FN
- #endif /* DATA_SIZE >= 16 */
  
- #undef END
-@@ -241,5 +311,6 @@ ABI_TYPE ATOMIC_NAME(add_fetch)(CPUArchState *env, target_ulong addr,
- #undef BSWAP
- #undef ABI_TYPE
- #undef DATA_TYPE
-+#undef SDATA_TYPE
- #undef SUFFIX
- #undef DATA_SIZE
-diff --git a/accel/tcg/tcg-runtime.h b/accel/tcg/tcg-runtime.h
-index 2536959a18..1bd39d136d 100644
---- a/accel/tcg/tcg-runtime.h
-+++ b/accel/tcg/tcg-runtime.h
-@@ -125,11 +125,19 @@ GEN_ATOMIC_HELPERS(fetch_add)
- GEN_ATOMIC_HELPERS(fetch_and)
- GEN_ATOMIC_HELPERS(fetch_or)
- GEN_ATOMIC_HELPERS(fetch_xor)
-+GEN_ATOMIC_HELPERS(fetch_smin)
-+GEN_ATOMIC_HELPERS(fetch_umin)
-+GEN_ATOMIC_HELPERS(fetch_smax)
-+GEN_ATOMIC_HELPERS(fetch_umax)
- 
- GEN_ATOMIC_HELPERS(add_fetch)
- GEN_ATOMIC_HELPERS(and_fetch)
- GEN_ATOMIC_HELPERS(or_fetch)
- GEN_ATOMIC_HELPERS(xor_fetch)
-+GEN_ATOMIC_HELPERS(smin_fetch)
-+GEN_ATOMIC_HELPERS(umin_fetch)
-+GEN_ATOMIC_HELPERS(smax_fetch)
-+GEN_ATOMIC_HELPERS(umax_fetch)
- 
- GEN_ATOMIC_HELPERS(xchg)
- 
-diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-index 0451e2752e..04eb3e9e17 100644
---- a/tcg/tcg-op.h
-+++ b/tcg/tcg-op.h
-@@ -898,6 +898,7 @@ void tcg_gen_atomic_cmpxchg_i64(TCGv_i64, TCGv, TCGv_i64, TCGv_i64,
- 
- void tcg_gen_atomic_xchg_i32(TCGv_i32, TCGv, TCGv_i32, TCGArg, TCGMemOp);
- void tcg_gen_atomic_xchg_i64(TCGv_i64, TCGv, TCGv_i64, TCGArg, TCGMemOp);
-+
- void tcg_gen_atomic_fetch_add_i32(TCGv_i32, TCGv, TCGv_i32, TCGArg, TCGMemOp);
- void tcg_gen_atomic_fetch_add_i64(TCGv_i64, TCGv, TCGv_i64, TCGArg, TCGMemOp);
- void tcg_gen_atomic_fetch_and_i32(TCGv_i32, TCGv, TCGv_i32, TCGArg, TCGMemOp);
-@@ -906,6 +907,15 @@ void tcg_gen_atomic_fetch_or_i32(TCGv_i32, TCGv, TCGv_i32, TCGArg, TCGMemOp);
- void tcg_gen_atomic_fetch_or_i64(TCGv_i64, TCGv, TCGv_i64, TCGArg, TCGMemOp);
- void tcg_gen_atomic_fetch_xor_i32(TCGv_i32, TCGv, TCGv_i32, TCGArg, TCGMemOp);
- void tcg_gen_atomic_fetch_xor_i64(TCGv_i64, TCGv, TCGv_i64, TCGArg, TCGMemOp);
-+void tcg_gen_atomic_fetch_smin_i32(TCGv_i32, TCGv, TCGv_i32, TCGArg, TCGMemOp);
-+void tcg_gen_atomic_fetch_smin_i64(TCGv_i64, TCGv, TCGv_i64, TCGArg, TCGMemOp);
-+void tcg_gen_atomic_fetch_umin_i32(TCGv_i32, TCGv, TCGv_i32, TCGArg, TCGMemOp);
-+void tcg_gen_atomic_fetch_umin_i64(TCGv_i64, TCGv, TCGv_i64, TCGArg, TCGMemOp);
-+void tcg_gen_atomic_fetch_smax_i32(TCGv_i32, TCGv, TCGv_i32, TCGArg, TCGMemOp);
-+void tcg_gen_atomic_fetch_smax_i64(TCGv_i64, TCGv, TCGv_i64, TCGArg, TCGMemOp);
-+void tcg_gen_atomic_fetch_umax_i32(TCGv_i32, TCGv, TCGv_i32, TCGArg, TCGMemOp);
-+void tcg_gen_atomic_fetch_umax_i64(TCGv_i64, TCGv, TCGv_i64, TCGArg, TCGMemOp);
-+
- void tcg_gen_atomic_add_fetch_i32(TCGv_i32, TCGv, TCGv_i32, TCGArg, TCGMemOp);
- void tcg_gen_atomic_add_fetch_i64(TCGv_i64, TCGv, TCGv_i64, TCGArg, TCGMemOp);
- void tcg_gen_atomic_and_fetch_i32(TCGv_i32, TCGv, TCGv_i32, TCGArg, TCGMemOp);
-@@ -914,6 +924,14 @@ void tcg_gen_atomic_or_fetch_i32(TCGv_i32, TCGv, TCGv_i32, TCGArg, TCGMemOp);
- void tcg_gen_atomic_or_fetch_i64(TCGv_i64, TCGv, TCGv_i64, TCGArg, TCGMemOp);
- void tcg_gen_atomic_xor_fetch_i32(TCGv_i32, TCGv, TCGv_i32, TCGArg, TCGMemOp);
- void tcg_gen_atomic_xor_fetch_i64(TCGv_i64, TCGv, TCGv_i64, TCGArg, TCGMemOp);
-+void tcg_gen_atomic_smin_fetch_i32(TCGv_i32, TCGv, TCGv_i32, TCGArg, TCGMemOp);
-+void tcg_gen_atomic_smin_fetch_i64(TCGv_i64, TCGv, TCGv_i64, TCGArg, TCGMemOp);
-+void tcg_gen_atomic_umin_fetch_i32(TCGv_i32, TCGv, TCGv_i32, TCGArg, TCGMemOp);
-+void tcg_gen_atomic_umin_fetch_i64(TCGv_i64, TCGv, TCGv_i64, TCGArg, TCGMemOp);
-+void tcg_gen_atomic_smax_fetch_i32(TCGv_i32, TCGv, TCGv_i32, TCGArg, TCGMemOp);
-+void tcg_gen_atomic_smax_fetch_i64(TCGv_i64, TCGv, TCGv_i64, TCGArg, TCGMemOp);
-+void tcg_gen_atomic_umax_fetch_i32(TCGv_i32, TCGv, TCGv_i32, TCGArg, TCGMemOp);
-+void tcg_gen_atomic_umax_fetch_i64(TCGv_i64, TCGv, TCGv_i64, TCGArg, TCGMemOp);
- 
- void tcg_gen_mov_vec(TCGv_vec, TCGv_vec);
- void tcg_gen_dup_i32_vec(unsigned vece, TCGv_vec, TCGv_i32);
-@@ -1043,10 +1061,18 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
- #define tcg_gen_atomic_fetch_and_tl tcg_gen_atomic_fetch_and_i64
- #define tcg_gen_atomic_fetch_or_tl tcg_gen_atomic_fetch_or_i64
- #define tcg_gen_atomic_fetch_xor_tl tcg_gen_atomic_fetch_xor_i64
-+#define tcg_gen_atomic_fetch_smin_tl tcg_gen_atomic_fetch_smin_i64
-+#define tcg_gen_atomic_fetch_umin_tl tcg_gen_atomic_fetch_umin_i64
-+#define tcg_gen_atomic_fetch_smax_tl tcg_gen_atomic_fetch_smax_i64
-+#define tcg_gen_atomic_fetch_umax_tl tcg_gen_atomic_fetch_umax_i64
- #define tcg_gen_atomic_add_fetch_tl tcg_gen_atomic_add_fetch_i64
- #define tcg_gen_atomic_and_fetch_tl tcg_gen_atomic_and_fetch_i64
- #define tcg_gen_atomic_or_fetch_tl tcg_gen_atomic_or_fetch_i64
- #define tcg_gen_atomic_xor_fetch_tl tcg_gen_atomic_xor_fetch_i64
-+#define tcg_gen_atomic_smin_fetch_tl tcg_gen_atomic_smin_fetch_i64
-+#define tcg_gen_atomic_umin_fetch_tl tcg_gen_atomic_umin_fetch_i64
-+#define tcg_gen_atomic_smax_fetch_tl tcg_gen_atomic_smax_fetch_i64
-+#define tcg_gen_atomic_umax_fetch_tl tcg_gen_atomic_umax_fetch_i64
- #define tcg_gen_dup_tl_vec  tcg_gen_dup_i64_vec
- #else
- #define tcg_gen_movi_tl tcg_gen_movi_i32
-@@ -1145,10 +1171,18 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
- #define tcg_gen_atomic_fetch_and_tl tcg_gen_atomic_fetch_and_i32
- #define tcg_gen_atomic_fetch_or_tl tcg_gen_atomic_fetch_or_i32
- #define tcg_gen_atomic_fetch_xor_tl tcg_gen_atomic_fetch_xor_i32
-+#define tcg_gen_atomic_fetch_smin_tl tcg_gen_atomic_fetch_smin_i32
-+#define tcg_gen_atomic_fetch_umin_tl tcg_gen_atomic_fetch_umin_i32
-+#define tcg_gen_atomic_fetch_smax_tl tcg_gen_atomic_fetch_smax_i32
-+#define tcg_gen_atomic_fetch_umax_tl tcg_gen_atomic_fetch_umax_i32
- #define tcg_gen_atomic_add_fetch_tl tcg_gen_atomic_add_fetch_i32
- #define tcg_gen_atomic_and_fetch_tl tcg_gen_atomic_and_fetch_i32
- #define tcg_gen_atomic_or_fetch_tl tcg_gen_atomic_or_fetch_i32
- #define tcg_gen_atomic_xor_fetch_tl tcg_gen_atomic_xor_fetch_i32
-+#define tcg_gen_atomic_smin_fetch_tl tcg_gen_atomic_smin_fetch_i32
-+#define tcg_gen_atomic_umin_fetch_tl tcg_gen_atomic_umin_fetch_i32
-+#define tcg_gen_atomic_smax_fetch_tl tcg_gen_atomic_smax_fetch_i32
-+#define tcg_gen_atomic_umax_fetch_tl tcg_gen_atomic_umax_fetch_i32
- #define tcg_gen_dup_tl_vec  tcg_gen_dup_i32_vec
- #endif
- 
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 75fbad128b..1ca985479b 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -1415,12 +1415,20 @@ GEN_ATOMIC_HELPER_ALL(fetch_sub)
- GEN_ATOMIC_HELPER_ALL(fetch_and)
- GEN_ATOMIC_HELPER_ALL(fetch_or)
- GEN_ATOMIC_HELPER_ALL(fetch_xor)
-+GEN_ATOMIC_HELPER_ALL(fetch_smin)
-+GEN_ATOMIC_HELPER_ALL(fetch_umin)
-+GEN_ATOMIC_HELPER_ALL(fetch_smax)
-+GEN_ATOMIC_HELPER_ALL(fetch_umax)
- 
- GEN_ATOMIC_HELPER_ALL(add_fetch)
- GEN_ATOMIC_HELPER_ALL(sub_fetch)
- GEN_ATOMIC_HELPER_ALL(and_fetch)
- GEN_ATOMIC_HELPER_ALL(or_fetch)
- GEN_ATOMIC_HELPER_ALL(xor_fetch)
-+GEN_ATOMIC_HELPER_ALL(smin_fetch)
-+GEN_ATOMIC_HELPER_ALL(umin_fetch)
-+GEN_ATOMIC_HELPER_ALL(smax_fetch)
-+GEN_ATOMIC_HELPER_ALL(umax_fetch)
- 
- GEN_ATOMIC_HELPER_ALL(xchg)
- 
-diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-index 5b82c3be8d..6a914654f5 100644
---- a/tcg/tcg-op.c
-+++ b/tcg/tcg-op.c
-@@ -3051,11 +3051,19 @@ GEN_ATOMIC_HELPER(fetch_add, add, 0)
- GEN_ATOMIC_HELPER(fetch_and, and, 0)
- GEN_ATOMIC_HELPER(fetch_or, or, 0)
- GEN_ATOMIC_HELPER(fetch_xor, xor, 0)
-+GEN_ATOMIC_HELPER(fetch_smin, smin, 0)
-+GEN_ATOMIC_HELPER(fetch_umin, umin, 0)
-+GEN_ATOMIC_HELPER(fetch_smax, smax, 0)
-+GEN_ATOMIC_HELPER(fetch_umax, umax, 0)
- 
- GEN_ATOMIC_HELPER(add_fetch, add, 1)
- GEN_ATOMIC_HELPER(and_fetch, and, 1)
- GEN_ATOMIC_HELPER(or_fetch, or, 1)
- GEN_ATOMIC_HELPER(xor_fetch, xor, 1)
-+GEN_ATOMIC_HELPER(smin_fetch, smin, 1)
-+GEN_ATOMIC_HELPER(umin_fetch, umin, 1)
-+GEN_ATOMIC_HELPER(smax_fetch, smax, 1)
-+GEN_ATOMIC_HELPER(umax_fetch, umax, 1)
- 
- static void tcg_gen_mov2_i32(TCGv_i32 r, TCGv_i32 a, TCGv_i32 b)
- {
+ /* Load/store register (all forms) */
 -- 
 2.17.0
