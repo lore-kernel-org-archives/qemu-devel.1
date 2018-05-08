@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fG4gq-0001Tv-Sx
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:38:12 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fG4hV-000213-5q
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:38:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fG4go-0005oh-I9
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:38:08 -0400
-Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:41434)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fG4go-0005oR-D5
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:38:06 -0400
-Received: by mail-ot0-x230.google.com with SMTP id t1-v6so36576583oth.8
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 08:38:06 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1fG4hS-000626-VT
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:38:49 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52352 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fG4hS-00061s-R7
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:38:46 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 517EDEB71C
+	for <qemu-devel@nongnu.org>; Tue,  8 May 2018 15:38:46 +0000 (UTC)
+Date: Tue, 8 May 2018 16:38:40 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180508153838.GQ2500@work-vm>
+References: <20180425111940.1030-1-quintela@redhat.com>
+	<20180425111940.1030-4-quintela@redhat.com>
+	<20180503173154.GL2660@work-vm> <87sh726uvd.fsf@secure.laptop>
 MIME-Version: 1.0
-In-Reply-To: <20180302185448.6314-9-kwolf@redhat.com>
-References: <20180302185448.6314-1-kwolf@redhat.com>
-	<20180302185448.6314-9-kwolf@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 8 May 2018 16:37:45 +0100
-Message-ID: <CAFEAcA9eQ6be2Db89kR_OrrG2Hz-M_H7=NYDSTFQEXk62Lj9Tg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 08/37] iscsi: Switch to
- .bdrv_co_block_status()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87sh726uvd.fsf@secure.laptop>
+Subject: Re: [Qemu-devel] [PATCH v8 3/8] tests: Add migration xbzrle test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,27 +34,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-On 2 March 2018 at 18:54, Kevin Wolf <kwolf@redhat.com> wrote:
-> From: Eric Blake <eblake@redhat.com>
->
-> We are gradually moving away from sector-based interfaces, towards
-> byte-based.  Update the iscsi driver accordingly.  In this case,
-> it is handy to teach iscsi_co_block_status() to handle a NULL map
-> and file parameter, even though the block layer passes non-NULL
-> values, because we also call the function directly.  For now, there
-> are no optimizations done based on the want_zero flag.
->
+* Juan Quintela (quintela@redhat.com) wrote:
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > * Juan Quintela (quintela@redhat.com) wrote:
+> >> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> >> Reviewed-by: Peter Xu <peterx@redhat.com>
+> 
+> >> +
+> >> +    migrate_set_parameter(from, "xbzrle-cache-size", "33554432");
+> >
+> > I still worry about the cache size relative to the size of memory we're
+> > actually changing in the test; I don't quite understand why it's turning
+> > out to get lots of hits.
+> 
+> I planned this as a smorke test.  But what value do you have in mind?
 
-> -    *pnum = sector_lun2qemu(lbasd->num_blocks, iscsilun);
-> +    *pnum = lbasd->num_blocks * iscsilun->block_size;
+Given the test code dirties 100MB of RAM, I suggest a cache of 110MB
+say.  But it's interesting that the stats show we are getting a lot of
+page hits; I'm not sure I understand why.
 
-Hi; following this change Coverity complains (CID1390646) about
-this multiplication, which is a 32-bit multiply whose result
-is then put into a 64-bit result. Is it intended to be a
-64-bit multiply ?
+> > Also, xbzrle eats so much CPU we'll still have to watch out for the low
+> > end CPUs.
+> 
+> Any concrete suggestion?
+> 
+> My plan would have been to push on my next pull request:
+> 
+> Add migration precopy test
+> Add migration xbzrle test
+> Migration ppc now inlines its program
+> 
+> And put the rest of the patches with fixes for another review.
 
-thanks
--- PMM
+Go with it and lets see; if we hit problems then we can just turn that
+300ms downtime limit right up.
+
+Dave
+
+> 
+> Later, Juan.
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
