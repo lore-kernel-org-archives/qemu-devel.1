@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fG1p5-0001EB-Vf
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:34:28 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fG1vj-00041A-Ik
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:41:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fG1p2-0003Jr-K0
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:34:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33382 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fG1p2-0003J7-G8
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:34:24 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <1525701137-9384-2-git-send-email-lidongchen@tencent.com> (Lidong
-	Chen's message of "Mon, 7 May 2018 21:52:17 +0800")
-References: <1525701137-9384-1-git-send-email-lidongchen@tencent.com>
-	<1525701137-9384-2-git-send-email-lidongchen@tencent.com>
-Reply-To: quintela@redhat.com
-Date: Tue, 08 May 2018 14:36:30 +0200
-Message-ID: <877eoe8gtt.fsf@secure.laptop>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fG1vd-0000Sb-Vm
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:41:19 -0400
+Received: from mail-qk0-x233.google.com ([2607:f8b0:400d:c09::233]:35520)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fG1vd-0000Rg-Pq
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:41:13 -0400
+Received: by mail-qk0-x233.google.com with SMTP id g4so6771604qki.2
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 05:41:13 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <65983efd-e68f-76f5-bfb1-a8d14045df76@amsat.org>
+Date: Tue, 8 May 2018 09:41:05 -0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/2] migration: invoke qio_channel_yield
- only when qemu_in_coroutine()
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="h3qNqyDfruqFGQPuKHOADNQnMmF6kbClR"
+Subject: [Qemu-devel] tpm_emu_test_wait_cond: code should not be reached
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +32,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lidong Chen <jemmy858585@gmail.com>
-Cc: dgilbert@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org, galsha@mellanox.com, aviadye@mellanox.com, adido@mellanox.com, Lidong Chen <lidongchen@tencent.com>
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Lidong Chen <jemmy858585@gmail.com> wrote:
-> when qio_channel_read return QIO_CHANNEL_ERR_BLOCK, the source qemu crash.
->
-> The backtrace is:
->     (gdb) bt
->     #0  0x00007fb20aba91d7 in raise () from /lib64/libc.so.6
->     #1  0x00007fb20abaa8c8 in abort () from /lib64/libc.so.6
->     #2  0x00007fb20aba2146 in __assert_fail_base () from /lib64/libc.so.6
->     #3  0x00007fb20aba21f2 in __assert_fail () from /lib64/libc.so.6
->     #4  0x00000000008dba2d in qio_channel_yield (ioc=0x22f9e20, condition=G_IO_IN) at io/channel.c:460
->     #5  0x00000000007a870b in channel_get_buffer (opaque=0x22f9e20, buf=0x3d54038 "", pos=0, size=32768)
->         at migration/qemu-file-channel.c:83
->     #6  0x00000000007a70f6 in qemu_fill_buffer (f=0x3d54000) at migration/qemu-file.c:299
->     #7  0x00000000007a79d0 in qemu_peek_byte (f=0x3d54000, offset=0) at migration/qemu-file.c:562
->     #8  0x00000000007a7a22 in qemu_get_byte (f=0x3d54000) at migration/qemu-file.c:575
->     #9  0x00000000007a7c46 in qemu_get_be16 (f=0x3d54000) at migration/qemu-file.c:647
->     #10 0x0000000000796db7 in source_return_path_thread (opaque=0x2242280) at migration/migration.c:1794
->     #11 0x00000000009428fa in qemu_thread_start (args=0x3e58420) at util/qemu-thread-posix.c:504
->     #12 0x00007fb20af3ddc5 in start_thread () from /lib64/libpthread.so.0
->     #13 0x00007fb20ac6b74d in clone () from /lib64/libc.so.6
->
-> This patch fixed by invoke qio_channel_yield only when qemu_in_coroutine().
->
-> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--h3qNqyDfruqFGQPuKHOADNQnMmF6kbClR
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Message-ID: <65983efd-e68f-76f5-bfb1-a8d14045df76@amsat.org>
+Subject: tpm_emu_test_wait_cond: code should not be reached
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+Hi,
 
-queued
+Travis CI hit this error testing commit 853f8ca13cd6d256:
 
-> -            qio_channel_wait(ioc, G_IO_OUT);
-> +            if (qemu_in_coroutine()) {
-> +                qio_channel_yield(ioc, G_IO_OUT);
-> +            } else {
-> +                qio_channel_wait(ioc, G_IO_OUT);
-> +            }
+$ clang --version
+Apple LLVM version 8.1.0 (clang-802.0.42)
+Target: x86_64-apple-darwin16.7.0
 
-Dan, once that I am here, shouldn't this code be inside
-qio_channel_wait()?  Or have a function that does it?
+$ ./configure
+C compiler        clang
+host CPU          x86_64
+=2E..
+TPM support       yes
+libssh2 support   no
+TPM passthrough   no
+TPM emulator      yes
 
-qio_channel_readv_all_eof() and qio_channel_writev_all() already have to use it.
+  GTESTER check-qtest-i386
+Unexpected error in qio_channel_socket_readv() at io/channel-socket.c:494=
+:
+**
+ERROR:tests/tpm-emu.c:27:tpm_emu_test_wait_cond: code should not be reach=
+ed
+make: *** [check-qtest-i386] Error 1
+make: *** Waiting for unfinished jobs....
 
-Just wondering.
+see https://travis-ci.org/qemu/qemu/jobs/376289241
+
+Regards,
+
+Phil.
+
+
+--h3qNqyDfruqFGQPuKHOADNQnMmF6kbClR
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlrxmuEACgkQ4+MsLN6t
+wN4p9RAAx8QflLIF0Z9I2DeTsVB2BDq2cD6cpC8fTvkx3dA3ivceRnw3UL8eMVf5
+j5JH7cp8s9qJjZgOK6D+mDy2cOIWoKy2WE7MrIGkpennBzQu6fBZjtUEKaTR5t17
+QyQXTb9JhkteFMKZ+kCdOSjU2v3O2rYdONPVG74KzcP3aXM4NfEdpRn67QkkaglF
+2jt5lE5vU28Wjedzr4mjNuJHSlEGd0e8HQ3CFp9VddyOYoDhFBLXWctNAC9vk4Xs
+dNheN8T3eKW7ZTfwyh8YIKuV5JWIFqdUUi8cQ2rCh1JuMdOLWK9utVK+VLTRLoUC
+ZWwkkx9cQ/QvJ9gWjRsnU/UTQx4z5rpIp/mbF6iBhROkOsqpEko11KjhJidhczAp
+vjBjB3NRDjkIBkBb6rxx4FOnhYyWRCGzqa1mSTSTc186bmPMoNXK8GjczHN3Pf94
+SNexW4fmHMHpGzhZVGKL7Nnf4Akrsup0g0EpSL3CQzlrTCLOaLoDHPEa8wiXAmMR
+TeUOhzITUEXQmiuCiVzr5kPGpZFsfuua0D5do17ZQ4mAC99eMF5XYrhfMnRfswF1
+0B0s8UsZ93VQsOPHxt/751kkze9C5CkmcfNPjnHOKt7jlPYx3b2dwiMPp5hvjlgq
+1ZLAxTmKJhix8pqTNdVUnKVG4ncbXIfLrKvuHzRn/GExys2Wy/g=
+=rbNG
+-----END PGP SIGNATURE-----
+
+--h3qNqyDfruqFGQPuKHOADNQnMmF6kbClR--
