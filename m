@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44071)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fG6TM-0008KO-LR
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 13:32:22 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fG6TO-0008MK-Gz
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 13:32:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fG6TL-0005Pj-DG
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 13:32:20 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:42697)
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fG6TM-0005QZ-Vi
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 13:32:22 -0400
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:44878)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1fG6TL-0005P4-1j
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 13:32:19 -0400
-Received: by mail-lf0-x244.google.com with SMTP id u21-v6so47043536lfu.9
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 10:32:18 -0700 (PDT)
+	id 1fG6TM-0005Pv-KV
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 13:32:20 -0400
+Received: by mail-lf0-x242.google.com with SMTP id h197-v6so47005708lfg.11
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 10:32:20 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Tue,  8 May 2018 19:31:31 +0200
-Message-Id: <20180508173152.29327-16-edgar.iglesias@gmail.com>
+Date: Tue,  8 May 2018 19:31:32 +0200
+Message-Id: <20180508173152.29327-17-edgar.iglesias@gmail.com>
 In-Reply-To: <20180508173152.29327-1-edgar.iglesias@gmail.com>
 References: <20180508173152.29327-1-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 15/36] target-microblaze: Break out
- trap_userspace()
+Subject: [Qemu-devel] [PATCH v2 16/36] target-microblaze: Break out
+ trap_illegal()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,193 +32,171 @@ Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, frederic.konrad@adac
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Break out trap_userspace() to avoid open coding it everywhere.
-For privileged insns, we now always stop translation of the
-current insn for cores without exceptions.
+Break out trap_illegal() to handle illegal operation traps.
+We now generally stop translation of the current insn if
+it's not valid.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- target/microblaze/translate.c | 76 +++++++++++++++----------------------------
- 1 file changed, 27 insertions(+), 49 deletions(-)
+ target/microblaze/translate.c | 75 ++++++++++++++++---------------------------
+ 1 file changed, 27 insertions(+), 48 deletions(-)
 
 diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 6cc92d09c9..c363619785 100644
+index c363619785..4290fb2eaf 100644
 --- a/target/microblaze/translate.c
 +++ b/target/microblaze/translate.c
-@@ -179,6 +179,22 @@ static void write_carryi(DisasContext *dc, bool carry)
+@@ -179,6 +179,20 @@ static void write_carryi(DisasContext *dc, bool carry)
      tcg_temp_free_i32(t0);
  }
  
 +/*
-+ * Returns true if the insn is illegal in userspace.
++ * Returns true if the insn an illegal operation.
 + * If exceptions are enabled, an exception is raised.
 + */
-+static bool trap_userspace(DisasContext *dc, bool cond)
++static bool trap_illegal(DisasContext *dc, bool cond)
 +{
-+    int mem_index = cpu_mmu_index(&dc->cpu->env, false);
-+    bool cond_user = cond && mem_index == MMU_USER_IDX;
-+
-+    if (cond_user && (dc->tb_flags & MSR_EE_FLAG)) {
-+        tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
++    if (cond && (dc->tb_flags & MSR_EE_FLAG)
++        && (dc->cpu->env.pvr.regs[2] & PVR2_ILL_OPCODE_EXC_MASK)) {
++        tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_ILLEGAL_OP);
 +        t_gen_raise_exception(dc, EXCP_HW_EXCP);
 +    }
-+    return cond_user;
++    return cond;
 +}
 +
- /* True if ALU operand b is a small immediate that may deserve
-    faster treatment.  */
- static inline int dec_alu_op_b_is_small_imm(DisasContext *dc)
-@@ -432,7 +448,6 @@ static void dec_msr(DisasContext *dc)
-     CPUState *cs = CPU(dc->cpu);
-     TCGv_i32 t0, t1;
-     unsigned int sr, to, rn;
--    int mem_index = cpu_mmu_index(&dc->cpu->env, false);
+ /*
+  * Returns true if the insn is illegal in userspace.
+  * If exceptions are enabled, an exception is raised.
+@@ -344,11 +358,8 @@ static void dec_pattern(DisasContext *dc)
+ {
+     unsigned int mode;
  
-     sr = dc->imm & ((1 << 14) - 1);
-     to = dc->imm & (1 << 14);
-@@ -452,10 +467,7 @@ static void dec_msr(DisasContext *dc)
-             return;
-         }
+-    if ((dc->tb_flags & MSR_EE_FLAG)
+-          && (dc->cpu->env.pvr.regs[2] & PVR2_ILL_OPCODE_EXC_MASK)
+-          && !dc->cpu->cfg.use_pcmp_instr) {
+-        tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_ILLEGAL_OP);
+-        t_gen_raise_exception(dc, EXCP_HW_EXCP);
++    if (trap_illegal(dc, !dc->cpu->cfg.use_pcmp_instr)) {
++        return;
+     }
  
--        if ((dc->tb_flags & MSR_EE_FLAG)
--            && mem_index == MMU_USER_IDX && (dc->imm != 4 && dc->imm != 0)) {
--            tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
--            t_gen_raise_exception(dc, EXCP_HW_EXCP);
-+        if (trap_userspace(dc, dc->imm != 4 && dc->imm != 0)) {
-             return;
-         }
+     mode = dc->opcode & 3;
+@@ -602,11 +613,7 @@ static void dec_mul(DisasContext *dc)
+     TCGv_i32 tmp;
+     unsigned int subcode;
  
-@@ -480,13 +492,8 @@ static void dec_msr(DisasContext *dc)
+-    if ((dc->tb_flags & MSR_EE_FLAG)
+-         && (dc->cpu->env.pvr.regs[2] & PVR2_ILL_OPCODE_EXC_MASK)
+-         && !dc->cpu->cfg.use_hw_mul) {
+-        tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_ILLEGAL_OP);
+-        t_gen_raise_exception(dc, EXCP_HW_EXCP);
++    if (trap_illegal(dc, !dc->cpu->cfg.use_hw_mul)) {
          return;
      }
  
--    if (to) {
+@@ -658,10 +665,8 @@ static void dec_div(DisasContext *dc)
+     u = dc->imm & 2; 
+     LOG_DIS("div\n");
+ 
+-    if ((dc->cpu->env.pvr.regs[2] & PVR2_ILL_OPCODE_EXC_MASK)
+-          && !dc->cpu->cfg.use_div) {
+-        tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_ILLEGAL_OP);
+-        t_gen_raise_exception(dc, EXCP_HW_EXCP);
++    if (trap_illegal(dc, !dc->cpu->cfg.use_div)) {
++        return;
+     }
+ 
+     if (u)
+@@ -680,11 +685,7 @@ static void dec_barrel(DisasContext *dc)
+     unsigned int imm_w, imm_s;
+     bool s, t, e = false, i = false;
+ 
+-    if ((dc->tb_flags & MSR_EE_FLAG)
+-          && (dc->cpu->env.pvr.regs[2] & PVR2_ILL_OPCODE_EXC_MASK)
+-          && !dc->cpu->cfg.use_barrel) {
+-        tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_ILLEGAL_OP);
+-        t_gen_raise_exception(dc, EXCP_HW_EXCP);
++    if (trap_illegal(dc, !dc->cpu->cfg.use_barrel)) {
+         return;
+     }
+ 
+@@ -798,11 +799,8 @@ static void dec_bit(DisasContext *dc)
+             trap_userspace(dc, true);
+             break;
+         case 0xe0:
+-            if ((dc->tb_flags & MSR_EE_FLAG)
+-                && (dc->cpu->env.pvr.regs[2] & PVR2_ILL_OPCODE_EXC_MASK)
+-                && !dc->cpu->cfg.use_pcmp_instr) {
+-                tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_ILLEGAL_OP);
+-                t_gen_raise_exception(dc, EXCP_HW_EXCP);
++            if (trap_illegal(dc, !dc->cpu->cfg.use_pcmp_instr)) {
++                return;
+             }
+             if (dc->cpu->cfg.use_pcmp_instr) {
+                 tcg_gen_clzi_i32(cpu_R[dc->rd], cpu_R[dc->ra], 32);
+@@ -921,10 +919,7 @@ static void dec_load(DisasContext *dc)
+         mop ^= MO_BSWAP;
+     }
+ 
+-    if (size > 4 && (dc->tb_flags & MSR_EE_FLAG)
+-          && (dc->cpu->env.pvr.regs[2] & PVR2_ILL_OPCODE_EXC_MASK)) {
+-        tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_ILLEGAL_OP);
+-        t_gen_raise_exception(dc, EXCP_HW_EXCP);
++    if (trap_illegal(dc, size > 4)) {
+         return;
+     }
+ 
+@@ -1031,10 +1026,7 @@ static void dec_store(DisasContext *dc)
+         mop ^= MO_BSWAP;
+     }
+ 
+-    if (size > 4 && (dc->tb_flags & MSR_EE_FLAG)
+-          && (dc->cpu->env.pvr.regs[2] & PVR2_ILL_OPCODE_EXC_MASK)) {
+-        tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_ILLEGAL_OP);
+-        t_gen_raise_exception(dc, EXCP_HW_EXCP);
++    if (trap_illegal(dc, size > 4)) {
+         return;
+     }
+ 
+@@ -1368,11 +1360,7 @@ static void dec_fpu(DisasContext *dc)
+ {
+     unsigned int fpu_insn;
+ 
+-    if ((dc->tb_flags & MSR_EE_FLAG)
+-          && (dc->cpu->env.pvr.regs[2] & PVR2_ILL_OPCODE_EXC_MASK)
+-          && !dc->cpu->cfg.use_fpu) {
+-        tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_ILLEGAL_OP);
+-        t_gen_raise_exception(dc, EXCP_HW_EXCP);
++    if (trap_illegal(dc, !dc->cpu->cfg.use_fpu)) {
+         return;
+     }
+ 
+@@ -1471,10 +1459,7 @@ static void dec_fpu(DisasContext *dc)
+ 
+ static void dec_null(DisasContext *dc)
+ {
+-    if ((dc->tb_flags & MSR_EE_FLAG)
+-          && (dc->cpu->env.pvr.regs[2] & PVR2_ILL_OPCODE_EXC_MASK)) {
+-        tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_ILLEGAL_OP);
+-        t_gen_raise_exception(dc, EXCP_HW_EXCP);
++    if (trap_illegal(dc, true)) {
+         return;
+     }
+     qemu_log_mask(LOG_GUEST_ERROR, "unknown insn pc=%x opc=%x\n", dc->pc, dc->opcode);
+@@ -1552,13 +1537,7 @@ static inline void decode(DisasContext *dc, uint32_t ir)
+     if (dc->ir)
+         dc->nr_nops = 0;
+     else {
 -        if ((dc->tb_flags & MSR_EE_FLAG)
--             && mem_index == MMU_USER_IDX) {
--            tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
+-              && (dc->cpu->env.pvr.regs[2] & PVR2_ILL_OPCODE_EXC_MASK)
+-              && (dc->cpu->env.pvr.regs[2] & PVR2_OPCODE_0x0_ILL_MASK)) {
+-            tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_ILLEGAL_OP);
 -            t_gen_raise_exception(dc, EXCP_HW_EXCP);
 -            return;
 -        }
-+    if (trap_userspace(dc, to)) {
-+        return;
-     }
++        trap_illegal(dc, dc->cpu->env.pvr.regs[2] & PVR2_OPCODE_0x0_ILL_MASK);
  
- #if !defined(CONFIG_USER_ONLY)
-@@ -738,7 +745,6 @@ static void dec_bit(DisasContext *dc)
-     CPUState *cs = CPU(dc->cpu);
-     TCGv_i32 t0;
-     unsigned int op;
--    int mem_index = cpu_mmu_index(&dc->cpu->env, false);
- 
-     op = dc->ir & ((1 << 9) - 1);
-     switch (op) {
-@@ -784,22 +790,12 @@ static void dec_bit(DisasContext *dc)
-         case 0x76:
-             /* wdc.  */
-             LOG_DIS("wdc r%d\n", dc->ra);
--            if ((dc->tb_flags & MSR_EE_FLAG)
--                 && mem_index == MMU_USER_IDX) {
--                tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
--                t_gen_raise_exception(dc, EXCP_HW_EXCP);
--                return;
--            }
-+            trap_userspace(dc, true);
-             break;
-         case 0x68:
-             /* wic.  */
-             LOG_DIS("wic r%d\n", dc->ra);
--            if ((dc->tb_flags & MSR_EE_FLAG)
--                 && mem_index == MMU_USER_IDX) {
--                tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
--                t_gen_raise_exception(dc, EXCP_HW_EXCP);
--                return;
--            }
-+            trap_userspace(dc, true);
-             break;
-         case 0xe0:
-             if ((dc->tb_flags & MSR_EE_FLAG)
-@@ -1199,7 +1195,6 @@ static void dec_bcc(DisasContext *dc)
- static void dec_br(DisasContext *dc)
- {
-     unsigned int dslot, link, abs, mbar;
--    int mem_index = cpu_mmu_index(&dc->cpu->env, false);
- 
-     dslot = dc->ir & (1 << 20);
-     abs = dc->ir & (1 << 19);
-@@ -1254,9 +1249,7 @@ static void dec_br(DisasContext *dc)
-             if (!(dc->tb_flags & IMM_FLAG) && (dc->imm == 8 || dc->imm == 0x18))
-                 t_gen_raise_exception(dc, EXCP_BREAK);
-             if (dc->imm == 0) {
--                if ((dc->tb_flags & MSR_EE_FLAG) && mem_index == MMU_USER_IDX) {
--                    tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
--                    t_gen_raise_exception(dc, EXCP_HW_EXCP);
-+                if (trap_userspace(dc, true)) {
-                     return;
-                 }
- 
-@@ -1331,12 +1324,15 @@ static inline void do_rte(DisasContext *dc)
- static void dec_rts(DisasContext *dc)
- {
-     unsigned int b_bit, i_bit, e_bit;
--    int mem_index = cpu_mmu_index(&dc->cpu->env, false);
- 
-     i_bit = dc->ir & (1 << 21);
-     b_bit = dc->ir & (1 << 22);
-     e_bit = dc->ir & (1 << 23);
- 
-+    if (trap_userspace(dc, i_bit || b_bit || e_bit)) {
-+        return;
-+    }
-+
-     dc->delayed_branch = 2;
-     dc->tb_flags |= D_FLAG;
-     tcg_gen_st_i32(tcg_const_i32(dc->type_b && (dc->tb_flags & IMM_FLAG)),
-@@ -1344,27 +1340,12 @@ static void dec_rts(DisasContext *dc)
- 
-     if (i_bit) {
-         LOG_DIS("rtid ir=%x\n", dc->ir);
--        if ((dc->tb_flags & MSR_EE_FLAG)
--             && mem_index == MMU_USER_IDX) {
--            tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
--            t_gen_raise_exception(dc, EXCP_HW_EXCP);
--        }
-         dc->tb_flags |= DRTI_FLAG;
-     } else if (b_bit) {
-         LOG_DIS("rtbd ir=%x\n", dc->ir);
--        if ((dc->tb_flags & MSR_EE_FLAG)
--             && mem_index == MMU_USER_IDX) {
--            tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
--            t_gen_raise_exception(dc, EXCP_HW_EXCP);
--        }
-         dc->tb_flags |= DRTB_FLAG;
-     } else if (e_bit) {
-         LOG_DIS("rted ir=%x\n", dc->ir);
--        if ((dc->tb_flags & MSR_EE_FLAG)
--             && mem_index == MMU_USER_IDX) {
--            tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
--            t_gen_raise_exception(dc, EXCP_HW_EXCP);
--        }
-         dc->tb_flags |= DRTE_FLAG;
-     } else
-         LOG_DIS("rts ir=%x\n", dc->ir);
-@@ -1503,16 +1484,13 @@ static void dec_null(DisasContext *dc)
- /* Insns connected to FSL or AXI stream attached devices.  */
- static void dec_stream(DisasContext *dc)
- {
--    int mem_index = cpu_mmu_index(&dc->cpu->env, false);
-     TCGv_i32 t_id, t_ctrl;
-     int ctrl;
- 
-     LOG_DIS("%s%s imm=%x\n", dc->rd ? "get" : "put",
-             dc->type_b ? "" : "d", dc->imm);
- 
--    if ((dc->tb_flags & MSR_EE_FLAG) && (mem_index == MMU_USER_IDX)) {
--        tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_PRIVINSN);
--        t_gen_raise_exception(dc, EXCP_HW_EXCP);
-+    if (trap_userspace(dc, true)) {
-         return;
-     }
- 
+         LOG_DIS("nr_nops=%d\t", dc->nr_nops);
+         dc->nr_nops++;
 -- 
 2.14.1
