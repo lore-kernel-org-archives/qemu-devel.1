@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fG2Y4-0004rh-Fb
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:20:57 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fG2Zj-0005fO-Ht
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:22:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fG2Y1-0004l8-Qd
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:20:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41728 helo=mx1.redhat.com)
+	(envelope-from <kraxel@redhat.com>) id 1fG2Zg-00062y-UT
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:22:39 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45572 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fG2Y1-0004kh-Lr
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:20:53 -0400
-Date: Tue, 8 May 2018 14:20:47 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180508132047.GL2500@work-vm>
-References: <20180502104740.12123-1-peterx@redhat.com>
-	<20180502104740.12123-24-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fG2Zg-000622-QA
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:22:36 -0400
+Date: Tue, 8 May 2018 15:22:34 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180508132234.yegmw442swuofykh@sirius.home.kraxel.org>
+References: <152541524728.557.4600864098110042577.malonedeb@gac.canonical.com>
+	<152577650854.21921.3043264133804855985.malone@soybean.canonical.com>
+	<20180508112338.GI2500@work-vm>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180502104740.12123-24-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v8 23/24] migration/qmp: add command
- migrate-pause
+In-Reply-To: <20180508112338.GI2500@work-vm>
+Subject: Re: [Qemu-devel] [Bug 1769053] Re: Cannot start a guest with more
+ than 1TB of RAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,98 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: Bug 1769053 <1769053@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org
 
-* Peter Xu (peterx@redhat.com) wrote:
-> It pauses an ongoing migration.  Currently it only supports postcopy.
-> Note that this command will work on either side of the migration.
-> Basically when we trigger this on one side, it'll interrupt the other
-> side as well since the other side will get notified on the disconnect
-> event.
-> 
-> However, it's still possible that the other side is not notified, for
-> example, when the network is totally broken, or due to some firewall
-> configuration changes.  In that case, we will also need to run the same
-> command on the other side so both sides will go into the paused state.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+  Hi,
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>   d) For smaller amount of RAM it might still fail if
+> RAM+rounding+pci+hotplug space goes over the limit.
+>      Figuring that limit out is tricky (and I thought it
+>      might be BIOS/EFI dependent as well depending where they
+>      decide to put their PCI devices)
 
-(I don't really like the name 'pause' but I can't think of a better one)
+Both seabios and ovmf try to not go too high in address space.  Reason
+is exactly the phys-bits issue.  Using 40 here by default does not only
+limit the memory to 1TB.  It also has the problem that the guest thinks
+it has 1TB of address space but in reality it might be less.  Even
+recent skylake machines have phys-bits=39 (512G) only, and trying to use
+the physical address space above 512G in the guest just doesn't work
+because the phys-bits=39 limit applies to EPT too.
 
-> ---
->  qapi/migration.json   | 16 ++++++++++++++++
->  migration/migration.c | 29 +++++++++++++++++++++++++++++
->  2 files changed, 45 insertions(+)
-> 
-> diff --git a/qapi/migration.json b/qapi/migration.json
-> index a1c2c238ab..bf403d2dd2 100644
-> --- a/qapi/migration.json
-> +++ b/qapi/migration.json
-> @@ -1211,3 +1211,19 @@
->  ##
->  { 'command': 'migrate-recover', 'data': { 'uri': 'str' },
->    'allow-oob': true }
-> +
-> +##
-> +# @migrate-pause:
-> +#
-> +# Pause a migration.  Currently it only supports postcopy.
-> +#
-> +# Returns: nothing.
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "migrate-pause" }
-> +# <- { "return": {} }
-> +#
-> +# Since: 2.12
-> +##
-> +{ 'command': 'migrate-pause', 'allow-oob': true }
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 25f26052d2..03e4950976 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1502,6 +1502,35 @@ void qmp_migrate_recover(const char *uri, Error **errp)
->      qemu_start_incoming_migration(uri, errp);
->  }
->  
-> +void qmp_migrate_pause(Error **errp)
-> +{
-> +    MigrationState *ms = migrate_get_current();
-> +    MigrationIncomingState *mis = migration_incoming_get_current();
-> +    int ret;
-> +
-> +    if (ms->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
-> +        /* Source side, during postcopy */
-> +        qemu_mutex_lock(&ms->qemu_file_lock);
-> +        ret = qemu_file_shutdown(ms->to_dst_file);
-> +        qemu_mutex_unlock(&ms->qemu_file_lock);
-> +        if (ret) {
-> +            error_setg(errp, "Failed to pause source migration");
-> +        }
-> +        return;
-> +    }
-> +
-> +    if (mis->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
-> +        ret = qemu_file_shutdown(mis->from_src_file);
-> +        if (ret) {
-> +            error_setg(errp, "Failed to pause destination migration");
-> +        }
-> +        return;
-> +    }
-> +
-> +    error_setg(errp, "migrate-pause is currently only supported "
-> +               "during postcopy-active state");
-> +}
-> +
->  bool migration_is_blocked(Error **errp)
->  {
->      if (qemu_savevm_state_blocked(errp)) {
-> -- 
-> 2.14.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+So checking phys-bits in the firmware, for example to place pci bars as
+high as possible in physical address space, is not going to work.
+
+IIRC ovmf uses a 32G sized region with 32G alignment by default, which
+will land below 64G (aka phys-bits=36 address space) unless the guest
+has more than 30 (q35) or 31 (piix4) GB of memory.
+
+seabios will not map pci bars above 4G unless it runs out of space below
+4G.  If needed 64bit PCI bars will be placed right above ram, with
+gigabyte alignment.
+
+cheers,
+  Gerd
