@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fFzah-0008Dm-25
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:11:28 -0400
+	(envelope-from <thuth@redhat.com>) id 1fFzhI-0002SW-27
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:18:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fFzad-0000fP-U0
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:11:27 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:46429)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fFzad-0000f8-Ms
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:11:23 -0400
-Received: by mail-wr0-x243.google.com with SMTP id a12-v6so792691wrn.13
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 03:11:23 -0700 (PDT)
-Date: Tue, 8 May 2018 11:11:21 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180508101121.GD19710@stefanha-x1.localdomain>
-References: <ba020090-1877-6b9a-891d-dbfbabf25c71@ymail.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="fOHHtNG4YXGJ0yqR"
-Content-Disposition: inline
-In-Reply-To: <ba020090-1877-6b9a-891d-dbfbabf25c71@ymail.com>
-Subject: Re: [Qemu-devel] Unix signal to send ACPI-shutdown to Guest
+	(envelope-from <thuth@redhat.com>) id 1fFzhB-0002Bo-6p
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:18:14 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Tue,  8 May 2018 12:17:52 +0200
+Message-Id: <1525774672-11913-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] pc-bios/s390-ccw: struct tpi_info must be
+ declared as aligned(4)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +18,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Wood <andrewjameswood@ymail.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
 
+I've run into a compilation error today with the current version of GCC 8:
 
---fOHHtNG4YXGJ0yqR
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In file included from s390-ccw.h:49,
+                 from main.c:12:
+cio.h:128:1: error: alignment 1 of 'struct tpi_info' is less than 4 [-Werror=packed-not-aligned]
+ } __attribute__ ((packed));
+ ^
+cc1: all warnings being treated as errors
 
-On Sat, Apr 28, 2018 at 11:59:41PM +0100, Andrew Wood via Qemu-devel wrote:
-> Ive been looking into the possibility of using a unix signal to send an a=
-cpi
-> shutdown request to a VM, and came across a posting on this l in March 1.
-> See https://lists.nongnu.org/archive/html/qemu-devel/2017-03/msg04169.html
->=20
->=20
-> To summarise to refresh memories=A0 there was a patch proposed using SIGI=
-NT
-> followed by discussion as to why SIGINT wasnt ideal because it would cause
-> regressions for anyone relying on the existing handling of SIGINT, and
-> various other signals were considered including HUP & USR1 & USR2 all of
-> which are already used for something else.
->=20
-> Is SIGPWR a suitable candidate, I have made a patch to use SIGPWR but as =
-Im
-> new to QEMUs internals Im not sure if there are any circumstances in which
-> an alternative handler is registered for SIGPWR which might conflict?
+Since the struct tpi_info contains an element ("struct subchannel_id schid")
+which is marked as aligned(4), we've got to mark the struct tpi_info as
+aligned(4), too.
 
-A quick grep of the Linux kernel code suggests that SIGPWR is very
-rarely raised by the kernel.  It's only sent to init on s390 and Silicon
-Graphics SN systems.  QEMU could use the signal on Linux without risk of
-collision.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ pc-bios/s390-ccw/cio.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-It's worth sending a patch.  Here are the patch submission guidelines:
-https://wiki.qemu.org/Contribute/SubmitAPatch
-
-Stefan
-
---fOHHtNG4YXGJ0yqR
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEbBAEBAgAGBQJa8XfJAAoJEJykq7OBq3PIoPUH+N1xR2abvjjX5Q6vMid8eZ9w
-nWmSA0FHTN8ik/cUDmbpIuSeF/pmzSClgKj7AYD8xHqgVTuTqCZ4KjbEWyNuwJAZ
-2qX/bb1u2sWq5Ska0OCfc4O6w3eXbBw+Qkf6n/28zVPNCgnIFZdWJPZUs9rawZeK
-F21cSGRiKquHhsVUWy/EwN46UT5miGQ6ldGq0d0znq3FrxoVoH0mAHnb+ejjcCW8
-thuZobnM/a8VoIpCdCiYm/XcCZccHU/33+c/x7/7q0M6Vr3R3NgGAyZLd7I197AN
-AEztE8fNQT+a9639bwJhk3+rg+04M4ZleExKK3PKUejW0Ta9fJIUTRqY/i3TiQ==
-=EDRw
------END PGP SIGNATURE-----
-
---fOHHtNG4YXGJ0yqR--
+diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
+index 55eaeee..1a0795f 100644
+--- a/pc-bios/s390-ccw/cio.h
++++ b/pc-bios/s390-ccw/cio.h
+@@ -125,7 +125,7 @@ struct tpi_info {
+     __u32 reserved3  : 12;
+     __u32 int_type   : 3;
+     __u32 reserved4  : 12;
+-} __attribute__ ((packed));
++} __attribute__ ((packed, aligned(4)));
+ 
+ /* channel command word (type 1) */
+ struct ccw1 {
+-- 
+1.8.3.1
