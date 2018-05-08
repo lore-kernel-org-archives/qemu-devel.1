@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fGAud-0004RM-VW
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 18:16:48 -0400
+	(envelope-from <alistair23@gmail.com>) id 1fGBGi-000089-En
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 18:39:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fGAuc-0002RW-S5
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 18:16:47 -0400
-References: <20180508151035.16774-1-f4bug@amsat.org>
-	<20180508151035.16774-5-f4bug@amsat.org>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <af242f4e-7a71-c219-a24b-6360c5657bfa@redhat.com>
-Date: Tue, 8 May 2018 18:16:35 -0400
+	(envelope-from <alistair23@gmail.com>) id 1fGBGh-0003S0-Ai
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 18:39:36 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:36735)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1fGBGh-0003Ra-3K
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 18:39:35 -0400
+Received: by mail-lf0-x243.google.com with SMTP id t129-v6so8889307lff.3
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 15:39:34 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180508151035.16774-5-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20180508144242.13370-1-f4bug@amsat.org>
+References: <20180508144242.13370-1-f4bug@amsat.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 8 May 2018 15:39:02 -0700
+Message-ID: <CAKmqyKM9OrAq2j_Z6z6ioES-BO3qTUYh+VPtFz6eQAcLYL-_Rg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 4/4] hw/ide/ahci: Remove
- AllwinnerAHCIState from qemu/typedefs.h
+Subject: Re: [Qemu-devel] [PATCH] RISC-V: Remove unnecessary header include
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +29,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Alistair Francis <alistair@alistair23.me>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-
-
-On 05/08/2018 11:10 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Files requiring AllwinnerAHCIState already include "hw/ide/ahci.h".
->=20
+On Tue, May 8, 2018 at 7:42 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+
+Alistair
+
 > ---
->  include/hw/ide/ahci.h   | 4 ++--
->  include/qemu/typedefs.h | 1 -
->  2 files changed, 2 insertions(+), 3 deletions(-)
->=20
-> diff --git a/include/hw/ide/ahci.h b/include/hw/ide/ahci.h
-> index b7bb2b02d6..b44e3000cf 100644
-> --- a/include/hw/ide/ahci.h
-> +++ b/include/hw/ide/ahci.h
-> @@ -73,13 +73,13 @@ typedef struct SysbusAHCIState {
->  #define ALLWINNER_AHCI_MMIO_OFF  0x80
->  #define ALLWINNER_AHCI_MMIO_SIZE 0x80
-> =20
-> -struct AllwinnerAHCIState {
-> +typedef struct AllwinnerAHCIState {
->      /*< private >*/
->      SysbusAHCIState parent_obj;
->      /*< public >*/
-> =20
->      MemoryRegion mmio;
->      uint32_t regs[ALLWINNER_AHCI_MMIO_SIZE/4];
-> -};
-> +} AllwinnerAHCIState;
-> =20
->  #endif /* HW_IDE_AHCI_H */
-> diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-> index b4dc63a466..6baadfbd49 100644
-> --- a/include/qemu/typedefs.h
-> +++ b/include/qemu/typedefs.h
-> @@ -8,7 +8,6 @@
->  typedef struct AdapterInfo AdapterInfo;
->  typedef struct AddressSpace AddressSpace;
->  typedef struct AioContext AioContext;
-> -typedef struct AllwinnerAHCIState AllwinnerAHCIState;
->  typedef struct AudioState AudioState;
->  typedef struct BdrvDirtyBitmap BdrvDirtyBitmap;
->  typedef struct BdrvDirtyBitmapIter BdrvDirtyBitmapIter;
->=20
-
-Hm, sure; I suppose we don't need QEMU-wide definitions of these sorts
-of things.
-
-Acked-by: John Snow <jsnow@redhat.com>
+>  hw/riscv/riscv_htif.c | 1 -
+>  hw/riscv/sifive_e.c   | 1 -
+>  hw/riscv/sifive_u.c   | 1 -
+>  hw/riscv/spike.c      | 1 -
+>  hw/riscv/virt.c       | 1 -
+>  5 files changed, 5 deletions(-)
+>
+> diff --git a/hw/riscv/riscv_htif.c b/hw/riscv/riscv_htif.c
+> index 3e17f30251..43533f9dc2 100644
+> --- a/hw/riscv/riscv_htif.c
+> +++ b/hw/riscv/riscv_htif.c
+> @@ -29,7 +29,6 @@
+>  #include "chardev/char-fe.h"
+>  #include "hw/riscv/riscv_htif.h"
+>  #include "qemu/timer.h"
+> -#include "exec/address-spaces.h"
+>  #include "qemu/error-report.h"
+>
+>  #define RISCV_DEBUG_HTIF 0
+> diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+> index e4ecb7aa4b..d3d11e849b 100644
+> --- a/hw/riscv/sifive_e.c
+> +++ b/hw/riscv/sifive_e.c
+> @@ -46,7 +46,6 @@
+>  #include "hw/riscv/sifive_e.h"
+>  #include "chardev/char.h"
+>  #include "sysemu/arch_init.h"
+> -#include "exec/address-spaces.h"
+>  #include "elf.h"
+>
+>  static const struct MemmapEntry {
+> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> index c05dcbba95..07f8644695 100644
+> --- a/hw/riscv/sifive_u.c
+> +++ b/hw/riscv/sifive_u.c
+> @@ -44,7 +44,6 @@
+>  #include "chardev/char.h"
+>  #include "sysemu/arch_init.h"
+>  #include "sysemu/device_tree.h"
+> -#include "exec/address-spaces.h"
+>  #include "elf.h"
+>
+>  #include <libfdt.h>
+> diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+> index f94e2b6707..aecdf296cc 100644
+> --- a/hw/riscv/spike.c
+> +++ b/hw/riscv/spike.c
+> @@ -39,7 +39,6 @@
+>  #include "chardev/char.h"
+>  #include "sysemu/arch_init.h"
+>  #include "sysemu/device_tree.h"
+> -#include "exec/address-spaces.h"
+>  #include "elf.h"
+>
+>  #include <libfdt.h>
+> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+> index ad03113e0f..d967624bcc 100644
+> --- a/hw/riscv/virt.c
+> +++ b/hw/riscv/virt.c
+> @@ -37,7 +37,6 @@
+>  #include "chardev/char.h"
+>  #include "sysemu/arch_init.h"
+>  #include "sysemu/device_tree.h"
+> -#include "exec/address-spaces.h"
+>  #include "elf.h"
+>
+>  #include <libfdt.h>
+> --
+> 2.17.0
+>
+>
