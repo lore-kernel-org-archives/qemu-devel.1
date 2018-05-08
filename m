@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fG2Wu-0004GS-D0
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:19:45 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fG2Y4-0004rh-Fb
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:20:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fG2Wr-0004Co-Oi
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:19:44 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33204 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1fG2Y1-0004l8-Qd
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:20:56 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41728 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fG2Wr-0004CW-K6
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:19:41 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E6D8681A88A2
-	for <qemu-devel@nongnu.org>; Tue,  8 May 2018 13:19:30 +0000 (UTC)
-References: <1525326658-3078-1-git-send-email-thuth@redhat.com>
-	<87k1slot93.fsf@dusky.pond.sub.org>
-	<54f1bb8c-c61e-557a-952d-92ba1297e818@redhat.com>
-	<87in80ym1o.fsf@dusky.pond.sub.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <9d66d071-324f-5d33-547d-901f497cb497@redhat.com>
-Date: Tue, 8 May 2018 15:19:24 +0200
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fG2Y1-0004kh-Lr
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:20:53 -0400
+Date: Tue, 8 May 2018 14:20:47 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180508132047.GL2500@work-vm>
+References: <20180502104740.12123-1-peterx@redhat.com>
+	<20180502104740.12123-24-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87in80ym1o.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] net: Silence 'has no peer' messages in
- testing mode
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180502104740.12123-24-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v8 23/24] migration/qmp: add command
+ migrate-pause
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,42 +28,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-On 07.05.2018 09:14, Markus Armbruster wrote:
-[...]
-> Two (possibly confused) questions:
->=20
-> 1. The user can add nics without convenience options:
->=20
->     $ upstream-qemu -display none -nodefaults -device e1000
->     upstream-qemu: warning: nic e1000.0 has no peer
->=20
->    Shouldn't we silence the warning then, too?
+* Peter Xu (peterx@redhat.com) wrote:
+> It pauses an ongoing migration.  Currently it only supports postcopy.
+> Note that this command will work on either side of the migration.
+> Basically when we trigger this on one side, it'll interrupt the other
+> side as well since the other side will get notified on the disconnect
+> event.
+> 
+> However, it's still possible that the other side is not notified, for
+> example, when the network is totally broken, or due to some firewall
+> configuration changes.  In that case, we will also need to run the same
+> command on the other side so both sides will go into the paused state.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-No, since that is certainly a mis-configuration in that case. Why would
-a user want to add a NIC without host backend?
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-> 2. We already have code to silence the warning:
->=20
->     /* Don't warn about the default network setup that you get if
->      * no command line -net or -netdev options are specified. There
->      * are two cases that we would otherwise complain about:
->      * (1) board doesn't support a NIC but the implicit "-net nic"
->      * requested one
->      * (2) CONFIG_SLIRP not set, in which case the implicit "-net nic"
->      * sets up a nic that isn't connected to anything.
->      */
->     if (!default_net) {
->         net_check_clients();
->     }
->=20
->    Is it a good idea to split the logic between net_check_clients() and
->    its caller?
+(I don't really like the name 'pause' but I can't think of a better one)
 
-Hmm, it's likely nicer to keep everything in one place. Since
-"default_net" is only available in vl.c, I think the checks should go
-there... so I'll rework my patch accordingly.
-
- Thomas
+> ---
+>  qapi/migration.json   | 16 ++++++++++++++++
+>  migration/migration.c | 29 +++++++++++++++++++++++++++++
+>  2 files changed, 45 insertions(+)
+> 
+> diff --git a/qapi/migration.json b/qapi/migration.json
+> index a1c2c238ab..bf403d2dd2 100644
+> --- a/qapi/migration.json
+> +++ b/qapi/migration.json
+> @@ -1211,3 +1211,19 @@
+>  ##
+>  { 'command': 'migrate-recover', 'data': { 'uri': 'str' },
+>    'allow-oob': true }
+> +
+> +##
+> +# @migrate-pause:
+> +#
+> +# Pause a migration.  Currently it only supports postcopy.
+> +#
+> +# Returns: nothing.
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "migrate-pause" }
+> +# <- { "return": {} }
+> +#
+> +# Since: 2.12
+> +##
+> +{ 'command': 'migrate-pause', 'allow-oob': true }
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 25f26052d2..03e4950976 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1502,6 +1502,35 @@ void qmp_migrate_recover(const char *uri, Error **errp)
+>      qemu_start_incoming_migration(uri, errp);
+>  }
+>  
+> +void qmp_migrate_pause(Error **errp)
+> +{
+> +    MigrationState *ms = migrate_get_current();
+> +    MigrationIncomingState *mis = migration_incoming_get_current();
+> +    int ret;
+> +
+> +    if (ms->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
+> +        /* Source side, during postcopy */
+> +        qemu_mutex_lock(&ms->qemu_file_lock);
+> +        ret = qemu_file_shutdown(ms->to_dst_file);
+> +        qemu_mutex_unlock(&ms->qemu_file_lock);
+> +        if (ret) {
+> +            error_setg(errp, "Failed to pause source migration");
+> +        }
+> +        return;
+> +    }
+> +
+> +    if (mis->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
+> +        ret = qemu_file_shutdown(mis->from_src_file);
+> +        if (ret) {
+> +            error_setg(errp, "Failed to pause destination migration");
+> +        }
+> +        return;
+> +    }
+> +
+> +    error_setg(errp, "migrate-pause is currently only supported "
+> +               "during postcopy-active state");
+> +}
+> +
+>  bool migration_is_blocked(Error **errp)
+>  {
+>      if (qemu_savevm_state_blocked(errp)) {
+> -- 
+> 2.14.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
