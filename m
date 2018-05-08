@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fG4JY-0005Sz-FQ
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:14:08 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fG4KC-0006Xe-Ua
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:14:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fG4JT-0007ON-TI
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:14:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41086 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fG4JT-0007Ny-Ox
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:13:59 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180502104740.12123-3-peterx@redhat.com> (Peter Xu's message of
-	"Wed, 2 May 2018 18:47:18 +0800")
-References: <20180502104740.12123-1-peterx@redhat.com>
-	<20180502104740.12123-3-peterx@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Tue, 08 May 2018 17:16:15 +0200
-Message-ID: <87r2mm6uv4.fsf@secure.laptop>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v8 02/24] migration: new postcopy-pause
- state
+	(envelope-from <richard.henderson@linaro.org>) id 1fG4KA-00085k-8O
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:14:44 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:46991)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fG4KA-00085A-3M
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:14:42 -0400
+Received: by mail-pg0-x242.google.com with SMTP id z4-v6so21298088pgu.13
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 08:14:42 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Tue,  8 May 2018 08:14:28 -0700
+Message-Id: <20180508151437.4232-2-richard.henderson@linaro.org>
+In-Reply-To: <20180508151437.4232-1-richard.henderson@linaro.org>
+References: <20180508151437.4232-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v3 01/10] tcg: Introduce helpers for integer
+ min/max
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,21 +27,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-Peter Xu <peterx@redhat.com> wrote:
-> Introducing a new state "postcopy-paused", which can be used when the
-> postcopy migration is paused. It is targeted for postcopy network
-> failure recovery.
->
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+These operations are re-invented by several targets so far.
+Several supported hosts have insns for these, so place the
+expanders out-of-line for a future introduction of tcg opcodes.
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ tcg/tcg-op.h | 16 ++++++++++++++++
+ tcg/tcg-op.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 56 insertions(+)
 
-> +# @postcopy-paused: during postcopy but paused. (since 2.12)
-> +#
-
-since 2.13
-will fix it when I queue it.
+diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
+index 5d2c91a1b6..0451e2752e 100644
+--- a/tcg/tcg-op.h
++++ b/tcg/tcg-op.h
+@@ -324,6 +324,10 @@ void tcg_gen_ext8u_i32(TCGv_i32 ret, TCGv_i32 arg);
+ void tcg_gen_ext16u_i32(TCGv_i32 ret, TCGv_i32 arg);
+ void tcg_gen_bswap16_i32(TCGv_i32 ret, TCGv_i32 arg);
+ void tcg_gen_bswap32_i32(TCGv_i32 ret, TCGv_i32 arg);
++void tcg_gen_smin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
++void tcg_gen_smax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
++void tcg_gen_umin_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
++void tcg_gen_umax_i32(TCGv_i32, TCGv_i32 arg1, TCGv_i32 arg2);
+ 
+ static inline void tcg_gen_discard_i32(TCGv_i32 arg)
+ {
+@@ -517,6 +521,10 @@ void tcg_gen_ext32u_i64(TCGv_i64 ret, TCGv_i64 arg);
+ void tcg_gen_bswap16_i64(TCGv_i64 ret, TCGv_i64 arg);
+ void tcg_gen_bswap32_i64(TCGv_i64 ret, TCGv_i64 arg);
+ void tcg_gen_bswap64_i64(TCGv_i64 ret, TCGv_i64 arg);
++void tcg_gen_smin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
++void tcg_gen_smax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
++void tcg_gen_umin_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
++void tcg_gen_umax_i64(TCGv_i64, TCGv_i64 arg1, TCGv_i64 arg2);
+ 
+ #if TCG_TARGET_REG_BITS == 64
+ static inline void tcg_gen_discard_i64(TCGv_i64 arg)
+@@ -1025,6 +1033,10 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
+ #define tcg_gen_mulu2_tl tcg_gen_mulu2_i64
+ #define tcg_gen_muls2_tl tcg_gen_muls2_i64
+ #define tcg_gen_mulsu2_tl tcg_gen_mulsu2_i64
++#define tcg_gen_smin_tl tcg_gen_smin_i64
++#define tcg_gen_umin_tl tcg_gen_umin_i64
++#define tcg_gen_smax_tl tcg_gen_smax_i64
++#define tcg_gen_umax_tl tcg_gen_umax_i64
+ #define tcg_gen_atomic_cmpxchg_tl tcg_gen_atomic_cmpxchg_i64
+ #define tcg_gen_atomic_xchg_tl tcg_gen_atomic_xchg_i64
+ #define tcg_gen_atomic_fetch_add_tl tcg_gen_atomic_fetch_add_i64
+@@ -1123,6 +1135,10 @@ void tcg_gen_stl_vec(TCGv_vec r, TCGv_ptr base, TCGArg offset, TCGType t);
+ #define tcg_gen_mulu2_tl tcg_gen_mulu2_i32
+ #define tcg_gen_muls2_tl tcg_gen_muls2_i32
+ #define tcg_gen_mulsu2_tl tcg_gen_mulsu2_i32
++#define tcg_gen_smin_tl tcg_gen_smin_i32
++#define tcg_gen_umin_tl tcg_gen_umin_i32
++#define tcg_gen_smax_tl tcg_gen_smax_i32
++#define tcg_gen_umax_tl tcg_gen_umax_i32
+ #define tcg_gen_atomic_cmpxchg_tl tcg_gen_atomic_cmpxchg_i32
+ #define tcg_gen_atomic_xchg_tl tcg_gen_atomic_xchg_i32
+ #define tcg_gen_atomic_fetch_add_tl tcg_gen_atomic_fetch_add_i32
+diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+index 34b96d68f3..5b82c3be8d 100644
+--- a/tcg/tcg-op.c
++++ b/tcg/tcg-op.c
+@@ -1033,6 +1033,26 @@ void tcg_gen_bswap32_i32(TCGv_i32 ret, TCGv_i32 arg)
+     }
+ }
+ 
++void tcg_gen_smin_i32(TCGv_i32 ret, TCGv_i32 a, TCGv_i32 b)
++{
++    tcg_gen_movcond_i32(TCG_COND_LT, ret, a, b, a, b);
++}
++
++void tcg_gen_umin_i32(TCGv_i32 ret, TCGv_i32 a, TCGv_i32 b)
++{
++    tcg_gen_movcond_i32(TCG_COND_LTU, ret, a, b, a, b);
++}
++
++void tcg_gen_smax_i32(TCGv_i32 ret, TCGv_i32 a, TCGv_i32 b)
++{
++    tcg_gen_movcond_i32(TCG_COND_LT, ret, a, b, b, a);
++}
++
++void tcg_gen_umax_i32(TCGv_i32 ret, TCGv_i32 a, TCGv_i32 b)
++{
++    tcg_gen_movcond_i32(TCG_COND_LTU, ret, a, b, b, a);
++}
++
+ /* 64-bit ops */
+ 
+ #if TCG_TARGET_REG_BITS == 32
+@@ -2438,6 +2458,26 @@ void tcg_gen_mulsu2_i64(TCGv_i64 rl, TCGv_i64 rh, TCGv_i64 arg1, TCGv_i64 arg2)
+     tcg_temp_free_i64(t2);
+ }
+ 
++void tcg_gen_smin_i64(TCGv_i64 ret, TCGv_i64 a, TCGv_i64 b)
++{
++    tcg_gen_movcond_i64(TCG_COND_LT, ret, a, b, a, b);
++}
++
++void tcg_gen_umin_i64(TCGv_i64 ret, TCGv_i64 a, TCGv_i64 b)
++{
++    tcg_gen_movcond_i64(TCG_COND_LTU, ret, a, b, a, b);
++}
++
++void tcg_gen_smax_i64(TCGv_i64 ret, TCGv_i64 a, TCGv_i64 b)
++{
++    tcg_gen_movcond_i64(TCG_COND_LT, ret, a, b, b, a);
++}
++
++void tcg_gen_umax_i64(TCGv_i64 ret, TCGv_i64 a, TCGv_i64 b)
++{
++    tcg_gen_movcond_i64(TCG_COND_LTU, ret, a, b, b, a);
++}
++
+ /* Size changing operations.  */
+ 
+ void tcg_gen_extrl_i64_i32(TCGv_i32 ret, TCGv_i64 arg)
+-- 
+2.17.0
