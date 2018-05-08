@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54456)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fG0pr-0003hW-5p
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 07:31:12 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fG0qf-0004Fb-I0
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 07:32:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fG0pn-0002hR-4c
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 07:31:11 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47070)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fG0pm-0002gw-UY
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 07:31:07 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fG0pj-0000hm-IU
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 11:31:03 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AA98A2E8137
-	for <qemu-devel@nongnu.org>; Tue,  8 May 2018 11:31:02 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 08 May 2018 11:23:39 -0000
+	(envelope-from <dgilbert@redhat.com>) id 1fG0qb-000396-GL
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 07:32:01 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57580 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fG0qb-00038w-Aa
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 07:31:57 -0400
+Date: Tue, 8 May 2018 12:31:49 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1769053 <1769053@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152541524728.557.4600864098110042577.malonedeb@gac.canonical.com>
-	<152577650854.21921.3043264133804855985.malone@soybean.canonical.com>
-Message-Id: <20180508112338.GI2500@work-vm>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1769053] Re: Cannot start a guest with more
- than 1TB of RAM
+Message-ID: <20180508113148.GJ2500@work-vm>
+References: <20180502104740.12123-1-peterx@redhat.com>
+	<20180502104740.12123-23-peterx@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180502104740.12123-23-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v8 22/24] migration: introduce lock for
+ to_dst_file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,146 +28,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-* Daniel Berrange (1769053@bugs.launchpad.net) wrote:
-> Hmm, if we know that QEMU guests will crash & burn when > 1 TB mem, when
-> host-phys-bits/phys-bits are unset, then perhaps libvirt should do the
-> right thing by default here. eg we can't use host-phys-bits=3Dtrue due to
-> migration compat issues, but if we see > 1TB mem, libvirt could
-> reasonably set phys-bits=3DNNN for some suitable value of NNN.  We should
-> expose this in the XML config for the CPU explicitly too.
+* Peter Xu (peterx@redhat.com) wrote:
+> Let's introduce a lock for that QEMUFile since we are going to operate
+> on it in multiple threads.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Yep:
-  a) It should be possible to add a setting to the XML to specify the
-     phys-bits
-  b) It should be possible for libvirt to check the host it's on can
-     satisfy that requirement
-  c) libvirt can check that if RAM > 2^phys-bits it can complain
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-but
+> ---
+>  migration/migration.h |  6 ++++++
+>  migration/channel.c   |  3 ++-
+>  migration/migration.c | 22 +++++++++++++++++++---
+>  3 files changed, 27 insertions(+), 4 deletions(-)
+> 
+> diff --git a/migration/migration.h b/migration/migration.h
+> index 012bcd352b..f6b9e774f9 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -114,6 +114,12 @@ struct MigrationState
+>      QemuThread thread;
+>      QEMUBH *cleanup_bh;
+>      QEMUFile *to_dst_file;
+> +    /*
+> +     * Protects to_dst_file pointer.  We need to make sure we won't
+> +     * yield or hang during the critical section, since this lock will
+> +     * be used in OOB command handler.
+> +     */
+> +    QemuMutex qemu_file_lock;
 
-  d) For smaller amount of RAM it might still fail if
-RAM+rounding+pci+hotplug space goes over the limit.
-     Figuring that limit out is tricky (and I thought it
-     might be BIOS/EFI dependent as well depending where they
-     decide to put their PCI devices)
+So what are the rules on access to_dst_file?
+You only seem to be taking the lock when closing or setting the
+to_dst_file.  Which I think given the problem we were trying
+to fix is OK, but it needs to be commented to say why it's safe.
 
 Dave
 
-> -- =
-
-> You received this bug notification because you are subscribed to the bug
-> report.
-> https://bugs.launchpad.net/bugs/1769053
-> =
-
-> Title:
->   Cannot start a guest with more than 1TB of RAM
-> =
-
-> Status in QEMU:
->   Incomplete
-> Status in qemu package in Ubuntu:
->   Incomplete
-> =
-
-> Bug description:
->   Attempting to start a KVM guest with more than 1TB of RAM fails.
-> =
-
->   It looks like we might need some extra patches:
->   https://lists.gnu.org/archive/html/qemu-discuss/2017-12/msg00005.html
-> =
-
->   ProblemType: Bug
->   DistroRelease: Ubuntu 18.04
->   Package: qemu-system-x86 1:2.11+dfsg-1ubuntu7
->   ProcVersionSignature: Ubuntu 4.15.0-20.21-generic 4.15.17
->   Uname: Linux 4.15.0-20-generic x86_64
->   ApportVersion: 2.20.9-0ubuntu7
->   Architecture: amd64
->   CurrentDesktop: Unity:Unity7:ubuntu
->   Date: Fri May  4 16:21:14 2018
->   InstallationDate: Installed on 2017-04-05 (393 days ago)
->   InstallationMedia: Ubuntu 16.10 "Yakkety Yak" - Release amd64 (20161012=
-.2)
->   MachineType: Dell Inc. XPS 13 9360
->   ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.15.0-20-generic root=3D/dev/=
-mapper/ubuntu--vg-root ro quiet splash transparent_hugepage=3Dmadvise vt.ha=
-ndoff=3D1
->   SourcePackage: qemu
->   UpgradeStatus: Upgraded to bionic on 2018-04-30 (3 days ago)
->   dmi.bios.date: 02/26/2018
->   dmi.bios.vendor: Dell Inc.
->   dmi.bios.version: 2.6.2
->   dmi.board.name: 0PF86Y
->   dmi.board.vendor: Dell Inc.
->   dmi.board.version: A00
->   dmi.chassis.type: 9
->   dmi.chassis.vendor: Dell Inc.
->   dmi.modalias: dmi:bvnDellInc.:bvr2.6.2:bd02/26/2018:svnDellInc.:pnXPS13=
-9360:pvr:rvnDellInc.:rn0PF86Y:rvrA00:cvnDellInc.:ct9:cvr:
->   dmi.product.family: XPS
->   dmi.product.name: XPS 13 9360
->   dmi.sys.vendor: Dell Inc.
-> =
-
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1769053/+subscriptions
+>      /* bytes already send at the beggining of current interation */
+>      uint64_t iteration_initial_bytes;
+> diff --git a/migration/channel.c b/migration/channel.c
+> index c5eaf0fa0e..716192bf75 100644
+> --- a/migration/channel.c
+> +++ b/migration/channel.c
+> @@ -74,8 +74,9 @@ void migration_channel_connect(MigrationState *s,
+>          } else {
+>              QEMUFile *f = qemu_fopen_channel_output(ioc);
+>  
+> +            qemu_mutex_lock(&s->qemu_file_lock);
+>              s->to_dst_file = f;
+> -
+> +            qemu_mutex_unlock(&s->qemu_file_lock);
+>          }
+>      }
+>      migrate_fd_connect(s, error);
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 03d1fc7bc3..25f26052d2 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1229,6 +1229,7 @@ static void migrate_fd_cleanup(void *opaque)
+>  
+>      if (s->to_dst_file) {
+>          Error *local_err = NULL;
+> +        QEMUFile *tmp;
+>  
+>          trace_migrate_fd_cleanup();
+>          qemu_mutex_unlock_iothread();
+> @@ -1241,8 +1242,15 @@ static void migrate_fd_cleanup(void *opaque)
+>          if (multifd_save_cleanup(&local_err) != 0) {
+>              error_report_err(local_err);
+>          }
+> -        qemu_fclose(s->to_dst_file);
+> +        qemu_mutex_lock(&s->qemu_file_lock);
+> +        tmp = s->to_dst_file;
+>          s->to_dst_file = NULL;
+> +        qemu_mutex_unlock(&s->qemu_file_lock);
+> +        /*
+> +         * Close the file handle without the lock to make sure the
+> +         * critical section won't block for long.
+> +         */
+> +        qemu_fclose(tmp);
+>      }
+>  
+>      assert((s->state != MIGRATION_STATUS_ACTIVE) &&
+> @@ -2526,14 +2534,20 @@ static MigThrError postcopy_pause(MigrationState *s)
+>      assert(s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE);
+>  
+>      while (true) {
+> +        QEMUFile *file;
+> +
+>          migrate_set_state(&s->state, s->state,
+>                            MIGRATION_STATUS_POSTCOPY_PAUSED);
+>  
+>          /* Current channel is possibly broken. Release it. */
+>          assert(s->to_dst_file);
+> -        qemu_file_shutdown(s->to_dst_file);
+> -        qemu_fclose(s->to_dst_file);
+> +        qemu_mutex_lock(&s->qemu_file_lock);
+> +        file = s->to_dst_file;
+>          s->to_dst_file = NULL;
+> +        qemu_mutex_unlock(&s->qemu_file_lock);
+> +
+> +        qemu_file_shutdown(file);
+> +        qemu_fclose(file);
+>  
+>          error_report("Detected IO failure for postcopy. "
+>                       "Migration paused.");
+> @@ -3002,6 +3016,7 @@ static void migration_instance_finalize(Object *obj)
+>      MigrationParameters *params = &ms->parameters;
+>  
+>      qemu_mutex_destroy(&ms->error_mutex);
+> +    qemu_mutex_destroy(&ms->qemu_file_lock);
+>      g_free(params->tls_hostname);
+>      g_free(params->tls_creds);
+>      qemu_sem_destroy(&ms->pause_sem);
+> @@ -3041,6 +3056,7 @@ static void migration_instance_init(Object *obj)
+>      qemu_sem_init(&ms->postcopy_pause_sem, 0);
+>      qemu_sem_init(&ms->postcopy_pause_rp_sem, 0);
+>      qemu_sem_init(&ms->rp_state.rp_sem, 0);
+> +    qemu_mutex_init(&ms->qemu_file_lock);
+>  }
+>  
+>  /*
+> -- 
+> 2.14.3
+> 
 --
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1769053
-
-Title:
-  Cannot start a guest with more than 1TB of RAM
-
-Status in QEMU:
-  Incomplete
-Status in qemu package in Ubuntu:
-  Incomplete
-
-Bug description:
-  Attempting to start a KVM guest with more than 1TB of RAM fails.
-
-  It looks like we might need some extra patches:
-  https://lists.gnu.org/archive/html/qemu-discuss/2017-12/msg00005.html
-
-  ProblemType: Bug
-  DistroRelease: Ubuntu 18.04
-  Package: qemu-system-x86 1:2.11+dfsg-1ubuntu7
-  ProcVersionSignature: Ubuntu 4.15.0-20.21-generic 4.15.17
-  Uname: Linux 4.15.0-20-generic x86_64
-  ApportVersion: 2.20.9-0ubuntu7
-  Architecture: amd64
-  CurrentDesktop: Unity:Unity7:ubuntu
-  Date: Fri May  4 16:21:14 2018
-  InstallationDate: Installed on 2017-04-05 (393 days ago)
-  InstallationMedia: Ubuntu 16.10 "Yakkety Yak" - Release amd64 (20161012.2)
-  MachineType: Dell Inc. XPS 13 9360
-  ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.15.0-20-generic root=3D/dev/ma=
-pper/ubuntu--vg-root ro quiet splash transparent_hugepage=3Dmadvise vt.hand=
-off=3D1
-  SourcePackage: qemu
-  UpgradeStatus: Upgraded to bionic on 2018-04-30 (3 days ago)
-  dmi.bios.date: 02/26/2018
-  dmi.bios.vendor: Dell Inc.
-  dmi.bios.version: 2.6.2
-  dmi.board.name: 0PF86Y
-  dmi.board.vendor: Dell Inc.
-  dmi.board.version: A00
-  dmi.chassis.type: 9
-  dmi.chassis.vendor: Dell Inc.
-  dmi.modalias: dmi:bvnDellInc.:bvr2.6.2:bd02/26/2018:svnDellInc.:pnXPS1393=
-60:pvr:rvnDellInc.:rn0PF86Y:rvrA00:cvnDellInc.:ct9:cvr:
-  dmi.product.family: XPS
-  dmi.product.name: XPS 13 9360
-  dmi.sys.vendor: Dell Inc.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1769053/+subscriptions
