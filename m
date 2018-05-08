@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37391)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fG4cu-0006nA-7Y
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:34:07 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fG4d4-0006uR-3j
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:34:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fG4co-0004GA-Vu
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:34:04 -0400
-Date: Tue, 8 May 2018 11:33:45 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180508153345.GB6722@localhost.localdomain>
-References: <20180503225648.13153-1-jsnow@redhat.com>
-	<20180503225648.13153-3-jsnow@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fG4d3-0004JK-8m
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:34:14 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:36998)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fG4d3-0004JA-3e
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:34:13 -0400
+Received: by mail-ot0-x243.google.com with SMTP id 77-v6so36554105otd.4
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 08:34:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180503225648.13153-3-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/5] qemu-img.texi: fix
- command ordering
+In-Reply-To: <20180213170529.10858-14-kwolf@redhat.com>
+References: <20180213170529.10858-1-kwolf@redhat.com>
+	<20180213170529.10858-14-kwolf@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 8 May 2018 16:33:51 +0100
+Message-ID: <CAFEAcA-Ggc+gwd2yBh+azTLd3i9LpjqqnSvsz2p1Ddx7CVD22w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 13/55] sheepdog: Make sd_prealloc() take a
+ BDS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,111 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, qemu-trivial@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, May 03, 2018 at 06:56:45PM -0400, John Snow wrote:
-> This should match the summary ordering, which is alphabetical.
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
+On 13 February 2018 at 17:04, Kevin Wolf <kwolf@redhat.com> wrote:
+> From: Max Reitz <mreitz@redhat.com>
+>
+> We want to use this function in sd_truncate() later on, so taking a
+> filename is not exactly ideal.
+>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
+>  block/sheepdog.c | 29 +++++++++++++++++++++--------
+>  1 file changed, 21 insertions(+), 8 deletions(-)
+>
+> diff --git a/block/sheepdog.c b/block/sheepdog.c
+> index af125a2c8d..cc1d37b3da 100644
+> --- a/block/sheepdog.c
+> +++ b/block/sheepdog.c
+> @@ -1826,10 +1826,10 @@ static int do_sd_create(BDRVSheepdogState *s, uint32_t *vdi_id, int snapshot,
+>      return 0;
+>  }
+>
+> -static int sd_prealloc(const char *filename, Error **errp)
+> +static int sd_prealloc(BlockDriverState *bs, Error **errp)
+>  {
+>      BlockBackend *blk = NULL;
+> -    BDRVSheepdogState *base = NULL;
+> +    BDRVSheepdogState *base = bs->opaque;
+>      unsigned long buf_size;
+>      uint32_t idx, max_idx;
+>      uint32_t object_size;
+> @@ -1837,10 +1837,11 @@ static int sd_prealloc(const char *filename, Error **errp)
+>      void *buf = NULL;
+>      int ret;
+>
+> -    blk = blk_new_open(filename, NULL, NULL,
+> -                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL, errp);
+> -    if (blk == NULL) {
+> -        ret = -EIO;
+> +    blk = blk_new(BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE | BLK_PERM_RESIZE,
+> +                  BLK_PERM_ALL);
+> +
+> +    ret = blk_insert_bs(blk, bs, errp);
+> +    if (ret < 0) {
+>          goto out_with_err_set;
+>      }
 
-Reviewed-by: Jeff Cody <jcody@redhat.com>
+Hi. Coverity (CID 1390636) points out that there's now a useless
+NULL check of a definitely-not-NULL pointer in the 'out_with_err_set'
+code, because this change has removed the code path which could get
+there with blk == NULL. The "if (blk)" check could be removed to
+make the blk_unref() unconditional, I think.
 
->  qemu-img.texi | 58 ++++++++++++++++++++++++++++++----------------------------
->  1 file changed, 30 insertions(+), 28 deletions(-)
-> 
-> diff --git a/qemu-img.texi b/qemu-img.texi
-> index 8a26400adb..adf5176902 100644
-> --- a/qemu-img.texi
-> +++ b/qemu-img.texi
-> @@ -193,6 +193,12 @@ sets the number of input blocks to skip
->  Command description:
->  
->  @table @option
-> +
-> +@item amend [-p] [-f @var{fmt}] [-t @var{cache}] -o @var{options} @var{filename}
-> +
-> +Amends the image format specific @var{options} for the image file
-> +@var{filename}. Not all file formats support this operation.
-> +
->  @item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-interval=@var{flush_interval}] [-n] [--no-drain] [-o @var{offset}] [--pattern=@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_size}] [-t @var{cache}] [-w] @var{filename}
->  
->  Run a simple sequential I/O benchmark on the specified image. If @code{-w} is
-> @@ -253,30 +259,6 @@ If @code{-r} is specified, exit codes representing the image state refer to the
->  state after (the attempt at) repairing it. That is, a successful @code{-r all}
->  will yield the exit code 0, independently of the image state before.
->  
-> -@item create [-f @var{fmt}] [-b @var{backing_file}] [-F @var{backing_fmt}] [-u] [-o @var{options}] @var{filename} [@var{size}]
-> -
-> -Create the new disk image @var{filename} of size @var{size} and format
-> -@var{fmt}. Depending on the file format, you can add one or more @var{options}
-> -that enable additional features of this format.
-> -
-> -If the option @var{backing_file} is specified, then the image will record
-> -only the differences from @var{backing_file}. No size needs to be specified in
-> -this case. @var{backing_file} will never be modified unless you use the
-> -@code{commit} monitor command (or qemu-img commit).
-> -
-> -If a relative path name is given, the backing file is looked up relative to
-> -the directory containing @var{filename}.
-> -
-> -Note that a given backing file will be opened to check that it is valid. Use
-> -the @code{-u} option to enable unsafe backing file mode, which means that the
-> -image will be created even if the associated backing file cannot be opened. A
-> -matching backing file must be created or additional options be used to make the
-> -backing file specification valid when you want to use an image created this
-> -way.
-> -
-> -The size can also be specified using the @var{size} option with @code{-o},
-> -it doesn't need to be specified separately in this case.
-> -
->  @item commit [-q] [-f @var{fmt}] [-t @var{cache}] [-b @var{base}] [-d] [-p] @var{filename}
->  
->  Commit the changes recorded in @var{filename} in its base image or backing file.
-> @@ -381,6 +363,30 @@ creating compressed images.
->  @var{num_coroutines} specifies how many coroutines work in parallel during
->  the convert process (defaults to 8).
->  
-> +@item create [-f @var{fmt}] [-b @var{backing_file}] [-F @var{backing_fmt}] [-u] [-o @var{options}] @var{filename} [@var{size}]
-> +
-> +Create the new disk image @var{filename} of size @var{size} and format
-> +@var{fmt}. Depending on the file format, you can add one or more @var{options}
-> +that enable additional features of this format.
-> +
-> +If the option @var{backing_file} is specified, then the image will record
-> +only the differences from @var{backing_file}. No size needs to be specified in
-> +this case. @var{backing_file} will never be modified unless you use the
-> +@code{commit} monitor command (or qemu-img commit).
-> +
-> +If a relative path name is given, the backing file is looked up relative to
-> +the directory containing @var{filename}.
-> +
-> +Note that a given backing file will be opened to check that it is valid. Use
-> +the @code{-u} option to enable unsafe backing file mode, which means that the
-> +image will be created even if the associated backing file cannot be opened. A
-> +matching backing file must be created or additional options be used to make the
-> +backing file specification valid when you want to use an image created this
-> +way.
-> +
-> +The size can also be specified using the @var{size} option with @code{-o},
-> +it doesn't need to be specified separately in this case.
-> +
->  @item dd [-f @var{fmt}] [-O @var{output_fmt}] [bs=@var{block_size}] [count=@var{blocks}] [skip=@var{blocks}] if=@var{input} of=@var{output}
->  
->  Dd copies from @var{input} file to @var{output} file converting it from
-> @@ -585,10 +591,6 @@ how the additional image area should be allocated on the host.  See the format
->  description in the @code{NOTES} section which values are allowed.  Using this
->  option may result in slightly more data being allocated than necessary.
->  
-> -@item amend [-p] [-f @var{fmt}] [-t @var{cache}] -o @var{options} @var{filename}
-> -
-> -Amends the image format specific @var{options} for the image file
-> -@var{filename}. Not all file formats support this operation.
->  @end table
->  @c man end
->  
-> -- 
-> 2.14.3
-> 
-> 
+thanks
+-- PMM
