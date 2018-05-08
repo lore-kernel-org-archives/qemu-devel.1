@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fG3Q5-0007ok-63
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:16:46 -0400
+	(envelope-from <thuth@redhat.com>) id 1fG3Qn-0008BQ-MP
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:17:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fG3Q1-0001OH-92
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:16:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44488)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fG3Q1-0001OA-3M
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:16:41 -0400
-Date: Tue, 8 May 2018 11:16:32 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180508141632.GJ25013@localhost.localdomain>
-References: <1524760009-24710-1-git-send-email-babu.moger@amd.com>
-	<1524760009-24710-8-git-send-email-babu.moger@amd.com>
-	<20180507193944.GF13350@localhost.localdomain>
-	<BL0PR12MB2468B701C4DF796ABF9EAD3D959B0@BL0PR12MB2468.namprd12.prod.outlook.com>
+	(envelope-from <thuth@redhat.com>) id 1fG3Qj-0001h2-EA
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:17:29 -0400
+References: <1525376963-79623-1-git-send-email-mst@redhat.com>
+	<1525376963-79623-5-git-send-email-mst@redhat.com>
+	<b3620ea6-0805-ccec-3bd5-11dc30bc2569@redhat.com>
+	<20180508152349.15ad26d0.cohuck@redhat.com>
+	<bc3f13f6-56fd-058d-d717-508b7034d437@redhat.com>
+	<20180508154538.1b55f721.cohuck@redhat.com>
+	<b335f5ae-a99e-310c-edb2-65755a2ca51a@redhat.com>
+	<e05f0ed0-43cc-dc80-a5a5-7782bc77faff@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <02f0e79e-251e-5b51-6e52-d741f14a1fcd@redhat.com>
+Date: Tue, 8 May 2018 16:17:09 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BL0PR12MB2468B701C4DF796ABF9EAD3D959B0@BL0PR12MB2468.namprd12.prod.outlook.com>
-Subject: Re: [Qemu-devel] [PATCH v7 7/9] i386: Add support for
- CPUID_8000_001E for AMD
+In-Reply-To: <e05f0ed0-43cc-dc80-a5a5-7782bc77faff@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 04/67] s390x: drop an unused include
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +30,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Moger, Babu" <Babu.Moger@amd.com>
-Cc: "mst@redhat.com" <mst@redhat.com>, "marcel@redhat.com" <marcel@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "geoff@hostfission.com" <geoff@hostfission.com>, "kash@tripleback.net" <kash@tripleback.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Cornelia Huck <cohuck@redhat.com>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, "Michael S. Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
 
-On Mon, May 07, 2018 at 11:44:31PM +0000, Moger, Babu wrote:
+On 08.05.2018 16:06, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 05/08/2018 10:50 AM, Thomas Huth wrote:
+>> On 08.05.2018 15:45, Cornelia Huck wrote:
+>>> On Tue, 8 May 2018 15:38:03 +0200
+>>> Thomas Huth <thuth@redhat.com> wrote:
+>>>
+>>>> On 08.05.2018 15:23, Cornelia Huck wrote:
 [...]
-> > > +
-> > >  /*
-> > >   * Encode cache info for CPUID[0x80000006].ECX and
-> > CPUID[0x80000006].EDX
-> > >   * @l3 can be NULL.
-> > > @@ -4105,6 +4111,14 @@ void cpu_x86_cpuid(CPUX86State *env,
-> > uint32_t index, uint32_t count,
-> > >              break;
-> > >          }
-> > >          break;
-> > > +    case 0x8000001E:
-> > > +        assert(cpu->core_id <= 255);
-> > 
-> > Where's the code that ensures this assert() line can't be
-> > triggered by any command-line configuration?
-> 
-> I did not understand this. Can you please elaborate. Thanks 
+>>>>> Hm, I'm wondering why we do the typedef in cpu-qom.h, while other
+>>>>> architectures do it in their cpu.h. =20
+>>>>
+>>>> See:
+>>>>
+>>>> commit ef2974cc270d51959ce90df6b4d4d41635d7a603
+>>>> Author: David Hildenbrand <david@redhat.com>
+>>>> Date:   Wed Sep 13 15:24:02 2017 +0200
+>>>>
+>>>>     target/s390x: move some s390x typedefs to cpu-qom.h
+>>>>    =20
+>>>>     This allows us to drop inclusion of cpu_models.h in cpu-qom.h, a=
+nd
+>>>>     prepares for using cpu-qom.h as a s390 specific version of typed=
+efs.h
+>>>>    =20
+>>>>     Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>>     Message-Id: <20170913132417.24384-8-david@redhat.com>
+>>>>     Reviewed-by: Thomas Huth <thuth@redhat.com>
+>>>>     Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>>>>
+>>>>  Thomas
+>>>
+>>> Gargh, this is all very confusing...
+>>
+>> If you'd ask me, I'd say we should get rid of the typedefs and do it t=
+he
+>> Linux kernel way and enforce using "struct xyz" everywhere, then you
+>> also do not have this problem with typedefs.h anymore ... but well, so
+>> far it seems as I'm still part of a minority with this opinion here.
+>=20
+> Maybe not getting rid of the typedefs, but I agree with removing typede=
+fs.h.
 
-The user must not be able to trigger an assert(), so we need to
-ensure that core_id will never be larger than 255.  Is there
-existing code that ensures that?
+But you need a way to do forward declarations ... thus you need
+something like typedefs.h as long as you use typedefs. Otherwise older
+versions of GCC will choke on multiple "typedef struct XyZ XyZ" statement=
+s.
 
-> 
-> > 
-> > > +        *eax = EXTENDED_APIC_ID((cs->nr_threads - 1),
-> > > +               cpu->socket_id, cpu->core_id, cpu->thread_id);
-> > > +        *ebx = (cs->nr_threads - 1) << 8 | cpu->core_id;
-> > > +        *ecx = cpu->socket_id;
-> > > +        *edx = 0;
-> > > +        break;
-> > >      case 0xC0000000:
-> > >          *eax = env->cpuid_xlevel2;
-> > >          *ebx = 0;
-> > > --
-> > > 2.7.4
-> > >
-> > >
-> > 
-> > --
-> > Eduardo
-
--- 
-Eduardo
+ Thomas
