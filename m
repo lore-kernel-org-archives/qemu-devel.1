@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fGAt9-0003A8-Uz
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 18:15:16 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fGAt7-00036l-3x
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 18:15:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fGAt8-0001WV-UQ
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 18:15:15 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35366)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fGAt4-0001Ti-Kx
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 18:15:13 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:40910)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fGAt8-0001WK-Mf
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 18:15:14 -0400
-Received: by mail-wm0-x241.google.com with SMTP id o78-v6so24238531wmg.0
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 15:15:14 -0700 (PDT)
+	id 1fGAt4-0001Rv-E7
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 18:15:10 -0400
+Received: by mail-wm0-x244.google.com with SMTP id j5-v6so24176346wme.5
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 15:15:10 -0700 (PDT)
+Received: from 640k.lan (dynamic-adsl-78-12-189-60.clienti.tiscali.it.
+	[78.12.189.60]) by smtp.gmail.com with ESMTPSA id
+	c15-v6sm14020129edr.78.2018.05.08.15.15.08
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 08 May 2018 15:15:08 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed,  9 May 2018 00:14:37 +0200
-Message-Id: <1525817687-34620-21-git-send-email-pbonzini@redhat.com>
+Date: Wed,  9 May 2018 00:14:33 +0200
+Message-Id: <1525817687-34620-17-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1525817687-34620-1-git-send-email-pbonzini@redhat.com>
 References: <1525817687-34620-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 20/30] qemu-options: Remove deprecated
- -no-kvm-pit-reinjection
+Subject: [Qemu-devel] [PULL 16/30] target/i386: sev: fix memory leaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,78 +34,133 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>
 
-From: Thomas Huth <thuth@redhat.com>
+Reported by Coverity.
 
-Deprecated since the beginning when it was added for compatibility with
-the ancient qemu-kvm fork of QEMU, and it even printed out the deprecation
-warning since right from the start (i.e. QEMU v1.3.0), so it's really time
-to remove this now.
-
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1525453270-23074-4-git-send-email-thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- qemu-doc.texi   |  5 -----
- qemu-options.hx |  4 ----
- vl.c            | 12 ------------
- 3 files changed, 21 deletions(-)
+ target/i386/sev.c | 32 +++++++++++++++++---------------
+ 1 file changed, 17 insertions(+), 15 deletions(-)
 
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index 4add403..85a7a39 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -2786,11 +2786,6 @@ which is the default.
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index c011671..2395171 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -430,7 +430,8 @@ static int
+ sev_get_pdh_info(int fd, guchar **pdh, size_t *pdh_len, guchar **cert_chain,
+                  size_t *cert_chain_len)
+ {
+-    guchar *pdh_data, *cert_chain_data;
++    guchar *pdh_data = NULL;
++    guchar *cert_chain_data = NULL;
+     struct sev_user_data_pdh_cert_export export = {};
+     int err, r;
  
- @section System emulator command line arguments
+@@ -471,8 +472,9 @@ e_free:
+ SevCapability *
+ sev_get_capabilities(void)
+ {
+-    SevCapability *cap;
+-    guchar *pdh_data, *cert_chain_data;
++    SevCapability *cap = NULL;
++    guchar *pdh_data = NULL;
++    guchar *cert_chain_data = NULL;
+     size_t pdh_len = 0, cert_chain_len = 0;
+     uint32_t ebx;
+     int fd;
+@@ -486,7 +488,7 @@ sev_get_capabilities(void)
  
--@subsection -no-kvm-pit-reinjection (since 1.3.0)
+     if (sev_get_pdh_info(fd, &pdh_data, &pdh_len,
+                          &cert_chain_data, &cert_chain_len)) {
+-        return NULL;
++        goto out;
+     }
+ 
+     cap = g_new0(SevCapability, 1);
+@@ -502,9 +504,9 @@ sev_get_capabilities(void)
+      */
+     cap->reduced_phys_bits = 1;
+ 
++out:
+     g_free(pdh_data);
+     g_free(cert_chain_data);
 -
--The ``-no-kvm-pit-reinjection'' argument is now a
--synonym for setting ``-global kvm-pit.lost_tick_policy=discard''.
--
- @subsection -no-kvm-irqchip (since 1.3.0)
+     close(fd);
+     return cap;
+ }
+@@ -530,7 +532,7 @@ sev_launch_start(SEVState *s)
+ {
+     gsize sz;
+     int ret = 1;
+-    int fw_error;
++    int fw_error, rc;
+     QSevGuestInfo *sev = s->sev_info;
+     struct kvm_sev_launch_start *start;
+     guchar *session = NULL, *dh_cert = NULL;
+@@ -543,7 +545,7 @@ sev_launch_start(SEVState *s)
+                                             &error_abort);
+     if (sev->session_file) {
+         if (sev_read_file_base64(sev->session_file, &session, &sz) < 0) {
+-            return 1;
++            goto out;
+         }
+         start->session_uaddr = (unsigned long)session;
+         start->session_len = sz;
+@@ -551,18 +553,18 @@ sev_launch_start(SEVState *s)
  
- The ``-no-kvm-irqchip'' argument is now a synonym for
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 50c906c..dfff698 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3914,10 +3914,6 @@ ETEXI
- HXCOMM Deprecated by -machine accel=tcg property
- DEF("no-kvm", 0, QEMU_OPTION_no_kvm, "", QEMU_ARCH_I386)
+     if (sev->dh_cert_file) {
+         if (sev_read_file_base64(sev->dh_cert_file, &dh_cert, &sz) < 0) {
+-            return 1;
++            goto out;
+         }
+         start->dh_uaddr = (unsigned long)dh_cert;
+         start->dh_len = sz;
+     }
  
--HXCOMM Deprecated by kvm-pit driver properties
--DEF("no-kvm-pit-reinjection", 0, QEMU_OPTION_no_kvm_pit_reinjection,
--    "", QEMU_ARCH_I386)
--
- HXCOMM Deprecated by -machine kernel_irqchip=on|off property
- DEF("no-kvm-irqchip", 0, QEMU_OPTION_no_kvm_irqchip, "", QEMU_ARCH_I386)
+     trace_kvm_sev_launch_start(start->policy, session, dh_cert);
+-    ret = sev_ioctl(s->sev_fd, KVM_SEV_LAUNCH_START, start, &fw_error);
+-    if (ret < 0) {
++    rc = sev_ioctl(s->sev_fd, KVM_SEV_LAUNCH_START, start, &fw_error);
++    if (rc < 0) {
+         error_report("%s: LAUNCH_START ret=%d fw_error=%d '%s'",
+                 __func__, ret, fw_error, fw_error_to_str(fw_error));
+-        return 1;
++        goto out;
+     }
  
-diff --git a/vl.c b/vl.c
-index a23acb2..23d55a4 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3696,18 +3696,6 @@ int main(int argc, char **argv, char **envp)
-                 olist = qemu_find_opts("machine");
-                 qemu_opts_parse_noisily(olist, "accel=tcg", false);
-                 break;
--            case QEMU_OPTION_no_kvm_pit_reinjection: {
--                static GlobalProperty kvm_pit_lost_tick_policy = {
--                    .driver   = "kvm-pit",
--                    .property = "lost_tick_policy",
--                    .value    = "discard",
--                };
+     object_property_set_int(OBJECT(sev), start->handle, "handle",
+@@ -570,12 +572,13 @@ sev_launch_start(SEVState *s)
+     sev_set_guest_state(SEV_STATE_LAUNCH_UPDATE);
+     s->handle = start->handle;
+     s->policy = start->policy;
++    ret = 0;
+ 
++out:
+     g_free(start);
+     g_free(session);
+     g_free(dh_cert);
 -
--                warn_report("deprecated, replaced by "
--                            "-global kvm-pit.lost_tick_policy=discard");
--                qdev_prop_register_global(&kvm_pit_lost_tick_policy);
--                break;
--            }
-             case QEMU_OPTION_accel:
-                 accel_opts = qemu_opts_parse_noisily(qemu_find_opts("accel"),
-                                                      optarg, true);
+-    return 0;
++    return ret;
+ }
+ 
+ static int
+@@ -712,7 +715,7 @@ sev_guest_init(const char *id)
+     uint32_t host_cbitpos;
+     struct sev_user_data_status status = {};
+ 
+-    s = g_new0(SEVState, 1);
++    sev_state = s = g_new0(SEVState, 1);
+     s->sev_info = lookup_sev_guest_info(id);
+     if (!s->sev_info) {
+         error_report("%s: '%s' is not a valid '%s' object",
+@@ -720,7 +723,6 @@ sev_guest_init(const char *id)
+         goto err;
+     }
+ 
+-    sev_state = s;
+     s->state = SEV_STATE_UNINIT;
+ 
+     host_cpuid(0x8000001F, 0, NULL, &ebx, NULL, NULL);
 -- 
 1.8.3.1
