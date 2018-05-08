@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fG57l-0000iR-Nf
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 12:06:02 -0400
+	(envelope-from <berrange@redhat.com>) id 1fG5Fx-0003Mg-8P
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 12:14:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fG57k-0002bb-IU
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 12:05:57 -0400
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:40007)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fG57k-0002Y4-E7
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 12:05:56 -0400
-Received: by mail-ot0-x243.google.com with SMTP id n1-v6so36691107otf.7
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 09:05:56 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1fG5Ft-0005au-AN
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 12:14:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52550 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fG5Ft-0005ao-5P
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 12:14:21 -0400
+Date: Tue, 8 May 2018 17:14:01 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180508161401.GI5967@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180504160026.14017-1-berrange@redhat.com>
+	<20180504160026.14017-4-berrange@redhat.com>
+	<752b52d8-2990-13d7-753c-36aafc5f0041@redhat.com>
+	<20180508151940.GC5967@redhat.com>
+	<ea7bffe9-5219-43a9-a250-b60b67b69b55@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1525734893-10299-1-git-send-email-mjc@sifive.com>
-References: <1525734893-10299-1-git-send-email-mjc@sifive.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 8 May 2018 17:05:35 +0100
-Message-ID: <CAFEAcA8U5nkAKfCVSRVdHZ0CUEj20S3EyobfDvTnyNJ259A40w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/3] RISC-V: QEMU 2.13 Minor Fixes
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ea7bffe9-5219-43a9-a250-b60b67b69b55@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/3] glib: enforce the minimum required
+ version and warn about old APIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +33,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, RISC-V Patches <patches@groups.riscv.org>, KONRAD Frederic <frederic.konrad@adacore.com>, Alistair Francis <alistair.francis@xilinx.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-stable <qemu-stable@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, Olaf Hering <olaf@aepfle.de>, Stefan Hajnoczi <stefanha@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-On 8 May 2018 at 00:14, Michael Clark <mjc@sifive.com> wrote:
-> The following changes since commit c8b7e627b4269a3bc3ae41d9f420547a47e6d9b9:
->
->   Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2018-05-04' into staging (2018-05-04 14:42:46 +0100)
->
-> are available in the git repository at:
->
->   https://github.com/riscv/riscv-qemu.git tags/riscv-qemu-2.13-minor-fixes-1
->
-> for you to fetch changes up to d4a63373c0e6349c6f36f56a6290ad639bfa20cb:
->
->   riscv: requires libfdt (2018-05-08 10:57:21 +1200)
->
-> ----------------------------------------------------------------
-> RISC-V: QEMU 2.13 Minor Fixes
->
-> * Require libfdt when configuring for 'riscv*-softmmu'
-> * Increase HTIF priority and allow zero address
->
-> ----------------------------------------------------------------
-> KONRAD Frederic (3):
->       riscv: spike: allow base == 0
->       riscv: htif: increase the priority of the htif subregion
->       riscv: requires libfdt
+On Tue, May 08, 2018 at 06:02:55PM +0200, Paolo Bonzini wrote:
+> On 08/05/2018 17:19, Daniel P. Berrang=C3=A9 wrote:
+> > Ok, that change looks fine with me assuming it passes your build test=
+s.
+> > In fact that is what I had done in an earlier version.
+> >=20
+> > Regards,
+> > Daniel
+>=20
+> Actually there is a use of g_strv_contains in tests/test-qga.c.  It is
+> guarded by GLIB_CHECK_VERSION(2, 44, 0) but the right fix should be to
+> include the compatibility function instead.
+>=20
+> For now I am dropping this patch.
 
-Hi Michael -- these patches from Fred need your Signed-off-by:
-line in the commit messages as well as his. (This indicates that
-they've passed through your hands to get to master; see item 3
-in https://wiki.qemu.org/Contribute/SubmitAPullRequest )
+Ok, I'll have a look at that, and re-post an updated patch later. There
+are a few other uses of GLIB_CHECK_VERSION to be investigated too I see.
 
-I did a build test and they passed that fine, so if you can just
-respin this pullreq with the signoff lines added to each commit
-message I should be able to apply it.
-
-thanks
--- PMM
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
