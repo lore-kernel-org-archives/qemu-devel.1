@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fG3wU-00051F-OM
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:50:15 -0400
+	(envelope-from <dunlapg@gmail.com>) id 1fG3xD-0005VY-Er
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:51:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fG3wQ-000548-Nw
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:50:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39614 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fG3wQ-00053p-K6
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:50:10 -0400
-References: <1520930033-18885-1-git-send-email-junyan.he@intel.com>
-	<1520930033-18885-3-git-send-email-junyan.he@intel.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <433eb0d1-c6b2-ff49-26b6-664636cfe5b0@redhat.com>
-Date: Tue, 8 May 2018 09:50:00 -0500
+	(envelope-from <dunlapg@gmail.com>) id 1fG3x7-0005L8-GK
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:50:59 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:32802)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dunlapg@gmail.com>) id 1fG3x7-0005KN-98
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:50:53 -0400
+Received: by mail-qk0-x244.google.com with SMTP id c11so1200350qkm.0
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 07:50:50 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1520930033-18885-3-git-send-email-junyan.he@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 02/10] RFC: Implement qcow2's snapshot
- dependent saving function.
+Sender: dunlapg@gmail.com
+In-Reply-To: <20180504210001.GB30250@redhat.com>
+References: <20180504160026.14017-1-berrange@redhat.com>
+	<20180504210001.GB30250@redhat.com>
+From: George Dunlap <dunlapg@umich.edu>
+Date: Tue, 8 May 2018 15:50:49 +0100
+Message-ID: <CAFLBxZYO7Yeje8HROjJY9P=9bEQ8RCBhA9fqbGTXN_87U5sowA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Xen-devel] [PATCH 0/3] Document intent for
+ supported build platforms and bump min glib to 2.42
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +31,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: junyan.he@intel.com, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, crosthwaite.peter@gmail.com, quintela@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, rth@twiddle.net, Pavel Dovgaluk <Pavel.Dovgaluk@ispras.ru>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, xen-devel <xen-devel@lists.xenproject.org>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Olaf Hering <olaf@aepfle.de>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Ian Jackson <ian.jackson@eu.citrix.com>, Jan Beulich <JBeulich@suse.com>, Juergen Gross <jgross@suse.com>, Anthony Perard <anthony.perard@citrix.com>
 
-On 03/13/2018 03:33 AM, junyan.he@intel.com wrote:
-> From: Junyan He <junyan.he@intel.com>
-> 
-> For qcow2 format, we can increase the cluster's reference count of
-> dependent snapshot content and link the offset to the L2 table of
-> the new snapshot point. This way can avoid obvious snapshot's dependent
-> relationship, so when we delete some snapshot point, just decrease the
-> cluster count and no need to check further.
-> 
-> Signed-off-by: Junyan He <junyan.he@intel.com>
-> ---
->   block/qcow2-snapshot.c | 154 +++++++++++++++++++++++++++++++++++++++++++++++++
->   block/qcow2.c          |   2 +
->   block/qcow2.h          |   7 +++
->   3 files changed, 163 insertions(+)
+On Fri, May 4, 2018 at 10:00 PM, Daniel P. Berrang=C3=A9 <berrange@redhat.c=
+om> wrote:
+> CC'ing xen-devel in case Xen maintainers have a need for something that
+> will that conflict with this proposal wrt supported build platforms.
 
-It sounds like you are trying to modify the qcow2 spec to store more 
-information into the internal snapshot table (and if you aren't, why 
-not? If an internal snapshot depends on another one and we don't record 
-that information in the qcow2 metadata, then we are pushing the burden 
-of tracking inter-relationships onto management apps, and risk 
-corruption if you load a snapshot without also visiting its 
-dependencies).  It is absolutely essential that such modifications be 
-reflected in docs/interop/qcow2.txt first, to make sure we agree on the 
-implementation. What's more, there is already another parallel proposal 
-that is also wanting to tweak qcow2 files:
+Thanks for the heads-up.  CC'ing some more people who usually have
+opinions on this sort of thing.
 
-https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg05231.html
+>
+> On Fri, May 04, 2018 at 05:00:23PM +0100, Daniel P. Berrang=C3=A9 wrote:
+>> This short series is a followup the discussions around min glib version
+>> when Olaf found we had accidentally increased the min glib by using a
+>> newer function:
+>>
+>>   https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg02699.html
+>>
+>> Some key points from that thread
+>>
+>>   - Although we have a docker job that tries to test the min glib
+>>     version is adhered to, that's only run post-build, not by Peter's
+>>     merge tests, nor by patchew.
+>>
+>>   - The docker min glib test failed to detect the problem anyway
+>>     because RHEL had backported the symbol in question.
+>>
+>>   - The docker min glib test only builds with certain configure
+>>     options so isn't foolproof.
+>>
+>>   - The modern distros we implicitly care about have way newer glib
+>>     than 2.22
+>>
+>>   - Peter's OS-X build host previously had 2.22, but after switching
+>>     from fink to homebrew now has 2.56
+>>
+>>   - I suggested following libvirt's lead in writing a policy for how
+>>     we pick supported OS targets to inform maintainers when min versions
+>>     can be increased.
+>>
+>> This series writes such a document largely based on one I wrote for
+>> libvirt with a few changes, largely around OS-X and *BSD. Note it
+>> is not meant to be an exhaustive list of distros we'll build on, rather
+>> a representative selection, so that we can identify the range of 3rd
+>> party library versions we need to care about. So if your favourite
+>> distro is missing, dont be alarmed, as it probably ships similar
+>> vintage software to one of those listed - if not feel free to suggest
+>> additions.
+>>
+>> Based on that doc and https://repology.org/metapackage/glib/versions,
+>> I identified that we could feasibly set min glib to 2.42. Note that
+>> this would be dropping RHEL-6 as a build host (RHEL-6.0 came out in
+>> 2010 so that's reasonable to drop IMHO). It would still cover 2 major
+>> Debian versions and 2 most recent Ubuntu LTS (16.04, 18.04, but *not*
+>> 14.04). This min glib lets us remove almost all our compat code.
+>>
+>> Most interestingly, thanks tothe new min version being greater than
+>> 2.32, we can now use GLIB_VERSION_MAX_ALLOWED to validate the correct
+>> API usage according to our min version:
+>>
+>>   https://developer.gnome.org/glib/stable/glib-Version-Information.html#=
+GLIB-VERSION-MAX-ALLOWED:CAPS
+>>
+>> This means that *all* our CI jobs & developer builds will be enforcing
+>> the min version, so means very many more conditionally built features
+>> will get their build validated against min glib version. This would
+>> do a much better job of catching mistakes than our min-glib docker
+>> job, making that obsolete.
+>>
+>> Daniel P. Berrang=C3=A9 (3):
+>>   qemu-doc: provide details of supported build platforms
+>>   glib: bump min required glib library version to 2.42
+>>   glib: enforce the minimum required version and warn about old APIs
 
-We need to make sure both additions are coordinated.
+Two responses from me.
 
+With my Xen maintainer hat on: I wouldn't feel justified, personally,
+in asking another project to continue supporting older versions.  If
+we didn't want to bump our own glib version, we would have to disable
+"upstream" QEMU (as opposed to Xen's old qemu fork) for older versions
+of glib.
 
-> +
-> +    if (!QEMU_IS_ALIGNED(depend_offset,  s->cluster_size)) {
+That said, when we've had similar discussions for our own project,
+we've generally aimed at supporting all major currently-supported
+distros, which would include RHEL 6 / CentOS 6.
 
-Why two spaces here and elsewhere?
+Tailing into that, with my CentOS package maintainer hat on: You said
+that the code in question compiled on RHEL 6 because RH had backported
+the function in question.  Will QEMU continue to actually compile on
+RHEL 6 / CentOS 6?  I.e., will configure be checking for that
+function, or only checking for the version number?
 
+If the former, then the CentOS 6 Xen packages won't be affected.  If
+the latter, then at some point I'll have to stop updating the Xen
+version for CentOS 6 -- but as the CentOS 6 EOL is coming up in 2020,
+it shouldn't be too much of a hardship.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+ -George
