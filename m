@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fG5R5-0007kJ-6C
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 12:25:56 -0400
+	(envelope-from <cota@braap.org>) id 1fG5VO-0001K2-4H
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 12:30:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fG5R4-0000fK-3y
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 12:25:55 -0400
-Received: from mail-ot0-x22e.google.com ([2607:f8b0:4003:c0f::22e]:45660)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fG5R3-0000f1-VD
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 12:25:54 -0400
-Received: by mail-ot0-x22e.google.com with SMTP id 15-v6so21946421otn.12
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 09:25:53 -0700 (PDT)
+	(envelope-from <cota@braap.org>) id 1fG5VL-0002Nk-1g
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 12:30:22 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:60047)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fG5VK-0002N4-Er
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 12:30:18 -0400
+Date: Tue, 8 May 2018 12:30:15 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180508163015.GA873@flamenco>
+References: <1522980788-1252-1-git-send-email-cota@braap.org>
+	<1522980788-1252-11-git-send-email-cota@braap.org>
+	<87be5f7f-e33e-a101-ff01-2a7375ac9934@linaro.org>
+	<20180424001831.GA8651@flamenco>
 MIME-Version: 1.0
-In-Reply-To: <703a3977-7490-9c45-5fcd-66b96840b865@redhat.com>
-References: <20180501101907.22638-1-peter.maydell@linaro.org>
-	<a660c604-5e6e-29c7-ed3f-47e40de8da1b@redhat.com>
-	<CAFEAcA_+gu3fWW9jNwT9DM5Yh2OFgehVDOnckAVACFPouzp58A@mail.gmail.com>
-	<703a3977-7490-9c45-5fcd-66b96840b865@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 8 May 2018 17:25:32 +0100
-Message-ID: <CAFEAcA-XfLPQzPPxWC+ugCufnFt+nzFfWuDH_m+xP-mH=w9M_Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] memory.h: Improve IOMMU related
- documentation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180424001831.GA8651@flamenco>
+Subject: Re: [Qemu-devel] [PATCH v2 10/17] translate-all: use per-page
+ locking in !user-mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,61 +30,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: "patches@linaro.org" <patches@linaro.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, QEMU Developers <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 1 May 2018 at 16:53, Auger Eric <eric.auger@redhat.com> wrote:
-> Hi Peter,
->
-> On 05/01/2018 05:00 PM, Peter Maydell wrote:
->> On 1 May 2018 at 15:32, Auger Eric <eric.auger@redhat.com> wrote:
->>> Hi Peter,
->>>
->>> On 05/01/2018 12:19 PM, Peter Maydell wrote:
->>>> +     * Once the IOMMU has returned a TLB entry, it must notify
->>>> +     * the IOMMU's users if that TLB entry changes, using
->>>> +     * memory_region_notify_iommu() (or, if necessary, by calling
->>>> +     * memory_region_notify_one() for each registered notifier).
->>> if caching mode is set (VFIO integration), On the first guest map
->>> (invalidation on map), the IOMMU must replay the mapping (notify VFIO)
->>> to get the 1st stage of the physical IOMMU programmed. At that moment
->>> the IOMMU may not have returned any TLB entry.
->>
->> I'm afraid you've lost me. What is caching mode, how do you set it,
->> how does the IOMMU replay the mapping? More concretely, what change
->> needs to be made to this text?
->
-> np. The caching mode relates to Intel IOMMU. When this bit is advertised
-> in the Intel IOMMU, it forces the IOMMU driver to invalidate TLB entries
-> also on map and not only on unmap. So when any iova is mapped, an
-> invalidation command is sent and this allows to trap when entries are
-> created. Then the IOMMU device can notify "users" that a mapping
-> happened and this mapping can be forwarded to the physical IOMMU.
-> Caching mode is set when a VFIO device is behind the IOMMU and both
-> stage 1 and stage 2 are combined in the physical IOMMU.
->
-> what about: the IOMMU is responsible to call the registered user
-> notifiers when the associated event occurs on an IOTLB entry (map/unmap).
+Hi Richard,
 
-This runs into something I found when I was implementing the Arm
-Memory Protection Controller -- at the point when the guest changes
-the config, it doesn't have enough information to be able to call a
-"map" notifier, because the mapping depends on the memory transaction
-attributes, it's not fixed and dependent only on the address. We can
-say "unmap" to indicate that the old information is not usable any
-more, but that's all. (Similarly if the mapping depends on the
-read/write permission then the IOMMU isn't going to be able to
-provide a new mapping to the notifier, because it doesn't have the
-information to do that.)
+On Mon, Apr 23, 2018 at 20:18:31 -0400, Emilio G. Cota wrote:
+> On Fri, Apr 13, 2018 at 17:29:20 -1000, Richard Henderson wrote:
+> > On 04/05/2018 04:13 PM, Emilio G. Cota wrote:
+> (snip)
+> > > +struct page_collection {
+> > > +    GTree *tree;
+> > > +    struct page_entry *max;
+> > > +};
+> > 
+> > I don't understand the motivation for this data structure.  Substituting one
+> > tree for another does not, on the face of it, seem to be a win.
+> > 
+> > Given that your locking order is based on the physical address, I can
+> > understand that the sequential virtual addresses that these routines are given
+> > is not appropriate.  But surely you should know how many pages are involved,
+> > and therefore be able to allocate a flat array to hold the PageDesc.
+> > 
+> > > +/*
+> > > + * Lock a range of pages ([@start,@end[) as well as the pages of all
+> > > + * intersecting TBs.
+> > > + * Locking order: acquire locks in ascending order of page index.
+> > > + */
+> > 
+> > I don't think I understand this either.  From whence do you wind up with a
+> > range of physical addresses?
+> 
+> For instance in tb_invalidate_phys_page_range. We need to invalidate
+> all TBs associated with a range of phys addresses.
+> 
+> I am not sure how an array would make things easier, since we need
+> to lock the pages in the given range, as well as the pages that
+> overlap with the TBs in said range (since we'll invalidate the TBs).
+> For example, if we have to invalidate all TBs in the range A-E, it
+> is possible that a TB in page C will overlap with page K (not in
+> the original range), so we'll have to lock page K as well. All of
+> this needs to be done in order, that is, A-E,K.
+> 
+> If we had an array, we'd have to resize the array anytime we had
+> an out-of-range page, and then do a binary search in the array
+> to check whether we already locked that page. At this point
+> we'd be reinventing a binary tree, so it seems simpler to just
+> use a tree.
 
-My use-case for notifiers (getting the TCG code to throw away its
-TLB entries for the now-stale information) doesn't require anything
-more from the notifier, but it's not clear to me what the exact
-notifier-calling requirements are.
+Do you have any comments wrt the above (and my other replies to
+your comments in this series)? I'd like to do a respin this week.
 
-If you can't actually use the memory transaction attributes info
-to inform your translation, then there's not much point plumbing
-them into the IOMMU.
+Thanks,
 
-thanks
--- PMM
+		Emilio
