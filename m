@@ -1,26 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40335)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fG3TC-00019b-JD
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:20:04 -0400
+	(envelope-from <pasic@linux.ibm.com>) id 1fG3XT-0002Yy-JQ
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:24:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fG3TB-0002N9-OB
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:19:58 -0400
-Received: from mail-oi0-x22f.google.com ([2607:f8b0:4003:c06::22f]:36068)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fG3TB-0002Mz-Ij
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:19:57 -0400
-Received: by mail-oi0-x22f.google.com with SMTP id v2-v6so28485496oif.3
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 07:19:57 -0700 (PDT)
+	(envelope-from <pasic@linux.ibm.com>) id 1fG3XN-0003tL-PK
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:24:23 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56734)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fG3XN-0003t1-Fq
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:24:17 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w48EGWYd063397
+	for <qemu-devel@nongnu.org>; Tue, 8 May 2018 10:24:16 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2hubrepead-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 10:24:15 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Tue, 8 May 2018 15:24:13 +0100
+References: <20180507155130.21085-1-cohuck@redhat.com>
+	<2a6f6a2a-ddaf-27ae-de04-581dcc67fdd0@linux.ibm.com>
+	<20180508155551.7cea014f.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.ibm.com>
+Date: Tue, 8 May 2018 16:24:08 +0200
 MIME-Version: 1.0
-In-Reply-To: <1525691524-32265-1-git-send-email-imammedo@redhat.com>
-References: <1525691524-32265-1-git-send-email-imammedo@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 8 May 2018 15:19:36 +0100
-Message-ID: <CAFEAcA8vrk2VJBDrWkTCqa=5g3+6tTf-ijHF7w42+zwhBEJzbg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 0/4] arm: isolate and clean up dtb
- generation
+In-Reply-To: <20180508155551.7cea014f.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <e18c6c5b-5036-fb0c-b861-5b55786cd6ba@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 0/2] s390x: reset handling for ccw devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +42,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On 7 May 2018 at 12:12, Igor Mammedov <imammedo@redhat.com> wrote:
->
-> Changelog v3->v4:
->    * dropped "arm: boot: set boot_info starting from  first_cpu",
->      since it's applied to target-arm.next
->    * fix crash (in 3/4) when QEMU tried to load DTB but none was provided,
->      get_dtb() hook isn't set by most ARM boards so such boards crash
->      trying to call it. Check if there is DTB before trying to load it.
 
-Thanks, applied this version to target-arm.next.
 
--- PMM
+On 05/08/2018 03:55 PM, Cornelia Huck wrote:
+> On Tue, 8 May 2018 15:29:50 +0200
+> Halil Pasic <pasic@linux.ibm.com> wrote:
+> 
+>> On 05/07/2018 05:51 PM, Cornelia Huck wrote:
+>>> On Friday, Thomas noticed some problems with 3270 devices. One result
+>>> was "s390x/css: disabled subchannels cannot be status pending", but
+>>> a reboot did not cure the previous broken status. Turns out that 3270
+>>> devices are missing a reset handler.
+>>>
+>>> This series cleans up reset handling a bit and makes sure that the base
+>>> ccw device class provides a subchannel reset handler. I'm currently
+>>> not sure what we should do with vfio-ccw, so the behaviour there is
+>>> left unchanged.
+>>
+>> Had a look, and LGTM (will tag separately) modulo what follows here. I'm
+>> a bit concerned about vfio-ccw not being made compliant to this new
+>> he reset of CCWDeviceClass is taking care of resetting the subchannel data
+>> structures. This feels like introducing a common abstraction
+>> to me, but then some things bother me.
+> 
+> We are having a common abstraction that can be overwritten by any
+> specialized implementation - and this is what vfio-ccw is doing,
+> therefore nothing changes for it.
+> 
+
+Sorry my OO background is making me overthink things. I was on
+the separation of concerns line: base class takes care of its
+own class invariants and the the derived of its own. Considering
+what your statements below, I think we are in agreement.
+
+>> In particular the the pim, the lpm and the pam set in css_reset_sch
+>> seems to suit only devices that use the virtual chp. That
+>> is it ain't suits any CCWDevice instance.
+> 
+> Yes, we need to revisit this code and split out what makes sense and
+> what doesn't. For now, we only have virtual devices and vfio-ccw, so
+> we're fine. It even might make sense to keep them separate in the
+> future, as having a virtual device and one only mirroring some state in
+> QEMU sound like they want to be handled differently.
+> 
+
+I agree. The last sentence probably means that resetting the in QEMU
+state may not be sufficient.
+
+Another to me somewhat strange thing I noticed is this disabled_cb
+used by virtio. It's is I guess the way it it is (specified in
+the OASIS spec and everything), but I don't really understand how
+this aligns with what the PoP says about MSCH. I mean AFAIU
+MSCH does not trigger any communication between the channel subsystem
+and the CU and or the device. I read the PoP as nothing is supposed
+to change expect the things specified where MSCH is described. I guess
+it is just another strange thing we have to live with -- for historical
+reasons.
+
+Regards,
+Halil
