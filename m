@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fFq5K-0001ra-OK
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 20:02:27 -0400
+	(envelope-from <famz@redhat.com>) id 1fFqli-0000BA-0L
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 20:46:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fFq5F-0002QZ-Sc
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 20:02:26 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:43245)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fFq5F-0002QI-NP
-	for qemu-devel@nongnu.org; Mon, 07 May 2018 20:02:21 -0400
-Received: by mail-qt0-x243.google.com with SMTP id f13-v6so29020768qtp.10
-	for <qemu-devel@nongnu.org>; Mon, 07 May 2018 17:02:21 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-References: <90990df8024b287004e771ebd2370cc390e49106.1525723355.git.alistair.francis@wdc.com>
-	<828d2efb-6cee-f4f5-138a-5fd7da3de675@amsat.org>
-Message-ID: <5d0f62c3-cfab-bd64-ee75-d0ce5e064e2d@amsat.org>
-Date: Mon, 7 May 2018 21:02:16 -0300
+	(envelope-from <famz@redhat.com>) id 1fFqle-0004XC-2O
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 20:46:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45364 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fFqld-0004WN-Qp
+	for qemu-devel@nongnu.org; Mon, 07 May 2018 20:46:09 -0400
+Date: Tue, 8 May 2018 08:45:59 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180508004559.GE22503@lemon.usersys.redhat.com>
+References: <20180504074207.22634-1-famz@redhat.com>
+	<152542019271.2502.11957748187759069388@71c20359a636>
 MIME-Version: 1.0
-In-Reply-To: <828d2efb-6cee-f4f5-138a-5fd7da3de675@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] tests/docker: Add a Avocado Docker
- test
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <152542019271.2502.11957748187759069388@71c20359a636>
+Subject: Re: [Qemu-devel] [PATCH v6 0/4] slirp: Add query-usernet QMP command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,118 +27,349 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org
-Cc: famz@redhat.com, alex.bennee@linaro.org, alistair23@gmail.com
+To: qemu-devel@nongnu.org
+Cc: samuel.thibault@ens-lyon.org, jasowang@redhat.com, f4bug@amsat.org, armbru@redhat.com, jan.kiszka@siemens.com, alex.bennee@linaro.org
 
-On 05/07/2018 07:44 PM, Philippe Mathieu-Daudé wrote:
-> Hi Alistair,
+On Fri, 05/04 00:49, no-reply@patchew.org wrote:
+> Hi,
 > 
-> On 05/07/2018 05:09 PM, Alistair Francis wrote:
->> Avocado is not trivial to setup on non-Fedora systems. To simplfying
->> future testing add a docker test image that runs Avocado tests.
-> 
-> How big is the image with the new packages?
+> This series seems to have some coding style problems. See output below for
+> more information:
 
-Before: 1.7GB
-After: 2.18GB
+Code indentation issues are due to the pre-existing style in the file and is
+not changed by the patch.
+
+Fam
 
 > 
-> If not everybody is interested in using Avocado and Python 3 as default.
-> You might use the fedora as a base image for a 'fedora-avocado' one via
-> 'FROM qemu:fedora' and adding a 'docker-image-fedora-avocado:
-> docker-image-fedora' dependency in Makefile.include.
+> Type: series
+> Message-id: 20180504074207.22634-1-famz@redhat.com
+> Subject: [Qemu-devel] [PATCH v6 0/4] slirp: Add query-usernet QMP command
 > 
->>
->> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
->> ---
->>  tests/docker/dockerfiles/fedora.docker | 12 +++++++++--
->>  tests/docker/test-avocado              | 28 ++++++++++++++++++++++++++
->>  2 files changed, 38 insertions(+), 2 deletions(-)
->>  create mode 100755 tests/docker/test-avocado
->>
->> diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
->> index b706f42405..5c23f6e459 100644
->> --- a/tests/docker/dockerfiles/fedora.docker
->> +++ b/tests/docker/dockerfiles/fedora.docker
->> @@ -18,9 +18,17 @@ ENV PACKAGES \
->>      mingw64-pixman mingw64-glib2 mingw64-gmp mingw64-SDL mingw64-pkg-config \
->>      mingw64-gtk2 mingw64-gtk3 mingw64-gnutls mingw64-nettle mingw64-libtasn1 \
->>      mingw64-libjpeg-turbo mingw64-libpng mingw64-curl mingw64-libssh2 \
->> -    mingw64-bzip2
->> +    mingw64-bzip2 \
->> +    xz tcpdump nc \
->> +    python2-devel python3-devel python-avocado \
->> +    libvirt-devel qemu-kvm
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
 > 
-> I'd personally prefer a commit that sort this list alphabetically (one
-> package per line), and another commit only adding the Avocado packages;
-> but this is up to Fam.
+> BASE=base
+> n=1
+> total=$(git log --oneline $BASE.. | wc -l)
+> failed=0
 > 
->>  ENV QEMU_CONFIGURE_OPTS --python=/usr/bin/python3
->> +ENV PIP_PACKAGES \
->> +    avocado-framework avocado-qemu \
->> +    avocado-framework-plugin-vt avocado-framework-plugin-runner-vm \
->> +    avocado-framework-plugin-runner-remote avocado-framework-plugin-result-html
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> git config --local diff.algorithm histogram
 > 
-> Ditto, alphabetically sorted one per line.
+> commits="$(git log --format=%H --reverse $BASE..)"
+> for c in $commits; do
+>     echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
+>     if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
+>         failed=1
+>         echo
+>     fi
+>     n=$((n+1))
+> done
 > 
->>  
->>  RUN dnf install -y $PACKAGES
->> +RUN pip install $PIP_PACKAGES
->>  RUN rpm -q $PACKAGES | sort > /packages.txt
->> -ENV FEATURES mingw clang pyyaml asan
->> +ENV FEATURES mingw clang pyyaml asan avocado
->> diff --git a/tests/docker/test-avocado b/tests/docker/test-avocado
->> new file mode 100755
->> index 0000000000..8da7bc10a2
->> --- /dev/null
->> +++ b/tests/docker/test-avocado
->> @@ -0,0 +1,28 @@
->> +#!/bin/bash -e
->> +#
->> +# Avocado tests on Fedora, as these are a real pain on Debian systems
+> exit $failed
+> === TEST SCRIPT END ===
 > 
-> Have been here... Then used the git version :/
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> From https://github.com/patchew-project/qemu
+>  * [new tag]               patchew/20180504074207.22634-1-famz@redhat.com -> patchew/20180504074207.22634-1-famz@redhat.com
+> Switched to a new branch 'test'
+> c08e6e3a7f tests: Use query-usernet instead of 'info usernet'
+> c493a69267 slirp: Add "query-usernet" QMP command
+> 5150e445b4 slirp: Use QAPI enum to replace TCPS_* macros
+> 0f3b1a240b qapi: Introduce UsernetTcpState
 > 
->> +#
->> +# Copyright (c) 2018 Western Digital.
->> +#
->> +# Authors:
->> +#  Alistair Francis <alistair.francis@wdc.com>
->> +#
->> +# This work is licensed under the terms of the GNU GPL, version 2
->> +# or (at your option) any later version. See the COPYING file in
->> +# the top-level directory.
->> +#
->> +# Run this test: NETWORK=1 make docker-test-avocado@fedora
->> +
->> +. common.rc
->> +
->> +requires avocado
->> +
->> +cd "$BUILD_DIR"
->> +
->> +DEF_TARGET_LIST="x86_64-softmmu"
->> +TARGET_LIST=${TARGET_LIST:-$DEF_TARGET_LIST} \
->> +build_qemu
->> +install_qemu
->> +export PATH="${PATH}:$(pwd)"
->> +avocado vt-bootstrap --yes-to-all --vt-type qemu
-
-Can we do the bootstrapping in the Dockerfile?
-
-Testing your image it download big files (i.e. JeOS image) in my
-~avocado/data/avocado-vt/images which is internal to the volatile docker
-instance, so I have to download again each time I run the tests...
-
-We need to pass this cache path to the docker instance.
-For example the vm-test use ~/.cache/qemu-vm/download.
-
->> +avocado run boot --vt-qemu-bin ./x86_64-softmmu/qemu-system-x86_64
+> === OUTPUT BEGIN ===
+> Checking PATCH 1/4: qapi: Introduce UsernetTcpState...
+> Checking PATCH 2/4: slirp: Use QAPI enum to replace TCPS_* macros...
+> ERROR: code indent should never use tabs
+> #112: FILE: slirp/tcp_input.c:88:
+> +^I    (tp)->t_state == USERNET_TCP_STATE_ESTABLISHED) { \$
 > 
-> So this script is for the VT version, specific to x86. I'd rather name
-> the script accordingly "test-avocado-vt".
+> ERROR: code indent should never use tabs
+> #121: FILE: slirp/tcp_input.c:193:
+> +^Iif (tp->t_state == USERNET_TCP_STATE_SYN_RECEIVED && ti->ti_len)$
 > 
-> Regards,
+> ERROR: code indent should never use tabs
+> #130: FILE: slirp/tcp_input.c:460:
+> +^I  tp->t_state = USERNET_TCP_STATE_LISTEN;$
 > 
-> Phil.
+> ERROR: code indent should never use tabs
+> #139: FILE: slirp/tcp_input.c:476:
+> +^Iif (tp->t_state == USERNET_TCP_STATE_CLOSED)$
+> 
+> ERROR: braces {} are necessary for all arms of this statement
+> #139: FILE: slirp/tcp_input.c:476:
+> +	if (tp->t_state == USERNET_TCP_STATE_CLOSED)
+> [...]
+> 
+> ERROR: code indent should never use tabs
+> #148: FILE: slirp/tcp_input.c:495:
+> +^Iif (optp && tp->t_state != USERNET_TCP_STATE_LISTEN)$
+> 
+> ERROR: braces {} are necessary for all arms of this statement
+> #148: FILE: slirp/tcp_input.c:495:
+> +	if (optp && tp->t_state != USERNET_TCP_STATE_LISTEN)
+> [...]
+> 
+> ERROR: code indent should never use tabs
+> #157: FILE: slirp/tcp_input.c:516:
+> +^Iif (tp->t_state == USERNET_TCP_STATE_ESTABLISHED &&$
+> 
+> ERROR: code indent should never use tabs
+> #166: FILE: slirp/tcp_input.c:618:
+> +^Icase USERNET_TCP_STATE_LISTEN: {$
+> 
+> ERROR: code indent should never use tabs
+> #175: FILE: slirp/tcp_input.c:729:
+> +^I    tp->t_state = USERNET_TCP_STATE_SYN_RECEIVED;$
+> 
+> ERROR: code indent should never use tabs
+> #184: FILE: slirp/tcp_input.c:763:
+> +^I  tp->t_state = USERNET_TCP_STATE_SYN_RECEIVED;$
+> 
+> ERROR: code indent should never use tabs
+> #188: FILE: slirp/tcp_input.c:766:
+> +^I} /* case USERNET_TCP_STATE_LISTEN */$
+> 
+> ERROR: code indent should never use tabs
+> #197: FILE: slirp/tcp_input.c:780:
+> +^Icase USERNET_TCP_STATE_SYN_SENT:$
+> 
+> ERROR: code indent should never use tabs
+> #206: FILE: slirp/tcp_input.c:807:
+> +^I^I^Itp->t_state = USERNET_TCP_STATE_ESTABLISHED;$
+> 
+> ERROR: code indent should never use tabs
+> #215: FILE: slirp/tcp_input.c:818:
+> +^I^I^Itp->t_state = USERNET_TCP_STATE_SYN_RECEIVED;$
+> 
+> ERROR: code indent should never use tabs
+> #224: FILE: slirp/tcp_input.c:888:
+> +^I    tp->t_state > USERNET_TCP_STATE_CLOSE_WAIT && ti->ti_len) {$
+> 
+> ERROR: code indent should never use tabs
+> #233: FILE: slirp/tcp_input.c:907:
+> +^I^I^I    tp->t_state == USERNET_TCP_STATE_TIME_WAIT &&$
+> 
+> ERROR: code indent should never use tabs
+> #247: FILE: slirp/tcp_input.c:943:
+> +^Icase USERNET_TCP_STATE_SYN_RECEIVED:$
+> 
+> ERROR: code indent should never use tabs
+> #248: FILE: slirp/tcp_input.c:944:
+> +^Icase USERNET_TCP_STATE_ESTABLISHED:$
+> 
+> ERROR: code indent should never use tabs
+> #249: FILE: slirp/tcp_input.c:945:
+> +^Icase USERNET_TCP_STATE_FIN_WAIT_1:$
+> 
+> ERROR: code indent should never use tabs
+> #250: FILE: slirp/tcp_input.c:946:
+> +^Icase USERNET_TCP_STATE_FIN_WAIT_2:$
+> 
+> ERROR: code indent should never use tabs
+> #251: FILE: slirp/tcp_input.c:947:
+> +^Icase USERNET_TCP_STATE_CLOSE_WAIT:$
+> 
+> ERROR: code indent should never use tabs
+> #252: FILE: slirp/tcp_input.c:948:
+> +^I^Itp->t_state = USERNET_TCP_STATE_CLOSED;$
+> 
+> ERROR: code indent should never use tabs
+> #259: FILE: slirp/tcp_input.c:952:
+> +^Icase USERNET_TCP_STATE_CLOSING:$
+> 
+> ERROR: code indent should never use tabs
+> #260: FILE: slirp/tcp_input.c:953:
+> +^Icase USERNET_TCP_STATE_LAST_ACK:$
+> 
+> ERROR: code indent should never use tabs
+> #261: FILE: slirp/tcp_input.c:954:
+> +^Icase USERNET_TCP_STATE_TIME_WAIT:$
+> 
+> ERROR: code indent should never use tabs
+> #270: FILE: slirp/tcp_input.c:982:
+> +^Icase USERNET_TCP_STATE_SYN_RECEIVED:$
+> 
+> ERROR: code indent should never use tabs
+> #276: FILE: slirp/tcp_input.c:987:
+> +^I^Itp->t_state = USERNET_TCP_STATE_ESTABLISHED;$
+> 
+> ERROR: code indent should never use tabs
+> #285: FILE: slirp/tcp_input.c:1007:
+> +^I^I    tp->t_state = USERNET_TCP_STATE_FIN_WAIT_1;$
+> 
+> ERROR: code indent should never use tabs
+> #300: FILE: slirp/tcp_input.c:1027:
+> +^Icase USERNET_TCP_STATE_ESTABLISHED:$
+> 
+> ERROR: code indent should never use tabs
+> #301: FILE: slirp/tcp_input.c:1028:
+> +^Icase USERNET_TCP_STATE_FIN_WAIT_1:$
+> 
+> ERROR: code indent should never use tabs
+> #302: FILE: slirp/tcp_input.c:1029:
+> +^Icase USERNET_TCP_STATE_FIN_WAIT_2:$
+> 
+> ERROR: code indent should never use tabs
+> #303: FILE: slirp/tcp_input.c:1030:
+> +^Icase USERNET_TCP_STATE_CLOSE_WAIT:$
+> 
+> ERROR: code indent should never use tabs
+> #304: FILE: slirp/tcp_input.c:1031:
+> +^Icase USERNET_TCP_STATE_CLOSING:$
+> 
+> ERROR: code indent should never use tabs
+> #305: FILE: slirp/tcp_input.c:1032:
+> +^Icase USERNET_TCP_STATE_LAST_ACK:$
+> 
+> ERROR: code indent should never use tabs
+> #306: FILE: slirp/tcp_input.c:1033:
+> +^Icase USERNET_TCP_STATE_TIME_WAIT:$
+> 
+> ERROR: code indent should never use tabs
+> #315: FILE: slirp/tcp_input.c:1164:
+> +^I^Icase USERNET_TCP_STATE_FIN_WAIT_1:$
+> 
+> ERROR: code indent should never use tabs
+> #324: FILE: slirp/tcp_input.c:1176:
+> +^I^I^I^Itp->t_state = USERNET_TCP_STATE_FIN_WAIT_2;$
+> 
+> ERROR: code indent should never use tabs
+> #333: FILE: slirp/tcp_input.c:1186:
+> +^I^Icase USERNET_TCP_STATE_CLOSING:$
+> 
+> ERROR: code indent should never use tabs
+> #336: FILE: slirp/tcp_input.c:1188:
+> +^I^I^I^Itp->t_state = USERNET_TCP_STATE_TIME_WAIT;$
+> 
+> ERROR: code indent should never use tabs
+> #345: FILE: slirp/tcp_input.c:1200:
+> +^I^Icase USERNET_TCP_STATE_LAST_ACK:$
+> 
+> ERROR: code indent should never use tabs
+> #354: FILE: slirp/tcp_input.c:1212:
+> +^I^Icase USERNET_TCP_STATE_TIME_WAIT:$
+> 
+> WARNING: line over 80 characters
+> #363: FILE: slirp/tcp_input.c:1320:
+> +			 * will got to USERNET_TCP_STATE_LAST_ACK, and use tcp_output()
+> 
+> ERROR: code indent should never use tabs
+> #363: FILE: slirp/tcp_input.c:1320:
+> +^I^I^I * will got to USERNET_TCP_STATE_LAST_ACK, and use tcp_output()$
+> 
+> ERROR: code indent should never use tabs
+> #373: FILE: slirp/tcp_input.c:1334:
+> +^I^Icase USERNET_TCP_STATE_SYN_RECEIVED:$
+> 
+> ERROR: code indent should never use tabs
+> #374: FILE: slirp/tcp_input.c:1335:
+> +^I^Icase USERNET_TCP_STATE_ESTABLISHED:$
+> 
+> ERROR: code indent should never use tabs
+> #377: FILE: slirp/tcp_input.c:1337:
+> +^I^I    tp->t_state = USERNET_TCP_STATE_LAST_ACK;$
+> 
+> ERROR: code indent should never use tabs
+> #380: FILE: slirp/tcp_input.c:1339:
+> +^I^I    tp->t_state = USERNET_TCP_STATE_CLOSE_WAIT;$
+> 
+> ERROR: code indent should never use tabs
+> #389: FILE: slirp/tcp_input.c:1346:
+> +^I^Icase USERNET_TCP_STATE_FIN_WAIT_1:$
+> 
+> ERROR: code indent should never use tabs
+> #390: FILE: slirp/tcp_input.c:1347:
+> +^I^I^Itp->t_state = USERNET_TCP_STATE_CLOSING;$
+> 
+> ERROR: code indent should never use tabs
+> #400: FILE: slirp/tcp_input.c:1355:
+> +^I^Icase USERNET_TCP_STATE_FIN_WAIT_2:$
+> 
+> ERROR: code indent should never use tabs
+> #401: FILE: slirp/tcp_input.c:1356:
+> +^I^I^Itp->t_state = USERNET_TCP_STATE_TIME_WAIT;$
+> 
+> ERROR: code indent should never use tabs
+> #410: FILE: slirp/tcp_input.c:1364:
+> +^I^Icase USERNET_TCP_STATE_TIME_WAIT:$
+> 
+> ERROR: code indent should never use tabs
+> #431: FILE: slirp/tcp_subr.c:286:
+> +^Itp->t_state = USERNET_TCP_STATE_CLOSED;$
+> 
+> ERROR: code indent should never use tabs
+> #440: FILE: slirp/tcp_subr.c:305:
+> +^I^Itp->t_state = USERNET_TCP_STATE_CLOSED;$
+> 
+> ERROR: code indent should never use tabs
+> #452: FILE: slirp/tcp_subr.c:375:
+> +^Icase USERNET_TCP_STATE_CLOSED:$
+> 
+> ERROR: code indent should never use tabs
+> #453: FILE: slirp/tcp_subr.c:376:
+> +^Icase USERNET_TCP_STATE_LISTEN:$
+> 
+> ERROR: code indent should never use tabs
+> #454: FILE: slirp/tcp_subr.c:377:
+> +^Icase USERNET_TCP_STATE_SYN_SENT:$
+> 
+> ERROR: code indent should never use tabs
+> #455: FILE: slirp/tcp_subr.c:378:
+> +^I^Itp->t_state = USERNET_TCP_STATE_CLOSED;$
+> 
+> ERROR: code indent should never use tabs
+> #462: FILE: slirp/tcp_subr.c:382:
+> +^Icase USERNET_TCP_STATE_SYN_RECEIVED:$
+> 
+> ERROR: code indent should never use tabs
+> #463: FILE: slirp/tcp_subr.c:383:
+> +^Icase USERNET_TCP_STATE_ESTABLISHED:$
+> 
+> ERROR: code indent should never use tabs
+> #464: FILE: slirp/tcp_subr.c:384:
+> +^I^Itp->t_state = USERNET_TCP_STATE_FIN_WAIT_1;$
+> 
+> ERROR: code indent should never use tabs
+> #469: FILE: slirp/tcp_subr.c:387:
+> +^Icase USERNET_TCP_STATE_CLOSE_WAIT:$
+> 
+> ERROR: code indent should never use tabs
+> #470: FILE: slirp/tcp_subr.c:388:
+> +^I^Itp->t_state = USERNET_TCP_STATE_LAST_ACK;$
+> 
+> ERROR: code indent should never use tabs
+> #500: FILE: slirp/tcp_timer.c:139:
+> +^I^Iif (tp->t_state != USERNET_TCP_STATE_TIME_WAIT &&$
+> 
+> ERROR: code indent should never use tabs
+> #509: FILE: slirp/tcp_timer.c:263:
+> +^I^Iif (tp->t_state < USERNET_TCP_STATE_ESTABLISHED)$
+> 
+> WARNING: line over 80 characters
+> #513: FILE: slirp/tcp_timer.c:266:
+> +		if ((SO_OPTIONS) && tp->t_state <= USERNET_TCP_STATE_CLOSE_WAIT) {
+> 
+> ERROR: code indent should never use tabs
+> #513: FILE: slirp/tcp_timer.c:266:
+> +^I^Iif ((SO_OPTIONS) && tp->t_state <= USERNET_TCP_STATE_CLOSE_WAIT) {$
+> 
+> total: 66 errors, 2 warnings, 444 lines checked
+> 
+> Your patch has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 
+> Checking PATCH 3/4: slirp: Add "query-usernet" QMP command...
+> Checking PATCH 4/4: tests: Use query-usernet instead of 'info usernet'...
+> === OUTPUT END ===
+> 
+> Test command exited with code: 1
+> 
+> 
+> ---
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
