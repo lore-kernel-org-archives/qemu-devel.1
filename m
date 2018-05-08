@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fG1n6-0008JX-Ug
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:32:26 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fG1ny-0000RS-IQ
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:33:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fG1n2-0002Ea-C3
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:32:24 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43232 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fG1n2-0002E1-8Z
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:32:20 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <1525701137-9384-1-git-send-email-lidongchen@tencent.com> (Lidong
-	Chen's message of "Mon, 7 May 2018 21:52:16 +0800")
-References: <1525701137-9384-1-git-send-email-lidongchen@tencent.com>
-Reply-To: quintela@redhat.com
-Date: Tue, 08 May 2018 14:34:30 +0200
-Message-ID: <87bmdq8gx5.fsf@secure.laptop>
+	(envelope-from <stefanha@gmail.com>) id 1fG1nu-0002hM-Jh
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:33:18 -0400
+Date: Tue, 8 May 2018 13:33:06 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180508123306.GM19710@stefanha-x1.localdomain>
+References: <5aeae35ea760c_20132ae99f421c0c59611@hookshot-fe-265448d.cp1-iad.github.net.mail>
+	<41143fbe-baef-2959-7a96-c6434c82754a@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/2] migration: implement
- io_set_aio_fd_handler function for RDMA QIOChannel
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="EOHJn1TVIJfeVXv2"
+Content-Disposition: inline
+In-Reply-To: <41143fbe-baef-2959-7a96-c6434c82754a@vivier.eu>
+Subject: Re: [Qemu-devel] [Qemu-commits] [qemu/qemu] 8f9c64: 9p: add trace
+ event for v9fs_setattr()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +25,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lidong Chen <jemmy858585@gmail.com>
-Cc: dgilbert@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org, galsha@mellanox.com, aviadye@mellanox.com, adido@mellanox.com, Lidong Chen <lidongchen@tencent.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-commits@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>, Anthony Liguori <anthony@codemonkey.ws>
 
-Lidong Chen <jemmy858585@gmail.com> wrote:
-> if qio_channel_rdma_readv return QIO_CHANNEL_ERR_BLOCK, the destination qemu
-> crash.
->
-> The backtrace is:
-> (gdb) bt
->     #0  0x0000000000000000 in ?? ()
->     #1  0x00000000008db50e in qio_channel_set_aio_fd_handler (ioc=0x38111e0, ctx=0x3726080,
->         io_read=0x8db841 <qio_channel_restart_read>, io_write=0x0, opaque=0x38111e0) at io/channel.c:
->     #2  0x00000000008db952 in qio_channel_set_aio_fd_handlers (ioc=0x38111e0) at io/channel.c:438
->     #3  0x00000000008dbab4 in qio_channel_yield (ioc=0x38111e0, condition=G_IO_IN) at io/channel.c:47
->     #4  0x00000000007a870b in channel_get_buffer (opaque=0x38111e0, buf=0x440c038 "", pos=0, size=327
->         at migration/qemu-file-channel.c:83
->     #5  0x00000000007a70f6 in qemu_fill_buffer (f=0x440c000) at migration/qemu-file.c:299
->     #6  0x00000000007a79d0 in qemu_peek_byte (f=0x440c000, offset=0) at migration/qemu-file.c:562
->     #7  0x00000000007a7a22 in qemu_get_byte (f=0x440c000) at migration/qemu-file.c:575
->     #8  0x00000000007a7c78 in qemu_get_be32 (f=0x440c000) at migration/qemu-file.c:655
->     #9  0x00000000007a0508 in qemu_loadvm_state (f=0x440c000) at migration/savevm.c:2126
->     #10 0x0000000000794141 in process_incoming_migration_co (opaque=0x0) at migration/migration.c:366
->     #11 0x000000000095c598 in coroutine_trampoline (i0=84033984, i1=0) at util/coroutine-ucontext.c:1
->     #12 0x00007f9c0db56d40 in ?? () from /lib64/libc.so.6
->     #13 0x00007f96fe858760 in ?? ()
->     #14 0x0000000000000000 in ?? ()
->
-> RDMA QIOChannel not implement io_set_aio_fd_handler. so
-> qio_channel_set_aio_fd_handler will access NULL pointer.
->
-> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+--EOHJn1TVIJfeVXv2
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-queued
+On Thu, May 03, 2018 at 12:59:16PM +0200, Laurent Vivier wrote:
+> Le 03/05/2018 =E0 12:24, GitHub a =E9crit=A0:
+> ...
+> > Compare: https://github.com/qemu/qemu/compare/26bd8d98c4b3...98bae9c4af=
+b4
+> >       **NOTE:** This service been marked for deprecation: https://devel=
+oper.github.com/changes/2018-04-25-github-services-deprecation/
+> >=20
+> >       Functionality will be removed from GitHub.com on January 31st, 20=
+19.
+> >=20
+>=20
+> Does someone take care of the qemu-commits@nongnu.org mailing-list?
+>=20
+> I think it has originally been set by Anthony Liguori.
+
+Yes, I think so too.  Thanks for the advance notice.  There might be no
+one who relies on the commits mailing list.  I suggest we remove the
+mailing list if no one needs it - better than having a dead archive that
+might cause confusion.
+
+Stefan
+
+--EOHJn1TVIJfeVXv2
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJa8ZkCAAoJEJykq7OBq3PIoqsH/1q7VuVtSFT1sm8yWOVBpc0Y
+B5wpdMddsPCVDBhD0xIHJEbVRjlNExQCetvwht2a6LQ7PocjKmXVXSV8W+Ew1yak
+goTvabCP7YyXvX5I4q4XgSh8BO0+cjoqW1558RhlIlGxsQ0RMYCv6Z0vJCsuQdYo
+3X2MjjCJ6YVbA19ndLKvmOOm+2H5hv1Vz+MHqDF5SwwdjsIRrLOYVKnA6cqzGnii
+8mtJXDTNk847OBxk6PrJl9y/wnT1aL9ocsTi4uF98FVtnlZK7KYKFqwNMhTXnq9w
+0zTN1i9agzJ5wk7tg2rL3berhatj7KHshJFcjFCXXjAvAw6nRJjq7MgL96KhFTw=
+=PGfp
+-----END PGP SIGNATURE-----
+
+--EOHJn1TVIJfeVXv2--
