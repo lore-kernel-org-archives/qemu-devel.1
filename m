@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fG488-0003bI-9c
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:02:20 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fG49U-0004jP-38
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:03:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fG483-0004As-IZ
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:02:16 -0400
-Received: from mail-cys01nam02on0060.outbound.protection.outlook.com
-	([104.47.37.60]:56293
-	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fG483-00049A-28
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:02:11 -0400
-From: "Moger, Babu" <Babu.Moger@amd.com>
-Date: Tue, 8 May 2018 15:02:07 +0000
-Message-ID: <SN1PR12MB24774FAF36327C67C2B46FB1959A0@SN1PR12MB2477.namprd12.prod.outlook.com>
-References: <1524760009-24710-1-git-send-email-babu.moger@amd.com>
-	<1524760009-24710-8-git-send-email-babu.moger@amd.com>
-	<20180507193944.GF13350@localhost.localdomain>
-	<BL0PR12MB2468B701C4DF796ABF9EAD3D959B0@BL0PR12MB2468.namprd12.prod.outlook.com>
-	<20180508141632.GJ25013@localhost.localdomain>
-In-Reply-To: <20180508141632.GJ25013@localhost.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <kwolf@redhat.com>) id 1fG49O-0005VU-Ai
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:03:40 -0400
+Date: Tue, 8 May 2018 17:03:09 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180508150309.GC4065@localhost.localdomain>
+References: <1514187226.13662.28.camel@intel.com>
+	<6e792b9f-2281-e8db-0410-c4c3468ffc90@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v7 7/9] i386: Add support for
- CPUID_8000_001E for AMD
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <6e792b9f-2281-e8db-0410-c4c3468ffc90@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-block] Some question about savem/qcow2
+ incremental snapshot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,69 +25,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "mst@redhat.com" <mst@redhat.com>, "marcel@redhat.com" <marcel@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "geoff@hostfission.com" <geoff@hostfission.com>, "kash@tripleback.net" <kash@tripleback.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: He Junyan <junyan.he@intel.com>, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>, qemu block <qemu-block@nongnu.org>, stefanha@redhat.com
 
+Am 08.05.2018 um 16:41 hat Eric Blake geschrieben:
+> On 12/25/2017 01:33 AM, He Junyan wrote:
+> > hi all:
+> >=20
+> > I am now focusing on snapshot optimization for Intel NVDimm kind
+> > memory. Different from the normal memory, the NVDimm may be 128G, 256=
+G
+> > or even more for just one guest, and its speed is slower than the
+> > normal memory. So sometimes it may take several minutes to complete
+> > just one snapshot saving. Even with compression enabled, the=A0snapsh=
+ot
+> > point may consume more than 30G disk space.
+> > We decide to add incremental kind snapshot saving to resolve this. Ju=
+st
+> > store difference between snapshot points to save time and disk space.
+> > But the current snapshot/save_vm framework seems not to support this.
+> > We need to add snapshot dependency and extra operations when we LOAD
+> > and DELETE the snapshot point.
+> > Is that possible to modify the savevm framework and add some
+> > incremental snapshot support to QCOW2 format?
+>=20
+> In general, the list has tended to focus on external snapshots rather t=
+han
+> internal; where persistent bitmaps have been the proposed mechanism for
+> tracking incremental differences between snapshots.  But yes, it is
+> certainly feasible that patches to improve internal snapshots to take
+> advantage of incremental relationships may prove useful.  You will need=
+ to
+> document all enhancements to the qcow2 file format and get that approve=
+d
+> first, as interoperability demands that others reading the same spec wo=
+uld
+> be able to interpret the image you create that is utilizing an internal
+> snapshot with an incremental diff.
 
-> -----Original Message-----
-> From: Eduardo Habkost [mailto:ehabkost@redhat.com]
-> Sent: Tuesday, May 8, 2018 9:17 AM
-> To: Moger, Babu <Babu.Moger@amd.com>
-> Cc: mst@redhat.com; marcel@redhat.com; pbonzini@redhat.com;
-> rth@twiddle.net; mtosatti@redhat.com; geoff@hostfission.com;
-> kash@tripleback.net; qemu-devel@nongnu.org; kvm@vger.kernel.org
-> Subject: Re: [Qemu-devel] [PATCH v7 7/9] i386: Add support for
-> CPUID_8000_001E for AMD
->=20
-> On Mon, May 07, 2018 at 11:44:31PM +0000, Moger, Babu wrote:
-> [...]
-> > > > +
-> > > >  /*
-> > > >   * Encode cache info for CPUID[0x80000006].ECX and
-> > > CPUID[0x80000006].EDX
-> > > >   * @l3 can be NULL.
-> > > > @@ -4105,6 +4111,14 @@ void cpu_x86_cpuid(CPUX86State *env,
-> > > uint32_t index, uint32_t count,
-> > > >              break;
-> > > >          }
-> > > >          break;
-> > > > +    case 0x8000001E:
-> > > > +        assert(cpu->core_id <=3D 255);
-> > >
-> > > Where's the code that ensures this assert() line can't be
-> > > triggered by any command-line configuration?
-> >
-> > I did not understand this. Can you please elaborate. Thanks
->=20
-> The user must not be able to trigger an assert(), so we need to
-> ensure that core_id will never be larger than 255.  Is there
-> existing code that ensures that?
+Snapshots are incremental by their very nature. That is, the snapshot of
+the disk content is incremental. We don't diff VM state. Persistent
+bitmaps are a completely separate thing.
 
-I see that max_cpus is set to 255 and also there are checks to make sure co=
-re_id does not go above 255.
-I verified it while testing.  So, probably we don't need assert here.  Radi=
-m asked me to add this assert.
-I can remove it if no abjections.=20
-=20
->=20
-> >
-> > >
-> > > > +        *eax =3D EXTENDED_APIC_ID((cs->nr_threads - 1),
-> > > > +               cpu->socket_id, cpu->core_id, cpu->thread_id);
-> > > > +        *ebx =3D (cs->nr_threads - 1) << 8 | cpu->core_id;
-> > > > +        *ecx =3D cpu->socket_id;
-> > > > +        *edx =3D 0;
-> > > > +        break;
-> > > >      case 0xC0000000:
-> > > >          *eax =3D env->cpuid_xlevel2;
-> > > >          *ebx =3D 0;
-> > > > --
-> > > > 2.7.4
-> > > >
-> > > >
-> > >
-> > > --
-> > > Eduardo
->=20
-> --
-> Eduardo
+I may be misunderstanding the problem, but to me it sounds as if the
+content of the nvdimm device ended up in the VM state, which is stored
+in a (non-nvdimm) qcow2 image. Having the nvdimm in the VM state is
+certainly not the right approach. Instead, it needs to be treated like
+a block device.
+
+What I believe you really need is two things:
+
+1. Stop the nvdimm from ending up in the VM state. This should be fairly
+   easy.
+
+2. Make the nvdimm device use the QEMU block layer so that it is backed
+   by a non-raw disk image (such as a qcow2 file representing the
+   content of the nvdimm) that supports snapshots.
+
+   This part is hard because it requires some completely new
+   infrastructure such as mapping clusters of the image file to guest
+   pages, and doing cluster allocation (including the copy on write
+   logic) by handling guest page faults.
+
+I think it makes sense to invest some effort into such interfaces, but
+be prepared for a long journey.
+
+Kevin
