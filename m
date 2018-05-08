@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fG8Td-0006vF-SN
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 15:40:48 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fG8Te-0006w5-Op
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 15:40:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fG8Tb-0002WO-Ku
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 15:40:45 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:45829)
+	(envelope-from <laurent@vivier.eu>) id 1fG8Tb-0002WQ-Ki
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 15:40:46 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:40333)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fG8Tb-0002Th-6x
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fG8Tb-0002Tv-Bg
 	for qemu-devel@nongnu.org; Tue, 08 May 2018 15:40:43 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue,  8 May 2018 21:40:26 +0200
-Message-Id: <20180508194026.1281-6-laurent@vivier.eu>
+Date: Tue,  8 May 2018 21:40:25 +0200
+Message-Id: <20180508194026.1281-5-laurent@vivier.eu>
 In-Reply-To: <20180508194026.1281-1-laurent@vivier.eu>
 References: <20180508194026.1281-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH 5/5] linux-user: add sparc/sparc64 specific
- errno
+Subject: [Qemu-devel] [PATCH 4/5] linux-user: fix convertion of
+ flock/flock64 l_type field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,437 +27,118 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-Copied from linux/arch/sparc/include/uapi/asm/errno.h
+As l_type values (F_RDLCK, F_WRLCK, F_UNLCK, F_EXLCK, F_SHLCK)
+are not bitmasks, we can't use target_to_host_bitmask() and
+host_to_target_bitmask() to convert them.
+
+Introduce target_to_host_flock() and host_to_target_flock()
+to convert values between host and target.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/sparc/target_syscall.h   | 203 ++++++++++++++++++++++++++++++++++++
- linux-user/sparc64/target_syscall.h | 203 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 406 insertions(+)
+ linux-user/syscall.c | 48 +++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 33 insertions(+), 15 deletions(-)
 
-diff --git a/linux-user/sparc/target_syscall.h b/linux-user/sparc/target_syscall.h
-index 5f09abfe89..63798298ef 100644
---- a/linux-user/sparc/target_syscall.h
-+++ b/linux-user/sparc/target_syscall.h
-@@ -38,4 +38,207 @@ static inline abi_ulong target_shmlba(CPUSPARCState *env)
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index e4825747f9..fdf6766eca 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -6546,15 +6546,33 @@ static int target_to_host_fcntl_cmd(int cmd)
+     return -TARGET_EINVAL;
+ }
+ 
+-#define TRANSTBL_CONVERT(a) { -1, TARGET_##a, -1, a }
+-static const bitmask_transtbl flock_tbl[] = {
+-    TRANSTBL_CONVERT(F_RDLCK),
+-    TRANSTBL_CONVERT(F_WRLCK),
+-    TRANSTBL_CONVERT(F_UNLCK),
+-    TRANSTBL_CONVERT(F_EXLCK),
+-    TRANSTBL_CONVERT(F_SHLCK),
+-    { 0, 0, 0, 0 }
+-};
++static unsigned int target_to_host_flock(unsigned int type)
++{
++    switch (type) {
++#define TRANSTBL_CONVERT(a) case TARGET_##a: return a;
++    TRANSTBL_CONVERT(F_RDLCK)
++    TRANSTBL_CONVERT(F_WRLCK)
++    TRANSTBL_CONVERT(F_UNLCK)
++    TRANSTBL_CONVERT(F_EXLCK)
++    TRANSTBL_CONVERT(F_SHLCK)
++#undef  TRANSTBL_CONVERT
++    }
++    return type;
++}
++
++static unsigned int host_to_target_flock(unsigned int type)
++{
++    switch (type) {
++#define TRANSTBL_CONVERT(a) case a: return TARGET_##a;
++    TRANSTBL_CONVERT(F_RDLCK)
++    TRANSTBL_CONVERT(F_WRLCK)
++    TRANSTBL_CONVERT(F_UNLCK)
++    TRANSTBL_CONVERT(F_EXLCK)
++    TRANSTBL_CONVERT(F_SHLCK)
++#undef  TRANSTBL_CONVERT
++    }
++    return type;
++}
+ 
+ static inline abi_long copy_from_user_flock(struct flock64 *fl,
+                                             abi_ulong target_flock_addr)
+@@ -6567,7 +6585,7 @@ static inline abi_long copy_from_user_flock(struct flock64 *fl,
      }
- }
  
-+/* Target errno definitions taken from asm-sparc/errno.h */
-+#undef TARGET_EWOULDBLOCK
-+#define TARGET_EWOULDBLOCK     TARGET_EAGAIN /* Operation would block */
-+#undef TARGET_EINPROGRESS
-+#define TARGET_EINPROGRESS     36 /* Operation now in progress */
-+#undef TARGET_EALREADY
-+#define TARGET_EALREADY        37 /* Operation already in progress */
-+#undef TARGET_ENOTSOCK
-+#define TARGET_ENOTSOCK        38 /* Socket operation on non-socket */
-+#undef TARGET_EDESTADDRREQ
-+#define TARGET_EDESTADDRREQ    39 /* Destination address required */
-+#undef TARGET_EMSGSIZE
-+#define TARGET_EMSGSIZE        40 /* Message too long */
-+#undef TARGET_EPROTOTYPE
-+#define TARGET_EPROTOTYPE      41 /* Protocol wrong type for socket */
-+#undef TARGET_ENOPROTOOPT
-+#define TARGET_ENOPROTOOPT     42 /* Protocol not available */
-+#undef TARGET_EPROTONOSUPPORT
-+#define TARGET_EPROTONOSUPPORT  43 /* Protocol not supported */
-+#undef TARGET_ESOCKTNOSUPPORT
-+#define TARGET_ESOCKTNOSUPPORT  44 /* Socket type not supported */
-+#undef TARGET_EOPNOTSUPP
-+#define TARGET_EOPNOTSUPP      45 /* Op not supported on transport endpoint */
-+#undef TARGET_EPFNOSUPPORT
-+#define TARGET_EPFNOSUPPORT    46 /* Protocol family not supported */
-+#undef TARGET_EAFNOSUPPORT
-+#define TARGET_EAFNOSUPPORT    47 /* Address family not supported by protocol */
-+#undef TARGET_EADDRINUSE
-+#define TARGET_EADDRINUSE      48 /* Address already in use */
-+#undef TARGET_EADDRNOTAVAIL
-+#define TARGET_EADDRNOTAVAIL   49 /* Cannot assign requested address */
-+#undef TARGET_ENETDOWN
-+#define TARGET_ENETDOWN        50 /* Network is down */
-+#undef TARGET_ENETUNREACH
-+#define TARGET_ENETUNREACH     51 /* Network is unreachable */
-+#undef TARGET_ENETRESET
-+#define TARGET_ENETRESET       52 /* Net dropped connection because of reset */
-+#undef TARGET_ECONNABORTED
-+#define TARGET_ECONNABORTED    53 /* Software caused connection abort */
-+#undef TARGET_ECONNRESET
-+#define TARGET_ECONNRESET      54 /* Connection reset by peer */
-+#undef TARGET_ENOBUFS
-+#define TARGET_ENOBUFS         55 /* No buffer space available */
-+#undef TARGET_EISCONN
-+#define TARGET_EISCONN         56 /* Transport endpoint is already connected */
-+#undef TARGET_ENOTCONN
-+#define TARGET_ENOTCONN        57 /* Transport endpoint is not connected */
-+#undef TARGET_ESHUTDOWN
-+#define TARGET_ESHUTDOWN       58 /* No send after transport endpoint shutdown*/
-+#undef TARGET_ETOOMANYREFS
-+#define TARGET_ETOOMANYREFS    59 /* Too many references: cannot splice */
-+#undef TARGET_ETIMEDOUT
-+#define TARGET_ETIMEDOUT       60 /* Connection timed out */
-+#undef TARGET_ECONNREFUSED
-+#define TARGET_ECONNREFUSED    61 /* Connection refused */
-+#undef TARGET_ELOOP
-+#define TARGET_ELOOP           62 /* Too many symbolic links encountered */
-+#undef TARGET_ENAMETOOLONG
-+#define TARGET_ENAMETOOLONG    63 /* File name too long */
-+#undef TARGET_EHOSTDOWN
-+#define TARGET_EHOSTDOWN       64 /* Host is down */
-+#undef TARGET_EHOSTUNREACH
-+#define TARGET_EHOSTUNREACH    65 /* No route to host */
-+#undef TARGET_ENOTEMPTY
-+#define TARGET_ENOTEMPTY       66 /* Directory not empty */
-+#undef TARGET_EPROCLIM
-+#define TARGET_EPROCLIM        67 /* SUNOS: Too many processes */
-+#undef TARGET_EUSERS
-+#define TARGET_EUSERS          68 /* Too many users */
-+#undef TARGET_EDQUOT
-+#define TARGET_EDQUOT          69 /* Quota exceeded */
-+#undef TARGET_ESTALE
-+#define TARGET_ESTALE          70 /* Stale file handle */
-+#undef TARGET_EREMOTE
-+#define TARGET_EREMOTE         71 /* Object is remote */
-+#undef TARGET_ENOSTR
-+#define TARGET_ENOSTR          72 /* Device not a stream */
-+#undef TARGET_ETIME
-+#define TARGET_ETIME           73 /* Timer expired */
-+#undef TARGET_ENOSR
-+#define TARGET_ENOSR           74 /* Out of streams resources */
-+#undef TARGET_ENOMSG
-+#define TARGET_ENOMSG          75 /* No message of desired type */
-+#undef TARGET_EBADMSG
-+#define TARGET_EBADMSG         76 /* Not a data message */
-+#undef TARGET_EIDRM
-+#define TARGET_EIDRM           77 /* Identifier removed */
-+#undef TARGET_EDEADLK
-+#define TARGET_EDEADLK         78 /* Resource deadlock would occur */
-+#undef TARGET_ENOLCK
-+#define TARGET_ENOLCK          79 /* No record locks available */
-+#undef TARGET_ENONET
-+#define TARGET_ENONET          80 /* Machine is not on the network */
-+#undef TARGET_ERREMOTE
-+#define TARGET_ERREMOTE        81 /* SunOS: Too many lvls of remote in path */
-+#undef TARGET_ENOLINK
-+#define TARGET_ENOLINK         82 /* Link has been severed */
-+#undef TARGET_EADV
-+#define TARGET_EADV            83 /* Advertise error */
-+#undef TARGET_ESRMNT
-+#define TARGET_ESRMNT          84 /* Srmount error */
-+#undef TARGET_ECOMM
-+#define TARGET_ECOMM           85 /* Communication error on send */
-+#undef TARGET_EPROTO
-+#define TARGET_EPROTO          86 /* Protocol error */
-+#undef TARGET_EMULTIHOP
-+#define TARGET_EMULTIHOP       87 /* Multihop attempted */
-+#undef TARGET_EDOTDOT
-+#define TARGET_EDOTDOT         88 /* RFS specific error */
-+#undef TARGET_EREMCHG
-+#define TARGET_EREMCHG         89 /* Remote address changed */
-+#undef TARGET_ENOSYS
-+#define TARGET_ENOSYS          90 /* Function not implemented */
-+#undef TARGET_ESTRPIPE
-+#define TARGET_ESTRPIPE        91 /* Streams pipe error */
-+#undef TARGET_EOVERFLOW
-+#define TARGET_EOVERFLOW       92 /* Value too large for defined data type */
-+#undef TARGET_EBADFD
-+#define TARGET_EBADFD          93 /* File descriptor in bad state */
-+#undef TARGET_ECHRNG
-+#define TARGET_ECHRNG          94 /* Channel number out of range */
-+#undef TARGET_EL2NSYNC
-+#define TARGET_EL2NSYNC        95 /* Level 2 not synchronized */
-+#undef TARGET_EL3HLT
-+#define TARGET_EL3HLT          96 /* Level 3 halted */
-+#undef TARGET_EL3RST
-+#define TARGET_EL3RST          97 /* Level 3 reset */
-+#undef TARGET_ELNRNG
-+#define TARGET_ELNRNG          98 /* Link number out of range */
-+#undef TARGET_EUNATCH
-+#define TARGET_EUNATCH         99 /* Protocol driver not attached */
-+#undef TARGET_ENOCSI
-+#define TARGET_ENOCSI          100 /* No CSI structure available */
-+#undef TARGET_EL2HLT
-+#define TARGET_EL2HLT          101 /* Level 2 halted */
-+#undef TARGET_EBADE
-+#define TARGET_EBADE           102 /* Invalid exchange */
-+#undef TARGET_EBADR
-+#define TARGET_EBADR           103 /* Invalid request descriptor */
-+#undef TARGET_EXFULL
-+#define TARGET_EXFULL          104 /* Exchange full */
-+#undef TARGET_ENOANO
-+#define TARGET_ENOANO          105 /* No anode */
-+#undef TARGET_EBADRQC
-+#define TARGET_EBADRQC         106 /* Invalid request code */
-+#undef TARGET_EBADSLT
-+#define TARGET_EBADSLT         107 /* Invalid slot */
-+#undef TARGET_EDEADLOCK
-+#define TARGET_EDEADLOCK       108 /* File locking deadlock error */
-+#undef TARGET_EBFONT
-+#define TARGET_EBFONT          109 /* Bad font file format */
-+#undef TARGET_ELIBEXEC
-+#define TARGET_ELIBEXEC        110 /* Cannot exec a shared library directly */
-+#undef TARGET_ENODATA
-+#define TARGET_ENODATA         111 /* No data available */
-+#undef TARGET_ELIBBAD
-+#define TARGET_ELIBBAD         112 /* Accessing a corrupted shared library */
-+#undef TARGET_ENOPKG
-+#define TARGET_ENOPKG          113 /* Package not installed */
-+#undef TARGET_ELIBACC
-+#define TARGET_ELIBACC         114 /* Can not access a needed shared library */
-+#undef TARGET_ENOTUNIQ
-+#define TARGET_ENOTUNIQ        115 /* Name not unique on network */
-+#undef TARGET_ERESTART
-+#define TARGET_ERESTART        116 /* Interrupted syscall should be restarted */
-+#undef TARGET_EUCLEAN
-+#define TARGET_EUCLEAN         117 /* Structure needs cleaning */
-+#undef TARGET_ENOTNAM
-+#define TARGET_ENOTNAM         118 /* Not a XENIX named type file */
-+#undef TARGET_ENAVAIL
-+#define TARGET_ENAVAIL         119 /* No XENIX semaphores available */
-+#undef TARGET_EISNAM
-+#define TARGET_EISNAM          120 /* Is a named type file */
-+#undef TARGET_EREMOTEIO
-+#define TARGET_EREMOTEIO       121 /* Remote I/O error */
-+#undef TARGET_EILSEQ
-+#define TARGET_EILSEQ          122 /* Illegal byte sequence */
-+#undef TARGET_ELIBMAX
-+#define TARGET_ELIBMAX         123 /* Atmpt to link in too many shared libs */
-+#undef TARGET_ELIBSCN
-+#define TARGET_ELIBSCN         124 /* .lib section in a.out corrupted */
-+#undef TARGET_ENOMEDIUM
-+#define TARGET_ENOMEDIUM       125 /* No medium found */
-+#undef TARGET_EMEDIUMTYPE
-+#define TARGET_EMEDIUMTYPE     126 /* Wrong medium type */
-+#undef TARGET_ECANCELED
-+#define TARGET_ECANCELED       127 /* Operation Cancelled */
-+#undef TARGET_ENOKEY
-+#define TARGET_ENOKEY          128 /* Required key not available */
-+#undef TARGET_EKEYEXPIRED
-+#define TARGET_EKEYEXPIRED     129 /* Key has expired */
-+#undef TARGET_EKEYREVOKED
-+#define TARGET_EKEYREVOKED     130 /* Key has been revoked */
-+#undef TARGET_EKEYREJECTED
-+#define TARGET_EKEYREJECTED    131 /* Key was rejected by service */
-+#undef TARGET_EOWNERDEAD
-+#define TARGET_EOWNERDEAD      132 /* Owner died */
-+#undef TARGET_ENOTRECOVERABLE
-+#define TARGET_ENOTRECOVERABLE  133 /* State not recoverable */
-+#undef TARGET_ERFKILL
-+#define TARGET_ERFKILL         134 /* Operation not possible due to RF-kill */
-+#undef TARGET_EHWPOISON
-+#define TARGET_EHWPOISON       135 /* Memory page has hardware error */
- #endif /* SPARC_TARGET_SYSCALL_H */
-diff --git a/linux-user/sparc64/target_syscall.h b/linux-user/sparc64/target_syscall.h
-index 2cbbaaed1b..105e60112d 100644
---- a/linux-user/sparc64/target_syscall.h
-+++ b/linux-user/sparc64/target_syscall.h
-@@ -30,4 +30,207 @@ static inline abi_ulong target_shmlba(CPUSPARCState *env)
-     return MAX(TARGET_PAGE_SIZE, 16 * 1024);
- }
+     __get_user(l_type, &target_fl->l_type);
+-    fl->l_type = target_to_host_bitmask(l_type, flock_tbl);
++    fl->l_type = target_to_host_flock(l_type);
+     __get_user(fl->l_whence, &target_fl->l_whence);
+     __get_user(fl->l_start, &target_fl->l_start);
+     __get_user(fl->l_len, &target_fl->l_len);
+@@ -6586,7 +6604,7 @@ static inline abi_long copy_to_user_flock(abi_ulong target_flock_addr,
+         return -TARGET_EFAULT;
+     }
  
-+/* Target errno definitions taken from asm-sparc/errno.h */
-+#undef TARGET_EWOULDBLOCK
-+#define TARGET_EWOULDBLOCK     TARGET_EAGAIN /* Operation would block */
-+#undef TARGET_EINPROGRESS
-+#define TARGET_EINPROGRESS     36 /* Operation now in progress */
-+#undef TARGET_EALREADY
-+#define TARGET_EALREADY        37 /* Operation already in progress */
-+#undef TARGET_ENOTSOCK
-+#define TARGET_ENOTSOCK        38 /* Socket operation on non-socket */
-+#undef TARGET_EDESTADDRREQ
-+#define TARGET_EDESTADDRREQ    39 /* Destination address required */
-+#undef TARGET_EMSGSIZE
-+#define TARGET_EMSGSIZE        40 /* Message too long */
-+#undef TARGET_EPROTOTYPE
-+#define TARGET_EPROTOTYPE      41 /* Protocol wrong type for socket */
-+#undef TARGET_ENOPROTOOPT
-+#define TARGET_ENOPROTOOPT     42 /* Protocol not available */
-+#undef TARGET_EPROTONOSUPPORT
-+#define TARGET_EPROTONOSUPPORT  43 /* Protocol not supported */
-+#undef TARGET_ESOCKTNOSUPPORT
-+#define TARGET_ESOCKTNOSUPPORT  44 /* Socket type not supported */
-+#undef TARGET_EOPNOTSUPP
-+#define TARGET_EOPNOTSUPP      45 /* Op not supported on transport endpoint */
-+#undef TARGET_EPFNOSUPPORT
-+#define TARGET_EPFNOSUPPORT    46 /* Protocol family not supported */
-+#undef TARGET_EAFNOSUPPORT
-+#define TARGET_EAFNOSUPPORT    47 /* Address family not supported by protocol */
-+#undef TARGET_EADDRINUSE
-+#define TARGET_EADDRINUSE      48 /* Address already in use */
-+#undef TARGET_EADDRNOTAVAIL
-+#define TARGET_EADDRNOTAVAIL   49 /* Cannot assign requested address */
-+#undef TARGET_ENETDOWN
-+#define TARGET_ENETDOWN        50 /* Network is down */
-+#undef TARGET_ENETUNREACH
-+#define TARGET_ENETUNREACH     51 /* Network is unreachable */
-+#undef TARGET_ENETRESET
-+#define TARGET_ENETRESET       52 /* Net dropped connection because of reset */
-+#undef TARGET_ECONNABORTED
-+#define TARGET_ECONNABORTED    53 /* Software caused connection abort */
-+#undef TARGET_ECONNRESET
-+#define TARGET_ECONNRESET      54 /* Connection reset by peer */
-+#undef TARGET_ENOBUFS
-+#define TARGET_ENOBUFS         55 /* No buffer space available */
-+#undef TARGET_EISCONN
-+#define TARGET_EISCONN         56 /* Transport endpoint is already connected */
-+#undef TARGET_ENOTCONN
-+#define TARGET_ENOTCONN        57 /* Transport endpoint is not connected */
-+#undef TARGET_ESHUTDOWN
-+#define TARGET_ESHUTDOWN       58 /* No send after transport endpoint shutdown*/
-+#undef TARGET_ETOOMANYREFS
-+#define TARGET_ETOOMANYREFS    59 /* Too many references: cannot splice */
-+#undef TARGET_ETIMEDOUT
-+#define TARGET_ETIMEDOUT       60 /* Connection timed out */
-+#undef TARGET_ECONNREFUSED
-+#define TARGET_ECONNREFUSED    61 /* Connection refused */
-+#undef TARGET_ELOOP
-+#define TARGET_ELOOP           62 /* Too many symbolic links encountered */
-+#undef TARGET_ENAMETOOLONG
-+#define TARGET_ENAMETOOLONG    63 /* File name too long */
-+#undef TARGET_EHOSTDOWN
-+#define TARGET_EHOSTDOWN       64 /* Host is down */
-+#undef TARGET_EHOSTUNREACH
-+#define TARGET_EHOSTUNREACH    65 /* No route to host */
-+#undef TARGET_ENOTEMPTY
-+#define TARGET_ENOTEMPTY       66 /* Directory not empty */
-+#undef TARGET_EPROCLIM
-+#define TARGET_EPROCLIM        67 /* SUNOS: Too many processes */
-+#undef TARGET_EUSERS
-+#define TARGET_EUSERS          68 /* Too many users */
-+#undef TARGET_EDQUOT
-+#define TARGET_EDQUOT          69 /* Quota exceeded */
-+#undef TARGET_ESTALE
-+#define TARGET_ESTALE          70 /* Stale file handle */
-+#undef TARGET_EREMOTE
-+#define TARGET_EREMOTE         71 /* Object is remote */
-+#undef TARGET_ENOSTR
-+#define TARGET_ENOSTR          72 /* Device not a stream */
-+#undef TARGET_ETIME
-+#define TARGET_ETIME           73 /* Timer expired */
-+#undef TARGET_ENOSR
-+#define TARGET_ENOSR           74 /* Out of streams resources */
-+#undef TARGET_ENOMSG
-+#define TARGET_ENOMSG          75 /* No message of desired type */
-+#undef TARGET_EBADMSG
-+#define TARGET_EBADMSG         76 /* Not a data message */
-+#undef TARGET_EIDRM
-+#define TARGET_EIDRM           77 /* Identifier removed */
-+#undef TARGET_EDEADLK
-+#define TARGET_EDEADLK         78 /* Resource deadlock would occur */
-+#undef TARGET_ENOLCK
-+#define TARGET_ENOLCK          79 /* No record locks available */
-+#undef TARGET_ENONET
-+#define TARGET_ENONET          80 /* Machine is not on the network */
-+#undef TARGET_ERREMOTE
-+#define TARGET_ERREMOTE        81 /* SunOS: Too many lvls of remote in path */
-+#undef TARGET_ENOLINK
-+#define TARGET_ENOLINK         82 /* Link has been severed */
-+#undef TARGET_EADV
-+#define TARGET_EADV            83 /* Advertise error */
-+#undef TARGET_ESRMNT
-+#define TARGET_ESRMNT          84 /* Srmount error */
-+#undef TARGET_ECOMM
-+#define TARGET_ECOMM           85 /* Communication error on send */
-+#undef TARGET_EPROTO
-+#define TARGET_EPROTO          86 /* Protocol error */
-+#undef TARGET_EMULTIHOP
-+#define TARGET_EMULTIHOP       87 /* Multihop attempted */
-+#undef TARGET_EDOTDOT
-+#define TARGET_EDOTDOT         88 /* RFS specific error */
-+#undef TARGET_EREMCHG
-+#define TARGET_EREMCHG         89 /* Remote address changed */
-+#undef TARGET_ENOSYS
-+#define TARGET_ENOSYS          90 /* Function not implemented */
-+#undef TARGET_ESTRPIPE
-+#define TARGET_ESTRPIPE        91 /* Streams pipe error */
-+#undef TARGET_EOVERFLOW
-+#define TARGET_EOVERFLOW       92 /* Value too large for defined data type */
-+#undef TARGET_EBADFD
-+#define TARGET_EBADFD          93 /* File descriptor in bad state */
-+#undef TARGET_ECHRNG
-+#define TARGET_ECHRNG          94 /* Channel number out of range */
-+#undef TARGET_EL2NSYNC
-+#define TARGET_EL2NSYNC        95 /* Level 2 not synchronized */
-+#undef TARGET_EL3HLT
-+#define TARGET_EL3HLT          96 /* Level 3 halted */
-+#undef TARGET_EL3RST
-+#define TARGET_EL3RST          97 /* Level 3 reset */
-+#undef TARGET_ELNRNG
-+#define TARGET_ELNRNG          98 /* Link number out of range */
-+#undef TARGET_EUNATCH
-+#define TARGET_EUNATCH         99 /* Protocol driver not attached */
-+#undef TARGET_ENOCSI
-+#define TARGET_ENOCSI          100 /* No CSI structure available */
-+#undef TARGET_EL2HLT
-+#define TARGET_EL2HLT          101 /* Level 2 halted */
-+#undef TARGET_EBADE
-+#define TARGET_EBADE           102 /* Invalid exchange */
-+#undef TARGET_EBADR
-+#define TARGET_EBADR           103 /* Invalid request descriptor */
-+#undef TARGET_EXFULL
-+#define TARGET_EXFULL          104 /* Exchange full */
-+#undef TARGET_ENOANO
-+#define TARGET_ENOANO          105 /* No anode */
-+#undef TARGET_EBADRQC
-+#define TARGET_EBADRQC         106 /* Invalid request code */
-+#undef TARGET_EBADSLT
-+#define TARGET_EBADSLT         107 /* Invalid slot */
-+#undef TARGET_EDEADLOCK
-+#define TARGET_EDEADLOCK       108 /* File locking deadlock error */
-+#undef TARGET_EBFONT
-+#define TARGET_EBFONT          109 /* Bad font file format */
-+#undef TARGET_ELIBEXEC
-+#define TARGET_ELIBEXEC        110 /* Cannot exec a shared library directly */
-+#undef TARGET_ENODATA
-+#define TARGET_ENODATA         111 /* No data available */
-+#undef TARGET_ELIBBAD
-+#define TARGET_ELIBBAD         112 /* Accessing a corrupted shared library */
-+#undef TARGET_ENOPKG
-+#define TARGET_ENOPKG          113 /* Package not installed */
-+#undef TARGET_ELIBACC
-+#define TARGET_ELIBACC         114 /* Can not access a needed shared library */
-+#undef TARGET_ENOTUNIQ
-+#define TARGET_ENOTUNIQ        115 /* Name not unique on network */
-+#undef TARGET_ERESTART
-+#define TARGET_ERESTART        116 /* Interrupted syscall should be restarted */
-+#undef TARGET_EUCLEAN
-+#define TARGET_EUCLEAN         117 /* Structure needs cleaning */
-+#undef TARGET_ENOTNAM
-+#define TARGET_ENOTNAM         118 /* Not a XENIX named type file */
-+#undef TARGET_ENAVAIL
-+#define TARGET_ENAVAIL         119 /* No XENIX semaphores available */
-+#undef TARGET_EISNAM
-+#define TARGET_EISNAM          120 /* Is a named type file */
-+#undef TARGET_EREMOTEIO
-+#define TARGET_EREMOTEIO       121 /* Remote I/O error */
-+#undef TARGET_EILSEQ
-+#define TARGET_EILSEQ          122 /* Illegal byte sequence */
-+#undef TARGET_ELIBMAX
-+#define TARGET_ELIBMAX         123 /* Atmpt to link in too many shared libs */
-+#undef TARGET_ELIBSCN
-+#define TARGET_ELIBSCN         124 /* .lib section in a.out corrupted */
-+#undef TARGET_ENOMEDIUM
-+#define TARGET_ENOMEDIUM       125 /* No medium found */
-+#undef TARGET_EMEDIUMTYPE
-+#define TARGET_EMEDIUMTYPE     126 /* Wrong medium type */
-+#undef TARGET_ECANCELED
-+#define TARGET_ECANCELED       127 /* Operation Cancelled */
-+#undef TARGET_ENOKEY
-+#define TARGET_ENOKEY          128 /* Required key not available */
-+#undef TARGET_EKEYEXPIRED
-+#define TARGET_EKEYEXPIRED     129 /* Key has expired */
-+#undef TARGET_EKEYREVOKED
-+#define TARGET_EKEYREVOKED     130 /* Key has been revoked */
-+#undef TARGET_EKEYREJECTED
-+#define TARGET_EKEYREJECTED    131 /* Key was rejected by service */
-+#undef TARGET_EOWNERDEAD
-+#define TARGET_EOWNERDEAD      132 /* Owner died */
-+#undef TARGET_ENOTRECOVERABLE
-+#define TARGET_ENOTRECOVERABLE  133 /* State not recoverable */
-+#undef TARGET_ERFKILL
-+#define TARGET_ERFKILL         134 /* Operation not possible due to RF-kill */
-+#undef TARGET_EHWPOISON
-+#define TARGET_EHWPOISON       135 /* Memory page has hardware error */
- #endif /* SPARC64_TARGET_SYSCALL_H */
+-    l_type = host_to_target_bitmask(fl->l_type, flock_tbl);
++    l_type = host_to_target_flock(fl->l_type);
+     __put_user(l_type, &target_fl->l_type);
+     __put_user(fl->l_whence, &target_fl->l_whence);
+     __put_user(fl->l_start, &target_fl->l_start);
+@@ -6611,7 +6629,7 @@ static inline abi_long copy_from_user_oabi_flock64(struct flock64 *fl,
+     }
+ 
+     __get_user(l_type, &target_fl->l_type);
+-    fl->l_type = target_to_host_bitmask(l_type, flock_tbl);
++    fl->l_type = target_to_host_flock(l_type);
+     __get_user(fl->l_whence, &target_fl->l_whence);
+     __get_user(fl->l_start, &target_fl->l_start);
+     __get_user(fl->l_len, &target_fl->l_len);
+@@ -6630,7 +6648,7 @@ static inline abi_long copy_to_user_oabi_flock64(abi_ulong target_flock_addr,
+         return -TARGET_EFAULT;
+     }
+ 
+-    l_type = host_to_target_bitmask(fl->l_type, flock_tbl);
++    l_type = host_to_target_flock(fl->l_type);
+     __put_user(l_type, &target_fl->l_type);
+     __put_user(fl->l_whence, &target_fl->l_whence);
+     __put_user(fl->l_start, &target_fl->l_start);
+@@ -6652,7 +6670,7 @@ static inline abi_long copy_from_user_flock64(struct flock64 *fl,
+     }
+ 
+     __get_user(l_type, &target_fl->l_type);
+-    fl->l_type = target_to_host_bitmask(l_type, flock_tbl);
++    fl->l_type = target_to_host_flock(l_type);
+     __get_user(fl->l_whence, &target_fl->l_whence);
+     __get_user(fl->l_start, &target_fl->l_start);
+     __get_user(fl->l_len, &target_fl->l_len);
+@@ -6671,7 +6689,7 @@ static inline abi_long copy_to_user_flock64(abi_ulong target_flock_addr,
+         return -TARGET_EFAULT;
+     }
+ 
+-    l_type = host_to_target_bitmask(fl->l_type, flock_tbl);
++    l_type = host_to_target_flock(fl->l_type);
+     __put_user(l_type, &target_fl->l_type);
+     __put_user(fl->l_whence, &target_fl->l_whence);
+     __put_user(fl->l_start, &target_fl->l_start);
 -- 
 2.14.3
