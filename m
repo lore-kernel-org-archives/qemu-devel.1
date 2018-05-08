@@ -1,34 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40209)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fG1gF-0003nh-IB
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:25:25 -0400
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fG1gM-0003sY-7f
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:25:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fG1gC-0006mj-7K
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:25:19 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45054
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fG1gI-0006qR-VB
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:25:26 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32828
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <akrowiak@linux.vnet.ibm.com>)
-	id 1fG1gB-0006lY-Qv
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:25:16 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	id 1fG1gI-0006qF-Nd
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:25:22 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w48CKQhK095577
-	for <qemu-devel@nongnu.org>; Tue, 8 May 2018 08:25:15 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2huah1c91q-1
+	w48CMTkm173407
+	for <qemu-devel@nongnu.org>; Tue, 8 May 2018 08:25:22 -0400
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2hu8kh1wrr-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 08:25:14 -0400
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 08:25:21 -0400
 Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <akrowiak@linux.vnet.ibm.com>;
-	Tue, 8 May 2018 08:25:13 -0400
+	Tue, 8 May 2018 08:25:21 -0400
 From: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-Date: Tue,  8 May 2018 08:24:57 -0400
-Message-Id: <1525782303-16940-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v5 0/6] s390x: vfio-ap: guest dedicated crypto
- adapters
+Date: Tue,  8 May 2018 08:25:00 -0400
+In-Reply-To: <1525782303-16940-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+References: <1525782303-16940-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+Message-Id: <1525782303-16940-4-git-send-email-akrowiak@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v5 3/6] s390x/cpumodel: Set up CPU model for AP
+ device support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,57 +42,129 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net, akrowiak@linux.vnet.ibm.com
 
-This patch series is the QEMU counterpart to the KVM/kernel support for 
-guest dedicated crypto adapters. The KVM/kernel model is built on the 
-VFIO mediated device framework and provides the infrastructure for 
-granting exclusive guest access to crypto devices installed on the linux 
-host. This patch series introduces a new QEMU command line option, QEMU 
-object model and CPU model features to exploit the KVM/kernel model.
+A new CPU model feature and two new CPU model facilities are
+introduced to support AP devices for a KVM guest.
 
-See the detailed specifications for AP virtualization provided by this 
-patch set in docs/vfio-ap.txt for a more complete discussion of the 
-design introduced by this patch series.
+CPU model features:
 
-Note: This series implements the minimal viable product (MVP) and does not
-      provide support for hot plug/unplug, migration, or VSIE. The goal
-      of the MVP model is to solidify a base upon which these additional 
-      features will be built.
+1. The KVM_S390_VM_CPU_FEAT_AP CPU model feature indicates that
+   AP facilities are installed. This feature will be enabled by
+   the kernel only if the AP facilities are installed on the linux
+   host. This feature must be turned on from userspace to access
+   AP devices from the KVM guest. The QEMU command line to turn
+   this feature looks something like this:
 
-v4 => v5 Change log:
-===================
-* Added MAINTAINERS entries for VFIO AP
-* Added explanation for why we are only supporting zEC12 and newer CPU 
-  models.
-* Changed CPU model feature qci=on|off to apqci=on|off
-* Misc. minor changes
+	qemu-system-s390x ... -cpu xxx,ap=on
 
+   This feature will be supported for zEC12 and newer CPU models.
+   The feature will not be supported for older models due to
+   testability issues.
 
-Tony Krowiak (6):
-  linux-headers: linux header updates for AP support
-  s390x/ap: base Adjunct Processor (AP) object
-  s390x/cpumodel: Set up CPU model for AP device support
-  s390x/vfio: ap: Introduce VFIO AP device
-  s390: doc: detailed specifications for AP virtualization
-  MAINTAINERS: add entries for AP
+CPU model facilities:
 
- MAINTAINERS                       |   14 +
- default-configs/s390x-softmmu.mak |    1 +
- docs/vfio-ap.txt                  |  649 +++++++++++++++++++++++++++++++++++++
- hw/s390x/Makefile.objs            |    1 +
- hw/s390x/ap-device.c              |   39 +++
- hw/vfio/Makefile.objs             |    1 +
- hw/vfio/ap.c                      |  182 +++++++++++
- include/hw/s390x/ap-device.h      |   38 +++
- include/hw/vfio/vfio-common.h     |    1 +
- linux-headers/asm-s390/kvm.h      |    2 +
- linux-headers/linux/vfio.h        |    2 +
- target/s390x/cpu_features.c       |    3 +
- target/s390x/cpu_features_def.h   |    3 +
- target/s390x/cpu_models.c         |    2 +
- target/s390x/gen-features.c       |    3 +
- target/s390x/kvm.c                |    1 +
- 16 files changed, 942 insertions(+), 0 deletions(-)
- create mode 100644 docs/vfio-ap.txt
- create mode 100644 hw/s390x/ap-device.c
- create mode 100644 hw/vfio/ap.c
- create mode 100644 include/hw/s390x/ap-device.h
+1. The S390_FEAT_AP_QUERY_CONFIG_INFO feature indicates the AP Query
+   Configuration Information (QCI) facility is installed. This feature
+   will be enabled by the kernel only if the QCI is installed on
+   the host.
+
+2. The S390_FEAT_AP_FACILITY_TEST feature indicates that the AP
+   Facility Test (APFT) facility is installed. This feature will
+   be enabled by the kernel only if the APFT facility is installed
+   on the host.
+
+Signed-off-by: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+---
+ target/s390x/cpu_features.c     |    3 +++
+ target/s390x/cpu_features_def.h |    3 +++
+ target/s390x/cpu_models.c       |    2 ++
+ target/s390x/gen-features.c     |    3 +++
+ target/s390x/kvm.c              |    1 +
+ 5 files changed, 12 insertions(+), 0 deletions(-)
+
+diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
+index 3b9e274..f344323 100644
+--- a/target/s390x/cpu_features.c
++++ b/target/s390x/cpu_features.c
+@@ -40,8 +40,10 @@ static const S390FeatDef s390_features[] = {
+     FEAT_INIT("srs", S390_FEAT_TYPE_STFL, 9, "Sense-running-status facility"),
+     FEAT_INIT("csske", S390_FEAT_TYPE_STFL, 10, "Conditional-SSKE facility"),
+     FEAT_INIT("ctop", S390_FEAT_TYPE_STFL, 11, "Configuration-topology facility"),
++    FEAT_INIT("apqci", S390_FEAT_TYPE_STFL, 12, "Query AP Configuration facility"),
+     FEAT_INIT("ipter", S390_FEAT_TYPE_STFL, 13, "IPTE-range facility"),
+     FEAT_INIT("nonqks", S390_FEAT_TYPE_STFL, 14, "Nonquiescing key-setting facility"),
++    FEAT_INIT("apft", S390_FEAT_TYPE_STFL, 15, "Adjunct Processor Facilities Test facility"),
+     FEAT_INIT("etf2", S390_FEAT_TYPE_STFL, 16, "Extended-translation facility 2"),
+     FEAT_INIT("msa-base", S390_FEAT_TYPE_STFL, 17, "Message-security-assist facility (excluding subfunctions)"),
+     FEAT_INIT("ldisp", S390_FEAT_TYPE_STFL, 18, "Long-displacement facility"),
+@@ -129,6 +131,7 @@ static const S390FeatDef s390_features[] = {
+ 
+     FEAT_INIT_MISC("dateh2", "DAT-enhancement facility 2"),
+     FEAT_INIT_MISC("cmm", "Collaborative-memory-management facility"),
++    FEAT_INIT_MISC("ap", "AP instructions installed"),
+ 
+     FEAT_INIT("plo-cl", S390_FEAT_TYPE_PLO, 0, "PLO Compare and load (32 bit in general registers)"),
+     FEAT_INIT("plo-clg", S390_FEAT_TYPE_PLO, 1, "PLO Compare and load (64 bit in parameter list)"),
+diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
+index 7c5915c..8998b65 100644
+--- a/target/s390x/cpu_features_def.h
++++ b/target/s390x/cpu_features_def.h
+@@ -27,8 +27,10 @@ typedef enum {
+     S390_FEAT_SENSE_RUNNING_STATUS,
+     S390_FEAT_CONDITIONAL_SSKE,
+     S390_FEAT_CONFIGURATION_TOPOLOGY,
++    S390_FEAT_AP_QUERY_CONFIG_INFO,
+     S390_FEAT_IPTE_RANGE,
+     S390_FEAT_NONQ_KEY_SETTING,
++    S390_FEAT_AP_FACILITIES_TEST,
+     S390_FEAT_EXTENDED_TRANSLATION_2,
+     S390_FEAT_MSA,
+     S390_FEAT_LONG_DISPLACEMENT,
+@@ -118,6 +120,7 @@ typedef enum {
+     /* Misc */
+     S390_FEAT_DAT_ENH_2,
+     S390_FEAT_CMM,
++    S390_FEAT_AP,
+ 
+     /* PLO */
+     S390_FEAT_PLO_CL,
+diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+index e10035a..5d834b4 100644
+--- a/target/s390x/cpu_models.c
++++ b/target/s390x/cpu_models.c
+@@ -770,6 +770,8 @@ static void check_consistency(const S390CPUModel *model)
+         { S390_FEAT_PRNO_TRNG_QRTCR, S390_FEAT_MSA_EXT_5 },
+         { S390_FEAT_PRNO_TRNG, S390_FEAT_MSA_EXT_5 },
+         { S390_FEAT_SIE_KSS, S390_FEAT_SIE_F2 },
++        { S390_FEAT_AP_QUERY_CONFIG_INFO, S390_FEAT_AP },
++        { S390_FEAT_AP_FACILITIES_TEST, S390_FEAT_AP },
+     };
+     int i;
+ 
+diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+index 0cdbc15..0d5b0f7 100644
+--- a/target/s390x/gen-features.c
++++ b/target/s390x/gen-features.c
+@@ -447,6 +447,9 @@ static uint16_t full_GEN12_GA1[] = {
+     S390_FEAT_ADAPTER_INT_SUPPRESSION,
+     S390_FEAT_EDAT_2,
+     S390_FEAT_SIDE_EFFECT_ACCESS_ESOP2,
++    S390_FEAT_AP_QUERY_CONFIG_INFO,
++    S390_FEAT_AP_FACILITIES_TEST,
++    S390_FEAT_AP,
+ };
+ 
+ static uint16_t full_GEN12_GA2[] = {
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 12b90cf..4d8c344 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -2082,6 +2082,7 @@ static int kvm_to_feat[][2] = {
+     { KVM_S390_VM_CPU_FEAT_PFMFI, S390_FEAT_SIE_PFMFI},
+     { KVM_S390_VM_CPU_FEAT_SIGPIF, S390_FEAT_SIE_SIGPIF},
+     { KVM_S390_VM_CPU_FEAT_KSS, S390_FEAT_SIE_KSS},
++    { KVM_S390_VM_CPU_FEAT_AP, S390_FEAT_AP},
+ };
+ 
+ static int query_cpu_feat(S390FeatBitmap features)
+-- 
+1.7.1
