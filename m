@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fG3oa-0001Pw-5C
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:42:07 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fG3pO-0001o7-Kc
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:42:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fG3oX-0002Dl-21
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:42:04 -0400
-References: <1514187226.13662.28.camel@intel.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <6e792b9f-2281-e8db-0410-c4c3468ffc90@redhat.com>
-Date: Tue, 8 May 2018 09:41:40 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fG3pL-0002UJ-Ih
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:42:54 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:36502)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fG3pL-0002U1-EI
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:42:51 -0400
+Received: by mail-qt0-x241.google.com with SMTP id q6-v6so41313395qtn.3
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 07:42:51 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Tue,  8 May 2018 11:42:42 -0300
+Message-Id: <20180508144242.13370-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <1514187226.13662.28.camel@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Some question about savem/qcow2 incremental
- snapshot
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] RISC-V: Remove unnecessary header include
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,37 +31,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: He Junyan <junyan.he@intel.com>, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>, qemu block <qemu-block@nongnu.org>
+To: Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Alistair Francis <alistair@alistair23.me>
 
-On 12/25/2017 01:33 AM, He Junyan wrote:
-> hi all:
->=20
-> I am now focusing on snapshot optimization for Intel NVDimm kind
-> memory. Different from the normal memory, the NVDimm may be 128G, 256G
-> or even more for just one guest, and its speed is slower than the
-> normal memory. So sometimes it may take several minutes to complete
-> just one snapshot saving. Even with compression enabled, the=C2=A0snaps=
-hot
-> point may consume more than 30G disk space.
-> We decide to add incremental kind snapshot saving to resolve this. Just
-> store difference between snapshot points to save time and disk space.
-> But the current snapshot/save_vm framework seems not to support this.
-> We need to add snapshot dependency and extra operations when we LOAD
-> and DELETE the snapshot point.
-> Is that possible to modify the savevm framework and add some
-> incremental snapshot support to QCOW2 format?
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/riscv/riscv_htif.c | 1 -
+ hw/riscv/sifive_e.c   | 1 -
+ hw/riscv/sifive_u.c   | 1 -
+ hw/riscv/spike.c      | 1 -
+ hw/riscv/virt.c       | 1 -
+ 5 files changed, 5 deletions(-)
 
-In general, the list has tended to focus on external snapshots rather=20
-than internal; where persistent bitmaps have been the proposed mechanism=20
-for tracking incremental differences between snapshots.  But yes, it is=20
-certainly feasible that patches to improve internal snapshots to take=20
-advantage of incremental relationships may prove useful.  You will need=20
-to document all enhancements to the qcow2 file format and get that=20
-approved first, as interoperability demands that others reading the same=20
-spec would be able to interpret the image you create that is utilizing=20
-an internal snapshot with an incremental diff.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+diff --git a/hw/riscv/riscv_htif.c b/hw/riscv/riscv_htif.c
+index 3e17f30251..43533f9dc2 100644
+--- a/hw/riscv/riscv_htif.c
++++ b/hw/riscv/riscv_htif.c
+@@ -29,7 +29,6 @@
+ #include "chardev/char-fe.h"
+ #include "hw/riscv/riscv_htif.h"
+ #include "qemu/timer.h"
+-#include "exec/address-spaces.h"
+ #include "qemu/error-report.h"
+ 
+ #define RISCV_DEBUG_HTIF 0
+diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+index e4ecb7aa4b..d3d11e849b 100644
+--- a/hw/riscv/sifive_e.c
++++ b/hw/riscv/sifive_e.c
+@@ -46,7 +46,6 @@
+ #include "hw/riscv/sifive_e.h"
+ #include "chardev/char.h"
+ #include "sysemu/arch_init.h"
+-#include "exec/address-spaces.h"
+ #include "elf.h"
+ 
+ static const struct MemmapEntry {
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index c05dcbba95..07f8644695 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -44,7 +44,6 @@
+ #include "chardev/char.h"
+ #include "sysemu/arch_init.h"
+ #include "sysemu/device_tree.h"
+-#include "exec/address-spaces.h"
+ #include "elf.h"
+ 
+ #include <libfdt.h>
+diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+index f94e2b6707..aecdf296cc 100644
+--- a/hw/riscv/spike.c
++++ b/hw/riscv/spike.c
+@@ -39,7 +39,6 @@
+ #include "chardev/char.h"
+ #include "sysemu/arch_init.h"
+ #include "sysemu/device_tree.h"
+-#include "exec/address-spaces.h"
+ #include "elf.h"
+ 
+ #include <libfdt.h>
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index ad03113e0f..d967624bcc 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -37,7 +37,6 @@
+ #include "chardev/char.h"
+ #include "sysemu/arch_init.h"
+ #include "sysemu/device_tree.h"
+-#include "exec/address-spaces.h"
+ #include "elf.h"
+ 
+ #include <libfdt.h>
+-- 
+2.17.0
