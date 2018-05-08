@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35653)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fG3Fu-00021u-5H
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:06:18 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fG3JK-0003u7-Uw
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:09:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fG3Ft-00058R-5G
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:06:14 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1525376963-79623-1-git-send-email-mst@redhat.com>
-	<1525376963-79623-5-git-send-email-mst@redhat.com>
-	<b3620ea6-0805-ccec-3bd5-11dc30bc2569@redhat.com>
-	<20180508152349.15ad26d0.cohuck@redhat.com>
-	<bc3f13f6-56fd-058d-d717-508b7034d437@redhat.com>
-	<20180508154538.1b55f721.cohuck@redhat.com>
-	<b335f5ae-a99e-310c-edb2-65755a2ca51a@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e05f0ed0-43cc-dc80-a5a5-7782bc77faff@amsat.org>
-Date: Tue, 8 May 2018 11:06:00 -0300
+	(envelope-from <stefanha@redhat.com>) id 1fG3JI-0006Fn-85
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:09:46 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46944 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fG3JI-0006FS-3K
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:09:44 -0400
+Date: Tue, 8 May 2018 15:09:31 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180508140931.GA30745@stefanha-x1.localdomain>
+References: <20180502100422.8688-1-peterx@redhat.com>
+	<20180502100422.8688-4-peterx@redhat.com>
+	<20180508102338.GE19710@stefanha-x1.localdomain>
+	<20180508103232.GA19024@xz-mi>
 MIME-Version: 1.0
-In-Reply-To: <b335f5ae-a99e-310c-edb2-65755a2ca51a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 04/67] s390x: drop an unused include
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="2oS5YaxWCcQjTEyO"
+Content-Disposition: inline
+In-Reply-To: <20180508103232.GA19024@xz-mi>
+Subject: Re: [Qemu-devel] [PATCH v4 3/4] monitor: more comments on lock-free
+ fleids/funcs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,68 +31,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, "Michael S. Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
 
-On 05/08/2018 10:50 AM, Thomas Huth wrote:
-> On 08.05.2018 15:45, Cornelia Huck wrote:
->> On Tue, 8 May 2018 15:38:03 +0200
->> Thomas Huth <thuth@redhat.com> wrote:
->>
->>> On 08.05.2018 15:23, Cornelia Huck wrote:
->>>> On Fri, 4 May 2018 02:24:12 +0200
->>>> Thomas Huth <thuth@redhat.com> wrote:
->>>>   
->>>>> On 03.05.2018 21:50, Michael S. Tsirkin wrote:  
->>>>>> we just need a struct name, let's add a forward
->>>>>> declaration instead of an include.
->>>>>>
->>>>>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->>>>>> ---
->>>>>>  include/hw/s390x/sclp.h | 3 ++-
->>>>>>  1 file changed, 2 insertions(+), 1 deletion(-)
->>>>>>
->>>>>> diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
->>>>>> index f9db243..6e65150 100644
->>>>>> --- a/include/hw/s390x/sclp.h
->>>>>> +++ b/include/hw/s390x/sclp.h
->>>>>> @@ -16,7 +16,8 @@
->>>>>>  
->>>>>>  #include "hw/sysbus.h"
->>>>>>  #include "hw/qdev.h"
->>>>>> -#include "target/s390x/cpu-qom.h"
->>>>>> +
->>>>>> +typedef struct CPUS390XState CPUS390XState;    
->>>>>
->>>>> IIRC you have to use include/qemu/typedefs.h instead to avoid trouble
->>>>> with older versions of GCC.  
->>>>
->>>> Hm, I'm wondering why we do the typedef in cpu-qom.h, while other
->>>> architectures do it in their cpu.h.  
->>>
->>> See:
->>>
->>> commit ef2974cc270d51959ce90df6b4d4d41635d7a603
->>> Author: David Hildenbrand <david@redhat.com>
->>> Date:   Wed Sep 13 15:24:02 2017 +0200
->>>
->>>     target/s390x: move some s390x typedefs to cpu-qom.h
->>>     
->>>     This allows us to drop inclusion of cpu_models.h in cpu-qom.h, and
->>>     prepares for using cpu-qom.h as a s390 specific version of typedefs.h
->>>     
->>>     Signed-off-by: David Hildenbrand <david@redhat.com>
->>>     Message-Id: <20170913132417.24384-8-david@redhat.com>
->>>     Reviewed-by: Thomas Huth <thuth@redhat.com>
->>>     Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->>>
->>>  Thomas
->>
->> Gargh, this is all very confusing...
-> 
-> If you'd ask me, I'd say we should get rid of the typedefs and do it the
-> Linux kernel way and enforce using "struct xyz" everywhere, then you
-> also do not have this problem with typedefs.h anymore ... but well, so
-> far it seems as I'm still part of a minority with this opinion here.
 
-Maybe not getting rid of the typedefs, but I agree with removing typedefs.h.
+--2oS5YaxWCcQjTEyO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, May 08, 2018 at 06:32:32PM +0800, Peter Xu wrote:
+> On Tue, May 08, 2018 at 11:23:38AM +0100, Stefan Hajnoczi wrote:
+> > On Wed, May 02, 2018 at 06:04:21PM +0800, Peter Xu wrote:
+> > > Add some explicit comment for both Readline and cpu_set/cpu_get helpe=
+rs
+> > > that they do not need the mon_lock protection.
+> > >=20
+> > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > ---
+> > >  monitor.c | 4 +++-
+> > >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > >=20
+> > > diff --git a/monitor.c b/monitor.c
+> > > index 9f361ec21e..6100ad44f8 100644
+> > > --- a/monitor.c
+> > > +++ b/monitor.c
+> > > @@ -207,6 +207,7 @@ struct Monitor {
+> > >      int suspend_cnt;            /* Needs to be accessed atomically */
+> > >      bool skip_flush;
+> > >      bool use_io_thr;
+> > > +    /* Only used in parser, so no lock needed. */
+> > >      ReadLineState *rs;
+> > >      MonitorQMP qmp;
+> > >      gchar *mon_cpu_path;
+> >=20
+> > Which fields does this comment cover?
+>=20
+> "rs" only.  Maybe I should move the comment to the end of line?
+>=20
+>     ReadLineState *rs;       /* Only used in parser, so no lock needed. */
+
+Yes, please.
+
+Stefan
+
+--2oS5YaxWCcQjTEyO
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJa8a+bAAoJEJykq7OBq3PIlmUH/0klIuoxUqQoTKZuHUm8Yn8e
+yzDnqPxX8Taaw4WRx1Xiq8VKsKfBNYFWWo6jlNvISkRQtKozw7+NjTY2mlzl+OJp
+auRnXnxls6AFRPMhJio0EU3DQBIX6PRtqbK//fuV6Ra1arlBM4a/RaOFoZict9vr
+c29IZVl+iihI62/W07m+musnm+0CmuiWYKPTyZgE3BT0WSvh07cH8obmrEG9VpED
+EjsJE6NnEj5X5KAB4HKDHd4NT3rDVK7hUoWW2+aOOywt/pdVYmKKkvOQ72omXRir
+KtpLce5TWQlVxc2ARJOVsRf/n02zydBrfp1Ld6BVUp+ik/xvKDXWeFnxheqxmqc=
+=WsvI
+-----END PGP SIGNATURE-----
+
+--2oS5YaxWCcQjTEyO--
