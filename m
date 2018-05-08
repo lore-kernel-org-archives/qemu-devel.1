@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fG0GQ-0001Be-Kz
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:54:36 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fG0GU-0001Cg-Aj
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:54:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fG0GN-0007ly-HA
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:54:34 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37252 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fG0GN-0007lu-Bf
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:54:31 -0400
-Date: Tue, 8 May 2018 11:54:25 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180508105424.GH2500@work-vm>
-References: <20180502104740.12123-1-peterx@redhat.com>
-	<20180502104740.12123-18-peterx@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1fG0GR-0007mi-6F
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:54:38 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:38878)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fG0GQ-0007mT-VT
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:54:35 -0400
+Received: by mail-wm0-x234.google.com with SMTP id y189-v6so2500918wmc.3
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 03:54:34 -0700 (PDT)
+References: <20180221110523.859-1-alex.bennee@linaro.org>
+	<20180221110523.859-19-alex.bennee@linaro.org>
+	<CAFEAcA_5WHS5_J4vMFjyZX=Dp404bzSpmwwENs_MYKtG07p22w@mail.gmail.com>
+	<87zi1okbdo.fsf@linaro.org>
+	<CAFEAcA_FOADyf8wxXRiZHb34j+5YmPTX5XTh0wX5x2Q1UP0M3w@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA_FOADyf8wxXRiZHb34j+5YmPTX5XTh0wX5x2Q1UP0M3w@mail.gmail.com>
+Date: Tue, 08 May 2018 11:54:31 +0100
+Message-ID: <87vabyv2mw.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180502104740.12123-18-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v8 17/24] migration: setup ramstate for
- resume
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 18/22] fpu/softfloat: re-factor int/uint to
+ float
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,103 +34,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <richard.henderson@linaro.org>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> After we updated the dirty bitmaps of ramblocks, we also need to update
-> the critical fields in RAMState to make sure it is ready for a resume.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  migration/ram.c        | 45 ++++++++++++++++++++++++++++++++++++++++++++-
->  migration/trace-events |  1 +
->  2 files changed, 45 insertions(+), 1 deletion(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 118460109b..2821e15cc2 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -2291,6 +2291,41 @@ static int ram_init_all(RAMState **rsp)
->      return 0;
->  }
->  
-> +static void ram_state_resume_prepare(RAMState *rs, QEMUFile *out)
-> +{
-> +    RAMBlock *block;
-> +    uint64_t pages = 0;
-> +
-> +    /*
-> +     * Postcopy is not using xbzrle/compression, so no need for that.
-> +     * Also, since source are already halted, we don't need to care
-> +     * about dirty page logging as well.
-> +     */
-> +
-> +    RAMBLOCK_FOREACH(block) {
-> +        pages += bitmap_count_one(block->bmap,
-> +                                  block->used_length >> TARGET_PAGE_BITS);
-> +    }
-> +
-> +    /* This may not be aligned with current bitmaps. Recalculate. */
-> +    rs->migration_dirty_pages = pages;
-> +
-> +    rs->last_seen_block = NULL;
-> +    rs->last_sent_block = NULL;
-> +    rs->last_page = 0;
-> +    rs->last_version = ram_list.version;
-> +    /*
-> +     * Disable the bulk stage, otherwise we'll resend the whole RAM no
-> +     * matter what we have sent.
-> +     */
-> +    rs->ram_bulk_stage = false;
-> +
-> +    /* Update RAMState cache of output QEMUFile */
-> +    rs->f = out;
-> +
-> +    trace_ram_state_resume_prepare(pages);
-> +}
-> +
->  /*
->   * Each of ram_save_setup, ram_save_iterate and ram_save_complete has
->   * long-running RCU critical section.  When rcu-reclaims in the code
-> @@ -3286,8 +3321,16 @@ out:
->  static int ram_resume_prepare(MigrationState *s, void *opaque)
->  {
->      RAMState *rs = *(RAMState **)opaque;
-> +    int ret;
->  
-> -    return ram_dirty_bitmap_sync_all(s, rs);
-> +    ret = ram_dirty_bitmap_sync_all(s, rs);
-> +    if (ret) {
-> +        return ret;
-> +    }
-> +
-> +    ram_state_resume_prepare(rs, s->to_dst_file);
-> +
-> +    return 0;
->  }
->  
->  static SaveVMHandlers savevm_ram_handlers = {
-> diff --git a/migration/trace-events b/migration/trace-events
-> index 53243e17ec..46c5ca1dba 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -88,6 +88,7 @@ ram_dirty_bitmap_reload_complete(char *str) "%s"
->  ram_dirty_bitmap_sync_start(void) ""
->  ram_dirty_bitmap_sync_wait(void) ""
->  ram_dirty_bitmap_sync_complete(void) ""
-> +ram_state_resume_prepare(uint64_t v) "%ld"
 
-That should be "%" PRId64
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-But otherwise looks OK, so with that change:
+> On 27 April 2018 at 14:49, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
+e:
+>>
+>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>
+>>> On 21 February 2018 at 11:05, Alex Benn=C3=A9e <alex.bennee@linaro.org>=
+ wrote:
+>>>> +/*
+>>>> + * Integer to float conversions
+>>>> + *
+>>>> + * Returns the result of converting the two's complement integer `a'
+>>>> + * to the floating-point format. The conversion is performed according
+>>>> + * to the IEC/IEEE Standard for Binary Floating-Point Arithmetic.
+>>>> + */
+>>>> +
+>>>> +static FloatParts int_to_float(int64_t a, float_status *status)
+>>>> +{
+>>>> +    FloatParts r;
+>>>> +    if (a =3D=3D 0) {
+>>>> +        r.cls =3D float_class_zero;
+>>>> +        r.sign =3D false;
+>>>> +    } else if (a =3D=3D (1ULL << 63)) {
+>>>> +        r.cls =3D float_class_normal;
+>>>> +        r.sign =3D true;
+>>>> +        r.frac =3D DECOMPOSED_IMPLICIT_BIT;
+>>>> +        r.exp =3D 63;
+>>>> +    } else {
+>>>> +        uint64_t f;
+>>>> +        if (a < 0) {
+>>>> +            f =3D -a;
+>>>> +            r.sign =3D true;
+>>>> +        } else {
+>>>> +            f =3D a;
+>>>> +            r.sign =3D false;
+>>>> +        }
+>>>> +        int shift =3D clz64(f) - 1;
+>>>> +        r.cls =3D float_class_normal;
+>>>> +        r.exp =3D (DECOMPOSED_BINARY_POINT - shift);
+>>>> +        r.frac =3D f << shift;
+>>>> +    }
+>>>> +
+>>>> +    return r;
+>>>> +}
+>>>
+>>> Hi -- Coverity complains about this function (CID1390635) because
+>>> there's a code path through it that doesn't fully initialize
+>>> the struct (the a =3D=3D 0 case doesn't set r.frac), and it thinks
+>>> that "return r" is a 'use' of all fields in the structure.
+>>> I don't know why it doesn't complain about r.exp.
+>>>
+>>> Should we initialize all of r's fields anyway to shut it up,
+>>> or mark it as a Coverity false-positive?
+>>
+>> Hmm tricky - because in some cases we don't want to mess with it. The
+>> fcvt patch for example manually messed with the frac portion to deal
+>> with conversion. But it's done outside of the main canonicalize/pack
+>> routines.
+>
+> Hmm? The problem is only in this specific function, which
+> currently returns an entirely uninitialized 'frac' field,
+> and could be made to return a zeroed field. There aren't
+> many other functions that create a FloatParts struct themselves
+> rather than modifying an existing one:
+>  * unpack_raw() sets all the fields
+>  * uint_to_float() has "FloatParts r =3D { .sign =3D false};"
+>    which implicitly sets all the other parts to 0
+>
+> It doesn't seem too unreasonable to me to either have this
+> function start "FloatParts r =3D {};" or to init both exp
+> and frac in the "zero" case.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Good point - it is the source of the FloatParts in this case. I'll init
+it.
 
->  # migration/migration.c
->  await_return_path_close_on_source_close(void) ""
-> -- 
-> 2.14.3
-> 
+>
+> thanks
+> -- PMM
+
+
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Alex Benn=C3=A9e
