@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40225)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fFzvD-00007L-Rq
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:32:40 -0400
+	(envelope-from <peterx@redhat.com>) id 1fFzvU-0000Eb-Iq
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:32:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fFzv9-0007Rj-TK
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:32:39 -0400
-Date: Tue, 8 May 2018 11:32:32 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180508103232.GI19710@stefanha-x1.localdomain>
-References: <20180427162312.18583-1-stefanha@redhat.com>
+	(envelope-from <peterx@redhat.com>) id 1fFzvQ-0007UO-Lj
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:32:56 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36536 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fFzvQ-0007UI-HY
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:32:52 -0400
+Date: Tue, 8 May 2018 18:32:32 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180508103232.GA19024@xz-mi>
+References: <20180502100422.8688-1-peterx@redhat.com>
+	<20180502100422.8688-4-peterx@redhat.com>
+	<20180508102338.GE19710@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ev7mvGV+3JQuI2Eo"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180427162312.18583-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 0/2] block/file-posix:
- allow -drive cache.direct=off live migration
+In-Reply-To: <20180508102338.GE19710@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v4 3/4] monitor: more comments on lock-free
+ fleids/funcs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,86 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, Fam Zheng <famz@redhat.com>, Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
+On Tue, May 08, 2018 at 11:23:38AM +0100, Stefan Hajnoczi wrote:
+> On Wed, May 02, 2018 at 06:04:21PM +0800, Peter Xu wrote:
+> > Add some explicit comment for both Readline and cpu_set/cpu_get helpers
+> > that they do not need the mon_lock protection.
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  monitor.c | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/monitor.c b/monitor.c
+> > index 9f361ec21e..6100ad44f8 100644
+> > --- a/monitor.c
+> > +++ b/monitor.c
+> > @@ -207,6 +207,7 @@ struct Monitor {
+> >      int suspend_cnt;            /* Needs to be accessed atomically */
+> >      bool skip_flush;
+> >      bool use_io_thr;
+> > +    /* Only used in parser, so no lock needed. */
+> >      ReadLineState *rs;
+> >      MonitorQMP qmp;
+> >      gchar *mon_cpu_path;
+> 
+> Which fields does this comment cover?
 
---ev7mvGV+3JQuI2Eo
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+"rs" only.  Maybe I should move the comment to the end of line?
 
-On Fri, Apr 27, 2018 at 05:23:10PM +0100, Stefan Hajnoczi wrote:
-> v2:
->  * Add comment on !__linux__ situation [Fam]
->  * Add file-posix.c x-check-cache-dropped=3Don|off option [DaveG, Kevin]
->=20
-> file-posix.c only supports shared storage live migration with -drive
-> cache.direct=3Doff due to cache consistency issues.  There are two main s=
-hared
-> storage configurations: files on NFS and host block devices on SAN LUNs.
->=20
-> The problem is that QEMU starts on the destination host before the source=
- host
-> has written everything out to the disk.  The page cache on the destinatio=
-n host
-> may contain stale data read when QEMU opened the image file (before migra=
-tion
-> handover).  Using O_DIRECT avoids this problem but prevents users from ta=
-king
-> advantage of the host page cache.
->=20
-> Although cache=3Dnone is the recommended setting for virtualization use c=
-ases,
-> there are scenarios where cache=3Dwriteback makes sense.  If the guest ha=
-s much
-> less RAM than the host or many guests share the same backing file, then t=
-he
-> host page cache can significantly improve disk I/O performance.
->=20
-> This patch series implements .bdrv_co_invalidate_cache() for block/file-p=
-osix.c
-> on Linux so that shared storage live migration works.  I have sent it as =
-an RFC
-> because cache consistency is not binary, there are corner cases which I've
-> described in the actual patch, and this may require more discussion.
->=20
-> Regarding NFS, QEMU relies on O_DIRECT rather than the close-to-open
-> consistency model (see nfs(5)), which is the basic guarantee provided by =
-NFS.
-> After this patch cache consistency is no longer provided by O_DIRECT.
->=20
-> This patch series relies on fdatasync(2) (source) +
-> posix_fadvise(POSIX_FADV_DONTNEED) (destination) instead.  I believe it i=
-s safe
-> for both NFS and SAN LUNs.  Maybe we should use fsync(2) instead of
-> fdatasync(2) so that NFS has up-to-date inode metadata?
->=20
-> Stefan Hajnoczi (2):
->   block/file-posix: implement bdrv_co_invalidate_cache() on Linux
->   block/file-posix: add x-check-page-cache=3Don|off option
->=20
->  qapi/block-core.json |   7 ++-
->  block/file-posix.c   | 146 +++++++++++++++++++++++++++++++++++++++++++++=
-+++++-
->  2 files changed, 150 insertions(+), 3 deletions(-)
+    ReadLineState *rs;       /* Only used in parser, so no lock needed. */
 
-Kevin: Are you happy with this series?
-
-Stefan
-
---ev7mvGV+3JQuI2Eo
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEbBAEBAgAGBQJa8XzAAAoJEJykq7OBq3PIafIH9iFmxcARD/BtBv3jfju/eSav
-MlSgxXjLfPicHeJaQxvganz6TJU4eOYbFcGXnycGhGeokagfuL9wKfFyN/yn9oQD
-5CN9RvG8Y4Ne5Up7O6EZsNZ0qh8Jn6YIAIj5nQr1JbnShaHyIf8YcCeWXVJENrg+
-RmqPUrCRSKX+VKXgBEBUzVI+NP0EzLa7RBHfrUU1M71gWXjkBZO8AzKOz7Md2xGY
-vkIdynCS7p7gNnJprqz8pcmJRKtGNCSvOipP2j7y+3ngN/FCq9vtvt6+f3n3Nx/K
-I2blkXFU8lwLFl/J9Uo+lChixjTGNboppm/IyJBKfzhvZ/2F8axccjocDsGewg==
-=MArC
------END PGP SIGNATURE-----
-
---ev7mvGV+3JQuI2Eo--
+-- 
+Peter Xu
