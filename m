@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fFwFI-0001Gm-9J
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 02:37:09 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fFwqC-000075-Qn
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 03:15:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fFwFH-0001xS-Ae
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 02:37:08 -0400
-References: <20180507154458.73945-1-vsementsov@virtuozzo.com>
-	<20180507154458.73945-6-vsementsov@virtuozzo.com>
-	<d061f619-d1f7-57be-d8f0-0792ca64504a@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <26df9d70-4d26-5154-9fdb-ffb18951c4e7@virtuozzo.com>
-Date: Tue, 8 May 2018 09:36:53 +0300
+	(envelope-from <kraxel@redhat.com>) id 1fFwq8-0001I9-9T
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 03:15:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59958 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fFwq8-0001Ho-2R
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 03:15:12 -0400
+Date: Tue, 8 May 2018 09:14:54 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180508071454.jhamtvwy6lsc3c5q@sirius.home.kraxel.org>
+References: <20180507101013.32736-1-kraxel@redhat.com>
+	<CAFEAcA-a74RLKXi=v7w-8v9h6A_QFSKeNxK64AvCYKxc_VN+uA@mail.gmail.com>
+	<20180507121126.gjeufzppsc7qspgm@sirius.home.kraxel.org>
+	<CAFEAcA_hgd7P5fjgqpc00_PzoAdMzBuABombyAnk4ej6a2itoA@mail.gmail.com>
+	<20180507143006.7jodoxul7aplhyh3@sirius.home.kraxel.org>
+	<CAFEAcA_yutOHAQWcvqm-cfB8EUwmrsw0JrRPF6+eTPtzVOpnpA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <d061f619-d1f7-57be-d8f0-0792ca64504a@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 5/5] block/nbd-client: don't check ioc
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_yutOHAQWcvqm-cfB8EUwmrsw0JrRPF6+eTPtzVOpnpA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] vga: print friendly error message in case
+ multiple vga devices are added
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,33 +32,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-07.05.2018 21:08, Eric Blake wrote:
-> On 05/07/2018 10:44 AM, Vladimir Sementsov-Ogievskiy wrote:
->> We have several paranoiac checks for ioc !=3D NULL. But ioc may become
->> NULL only on close, which should not happen during requests handling.
->> Also, we check ioc only sometimes, not after each yield, which is
->> inconsistent. Let's drop these checks.
->
-> Can (or even should) any of these be replaced by asserts that ioc is=20
-> not NULL?
->
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->> =C2=A0 block/nbd-client.c | 14 +-------------
->> =C2=A0 1 file changed, 1 insertion(+), 13 deletions(-)
->
+On Mon, May 07, 2018 at 06:00:56PM +0100, Peter Maydell wrote:
+> On 7 May 2018 at 15:30, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> > The only one which passes global_vmstate == false is "-device
+> > secondary-vga", and that does *not* register vga ioports (the
+> > registers can be accessed via mmio pci bar though).
+> 
+> Looks like virtio-vga does as well.
 
-No problem, I can add them. Actually in most of cases we will crash very=20
-soon on
-next QIO_CHANNEL_GET_CLASS(ioc). The exclusions (looked through) are:
+Oh, ok.  Didn't remember that one.  Probably because there is no reason
+to worry about live migration backward compatibility for this one.
 
- =C2=A0- "if (!s->ioc || s->quit) {" case, if reply is not simple.
- =C2=A0- zero-length io requests in other cases, if they are possible
+Guess I have to rethink the logic then.
 
---=20
-Best regards,
-Vladimir
+cheers,
+  Gerd
