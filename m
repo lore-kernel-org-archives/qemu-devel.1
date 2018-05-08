@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fG4oG-0005XI-1F
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:45:49 -0400
+	(envelope-from <dunlapg@gmail.com>) id 1fG4qE-0006sL-Qf
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:47:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fG4oE-0008L5-KM
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:45:48 -0400
-Date: Tue, 8 May 2018 11:45:35 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180508154535.GD6722@localhost.localdomain>
-References: <20180503225648.13153-1-jsnow@redhat.com>
-	<20180503225648.13153-5-jsnow@redhat.com>
+	(envelope-from <dunlapg@gmail.com>) id 1fG4qE-000114-1d
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:47:50 -0400
+Received: from mail-qt0-x230.google.com ([2607:f8b0:400d:c0d::230]:40650)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dunlapg@gmail.com>) id 1fG4qD-00010q-QR
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:47:49 -0400
+Received: by mail-qt0-x230.google.com with SMTP id h2-v6so41632931qtp.7
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 08:47:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180503225648.13153-5-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 4/5] qemu-img: Make
- documentation between .texi and .hx consistent
+Sender: dunlapg@gmail.com
+In-Reply-To: <20180508151026.GA5967@redhat.com>
+References: <20180504160026.14017-1-berrange@redhat.com>
+	<20180504210001.GB30250@redhat.com>
+	<CAFLBxZYO7Yeje8HROjJY9P=9bEQ8RCBhA9fqbGTXN_87U5sowA@mail.gmail.com>
+	<20180508151026.GA5967@redhat.com>
+From: George Dunlap <dunlapg@umich.edu>
+Date: Tue, 8 May 2018 16:47:48 +0100
+Message-ID: <CAFLBxZbsSPW1E7GAVPmQ8AnmQCqs16qx4r3Cq2q+sFsn48NYLA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Xen-devel] [PATCH 0/3] Document intent for
+ supported build platforms and bump min glib to 2.42
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,148 +33,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, qemu-trivial@nongnu.org
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, xen-devel <xen-devel@lists.xenproject.org>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Olaf Hering <olaf@aepfle.de>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Ian Jackson <ian.jackson@eu.citrix.com>, Jan Beulich <JBeulich@suse.com>, Juergen Gross <jgross@suse.com>, Anthony Perard <anthony.perard@citrix.com>
 
-On Thu, May 03, 2018 at 06:56:47PM -0400, John Snow wrote:
-> These are also different and out of order for whatever reason.
-> I'd like to automate this in the future, but for now let's put
-> on the band-aid.
-> 
-> In the case of resize, there were options missing from all
-> three docstrings; the new string is based on the code.
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
+On Tue, May 8, 2018 at 4:10 PM, Daniel P. Berrang=C3=A9 <berrange@redhat.co=
+m> wrote:
+>> With my Xen maintainer hat on: I wouldn't feel justified, personally,
+>> in asking another project to continue supporting older versions.  If
+>> we didn't want to bump our own glib version, we would have to disable
+>> "upstream" QEMU (as opposed to Xen's old qemu fork) for older versions
+>> of glib.
+>
+> Or could you say that people need to use a stable version of QEMU ?
+> eg users wanting Xen on RHEL-6, can use "upstream" QEMU, but they'll
+> need to stick with the 2.12 stable branch version - not use git master
+> or future releases. I guess it depends whether you can expect 2.12
+> QEMU to carry on working correctly with ongoing Xen changes.
 
-Reviewed-by: Jeff Cody <jcody@redhat.com>
+Yes, that's a good point.  In theory older versions of QEMU should in
+theory continue working with newer versions of Xen.
 
-> ---
->  qemu-img-cmds.hx |  4 ++--
->  qemu-img.texi    | 24 ++++++++++++------------
->  2 files changed, 14 insertions(+), 14 deletions(-)
-> 
-> diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
-> index 8bcefcafe9..84deb858af 100644
-> --- a/qemu-img-cmds.hx
-> +++ b/qemu-img-cmds.hx
-> @@ -89,9 +89,9 @@ STEXI
->  ETEXI
->  
->  DEF("resize", img_resize,
-> -    "resize [--object objectdef] [--image-opts] [-q] [--shrink] filename [+ | -]size")
-> +    "resize [--object objectdef] [--image-opts] [-f fmt] [--preallocation=prealloc] [-q] [--shrink] filename [+ | -]size")
->  STEXI
-> -@item resize [--object @var{objectdef}] [--image-opts] [-q] [--shrink] @var{filename} [+ | -]@var{size}
-> +@item resize [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [--preallocation=@var{prealloc}] [-q] [--shrink] @var{filename} [+ | -]@var{size}
->  ETEXI
->  
->  STEXI
-> diff --git a/qemu-img.texi b/qemu-img.texi
-> index adf5176902..2be8206a05 100644
-> --- a/qemu-img.texi
-> +++ b/qemu-img.texi
-> @@ -194,12 +194,12 @@ Command description:
->  
->  @table @option
->  
-> -@item amend [-p] [-f @var{fmt}] [-t @var{cache}] -o @var{options} @var{filename}
-> +@item amend [--object @var{objectdef}] [--image-opts] [-p] [-p] [-f @var{fmt}] [-t @var{cache}] -o @var{options} @var{filename}
->  
->  Amends the image format specific @var{options} for the image file
->  @var{filename}. Not all file formats support this operation.
->  
-> -@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-interval=@var{flush_interval}] [-n] [--no-drain] [-o @var{offset}] [--pattern=@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_size}] [-t @var{cache}] [-w] @var{filename}
-> +@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-interval=@var{flush_interval}] [-n] [--no-drain] [-o @var{offset}] [--pattern=@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_size}] [-t @var{cache}] [-w] [-U] @var{filename}
->  
->  Run a simple sequential I/O benchmark on the specified image. If @code{-w} is
->  specified, a write test is performed, otherwise a read test is performed.
-> @@ -223,7 +223,7 @@ specified as well.
->  For write tests, by default a buffer filled with zeros is written. This can be
->  overridden with a pattern byte specified by @var{pattern}.
->  
-> -@item check [-f @var{fmt}] [--output=@var{ofmt}] [-r [leaks | all]] [-T @var{src_cache}] @var{filename}
-> +@item check [--object @var{objectdef}] [--image-opts] [-q] [-f @var{fmt}] [--output=@var{ofmt}] [-r [leaks | all]] [-T @var{src_cache}] [-U] @var{filename}
->  
->  Perform a consistency check on the disk image @var{filename}. The command can
->  output in the format @var{ofmt} which is either @code{human} or @code{json}.
-> @@ -259,7 +259,7 @@ If @code{-r} is specified, exit codes representing the image state refer to the
->  state after (the attempt at) repairing it. That is, a successful @code{-r all}
->  will yield the exit code 0, independently of the image state before.
->  
-> -@item commit [-q] [-f @var{fmt}] [-t @var{cache}] [-b @var{base}] [-d] [-p] @var{filename}
-> +@item commit [--object @var{objectdef}] [--image-opts] [-q] [-f @var{fmt}] [-t @var{cache}] [-b @var{base}] [-d] [-p] @var{filename}
->  
->  Commit the changes recorded in @var{filename} in its base image or backing file.
->  If the backing file is smaller than the snapshot, then the backing file will be
-> @@ -281,7 +281,7 @@ all images between @var{base} and the top image will be invalid and may return
->  garbage data when read. For this reason, @code{-b} implies @code{-d} (so that
->  the top image stays valid).
->  
-> -@item compare [-f @var{fmt}] [-F @var{fmt}] [-T @var{src_cache}] [-p] [-s] [-q] @var{filename1} @var{filename2}
-> +@item compare [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [-F @var{fmt}] [-T @var{src_cache}] [-p] [-q] [-s] [-U] @var{filename1} @var{filename2}
->  
->  Check if two images have the same content. You can compare images with
->  different format or settings.
-> @@ -322,7 +322,7 @@ Error on reading data
->  
->  @end table
->  
-> -@item convert [-c] [-p] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-B @var{backing_file}] [-o @var{options}] [-s @var{snapshot_id_or_name}] [-l @var{snapshot_param}] [-m @var{num_coroutines}] [-W] [-S @var{sparse_size}] @var{filename} [@var{filename2} [...]] @var{output_filename}
-> +@item convert [--object @var{objectdef}] [--image-opts] [--target-image-opts] [-U] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-B @var{backing_file}] [-o @var{options}] [-s @var{snapshot_id_or_name}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] @var{filename} [@var{filename2} [...]] @var{output_filename}
->  
->  Convert the disk image @var{filename} or a snapshot @var{snapshot_param}(@var{snapshot_id_or_name} is deprecated)
->  to disk image @var{output_filename} using format @var{output_fmt}. It can be optionally compressed (@code{-c}
-> @@ -363,7 +363,7 @@ creating compressed images.
->  @var{num_coroutines} specifies how many coroutines work in parallel during
->  the convert process (defaults to 8).
->  
-> -@item create [-f @var{fmt}] [-b @var{backing_file}] [-F @var{backing_fmt}] [-u] [-o @var{options}] @var{filename} [@var{size}]
-> +@item create [--object @var{objectdef}] [-q] [-f @var{fmt}] [-b @var{backing_file}] [-F @var{backing_fmt}] [-u] [-o @var{options}] @var{filename} [@var{size}]
->  
->  Create the new disk image @var{filename} of size @var{size} and format
->  @var{fmt}. Depending on the file format, you can add one or more @var{options}
-> @@ -387,7 +387,7 @@ way.
->  The size can also be specified using the @var{size} option with @code{-o},
->  it doesn't need to be specified separately in this case.
->  
-> -@item dd [-f @var{fmt}] [-O @var{output_fmt}] [bs=@var{block_size}] [count=@var{blocks}] [skip=@var{blocks}] if=@var{input} of=@var{output}
-> +@item dd [--image-opts] [-U] [-f @var{fmt}] [-O @var{output_fmt}] [bs=@var{block_size}] [count=@var{blocks}] [skip=@var{blocks}] if=@var{input} of=@var{output}
->  
->  Dd copies from @var{input} file to @var{output} file converting it from
->  @var{fmt} format to @var{output_fmt} format.
-> @@ -398,7 +398,7 @@ dd will stop reading input after reading @var{blocks} input blocks.
->  
->  The size syntax is similar to dd(1)'s size syntax.
->  
-> -@item info [-f @var{fmt}] [--output=@var{ofmt}] [--backing-chain] @var{filename}
-> +@item info [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [--output=@var{ofmt}] [--backing-chain] [-U] @var{filename}
->  
->  Give information about the disk image @var{filename}. Use it in
->  particular to know the size reserved on disk which can be different
-> @@ -506,11 +506,11 @@ been written to all sectors.  This is the maximum size that the image file can
->  occupy with the exception of internal snapshots, dirty bitmaps, vmstate data,
->  and other advanced image format features.
->  
-> -@item snapshot [-l | -a @var{snapshot} | -c @var{snapshot} | -d @var{snapshot} ] @var{filename}
-> +@item snapshot [--object @var{objectdef}] [--image-opts] [-U] [-q] [-l | -a @var{snapshot} | -c @var{snapshot} | -d @var{snapshot}] @var{filename}
->  
->  List, apply, create or delete snapshots in image @var{filename}.
->  
-> -@item rebase [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-p] [-u] -b @var{backing_file} [-F @var{backing_fmt}] @var{filename}
-> +@item rebase [--object @var{objectdef}] [--image-opts] [-U] [-q] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-p] [-u] -b @var{backing_file} [-F @var{backing_fmt}] @var{filename}
->  
->  Changes the backing file of an image. Only the formats @code{qcow2} and
->  @code{qed} support changing the backing file.
-> @@ -570,7 +570,7 @@ qemu-img rebase -b base.img diff.qcow2
->  At this point, @code{modified.img} can be discarded, since
->  @code{base.img + diff.qcow2} contains the same information.
->  
-> -@item resize [--shrink] [--preallocation=@var{prealloc}] @var{filename} [+ | -]@var{size}
-> +@item resize [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [--preallocation=@var{prealloc}] [-q] [--shrink] @var{filename} [+ | -]@var{size}
->  
->  Change the disk image as if it had been created with @var{size}.
->  
-> -- 
-> 2.14.3
-> 
-> 
+Two points about that solution:
+
+1. Our release tarball currently ships with a snapshotted version of a
+specific version of QEMU, and if you check out a release tag in our
+git repo it will by default clone a specific version of qemu for you.
+Users / downstreams would have to disable that and clone their own
+version.
+
+2. While in theory all versions should continue to work, in practice
+our testing system and the majority of our downstreams use the version
+specified by the release, even when they build QEMU separately.  (I
+think Debian may be an exception to this rule but I'm not sure.)
+Using an older version of QEMU does mean going "off the beaten track"
+a bit, increasing slightly the chance of random bugs.
+
+Anyway, from what I can tell, your decision sounds entirely
+reasonable, and users and downstreams who don't want to / can't update
+glib have a number of options, so I personally don't see any grounds
+for objecting or complaining.  Thanks again for the heads-up.
+
+ -George
