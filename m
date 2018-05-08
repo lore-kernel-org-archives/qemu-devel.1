@@ -1,43 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43651)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fG09A-0007Ec-Ef
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:47:05 -0400
+	(envelope-from <thuth@redhat.com>) id 1fG09Z-0007WF-FZ
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:47:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fG095-0004uX-3y
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:47:03 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59816)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <akrowiak@linux.vnet.ibm.com>)
-	id 1fG094-0004uA-SF
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:46:59 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w48AeEGI079788
-	for <qemu-devel@nongnu.org>; Tue, 8 May 2018 06:46:57 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2hu6wfhdt4-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 06:46:57 -0400
-Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <akrowiak@linux.vnet.ibm.com>;
-	Tue, 8 May 2018 06:46:55 -0400
-References: <1523819244-29954-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<1523819244-29954-4-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<819cba2d-32d7-6a5c-978f-1c6aa04872fa@linux.vnet.ibm.com>
-	<bf3ac9e4-1f53-0372-450d-1a84f780d25e@linux.vnet.ibm.com>
-	<204d8b6e-0068-d8de-ebe6-2598d136997d@linux.ibm.com>
-From: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-Date: Tue, 8 May 2018 06:46:48 -0400
+	(envelope-from <thuth@redhat.com>) id 1fG09W-000594-Ag
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:47:29 -0400
+From: Thomas Huth <thuth@redhat.com>
+References: <1521452376-25099-1-git-send-email-thuth@redhat.com>
+	<87bme62nu0.fsf@dusky.pond.sub.org>
+	<068649bc-1546-6fc5-3e41-63512196cbf8@redhat.com>
+	<20180427003215.GU29865@localhost.localdomain>
+	<87o9i5uplt.fsf@dusky.pond.sub.org>
+	<20180507135330.GS25013@localhost.localdomain>
+	<87h8njtnok.fsf@dusky.pond.sub.org>
+	<20180507182126.GC25013@localhost.localdomain>
+	<4bba0be5-a52c-48ad-3df4-4e9be3624dc0@redhat.com>
+	<20180507193220.GF25013@localhost.localdomain>
+	<5837d14a-b562-c382-f95a-32ef12a4e25c@redhat.com>
+Message-ID: <271ae0da-3474-85ab-8378-68fa572dc778@redhat.com>
+Date: Tue, 8 May 2018 12:47:19 +0200
 MIME-Version: 1.0
-In-Reply-To: <204d8b6e-0068-d8de-ebe6-2598d136997d@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <5837d14a-b562-c382-f95a-32ef12a4e25c@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Message-Id: <6bcce046-0019-02e2-b394-5751bd439530@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v4 3/5] s390x/cpumodel: Set up CPU model
- for AP device support
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Running QEMU without default devices / kernel /
+ bios
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,43 +34,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: mjrosato@linux.vnet.ibm.com, peter.maydell@linaro.org, alifm@linux.vnet.ibm.com, eskultet@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, cohuck@redhat.com, heiko.carstens@de.ibm.com, alex.williamson@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, jjherne@linux.vnet.ibm.com, schwidefsky@de.ibm.com, pbonzini@redhat.com, bjsdjshi@linux.vnet.ibm.com, eric.auger@redhat.com, rth@twiddle.net
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-On 04/22/2018 12:01 PM, Halil Pasic wrote:
->
->
-> On 04/22/2018 05:43 PM, Tony Krowiak wrote:
->>>> +    FEAT_INIT_MISC("ap", "AP facilities installed"),
+On 08.05.2018 07:33, Thomas Huth wrote:
+> On 07.05.2018 21:32, Eduardo Habkost wrote:
+>> On Mon, May 07, 2018 at 09:13:57PM +0200, Thomas Huth wrote:
+>>> On 07.05.2018 20:21, Eduardo Habkost wrote:
+>>>> On Mon, May 07, 2018 at 06:50:35PM +0200, Markus Armbruster wrote:
+>>>>> Eduardo Habkost <ehabkost@redhat.com> writes:
+>>>>>
+>>>>>> On Fri, Apr 27, 2018 at 08:31:58AM +0200, Markus Armbruster wrote:
+>>>>>>> Eduardo Habkost <ehabkost@redhat.com> writes:
+>>>>>>>
+>>>>>>>> On Thu, Apr 26, 2018 at 05:20:25PM +0200, Thomas Huth wrote:
+>>>>>>>>> On 26.04.2018 13:45, Markus Armbruster wrote:
+>>>>>>>>>> Thomas Huth <thuth@redhat.com> writes:
+>>>>>>>>> [...]
+>>>>>>>>>>> @@ -260,6 +263,26 @@ static void test_abstract_interfaces(voi=
+d)
+>>>>>>>>>>>      qtest_end();
+>>>>>>>>>>>  }
+>>>>>>>>>>> =20
+>>>>>>>>>>> +static void add_machine_test_case(const char *mname)
+>>>>>>>>>>> +{
+>>>>>>>>>>> +    char *path, *args;
+>>>>>>>>>>> +
+>>>>>>>>>>> +    /* Ignore blacklisted machines */
+>>>>>>>>>>> +    if (g_str_equal("xenfv", mname) || g_str_equal("xenpv", =
+mname)) {
+>>>>>>>>>>> +        return;
+>>>>>>>>>>> +    }
+>>>>>>>>>>> +
+>>>>>>>>>>> +    path =3D g_strdup_printf("device/introspect/concrete-def=
+aults-%s", mname);
+>>>>>>>>>>> +    args =3D g_strdup_printf("-machine %s", mname);
+>>>>>>>>>>> +    qtest_add_data_func(path, args, test_device_intro_concre=
+te);
+>>>>>>>>>>
+>>>>>>>>>> This runs test_device_intro_concrete() with "-machine M" for a=
+ll machine
+>>>>>>>>>> types M, in SPEED=3Dslow mode.
+>>>>>>>>>>
+>>>>>>>>>>> +    g_free(path);
+>>>>>>>>>>> +
+>>>>>>>>>>> +    path =3D g_strdup_printf("device/introspect/concrete-nod=
+efaults-%s", mname);
+>>>>>>>>>>> +    args =3D g_strdup_printf("-nodefaults -machine %s", mnam=
+e);
+>>>>>>>>>>> +    qtest_add_data_func(path, args, test_device_intro_concre=
+te);
+>>>>>>>>>>
+>>>>>>>>>> This runs test_device_intro_concrete() with "-nodefaults -mach=
+ine M" for
+>>>>>>>>>> all machine types M, in SPEED=3Dslow mode.
+>>>>>>>>>>
+>>>>>>>>>> Has "without -nodefaults" exposed additional bugs?
+>>>>>>>>>
+>>>>>>>>> After testing this with all machines, I had to discover that
+>>>>>>>>> "-nodefaults" does not work so easily: A lot of the embedded ma=
+chines
+>>>>>>>>> (especially the ARM machines) simply refuse to work with "-node=
+faults"
+>>>>>>>>> and exit immediately instead. E.g.:
+>>>>>>>>>
+>>>>>>>>> $ arm-softmmu/qemu-system-arm -nodefaults -nographic -M n810,ac=
+cel=3Dqtest
+>>>>>>>>> qemu-system-arm: missing SecureDigital device
+>>>>>>>
+>>>>>>> These are all bugs.  --nodefaults is supposed to suppress *option=
+al*
+>>>>>>> devices, not mandatory ones.
+>>>>>>
+>>>>>> I'm not sure I understand the requirements.  What exactly is the
+>>>>>> definition of "mandatory"?
+>>>>>>
+>>>>>> A machine created by "qemu-system-x86_64 -machine pc -nodefaults"
+>>>>>> is useless because it has no any device to boot from.  How is
+>>>>>> that different from a n810 machine not booting because there's no
+>>>>>> SD device?
+>>>>>
+>>>>> I propose:
+>>>>>
+>>>>> * Stuff that's required for QEMU to run is not suppressed by -nodef=
+aults
+>>>>>
+>>>>> * Stuff that a real machine has soldered on is also not suppressed
+>>>>>
+>>>>> * Stuff that can be pulled out of a real machine may be suppressed,=
+ even
+>>>>>   when that means the guest won't run
+>>>>
+>>>> Makes sense to me.  It looks like the only obstacle for
+>>>> tests/device-introspect and device-crash-test is the first rule.
+>>>> "Guest won't boot" isn't a problem, but "QEMU won't run" is.
+>>>>
+>>>> The first rule is easily testable, too: running
+>>>> "$QEMU -machine $MACHINE -nodefaults" and not having a working
+>>>> QMP monitor should be reported as a bug by automated tests.
 >>>
->>> Why plural ('facilities')? Would not s/facilities/instructions be 
->>> more end-user
->>> friendly?
+>>> You mean with "-accel qtest" or without? With "-accel qtest" we shoul=
+d
+>>> pretty soon be fine, after Peter's current PULL request has been merg=
+ed
+>>> (which contains a patch from me for fixing these SD card problems wit=
+h
+>>> ARM machines).
+>>> Without "-accel qtest", things are not that easy, unfortunately. Lots=
+ of
+>>> boards require "-kernel" or "-bios" and refuse to work without. So yo=
+u
+>>> can hardly test "-nodefaults" automatically in the normal tcg mode. (=
+But
+>>> maybe all boards should allow to start QEMU in case you've at least a=
+lso
+>>> specified "-S" ? ... in that case we've got plenty of work for
+>>> BiteSizeTasks ;-) )
 >>
->> It's a matter of opinion. I prefer facilities because AP is comprised 
->> of not only
->> instructions, but also AP processors.
->
-> Please elaborate. You mean processors like AP cards? If yes what if 
-> the matrix is
-> empty (e.g. the state we decided is the default when no further action 
-> is taken
-> (assign queues to the vfio-ap kernel driver, set up an mdev, -device 
-> vfio-ap on
-> qemu cmd line))?
->
-> I just wanted to point out that this plural is very vague. Not 
-> speaking about that
-> QCI should be an AP facility too, but is not included in this 
-> 'features' and is not
-> covered by this cpu model feature. It has it's own cpu model feature 
-> and even a
-> dedicated STFLE bit.
+>> Hmm, maybe it's not a bite-sized task after all.  :)
+>>
+>> Should we do this gradually?
+>>
+>> * Working with -accel qtest is useful, and sounds like an easier goal;
+>=20
+> We're pretty much there already. Apart from the SD card problem (and th=
+e
+> xen boards), all machines should work with -nodefaults in qtest mode no=
+w.
 
-FYI, I decided to take your suggestion and go with 'AP instructions 
-installed'.
+I forgot to mention that some sparc machines also still have problems.
+Patches are available here:
 
->
->
-> Regards,
-> Halil
+https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg00543.html
+
+and
+
+https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg00546.html
+
+... but they have not been merged yet.
+
+ Thomas
