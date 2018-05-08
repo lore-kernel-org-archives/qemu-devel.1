@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fG2aD-0005tO-3Z
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:23:10 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fG2ay-0006Xl-MF
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:23:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fG2aB-0006GB-Vw
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:23:09 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:42083)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fG2aB-0006G1-Qz
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:23:07 -0400
-Received: by mail-ot0-x244.google.com with SMTP id l13-v6so36029671otk.9
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 06:23:07 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1fG2aw-0006We-18
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:23:56 -0400
+Date: Tue, 8 May 2018 15:23:49 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180508152349.15ad26d0.cohuck@redhat.com>
+In-Reply-To: <b3620ea6-0805-ccec-3bd5-11dc30bc2569@redhat.com>
+References: <1525376963-79623-1-git-send-email-mst@redhat.com>
+	<1525376963-79623-5-git-send-email-mst@redhat.com>
+	<b3620ea6-0805-ccec-3bd5-11dc30bc2569@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180507094448.32386-1-kraxel@redhat.com>
-References: <20180507094448.32386-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 8 May 2018 14:22:46 +0100
-Message-ID: <CAFEAcA-=o2M3y8YN5-YZs0yxgoovyxc+GMWVA+R6KYhc_hcGpA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/3] Usb 20180507 patches
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 04/67] s390x: drop an unused include
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +24,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
 
-On 7 May 2018 at 10:44, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> The following changes since commit c8b7e627b4269a3bc3ae41d9f420547a47e6d9b9:
->
->   Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2018-05-04' into staging (2018-05-04 14:42:46 +0100)
->
-> are available in the git repository at:
->
->   git://git.kraxel.org/qemu tags/usb-20180507-pull-request
->
-> for you to fetch changes up to 3280ea8edede3814553aa19fa27a58daedd48ad9:
->
->   usb-host: skip open on pending postload bh (2018-05-07 11:10:42 +0200)
->
-> ----------------------------------------------------------------
-> usb: fixes for mtp and host.
->
-> ----------------------------------------------------------------
->
-> Bandan Das (2):
->   usb-mtp: Add some NULL checks for issues pointed out by coverity
->   usb-mtp: Unconditionally check for the readonly bit
->
-> Gerd Hoffmann (1):
->   usb-host: skip open on pending postload bh
->
->  hw/usb/dev-mtp.c     | 15 ++++++++-------
->  hw/usb/host-libusb.c |  7 +++++++
->  2 files changed, 15 insertions(+), 7 deletions(-)
+On Fri, 4 May 2018 02:24:12 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-Applied, thanks.
+> On 03.05.2018 21:50, Michael S. Tsirkin wrote:
+> > we just need a struct name, let's add a forward
+> > declaration instead of an include.
+> > 
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> >  include/hw/s390x/sclp.h | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
+> > index f9db243..6e65150 100644
+> > --- a/include/hw/s390x/sclp.h
+> > +++ b/include/hw/s390x/sclp.h
+> > @@ -16,7 +16,8 @@
+> >  
+> >  #include "hw/sysbus.h"
+> >  #include "hw/qdev.h"
+> > -#include "target/s390x/cpu-qom.h"
+> > +
+> > +typedef struct CPUS390XState CPUS390XState;  
+> 
+> IIRC you have to use include/qemu/typedefs.h instead to avoid trouble
+> with older versions of GCC.
 
--- PMM
+Hm, I'm wondering why we do the typedef in cpu-qom.h, while other
+architectures do it in their cpu.h.
