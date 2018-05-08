@@ -1,19 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48135)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fG29b-00039E-3V
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:55:39 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fG2Am-0003ku-Qm
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:56:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fG29X-0000a8-4y
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:55:39 -0400
-Date: Tue, 8 May 2018 14:55:19 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180508145519.05ef0275.cohuck@redhat.com>
-In-Reply-To: <20180507155130.21085-1-cohuck@redhat.com>
-References: <20180507155130.21085-1-cohuck@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fG2Ai-00018u-BB
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:56:52 -0400
+Received: from mail-qt0-x236.google.com ([2607:f8b0:400d:c0d::236]:44394)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fG2Ai-00018e-5i
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:56:48 -0400
+Received: by mail-qt0-x236.google.com with SMTP id d3-v6so40752316qtp.11
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 05:56:48 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1525376963-79623-1-git-send-email-mst@redhat.com>
+	<1525376963-79623-37-git-send-email-mst@redhat.com>
+	<87o9hq8hcs.fsf@secure.laptop>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <2e2101dd-65be-efb0-c774-28793bee1436@amsat.org>
+Date: Tue, 8 May 2018 09:56:43 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/2] s390x: reset handling for ccw devices
+In-Reply-To: <87o9hq8hcs.fsf@secure.laptop>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 36/67] migration: add include directory
+ headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,30 +37,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>
-Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: quintela@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Mon,  7 May 2018 17:51:28 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
+On 05/08/2018 09:25 AM, Juan Quintela wrote:
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+>> This way they are easier to find using standard rules.
+>>
+>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> Nack.
+> 
+> This are _internal_ files, that shouldn't be used anywere elese.
+> 
+> Except .... that we need them to write tests.  We only have two scopes
+> on qemu:
+> - internal: only for the subsystem we are at in
+> - pubilc: they can be used everywhere
+> 
+> So, tests came in a strange class here, because they need internal
+> implementation, but they are not in the proper directory due to the way
+> we do tests.
+> 
+> I *think* that using complete paths is the only reasonable way of doing
+> this.
 
-> On Friday, Thomas noticed some problems with 3270 devices. One result
-> was "s390x/css: disabled subchannels cannot be status pending", but
-> a reboot did not cure the previous broken status. Turns out that 3270
-> devices are missing a reset handler.
-> 
-> This series cleans up reset handling a bit and makes sure that the base
-> ccw device class provides a subchannel reset handler. I'm currently
-> not sure what we should do with vfio-ccw, so the behaviour there is
-> left unchanged.
-> 
-> Cornelia Huck (2):
->   virtio-ccw: common reset handler
->   s390x/ccw: make sure all ccw devices are properly reset
-> 
->  hw/s390x/ccw-device.c |  8 ++++++++
->  hw/s390x/virtio-ccw.c | 20 ++++++--------------
->  hw/s390x/virtio-ccw.h |  1 +
->  3 files changed, 15 insertions(+), 14 deletions(-)
-> 
+I hit the same issue with SD tests.
 
-Queued to s390-next (with cc:stable added).
+The current scheme is confuse but works fine:
+
+tests/test-vmstate.c:30:#include "migration/qemu-file-types.h"
+tests/test-vmstate.c:32:#include "../migration/qemu-file-channel.h"
+
+Michael, what about keeping those includes internal ("only for the
+subsystem we are at in") and adding complete paths in
+tests/Makefile.include?
+Such:
+
+tests/test-vmstate.o: QEMU_CFLAGS += -I$(SRC_PATH)/migration
