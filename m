@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fG0O2-0004BL-Uf
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 07:02:32 -0400
+	(envelope-from <thuth@redhat.com>) id 1fG0CE-0000hg-OV
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:50:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fG0Nx-0001ag-Ct
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 07:02:27 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:46693)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fG0Nx-0001aE-8A
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 07:02:21 -0400
-Received: by mail-ot0-x244.google.com with SMTP id t1-v6so35532585ott.13
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 04:02:20 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1fG0CB-0006BC-L5
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:50:14 -0400
+References: <1525774672-11913-1-git-send-email-thuth@redhat.com>
+	<20180508124454.1b4a5799.cohuck@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <7c0e5b23-ef92-141c-ae57-4928fc2962f2@redhat.com>
+Date: Tue, 8 May 2018 12:49:59 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180508113425.003c5031@bahia.lan>
-References: <152568372989.443627.900708381919207053.stgit@bahia.lan>
-	<71b68bd5-e50b-3baa-3f72-f6af78db4e2e@redhat.com>
-	<20180508113425.003c5031@bahia.lan>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 8 May 2018 12:01:59 +0100
-Message-ID: <CAFEAcA8bbdzEPZLA1sTXH-eGeOPUZw8f=p3_a9c4ERq35+mDew@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] ppc: e500: use g_strdup_printf() instead
- of snprintf()
+In-Reply-To: <20180508124454.1b4a5799.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] pc-bios/s390-ccw: struct tpi_info must be
+ declared as aligned(4)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,47 +25,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Howard Spoelstra <hsp.cat7@gmail.com>, qemu-ppc <qemu-ppc@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
 
-On 8 May 2018 at 10:34, Greg Kurz <groug@kaod.org> wrote:
-> On Mon, 7 May 2018 12:53:45 -0500
-> Eric Blake <eblake@redhat.com> wrote:
->
->> On 05/07/2018 04:02 AM, Greg Kurz wrote:
->> > qemu-system-ppc fails to build with GCC 8.0.1:
->> >
->> > /home/hsp/src/qemu-master/hw/ppc/e500.c: In function =E2=80=98ppce500_=
-load_device_tree=E2=80=99:
->> > /home/hsp/src/qemu-master/hw/ppc/e500.c:442:37: error: =E2=80=98/pic@=
-=E2=80=99
->> > directive output may be truncated writing 5 bytes into a region of
->> > size between 1 and 128 [-Werror=3Dformat-truncation=3D]
->> >       snprintf(mpic, sizeof(mpic), "%s/pic@%llx", soc, MPC8544_MPIC_RE=
-GS_OFFSET);
->> >                                       ^~~~~
+On 08.05.2018 12:44, Cornelia Huck wrote:
+> On Tue,  8 May 2018 12:17:52 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
+> 
+>> I've run into a compilation error today with the current version of GCC 8:
 >>
->> >
->> > Fix this by converting e500 to use g_strdup_printf()+g_free() instead
->> > of snprintf(). This is done globally, even for call sites that don't
->> > break build, since this is the preferred practice in QEMU.
->> >
->> > Reported-by: Howard Spoelstra <hsp.cat7@gmail.com>
->> > Signed-off-by: Greg Kurz <groug@kaod.org>
->> > ---
->> >   hw/ppc/e500.c |   39 +++++++++++++++++++++++----------------
->> >   1 file changed, 23 insertions(+), 16 deletions(-)
->> >
+>> In file included from s390-ccw.h:49,
+>>                  from main.c:12:
+>> cio.h:128:1: error: alignment 1 of 'struct tpi_info' is less than 4 [-Werror=packed-not-aligned]
+>>  } __attribute__ ((packed));
+>>  ^
+>> cc1: all warnings being treated as errors
 >>
->> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> Since the struct tpi_info contains an element ("struct subchannel_id schid")
+>> which is marked as aligned(4), we've got to mark the struct tpi_info as
+>> aligned(4), too.
 >>
->
-> Hi Peter,
->
-> David said the next pull request for ppc would happen in a month. This
-> patch fixes an annoying build break with recent GCC, and it already
-> got two positive reviews, is it possible to have it merged upstream ?
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  pc-bios/s390-ccw/cio.h | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
+>> index 55eaeee..1a0795f 100644
+>> --- a/pc-bios/s390-ccw/cio.h
+>> +++ b/pc-bios/s390-ccw/cio.h
+>> @@ -125,7 +125,7 @@ struct tpi_info {
+>>      __u32 reserved3  : 12;
+>>      __u32 int_type   : 3;
+>>      __u32 reserved4  : 12;
+>> -} __attribute__ ((packed));
+>> +} __attribute__ ((packed, aligned(4)));
+>>  
+>>  /* channel command word (type 1) */
+>>  struct ccw1 {
+> 
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> 
+> Alternatively, we could also ditch this struct and the tpi function...
+> but I have not given up hope yet that we might someday handle channel
+> I/O more canonically in the bios :)
 
-Sure; applied to master.
+Yes, it's currently unused (so I think you could also pick up the patch
+directly, without the need for recompiling the s390-ccw.img just because
+of this) ... I don't mind too much if we fix it or remove it, but since
+you've said that it might be useful in the future again, I think we can
+simply keep it for now.
 
--- PMM
+ Thomas
