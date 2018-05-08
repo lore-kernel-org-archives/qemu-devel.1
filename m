@@ -1,15 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fFzhI-0002SW-27
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:18:16 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fFzmd-0003mX-6W
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:23:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fFzhB-0002Bo-6p
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:18:14 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue,  8 May 2018 12:17:52 +0200
-Message-Id: <1525774672-11913-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] pc-bios/s390-ccw: struct tpi_info must be
- declared as aligned(4)
+	(envelope-from <stefanha@gmail.com>) id 1fFzmY-0004nR-6n
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:23:47 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:40367)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fFzmX-0004nJ-V7
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:23:42 -0400
+Received: by mail-wr0-x241.google.com with SMTP id v60-v6so31709317wrc.7
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 03:23:41 -0700 (PDT)
+Date: Tue, 8 May 2018 11:23:38 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180508102338.GE19710@stefanha-x1.localdomain>
+References: <20180502100422.8688-1-peterx@redhat.com>
+	<20180502100422.8688-4-peterx@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="u5E4XgoOPWr4PD9E"
+Content-Disposition: inline
+In-Reply-To: <20180502100422.8688-4-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 3/4] monitor: more comments on lock-free
+ fleids/funcs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,39 +31,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-s390x@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
 
-I've run into a compilation error today with the current version of GCC 8:
 
-In file included from s390-ccw.h:49,
-                 from main.c:12:
-cio.h:128:1: error: alignment 1 of 'struct tpi_info' is less than 4 [-Werror=packed-not-aligned]
- } __attribute__ ((packed));
- ^
-cc1: all warnings being treated as errors
+--u5E4XgoOPWr4PD9E
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Since the struct tpi_info contains an element ("struct subchannel_id schid")
-which is marked as aligned(4), we've got to mark the struct tpi_info as
-aligned(4), too.
+On Wed, May 02, 2018 at 06:04:21PM +0800, Peter Xu wrote:
+> Add some explicit comment for both Readline and cpu_set/cpu_get helpers
+> that they do not need the mon_lock protection.
+>=20
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  monitor.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/monitor.c b/monitor.c
+> index 9f361ec21e..6100ad44f8 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -207,6 +207,7 @@ struct Monitor {
+>      int suspend_cnt;            /* Needs to be accessed atomically */
+>      bool skip_flush;
+>      bool use_io_thr;
+> +    /* Only used in parser, so no lock needed. */
+>      ReadLineState *rs;
+>      MonitorQMP qmp;
+>      gchar *mon_cpu_path;
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- pc-bios/s390-ccw/cio.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Which fields does this comment cover?
 
-diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
-index 55eaeee..1a0795f 100644
---- a/pc-bios/s390-ccw/cio.h
-+++ b/pc-bios/s390-ccw/cio.h
-@@ -125,7 +125,7 @@ struct tpi_info {
-     __u32 reserved3  : 12;
-     __u32 int_type   : 3;
-     __u32 reserved4  : 12;
--} __attribute__ ((packed));
-+} __attribute__ ((packed, aligned(4)));
- 
- /* channel command word (type 1) */
- struct ccw1 {
--- 
-1.8.3.1
+--u5E4XgoOPWr4PD9E
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJa8XqqAAoJEJykq7OBq3PIWsoH+wdMp01FLt8P91RBfXyxeC9Q
+r20OH1pbLotuJ+ZQpotUUG5wjRvDP7VxxoToGnVScDPP5EKDp6GibsZ2Wu2+SZ3y
+sK1+ncy8Mk48sqTk7T3reuWJ1rdV6Q0tKxmB0iSoJ4YAfkOahK1qlh3hnHCSuPg6
+oMv6bbOhx5Th12m4kvPMuQGMndnlpfX6zygNJj3ObRKp72t7eIBdsuNg8kt3tO/W
+6KY3xoxiIDBDHdazX9fcoNeSy0a+Oe+x65R2Rb4JFNCWMKRyvvVhbrRzAge9ql3o
+fUuxq9DihMspKzEGNLQJUvMQQvF7iK6ftlzIb4EcOnDARzKv+bxtKq1ibCNtnSU=
+=FS+8
+-----END PGP SIGNATURE-----
+
+--u5E4XgoOPWr4PD9E--
