@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fFxN0-0000dk-0y
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 03:49:10 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fFxWT-0002Zr-F9
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 03:58:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fFxMw-0006GF-3x
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 03:49:10 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33556 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fFxMv-0006G2-UJ
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 03:49:06 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6AC22401DEA7
-	for <qemu-devel@nongnu.org>; Tue,  8 May 2018 07:49:05 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180413120234.GF16263@redhat.com> ("Daniel P. =?utf-8?Q?Ber?=
-	=?utf-8?Q?rang=C3=A9=22's?=
-	message of "Fri, 13 Apr 2018 13:02:34 +0100")
-References: <20180404112731.5922-1-quintela@redhat.com>
-	<20180404112731.5922-5-quintela@redhat.com>
-	<20180412130932.GG2704@work-vm> <20180413120234.GF16263@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Tue, 08 May 2018 09:51:19 +0200
-Message-ID: <87r2mma8lk.fsf@secure.laptop>
+	(envelope-from <stefanha@gmail.com>) id 1fFxWS-0003NH-IV
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 03:58:57 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:37102)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fFxWS-0003Mi-B3
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 03:58:56 -0400
+Received: by mail-wm0-x229.google.com with SMTP id l1-v6so19755541wmb.2
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 00:58:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 4/8] migration: Create socket-address
- parameter
+In-Reply-To: <VI1PR05MB44457ABF0BD18DF5F02F8CE0AE860@VI1PR05MB4445.eurprd05.prod.outlook.com>
+References: <VI1PR05MB44457ABF0BD18DF5F02F8CE0AE860@VI1PR05MB4445.eurprd05.prod.outlook.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Tue, 8 May 2018 08:58:54 +0100
+Message-ID: <CAJSP0QU_82msO_dqoUCOZvwToYQ2LmOKQKXx4+54VbJtHFALzg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] GSoC intro: Emanuele working on Qtest Driver
+ Framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,38 +28,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, lvivier@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com
+To: Emanuele Giuseppe Esposito <emanuele.giuseppe.esposito@usi.ch>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
-> On Thu, Apr 12, 2018 at 02:09:33PM +0100, Dr. David Alan Gilbert wrote:
->> * Juan Quintela (quintela@redhat.com) wrote:
->> > It will be used to store the uri parameters. We want this only for
->> > tcp, so we don't set it for other uris.  We need it to know what port
->> > is migration running.
->> >=20
->> > Signed-off-by: Juan Quintela <quintela@redhat.com>
->> >=20
->> > --
->> >=20
->> > This used to be uri parameter, but it has so many troubles to
->> > reproduce that it don't just make sense.
->> >=20
->> > This used to be a port parameter.  I was asked to move to
->> > SocketAddress, done.
->> > I also merged the setting of the migration tcp port in this one
->> > because now I need to free the address, and this makes it easier.
->> > This used to be x-socket-address with a single direction, now it is a
->> > list of addresses.
->>=20
->> Is there a reason it's a parameter rather than just an entry in
->> MigrationInfo?
+On Fri, May 4, 2018 at 5:39 PM, Emanuele Giuseppe Esposito
+<emanuele.giuseppe.esposito@usi.ch> wrote:
+> my name is Emanuele and I am one of the students selected to participate at the Google Summer of Code with QEMU.
+> I'll work on the current test driver framework and will try to improve it (i.e. automatically detect devices and run tests based on the targeted architecture). More info can be found at https://wiki.qemu.org/Features/qtest_driver_framework.
+> My mentors will be Paolo Bonzini and Laurent Vivier.
 >
-> I imagine it is a side-effect of earlier versions of this patch
-> which used the migration parameter setter method. Having it in
-> the MigrationInfo does seem reasonable to me since this is not
-> a tunable parameter.
+> I am currently studying Computer Science in Lugano, at Universita' della Svizzera Italiana (USI), and will graduate in June.
+> I'm looking forward to working in this community!
 
-Yeap, that was the reason, as said on previous email, changed.
+Welcome Emanuele!
 
-Thanks to both, Juan.
+If you have quick questions about the QEMU source code don't hesitate
+to ask on the #qemu irc.oftc.net IRC channel.
+
+Stefan
