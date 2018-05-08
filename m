@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fG09Z-0007WF-FZ
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:47:32 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fG0GQ-0001Be-Kz
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:54:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fG09W-000594-Ag
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:47:29 -0400
-From: Thomas Huth <thuth@redhat.com>
-References: <1521452376-25099-1-git-send-email-thuth@redhat.com>
-	<87bme62nu0.fsf@dusky.pond.sub.org>
-	<068649bc-1546-6fc5-3e41-63512196cbf8@redhat.com>
-	<20180427003215.GU29865@localhost.localdomain>
-	<87o9i5uplt.fsf@dusky.pond.sub.org>
-	<20180507135330.GS25013@localhost.localdomain>
-	<87h8njtnok.fsf@dusky.pond.sub.org>
-	<20180507182126.GC25013@localhost.localdomain>
-	<4bba0be5-a52c-48ad-3df4-4e9be3624dc0@redhat.com>
-	<20180507193220.GF25013@localhost.localdomain>
-	<5837d14a-b562-c382-f95a-32ef12a4e25c@redhat.com>
-Message-ID: <271ae0da-3474-85ab-8378-68fa572dc778@redhat.com>
-Date: Tue, 8 May 2018 12:47:19 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1fG0GN-0007ly-HA
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:54:34 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37252 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fG0GN-0007lu-Bf
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 06:54:31 -0400
+Date: Tue, 8 May 2018 11:54:25 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180508105424.GH2500@work-vm>
+References: <20180502104740.12123-1-peterx@redhat.com>
+	<20180502104740.12123-18-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <5837d14a-b562-c382-f95a-32ef12a4e25c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Running QEMU without default devices / kernel /
- bios
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180502104740.12123-18-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v8 17/24] migration: setup ramstate for
+ resume
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,143 +28,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Alexey Perevalov <a.perevalov@samsung.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-On 08.05.2018 07:33, Thomas Huth wrote:
-> On 07.05.2018 21:32, Eduardo Habkost wrote:
->> On Mon, May 07, 2018 at 09:13:57PM +0200, Thomas Huth wrote:
->>> On 07.05.2018 20:21, Eduardo Habkost wrote:
->>>> On Mon, May 07, 2018 at 06:50:35PM +0200, Markus Armbruster wrote:
->>>>> Eduardo Habkost <ehabkost@redhat.com> writes:
->>>>>
->>>>>> On Fri, Apr 27, 2018 at 08:31:58AM +0200, Markus Armbruster wrote:
->>>>>>> Eduardo Habkost <ehabkost@redhat.com> writes:
->>>>>>>
->>>>>>>> On Thu, Apr 26, 2018 at 05:20:25PM +0200, Thomas Huth wrote:
->>>>>>>>> On 26.04.2018 13:45, Markus Armbruster wrote:
->>>>>>>>>> Thomas Huth <thuth@redhat.com> writes:
->>>>>>>>> [...]
->>>>>>>>>>> @@ -260,6 +263,26 @@ static void test_abstract_interfaces(voi=
-d)
->>>>>>>>>>>      qtest_end();
->>>>>>>>>>>  }
->>>>>>>>>>> =20
->>>>>>>>>>> +static void add_machine_test_case(const char *mname)
->>>>>>>>>>> +{
->>>>>>>>>>> +    char *path, *args;
->>>>>>>>>>> +
->>>>>>>>>>> +    /* Ignore blacklisted machines */
->>>>>>>>>>> +    if (g_str_equal("xenfv", mname) || g_str_equal("xenpv", =
-mname)) {
->>>>>>>>>>> +        return;
->>>>>>>>>>> +    }
->>>>>>>>>>> +
->>>>>>>>>>> +    path =3D g_strdup_printf("device/introspect/concrete-def=
-aults-%s", mname);
->>>>>>>>>>> +    args =3D g_strdup_printf("-machine %s", mname);
->>>>>>>>>>> +    qtest_add_data_func(path, args, test_device_intro_concre=
-te);
->>>>>>>>>>
->>>>>>>>>> This runs test_device_intro_concrete() with "-machine M" for a=
-ll machine
->>>>>>>>>> types M, in SPEED=3Dslow mode.
->>>>>>>>>>
->>>>>>>>>>> +    g_free(path);
->>>>>>>>>>> +
->>>>>>>>>>> +    path =3D g_strdup_printf("device/introspect/concrete-nod=
-efaults-%s", mname);
->>>>>>>>>>> +    args =3D g_strdup_printf("-nodefaults -machine %s", mnam=
-e);
->>>>>>>>>>> +    qtest_add_data_func(path, args, test_device_intro_concre=
-te);
->>>>>>>>>>
->>>>>>>>>> This runs test_device_intro_concrete() with "-nodefaults -mach=
-ine M" for
->>>>>>>>>> all machine types M, in SPEED=3Dslow mode.
->>>>>>>>>>
->>>>>>>>>> Has "without -nodefaults" exposed additional bugs?
->>>>>>>>>
->>>>>>>>> After testing this with all machines, I had to discover that
->>>>>>>>> "-nodefaults" does not work so easily: A lot of the embedded ma=
-chines
->>>>>>>>> (especially the ARM machines) simply refuse to work with "-node=
-faults"
->>>>>>>>> and exit immediately instead. E.g.:
->>>>>>>>>
->>>>>>>>> $ arm-softmmu/qemu-system-arm -nodefaults -nographic -M n810,ac=
-cel=3Dqtest
->>>>>>>>> qemu-system-arm: missing SecureDigital device
->>>>>>>
->>>>>>> These are all bugs.  --nodefaults is supposed to suppress *option=
-al*
->>>>>>> devices, not mandatory ones.
->>>>>>
->>>>>> I'm not sure I understand the requirements.  What exactly is the
->>>>>> definition of "mandatory"?
->>>>>>
->>>>>> A machine created by "qemu-system-x86_64 -machine pc -nodefaults"
->>>>>> is useless because it has no any device to boot from.  How is
->>>>>> that different from a n810 machine not booting because there's no
->>>>>> SD device?
->>>>>
->>>>> I propose:
->>>>>
->>>>> * Stuff that's required for QEMU to run is not suppressed by -nodef=
-aults
->>>>>
->>>>> * Stuff that a real machine has soldered on is also not suppressed
->>>>>
->>>>> * Stuff that can be pulled out of a real machine may be suppressed,=
- even
->>>>>   when that means the guest won't run
->>>>
->>>> Makes sense to me.  It looks like the only obstacle for
->>>> tests/device-introspect and device-crash-test is the first rule.
->>>> "Guest won't boot" isn't a problem, but "QEMU won't run" is.
->>>>
->>>> The first rule is easily testable, too: running
->>>> "$QEMU -machine $MACHINE -nodefaults" and not having a working
->>>> QMP monitor should be reported as a bug by automated tests.
->>>
->>> You mean with "-accel qtest" or without? With "-accel qtest" we shoul=
-d
->>> pretty soon be fine, after Peter's current PULL request has been merg=
-ed
->>> (which contains a patch from me for fixing these SD card problems wit=
-h
->>> ARM machines).
->>> Without "-accel qtest", things are not that easy, unfortunately. Lots=
- of
->>> boards require "-kernel" or "-bios" and refuse to work without. So yo=
-u
->>> can hardly test "-nodefaults" automatically in the normal tcg mode. (=
-But
->>> maybe all boards should allow to start QEMU in case you've at least a=
-lso
->>> specified "-S" ? ... in that case we've got plenty of work for
->>> BiteSizeTasks ;-) )
->>
->> Hmm, maybe it's not a bite-sized task after all.  :)
->>
->> Should we do this gradually?
->>
->> * Working with -accel qtest is useful, and sounds like an easier goal;
->=20
-> We're pretty much there already. Apart from the SD card problem (and th=
-e
-> xen boards), all machines should work with -nodefaults in qtest mode no=
-w.
+* Peter Xu (peterx@redhat.com) wrote:
+> After we updated the dirty bitmaps of ramblocks, we also need to update
+> the critical fields in RAMState to make sure it is ready for a resume.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  migration/ram.c        | 45 ++++++++++++++++++++++++++++++++++++++++++++-
+>  migration/trace-events |  1 +
+>  2 files changed, 45 insertions(+), 1 deletion(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 118460109b..2821e15cc2 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -2291,6 +2291,41 @@ static int ram_init_all(RAMState **rsp)
+>      return 0;
+>  }
+>  
+> +static void ram_state_resume_prepare(RAMState *rs, QEMUFile *out)
+> +{
+> +    RAMBlock *block;
+> +    uint64_t pages = 0;
+> +
+> +    /*
+> +     * Postcopy is not using xbzrle/compression, so no need for that.
+> +     * Also, since source are already halted, we don't need to care
+> +     * about dirty page logging as well.
+> +     */
+> +
+> +    RAMBLOCK_FOREACH(block) {
+> +        pages += bitmap_count_one(block->bmap,
+> +                                  block->used_length >> TARGET_PAGE_BITS);
+> +    }
+> +
+> +    /* This may not be aligned with current bitmaps. Recalculate. */
+> +    rs->migration_dirty_pages = pages;
+> +
+> +    rs->last_seen_block = NULL;
+> +    rs->last_sent_block = NULL;
+> +    rs->last_page = 0;
+> +    rs->last_version = ram_list.version;
+> +    /*
+> +     * Disable the bulk stage, otherwise we'll resend the whole RAM no
+> +     * matter what we have sent.
+> +     */
+> +    rs->ram_bulk_stage = false;
+> +
+> +    /* Update RAMState cache of output QEMUFile */
+> +    rs->f = out;
+> +
+> +    trace_ram_state_resume_prepare(pages);
+> +}
+> +
+>  /*
+>   * Each of ram_save_setup, ram_save_iterate and ram_save_complete has
+>   * long-running RCU critical section.  When rcu-reclaims in the code
+> @@ -3286,8 +3321,16 @@ out:
+>  static int ram_resume_prepare(MigrationState *s, void *opaque)
+>  {
+>      RAMState *rs = *(RAMState **)opaque;
+> +    int ret;
+>  
+> -    return ram_dirty_bitmap_sync_all(s, rs);
+> +    ret = ram_dirty_bitmap_sync_all(s, rs);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+> +    ram_state_resume_prepare(rs, s->to_dst_file);
+> +
+> +    return 0;
+>  }
+>  
+>  static SaveVMHandlers savevm_ram_handlers = {
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 53243e17ec..46c5ca1dba 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -88,6 +88,7 @@ ram_dirty_bitmap_reload_complete(char *str) "%s"
+>  ram_dirty_bitmap_sync_start(void) ""
+>  ram_dirty_bitmap_sync_wait(void) ""
+>  ram_dirty_bitmap_sync_complete(void) ""
+> +ram_state_resume_prepare(uint64_t v) "%ld"
 
-I forgot to mention that some sparc machines also still have problems.
-Patches are available here:
+That should be "%" PRId64
 
-https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg00543.html
+But otherwise looks OK, so with that change:
 
-and
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg00546.html
-
-... but they have not been merged yet.
-
- Thomas
+>  # migration/migration.c
+>  await_return_path_close_on_source_close(void) ""
+> -- 
+> 2.14.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
