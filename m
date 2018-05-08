@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36274)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fG3Jj-00046i-Qn
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:10:12 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fG3Lq-0005lj-EE
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:12:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fG3Je-0006NS-57
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:10:09 -0400
-Received: from mail-ot0-x235.google.com ([2607:f8b0:4003:c0f::235]:35940)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fG3Je-0006NA-0U
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:10:06 -0400
-Received: by mail-ot0-x235.google.com with SMTP id m11-v6so30026935otf.3
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 07:10:05 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1fG3Lk-0007WH-3J
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:12:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47974)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fG3Lj-0007VR-RK
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:12:16 -0400
+Date: Tue, 8 May 2018 11:12:01 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180508141201.GI25013@localhost.localdomain>
+References: <1524760009-24710-1-git-send-email-babu.moger@amd.com>
+	<1524760009-24710-6-git-send-email-babu.moger@amd.com>
+	<20180507193732.GE13350@localhost.localdomain>
+	<BL0PR12MB2468EFDC6A05DB20E253E965959B0@BL0PR12MB2468.namprd12.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <20180504224521.7801-1-richard.henderson@linaro.org>
-References: <20180504183021.19318-1-richard.henderson@linaro.org>
-	<20180504224521.7801-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 8 May 2018 15:09:44 +0100
-Message-ID: <CAFEAcA8U4sy2Kt+W4gcqiTePr5Po36SFww768nDDKhrtMB2Bhg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 08/10] target/arm: Fill in
- disas_ldst_atomic
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BL0PR12MB2468EFDC6A05DB20E253E965959B0@BL0PR12MB2468.namprd12.prod.outlook.com>
+Subject: Re: [Qemu-devel] [PATCH v7 5/9] i386: Use the statically loaded
+ cache definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,24 +30,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: "Moger, Babu" <Babu.Moger@amd.com>
+Cc: "mst@redhat.com" <mst@redhat.com>, "marcel@redhat.com" <marcel@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "geoff@hostfission.com" <geoff@hostfission.com>, "kash@tripleback.net" <kash@tripleback.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 
-On 4 May 2018 at 23:45, Richard Henderson <richard.henderson@linaro.org> wrote:
-> This implements all of the v8.1-Atomics instructions except
-> for compare-and-swap, which is decoded elsewhere.
->
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
-> v3: Do not zero-extend X[s] via the third parameter to read_cpu_reg.
+On Mon, May 07, 2018 at 11:39:45PM +0000, Moger, Babu wrote:
+> 
+> 
+> > -----Original Message-----
+> > From: Eduardo Habkost [mailto:ehabkost@redhat.com]
+> > Sent: Monday, May 7, 2018 2:38 PM
+> > To: Moger, Babu <Babu.Moger@amd.com>
+> > Cc: mst@redhat.com; marcel@redhat.com; pbonzini@redhat.com;
+> > rth@twiddle.net; mtosatti@redhat.com; geoff@hostfission.com;
+> > kash@tripleback.net; qemu-devel@nongnu.org; kvm@vger.kernel.org
+> > Subject: Re: [Qemu-devel] [PATCH v7 5/9] i386: Use the statically loaded
+> > cache definitions
+> > 
+> > On Thu, Apr 26, 2018 at 11:26:45AM -0500, Babu Moger wrote:
+> > > Use the statically loaded cache definitions if available
+> > > and legacy-cache parameter is not set.
+> > >
+> > > Signed-off-by: Babu Moger <babu.moger@amd.com>
+> > > Tested-by: Geoffrey McRae <geoff@hostfission.com>
+> > 
+> > Now that I'm looking at the rest of the code, this seems
+> > incomplete:
+> > 
+> > What about CPUID[2], CPUID[4]?  They are still referring to the
+> > old legacy cache structs.
+> 
+> There is no change in CPUID[2], CPUID[4] behavior. It is intel specific. It did not change. So, we don't need to change that.
+> In case it changes in future, we can add it later. AMD does not use CPUID[2] and CPUID[4].
 
-Can you just resend the full series, please? Sending a single
-patch rather than the whole thing means that 'patches' complains
-about "series is either incomplete or improperly threaded",
-and my eyeball for updated versions to add to my to-review
-queue generally skips over patches which aren't cover letters
-or single-patches...
+Right, now I see that CPUID 2h-4h are reserved on AMD.
 
-thanks
--- PMM
+However, X86CPUDefinition::cache_info is not documented as
+AMD-specific, so developers changing the code CPU model table in
+the future would expect it to affect all cache CPUID leaves.
+
+We could document it as AMD-specific, but it's simpler to just
+make it affect all CPUID leaves.
+
+> 
+> > 
+> > If their corresponding code isn't updated to use env->cache_info,
+> > those leaves will be inconsistent with CPUID[0x8000005] and
+> > CPUID[0x80000006].
+> > 
+> > > ---
+> > >  target/i386/cpu.c | 22 +++++++++++++++++-----
+> > >  1 file changed, 17 insertions(+), 5 deletions(-)
+> > >
+> > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > > index a27b658..56d2f0b 100644
+> > > --- a/target/i386/cpu.c
+> > > +++ b/target/i386/cpu.c
+> > > @@ -3941,8 +3941,13 @@ void cpu_x86_cpuid(CPUX86State *env,
+> > uint32_t index, uint32_t count,
+> > >                 (L1_ITLB_2M_ASSOC <<  8) | (L1_ITLB_2M_ENTRIES);
+> > >          *ebx = (L1_DTLB_4K_ASSOC << 24) | (L1_DTLB_4K_ENTRIES << 16) | \
+> > >                 (L1_ITLB_4K_ASSOC <<  8) | (L1_ITLB_4K_ENTRIES);
+> > > -        *ecx = encode_cache_cpuid80000005(&l1d_cache_amd);
+> > > -        *edx = encode_cache_cpuid80000005(&l1i_cache_amd);
+> > > +        if (env->cache_info.valid && !cpu->legacy_cache) {
+> > > +            *ecx = encode_cache_cpuid80000005(&env-
+> > >cache_info.l1d_cache);
+> > > +            *edx = encode_cache_cpuid80000005(&env-
+> > >cache_info.l1i_cache);
+> > > +        } else {
+> > > +            *ecx = encode_cache_cpuid80000005(&l1d_cache_amd);
+> > > +            *edx = encode_cache_cpuid80000005(&l1i_cache_amd);
+> > > +        }
+> > >          break;
+> > >      case 0x80000006:
+> > >          /* cache info (L2 cache) */
+> > > @@ -3958,9 +3963,16 @@ void cpu_x86_cpuid(CPUX86State *env,
+> > uint32_t index, uint32_t count,
+> > >                 (L2_DTLB_4K_ENTRIES << 16) | \
+> > >                 (AMD_ENC_ASSOC(L2_ITLB_4K_ASSOC) << 12) | \
+> > >                 (L2_ITLB_4K_ENTRIES);
+> > > -        encode_cache_cpuid80000006(&l2_cache_amd,
+> > > -                                   cpu->enable_l3_cache ? &l3_cache : NULL,
+> > > -                                   ecx, edx);
+> > > +        if (env->cache_info.valid && !cpu->legacy_cache) {
+> > > +            encode_cache_cpuid80000006(&env->cache_info.l2_cache,
+> > > +                                       cpu->enable_l3_cache ?
+> > > +                                       &env->cache_info.l3_cache : NULL,
+> > > +                                       ecx, edx);
+> > > +        } else {
+> > > +            encode_cache_cpuid80000006(&l2_cache_amd,
+> > > +                                       cpu->enable_l3_cache ? &l3_cache : NULL,
+> > > +                                       ecx, edx);
+> > > +        }
+> > >          break;
+> > >      case 0x80000007:
+> > >          *eax = 0;
+> > > --
+> > > 2.7.4
+> > >
+> > >
+> > 
+> > --
+> > Eduardo
+
+-- 
+Eduardo
