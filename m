@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38424)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fG4hV-000213-5q
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:38:51 -0400
+	(envelope-from <jcody@redhat.com>) id 1fG4ni-00055k-SC
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:45:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fG4hS-000626-VT
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:38:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52352 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fG4hS-00061s-R7
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:38:46 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 517EDEB71C
-	for <qemu-devel@nongnu.org>; Tue,  8 May 2018 15:38:46 +0000 (UTC)
-Date: Tue, 8 May 2018 16:38:40 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180508153838.GQ2500@work-vm>
-References: <20180425111940.1030-1-quintela@redhat.com>
-	<20180425111940.1030-4-quintela@redhat.com>
-	<20180503173154.GL2660@work-vm> <87sh726uvd.fsf@secure.laptop>
+	(envelope-from <jcody@redhat.com>) id 1fG4ni-00089V-4l
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:45:14 -0400
+Date: Tue, 8 May 2018 11:45:01 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180508154501.GC6722@localhost.localdomain>
+References: <20180503225648.13153-1-jsnow@redhat.com>
+	<20180503225648.13153-4-jsnow@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87sh726uvd.fsf@secure.laptop>
-Subject: Re: [Qemu-devel] [PATCH v8 3/8] tests: Add migration xbzrle test
+In-Reply-To: <20180503225648.13153-4-jsnow@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 3/5] qemu-img: remove
+ references to GEN_DOCS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,47 +24,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, qemu-trivial@nongnu.org
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > * Juan Quintela (quintela@redhat.com) wrote:
-> >> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> >> Reviewed-by: Peter Xu <peterx@redhat.com>
-> 
-> >> +
-> >> +    migrate_set_parameter(from, "xbzrle-cache-size", "33554432");
-> >
-> > I still worry about the cache size relative to the size of memory we're
-> > actually changing in the test; I don't quite understand why it's turning
-> > out to get lots of hits.
-> 
-> I planned this as a smorke test.  But what value do you have in mind?
+On Thu, May 03, 2018 at 06:56:46PM -0400, John Snow wrote:
+> Nothing seemingly uses this.
+>
 
-Given the test code dirties 100MB of RAM, I suggest a cache of 110MB
-say.  But it's interesting that the stats show we are getting a lot of
-page hits; I'm not sure I understand why.
+Indeed - it looks like it has been vestigial for a while now (commit
+77bd1119ba even mentions that it appears unused).
 
-> > Also, xbzrle eats so much CPU we'll still have to watch out for the low
-> > end CPUs.
-> 
-> Any concrete suggestion?
-> 
-> My plan would have been to push on my next pull request:
-> 
-> Add migration precopy test
-> Add migration xbzrle test
-> Migration ppc now inlines its program
-> 
-> And put the rest of the patches with fixes for another review.
+Reviewed-by: Jeff Cody <jcody@redhat.com>
 
-Go with it and lets see; if we hit problems then we can just turn that
-300ms downtime limit right up.
-
-Dave
-
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  qemu-img.c             | 2 --
+>  qemu-options-wrapper.h | 1 -
+>  2 files changed, 3 deletions(-)
 > 
-> Later, Juan.
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> diff --git a/qemu-img.c b/qemu-img.c
+> index 855fa52514..a01425372d 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -123,7 +123,6 @@ static void QEMU_NORETURN help(void)
+>             "  " arg_string "\n"
+>  #include "qemu-img-cmds.h"
+>  #undef DEF
+> -#undef GEN_DOCS
+>             "\n"
+>             "Command parameters:\n"
+>             "  'filename' is a disk image filename\n"
+> @@ -4685,7 +4684,6 @@ static const img_cmd_t img_cmds[] = {
+>      { option, callback },
+>  #include "qemu-img-cmds.h"
+>  #undef DEF
+> -#undef GEN_DOCS
+>      { NULL, NULL, },
+>  };
+>  
+> diff --git a/qemu-options-wrapper.h b/qemu-options-wrapper.h
+> index 13bfea0294..6f548e3922 100644
+> --- a/qemu-options-wrapper.h
+> +++ b/qemu-options-wrapper.h
+> @@ -34,7 +34,6 @@
+>  #undef DEF
+>  #undef DEFHEADING
+>  #undef ARCHHEADING
+> -#undef GEN_DOCS
+>  
+>  #undef QEMU_OPTIONS_GENERATE_ENUM
+>  #undef QEMU_OPTIONS_GENERATE_HELP
+> -- 
+> 2.14.3
+> 
+> 
