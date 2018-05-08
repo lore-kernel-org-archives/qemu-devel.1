@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44809)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fG4wg-0003G9-GM
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:54:31 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fG554-0007A6-8M
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 12:03:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fG4wc-0003gG-9P
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:54:30 -0400
-Resent-Message-Id: <E1fG4wc-0003gG-9P@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21094)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fG4wc-0003fA-0g
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:54:26 -0400
-In-Reply-To: <20180508151437.4232-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152579484551.2667.2597660341273830590@71c20359a636>
+	(envelope-from <pbonzini@redhat.com>) id 1fG550-0006pW-Ah
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 12:03:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59420 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fG550-0006pL-5g
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 12:03:06 -0400
+References: <20180504160026.14017-1-berrange@redhat.com>
+	<20180504160026.14017-4-berrange@redhat.com>
+	<752b52d8-2990-13d7-753c-36aafc5f0041@redhat.com>
+	<20180508151940.GC5967@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ea7bffe9-5219-43a9-a250-b60b67b69b55@redhat.com>
+Date: Tue, 8 May 2018 18:02:55 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 8 May 2018 08:54:06 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3 00/10] target/arm: Implement v8.1-Atomics
+In-Reply-To: <20180508151940.GC5967@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/3] glib: enforce the minimum required
+ version and warn about old APIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +31,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, Olaf Hering <olaf@aepfle.de>, Stefan Hajnoczi <stefanha@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNTA4MTUxNDM3LjQyMzItMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8u
-b3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMDAvMTBdIHRhcmdldC9hcm06IElt
-cGxlbWVudCB2OC4xLUF0b21pY3MKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jh
-c2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2Mg
-LWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBj
-b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5h
-bGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZl
-cnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBB
-VENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYg
-ISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0t
-bWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAg
-IG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpV
-cGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0
-cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAg
-ICAgICAgIHBhdGNoZXcvMjAxODA1MDMyMjU2NDguMTMxNTMtMS1qc25vd0ByZWRoYXQuY29tIC0+
-IHBhdGNoZXcvMjAxODA1MDMyMjU2NDguMTMxNTMtMS1qc25vd0ByZWRoYXQuY29tClN3aXRjaGVk
-IHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMDNjNGU3YzQ1ZiB0YXJnZXQvYXJtOiBFbmFibGUgQVJN
-X0ZFQVRVUkVfVjhfQVRPTUlDUyBmb3IgdXNlci1vbmx5CmJmZDQ3YmE0YmMgdGFyZ2V0L2FybTog
-SW1wbGVtZW50IENBUyBhbmQgQ0FTUAo5MjQ4NDQ2M2QwIHRhcmdldC9hcm06IEZpbGwgaW4gZGlz
-YXNfbGRzdF9hdG9taWMKMTNiNzkzMzUwOSB0YXJnZXQvYXJtOiBJbnRyb2R1Y2UgQVJNX0ZFQVRV
-UkVfVjhfQVRPTUlDUyBhbmQgaW5pdGlhbCBkZWNvZGUKOTdkZWE0MDhhYSB0YXJnZXQvcmlzY3Y6
-IFVzZSBuZXcgYXRvbWljIG1pbi9tYXggZXhwYW5kZXJzCjcyMTE2YzU4Y2IgdGNnOiBVc2UgR0VO
-X0FUT01JQ19IRUxQRVJfRk4gZm9yIG9wcG9zaXRlIGVuZGlhbiBhdG9taWMgYWRkCmNiMjRmYzhm
-ZWQgdGNnOiBJbnRyb2R1Y2UgYXRvbWljIGhlbHBlcnMgZm9yIGludGVnZXIgbWluL21heAoyNTU1
-MDViNTVmIHRhcmdldC94dGVuc2E6IFVzZSBuZXcgbWluL21heCBleHBhbmRlcnMKZjgyZjUzYzQ3
-YSB0YXJnZXQvYXJtOiBVc2UgbmV3IG1pbi9tYXggZXhwYW5kZXJzCjVkODk2NWM3MGIgdGNnOiBJ
-bnRyb2R1Y2UgaGVscGVycyBmb3IgaW50ZWdlciBtaW4vbWF4Cgo9PT0gT1VUUFVUIEJFR0lOID09
-PQpDaGVja2luZyBQQVRDSCAxLzEwOiB0Y2c6IEludHJvZHVjZSBoZWxwZXJzIGZvciBpbnRlZ2Vy
-IG1pbi9tYXguLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xMDogdGFyZ2V0L2FybTogVXNlIG5ldyBtaW4v
-bWF4IGV4cGFuZGVycy4uLgpDaGVja2luZyBQQVRDSCAzLzEwOiB0YXJnZXQveHRlbnNhOiBVc2Ug
-bmV3IG1pbi9tYXggZXhwYW5kZXJzLi4uCkNoZWNraW5nIFBBVENIIDQvMTA6IHRjZzogSW50cm9k
-dWNlIGF0b21pYyBoZWxwZXJzIGZvciBpbnRlZ2VyIG1pbi9tYXguLi4KRVJST1I6IG1lbW9yeSBi
-YXJyaWVyIHdpdGhvdXQgY29tbWVudAojNTY6IEZJTEU6IGFjY2VsL3RjZy9hdG9taWNfdGVtcGxh
-dGUuaDoxMzc6CisgICAgc21wX21iKCk7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIFwKCkVSUk9SOiBtZW1vcnkgYmFycmllciB3aXRob3V0IGNv
-bW1lbnQKIzk2OiBGSUxFOiBhY2NlbC90Y2cvYXRvbWljX3RlbXBsYXRlLmg6Mjg1OgorICAgIHNt
-cF9tYigpOyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBcCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDIzNiBsaW5lcyBjaGVja2VkCgpZ
-b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA1LzEw
-OiB0Y2c6IFVzZSBHRU5fQVRPTUlDX0hFTFBFUl9GTiBmb3Igb3Bwb3NpdGUgZW5kaWFuIGF0b21p
-YyBhZGQuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8xMDogdGFyZ2V0L3Jpc2N2OiBVc2UgbmV3IGF0b21p
-YyBtaW4vbWF4IGV4cGFuZGVycy4uLgpDaGVja2luZyBQQVRDSCA3LzEwOiB0YXJnZXQvYXJtOiBJ
-bnRyb2R1Y2UgQVJNX0ZFQVRVUkVfVjhfQVRPTUlDUyBhbmQgaW5pdGlhbCBkZWNvZGUuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggOC8xMDogdGFyZ2V0L2FybTogRmlsbCBpbiBkaXNhc19sZHN0X2F0b21pYy4u
-LgpDaGVja2luZyBQQVRDSCA5LzEwOiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgQ0FTIGFuZCBDQVNQ
-Li4uCkNoZWNraW5nIFBBVENIIDEwLzEwOiB0YXJnZXQvYXJtOiBFbmFibGUgQVJNX0ZFQVRVUkVf
-VjhfQVRPTUlDUyBmb3IgdXNlci1vbmx5Li4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
-YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
-bHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
-ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 08/05/2018 17:19, Daniel P. Berrang=C3=A9 wrote:
+> Ok, that change looks fine with me assuming it passes your build tests.
+> In fact that is what I had done in an earlier version.
+>=20
+> Regards,
+> Daniel
+
+Actually there is a use of g_strv_contains in tests/test-qga.c.  It is
+guarded by GLIB_CHECK_VERSION(2, 44, 0) but the right fix should be to
+include the compatibility function instead.
+
+For now I am dropping this patch.
+
+Paolo
