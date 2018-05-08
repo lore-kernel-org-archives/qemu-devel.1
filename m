@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fG6To-0000J8-L6
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fG6To-0000JD-M4
 	for qemu-devel@nongnu.org; Tue, 08 May 2018 13:32:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fG6Tl-0005ba-4t
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fG6Tj-0005bB-VF
 	for qemu-devel@nongnu.org; Tue, 08 May 2018 13:32:48 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:38804)
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:36898)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1fG6Tk-0005bJ-Tr
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 13:32:45 -0400
-Received: by mail-lf0-x243.google.com with SMTP id z142-v6so3773212lff.5
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 10:32:44 -0700 (PDT)
+	id 1fG6Tj-0005ap-J4
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 13:32:43 -0400
+Received: by mail-lf0-x244.google.com with SMTP id r2-v6so10919609lff.4
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 10:32:43 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Tue,  8 May 2018 19:31:48 +0200
-Message-Id: <20180508173152.29327-33-edgar.iglesias@gmail.com>
+Date: Tue,  8 May 2018 19:31:47 +0200
+Message-Id: <20180508173152.29327-32-edgar.iglesias@gmail.com>
 In-Reply-To: <20180508173152.29327-1-edgar.iglesias@gmail.com>
 References: <20180508173152.29327-1-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 32/36] target-microblaze: Use table based
- condition-codes conversion
+Subject: [Qemu-devel] [PATCH v2 31/36] target-microblaze: mmu: Cleanup debug
+ log messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,67 +32,152 @@ Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, frederic.konrad@adac
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Use a table based conversion to map condition-codes between
-MicroBlaze ISA encoding and TCG.
-No functional change.
+Cleanup debug log messages:
+* Avoid long 80+ character lines.
+* Remove D() macro and use qemu_log_mask.
+* Remove logs that are not very useful
 
+Suggested-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- target/microblaze/translate.c | 41 ++++++++++++++++++++---------------------
- 1 file changed, 20 insertions(+), 21 deletions(-)
+ target/microblaze/mmu.c | 39 +++++++++++++++++++--------------------
+ 1 file changed, 19 insertions(+), 20 deletions(-)
 
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index a987444f19..231a66e77d 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -1141,28 +1141,27 @@ static void dec_store(DisasContext *dc)
- static inline void eval_cc(DisasContext *dc, unsigned int cc,
-                            TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
+diff --git a/target/microblaze/mmu.c b/target/microblaze/mmu.c
+index 9ecffb2c9c..f4ceaea520 100644
+--- a/target/microblaze/mmu.c
++++ b/target/microblaze/mmu.c
+@@ -22,8 +22,6 @@
+ #include "cpu.h"
+ #include "exec/exec-all.h"
+ 
+-#define D(x)
+-
+ static unsigned int tlb_decode_size(unsigned int f)
  {
-+    static const int mb_to_tcg_cc[] = {
-+        [CC_EQ] = TCG_COND_EQ,
-+        [CC_NE] = TCG_COND_NE,
-+        [CC_LT] = TCG_COND_LT,
-+        [CC_LE] = TCG_COND_LE,
-+        [CC_GE] = TCG_COND_GE,
-+        [CC_GT] = TCG_COND_GT,
-+    };
-+
-     switch (cc) {
--        case CC_EQ:
--            tcg_gen_setcond_i32(TCG_COND_EQ, d, a, b);
--            break;
--        case CC_NE:
--            tcg_gen_setcond_i32(TCG_COND_NE, d, a, b);
--            break;
--        case CC_LT:
--            tcg_gen_setcond_i32(TCG_COND_LT, d, a, b);
--            break;
--        case CC_LE:
--            tcg_gen_setcond_i32(TCG_COND_LE, d, a, b);
--            break;
--        case CC_GE:
--            tcg_gen_setcond_i32(TCG_COND_GE, d, a, b);
--            break;
--        case CC_GT:
--            tcg_gen_setcond_i32(TCG_COND_GT, d, a, b);
--            break;
--        default:
--            cpu_abort(CPU(dc->cpu), "Unknown condition code %x.\n", cc);
--            break;
-+    case CC_EQ:
-+    case CC_NE:
-+    case CC_LT:
-+    case CC_LE:
-+    case CC_GE:
-+    case CC_GT:
-+        tcg_gen_setcond_i32(mb_to_tcg_cc[cc], d, a, b);
-+        break;
-+    default:
-+        cpu_abort(CPU(dc->cpu), "Unknown condition code %x.\n", cc);
-+        break;
+     static const unsigned int sizes[] = {
+@@ -90,25 +88,20 @@ unsigned int mmu_translate(struct microblaze_mmu *mmu,
+ 
+         /* Lookup and decode.  */
+         t = mmu->rams[RAM_TAG][i];
+-        D(qemu_log("TLB %d valid=%" PRId64 "\n", i, t & TLB_VALID));
+         if (t & TLB_VALID) {
+             tlb_size = tlb_decode_size((t & TLB_PAGESZ_MASK) >> 7);
+             if (tlb_size < TARGET_PAGE_SIZE) {
+-                qemu_log("%d pages not supported\n", tlb_size);
++                qemu_log_mask(LOG_UNIMP, "%d pages not supported\n", tlb_size);
+                 abort();
+             }
+ 
+             mask = ~((uint64_t)tlb_size - 1);
+             tlb_tag = t & TLB_EPN_MASK;
+             if ((vaddr & mask) != (tlb_tag & mask)) {
+-                D(qemu_log("TLB %d vaddr=%" PRIx64 " != tag=%" PRIx64 "\n",
+-                           i, vaddr & mask, tlb_tag & mask));
+                 continue;
+             }
+             if (mmu->tids[i]
+                 && ((mmu->regs[MMU_R_PID] & 0xff) != mmu->tids[i])) {
+-                D(qemu_log("TLB %d pid=%x != tid=%x\n",
+-                           i, mmu->regs[MMU_R_PID], mmu->tids[i]));
+                 continue;
+             }
+ 
+@@ -123,7 +116,8 @@ unsigned int mmu_translate(struct microblaze_mmu *mmu,
+             t0 &= 0x3;
+ 
+             if (tlb_zsel > mmu->c_mmu_zones) {
+-                qemu_log_mask(LOG_GUEST_ERROR, "tlb zone select out of range! %d\n", tlb_zsel);
++                qemu_log_mask(LOG_GUEST_ERROR,
++                              "tlb zone select out of range! %d\n", tlb_zsel);
+                 t0 = 1; /* Ignore.  */
+             }
+ 
+@@ -174,8 +168,9 @@ unsigned int mmu_translate(struct microblaze_mmu *mmu,
+         }
      }
+ done:
+-    D(qemu_log("MMU vaddr=%" PRIx64 " rw=%d tlb_wr=%d tlb_ex=%d hit=%d\n",
+-              vaddr, rw, tlb_wr, tlb_ex, hit));
++    qemu_log_mask(CPU_LOG_MMU,
++                  "MMU vaddr=%" PRIx64 " rw=%d tlb_wr=%d tlb_ex=%d hit=%d\n",
++                  vaddr, rw, tlb_wr, tlb_ex, hit);
+     return hit;
  }
+ 
+@@ -199,7 +194,8 @@ uint32_t mmu_read(CPUMBState *env, bool ext, uint32_t rn)
+         case MMU_R_TLBLO:
+         case MMU_R_TLBHI:
+             if (!(env->mmu.c_mmu_tlb_access & 1)) {
+-                qemu_log_mask(LOG_GUEST_ERROR, "Invalid access to MMU reg %d\n", rn);
++                qemu_log_mask(LOG_GUEST_ERROR,
++                              "Invalid access to MMU reg %d\n", rn);
+                 return 0;
+             }
+ 
+@@ -211,7 +207,8 @@ uint32_t mmu_read(CPUMBState *env, bool ext, uint32_t rn)
+         case MMU_R_PID:
+         case MMU_R_ZPR:
+             if (!(env->mmu.c_mmu_tlb_access & 1)) {
+-                qemu_log_mask(LOG_GUEST_ERROR, "Invalid access to MMU reg %d\n", rn);
++                qemu_log_mask(LOG_GUEST_ERROR,
++                              "Invalid access to MMU reg %d\n", rn);
+                 return 0;
+             }
+             r = env->mmu.regs[rn];
+@@ -226,7 +223,7 @@ uint32_t mmu_read(CPUMBState *env, bool ext, uint32_t rn)
+             qemu_log_mask(LOG_GUEST_ERROR, "Invalid MMU register %d.\n", rn);
+             break;
+     }
+-    D(qemu_log("%s rn=%d=%x\n", __func__, rn, r));
++    qemu_log_mask(CPU_LOG_MMU, "%s rn=%d=%x\n", __func__, rn, r);
+     return r;
+ }
+ 
+@@ -235,7 +232,8 @@ void mmu_write(CPUMBState *env, bool ext, uint32_t rn, uint32_t v)
+     MicroBlazeCPU *cpu = mb_env_get_cpu(env);
+     uint64_t tmp64;
+     unsigned int i;
+-    D(qemu_log("%s rn=%d=%x old=%x\n", __func__, rn, v, env->mmu.regs[rn]));
++    qemu_log_mask(CPU_LOG_MMU,
++                  "%s rn=%d=%x old=%x\n", __func__, rn, v, env->mmu.regs[rn]);
+ 
+     if (env->mmu.c_mmu < 2 || !env->mmu.c_mmu_tlb_access) {
+         qemu_log_mask(LOG_GUEST_ERROR, "MMU access on MMU-less system\n");
+@@ -261,12 +259,11 @@ void mmu_write(CPUMBState *env, bool ext, uint32_t rn, uint32_t v)
+             }
+             tmp64 = env->mmu.rams[rn & 1][i];
+             env->mmu.rams[rn & 1][i] = deposit64(tmp64, ext * 32, 32, v);
+-
+-            D(qemu_log("%s ram[%d][%d]=%x\n", __func__, rn & 1, i, v));
+             break;
+         case MMU_R_ZPR:
+             if (env->mmu.c_mmu_tlb_access <= 1) {
+-                qemu_log_mask(LOG_GUEST_ERROR, "Invalid access to MMU reg %d\n", rn);
++                qemu_log_mask(LOG_GUEST_ERROR,
++                              "Invalid access to MMU reg %d\n", rn);
+                 return;
+             }
+ 
+@@ -279,7 +276,8 @@ void mmu_write(CPUMBState *env, bool ext, uint32_t rn, uint32_t v)
+             break;
+         case MMU_R_PID:
+             if (env->mmu.c_mmu_tlb_access <= 1) {
+-                qemu_log_mask(LOG_GUEST_ERROR, "Invalid access to MMU reg %d\n", rn);
++                qemu_log_mask(LOG_GUEST_ERROR,
++                              "Invalid access to MMU reg %d\n", rn);
+                 return;
+             }
+ 
+@@ -298,7 +296,8 @@ void mmu_write(CPUMBState *env, bool ext, uint32_t rn, uint32_t v)
+             int hit;
+ 
+             if (env->mmu.c_mmu_tlb_access <= 1) {
+-                qemu_log_mask(LOG_GUEST_ERROR, "Invalid access to MMU reg %d\n", rn);
++                qemu_log_mask(LOG_GUEST_ERROR,
++                              "Invalid access to MMU reg %d\n", rn);
+                 return;
+             }
  
 -- 
 2.14.1
