@@ -1,37 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fG3FU-0001pk-V1
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:05:50 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fG3Fu-00021u-5H
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:06:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fG3FS-00054O-6i
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:05:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37370)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fG3FR-00054A-Uw
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:05:46 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fG3FQ-0000C4-QC
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 14:05:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BDA6A2E80CB
-	for <qemu-devel@nongnu.org>; Tue,  8 May 2018 14:05:44 +0000 (UTC)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fG3Ft-00058R-5G
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:06:14 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1525376963-79623-1-git-send-email-mst@redhat.com>
+	<1525376963-79623-5-git-send-email-mst@redhat.com>
+	<b3620ea6-0805-ccec-3bd5-11dc30bc2569@redhat.com>
+	<20180508152349.15ad26d0.cohuck@redhat.com>
+	<bc3f13f6-56fd-058d-d717-508b7034d437@redhat.com>
+	<20180508154538.1b55f721.cohuck@redhat.com>
+	<b335f5ae-a99e-310c-edb2-65755a2ca51a@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <e05f0ed0-43cc-dc80-a5a5-7782bc77faff@amsat.org>
+Date: Tue, 8 May 2018 11:06:00 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 08 May 2018 14:00:19 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1769053 <1769053@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152541524728.557.4600864098110042577.malonedeb@gac.canonical.com>
-	<152577650854.21921.3043264133804855985.malone@soybean.canonical.com>
-	<20180508112338.GI2500@work-vm>
-	<20180508132234.yegmw442swuofykh@sirius.home.kraxel.org>
-Message-Id: <20180508140019.GM2500@work-vm>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1769053] Re: Cannot start a guest with more
- than 1TB of RAM
+In-Reply-To: <b335f5ae-a99e-310c-edb2-65755a2ca51a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 04/67] s390x: drop an unused include
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,163 +33,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, "Michael S. Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
 
-* Gerd Hoffmann (1769053@bugs.launchpad.net) wrote:
-> Hi,
-> =
+On 05/08/2018 10:50 AM, Thomas Huth wrote:
+> On 08.05.2018 15:45, Cornelia Huck wrote:
+>> On Tue, 8 May 2018 15:38:03 +0200
+>> Thomas Huth <thuth@redhat.com> wrote:
+>>
+>>> On 08.05.2018 15:23, Cornelia Huck wrote:
+>>>> On Fri, 4 May 2018 02:24:12 +0200
+>>>> Thomas Huth <thuth@redhat.com> wrote:
+>>>>   
+>>>>> On 03.05.2018 21:50, Michael S. Tsirkin wrote:  
+>>>>>> we just need a struct name, let's add a forward
+>>>>>> declaration instead of an include.
+>>>>>>
+>>>>>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>>>>>> ---
+>>>>>>  include/hw/s390x/sclp.h | 3 ++-
+>>>>>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>>>>>
+>>>>>> diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
+>>>>>> index f9db243..6e65150 100644
+>>>>>> --- a/include/hw/s390x/sclp.h
+>>>>>> +++ b/include/hw/s390x/sclp.h
+>>>>>> @@ -16,7 +16,8 @@
+>>>>>>  
+>>>>>>  #include "hw/sysbus.h"
+>>>>>>  #include "hw/qdev.h"
+>>>>>> -#include "target/s390x/cpu-qom.h"
+>>>>>> +
+>>>>>> +typedef struct CPUS390XState CPUS390XState;    
+>>>>>
+>>>>> IIRC you have to use include/qemu/typedefs.h instead to avoid trouble
+>>>>> with older versions of GCC.  
+>>>>
+>>>> Hm, I'm wondering why we do the typedef in cpu-qom.h, while other
+>>>> architectures do it in their cpu.h.  
+>>>
+>>> See:
+>>>
+>>> commit ef2974cc270d51959ce90df6b4d4d41635d7a603
+>>> Author: David Hildenbrand <david@redhat.com>
+>>> Date:   Wed Sep 13 15:24:02 2017 +0200
+>>>
+>>>     target/s390x: move some s390x typedefs to cpu-qom.h
+>>>     
+>>>     This allows us to drop inclusion of cpu_models.h in cpu-qom.h, and
+>>>     prepares for using cpu-qom.h as a s390 specific version of typedefs.h
+>>>     
+>>>     Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>     Message-Id: <20170913132417.24384-8-david@redhat.com>
+>>>     Reviewed-by: Thomas Huth <thuth@redhat.com>
+>>>     Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>>>
+>>>  Thomas
+>>
+>> Gargh, this is all very confusing...
+> 
+> If you'd ask me, I'd say we should get rid of the typedefs and do it the
+> Linux kernel way and enforce using "struct xyz" everywhere, then you
+> also do not have this problem with typedefs.h anymore ... but well, so
+> far it seems as I'm still part of a minority with this opinion here.
 
-> >   d) For smaller amount of RAM it might still fail if
-> > RAM+rounding+pci+hotplug space goes over the limit.
-> >      Figuring that limit out is tricky (and I thought it
-> >      might be BIOS/EFI dependent as well depending where they
-> >      decide to put their PCI devices)
-> =
-
-> Both seabios and ovmf try to not go too high in address space.  Reason
-> is exactly the phys-bits issue.  Using 40 here by default does not only
-> limit the memory to 1TB.  It also has the problem that the guest thinks
-> it has 1TB of address space but in reality it might be less.  Even
-> recent skylake machines have phys-bits=3D39 (512G) only, and trying to use
-> the physical address space above 512G in the guest just doesn't work
-> because the phys-bits=3D39 limit applies to EPT too.
-> =
-
-> So checking phys-bits in the firmware, for example to place pci bars as
-> high as possible in physical address space, is not going to work.
-> =
-
-> IIRC ovmf uses a 32G sized region with 32G alignment by default, which
-> will land below 64G (aka phys-bits=3D36 address space) unless the guest
-> has more than 30 (q35) or 31 (piix4) GB of memory.
-> =
-
-> seabios will not map pci bars above 4G unless it runs out of space below
-> 4G.  If needed 64bit PCI bars will be placed right above ram, with
-> gigabyte alignment.
-
-Yep, I was tempted to set host-phys-bits=3Dtrue on upstream, but TCG
-has a fixed 40 bits last time I looked.
-
-Dave
-
-> cheers,
->   Gerd
-> =
-
-> -- =
-
-> You received this bug notification because you are subscribed to the bug
-> report.
-> https://bugs.launchpad.net/bugs/1769053
-> =
-
-> Title:
->   Cannot start a guest with more than 1TB of RAM
-> =
-
-> Status in QEMU:
->   Incomplete
-> Status in qemu package in Ubuntu:
->   Incomplete
-> =
-
-> Bug description:
->   Attempting to start a KVM guest with more than 1TB of RAM fails.
-> =
-
->   It looks like we might need some extra patches:
->   https://lists.gnu.org/archive/html/qemu-discuss/2017-12/msg00005.html
-> =
-
->   ProblemType: Bug
->   DistroRelease: Ubuntu 18.04
->   Package: qemu-system-x86 1:2.11+dfsg-1ubuntu7
->   ProcVersionSignature: Ubuntu 4.15.0-20.21-generic 4.15.17
->   Uname: Linux 4.15.0-20-generic x86_64
->   ApportVersion: 2.20.9-0ubuntu7
->   Architecture: amd64
->   CurrentDesktop: Unity:Unity7:ubuntu
->   Date: Fri May  4 16:21:14 2018
->   InstallationDate: Installed on 2017-04-05 (393 days ago)
->   InstallationMedia: Ubuntu 16.10 "Yakkety Yak" - Release amd64 (20161012=
-.2)
->   MachineType: Dell Inc. XPS 13 9360
->   ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.15.0-20-generic root=3D/dev/=
-mapper/ubuntu--vg-root ro quiet splash transparent_hugepage=3Dmadvise vt.ha=
-ndoff=3D1
->   SourcePackage: qemu
->   UpgradeStatus: Upgraded to bionic on 2018-04-30 (3 days ago)
->   dmi.bios.date: 02/26/2018
->   dmi.bios.vendor: Dell Inc.
->   dmi.bios.version: 2.6.2
->   dmi.board.name: 0PF86Y
->   dmi.board.vendor: Dell Inc.
->   dmi.board.version: A00
->   dmi.chassis.type: 9
->   dmi.chassis.vendor: Dell Inc.
->   dmi.modalias: dmi:bvnDellInc.:bvr2.6.2:bd02/26/2018:svnDellInc.:pnXPS13=
-9360:pvr:rvnDellInc.:rn0PF86Y:rvrA00:cvnDellInc.:ct9:cvr:
->   dmi.product.family: XPS
->   dmi.product.name: XPS 13 9360
->   dmi.sys.vendor: Dell Inc.
-> =
-
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1769053/+subscriptions
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1769053
-
-Title:
-  Cannot start a guest with more than 1TB of RAM
-
-Status in QEMU:
-  Incomplete
-Status in qemu package in Ubuntu:
-  Incomplete
-
-Bug description:
-  Attempting to start a KVM guest with more than 1TB of RAM fails.
-
-  It looks like we might need some extra patches:
-  https://lists.gnu.org/archive/html/qemu-discuss/2017-12/msg00005.html
-
-  ProblemType: Bug
-  DistroRelease: Ubuntu 18.04
-  Package: qemu-system-x86 1:2.11+dfsg-1ubuntu7
-  ProcVersionSignature: Ubuntu 4.15.0-20.21-generic 4.15.17
-  Uname: Linux 4.15.0-20-generic x86_64
-  ApportVersion: 2.20.9-0ubuntu7
-  Architecture: amd64
-  CurrentDesktop: Unity:Unity7:ubuntu
-  Date: Fri May  4 16:21:14 2018
-  InstallationDate: Installed on 2017-04-05 (393 days ago)
-  InstallationMedia: Ubuntu 16.10 "Yakkety Yak" - Release amd64 (20161012.2)
-  MachineType: Dell Inc. XPS 13 9360
-  ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.15.0-20-generic root=3D/dev/ma=
-pper/ubuntu--vg-root ro quiet splash transparent_hugepage=3Dmadvise vt.hand=
-off=3D1
-  SourcePackage: qemu
-  UpgradeStatus: Upgraded to bionic on 2018-04-30 (3 days ago)
-  dmi.bios.date: 02/26/2018
-  dmi.bios.vendor: Dell Inc.
-  dmi.bios.version: 2.6.2
-  dmi.board.name: 0PF86Y
-  dmi.board.vendor: Dell Inc.
-  dmi.board.version: A00
-  dmi.chassis.type: 9
-  dmi.chassis.vendor: Dell Inc.
-  dmi.modalias: dmi:bvnDellInc.:bvr2.6.2:bd02/26/2018:svnDellInc.:pnXPS1393=
-60:pvr:rvnDellInc.:rn0PF86Y:rvrA00:cvnDellInc.:ct9:cvr:
-  dmi.product.family: XPS
-  dmi.product.name: XPS 13 9360
-  dmi.sys.vendor: Dell Inc.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1769053/+subscriptions
+Maybe not getting rid of the typedefs, but I agree with removing typedefs.h.
