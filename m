@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59496)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fG4KC-0006Xd-UY
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:14:45 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fG4KD-0006YX-Tq
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:14:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fG4K8-00084W-Vd
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:14:44 -0400
-Received: from mail-pg0-x22c.google.com ([2607:f8b0:400e:c05::22c]:43440)
+	(envelope-from <richard.henderson@linaro.org>) id 1fG4KC-00087t-PX
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:14:45 -0400
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:45547)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fG4K8-00083l-OP
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:14:40 -0400
-Received: by mail-pg0-x22c.google.com with SMTP id k11-v6so20197544pgo.10
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 08:14:40 -0700 (PDT)
+	id 1fG4KC-00087N-Jb
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:14:44 -0400
+Received: by mail-pf0-x242.google.com with SMTP id c10so24105242pfi.12
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 08:14:44 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue,  8 May 2018 08:14:27 -0700
-Message-Id: <20180508151437.4232-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 00/10] target/arm: Implement v8.1-Atomics
+Date: Tue,  8 May 2018 08:14:30 -0700
+Message-Id: <20180508151437.4232-4-richard.henderson@linaro.org>
+In-Reply-To: <20180508151437.4232-1-richard.henderson@linaro.org>
+References: <20180508151437.4232-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v3 03/10] target/xtensa: Use new min/max
+ expanders
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,57 +30,99 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-This implements the Atomics extension, which is mandatory for v8.1.
-While testing the v8.2-SVE extension, I've run into issues with the
-GCC testsuite expecting this to exist.
+The generic expanders replace nearly identical code in the translator.
 
-Missing is the wiring up of the system registers to indicate that
-the extension exists, but we have no system CPU model that would
-exercise such a setting.
+Acked-by: Max Filippov <jcmvbkbc@gmail.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/xtensa/translate.c | 50 ++++++++++++++++++++++++++-------------
+ 1 file changed, 33 insertions(+), 17 deletions(-)
 
-Changes since v3:
-  * Patch 8: Do not zero-extend X[s] via the third parameter
-    to read_cpu_reg.
-
-Changes since v2:
-  * New patch to use a helper macro for opposite-endian
-    atomic_fetch_add and atomic_add_fetch, as suggested
-    by pm215.
-  * Introduce ARM_FEATURE_V8_1 and define ARM_FEATURE_V8_ATOMICS
-    in terms of that, reinforcing the mandatory nature of
-    the extension.
-  * Typo fix in patch 8.
-
-
-r~
-
-
-Richard Henderson (10):
-  tcg: Introduce helpers for integer min/max
-  target/arm: Use new min/max expanders
-  target/xtensa: Use new min/max expanders
-  tcg: Introduce atomic helpers for integer min/max
-  tcg: Use GEN_ATOMIC_HELPER_FN for opposite endian atomic add
-  target/riscv: Use new atomic min/max expanders
-  target/arm: Introduce ARM_FEATURE_V8_ATOMICS and initial decode
-  target/arm: Fill in disas_ldst_atomic
-  target/arm: Implement CAS and CASP
-  target/arm: Enable ARM_FEATURE_V8_ATOMICS for user-only
-
- accel/tcg/atomic_template.h | 112 +++++++----
- accel/tcg/tcg-runtime.h     |   8 +
- target/arm/cpu.h            |   2 +
- target/arm/helper-a64.h     |   2 +
- tcg/tcg-op.h                |  50 +++++
- tcg/tcg.h                   |   8 +
- linux-user/elfload.c        |   1 +
- target/arm/cpu64.c          |   1 +
- target/arm/helper-a64.c     |  43 +++++
- target/arm/translate-a64.c  | 375 ++++++++++++++++++++++++++++--------
- target/riscv/translate.c    |  72 ++-----
- target/xtensa/translate.c   |  50 +++--
- tcg/tcg-op.c                |  48 +++++
- 13 files changed, 587 insertions(+), 185 deletions(-)
-
+diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
+index 4f6d03059f..bad5cdb009 100644
+--- a/target/xtensa/translate.c
++++ b/target/xtensa/translate.c
+@@ -1527,10 +1527,8 @@ static void translate_clamps(DisasContext *dc, const uint32_t arg[],
+         TCGv_i32 tmp1 = tcg_const_i32(-1u << arg[2]);
+         TCGv_i32 tmp2 = tcg_const_i32((1 << arg[2]) - 1);
+ 
+-        tcg_gen_movcond_i32(TCG_COND_GT, tmp1,
+-                            cpu_R[arg[1]], tmp1, cpu_R[arg[1]], tmp1);
+-        tcg_gen_movcond_i32(TCG_COND_LT, cpu_R[arg[0]],
+-                            tmp1, tmp2, tmp1, tmp2);
++        tcg_gen_smax_i32(tmp1, tmp1, cpu_R[arg[1]]);
++        tcg_gen_smin_i32(cpu_R[arg[0]], tmp1, tmp2);
+         tcg_temp_free(tmp1);
+         tcg_temp_free(tmp2);
+     }
+@@ -1855,13 +1853,35 @@ static void translate_memw(DisasContext *dc, const uint32_t arg[],
+     tcg_gen_mb(TCG_BAR_SC | TCG_MO_ALL);
+ }
+ 
+-static void translate_minmax(DisasContext *dc, const uint32_t arg[],
+-                             const uint32_t par[])
++static void translate_smin(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
+ {
+     if (gen_window_check3(dc, arg[0], arg[1], arg[2])) {
+-        tcg_gen_movcond_i32(par[0], cpu_R[arg[0]],
+-                            cpu_R[arg[1]], cpu_R[arg[2]],
+-                            cpu_R[arg[1]], cpu_R[arg[2]]);
++        tcg_gen_smin_i32(cpu_R[arg[0]], cpu_R[arg[1]], cpu_R[arg[2]]);
++    }
++}
++
++static void translate_umin(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_window_check3(dc, arg[0], arg[1], arg[2])) {
++        tcg_gen_umin_i32(cpu_R[arg[0]], cpu_R[arg[1]], cpu_R[arg[2]]);
++    }
++}
++
++static void translate_smax(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_window_check3(dc, arg[0], arg[1], arg[2])) {
++        tcg_gen_smax_i32(cpu_R[arg[0]], cpu_R[arg[1]], cpu_R[arg[2]]);
++    }
++}
++
++static void translate_umax(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_window_check3(dc, arg[0], arg[1], arg[2])) {
++        tcg_gen_umax_i32(cpu_R[arg[0]], cpu_R[arg[1]], cpu_R[arg[2]]);
+     }
+ }
+ 
+@@ -2984,23 +3004,19 @@ static const XtensaOpcodeOps core_ops[] = {
+         .par = (const uint32_t[]){TCG_COND_NE},
+     }, {
+         .name = "max",
+-        .translate = translate_minmax,
+-        .par = (const uint32_t[]){TCG_COND_GE},
++        .translate = translate_smax,
+     }, {
+         .name = "maxu",
+-        .translate = translate_minmax,
+-        .par = (const uint32_t[]){TCG_COND_GEU},
++        .translate = translate_umax,
+     }, {
+         .name = "memw",
+         .translate = translate_memw,
+     }, {
+         .name = "min",
+-        .translate = translate_minmax,
+-        .par = (const uint32_t[]){TCG_COND_LT},
++        .translate = translate_smin,
+     }, {
+         .name = "minu",
+-        .translate = translate_minmax,
+-        .par = (const uint32_t[]){TCG_COND_LTU},
++        .translate = translate_umin,
+     }, {
+         .name = "mov",
+         .translate = translate_mov,
 -- 
 2.17.0
