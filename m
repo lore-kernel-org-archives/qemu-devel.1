@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fFxXy-0003UY-Lf
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 04:00:34 -0400
+	(envelope-from <bounces@canonical.com>) id 1fFyKr-0006gA-2l
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 04:51:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fFxXq-00047C-Td
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 04:00:30 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33986 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fFxXq-00046n-LF
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 04:00:22 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 513E340201A3
-	for <qemu-devel@nongnu.org>; Tue,  8 May 2018 08:00:21 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180413120120.GE16263@redhat.com> ("Daniel P. =?utf-8?Q?Ber?=
-	=?utf-8?Q?rang=C3=A9=22's?=
-	message of "Fri, 13 Apr 2018 13:01:20 +0100")
-References: <20180404112731.5922-1-quintela@redhat.com>
-	<20180404112731.5922-5-quintela@redhat.com>
-	<20180413120120.GE16263@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Tue, 08 May 2018 10:02:32 +0200
-Message-ID: <87lgcua82v.fsf@secure.laptop>
+	(envelope-from <bounces@canonical.com>) id 1fFyKn-0004eV-Vh
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 04:51:01 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41340)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fFyKn-0004dt-MH
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 04:50:57 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fFyKk-0006rI-I2
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 08:50:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 45B092E81C3
+	for <qemu-devel@nongnu.org>; Tue,  8 May 2018 08:50:50 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 4/8] migration: Create socket-address
- parameter
+Date: Tue, 08 May 2018 08:37:22 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1769053 <1769053@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152541524728.557.4600864098110042577.malonedeb@gac.canonical.com>
+	<152568921469.6485.15990399219355923244.malone@chaenomeles.canonical.com>
+Message-Id: <20180508083722.GB2500@work-vm>
+Errors-To: bounces@canonical.com
+Subject: Re: [Qemu-devel] [Bug 1769053] Re: Cannot start a guest with more
+ than 1TB of RAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,109 +38,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
-> On Wed, Apr 04, 2018 at 01:27:27PM +0200, Juan Quintela wrote:
->> It will be used to store the uri parameters. We want this only for
->> tcp, so we don't set it for other uris.  We need it to know what port
->> is migration running.
->>=20
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> @@ -277,6 +279,21 @@ int migrate_send_rp_req_pages(MigrationIncomingStat=
-e *mis, const char *rbname,
->>      return migrate_send_rp_message(mis, msg_type, msglen, bufc);
->>  }
->>=20=20
->> +void migrate_set_address(SocketAddress *address)
->
-> s/set/add/ in the method name since you're expecting this to be called
-> multiple times, augmenting the value, not replacing it.
+* ChristianEhrhardt (1769053@bugs.launchpad.net) wrote:
+> > Interesting; I thought this was supposed to work.
+> =
 
-Makes sense, done.
+> Exactly that was my thought when triaging it initially
+> Furthermore I assume people working la57 (https://lwn.net/Articles/730925=
+/) and such ran tests on much bigger sizes.
 
->> @@ -564,6 +581,11 @@ MigrationParameters *qmp_query_migrate_parameters(E=
-rror **errp)
->>      params->x_multifd_page_count =3D s->parameters.x_multifd_page_count;
->>      params->has_xbzrle_cache_size =3D true;
->>      params->xbzrle_cache_size =3D s->parameters.xbzrle_cache_size;
->> +    if (s->parameters.socket_address) {
->
-> nitpick, should really check  s->parameters.has_socket_address
+I assume so, but I've not looked at the detail of that.
 
-Changed to state, no has_socket_address on mis-> anymore (if
-socket_address !=3D NULL, we know there are some)
+> > Ah right Dan, if you're seeing the 40 bits physical in the guest you
+> definitely need to try the flags I suggest in comment 6; host-phys-
+> bits=3Dtrue should work for you.
+> =
 
+> I tested Bionic to be at least on libvirt 4.0 / qemu 2.11.1 when we want
+> to check things under the "supposed to work now" flag.
+> =
 
->> @@ -152,6 +153,7 @@ static void socket_start_incoming_migration(SocketAd=
-dress *saddr,
->>                                              Error **errp)
->>  {
->>      QIONetListener *listener =3D qio_net_listener_new();
->> +    int i;
->
-> Nitpick   size_t for array indexes
+> Defaults:
+> Host:  address sizes   : 46 bits physical, 48 bits virtual
+> Guest: address sizes   : 40 bits physical, 48 bits virtual
+> =
 
-changed.
+> I ensured that with option -cpu host,host-phys-bits=3Dtrue set I successf=
+ully get what my host can provide in the guest:
+> Guest: address sizes   : 46 bits physical, 48 bits virtual
+> =
 
->>=20=20
->>      qio_net_listener_set_name(listener, "migration-socket-listener");
->>=20=20
->> @@ -163,6 +165,15 @@ static void socket_start_incoming_migration(SocketA=
-ddress *saddr,
->>      qio_net_listener_set_client_func(listener,
->>                                       socket_accept_incoming_migration,
->>                                       NULL, NULL);
->> +
->> +    for (i =3D 0; i < listener->nsioc; i++)  {
->> +        SocketAddress *address =3D
->> +            qio_channel_socket_get_local_address(listener->sioc[i], err=
-p);
->> +        if (address < 0) {
->
-> 'address' is a pointer, so comparing to ' < 0' is wrong - I'm surprised
-> the compiler isn't issuing a warning about this.
+> Starting a guest with that >1TB (that would be mostly on swap if needed) =
+works just fine as expected. Here ~1063 GB from /proc/meminfo
+> MemTotal:       1114676492 kB
 
-Oops, I guess a copy & paste from other error check.  No real clue why
-compiler didn't detect it either.
->> +
->> +##
->> +# @DummyStruct:
->> +#
->> +# Both block-core and migration needs SocketAddressList
->> +# I am open to comments about how to share it
->
-> What's the actual problem you're addressing with this ?
+OK, good - that suggests there's nothing missing.
+We enable host-phys-bits=3Dtrue by default I think (in our machine type?)
 
-Until now, List of SocketAddress were onl used on block-core.  QAPI
-generator is able to cope with that.  Now, we need to use them on both
-migration.json and block-core.json.  QAPI generator is smart enough to
-detect that SocketAddressList templates have already been generated, but
-it is not able to use them on both sides.  if I put them in a common
-place that are included from both .json, it is just generated correctly,
-only once, and it compiles.
+> I also checked a more compatible approach like -cpu qemu64,phys-bits=3D42
+> and that works as well.
+> =
 
-I haven't been able to find a way to convince qapi generator that I just
-want it to generate the code here, without creating something that uses
-it.
+> IMHO - if anything - one could argue that libvirt/qemu could be smarter
+> about e.g. auto adding those arguments (or print a warning) when
+> crossing a certain memory size.
 
-I am open to changes.
+The problem is there are a whole bunch of things that are hard to deal
+with:
+  a) Cheaper CPUs tend to have smaller phys-bits even in the same
+generation; e.g. my laptop is still 36 bits, a lot are 39 bits.  I think
+the same is true of the Xeon E3-.... family.   It makes it hard to know
+what to pick when you're going to allow migration.
 
-Thanks, Juan.
+  b) Reasoning about the total address size range is difficult; you've
+got to take into account PCI address space and hot plug space etc
+to know where the upper edge is.
 
->
->> +#
->> +# @dummy-list: A dummy list
->> +#
->> +# Since: 2.13
->> +##
->> +{ 'struct': 'DummyStruct',
->> +  'data': { 'dummy-list': ['SocketAddress'] } }
->> --=20
->> 2.14.3
->>=20
->>=20
->
-> Regards,
-> Daniel
+Dave
+
+> So for now I'd stick to the "actually works" summary and keep the status
+> to incomplete.
+> =
+
+> -- =
+
+> You received this bug notification because you are subscribed to the bug
+> report.
+> https://bugs.launchpad.net/bugs/1769053
+> =
+
+> Title:
+>   Cannot start a guest with more than 1TB of RAM
+> =
+
+> Status in QEMU:
+>   Incomplete
+> Status in qemu package in Ubuntu:
+>   Incomplete
+> =
+
+> Bug description:
+>   Attempting to start a KVM guest with more than 1TB of RAM fails.
+> =
+
+>   It looks like we might need some extra patches:
+>   https://lists.gnu.org/archive/html/qemu-discuss/2017-12/msg00005.html
+> =
+
+>   ProblemType: Bug
+>   DistroRelease: Ubuntu 18.04
+>   Package: qemu-system-x86 1:2.11+dfsg-1ubuntu7
+>   ProcVersionSignature: Ubuntu 4.15.0-20.21-generic 4.15.17
+>   Uname: Linux 4.15.0-20-generic x86_64
+>   ApportVersion: 2.20.9-0ubuntu7
+>   Architecture: amd64
+>   CurrentDesktop: Unity:Unity7:ubuntu
+>   Date: Fri May  4 16:21:14 2018
+>   InstallationDate: Installed on 2017-04-05 (393 days ago)
+>   InstallationMedia: Ubuntu 16.10 "Yakkety Yak" - Release amd64 (20161012=
+.2)
+>   MachineType: Dell Inc. XPS 13 9360
+>   ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.15.0-20-generic root=3D/dev/=
+mapper/ubuntu--vg-root ro quiet splash transparent_hugepage=3Dmadvise vt.ha=
+ndoff=3D1
+>   SourcePackage: qemu
+>   UpgradeStatus: Upgraded to bionic on 2018-04-30 (3 days ago)
+>   dmi.bios.date: 02/26/2018
+>   dmi.bios.vendor: Dell Inc.
+>   dmi.bios.version: 2.6.2
+>   dmi.board.name: 0PF86Y
+>   dmi.board.vendor: Dell Inc.
+>   dmi.board.version: A00
+>   dmi.chassis.type: 9
+>   dmi.chassis.vendor: Dell Inc.
+>   dmi.modalias: dmi:bvnDellInc.:bvr2.6.2:bd02/26/2018:svnDellInc.:pnXPS13=
+9360:pvr:rvnDellInc.:rn0PF86Y:rvrA00:cvnDellInc.:ct9:cvr:
+>   dmi.product.family: XPS
+>   dmi.product.name: XPS 13 9360
+>   dmi.sys.vendor: Dell Inc.
+> =
+
+> To manage notifications about this bug go to:
+> https://bugs.launchpad.net/qemu/+bug/1769053/+subscriptions
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1769053
+
+Title:
+  Cannot start a guest with more than 1TB of RAM
+
+Status in QEMU:
+  Incomplete
+Status in qemu package in Ubuntu:
+  Incomplete
+
+Bug description:
+  Attempting to start a KVM guest with more than 1TB of RAM fails.
+
+  It looks like we might need some extra patches:
+  https://lists.gnu.org/archive/html/qemu-discuss/2017-12/msg00005.html
+
+  ProblemType: Bug
+  DistroRelease: Ubuntu 18.04
+  Package: qemu-system-x86 1:2.11+dfsg-1ubuntu7
+  ProcVersionSignature: Ubuntu 4.15.0-20.21-generic 4.15.17
+  Uname: Linux 4.15.0-20-generic x86_64
+  ApportVersion: 2.20.9-0ubuntu7
+  Architecture: amd64
+  CurrentDesktop: Unity:Unity7:ubuntu
+  Date: Fri May  4 16:21:14 2018
+  InstallationDate: Installed on 2017-04-05 (393 days ago)
+  InstallationMedia: Ubuntu 16.10 "Yakkety Yak" - Release amd64 (20161012.2)
+  MachineType: Dell Inc. XPS 13 9360
+  ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.15.0-20-generic root=3D/dev/ma=
+pper/ubuntu--vg-root ro quiet splash transparent_hugepage=3Dmadvise vt.hand=
+off=3D1
+  SourcePackage: qemu
+  UpgradeStatus: Upgraded to bionic on 2018-04-30 (3 days ago)
+  dmi.bios.date: 02/26/2018
+  dmi.bios.vendor: Dell Inc.
+  dmi.bios.version: 2.6.2
+  dmi.board.name: 0PF86Y
+  dmi.board.vendor: Dell Inc.
+  dmi.board.version: A00
+  dmi.chassis.type: 9
+  dmi.chassis.vendor: Dell Inc.
+  dmi.modalias: dmi:bvnDellInc.:bvr2.6.2:bd02/26/2018:svnDellInc.:pnXPS1393=
+60:pvr:rvnDellInc.:rn0PF86Y:rvrA00:cvnDellInc.:ct9:cvr:
+  dmi.product.family: XPS
+  dmi.product.name: XPS 13 9360
+  dmi.sys.vendor: Dell Inc.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1769053/+subscriptions
