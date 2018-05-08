@@ -1,36 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fG5lA-0007m0-US
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 12:46:42 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1fG5mS-0008J7-P3
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 12:48:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fG5l6-0000lB-2C
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 12:46:40 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42618
+	(envelope-from <borntraeger@de.ibm.com>) id 1fG5mO-00013Z-ST
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 12:48:00 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53778
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1fG5l5-0000ks-Tm
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 12:46:36 -0400
+	id 1fG5mO-00013V-N6
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 12:47:56 -0400
 Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w48GiSgg064801
-	for <qemu-devel@nongnu.org>; Tue, 8 May 2018 12:46:34 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2hufjjgcx0-1
+	w48GiSPG064809
+	for <qemu-devel@nongnu.org>; Tue, 8 May 2018 12:47:56 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2hufjjgew0-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 12:46:33 -0400
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 12:47:55 -0400
 Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 8 May 2018 17:46:32 +0100
+	Tue, 8 May 2018 17:47:54 +0100
 References: <20180508141506.56480-1-borntraeger@de.ibm.com>
 From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 8 May 2018 18:46:25 +0200
+Date: Tue, 8 May 2018 18:47:48 +0200
 MIME-Version: 1.0
 In-Reply-To: <20180508141506.56480-1-borntraeger@de.ibm.com>
 Content-Language: en-US
-Message-Id: <e41a4324-a0a6-7144-ea56-d41c21e47cfe@de.ibm.com>
+Message-Id: <ef140802-cfbe-1ea8-d26f-50c26b7a09f3@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Subject: Re: [Qemu-devel] [PATCH] s390x/ipl: Try to detect Linux vs non
@@ -89,4 +89,12 @@ On 05/08/2018 04:15 PM, Christian Borntraeger wrote:
 > +                if (iplpsw) {
 > +                    pentry = *iplpsw & 0x7fffffffUL;
 
-This needs an endianess conversion I think.
+I forgot endianess conversion here.
+
+
+> +                }
+> +            }
+>          }
+>          if (kernel_size < 0) {
+>              error_setg(&err, "could not load kernel '%s'", ipl->kernel);
+> 
