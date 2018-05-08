@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fG4PJ-0002A3-4J
+	(envelope-from <jcody@redhat.com>) id 1fG4PJ-00029y-2D
 	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:20:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fG4PI-0004ZU-6l
+	(envelope-from <jcody@redhat.com>) id 1fG4PI-0004ZJ-0w
 	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:20:01 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Tue,  8 May 2018 11:19:21 -0400
-Message-Id: <20180508151924.18741-2-jcody@redhat.com>
+Date: Tue,  8 May 2018 11:19:22 -0400
+Message-Id: <20180508151924.18741-3-jcody@redhat.com>
 In-Reply-To: <20180508151924.18741-1-jcody@redhat.com>
 References: <20180508151924.18741-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL 1/4] block/mirror: honor ratelimit again
+Subject: [Qemu-devel] [PULL 2/4] block/mirror: Make cancel always cancel
+ pre-READY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,75 +21,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-block@nongnu.org
-Cc: peter.maydell@linaro.org, sheepdog@lists.wpkg.org, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, Liu Yuan <namei.unix@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Liang Li <liliang.opensource@gmail.com>
+Cc: peter.maydell@linaro.org, sheepdog@lists.wpkg.org, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, Liu Yuan <namei.unix@gmail.com>, qemu-stable@nongnu.org
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 
-Commit b76e4458b1eb3c32e9824fe6aa51f67d2b251748 ("block/mirror: change
-the semantic of 'force' of block-job-cancel") accidentally removed the
-ratelimit in the mirror job.
+Commit b76e4458b1eb3c32e9824fe6aa51f67d2b251748 made the mirror block
+job respect block-job-cancel's @force flag: With that flag set, it would
+now always really cancel, even post-READY.
 
-Reintroduce the ratelimit but keep the block-job-cancel force=true
-behavior that was added in commit
-b76e4458b1eb3c32e9824fe6aa51f67d2b251748.
+Unfortunately, it had a side effect: Without that flag set, it would now
+never cancel, not even before READY.  Considering that is an
+incompatible change and not noted anywhere in the commit or the
+description of block-job-cancel's @force parameter, this seems
+unintentional and we should revert to the previous behavior, which is to
+immediately cancel the job when block-job-cancel is called before source
+and target are in sync (i.e. before the READY event).
 
-Note that block_job_sleep_ns() returns immediately when the job is
-cancelled.  Therefore it's safe to unconditionally call
-block_job_sleep_ns() - a cancelled job does not sleep.
-
-This commit fixes the non-deterministic qemu-iotests 185 output.  The
-test relies on the ratelimit to make the job sleep until the 'quit'
-command is processed.  Previously the job could complete before the
-'quit' command was received since there was no ratelimit.
-
-Cc: Liang Li <liliang.opensource@gmail.com>
-Cc: Jeff Cody <jcody@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-id: 20180424123527.19168-1-stefanha@redhat.com
+Cc: qemu-stable@nongnu.org
+Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1572856
+Reported-by: Yanan Fu <yfu@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-id: 20180501220509.14152-2-mreitz@redhat.com
+Reviewed-by: Jeff Cody <jcody@redhat.com>
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- block/mirror.c             | 8 +++++---
- tests/qemu-iotests/185.out | 4 ++--
- 2 files changed, 7 insertions(+), 5 deletions(-)
+ block/mirror.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/block/mirror.c b/block/mirror.c
-index 820f512c7b..9436a8d5ee 100644
+index 9436a8d5ee..99da9c0858 100644
 --- a/block/mirror.c
 +++ b/block/mirror.c
-@@ -868,12 +868,14 @@ static void coroutine_fn mirror_run(void *opaque)
+@@ -874,7 +874,9 @@ static void coroutine_fn mirror_run(void *opaque)
          }
- 
-         ret = 0;
-+
-+        if (s->synced && !should_complete) {
-+            delay_ns = (s->in_flight == 0 && cnt == 0 ? SLICE_TIME : 0);
-+        }
          trace_mirror_before_sleep(s, cnt, s->synced, delay_ns);
-+        block_job_sleep_ns(&s->common, delay_ns);
-         if (block_job_is_cancelled(&s->common) && s->common.force) {
+         block_job_sleep_ns(&s->common, delay_ns);
+-        if (block_job_is_cancelled(&s->common) && s->common.force) {
++        if (block_job_is_cancelled(&s->common) &&
++            (!s->synced || s->common.force))
++        {
              break;
--        } else if (!should_complete) {
--            delay_ns = (s->in_flight == 0 && cnt == 0 ? SLICE_TIME : 0);
--            block_job_sleep_ns(&s->common, delay_ns);
          }
          s->last_pause_ns = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
-     }
-diff --git a/tests/qemu-iotests/185.out b/tests/qemu-iotests/185.out
-index 2c4b04de73..992162f418 100644
---- a/tests/qemu-iotests/185.out
-+++ b/tests/qemu-iotests/185.out
-@@ -36,9 +36,9 @@ Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 backing_file=TEST_DIR/t.q
- {"return": {}}
- Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- {"return": {}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "mirror"}}
--{"return": {}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "disk", "len": 4194304, "offset": 4194304, "speed": 65536, "type": "mirror"}}
- 
- === Start backup job and exit qemu ===
 -- 
 2.13.6
