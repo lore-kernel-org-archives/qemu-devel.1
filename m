@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fG239-0007Mm-8f
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:49:00 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fG23D-0007Qw-4i
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:49:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fG235-00067D-9G
+	(envelope-from <stefanha@gmail.com>) id 1fG239-00068W-63
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:49:03 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:33971)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fG238-00068A-UV
 	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:48:59 -0400
-Resent-Message-Id: <E1fG235-00067D-9G@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21102)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fG235-00065O-0Y
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 08:48:55 -0400
-In-Reply-To: <1525782303-16940-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152578369374.2619.9448703930561096387@71c20359a636>
+Received: by mail-wr0-x243.google.com with SMTP id p18-v6so32212254wrm.1
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 05:48:58 -0700 (PDT)
+Date: Tue, 8 May 2018 13:48:56 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180508124856.GO19710@stefanha-x1.localdomain>
+References: <1525431107-44981-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 8 May 2018 05:48:15 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v5 0/6] s390x: vfio-ap: guest dedicated
- crypto adapters
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="keoAwTxaagou87Dg"
+Content-Disposition: inline
+In-Reply-To: <1525431107-44981-1-git-send-email-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] rename included C files to foo.inc.c,
+ remove osdep.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +30,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: akrowiak@linux.vnet.ibm.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, mjrosato@linux.vnet.ibm.com, peter.maydell@linaro.org, pasic@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, eskultet@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, cohuck@redhat.com, heiko.carstens@de.ibm.com, alex.williamson@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, jjherne@linux.vnet.ibm.com, schwidefsky@de.ibm.com, pbonzini@redhat.com, bjsdjshi@linux.vnet.ibm.com, eric.auger@redhat.com, rth@twiddle.net
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MjU3ODIzMDMtMTY5NDAtMS1naXQtc2VuZC1lbWFpbC1ha3Jvd2lha0BsaW51
-eC52bmV0LmlibS5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2NSAwLzZdIHMzOTB4
-OiB2ZmlvLWFwOiBndWVzdCBkZWRpY2F0ZWQgY3J5cHRvIGFkYXB0ZXJzCgo9PT0gVEVTVCBTQ1JJ
-UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAt
-LW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQg
-bG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRv
-CiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9y
-bWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Nj
-cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQog
-ICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0g
-VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
-NDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVt
-dQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzE1MjU3ODIzMDMtMTY5NDAtMS1n
-aXQtc2VuZC1lbWFpbC1ha3Jvd2lha0BsaW51eC52bmV0LmlibS5jb20gLT4gcGF0Y2hldy8xNTI1
-NzgyMzAzLTE2OTQwLTEtZ2l0LXNlbmQtZW1haWwtYWtyb3dpYWtAbGludXgudm5ldC5pYm0uY29t
-ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYTk5ZThlYmQ1MSBNQUlOVEFJTkVSUzog
-YWRkIGVudHJpZXMgZm9yIEFQCjgxM2MwOWVmN2UgczM5MDogZG9jOiBkZXRhaWxlZCBzcGVjaWZp
-Y2F0aW9ucyBmb3IgQVAgdmlydHVhbGl6YXRpb24KNDIxN2ZiNDNjYSBzMzkweC92ZmlvOiBhcDog
-SW50cm9kdWNlIFZGSU8gQVAgZGV2aWNlCjliNDk0MDg4ZDkgczM5MHgvY3B1bW9kZWw6IFNldCB1
-cCBDUFUgbW9kZWwgZm9yIEFQIGRldmljZSBzdXBwb3J0CjZlZjZjNGNkYzIgczM5MHgvYXA6IGJh
-c2UgQWRqdW5jdCBQcm9jZXNzb3IgKEFQKSBvYmplY3QKYjI4M2JjYzg4MSBsaW51eC1oZWFkZXJz
-OiBsaW51eCBoZWFkZXIgdXBkYXRlcyBmb3IgQVAgc3VwcG9ydAoKPT09IE9VVFBVVCBCRUdJTiA9
-PT0KQ2hlY2tpbmcgUEFUQ0ggMS82OiBsaW51eC1oZWFkZXJzOiBsaW51eCBoZWFkZXIgdXBkYXRl
-cyBmb3IgQVAgc3VwcG9ydC4uLgpDaGVja2luZyBQQVRDSCAyLzY6IHMzOTB4L2FwOiBiYXNlIEFk
-anVuY3QgUHJvY2Vzc29yIChBUCkgb2JqZWN0Li4uCkNoZWNraW5nIFBBVENIIDMvNjogczM5MHgv
-Y3B1bW9kZWw6IFNldCB1cCBDUFUgbW9kZWwgZm9yIEFQIGRldmljZSBzdXBwb3J0Li4uCldBUk5J
-Tkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0NzogRklMRTogdGFyZ2V0L3MzOTB4L2NwdV9m
-ZWF0dXJlcy5jOjQzOgorICAgIEZFQVRfSU5JVCgiYXBxY2kiLCBTMzkwX0ZFQVRfVFlQRV9TVEZM
-LCAxMiwgIlF1ZXJ5IEFQIENvbmZpZ3VyYXRpb24gZmFjaWxpdHkiKSwKCkVSUk9SOiBsaW5lIG92
-ZXIgOTAgY2hhcmFjdGVycwojNTA6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzo0
-NjoKKyAgICBGRUFUX0lOSVQoImFwZnQiLCBTMzkwX0ZFQVRfVFlQRV9TVEZMLCAxNSwgIkFkanVu
-Y3QgUHJvY2Vzc29yIEZhY2lsaXRpZXMgVGVzdCBmYWNpbGl0eSIpLAoKdG90YWw6IDEgZXJyb3Jz
-LCAxIHdhcm5pbmdzLCA1OCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9i
-bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
-c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
-TUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA0LzY6IHMzOTB4L3ZmaW86IGFwOiBJbnRyb2R1
-Y2UgVkZJTyBBUCBkZXZpY2UuLi4KQ2hlY2tpbmcgUEFUQ0ggNS82OiBzMzkwOiBkb2M6IGRldGFp
-bGVkIHNwZWNpZmljYXRpb25zIGZvciBBUCB2aXJ0dWFsaXphdGlvbi4uLgpDaGVja2luZyBQQVRD
-SCA2LzY6IE1BSU5UQUlORVJTOiBhZGQgZW50cmllcyBmb3IgQVAuLi4KPT09IE9VVFBVVCBFTkQg
-PT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0
-ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
-IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+
+--keoAwTxaagou87Dg
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, May 04, 2018 at 12:51:47PM +0200, Paolo Bonzini wrote:
+> osdep.h is only needed for files that are compiled directly.
+> Remove it from included C source files, and rename them to
+> *.inc.c so that scripts/clean-includes knows to skip them.
+>=20
+> Cc: Eric Blake <eblake@redhat.com>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  target/cris/translate.c                            |    2 +-
+>  .../cris/{translate_v10.c =3D> translate_v10.inc.c}  |    0
+>  target/mips/translate.c                            |    2 +-
+>  .../{translate_init.c =3D> translate_init.inc.c}     |    0
+>  target/ppc/int_helper.c                            |    2 +-
+>  target/ppc/{mfrom_table.c =3D> mfrom_table.inc.c}    |    0
+>  target/ppc/translate.c                             |    2 +-
+>  .../ppc/{translate_init.c =3D> translate_init.inc.c} |    1 -
+>  ui/vnc-enc-zrle.c                                  |   22 ++++++++++----=
+------
+>  ui/{vnc-enc-zrle-template.c =3D> vnc-enc-zrle.inc.c} |    0
+>  10 files changed, 15 insertions(+), 16 deletions(-)
+>  rename target/cris/{translate_v10.c =3D> translate_v10.inc.c} (100%)
+>  rename target/mips/{translate_init.c =3D> translate_init.inc.c} (100%)
+>  rename target/ppc/{mfrom_table.c =3D> mfrom_table.inc.c} (100%)
+>  rename target/ppc/{translate_init.c =3D> translate_init.inc.c} (99%)
+>  rename ui/{vnc-enc-zrle-template.c =3D> vnc-enc-zrle.inc.c} (100%)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--keoAwTxaagou87Dg
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJa8Zy4AAoJEJykq7OBq3PIc94IAL+kkiQ2JfA9IacV/+aJZsbv
+6aAcebFpYSvYqGYfi783LGQepPeI3ndt8IPRJMAaBEmbGRUyJWmE5qgnE4TwyZ3c
+ukKRZ1BGuotviKgTqlyjk0YCIgRIJYnUoB6dAnsKdFkNVHNj6PlSYGn8FEbZHM+x
+WwWrpr8kFqBEDpsD//MkBo9tenFtFMzsZH23idb4hacea01fHBVUmo4/JeESWzo6
+0pa2Gkm/XfR3Gd9a5fKxIqjZqfWzjF++79BQOO/EBxtWXVFiAZxzsFNtKgIDzTZy
+lryID8yCI6tzLjllVGl07pyjwlpsOtk2WET+Hf7j42hlhPnlT994vmFeJpZHyYk=
+=sImD
+-----END PGP SIGNATURE-----
+
+--keoAwTxaagou87Dg--
