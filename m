@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fG4Ts-0006Zb-Ge
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:24:45 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fG4Vf-0000G7-Bx
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:26:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fG4Tp-0008AT-Ah
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:24:44 -0400
-References: <20180508151035.16774-1-f4bug@amsat.org>
-	<20180508151035.16774-2-f4bug@amsat.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <0f2eb270-8541-05e3-bdba-4c294c057a39@redhat.com>
-Date: Tue, 8 May 2018 17:24:30 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fG4Ve-00015z-FS
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:26:35 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:38203)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fG4Ve-00015c-A9
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 11:26:34 -0400
+Received: by mail-oi0-x241.google.com with SMTP id k17-v6so28691533oih.5
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 08:26:34 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180508151035.16774-2-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 1/4] typedefs: Remove PcGuestInfo from
- qemu/typedefs.h
+In-Reply-To: <20180309161933.8168-31-kwolf@redhat.com>
+References: <20180309161933.8168-1-kwolf@redhat.com>
+	<20180309161933.8168-31-kwolf@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 8 May 2018 16:26:13 +0100
+Message-ID: <CAFEAcA9F3whtO-T9Em7Tg87=_ukSKS+DGEcWjVS_drnKGPui4w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 30/56] file-posix: Support .bdrv_co_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,31 +29,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Michael S . Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, QEMU Trivial <qemu-trivial@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 08.05.2018 17:10, Philippe Mathieu-Daud=C3=A9 wrote:
-> It is long gone since e4e8ba04c2007 ...
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  include/qemu/typedefs.h | 1 -
->  1 file changed, 1 deletion(-)
->=20
-> diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-> index a46b0b347b..325c72de33 100644
-> --- a/include/qemu/typedefs.h
-> +++ b/include/qemu/typedefs.h
-> @@ -62,7 +62,6 @@ typedef struct NetClientState NetClientState;
->  typedef struct NetFilterState NetFilterState;
->  typedef struct NICInfo NICInfo;
->  typedef struct NumaNodeMem NumaNodeMem;
-> -typedef struct PcGuestInfo PcGuestInfo;
->  typedef struct PCIBridge PCIBridge;
->  typedef struct PCIBus PCIBus;
->  typedef struct PCIDevice PCIDevice;
->=20
+On 9 March 2018 at 16:19, Kevin Wolf <kwolf@redhat.com> wrote:
+> This adds the .bdrv_co_create driver callback to file, which enables
+> image creation over QMP.
+> +static int coroutine_fn raw_co_create_opts(const char *filename, QemuOpts *opts,
+> +                                           Error **errp)
+> +{
+> +    BlockdevCreateOptions options;
+> +    int64_t total_size = 0;
+> +    bool nocow = false;
+> +    PreallocMode prealloc;
+> +    char *buf = NULL;
+> +    Error *local_err = NULL;
+> +
+> +    /* Skip file: protocol prefix */
+> +    strstart(filename, "file:", &filename);
 
-No need to mark this patch as RFC - this is certainly a good idea.
+This isn't new, but the code-motion causes Coverity to notice
+(CID 1390569) that this strstart() return value isn't checked (which
+we apparently do in 98 of the other 100 callsites). The "doesn't
+begin with 'file:'" case can't happen given the BlockDriver struct
+definition, though, so I've marked the warning as false-positive.
+I mention it just in case you think it's worth adding an
+"assert(filename);" here (and similarly in file-win32.c).
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+thanks
+-- PMM
