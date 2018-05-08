@@ -1,39 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1fG2iy-0002BB-2o
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:32:12 -0400
+	(envelope-from <thuth@redhat.com>) id 1fG2p0-0004Zg-2K
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:38:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1fG2is-0001TD-7c
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:32:12 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51366)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fG2ir-0001S0-U1
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:32:06 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w48DVF9b097960
-	for <qemu-devel@nongnu.org>; Tue, 8 May 2018 09:32:04 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2hubhrv7wn-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 09:32:01 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Tue, 8 May 2018 14:31:51 +0100
-References: <20180507155130.21085-1-cohuck@redhat.com>
-	<20180507155130.21085-2-cohuck@redhat.com>
-From: Halil Pasic <pasic@linux.ibm.com>
-Date: Tue, 8 May 2018 15:31:46 +0200
+	(envelope-from <thuth@redhat.com>) id 1fG2ov-0004KF-Vj
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 09:38:26 -0400
+References: <1525376963-79623-1-git-send-email-mst@redhat.com>
+	<1525376963-79623-5-git-send-email-mst@redhat.com>
+	<b3620ea6-0805-ccec-3bd5-11dc30bc2569@redhat.com>
+	<20180508152349.15ad26d0.cohuck@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <bc3f13f6-56fd-058d-d717-508b7034d437@redhat.com>
+Date: Tue, 8 May 2018 15:38:03 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180507155130.21085-2-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180508152349.15ad26d0.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <b03932e1-2e02-1d1c-cb2d-0d01ef123740@linux.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 1/2] virtio-ccw: common reset
- handler
+Subject: Re: [Qemu-devel] [PATCH 04/67] s390x: drop an unused include
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,21 +26,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, David Hildenbrand <david@redhat.com>
 
-
-
-On 05/07/2018 05:51 PM, Cornelia Huck wrote:
-> All the different virtio ccw devices use the same reset handler,
-> so let's move setting it into the base virtio ccw device class.
+On 08.05.2018 15:23, Cornelia Huck wrote:
+> On Fri, 4 May 2018 02:24:12 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
 > 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>> On 03.05.2018 21:50, Michael S. Tsirkin wrote:
+>>> we just need a struct name, let's add a forward
+>>> declaration instead of an include.
+>>>
+>>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>>> ---
+>>>  include/hw/s390x/sclp.h | 3 ++-
+>>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
+>>> index f9db243..6e65150 100644
+>>> --- a/include/hw/s390x/sclp.h
+>>> +++ b/include/hw/s390x/sclp.h
+>>> @@ -16,7 +16,8 @@
+>>>  
+>>>  #include "hw/sysbus.h"
+>>>  #include "hw/qdev.h"
+>>> -#include "target/s390x/cpu-qom.h"
+>>> +
+>>> +typedef struct CPUS390XState CPUS390XState;  
+>>
+>> IIRC you have to use include/qemu/typedefs.h instead to avoid trouble
+>> with older versions of GCC.
+> 
+> Hm, I'm wondering why we do the typedef in cpu-qom.h, while other
+> architectures do it in their cpu.h.
 
-Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+See:
 
+commit ef2974cc270d51959ce90df6b4d4d41635d7a603
+Author: David Hildenbrand <david@redhat.com>
+Date:   Wed Sep 13 15:24:02 2017 +0200
 
-> ---
->   hw/s390x/virtio-ccw.c | 13 +------------
+    target/s390x: move some s390x typedefs to cpu-qom.h
+    
+    This allows us to drop inclusion of cpu_models.h in cpu-qom.h, and
+    prepares for using cpu-qom.h as a s390 specific version of typedefs.h
+    
+    Signed-off-by: David Hildenbrand <david@redhat.com>
+    Message-Id: <20170913132417.24384-8-david@redhat.com>
+    Reviewed-by: Thomas Huth <thuth@redhat.com>
+    Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 
-[..]
+ Thomas
