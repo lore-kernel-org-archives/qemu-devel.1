@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fG3BN-0008Vd-IH
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:01:42 -0400
+	(envelope-from <berrange@redhat.com>) id 1fG3DT-0000js-2u
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:03:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fG3BH-00049v-W3
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:01:33 -0400
-Date: Tue, 8 May 2018 16:01:17 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180508160117.0d6619f2.cohuck@redhat.com>
-In-Reply-To: <388a5b5e-7ba1-4510-d2d3-88e2cc32ae94@linux.ibm.com>
-References: <20180507155130.21085-1-cohuck@redhat.com>
-	<20180507155130.21085-3-cohuck@redhat.com>
-	<388a5b5e-7ba1-4510-d2d3-88e2cc32ae94@linux.ibm.com>
+	(envelope-from <berrange@redhat.com>) id 1fG3DN-0004cn-Ff
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:03:43 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54754 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fG3DN-0004cj-BO
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 10:03:37 -0400
+Date: Tue, 8 May 2018 15:03:27 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180508140327.GY5967@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <65983efd-e68f-76f5-bfb1-a8d14045df76@amsat.org>
+	<20180508134831.GV5967@redhat.com>
+	<CAFEAcA_L3fy+MFh72=zX3pHtXP634Uhu0+G=nz-fMWaGC8muNw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] s390x/ccw: make sure all ccw devices
- are properly reset
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_L3fy+MFh72=zX3pHtXP634Uhu0+G=nz-fMWaGC8muNw@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] tpm_emu_test_wait_cond: code should not be reached
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +30,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-On Tue, 8 May 2018 15:42:17 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
+On Tue, May 08, 2018 at 02:54:39PM +0100, Peter Maydell wrote:
+> On 8 May 2018 at 14:48, Daniel P. Berrang=C3=A9 <berrange@redhat.com> w=
+rote:
+> > This test has a couple of threads running, and passes &error_abort to
+> > the qio_channel_socket_readv() function. So I expect that one thread
+> > is closing the socket connection, and the other thread has not yet
+> > shutdown cleanly, so tries to readv on a dead socket triggering the
+> > error_abort.  IOW,  qio_channel_socket_readv is likely just the sympt=
+om
+> > of brokeness somewhere else in the test, not the cause.
+>=20
+> That sounds familiar...didn't we have a thread about this a while back?
 
-> On 05/07/2018 05:51 PM, Cornelia Huck wrote:
-> > Thomas reported that the subchannel for a  3270 device that ended up
-> > in a broken state (status pending even though not enabled) did not
-> > get out of that state even after a reboot (which involves a subsytem
-> > reset). The reason for this is that the 3270 device did not define
-> > a reset handler.
-> > 
-> > Let's fix this by introducing a base reset handler (set up for all
-> > ccw devices) that resets the subchannel and have virtio-ccw call
-> > its virtio-specific reset procedure in addition to that.
-> > 
-> > Reported-by: Thomas Huth <thuth@redhat.com>
-> > Suggested-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>  
-> 
-> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
-> 
-> The 'all' from the subject is actually 'all except maybe vfio-ccw'
-> AFAIU.
+Yeah, I don't recall if it was related to this particular test, or
+another similar situation in a different test.
 
-Yeah, but as it overwrites the default handler, it's on its own :)
-
-Thanks for your review!
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
