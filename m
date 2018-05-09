@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59825)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fGSNd-0003ei-Es
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:55:55 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fGSNi-0003k3-Lv
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:55:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fGSNb-0006ph-GJ
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:55:53 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fGSNf-0006yj-OE
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:55:58 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed,  9 May 2018 18:55:23 +0200
-Message-Id: <20180509165530.29561-7-mreitz@redhat.com>
+Date: Wed,  9 May 2018 18:55:26 +0200
+Message-Id: <20180509165530.29561-10-mreitz@redhat.com>
 In-Reply-To: <20180509165530.29561-1-mreitz@redhat.com>
 References: <20180509165530.29561-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 06/13] block: Add block-specific QDict header
+Subject: [Qemu-devel] [PATCH 09/13] qdict: Make qdict_flatten()
+ shallow-clone-friendly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,403 +23,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-There are numerous QDict functions that have been introduced for and are
-used only by the block layer.  Move their declarations into an own
-header file to reflect that.
+In its current form, qdict_flatten() removes all entries from nested
+QDicts that are moved to the root QDict.  It is completely sufficient to
+remove all old entries from the root QDict, however.  If the nested
+dicts have a refcount of 1, this will automatically delete them, too.
+And if they have a greater refcount, we probably do not want to modify
+them in the first place.
 
-While qdict_extract_subqdict() is in fact used outside of the block
-layer (in util/qemu-config.c), it is still a function related very
-closely to how the block layer works with nested QDicts, namely by
-sometimes flattening them.  Therefore, its declaration is put into this
-header as well and util/qemu-config.c includes it with a comment stating
-exactly which function it needs.
+The latter observation means that it was currently (in general)
+impossible to qdict_flatten() a shallowly cloned dict because that would
+empty nested QDicts in the original dict as well.  This patch changes
+this, so you can now use qdict_flatten(qdict_shallow_clone(dict)) to get
+a flattened copy without disturbing the original.
 
-Suggested-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/qdict.h    | 35 +++++++++++++++++++++++++++++++++++
- include/qapi/qmp/qdict.h | 17 -----------------
- block.c                  |  1 +
- block/gluster.c          |  1 +
- block/iscsi.c            |  1 +
- block/nbd.c              |  1 +
- block/nfs.c              |  1 +
- block/parallels.c        |  1 +
- block/qcow.c             |  1 +
- block/qcow2.c            |  1 +
- block/qed.c              |  1 +
- block/quorum.c           |  1 +
- block/rbd.c              |  1 +
- block/sheepdog.c         |  1 +
- block/snapshot.c         |  1 +
- block/ssh.c              |  1 +
- block/vhdx.c             |  1 +
- block/vpc.c              |  1 +
- block/vvfat.c            |  1 +
- block/vxhs.c             |  1 +
- blockdev.c               |  1 +
- qobject/qdict.c          |  1 +
- tests/check-qdict.c      |  1 +
- tests/check-qobject.c    |  1 +
- tests/test-replication.c |  1 +
- util/qemu-config.c       |  1 +
- 26 files changed, 59 insertions(+), 17 deletions(-)
- create mode 100644 include/block/qdict.h
+ qobject/qdict.c | 23 ++++++++++++++++-------
+ 1 file changed, 16 insertions(+), 7 deletions(-)
 
-diff --git a/include/block/qdict.h b/include/block/qdict.h
-new file mode 100644
-index 0000000000..825e096a72
---- /dev/null
-+++ b/include/block/qdict.h
-@@ -0,0 +1,35 @@
-+/*
-+ * Special QDict functions used by the block layer
-+ *
-+ * Copyright (c) 2018 Red Hat, Inc.
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
-+ * See the COPYING.LIB file in the top-level directory.
-+ */
-+
-+#ifndef BLOCK_QDICT_H
-+#define BLOCK_QDICT_H
-+
-+#include "qapi/qmp/qdict.h"
-+#include "qapi/qmp/qobject.h"
-+#include "qapi/error.h"
-+
-+
-+void qdict_copy_default(QDict *dst, QDict *src, const char *key);
-+void qdict_set_default_str(QDict *dst, const char *key, const char *val);
-+
-+void qdict_join(QDict *dest, QDict *src, bool overwrite);
-+
-+void qdict_extract_subqdict(QDict *src, QDict **dst, const char *start);
-+void qdict_array_split(QDict *src, QList **dst);
-+int qdict_array_entries(QDict *src, const char *subqdict);
-+QObject *qdict_crumple(const QDict *src, Error **errp);
-+void qdict_flatten(QDict *qdict);
-+
-+typedef struct QDictRenames {
-+    const char *from;
-+    const char *to;
-+} QDictRenames;
-+bool qdict_rename_keys(QDict *qdict, const QDictRenames *renames, Error **errp);
-+
-+#endif
-diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
-index 921a28d2d3..7f3ec10a10 100644
---- a/include/qapi/qmp/qdict.h
-+++ b/include/qapi/qmp/qdict.h
-@@ -67,23 +67,6 @@ int64_t qdict_get_try_int(const QDict *qdict, const char *key,
- bool qdict_get_try_bool(const QDict *qdict, const char *key, bool def_value);
- const char *qdict_get_try_str(const QDict *qdict, const char *key);
- 
--void qdict_copy_default(QDict *dst, QDict *src, const char *key);
--void qdict_set_default_str(QDict *dst, const char *key, const char *val);
--
- QDict *qdict_clone_shallow(const QDict *src);
--void qdict_flatten(QDict *qdict);
--
--void qdict_extract_subqdict(QDict *src, QDict **dst, const char *start);
--void qdict_array_split(QDict *src, QList **dst);
--int qdict_array_entries(QDict *src, const char *subqdict);
--QObject *qdict_crumple(const QDict *src, Error **errp);
--
--void qdict_join(QDict *dest, QDict *src, bool overwrite);
--
--typedef struct QDictRenames {
--    const char *from;
--    const char *to;
--} QDictRenames;
--bool qdict_rename_keys(QDict *qdict, const QDictRenames *renames, Error **errp);
- 
- #endif /* QDICT_H */
-diff --git a/block.c b/block.c
-index 676e57f562..3c3e8fd11d 100644
---- a/block.c
-+++ b/block.c
-@@ -27,6 +27,7 @@
- #include "block/block_int.h"
- #include "block/blockjob.h"
- #include "block/nbd.h"
-+#include "block/qdict.h"
- #include "qemu/error-report.h"
- #include "module_block.h"
- #include "qemu/module.h"
-diff --git a/block/gluster.c b/block/gluster.c
-index 9900b6420c..b5fe7f3e87 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -11,6 +11,7 @@
- #include "qemu/osdep.h"
- #include <glusterfs/api/glfs.h>
- #include "block/block_int.h"
-+#include "block/qdict.h"
- #include "qapi/error.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qerror.h"
-diff --git a/block/iscsi.c b/block/iscsi.c
-index 3fd7203916..d70e8aea84 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -33,6 +33,7 @@
- #include "qemu/bitops.h"
- #include "qemu/bitmap.h"
- #include "block/block_int.h"
-+#include "block/qdict.h"
- #include "scsi/constants.h"
- #include "qemu/iov.h"
- #include "qemu/option.h"
-diff --git a/block/nbd.c b/block/nbd.c
-index 3e1693cc55..f499830410 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -28,6 +28,7 @@
- 
- #include "qemu/osdep.h"
- #include "block/nbd-client.h"
-+#include "block/qdict.h"
- #include "qapi/error.h"
- #include "qemu/uri.h"
- #include "block/block_int.h"
-diff --git a/block/nfs.c b/block/nfs.c
-index 66fddf12d4..5159ef0aa7 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -29,6 +29,7 @@
- #include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "block/block_int.h"
-+#include "block/qdict.h"
- #include "trace.h"
- #include "qemu/iov.h"
- #include "qemu/option.h"
-diff --git a/block/parallels.c b/block/parallels.c
-index 6e9c37f44e..c1d9643498 100644
---- a/block/parallels.c
-+++ b/block/parallels.c
-@@ -31,6 +31,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "block/block_int.h"
-+#include "block/qdict.h"
- #include "sysemu/block-backend.h"
- #include "qemu/module.h"
- #include "qemu/option.h"
-diff --git a/block/qcow.c b/block/qcow.c
-index 3ba2ca25ea..e34eedc903 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -26,6 +26,7 @@
- #include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "block/block_int.h"
-+#include "block/qdict.h"
- #include "sysemu/block-backend.h"
- #include "qemu/module.h"
- #include "qemu/option.h"
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 6d532470a8..416ab54298 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -24,6 +24,7 @@
- 
- #include "qemu/osdep.h"
- #include "block/block_int.h"
-+#include "block/qdict.h"
- #include "sysemu/block-backend.h"
- #include "qemu/module.h"
- #include <zlib.h>
-diff --git a/block/qed.c b/block/qed.c
-index 65cfe92393..324a953cbc 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -13,6 +13,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "block/qdict.h"
- #include "qapi/error.h"
- #include "qemu/timer.h"
- #include "qemu/bswap.h"
-diff --git a/block/quorum.c b/block/quorum.c
-index e448d7e384..0d90a02583 100644
---- a/block/quorum.c
-+++ b/block/quorum.c
-@@ -17,6 +17,7 @@
- #include "qemu/cutils.h"
- #include "qemu/option.h"
- #include "block/block_int.h"
-+#include "block/qdict.h"
- #include "qapi/error.h"
- #include "qapi/qapi-events-block.h"
- #include "qapi/qmp/qdict.h"
-diff --git a/block/rbd.c b/block/rbd.c
-index a16431e267..ad5fd30b43 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -18,6 +18,7 @@
- #include "qemu/error-report.h"
- #include "qemu/option.h"
- #include "block/block_int.h"
-+#include "block/qdict.h"
- #include "crypto/secret.h"
- #include "qemu/cutils.h"
- #include "qapi/qmp/qstring.h"
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index 4237132419..bf7ab896d2 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -24,6 +24,7 @@
- #include "qemu/option.h"
- #include "qemu/sockets.h"
- #include "block/block_int.h"
-+#include "block/qdict.h"
- #include "sysemu/block-backend.h"
- #include "qemu/bitops.h"
- #include "qemu/cutils.h"
-diff --git a/block/snapshot.c b/block/snapshot.c
-index 2953d96c06..f9903bc94e 100644
---- a/block/snapshot.c
-+++ b/block/snapshot.c
-@@ -25,6 +25,7 @@
- #include "qemu/osdep.h"
- #include "block/snapshot.h"
- #include "block/block_int.h"
-+#include "block/qdict.h"
- #include "qapi/error.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qerror.h"
-diff --git a/block/ssh.c b/block/ssh.c
-index 4c4fa3ccfc..eec37dd27c 100644
---- a/block/ssh.c
-+++ b/block/ssh.c
-@@ -28,6 +28,7 @@
- #include <libssh2_sftp.h>
- 
- #include "block/block_int.h"
-+#include "block/qdict.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "qemu/option.h"
-diff --git a/block/vhdx.c b/block/vhdx.c
-index 0b1e21c750..b409acfeb2 100644
---- a/block/vhdx.c
-+++ b/block/vhdx.c
-@@ -18,6 +18,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "block/block_int.h"
-+#include "block/qdict.h"
- #include "sysemu/block-backend.h"
- #include "qemu/module.h"
- #include "qemu/option.h"
-diff --git a/block/vpc.c b/block/vpc.c
-index 0ebfcd3cc8..41c8c980f1 100644
---- a/block/vpc.c
-+++ b/block/vpc.c
-@@ -26,6 +26,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "block/block_int.h"
-+#include "block/qdict.h"
- #include "sysemu/block-backend.h"
- #include "qemu/module.h"
- #include "qemu/option.h"
-diff --git a/block/vvfat.c b/block/vvfat.c
-index 662dca0114..4595f335b8 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -27,6 +27,7 @@
- #include <dirent.h>
- #include "qapi/error.h"
- #include "block/block_int.h"
-+#include "block/qdict.h"
- #include "qemu/module.h"
- #include "qemu/option.h"
- #include "qemu/bswap.h"
-diff --git a/block/vxhs.c b/block/vxhs.c
-index 339e23218d..0cb0a007e9 100644
---- a/block/vxhs.c
-+++ b/block/vxhs.c
-@@ -12,6 +12,7 @@
- #include <qnio/qnio_api.h>
- #include <sys/param.h>
- #include "block/block_int.h"
-+#include "block/qdict.h"
- #include "qapi/qmp/qerror.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qstring.h"
-diff --git a/blockdev.c b/blockdev.c
-index 3808b1fc00..19c04d9276 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -35,6 +35,7 @@
- #include "sysemu/blockdev.h"
- #include "hw/block/block.h"
- #include "block/blockjob.h"
-+#include "block/qdict.h"
- #include "block/throttle-groups.h"
- #include "monitor/monitor.h"
- #include "qemu/error-report.h"
 diff --git a/qobject/qdict.c b/qobject/qdict.c
-index 22800eeceb..0554c64553 100644
+index 83678c4951..63dcb43e73 100644
 --- a/qobject/qdict.c
 +++ b/qobject/qdict.c
-@@ -11,6 +11,7 @@
-  */
+@@ -537,7 +537,7 @@ static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
+     QObject *value;
+     const QDictEntry *entry, *next;
+     char *new_key;
+-    bool delete;
++    bool copied_value;
  
- #include "qemu/osdep.h"
-+#include "block/qdict.h"
- #include "qapi/qmp/qnum.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qbool.h"
-diff --git a/tests/check-qdict.c b/tests/check-qdict.c
-index eba5d3528e..93e2112b6d 100644
---- a/tests/check-qdict.c
-+++ b/tests/check-qdict.c
-@@ -11,6 +11,7 @@
-  */
+     entry = qdict_first(qdict);
  
- #include "qemu/osdep.h"
-+#include "block/qdict.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qlist.h"
- #include "qapi/qmp/qnum.h"
-diff --git a/tests/check-qobject.c b/tests/check-qobject.c
-index 5cb08fcb63..16ccbde82c 100644
---- a/tests/check-qobject.c
-+++ b/tests/check-qobject.c
-@@ -8,6 +8,7 @@
-  */
+@@ -546,7 +546,7 @@ static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
+         next = qdict_next(qdict, entry);
+         value = qdict_entry_value(entry);
+         new_key = NULL;
+-        delete = false;
++        copied_value = false;
  
- #include "qemu/osdep.h"
-+#include "block/qdict.h"
- #include "qapi/qmp/qbool.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qlist.h"
-diff --git a/tests/test-replication.c b/tests/test-replication.c
-index 68c0d04f2a..c8165ae954 100644
---- a/tests/test-replication.c
-+++ b/tests/test-replication.c
-@@ -15,6 +15,7 @@
- #include "qemu/option.h"
- #include "replication.h"
- #include "block/block_int.h"
-+#include "block/qdict.h"
- #include "sysemu/block-backend.h"
+         if (prefix) {
+             new_key = g_strdup_printf("%s.%s", prefix, entry->key);
+@@ -557,23 +557,32 @@ static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
+              * itself disappears. */
+             qdict_flatten_qdict(qobject_to(QDict, value), target,
+                                 new_key ? new_key : entry->key);
+-            delete = true;
++            copied_value = true;
+         } else if (qobject_type(value) == QTYPE_QLIST) {
+             qdict_flatten_qlist(qobject_to(QList, value), target,
+                                 new_key ? new_key : entry->key);
+-            delete = true;
++            copied_value = true;
+         } else if (prefix) {
+             /* All other objects are moved to the target unchanged. */
+             qdict_put_obj(target, new_key, qobject_ref(value));
+-            delete = true;
++            copied_value = true;
+         }
  
- #define IMG_SIZE (64 * 1024 * 1024)
-diff --git a/util/qemu-config.c b/util/qemu-config.c
-index 14d84022dc..9d2e278e29 100644
---- a/util/qemu-config.c
-+++ b/util/qemu-config.c
-@@ -1,4 +1,5 @@
- #include "qemu/osdep.h"
-+#include "block/qdict.h" /* for qdict_extract_subqdict() */
- #include "qapi/error.h"
- #include "qapi/qapi-commands-misc.h"
- #include "qapi/qmp/qdict.h"
+         g_free(new_key);
+ 
+-        if (delete) {
++        if (copied_value && qdict == target) {
++            /* If we have copied a value, and if we are on the root
++             * level, we need to remove the old entry.  Otherwise, we
++             * do not, because by removing these entries on the root
++             * level, the reference counts of nested dicts and listed
++             * will be reduced automatically.  In fact, we probably do
++             * not want to modify nested dicts and lists with
++             * refcounts greater than 1 anyway. */
+             qdict_del(qdict, entry->key);
+ 
+-            /* Restart loop after modifying the iterated QDict */
++            /* Restart loop after modifying the iterated QDict.  We
++             * only need to do this if qdict == target, because
++             * otherwise copying the value did not affect qdict. */
+             entry = qdict_first(qdict);
+             continue;
+         }
 -- 
 2.14.3
