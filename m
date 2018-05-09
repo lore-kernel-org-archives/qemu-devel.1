@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fGNf0-00006a-0P
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:53:31 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fGNfp-00018t-VI
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:54:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fGNez-0006K2-3r
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:53:30 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180509055802.28423-1-famz@redhat.com>
-	<20180509055802.28423-2-famz@redhat.com>
-Date: Wed, 09 May 2018 13:53:23 +0200
-In-Reply-To: <20180509055802.28423-2-famz@redhat.com> (Fam Zheng's message of
-	"Wed, 9 May 2018 13:57:58 +0800")
-Message-ID: <87wowd9hak.fsf@dusky.pond.sub.org>
+	(envelope-from <pbonzini@redhat.com>) id 1fGNfm-0007pl-Ug
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:54:22 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33986 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fGNfm-0007oK-PG
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:54:18 -0400
+References: <20180413075200.15217-1-clg@kaod.org>
+	<20180419165800.GA2731@work-vm>
+	<e5447136-8de7-73f3-ca6d-0c7a1fe11abe@kaod.org>
+	<20180509110833.GD2527@work-vm>
+	<CAFEAcA9T=UUXS1ABrtahv_LyDtAf6DT-pRoTRYFr3LvvSkdyTQ@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ec5b599c-32ae-5021-911a-db680327bbb5@redhat.com>
+Date: Wed, 9 May 2018 13:54:10 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/5] qapi: Add qapi_enum_parse_full
+In-Reply-To: <CAFEAcA9T=UUXS1ABrtahv_LyDtAf6DT-pRoTRYFr3LvvSkdyTQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] migration: discard non-migratable
+ RAMBlocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,88 +32,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>, Yulei Zhang <yulei.zhang@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, Kirti Wankhede <kwankhede@nvidia.com>, zhi.a.wang@intel.com, Paul Burton <paul.burton@mips.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>
 
-Fam Zheng <famz@redhat.com> writes:
+On 09/05/2018 13:33, Peter Maydell wrote:
+> 
+> I don't think we need to fix those first, but:
+> 
+>  * we should note in the commit message for this patch that
+>    it is a de-facto migration break for those boards
+>  * we should fix those devices/boards in this release cycle,
+>    since we've broken migration compat anyway
+>  * we should check with the MIPS maintainers that they're ok
+>    with a cross-version migration compat break for those boards
+>    (I've cc'd them)
 
-> This variant of qapi_enum_parse can do case insensitive compare.
+Isn't that implicitly the case for non-versioned machine types?...
 
-I'm curious why we need that.  We'll see when we get to the new
-function's uses.
-
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  include/qapi/util.h |  2 ++
->  qapi/qapi-util.c    | 20 ++++++++++++++++----
->  2 files changed, 18 insertions(+), 4 deletions(-)
->
-> diff --git a/include/qapi/util.h b/include/qapi/util.h
-> index a7c3c64148..2cec231919 100644
-> --- a/include/qapi/util.h
-> +++ b/include/qapi/util.h
-> @@ -19,6 +19,8 @@ typedef struct QEnumLookup {
->  const char *qapi_enum_lookup(const QEnumLookup *lookup, int val);
->  int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
->                      int def, Error **errp);
-> +int qapi_enum_parse_full(const QEnumLookup *lookup, const char *buf,
-> +                         int def, bool ignore_case, Error **errp);
->  
->  int parse_qapi_name(const char *name, bool complete);
->  
-> diff --git a/qapi/qapi-util.c b/qapi/qapi-util.c
-> index e9b266bb70..6180957edb 100644
-> --- a/qapi/qapi-util.c
-> +++ b/qapi/qapi-util.c
-> @@ -21,8 +21,8 @@ const char *qapi_enum_lookup(const QEnumLookup *lookup, int val)
->      return lookup->array[val];
->  }
->  
-> -int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
-> -                    int def, Error **errp)
-> +int qapi_enum_parse_full(const QEnumLookup *lookup, const char *buf,
-> +                         int def, bool ignore_case, Error **errp)
->  {
->      int i;
->  
-> @@ -31,8 +31,14 @@ int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
->      }
->  
->      for (i = 0; i < lookup->size; i++) {
-> -        if (!strcmp(buf, lookup->array[i])) {
-> -            return i;
-> +        if (ignore_case) {
-> +            if (!strcasecmp(buf, lookup->array[i])) {
-> +                return i;
-> +            }
-> +        } else {
-> +            if (!strcmp(buf, lookup->array[i])) {
-> +                return i;
-> +            }
->          }
->      }
->  
-> @@ -40,6 +46,12 @@ int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
->      return def;
->  }
->  
-> +int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
-> +                    int def, Error **errp)
-> +{
-> +    return qapi_enum_parse_full(lookup, buf, def, false, errp);
-> +}
-> +
->  /*
->   * Parse a valid QAPI name from @str.
->   * A valid name consists of letters, digits, hyphen and underscore.
-
-What's "full" about qapi_enum_parse_full()?
-
-Existing parse_unit_full() differs from parse_uint() in that it always
-consumes the full string.  Hmm.
-
-Do we expect to pass anything but literal false or true to @ignore_case?
-If not, then a more convenient interface is two functions, just like we
-have strcmp() and strcasecmp().  They could still call a common internal
-helper to avoid code duplication.  Consider passing strcmp, strcasecmp
-instead of false, true to it then.
+Paolo
