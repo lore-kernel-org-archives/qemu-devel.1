@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fGKEA-00063A-A6
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 04:13:35 -0400
+	(envelope-from <quintela@redhat.com>) id 1fGKWn-0003NC-BS
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 04:32:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fGKE7-0000XL-0d
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 04:13:34 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43250 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fGKWi-0003k0-AN
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 04:32:49 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46336 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fGKE6-0000WJ-Ro
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 04:13:30 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fGKWi-0003jF-6J
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 04:32:44 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 68E1CEB71E
-	for <qemu-devel@nongnu.org>; Wed,  9 May 2018 08:13:30 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A07D88182D1C
+	for <qemu-devel@nongnu.org>; Wed,  9 May 2018 08:32:43 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180502155346.GG2679@work-vm> (David Alan Gilbert's message of
-	"Wed, 2 May 2018 16:53:47 +0100")
+In-Reply-To: <20180502171938.GJ2679@work-vm> (David Alan Gilbert's message of
+	"Wed, 2 May 2018 18:19:39 +0100")
 References: <20180425112723.1111-1-quintela@redhat.com>
-	<20180425112723.1111-2-quintela@redhat.com>
-	<20180502155346.GG2679@work-vm>
+	<20180425112723.1111-9-quintela@redhat.com>
+	<20180502171938.GJ2679@work-vm>
 Reply-To: quintela@redhat.com
-Date: Wed, 09 May 2018 10:15:39 +0200
-Message-ID: <87603x6y8k.fsf@secure.laptop>
+Date: Wed, 09 May 2018 10:34:57 +0200
+Message-ID: <871sel6xce.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v12 01/21] migration: Set error state in
- case of error
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v12 08/21] migration: Transmit initial
+ package through the multifd channels
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,115 +43,35 @@ Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 > * Juan Quintela (quintela@redhat.com) wrote:
 >> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> ---
->>  migration/ram.c | 24 ++++++++++++++++++++++--
->>  1 file changed, 22 insertions(+), 2 deletions(-)
->> 
->> diff --git a/migration/ram.c b/migration/ram.c
->> index 0e90efa092..2ae560ea80 100644
->> --- a/migration/ram.c
->> +++ b/migration/ram.c
->> @@ -415,10 +415,20 @@ struct {
->>      int count;
->>  } *multifd_send_state;
->>  
->> -static void terminate_multifd_send_threads(Error *errp)
->> +static void terminate_multifd_send_threads(Error *err)
->>  {
->>      int i;
->>  
->> +    if (err) {
->> +        MigrationState *s = migrate_get_current();
->> +        migrate_set_error(s, err);
->> +        if (s->state == MIGRATION_STATUS_SETUP ||
->> +            s->state == MIGRATION_STATUS_ACTIVE) {
+>> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 >
-> Can you explain/add comment why these only set it in some states?
-> For example what about PRE_SWITCHOVER, DEVICE or postcopy?
+> Please print the magic with %x.
 
-This were the ones needed when I did the patch? O:-)
+done.
 
-Ok, looking at all of them:
-
-    MIGRATION_STATUS_NONE = 0,
-
-We can't be on that state
-
-    MIGRATION_STATUS_SETUP = 1,
-There
-
-MIGRATION_STATUS_CANCELLING = 2,
-    MIGRATION_STATUS_CANCELLED = 3,
-
-We don't want to touch in the case of that two.
-
-    MIGRATION_STATUS_ACTIVE = 4,
-
-There.
-
-    MIGRATION_STATUS_POSTCOPY_ACTIVE = 5,
-    MIGRATION_STATUS_POSTCOPY_PAUSED = 6,
-
-We are not supporing those yet.
-
-    MIGRATION_STATUS_COMPLETED = 7,
-
-This is impossible (TM)
-
-    MIGRATION_STATUS_FAILED = 8,
-
-We don't want to change.
-
-    MIGRATION_STATUS_COLO = 9,
-
-Not contemplated yet
-    MIGRATION_STATUS_PRE_SWITCHOVER = 10,
-    MIGRATION_STATUS_DEVICE = 11,
-
-Needed.
-    MIGRATION_STATUS__MAX = 12,
-
-Irrelelevant.
-
-So, I agree with your suggestion.
-
-Later, Juan.
-
-
-> Dave
 >
->> +            migrate_set_state(&s->state, s->state,
->> +                              MIGRATION_STATUS_FAILED);
->> +        }
+>> +        return -1;
 >> +    }
 >> +
->>      for (i = 0; i < multifd_send_state->count; i++) {
->>          MultiFDSendParams *p = &multifd_send_state->params[i];
->>  
->> @@ -515,10 +525,20 @@ struct {
->>      int count;
->>  } *multifd_recv_state;
->>  
->> -static void terminate_multifd_recv_threads(Error *errp)
->> +static void terminate_multifd_recv_threads(Error *err)
->>  {
->>      int i;
->>  
->> +    if (err) {
->> +        MigrationState *s = migrate_get_current();
->> +        migrate_set_error(s, err);
->> +        if (s->state == MIGRATION_STATUS_SETUP ||
->> +            s->state == MIGRATION_STATUS_ACTIVE) {
->> +            migrate_set_state(&s->state, s->state,
->> +                              MIGRATION_STATUS_FAILED);
->> +        }
+>> +    if (msg.version !=3D MULTIFD_VERSION) {
+>> +        error_setg(errp, "multifd: received packet version %d "
+>> +                   "expected %d", msg.version, MULTIFD_VERSION);
+>> +        return -1;
 >> +    }
 >> +
->>      for (i = 0; i < multifd_recv_state->count; i++) {
->>          MultiFDRecvParams *p = &multifd_recv_state->params[i];
->>  
->> -- 
->> 2.17.0
->> 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>> +    if (memcmp(msg.uuid, &qemu_uuid, sizeof(qemu_uuid))) {
+>> +        char *uuid =3D qemu_uuid_unparse_strdup(&qemu_uuid);
+>> +        error_setg(errp, "multifd: received uuid '%s' and expected "
+>> +                   "uuid '%s' for channel %hhd", msg.uuid, uuid, msg.id=
+);
+>
+> I don't think you can just print msg.uuid there; it's the raw 16 bytes
+> isn't it rather than a string?
+
+You ae right.
+
+> I suspect you need to do the unprase on both of them.
+
+Done.
+
+Thanks, Juan.
