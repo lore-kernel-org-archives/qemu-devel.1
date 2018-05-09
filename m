@@ -1,23 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41078)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=66078d76a=Paul.Durrant@citrix.com>)
-	id 1fGRIH-0007W9-6K
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 11:46:23 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fGRKQ-0000ae-2P
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 11:48:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=66078d76a=Paul.Durrant@citrix.com>)
-	id 1fGRIB-000222-Hm
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 11:46:17 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:59874)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=66078d76a=Paul.Durrant@citrix.com>)
-	id 1fGRIB-0001uW-7z
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 11:46:11 -0400
-From: Paul Durrant <paul.durrant@citrix.com>
-Date: Wed, 9 May 2018 16:46:02 +0100
-Message-ID: <20180509154604.25530-1-paul.durrant@citrix.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 0/2] xen-hvm: use new resource mapping API
+	(envelope-from <cohuck@redhat.com>) id 1fGRKM-00066C-U1
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 11:48:30 -0400
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Wed,  9 May 2018 17:48:20 +0200
+Message-Id: <20180509154822.23510-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH RFC 0/2] vfio-ccw: support for {halt,
+ clear} subchannel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,21 +18,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Paul Durrant <paul.durrant@citrix.com>
+To: Dong Jia Shi <bjsdjshi@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 
-This series modifies QEMU to use the new guest resource mapping API
-(available in Xen 4.11+) to map ioreq pages.
+Hi,
 
-Paul Durrant (2):
-  xen-hvm: create separate function for ioreq server initialization
-  xen-hvm: try to use xenforeignmemory_map_resource() to map ioreq pages
+this (RFC) is an initial stab at passing the halt and clear subchannel
+operations to the host device. Today, host userspace is emulating
+those two operations, but we really want to execute them on the host
+device (e.g. for error recovery situations).
 
- configure                   |   5 ++
- hw/i386/xen/trace-events    |   1 +
- hw/i386/xen/xen-hvm.c       | 114 ++++++++++++++++++++++++++++++++------------
- include/hw/xen/xen_common.h |  14 ++++++
- 4 files changed, 104 insertions(+), 30 deletions(-)
+The nice thing about this approach is that is independent from userspace
+changes: Unless userspace forwards halt/clear requests, we behave as
+before. Conversely, userspace can simply try to submit halt/clear, and
+old kernels will simply indicate that it is not supported.
+
+This survives triggering clear subchannel in the guest (hacked in by
+myself) together with an update QEMU (to be posted in a moment).
+
+Obviously, this needs some more work. Better support for async handling
+comes to mind. We probably also want to support other channel I/O
+instructions.
+
+Cornelia Huck (2):
+  s390/cio: export hsch to modules
+  vfio-ccw: support for halt/clear subchannel
+
+ drivers/s390/cio/ioasm.c        |  1 +
+ drivers/s390/cio/vfio_ccw_drv.c | 10 ++++-
+ drivers/s390/cio/vfio_ccw_fsm.c | 94 ++++++++++++++++++++++++++++++++++++-----
+ 3 files changed, 93 insertions(+), 12 deletions(-)
 
 -- 
-2.11.0
+2.14.3
