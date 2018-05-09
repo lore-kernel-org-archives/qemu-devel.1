@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fGMOe-0006t6-1t
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 06:32:32 -0400
+	(envelope-from <bounces@canonical.com>) id 1fGMSl-0008Fl-L5
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 06:36:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fGMOZ-0006rP-Vs
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 06:32:32 -0400
-References: <20180418075045.27393-1-olaf@aepfle.de>
-	<41df38a4-dc02-7c17-4877-26541fddd209@redhat.com>
-	<d058d5e6-710b-2f34-9828-9ddde18069a1@redhat.com>
-	<20180509074434.23de9dab.olaf@aepfle.de>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e823b03a-7269-7b43-99cb-6b734f5105db@redhat.com>
-Date: Wed, 9 May 2018 12:32:13 +0200
+	(envelope-from <bounces@canonical.com>) id 1fGMSi-0005by-Ci
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 06:36:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50744)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fGMSi-0005ag-7L
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 06:36:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fGMSh-0000Hn-23
+	for <qemu-devel@nongnu.org>; Wed, 09 May 2018 10:36:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 0E4CC2E80CB
+	for <qemu-devel@nongnu.org>; Wed,  9 May 2018 10:36:43 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180509074434.23de9dab.olaf@aepfle.de>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="n6Orlz0luk8fBsPrdZI5HD37hUyeMmbmL"
-Subject: Re: [Qemu-devel] [PATCH v1] configure: recognize more rpmbuild
- macros
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 09 May 2018 10:17:09 -0000
+From: Thomas Huth <1440843@bugs.launchpad.net>
+Reply-To: Bug 1440843 <1440843@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150406185912.26127.6004.malonedeb@gac.canonical.com>
+Message-Id: <152586102975.6935.16592237805259438061.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1440843] Re: Guest WinXP crashes when trying to
+ use a USB spectrometer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,69 +37,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Olaf Hering <olaf@aepfle.de>
-Cc: qemu-trivial@nongnu.org, "open list:All patches CC here" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---n6Orlz0luk8fBsPrdZI5HD37hUyeMmbmL
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Olaf Hering <olaf@aepfle.de>
-Cc: qemu-trivial@nongnu.org,
- "open list:All patches CC here" <qemu-devel@nongnu.org>,
- Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <f4bug@amsat.org>
-Message-ID: <e823b03a-7269-7b43-99cb-6b734f5105db@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v1] configure: recognize more rpmbuild macros
-References: <20180418075045.27393-1-olaf@aepfle.de>
- <41df38a4-dc02-7c17-4877-26541fddd209@redhat.com>
- <d058d5e6-710b-2f34-9828-9ddde18069a1@redhat.com>
- <20180509074434.23de9dab.olaf@aepfle.de>
-In-Reply-To: <20180509074434.23de9dab.olaf@aepfle.de>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+"-usbdevice host" and "usb_add host" have been removed with QEMU 2.12,
+so marking this bug as Wont-Fix.
 
-On 09/05/2018 07:44, Olaf Hering wrote:
-> Am Wed, 9 May 2018 00:15:42 +0200
-> schrieb Paolo Bonzini <pbonzini@redhat.com>:
->=20
->> Actually, --program-prefix=3D and --exec-prefix=3D have a meaning, the=
-y
->> cannot just be ignored.  For now I've removed this line; what is the
->> exact incantation used by SUSE Linux?
->=20
-> Like in every other rpm.rpm I guess:
->=20
-> /usr/lib/rpm/macros:%_exec_prefix               %{_prefix}
-> /usr/lib/rpm/macros:    --program-prefix=3D%{?_program_prefix} \\\
-> /usr/lib/rpm/macros:    --exec-prefix=3D%{_exec_prefix} \\\
->=20
-> Are you saying your %configure is different from my %configure?
-> In any case, qemu has to tolerate both options.
+** Changed in: qemu
+       Status: New =3D> Won't Fix
 
-I agree that it's a worthwhile improvement but it also has to fail if
-use an argument other than the default (or implement them, which I'm
-probably not advising here).  Otherwise packaging breaks if someone for
-whatever reason overrides the %_program_prefix and %_exec_prefix macros.
+-- =
 
-Paolo
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1440843
 
+Title:
+  Guest WinXP crashes when trying to use a USB spectrometer
 
---n6Orlz0luk8fBsPrdZI5HD37hUyeMmbmL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Status in QEMU:
+  Won't Fix
 
------BEGIN PGP SIGNATURE-----
+Bug description:
+  I'm using Amadeus spectrometer (OceanOptics USB250) via Windows-based
+  software "Quantum". I've tried six ways of attaching it to QEMU:
 
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAlryzjAACgkQv/vSX3jH
-roN66Af+PP2rpTKeAtkkai2+rNwOxrt62UJcJyfWKFWPB4Ggq3SbFhBKNHO62xgP
-xTVWAS6bGI5/5LCa8FziBbaPjza/UtU5FQGOnLjLonK0qS+03T0da+RXF7EkYCIA
-O7mO2INRFi4xaAYYY9VvRSR/JF3ykRqvGuSR14Y1YgmIBstxjRQ8BNSSlr58+tER
-VoC+nMOBH6VmIK2dwNGls1G+dYiZkTqbx8uWvGgLUrfziwZUjccB05SkxFbaXy2K
-ZrHRgznc6Hp6fUyIUVAnMZHn4rwOWPg535Pbjks9hLSUPDn+JrDFOKy5tMmGGGOR
-VZbitER70jN9rwEg1q0bSIakRu5WiA==
-=OcrH
------END PGP SIGNATURE-----
+  1. command line parameter "-device usb-host,hostbus=3D3,hostaddr=3D25"
+  2. command line parameter "-device usb-host,vendorid=3D0x2457,productid=
+=3D0x1030"
+  3. command line parameter "-usbdevice host:2457:1030
+  4. command line parameter "-usbdevice host:3.25"
+  5. qemu console command "usb_add host:2457:1030"
+  5. qemu console command "usb_add host:3.25"
 
---n6Orlz0luk8fBsPrdZI5HD37hUyeMmbmL--
+  From these, only "-device ..." options work, i.e. numbers 1 and 2 in
+  the list above, and all others lead to IRQL_NOT_LESS_OR_EQUAL BSOD in
+  usbuhci.sys when I launch Quantum, which tries to start acquiring
+  spectra.
+
+  I've also tried to reproduce the crash with a flash drive, but
+  couldn't =E2=80=94 it seems to work reliably in this case.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1440843/+subscriptions
