@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGTJ8-0004fS-G6
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 13:55:20 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fGTJ8-0004g8-NA
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 13:55:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGTJ4-0005LU-3R
+	(envelope-from <richard.henderson@linaro.org>) id 1fGTJ7-0005Rv-Et
 	for qemu-devel@nongnu.org; Wed, 09 May 2018 13:55:18 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:41945)
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:46105)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fGTJ3-0005Jt-Qi
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 13:55:13 -0400
-Received: by mail-pg0-x242.google.com with SMTP id m21-v6so23010213pgv.8
-	for <qemu-devel@nongnu.org>; Wed, 09 May 2018 10:55:13 -0700 (PDT)
+	id 1fGTJ7-0005Q7-9b
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 13:55:17 -0400
+Received: by mail-pg0-x241.google.com with SMTP id z4-v6so22986552pgu.13
+	for <qemu-devel@nongnu.org>; Wed, 09 May 2018 10:55:17 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  9 May 2018 10:54:37 -0700
-Message-Id: <20180509175458.15642-8-richard.henderson@linaro.org>
+Date: Wed,  9 May 2018 10:54:39 -0700
+Message-Id: <20180509175458.15642-10-richard.henderson@linaro.org>
 In-Reply-To: <20180509175458.15642-1-richard.henderson@linaro.org>
 References: <20180509175458.15642-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 07/28] target/microblaze: avoid integer overflow
- in next_page PC check
+Subject: [Qemu-devel] [PULL 09/28] target/s390x: avoid integer overflow in
+ next_page PC check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,43 +36,49 @@ If the PC is in the last page of the address space, next_page_start
 overflows to 0. Fix it.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Acked-by: Cornelia Huck <cohuck@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>
+Cc: Alexander Graf <agraf@suse.de>
+Cc: David Hildenbrand <david@redhat.com>
+Cc: qemu-s390x@nongnu.org
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/microblaze/translate.c | 6 +++---
+ target/s390x/translate.c | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 100883e2cc..0872dc9ded 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -1635,7 +1635,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-     uint32_t pc_start;
-     struct DisasContext ctx;
-     struct DisasContext *dc = &ctx;
--    uint32_t next_page_start, org_flags;
-+    uint32_t page_start, org_flags;
-     target_ulong npc;
-     int num_insns;
-     int max_insns;
-@@ -1661,7 +1661,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-         cpu_abort(cs, "Microblaze: unaligned PC=%x\n", pc_start);
-     }
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 7d39ab350d..44449f11ab 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -6163,7 +6163,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
+     CPUS390XState *env = cs->env_ptr;
+     DisasContext dc;
+     target_ulong pc_start;
+-    uint64_t next_page_start;
++    uint64_t page_start;
+     int num_insns, max_insns;
+     ExitStatus status;
+     bool do_debug;
+@@ -6181,7 +6181,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
+     dc.ex_value = tb->cs_base;
+     do_debug = dc.singlestep_enabled = cs->singlestep_enabled;
  
 -    next_page_start = (pc_start & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
 +    page_start = pc_start & TARGET_PAGE_MASK;
+ 
      num_insns = 0;
      max_insns = tb_cflags(tb) & CF_COUNT_MASK;
-     if (max_insns == 0) {
-@@ -1747,7 +1747,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-     } while (!dc->is_jmp && !dc->cpustate_changed
-              && !tcg_op_buf_full()
-              && !singlestep
--             && (dc->pc < next_page_start)
-+             && (dc->pc - page_start < TARGET_PAGE_SIZE)
-              && num_insns < max_insns);
- 
-     npc = dc->pc;
+@@ -6218,7 +6218,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
+         /* If we reach a page boundary, are single stepping,
+            or exhaust instruction count, stop generation.  */
+         if (status == NO_EXIT
+-            && (dc.pc >= next_page_start
++            && (dc.pc - page_start >= TARGET_PAGE_SIZE
+                 || tcg_op_buf_full()
+                 || num_insns >= max_insns
+                 || singlestep
 -- 
 2.17.0
