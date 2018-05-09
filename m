@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fGQCY-00067L-Cb
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 10:36:19 -0400
+	(envelope-from <mjc@sifive.com>) id 1fGQDS-0006Xg-9T
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 10:37:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fGQCU-0005e8-FL
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 10:36:18 -0400
-Date: Wed, 9 May 2018 16:36:07 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180509163607.499e13af.cohuck@redhat.com>
-In-Reply-To: <7c418965-f96f-fbbc-0010-8dd853280f6b@redhat.com>
-References: <20180424101859.10239-1-david@redhat.com>
-	<7c418965-f96f-fbbc-0010-8dd853280f6b@redhat.com>
+	(envelope-from <mjc@sifive.com>) id 1fGQDQ-0007gh-Om
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 10:37:14 -0400
+Received: from mail-oi0-x231.google.com ([2607:f8b0:4003:c06::231]:42805)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fGQDQ-0007fA-I4
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 10:37:12 -0400
+Received: by mail-oi0-x231.google.com with SMTP id t27-v6so31667045oij.9
+	for <qemu-devel@nongnu.org>; Wed, 09 May 2018 07:37:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x: refactor reset/reipl handling
+References: <1525810060-36690-1-git-send-email-mjc@sifive.com>
+	<CAFEAcA_iD-ub8obNp-7B27oFE_12T6iDDiAMuXcKX_TqHesofQ@mail.gmail.com>
+	<CAHNT7NtpucYDZEpCu89ztbwd+sKhR+cE7ZZxMAhEoMY37cEKEw@mail.gmail.com>
+	<CAFEAcA_X3HLQyRUYJ4WYmLL0aYagfkN9PssHqOw6bTCwiL3kcg@mail.gmail.com>
+In-Reply-To: <CAFEAcA_X3HLQyRUYJ4WYmLL0aYagfkN9PssHqOw6bTCwiL3kcg@mail.gmail.com>
+From: Michael Clark <mjc@sifive.com>
+Date: Wed, 09 May 2018 14:37:01 +0000
+Message-ID: <CAHNT7NtWB90aOkmwhL=NmMe0PyJ61Deyd-JWZ=NiOkPnDdTFCQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 0/3] RISC-V: QEMU 2.13 Minor Fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +31,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, KONRAD Frederic <frederic.konrad@adacore.com>, Palmer Dabbelt <palmer@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, RISC-V Patches <patches@groups.riscv.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, qemu-stable <qemu-stable@nongnu.org>
 
-On Wed, 9 May 2018 16:15:38 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On Wed, 9 May 2018 at 11:14 PM, Peter Maydell <peter.maydell@linaro.org>
+wrote:
 
-> On 24.04.2018 12:18, David Hildenbrand wrote:
-> > Calling pause_all_vcpus()/resume_all_vcpus() from a VCPU thread might
-> > not be the best idea. As pause_all_vcpus() temporarily drops the qemu
-> > mutex, two parallel calls to pause_all_vcpus() can be active at a time,
-> > resulting in a deadlock. (either by two VCPUs or by the main thread and a
-> > VCPU)
-> > 
-> > Let's handle it via the main loop instead, as suggested by Paolo. If we
-> > would have two parallel reset requests by two different VCPUs at the
-> > same time, the last one would win.
-> > 
-> > We use the existing ipl device to handle it. The nice side effect is
-> > that we can get rid of reipl_requested.
-> > 
-> > This change implies that all reset handling now goes via the common
-> > path, so "no-reboot" handling is now active for all kinds of reboots.
-> > 
-> > Let's execute any CPU initialization code on the target CPU using
-> > run_on_cpu.
-> > 
-> > Signed-off-by: David Hildenbrand <david@redhat.com>
-> > ---
-> > 
-> > RFC -> v1:
-> > - initital -> initial
-> > - get rid of goto
-> > - store CPU index instead of CPU. Fallback to any CPU in case not found
-> > - handle default case in switch-case  
-> 
-> Very friendly ping :)
+> On 8 May 2018 at 23:05, Michael Clark <mjc@sifive.com> wrote:
+> >
+> >
+> > On Wed, May 9, 2018 at 8:49 AM, Peter Maydell <peter.maydell@linaro.org=
+>
+> > wrote:
+> >>
+> >> On 8 May 2018 at 21:07, Michael Clark <mjc@sifive.com> wrote:
+> >> > The following changes since commit
+> >> > c8b7e627b4269a3bc3ae41d9f420547a47e6d9b9:
+> >> >
+> >> >   Merge remote-tracking branch
+> 'remotes/ericb/tags/pull-nbd-2018-05-04'
+> >> > into staging (2018-05-04 14:42:46 +0100)
+> >> >
+> >> > are available in the git repository at:
+> >> >
+> >> >   https://github.com/riscv/riscv-qemu.git
+> >> > tags/riscv-qemu-2.13-minor-fixes-2
+> >> >
+> >> > for you to fetch changes up to
+> fc28db142ea9331d24d08a6418efa93e258a6876:
+> >> >
+> >> >   riscv: requires libfdt (2018-05-09 07:57:57 +1200)
+> >> >
+> >> > ----------------------------------------------------------------
+> >> > RISC-V: QEMU 2.13 Minor Fixes
+> >> >
+> >> > * Require libfdt when configuring for 'riscv*-softmmu'
+> >> > * Increase HTIF priority and allow zero base address
+> >> >
+> >> > Consider backporting to stable branch for 2.12.1
+> >>
+> >> Ah, if you want something flagged to be backported to
+> >> the stable branch, the way to do that is to include
+> >> the line "Cc: qemu-stable@nongnu.org" in the commit
+> >> message. We use the same approach for flagging things
+> >> for stable as the Linux kernel. (Individual submaintainers
+> >> are generally in the best position to decide whether
+> >> something should go into stable, and this system leaves
+> >> that choice up to them. A patch submitter can also suggest
+> >> something for stable when you submit the initial patch for
+> >> review by adding the Cc: line and cc'ing qemu-stable on the
+> >> patchmail.)
+> >
+> >
+> > Okay. Given the 'Cc is missing in the commit (only on the cover) I coul=
+d
+> > send a separate patch.
+> >
+> > Or I can respin with the 'Cc on the configure libfdt dependency fix
+> commit
+> > and remove the backport message from the tag...
+>
+> Tag messages are just informational (we use them to help
+> in writing up the changelog for releases), mostly. So I
+> would recommend respinning the pullreq with the Cc: line
+> in the relevant commit(s).
 
-I'm currently inclined to just go ahead and merge it -- so if anyone
-still wants to provide review, now's the time :)
+
+I respun the PR with a Cc: qemu-stable in the configure libfdt dependency
+patch. You should have received a PR with the tag
+=E2=80=98riscv-qemu-2.13-minor-fixes-3=E2=80=99
+
+Thanks,
+Michael
+
+>
+>
