@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fGRwp-000689-QU
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:28:13 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fGRwr-00069n-4w
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:28:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fGRwo-00036d-Jt
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:28:11 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fGRwq-00039G-04
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:28:13 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed,  9 May 2018 18:26:35 +0200
-Message-Id: <20180509162637.15575-41-kwolf@redhat.com>
+Date: Wed,  9 May 2018 18:26:36 +0200
+Message-Id: <20180509162637.15575-42-kwolf@redhat.com>
 In-Reply-To: <20180509162637.15575-1-kwolf@redhat.com>
 References: <20180509162637.15575-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 40/42] job: Add query-jobs QMP command
+Subject: [Qemu-devel] [PATCH 41/42] iotests: Move qmp_to_opts() to VM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,210 +22,116 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-This adds a minimal query-jobs implementation that shouldn't pose many
-design questions. It can later be extended to expose more information,
-and especially job-specific information.
+qmp_to_opts() used to be a method of QMPTestCase, but recently we
+started to add more Python test cases that don't make use of
+QMPTestCase. In order to make the method usable there, move it to VM.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/block-core.json | 18 ----------------
- qapi/job.json        | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- include/qemu/job.h   |  3 +++
- job-qmp.c            | 54 +++++++++++++++++++++++++++++++++++++++++++++++
- job.c                |  2 +-
- 5 files changed, 117 insertions(+), 19 deletions(-)
+ tests/qemu-iotests/041        |  6 +++---
+ tests/qemu-iotests/155        |  2 +-
+ tests/qemu-iotests/iotests.py | 45 ++++++++++++++++++++++---------------------
+ 3 files changed, 27 insertions(+), 26 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index f2da7d696d..d38dfa7836 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1051,24 +1051,6 @@
-   'data': ['top', 'full', 'none', 'incremental'] }
+diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
+index e94587950c..c20ac7da87 100755
+--- a/tests/qemu-iotests/041
++++ b/tests/qemu-iotests/041
+@@ -1030,9 +1030,9 @@ class TestOrphanedSource(iotests.QMPTestCase):
+                  'read-only': 'on' }
  
- ##
--# @JobType:
--#
--# Type of a background job.
--#
--# @commit: block commit job type, see "block-commit"
--#
--# @stream: block stream job type, see "block-stream"
--#
--# @mirror: drive mirror job type, see "drive-mirror"
--#
--# @backup: drive backup job type, see "drive-backup"
--#
--# Since: 1.7
--##
--{ 'enum': 'JobType',
--  'data': ['commit', 'stream', 'mirror', 'backup'] }
+         self.vm = iotests.VM()
+-        self.vm.add_blockdev(self.qmp_to_opts(blk0))
+-        self.vm.add_blockdev(self.qmp_to_opts(blk1))
+-        self.vm.add_blockdev(self.qmp_to_opts(blk2))
++        self.vm.add_blockdev(self.vm.qmp_to_opts(blk0))
++        self.vm.add_blockdev(self.vm.qmp_to_opts(blk1))
++        self.vm.add_blockdev(self.vm.qmp_to_opts(blk2))
+         self.vm.launch()
+ 
+     def tearDown(self):
+diff --git a/tests/qemu-iotests/155 b/tests/qemu-iotests/155
+index 42dae04c83..63a5b5e2c0 100755
+--- a/tests/qemu-iotests/155
++++ b/tests/qemu-iotests/155
+@@ -63,7 +63,7 @@ class BaseClass(iotests.QMPTestCase):
+                     'driver': iotests.imgfmt,
+                     'file': {'driver': 'file',
+                              'filename': source_img}}
+-        self.vm.add_blockdev(self.qmp_to_opts(blockdev))
++        self.vm.add_blockdev(self.vm.qmp_to_opts(blockdev))
+         self.vm.add_device('virtio-blk,id=qdev0,drive=source')
+         self.vm.launch()
+ 
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index b25d48a91b..7040f71b57 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -363,6 +363,27 @@ class VM(qtest.QEMUQtestMachine):
+         return self.qmp('human-monitor-command',
+                         command_line='qemu-io %s "%s"' % (drive, cmd))
+ 
++    def flatten_qmp_object(self, obj, output=None, basestr=''):
++        if output is None:
++            output = dict()
++        if isinstance(obj, list):
++            for i in range(len(obj)):
++                self.flatten_qmp_object(obj[i], output, basestr + str(i) + '.')
++        elif isinstance(obj, dict):
++            for key in obj:
++                self.flatten_qmp_object(obj[key], output, basestr + key + '.')
++        else:
++            output[basestr[:-1]] = obj # Strip trailing '.'
++        return output
++
++    def qmp_to_opts(self, obj):
++        obj = self.flatten_qmp_object(obj)
++        output_list = list()
++        for key in obj:
++            output_list += [key + '=' + obj[key]]
++        return ','.join(output_list)
++
++
+ 
+ index_re = re.compile(r'([^\[]+)\[([^\]]+)\]')
+ 
+@@ -390,26 +411,6 @@ class QMPTestCase(unittest.TestCase):
+                     self.fail('invalid index "%s" in path "%s" in "%s"' % (idx, path, str(d)))
+         return d
+ 
+-    def flatten_qmp_object(self, obj, output=None, basestr=''):
+-        if output is None:
+-            output = dict()
+-        if isinstance(obj, list):
+-            for i in range(len(obj)):
+-                self.flatten_qmp_object(obj[i], output, basestr + str(i) + '.')
+-        elif isinstance(obj, dict):
+-            for key in obj:
+-                self.flatten_qmp_object(obj[key], output, basestr + key + '.')
+-        else:
+-            output[basestr[:-1]] = obj # Strip trailing '.'
+-        return output
 -
--##
- # @JobVerb:
- #
- # Represents command verbs that can be applied to a job.
-diff --git a/qapi/job.json b/qapi/job.json
-index 7b84158292..742fa97768 100644
---- a/qapi/job.json
-+++ b/qapi/job.json
-@@ -5,6 +5,24 @@
- ##
+-    def qmp_to_opts(self, obj):
+-        obj = self.flatten_qmp_object(obj)
+-        output_list = list()
+-        for key in obj:
+-            output_list += [key + '=' + obj[key]]
+-        return ','.join(output_list)
+-
+     def assert_qmp_absent(self, d, path):
+         try:
+             result = self.dictpath(d, path)
+@@ -444,8 +445,8 @@ class QMPTestCase(unittest.TestCase):
+         '''Asserts that the given filename is a json: filename and that its
+            content is equal to the given reference object'''
+         self.assertEqual(json_filename[:5], 'json:')
+-        self.assertEqual(self.flatten_qmp_object(json.loads(json_filename[5:])),
+-                         self.flatten_qmp_object(reference))
++        self.assertEqual(self.vm.flatten_qmp_object(json.loads(json_filename[5:])),
++                         self.vm.flatten_qmp_object(reference))
  
- ##
-+# @JobType:
-+#
-+# Type of a background job.
-+#
-+# @commit: block commit job type, see "block-commit"
-+#
-+# @stream: block stream job type, see "block-stream"
-+#
-+# @mirror: drive mirror job type, see "drive-mirror"
-+#
-+# @backup: drive backup job type, see "drive-backup"
-+#
-+# Since: 1.7
-+##
-+{ 'enum': 'JobType',
-+  'data': ['commit', 'stream', 'mirror', 'backup'] }
-+
-+##
- # @JobStatus:
- #
- # Indicates the present state of a given job in its lifetime.
-@@ -175,3 +193,44 @@
- # Since: 2.13
- ##
- { 'command': 'job-finalize', 'data': { 'id': 'str' } }
-+
-+##
-+# @JobInfo:
-+#
-+# Information about a job.
-+#
-+# @id:                  The job identifier
-+#
-+# @type:                The job type
-+#
-+# @status:              Current job state/status
-+#
-+# @current-progress:    The current progress value
-+#
-+# @total-progress:      The maximum progress value
-+#
-+# @error:               If this field is present, the job failed; if it is
-+#                       still missing in the CONCLUDED state, this indicates
-+#                       successful completion.
-+#
-+#                       The value is a human-readable error message to describe
-+#                       the reason for the job failure. It should not be parsed
-+#                       by applications.
-+#
-+# Since: 2.13
-+##
-+{ 'struct': 'JobInfo',
-+  'data': { 'id': 'str', 'type': 'JobType', 'status': 'JobStatus',
-+            'current-progress': 'int', 'total-progress': 'int',
-+            '*error': 'str' } }
-+
-+##
-+# @query-jobs:
-+#
-+# Return information about jobs.
-+#
-+# Returns: a list with a @JobInfo for each active job
-+#
-+# Since: 2.13
-+##
-+{ 'command': 'query-jobs', 'returns': ['JobInfo'] }
-diff --git a/include/qemu/job.h b/include/qemu/job.h
-index 9e61663f3a..da1c56f515 100644
---- a/include/qemu/job.h
-+++ b/include/qemu/job.h
-@@ -391,6 +391,9 @@ JobType job_type(Job *job);
- /** Returns the enum string for the JobType of a given Job. */
- const char *job_type_str(Job *job);
- 
-+/** Returns true if the job should not be visible to the management layer. */
-+bool job_is_internal(Job *job);
-+
- /** Returns whether the job is scheduled for cancellation. */
- bool job_is_cancelled(Job *job);
- 
-diff --git a/job-qmp.c b/job-qmp.c
-index f32cb8b73e..7425a2a490 100644
---- a/job-qmp.c
-+++ b/job-qmp.c
-@@ -138,3 +138,57 @@ void qmp_job_dismiss(const char *id, Error **errp)
-     job_dismiss(&job, errp);
-     aio_context_release(aio_context);
- }
-+
-+static JobInfo *job_query_single(Job *job, Error **errp)
-+{
-+    JobInfo *info;
-+    const char *errmsg = NULL;
-+
-+    assert (!job_is_internal(job));
-+
-+    if (job->ret < 0) {
-+        errmsg = strerror(-job->ret);
-+    }
-+
-+    info = g_new(JobInfo, 1);
-+    *info = (JobInfo) {
-+        .id                 = g_strdup(job->id),
-+        .type               = job_type(job),
-+        .status             = job->status,
-+        .current_progress   = job->progress_current,
-+        .total_progress     = job->progress_total,
-+        .has_error          = !!errmsg,
-+        .error              = g_strdup(errmsg),
-+    };
-+
-+    return info;
-+}
-+
-+JobInfoList *qmp_query_jobs(Error **errp)
-+{
-+    JobInfoList *head = NULL, **p_next = &head;
-+    Job *job;
-+
-+    for (job = job_next(NULL); job; job = job_next(job)) {
-+        JobInfoList *elem;
-+        AioContext *aio_context;
-+
-+        if (job_is_internal(job)) {
-+            continue;
-+        }
-+        elem = g_new0(JobInfoList, 1);
-+        aio_context = job->aio_context;
-+        aio_context_acquire(aio_context);
-+        elem->value = job_query_single(job, errp);
-+        aio_context_release(aio_context);
-+        if (!elem->value) {
-+            g_free(elem);
-+            qapi_free_JobInfoList(head);
-+            return NULL;
-+        }
-+        *p_next = elem;
-+        p_next = &elem->next;
-+    }
-+
-+    return head;
-+}
-diff --git a/job.c b/job.c
-index 4dc45648e9..178d540dc7 100644
---- a/job.c
-+++ b/job.c
-@@ -158,7 +158,7 @@ static int job_txn_apply(JobTxn *txn, int fn(Job *), bool lock)
-     return rc;
- }
- 
--static bool job_is_internal(Job *job)
-+bool job_is_internal(Job *job)
- {
-     return (job->id == NULL);
- }
+     def cancel_and_wait(self, drive='drive0', force=False, resume=False):
+         '''Cancel a block job and wait for it to finish, returning the event'''
 -- 
 2.13.6
