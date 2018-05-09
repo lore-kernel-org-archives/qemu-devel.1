@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58546)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fGG4i-0004aX-S6
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 23:47:34 -0400
+	id 1fGG4l-0004cu-SF
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 23:47:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fGG4h-0002yc-UN
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 23:47:32 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:43754)
+	id 1fGG4k-00033k-TL
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 23:47:35 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:37782)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fGG4h-0002xp-PM
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 23:47:31 -0400
-Received: by mail-qk0-x244.google.com with SMTP id h19so26472026qkj.10
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 20:47:31 -0700 (PDT)
+	id 1fGG4k-00032c-Nl
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 23:47:34 -0400
+Received: by mail-qk0-x242.google.com with SMTP id d74so26465926qkg.4
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 20:47:34 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed,  9 May 2018 00:46:52 -0300
-Message-Id: <20180509034658.26455-9-f4bug@amsat.org>
+Date: Wed,  9 May 2018 00:46:53 -0300
+Message-Id: <20180509034658.26455-10-f4bug@amsat.org>
 In-Reply-To: <20180509034658.26455-1-f4bug@amsat.org>
 References: <20180509034658.26455-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 08/14] sdcard: Extract
- sd_frame48_verify_checksum() out for qtesting
+Subject: [Qemu-devel] [PATCH v2 09/14] sdcard: Add
+ sd_frame136_verify_checksum()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,57 +40,74 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
  include/hw/sd/sd.h     | 10 ++++++++++
- hw/sd/sd.c             |  2 +-
  hw/sd/sdmmc-internal.c |  6 ++++++
- 3 files changed, 17 insertions(+), 1 deletion(-)
+ tests/sdcard-test.c    | 12 ++++++++++++
+ 3 files changed, 28 insertions(+)
 
 diff --git a/include/hw/sd/sd.h b/include/hw/sd/sd.h
-index c854ed6a14..752d8edd6c 100644
+index 752d8edd6c..83399cd42d 100644
 --- a/include/hw/sd/sd.h
 +++ b/include/hw/sd/sd.h
-@@ -150,6 +150,16 @@ uint8_t sd_frame48_calc_checksum(const void *content);
+@@ -160,6 +160,16 @@ uint8_t sd_frame136_calc_checksum(const void *content);
   */
- uint8_t sd_frame136_calc_checksum(const void *content);
+ bool sd_frame48_verify_checksum(const void *content);
  
 +/**
-+ * sd_frame48_verify_checksum:
++ * sd_frame136_verify_checksum:
 + * @content: pointer to the frame content
 + *
-+ * Verify the 7-bit CRC checksum of a 48-bit SD frame.
++ * Verify the 7-bit CRC checksum of a 136-bit SD frame.
 + *
 + * Returns: A boolean indicating whether the frame 7-bit CRC is correct.
 + */
-+bool sd_frame48_verify_checksum(const void *content);
++bool sd_frame136_verify_checksum(const void *content);
 +
  /* Legacy functions to be used only by non-qdevified callers */
  SDState *sd_init(BlockBackend *bs, bool is_spi);
  int sd_do_command(SDState *sd, SDRequest *req,
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 6fc8daa5b8..125707a65c 100644
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -473,7 +473,7 @@ static bool sd_req_crc_is_valid(SDRequest *req)
-     buffer[0] = 0x40 | req->cmd;
-     stl_be_p(&buffer[1], req->arg);
-     return true;
--    return sd_frame48_calc_checksum(buffer) == req->crc; /* TODO */
-+    return sd_frame48_verify_checksum(buffer); /* TODO */
- }
- 
- static void sd_response_r1_make(SDState *sd, uint8_t *response)
 diff --git a/hw/sd/sdmmc-internal.c b/hw/sd/sdmmc-internal.c
-index a94d65b756..a9d19ce3eb 100644
+index a9d19ce3eb..f709211401 100644
 --- a/hw/sd/sdmmc-internal.c
 +++ b/hw/sd/sdmmc-internal.c
-@@ -105,3 +105,9 @@ uint8_t sd_frame136_calc_checksum(const void *content)
- {
-     return (sd_crc7(content, F136_CONTENT_LENGTH) << 1) | 1;
+@@ -111,3 +111,9 @@ bool sd_frame48_verify_checksum(const void *content)
+     return sd_frame48_calc_checksum(content)
+            == ((const uint8_t *)content)[F48_CONTENT_LENGTH];
  }
 +
-+bool sd_frame48_verify_checksum(const void *content)
++bool sd_frame136_verify_checksum(const void *content)
 +{
-+    return sd_frame48_calc_checksum(content)
-+           == ((const uint8_t *)content)[F48_CONTENT_LENGTH];
++    return sd_frame136_calc_checksum(content)
++           == ((const uint8_t *)content)[F136_CONTENT_LENGTH];
 +}
+diff --git a/tests/sdcard-test.c b/tests/sdcard-test.c
+index c59af28382..81789d1f88 100644
+--- a/tests/sdcard-test.c
++++ b/tests/sdcard-test.c
+@@ -23,6 +23,17 @@ static void test_sd_response_frame136_crc7(void)
+            sizeof(buf));
+     buf[15] = sd_frame136_calc_checksum(buf);
+     g_assert_cmphex(buf[15], ==, 0xad);
++
++    g_assert_true(sd_frame136_verify_checksum(buf));
++}
++
++static void test_sd_verify_cksum_frame136(void)
++{
++    uint8_t buf[16];
++
++    memset(buf, 69, sizeof(buf));
++    buf[15] = sd_frame136_calc_checksum(buf);
++    g_assert_true(sd_frame136_verify_checksum(buf));
+ }
+ 
+ int main(int argc, char *argv[])
+@@ -30,6 +41,7 @@ int main(int argc, char *argv[])
+     g_test_init(&argc, &argv, NULL);
+ 
+     qtest_add_func("sd/prepare_resp136_crc7", test_sd_response_frame136_crc7);
++    qtest_add_func("sd/verify_cksum_frame136", test_sd_verify_cksum_frame136);
+ 
+     return g_test_run();
+ }
 -- 
 2.17.0
