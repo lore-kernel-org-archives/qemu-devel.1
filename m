@@ -1,38 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fGJS9-0003IS-Et
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 03:23:59 -0400
+	(envelope-from <clg@kaod.org>) id 1fGJVW-0004yo-2a
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 03:27:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fGJS6-0007Cy-Ac
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 03:23:57 -0400
-Received: from 4.mo178.mail-out.ovh.net ([46.105.49.171]:37214)
+	(envelope-from <clg@kaod.org>) id 1fGJVS-0004UN-Sw
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 03:27:26 -0400
+Received: from 1.mo69.mail-out.ovh.net ([178.33.251.173]:48814)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fGJS6-00072H-0x
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 03:23:54 -0400
-Received: from player714.ha.ovh.net (unknown [10.109.108.59])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id A8D7714288
-	for <qemu-devel@nongnu.org>; Wed,  9 May 2018 09:23:45 +0200 (CEST)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fGJVS-0004TH-J9
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 03:27:22 -0400
+Received: from player714.ha.ovh.net (unknown [10.109.120.77])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 705C01560A
+	for <qemu-devel@nongnu.org>; Wed,  9 May 2018 09:27:20 +0200 (CEST)
 References: <20180419124331.3915-1-clg@kaod.org>
-	<20180419124331.3915-5-clg@kaod.org>
-	<20180424065131.GQ19804@umbus.fritz.box>
-	<5def5bbb-9842-0121-e889-014ba88fd4c5@kaod.org>
-	<20180426042002.GF8800@umbus.fritz.box>
-	<660d1e36-b269-0202-7ac5-570479bb4083@kaod.org>
-	<20180503052205.GQ13229@umbus.fritz.box>
-	<a671a058-ab56-6a97-d172-7fa22dca1f25@kaod.org>
-	<20180504033325.GR13229@umbus.fritz.box>
-	<504aeada-4eb9-3969-a3a0-a0e03d9d19b8@kaod.org>
-	<20180505042604.GJ13229@umbus.fritz.box>
+	<20180419124331.3915-7-clg@kaod.org>
+	<20180426071129.GJ8800@umbus.fritz.box>
+	<9273a240-6518-155f-ed78-79abe53761e3@kaod.org>
+	<20180503053532.GR13229@umbus.fritz.box>
+	<9c6d62fe-40e7-0bb9-678e-ed8246373e98@kaod.org>
+	<20180504045149.GT13229@umbus.fritz.box>
+	<d1ba980e-8739-bf54-a52a-8e747944e2db@kaod.org>
+	<20180505042702.GK13229@umbus.fritz.box>
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <7f2d8ad0-27b0-1449-ae28-2589de8d3c50@kaod.org>
-Date: Wed, 9 May 2018 09:23:40 +0200
+Message-ID: <6a436b75-5a77-4f98-e5a6-64c884b04c13@kaod.org>
+Date: Wed, 9 May 2018 09:27:17 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180505042604.GJ13229@umbus.fritz.box>
+In-Reply-To: <20180505042702.GK13229@umbus.fritz.box>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 04/35] spapr/xive: introduce a XIVE
- interrupt controller for sPAPR
+Subject: Re: [Qemu-devel] [PATCH v3 06/35] spapr/xive: introduce a XIVE
+ interrupt presenter model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,192 +42,301 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On 05/05/2018 06:26 AM, David Gibson wrote:
-> On Fri, May 04, 2018 at 03:05:08PM +0200, C=E9dric Le Goater wrote:
->> On 05/04/2018 05:33 AM, David Gibson wrote:
->>> On Thu, May 03, 2018 at 06:50:09PM +0200, C=E9dric Le Goater wrote:
->>>> On 05/03/2018 07:22 AM, David Gibson wrote:
->>>>> On Thu, Apr 26, 2018 at 12:43:29PM +0200, C=E9dric Le Goater wrote:
->>>>>> On 04/26/2018 06:20 AM, David Gibson wrote:
->>>>>>> On Tue, Apr 24, 2018 at 11:46:04AM +0200, C=E9dric Le Goater wrot=
+On 05/05/2018 06:27 AM, David Gibson wrote:
+> On Fri, May 04, 2018 at 03:11:57PM +0200, C=E9dric Le Goater wrote:
+>> On 05/04/2018 06:51 AM, David Gibson wrote:
+>>> On Thu, May 03, 2018 at 06:06:14PM +0200, C=E9dric Le Goater wrote:
+>>>> On 05/03/2018 07:35 AM, David Gibson wrote:
+>>>>> On Thu, Apr 26, 2018 at 11:27:21AM +0200, C=E9dric Le Goater wrote:
+>>>>>> On 04/26/2018 09:11 AM, David Gibson wrote:
+>>>>>>> On Thu, Apr 19, 2018 at 02:43:02PM +0200, C=E9dric Le Goater wrot=
 e:
->>>>>>>> On 04/24/2018 08:51 AM, David Gibson wrote:
->>>>>>>>> On Thu, Apr 19, 2018 at 02:43:00PM +0200, C=E9dric Le Goater wr=
-ote:
->>>>>>>>>> sPAPRXive is a model for the XIVE interrupt controller device =
-of the
->>>>>>>>>> sPAPR machine. It holds the routing XIVE table, the Interrupt
->>>>>>>>>> Virtualization Entry (IVE) table which associates interrupt so=
-urce
->>>>>>>>>> numbers with targets.
->>>>>>>>>>
->>>>>>>>>> Also extend the XiveFabric with an accessor to the IVT. This w=
-ill be
->>>>>>>>>> needed by the routing algorithm.
->>>>>>>>>>
->>>>>>>>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->>>>>>>>>> ---
->>>>>>>>>>
->>>>>>>>>>  May be should introduce a XiveRouter model to hold the IVT. T=
-o be
->>>>>>>>>>  discussed.
->>>>>>>>>
->>>>>>>>> Yeah, maybe.  Am I correct in thinking that on pnv there could =
-be more
->>>>>>>>> than one XiveRouter?
+>>>>>>>> The XIVE presenter engine uses a set of registers to handle prio=
+rity
+>>>>>>>> management and interrupt acknowledgment among other things. The =
+most
+>>>>>>>> important ones being :
 >>>>>>>>
->>>>>>>> There is only one, the main IC.=20
->>>>>>>
->>>>>>> Ok, that's what I thought originally.  In that case some of the s=
-tuff
->>>>>>> in the patches really doesn't make sense to me.
->>>>>>
->>>>>> well, there is one IC per chip on powernv, but we haven't reach th=
-at part
->>>>>> yet.
->>>>>
->>>>> Hmm.  There's some things we can delay dealing with, but I don't th=
-ink
->>>>> this is one of them.  I think we need to understand how multichip i=
-s
->>>>> going to work in order to come up with a sane architecture.  Otherw=
-ise
->>>>> I fear we'll end up with something that we either need to horribly
->>>>> bastardize for multichip, or have to rework things dramatically
->>>>> leading to migration nightmares.
->>>>
->>>> So, it is all controlled by MMIO, so we should be fine on that part.=
-=20
->>>> As for the internal tables, they are all configured by firmware, usi=
-ng
->>>> a chip identifier (block). I need to check how the remote XIVE are=20
->>>> accessed. I think this is by MMIO.=20
->>>
->>> Right, but for powernv we execute OPAL inside the VM, rather than
->>> emulating its effects.  So we still need to model the actual hardware
->>> interfaces.  OPAL hides the details from the kernel, but not from us
->>> on the other side.
->>
->> Yes. This is the case in the current model. I took a look today and
->> I have a few fixes for the MMIO layout for P9 chips which I will send.
->>
->> As for XIVE, the model needs to be a little more  complex to support=20
->> VSD_MODE_FORWARD tables which describe how to forward a notification
->> to another XIVE IC on another chip. They contain an address on which=20
->> to load, This is another hop in the notification chain. =20
->=20
-> Ah, ok.  So is that mode and address configured in the (bare metal)
-> IVT as well?  Or is that a different piece of configuration?
-
-The mode of a virtual structure table is configured by firmware.=20
-There are 4 main table types:  IVT, SBE, EQD, VPD (and an extra one
-for IRQ) for the 16 possible blocks of a machine (I am simplifying=20
-a bit there).=20
-
-Local tables to a block/chip, today, are set to EXCLUSIVE and all=20
-remotes tables set to FORWARD.
-
-The address of a table is configured by FW also. In case of a=20
-FORWARD table, it is set to the remote IC BAR + one page. This page=20
-has two 2K windows : one for for HW interrupt triggers and another=20
-one for to forward interrupts and for operation synchronization.=20
->>>> I haven't looked at multichip XIVE support but I am not too worried =
-as=20
->>>> the framework is already in place for the machine.
->>>> =20
->>>>>>>>> If we did have a XiveRouter, I'm not sure we'd need the XiveFab=
-ric
->>>>>>>>> interface, possibly its methods could just be class methods of
->>>>>>>>> XiveRouter.
+>>>>>>>>   - Interrupt Priority Register (PIPR)
+>>>>>>>>   - Interrupt Pending Buffer (IPB)
+>>>>>>>>   - Current Processor Priority (CPPR)
+>>>>>>>>   - Notification Source Register (NSR)
 >>>>>>>>
->>>>>>>> Yes. We could introduce a XiveRouter to share the ivt table betw=
-een=20
->>>>>>>> the sPAPRXive and the PnvXIVE models, the interrupt controllers =
-of
->>>>>>>> the machines. Methods would provide way to get the ivt/eq/nvt
->>>>>>>> objects required for routing. I need to add a set_eq() to push t=
-he
->>>>>>>> EQ data.
->>>>>>>
->>>>>>> Hrm.  Well, to add some more clarity, let's say the XiveRouter is=
+>>>>>>>> There is one set of registers per level of privilege, four in al=
+l :
+>>>>>>>> HW, HV pool, OS and User. These are called rings. All registers =
+are
+>>>>>>>> accessible through a specific MMIO region called the Thread Inte=
+rrupt
+>>>>>>>> Management Areas (TIMA) but, depending on the privilege level of=
  the
->>>>>>> object which owns the IVT. =20
->>>>>>
->>>>>> OK. that would be a model with some state and not an interface.
->>>>>
->>>>> Yes.  For papr variant it would have the whole IVT contents as its
->>>>> state.  For the powernv, just the registers telling it where to fin=
-d
->>>>> the IVT in RAM.
->>>>>
->>>>>>> It may or may not do other stuff as well.
->>>>>>
->>>>>> Its only task would be to do the final event routing: get the IVE,
->>>>>> get the EQ, push the EQ DATA in the OS event queue, notify the CPU=
+>>>>>>>> CPU, the view of the TIMA is filtered. The sPAPR machine runs at=
+ the
+>>>>>>>> OS privilege and therefore can only accesses the OS and the User
+>>>>>>>> rings. The others are for hypervisor levels.
+>>>>>>>>
+>>>>>>>> The CPU interrupt state is modeled with a XiveNVT object which s=
+tores
+>>>>>>>> the values of the different registers. The different TIMA views =
+are
+>>>>>>>> mapped at the same address for each CPU and 'current_cpu' is use=
+d to
+>>>>>>>> retrieve the XiveNVT holding the ring registers.
+>>>>>>>>
+>>>>>>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>>>>>>>> ---
+>>>>>>>>
+>>>>>>>>  Changes since v2 :
+>>>>>>>>
+>>>>>>>>  - introduced the XiveFabric interface
+>>>>>>>>
+>>>>>>>>  hw/intc/spapr_xive.c        |  25 ++++
+>>>>>>>>  hw/intc/xive.c              | 279 +++++++++++++++++++++++++++++=
++++++++++++++++
+>>>>>>>>  include/hw/ppc/spapr_xive.h |   5 +
+>>>>>>>>  include/hw/ppc/xive.h       |  31 +++++
+>>>>>>>>  include/hw/ppc/xive_regs.h  |  84 +++++++++++++
+>>>>>>>>  5 files changed, 424 insertions(+)
+>>>>>>>>
+>>>>>>>> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+>>>>>>>> index 90cde8a4082d..f07832bf0a00 100644
+>>>>>>>> --- a/hw/intc/spapr_xive.c
+>>>>>>>> +++ b/hw/intc/spapr_xive.c
+>>>>>>>> @@ -13,6 +13,7 @@
+>>>>>>>>  #include "target/ppc/cpu.h"
+>>>>>>>>  #include "sysemu/cpus.h"
+>>>>>>>>  #include "monitor/monitor.h"
+>>>>>>>> +#include "hw/ppc/spapr.h"
+>>>>>>>>  #include "hw/ppc/spapr_xive.h"
+>>>>>>>>  #include "hw/ppc/xive.h"
+>>>>>>>>  #include "hw/ppc/xive_regs.h"
+>>>>>>>> @@ -95,6 +96,22 @@ static void spapr_xive_realize(DeviceState *d=
+ev, Error **errp)
+>>>>>>>> =20
+>>>>>>>>      /* Allocate the Interrupt Virtualization Table */
+>>>>>>>>      xive->ivt =3D g_new0(XiveIVE, xive->nr_irqs);
+>>>>>>>> +
+>>>>>>>> +    /* The Thread Interrupt Management Area has the same addres=
+s for
+>>>>>>>> +     * each chip. On sPAPR, we only need to expose the User and=
+ OS
+>>>>>>>> +     * level views of the TIMA.
+>>>>>>>> +     */
+>>>>>>>> +    xive->tm_base =3D XIVE_TM_BASE;
+>>>>>>>
+>>>>>>> The constant should probably have PAPR in the name somewhere, sin=
+ce
+>>>>>>> it's just for PAPR machines (same for the ESB mappings, actually)=
 .
->>>>>
->>>>> That seems like a lot of steps.  Up to push the EQ DATA, certainly.
->>>>> And I guess it'll have to ping an NVT somehow, but I'm not sure it
->>>>> should know about CPUs as such.
->>>>
->>>> For PowerNV, the concept could be generalized, yes. An NVT can=20
->>>> contain the interrupt state of a logical server but the common=20
->>>> case is baremetal without guests for QEMU and so we have a NVT=20
->>>> per cpu.=20
->>>
->>> Hmm.  We eventually want to support a kernel running guests under
->>> qemu/powernv though, right? =20
->>
->> arg. an emulated hypervisor ! OK let's say this is a long term goal :)=
+>>>>>>
+>>>>>> ok.=20
+>>>>>>
+>>>>>> I have also made 'tm_base' a property, like 'vc_base' for ESBs, in=
 =20
->>
->>> So even if we don't allow it right now,
->>> we don't want allowing that to require major surgery to our
->>> architecture.
->>
->> That I agree on.=20
->>
->>>> PowerNV will have some limitation but we can make it better than=20
->>>> today for sure. It boots.
+>>>>>> case we want to change the value when the guest is instantiated.=20
+>>>>>> I doubt it but this is an address in the global address space, so=20
+>>>>>> letting the machine have control is better I think.
+>>>>>
+>>>>> I agree.
+>>>>>
+>>>>>>>> +
+>>>>>>>> +    memory_region_init_io(&xive->tm_mmio_user, OBJECT(xive),
+>>>>>>>> +                          &xive_tm_user_ops, xive, "xive.tima.u=
+ser",
+>>>>>>>> +                          1ull << TM_SHIFT);
+>>>>>>>> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &xive->tm_mmio_user);
+>>>>>>>> +
+>>>>>>>> +    memory_region_init_io(&xive->tm_mmio_os, OBJECT(xive),
+>>>>>>>> +                          &xive_tm_os_ops, xive, "xive.tima.os"=
+,
+>>>>>>>> +                          1ull << TM_SHIFT);
+>>>>>>>> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &xive->tm_mmio_os);
+>>>>>>>>  }
+>>>>>>>> =20
+>>>>>>>>  static XiveIVE *spapr_xive_get_ive(XiveFabric *xf, uint32_t lis=
+n)
+>>>>>>>> @@ -104,6 +121,13 @@ static XiveIVE *spapr_xive_get_ive(XiveFabr=
+ic *xf, uint32_t lisn)
+>>>>>>>>      return lisn < xive->nr_irqs ? &xive->ivt[lisn] : NULL;
+>>>>>>>>  }
+>>>>>>>> =20
+>>>>>>>> +static XiveNVT *spapr_xive_get_nvt(XiveFabric *xf, uint32_t ser=
+ver)
+>>>>>>>> +{
+>>>>>>>> +    PowerPCCPU *cpu =3D spapr_find_cpu(server);
+>>>>>>>> +
+>>>>>>>> +    return cpu ? XIVE_NVT(cpu->intc) : NULL;
+>>>>>>>> +}
+>>>>>>>
+>>>>>>> So this is a bit of a tangent, but I've been thinking of implemen=
+ting
+>>>>>>> a scheme where there's an opaque pointer in the cpu structure for=
+ the
+>>>>>>> use of the machine.  I'm planning for that to replace the intc po=
+inter
+>>>>>>> (which isn't really used directly by the cpu). That would allow u=
+s to
+>>>>>>> have spapr put a structure there and have both xics and xive poin=
+ters
+>>>>>>> which could be useful later on.
+>>>>>>
+>>>>>> ok. That should simplify the patchset at the end, in which we need=
+ to=20
+>>>>>> switch the 'intc' pointer.=20
+>>>>>>
+>>>>>>> I think we'd need something similar to correctly handle migration=
+ of
+>>>>>>> the VPA state, which is currently horribly broken.
+>>>>>>>
+>>>>>>>> +
+>>>>>>>>  static const VMStateDescription vmstate_spapr_xive_ive =3D {
+>>>>>>>>      .name =3D TYPE_SPAPR_XIVE "/ive",
+>>>>>>>>      .version_id =3D 1,
+>>>>>>>> @@ -143,6 +167,7 @@ static void spapr_xive_class_init(ObjectClas=
+s *klass, void *data)
+>>>>>>>>      dc->vmsd =3D &vmstate_spapr_xive;
+>>>>>>>> =20
+>>>>>>>>      xfc->get_ive =3D spapr_xive_get_ive;
+>>>>>>>> +    xfc->get_nvt =3D spapr_xive_get_nvt;
+>>>>>>>>  }
+>>>>>>>> =20
+>>>>>>>>  static const TypeInfo spapr_xive_info =3D {
+>>>>>>>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+>>>>>>>> index dccad0318834..5691bb9474e4 100644
+>>>>>>>> --- a/hw/intc/xive.c
+>>>>>>>> +++ b/hw/intc/xive.c
+>>>>>>>> @@ -14,7 +14,278 @@
+>>>>>>>>  #include "sysemu/cpus.h"
+>>>>>>>>  #include "sysemu/dma.h"
+>>>>>>>>  #include "monitor/monitor.h"
+>>>>>>>> +#include "hw/ppc/xics.h" /* for ICP_PROP_CPU */
+>>>>>>>>  #include "hw/ppc/xive.h"
+>>>>>>>> +#include "hw/ppc/xive_regs.h"
+>>>>>>>> +
+>>>>>>>> +/*
+>>>>>>>> + * XIVE Interrupt Presenter
+>>>>>>>> + */
+>>>>>>>> +
+>>>>>>>> +static uint64_t xive_nvt_accept(XiveNVT *nvt)
+>>>>>>>> +{
+>>>>>>>> +    return 0;
+>>>>>>>> +}
+>>>>>>>> +
+>>>>>>>> +static void xive_nvt_set_cppr(XiveNVT *nvt, uint8_t cppr)
+>>>>>>>> +{
+>>>>>>>> +    if (cppr > XIVE_PRIORITY_MAX) {
+>>>>>>>> +        cppr =3D 0xff;
+>>>>>>>> +    }
+>>>>>>>> +
+>>>>>>>> +    nvt->ring_os[TM_CPPR] =3D cppr;
+>>>>>>>
+>>>>>>> Surely this needs to recheck if we should be interrupting the cpu=
+?
+>>>>>>
+>>>>>> yes. In patch 9, when we introduce the nvt notify routine.
+>>>>>
+>>>>> Ok.
+>>>>>
+>>>>>>>> +}
+>>>>>>>> +
+>>>>>>>> +/*
+>>>>>>>> + * OS Thread Interrupt Management Area MMIO
+>>>>>>>> + */
+>>>>>>>> +static uint64_t xive_tm_read_special(XiveNVT *nvt, hwaddr offse=
+t,
+>>>>>>>> +                                           unsigned size)
+>>>>>>>> +{
+>>>>>>>> +    uint64_t ret =3D -1;
+>>>>>>>> +
+>>>>>>>> +    if (offset =3D=3D TM_SPC_ACK_OS_REG && size =3D=3D 2) {
+>>>>>>>> +        ret =3D xive_nvt_accept(nvt);
+>>>>>>>> +    } else {
+>>>>>>>> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid TIMA read=
+ @%"
+>>>>>>>> +                      HWADDR_PRIx" size %d\n", offset, size);
+>>>>>>>> +    }
+>>>>>>>> +
+>>>>>>>> +    return ret;
+>>>>>>>> +}
+>>>>>>>> +
+>>>>>>>> +#define TM_RING(offset) ((offset) & 0xf0)
+>>>>>>>> +
+>>>>>>>> +static uint64_t xive_tm_os_read(void *opaque, hwaddr offset,
+>>>>>>>> +                                      unsigned size)
+>>>>>>>> +{
+>>>>>>>> +    PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
+>>>>>>>
+>>>>>>> So, as I said on a previous version of this, we can actually corr=
+ectly
+>>>>>>> represent different mappings in different cpu spaces, by exploiti=
+ng
+>>>>>>> cpu->as and not just having them all point to &address_space_memo=
+ry.
+>>>>>>
+>>>>>> Yes, you did and I haven't studied the question yet. For the next =
+version.
+>>>>>
+>>>>> So, it's possible that using the cpu->as thing will be more trouble
+>>>>> that it's worth.=20
 >>>>
->>>> We can improve some of the NVT notification process, the way NVT=20
->>>> are matched eventually. may be support remote engines if the
->>>> NVT is not local. I have not looked at the details.
->>>>
->>>>> I'm not sure at this stage what should own the EQD table.
->>>>
->>>> The EQDT is in RAM.
+>>>> One of the trouble is the number of memory regions to use, one per c=
+pu,=20
 >>>
->>> Not for spapr, it's not. =20
+>>> Well, we're already going to have an NVT object for each cpu, yes?  S=
+o
+>>> a memory region per-cpu doesn't seem like a big stretch.
+>>>
+>>>> and the KVM support.
+>>>
+>>> And I really don't see how the memory regions impacts KVM.
 >>
->> yeah ok. It's in QEMU/KVM.
->>
->>> And even when it is in RAM, something needs
->>> to own the register that gives its base address.
->>
->> It's more complex than registers on powernv. There is a procedure
->> to define the XIVE tables using XIVE table descriptors which contain
->> their characteristics, size, indirect vs. indirect, local vs remote.
->> OPAL/skiboot defines all these to configure the HW, and the model
->> necessarily needs to support the same interface. This is the case
->> for a single chip.
+>> The TIMA is setup when the KVM device is initialized using some specif=
+ic=20
+>> ioctl to get an fd on a MMIO region from the host. It is then passed t=
+o=20
+>> the guest as a 'ram_device', same for the ESBs.=20
 >=20
-> Ah, ok.  So there's some sort of IVTD.=20
+> Ah, good point.
+>=20
+>> This is not a common region.
+>=20
+> I'm not sure what you mean by that.
 
-These are called Virtual Structure table Descriptors (VSDs). Each
-XIVE chip has an array of these.
-
-> Also in RAM? =20
-
-Yes. But the vsd are just temporary structures to configure HW.=20
-What is important is the information it is holding : IVT, EQDT,
-VPDT, etc.=20
-
-> Eventually there
-> must be a register giving the base address of the IVTD, yes?
-
-There are two registers to configure the table. One to set the=20
-table type and block, and one to set its VSD.
+I meant by that 'out of the ordinary', 'unusual'. Specially when under KV=
+M.
 
 C.
+
 =20
+>>>> Having a single region is much easier.=20
+>>>>
+>>>>> I am a little concerned about using current_cpu though. =20
+>>>>> First, will it work with KVM with kernel_irqchip=3Doff - the
+>>>>> cpus are running truly concurrently,
+>>>>
+>>>> FWIW, I didn't see any issue yet while stressing.=20
+>>>
+>>> Ok.
+>>>
+>>>>> but we still need to work out who's poking at the TIMA. =20
+>>>>
+>>>> I understand. The registers are accessed by the current cpu to set t=
+he=20
+>>>> CPPR and to ack an interrupt. But when we route an event, we also ac=
+cess=20
+>>>> and modify the registers. Do you suggest some locking ? I am not sur=
+e
+>>>> how are protected the TIMA region accesses vs. the routing, which is=
+=20
+>>>> necessarily initiated by an ESB MMIO though.
+>>>
+>>> Locking isn't really the issue.  I mean, we do need locking, but the
+>>> BQL should provide that.  The issue is what exactly does "current"
+>>> mean in the context of multiple concurrently running cpus.  Does it
+>>> always mean what we need it to mean in every context we might call
+>>> this from.
+>>
+>> I would say so.
+>=20
+> Ok.
+>=20
