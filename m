@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49774)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fGX1z-0007IT-PV
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:53:55 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fGX23-0007Mj-Py
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:53:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fGX1y-0006o9-Rt
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:53:51 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fGX1z-0006oN-Re
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:53:55 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed,  9 May 2018 23:53:35 +0200
-Message-Id: <20180509215336.31304-3-mreitz@redhat.com>
+Date: Wed,  9 May 2018 23:53:36 +0200
+Message-Id: <20180509215336.31304-4-mreitz@redhat.com>
 In-Reply-To: <20180509215336.31304-1-mreitz@redhat.com>
 References: <20180509215336.31304-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/3] block/file-posix: File locking during
- creation
+Subject: [Qemu-devel] [PATCH v2 3/3] iotests: Add creation test to 153
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,84 +22,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-When creating a file, we should take the WRITE and RESIZE permissions.
-We do not need either for the creation itself, but we do need them for
-clearing and resizing it.  So we can take the proper permissions by
-replacing O_TRUNC with an explicit truncation to 0, and by taking the
-appropriate file locks between those two steps.
+This patch adds a test case to 153 which tries to overwrite an image
+(using qemu-img create) while it is in use.  Without the original user
+explicitly sharing the necessary permissions (writing and truncation),
+this should not be allowed.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
 ---
- block/file-posix.c | 37 +++++++++++++++++++++++++++++++++++--
- 1 file changed, 35 insertions(+), 2 deletions(-)
+ tests/qemu-iotests/153     | 18 ++++++++++++++++++
+ tests/qemu-iotests/153.out | 13 +++++++++++++
+ 2 files changed, 31 insertions(+)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index c98a4a1556..370a4833e4 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1992,6 +1992,7 @@ static int raw_co_create(BlockdevCreateOptions *options, Error **errp)
- {
-     BlockdevCreateOptionsFile *file_opts;
-     int fd;
-+    int perm, shared;
-     int result = 0;
- 
-     /* Validate options and set default values */
-@@ -2006,14 +2007,44 @@ static int raw_co_create(BlockdevCreateOptions *options, Error **errp)
-     }
- 
-     /* Create file */
--    fd = qemu_open(file_opts->filename, O_RDWR | O_CREAT | O_TRUNC | O_BINARY,
--                   0644);
-+    fd = qemu_open(file_opts->filename, O_RDWR | O_CREAT | O_BINARY, 0644);
-     if (fd < 0) {
-         result = -errno;
-         error_setg_errno(errp, -result, "Could not create file");
-         goto out;
-     }
- 
-+    /* Take permissions: We want to discard everything, so we need
-+     * BLK_PERM_WRITE; and truncation to the desired size requires
-+     * BLK_PERM_RESIZE.
-+     * On the other hand, we cannot share the RESIZE permission
-+     * because we promise that after this function, the file has the
-+     * size given in the options.  If someone else were to resize it
-+     * concurrently, we could not guarantee that.
-+     * Note that after this function, we can no longer guarantee that
-+     * the file is not touched by a third party, so it may be resized
-+     * then. */
-+    perm = BLK_PERM_WRITE | BLK_PERM_RESIZE;
-+    shared = BLK_PERM_ALL & ~BLK_PERM_RESIZE;
+diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
+index a0fd815483..1be83912f8 100755
+--- a/tests/qemu-iotests/153
++++ b/tests/qemu-iotests/153
+@@ -137,6 +137,24 @@ for opts1 in "" "read-only=on" "read-only=on,force-share=on"; do
+         _run_cmd $QEMU_IMG dd          $L if="${TEST_IMG}" of="${TEST_IMG}.convert" bs=512 count=1
+         _run_cmd $QEMU_IMG bench       $L -c 1 "${TEST_IMG}"
+         _run_cmd $QEMU_IMG bench       $L -w -c 1 "${TEST_IMG}"
 +
-+    /* Step one: Take locks */
-+    result = raw_apply_lock_bytes(fd, perm, shared, false, errp);
-+    if (result < 0) {
-+        goto out_close;
-+    }
-+
-+    /* Step two: Check that nobody else has taken conflicting locks */
-+    result = raw_check_lock_bytes(fd, perm, shared, errp);
-+    if (result < 0) {
-+        goto out_close;
-+    }
-+
-+    /* Clear the file by truncating it to 0 */
-+    result = raw_regular_truncate(fd, 0, PREALLOC_MODE_OFF, errp);
-+    if (result < 0) {
-+        goto out_close;
-+    }
-+
-     if (file_opts->nocow) {
- #ifdef __linux__
-         /* Set NOCOW flag to solve performance issue on fs like btrfs.
-@@ -2029,6 +2060,8 @@ static int raw_co_create(BlockdevCreateOptions *options, Error **errp)
- #endif
-     }
++        # qemu-img create does not support -U
++        if [ -z "$L" ]; then
++            _run_cmd $QEMU_IMG create -f $IMGFMT "${TEST_IMG}" \
++                                      -b ${TEST_IMG}.base
++            # Read the file format.  It used to be the case that
++            # file-posix simply truncated the file, but the qcow2
++            # driver then failed to format it because it was unable
++            # to acquire the necessary WRITE permission.  However, the
++            # truncation was already wrong, and the whole process
++            # resulted in the file being completely empty and thus its
++            # format would be detected to be raw.
++            # So we read it here to see that creation either completed
++            # successfully (thus the format is qcow2) or it aborted
++            # before the file was changed at all (thus the format stays
++            # qcow2).
++            _img_info -U | grep 'file format'
++        fi
+     done
+     _send_qemu_cmd $h "{ 'execute': 'quit', }" ""
+     echo
+diff --git a/tests/qemu-iotests/153.out b/tests/qemu-iotests/153.out
+index bb721cb747..e8eb369cae 100644
+--- a/tests/qemu-iotests/153.out
++++ b/tests/qemu-iotests/153.out
+@@ -92,6 +92,11 @@ _qemu_img_wrapper bench -w -c 1 TEST_DIR/t.qcow2
+ qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to get "write" lock
+ Is another process using the image?
  
-+    /* Resize and potentially preallocate the file to the desired
-+     * final size */
-     result = raw_regular_truncate(fd, file_opts->size, file_opts->preallocation,
-                                   errp);
-     if (result < 0) {
++_qemu_img_wrapper create -f qcow2 TEST_DIR/t.qcow2 -b TEST_DIR/t.qcow2.base
++qemu-img: TEST_DIR/t.qcow2: Failed to get "write" lock
++Is another process using the image?
++file format: IMGFMT
++
+ == Running utility commands -U ==
+ 
+ _qemu_io_wrapper -U -c read 0 512 TEST_DIR/t.qcow2
+@@ -209,6 +214,11 @@ _qemu_img_wrapper bench -w -c 1 TEST_DIR/t.qcow2
+ qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to get "write" lock
+ Is another process using the image?
+ 
++_qemu_img_wrapper create -f qcow2 TEST_DIR/t.qcow2 -b TEST_DIR/t.qcow2.base
++qemu-img: TEST_DIR/t.qcow2: Failed to get "write" lock
++Is another process using the image?
++file format: IMGFMT
++
+ == Running utility commands -U ==
+ 
+ _qemu_io_wrapper -U -c read 0 512 TEST_DIR/t.qcow2
+@@ -309,6 +319,9 @@ _qemu_img_wrapper bench -c 1 TEST_DIR/t.qcow2
+ 
+ _qemu_img_wrapper bench -w -c 1 TEST_DIR/t.qcow2
+ 
++_qemu_img_wrapper create -f qcow2 TEST_DIR/t.qcow2 -b TEST_DIR/t.qcow2.base
++file format: IMGFMT
++
+ == Running utility commands -U ==
+ 
+ _qemu_io_wrapper -U -c read 0 512 TEST_DIR/t.qcow2
 -- 
 2.14.3
