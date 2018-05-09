@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52938)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fGRwp-00067W-Fw
+	(envelope-from <kwolf@redhat.com>) id 1fGRwp-000689-QU
 	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:28:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fGRwn-00034w-Oi
+	(envelope-from <kwolf@redhat.com>) id 1fGRwo-00036d-Jt
 	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:28:11 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed,  9 May 2018 18:26:34 +0200
-Message-Id: <20180509162637.15575-40-kwolf@redhat.com>
+Date: Wed,  9 May 2018 18:26:35 +0200
+Message-Id: <20180509162637.15575-41-kwolf@redhat.com>
 In-Reply-To: <20180509162637.15575-1-kwolf@redhat.com>
 References: <20180509162637.15575-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 39/42] job: Add lifecycle QMP commands
+Subject: [Qemu-devel] [PATCH 40/42] job: Add query-jobs QMP command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,329 +22,210 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-This adds QMP commands that control the transition between states of the
-job lifecycle.
+This adds a minimal query-jobs implementation that shouldn't pose many
+design questions. It can later be extended to expose more information,
+and especially job-specific information.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/job.json | 112 ++++++++++++++++++++++++++++++++++++++++++++++
- job-qmp.c     | 140 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- MAINTAINERS   |   1 +
- Makefile.objs |   2 +-
- trace-events  |   9 ++++
- 5 files changed, 263 insertions(+), 1 deletion(-)
- create mode 100644 job-qmp.c
+ qapi/block-core.json | 18 ----------------
+ qapi/job.json        | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ include/qemu/job.h   |  3 +++
+ job-qmp.c            | 54 +++++++++++++++++++++++++++++++++++++++++++++++
+ job.c                |  2 +-
+ 5 files changed, 117 insertions(+), 19 deletions(-)
 
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index f2da7d696d..d38dfa7836 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -1051,24 +1051,6 @@
+   'data': ['top', 'full', 'none', 'incremental'] }
+ 
+ ##
+-# @JobType:
+-#
+-# Type of a background job.
+-#
+-# @commit: block commit job type, see "block-commit"
+-#
+-# @stream: block stream job type, see "block-stream"
+-#
+-# @mirror: drive mirror job type, see "drive-mirror"
+-#
+-# @backup: drive backup job type, see "drive-backup"
+-#
+-# Since: 1.7
+-##
+-{ 'enum': 'JobType',
+-  'data': ['commit', 'stream', 'mirror', 'backup'] }
+-
+-##
+ # @JobVerb:
+ #
+ # Represents command verbs that can be applied to a job.
 diff --git a/qapi/job.json b/qapi/job.json
-index bd88a358d0..7b84158292 100644
+index 7b84158292..742fa97768 100644
 --- a/qapi/job.json
 +++ b/qapi/job.json
-@@ -63,3 +63,115 @@
- { 'event': 'JOB_STATUS_CHANGE',
-   'data': { 'id': 'str',
-             'status': 'JobStatus' } }
+@@ -5,6 +5,24 @@
+ ##
+ 
+ ##
++# @JobType:
++#
++# Type of a background job.
++#
++# @commit: block commit job type, see "block-commit"
++#
++# @stream: block stream job type, see "block-stream"
++#
++# @mirror: drive mirror job type, see "drive-mirror"
++#
++# @backup: drive backup job type, see "drive-backup"
++#
++# Since: 1.7
++##
++{ 'enum': 'JobType',
++  'data': ['commit', 'stream', 'mirror', 'backup'] }
 +
 +##
-+# @job-pause:
+ # @JobStatus:
+ #
+ # Indicates the present state of a given job in its lifetime.
+@@ -175,3 +193,44 @@
+ # Since: 2.13
+ ##
+ { 'command': 'job-finalize', 'data': { 'id': 'str' } }
++
++##
++# @JobInfo:
 +#
-+# Pause an active job.
++# Information about a job.
 +#
-+# This command returns immediately after marking the active job for pausing.
-+# Pausing an already paused job has no cumulative effect; a single job-resume
-+# command will resume the job.
++# @id:                  The job identifier
 +#
-+# The job will pause as soon as possible, which means transitioning into the
-+# PAUSED state if it was RUNNING, or into STANDBY if it was READY. The
-+# corresponding JOB_STATUS_CHANGE event will be emitted.
++# @type:                The job type
 +#
-+# Cancelling a paused job automatically resumes it.
++# @status:              Current job state/status
 +#
-+# @id: The job identifier.
++# @current-progress:    The current progress value
++#
++# @total-progress:      The maximum progress value
++#
++# @error:               If this field is present, the job failed; if it is
++#                       still missing in the CONCLUDED state, this indicates
++#                       successful completion.
++#
++#                       The value is a human-readable error message to describe
++#                       the reason for the job failure. It should not be parsed
++#                       by applications.
 +#
 +# Since: 2.13
 +##
-+{ 'command': 'job-pause', 'data': { 'id': 'str' } }
++{ 'struct': 'JobInfo',
++  'data': { 'id': 'str', 'type': 'JobType', 'status': 'JobStatus',
++            'current-progress': 'int', 'total-progress': 'int',
++            '*error': 'str' } }
 +
 +##
-+# @job-resume:
++# @query-jobs:
 +#
-+# Resume a paused job.
++# Return information about jobs.
 +#
-+# This command returns immediately after resuming a paused job. Resuming an
-+# already running job is an error.
-+#
-+# @id : The job identifier.
++# Returns: a list with a @JobInfo for each active job
 +#
 +# Since: 2.13
 +##
-+{ 'command': 'job-resume', 'data': { 'id': 'str' } }
++{ 'command': 'query-jobs', 'returns': ['JobInfo'] }
+diff --git a/include/qemu/job.h b/include/qemu/job.h
+index 9e61663f3a..da1c56f515 100644
+--- a/include/qemu/job.h
++++ b/include/qemu/job.h
+@@ -391,6 +391,9 @@ JobType job_type(Job *job);
+ /** Returns the enum string for the JobType of a given Job. */
+ const char *job_type_str(Job *job);
+ 
++/** Returns true if the job should not be visible to the management layer. */
++bool job_is_internal(Job *job);
 +
-+##
-+# @job-cancel:
-+#
-+# Instruct an active background job to cancel at the next opportunity.
-+# This command returns immediately after marking the active job for
-+# cancellation.
-+#
-+# The job will cancel as soon as possible and then emit a JOB_STATUS_CHANGE
-+# event. Usually, the status will change to ABORTING, but it is possible that
-+# a job successfully completes (e.g. because it was almost done and there was
-+# no opportunity to cancel earlier than completing the job) and transitions to
-+# PENDING instead.
-+#
-+# Note that if you issue 'job-cancel' after a mirror block job has indicated
-+# (via the event BLOCK_JOB_READY, and by transitioning into the READY state)
-+# that the source and destination are synchronized, then the job always
-+# completes successfully and transitions to PENDING as well as triggering the
-+# event BLOCK_JOB_COMPLETED, to indicate that the mirroring has ended and the
-+# destination now has a point-in-time copy tied to the time of the
-+# cancellation.
-+#
-+# @id: The job identifier.
-+#
-+# @force: If true, and the job is already in the READY state, abandon the job
-+#         immediately (even if it is paused) instead of waiting for the
-+#         destination to complete its final synchronization
-+#
-+# Since: 2.13
-+##
-+{ 'command': 'job-cancel', 'data': { 'id': 'str', '*force': 'bool' } }
-+
-+
-+##
-+# @job-complete:
-+#
-+# Manually trigger completion of an active job in the READY state.
-+#
-+# @id: The job identifier.
-+#
-+# Since: 2.13
-+##
-+{ 'command': 'job-complete', 'data': { 'id': 'str' } }
-+
-+##
-+# @job-dismiss:
-+#
-+# Deletes a job that is in the CONCLUDED state. This command only needs to be
-+# run explicitly for jobs that don't have automatic dismiss enabled.
-+#
-+# This command will refuse to operate on any job that has not yet reached its
-+# terminal state, JOB_STATUS_CONCLUDED. For jobs that make use of JOB_READY
-+# event, job-cancel or job-complete will still need to be used as appropriate.
-+#
-+# @id: The job identifier.
-+#
-+# Since: 2.13
-+##
-+{ 'command': 'job-dismiss', 'data': { 'id': 'str' } }
-+
-+##
-+# @job-finalize:
-+#
-+# Instructs all jobs in a transaction (or a single job if it is not part of any
-+# transaction) to finalize any graph changes and do any necessary cleanup. This
-+# command requires that all involved jobs are in the PENDING state.
-+#
-+# For jobs in a transaction, instructing one job to finalize will force
-+# ALL jobs in the transaction to finalize, so it is only necessary to instruct
-+# a single member job to finalize.
-+#
-+# @id: The identifier of any job in the transaction, or of a job that is not
-+#      part of any transaction.
-+#
-+# Since: 2.13
-+##
-+{ 'command': 'job-finalize', 'data': { 'id': 'str' } }
+ /** Returns whether the job is scheduled for cancellation. */
+ bool job_is_cancelled(Job *job);
+ 
 diff --git a/job-qmp.c b/job-qmp.c
-new file mode 100644
-index 0000000000..f32cb8b73e
---- /dev/null
+index f32cb8b73e..7425a2a490 100644
+--- a/job-qmp.c
 +++ b/job-qmp.c
-@@ -0,0 +1,140 @@
-+/*
-+ * QMP interface for background jobs
-+ *
-+ * Copyright (c) 2011 IBM Corp.
-+ * Copyright (c) 2012, 2018 Red Hat, Inc.
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
+@@ -138,3 +138,57 @@ void qmp_job_dismiss(const char *id, Error **errp)
+     job_dismiss(&job, errp);
+     aio_context_release(aio_context);
+ }
 +
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "qemu/job.h"
-+#include "qapi/qapi-commands-job.h"
-+#include "qapi/error.h"
-+#include "trace-root.h"
-+
-+/* Get a job using its ID and acquire its AioContext */
-+static Job *find_job(const char *id, AioContext **aio_context, Error **errp)
++static JobInfo *job_query_single(Job *job, Error **errp)
 +{
++    JobInfo *info;
++    const char *errmsg = NULL;
++
++    assert (!job_is_internal(job));
++
++    if (job->ret < 0) {
++        errmsg = strerror(-job->ret);
++    }
++
++    info = g_new(JobInfo, 1);
++    *info = (JobInfo) {
++        .id                 = g_strdup(job->id),
++        .type               = job_type(job),
++        .status             = job->status,
++        .current_progress   = job->progress_current,
++        .total_progress     = job->progress_total,
++        .has_error          = !!errmsg,
++        .error              = g_strdup(errmsg),
++    };
++
++    return info;
++}
++
++JobInfoList *qmp_query_jobs(Error **errp)
++{
++    JobInfoList *head = NULL, **p_next = &head;
 +    Job *job;
 +
-+    *aio_context = NULL;
++    for (job = job_next(NULL); job; job = job_next(job)) {
++        JobInfoList *elem;
++        AioContext *aio_context;
 +
-+    job = job_get(id);
-+    if (!job) {
-+        error_setg(errp, "Job not found");
-+        return NULL;
++        if (job_is_internal(job)) {
++            continue;
++        }
++        elem = g_new0(JobInfoList, 1);
++        aio_context = job->aio_context;
++        aio_context_acquire(aio_context);
++        elem->value = job_query_single(job, errp);
++        aio_context_release(aio_context);
++        if (!elem->value) {
++            g_free(elem);
++            qapi_free_JobInfoList(head);
++            return NULL;
++        }
++        *p_next = elem;
++        p_next = &elem->next;
 +    }
 +
-+    *aio_context = job->aio_context;
-+    aio_context_acquire(*aio_context);
-+
-+    return job;
++    return head;
 +}
-+
-+void qmp_job_cancel(const char *id, bool has_force, bool force, Error **errp)
-+{
-+    AioContext *aio_context;
-+    Job *job = find_job(id, &aio_context, errp);
-+
-+    if (!job) {
-+        return;
-+    }
-+
-+    if (job_user_paused(job) && !force) {
-+        error_setg(errp, "Job is currently paused");
-+        goto out;
-+    }
-+
-+    trace_qmp_job_cancel(job);
-+    job_user_cancel(job, force, errp);
-+out:
-+    aio_context_release(aio_context);
-+}
-+
-+void qmp_job_pause(const char *id, Error **errp)
-+{
-+    AioContext *aio_context;
-+    Job *job = find_job(id, &aio_context, errp);
-+
-+    if (!job) {
-+        return;
-+    }
-+
-+    trace_qmp_job_pause(job);
-+    job_user_pause(job, errp);
-+    aio_context_release(aio_context);
-+}
-+
-+void qmp_job_resume(const char *id, Error **errp)
-+{
-+    AioContext *aio_context;
-+    Job *job = find_job(id, &aio_context, errp);
-+
-+    if (!job) {
-+        return;
-+    }
-+
-+    trace_qmp_job_resume(job);
-+    job_user_resume(job, errp);
-+    aio_context_release(aio_context);
-+}
-+
-+void qmp_job_complete(const char *id, Error **errp)
-+{
-+    AioContext *aio_context;
-+    Job *job = find_job(id, &aio_context, errp);
-+
-+    if (!job) {
-+        return;
-+    }
-+
-+    trace_qmp_job_complete(job);
-+    job_complete(job, errp);
-+    aio_context_release(aio_context);
-+}
-+
-+void qmp_job_finalize(const char *id, Error **errp)
-+{
-+    AioContext *aio_context;
-+    Job *job = find_job(id, &aio_context, errp);
-+
-+    if (!job) {
-+        return;
-+    }
-+
-+    trace_qmp_job_finalize(job);
-+    job_finalize(job, errp);
-+    aio_context_release(aio_context);
-+}
-+
-+void qmp_job_dismiss(const char *id, Error **errp)
-+{
-+    AioContext *aio_context;
-+    Job *job = find_job(id, &aio_context, errp);
-+
-+    if (!job) {
-+        return;
-+    }
-+
-+    trace_qmp_job_dismiss(job);
-+    job_dismiss(&job, errp);
-+    aio_context_release(aio_context);
-+}
-diff --git a/MAINTAINERS b/MAINTAINERS
-index a97f60d104..778c6692d6 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1370,6 +1370,7 @@ S: Supported
- F: blockjob.c
- F: include/block/blockjob.h
- F: job.c
-+F: job-qmp.c
- F: include/block/job.h
- F: block/backup.c
- F: block/commit.c
-diff --git a/Makefile.objs b/Makefile.objs
-index 3df8d58e49..253e0356f3 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -66,7 +66,7 @@ chardev-obj-y = chardev/
- # block-obj-y is code used by both qemu system emulation and qemu-img
+diff --git a/job.c b/job.c
+index 4dc45648e9..178d540dc7 100644
+--- a/job.c
++++ b/job.c
+@@ -158,7 +158,7 @@ static int job_txn_apply(JobTxn *txn, int fn(Job *), bool lock)
+     return rc;
+ }
  
- block-obj-y += nbd/
--block-obj-y += block.o blockjob.o job.o
-+block-obj-y += block.o blockjob.o job.o job-qmp.o
- block-obj-y += block/ scsi/
- block-obj-y += qemu-io-cmds.o
- block-obj-$(CONFIG_REPLICATION) += replication.o
-diff --git a/trace-events b/trace-events
-index ef7579a285..c445f54773 100644
---- a/trace-events
-+++ b/trace-events
-@@ -109,6 +109,15 @@ job_state_transition(void *job,  int ret, const char *legal, const char *s0, con
- job_apply_verb(void *job, const char *state, const char *verb, const char *legal) "job %p in state %s; applying verb %s (%s)"
- job_completed(void *job, int ret, int jret) "job %p ret %d corrected ret %d"
- 
-+# job-qmp.c
-+qmp_job_cancel(void *job) "job %p"
-+qmp_job_pause(void *job) "job %p"
-+qmp_job_resume(void *job) "job %p"
-+qmp_job_complete(void *job) "job %p"
-+qmp_job_finalize(void *job) "job %p"
-+qmp_job_dismiss(void *job) "job %p"
-+
-+
- ### Guest events, keep at bottom
- 
- 
+-static bool job_is_internal(Job *job)
++bool job_is_internal(Job *job)
+ {
+     return (job->id == NULL);
+ }
 -- 
 2.13.6
