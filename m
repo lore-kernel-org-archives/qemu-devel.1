@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fGNCq-0004G0-6W
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:24:25 -0400
+	(envelope-from <quintela@redhat.com>) id 1fGNCr-0004H2-7V
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:24:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fGNCp-0000Xi-1l
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:24:24 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52176 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fGNCq-0000al-Ac
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:24:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37836 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fGNCo-0000X4-Tn
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:24:22 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fGNCq-0000Zf-5s
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:24:24 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C605740200A0
+	for <qemu-devel@nongnu.org>; Wed,  9 May 2018 11:24:23 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed,  9 May 2018 13:23:26 +0200
-Message-Id: <20180509112406.6183-2-quintela@redhat.com>
+Date: Wed,  9 May 2018 13:23:27 +0200
+Message-Id: <20180509112406.6183-3-quintela@redhat.com>
 In-Reply-To: <20180509112406.6183-1-quintela@redhat.com>
 References: <20180509112406.6183-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 01/41] migration: fix saving normal page even if
- it's been compressed
+Subject: [Qemu-devel] [PULL 02/41] tests: Add migration precopy test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,35 +30,85 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-From: Xiao Guangrong <xiaoguangrong@tencent.com>
-
-Fix the bug introduced by da3f56cb2e767016 (migration: remove
-ram_save_compressed_page()), It should be 'return' rather than
-'res'
-
-Sorry for this stupid mistake :(
-
-Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
-Message-Id: <20180428081045.8878-1-xiaoguangrong@tencent.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- migration/ram.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/migration-test.c | 44 ++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 42 insertions(+), 2 deletions(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 912810c18e..da0b567003 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -1490,7 +1490,7 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
-      * CPU resource.
-      */
-     if (block == rs->last_sent_block && save_page_use_compression(rs)) {
--        res = compress_page_with_multi_thread(rs, block, offset);
-+        return compress_page_with_multi_thread(rs, block, offset);
-     }
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index b99661b773..2b9c0ce91e 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -536,7 +536,7 @@ static void test_deprecated(void)
+     qtest_quit(from);
+ }
  
-     return ram_save_page(rs, pss, last_stage);
+-static void test_migrate(void)
++static void test_postcopy(void)
+ {
+     char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
+     QTestState *from, *to;
+@@ -611,6 +611,45 @@ static void test_baddest(void)
+     test_migrate_end(from, to, false);
+ }
+ 
++static void test_precopy_unix(void)
++{
++    char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
++    QTestState *from, *to;
++
++    test_migrate_start(&from, &to, uri, false);
++
++    /* We want to pick a speed slow enough that the test completes
++     * quickly, but that it doesn't complete precopy even on a slow
++     * machine, so also set the downtime.
++     */
++    /* 1 ms should make it not converge*/
++    migrate_set_parameter(from, "downtime-limit", "1");
++    /* 1GB/s */
++    migrate_set_parameter(from, "max-bandwidth", "1000000000");
++
++    /* Wait for the first serial output from the source */
++    wait_for_serial("src_serial");
++
++    migrate(from, uri);
++
++    wait_for_migration_pass(from);
++
++    /* 300 ms should converge */
++    migrate_set_parameter(from, "downtime-limit", "300");
++
++    if (!got_stop) {
++        qtest_qmp_eventwait(from, "STOP");
++    }
++
++    qtest_qmp_eventwait(to, "RESUME");
++
++    wait_for_serial("dest_serial");
++    wait_for_migration_complete(from);
++
++    test_migrate_end(from, to, true);
++    g_free(uri);
++}
++
+ int main(int argc, char **argv)
+ {
+     char template[] = "/tmp/migration-test-XXXXXX";
+@@ -630,9 +669,10 @@ int main(int argc, char **argv)
+ 
+     module_call_init(MODULE_INIT_QOM);
+ 
+-    qtest_add_func("/migration/postcopy/unix", test_migrate);
++    qtest_add_func("/migration/postcopy/unix", test_postcopy);
+     qtest_add_func("/migration/deprecated", test_deprecated);
+     qtest_add_func("/migration/bad_dest", test_baddest);
++    qtest_add_func("/migration/precopy/unix", test_precopy_unix);
+ 
+     ret = g_test_run();
+ 
 -- 
 2.17.0
