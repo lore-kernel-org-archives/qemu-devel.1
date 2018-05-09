@@ -1,16 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39361)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fGWCc-0000Ac-7D
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:00:47 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fGWGB-0003MI-Px
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:04:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fGWCb-0002Gf-84
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:00:46 -0400
-From: Max Reitz <mreitz@redhat.com>
-Date: Wed,  9 May 2018 23:00:23 +0200
-Message-Id: <20180509210023.20283-8-mreitz@redhat.com>
-In-Reply-To: <20180509210023.20283-1-mreitz@redhat.com>
-References: <20180509210023.20283-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 7/7] iotests: Rework 113
+	(envelope-from <richard.henderson@linaro.org>) id 1fGWG7-0003z6-T7
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:04:27 -0400
+Received: from mail-pf0-x231.google.com ([2607:f8b0:400e:c00::231]:39858)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fGWG7-0003yw-Mk
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:04:23 -0400
+Received: by mail-pf0-x231.google.com with SMTP id a22so12125465pfn.6
+	for <qemu-devel@nongnu.org>; Wed, 09 May 2018 14:04:23 -0700 (PDT)
+References: <20180508173152.29327-1-edgar.iglesias@gmail.com>
+	<20180508173152.29327-24-edgar.iglesias@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <743fbf75-6f85-aa55-e81b-68d94db3a085@linaro.org>
+Date: Wed, 9 May 2018 14:04:20 -0700
+MIME-Version: 1.0
+In-Reply-To: <20180508173152.29327-24-edgar.iglesias@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 23/36] target-microblaze: Implement MFSE
+ EAR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,118 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, frederic.konrad@adacore.com, alistair@alistair23.me, frasse.iglesias@gmail.com, sai.pavan.boddu@xilinx.com, edgar.iglesias@xilinx.com
 
-This test case has been broken since 398e6ad014df261d (roughly half a
-year).  qemu-img amend requires its output image to be R/W, so it opens
-it as such; the node is then turned into an read-only node automatically
-which is now accompanied by a warning, however.  This warning has not
-been part of the reference output.
+On 05/08/2018 10:31 AM, Edgar E. Iglesias wrote:
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+> 
+> Implement MFSE EAR to enable access to the upper part of EAR.
+> 
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> ---
+>  target/microblaze/translate.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
 
-For one thing, this warning shows that we cannot keep the test case as
-it is.  We would need a format that has no create_opts but that does
-have write support -- we do not have such a format, though.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Another thing is that qemu now actually checks whether an image format
-supports amendment instead of whether it has create_opts (since the
-former always implies the latter).  So we can now use any format that
-does not support amendment (even if it supports creation) and thus test
-the same code path.
 
-The reason nobody has noticed the breakage until now of course is the
-fact that nobody runs the iotests for nbd+bochs.  There actually was
-never any reason to set the protocol to "nbd" but because that was
-technically correct; functionally it made no difference.  So that is the
-first thing we are going to change: Make the protocol "file" instead so
-that people might actually notice breakage here.
-
-Secondly, now that bochs no longer works for the amend test case, we
-have to change the format there anyway.  Set let us just bend the truth
-a bit, declare this test a raw test.  In fact, that does not even
-concern the bochs test cases, other than the output now reading 'bochs'
-instead of 'IMGFMT'.
-
-So with this test now being a raw test, we can rework the amend test
-case to use raw instead.
-
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
----
- tests/qemu-iotests/113     | 19 +++++++++----------
- tests/qemu-iotests/113.out |  7 ++++---
- 2 files changed, 13 insertions(+), 13 deletions(-)
-
-diff --git a/tests/qemu-iotests/113 b/tests/qemu-iotests/113
-index 19b68b2727..4e09810905 100755
---- a/tests/qemu-iotests/113
-+++ b/tests/qemu-iotests/113
-@@ -38,16 +38,17 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
- . ./common.rc
- . ./common.filter
- 
--# We can only test one format here because we need its sample file
--_supported_fmt bochs
--_supported_proto nbd
-+# Some of these test cases use bochs, but others do use raw, so this
-+# is only half a lie.
-+_supported_fmt raw
-+_supported_proto file
- _supported_os Linux
- 
- echo
- echo '=== Unsupported image creation in qemu-img create ==='
- echo
- 
--$QEMU_IMG create -f $IMGFMT nbd://example.com 2>&1 64M | _filter_imgfmt
-+$QEMU_IMG create -f bochs nbd://example.com 2>&1 64M
- 
- echo
- echo '=== Unsupported image creation in qemu-img convert ==='
-@@ -56,17 +57,15 @@ echo
- # We could use any input image format here, but this is a bochs test, so just
- # use the bochs image
- _use_sample_img empty.bochs.bz2
--$QEMU_IMG convert -f $IMGFMT -O $IMGFMT "$TEST_IMG" nbd://example.com 2>&1 \
--    | _filter_imgfmt
-+$QEMU_IMG convert -f bochs -O bochs "$TEST_IMG" nbd://example.com
- 
- echo
- echo '=== Unsupported format in qemu-img amend ==='
- echo
- 
--# The protocol does not matter here
--_use_sample_img empty.bochs.bz2
--$QEMU_IMG amend -f $IMGFMT -o foo=bar "$TEST_IMG" 2>&1 | _filter_imgfmt
--
-+TEST_IMG="$TEST_DIR/t.$IMGFMT"
-+_make_test_img 1M
-+$QEMU_IMG amend -f $IMGFMT -o size=2M "$TEST_IMG" 2>&1 | _filter_imgfmt
- 
- # success, all done
- echo
-diff --git a/tests/qemu-iotests/113.out b/tests/qemu-iotests/113.out
-index 00bdfd6887..3557e2bbf0 100644
---- a/tests/qemu-iotests/113.out
-+++ b/tests/qemu-iotests/113.out
-@@ -2,14 +2,15 @@ QA output created by 113
- 
- === Unsupported image creation in qemu-img create ===
- 
--qemu-img: nbd://example.com: Format driver 'IMGFMT' does not support image creation
-+qemu-img: nbd://example.com: Format driver 'bochs' does not support image creation
- 
- === Unsupported image creation in qemu-img convert ===
- 
--qemu-img: Format driver 'IMGFMT' does not support image creation
-+qemu-img: Format driver 'bochs' does not support image creation
- 
- === Unsupported format in qemu-img amend ===
- 
--qemu-img: Format driver 'IMGFMT' does not support any options to amend
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-+qemu-img: Format driver 'IMGFMT' does not support option amendment
- 
- *** done
--- 
-2.14.3
+r~
