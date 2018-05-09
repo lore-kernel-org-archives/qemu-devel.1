@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58279)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fGNCd-00048i-M3
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:24:12 -0400
+	(envelope-from <quintela@redhat.com>) id 1fGNCp-0004Fn-JM
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:24:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fGNCc-0000AZ-FP
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:24:11 -0400
-Received: from mail-ot0-x234.google.com ([2607:f8b0:4003:c0f::234]:33681)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fGNCc-00008h-8E
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:24:10 -0400
-Received: by mail-ot0-x234.google.com with SMTP id l22-v6so39728312otj.0
-	for <qemu-devel@nongnu.org>; Wed, 09 May 2018 04:24:10 -0700 (PDT)
+	(envelope-from <quintela@redhat.com>) id 1fGNCm-0000Tq-Fd
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:24:23 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60822 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fGNCm-0000SQ-BC
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:24:20 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BBD6D4068027
+	for <qemu-devel@nongnu.org>; Wed,  9 May 2018 11:24:19 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Wed,  9 May 2018 13:23:25 +0200
+Message-Id: <20180509112406.6183-1-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180509053207.GA19425@umbus>
-References: <1525396794-17042-1-git-send-email-mjc@sifive.com>
-	<CAFEAcA-U8U6Q4KWEC7bNt9sUkr8jdPLKaGnFmvQbWaTbWT4qAw@mail.gmail.com>
-	<20180505114812.GO13229@umbus.fritz.box>
-	<CAHNT7Ns98LZzRK9AguCqrG+GQrSEm1+ZiPVLYnFKob8LgDdMKg@mail.gmail.com>
-	<CAFEAcA_fC6AmZBv4ovKunEm+2YPMdQJ0OWVVZXCuiLxGxAG=SA@mail.gmail.com>
-	<20180506133955.GP13229@umbus.fritz.box>
-	<CAFEAcA-bYHDSFL07f3BE_Lj-Dou+GeZod6cdX4-LSxzpRmQaDA@mail.gmail.com>
-	<20180509053207.GA19425@umbus>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 9 May 2018 12:23:49 +0100
-Message-ID: <CAFEAcA-w4o72z-x+5bC8O+eC9A_0BG4opk=sSRB7J7c5VB+uTA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] device_tree: Add qemu_fdt_totalsize
- function
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/41] Migration queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,75 +30,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Michael Clark <mjc@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>, Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-On 9 May 2018 at 06:32, David Gibson <david@gibson.dropbear.id.au> wrote:
-> On Sun, May 06, 2018 at 04:04:02PM +0100, Peter Maydell wrote:
->> On 6 May 2018 at 14:39, David Gibson <david@gibson.dropbear.id.au> wrote:
->> > Although, that said, I'll re-iterate that I think qemu's fdt
->> > manipulation is now sufficiently complex that it would be better off
->> > using a "live" (dynamically allocated & pointer based) tree
->> > representation that we just flatten immediately before loading it into
->> > the guest.
->>
->> This sounds to me like something that should be handled
->> by libfdt.
->
-> No, it's really not.  libfdt is specifically for reading and writing
-> flattened trees in place, in flattened form.  That's the whole basis
-> of the design and it's directly responsible for some of the
-> infelicities you mention.
->
-> I was never intended as a general runtime t manipulation library.  A
-> libdt that does that (using an allocator and internal pointer
-> representation) would be a nice thing to have, but libfdt isn't it.
-> Obviously being able to use libfdt to flatten and unflatten trees
-> would be a very good feature for such a library.
+Hi
 
-The difficulty is that libfdt is the closest we have to a
-dt manipulation library. The current wrapper layer is sort
-of trying to fix up its deficiencies for this use case.
-I just think that libfdt (as project, not necessarily as
-a single source file or library) is better placed to design
-and implement a more featured dt manipulation library layer
-than QEMU is.
+this includes the reviewed patches for migration:
+- update docs (dave)
+- fixes for blocktime (text cleatups) (dave)
+- migration+tls (dave)
+- rdma index fix (lidong)
+- Postcopy recovery (peterx)
+- Parts reviewed of multifd and tests (me)
 
-(Possibly we have here a slight terminology confusion: when
-I think about "libfdt" what I mean is "the project that has
-code for manipulating device trees and provides a library
-and some source files you can compile directly into a kernel
-or bootloader and a standalone dtc compiler binary and so on",
-not "specifically a single library". So it seems to me more
-natural for generic library code for manipulating DTs with
-an unflatten-manipulate-flatten approach would also be part
-of that project.)
+There are missing parts of RDMA, will be sent after this is in.  This got=
+ already too big.
 
->> internal representation of the data structure is, I just
->> want to be able to (a) hand it an fdt read in from a file
->> (b) call various functions to modify the data structure
->> and then (c) write the resulting thing out to an fdt in
->> guest memory. Whether libfdt prefers to do that by
->> modifying the flat representation or by converting into
->> a dynamically allocated unflattened tree and back again
->> is something I'd rather leave to it as an implementation
->> detail.
->
-> Sort of.  But there design constraints in libfdt which means that's
-> not really feasible.  Such as:
->   * not requiring an allocator
->   * not requiring a "read / unflatten" pass before reading values from
->     an fdt
->   * not requiring allocation or creation of a "context" state for
->     manipulating a tree
->
-> Those aren't aren't really relevant to qemu and perhaps aren't part of
-> what you'd usually think of as the API.  But they do matter to real
-> libfdt use cases.
+Please, apply.
 
-Yes, you'd certainly want to keep the compile time option
-to just have the "no allocation" parts of the library so
-you could build it into kernels and boot loaders.
+The following changes since commit e5cd695266c5709308aa95b1baae499e4b5d45=
+44:
 
-thanks
--- PMM
+  Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' int=
+o staging (2018-05-08 17:05:58 +0100)
+
+are available in the Git repository at:
+
+  git://github.com/juanquintela/qemu.git tags/migration/20180509
+
+for you to fetch changes up to c14eb5ac63b0d2cd146ca004daaeaf56677b7ed1:
+
+  Migration+TLS: Fix crash due to double cleanup (2018-05-09 12:17:22 +02=
+00)
+
+----------------------------------------------------------------
+migration/next for 20180509
+
+----------------------------------------------------------------
+Dr. David Alan Gilbert (3):
+      migration: update docs
+      migration: Textual fixups for blocktime
+      Migration+TLS: Fix crash due to double cleanup
+
+Juan Quintela (12):
+      tests: Add migration precopy test
+      tests: Add migration xbzrle test
+      tests: Migration ppc now inlines its program
+      migration: Set error state in case of error
+      migration: Introduce multifd_recv_new_channel()
+      migration: terminate_* can be called for other threads
+      migration: Be sure all recv channels are created
+      migration: Export functions to create send channels
+      migration: Create multifd channels
+      migration: Delay start of migration main routines
+      migration: Transmit initial package through the multifd channels
+      migration: Define MultifdRecvParams sooner
+
+Lidong Chen (1):
+      migration: update index field when delete or qsort RDMALocalBlock
+
+Peter Xu (24):
+      migration: let incoming side use thread context
+      migration: new postcopy-pause state
+      migration: implement "postcopy-pause" src logic
+      migration: allow dst vm pause on postcopy
+      migration: allow src return path to pause
+      migration: allow fault thread to pause
+      qmp: hmp: add migrate "resume" option
+      migration: rebuild channel on source
+      migration: new state "postcopy-recover"
+      migration: wakeup dst ram-load-thread for recover
+      migration: new cmd MIG_CMD_RECV_BITMAP
+      migration: new message MIG_RP_MSG_RECV_BITMAP
+      migration: new cmd MIG_CMD_POSTCOPY_RESUME
+      migration: new message MIG_RP_MSG_RESUME_ACK
+      migration: introduce SaveVMHandlers.resume_prepare
+      migration: synchronize dirty bitmap for resume
+      migration: setup ramstate for resume
+      migration: final handshake for the resume
+      migration: init dst in migration_object_init too
+      qmp/migration: new command migrate-recover
+      hmp/migration: add migrate_recover command
+      migration: introduce lock for to_dst_file
+      migration/qmp: add command migrate-pause
+      migration/hmp: add migrate_pause command
+
+Xiao Guangrong (1):
+      migration: fix saving normal page even if it's been compressed
+
+ docs/devel/migration.rst     | 532 ++++++++++++++++++++++++++++---------=
+---
+ hmp-commands.hx              |  34 ++-
+ hmp.c                        |  23 +-
+ hmp.h                        |   2 +
+ include/migration/register.h |   2 +
+ migration/channel.c          |  12 +-
+ migration/exec.c             |   9 +-
+ migration/fd.c               |   9 +-
+ migration/migration.c        | 559 +++++++++++++++++++++++++++++++++++++=
+++----
+ migration/migration.h        |  22 ++
+ migration/postcopy-ram.c     |  54 ++++-
+ migration/ram.c              | 500 +++++++++++++++++++++++++++++++++++--=
+-
+ migration/ram.h              |   6 +
+ migration/rdma.c             |   7 +
+ migration/savevm.c           | 191 ++++++++++++++-
+ migration/savevm.h           |   3 +
+ migration/socket.c           |  39 ++-
+ migration/socket.h           |   7 +
+ migration/trace-events       |  21 ++
+ qapi/migration.json          |  57 ++++-
+ tests/migration-test.c       | 149 +++++++++---
+ 21 files changed, 1928 insertions(+), 310 deletions(-)
