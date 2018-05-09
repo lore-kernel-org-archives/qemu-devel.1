@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fGI7M-0005iV-UV
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 01:58:25 -0400
+	(envelope-from <famz@redhat.com>) id 1fGI7P-0005md-6G
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 01:58:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fGI7J-0000ok-Uu
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 01:58:25 -0400
+	(envelope-from <famz@redhat.com>) id 1fGI7O-0000xI-AC
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 01:58:27 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Wed,  9 May 2018 13:57:58 +0800
-Message-Id: <20180509055802.28423-2-famz@redhat.com>
+Date: Wed,  9 May 2018 13:57:59 +0800
+Message-Id: <20180509055802.28423-3-famz@redhat.com>
 In-Reply-To: <20180509055802.28423-1-famz@redhat.com>
 References: <20180509055802.28423-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/5] qapi: Add qapi_enum_parse_full
+Subject: [Qemu-devel] [PATCH 2/5] vmdk: Refactor vmdk_create_extent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,71 +22,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-This variant of qapi_enum_parse can do case insensitive compare.
+The extracted vmdk_init_extent takes a BlockBackend object and
+initializes the format metadata. It is the common part between "qemu-img
+create" and "blockdev-create".
+
+Add a "BlockBackend *pbb" parameter to vmdk_create_extent, to return the
+opened BB to the caller in the next patch.
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- include/qapi/util.h |  2 ++
- qapi/qapi-util.c    | 20 ++++++++++++++++----
- 2 files changed, 18 insertions(+), 4 deletions(-)
+ block/vmdk.c | 71 +++++++++++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 44 insertions(+), 27 deletions(-)
 
-diff --git a/include/qapi/util.h b/include/qapi/util.h
-index a7c3c64148..2cec231919 100644
---- a/include/qapi/util.h
-+++ b/include/qapi/util.h
-@@ -19,6 +19,8 @@ typedef struct QEnumLookup {
- const char *qapi_enum_lookup(const QEnumLookup *lookup, int val);
- int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
-                     int def, Error **errp);
-+int qapi_enum_parse_full(const QEnumLookup *lookup, const char *buf,
-+                         int def, bool ignore_case, Error **errp);
- 
- int parse_qapi_name(const char *name, bool complete);
- 
-diff --git a/qapi/qapi-util.c b/qapi/qapi-util.c
-index e9b266bb70..6180957edb 100644
---- a/qapi/qapi-util.c
-+++ b/qapi/qapi-util.c
-@@ -21,8 +21,8 @@ const char *qapi_enum_lookup(const QEnumLookup *lookup, int val)
-     return lookup->array[val];
+diff --git a/block/vmdk.c b/block/vmdk.c
+index 84f8bbe480..083942f806 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -1714,35 +1714,17 @@ static int coroutine_fn vmdk_co_pwrite_zeroes(BlockDriverState *bs,
+     return ret;
  }
  
--int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
--                    int def, Error **errp)
-+int qapi_enum_parse_full(const QEnumLookup *lookup, const char *buf,
-+                         int def, bool ignore_case, Error **errp)
+-static int vmdk_create_extent(const char *filename, int64_t filesize,
+-                              bool flat, bool compress, bool zeroed_grain,
+-                              QemuOpts *opts, Error **errp)
++static int vmdk_init_extent(BlockBackend *blk,
++                            int64_t filesize, bool flat,
++                            bool compress, bool zeroed_grain,
++                            Error **errp)
  {
-     int i;
+     int ret, i;
+-    BlockBackend *blk = NULL;
+     VMDK4Header header;
+-    Error *local_err = NULL;
+     uint32_t tmp, magic, grains, gd_sectors, gt_size, gt_count;
+     uint32_t *gd_buf = NULL;
+     int gd_buf_size;
  
-@@ -31,8 +31,14 @@ int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
+-    ret = bdrv_create_file(filename, opts, &local_err);
+-    if (ret < 0) {
+-        error_propagate(errp, local_err);
+-        goto exit;
+-    }
+-
+-    blk = blk_new_open(filename, NULL, NULL,
+-                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
+-                       &local_err);
+-    if (blk == NULL) {
+-        error_propagate(errp, local_err);
+-        ret = -EIO;
+-        goto exit;
+-    }
+-
+-    blk_set_allow_write_beyond_eof(blk, true);
+-
+     if (flat) {
+         ret = blk_truncate(blk, filesize, PREALLOC_MODE_OFF, errp);
+         goto exit;
+@@ -1836,18 +1818,53 @@ static int vmdk_create_extent(const char *filename, int64_t filesize,
+                      gd_buf, gd_buf_size, 0);
+     if (ret < 0) {
+         error_setg(errp, QERR_IO_ERROR);
+-        goto exit;
      }
  
-     for (i = 0; i < lookup->size; i++) {
--        if (!strcmp(buf, lookup->array[i])) {
--            return i;
-+        if (ignore_case) {
-+            if (!strcasecmp(buf, lookup->array[i])) {
-+                return i;
-+            }
-+        } else {
-+            if (!strcmp(buf, lookup->array[i])) {
-+                return i;
-+            }
-         }
-     }
- 
-@@ -40,6 +46,12 @@ int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
-     return def;
+     ret = 0;
+ exit:
+-    if (blk) {
+-        blk_unref(blk);
+-    }
+     g_free(gd_buf);
+     return ret;
  }
  
-+int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
-+                    int def, Error **errp)
++static int vmdk_create_extent(const char *filename, int64_t filesize,
++                              bool flat, bool compress, bool zeroed_grain,
++                              BlockBackend **pbb,
++                              QemuOpts *opts, Error **errp)
 +{
-+    return qapi_enum_parse_full(lookup, buf, def, false, errp);
++    int ret;
++    BlockBackend *blk = NULL;
++    Error *local_err = NULL;
++
++    ret = bdrv_create_file(filename, opts, &local_err);
++    if (ret < 0) {
++        error_propagate(errp, local_err);
++        goto exit;
++    }
++
++    blk = blk_new_open(filename, NULL, NULL,
++                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
++                       &local_err);
++    if (blk == NULL) {
++        error_propagate(errp, local_err);
++        ret = -EIO;
++        goto exit;
++    }
++
++    blk_set_allow_write_beyond_eof(blk, true);
++
++    ret = vmdk_init_extent(blk, filesize, flat, compress, zeroed_grain, errp);
++exit:
++    if (blk) {
++        if (pbb) {
++            *pbb = blk;
++        } else {
++            blk_unref(blk);
++            blk = NULL;
++        }
++    }
++    return ret;
 +}
 +
- /*
-  * Parse a valid QAPI name from @str.
-  * A valid name consists of letters, digits, hyphen and underscore.
+ static int filename_decompose(const char *filename, char *path, char *prefix,
+                               char *postfix, size_t buf_len, Error **errp)
+ {
+@@ -2067,7 +2084,7 @@ static int coroutine_fn vmdk_co_create_opts(const char *filename, QemuOpts *opts
+         snprintf(ext_filename, PATH_MAX, "%s%s", path, desc_filename);
+ 
+         if (vmdk_create_extent(ext_filename, size,
+-                               flat, compress, zeroed_grain, opts, errp)) {
++                               flat, compress, zeroed_grain, NULL, opts, errp)) {
+             ret = -EINVAL;
+             goto exit;
+         }
 -- 
 2.14.3
