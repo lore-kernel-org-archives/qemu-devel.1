@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57253)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fGN62-0001Z9-2l
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:17:26 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fGNCd-00048i-M3
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:24:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fGN5x-00057U-Qo
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:17:22 -0400
-Received: from 4.mo2.mail-out.ovh.net ([87.98.172.75]:45939)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fGN5x-0004o4-KU
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:17:17 -0400
-Received: from player799.ha.ovh.net (unknown [10.109.120.80])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 319E1131E87
-	for <qemu-devel@nongnu.org>; Wed,  9 May 2018 13:17:08 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Wed, 09 May 2018 13:16:56 +0200
-Message-ID: <152586461606.636636.16396178012223646393.stgit@bahia.lan>
+	(envelope-from <peter.maydell@linaro.org>) id 1fGNCc-0000AZ-FP
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:24:11 -0400
+Received: from mail-ot0-x234.google.com ([2607:f8b0:4003:c0f::234]:33681)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fGNCc-00008h-8E
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:24:10 -0400
+Received: by mail-ot0-x234.google.com with SMTP id l22-v6so39728312otj.0
+	for <qemu-devel@nongnu.org>; Wed, 09 May 2018 04:24:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] target/ppc: migrate VPA related state
+In-Reply-To: <20180509053207.GA19425@umbus>
+References: <1525396794-17042-1-git-send-email-mjc@sifive.com>
+	<CAFEAcA-U8U6Q4KWEC7bNt9sUkr8jdPLKaGnFmvQbWaTbWT4qAw@mail.gmail.com>
+	<20180505114812.GO13229@umbus.fritz.box>
+	<CAHNT7Ns98LZzRK9AguCqrG+GQrSEm1+ZiPVLYnFKob8LgDdMKg@mail.gmail.com>
+	<CAFEAcA_fC6AmZBv4ovKunEm+2YPMdQJ0OWVVZXCuiLxGxAG=SA@mail.gmail.com>
+	<20180506133955.GP13229@umbus.fritz.box>
+	<CAFEAcA-bYHDSFL07f3BE_Lj-Dou+GeZod6cdX4-LSxzpRmQaDA@mail.gmail.com>
+	<20180509053207.GA19425@umbus>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 9 May 2018 12:23:49 +0100
+Message-ID: <CAFEAcA-w4o72z-x+5bC8O+eC9A_0BG4opk=sSRB7J7c5VB+uTA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] device_tree: Add qemu_fdt_totalsize
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,121 +36,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Paul Mackerras <paulus@samba.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Michael Clark <mjc@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>, Alistair Francis <alistair.francis@wdc.com>
 
-QEMU implements the "Shared Processor LPAR" (SPLPAR) option, which allows
-the hypervisor to time-slice a physical processor into multiple virtual
-processor. The intent is to allow more guests to run, and to optimize
-processor utilization.
+On 9 May 2018 at 06:32, David Gibson <david@gibson.dropbear.id.au> wrote:
+> On Sun, May 06, 2018 at 04:04:02PM +0100, Peter Maydell wrote:
+>> On 6 May 2018 at 14:39, David Gibson <david@gibson.dropbear.id.au> wrote:
+>> > Although, that said, I'll re-iterate that I think qemu's fdt
+>> > manipulation is now sufficiently complex that it would be better off
+>> > using a "live" (dynamically allocated & pointer based) tree
+>> > representation that we just flatten immediately before loading it into
+>> > the guest.
+>>
+>> This sounds to me like something that should be handled
+>> by libfdt.
+>
+> No, it's really not.  libfdt is specifically for reading and writing
+> flattened trees in place, in flattened form.  That's the whole basis
+> of the design and it's directly responsible for some of the
+> infelicities you mention.
+>
+> I was never intended as a general runtime t manipulation library.  A
+> libdt that does that (using an allocator and internal pointer
+> representation) would be a nice thing to have, but libfdt isn't it.
+> Obviously being able to use libfdt to flatten and unflatten trees
+> would be a very good feature for such a library.
 
-The guest OS can cede idle VCPUs, so that their processing capacity may
-be used by other VCPUs, with the H_CEDE hcall. The guest OS can also
-optimize spinlocks, by confering the time-slice of a spinning VCPU to the
-spinlock holder if it's currently notrunning, with the H_CONFER hcall.
+The difficulty is that libfdt is the closest we have to a
+dt manipulation library. The current wrapper layer is sort
+of trying to fix up its deficiencies for this use case.
+I just think that libfdt (as project, not necessarily as
+a single source file or library) is better placed to design
+and implement a more featured dt manipulation library layer
+than QEMU is.
 
-Both hcalls depend on a "Virtual Processor Area" (VPA) to be registered
-by the guest OS, generally during early boot. Other per-VCPU areas can
-be registerer: the "SLB Shadow Buffer" which allows a more efficient
-dispatching of VCPUs, and the "Dispatch Trace Log Buffer" (DTL) which
-is used to compute time stolen by the hypervisor. Both DTL and SLB Shadow
-areas depend on the VPA to be registered.
+(Possibly we have here a slight terminology confusion: when
+I think about "libfdt" what I mean is "the project that has
+code for manipulating device trees and provides a library
+and some source files you can compile directly into a kernel
+or bootloader and a standalone dtc compiler binary and so on",
+not "specifically a single library". So it seems to me more
+natural for generic library code for manipulating DTs with
+an unflatten-manipulate-flatten approach would also be part
+of that project.)
 
-The VPA/SLB Shadow/DTL are state that QEMU should migrate, but this doesn't
-happen, for no apparent reason other than it was just never coded. This
-causes the features listed above to stop working after migration, and it
-breaks the logic of the H_REGISTER_VPA hcall in the destination.
+>> internal representation of the data structure is, I just
+>> want to be able to (a) hand it an fdt read in from a file
+>> (b) call various functions to modify the data structure
+>> and then (c) write the resulting thing out to an fdt in
+>> guest memory. Whether libfdt prefers to do that by
+>> modifying the flat representation or by converting into
+>> a dynamically allocated unflattened tree and back again
+>> is something I'd rather leave to it as an implementation
+>> detail.
+>
+> Sort of.  But there design constraints in libfdt which means that's
+> not really feasible.  Such as:
+>   * not requiring an allocator
+>   * not requiring a "read / unflatten" pass before reading values from
+>     an fdt
+>   * not requiring allocation or creation of a "context" state for
+>     manipulating a tree
+>
+> Those aren't aren't really relevant to qemu and perhaps aren't part of
+> what you'd usually think of as the API.  But they do matter to real
+> libfdt use cases.
 
-This patch fixes it for newer machine types (ie, version > 2.12) by adding
-a "cpu/vpa" subsection to the CPU migration stream. It ensures backward
-migration to existing QEMU versions.
+Yes, you'd certainly want to keep the compile time option
+to just have the "no allocation" parts of the library so
+you could build it into kernels and boot loaders.
 
-Since DTL and SLB Shadow are optional and both depend on VPA, they get
-their own subsections "cpu/vpa/slb_shadow" and "cpu/vpa/dtl" hanging from
-the "cpu/vpa" subsection.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- target/ppc/machine.c |   62 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 62 insertions(+)
-
-diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-index ba1b9e531f97..b0d4040b37f9 100644
---- a/target/ppc/machine.c
-+++ b/target/ppc/machine.c
-@@ -677,6 +677,67 @@ static const VMStateDescription vmstate_compat = {
-     }
- };
- 
-+static bool slb_shadow_needed(void *opaque)
-+{
-+    PowerPCCPU *cpu = opaque;
-+
-+    return cpu->env.slb_shadow_addr != 0;
-+}
-+
-+static const VMStateDescription vmstate_slb_shadow = {
-+    .name = "cpu/vpa/slb_shadow",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = slb_shadow_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(env.slb_shadow_addr, PowerPCCPU),
-+        VMSTATE_UINT64(env.slb_shadow_size, PowerPCCPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static bool dtl_needed(void *opaque)
-+{
-+    PowerPCCPU *cpu = opaque;
-+
-+    return cpu->env.dtl_addr != 0;
-+}
-+
-+static const VMStateDescription vmstate_dtl = {
-+    .name = "cpu/vpa/dtl",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = dtl_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(env.dtl_addr, PowerPCCPU),
-+        VMSTATE_UINT64(env.dtl_size, PowerPCCPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static bool vpa_needed(void *opaque)
-+{
-+    PowerPCCPU *cpu = opaque;
-+
-+    return !cpu->pre_2_13_migration && cpu->env.vpa_addr != 0;
-+}
-+
-+static const VMStateDescription vmstate_vpa = {
-+    .name = "cpu/vpa",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = vpa_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(env.vpa_addr, PowerPCCPU),
-+        VMSTATE_END_OF_LIST()
-+    },
-+    .subsections = (const VMStateDescription * []) {
-+        &vmstate_slb_shadow,
-+        &vmstate_dtl,
-+        NULL
-+    }
-+};
-+
- const VMStateDescription vmstate_ppc_cpu = {
-     .name = "cpu",
-     .version_id = 5,
-@@ -731,6 +792,7 @@ const VMStateDescription vmstate_ppc_cpu = {
-         &vmstate_tlbemb,
-         &vmstate_tlbmas,
-         &vmstate_compat,
-+        &vmstate_vpa,
-         NULL
-     }
- };
+thanks
+-- PMM
