@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fGVPw-000707-PD
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 16:10:29 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fGW10-0000ty-8M
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 16:48:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fGVPv-0007nu-TE
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 16:10:28 -0400
-References: <20180502140359.18222-1-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <8efe25d9-c89e-9582-e2a0-57812441556e@redhat.com>
-Date: Wed, 9 May 2018 22:10:18 +0200
+	(envelope-from <richard.henderson@linaro.org>) id 1fGW0w-0006eM-1f
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 16:48:46 -0400
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:34604)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fGW0v-0006e2-RL
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 16:48:41 -0400
+Received: by mail-pl0-x243.google.com with SMTP id ay10-v6so4992784plb.1
+	for <qemu-devel@nongnu.org>; Wed, 09 May 2018 13:48:41 -0700 (PDT)
+References: <20180508173152.29327-1-edgar.iglesias@gmail.com>
+	<20180508173152.29327-9-edgar.iglesias@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <9e11eab3-23cf-4308-0052-f2e6ad5e6f45@linaro.org>
+Date: Wed, 9 May 2018 13:48:37 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180502140359.18222-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="2JmkDyjfOU2vbHaBCYiDYGgoxUpVYSt8n"
-Subject: Re: [Qemu-devel] [PATCH] block: Document BDRV_REQ_WRITE_UNCHANGED
- support
+In-Reply-To: <20180508173152.29327-9-edgar.iglesias@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 08/36] target-microblaze: Remove USE_MMU
+ PVR checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,63 +32,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, frederic.konrad@adacore.com, alistair@alistair23.me, frasse.iglesias@gmail.com, sai.pavan.boddu@xilinx.com, edgar.iglesias@xilinx.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2JmkDyjfOU2vbHaBCYiDYGgoxUpVYSt8n
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>
-Message-ID: <8efe25d9-c89e-9582-e2a0-57812441556e@redhat.com>
-Subject: Re: [PATCH] block: Document BDRV_REQ_WRITE_UNCHANGED support
-References: <20180502140359.18222-1-mreitz@redhat.com>
-In-Reply-To: <20180502140359.18222-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2018-05-02 16:03, Max Reitz wrote:
-> Add BDRV_REQ_WRITE_UNCHANGED to the list of flags honored during pwrite=
-
-> and pwrite_zeroes, and also add a note on when you absolutely need to
-> support it.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+On 05/08/2018 10:31 AM, Edgar E. Iglesias wrote:
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+> 
+> We already have a CPU property to control if a core has
+> an MMU or not. Remove USE_MMU PVR checks in favor of
+> looking at the property.
+> 
+> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 > ---
-> I did not include a note on how this might be useful to protocol
-> drivers, because BDRV_REQ_WRITE_UNCHANGED requests will usually not end=
+>  target/microblaze/helper.c | 12 +-----------
+>  1 file changed, 1 insertion(+), 11 deletions(-)
 
-> up on the protocol level anyway.
-> (I suppose it would be possible in theory if a protocol driver reports =
-a
->  certain range as unallocated and the user installs a copy-on-read
->  driver on top, but I think every protocol driver currently reports
->  everything as allocated.)
-> ---
->  include/block/block_int.h | 18 ++++++++++++++++--
->  1 file changed, 16 insertions(+), 2 deletions(-)
-
-Thanks for the review, applied to my block branch.
-
-Max
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
---2JmkDyjfOU2vbHaBCYiDYGgoxUpVYSt8n
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlrzVaoACgkQ9AfbAGHV
-z0BtWwf/TcyC+SIMs+9v7iarT1k6tD+jZUQCDwQXaFICc5ikkax6OtWRWU2IG03+
-cb+yhdiUq/4f4yMcHFiBAeagWE+JQA+clQ7N5dLBT06CB2Ny5Iwu8JITRMHbNyPf
-UfYjLSCOlgK7tLPJTTUeI1Ff+XXzf8TAz6w6JUZTgShQyAUb0QD/CbSNs0IRjDqs
-E5ngnU76L6yu5SJ0+0UmCiKp7v/hZhbi83+J+Z7ZflBsRT+Qjw71Sw1KuKQYstXa
-Sru/7BbvsI5P0TyGxFagpr4ziQKWFhAm1QbNgkxcpthX/pQT3ON6kAuxjSt7Buou
-jDOnN1VmSZDrP38Ra5sUI1KGvKsfug==
-=oZgp
------END PGP SIGNATURE-----
-
---2JmkDyjfOU2vbHaBCYiDYGgoxUpVYSt8n--
+r~
