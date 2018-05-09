@@ -1,15 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41078)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fGRKQ-0000ae-2P
+	(envelope-from <cohuck@redhat.com>) id 1fGRKQ-0000af-2X
 	for qemu-devel@nongnu.org; Wed, 09 May 2018 11:48:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fGRKM-00066C-U1
+	(envelope-from <cohuck@redhat.com>) id 1fGRKN-000678-Kk
 	for qemu-devel@nongnu.org; Wed, 09 May 2018 11:48:30 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Wed,  9 May 2018 17:48:20 +0200
-Message-Id: <20180509154822.23510-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC 0/2] vfio-ccw: support for {halt,
- clear} subchannel
+Date: Wed,  9 May 2018 17:48:21 +0200
+Message-Id: <20180509154822.23510-2-cohuck@redhat.com>
+In-Reply-To: <20180509154822.23510-1-cohuck@redhat.com>
+References: <20180509154822.23510-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH RFC 1/2] s390/cio: export hsch to modules
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,33 +22,25 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Dong Jia Shi <bjsdjshi@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
 Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 
-Hi,
+The vfio-ccw code will need this, and it matches treatment of ssch
+and csch.
 
-this (RFC) is an initial stab at passing the halt and clear subchannel
-operations to the host device. Today, host userspace is emulating
-those two operations, but we really want to execute them on the host
-device (e.g. for error recovery situations).
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ drivers/s390/cio/ioasm.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-The nice thing about this approach is that is independent from userspace
-changes: Unless userspace forwards halt/clear requests, we behave as
-before. Conversely, userspace can simply try to submit halt/clear, and
-old kernels will simply indicate that it is not supported.
-
-This survives triggering clear subchannel in the guest (hacked in by
-myself) together with an update QEMU (to be posted in a moment).
-
-Obviously, this needs some more work. Better support for async handling
-comes to mind. We probably also want to support other channel I/O
-instructions.
-
-Cornelia Huck (2):
-  s390/cio: export hsch to modules
-  vfio-ccw: support for halt/clear subchannel
-
- drivers/s390/cio/ioasm.c        |  1 +
- drivers/s390/cio/vfio_ccw_drv.c | 10 ++++-
- drivers/s390/cio/vfio_ccw_fsm.c | 94 ++++++++++++++++++++++++++++++++++++-----
- 3 files changed, 93 insertions(+), 12 deletions(-)
-
+diff --git a/drivers/s390/cio/ioasm.c b/drivers/s390/cio/ioasm.c
+index 14d328338ce2..08eb10283b18 100644
+--- a/drivers/s390/cio/ioasm.c
++++ b/drivers/s390/cio/ioasm.c
+@@ -233,6 +233,7 @@ int hsch(struct subchannel_id schid)
+ 
+ 	return ccode;
+ }
++EXPORT_SYMBOL(hsch);
+ 
+ static inline int __xsch(struct subchannel_id schid)
+ {
 -- 
 2.14.3
