@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fGX1y-0007Hk-JT
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:53:51 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fGX1z-0007IT-PV
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:53:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fGX1w-0006n2-2i
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:53:49 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fGX1y-0006o9-Rt
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:53:51 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed,  9 May 2018 23:53:34 +0200
-Message-Id: <20180509215336.31304-2-mreitz@redhat.com>
+Date: Wed,  9 May 2018 23:53:35 +0200
+Message-Id: <20180509215336.31304-3-mreitz@redhat.com>
 In-Reply-To: <20180509215336.31304-1-mreitz@redhat.com>
 References: <20180509215336.31304-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/3] block/file-posix: Pass FD to locking
- helpers
+Subject: [Qemu-devel] [PATCH v2 2/3] block/file-posix: File locking during
+ creation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,124 +23,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-raw_apply_lock_bytes() and raw_check_lock_bytes() currently take a
-BDRVRawState *, but they only use the lock_fd field.  During image
-creation, we do not have a BDRVRawState, but we do have an FD; so if we
-want to reuse the functions there, we should modify them to receive only
-the FD.
+When creating a file, we should take the WRITE and RESIZE permissions.
+We do not need either for the creation itself, but we do need them for
+clearing and resizing it.  So we can take the proper permissions by
+replacing O_TRUNC with an explicit truncation to 0, and by taking the
+appropriate file locks between those two steps.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
 ---
- block/file-posix.c | 27 ++++++++++++++-------------
- 1 file changed, 14 insertions(+), 13 deletions(-)
+ block/file-posix.c | 37 +++++++++++++++++++++++++++++++++++--
+ 1 file changed, 35 insertions(+), 2 deletions(-)
 
 diff --git a/block/file-posix.c b/block/file-posix.c
-index 3794c0007a..c98a4a1556 100644
+index c98a4a1556..370a4833e4 100644
 --- a/block/file-posix.c
 +++ b/block/file-posix.c
-@@ -630,7 +630,7 @@ typedef enum {
-  * file; if @unlock == true, also unlock the unneeded bytes.
-  * @shared_perm_lock_bits is the mask of all permissions that are NOT shared.
-  */
--static int raw_apply_lock_bytes(BDRVRawState *s,
-+static int raw_apply_lock_bytes(int fd,
-                                 uint64_t perm_lock_bits,
-                                 uint64_t shared_perm_lock_bits,
-                                 bool unlock, Error **errp)
-@@ -641,13 +641,13 @@ static int raw_apply_lock_bytes(BDRVRawState *s,
-     PERM_FOREACH(i) {
-         int off = RAW_LOCK_PERM_BASE + i;
-         if (perm_lock_bits & (1ULL << i)) {
--            ret = qemu_lock_fd(s->lock_fd, off, 1, false);
-+            ret = qemu_lock_fd(fd, off, 1, false);
-             if (ret) {
-                 error_setg(errp, "Failed to lock byte %d", off);
-                 return ret;
-             }
-         } else if (unlock) {
--            ret = qemu_unlock_fd(s->lock_fd, off, 1);
-+            ret = qemu_unlock_fd(fd, off, 1);
-             if (ret) {
-                 error_setg(errp, "Failed to unlock byte %d", off);
-                 return ret;
-@@ -657,13 +657,13 @@ static int raw_apply_lock_bytes(BDRVRawState *s,
-     PERM_FOREACH(i) {
-         int off = RAW_LOCK_SHARED_BASE + i;
-         if (shared_perm_lock_bits & (1ULL << i)) {
--            ret = qemu_lock_fd(s->lock_fd, off, 1, false);
-+            ret = qemu_lock_fd(fd, off, 1, false);
-             if (ret) {
-                 error_setg(errp, "Failed to lock byte %d", off);
-                 return ret;
-             }
-         } else if (unlock) {
--            ret = qemu_unlock_fd(s->lock_fd, off, 1);
-+            ret = qemu_unlock_fd(fd, off, 1);
-             if (ret) {
-                 error_setg(errp, "Failed to unlock byte %d", off);
-                 return ret;
-@@ -674,8 +674,7 @@ static int raw_apply_lock_bytes(BDRVRawState *s,
- }
- 
- /* Check "unshared" bytes implied by @perm and ~@shared_perm in the file. */
--static int raw_check_lock_bytes(BDRVRawState *s,
--                                uint64_t perm, uint64_t shared_perm,
-+static int raw_check_lock_bytes(int fd, uint64_t perm, uint64_t shared_perm,
-                                 Error **errp)
+@@ -1992,6 +1992,7 @@ static int raw_co_create(BlockdevCreateOptions *options, Error **errp)
  {
-     int ret;
-@@ -685,7 +684,7 @@ static int raw_check_lock_bytes(BDRVRawState *s,
-         int off = RAW_LOCK_SHARED_BASE + i;
-         uint64_t p = 1ULL << i;
-         if (perm & p) {
--            ret = qemu_lock_fd_test(s->lock_fd, off, 1, true);
-+            ret = qemu_lock_fd_test(fd, off, 1, true);
-             if (ret) {
-                 char *perm_name = bdrv_perm_names(p);
-                 error_setg(errp,
-@@ -702,7 +701,7 @@ static int raw_check_lock_bytes(BDRVRawState *s,
-         int off = RAW_LOCK_PERM_BASE + i;
-         uint64_t p = 1ULL << i;
-         if (!(shared_perm & p)) {
--            ret = qemu_lock_fd_test(s->lock_fd, off, 1, true);
-+            ret = qemu_lock_fd_test(fd, off, 1, true);
-             if (ret) {
-                 char *perm_name = bdrv_perm_names(p);
-                 error_setg(errp,
-@@ -739,11 +738,11 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
+     BlockdevCreateOptionsFile *file_opts;
+     int fd;
++    int perm, shared;
+     int result = 0;
  
-     switch (op) {
-     case RAW_PL_PREPARE:
--        ret = raw_apply_lock_bytes(s, s->perm | new_perm,
-+        ret = raw_apply_lock_bytes(s->lock_fd, s->perm | new_perm,
-                                    ~s->shared_perm | ~new_shared,
-                                    false, errp);
-         if (!ret) {
--            ret = raw_check_lock_bytes(s, new_perm, new_shared, errp);
-+            ret = raw_check_lock_bytes(s->lock_fd, new_perm, new_shared, errp);
-             if (!ret) {
-                 return 0;
-             }
-@@ -751,7 +750,8 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
-         op = RAW_PL_ABORT;
-         /* fall through to unlock bytes. */
-     case RAW_PL_ABORT:
--        raw_apply_lock_bytes(s, s->perm, ~s->shared_perm, true, &local_err);
-+        raw_apply_lock_bytes(s->lock_fd, s->perm, ~s->shared_perm,
-+                             true, &local_err);
-         if (local_err) {
-             /* Theoretically the above call only unlocks bytes and it cannot
-              * fail. Something weird happened, report it.
-@@ -760,7 +760,8 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
-         }
-         break;
-     case RAW_PL_COMMIT:
--        raw_apply_lock_bytes(s, new_perm, ~new_shared, true, &local_err);
-+        raw_apply_lock_bytes(s->lock_fd, new_perm, ~new_shared,
-+                             true, &local_err);
-         if (local_err) {
-             /* Theoretically the above call only unlocks bytes and it cannot
-              * fail. Something weird happened, report it.
+     /* Validate options and set default values */
+@@ -2006,14 +2007,44 @@ static int raw_co_create(BlockdevCreateOptions *options, Error **errp)
+     }
+ 
+     /* Create file */
+-    fd = qemu_open(file_opts->filename, O_RDWR | O_CREAT | O_TRUNC | O_BINARY,
+-                   0644);
++    fd = qemu_open(file_opts->filename, O_RDWR | O_CREAT | O_BINARY, 0644);
+     if (fd < 0) {
+         result = -errno;
+         error_setg_errno(errp, -result, "Could not create file");
+         goto out;
+     }
+ 
++    /* Take permissions: We want to discard everything, so we need
++     * BLK_PERM_WRITE; and truncation to the desired size requires
++     * BLK_PERM_RESIZE.
++     * On the other hand, we cannot share the RESIZE permission
++     * because we promise that after this function, the file has the
++     * size given in the options.  If someone else were to resize it
++     * concurrently, we could not guarantee that.
++     * Note that after this function, we can no longer guarantee that
++     * the file is not touched by a third party, so it may be resized
++     * then. */
++    perm = BLK_PERM_WRITE | BLK_PERM_RESIZE;
++    shared = BLK_PERM_ALL & ~BLK_PERM_RESIZE;
++
++    /* Step one: Take locks */
++    result = raw_apply_lock_bytes(fd, perm, shared, false, errp);
++    if (result < 0) {
++        goto out_close;
++    }
++
++    /* Step two: Check that nobody else has taken conflicting locks */
++    result = raw_check_lock_bytes(fd, perm, shared, errp);
++    if (result < 0) {
++        goto out_close;
++    }
++
++    /* Clear the file by truncating it to 0 */
++    result = raw_regular_truncate(fd, 0, PREALLOC_MODE_OFF, errp);
++    if (result < 0) {
++        goto out_close;
++    }
++
+     if (file_opts->nocow) {
+ #ifdef __linux__
+         /* Set NOCOW flag to solve performance issue on fs like btrfs.
+@@ -2029,6 +2060,8 @@ static int raw_co_create(BlockdevCreateOptions *options, Error **errp)
+ #endif
+     }
+ 
++    /* Resize and potentially preallocate the file to the desired
++     * final size */
+     result = raw_regular_truncate(fd, file_opts->size, file_opts->preallocation,
+                                   errp);
+     if (result < 0) {
 -- 
 2.14.3
