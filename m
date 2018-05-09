@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fH3zy-0000aO-AN
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:06:02 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fH42x-0002N1-E7
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:09:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fH3zu-0000ek-9E
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:05:58 -0400
-Received: from mail-he1eur01on0724.outbound.protection.outlook.com
-	([2a01:111:f400:fe1e::724]:32813
-	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
-	id 1fH3zt-0000WI-MY
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:05:54 -0400
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Fri, 11 May 2018 12:05:32 +0300
-Message-Id: <1526029534-35771-1-git-send-email-anton.nefedov@virtuozzo.com>
+	(envelope-from <pbonzini@redhat.com>) id 1fH42s-0002B2-Gk
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:09:03 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56778 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fH42s-0002At-B8
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:08:58 -0400
+References: <fe42db47-7e7c-3ec5-ab5f-8e8653554a74@amsat.org>
+	<c4082565-98f0-7bd7-4409-45af9d8823fb@redhat.com>
+	<30ad3bab7ecc6acd713da0d945d35681@walle.cc>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0408ef88-bdcd-95ed-f8bc-75381d5fade1@redhat.com>
+Date: Wed, 9 May 2018 17:57:44 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 0/2] qapi: allow flat unions with empty branches
+In-Reply-To: <30ad3bab7ecc6acd713da0d945d35681@walle.cc>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] lm32: tcg_handle_interrupt: assertion failed:
+ (qemu_mutex_iothread_locked())
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,31 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: eblake@redhat.com, armbru@redhat.com, mdroth@linux.vnet.ibm.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
+To: Michael Walle <michael@walle.cc>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-hej,
+On 09/05/2018 17:06, Michael Walle wrote:
+>>
+>> All these calls into lm32_pic.c need to take the BQL.=C2=A0 They are a=
+ll
+>> wrong, but this one was unlucky (or lucky) enough to be caught.
+>>
+>> Paolo
+>=20
+> my patch [1] from the beginning of this year just take the lock in
+> op_helper.c.
 
-inspired by this thread
-http://lists.nongnu.org/archive/html/qemu-devel/2018-01/msg04802.html
+Yes, I agree that's the best way to do it.
 
-Seems that nobody got around to this since (did anybody?),
-so I thought I'd give a try.
+> The only other places are the gdbstub.c and
+> lm32_cpu_dump_state(). So these are still missing, right?
 
-There's a generator patch and usage example.
+Those should be called with BQL taken.
 
-Anton Nefedov (2):
-  qapi: allow flat unions with empty branches
-  qapi: avoid empty CpuInfoOther type
+Paolo
 
- qapi/misc.json                 | 48 ++++--------------------------------------
- cpus.c                         |  2 --
- scripts/qapi/common.py         | 18 ++++++++++------
- scripts/qapi/doc.py            |  2 +-
- scripts/qapi/types.py          |  2 +-
- scripts/qapi/visit.py          | 12 ++++++-----
- tests/qapi-schema/test-qapi.py |  2 +-
- 7 files changed, 26 insertions(+), 60 deletions(-)
-
--- 
-2.7.4
+>=20
+> -michael
+>=20
+> [1] http://lists.gnu.org/archive/html/qemu-devel/2018-01/msg01598.html
