@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thomas.tai@oracle.com>) id 1fGUbg-00054W-QZ
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 15:18:33 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fGUdv-0007nN-S5
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 15:20:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thomas.tai@oracle.com>) id 1fGUbd-0002A8-IE
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 15:18:32 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:48590)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thomas.tai@oracle.com>)
-	id 1fGUbd-00029Y-7z
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 15:18:29 -0400
-From: Thomas Tai <thomas.tai@oracle.com>
-Date: Wed,  9 May 2018 15:53:05 -0400
-Message-Id: <1525895585-79023-2-git-send-email-thomas.tai@oracle.com>
-In-Reply-To: <1525895585-79023-1-git-send-email-thomas.tai@oracle.com>
-References: <1525895585-79023-1-git-send-email-thomas.tai@oracle.com>
-Subject: [Qemu-devel] [PATCH V2 1/1] virtio-balloon: fix internal stat name
- array to match Linux kernel
+	(envelope-from <mreitz@redhat.com>) id 1fGUdu-00033U-PJ
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 15:20:51 -0400
+References: <20180509182002.8044-1-mreitz@redhat.com>
+	<20180509182002.8044-2-mreitz@redhat.com>
+	<de872504-7edb-585d-92fd-a4756e36a204@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <e1df9392-304e-8e6f-46cd-7830388a3c70@redhat.com>
+Date: Wed, 9 May 2018 21:20:42 +0200
+MIME-Version: 1.0
+In-Reply-To: <de872504-7edb-585d-92fd-a4756e36a204@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="wphiS1yBEdzVVUrjXPdWTPOpGi8THKPz7"
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] qemu-img: Resolve relative backing
+ paths in rebase
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,95 +26,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com
-Cc: jasowang@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, rob.gardner@oracle.com, thomas.tai@oracle.com
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-The Linux kernel commit b40000325044 ("virtio_balloon: add array
-of stat names") defines an array of stat name strings for consumers
-of the virtio interface to use via the virtio_balloon.h header
-file, rather than requiring each consumer to define its own. But at
-present, the stat names defined in this array by the Linux kernel
-do not match up with those defined internally by QEMU.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--wphiS1yBEdzVVUrjXPdWTPOpGi8THKPz7
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <e1df9392-304e-8e6f-46cd-7830388a3c70@redhat.com>
+Subject: Re: [PATCH v2 1/2] qemu-img: Resolve relative backing paths in rebase
+References: <20180509182002.8044-1-mreitz@redhat.com>
+ <20180509182002.8044-2-mreitz@redhat.com>
+ <de872504-7edb-585d-92fd-a4756e36a204@redhat.com>
+In-Reply-To: <de872504-7edb-585d-92fd-a4756e36a204@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This patch fixes this inconsistency by importing the header file
-from linux and use the new macro to construct the balloon_stat_names
-array.
+On 2018-05-09 20:51, Eric Blake wrote:
+> On 05/09/2018 01:20 PM, Max Reitz wrote:
+>> Currently, rebase interprets a relative path for the new backing image=
 
-Signed-off-by: Jonathan Helman <jonathan.helman@oracle.com>
-Signed-off-by: Thomas Tai <thomas.tai@oracle.com>
-Cc: Rob Gardner <rob.gardner@oracle.com>
----
- docs/virtio-balloon-stats.txt                   |  2 ++
- hw/virtio/virtio-balloon.c                      | 13 ++-----------
- include/standard-headers/linux/virtio_balloon.h | 19 ++++++++++++++++++-
- 3 files changed, 22 insertions(+), 12 deletions(-)
+>> as follows:
+>> (1) Open the new backing image with the given relative path (thus
+>> relative to
+>> =C2=A0=C2=A0=C2=A0=C2=A0 qemu-img's working directory).
+>> (2) Write it directly into the overlay's backing path field (thus
+>> =C2=A0=C2=A0=C2=A0=C2=A0 relative to the overlay).
+>>
+>> If the overlay is not in qemu-img's working directory, both will be
+>> different interpretations, which may either lead to an error somewhere=
 
-diff --git a/docs/virtio-balloon-stats.txt b/docs/virtio-balloon-stats.txt
-index 7a66d25..7c69fdb 100644
---- a/docs/virtio-balloon-stats.txt
-+++ b/docs/virtio-balloon-stats.txt
-@@ -34,6 +34,8 @@ which will return a dictionary containing:
-       - stat-total-memory
-       - stat-available-memory
-       - stat-disk-caches
-+      - stat-hugetlb-allocations
-+      - stat-hugetlb-failures
- 
-   o A key named last-update, which contains the last stats update
-     timestamp in seconds. Since this timestamp is generated by the host,
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index f456cea..646f2e0 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -43,17 +43,8 @@ static void balloon_page(void *addr, int deflate)
-     }
- }
- 
--static const char *balloon_stat_names[] = {
--   [VIRTIO_BALLOON_S_SWAP_IN] = "stat-swap-in",
--   [VIRTIO_BALLOON_S_SWAP_OUT] = "stat-swap-out",
--   [VIRTIO_BALLOON_S_MAJFLT] = "stat-major-faults",
--   [VIRTIO_BALLOON_S_MINFLT] = "stat-minor-faults",
--   [VIRTIO_BALLOON_S_MEMFREE] = "stat-free-memory",
--   [VIRTIO_BALLOON_S_MEMTOT] = "stat-total-memory",
--   [VIRTIO_BALLOON_S_AVAIL] = "stat-available-memory",
--   [VIRTIO_BALLOON_S_CACHES] = "stat-disk-caches",
--   [VIRTIO_BALLOON_S_NR] = NULL
--};
-+static const char *balloon_stat_names[VIRTIO_BALLOON_S_NR] = \
-+	VIRTIO_BALLOON_S_NAMES_WITH_PREFIX("stat-");
- 
- /*
-  * reset_stats - Mark all items in the stats array as unset
-diff --git a/include/standard-headers/linux/virtio_balloon.h b/include/standard-headers/linux/virtio_balloon.h
-index 7b0a41b..4dbb7dc 100644
---- a/include/standard-headers/linux/virtio_balloon.h
-+++ b/include/standard-headers/linux/virtio_balloon.h
-@@ -53,7 +53,24 @@ struct virtio_balloon_config {
- #define VIRTIO_BALLOON_S_MEMTOT   5   /* Total amount of memory */
- #define VIRTIO_BALLOON_S_AVAIL    6   /* Available memory as in /proc */
- #define VIRTIO_BALLOON_S_CACHES   7   /* Disk caches */
--#define VIRTIO_BALLOON_S_NR       8
-+#define VIRTIO_BALLOON_S_HTLB_PGALLOC  8  /* Hugetlb page allocations */
-+#define VIRTIO_BALLOON_S_HTLB_PGFAIL   9  /* Hugetlb page allocation failures */
-+#define VIRTIO_BALLOON_S_NR       10
-+
-+#define VIRTIO_BALLOON_S_NAMES_WITH_PREFIX(VIRTIO_BALLOON_S_NAMES_prefix) { \
-+	VIRTIO_BALLOON_S_NAMES_prefix "swap-in", \
-+	VIRTIO_BALLOON_S_NAMES_prefix "swap-out", \
-+	VIRTIO_BALLOON_S_NAMES_prefix "major-faults", \
-+	VIRTIO_BALLOON_S_NAMES_prefix "minor-faults", \
-+	VIRTIO_BALLOON_S_NAMES_prefix "free-memory", \
-+	VIRTIO_BALLOON_S_NAMES_prefix "total-memory", \
-+	VIRTIO_BALLOON_S_NAMES_prefix "available-memory", \
-+	VIRTIO_BALLOON_S_NAMES_prefix "disk-caches", \
-+	VIRTIO_BALLOON_S_NAMES_prefix "hugetlb-allocations", \
-+	VIRTIO_BALLOON_S_NAMES_prefix "hugetlb-failures" \
-+}
-+
-+#define VIRTIO_BALLOON_S_NAMES VIRTIO_BALLOON_S_NAMES_WITH_PREFIX("")
- 
- /*
-  * Memory statistics structure.
--- 
-1.8.3.1
+>> (either rebase fails because it cannot open the new backing image, or
+>> =C2=A0 your overlay becomes unusable because its backing path does not=
+ point
+>> =C2=A0 to a file), or, even worse, it may result in your rebase being
+>> performed for a different backing file than what your overlay will poi=
+nt
+>=20
+> Interesting indentation in this paragraph. A maintainer could tweak it.=
+
+
+Well, it was meant this way (because of the opening paranthesis), but I
+could out-dent it.
+
+Max
+
+>> to after the rebase.
+>>
+>> Fix this by interpreting the target backing path as relative to the
+>> overlay, like qemu-img does everywhere else.
+>>
+>> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1569835
+>> Cc: qemu-stable@nongnu.org
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>> =C2=A0 qemu-img.c | 23 ++++++++++++++++++++++-
+>> =C2=A0 1 file changed, 22 insertions(+), 1 deletion(-)
+>=20
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
+
+
+
+--wphiS1yBEdzVVUrjXPdWTPOpGi8THKPz7
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlrzSgoACgkQ9AfbAGHV
+z0Bcigf9GBEDCHH7Lx+9GeiDIjD/L5PuBWnMoZq7norcrzeQiHRSKXN7P3S/+LQL
+MPKfsT69WSkJn/jp1Ow57Cplyf/YYvEdv++03Y/XgB0ceRdtdQobjQeNlPHt4Qfq
+Dwuu5gBISC59hcEjn0vzMn22aRoPxZ4LtPV7VNNYEGb+idEqdukYo7Gm3zSvD8Pd
+6d8Ij1DjPqKJmkmW+oPbNldF31+mq+0AGeHeDaXQQN4NuC/nwHcYMBlalB+sqnMw
+eANdaOiwPy6Izt+2ftBwE5TyOJa04zO72Uzte9LLT6FMpJ3vK7QsADAwjDxnAGw/
+8EhfIE9uSmNbbk77Dm4CDxTBuvkgHA==
+=10DX
+-----END PGP SIGNATURE-----
+
+--wphiS1yBEdzVVUrjXPdWTPOpGi8THKPz7--
