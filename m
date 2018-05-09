@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGWSG-0006IQ-3K
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:16:59 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fGWTT-000702-IE
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:18:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGWSD-0008Ml-Nz
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:16:56 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:33207)
+	(envelope-from <richard.henderson@linaro.org>) id 1fGWTQ-0000kz-BT
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:18:11 -0400
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:33213)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fGWSD-0008Md-HX
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:16:53 -0400
-Received: by mail-pg0-x241.google.com with SMTP id i194-v6so23218494pgd.0
-	for <qemu-devel@nongnu.org>; Wed, 09 May 2018 14:16:53 -0700 (PDT)
+	id 1fGWTQ-0000jx-4P
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:18:08 -0400
+Received: by mail-pg0-x243.google.com with SMTP id i194-v6so23219688pgd.0
+	for <qemu-devel@nongnu.org>; Wed, 09 May 2018 14:18:07 -0700 (PDT)
 References: <20180508173152.29327-1-edgar.iglesias@gmail.com>
-	<20180508173152.29327-32-edgar.iglesias@gmail.com>
+	<20180508173152.29327-33-edgar.iglesias@gmail.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <8747feeb-779e-a2c4-d657-dd5a673f3e62@linaro.org>
-Date: Wed, 9 May 2018 14:16:50 -0700
+Message-ID: <a023d7a2-1ac1-c389-b738-711776e3bcb7@linaro.org>
+Date: Wed, 9 May 2018 14:18:04 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180508173152.29327-32-edgar.iglesias@gmail.com>
+In-Reply-To: <20180508173152.29327-33-edgar.iglesias@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 31/36] target-microblaze: mmu: Cleanup
- debug log messages
+Subject: Re: [Qemu-devel] [PATCH v2 32/36] target-microblaze: Use table
+ based condition-codes conversion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,16 +38,14 @@ Cc: peter.maydell@linaro.org, frederic.konrad@adacore.com, alistair@alistair23.m
 On 05/08/2018 10:31 AM, Edgar E. Iglesias wrote:
 > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 > 
-> Cleanup debug log messages:
-> * Avoid long 80+ character lines.
-> * Remove D() macro and use qemu_log_mask.
-> * Remove logs that are not very useful
+> Use a table based conversion to map condition-codes between
+> MicroBlaze ISA encoding and TCG.
+> No functional change.
 > 
-> Suggested-by: Alistair Francis <alistair.francis@wdc.com>
 > Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 > ---
->  target/microblaze/mmu.c | 39 +++++++++++++++++++--------------------
->  1 file changed, 19 insertions(+), 20 deletions(-)
+>  target/microblaze/translate.c | 41 ++++++++++++++++++++---------------------
+>  1 file changed, 20 insertions(+), 21 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
