@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fGLBh-0006dj-H6
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 05:15:06 -0400
+	(envelope-from <famz@redhat.com>) id 1fGLVy-0005zk-9O
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 05:36:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fGLBg-0002si-Op
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 05:15:05 -0400
-Date: Wed, 9 May 2018 11:14:57 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180509091457.GA4714@localhost.localdomain>
-References: <20180508233659.13973-1-jsnow@redhat.com>
+	(envelope-from <famz@redhat.com>) id 1fGLVx-00031a-93
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 05:36:02 -0400
+Date: Wed, 9 May 2018 17:35:52 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180509093552.GA14577@lemon.usersys.redhat.com>
+References: <20180509055802.28423-1-famz@redhat.com>
+	<152584609273.2673.17409124136571170302@71c20359a636>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180508233659.13973-1-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] blockjob: expose error string via query
+In-Reply-To: <152584609273.2673.17409124136571170302@71c20359a636>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/5] vmdk: Implement x-blockdev-create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,23 +24,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Jeff Cody <jcody@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mdroth@linux.vnet.ibm.com, qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com
 
-Am 09.05.2018 um 01:36 hat John Snow geschrieben:
-> When we've reached the concluded state, we need to expose the error
-> state if applicable. Add the new field.
-> 
-> This should be sufficient for determining if a job completed
-> successfully or not after concluding; if we want to discriminate
-> based on how it failed more mechanically, we can always add an
-> explicit return code enumeration later.
-> 
-> I didn't bother to make it only show up if we are in the concluded
-> state; I don't think it's necessary.
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
+On Tue, 05/08 23:08, no-reply@patchew.org wrote:
+> /var/tmp/patchew-tester-tmp-rg1lnbdu/src/block/vmdk.c: In function =E2=80=
+=98vmdk_co_do_create=E2=80=99:
+> /var/tmp/patchew-tester-tmp-rg1lnbdu/src/block/vmdk.c:2153:8: error: =E2=
+=80=98blk=E2=80=99 may be used uninitialized in this function [-Werror=3D=
+maybe-uninitialized]
+>      if (blk) {
+>         ^
+> cc1: all warnings being treated as errors
 
-Thanks, applied to the block branch.
+It's a genuine bug. blk should be initialized to NULL.
 
-Kevin
+>   CC      block/dmg.o
+> make: *** [/var/tmp/patchew-tester-tmp-rg1lnbdu/src/rules.mak:66: block=
+/vmdk.o] Error 1
+> make: *** Waiting for unfinished jobs....
+> =3D=3D=3D OUTPUT END =3D=3D=3D
+>=20
+> Test command exited with code: 2
+>=20
+>=20
+> ---
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
