@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fGMfR-0006AW-Qg
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 06:49:54 -0400
+	(envelope-from <quintela@redhat.com>) id 1fGMgu-0006pI-PQ
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 06:51:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fGMfO-0003KT-Jo
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 06:49:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36238 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fGMgs-0006BT-8H
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 06:51:24 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36268 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fGMfO-0003Iu-EX
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 06:49:50 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fGMgs-0006AU-3s
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 06:51:22 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C8C4F40200A0
-	for <qemu-devel@nongnu.org>; Wed,  9 May 2018 10:49:49 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A09F140200A0
+	for <qemu-devel@nongnu.org>; Wed,  9 May 2018 10:51:21 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180426071558.GQ9036@xz-mi> (Peter Xu's message of "Thu, 26 Apr
-	2018 15:15:58 +0800")
+In-Reply-To: <20180502175237.GL2679@work-vm> (David Alan Gilbert's message of
+	"Wed, 2 May 2018 18:52:38 +0100")
 References: <20180425112723.1111-1-quintela@redhat.com>
 	<20180425112723.1111-11-quintela@redhat.com>
-	<20180426071558.GQ9036@xz-mi>
+	<20180502175237.GL2679@work-vm>
 Reply-To: quintela@redhat.com
-Date: Wed, 09 May 2018 12:52:01 +0200
-Message-ID: <87lgct5cfi.fsf@secure.laptop>
+Date: Wed, 09 May 2018 12:53:37 +0200
+Message-ID: <87h8nh5ccu.fsf@secure.laptop>
 MIME-Version: 1.0
 Content-Type: text/plain
 Subject: Re: [Qemu-devel] [PATCH v12 10/21] migration: Create multipage
@@ -36,49 +36,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-Peter Xu <peterx@redhat.com> wrote:
-> On Wed, Apr 25, 2018 at 01:27:12PM +0200, Juan Quintela wrote:
->
-> [...]
->
->> +static void multifd_pages_init(MultiFDPages_t **ppages, size_t size)
->> +{
->> +    MultiFDPages_t *pages = g_new0(MultiFDPages_t, 1);
->> +
->> +    pages->allocated = size;
->> +    pages->iov = g_new0(struct iovec, size);
->> +    pages->offset = g_new0(ram_addr_t, size);
->> +    *ppages = pages;
->> +}
->
-> Can we just return the pages pointer?  Then it can be:
->
->   static MultiFDPages_t *multifd_pages_init(size_t size)
-
-Done.
-
->
-> [...]
->
->> @@ -731,6 +784,7 @@ static void *multifd_recv_thread(void *opaque)
->>  int multifd_load_setup(void)
->>  {
->>      int thread_count;
->> +    uint32_t page_count = migrate_multifd_page_count();
->>      uint8_t i;
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> * Juan Quintela (quintela@redhat.com) wrote:
+>> We only create/destry the page list here.  We will use it later.
+>> 
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> ---
+>>  migration/ram.c | 56 +++++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 56 insertions(+)
+>> 
+>> diff --git a/migration/ram.c b/migration/ram.c
+>> index ffefa73099..b19300992e 100644
+>> --- a/migration/ram.c
+>> +++ b/migration/ram.c
+>> @@ -412,6 +412,20 @@ typedef struct {
+>>      uint8_t id;
+>>  } __attribute__((packed)) MultiFDInit_t;
 >>  
->>      if (!migrate_use_multifd()) {
->> @@ -740,6 +794,7 @@ int multifd_load_setup(void)
->>      multifd_recv_state = g_malloc0(sizeof(*multifd_recv_state));
->>      multifd_recv_state->params = g_new0(MultiFDRecvParams, thread_count);
->>      atomic_set(&multifd_recv_state->count, 0);
->> +
+>> +typedef struct {
+>> +    /* number of used pages */
+>> +    uint32_t used;
+>> +    /* number of allocated pages */
+>> +    uint32_t allocated;
+>> +    /* global number of generated multifd packets */
+>> +    uint32_t seq;
 >
-> Useless line?
+> Is that sufficiently large?
+> Consider a 40Gbps link; that's ~4GByte/second,
+> so if each packet is a 4K page, that's just over one hour at
+> that link speed;  that's a long migration on a fast link, but
+> it's not impossible is it - and what happens when it wraps?
 
-Changed it a lot in other places.
+Nothing really, it is just a counter that is used for traces.
 
 Later, Juan.
