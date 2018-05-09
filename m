@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fGRwh-0005yH-FI
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:28:04 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fGRwf-0005vE-2o
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:28:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fGRwg-0002u0-Bl
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:28:03 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fGRwe-0002oa-0R
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:28:01 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed,  9 May 2018 18:26:30 +0200
-Message-Id: <20180509162637.15575-36-kwolf@redhat.com>
+Date: Wed,  9 May 2018 18:26:28 +0200
+Message-Id: <20180509162637.15575-34-kwolf@redhat.com>
 In-Reply-To: <20180509162637.15575-1-kwolf@redhat.com>
 References: <20180509162637.15575-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 35/42] job: Add job_is_ready()
+Subject: [Qemu-devel] [PATCH 33/42] job: Add job_yield()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,139 +22,175 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-Instead of having a 'bool ready' in BlockJob, add a function that
-derives its value from the job status.
-
-At the same time, this fixes the behaviour to match what the QAPI
-documentation promises for query-block-job: 'true if the job may be
-completed'. When the ready flag was introduced in commit ef6dbf1e46e,
-the flag never had to be reset to match the description because after
-being ready, the jobs would immediately complete and disappear.
-
-Job transactions and manual job finalisation were introduced only later.
-With these changes, jobs may stay around even after having completed
-(and they are not ready to be completed a second time), however their
-patches forgot to reset the ready flag.
+This moves block_job_yield() to the Job layer.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/block/blockjob.h |  5 -----
- include/qemu/job.h       |  3 +++
- blockjob.c               |  3 +--
- job.c                    | 22 ++++++++++++++++++++++
- qemu-img.c               |  2 +-
- tests/test-blockjob.c    |  2 +-
- 6 files changed, 28 insertions(+), 9 deletions(-)
+ include/block/blockjob_int.h |  8 --------
+ include/qemu/job.h           |  9 +++++++--
+ block/backup.c               |  2 +-
+ block/mirror.c               |  2 +-
+ blockjob.c                   | 16 ----------------
+ job.c                        | 20 ++++++++++++++++++--
+ tests/test-blockjob-txn.c    |  2 +-
+ 7 files changed, 28 insertions(+), 31 deletions(-)
 
-diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index ba08bcf7c0..932a12d1a6 100644
---- a/include/block/blockjob.h
-+++ b/include/block/blockjob.h
-@@ -49,11 +49,6 @@ typedef struct BlockJob {
-     /** The block device on which the job is operating.  */
-     BlockBackend *blk;
+diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
+index 7df07b20cf..806ac64d87 100644
+--- a/include/block/blockjob_int.h
++++ b/include/block/blockjob_int.h
+@@ -108,14 +108,6 @@ void block_job_user_resume(Job *job);
+ void block_job_drain(Job *job);
  
--    /**
--     * Set to true when the job is ready to be completed.
--     */
--    bool ready;
+ /**
+- * block_job_yield:
+- * @job: The job that calls the function.
+- *
+- * Yield the block job coroutine.
+- */
+-void block_job_yield(BlockJob *job);
 -
-     /** Status that is published by the query-block-jobs QMP API */
-     BlockDeviceIoStatus iostatus;
- 
+-/**
+  * block_job_ratelimit_get_delay:
+  *
+  * Calculate and return delay for the next request in ns. See the documentation
 diff --git a/include/qemu/job.h b/include/qemu/job.h
-index f3acebbc17..fb81cc7c09 100644
+index a7e253a6fb..5ec3e3c01d 100644
 --- a/include/qemu/job.h
 +++ b/include/qemu/job.h
-@@ -367,6 +367,9 @@ bool job_is_cancelled(Job *job);
- /** Returns whether the job is in a completed state. */
- bool job_is_completed(Job *job);
+@@ -339,6 +339,13 @@ void coroutine_fn job_pause_point(Job *job);
  
-+/** Returns whether the job is ready to be completed. */
-+bool job_is_ready(Job *job);
-+
  /**
-  * Request @job to pause at the next pause point. Must be paired with
-  * job_resume(). If the job is supposed to be resumed by user action, call
+  * @job: The job that calls the function.
++ *
++ * Yield the job coroutine.
++ */
++void job_yield(Job *job);
++
++/**
++ * @job: The job that calls the function.
+  * @ns: How many nanoseconds to stop for.
+  *
+  * Put the job to sleep (assuming that it wasn't canceled) for @ns
+@@ -508,8 +515,6 @@ int job_finish_sync(Job *job, void (*finish)(Job *, Error **errp), Error **errp)
+ 
+ /* TODO To be removed from the public interface */
+ void job_state_transition(Job *job, JobStatus s1);
+-void coroutine_fn job_do_yield(Job *job, uint64_t ns);
+-bool job_should_pause(Job *job);
+ void job_do_dismiss(Job *job);
+ 
+ #endif
+diff --git a/block/backup.c b/block/backup.c
+index b13f91d8a7..6f4f3df229 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -444,7 +444,7 @@ static void coroutine_fn backup_run(void *opaque)
+         while (!job_is_cancelled(&job->common.job)) {
+             /* Yield until the job is cancelled.  We just let our before_write
+              * notify callback service CoW requests. */
+-            block_job_yield(&job->common);
++            job_yield(&job->common.job);
+         }
+     } else if (job->sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
+         ret = backup_run_incremental(job);
+diff --git a/block/mirror.c b/block/mirror.c
+index 2f33ee42fc..67a9482c16 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -731,7 +731,7 @@ static void coroutine_fn mirror_run(void *opaque)
+         block_job_event_ready(&s->common);
+         s->synced = true;
+         while (!job_is_cancelled(&s->common.job) && !s->should_complete) {
+-            block_job_yield(&s->common);
++            job_yield(&s->common.job);
+         }
+         s->common.job.cancelled = false;
+         goto immediate_exit;
 diff --git a/blockjob.c b/blockjob.c
-index 5ab22596bf..0512b41901 100644
+index c409788723..e8d7e85d6b 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -270,7 +270,7 @@ BlockJobInfo *block_job_query(BlockJob *job, Error **errp)
-     info->offset    = job->offset;
-     info->speed     = job->speed;
-     info->io_status = job->iostatus;
--    info->ready     = job->ready;
-+    info->ready     = job_is_ready(&job->job),
-     info->status    = job->job.status;
-     info->auto_finalize = job->job.auto_finalize;
-     info->auto_dismiss  = job->job.auto_dismiss;
-@@ -438,7 +438,6 @@ void block_job_user_resume(Job *job)
- void block_job_event_ready(BlockJob *job)
- {
-     job_state_transition(&job->job, JOB_STATUS_READY);
--    job->ready = true;
- 
-     if (block_job_is_internal(job)) {
-         return;
-diff --git a/job.c b/job.c
-index 744490dffe..a500e8d1fd 100644
---- a/job.c
-+++ b/job.c
-@@ -199,6 +199,28 @@ bool job_is_cancelled(Job *job)
-     return job->cancelled;
+@@ -433,22 +433,6 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+     return job;
  }
  
-+bool job_is_ready(Job *job)
+-void block_job_yield(BlockJob *job)
+-{
+-    assert(job->job.busy);
+-
+-    /* Check cancellation *before* setting busy = false, too!  */
+-    if (job_is_cancelled(&job->job)) {
+-        return;
+-    }
+-
+-    if (!job_should_pause(&job->job)) {
+-        job_do_yield(&job->job, -1);
+-    }
+-
+-    job_pause_point(&job->job);
+-}
+-
+ void block_job_iostatus_reset(BlockJob *job)
+ {
+     if (job->iostatus == BLOCK_DEVICE_IO_STATUS_OK) {
+diff --git a/job.c b/job.c
+index 892affba54..1627118c26 100644
+--- a/job.c
++++ b/job.c
+@@ -226,7 +226,7 @@ static bool job_started(Job *job)
+     return job->co;
+ }
+ 
+-bool job_should_pause(Job *job)
++static bool job_should_pause(Job *job)
+ {
+     return job->pause_count > 0;
+ }
+@@ -397,7 +397,7 @@ void job_enter(Job *job)
+  *
+  * If @ns is (uint64_t) -1, no timer is scheduled and block_job_enter() must be
+  * called explicitly. */
+-void coroutine_fn job_do_yield(Job *job, uint64_t ns)
++static void coroutine_fn job_do_yield(Job *job, uint64_t ns)
+ {
+     job_lock();
+     if (ns != -1) {
+@@ -442,6 +442,22 @@ void coroutine_fn job_pause_point(Job *job)
+     }
+ }
+ 
++void job_yield(Job *job)
 +{
-+    switch (job->status) {
-+    case JOB_STATUS_UNDEFINED:
-+    case JOB_STATUS_CREATED:
-+    case JOB_STATUS_RUNNING:
-+    case JOB_STATUS_PAUSED:
-+    case JOB_STATUS_WAITING:
-+    case JOB_STATUS_PENDING:
-+    case JOB_STATUS_ABORTING:
-+    case JOB_STATUS_CONCLUDED:
-+    case JOB_STATUS_NULL:
-+        return false;
-+    case JOB_STATUS_READY:
-+    case JOB_STATUS_STANDBY:
-+        return true;
-+    default:
-+        g_assert_not_reached();
++    assert(job->busy);
++
++    /* Check cancellation *before* setting busy = false, too!  */
++    if (job_is_cancelled(job)) {
++        return;
 +    }
-+    return false;
++
++    if (!job_should_pause(job)) {
++        job_do_yield(job, -1);
++    }
++
++    job_pause_point(job);
 +}
 +
- bool job_is_completed(Job *job)
+ void coroutine_fn job_sleep_ns(Job *job, int64_t ns)
  {
-     switch (job->status) {
-diff --git a/qemu-img.c b/qemu-img.c
-index 176eb630a1..6361d4edf5 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -867,7 +867,7 @@ static void run_block_job(BlockJob *job, Error **errp)
-         aio_poll(aio_context, true);
-         qemu_progress_print(job->len ?
-                             ((float)job->offset / job->len * 100.f) : 0.0f, 0);
--    } while (!job->ready && !job_is_completed(&job->job));
-+    } while (!job_is_ready(&job->job) && !job_is_completed(&job->job));
- 
-     if (!job_is_completed(&job->job)) {
-         ret = job_complete_sync(&job->job, errp);
-diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
-index 7131cabb16..8180d03a5f 100644
---- a/tests/test-blockjob.c
-+++ b/tests/test-blockjob.c
-@@ -185,7 +185,7 @@ static void coroutine_fn cancel_job_start(void *opaque)
-             goto defer;
+     assert(job->busy);
+diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
+index 34ee179574..fce836639a 100644
+--- a/tests/test-blockjob-txn.c
++++ b/tests/test-blockjob-txn.c
+@@ -47,7 +47,7 @@ static void coroutine_fn test_block_job_run(void *opaque)
+         if (s->use_timer) {
+             job_sleep_ns(&job->job, 0);
+         } else {
+-            block_job_yield(job);
++            job_yield(&job->job);
          }
  
--        if (!s->common.ready && s->should_converge) {
-+        if (!job_is_ready(&s->common.job) && s->should_converge) {
-             block_job_event_ready(&s->common);
-         }
- 
+         if (job_is_cancelled(&job->job)) {
 -- 
 2.13.6
