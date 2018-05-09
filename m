@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52420)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fGRwO-0005dx-2I
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:27:46 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fGRwO-0005eh-Op
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:27:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fGRwM-0002G7-04
+	(envelope-from <kwolf@redhat.com>) id 1fGRwM-0002Gv-5k
 	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:27:44 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed,  9 May 2018 18:26:14 +0200
-Message-Id: <20180509162637.15575-20-kwolf@redhat.com>
+Date: Wed,  9 May 2018 18:26:15 +0200
+Message-Id: <20180509162637.15575-21-kwolf@redhat.com>
 In-Reply-To: <20180509162637.15575-1-kwolf@redhat.com>
 References: <20180509162637.15575-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 19/42] job: Add job_sleep_ns()
+Subject: [Qemu-devel] [PATCH 20/42] job: Move pause/resume functions to Job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,337 +22,517 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-There is nothing block layer specific about block_job_sleep_ns(), so
-move the function to Job.
+While we already moved the state related to job pausing to Job, the
+functions to do were still BlockJob only. This commit moves them over to
+Job.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/block/blockjob_int.h | 11 -----------
- include/qemu/job.h           | 17 +++++++++++++++++
- block/backup.c               |  2 +-
- block/commit.c               |  2 +-
- block/mirror.c               |  4 ++--
- block/stream.c               |  2 +-
- blockjob.c                   | 27 ---------------------------
- job.c                        | 32 ++++++++++++++++++++++++++++++++
- tests/test-bdrv-drain.c      |  8 ++++----
- tests/test-blockjob-txn.c    |  2 +-
- tests/test-blockjob.c        |  2 +-
- 11 files changed, 60 insertions(+), 49 deletions(-)
+ include/block/blockjob.h     | 32 -------------------
+ include/block/blockjob_int.h |  7 +++++
+ include/qemu/job.h           | 37 ++++++++++++++++++++++
+ block/backup.c               |  1 +
+ block/commit.c               |  1 +
+ block/mirror.c               |  2 ++
+ block/stream.c               |  1 +
+ blockdev.c                   |  6 ++--
+ blockjob.c                   | 73 ++++++++++----------------------------------
+ job.c                        | 51 +++++++++++++++++++++++++++++++
+ tests/test-bdrv-drain.c      |  1 +
+ tests/test-blockjob-txn.c    |  1 +
+ tests/test-blockjob.c        |  6 ++--
+ 13 files changed, 125 insertions(+), 94 deletions(-)
 
+diff --git a/include/block/blockjob.h b/include/block/blockjob.h
+index c0448206e2..ce136ff2ac 100644
+--- a/include/block/blockjob.h
++++ b/include/block/blockjob.h
+@@ -57,12 +57,6 @@ typedef struct BlockJob {
+     bool force;
+ 
+     /**
+-     * Set to true if the job is paused by user.  Can be unpaused with the
+-     * block-job-resume QMP command.
+-     */
+-    bool user_paused;
+-
+-    /**
+      * Set to true when the job is ready to be completed.
+      */
+     bool ready;
+@@ -248,32 +242,6 @@ void block_job_progress_set_remaining(BlockJob *job, uint64_t remaining);
+ BlockJobInfo *block_job_query(BlockJob *job, Error **errp);
+ 
+ /**
+- * block_job_user_pause:
+- * @job: The job to be paused.
+- *
+- * Asynchronously pause the specified job.
+- * Do not allow a resume until a matching call to block_job_user_resume.
+- */
+-void block_job_user_pause(BlockJob *job, Error **errp);
+-
+-/**
+- * block_job_paused:
+- * @job: The job to query.
+- *
+- * Returns true if the job is user-paused.
+- */
+-bool block_job_user_paused(BlockJob *job);
+-
+-/**
+- * block_job_user_resume:
+- * @job: The job to be resumed.
+- *
+- * Resume the specified job.
+- * Must be paired with a preceding block_job_user_pause.
+- */
+-void block_job_user_resume(BlockJob *job, Error **errp);
+-
+-/**
+  * block_job_user_cancel:
+  * @job: The job to be cancelled.
+  * @force: Quit a job without waiting for data to be in sync.
 diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-index 0a614a89b8..8937f5b163 100644
+index 8937f5b163..7e705ae0e9 100644
 --- a/include/block/blockjob_int.h
 +++ b/include/block/blockjob_int.h
-@@ -134,17 +134,6 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+@@ -134,6 +134,13 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
  void block_job_free(Job *job);
  
  /**
-- * block_job_sleep_ns:
-- * @job: The job that calls the function.
-- * @ns: How many nanoseconds to stop for.
-- *
-- * Put the job to sleep (assuming that it wasn't canceled) for @ns
-- * %QEMU_CLOCK_REALTIME nanoseconds.  Canceling the job will immediately
-- * interrupt the wait.
-- */
--void block_job_sleep_ns(BlockJob *job, int64_t ns);
--
--/**
++ * block_job_user_resume:
++ * Callback to be used for JobDriver.user_resume in all block jobs. Resets the
++ * iostatus when the user resumes @job.
++ */
++void block_job_user_resume(Job *job);
++
++/**
   * block_job_yield:
   * @job: The job that calls the function.
   *
 diff --git a/include/qemu/job.h b/include/qemu/job.h
-index 00c7cda9a3..ddfa824315 100644
+index ddfa824315..0ba6cb3161 100644
 --- a/include/qemu/job.h
 +++ b/include/qemu/job.h
-@@ -168,6 +168,13 @@ void job_enter_cond(Job *job, bool(*fn)(Job *job));
- void job_start(Job *job);
+@@ -83,6 +83,12 @@ typedef struct Job {
+     bool paused;
+ 
+     /**
++     * Set to true if the job is paused by user.  Can be unpaused with the
++     * block-job-resume QMP command.
++     */
++    bool user_paused;
++
++    /**
+      * Set to true if the job should cancel itself.  The flag must
+      * always be tested just before toggling the busy flag from false
+      * to true.  After a job has been cancelled, it should only yield
+@@ -124,6 +130,12 @@ struct JobDriver {
+      */
+     void coroutine_fn (*resume)(Job *job);
+ 
++    /**
++     * Called when the job is resumed by the user (i.e. user_paused becomes
++     * false). .user_resume is called before .resume.
++     */
++    void (*user_resume)(Job *job);
++
+     /** Called when the job is freed */
+     void (*free)(Job *job);
+ };
+@@ -203,6 +215,31 @@ const char *job_type_str(Job *job);
+ bool job_is_cancelled(Job *job);
  
  /**
-+ * @job: The job to enter.
-+ *
-+ * Continue the specified job by entering the coroutine.
++ * Request @job to pause at the next pause point. Must be paired with
++ * job_resume(). If the job is supposed to be resumed by user action, call
++ * job_user_pause() instead.
 + */
-+void job_enter(Job *job);
++void job_pause(Job *job);
++
++/** Resumes a @job paused with job_pause. */
++void job_resume(Job *job);
 +
 +/**
-  * @job: The job that is ready to pause.
++ * Asynchronously pause the specified @job.
++ * Do not allow a resume until a matching call to job_user_resume.
++ */
++void job_user_pause(Job *job, Error **errp);
++
++/** Returns true if the job is user-paused. */
++bool job_user_paused(Job *job);
++
++/**
++ * Resume the specified @job.
++ * Must be paired with a preceding job_user_pause.
++ */
++void job_user_resume(Job *job, Error **errp);
++
++/**
+  * Get the next element from the list of block jobs after @job, or the
+  * first one if @job is %NULL.
   *
-  * Pause now if job_pause() has been called. Jobs that perform lots of I/O
-@@ -175,6 +182,16 @@ void job_start(Job *job);
-  */
- void coroutine_fn job_pause_point(Job *job);
- 
-+/**
-+ * @job: The job that calls the function.
-+ * @ns: How many nanoseconds to stop for.
-+ *
-+ * Put the job to sleep (assuming that it wasn't canceled) for @ns
-+ * %QEMU_CLOCK_REALTIME nanoseconds.  Canceling the job will immediately
-+ * interrupt the wait.
-+ */
-+void coroutine_fn job_sleep_ns(Job *job, int64_t ns);
-+
- 
- /** Returns the JobType of a given Job. */
- JobType job_type(Job *job);
 diff --git a/block/backup.c b/block/backup.c
-index 7d9aad9749..f3a4f7c898 100644
+index f3a4f7c898..4d011d5a5c 100644
 --- a/block/backup.c
 +++ b/block/backup.c
-@@ -338,7 +338,7 @@ static bool coroutine_fn yield_and_check(BackupBlockJob *job)
-      * return. Without a yield, the VM would not reboot. */
-     delay_ns = block_job_ratelimit_get_delay(&job->common, job->bytes_read);
-     job->bytes_read = 0;
--    block_job_sleep_ns(&job->common, delay_ns);
-+    job_sleep_ns(&job->common.job, delay_ns);
- 
-     if (job_is_cancelled(&job->common.job)) {
-         return true;
+@@ -528,6 +528,7 @@ static const BlockJobDriver backup_job_driver = {
+         .instance_size          = sizeof(BackupBlockJob),
+         .job_type               = JOB_TYPE_BACKUP,
+         .free                   = block_job_free,
++        .user_resume            = block_job_user_resume,
+         .start                  = backup_run,
+     },
+     .commit                 = backup_commit,
 diff --git a/block/commit.c b/block/commit.c
-index 2fbc31077a..1c6cb6c298 100644
+index 1c6cb6c298..c4a98e5804 100644
 --- a/block/commit.c
 +++ b/block/commit.c
-@@ -172,7 +172,7 @@ static void coroutine_fn commit_run(void *opaque)
-         /* Note that even when no rate limit is applied we need to yield
-          * with no pending I/O here so that bdrv_drain_all() returns.
-          */
--        block_job_sleep_ns(&s->common, delay_ns);
-+        job_sleep_ns(&s->common.job, delay_ns);
-         if (job_is_cancelled(&s->common.job)) {
-             break;
-         }
+@@ -220,6 +220,7 @@ static const BlockJobDriver commit_job_driver = {
+         .instance_size = sizeof(CommitBlockJob),
+         .job_type      = JOB_TYPE_COMMIT,
+         .free          = block_job_free,
++        .user_resume   = block_job_user_resume,
+         .start         = commit_run,
+     },
+ };
 diff --git a/block/mirror.c b/block/mirror.c
-index 5e8e0869be..6d54729557 100644
+index 6d54729557..80f068ca75 100644
 --- a/block/mirror.c
 +++ b/block/mirror.c
-@@ -595,7 +595,7 @@ static void mirror_throttle(MirrorBlockJob *s)
- 
-     if (now - s->last_pause_ns > SLICE_TIME) {
-         s->last_pause_ns = now;
--        block_job_sleep_ns(&s->common, 0);
-+        job_sleep_ns(&s->common.job, 0);
-     } else {
-         job_pause_point(&s->common.job);
-     }
-@@ -869,7 +869,7 @@ static void coroutine_fn mirror_run(void *opaque)
-             delay_ns = (s->in_flight == 0 && cnt == 0 ? SLICE_TIME : 0);
-         }
-         trace_mirror_before_sleep(s, cnt, s->synced, delay_ns);
--        block_job_sleep_ns(&s->common, delay_ns);
-+        job_sleep_ns(&s->common.job, delay_ns);
-         if (job_is_cancelled(&s->common.job) &&
-             (!s->synced || s->common.force))
-         {
+@@ -991,6 +991,7 @@ static const BlockJobDriver mirror_job_driver = {
+         .instance_size          = sizeof(MirrorBlockJob),
+         .job_type               = JOB_TYPE_MIRROR,
+         .free                   = block_job_free,
++        .user_resume            = block_job_user_resume,
+         .start                  = mirror_run,
+         .pause                  = mirror_pause,
+     },
+@@ -1004,6 +1005,7 @@ static const BlockJobDriver commit_active_job_driver = {
+         .instance_size          = sizeof(MirrorBlockJob),
+         .job_type               = JOB_TYPE_COMMIT,
+         .free                   = block_job_free,
++        .user_resume            = block_job_user_resume,
+         .start                  = mirror_run,
+         .pause                  = mirror_pause,
+     },
 diff --git a/block/stream.c b/block/stream.c
-index 6d8b7b6eee..1faab02086 100644
+index 1faab02086..e81b488a22 100644
 --- a/block/stream.c
 +++ b/block/stream.c
-@@ -140,7 +140,7 @@ static void coroutine_fn stream_run(void *opaque)
-         /* Note that even when no rate limit is applied we need to yield
-          * with no pending I/O here so that bdrv_drain_all() returns.
-          */
--        block_job_sleep_ns(&s->common, delay_ns);
-+        job_sleep_ns(&s->common.job, delay_ns);
-         if (job_is_cancelled(&s->common.job)) {
-             break;
-         }
+@@ -214,6 +214,7 @@ static const BlockJobDriver stream_job_driver = {
+         .job_type      = JOB_TYPE_STREAM,
+         .free          = block_job_free,
+         .start         = stream_run,
++        .user_resume   = block_job_user_resume,
+     },
+ };
+ 
+diff --git a/blockdev.c b/blockdev.c
+index c551fdf39a..3533c0dd6a 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3844,7 +3844,7 @@ void qmp_block_job_cancel(const char *device,
+         force = false;
+     }
+ 
+-    if (block_job_user_paused(job) && !force) {
++    if (job_user_paused(&job->job) && !force) {
+         error_setg(errp, "The block job for device '%s' is currently paused",
+                    device);
+         goto out;
+@@ -3866,7 +3866,7 @@ void qmp_block_job_pause(const char *device, Error **errp)
+     }
+ 
+     trace_qmp_block_job_pause(job);
+-    block_job_user_pause(job, errp);
++    job_user_pause(&job->job, errp);
+     aio_context_release(aio_context);
+ }
+ 
+@@ -3880,7 +3880,7 @@ void qmp_block_job_resume(const char *device, Error **errp)
+     }
+ 
+     trace_qmp_block_job_resume(job);
+-    block_job_user_resume(job, errp);
++    job_user_resume(&job->job, errp);
+     aio_context_release(aio_context);
+ }
+ 
 diff --git a/blockjob.c b/blockjob.c
-index 323dad96a3..342ec74f66 100644
+index 342ec74f66..a2b6bfc975 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -174,7 +174,6 @@ void block_job_free(Job *job)
-                                     block_job_detach_aio_context, bjob);
-     blk_unref(bjob->blk);
-     error_free(bjob->blocker);
--    assert(!timer_pending(&bjob->job.sleep_timer));
+@@ -141,21 +141,6 @@ static void block_job_txn_del_job(BlockJob *job)
+     }
  }
  
- static void block_job_attached_aio_context(AioContext *new_context,
-@@ -283,13 +282,6 @@ const BlockJobDriver *block_job_driver(BlockJob *job)
-     return job->driver;
- }
- 
--static void block_job_sleep_timer_cb(void *opaque)
+-static void block_job_pause(BlockJob *job)
 -{
--    BlockJob *job = opaque;
+-    job->job.pause_count++;
+-}
 -
+-static void block_job_resume(BlockJob *job)
+-{
+-    assert(job->job.pause_count > 0);
+-    job->job.pause_count--;
+-    if (job->job.pause_count) {
+-        return;
+-    }
 -    block_job_enter(job);
 -}
 -
- static void block_job_decommission(BlockJob *job)
- {
-     assert(job);
-@@ -859,9 +851,6 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-     job->opaque        = opaque;
-     job->auto_finalize = !(flags & BLOCK_JOB_MANUAL_FINALIZE);
-     job->auto_dismiss  = !(flags & BLOCK_JOB_MANUAL_DISMISS);
--    aio_timer_init(qemu_get_aio_context(), &job->job.sleep_timer,
--                   QEMU_CLOCK_REALTIME, SCALE_NS,
--                   block_job_sleep_timer_cb, job);
+ static void block_job_attached_aio_context(AioContext *new_context,
+                                            void *opaque);
+ static void block_job_detach_aio_context(void *opaque);
+@@ -186,7 +171,7 @@ static void block_job_attached_aio_context(AioContext *new_context,
+         job->driver->attached_aio_context(job, new_context);
+     }
  
-     error_setg(&job->blocker, "block device is in use by block job: %s",
-                job_type_str(&job->job));
-@@ -924,22 +913,6 @@ void block_job_enter(BlockJob *job)
-     job_enter_cond(&job->job, NULL);
+-    block_job_resume(job);
++    job_resume(&job->job);
  }
  
--void block_job_sleep_ns(BlockJob *job, int64_t ns)
+ static void block_job_drain(BlockJob *job)
+@@ -207,7 +192,7 @@ static void block_job_detach_aio_context(void *opaque)
+     /* In case the job terminates during aio_poll()... */
+     job_ref(&job->job);
+ 
+-    block_job_pause(job);
++    job_pause(&job->job);
+ 
+     while (!job->job.paused && !job->completed) {
+         block_job_drain(job);
+@@ -226,13 +211,13 @@ static char *child_job_get_parent_desc(BdrvChild *c)
+ static void child_job_drained_begin(BdrvChild *c)
+ {
+     BlockJob *job = c->opaque;
+-    block_job_pause(job);
++    job_pause(&job->job);
+ }
+ 
+ static void child_job_drained_end(BdrvChild *c)
+ {
+     BlockJob *job = c->opaque;
+-    block_job_resume(job);
++    job_resume(&job->job);
+ }
+ 
+ static const BdrvChildRole child_job = {
+@@ -389,9 +374,9 @@ static void block_job_cancel_async(BlockJob *job, bool force)
+     if (job->iostatus != BLOCK_DEVICE_IO_STATUS_OK) {
+         block_job_iostatus_reset(job);
+     }
+-    if (job->user_paused) {
++    if (job->job.user_paused) {
+         /* Do not call block_job_enter here, the caller will handle it.  */
+-        job->user_paused = false;
++        job->job.user_paused = false;
+         job->job.pause_count--;
+     }
+     job->job.cancelled = true;
+@@ -621,39 +606,6 @@ void block_job_dismiss(BlockJob **jobptr, Error **errp)
+     *jobptr = NULL;
+ }
+ 
+-void block_job_user_pause(BlockJob *job, Error **errp)
 -{
--    assert(job->job.busy);
--
--    /* Check cancellation *before* setting busy = false, too!  */
--    if (job_is_cancelled(&job->job)) {
+-    if (job_apply_verb(&job->job, JOB_VERB_PAUSE, errp)) {
 -        return;
 -    }
--
--    if (!job_should_pause(&job->job)) {
--        job_do_yield(&job->job, qemu_clock_get_ns(QEMU_CLOCK_REALTIME) + ns);
+-    if (job->user_paused) {
+-        error_setg(errp, "Job is already paused");
+-        return;
 -    }
--
--    job_pause_point(&job->job);
+-    job->user_paused = true;
+-    block_job_pause(job);
 -}
 -
- void block_job_yield(BlockJob *job)
+-bool block_job_user_paused(BlockJob *job)
+-{
+-    return job->user_paused;
+-}
+-
+-void block_job_user_resume(BlockJob *job, Error **errp)
+-{
+-    assert(job);
+-    if (!job->user_paused || job->job.pause_count <= 0) {
+-        error_setg(errp, "Can't resume a job that was not paused");
+-        return;
+-    }
+-    if (job_apply_verb(&job->job, JOB_VERB_RESUME, errp)) {
+-        return;
+-    }
+-    block_job_iostatus_reset(job);
+-    job->user_paused = false;
+-    block_job_resume(job);
+-}
+-
+ void block_job_cancel(BlockJob *job, bool force)
  {
-     assert(job->job.busy);
-diff --git a/job.c b/job.c
-index b4cece1a82..932ccea105 100644
---- a/job.c
-+++ b/job.c
-@@ -152,6 +152,13 @@ Job *job_get(const char *id)
-     return NULL;
+     if (job->job.status == JOB_STATUS_CONCLUDED) {
+@@ -844,6 +796,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+ 
+     assert(is_block_job(&job->job));
+     assert(job->job.driver->free == &block_job_free);
++    assert(job->job.driver->user_resume == &block_job_user_resume);
+ 
+     job->driver        = driver;
+     job->blk           = blk;
+@@ -934,10 +887,16 @@ void block_job_iostatus_reset(BlockJob *job)
+     if (job->iostatus == BLOCK_DEVICE_IO_STATUS_OK) {
+         return;
+     }
+-    assert(job->user_paused && job->job.pause_count > 0);
++    assert(job->job.user_paused && job->job.pause_count > 0);
+     job->iostatus = BLOCK_DEVICE_IO_STATUS_OK;
  }
  
-+static void job_sleep_timer_cb(void *opaque)
++void block_job_user_resume(Job *job)
 +{
-+    Job *job = opaque;
++    BlockJob *bjob = container_of(job, BlockJob, job);
++    block_job_iostatus_reset(bjob);
++}
 +
+ void block_job_event_ready(BlockJob *job)
+ {
+     job_state_transition(&job->job, JOB_STATUS_READY);
+@@ -984,9 +943,9 @@ BlockErrorAction block_job_error_action(BlockJob *job, BlockdevOnError on_err,
+                                         action, &error_abort);
+     }
+     if (action == BLOCK_ERROR_ACTION_STOP) {
+-        block_job_pause(job);
++        job_pause(&job->job);
+         /* make the pause user visible, which will be resumed from QMP. */
+-        job->user_paused = true;
++        job->job.user_paused = true;
+         block_job_iostatus_set_err(job, error);
+     }
+     return action;
+diff --git a/job.c b/job.c
+index 932ccea105..94ad01a51a 100644
+--- a/job.c
++++ b/job.c
+@@ -341,6 +341,57 @@ void job_start(Job *job)
+     aio_co_enter(job->aio_context, job->co);
+ }
+ 
++void job_pause(Job *job)
++{
++    job->pause_count++;
++}
++
++void job_resume(Job *job)
++{
++    assert(job->pause_count > 0);
++    job->pause_count--;
++    if (job->pause_count) {
++        return;
++    }
 +    job_enter(job);
 +}
 +
- void *job_create(const char *job_id, const JobDriver *driver, AioContext *ctx,
-                  Error **errp)
- {
-@@ -178,6 +185,9 @@ void *job_create(const char *job_id, const JobDriver *driver, AioContext *ctx,
-     job->pause_count   = 1;
- 
-     job_state_transition(job, JOB_STATUS_CREATED);
-+    aio_timer_init(qemu_get_aio_context(), &job->sleep_timer,
-+                   QEMU_CLOCK_REALTIME, SCALE_NS,
-+                   job_sleep_timer_cb, job);
- 
-     QLIST_INSERT_HEAD(&jobs, job, job_list);
- 
-@@ -193,6 +203,7 @@ void job_unref(Job *job)
- {
-     if (--job->refcnt == 0) {
-         assert(job->status == JOB_STATUS_NULL);
-+        assert(!timer_pending(&job->sleep_timer));
- 
-         if (job->driver->free) {
-             job->driver->free(job);
-@@ -232,6 +243,11 @@ void job_enter_cond(Job *job, bool(*fn)(Job *job))
-     aio_co_wake(job->co);
- }
- 
-+void job_enter(Job *job)
++void job_user_pause(Job *job, Error **errp)
 +{
-+    job_enter_cond(job, NULL);
-+}
-+
- /* Yield, and schedule a timer to reenter the coroutine after @ns nanoseconds.
-  * Reentering the job coroutine with block_job_enter() before the timer has
-  * expired is allowed and cancels the timer.
-@@ -283,6 +299,22 @@ void coroutine_fn job_pause_point(Job *job)
-     }
- }
- 
-+void coroutine_fn job_sleep_ns(Job *job, int64_t ns)
-+{
-+    assert(job->busy);
-+
-+    /* Check cancellation *before* setting busy = false, too!  */
-+    if (job_is_cancelled(job)) {
++    if (job_apply_verb(job, JOB_VERB_PAUSE, errp)) {
 +        return;
 +    }
-+
-+    if (!job_should_pause(job)) {
-+        job_do_yield(job, qemu_clock_get_ns(QEMU_CLOCK_REALTIME) + ns);
++    if (job->user_paused) {
++        error_setg(errp, "Job is already paused");
++        return;
 +    }
-+
-+    job_pause_point(job);
++    job->user_paused = true;
++    job_pause(job);
 +}
 +
- /**
-  * All jobs must allow a pause point before entering their job proper. This
-  * ensures that jobs can be paused prior to being started, then resumed later.
++bool job_user_paused(Job *job)
++{
++    return job->user_paused;
++}
++
++void job_user_resume(Job *job, Error **errp)
++{
++    assert(job);
++    if (!job->user_paused || job->pause_count <= 0) {
++        error_setg(errp, "Can't resume a job that was not paused");
++        return;
++    }
++    if (job_apply_verb(job, JOB_VERB_RESUME, errp)) {
++        return;
++    }
++    if (job->driver->user_resume) {
++        job->driver->user_resume(job);
++    }
++    job->user_paused = false;
++    job_resume(job);
++}
++
++
+ typedef struct {
+     Job *job;
+     JobDeferToMainLoopFn *fn;
 diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
-index c9f2f9b183..50232f5eaf 100644
+index 50232f5eaf..c993512f66 100644
 --- a/tests/test-bdrv-drain.c
 +++ b/tests/test-bdrv-drain.c
-@@ -508,7 +508,7 @@ static void coroutine_fn test_job_start(void *opaque)
- 
-     block_job_event_ready(&s->common);
-     while (!s->should_complete) {
--        block_job_sleep_ns(&s->common, 100000);
-+        job_sleep_ns(&s->common.job, 100000);
-     }
- 
-     job_defer_to_main_loop(&s->common.job, test_job_completed, NULL);
-@@ -553,7 +553,7 @@ static void test_blockjob_common(enum drain_type drain_type)
- 
-     g_assert_cmpint(job->job.pause_count, ==, 0);
-     g_assert_false(job->job.paused);
--    g_assert_false(job->job.busy); /* We're in block_job_sleep_ns() */
-+    g_assert_false(job->job.busy); /* We're in job_sleep_ns() */
- 
-     do_drain_begin(drain_type, src);
- 
-@@ -571,7 +571,7 @@ static void test_blockjob_common(enum drain_type drain_type)
- 
-     g_assert_cmpint(job->job.pause_count, ==, 0);
-     g_assert_false(job->job.paused);
--    g_assert_false(job->job.busy); /* We're in block_job_sleep_ns() */
-+    g_assert_false(job->job.busy); /* We're in job_sleep_ns() */
- 
-     do_drain_begin(drain_type, target);
- 
-@@ -589,7 +589,7 @@ static void test_blockjob_common(enum drain_type drain_type)
- 
-     g_assert_cmpint(job->job.pause_count, ==, 0);
-     g_assert_false(job->job.paused);
--    g_assert_false(job->job.busy); /* We're in block_job_sleep_ns() */
-+    g_assert_false(job->job.busy); /* We're in job_sleep_ns() */
- 
-     ret = block_job_complete_sync(job, &error_abort);
-     g_assert_cmpint(ret, ==, 0);
+@@ -524,6 +524,7 @@ BlockJobDriver test_job_driver = {
+     .job_driver = {
+         .instance_size  = sizeof(TestBlockJob),
+         .free           = block_job_free,
++        .user_resume    = block_job_user_resume,
+         .start          = test_job_start,
+     },
+     .complete       = test_job_complete,
 diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
-index 323e154a00..0e6162bc71 100644
+index 0e6162bc71..93d1ff0859 100644
 --- a/tests/test-blockjob-txn.c
 +++ b/tests/test-blockjob-txn.c
-@@ -45,7 +45,7 @@ static void coroutine_fn test_block_job_run(void *opaque)
- 
-     while (s->iterations--) {
-         if (s->use_timer) {
--            block_job_sleep_ns(job, 0);
-+            job_sleep_ns(&job->job, 0);
-         } else {
-             block_job_yield(job);
-         }
+@@ -78,6 +78,7 @@ static const BlockJobDriver test_block_job_driver = {
+     .job_driver = {
+         .instance_size = sizeof(TestBlockJob),
+         .free          = block_job_free,
++        .user_resume   = block_job_user_resume,
+         .start         = test_block_job_run,
+     },
+ };
 diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
-index 1d18325feb..b329bd5274 100644
+index b329bd5274..ceb59600ed 100644
 --- a/tests/test-blockjob.c
 +++ b/tests/test-blockjob.c
-@@ -188,7 +188,7 @@ static void coroutine_fn cancel_job_start(void *opaque)
-             block_job_event_ready(&s->common);
-         }
+@@ -20,6 +20,7 @@ static const BlockJobDriver test_block_job_driver = {
+     .job_driver = {
+         .instance_size = sizeof(BlockJob),
+         .free          = block_job_free,
++        .user_resume   = block_job_user_resume,
+     },
+ };
  
--        block_job_sleep_ns(&s->common, 100000);
-+        job_sleep_ns(&s->common.job, 100000);
-     }
+@@ -199,6 +200,7 @@ static const BlockJobDriver test_cancel_driver = {
+     .job_driver = {
+         .instance_size = sizeof(CancelJob),
+         .free          = block_job_free,
++        .user_resume   = block_job_user_resume,
+         .start         = cancel_job_start,
+     },
+     .complete      = cancel_job_complete,
+@@ -270,7 +272,7 @@ static void test_cancel_paused(void)
+     job_start(&job->job);
+     assert(job->job.status == JOB_STATUS_RUNNING);
  
-  defer:
+-    block_job_user_pause(job, &error_abort);
++    job_user_pause(&job->job, &error_abort);
+     block_job_enter(job);
+     assert(job->job.status == JOB_STATUS_PAUSED);
+ 
+@@ -308,7 +310,7 @@ static void test_cancel_standby(void)
+     block_job_enter(job);
+     assert(job->job.status == JOB_STATUS_READY);
+ 
+-    block_job_user_pause(job, &error_abort);
++    job_user_pause(&job->job, &error_abort);
+     block_job_enter(job);
+     assert(job->job.status == JOB_STATUS_STANDBY);
+ 
 -- 
 2.13.6
