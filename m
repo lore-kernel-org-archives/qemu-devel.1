@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGTJ3-0004SV-O7
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 13:55:18 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fGTJ8-0004fS-G6
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 13:55:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGTJ2-0005IG-DJ
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 13:55:13 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:33908)
+	(envelope-from <richard.henderson@linaro.org>) id 1fGTJ4-0005LU-3R
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 13:55:18 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:41945)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fGTJ2-0005Gf-3g
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 13:55:12 -0400
-Received: by mail-pg0-x242.google.com with SMTP id g20-v6so16326547pgv.1
-	for <qemu-devel@nongnu.org>; Wed, 09 May 2018 10:55:11 -0700 (PDT)
+	id 1fGTJ3-0005Jt-Qi
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 13:55:13 -0400
+Received: by mail-pg0-x242.google.com with SMTP id m21-v6so23010213pgv.8
+	for <qemu-devel@nongnu.org>; Wed, 09 May 2018 10:55:13 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  9 May 2018 10:54:36 -0700
-Message-Id: <20180509175458.15642-7-richard.henderson@linaro.org>
+Date: Wed,  9 May 2018 10:54:37 -0700
+Message-Id: <20180509175458.15642-8-richard.henderson@linaro.org>
 In-Reply-To: <20180509175458.15642-1-richard.henderson@linaro.org>
 References: <20180509175458.15642-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 06/28] target/tilegx: avoid integer overflow in
- next_page PC check
+Subject: [Qemu-devel] [PULL 07/28] target/microblaze: avoid integer overflow
+ in next_page PC check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,33 +36,43 @@ If the PC is in the last page of the address space, next_page_start
 overflows to 0. Fix it.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/tilegx/translate.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ target/microblaze/translate.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/target/tilegx/translate.c b/target/tilegx/translate.c
-index d63bf5bba3..6c53c5e767 100644
---- a/target/tilegx/translate.c
-+++ b/target/tilegx/translate.c
-@@ -2375,7 +2375,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-     DisasContext ctx;
-     DisasContext *dc = &ctx;
-     uint64_t pc_start = tb->pc;
--    uint64_t next_page_start = (pc_start & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
-+    uint64_t page_start = pc_start & TARGET_PAGE_MASK;
-     int num_insns = 0;
-     int max_insns = tb_cflags(tb) & CF_COUNT_MASK;
+diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
+index 100883e2cc..0872dc9ded 100644
+--- a/target/microblaze/translate.c
++++ b/target/microblaze/translate.c
+@@ -1635,7 +1635,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
+     uint32_t pc_start;
+     struct DisasContext ctx;
+     struct DisasContext *dc = &ctx;
+-    uint32_t next_page_start, org_flags;
++    uint32_t page_start, org_flags;
+     target_ulong npc;
+     int num_insns;
+     int max_insns;
+@@ -1661,7 +1661,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
+         cpu_abort(cs, "Microblaze: unaligned PC=%x\n", pc_start);
+     }
  
-@@ -2415,7 +2415,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-         }
-         dc->pc += TILEGX_BUNDLE_SIZE_IN_BYTES;
-         if (num_insns >= max_insns
--            || dc->pc >= next_page_start
-+            || (dc->pc - page_start >= TARGET_PAGE_SIZE)
-             || tcg_op_buf_full()) {
-             /* Ending the TB due to TB size or page boundary.  Set PC.  */
-             tcg_gen_movi_tl(cpu_pc, dc->pc);
+-    next_page_start = (pc_start & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
++    page_start = pc_start & TARGET_PAGE_MASK;
+     num_insns = 0;
+     max_insns = tb_cflags(tb) & CF_COUNT_MASK;
+     if (max_insns == 0) {
+@@ -1747,7 +1747,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
+     } while (!dc->is_jmp && !dc->cpustate_changed
+              && !tcg_op_buf_full()
+              && !singlestep
+-             && (dc->pc < next_page_start)
++             && (dc->pc - page_start < TARGET_PAGE_SIZE)
+              && num_insns < max_insns);
+ 
+     npc = dc->pc;
 -- 
 2.17.0
