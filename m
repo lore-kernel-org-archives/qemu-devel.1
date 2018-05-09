@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fGYFY-0007z6-Py
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 19:11:58 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fGYFc-000815-KJ
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 19:12:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fGYFU-0002fw-Lc
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 19:11:56 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:46353)
+	(envelope-from <laurent@vivier.eu>) id 1fGYFa-0002p2-SI
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 19:12:00 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:36839)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fGYFU-0002e5-9a
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 19:11:52 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fGYFa-0002o1-HI
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 19:11:58 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu, 10 May 2018 01:11:20 +0200
-Message-Id: <20180509231123.20864-4-laurent@vivier.eu>
+Date: Thu, 10 May 2018 01:11:22 +0200
+Message-Id: <20180509231123.20864-6-laurent@vivier.eu>
 In-Reply-To: <20180509231123.20864-1-laurent@vivier.eu>
 References: <20180509231123.20864-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v2 3/6] linux-user: update sparc/syscall_nr.h
- to linux header 4.16
+Subject: [Qemu-devel] [PATCH v2 5/6] linux-user: add sparc/sparc64 specific
+ errno
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,200 +27,265 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Max Filippov <jcmvbkbc@gmail.com>, Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>, Eric Blake <eblake@redhat.com>
 
-And kill sys_aplib, add sys_sync_file_range:
-on sparc, since linux 2.6.17, aplib syscall has been replaced
- by sync_file_range syscall.
-(289eee6fa78e ["SPARC]: Wire up sys_sync_file_range() into syscall tables.")
-The syscall has been removed in linux v2.5.71
-(6196166fad "[SPARC64]: Kill sys_aplib.")
+Copied from linux/arch/sparc/include/uapi/asm/errno.h
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/sparc/syscall_nr.h   | 32 +++++++++++++++++++++++++++++++-
- linux-user/sparc64/syscall_nr.h | 20 ++++++++++++--------
- 2 files changed, 43 insertions(+), 9 deletions(-)
 
-diff --git a/linux-user/sparc/syscall_nr.h b/linux-user/sparc/syscall_nr.h
-index e713c9d5f4..2d77e19bec 100644
---- a/linux-user/sparc/syscall_nr.h
-+++ b/linux-user/sparc/syscall_nr.h
-@@ -22,6 +22,7 @@
- #define TARGET_NR_capset		 22 /* Linux Specific				   */
- #define TARGET_NR_setuid              23 /* Implemented via setreuid in SunOS           */
- #define TARGET_NR_getuid              24 /* Common                                      */
-+#define TARGET_NR_vmsplice            25
- #define TARGET_NR_ptrace              26 /* Common                                      */
- #define TARGET_NR_alarm               27 /* Implemented via setitimer in SunOS          */
- #define TARGET_NR_sigaltstack	 28 /* Common					   */
-@@ -135,6 +136,7 @@
- #define TARGET_NR_rmdir              137 /* Common                                      */
- #define TARGET_NR_utimes             138 /* SunOS Specific                              */
- #define TARGET_NR_stat64		139 /* Linux sparc32 Specific			   */
-+#define TARGET_NR_sendfile64         140
- #define TARGET_NR_getpeername        141 /* Common                                      */
- #define TARGET_NR_futex              142 /* gethostid under SunOS                       */
- #define TARGET_NR_gettid             143 /* ENOSYS under SunOS                          */
-@@ -145,29 +147,51 @@
- #define TARGET_NR_pciconfig_read	148 /* ENOSYS under SunOS                          */
- #define TARGET_NR_pciconfig_write	149 /* ENOSYS under SunOS                          */
- #define TARGET_NR_getsockname        150 /* Common                                      */
-+#define TARGET_NR_inotify_init       151
-+#define TARGET_NR_inotify_add_watch  152
- #define TARGET_NR_poll               153 /* Common                                      */
- #define TARGET_NR_getdents64		154 /* Linux specific				   */
- #define TARGET_NR_fcntl64		155 /* Linux sparc32 Specific                      */
-+#define TARGET_NR_inotify_rm_watch   156
- #define TARGET_NR_statfs             157 /* Common                                      */
- #define TARGET_NR_fstatfs            158 /* Common                                      */
- #define TARGET_NR_umount             159 /* Common                                      */
-+#define TARGET_NR_sched_set_affinity 160
-+#define TARGET_NR_sched_get_affinity 161
- #define TARGET_NR_getdomainname      162 /* SunOS Specific                              */
- #define TARGET_NR_setdomainname      163 /* Common                                      */
- #define TARGET_NR_quotactl           165 /* Common                                      */
- #define TARGET_NR_set_tid_address    166 /* Linux specific, exportfs under SunOS        */
- #define TARGET_NR_mount              167 /* Common                                      */
- #define TARGET_NR_ustat              168 /* Common                                      */
-+#define TARGET_NR_setxattr           169
-+#define TARGET_NR_lsetxattr          170
-+#define TARGET_NR_fsetxattr          171
-+#define TARGET_NR_getxattr           172
-+#define TARGET_NR_lgetxattr          173
- #define TARGET_NR_getdents           174 /* Common                                      */
- #define TARGET_NR_setsid             175 /* Common                                      */
- #define TARGET_NR_fchdir             176 /* Common                                      */
-+#define TARGET_NR_fgetxattr          177
-+#define TARGET_NR_listxattr          178
-+#define TARGET_NR_llistxattr         179
-+#define TARGET_NR_flistxattr         180
-+#define TARGET_NR_removexattr        181
-+#define TARGET_NR_lremovexattr       182
- #define TARGET_NR_sigpending         183 /* Common                                      */
- #define TARGET_NR_query_module	184 /* Linux Specific				   */
- #define TARGET_NR_setpgid            185 /* Common                                      */
-+#define TARGET_NR_fremovexattr       186
- #define TARGET_NR_tkill              187 /* SunOS: fpathconf                            */
- #define TARGET_NR_exit_group	     188 /* Linux specific, sysconf undef SunOS         */
- #define TARGET_NR_uname              189 /* Linux Specific                              */
- #define TARGET_NR_init_module        190 /* Linux Specific                              */
- #define TARGET_NR_personality        191 /* Linux Specific                              */
-+#define TARGET_NR_remap_file_pages   192
-+#define TARGET_NR_epoll_create       193
-+#define TARGET_NR_epoll_ctl          194
-+#define TARGET_NR_epoll_wait         195
-+#define TARGET_NR_ioprio_set         196
- #define TARGET_NR_getppid            197 /* Linux Specific                              */
- #define TARGET_NR_sigaction          198 /* Linux Specific                              */
- #define TARGET_NR_sgetmask           199 /* Linux Specific                              */
-@@ -189,6 +213,7 @@
- #define TARGET_NR_ipc                215 /* Linux Specific                              */
- #define TARGET_NR_sigreturn          216 /* Linux Specific                              */
- #define TARGET_NR_clone              217 /* Linux Specific                              */
-+#define TARGET_NR_ioprio_get         218
- #define TARGET_NR_adjtimex           219 /* Linux Specific                              */
- #define TARGET_NR_sigprocmask        220 /* Linux Specific                              */
- #define TARGET_NR_create_module      221 /* Linux Specific                              */
-@@ -202,6 +227,7 @@
- #define TARGET_NR_setfsgid           229 /* Linux Specific                              */
- #define TARGET_NR__newselect         230 /* Linux Specific                              */
- #define TARGET_NR_time               231 /* Linux Specific                              */
-+#define TARGET_NR_splice             232
- #define TARGET_NR_stime              233 /* Linux Specific                              */
- #define TARGET_NR_statfs64           234 /* Linux Specific                              */
- #define TARGET_NR_fstatfs64          235 /* Linux Specific                              */
-@@ -224,7 +250,7 @@
- #define TARGET_NR_getsid             252
- #define TARGET_NR_fdatasync          253
- #define TARGET_NR_nfsservctl         254
--#define TARGET_NR_aplib              255
-+#define TARGET_NR_sync_file_range    255
- #define TARGET_NR_clock_settime	256
- #define TARGET_NR_clock_gettime	257
- #define TARGET_NR_clock_getres	258
-@@ -326,3 +352,7 @@
- #define TARGET_NR_listen                354
- #define TARGET_NR_setsockopt            355
- #define TARGET_NR_mlock2                356
-+#define TARGET_NR_copy_file_range       357
-+#define TARGET_NR_preadv2               358
-+#define TARGET_NR_pwritev2              359
-+#define TARGET_NR_statx                 360
-diff --git a/linux-user/sparc64/syscall_nr.h b/linux-user/sparc64/syscall_nr.h
-index 2b49ead267..9391645598 100644
---- a/linux-user/sparc64/syscall_nr.h
-+++ b/linux-user/sparc64/syscall_nr.h
-@@ -23,7 +23,7 @@
- #define TARGET_NR_capset		 22 /* Linux Specific				   */
- #define TARGET_NR_setuid              23 /* Implemented via setreuid in SunOS           */
- #define TARGET_NR_getuid              24 /* Common                                      */
--/* #define TARGET_NR_time alias	 25    ENOSYS under SunOS			   */
-+#define TARGET_NR_vmsplice            25
- #define TARGET_NR_ptrace              26 /* Common                                      */
- #define TARGET_NR_alarm               27 /* Implemented via setitimer in SunOS          */
- #define TARGET_NR_sigaltstack	 28 /* Common					   */
-@@ -149,8 +149,8 @@
- #define TARGET_NR_pciconfig_read	148 /* ENOSYS under SunOS                          */
- #define TARGET_NR_pciconfig_write	149 /* ENOSYS under SunOS                          */
- #define TARGET_NR_getsockname        150 /* Common                                      */
--/* #define TARGET_NR_getmsg          151    SunOS Specific                              */
--/* #define TARGET_NR_putmsg          152    SunOS Specific                              */
-+#define TARGET_NR_inotify_init       151
-+#define TARGET_NR_inotify_add_watch  152
- #define TARGET_NR_poll               153 /* Common                                      */
- #define TARGET_NR_getdents64		154 /* Linux specific				   */
- #define TARGET_NR_fcntl64            155 /* Linux sparc32 Specific                      */
-@@ -194,7 +194,7 @@
- #define TARGET_NR_epoll_create       193 /* Linux Specific                              */
- #define TARGET_NR_epoll_ctl          194 /* Linux Specific                              */
- #define TARGET_NR_epoll_wait         195 /* Linux Specific                              */
--/* #define TARGET_NR_ulimit          196    Linux Specific                              */
-+#define TARGET_NR_ioprio_set         196
- #define TARGET_NR_getppid            197 /* Linux Specific                              */
- #define TARGET_NR_sigaction          198 /* Linux Specific                              */
- #define TARGET_NR_sgetmask           199 /* Linux Specific                              */
-@@ -216,7 +216,7 @@
- #define TARGET_NR_ipc                215 /* Linux Specific                              */
- #define TARGET_NR_sigreturn          216 /* Linux Specific                              */
- #define TARGET_NR_clone              217 /* Linux Specific                              */
--/* #define TARGET_NR_modify_ldt      218    Linux Specific - i386 specific, unused      */
-+#define TARGET_NR_ioprio_get         218
- #define TARGET_NR_adjtimex           219 /* Linux Specific                              */
- #define TARGET_NR_sigprocmask        220 /* Linux Specific                              */
- #define TARGET_NR_create_module      221 /* Linux Specific                              */
-@@ -230,7 +230,7 @@
- #define TARGET_NR_setfsgid           229 /* Linux Specific                              */
- #define TARGET_NR__newselect         230 /* Linux Specific                              */
- #define TARGET_NR_time               231 /* Linux sparc32                               */
--/* #define TARGET_NR_oldstat         232    Linux Specific                              */
-+#define TARGET_NR_splice             232
- #define TARGET_NR_stime              233 /* Linux Specific                              */
- #define TARGET_NR_statfs64           234 /* Linux Specific                              */
- #define TARGET_NR_fstatfs64          235 /* Linux Specific                              */
-@@ -253,7 +253,7 @@
- #define TARGET_NR_getsid             252
- #define TARGET_NR_fdatasync          253
- #define TARGET_NR_nfsservctl         254
--#define TARGET_NR_aplib              255
-+#define TARGET_NR_sync_file_range    255
- #define TARGET_NR_clock_settime	256
- #define TARGET_NR_clock_gettime	257
- #define TARGET_NR_clock_getres	258
-@@ -310,7 +310,7 @@
- #define TARGET_NR_epoll_pwait	309
- #define TARGET_NR_utimensat		310
- #define TARGET_NR_signalfd		311
--#define TARGET_NR_timerfd		312
-+#define TARGET_NR_timerfd_create        312
- #define TARGET_NR_eventfd		313
- #define TARGET_NR_fallocate		314
- #define TARGET_NR_timerfd_settime	315
-@@ -355,3 +355,7 @@
- #define TARGET_NR_listen                354
- #define TARGET_NR_setsockopt            355
- #define TARGET_NR_mlock2                356
-+#define TARGET_NR_copy_file_range       357
-+#define TARGET_NR_preadv2               358
-+#define TARGET_NR_pwritev2              359
-+#define TARGET_NR_statx                 360
+Notes:
+    v2:
+      - move sparc errno definitions to linux-user/sparc/target_errno.h
+
+ linux-user/sparc/target_errno.h     | 207 ++++++++++++++++++++++++++++++++++++
+ linux-user/sparc/target_syscall.h   |   2 +
+ linux-user/sparc64/target_syscall.h |   3 +-
+ 3 files changed, 211 insertions(+), 1 deletion(-)
+ create mode 100644 linux-user/sparc/target_errno.h
+
+diff --git a/linux-user/sparc/target_errno.h b/linux-user/sparc/target_errno.h
+new file mode 100644
+index 0000000000..9b846899cd
+--- /dev/null
++++ b/linux-user/sparc/target_errno.h
+@@ -0,0 +1,207 @@
++#ifndef SPARC_TARGET_ERRNO_H
++#define SPARC_TARGET_ERRNO_H
++
++/* Target errno definitions taken from asm-sparc/errno.h */
++#undef TARGET_EWOULDBLOCK
++#define TARGET_EWOULDBLOCK     TARGET_EAGAIN /* Operation would block */
++#undef TARGET_EINPROGRESS
++#define TARGET_EINPROGRESS     36 /* Operation now in progress */
++#undef TARGET_EALREADY
++#define TARGET_EALREADY        37 /* Operation already in progress */
++#undef TARGET_ENOTSOCK
++#define TARGET_ENOTSOCK        38 /* Socket operation on non-socket */
++#undef TARGET_EDESTADDRREQ
++#define TARGET_EDESTADDRREQ    39 /* Destination address required */
++#undef TARGET_EMSGSIZE
++#define TARGET_EMSGSIZE        40 /* Message too long */
++#undef TARGET_EPROTOTYPE
++#define TARGET_EPROTOTYPE      41 /* Protocol wrong type for socket */
++#undef TARGET_ENOPROTOOPT
++#define TARGET_ENOPROTOOPT     42 /* Protocol not available */
++#undef TARGET_EPROTONOSUPPORT
++#define TARGET_EPROTONOSUPPORT  43 /* Protocol not supported */
++#undef TARGET_ESOCKTNOSUPPORT
++#define TARGET_ESOCKTNOSUPPORT  44 /* Socket type not supported */
++#undef TARGET_EOPNOTSUPP
++#define TARGET_EOPNOTSUPP      45 /* Op not supported on transport endpoint */
++#undef TARGET_EPFNOSUPPORT
++#define TARGET_EPFNOSUPPORT    46 /* Protocol family not supported */
++#undef TARGET_EAFNOSUPPORT
++#define TARGET_EAFNOSUPPORT    47 /* Address family not supported by protocol */
++#undef TARGET_EADDRINUSE
++#define TARGET_EADDRINUSE      48 /* Address already in use */
++#undef TARGET_EADDRNOTAVAIL
++#define TARGET_EADDRNOTAVAIL   49 /* Cannot assign requested address */
++#undef TARGET_ENETDOWN
++#define TARGET_ENETDOWN        50 /* Network is down */
++#undef TARGET_ENETUNREACH
++#define TARGET_ENETUNREACH     51 /* Network is unreachable */
++#undef TARGET_ENETRESET
++#define TARGET_ENETRESET       52 /* Net dropped connection because of reset */
++#undef TARGET_ECONNABORTED
++#define TARGET_ECONNABORTED    53 /* Software caused connection abort */
++#undef TARGET_ECONNRESET
++#define TARGET_ECONNRESET      54 /* Connection reset by peer */
++#undef TARGET_ENOBUFS
++#define TARGET_ENOBUFS         55 /* No buffer space available */
++#undef TARGET_EISCONN
++#define TARGET_EISCONN         56 /* Transport endpoint is already connected */
++#undef TARGET_ENOTCONN
++#define TARGET_ENOTCONN        57 /* Transport endpoint is not connected */
++#undef TARGET_ESHUTDOWN
++#define TARGET_ESHUTDOWN       58 /* No send after transport endpoint shutdown*/
++#undef TARGET_ETOOMANYREFS
++#define TARGET_ETOOMANYREFS    59 /* Too many references: cannot splice */
++#undef TARGET_ETIMEDOUT
++#define TARGET_ETIMEDOUT       60 /* Connection timed out */
++#undef TARGET_ECONNREFUSED
++#define TARGET_ECONNREFUSED    61 /* Connection refused */
++#undef TARGET_ELOOP
++#define TARGET_ELOOP           62 /* Too many symbolic links encountered */
++#undef TARGET_ENAMETOOLONG
++#define TARGET_ENAMETOOLONG    63 /* File name too long */
++#undef TARGET_EHOSTDOWN
++#define TARGET_EHOSTDOWN       64 /* Host is down */
++#undef TARGET_EHOSTUNREACH
++#define TARGET_EHOSTUNREACH    65 /* No route to host */
++#undef TARGET_ENOTEMPTY
++#define TARGET_ENOTEMPTY       66 /* Directory not empty */
++#undef TARGET_EPROCLIM
++#define TARGET_EPROCLIM        67 /* SUNOS: Too many processes */
++#undef TARGET_EUSERS
++#define TARGET_EUSERS          68 /* Too many users */
++#undef TARGET_EDQUOT
++#define TARGET_EDQUOT          69 /* Quota exceeded */
++#undef TARGET_ESTALE
++#define TARGET_ESTALE          70 /* Stale file handle */
++#undef TARGET_EREMOTE
++#define TARGET_EREMOTE         71 /* Object is remote */
++#undef TARGET_ENOSTR
++#define TARGET_ENOSTR          72 /* Device not a stream */
++#undef TARGET_ETIME
++#define TARGET_ETIME           73 /* Timer expired */
++#undef TARGET_ENOSR
++#define TARGET_ENOSR           74 /* Out of streams resources */
++#undef TARGET_ENOMSG
++#define TARGET_ENOMSG          75 /* No message of desired type */
++#undef TARGET_EBADMSG
++#define TARGET_EBADMSG         76 /* Not a data message */
++#undef TARGET_EIDRM
++#define TARGET_EIDRM           77 /* Identifier removed */
++#undef TARGET_EDEADLK
++#define TARGET_EDEADLK         78 /* Resource deadlock would occur */
++#undef TARGET_ENOLCK
++#define TARGET_ENOLCK          79 /* No record locks available */
++#undef TARGET_ENONET
++#define TARGET_ENONET          80 /* Machine is not on the network */
++#undef TARGET_ERREMOTE
++#define TARGET_ERREMOTE        81 /* SunOS: Too many lvls of remote in path */
++#undef TARGET_ENOLINK
++#define TARGET_ENOLINK         82 /* Link has been severed */
++#undef TARGET_EADV
++#define TARGET_EADV            83 /* Advertise error */
++#undef TARGET_ESRMNT
++#define TARGET_ESRMNT          84 /* Srmount error */
++#undef TARGET_ECOMM
++#define TARGET_ECOMM           85 /* Communication error on send */
++#undef TARGET_EPROTO
++#define TARGET_EPROTO          86 /* Protocol error */
++#undef TARGET_EMULTIHOP
++#define TARGET_EMULTIHOP       87 /* Multihop attempted */
++#undef TARGET_EDOTDOT
++#define TARGET_EDOTDOT         88 /* RFS specific error */
++#undef TARGET_EREMCHG
++#define TARGET_EREMCHG         89 /* Remote address changed */
++#undef TARGET_ENOSYS
++#define TARGET_ENOSYS          90 /* Function not implemented */
++#undef TARGET_ESTRPIPE
++#define TARGET_ESTRPIPE        91 /* Streams pipe error */
++#undef TARGET_EOVERFLOW
++#define TARGET_EOVERFLOW       92 /* Value too large for defined data type */
++#undef TARGET_EBADFD
++#define TARGET_EBADFD          93 /* File descriptor in bad state */
++#undef TARGET_ECHRNG
++#define TARGET_ECHRNG          94 /* Channel number out of range */
++#undef TARGET_EL2NSYNC
++#define TARGET_EL2NSYNC        95 /* Level 2 not synchronized */
++#undef TARGET_EL3HLT
++#define TARGET_EL3HLT          96 /* Level 3 halted */
++#undef TARGET_EL3RST
++#define TARGET_EL3RST          97 /* Level 3 reset */
++#undef TARGET_ELNRNG
++#define TARGET_ELNRNG          98 /* Link number out of range */
++#undef TARGET_EUNATCH
++#define TARGET_EUNATCH         99 /* Protocol driver not attached */
++#undef TARGET_ENOCSI
++#define TARGET_ENOCSI          100 /* No CSI structure available */
++#undef TARGET_EL2HLT
++#define TARGET_EL2HLT          101 /* Level 2 halted */
++#undef TARGET_EBADE
++#define TARGET_EBADE           102 /* Invalid exchange */
++#undef TARGET_EBADR
++#define TARGET_EBADR           103 /* Invalid request descriptor */
++#undef TARGET_EXFULL
++#define TARGET_EXFULL          104 /* Exchange full */
++#undef TARGET_ENOANO
++#define TARGET_ENOANO          105 /* No anode */
++#undef TARGET_EBADRQC
++#define TARGET_EBADRQC         106 /* Invalid request code */
++#undef TARGET_EBADSLT
++#define TARGET_EBADSLT         107 /* Invalid slot */
++#undef TARGET_EDEADLOCK
++#define TARGET_EDEADLOCK       108 /* File locking deadlock error */
++#undef TARGET_EBFONT
++#define TARGET_EBFONT          109 /* Bad font file format */
++#undef TARGET_ELIBEXEC
++#define TARGET_ELIBEXEC        110 /* Cannot exec a shared library directly */
++#undef TARGET_ENODATA
++#define TARGET_ENODATA         111 /* No data available */
++#undef TARGET_ELIBBAD
++#define TARGET_ELIBBAD         112 /* Accessing a corrupted shared library */
++#undef TARGET_ENOPKG
++#define TARGET_ENOPKG          113 /* Package not installed */
++#undef TARGET_ELIBACC
++#define TARGET_ELIBACC         114 /* Can not access a needed shared library */
++#undef TARGET_ENOTUNIQ
++#define TARGET_ENOTUNIQ        115 /* Name not unique on network */
++#undef TARGET_ERESTART
++#define TARGET_ERESTART        116 /* Interrupted syscall should be restarted */
++#undef TARGET_EUCLEAN
++#define TARGET_EUCLEAN         117 /* Structure needs cleaning */
++#undef TARGET_ENOTNAM
++#define TARGET_ENOTNAM         118 /* Not a XENIX named type file */
++#undef TARGET_ENAVAIL
++#define TARGET_ENAVAIL         119 /* No XENIX semaphores available */
++#undef TARGET_EISNAM
++#define TARGET_EISNAM          120 /* Is a named type file */
++#undef TARGET_EREMOTEIO
++#define TARGET_EREMOTEIO       121 /* Remote I/O error */
++#undef TARGET_EILSEQ
++#define TARGET_EILSEQ          122 /* Illegal byte sequence */
++#undef TARGET_ELIBMAX
++#define TARGET_ELIBMAX         123 /* Atmpt to link in too many shared libs */
++#undef TARGET_ELIBSCN
++#define TARGET_ELIBSCN         124 /* .lib section in a.out corrupted */
++#undef TARGET_ENOMEDIUM
++#define TARGET_ENOMEDIUM       125 /* No medium found */
++#undef TARGET_EMEDIUMTYPE
++#define TARGET_EMEDIUMTYPE     126 /* Wrong medium type */
++#undef TARGET_ECANCELED
++#define TARGET_ECANCELED       127 /* Operation Cancelled */
++#undef TARGET_ENOKEY
++#define TARGET_ENOKEY          128 /* Required key not available */
++#undef TARGET_EKEYEXPIRED
++#define TARGET_EKEYEXPIRED     129 /* Key has expired */
++#undef TARGET_EKEYREVOKED
++#define TARGET_EKEYREVOKED     130 /* Key has been revoked */
++#undef TARGET_EKEYREJECTED
++#define TARGET_EKEYREJECTED    131 /* Key was rejected by service */
++#undef TARGET_EOWNERDEAD
++#define TARGET_EOWNERDEAD      132 /* Owner died */
++#undef TARGET_ENOTRECOVERABLE
++#define TARGET_ENOTRECOVERABLE  133 /* State not recoverable */
++#undef TARGET_ERFKILL
++#define TARGET_ERFKILL         134 /* Operation not possible due to RF-kill */
++#undef TARGET_EHWPOISON
++#define TARGET_EHWPOISON       135 /* Memory page has hardware error */
++#endif
+diff --git a/linux-user/sparc/target_syscall.h b/linux-user/sparc/target_syscall.h
+index 5f09abfe89..3725875fcf 100644
+--- a/linux-user/sparc/target_syscall.h
++++ b/linux-user/sparc/target_syscall.h
+@@ -1,6 +1,8 @@
+ #ifndef SPARC_TARGET_SYSCALL_H
+ #define SPARC_TARGET_SYSCALL_H
+ 
++#include "target_errno.h"
++
+ struct target_pt_regs {
+ 	abi_ulong psr;
+ 	abi_ulong pc;
+diff --git a/linux-user/sparc64/target_syscall.h b/linux-user/sparc64/target_syscall.h
+index 2cbbaaed1b..34f49df4a1 100644
+--- a/linux-user/sparc64/target_syscall.h
++++ b/linux-user/sparc64/target_syscall.h
+@@ -1,6 +1,8 @@
+ #ifndef SPARC64_TARGET_SYSCALL_H
+ #define SPARC64_TARGET_SYSCALL_H
+ 
++#include "../sparc/target_errno.h"
++
+ struct target_pt_regs {
+ 	abi_ulong u_regs[16];
+ 	abi_ulong tstate;
+@@ -29,5 +31,4 @@ static inline abi_ulong target_shmlba(CPUSPARCState *env)
+ {
+     return MAX(TARGET_PAGE_SIZE, 16 * 1024);
+ }
+-
+ #endif /* SPARC64_TARGET_SYSCALL_H */
 -- 
 2.14.3
