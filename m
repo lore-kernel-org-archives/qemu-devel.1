@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fGV1z-0005iO-5w
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 15:45:44 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fGVGu-000880-Fn
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 16:01:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fGV1y-0005hY-Cv
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 15:45:43 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <CAFEAcA-pjg34=bPe7EiYN6oYC_3xuMCyiucPwZrka2Fxxrk3DQ@mail.gmail.com>
-	<20180109170113.20768-1-michael@walle.cc>
-	<1a4554ccbdae089bdb0a0a3ae0799b20@walle.cc>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f2b761e0-cf29-835d-988f-98382d24f3c1@amsat.org>
-Date: Wed, 9 May 2018 16:45:33 -0300
-MIME-Version: 1.0
-In-Reply-To: <1a4554ccbdae089bdb0a0a3ae0799b20@walle.cc>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] lm32: take BQL before writing IP/IM
- register
+	(envelope-from <mreitz@redhat.com>) id 1fGVGt-00046R-KH
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 16:01:08 -0400
+From: Max Reitz <mreitz@redhat.com>
+Date: Wed,  9 May 2018 22:00:58 +0200
+Message-Id: <20180509200059.31125-2-mreitz@redhat.com>
+In-Reply-To: <20180509200059.31125-1-mreitz@redhat.com>
+References: <20180509200059.31125-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/2] qcow2: Repair OFLAG_COPIED when fixing
+ leaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +20,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Walle <michael@walle.cc>, peter.maydell@linaro.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, Programmingkid <programmingkidx@gmail.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-On 02/01/2018 06:09 AM, Michael Walle wrote:
-> 
-> Hi Peter,
-> 
-> do you apply this patch? Or do I have to send a pull request?
+Repairing OFLAG_COPIED is usually safe because it is done after the
+refcounts have been repaired.  Therefore, it we did not find anyone else
+referencing a data or L2 cluster, it makes no sense to not set
+OFLAG_COPIED -- and the other direction (clearing OFLAG_COPIED) is
+always safe, anyway, it may just induce leaks.
 
-Cc'ing Paolo.
+Furthermore, if OFLAG_COPIED is actually consistent with a wrong (leaky)
+refcount, we will decrement the refcount with -r leaks, but OFLAG_COPIED
+will then be wrong.  qemu-img check should not produce images that are
+more corrupted afterwards then they were before.
 
-> 
-> -michael
-> 
-> Am 2018-01-09 18:01, schrieb Michael Walle:
->> Writing to these registers may raise an interrupt request. Actually,
->> this prevents the milkymist board from starting.
->>
->> Cc: qemu-stable@nongnu.org
->> Signed-off-by: Michael Walle <michael@walle.cc>
+Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1527085
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ block/qcow2-refcount.c | 25 +++++++++++++++++--------
+ 1 file changed, 17 insertions(+), 8 deletions(-)
 
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
->> ---
->>  target/lm32/op_helper.c | 4 ++++
->>  1 file changed, 4 insertions(+)
->>
->> diff --git a/target/lm32/op_helper.c b/target/lm32/op_helper.c
->> index 30f670eee8..a766a1ece4 100644
->> --- a/target/lm32/op_helper.c
->> +++ b/target/lm32/op_helper.c
->> @@ -102,12 +102,16 @@ void HELPER(wcsr_dc)(CPULM32State *env, uint32_t
->> dc)
->>
->>  void HELPER(wcsr_im)(CPULM32State *env, uint32_t im)
->>  {
->> +    qemu_mutex_lock_iothread();
->>      lm32_pic_set_im(env->pic_state, im);
->> +    qemu_mutex_unlock_iothread();
->>  }
->>
->>  void HELPER(wcsr_ip)(CPULM32State *env, uint32_t im)
->>  {
->> +    qemu_mutex_lock_iothread();
->>      lm32_pic_set_ip(env->pic_state, im);
->> +    qemu_mutex_unlock_iothread();
->>  }
->>
->>  void HELPER(wcsr_jtx)(CPULM32State *env, uint32_t jtx)
-> 
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 2dc23005b7..e1ab4d0bfd 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -1799,6 +1799,19 @@ static int check_oflag_copied(BlockDriverState *bs, BdrvCheckResult *res,
+     int ret;
+     uint64_t refcount;
+     int i, j;
++    bool repair;
++
++    if (fix & BDRV_FIX_ERRORS) {
++        /* Always repair */
++        repair = true;
++    } else if (fix & BDRV_FIX_LEAKS) {
++        /* Repair only if that seems safe: This function is always
++         * called after the refcounts have been fixed, so the refcount
++         * is accurate if that repair was successful */
++        repair = !res->check_errors && !res->corruptions && !res->leaks;
++    } else {
++        repair = false;
++    }
+ 
+     for (i = 0; i < s->l1_size; i++) {
+         uint64_t l1_entry = s->l1_table[i];
+@@ -1818,10 +1831,8 @@ static int check_oflag_copied(BlockDriverState *bs, BdrvCheckResult *res,
+         if ((refcount == 1) != ((l1_entry & QCOW_OFLAG_COPIED) != 0)) {
+             fprintf(stderr, "%s OFLAG_COPIED L2 cluster: l1_index=%d "
+                     "l1_entry=%" PRIx64 " refcount=%" PRIu64 "\n",
+-                    fix & BDRV_FIX_ERRORS ? "Repairing" :
+-                                            "ERROR",
+-                    i, l1_entry, refcount);
+-            if (fix & BDRV_FIX_ERRORS) {
++                    repair ? "Repairing" : "ERROR", i, l1_entry, refcount);
++            if (repair) {
+                 s->l1_table[i] = refcount == 1
+                                ? l1_entry |  QCOW_OFLAG_COPIED
+                                : l1_entry & ~QCOW_OFLAG_COPIED;
+@@ -1862,10 +1873,8 @@ static int check_oflag_copied(BlockDriverState *bs, BdrvCheckResult *res,
+                 if ((refcount == 1) != ((l2_entry & QCOW_OFLAG_COPIED) != 0)) {
+                     fprintf(stderr, "%s OFLAG_COPIED data cluster: "
+                             "l2_entry=%" PRIx64 " refcount=%" PRIu64 "\n",
+-                            fix & BDRV_FIX_ERRORS ? "Repairing" :
+-                                                    "ERROR",
+-                            l2_entry, refcount);
+-                    if (fix & BDRV_FIX_ERRORS) {
++                            repair ? "Repairing" : "ERROR", l2_entry, refcount);
++                    if (repair) {
+                         l2_table[j] = cpu_to_be64(refcount == 1
+                                     ? l2_entry |  QCOW_OFLAG_COPIED
+                                     : l2_entry & ~QCOW_OFLAG_COPIED);
+-- 
+2.14.3
