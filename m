@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fGNd8-0006uF-3I
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:51:35 -0400
+	(envelope-from <armbru@redhat.com>) id 1fGNf0-00006a-0P
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:53:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fGNd5-0002Rb-2o
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:51:34 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33888 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fGNd4-0002Pv-TW
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:51:30 -0400
-References: <fe42db47-7e7c-3ec5-ab5f-8e8653554a74@amsat.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c4082565-98f0-7bd7-4409-45af9d8823fb@redhat.com>
-Date: Wed, 9 May 2018 13:51:26 +0200
+	(envelope-from <armbru@redhat.com>) id 1fGNez-0006K2-3r
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:53:30 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180509055802.28423-1-famz@redhat.com>
+	<20180509055802.28423-2-famz@redhat.com>
+Date: Wed, 09 May 2018 13:53:23 +0200
+In-Reply-To: <20180509055802.28423-2-famz@redhat.com> (Fam Zheng's message of
+	"Wed, 9 May 2018 13:57:58 +0800")
+Message-ID: <87wowd9hak.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <fe42db47-7e7c-3ec5-ab5f-8e8653554a74@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] lm32: tcg_handle_interrupt: assertion failed:
- (qemu_mutex_iothread_locked())
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/5] qapi: Add qapi_enum_parse_full
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +23,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Michael Walle <michael@walle.cc>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 08/05/2018 03:49, Philippe Mathieu-Daud=C3=A9 wrote:
-> #2  0x00007fe17d5eefa5 in g_assertion_message () at
-> /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0
-> #3  0x00007fe17d5ef00a in g_assertion_message_expr () at
-> /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0
-> #4  0x0000559d92ace7d5 in tcg_handle_interrupt (cpu=3D0x559d93aa35d0,
-> mask=3D2) at qemu/accel/tcg/tcg-all.c:42
-> #5  0x0000559d92af1b3c in cpu_interrupt (cpu=3D0x559d93aa35d0, mask=3D2=
-) at
-> qemu/include/qom/cpu.h:848
-> #6  0x0000559d92af2516 in cpu_irq_handler (opaque=3D0x559d93aa35d0, irq=
-=3D0,
-> level=3D1) at qemu/hw/lm32/milkymist.c:59
-> #7  0x0000559d92b6639d in qemu_set_irq (irq=3D0x559d93a0f250, level=3D1=
-) at
-> qemu/hw/core/irq.c:45
-> #8  0x0000559d92b76d5f in qemu_irq_raise (irq=3D0x559d93a0f250) at
-> qemu/include/hw/irq.h:16
-> #9  0x0000559d92b7723e in update_irq (s=3D0x559d93adba00) at
-> qemu/hw/intc/lm32_pic.c:51
-> #10 0x0000559d92b7738e in lm32_pic_set_im (d=3D0x559d93adba00, im=3D1) =
-at
-> qemu/hw/intc/lm32_pic.c:82
-> #11 0x0000559d92af72e0 in helper_wcsr_im (env=3D0x559d93aab870, im=3D1)=
- at
-> qemu/target/lm32/op_helper.c:105
-> #12 0x00007fe155e250ca in code_gen_buffer ()
-> #13 0x0000559d92adec8e in cpu_tb_exec (cpu=3D0x559d93aa35d0,
-> itb=3D0x7fe155e24fc0 <code_gen_buffer+49043>)
+Fam Zheng <famz@redhat.com> writes:
 
-All these calls into lm32_pic.c need to take the BQL.  They are all
-wrong, but this one was unlucky (or lucky) enough to be caught.
+> This variant of qapi_enum_parse can do case insensitive compare.
 
-Paolo
+I'm curious why we need that.  We'll see when we get to the new
+function's uses.
+
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  include/qapi/util.h |  2 ++
+>  qapi/qapi-util.c    | 20 ++++++++++++++++----
+>  2 files changed, 18 insertions(+), 4 deletions(-)
+>
+> diff --git a/include/qapi/util.h b/include/qapi/util.h
+> index a7c3c64148..2cec231919 100644
+> --- a/include/qapi/util.h
+> +++ b/include/qapi/util.h
+> @@ -19,6 +19,8 @@ typedef struct QEnumLookup {
+>  const char *qapi_enum_lookup(const QEnumLookup *lookup, int val);
+>  int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
+>                      int def, Error **errp);
+> +int qapi_enum_parse_full(const QEnumLookup *lookup, const char *buf,
+> +                         int def, bool ignore_case, Error **errp);
+>  
+>  int parse_qapi_name(const char *name, bool complete);
+>  
+> diff --git a/qapi/qapi-util.c b/qapi/qapi-util.c
+> index e9b266bb70..6180957edb 100644
+> --- a/qapi/qapi-util.c
+> +++ b/qapi/qapi-util.c
+> @@ -21,8 +21,8 @@ const char *qapi_enum_lookup(const QEnumLookup *lookup, int val)
+>      return lookup->array[val];
+>  }
+>  
+> -int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
+> -                    int def, Error **errp)
+> +int qapi_enum_parse_full(const QEnumLookup *lookup, const char *buf,
+> +                         int def, bool ignore_case, Error **errp)
+>  {
+>      int i;
+>  
+> @@ -31,8 +31,14 @@ int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
+>      }
+>  
+>      for (i = 0; i < lookup->size; i++) {
+> -        if (!strcmp(buf, lookup->array[i])) {
+> -            return i;
+> +        if (ignore_case) {
+> +            if (!strcasecmp(buf, lookup->array[i])) {
+> +                return i;
+> +            }
+> +        } else {
+> +            if (!strcmp(buf, lookup->array[i])) {
+> +                return i;
+> +            }
+>          }
+>      }
+>  
+> @@ -40,6 +46,12 @@ int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
+>      return def;
+>  }
+>  
+> +int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
+> +                    int def, Error **errp)
+> +{
+> +    return qapi_enum_parse_full(lookup, buf, def, false, errp);
+> +}
+> +
+>  /*
+>   * Parse a valid QAPI name from @str.
+>   * A valid name consists of letters, digits, hyphen and underscore.
+
+What's "full" about qapi_enum_parse_full()?
+
+Existing parse_unit_full() differs from parse_uint() in that it always
+consumes the full string.  Hmm.
+
+Do we expect to pass anything but literal false or true to @ignore_case?
+If not, then a more convenient interface is two functions, just like we
+have strcmp() and strcasecmp().  They could still call a common internal
+helper to avoid code duplication.  Consider passing strcmp, strcasecmp
+instead of false, true to it then.
