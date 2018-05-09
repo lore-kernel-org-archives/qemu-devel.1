@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1fGHHe-0005zG-AH
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 01:04:59 -0400
+	(envelope-from <thuth@redhat.com>) id 1fGHN7-0007fA-Us
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 01:10:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1fGHHZ-0008W9-UO
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 01:04:58 -0400
-Received: from mail-wr0-f195.google.com ([209.85.128.195]:33567)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1fGHHZ-0008Uw-NQ
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 01:04:53 -0400
-Received: by mail-wr0-f195.google.com with SMTP id o4-v6so34361532wrm.0
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 22:04:53 -0700 (PDT)
-References: <20180508203937.16796-1-laurent@vivier.eu>
-From: Thomas Huth <huth@tuxfamily.org>
-Message-ID: <0048408f-666d-6771-a4fa-7a92835f17bf@tuxfamily.org>
-Date: Wed, 9 May 2018 07:04:49 +0200
+	(envelope-from <thuth@redhat.com>) id 1fGHN4-00009A-BI
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 01:10:37 -0400
+References: <1525840700-30635-1-git-send-email-thuth@redhat.com>
+	<f0a24157-3aa9-4b51-8870-e83407e85697@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <c91c4ff7-85d8-3605-7890-779abebea6fd@redhat.com>
+Date: Wed, 9 May 2018 07:10:21 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180508203937.16796-1-laurent@vivier.eu>
+In-Reply-To: <f0a24157-3aa9-4b51-8870-e83407e85697@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] m68k: fix floatx80_mod() (Coverity
- CID1390568)
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Add trace-events and
+ qemu-option-trace.texi to tracing section
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +25,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-On 08.05.2018 22:39, Laurent Vivier wrote:
-> Update the variable checked by the loop condition (expDiff).
-> Backport the update from Previous.
-> 
-> Fixes: 591596b77a ("target/m68k: add fmod/frem")
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->  target/m68k/softfloat.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/target/m68k/softfloat.c b/target/m68k/softfloat.c
-> index e41b07d042..d093997219 100644
-> --- a/target/m68k/softfloat.c
-> +++ b/target/m68k/softfloat.c
-> @@ -103,6 +103,7 @@ floatx80 floatx80_mod(floatx80 a, floatx80 b, float_status *status)
->          mul64To128(bSig, qTemp, &term0, &term1);
->          sub128(aSig0, aSig1, term0, term1, &aSig0, &aSig1);
->          shortShift128Left(aSig0, aSig1, 62, &aSig0, &aSig1);
-> +        expDiff -= 62;
->      }
->      expDiff += 64;
->      if (0 < expDiff) {
+On 09.05.2018 07:02, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Thomas,
+>=20
+> On 05/09/2018 01:38 AM, Thomas Huth wrote:
+>> The "trace-events" and "qemu-option-trace.texi" files in the top direc=
+tory
+>> are currently "unmaintained" according to scripts/get_maintainer.pl. T=
+hey
+>> obviously belong to the Tracing section, so add an entry for them ther=
+e.
+>=20
+> I agree qemu-option-trace.texi belongs to the Tracing section,
+> however I think trace-events is not specific to Tracing but belongs to
+> everybody maintaining a C file in the top directory... Since they'll
+> need to modify this file.
 
-Reviewed-by: Thomas Huth <huth@tuxfamily.org>
+Right ... but what do you do if you just want to fix something in the
+generic comments of that file? Who's then responsible for picking up the
+patch? ... well, updates to comments could maybe go through
+qemu-trivial, too, so I'm also fine if we do not list trace-events in
+MAINTAINERS. I'll leave this up to Stefan to decide.
+
+ Thomas
