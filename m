@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fGMVQ-0002jE-5W
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 06:39:33 -0400
+	(envelope-from <quintela@redhat.com>) id 1fGMfR-0006AW-Qg
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 06:49:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fGMVM-0001uY-UQ
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 06:39:32 -0400
-Received: from mail-wr0-f194.google.com ([209.85.128.194]:42234)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fGMVM-0001sf-Nm
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 06:39:28 -0400
-Received: by mail-wr0-f194.google.com with SMTP id v5-v6so35187899wrf.9
-	for <qemu-devel@nongnu.org>; Wed, 09 May 2018 03:39:28 -0700 (PDT)
-References: <1525376963-79623-1-git-send-email-mst@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <094f90c0-04dd-eddd-fd29-f081def1a812@redhat.com>
-Date: Wed, 9 May 2018 12:39:25 +0200
+	(envelope-from <quintela@redhat.com>) id 1fGMfO-0003KT-Jo
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 06:49:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36238 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fGMfO-0003Iu-EX
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 06:49:50 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C8C4F40200A0
+	for <qemu-devel@nongnu.org>; Wed,  9 May 2018 10:49:49 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20180426071558.GQ9036@xz-mi> (Peter Xu's message of "Thu, 26 Apr
+	2018 15:15:58 +0800")
+References: <20180425112723.1111-1-quintela@redhat.com>
+	<20180425112723.1111-11-quintela@redhat.com>
+	<20180426071558.GQ9036@xz-mi>
+Reply-To: quintela@redhat.com
+Date: Wed, 09 May 2018 12:52:01 +0200
+Message-ID: <87lgct5cfi.fsf@secure.laptop>
 MIME-Version: 1.0
-In-Reply-To: <1525376963-79623-1-git-send-email-mst@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 00/67] include path cleanup
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v12 10/21] migration: Create multipage
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +36,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
 
-On 03/05/2018 21:50, Michael S. Tsirkin wrote:
-> At the moment during build we have multiple subdirectories of the source
-> tree on the search path for include files.  This includes source
-> directory itself, tcg and accel/tcg subdirectories, target-specific
-> source subdirectory and the include subdirectory.
-> 
-> The result is that there are many ways to include each
-> specific file, e.g. for a file in the include directory:
-> 
-> #include "dir/foo.h"
-> #include "include/dir/foo.h"
-> 
-> (We actually do both).
-> 
-> OTOH local headers can be included with
-> #include "foo.h"
-> #include "dir/foo.h"
-> 
-> There are also target-specific headers and they are even
-> trickier - e.g. try to guess which file does
-> #include "cpu.h"
-> pull in?  The answer actually depends on which target is built.
-> 
-> It is also quite easy to place an external header outside of
-> include/ as nothing will catch this misuse.
-> 
-> In an attempt to simplify this situation, this changes the build to look
-> for headers in a single directory under the source tree: include/
-> (generated files are still spread around a bit, this is left for another
-> patchset - and RFC of that I posted earlier).
-> 
-> This way, one can always find any header under include/
-> (and sometimes follow from there to another directory).
-> 
-> A nice side effect of this refactoring is that it makes it easy to
-> identify external headers which are not under include/.
+Peter Xu <peterx@redhat.com> wrote:
+> On Wed, Apr 25, 2018 at 01:27:12PM +0200, Juan Quintela wrote:
+>
+> [...]
+>
+>> +static void multifd_pages_init(MultiFDPages_t **ppages, size_t size)
+>> +{
+>> +    MultiFDPages_t *pages = g_new0(MultiFDPages_t, 1);
+>> +
+>> +    pages->allocated = size;
+>> +    pages->iov = g_new0(struct iovec, size);
+>> +    pages->offset = g_new0(ram_addr_t, size);
+>> +    *ppages = pages;
+>> +}
+>
+> Can we just return the pages pointer?  Then it can be:
+>
+>   static MultiFDPages_t *multifd_pages_init(size_t size)
 
-Yes, this was always the intended usage.
+Done.
 
-> I decided not to actually move any headers around -
-> instead I created small stub files using include_next
-> which pull in the original files.
+>
+> [...]
+>
+>> @@ -731,6 +784,7 @@ static void *multifd_recv_thread(void *opaque)
+>>  int multifd_load_setup(void)
+>>  {
+>>      int thread_count;
+>> +    uint32_t page_count = migrate_multifd_page_count();
+>>      uint8_t i;
+>>  
+>>      if (!migrate_use_multifd()) {
+>> @@ -740,6 +794,7 @@ int multifd_load_setup(void)
+>>      multifd_recv_state = g_malloc0(sizeof(*multifd_recv_state));
+>>      multifd_recv_state->params = g_new0(MultiFDRecvParams, thread_count);
+>>      atomic_set(&multifd_recv_state->count, 0);
+>> +
+>
+> Useless line?
 
-For the RFC is okay, but I think we should at least see which headers
-can just get a home in include/ before applying the series.  Perhaps we
-can add an include-from-topsrcdir/ directory with the #include_next
-directives so that the todo list is clear.
+Changed it a lot in other places.
 
-> This way we can move the headers gradually - in particular it is often
-> benefitial to split a header up with external parts under include and
-> internal ones with the source.
-
-I agree.
-
-> Note that it's already benefitial even in this form, since
-> - it's now easy to see there is an external header outside include
->   that requires work
-> - reader can simply look at the header and immediately know
->   where to look for it
-> 
-> Target specific files are pulled in using preprocessor which is still
-> tricky but arguably easier to understand than makefile tricks.
-
-Another possibility is to directories like include/target/<XXX>, or
-target/<XXX>/include/.
-
-Paolo
+Later, Juan.
