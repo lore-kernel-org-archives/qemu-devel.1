@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49791)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fGX23-0007Mj-Py
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:53:58 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fGX5a-0002Ri-VU
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:57:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fGX1z-0006oN-Re
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:53:55 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fGX5a-00089s-8R
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:57:35 -0400
+References: <20180502202051.15493-1-mreitz@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed,  9 May 2018 23:53:36 +0200
-Message-Id: <20180509215336.31304-4-mreitz@redhat.com>
-In-Reply-To: <20180509215336.31304-1-mreitz@redhat.com>
-References: <20180509215336.31304-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/3] iotests: Add creation test to 153
+Message-ID: <8a815994-e84a-61fd-b69f-420e5d9d6461@redhat.com>
+Date: Wed, 9 May 2018 23:57:26 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180502202051.15493-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="JwdsndkHXwqsffbgMChXmp8SQO1QXaRTU"
+Subject: Re: [Qemu-devel] [PATCH 0/3] qemu-io/img: Fix -U/force-share
+ conflict testing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,86 +25,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-stable@nongnu.org
 
-This patch adds a test case to 153 which tries to overwrite an image
-(using qemu-img create) while it is in use.  Without the original user
-explicitly sharing the necessary permissions (writing and truncation),
-this should not be allowed.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--JwdsndkHXwqsffbgMChXmp8SQO1QXaRTU
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Fam Zheng <famz@redhat.com>, qemu-stable@nongnu.org
+Message-ID: <8a815994-e84a-61fd-b69f-420e5d9d6461@redhat.com>
+Subject: Re: [PATCH 0/3] qemu-io/img: Fix -U/force-share conflict testing
+References: <20180502202051.15493-1-mreitz@redhat.com>
+In-Reply-To: <20180502202051.15493-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
----
- tests/qemu-iotests/153     | 18 ++++++++++++++++++
- tests/qemu-iotests/153.out | 13 +++++++++++++
- 2 files changed, 31 insertions(+)
+On 2018-05-02 22:20, Max Reitz wrote:
+> qemu-img and qemu-io try to detect when you use both -U and force-share=
 
-diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
-index a0fd815483..1be83912f8 100755
---- a/tests/qemu-iotests/153
-+++ b/tests/qemu-iotests/153
-@@ -137,6 +137,24 @@ for opts1 in "" "read-only=on" "read-only=on,force-share=on"; do
-         _run_cmd $QEMU_IMG dd          $L if="${TEST_IMG}" of="${TEST_IMG}.convert" bs=512 count=1
-         _run_cmd $QEMU_IMG bench       $L -c 1 "${TEST_IMG}"
-         _run_cmd $QEMU_IMG bench       $L -w -c 1 "${TEST_IMG}"
-+
-+        # qemu-img create does not support -U
-+        if [ -z "$L" ]; then
-+            _run_cmd $QEMU_IMG create -f $IMGFMT "${TEST_IMG}" \
-+                                      -b ${TEST_IMG}.base
-+            # Read the file format.  It used to be the case that
-+            # file-posix simply truncated the file, but the qcow2
-+            # driver then failed to format it because it was unable
-+            # to acquire the necessary WRITE permission.  However, the
-+            # truncation was already wrong, and the whole process
-+            # resulted in the file being completely empty and thus its
-+            # format would be detected to be raw.
-+            # So we read it here to see that creation either completed
-+            # successfully (thus the format is qcow2) or it aborted
-+            # before the file was changed at all (thus the format stays
-+            # qcow2).
-+            _img_info -U | grep 'file format'
-+        fi
-     done
-     _send_qemu_cmd $h "{ 'execute': 'quit', }" ""
-     echo
-diff --git a/tests/qemu-iotests/153.out b/tests/qemu-iotests/153.out
-index bb721cb747..e8eb369cae 100644
---- a/tests/qemu-iotests/153.out
-+++ b/tests/qemu-iotests/153.out
-@@ -92,6 +92,11 @@ _qemu_img_wrapper bench -w -c 1 TEST_DIR/t.qcow2
- qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to get "write" lock
- Is another process using the image?
- 
-+_qemu_img_wrapper create -f qcow2 TEST_DIR/t.qcow2 -b TEST_DIR/t.qcow2.base
-+qemu-img: TEST_DIR/t.qcow2: Failed to get "write" lock
-+Is another process using the image?
-+file format: IMGFMT
-+
- == Running utility commands -U ==
- 
- _qemu_io_wrapper -U -c read 0 512 TEST_DIR/t.qcow2
-@@ -209,6 +214,11 @@ _qemu_img_wrapper bench -w -c 1 TEST_DIR/t.qcow2
- qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to get "write" lock
- Is another process using the image?
- 
-+_qemu_img_wrapper create -f qcow2 TEST_DIR/t.qcow2 -b TEST_DIR/t.qcow2.base
-+qemu-img: TEST_DIR/t.qcow2: Failed to get "write" lock
-+Is another process using the image?
-+file format: IMGFMT
-+
- == Running utility commands -U ==
- 
- _qemu_io_wrapper -U -c read 0 512 TEST_DIR/t.qcow2
-@@ -309,6 +319,9 @@ _qemu_img_wrapper bench -c 1 TEST_DIR/t.qcow2
- 
- _qemu_img_wrapper bench -w -c 1 TEST_DIR/t.qcow2
- 
-+_qemu_img_wrapper create -f qcow2 TEST_DIR/t.qcow2 -b TEST_DIR/t.qcow2.base
-+file format: IMGFMT
-+
- == Running utility commands -U ==
- 
- _qemu_io_wrapper -U -c read 0 512 TEST_DIR/t.qcow2
--- 
-2.14.3
+> manually, but a conflict is not rejected with an error message but with=
+
+> a segmentation fault.  I guess that works, but it's probably not the wa=
+y
+> it was meant to be.
+>=20
+>=20
+> Max Reitz (3):
+>   qemu-io: Use purely string blockdev options
+>   qemu-img: Use only string options in img_open_opts
+>   iotests: Add test for -U/force-share conflicts
+>=20
+>  qemu-img.c                 |  4 ++--
+>  qemu-io.c                  |  4 ++--
+>  tests/qemu-iotests/153     | 17 +++++++++++++++++
+>  tests/qemu-iotests/153.out | 16 ++++++++++++++++
+>  4 files changed, 37 insertions(+), 4 deletions(-)
+
+Thanks for the review, applied to my block branch.
+
+Max
+
+
+--JwdsndkHXwqsffbgMChXmp8SQO1QXaRTU
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlrzbsYACgkQ9AfbAGHV
+z0DpgQf+JEj0GKGfxG+ObMOMyi1TJXoSL2lWS+iU05i1nHJ3yz5Y8ba3XHjfWbSF
+PQ1ZyXW7GjZIIKzEJimPtHb0EwiFWlKJg7DHpRaz+hxqXQwZ0Snq0ElUBcpk2grH
+SS4upD4eQFtSX1Plf284bHglRRH+K+XS8hHJyim2ovw1rZvx/QkHKmQQKKQdLd8Q
+p2OCa2jzwQUlOJS4IbnH/ChyLt6UbbmrR0YsPO77m+3TqH6tyeSveKJy961H4qti
+TxD4jsRLEJ7Q/lFWk3KfeioH266gg7uKof6y6Y2t/+V0CheD+sWvW629vYwcMzab
+YKGLR2vModhF1CR0LF10XdEMGqxmSQ==
+=Gy+g
+-----END PGP SIGNATURE-----
+
+--JwdsndkHXwqsffbgMChXmp8SQO1QXaRTU--
