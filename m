@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fGHN7-0007fA-Us
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 01:10:38 -0400
+	(envelope-from <thuth@redhat.com>) id 1fGHbs-0003a7-3V
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 01:25:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fGHN4-00009A-BI
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 01:10:37 -0400
-References: <1525840700-30635-1-git-send-email-thuth@redhat.com>
-	<f0a24157-3aa9-4b51-8870-e83407e85697@amsat.org>
+	(envelope-from <thuth@redhat.com>) id 1fGHbp-0000LN-FE
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 01:25:52 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58684 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fGHbp-0000KD-B8
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 01:25:49 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DADDB430A693
+	for <qemu-devel@nongnu.org>; Wed,  9 May 2018 05:20:18 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <c91c4ff7-85d8-3605-7890-779abebea6fd@redhat.com>
-Date: Wed, 9 May 2018 07:10:21 +0200
-MIME-Version: 1.0
-In-Reply-To: <f0a24157-3aa9-4b51-8870-e83407e85697@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Add trace-events and
- qemu-option-trace.texi to tracing section
+Date: Wed,  9 May 2018 07:20:12 +0200
+Message-Id: <1525843212-31922-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] MAINTAINERS: Add an entry for qemu-options*
+ files in main directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,29 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-On 09.05.2018 07:02, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Thomas,
->=20
-> On 05/09/2018 01:38 AM, Thomas Huth wrote:
->> The "trace-events" and "qemu-option-trace.texi" files in the top direc=
-tory
->> are currently "unmaintained" according to scripts/get_maintainer.pl. T=
-hey
->> obviously belong to the Tracing section, so add an entry for them ther=
-e.
->=20
-> I agree qemu-option-trace.texi belongs to the Tracing section,
-> however I think trace-events is not specific to Tracing but belongs to
-> everybody maintaining a C file in the top directory... Since they'll
-> need to modify this file.
+The file "qemu-options.h", "qemu-options.hx" and "qemu-options-wrapper.h"
+in the main directory are currently without maintainer according to our
+get_maintainers.pl script. Considering that the command line options are
+a public interface and thus quite important, this is quite a bad state.
+So I'd like to suggest to add these files to the "Command line option
+argument parsing" section now.
 
-Right ... but what do you do if you just want to fix something in the
-generic comments of that file? Who's then responsible for picking up the
-patch? ... well, updates to comments could maybe go through
-qemu-trivial, too, so I'm also fine if we do not list trace-events in
-MAINTAINERS. I'll leave this up to Stefan to decide.
+And since I'm interested in the command line interface of QEMU, add
+myself as reviewer here.
 
- Thomas
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ MAINTAINERS | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index e187b1f..6aa19dc 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1413,7 +1413,9 @@ F: chardev/baum.c
+ 
+ Command line option argument parsing
+ M: Markus Armbruster <armbru@redhat.com>
++R: Thomas Huth <thuth@redhat.com>
+ S: Supported
++F: qemu-options*
+ F: include/qemu/option.h
+ F: tests/test-keyval.c
+ F: tests/test-qemu-opts.c
+-- 
+1.8.3.1
