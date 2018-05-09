@@ -1,24 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57466)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fGSDp-0000kc-J0
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:45:46 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fGSNR-0003RP-1x
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:55:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fGSDn-0002eQ-1t
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:45:45 -0400
-Date: Wed, 9 May 2018 12:45:39 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180509164539.GA9663@flamenco>
-References: <1523377186-32578-1-git-send-email-cota@braap.org>
-	<e863cce3-d06e-f225-eb25-212729c5f05f@linaro.org>
-	<20180411152942.GA4480@flamenco>
-	<5a725be3-4ca1-a883-7313-cee1dc5825c2@linaro.org>
-	<CAHNT7NtS6AazERJuoK9qtAW2Z6j=YWhQkFdsmEbx-O5L9UtG2A@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHNT7NtS6AazERJuoK9qtAW2Z6j=YWhQkFdsmEbx-O5L9UtG2A@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 00/10] Avoid integer overflow in
- next_page_start
+	(envelope-from <mreitz@redhat.com>) id 1fGSNQ-0006Y2-76
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:55:41 -0400
+From: Max Reitz <mreitz@redhat.com>
+Date: Wed,  9 May 2018 18:55:19 +0200
+Message-Id: <20180509165530.29561-3-mreitz@redhat.com>
+In-Reply-To: <20180509165530.29561-1-mreitz@redhat.com>
+References: <20180509165530.29561-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH 02/13] docs/qapi: Document optional
+ discriminators
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,26 +20,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Michael Walle <michael@walle.cc>, Max Filippov <jcmvbkbc@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Wed, May 09, 2018 at 12:51:14 +1200, Michael Clark wrote:
-> Emilio,
-> 
-> Is this your latest branch for these changes?
-> 
-> - https://github.com/cota/qemu/tree/trloop-conv-v3
-> 
-> I see that this branch has this change "target/riscv: avoid integer
-> overflow in next_page PC check"
-> 
-> I have some changes for target/riscv/translate.c and was thinking of basing
-> them on your patches so we don't have conflicts.
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ docs/devel/qapi-code-gen.txt | 21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
 
-Yes that's the latest branch. Richard is currently working
-on a pull request to get that branch merged, so you'll soon
-be able to rebase your changes on top of master.
-
-Thanks,
-
-		Emilio
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index b9b6eabd08..35b9f0d99d 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -472,8 +472,8 @@ All branches of the union must be complex types, and the top-level
+ members of the union dictionary on the wire will be combination of
+ members from both the base type and the appropriate branch type (when
+ merging two dictionaries, there must be no keys in common).  The
+-'discriminator' member must be the name of a non-optional enum-typed
+-member of the base struct.
++'discriminator' member must be the name of an enum-typed member of the
++base struct.
+ 
+ The following example enhances the above simple union example by
+ adding an optional common member 'read-only', renaming the
+@@ -502,6 +502,23 @@ the enum).  In the resulting generated C data types, a flat union is
+ represented as a struct with the base members included directly, and
+ then a union of structures for each branch of the struct.
+ 
++If the discriminator points to an optional member of the base struct,
++its default value must be specified as a 'default-variant'.  In the
++following example, the above BlockDriver struct is changed so it
++defaults to the 'file' driver if that field is omitted on the wire:
++
++ { 'union': 'BlockdevOptions',
++   'base': { '*driver': 'BlockdevDriver', '*read-only': 'bool' },
++   'discriminator': 'driver',
++   'default-variant': 'file',
++   'data': { 'file': 'BlockdevOptionsFile',
++             'qcow2': 'BlockdevOptionsQcow2' } }
++
++Now the 'file' JSON object can be abbreviated to:
++
++ { "read-only": "true",
++   "filename": "/some/place/my-image" }
++
+ A simple union can always be re-written as a flat union where the base
+ class has a single member named 'type', and where each branch of the
+ union has a struct with a single member named 'data'.  That is,
+-- 
+2.14.3
