@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fGRvu-00058n-FQ
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:27:17 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fGRvz-0005BL-2P
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:27:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fGRvs-0001LG-Jk
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:27:14 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fGRvx-0001VA-JC
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:27:19 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed,  9 May 2018 18:25:57 +0200
-Message-Id: <20180509162637.15575-3-kwolf@redhat.com>
+Date: Wed,  9 May 2018 18:25:58 +0200
+Message-Id: <20180509162637.15575-4-kwolf@redhat.com>
 In-Reply-To: <20180509162637.15575-1-kwolf@redhat.com>
 References: <20180509162637.15575-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 02/42] blockjob: Wrappers for progress counter
- access
+Subject: [Qemu-devel] [PATCH 03/42] blockjob: Move RateLimit to BlockJob
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,294 +22,162 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-Block job drivers are not expected to mess with the internals of the
-BlockJob object, so provide wrapper functions for one of the cases where
-they still do it: Updating the progress counter.
+Every block job has a RateLimit, and they all do the exact same thing
+with it, so it should be common infrastructure. Move the struct field
+for a start.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- include/block/blockjob.h | 19 +++++++++++++++++++
- block/backup.c           | 22 +++++++++++++---------
- block/commit.c           | 16 ++++++++--------
- block/mirror.c           | 11 +++++------
- block/stream.c           | 14 ++++++++------
- blockjob.c               | 10 ++++++++++
- 6 files changed, 63 insertions(+), 29 deletions(-)
+ include/block/blockjob.h | 4 ++++
+ block/backup.c           | 5 ++---
+ block/commit.c           | 5 ++---
+ block/mirror.c           | 6 +++---
+ block/stream.c           | 5 ++---
+ 5 files changed, 13 insertions(+), 12 deletions(-)
 
 diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index fc645dac68..a2cc52233b 100644
+index a2cc52233b..22bf418209 100644
 --- a/include/block/blockjob.h
 +++ b/include/block/blockjob.h
-@@ -278,6 +278,25 @@ void block_job_finalize(BlockJob *job, Error **errp);
- void block_job_dismiss(BlockJob **job, Error **errp);
+@@ -27,6 +27,7 @@
+ #define BLOCKJOB_H
  
- /**
-+ * block_job_progress_update:
-+ * @job: The job that has made progress
-+ * @done: How much progress the job made
-+ *
-+ * Updates the progress counter of the job.
-+ */
-+void block_job_progress_update(BlockJob *job, uint64_t done);
+ #include "block/block.h"
++#include "qemu/ratelimit.h"
+ 
+ typedef struct BlockJobDriver BlockJobDriver;
+ typedef struct BlockJobTxn BlockJobTxn;
+@@ -118,6 +119,9 @@ typedef struct BlockJob {
+     /** Speed that was set with @block_job_set_speed.  */
+     int64_t speed;
+ 
++    /** Rate limiting data structure for implementing @speed. */
++    RateLimit limit;
 +
-+/**
-+ * block_job_progress_set_remaining:
-+ * @job: The job whose expected progress end value is set
-+ * @remaining: Expected end value of the progress counter of the job
-+ *
-+ * Sets the expected end value of the progress counter of a job so that a
-+ * completion percentage can be calculated when the progress is updated.
-+ */
-+void block_job_progress_set_remaining(BlockJob *job, uint64_t remaining);
-+
-+/**
-  * block_job_query:
-  * @job: The job to get information about.
-  *
+     /** The completion function that will be called when the job completes.  */
+     BlockCompletionFunc *cb;
+ 
 diff --git a/block/backup.c b/block/backup.c
-index 453cd62c24..5d95805472 100644
+index 5d95805472..7585c4391e 100644
 --- a/block/backup.c
 +++ b/block/backup.c
-@@ -39,6 +39,7 @@ typedef struct BackupBlockJob {
+@@ -35,7 +35,6 @@ typedef struct BackupBlockJob {
+     /* bitmap for sync=incremental */
+     BdrvDirtyBitmap *sync_bitmap;
+     MirrorSyncMode sync_mode;
+-    RateLimit limit;
      BlockdevOnError on_source_error;
      BlockdevOnError on_target_error;
      CoRwlock flush_rwlock;
-+    uint64_t len;
-     uint64_t bytes_read;
-     int64_t cluster_size;
-     bool compress;
-@@ -118,7 +119,7 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
- 
-         trace_backup_do_cow_process(job, start);
- 
--        n = MIN(job->cluster_size, job->common.len - start);
-+        n = MIN(job->cluster_size, job->len - start);
- 
-         if (!bounce_buffer) {
-             bounce_buffer = blk_blockalign(blk, job->cluster_size);
-@@ -159,7 +160,7 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-          * offset field is an opaque progress value, it is not a disk offset.
-          */
-         job->bytes_read += n;
--        job->common.offset += n;
-+        block_job_progress_update(&job->common, n);
-     }
- 
- out:
-@@ -261,7 +262,7 @@ void backup_do_checkpoint(BlockJob *job, Error **errp)
+@@ -199,7 +198,7 @@ static void backup_set_speed(BlockJob *job, int64_t speed, Error **errp)
+         error_setg(errp, QERR_INVALID_PARAMETER, "speed");
          return;
      }
- 
--    len = DIV_ROUND_UP(backup_job->common.len, backup_job->cluster_size);
-+    len = DIV_ROUND_UP(backup_job->len, backup_job->cluster_size);
-     hbitmap_set(backup_job->copy_bitmap, 0, len);
+-    ratelimit_set_speed(&s->limit, speed, SLICE_TIME);
++    ratelimit_set_speed(&s->common.limit, speed, SLICE_TIME);
  }
  
-@@ -420,8 +421,9 @@ static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
-         bdrv_set_dirty_iter(dbi, next_cluster * job->cluster_size);
-     }
- 
--    job->common.offset = job->common.len -
--                         hbitmap_count(job->copy_bitmap) * job->cluster_size;
-+    /* TODO block_job_progress_set_remaining() would make more sense */
-+    block_job_progress_update(&job->common,
-+        job->len - hbitmap_count(job->copy_bitmap) * job->cluster_size);
- 
-     bdrv_dirty_iter_free(dbi);
- }
-@@ -437,7 +439,9 @@ static void coroutine_fn backup_run(void *opaque)
-     QLIST_INIT(&job->inflight_reqs);
-     qemu_co_rwlock_init(&job->flush_rwlock);
- 
--    nb_clusters = DIV_ROUND_UP(job->common.len, job->cluster_size);
-+    nb_clusters = DIV_ROUND_UP(job->len, job->cluster_size);
-+    block_job_progress_set_remaining(&job->common, job->len);
-+
-     job->copy_bitmap = hbitmap_alloc(nb_clusters, 0);
-     if (job->sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
-         backup_incremental_init_copy_bitmap(job);
-@@ -461,7 +465,7 @@ static void coroutine_fn backup_run(void *opaque)
-         ret = backup_run_incremental(job);
-     } else {
-         /* Both FULL and TOP SYNC_MODE's require copying.. */
--        for (offset = 0; offset < job->common.len;
-+        for (offset = 0; offset < job->len;
-              offset += job->cluster_size) {
-             bool error_is_read;
-             int alloced = 0;
-@@ -620,7 +624,7 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-         goto error;
-     }
- 
--    /* job->common.len is fixed, so we can't allow resize */
-+    /* job->len is fixed, so we can't allow resize */
-     job = block_job_create(job_id, &backup_job_driver, txn, bs,
-                            BLK_PERM_CONSISTENT_READ,
-                            BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE |
-@@ -676,7 +680,7 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-     /* Required permissions are already taken with target's blk_new() */
-     block_job_add_bdrv(&job->common, "target", target, 0, BLK_PERM_ALL,
-                        &error_abort);
--    job->common.len = len;
-+    job->len = len;
- 
-     return &job->common;
- 
+ static void backup_cleanup_sync_bitmap(BackupBlockJob *job, int ret)
+@@ -346,7 +345,7 @@ static bool coroutine_fn yield_and_check(BackupBlockJob *job)
+      * (without, VM does not reboot)
+      */
+     if (job->common.speed) {
+-        uint64_t delay_ns = ratelimit_calculate_delay(&job->limit,
++        uint64_t delay_ns = ratelimit_calculate_delay(&job->common.limit,
+                                                       job->bytes_read);
+         job->bytes_read = 0;
+         block_job_sleep_ns(&job->common, delay_ns);
 diff --git a/block/commit.c b/block/commit.c
-index 1432baeef4..50b191c980 100644
+index 50b191c980..beec5d0ad6 100644
 --- a/block/commit.c
 +++ b/block/commit.c
-@@ -146,21 +146,21 @@ static void coroutine_fn commit_run(void *opaque)
-     int64_t n = 0; /* bytes */
-     void *buf = NULL;
-     int bytes_written = 0;
--    int64_t base_len;
-+    int64_t len, base_len;
+@@ -35,7 +35,6 @@ enum {
  
--    ret = s->common.len = blk_getlength(s->top);
--
--    if (s->common.len < 0) {
-+    ret = len = blk_getlength(s->top);
-+    if (len < 0) {
-         goto out;
-     }
-+    block_job_progress_set_remaining(&s->common, len);
- 
-     ret = base_len = blk_getlength(s->base);
-     if (base_len < 0) {
-         goto out;
-     }
- 
--    if (base_len < s->common.len) {
--        ret = blk_truncate(s->base, s->common.len, PREALLOC_MODE_OFF, NULL);
-+    if (base_len < len) {
-+        ret = blk_truncate(s->base, len, PREALLOC_MODE_OFF, NULL);
-         if (ret) {
-             goto out;
-         }
-@@ -168,7 +168,7 @@ static void coroutine_fn commit_run(void *opaque)
- 
-     buf = blk_blockalign(s->top, COMMIT_BUFFER_SIZE);
- 
--    for (offset = 0; offset < s->common.len; offset += n) {
-+    for (offset = 0; offset < len; offset += n) {
-         bool copy;
- 
-         /* Note that even when no rate limit is applied we need to yield
-@@ -198,7 +198,7 @@ static void coroutine_fn commit_run(void *opaque)
-             }
-         }
-         /* Publish progress */
--        s->common.offset += n;
-+        block_job_progress_update(&s->common, n);
+ typedef struct CommitBlockJob {
+     BlockJob common;
+-    RateLimit limit;
+     BlockDriverState *commit_top_bs;
+     BlockBackend *top;
+     BlockBackend *base;
+@@ -201,7 +200,7 @@ static void coroutine_fn commit_run(void *opaque)
+         block_job_progress_update(&s->common, n);
  
          if (copy && s->common.speed) {
-             delay_ns = ratelimit_calculate_delay(&s->limit, n);
-diff --git a/block/mirror.c b/block/mirror.c
-index 99da9c0858..77ee9b1791 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -121,7 +121,7 @@ static void mirror_iteration_done(MirrorOp *op, int ret)
-             bitmap_set(s->cow_bitmap, chunk_num, nb_chunks);
-         }
-         if (!s->initial_zeroing_ongoing) {
--            s->common.offset += op->bytes;
-+            block_job_progress_update(&s->common, op->bytes);
-         }
-     }
-     qemu_iovec_destroy(&op->qiov);
-@@ -792,11 +792,10 @@ static void coroutine_fn mirror_run(void *opaque)
-         block_job_pause_point(&s->common);
- 
-         cnt = bdrv_get_dirty_count(s->dirty_bitmap);
--        /* s->common.offset contains the number of bytes already processed so
--         * far, cnt is the number of dirty bytes remaining and
--         * s->bytes_in_flight is the number of bytes currently being
--         * processed; together those are the current total operation length */
--        s->common.len = s->common.offset + s->bytes_in_flight + cnt;
-+        /* cnt is the number of dirty bytes remaining and s->bytes_in_flight is
-+         * the number of bytes currently being processed; together those are
-+         * the current total operation length */
-+        block_job_progress_set_remaining(&s->common, s->bytes_in_flight + cnt);
- 
-         /* Note that even when no rate limit is applied we need to yield
-          * periodically with no pending I/O so that bdrv_drain_all() returns.
-diff --git a/block/stream.c b/block/stream.c
-index 1a85708fcf..8369852bda 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -107,6 +107,7 @@ static void coroutine_fn stream_run(void *opaque)
-     BlockBackend *blk = s->common.blk;
-     BlockDriverState *bs = blk_bs(blk);
-     BlockDriverState *base = s->base;
-+    int64_t len;
-     int64_t offset = 0;
-     uint64_t delay_ns = 0;
-     int error = 0;
-@@ -118,11 +119,12 @@ static void coroutine_fn stream_run(void *opaque)
-         goto out;
-     }
- 
--    s->common.len = bdrv_getlength(bs);
--    if (s->common.len < 0) {
--        ret = s->common.len;
-+    len = bdrv_getlength(bs);
-+    if (len < 0) {
-+        ret = len;
-         goto out;
-     }
-+    block_job_progress_set_remaining(&s->common, len);
- 
-     buf = qemu_blockalign(bs, STREAM_BUFFER_SIZE);
- 
-@@ -135,7 +137,7 @@ static void coroutine_fn stream_run(void *opaque)
-         bdrv_enable_copy_on_read(bs);
-     }
- 
--    for ( ; offset < s->common.len; offset += n) {
-+    for ( ; offset < len; offset += n) {
-         bool copy;
- 
-         /* Note that even when no rate limit is applied we need to yield
-@@ -159,7 +161,7 @@ static void coroutine_fn stream_run(void *opaque)
- 
-             /* Finish early if end of backing file has been reached */
-             if (ret == 0 && n == 0) {
--                n = s->common.len - offset;
-+                n = len - offset;
-             }
- 
-             copy = (ret == 1);
-@@ -185,7 +187,7 @@ static void coroutine_fn stream_run(void *opaque)
-         ret = 0;
- 
-         /* Publish progress */
--        s->common.offset += n;
-+        block_job_progress_update(&s->common, n);
-         if (copy && s->common.speed) {
-             delay_ns = ratelimit_calculate_delay(&s->limit, n);
+-            delay_ns = ratelimit_calculate_delay(&s->limit, n);
++            delay_ns = ratelimit_calculate_delay(&s->common.limit, n);
          } else {
-diff --git a/blockjob.c b/blockjob.c
-index b38ed7e265..bdd34f3a76 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -810,6 +810,16 @@ int block_job_complete_sync(BlockJob *job, Error **errp)
-     return block_job_finish_sync(job, &block_job_complete, errp);
+             delay_ns = 0;
+         }
+@@ -225,7 +224,7 @@ static void commit_set_speed(BlockJob *job, int64_t speed, Error **errp)
+         error_setg(errp, QERR_INVALID_PARAMETER, "speed");
+         return;
+     }
+-    ratelimit_set_speed(&s->limit, speed, SLICE_TIME);
++    ratelimit_set_speed(&s->common.limit, speed, SLICE_TIME);
  }
  
-+void block_job_progress_update(BlockJob *job, uint64_t done)
-+{
-+    job->offset += done;
-+}
-+
-+void block_job_progress_set_remaining(BlockJob *job, uint64_t remaining)
-+{
-+    job->len = job->offset + remaining;
-+}
-+
- BlockJobInfo *block_job_query(BlockJob *job, Error **errp)
- {
-     BlockJobInfo *info;
+ static const BlockJobDriver commit_job_driver = {
+diff --git a/block/mirror.c b/block/mirror.c
+index 77ee9b1791..95da62544f 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -36,7 +36,6 @@ typedef struct MirrorBuffer {
+ 
+ typedef struct MirrorBlockJob {
+     BlockJob common;
+-    RateLimit limit;
+     BlockBackend *target;
+     BlockDriverState *mirror_top_bs;
+     BlockDriverState *source;
+@@ -450,7 +449,8 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+         offset += io_bytes;
+         nb_chunks -= DIV_ROUND_UP(io_bytes, s->granularity);
+         if (s->common.speed) {
+-            delay_ns = ratelimit_calculate_delay(&s->limit, io_bytes_acct);
++            delay_ns = ratelimit_calculate_delay(&s->common.limit,
++                                                 io_bytes_acct);
+         }
+     }
+     return delay_ns;
+@@ -916,7 +916,7 @@ static void mirror_set_speed(BlockJob *job, int64_t speed, Error **errp)
+         error_setg(errp, QERR_INVALID_PARAMETER, "speed");
+         return;
+     }
+-    ratelimit_set_speed(&s->limit, speed, SLICE_TIME);
++    ratelimit_set_speed(&s->common.limit, speed, SLICE_TIME);
+ }
+ 
+ static void mirror_complete(BlockJob *job, Error **errp)
+diff --git a/block/stream.c b/block/stream.c
+index 8369852bda..a1d4768c2e 100644
+--- a/block/stream.c
++++ b/block/stream.c
+@@ -33,7 +33,6 @@ enum {
+ 
+ typedef struct StreamBlockJob {
+     BlockJob common;
+-    RateLimit limit;
+     BlockDriverState *base;
+     BlockdevOnError on_error;
+     char *backing_file_str;
+@@ -189,7 +188,7 @@ static void coroutine_fn stream_run(void *opaque)
+         /* Publish progress */
+         block_job_progress_update(&s->common, n);
+         if (copy && s->common.speed) {
+-            delay_ns = ratelimit_calculate_delay(&s->limit, n);
++            delay_ns = ratelimit_calculate_delay(&s->common.limit, n);
+         } else {
+             delay_ns = 0;
+         }
+@@ -219,7 +218,7 @@ static void stream_set_speed(BlockJob *job, int64_t speed, Error **errp)
+         error_setg(errp, QERR_INVALID_PARAMETER, "speed");
+         return;
+     }
+-    ratelimit_set_speed(&s->limit, speed, SLICE_TIME);
++    ratelimit_set_speed(&s->common.limit, speed, SLICE_TIME);
+ }
+ 
+ static const BlockJobDriver stream_job_driver = {
 -- 
 2.13.6
