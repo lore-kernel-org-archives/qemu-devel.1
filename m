@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fGM0C-0000fe-Ep
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 06:07:19 -0400
+	(envelope-from <mjc@sifive.com>) id 1fGM3v-0002WD-59
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 06:11:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fGM07-000549-Dy
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 06:07:16 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50426 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fGM07-00053g-9N
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 06:07:11 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180503191059.19576-1-dgilbert@redhat.com> (David Alan
-	Gilbert's message of "Thu, 3 May 2018 20:10:59 +0100")
-References: <20180503191059.19576-1-dgilbert@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 09 May 2018 12:09:23 +0200
-Message-ID: <87wowd5eek.fsf@secure.laptop>
+	(envelope-from <mjc@sifive.com>) id 1fGM3s-00038q-S8
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 06:11:07 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:39655)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fGM3s-00038D-KP
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 06:11:04 -0400
+Received: by mail-oi0-x241.google.com with SMTP id n65-v6so30991851oig.6
+	for <qemu-devel@nongnu.org>; Wed, 09 May 2018 03:11:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3] migration: update docs
+In-Reply-To: <1524250517-28032-19-git-send-email-cota@braap.org>
+References: <1524250517-28032-1-git-send-email-cota@braap.org>
+	<1524250517-28032-19-git-send-email-cota@braap.org>
+From: Michael Clark <mjc@sifive.com>
+Date: Wed, 9 May 2018 22:11:03 +1200
+Message-ID: <CAHNT7Nu_HOc5h0URhau-hoBECLZ7_A7dE6PWsr7uM+EewR=vCQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 18/18] target/riscv: convert to
+ TranslatorOps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,23 +29,221 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, bala24@linux.vnet.ibm.com, eblake@redhat.com, peterx@redhat.com
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> Update the migration docs:
->
-> Among other changes:
->   * Added a general list of advice for device authors
->   * Reordered the section on conditional state (subsections etc)
->     into the order we prefer.
->   * Add a note about firmware
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Reviewed-by: Peter Xu <peterx@redhat.com>
+On Sat, Apr 21, 2018 at 6:55 AM, Emilio G. Cota <cota@braap.org> wrote:
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Cc: Michael Clark <mjc@sifive.com>
+> Cc: Palmer Dabbelt <palmer@sifive.com>
+> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+>
 
-queued
+Reviewed-by: Michael Clark <mjc@sifive.com>
+
+
+> ---
+>  target/riscv/translate.c | 158 ++++++++++++++++++++++++------
+> -----------------
+>  1 file changed, 80 insertions(+), 78 deletions(-)
+>
+> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+> index 18ec1a7..fc9c659 100644
+> --- a/target/riscv/translate.c
+> +++ b/target/riscv/translate.c
+> @@ -1836,78 +1836,71 @@ static void decode_opc(CPURISCVState *env,
+> DisasContext *ctx)
+>      }
+>  }
+>
+> -void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+> +static void riscv_tr_init_disas_context(DisasContextBase *dcbase,
+> CPUState *cs)
+>  {
+> -    CPURISCVState *env = cs->env_ptr;
+> -    DisasContext ctx;
+> -    target_ulong page_start;
+> -    int num_insns;
+> -    int max_insns;
+> -
+> -    ctx.base.pc_first = tb->pc;
+> -    ctx.base.pc_next = ctx.base.pc_first;
+> -    /* once we have GDB, the rest of the translate.c implementation
+> should be
+> -       ready for singlestep */
+> -    ctx.base.singlestep_enabled = cs->singlestep_enabled;
+> -    ctx.base.tb = tb;
+> -    ctx.base.is_jmp = DISAS_NEXT;
+> -
+> -    page_start = ctx.base.pc_first & TARGET_PAGE_MASK;
+> -    ctx.pc_succ_insn = ctx.base.pc_first;
+> -    ctx.flags = tb->flags;
+> -    ctx.mem_idx = tb->flags & TB_FLAGS_MMU_MASK;
+> -    ctx.frm = -1;  /* unknown rounding mode */
+> -
+> -    num_insns = 0;
+> -    max_insns = tb_cflags(ctx.base.tb) & CF_COUNT_MASK;
+> -    if (max_insns == 0) {
+> -        max_insns = CF_COUNT_MASK;
+> -    }
+> -    if (max_insns > TCG_MAX_INSNS) {
+> -        max_insns = TCG_MAX_INSNS;
+> -    }
+> -    gen_tb_start(tb);
+> +    DisasContext *ctx = container_of(dcbase, DisasContext, base);
+>
+> -    while (ctx.base.is_jmp == DISAS_NEXT) {
+> -        tcg_gen_insn_start(ctx.base.pc_next);
+> -        num_insns++;
+> +    ctx->pc_succ_insn = ctx->base.pc_first;
+> +    ctx->flags = ctx->base.tb->flags;
+> +    ctx->mem_idx = ctx->base.tb->flags & TB_FLAGS_MMU_MASK;
+> +    ctx->frm = -1;  /* unknown rounding mode */
+> +}
+>
+> -        if (unlikely(cpu_breakpoint_test(cs, ctx.base.pc_next, BP_ANY)))
+> {
+> -            tcg_gen_movi_tl(cpu_pc, ctx.base.pc_next);
+> -            ctx.base.is_jmp = DISAS_NORETURN;
+> -            gen_exception_debug();
+> -            /* The address covered by the breakpoint must be included in
+> -               [tb->pc, tb->pc + tb->size) in order to for it to be
+> -               properly cleared -- thus we increment the PC here so that
+> -               the logic setting tb->size below does the right thing.  */
+> -            ctx.base.pc_next += 4;
+> -            goto done_generating;
+> -        }
+> +static void riscv_tr_tb_start(DisasContextBase *db, CPUState *cpu)
+> +{
+> +}
+>
+> -        if (num_insns == max_insns && (tb_cflags(ctx.base.tb) &
+> CF_LAST_IO)) {
+> -            gen_io_start();
+> -        }
+> +static void riscv_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
+> +{
+> +    DisasContext *ctx = container_of(dcbase, DisasContext, base);
+> +
+> +    tcg_gen_insn_start(ctx->base.pc_next);
+> +}
+> +
+> +static bool riscv_tr_breakpoint_check(DisasContextBase *dcbase, CPUState
+> *cpu,
+> +                                      const CPUBreakpoint *bp)
+> +{
+> +    DisasContext *ctx = container_of(dcbase, DisasContext, base);
+> +
+> +    tcg_gen_movi_tl(cpu_pc, ctx->base.pc_next);
+> +    ctx->base.is_jmp = DISAS_NORETURN;
+> +    gen_exception_debug();
+> +    /* The address covered by the breakpoint must be included in
+> +       [tb->pc, tb->pc + tb->size) in order to for it to be
+> +       properly cleared -- thus we increment the PC here so that
+> +       the logic setting tb->size below does the right thing.  */
+> +    ctx->base.pc_next += 4;
+> +    return true;
+> +}
+> +
+> +
+> +static void riscv_tr_translate_insn(DisasContextBase *dcbase, CPUState
+> *cpu)
+> +{
+> +    DisasContext *ctx = container_of(dcbase, DisasContext, base);
+> +    CPURISCVState *env = cpu->env_ptr;
+> +
+> +    ctx->opcode = cpu_ldl_code(env, ctx->base.pc_next);
+> +    decode_opc(env, ctx);
+> +    ctx->base.pc_next = ctx->pc_succ_insn;
+> +
+> +    if (ctx->base.is_jmp == DISAS_NEXT) {
+> +        target_ulong page_start;
+>
+> -        ctx.opcode = cpu_ldl_code(env, ctx.base.pc_next);
+> -        decode_opc(env, &ctx);
+> -        ctx.base.pc_next = ctx.pc_succ_insn;
+> -
+> -        if (ctx.base.is_jmp == DISAS_NEXT &&
+> -            (cs->singlestep_enabled ||
+> -             ctx.base.pc_next - page_start >= TARGET_PAGE_SIZE ||
+> -             tcg_op_buf_full() ||
+> -             num_insns >= max_insns ||
+> -             singlestep)) {
+> -            ctx.base.is_jmp = DISAS_TOO_MANY;
+> +        page_start = ctx->base.pc_first & TARGET_PAGE_MASK;
+> +        if (ctx->base.pc_next - page_start >= TARGET_PAGE_SIZE) {
+> +            ctx->base.is_jmp = DISAS_TOO_MANY;
+>          }
+>      }
+> -    if (tb_cflags(ctx.base.tb) & CF_LAST_IO) {
+> -        gen_io_end();
+> -    }
+> -    switch (ctx.base.is_jmp) {
+> +}
+> +
+> +static void riscv_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+> +{
+> +    DisasContext *ctx = container_of(dcbase, DisasContext, base);
+> +
+> +    switch (ctx->base.is_jmp) {
+>      case DISAS_TOO_MANY:
+> -        tcg_gen_movi_tl(cpu_pc, ctx.base.pc_next);
+> -        if (cs->singlestep_enabled) {
+> +        tcg_gen_movi_tl(cpu_pc, ctx->base.pc_next);
+> +        if (ctx->base.singlestep_enabled) {
+>              gen_exception_debug();
+>          } else {
+>              tcg_gen_exit_tb(0);
+> @@ -1918,20 +1911,29 @@ void gen_intermediate_code(CPUState *cs,
+> TranslationBlock *tb)
+>      default:
+>          g_assert_not_reached();
+>      }
+> -done_generating:
+> -    gen_tb_end(tb, num_insns);
+> -    tb->size = ctx.base.pc_next - ctx.base.pc_first;
+> -    tb->icount = num_insns;
+> -
+> -#ifdef DEBUG_DISAS
+> -    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
+> -        && qemu_log_in_addr_range(ctx.base.pc_first)) {
+> -        qemu_log("IN: %s\n", lookup_symbol(ctx.base.pc_first));
+> -        log_target_disas(cs, ctx.base.pc_first,
+> -                         ctx.base.pc_next - ctx.base.pc_first);
+> -        qemu_log("\n");
+> -    }
+> -#endif
+> +}
+> +
+> +static void riscv_tr_disas_log(const DisasContextBase *dcbase, CPUState
+> *cpu)
+> +{
+> +    qemu_log("IN: %s\n", lookup_symbol(dcbase->pc_first));
+> +    log_target_disas(cpu, dcbase->pc_first, dcbase->tb->size);
+> +}
+> +
+> +static const TranslatorOps riscv_tr_ops = {
+> +    .init_disas_context = riscv_tr_init_disas_context,
+> +    .tb_start           = riscv_tr_tb_start,
+> +    .insn_start         = riscv_tr_insn_start,
+> +    .breakpoint_check   = riscv_tr_breakpoint_check,
+> +    .translate_insn     = riscv_tr_translate_insn,
+> +    .tb_stop            = riscv_tr_tb_stop,
+> +    .disas_log          = riscv_tr_disas_log,
+> +};
+> +
+> +void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+> +{
+> +    DisasContext ctx;
+> +
+> +    translator_loop(&riscv_tr_ops, &ctx.base, cs, tb);
+>  }
+>
+>  void riscv_translate_init(void)
+> --
+> 2.7.4
+>
+>
