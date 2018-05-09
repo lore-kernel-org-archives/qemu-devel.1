@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39364)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fGWCa-00008L-EZ
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:00:45 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fGWCc-0000Ad-8G
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:00:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fGWCZ-0002FG-N8
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:00:44 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fGWCa-0002G2-OG
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 17:00:46 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed,  9 May 2018 23:00:21 +0200
-Message-Id: <20180509210023.20283-6-mreitz@redhat.com>
+Date: Wed,  9 May 2018 23:00:22 +0200
+Message-Id: <20180509210023.20283-7-mreitz@redhat.com>
 In-Reply-To: <20180509210023.20283-1-mreitz@redhat.com>
 References: <20180509210023.20283-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 5/7] qemu-img: Recognize no creation support
- in -o help
+Subject: [Qemu-devel] [PATCH v2 6/7] iotests: Test help option for
+ unsupporting formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,57 +23,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-The only users of print_block_option_help() are qemu-img create and
-qemu-img convert for the output image, so this function is always used
-for image creation (it used to be used for amendment also, but that is
-no longer the case).
-
-So if image creation is not supported by either the format or the
-protocol, there is no need to print any option description, because the
-user cannot create an image like this anyway.
-
-This also fixes an assertion failure:
-
-    $ qemu-img create -f bochs -o help
-    Supported options:
-    qemu-img: util/qemu-option.c:219:
-    qemu_opts_print_help: Assertion `list' failed.
-    [1]    24831 abort (core dumped)  qemu-img create -f bochs -o help
+This adds test cases to 082 for qemu-img create/convert/amend "-o help"
+on formats that do not support creation or amendment, respectively.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qemu-img.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ tests/qemu-iotests/082     | 9 +++++++++
+ tests/qemu-iotests/082.out | 9 +++++++++
+ 2 files changed, 18 insertions(+)
 
-diff --git a/qemu-img.c b/qemu-img.c
-index a1ae718a52..81ad1e040c 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -250,6 +250,11 @@ static int print_block_option_help(const char *filename, const char *fmt)
-         return 1;
-     }
+diff --git a/tests/qemu-iotests/082 b/tests/qemu-iotests/082
+index d5c83d45ed..a872f771a6 100755
+--- a/tests/qemu-iotests/082
++++ b/tests/qemu-iotests/082
+@@ -97,6 +97,9 @@ run_qemu_img create -f $IMGFMT -o backing_file="$TEST_IMG" -o ,, -o help "$TEST_
+ run_qemu_img create -f $IMGFMT -o help
+ run_qemu_img create -o help
  
-+    if (!drv->create_opts) {
-+        error_report("Format driver '%s' does not support image creation", fmt);
-+        return 1;
-+    }
++# Try help option for a format that does not support creation
++run_qemu_img create -f bochs -o help
 +
-     create_opts = qemu_opts_append(create_opts, drv->create_opts);
-     if (filename) {
-         proto_drv = bdrv_find_protocol(filename, true, &local_err);
-@@ -258,6 +263,11 @@ static int print_block_option_help(const char *filename, const char *fmt)
-             qemu_opts_free(create_opts);
-             return 1;
-         }
-+        if (!proto_drv->create_opts) {
-+            error_report("Protocal driver '%s' does not support image creation",
-+                         proto_drv->format_name);
-+            return 1;
-+        }
-         create_opts = qemu_opts_append(create_opts, proto_drv->create_opts);
-     }
+ echo
+ echo === convert: Options specified more than once ===
  
+@@ -151,6 +154,9 @@ run_qemu_img convert -O $IMGFMT -o backing_file="$TEST_IMG" -o ,, -o help "$TEST
+ run_qemu_img convert -O $IMGFMT -o help
+ run_qemu_img convert -o help
+ 
++# Try help option for a format that does not support creation
++run_qemu_img convert -O bochs -o help
++
+ echo
+ echo === amend: Options specified more than once ===
+ 
+@@ -201,6 +207,9 @@ run_qemu_img amend -f $IMGFMT -o backing_file="$TEST_IMG" -o ,, -o help "$TEST_I
+ run_qemu_img amend -f $IMGFMT -o help
+ run_qemu_img convert -o help
+ 
++# Try help option for a format that does not support amendment
++run_qemu_img amend -f bochs -o help
++
+ # success, all done
+ echo "*** done"
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/082.out b/tests/qemu-iotests/082.out
+index 4e52dce8d6..60ef87c276 100644
+--- a/tests/qemu-iotests/082.out
++++ b/tests/qemu-iotests/082.out
+@@ -249,6 +249,9 @@ Testing: create -o help
+ Supported options:
+ size             Virtual disk size
+ 
++Testing: create -f bochs -o help
++qemu-img: Format driver 'bochs' does not support image creation
++
+ === convert: Options specified more than once ===
+ 
+ Testing: create -f qcow2 TEST_DIR/t.qcow2 128M
+@@ -502,6 +505,9 @@ Testing: convert -o help
+ Supported options:
+ size             Virtual disk size
+ 
++Testing: convert -O bochs -o help
++qemu-img: Format driver 'bochs' does not support image creation
++
+ === amend: Options specified more than once ===
+ 
+ Testing: amend -f foo -f qcow2 -o lazy_refcounts=on TEST_DIR/t.qcow2
+@@ -763,4 +769,7 @@ Note that not all of these options may be amendable.
+ Testing: convert -o help
+ Supported options:
+ size             Virtual disk size
++
++Testing: amend -f bochs -o help
++qemu-img: Format driver 'bochs' does not support option amendment
+ *** done
 -- 
 2.14.3
