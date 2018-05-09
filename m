@@ -1,40 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37231)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fGPAR-00075B-40
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 09:30:08 -0400
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fGPBE-0007g1-9t
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 09:30:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fGPAM-0007mr-6t
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 09:30:03 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57216)
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fGPB8-0000Za-BE
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 09:30:52 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57732)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <akrowiak@linux.vnet.ibm.com>)
-	id 1fGPAL-0007lA-Rg
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 09:29:58 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	id 1fGPB7-0000Xo-V1
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 09:30:46 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w49DTsJS099737
-	for <qemu-devel@nongnu.org>; Wed, 9 May 2018 09:29:56 -0400
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2hv1ve06hb-1
+	w49DTq8Q117694
+	for <qemu-devel@nongnu.org>; Wed, 9 May 2018 09:30:44 -0400
+Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2hv14cjqyv-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 09 May 2018 09:29:56 -0400
+	for <qemu-devel@nongnu.org>; Wed, 09 May 2018 09:30:43 -0400
 Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <akrowiak@linux.vnet.ibm.com>;
-	Wed, 9 May 2018 07:29:54 -0600
+	Wed, 9 May 2018 07:30:42 -0600
 References: <1525782303-16940-1-git-send-email-akrowiak@linux.vnet.ibm.com>
 	<1525782303-16940-7-git-send-email-akrowiak@linux.vnet.ibm.com>
 	<20180508144608.4c4e8180.cohuck@redhat.com>
-	<20180508144722.57f2aeb7.cohuck@redhat.com>
+	<e8e66bb4-f9bf-7674-c2f4-6dc10edb737b@linux.ibm.com>
 From: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-Date: Wed, 9 May 2018 09:29:46 -0400
+Date: Wed, 9 May 2018 09:30:32 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180508144722.57f2aeb7.cohuck@redhat.com>
+In-Reply-To: <e8e66bb4-f9bf-7674-c2f4-6dc10edb737b@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Message-Id: <2f8ed904-cca0-7e19-40b9-e6644ff41e5b@linux.vnet.ibm.com>
+Message-Id: <9432a24e-381c-62e1-7579-d2a98a7e911d@linux.vnet.ibm.com>
 Subject: Re: [Qemu-devel] [PATCH v5 6/6] MAINTAINERS: add entries for AP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -44,13 +44,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
+To: Halil Pasic <pasic@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: mjrosato@linux.vnet.ibm.com, alex.williamson@redhat.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, david@redhat.com, peter.maydell@linaro.org, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, heiko.carstens@de.ibm.com, qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, jjherne@linux.vnet.ibm.com, schwidefsky@de.ibm.com, pbonzini@redhat.com, bjsdjshi@linux.vnet.ibm.com, eric.auger@redhat.com, rth@twiddle.net
 
-On 05/08/2018 08:47 AM, Cornelia Huck wrote:
-> On Tue, 8 May 2018 14:46:08 +0200
-> Cornelia Huck <cohuck@redhat.com> wrote:
+On 05/08/2018 09:47 AM, Halil Pasic wrote:
 >
+>
+> On 05/08/2018 02:46 PM, Cornelia Huck wrote:
 >> On Tue,  8 May 2018 08:25:03 -0400
 >> Tony Krowiak <akrowiak@linux.vnet.ibm.com> wrote:
 >>
@@ -60,51 +60,21 @@ On 05/08/2018 08:47 AM, Cornelia Huck wrote:
 >>> ---
 >>>   MAINTAINERS |   14 ++++++++++++++
 >>>   1 files changed, 14 insertions(+), 0 deletions(-)
->>>
->>> diff --git a/MAINTAINERS b/MAINTAINERS
->>> index 459e359..c9e8d7b 100644
->>> --- a/MAINTAINERS
->>> +++ b/MAINTAINERS
->>> @@ -82,6 +82,7 @@ S390
->>>   M: Cornelia Huck <cohuck@redhat.com>
->>>   S: Supported
->>>   F: default-configs/s390x-softmmu.mak
->>> +F: docs/vfio-ap.txt
->>>   F: gdb-xml/s390*.xml
->>>   F: hw/char/sclp*.[hc]
->>>   F: hw/char/terminal3270.c
->>> @@ -89,6 +90,7 @@ F: hw/intc/s390_flic.c
->>>   F: hw/intc/s390_flic_kvm.c
->>>   F: hw/s390x/
->>>   F: hw/vfio/ccw.c
->>> +F: hw/vfio/ap.c
->>>   F: hw/watchdog/wdt_diag288.c
->>>   F: include/hw/s390x/
->>>   F: include/hw/watchdog/wdt_diag288.h
->>> @@ -1152,6 +1154,18 @@ F: include/hw/s390x/s390-ccw.h
->>>   T: git git://github.com/cohuck/qemu.git s390-next
->>>   L: qemu-s390x@nongnu.org
->>>   
->>> +vfio-ap
+>
+> [..]
+>
 >>> +M: Christian Borntraeger <borntraeger@de.ibm.com>
 >>> +M: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
 >>> +M: Halil Pasic <pasic@linux.vnet.ibm.com>
 >>> +M: Pierre Morel <pmorel@linux.vnet.ibm.com>
+>>
 >> Dumb question: Aren't you folks dropping the 'vnet' part in the future?
 >>
->>> +S: Maintained
-> Oh, and don't you want to make this 'Supported' (as for the other s390x
-> entries)?
+>
+> Not dumb at all. Please drop 'vnet' (at least for me).
 
-Yes, I'll make that change.
+I was not aware of that change.
 
 >
->>> +F: hw/vfio/ap.c
->>> +F: hw/s390x/ap-device.c
->>> +F: include/hw/s390x/ap-device.h
->>> +F: docs/vfio-ap.txt
->>> +L: qemu-s390x@nongnu.org
->>> +
->>>   vhost
->>>   M: Michael S. Tsirkin <mst@redhat.com>
->>>   S: Supported
+>
+> [..]
