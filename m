@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47823)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51254)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=66078d76a=Paul.Durrant@citrix.com>)
-	id 1fGRbp-0002Uk-F8
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:06:33 -0400
+	(envelope-from <thuth@redhat.com>) id 1fGRu9-0004KD-LH
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:25:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=66078d76a=Paul.Durrant@citrix.com>)
-	id 1fGRbl-0005ad-SL
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:06:29 -0400
-Received: from smtp.eu.citrix.com ([185.25.65.24]:63341)
+	(envelope-from <thuth@redhat.com>) id 1fGRu6-00062a-5m
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:25:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52134 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=66078d76a=Paul.Durrant@citrix.com>)
-	id 1fGRbl-0005Y2-Fb
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:06:25 -0400
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Wed, 9 May 2018 16:05:37 +0000
-Message-ID: <82906d30c1854e13bd7986af99eb1d98@AMSPEX02CL03.citrite.net>
-References: <20180509154604.25530-1-paul.durrant@citrix.com>
-	<152588171396.2703.471985236583323449@71c20359a636>
-In-Reply-To: <152588171396.2703.471985236583323449@71c20359a636>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fGRu5-00061E-Rd
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:25:22 -0400
+References: <20180426135755.GI29865@localhost.localdomain>
+	<CAFEAcA_4_K-aGJL4ds3G3p_-Dc1=6OGp9fUaZFuE+PW=UBoSSg@mail.gmail.com>
+	<CAHNT7NtRy0PcrnT-=xkX1P7m=L7x6NrXN0r27o6fFHZ3q4vfnQ@mail.gmail.com>
+	<87po24vn9c.fsf@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6fe42e75-9ee2-faa4-2b0b-135b0e526241@redhat.com>
+Date: Wed, 9 May 2018 18:25:16 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 0/2] xen-hvm: use new resource mapping API
+In-Reply-To: <87po24vn9c.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Who is running QEMU automated tests, and when?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,58 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "famz@redhat.com" <famz@redhat.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
+To: Michael Clark <mjc@sifive.com>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Yash Mankad <ymankad@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Palmer Dabbelt <palmer@sifive.com>, Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>, Andrew Waterman <andrew@sifive.com>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBuby1yZXBseUBwYXRjaGV3Lm9y
-ZyBbbWFpbHRvOm5vLXJlcGx5QHBhdGNoZXcub3JnXQ0KPiBTZW50OiAwOSBNYXkgMjAxOCAxNzow
-Mg0KPiBUbzogUGF1bCBEdXJyYW50IDxQYXVsLkR1cnJhbnRAY2l0cml4LmNvbT4NCj4gQ2M6IGZh
-bXpAcmVkaGF0LmNvbTsgcWVtdS1kZXZlbEBub25nbnUub3JnOyB4ZW4tDQo+IGRldmVsQGxpc3Rz
-LnhlbnByb2plY3Qub3JnOyBQYXVsIER1cnJhbnQgPFBhdWwuRHVycmFudEBjaXRyaXguY29tPg0K
-PiBTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzJdIHhlbi1odm06IHVzZSBuZXcg
-cmVzb3VyY2UgbWFwcGluZw0KPiBBUEkNCj4gDQo+IEhpLA0KPiANCj4gVGhpcyBzZXJpZXMgc2Vl
-bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
-b3INCj4gbW9yZSBpbmZvcm1hdGlvbjoNCj4gDQo+IFR5cGU6IHNlcmllcw0KPiBNZXNzYWdlLWlk
-OiAyMDE4MDUwOTE1NDYwNC4yNTUzMC0xLXBhdWwuZHVycmFudEBjaXRyaXguY29tDQo+IFN1Ympl
-Y3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC8yXSB4ZW4taHZtOiB1c2UgbmV3IHJlc291cmNlIG1h
-cHBpbmcNCj4gQVBJDQo+IA0KPiA9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09DQo+ICMhL2Jpbi9i
-YXNoDQo+IA0KPiBCQVNFPWJhc2UNCj4gbj0xDQo+IHRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUg
-JEJBU0UuLiB8IHdjIC1sKQ0KPiBmYWlsZWQ9MA0KPiANCj4gZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lbGltaXQgMA0KPiBnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUN
-Cj4gZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQ0KPiANCj4gY29t
-bWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSINCj4gZm9yIGMg
-aW4gJGNvbW1pdHM7IGRvDQo+ICAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQo
-Z2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiINCj4gICAgIGlmICEgZ2l0IHNob3cgJGMg
-LS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRo
-ZW4NCj4gICAgICAgICBmYWlsZWQ9MQ0KPiAgICAgICAgIGVjaG8NCj4gICAgIGZpDQo+ICAgICBu
-PSQoKG4rMSkpDQo+IGRvbmUNCj4gDQo+IGV4aXQgJGZhaWxlZA0KPiA9PT0gVEVTVCBTQ1JJUFQg
-RU5EID09PQ0KPiANCj4gVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
-ODcxMzM4NA0KPiBGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQ0K
-PiAgKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwNTA5MTU0NjA0LjI1NTMw
-LTEtDQo+IHBhdWwuZHVycmFudEBjaXRyaXguY29tIC0+IHBhdGNoZXcvMjAxODA1MDkxNTQ2MDQu
-MjU1MzAtMS0NCj4gcGF1bC5kdXJyYW50QGNpdHJpeC5jb20NCj4gICogW25ldyB0YWddICAgICAg
-ICAgICAgICAgcGF0Y2hldy8yMDE4MDUwOTE1NDg0OS4yNzk3OS0xLQ0KPiByaWNoYXJkLmhlbmRl
-cnNvbkBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxODA1MDkxNTQ4NDkuMjc5NzktMS0NCj4gcmlj
-aGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZw0KPiAgKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBw
-YXRjaGV3LzIwMTgwNTA5MTU0OTQ5LjgyMDYtMS1tcmVpdHpAcmVkaGF0LmNvbSAtPg0KPiBwYXRj
-aGV3LzIwMTgwNTA5MTU0OTQ5LjgyMDYtMS1tcmVpdHpAcmVkaGF0LmNvbQ0KPiBTd2l0Y2hlZCB0
-byBhIG5ldyBicmFuY2ggJ3Rlc3QnDQo+IDE2NjkxZmY0OWUgeGVuLWh2bTogdHJ5IHRvIHVzZSB4
-ZW5mb3JlaWdubWVtb3J5X21hcF9yZXNvdXJjZSgpIHRvIG1hcA0KPiBpb3JlcSBwYWdlcw0KPiBk
-NGJjZDY4MjUyIHhlbi1odm06IGNyZWF0ZSBzZXBhcmF0ZSBmdW5jdGlvbiBmb3IgaW9yZXEgc2Vy
-dmVyIGluaXRpYWxpemF0aW9uDQo+IA0KPiA9PT0gT1VUUFVUIEJFR0lOID09PQ0KPiBDaGVja2lu
-ZyBQQVRDSCAxLzI6IHhlbi1odm06IGNyZWF0ZSBzZXBhcmF0ZSBmdW5jdGlvbiBmb3IgaW9yZXEg
-c2VydmVyDQo+IGluaXRpYWxpemF0aW9uLi4uDQo+IENoZWNraW5nIFBBVENIIDIvMjogeGVuLWh2
-bTogdHJ5IHRvIHVzZQ0KPiB4ZW5mb3JlaWdubWVtb3J5X21hcF9yZXNvdXJjZSgpIHRvIG1hcCBp
-b3JlcSBwYWdlcy4uLg0KPiBFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAo
-Y3R4Old4VikNCj4gIzE2NDogRklMRTogaW5jbHVkZS9ody94ZW4veGVuX2NvbW1vbi5oOjEyODoN
-Cj4gKyAgICB4ZW5mb3JlaWdubWVtb3J5X2hhbmRsZSAqZm1lbSwgZG9taWRfdCBkb21pZCwgdW5z
-aWduZWQgaW50IHR5cGUsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXg0KPiANCj4g
-dG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMzggbGluZXMgY2hlY2tlZA0KPiANCj4gWW91
-ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzDQo+IGFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQ0KPiBDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLg0KDQpUaGlzIHN0eWxlIHdh
-cm5pbmcgYXBwZWFycyB0byBiZSBzcHVyaW91cy4NCg0KICBQYXVsDQoNCj4gDQo+ID09PSBPVVRQ
-VVQgRU5EID09PQ0KPiANCj4gVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDENCj4gDQo+
-IA0KPiAtLS0NCj4gRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0
-cDovL3BhdGNoZXcub3JnL10uDQo+IFBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
-dy1kZXZlbEByZWRoYXQuY29tDQo=
+On 09.05.2018 17:53, Alex Benn=C3=A9e wrote:
+>=20
+> Michael Clark <mjc@sifive.com> writes:
+>=20
+>> On Fri, Apr 27, 2018 at 2:04 AM, Peter Maydell <peter.maydell@linaro.o=
+rg>
+>> wrote:
+>>
+>>> On 26 April 2018 at 14:57, Eduardo Habkost <ehabkost@redhat.com> wrot=
+e:
+>>>> Peter, do you have additional tests you run before merging a pull
+>>>> request?  Additional test sets run before tagging a release?
+>>>
+>>> I run make && make check, on a variety of hosts, before merging
+>>> any pull request. That's the only testing I do, and I don't
+>>> do anything more before I do a tag.
+>>>
+>>
+>> This is what I do on riscv, however it is not yet automated:
+>>
+> <snip>
+>>
+>> We could bring a snapshot of riscv-tests into the QEMU tree however it
+>> would be best if they retained the BSD license so we can share locally
+>> added tests with upstream as upstream is adding tests periodically.
+>=20
+> Certainly it would be worth considering some smoke tests for
+> tests/tcg/riscv that at least verify the basics CPU features work as
+> expected.
+
+ Hi Michael,
+
+has one of the riscv machine an UART that can be programmed with some
+few lines of assembler? In that case we could extend
+tests/boot-serial-test.c to also check riscv. That's just a very, very
+simple test, but it's better than nothing and indeed helped to find a
+couple of bugs in the past already.
+
+ Thomas
