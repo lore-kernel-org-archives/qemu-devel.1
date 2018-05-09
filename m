@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fGRLt-0002wD-KG
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 11:50:05 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fGRPS-0005t6-Cn
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 11:53:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fGRLs-0000Nt-IG
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 11:50:01 -0400
-From: Max Reitz <mreitz@redhat.com>
-Date: Wed,  9 May 2018 17:49:49 +0200
-Message-Id: <20180509154949.8206-3-mreitz@redhat.com>
-In-Reply-To: <20180509154949.8206-1-mreitz@redhat.com>
-References: <20180509154949.8206-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] iotests: Add test for rebasing with
- relative paths
+	(envelope-from <alex.bennee@linaro.org>) id 1fGRPO-00078V-Eu
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 11:53:42 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:44961)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fGRPO-000777-8e
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 11:53:38 -0400
+Received: by mail-wr0-x241.google.com with SMTP id y15-v6so24368350wrg.11
+	for <qemu-devel@nongnu.org>; Wed, 09 May 2018 08:53:37 -0700 (PDT)
+References: <20180426135755.GI29865@localhost.localdomain>
+	<CAFEAcA_4_K-aGJL4ds3G3p_-Dc1=6OGp9fUaZFuE+PW=UBoSSg@mail.gmail.com>
+	<CAHNT7NtRy0PcrnT-=xkX1P7m=L7x6NrXN0r27o6fFHZ3q4vfnQ@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAHNT7NtRy0PcrnT-=xkX1P7m=L7x6NrXN0r27o6fFHZ3q4vfnQ@mail.gmail.com>
+Date: Wed, 09 May 2018 16:53:35 +0100
+Message-ID: <87po24vn9c.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Who is running QEMU automated tests, and when?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,153 +31,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-stable@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Michael Clark <mjc@sifive.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Yash Mankad <ymankad@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Palmer Dabbelt <palmer@sifive.com>, Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Waterman <andrew@sifive.com>, Cleber Rosa <crosa@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/024     | 82 ++++++++++++++++++++++++++++++++++++++++++++--
- tests/qemu-iotests/024.out | 30 +++++++++++++++++
- 2 files changed, 109 insertions(+), 3 deletions(-)
 
-diff --git a/tests/qemu-iotests/024 b/tests/qemu-iotests/024
-index e0d77ce2f5..4071ed6093 100755
---- a/tests/qemu-iotests/024
-+++ b/tests/qemu-iotests/024
-@@ -29,9 +29,14 @@ status=1	# failure is the default!
- 
- _cleanup()
- {
--	_cleanup_test_img
--	rm -f "$TEST_DIR/t.$IMGFMT.base_old"
--	rm -f "$TEST_DIR/t.$IMGFMT.base_new"
-+    _cleanup_test_img
-+    rm -f "$TEST_DIR/t.$IMGFMT.base_old"
-+    rm -f "$TEST_DIR/t.$IMGFMT.base_new"
-+
-+    rm -f "$TEST_DIR/subdir/t.$IMGFMT"
-+    rm -f "$TEST_DIR/subdir/t.$IMGFMT.base_old"
-+    rm -f "$TEST_DIR/subdir/t.$IMGFMT.base_new"
-+    rmdir "$TEST_DIR/subdir" 2> /dev/null
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
-@@ -123,6 +128,77 @@ io_pattern readv $((13 * CLUSTER_SIZE)) $CLUSTER_SIZE 0 1 0x00
- io_pattern readv $((14 * CLUSTER_SIZE)) $CLUSTER_SIZE 0 1 0x11
- io_pattern readv $((15 * CLUSTER_SIZE)) $CLUSTER_SIZE 0 1 0x00
- 
-+echo
-+echo "=== Test rebase in a subdirectory of the working directory ==="
-+echo
-+
-+# Clean up the old images beforehand so they do not interfere with
-+# this test
-+_cleanup
-+
-+mkdir "$TEST_DIR/subdir"
-+
-+# Relative to the overlay
-+BASE_OLD_OREL="t.$IMGFMT.base_old"
-+BASE_NEW_OREL="t.$IMGFMT.base_new"
-+
-+# Relative to $TEST_DIR (which is going to be our working directory)
-+OVERLAY_WREL="subdir/t.$IMGFMT"
-+
-+BASE_OLD="$TEST_DIR/subdir/$BASE_OLD_OREL"
-+BASE_NEW="$TEST_DIR/subdir/$BASE_NEW_OREL"
-+OVERLAY="$TEST_DIR/$OVERLAY_WREL"
-+
-+# Test done here:
-+#
-+# Backing (old): 11 11 -- 11
-+# Backing (new): -- 22 22 11
-+# Overlay:       -- -- -- --
-+#
-+# Rebasing works, we have verified that above.  Here, we just want to
-+# see that rebasing is done for the correct target backing file.
-+
-+TEST_IMG=$BASE_OLD _make_test_img 1M
-+TEST_IMG=$BASE_NEW _make_test_img 1M
-+TEST_IMG=$OVERLAY _make_test_img -b "$BASE_OLD_OREL" 1M
-+
-+echo
-+
-+$QEMU_IO "$BASE_OLD" \
-+    -c "write -P 0x11 $((0 * CLUSTER_SIZE)) $((2 * CLUSTER_SIZE))" \
-+    -c "write -P 0x11 $((3 * CLUSTER_SIZE)) $((1 * CLUSTER_SIZE))" \
-+    | _filter_qemu_io
-+
-+$QEMU_IO "$BASE_NEW" \
-+    -c "write -P 0x22 $((1 * CLUSTER_SIZE)) $((2 * CLUSTER_SIZE))" \
-+    -c "write -P 0x11 $((3 * CLUSTER_SIZE)) $((1 * CLUSTER_SIZE))" \
-+    | _filter_qemu_io
-+
-+echo
-+
-+pushd "$TEST_DIR" >/dev/null
-+$QEMU_IMG rebase -f "$IMGFMT" -b "$BASE_NEW_OREL" "$OVERLAY_WREL"
-+popd >/dev/null
-+
-+# Verify the backing path is correct
-+TEST_IMG=$OVERLAY _img_info | grep '^backing file'
-+
-+echo
-+
-+# Verify the data is correct
-+$QEMU_IO "$OVERLAY" \
-+    -c "read -P 0x11 $((0 * CLUSTER_SIZE)) $CLUSTER_SIZE" \
-+    -c "read -P 0x11 $((1 * CLUSTER_SIZE)) $CLUSTER_SIZE" \
-+    -c "read -P 0x00 $((2 * CLUSTER_SIZE)) $CLUSTER_SIZE" \
-+    -c "read -P 0x11 $((3 * CLUSTER_SIZE)) $CLUSTER_SIZE" \
-+    | _filter_qemu_io
-+
-+echo
-+
-+# Verify that cluster #3 is not allocated (because it is the same in
-+# $BASE_OLD and $BASE_NEW)
-+$QEMU_IMG map "$OVERLAY" | _filter_qemu_img_map
-+
- 
- # success, all done
- echo "*** done"
-diff --git a/tests/qemu-iotests/024.out b/tests/qemu-iotests/024.out
-index 33cfaf5cfc..024dc786b3 100644
---- a/tests/qemu-iotests/024.out
-+++ b/tests/qemu-iotests/024.out
-@@ -141,4 +141,34 @@ read 65536/65536 bytes at offset 917504
- === IO: pattern 0x00
- read 65536/65536 bytes at offset 983040
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=== Test rebase in a subdirectory of the working directory ===
-+
-+Formatting 'TEST_DIR/subdir/t.IMGFMT.base_old', fmt=IMGFMT size=1048576
-+Formatting 'TEST_DIR/subdir/t.IMGFMT.base_new', fmt=IMGFMT size=1048576
-+Formatting 'TEST_DIR/subdir/t.IMGFMT', fmt=IMGFMT size=1048576 backing_file=t.IMGFMT.base_old
-+
-+wrote 131072/131072 bytes at offset 0
-+128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 65536/65536 bytes at offset 196608
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 131072/131072 bytes at offset 65536
-+128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 65536/65536 bytes at offset 196608
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+backing file: t.IMGFMT.base_new (actual path: TEST_DIR/subdir/t.IMGFMT.base_new)
-+
-+read 65536/65536 bytes at offset 0
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 65536/65536 bytes at offset 65536
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 65536/65536 bytes at offset 131072
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 65536/65536 bytes at offset 196608
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+Offset          Length          File
-+0               0x30000         TEST_DIR/subdir/t.IMGFMT
-+0x30000         0x10000         TEST_DIR/subdir/t.IMGFMT.base_new
- *** done
--- 
-2.14.3
+Michael Clark <mjc@sifive.com> writes:
+
+> On Fri, Apr 27, 2018 at 2:04 AM, Peter Maydell <peter.maydell@linaro.org>
+> wrote:
+>
+>> On 26 April 2018 at 14:57, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>> > Peter, do you have additional tests you run before merging a pull
+>> > request?  Additional test sets run before tagging a release?
+>>
+>> I run make && make check, on a variety of hosts, before merging
+>> any pull request. That's the only testing I do, and I don't
+>> do anything more before I do a tag.
+>>
+>
+> This is what I do on riscv, however it is not yet automated:
+>
+<snip>
+>
+> We could bring a snapshot of riscv-tests into the QEMU tree however it
+> would be best if they retained the BSD license so we can share locally
+> added tests with upstream as upstream is adding tests periodically.
+
+Certainly it would be worth considering some smoke tests for
+tests/tcg/riscv that at least verify the basics CPU features work as
+expected.
+
+I've got some ideas for packaging more extensive test suites like LTP
+and kvm-unit-tests but would like to get simple linux-user stuff up and
+running first.
+
+<snip>
+>
+> We would like to automate all of this and we are working towards that goa=
+l.
+> One of the dependencies for docker tests are the riscv toolchain packages
+> and we are working on this...
+
+I got riscv64 working with the SID toolchain:
+
+  https://github.com/stsquad/qemu/commit/db0a108b9a0efdeeb2f63e670595c5e28e=
+236a97
+
+Once I've fixed it up to use snapshots.debian.org it will be in v4 of
+the TCG tests.
+
+> Adding port specific tests, like riscv tests to QEMU not only benefits the
+> particular port but also exercises a log of generic code such as the TCG,
+> the IO system, IO mutex, Virt IO and many other shared code paths.
+
+I agree it would be worthwhile testing.
+
+System tests are a bit more complicated in terms of code required
+although we have some for CRIS/MIPS/Xtensa/lm32 which need re-enabling -
+although toolchains for the more esoteric architectures is a pain.
+
+--
+Alex Benn=C3=A9e
