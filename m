@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34835)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fGOxP-0000cg-1e
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 09:16:36 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fGP53-0003ra-1Q
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 09:24:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fGOxJ-0003gS-Ul
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 09:16:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58074 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fGOxJ-0003fb-PT
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 09:16:29 -0400
-References: <1525854998-14243-1-git-send-email-jingqi.liu@intel.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7279dfe4-ca56-dbc7-c26f-ca566267a937@redhat.com>
-Date: Wed, 9 May 2018 08:16:28 -0500
+	(envelope-from <stefanha@gmail.com>) id 1fGP4z-0007V1-AI
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 09:24:29 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:46306)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fGP4z-0007SS-3V
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 09:24:25 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id a12-v6so4748077wrn.13
+	for <qemu-devel@nongnu.org>; Wed, 09 May 2018 06:24:24 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1525854998-14243-1-git-send-email-jingqi.liu@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 5/7] numa: Extend the command-line to
- provide memory latency and bandwidth information
+In-Reply-To: <4af4c034.10f40.16339ed38a1.Coremail.suhang16@mails.ucas.ac.cn>
+References: <1524750698-16322-1-git-send-email-suhang16@mails.ucas.ac.cn>
+	<1524750698-16322-2-git-send-email-suhang16@mails.ucas.ac.cn>
+	<20180430142340.GD10576@stefanha-x1.localdomain>
+	<4af4c034.10f40.16339ed38a1.Coremail.suhang16@mails.ucas.ac.cn>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Wed, 9 May 2018 14:24:23 +0100
+Message-ID: <CAJSP0QUrtMb7bcv00Q124UkbcuHat=Ljwm82tsXp41PxyVoVxA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v6 1/2] Implement .hex file loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +30,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liu Jingqi <jingqi.liu@intel.com>, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
-Cc: imammedo@redhat.com, qemu-devel@nongnu.org, mst@redhat.com
+To: Su Hang <suhang16@mails.ucas.ac.cn>
+Cc: Jim Mussared <jim@groklearning.com>, Joel Stanley <joel@jms.id.au>, qemu-devel <qemu-devel@nongnu.org>
 
-On 05/09/2018 03:36 AM, Liu Jingqi wrote:
-> Add -numa hmat-lb option to provide System Locality Latency and
-> Bandwidth Information. These memory attributes help to build
-> System Locality Latency and Bandwidth Information Structure(s)
-> in ACPI Heterogeneous Memory Attribute Table (HMAT).
-> 
-> Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
-> ---
+On Mon, May 7, 2018 at 10:27 AM, Su Hang <suhang16@mails.ucas.ac.cn> wrote:
+>> > +    size_t total_size = 0;
+>>
+>> Please use int instead of size_t (see above for reasons).
+> I have question here:
+> Since `EXT_LINEAR_ADDR_RECORD` supports 32 bit addressing (up to 4GiB), is `int`
+> big enough for this type?
+> The same question will happen to other similar cases.
+> Or should I use `long long` instead of `int`?
 
-> +++ b/qapi/misc.json
-> @@ -2705,7 +2705,7 @@
->   # Since: 2.1
->   ##
->   { 'enum': 'NumaOptionsType',
-> -  'data': [ 'node', 'dist', 'cpu' ] }
-> +  'data': [ 'node', 'dist', 'cpu', 'hmat-lb' ] }
+There is no way of fixing that without modifying hw/arm/boot.c to use
+a different type for kernel_size.  It looks like the actual size is
+never used in that file.  A bool would be enough to indicate whether
+loading the kernel succeeded.
 
-Missing documentation for the new addition, particularly that it is 
-'(since 2.13)'.
+Then the Intel .hex file parser code could be adjusted to either just
+return bool or to use an appropriate type as you suggested.
 
-
->   ##
-> +# @NumaHmatLBOptions:
-> +#
-> +# Set the system locality latency and bandwidth information between Initiator and Target proximity Domains.
-
-Long line here and elsewhere. Please keep this file wrapped below 80 
-columns.
-
-> +#
-> +# @initiator: the Initiator Proximity Domain.
-> +#
-> +# @target: the Target Proximity Domain.
-> +#
-> +# @hierarchy: the Memory Hierarchy. Indicates the performance of memory or side cache.
-> +#
-> +# @level: indicates the level of side cache, if it's the performance of side cache.
-> +#
-> +# @data-type: presents the type of data, access/read/write latency or hit latency.
-> +#
-> +# @base-lat: the base unit for latency in nanosecondsbytes.
-
-Is that supposed to be nanoseconds/bytes?
-
-> +#
-> +# @base-bw: the base unit for bandwidth in megabytes per second(MB/s).
-> +#
-> +# @latency: the value of latency based on Base Unit from @initiator to @target proximity domain.
-> +#
-> +# @bandwidth: the value of bandwidth based on Base Unit between @initiator to @target proximity domain.
-> +#
-> +# Since: 2.10
-
-Not even close.  The soonest this could make it in is 2.13.
-
-> +##
-> +{ 'struct': 'NumaHmatLBOptions',
-> +  'data': {
-> +   'initiator': 'uint16',
-> +   'target': 'uint16',
-> +   'hierarchy': 'str',
-
-Is this really a free-form string, or is it better as an enum type?
-
-> +   '*level': 'uint8',
-> +   'data-type': 'str',
-
-Ditto.
-
-> +   '*base-lat': 'uint64',
-> +   '*base-bw': 'uint64',
-> +   '*latency': 'uint16',
-> +   '*bandwidth': 'uint16' }}
-> +
-
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Stefan
