@@ -1,14 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fGCAU-0002er-4P
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 19:37:15 -0400
+	(envelope-from <mjc@sifive.com>) id 1fGDK9-0005JH-IU
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 20:51:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fGCAT-0004Cx-DQ
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 19:37:14 -0400
-From: John Snow <jsnow@redhat.com>
-Date: Tue,  8 May 2018 19:36:59 -0400
-Message-Id: <20180508233659.13973-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH] blockjob: expose error string via query
+	(envelope-from <mjc@sifive.com>) id 1fGDK8-0002wO-F8
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 20:51:17 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:38611)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fGDK8-0002uW-9J
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 20:51:16 -0400
+Received: by mail-oi0-x243.google.com with SMTP id k17-v6so30044146oih.5
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 17:51:15 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <5a725be3-4ca1-a883-7313-cee1dc5825c2@linaro.org>
+References: <1523377186-32578-1-git-send-email-cota@braap.org>
+	<e863cce3-d06e-f225-eb25-212729c5f05f@linaro.org>
+	<20180411152942.GA4480@flamenco>
+	<5a725be3-4ca1-a883-7313-cee1dc5825c2@linaro.org>
+From: Michael Clark <mjc@sifive.com>
+Date: Wed, 9 May 2018 12:51:14 +1200
+Message-ID: <CAHNT7NtS6AazERJuoK9qtAW2Z6j=YWhQkFdsmEbx-O5L9UtG2A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 00/10] Avoid integer overflow in
+ next_page_start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,62 +31,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-stable@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Jeff Cody <jcody@redhat.com>, John Snow <jsnow@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: "Emilio G. Cota" <cota@braap.org>, QEMU Developers <qemu-devel@nongnu.org>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Michael Walle <michael@walle.cc>, Max Filippov <jcmvbkbc@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>
 
-When we've reached the concluded state, we need to expose the error
-state if applicable. Add the new field.
+On Thu, Apr 12, 2018 at 11:56 AM, Richard Henderson <
+richard.henderson@linaro.org> wrote:
 
-This should be sufficient for determining if a job completed
-successfully or not after concluding; if we want to discriminate
-based on how it failed more mechanically, we can always add an
-explicit return code enumeration later.
+> On 04/12/2018 01:29 AM, Emilio G. Cota wrote:
+> > To ease an eventual merge I'll be updating the patches' R-b tags as
+> > they come in this branch:
+> >   https://github.com/cota/qemu/tree/next_page_overflow-r-b
+> >
+> > BTW to avoid conflicts we should merge this before the translator loop
+> > conversion series; I'll make that clear when I send a new version
+> > of that patch set.
+>
+> Right-o.  Thanks.  We'll get these in right away once development starts
+> again
+> so that you don't have to carry it long.
 
-I didn't bother to make it only show up if we are in the concluded
-state; I don't think it's necessary.
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- blockjob.c           | 2 ++
- qapi/block-core.json | 6 +++++-
- 2 files changed, 7 insertions(+), 1 deletion(-)
+Emilio,
 
-diff --git a/blockjob.c b/blockjob.c
-index 27f957e571..4de48166b2 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -831,6 +831,8 @@ BlockJobInfo *block_job_query(BlockJob *job, Error **errp)
-     info->status    = job->status;
-     info->auto_finalize = job->auto_finalize;
-     info->auto_dismiss  = job->auto_dismiss;
-+    info->has_error = job->ret != 0;
-+    info->error     = job->ret ? g_strdup(strerror(-job->ret)) : NULL;
-     return info;
- }
- 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index c50517bff3..7da3bea6bc 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1172,6 +1172,9 @@
- # @auto-dismiss: Job will dismiss itself when CONCLUDED, moving to the NULL
- #                state and disappearing from the query list. (since 2.12)
- #
-+# @error: Error information if the job did not complete successfully.
-+#         Not set if the job completed successfully. (since 2.12.1)
-+#
- # Since: 1.1
- ##
- { 'struct': 'BlockJobInfo',
-@@ -1179,7 +1182,8 @@
-            'offset': 'int', 'busy': 'bool', 'paused': 'bool', 'speed': 'int',
-            'io-status': 'BlockDeviceIoStatus', 'ready': 'bool',
-            'status': 'BlockJobStatus',
--           'auto-finalize': 'bool', 'auto-dismiss': 'bool' } }
-+           'auto-finalize': 'bool', 'auto-dismiss': 'bool',
-+           '*error': 'str' } }
- 
- ##
- # @query-block-jobs:
--- 
-2.14.3
+Is this your latest branch for these changes?
+
+- https://github.com/cota/qemu/tree/trloop-conv-v3
+
+I see that this branch has this change "target/riscv: avoid integer
+overflow in next_page PC check"
+
+I have some changes for target/riscv/translate.c and was thinking of basing
+them on your patches so we don't have conflicts.
+
+Thanks,
+Michael
