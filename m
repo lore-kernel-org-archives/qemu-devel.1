@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41616)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fGRLA-0001MD-DL
+	(envelope-from <cohuck@redhat.com>) id 1fGRLA-0001MH-Dr
 	for qemu-devel@nongnu.org; Wed, 09 May 2018 11:49:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fGRL7-0007TW-9V
+	(envelope-from <cohuck@redhat.com>) id 1fGRL8-0007YY-S4
 	for qemu-devel@nongnu.org; Wed, 09 May 2018 11:49:16 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Wed,  9 May 2018 17:49:08 +0200
-Message-Id: <20180509154910.23578-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC 0/2] vfio-ccw: exploit halt/clear
- subchannel support
+Date: Wed,  9 May 2018 17:49:09 +0200
+Message-Id: <20180509154910.23578-2-cohuck@redhat.com>
+In-Reply-To: <20180509154910.23578-1-cohuck@redhat.com>
+References: <20180509154910.23578-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH RFC 1/2] vfio-ccw: forward halt/clear to device
+ if supported
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,25 +23,139 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Dong Jia Shi <bjsdjshi@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
 Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 
-Hi,
+The initial version of vfio-ccw did not support forwarding of the
+halt or clear functions to the device, and we had to emulate them
+instead.
 
-this is the QEMU companion patchset to "vfio-ccw: support for {halt,clear}
-subchannel", but is interface-wise independent of it.
+For versions of the vfio-ccw kernel implementation that indeed do
+support halt/clear (by indicating them in the fctl of the scsw in
+the io_region), we can simply start making use of it. If the kernel
+does not support handling halt/clear, fall back to emulation.
 
-With an old host kernel, things should work as before. With a new host
-kernel, guest halt/clear requests should get passed through to the host.
-
-I tested this with a hacked-up guest kernel to issue clears on demand.
-
-Cornelia Huck (2):
-  vfio-ccw: forward halt/clear to device if supported
-  s390/css: add some tracing for pass-through handling
-
- hw/s390x/css.c         | 38 ++++++++++++++++++++++++++++++++++----
- hw/s390x/trace-events  |  4 ++++
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ hw/s390x/css.c         | 32 ++++++++++++++++++++++++++++----
  hw/vfio/ccw.c          | 11 +++++++++--
  include/hw/s390x/css.h | 10 +++++++---
- 4 files changed, 54 insertions(+), 9 deletions(-)
+ 3 files changed, 44 insertions(+), 9 deletions(-)
 
+diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+index 301bf1772f..b6727d0607 100644
+--- a/hw/s390x/css.c
++++ b/hw/s390x/css.c
+@@ -1180,6 +1180,16 @@ static void sch_handle_start_func_virtual(SubchDev *sch)
+ 
+ }
+ 
++static IOInstEnding sch_handle_clear_func_passthrough(SubchDev *sch)
++{
++    return s390_ccw_cmd_request(sch);
++}
++
++static IOInstEnding sch_handle_halt_func_passthrough(SubchDev *sch)
++{
++    return s390_ccw_cmd_request(sch);
++}
++
+ static IOInstEnding sch_handle_start_func_passthrough(SubchDev *sch)
+ {
+ 
+@@ -1233,13 +1243,27 @@ IOInstEnding do_subchannel_work_virtual(SubchDev *sch)
+ IOInstEnding do_subchannel_work_passthrough(SubchDev *sch)
+ {
+     SCSW *s = &sch->curr_status.scsw;
++    static bool no_halt_clear;
+ 
++    /* if the kernel does not support halt/clear, fall back to emulation */
+     if (s->ctrl & SCSW_FCTL_CLEAR_FUNC) {
+-        /* TODO: Clear handling */
+-        sch_handle_clear_func(sch);
++        if (no_halt_clear) {
++            sch_handle_clear_func(sch);
++        } else {
++            if (sch_handle_clear_func_passthrough(sch) == IOINST_OPNOTSUPP) {
++                no_halt_clear = true;
++                sch_handle_halt_func(sch);
++            }
++        }
+     } else if (s->ctrl & SCSW_FCTL_HALT_FUNC) {
+-        /* TODO: Halt handling */
+-        sch_handle_halt_func(sch);
++        if (no_halt_clear) {
++            sch_handle_halt_func(sch);
++        } else {
++            if (sch_handle_halt_func_passthrough(sch) == IOINST_OPNOTSUPP) {
++                no_halt_clear = true;
++                sch_handle_halt_func(sch);
++            }
++        }
+     } else if (s->ctrl & SCSW_FCTL_START_FUNC) {
+         return sch_handle_start_func_passthrough(sch);
+     }
+diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+index e67392c5f9..247901ae41 100644
+--- a/hw/vfio/ccw.c
++++ b/hw/vfio/ccw.c
+@@ -60,6 +60,7 @@ static IOInstEnding vfio_ccw_handle_request(SubchDev *sch)
+ 
+     memset(region, 0, sizeof(*region));
+ 
++    /* orb is only valid for ssch, but does not hurt for other functions */
+     memcpy(region->orb_area, &sch->orb, sizeof(ORB));
+     memcpy(region->scsw_area, &sch->curr_status.scsw, sizeof(SCSW));
+ 
+@@ -70,8 +71,12 @@ again:
+         if (errno == EAGAIN) {
+             goto again;
+         }
+-        error_report("vfio-ccw: wirte I/O region failed with errno=%d", errno);
+-        ret = -errno;
++        /* handle not supported operations like halt/clear on older kernels */
++        if (ret != -EOPNOTSUPP) {
++            error_report("vfio-ccw: write I/O region failed with errno=%d",
++                         errno);
++            ret = -errno;
++        }
+     } else {
+         ret = region->ret_code;
+     }
+@@ -83,6 +88,8 @@ again:
+     case -ENODEV:
+     case -EACCES:
+         return IOINST_CC_NOT_OPERATIONAL;
++    case -EOPNOTSUPP:
++        return IOINST_OPNOTSUPP;
+     case -EFAULT:
+     default:
+         sch_gen_unit_exception(sch);
+diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+index 35facb47d2..e33f26882b 100644
+--- a/include/hw/s390x/css.h
++++ b/include/hw/s390x/css.h
+@@ -100,9 +100,11 @@ typedef struct CcwDataStream {
+ } CcwDataStream;
+ 
+ /*
+- * IO instructions conclude according to this. Currently we have only
+- * cc codes. Valid values are 0, 1, 2, 3 and the generic semantic for
++ * IO instructions conclude according to this. One class of values are
++ * cc codes: Valid values are 0, 1, 2, 3 and the generic semantic for
+  * IO instructions is described briefly. For more details consult the PoP.
++ * Additionally, other endings may occur due to internal processing errors
++ * like lack of support for an operation.
+  */
+ typedef enum IOInstEnding {
+     /* produced expected result */
+@@ -112,7 +114,9 @@ typedef enum IOInstEnding {
+     /* inst. ineffective because busy with previously initiated function */
+     IOINST_CC_BUSY = 2,
+     /* inst. ineffective because not operational */
+-    IOINST_CC_NOT_OPERATIONAL = 3
++    IOINST_CC_NOT_OPERATIONAL = 3,
++    /* internal: operation not supported */
++    IOINST_OPNOTSUPP = 4
+ } IOInstEnding;
+ 
+ typedef struct SubchDev SubchDev;
 -- 
 2.14.3
