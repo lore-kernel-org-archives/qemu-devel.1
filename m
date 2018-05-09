@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fGNDY-00052D-UX
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:25:09 -0400
+	(envelope-from <quintela@redhat.com>) id 1fGNDY-00052E-VT
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:25:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fGNDV-0001q7-UD
+	(envelope-from <quintela@redhat.com>) id 1fGNDX-0001s6-9r
 	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:25:08 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45338 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60862 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fGNDV-0001pc-Qg
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:25:05 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fGNDX-0001qp-44
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:25:07 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 77F234078BB9
-	for <qemu-devel@nongnu.org>; Wed,  9 May 2018 11:25:05 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C065D406C758
+	for <qemu-devel@nongnu.org>; Wed,  9 May 2018 11:25:06 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed,  9 May 2018 13:23:59 +0200
-Message-Id: <20180509112406.6183-35-quintela@redhat.com>
+Date: Wed,  9 May 2018 13:24:00 +0200
+Message-Id: <20180509112406.6183-36-quintela@redhat.com>
 In-Reply-To: <20180509112406.6183-1-quintela@redhat.com>
 References: <20180509112406.6183-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 34/41] hmp/migration: add migrate_recover command
+Subject: [Qemu-devel] [PULL 35/41] migration: introduce lock for to_dst_file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,75 +34,118 @@ Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
 From: Peter Xu <peterx@redhat.com>
 
-Sister command to migrate-recover in QMP.
+Let's introduce a lock for that QEMUFile since we are going to operate
+on it in multiple threads.
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20180502104740.12123-22-peterx@redhat.com>
+Message-Id: <20180502104740.12123-23-peterx@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- hmp-commands.hx | 13 +++++++++++++
- hmp.c           | 10 ++++++++++
- hmp.h           |  1 +
- 3 files changed, 24 insertions(+)
+ migration/channel.c   |  3 ++-
+ migration/migration.c | 22 +++++++++++++++++++---
+ migration/migration.h |  6 ++++++
+ 3 files changed, 27 insertions(+), 4 deletions(-)
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 078ded20cd..8facba7b4d 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -957,7 +957,20 @@ STEXI
- @findex migrate_incoming
- Continue an incoming migration using the @var{uri} (that has the same syntax
- as the -incoming option).
-+ETEXI
+diff --git a/migration/channel.c b/migration/channel.c
+index c5eaf0fa0e..716192bf75 100644
+--- a/migration/channel.c
++++ b/migration/channel.c
+@@ -74,8 +74,9 @@ void migration_channel_connect(MigrationState *s,
+         } else {
+             QEMUFile *f = qemu_fopen_channel_output(ioc);
  
-+    {
-+        .name       = "migrate_recover",
-+        .args_type  = "uri:s",
-+        .params     = "uri",
-+        .help       = "Continue a paused incoming postcopy migration",
-+        .cmd        = hmp_migrate_recover,
-+    },
++            qemu_mutex_lock(&s->qemu_file_lock);
+             s->to_dst_file = f;
+-
++            qemu_mutex_unlock(&s->qemu_file_lock);
+         }
+     }
+     migrate_fd_connect(s, error);
+diff --git a/migration/migration.c b/migration/migration.c
+index 1beb5e07fb..3deded90e5 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1234,6 +1234,7 @@ static void migrate_fd_cleanup(void *opaque)
+ 
+     if (s->to_dst_file) {
+         Error *local_err = NULL;
++        QEMUFile *tmp;
+ 
+         trace_migrate_fd_cleanup();
+         qemu_mutex_unlock_iothread();
+@@ -1246,8 +1247,15 @@ static void migrate_fd_cleanup(void *opaque)
+         if (multifd_save_cleanup(&local_err) != 0) {
+             error_report_err(local_err);
+         }
+-        qemu_fclose(s->to_dst_file);
++        qemu_mutex_lock(&s->qemu_file_lock);
++        tmp = s->to_dst_file;
+         s->to_dst_file = NULL;
++        qemu_mutex_unlock(&s->qemu_file_lock);
++        /*
++         * Close the file handle without the lock to make sure the
++         * critical section won't block for long.
++         */
++        qemu_fclose(tmp);
+     }
+ 
+     assert((s->state != MIGRATION_STATUS_ACTIVE) &&
+@@ -2531,14 +2539,20 @@ static MigThrError postcopy_pause(MigrationState *s)
+     assert(s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE);
+ 
+     while (true) {
++        QEMUFile *file;
 +
-+STEXI
-+@item migrate_recover @var{uri}
-+@findex migrate_recover
-+Continue a paused incoming postcopy migration using the @var{uri}.
- ETEXI
+         migrate_set_state(&s->state, s->state,
+                           MIGRATION_STATUS_POSTCOPY_PAUSED);
  
-     {
-diff --git a/hmp.c b/hmp.c
-index 59d5341590..4ac2126969 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1517,6 +1517,16 @@ void hmp_migrate_incoming(Monitor *mon, const QDict *qdict)
-     hmp_handle_error(mon, &err);
+         /* Current channel is possibly broken. Release it. */
+         assert(s->to_dst_file);
+-        qemu_file_shutdown(s->to_dst_file);
+-        qemu_fclose(s->to_dst_file);
++        qemu_mutex_lock(&s->qemu_file_lock);
++        file = s->to_dst_file;
+         s->to_dst_file = NULL;
++        qemu_mutex_unlock(&s->qemu_file_lock);
++
++        qemu_file_shutdown(file);
++        qemu_fclose(file);
+ 
+         error_report("Detected IO failure for postcopy. "
+                      "Migration paused.");
+@@ -3007,6 +3021,7 @@ static void migration_instance_finalize(Object *obj)
+     MigrationParameters *params = &ms->parameters;
+ 
+     qemu_mutex_destroy(&ms->error_mutex);
++    qemu_mutex_destroy(&ms->qemu_file_lock);
+     g_free(params->tls_hostname);
+     g_free(params->tls_creds);
+     qemu_sem_destroy(&ms->pause_sem);
+@@ -3046,6 +3061,7 @@ static void migration_instance_init(Object *obj)
+     qemu_sem_init(&ms->postcopy_pause_sem, 0);
+     qemu_sem_init(&ms->postcopy_pause_rp_sem, 0);
+     qemu_sem_init(&ms->rp_state.rp_sem, 0);
++    qemu_mutex_init(&ms->qemu_file_lock);
  }
  
-+void hmp_migrate_recover(Monitor *mon, const QDict *qdict)
-+{
-+    Error *err = NULL;
-+    const char *uri = qdict_get_str(qdict, "uri");
-+
-+    qmp_migrate_recover(uri, &err);
-+
-+    hmp_handle_error(mon, &err);
-+}
-+
- /* Kept for backwards compatibility */
- void hmp_migrate_set_downtime(Monitor *mon, const QDict *qdict)
- {
-diff --git a/hmp.h b/hmp.h
-index 4e2ec375b0..b6b56c8161 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -68,6 +68,7 @@ void hmp_info_snapshots(Monitor *mon, const QDict *qdict);
- void hmp_migrate_cancel(Monitor *mon, const QDict *qdict);
- void hmp_migrate_continue(Monitor *mon, const QDict *qdict);
- void hmp_migrate_incoming(Monitor *mon, const QDict *qdict);
-+void hmp_migrate_recover(Monitor *mon, const QDict *qdict);
- void hmp_migrate_set_downtime(Monitor *mon, const QDict *qdict);
- void hmp_migrate_set_speed(Monitor *mon, const QDict *qdict);
- void hmp_migrate_set_capability(Monitor *mon, const QDict *qdict);
+ /*
+diff --git a/migration/migration.h b/migration/migration.h
+index f83f1064b5..8f0c82159b 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -114,6 +114,12 @@ struct MigrationState
+     QemuThread thread;
+     QEMUBH *cleanup_bh;
+     QEMUFile *to_dst_file;
++    /*
++     * Protects to_dst_file pointer.  We need to make sure we won't
++     * yield or hang during the critical section, since this lock will
++     * be used in OOB command handler.
++     */
++    QemuMutex qemu_file_lock;
+ 
+     /* bytes already send at the beggining of current interation */
+     uint64_t iteration_initial_bytes;
 -- 
 2.17.0
