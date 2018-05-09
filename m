@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fGRwg-0005w6-1e
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:28:03 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fGRwh-0005yH-FI
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:28:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fGRwe-0002r1-V7
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:28:02 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fGRwg-0002u0-Bl
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 12:28:03 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed,  9 May 2018 18:26:29 +0200
-Message-Id: <20180509162637.15575-35-kwolf@redhat.com>
+Date: Wed,  9 May 2018 18:26:30 +0200
+Message-Id: <20180509162637.15575-36-kwolf@redhat.com>
 In-Reply-To: <20180509162637.15575-1-kwolf@redhat.com>
 References: <20180509162637.15575-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 34/42] job: Add job_dismiss()
+Subject: [Qemu-devel] [PATCH 35/42] job: Add job_is_ready()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,157 +22,139 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-This moves block_job_dismiss() to the Job layer.
+Instead of having a 'bool ready' in BlockJob, add a function that
+derives its value from the job status.
+
+At the same time, this fixes the behaviour to match what the QAPI
+documentation promises for query-block-job: 'true if the job may be
+completed'. When the ready flag was introduced in commit ef6dbf1e46e,
+the flag never had to be reset to match the description because after
+being ready, the jobs would immediately complete and disappear.
+
+Job transactions and manual job finalisation were introduced only later.
+With these changes, jobs may stay around even after having completed
+(and they are not ready to be completed a second time), however their
+patches forgot to reset the ready flag.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/block/blockjob.h |  9 ---------
- include/qemu/job.h       |  7 ++++++-
- blockdev.c               |  8 +++++---
- blockjob.c               | 13 -------------
- job.c                    | 15 ++++++++++++++-
- tests/test-blockjob.c    |  4 ++--
- 6 files changed, 27 insertions(+), 29 deletions(-)
+ include/block/blockjob.h |  5 -----
+ include/qemu/job.h       |  3 +++
+ blockjob.c               |  3 +--
+ job.c                    | 22 ++++++++++++++++++++++
+ qemu-img.c               |  2 +-
+ tests/test-blockjob.c    |  2 +-
+ 6 files changed, 28 insertions(+), 9 deletions(-)
 
 diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index 7a0d95e789..ba08bcf7c0 100644
+index ba08bcf7c0..932a12d1a6 100644
 --- a/include/block/blockjob.h
 +++ b/include/block/blockjob.h
-@@ -141,15 +141,6 @@ void block_job_remove_all_bdrv(BlockJob *job);
- void block_job_set_speed(BlockJob *job, int64_t speed, Error **errp);
+@@ -49,11 +49,6 @@ typedef struct BlockJob {
+     /** The block device on which the job is operating.  */
+     BlockBackend *blk;
  
- /**
-- * block_job_dismiss:
-- * @job: The job to be dismissed.
-- * @errp: Error object.
-- *
-- * Remove a concluded job from the query list.
-- */
--void block_job_dismiss(BlockJob **job, Error **errp);
+-    /**
+-     * Set to true when the job is ready to be completed.
+-     */
+-    bool ready;
 -
--/**
-  * block_job_progress_update:
-  * @job: The job that has made progress
-  * @done: How much progress the job made
+     /** Status that is published by the query-block-jobs QMP API */
+     BlockDeviceIoStatus iostatus;
+ 
 diff --git a/include/qemu/job.h b/include/qemu/job.h
-index 5ec3e3c01d..f3acebbc17 100644
+index f3acebbc17..fb81cc7c09 100644
 --- a/include/qemu/job.h
 +++ b/include/qemu/job.h
-@@ -487,6 +487,12 @@ int job_complete_sync(Job *job, Error **errp);
-  */
- void job_finalize(Job *job, Error **errp);
+@@ -367,6 +367,9 @@ bool job_is_cancelled(Job *job);
+ /** Returns whether the job is in a completed state. */
+ bool job_is_completed(Job *job);
  
-+/**
-+ * Remove the concluded @job from the query list and resets the passed pointer
-+ * to %NULL. Returns an error if the job is not actually concluded.
-+ */
-+void job_dismiss(Job **job, Error **errp);
++/** Returns whether the job is ready to be completed. */
++bool job_is_ready(Job *job);
 +
- typedef void JobDeferToMainLoopFn(Job *job, void *opaque);
- 
  /**
-@@ -515,6 +521,5 @@ int job_finish_sync(Job *job, void (*finish)(Job *, Error **errp), Error **errp)
- 
- /* TODO To be removed from the public interface */
- void job_state_transition(Job *job, JobStatus s1);
--void job_do_dismiss(Job *job);
- 
- #endif
-diff --git a/blockdev.c b/blockdev.c
-index 31319a6d5a..15753d9719 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3915,14 +3915,16 @@ void qmp_block_job_finalize(const char *id, Error **errp)
- void qmp_block_job_dismiss(const char *id, Error **errp)
- {
-     AioContext *aio_context;
--    BlockJob *job = find_block_job(id, &aio_context, errp);
-+    BlockJob *bjob = find_block_job(id, &aio_context, errp);
-+    Job *job;
- 
--    if (!job) {
-+    if (!bjob) {
-         return;
-     }
- 
-     trace_qmp_block_job_dismiss(job);
--    block_job_dismiss(&job, errp);
-+    job = &bjob->job;
-+    job_dismiss(&job, errp);
-     aio_context_release(aio_context);
- }
- 
+  * Request @job to pause at the next pause point. Must be paired with
+  * job_resume(). If the job is supposed to be resumed by user action, call
 diff --git a/blockjob.c b/blockjob.c
-index e8d7e85d6b..5ab22596bf 100644
+index 5ab22596bf..0512b41901 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -243,19 +243,6 @@ int64_t block_job_ratelimit_get_delay(BlockJob *job, uint64_t n)
-     return ratelimit_calculate_delay(&job->limit, n);
- }
- 
--void block_job_dismiss(BlockJob **jobptr, Error **errp)
--{
--    BlockJob *job = *jobptr;
--    /* similarly to _complete, this is QMP-interface only. */
--    assert(job->job.id);
--    if (job_apply_verb(&job->job, JOB_VERB_DISMISS, errp)) {
--        return;
--    }
--
--    job_do_dismiss(&job->job);
--    *jobptr = NULL;
--}
--
- void block_job_progress_update(BlockJob *job, uint64_t done)
+@@ -270,7 +270,7 @@ BlockJobInfo *block_job_query(BlockJob *job, Error **errp)
+     info->offset    = job->offset;
+     info->speed     = job->speed;
+     info->io_status = job->iostatus;
+-    info->ready     = job->ready;
++    info->ready     = job_is_ready(&job->job),
+     info->status    = job->job.status;
+     info->auto_finalize = job->job.auto_finalize;
+     info->auto_dismiss  = job->job.auto_dismiss;
+@@ -438,7 +438,6 @@ void block_job_user_resume(Job *job)
+ void block_job_event_ready(BlockJob *job)
  {
-     job->offset += done;
+     job_state_transition(&job->job, JOB_STATUS_READY);
+-    job->ready = true;
+ 
+     if (block_job_is_internal(job)) {
+         return;
 diff --git a/job.c b/job.c
-index 1627118c26..744490dffe 100644
+index 744490dffe..a500e8d1fd 100644
 --- a/job.c
 +++ b/job.c
-@@ -561,7 +561,7 @@ void job_user_resume(Job *job, Error **errp)
-     job_resume(job);
+@@ -199,6 +199,28 @@ bool job_is_cancelled(Job *job)
+     return job->cancelled;
  }
  
--void job_do_dismiss(Job *job)
-+static void job_do_dismiss(Job *job)
- {
-     assert(job);
-     job->busy = false;
-@@ -574,6 +574,19 @@ void job_do_dismiss(Job *job)
-     job_unref(job);
- }
- 
-+void job_dismiss(Job **jobptr, Error **errp)
++bool job_is_ready(Job *job)
 +{
-+    Job *job = *jobptr;
-+    /* similarly to _complete, this is QMP-interface only. */
-+    assert(job->id);
-+    if (job_apply_verb(job, JOB_VERB_DISMISS, errp)) {
-+        return;
++    switch (job->status) {
++    case JOB_STATUS_UNDEFINED:
++    case JOB_STATUS_CREATED:
++    case JOB_STATUS_RUNNING:
++    case JOB_STATUS_PAUSED:
++    case JOB_STATUS_WAITING:
++    case JOB_STATUS_PENDING:
++    case JOB_STATUS_ABORTING:
++    case JOB_STATUS_CONCLUDED:
++    case JOB_STATUS_NULL:
++        return false;
++    case JOB_STATUS_READY:
++    case JOB_STATUS_STANDBY:
++        return true;
++    default:
++        g_assert_not_reached();
 +    }
-+
-+    job_do_dismiss(job);
-+    *jobptr = NULL;
++    return false;
 +}
 +
- void job_early_fail(Job *job)
+ bool job_is_completed(Job *job)
  {
-     assert(job->status == JOB_STATUS_CREATED);
+     switch (job->status) {
+diff --git a/qemu-img.c b/qemu-img.c
+index 176eb630a1..6361d4edf5 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -867,7 +867,7 @@ static void run_block_job(BlockJob *job, Error **errp)
+         aio_poll(aio_context, true);
+         qemu_progress_print(job->len ?
+                             ((float)job->offset / job->len * 100.f) : 0.0f, 0);
+-    } while (!job->ready && !job_is_completed(&job->job));
++    } while (!job_is_ready(&job->job) && !job_is_completed(&job->job));
+ 
+     if (!job_is_completed(&job->job)) {
+         ret = job_complete_sync(&job->job, errp);
 diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
-index 46a78739aa..7131cabb16 100644
+index 7131cabb16..8180d03a5f 100644
 --- a/tests/test-blockjob.c
 +++ b/tests/test-blockjob.c
-@@ -233,8 +233,8 @@ static void cancel_common(CancelJob *s)
+@@ -185,7 +185,7 @@ static void coroutine_fn cancel_job_start(void *opaque)
+             goto defer;
+         }
  
-     job_cancel_sync(&job->job);
-     if (sts != JOB_STATUS_CREATED && sts != JOB_STATUS_CONCLUDED) {
--        BlockJob *dummy = job;
--        block_job_dismiss(&dummy, &error_abort);
-+        Job *dummy = &job->job;
-+        job_dismiss(&dummy, &error_abort);
-     }
-     assert(job->job.status == JOB_STATUS_NULL);
-     job_unref(&job->job);
+-        if (!s->common.ready && s->should_converge) {
++        if (!job_is_ready(&s->common.job) && s->should_converge) {
+             block_job_event_ready(&s->common);
+         }
+ 
 -- 
 2.13.6
