@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fGNDH-0004hJ-0H
+	(envelope-from <quintela@redhat.com>) id 1fGNDI-0004iI-Vf
 	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:24:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fGNDD-0001Jl-Q8
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:24:50 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43684 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fGNDH-0001Pi-Ma
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:24:52 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43702 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fGNDD-0001J4-LX
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:24:47 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fGNDH-0001PO-J6
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 07:24:51 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5060E8E7B4
-	for <qemu-devel@nongnu.org>; Wed,  9 May 2018 11:24:47 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3369AA1BD4
+	for <qemu-devel@nongnu.org>; Wed,  9 May 2018 11:24:51 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed,  9 May 2018 13:23:45 +0200
-Message-Id: <20180509112406.6183-21-quintela@redhat.com>
+Date: Wed,  9 May 2018 13:23:48 +0200
+Message-Id: <20180509112406.6183-24-quintela@redhat.com>
 In-Reply-To: <20180509112406.6183-1-quintela@redhat.com>
 References: <20180509112406.6183-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 20/41] qmp: hmp: add migrate "resume" option
+Subject: [Qemu-devel] [PULL 23/41] migration: wakeup dst ram-load-thread for
+ recover
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,94 +35,64 @@ Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
 From: Peter Xu <peterx@redhat.com>
 
-It will be used when we want to resume one paused migration.
+On the destination side, we cannot wake up all the threads when we got
+reconnected. The first thing to do is to wake up the main load thread,
+so that we can continue to receive valid messages from source again and
+reply when needed.
+
+At this point, we switch the destination VM state from postcopy-paused
+back to postcopy-recover.
+
+Now we are finally ready to do the resume logic.
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20180502104740.12123-8-peterx@redhat.com>
+Message-Id: <20180502104740.12123-11-peterx@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- hmp-commands.hx       | 7 ++++---
- hmp.c                 | 4 +++-
- migration/migration.c | 2 +-
- qapi/migration.json   | 5 ++++-
- 4 files changed, 12 insertions(+), 6 deletions(-)
+ migration/migration.c | 30 ++++++++++++++++++++++++++++--
+ 1 file changed, 28 insertions(+), 2 deletions(-)
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 35d862a5d2..078ded20cd 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -897,13 +897,14 @@ ETEXI
- 
-     {
-         .name       = "migrate",
--        .args_type  = "detach:-d,blk:-b,inc:-i,uri:s",
--        .params     = "[-d] [-b] [-i] uri",
-+        .args_type  = "detach:-d,blk:-b,inc:-i,resume:-r,uri:s",
-+        .params     = "[-d] [-b] [-i] [-r] uri",
-         .help       = "migrate to URI (using -d to not wait for completion)"
- 		      "\n\t\t\t -b for migration without shared storage with"
- 		      " full copy of disk\n\t\t\t -i for migration without "
- 		      "shared storage with incremental copy of disk "
--		      "(base image shared between src and destination)",
-+		      "(base image shared between src and destination)"
-+                      "\n\t\t\t -r to resume a paused migration",
-         .cmd        = hmp_migrate,
-     },
- 
-diff --git a/hmp.c b/hmp.c
-index 898e25f3e1..59d5341590 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1919,10 +1919,12 @@ void hmp_migrate(Monitor *mon, const QDict *qdict)
-     bool detach = qdict_get_try_bool(qdict, "detach", false);
-     bool blk = qdict_get_try_bool(qdict, "blk", false);
-     bool inc = qdict_get_try_bool(qdict, "inc", false);
-+    bool resume = qdict_get_try_bool(qdict, "resume", false);
-     const char *uri = qdict_get_str(qdict, "uri");
-     Error *err = NULL;
- 
--    qmp_migrate(uri, !!blk, blk, !!inc, inc, false, false, &err);
-+    qmp_migrate(uri, !!blk, blk, !!inc, inc,
-+                false, false, true, resume, &err);
-     if (err) {
-         hmp_handle_error(mon, &err);
-         return;
 diff --git a/migration/migration.c b/migration/migration.c
-index 3d3b0a5b4a..19f07fb64f 100644
+index 4ab637a1fe..ec3bc9ae20 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -1413,7 +1413,7 @@ bool migration_is_blocked(Error **errp)
+@@ -440,8 +440,34 @@ void migration_incoming_process(void)
  
- void qmp_migrate(const char *uri, bool has_blk, bool blk,
-                  bool has_inc, bool inc, bool has_detach, bool detach,
--                 Error **errp)
-+                 bool has_resume, bool resume, Error **errp)
+ void migration_fd_process_incoming(QEMUFile *f)
  {
-     Error *local_err = NULL;
-     MigrationState *s = migrate_get_current();
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 244334e9f4..84ae4b90d5 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -1031,6 +1031,8 @@
- # @detach: this argument exists only for compatibility reasons and
- #          is ignored by QEMU
- #
-+# @resume: resume one paused migration, default "off". (since 2.12)
-+#
- # Returns: nothing on success
- #
- # Since: 0.14.0
-@@ -1052,7 +1054,8 @@
- #
- ##
- { 'command': 'migrate',
--  'data': {'uri': 'str', '*blk': 'bool', '*inc': 'bool', '*detach': 'bool' } }
-+  'data': {'uri': 'str', '*blk': 'bool', '*inc': 'bool',
-+           '*detach': 'bool', '*resume': 'bool' } }
+-    migration_incoming_setup(f);
+-    migration_incoming_process();
++    MigrationIncomingState *mis = migration_incoming_get_current();
++
++    if (mis->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
++        /* Resumed from a paused postcopy migration */
++
++        mis->from_src_file = f;
++        /* Postcopy has standalone thread to do vm load */
++        qemu_file_set_blocking(f, true);
++
++        /* Re-configure the return path */
++        mis->to_src_file = qemu_file_get_return_path(f);
++
++        migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_PAUSED,
++                          MIGRATION_STATUS_POSTCOPY_RECOVER);
++
++        /*
++         * Here, we only wake up the main loading thread (while the
++         * fault thread will still be waiting), so that we can receive
++         * commands from source now, and answer it if needed. The
++         * fault thread will be woken up afterwards until we are sure
++         * that source is ready to reply to page requests.
++         */
++        qemu_sem_post(&mis->postcopy_pause_sem_dst);
++    } else {
++        /* New incoming migration */
++        migration_incoming_setup(f);
++        migration_incoming_process();
++    }
+ }
  
- ##
- # @migrate-incoming:
+ void migration_ioc_process_incoming(QIOChannel *ioc)
 -- 
 2.17.0
