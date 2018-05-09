@@ -1,24 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49336)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fGI6o-0005Tr-Lc
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 01:57:51 -0400
+	(envelope-from <famz@redhat.com>) id 1fGI7G-0005f9-At
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 01:58:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fGI6l-0008LB-Jp
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 01:57:50 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48328 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fGI6l-0008KR-FB
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 01:57:47 -0400
-Date: Wed, 9 May 2018 13:57:29 +0800
+	(envelope-from <famz@redhat.com>) id 1fGI7F-0000gv-M1
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 01:58:18 -0400
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180509032533.GI22503@lemon.usersys.redhat.com>
-References: <90990df8024b287004e771ebd2370cc390e49106.1525723355.git.alistair.francis@wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <90990df8024b287004e771ebd2370cc390e49106.1525723355.git.alistair.francis@wdc.com>
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] tests/docker: Add a Avocado Docker
- test
+Date: Wed,  9 May 2018 13:57:57 +0800
+Message-Id: <20180509055802.28423-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/5] vmdk: Implement x-blockdev-create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,84 +17,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@wdc.com>
-Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org, f4bug@amsat.org, alistair23@gmail.com
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Mon, 05/07 13:09, Alistair Francis wrote:
-> Avocado is not trivial to setup on non-Fedora systems. To simplfying
-> future testing add a docker test image that runs Avocado tests.
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
->  tests/docker/dockerfiles/fedora.docker | 12 +++++++++--
->  tests/docker/test-avocado              | 28 ++++++++++++++++++++++++++
->  2 files changed, 38 insertions(+), 2 deletions(-)
->  create mode 100755 tests/docker/test-avocado
-> 
-> diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
-> index b706f42405..5c23f6e459 100644
-> --- a/tests/docker/dockerfiles/fedora.docker
-> +++ b/tests/docker/dockerfiles/fedora.docker
-> @@ -18,9 +18,17 @@ ENV PACKAGES \
->      mingw64-pixman mingw64-glib2 mingw64-gmp mingw64-SDL mingw64-pkg-config \
->      mingw64-gtk2 mingw64-gtk3 mingw64-gnutls mingw64-nettle mingw64-libtasn1 \
->      mingw64-libjpeg-turbo mingw64-libpng mingw64-curl mingw64-libssh2 \
-> -    mingw64-bzip2
-> +    mingw64-bzip2 \
-> +    xz tcpdump nc \
-> +    python2-devel python3-devel python-avocado \
-> +    libvirt-devel qemu-kvm
->  ENV QEMU_CONFIGURE_OPTS --python=/usr/bin/python3
-> +ENV PIP_PACKAGES \
-> +    avocado-framework avocado-qemu \
+This adds vmdk support to x-blockdev-create command.
 
-I think python-avacado overlaps with pip avacado-framework. Why are both needed?
+Unlike other formats, several VMDK subformats consists of multiple files
+(extents). In the QAPI interface we use an array of BlockdevRef to pass in. The
+management tool need to figure out how many extent files are needed but that is
+simple enough. There is a convention how VMware (as well as qemu-img) builds
+the extents' file names, but that isn't standardized, therefore it is not
+documented as part of this API.  Extraneous extents in the end of the provided
+array are ignored.
 
-Fam
+A big part of the patch is refactoring so that BlockdevRef parsing can be
+hooked in.
 
-> +    avocado-framework-plugin-vt avocado-framework-plugin-runner-vm \
-> +    avocado-framework-plugin-runner-remote avocado-framework-plugin-result-html
->  
->  RUN dnf install -y $PACKAGES
-> +RUN pip install $PIP_PACKAGES
->  RUN rpm -q $PACKAGES | sort > /packages.txt
-> -ENV FEATURES mingw clang pyyaml asan
-> +ENV FEATURES mingw clang pyyaml asan avocado
-> diff --git a/tests/docker/test-avocado b/tests/docker/test-avocado
-> new file mode 100755
-> index 0000000000..8da7bc10a2
-> --- /dev/null
-> +++ b/tests/docker/test-avocado
-> @@ -0,0 +1,28 @@
-> +#!/bin/bash -e
-> +#
-> +# Avocado tests on Fedora, as these are a real pain on Debian systems
-> +#
-> +# Copyright (c) 2018 Western Digital.
-> +#
-> +# Authors:
-> +#  Alistair Francis <alistair.francis@wdc.com>
-> +#
-> +# This work is licensed under the terms of the GNU GPL, version 2
-> +# or (at your option) any later version. See the COPYING file in
-> +# the top-level directory.
-> +#
-> +# Run this test: NETWORK=1 make docker-test-avocado@fedora
-> +
-> +. common.rc
-> +
-> +requires avocado
-> +
-> +cd "$BUILD_DIR"
-> +
-> +DEF_TARGET_LIST="x86_64-softmmu"
-> +TARGET_LIST=${TARGET_LIST:-$DEF_TARGET_LIST} \
-> +build_qemu
-> +install_qemu
-> +export PATH="${PATH}:$(pwd)"
-> +avocado vt-bootstrap --yes-to-all --vt-type qemu
-> +avocado run boot --vt-qemu-bin ./x86_64-softmmu/qemu-system-x86_64
-> -- 
-> 2.17.0
-> 
-> 
+Please review! Thanks.
+
+Fam Zheng (5):
+  qapi: Add qapi_enum_parse_full
+  vmdk: Refactor vmdk_create_extent
+  vmdk: Implement .bdrv_co_create callback
+  iotests: Filter cid numbers in VMDK extent info
+  iotests: Add VMDK tests for blockdev-create
+
+ block/vmdk.c                     | 550 ++++++++++++++++++++++++++++-----------
+ include/qapi/util.h              |   2 +
+ qapi/block-core.json             |  67 ++++-
+ qapi/qapi-util.c                 |  20 +-
+ tests/qemu-iotests/214           | 268 +++++++++++++++++++
+ tests/qemu-iotests/214.out       | 304 ++++++++++++++++++++++
+ tests/qemu-iotests/common.filter |   1 +
+ tests/qemu-iotests/group         |   1 +
+ 8 files changed, 1053 insertions(+), 160 deletions(-)
+ create mode 100755 tests/qemu-iotests/214
+ create mode 100644 tests/qemu-iotests/214.out
+
+-- 
+2.14.3
