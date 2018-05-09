@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53882)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fGUzd-0002Q9-8r
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 15:43:18 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fGUze-0002RD-5w
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 15:43:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fGUzb-0004RU-Qj
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 15:43:17 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fGUzd-0004SW-83
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 15:43:18 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed,  9 May 2018 21:43:00 +0200
-Message-Id: <20180509194302.21585-4-mreitz@redhat.com>
+Date: Wed,  9 May 2018 21:43:02 +0200
+Message-Id: <20180509194302.21585-6-mreitz@redhat.com>
 In-Reply-To: <20180509194302.21585-1-mreitz@redhat.com>
 References: <20180509194302.21585-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/5] qemu-io: Exit with error when a command
- failed
+Subject: [Qemu-devel] [PATCH v2 5/5] iotests: Let 216 make use of qemu-io's
+ exit code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,99 +23,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Currently, qemu-io basically always returns success when it gets to
-interactive mode (so once the whole command line has been parsed; even
-before the commands on the command line are interpreted).  That is not
-very useful.
+As a showcase of how you can use qemu-io's exit code to determine
+success or failure (same for qemu-img), this test is changed to use
+qemu_io_silent() instead of qemu_io(), and to assert the exit code
+instead of logging the filtered result.
 
-This patch makes qemu-io return failure when any of the executed
-commands failed.
+One real advantage of this is that in case of an error, you get a
+backtrace that helps you locate the issue in the test file quickly.
 
-Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1519617
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qemu-io.c | 28 ++++++++++++++++++++++------
- 1 file changed, 22 insertions(+), 6 deletions(-)
+ tests/qemu-iotests/216     | 23 ++++++++++++-----------
+ tests/qemu-iotests/216.out | 17 ++---------------
+ 2 files changed, 14 insertions(+), 26 deletions(-)
 
-diff --git a/qemu-io.c b/qemu-io.c
-index 78eb7a6d2e..6737cbb221 100644
---- a/qemu-io.c
-+++ b/qemu-io.c
-@@ -400,17 +400,21 @@ static void prep_fetchline(void *opaque)
-     *fetchable= 1;
- }
+diff --git a/tests/qemu-iotests/216 b/tests/qemu-iotests/216
+index ca9b47a7fd..3c0ae54b44 100755
+--- a/tests/qemu-iotests/216
++++ b/tests/qemu-iotests/216
+@@ -20,7 +20,7 @@
+ # Creator/Owner: Max Reitz <mreitz@redhat.com>
  
--static void command_loop(void)
-+static int command_loop(void)
- {
-     int i, fetchable = 0, prompted = 0;
-+    int ret, last_error = 0;
-     char *input;
+ import iotests
+-from iotests import log, qemu_img_pipe, qemu_io, filter_qemu_io
++from iotests import log, qemu_img, qemu_io_silent
  
-     for (i = 0; !quit_qemu_io && i < ncmdline; i++) {
--        qemuio_command(qemuio_blk, cmdline[i]);
-+        ret = qemuio_command(qemuio_blk, cmdline[i]);
-+        if (ret < 0) {
-+            last_error = ret;
-+        }
-     }
-     if (cmdline) {
-         g_free(cmdline);
--        return;
-+        return last_error;
-     }
+ # Need backing file support
+ iotests.verify_image_format(supported_fmts=['qcow2', 'qcow', 'qed', 'vmdk'])
+@@ -50,14 +50,13 @@ with iotests.FilePath('base.img') as base_img_path, \
+     log('--- Setting up images ---')
+     log('')
  
-     while (!quit_qemu_io) {
-@@ -431,13 +435,19 @@ static void command_loop(void)
-         if (input == NULL) {
-             break;
-         }
--        qemuio_command(qemuio_blk, input);
-+        ret = qemuio_command(qemuio_blk, input);
-         g_free(input);
+-    qemu_img_pipe('create', '-f', iotests.imgfmt, base_img_path, '64M')
++    assert qemu_img('create', '-f', iotests.imgfmt, base_img_path, '64M') == 0
++    assert qemu_io_silent(base_img_path, '-c', 'write -P 1 0M 1M') == 0
++    assert qemu_img('create', '-f', iotests.imgfmt, '-b', base_img_path,
++                    top_img_path) == 0
++    assert qemu_io_silent(top_img_path,  '-c', 'write -P 2 1M 1M') == 0
  
-+        if (ret < 0) {
-+            last_error = ret;
-+        }
+-    log(filter_qemu_io(qemu_io(base_img_path, '-c', 'write -P 1 0M 1M')))
+-
+-    qemu_img_pipe('create', '-f', iotests.imgfmt, '-b', base_img_path,
+-                  top_img_path)
+-
+-    log(filter_qemu_io(qemu_io(top_img_path,  '-c', 'write -P 2 1M 1M')))
++    log('Done')
+ 
+     log('')
+     log('--- Doing COR ---')
+@@ -110,6 +109,8 @@ with iotests.FilePath('base.img') as base_img_path, \
+     log('--- Checking COR result ---')
+     log('')
+ 
+-    log(filter_qemu_io(qemu_io(base_img_path, '-c', 'discard 0 64M')))
+-    log(filter_qemu_io(qemu_io(top_img_path,  '-c', 'read -P 1 0M 1M')))
+-    log(filter_qemu_io(qemu_io(top_img_path,  '-c', 'read -P 2 1M 1M')))
++    assert qemu_io_silent(base_img_path, '-c', 'discard 0 64M') == 0
++    assert qemu_io_silent(top_img_path,  '-c', 'read -P 1 0M 1M') == 0
++    assert qemu_io_silent(top_img_path,  '-c', 'read -P 2 1M 1M') == 0
 +
-         prompted = 0;
-         fetchable = 0;
-     }
-     qemu_set_fd_handler(STDIN_FILENO, NULL, NULL, NULL);
-+
-+    return last_error;
- }
++    log('Done')
+diff --git a/tests/qemu-iotests/216.out b/tests/qemu-iotests/216.out
+index d3fc590d29..45ea857ee1 100644
+--- a/tests/qemu-iotests/216.out
++++ b/tests/qemu-iotests/216.out
+@@ -3,12 +3,7 @@
  
- static void add_user_command(char *optarg)
-@@ -502,6 +512,7 @@ int main(int argc, char **argv)
-     int c;
-     int opt_index = 0;
-     int flags = BDRV_O_UNMAP;
-+    int ret;
-     bool writethrough = true;
-     Error *local_error = NULL;
-     QDict *opts = NULL;
-@@ -663,7 +674,7 @@ int main(int argc, char **argv)
-             }
-         }
-     }
--    command_loop();
-+    ret = command_loop();
+ --- Setting up images ---
  
-     /*
-      * Make sure all outstanding requests complete before the program exits.
-@@ -672,5 +683,10 @@ int main(int argc, char **argv)
+-wrote 1048576/1048576 bytes at offset 0
+-1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-
+-wrote 1048576/1048576 bytes at offset 1048576
+-1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-
++Done
  
-     blk_unref(qemuio_blk);
-     g_free(readline_state);
--    return 0;
-+
-+    if (ret < 0) {
-+        return 1;
-+    } else {
-+        return 0;
-+    }
- }
+ --- Doing COR ---
+ 
+@@ -17,12 +12,4 @@ wrote 1048576/1048576 bytes at offset 1048576
+ 
+ --- Checking COR result ---
+ 
+-discard 67108864/67108864 bytes at offset 0
+-64 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-
+-read 1048576/1048576 bytes at offset 0
+-1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-
+-read 1048576/1048576 bytes at offset 1048576
+-1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-
++Done
 -- 
 2.14.3
