@@ -1,41 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37398)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fGPBE-0007g1-9t
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 09:30:58 -0400
+	(envelope-from <david@redhat.com>) id 1fGPqT-0001BI-3q
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 10:13:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fGPB8-0000Za-BE
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 09:30:52 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57732)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <akrowiak@linux.vnet.ibm.com>)
-	id 1fGPB7-0000Xo-V1
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 09:30:46 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w49DTq8Q117694
-	for <qemu-devel@nongnu.org>; Wed, 9 May 2018 09:30:44 -0400
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2hv14cjqyv-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 09 May 2018 09:30:43 -0400
-Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <akrowiak@linux.vnet.ibm.com>;
-	Wed, 9 May 2018 07:30:42 -0600
-References: <1525782303-16940-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<1525782303-16940-7-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<20180508144608.4c4e8180.cohuck@redhat.com>
-	<e8e66bb4-f9bf-7674-c2f4-6dc10edb737b@linux.ibm.com>
-From: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-Date: Wed, 9 May 2018 09:30:32 -0400
+	(envelope-from <david@redhat.com>) id 1fGPqO-0007PE-43
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 10:13:29 -0400
+References: <20180503154936.18946-1-david@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <19eb43f8-3bdc-fbfe-47c1-bcc1de7a64ba@redhat.com>
+Date: Wed, 9 May 2018 16:13:14 +0200
 MIME-Version: 1.0
-In-Reply-To: <e8e66bb4-f9bf-7674-c2f4-6dc10edb737b@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20180503154936.18946-1-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Message-Id: <9432a24e-381c-62e1-7579-d2a98a7e911d@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v5 6/6] MAINTAINERS: add entries for AP
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 0/8] MemoryDevice: introduce and use
+ ResourceHandler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,37 +24,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: mjrosato@linux.vnet.ibm.com, alex.williamson@redhat.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, david@redhat.com, peter.maydell@linaro.org, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, heiko.carstens@de.ibm.com, qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, jjherne@linux.vnet.ibm.com, schwidefsky@de.ibm.com, pbonzini@redhat.com, bjsdjshi@linux.vnet.ibm.com, eric.auger@redhat.com, rth@twiddle.net
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>
 
-On 05/08/2018 09:47 AM, Halil Pasic wrote:
->
->
-> On 05/08/2018 02:46 PM, Cornelia Huck wrote:
->> On Tue,  8 May 2018 08:25:03 -0400
->> Tony Krowiak <akrowiak@linux.vnet.ibm.com> wrote:
->>
->>> Added entries for the s390 adjunct processor (AP) support.
->>>
->>> Signed-off-by: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
->>> ---
->>>   MAINTAINERS |   14 ++++++++++++++
->>>   1 files changed, 14 insertions(+), 0 deletions(-)
->
-> [..]
->
->>> +M: Christian Borntraeger <borntraeger@de.ibm.com>
->>> +M: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
->>> +M: Halil Pasic <pasic@linux.vnet.ibm.com>
->>> +M: Pierre Morel <pmorel@linux.vnet.ibm.com>
->>
->> Dumb question: Aren't you folks dropping the 'vnet' part in the future?
->>
->
-> Not dumb at all. Please drop 'vnet' (at least for me).
+On 03.05.2018 17:49, David Hildenbrand wrote:
+> Hotplug handlers usually have the following tasks:
+> 1. Allocate some resources for a new device
+> 2. Make the new device visible for the guest
+> 3. Notify the guest about the new device
+> 
+> Hotplug handlers have right now one limitation: They handle their own
+> context and only care about resources they manage.
+> 
+> We can have devices that need certain other resources that are e.g.
+> system resources managed by the machine. We need a clean way to assign
+> these resources (without violating layers as brought up by Igor).
+> 
+> One example is virtio-mem/virtio-pmem. Both device types need to be
+> assigned some region in guest physical address space. This device memory
+> belongs to the machine and is managed by it. However, virito devices are
+> hotplugged using the hotplug handler their proxy device implements. So we
+> could trigger e.g. a PCI hotplug handler for virtio-pci or a CSS/CCW
+> hotplug handler for virtio-ccw. But definetly not the machine.
+> 
+> So let's generalize the task of "assigning" resources and use it directly
+> for memory devices. We now have a clean way to support any kind of memory
+> device - independent of the underlying device type. Right now, only one
+> resource handler per device can be supported (in addition to the existing
+> hotplug handler).
+> 
+> You can find more details in patch nr 2.
+> 
+> This work is based on the already queued patch series
+>     "[PATCH v4 00/11] pc-dimm: factor out MemoryDevice"
+> 
+> David Hildenbrand (8):
+>   memory-device: always compile support for memory devices for SOFTMMU
+>   qdev: introduce ResourceHandler as a first-stage hotplug handler
+>   machine: provide default resource handler
+>   memory-device: new functions to handle resource assignment
+>   pc-dimm: implement new memory device functions
+>   machine: introduce enforce_memory_device_align() and add it for pc
+>   memory-device: factor out pre-assign into default resource handler
+>   memory-device: factor out (un)assign into default resource handler
+> 
+>  hw/Makefile.objs               |   2 +-
+>  hw/core/Makefile.objs          |   1 +
+>  hw/core/machine.c              |  70 +++++++++++++++++++++++
+>  hw/core/qdev.c                 |  41 +++++++++++++-
+>  hw/core/resource-handler.c     |  57 +++++++++++++++++++
+>  hw/i386/pc.c                   |  31 ++++++-----
+>  hw/mem/Makefile.objs           |   2 +-
+>  hw/mem/memory-device.c         | 122 +++++++++++++++++++++++++----------------
+>  hw/mem/pc-dimm.c               |  53 ++++++++----------
+>  hw/mem/trace-events            |   4 +-
+>  hw/ppc/spapr.c                 |   5 +-
+>  include/hw/boards.h            |  17 ++++++
+>  include/hw/mem/memory-device.h |  17 ++++--
+>  include/hw/mem/pc-dimm.h       |   3 +-
+>  include/hw/resource-handler.h  |  46 ++++++++++++++++
+>  stubs/Makefile.objs            |   1 -
+>  stubs/qmp_memory_device.c      |  13 -----
+>  17 files changed, 364 insertions(+), 121 deletions(-)
+>  create mode 100644 hw/core/resource-handler.c
+>  create mode 100644 include/hw/resource-handler.h
+>  delete mode 100644 stubs/qmp_memory_device.c
+> 
 
-I was not aware of that change.
+If there are no further comments, I'll send a v2 by the end of this
+week. Thanks!
 
->
->
-> [..]
+-- 
+
+Thanks,
+
+David / dhildenb
