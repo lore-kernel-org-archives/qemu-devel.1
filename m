@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58605)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fGG50-0004nn-0o
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 23:47:51 -0400
+	id 1fGG4y-0004nl-Uv
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 23:47:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fGG4z-0003T6-23
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 23:47:50 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:39794)
+	id 1fGG4v-0003Lo-RX
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 23:47:49 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:38215)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fGG4y-0003SY-TG
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 23:47:48 -0400
-Received: by mail-qt0-x243.google.com with SMTP id f1-v6so43975283qtj.6
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 20:47:48 -0700 (PDT)
+	id 1fGG4v-0003LA-Mk
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 23:47:45 -0400
+Received: by mail-qt0-x243.google.com with SMTP id m9-v6so23222198qtb.5
+	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 20:47:45 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed,  9 May 2018 00:46:57 -0300
-Message-Id: <20180509034658.26455-14-f4bug@amsat.org>
+Date: Wed,  9 May 2018 00:46:56 -0300
+Message-Id: <20180509034658.26455-13-f4bug@amsat.org>
 In-Reply-To: <20180509034658.26455-1-f4bug@amsat.org>
 References: <20180509034658.26455-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 13/14] sdcard: Add a "validate-crc" property
+Subject: [Qemu-devel] [PATCH v2 12/14] sdcard: Add tests to validate the
+ 7-bit CRC checksum of 48-bit SD frame
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,83 +35,112 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alistair Francis <alistair@alistair23.me>, Michael Walle <michael@walle.cc>
-
-Since not all modelled controllers use the CRC verification (which is
-somehow expensive), let the controller have a configurable property
-to enable verification.
-
-So far only the Milkymist controller uses it.
-
-This silent the Coverity warning:
-
-  "Code block is unreachable because of the syntactic structure of the code (CWE-561)"
-
-and fixes the following issue:
-
-- CID1005332 (hw/sd/sd.c::sd_req_crc_validate) Structurally dead code
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alistair Francis <alistair@alistair23.me>
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/sd/milkymist-memcard.c |  1 +
- hw/sd/sd.c                | 10 +++++++---
- 2 files changed, 8 insertions(+), 3 deletions(-)
+ tests/sdcard-test.c | 74 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 74 insertions(+)
 
-diff --git a/hw/sd/milkymist-memcard.c b/hw/sd/milkymist-memcard.c
-index 94bb1ffc6f..f7b6d3b140 100644
---- a/hw/sd/milkymist-memcard.c
-+++ b/hw/sd/milkymist-memcard.c
-@@ -273,6 +273,7 @@ static void milkymist_memcard_realize(DeviceState *dev, Error **errp)
-     blk = dinfo ? blk_by_legacy_dinfo(dinfo) : NULL;
-     carddev = qdev_create(&s->sdbus.qbus, TYPE_SD_CARD);
-     qdev_prop_set_drive(carddev, "drive", blk, &err);
-+    object_property_set_bool(OBJECT(carddev), true, "validate-crc", &err);
-     object_property_set_bool(OBJECT(carddev), true, "realized", &err);
-     if (err) {
-         error_setg(errp, "failed to init SD card: %s", error_get_pretty(err));
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index aaf3a6806a..0170eb832b 100644
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -93,6 +93,7 @@ struct SDState {
-     /* Configurable properties */
-     BlockBackend *blk;
-     bool spi;
-+    bool validate_crc;
+diff --git a/tests/sdcard-test.c b/tests/sdcard-test.c
+index 81789d1f88..2288a05cdf 100644
+--- a/tests/sdcard-test.c
++++ b/tests/sdcard-test.c
+@@ -14,6 +14,66 @@
+ #include "libqtest.h"
+ #include "hw/sd/sd.h"
  
-     uint32_t mode;    /* current card mode, one of SDCardModes */
-     int32_t state;    /* current card state, one of SDCardStates */
-@@ -467,10 +468,12 @@ static void sd_set_sdstatus(SDState *sd)
-     memset(sd->sd_status, 0, 64);
- }
- 
--static bool sd_req_crc_is_valid(const void *buffer)
-+static bool sd_req_crc_is_valid(SDState *sd, const void *request)
++static void sd_prepare_request48(uint8_t *buf, size_t bufsize,
++                                 uint8_t cmd, uint32_t arg)
++{
++    sd_frame48_init(buf, bufsize, cmd, arg, /* is_resp */ false);
++    buf[5] = sd_frame48_calc_checksum(buf);
++}
++
++static void sd_prepare_response48(uint8_t *buf, size_t bufsize,
++                                  uint8_t cmd, uint32_t arg)
++{
++    sd_frame48_init(buf, bufsize, cmd, arg, /* is_resp */ true);
++    buf[5] = sd_frame48_calc_checksum(buf);
++}
++
++static void test_sd_request_frame_crc7(void)
++{
++    uint8_t req[6];
++
++    /* CMD0 */
++    sd_prepare_request48(req, sizeof(req), 0, 0);
++    g_assert_cmphex(req[5], ==, 0b1001010);
++
++    /* CMD17 */
++    sd_prepare_request48(req, sizeof(req), 17, 0);
++    g_assert_cmphex(req[5], ==, 0b0101010);
++
++    /* APP_CMD */
++    sd_prepare_request48(req, sizeof(req), 55, 0);
++    g_assert_cmphex(req[5], ==, 0x32);
++
++    /* ACMD41 SEND_OP_COND */
++    sd_prepare_request48(req, sizeof(req), 41, 0x00100000);
++    g_assert_cmphex(req[5], ==, 0x5f >> 1);
++
++    /* CMD2 ALL_SEND_CID */
++    sd_prepare_request48(req, sizeof(req), 2, 0);
++    g_assert_cmphex(req[5], ==, 0x4d >> 1);
++
++    g_assert_true(sd_frame48_verify_checksum(req));
++}
++
++static void test_sd_response_frame48_crc7(void)
++{
++    uint8_t resp[6];
++
++    /* response to CMD17 */
++    sd_prepare_response48(resp, sizeof(resp), 17, 0x00000900);
++    g_assert_cmphex(resp[5], ==, 0b0110011);
++
++    /* response to the APP_CMD */
++    sd_prepare_response48(resp, sizeof(resp), 55, 0x00000120);
++    g_assert_cmphex(resp[5], ==, 0x41);
++
++    /* response to CMD3 SEND_RELATIVE_ADDR (Relative Card Address is 0xb368) */
++    sd_prepare_response48(resp, sizeof(resp), 3, 0xb3680500);
++    g_assert_cmphex(resp[5], ==, 0x0c);
++
++    g_assert_true(sd_frame48_verify_checksum(resp));
++}
++
+ static void test_sd_response_frame136_crc7(void)
  {
-+    if (sd->validate_crc) {
-+        return sd_frame48_verify_checksum(request);
-+    }
-     return true;
--    return sd_frame48_verify_checksum(buffer); /* TODO */
+     uint8_t buf[16];
+@@ -27,6 +87,17 @@ static void test_sd_response_frame136_crc7(void)
+     g_assert_true(sd_frame136_verify_checksum(buf));
  }
  
- static void sd_response_r1_make(SDState *sd, uint8_t *response)
-@@ -1631,7 +1634,7 @@ int sd_do_command(SDState *sd, const uint8_t *request,
-     cmd = request[0];
-     arg = ldl_be_p(&request[1]);
++static void test_sd_verify_cksum_frame48(void)
++{
++    uint8_t buf[6];
++
++    sd_prepare_request48(buf, sizeof(buf), 42, 0x12345678);
++    g_assert_true(sd_frame48_verify_checksum(buf));
++
++    sd_prepare_response48(buf, sizeof(buf), 69, 0x98765432);
++    g_assert_true(sd_frame48_verify_checksum(buf));
++}
++
+ static void test_sd_verify_cksum_frame136(void)
+ {
+     uint8_t buf[16];
+@@ -40,7 +111,10 @@ int main(int argc, char *argv[])
+ {
+     g_test_init(&argc, &argv, NULL);
  
--    if (!sd_req_crc_is_valid(request)) {
-+    if (!sd_req_crc_is_valid(sd, request)) {
-         sd->card_status |= COM_CRC_ERROR;
-         rtype = sd_illegal;
-         goto send_response;
-@@ -2079,6 +2082,7 @@ static Property sd_properties[] = {
-      * board to ensure that ssi transfers only occur when the chip select
-      * is asserted.  */
-     DEFINE_PROP_BOOL("spi", SDState, spi, false),
-+    DEFINE_PROP_BOOL("validate-crc", SDState, validate_crc, false),
-     DEFINE_PROP_END_OF_LIST()
- };
++    qtest_add_func("sd/prepare_req_crc7", test_sd_request_frame_crc7);
++    qtest_add_func("sd/prepare_resp48_crc7", test_sd_response_frame48_crc7);
+     qtest_add_func("sd/prepare_resp136_crc7", test_sd_response_frame136_crc7);
++    qtest_add_func("sd/verify_cksum_frame48", test_sd_verify_cksum_frame48);
+     qtest_add_func("sd/verify_cksum_frame136", test_sd_verify_cksum_frame136);
  
+     return g_test_run();
 -- 
 2.17.0
