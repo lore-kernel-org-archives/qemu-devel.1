@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58582)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fGG4q-0004h6-CD
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 23:47:42 -0400
+	id 1fGG4u-0004kt-M4
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 23:47:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fGG4o-00038b-EA
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 23:47:40 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:45685)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fGG4o-00038C-8D
-	for qemu-devel@nongnu.org; Tue, 08 May 2018 23:47:38 -0400
-Received: by mail-qt0-x242.google.com with SMTP id j42-v6so43940710qtj.12
-	for <qemu-devel@nongnu.org>; Tue, 08 May 2018 20:47:38 -0700 (PDT)
+	id 1fGG4s-0003GY-RA
+	for qemu-devel@nongnu.org; Tue, 08 May 2018 23:47:44 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed,  9 May 2018 00:46:54 -0300
-Message-Id: <20180509034658.26455-11-f4bug@amsat.org>
+Date: Wed,  9 May 2018 00:46:55 -0300
+Message-Id: <20180509034658.26455-12-f4bug@amsat.org>
 In-Reply-To: <20180509034658.26455-1-f4bug@amsat.org>
 References: <20180509034658.26455-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 10/14] sdcard: Remove the SDRequest argument
- from internal functions
+Subject: [Qemu-devel] [PATCH v2 11/14] sdcard: Add sd_frame48_init(),
+ replace SDRequest by a raw buffer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,328 +28,390 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alistair Francis <alistair@alistair23.me>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alistair Francis <alistair@alistair23.me>, Michael Walle <michael@walle.cc>, Andrzej Zaborowski <balrogg@gmail.com>, "open list:ARM PrimeCell and..." <qemu-arm@nongnu.org>
 
-Replace the SDRequest argument using directly {uint8_t cmd, uint32_t arg},
-it will be easier to remove the SDRequest struct in the next commit.
+Using sd_frame48_init() we silent the Coverity warning:
+
+  "Use of an uninitialized variable (CWE-457)"
+
+and fixes the following issues (all "Uninitialized scalar variable"):
+
+- CID1386072 (hw/sd/sdhci.c::sdhci_end_transfer)
+- CID1386074 (hw/sd/bcm2835_sdhost.c::bcm2835_sdhost_send_command)
+- CID1386076 (hw/sd/sdhci.c::sdhci_send_command)
+- CID1390571 (hw/sd/ssi-sd.c::ssi_sd_transfer)
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/sd/sd.c | 104 +++++++++++++++++++++++++++--------------------------
- 1 file changed, 53 insertions(+), 51 deletions(-)
+ include/hw/sd/sd.h        | 24 +++++++++++++++---------
+ hw/sd/bcm2835_sdhost.c    |  8 ++++----
+ hw/sd/core.c              |  7 ++++---
+ hw/sd/milkymist-memcard.c | 12 +++---------
+ hw/sd/omap_mmc.c          |  8 +++-----
+ hw/sd/pl181.c             | 10 +++++-----
+ hw/sd/pxa2xx_mmci.c       |  8 +++-----
+ hw/sd/sd.c                | 13 +++++--------
+ hw/sd/sdhci.c             | 20 ++++++++++----------
+ hw/sd/sdmmc-internal.c    | 12 ++++++++++++
+ hw/sd/ssi-sd.c            | 12 +++++++-----
+ 11 files changed, 71 insertions(+), 63 deletions(-)
 
+diff --git a/include/hw/sd/sd.h b/include/hw/sd/sd.h
+index 83399cd42d..85b66a27a3 100644
+--- a/include/hw/sd/sd.h
++++ b/include/hw/sd/sd.h
+@@ -76,12 +76,6 @@ typedef enum {
+     sd_adtc,	/* addressed with data transfer */
+ } sd_cmd_type_t;
+ 
+-typedef struct {
+-    uint8_t cmd;
+-    uint32_t arg;
+-    uint8_t crc;
+-} SDRequest;
+-
+ typedef struct SDState SDState;
+ typedef struct SDBus SDBus;
+ 
+@@ -97,7 +91,7 @@ typedef struct {
+     DeviceClass parent_class;
+     /*< public >*/
+ 
+-    int (*do_command)(SDState *sd, SDRequest *req, uint8_t *response);
++    int (*do_command)(SDState *sd, const uint8_t *request, uint8_t *response);
+     void (*write_data)(SDState *sd, uint8_t value);
+     uint8_t (*read_data)(SDState *sd);
+     bool (*data_ready)(SDState *sd);
+@@ -130,6 +124,18 @@ typedef struct {
+     void (*set_readonly)(DeviceState *dev, bool readonly);
+ } SDBusClass;
+ 
++/**
++ * sd_frame48_init: Initialize a 48-bit SD frame
++ *
++ * @buf: the buffer to be filled
++ * @bufsize: the size of the @buffer
++ * @cmd: the SD command
++ * @arg: the SD command argument
++ * @is_response: whether the frame is a command request or response
++ */
++void sd_frame48_init(uint8_t *buf, size_t bufsize, uint8_t cmd, uint32_t arg,
++                     bool is_response);
++
+ /**
+  * sd_frame48_calc_checksum:
+  * @content: pointer to the frame content
+@@ -172,7 +178,7 @@ bool sd_frame136_verify_checksum(const void *content);
+ 
+ /* Legacy functions to be used only by non-qdevified callers */
+ SDState *sd_init(BlockBackend *bs, bool is_spi);
+-int sd_do_command(SDState *sd, SDRequest *req,
++int sd_do_command(SDState *sd, const uint8_t *request,
+                   uint8_t *response);
+ void sd_write_data(SDState *sd, uint8_t value);
+ uint8_t sd_read_data(SDState *sd);
+@@ -193,7 +199,7 @@ void sd_enable(SDState *sd, bool enable);
+ void sdbus_set_voltage(SDBus *sdbus, uint16_t millivolts);
+ uint8_t sdbus_get_dat_lines(SDBus *sdbus);
+ bool sdbus_get_cmd_line(SDBus *sdbus);
+-int sdbus_do_command(SDBus *sd, SDRequest *req, uint8_t *response);
++int sdbus_do_command(SDBus *sd, const uint8_t *request, uint8_t *response);
+ void sdbus_write_data(SDBus *sd, uint8_t value);
+ uint8_t sdbus_read_data(SDBus *sd);
+ bool sdbus_data_ready(SDBus *sd);
+diff --git a/hw/sd/bcm2835_sdhost.c b/hw/sd/bcm2835_sdhost.c
+index 4df4de7d67..b637a392b6 100644
+--- a/hw/sd/bcm2835_sdhost.c
++++ b/hw/sd/bcm2835_sdhost.c
+@@ -106,14 +106,14 @@ static void bcm2835_sdhost_update_irq(BCM2835SDHostState *s)
+ 
+ static void bcm2835_sdhost_send_command(BCM2835SDHostState *s)
+ {
+-    SDRequest request;
++    uint8_t req[6];
+     uint8_t rsp[16];
+     int rlen;
+ 
+-    request.cmd = s->cmd & SDCMD_CMD_MASK;
+-    request.arg = s->cmdarg;
++    sd_frame48_init(req, sizeof(req), s->cmd & SDCMD_CMD_MASK,
++                    s->cmdarg, false);
+ 
+-    rlen = sdbus_do_command(&s->sdbus, &request, rsp);
++    rlen = sdbus_do_command(&s->sdbus, req, rsp);
+     if (rlen < 0) {
+         goto error;
+     }
+diff --git a/hw/sd/core.c b/hw/sd/core.c
+index 820345f704..15cae5053c 100644
+--- a/hw/sd/core.c
++++ b/hw/sd/core.c
+@@ -87,15 +87,16 @@ void sdbus_set_voltage(SDBus *sdbus, uint16_t millivolts)
+     }
+ }
+ 
+-int sdbus_do_command(SDBus *sdbus, SDRequest *req, uint8_t *response)
++int sdbus_do_command(SDBus *sdbus, const uint8_t *request, uint8_t *response)
+ {
+     SDState *card = get_card(sdbus);
+ 
+-    trace_sdbus_command(sdbus_name(sdbus), req->cmd, req->arg, req->crc);
++    trace_sdbus_command(sdbus_name(sdbus),
++                        request[0] & 0x3f, ldl_be_p(&request[1]), request[5]);
+     if (card) {
+         SDCardClass *sc = SD_CARD_GET_CLASS(card);
+ 
+-        return sc->do_command(card, req, response);
++        return sc->do_command(card, request, response);
+     }
+ 
+     return 0;
+diff --git a/hw/sd/milkymist-memcard.c b/hw/sd/milkymist-memcard.c
+index ff2b92dc64..94bb1ffc6f 100644
+--- a/hw/sd/milkymist-memcard.c
++++ b/hw/sd/milkymist-memcard.c
+@@ -97,14 +97,8 @@ static void update_pending_bits(MilkymistMemcardState *s)
+ 
+ static void memcard_sd_command(MilkymistMemcardState *s)
+ {
+-    SDRequest req;
+-
+-    req.cmd = s->command[0] & 0x3f;
+-    req.arg = ldl_be_p(s->command + 1);
+-    req.crc = s->command[5];
+-
+-    s->response[0] = req.cmd;
+-    s->response_len = sdbus_do_command(&s->sdbus, &req, s->response + 1);
++    s->response[0] = s->command[0];
++    s->response_len = sdbus_do_command(&s->sdbus, s->command, s->response + 1);
+     s->response_read_ptr = 0;
+ 
+     if (s->response_len == 16) {
+@@ -117,7 +111,7 @@ static void memcard_sd_command(MilkymistMemcardState *s)
+         s->response_len += 2;
+     }
+ 
+-    if (req.cmd == 0) {
++    if ((s->command[0] & 0x3f) == 0) {
+         /* next write is a dummy byte to clock the initialization of the sd
+          * card */
+         s->ignore_next_cmd = 1;
+diff --git a/hw/sd/omap_mmc.c b/hw/sd/omap_mmc.c
+index 51c6c124b2..ca6a2ab2aa 100644
+--- a/hw/sd/omap_mmc.c
++++ b/hw/sd/omap_mmc.c
+@@ -113,7 +113,7 @@ static void omap_mmc_command(struct omap_mmc_s *host, int cmd, int dir,
+ {
+     uint32_t rspstatus, mask;
+     int rsplen, timeout;
+-    SDRequest request;
++    uint8_t request[6];
+     uint8_t response[16];
+ 
+     if (init && cmd == 0) {
+@@ -135,11 +135,9 @@ static void omap_mmc_command(struct omap_mmc_s *host, int cmd, int dir,
+     mask = 0;
+     rspstatus = 0;
+ 
+-    request.cmd = cmd;
+-    request.arg = host->arg;
+-    request.crc = 0; /* FIXME */
++    sd_frame48_init(request, sizeof(request), cmd, host->arg, false);
+ 
+-    rsplen = sd_do_command(host->card, &request, response);
++    rsplen = sd_do_command(host->card, request, response);
+ 
+     /* TODO: validate CRCs */
+     switch (resptype) {
+diff --git a/hw/sd/pl181.c b/hw/sd/pl181.c
+index c9b1a6cb23..d8f6df8726 100644
+--- a/hw/sd/pl181.c
++++ b/hw/sd/pl181.c
+@@ -172,14 +172,14 @@ static uint32_t pl181_fifo_pop(PL181State *s)
+ 
+ static void pl181_send_command(PL181State *s)
+ {
+-    SDRequest request;
++    uint8_t request[6];
+     uint8_t response[16];
+     int rlen;
+ 
+-    request.cmd = s->cmd & PL181_CMD_INDEX;
+-    request.arg = s->cmdarg;
+-    DPRINTF("Command %d %08x\n", request.cmd, request.arg);
+-    rlen = sd_do_command(s->card, &request, response);
++    sd_frame48_init(request, sizeof(request), s->cmd & PL181_CMD_INDEX,
++                    s->cmdarg, false);
++
++    rlen = sd_do_command(s->card, request, response);
+     if (rlen < 0)
+         goto error;
+     if (s->cmd & PL181_CMD_RESPONSE) {
+diff --git a/hw/sd/pxa2xx_mmci.c b/hw/sd/pxa2xx_mmci.c
+index 82f8ec0d50..055d140f83 100644
+--- a/hw/sd/pxa2xx_mmci.c
++++ b/hw/sd/pxa2xx_mmci.c
+@@ -216,7 +216,7 @@ static void pxa2xx_mmci_fifo_update(PXA2xxMMCIState *s)
+ static void pxa2xx_mmci_wakequeues(PXA2xxMMCIState *s)
+ {
+     int rsplen, i;
+-    SDRequest request;
++    uint8_t request[6];
+     uint8_t response[16];
+ 
+     s->active = 1;
+@@ -224,11 +224,9 @@ static void pxa2xx_mmci_wakequeues(PXA2xxMMCIState *s)
+     s->tx_len = 0;
+     s->cmdreq = 0;
+ 
+-    request.cmd = s->cmd;
+-    request.arg = s->arg;
+-    request.crc = 0;	/* FIXME */
++    sd_frame48_init(request, sizeof(request), s->cmd, s->arg, false);
+ 
+-    rsplen = sdbus_do_command(&s->sdbus, &request, response);
++    rsplen = sdbus_do_command(&s->sdbus, request, response);
+     s->intreq |= INT_END_CMD;
+ 
+     memset(s->resp_fifo, 0, sizeof(s->resp_fifo));
 diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 125707a65c..0dfcaf480c 100644
+index 0dfcaf480c..aaf3a6806a 100644
 --- a/hw/sd/sd.c
 +++ b/hw/sd/sd.c
-@@ -853,35 +853,34 @@ static void sd_lock_command(SDState *sd)
-         sd->card_status &= ~CARD_IS_LOCKED;
+@@ -467,11 +467,8 @@ static void sd_set_sdstatus(SDState *sd)
+     memset(sd->sd_status, 0, 64);
  }
  
--static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
-+static sd_rsp_type_t sd_normal_command(SDState *sd, uint8_t cmd, uint32_t arg)
+-static bool sd_req_crc_is_valid(SDRequest *req)
++static bool sd_req_crc_is_valid(const void *buffer)
  {
-     uint32_t rca = 0x0000;
--    uint64_t addr = (sd->ocr & (1 << 30)) ? (uint64_t) req.arg << 9 : req.arg;
-+    uint64_t addr = (sd->ocr & (1 << 30)) ? (uint64_t) arg << 9 : arg;
- 
-     /* CMD55 precedes an ACMD, so we are not interested in tracing it.
-      * However there is no ACMD55, so we want to trace this particular case.
-      */
--    if (req.cmd != 55 || sd->expecting_acmd) {
-+    if (cmd != 55 || sd->expecting_acmd) {
-         trace_sdcard_normal_command(sd->proto_name,
--                                    sd_cmd_name(req.cmd), req.cmd,
--                                    req.arg, sd_state_name(sd->state));
-+                                    sd_cmd_name(cmd), cmd,
-+                                    arg, sd_state_name(sd->state));
-     }
- 
-     /* Not interpreting this as an app command */
-     sd->card_status &= ~APP_CMD;
- 
--    if (sd_cmd_type[req.cmd] == sd_ac
--        || sd_cmd_type[req.cmd] == sd_adtc) {
--        rca = req.arg >> 16;
-+    if (sd_cmd_type[cmd] == sd_ac || sd_cmd_type[cmd] == sd_adtc) {
-+        rca = arg >> 16;
-     }
- 
-     /* CMD23 (set block count) must be immediately followed by CMD18 or CMD25
-      * if not, its effects are cancelled */
--    if (sd->multi_blk_cnt != 0 && !(req.cmd == 18 || req.cmd == 25)) {
-+    if (sd->multi_blk_cnt != 0 && !(cmd == 18 || cmd == 25)) {
-         sd->multi_blk_cnt = 0;
-     }
- 
--    switch (req.cmd) {
-+    switch (cmd) {
-     /* Basic commands (Class 0 and Class 1) */
-     case 0:	/* CMD0:   GO_IDLE_STATE */
-         switch (sd->state) {
-@@ -950,7 +949,7 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
-             goto bad_cmd;
-         switch (sd->mode) {
-         case sd_data_transfer_mode:
--            sd_function_switch(sd, req.arg);
-+            sd_function_switch(sd, arg);
-             sd->state = sd_sendingdata_state;
-             sd->data_start = 0;
-             sd->data_offset = 0;
-@@ -1007,12 +1006,12 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
-         sd->vhs = 0;
- 
-         /* No response if not exactly one VHS bit is set.  */
--        if (!(req.arg >> 8) || (req.arg >> (ctz32(req.arg & ~0xff) + 1))) {
-+        if (!(arg >> 8) || (arg >> (ctz32(arg & ~0xff) + 1))) {
-             return sd->spi ? sd_r7 : sd_r0;
-         }
- 
-         /* Accept.  */
--        sd->vhs = req.arg;
-+        sd->vhs = arg;
-         return sd_r7;
- 
-     case 9:	/* CMD9:   SEND_CSD */
-@@ -1109,11 +1108,11 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
-     case 16:	/* CMD16:  SET_BLOCKLEN */
-         switch (sd->state) {
-         case sd_transfer_state:
--            if (req.arg > (1 << HWBLOCK_SHIFT)) {
-+            if (arg > (1 << HWBLOCK_SHIFT)) {
-                 sd->card_status |= BLOCK_LEN_ERROR;
-             } else {
--                trace_sdcard_set_blocklen(req.arg);
--                sd->blk_len = req.arg;
-+                trace_sdcard_set_blocklen(arg);
-+                sd->blk_len = arg;
-             }
- 
-             return sd_r1;
-@@ -1166,7 +1165,7 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
-     case 23:    /* CMD23: SET_BLOCK_COUNT */
-         switch (sd->state) {
-         case sd_transfer_state:
--            sd->multi_blk_cnt = req.arg;
-+            sd->multi_blk_cnt = arg;
-             return sd_r1;
- 
-         default:
-@@ -1303,7 +1302,7 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
-         switch (sd->state) {
-         case sd_transfer_state:
-             sd->state = sd_sendingdata_state;
--            *(uint32_t *) sd->data = sd_wpbits(sd, req.arg);
-+            *(uint32_t *) sd->data = sd_wpbits(sd, arg);
-             sd->data_start = addr;
-             sd->data_offset = 0;
-             return sd_r1b;
-@@ -1317,7 +1316,7 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
-     case 32:	/* CMD32:  ERASE_WR_BLK_START */
-         switch (sd->state) {
-         case sd_transfer_state:
--            sd->erase_start = req.arg;
-+            sd->erase_start = arg;
-             return sd_r1;
- 
-         default:
-@@ -1328,7 +1327,7 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
-     case 33:	/* CMD33:  ERASE_WR_BLK_END */
-         switch (sd->state) {
-         case sd_transfer_state:
--            sd->erase_end = req.arg;
-+            sd->erase_end = arg;
-             return sd_r1;
- 
-         default:
-@@ -1391,7 +1390,7 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
-         case sd_idle_state:
-             if (rca) {
-                 qemu_log_mask(LOG_GUEST_ERROR,
--                              "SD: illegal RCA 0x%04x for APP_CMD\n", req.cmd);
-+                              "SD: illegal RCA 0x%04x for APP_CMD\n", cmd);
-             }
-         default:
-             break;
-@@ -1409,10 +1408,11 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
-         switch (sd->state) {
-         case sd_transfer_state:
-             sd->data_offset = 0;
--            if (req.arg & 1)
-+            if (arg & 1) {
-                 sd->state = sd_sendingdata_state;
--            else
-+            } else {
-                 sd->state = sd_receivingdata_state;
-+            }
-             return sd_r1;
- 
-         default:
-@@ -1434,27 +1434,26 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
- 
-     default:
-     bad_cmd:
--        qemu_log_mask(LOG_GUEST_ERROR, "SD: Unknown CMD%i\n", req.cmd);
-+        qemu_log_mask(LOG_GUEST_ERROR, "SD: Unknown CMD%i\n", cmd);
-         return sd_illegal;
- 
-     unimplemented_spi_cmd:
-         /* Commands that are recognised but not yet implemented in SPI mode.  */
-         qemu_log_mask(LOG_UNIMP, "SD: CMD%i not implemented in SPI mode\n",
--                      req.cmd);
-+                      cmd);
-         return sd_illegal;
-     }
- 
--    qemu_log_mask(LOG_GUEST_ERROR, "SD: CMD%i in a wrong state\n", req.cmd);
-+    qemu_log_mask(LOG_GUEST_ERROR, "SD: CMD%i in a wrong state\n", cmd);
-     return sd_illegal;
+-    uint8_t buffer[5];
+-    buffer[0] = 0x40 | req->cmd;
+-    stl_be_p(&buffer[1], req->arg);
+     return true;
+     return sd_frame48_verify_checksum(buffer); /* TODO */
+ }
+@@ -1619,7 +1616,7 @@ static int cmd_valid_while_locked(SDState *sd, uint8_t cmd)
+     return sd_cmd_class[cmd] == 0 || sd_cmd_class[cmd] == 7;
  }
  
--static sd_rsp_type_t sd_app_command(SDState *sd,
--                                    SDRequest req)
-+static sd_rsp_type_t sd_app_command(SDState *sd, uint8_t cmd, uint32_t arg)
- {
--    trace_sdcard_app_command(sd->proto_name, sd_acmd_name(req.cmd),
--                             req.cmd, req.arg, sd_state_name(sd->state));
-+    trace_sdcard_app_command(sd->proto_name, sd_acmd_name(cmd),
-+                             cmd, arg, sd_state_name(sd->state));
-     sd->card_status |= APP_CMD;
--    switch (req.cmd) {
-+    switch (cmd) {
-     case 6:	/* ACMD6:  SET_BUS_WIDTH */
-         if (sd->spi) {
-             goto unimplemented_spi_cmd;
-@@ -1462,7 +1461,7 @@ static sd_rsp_type_t sd_app_command(SDState *sd,
-         switch (sd->state) {
-         case sd_transfer_state:
-             sd->sd_status[0] &= 0x3f;
--            sd->sd_status[0] |= (req.arg & 0x03) << 6;
-+            sd->sd_status[0] |= (arg & 0x03) << 6;
-             return sd_r1;
- 
-         default:
-@@ -1526,7 +1525,7 @@ static sd_rsp_type_t sd_app_command(SDState *sd,
-          * assumes that the card is in ready state as soon as it
-          * sees the power up bit set. */
-         if (!FIELD_EX32(sd->ocr, OCR, CARD_POWER_UP)) {
--            if ((req.arg & ACMD41_ENQUIRY_MASK) != 0) {
-+            if ((arg & ACMD41_ENQUIRY_MASK) != 0) {
-                 timer_del(sd->ocr_power_timer);
-                 sd_ocr_powerup(sd);
-             } else {
-@@ -1539,7 +1538,7 @@ static sd_rsp_type_t sd_app_command(SDState *sd,
-             }
-         }
- 
--        if (FIELD_EX32(sd->ocr & req.arg, OCR, VDD_VOLTAGE_WINDOW)) {
-+        if (FIELD_EX32(sd->ocr & arg, OCR, VDD_VOLTAGE_WINDOW)) {
-             /* We accept any voltage.  10000 V is nothing.
-              *
-              * Once we're powered up, we advance straight to ready state
-@@ -1583,25 +1582,25 @@ static sd_rsp_type_t sd_app_command(SDState *sd,
-          * information about the SD Security Features.
-          */
-         qemu_log_mask(LOG_UNIMP, "SD: CMD%i Security not implemented\n",
--                      req.cmd);
-+                      cmd);
-         return sd_illegal;
- 
-     default:
-         /* Fall back to standard commands.  */
--        return sd_normal_command(sd, req);
-+        return sd_normal_command(sd, cmd, arg);
- 
-     unimplemented_spi_cmd:
-         /* Commands that are recognised but not yet implemented in SPI mode.  */
-         qemu_log_mask(LOG_UNIMP, "SD: CMD%i not implemented in SPI mode\n",
--                      req.cmd);
-+                      cmd);
-         return sd_illegal;
-     }
- 
--    qemu_log_mask(LOG_GUEST_ERROR, "SD: ACMD%i in a wrong state\n", req.cmd);
-+    qemu_log_mask(LOG_GUEST_ERROR, "SD: ACMD%i in a wrong state\n", cmd);
-     return sd_illegal;
- }
- 
--static int cmd_valid_while_locked(SDState *sd, SDRequest *req)
-+static int cmd_valid_while_locked(SDState *sd, uint8_t cmd)
- {
-     /* Valid commands in locked state:
-      * basic class (0)
-@@ -1612,13 +1611,12 @@ static int cmd_valid_while_locked(SDState *sd, SDRequest *req)
-      * Anything else provokes an "illegal command" response.
-      */
-     if (sd->expecting_acmd) {
--        return req->cmd == 41 || req->cmd == 42;
-+        return cmd == 41 || cmd == 42;
-     }
--    if (req->cmd == 16 || req->cmd == 55) {
-+    if (cmd == 16 || cmd == 55) {
-         return 1;
-     }
--    return sd_cmd_class[req->cmd] == 0
--            || sd_cmd_class[req->cmd] == 7;
-+    return sd_cmd_class[cmd] == 0 || sd_cmd_class[cmd] == 7;
- }
- 
- int sd_do_command(SDState *sd, SDRequest *req,
-@@ -1626,25 +1624,29 @@ int sd_do_command(SDState *sd, SDRequest *req,
+-int sd_do_command(SDState *sd, SDRequest *req,
++int sd_do_command(SDState *sd, const uint8_t *request,
+                   uint8_t *response) {
      int last_state;
      sd_rsp_type_t rtype;
-     int rsplen;
-+    uint8_t cmd;
-+    uint32_t arg;
- 
-     if (!sd->blk || !blk_is_inserted(sd->blk) || !sd->enable) {
+@@ -1631,10 +1628,10 @@ int sd_do_command(SDState *sd, SDRequest *req,
          return 0;
      }
  
-+    cmd = req->cmd;
-+    arg = req->arg;
-+
-     if (!sd_req_crc_is_valid(req)) {
+-    cmd = req->cmd;
+-    arg = req->arg;
++    cmd = request[0];
++    arg = ldl_be_p(&request[1]);
+ 
+-    if (!sd_req_crc_is_valid(req)) {
++    if (!sd_req_crc_is_valid(request)) {
          sd->card_status |= COM_CRC_ERROR;
          rtype = sd_illegal;
          goto send_response;
-     }
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index f6fe93f033..554bb059ec 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -330,17 +330,18 @@ static void sdhci_data_transfer(void *opaque);
  
--    if (req->cmd >= SDMMC_CMD_MAX) {
--        qemu_log_mask(LOG_GUEST_ERROR, "SD: incorrect command 0x%02x\n",
--                      req->cmd);
--        req->cmd &= 0x3f;
-+    if (cmd >= SDMMC_CMD_MAX) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "SD: incorrect command 0x%02x\n", cmd);
-+        cmd &= 0x3f;
-     }
+ static void sdhci_send_command(SDHCIState *s)
+ {
+-    SDRequest request;
++    uint8_t request[6];
+     uint8_t response[16];
+     int rlen;
  
-     if (sd->card_status & CARD_IS_LOCKED) {
--        if (!cmd_valid_while_locked(sd, req)) {
-+        if (!cmd_valid_while_locked(sd, cmd)) {
-             sd->card_status |= ILLEGAL_COMMAND;
-             sd->expecting_acmd = false;
-             qemu_log_mask(LOG_GUEST_ERROR, "SD: Card is locked\n");
-@@ -1658,9 +1660,9 @@ int sd_do_command(SDState *sd, SDRequest *req,
+     s->errintsts = 0;
+     s->acmd12errsts = 0;
+-    request.cmd = s->cmdreg >> 8;
+-    request.arg = s->argument;
  
-     if (sd->expecting_acmd) {
-         sd->expecting_acmd = false;
--        rtype = sd_app_command(sd, *req);
-+        rtype = sd_app_command(sd, cmd, arg);
-     } else {
--        rtype = sd_normal_command(sd, *req);
-+        rtype = sd_normal_command(sd, cmd, arg);
-     }
+-    trace_sdhci_send_command(request.cmd, request.arg);
+-    rlen = sdbus_do_command(&s->sdbus, &request, response);
++    trace_sdhci_send_command(s->cmdreg >> 8, s->argument);
++    sd_frame48_init(request, sizeof(request), s->cmdreg >> 8,
++                    s->argument, false);
++
++    rlen = sdbus_do_command(&s->sdbus, request, response);
  
-     if (rtype == sd_illegal) {
-@@ -1669,7 +1671,7 @@ int sd_do_command(SDState *sd, SDRequest *req,
-         /* Valid command, we can update the 'state before command' bits.
-          * (Do this now so they appear in r1 responses.)
-          */
--        sd->current_cmd = req->cmd;
-+        sd->current_cmd = cmd;
-         sd->card_status &= ~CURRENT_STATE;
-         sd->card_status |= (last_state << 9);
+     if (s->cmdreg & SDHC_CMD_RESPONSE) {
+         if (rlen == 4) {
+@@ -386,13 +387,12 @@ static void sdhci_end_transfer(SDHCIState *s)
+ {
+     /* Automatically send CMD12 to stop transfer if AutoCMD12 enabled */
+     if ((s->trnmod & SDHC_TRNS_ACMD12) != 0) {
+-        SDRequest request;
++        uint8_t request[6];
+         uint8_t response[16];
+ 
+-        request.cmd = 0x0C;
+-        request.arg = 0;
+-        trace_sdhci_end_transfer(request.cmd, request.arg);
+-        sdbus_do_command(&s->sdbus, &request, response);
++        trace_sdhci_end_transfer(12, 0);
++        sd_frame48_init(request, sizeof(request), 12, 0, false);
++        sdbus_do_command(&s->sdbus, request, response);
+         /* Auto CMD12 response goes to the upper Response register */
+         s->rspreg[3] = ldl_be_p(response);
      }
+diff --git a/hw/sd/sdmmc-internal.c b/hw/sd/sdmmc-internal.c
+index f709211401..c8475a6e8e 100644
+--- a/hw/sd/sdmmc-internal.c
++++ b/hw/sd/sdmmc-internal.c
+@@ -92,7 +92,9 @@ static uint8_t sd_crc7(const void *message, size_t width)
+ }
+ 
+ enum {
++    CRC7_LENGTH         = 1,
+     F48_CONTENT_LENGTH  = 1 /* command */ + 4 /* argument */,
++    F48_SIZE_MAX        = F48_CONTENT_LENGTH + CRC7_LENGTH,
+     F136_CONTENT_LENGTH = 15,
+ };
+ 
+@@ -117,3 +119,13 @@ bool sd_frame136_verify_checksum(const void *content)
+     return sd_frame136_calc_checksum(content)
+            == ((const uint8_t *)content)[F136_CONTENT_LENGTH];
+ }
++
++void sd_frame48_init(uint8_t *buf, size_t bufsize, uint8_t cmd, uint32_t arg,
++                     bool is_response)
++{
++    assert(bufsize >= F48_SIZE_MAX);
++    buf[0] = (!is_response << 6) | cmd;
++    stl_be_p(&buf[1], arg);
++    /* Zero-initialize the CRC byte to avoid leaking host memory to the guest */
++    buf[F48_CONTENT_LENGTH] = 0x00;
++}
+diff --git a/hw/sd/ssi-sd.c b/hw/sd/ssi-sd.c
+index dbcff4013d..77e446bb94 100644
+--- a/hw/sd/ssi-sd.c
++++ b/hw/sd/ssi-sd.c
+@@ -93,13 +93,15 @@ static uint32_t ssi_sd_transfer(SSISlave *dev, uint32_t val)
+         return 0xff;
+     case SSI_SD_CMDARG:
+         if (s->arglen == 4) {
+-            SDRequest request;
++            uint8_t request[6];
+             uint8_t longresp[16];
+             /* FIXME: Check CRC.  */
+-            request.cmd = s->cmd;
+-            request.arg = ldl_be_p(s->cmdarg);
+-            DPRINTF("CMD%d arg 0x%08x\n", s->cmd, request.arg);
+-            s->arglen = sdbus_do_command(&s->sdbus, &request, longresp);
++
++            DPRINTF("CMD%d arg 0x%08x\n", s->cmd, ldl_be_p(s->cmdarg));
++            sd_frame48_init(request, sizeof(request), s->cmd,
++                            ldl_be_p(s->cmdarg), false);
++
++            s->arglen = sdbus_do_command(&s->sdbus, request, longresp);
+             if (s->arglen <= 0) {
+                 s->arglen = 1;
+                 s->response[0] = 4;
 -- 
 2.17.0
