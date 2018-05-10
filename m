@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46794)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fGu1Q-0005DR-9K
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 18:26:49 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fGuA5-0004wC-Dw
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 18:35:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fGu1N-00084s-3b
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 18:26:48 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:60211)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fGu1M-00082Z-Qe
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 18:26:45 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Fri, 11 May 2018 00:25:57 +0200
-Message-Id: <20180510222601.19944-2-laurent@vivier.eu>
+	(envelope-from <no-reply@patchew.org>) id 1fGuA1-0003yj-22
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 18:35:45 -0400
+Resent-Message-Id: <E1fGuA1-0003yj-22@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21001)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fGuA0-0003xz-Ph
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 18:35:40 -0400
 In-Reply-To: <20180510222601.19944-1-laurent@vivier.eu>
-References: <20180510222601.19944-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH 1/5] linux-user: move mips socket.h definitions
- to mips/sockbits.h
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152599166928.2838.15222537828084685604@71c20359a636>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 10 May 2018 15:34:30 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/5] linux-user: move socket.h definitions
+ to CPU directories
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,264 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Yongbok Kim <yongbok.kim@mips.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>
+To: laurent@vivier.eu
+Cc: famz@redhat.com, qemu-devel@nongnu.org, mark.cave-ayland@ilande.co.uk, riku.voipio@iki.fi, yongbok.kim@mips.com, rth@twiddle.net
 
-No code change.
-
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/mips/sockbits.h   | 110 +++++++++++++++++++++++++++++++++++++++++++
- linux-user/mips64/sockbits.h |   1 +
- linux-user/socket.h          | 106 +----------------------------------------
- 3 files changed, 113 insertions(+), 104 deletions(-)
- create mode 100644 linux-user/mips/sockbits.h
- create mode 100644 linux-user/mips64/sockbits.h
-
-diff --git a/linux-user/mips/sockbits.h b/linux-user/mips/sockbits.h
-new file mode 100644
-index 0000000000..3fe5ac88e7
---- /dev/null
-+++ b/linux-user/mips/sockbits.h
-@@ -0,0 +1,110 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef MIPS_SOCKBITS_H
-+#define MIPS_SOCKBITS_H
-+/* MIPS special values for constants */
-+
-+/*
-+ * For setsockopt(2)
-+ *
-+ * This defines are ABI conformant as far as Linux supports these ...
-+ */
-+#define TARGET_SOL_SOCKET      0xffff
-+
-+#define TARGET_SO_DEBUG        0x0001  /* Record debugging information. */
-+#define TARGET_SO_REUSEADDR    0x0004  /* Allow reuse of local addresses. */
-+#define TARGET_SO_KEEPALIVE    0x0008  /* Keep connections alive and send
-+                                          SIGPIPE when they die. */
-+#define TARGET_SO_DONTROUTE    0x0010  /* Don't do local routing. */
-+#define TARGET_SO_BROADCAST    0x0020  /* Allow transmission of
-+                                          broadcast messages. */
-+#define TARGET_SO_LINGER       0x0080  /* Block on close of a reliable
-+                                        * socket to transmit pending data.
-+                                        */
-+#define TARGET_SO_OOBINLINE 0x0100     /* Receive out-of-band data in-band.
-+                                        */
-+#if 0
-+/* To add: Allow local address and port reuse. */
-+#define TARGET_SO_REUSEPORT 0x0200
-+#endif
-+
-+#define TARGET_SO_TYPE         0x1008  /* Compatible name for SO_STYLE. */
-+#define TARGET_SO_STYLE        SO_TYPE /* Synonym */
-+#define TARGET_SO_ERROR        0x1007  /* get error status and clear */
-+#define TARGET_SO_SNDBUF       0x1001  /* Send buffer size. */
-+#define TARGET_SO_RCVBUF       0x1002  /* Receive buffer. */
-+#define TARGET_SO_SNDLOWAT     0x1003  /* send low-water mark */
-+#define TARGET_SO_RCVLOWAT     0x1004  /* receive low-water mark */
-+#define TARGET_SO_SNDTIMEO     0x1005  /* send timeout */
-+#define TARGET_SO_RCVTIMEO     0x1006  /* receive timeout */
-+#define TARGET_SO_ACCEPTCONN   0x1009
-+
-+/* linux-specific, might as well be the same as on i386 */
-+#define TARGET_SO_NO_CHECK     11
-+#define TARGET_SO_PRIORITY     12
-+#define TARGET_SO_BSDCOMPAT    14
-+
-+#define TARGET_SO_PASSCRED     17
-+#define TARGET_SO_PEERCRED     18
-+
-+/* Security levels - as per NRL IPv6 - don't actually do anything */
-+#define TARGET_SO_SECURITY_AUTHENTICATION              22
-+#define TARGET_SO_SECURITY_ENCRYPTION_TRANSPORT        23
-+#define TARGET_SO_SECURITY_ENCRYPTION_NETWORK          24
-+
-+#define TARGET_SO_BINDTODEVICE         25
-+
-+/* Socket filtering */
-+#define TARGET_SO_ATTACH_FILTER        26
-+#define TARGET_SO_DETACH_FILTER        27
-+
-+#define TARGET_SO_PEERNAME             28
-+#define TARGET_SO_TIMESTAMP            29
-+#define SCM_TIMESTAMP          SO_TIMESTAMP
-+
-+#define TARGET_SO_PEERSEC              30
-+#define TARGET_SO_SNDBUFFORCE          31
-+#define TARGET_SO_RCVBUFFORCE          33
-+#define TARGET_SO_PASSSEC              34
-+
-+/** sock_type - Socket types
-+ *
-+ * Please notice that for binary compat reasons MIPS has to
-+ * override the enum sock_type in include/linux/net.h, so
-+ * we define ARCH_HAS_SOCKET_TYPES here.
-+ *
-+ * @SOCK_DGRAM - datagram (conn.less) socket
-+ * @SOCK_STREAM - stream (connection) socket
-+ * @SOCK_RAW - raw socket
-+ * @SOCK_RDM - reliably-delivered message
-+ * @SOCK_SEQPACKET - sequential packet socket
-+ * @SOCK_DCCP - Datagram Congestion Control Protocol socket
-+ * @SOCK_PACKET - linux specific way of getting packets at the dev level.
-+ *                For writing rarp and other similar things on the user
-+ *                level.
-+ * @SOCK_CLOEXEC - sets the close-on-exec (FD_CLOEXEC) flag.
-+ * @SOCK_NONBLOCK - sets the O_NONBLOCK file status flag.
-+ */
-+
-+#define ARCH_HAS_SOCKET_TYPES          1
-+
-+enum sock_type {
-+       TARGET_SOCK_DGRAM       = 1,
-+       TARGET_SOCK_STREAM      = 2,
-+       TARGET_SOCK_RAW         = 3,
-+       TARGET_SOCK_RDM         = 4,
-+       TARGET_SOCK_SEQPACKET   = 5,
-+       TARGET_SOCK_DCCP        = 6,
-+       TARGET_SOCK_PACKET      = 10,
-+       TARGET_SOCK_CLOEXEC     = 02000000,
-+       TARGET_SOCK_NONBLOCK    = 0200,
-+};
-+
-+#define TARGET_SOCK_MAX (TARGET_SOCK_PACKET + 1)
-+#define TARGET_SOCK_TYPE_MASK    0xf  /* Covers up to TARGET_SOCK_MAX-1. */
-+#endif
-diff --git a/linux-user/mips64/sockbits.h b/linux-user/mips64/sockbits.h
-new file mode 100644
-index 0000000000..e6b6d31ac9
---- /dev/null
-+++ b/linux-user/mips64/sockbits.h
-@@ -0,0 +1 @@
-+#include "../mips/sockbits.h"
-diff --git a/linux-user/socket.h b/linux-user/socket.h
-index 7051cd2cf4..9c57da7a61 100644
---- a/linux-user/socket.h
-+++ b/linux-user/socket.h
-@@ -1,106 +1,6 @@
- 
--#if defined(TARGET_MIPS)
--    /* MIPS special values for constants */
--
--    /*
--     * For setsockopt(2)
--     *
--     * This defines are ABI conformant as far as Linux supports these ...
--     */
--    #define TARGET_SOL_SOCKET      0xffff
--
--    #define TARGET_SO_DEBUG        0x0001  /* Record debugging information. */
--    #define TARGET_SO_REUSEADDR    0x0004  /* Allow reuse of local addresses. */
--    #define TARGET_SO_KEEPALIVE    0x0008  /* Keep connections alive and send
--                                              SIGPIPE when they die. */
--    #define TARGET_SO_DONTROUTE    0x0010  /* Don't do local routing. */
--    #define TARGET_SO_BROADCAST    0x0020  /* Allow transmission of
--                                              broadcast messages. */
--    #define TARGET_SO_LINGER       0x0080  /* Block on close of a reliable
--                                            * socket to transmit pending data.
--                                            */
--    #define TARGET_SO_OOBINLINE 0x0100     /* Receive out-of-band data in-band.
--                                            */
--    #if 0
--    /* To add: Allow local address and port reuse. */
--    #define TARGET_SO_REUSEPORT 0x0200
--    #endif
--
--    #define TARGET_SO_TYPE         0x1008  /* Compatible name for SO_STYLE. */
--    #define TARGET_SO_STYLE        SO_TYPE /* Synonym */
--    #define TARGET_SO_ERROR        0x1007  /* get error status and clear */
--    #define TARGET_SO_SNDBUF       0x1001  /* Send buffer size. */
--    #define TARGET_SO_RCVBUF       0x1002  /* Receive buffer. */
--    #define TARGET_SO_SNDLOWAT     0x1003  /* send low-water mark */
--    #define TARGET_SO_RCVLOWAT     0x1004  /* receive low-water mark */
--    #define TARGET_SO_SNDTIMEO     0x1005  /* send timeout */
--    #define TARGET_SO_RCVTIMEO     0x1006  /* receive timeout */
--    #define TARGET_SO_ACCEPTCONN   0x1009
--
--    /* linux-specific, might as well be the same as on i386 */
--    #define TARGET_SO_NO_CHECK     11
--    #define TARGET_SO_PRIORITY     12
--    #define TARGET_SO_BSDCOMPAT    14
--
--    #define TARGET_SO_PASSCRED     17
--    #define TARGET_SO_PEERCRED     18
--
--    /* Security levels - as per NRL IPv6 - don't actually do anything */
--    #define TARGET_SO_SECURITY_AUTHENTICATION              22
--    #define TARGET_SO_SECURITY_ENCRYPTION_TRANSPORT        23
--    #define TARGET_SO_SECURITY_ENCRYPTION_NETWORK          24
--
--    #define TARGET_SO_BINDTODEVICE         25
--
--    /* Socket filtering */
--    #define TARGET_SO_ATTACH_FILTER        26
--    #define TARGET_SO_DETACH_FILTER        27
--
--    #define TARGET_SO_PEERNAME             28
--    #define TARGET_SO_TIMESTAMP            29
--    #define SCM_TIMESTAMP          SO_TIMESTAMP
--
--    #define TARGET_SO_PEERSEC              30
--    #define TARGET_SO_SNDBUFFORCE          31
--    #define TARGET_SO_RCVBUFFORCE          33
--    #define TARGET_SO_PASSSEC              34
--
--    /** sock_type - Socket types
--     *
--     * Please notice that for binary compat reasons MIPS has to
--     * override the enum sock_type in include/linux/net.h, so
--     * we define ARCH_HAS_SOCKET_TYPES here.
--     *
--     * @SOCK_DGRAM - datagram (conn.less) socket
--     * @SOCK_STREAM - stream (connection) socket
--     * @SOCK_RAW - raw socket
--     * @SOCK_RDM - reliably-delivered message
--     * @SOCK_SEQPACKET - sequential packet socket
--     * @SOCK_DCCP - Datagram Congestion Control Protocol socket
--     * @SOCK_PACKET - linux specific way of getting packets at the dev level.
--     *                For writing rarp and other similar things on the user
--     *                level.
--     * @SOCK_CLOEXEC - sets the close-on-exec (FD_CLOEXEC) flag.
--     * @SOCK_NONBLOCK - sets the O_NONBLOCK file status flag.
--     */
--
--    #define ARCH_HAS_SOCKET_TYPES          1
--
--    enum sock_type {
--           TARGET_SOCK_DGRAM       = 1,
--           TARGET_SOCK_STREAM      = 2,
--           TARGET_SOCK_RAW         = 3,
--           TARGET_SOCK_RDM         = 4,
--           TARGET_SOCK_SEQPACKET   = 5,
--           TARGET_SOCK_DCCP        = 6,
--           TARGET_SOCK_PACKET      = 10,
--           TARGET_SOCK_CLOEXEC     = 02000000,
--           TARGET_SOCK_NONBLOCK    = 0200,
--    };
--
--    #define TARGET_SOCK_MAX (TARGET_SOCK_PACKET + 1)
--    #define TARGET_SOCK_TYPE_MASK    0xf  /* Covers up to TARGET_SOCK_MAX-1. */
--
-+#if defined(TARGET_MIPS) || defined(TARGET_HPPA)
-+#include "sockbits.h"
- #elif defined(TARGET_ALPHA)
- 
-     /* For setsockopt(2) */
-@@ -205,8 +105,6 @@
- 
-     #define TARGET_SOCK_MAX (TARGET_SOCK_PACKET + 1)
-     #define TARGET_SOCK_TYPE_MASK    0xf  /* Covers up to TARGET_SOCK_MAX-1. */
--#elif defined(TARGET_HPPA)
--#include <hppa/sockbits.h>
- #else
- 
- #if defined(TARGET_SPARC)
--- 
-2.14.3
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNTEwMjIyNjAxLjE5OTQ0LTEtbGF1cmVudEB2aXZpZXIuZXUKU3ViamVj
+dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzVdIGxpbnV4LXVzZXI6IG1vdmUgc29ja2V0LmggZGVm
+aW5pdGlvbnMgdG8gQ1BVIGRpcmVjdG9yaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
+L2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0Uu
+LiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
+MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2Fs
+IGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVI
+IC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVj
+a2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIK
+ICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRj
+aC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAg
+IGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5E
+ID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApG
+cm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10g
+ICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwNTEwMjIyNjAxLjE5OTQ0LTEtbGF1cmVudEB2aXZp
+ZXIuZXUgLT4gcGF0Y2hldy8yMDE4MDUxMDIyMjYwMS4xOTk0NC0xLWxhdXJlbnRAdml2aWVyLmV1
+ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMTIzZTc5YWMzYSBsaW51eC11c2VyOiBj
+b3B5IHNwYXJjL3NvY2tiaXRzLmggZGVmaW5pdGlvbnMgZnJvbSBsaW51eAo4MjgzZGVmODU1IGxp
+bnV4LXVzZXI6IG1vdmUgcHBjIHNvY2tldC5oIGRlZmluaXRpb25zIHRvIHBwYy9zb2NrYml0cy5o
+CmYzYjU2YWI4MjUgbGludXgtdXNlcjogbW92ZSBzcGFyYy9zcGFyYzY0IHNvY2tldC5oIGRlZmlu
+aXRpb25zIHRvIHNwYXJjL3NvY2tiaXRzLmgKY2UwNjZjMjIwOSBsaW51eC11c2VyOiBtb3ZlIGFs
+cGhhIHNvY2tldC5oIGRlZmluaXRpb25zIHRvIGFscGhhL3NvY2tiaXRzLmgKOTdmNmZiYmFjYiBs
+aW51eC11c2VyOiBtb3ZlIG1pcHMgc29ja2V0LmggZGVmaW5pdGlvbnMgdG8gbWlwcy9zb2NrYml0
+cy5oCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzU6IGxpbnV4LXVzZXI6
+IG1vdmUgbWlwcyBzb2NrZXQuaCBkZWZpbml0aW9ucyB0byBtaXBzL3NvY2tiaXRzLmguLi4KRVJS
+T1I6IGlmIHRoaXMgY29kZSBpcyByZWR1bmRhbnQgY29uc2lkZXIgcmVtb3ZpbmcgaXQKIzQ3OiBG
+SUxFOiBsaW51eC11c2VyL21pcHMvc29ja2JpdHMuaDozMToKKyNpZiAwCgp0b3RhbDogMSBlcnJv
+cnMsIDAgd2FybmluZ3MsIDIyNyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBw
+cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
+IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
+aW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyLzU6IGxpbnV4LXVzZXI6IG1vdmUgYWxw
+aGEgc29ja2V0LmggZGVmaW5pdGlvbnMgdG8gYWxwaGEvc29ja2JpdHMuaC4uLgpDaGVja2luZyBQ
+QVRDSCAzLzU6IGxpbnV4LXVzZXI6IG1vdmUgc3BhcmMvc3BhcmM2NCBzb2NrZXQuaCBkZWZpbml0
+aW9ucyB0byBzcGFyYy9zb2NrYml0cy5oLi4uCkNoZWNraW5nIFBBVENIIDQvNTogbGludXgtdXNl
+cjogbW92ZSBwcGMgc29ja2V0LmggZGVmaW5pdGlvbnMgdG8gcHBjL3NvY2tiaXRzLmguLi4KQ2hl
+Y2tpbmcgUEFUQ0ggNS81OiBsaW51eC11c2VyOiBjb3B5IHNwYXJjL3NvY2tiaXRzLmggZGVmaW5p
+dGlvbnMgZnJvbSBsaW51eC4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0
+ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
+dGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
+IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
