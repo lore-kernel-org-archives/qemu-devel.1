@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fGZ2g-0006Of-Mc
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 20:02:43 -0400
+	(envelope-from <pasic@linux.ibm.com>) id 1fGZ7v-0000HA-Re
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 20:08:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fGZ2f-00050O-QJ
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 20:02:42 -0400
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:37987)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1fGZ2f-00050A-J7
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 20:02:41 -0400
-Received: by mail-lf0-x241.google.com with SMTP id z142-v6so400187lff.5
-	for <qemu-devel@nongnu.org>; Wed, 09 May 2018 17:02:41 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180509034658.26455-9-f4bug@amsat.org>
-References: <20180509034658.26455-1-f4bug@amsat.org>
-	<20180509034658.26455-9-f4bug@amsat.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 9 May 2018 17:02:09 -0700
-Message-ID: <CAKmqyKOm4tpM_LbK6HiHwNDj5YMiuPqWhNDSS7wUM9Bk1z-2pw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 08/14] sdcard: Extract
- sd_frame48_verify_checksum() out for qtesting
+	(envelope-from <pasic@linux.ibm.com>) id 1fGZ7s-0006Ub-JC
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 20:08:07 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43136
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fGZ7s-0006U7-CJ
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 20:08:04 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w4A04NBa056293
+	for <qemu-devel@nongnu.org>; Wed, 9 May 2018 20:08:03 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2hv8d3696m-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 09 May 2018 20:08:03 -0400
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Thu, 10 May 2018 01:08:01 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+Date: Thu, 10 May 2018 02:07:10 +0200
+Message-Id: <20180510000712.6472-1-pasic@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH 0/2] vfio-ccw: loosen orb flags checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,74 +35,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair@alistair23.me>, Stefan Hajnoczi <stefanha@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: Halil Pasic <pasic@linux.ibm.com>, Dong Jia Shi <bjsdjshi@linux.ibm.com>, "Jason J. Herne" <jjherne@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
 
-On Tue, May 8, 2018 at 8:46 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g> wrote:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+See the individual patches. The second one makes even more
+sense with the corresponding kernel patch.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Halil Pasic (2):
+  vfio-ccw: add force unlimited prefetch property
+  vfio-ccw: remove orb.c64 (64 bit data addresses) check
 
-Alistair
+ hw/s390x/css.c | 12 ------------
+ hw/vfio/ccw.c  | 13 +++++++++++++
+ 2 files changed, 13 insertions(+), 12 deletions(-)
 
-> ---
->  include/hw/sd/sd.h     | 10 ++++++++++
->  hw/sd/sd.c             |  2 +-
->  hw/sd/sdmmc-internal.c |  6 ++++++
->  3 files changed, 17 insertions(+), 1 deletion(-)
->
-> diff --git a/include/hw/sd/sd.h b/include/hw/sd/sd.h
-> index c854ed6a14..752d8edd6c 100644
-> --- a/include/hw/sd/sd.h
-> +++ b/include/hw/sd/sd.h
-> @@ -150,6 +150,16 @@ uint8_t sd_frame48_calc_checksum(const void *content=
-);
->   */
->  uint8_t sd_frame136_calc_checksum(const void *content);
->
-> +/**
-> + * sd_frame48_verify_checksum:
-> + * @content: pointer to the frame content
-> + *
-> + * Verify the 7-bit CRC checksum of a 48-bit SD frame.
-> + *
-> + * Returns: A boolean indicating whether the frame 7-bit CRC is correct.
-> + */
-> +bool sd_frame48_verify_checksum(const void *content);
-> +
->  /* Legacy functions to be used only by non-qdevified callers */
->  SDState *sd_init(BlockBackend *bs, bool is_spi);
->  int sd_do_command(SDState *sd, SDRequest *req,
-> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-> index 6fc8daa5b8..125707a65c 100644
-> --- a/hw/sd/sd.c
-> +++ b/hw/sd/sd.c
-> @@ -473,7 +473,7 @@ static bool sd_req_crc_is_valid(SDRequest *req)
->      buffer[0] =3D 0x40 | req->cmd;
->      stl_be_p(&buffer[1], req->arg);
->      return true;
-> -    return sd_frame48_calc_checksum(buffer) =3D=3D req->crc; /* TODO */
-> +    return sd_frame48_verify_checksum(buffer); /* TODO */
->  }
->
->  static void sd_response_r1_make(SDState *sd, uint8_t *response)
-> diff --git a/hw/sd/sdmmc-internal.c b/hw/sd/sdmmc-internal.c
-> index a94d65b756..a9d19ce3eb 100644
-> --- a/hw/sd/sdmmc-internal.c
-> +++ b/hw/sd/sdmmc-internal.c
-> @@ -105,3 +105,9 @@ uint8_t sd_frame136_calc_checksum(const void *content=
-)
->  {
->      return (sd_crc7(content, F136_CONTENT_LENGTH) << 1) | 1;
->  }
-> +
-> +bool sd_frame48_verify_checksum(const void *content)
-> +{
-> +    return sd_frame48_calc_checksum(content)
-> +           =3D=3D ((const uint8_t *)content)[F48_CONTENT_LENGTH];
-> +}
-> --
-> 2.17.0
->
->
+-- 
+2.16.3
