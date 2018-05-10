@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fGi5V-0002Ei-F2
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:42:14 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fGi5W-0002FW-Nq
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:42:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fGi5R-0004Rs-Hr
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:42:13 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:38001)
+	(envelope-from <alex.bennee@linaro.org>) id 1fGi5V-0004UI-Hz
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:42:14 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:38218)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fGi5R-0004RA-BK
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:42:09 -0400
-Received: by mail-wr0-x243.google.com with SMTP id 94-v6so1334059wrf.5
-	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 02:42:09 -0700 (PDT)
+	id 1fGi5V-0004Tl-9k
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:42:13 -0400
+Received: by mail-wm0-x244.google.com with SMTP id y189-v6so3199508wmc.3
+	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 02:42:13 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 10 May 2018 10:42:01 +0100
-Message-Id: <20180510094206.15354-1-alex.bennee@linaro.org>
+Date: Thu, 10 May 2018 10:42:06 +0100
+Message-Id: <20180510094206.15354-6-alex.bennee@linaro.org>
+In-Reply-To: <20180510094206.15354-1-alex.bennee@linaro.org>
+References: <20180510094206.15354-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 0/5] refactor float-to-float and fix AHP
+Subject: [Qemu-devel] [PATCH v3 5/5] target/arm: squash FZ16 behaviour for
+ conversions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +33,65 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: richard.henderson@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Hi,
+The ARM ARM specifies FZ16 is suppressed for conversions. Rather than
+pushing this logic into the softfloat code we can simply save the FZ
+state and temporarily disable it for the softfloat call.
 
-Hi,
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ target/arm/helper.c | 24 ++++++++++++++++++++----
+ 1 file changed, 20 insertions(+), 4 deletions(-)
 
-I've not included the test case in the series but you can find it in
-my TCG fixup branch:
-
-  https://github.com/stsquad/qemu/blob/testing/tcg-tests-revival-v4/tests/tcg/arm/fcvt.c
-
-Some of the ARMv7 versions are commented out as they where not
-supported until later revs. I do have a build that includes that but
-unfortunately the Debian compiler it too old to build it.
-
-: patch 0001/fpu softfloat int_to_float ensure r fully initial.patch needs review
-: patch 0004/target arm convert conversion helpers to fpst ahp.patch needs review
-: patch 0005/target arm squash FZ16 behaviour for conversions.patch needs review
-
-Alex Bennée (5):
-  fpu/softfloat: int_to_float ensure r fully initialised
-  fpu/softfloat: re-factor float to float conversions
-  fpu/softfloat: support ARM Alternative half-precision
-  target/arm: convert conversion helpers to fpst/ahp_flag
-  target/arm: squash FZ16 behaviour for conversions
-
- fpu/softfloat-specialize.h |  40 ---
- fpu/softfloat.c            | 546 +++++++++++--------------------------
- include/fpu/softfloat.h    |   8 +-
- target/arm/helper.c        |  66 ++---
- target/arm/helper.h        |  12 +-
- target/arm/translate-a64.c |  38 ++-
- target/arm/translate.c     |  70 +++--
- target/arm/translate.h     |  15 +
- 8 files changed, 306 insertions(+), 489 deletions(-)
-
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 4dd28bb70c..17147be58b 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -11459,12 +11459,20 @@ uint32_t HELPER(set_neon_rmode)(uint32_t rmode, CPUARMState *env)
+ /* Half precision conversions.  */
+ static float32 do_fcvt_f16_to_f32(float16 a, float_status *s, bool ahp)
+ {
+-    return float16_to_float32(a, !ahp, s);
++    flag save_flush_to_zero = s->flush_to_zero;
++    set_flush_to_zero(false, s);
++    float32 r = float16_to_float32(a, !ahp, s);
++    set_flush_to_zero(save_flush_to_zero, s);
++    return r;
+ }
+ 
+ static float16 do_fcvt_f32_to_f16(float32 a, float_status *s, bool ahp)
+ {
+-    return float32_to_float16(a, !ahp, s);
++    flag save_flush_to_zero = s->flush_to_zero;
++    set_flush_to_zero(false, s);
++    float16 r = float32_to_float16(a, !ahp, s);
++    set_flush_to_zero(save_flush_to_zero, s);
++    return float16_val(r);
+ }
+ 
+ float32 HELPER(neon_fcvt_f16_to_f32)(float16 a, void *fpstp, uint32_t ahp_mode)
+@@ -11494,13 +11502,21 @@ float16 HELPER(vfp_fcvt_f32_to_f16)(float32 a, void *fpstp, uint32_t ahp_mode)
+ float64 HELPER(vfp_fcvt_f16_to_f64)(float16 a, void *fpstp, uint32_t ahp_mode)
+ {
+     float_status *fpst = fpstp;
+-    return float16_to_float64(a, !ahp_mode, fpst);
++    flag save_flush_to_zero = fpst->flush_to_zero;
++    set_flush_to_zero(false, fpst);
++    float64 r = float16_to_float64(a, !ahp_mode, fpst);
++    set_flush_to_zero(save_flush_to_zero, fpst);
++    return r;
+ }
+ 
+ float16 HELPER(vfp_fcvt_f64_to_f16)(float64 a, void *fpstp, uint32_t ahp_mode)
+ {
+     float_status *fpst = fpstp;
+-    return float64_to_float16(a, !ahp_mode, fpst);
++    flag save_flush_to_zero = fpst->flush_to_zero;
++    set_flush_to_zero(false, fpst);
++    float16 r = float64_to_float16(a, !ahp_mode, fpst);
++    set_flush_to_zero(save_flush_to_zero, fpst);
++    return float16_val(r);
+ }
+ 
+ #define float32_two make_float32(0x40000000)
 -- 
 2.17.0
