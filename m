@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fGu1C-00056p-Bi
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 18:26:35 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fGu1G-00057j-3e
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 18:26:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fGu1A-0007rz-C8
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 18:26:34 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:47713)
+	(envelope-from <laurent@vivier.eu>) id 1fGu1C-0007wJ-SU
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 18:26:38 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:38561)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fGu1A-0007re-3B
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 18:26:32 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fGu1C-0007tz-Iz
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 18:26:34 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Fri, 11 May 2018 00:26:00 +0200
-Message-Id: <20180510222601.19944-5-laurent@vivier.eu>
+Date: Fri, 11 May 2018 00:26:01 +0200
+Message-Id: <20180510222601.19944-6-laurent@vivier.eu>
 In-Reply-To: <20180510222601.19944-1-laurent@vivier.eu>
 References: <20180510222601.19944-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH 4/5] linux-user: move ppc socket.h definitions
- to ppc/sockbits.h
+Subject: [Qemu-devel] [PATCH 5/5] linux-user: copy sparc/sockbits.h
+ definitions from linux
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,112 +27,195 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Yongbok Kim <yongbok.kim@mips.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>
 
-No code change.
+Values defined for sparc are not correct.
+Copy the content of "arch/sparc/include/uapi/asm/socket.h"
+to fix them.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/ppc/sockbits.h | 58 +++++++++++++++++++++++++++++++++++++++++++++++
- linux-user/socket.h       | 11 +--------
- 2 files changed, 59 insertions(+), 10 deletions(-)
- create mode 100644 linux-user/ppc/sockbits.h
+ linux-user/sparc/sockbits.h | 161 ++++++++++++++++++++++++--------------------
+ 1 file changed, 89 insertions(+), 72 deletions(-)
 
-diff --git a/linux-user/ppc/sockbits.h b/linux-user/ppc/sockbits.h
-new file mode 100644
-index 0000000000..7561529395
---- /dev/null
-+++ b/linux-user/ppc/sockbits.h
-@@ -0,0 +1,58 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef PPC_SOCKBITS_H
-+#define PPC_SOCKBITS_H
-+
-+#define TARGET_SO_PASSSEC        34
-+
+diff --git a/linux-user/sparc/sockbits.h b/linux-user/sparc/sockbits.h
+index 385061c8b0..0a822e3e1f 100644
+--- a/linux-user/sparc/sockbits.h
++++ b/linux-user/sparc/sockbits.h
+@@ -8,87 +8,104 @@
+ #ifndef SPARC_SOCKBITS_H
+ #define SPARC_SOCKBITS_H
+ 
+-/** sock_type - Socket types
+- *
+- * Please notice that for binary compat reasons SPARC has to
+- * override the enum sock_type in include/linux/net.h, so
+- * we define ARCH_HAS_SOCKET_TYPES here.
+- *
+- * @SOCK_DGRAM - datagram (conn.less) socket
+- * @SOCK_STREAM - stream (connection) socket
+- * @SOCK_RAW - raw socket
+- * @SOCK_RDM - reliably-delivered message
+- * @SOCK_SEQPACKET - sequential packet socket
+- * @SOCK_DCCP - Datagram Congestion Control Protocol socket
+- * @SOCK_PACKET - linux specific way of getting packets at the dev level.
+- *                For writing rarp and other similar things on the user
+- *                level.
+- * @SOCK_CLOEXEC - sets the close-on-exec (FD_CLOEXEC) flag.
+- * @SOCK_NONBLOCK - sets the O_NONBLOCK file status flag.
+- */
 +/* For setsockopt(2) */
-+#define TARGET_SOL_SOCKET      1
++#define TARGET_SOL_SOCKET      0xffff
+ 
+-#define ARCH_HAS_SOCKET_TYPES          1
++#define TARGET_SO_DEBUG        0x0001
++#define TARGET_SO_PASSCRED     0x0002
++#define TARGET_SO_REUSEADDR    0x0004
++#define TARGET_SO_KEEPALIVE    0x0008
++#define TARGET_SO_DONTROUTE    0x0010
++#define TARGET_SO_BROADCAST    0x0020
++#define TARGET_SO_PEERCRED     0x0040
++#define TARGET_SO_LINGER       0x0080
++#define TARGET_SO_OOBINLINE    0x0100
++#define TARGET_SO_REUSEPORT    0x0200
++#define TARGET_SO_BSDCOMPAT    0x0400
++#define TARGET_SO_RCVLOWAT     0x0800
++#define TARGET_SO_SNDLOWAT     0x1000
++#define TARGET_SO_RCVTIMEO     0x2000
++#define TARGET_SO_SNDTIMEO     0x4000
++#define TARGET_SO_ACCEPTCONN   0x8000
+ 
+-enum sock_type {
+-       TARGET_SOCK_STREAM      = 1,
+-       TARGET_SOCK_DGRAM       = 2,
+-       TARGET_SOCK_RAW         = 3,
+-       TARGET_SOCK_RDM         = 4,
+-       TARGET_SOCK_SEQPACKET   = 5,
+-       TARGET_SOCK_DCCP        = 6,
+-       TARGET_SOCK_PACKET      = 10,
+-       TARGET_SOCK_CLOEXEC     = 020000000,
+-       TARGET_SOCK_NONBLOCK    = 040000,
+-};
++#define TARGET_SO_SNDBUF       0x1001
++#define TARGET_SO_RCVBUF       0x1002
++#define TARGET_SO_SNDBUFFORCE  0x100a
++#define TARGET_SO_RCVBUFFORCE  0x100b
++#define TARGET_SO_ERROR        0x1007
++#define TARGET_SO_TYPE         0x1008
++#define TARGET_SO_PROTOCOL     0x1028
++#define TARGET_SO_DOMAIN       0x1029
+ 
+-#define TARGET_SOCK_MAX (TARGET_SOCK_PACKET + 1)
+-#define TARGET_SOCK_TYPE_MASK    0xf  /* Covers up to TARGET_SOCK_MAX-1. */
++/* Linux specific, keep the same. */
++#define TARGET_SO_NO_CHECK     0x000b
++#define TARGET_SO_PRIORITY     0x000c
+ 
+-#define TARGET_SO_PASSSEC        31
++#define TARGET_SO_BINDTODEVICE 0x000d
+ 
+-/* For setsockopt(2) */
+-#define TARGET_SOL_SOCKET      1
+-
+-#define TARGET_SO_DEBUG        1
+-#define TARGET_SO_REUSEADDR    2
+-#define TARGET_SO_TYPE         3
+-#define TARGET_SO_ERROR        4
+-#define TARGET_SO_DONTROUTE    5
+-#define TARGET_SO_BROADCAST    6
+-#define TARGET_SO_SNDBUF       7
+-#define TARGET_SO_RCVBUF       8
+-#define TARGET_SO_SNDBUFFORCE  32
+-#define TARGET_SO_RCVBUFFORCE  33
+-#define TARGET_SO_KEEPALIVE    9
+-#define TARGET_SO_OOBINLINE    10
+-#define TARGET_SO_NO_CHECK     11
+-#define TARGET_SO_PRIORITY     12
+-#define TARGET_SO_LINGER       13
+-#define TARGET_SO_BSDCOMPAT    14
+-/* To add :#define TARGET_SO_REUSEPORT 15 */
+-#define TARGET_SO_PASSCRED     16
+-#define TARGET_SO_PEERCRED     17
+-#define TARGET_SO_RCVLOWAT     18
+-#define TARGET_SO_SNDLOWAT     19
+-#define TARGET_SO_RCVTIMEO     20
+-#define TARGET_SO_SNDTIMEO     21
++#define TARGET_SO_ATTACH_FILTER        0x001a
++#define TARGET_SO_DETACH_FILTER        0x001b
++#define TARGET_SO_GET_FILTER           TARGET_SO_ATTACH_FILTER
+ 
+-/* Security levels - as per NRL IPv6 - don't actually do anything */
+-#define TARGET_SO_SECURITY_AUTHENTICATION              22
+-#define TARGET_SO_SECURITY_ENCRYPTION_TRANSPORT        23
+-#define TARGET_SO_SECURITY_ENCRYPTION_NETWORK          24
++#define TARGET_SO_PEERNAME             0x001c
++#define TARGET_SO_TIMESTAMP            0x001d
++#define TARGET_SCM_TIMESTAMP           TARGET_SO_TIMESTAMP
+ 
+-#define TARGET_SO_BINDTODEVICE 25
++#define TARGET_SO_PEERSEC              0x001e
++#define TARGET_SO_PASSSEC              0x001f
++#define TARGET_SO_TIMESTAMPNS          0x0021
++#define TARGET_SCM_TIMESTAMPNS         TARGET_SO_TIMESTAMPNS
+ 
+-/* Socket filtering */
+-#define TARGET_SO_ATTACH_FILTER        26
+-#define TARGET_SO_DETACH_FILTER        27
++#define TARGET_SO_MARK                 0x0022
+ 
+-#define TARGET_SO_PEERNAME             28
+-#define TARGET_SO_TIMESTAMP            29
+-#define TARGET_SCM_TIMESTAMP           TARGET_SO_TIMESTAMP
++#define TARGET_SO_TIMESTAMPING         0x0023
++#define TARGET_SCM_TIMESTAMPING        TARGET_SO_TIMESTAMPING
 +
-+#define TARGET_SO_DEBUG        1
-+#define TARGET_SO_REUSEADDR    2
-+#define TARGET_SO_TYPE         3
-+#define TARGET_SO_ERROR        4
-+#define TARGET_SO_DONTROUTE    5
-+#define TARGET_SO_BROADCAST    6
-+#define TARGET_SO_SNDBUF       7
-+#define TARGET_SO_RCVBUF       8
-+#define TARGET_SO_SNDBUFFORCE  32
-+#define TARGET_SO_RCVBUFFORCE  33
-+#define TARGET_SO_KEEPALIVE    9
-+#define TARGET_SO_OOBINLINE    10
-+#define TARGET_SO_NO_CHECK     11
-+#define TARGET_SO_PRIORITY     12
-+#define TARGET_SO_LINGER       13
-+#define TARGET_SO_BSDCOMPAT    14
-+/* To add :#define TARGET_SO_REUSEPORT 15 */
-+#define TARGET_SO_RCVLOWAT     16
-+#define TARGET_SO_SNDLOWAT     17
-+#define TARGET_SO_RCVTIMEO     18
-+#define TARGET_SO_SNDTIMEO     19
-+#define TARGET_SO_PASSCRED     20
-+#define TARGET_SO_PEERCRED     21
++#define TARGET_SO_RXQ_OVFL             0x0024
++
++#define TARGET_SO_WIFI_STATUS          0x0025
++#define TARGET_SCM_WIFI_STATUS         TARGET_SO_WIFI_STATUS
++#define TARGET_SO_PEEK_OFF             0x0026
++
++/* Instruct lower device to use last 4-bytes of skb data as FCS */
++#define TARGET_SO_NOFCS                0x0027
++
++#define TARGET_SO_LOCK_FILTER          0x0028
++
++#define TARGET_SO_SELECT_ERR_QUEUE     0x0029
++
++#define TARGET_SO_BUSY_POLL            0x0030
++
++#define TARGET_SO_MAX_PACING_RATE      0x0031
+ 
+-#define TARGET_SO_ACCEPTCONN           30
++#define TARGET_SO_BPF_EXTENSIONS       0x0032
+ 
+-#define TARGET_SO_PEERSEC              31
++#define TARGET_SO_INCOMING_CPU         0x0033
++
++#define TARGET_SO_ATTACH_BPF           0x0034
++#define TARGET_SO_DETACH_BPF           TARGET_SO_DETACH_FILTER
++
++#define TARGET_SO_ATTACH_REUSEPORT_CBPF        0x0035
++#define TARGET_SO_ATTACH_REUSEPORT_EBPF        0x0036
++
++#define TARGET_SO_CNX_ADVICE           0x0037
++
++#define TARGET_SCM_TIMESTAMPING_OPT_STATS      0x0038
++
++#define TARGET_SO_MEMINFO              0x0039
++
++#define TARGET_SO_INCOMING_NAPI_ID     0x003a
++
++#define TARGET_SO_COOKIE               0x003b
++
++#define TARGET_SCM_TIMESTAMPING_PKTINFO        0x003c
++
++#define TARGET_SO_PEERGROUPS           0x003d
++
++#define TARGET_SO_ZEROCOPY             0x003e
 +
 +/* Security levels - as per NRL IPv6 - don't actually do anything */
-+#define TARGET_SO_SECURITY_AUTHENTICATION              22
-+#define TARGET_SO_SECURITY_ENCRYPTION_TRANSPORT        23
-+#define TARGET_SO_SECURITY_ENCRYPTION_NETWORK          24
-+
-+#define TARGET_SO_BINDTODEVICE 25
-+
-+/* Socket filtering */
-+#define TARGET_SO_ATTACH_FILTER        26
-+#define TARGET_SO_DETACH_FILTER        27
-+
-+#define TARGET_SO_PEERNAME             28
-+#define TARGET_SO_TIMESTAMP            29
-+#define TARGET_SCM_TIMESTAMP           TARGET_SO_TIMESTAMP
-+
-+#define TARGET_SO_ACCEPTCONN           30
-+
-+#define TARGET_SO_PEERSEC              31
-+#endif
-diff --git a/linux-user/socket.h b/linux-user/socket.h
-index 8eb62ea3f2..3eceb6534e 100644
---- a/linux-user/socket.h
-+++ b/linux-user/socket.h
-@@ -1,6 +1,6 @@
- 
- #if defined(TARGET_MIPS) || defined(TARGET_HPPA) || defined(TARGET_ALPHA) || \
--    defined(TARGET_SPARC)
-+    defined(TARGET_SPARC) || defined(TARGET_PPC)
- #include "sockbits.h"
- #else
-     #define TARGET_SO_PASSSEC        34
-@@ -25,21 +25,12 @@
-     #define TARGET_SO_LINGER       13
-     #define TARGET_SO_BSDCOMPAT    14
-     /* To add :#define TARGET_SO_REUSEPORT 15 */
--#if defined(TARGET_PPC)
--    #define TARGET_SO_RCVLOWAT     16
--    #define TARGET_SO_SNDLOWAT     17
--    #define TARGET_SO_RCVTIMEO     18
--    #define TARGET_SO_SNDTIMEO     19
--    #define TARGET_SO_PASSCRED     20
--    #define TARGET_SO_PEERCRED     21
--#else
-     #define TARGET_SO_PASSCRED     16
-     #define TARGET_SO_PEERCRED     17
-     #define TARGET_SO_RCVLOWAT     18
-     #define TARGET_SO_SNDLOWAT     19
-     #define TARGET_SO_RCVTIMEO     20
-     #define TARGET_SO_SNDTIMEO     21
--#endif
- 
-     /* Security levels - as per NRL IPv6 - don't actually do anything */
-     #define TARGET_SO_SECURITY_AUTHENTICATION              22
++#define TARGET_SO_SECURITY_AUTHENTICATION              0x5001
++#define TARGET_SO_SECURITY_ENCRYPTION_TRANSPORT        0x5002
++#define TARGET_SO_SECURITY_ENCRYPTION_NETWORK          0x5004
+ #endif
 -- 
 2.14.3
