@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39544)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fGnAY-000102-Ct
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 11:07:50 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fGnLO-00063a-4Z
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 11:18:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fGnAV-0004sv-RO
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 11:07:46 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:43116)
+	(envelope-from <peter.maydell@linaro.org>) id 1fGnLM-0001M4-W5
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 11:18:58 -0400
+Received: from mail-oi0-x231.google.com ([2607:f8b0:4003:c06::231]:44388)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fGnAV-0004sW-La
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 11:07:43 -0400
-Received: by mail-wr0-x243.google.com with SMTP id v15-v6so2353927wrm.10
-	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 08:07:43 -0700 (PDT)
-References: <20180510140934.22855-1-peter.maydell@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180510140934.22855-1-peter.maydell@linaro.org>
-Date: Thu, 10 May 2018 16:07:41 +0100
-Message-ID: <87in7vv9aa.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fGnLM-0001Lj-Qz
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 11:18:56 -0400
+Received: by mail-oi0-x231.google.com with SMTP id e80-v6so2063946oig.11
+	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 08:18:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180509034658.26455-1-f4bug@amsat.org>
+References: <20180509034658.26455-1-f4bug@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 10 May 2018 16:18:35 +0100
+Message-ID: <CAFEAcA-LX2NfmZ_03O0XvtThbZ6Sa2SfTAFCneXyCghEousx3w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] fix fp16 tininess
+Subject: Re: [Qemu-devel] [PATCH v2 00/14] sdcard: Proper implementation of
+ CRC7
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,46 +30,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Richard Henderson <rth@twiddle.net>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alistair Francis <alistair@alistair23.me>
 
-
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> In commit d81ce0ef2c4f105 we added an extra float_status field
-> fp_status_fp16 for Arm, but forgot to initialize it correctly
-> by setting it to float_tininess_before_rounding. This currently
-> will only cause problems for the new V8_FP16 feature, since the
-> float-to-float conversion code doesn't use it yet. The effect
-> would be that we failed to set the Underflow IEEE exception flag
-> in all the cases where we should.
+On 9 May 2018 at 04:46, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote=
+:
+> Hi,
 >
-> Add the missing initialization.
+> This series emerged after last Coverity scan and Peter suggestion in:
+> http://lists.nongnu.org/archive/html/qemu-devel/2018-04/msg05046.html
 >
-> Fixes: d81ce0ef2c4f105
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  target/arm/cpu.c | 2 ++
->  1 file changed, 2 insertions(+)
+>     (3) "proper" implementation of CRC, so that an sd controller
+>     can either (a) mark the SDRequest as "no CRC" and have
+>     sd_req_crc_validate() always pass, or (b) mark the SDRequest
+>     as having a CRC and have sd_req_crc_validate() actually
+>     do the check which it currently stubs out with "return 0"
 >
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index d175c5e94f..7939c6b8ae 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -324,6 +324,8 @@ static void arm_cpu_reset(CPUState *s)
->                                &env->vfp.fp_status);
->      set_float_detect_tininess(float_tininess_before_rounding,
->                                &env->vfp.standard_fp_status);
-> +    set_float_detect_tininess(float_tininess_before_rounding,
-> +                              &env->vfp.fp_status_f16);
->  #ifndef CONFIG_USER_ONLY
->      if (kvm_enabled()) {
->          kvm_arm_reset_vcpu(cpu);
+> - Coverity issues fixed
+> - new functions documented
+> - qtests added
+>
+> This series would be much smaller without qtests (less refactor and code
+> movement), but I feel more confident having them passing :)
 
+This series isn't going in the direction I expected.
 
---
-Alex Benn=C3=A9e
+We have two cases:
+ (1) we model an SD controller which in hardware calculates its
+     own checksums. Most of our SD controllers are like that.
+     Since in QEMU there is no chance of data corruption between
+     the controller and the card, there's no point in calculating
+     a checksum by calling a function, and then checking that we
+     get the same result a few function calls later when we call
+     the exact same function in the SD card model. So we should
+     just unconditionally say "no checksum provided" in the
+     SDRequest struct the controller fills in, and then skip
+     the check in the card model.
+ (2) we model an SD controller which leaves the checksum calculation
+     to guest software. The only one of these we have that I know
+     of is milkymist-memcard. In this case, the checksum is calculated
+     by guest software, and so we do want to check it in the SD
+     card model. So the controller should fill in the CRC field
+     in SDRequest, and set the flag in SDRequest to say "checksum
+     provided".
+
+We don't need to provide a property on the device or the
+card objects to control this behaviour, for either case.
+
+I'm not clear why this patchset has removed the SDRequest struct
+in favour of a raw buffer, either: that makes it harder to just
+say "this request doesn't have a checksum you need to check".
+
+thanks
+-- PMM
