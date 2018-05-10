@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38759)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <renyime@gmail.com>) id 1fGn7H-0006yO-O3
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 11:04:25 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fGnAY-000102-Ct
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 11:07:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <renyime@gmail.com>) id 1fGn7G-0003GO-4v
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 11:04:23 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fGnAV-0004sv-RO
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 11:07:46 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:43116)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fGnAV-0004sW-La
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 11:07:43 -0400
+Received: by mail-wr0-x243.google.com with SMTP id v15-v6so2353927wrm.10
+	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 08:07:43 -0700 (PDT)
+References: <20180510140934.22855-1-peter.maydell@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180510140934.22855-1-peter.maydell@linaro.org>
+Date: Thu, 10 May 2018 16:07:41 +0100
+Message-ID: <87in7vv9aa.fsf@linaro.org>
 MIME-Version: 1.0
-References: <1525782441-2224-1-git-send-email-ivanren@tencent.com>
-In-Reply-To: <1525782441-2224-1-git-send-email-ivanren@tencent.com>
-From: Ivan Ren <renyime@gmail.com>
-Date: Thu, 10 May 2018 15:04:02 +0000
-Message-ID: <CA+6E1==5QPpUwF177Ot2fYX_tF-5E1=4dL46jxTCDUEVRabd9Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] qcow2: fix preallocation with metadata on
- bare block device
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] fix fp16 tininess
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,125 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mreitz@redhat.com, kwolf@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Richard Henderson <rth@twiddle.net>
 
-ping for review
 
-On Tue, May 8, 2018 at 8:27 PM Ivan Ren <renyime@gmail.com> wrote:
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-> Create a qcow2 directly on bare block device with
-> "-o preallocation=metadata" option. When read this qcow2, it will
-> return dirty data of block device. This patch add QCOW_OFLAG_ZERO
-> for all preallocated l2 entry if the underlying device is a bare
-> block device.
+> In commit d81ce0ef2c4f105 we added an extra float_status field
+> fp_status_fp16 for Arm, but forgot to initialize it correctly
+> by setting it to float_tininess_before_rounding. This currently
+> will only cause problems for the new V8_FP16 feature, since the
+> float-to-float conversion code doesn't use it yet. The effect
+> would be that we failed to set the Underflow IEEE exception flag
+> in all the cases where we should.
 >
-> Signed-off-by: Ivan Ren <ivanren@tencent.com>
+> Add the missing initialization.
+>
+> Fixes: d81ce0ef2c4f105
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
 > ---
->  block/qcow2-cluster.c |  5 +++--
->  block/qcow2.c         | 19 ++++++++++++++++---
->  block/qcow2.h         |  3 ++-
->  3 files changed, 21 insertions(+), 6 deletions(-)
+>  target/arm/cpu.c | 2 ++
+>  1 file changed, 2 insertions(+)
 >
-> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-> index 1aee726..b9e0ceb 100644
-> --- a/block/qcow2-cluster.c
-> +++ b/block/qcow2-cluster.c
-> @@ -919,7 +919,8 @@ fail:
->      return ret;
->  }
->
-> -int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
-> +int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m,
-> +                                uint64_t flags)
->  {
->      BDRVQcow2State *s = bs->opaque;
->      int i, j = 0, l2_index, ret;
-> @@ -969,7 +970,7 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs,
-> QCowL2Meta *m)
->          }
->
->          l2_slice[l2_index + i] = cpu_to_be64((cluster_offset +
-> -                    (i << s->cluster_bits)) | QCOW_OFLAG_COPIED);
-> +                    (i << s->cluster_bits)) | QCOW_OFLAG_COPIED | flags);
->       }
->
->
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 2f36e63..093735c 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -2044,7 +2044,7 @@ static coroutine_fn int
-> qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
->          while (l2meta != NULL) {
->              QCowL2Meta *next;
->
-> -            ret = qcow2_alloc_cluster_link_l2(bs, l2meta);
-> +            ret = qcow2_alloc_cluster_link_l2(bs, l2meta, 0);
->              if (ret < 0) {
->                  goto fail;
->              }
-> @@ -2534,6 +2534,7 @@ static void coroutine_fn preallocate_co(void *opaque)
->      uint64_t host_offset = 0;
->      unsigned int cur_bytes;
->      int ret;
-> +    struct stat st;
->      QCowL2Meta *meta;
->
->      qemu_co_mutex_lock(&s->lock);
-> @@ -2552,7 +2553,19 @@ static void coroutine_fn preallocate_co(void
-> *opaque)
->          while (meta) {
->              QCowL2Meta *next = meta->next;
->
-> -            ret = qcow2_alloc_cluster_link_l2(bs, meta);
-> +            /* Check the underlying device type.
-> +             * If the underlying device is a block device, we add
-> +             * QCOW_OFLAG_ZERO for all preallocated l2 entry to ignore
-> dirty
-> +             * data on block device.
-> +             * If the underlying device can't be used with stat(return <
-> 0),
-> +             * treat it as a regular file.
-> +             */
-> +            if (stat(bs->filename, &st) < 0 || !S_ISBLK(st.st_mode)) {
-> +                ret = qcow2_alloc_cluster_link_l2(bs, meta, 0);
-> +            } else {
-> +                ret = qcow2_alloc_cluster_link_l2(bs, meta,
-> QCOW_OFLAG_ZERO);
-> +            }
-> +
->              if (ret < 0) {
->                  qcow2_free_any_clusters(bs, meta->alloc_offset,
->                                          meta->nb_clusters,
-> QCOW2_DISCARD_NEVER);
-> @@ -3458,7 +3471,7 @@ static int qcow2_truncate(BlockDriverState *bs,
-> int64_t offset,
->              };
->              qemu_co_queue_init(&allocation.dependent_requests);
->
-> -            ret = qcow2_alloc_cluster_link_l2(bs, &allocation);
-> +            ret = qcow2_alloc_cluster_link_l2(bs, &allocation, 0);
->              if (ret < 0) {
->                  error_setg_errno(errp, -ret, "Failed to update L2
-> tables");
->                  qcow2_free_clusters(bs, host_offset,
-> diff --git a/block/qcow2.h b/block/qcow2.h
-> index adf5c39..9a59602 100644
-> --- a/block/qcow2.h
-> +++ b/block/qcow2.h
-> @@ -617,7 +617,8 @@ uint64_t
-> qcow2_alloc_compressed_cluster_offset(BlockDriverState *bs,
->                                           uint64_t offset,
->                                           int compressed_size);
->
-> -int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m);
-> +int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m,
-> +                                uint64_t flags);
->  int qcow2_cluster_discard(BlockDriverState *bs, uint64_t offset,
->                            uint64_t bytes, enum qcow2_discard_type type,
->                            bool full_discard);
-> --
-> 1.8.3.1
->
->
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index d175c5e94f..7939c6b8ae 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -324,6 +324,8 @@ static void arm_cpu_reset(CPUState *s)
+>                                &env->vfp.fp_status);
+>      set_float_detect_tininess(float_tininess_before_rounding,
+>                                &env->vfp.standard_fp_status);
+> +    set_float_detect_tininess(float_tininess_before_rounding,
+> +                              &env->vfp.fp_status_f16);
+>  #ifndef CONFIG_USER_ONLY
+>      if (kvm_enabled()) {
+>          kvm_arm_reset_vcpu(cpu);
+
+
+--
+Alex Benn=C3=A9e
