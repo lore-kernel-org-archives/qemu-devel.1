@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51128)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fGiSH-0002JA-PH
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 06:05:46 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fGiYN-0005Fz-ST
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 06:12:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fGiSG-0007oa-OS
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 06:05:45 -0400
-Date: Thu, 10 May 2018 11:05:37 +0100
+	(envelope-from <stefanha@redhat.com>) id 1fGiYK-000285-MD
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 06:12:03 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52026 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fGiYK-00027t-I2
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 06:12:00 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E3C4C8185344
+	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 10:11:59 +0000 (UTC)
+Date: Thu, 10 May 2018 11:11:58 +0100
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180510100537.GP1296@stefanha-x1.localdomain>
-References: <20180508135436.30140-1-stefanha@redhat.com>
-	<20180508135436.30140-2-stefanha@redhat.com>
-	<aa220f7d-9aa1-f32d-14f0-35d6a8161032@redhat.com>
+Message-ID: <20180510101158.GQ1296@stefanha-x1.localdomain>
+References: <20180509041734.14135-1-peterx@redhat.com>
+	<20180509041734.14135-3-peterx@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="IYV9cRr2u6rjcP4B"
+	protocol="application/pgp-signature"; boundary="DCA/C9WSnDtl50zu"
 Content-Disposition: inline
-In-Reply-To: <aa220f7d-9aa1-f32d-14f0-35d6a8161032@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] qemu-iotests: reduce chance of
- races in 185
+In-Reply-To: <20180509041734.14135-3-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 2/4] monitor: protect mon->fds with
+ mon_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,76 +35,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
 
---IYV9cRr2u6rjcP4B
+--DCA/C9WSnDtl50zu
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 08, 2018 at 09:26:03AM -0500, Eric Blake wrote:
-> On 05/08/2018 08:54 AM, Stefan Hajnoczi wrote:
-> > Commit 8565c3ab537e78f3e69977ec2c609dc9417a806e ("qemu-iotests: fix
-> > 185") identified a race condition in a sub-test.
-> >=20
-> > Similar issues also affect the other sub-tests.  If disk I/O completes
-> > quickly, it races with the QMP 'quit' command.  This causes spurious
-> > test failures because QMP events are emitted in an unpredictable order.
-> >=20
-> > This test relies on QEMU internals and there is no QMP API for getting
-> > deterministic behavior needed to make this test 100% reliable.  At the
-> > same time, the test is useful and it would be a shame to remove it.
-> >=20
-> > Add sleep 0.5 to reduce the chance of races.  This is not a real fix but
-> > appears to reduce spurious failures in practice.
-> >=20
-> > Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > ---
-> >   tests/qemu-iotests/185 | 12 ++++++++++++
-> >   1 file changed, 12 insertions(+)
->=20
-> I'm not opposed to this patch, but is there any way to write the test to
-> take both events in either order, without logging the events as they arri=
-ve,
-> but instead summarizing in a deterministic order which events were receiv=
-ed
-> after the fact?  That way, no matter which way the race is won, we merely
-> log that we got two expected events, and could avoid the extra sleep.
+On Wed, May 09, 2018 at 12:17:32PM +0800, Peter Xu wrote:
+> mon->fds were protected by BQL.  Now protect it by mon_lock so that it
+> can even be used in monitor iothread.
 
-I don't think there is a practical way of doing that without big changes
-to the test.  It could be rewritten in Python to make filtering the QMP
-events easier.
+Only monitor_get_fd() can safely be called from the monitor iothread
+(oob).
 
-Hiding the race doesn't solve the deeper problem though: the test case
-doesn't exercise the same code path each time.  The test should really
-cover all cancellation points in the block job lifecycle instead of just
-one at random.  If we solve this problem then we don't need to filter
-the QMP event sequence.
+The other functions call close(2), which may block, and therefore aren't
+allowed in oob code.
 
-Maybe it can be done with blkdebug.  If not then maybe a blockjobdbg
-interface is necessary to perform deterministic tests (eliminating the
-need for the ratelimiting trick used by this test!).
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Please share ideas, but I think this is a long-term item that shouldn't
-block this series.
-
-Stefan
-
---IYV9cRr2u6rjcP4B
+--DCA/C9WSnDtl50zu
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJa9BlxAAoJEJykq7OBq3PIQT0H/3ETAaiUSm15NpE1I/11VQ0J
-e/EKX2ag9HpRIAY+EKVeql3/AsdSOYKBXZkkZ8QyKHWeSdGs3XX0WK3rWYUgjrv2
-tM6cF9f6QQNEWAcb/zkEgqjx8lD2MSBcuhVPtQaiKK16PiTTRBi5Olwlw4H4lHqq
-YgJYUjWBcKZIlC/Ie9Xl1NAgcoykjohHnkAcs97tVaW1db+u4szMsLFMrrw/KoZz
-wUvkbNvdoeAe8Pa7dkLANH1xLlHyf3jwesVww6EWjM4jdEXd0FOg+mftDOaUVcui
-rk1LEuo6///kkzlFJCqJZrBHJWHgW/GgRecMv6z//GRqu2gDVr0GDjX7fWJ0U5Q=
-=AGRE
+iQEcBAEBAgAGBQJa9BruAAoJEJykq7OBq3PIomkH+wVjqiEcxb+YtuRlcuAPKk81
+nSBFCHFmLy1dOTEKKVznOiShHvcNz+drsfvdQf4VLdC8ivCrZLe07u4dkQEtMbAP
+fa3E6PtEFc9IliYNmvcAW2Xiv5bsyOWB8gkMFYPiO+BY/xoz9RzkyQn6u6gOf9du
+pjXgAyuohpg3tZyvVmYWIxjxXqlnml79H3ZnIgekZr1TuEQvHhCZFoxzC1VNdWES
+npycA9BoRQWuD2z9nVzenaJZg/gAehA1FAcsgIg3dnavGc2y2cC7mEP5hjbYRHbe
+723UH8sfigKy8XHN0f64LVqcYKPp4M5p3JbUlWgqO9vgxl5KPShQ9kKPfKAoQhw=
+=hkwH
 -----END PGP SIGNATURE-----
 
---IYV9cRr2u6rjcP4B--
+--DCA/C9WSnDtl50zu--
