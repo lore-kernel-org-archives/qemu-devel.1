@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fGhzD-0008Lr-Aj
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:35:44 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fGi5V-0002Ek-Ft
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:42:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fGhzC-000287-DO
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:35:43 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:38796)
+	(envelope-from <alex.bennee@linaro.org>) id 1fGi5S-0004SH-5J
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:42:13 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:42605)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fGhzC-00027o-8D
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:35:42 -0400
-Received: by mail-oi0-x242.google.com with SMTP id k17-v6so1215196oih.5
-	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 02:35:42 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fGi5R-0004Rd-Vc
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:42:10 -0400
+Received: by mail-wr0-x243.google.com with SMTP id v5-v6so1326837wrf.9
+	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 02:42:09 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Thu, 10 May 2018 10:42:02 +0100
+Message-Id: <20180510094206.15354-2-alex.bennee@linaro.org>
+In-Reply-To: <20180510094206.15354-1-alex.bennee@linaro.org>
+References: <20180510094206.15354-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180510092935.29088-1-laurent@vivier.eu>
-References: <20180510092935.29088-1-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 10 May 2018 10:35:21 +0100
-Message-ID: <CAFEAcA9xE=7ZRO4iivpFGkX1ELWpS=QcurrDMDPux_sK1+fQdg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] linux-user: move thunk.c to linux-user/
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3 1/5] fpu/softfloat: int_to_float ensure r
+ fully initialised
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,23 +30,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, Warner Losh <imp@bsdimp.com>
+To: peter.maydell@linaro.org
+Cc: richard.henderson@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 10 May 2018 at 10:29, Laurent Vivier <laurent@vivier.eu> wrote:
-> thunk.c is part of linux-user and only used by it,
-> so move it to the linux-user directory.
->
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->  Makefile.target               | 2 +-
->  linux-user/Makefile.objs      | 2 +-
->  thunk.c => linux-user/thunk.c | 0
->  3 files changed, 2 insertions(+), 2 deletions(-)
->  rename thunk.c => linux-user/thunk.c (100%)
+Reported by Coverity (CID1390635). We ensure this for uint_to_float
+later on so we might as well mirror that.
 
-bsd-user doesn't use it now, but I have a feeling maybe
-the currently-out-of-tree improvements do?
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ fpu/softfloat.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-thanks
--- PMM
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index 70e0c40a1c..3adf6a06e4 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -1517,7 +1517,7 @@ FLOAT_TO_UINT(64, 64)
+ 
+ static FloatParts int_to_float(int64_t a, float_status *status)
+ {
+-    FloatParts r;
++    FloatParts r = {};
+     if (a == 0) {
+         r.cls = float_class_zero;
+         r.sign = false;
+-- 
+2.17.0
