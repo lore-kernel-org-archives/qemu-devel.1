@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36241)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fGmv1-00069I-SR
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 10:51:44 -0400
+	(envelope-from <eblake@redhat.com>) id 1fGmxd-0000ht-Lx
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 10:54:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fGmv1-0006Bu-75
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 10:51:43 -0400
-Date: Thu, 10 May 2018 22:51:32 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180510145132.GE4492@lemon.usersys.redhat.com>
-References: <20180509145815.3330-1-famz@redhat.com>
-	<20180509145815.3330-4-famz@redhat.com>
-	<20180510092550.GL1296@stefanha-x1.localdomain>
+	(envelope-from <eblake@redhat.com>) id 1fGmxc-0007VV-MZ
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 10:54:25 -0400
+References: <20180509165530.29561-1-mreitz@redhat.com>
+	<20180509165530.29561-7-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <105c40ee-d81a-2ebb-cd3a-63aa9e518d80@redhat.com>
+Date: Thu, 10 May 2018 09:54:18 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180510092550.GL1296@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v3 3/9] qcow2: Implement copy offloading
+In-Reply-To: <20180509165530.29561-7-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 06/13] block: Add block-specific QDict
+ header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,51 +25,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Lieven <pl@kamp.de>, Max Reitz <mreitz@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Thu, 05/10 10:25, Stefan Hajnoczi wrote:
-> On Wed, May 09, 2018 at 10:58:09PM +0800, Fam Zheng wrote:
-> > +static int qcow2_co_copy_range_from(BlockDriverState *bs,
-> > +                                    BdrvChild *src, uint64_t src_offset,
-> > +                                    BdrvChild *dst, uint64_t dst_offset,
-> > +                                    uint64_t bytes, BdrvRequestFlags flags)
-> > +{
-> > +    BDRVQcow2State *s = bs->opaque;
-> > +    int offset_in_cluster;
-> > +    int ret;
-> > +    unsigned int cur_bytes; /* number of bytes in current iteration */
-> > +    uint64_t cluster_offset = 0;
-> > +    BdrvChild *child = NULL;
-> > +
-> > +    assert(!bs->encrypted);
-> > +    qemu_co_mutex_lock(&s->lock);
-> > +
-> > +    while (bytes != 0) {
-> > +
-> > +        /* prepare next request */
-> > +        cur_bytes = MIN(bytes, INT_MAX);
-> > +
-> > +        ret = qcow2_get_cluster_offset(bs, src_offset, &cur_bytes, &cluster_offset);
-> > +        if (ret < 0) {
-> > +            goto out;
-> > +        }
-> > +
-> > +        offset_in_cluster = offset_into_cluster(s, src_offset);
-> > +
-> > +        switch (ret) {
-> > +        case QCOW2_CLUSTER_UNALLOCATED:
-> > +            if (bs->backing) {
-> > +                child = bs->backing;
-> > +            } else {
-> > +                flags |= BDRV_REQ_ZERO_WRITE;
-> > +            }
-> > +            break;
+On 05/09/2018 11:55 AM, Max Reitz wrote:
+> There are numerous QDict functions that have been introduced for and are
+> used only by the block layer.  Move their declarations into an own
+
+s/an own/their own/
+
+> header file to reflect that.
 > 
-> Do we need a special case if the backing file is shorter than this
-> image?
+> While qdict_extract_subqdict() is in fact used outside of the block
+> layer (in util/qemu-config.c), it is still a function related very
+> closely to how the block layer works with nested QDicts, namely by
+> sometimes flattening them.  Therefore, its declaration is put into this
+> header as well and util/qemu-config.c includes it with a comment stating
+> exactly which function it needs.
+> 
+> Suggested-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
 
-Yes, we should take the BDRV_REQ_ZERO_WRITE path if the range is fully beyond
-EOF, otherwise clip cur_bytes at the backing image offset.
+> +++ b/include/block/qdict.h
+> @@ -0,0 +1,35 @@
+> +/*
+> + * Special QDict functions used by the block layer
+> + *
+> + * Copyright (c) 2018 Red Hat, Inc.
 
-Fam
+You are extracting this from qdict.h which has:
+  * Copyright (C) 2009 Red Hat Inc.
+
+Is it worth listing 2009-2018, instead of just this year?
+
+
+> +
+> +void qdict_copy_default(QDict *dst, QDict *src, const char *key);
+> +void qdict_set_default_str(QDict *dst, const char *key, const char *val);
+
+These two might be useful outside of the block layer; we can move them 
+back in a later patch if so.  But for now, I agree with your choice of 
+moving them.
+
+> +
+> +void qdict_join(QDict *dest, QDict *src, bool overwrite);
+
+This is borderline whether it would be useful outside of the block layer.
+
+> +
+> +void qdict_extract_subqdict(QDict *src, QDict **dst, const char *start);
+> +void qdict_array_split(QDict *src, QList **dst);
+> +int qdict_array_entries(QDict *src, const char *subqdict);
+> +QObject *qdict_crumple(const QDict *src, Error **errp);
+> +void qdict_flatten(QDict *qdict);
+
+And these are definitely hacks that the block layer relies on, where 
+hopefully someday long term we can rewrite the block layer to use QAPI 
+types directly instead of constant reconversion between QemuOpts and 
+QDict and QAPI types.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
