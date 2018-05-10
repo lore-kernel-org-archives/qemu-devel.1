@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fGoKi-00074x-7n
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 12:22:21 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fGoSl-0005St-NY
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 12:30:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fGoKh-0006qW-Dx
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 12:22:20 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:44149)
+	(envelope-from <peter.maydell@linaro.org>) id 1fGoSl-0001mj-0f
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 12:30:39 -0400
+Received: from mail-oi0-x22b.google.com ([2607:f8b0:4003:c06::22b]:37657)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fGoKh-0006oz-8z
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 12:22:19 -0400
-Received: by mail-oi0-x244.google.com with SMTP id e80-v6so2249419oig.11
-	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 09:22:19 -0700 (PDT)
+	id 1fGoSk-0001lh-Rg
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 12:30:38 -0400
+Received: by mail-oi0-x22b.google.com with SMTP id w123-v6so2288709oia.4
+	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 09:30:38 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180502221552.3873-6-richard.henderson@linaro.org>
+In-Reply-To: <20180502221552.3873-9-richard.henderson@linaro.org>
 References: <20180502221552.3873-1-richard.henderson@linaro.org>
-	<20180502221552.3873-6-richard.henderson@linaro.org>
+	<20180502221552.3873-9-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 10 May 2018 17:21:58 +0100
-Message-ID: <CAFEAcA-HtS=Pm=L_zEsBqqFfCorQOuXpjNWxO9bBb+dkt7ihqg@mail.gmail.com>
+Date: Thu, 10 May 2018 17:30:17 +0100
+Message-ID: <CAFEAcA8+iOq7VPtesr=8J==3kV28Acu+XFqB1y5WFYFCaGpCFA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 05/14] target/arm: Implement FMOV
- (general) for fp16
+Subject: Re: [Qemu-devel] [PATCH v2 08/14] target/arm: Introduce and use
+ read_fp_hreg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,75 +34,14 @@ To: Richard Henderson <richard.henderson@linaro.org>
 Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>
 
 On 2 May 2018 at 23:15, Richard Henderson <richard.henderson@linaro.org> wrote:
-> Adding the fp16 moves to/from general registers.
->
 > Cc: qemu-stable@nongnu.org
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  target/arm/translate-a64.c | 22 +++++++++++++++++++++-
->  1 file changed, 21 insertions(+), 1 deletion(-)
+>  target/arm/translate-a64.c | 30 ++++++++++++++----------------
+>  1 file changed, 14 insertions(+), 16 deletions(-)
 >
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index c64c3ed99d..247a4f0cce 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -5463,6 +5463,15 @@ static void handle_fmov(DisasContext *s, int rd, int rn, int type, bool itof)
->              tcg_gen_st_i64(tcg_rn, cpu_env, fp_reg_hi_offset(s, rd));
->              clear_vec_high(s, true, rd);
->              break;
-> +        case 3:
-> +            /* 16 bit */
-> +            tmp = tcg_temp_new_i64();
-> +            tcg_gen_ext16u_i64(tmp, tcg_rn);
-> +            write_fp_dreg(s, rd, tmp);
-> +            tcg_temp_free_i64(tmp);
-> +            break;
-> +        default:
-> +            g_assert_not_reached();
->          }
->      } else {
->          TCGv_i64 tcg_rd = cpu_reg(s, rd);
-> @@ -5480,6 +5489,12 @@ static void handle_fmov(DisasContext *s, int rd, int rn, int type, bool itof)
->              /* 64 bits from top half */
->              tcg_gen_ld_i64(tcg_rd, cpu_env, fp_reg_hi_offset(s, rn));
->              break;
-> +        case 3:
-> +            /* 16 bit */
-> +            tcg_gen_ld16u_i64(tcg_rd, cpu_env, fp_reg_offset(s, rn, MO_16));
-> +            break;
-> +        default:
-> +            g_assert_not_reached();
->          }
->      }
->  }
-> @@ -5519,10 +5534,15 @@ static void disas_fp_int_conv(DisasContext *s, uint32_t insn)
->          case 0xa: /* 64 bit */
->          case 0xd: /* 64 bit to top half of quad */
->              break;
-> +        case 0x6: /* 16-bit */
-> +            if (arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
-> +                break;
-> +            }
-> +            /* fallthru */
 
-This is a switch on (sf << 3 | type << 1 | rmode), so this catches
-the halfprec <-> 32 bit cases, but it misses the halfprec <-> 64 bit
-ops, which have sf == 1. So I think you need a 'case 0xe' as well.
-
->          default:
->              /* all other sf/type/rmode combinations are invalid */
->              unallocated_encoding(s);
-> -            break;
-> +            return;
-
-This is a distinct bugfix, I think (though the only effect would
-be generation of unnecessary dead code after the undef).
-
->          }
->
->          if (!fp_access_check(s)) {
-> --
-> 2.14.3
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
 thanks
 -- PMM
