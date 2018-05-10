@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fGguy-0002HQ-Fm
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 04:27:17 -0400
+	(envelope-from <prvs=66179fe3f=Paul.Durrant@citrix.com>)
+	id 1fGgx6-0003da-Qw
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 04:29:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fGguu-0003MW-HD
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 04:27:16 -0400
-Date: Thu, 10 May 2018 09:26:59 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180510082659.GC1296@stefanha-x1.localdomain>
-References: <1514187226.13662.28.camel@intel.com>
-	<6e792b9f-2281-e8db-0410-c4c3468ffc90@redhat.com>
-	<20180508150309.GC4065@localhost.localdomain>
-	<20180509101618.GC19645@stefanha-x1.localdomain>
-	<d8a06161-d611-4f27-f4c8-f14370f191d4@redhat.com>
+	(envelope-from <prvs=66179fe3f=Paul.Durrant@citrix.com>)
+	id 1fGgx3-0004pT-14
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 04:29:28 -0400
+Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:21792
+	helo=SMTP.EU.CITRIX.COM)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <prvs=66179fe3f=Paul.Durrant@citrix.com>)
+	id 1fGgx2-0004mz-NJ
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 04:29:24 -0400
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Thu, 10 May 2018 08:29:22 +0000
+Message-ID: <a789514577864e9b92d954f7944795bc@AMSPEX02CL03.citrite.net>
+References: <20180509154604.25530-1-paul.durrant@citrix.com>
+	<152588171396.2703.471985236583323449@71c20359a636>
+	<82906d30c1854e13bd7986af99eb1d98@AMSPEX02CL03.citrite.net>
+	<0c96c8b0-4736-d1fe-8145-bf14d2a24a97@redhat.com>
+In-Reply-To: <0c96c8b0-4736-d1fe-8145-bf14d2a24a97@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="m51xatjYGsM+13rf"
-Content-Disposition: inline
-In-Reply-To: <d8a06161-d611-4f27-f4c8-f14370f191d4@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] Some question about savem/qcow2
- incremental snapshot
+Subject: Re: [Qemu-devel] [PATCH 0/2] xen-hvm: use new resource mapping API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,148 +34,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, qemu block <qemu-block@nongnu.org>, qemu-devel@nongnu.org, He Junyan <junyan.he@intel.com>
+To: 'Eric Blake' <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "famz@redhat.com" <famz@redhat.com>
 
-
---m51xatjYGsM+13rf
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, May 09, 2018 at 07:54:31PM +0200, Max Reitz wrote:
-> On 2018-05-09 12:16, Stefan Hajnoczi wrote:
-> > On Tue, May 08, 2018 at 05:03:09PM +0200, Kevin Wolf wrote:
-> >> Am 08.05.2018 um 16:41 hat Eric Blake geschrieben:
-> >>> On 12/25/2017 01:33 AM, He Junyan wrote:
-> >> 2. Make the nvdimm device use the QEMU block layer so that it is backed
-> >>    by a non-raw disk image (such as a qcow2 file representing the
-> >>    content of the nvdimm) that supports snapshots.
-> >>
-> >>    This part is hard because it requires some completely new
-> >>    infrastructure such as mapping clusters of the image file to guest
-> >>    pages, and doing cluster allocation (including the copy on write
-> >>    logic) by handling guest page faults.
-> >>
-> >> I think it makes sense to invest some effort into such interfaces, but
-> >> be prepared for a long journey.
-> >=20
-> > I like the suggestion but it needs to be followed up with a concrete
-> > design that is feasible and fair for Junyan and others to implement.
-> > Otherwise the "long journey" is really just a way of rejecting this
-> > feature.
-> >=20
-> > Let's discuss the details of using the block layer for NVDIMM and try to
-> > come up with a plan.
-> >=20
-> > The biggest issue with using the block layer is that persistent memory
-> > applications use load/store instructions to directly access data.  This
-> > is fundamentally different from the block layer, which transfers blocks
-> > of data to and from the device.
-> >=20
-> > Because of block DMA, QEMU is able to perform processing at each block
-> > driver graph node.  This doesn't exist for persistent memory because
-> > software does not trap I/O.  Therefore the concept of filter nodes
-> > doesn't make sense for persistent memory - we certainly do not want to
-> > trap every I/O because performance would be terrible.
-> >=20
-> > Another difference is that persistent memory I/O is synchronous.
-> > Load/store instructions execute quickly.  Perhaps we could use KVM async
-> > page faults in cases where QEMU needs to perform processing, but again
-> > the performance would be bad.
->=20
-> Let me first say that I have no idea how the interface to NVDIMM looks.
-> I just assume it works pretty much like normal RAM (so the interface is
-> just that it=E2=80=99s a part of the physical address space).
->=20
-> Also, it sounds a bit like you are already discarding my idea, but here
-> goes anyway.
->=20
-> Would it be possible to introduce a buffering block driver that presents
-> the guest an area of RAM/NVDIMM through an NVDIMM interface (so I
-> suppose as part of the guest address space)?  For writing, we=E2=80=99d k=
-eep a
-> dirty bitmap on it, and then we=E2=80=99d asynchronously move the dirty a=
-reas
-> through the block layer, so basically like mirror.  On flushing, we=E2=80=
-=99d
-> block until everything is clean.
->=20
-> For reading, we=E2=80=99d follow a COR/stream model, basically, where eve=
-rything
-> is unpopulated in the beginning and everything is loaded through the
-> block layer both asynchronously all the time and on-demand whenever the
-> guest needs something that has not been loaded yet.
->=20
-> Now I notice that that looks pretty much like a backing file model where
-> we constantly run both a stream and a commit job at the same time.
->=20
-> The user could decide how much memory to use for the buffer, so it could
-> either hold everything or be partially unallocated.
->=20
-> You=E2=80=99d probably want to back the buffer by NVDIMM normally, so that
-> nothing is lost on crashes (though this would imply that for partial
-> allocation the buffering block driver would need to know the mapping
-> between the area in real NVDIMM and its virtual representation of it).
->=20
-> Just my two cents while scanning through qemu-block to find emails that
-> don=E2=80=99t actually concern me...
-
-The guest kernel already implements this - it's the page cache and the
-block layer!
-
-Doing it in QEMU with dirty memory logging enabled is less efficient
-than doing it in the guest.
-
-That's why I said it's better to just use block devices than to
-implement buffering.
-
-I'm saying that persistent memory emulation on top of the iscsi:// block
-driver (for example) does not make sense.  It could be implemented but
-the performance wouldn't be better than block I/O and the
-complexity/code size in QEMU isn't justified IMO.
-
-Stefan
-
-> > Most protocol drivers do not support direct memory access.  iscsi, curl,
-> > etc just don't fit the model.  One might be tempted to implement
-> > buffering but at that point it's better to just use block devices.
-> >=20
-> > I have CCed Pankaj, who is working on the virtio-pmem device.  I need to
-> > be clear that emulated NVDIMM cannot be supported with the block layer
-> > since it lacks a guest flush mechanism.  There is no way for
-> > applications to let the hypervisor know the file needs to be fsynced.
-> > That's what virtio-pmem addresses.
-> >=20
-> > Summary:
-> > A subset of the block layer could be used to back virtio-pmem.  This
-> > requires a new block driver API and the KVM async page fault mechanism
-> > for trapping and mapping pages.  Actual emulated NVDIMM devices cannot
-> > be supported unless the hardware specification is extended with a
-> > virtualization-friendly interface in the future.
-> >=20
-> > Please let me know your thoughts.
-> >=20
-> > Stefan
-> >=20
->=20
->=20
-
-
-
-
---m51xatjYGsM+13rf
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJa9AJTAAoJEJykq7OBq3PInsEH/jxLUrmPM+nPEr8lCjUqUe0M
-xAcWz2X7oBTZUgLrXp0Ha0ee00/H52wDPhxFWvgqSCQ+gpZKNoTRZTtLylzTDL7J
-xfeL1jvRIqht4FtNMXb4V8k+BqSCRHnuge5WPZIciybqxcsEWz9FQDnwQFXPgbCa
-QsE8KbeCvld9LKN5x++nNgpOvzFK4zLGFQmpT4r+Ef5wSLwbdQkCnKvCycBA2t9b
-QJjfEoPx/TJeN7aCi7T7GjvwBNbzwb60Ly/5pHnsHHaLEpnaGrjNyd1fLHr6y+Cr
-ymLOFxqFpF9VqbFknfysgLGIjlPxyZ62tG5Im9K7lz6v0fONy0uCC5tS4+cVVIA=
-=Penv
------END PGP SIGNATURE-----
-
---m51xatjYGsM+13rf--
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBFcmljIEJsYWtlIFttYWlsdG86
+ZWJsYWtlQHJlZGhhdC5jb21dDQo+IFNlbnQ6IDA5IE1heSAyMDE4IDE4OjI2DQo+IFRvOiBQYXVs
+IER1cnJhbnQgPFBhdWwuRHVycmFudEBjaXRyaXguY29tPjsgcWVtdS1kZXZlbEBub25nbnUub3Jn
+DQo+IENjOiB4ZW4tZGV2ZWxAbGlzdHMueGVucHJvamVjdC5vcmc7IGZhbXpAcmVkaGF0LmNvbQ0K
+PiBTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzJdIHhlbi1odm06IHVzZSBuZXcg
+cmVzb3VyY2UgbWFwcGluZw0KPiBBUEkNCj4gDQo+IE9uIDA1LzA5LzIwMTggMTE6MDUgQU0sIFBh
+dWwgRHVycmFudCB3cm90ZToNCj4gDQo+ID4+IHhlbmZvcmVpZ25tZW1vcnlfbWFwX3Jlc291cmNl
+KCkgdG8gbWFwIGlvcmVxIHBhZ2VzLi4uDQo+ID4+IEVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJv
+dW5kIHRoYXQgJyonIChjdHg6V3hWKQ0KPiA+PiAjMTY0OiBGSUxFOiBpbmNsdWRlL2h3L3hlbi94
+ZW5fY29tbW9uLmg6MTI4Og0KPiA+PiArICAgIHhlbmZvcmVpZ25tZW1vcnlfaGFuZGxlICpmbWVt
+LCBkb21pZF90IGRvbWlkLCB1bnNpZ25lZCBpbnQNCj4gdHlwZSwNCj4gPj4gICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgXg0KPiA+Pg0KPiA+PiB0b3RhbDogMSBlcnJvcnMsIDAgd2Fybmlu
+Z3MsIDEzOCBsaW5lcyBjaGVja2VkDQo+ID4+DQo+ID4+IFlvdXIgcGF0Y2ggaGFzIHN0eWxlIHBy
+b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycw0KPiA+PiBhcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUNCj4gPj4g
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4NCj4gPg0KPiA+IFRoaXMgc3R5bGUgd2FybmluZyBh
+cHBlYXJzIHRvIGJlIHNwdXJpb3VzLg0KPiANCj4gWWVwLCBhbmQgaXQncyBiZWNhdXNlIHhlbmZv
+cmVpZ25tZW1vcnlfaGFuZGxlIGRvZXNuJ3QgZm9sbG93IG91ciB1c3VhbA0KPiBjb252ZW50aW9u
+cyBmb3IgYSB0eXBlIG5hbWUuICBTZWUgY29tbWl0IDVhYzA2N2EgaWYgeW91IHdhbnQgdG8gYWRk
+IGl0DQo+IHRvIHRoZSBsaXN0IG9mIHdoaXRlbGlzdGVkIGV4Y2VwdGlvbiB0eXBlIG5hbWVzLCB0
+byBzaWxlbmNlIG1lc3NhZ2VzDQo+IGxpa2UgdGhpcy4NCg0KVGhhbmtzIEVyaWMuIEknbGwgc2Vu
+ZCBhIHYyIHNlcmllcyB3aXRoIGEgc3VpdGFibGUgYWRkaXRpb25hbCBwYXRjaC4NCg0KICBDaGVl
+cnMsDQoNCiAgICBQYXVsDQoNCj4gDQo+IC0tDQo+IEVyaWMgQmxha2UsIFByaW5jaXBhbCBTb2Z0
+d2FyZSBFbmdpbmVlcg0KPiBSZWQgSGF0LCBJbmMuICAgICAgICAgICArMS05MTktMzAxLTMyNjYN
+Cj4gVmlydHVhbGl6YXRpb246ICBxZW11Lm9yZyB8IGxpYnZpcnQub3JnDQo=
