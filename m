@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fGshH-0006eE-56
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 17:01:57 -0400
+	(envelope-from <alistair23@gmail.com>) id 1fGshZ-0006oC-Mr
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 17:02:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fGshG-0006r1-6H
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 17:01:55 -0400
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:36962)
+	(envelope-from <alistair23@gmail.com>) id 1fGshZ-0006v7-0J
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 17:02:13 -0400
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:40974)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1fGshF-0006qm-Uy
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 17:01:54 -0400
-Received: by mail-lf0-x242.google.com with SMTP id r2-v6so4906724lff.4
-	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 14:01:53 -0700 (PDT)
+	id 1fGshY-0006uy-PX
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 17:02:12 -0400
+Received: by mail-lf0-x242.google.com with SMTP id o123-v6so4885301lfe.8
+	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 14:02:12 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <3c63d68b-20c2-8ac6-1b8d-6344d5e6de0b@amsat.org>
+In-Reply-To: <20180509032533.GI22503@lemon.usersys.redhat.com>
 References: <90990df8024b287004e771ebd2370cc390e49106.1525723355.git.alistair.francis@wdc.com>
-	<828d2efb-6cee-f4f5-138a-5fd7da3de675@amsat.org>
-	<5d0f62c3-cfab-bd64-ee75-d0ce5e064e2d@amsat.org>
-	<3c63d68b-20c2-8ac6-1b8d-6344d5e6de0b@amsat.org>
+	<20180509032533.GI22503@lemon.usersys.redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 10 May 2018 14:01:22 -0700
-Message-ID: <CAKmqyKOZpmZmdLda-KcBwVUPdattj7+Tz-AjCFLFVeFmjKHjKQ@mail.gmail.com>
+Date: Thu, 10 May 2018 14:01:41 -0700
+Message-ID: <CAKmqyKMkduwKOoAvxadHPYZJCVZySnd6eLBUD8AZQNdL8=6SCA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH v1 1/1] tests/docker: Add a Avocado Docker
  test
 List-Id: <qemu-devel.nongnu.org>
@@ -33,70 +30,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Fam Zheng <famz@redhat.com>
+Cc: Alistair Francis <alistair.francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-On Tue, May 8, 2018 at 8:49 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g> wrote:
-> Hi Alistair,
->
-> On 05/07/2018 09:02 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->>> On 05/07/2018 05:09 PM, Alistair Francis wrote:
-> [...]>>> +++ b/tests/docker/test-avocado
->>>> @@ -0,0 +1,28 @@
->>>> +#!/bin/bash -e
->>>> +#
->>>> +# Avocado tests on Fedora, as these are a real pain on Debian systems
->>>
->>> Have been here... Then used the git version :/
->>>
->>>> +#
->>>> +# Copyright (c) 2018 Western Digital.
->>>> +#
->>>> +# Authors:
->>>> +#  Alistair Francis <alistair.francis@wdc.com>
->>>> +#
->>>> +# This work is licensed under the terms of the GNU GPL, version 2
->>>> +# or (at your option) any later version. See the COPYING file in
->>>> +# the top-level directory.
->>>> +#
->>>> +# Run this test: NETWORK=3D1 make docker-test-avocado@fedora
->>>> +
->>>> +. common.rc
->>>> +
->>>> +requires avocado
->>>> +
->>>> +cd "$BUILD_DIR"
->>>> +
->>>> +DEF_TARGET_LIST=3D"x86_64-softmmu"
->>>> +TARGET_LIST=3D${TARGET_LIST:-$DEF_TARGET_LIST} \
->>>> +build_qemu
->>>> +install_qemu
->>>> +export PATH=3D"${PATH}:$(pwd)"
->>>> +avocado vt-bootstrap --yes-to-all --vt-type qemu
+On Tue, May 8, 2018 at 10:57 PM, Fam Zheng <famz@redhat.com> wrote:
+> On Mon, 05/07 13:09, Alistair Francis wrote:
+>> Avocado is not trivial to setup on non-Fedora systems. To simplfying
+>> future testing add a docker test image that runs Avocado tests.
 >>
->> Can we do the bootstrapping in the Dockerfile?
+>> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+>> ---
+>>  tests/docker/dockerfiles/fedora.docker | 12 +++++++++--
+>>  tests/docker/test-avocado              | 28 ++++++++++++++++++++++++++
+>>  2 files changed, 38 insertions(+), 2 deletions(-)
+>>  create mode 100755 tests/docker/test-avocado
 >>
->> Testing your image it download big files (i.e. JeOS image) in my
->> ~avocado/data/avocado-vt/images which is internal to the volatile docker
->> instance, so I have to download again each time I run the tests...
+>> diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
+>> index b706f42405..5c23f6e459 100644
+>> --- a/tests/docker/dockerfiles/fedora.docker
+>> +++ b/tests/docker/dockerfiles/fedora.docker
+>> @@ -18,9 +18,17 @@ ENV PACKAGES \
+>>      mingw64-pixman mingw64-glib2 mingw64-gmp mingw64-SDL mingw64-pkg-config \
+>>      mingw64-gtk2 mingw64-gtk3 mingw64-gnutls mingw64-nettle mingw64-libtasn1 \
+>>      mingw64-libjpeg-turbo mingw64-libpng mingw64-curl mingw64-libssh2 \
+>> -    mingw64-bzip2
+>> +    mingw64-bzip2 \
+>> +    xz tcpdump nc \
+>> +    python2-devel python3-devel python-avocado \
+>> +    libvirt-devel qemu-kvm
+>>  ENV QEMU_CONFIGURE_OPTS --python=/usr/bin/python3
+>> +ENV PIP_PACKAGES \
+>> +    avocado-framework avocado-qemu \
 >
-> Do we need this JeOS image?
->
-> http://avocado-vt.readthedocs.io/en/latest/DownloadableImages.html#jeos-i=
-mage
+> I think python-avacado overlaps with pip avacado-framework. Why are both needed?
 
-I think that is the one that is pulled in.
+They aren't, fixed in v2.
 
 Alistair
 
 >
->>
->> We need to pass this cache path to the docker instance.
->> For example the vm-test use ~/.cache/qemu-vm/download.
->>
->>>> +avocado run boot --vt-qemu-bin ./x86_64-softmmu/qemu-system-x86_64
->>>
->>> So this script is for the VT version, specific to x86. I'd rather name
->>> the script accordingly "test-avocado-vt".
+> Fam
 >
+>> +    avocado-framework-plugin-vt avocado-framework-plugin-runner-vm \
+>> +    avocado-framework-plugin-runner-remote avocado-framework-plugin-result-html
+>>
+>>  RUN dnf install -y $PACKAGES
+>> +RUN pip install $PIP_PACKAGES
+>>  RUN rpm -q $PACKAGES | sort > /packages.txt
+>> -ENV FEATURES mingw clang pyyaml asan
+>> +ENV FEATURES mingw clang pyyaml asan avocado
+>> diff --git a/tests/docker/test-avocado b/tests/docker/test-avocado
+>> new file mode 100755
+>> index 0000000000..8da7bc10a2
+>> --- /dev/null
+>> +++ b/tests/docker/test-avocado
+>> @@ -0,0 +1,28 @@
+>> +#!/bin/bash -e
+>> +#
+>> +# Avocado tests on Fedora, as these are a real pain on Debian systems
+>> +#
+>> +# Copyright (c) 2018 Western Digital.
+>> +#
+>> +# Authors:
+>> +#  Alistair Francis <alistair.francis@wdc.com>
+>> +#
+>> +# This work is licensed under the terms of the GNU GPL, version 2
+>> +# or (at your option) any later version. See the COPYING file in
+>> +# the top-level directory.
+>> +#
+>> +# Run this test: NETWORK=1 make docker-test-avocado@fedora
+>> +
+>> +. common.rc
+>> +
+>> +requires avocado
+>> +
+>> +cd "$BUILD_DIR"
+>> +
+>> +DEF_TARGET_LIST="x86_64-softmmu"
+>> +TARGET_LIST=${TARGET_LIST:-$DEF_TARGET_LIST} \
+>> +build_qemu
+>> +install_qemu
+>> +export PATH="${PATH}:$(pwd)"
+>> +avocado vt-bootstrap --yes-to-all --vt-type qemu
+>> +avocado run boot --vt-qemu-bin ./x86_64-softmmu/qemu-system-x86_64
+>> --
+>> 2.17.0
+>>
+>>
