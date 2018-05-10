@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fGuA5-0004wC-Dw
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 18:35:46 -0400
+	(envelope-from <peter@lekensteyn.nl>) id 1fGuf4-0002eo-Tl
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 19:07:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fGuA1-0003yj-22
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 18:35:45 -0400
-Resent-Message-Id: <E1fGuA1-0003yj-22@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21001)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fGuA0-0003xz-Ph
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 18:35:40 -0400
-In-Reply-To: <20180510222601.19944-1-laurent@vivier.eu>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152599166928.2838.15222537828084685604@71c20359a636>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 10 May 2018 15:34:30 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/5] linux-user: move socket.h definitions
- to CPU directories
+	(envelope-from <peter@lekensteyn.nl>) id 1fGuf3-0005HT-Vy
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 19:07:46 -0400
+Received: from mail.lekensteyn.nl ([2a02:2308::360:1:25]:54765)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter@lekensteyn.nl>) id 1fGuf3-0005GM-MI
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 19:07:45 -0400
+From: Peter Wu <peter@lekensteyn.nl>
+Date: Fri, 11 May 2018 01:07:39 +0200
+Message-Id: <20180510230739.28459-2-peter@lekensteyn.nl>
+In-Reply-To: <20180510230739.28459-1-peter@lekensteyn.nl>
+References: <20180510230739.28459-1-peter@lekensteyn.nl>
+Subject: [Qemu-devel] [PATCH 2/2] gtk: disable the F10 menubar key
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +23,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: laurent@vivier.eu
-Cc: famz@redhat.com, qemu-devel@nongnu.org, mark.cave-ayland@ilande.co.uk, riku.voipio@iki.fi, yongbok.kim@mips.com, rth@twiddle.net
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNTEwMjIyNjAxLjE5OTQ0LTEtbGF1cmVudEB2aXZpZXIuZXUKU3ViamVj
-dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzVdIGxpbnV4LXVzZXI6IG1vdmUgc29ja2V0LmggZGVm
-aW5pdGlvbnMgdG8gQ1BVIGRpcmVjdG9yaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
-L2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0Uu
-LiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVI
-IC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVj
-a2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIK
-ICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRj
-aC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAg
-IGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5E
-ID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApG
-cm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10g
-ICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwNTEwMjIyNjAxLjE5OTQ0LTEtbGF1cmVudEB2aXZp
-ZXIuZXUgLT4gcGF0Y2hldy8yMDE4MDUxMDIyMjYwMS4xOTk0NC0xLWxhdXJlbnRAdml2aWVyLmV1
-ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMTIzZTc5YWMzYSBsaW51eC11c2VyOiBj
-b3B5IHNwYXJjL3NvY2tiaXRzLmggZGVmaW5pdGlvbnMgZnJvbSBsaW51eAo4MjgzZGVmODU1IGxp
-bnV4LXVzZXI6IG1vdmUgcHBjIHNvY2tldC5oIGRlZmluaXRpb25zIHRvIHBwYy9zb2NrYml0cy5o
-CmYzYjU2YWI4MjUgbGludXgtdXNlcjogbW92ZSBzcGFyYy9zcGFyYzY0IHNvY2tldC5oIGRlZmlu
-aXRpb25zIHRvIHNwYXJjL3NvY2tiaXRzLmgKY2UwNjZjMjIwOSBsaW51eC11c2VyOiBtb3ZlIGFs
-cGhhIHNvY2tldC5oIGRlZmluaXRpb25zIHRvIGFscGhhL3NvY2tiaXRzLmgKOTdmNmZiYmFjYiBs
-aW51eC11c2VyOiBtb3ZlIG1pcHMgc29ja2V0LmggZGVmaW5pdGlvbnMgdG8gbWlwcy9zb2NrYml0
-cy5oCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzU6IGxpbnV4LXVzZXI6
-IG1vdmUgbWlwcyBzb2NrZXQuaCBkZWZpbml0aW9ucyB0byBtaXBzL3NvY2tiaXRzLmguLi4KRVJS
-T1I6IGlmIHRoaXMgY29kZSBpcyByZWR1bmRhbnQgY29uc2lkZXIgcmVtb3ZpbmcgaXQKIzQ3OiBG
-SUxFOiBsaW51eC11c2VyL21pcHMvc29ja2JpdHMuaDozMToKKyNpZiAwCgp0b3RhbDogMSBlcnJv
-cnMsIDAgd2FybmluZ3MsIDIyNyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBw
-cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
-IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
-aW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyLzU6IGxpbnV4LXVzZXI6IG1vdmUgYWxw
-aGEgc29ja2V0LmggZGVmaW5pdGlvbnMgdG8gYWxwaGEvc29ja2JpdHMuaC4uLgpDaGVja2luZyBQ
-QVRDSCAzLzU6IGxpbnV4LXVzZXI6IG1vdmUgc3BhcmMvc3BhcmM2NCBzb2NrZXQuaCBkZWZpbml0
-aW9ucyB0byBzcGFyYy9zb2NrYml0cy5oLi4uCkNoZWNraW5nIFBBVENIIDQvNTogbGludXgtdXNl
-cjogbW92ZSBwcGMgc29ja2V0LmggZGVmaW5pdGlvbnMgdG8gcHBjL3NvY2tiaXRzLmguLi4KQ2hl
-Y2tpbmcgUEFUQ0ggNS81OiBsaW51eC11c2VyOiBjb3B5IHNwYXJjL3NvY2tiaXRzLmggZGVmaW5p
-dGlvbnMgZnJvbSBsaW51eC4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0
-ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
-dGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
-IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+The F10 key is used in various applications, disable it unconditionally
+(do not limit it to grab mode). Note that this property is deprecated
+and might be removed in the future (GTK+ commit b082fb598d).
+
+Fixes: https://bugs.launchpad.net/qemu/+bug/1726910
+Signed-off-by: Peter Wu <peter@lekensteyn.nl>
+---
+ ui/gtk.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/ui/gtk.c b/ui/gtk.c
+index 9e5390f2c2..6ad6cacfaa 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -2321,6 +2321,8 @@ static GtkWidget *gd_create_menu_view(GtkDisplayState *s)
+ 
+ static void gd_create_menus(GtkDisplayState *s)
+ {
++    GtkSettings *settings;
++
+     s->accel_group = gtk_accel_group_new();
+     s->machine_menu = gd_create_menu_machine(s);
+     s->view_menu = gd_create_menu_view(s);
+@@ -2336,6 +2338,10 @@ static void gd_create_menus(GtkDisplayState *s)
+ 
+     g_object_set_data(G_OBJECT(s->window), "accel_group", s->accel_group);
+     gtk_window_add_accel_group(GTK_WINDOW(s->window), s->accel_group);
++
++    /* Disable the default "F10" menu shortcut. */
++    settings = gtk_widget_get_settings(s->window);
++    g_object_set(G_OBJECT(settings), "gtk-menu-bar-accel", "", NULL);
+ }
+ 
+ 
+-- 
+2.17.0
