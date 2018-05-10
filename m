@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fGsOB-0005PY-81
+	(envelope-from <Babu.Moger@amd.com>) id 1fGsOB-0005PX-7n
 	for qemu-devel@nongnu.org; Thu, 10 May 2018 16:42:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fGsO7-0004WI-5W
+	(envelope-from <Babu.Moger@amd.com>) id 1fGsO7-0004WU-GM
 	for qemu-devel@nongnu.org; Thu, 10 May 2018 16:42:11 -0400
 Received: from mail-sn1nam01on0041.outbound.protection.outlook.com
 	([104.47.32.41]:36736
 	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fGsO6-0004Vg-Sp
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fGsO7-0004Vg-70
 	for qemu-devel@nongnu.org; Thu, 10 May 2018 16:42:07 -0400
 From: Babu Moger <babu.moger@amd.com>
-Date: Thu, 10 May 2018 15:41:40 -0500
-Message-ID: <20180510204148.11687-1-babu.moger@amd.com>
+Date: Thu, 10 May 2018 15:41:41 -0500
+Message-Id: <20180510204148.11687-2-babu.moger@amd.com>
+In-Reply-To: <20180510204148.11687-1-babu.moger@amd.com>
+References: <20180510204148.11687-1-babu.moger@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v8 0/8] i386: Enable TOPOEXT to support
- hyperthreading on AMD CPU
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v8 1/8] i386: Helpers to encode cache
+ information consistently
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,141 +31,672 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com
 Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, geoff@hostfission.com, kash@tripleback.net, babu.moger@amd.com
 
-This series enables the TOPOEXT feature for AMD CPUs. This is required to
-support hyperthreading on kvm guests.
+From: Eduardo Habkost <ehabkost@redhat.com>
 
-This addresses the issues reported in these bugs:
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1481253
-https://bugs.launchpad.net/qemu/+bug/1703506=20
+Instead of having a collection of macros that need to be used in
+complex expressions to build CPUID data, define a CPUCacheInfo
+struct that can hold information about a given cache.  Helper
+functions will take a CPUCacheInfo struct as input to encode
+CPUID leaves for a cache.
 
-v8:
- Addressed feedback from Eduardo. Thanks Eduardo for being patient with me.
- Tested on AMD EPYC server and also did some basic testing on intel box.
- Summary of changes.
- 1. Reverted back l2 cache associativity. Kept it same as legacy.
- 2. Changed cache_info structure in X86CPUDefinition and CPUX86State to poi=
-nters.
- 3. Added legacy_cache property in PC_COMPAT_2_12 and initialized legacy_ca=
-che
-    based on static cache_info availability.
- 4. Squashed patch 4 and 5 and applied it before patch 3.
- 5. Added legacy cache check for cpuid[2] and cpuid[4] for consistancy.
- 6. Simplified NUM_SHARING_CACHE definition for readability,
- 7. Removed assert for core_id as it appeared redundant.
- 8. Simplified encode_cache_cpuid8000001d little bit.
- 9. Few more minor changes
+This will help us ensure consistency between cache information
+CPUID leaves, and make the existing inconsistencies in CPUID info
+more visible.
 
-v7:
- Rebased on top of latest tree after 2.12 release and done few basic tests.=
- There are
- no changes except for few minor hunks. Hopefully this gets pulled into 2.1=
-3 release.
- Please review, let me know of any feedback.
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Babu Moger <babu.moger@amd.com>
+Tested-by: Geoffrey McRae <geoff@hostfission.com>
+---
+ target/i386/cpu.c | 495 ++++++++++++++++++++++++++++++++++------------
+ target/i386/cpu.h |  53 +++++
+ 2 files changed, 424 insertions(+), 124 deletions(-)
 
-v6:
-1.Fixed problem with patch#4(Add new property to control cache info). The p=
-arameter
- legacy_cache should be "on" by default on machine type "pc-q35-2.10". This=
- was
- found by Alexandr Iarygin.
-2.Fixed the l3 cache size for EPYC based machines(patch#3). Also, fixed the=
- number of
- logical processors sharing the cache(patch#6). Only L3 cache is shared by =
-multiple
- cores but not L1 or L2. This was a bug while decoding. This was found by G=
-eoffrey McRae
- and he verified the fix.=20
-
-v5:
- In this series I tried to address the feedback from Eduardo Habkost.
- The discussion thread is here.
- https://patchwork.kernel.org/patch/10299745/
- The previous thread is here.
- http://patchwork.ozlabs.org/cover/884885/
-
-Reason for these changes.
- The cache properties for AMD family of processors have changed from
- previous releases. We don't want to display the new information on the
- old family of processors as this might cause compatibility issues.
-
-Changes:
-1.Based the patches on top of Eduardo's(patch#1) patch.
-  Changed few things.
-  Moved the Cache definitions to cpu.h file.
-  Changed the CPUID_4 names to generic names.
-2.Added a new propery "legacy-cache" in cpu object(patch#2). This can be
-  used to display the old property even if the host supports the new cache
-  properties.
-3.Added cache information in X86CPUDefinition and CPUX86State
-4.Patch 6-7 changed quite a bit from previous version does to new approach.
-5.Addressed few issues with CPUID_8000_001d and CPUID_8000_001E.
-
-v4:
-1.Removed the checks under cpuid 0x8000001D leaf(patch #2). These check are
-  not necessary. Found this during internal review.
-2.Added CPUID_EXT3_TOPOEXT feature for all the 17 family(patch #4). This wa=
-s
-  found by Kash Pande during his testing.
-3.Removed th hardcoded cpuid xlevel and dynamically extended if CPUID_EXT3_=
-TOPOEXT
-  is supported(Suggested by Brijesh Singh).=20
-
-v3:
-1.Removed the patch #1. Radim mentioned that original typo problem is in=20
-  linux kernel header. qemu is just copying those files.
-2.In previous version, I used the cpuid 4 definitions for AMDs cpuid leaf
-  0x8000001D. CPUID 4 is very intel specific and we dont want to expose tho=
-se
-  details under AMD. I have renamed some of these definitions as generic.
-  These changes are in patch#1. Radim, let me know if this is what you inte=
-nded.
-3.Added assert to for core_id(Suggested by Radim Krcm=C3=A1r).
-4.Changed the if condition under "L3 cache info"(Suggested by Gary Hook).
-5.Addressed few more text correction and code cleanup(Suggested by Thomas L=
-endacky).
-
-v2:
-  Fixed few more minor issues per Gary Hook's comments. Thank you Gary.
-  Removed the patch#1. We need to handle the instruction cache associativit=
-y=20
-  seperately. It varies based on the cpu family. I will comeback to that la=
-ter.
-  Added two more typo corrections in patch#1 and patch#5.
-
-v1:
-  Stanislav Lanci posted few patches earlier.=20
-  https://patchwork.kernel.org/patch/10040903/
-
-Rebased his patches with few changes.
-1.Spit the patches into two, separating cpuid functions=20
-  0x8000001D and 0x8000001E (Patch 2 and 3).
-2.Removed the generic non-intel check and made a separate patch
-  with some changes(Patch 5).
-3.Fixed L3_N_SETS_AMD(from 4096 to 8192) based on CPUID_Fn8000001D_ECX_x03.
-
-Added 2 more patches.
-Patch 1. Fixes cache associativity.
-Patch 4. Adds TOPOEXT feature on AMD EPYC CPU.
-
-
-Babu Moger (7):
-  i386: Add cache information in X86CPUDefinition
-  i386: Add new property to control cache info
-  i386: Initialize cache information for EPYC family processors
-  i386: Populate AMD Processor Cache Information for cpuid 0x8000001D
-  i386: Add support for CPUID_8000_001E for AMD
-  i386: Enable TOPOEXT feature on AMD EPYC CPU
-  i386: Remove generic SMT thread check
-
-Eduardo Habkost (1):
-  i386: Helpers to encode cache information consistently
-
- include/hw/i386/pc.h       |   8 +
- include/hw/i386/topology.h |   6 +
- target/i386/cpu.c          | 703 ++++++++++++++++++++++++++++++-------
- target/i386/cpu.h          |  65 ++++
- target/i386/kvm.c          |  29 +-
- 5 files changed, 677 insertions(+), 134 deletions(-)
-
---=20
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index a20fe26573..18835400f1 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -56,33 +56,240 @@
+ 
+ #include "disas/capstone.h"
+ 
++/* Helpers for building CPUID[2] descriptors: */
++
++struct CPUID2CacheDescriptorInfo {
++    enum CacheType type;
++    int level;
++    int size;
++    int line_size;
++    int associativity;
++};
+ 
+-/* Cache topology CPUID constants: */
++#define KiB 1024
++#define MiB (1024 * 1024)
+ 
+-/* CPUID Leaf 2 Descriptors */
++/*
++ * Known CPUID 2 cache descriptors.
++ * From Intel SDM Volume 2A, CPUID instruction
++ */
++struct CPUID2CacheDescriptorInfo cpuid2_cache_descriptors[] = {
++    [0x06] = { .level = 1, .type = ICACHE,        .size =   8 * KiB,
++               .associativity = 4,  .line_size = 32, },
++    [0x08] = { .level = 1, .type = ICACHE,        .size =  16 * KiB,
++               .associativity = 4,  .line_size = 32, },
++    [0x09] = { .level = 1, .type = ICACHE,        .size =  32 * KiB,
++               .associativity = 4,  .line_size = 64, },
++    [0x0A] = { .level = 1, .type = DCACHE,        .size =   8 * KiB,
++               .associativity = 2,  .line_size = 32, },
++    [0x0C] = { .level = 1, .type = DCACHE,        .size =  16 * KiB,
++               .associativity = 4,  .line_size = 32, },
++    [0x0D] = { .level = 1, .type = DCACHE,        .size =  16 * KiB,
++               .associativity = 4,  .line_size = 64, },
++    [0x0E] = { .level = 1, .type = DCACHE,        .size =  24 * KiB,
++               .associativity = 6,  .line_size = 64, },
++    [0x1D] = { .level = 2, .type = UNIFIED_CACHE, .size = 128 * KiB,
++               .associativity = 2,  .line_size = 64, },
++    [0x21] = { .level = 2, .type = UNIFIED_CACHE, .size = 256 * KiB,
++               .associativity = 8,  .line_size = 64, },
++    /* lines per sector is not supported cpuid2_cache_descriptor(),
++    * so descriptors 0x22, 0x23 are not included
++    */
++    [0x24] = { .level = 2, .type = UNIFIED_CACHE, .size =   1 * MiB,
++               .associativity = 16, .line_size = 64, },
++    /* lines per sector is not supported cpuid2_cache_descriptor(),
++    * so descriptors 0x25, 0x20 are not included
++    */
++    [0x2C] = { .level = 1, .type = DCACHE,        .size =  32 * KiB,
++               .associativity = 8,  .line_size = 64, },
++    [0x30] = { .level = 1, .type = ICACHE,        .size =  32 * KiB,
++               .associativity = 8,  .line_size = 64, },
++    [0x41] = { .level = 2, .type = UNIFIED_CACHE, .size = 128 * KiB,
++               .associativity = 4,  .line_size = 32, },
++    [0x42] = { .level = 2, .type = UNIFIED_CACHE, .size = 256 * KiB,
++               .associativity = 4,  .line_size = 32, },
++    [0x43] = { .level = 2, .type = UNIFIED_CACHE, .size = 512 * KiB,
++               .associativity = 4,  .line_size = 32, },
++    [0x44] = { .level = 2, .type = UNIFIED_CACHE, .size =   1 * MiB,
++               .associativity = 4,  .line_size = 32, },
++    [0x45] = { .level = 2, .type = UNIFIED_CACHE, .size =   2 * MiB,
++               .associativity = 4,  .line_size = 32, },
++    [0x46] = { .level = 3, .type = UNIFIED_CACHE, .size =   4 * MiB,
++               .associativity = 4,  .line_size = 64, },
++    [0x47] = { .level = 3, .type = UNIFIED_CACHE, .size =   8 * MiB,
++               .associativity = 8,  .line_size = 64, },
++    [0x48] = { .level = 2, .type = UNIFIED_CACHE, .size =   3 * MiB,
++               .associativity = 12, .line_size = 64, },
++    /* Descriptor 0x49 depends on CPU family/model, so it is not included */
++    [0x4A] = { .level = 3, .type = UNIFIED_CACHE, .size =   6 * MiB,
++               .associativity = 12, .line_size = 64, },
++    [0x4B] = { .level = 3, .type = UNIFIED_CACHE, .size =   8 * MiB,
++               .associativity = 16, .line_size = 64, },
++    [0x4C] = { .level = 3, .type = UNIFIED_CACHE, .size =  12 * MiB,
++               .associativity = 12, .line_size = 64, },
++    [0x4D] = { .level = 3, .type = UNIFIED_CACHE, .size =  16 * MiB,
++               .associativity = 16, .line_size = 64, },
++    [0x4E] = { .level = 2, .type = UNIFIED_CACHE, .size =   6 * MiB,
++               .associativity = 24, .line_size = 64, },
++    [0x60] = { .level = 1, .type = DCACHE,        .size =  16 * KiB,
++               .associativity = 8,  .line_size = 64, },
++    [0x66] = { .level = 1, .type = DCACHE,        .size =   8 * KiB,
++               .associativity = 4,  .line_size = 64, },
++    [0x67] = { .level = 1, .type = DCACHE,        .size =  16 * KiB,
++               .associativity = 4,  .line_size = 64, },
++    [0x68] = { .level = 1, .type = DCACHE,        .size =  32 * KiB,
++               .associativity = 4,  .line_size = 64, },
++    [0x78] = { .level = 2, .type = UNIFIED_CACHE, .size =   1 * MiB,
++               .associativity = 4,  .line_size = 64, },
++    /* lines per sector is not supported cpuid2_cache_descriptor(),
++    * so descriptors 0x79, 0x7A, 0x7B, 0x7C are not included.
++    */
++    [0x7D] = { .level = 2, .type = UNIFIED_CACHE, .size =   2 * MiB,
++               .associativity = 8,  .line_size = 64, },
++    [0x7F] = { .level = 2, .type = UNIFIED_CACHE, .size = 512 * KiB,
++               .associativity = 2,  .line_size = 64, },
++    [0x80] = { .level = 2, .type = UNIFIED_CACHE, .size = 512 * KiB,
++               .associativity = 8,  .line_size = 64, },
++    [0x82] = { .level = 2, .type = UNIFIED_CACHE, .size = 256 * KiB,
++               .associativity = 8,  .line_size = 32, },
++    [0x83] = { .level = 2, .type = UNIFIED_CACHE, .size = 512 * KiB,
++               .associativity = 8,  .line_size = 32, },
++    [0x84] = { .level = 2, .type = UNIFIED_CACHE, .size =   1 * MiB,
++               .associativity = 8,  .line_size = 32, },
++    [0x85] = { .level = 2, .type = UNIFIED_CACHE, .size =   2 * MiB,
++               .associativity = 8,  .line_size = 32, },
++    [0x86] = { .level = 2, .type = UNIFIED_CACHE, .size = 512 * KiB,
++               .associativity = 4,  .line_size = 64, },
++    [0x87] = { .level = 2, .type = UNIFIED_CACHE, .size =   1 * MiB,
++               .associativity = 8,  .line_size = 64, },
++    [0xD0] = { .level = 3, .type = UNIFIED_CACHE, .size = 512 * KiB,
++               .associativity = 4,  .line_size = 64, },
++    [0xD1] = { .level = 3, .type = UNIFIED_CACHE, .size =   1 * MiB,
++               .associativity = 4,  .line_size = 64, },
++    [0xD2] = { .level = 3, .type = UNIFIED_CACHE, .size =   2 * MiB,
++               .associativity = 4,  .line_size = 64, },
++    [0xD6] = { .level = 3, .type = UNIFIED_CACHE, .size =   1 * MiB,
++               .associativity = 8,  .line_size = 64, },
++    [0xD7] = { .level = 3, .type = UNIFIED_CACHE, .size =   2 * MiB,
++               .associativity = 8,  .line_size = 64, },
++    [0xD8] = { .level = 3, .type = UNIFIED_CACHE, .size =   4 * MiB,
++               .associativity = 8,  .line_size = 64, },
++    [0xDC] = { .level = 3, .type = UNIFIED_CACHE, .size = 1.5 * MiB,
++               .associativity = 12, .line_size = 64, },
++    [0xDD] = { .level = 3, .type = UNIFIED_CACHE, .size =   3 * MiB,
++               .associativity = 12, .line_size = 64, },
++    [0xDE] = { .level = 3, .type = UNIFIED_CACHE, .size =   6 * MiB,
++               .associativity = 12, .line_size = 64, },
++    [0xE2] = { .level = 3, .type = UNIFIED_CACHE, .size =   2 * MiB,
++               .associativity = 16, .line_size = 64, },
++    [0xE3] = { .level = 3, .type = UNIFIED_CACHE, .size =   4 * MiB,
++               .associativity = 16, .line_size = 64, },
++    [0xE4] = { .level = 3, .type = UNIFIED_CACHE, .size =   8 * MiB,
++               .associativity = 16, .line_size = 64, },
++    [0xEA] = { .level = 3, .type = UNIFIED_CACHE, .size =  12 * MiB,
++               .associativity = 24, .line_size = 64, },
++    [0xEB] = { .level = 3, .type = UNIFIED_CACHE, .size =  18 * MiB,
++               .associativity = 24, .line_size = 64, },
++    [0xEC] = { .level = 3, .type = UNIFIED_CACHE, .size =  24 * MiB,
++               .associativity = 24, .line_size = 64, },
++};
++
++/*
++ * "CPUID leaf 2 does not report cache descriptor information,
++ * use CPUID leaf 4 to query cache parameters"
++ */
++#define CACHE_DESCRIPTOR_UNAVAILABLE 0xFF
+ 
+-#define CPUID_2_L1D_32KB_8WAY_64B 0x2c
+-#define CPUID_2_L1I_32KB_8WAY_64B 0x30
+-#define CPUID_2_L2_2MB_8WAY_64B   0x7d
+-#define CPUID_2_L3_16MB_16WAY_64B 0x4d
++/*
++ * Return a CPUID 2 cache descriptor for a given cache.
++ * If no known descriptor is found, return CACHE_DESCRIPTOR_UNAVAILABLE
++ */
++static uint8_t cpuid2_cache_descriptor(CPUCacheInfo *cache)
++{
++    int i;
++
++    assert(cache->size > 0);
++    assert(cache->level > 0);
++    assert(cache->line_size > 0);
++    assert(cache->associativity > 0);
++    for (i = 0; i < ARRAY_SIZE(cpuid2_cache_descriptors); i++) {
++        struct CPUID2CacheDescriptorInfo *d = &cpuid2_cache_descriptors[i];
++        if (d->level == cache->level && d->type == cache->type &&
++            d->size == cache->size && d->line_size == cache->line_size &&
++            d->associativity == cache->associativity) {
++                return i;
++            }
++    }
+ 
++    return CACHE_DESCRIPTOR_UNAVAILABLE;
++}
+ 
+ /* CPUID Leaf 4 constants: */
+ 
+ /* EAX: */
+-#define CPUID_4_TYPE_DCACHE  1
+-#define CPUID_4_TYPE_ICACHE  2
+-#define CPUID_4_TYPE_UNIFIED 3
++#define CACHE_TYPE_D    1
++#define CACHE_TYPE_I    2
++#define CACHE_TYPE_UNIFIED   3
+ 
+-#define CPUID_4_LEVEL(l)          ((l) << 5)
++#define CACHE_LEVEL(l)        (l << 5)
+ 
+-#define CPUID_4_SELF_INIT_LEVEL (1 << 8)
+-#define CPUID_4_FULLY_ASSOC     (1 << 9)
++#define CACHE_SELF_INIT_LEVEL (1 << 8)
+ 
+ /* EDX: */
+-#define CPUID_4_NO_INVD_SHARING (1 << 0)
+-#define CPUID_4_INCLUSIVE       (1 << 1)
+-#define CPUID_4_COMPLEX_IDX     (1 << 2)
++#define CACHE_NO_INVD_SHARING   (1 << 0)
++#define CACHE_INCLUSIVE       (1 << 1)
++#define CACHE_COMPLEX_IDX     (1 << 2)
++
++/* Encode CacheType for CPUID[4].EAX */
++#define CACHE_TYPE(t) (((t) == DCACHE)  ? CACHE_TYPE_D  : \
++                         ((t) == ICACHE)  ? CACHE_TYPE_I  : \
++                         ((t) == UNIFIED_CACHE) ? CACHE_TYPE_UNIFIED : \
++                         0 /* Invalid value */)
++
++
++/* Encode cache info for CPUID[4] */
++static void encode_cache_cpuid4(CPUCacheInfo *cache,
++                                int num_apic_ids, int num_cores,
++                                uint32_t *eax, uint32_t *ebx,
++                                uint32_t *ecx, uint32_t *edx)
++{
++    assert(cache->size == cache->line_size * cache->associativity *
++                          cache->partitions * cache->sets);
++
++    assert(num_apic_ids > 0);
++    *eax = CACHE_TYPE(cache->type) |
++           CACHE_LEVEL(cache->level) |
++           (cache->self_init ? CACHE_SELF_INIT_LEVEL : 0) |
++           ((num_cores - 1) << 26) |
++           ((num_apic_ids - 1) << 14);
++
++    assert(cache->line_size > 0);
++    assert(cache->partitions > 0);
++    assert(cache->associativity > 0);
++    /* We don't implement fully-associative caches */
++    assert(cache->associativity < cache->sets);
++    *ebx = (cache->line_size - 1) |
++           ((cache->partitions - 1) << 12) |
++           ((cache->associativity - 1) << 22);
++
++    assert(cache->sets > 0);
++    *ecx = cache->sets - 1;
++
++    *edx = (cache->no_invd_sharing ? CACHE_NO_INVD_SHARING : 0) |
++           (cache->inclusive ? CACHE_INCLUSIVE : 0) |
++           (cache->complex_indexing ? CACHE_COMPLEX_IDX : 0);
++}
++
++/* Encode cache info for CPUID[0x80000005].ECX or CPUID[0x80000005].EDX */
++static uint32_t encode_cache_cpuid80000005(CPUCacheInfo *cache)
++{
++    assert(cache->size % 1024 == 0);
++    assert(cache->lines_per_tag > 0);
++    assert(cache->associativity > 0);
++    assert(cache->line_size > 0);
++    return ((cache->size / 1024) << 24) | (cache->associativity << 16) |
++           (cache->lines_per_tag << 8) | (cache->line_size);
++}
+ 
+ #define ASSOC_FULL 0xFF
+ 
+@@ -100,57 +307,140 @@
+                           a == ASSOC_FULL ? 0xF : \
+                           0 /* invalid value */)
+ 
++/*
++ * Encode cache info for CPUID[0x80000006].ECX and CPUID[0x80000006].EDX
++ * @l3 can be NULL.
++ */
++static void encode_cache_cpuid80000006(CPUCacheInfo *l2,
++                                       CPUCacheInfo *l3,
++                                       uint32_t *ecx, uint32_t *edx)
++{
++    assert(l2->size % 1024 == 0);
++    assert(l2->associativity > 0);
++    assert(l2->lines_per_tag > 0);
++    assert(l2->line_size > 0);
++    *ecx = ((l2->size / 1024) << 16) |
++           (AMD_ENC_ASSOC(l2->associativity) << 12) |
++           (l2->lines_per_tag << 8) | (l2->line_size);
++
++    if (l3) {
++        assert(l3->size % (512 * 1024) == 0);
++        assert(l3->associativity > 0);
++        assert(l3->lines_per_tag > 0);
++        assert(l3->line_size > 0);
++        *edx = ((l3->size / (512 * 1024)) << 18) |
++               (AMD_ENC_ASSOC(l3->associativity) << 12) |
++               (l3->lines_per_tag << 8) | (l3->line_size);
++    } else {
++        *edx = 0;
++    }
++}
+ 
+ /* Definitions of the hardcoded cache entries we expose: */
+ 
+ /* L1 data cache: */
+-#define L1D_LINE_SIZE         64
+-#define L1D_ASSOCIATIVITY      8
+-#define L1D_SETS              64
+-#define L1D_PARTITIONS         1
+-/* Size = LINE_SIZE*ASSOCIATIVITY*SETS*PARTITIONS = 32KiB */
+-#define L1D_DESCRIPTOR CPUID_2_L1D_32KB_8WAY_64B
++static CPUCacheInfo l1d_cache = {
++    .type = DCACHE,
++    .level = 1,
++    .size = 32 * KiB,
++    .self_init = 1,
++    .line_size = 64,
++    .associativity = 8,
++    .sets = 64,
++    .partitions = 1,
++    .no_invd_sharing = true,
++};
++
+ /*FIXME: CPUID leaf 0x80000005 is inconsistent with leaves 2 & 4 */
+-#define L1D_LINES_PER_TAG      1
+-#define L1D_SIZE_KB_AMD       64
+-#define L1D_ASSOCIATIVITY_AMD  2
++static CPUCacheInfo l1d_cache_amd = {
++    .type = DCACHE,
++    .level = 1,
++    .size = 64 * KiB,
++    .self_init = 1,
++    .line_size = 64,
++    .associativity = 2,
++    .sets = 512,
++    .partitions = 1,
++    .lines_per_tag = 1,
++    .no_invd_sharing = true,
++};
+ 
+ /* L1 instruction cache: */
+-#define L1I_LINE_SIZE         64
+-#define L1I_ASSOCIATIVITY      8
+-#define L1I_SETS              64
+-#define L1I_PARTITIONS         1
+-/* Size = LINE_SIZE*ASSOCIATIVITY*SETS*PARTITIONS = 32KiB */
+-#define L1I_DESCRIPTOR CPUID_2_L1I_32KB_8WAY_64B
++static CPUCacheInfo l1i_cache = {
++    .type = ICACHE,
++    .level = 1,
++    .size = 32 * KiB,
++    .self_init = 1,
++    .line_size = 64,
++    .associativity = 8,
++    .sets = 64,
++    .partitions = 1,
++    .no_invd_sharing = true,
++};
++
+ /*FIXME: CPUID leaf 0x80000005 is inconsistent with leaves 2 & 4 */
+-#define L1I_LINES_PER_TAG      1
+-#define L1I_SIZE_KB_AMD       64
+-#define L1I_ASSOCIATIVITY_AMD  2
++static CPUCacheInfo l1i_cache_amd = {
++    .type = ICACHE,
++    .level = 1,
++    .size = 64 * KiB,
++    .self_init = 1,
++    .line_size = 64,
++    .associativity = 2,
++    .sets = 512,
++    .partitions = 1,
++    .lines_per_tag = 1,
++    .no_invd_sharing = true,
++};
+ 
+ /* Level 2 unified cache: */
+-#define L2_LINE_SIZE          64
+-#define L2_ASSOCIATIVITY      16
+-#define L2_SETS             4096
+-#define L2_PARTITIONS          1
+-/* Size = LINE_SIZE*ASSOCIATIVITY*SETS*PARTITIONS = 4MiB */
++static CPUCacheInfo l2_cache = {
++    .type = UNIFIED_CACHE,
++    .level = 2,
++    .size = 4 * MiB,
++    .self_init = 1,
++    .line_size = 64,
++    .associativity = 16,
++    .sets = 4096,
++    .partitions = 1,
++    .no_invd_sharing = true,
++};
++
+ /*FIXME: CPUID leaf 2 descriptor is inconsistent with CPUID leaf 4 */
+-#define L2_DESCRIPTOR CPUID_2_L2_2MB_8WAY_64B
++static CPUCacheInfo l2_cache_cpuid2 = {
++    .type = UNIFIED_CACHE,
++    .level = 2,
++    .size = 2 * MiB,
++    .line_size = 64,
++    .associativity = 8,
++};
++
++
+ /*FIXME: CPUID leaf 0x80000006 is inconsistent with leaves 2 & 4 */
+-#define L2_LINES_PER_TAG       1
+-#define L2_SIZE_KB_AMD       512
++static CPUCacheInfo l2_cache_amd = {
++    .type = UNIFIED_CACHE,
++    .level = 2,
++    .size = 512 * KiB,
++    .line_size = 64,
++    .lines_per_tag = 1,
++    .associativity = 16,
++    .sets = 512,
++    .partitions = 1,
++};
+ 
+ /* Level 3 unified cache: */
+-#define L3_SIZE_KB             0 /* disabled */
+-#define L3_ASSOCIATIVITY       0 /* disabled */
+-#define L3_LINES_PER_TAG       0 /* disabled */
+-#define L3_LINE_SIZE           0 /* disabled */
+-#define L3_N_LINE_SIZE         64
+-#define L3_N_ASSOCIATIVITY     16
+-#define L3_N_SETS           16384
+-#define L3_N_PARTITIONS         1
+-#define L3_N_DESCRIPTOR CPUID_2_L3_16MB_16WAY_64B
+-#define L3_N_LINES_PER_TAG      1
+-#define L3_N_SIZE_KB_AMD    16384
++static CPUCacheInfo l3_cache = {
++    .type = UNIFIED_CACHE,
++    .level = 3,
++    .size = 16 * MiB,
++    .line_size = 64,
++    .associativity = 16,
++    .sets = 16384,
++    .partitions = 1,
++    .lines_per_tag = 1,
++    .self_init = true,
++    .inclusive = true,
++    .complex_indexing = true,
++};
+ 
+ /* TLB definitions: */
+ 
+@@ -3301,85 +3591,53 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+         if (!cpu->enable_l3_cache) {
+             *ecx = 0;
+         } else {
+-            *ecx = L3_N_DESCRIPTOR;
++            *ecx = cpuid2_cache_descriptor(&l3_cache);
+         }
+-        *edx = (L1D_DESCRIPTOR << 16) | \
+-               (L1I_DESCRIPTOR <<  8) | \
+-               (L2_DESCRIPTOR);
++        *edx = (cpuid2_cache_descriptor(&l1d_cache) << 16) |
++               (cpuid2_cache_descriptor(&l1i_cache) <<  8) |
++               (cpuid2_cache_descriptor(&l2_cache_cpuid2));
+         break;
+     case 4:
+         /* cache info: needed for Core compatibility */
+         if (cpu->cache_info_passthrough) {
+             host_cpuid(index, count, eax, ebx, ecx, edx);
++            /* QEMU gives out its own APIC IDs, never pass down bits 31..26.  */
+             *eax &= ~0xFC000000;
++            if ((*eax & 31) && cs->nr_cores > 1) {
++                *eax |= (cs->nr_cores - 1) << 26;
++            }
+         } else {
+             *eax = 0;
+             switch (count) {
+             case 0: /* L1 dcache info */
+-                *eax |= CPUID_4_TYPE_DCACHE | \
+-                        CPUID_4_LEVEL(1) | \
+-                        CPUID_4_SELF_INIT_LEVEL;
+-                *ebx = (L1D_LINE_SIZE - 1) | \
+-                       ((L1D_PARTITIONS - 1) << 12) | \
+-                       ((L1D_ASSOCIATIVITY - 1) << 22);
+-                *ecx = L1D_SETS - 1;
+-                *edx = CPUID_4_NO_INVD_SHARING;
++                encode_cache_cpuid4(&l1d_cache,
++                                    1, cs->nr_cores,
++                                    eax, ebx, ecx, edx);
+                 break;
+             case 1: /* L1 icache info */
+-                *eax |= CPUID_4_TYPE_ICACHE | \
+-                        CPUID_4_LEVEL(1) | \
+-                        CPUID_4_SELF_INIT_LEVEL;
+-                *ebx = (L1I_LINE_SIZE - 1) | \
+-                       ((L1I_PARTITIONS - 1) << 12) | \
+-                       ((L1I_ASSOCIATIVITY - 1) << 22);
+-                *ecx = L1I_SETS - 1;
+-                *edx = CPUID_4_NO_INVD_SHARING;
++                encode_cache_cpuid4(&l1i_cache,
++                                    1, cs->nr_cores,
++                                    eax, ebx, ecx, edx);
+                 break;
+             case 2: /* L2 cache info */
+-                *eax |= CPUID_4_TYPE_UNIFIED | \
+-                        CPUID_4_LEVEL(2) | \
+-                        CPUID_4_SELF_INIT_LEVEL;
+-                if (cs->nr_threads > 1) {
+-                    *eax |= (cs->nr_threads - 1) << 14;
+-                }
+-                *ebx = (L2_LINE_SIZE - 1) | \
+-                       ((L2_PARTITIONS - 1) << 12) | \
+-                       ((L2_ASSOCIATIVITY - 1) << 22);
+-                *ecx = L2_SETS - 1;
+-                *edx = CPUID_4_NO_INVD_SHARING;
++                encode_cache_cpuid4(&l2_cache,
++                                    cs->nr_threads, cs->nr_cores,
++                                    eax, ebx, ecx, edx);
+                 break;
+             case 3: /* L3 cache info */
+-                if (!cpu->enable_l3_cache) {
+-                    *eax = 0;
+-                    *ebx = 0;
+-                    *ecx = 0;
+-                    *edx = 0;
++                pkg_offset = apicid_pkg_offset(cs->nr_cores, cs->nr_threads);
++                if (cpu->enable_l3_cache) {
++                    encode_cache_cpuid4(&l3_cache,
++                                        (1 << pkg_offset), cs->nr_cores,
++                                        eax, ebx, ecx, edx);
+                     break;
+                 }
+-                *eax |= CPUID_4_TYPE_UNIFIED | \
+-                        CPUID_4_LEVEL(3) | \
+-                        CPUID_4_SELF_INIT_LEVEL;
+-                pkg_offset = apicid_pkg_offset(cs->nr_cores, cs->nr_threads);
+-                *eax |= ((1 << pkg_offset) - 1) << 14;
+-                *ebx = (L3_N_LINE_SIZE - 1) | \
+-                       ((L3_N_PARTITIONS - 1) << 12) | \
+-                       ((L3_N_ASSOCIATIVITY - 1) << 22);
+-                *ecx = L3_N_SETS - 1;
+-                *edx = CPUID_4_INCLUSIVE | CPUID_4_COMPLEX_IDX;
+-                break;
++                /* fall through */
+             default: /* end of info */
+-                *eax = 0;
+-                *ebx = 0;
+-                *ecx = 0;
+-                *edx = 0;
++                *eax = *ebx = *ecx = *edx = 0;
+                 break;
+             }
+         }
+-
+-        /* QEMU gives out its own APIC IDs, never pass down bits 31..26.  */
+-        if ((*eax & 31) && cs->nr_cores > 1) {
+-            *eax |= (cs->nr_cores - 1) << 26;
+-        }
+         break;
+     case 5:
+         /* mwait info: needed for Core compatibility */
+@@ -3583,10 +3841,8 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+                (L1_ITLB_2M_ASSOC <<  8) | (L1_ITLB_2M_ENTRIES);
+         *ebx = (L1_DTLB_4K_ASSOC << 24) | (L1_DTLB_4K_ENTRIES << 16) | \
+                (L1_ITLB_4K_ASSOC <<  8) | (L1_ITLB_4K_ENTRIES);
+-        *ecx = (L1D_SIZE_KB_AMD << 24) | (L1D_ASSOCIATIVITY_AMD << 16) | \
+-               (L1D_LINES_PER_TAG << 8) | (L1D_LINE_SIZE);
+-        *edx = (L1I_SIZE_KB_AMD << 24) | (L1I_ASSOCIATIVITY_AMD << 16) | \
+-               (L1I_LINES_PER_TAG << 8) | (L1I_LINE_SIZE);
++        *ecx = encode_cache_cpuid80000005(&l1d_cache_amd);
++        *edx = encode_cache_cpuid80000005(&l1i_cache_amd);
+         break;
+     case 0x80000006:
+         /* cache info (L2 cache) */
+@@ -3602,18 +3858,9 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+                (L2_DTLB_4K_ENTRIES << 16) | \
+                (AMD_ENC_ASSOC(L2_ITLB_4K_ASSOC) << 12) | \
+                (L2_ITLB_4K_ENTRIES);
+-        *ecx = (L2_SIZE_KB_AMD << 16) | \
+-               (AMD_ENC_ASSOC(L2_ASSOCIATIVITY) << 12) | \
+-               (L2_LINES_PER_TAG << 8) | (L2_LINE_SIZE);
+-        if (!cpu->enable_l3_cache) {
+-            *edx = ((L3_SIZE_KB / 512) << 18) | \
+-                   (AMD_ENC_ASSOC(L3_ASSOCIATIVITY) << 12) | \
+-                   (L3_LINES_PER_TAG << 8) | (L3_LINE_SIZE);
+-        } else {
+-            *edx = ((L3_N_SIZE_KB_AMD / 512) << 18) | \
+-                   (AMD_ENC_ASSOC(L3_N_ASSOCIATIVITY) << 12) | \
+-                   (L3_N_LINES_PER_TAG << 8) | (L3_N_LINE_SIZE);
+-        }
++        encode_cache_cpuid80000006(&l2_cache_amd,
++                                   cpu->enable_l3_cache ? &l3_cache : NULL,
++                                   ecx, edx);
+         break;
+     case 0x80000007:
+         *eax = 0;
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 1b219fafc4..fa03e2ced4 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1044,6 +1044,59 @@ typedef enum TPRAccess {
+     TPR_ACCESS_WRITE,
+ } TPRAccess;
+ 
++/* Cache information data structures: */
++
++enum CacheType {
++    DCACHE,
++    ICACHE,
++    UNIFIED_CACHE
++};
++
++typedef struct CPUCacheInfo {
++    enum CacheType type;
++    uint8_t level;
++    /* Size in bytes */
++    uint32_t size;
++    /* Line size, in bytes */
++    uint16_t line_size;
++    /*
++     * Associativity.
++     * Note: representation of fully-associative caches is not implemented
++     */
++    uint8_t associativity;
++    /* Physical line partitions. CPUID[0x8000001D].EBX, CPUID[4].EBX */
++    uint8_t partitions;
++    /* Number of sets. CPUID[0x8000001D].ECX, CPUID[4].ECX */
++    uint32_t sets;
++    /*
++     * Lines per tag.
++     * AMD-specific: CPUID[0x80000005], CPUID[0x80000006].
++     * (Is this synonym to @partitions?)
++     */
++    uint8_t lines_per_tag;
++
++    /* Self-initializing cache */
++    bool self_init;
++    /*
++     * WBINVD/INVD is not guaranteed to act upon lower level caches of
++     * non-originating threads sharing this cache.
++     * CPUID[4].EDX[bit 0], CPUID[0x8000001D].EDX[bit 0]
++     */
++    bool no_invd_sharing;
++    /*
++     * Cache is inclusive of lower cache levels.
++     * CPUID[4].EDX[bit 1], CPUID[0x8000001D].EDX[bit 1].
++     */
++    bool inclusive;
++    /*
++     * A complex function is used to index the cache, potentially using all
++     * address bits.  CPUID[4].EDX[bit 2].
++     */
++    bool complex_indexing;
++} CPUCacheInfo;
++
++
++
+ typedef struct CPUX86State {
+     /* standard registers */
+     target_ulong regs[CPU_NB_REGS];
+-- 
 2.17.0
