@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fGp4C-0001FP-F2
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 13:09:22 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fGp4X-0002JV-I5
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 13:09:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fGp47-000419-HL
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 13:09:20 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49610 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fGp47-00040v-BV
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 13:09:15 -0400
-References: <20180510143618.23673-1-peter.maydell@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <38f1b68c-08a5-dd19-26c0-5005ad6943c0@redhat.com>
-Date: Thu, 10 May 2018 19:09:12 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fGp4W-00049X-JQ
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 13:09:41 -0400
+Received: from mail-oi0-x22e.google.com ([2607:f8b0:4003:c06::22e]:35876)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fGp4W-00049J-Dy
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 13:09:40 -0400
+Received: by mail-oi0-x22e.google.com with SMTP id v2-v6so2402102oif.3
+	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 10:09:40 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180510143618.23673-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] atomic.h: Work around gcc spurious "unused
- value" warning
+In-Reply-To: <20180502221552.3873-1-richard.henderson@linaro.org>
+References: <20180502221552.3873-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 10 May 2018 18:09:19 +0100
+Message-ID: <CAFEAcA_wNfL2YqWB6xykyf2UbTjwViodUt8AvdRS+HA+RMssuw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 00/14] target/arm: Fixups for
+ ARM_FEATURE_V8_FP16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On 10/05/2018 16:36, Peter Maydell wrote:
-> Some versions of gcc produce a spurious warning if the result of
-> __atomic_compare_echange_n() is not used and the type involved
-> is a signed 8 bit value:
->   error: value computed is not used [-Werror=unused-value]
-> This has been seen on at least
->  gcc (Ubuntu 5.4.0-6ubuntu1~16.04.9) 5.4.0 20160609
-> 
-> Work around this by using an explicit cast to void to indicate
-> that we don't care about the return value.
-> 
-> We don't currently use our atomic_cmpxchg() macro on any signed
-> 8 bit types, but the upcoming support for the Arm v8.1-Atomics
-> will require it.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> Sending out my workaround as an actual patch. If this is OK I'll
-> put in via target-arm.next as it's a dependency for the v8.1-atomics
-> series.
+On 2 May 2018 at 23:15, Richard Henderson <richard.henderson@linaro.org> wrote:
+> When running the gcc testsuite with current aarch64-linux-user,
+> the testsuite detects the presence of the fp16 extension and
+> enables lots of extra tests for builtins.
+>
+> Quite a few of these new tests fail because we missed implementing
+> some instructions.  We really should go back and verify that nothing
+> else is missing from this (rather large) extension.
+>
+> In addition, it tests some edge conditions on data that show flaws
+> in the way we were performing integer<->fp conversion; particularly
+> with respect to scaled conversion.
+>
+> Changes since v1:
+>   * Rebased vs master instead of tgt-arm-sve-9.
+>   * Alex did some additional digging through the ARM xhtml
+>     and came up with some additional missing instructions.
+>   * Everything cc'd to qemu-stable.
 
-Yes, please go ahead!
+I'm going to take patches 1..4 into target-arm.next, just to
+reduce the size of this a bit. Patch 5 is the FMOV one which
+is missing some decode. Otherwise I've reviewed all the ones
+which still needed review. Don't forget to fix the patch 12
+patchew warning:
+ERROR: space required before the open parenthesis '('
+#41: FILE: target/arm/translate-a64.c:4683:
++    switch(type) {
 
-Paolo
-
->  include/qemu/atomic.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/include/qemu/atomic.h b/include/qemu/atomic.h
-> index d73c9e14d7..9ed39effd3 100644
-> --- a/include/qemu/atomic.h
-> +++ b/include/qemu/atomic.h
-> @@ -187,7 +187,7 @@
->  /* Returns the eventual value, failed or not */
->  #define atomic_cmpxchg__nocheck(ptr, old, new)    ({                    \
->      typeof_strip_qual(*ptr) _old = (old);                               \
-> -    __atomic_compare_exchange_n(ptr, &_old, new, false,                 \
-> +    (void)__atomic_compare_exchange_n(ptr, &_old, new, false,           \
->                                __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);      \
->      _old;                                                               \
->  })
-> 
+thanks
+-- PMM
