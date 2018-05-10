@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fGn6i-0006Ll-Ce
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 11:03:49 -0400
+	(envelope-from <renyime@gmail.com>) id 1fGn7H-0006yO-O3
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 11:04:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fGn6h-00031i-Jj
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 11:03:48 -0400
-Received: from mail-ot0-x22b.google.com ([2607:f8b0:4003:c0f::22b]:37652)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fGn6h-00031T-Dn
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 11:03:47 -0400
-Received: by mail-ot0-x22b.google.com with SMTP id 77-v6so2655650otd.4
-	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 08:03:47 -0700 (PDT)
+	(envelope-from <renyime@gmail.com>) id 1fGn7G-0003GO-4v
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 11:04:23 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180508151437.4232-1-richard.henderson@linaro.org>
-References: <20180508151437.4232-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 10 May 2018 16:03:26 +0100
-Message-ID: <CAFEAcA-G6XmdJo9oD1oBO_GU4k+vvjz4dAc2FX4VOLYfTjBg_w@mail.gmail.com>
+References: <1525782441-2224-1-git-send-email-ivanren@tencent.com>
+In-Reply-To: <1525782441-2224-1-git-send-email-ivanren@tencent.com>
+From: Ivan Ren <renyime@gmail.com>
+Date: Thu, 10 May 2018 15:04:02 +0000
+Message-ID: <CA+6E1==5QPpUwF177Ot2fYX_tF-5E1=4dL46jxTCDUEVRabd9Q@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 00/10] target/arm: Implement v8.1-Atomics
+Subject: Re: [Qemu-devel] [PATCH] qcow2: fix preallocation with metadata on
+ bare block device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +22,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: mreitz@redhat.com, kwolf@redhat.com
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-On 8 May 2018 at 16:14, Richard Henderson <richard.henderson@linaro.org> wrote:
-> This implements the Atomics extension, which is mandatory for v8.1.
-> While testing the v8.2-SVE extension, I've run into issues with the
-> GCC testsuite expecting this to exist.
+ping for review
+
+On Tue, May 8, 2018 at 8:27 PM Ivan Ren <renyime@gmail.com> wrote:
+
+> Create a qcow2 directly on bare block device with
+> "-o preallocation=metadata" option. When read this qcow2, it will
+> return dirty data of block device. This patch add QCOW_OFLAG_ZERO
+> for all preallocated l2 entry if the underlying device is a bare
+> block device.
 >
-> Missing is the wiring up of the system registers to indicate that
-> the extension exists, but we have no system CPU model that would
-> exercise such a setting.
+> Signed-off-by: Ivan Ren <ivanren@tencent.com>
+> ---
+>  block/qcow2-cluster.c |  5 +++--
+>  block/qcow2.c         | 19 ++++++++++++++++---
+>  block/qcow2.h         |  3 ++-
+>  3 files changed, 21 insertions(+), 6 deletions(-)
 >
-> Changes since v3:
->   * Patch 8: Do not zero-extend X[s] via the third parameter
->     to read_cpu_reg.
+> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+> index 1aee726..b9e0ceb 100644
+> --- a/block/qcow2-cluster.c
+> +++ b/block/qcow2-cluster.c
+> @@ -919,7 +919,8 @@ fail:
+>      return ret;
+>  }
 >
-> Changes since v2:
->   * New patch to use a helper macro for opposite-endian
->     atomic_fetch_add and atomic_add_fetch, as suggested
->     by pm215.
->   * Introduce ARM_FEATURE_V8_1 and define ARM_FEATURE_V8_ATOMICS
->     in terms of that, reinforcing the mandatory nature of
->     the extension.
->   * Typo fix in patch 8
-
-
-
-Applied to target-arm.next (with the atomics.h workaround first
-and the removal of ARM_FEATURE_V8_1), thanks.
-
--- PMM
+> -int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
+> +int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m,
+> +                                uint64_t flags)
+>  {
+>      BDRVQcow2State *s = bs->opaque;
+>      int i, j = 0, l2_index, ret;
+> @@ -969,7 +970,7 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs,
+> QCowL2Meta *m)
+>          }
+>
+>          l2_slice[l2_index + i] = cpu_to_be64((cluster_offset +
+> -                    (i << s->cluster_bits)) | QCOW_OFLAG_COPIED);
+> +                    (i << s->cluster_bits)) | QCOW_OFLAG_COPIED | flags);
+>       }
+>
+>
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 2f36e63..093735c 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -2044,7 +2044,7 @@ static coroutine_fn int
+> qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+>          while (l2meta != NULL) {
+>              QCowL2Meta *next;
+>
+> -            ret = qcow2_alloc_cluster_link_l2(bs, l2meta);
+> +            ret = qcow2_alloc_cluster_link_l2(bs, l2meta, 0);
+>              if (ret < 0) {
+>                  goto fail;
+>              }
+> @@ -2534,6 +2534,7 @@ static void coroutine_fn preallocate_co(void *opaque)
+>      uint64_t host_offset = 0;
+>      unsigned int cur_bytes;
+>      int ret;
+> +    struct stat st;
+>      QCowL2Meta *meta;
+>
+>      qemu_co_mutex_lock(&s->lock);
+> @@ -2552,7 +2553,19 @@ static void coroutine_fn preallocate_co(void
+> *opaque)
+>          while (meta) {
+>              QCowL2Meta *next = meta->next;
+>
+> -            ret = qcow2_alloc_cluster_link_l2(bs, meta);
+> +            /* Check the underlying device type.
+> +             * If the underlying device is a block device, we add
+> +             * QCOW_OFLAG_ZERO for all preallocated l2 entry to ignore
+> dirty
+> +             * data on block device.
+> +             * If the underlying device can't be used with stat(return <
+> 0),
+> +             * treat it as a regular file.
+> +             */
+> +            if (stat(bs->filename, &st) < 0 || !S_ISBLK(st.st_mode)) {
+> +                ret = qcow2_alloc_cluster_link_l2(bs, meta, 0);
+> +            } else {
+> +                ret = qcow2_alloc_cluster_link_l2(bs, meta,
+> QCOW_OFLAG_ZERO);
+> +            }
+> +
+>              if (ret < 0) {
+>                  qcow2_free_any_clusters(bs, meta->alloc_offset,
+>                                          meta->nb_clusters,
+> QCOW2_DISCARD_NEVER);
+> @@ -3458,7 +3471,7 @@ static int qcow2_truncate(BlockDriverState *bs,
+> int64_t offset,
+>              };
+>              qemu_co_queue_init(&allocation.dependent_requests);
+>
+> -            ret = qcow2_alloc_cluster_link_l2(bs, &allocation);
+> +            ret = qcow2_alloc_cluster_link_l2(bs, &allocation, 0);
+>              if (ret < 0) {
+>                  error_setg_errno(errp, -ret, "Failed to update L2
+> tables");
+>                  qcow2_free_clusters(bs, host_offset,
+> diff --git a/block/qcow2.h b/block/qcow2.h
+> index adf5c39..9a59602 100644
+> --- a/block/qcow2.h
+> +++ b/block/qcow2.h
+> @@ -617,7 +617,8 @@ uint64_t
+> qcow2_alloc_compressed_cluster_offset(BlockDriverState *bs,
+>                                           uint64_t offset,
+>                                           int compressed_size);
+>
+> -int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m);
+> +int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m,
+> +                                uint64_t flags);
+>  int qcow2_cluster_discard(BlockDriverState *bs, uint64_t offset,
+>                            uint64_t bytes, enum qcow2_discard_type type,
+>                            bool full_discard);
+> --
+> 1.8.3.1
+>
+>
