@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fGmxd-0000ht-Lx
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 10:54:26 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fGn1w-0003l1-Fc
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 10:58:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fGmxc-0007VV-MZ
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 10:54:25 -0400
-References: <20180509165530.29561-1-mreitz@redhat.com>
-	<20180509165530.29561-7-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <105c40ee-d81a-2ebb-cd3a-63aa9e518d80@redhat.com>
-Date: Thu, 10 May 2018 09:54:18 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fGn1u-0000eE-02
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 10:58:52 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:44041)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fGn1t-0000e1-Q0
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 10:58:49 -0400
+Received: by mail-qt0-x241.google.com with SMTP id d3-v6so2903788qtp.11
+	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 07:58:49 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180510143618.23673-1-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <6bac6039-96dc-ba2c-b865-8afecbc60daa@amsat.org>
+Date: Thu, 10 May 2018 11:58:44 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180509165530.29561-7-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180510143618.23673-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 06/13] block: Add block-specific QDict
- header
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] atomic.h: Work around gcc spurious "unused
+ value" warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,69 +35,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, patches@linaro.org
 
-On 05/09/2018 11:55 AM, Max Reitz wrote:
-> There are numerous QDict functions that have been introduced for and are
-> used only by the block layer.  Move their declarations into an own
-
-s/an own/their own/
-
-> header file to reflect that.
+On 05/10/2018 11:36 AM, Peter Maydell wrote:
+> Some versions of gcc produce a spurious warning if the result of
+> __atomic_compare_echange_n() is not used and the type involved
+> is a signed 8 bit value:
+>   error: value computed is not used [-Werror=unused-value]
+> This has been seen on at least
+>  gcc (Ubuntu 5.4.0-6ubuntu1~16.04.9) 5.4.0 20160609
 > 
-> While qdict_extract_subqdict() is in fact used outside of the block
-> layer (in util/qemu-config.c), it is still a function related very
-> closely to how the block layer works with nested QDicts, namely by
-> sometimes flattening them.  Therefore, its declaration is put into this
-> header as well and util/qemu-config.c includes it with a comment stating
-> exactly which function it needs.
+> Work around this by using an explicit cast to void to indicate
+> that we don't care about the return value.
 > 
-> Suggested-by: Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> We don't currently use our atomic_cmpxchg() macro on any signed
+> 8 bit types, but the upcoming support for the Arm v8.1-Atomics
+> will require it.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 > ---
-
-> +++ b/include/block/qdict.h
-> @@ -0,0 +1,35 @@
-> +/*
-> + * Special QDict functions used by the block layer
-> + *
-> + * Copyright (c) 2018 Red Hat, Inc.
-
-You are extracting this from qdict.h which has:
-  * Copyright (C) 2009 Red Hat Inc.
-
-Is it worth listing 2009-2018, instead of just this year?
-
-
-> +
-> +void qdict_copy_default(QDict *dst, QDict *src, const char *key);
-> +void qdict_set_default_str(QDict *dst, const char *key, const char *val);
-
-These two might be useful outside of the block layer; we can move them 
-back in a later patch if so.  But for now, I agree with your choice of 
-moving them.
-
-> +
-> +void qdict_join(QDict *dest, QDict *src, bool overwrite);
-
-This is borderline whether it would be useful outside of the block layer.
-
-> +
-> +void qdict_extract_subqdict(QDict *src, QDict **dst, const char *start);
-> +void qdict_array_split(QDict *src, QList **dst);
-> +int qdict_array_entries(QDict *src, const char *subqdict);
-> +QObject *qdict_crumple(const QDict *src, Error **errp);
-> +void qdict_flatten(QDict *qdict);
-
-And these are definitely hacks that the block layer relies on, where 
-hopefully someday long term we can rewrite the block layer to use QAPI 
-types directly instead of constant reconversion between QemuOpts and 
-QDict and QAPI types.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> Sending out my workaround as an actual patch. If this is OK I'll
+> put in via target-arm.next as it's a dependency for the v8.1-atomics
+> series.
+> 
+>  include/qemu/atomic.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/include/qemu/atomic.h b/include/qemu/atomic.h
+> index d73c9e14d7..9ed39effd3 100644
+> --- a/include/qemu/atomic.h
+> +++ b/include/qemu/atomic.h
+> @@ -187,7 +187,7 @@
+>  /* Returns the eventual value, failed or not */
+>  #define atomic_cmpxchg__nocheck(ptr, old, new)    ({                    \
+>      typeof_strip_qual(*ptr) _old = (old);                               \
+> -    __atomic_compare_exchange_n(ptr, &_old, new, false,                 \
+> +    (void)__atomic_compare_exchange_n(ptr, &_old, new, false,           \
+>                                __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);      \
+>      _old;                                                               \
+>  })
+> 
