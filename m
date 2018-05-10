@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fGlVF-0005KL-9V
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 09:21:02 -0400
+	(envelope-from <eblake@redhat.com>) id 1fGlYi-00078j-6a
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 09:24:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fGlVC-00020a-3p
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 09:21:01 -0400
-References: <20180503154936.18946-1-david@redhat.com>
-	<19eb43f8-3bdc-fbfe-47c1-bcc1de7a64ba@redhat.com>
-	<20180510150206.1ff3ce22@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <692c9dc0-42d8-2909-6f76-2e181e15ba13@redhat.com>
-Date: Thu, 10 May 2018 15:20:55 +0200
+	(envelope-from <eblake@redhat.com>) id 1fGlYh-0002io-4b
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 09:24:36 -0400
+References: <20180508135436.30140-1-stefanha@redhat.com>
+	<20180508135436.30140-2-stefanha@redhat.com>
+	<aa220f7d-9aa1-f32d-14f0-35d6a8161032@redhat.com>
+	<20180510100537.GP1296@stefanha-x1.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <fd86c6a9-998d-cb22-bfa6-e33113fa13b0@redhat.com>
+Date: Thu, 10 May 2018 08:24:24 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180510150206.1ff3ce22@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180510100537.GP1296@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 0/8] MemoryDevice: introduce and use
- ResourceHandler
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] qemu-iotests: reduce chance of
+ races in 185
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,146 +27,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 10.05.2018 15:02, Igor Mammedov wrote:
-> On Wed, 9 May 2018 16:13:14 +0200
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> On 03.05.2018 17:49, David Hildenbrand wrote:
->>> Hotplug handlers usually have the following tasks:
->>> 1. Allocate some resources for a new device
->>> 2. Make the new device visible for the guest
->>> 3. Notify the guest about the new device
+On 05/10/2018 05:05 AM, Stefan Hajnoczi wrote:
+
+>>> Add sleep 0.5 to reduce the chance of races.  This is not a real fix but
+>>> appears to reduce spurious failures in practice.
 >>>
->>> Hotplug handlers have right now one limitation: They handle their own
->>> context and only care about resources they manage.
->>>
->>> We can have devices that need certain other resources that are e.g.
->>> system resources managed by the machine. We need a clean way to assign
->>> these resources (without violating layers as brought up by Igor).
->>>
->>> One example is virtio-mem/virtio-pmem. Both device types need to be
->>> assigned some region in guest physical address space. This device memory
->>> belongs to the machine and is managed by it. However, virito devices are
->>> hotplugged using the hotplug handler their proxy device implements. So we
->>> could trigger e.g. a PCI hotplug handler for virtio-pci or a CSS/CCW
->>> hotplug handler for virtio-ccw. But definetly not the machine.
->>>
->>> So let's generalize the task of "assigning" resources and use it directly
->>> for memory devices. We now have a clean way to support any kind of memory
->>> device - independent of the underlying device type. Right now, only one
->>> resource handler per device can be supported (in addition to the existing
->>> hotplug handler).
->>>
->>> You can find more details in patch nr 2.
->>>
->>> This work is based on the already queued patch series
->>>     "[PATCH v4 00/11] pc-dimm: factor out MemoryDevice"
->>>
->>> David Hildenbrand (8):
->>>   memory-device: always compile support for memory devices for SOFTMMU
->>>   qdev: introduce ResourceHandler as a first-stage hotplug handler
->>>   machine: provide default resource handler
->>>   memory-device: new functions to handle resource assignment
->>>   pc-dimm: implement new memory device functions
->>>   machine: introduce enforce_memory_device_align() and add it for pc
->>>   memory-device: factor out pre-assign into default resource handler
->>>   memory-device: factor out (un)assign into default resource handler
->>>
->>>  hw/Makefile.objs               |   2 +-
->>>  hw/core/Makefile.objs          |   1 +
->>>  hw/core/machine.c              |  70 +++++++++++++++++++++++
->>>  hw/core/qdev.c                 |  41 +++++++++++++-
->>>  hw/core/resource-handler.c     |  57 +++++++++++++++++++
->>>  hw/i386/pc.c                   |  31 ++++++-----
->>>  hw/mem/Makefile.objs           |   2 +-
->>>  hw/mem/memory-device.c         | 122 +++++++++++++++++++++++++----------------
->>>  hw/mem/pc-dimm.c               |  53 ++++++++----------
->>>  hw/mem/trace-events            |   4 +-
->>>  hw/ppc/spapr.c                 |   5 +-
->>>  include/hw/boards.h            |  17 ++++++
->>>  include/hw/mem/memory-device.h |  17 ++++--
->>>  include/hw/mem/pc-dimm.h       |   3 +-
->>>  include/hw/resource-handler.h  |  46 ++++++++++++++++
->>>  stubs/Makefile.objs            |   1 -
->>>  stubs/qmp_memory_device.c      |  13 -----
->>>  17 files changed, 364 insertions(+), 121 deletions(-)
->>>  create mode 100644 hw/core/resource-handler.c
->>>  create mode 100644 include/hw/resource-handler.h
->>>  delete mode 100644 stubs/qmp_memory_device.c
->>>   
+>>> Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>>> ---
+>>>    tests/qemu-iotests/185 | 12 ++++++++++++
+>>>    1 file changed, 12 insertions(+)
 >>
->> If there are no further comments, I'll send a v2 by the end of this
->> week. Thanks!
-> I couldn't convince myself that ResourceHandler is really necessary.
-> My main gripe with it, is that it imposes specific ordering wrt hotplug
-> handler that resources will be touched. Other issue is that it looks
-> a bit over-engineered with a lot of code fragmentation. Hence,
+>> I'm not opposed to this patch, but is there any way to write the test to
+>> take both events in either order, without logging the events as they arrive,
+>> but instead summarizing in a deterministic order which events were received
+>> after the fact?  That way, no matter which way the race is won, we merely
+>> log that we got two expected events, and could avoid the extra sleep.
 > 
-> I'd suggest use simple hotplug handler chaining instead,
-> which should take care of wiring up virtio-mem/virtio-pmem,
-> keeping code compact at the same time.
+> I don't think there is a practical way of doing that without big changes
+> to the test.  It could be rewritten in Python to make filtering the QMP
+> events easier.
+> 
+> Hiding the race doesn't solve the deeper problem though: the test case
+> doesn't exercise the same code path each time.  The test should really
+> cover all cancellation points in the block job lifecycle instead of just
+> one at random.  If we solve this problem then we don't need to filter
+> the QMP event sequence.
+> 
+> Maybe it can be done with blkdebug.  If not then maybe a blockjobdbg
+> interface is necessary to perform deterministic tests (eliminating the
+> need for the ratelimiting trick used by this test!).
 
-I'll have a look tomorrow or next friday if that could work - not sure
-yet about unplug vs. unplug requests. Unplug requests might be tricky.
-Would be nice if it would work. Thanks!
+So trying to restate your question - can blkdebug be used to pause I/O, 
+or does it just cause an error?  If the rate limiting is in effect, then 
+we expect that the job will only write to the first half of a 
+destination, so a blkdebug injected error for writes to the second half 
+would either not trigger (the normal cancel won the race) or does 
+trigger (the job advanced before the normal cancel, but blkdebug's 
+injected error also serves as a means of cancelling the job, so while 
+we'd have to filter things, we at least have a deterministic way of 
+ending the job before it runs to completion). Except that I'm writing 
+that without even re-reading the test in question to see how it would 
+all fit in.  It may or may not be worth pursuing.
 
 > 
-> Could you try something along these lines (I'll post a patch to
-> override default hotplug handler as reply here for you to pick up,
-> that should make following work):
-> 
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 100dfdc..c400c0c 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -393,12 +393,30 @@ static void s390_machine_reset(void)
->      s390_ipl_prepare_cpu(ipl_cpu);
->      s390_cpu_set_state(S390_CPU_STATE_OPERATING, ipl_cpu);
->  }
-> +static void s390_machine_device_pre_plug(HotplugHandler *hotplug_dev,
-> +                                         DeviceState *dev, Error **errp)
-> +{
-> +    if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_CCW)) {
-> +        /* do checks && set default values if it weren't set by user */
-> +        /* possibly pass to device's bus pre_plug handler if need */
-> +    }
-> +}
->  
->  static void s390_machine_device_plug(HotplugHandler *hotplug_dev,
->                                       DeviceState *dev, Error **errp)
->  {
->      if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
->          s390_cpu_plug(hotplug_dev, dev, errp);
-> +    } if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_CCW)) {
-> +        HotplugHandler *hotplug_ctrl = dev->parent_bus->hotplug_handler;
-> +
-> +        /* do machine specific wiring, i.e.
-> +         * assign resources specified by user or by foo_pre_plug(),
-> +         * like map region into machine address space at specified address */
-> +        if (OK) {
-> +            /* pass control down to bus specific hotplug chain */
-> +            hotplug_handler_plug(hotplug_ctrl, dev, errp);
-> +        }
->      }
->  }
->  
-> @@ -449,6 +467,8 @@ static HotplugHandler *s390_get_hotplug_handler(MachineState *machine,
->  {
->      if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
->          return HOTPLUG_HANDLER(machine);
-> +    } (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM)) {
-> +        return HOTPLUG_HANDLER(machine);
->      }
->      return NULL;
->  }
-> 
+> Please share ideas, but I think this is a long-term item that shouldn't
+> block this series.
 
+I agree that any further improvements don't need to hold up this patch 
+from making things at least more reliable, even if not perfect.  So:
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 -- 
-
-Thanks,
-
-David / dhildenb
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
