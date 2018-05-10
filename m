@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fGpdJ-0005AG-7t
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 13:45:38 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fGpdH-00057W-4Z
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 13:45:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fGpdI-0000wc-CR
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 13:45:37 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41608)
+	(envelope-from <pm215@archaic.org.uk>) id 1fGpdF-0000uW-GS
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 13:45:35 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41604)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fGpdI-0000vB-68
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 13:45:36 -0400
+	id 1fGpdF-0000tL-7C
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 13:45:33 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fGpdG-0003b7-UG
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 18:45:34 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fGpdE-0003ZJ-0W
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 18:45:32 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 10 May 2018 18:45:16 +0100
-Message-Id: <20180510174519.11264-19-peter.maydell@linaro.org>
+Date: Thu, 10 May 2018 18:45:12 +0100
+Message-Id: <20180510174519.11264-15-peter.maydell@linaro.org>
 In-Reply-To: <20180510174519.11264-1-peter.maydell@linaro.org>
 References: <20180510174519.11264-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 18/21] target/arm: Implement vector shifted
- SCVF/UCVF for fp16
+Subject: [Qemu-devel] [PULL 14/21] target/arm: Introduce
+ ARM_FEATURE_V8_ATOMICS and initial decode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,76 +32,279 @@ To: qemu-devel@nongnu.org
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-While we have some of the scalar paths for *CVF for fp16,
-we failed to decode the fp16 version of these instructions.
+The insns in the ARMv8.1-Atomics are added to the existing
+load/store exclusive and load/store reg opcode spaces.
+Rearrange the top-level decoders for these to accomodate.
+The Atomics insns themselves still generate Unallocated.
 
-Cc: qemu-stable@nongnu.org
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20180502221552.3873-2-richard.henderson@linaro.org
+Message-id: 20180508151437.4232-8-richard.henderson@linaro.org
+[PMM: Drop the ARM_FEATURE_V8_1 feature flag]
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate-a64.c | 33 ++++++++++++++++++++-------------
- 1 file changed, 20 insertions(+), 13 deletions(-)
+ target/arm/cpu.h           |   1 +
+ linux-user/elfload.c       |   1 +
+ target/arm/translate-a64.c | 182 +++++++++++++++++++++++++++----------
+ 3 files changed, 138 insertions(+), 46 deletions(-)
 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 44e6b77151..3b086be570 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -1449,6 +1449,7 @@ enum arm_features {
+     ARM_FEATURE_V8_SHA3, /* implements SHA3 part of v8 Crypto Extensions */
+     ARM_FEATURE_V8_SM3, /* implements SM3 part of v8 Crypto Extensions */
+     ARM_FEATURE_V8_SM4, /* implements SM4 part of v8 Crypto Extensions */
++    ARM_FEATURE_V8_ATOMICS, /* ARMv8.1-Atomics feature */
+     ARM_FEATURE_V8_RDM, /* implements v8.1 simd round multiply */
+     ARM_FEATURE_V8_FP16, /* implements v8.2 half-precision float */
+     ARM_FEATURE_V8_FCMA, /* has complex number part of v8.3 extensions.  */
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 36d52194bc..13bc78d0c8 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -581,6 +581,7 @@ static uint32_t get_elf_hwcap(void)
+     GET_FEATURE(ARM_FEATURE_V8_SHA512, ARM_HWCAP_A64_SHA512);
+     GET_FEATURE(ARM_FEATURE_V8_FP16,
+                 ARM_HWCAP_A64_FPHP | ARM_HWCAP_A64_ASIMDHP);
++    GET_FEATURE(ARM_FEATURE_V8_ATOMICS, ARM_HWCAP_A64_ATOMICS);
+     GET_FEATURE(ARM_FEATURE_V8_RDM, ARM_HWCAP_A64_ASIMDRDM);
+     GET_FEATURE(ARM_FEATURE_V8_FCMA, ARM_HWCAP_A64_FCMA);
+ #undef GET_FEATURE
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index fa60cf908f..f4e2afa72c 100644
+index 60d104cc8a..bb8a176f9a 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -7405,13 +7405,26 @@ static void handle_simd_shift_intfp_conv(DisasContext *s, bool is_scalar,
-                                          int immh, int immb, int opcode,
-                                          int rn, int rd)
- {
--    bool is_double = extract32(immh, 3, 1);
--    int size = is_double ? MO_64 : MO_32;
--    int elements;
-+    int size, elements, fracbits;
-     int immhb = immh << 3 | immb;
--    int fracbits = (is_double ? 128 : 64) - immhb;
+@@ -2147,62 +2147,98 @@ static void disas_ldst_excl(DisasContext *s, uint32_t insn)
+     int rt = extract32(insn, 0, 5);
+     int rn = extract32(insn, 5, 5);
+     int rt2 = extract32(insn, 10, 5);
+-    int is_lasr = extract32(insn, 15, 1);
+     int rs = extract32(insn, 16, 5);
+-    int is_pair = extract32(insn, 21, 1);
+-    int is_store = !extract32(insn, 22, 1);
+-    int is_excl = !extract32(insn, 23, 1);
++    int is_lasr = extract32(insn, 15, 1);
++    int o2_L_o1_o0 = extract32(insn, 21, 3) * 2 | is_lasr;
+     int size = extract32(insn, 30, 2);
+     TCGv_i64 tcg_addr;
  
--    if (!extract32(immh, 2, 2)) {
-+    if (immh & 8) {
-+        size = MO_64;
-+        if (!is_scalar && !is_q) {
-+            unallocated_encoding(s);
-+            return;
+-    if ((!is_excl && !is_pair && !is_lasr) ||
+-        (!is_excl && is_pair) ||
+-        (is_pair && size < 2)) {
+-        unallocated_encoding(s);
++    switch (o2_L_o1_o0) {
++    case 0x0: /* STXR */
++    case 0x1: /* STLXR */
++        if (rn == 31) {
++            gen_check_sp_alignment(s);
 +        }
-+    } else if (immh & 4) {
-+        size = MO_32;
-+    } else if (immh & 2) {
-+        size = MO_16;
-+        if (!arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
-+            unallocated_encoding(s);
-+            return;
++        if (is_lasr) {
++            tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
 +        }
-+    } else {
-+        /* immh == 0 would be a failure of the decode logic */
-+        g_assert(immh == 1);
-         unallocated_encoding(s);
++        tcg_addr = read_cpu_reg_sp(s, rn, 1);
++        gen_store_exclusive(s, rs, rt, rt2, tcg_addr, size, false);
          return;
-     }
-@@ -7419,20 +7432,14 @@ static void handle_simd_shift_intfp_conv(DisasContext *s, bool is_scalar,
-     if (is_scalar) {
-         elements = 1;
-     } else {
--        elements = is_double ? 2 : is_q ? 4 : 2;
--        if (is_double && !is_q) {
--            unallocated_encoding(s);
--            return;
--        }
-+        elements = (8 << is_q) >> size;
-     }
-+    fracbits = (16 << size) - immhb;
+-    }
  
-     if (!fp_access_check(s)) {
-         return;
-     }
- 
--    /* immh == 0 would be a failure of the decode logic */
--    g_assert(immh);
+-    if (rn == 31) {
+-        gen_check_sp_alignment(s);
+-    }
+-    tcg_addr = read_cpu_reg_sp(s, rn, 1);
 -
-     handle_simd_intfp_conv(s, rd, rn, elements, !is_u, fracbits, size);
+-    /* Note that since TCG is single threaded load-acquire/store-release
+-     * semantics require no extra if (is_lasr) { ... } handling.
+-     */
+-
+-    if (is_excl) {
+-        if (!is_store) {
+-            s->is_ldex = true;
+-            gen_load_exclusive(s, rt, rt2, tcg_addr, size, is_pair);
+-            if (is_lasr) {
+-                tcg_gen_mb(TCG_MO_ALL | TCG_BAR_LDAQ);
+-            }
+-        } else {
+-            if (is_lasr) {
+-                tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
+-            }
+-            gen_store_exclusive(s, rs, rt, rt2, tcg_addr, size, is_pair);
++    case 0x4: /* LDXR */
++    case 0x5: /* LDAXR */
++        if (rn == 31) {
++            gen_check_sp_alignment(s);
+         }
+-    } else {
+-        TCGv_i64 tcg_rt = cpu_reg(s, rt);
+-        bool iss_sf = disas_ldst_compute_iss_sf(size, false, 0);
++        tcg_addr = read_cpu_reg_sp(s, rn, 1);
++        s->is_ldex = true;
++        gen_load_exclusive(s, rt, rt2, tcg_addr, size, false);
++        if (is_lasr) {
++            tcg_gen_mb(TCG_MO_ALL | TCG_BAR_LDAQ);
++        }
++        return;
+ 
++    case 0x9: /* STLR */
+         /* Generate ISS for non-exclusive accesses including LASR.  */
+-        if (is_store) {
++        if (rn == 31) {
++            gen_check_sp_alignment(s);
++        }
++        tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
++        tcg_addr = read_cpu_reg_sp(s, rn, 1);
++        do_gpr_st(s, cpu_reg(s, rt), tcg_addr, size, true, rt,
++                  disas_ldst_compute_iss_sf(size, false, 0), is_lasr);
++        return;
++
++    case 0xd: /* LDAR */
++        /* Generate ISS for non-exclusive accesses including LASR.  */
++        if (rn == 31) {
++            gen_check_sp_alignment(s);
++        }
++        tcg_addr = read_cpu_reg_sp(s, rn, 1);
++        do_gpr_ld(s, cpu_reg(s, rt), tcg_addr, size, false, false, true, rt,
++                  disas_ldst_compute_iss_sf(size, false, 0), is_lasr);
++        tcg_gen_mb(TCG_MO_ALL | TCG_BAR_LDAQ);
++        return;
++
++    case 0x2: case 0x3: /* CASP / STXP */
++        if (size & 2) { /* STXP / STLXP */
++            if (rn == 31) {
++                gen_check_sp_alignment(s);
++            }
+             if (is_lasr) {
+                 tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
+             }
+-            do_gpr_st(s, tcg_rt, tcg_addr, size,
+-                      true, rt, iss_sf, is_lasr);
+-        } else {
+-            do_gpr_ld(s, tcg_rt, tcg_addr, size, false, false,
+-                      true, rt, iss_sf, is_lasr);
++            tcg_addr = read_cpu_reg_sp(s, rn, 1);
++            gen_store_exclusive(s, rs, rt, rt2, tcg_addr, size, true);
++            return;
++        }
++        /* CASP / CASPL */
++        break;
++
++    case 0x6: case 0x7: /* CASP / LDXP */
++        if (size & 2) { /* LDXP / LDAXP */
++            if (rn == 31) {
++                gen_check_sp_alignment(s);
++            }
++            tcg_addr = read_cpu_reg_sp(s, rn, 1);
++            s->is_ldex = true;
++            gen_load_exclusive(s, rt, rt2, tcg_addr, size, true);
+             if (is_lasr) {
+                 tcg_gen_mb(TCG_MO_ALL | TCG_BAR_LDAQ);
+             }
++            return;
+         }
++        /* CASPA / CASPAL */
++        break;
++
++    case 0xa: /* CAS */
++    case 0xb: /* CASL */
++    case 0xe: /* CASA */
++    case 0xf: /* CASAL */
++        break;
+     }
++    unallocated_encoding(s);
  }
  
+ /*
+@@ -2715,6 +2751,55 @@ static void disas_ldst_reg_unsigned_imm(DisasContext *s, uint32_t insn,
+     }
+ }
+ 
++/* Atomic memory operations
++ *
++ *  31  30      27  26    24    22  21   16   15    12    10    5     0
++ * +------+-------+---+-----+-----+---+----+----+-----+-----+----+-----+
++ * | size | 1 1 1 | V | 0 0 | A R | 1 | Rs | o3 | opc | 0 0 | Rn |  Rt |
++ * +------+-------+---+-----+-----+--------+----+-----+-----+----+-----+
++ *
++ * Rt: the result register
++ * Rn: base address or SP
++ * Rs: the source register for the operation
++ * V: vector flag (always 0 as of v8.3)
++ * A: acquire flag
++ * R: release flag
++ */
++static void disas_ldst_atomic(DisasContext *s, uint32_t insn,
++                              int size, int rt, bool is_vector)
++{
++    int rs = extract32(insn, 16, 5);
++    int rn = extract32(insn, 5, 5);
++    int o3_opc = extract32(insn, 12, 4);
++    int feature = ARM_FEATURE_V8_ATOMICS;
++
++    if (is_vector) {
++        unallocated_encoding(s);
++        return;
++    }
++    switch (o3_opc) {
++    case 000: /* LDADD */
++    case 001: /* LDCLR */
++    case 002: /* LDEOR */
++    case 003: /* LDSET */
++    case 004: /* LDSMAX */
++    case 005: /* LDSMIN */
++    case 006: /* LDUMAX */
++    case 007: /* LDUMIN */
++    case 010: /* SWP */
++    default:
++        unallocated_encoding(s);
++        return;
++    }
++    if (!arm_dc_feature(s, feature)) {
++        unallocated_encoding(s);
++        return;
++    }
++
++    (void)rs;
++    (void)rn;
++}
++
+ /* Load/store register (all forms) */
+ static void disas_ldst_reg(DisasContext *s, uint32_t insn)
+ {
+@@ -2725,23 +2810,28 @@ static void disas_ldst_reg(DisasContext *s, uint32_t insn)
+ 
+     switch (extract32(insn, 24, 2)) {
+     case 0:
+-        if (extract32(insn, 21, 1) == 1 && extract32(insn, 10, 2) == 2) {
+-            disas_ldst_reg_roffset(s, insn, opc, size, rt, is_vector);
+-        } else {
++        if (extract32(insn, 21, 1) == 0) {
+             /* Load/store register (unscaled immediate)
+              * Load/store immediate pre/post-indexed
+              * Load/store register unprivileged
+              */
+             disas_ldst_reg_imm9(s, insn, opc, size, rt, is_vector);
++            return;
++        }
++        switch (extract32(insn, 10, 2)) {
++        case 0:
++            disas_ldst_atomic(s, insn, size, rt, is_vector);
++            return;
++        case 2:
++            disas_ldst_reg_roffset(s, insn, opc, size, rt, is_vector);
++            return;
+         }
+         break;
+     case 1:
+         disas_ldst_reg_unsigned_imm(s, insn, opc, size, rt, is_vector);
+-        break;
+-    default:
+-        unallocated_encoding(s);
+-        break;
++        return;
+     }
++    unallocated_encoding(s);
+ }
+ 
+ /* AdvSIMD load/store multiple structures
 -- 
 2.17.0
