@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fGot0-0001be-94
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 12:57:47 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fGouh-0002sP-G6
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 12:59:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fGosz-0007Zn-CC
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 12:57:46 -0400
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20180423165126.15441-1-david@redhat.com>
-	<20180423165126.15441-3-david@redhat.com>
-	<20180504192635.GA4903@localhost.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f2b567cb-8723-4e6d-b6ec-a6d97bffab10@redhat.com>
-Date: Thu, 10 May 2018 18:57:32 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fGoug-0008CI-Il
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 12:59:31 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:36362)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fGoug-0008C0-El
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 12:59:30 -0400
+Received: by mail-ot0-x242.google.com with SMTP id m11-v6so3087274otf.3
+	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 09:59:30 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180504192635.GA4903@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 02/11] machine: make MemoryHotplugState
- accessible via the machine
+In-Reply-To: <20180502221552.3873-12-richard.henderson@linaro.org>
+References: <20180502221552.3873-1-richard.henderson@linaro.org>
+	<20180502221552.3873-12-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 10 May 2018 17:59:09 +0100
+Message-ID: <CAFEAcA9fa4-DMgxMFGrOYgB6eMYGvLupyKS_LNp+vez7xGRKNw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 11/14] target/arm: Implement FCMP for
+ fp16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,81 +31,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, qemu-stable <qemu-stable@nongnu.org>
 
-On 04/05/2018 21:26, Eduardo Habkost wrote:
-> On Mon, Apr 23, 2018 at 06:51:17PM +0200, David Hildenbrand wrote:
-> [...]
->> +    /* always allocate the device memory information */
->> +    machine->device_memory = g_malloc(sizeof(*machine->device_memory));
-> [...]
->> -    /* initialize hotplug memory address space */
->> +    /* always allocate the device memory information */
->> +    machine->device_memory = g_malloc(sizeof(*machine->device_memory));
-> 
-> This makes QEMU crash because machine->device_memory->base is initialized with
-> garbage:
-> 
-> #1  0x00007fffef30a8f8 in abort () at /lib64/libc.so.6
-> #2  0x00007fffef302026 in __assert_fail_base () at /lib64/libc.so.6
-> #3  0x00007fffef3020d2 in  () at /lib64/libc.so.6
-> #4  0x0000555555833483 in int128_get64 (a=<optimized out>) at .../qemu-build/include/qemu/int128.h:22
-> #5  0x0000555555837c2e in memory_region_size (a=<optimized out>) at .../qemu-build/memory.c:1735
-> #6  0x0000555555837c2e in memory_region_size (mr=<optimized out>) at .../qemu-build/memory.c:1739
-> #7  0x00005555558a2b14 in pc_memory_init (pcms=pcms@entry=0x555556850050, system_memory=system_memory@entry=0x555556851e00, rom_memory=rom_memory@entry=0x5555568b8120, ram_memory=ram_memory@entry=0x7fffffffd630)
->     at .../qemu-build/hw/i386/pc.c:1440
-> #8  0x00005555558a5a73 in pc_init1 (machine=0x555556850050, pci_type=0x555555cb6fd0 "i440FX", host_type=0x555555c43e41 "i440FX-pcihost") at .../qemu-build/hw/i386/pc_piix.c:179
-> #9  0x00005555559abbda in machine_run_board_init (machine=0x555556850050) at .../qemu-build/hw/core/machine.c:829
-> #10 0x00005555557dc515 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at .../qemu-build/vl.c:4563
-> 
-> 
-> I will squash the following fixup:
-> 
-> From 6216fdb28476ed21c4ced4672003c9c7cb0e04d2 Mon Sep 17 00:00:00 2001
-> From: David Hildenbrand <david@redhat.com>
-> Date: Fri, 4 May 2018 15:54:46 +0200
-> Subject: [PATCH] memory-device: fix device_memory creation on pc and spapr
-> 
-> We have to inititalize the struct to 0. Otherwise, without "maxmem",
-> the content is undefined, which might result in random asserts
-> striking when e.g. reading out the size of the contained memory region.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+On 2 May 2018 at 23:15, Richard Henderson <richard.henderson@linaro.org> wr=
+ote:
+> From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+> These where missed out from the rest of the half-precision work.
+>
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> [rth: Diagnose lack of FP16 before fp_access_check]
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  hw/i386/pc.c   | 2 +-
->  hw/ppc/spapr.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index ffcd7b85d9..868893d0a1 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1372,7 +1372,7 @@ void pc_memory_init(PCMachineState *pcms,
->      }
->  
->      /* always allocate the device memory information */
-> -    machine->device_memory = g_malloc(sizeof(*machine->device_memory));
-> +    machine->device_memory = g_malloc0(sizeof(*machine->device_memory));
->  
->      /* initialize device memory address space */
->      if (pcmc->has_reserved_memory &&
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index ef05075232..a1abcba6ad 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2637,7 +2637,7 @@ static void spapr_machine_init(MachineState *machine)
->      memory_region_add_subregion(sysmem, 0, ram);
->  
->      /* always allocate the device memory information */
-> -    machine->device_memory = g_malloc(sizeof(*machine->device_memory));
-> +    machine->device_memory = g_malloc0(sizeof(*machine->device_memory));
+>  target/arm/helper-a64.h    |  2 ++
+>  target/arm/helper-a64.c    | 10 ++++++
+>  target/arm/translate-a64.c | 88 +++++++++++++++++++++++++++++++++++++---=
+------
+>  3 files changed, 83 insertions(+), 17 deletions(-)
+>
 
-g_new0 since you are at it? :)
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Paolo
-
->  
->      /* initialize hotplug memory address space */
->      if (machine->ram_size < machine->maxram_size) {
-> 
+thanks
+-- PMM
