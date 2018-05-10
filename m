@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jingqi.liu@intel.com>) id 1fGbtT-0004Qp-4Q
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 23:05:24 -0400
+	(envelope-from <jingqi.liu@intel.com>) id 1fGbug-00056m-S5
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 23:06:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jingqi.liu@intel.com>) id 1fGbtP-0005zK-Vx
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 23:05:23 -0400
-Received: from mga11.intel.com ([192.55.52.93]:42474)
+	(envelope-from <jingqi.liu@intel.com>) id 1fGbud-0006gz-Lp
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 23:06:38 -0400
+Received: from mga04.intel.com ([192.55.52.120]:6714)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jingqi.liu@intel.com>)
-	id 1fGbtP-0005zE-M5
-	for qemu-devel@nongnu.org; Wed, 09 May 2018 23:05:19 -0400
+	id 1fGbud-0006gp-9a
+	for qemu-devel@nongnu.org; Wed, 09 May 2018 23:06:35 -0400
 From: "Liu, Jingqi" <jingqi.liu@intel.com>
-Date: Thu, 10 May 2018 03:05:10 +0000
-Message-ID: <09D68D4CF52CAF489B702DEBDD12D3D35269B8FA@SHSMSX103.ccr.corp.intel.com>
-References: <1525854869-13975-1-git-send-email-jingqi.liu@intel.com>
-	<5c500726-bd2d-2261-68ec-dd39c98d06aa@redhat.com>
-In-Reply-To: <5c500726-bd2d-2261-68ec-dd39c98d06aa@redhat.com>
+Date: Thu, 10 May 2018 03:05:48 +0000
+Message-ID: <09D68D4CF52CAF489B702DEBDD12D3D35269B908@SHSMSX103.ccr.corp.intel.com>
+References: <1525854998-14243-1-git-send-email-jingqi.liu@intel.com>
+	<7279dfe4-ca56-dbc7-c26f-ca566267a937@redhat.com>
+In-Reply-To: <7279dfe4-ca56-dbc7-c26f-ca566267a937@redhat.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v1 1/7] hmat acpi: Build Memory Subsystem
- Address Range Structre(s) in ACPI HMAT
+Subject: Re: [Qemu-devel] [PATCH v1 5/7] numa: Extend the command-line to
+ provide memory latency and bandwidth information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,27 +35,54 @@ Cc: "imammedo@redhat.com" <imammedo@redhat.com>, "qemu-devel@nongnu.org" <qemu-d
 
 DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogRXJpYyBCbGFrZSBbbWFp
 bHRvOmVibGFrZUByZWRoYXQuY29tXQ0KPiBTZW50OiBXZWRuZXNkYXksIE1heSA5LCAyMDE4IDk6
-MTMgUE0NCj4gVG86IExpdSwgSmluZ3FpIDxqaW5ncWkubGl1QGludGVsLmNvbT47IHBib256aW5p
+MTYgUE0NCj4gVG86IExpdSwgSmluZ3FpIDxqaW5ncWkubGl1QGludGVsLmNvbT47IHBib256aW5p
 QHJlZGhhdC5jb207IHJ0aEB0d2lkZGxlLm5ldDsNCj4gZWhhYmtvc3RAcmVkaGF0LmNvbQ0KPiBD
 YzogaW1hbW1lZG9AcmVkaGF0LmNvbTsgcWVtdS1kZXZlbEBub25nbnUub3JnOyBtc3RAcmVkaGF0
-LmNvbQ0KPiBTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MSAxLzddIGhtYXQgYWNw
-aTogQnVpbGQgTWVtb3J5IFN1YnN5c3RlbQ0KPiBBZGRyZXNzIFJhbmdlIFN0cnVjdHJlKHMpIGlu
-IEFDUEkgSE1BVA0KPiANCj4gT24gMDUvMDkvMjAxOCAwMzozNCBBTSwgTGl1IEppbmdxaSB3cm90
-ZToNCj4gDQo+IEluIHRoZSBzdWJqZWN0IGxpbmU6IHMvU3RydWN0cmUvU3RydWN0dXJlLw0KPiAN
-Cj4gTG9uZyBzdWJqZWN0IGxpbmU7IHJlYWQgJ2dpdCBzaG9ydGxvZyAtMzAnIHRvIGdldCBhIGZl
-ZWwgZm9yIG1vcmUgdHlwaWNhbCBzdWJqZWN0cywNCj4gYW5kIHRyeSB0byBrZWVwIGl0IGF0IDYw
-IGNoYXJhY3RlcnMgb3IgbGVzcyAoeW91IHN0aWxsIHdhbnQgbGVnaWJsZSBzdWJqZWN0cyBpbiBh
-biA4MC0NCj4gY29sdW1uIHdpbmRvdyBldmVuIHdoZW4gZ2l0IGFkZHMgaW5kZW50YXRpb24gYW5k
-L29yIGFiYnJldmlhdGVkIGNvbW1pdCBpZA0KPiBwcmVmaXhlcykNCj4gDQo+ID4gSE1BVCBpcyBk
-ZWZpbmVkIGluIEFDUEkgNi4yOiA1LjIuMjcgSGV0ZXJvZ2VuZW91cyBNZW1vcnkgQXR0cmlidXRl
-IFRhYmxlDQo+IChITUFUKS4NCj4gPiBUaGUgc3BlY2lmaWNhdGlvbiByZWZlcmVuY2VzIGJlbG93
-IGxpbms6DQo+ID4gaHR0cDovL3d3dy51ZWZpLm9yZy9zaXRlcy9kZWZhdWx0L2ZpbGVzL3Jlc291
-cmNlcy9BQ1BJXzZfMi5wZGYNCj4gDQo+IEFsc28sIHlvdXIgbWFpbCB3YXMgc2VudCB3aXRob3V0
-IGFueSBJbi1SZXBseS1Ubzogb3IgUmVmZXJlbmNlczoNCj4gaGVhZGVycywgbWVhbmluZyBpdCB3
-YXMgbm90IHRocmVhZGVkIHRvIGEgMC83IGNvdmVyIGxldHRlciwgYnV0IGluc3RlYWQNCj4gNyBk
-aWZmZXJlbnQgdG9wLWxldmVsIHRocmVhZHMuICBUaGF0IG1ha2VzIGl0IGhhcmRlciB0byB0cmFj
-ayByZXBsaWVzIHRvIHlvdXINCj4gdGhyZWFkLg0KPiANCj4gLS0NCj4gRXJpYyBCbGFrZSwgUHJp
-bmNpcGFsIFNvZnR3YXJlIEVuZ2luZWVyDQo+IFJlZCBIYXQsIEluYy4gICAgICAgICAgICsxLTkx
-OS0zMDEtMzI2Ng0KPiBWaXJ0dWFsaXphdGlvbjogIHFlbXUub3JnIHwgbGlidmlydC5vcmcNCg0K
-SGkgRXJpYywNClRoYW5rcyBmb3IgeW91ciByZXZpZXdpbmcuDQpJIHdpbGwgY29ycmVjdCB0aGVz
-ZSBpc3N1ZXMuDQoNCkppbmdxaSBMaXUNCg==
+LmNvbQ0KPiBTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MSA1LzddIG51bWE6IEV4
+dGVuZCB0aGUgY29tbWFuZC1saW5lIHRvDQo+IHByb3ZpZGUgbWVtb3J5IGxhdGVuY3kgYW5kIGJh
+bmR3aWR0aCBpbmZvcm1hdGlvbg0KPiANCj4gT24gMDUvMDkvMjAxOCAwMzozNiBBTSwgTGl1IEpp
+bmdxaSB3cm90ZToNCj4gPiBBZGQgLW51bWEgaG1hdC1sYiBvcHRpb24gdG8gcHJvdmlkZSBTeXN0
+ZW0gTG9jYWxpdHkgTGF0ZW5jeSBhbmQNCj4gPiBCYW5kd2lkdGggSW5mb3JtYXRpb24uIFRoZXNl
+IG1lbW9yeSBhdHRyaWJ1dGVzIGhlbHAgdG8gYnVpbGQgU3lzdGVtDQo+ID4gTG9jYWxpdHkgTGF0
+ZW5jeSBhbmQgQmFuZHdpZHRoIEluZm9ybWF0aW9uIFN0cnVjdHVyZShzKSBpbiBBQ1BJDQo+ID4g
+SGV0ZXJvZ2VuZW91cyBNZW1vcnkgQXR0cmlidXRlIFRhYmxlIChITUFUKS4NCj4gPg0KPiA+IFNp
+Z25lZC1vZmYtYnk6IExpdSBKaW5ncWkgPGppbmdxaS5saXVAaW50ZWwuY29tPg0KPiA+IC0tLQ0K
+PiANCj4gPiArKysgYi9xYXBpL21pc2MuanNvbg0KPiA+IEBAIC0yNzA1LDcgKzI3MDUsNyBAQA0K
+PiA+ICAgIyBTaW5jZTogMi4xDQo+ID4gICAjIw0KPiA+ICAgeyAnZW51bSc6ICdOdW1hT3B0aW9u
+c1R5cGUnLA0KPiA+IC0gICdkYXRhJzogWyAnbm9kZScsICdkaXN0JywgJ2NwdScgXSB9DQo+ID4g
+KyAgJ2RhdGEnOiBbICdub2RlJywgJ2Rpc3QnLCAnY3B1JywgJ2htYXQtbGInIF0gfQ0KPiANCj4g
+TWlzc2luZyBkb2N1bWVudGF0aW9uIGZvciB0aGUgbmV3IGFkZGl0aW9uLCBwYXJ0aWN1bGFybHkg
+dGhhdCBpdCBpcyAnKHNpbmNlIDIuMTMpJy4NCj4gDQo+IA0KPiA+ICAgIyMNCj4gPiArIyBATnVt
+YUhtYXRMQk9wdGlvbnM6DQo+ID4gKyMNCj4gPiArIyBTZXQgdGhlIHN5c3RlbSBsb2NhbGl0eSBs
+YXRlbmN5IGFuZCBiYW5kd2lkdGggaW5mb3JtYXRpb24gYmV0d2Vlbg0KPiBJbml0aWF0b3IgYW5k
+IFRhcmdldCBwcm94aW1pdHkgRG9tYWlucy4NCj4gDQo+IExvbmcgbGluZSBoZXJlIGFuZCBlbHNl
+d2hlcmUuIFBsZWFzZSBrZWVwIHRoaXMgZmlsZSB3cmFwcGVkIGJlbG93IDgwDQo+IGNvbHVtbnMu
+DQo+IA0KPiA+ICsjDQo+ID4gKyMgQGluaXRpYXRvcjogdGhlIEluaXRpYXRvciBQcm94aW1pdHkg
+RG9tYWluLg0KPiA+ICsjDQo+ID4gKyMgQHRhcmdldDogdGhlIFRhcmdldCBQcm94aW1pdHkgRG9t
+YWluLg0KPiA+ICsjDQo+ID4gKyMgQGhpZXJhcmNoeTogdGhlIE1lbW9yeSBIaWVyYXJjaHkuIElu
+ZGljYXRlcyB0aGUgcGVyZm9ybWFuY2Ugb2YgbWVtb3J5DQo+IG9yIHNpZGUgY2FjaGUuDQo+ID4g
+KyMNCj4gPiArIyBAbGV2ZWw6IGluZGljYXRlcyB0aGUgbGV2ZWwgb2Ygc2lkZSBjYWNoZSwgaWYg
+aXQncyB0aGUgcGVyZm9ybWFuY2Ugb2Ygc2lkZQ0KPiBjYWNoZS4NCj4gPiArIw0KPiA+ICsjIEBk
+YXRhLXR5cGU6IHByZXNlbnRzIHRoZSB0eXBlIG9mIGRhdGEsIGFjY2Vzcy9yZWFkL3dyaXRlIGxh
+dGVuY3kgb3IgaGl0DQo+IGxhdGVuY3kuDQo+ID4gKyMNCj4gPiArIyBAYmFzZS1sYXQ6IHRoZSBi
+YXNlIHVuaXQgZm9yIGxhdGVuY3kgaW4gbmFub3NlY29uZHNieXRlcy4NCj4gDQo+IElzIHRoYXQg
+c3VwcG9zZWQgdG8gYmUgbmFub3NlY29uZHMvYnl0ZXM/DQo+IA0KPiA+ICsjDQo+ID4gKyMgQGJh
+c2UtYnc6IHRoZSBiYXNlIHVuaXQgZm9yIGJhbmR3aWR0aCBpbiBtZWdhYnl0ZXMgcGVyIHNlY29u
+ZChNQi9zKS4NCj4gPiArIw0KPiA+ICsjIEBsYXRlbmN5OiB0aGUgdmFsdWUgb2YgbGF0ZW5jeSBi
+YXNlZCBvbiBCYXNlIFVuaXQgZnJvbSBAaW5pdGlhdG9yIHRvDQo+IEB0YXJnZXQgcHJveGltaXR5
+IGRvbWFpbi4NCj4gPiArIw0KPiA+ICsjIEBiYW5kd2lkdGg6IHRoZSB2YWx1ZSBvZiBiYW5kd2lk
+dGggYmFzZWQgb24gQmFzZSBVbml0IGJldHdlZW4NCj4gQGluaXRpYXRvciB0byBAdGFyZ2V0IHBy
+b3hpbWl0eSBkb21haW4uDQo+ID4gKyMNCj4gPiArIyBTaW5jZTogMi4xMA0KPiANCj4gTm90IGV2
+ZW4gY2xvc2UuICBUaGUgc29vbmVzdCB0aGlzIGNvdWxkIG1ha2UgaXQgaW4gaXMgMi4xMy4NCj4g
+DQo+ID4gKyMjDQo+ID4gK3sgJ3N0cnVjdCc6ICdOdW1hSG1hdExCT3B0aW9ucycsDQo+ID4gKyAg
+J2RhdGEnOiB7DQo+ID4gKyAgICdpbml0aWF0b3InOiAndWludDE2JywNCj4gPiArICAgJ3Rhcmdl
+dCc6ICd1aW50MTYnLA0KPiA+ICsgICAnaGllcmFyY2h5JzogJ3N0cicsDQo+IA0KPiBJcyB0aGlz
+IHJlYWxseSBhIGZyZWUtZm9ybSBzdHJpbmcsIG9yIGlzIGl0IGJldHRlciBhcyBhbiBlbnVtIHR5
+cGU/DQo+IA0KPiA+ICsgICAnKmxldmVsJzogJ3VpbnQ4JywNCj4gPiArICAgJ2RhdGEtdHlwZSc6
+ICdzdHInLA0KPiANCj4gRGl0dG8uDQo+IA0KPiA+ICsgICAnKmJhc2UtbGF0JzogJ3VpbnQ2NCcs
+DQo+ID4gKyAgICcqYmFzZS1idyc6ICd1aW50NjQnLA0KPiA+ICsgICAnKmxhdGVuY3knOiAndWlu
+dDE2JywNCj4gPiArICAgJypiYW5kd2lkdGgnOiAndWludDE2JyB9fQ0KPiA+ICsNCj4gDQo+IA0K
+PiAtLQ0KPiBFcmljIEJsYWtlLCBQcmluY2lwYWwgU29mdHdhcmUgRW5naW5lZXINCj4gUmVkIEhh
+dCwgSW5jLiAgICAgICAgICAgKzEtOTE5LTMwMS0zMjY2DQo+IFZpcnR1YWxpemF0aW9uOiAgcWVt
+dS5vcmcgfCBsaWJ2aXJ0Lm9yZw0KDQpIaSBFcmljLA0KVGhhbmtzIGZvciB5b3VyIHJldmlld2lu
+Zy4NCkkgd2lsbCBjb3JyZWN0IHRoZW0uDQoNCkppbmdxaSBMaXUNCg==
