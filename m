@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fGnwY-0008G7-69
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 11:57:23 -0400
+	(envelope-from <eblake@redhat.com>) id 1fGo1G-0003nr-6W
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 12:02:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fGnwW-0002Ul-VQ
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 11:57:22 -0400
-References: <1525782441-2224-1-git-send-email-ivanren@tencent.com>
+	(envelope-from <eblake@redhat.com>) id 1fGo1F-0004WL-EL
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 12:02:14 -0400
+References: <20180509165530.29561-1-mreitz@redhat.com>
+	<20180509165530.29561-9-mreitz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <84eb5455-cfd9-ba2b-9a7b-12c5204290bc@redhat.com>
-Date: Thu, 10 May 2018 10:57:11 -0500
+Message-ID: <ba5e8366-e549-5611-b161-1710fc2f95b5@redhat.com>
+Date: Thu, 10 May 2018 11:02:05 -0500
 MIME-Version: 1.0
-In-Reply-To: <1525782441-2224-1-git-send-email-ivanren@tencent.com>
+In-Reply-To: <20180509165530.29561-9-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qcow2: fix preallocation with metadata on
- bare block device
+Subject: Re: [Qemu-devel] [PATCH 08/13] tests: Add
+ qdict_stringify_for_keyval() test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,137 +25,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ivan Ren <renyime@gmail.com>, mreitz@redhat.com, kwolf@redhat.com
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 05/08/2018 07:27 AM, Ivan Ren wrote:
-> Create a qcow2 directly on bare block device with
-> "-o preallocation=metadata" option. When read this qcow2, it will
-> return dirty data of block device.
-
-Yes, reading garbage is expected.
-
-> This patch add QCOW_OFLAG_ZERO
-> for all preallocated l2 entry if the underlying device is a bare
-> block device.
-
-This says what the patch does, but not why.  What is the actual use case 
-scenario where changing semantics to have the qcow2 overwrite the 
-garbage to read 0 instead of any pre-existing garbage, when dealing with 
-portions of the disk that have not yet been written by the guest?  Are 
-you trying to prevent a security leak of previous information that may 
-be resident on the block device?
-
-> 
-> Signed-off-by: Ivan Ren <ivanren@tencent.com>
+On 05/09/2018 11:55 AM, Max Reitz wrote:
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->   block/qcow2-cluster.c |  5 +++--
->   block/qcow2.c         | 19 ++++++++++++++++---
->   block/qcow2.h         |  3 ++-
->   3 files changed, 21 insertions(+), 6 deletions(-)
+>   tests/check-qdict.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 54 insertions(+)
 > 
-> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-> index 1aee726..b9e0ceb 100644
-> --- a/block/qcow2-cluster.c
-> +++ b/block/qcow2-cluster.c
-> @@ -919,7 +919,8 @@ fail:
->       return ret;
->   }
->   
-> -int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
-> +int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m,
-> +                                uint64_t flags)
->   {
->       BDRVQcow2State *s = bs->opaque;
->       int i, j = 0, l2_index, ret;
-> @@ -969,7 +970,7 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
->           }
->   
->           l2_slice[l2_index + i] = cpu_to_be64((cluster_offset +
-> -                    (i << s->cluster_bits)) | QCOW_OFLAG_COPIED);
-> +                    (i << s->cluster_bits)) | QCOW_OFLAG_COPIED | flags);
->        }
->   
->   
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 2f36e63..093735c 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -2044,7 +2044,7 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
->           while (l2meta != NULL) {
->               QCowL2Meta *next;
->   
-> -            ret = qcow2_alloc_cluster_link_l2(bs, l2meta);
-> +            ret = qcow2_alloc_cluster_link_l2(bs, l2meta, 0);
->               if (ret < 0) {
->                   goto fail;
->               }
-> @@ -2534,6 +2534,7 @@ static void coroutine_fn preallocate_co(void *opaque)
->       uint64_t host_offset = 0;
->       unsigned int cur_bytes;
->       int ret;
-> +    struct stat st;
->       QCowL2Meta *meta;
->   
->       qemu_co_mutex_lock(&s->lock);
-> @@ -2552,7 +2553,19 @@ static void coroutine_fn preallocate_co(void *opaque)
->           while (meta) {
->               QCowL2Meta *next = meta->next;
->   
-> -            ret = qcow2_alloc_cluster_link_l2(bs, meta);
-> +            /* Check the underlying device type.
-> +             * If the underlying device is a block device, we add
-> +             * QCOW_OFLAG_ZERO for all preallocated l2 entry to ignore dirty
-> +             * data on block device.
-> +             * If the underlying device can't be used with stat(return < 0),
-> +             * treat it as a regular file.
-> +             */
-> +            if (stat(bs->filename, &st) < 0 || !S_ISBLK(st.st_mode)) {
 
-Won't work.  You cannot guarantee that bs->filename is a local file; it 
-could be a remote protocol, such as NBD or gluster.  If you need to know 
-whether bs->filename has a property that it reads as all zeroes when 
-first initialized, we already have 
-BlockDriverInfo::unallocated_blocks_are_zero, which is set to true for 
-regular files and false for block devices.
-
-> +                ret = qcow2_alloc_cluster_link_l2(bs, meta, 0);
-> +            } else {
-> +                ret = qcow2_alloc_cluster_link_l2(bs, meta, QCOW_OFLAG_ZERO);
-
-Why would we not want to pass QCOW_OFLAG_ZERO always, rather than 
-special-casing it based on what the underlying protocol might already 
-have in place?
-
-> +            }
+> +static void qdict_stringify_for_keyval_test(void)
+> +{
+> +    QDict *dict = qdict_new();
 > +
->               if (ret < 0) {
->                   qcow2_free_any_clusters(bs, meta->alloc_offset,
->                                           meta->nb_clusters, QCOW2_DISCARD_NEVER);
-> @@ -3458,7 +3471,7 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
->               };
->               qemu_co_queue_init(&allocation.dependent_requests);
->   
-> -            ret = qcow2_alloc_cluster_link_l2(bs, &allocation);
-> +            ret = qcow2_alloc_cluster_link_l2(bs, &allocation, 0);
->               if (ret < 0) {
->                   error_setg_errno(errp, -ret, "Failed to update L2 tables");
->                   qcow2_free_clusters(bs, host_offset,
-> diff --git a/block/qcow2.h b/block/qcow2.h
-> index adf5c39..9a59602 100644
-> --- a/block/qcow2.h
-> +++ b/block/qcow2.h
-> @@ -617,7 +617,8 @@ uint64_t qcow2_alloc_compressed_cluster_offset(BlockDriverState *bs,
->                                            uint64_t offset,
->                                            int compressed_size);
->   
-> -int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m);
-> +int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m,
-> +                                uint64_t flags);
->   int qcow2_cluster_discard(BlockDriverState *bs, uint64_t offset,
->                             uint64_t bytes, enum qcow2_discard_type type,
->                             bool full_discard);
-> 
+> +    /*
+> +     * Test stringification of:
+> +     *
+> +     * {
+> +     *     "a": "null",
+> +     *     "b": 42,
+> +     *     "c": -23,
+> +     *     "d": false,
+> +     *     "e": null,
+> +     *     "f": "",
+> +     *     "g": 0.5,
+> +     *     "h": 0xffffffffffffffff,
+> +     *     "i": true,
+> +     *     "j": 0
+
+Is it worth testing fun things like '-0.0'?
+
+
+> +    g_assert(!strcmp(qdict_get_str(dict, "a"), "null"));
+> +    g_assert(!strcmp(qdict_get_str(dict, "b"), "42"));
+> +    g_assert(!strcmp(qdict_get_str(dict, "c"), "-23"));
+> +    g_assert(!strcmp(qdict_get_str(dict, "d"), "off"));
+> +    g_assert(qobject_type(qdict_get(dict, "e")) == QTYPE_QNULL);
+
+Is it worth shortening this line to:
+g_assert(qobject_to(QNull, qdict_get(dict, "e")));
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 -- 
 Eric Blake, Principal Software Engineer
