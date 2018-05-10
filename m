@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGnN7-0000Cb-4m
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 11:20:46 -0400
+	(envelope-from <eblake@redhat.com>) id 1fGnwY-0008G7-69
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 11:57:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGnN2-0002cC-VU
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 11:20:45 -0400
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:46763)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fGnN2-0002az-Ou
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 11:20:40 -0400
-Received: by mail-pl0-x242.google.com with SMTP id 59-v6so1488900plc.13
-	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 08:20:40 -0700 (PDT)
-References: <20180510140141.12120-1-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <72c275da-00d0-9d45-9d3b-2a724e734493@linaro.org>
-Date: Thu, 10 May 2018 08:20:36 -0700
+	(envelope-from <eblake@redhat.com>) id 1fGnwW-0002Ul-VQ
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 11:57:22 -0400
+References: <1525782441-2224-1-git-send-email-ivanren@tencent.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <84eb5455-cfd9-ba2b-9a7b-12c5204290bc@redhat.com>
+Date: Thu, 10 May 2018 10:57:11 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180510140141.12120-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1525782441-2224-1-git-send-email-ivanren@tencent.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] fpu/softfloat: Don't set Invalid for
- float-to-int(MAXINT)
+Subject: Re: [Qemu-devel] [PATCH] qcow2: fix preallocation with metadata on
+ bare block device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +24,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, patches@linaro.org
+To: Ivan Ren <renyime@gmail.com>, mreitz@redhat.com, kwolf@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On 05/10/2018 07:01 AM, Peter Maydell wrote:
-> In float-to-integer conversion, if the floating point input
-> converts exactly to the largest or smallest integer that
-> fits in to the result type, this is not an overflow.
-> In this situation we were producing the correct result value,
-> but were incorrectly setting the Invalid flag.
-> For example for Arm A64, "FCVTAS w0, d0" on an input of
-> 0x41dfffffffc00000 should produce 0x7fffffff and set no flags.
+On 05/08/2018 07:27 AM, Ivan Ren wrote:
+> Create a qcow2 directly on bare block device with
+> "-o preallocation=metadata" option. When read this qcow2, it will
+> return dirty data of block device.
+
+Yes, reading garbage is expected.
+
+> This patch add QCOW_OFLAG_ZERO
+> for all preallocated l2 entry if the underlying device is a bare
+> block device.
+
+This says what the patch does, but not why.  What is the actual use case 
+scenario where changing semantics to have the qcow2 overwrite the 
+garbage to read 0 instead of any pre-existing garbage, when dealing with 
+portions of the disk that have not yet been written by the guest?  Are 
+you trying to prevent a security leak of previous information that may 
+be resident on the block device?
+
 > 
-> Fix the boundary case to take the right half of the if()
-> statements.
-> 
-> This fixes a regression from 2.11 introduced by the softfloat
-> refactoring.
-> 
-> Cc: qemu-stable@nongnu.org
-> Fixes: ab52f973a50
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Ivan Ren <ivanren@tencent.com>
 > ---
->  fpu/softfloat.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>   block/qcow2-cluster.c |  5 +++--
+>   block/qcow2.c         | 19 ++++++++++++++++---
+>   block/qcow2.h         |  3 ++-
+>   3 files changed, 21 insertions(+), 6 deletions(-)
+> 
+> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+> index 1aee726..b9e0ceb 100644
+> --- a/block/qcow2-cluster.c
+> +++ b/block/qcow2-cluster.c
+> @@ -919,7 +919,8 @@ fail:
+>       return ret;
+>   }
+>   
+> -int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
+> +int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m,
+> +                                uint64_t flags)
+>   {
+>       BDRVQcow2State *s = bs->opaque;
+>       int i, j = 0, l2_index, ret;
+> @@ -969,7 +970,7 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
+>           }
+>   
+>           l2_slice[l2_index + i] = cpu_to_be64((cluster_offset +
+> -                    (i << s->cluster_bits)) | QCOW_OFLAG_COPIED);
+> +                    (i << s->cluster_bits)) | QCOW_OFLAG_COPIED | flags);
+>        }
+>   
+>   
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 2f36e63..093735c 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -2044,7 +2044,7 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+>           while (l2meta != NULL) {
+>               QCowL2Meta *next;
+>   
+> -            ret = qcow2_alloc_cluster_link_l2(bs, l2meta);
+> +            ret = qcow2_alloc_cluster_link_l2(bs, l2meta, 0);
+>               if (ret < 0) {
+>                   goto fail;
+>               }
+> @@ -2534,6 +2534,7 @@ static void coroutine_fn preallocate_co(void *opaque)
+>       uint64_t host_offset = 0;
+>       unsigned int cur_bytes;
+>       int ret;
+> +    struct stat st;
+>       QCowL2Meta *meta;
+>   
+>       qemu_co_mutex_lock(&s->lock);
+> @@ -2552,7 +2553,19 @@ static void coroutine_fn preallocate_co(void *opaque)
+>           while (meta) {
+>               QCowL2Meta *next = meta->next;
+>   
+> -            ret = qcow2_alloc_cluster_link_l2(bs, meta);
+> +            /* Check the underlying device type.
+> +             * If the underlying device is a block device, we add
+> +             * QCOW_OFLAG_ZERO for all preallocated l2 entry to ignore dirty
+> +             * data on block device.
+> +             * If the underlying device can't be used with stat(return < 0),
+> +             * treat it as a regular file.
+> +             */
+> +            if (stat(bs->filename, &st) < 0 || !S_ISBLK(st.st_mode)) {
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Won't work.  You cannot guarantee that bs->filename is a local file; it 
+could be a remote protocol, such as NBD or gluster.  If you need to know 
+whether bs->filename has a property that it reads as all zeroes when 
+first initialized, we already have 
+BlockDriverInfo::unallocated_blocks_are_zero, which is set to true for 
+regular files and false for block devices.
 
+> +                ret = qcow2_alloc_cluster_link_l2(bs, meta, 0);
+> +            } else {
+> +                ret = qcow2_alloc_cluster_link_l2(bs, meta, QCOW_OFLAG_ZERO);
 
-r~
+Why would we not want to pass QCOW_OFLAG_ZERO always, rather than 
+special-casing it based on what the underlying protocol might already 
+have in place?
+
+> +            }
+> +
+>               if (ret < 0) {
+>                   qcow2_free_any_clusters(bs, meta->alloc_offset,
+>                                           meta->nb_clusters, QCOW2_DISCARD_NEVER);
+> @@ -3458,7 +3471,7 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
+>               };
+>               qemu_co_queue_init(&allocation.dependent_requests);
+>   
+> -            ret = qcow2_alloc_cluster_link_l2(bs, &allocation);
+> +            ret = qcow2_alloc_cluster_link_l2(bs, &allocation, 0);
+>               if (ret < 0) {
+>                   error_setg_errno(errp, -ret, "Failed to update L2 tables");
+>                   qcow2_free_clusters(bs, host_offset,
+> diff --git a/block/qcow2.h b/block/qcow2.h
+> index adf5c39..9a59602 100644
+> --- a/block/qcow2.h
+> +++ b/block/qcow2.h
+> @@ -617,7 +617,8 @@ uint64_t qcow2_alloc_compressed_cluster_offset(BlockDriverState *bs,
+>                                            uint64_t offset,
+>                                            int compressed_size);
+>   
+> -int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m);
+> +int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m,
+> +                                uint64_t flags);
+>   int qcow2_cluster_discard(BlockDriverState *bs, uint64_t offset,
+>                             uint64_t bytes, enum qcow2_discard_type type,
+>                             bool full_discard);
+> 
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
