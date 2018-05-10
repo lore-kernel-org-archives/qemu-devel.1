@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1fGme7-0002Jt-7n
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 10:34:16 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fGmgB-0005PY-BF
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 10:36:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1fGme3-000708-9S
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 10:34:15 -0400
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20180510140934.22855-1-peter.maydell@linaro.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <7a4a1ad9-0e47-5c2c-6f93-4e13066ecfac@twiddle.net>
-Date: Thu, 10 May 2018 07:34:06 -0700
-MIME-Version: 1.0
-In-Reply-To: <20180510140934.22855-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] fix fp16 tininess
+	(envelope-from <pm215@archaic.org.uk>) id 1fGmgA-00082b-Io
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 10:36:23 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41582)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1fGmgA-00080D-Bf
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 10:36:22 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 10 May 2018 15:36:18 +0100
+Message-Id: <20180510143618.23673-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] atomic.h: Work around gcc spurious "unused
+ value" warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,28 +23,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 05/10/2018 07:09 AM, Peter Maydell wrote:
-> In commit d81ce0ef2c4f105 we added an extra float_status field
-> fp_status_fp16 for Arm, but forgot to initialize it correctly
-> by setting it to float_tininess_before_rounding. This currently
-> will only cause problems for the new V8_FP16 feature, since the
-> float-to-float conversion code doesn't use it yet. The effect
-> would be that we failed to set the Underflow IEEE exception flag
-> in all the cases where we should.
-> 
-> Add the missing initialization.
-> 
-> Fixes: d81ce0ef2c4f105
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  target/arm/cpu.c | 2 ++
->  1 file changed, 2 insertions(+)
+Some versions of gcc produce a spurious warning if the result of
+__atomic_compare_echange_n() is not used and the type involved
+is a signed 8 bit value:
+  error: value computed is not used [-Werror=unused-value]
+This has been seen on at least
+ gcc (Ubuntu 5.4.0-6ubuntu1~16.04.9) 5.4.0 20160609
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Work around this by using an explicit cast to void to indicate
+that we don't care about the return value.
 
+We don't currently use our atomic_cmpxchg() macro on any signed
+8 bit types, but the upcoming support for the Arm v8.1-Atomics
+will require it.
 
-r~
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+Sending out my workaround as an actual patch. If this is OK I'll
+put in via target-arm.next as it's a dependency for the v8.1-atomics
+series.
+
+ include/qemu/atomic.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/qemu/atomic.h b/include/qemu/atomic.h
+index d73c9e14d7..9ed39effd3 100644
+--- a/include/qemu/atomic.h
++++ b/include/qemu/atomic.h
+@@ -187,7 +187,7 @@
+ /* Returns the eventual value, failed or not */
+ #define atomic_cmpxchg__nocheck(ptr, old, new)    ({                    \
+     typeof_strip_qual(*ptr) _old = (old);                               \
+-    __atomic_compare_exchange_n(ptr, &_old, new, false,                 \
++    (void)__atomic_compare_exchange_n(ptr, &_old, new, false,           \
+                               __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);      \
+     _old;                                                               \
+ })
+-- 
+2.17.0
