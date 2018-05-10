@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55691)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fGgTh-00041J-NU
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 03:59:07 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fGgmM-0005S4-5E
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 04:18:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fGgTg-00081H-KS
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 03:59:05 -0400
-Date: Thu, 10 May 2018 08:58:54 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180510075854.GC23581@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180509165530.29561-1-mreitz@redhat.com>
-	<20180509165530.29561-5-mreitz@redhat.com>
+	(envelope-from <stefanha@redhat.com>) id 1fGgmH-000563-RV
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 04:18:22 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58776 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fGgmH-000551-Id
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 04:18:17 -0400
+Date: Thu, 10 May 2018 09:18:12 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180510081812.GA1296@stefanha-x1.localdomain>
+References: <1525895585-79023-1-git-send-email-thomas.tai@oracle.com>
+	<1525895585-79023-2-git-send-email-thomas.tai@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="YZ5djTAD1cGYuMQK"
 Content-Disposition: inline
-In-Reply-To: <20180509165530.29561-5-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 04/13] qapi: Formalize qcow2 encryption
- probing
+In-Reply-To: <1525895585-79023-2-git-send-email-thomas.tai@oracle.com>
+Subject: Re: [Qemu-devel] [virtio-dev] [PATCH V2 1/1] virtio-balloon: fix
+ internal stat name array to match Linux kernel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,132 +29,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Thomas Tai <thomas.tai@oracle.com>
+Cc: mst@redhat.com, jasowang@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, rob.gardner@oracle.com
 
-On Wed, May 09, 2018 at 06:55:21PM +0200, Max Reitz wrote:
-> Currently, you can give no encryption format for a qcow2 file while
-> still passing a key-secret.  That does not conform to the schema, so
-> this patch changes the schema to allow it.
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+
+--YZ5djTAD1cGYuMQK
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, May 09, 2018 at 03:53:05PM -0400, Thomas Tai wrote:
+> The Linux kernel commit b40000325044 ("virtio_balloon: add array
+> of stat names") defines an array of stat name strings for consumers
+> of the virtio interface to use via the virtio_balloon.h header
+> file, rather than requiring each consumer to define its own. But at
+> present, the stat names defined in this array by the Linux kernel
+> do not match up with those defined internally by QEMU.
+>=20
+> This patch fixes this inconsistency by importing the header file
+> from linux and use the new macro to construct the balloon_stat_names
+> array.
+>=20
+> Signed-off-by: Jonathan Helman <jonathan.helman@oracle.com>
+> Signed-off-by: Thomas Tai <thomas.tai@oracle.com>
+> Cc: Rob Gardner <rob.gardner@oracle.com>
 > ---
->  qapi/block-core.json | 44 ++++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 40 insertions(+), 4 deletions(-)
-> 
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 71c9ab8538..092a1aba2d 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -43,6 +43,19 @@
->  { 'struct': 'ImageInfoSpecificQCow2EncryptionBase',
->    'data': { 'format': 'BlockdevQcow2EncryptionFormat'}}
->  
-> +##
-> +# @ImageInfoSpecificQCow2EncryptionNoInfo:
-> +#
-> +# Only used for the qcow2 encryption format "from-image" in which the
-> +# actual encryption format is determined from the image header.
-> +# Therefore, this encryption format will never be reported in
-> +# ImageInfoSpecificQCow2Encryption.
-> +#
-> +# Since: 2.13
-> +##
-> +{ 'struct': 'ImageInfoSpecificQCow2EncryptionNoInfo',
-> +  'data': { } }
+>  docs/virtio-balloon-stats.txt                   |  2 ++
+>  hw/virtio/virtio-balloon.c                      | 13 ++-----------
+>  include/standard-headers/linux/virtio_balloon.h | 19 ++++++++++++++++++-
+>  3 files changed, 22 insertions(+), 12 deletions(-)
+>=20
+> diff --git a/docs/virtio-balloon-stats.txt b/docs/virtio-balloon-stats.txt
+> index 7a66d25..7c69fdb 100644
+> --- a/docs/virtio-balloon-stats.txt
+> +++ b/docs/virtio-balloon-stats.txt
+> @@ -34,6 +34,8 @@ which will return a dictionary containing:
+>        - stat-total-memory
+>        - stat-available-memory
+>        - stat-disk-caches
+> +      - stat-hugetlb-allocations
+> +      - stat-hugetlb-failures
+> =20
+>    o A key named last-update, which contains the last stats update
+>      timestamp in seconds. Since this timestamp is generated by the host,
+> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+> index f456cea..646f2e0 100644
+> --- a/hw/virtio/virtio-balloon.c
+> +++ b/hw/virtio/virtio-balloon.c
+> @@ -43,17 +43,8 @@ static void balloon_page(void *addr, int deflate)
+>      }
+>  }
+> =20
+> -static const char *balloon_stat_names[] =3D {
+> -   [VIRTIO_BALLOON_S_SWAP_IN] =3D "stat-swap-in",
+> -   [VIRTIO_BALLOON_S_SWAP_OUT] =3D "stat-swap-out",
+> -   [VIRTIO_BALLOON_S_MAJFLT] =3D "stat-major-faults",
+> -   [VIRTIO_BALLOON_S_MINFLT] =3D "stat-minor-faults",
+> -   [VIRTIO_BALLOON_S_MEMFREE] =3D "stat-free-memory",
+> -   [VIRTIO_BALLOON_S_MEMTOT] =3D "stat-total-memory",
+> -   [VIRTIO_BALLOON_S_AVAIL] =3D "stat-available-memory",
+> -   [VIRTIO_BALLOON_S_CACHES] =3D "stat-disk-caches",
+> -   [VIRTIO_BALLOON_S_NR] =3D NULL
+> -};
+> +static const char *balloon_stat_names[VIRTIO_BALLOON_S_NR] =3D \
+> +	VIRTIO_BALLOON_S_NAMES_WITH_PREFIX("stat-");
+> =20
+>  /*
+>   * reset_stats - Mark all items in the stats array as unset
+> diff --git a/include/standard-headers/linux/virtio_balloon.h b/include/st=
+andard-headers/linux/virtio_balloon.h
+> index 7b0a41b..4dbb7dc 100644
+> --- a/include/standard-headers/linux/virtio_balloon.h
+> +++ b/include/standard-headers/linux/virtio_balloon.h
+> @@ -53,7 +53,24 @@ struct virtio_balloon_config {
+>  #define VIRTIO_BALLOON_S_MEMTOT   5   /* Total amount of memory */
+>  #define VIRTIO_BALLOON_S_AVAIL    6   /* Available memory as in /proc */
+>  #define VIRTIO_BALLOON_S_CACHES   7   /* Disk caches */
+> -#define VIRTIO_BALLOON_S_NR       8
+> +#define VIRTIO_BALLOON_S_HTLB_PGALLOC  8  /* Hugetlb page allocations */
+> +#define VIRTIO_BALLOON_S_HTLB_PGFAIL   9  /* Hugetlb page allocation fai=
+lures */
+> +#define VIRTIO_BALLOON_S_NR       10
 > +
->  ##
->  # @ImageInfoSpecificQCow2Encryption:
->  #
-> @@ -52,7 +65,8 @@
->    'base': 'ImageInfoSpecificQCow2EncryptionBase',
->    'discriminator': 'format',
->    'data': { 'aes': 'QCryptoBlockInfoQCow',
-> -            'luks': 'QCryptoBlockInfoLUKS' } }
-> +            'luks': 'QCryptoBlockInfoLUKS',
-> +            'from-image': 'ImageInfoSpecificQCow2EncryptionNoInfo' } }
->  
->  ##
->  # @ImageInfoSpecificQCow2:
-> @@ -2739,10 +2753,30 @@
->  # @BlockdevQcow2EncryptionFormat:
->  # @aes: AES-CBC with plain64 initialization venctors
->  #
-> +# @from-image:      Determine the encryption format from the image
-> +#                   header.  This only allows the use of the
-> +#                   key-secret option.  (Since: 2.13)
-> +#
->  # Since: 2.10
->  ##
->  { 'enum': 'BlockdevQcow2EncryptionFormat',
-> -  'data': [ 'aes', 'luks' ] }
-> +  'data': [ 'aes', 'luks', 'from-image' ] }
+> +#define VIRTIO_BALLOON_S_NAMES_WITH_PREFIX(VIRTIO_BALLOON_S_NAMES_prefix=
+) { \
+> +	VIRTIO_BALLOON_S_NAMES_prefix "swap-in", \
+> +	VIRTIO_BALLOON_S_NAMES_prefix "swap-out", \
+> +	VIRTIO_BALLOON_S_NAMES_prefix "major-faults", \
+> +	VIRTIO_BALLOON_S_NAMES_prefix "minor-faults", \
+> +	VIRTIO_BALLOON_S_NAMES_prefix "free-memory", \
+> +	VIRTIO_BALLOON_S_NAMES_prefix "total-memory", \
+> +	VIRTIO_BALLOON_S_NAMES_prefix "available-memory", \
+> +	VIRTIO_BALLOON_S_NAMES_prefix "disk-caches", \
+> +	VIRTIO_BALLOON_S_NAMES_prefix "hugetlb-allocations", \
+> +	VIRTIO_BALLOON_S_NAMES_prefix "hugetlb-failures" \
+> +}
 > +
-> +##
-> +# @BlockdevQcow2EncryptionSecret:
-> +#
-> +# Allows specifying a key-secret without specifying the exact
-> +# encryption format, which is determined automatically from the image
-> +# header.
-> +#
-> +# @key-secret:      The ID of a QCryptoSecret object providing the
-> +#                   decryption key.  Mandatory except when probing
-> +#                   image for metadata only.
-> +#
-> +# Since: 2.13
-> +##
-> +{ 'struct': 'BlockdevQcow2EncryptionSecret',
-> +  'data': { '*key-secret': 'str' } }
->  
->  ##
->  # @BlockdevQcow2Encryption:
-> @@ -2750,10 +2784,12 @@
->  # Since: 2.10
->  ##
->  { 'union': 'BlockdevQcow2Encryption',
-> -  'base': { 'format': 'BlockdevQcow2EncryptionFormat' },
-> +  'base': { '*format': 'BlockdevQcow2EncryptionFormat' },
->    'discriminator': 'format',
-> +  'default-variant': 'from-image',
->    'data': { 'aes': 'QCryptoBlockOptionsQCow',
-> -            'luks': 'QCryptoBlockOptionsLUKS'} }
-> +            'luks': 'QCryptoBlockOptionsLUKS',
-> +            'from-image': 'BlockdevQcow2EncryptionSecret' } }
+> +#define VIRTIO_BALLOON_S_NAMES VIRTIO_BALLOON_S_NAMES_WITH_PREFIX("")
+> =20
+>  /*
+>   * Memory statistics structure.
+> --=20
+> 1.8.3.1
+>=20
+>=20
+> ---------------------------------------------------------------------
+> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
+> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+>=20
 
-Bike-shedding on name, how about "auto" or "probe" ?
+--YZ5djTAD1cGYuMQK
+Content-Type: application/pgp-signature; name="signature.asc"
 
-IIUC, this schema addition means the QAPI parser now allows
+-----BEGIN PGP SIGNATURE-----
 
-   encrypt.format=from-image,encrypt.key-secret=sec0,...other opts...
+iQEcBAEBAgAGBQJa9ABEAAoJEJykq7OBq3PIf4gH/1d8aPBcKwsm8is53buP7HMw
+WrZkgfv3qcUeBhcdqzm+ZmCtu5CJgFJLEyN0t29ccm63fpdSmzjsxxfbNyMGGEVJ
+ygnj1DBqi6mvqd2PvmJeGXu+k/YSjgmZWjJrbjE3fsq4PW2F2X/KUTpLweqVGGNx
+SildET64kjdlCmYW2MAHvPnC2x+CrR/obe0zO63vovSSJIs1f3P73TQw2exh6J4r
+0RbuLFOzbTYNsqDqbGoqg3IMYBVanMpcWnMw4bb546HfK3K1ujyesHkBLzOpst+X
+/AknZL5+EY6eVRQ+tgt7rdw+ksDH+DB32OiVSwKP0tW0Qzcb7vLwtSaF4LGDNvE=
+=fk0x
+-----END PGP SIGNATURE-----
 
-but the code will not accept "from-image" as a valid string.
-
-eg qcow2_update_options_prepare() will do
-
-    case QCOW_CRYPT_AES:
-        if (encryptfmt && !g_str_equal(encryptfmt, "aes")) {
-            error_setg(errp,
-                       "Header reported 'aes' encryption format but "
-                       "options specify '%s'", encryptfmt);
-            ret = -EINVAL;
-            goto fail;
-        }
-
-       ...snip....
-
-    case QCOW_CRYPT_LUKS:
-        if (encryptfmt && !g_str_equal(encryptfmt, "luks")) {
-            error_setg(errp,
-                       "Header reported 'luks' encryption format but "
-                       "options specify '%s'", encryptfmt);
-            ret = -EINVAL;
-            goto fail;
-        }
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--YZ5djTAD1cGYuMQK--
