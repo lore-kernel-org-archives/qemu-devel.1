@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fGmil-00075e-CF
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 10:39:04 -0400
+	(envelope-from <rth7680@gmail.com>) id 1fGmnC-00025V-Rp
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 10:43:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fGmik-0000Zf-HH
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 10:39:03 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:44346)
+	(envelope-from <rth7680@gmail.com>) id 1fGmn9-0002eq-MZ
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 10:43:38 -0400
+Received: from mail-pg0-x22d.google.com ([2607:f8b0:400e:c05::22d]:34611)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fGmik-0000ZO-D4
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 10:39:02 -0400
-Received: by mail-oi0-x243.google.com with SMTP id e80-v6so1938384oig.11
-	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 07:39:02 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <d4525d99-e8cd-e56b-e23e-d486cb9f57ef@twiddle.net>
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1fGmn9-0002eY-GK
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 10:43:35 -0400
+Received: by mail-pg0-x22d.google.com with SMTP id g20-v6so1073374pgv.1
+	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 07:43:35 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
 References: <20180510143618.23673-1-peter.maydell@linaro.org>
 	<d4525d99-e8cd-e56b-e23e-d486cb9f57ef@twiddle.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 10 May 2018 15:38:41 +0100
-Message-ID: <CAFEAcA8V_Zb3kHThShPQshC4=wt2Oof=VoVU35C0-TyusGzC_w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	<CAFEAcA8V_Zb3kHThShPQshC4=wt2Oof=VoVU35C0-TyusGzC_w@mail.gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <73b20cd6-4b4f-a060-8c37-e9df9793e44b@twiddle.net>
+Date: Thu, 10 May 2018 07:43:32 -0700
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA8V_Zb3kHThShPQshC4=wt2Oof=VoVU35C0-TyusGzC_w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH] atomic.h: Work around gcc spurious "unused
  value" warning
 List-Id: <qemu-devel.nongnu.org>
@@ -30,37 +33,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
+To: Peter Maydell <peter.maydell@linaro.org>
 Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 10 May 2018 at 15:37, Richard Henderson <rth@twiddle.net> wrote:
-> On 05/10/2018 07:36 AM, Peter Maydell wrote:
->> Some versions of gcc produce a spurious warning if the result of
->> __atomic_compare_echange_n() is not used and the type involved
->> is a signed 8 bit value:
->>   error: value computed is not used [-Werror=unused-value]
->> This has been seen on at least
->>  gcc (Ubuntu 5.4.0-6ubuntu1~16.04.9) 5.4.0 20160609
->>
->> Work around this by using an explicit cast to void to indicate
->> that we don't care about the return value.
->>
->> We don't currently use our atomic_cmpxchg() macro on any signed
->> 8 bit types, but the upcoming support for the Arm v8.1-Atomics
->> will require it.
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->> Sending out my workaround as an actual patch. If this is OK I'll
->> put in via target-arm.next as it's a dependency for the v8.1-atomics
->> series.
->>
->>  include/qemu/atomic.h | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+On 05/10/2018 07:38 AM, Peter Maydell wrote:
+> Thanks. Do we care about trying to follow up on the gcc side
+> to find out if this is a definitely-fixed bug?
 
-Thanks. Do we care about trying to follow up on the gcc side
-to find out if this is a definitely-fixed bug?
+Given I did not see the problem with gcc 6 as shipped with debian 9, I'm not
+overly inclined to dig further than that.
 
--- PMM
+
+r~
