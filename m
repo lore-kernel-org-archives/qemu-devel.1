@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33675)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fGmgB-0005PY-BF
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 10:36:24 -0400
+	(envelope-from <rth7680@gmail.com>) id 1fGmgC-0005Q4-A1
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 10:36:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fGmgA-00082b-Io
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 10:36:23 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41582)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fGmgA-00080D-Bf
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 10:36:22 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 10 May 2018 15:36:18 +0100
-Message-Id: <20180510143618.23673-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] atomic.h: Work around gcc spurious "unused
- value" warning
+	(envelope-from <rth7680@gmail.com>) id 1fGmg8-0007yY-9s
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 10:36:24 -0400
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:44802)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1fGmg8-0007y3-2w
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 10:36:20 -0400
+Received: by mail-pl0-x241.google.com with SMTP id e6-v6so1414134plt.11
+	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 07:36:19 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20180510130024.31678-1-peter.maydell@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <38c06afb-389d-7e10-42b0-df1f8c2a23eb@twiddle.net>
+Date: Thu, 10 May 2018 07:36:17 -0700
+MIME-Version: 1.0
+In-Reply-To: <20180510130024.31678-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] tcg: Optionally log FPU state in TCG -d
+ cpu logging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,44 +31,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-Some versions of gcc produce a spurious warning if the result of
-__atomic_compare_echange_n() is not used and the type involved
-is a signed 8 bit value:
-  error: value computed is not used [-Werror=unused-value]
-This has been seen on at least
- gcc (Ubuntu 5.4.0-6ubuntu1~16.04.9) 5.4.0 20160609
+On 05/10/2018 06:00 AM, Peter Maydell wrote:
+> Usually the logging of the CPU state produced by -d cpu is sufficient
+> to diagnose problems, but sometimes you want to see the state of
+> the floating point registers as well. We don't want to enable that
+> by default as it adds a lot of extra data to the log; instead,
+> allow it to be optionally enabled via -d fpu.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> I've found this helpful while tracking down fp-emulation related bugs.
+> 
+>  include/qemu/log.h   | 1 +
+>  accel/tcg/cpu-exec.c | 9 ++++++---
+>  util/log.c           | 2 ++
+>  3 files changed, 9 insertions(+), 3 deletions(-)
 
-Work around this by using an explicit cast to void to indicate
-that we don't care about the return value.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-We don't currently use our atomic_cmpxchg() macro on any signed
-8 bit types, but the upcoming support for the Arm v8.1-Atomics
-will require it.
+I'll also note that only i386 and arm check this flag;
+something to fix for the rest...
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-Sending out my workaround as an actual patch. If this is OK I'll
-put in via target-arm.next as it's a dependency for the v8.1-atomics
-series.
 
- include/qemu/atomic.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/include/qemu/atomic.h b/include/qemu/atomic.h
-index d73c9e14d7..9ed39effd3 100644
---- a/include/qemu/atomic.h
-+++ b/include/qemu/atomic.h
-@@ -187,7 +187,7 @@
- /* Returns the eventual value, failed or not */
- #define atomic_cmpxchg__nocheck(ptr, old, new)    ({                    \
-     typeof_strip_qual(*ptr) _old = (old);                               \
--    __atomic_compare_exchange_n(ptr, &_old, new, false,                 \
-+    (void)__atomic_compare_exchange_n(ptr, &_old, new, false,           \
-                               __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);      \
-     _old;                                                               \
- })
--- 
-2.17.0
+r~
