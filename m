@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fGpYa-0001qI-53
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 13:40:45 -0400
+	(envelope-from <alistair23@gmail.com>) id 1fGpa0-0002Qc-43
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 13:42:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fGpYY-0007TM-PJ
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 13:40:44 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:35894)
+	(envelope-from <alistair23@gmail.com>) id 1fGpZy-0008ET-Qu
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 13:42:12 -0400
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:42378)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1fGpYY-0007QT-EW
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 13:40:42 -0400
-Received: by mail-lf0-x243.google.com with SMTP id t129-v6so4138836lff.3
-	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 10:40:42 -0700 (PDT)
+	id 1fGpZy-0008Dz-JJ
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 13:42:10 -0400
+Received: by mail-lf0-x244.google.com with SMTP id b18-v6so3445061lfa.9
+	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 10:42:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <66d0552d-5017-e89c-7d40-d5ff8e02ce23@amsat.org>
-References: <cover.1525464177.git.alistair.francis@wdc.com>
-	<6634a98e5558a060369ac365e8ea2fd960af5b81.1525464177.git.alistair.francis@wdc.com>
-	<66d0552d-5017-e89c-7d40-d5ff8e02ce23@amsat.org>
+In-Reply-To: <025447ec-d2af-4f92-9cc0-6f59877e617a@amsat.org>
+References: <20180509034658.26455-1-f4bug@amsat.org>
+	<20180509034658.26455-5-f4bug@amsat.org>
+	<CAKmqyKN71oTTVMiuqGnFL2wyiAEBRH+nGCvxj_UpK+6RxF1PLg@mail.gmail.com>
+	<b30a766d-2c6e-8804-973c-8110bb6ac5d2@amsat.org>
+	<CAKmqyKPnrF93GGY9YaqpjDLrnWPmEis8xt1SDm4GRhcvP2KTRQ@mail.gmail.com>
+	<025447ec-d2af-4f92-9cc0-6f59877e617a@amsat.org>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 10 May 2018 10:40:10 -0700
-Message-ID: <CAKmqyKMfyYkT1gvQ3ZRRYH_+XeCs7_njZaMX-RUoPFCsHd+3Dg@mail.gmail.com>
+Date: Thu, 10 May 2018 10:41:38 -0700
+Message-ID: <CAKmqyKMo9xhFapDLK_Su5mL+zgy4pFLgnsCAo-XiwMCAGn+LcQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 2/4] hw/riscv/sifive_plic: Use gpios
- instead of irqs
+Subject: Re: [Qemu-devel] [PATCH v2 04/14] sdcard: Extract
+ sd_frame48/136_calc_checksum()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,160 +36,132 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Alistair Francis <alistair.francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair@alistair23.me>, Stefan Hajnoczi <stefanha@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-On Wed, May 9, 2018 at 7:33 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+On Wed, May 9, 2018 at 5:16 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
 g> wrote:
-> Hi Alistair,
->
-> On 05/04/2018 05:13 PM, Alistair Francis wrote:
->> Instead of creating the interrupt in lines with qemu_allocate_irq() use
->> qdev_init_gpio_in() as this gives us the ability to use the qdev*gpio*()
->> helpers later on.
->
-> This is a good idea, but your patch is incomplete:
-> The devices previously using plic->irqs[] now need to use those
-> qdev*gpio*() helpers.
->
+> On 05/09/2018 08:04 PM, Alistair Francis wrote:
+>> On Wed, May 9, 2018 at 12:15 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsa=
+t.org> wrote:
+>>> Hi Alistair,
+>>>
+>>> On 05/09/2018 03:00 PM, Alistair Francis wrote:
+>>>> On Tue, May 8, 2018 at 8:46 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@ams=
+at.org> wrote:
+>>>>> It will help when moving this around for qtesting in the next commit.
+>>>>>
+>>>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>>>> ---
+>>>>>  hw/sd/sd.c | 21 ++++++++++++++++++---
+>>>>>  1 file changed, 18 insertions(+), 3 deletions(-)
+>>>>>
+>>>>> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+>>>>> index 27a70896cd..06607115a7 100644
+>>>>> --- a/hw/sd/sd.c
+>>>>> +++ b/hw/sd/sd.c
+>>>>> @@ -273,6 +273,21 @@ static uint16_t sd_crc16(const void *message, si=
+ze_t width)
+>>>>>      return shift_reg;
+>>>>>  }
+>>>>>
+>>>>> +enum {
+>>>>> +    F48_CONTENT_LENGTH  =3D 1 /* command */ + 4 /* argument */,
+>>>>> +    F136_CONTENT_LENGTH =3D 15,
+>>>>> +};
+>>>>> +
+>>>>> +static uint8_t sd_frame48_calc_checksum(const void *content)
+>>>>> +{
+>>>>> +    return sd_crc7(content, F48_CONTENT_LENGTH);
+>>>>> +}
+>>>>> +
+>>>>> +static uint8_t sd_frame136_calc_checksum(const void *content)
+>>>>> +{
+>>>>> +    return (sd_crc7(content, F136_CONTENT_LENGTH) << 1) | 1;
+>>>>> +}
+>>>>> +
+>>>>>  #define OCR_POWER_DELAY_NS      500000 /* 0.5ms */
+>>>>>
+>>>>>  FIELD(OCR, VDD_VOLTAGE_WINDOW,          0, 24)
+>>>>> @@ -352,7 +367,7 @@ static void sd_set_cid(SDState *sd)
+>>>>>      sd->cid[13] =3D 0x00 |       /* Manufacture date (MDT) */
+>>>>>          ((MDT_YR - 2000) / 10);
+>>>>>      sd->cid[14] =3D ((MDT_YR % 10) << 4) | MDT_MON;
+>>>>> -    sd->cid[15] =3D (sd_crc7(sd->cid, 15) << 1) | 1;
+>>>>> +    sd->cid[15] =3D sd_frame136_calc_checksum(sd->cid);
+>>>>>  }
+>>>>>
+>>>>>  #define HWBLOCK_SHIFT  9                       /* 512 bytes */
+>>>>> @@ -416,7 +431,7 @@ static void sd_set_csd(SDState *sd, uint64_t size=
+)
+>>>>>          sd->csd[13] =3D 0x40;
+>>>>>          sd->csd[14] =3D 0x00;
+>>>>>      }
+>>>>> -    sd->csd[15] =3D (sd_crc7(sd->csd, 15) << 1) | 1;
+>>>>> +    sd->csd[15] =3D sd_frame136_calc_checksum(sd->csd);
+>>>>>  }
+>>>>>
+>>>>>  static void sd_set_rca(SDState *sd)
+>>>>> @@ -491,7 +506,7 @@ static int sd_req_crc_validate(SDRequest *req)
+>>>>>      buffer[0] =3D 0x40 | req->cmd;
+>>>>>      stl_be_p(&buffer[1], req->arg);
+>>>>>      return 0;
+>>>>> -    return sd_crc7(buffer, 5) !=3D req->crc;     /* TODO */
+>>>>> +    return sd_frame48_calc_checksum(buffer) !=3D req->crc; /* TODO *=
+/
+>>>>
+>>>> This 5 has changed to a 15. Is that on purpose? It should be mentioned
+>>>> in the commit message if it is.
+>>>
+>>> I just extracted this function:
+>>>
+>>>   static uint8_t sd_frame48_calc_checksum(const void *content)
+>>>   {
+>>>       return sd_crc7(content, F48_CONTENT_LENGTH);
+>>>   }
+>>>
+>>> Having:
+>>>
+>>>   enum {
+>>>       F48_CONTENT_LENGTH  =3D 1 /* command */ + 4 /* argument */,
+>>>
+>>> So F48_CONTENT_LENGTH =3D 5 as previous.
 >>
->> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
->> ---
->>  hw/riscv/sifive_plic.c | 5 +----
->>  1 file changed, 1 insertion(+), 4 deletions(-)
->>
->> diff --git a/hw/riscv/sifive_plic.c b/hw/riscv/sifive_plic.c
->> index a4ac910ca9..81b6b5245b 100644
->> --- a/hw/riscv/sifive_plic.c
->> +++ b/hw/riscv/sifive_plic.c
->> @@ -431,7 +431,6 @@ static void sifive_plic_irq_request(void *opaque, in=
-t irq, int level)
->>  static void sifive_plic_realize(DeviceState *dev, Error **errp)
->>  {
->>      SiFivePLICState *plic =3D SIFIVE_PLIC(dev);
->> -    int i;
->>
->>      memory_region_init_io(&plic->mmio, OBJECT(dev), &sifive_plic_ops, p=
-lic,
->>                            TYPE_SIFIVE_PLIC, plic->aperture_size);
->> @@ -444,9 +443,7 @@ static void sifive_plic_realize(DeviceState *dev, Er=
-ror **errp)
->>      plic->enable =3D g_new0(uint32_t, plic->bitfield_words * plic->num_=
-addrs);
->>      sysbus_init_mmio(SYS_BUS_DEVICE(dev), &plic->mmio);
->>      plic->irqs =3D g_new0(qemu_irq, plic->num_sources + 1);
->> -    for (i =3D 0; i <=3D plic->num_sources; i++) {
->> -        plic->irqs[i] =3D qemu_allocate_irq(sifive_plic_irq_request, pl=
-ic, i);
->> -    }
->> +    qdev_init_gpio_in(dev, sifive_plic_irq_request, plic->num_sources);
->>  }
->>
->>  static void sifive_plic_class_init(ObjectClass *klass, void *data)
->>
+>> Ah, I missed the '+ 4 '. I just stopped reading at the comment.
 >
-> The following patch completes yours:
+> This way looked clearer to me, but it might not be...
+> Would this be clearer?
 >
-> - access the irqs with qdev_get_gpio_in()
-> - remove plic->irqs[] alloc in sifive_plic_realize()
-> - remove plic->irqs[] from SiFivePLICState struct
+>    F48_CONTENT_LENGTH  =3D 1 + 4 /* command + argument */,
 
-Thanks for that.
+I think this is clearer, but the way you have it now is fine as well.
 
-I realised the same thing. This series is also missing some device
-tree changes that are required. I'll fix all of that in the next
-version.
+>
+>>
+>> Looks good then:
+>>
+>> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+>
+> Thanks for your review time :)
+
+No worries :)
 
 Alistair
 
 >
-> -- >8 --
->  include/hw/riscv/sifive_plic.h | 1 -
->  hw/riscv/sifive_e.c            | 2 +-
->  hw/riscv/sifive_plic.c         | 1 -
->  hw/riscv/sifive_u.c            | 2 +-
->  hw/riscv/virt.c                | 4 ++--
->  5 files changed, 4 insertions(+), 6 deletions(-)
->
-> diff --git a/include/hw/riscv/sifive_plic.h b/include/hw/riscv/sifive_pli=
-c.h
-> index 11a5a98df1..2f2af7e686 100644
-> --- a/include/hw/riscv/sifive_plic.h
-> +++ b/include/hw/riscv/sifive_plic.h
-> @@ -56,7 +56,6 @@ typedef struct SiFivePLICState {
->      uint32_t *claimed;
->      uint32_t *enable;
->      QemuMutex lock;
-> -    qemu_irq *irqs;
->
->      /* config */
->      char *hart_config;
-> diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-> index 0ab5e3ca45..7b4f04adcf 100644
-> --- a/hw/riscv/sifive_e.c
-> +++ b/hw/riscv/sifive_e.c
-> @@ -190,7 +190,7 @@ static void riscv_sifive_e31_realize(DeviceState
-> *dev, Error **errp)
->      sifive_mmio_emulate(sys_mem, "riscv.sifive.e.gpio0",
->          memmap[SIFIVE_E_GPIO0].base, memmap[SIFIVE_E_GPIO0].size);
->      sifive_uart_create(sys_mem, memmap[SIFIVE_E_UART0].base,
-> -        serial_hd(0), SIFIVE_PLIC(s->plic)->irqs[SIFIVE_E_UART0_IRQ]);
-> +        serial_hd(0), qdev_get_gpio_in(DEVICE(s->plic),
-> SIFIVE_E_UART0_IRQ));
->      sifive_mmio_emulate(sys_mem, "riscv.sifive.e.qspi0",
->          memmap[SIFIVE_E_QSPI0].base, memmap[SIFIVE_E_QSPI0].size);
->      sifive_mmio_emulate(sys_mem, "riscv.sifive.e.pwm0",
-> diff --git a/hw/riscv/sifive_plic.c b/hw/riscv/sifive_plic.c
-> index c6ad17057d..a91aeb97ab 100644
-> --- a/hw/riscv/sifive_plic.c
-> +++ b/hw/riscv/sifive_plic.c
-> @@ -447,7 +447,6 @@ static void sifive_plic_realize(DeviceState *dev,
-> Error **errp)
->      plic->claimed =3D g_new0(uint32_t, plic->bitfield_words);
->      plic->enable =3D g_new0(uint32_t, plic->bitfield_words *
-> plic->num_addrs);
->      sysbus_init_mmio(SYS_BUS_DEVICE(dev), &plic->mmio);
-> -    plic->irqs =3D g_new0(qemu_irq, plic->num_sources + 1);
->      qdev_init_gpio_in(dev, sifive_plic_irq_request, plic->num_sources);
->  }
->
-> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index 54f33c39ae..b7936dcec5 100644
-> --- a/hw/riscv/sifive_u.c
-> +++ b/hw/riscv/sifive_u.c
-> @@ -330,7 +330,7 @@ static void riscv_sifive_u54_realize(DeviceState
-> *dev, Error **errp)
->          SIFIVE_U_PLIC_CONTEXT_STRIDE,
->          memmap[SIFIVE_U_PLIC].size);
->      sifive_uart_create(system_memory, memmap[SIFIVE_U_UART0].base,
-> -        serial_hd(0), SIFIVE_PLIC(s->plic)->irqs[SIFIVE_U_UART0_IRQ]);
-> +        serial_hd(0), qdev_get_gpio_in(DEVICE(s->plic),
-> SIFIVE_U_UART0_IRQ));
->      /* sifive_uart_create(system_memory, memmap[SIFIVE_U_UART1].base,
->          serial_hd(1), SIFIVE_PLIC(s->plic)->irqs[SIFIVE_U_UART1_IRQ]); *=
-/
->      sifive_clint_create(memmap[SIFIVE_U_CLINT].base,
-> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-> index ad03113e0f..bdd75722eb 100644
-> --- a/hw/riscv/virt.c
-> +++ b/hw/riscv/virt.c
-> @@ -379,11 +379,11 @@ static void riscv_virt_board_init(MachineState
-> *machine)
->      for (i =3D 0; i < VIRTIO_COUNT; i++) {
->          sysbus_create_simple("virtio-mmio",
->              memmap[VIRT_VIRTIO].base + i * memmap[VIRT_VIRTIO].size,
-> -            SIFIVE_PLIC(s->plic)->irqs[VIRTIO_IRQ + i]);
-> +            qdev_get_gpio_in(DEVICE(s->plic), VIRTIO_IRQ + i));
->      }
->
->      serial_mm_init(system_memory, memmap[VIRT_UART0].base,
-> -        0, SIFIVE_PLIC(s->plic)->irqs[UART0_IRQ], 399193,
-> +        0, qdev_get_gpio_in(DEVICE(s->plic), UART0_IRQ), 399193,
->          serial_hd(0), DEVICE_LITTLE_ENDIAN);
->  }
->
-> --
->
-> Regards,
->
-> Phil.
->
+>>
+>> Alistair
+>>
+>>>
+>>> This function is later verified with tests from patch 12 of this series=
+.
+>>>
+>>>>
+>>>> Alistair
+>>>>
+>>>>>  }
+>>>>>
+>>>>>  static void sd_response_r1_make(SDState *sd, uint8_t *response)
+>>>>> --
+>>>>> 2.17.0
+>>>>>
+>>>>>
