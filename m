@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46197)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fGi5Y-0002HF-KO
+	(envelope-from <alex.bennee@linaro.org>) id 1fGi5X-0002G0-FZ
 	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:42:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fGi5W-0004VM-Ph
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:42:16 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:33934)
+	(envelope-from <alex.bennee@linaro.org>) id 1fGi5U-0004TO-0c
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:42:15 -0400
+Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:46441)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fGi5W-0004Uj-FZ
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:42:14 -0400
-Received: by mail-wm0-x243.google.com with SMTP id a137-v6so26707008wme.1
-	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 02:42:14 -0700 (PDT)
+	id 1fGi5T-0004Sm-L1
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:42:11 -0400
+Received: by mail-wr0-x230.google.com with SMTP id a12-v6so1318595wrn.13
+	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 02:42:11 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 10 May 2018 10:42:05 +0100
-Message-Id: <20180510094206.15354-5-alex.bennee@linaro.org>
+Date: Thu, 10 May 2018 10:42:03 +0100
+Message-Id: <20180510094206.15354-3-alex.bennee@linaro.org>
 In-Reply-To: <20180510094206.15354-1-alex.bennee@linaro.org>
 References: <20180510094206.15354-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 4/5] target/arm: convert conversion helpers
- to fpst/ahp_flag
+Subject: [Qemu-devel] [PATCH v3 2/5] fpu/softfloat: re-factor float to float
+ conversions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,439 +31,588 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: richard.henderson@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: richard.henderson@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-Instead of passing env and leaving it up to the helper to get the
-right fpstatus we pass it explicitly. There was already a get_fpstatus
-helper for neon for the 32 bit code. We also add an get_ahp_flag() for
-passing the state of the alternative FP16 format flag. This leaves
-scope for later tracking the AHP state in translation flags.
+This allows us to delete a lot of additional boilerplate code which is
+no longer needed. Currently the ieee flag is ignored (everything is
+assumed to be ieee). Handling for ARM AHP will be in the next patch.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- target/arm/helper.c        | 58 ++++++++++++-------------------
- target/arm/helper.h        | 12 +++----
- target/arm/translate-a64.c | 38 +++++++++++++++++----
- target/arm/translate.c     | 70 +++++++++++++++++++++++++++++---------
- target/arm/translate.h     | 15 ++++++++
- 5 files changed, 128 insertions(+), 65 deletions(-)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 0fef5d4d06..4dd28bb70c 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -11457,64 +11457,50 @@ uint32_t HELPER(set_neon_rmode)(uint32_t rmode, CPUARMState *env)
+---
+v2
+  - pass FloatFmt to float_to_float instead of sizes
+  - split AHP handling to another patch
+  - use rth's suggested re-packing (+ setting .exp)
+v3
+  - also rm extractFloat16Sign
+---
+ fpu/softfloat-specialize.h |  40 ----
+ fpu/softfloat.c            | 452 +++++++------------------------------
+ include/fpu/softfloat.h    |   8 +-
+ 3 files changed, 88 insertions(+), 412 deletions(-)
+
+diff --git a/fpu/softfloat-specialize.h b/fpu/softfloat-specialize.h
+index 27834af0de..a20b440159 100644
+--- a/fpu/softfloat-specialize.h
++++ b/fpu/softfloat-specialize.h
+@@ -293,46 +293,6 @@ float16 float16_maybe_silence_nan(float16 a_, float_status *status)
+     return a_;
  }
  
- /* Half precision conversions.  */
--static float32 do_fcvt_f16_to_f32(uint32_t a, CPUARMState *env, float_status *s)
-+static float32 do_fcvt_f16_to_f32(float16 a, float_status *s, bool ahp)
- {
--    int ieee = (env->vfp.xregs[ARM_VFP_FPSCR] & (1 << 26)) == 0;
--    float32 r = float16_to_float32(make_float16(a), ieee, s);
--    if (ieee) {
--        return float32_maybe_silence_nan(r, s);
+-/*----------------------------------------------------------------------------
+-| Returns the result of converting the half-precision floating-point NaN
+-| `a' to the canonical NaN format.  If `a' is a signaling NaN, the invalid
+-| exception is raised.
+-*----------------------------------------------------------------------------*/
+-
+-static commonNaNT float16ToCommonNaN(float16 a, float_status *status)
+-{
+-    commonNaNT z;
+-
+-    if (float16_is_signaling_nan(a, status)) {
+-        float_raise(float_flag_invalid, status);
 -    }
--    return r;
-+    return float16_to_float32(a, !ahp, s);
- }
- 
--static uint32_t do_fcvt_f32_to_f16(float32 a, CPUARMState *env, float_status *s)
-+static float16 do_fcvt_f32_to_f16(float32 a, float_status *s, bool ahp)
- {
--    int ieee = (env->vfp.xregs[ARM_VFP_FPSCR] & (1 << 26)) == 0;
--    float16 r = float32_to_float16(a, ieee, s);
--    if (ieee) {
--        r = float16_maybe_silence_nan(r, s);
+-    z.sign = float16_val(a) >> 15;
+-    z.low = 0;
+-    z.high = ((uint64_t) float16_val(a)) << 54;
+-    return z;
+-}
+-
+-/*----------------------------------------------------------------------------
+-| Returns the result of converting the canonical NaN `a' to the half-
+-| precision floating-point format.
+-*----------------------------------------------------------------------------*/
+-
+-static float16 commonNaNToFloat16(commonNaNT a, float_status *status)
+-{
+-    uint16_t mantissa = a.high >> 54;
+-
+-    if (status->default_nan_mode) {
+-        return float16_default_nan(status);
 -    }
--    return float16_val(r);
-+    return float32_to_float16(a, !ahp, s);
- }
- 
--float32 HELPER(neon_fcvt_f16_to_f32)(uint32_t a, CPUARMState *env)
-+float32 HELPER(neon_fcvt_f16_to_f32)(float16 a, void *fpstp, uint32_t ahp_mode)
- {
--    return do_fcvt_f16_to_f32(a, env, &env->vfp.standard_fp_status);
-+    float_status *fpst = fpstp;
-+    return do_fcvt_f16_to_f32(a, fpst, ahp_mode);
- }
- 
--uint32_t HELPER(neon_fcvt_f32_to_f16)(float32 a, CPUARMState *env)
-+float16 HELPER(neon_fcvt_f32_to_f16)(float32 a, void *fpstp, uint32_t ahp_mode)
- {
--    return do_fcvt_f32_to_f16(a, env, &env->vfp.standard_fp_status);
-+    float_status *fpst = fpstp;
-+    return do_fcvt_f32_to_f16(a, fpst, ahp_mode);
- }
- 
--float32 HELPER(vfp_fcvt_f16_to_f32)(uint32_t a, CPUARMState *env)
-+float32 HELPER(vfp_fcvt_f16_to_f32)(float16 a, void *fpstp, uint32_t ahp_mode)
- {
--    return do_fcvt_f16_to_f32(a, env, &env->vfp.fp_status);
-+    float_status *fpst = fpstp;
-+    return do_fcvt_f16_to_f32(a, fpst, ahp_mode);
- }
- 
--uint32_t HELPER(vfp_fcvt_f32_to_f16)(float32 a, CPUARMState *env)
-+float16 HELPER(vfp_fcvt_f32_to_f16)(float32 a, void *fpstp, uint32_t ahp_mode)
- {
--    return do_fcvt_f32_to_f16(a, env, &env->vfp.fp_status);
-+    float_status *fpst = fpstp;
-+    return do_fcvt_f32_to_f16(a, fpst, ahp_mode);
- }
- 
--float64 HELPER(vfp_fcvt_f16_to_f64)(uint32_t a, CPUARMState *env)
-+float64 HELPER(vfp_fcvt_f16_to_f64)(float16 a, void *fpstp, uint32_t ahp_mode)
- {
--    int ieee = (env->vfp.xregs[ARM_VFP_FPSCR] & (1 << 26)) == 0;
--    float64 r = float16_to_float64(make_float16(a), ieee, &env->vfp.fp_status);
--    if (ieee) {
--        return float64_maybe_silence_nan(r, &env->vfp.fp_status);
+-
+-    if (mantissa) {
+-        return make_float16(((((uint16_t) a.sign) << 15)
+-                             | (0x1F << 10) | mantissa));
+-    } else {
+-        return float16_default_nan(status);
 -    }
--    return r;
-+    float_status *fpst = fpstp;
-+    return float16_to_float64(a, !ahp_mode, fpst);
- }
- 
--uint32_t HELPER(vfp_fcvt_f64_to_f16)(float64 a, CPUARMState *env)
-+float16 HELPER(vfp_fcvt_f64_to_f16)(float64 a, void *fpstp, uint32_t ahp_mode)
+-}
+-
+ #ifdef NO_SIGNALING_NANS
+ int float32_is_quiet_nan(float32 a_, float_status *status)
  {
--    int ieee = (env->vfp.xregs[ARM_VFP_FPSCR] & (1 << 26)) == 0;
--    float16 r = float64_to_float16(a, ieee, &env->vfp.fp_status);
--    if (ieee) {
--        r = float16_maybe_silence_nan(r, &env->vfp.fp_status);
--    }
--    return float16_val(r);
-+    float_status *fpst = fpstp;
-+    return float64_to_float16(a, !ahp_mode, fpst);
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index 3adf6a06e4..042e5c901d 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -123,15 +123,6 @@ static inline int extractFloat16Exp(float16 a)
+     return (float16_val(a) >> 10) & 0x1f;
  }
  
- #define float32_two make_float32(0x40000000)
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 34e8cc8904..288480a0e7 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -181,12 +181,12 @@ DEF_HELPER_3(vfp_ultoh, f16, i32, i32, ptr)
- DEF_HELPER_FLAGS_2(set_rmode, TCG_CALL_NO_RWG, i32, i32, ptr)
- DEF_HELPER_FLAGS_2(set_neon_rmode, TCG_CALL_NO_RWG, i32, i32, env)
- 
--DEF_HELPER_2(vfp_fcvt_f16_to_f32, f32, i32, env)
--DEF_HELPER_2(vfp_fcvt_f32_to_f16, i32, f32, env)
--DEF_HELPER_2(neon_fcvt_f16_to_f32, f32, i32, env)
--DEF_HELPER_2(neon_fcvt_f32_to_f16, i32, f32, env)
--DEF_HELPER_FLAGS_2(vfp_fcvt_f16_to_f64, TCG_CALL_NO_RWG, f64, i32, env)
--DEF_HELPER_FLAGS_2(vfp_fcvt_f64_to_f16, TCG_CALL_NO_RWG, i32, f64, env)
-+DEF_HELPER_3(vfp_fcvt_f16_to_f32, f32, f16, ptr, i32)
-+DEF_HELPER_3(vfp_fcvt_f32_to_f16, f16, f32, ptr, i32)
-+DEF_HELPER_3(neon_fcvt_f16_to_f32, f32, f16, ptr, i32)
-+DEF_HELPER_3(neon_fcvt_f32_to_f16, f16, f32, ptr, i32)
-+DEF_HELPER_FLAGS_3(vfp_fcvt_f16_to_f64, TCG_CALL_NO_RWG, f64, f16, ptr, i32)
-+DEF_HELPER_FLAGS_3(vfp_fcvt_f64_to_f16, TCG_CALL_NO_RWG, f16, f64, ptr, i32)
- 
- DEF_HELPER_4(vfp_muladdd, f64, f64, f64, f64, ptr)
- DEF_HELPER_4(vfp_muladds, f32, f32, f32, f32, ptr)
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 6d49f30b4a..00a7c63240 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -4830,10 +4830,15 @@ static void handle_fp_fcvt(DisasContext *s, int opcode,
-         } else {
-             /* Single to half */
-             TCGv_i32 tcg_rd = tcg_temp_new_i32();
--            gen_helper_vfp_fcvt_f32_to_f16(tcg_rd, tcg_rn, cpu_env);
-+            TCGv_i32 ahp = get_ahp_flag();
-+            TCGv_ptr fpst = get_fpstatus_ptr(true);
-+
-+            gen_helper_vfp_fcvt_f32_to_f16(tcg_rd, tcg_rn, fpst, ahp);
-             /* write_fp_sreg is OK here because top half of tcg_rd is zero */
-             write_fp_sreg(s, rd, tcg_rd);
-             tcg_temp_free_i32(tcg_rd);
-+            tcg_temp_free_i32(ahp);
-+            tcg_temp_free_ptr(fpst);
-         }
-         tcg_temp_free_i32(tcg_rn);
-         break;
-@@ -4846,9 +4851,13 @@ static void handle_fp_fcvt(DisasContext *s, int opcode,
-             /* Double to single */
-             gen_helper_vfp_fcvtsd(tcg_rd, tcg_rn, cpu_env);
-         } else {
-+            TCGv_ptr fpst = get_fpstatus_ptr(true);
-+            TCGv_i32 ahp = get_ahp_flag();
-             /* Double to half */
--            gen_helper_vfp_fcvt_f64_to_f16(tcg_rd, tcg_rn, cpu_env);
-+            gen_helper_vfp_fcvt_f64_to_f16(tcg_rd, tcg_rn, fpst, ahp);
-             /* write_fp_sreg is OK here because top half of tcg_rd is zero */
-+            tcg_temp_free_ptr(fpst);
-+            tcg_temp_free_i32(ahp);
-         }
-         write_fp_sreg(s, rd, tcg_rd);
-         tcg_temp_free_i32(tcg_rd);
-@@ -4858,17 +4867,21 @@ static void handle_fp_fcvt(DisasContext *s, int opcode,
-     case 0x3:
-     {
-         TCGv_i32 tcg_rn = read_fp_sreg(s, rn);
-+        TCGv_ptr tcg_fpst = get_fpstatus_ptr(true);
-+        TCGv_i32 tcg_ahp = get_ahp_flag();
-         tcg_gen_ext16u_i32(tcg_rn, tcg_rn);
-         if (dtype == 0) {
-             /* Half to single */
-             TCGv_i32 tcg_rd = tcg_temp_new_i32();
--            gen_helper_vfp_fcvt_f16_to_f32(tcg_rd, tcg_rn, cpu_env);
-+            gen_helper_vfp_fcvt_f16_to_f32(tcg_rd, tcg_rn, tcg_fpst, tcg_ahp);
-             write_fp_sreg(s, rd, tcg_rd);
-+            tcg_temp_free_ptr(tcg_fpst);
-+            tcg_temp_free_i32(tcg_ahp);
-             tcg_temp_free_i32(tcg_rd);
-         } else {
-             /* Half to double */
-             TCGv_i64 tcg_rd = tcg_temp_new_i64();
--            gen_helper_vfp_fcvt_f16_to_f64(tcg_rd, tcg_rn, cpu_env);
-+            gen_helper_vfp_fcvt_f16_to_f64(tcg_rd, tcg_rn, tcg_fpst, tcg_ahp);
-             write_fp_dreg(s, rd, tcg_rd);
-             tcg_temp_free_i64(tcg_rd);
-         }
-@@ -8487,12 +8500,17 @@ static void handle_2misc_narrow(DisasContext *s, bool scalar,
-             } else {
-                 TCGv_i32 tcg_lo = tcg_temp_new_i32();
-                 TCGv_i32 tcg_hi = tcg_temp_new_i32();
-+                TCGv_ptr fpst = get_fpstatus_ptr(true);
-+                TCGv_i32 ahp = get_ahp_flag();
-+
-                 tcg_gen_extr_i64_i32(tcg_lo, tcg_hi, tcg_op);
--                gen_helper_vfp_fcvt_f32_to_f16(tcg_lo, tcg_lo, cpu_env);
--                gen_helper_vfp_fcvt_f32_to_f16(tcg_hi, tcg_hi, cpu_env);
-+                gen_helper_vfp_fcvt_f32_to_f16(tcg_lo, tcg_lo, fpst, ahp);
-+                gen_helper_vfp_fcvt_f32_to_f16(tcg_hi, tcg_hi, fpst, ahp);
-                 tcg_gen_deposit_i32(tcg_res[pass], tcg_lo, tcg_hi, 16, 16);
-                 tcg_temp_free_i32(tcg_lo);
-                 tcg_temp_free_i32(tcg_hi);
-+                tcg_temp_free_ptr(fpst);
-+                tcg_temp_free_i32(ahp);
-             }
-             break;
-         case 0x56:  /* FCVTXN, FCVTXN2 */
-@@ -10987,18 +11005,24 @@ static void handle_2misc_widening(DisasContext *s, int opcode, bool is_q,
-         /* 16 -> 32 bit fp conversion */
-         int srcelt = is_q ? 4 : 0;
-         TCGv_i32 tcg_res[4];
-+        TCGv_ptr fpst = get_fpstatus_ptr(true);
-+        TCGv_i32 ahp = get_ahp_flag();
-+
- 
-         for (pass = 0; pass < 4; pass++) {
-             tcg_res[pass] = tcg_temp_new_i32();
- 
-             read_vec_element_i32(s, tcg_res[pass], rn, srcelt + pass, MO_16);
-             gen_helper_vfp_fcvt_f16_to_f32(tcg_res[pass], tcg_res[pass],
--                                           cpu_env);
-+                                           fpst, ahp);
-         }
-         for (pass = 0; pass < 4; pass++) {
-             write_vec_element_i32(s, tcg_res[pass], rd, pass, MO_32);
-             tcg_temp_free_i32(tcg_res[pass]);
-         }
-+
-+        tcg_temp_free_ptr(fpst);
-+        tcg_temp_free_i32(ahp);
-     }
+-/*----------------------------------------------------------------------------
+-| Returns the sign bit of the single-precision floating-point value `a'.
+-*----------------------------------------------------------------------------*/
+-
+-static inline flag extractFloat16Sign(float16 a)
+-{
+-    return float16_val(a)>>15;
+-}
+-
+ /*----------------------------------------------------------------------------
+ | Returns the fraction bits of the single-precision floating-point value `a'.
+ *----------------------------------------------------------------------------*/
+@@ -1194,6 +1185,90 @@ float64 float64_div(float64 a, float64 b, float_status *status)
+     return float64_round_pack_canonical(pr, status);
  }
  
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index ad208867a7..5eab9d585a 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -3824,53 +3824,75 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-                         gen_vfp_sqrt(dp);
-                         break;
-                     case 4: /* vcvtb.f32.f16, vcvtb.f64.f16 */
-+                    {
-+                        TCGv_ptr fpst = get_fpstatus_ptr(false);
-+                        TCGv_i32 ahp_mode = get_ahp_flag();
-                         tmp = gen_vfp_mrs();
-                         tcg_gen_ext16u_i32(tmp, tmp);
-                         if (dp) {
-                             gen_helper_vfp_fcvt_f16_to_f64(cpu_F0d, tmp,
--                                                           cpu_env);
-+                                                           fpst, ahp_mode);
-                         } else {
-                             gen_helper_vfp_fcvt_f16_to_f32(cpu_F0s, tmp,
--                                                           cpu_env);
-+                                                           fpst, ahp_mode);
-                         }
-+                        tcg_temp_free_i32(ahp_mode);
-+                        tcg_temp_free_ptr(fpst);
-                         tcg_temp_free_i32(tmp);
-                         break;
-+                    }
-                     case 5: /* vcvtt.f32.f16, vcvtt.f64.f16 */
-+                    {
-+                        TCGv_ptr fpst = get_fpstatus_ptr(false);
-+                        TCGv_i32 ahp = get_ahp_flag();
-                         tmp = gen_vfp_mrs();
-                         tcg_gen_shri_i32(tmp, tmp, 16);
-                         if (dp) {
-                             gen_helper_vfp_fcvt_f16_to_f64(cpu_F0d, tmp,
--                                                           cpu_env);
-+                                                           fpst, ahp);
-                         } else {
-                             gen_helper_vfp_fcvt_f16_to_f32(cpu_F0s, tmp,
--                                                           cpu_env);
-+                                                           fpst, ahp);
-                         }
-                         tcg_temp_free_i32(tmp);
-+                        tcg_temp_free_i32(ahp);
-+                        tcg_temp_free_ptr(fpst);
-                         break;
-+                    }
-                     case 6: /* vcvtb.f16.f32, vcvtb.f16.f64 */
-+                    {
-+                        TCGv_ptr fpst = get_fpstatus_ptr(false);
-+                        TCGv_i32 ahp = get_ahp_flag();
-                         tmp = tcg_temp_new_i32();
++/*
++ * Float to Float conversions
++ *
++ * Returns the result of converting one float format to another. The
++ * conversion is performed according to the IEC/IEEE Standard for
++ * Binary Floating-Point Arithmetic.
++ *
++ * The float_to_float helper only needs to take care of raising
++ * invalid exceptions and handling the conversion on NaNs.
++ */
 +
-                         if (dp) {
-                             gen_helper_vfp_fcvt_f64_to_f16(tmp, cpu_F0d,
--                                                           cpu_env);
-+                                                           fpst, ahp);
-                         } else {
-                             gen_helper_vfp_fcvt_f32_to_f16(tmp, cpu_F0s,
--                                                           cpu_env);
-+                                                           fpst, ahp);
-                         }
-                         gen_mov_F0_vreg(0, rd);
-                         tmp2 = gen_vfp_mrs();
-                         tcg_gen_andi_i32(tmp2, tmp2, 0xffff0000);
-                         tcg_gen_or_i32(tmp, tmp, tmp2);
-                         tcg_temp_free_i32(tmp2);
-+                        tcg_temp_free_i32(ahp);
-+                        tcg_temp_free_ptr(fpst);
-                         gen_vfp_msr(tmp);
-                         break;
-+                    }
-                     case 7: /* vcvtt.f16.f32, vcvtt.f16.f64 */
-+                    {
-+                        TCGv_ptr fpst = get_fpstatus_ptr(true);
-+                        TCGv_i32 ahp = get_ahp_flag();
-                         tmp = tcg_temp_new_i32();
-                         if (dp) {
-                             gen_helper_vfp_fcvt_f64_to_f16(tmp, cpu_F0d,
--                                                           cpu_env);
-+                                                           fpst, ahp);
-                         } else {
-                             gen_helper_vfp_fcvt_f32_to_f16(tmp, cpu_F0s,
--                                                           cpu_env);
-+                                                           fpst, ahp);
-                         }
-                         tcg_gen_shli_i32(tmp, tmp, 16);
-                         gen_mov_F0_vreg(0, rd);
-@@ -3880,6 +3902,7 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-                         tcg_temp_free_i32(tmp2);
-                         gen_vfp_msr(tmp);
-                         break;
-+                    }
-                     case 8: /* cmp */
-                         gen_vfp_cmp(dp);
-                         break;
-@@ -7222,53 +7245,68 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                     }
-                     break;
-                 case NEON_2RM_VCVT_F16_F32:
-+                {
-+                    TCGv_ptr fpst;
-+                    TCGv_i32 ahp;
-+
-                     if (!arm_dc_feature(s, ARM_FEATURE_VFP_FP16) ||
-                         q || (rm & 1)) {
-                         return 1;
-                     }
-                     tmp = tcg_temp_new_i32();
-                     tmp2 = tcg_temp_new_i32();
-+                    fpst = get_fpstatus_ptr(true);
-+                    ahp = get_ahp_flag();
-                     tcg_gen_ld_f32(cpu_F0s, cpu_env, neon_reg_offset(rm, 0));
--                    gen_helper_neon_fcvt_f32_to_f16(tmp, cpu_F0s, cpu_env);
-+                    gen_helper_neon_fcvt_f32_to_f16(tmp, cpu_F0s, fpst, ahp);
-                     tcg_gen_ld_f32(cpu_F0s, cpu_env, neon_reg_offset(rm, 1));
--                    gen_helper_neon_fcvt_f32_to_f16(tmp2, cpu_F0s, cpu_env);
-+                    gen_helper_neon_fcvt_f32_to_f16(tmp2, cpu_F0s, fpst, ahp);
-                     tcg_gen_shli_i32(tmp2, tmp2, 16);
-                     tcg_gen_or_i32(tmp2, tmp2, tmp);
-                     tcg_gen_ld_f32(cpu_F0s, cpu_env, neon_reg_offset(rm, 2));
--                    gen_helper_neon_fcvt_f32_to_f16(tmp, cpu_F0s, cpu_env);
-+                    gen_helper_neon_fcvt_f32_to_f16(tmp, cpu_F0s, fpst, ahp);
-                     tcg_gen_ld_f32(cpu_F0s, cpu_env, neon_reg_offset(rm, 3));
-                     neon_store_reg(rd, 0, tmp2);
-                     tmp2 = tcg_temp_new_i32();
--                    gen_helper_neon_fcvt_f32_to_f16(tmp2, cpu_F0s, cpu_env);
-+                    gen_helper_neon_fcvt_f32_to_f16(tmp2, cpu_F0s, fpst, ahp);
-                     tcg_gen_shli_i32(tmp2, tmp2, 16);
-                     tcg_gen_or_i32(tmp2, tmp2, tmp);
-                     neon_store_reg(rd, 1, tmp2);
-                     tcg_temp_free_i32(tmp);
-+                    tcg_temp_free_i32(ahp);
-+                    tcg_temp_free_ptr(fpst);
-                     break;
-+                }
-                 case NEON_2RM_VCVT_F32_F16:
-+                {
-+                    TCGv_ptr fpst;
-+                    TCGv_i32 ahp;
-                     if (!arm_dc_feature(s, ARM_FEATURE_VFP_FP16) ||
-                         q || (rd & 1)) {
-                         return 1;
-                     }
-+                    fpst = get_fpstatus_ptr(true);
-+                    ahp = get_ahp_flag();
-                     tmp3 = tcg_temp_new_i32();
-                     tmp = neon_load_reg(rm, 0);
-                     tmp2 = neon_load_reg(rm, 1);
-                     tcg_gen_ext16u_i32(tmp3, tmp);
--                    gen_helper_neon_fcvt_f16_to_f32(cpu_F0s, tmp3, cpu_env);
-+                    gen_helper_neon_fcvt_f16_to_f32(cpu_F0s, tmp3, fpst, ahp);
-                     tcg_gen_st_f32(cpu_F0s, cpu_env, neon_reg_offset(rd, 0));
-                     tcg_gen_shri_i32(tmp3, tmp, 16);
--                    gen_helper_neon_fcvt_f16_to_f32(cpu_F0s, tmp3, cpu_env);
-+                    gen_helper_neon_fcvt_f16_to_f32(cpu_F0s, tmp3, fpst, ahp);
-                     tcg_gen_st_f32(cpu_F0s, cpu_env, neon_reg_offset(rd, 1));
-                     tcg_temp_free_i32(tmp);
-                     tcg_gen_ext16u_i32(tmp3, tmp2);
--                    gen_helper_neon_fcvt_f16_to_f32(cpu_F0s, tmp3, cpu_env);
-+                    gen_helper_neon_fcvt_f16_to_f32(cpu_F0s, tmp3, fpst, ahp);
-                     tcg_gen_st_f32(cpu_F0s, cpu_env, neon_reg_offset(rd, 2));
-                     tcg_gen_shri_i32(tmp3, tmp2, 16);
--                    gen_helper_neon_fcvt_f16_to_f32(cpu_F0s, tmp3, cpu_env);
-+                    gen_helper_neon_fcvt_f16_to_f32(cpu_F0s, tmp3, fpst, ahp);
-                     tcg_gen_st_f32(cpu_F0s, cpu_env, neon_reg_offset(rd, 3));
-                     tcg_temp_free_i32(tmp2);
-                     tcg_temp_free_i32(tmp3);
-                     break;
-+                }
-                 case NEON_2RM_AESE: case NEON_2RM_AESMC:
-                     if (!arm_dc_feature(s, ARM_FEATURE_V8_AES)
-                         || ((rm | rd) & 1)) {
-diff --git a/target/arm/translate.h b/target/arm/translate.h
-index 4428c98e2e..41d0b8cd9a 100644
---- a/target/arm/translate.h
-+++ b/target/arm/translate.h
-@@ -177,4 +177,19 @@ void arm_free_cc(DisasCompare *cmp);
- void arm_jump_cc(DisasCompare *cmp, TCGLabel *label);
- void arm_gen_test_cc(int cc, TCGLabel *label);
- 
-+/* Return state of Alternate Half-precision flag, caller frees result */
-+static inline TCGv_i32 get_ahp_flag(void)
++static FloatParts float_to_float(FloatParts a,
++                                 const FloatFmt *srcf, const FloatFmt *dstf,
++                                 float_status *s)
 +{
-+    TCGv_i32 fpscr = tcg_temp_new_i32();
-+    TCGv_i32 ahp_mode = tcg_temp_new_i32();
++    if (is_nan(a.cls)) {
 +
-+    tcg_gen_ld_i32(fpscr, cpu_env, offsetof(CPUARMState,
-+                                            vfp.xregs[ARM_VFP_FPSCR]));
-+    tcg_gen_extract_i32(ahp_mode, fpscr, 26, 1);
++        if (is_snan(a.cls)) {
++            s->float_exception_flags |= float_flag_invalid;
++        }
 +
-+    tcg_temp_free_i32(fpscr);
++        if (s->default_nan_mode) {
++            a.cls = float_class_dnan;
++            return a;
++        }
 +
-+    return ahp_mode;
++        /*
++         * Our only option now is to "re-pack" the NaN. As the
++         * canonilization process doesn't mess with fraction bits for
++         * NaNs we do it all here. We also reset a.exp to the
++         * destination format exp_max as the maybe_silence_nan code
++         * assumes it is correct (which is would be for non-conversions).
++         */
++        a.frac = a.frac << (64 - srcf->frac_size) >> (64 - dstf->frac_size);
++        a.exp = dstf->exp_max;
++        a.cls = float_class_msnan;
++    }
++
++    return a;
 +}
 +
- #endif /* TARGET_ARM_TRANSLATE_H */
++float32 float16_to_float32(float16 a, bool ieee, float_status *s)
++{
++    FloatParts p = float16_unpack_canonical(a, s);
++    FloatParts pr = float_to_float(p, &float16_params, &float32_params, s);
++    return float32_round_pack_canonical(pr, s);
++}
++
++float64 float16_to_float64(float16 a, bool ieee, float_status *s)
++{
++    FloatParts p = float16_unpack_canonical(a, s);
++    FloatParts pr = float_to_float(p, &float16_params, &float64_params, s);
++    return float64_round_pack_canonical(pr, s);
++}
++
++float16 float32_to_float16(float32 a, bool ieee, float_status *s)
++{
++    FloatParts p = float32_unpack_canonical(a, s);
++    FloatParts pr = float_to_float(p, &float32_params, &float16_params, s);
++    return float16_round_pack_canonical(pr, s);
++}
++
++float64 float32_to_float64(float32 a, float_status *s)
++{
++    FloatParts p = float32_unpack_canonical(a, s);
++    FloatParts pr = float_to_float(p, &float32_params, &float64_params, s);
++    return float64_round_pack_canonical(pr, s);
++}
++
++float16 float64_to_float16(float64 a, bool ieee, float_status *s)
++{
++    FloatParts p = float64_unpack_canonical(a, s);
++    FloatParts pr = float_to_float(p, &float64_params, &float16_params, s);
++    return float16_round_pack_canonical(pr, s);
++}
++
++float32 float64_to_float32(float64 a, float_status *s)
++{
++    FloatParts p = float64_unpack_canonical(a, s);
++    FloatParts pr = float_to_float(p, &float64_params, &float32_params, s);
++    return float32_round_pack_canonical(pr, s);
++}
++
++
+ /*
+  * Rounds the floating-point value `a' to an integer, and returns the
+  * result as a floating-point value. The operation is performed
+@@ -3142,41 +3217,6 @@ float128 uint64_to_float128(uint64_t a, float_status *status)
+     return normalizeRoundAndPackFloat128(0, 0x406E, a, 0, status);
+ }
+ 
+-
+-
+-
+-/*----------------------------------------------------------------------------
+-| Returns the result of converting the single-precision floating-point value
+-| `a' to the double-precision floating-point format.  The conversion is
+-| performed according to the IEC/IEEE Standard for Binary Floating-Point
+-| Arithmetic.
+-*----------------------------------------------------------------------------*/
+-
+-float64 float32_to_float64(float32 a, float_status *status)
+-{
+-    flag aSign;
+-    int aExp;
+-    uint32_t aSig;
+-    a = float32_squash_input_denormal(a, status);
+-
+-    aSig = extractFloat32Frac( a );
+-    aExp = extractFloat32Exp( a );
+-    aSign = extractFloat32Sign( a );
+-    if ( aExp == 0xFF ) {
+-        if (aSig) {
+-            return commonNaNToFloat64(float32ToCommonNaN(a, status), status);
+-        }
+-        return packFloat64( aSign, 0x7FF, 0 );
+-    }
+-    if ( aExp == 0 ) {
+-        if ( aSig == 0 ) return packFloat64( aSign, 0, 0 );
+-        normalizeFloat32Subnormal( aSig, &aExp, &aSig );
+-        --aExp;
+-    }
+-    return packFloat64( aSign, aExp + 0x380, ( (uint64_t) aSig )<<29 );
+-
+-}
+-
+ /*----------------------------------------------------------------------------
+ | Returns the result of converting the single-precision floating-point value
+ | `a' to the extended double-precision floating-point format.  The conversion
+@@ -3695,173 +3735,6 @@ int float32_unordered_quiet(float32 a, float32 b, float_status *status)
+     return 0;
+ }
+ 
+-
+-/*----------------------------------------------------------------------------
+-| Returns the result of converting the double-precision floating-point value
+-| `a' to the single-precision floating-point format.  The conversion is
+-| performed according to the IEC/IEEE Standard for Binary Floating-Point
+-| Arithmetic.
+-*----------------------------------------------------------------------------*/
+-
+-float32 float64_to_float32(float64 a, float_status *status)
+-{
+-    flag aSign;
+-    int aExp;
+-    uint64_t aSig;
+-    uint32_t zSig;
+-    a = float64_squash_input_denormal(a, status);
+-
+-    aSig = extractFloat64Frac( a );
+-    aExp = extractFloat64Exp( a );
+-    aSign = extractFloat64Sign( a );
+-    if ( aExp == 0x7FF ) {
+-        if (aSig) {
+-            return commonNaNToFloat32(float64ToCommonNaN(a, status), status);
+-        }
+-        return packFloat32( aSign, 0xFF, 0 );
+-    }
+-    shift64RightJamming( aSig, 22, &aSig );
+-    zSig = aSig;
+-    if ( aExp || zSig ) {
+-        zSig |= 0x40000000;
+-        aExp -= 0x381;
+-    }
+-    return roundAndPackFloat32(aSign, aExp, zSig, status);
+-
+-}
+-
+-
+-/*----------------------------------------------------------------------------
+-| Packs the sign `zSign', exponent `zExp', and significand `zSig' into a
+-| half-precision floating-point value, returning the result.  After being
+-| shifted into the proper positions, the three fields are simply added
+-| together to form the result.  This means that any integer portion of `zSig'
+-| will be added into the exponent.  Since a properly normalized significand
+-| will have an integer portion equal to 1, the `zExp' input should be 1 less
+-| than the desired result exponent whenever `zSig' is a complete, normalized
+-| significand.
+-*----------------------------------------------------------------------------*/
+-static float16 packFloat16(flag zSign, int zExp, uint16_t zSig)
+-{
+-    return make_float16(
+-        (((uint32_t)zSign) << 15) + (((uint32_t)zExp) << 10) + zSig);
+-}
+-
+-/*----------------------------------------------------------------------------
+-| Takes an abstract floating-point value having sign `zSign', exponent `zExp',
+-| and significand `zSig', and returns the proper half-precision floating-
+-| point value corresponding to the abstract input.  Ordinarily, the abstract
+-| value is simply rounded and packed into the half-precision format, with
+-| the inexact exception raised if the abstract input cannot be represented
+-| exactly.  However, if the abstract value is too large, the overflow and
+-| inexact exceptions are raised and an infinity or maximal finite value is
+-| returned.  If the abstract value is too small, the input value is rounded to
+-| a subnormal number, and the underflow and inexact exceptions are raised if
+-| the abstract input cannot be represented exactly as a subnormal half-
+-| precision floating-point number.
+-| The `ieee' flag indicates whether to use IEEE standard half precision, or
+-| ARM-style "alternative representation", which omits the NaN and Inf
+-| encodings in order to raise the maximum representable exponent by one.
+-|     The input significand `zSig' has its binary point between bits 22
+-| and 23, which is 13 bits to the left of the usual location.  This shifted
+-| significand must be normalized or smaller.  If `zSig' is not normalized,
+-| `zExp' must be 0; in that case, the result returned is a subnormal number,
+-| and it must not require rounding.  In the usual case that `zSig' is
+-| normalized, `zExp' must be 1 less than the ``true'' floating-point exponent.
+-| Note the slightly odd position of the binary point in zSig compared with the
+-| other roundAndPackFloat functions. This should probably be fixed if we
+-| need to implement more float16 routines than just conversion.
+-| The handling of underflow and overflow follows the IEC/IEEE Standard for
+-| Binary Floating-Point Arithmetic.
+-*----------------------------------------------------------------------------*/
+-
+-static float16 roundAndPackFloat16(flag zSign, int zExp,
+-                                   uint32_t zSig, flag ieee,
+-                                   float_status *status)
+-{
+-    int maxexp = ieee ? 29 : 30;
+-    uint32_t mask;
+-    uint32_t increment;
+-    bool rounding_bumps_exp;
+-    bool is_tiny = false;
+-
+-    /* Calculate the mask of bits of the mantissa which are not
+-     * representable in half-precision and will be lost.
+-     */
+-    if (zExp < 1) {
+-        /* Will be denormal in halfprec */
+-        mask = 0x00ffffff;
+-        if (zExp >= -11) {
+-            mask >>= 11 + zExp;
+-        }
+-    } else {
+-        /* Normal number in halfprec */
+-        mask = 0x00001fff;
+-    }
+-
+-    switch (status->float_rounding_mode) {
+-    case float_round_nearest_even:
+-        increment = (mask + 1) >> 1;
+-        if ((zSig & mask) == increment) {
+-            increment = zSig & (increment << 1);
+-        }
+-        break;
+-    case float_round_ties_away:
+-        increment = (mask + 1) >> 1;
+-        break;
+-    case float_round_up:
+-        increment = zSign ? 0 : mask;
+-        break;
+-    case float_round_down:
+-        increment = zSign ? mask : 0;
+-        break;
+-    default: /* round_to_zero */
+-        increment = 0;
+-        break;
+-    }
+-
+-    rounding_bumps_exp = (zSig + increment >= 0x01000000);
+-
+-    if (zExp > maxexp || (zExp == maxexp && rounding_bumps_exp)) {
+-        if (ieee) {
+-            float_raise(float_flag_overflow | float_flag_inexact, status);
+-            return packFloat16(zSign, 0x1f, 0);
+-        } else {
+-            float_raise(float_flag_invalid, status);
+-            return packFloat16(zSign, 0x1f, 0x3ff);
+-        }
+-    }
+-
+-    if (zExp < 0) {
+-        /* Note that flush-to-zero does not affect half-precision results */
+-        is_tiny =
+-            (status->float_detect_tininess == float_tininess_before_rounding)
+-            || (zExp < -1)
+-            || (!rounding_bumps_exp);
+-    }
+-    if (zSig & mask) {
+-        float_raise(float_flag_inexact, status);
+-        if (is_tiny) {
+-            float_raise(float_flag_underflow, status);
+-        }
+-    }
+-
+-    zSig += increment;
+-    if (rounding_bumps_exp) {
+-        zSig >>= 1;
+-        zExp++;
+-    }
+-
+-    if (zExp < -10) {
+-        return packFloat16(zSign, 0, 0);
+-    }
+-    if (zExp < 0) {
+-        zSig >>= -zExp;
+-        zExp = 0;
+-    }
+-    return packFloat16(zSign, zExp, zSig >> 13);
+-}
+-
+ /*----------------------------------------------------------------------------
+ | If `a' is denormal and we are in flush-to-zero mode then set the
+ | input-denormal exception and return zero. Otherwise just return the value.
+@@ -3877,163 +3750,6 @@ float16 float16_squash_input_denormal(float16 a, float_status *status)
+     return a;
+ }
+ 
+-static void normalizeFloat16Subnormal(uint32_t aSig, int *zExpPtr,
+-                                      uint32_t *zSigPtr)
+-{
+-    int8_t shiftCount = countLeadingZeros32(aSig) - 21;
+-    *zSigPtr = aSig << shiftCount;
+-    *zExpPtr = 1 - shiftCount;
+-}
+-
+-/* Half precision floats come in two formats: standard IEEE and "ARM" format.
+-   The latter gains extra exponent range by omitting the NaN/Inf encodings.  */
+-
+-float32 float16_to_float32(float16 a, flag ieee, float_status *status)
+-{
+-    flag aSign;
+-    int aExp;
+-    uint32_t aSig;
+-
+-    aSign = extractFloat16Sign(a);
+-    aExp = extractFloat16Exp(a);
+-    aSig = extractFloat16Frac(a);
+-
+-    if (aExp == 0x1f && ieee) {
+-        if (aSig) {
+-            return commonNaNToFloat32(float16ToCommonNaN(a, status), status);
+-        }
+-        return packFloat32(aSign, 0xff, 0);
+-    }
+-    if (aExp == 0) {
+-        if (aSig == 0) {
+-            return packFloat32(aSign, 0, 0);
+-        }
+-
+-        normalizeFloat16Subnormal(aSig, &aExp, &aSig);
+-        aExp--;
+-    }
+-    return packFloat32( aSign, aExp + 0x70, aSig << 13);
+-}
+-
+-float16 float32_to_float16(float32 a, flag ieee, float_status *status)
+-{
+-    flag aSign;
+-    int aExp;
+-    uint32_t aSig;
+-
+-    a = float32_squash_input_denormal(a, status);
+-
+-    aSig = extractFloat32Frac( a );
+-    aExp = extractFloat32Exp( a );
+-    aSign = extractFloat32Sign( a );
+-    if ( aExp == 0xFF ) {
+-        if (aSig) {
+-            /* Input is a NaN */
+-            if (!ieee) {
+-                float_raise(float_flag_invalid, status);
+-                return packFloat16(aSign, 0, 0);
+-            }
+-            return commonNaNToFloat16(
+-                float32ToCommonNaN(a, status), status);
+-        }
+-        /* Infinity */
+-        if (!ieee) {
+-            float_raise(float_flag_invalid, status);
+-            return packFloat16(aSign, 0x1f, 0x3ff);
+-        }
+-        return packFloat16(aSign, 0x1f, 0);
+-    }
+-    if (aExp == 0 && aSig == 0) {
+-        return packFloat16(aSign, 0, 0);
+-    }
+-    /* Decimal point between bits 22 and 23. Note that we add the 1 bit
+-     * even if the input is denormal; however this is harmless because
+-     * the largest possible single-precision denormal is still smaller
+-     * than the smallest representable half-precision denormal, and so we
+-     * will end up ignoring aSig and returning via the "always return zero"
+-     * codepath.
+-     */
+-    aSig |= 0x00800000;
+-    aExp -= 0x71;
+-
+-    return roundAndPackFloat16(aSign, aExp, aSig, ieee, status);
+-}
+-
+-float64 float16_to_float64(float16 a, flag ieee, float_status *status)
+-{
+-    flag aSign;
+-    int aExp;
+-    uint32_t aSig;
+-
+-    aSign = extractFloat16Sign(a);
+-    aExp = extractFloat16Exp(a);
+-    aSig = extractFloat16Frac(a);
+-
+-    if (aExp == 0x1f && ieee) {
+-        if (aSig) {
+-            return commonNaNToFloat64(
+-                float16ToCommonNaN(a, status), status);
+-        }
+-        return packFloat64(aSign, 0x7ff, 0);
+-    }
+-    if (aExp == 0) {
+-        if (aSig == 0) {
+-            return packFloat64(aSign, 0, 0);
+-        }
+-
+-        normalizeFloat16Subnormal(aSig, &aExp, &aSig);
+-        aExp--;
+-    }
+-    return packFloat64(aSign, aExp + 0x3f0, ((uint64_t)aSig) << 42);
+-}
+-
+-float16 float64_to_float16(float64 a, flag ieee, float_status *status)
+-{
+-    flag aSign;
+-    int aExp;
+-    uint64_t aSig;
+-    uint32_t zSig;
+-
+-    a = float64_squash_input_denormal(a, status);
+-
+-    aSig = extractFloat64Frac(a);
+-    aExp = extractFloat64Exp(a);
+-    aSign = extractFloat64Sign(a);
+-    if (aExp == 0x7FF) {
+-        if (aSig) {
+-            /* Input is a NaN */
+-            if (!ieee) {
+-                float_raise(float_flag_invalid, status);
+-                return packFloat16(aSign, 0, 0);
+-            }
+-            return commonNaNToFloat16(
+-                float64ToCommonNaN(a, status), status);
+-        }
+-        /* Infinity */
+-        if (!ieee) {
+-            float_raise(float_flag_invalid, status);
+-            return packFloat16(aSign, 0x1f, 0x3ff);
+-        }
+-        return packFloat16(aSign, 0x1f, 0);
+-    }
+-    shift64RightJamming(aSig, 29, &aSig);
+-    zSig = aSig;
+-    if (aExp == 0 && zSig == 0) {
+-        return packFloat16(aSign, 0, 0);
+-    }
+-    /* Decimal point between bits 22 and 23. Note that we add the 1 bit
+-     * even if the input is denormal; however this is harmless because
+-     * the largest possible single-precision denormal is still smaller
+-     * than the smallest representable half-precision denormal, and so we
+-     * will end up ignoring aSig and returning via the "always return zero"
+-     * codepath.
+-     */
+-    zSig |= 0x00800000;
+-    aExp -= 0x3F1;
+-
+-    return roundAndPackFloat16(aSign, aExp, zSig, ieee, status);
+-}
+-
+ /*----------------------------------------------------------------------------
+ | Returns the result of converting the double-precision floating-point value
+ | `a' to the extended double-precision floating-point format.  The conversion
+diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+index 36626a501b..01ef1c6b81 100644
+--- a/include/fpu/softfloat.h
++++ b/include/fpu/softfloat.h
+@@ -211,10 +211,10 @@ float128 uint64_to_float128(uint64_t, float_status *status);
+ /*----------------------------------------------------------------------------
+ | Software half-precision conversion routines.
+ *----------------------------------------------------------------------------*/
+-float16 float32_to_float16(float32, flag, float_status *status);
+-float32 float16_to_float32(float16, flag, float_status *status);
+-float16 float64_to_float16(float64 a, flag ieee, float_status *status);
+-float64 float16_to_float64(float16 a, flag ieee, float_status *status);
++float16 float32_to_float16(float32, bool ieee, float_status *status);
++float32 float16_to_float32(float16, bool ieee, float_status *status);
++float16 float64_to_float16(float64 a, bool ieee, float_status *status);
++float64 float16_to_float64(float16 a, bool ieee, float_status *status);
+ int16_t float16_to_int16(float16, float_status *status);
+ uint16_t float16_to_uint16(float16 a, float_status *status);
+ int16_t float16_to_int16_round_to_zero(float16, float_status *status);
 -- 
 2.17.0
