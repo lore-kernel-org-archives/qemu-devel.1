@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fGpdL-0005CA-4Y
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 13:45:40 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fGpk4-0004hw-Tt
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 13:52:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fGpdK-0000z0-7J
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 13:45:39 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41612)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fGpdK-0000y5-0X
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 13:45:38 -0400
-Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fGpdJ-0003cT-1i
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 18:45:37 +0100
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 10 May 2018 18:45:19 +0100
-Message-Id: <20180510174519.11264-22-peter.maydell@linaro.org>
-In-Reply-To: <20180510174519.11264-1-peter.maydell@linaro.org>
-References: <20180510174519.11264-1-peter.maydell@linaro.org>
+	(envelope-from <ehabkost@redhat.com>) id 1fGpk1-0003QA-Ms
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 13:52:36 -0400
+Date: Thu, 10 May 2018 14:52:22 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180510175222.GV25013@localhost.localdomain>
+References: <20180423165126.15441-1-david@redhat.com>
+	<20180423165126.15441-3-david@redhat.com>
+	<20180504192635.GA4903@localhost.localdomain>
+	<f2b567cb-8723-4e6d-b6ec-a6d97bffab10@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 21/21] target/arm: Clear SVE high bits for FMOV
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f2b567cb-8723-4e6d-b6ec-a6d97bffab10@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 02/11] machine: make MemoryHotplugState
+ accessible via the machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +26,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+On Thu, May 10, 2018 at 06:57:32PM +0200, Paolo Bonzini wrote:
+[...]
+> > -    machine->device_memory = g_malloc(sizeof(*machine->device_memory));
+> > +    machine->device_memory = g_malloc0(sizeof(*machine->device_memory));
+> 
+> g_new0 since you are at it? :)
 
-Use write_fp_dreg and clear_vec_high to zero the bits
-that need zeroing for these cases.
+Nice suggestion, but this was already merged.
 
-Cc: qemu-stable@nongnu.org
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20180502221552.3873-5-richard.henderson@linaro.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/translate-a64.c | 17 +++++------------
- 1 file changed, 5 insertions(+), 12 deletions(-)
+I think we have a Coccinelle script that should detect this?
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index b302171545..b0471c842e 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -5681,31 +5681,24 @@ static void handle_fmov(DisasContext *s, int rd, int rn, int type, bool itof)
- 
-     if (itof) {
-         TCGv_i64 tcg_rn = cpu_reg(s, rn);
-+        TCGv_i64 tmp;
- 
-         switch (type) {
-         case 0:
--        {
-             /* 32 bit */
--            TCGv_i64 tmp = tcg_temp_new_i64();
-+            tmp = tcg_temp_new_i64();
-             tcg_gen_ext32u_i64(tmp, tcg_rn);
--            tcg_gen_st_i64(tmp, cpu_env, fp_reg_offset(s, rd, MO_64));
--            tcg_gen_movi_i64(tmp, 0);
--            tcg_gen_st_i64(tmp, cpu_env, fp_reg_hi_offset(s, rd));
-+            write_fp_dreg(s, rd, tmp);
-             tcg_temp_free_i64(tmp);
-             break;
--        }
-         case 1:
--        {
-             /* 64 bit */
--            TCGv_i64 tmp = tcg_const_i64(0);
--            tcg_gen_st_i64(tcg_rn, cpu_env, fp_reg_offset(s, rd, MO_64));
--            tcg_gen_st_i64(tmp, cpu_env, fp_reg_hi_offset(s, rd));
--            tcg_temp_free_i64(tmp);
-+            write_fp_dreg(s, rd, tcg_rn);
-             break;
--        }
-         case 2:
-             /* 64 bit to top half. */
-             tcg_gen_st_i64(tcg_rn, cpu_env, fp_reg_hi_offset(s, rd));
-+            clear_vec_high(s, true, rd);
-             break;
-         }
-     } else {
 -- 
-2.17.0
+Eduardo
