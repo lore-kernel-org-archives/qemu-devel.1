@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fGpdB-00051G-G1
+	(envelope-from <pm215@archaic.org.uk>) id 1fGpdB-00051c-U0
 	for qemu-devel@nongnu.org; Thu, 10 May 2018 13:45:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fGpdA-0000rE-DP
+	(envelope-from <pm215@archaic.org.uk>) id 1fGpdA-0000rZ-T2
 	for qemu-devel@nongnu.org; Thu, 10 May 2018 13:45:29 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41598)
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41600)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fGpdA-0000qF-6W
+	id 1fGpdA-0000qy-KQ
 	for qemu-devel@nongnu.org; Thu, 10 May 2018 13:45:28 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fGpd8-0003Wr-Ud
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 18:45:26 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fGpd9-0003XV-KL
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 18:45:27 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 10 May 2018 18:45:07 +0100
-Message-Id: <20180510174519.11264-10-peter.maydell@linaro.org>
+Date: Thu, 10 May 2018 18:45:08 +0100
+Message-Id: <20180510174519.11264-11-peter.maydell@linaro.org>
 In-Reply-To: <20180510174519.11264-1-peter.maydell@linaro.org>
 References: <20180510174519.11264-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 09/21] target/arm: Use new min/max expanders
+Subject: [Qemu-devel] [PULL 10/21] target/xtensa: Use new min/max expanders
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,107 +33,99 @@ From: Richard Henderson <richard.henderson@linaro.org>
 
 The generic expanders replace nearly identical code in the translator.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Acked-by: Max Filippov <jcmvbkbc@gmail.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20180508151437.4232-3-richard.henderson@linaro.org
+Message-id: 20180508151437.4232-4-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate-a64.c | 46 ++++++++++++--------------------------
- 1 file changed, 14 insertions(+), 32 deletions(-)
+ target/xtensa/translate.c | 50 ++++++++++++++++++++++++++-------------
+ 1 file changed, 33 insertions(+), 17 deletions(-)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 6d49f30b4a..60d104cc8a 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -6021,15 +6021,18 @@ static void disas_simd_across_lanes(DisasContext *s, uint32_t insn)
-                 tcg_gen_add_i64(tcg_res, tcg_res, tcg_elt);
-                 break;
-             case 0x0a: /* SMAXV / UMAXV */
--                tcg_gen_movcond_i64(is_u ? TCG_COND_GEU : TCG_COND_GE,
--                                    tcg_res,
--                                    tcg_res, tcg_elt, tcg_res, tcg_elt);
-+                if (is_u) {
-+                    tcg_gen_umax_i64(tcg_res, tcg_res, tcg_elt);
-+                } else {
-+                    tcg_gen_smax_i64(tcg_res, tcg_res, tcg_elt);
-+                }
-                 break;
-             case 0x1a: /* SMINV / UMINV */
--                tcg_gen_movcond_i64(is_u ? TCG_COND_LEU : TCG_COND_LE,
--                                    tcg_res,
--                                    tcg_res, tcg_elt, tcg_res, tcg_elt);
--                break;
-+                if (is_u) {
-+                    tcg_gen_umin_i64(tcg_res, tcg_res, tcg_elt);
-+                } else {
-+                    tcg_gen_smin_i64(tcg_res, tcg_res, tcg_elt);
-+                }
-                 break;
-             default:
-                 g_assert_not_reached();
-@@ -9927,27 +9930,6 @@ static void disas_simd_3same_logic(DisasContext *s, uint32_t insn)
+diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
+index 4f6d03059f..bad5cdb009 100644
+--- a/target/xtensa/translate.c
++++ b/target/xtensa/translate.c
+@@ -1527,10 +1527,8 @@ static void translate_clamps(DisasContext *dc, const uint32_t arg[],
+         TCGv_i32 tmp1 = tcg_const_i32(-1u << arg[2]);
+         TCGv_i32 tmp2 = tcg_const_i32((1 << arg[2]) - 1);
+ 
+-        tcg_gen_movcond_i32(TCG_COND_GT, tmp1,
+-                            cpu_R[arg[1]], tmp1, cpu_R[arg[1]], tmp1);
+-        tcg_gen_movcond_i32(TCG_COND_LT, cpu_R[arg[0]],
+-                            tmp1, tmp2, tmp1, tmp2);
++        tcg_gen_smax_i32(tmp1, tmp1, cpu_R[arg[1]]);
++        tcg_gen_smin_i32(cpu_R[arg[0]], tmp1, tmp2);
+         tcg_temp_free(tmp1);
+         tcg_temp_free(tmp2);
+     }
+@@ -1855,13 +1853,35 @@ static void translate_memw(DisasContext *dc, const uint32_t arg[],
+     tcg_gen_mb(TCG_BAR_SC | TCG_MO_ALL);
+ }
+ 
+-static void translate_minmax(DisasContext *dc, const uint32_t arg[],
+-                             const uint32_t par[])
++static void translate_smin(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
+ {
+     if (gen_window_check3(dc, arg[0], arg[1], arg[2])) {
+-        tcg_gen_movcond_i32(par[0], cpu_R[arg[0]],
+-                            cpu_R[arg[1]], cpu_R[arg[2]],
+-                            cpu_R[arg[1]], cpu_R[arg[2]]);
++        tcg_gen_smin_i32(cpu_R[arg[0]], cpu_R[arg[1]], cpu_R[arg[2]]);
++    }
++}
++
++static void translate_umin(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_window_check3(dc, arg[0], arg[1], arg[2])) {
++        tcg_gen_umin_i32(cpu_R[arg[0]], cpu_R[arg[1]], cpu_R[arg[2]]);
++    }
++}
++
++static void translate_smax(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_window_check3(dc, arg[0], arg[1], arg[2])) {
++        tcg_gen_smax_i32(cpu_R[arg[0]], cpu_R[arg[1]], cpu_R[arg[2]]);
++    }
++}
++
++static void translate_umax(DisasContext *dc, const uint32_t arg[],
++                           const uint32_t par[])
++{
++    if (gen_window_check3(dc, arg[0], arg[1], arg[2])) {
++        tcg_gen_umax_i32(cpu_R[arg[0]], cpu_R[arg[1]], cpu_R[arg[2]]);
      }
  }
  
--/* Helper functions for 32 bit comparisons */
--static void gen_max_s32(TCGv_i32 res, TCGv_i32 op1, TCGv_i32 op2)
--{
--    tcg_gen_movcond_i32(TCG_COND_GE, res, op1, op2, op1, op2);
--}
--
--static void gen_max_u32(TCGv_i32 res, TCGv_i32 op1, TCGv_i32 op2)
--{
--    tcg_gen_movcond_i32(TCG_COND_GEU, res, op1, op2, op1, op2);
--}
--
--static void gen_min_s32(TCGv_i32 res, TCGv_i32 op1, TCGv_i32 op2)
--{
--    tcg_gen_movcond_i32(TCG_COND_LE, res, op1, op2, op1, op2);
--}
--
--static void gen_min_u32(TCGv_i32 res, TCGv_i32 op1, TCGv_i32 op2)
--{
--    tcg_gen_movcond_i32(TCG_COND_LEU, res, op1, op2, op1, op2);
--}
--
- /* Pairwise op subgroup of C3.6.16.
-  *
-  * This is called directly or via the handle_3same_float for float pairwise
-@@ -10047,7 +10029,7 @@ static void handle_simd_3same_pair(DisasContext *s, int is_q, int u, int opcode,
-                 static NeonGenTwoOpFn * const fns[3][2] = {
-                     { gen_helper_neon_pmax_s8, gen_helper_neon_pmax_u8 },
-                     { gen_helper_neon_pmax_s16, gen_helper_neon_pmax_u16 },
--                    { gen_max_s32, gen_max_u32 },
-+                    { tcg_gen_smax_i32, tcg_gen_umax_i32 },
-                 };
-                 genfn = fns[size][u];
-                 break;
-@@ -10057,7 +10039,7 @@ static void handle_simd_3same_pair(DisasContext *s, int is_q, int u, int opcode,
-                 static NeonGenTwoOpFn * const fns[3][2] = {
-                     { gen_helper_neon_pmin_s8, gen_helper_neon_pmin_u8 },
-                     { gen_helper_neon_pmin_s16, gen_helper_neon_pmin_u16 },
--                    { gen_min_s32, gen_min_u32 },
-+                    { tcg_gen_smin_i32, tcg_gen_umin_i32 },
-                 };
-                 genfn = fns[size][u];
-                 break;
-@@ -10512,7 +10494,7 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
-                 static NeonGenTwoOpFn * const fns[3][2] = {
-                     { gen_helper_neon_max_s8, gen_helper_neon_max_u8 },
-                     { gen_helper_neon_max_s16, gen_helper_neon_max_u16 },
--                    { gen_max_s32, gen_max_u32 },
-+                    { tcg_gen_smax_i32, tcg_gen_umax_i32 },
-                 };
-                 genfn = fns[size][u];
-                 break;
-@@ -10523,7 +10505,7 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
-                 static NeonGenTwoOpFn * const fns[3][2] = {
-                     { gen_helper_neon_min_s8, gen_helper_neon_min_u8 },
-                     { gen_helper_neon_min_s16, gen_helper_neon_min_u16 },
--                    { gen_min_s32, gen_min_u32 },
-+                    { tcg_gen_smin_i32, tcg_gen_umin_i32 },
-                 };
-                 genfn = fns[size][u];
-                 break;
+@@ -2984,23 +3004,19 @@ static const XtensaOpcodeOps core_ops[] = {
+         .par = (const uint32_t[]){TCG_COND_NE},
+     }, {
+         .name = "max",
+-        .translate = translate_minmax,
+-        .par = (const uint32_t[]){TCG_COND_GE},
++        .translate = translate_smax,
+     }, {
+         .name = "maxu",
+-        .translate = translate_minmax,
+-        .par = (const uint32_t[]){TCG_COND_GEU},
++        .translate = translate_umax,
+     }, {
+         .name = "memw",
+         .translate = translate_memw,
+     }, {
+         .name = "min",
+-        .translate = translate_minmax,
+-        .par = (const uint32_t[]){TCG_COND_LT},
++        .translate = translate_smin,
+     }, {
+         .name = "minu",
+-        .translate = translate_minmax,
+-        .par = (const uint32_t[]){TCG_COND_LTU},
++        .translate = translate_umin,
+     }, {
+         .name = "mov",
+         .translate = translate_mov,
 -- 
 2.17.0
