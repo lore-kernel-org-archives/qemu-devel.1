@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56347)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fGq0t-0005Qc-92
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 14:10:00 -0400
+	(envelope-from <eblake@redhat.com>) id 1fGqKc-0002Ng-05
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 14:30:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fGq0s-0007ea-F5
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 14:09:59 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180503115620.10596-1-edgar.iglesias@gmail.com>
-	<20180503115620.10596-3-edgar.iglesias@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c7409bf9-b336-8df2-bc2a-ace45077bcce@amsat.org>
-Date: Thu, 10 May 2018 15:09:46 -0300
+	(envelope-from <eblake@redhat.com>) id 1fGqKY-0007KQ-33
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 14:30:22 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36788 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fGqKX-0007KE-Ng
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 14:30:17 -0400
+References: <1525855090-14384-1-git-send-email-jingqi.liu@intel.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ed89a89f-ae8d-3b3c-6daf-d5ca25b5141c@redhat.com>
+Date: Thu, 10 May 2018 13:30:13 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180503115620.10596-3-edgar.iglesias@gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1525855090-14384-1-git-send-email-jingqi.liu@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v1 2/2] xlnx-zynqmp: Swap
- Cortex-R5 for Cortex-R5F
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 6/7] numa: Extend the command-line to
+ provide memory side cache information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +28,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com, frasse.iglesias@gmail.com, alistair@alistair23.me, frederic.konrad@adacore.com, qemu-arm@nongnu.org
+To: Liu Jingqi <jingqi.liu@intel.com>, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
+Cc: imammedo@redhat.com, qemu-devel@nongnu.org, mst@redhat.com
 
-Hi Edgar,
-
-On 05/03/2018 08:56 AM, Edgar E. Iglesias wrote:
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+On 05/09/2018 03:38 AM, Liu Jingqi wrote:
+> Add -numa hmat-cache option to provide Memory Side Cache Information.
+> These memory attributes help to build Memory Side Cache Information
+> Structure(s) in ACPI Heterogeneous Memory Attribute Table (HMAT).
 > 
-> The ZynqMP has Cortex-R5Fs with the optional FPU enabled.
-
-What about updating the xlnx-zcu102 machine description too?
-
-  mc->desc = "Xilinx ZynqMP ZCU102 board with 4xA53s and 2xR5Fs ..."
-
-> 
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-I just noticed we can not get information for the R profile cores via
-the monitor:
-
-(qemu) info cpus
-* CPU #0: thread_id=19283
-  CPU #1: thread_id=19284
-  CPU #2: thread_id=19285
-  CPU #3: thread_id=19286
-
-same with "info registers -a"
-
+> Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
 > ---
->  hw/arm/xlnx-zynqmp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-> index 505253e0d2..efeb53c732 100644
-> --- a/hw/arm/xlnx-zynqmp.c
-> +++ b/hw/arm/xlnx-zynqmp.c
-> @@ -116,7 +116,7 @@ static void xlnx_zynqmp_create_rpu(XlnxZynqMPState *s, const char *boot_cpu,
->          char *name;
->  
->          object_initialize(&s->rpu_cpu[i], sizeof(s->rpu_cpu[i]),
-> -                          "cortex-r5-" TYPE_ARM_CPU);
-> +                          "cortex-r5f-" TYPE_ARM_CPU);
->          object_property_add_child(OBJECT(s), "rpu-cpu[*]",
->                                    OBJECT(&s->rpu_cpu[i]), &error_abort);
->  
-> 
+
+> +++ b/qapi/misc.json
+> @@ -2705,7 +2705,7 @@
+>   # Since: 2.1
+>   ##
+>   { 'enum': 'NumaOptionsType',
+> -  'data': [ 'node', 'dist', 'cpu', 'hmat-lb' ] }
+> +  'data': [ 'node', 'dist', 'cpu', 'hmat-lb', 'hmat-cache' ] }
+
+Missing documentation.
+
+
+>   ##
+> +# @NumaHmatCacheOptions:
+> +#
+> +# Set the memory side cache information for a given memory domain.
+> +#
+> +# @node-id: the memory proximity domain to wich the memory belongs.
+
+s/wich/which/
+
+> +#
+> +# @size: the size of memory side cache in bytes.
+> +#
+> +# @total: the total cache levels for this memory proximity domain.
+> +#
+> +# @level: the cache level described in this structure.
+> +#
+> +# @assoc: the cache associativity, none/direct(direct mapped)/complex(complex cache indexing).
+> +
+> +# @policy: the write policy, none/wb(write back)/wt(wirte through).
+
+No need to abbreviate; machines are just fine spitting out legible words 
+like 'write-back' or 'write-through'.
+
+s/wirte/write/
+
+> +#
+> +# @line: the cache Line size in bytes.
+> +#
+> +# Since: 2.10
+
+2.13
+
+> +##
+> +{ 'struct': 'NumaHmatCacheOptions',
+> +  'data': {
+> +   'node-id': 'uint32',
+> +   'size': 'size',
+> +   'total': 'uint8',
+> +   'level': 'uint8',
+> +   'assoc': 'str',
+
+Make this an enum, not an open-coded string.
+
+> +   'policy': 'str',
+
+Ditto.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
