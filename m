@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49336)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fGliU-0006Xk-J6
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 09:34:43 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fGljX-0008D0-Ho
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 09:35:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fGliQ-0005oC-BR
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 09:34:42 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:39183)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fGliQ-0005nn-4w
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 09:34:38 -0400
-Received: by mail-wr0-x234.google.com with SMTP id q3-v6so2052299wrj.6
-	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 06:34:38 -0700 (PDT)
-References: <20180510094206.15354-1-alex.bennee@linaro.org>
-	<CAFEAcA88-EFYN3y-sU=YbzeT-eXCBk7md-y2rEQfpJtZ+MF-wQ@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA88-EFYN3y-sU=YbzeT-eXCBk7md-y2rEQfpJtZ+MF-wQ@mail.gmail.com>
-Date: Thu, 10 May 2018 14:34:35 +0100
-Message-ID: <87k1sbvdlg.fsf@linaro.org>
+	(envelope-from <pbonzini@redhat.com>) id 1fGljT-0006Ev-DY
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 09:35:47 -0400
+References: <CAFEAcA-pjg34=bPe7EiYN6oYC_3xuMCyiucPwZrka2Fxxrk3DQ@mail.gmail.com>
+	<20180109170113.20768-1-michael@walle.cc>
+	<1a4554ccbdae089bdb0a0a3ae0799b20@walle.cc>
+	<f2b761e0-cf29-835d-988f-98382d24f3c1@amsat.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0bcfa9d2-3d1b-dc91-8e14-76c8e84ad425@redhat.com>
+Date: Thu, 10 May 2018 15:35:40 +0200
 MIME-Version: 1.0
+In-Reply-To: <f2b761e0-cf29-835d-988f-98382d24f3c1@amsat.org>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 0/5] refactor float-to-float and fix AHP
+Subject: Re: [Qemu-devel] [PATCH] lm32: take BQL before writing IP/IM
+ register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +27,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Michael Walle <michael@walle.cc>, peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, Programmingkid <programmingkidx@gmail.com>
 
-
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> On 10 May 2018 at 10:42, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
->> Hi,
+On 09/05/2018 21:45, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 02/01/2018 06:09 AM, Michael Walle wrote:
 >>
->> Hi,
+>> Hi Peter,
 >>
->> I've not included the test case in the series but you can find it in
->> my TCG fixup branch:
+>> do you apply this patch? Or do I have to send a pull request?
+>=20
+> Cc'ing Paolo.
+
+Please send a pull request.
+
+Paolo
+
 >>
->>   https://github.com/stsquad/qemu/blob/testing/tcg-tests-revival-v4/test=
-s/tcg/arm/fcvt.c
+>> -michael
 >>
->> Some of the ARMv7 versions are commented out as they where not
->> supported until later revs. I do have a build that includes that but
->> unfortunately the Debian compiler it too old to build it.
+>> Am 2018-01-09 18:01, schrieb Michael Walle:
+>>> Writing to these registers may raise an interrupt request. Actually,
+>>> this prevents the milkymist board from starting.
+>>>
+>>> Cc: qemu-stable@nongnu.org
+>>> Signed-off-by: Michael Walle <michael@walle.cc>
+>=20
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>=20
+>>> ---
+>>> =C2=A0target/lm32/op_helper.c | 4 ++++
+>>> =C2=A01 file changed, 4 insertions(+)
+>>>
+>>> diff --git a/target/lm32/op_helper.c b/target/lm32/op_helper.c
+>>> index 30f670eee8..a766a1ece4 100644
+>>> --- a/target/lm32/op_helper.c
+>>> +++ b/target/lm32/op_helper.c
+>>> @@ -102,12 +102,16 @@ void HELPER(wcsr_dc)(CPULM32State *env, uint32_=
+t
+>>> dc)
+>>>
+>>> =C2=A0void HELPER(wcsr_im)(CPULM32State *env, uint32_t im)
+>>> =C2=A0{
+>>> +=C2=A0=C2=A0=C2=A0 qemu_mutex_lock_iothread();
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 lm32_pic_set_im(env->pic_state, im);
+>>> +=C2=A0=C2=A0=C2=A0 qemu_mutex_unlock_iothread();
+>>> =C2=A0}
+>>>
+>>> =C2=A0void HELPER(wcsr_ip)(CPULM32State *env, uint32_t im)
+>>> =C2=A0{
+>>> +=C2=A0=C2=A0=C2=A0 qemu_mutex_lock_iothread();
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 lm32_pic_set_ip(env->pic_state, im);
+>>> +=C2=A0=C2=A0=C2=A0 qemu_mutex_unlock_iothread();
+>>> =C2=A0}
+>>>
+>>> =C2=A0void HELPER(wcsr_jtx)(CPULM32State *env, uint32_t jtx)
 >>
->> : patch 0001/fpu softfloat int_to_float ensure r fully initial.patch nee=
-ds review
->> : patch 0004/target arm convert conversion helpers to fpst ahp.patch nee=
-ds review
->> : patch 0005/target arm squash FZ16 behaviour for conversions.patch need=
-s review
->
-> This still seems to regress the NaN conversion case I mentioned
-> in review of the previous series:
->
-> (3) Here's a NaN case we get wrong now: 64 to IEEE-16 conversion,
-> input is 0x7ff0000000000001 (an SNaN), we produce
-> 0x7c00 (infinity) but should produce 0x7e00 (a QNaN).
-
-Hmm I had added the test case but due to another bug it never actually
-ran :-/
-
->
-> thanks
-> -- PMM
-
-
---
-Alex Benn=C3=A9e
