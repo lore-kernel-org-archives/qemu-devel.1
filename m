@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44627)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fGhpm-0001Wv-U0
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:25:59 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fGhtj-00052r-VB
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:30:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fGhpm-0006NM-8D
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:25:58 -0400
-Date: Thu, 10 May 2018 10:25:50 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180510092550.GL1296@stefanha-x1.localdomain>
-References: <20180509145815.3330-1-famz@redhat.com>
-	<20180509145815.3330-4-famz@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="bPg9NdpM9EETxvqt"
-Content-Disposition: inline
-In-Reply-To: <20180509145815.3330-4-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 3/9] qcow2: Implement copy offloading
+	(envelope-from <laurent@vivier.eu>) id 1fGhtf-0007jY-3V
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:30:03 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:59575)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fGhte-0007j7-Qj
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:29:59 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Thu, 10 May 2018 11:29:35 +0200
+Message-Id: <20180510092935.29088-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH] linux-user: move thunk.c to linux-user/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,66 +21,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Lieven <pl@kamp.de>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
+thunk.c is part of linux-user and only used by it,
+so move it to the linux-user directory.
 
---bPg9NdpM9EETxvqt
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ Makefile.target               | 2 +-
+ linux-user/Makefile.objs      | 2 +-
+ thunk.c => linux-user/thunk.c | 0
+ 3 files changed, 2 insertions(+), 2 deletions(-)
+ rename thunk.c => linux-user/thunk.c (100%)
 
-On Wed, May 09, 2018 at 10:58:09PM +0800, Fam Zheng wrote:
-> +static int qcow2_co_copy_range_from(BlockDriverState *bs,
-> +                                    BdrvChild *src, uint64_t src_offset,
-> +                                    BdrvChild *dst, uint64_t dst_offset,
-> +                                    uint64_t bytes, BdrvRequestFlags flags)
-> +{
-> +    BDRVQcow2State *s = bs->opaque;
-> +    int offset_in_cluster;
-> +    int ret;
-> +    unsigned int cur_bytes; /* number of bytes in current iteration */
-> +    uint64_t cluster_offset = 0;
-> +    BdrvChild *child = NULL;
-> +
-> +    assert(!bs->encrypted);
-> +    qemu_co_mutex_lock(&s->lock);
-> +
-> +    while (bytes != 0) {
-> +
-> +        /* prepare next request */
-> +        cur_bytes = MIN(bytes, INT_MAX);
-> +
-> +        ret = qcow2_get_cluster_offset(bs, src_offset, &cur_bytes, &cluster_offset);
-> +        if (ret < 0) {
-> +            goto out;
-> +        }
-> +
-> +        offset_in_cluster = offset_into_cluster(s, src_offset);
-> +
-> +        switch (ret) {
-> +        case QCOW2_CLUSTER_UNALLOCATED:
-> +            if (bs->backing) {
-> +                child = bs->backing;
-> +            } else {
-> +                flags |= BDRV_REQ_ZERO_WRITE;
-> +            }
-> +            break;
-
-Do we need a special case if the backing file is shorter than this
-image?
-
---bPg9NdpM9EETxvqt
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJa9BAeAAoJEJykq7OBq3PIa48IAMpUtIbxue+Iqs+xDBwNU855
-+GYszDRjQSbGDsOYGiUnksyahifvvaGPRMd9wh39fPLtzHCy0DXivxGbUZAfBsl1
-jpjE+Qm0dCPmksZYbz+c8WiJ9d/8TeUnU3yHmDMhG3/AsApazhaqCLZ1Md6WruLv
-sjvewQdkSmNkveJgYK7mJzHF9corSkyLcJgymIMWDY0tjnrBEDXlfk+aej4wB/pk
-9nu+dWi/8/InhDMoy0Bc9+JkD/kg0AWhl3dX1+2EROtWwMdDaFgq9KhecvTjCRSo
-bhqHOshdVcy4gX+9yM7s8W+kOTucTYpVWk+EINOTcds4+phTvMfMEotNkl1eqIk=
-=TBff
------END PGP SIGNATURE-----
-
---bPg9NdpM9EETxvqt--
+diff --git a/Makefile.target b/Makefile.target
+index d0ec77a307..98f25c91c7 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -112,7 +112,7 @@ QEMU_CFLAGS+=-I$(SRC_PATH)/linux-user/$(TARGET_ABI_DIR) \
+              -I$(SRC_PATH)/linux-user
+ 
+ obj-y += linux-user/
+-obj-y += gdbstub.o thunk.o
++obj-y += gdbstub.o
+ 
+ endif #CONFIG_LINUX_USER
+ 
+diff --git a/linux-user/Makefile.objs b/linux-user/Makefile.objs
+index 59a5c17354..1fc1dd2762 100644
+--- a/linux-user/Makefile.objs
++++ b/linux-user/Makefile.objs
+@@ -1,7 +1,7 @@
+ obj-y = main.o syscall.o strace.o mmap.o signal.o \
+ 	elfload.o linuxload.o uaccess.o uname.o \
+ 	safe-syscall.o $(TARGET_ABI_DIR)/signal.o \
+-        $(TARGET_ABI_DIR)/cpu_loop.o
++        $(TARGET_ABI_DIR)/cpu_loop.o thunk.o
+ 
+ obj-$(TARGET_HAS_BFLT) += flatload.o
+ obj-$(TARGET_I386) += vm86.o
+diff --git a/thunk.c b/linux-user/thunk.c
+similarity index 100%
+rename from thunk.c
+rename to linux-user/thunk.c
+-- 
+2.14.3
