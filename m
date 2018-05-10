@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=66179fe3f=Paul.Durrant@citrix.com>)
-	id 1fGhfb-0004Bt-Ra
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:15:29 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fGhpm-0001Wv-U0
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:25:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=66179fe3f=Paul.Durrant@citrix.com>)
-	id 1fGhfa-0002NF-96
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:15:27 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:30400)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=66179fe3f=Paul.Durrant@citrix.com>)
-	id 1fGhfZ-0002K7-MH
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:15:26 -0400
-From: Paul Durrant <paul.durrant@citrix.com>
-Date: Thu, 10 May 2018 10:15:18 +0100
-Message-ID: <20180510091518.28199-4-paul.durrant@citrix.com>
-In-Reply-To: <20180510091518.28199-1-paul.durrant@citrix.com>
-References: <20180510091518.28199-1-paul.durrant@citrix.com>
+	(envelope-from <stefanha@redhat.com>) id 1fGhpm-0006NM-8D
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 05:25:58 -0400
+Date: Thu, 10 May 2018 10:25:50 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180510092550.GL1296@stefanha-x1.localdomain>
+References: <20180509145815.3330-1-famz@redhat.com>
+	<20180509145815.3330-4-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 3/3] xen-hvm: try to use
- xenforeignmemory_map_resource() to map ioreq pages
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="bPg9NdpM9EETxvqt"
+Content-Disposition: inline
+In-Reply-To: <20180509145815.3330-4-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 3/9] qcow2: Implement copy offloading
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,183 +24,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Lieven <pl@kamp.de>, Max Reitz <mreitz@redhat.com>
 
-Xen 4.11 has a new API to directly map guest resources. Among the resources
-that can be mapped using this API are ioreq pages.
 
-This patch modifies QEMU to attempt to use the new API should it exist,
-falling back to the previous mechanism if it is unavailable.
+--bPg9NdpM9EETxvqt
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
----
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
----
- configure                   |  5 ++++
- hw/i386/xen/trace-events    |  1 +
- hw/i386/xen/xen-hvm.c       | 68 +++++++++++++++++++++++++++++++++++----------
- include/hw/xen/xen_common.h | 14 ++++++++++
- 4 files changed, 73 insertions(+), 15 deletions(-)
+On Wed, May 09, 2018 at 10:58:09PM +0800, Fam Zheng wrote:
+> +static int qcow2_co_copy_range_from(BlockDriverState *bs,
+> +                                    BdrvChild *src, uint64_t src_offset,
+> +                                    BdrvChild *dst, uint64_t dst_offset,
+> +                                    uint64_t bytes, BdrvRequestFlags flags)
+> +{
+> +    BDRVQcow2State *s = bs->opaque;
+> +    int offset_in_cluster;
+> +    int ret;
+> +    unsigned int cur_bytes; /* number of bytes in current iteration */
+> +    uint64_t cluster_offset = 0;
+> +    BdrvChild *child = NULL;
+> +
+> +    assert(!bs->encrypted);
+> +    qemu_co_mutex_lock(&s->lock);
+> +
+> +    while (bytes != 0) {
+> +
+> +        /* prepare next request */
+> +        cur_bytes = MIN(bytes, INT_MAX);
+> +
+> +        ret = qcow2_get_cluster_offset(bs, src_offset, &cur_bytes, &cluster_offset);
+> +        if (ret < 0) {
+> +            goto out;
+> +        }
+> +
+> +        offset_in_cluster = offset_into_cluster(s, src_offset);
+> +
+> +        switch (ret) {
+> +        case QCOW2_CLUSTER_UNALLOCATED:
+> +            if (bs->backing) {
+> +                child = bs->backing;
+> +            } else {
+> +                flags |= BDRV_REQ_ZERO_WRITE;
+> +            }
+> +            break;
 
-diff --git a/configure b/configure
-index 1443422e83..0f9c2f000e 100755
---- a/configure
-+++ b/configure
-@@ -2229,12 +2229,17 @@ EOF
- #undef XC_WANT_COMPAT_DEVICEMODEL_API
- #define __XEN_TOOLS__
- #include <xendevicemodel.h>
-+#include <xenforeignmemory.h>
- int main(void) {
-   xendevicemodel_handle *xd;
-+  xenforeignmemory_handle *xfmem;
- 
-   xd = xendevicemodel_open(0, 0);
-   xendevicemodel_pin_memory_cacheattr(xd, 0, 0, 0, 0);
- 
-+  xfmem = xenforeignmemory_open(0, 0);
-+  xenforeignmemory_map_resource(xfmem, 0, 0, 0, 0, 0, NULL, 0, 0);
-+
-   return 0;
- }
- EOF
-diff --git a/hw/i386/xen/trace-events b/hw/i386/xen/trace-events
-index 8dab7bcfe0..38616b698f 100644
---- a/hw/i386/xen/trace-events
-+++ b/hw/i386/xen/trace-events
-@@ -15,6 +15,7 @@ cpu_ioreq_pio(void *req, uint32_t dir, uint32_t df, uint32_t data_is_ptr, uint64
- cpu_ioreq_pio_read_reg(void *req, uint64_t data, uint64_t addr, uint32_t size) "I/O=%p pio read reg data=0x%"PRIx64" port=0x%"PRIx64" size=%d"
- cpu_ioreq_pio_write_reg(void *req, uint64_t data, uint64_t addr, uint32_t size) "I/O=%p pio write reg data=0x%"PRIx64" port=0x%"PRIx64" size=%d"
- cpu_ioreq_move(void *req, uint32_t dir, uint32_t df, uint32_t data_is_ptr, uint64_t addr, uint64_t data, uint32_t count, uint32_t size) "I/O=%p copy dir=%d df=%d ptr=%d port=0x%"PRIx64" data=0x%"PRIx64" count=%d size=%d"
-+xen_map_resource_ioreq(uint32_t id, void *addr) "id: %u addr: %p"
- 
- # xen-mapcache.c
- xen_map_cache(uint64_t phys_addr) "want 0x%"PRIx64
-diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-index 6ffa3c22cc..664cc52532 100644
---- a/hw/i386/xen/xen-hvm.c
-+++ b/hw/i386/xen/xen-hvm.c
-@@ -1239,13 +1239,41 @@ static void xen_wakeup_notifier(Notifier *notifier, void *data)
- 
- static int xen_map_ioreq_server(XenIOState *state)
- {
-+    void *addr = NULL;
-+    xenforeignmemory_resource_handle *fres;
-     xen_pfn_t ioreq_pfn;
-     xen_pfn_t bufioreq_pfn;
-     evtchn_port_t bufioreq_evtchn;
-     int rc;
- 
-+    /*
-+     * Attempt to map using the resource API and fall back to normal
-+     * foreign mapping if this is not supported.
-+     */
-+    QEMU_BUILD_BUG_ON(XENMEM_resource_ioreq_server_frame_bufioreq != 0);
-+    QEMU_BUILD_BUG_ON(XENMEM_resource_ioreq_server_frame_ioreq(0) != 1);
-+    fres = xenforeignmemory_map_resource(xen_fmem, xen_domid,
-+                                         XENMEM_resource_ioreq_server,
-+                                         state->ioservid, 0, 2,
-+                                         &addr,
-+                                         PROT_READ | PROT_WRITE, 0);
-+    if (fres != NULL) {
-+        trace_xen_map_resource_ioreq(state->ioservid, addr);
-+        state->buffered_io_page = addr;
-+        state->shared_page = addr + TARGET_PAGE_SIZE;
-+    } else {
-+        error_report("failed to map ioreq server resources: error %d handle=%p",
-+                     errno, xen_xc);
-+        if (errno != EOPNOTSUPP) {
-+            return -1;
-+        }
-+    }
-+
-     rc = xen_get_ioreq_server_info(xen_domid, state->ioservid,
--                                   &ioreq_pfn, &bufioreq_pfn,
-+                                   (state->shared_page == NULL) ?
-+                                   &ioreq_pfn : NULL,
-+                                   (state->buffered_io_page == NULL) ?
-+                                   &bufioreq_pfn : NULL,
-                                    &bufioreq_evtchn);
-     if (rc < 0) {
-         error_report("failed to get ioreq server info: error %d handle=%p",
-@@ -1253,27 +1281,37 @@ static int xen_map_ioreq_server(XenIOState *state)
-         return rc;
-     }
- 
--    DPRINTF("shared page at pfn %lx\n", ioreq_pfn);
--    DPRINTF("buffered io page at pfn %lx\n", bufioreq_pfn);
--    DPRINTF("buffered io evtchn is %x\n", bufioreq_evtchn);
--
--    state->shared_page = xenforeignmemory_map(xen_fmem, xen_domid,
--                                              PROT_READ | PROT_WRITE,
--                                              1, &ioreq_pfn, NULL);
-     if (state->shared_page == NULL) {
--        error_report("map shared IO page returned error %d handle=%p",
--                     errno, xen_xc);
--        return -1;
-+        DPRINTF("shared page at pfn %lx\n", ioreq_pfn);
-+
-+        state->shared_page = xenforeignmemory_map(xen_fmem, xen_domid,
-+                                                  PROT_READ | PROT_WRITE,
-+                                                  1, &ioreq_pfn, NULL);
-+        if (state->shared_page == NULL) {
-+            error_report("map shared IO page returned error %d handle=%p",
-+                         errno, xen_xc);
-+        }
-     }
- 
--    state->buffered_io_page = xenforeignmemory_map(xen_fmem, xen_domid,
--                                                   PROT_READ | PROT_WRITE,
--                                                   1, &bufioreq_pfn, NULL);
-     if (state->buffered_io_page == NULL) {
--        error_report("map buffered IO page returned error %d", errno);
-+        DPRINTF("buffered io page at pfn %lx\n", bufioreq_pfn);
-+
-+        state->buffered_io_page = xenforeignmemory_map(xen_fmem, xen_domid,
-+                                                       PROT_READ | PROT_WRITE,
-+                                                       1, &bufioreq_pfn,
-+                                                       NULL);
-+        if (state->buffered_io_page == NULL) {
-+            error_report("map buffered IO page returned error %d", errno);
-+            return -1;
-+        }
-+    }
-+
-+    if (state->shared_page == NULL || state->buffered_io_page == NULL) {
-         return -1;
-     }
- 
-+    DPRINTF("buffered io evtchn is %x\n", bufioreq_evtchn);
-+
-     state->bufioreq_remote_port = bufioreq_evtchn;
- 
-     return 0;
-diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
-index 5f1402b494..d925751040 100644
---- a/include/hw/xen/xen_common.h
-+++ b/include/hw/xen/xen_common.h
-@@ -119,6 +119,20 @@ static inline int xendevicemodel_pin_memory_cacheattr(
-     return xc_domain_pin_memory_cacheattr(xen_xc, domid, start, end, type);
- }
- 
-+typedef void xenforeignmemory_resource_handle;
-+
-+#define XENMEM_resource_ioreq_server_frame_bufioreq 0
-+#define XENMEM_resource_ioreq_server_frame_ioreq(n) (1 + (n))
-+
-+static inline xenforeignmemory_resource_handle *xenforeignmemory_map_resource(
-+    xenforeignmemory_handle *fmem, domid_t domid, unsigned int type,
-+    unsigned int id, unsigned long frame, unsigned long nr_frames,
-+    void **paddr, int prot, int flags)
-+{
-+    errno = EOPNOTSUPP;
-+    return -1;
-+}
-+
- #endif /* CONFIG_XEN_CTRL_INTERFACE_VERSION < 41100 */
- 
- #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
--- 
-2.11.0
+Do we need a special case if the backing file is shorter than this
+image?
+
+--bPg9NdpM9EETxvqt
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJa9BAeAAoJEJykq7OBq3PIa48IAMpUtIbxue+Iqs+xDBwNU855
++GYszDRjQSbGDsOYGiUnksyahifvvaGPRMd9wh39fPLtzHCy0DXivxGbUZAfBsl1
+jpjE+Qm0dCPmksZYbz+c8WiJ9d/8TeUnU3yHmDMhG3/AsApazhaqCLZ1Md6WruLv
+sjvewQdkSmNkveJgYK7mJzHF9corSkyLcJgymIMWDY0tjnrBEDXlfk+aej4wB/pk
+9nu+dWi/8/InhDMoy0Bc9+JkD/kg0AWhl3dX1+2EROtWwMdDaFgq9KhecvTjCRSo
+bhqHOshdVcy4gX+9yM7s8W+kOTucTYpVWk+EINOTcds4+phTvMfMEotNkl1eqIk=
+=TBff
+-----END PGP SIGNATURE-----
+
+--bPg9NdpM9EETxvqt--
