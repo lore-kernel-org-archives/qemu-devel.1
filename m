@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fH8Zp-0001YU-Ka
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 09:59:18 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fH8uQ-0006nN-Co
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 10:20:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fH8Zo-0002ZG-DI
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 09:59:17 -0400
-References: <20180511120823.7892-1-famz@redhat.com>
-	<20180511120823.7892-3-famz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <16dd8da5-e0cc-43d1-caba-b0dd3807a52c@redhat.com>
-Date: Fri, 11 May 2018 08:59:05 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1fH8uM-0006Yb-ET
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 10:20:34 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41838 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fH8uM-0006XT-8c
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 10:20:30 -0400
+Date: Fri, 11 May 2018 15:20:23 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180511142023.GD2720@work-vm>
+References: <20180509112406.6183-1-quintela@redhat.com>
+	<CAFEAcA9+qqcVO1gq7PiLqCdKiHkrE81KroEdz7+iPanQ50zJRQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180511120823.7892-3-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 02/10] raw: Check byte range uniformly
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA9+qqcVO1gq7PiLqCdKiHkrE81KroEdz7+iPanQ50zJRQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 00/41] Migration queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,170 +27,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-stable <qemu-stable@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Juan Quintela <quintela@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Peter Xu <peterx@redhat.com>
 
-On 05/11/2018 07:08 AM, Fam Zheng wrote:
-> We don't verify the request range against s->size in the I/O callbacks
-> except for raw_co_pwritev. This is wrong (especially for
-> raw_co_pwrite_zeroes and raw_co_pdiscard), so fix them.
-
-Did you bother identifying how long the bug has been present (but read 
-below, because I'm not sure there was even a bug)?
-
-CC: qemu-stable@nongnu.org
-
+* Peter Maydell (peter.maydell@linaro.org) wrote:
+> On 9 May 2018 at 12:23, Juan Quintela <quintela@redhat.com> wrote:
+> > Hi
+> >
+> > this includes the reviewed patches for migration:
+> > - update docs (dave)
+> > - fixes for blocktime (text cleatups) (dave)
+> > - migration+tls (dave)
+> > - rdma index fix (lidong)
+> > - Postcopy recovery (peterx)
+> > - Parts reviewed of multifd and tests (me)
+> >
+> > There are missing parts of RDMA, will be sent after this is in.  This got already too big.
+> >
+> > Please, apply.
+> >
+> > The following changes since commit e5cd695266c5709308aa95b1baae499e4b5d4544:
+> >
+> >   Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' into staging (2018-05-08 17:05:58 +0100)
+> >
+> > are available in the Git repository at:
+> >
+> >   git://github.com/juanquintela/qemu.git tags/migration/20180509
+> >
+> > for you to fetch changes up to c14eb5ac63b0d2cd146ca004daaeaf56677b7ed1:
+> >
+> >   Migration+TLS: Fix crash due to double cleanup (2018-05-09 12:17:22 +0200)
+> >
+> > ----------------------------------------------------------------
+> > migration/next for 20180509
+> >
 > 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->   block/raw-format.c | 63 ++++++++++++++++++++++++++++++++----------------------
->   1 file changed, 38 insertions(+), 25 deletions(-)
+> Hi. I get some test failures here:
 > 
-> diff --git a/block/raw-format.c b/block/raw-format.c
-> index a378547c99..803083f1a1 100644
-> --- a/block/raw-format.c
-> +++ b/block/raw-format.c
-> @@ -167,16 +167,36 @@ static void raw_reopen_abort(BDRVReopenState *state)
->       state->opaque = NULL;
->   }
->   
-> +/* Check and adjust the offset, against 'offset' and 'size' options. */
-> +static inline int raw_adjust_offset(BlockDriverState *bs, uint64_t *offset,
-> +                                    uint64_t bytes)
-> +{
-> +    BDRVRawState *s = bs->opaque;
-> +
-> +    if (s->has_size && (*offset > s->size || bytes > (s->size - *offset))) {
-> +        /* There's not enough space for the data. Don't write anything and just
-> +         * fail to prevent leaking out of the size specified in options. */
-> +        return -ENOSPC;
-> +    }
-
-Can this even trigger? The block layer should already be clamping 
-requests according to the device's reported size, and we already report 
-a smaller size according to s->size and s->offset.  This could probably 
-be an assertion instead.
-
-> +
-> +    if (*offset > UINT64_MAX - s->offset) {
-> +        return -EINVAL;
-
-Should this be against INT64_MAX instead?  After all, we really do use 
-off_t (a 63-bit quantity, since it is signed), rather than uint64_t, as 
-our maximum (theoretical) image size.  But again, can it even trigger, 
-or can it be an assertion?
-
-> +    }
-> +    *offset += s->offset;
-> +
-> +    return 0;
-> +}
-> +
->   static int coroutine_fn raw_co_preadv(BlockDriverState *bs, uint64_t offset,
->                                         uint64_t bytes, QEMUIOVector *qiov,
->                                         int flags)
->   {
-> -    BDRVRawState *s = bs->opaque;
-> +    int ret;
->   
-> -    if (offset > UINT64_MAX - s->offset) {
-> -        return -EINVAL;
-> +    ret = raw_adjust_offset(bs, &offset, bytes);
-
-If I'm right and we can assert instead of failing, then 
-raw_adjust_offset() doesn't return failure.  If I'm wrong, then there is 
-now a code path where we can return ENOSPC on a read, which is unusual 
-and probably wrong.
-
-> +    if (ret) {
-> +        return ret;
->       }
-> -    offset += s->offset;
->   
->       BLKDBG_EVENT(bs->file, BLKDBG_READ_AIO);
->       return bdrv_co_preadv(bs->file, offset, bytes, qiov, flags);
-> @@ -186,23 +206,11 @@ static int coroutine_fn raw_co_pwritev(BlockDriverState *bs, uint64_t offset,
->                                          uint64_t bytes, QEMUIOVector *qiov,
->                                          int flags)
->   {
-> -    BDRVRawState *s = bs->opaque;
->       void *buf = NULL;
->       BlockDriver *drv;
->       QEMUIOVector local_qiov;
->       int ret;
->   
-> -    if (s->has_size && (offset > s->size || bytes > (s->size - offset))) {
-> -        /* There's not enough space for the data. Don't write anything and just
-> -         * fail to prevent leaking out of the size specified in options. */
-> -        return -ENOSPC;
-> -    }
-> -
-> -    if (offset > UINT64_MAX - s->offset) {
-> -        ret = -EINVAL;
-> -        goto fail;
-> -    }
-
-Okay, so you're just doing code refactoring; perhaps we could have done 
-assertions here.
-
-> -
->       if (bs->probed && offset < BLOCK_PROBE_BUF_SIZE && bytes) {
->           /* Handling partial writes would be a pain - so we just
->            * require that guests have 512-byte request alignment if
-> @@ -237,7 +245,10 @@ static int coroutine_fn raw_co_pwritev(BlockDriverState *bs, uint64_t offset,
->           qiov = &local_qiov;
->       }
->   
-> -    offset += s->offset;
-> +    ret = raw_adjust_offset(bs, &offset, bytes);
-> +    if (ret) {
-> +        goto fail;
-> +    }
->   
->       BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
->       ret = bdrv_co_pwritev(bs->file, offset, bytes, qiov, flags);
-> @@ -267,22 +278,24 @@ static int coroutine_fn raw_co_pwrite_zeroes(BlockDriverState *bs,
->                                                int64_t offset, int bytes,
->                                                BdrvRequestFlags flags)
->   {
-> -    BDRVRawState *s = bs->opaque;
-> -    if (offset > UINT64_MAX - s->offset) {
-> -        return -EINVAL;
-> +    int ret;
-> +
-> +    ret = raw_adjust_offset(bs, (uint64_t *)&offset, bytes);
-> +    if (ret) {
-> +        return ret;
->       }
-> -    offset += s->offset;
-
-If I'm right and raw_adjust_offset() can't fail, then this didn't add 
-any protection.  If I'm wrong and it is possible to get the block layer 
-to send a request beyond our advertised size, then this is indeed a bug 
-fix worthy of being on the stable branch.
-
->       return bdrv_co_pwrite_zeroes(bs->file, offset, bytes, flags);
->   }
->   
->   static int coroutine_fn raw_co_pdiscard(BlockDriverState *bs,
->                                           int64_t offset, int bytes)
->   {
-> -    BDRVRawState *s = bs->opaque;
-> -    if (offset > UINT64_MAX - s->offset) {
-> -        return -EINVAL;
-> +    int ret;
-> +
-> +    ret = raw_adjust_offset(bs, (uint64_t *)&offset, bytes);
-> +    if (ret) {
-> +        return ret;
->       }
-> -    offset += s->offset;
->       return bdrv_co_pdiscard(bs->file->bs, offset, bytes);
->   }
->   
+> S390x host:
+> TEST: tests/migration-test... (pid=57456)
+>   /ppc64/migration/deprecated:                                         OK
+>   /ppc64/migration/bad_dest:                                           OK
+>   /ppc64/migration/postcopy/unix:                                      OK
+>   /ppc64/migration/precopy/unix:                                       OK
+>   /ppc64/migration/xbzrle/unix:
+> Unexpected 32 on dest_serial serial
+> **
+> ERROR:/home/linux1/qemu/tests/migration-test.c:144:wait_for_serial:
+> code should not be reached
+> FAIL
 > 
+> aarch64 host:
+> 
+> Memory content inconsistency at 44f7000 first_byte = 7 last_byte = 6
+> current = 5 hit_edge = 1
+> ERROR:/home/peter.maydell/qemu/tests/migration-test.c:281:check_guests_ram:
+> 'bad' should be FALSE
+> (this is probably for ppc64 guest; unfortunately this system doesn't
+> have a make that knows about --output-sync, so the make check output
+> is hard to interpret.)
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+I'd be tempted to drop 03/41 xbzrle test  and see what happens;
+it's a heavy CPU eater so might be making things worse when in parallel.
+I suspect that aarch64 case is the same one we occasionally hit
+due to the page flag dirtying being wrong in TCG.
+
+Can you do that without another pull?
+
+Dave
+
+> thanks
+> -- PMM
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
