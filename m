@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cyrus296@gmail.com>) id 1fHF6r-0002AS-HJ
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 16:57:52 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fHGWr-0001gK-Ad
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 18:28:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cyrus296@gmail.com>) id 1fHF6q-000547-FW
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 16:57:49 -0400
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:33900)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <cyrus296@gmail.com>) id 1fHF6q-00053z-BI
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 16:57:48 -0400
-Received: by mail-io0-x244.google.com with SMTP id p124-v6so8516445iod.1
-	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 13:57:48 -0700 (PDT)
-From: Calvin Lee <cyrus296@gmail.com>
-Date: Fri, 11 May 2018 14:57:23 -0600
-Message-Id: <20180511205724.4039-2-cyrus296@gmail.com>
-In-Reply-To: <20180511205724.4039-1-cyrus296@gmail.com>
-References: <20180511205724.4039-1-cyrus296@gmail.com>
-Subject: [Qemu-devel] [PATCH RFC 1/2] PC Chipset: Improve serial divisor
- calculation
+	(envelope-from <mreitz@redhat.com>) id 1fHGWq-0006Jl-GG
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 18:28:45 -0400
+References: <20180509162637.15575-1-kwolf@redhat.com>
+	<20180509162637.15575-7-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <9d18d578-3d86-5254-1de8-5156555c5ef0@redhat.com>
+Date: Sat, 12 May 2018 00:28:32 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180509162637.15575-7-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="q89dfnOIMbuBVgIgSZ7Lz4mxnYFJKOn5C"
+Subject: Re: [Qemu-devel] [PATCH 06/42] blockjob: Add block_job_driver()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,84 +24,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, Calvin Lee <cyrus296@gmail.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-This fixes several problems I found in the UART serial implementation.
-Now all divisor values are allowed, while before divisor values of zero
-and below the base baud rate were rejected. All changes are in reference
-to http://www.sci.muni.cz/docs/pc/serport.txt
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--q89dfnOIMbuBVgIgSZ7Lz4mxnYFJKOn5C
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com,
+ qemu-devel@nongnu.org
+Message-ID: <9d18d578-3d86-5254-1de8-5156555c5ef0@redhat.com>
+Subject: Re: [PATCH 06/42] blockjob: Add block_job_driver()
+References: <20180509162637.15575-1-kwolf@redhat.com>
+ <20180509162637.15575-7-kwolf@redhat.com>
+In-Reply-To: <20180509162637.15575-7-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Calvin Lee <cyrus296@gmail.com>
----
-I included a slight code-style change in this commit because it seemed
-close enough to the code I was editing to be relevant. If not, I can
-change the commit to not include this change.
+On 2018-05-09 18:26, Kevin Wolf wrote:
+> The backup block job directly accesses the driver field in BlockJob. Ad=
+d
+> a wrapper for getting it.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> ---
+>  include/block/blockjob.h | 7 +++++++
+>  block/backup.c           | 8 +++++---
+>  blockjob.c               | 5 +++++
+>  3 files changed, 17 insertions(+), 3 deletions(-)
 
- hw/char/serial.c | 23 +++++++++++++----------
- 1 file changed, 13 insertions(+), 10 deletions(-)
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-diff --git a/hw/char/serial.c b/hw/char/serial.c
-index 2c080c9862..4159a46a2f 100644
---- a/hw/char/serial.c
-+++ b/hw/char/serial.c
-@@ -150,13 +150,10 @@ static void serial_update_irq(SerialState *s)
- 
- static void serial_update_parameters(SerialState *s)
- {
--    int speed, parity, data_bits, stop_bits, frame_size;
-+    float speed;
-+    int parity, data_bits, stop_bits, frame_size;
-     QEMUSerialSetParams ssp;
- 
--    if (s->divider == 0 || s->divider > s->baudbase) {
--        return;
--    }
--
-     /* Start bit. */
-     frame_size = 1;
-     if (s->lcr & 0x08) {
-@@ -169,14 +166,16 @@ static void serial_update_parameters(SerialState *s)
-     } else {
-             parity = 'N';
-     }
--    if (s->lcr & 0x04)
-+    if (s->lcr & 0x04) {
-         stop_bits = 2;
--    else
-+    } else {
-         stop_bits = 1;
-+    }
- 
-     data_bits = (s->lcr & 0x03) + 5;
-     frame_size += data_bits + stop_bits;
--    speed = s->baudbase / s->divider;
-+    /* Zero divisor should give about 3500 baud */
-+    speed = (s->divider == 0) ? 3500 : (float) s->baudbase / s->divider;
-     ssp.speed = speed;
-     ssp.parity = parity;
-     ssp.data_bits = data_bits;
-@@ -184,7 +183,7 @@ static void serial_update_parameters(SerialState *s)
-     s->char_transmit_time =  (NANOSECONDS_PER_SECOND / speed) * frame_size;
-     qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_SERIAL_SET_PARAMS, &ssp);
- 
--    DPRINTF("speed=%d parity=%c data=%d stop=%d\n",
-+    DPRINTF("speed=%.2f parity=%c data=%d stop=%d\n",
-            speed, parity, data_bits, stop_bits);
- }
- 
-@@ -341,7 +340,11 @@ static void serial_ioport_write(void *opaque, hwaddr addr, uint64_t val,
-     default:
-     case 0:
-         if (s->lcr & UART_LCR_DLAB) {
--            s->divider = (s->divider & 0xff00) | val;
-+            if (size == 2) {
-+                s->divider = (s->divider & 0xff00) | val;
-+            } else if (size == 4) {
-+                s->divider = val;
-+            }
-             serial_update_parameters(s);
-         } else {
-             s->thr = (uint8_t) val;
--- 
-2.17.0
+
+--q89dfnOIMbuBVgIgSZ7Lz4mxnYFJKOn5C
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr2GRAACgkQ9AfbAGHV
+z0Cfmgf7BQqKjUILelStJbzzhIDIKt7kJxYLS1ngwZ2lijQTmVrhQc8qBuQrD4O+
+tuWi+oP4avoOsv2zsqcQcE46BKAwtc4mKDcLYGaPmgmDt9N83x9QhWzPyi6i17V1
+gJKPn8bYpR9tpZY07A1gR7z973xIqLszzaEWtHgQgK+5fjUazczfuRKj+4CnK/N9
+KlVNAK/ECHe0nhZEladcWC8oiiGEIO9zAO6F2Eb0e8sf/hFgTAY1/4HSwvqvjcoQ
+1GnGlRccZraSetQdLtcFiITQQPpWJgGJOnJM4meNAQoK4OU0E5/MKzcsodRQ6uQE
+qAag5ayth0rySCDC70w+hUMiJKMUKA==
+=ddnt
+-----END PGP SIGNATURE-----
+
+--q89dfnOIMbuBVgIgSZ7Lz4mxnYFJKOn5C--
