@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fHF4R-0008U8-DG
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 16:55:20 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fHFMX-0004wo-Nf
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 17:14:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fHF4O-000442-CB
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 16:55:19 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39642)
+	(envelope-from <alex.bennee@linaro.org>) id 1fHFMS-0002hk-Pj
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 17:14:01 -0400
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:37664)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fHF4O-00043Z-5q
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 16:55:16 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fHF4N-0007H7-0R
-	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 20:55:15 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 007792E8050
-	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 20:55:15 +0000 (UTC)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fHFMS-0002hP-Hv
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 17:13:56 -0400
+Received: by mail-wr0-x233.google.com with SMTP id h5-v6so6567274wrm.4
+	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 14:13:56 -0700 (PDT)
+References: <20180425012300.14698-1-richard.henderson@linaro.org>
+	<87wowsk1ih.fsf@linaro.org>
+	<8979b195-d1b0-de1f-7cad-864982108610@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <8979b195-d1b0-de1f-7cad-864982108610@linaro.org>
+Date: Fri, 11 May 2018 22:13:53 +0100
+Message-ID: <87a7t5vqsu.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 11 May 2018 20:39:35 -0000
-From: Max Reitz <1524546@bugs.launchpad.net>
-Reply-To: Bug 1524546 <1524546@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20151209233416.12733.38134.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152607117583.24806.13315470042800063032.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1524546] Re: qemu-img rebase error message
- mentions wrong file name
+Subject: Re: [Qemu-devel] [PATCH 0/9] target/arm: Fixups for
+ ARM_FEATURE_V8_FP16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,81 +32,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-The full story is that in 2015, qemu probably did not note that it
-failed to open the overlay (<filename>) because it failed to open the
-backing file.  It does that, now, though:
 
-$ qemu-img rebase -b new.qcow2 top.qcow2 =
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-qemu-img: Could not open 'top.qcow2': Could not open backing file: Could no=
-t open 'base.qcow2': No such file or directory
+> On 04/27/2018 10:22 AM, Alex Benn=C3=A9e wrote:
+>>
+>> Richard Henderson <richard.henderson@linaro.org> writes:
+>>
+>>> When running the gcc testsuite with current aarch64-linux-user,
+>>> the testsuite detects the presence of the fp16 extension and
+>>> enables lots of extra tests for builtins.
+>>>
+>>> Quite a few of these new tests fail because we missed implementing
+>>> some instructions.  We really should go back and verify that nothing
+>>> else is missing from this (rather large) extension.
+>>
+>> So this set of instructions is generated from any ASL description that
+>> contains "half":
+>
+> This still isn't all of them.  At least the insns from fmov_float_gen.htm=
+l are
+> missing.  The four insns could be handled with
+>
+> FMOV_H_general  A64_V sf:1 00 11110 11 100 11 o:1 000000 Rn:5 Rd:5
+>
+> Peter had pointed out that I didn't handle sf=3D1 in fmov during review.
 
-So that should be a fix.
+It describes itself as:
 
-Max
+   <docvars>
+       <docvar key=3D"convert-type" value=3D"32-to-half" />
+       <docvar key=3D"instr-class" value=3D"float" />
+       <docvar key=3D"isa" value=3D"A64" />
+       <docvar key=3D"mnemonic" value=3D"FMOV" />
+   </docvars>
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+I found I had to make the --desc matching a lot more liberal to catch
+stuff from the Aarch32 XML, so now:
 
-** Changed in: qemu
-       Status: Incomplete =3D> Fix Released
+22:11:47 [alex@zen:~/l/q/risu.git] add-asl-support-v2(+1/-1) + ./contrib/ar=
+masl2risu.py --only-desc "half" xml/ISA_v83A_A64_xml_00bet6/*.xml | grep FM=
+OV
+FMOV_32H_float2int A64_V 0001111011100110000000 Rn:5  Rd:5
+FMOV_H32_float2int A64_V 0001111011100111000000 Rn:5  Rd:5
+FMOV_asimdimm_H_h A64_V 0 Q:1 00111100000 a:1  b:1  c:1 111111 d:1  e:1  f:=
+1  g:1  h:1  Rd:5
+FMOV_H64_float2int A64_V 1001111011100111000000 Rn:5  Rd:5
+FMOV_64H_float2int A64_V 1001111011100110000000 Rn:5  Rd:5
+FMOV_H_floatimm A64_V 00011110111 imm8:8 10000000 Rd:5
+FMOV_H_floatdp1 A64_V 0001111011100000010000 Rn:5  Rd:5
 
--- =
+Whereas I had:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1524546
+22:11:58 [alex@zen:~/l/q/risu.git] add-asl-support-v2(+1/-1) + grep FMOV al=
+l_v82_half.risu
+FMOV_H_floatimm A64_V 00011110111 imm8:8 10000000 Rd:5
+FMOV_H_floatdp1 A64_V 0001111011100000010000 Rn:5  Rd:5
 
-Title:
-  qemu-img rebase error message mentions wrong file name
+I'll regenerate a set.
 
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  While doing 'qemu-img rebase' for linking to a different backing file, if=
- the old backing file does not exist, the command fails. During this failur=
-e, the error message shown is misleading.
-  e.g. qemu-img rebase -b <backing_file> <filename> throws error saying "Co=
-uld not open <filename>"
-  Ideally it should "Could not open <old_backing_file>"
-
-  snippet -
-  [root@oxy-dev ~]# qemu-img info /opt/stack/data/nova/instances/94864a64-e=
-bf8-45e6-a777-615921216a0a/disk
-  image: /opt/stack/data/nova/instances/94864a64-ebf8-45e6-a777-615921216a0=
-a/disk
-  file format: qcow2
-  virtual size: 20G (21474836480 bytes)
-  disk size: 174M
-  cluster_size: 65536
-  backing file: /tmp/3559241a79b79ae663ec6e3d9b75d469967b383b
-  Format specific information:
-      compat: 1.1
-      lazy refcounts: false
-  [root@oxy-dev ~]# mv /tmp/3559241a79b79ae663ec6e3d9b75d469967b383b /tmp/3=
-559241a79b79ae663ec6e3d9b75d469967b383a
-  [root@oxy-dev ~]# file !$
-  file /tmp/3559241a79b79ae663ec6e3d9b75d469967b383a
-  /tmp/3559241a79b79ae663ec6e3d9b75d469967b383a: x86 boot sector; partition=
- 1: ID=3D0x83, active, starthead 32, startsector 2048, 409600 sectors; part=
-ition 2: ID=3D0x8e, starthead 159, startsector 411648, 16365568 sectors, co=
-de offset 0xc0
-  [root@oxy-dev ~]# file /tmp/3559241a79b79ae663ec6e3d9b75d469967b383b
-  /tmp/3559241a79b79ae663ec6e3d9b75d469967b383b: cannot open (No such file =
-or directory)
-  [root@oxy-dev ~]# qemu-img rebase -b /tmp/3559241a79b79ae663ec6e3d9b75d46=
-9967b383a /opt/stack/data/nova/instances/94864a64-ebf8-45e6-a777-615921216a=
-0a/disk
-  qemu-img: Could not open '/opt/stack/data/nova/instances/94864a64-ebf8-45=
-e6-a777-615921216a0a/disk': Could not open file: No such file or directory
-  [root@oxy-dev ~]# =
-
-  qemu-img version 1.5.3
-  OS: RHEL7 - 3.10.0-229
-  libvirtd (libvirt) 1.2.8
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1524546/+subscriptions
+--
+Alex Benn=C3=A9e
