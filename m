@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fHAfo-000376-66
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 12:13:37 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fHAtp-0005FM-BW
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 12:28:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fHAfn-0005Ml-4D
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 12:13:36 -0400
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:38402)
+	(envelope-from <alex.bennee@linaro.org>) id 1fHAtm-00038H-7t
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 12:28:05 -0400
+Received: from mail-wr0-f195.google.com ([209.85.128.195]:40343)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fHAfm-0005Ks-To
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 12:13:35 -0400
-Received: by mail-wm0-x234.google.com with SMTP id m129-v6so4174069wmb.3
-	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 09:13:33 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fHAtm-00037w-0k
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 12:28:02 -0400
+Received: by mail-wr0-f195.google.com with SMTP id v60-v6so5911772wrc.7
+	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 09:28:01 -0700 (PDT)
+References: <20180511004345.26708-1-richard.henderson@linaro.org>
+	<20180511004345.26708-5-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180511004345.26708-5-richard.henderson@linaro.org>
+Date: Fri, 11 May 2018 17:26:58 +0100
+Message-ID: <87bmdmupil.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <bdfbc910-4a08-98ae-563d-96090f0f381a@mail.ru>
-References: <bdfbc910-4a08-98ae-563d-96090f0f381a@mail.ru>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Fri, 11 May 2018 17:13:31 +0100
-Message-ID: <CAJSP0QXnKJemDtZVOOgktwAawRUto25E1i-JjggKsviN4iuS5A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Outreachy intro: micro:bit project
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 04/19] fpu/softfloat: Canonicalize NaN
+ fraction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,25 +31,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julia Suvorova <jusual@mail.ru>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Jim Mussared <jim@groklearning.com>, Joel Stanley <joel@jms.id.au>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-On Thu, May 10, 2018 at 11:19 PM, Julia Suvorova <jusual@mail.ru> wrote:
-> My name is Julia. I am a bachelor of mathematics from Moscow who is
-> interested in system programming. I've been selected for Outreachy this
-> year to work on the micro:bit project.
-> The project is divided between two people - me and Steffen.
-> We will develop support for the micro:bit board and the Cortex-M0 cpu.
+
+Richard Henderson <richard.henderson@linaro.org> writes:
+
+> Shift the NaN fraction to a canonical position, much like we do
+> for the fraction of normal numbers.  Immediately, this simplifies
+> the float-to-float conversion.  Later, this will facilitate
+> manipulation of NaNs within the shared code paths.
 >
-> I'm very excited to work with QEMU community. Wish me luck!
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  fpu/softfloat.c | 13 ++++++-------
+>  1 file changed, 6 insertions(+), 7 deletions(-)
+>
+> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+> index 5e4982b035..df377b6314 100644
+> --- a/fpu/softfloat.c
+> +++ b/fpu/softfloat.c
+> @@ -329,10 +329,11 @@ static FloatParts canonicalize(FloatParts part, con=
+st FloatFmt *parm,
+>          if (part.frac =3D=3D 0) {
+>              part.cls =3D float_class_inf;
+>          } else {
+> +            part.frac <<=3D parm->frac_shift;
+>  #ifdef NO_SIGNALING_NANS
+>              part.cls =3D float_class_qnan;
+>  #else
+> -            int64_t msb =3D part.frac << (parm->frac_shift + 2);
+> +            int64_t msb =3D part.frac << 2;
+>              if ((msb < 0) =3D=3D status->snan_bit_is_one) {
+>                  part.cls =3D float_class_snan;
+>              } else {
+> @@ -498,6 +499,7 @@ static FloatParts round_canonical(FloatParts p, float=
+_status *s,
+>      case float_class_qnan:
+>      case float_class_snan:
+>          exp =3D exp_max;
+> +        frac >>=3D parm->frac_shift;
 
-Congratulations!  We are excited to work with you.
+Unfortunately we now miss this step when we handle:
 
-Do you have a blog URL where we can follow your work?
+    case float_class_msnan:
+        return float64_maybe_silence_nan(float64_pack_raw(p), s);
 
-You can add it to the open source virtualization blog aggregator here
-by contacting Daniel Berrange <berrange@redhat.com> (and follow the
-aggregator to see what others are doing!):
-https://planet.virt-tools.org/
+This seems to fix that:
 
-Stefan
+recanonicalise frac before packing and sending
+
+1 file changed, 3 insertions(+)
+fpu/softfloat.c | 3 +++
+
+modified   fpu/softfloat.c
+@@ -532,6 +532,7 @@ static float16 float16a_round_pack_canonical(const Floa=
+tFmt *params,
+     case float_class_dnan:
+         return float16_default_nan(s);
+     case float_class_msnan:
++        p.frac >>=3D params->frac_shift;
+         return float16_maybe_silence_nan(float16_pack_raw(p), s);
+     default:
+         p =3D round_canonical(p, s, params);
+@@ -555,6 +556,7 @@ static float32 float32_round_pack_canonical(FloatParts =
+p, float_status *s)
+     case float_class_dnan:
+         return float32_default_nan(s);
+     case float_class_msnan:
++        p.frac >>=3D float32_params.frac_shift;
+         return float32_maybe_silence_nan(float32_pack_raw(p), s);
+     default:
+         p =3D round_canonical(p, s, &float32_params);
+@@ -573,6 +575,7 @@ static float64 float64_round_pack_canonical(FloatParts =
+p, float_status *s)
+     case float_class_dnan:
+         return float64_default_nan(s);
+     case float_class_msnan:
++        p.frac >>=3D float64_params.frac_shift;
+         return float64_maybe_silence_nan(float64_pack_raw(p), s);
+     default:
+         p =3D round_canonical(p, s, &float64_params);
+
+--
+Alex Benn=C3=A9e
