@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrewjameswood@ymail.com>) id 1fHEif-0001UA-AG
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 16:32:50 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fHEm0-0003U6-5w
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 16:36:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrewjameswood@ymail.com>) id 1fHEia-0004a0-Do
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 16:32:49 -0400
-Received: from sonic305-21.consmr.mail.ir2.yahoo.com ([77.238.177.83]:37089)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <andrewjameswood@ymail.com>)
-	id 1fHEia-0004Yk-6k
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 16:32:44 -0400
-From: andrewjameswood@ymail.com
-Date: Fri, 11 May 2018 21:32:38 +0100
-Message-Id: <20180511203238.22881-1-andrewjameswood@ymail.com>
-Subject: [Qemu-devel] [PATCH] Added SIGPWR handler to send ACPI shutdown
+	(envelope-from <no-reply@patchew.org>) id 1fHElv-0005pF-Tx
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 16:36:16 -0400
+Resent-Message-Id: <E1fHElv-0005pF-Tx@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21083)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fHElv-0005o7-LX
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 16:36:11 -0400
+In-Reply-To: <20180511203238.22881-1-andrewjameswood@ymail.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152607093287.2859.3297705802542234151@71c20359a636>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 11 May 2018 13:35:33 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] Added SIGPWR handler to send ACPI shutdown
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,52 +28,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: Andrew Wood <awood@comms.org.uk>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, peter.maydell@linaro.org, awood@comms.org.uk
 
-From: Andrew Wood <awood@comms.org.uk>
-
-Signed-off-by: Andrew Wood <awood@comms.org.uk>
----
- os-posix.c |  1 +
- vl.c       | 13 +++++++++++--
- 2 files changed, 12 insertions(+), 2 deletions(-)
-
-diff --git a/os-posix.c b/os-posix.c
-index b9c2343b1e..68d70f269b 100644
---- a/os-posix.c
-+++ b/os-posix.c
-@@ -70,6 +70,7 @@ void os_setup_signal_handling(void)
-     sigaction(SIGINT,  &act, NULL);
-     sigaction(SIGHUP,  &act, NULL);
-     sigaction(SIGTERM, &act, NULL);
-+    sigaction(SIGPWR, &act, NULL);
- }
- 
- /* Find a likely location for support files using the location of the binary.
-diff --git a/vl.c b/vl.c
-index fce1fd12d8..55c5e06858 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1846,8 +1846,17 @@ void qemu_system_killed(int signal, pid_t pid)
-     /* Cannot call qemu_system_shutdown_request directly because
-      * we are in a signal handler.
-      */
--    shutdown_requested = SHUTDOWN_CAUSE_HOST_SIGNAL;
--    qemu_notify_event();
-+    if (signal==SIGPWR)
-+    {
-+	
-+	powerdown_requested = 1;
-+    	qemu_notify_event();
-+    }
-+    else
-+    {
-+    	shutdown_requested = SHUTDOWN_CAUSE_HOST_SIGNAL;
-+    	qemu_notify_event();
-+    }
- }
- 
- void qemu_system_shutdown_request(ShutdownCause reason)
--- 
-2.11.0
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNTExMjAzMjM4LjIyODgxLTEtYW5kcmV3amFtZXN3b29kQHltYWlsLmNv
+bQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBBZGRlZCBTSUdQV1IgaGFuZGxlciB0byBz
+ZW5kIEFDUEkgc2h1dGRvd24KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gK
+CkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwp
+CmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
+cml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNl
+ICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENI
+ICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBn
+aXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
+bGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49
+JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRh
+dGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6
+Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAg
+ICAgIHBhdGNoZXcvMjAxODA1MDkxNjU1MzAuMjk1NjEtMS1tcmVpdHpAcmVkaGF0LmNvbSAtPiBw
+YXRjaGV3LzIwMTgwNTA5MTY1NTMwLjI5NTYxLTEtbXJlaXR6QHJlZGhhdC5jb20KIHQgW3RhZyB1
+cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDUxMDIwNDE0OC4xMTY4Ny0xLWJhYnUubW9n
+ZXJAYW1kLmNvbSAtPiBwYXRjaGV3LzIwMTgwNTEwMjA0MTQ4LjExNjg3LTEtYmFidS5tb2dlckBh
+bWQuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxODA1MTEyMDMyMzgu
+MjI4ODEtMS1hbmRyZXdqYW1lc3dvb2RAeW1haWwuY29tIC0+IHBhdGNoZXcvMjAxODA1MTEyMDMy
+MzguMjI4ODEtMS1hbmRyZXdqYW1lc3dvb2RAeW1haWwuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJy
+YW5jaCAndGVzdCcKOGY3OGMzNGZmNSBBZGRlZCBTSUdQV1IgaGFuZGxlciB0byBzZW5kIEFDUEkg
+c2h1dGRvd24KCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogQWRkZWQg
+U0lHUFdSIGhhbmRsZXIgdG8gc2VuZCBBQ1BJIHNodXRkb3duLi4uCkVSUk9SOiB0aGF0IG9wZW4g
+YnJhY2UgeyBzaG91bGQgYmUgb24gdGhlIHByZXZpb3VzIGxpbmUKIzMxOiBGSUxFOiB2bC5jOjE4
+NDc6CisgICAgaWYgKHNpZ25hbD09U0lHUFdSKQorICAgIHsKCkVSUk9SOiBzcGFjZXMgcmVxdWly
+ZWQgYXJvdW5kIHRoYXQgJz09JyAoY3R4OlZ4VikKIzMxOiBGSUxFOiB2bC5jOjE4NDc6CisgICAg
+aWYgKHNpZ25hbD09U0lHUFdSKQogICAgICAgICAgICAgICBeCgpFUlJPUjogdHJhaWxpbmcgd2hp
+dGVzcGFjZQojMzM6IEZJTEU6IHZsLmM6MTg0OToKK15JJAoKRVJST1I6IGNvZGUgaW5kZW50IHNo
+b3VsZCBuZXZlciB1c2UgdGFicwojMzM6IEZJTEU6IHZsLmM6MTg0OToKK15JJAoKRVJST1I6IGNv
+ZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzQ6IEZJTEU6IHZsLmM6MTg1MDoKK15J
+cG93ZXJkb3duX3JlcXVlc3RlZCA9IDE7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZl
+ciB1c2UgdGFicwojMzU6IEZJTEU6IHZsLmM6MTg1MToKKyAgICBeSXFlbXVfbm90aWZ5X2V2ZW50
+KCk7JAoKRVJST1I6IHRoYXQgb3BlbiBicmFjZSB7IHNob3VsZCBiZSBvbiB0aGUgcHJldmlvdXMg
+bGluZQojMzc6IEZJTEU6IHZsLmM6MTg1MzoKKyAgICBlbHNlCisgICAgewoKRVJST1I6IGVsc2Ug
+c2hvdWxkIGZvbGxvdyBjbG9zZSBicmFjZSAnfScKIzM3OiBGSUxFOiB2bC5jOjE4NTM6CisgICAg
+fQorICAgIGVsc2UKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzM5
+OiBGSUxFOiB2bC5jOjE4NTU6CisgICAgXklzaHV0ZG93bl9yZXF1ZXN0ZWQgPSBTSFVURE9XTl9D
+QVVTRV9IT1NUX1NJR05BTDskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0
+YWJzCiM0MDogRklMRTogdmwuYzoxODU2OgorICAgIF5JcWVtdV9ub3RpZnlfZXZlbnQoKTskCgp0
+b3RhbDogMTAgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
+cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
+bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
+bGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
+ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
