@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52067)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52078)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGwAI-0007Hj-S1
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 20:44:07 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fGwAK-0007J9-91
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 20:44:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGwAH-0004sS-Sd
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 20:44:06 -0400
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:43673)
+	(envelope-from <richard.henderson@linaro.org>) id 1fGwAJ-0004sq-Da
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 20:44:08 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:37636)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fGwAH-0004sJ-Ni
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 20:44:05 -0400
-Received: by mail-pg0-x244.google.com with SMTP id k11-v6so1672800pgo.10
-	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 17:44:05 -0700 (PDT)
+	id 1fGwAJ-0004sf-7o
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 20:44:07 -0400
+Received: by mail-pg0-x244.google.com with SMTP id a13-v6so1681391pgu.4
+	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 17:44:07 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 10 May 2018 17:43:38 -0700
-Message-Id: <20180511004345.26708-13-richard.henderson@linaro.org>
+Date: Thu, 10 May 2018 17:43:39 -0700
+Message-Id: <20180511004345.26708-14-richard.henderson@linaro.org>
 In-Reply-To: <20180511004345.26708-1-richard.henderson@linaro.org>
 References: <20180511004345.26708-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 12/19] target/mips: Remove
+Subject: [Qemu-devel] [PATCH 13/19] target/riscv: Remove
  floatX_maybe_silence_nan from conversions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,73 +28,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, alex.bennee@linaro.org, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>
+Cc: peter.maydell@linaro.org, alex.bennee@linaro.org, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
 This is now handled properly by the generic softfloat code.
 
-Cc: Aurelien Jarno <aurelien@aurel32.net>
-Cc: Yongbok Kim <yongbok.kim@mips.com>
+Cc: Michael Clark <mjc@sifive.com>
+Cc: Palmer Dabbelt <palmer@sifive.com>
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/mips/msa_helper.c | 4 ----
- target/mips/op_helper.c  | 2 --
- 2 files changed, 6 deletions(-)
+ target/riscv/fpu_helper.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index 8fb7a369ca..c74e3cdc65 100644
---- a/target/mips/msa_helper.c
-+++ b/target/mips/msa_helper.c
-@@ -1615,7 +1615,6 @@ static inline float16 float16_from_float32(int32_t a, flag ieee,
-       float16 f_val;
+diff --git a/target/riscv/fpu_helper.c b/target/riscv/fpu_helper.c
+index abbadead5c..fdb87d8d82 100644
+--- a/target/riscv/fpu_helper.c
++++ b/target/riscv/fpu_helper.c
+@@ -279,14 +279,12 @@ uint64_t helper_fmax_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
  
-       f_val = float32_to_float16((float32)a, ieee, status);
--      f_val = float16_maybe_silence_nan(f_val, status);
- 
-       return a < 0 ? (f_val | (1 << 15)) : f_val;
+ uint64_t helper_fcvt_s_d(CPURISCVState *env, uint64_t rs1)
+ {
+-    rs1 = float64_to_float32(rs1, &env->fp_status);
+-    return float32_maybe_silence_nan(rs1, &env->fp_status);
++    return float64_to_float32(rs1, &env->fp_status);
  }
-@@ -1625,7 +1624,6 @@ static inline float32 float32_from_float64(int64_t a, float_status *status)
-       float32 f_val;
  
-       f_val = float64_to_float32((float64)a, status);
--      f_val = float32_maybe_silence_nan(f_val, status);
- 
-       return a < 0 ? (f_val | (1 << 31)) : f_val;
+ uint64_t helper_fcvt_d_s(CPURISCVState *env, uint64_t rs1)
+ {
+-    rs1 = float32_to_float64(rs1, &env->fp_status);
+-    return float64_maybe_silence_nan(rs1, &env->fp_status);
++    return float32_to_float64(rs1, &env->fp_status);
  }
-@@ -1636,7 +1634,6 @@ static inline float32 float32_from_float16(int16_t a, flag ieee,
-       float32 f_val;
  
-       f_val = float16_to_float32((float16)a, ieee, status);
--      f_val = float32_maybe_silence_nan(f_val, status);
- 
-       return a < 0 ? (f_val | (1 << 31)) : f_val;
- }
-@@ -1646,7 +1643,6 @@ static inline float64 float64_from_float32(int32_t a, float_status *status)
-       float64 f_val;
- 
-       f_val = float32_to_float64((float64)a, status);
--      f_val = float64_maybe_silence_nan(f_val, status);
- 
-       return a < 0 ? (f_val | (1ULL << 63)) : f_val;
- }
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index 798cdad030..9025f42366 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -2700,7 +2700,6 @@ uint64_t helper_float_cvtd_s(CPUMIPSState *env, uint32_t fst0)
-     uint64_t fdt2;
- 
-     fdt2 = float32_to_float64(fst0, &env->active_fpu.fp_status);
--    fdt2 = float64_maybe_silence_nan(fdt2, &env->active_fpu.fp_status);
-     update_fcr31(env, GETPC());
-     return fdt2;
- }
-@@ -2790,7 +2789,6 @@ uint32_t helper_float_cvts_d(CPUMIPSState *env, uint64_t fdt0)
-     uint32_t fst2;
- 
-     fst2 = float64_to_float32(fdt0, &env->active_fpu.fp_status);
--    fst2 = float32_maybe_silence_nan(fst2, &env->active_fpu.fp_status);
-     update_fcr31(env, GETPC());
-     return fst2;
- }
+ uint64_t helper_fsqrt_d(CPURISCVState *env, uint64_t frs1)
 -- 
 2.17.0
