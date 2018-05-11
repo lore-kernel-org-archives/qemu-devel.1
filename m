@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fH7ZH-0003Gl-7b
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 08:54:40 -0400
+	(envelope-from <david@redhat.com>) id 1fH7y0-0000op-59
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 09:20:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fH7ZD-0008Au-ER
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 08:54:39 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36020 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fH7ZD-0008Ac-9Z
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 08:54:35 -0400
-Date: Fri, 11 May 2018 13:54:30 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180511125430.GI22098@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1525817687-34620-1-git-send-email-pbonzini@redhat.com>
-	<CAFEAcA9gG5aSPr7KmqMvgP4OZ9zOC5Z5_UnS_pP+eujDiQmZHw@mail.gmail.com>
-	<20180511124253.GH22098@redhat.com>
-	<CAFEAcA9TyhX+UyskvuHMSEnJXi-dUdw-E1Es_Fs5NjfdwgZiLQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9TyhX+UyskvuHMSEnJXi-dUdw-E1Es_Fs5NjfdwgZiLQ@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/30] Misc patches for 2018-05-09
+	(envelope-from <david@redhat.com>) id 1fH7xw-0003gt-Va
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 09:20:12 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Fri, 11 May 2018 15:19:36 +0200
+Message-Id: <20180511131953.12905-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 00/17] MemoryDevice: use multi stage hotplug
+ handlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,62 +18,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>, David Hildenbrand <david@redhat.com>
 
-On Fri, May 11, 2018 at 01:50:28PM +0100, Peter Maydell wrote:
-> On 11 May 2018 at 13:42, Daniel P. Berrang=C3=A9 <berrange@redhat.com> =
-wrote:
-> > On Fri, May 11, 2018 at 01:19:51PM +0100, Peter Maydell wrote:
-> >> Some of my build setups barf on the new glib version requirement:
-> >>
-> >>  * my aarch64 build host (a gcc compile farm machine which is runnin=
-g
-> >>    Ubuntu 14.04.5 LTS and has glib 2.40.2)
-> >
-> > That is expected - per the policy we only aim to support the most rec=
-ent,
-> > and most recent but one for 2 years overlap. Since LTS releases are t=
-wo
-> > years apart, this basically means always just 2 most recent LTS relea=
-ses
-> > for Ubuntu. Since we Ubuntu 18.04 LTS came out last month, we don't
-> > need to continue 14.04 LTS
->=20
-> ...well, I could ask the GCC compile farm admins what their
-> upgrade plans are, but I don't particularly see the need
-> to impose load on a volunteer set of admins when the distro
-> they're running is still supported for another year. And I
-> don't want to drop aarch64 from my build test set.
+This is an alternative implementation of "MemoryDevice: introduce and use
+ResourceHandler". It is based on the proposal of Igor, to have multi stage
+hotplug handlers. This seems to work just fine for DIMMs and virtio-mem.
 
-Ah ok, I didn't realize you weren't in control of the OS version.
-2.40.2 is not too old, so we can accomodate that without significant
-problems.
+This approach results in slightly more LOC (each machine has to
+implement support for it), however the end result looks cleaner to me.
 
-> >>  * my windows cross compile setups (which have glib 2.34.3)
-> >
-> > Presumably you're using a Debian host for that ?
->=20
-> Ubuntu.
->=20
-> > The debian-win64-cross.docker job seems to pull in packages from
-> >
-> >   deb http://pkg.mxe.cc/repos/apt/debian jessie main
-> >
-> > And mxe claims to have glib 2.54
->=20
-> Thanks, I will have a look at this. (They seem to have tarballs
-> as well as debian packages.)
+----
 
-Ok, let me know if that works out, and if so, I'll repost min glib
-patches setting it to 2.40.2 to allow for the aarch64 build host.
+We can have devices that need certain other resources that are e.g.
+system resources managed by the machine. We need a clean way to assign
+these resources (without violating layers as brought up by Igor).
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+One example is virtio-mem/virtio-pmem. Both device types need to be
+assigned some region in guest physical address space. This device memory
+belongs to the machine and is managed by it. However, virito devices are
+hotplugged using the hotplug handler their proxy device implements. So we
+could trigger e.g. a PCI hotplug handler for virtio-pci or a CSS/CCW
+hotplug handler for virtio-ccw. But definetly not the machine.
+
+Now, we can route other devices through the machine hotplug handler, to
+properly assign/unassign resources - like a portion in guest physical
+address space.
+
+Main changes to other approach:
+- Use multi stage hotplug handler instead of resource handler
+- MemoryDevices only compiled if necessary (CONFIG_MEM_HOTPLUG)
+- Prepare PC/SPAPR machines properly for multi stage hotplug handlers
+- Route SPAPR unplug code via the hotunplug handler
+- Directly include s390x support :) But there are no usable memory devices
+  yet :( (well, only my virtio-mem prototype)
+- Included "memory-device: drop assert related to align and start of address
+  space"
+
+
+David Hildenbrand (16):
+  memory-device: drop assert related to align and start of address space
+  pc: prepare for multi stage hotplug handlers
+  pc: route all memory devices through the machine hotplug handler
+  spapr: prepare for multi stage hotplug handlers
+  spapr: route all memory devices through the machine hotplug handler
+  spapr: handle pc-dimm unplug via hotplug handler chain
+  spapr: handle cpu core unplug via hotplug handler chain
+  memory-device: new functions to handle plug/unplug
+  pc-dimm: implement new memory device functions
+  memory-device: factor out pre-plug into hotplug handler
+  memory-device: factor out unplug into hotplug handler
+  memory-device: factor out plug into hotplug handler
+  s390x/sclp: make sure ram_size and maxram_size stay in sync
+  s390x: prepare for multi stage hotplug handlers
+  s390x: initialize memory region for memory devices
+  s390x: support memory devices
+
+Igor Mammedov (1):
+  qdev: let machine hotplug handler to override bus hotplug handler
+
+ default-configs/s390x-softmmu.mak |   1 +
+ hw/core/qdev.c                    |   6 +-
+ hw/i386/pc.c                      | 107 +++++++++++++++++++++++-------
+ hw/mem/memory-device.c            | 129 ++++++++++++++++++++++--------------
+ hw/mem/pc-dimm.c                  |  48 +++++---------
+ hw/mem/trace-events               |   4 +-
+ hw/ppc/spapr.c                    | 135 +++++++++++++++++++++++++++++++++-----
+ hw/s390x/s390-virtio-ccw.c        | 102 +++++++++++++++++++++++++++-
+ hw/s390x/sclp.c                   |  18 ++++-
+ include/hw/mem/memory-device.h    |  21 ++++--
+ include/hw/mem/pc-dimm.h          |   3 +-
+ include/hw/qdev-core.h            |  11 ++++
+ 12 files changed, 446 insertions(+), 139 deletions(-)
+
+-- 
+2.14.3
