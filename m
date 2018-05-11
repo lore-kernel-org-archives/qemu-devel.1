@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51806)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fHExT-0007ru-Er
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 16:48:09 -0400
+	(envelope-from <bounces@canonical.com>) id 1fHF4R-0008U8-DG
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 16:55:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fHExQ-00017U-Bs
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 16:48:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43634)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fHExQ-00017M-6W
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 16:48:04 -0400
-Date: Fri, 11 May 2018 17:47:59 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180511204759.GP13350@localhost.localdomain>
-References: <20180510204148.11687-1-babu.moger@amd.com>
-	<20180510204148.11687-4-babu.moger@amd.com>
-	<20180511192145.GV25013@localhost.localdomain>
-	<BL0PR12MB24682473432EF64021381FAB959F0@BL0PR12MB2468.namprd12.prod.outlook.com>
+	(envelope-from <bounces@canonical.com>) id 1fHF4O-000442-CB
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 16:55:19 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39642)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fHF4O-00043Z-5q
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 16:55:16 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fHF4N-0007H7-0R
+	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 20:55:15 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 007792E8050
+	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 20:55:15 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BL0PR12MB24682473432EF64021381FAB959F0@BL0PR12MB2468.namprd12.prod.outlook.com>
-Subject: Re: [Qemu-devel] [PATCH v8 3/8] i386: Add new property to control
- cache info
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 11 May 2018 20:39:35 -0000
+From: Max Reitz <1524546@bugs.launchpad.net>
+Reply-To: Bug 1524546 <1524546@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20151209233416.12733.38134.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152607117583.24806.13315470042800063032.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1524546] Re: qemu-img rebase error message
+ mentions wrong file name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +37,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Moger, Babu" <Babu.Moger@amd.com>
-Cc: "geoff@hostfission.com" <geoff@hostfission.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>, "kash@tripleback.net" <kash@tripleback.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
-On Fri, May 11, 2018 at 08:21:50PM +0000, Moger, Babu wrote:
-> 
-> > -----Original Message-----
-> > From: Eduardo Habkost [mailto:ehabkost@redhat.com]
-> > Sent: Friday, May 11, 2018 2:22 PM
-> > To: Moger, Babu <Babu.Moger@amd.com>
-> > Cc: mst@redhat.com; marcel.apfelbaum@gmail.com; pbonzini@redhat.com;
-> > rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
-> > kvm@vger.kernel.org; geoff@hostfission.com; kash@tripleback.net
-> > Subject: Re: [PATCH v8 3/8] i386: Add new property to control cache info
-> > 
-> > On Thu, May 10, 2018 at 03:41:43PM -0500, Babu Moger wrote:
-> > > The property legacy-cache will be used to control the cache information.
-> > > If user passes "-cpu legacy-cache" then older information will
-> > > be displayed even if the hardware supports new information. Otherwise
-> > > use the statically loaded cache definitions if available.
-> > >
-> > > Signed-off-by: Babu Moger <babu.moger@amd.com>
-> > > Tested-by: Geoffrey McRae <geoff@hostfission.com>
-> > > ---
-> > >  include/hw/i386/pc.h |  8 ++++
-> > >  target/i386/cpu.c    | 97 ++++++++++++++++++++++++++++++++-----------
-> > -
-> > >  target/i386/cpu.h    |  5 +++
-> > >  3 files changed, 84 insertions(+), 26 deletions(-)
-> > >
-> > > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> > > index 2e834e6ded..df15deefca 100644
-> > > --- a/include/hw/i386/pc.h
-> > > +++ b/include/hw/i386/pc.h
-> > > @@ -304,6 +304,14 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
-> > >  int e820_get_num_entries(void);
-> > >  bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-> > >
-> > > +#define PC_COMPAT_2_12 \
-> > > +    HW_COMPAT_2_12 \
-> > > +    {\
-> > > +        .driver   = TYPE_X86_CPU,\
-> > > +        .property = "legacy-cache",\
-> > > +        .value    = "on",\
-> > > +    },
-> > 
-> > This isn't enough if the pc-*-2.12 machine-type isn't using the
-> > macro.
-> > 
-> > Before we do this, we need a commit similar to commit
-> > df47ce8af4a5, but adding pc-*-2.13 machine-types.
-> 
-> Ok. Sure. I think I got it. Will add pc-*-2.13 machine-types in v9 series. 
+The full story is that in 2015, qemu probably did not note that it
+failed to open the overlay (<filename>) because it failed to open the
+backing file.  It does that, now, though:
 
-Thanks.  If you submit v9, please use the x86-next tree as base
-so you don't need to resubmit the patches that I have already
-queued.  See MAINTAINERS for the git URL.
+$ qemu-img rebase -b new.qcow2 top.qcow2 =
 
--- 
-Eduardo
+qemu-img: Could not open 'top.qcow2': Could not open backing file: Could no=
+t open 'base.qcow2': No such file or directory
+
+So that should be a fix.
+
+Max
+
+** Changed in: qemu
+       Status: New =3D> Incomplete
+
+** Changed in: qemu
+       Status: Incomplete =3D> Fix Released
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1524546
+
+Title:
+  qemu-img rebase error message mentions wrong file name
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  While doing 'qemu-img rebase' for linking to a different backing file, if=
+ the old backing file does not exist, the command fails. During this failur=
+e, the error message shown is misleading.
+  e.g. qemu-img rebase -b <backing_file> <filename> throws error saying "Co=
+uld not open <filename>"
+  Ideally it should "Could not open <old_backing_file>"
+
+  snippet -
+  [root@oxy-dev ~]# qemu-img info /opt/stack/data/nova/instances/94864a64-e=
+bf8-45e6-a777-615921216a0a/disk
+  image: /opt/stack/data/nova/instances/94864a64-ebf8-45e6-a777-615921216a0=
+a/disk
+  file format: qcow2
+  virtual size: 20G (21474836480 bytes)
+  disk size: 174M
+  cluster_size: 65536
+  backing file: /tmp/3559241a79b79ae663ec6e3d9b75d469967b383b
+  Format specific information:
+      compat: 1.1
+      lazy refcounts: false
+  [root@oxy-dev ~]# mv /tmp/3559241a79b79ae663ec6e3d9b75d469967b383b /tmp/3=
+559241a79b79ae663ec6e3d9b75d469967b383a
+  [root@oxy-dev ~]# file !$
+  file /tmp/3559241a79b79ae663ec6e3d9b75d469967b383a
+  /tmp/3559241a79b79ae663ec6e3d9b75d469967b383a: x86 boot sector; partition=
+ 1: ID=3D0x83, active, starthead 32, startsector 2048, 409600 sectors; part=
+ition 2: ID=3D0x8e, starthead 159, startsector 411648, 16365568 sectors, co=
+de offset 0xc0
+  [root@oxy-dev ~]# file /tmp/3559241a79b79ae663ec6e3d9b75d469967b383b
+  /tmp/3559241a79b79ae663ec6e3d9b75d469967b383b: cannot open (No such file =
+or directory)
+  [root@oxy-dev ~]# qemu-img rebase -b /tmp/3559241a79b79ae663ec6e3d9b75d46=
+9967b383a /opt/stack/data/nova/instances/94864a64-ebf8-45e6-a777-615921216a=
+0a/disk
+  qemu-img: Could not open '/opt/stack/data/nova/instances/94864a64-ebf8-45=
+e6-a777-615921216a0a/disk': Could not open file: No such file or directory
+  [root@oxy-dev ~]# =
+
+  qemu-img version 1.5.3
+  OS: RHEL7 - 3.10.0-229
+  libvirtd (libvirt) 1.2.8
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1524546/+subscriptions
