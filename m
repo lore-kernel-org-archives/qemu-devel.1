@@ -1,44 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1fH3xK-0006h9-0n
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:03:20 -0400
+	(envelope-from <pmorel@linux.ibm.com>) id 1fH4Qu-00023W-R2
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:33:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1fH3xE-0007kB-1R
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:03:14 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38612
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <pmorel@linux.ibm.com>) id 1fH4Qr-00074I-KS
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:33:48 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56326)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
-	id 1fH3xD-0007jb-TA
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:03:07 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w4B8wxTh138337
-	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 05:03:05 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2hw4upraw6-1
+	id 1fH4Qr-00073f-Bn
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:33:45 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w4B9T1T7065627
+	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 05:33:44 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2hw4xp14aw-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 05:03:05 -0400
+	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 05:33:43 -0400
 Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
-	Fri, 11 May 2018 10:03:03 +0100
+	Fri, 11 May 2018 10:33:41 +0100
 Reply-To: pmorel@linux.ibm.com
-References: <1525782303-16940-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<1525782303-16940-5-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<c36ec83f-8cba-cf7b-3054-35cf4cd65c14@linux.ibm.com>
-	<1806faa3-dc46-f638-5c87-8a7415c9025a@linux.vnet.ibm.com>
+References: <20180509154822.23510-1-cohuck@redhat.com>
+	<20180509154822.23510-3-cohuck@redhat.com>
 From: Pierre Morel <pmorel@linux.ibm.com>
-Date: Fri, 11 May 2018 11:02:56 +0200
+Date: Fri, 11 May 2018 11:33:35 +0200
 MIME-Version: 1.0
-In-Reply-To: <1806faa3-dc46-f638-5c87-8a7415c9025a@linux.vnet.ibm.com>
+In-Reply-To: <20180509154822.23510-3-cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Message-Id: <369a35de-4313-ee41-bb11-634c6bc45a72@linux.ibm.com>
+Message-Id: <c18f9b9f-da00-1a0b-8ef0-7ac223c73d1a@linux.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 4/6] s390x/vfio: ap: Introduce VFIO AP
- device
+Subject: Re: [Qemu-devel] [PATCH RFC 2/2] vfio-ccw: support for halt/clear
+ subchannel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,111 +44,200 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tony Krowiak <akrowiak@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
+To: Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On 10/05/2018 15:10, Tony Krowiak wrote:
-> On 05/09/2018 10:28 AM, Halil Pasic wrote:
->>
->>
->> On 05/08/2018 02:25 PM, Tony Krowiak wrote:
->>> Introduces a VFIO based AP device. The device is defined via
->>> the QEMU command line by specifying:
->>>
->>> =C2=A0=C2=A0=C2=A0=C2=A0 -device vfio-ap,sysfsdev=3D<path-to-mediated=
--matrix-device>
->>>
->>> There may be only one vfio-ap device configured for a guest.
->>>
->>> The mediated matrix device is created by the VFIO AP device
->> [..]
->>> + * directory.
->>> + */
->>> +
->>> +#include <linux/vfio.h>
->>> +#include <sys/ioctl.h>
->>> +#include "qemu/osdep.h"
->>> +#include "qapi/error.h"
->>> +#include "hw/sysbus.h"
->>> +#include "hw/vfio/vfio.h"
->>> +#include "hw/vfio/vfio-common.h"
->>> +#include "hw/s390x/ap-device.h"
->>> +#include "qemu/error-report.h"
->>> +#include "qemu/queue.h"
->>> +#include "qemu/option.h"
->>> +#include "qemu/config-file.h"
->>> +#include "cpu.h"
->>> +#include "kvm_s390x.h"
->>> +#include "sysemu/sysemu.h"
->>> +
->>> +#define VFIO_AP_DEVICE_TYPE=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "vfio-ap"
->>> +
->>> +typedef struct VFIOAPDevice {
->>> +=C2=A0=C2=A0=C2=A0 APDevice apdev;
->>> +=C2=A0=C2=A0=C2=A0 VFIODevice vdev;
->>> +=C2=A0=C2=A0=C2=A0 QTAILQ_ENTRY(VFIOAPDevice) sibling;
->>> +} VFIOAPDevice;
->>> +
->>> +VFIOAPDevice *vfio_apdev;
->>> +
->>> +static void vfio_ap_compute_needs_reset(VFIODevice *vdev)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 vdev->needs_reset =3D false;
->>> +}
->>> +
->>> +/*
->>> + * We don't need vfio_hot_reset_multi and vfio_eoi operations for
->>> + * vfio-ap-matrix device now.
->>> + */
->>> +struct VFIODeviceOps vfio_ap_ops =3D {
->>> +=C2=A0=C2=A0=C2=A0 .vfio_compute_needs_reset =3D vfio_ap_compute_nee=
-ds_reset,
->>> +};
->>> +
->>
->> I'm not familiar with the vfio infrastructure, but AFAIR I
->> haven't seen any substantial reset handling (QEMU or kernel).
->> Did I miss something?
+On 09/05/2018 17:48, Cornelia Huck wrote:
+> Currently, vfio-ccw only relays start subchannel requests to the real
+> hardware, which is enough in many cases but falls short e.g. during
+> error recovery.
 >
-> No, you didn't miss anything, there is no reset handling.
+> Fortunately, it is easy to add support for halt and clear subchannel
+> requests to the existing infrastructure. User space can detect
+> support for halt/clear subchannel easily, as we always returned
+> -EOPNOTSUPP before and therefore we do not need any capability to
+> make this support discoverable.
 >
->>
->> If I did not. I think this is a big problem. We need to at least
->> zeroize the queues (e.g. on system reset)=C2=A0 to avoid leaking
->> sensitive information. Without this, there is no sane way to use
->> ap-passthrough. Or am I wrong?
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>   drivers/s390/cio/vfio_ccw_drv.c | 10 ++++-
+>   drivers/s390/cio/vfio_ccw_fsm.c | 94 ++++++++++++++++++++++++++++++++=
+++++-----
+>   2 files changed, 92 insertions(+), 12 deletions(-)
 >
-> I do not have a definitive answer, I will have to look into it.
-> I'm thinking that since we are using ap-passthrough, the AP bus
-> running on the guest would be responsible for handling reset possibly
-> by resetting or zeroizing its queues. I'll get back to you on this.
->
->>
->> Regards,
->> Halil
->>
->
-On the host, on system reset or subsystem reset, the queues are zeroized.
+> diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_cc=
+w_drv.c
+> index ea6a2d0b2894..6212d577117f 100644
+> --- a/drivers/s390/cio/vfio_ccw_drv.c
+> +++ b/drivers/s390/cio/vfio_ccw_drv.c
+> @@ -76,8 +76,14 @@ static void vfio_ccw_sch_io_todo(struct work_struct =
+*work)
+>   	irb =3D &private->irb;
+>  =20
+>   	if (scsw_is_solicited(&irb->scsw)) {
+> -		cp_update_scsw(&private->cp, &irb->scsw);
+> -		cp_free(&private->cp);
+> +		/*
+> +		 * For the start function, we need to update based on the
+> +		 * channel program. Nothing needs to be done for halt/clear.
+> +		 */
+> +		if (scsw_fctl(&irb->scsw) & SCSW_FCTL_START_FUNC) {
+> +			cp_update_scsw(&private->cp, &irb->scsw);
+> +			cp_free(&private->cp);
+> +		}
+>   	}
+>   	memcpy(private->io_region.irb_area, irb, sizeof(*irb));
+>  =20
+> diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_cc=
+w_fsm.c
+> index 3c800642134e..94cae2984c35 100644
+> --- a/drivers/s390/cio/vfio_ccw_fsm.c
+> +++ b/drivers/s390/cio/vfio_ccw_fsm.c
+> @@ -3,8 +3,10 @@
+>    * Finite state machine for vfio-ccw device handling
+>    *
+>    * Copyright IBM Corp. 2017
+> + * Copyright Red Hat, Inc. 2018
+>    *
+>    * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> + *            Cornelia Huck <cohuck@redhat.com>
+>    */
+>  =20
+>   #include <linux/vfio.h>
+> @@ -65,6 +67,70 @@ static int fsm_io_helper(struct vfio_ccw_private *pr=
+ivate)
+>   	return ret;
+>   }
+>  =20
+> +static int fsm_halt_helper(struct vfio_ccw_private *private)
+> +{
+> +	struct subchannel *sch;
+> +	int ccode;
+> +	unsigned long flags;
+> +	int ret;
+> +
+> +	sch =3D private->sch;
+> +
+> +	spin_lock_irqsave(sch->lock, flags);
+> +	private->state =3D VFIO_CCW_STATE_BUSY;
+> +
+> +	/* Issue "Halt Subchannel" */
+> +	ccode =3D hsch(sch->schid);
+> +
+> +	switch (ccode) {
+> +	case 0:
+> +		/*
+> +		 * Initialize device status information
+> +		 */
+> +		sch->schib.scsw.cmd.actl |=3D SCSW_ACTL_HALT_PEND;
+> +		ret =3D 0;
+> +		break;
+> +	case 1:		/* Status pending */
 
-It means we must do the same for the guest and implement both cold and=20
-hot reset.
+shouldn't we make a difference between status pending
+and having halt in progress?
 
-One of the patches in the interrupt handling serie I sent last wednesday=20
-zeroize
-the queues on starting and stopping the guest so no data leak occurs=20
-between
-host and guests or between guests.
-
-However we should follow the machine specification and zeroize the=20
-queues between
-two guest reset too. i.e. in the "reset" call back. and implement the=20
-VFIO_DEVICE_RESET
-ioctl.
+The guest can examine the SCSW, but couldn't it introduce
+a race condition?
 
 
-Regards,
+> +	case 2:		/* Busy */
+> +		ret =3D -EBUSY;
+> +		break;
+> +	default:	/* Device not operational */
+> +		ret =3D -ENODEV;
+> +	}
+> +	spin_unlock_irqrestore(sch->lock, flags);
+> +	return ret;
+> +}
+> +
+> +static int fsm_clear_helper(struct vfio_ccw_private *private)
+> +{
+> +	struct subchannel *sch;
+> +	int ccode;
+> +	unsigned long flags;
+> +	int ret;
+> +
+> +	sch =3D private->sch;
+> +
+> +	spin_lock_irqsave(sch->lock, flags);
+> +	private->state =3D VFIO_CCW_STATE_BUSY;
+> +
+> +	/* Issue "Clear Subchannel" */
+> +	ccode =3D csch(sch->schid);
+> +
+> +	switch (ccode) {
+> +	case 0:
+> +		/*
+> +		 * Initialize device status information
+> +		 */
+> +		sch->schib.scsw.cmd.actl |=3D SCSW_ACTL_CLEAR_PEND;
+> +		ret =3D 0;
+> +		break;
+> +	default:	/* Device not operational */
+> +		ret =3D -ENODEV;
+> +	}
+> +	spin_unlock_irqrestore(sch->lock, flags);
+> +	return ret;
+> +}
+> +
+>   static void fsm_notoper(struct vfio_ccw_private *private,
+>   			enum vfio_ccw_event event)
+>   {
+> @@ -126,7 +192,24 @@ static void fsm_io_request(struct vfio_ccw_private=
+ *private,
+>  =20
+>   	memcpy(scsw, io_region->scsw_area, sizeof(*scsw));
+>  =20
+> -	if (scsw->cmd.fctl & SCSW_FCTL_START_FUNC) {
+> +	/*
+> +	 * Start processing with the clear function, then halt, then start.
+> +	 * We may still be start pending when the caller wants to clean
+> +	 * up things via halt/clear.
+> +	 */
 
-Pierre
+hum. The scsw here does not reflect the hardware state but the
+command passed from the user interface.
+Can we and should we authorize multiple commands in one call?
+
+If not, the comment is not appropriate and a switch on cmd.fctl
+would be a clearer.
+
+> +	if (scsw->cmd.fctl & SCSW_FCTL_CLEAR_FUNC) {
+> +		/* issue clear and wait for interupt */
+> +		io_region->ret_code =3D fsm_clear_helper(private);
+> +		if (io_region->ret_code)
+> +			goto err_out;
+> +		return;
+> +	} else if (scsw->cmd.fctl & SCSW_FCTL_HALT_FUNC) {
+> +		/* issue halt and wait for interrupt */
+> +		io_region->ret_code =3D fsm_halt_helper(private);
+> +		if (io_region->ret_code)
+> +			goto err_out;
+> +		return;
+> +	} else if (scsw->cmd.fctl & SCSW_FCTL_START_FUNC) {
+>   		orb =3D (union orb *)io_region->orb_area;
+>  =20
+>   		/* Don't try to build a cp if transport mode is specified. */
+> @@ -152,16 +235,7 @@ static void fsm_io_request(struct vfio_ccw_private=
+ *private,
+>   			goto err_out;
+>   		}
+>   		return;
+> -	} else if (scsw->cmd.fctl & SCSW_FCTL_HALT_FUNC) {
+> -		/* XXX: Handle halt. */
+> -		io_region->ret_code =3D -EOPNOTSUPP;
+> -		goto err_out;
+> -	} else if (scsw->cmd.fctl & SCSW_FCTL_CLEAR_FUNC) {
+> -		/* XXX: Handle clear. */
+> -		io_region->ret_code =3D -EOPNOTSUPP;
+> -		goto err_out;
+>   	}
+> -
+>   err_out:
+>   	private->state =3D VFIO_CCW_STATE_IDLE;
+>   }
+
 
 --=20
 Pierre Morel
