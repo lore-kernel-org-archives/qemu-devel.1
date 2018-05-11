@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGxcR-0004kl-IY
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 22:17:16 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fGy3U-0001sd-46
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 22:45:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGxcO-0002yt-Df
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 22:17:15 -0400
-Received: from mail-pg0-x235.google.com ([2607:f8b0:400e:c05::235]:34614)
+	(envelope-from <richard.henderson@linaro.org>) id 1fGy3R-0005wy-1Q
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 22:45:12 -0400
+Received: from mail-pl0-x22a.google.com ([2607:f8b0:400e:c01::22a]:45478)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fGxcO-0002vM-84
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 22:17:12 -0400
-Received: by mail-pg0-x235.google.com with SMTP id g20-v6so1772063pgv.1
-	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 19:17:12 -0700 (PDT)
-References: <20180425012300.14698-1-richard.henderson@linaro.org>
-	<87wowsk1ih.fsf@linaro.org>
+	id 1fGy3Q-0005wq-RS
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 22:45:08 -0400
+Received: by mail-pl0-x22a.google.com with SMTP id bi12-v6so2410469plb.12
+	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 19:45:08 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <8979b195-d1b0-de1f-7cad-864982108610@linaro.org>
-Date: Thu, 10 May 2018 19:17:07 -0700
+Date: Thu, 10 May 2018 19:44:43 -0700
+Message-Id: <20180511024454.31679-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <87wowsk1ih.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 0/9] target/arm: Fixups for
+Subject: [Qemu-devel] [PATCH v3 00/11] target/arm: Fixups for
  ARM_FEATURE_V8_FP16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -32,30 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 
-On 04/27/2018 10:22 AM, Alex Bennée wrote:
-> 
-> Richard Henderson <richard.henderson@linaro.org> writes:
-> 
->> When running the gcc testsuite with current aarch64-linux-user,
->> the testsuite detects the presence of the fp16 extension and
->> enables lots of extra tests for builtins.
->>
->> Quite a few of these new tests fail because we missed implementing
->> some instructions.  We really should go back and verify that nothing
->> else is missing from this (rather large) extension.
-> 
-> So this set of instructions is generated from any ASL description that
-> contains "half":
+Changes since v2:
+  * Rebased vs target-arm.next.
+  * Merged Peter's review.
+  * Split out return fix as a separate patch.
 
-This still isn't all of them.  At least the insns from fmov_float_gen.html are
-missing.  The four insns could be handled with
-
-FMOV_H_general  A64_V sf:1 00 11110 11 100 11 o:1 000000 Rn:5 Rd:5
-
-Peter had pointed out that I didn't handle sf=1 in fmov during review.
+Changes since v1:
+  * Rebased vs master instead of tgt-arm-sve-9.
+  * Alex did some additional digging through the ARM xhtml
+    and came up with some additional missing instructions.
+  * Everything cc'd to qemu-stable.
 
 
 r~
+
+
+Alex Bennée (4):
+  target/arm: Implement FCMP for fp16
+  target/arm: Implement FCSEL for fp16
+  target/arm: Implement FMOV (immediate) for fp16
+  target/arm: Fix sqrt_f16 exception raising
+
+Richard Henderson (7):
+  target/arm: Implement FMOV (general) for fp16
+  target/arm: Early exit after unallocated_encoding in disas_fp_int_conv
+  target/arm: Implement FCVT (scalar,integer) for fp16
+  target/arm: Implement FCVT (scalar,fixed-point) for fp16
+  target/arm: Introduce and use read_fp_hreg
+  target/arm: Implement FP data-processing (2 source) for fp16
+  target/arm: Implement FP data-processing (3 source) for fp16
+
+ target/arm/helper-a64.h    |   2 +
+ target/arm/helper.h        |   6 +
+ target/arm/helper-a64.c    |  10 +
+ target/arm/helper.c        |  38 +++-
+ target/arm/translate-a64.c | 421 +++++++++++++++++++++++++++++++------
+ 5 files changed, 413 insertions(+), 64 deletions(-)
+
+-- 
+2.17.0
