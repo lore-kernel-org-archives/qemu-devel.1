@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fH1zw-0003zy-VX
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 02:57:49 -0400
+	(envelope-from <clg@kaod.org>) id 1fH20o-0004Nl-CC
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 02:58:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fH1zs-0000jy-N9
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 02:57:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42150 helo=mx1.redhat.com)
+	(envelope-from <clg@kaod.org>) id 1fH20j-0000zH-E1
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 02:58:42 -0400
+Received: from 13.mo1.mail-out.ovh.net ([178.33.253.128]:48965)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1fH1zs-0000ji-Jk
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 02:57:44 -0400
-References: <20180511035240.4016-1-richard.henderson@linaro.org>
-	<20180511035240.4016-7-richard.henderson@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <334644f2-a945-03d9-8d2e-efb34fa3b449@redhat.com>
-Date: Fri, 11 May 2018 08:57:42 +0200
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fH20j-0000ys-43
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 02:58:37 -0400
+Received: from player696.ha.ovh.net (unknown [10.109.122.86])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 2BD7AF4E57
+	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 08:58:35 +0200 (CEST)
+References: <20180510220248.10272-1-clg@kaod.org>
+	<20180511045946.GM19024@xz-mi>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <66612869-eedc-cec8-665f-e18e65471516@kaod.org>
+Date: Fri, 11 May 2018 08:58:12 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180511035240.4016-7-richard.henderson@linaro.org>
+In-Reply-To: <20180511045946.GM19024@xz-mi>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 6/9] target/s390x: Honor CPU_DUMP_FPU
+Subject: Re: [Qemu-devel] [PATCH v3] migration: discard non-migratable
+ RAMBlocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,73 +32,329 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: Alexander Graf <agraf@suse.de>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, kevin.tian@intel.com, joonas.lahtinen@linux.intel.com, kwankhede@nvidia.com, zhenyuw@linux.intel.com, Yulei Zhang <yulei.zhang@intel.com>, Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, zhi.a.wang@intel.com, David Gibson <david@gibson.dropbear.id.au>
 
-On 11.05.2018 05:52, Richard Henderson wrote:
-> Also do not dump both "fpu" and "vector" registers
-> as the former overlaps the latter.
+On 05/11/2018 06:59 AM, Peter Xu wrote:
+> On Fri, May 11, 2018 at 12:02:48AM +0200, C=C3=A9dric Le Goater wrote:
+>> On the POWER9 processor, the XIVE interrupt controller can control
+>> interrupt sources using MMIO to trigger events, to EOI or to turn off
+>> the sources. Priority management and interrupt acknowledgment is also
+>> controlled by MMIO in the presenter sub-engine.
+>>
+>> These MMIO regions are exposed to guests in QEMU with a set of 'ram
+>> device' memory mappings, similarly to VFIO, and the VMAs are populated
+>> dynamically with the appropriate pages using a fault handler.
+>>
+>> But, these regions are an issue for migration. We need to discard the
+>> associated RAMBlocks from the RAM state on the source VM and let the
+>> destination VM rebuild the memory mappings on the new host in the
+>> post_load() operation just before resuming the system.
+>>
+>> To achieve this goal, the following introduces a new RAMBlock flag
+>> RAM_MIGRATABLE which is updated in the vmstate_register_ram() and
+>> vmstate_unregister_ram() routines. This flag is then used by the
+>> migration to identify RAMBlocks to discard on the source. Some checks
+>> are also performed on the destination to make sure nothing invalid was
+>> sent.
+>>
+>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>> ---
+>>
+>>  Changes sinve v2:
+>>
+>>  - added an error_report() in ram_save_host_page()=20
+>>  - un/set the RAMBlock RAM_MIGRATABLE directly under vmstate_un/regist=
+er_ram()
+>>    with some new flag helpers=20
+>> =20
+>>  exec.c                    | 18 ++++++++++++++++++
+>>  include/exec/cpu-common.h |  3 +++
+>>  migration/ram.c           | 43 +++++++++++++++++++++++++++++++++-----=
+-----
+>>  migration/savevm.c        |  2 ++
+>>  4 files changed, 56 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/exec.c b/exec.c
+>> index c7fcefa851b2..079c5c8bab7b 100644
+>> --- a/exec.c
+>> +++ b/exec.c
+>> @@ -104,6 +104,9 @@ static MemoryRegion io_mem_unassigned;
+>>   * (Set during postcopy)
+>>   */
+>>  #define RAM_UF_ZEROPAGE (1 << 3)
+>> +
+>> +/* RAM can be migrated */
+>> +#define RAM_MIGRATABLE (1 << 4)
+>>  #endif
+>> =20
+>>  #ifdef TARGET_PAGE_BITS_VARY
+>> @@ -1797,6 +1800,21 @@ void qemu_ram_set_uf_zeroable(RAMBlock *rb)
+>>      rb->flags |=3D RAM_UF_ZEROPAGE;
+>>  }
+>> =20
+>> +bool qemu_ram_is_migratable(RAMBlock *rb)
+>> +{
+>> +    return rb->flags & RAM_MIGRATABLE;
+>> +}
+>> +
+>> +void qemu_ram_set_migratable(RAMBlock *rb)
+>> +{
+>> +    rb->flags |=3D RAM_MIGRATABLE;
+>> +}
+>> +
+>> +void qemu_ram_unset_migratable(RAMBlock *rb)
+>> +{
+>> +    rb->flags &=3D ~RAM_MIGRATABLE;
+>> +}
+>> +
+>>  /* Called with iothread lock held.  */
+>>  void qemu_ram_set_idstr(RAMBlock *new_block, const char *name, Device=
+State *dev)
+>>  {
+>> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+>> index 24d335f95d45..488288fce959 100644
+>> --- a/include/exec/cpu-common.h
+>> +++ b/include/exec/cpu-common.h
+>> @@ -75,6 +75,9 @@ const char *qemu_ram_get_idstr(RAMBlock *rb);
+>>  bool qemu_ram_is_shared(RAMBlock *rb);
+>>  bool qemu_ram_is_uf_zeroable(RAMBlock *rb);
+>>  void qemu_ram_set_uf_zeroable(RAMBlock *rb);
+>> +bool qemu_ram_is_migratable(RAMBlock *rb);
+>> +void qemu_ram_set_migratable(RAMBlock *rb);
+>> +void qemu_ram_unset_migratable(RAMBlock *rb);
+>> =20
+>>  size_t qemu_ram_pagesize(RAMBlock *block);
+>>  size_t qemu_ram_pagesize_largest(void);
+>> diff --git a/migration/ram.c b/migration/ram.c
+>> index 912810c18e0f..dfdec78ecb03 100644
+>> --- a/migration/ram.c
+>> +++ b/migration/ram.c
+>> @@ -187,6 +187,11 @@ void ramblock_recv_bitmap_set_range(RAMBlock *rb,=
+ void *host_addr,
+>>                        nr);
+>>  }
+>> =20
+>> +/* Should be holding either ram_list.mutex, or the RCU lock. */
+>> +#define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
+>> +    RAMBLOCK_FOREACH(block)                            \
+>> +        if (!qemu_ram_is_migratable(block)) {} else
 >=20
-> Cc: Alexander Graf <agraf@suse.de>
-> Cc: David Hildenbrand <david@redhat.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/s390x/helper.c | 23 ++++++++++++-----------
->  1 file changed, 12 insertions(+), 11 deletions(-)
+> Pure question: is here an explicit use of "else" rather than:
 >=20
-> diff --git a/target/s390x/helper.c b/target/s390x/helper.c
-> index e8548f340a..fd5791f134 100644
-> --- a/target/s390x/helper.c
-> +++ b/target/s390x/helper.c
-> @@ -327,21 +327,22 @@ void s390_cpu_dump_state(CPUState *cs, FILE *f, f=
-printf_function cpu_fprintf,
->          }
->      }
-> =20
-> -    for (i =3D 0; i < 16; i++) {
-> -        cpu_fprintf(f, "F%02d=3D%016" PRIx64, i, get_freg(env, i)->ll)=
+>       if (qemu_ram_is_migratable(block))
+>=20
+> ?
+
+The above is an imperfect macro 'trick' trying to handle code that=20
+would have omitted {}. It provides some protection.
+  =20
+>> +
+>>  /*
+>>   * An outstanding page request, on the source, having been received
+>>   * and queued
+>> @@ -813,6 +818,10 @@ unsigned long migration_bitmap_find_dirty(RAMStat=
+e *rs, RAMBlock *rb,
+>>      unsigned long *bitmap =3D rb->bmap;
+>>      unsigned long next;
+>> =20
+>> +    if (!qemu_ram_is_migratable(rb)) {
+>> +        return size;
+>> +    }
+>=20
+> (I would change the caller side at find_dirty_block(), we can just
+>  skip that if not migratable.  But this is also fine to me)
+
+Hmm. The do {} while() loop and callees in ram_find_and_save_block()=20
+is a bit complex to follow. I stumbled a few time when trying to=20
+change it.
+
+>> +
+>>      if (rs->ram_bulk_stage && start > 0) {
+>>          next =3D start + 1;
+>>      } else {
+>> @@ -858,7 +867,7 @@ uint64_t ram_pagesize_summary(void)
+>>      RAMBlock *block;
+>>      uint64_t summary =3D 0;
+>> =20
+>> -    RAMBLOCK_FOREACH(block) {
+>> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>>          summary |=3D block->page_size;
+>>      }
+>> =20
+>> @@ -882,7 +891,7 @@ static void migration_bitmap_sync(RAMState *rs)
+>> =20
+>>      qemu_mutex_lock(&rs->bitmap_mutex);
+>>      rcu_read_lock();
+>> -    RAMBLOCK_FOREACH(block) {
+>> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>>          migration_bitmap_sync_range(rs, block, 0, block->used_length)=
 ;
-> -        if ((i % 4) =3D=3D 3) {
-> -            cpu_fprintf(f, "\n");
-> +    if (flags & CPU_DUMP_FPU) {
-> +        if (s390_has_feat(S390_FEAT_VECTOR)) {
-
-CPU model should always be initialized at this point, so this check
-actually returns the right thing.
-
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
-> +            for (i =3D 0; i < 32; i++) {
-> +                cpu_fprintf(f, "V%02d=3D%016" PRIx64 "%016" PRIx64 "%c=
-",
-> +                            i, env->vregs[i][0].ll, env->vregs[i][1].l=
-l,
-> +                            i % 2 ? '\n' : ' ');
-> +            }
->          } else {
-> -            cpu_fprintf(f, " ");
-> +            for (i =3D 0; i < 16; i++) {
-> +                cpu_fprintf(f, "F%02d=3D%016" PRIx64 "%c",
-> +                            i, get_freg(env, i)->ll,
-> +                            (i % 4) =3D=3D 3 ? '\n' : ' ');
-> +            }
->          }
->      }
-> =20
-> -    for (i =3D 0; i < 32; i++) {
-> -        cpu_fprintf(f, "V%02d=3D%016" PRIx64 "%016" PRIx64, i,
-> -                    env->vregs[i][0].ll, env->vregs[i][1].ll);
-> -        cpu_fprintf(f, (i % 2) ? "\n" : " ");
-> -    }
-> -
->  #ifndef CONFIG_USER_ONLY
->      for (i =3D 0; i < 16; i++) {
->          cpu_fprintf(f, "C%02d=3D%016" PRIx64, i, env->cregs[i]);
+>>      }
+>>      rcu_read_unlock();
+>> @@ -1521,6 +1530,11 @@ static int ram_save_host_page(RAMState *rs, Pag=
+eSearchStatus *pss,
+>>      size_t pagesize_bits =3D
+>>          qemu_ram_pagesize(pss->block) >> TARGET_PAGE_BITS;
+>> =20
+>> +    if (!qemu_ram_is_migratable(pss->block)) {
+>> +        error_report("block %s should not be migrated !", pss->block-=
+>idstr);
+>> +        return 0;
+>> +    }
+>> +
+>>      do {
+>>          /* Check the pages is dirty and if it is send it */
+>>          if (!migration_bitmap_clear_dirty(rs, pss->block, pss->page))=
+ {
+>> @@ -1619,7 +1633,7 @@ uint64_t ram_bytes_total(void)
+>>      uint64_t total =3D 0;
+>> =20
+>>      rcu_read_lock();
+>> -    RAMBLOCK_FOREACH(block) {
+>> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>>          total +=3D block->used_length;
+>>      }
+>>      rcu_read_unlock();
+>> @@ -1674,7 +1688,7 @@ static void ram_save_cleanup(void *opaque)
+>>       */
+>>      memory_global_dirty_log_stop();
+>> =20
+>> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+>> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>>          g_free(block->bmap);
+>>          block->bmap =3D NULL;
+>>          g_free(block->unsentmap);
+>> @@ -1737,7 +1751,7 @@ void ram_postcopy_migrated_memory_release(Migrat=
+ionState *ms)
+>>  {
+>>      struct RAMBlock *block;
+>> =20
+>> -    RAMBLOCK_FOREACH(block) {
+>> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>>          unsigned long *bitmap =3D block->bmap;
+>>          unsigned long range =3D block->used_length >> TARGET_PAGE_BIT=
+S;
+>>          unsigned long run_start =3D find_next_zero_bit(bitmap, range,=
+ 0);
+>> @@ -1815,7 +1829,7 @@ static int postcopy_each_ram_send_discard(Migrat=
+ionState *ms)
+>>      struct RAMBlock *block;
+>>      int ret;
+>> =20
+>> -    RAMBLOCK_FOREACH(block) {
+>> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>>          PostcopyDiscardState *pds =3D
+>>              postcopy_discard_send_init(ms, block->idstr);
+>> =20
+>> @@ -2023,7 +2037,7 @@ int ram_postcopy_send_discard_bitmap(MigrationSt=
+ate *ms)
+>>      rs->last_sent_block =3D NULL;
+>>      rs->last_page =3D 0;
+>> =20
+>> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+>> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>>          unsigned long pages =3D block->used_length >> TARGET_PAGE_BIT=
+S;
+>>          unsigned long *bitmap =3D block->bmap;
+>>          unsigned long *unsentmap =3D block->unsentmap;
+>> @@ -2182,7 +2196,7 @@ static void ram_list_init_bitmaps(void)
+>> =20
+>>      /* Skip setting bitmap if there is no RAM */
+>>      if (ram_bytes_total()) {
+>> -        QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+>> +        RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>>              pages =3D block->max_length >> TARGET_PAGE_BITS;
+>>              block->bmap =3D bitmap_new(pages);
+>>              bitmap_set(block->bmap, 0, pages);
+>> @@ -2263,7 +2277,7 @@ static int ram_save_setup(QEMUFile *f, void *opa=
+que)
+>> =20
+>>      qemu_put_be64(f, ram_bytes_total() | RAM_SAVE_FLAG_MEM_SIZE);
+>> =20
+>> -    RAMBLOCK_FOREACH(block) {
+>> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>>          qemu_put_byte(f, strlen(block->idstr));
+>>          qemu_put_buffer(f, (uint8_t *)block->idstr, strlen(block->ids=
+tr));
+>>          qemu_put_be64(f, block->used_length);
+>> @@ -2507,6 +2521,11 @@ static inline RAMBlock *ram_block_from_stream(Q=
+EMUFile *f, int flags)
+>>          return NULL;
+>>      }
+>> =20
+>> +    if (!qemu_ram_is_migratable(block)) {
+>> +        error_report("block %s should not be migrated !", id);
+>> +        return NULL;
+>> +    }
+>> +
+>>      return block;
+>>  }
+>> =20
+>> @@ -3011,7 +3030,11 @@ static int ram_load(QEMUFile *f, void *opaque, =
+int version_id)
+>>                  length =3D qemu_get_be64(f);
+>> =20
+>>                  block =3D qemu_ram_block_by_name(id);
+>> -                if (block) {
+>> +                if (block && !qemu_ram_is_migratable(block)) {
+>> +                    error_report("block %s should not be migrated !",=
+ id);
+>> +                    ret =3D -EINVAL;
+>> +
 >=20
+> (extra new line)
 
+ah. yes indeed.
 
---=20
+> I saw quite a few of such checks in the patch that dumps errors.
+> Frankly speaking I would still prefer assertions if we are sure it's
+> programming errors, and I believe incorrect marking of RAMBlocks are.
+> I think I understand the concern here that we are just careful with
+> migration codes to avoid VM crash but at least here we are doing
+> precopy loading and we won't have problem to use assertion since it
+> won't crash the source (and after all we are returning -EINVAL so I
+> suppose the VM will quit too, just like a crash here).
+
+It is true that QEMU would be receiving invalid state from the source
+in this cases but asserting would stop migration on the target quite=20
+brutally. It seems excessive for bad input.
 
 Thanks,
 
-David / dhildenb
+C.
+
+>=20
+> I don't have strong opinion on this and current patch actually looks
+> good to me; I only raise this question up.
+>=20
+> Thanks,
+>=20
+>> +                } else if (block) {
+>>                      if (length !=3D block->used_length) {
+>>                          Error *local_err =3D NULL;
+>> =20
+>> diff --git a/migration/savevm.c b/migration/savevm.c
+>> index e2be02afe42c..9ebfba738ea4 100644
+>> --- a/migration/savevm.c
+>> +++ b/migration/savevm.c
+>> @@ -2501,11 +2501,13 @@ void vmstate_register_ram(MemoryRegion *mr, De=
+viceState *dev)
+>>  {
+>>      qemu_ram_set_idstr(mr->ram_block,
+>>                         memory_region_name(mr), dev);
+>> +    qemu_ram_set_migratable(mr->ram_block);
+>>  }
+>> =20
+>>  void vmstate_unregister_ram(MemoryRegion *mr, DeviceState *dev)
+>>  {
+>>      qemu_ram_unset_idstr(mr->ram_block);
+>> +    qemu_ram_unset_migratable(mr->ram_block);
+>>  }
+>> =20
+>>  void vmstate_register_ram_global(MemoryRegion *mr)
+>> --=20
+>> 2.13.6
+>>
+>>
+>=20
