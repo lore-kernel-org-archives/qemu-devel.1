@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fH8WX-0006vj-0P
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 09:55:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1fH8Zp-0001YU-Ka
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 09:59:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fH8WT-0001nI-U9
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 09:55:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37400)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fH8WT-0001n8-Nz
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 09:55:49 -0400
-Date: Fri, 11 May 2018 10:55:44 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180511135544.GH25013@localhost.localdomain>
-References: <20171108022828.7242-1-f4bug@amsat.org>
-	<23253f77-ccc8-220d-3028-f27945f9542c@redhat.com>
-	<791dd038-8811-6335-75f7-6dd309ff0ff7@amsat.org>
+	(envelope-from <eblake@redhat.com>) id 1fH8Zo-0002ZG-DI
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 09:59:17 -0400
+References: <20180511120823.7892-1-famz@redhat.com>
+	<20180511120823.7892-3-famz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <16dd8da5-e0cc-43d1-caba-b0dd3807a52c@redhat.com>
+Date: Fri, 11 May 2018 08:59:05 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <791dd038-8811-6335-75f7-6dd309ff0ff7@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] Publishing binary images for testing (was Re: [RFC
- PATCH 0/6] generic way to deprecate machines)
+In-Reply-To: <20180511120823.7892-3-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 02/10] raw: Check byte range uniformly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +24,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>, avocado-devel@redhat.com
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-stable <qemu-stable@nongnu.org>
 
-(CCing Cleber and avocado-devel in case they have suggestions)
+On 05/11/2018 07:08 AM, Fam Zheng wrote:
+> We don't verify the request range against s->size in the I/O callbacks
+> except for raw_co_pwritev. This is wrong (especially for
+> raw_co_pwrite_zeroes and raw_co_pdiscard), so fix them.
 
-On Tue, May 08, 2018 at 12:47:52PM -0300, Philippe Mathieu-Daud=E9 wrote:
-[...]
-> Ironically I have been using the Gumstix machines quite a lot for the S=
-D
-> 'subsystem' refactor, using the MMC commands in U-Boot (I am unable to
-> reach the Linux userland since the kernel crashes), and plan to add SD
-> integration tests via Avocado.
->=20
-> This raises:
->=20
-> - What will happens if I add tests downloading running on their compile=
-d
-> u-boot
-> (https://downloads.gumstix.com/images/angstrom/developer/2012-01-22-175=
-0/u-boot.bin)
-> and the company decides to remove this old directory?
-> Since sometimes old open-source software are hard to rebuild with recen=
-t
-> compilers, should we consider to use a public storage to keep
-> open-source (signed) blobs we can use for integration testing?
+Did you bother identifying how long the bug has been present (but read 
+below, because I'm not sure there was even a bug)?
 
-I think a maintained repository of images for testing would be
-nice to have.  We need to be careful to comply with the license
-of the software being distributed, though.
+CC: qemu-stable@nongnu.org
 
-If the images are very small (like u-boot.bin above), it might be
-OK to carry them in qemu.git, just like the images in pc-bios.
+> 
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>   block/raw-format.c | 63 ++++++++++++++++++++++++++++++++----------------------
+>   1 file changed, 38 insertions(+), 25 deletions(-)
+> 
+> diff --git a/block/raw-format.c b/block/raw-format.c
+> index a378547c99..803083f1a1 100644
+> --- a/block/raw-format.c
+> +++ b/block/raw-format.c
+> @@ -167,16 +167,36 @@ static void raw_reopen_abort(BDRVReopenState *state)
+>       state->opaque = NULL;
+>   }
+>   
+> +/* Check and adjust the offset, against 'offset' and 'size' options. */
+> +static inline int raw_adjust_offset(BlockDriverState *bs, uint64_t *offset,
+> +                                    uint64_t bytes)
+> +{
+> +    BDRVRawState *s = bs->opaque;
+> +
+> +    if (s->has_size && (*offset > s->size || bytes > (s->size - *offset))) {
+> +        /* There's not enough space for the data. Don't write anything and just
+> +         * fail to prevent leaking out of the size specified in options. */
+> +        return -ENOSPC;
+> +    }
 
->=20
-> Avocado has a 'vmimage library' which could be extended, adding support
-> for binary url + detached gpg signatures from some QEMU maintainers?
+Can this even trigger? The block layer should already be clamping 
+requests according to the device's reported size, and we already report 
+a smaller size according to s->size and s->offset.  This could probably 
+be an assertion instead.
 
-Requiring a signature makes the binaries hard to replace.  Any
-specific reason to suggest gpg signatures instead of just a
-(e.g.) sha256 hash?
+> +
+> +    if (*offset > UINT64_MAX - s->offset) {
+> +        return -EINVAL;
 
->=20
-> (I am also using old Gentoo/Debian packaged HPPA/Alpha Linux kernel for
-> Avocado SuperIO tests, which aren't guaranteed to stay downloadable
-> forever).
+Should this be against INT64_MAX instead?  After all, we really do use 
+off_t (a 63-bit quantity, since it is signed), rather than uint64_t, as 
+our maximum (theoretical) image size.  But again, can it even trigger, 
+or can it be an assertion?
 
-Question for the Avocado folks: how this is normally handled in
-avocado/avocado-vt?  Do you maintain a repository for guest
-images, or you always point to their original sources?
+> +    }
+> +    *offset += s->offset;
+> +
+> +    return 0;
+> +}
+> +
+>   static int coroutine_fn raw_co_preadv(BlockDriverState *bs, uint64_t offset,
+>                                         uint64_t bytes, QEMUIOVector *qiov,
+>                                         int flags)
+>   {
+> -    BDRVRawState *s = bs->opaque;
+> +    int ret;
+>   
+> -    if (offset > UINT64_MAX - s->offset) {
+> -        return -EINVAL;
+> +    ret = raw_adjust_offset(bs, &offset, bytes);
 
---=20
-Eduardo
+If I'm right and we can assert instead of failing, then 
+raw_adjust_offset() doesn't return failure.  If I'm wrong, then there is 
+now a code path where we can return ENOSPC on a read, which is unusual 
+and probably wrong.
+
+> +    if (ret) {
+> +        return ret;
+>       }
+> -    offset += s->offset;
+>   
+>       BLKDBG_EVENT(bs->file, BLKDBG_READ_AIO);
+>       return bdrv_co_preadv(bs->file, offset, bytes, qiov, flags);
+> @@ -186,23 +206,11 @@ static int coroutine_fn raw_co_pwritev(BlockDriverState *bs, uint64_t offset,
+>                                          uint64_t bytes, QEMUIOVector *qiov,
+>                                          int flags)
+>   {
+> -    BDRVRawState *s = bs->opaque;
+>       void *buf = NULL;
+>       BlockDriver *drv;
+>       QEMUIOVector local_qiov;
+>       int ret;
+>   
+> -    if (s->has_size && (offset > s->size || bytes > (s->size - offset))) {
+> -        /* There's not enough space for the data. Don't write anything and just
+> -         * fail to prevent leaking out of the size specified in options. */
+> -        return -ENOSPC;
+> -    }
+> -
+> -    if (offset > UINT64_MAX - s->offset) {
+> -        ret = -EINVAL;
+> -        goto fail;
+> -    }
+
+Okay, so you're just doing code refactoring; perhaps we could have done 
+assertions here.
+
+> -
+>       if (bs->probed && offset < BLOCK_PROBE_BUF_SIZE && bytes) {
+>           /* Handling partial writes would be a pain - so we just
+>            * require that guests have 512-byte request alignment if
+> @@ -237,7 +245,10 @@ static int coroutine_fn raw_co_pwritev(BlockDriverState *bs, uint64_t offset,
+>           qiov = &local_qiov;
+>       }
+>   
+> -    offset += s->offset;
+> +    ret = raw_adjust_offset(bs, &offset, bytes);
+> +    if (ret) {
+> +        goto fail;
+> +    }
+>   
+>       BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
+>       ret = bdrv_co_pwritev(bs->file, offset, bytes, qiov, flags);
+> @@ -267,22 +278,24 @@ static int coroutine_fn raw_co_pwrite_zeroes(BlockDriverState *bs,
+>                                                int64_t offset, int bytes,
+>                                                BdrvRequestFlags flags)
+>   {
+> -    BDRVRawState *s = bs->opaque;
+> -    if (offset > UINT64_MAX - s->offset) {
+> -        return -EINVAL;
+> +    int ret;
+> +
+> +    ret = raw_adjust_offset(bs, (uint64_t *)&offset, bytes);
+> +    if (ret) {
+> +        return ret;
+>       }
+> -    offset += s->offset;
+
+If I'm right and raw_adjust_offset() can't fail, then this didn't add 
+any protection.  If I'm wrong and it is possible to get the block layer 
+to send a request beyond our advertised size, then this is indeed a bug 
+fix worthy of being on the stable branch.
+
+>       return bdrv_co_pwrite_zeroes(bs->file, offset, bytes, flags);
+>   }
+>   
+>   static int coroutine_fn raw_co_pdiscard(BlockDriverState *bs,
+>                                           int64_t offset, int bytes)
+>   {
+> -    BDRVRawState *s = bs->opaque;
+> -    if (offset > UINT64_MAX - s->offset) {
+> -        return -EINVAL;
+> +    int ret;
+> +
+> +    ret = raw_adjust_offset(bs, (uint64_t *)&offset, bytes);
+> +    if (ret) {
+> +        return ret;
+>       }
+> -    offset += s->offset;
+>       return bdrv_co_pdiscard(bs->file->bs, offset, bytes);
+>   }
+>   
+> 
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
