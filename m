@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55253)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fH4Lc-0006J9-3K
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:28:20 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fH4hg-0004sS-Qs
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:51:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fH4Lb-0002sE-Bi
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:28:20 -0400
-Received: from mail-ot0-x22a.google.com ([2607:f8b0:4003:c0f::22a]:44909)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fH4Lb-0002rE-7k
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:28:19 -0400
-Received: by mail-ot0-x22a.google.com with SMTP id g7-v6so5510343otj.11
-	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 02:28:19 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1446725643-82458-3-git-send-email-pbonzini@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1fH4hd-0000kY-PF
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:51:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48090 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fH4hd-0000k8-Hn
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:51:05 -0400
 References: <1446725643-82458-1-git-send-email-pbonzini@redhat.com>
 	<1446725643-82458-3-git-send-email-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 11 May 2018 10:27:58 +0100
-Message-ID: <CAFEAcA8xPCQpXYPPbfizzXZ-7OzUXGUN4dyqrbM3_Vy27coDKw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	<CAFEAcA8xPCQpXYPPbfizzXZ-7OzUXGUN4dyqrbM3_Vy27coDKw@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8a22efa3-94a0-5ffa-17df-45702601624d@redhat.com>
+Date: Fri, 11 May 2018 11:51:00 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA8xPCQpXYPPbfizzXZ-7OzUXGUN4dyqrbM3_Vy27coDKw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PULL 02/18] replay: internal functions for replay
  log
 List-Id: <qemu-devel.nongnu.org>
@@ -30,41 +30,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
 Cc: QEMU Developers <qemu-devel@nongnu.org>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-On 5 November 2015 at 12:13, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
->
-> This patch adds functions to perform read and write operations
-> with replay log.
->
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+On 11/05/2018 11:27, Peter Maydell wrote:
+>> +uint8_t replay_get_byte(void)
+>> +{
+>> +    uint8_t byte = 0;
+>> +    if (replay_file) {
+>> +        byte = getc(replay_file);
+>> +    }
+>> +    return byte;
+>> +}
+> Coverity (CID 1390576) points out that this function isn't checking
+> the error return from getc(). That means we could incorrectly return
+> 255 from here and then the return value from replay_get_dword would
+> be 0xffffffff, which is unfortunate if the place that's using
+> that uses it as a loop boundary.
 
-> +void replay_put_byte(uint8_t byte)
-> +{
-> +    if (replay_file) {
-> +        putc(byte, replay_file);
-> +    }
-> +}
+Thanks!  Pavel can you check it?  How is error checking done in general
+for record/replay, should QEMU exit immediately?
 
-> +uint8_t replay_get_byte(void)
-> +{
-> +    uint8_t byte = 0;
-> +    if (replay_file) {
-> +        byte = getc(replay_file);
-> +    }
-> +    return byte;
-> +}
+> Incidentally, is it worth adding something to our coverity model
+> to tell coverity that data from replay_get_byte() is not tainted?
 
-Coverity (CID 1390576) points out that this function isn't checking
-the error return from getc(). That means we could incorrectly return
-255 from here and then the return value from replay_get_dword would
-be 0xffffffff, which is unfortunate if the place that's using
-that uses it as a loop boundary.
+Good idea.  Something like
 
-Incidentally, is it worth adding something to our coverity model
-to tell coverity that data from replay_get_byte() is not tainted?
+uint8_t replay_get_byte(void)
+{
+     uint8_t byte;
+     if (!replay_file) {
+         return 0;
+     }
+     return byte;
+}
 
-thanks
--- PMM
+should do.
+
+Paolo
