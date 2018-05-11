@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fHFW2-00028a-4O
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 17:23:50 -0400
+	(envelope-from <mst@redhat.com>) id 1fHFe5-0004nJ-3B
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 17:32:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fHFW1-000855-3o
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 17:23:49 -0400
-References: <8739e95e-1900-d4e3-7ac8-77e3aa8b927e@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <3828666d-c929-de15-9160-4089d237d323@redhat.com>
-Date: Fri, 11 May 2018 17:23:39 -0400
+	(envelope-from <mst@redhat.com>) id 1fHFe0-0002VL-6T
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 17:32:09 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53588 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fHFe0-0002VD-2f
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 17:32:04 -0400
+Date: Sat, 12 May 2018 00:32:02 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <1526074301-211877-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <8739e95e-1900-d4e3-7ac8-77e3aa8b927e@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Restoring bitmaps after failed/cancelled migration
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH v5 0/3] linux-headers: arch fixups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +24,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, "gilbert >> Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Juan Q >> Juan Jose Quintela Carreira" <quintela@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, James Hogan <jhogan@kernel.org>
 
+It turns out that we have unistd.h and kvm headers for some
+architectures but not others.  We are thus unable to use e.g. usefaultfd
+on these systems unless system headers have been updated.
 
+Fix up update-linux-headers.sh to make sure we auto-updates
+all architectures which have linux-headers/
+(unfortunately this still does not mean "all linux systems").
 
-On 04/18/2018 10:00 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Hi all.
-> 
-> We now have the following problem:
-> 
-> If dirty-bitmaps migration capability is enabled, persistance flag is
-> dropped for all migrated bitmaps, to prevent their storing to the
-> storage on inactivate. It works ok, persistence itself is migrated
-> through the migration channel. But on source, bitmaps becomes not
-> persistent, so if we, for some reasons, want to continue using source
-> vm, we'll lose bitmaps on stop/start.
-> 
+Tested on x86 only.
 
-Sorry for not following along more carefully, which kind of migration
-are we talking about in this case?
+Pls consider merging this through the ARM tree.
 
-> It's simple to fix it: just make bitmaps persistent again on invalidate
-> [1].. But I have some questions.
-> 
-> 1. What are possible cases? I think about the following:
-> 
-> a. migration cancel or fail, then invalidate
-> b. migration success, then qmp cont => invalidate
-> c. migration success, then stop/start (there was no invalidate, so [1]
-> will not work)
-> 
-> 
-> 2. Is it safe at all, saving bitmaps after inactivate, even without
-> persistence?
-> 
-> Inactive disk implies, that it may be changed by somebody other, isn't
-> it? Is it possible, that target will change the disk, and then we return
-> control to the source? In this case bitmaps will be invalid. So, should
-> not we drop all the bitmaps on inactivate?
-> 
+changes from v4:
+    dropped s390 chunks - already upstream
+
+Michael S. Tsirkin (3):
+  update-linux-headers.sh: unistd.h, kvm consistency
+  linux-headers: add unistd.h on all arches
+  linux-headers: add kvm header for mips
+
+ linux-headers/asm-arm/bitsperlong.h     |   1 +
+ linux-headers/asm-arm64/bitsperlong.h   |  24 +
+ linux-headers/asm-generic/bitsperlong.h |  16 +
+ linux-headers/asm-generic/unistd.h      | 944 ++++++++++++++++++++++++++++++++
+ linux-headers/asm-mips/bitsperlong.h    |   9 +
+ linux-headers/asm-mips/kvm.h            |  25 +-
+ linux-headers/asm-mips/sgidefs.h        |  45 ++
+ linux-headers/asm-mips/unistd.h         |  44 +-
+ linux-headers/asm-powerpc/bitsperlong.h |  13 +
+ linux-headers/asm-s390/bitsperlong.h    |  14 +
+ linux-headers/asm-x86/bitsperlong.h     |  14 +
+ scripts/update-linux-headers.sh         |  22 +-
+ 12 files changed, 1156 insertions(+), 15 deletions(-)
+ create mode 100644 linux-headers/asm-arm/bitsperlong.h
+ create mode 100644 linux-headers/asm-arm64/bitsperlong.h
+ create mode 100644 linux-headers/asm-generic/bitsperlong.h
+ create mode 100644 linux-headers/asm-generic/unistd.h
+ create mode 100644 linux-headers/asm-mips/bitsperlong.h
+ create mode 100644 linux-headers/asm-mips/sgidefs.h
+ create mode 100644 linux-headers/asm-powerpc/bitsperlong.h
+ create mode 100644 linux-headers/asm-s390/bitsperlong.h
+ create mode 100644 linux-headers/asm-x86/bitsperlong.h
+
+-- 
+MST
