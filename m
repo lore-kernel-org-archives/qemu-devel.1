@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51696)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fHCJw-0002Ix-Nh
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 13:59:09 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fHCOO-00027G-Me
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 14:03:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fHCJv-0001Qg-TL
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 13:59:08 -0400
-References: <20180509165530.29561-1-mreitz@redhat.com>
-	<20180509165530.29561-2-mreitz@redhat.com>
-	<6027508c-717e-d3c2-6704-0c1b614fca89@redhat.com>
-	<c8bb155f-4ff7-46d8-116f-c4e6be2c161c@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <4c7382dc-724f-4420-ea8d-b4d1bf0edf84@redhat.com>
-Date: Fri, 11 May 2018 19:59:00 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1fHCOK-0003Dd-Fe
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 14:03:44 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41548 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fHCOK-0003DV-AO
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 14:03:40 -0400
+Date: Fri, 11 May 2018 19:03:35 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180511180335.GH2720@work-vm>
+References: <1525618499-1560-1-git-send-email-lidongchen@tencent.com>
+	<1525618499-1560-2-git-send-email-lidongchen@tencent.com>
+	<20180508184035.GT2500@work-vm>
+	<CAOGPPbdy+198Nxd=ttOtm+mNy7_u4iJxYVhLqYyeK1JJytuZEQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <c8bb155f-4ff7-46d8-116f-c4e6be2c161c@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="AjR8ZaJ439rCnp4zs4x6h5pknxkdxAX7G"
-Subject: Re: [Qemu-devel] [PATCH 01/13] qapi: Add default-variant for flat
- unions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOGPPbdy+198Nxd=ttOtm+mNy7_u4iJxYVhLqYyeK1JJytuZEQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] migration: not wait
+ RDMA_CM_EVENT_DISCONNECTED event after rdma_disconnect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,109 +30,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: 858585 jemmy <jemmy858585@gmail.com>
+Cc: Aviad Yehezkel <aviadye@mellanox.com>, Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Gal Shachaf <galsha@mellanox.com>, adido@mellanox.com, Lidong Chen <lidongchen@tencent.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---AjR8ZaJ439rCnp4zs4x6h5pknxkdxAX7G
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
-Message-ID: <4c7382dc-724f-4420-ea8d-b4d1bf0edf84@redhat.com>
-Subject: Re: [PATCH 01/13] qapi: Add default-variant for flat unions
-References: <20180509165530.29561-1-mreitz@redhat.com>
- <20180509165530.29561-2-mreitz@redhat.com>
- <6027508c-717e-d3c2-6704-0c1b614fca89@redhat.com>
- <c8bb155f-4ff7-46d8-116f-c4e6be2c161c@redhat.com>
-In-Reply-To: <c8bb155f-4ff7-46d8-116f-c4e6be2c161c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+* 858585 jemmy (jemmy858585@gmail.com) wrote:
+> On Wed, May 9, 2018 at 2:40 AM, Dr. David Alan Gilbert
+> <dgilbert@redhat.com> wrote:
+> > * Lidong Chen (jemmy858585@gmail.com) wrote:
+> >> When cancel migration during RDMA precopy, the source qemu main thread hangs sometime.
+> >>
+> >> The backtrace is:
+> >>     (gdb) bt
+> >>     #0  0x00007f249eabd43d in write () from /lib64/libpthread.so.0
+> >>     #1  0x00007f24a1ce98e4 in rdma_get_cm_event (channel=0x4675d10, event=0x7ffe2f643dd0) at src/cma.c:2189
+> >>     #2  0x00000000007b6166 in qemu_rdma_cleanup (rdma=0x6784000) at migration/rdma.c:2296
+> >>     #3  0x00000000007b7cae in qio_channel_rdma_close (ioc=0x3bfcc30, errp=0x0) at migration/rdma.c:2999
+> >>     #4  0x00000000008db60e in qio_channel_close (ioc=0x3bfcc30, errp=0x0) at io/channel.c:273
+> >>     #5  0x00000000007a8765 in channel_close (opaque=0x3bfcc30) at migration/qemu-file-channel.c:98
+> >>     #6  0x00000000007a71f9 in qemu_fclose (f=0x527c000) at migration/qemu-file.c:334
+> >>     #7  0x0000000000795b96 in migrate_fd_cleanup (opaque=0x3b46280) at migration/migration.c:1162
+> >>     #8  0x000000000093a71b in aio_bh_call (bh=0x3db7a20) at util/async.c:90
+> >>     #9  0x000000000093a7b2 in aio_bh_poll (ctx=0x3b121c0) at util/async.c:118
+> >>     #10 0x000000000093f2ad in aio_dispatch (ctx=0x3b121c0) at util/aio-posix.c:436
+> >>     #11 0x000000000093ab41 in aio_ctx_dispatch (source=0x3b121c0, callback=0x0, user_data=0x0)
+> >>         at util/async.c:261
+> >>     #12 0x00007f249f73c7aa in g_main_context_dispatch () from /lib64/libglib-2.0.so.0
+> >>     #13 0x000000000093dc5e in glib_pollfds_poll () at util/main-loop.c:215
+> >>     #14 0x000000000093dd4e in os_host_main_loop_wait (timeout=28000000) at util/main-loop.c:263
+> >>     #15 0x000000000093de05 in main_loop_wait (nonblocking=0) at util/main-loop.c:522
+> >>     #16 0x00000000005bc6a5 in main_loop () at vl.c:1944
+> >>     #17 0x00000000005c39b5 in main (argc=56, argv=0x7ffe2f6443f8, envp=0x3ad0030) at vl.c:4752
+> >>
+> >> It does not get the RDMA_CM_EVENT_DISCONNECTED event after rdma_disconnect sometime.
+> >> I do not find out the root cause why not get RDMA_CM_EVENT_DISCONNECTED event, but
+> >> it can be reproduced if not invoke ibv_dereg_mr to release all ram blocks which fixed
+> >> in previous patch.
+> >
+> > Does this happen without your other changes?
+> 
+> Yes, this issue also happen on v2.12.0. base on
+> commit 4743c23509a51bd4ee85cc272287a41917d1be35
+> 
+> > Can you give me instructions to repeat it and also say which
+> > cards you wereusing?
+> 
+> This issue can be reproduced by start and cancel migration.
+> less than 10 times, this issue will be reproduced.
+> 
+> The command line is:
+> virsh migrate --live --copy-storage-all  --undefinesource --persistent
+> --timeout 10800 \
+>  --verbose 83e0049e-1325-4f31-baf9-25231509ada1  \
+> qemu+ssh://9.16.46.142/system rdma://9.16.46.142
+> 
+> The net card i use is :
+> 0000:3b:00.0 Ethernet controller: Mellanox Technologies MT27710 Family
+> [ConnectX-4 Lx]
+> 0000:3b:00.1 Ethernet controller: Mellanox Technologies MT27710 Family
+> [ConnectX-4 Lx]
+> 
+> This issue is related to ibv_dereg_mr, if not invoke ibv_dereg_mr for
+> all ram block, this issue can be reproduced.
+> If we fixed the bugs and use ibv_dereg_mr to release all ram block,
+> this issue never happens.
 
-On 2018-05-10 15:18, Eric Blake wrote:
-> On 05/10/2018 08:12 AM, Eric Blake wrote:
->=20
-> Oh, I just had a thought:
->=20
->>> +++ b/scripts/qapi/visit.py
->>> @@ -40,10 +40,20 @@ def gen_visit_object_members(name, base, members,=
-=20
->=20
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if variants:
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if variants.default_tag_v=
-alue is None:
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 r=
-et +=3D mcgen('''
->>> +=C2=A0=C2=A0=C2=A0 %(c_name)s =3D obj->%(c_name)s;
->>> +''',
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- c_name=3Dc_name(variants.tag_member.name))
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 else:
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 r=
-et +=3D mcgen('''
->>> +=C2=A0=C2=A0=C2=A0 if (obj->has_%(c_name)s) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 %(c_name)s =3D obj->%(c_n=
-ame)s;
->>> +=C2=A0=C2=A0=C2=A0 } else {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 %(c_name)s =3D %(enum_con=
-st)s;
->=20
-> In this branch of code, is it worth also generating:
->=20
-> %has_(c_name)s =3D true;
+Maybe that is the right fix; I can imagine that the RDMA code doesn't
+like closing down if there are still ramblocks registered that
+potentially could have incoming DMA?
 
-You mean obj->has_%(c_name)s, and then also set obj->%(c_name)s?
+> And for the kernel part, there is a bug also cause not release ram
+> block when canceling live migration.
+> https://patchwork.kernel.org/patch/10385781/
 
-> That way, the rest of the C code does not have to check
-> has_discriminator, because the process of assigning the default will
-> ensure that has_discriminator is always true later on.=C2=A0 It does ha=
-ve the
-> effect that output would never omit the discriminator - but that might
-> be a good thing: if we ever have an output union that used to have a
-> mandatory discriminator and want to now make it optional, we don't want=
+OK, that's a pain; which threads are doing the dereg - is some stuff
+in the migration thread and some stuff in the main thread on cleanup?
 
-> to break older clients that expected the discriminator to be present. I=
-t
-> does obscure whether input relied on the default, but I don't think tha=
-t
-> hurts.
+Dave
 
-Also, it would make code a bit simpler because it can cover the !has_X
-case under X =3D=3D default_X.
-
-But OTOH, you could make that case for any optional value -- except
-where "is missing" has special value.
-
-And that's the tricky part: I think it's hard to say that a missing
-discriminator never has special meaning.  We only need the
-default-variant so we know which variant of the union to pick; but we
-don't know that the fact that the discriminator value was missing does
-not have special meaning.
-
-Of course, we can simply foreclose that by setting it here.
-
-I don't have money in this game, so I suppose it's yours and Markus's
-call. :-)
-
-Max
-
-
---AjR8ZaJ439rCnp4zs4x6h5pknxkdxAX7G
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr12eQACgkQ9AfbAGHV
-z0CvhwgAwnkQ4MWSWRribvcpFNlXlKE0sfNs5kM5tKaIjId8ZaftUJePN4OLy8ev
-uFbfQskgdpIsQshaJ51xWhobJj4YGFn+LAwXeqGMDkSFZ/ITDh0p6/16+Pqr+4Nt
-zRhNYguuK9J3+/uGUBfS21SLbKlLMF2EtPOZR8PlRGhTzcDMQNV1J+kpBl0BYodh
-5xJ8AXR/K4bMIiim1Bvt4nozFez/tgqKM9bqUbNrZK7u+oaU2SoEWL/QpjGeOZ+D
-pVSu/KKcbLU/jQGq6wAFWkb0Pcxp92u16ds4u/5KsHr7Ma9+CYX0o9AeCCkdmTLR
-ZBIGAjufNNwCOqG8Ruc0JulnuAzuTA==
-=jKqh
------END PGP SIGNATURE-----
-
---AjR8ZaJ439rCnp4zs4x6h5pknxkdxAX7G--
+> >
+> >> Anyway, it should not invoke rdma_get_cm_event in main thread, and the event channel
+> >> is also destroyed in qemu_rdma_cleanup.
+> >>
+> >> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+> >> ---
+> >>  migration/rdma.c       | 12 ++----------
+> >>  migration/trace-events |  1 -
+> >>  2 files changed, 2 insertions(+), 11 deletions(-)
+> >>
+> >> diff --git a/migration/rdma.c b/migration/rdma.c
+> >> index 0dd4033..92e4d30 100644
+> >> --- a/migration/rdma.c
+> >> +++ b/migration/rdma.c
+> >> @@ -2275,8 +2275,7 @@ static int qemu_rdma_write(QEMUFile *f, RDMAContext *rdma,
+> >>
+> >>  static void qemu_rdma_cleanup(RDMAContext *rdma)
+> >>  {
+> >> -    struct rdma_cm_event *cm_event;
+> >> -    int ret, idx;
+> >> +    int idx;
+> >>
+> >>      if (rdma->cm_id && rdma->connected) {
+> >>          if ((rdma->error_state ||
+> >> @@ -2290,14 +2289,7 @@ static void qemu_rdma_cleanup(RDMAContext *rdma)
+> >>              qemu_rdma_post_send_control(rdma, NULL, &head);
+> >>          }
+> >>
+> >> -        ret = rdma_disconnect(rdma->cm_id);
+> >> -        if (!ret) {
+> >> -            trace_qemu_rdma_cleanup_waiting_for_disconnect();
+> >> -            ret = rdma_get_cm_event(rdma->channel, &cm_event);
+> >> -            if (!ret) {
+> >> -                rdma_ack_cm_event(cm_event);
+> >> -            }
+> >> -        }
+> >> +        rdma_disconnect(rdma->cm_id);
+> >
+> > I'm worried whether this change could break stuff:
+> > The docs say for rdma_disconnect that it flushes any posted work
+> > requests to the completion queue;  so unless we wait for the event
+> > do we know the stuff has been flushed?   In the normal non-cancel case
+> > I'm worried that means we could lose something.
+> > (But I don't know the rdma/infiniband specs well enough to know if it's
+> > really a problem).
+> 
+> In qemu_fclose function, it invoke qemu_fflush(f) before invoke f->ops->close.
+> so I think it's safe for normal migration case.
+> 
+> For the root cause why not receive RDMA_CM_EVENT_DISCONNECTED event
+> after rdma_disconnect,
+> I loop in Aviad Yehezkel<aviadye@mellanox.com>, Aviad will help us
+> find the root cause.
+> 
+> >
+> > Dave
+> >
+> >>          trace_qemu_rdma_cleanup_disconnect();
+> >>          rdma->connected = false;
+> >>      }
+> >> diff --git a/migration/trace-events b/migration/trace-events
+> >> index d6be74b..64573ff 100644
+> >> --- a/migration/trace-events
+> >> +++ b/migration/trace-events
+> >> @@ -125,7 +125,6 @@ qemu_rdma_accept_pin_state(bool pin) "%d"
+> >>  qemu_rdma_accept_pin_verbsc(void *verbs) "Verbs context after listen: %p"
+> >>  qemu_rdma_block_for_wrid_miss(const char *wcompstr, int wcomp, const char *gcompstr, uint64_t req) "A Wanted wrid %s (%d) but got %s (%" PRIu64 ")"
+> >>  qemu_rdma_cleanup_disconnect(void) ""
+> >> -qemu_rdma_cleanup_waiting_for_disconnect(void) ""
+> >>  qemu_rdma_close(void) ""
+> >>  qemu_rdma_connect_pin_all_requested(void) ""
+> >>  qemu_rdma_connect_pin_all_outcome(bool pin) "%d"
+> >> --
+> >> 1.8.3.1
+> >>
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
