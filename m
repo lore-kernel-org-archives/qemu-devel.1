@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fHGpz-0002OD-Rt
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 18:48:33 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fHGqZ-0002h9-A9
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 18:49:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fHGpw-00053r-R8
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 18:48:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37716)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fHGpw-00052k-Lm
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 18:48:28 -0400
-Date: Fri, 11 May 2018 19:48:23 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180511224823.GR13350@localhost.localdomain>
-References: <20180504160026.14017-1-berrange@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1fHGqY-0005IX-If
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 18:49:07 -0400
+References: <20180509162637.15575-1-kwolf@redhat.com>
+	<20180509162637.15575-10-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <dce2af16-e215-730c-8222-9b4400599b48@redhat.com>
+Date: Sat, 12 May 2018 00:48:59 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180504160026.14017-1-berrange@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] Requiring Python 2.7+ (was Re: [PATCH 0/3] Document
- intent for supported build platforms and bump min glib to 2.42)
+In-Reply-To: <20180509162637.15575-10-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="pmnyAxUDesMVkHlSF2GeOtCbeGdGf93Fe"
+Subject: Re: [Qemu-devel] [PATCH 09/42] job: Rename BlockJobType into JobType
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,23 +24,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Olaf Hering <olaf@aepfle.de>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-On Fri, May 04, 2018 at 05:00:23PM +0100, Daniel P. Berrang=E9 wrote:
-[...]
-> Based on that doc and https://repology.org/metapackage/glib/versions,
-> I identified that we could feasibly set min glib to 2.42. Note that
-> this would be dropping RHEL-6 as a build host (RHEL-6.0 came out in
-> 2010 so that's reasonable to drop IMHO). It would still cover 2 major
-> Debian versions and 2 most recent Ubuntu LTS (16.04, 18.04, but *not*
-> 14.04). This min glib lets us remove almost all our compat code.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--pmnyAxUDesMVkHlSF2GeOtCbeGdGf93Fe
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com,
+ qemu-devel@nongnu.org
+Message-ID: <dce2af16-e215-730c-8222-9b4400599b48@redhat.com>
+Subject: Re: [PATCH 09/42] job: Rename BlockJobType into JobType
+References: <20180509162637.15575-1-kwolf@redhat.com>
+ <20180509162637.15575-10-kwolf@redhat.com>
+In-Reply-To: <20180509162637.15575-10-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-If we're dropping RHEL-6, is there anything else blocking us from
-bumping the minimum required Python versino to 2.7?
+On 2018-05-09 18:26, Kevin Wolf wrote:
+> QAPI types aren't externally visible, so we can rename them without
+> causing problems. Before we add a job type to Job, rename the enum
+> so it can be used for more than just block jobs.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> ---
+>  qapi/block-core.json         | 14 +++++++-------
+>  include/block/blockjob_int.h |  2 +-
+>  block/backup.c               |  2 +-
+>  block/commit.c               |  2 +-
+>  block/mirror.c               |  4 ++--
+>  block/stream.c               |  2 +-
+>  blockjob.c                   |  6 +++---
+>  7 files changed, 16 insertions(+), 16 deletions(-)
 
->From the wording on patch 1/3, it looks like we will drop support
-for SLES-11 too?
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
---=20
-Eduardo
+
+--pmnyAxUDesMVkHlSF2GeOtCbeGdGf93Fe
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr2HdsACgkQ9AfbAGHV
+z0DFowf/fMoQ7E7yAi6UoKGxhOdi3AgPjVdLKDfpPYOX5B05lhnc5JMGJ/VlgfNo
+SCfXTYL0peA2QQ43YTEmLuH+XsvlTqrDa81QX4Zzd2tHO0XQy0K01UV3270Mz6S+
+J+FLpEnGgPqb7E+bTzCpvUD2qlVb+Bxrnq50bjw7lhJXMTWuTcpQqYS56wiT7Ncx
+HCI1i7yqwc6L/SZwFfnwCkYPPmwmqYcE++7+/KrUaiLtXhZXvtYy0Zsbn6No1f+f
+jId6mwEwTSpZjHyBUxrtyqBTD/wE22JJnN1Zwxsd5R8J92EM2WxMphvx/vPFBuhW
+0HN9y+blAfoZJT3QwdME6U4BLpJUHQ==
+=uxjF
+-----END PGP SIGNATURE-----
+
+--pmnyAxUDesMVkHlSF2GeOtCbeGdGf93Fe--
