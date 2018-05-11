@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fHGWr-0001gK-Ad
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 18:28:46 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fHGXc-0003lP-Bk
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 18:29:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fHGWq-0006Jl-GG
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 18:28:45 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fHGXb-0006Wi-Ka
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 18:29:32 -0400
 References: <20180509162637.15575-1-kwolf@redhat.com>
-	<20180509162637.15575-7-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <9d18d578-3d86-5254-1de8-5156555c5ef0@redhat.com>
-Date: Sat, 12 May 2018 00:28:32 +0200
+	<20180509162637.15575-2-kwolf@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <8f37b85b-6c7f-1942-9c33-c7c06842a63e@redhat.com>
+Date: Fri, 11 May 2018 18:29:24 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180509162637.15575-7-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="q89dfnOIMbuBVgIgSZ7Lz4mxnYFJKOn5C"
-Subject: Re: [Qemu-devel] [PATCH 06/42] blockjob: Add block_job_driver()
+In-Reply-To: <20180509162637.15575-2-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 01/42] blockjob: Fix assertion in
+ block_job_finalize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,53 +26,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, jcody@redhat.com, armbru@redhat.com, mreitz@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---q89dfnOIMbuBVgIgSZ7Lz4mxnYFJKOn5C
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com,
- qemu-devel@nongnu.org
-Message-ID: <9d18d578-3d86-5254-1de8-5156555c5ef0@redhat.com>
-Subject: Re: [PATCH 06/42] blockjob: Add block_job_driver()
-References: <20180509162637.15575-1-kwolf@redhat.com>
- <20180509162637.15575-7-kwolf@redhat.com>
-In-Reply-To: <20180509162637.15575-7-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 2018-05-09 18:26, Kevin Wolf wrote:
-> The backup block job directly accesses the driver field in BlockJob. Ad=
-d
-> a wrapper for getting it.
->=20
+
+On 05/09/2018 12:25 PM, Kevin Wolf wrote:
+> Every job gets a non-NULL job->txn on creation, but it doesn't
+> necessarily keep it until it is decommissioned: Finalising a job removes
+> it from its transaction. Therefore, calling 'blockdev-job-finalize' a
+> second time on an already concluded job causes an assertion failure.
+> 
+> Remove job->txn from the assertion in block_job_finalize() to fix this.
+> block_job_do_finalize() still has the same assertion, but if a job is
+> already removed from its transaction, block_job_apply_verb() will
+> already error out before we run into that assertion.
+> 
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Reviewed-by: John Snow <jsnow@redhat.com>
+
 > ---
->  include/block/blockjob.h | 7 +++++++
->  block/backup.c           | 8 +++++---
->  blockjob.c               | 5 +++++
->  3 files changed, 17 insertions(+), 3 deletions(-)
+>  blockjob.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/blockjob.c b/blockjob.c
+> index 4de48166b2..b38ed7e265 100644
+> --- a/blockjob.c
+> +++ b/blockjob.c
+> @@ -702,7 +702,7 @@ void block_job_complete(BlockJob *job, Error **errp)
+>  
+>  void block_job_finalize(BlockJob *job, Error **errp)
+>  {
+> -    assert(job && job->id && job->txn);
+> +    assert(job && job->id);
+>      if (block_job_apply_verb(job, BLOCK_JOB_VERB_FINALIZE, errp)) {
+>          return;
+>      }
+> 
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---q89dfnOIMbuBVgIgSZ7Lz4mxnYFJKOn5C
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr2GRAACgkQ9AfbAGHV
-z0Cfmgf7BQqKjUILelStJbzzhIDIKt7kJxYLS1ngwZ2lijQTmVrhQc8qBuQrD4O+
-tuWi+oP4avoOsv2zsqcQcE46BKAwtc4mKDcLYGaPmgmDt9N83x9QhWzPyi6i17V1
-gJKPn8bYpR9tpZY07A1gR7z973xIqLszzaEWtHgQgK+5fjUazczfuRKj+4CnK/N9
-KlVNAK/ECHe0nhZEladcWC8oiiGEIO9zAO6F2Eb0e8sf/hFgTAY1/4HSwvqvjcoQ
-1GnGlRccZraSetQdLtcFiITQQPpWJgGJOnJM4meNAQoK4OU0E5/MKzcsodRQ6uQE
-qAag5ayth0rySCDC70w+hUMiJKMUKA==
-=ddnt
------END PGP SIGNATURE-----
-
---q89dfnOIMbuBVgIgSZ7Lz4mxnYFJKOn5C--
+Oh, ack. Good catch.
