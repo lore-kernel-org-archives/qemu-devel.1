@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGy3d-0002OP-5P
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 22:45:22 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fGy3f-0002V5-1N
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 22:45:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGy3Z-00063V-VU
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 22:45:21 -0400
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:38048)
+	(envelope-from <richard.henderson@linaro.org>) id 1fGy3e-00067R-1O
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 22:45:22 -0400
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:33639)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fGy3Z-00062W-Qh
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 22:45:17 -0400
-Received: by mail-pg0-x244.google.com with SMTP id n9-v6so1792591pgq.5
-	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 19:45:17 -0700 (PDT)
+	id 1fGy3d-00066z-S9
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 22:45:21 -0400
+Received: by mail-pg0-x243.google.com with SMTP id i194-v6so1798707pgd.0
+	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 19:45:21 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 10 May 2018 19:44:50 -0700
-Message-Id: <20180511024454.31679-8-richard.henderson@linaro.org>
+Date: Thu, 10 May 2018 19:44:53 -0700
+Message-Id: <20180511024454.31679-11-richard.henderson@linaro.org>
 In-Reply-To: <20180511024454.31679-1-richard.henderson@linaro.org>
 References: <20180511024454.31679-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 07/11] target/arm: Implement FP
- data-processing (3 source) for fp16
+Subject: [Qemu-devel] [PATCH v3 10/11] target/arm: Implement FMOV
+ (immediate) for fp16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,80 +33,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, alex.bennee@linaro.org, qemu-stable@nongnu.org
 
-We missed all of the scalar fp16 fma operations.
+From: Alex Bennée <alex.bennee@linaro.org>
+
+All the hard work is already done by vfp_expand_imm, we just need to
+make sure we pick up the correct size.
 
 Cc: qemu-stable@nongnu.org
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+[rth: Merge unallocated_encoding check with TCGMemOp conversion.]
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-a64.c | 48 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
+ target/arm/translate-a64.c | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
 
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 1264e798a7..523fcf4801 100644
+index 85a46f7abd..d77eda7cbc 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -5477,6 +5477,44 @@ static void handle_fp_3src_double(DisasContext *s, bool o0, bool o1,
-     tcg_temp_free_i64(tcg_res);
- }
+@@ -5674,11 +5674,25 @@ static void disas_fp_imm(DisasContext *s, uint32_t insn)
+ {
+     int rd = extract32(insn, 0, 5);
+     int imm8 = extract32(insn, 13, 8);
+-    int is_double = extract32(insn, 22, 2);
++    int type = extract32(insn, 22, 2);
+     uint64_t imm;
+     TCGv_i64 tcg_res;
++    TCGMemOp sz;
  
-+/* Floating-point data-processing (3 source) - half precision */
-+static void handle_fp_3src_half(DisasContext *s, bool o0, bool o1,
-+                                int rd, int rn, int rm, int ra)
-+{
-+    TCGv_i32 tcg_op1, tcg_op2, tcg_op3;
-+    TCGv_i32 tcg_res = tcg_temp_new_i32();
-+    TCGv_ptr fpst = get_fpstatus_ptr(true);
-+
-+    tcg_op1 = read_fp_hreg(s, rn);
-+    tcg_op2 = read_fp_hreg(s, rm);
-+    tcg_op3 = read_fp_hreg(s, ra);
-+
-+    /* These are fused multiply-add, and must be done as one
-+     * floating point operation with no rounding between the
-+     * multiplication and addition steps.
-+     * NB that doing the negations here as separate steps is
-+     * correct : an input NaN should come out with its sign bit
-+     * flipped if it is a negated-input.
-+     */
-+    if (o1 == true) {
-+        tcg_gen_xori_i32(tcg_op3, tcg_op3, 0x8000);
-+    }
-+
-+    if (o0 != o1) {
-+        tcg_gen_xori_i32(tcg_op1, tcg_op1, 0x8000);
-+    }
-+
-+    gen_helper_advsimd_muladdh(tcg_res, tcg_op1, tcg_op2, tcg_op3, fpst);
-+
-+    write_fp_sreg(s, rd, tcg_res);
-+
-+    tcg_temp_free_ptr(fpst);
-+    tcg_temp_free_i32(tcg_op1);
-+    tcg_temp_free_i32(tcg_op2);
-+    tcg_temp_free_i32(tcg_op3);
-+    tcg_temp_free_i32(tcg_res);
-+}
-+
- /* Floating point data-processing (3 source)
-  *   31  30  29 28       24 23  22  21  20  16  15  14  10 9    5 4    0
-  * +---+---+---+-----------+------+----+------+----+------+------+------+
-@@ -5506,6 +5544,16 @@ static void disas_fp_3src(DisasContext *s, uint32_t insn)
-         }
-         handle_fp_3src_double(s, o0, o1, rd, rn, rm, ra);
-         break;
-+    case 3:
-+        if (!arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
-+            unallocated_encoding(s);
-+            return;
-+        }
-+        if (!fp_access_check(s)) {
-+            return;
-+        }
-+        handle_fp_3src_half(s, o0, o1, rd, rn, rm, ra);
+-    if (is_double > 1) {
++    switch (type) {
++    case 0:
++        sz = MO_32;
 +        break;
-     default:
++    case 1:
++        sz = MO_64;
++        break;
++    case 3:
++        sz = MO_16;
++        if (arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
++            break;
++        }
++        /* fallthru */
++    default:
          unallocated_encoding(s);
+         return;
      }
+@@ -5701,7 +5715,7 @@ static void disas_fp_imm(DisasContext *s, uint32_t insn)
+         return;
+     }
+ 
+-    imm = vfp_expand_imm(MO_32 + is_double, imm8);
++    imm = vfp_expand_imm(sz, imm8);
+ 
+     tcg_res = tcg_const_i64(imm);
+     write_fp_dreg(s, rd, tcg_res);
 -- 
 2.17.0
