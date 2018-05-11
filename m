@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fHFoF-0006o2-Q1
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 17:42:40 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fHG15-0000XW-UD
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 17:55:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fHFoE-0006KU-Qs
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 17:42:39 -0400
-References: <20180509165530.29561-1-mreitz@redhat.com>
-	<20180509165530.29561-8-mreitz@redhat.com>
-	<e0cb86f1-ac04-f7cd-bd19-77abeeb5636a@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1fHG15-0002I5-7Z
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 17:55:56 -0400
+References: <20180509162637.15575-1-kwolf@redhat.com>
+	<20180509162637.15575-2-kwolf@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <51b724fd-ed60-1021-cf26-729e6a0f7590@redhat.com>
-Date: Fri, 11 May 2018 23:42:33 +0200
+Message-ID: <d1b349d7-9632-2674-4459-2cded7f9f239@redhat.com>
+Date: Fri, 11 May 2018 23:55:44 +0200
 MIME-Version: 1.0
-In-Reply-To: <e0cb86f1-ac04-f7cd-bd19-77abeeb5636a@redhat.com>
+In-Reply-To: <20180509162637.15575-2-kwolf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="z8zEwCWOBVCs1KYe9GpQ6F3BKfgSQQvAW"
-Subject: Re: [Qemu-devel] [PATCH 07/13] qdict: Add
- qdict_stringify_for_keyval()
+	boundary="8bWbnft363SruIFAF9wOoDg5PU0AUJZsf"
+Subject: Re: [Qemu-devel] [PATCH 01/42] blockjob: Fix assertion in
+ block_job_finalize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,161 +25,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---z8zEwCWOBVCs1KYe9GpQ6F3BKfgSQQvAW
+--8bWbnft363SruIFAF9wOoDg5PU0AUJZsf
 From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
-Message-ID: <51b724fd-ed60-1021-cf26-729e6a0f7590@redhat.com>
-Subject: Re: [PATCH 07/13] qdict: Add qdict_stringify_for_keyval()
-References: <20180509165530.29561-1-mreitz@redhat.com>
- <20180509165530.29561-8-mreitz@redhat.com>
- <e0cb86f1-ac04-f7cd-bd19-77abeeb5636a@redhat.com>
-In-Reply-To: <e0cb86f1-ac04-f7cd-bd19-77abeeb5636a@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com,
+ qemu-devel@nongnu.org
+Message-ID: <d1b349d7-9632-2674-4459-2cded7f9f239@redhat.com>
+Subject: Re: [PATCH 01/42] blockjob: Fix assertion in block_job_finalize()
+References: <20180509162637.15575-1-kwolf@redhat.com>
+ <20180509162637.15575-2-kwolf@redhat.com>
+In-Reply-To: <20180509162637.15575-2-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2018-05-11 20:39, Eric Blake wrote:
-> On 05/09/2018 11:55 AM, Max Reitz wrote:
->> The purpose of this function is to prepare a QDict for consumption by
->> the keyval visitor, which only accepts strings and QNull.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->> =C2=A0 include/block/qdict.h |=C2=A0 2 ++
->> =C2=A0 qobject/qdict.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 57
->> +++++++++++++++++++++++++++++++++++++++++++++++++++
->> =C2=A0 2 files changed, 59 insertions(+)
->>
->=20
->> +/**
->> + * Convert all values in a QDict so it can be consumed by the keyval
->> + * input visitor.=C2=A0 QNull values are left as-is, all other values=
- are
->> + * converted to strings.
->> + *
->> + * @qdict must be flattened, i.e. it may not contain any nested QDict=
+On 2018-05-09 18:25, Kevin Wolf wrote:
+> Every job gets a non-NULL job->txn on creation, but it doesn't
+> necessarily keep it until it is decommissioned: Finalising a job remove=
 s
->> + * or QLists.
+> it from its transaction. Therefore, calling 'blockdev-job-finalize' a
+> second time on an already concluded job causes an assertion failure.
 >=20
-> Maybe s/flattened/flattened already/
->=20
-> or would it be worth letting this function PERFORM the flattening step
-> automatically?
+> Remove job->txn from the assertion in block_job_finalize() to fix this.=
 
-Possibly, but I don't think it would be any more efficient, so I'd
-rather leave it up to the caller to do it explicitly than to do it here
-and maybe surprise someone.
+> block_job_do_finalize() still has the same assertion, but if a job is
+> already removed from its transaction, block_job_apply_verb() will
+> already error out before we run into that assertion.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  blockjob.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-(Indeed I personally prefer to be surprised by an abort() than by some
-unintended data change.)
-
-Max
-
->> + */
->> +void qdict_stringify_for_keyval(QDict *qdict)
->> +{
->> +=C2=A0=C2=A0=C2=A0 const QDictEntry *e;
->> +
->> +=C2=A0=C2=A0=C2=A0 for (e =3D qdict_first(qdict); e; e =3D qdict_next=
-(qdict, e)) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QString *new_value =3D NUL=
-L;
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 switch (qobject_type(e->va=
-lue)) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case QTYPE_QNULL:
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*=
- leave as-is */
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 br=
-eak;
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case QTYPE_QNUM: {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ch=
-ar *str =3D qnum_to_string(qobject_to(QNum, e->value));
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ne=
-w_value =3D qstring_from_str(str);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 g_=
-free(str);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 br=
-eak;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case QTYPE_QSTRING:
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*=
- leave as-is */
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 br=
-eak;
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case QTYPE_QDICT:
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case QTYPE_QLIST:
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*=
- @qdict must be flattened */
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ab=
-ort();
->=20
-> Matches your documentation about requiring it to be already flattened.
->=20
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case QTYPE_QBOOL:
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if=
- (qbool_get_bool(qobject_to(QBool, e->value))) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 new_value =3D qstring_from_str("on");
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } =
-else {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 new_value =3D qstring_from_str("off");
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 br=
-eak;
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case QTYPE_NONE:
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case QTYPE__MAX:
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ab=
-ort();
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (new_value) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QD=
-ictEntry *mut_e =3D (QDictEntry *)e;
->=20
-> A bit of a shame that you have to cast away const. It took me a couple
-> reads to figure out this meant 'mutable_e'.=C2=A0 But in the end, the c=
-ode
-> looks correct.
->=20
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qo=
-bject_unref(mut_e->value);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mu=
-t_e->value =3D QOBJECT(new_value);
->=20
-> If we're okay requiring the caller to pre-flatten before calling this,
-> instead of offering to do it here,
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->=20
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
-
---z8zEwCWOBVCs1KYe9GpQ6F3BKfgSQQvAW
+--8bWbnft363SruIFAF9wOoDg5PU0AUJZsf
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr2DkkACgkQ9AfbAGHV
-z0Ba5wgAmzFs4pUIiykDXcOFfG3eFEJmkQErScAREsH2ALy9n7x87uLOwhqK7pD1
-1FuA5IZqOQsZS/vUWdhUq+szTLdVS1UbNQuFbOO4urfynO9tXQnYEnrCydsnY+VE
-G2NIpfvJO6p8PDHmRXqdBOP7DgoHfgEisfLVv6VMxXXskSadBAQ5v+LN8SXFZQJf
-UylReuDMryYTCyjyAyVkXAaU65hPjrAPu60tqhMY2jR1hGU6F+sHBZ3WV+cC7mXY
-DpOU6rxJTsk7NcXxdUJLELOsMCAyMr7RMhfYoOav8+F0dn4VSLyThmWsYup0h4Ai
-YHtkb4C8+siXvVWkEQFTMwNE+ZVWYg==
-=AdOn
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr2EWAACgkQ9AfbAGHV
+z0BbGAf/ebIk+qtTj8vKLxlsJpn4eE1IHop3Jm5Sjc3KFHHjGFLO9WZUI9KVQxt+
+dnkQHENDy04VWlOFjGYMGbTZ1pAVF2gButuMPLgMFXNIJ9D3ke77QNfHOGPZ1zuf
+CeLfMgOq34+MGUOkpJHpC/QN90zL2GjiVX63F6RqumFrYnnG18V8efZxMvj17E+0
+PRJ+c59+FCr72c/8nIbdZ/s1pb6IHUi6AhonOaiZt2sYZclg/LFR4sPVz4jDo9ZQ
+Q7e/b5ytoM0o3In4GdQ08PabScKUwu0GhlL2PrMpqmP4R+1AoG4tEWTQ2yrH1mC1
+yKRD6zufmL6k6RnckW8XudrhE9Ztug==
+=jGjf
 -----END PGP SIGNATURE-----
 
---z8zEwCWOBVCs1KYe9GpQ6F3BKfgSQQvAW--
+--8bWbnft363SruIFAF9wOoDg5PU0AUJZsf--
