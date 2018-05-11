@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fHCGu-0006qA-TJ
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 13:56:02 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fHCJw-0002Ix-Nh
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 13:59:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fHCGr-0000Vr-QW
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 13:56:00 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44848 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fHCGr-0000VN-Jg
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 13:55:57 -0400
-Date: Fri, 11 May 2018 18:55:48 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180511175547.GG2720@work-vm>
-References: <20180510220248.10272-1-clg@kaod.org>
+	(envelope-from <mreitz@redhat.com>) id 1fHCJv-0001Qg-TL
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 13:59:08 -0400
+References: <20180509165530.29561-1-mreitz@redhat.com>
+	<20180509165530.29561-2-mreitz@redhat.com>
+	<6027508c-717e-d3c2-6704-0c1b614fca89@redhat.com>
+	<c8bb155f-4ff7-46d8-116f-c4e6be2c161c@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <4c7382dc-724f-4420-ea8d-b4d1bf0edf84@redhat.com>
+Date: Fri, 11 May 2018 19:59:00 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180510220248.10272-1-clg@kaod.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] migration: discard non-migratable
- RAMBlocks
+In-Reply-To: <c8bb155f-4ff7-46d8-116f-c4e6be2c161c@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="AjR8ZaJ439rCnp4zs4x6h5pknxkdxAX7G"
+Subject: Re: [Qemu-devel] [PATCH 01/13] qapi: Add default-variant for flat
+ unions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,291 +27,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>, Yulei Zhang <yulei.zhang@intel.com>, kevin.tian@intel.com, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, kwankhede@nvidia.com, zhi.a.wang@intel.com, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-* C=E9dric Le Goater (clg@kaod.org) wrote:
-> On the POWER9 processor, the XIVE interrupt controller can control
-> interrupt sources using MMIO to trigger events, to EOI or to turn off
-> the sources. Priority management and interrupt acknowledgment is also
-> controlled by MMIO in the presenter sub-engine.
->=20
-> These MMIO regions are exposed to guests in QEMU with a set of 'ram
-> device' memory mappings, similarly to VFIO, and the VMAs are populated
-> dynamically with the appropriate pages using a fault handler.
->=20
-> But, these regions are an issue for migration. We need to discard the
-> associated RAMBlocks from the RAM state on the source VM and let the
-> destination VM rebuild the memory mappings on the new host in the
-> post_load() operation just before resuming the system.
->=20
-> To achieve this goal, the following introduces a new RAMBlock flag
-> RAM_MIGRATABLE which is updated in the vmstate_register_ram() and
-> vmstate_unregister_ram() routines. This flag is then used by the
-> migration to identify RAMBlocks to discard on the source. Some checks
-> are also performed on the destination to make sure nothing invalid was
-> sent.
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--AjR8ZaJ439rCnp4zs4x6h5pknxkdxAX7G
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Message-ID: <4c7382dc-724f-4420-ea8d-b4d1bf0edf84@redhat.com>
+Subject: Re: [PATCH 01/13] qapi: Add default-variant for flat unions
+References: <20180509165530.29561-1-mreitz@redhat.com>
+ <20180509165530.29561-2-mreitz@redhat.com>
+ <6027508c-717e-d3c2-6704-0c1b614fca89@redhat.com>
+ <c8bb155f-4ff7-46d8-116f-c4e6be2c161c@redhat.com>
+In-Reply-To: <c8bb155f-4ff7-46d8-116f-c4e6be2c161c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I was about to add Review-by when I noticed that we use
-qemu_ram_foeach_block in a number of places, once in migration/ram.c
-and a bunch in migration/postcopy-ram.c
-
-Sorry, I guess we need a version of that as well (or a flag).
-
-Dave
-
-
-> ---
+On 2018-05-10 15:18, Eric Blake wrote:
+> On 05/10/2018 08:12 AM, Eric Blake wrote:
 >=20
->  Changes sinve v2:
+> Oh, I just had a thought:
 >=20
->  - added an error_report() in ram_save_host_page()=20
->  - un/set the RAMBlock RAM_MIGRATABLE directly under vmstate_un/registe=
-r_ram()
->    with some new flag helpers=20
-> =20
->  exec.c                    | 18 ++++++++++++++++++
->  include/exec/cpu-common.h |  3 +++
->  migration/ram.c           | 43 +++++++++++++++++++++++++++++++++------=
-----
->  migration/savevm.c        |  2 ++
->  4 files changed, 56 insertions(+), 10 deletions(-)
+>>> +++ b/scripts/qapi/visit.py
+>>> @@ -40,10 +40,20 @@ def gen_visit_object_members(name, base, members,=
+=20
 >=20
-> diff --git a/exec.c b/exec.c
-> index c7fcefa851b2..079c5c8bab7b 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -104,6 +104,9 @@ static MemoryRegion io_mem_unassigned;
->   * (Set during postcopy)
->   */
->  #define RAM_UF_ZEROPAGE (1 << 3)
-> +
-> +/* RAM can be migrated */
-> +#define RAM_MIGRATABLE (1 << 4)
->  #endif
-> =20
->  #ifdef TARGET_PAGE_BITS_VARY
-> @@ -1797,6 +1800,21 @@ void qemu_ram_set_uf_zeroable(RAMBlock *rb)
->      rb->flags |=3D RAM_UF_ZEROPAGE;
->  }
-> =20
-> +bool qemu_ram_is_migratable(RAMBlock *rb)
-> +{
-> +    return rb->flags & RAM_MIGRATABLE;
-> +}
-> +
-> +void qemu_ram_set_migratable(RAMBlock *rb)
-> +{
-> +    rb->flags |=3D RAM_MIGRATABLE;
-> +}
-> +
-> +void qemu_ram_unset_migratable(RAMBlock *rb)
-> +{
-> +    rb->flags &=3D ~RAM_MIGRATABLE;
-> +}
-> +
->  /* Called with iothread lock held.  */
->  void qemu_ram_set_idstr(RAMBlock *new_block, const char *name, DeviceS=
-tate *dev)
->  {
-> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-> index 24d335f95d45..488288fce959 100644
-> --- a/include/exec/cpu-common.h
-> +++ b/include/exec/cpu-common.h
-> @@ -75,6 +75,9 @@ const char *qemu_ram_get_idstr(RAMBlock *rb);
->  bool qemu_ram_is_shared(RAMBlock *rb);
->  bool qemu_ram_is_uf_zeroable(RAMBlock *rb);
->  void qemu_ram_set_uf_zeroable(RAMBlock *rb);
-> +bool qemu_ram_is_migratable(RAMBlock *rb);
-> +void qemu_ram_set_migratable(RAMBlock *rb);
-> +void qemu_ram_unset_migratable(RAMBlock *rb);
-> =20
->  size_t qemu_ram_pagesize(RAMBlock *block);
->  size_t qemu_ram_pagesize_largest(void);
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 912810c18e0f..dfdec78ecb03 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -187,6 +187,11 @@ void ramblock_recv_bitmap_set_range(RAMBlock *rb, =
-void *host_addr,
->                        nr);
->  }
-> =20
-> +/* Should be holding either ram_list.mutex, or the RCU lock. */
-> +#define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
-> +    RAMBLOCK_FOREACH(block)                            \
-> +        if (!qemu_ram_is_migratable(block)) {} else
-> +
->  /*
->   * An outstanding page request, on the source, having been received
->   * and queued
-> @@ -813,6 +818,10 @@ unsigned long migration_bitmap_find_dirty(RAMState=
- *rs, RAMBlock *rb,
->      unsigned long *bitmap =3D rb->bmap;
->      unsigned long next;
-> =20
-> +    if (!qemu_ram_is_migratable(rb)) {
-> +        return size;
-> +    }
-> +
->      if (rs->ram_bulk_stage && start > 0) {
->          next =3D start + 1;
->      } else {
-> @@ -858,7 +867,7 @@ uint64_t ram_pagesize_summary(void)
->      RAMBlock *block;
->      uint64_t summary =3D 0;
-> =20
-> -    RAMBLOCK_FOREACH(block) {
-> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
->          summary |=3D block->page_size;
->      }
-> =20
-> @@ -882,7 +891,7 @@ static void migration_bitmap_sync(RAMState *rs)
-> =20
->      qemu_mutex_lock(&rs->bitmap_mutex);
->      rcu_read_lock();
-> -    RAMBLOCK_FOREACH(block) {
-> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
->          migration_bitmap_sync_range(rs, block, 0, block->used_length);
->      }
->      rcu_read_unlock();
-> @@ -1521,6 +1530,11 @@ static int ram_save_host_page(RAMState *rs, Page=
-SearchStatus *pss,
->      size_t pagesize_bits =3D
->          qemu_ram_pagesize(pss->block) >> TARGET_PAGE_BITS;
-> =20
-> +    if (!qemu_ram_is_migratable(pss->block)) {
-> +        error_report("block %s should not be migrated !", pss->block->=
-idstr);
-> +        return 0;
-> +    }
-> +
->      do {
->          /* Check the pages is dirty and if it is send it */
->          if (!migration_bitmap_clear_dirty(rs, pss->block, pss->page)) =
-{
-> @@ -1619,7 +1633,7 @@ uint64_t ram_bytes_total(void)
->      uint64_t total =3D 0;
-> =20
->      rcu_read_lock();
-> -    RAMBLOCK_FOREACH(block) {
-> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
->          total +=3D block->used_length;
->      }
->      rcu_read_unlock();
-> @@ -1674,7 +1688,7 @@ static void ram_save_cleanup(void *opaque)
->       */
->      memory_global_dirty_log_stop();
-> =20
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
->          g_free(block->bmap);
->          block->bmap =3D NULL;
->          g_free(block->unsentmap);
-> @@ -1737,7 +1751,7 @@ void ram_postcopy_migrated_memory_release(Migrati=
-onState *ms)
->  {
->      struct RAMBlock *block;
-> =20
-> -    RAMBLOCK_FOREACH(block) {
-> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
->          unsigned long *bitmap =3D block->bmap;
->          unsigned long range =3D block->used_length >> TARGET_PAGE_BITS=
-;
->          unsigned long run_start =3D find_next_zero_bit(bitmap, range, =
-0);
-> @@ -1815,7 +1829,7 @@ static int postcopy_each_ram_send_discard(Migrati=
-onState *ms)
->      struct RAMBlock *block;
->      int ret;
-> =20
-> -    RAMBLOCK_FOREACH(block) {
-> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
->          PostcopyDiscardState *pds =3D
->              postcopy_discard_send_init(ms, block->idstr);
-> =20
-> @@ -2023,7 +2037,7 @@ int ram_postcopy_send_discard_bitmap(MigrationSta=
-te *ms)
->      rs->last_sent_block =3D NULL;
->      rs->last_page =3D 0;
-> =20
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
->          unsigned long pages =3D block->used_length >> TARGET_PAGE_BITS=
-;
->          unsigned long *bitmap =3D block->bmap;
->          unsigned long *unsentmap =3D block->unsentmap;
-> @@ -2182,7 +2196,7 @@ static void ram_list_init_bitmaps(void)
-> =20
->      /* Skip setting bitmap if there is no RAM */
->      if (ram_bytes_total()) {
-> -        QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +        RAMBLOCK_FOREACH_MIGRATABLE(block) {
->              pages =3D block->max_length >> TARGET_PAGE_BITS;
->              block->bmap =3D bitmap_new(pages);
->              bitmap_set(block->bmap, 0, pages);
-> @@ -2263,7 +2277,7 @@ static int ram_save_setup(QEMUFile *f, void *opaq=
-ue)
-> =20
->      qemu_put_be64(f, ram_bytes_total() | RAM_SAVE_FLAG_MEM_SIZE);
-> =20
-> -    RAMBLOCK_FOREACH(block) {
-> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
->          qemu_put_byte(f, strlen(block->idstr));
->          qemu_put_buffer(f, (uint8_t *)block->idstr, strlen(block->idst=
-r));
->          qemu_put_be64(f, block->used_length);
-> @@ -2507,6 +2521,11 @@ static inline RAMBlock *ram_block_from_stream(QE=
-MUFile *f, int flags)
->          return NULL;
->      }
-> =20
-> +    if (!qemu_ram_is_migratable(block)) {
-> +        error_report("block %s should not be migrated !", id);
-> +        return NULL;
-> +    }
-> +
->      return block;
->  }
-> =20
-> @@ -3011,7 +3030,11 @@ static int ram_load(QEMUFile *f, void *opaque, i=
-nt version_id)
->                  length =3D qemu_get_be64(f);
-> =20
->                  block =3D qemu_ram_block_by_name(id);
-> -                if (block) {
-> +                if (block && !qemu_ram_is_migratable(block)) {
-> +                    error_report("block %s should not be migrated !", =
-id);
-> +                    ret =3D -EINVAL;
-> +
-> +                } else if (block) {
->                      if (length !=3D block->used_length) {
->                          Error *local_err =3D NULL;
-> =20
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index e2be02afe42c..9ebfba738ea4 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -2501,11 +2501,13 @@ void vmstate_register_ram(MemoryRegion *mr, Dev=
-iceState *dev)
->  {
->      qemu_ram_set_idstr(mr->ram_block,
->                         memory_region_name(mr), dev);
-> +    qemu_ram_set_migratable(mr->ram_block);
->  }
-> =20
->  void vmstate_unregister_ram(MemoryRegion *mr, DeviceState *dev)
->  {
->      qemu_ram_unset_idstr(mr->ram_block);
-> +    qemu_ram_unset_migratable(mr->ram_block);
->  }
-> =20
->  void vmstate_register_ram_global(MemoryRegion *mr)
-> --=20
-> 2.13.6
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if variants:
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if variants.default_tag_v=
+alue is None:
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 r=
+et +=3D mcgen('''
+>>> +=C2=A0=C2=A0=C2=A0 %(c_name)s =3D obj->%(c_name)s;
+>>> +''',
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ c_name=3Dc_name(variants.tag_member.name))
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 else:
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 r=
+et +=3D mcgen('''
+>>> +=C2=A0=C2=A0=C2=A0 if (obj->has_%(c_name)s) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 %(c_name)s =3D obj->%(c_n=
+ame)s;
+>>> +=C2=A0=C2=A0=C2=A0 } else {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 %(c_name)s =3D %(enum_con=
+st)s;
 >=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> In this branch of code, is it worth also generating:
+>=20
+> %has_(c_name)s =3D true;
+
+You mean obj->has_%(c_name)s, and then also set obj->%(c_name)s?
+
+> That way, the rest of the C code does not have to check
+> has_discriminator, because the process of assigning the default will
+> ensure that has_discriminator is always true later on.=C2=A0 It does ha=
+ve the
+> effect that output would never omit the discriminator - but that might
+> be a good thing: if we ever have an output union that used to have a
+> mandatory discriminator and want to now make it optional, we don't want=
+
+> to break older clients that expected the discriminator to be present. I=
+t
+> does obscure whether input relied on the default, but I don't think tha=
+t
+> hurts.
+
+Also, it would make code a bit simpler because it can cover the !has_X
+case under X =3D=3D default_X.
+
+But OTOH, you could make that case for any optional value -- except
+where "is missing" has special value.
+
+And that's the tricky part: I think it's hard to say that a missing
+discriminator never has special meaning.  We only need the
+default-variant so we know which variant of the union to pick; but we
+don't know that the fact that the discriminator value was missing does
+not have special meaning.
+
+Of course, we can simply foreclose that by setting it here.
+
+I don't have money in this game, so I suppose it's yours and Markus's
+call. :-)
+
+Max
+
+
+--AjR8ZaJ439rCnp4zs4x6h5pknxkdxAX7G
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr12eQACgkQ9AfbAGHV
+z0CvhwgAwnkQ4MWSWRribvcpFNlXlKE0sfNs5kM5tKaIjId8ZaftUJePN4OLy8ev
+uFbfQskgdpIsQshaJ51xWhobJj4YGFn+LAwXeqGMDkSFZ/ITDh0p6/16+Pqr+4Nt
+zRhNYguuK9J3+/uGUBfS21SLbKlLMF2EtPOZR8PlRGhTzcDMQNV1J+kpBl0BYodh
+5xJ8AXR/K4bMIiim1Bvt4nozFez/tgqKM9bqUbNrZK7u+oaU2SoEWL/QpjGeOZ+D
+pVSu/KKcbLU/jQGq6wAFWkb0Pcxp92u16ds4u/5KsHr7Ma9+CYX0o9AeCCkdmTLR
+ZBIGAjufNNwCOqG8Ruc0JulnuAzuTA==
+=jKqh
+-----END PGP SIGNATURE-----
+
+--AjR8ZaJ439rCnp4zs4x6h5pknxkdxAX7G--
