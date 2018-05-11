@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51944)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGwA6-00079L-Rv
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 20:43:56 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fGwAB-00079u-9C
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 20:44:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGwA6-0004oX-6d
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 20:43:54 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:44250)
+	(envelope-from <richard.henderson@linaro.org>) id 1fGwA8-0004pj-SO
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 20:43:57 -0400
+Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:45465)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fGwA6-0004o8-1n
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 20:43:54 -0400
-Received: by mail-pg0-x241.google.com with SMTP id x145-v6so1673335pgx.11
-	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 17:43:53 -0700 (PDT)
+	id 1fGwA8-0004pN-Mn
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 20:43:56 -0400
+Received: by mail-pl0-x244.google.com with SMTP id bi12-v6so2254001plb.12
+	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 17:43:56 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 10 May 2018 17:43:29 -0700
-Message-Id: <20180511004345.26708-4-richard.henderson@linaro.org>
+Date: Thu, 10 May 2018 17:43:31 -0700
+Message-Id: <20180511004345.26708-6-richard.henderson@linaro.org>
 In-Reply-To: <20180511004345.26708-1-richard.henderson@linaro.org>
 References: <20180511004345.26708-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 03/19] fpu/softfloat: Move
- softfloat-specialize.h below FloatParts definition
+Subject: [Qemu-devel] [PATCH 05/19] fpu/softfloat: Introduce
+ parts_is_snan_frac
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +30,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 
-We want to be able to specialize on the canonical representation.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- fpu/softfloat.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ fpu/softfloat-specialize.h | 15 +++++++++++++++
+ fpu/softfloat.c            | 12 ++----------
+ 2 files changed, 17 insertions(+), 10 deletions(-)
 
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index e7c8213a5e..5e4982b035 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -95,16 +95,6 @@ this code that are retained.
- *----------------------------------------------------------------------------*/
- #include "fpu/softfloat-macros.h"
- 
--/*----------------------------------------------------------------------------
--| Functions and definitions to determine:  (1) whether tininess for underflow
--| is detected before or after rounding by default, (2) what (if anything)
--| happens when exceptions are raised, (3) how signaling NaNs are distinguished
--| from quiet NaNs, (4) the default generated quiet NaNs, and (5) how NaNs
--| are propagated from function inputs to output.  These details are target-
--| specific.
--*----------------------------------------------------------------------------*/
--#include "softfloat-specialize.h"
--
- /*----------------------------------------------------------------------------
- | Returns the fraction bits of the half-precision floating-point value `a'.
- *----------------------------------------------------------------------------*/
-@@ -241,6 +231,16 @@ typedef struct {
-     bool arm_althp;
- } FloatFmt;
+diff --git a/fpu/softfloat-specialize.h b/fpu/softfloat-specialize.h
+index b59356f6a5..82d7a030e7 100644
+--- a/fpu/softfloat-specialize.h
++++ b/fpu/softfloat-specialize.h
+@@ -86,6 +86,21 @@ this code that are retained.
+ #define NO_SIGNALING_NANS 1
+ #endif
  
 +/*----------------------------------------------------------------------------
-+| Functions and definitions to determine:  (1) whether tininess for underflow
-+| is detected before or after rounding by default, (2) what (if anything)
-+| happens when exceptions are raised, (3) how signaling NaNs are distinguished
-+| from quiet NaNs, (4) the default generated quiet NaNs, and (5) how NaNs
-+| are propagated from function inputs to output.  These details are target-
-+| specific.
++| For the deconstructed floating-point with fraction FRAC, return true
++| if the fraction represents a signalling NaN; otherwise false.
 +*----------------------------------------------------------------------------*/
-+#include "softfloat-specialize.h"
 +
- /* Expand fields based on the size of exponent and fraction */
- #define FLOAT_PARAMS(E, F)                                           \
-     .exp_size       = E,                                             \
++static bool parts_is_snan_frac(uint64_t frac, float_status *status)
++{
++#ifdef NO_SIGNALING_NANS
++    return false;
++#else
++    flag msb = extract64(frac, DECOMPOSED_BINARY_POINT - 1, 1);
++    return msb == status->snan_bit_is_one;
++#endif
++}
++
+ /*----------------------------------------------------------------------------
+ | The pattern for a default generated half-precision NaN.
+ *----------------------------------------------------------------------------*/
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index df377b6314..6dfc992a7f 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -330,16 +330,8 @@ static FloatParts canonicalize(FloatParts part, const FloatFmt *parm,
+             part.cls = float_class_inf;
+         } else {
+             part.frac <<= parm->frac_shift;
+-#ifdef NO_SIGNALING_NANS
+-            part.cls = float_class_qnan;
+-#else
+-            int64_t msb = part.frac << 2;
+-            if ((msb < 0) == status->snan_bit_is_one) {
+-                part.cls = float_class_snan;
+-            } else {
+-                part.cls = float_class_qnan;
+-            }
+-#endif
++            part.cls = (parts_is_snan_frac(part.frac, status)
++                        ? float_class_snan : float_class_qnan);
+         }
+     } else if (part.exp == 0) {
+         if (likely(part.frac == 0)) {
 -- 
 2.17.0
