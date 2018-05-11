@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fH3vL-00056V-Hx
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:01:22 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fH3zz-0000aQ-DY
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:06:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fH3vF-0006wd-Mc
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:01:11 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38706)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fH3vF-0006vd-H8
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:01:05 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fH3vA-0004kA-AE
-	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 09:01:00 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 651A92E8F72
-	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 09:00:58 +0000 (UTC)
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fH3zv-0000fa-FR
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:05:59 -0400
+Received: from mail-he1eur01on0724.outbound.protection.outlook.com
+	([2a01:111:f400:fe1e::724]:32813
+	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
+	id 1fH3zv-0000WI-4j
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:05:55 -0400
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Date: Fri, 11 May 2018 12:05:34 +0300
+Message-Id: <1526029534-35771-3-git-send-email-anton.nefedov@virtuozzo.com>
+In-Reply-To: <1526029534-35771-1-git-send-email-anton.nefedov@virtuozzo.com>
+References: <1526029534-35771-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 11 May 2018 08:48:28 -0000
-From: ChristianEhrhardt <1770417@bugs.launchpad.net>
-Reply-To: Bug 1770417 <1770417@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152596210054.26788.14569755785770428905.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152602850825.1272.15023470059289212695.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1770417] Re: Qemu can not parse long fqdns during
- drive-mirror
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH 2/2] qapi: avoid empty CpuInfoOther type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,79 +29,108 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: eblake@redhat.com, armbru@redhat.com, mdroth@linux.vnet.ibm.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-As Daniel asked in [1] making this abug report against Qemu (upstream).
+the patch provides an example of a previously introduced data-partial
+qapi union tag
 
-[1]: https://bugzilla.redhat.com/show_bug.cgi?id=3D1568939
+Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+---
+ qapi/misc.json | 48 ++++--------------------------------------------
+ cpus.c         |  2 --
+ 2 files changed, 4 insertions(+), 46 deletions(-)
 
-** Bug watch added: Red Hat Bugzilla #1568939
-   https://bugzilla.redhat.com/show_bug.cgi?id=3D1568939
-
-** Also affects: qemu
-   Importance: Undecided
-       Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1770417
-
-Title:
-  Qemu can not parse long fqdns during drive-mirror
-
-Status in QEMU:
-  New
-Status in qemu package in Ubuntu:
-  Confirmed
-
-Bug description:
-  During migration of an openstack booted instance, I got the following
-  error:
-
-  Apr 12 10:55:22 cmp1 libvirtd[4133]: 2018-04-12 10:55:22.133+0000:
-  4139: error : qemuMonitorJSONCheckError:392 : internal error: unable
-  to execute QEMU command 'drive-mirror': error parsing address 'cmp0
-  .sandriichenko-deploy-heat-virtual-mcp-pike-ovs-76.bud-mk.local:49153'
-
-  A bit more info in libvirt bug
-  https://bugzilla.redhat.com/show_bug.cgi?id=3D1568939
-
-  To reproduce it with qemu only, I followed the guide at
-  https://github.com/qemu/qemu/blob/master/docs/interop/live-block-
-  operations.rst#id21. On dest and source compute nodes, I launched an
-  instance:
-
-  qemu-system-x86_64 -display none -nodefconfig -M q35 -nodefaults -m
-  512 -blockdev node-name=3Dnode-
-  TargetDisk,driver=3Dqcow2,file.driver=3Dfile,file.node-
-  name=3Dfile,file.filename=3D./test-instance-mirror.qcow2 -device virtio-
-  blk,drive=3Dnode-TargetDisk,id=3Dvirtio0 -S -monitor stdio -qmp unix
-  :./qmp-sock,server,nowait -incoming tcp:localhost:6666
-
-  Then on dest node I launched nbd server:
-
-  (qemu) nbd_server_start cmp0:49153
-  (qemu) nbd_server_add -w node-TargetDisk
-
-  On the source node:
-
-  (qemu) drive_mirror -n  node-TargetDisk nbd:cmp0.vdrok-deploy-heat-virtua=
-l-mcp-pike-ovs-foobarbuzz.bud-mk.local:49153:exportname=3Dnode-TargetDisk
-  error parsing address 'cmp0.vdrok-deploy-heat-virtual-mcp-pike-ovs-foobar=
-buzz.bud-mk.local:49153'
-
-  When using short host name instead of FQDN address seems to be parsed
-  fine:
-
-  (qemu) drive_mirror -n  node-TargetDisk nbd:cmp0:49153:exportname=3Dnode-=
-TargetDisk qcow2
-  Image is not in qcow2 format
-
-  (not sure why it is not a qcow2 format, as I have qcow2 image with raw
-  backing file, but this is unrelated)
-
-  QEMU version is 2.11.1 from bionic
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1770417/+subscriptions
+diff --git a/qapi/misc.json b/qapi/misc.json
+index f5988cc..2059852 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -387,14 +387,14 @@
+            'qom_path': 'str', 'thread_id': 'int',
+            '*props': 'CpuInstanceProperties', 'arch': 'CpuInfoArch' },
+   'discriminator': 'arch',
++  'data-partial': true,
+   'data': { 'x86': 'CpuInfoX86',
+             'sparc': 'CpuInfoSPARC',
+             'ppc': 'CpuInfoPPC',
+             'mips': 'CpuInfoMIPS',
+             'tricore': 'CpuInfoTricore',
+             's390': 'CpuInfoS390',
+-            'riscv': 'CpuInfoRISCV',
+-            'other': 'CpuInfoOther' } }
++            'riscv': 'CpuInfoRISCV' } }
+ 
+ ##
+ # @CpuInfoX86:
+@@ -465,16 +465,6 @@
+ { 'struct': 'CpuInfoRISCV', 'data': { 'pc': 'int' } }
+ 
+ ##
+-# @CpuInfoOther:
+-#
+-# No additional information is available about the virtual CPU
+-#
+-# Since: 2.6
+-#
+-##
+-{ 'struct': 'CpuInfoOther', 'data': { } }
+-
+-##
+ # @CpuS390State:
+ #
+ # An enumeration of cpu states that can be assumed by a virtual
+@@ -575,38 +565,8 @@
+                       'arch'         : 'CpuInfoArch',
+                       'target'       : 'SysEmuTarget' },
+   'discriminator' : 'target',
+-  'data'          : { 'aarch64'      : 'CpuInfoOther',
+-                      'alpha'        : 'CpuInfoOther',
+-                      'arm'          : 'CpuInfoOther',
+-                      'cris'         : 'CpuInfoOther',
+-                      'hppa'         : 'CpuInfoOther',
+-                      'i386'         : 'CpuInfoOther',
+-                      'lm32'         : 'CpuInfoOther',
+-                      'm68k'         : 'CpuInfoOther',
+-                      'microblaze'   : 'CpuInfoOther',
+-                      'microblazeel' : 'CpuInfoOther',
+-                      'mips'         : 'CpuInfoOther',
+-                      'mips64'       : 'CpuInfoOther',
+-                      'mips64el'     : 'CpuInfoOther',
+-                      'mipsel'       : 'CpuInfoOther',
+-                      'moxie'        : 'CpuInfoOther',
+-                      'nios2'        : 'CpuInfoOther',
+-                      'or1k'         : 'CpuInfoOther',
+-                      'ppc'          : 'CpuInfoOther',
+-                      'ppc64'        : 'CpuInfoOther',
+-                      'ppcemb'       : 'CpuInfoOther',
+-                      'riscv32'      : 'CpuInfoOther',
+-                      'riscv64'      : 'CpuInfoOther',
+-                      's390x'        : 'CpuInfoS390',
+-                      'sh4'          : 'CpuInfoOther',
+-                      'sh4eb'        : 'CpuInfoOther',
+-                      'sparc'        : 'CpuInfoOther',
+-                      'sparc64'      : 'CpuInfoOther',
+-                      'tricore'      : 'CpuInfoOther',
+-                      'unicore32'    : 'CpuInfoOther',
+-                      'x86_64'       : 'CpuInfoOther',
+-                      'xtensa'       : 'CpuInfoOther',
+-                      'xtensaeb'     : 'CpuInfoOther' } }
++  'data-partial'  : true,
++  'data'          : { 's390x'        : 'CpuInfoS390' } }
+ 
+ ##
+ # @query-cpus-fast:
+diff --git a/cpus.c b/cpus.c
+index 5bcd3ec..bd0de44 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -2273,8 +2273,6 @@ CpuInfoFastList *qmp_query_cpus_fast(Error **errp)
+         info->value->target = target;
+         if (target == SYS_EMU_TARGET_S390X) {
+             cpustate_to_cpuinfo_s390(&info->value->u.s390x, cpu);
+-        } else {
+-            /* do nothing for @CpuInfoOther */
+         }
+ 
+         if (!cur_item) {
+-- 
+2.7.4
