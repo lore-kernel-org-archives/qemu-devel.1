@@ -1,27 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47057)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fH6rm-0003Pa-Vv
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 08:09:43 -0400
+	(envelope-from <famz@redhat.com>) id 1fH6rt-0003YF-3l
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 08:09:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fH6rm-0003ae-21
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 08:09:42 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:45078)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fH6rl-0003aR-T1
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 08:09:41 -0400
-Received: by mail-oi0-x244.google.com with SMTP id b130-v6so4490051oif.12
-	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 05:09:41 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180510222601.19944-4-laurent@vivier.eu>
-References: <20180510222601.19944-1-laurent@vivier.eu>
-	<20180510222601.19944-4-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 11 May 2018 13:09:20 +0100
-Message-ID: <CAFEAcA8Lwhp6_uw2piEirtn7RMBm+UJJDnnWyFtLQp3r2NMnrw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 3/5] linux-user: move sparc/sparc64
- socket.h definitions to sparc/sockbits.h
+	(envelope-from <famz@redhat.com>) id 1fH6rs-0003fA-9o
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 08:09:49 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Fri, 11 May 2018 20:08:22 +0800
+Message-Id: <20180511120823.7892-10-famz@redhat.com>
+In-Reply-To: <20180511120823.7892-1-famz@redhat.com>
+References: <20180511120823.7892-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 09/10] block-backend: Add blk_co_copy_range
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,15 +19,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Riku Voipio <riku.voipio@iki.fi>, Yongbok Kim <yongbok.kim@mips.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, eblake@redhat.com
 
-On 10 May 2018 at 23:25, Laurent Vivier <laurent@vivier.eu> wrote:
-> No code change.
->
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+It's a BlockBackend wrapper of the BDS interface.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ block/block-backend.c          | 18 ++++++++++++++++++
+ include/sysemu/block-backend.h |  4 ++++
+ 2 files changed, 22 insertions(+)
 
-thanks
--- PMM
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 681b240b12..5562ec4238 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -2217,3 +2217,21 @@ void blk_unregister_buf(BlockBackend *blk, void *host)
+ {
+     bdrv_unregister_buf(blk_bs(blk), host);
+ }
++
++int coroutine_fn blk_co_copy_range(BlockBackend *blk_in, int64_t off_in,
++                                   BlockBackend *blk_out, int64_t off_out,
++                                   int bytes, BdrvRequestFlags flags)
++{
++    int r;
++    r = blk_check_byte_request(blk_in, off_in, bytes);
++    if (r) {
++        return r;
++    }
++    r = blk_check_byte_request(blk_out, off_out, bytes);
++    if (r) {
++        return r;
++    }
++    return bdrv_co_copy_range(blk_in->root, off_in,
++                              blk_out->root, off_out,
++                              bytes, flags);
++}
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+index 92ab624fac..6f043b6b51 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -232,4 +232,8 @@ void blk_set_force_allow_inactivate(BlockBackend *blk);
+ void blk_register_buf(BlockBackend *blk, void *host, size_t size);
+ void blk_unregister_buf(BlockBackend *blk, void *host);
+ 
++int blk_co_copy_range(BlockBackend *blk_in, int64_t off_in,
++                      BlockBackend *blk_out, int64_t off_out,
++                      int bytes, BdrvRequestFlags flags);
++
+ #endif
+-- 
+2.14.3
