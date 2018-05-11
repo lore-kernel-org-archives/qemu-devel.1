@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44605)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fHBnV-0008Hv-3K
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 13:25:39 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fHBnY-0008JL-4z
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 13:25:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fHBnP-0005Zn-WE
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 13:25:37 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42308 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fHBnP-0005Zd-PY
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 13:25:31 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 353F27D65F
-	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 17:25:31 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Fri, 11 May 2018 19:24:43 +0200
-Message-Id: <1526059483-42847-1-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1525423069-61903-8-git-send-email-imammedo@redhat.com>
-References: <1525423069-61903-8-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 07/11] cli: add --preconfig option
+	(envelope-from <kwolf@redhat.com>) id 1fHBnW-0005dV-KO
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 13:25:40 -0400
+Date: Fri, 11 May 2018 19:25:31 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180511172531.GB5016@localhost.localdomain>
+References: <1514187226.13662.28.camel@intel.com>
+	<6e792b9f-2281-e8db-0410-c4c3468ffc90@redhat.com>
+	<20180508150309.GC4065@localhost.localdomain>
+	<20180509101618.GC19645@stefanha-x1.localdomain>
+	<d8a06161-d611-4f27-f4c8-f14370f191d4@redhat.com>
+	<20180510082659.GC1296@stefanha-x1.localdomain>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="d6Gm4EdcadzBjdND"
+Content-Disposition: inline
+In-Reply-To: <20180510082659.GC1296@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] Some question about savem/qcow2
+ incremental snapshot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,348 +29,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, armbru@redhat.com, eblake@redhat.com
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, qemu block <qemu-block@nongnu.org>, qemu-devel@nongnu.org, He Junyan <junyan.he@intel.com>
 
-This option allows pausing QEMU in the new RUN_STATE_PRECONFIG state,
-allowing the configuration of QEMU from QMP before the machine jumps
-into board initialization code of machine_run_board_init()
 
-The intent is to allow management to query machine state and additionally
-configure it using previous query results within one QEMU instance
-(i.e. eliminate the need to start QEMU twice, 1st to query board specific
-parameters and 2nd for actual VM start using query results for
-additional parameters).
+--d6Gm4EdcadzBjdND
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The new option complements -S option and could be used with or without
-it. The difference is that -S pauses QEMU when the machine is completely
-initialized with all devices wired up and ready to execute guest code
-(QEMU needs only to unpause VCPUs to let guest execute its code),
-while the "preconfig" option pauses QEMU early before board specific init
-callback (machine_run_board_init) is executed and allows the configuration
-of machine parameters which will be used by board init code.
+Am 10.05.2018 um 10:26 hat Stefan Hajnoczi geschrieben:
+> On Wed, May 09, 2018 at 07:54:31PM +0200, Max Reitz wrote:
+> > On 2018-05-09 12:16, Stefan Hajnoczi wrote:
+> > > On Tue, May 08, 2018 at 05:03:09PM +0200, Kevin Wolf wrote:
+> > >> Am 08.05.2018 um 16:41 hat Eric Blake geschrieben:
+> > >>> On 12/25/2017 01:33 AM, He Junyan wrote:
+> > >> 2. Make the nvdimm device use the QEMU block layer so that it is bac=
+ked
+> > >>    by a non-raw disk image (such as a qcow2 file representing the
+> > >>    content of the nvdimm) that supports snapshots.
+> > >>
+> > >>    This part is hard because it requires some completely new
+> > >>    infrastructure such as mapping clusters of the image file to guest
+> > >>    pages, and doing cluster allocation (including the copy on write
+> > >>    logic) by handling guest page faults.
+> > >>
+> > >> I think it makes sense to invest some effort into such interfaces, b=
+ut
+> > >> be prepared for a long journey.
+> > >=20
+> > > I like the suggestion but it needs to be followed up with a concrete
+> > > design that is feasible and fair for Junyan and others to implement.
+> > > Otherwise the "long journey" is really just a way of rejecting this
+> > > feature.
+> > >=20
+> > > Let's discuss the details of using the block layer for NVDIMM and try=
+ to
+> > > come up with a plan.
+> > >=20
+> > > The biggest issue with using the block layer is that persistent memory
+> > > applications use load/store instructions to directly access data.  Th=
+is
+> > > is fundamentally different from the block layer, which transfers bloc=
+ks
+> > > of data to and from the device.
+> > >=20
+> > > Because of block DMA, QEMU is able to perform processing at each block
+> > > driver graph node.  This doesn't exist for persistent memory because
+> > > software does not trap I/O.  Therefore the concept of filter nodes
+> > > doesn't make sense for persistent memory - we certainly do not want to
+> > > trap every I/O because performance would be terrible.
+> > >=20
+> > > Another difference is that persistent memory I/O is synchronous.
+> > > Load/store instructions execute quickly.  Perhaps we could use KVM as=
+ync
+> > > page faults in cases where QEMU needs to perform processing, but again
+> > > the performance would be bad.
+> >=20
+> > Let me first say that I have no idea how the interface to NVDIMM looks.
+> > I just assume it works pretty much like normal RAM (so the interface is
+> > just that it=E2=80=99s a part of the physical address space).
+> >=20
+> > Also, it sounds a bit like you are already discarding my idea, but here
+> > goes anyway.
+> >=20
+> > Would it be possible to introduce a buffering block driver that presents
+> > the guest an area of RAM/NVDIMM through an NVDIMM interface (so I
+> > suppose as part of the guest address space)?  For writing, we=E2=80=99d=
+ keep a
+> > dirty bitmap on it, and then we=E2=80=99d asynchronously move the dirty=
+ areas
+> > through the block layer, so basically like mirror.  On flushing, we=E2=
+=80=99d
+> > block until everything is clean.
+> >=20
+> > For reading, we=E2=80=99d follow a COR/stream model, basically, where e=
+verything
+> > is unpopulated in the beginning and everything is loaded through the
+> > block layer both asynchronously all the time and on-demand whenever the
+> > guest needs something that has not been loaded yet.
+> >=20
+> > Now I notice that that looks pretty much like a backing file model where
+> > we constantly run both a stream and a commit job at the same time.
+> >=20
+> > The user could decide how much memory to use for the buffer, so it could
+> > either hold everything or be partially unallocated.
+> >=20
+> > You=E2=80=99d probably want to back the buffer by NVDIMM normally, so t=
+hat
+> > nothing is lost on crashes (though this would imply that for partial
+> > allocation the buffering block driver would need to know the mapping
+> > between the area in real NVDIMM and its virtual representation of it).
+> >=20
+> > Just my two cents while scanning through qemu-block to find emails that
+> > don=E2=80=99t actually concern me...
+>=20
+> The guest kernel already implements this - it's the page cache and the
+> block layer!
+>=20
+> Doing it in QEMU with dirty memory logging enabled is less efficient
+> than doing it in the guest.
+>=20
+> That's why I said it's better to just use block devices than to
+> implement buffering.
+>=20
+> I'm saying that persistent memory emulation on top of the iscsi:// block
+> driver (for example) does not make sense.  It could be implemented but
+> the performance wouldn't be better than block I/O and the
+> complexity/code size in QEMU isn't justified IMO.
 
-When early introspection/configuration is done, command 'exit-preconfig'
-should be used to exit RUN_STATE_PRECONFIG and transition to the next
-requested state (i.e. if -S is used then QEMU will pause the second
-time when board/device initialization is completed or start guest
-execution if -S isn't provided on CLI)
+I think it could make sense if you put everything together.
 
-PS:
-Initially 'preconfig' is planned to be used for configuring numa
-topology depending on board specified possible cpus layout.
+The primary motivation to use this would of course be that you can
+directly map the guest clusters of a qcow2 file into the guest. We'd
+potentially fault on the first access, but once it's mapped, you get raw
+speed. You're right about flushing, and I was indeed thinking of
+Pankaj's work there; maybe I should have been more explicit about that.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
-v8:
-  - doc gramar fixes (Eric Blake <eblake@redhat.com>)
-v7:
-  - (Eric Blake <eblake@redhat.com>)
-    * spelling/wording fixes in newelly added documentation
-    * s/allowed-in-preconfig/allow-preconfig/
-    * s/QCO_ALLOWED_IN_PRECONFIG/QCO_ALLOW_PRECONFIG/
-v6:
-  - (Eduardo Habkost <ehabkost@redhat.com>)
-    * add exit-preconfig QMP command instead of overloading meaning of 'cont' command
-    * add doc text to qemu-tech.texi about -S and --preconfig
-v5:
-  - (Eric Blake <eblake@redhat.com>)
-    * more spelling/wording fixes
-    * s/-preconfig/--preconfig/
-    * s/2.12/2.13/
-  - (Eduardo Habkost <ehabkost@redhat.com>)
-    * move QCO_ALLOWED_IN_PRECONFIG and do_qmp_dispatch() runstate check
-      from the later patch 'qapi: introduce new cmd option  "allowed-in-preconfig"'
-      to here for better bissectability
-    * add TODO comment to '{ RUN_STATE_PRECONFIG, RUN_STATE_INMIGRATE }' transition
-    * check for incoming && preconfig outside of option parsing loop
-v4:
-  * Explain more on behaviour in commit message and use suggested
-    wording in message and patch (Eric Blake <eblake@redhat.com>)
+Now buffering in QEMU might come in useful when you want to run a block
+job on the device. Block jobs are usually just temporary, and accepting
+temporarily lower performance might be very acceptable when the
+alternative is that you can't perform block jobs at all.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+If we want to offer something nvdimm-like not only for the extreme
+"performance only, no features" case, but as a viable option for the
+average user, we need to be fast in the normal case, and allow to use
+any block layer features without having to restart the VM with a
+different storage device, even if at a performance penalty.
 
-preconfig
----
- include/sysemu/sysemu.h |  1 +
- qapi/misc.json          | 23 +++++++++++++++++++++++
- qapi/qmp-dispatch.c     |  8 ++++++++
- qemu-options.hx         | 13 +++++++++++++
- qemu-tech.texi          | 40 ++++++++++++++++++++++++++++++++++++++++
- qmp.c                   | 10 ++++++++++
- vl.c                    | 35 ++++++++++++++++++++++++++++++++++-
- 7 files changed, 129 insertions(+), 1 deletion(-)
+On iscsi, you still don't gain anything compared to just using a block
+device, but support for that might just happen as a side effect when you
+implement the interesting features.
 
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 544ab77..e893f72 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -66,6 +66,7 @@ typedef enum WakeupReason {
-     QEMU_WAKEUP_REASON_OTHER,
- } WakeupReason;
- 
-+void qemu_exit_preconfig_request(void);
- void qemu_system_reset_request(ShutdownCause reason);
- void qemu_system_suspend_request(void);
- void qemu_register_suspend_notifier(Notifier *notifier);
-diff --git a/qapi/misc.json b/qapi/misc.json
-index a16a7ef..502d5cf 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -1245,6 +1245,29 @@
- { 'command': 'cont' }
- 
- ##
-+# @exit-preconfig:
-+#
-+# Exit from "preconfig" state
-+#
-+# This command makes QEMU exit the preconfig state and proceed with
-+# VM initialization using configuration data provided on the command line
-+# and via the QMP monitor during the preconfig state. The command is only
-+# available during the preconfig state (i.e. when the --preconfig command
-+# line option was in use).
-+#
-+# Since 2.13
-+#
-+# Returns: nothing
-+#
-+# Example:
-+#
-+# -> { "execute": "exit-preconfig" }
-+# <- { "return": {} }
-+#
-+##
-+{ 'command': 'exit-preconfig', 'allow-preconfig': true }
-+
-+##
- # @system_wakeup:
- #
- # Wakeup guest from suspend.  Does nothing in case the guest isn't suspended.
-diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-index f9377b2..935f9e1 100644
---- a/qapi/qmp-dispatch.c
-+++ b/qapi/qmp-dispatch.c
-@@ -18,6 +18,7 @@
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qjson.h"
- #include "qapi/qmp/qbool.h"
-+#include "sysemu/sysemu.h"
- 
- QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
- {
-@@ -101,6 +102,13 @@ static QObject *do_qmp_dispatch(QmpCommandList *cmds, QObject *request,
-         return NULL;
-     }
- 
-+    if (runstate_check(RUN_STATE_PRECONFIG) &&
-+        !(cmd->options & QCO_ALLOW_PRECONFIG)) {
-+        error_setg(errp, "The command '%s' isn't permitted in '%s' state",
-+                   cmd->name, RunState_str(RUN_STATE_PRECONFIG));
-+        return NULL;
-+    }
-+
-     if (!qdict_haskey(dict, "arguments")) {
-         args = qdict_new();
-     } else {
-diff --git a/qemu-options.hx b/qemu-options.hx
-index c611766..6ba2a4f 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3304,6 +3304,19 @@ STEXI
- Run the emulation in single step mode.
- ETEXI
- 
-+DEF("preconfig", 0, QEMU_OPTION_preconfig, \
-+    "--preconfig     pause QEMU before machine is initialized\n",
-+    QEMU_ARCH_ALL)
-+STEXI
-+@item --preconfig
-+@findex --preconfig
-+Pause QEMU for interactive configuration before the machine is created,
-+which allows querying and configuring properties that will affect
-+machine initialization. Use the QMP command 'exit-preconfig' to exit
-+the preconfig state and move to the next state (ie. run guest if -S
-+isn't used or pause the second time if -S is used).
-+ETEXI
-+
- DEF("S", 0, QEMU_OPTION_S, \
-     "-S              freeze CPU at startup (use 'c' to start execution)\n",
-     QEMU_ARCH_ALL)
-diff --git a/qemu-tech.texi b/qemu-tech.texi
-index 52a56ae..dcecba8 100644
---- a/qemu-tech.texi
-+++ b/qemu-tech.texi
-@@ -5,6 +5,7 @@
- * CPU emulation::
- * Translator Internals::
- * QEMU compared to other emulators::
-+* Managed start up options::
- * Bibliography::
- @end menu
- 
-@@ -314,6 +315,45 @@ VirtualBox [9], Xen [10] and KVM [11] are based on QEMU. QEMU-SystemC
- [12] uses QEMU to simulate a system where some hardware devices are
- developed in SystemC.
- 
-+@node Managed start up options
-+@section Managed start up options
-+
-+In system mode emulation, it's possible to create a VM in a paused state using
-+the -S command line option. In this state the machine is completely initialized
-+according to command line options and ready to execute VM code but VCPU threads
-+are not executing any code. The VM state in this paused state depends on the way
-+QEMU was started. It could be in:
-+@table @asis
-+@item initial state (after reset/power on state)
-+@item with direct kernel loading, the initial state could be amended to execute
-+code loaded by QEMU in the VM's RAM and with incoming migration
-+@item with incoming migration, initial state will by amended with the migrated
-+machine state after migration completes.
-+@end table
-+
-+This paused state is typically used by users to query machine state and/or
-+additionally configure the machine (by hotplugging devices) in runtime before
-+allowing VM code to run.
-+
-+However, at the -S pause point, it's impossible to configure options that affect
-+initial VM creation (like: -smp/-m/-numa ...) or cold plug devices. That's
-+when the --preconfig command line option should be used. It allows pausing QEMU
-+before the initial VM creation, in a new preconfig state, where additional
-+queries and configuration can be performed via QMP before moving on to
-+the resulting configuration startup. In the preconfig state, QEMU only allows
-+a limited set of commands over the QMP monitor, where the commands do not
-+depend on an initialized machine, including but not limited to:
-+@table @asis
-+@item qmp_capabilities
-+@item query-qmp-schema
-+@item query-commands
-+@item query-status
-+@item exit-preconfig
-+@end table
-+The full list of commands is in QMP schema which could be queried with
-+query-qmp-schema, where commands supported at preconfig state have option
-+'allow-preconfig' set to true.
-+
- @node Bibliography
- @section Bibliography
- 
-diff --git a/qmp.c b/qmp.c
-index 25fdc9a..73e46d7 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -161,6 +161,16 @@ SpiceInfo *qmp_query_spice(Error **errp)
- };
- #endif
- 
-+void qmp_exit_preconfig(Error **errp)
-+{
-+    if (!runstate_check(RUN_STATE_PRECONFIG)) {
-+        error_setg(errp, "The command is permitted only in '%s' state",
-+                   RunState_str(RUN_STATE_PRECONFIG));
-+        return;
-+    }
-+    qemu_exit_preconfig_request();
-+}
-+
- void qmp_cont(Error **errp)
- {
-     BlockBackend *blk;
-diff --git a/vl.c b/vl.c
-index 12e31d1..3480b30 100644
---- a/vl.c
-+++ b/vl.c
-@@ -592,7 +592,7 @@ static int default_driver_check(void *opaque, QemuOpts *opts, Error **errp)
- /***********************************************************/
- /* QEMU state */
- 
--static RunState current_run_state = RUN_STATE_PRELAUNCH;
-+static RunState current_run_state = RUN_STATE_PRECONFIG;
- 
- /* We use RUN_STATE__MAX but any invalid value will do */
- static RunState vmstop_requested = RUN_STATE__MAX;
-@@ -605,6 +605,13 @@ typedef struct {
- 
- static const RunStateTransition runstate_transitions_def[] = {
-     /*     from      ->     to      */
-+    { RUN_STATE_PRECONFIG, RUN_STATE_PRELAUNCH },
-+      /* Early switch to inmigrate state to allow  -incoming CLI option work
-+       * as it used to. TODO: delay actual switching to inmigrate state to
-+       * the point after machine is built and remove this hack.
-+       */
-+    { RUN_STATE_PRECONFIG, RUN_STATE_INMIGRATE },
-+
-     { RUN_STATE_DEBUG, RUN_STATE_RUNNING },
-     { RUN_STATE_DEBUG, RUN_STATE_FINISH_MIGRATE },
-     { RUN_STATE_DEBUG, RUN_STATE_PRELAUNCH },
-@@ -1628,6 +1635,7 @@ static pid_t shutdown_pid;
- static int powerdown_requested;
- static int debug_requested;
- static int suspend_requested;
-+static bool preconfig_exit_requested = true;
- static WakeupReason wakeup_reason;
- static NotifierList powerdown_notifiers =
-     NOTIFIER_LIST_INITIALIZER(powerdown_notifiers);
-@@ -1712,6 +1720,11 @@ static int qemu_debug_requested(void)
-     return r;
- }
- 
-+void qemu_exit_preconfig_request(void)
-+{
-+    preconfig_exit_requested = true;
-+}
-+
- /*
-  * Reset the VM. Issue an event unless @reason is SHUTDOWN_CAUSE_NONE.
-  */
-@@ -1885,6 +1898,13 @@ static bool main_loop_should_exit(void)
-     RunState r;
-     ShutdownCause request;
- 
-+    if (preconfig_exit_requested) {
-+        if (runstate_check(RUN_STATE_PRECONFIG)) {
-+            runstate_set(RUN_STATE_PRELAUNCH);
-+        }
-+        preconfig_exit_requested = false;
-+        return true;
-+    }
-     if (qemu_debug_requested()) {
-         vm_stop(RUN_STATE_DEBUG);
-     }
-@@ -3674,6 +3694,9 @@ int main(int argc, char **argv, char **envp)
-                     exit(1);
-                 }
-                 break;
-+            case QEMU_OPTION_preconfig:
-+                preconfig_exit_requested = false;
-+                break;
-             case QEMU_OPTION_enable_kvm:
-                 olist = qemu_find_opts("machine");
-                 qemu_opts_parse_noisily(olist, "accel=kvm", false);
-@@ -4043,6 +4066,12 @@ int main(int argc, char **argv, char **envp)
- 
-     replay_configure(icount_opts);
- 
-+    if (incoming && !preconfig_exit_requested) {
-+        error_report("'preconfig' and 'incoming' options are "
-+                     "mutually exclusive");
-+        exit(EXIT_FAILURE);
-+    }
-+
-     machine_class = select_machine();
- 
-     set_memory_options(&ram_slots, &maxram_size, machine_class);
-@@ -4560,6 +4589,10 @@ int main(int argc, char **argv, char **envp)
-     }
-     parse_numa_opts(current_machine);
- 
-+    /* do monitor/qmp handling at preconfig state if requested */
-+    main_loop();
-+
-+    /* from here on runstate is RUN_STATE_PRELAUNCH */
-     machine_run_board_init(current_machine);
- 
-     realtime_init();
--- 
-2.7.4
+Kevin
+
+--d6Gm4EdcadzBjdND
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJa9dILAAoJEH8JsnLIjy/WOD0P/j4kct48Y4E2Oo5wksj3jAB9
+xK4QAfwRFbvSYkxB6RCVBqbR982pUzL5FICnnK/cuX2aHQz967lqbxARZ5nbf9WG
+Z/95j/HtmTl1KntvLClWkbIn/tlp5VIBMObS+kJq8xNogfy1Z30ilWSN3E3XfxJc
+Idzj2z84Eubak0WIZUv3fbgaaNYOTPH4FfHUvOkLofj7h1t51HAstu6z4aevizXK
+p7uMFXhnzajkSKmyIXkjnCsbkZZm8Inbu25QfvFeu4oPP9VRmJjJBqoY6cKaIl8b
+yAc15OxST8+5XCLx6fRZlwtHaY3jiNwjIj1nWBiD88ZYSsolTHqeslLjXPWDy7sA
+gOq/nBSUnPNQ4S+Skj52+bjOWLaUIrxeAZgCwe4nE8oxj0WjET5y0JXxLv9TLTEI
+e4Jn5ZI3SgmVg0r9j4JwoSQwkMQp/dx/x8N7g//EGAiAISZmvbxweYehvylKmj4C
+4iKgAR7qX9Ji0BRgOuxQe6OosHJdzkHQ844zRf3/jPRqesWjHGcC5B2tA0phI3gd
+EUIY6XJ05KjKYLE17WxtN4/m6uoPr2DTb1Aqb/V27aJfS10XRyWPjpBWtxowmSBf
+lx2QBTaE4WB4xITG5pseU1FEW6jcv4NvcjlM+mW8W2pA2uguan9ofrHkqHqFy0tg
+cw7tYgR9dYNIzM+XB7cf
+=Mhfy
+-----END PGP SIGNATURE-----
+
+--d6Gm4EdcadzBjdND--
