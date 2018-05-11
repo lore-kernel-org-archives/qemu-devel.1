@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fH5Wo-0003aK-9l
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 06:43:59 -0400
+	(envelope-from <renyime@gmail.com>) id 1fH5Zm-0006a5-Ms
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 06:47:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fH5Wn-0003ZG-2D
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 06:43:58 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:46178)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fH5Wm-0003Z1-Ry
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 06:43:57 -0400
-Received: by mail-ot0-x244.google.com with SMTP id t1-v6so5697928ott.13
-	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 03:43:56 -0700 (PDT)
+	(envelope-from <renyime@gmail.com>) id 1fH5Zk-0004zW-1h
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 06:47:02 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180510205949.26455-1-laurent@vivier.eu>
-References: <20180510205949.26455-1-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 11 May 2018 11:43:35 +0100
-Message-ID: <CAFEAcA99yoOKX4Vy8e455cFQOe_WZN0rgu+CV1LLyvSonxQCoA@mail.gmail.com>
+References: <1525782441-2224-1-git-send-email-ivanren@tencent.com>
+	<84eb5455-cfd9-ba2b-9a7b-12c5204290bc@redhat.com>
+In-Reply-To: <84eb5455-cfd9-ba2b-9a7b-12c5204290bc@redhat.com>
+From: Ivan Ren <renyime@gmail.com>
+Date: Fri, 11 May 2018 18:46:47 +0800
+Message-ID: <CA+6E1=kV_RN8t8=9n=gdWu8g4UqaaBzwpnG7eSR0PmEBdELe9g@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] linux-user: correctly align types in
- thunking code
+Subject: Re: [Qemu-devel] [PATCH] qcow2: fix preallocation with metadata on
+ bare block device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,162 +23,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
+To: eblake@redhat.com
+Cc: mreitz@redhat.com, kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On 10 May 2018 at 21:59, Laurent Vivier <laurent@vivier.eu> wrote:
-> This is a follow up
-> of patch:
+> This says what the patch does, but not why.  What is the actual use case
+> scenario where changing semantics to have the qcow2 overwrite the
+> garbage to read 0 instead of any pre-existing garbage, when dealing with
+> portions of the disk that have not yet been written by the guest?  Are
+> you trying to prevent a security leak of previous information that may
+> be resident on the block device?
+
+Yes, any pre-existing data on the device should not be read, otherwise it
+may lead security leak in cloud environment.
+For metadata preallocated qcow2 on bare block device, I think
+QCOW_OFLAG_ZERO is more suitable to prevent this problem than other(such as
+do "dd" before create a preallocated qcow2).
+
+> > +            /* Check the underlying device type.
+> > +             * If the underlying device is a block device, we add
+> > +             * QCOW_OFLAG_ZERO for all preallocated l2 entry to ignore
+dirty
+> > +             * data on block device.
+> > +             * If the underlying device can't be used with stat(return
+< 0),
+> > +             * treat it as a regular file.
+> > +             */
+> > +            if (stat(bs->filename, &st) < 0 || !S_ISBLK(st.st_mode)) {
 >
->         commit c2e3dee6e03527baf8698698cce76b1a3174969a
->         Author: Laurent Vivier <laurent@vivier.eu>
->         Date:   Sun Feb 13 23:37:34 2011 +0100
+> Won't work.  You cannot guarantee that bs->filename is a local file; it
+> could be a remote protocol, such as NBD or gluster.  If you need to know
+> whether bs->filename has a property that it reads as all zeroes when
+> first initialized, we already have
+> BlockDriverInfo::unallocated_blocks_are_zero, which is set to true for
+> regular files and false for block devices.
+
+Yes, BlockDriverInfo::unallocated_blocks_are_zero is enough and better to
+distinguish the device.
+
+> > +                ret = qcow2_alloc_cluster_link_l2(bs, meta, 0);
+> > +            } else {
+> > +                ret = qcow2_alloc_cluster_link_l2(bs, meta,
+QCOW_OFLAG_ZERO);
 >
->             linux-user: Define target alignment size
+> Why would we not want to pass QCOW_OFLAG_ZERO always, rather than
+> special-casing it based on what the underlying protocol might already
+> have in place?
+
+Yea, it sounds good. Always pass QCOW_OFLAG_ZERO in preallocation has no
+problem and can guarantee no garbage will be read when preallcate metadata
+for qcow2 on any underlying device.
+
+I will send a v2 patch.
+
+Thanks.
+
+On Thu, May 10, 2018 at 11:57 PM Eric Blake <eblake@redhat.com> wrote:
+
+> On 05/08/2018 07:27 AM, Ivan Ren wrote:
+> > Create a qcow2 directly on bare block device with
+> > "-o preallocation=metadata" option. When read this qcow2, it will
+> > return dirty data of block device.
 >
-> In my case m68k aligns "int" on 2 not 4. You can check this with the
-> following program:
+> Yes, reading garbage is expected.
 >
-> int main(void)
-> {
->         struct rtentry rt;
->         printf("rt_pad1 %ld %zd\n", offsetof(struct rtentry, rt_pad1),
->                 sizeof(rt.rt_pad1));
->         printf("rt_dst %ld %zd\n", offsetof(struct rtentry, rt_dst),
->                 sizeof(rt.rt_dst));
->         printf("rt_gateway %ld %zd\n", offsetof(struct rtentry, rt_gateway),
->                 sizeof(rt.rt_gateway));
->         printf("rt_genmask %ld %zd\n", offsetof(struct rtentry, rt_genmask),
->                 sizeof(rt.rt_genmask));
->         printf("rt_flags %ld %zd\n", offsetof(struct rtentry, rt_flags),
->                 sizeof(rt.rt_flags));
->         printf("rt_pad2 %ld %zd\n", offsetof(struct rtentry, rt_pad2),
->                 sizeof(rt.rt_pad2));
->         printf("rt_pad3 %ld %zd\n", offsetof(struct rtentry, rt_pad3),
->                 sizeof(rt.rt_pad3));
->         printf("rt_pad4 %ld %zd\n", offsetof(struct rtentry, rt_pad4),
->                 sizeof(rt.rt_pad4));
->         printf("rt_metric %ld %zd\n", offsetof(struct rtentry, rt_metric),
->                 sizeof(rt.rt_metric));
->         printf("rt_dev %ld %zd\n", offsetof(struct rtentry, rt_dev),
->                 sizeof(rt.rt_dev));
->         printf("rt_mtu %ld %zd\n", offsetof(struct rtentry, rt_mtu),
->                 sizeof(rt.rt_mtu));
->         printf("rt_window %ld %zd\n", offsetof(struct rtentry, rt_window),
->                 sizeof(rt.rt_window));
->         printf("rt_irtt %ld %zd\n", offsetof(struct rtentry, rt_irtt),
->                 sizeof(rt.rt_irtt));
-> }
+> > This patch add QCOW_OFLAG_ZERO
+> > for all preallocated l2 entry if the underlying device is a bare
+> > block device.
 >
-> And result is :
+> This says what the patch does, but not why.  What is the actual use case
+> scenario where changing semantics to have the qcow2 overwrite the
+> garbage to read 0 instead of any pre-existing garbage, when dealing with
+> portions of the disk that have not yet been written by the guest?  Are
+> you trying to prevent a security leak of previous information that may
+> be resident on the block device?
 >
-> i386
+> >
+> > Signed-off-by: Ivan Ren <ivanren@tencent.com>
+> > ---
+> >   block/qcow2-cluster.c |  5 +++--
+> >   block/qcow2.c         | 19 ++++++++++++++++---
+> >   block/qcow2.h         |  3 ++-
+> >   3 files changed, 21 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+> > index 1aee726..b9e0ceb 100644
+> > --- a/block/qcow2-cluster.c
+> > +++ b/block/qcow2-cluster.c
+> > @@ -919,7 +919,8 @@ fail:
+> >       return ret;
+> >   }
+> >
+> > -int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m)
+> > +int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m,
+> > +                                uint64_t flags)
+> >   {
+> >       BDRVQcow2State *s = bs->opaque;
+> >       int i, j = 0, l2_index, ret;
+> > @@ -969,7 +970,7 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState
+> *bs, QCowL2Meta *m)
+> >           }
+> >
+> >           l2_slice[l2_index + i] = cpu_to_be64((cluster_offset +
+> > -                    (i << s->cluster_bits)) | QCOW_OFLAG_COPIED);
+> > +                    (i << s->cluster_bits)) | QCOW_OFLAG_COPIED |
+> flags);
+> >        }
+> >
+> >
+> > diff --git a/block/qcow2.c b/block/qcow2.c
+> > index 2f36e63..093735c 100644
+> > --- a/block/qcow2.c
+> > +++ b/block/qcow2.c
+> > @@ -2044,7 +2044,7 @@ static coroutine_fn int
+> qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+> >           while (l2meta != NULL) {
+> >               QCowL2Meta *next;
+> >
+> > -            ret = qcow2_alloc_cluster_link_l2(bs, l2meta);
+> > +            ret = qcow2_alloc_cluster_link_l2(bs, l2meta, 0);
+> >               if (ret < 0) {
+> >                   goto fail;
+> >               }
+> > @@ -2534,6 +2534,7 @@ static void coroutine_fn preallocate_co(void
+> *opaque)
+> >       uint64_t host_offset = 0;
+> >       unsigned int cur_bytes;
+> >       int ret;
+> > +    struct stat st;
+> >       QCowL2Meta *meta;
+> >
+> >       qemu_co_mutex_lock(&s->lock);
+> > @@ -2552,7 +2553,19 @@ static void coroutine_fn preallocate_co(void
+> *opaque)
+> >           while (meta) {
+> >               QCowL2Meta *next = meta->next;
+> >
+> > -            ret = qcow2_alloc_cluster_link_l2(bs, meta);
+> > +            /* Check the underlying device type.
+> > +             * If the underlying device is a block device, we add
+> > +             * QCOW_OFLAG_ZERO for all preallocated l2 entry to ignore
+> dirty
+> > +             * data on block device.
+> > +             * If the underlying device can't be used with stat(return
+> < 0),
+> > +             * treat it as a regular file.
+> > +             */
+> > +            if (stat(bs->filename, &st) < 0 || !S_ISBLK(st.st_mode)) {
 >
-> rt_pad1 0 4
-> rt_dst 4 16
-> rt_gateway 20 16
-> rt_genmask 36 16
-> rt_flags 52 2
-> rt_pad2 54 2
-> rt_pad3 56 4
-> rt_pad4 62 2
-> rt_metric 64 2
-> rt_dev 68 4
-> rt_mtu 72 4
-> rt_window 76 4
-> rt_irtt 80 2
+> Won't work.  You cannot guarantee that bs->filename is a local file; it
+> could be a remote protocol, such as NBD or gluster.  If you need to know
+> whether bs->filename has a property that it reads as all zeroes when
+> first initialized, we already have
+> BlockDriverInfo::unallocated_blocks_are_zero, which is set to true for
+> regular files and false for block devices.
 >
-> m68k
+> > +                ret = qcow2_alloc_cluster_link_l2(bs, meta, 0);
+> > +            } else {
+> > +                ret = qcow2_alloc_cluster_link_l2(bs, meta,
+> QCOW_OFLAG_ZERO);
 >
-> rt_pad1 0 4
-> rt_dst 4 16
-> rt_gateway 20 16
-> rt_genmask 36 16
-> rt_flags 52 2
-> rt_pad2 54 2
-> rt_pad3 56 4
-> rt_pad4 62 2
-> rt_metric 64 2
-> rt_dev 66 4
-> rt_mtu 70 4
-> rt_window 74 4
-> rt_irtt 78 2
+> Why would we not want to pass QCOW_OFLAG_ZERO always, rather than
+> special-casing it based on what the underlying protocol might already
+> have in place?
 >
-> This affects the "route" command :
+> > +            }
+> > +
+> >               if (ret < 0) {
+> >                   qcow2_free_any_clusters(bs, meta->alloc_offset,
+> >                                           meta->nb_clusters,
+> QCOW2_DISCARD_NEVER);
+> > @@ -3458,7 +3471,7 @@ static int qcow2_truncate(BlockDriverState *bs,
+> int64_t offset,
+> >               };
+> >               qemu_co_queue_init(&allocation.dependent_requests);
+> >
+> > -            ret = qcow2_alloc_cluster_link_l2(bs, &allocation);
+> > +            ret = qcow2_alloc_cluster_link_l2(bs, &allocation, 0);
+> >               if (ret < 0) {
+> >                   error_setg_errno(errp, -ret, "Failed to update L2
+> tables");
+> >                   qcow2_free_clusters(bs, host_offset,
+> > diff --git a/block/qcow2.h b/block/qcow2.h
+> > index adf5c39..9a59602 100644
+> > --- a/block/qcow2.h
+> > +++ b/block/qcow2.h
+> > @@ -617,7 +617,8 @@ uint64_t
+> qcow2_alloc_compressed_cluster_offset(BlockDriverState *bs,
+> >                                            uint64_t offset,
+> >                                            int compressed_size);
+> >
+> > -int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m);
+> > +int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m,
+> > +                                uint64_t flags);
+> >   int qcow2_cluster_discard(BlockDriverState *bs, uint64_t offset,
+> >                             uint64_t bytes, enum qcow2_discard_type type,
+> >                             bool full_discard);
+> >
 >
-> WITHOUT this patch:
->
-> $ sudo route add -net default gw 10.0.3.1 window 1024 irtt 2 eth0
-> $ netstat -nr
-> Kernel IP routing table
-> Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
-> 0.0.0.0         10.0.3.1        0.0.0.0         UG        0 67108866  32768 eth0
-> 10.0.3.0        0.0.0.0         255.255.255.0   U         0 0          0 eth0
->
-> WITH this patch:
->
-> $ sudo route add -net default gw 10.0.3.1 window 1024 irtt 2 eth0
-> $ netstat -nr
-> Kernel IP routing table
-> Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
-> 0.0.0.0         10.0.3.1        0.0.0.0         UG        0 1024       2 eth0
-> 10.0.3.0        0.0.0.0         255.255.255.0   U         0 0          0 eth0
->
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->  include/exec/user/thunk.h | 22 +++++++++++++++++-----
->  1 file changed, 17 insertions(+), 5 deletions(-)
->
-> diff --git a/include/exec/user/thunk.h b/include/exec/user/thunk.h
-> index f19ef4b230..8f55b233b3 100644
-> --- a/include/exec/user/thunk.h
-> +++ b/include/exec/user/thunk.h
-> @@ -149,20 +149,32 @@ static inline int thunk_type_align(const argtype *type_ptr, int is_host)
->      case TYPE_CHAR:
->          return 1;
->      case TYPE_SHORT:
-> -        return 2;
-> +        if (is_host) {
-> +            return __alignof__(short);
-> +        } else {
-> +            return ABI_SHORT_ALIGNMENT;
-> +        }
->      case TYPE_INT:
-> -        return 4;
-> +        if (is_host) {
-> +            return __alignof__(int);
-> +        } else {
-> +            return ABI_INT_ALIGNMENT;
-> +        }
->      case TYPE_LONGLONG:
->      case TYPE_ULONGLONG:
-> -        return 8;
-> +        if (is_host) {
-> +            return __alignof__(long long);
-> +        } else {
-> +            return ABI_LLONG_ALIGNMENT;
-> +        }
->      case TYPE_LONG:
->      case TYPE_ULONG:
->      case TYPE_PTRVOID:
->      case TYPE_PTR:
->          if (is_host) {
-> -            return sizeof(void *);
-> +            return __alignof__(long);
->          } else {
-> -            return TARGET_ABI_BITS / 8;
-> +            return ABI_LONG_ALIGNMENT;
->          }
->          break;
->      case TYPE_OLDDEVT:
 > --
-
-This definitely looks like the right thing. As well as m68k,
-this will also affect sh4 and i386 (where long long is 4
-aligned but we were saying it should be 8 aligned) -- I wonder
-if that fixes any bugs...
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+>
