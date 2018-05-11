@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGz6t-0004df-Vm
+	(envelope-from <richard.henderson@linaro.org>) id 1fGz6t-0004dg-Vo
 	for qemu-devel@nongnu.org; Thu, 10 May 2018 23:52:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGz6q-00067X-RM
+	(envelope-from <richard.henderson@linaro.org>) id 1fGz6r-00067m-Rz
 	for qemu-devel@nongnu.org; Thu, 10 May 2018 23:52:47 -0400
-Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:43571)
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:41820)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fGz6q-00067H-LP
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 23:52:44 -0400
-Received: by mail-pl0-x244.google.com with SMTP id a39-v6so2495863pla.10
-	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 20:52:44 -0700 (PDT)
+	id 1fGz6r-00067b-Ly
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 23:52:45 -0400
+Received: by mail-pl0-x242.google.com with SMTP id az12-v6so2500480plb.8
+	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 20:52:45 -0700 (PDT)
 Received: from cloudburst.twiddle.net (97-113-2-170.tukw.qwest.net.
 	[97.113.2.170]) by smtp.gmail.com with ESMTPSA id
-	e18-v6sm3495636pfi.100.2018.05.10.20.52.41
+	e18-v6sm3495636pfi.100.2018.05.10.20.52.42
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 10 May 2018 20:52:41 -0700 (PDT)
+	Thu, 10 May 2018 20:52:43 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 10 May 2018 20:52:31 -0700
-Message-Id: <20180511035240.4016-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 0/9] Honor CPU_DUMP_FPU
+Date: Thu, 10 May 2018 20:52:32 -0700
+Message-Id: <20180511035240.4016-2-richard.henderson@linaro.org>
+In-Reply-To: <20180511035240.4016-1-richard.henderson@linaro.org>
+References: <20180511035240.4016-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 1/9] target/alpha: Honor CPU_DUMP_FPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,36 +34,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-With Peter's new patch for "-d fpu", it makes sense to honor
-this setting in as many targets as currently dump the fpu.
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/alpha/helper.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-
-r~
-
-
-Richard Henderson (9):
-  target/alpha: Honor CPU_DUMP_FPU
-  target/mips: Honor CPU_DUMP_FPU
-  target/ppc: Honor CPU_DUMP_FPU
-  target/riscv: Introduce cpu_riscv_get_fcsr
-  target/riscv: Honor CPU_DUMP_FPU
-  target/s390x: Honor CPU_DUMP_FPU
-  target/sparc: Honor CPU_DUMP_FPU
-  target/unicore32: Honor CPU_DUMP_FPU
-  target/xtensa: Honor CPU_DUMP_FPU
-
- target/riscv/cpu.h           |  1 +
- target/alpha/helper.c        | 17 ++++++++---------
- target/mips/translate.c      |  3 ++-
- target/ppc/translate.c       | 20 +++++++++++++-------
- target/riscv/cpu.c           | 16 +++++++++++-----
- target/riscv/fpu_helper.c    |  6 ++++++
- target/riscv/op_helper.c     |  3 +--
- target/s390x/helper.c        | 23 ++++++++++++-----------
- target/sparc/cpu.c           | 17 ++++++++++-------
- target/unicore32/translate.c |  4 +++-
- target/xtensa/translate.c    |  3 ++-
- 11 files changed, 69 insertions(+), 44 deletions(-)
-
+diff --git a/target/alpha/helper.c b/target/alpha/helper.c
+index 8a6a948572..57e2c212b3 100644
+--- a/target/alpha/helper.c
++++ b/target/alpha/helper.c
+@@ -442,20 +442,19 @@ void alpha_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
+     cpu_fprintf(f, "     PC  " TARGET_FMT_lx "      PS  %02x\n",
+                 env->pc, extract32(env->flags, ENV_FLAG_PS_SHIFT, 8));
+     for (i = 0; i < 31; i++) {
+-        cpu_fprintf(f, "IR%02d %s " TARGET_FMT_lx " ", i,
+-                    linux_reg_names[i], cpu_alpha_load_gr(env, i));
+-        if ((i % 3) == 2)
+-            cpu_fprintf(f, "\n");
++        cpu_fprintf(f, "IR%02d %s " TARGET_FMT_lx "%c", i,
++                    linux_reg_names[i], cpu_alpha_load_gr(env, i),
++                    (i % 3) == 2 ? '\n' : ' ');
+     }
+ 
+     cpu_fprintf(f, "lock_a   " TARGET_FMT_lx " lock_v   " TARGET_FMT_lx "\n",
+                 env->lock_addr, env->lock_value);
+ 
+-    for (i = 0; i < 31; i++) {
+-        cpu_fprintf(f, "FIR%02d    " TARGET_FMT_lx " ", i,
+-                    *((uint64_t *)(&env->fir[i])));
+-        if ((i % 3) == 2)
+-            cpu_fprintf(f, "\n");
++    if (flags & CPU_DUMP_FPU) {
++        for (i = 0; i < 31; i++) {
++            cpu_fprintf(f, "FIR%02d    %016" PRIx64 "%c", i, env->fir[i],
++                        (i % 3) == 2 ? '\n' : ' ');
++        }
+     }
+     cpu_fprintf(f, "\n");
+ }
 -- 
 2.17.0
