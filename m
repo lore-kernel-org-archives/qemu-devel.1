@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46891)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fH6rZ-00035Z-0Q
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 08:09:30 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fH6rZ-00035X-06
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 08:09:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fH6rX-0003RY-VC
+	(envelope-from <peter.maydell@linaro.org>) id 1fH6rY-0003Rn-8P
 	for qemu-devel@nongnu.org; Fri, 11 May 2018 08:09:28 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Fri, 11 May 2018 20:08:19 +0800
-Message-Id: <20180511120823.7892-7-famz@redhat.com>
-In-Reply-To: <20180511120823.7892-1-famz@redhat.com>
-References: <20180511120823.7892-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 06/10] iscsi: Query and save device
- designator when opening
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:45111)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fH6rY-0003RT-4B
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 08:09:28 -0400
+Received: by mail-ot0-x243.google.com with SMTP id 15-v6so5937144otn.12
+	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 05:09:28 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180510222601.19944-3-laurent@vivier.eu>
+References: <20180510222601.19944-1-laurent@vivier.eu>
+	<20180510222601.19944-3-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 11 May 2018 13:09:07 +0100
+Message-ID: <CAFEAcA_SiFBwZ3gPSe50UiZ2bmuUDLYR03X0Se25XxZQEC_UEQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 2/5] linux-user: move alpha socket.h
+ definitions to alpha/sockbits.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,110 +30,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, eblake@redhat.com
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Riku Voipio <riku.voipio@iki.fi>, Yongbok Kim <yongbok.kim@mips.com>, Richard Henderson <rth@twiddle.net>
 
-The device designator data returned in INQUIRY command will be useful to
-fill in source/target fields during copy offloading. Do this when
-connecting to the target and save the data for later use.
+On 10 May 2018 at 23:25, Laurent Vivier <laurent@vivier.eu> wrote:
+> No code change.
+>
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- block/iscsi.c            | 41 +++++++++++++++++++++++++++++++++++++++++
- include/scsi/constants.h |  2 ++
- 2 files changed, 43 insertions(+)
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-diff --git a/block/iscsi.c b/block/iscsi.c
-index d19ae0e398..5811ff1d51 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -68,6 +68,7 @@ typedef struct IscsiLun {
-     QemuMutex mutex;
-     struct scsi_inquiry_logical_block_provisioning lbp;
-     struct scsi_inquiry_block_limits bl;
-+    struct scsi_inquiry_device_designator *dd;
-     unsigned char *zeroblock;
-     /* The allocmap tracks which clusters (pages) on the iSCSI target are
-      * allocated and which are not. In case a target returns zeros for
-@@ -1740,6 +1741,30 @@ static QemuOptsList runtime_opts = {
-     },
- };
- 
-+static void iscsi_save_designator(IscsiLun *lun,
-+                                  struct scsi_inquiry_device_identification *inq_di)
-+{
-+    struct scsi_inquiry_device_designator *desig, *copy = NULL;
-+
-+    for (desig = inq_di->designators; desig; desig = desig->next) {
-+        if (desig->association ||
-+            desig->designator_type > SCSI_DESIGNATOR_TYPE_NAA) {
-+            continue;
-+        }
-+        /* NAA works better than T10 vendor ID based designator. */
-+        if (!copy || copy->designator_type < desig->designator_type) {
-+            copy = desig;
-+        }
-+    }
-+    if (copy) {
-+        lun->dd = g_new(struct scsi_inquiry_device_designator, 1);
-+        *lun->dd = *copy;
-+        lun->dd->next = NULL;
-+        lun->dd->designator = g_malloc(copy->designator_length);
-+        memcpy(lun->dd->designator, copy->designator, copy->designator_length);
-+    }
-+}
-+
- static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
-                       Error **errp)
- {
-@@ -1922,6 +1947,7 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
-         struct scsi_task *inq_task;
-         struct scsi_inquiry_logical_block_provisioning *inq_lbp;
-         struct scsi_inquiry_block_limits *inq_bl;
-+        struct scsi_inquiry_device_identification *inq_di;
-         switch (inq_vpd->pages[i]) {
-         case SCSI_INQUIRY_PAGECODE_LOGICAL_BLOCK_PROVISIONING:
-             inq_task = iscsi_do_inquiry(iscsilun->iscsi, iscsilun->lun, 1,
-@@ -1947,6 +1973,17 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
-                    sizeof(struct scsi_inquiry_block_limits));
-             scsi_free_scsi_task(inq_task);
-             break;
-+        case SCSI_INQUIRY_PAGECODE_DEVICE_IDENTIFICATION:
-+            inq_task = iscsi_do_inquiry(iscsilun->iscsi, iscsilun->lun, 1,
-+                                    SCSI_INQUIRY_PAGECODE_DEVICE_IDENTIFICATION,
-+                                    (void **) &inq_di, errp);
-+            if (inq_task == NULL) {
-+                ret = -EINVAL;
-+                goto out;
-+            }
-+            iscsi_save_designator(iscsilun, inq_di);
-+            scsi_free_scsi_task(inq_task);
-+            break;
-         default:
-             break;
-         }
-@@ -2003,6 +2040,10 @@ static void iscsi_close(BlockDriverState *bs)
-         iscsi_logout_sync(iscsi);
-     }
-     iscsi_destroy_context(iscsi);
-+    if (iscsilun->dd) {
-+        g_free(iscsilun->dd->designator);
-+        g_free(iscsilun->dd);
-+    }
-     g_free(iscsilun->zeroblock);
-     iscsi_allocmap_free(iscsilun);
-     qemu_mutex_destroy(&iscsilun->mutex);
-diff --git a/include/scsi/constants.h b/include/scsi/constants.h
-index a141dd71f8..54733b7110 100644
---- a/include/scsi/constants.h
-+++ b/include/scsi/constants.h
-@@ -311,4 +311,6 @@
- #define MMC_PROFILE_HDDVD_RW_DL         0x005A
- #define MMC_PROFILE_INVALID             0xFFFF
- 
-+#define IDENT_DESCR_TGT_DESCR 0xE4
-+
- #endif
--- 
-2.14.3
+thanks
+-- PMM
