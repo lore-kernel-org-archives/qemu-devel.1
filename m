@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGzaj-0000Zm-AG
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 00:23:40 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fGzam-0000dD-Dx
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 00:23:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGzah-000876-RR
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 00:23:37 -0400
-Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:43685)
+	(envelope-from <richard.henderson@linaro.org>) id 1fGzaj-00087S-9E
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 00:23:40 -0400
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:42026)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fGzah-00086t-It
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 00:23:35 -0400
-Received: by mail-pl0-x244.google.com with SMTP id a39-v6so2536175pla.10
-	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 21:23:35 -0700 (PDT)
+	id 1fGzaj-00087L-0i
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 00:23:37 -0400
+Received: by mail-pl0-x243.google.com with SMTP id u6-v6so2541623pls.9
+	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 21:23:36 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 10 May 2018 21:23:16 -0700
-Message-Id: <20180511042324.5070-6-richard.henderson@linaro.org>
+Date: Thu, 10 May 2018 21:23:17 -0700
+Message-Id: <20180511042324.5070-7-richard.henderson@linaro.org>
 In-Reply-To: <20180511042324.5070-1-richard.henderson@linaro.org>
 References: <20180511042324.5070-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 05/13] target/openrisc: Convert remainder of
- dec_misc insns
+Subject: [Qemu-devel] [PULL 06/13] target/openrisc: Convert dec_calc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,373 +32,477 @@ Cc: Stafford Horne <shorne@gmail.com>, peter.maydell@linaro.org
 Acked-by: Stafford Horne <shorne@gmail.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/openrisc/translate.c  | 279 +++++++++++++++--------------------
- target/openrisc/insns.decode |  35 ++++-
- 2 files changed, 151 insertions(+), 163 deletions(-)
+ target/openrisc/translate.c  | 322 +++++++++++++++++++----------------
+ target/openrisc/insns.decode |  76 ++++++---
+ 2 files changed, 229 insertions(+), 169 deletions(-)
 
 diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-index 794002aaaa..0100fbc460 100644
+index 0100fbc460..90520b0805 100644
 --- a/target/openrisc/translate.c
 +++ b/target/openrisc/translate.c
-@@ -829,174 +829,118 @@ static bool trans_l_sh(DisasContext *dc, arg_store *a, uint32_t insn)
-     return true;
+@@ -457,171 +457,199 @@ static void gen_msbu(DisasContext *dc, TCGv srca, TCGv srcb)
+     gen_ove_cy(dc);
  }
  
--static void dec_misc(DisasContext *dc, uint32_t insn)
-+static bool trans_l_nop(DisasContext *dc, arg_l_nop *a, uint32_t insn)
-+{
-+    LOG_DIS("l.nop %d\n", a->k);
-+    return true;
-+}
-+
-+static bool trans_l_addi(DisasContext *dc, arg_rri *a, uint32_t insn)
+-static void dec_calc(DisasContext *dc, uint32_t insn)
++static bool trans_l_add(DisasContext *dc, arg_dab *a, uint32_t insn)
  {
--    uint32_t op0, op1;
+-    uint32_t op0, op1, op2;
 -    uint32_t ra, rb, rd;
--    uint32_t L6, K5, K16, K5_11;
--    int32_t I16;
-     TCGv t0;
- 
--    op0 = extract32(insn, 26, 6);
--    op1 = extract32(insn, 24, 2);
+-    op0 = extract32(insn, 0, 4);
+-    op1 = extract32(insn, 8, 2);
+-    op2 = extract32(insn, 6, 2);
 -    ra = extract32(insn, 16, 5);
 -    rb = extract32(insn, 11, 5);
 -    rd = extract32(insn, 21, 5);
--    L6 = extract32(insn, 5, 6);
--    K5 = extract32(insn, 0, 5);
--    K16 = extract32(insn, 0, 16);
--    I16 = (int16_t)K16;
--    K5_11 = (extract32(insn, 21, 5) << 11) | extract32(insn, 0, 11);
-+    LOG_DIS("l.addi r%d, r%d, %d\n", a->d, a->a, a->i);
++    LOG_DIS("l.add r%d, r%d, r%d\n", a->d, a->a, a->b);
 +    check_r0_write(a->d);
-+    t0 = tcg_const_tl(a->i);
-+    gen_add(dc, cpu_R[a->d], cpu_R[a->a], t0);
-+    tcg_temp_free(t0);
++    gen_add(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
 +    return true;
 +}
  
--    switch (op0) {
--    case 0x05:
--        switch (op1) {
--        case 0x01:    /* l.nop */
--            LOG_DIS("l.nop %d\n", I16);
+-    switch (op1) {
+-    case 0:
+-        switch (op0) {
+-        case 0x0: /* l.add */
+-            LOG_DIS("l.add r%d, r%d, r%d\n", rd, ra, rb);
+-            gen_add(dc, cpu_R[rd], cpu_R[ra], cpu_R[rb]);
+-            return;
++static bool trans_l_addc(DisasContext *dc, arg_dab *a, uint32_t insn)
++{
++    LOG_DIS("l.addc r%d, r%d, r%d\n", a->d, a->a, a->b);
++    check_r0_write(a->d);
++    gen_addc(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
+ 
+-        case 0x1: /* l.addc */
+-            LOG_DIS("l.addc r%d, r%d, r%d\n", rd, ra, rb);
+-            gen_addc(dc, cpu_R[rd], cpu_R[ra], cpu_R[rb]);
+-            return;
++static bool trans_l_sub(DisasContext *dc, arg_dab *a, uint32_t insn)
++{
++    LOG_DIS("l.sub r%d, r%d, r%d\n", a->d, a->a, a->b);
++    check_r0_write(a->d);
++    gen_sub(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
+ 
+-        case 0x2: /* l.sub */
+-            LOG_DIS("l.sub r%d, r%d, r%d\n", rd, ra, rb);
+-            gen_sub(dc, cpu_R[rd], cpu_R[ra], cpu_R[rb]);
+-            return;
++static bool trans_l_and(DisasContext *dc, arg_dab *a, uint32_t insn)
++{
++    LOG_DIS("l.and r%d, r%d, r%d\n", a->d, a->a, a->b);
++    check_r0_write(a->d);
++    tcg_gen_and_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
+ 
+-        case 0x3: /* l.and */
+-            LOG_DIS("l.and r%d, r%d, r%d\n", rd, ra, rb);
+-            tcg_gen_and_tl(cpu_R[rd], cpu_R[ra], cpu_R[rb]);
+-            return;
++static bool trans_l_or(DisasContext *dc, arg_dab *a, uint32_t insn)
++{
++    LOG_DIS("l.or r%d, r%d, r%d\n", a->d, a->a, a->b);
++    check_r0_write(a->d);
++    tcg_gen_or_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
+ 
+-        case 0x4: /* l.or */
+-            LOG_DIS("l.or r%d, r%d, r%d\n", rd, ra, rb);
+-            tcg_gen_or_tl(cpu_R[rd], cpu_R[ra], cpu_R[rb]);
+-            return;
++static bool trans_l_xor(DisasContext *dc, arg_dab *a, uint32_t insn)
++{
++    LOG_DIS("l.xor r%d, r%d, r%d\n", a->d, a->a, a->b);
++    check_r0_write(a->d);
++    tcg_gen_xor_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
+ 
+-        case 0x5: /* l.xor */
+-            LOG_DIS("l.xor r%d, r%d, r%d\n", rd, ra, rb);
+-            tcg_gen_xor_tl(cpu_R[rd], cpu_R[ra], cpu_R[rb]);
+-            return;
++static bool trans_l_sll(DisasContext *dc, arg_dab *a, uint32_t insn)
++{
++    LOG_DIS("l.sll r%d, r%d, r%d\n", a->d, a->a, a->b);
++    check_r0_write(a->d);
++    tcg_gen_shl_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
+ 
+-        case 0x8:
+-            switch (op2) {
+-            case 0: /* l.sll */
+-                LOG_DIS("l.sll r%d, r%d, r%d\n", rd, ra, rb);
+-                tcg_gen_shl_tl(cpu_R[rd], cpu_R[ra], cpu_R[rb]);
+-                return;
+-            case 1: /* l.srl */
+-                LOG_DIS("l.srl r%d, r%d, r%d\n", rd, ra, rb);
+-                tcg_gen_shr_tl(cpu_R[rd], cpu_R[ra], cpu_R[rb]);
+-                return;
+-            case 2: /* l.sra */
+-                LOG_DIS("l.sra r%d, r%d, r%d\n", rd, ra, rb);
+-                tcg_gen_sar_tl(cpu_R[rd], cpu_R[ra], cpu_R[rb]);
+-                return;
+-            case 3: /* l.ror */
+-                LOG_DIS("l.ror r%d, r%d, r%d\n", rd, ra, rb);
+-                tcg_gen_rotr_tl(cpu_R[rd], cpu_R[ra], cpu_R[rb]);
+-                return;
+-            }
 -            break;
-+static bool trans_l_addic(DisasContext *dc, arg_rri *a, uint32_t insn)
++static bool trans_l_srl(DisasContext *dc, arg_dab *a, uint32_t insn)
 +{
-+    TCGv t0;
++    LOG_DIS("l.srl r%d, r%d, r%d\n", a->d, a->a, a->b);
++    check_r0_write(a->d);
++    tcg_gen_shr_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
  
--        default:
--            gen_illegal_exception(dc);
+-        case 0xc:
+-            switch (op2) {
+-            case 0: /* l.exths */
+-                LOG_DIS("l.exths r%d, r%d\n", rd, ra);
+-                tcg_gen_ext16s_tl(cpu_R[rd], cpu_R[ra]);
+-                return;
+-            case 1: /* l.extbs */
+-                LOG_DIS("l.extbs r%d, r%d\n", rd, ra);
+-                tcg_gen_ext8s_tl(cpu_R[rd], cpu_R[ra]);
+-                return;
+-            case 2: /* l.exthz */
+-                LOG_DIS("l.exthz r%d, r%d\n", rd, ra);
+-                tcg_gen_ext16u_tl(cpu_R[rd], cpu_R[ra]);
+-                return;
+-            case 3: /* l.extbz */
+-                LOG_DIS("l.extbz r%d, r%d\n", rd, ra);
+-                tcg_gen_ext8u_tl(cpu_R[rd], cpu_R[ra]);
+-                return;
+-            }
 -            break;
--        }
--        break;
-+    LOG_DIS("l.addic r%d, r%d, %d\n", a->d, a->a, a->i);
++static bool trans_l_sra(DisasContext *dc, arg_dab *a, uint32_t insn)
++{
++    LOG_DIS("l.sra r%d, r%d, r%d\n", a->d, a->a, a->b);
 +    check_r0_write(a->d);
-+    t0 = tcg_const_tl(a->i);
-+    gen_addc(dc, cpu_R[a->d], cpu_R[a->a], t0);
-+    tcg_temp_free(t0);
++    tcg_gen_sar_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
 +    return true;
 +}
  
--    case 0x13:    /* l.maci */
--        LOG_DIS("l.maci r%d, %d\n", ra, I16);
--        t0 = tcg_const_tl(I16);
--        gen_mac(dc, cpu_R[ra], t0);
--        tcg_temp_free(t0);
--        break;
-+static bool trans_l_muli(DisasContext *dc, arg_rri *a, uint32_t insn)
+-        case 0xd:
+-            switch (op2) {
+-            case 0: /* l.extws */
+-                LOG_DIS("l.extws r%d, r%d\n", rd, ra);
+-                tcg_gen_ext32s_tl(cpu_R[rd], cpu_R[ra]);
+-                return;
+-            case 1: /* l.extwz */
+-                LOG_DIS("l.extwz r%d, r%d\n", rd, ra);
+-                tcg_gen_ext32u_tl(cpu_R[rd], cpu_R[ra]);
+-                return;
+-            }
+-            break;
++static bool trans_l_ror(DisasContext *dc, arg_dab *a, uint32_t insn)
 +{
-+    TCGv t0;
++    LOG_DIS("l.ror r%d, r%d, r%d\n", a->d, a->a, a->b);
++    check_r0_write(a->d);
++    tcg_gen_rotr_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
  
--    case 0x09:    /* l.rfe */
--        LOG_DIS("l.rfe\n");
--        {
--#if defined(CONFIG_USER_ONLY)
--            return;
-+    LOG_DIS("l.muli r%d, r%d, %d\n", a->d, a->a, a->i);
-+    check_r0_write(a->d);
-+    t0 = tcg_const_tl(a->i);
-+    gen_mul(dc, cpu_R[a->d], cpu_R[a->a], t0);
-+    tcg_temp_free(t0);
-+    return true;
-+}
-+
-+static bool trans_l_maci(DisasContext *dc, arg_l_maci *a, uint32_t insn)
-+{
-+    TCGv t0;
-+
-+    LOG_DIS("l.maci r%d, %d\n", a->a, a->i);
-+    t0 = tcg_const_tl(a->i);
-+    gen_mac(dc, cpu_R[a->a], t0);
-+    tcg_temp_free(t0);
-+    return true;
-+}
-+
-+static bool trans_l_andi(DisasContext *dc, arg_rrk *a, uint32_t insn)
-+{
-+    LOG_DIS("l.andi r%d, r%d, %d\n", a->d, a->a, a->k);
-+    check_r0_write(a->d);
-+    tcg_gen_andi_tl(cpu_R[a->d], cpu_R[a->a], a->k);
-+    return true;
-+}
-+
-+static bool trans_l_ori(DisasContext *dc, arg_rrk *a, uint32_t insn)
-+{
-+    LOG_DIS("l.ori r%d, r%d, %d\n", a->d, a->a, a->k);
-+    check_r0_write(a->d);
-+    tcg_gen_ori_tl(cpu_R[a->d], cpu_R[a->a], a->k);
-+    return true;
-+}
-+
-+static bool trans_l_xori(DisasContext *dc, arg_rri *a, uint32_t insn)
-+{
-+    LOG_DIS("l.xori r%d, r%d, %d\n", a->d, a->a, a->i);
-+    check_r0_write(a->d);
-+    tcg_gen_xori_tl(cpu_R[a->d], cpu_R[a->a], a->i);
-+    return true;
-+}
-+
-+static bool trans_l_mfspr(DisasContext *dc, arg_l_mfspr *a, uint32_t insn)
-+{
-+    LOG_DIS("l.mfspr r%d, r%d, %d\n", a->d, a->a, a->k);
-+    check_r0_write(a->d);
-+
-+#ifdef CONFIG_USER_ONLY
-+    gen_illegal_exception(dc);
- #else
--            if (dc->mem_idx == MMU_USER_IDX) {
--                gen_illegal_exception(dc);
--                return;
+-        case 0xe: /* l.cmov */
+-            LOG_DIS("l.cmov r%d, r%d, r%d\n", rd, ra, rb);
+-            {
+-                TCGv zero = tcg_const_tl(0);
+-                tcg_gen_movcond_tl(TCG_COND_NE, cpu_R[rd], cpu_sr_f, zero,
+-                                   cpu_R[ra], cpu_R[rb]);
+-                tcg_temp_free(zero);
 -            }
--            gen_helper_rfe(cpu_env);
--            dc->is_jmp = DISAS_UPDATE;
--#endif
+-            return;
++static bool trans_l_exths(DisasContext *dc, arg_da *a, uint32_t insn)
++{
++    LOG_DIS("l.exths r%d, r%d\n", a->d, a->a);
++    check_r0_write(a->d);
++    tcg_gen_ext16s_tl(cpu_R[a->d], cpu_R[a->a]);
++    return true;
++}
+ 
+-        case 0xf: /* l.ff1 */
+-            LOG_DIS("l.ff1 r%d, r%d, r%d\n", rd, ra, rb);
+-            tcg_gen_ctzi_tl(cpu_R[rd], cpu_R[ra], -1);
+-            tcg_gen_addi_tl(cpu_R[rd], cpu_R[rd], 1);
+-            return;
 -        }
 -        break;
--
--    case 0x1c:    /* l.cust1 */
--        LOG_DIS("l.cust1\n");
--        break;
--
--    case 0x1d:    /* l.cust2 */
--        LOG_DIS("l.cust2\n");
--        break;
--
--    case 0x1e:    /* l.cust3 */
--        LOG_DIS("l.cust3\n");
--        break;
--
--    case 0x1f:    /* l.cust4 */
--        LOG_DIS("l.cust4\n");
--        break;
--
--    case 0x3c:    /* l.cust5 */
--        LOG_DIS("l.cust5 r%d, r%d, r%d, %d, %d\n", rd, ra, rb, L6, K5);
--        break;
--
--    case 0x3d:    /* l.cust6 */
--        LOG_DIS("l.cust6\n");
--        break;
--
--    case 0x3e:    /* l.cust7 */
--        LOG_DIS("l.cust7\n");
--        break;
--
--    case 0x3f:    /* l.cust8 */
--        LOG_DIS("l.cust8\n");
--        break;
--
--    case 0x27:    /* l.addi */
--        LOG_DIS("l.addi r%d, r%d, %d\n", rd, ra, I16);
--        check_r0_write(rd);
--        t0 = tcg_const_tl(I16);
--        gen_add(dc, cpu_R[rd], cpu_R[ra], t0);
--        tcg_temp_free(t0);
--        break;
--
--    case 0x28:    /* l.addic */
--        LOG_DIS("l.addic r%d, r%d, %d\n", rd, ra, I16);
--        check_r0_write(rd);
--        t0 = tcg_const_tl(I16);
--        gen_addc(dc, cpu_R[rd], cpu_R[ra], t0);
--        tcg_temp_free(t0);
--        break;
--
--    case 0x29:    /* l.andi */
--        LOG_DIS("l.andi r%d, r%d, %d\n", rd, ra, K16);
--        check_r0_write(rd);
--        tcg_gen_andi_tl(cpu_R[rd], cpu_R[ra], K16);
--        break;
--
--    case 0x2a:    /* l.ori */
--        LOG_DIS("l.ori r%d, r%d, %d\n", rd, ra, K16);
--        check_r0_write(rd);
--        tcg_gen_ori_tl(cpu_R[rd], cpu_R[ra], K16);
--        break;
--
--    case 0x2b:    /* l.xori */
--        LOG_DIS("l.xori r%d, r%d, %d\n", rd, ra, I16);
--        check_r0_write(rd);
--        tcg_gen_xori_tl(cpu_R[rd], cpu_R[ra], I16);
--        break;
--
--    case 0x2c:    /* l.muli */
--        LOG_DIS("l.muli r%d, r%d, %d\n", rd, ra, I16);
--        check_r0_write(rd);
--        t0 = tcg_const_tl(I16);
--        gen_mul(dc, cpu_R[rd], cpu_R[ra], t0);
--        tcg_temp_free(t0);
--        break;
--
--    case 0x2d:    /* l.mfspr */
--        LOG_DIS("l.mfspr r%d, r%d, %d\n", rd, ra, K16);
--        check_r0_write(rd);
--        {
--#if defined(CONFIG_USER_ONLY)
++static bool trans_l_extbs(DisasContext *dc, arg_da *a, uint32_t insn)
++{
++    LOG_DIS("l.extbs r%d, r%d\n", a->d, a->a);
++    check_r0_write(a->d);
++    tcg_gen_ext8s_tl(cpu_R[a->d], cpu_R[a->a]);
++    return true;
++}
+ 
+-    case 1:
+-        switch (op0) {
+-        case 0xf: /* l.fl1 */
+-            LOG_DIS("l.fl1 r%d, r%d, r%d\n", rd, ra, rb);
+-            tcg_gen_clzi_tl(cpu_R[rd], cpu_R[ra], TARGET_LONG_BITS);
+-            tcg_gen_subfi_tl(cpu_R[rd], TARGET_LONG_BITS, cpu_R[rd]);
 -            return;
--#else
--            TCGv_i32 ti = tcg_const_i32(K16);
--            if (dc->mem_idx == MMU_USER_IDX) {
--                gen_illegal_exception(dc);
--                return;
--            }
--            gen_helper_mfspr(cpu_R[rd], cpu_env, cpu_R[rd], cpu_R[ra], ti);
--            tcg_temp_free_i32(ti);
--#endif
 -        }
 -        break;
--
--    case 0x30:    /* l.mtspr */
--        LOG_DIS("l.mtspr r%d, r%d, %d\n", ra, rb, K5_11);
--        {
--#if defined(CONFIG_USER_ONLY)
++static bool trans_l_exthz(DisasContext *dc, arg_da *a, uint32_t insn)
++{
++    LOG_DIS("l.exthz r%d, r%d\n", a->d, a->a);
++    check_r0_write(a->d);
++    tcg_gen_ext16u_tl(cpu_R[a->d], cpu_R[a->a]);
++    return true;
++}
+ 
+-    case 2:
+-        break;
++static bool trans_l_extbz(DisasContext *dc, arg_da *a, uint32_t insn)
++{
++    LOG_DIS("l.extbz r%d, r%d\n", a->d, a->a);
++    check_r0_write(a->d);
++    tcg_gen_ext8u_tl(cpu_R[a->d], cpu_R[a->a]);
++    return true;
++}
+ 
+-    case 3:
+-        switch (op0) {
+-        case 0x6: /* l.mul */
+-            LOG_DIS("l.mul r%d, r%d, r%d\n", rd, ra, rb);
+-            gen_mul(dc, cpu_R[rd], cpu_R[ra], cpu_R[rb]);
 -            return;
--#else
--            TCGv_i32 im = tcg_const_i32(K5_11);
--            if (dc->mem_idx == MMU_USER_IDX) {
--                gen_illegal_exception(dc);
--                return;
--            }
--            gen_helper_mtspr(cpu_env, cpu_R[ra], cpu_R[rb], im);
--            tcg_temp_free_i32(im);
--#endif
++static bool trans_l_cmov(DisasContext *dc, arg_dab *a, uint32_t insn)
++{
++    TCGv zero;
++    LOG_DIS("l.cmov r%d, r%d, r%d\n", a->d, a->a, a->b);
+ 
+-        case 0x7: /* l.muld */
+-            LOG_DIS("l.muld r%d, r%d\n", ra, rb);
+-            gen_muld(dc, cpu_R[ra], cpu_R[rb]);
+-            break;
++    check_r0_write(a->d);
++    zero = tcg_const_tl(0);
++    tcg_gen_movcond_tl(TCG_COND_NE, cpu_R[a->d], cpu_sr_f, zero,
++                       cpu_R[a->a], cpu_R[a->b]);
++    tcg_temp_free(zero);
++    return true;
++}
+ 
+-        case 0x9: /* l.div */
+-            LOG_DIS("l.div r%d, r%d, r%d\n", rd, ra, rb);
+-            gen_div(dc, cpu_R[rd], cpu_R[ra], cpu_R[rb]);
+-            return;
++static bool trans_l_ff1(DisasContext *dc, arg_da *a, uint32_t insn)
++{
++    LOG_DIS("l.ff1 r%d, r%d\n", a->d, a->a);
+ 
+-        case 0xa: /* l.divu */
+-            LOG_DIS("l.divu r%d, r%d, r%d\n", rd, ra, rb);
+-            gen_divu(dc, cpu_R[rd], cpu_R[ra], cpu_R[rb]);
+-            return;
++    check_r0_write(a->d);
++    tcg_gen_ctzi_tl(cpu_R[a->d], cpu_R[a->a], -1);
++    tcg_gen_addi_tl(cpu_R[a->d], cpu_R[a->d], 1);
++    return true;
++}
+ 
+-        case 0xb: /* l.mulu */
+-            LOG_DIS("l.mulu r%d, r%d, r%d\n", rd, ra, rb);
+-            gen_mulu(dc, cpu_R[rd], cpu_R[ra], cpu_R[rb]);
+-            return;
++static bool trans_l_fl1(DisasContext *dc, arg_da *a, uint32_t insn)
++{
++    LOG_DIS("l.fl1 r%d, r%d\n", a->d, a->a);
+ 
+-        case 0xc: /* l.muldu */
+-            LOG_DIS("l.muldu r%d, r%d\n", ra, rb);
+-            gen_muldu(dc, cpu_R[ra], cpu_R[rb]);
+-            return;
 -        }
 -        break;
--
--    default:
-+    if (dc->mem_idx == MMU_USER_IDX) {
-         gen_illegal_exception(dc);
--        break;
-+    } else {
-+        TCGv_i32 ti = tcg_const_i32(a->k);
-+        gen_helper_mfspr(cpu_R[a->d], cpu_env, cpu_R[a->d], cpu_R[a->a], ti);
-+        tcg_temp_free_i32(ti);
-     }
-+#endif
+-    }
+-    gen_illegal_exception(dc);
++    check_r0_write(a->d);
++    tcg_gen_clzi_tl(cpu_R[a->d], cpu_R[a->a], TARGET_LONG_BITS);
++    tcg_gen_subfi_tl(cpu_R[a->d], TARGET_LONG_BITS, cpu_R[a->d]);
 +    return true;
 +}
 +
-+static bool trans_l_mtspr(DisasContext *dc, arg_l_mtspr *a, uint32_t insn)
++static bool trans_l_mul(DisasContext *dc, arg_dab *a, uint32_t insn)
 +{
-+    LOG_DIS("l.mtspr r%d, r%d, %d\n", a->a, a->b, a->k);
++    LOG_DIS("l.mul r%d, r%d, r%d\n", a->d, a->a, a->b);
 +
-+#ifdef CONFIG_USER_ONLY
-+    gen_illegal_exception(dc);
-+#else
-+    if (dc->mem_idx == MMU_USER_IDX) {
-+        gen_illegal_exception(dc);
-+    } else {
-+        TCGv_i32 ti = tcg_const_i32(a->k);
-+        gen_helper_mtspr(cpu_env, cpu_R[a->a], cpu_R[a->b], ti);
-+        tcg_temp_free_i32(ti);
-+    }
-+#endif
++    check_r0_write(a->d);
++    gen_mul(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
++
++static bool trans_l_mulu(DisasContext *dc, arg_dab *a, uint32_t insn)
++{
++    LOG_DIS("l.mulu r%d, r%d, r%d\n", a->d, a->a, a->b);
++
++    check_r0_write(a->d);
++    gen_mulu(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
++
++static bool trans_l_div(DisasContext *dc, arg_dab *a, uint32_t insn)
++{
++    LOG_DIS("l.div r%d, r%d, r%d\n", a->d, a->a, a->b);
++
++    check_r0_write(a->d);
++    gen_div(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
++
++static bool trans_l_divu(DisasContext *dc, arg_dab *a, uint32_t insn)
++{
++    LOG_DIS("l.divu r%d, r%d, r%d\n", a->d, a->a, a->b);
++
++    check_r0_write(a->d);
++    gen_divu(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
++
++static bool trans_l_muld(DisasContext *dc, arg_ab *a, uint32_t insn)
++{
++    LOG_DIS("l.muld r%d, r%d\n", a->a, a->b);
++    gen_muld(dc, cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
++
++static bool trans_l_muldu(DisasContext *dc, arg_ab *a, uint32_t insn)
++{
++    LOG_DIS("l.muldu r%d, r%d\n", a->a, a->b);
++    gen_muldu(dc, cpu_R[a->a], cpu_R[a->b]);
 +    return true;
  }
  
- static void dec_mac(DisasContext *dc, uint32_t insn)
-@@ -1272,6 +1216,23 @@ static bool trans_l_csync(DisasContext *dc, arg_l_csync *a, uint32_t insn)
-     return true;
- }
- 
-+static bool trans_l_rfe(DisasContext *dc, arg_l_rfe *a, uint32_t insn)
-+{
-+    LOG_DIS("l.rfe\n");
-+
-+#ifdef CONFIG_USER_ONLY
-+    gen_illegal_exception(dc);
-+#else
-+    if (dc->mem_idx == MMU_USER_IDX) {
-+        gen_illegal_exception(dc);
-+    } else {
-+        gen_helper_rfe(cpu_env);
-+        dc->is_jmp = DISAS_UPDATE;
-+    }
-+#endif
-+    return true;
-+}
-+
- static void dec_float(DisasContext *dc, uint32_t insn)
- {
-     uint32_t op0;
-@@ -1534,7 +1495,7 @@ static void disas_openrisc_insn(DisasContext *dc, OpenRISCCPU *cpu)
+ static bool trans_l_j(DisasContext *dc, arg_l_j *a, uint32_t insn)
+@@ -1486,10 +1514,6 @@ static void disas_openrisc_insn(DisasContext *dc, OpenRISCCPU *cpu)
+         dec_float(dc, insn);
          break;
  
-     default:
--        dec_misc(dc, insn);
-+        gen_illegal_exception(dc);
+-    case 0x38:
+-        dec_calc(dc, insn);
+-        break;
+-
+     case 0x39:
+         dec_comp(dc, insn);
          break;
-     }
- }
 diff --git a/target/openrisc/insns.decode b/target/openrisc/insns.decode
-index ba5356abe1..247a2e14f2 100644
+index 247a2e14f2..20f035f488 100644
 --- a/target/openrisc/insns.decode
 +++ b/target/openrisc/insns.decode
-@@ -27,6 +27,8 @@ l_msync         001000 1000000000 00000000 00000000
+@@ -17,6 +17,10 @@
+ # License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ #
+ 
++&dab            d a b
++&da             d a
++&ab             a b
++
+ ####
+ # System Instructions
+ ####
+@@ -27,7 +31,7 @@ l_msync         001000 1000000000 00000000 00000000
  l_psync         001000 1010000000 00000000 00000000
  l_csync         001000 1100000000 00000000 00000000
  
-+l_rfe		001001 ----- ----- -------- --------
-+
+-l_rfe		001001 ----- ----- -------- --------
++l_rfe           001001 ----- ----- -------- --------
+ 
  ####
  # Branch Instructions
- ####
-@@ -58,7 +60,32 @@ l_lbs           100100 ..... ..... ........ ........    @load
+@@ -60,32 +64,64 @@ l_lbs           100100 ..... ..... ........ ........    @load
  l_lhz           100101 ..... ..... ........ ........    @load
  l_lhs           100110 ..... ..... ........ ........    @load
  
--l_swa           110011 ..... ..... ........ ........    @store
--l_sw            110101 ..... ..... ........ ........    @store
--l_sb            110110 ..... ..... ........ ........    @store
--l_sh            110111 ..... ..... ........ ........    @store
-+l_swa		110011 ..... ..... ..... ...........	@store
-+l_sw		110101 ..... ..... ..... ...........	@store
-+l_sb		110110 ..... ..... ..... ...........	@store
-+l_sh		110111 ..... ..... ..... ...........	@store
+-l_swa		110011 ..... ..... ..... ...........	@store
+-l_sw		110101 ..... ..... ..... ...........	@store
+-l_sb		110110 ..... ..... ..... ...........	@store
+-l_sh		110111 ..... ..... ..... ...........	@store
++l_swa           110011 ..... ..... ..... ...........    @store
++l_sw            110101 ..... ..... ..... ...........    @store
++l_sb            110110 ..... ..... ..... ...........    @store
++l_sh            110111 ..... ..... ..... ...........    @store
+ 
+ ####
+ # Immediate Operand Instructions
+ ####
+ 
+-%mtspr_k	21:5 0:11
++%mtspr_k        21:5 0:11
+ 
+-&rri		d a i
+-&rrk		d a k
+-@rri		...... d:5 a:5 i:s16			&rri
+-@rrk		...... d:5 a:5 k:16			&rrk
++&rri            d a i
++&rrk            d a k
++@rri            ...... d:5 a:5 i:s16                    &rri
++@rrk            ...... d:5 a:5 k:16                     &rrk
+ 
+-l_nop		000101 01--- ----- k:16
++l_nop           000101 01--- ----- k:16
+ 
+-l_addi		100111 ..... ..... ........ ........	@rri
+-l_addic		101000 ..... ..... ........ ........	@rri
+-l_andi		101001 ..... ..... ........ ........	@rrk
+-l_ori		101010 ..... ..... ........ ........	@rrk
+-l_xori		101011 ..... ..... ........ ........	@rri
+-l_muli		101100 ..... ..... ........ ........	@rri
++l_addi          100111 ..... ..... ........ ........    @rri
++l_addic         101000 ..... ..... ........ ........    @rri
++l_andi          101001 ..... ..... ........ ........    @rrk
++l_ori           101010 ..... ..... ........ ........    @rrk
++l_xori          101011 ..... ..... ........ ........    @rri
++l_muli          101100 ..... ..... ........ ........    @rri
+ 
+-l_mfspr		101101 ..... ..... ........ ........	@rrk
+-l_mtspr		110000 ..... a:5 b:5 ...........	k=%mtspr_k
++l_mfspr         101101 ..... ..... ........ ........    @rrk
++l_mtspr         110000 ..... a:5 b:5 ...........        k=%mtspr_k
+ 
+-l_maci		010011 ----- a:5 i:s16
++l_maci          010011 ----- a:5 i:s16
 +
 +####
-+# Immediate Operand Instructions
++# Arithmetic Instructions
 +####
 +
-+%mtspr_k	21:5 0:11
++l_exths         111000 d:5 a:5 ----- - 0000 -- 1100
++l_extbs         111000 d:5 a:5 ----- - 0001 -- 1100
++l_exthz         111000 d:5 a:5 ----- - 0010 -- 1100
++l_extbz         111000 d:5 a:5 ----- - 0011 -- 1100
 +
-+&rri		d a i
-+&rrk		d a k
-+@rri		...... d:5 a:5 i:s16			&rri
-+@rrk		...... d:5 a:5 k:16			&rrk
++l_add           111000 d:5 a:5 b:5   - 00 ---- 0000
++l_addc          111000 d:5 a:5 b:5   - 00 ---- 0001
++l_sub           111000 d:5 a:5 b:5   - 00 ---- 0010
++l_and           111000 d:5 a:5 b:5   - 00 ---- 0011
++l_or            111000 d:5 a:5 b:5   - 00 ---- 0100
++l_xor           111000 d:5 a:5 b:5   - 00 ---- 0101
++l_cmov          111000 d:5 a:5 b:5   - 00 ---- 1110
++l_ff1           111000 d:5 a:5 ----- - 00 ---- 1111
++l_fl1           111000 d:5 a:5 ----- - 01 ---- 1111
 +
-+l_nop		000101 01--- ----- k:16
++l_sll           111000 d:5 a:5 b:5   - 0000 -- 1000
++l_srl           111000 d:5 a:5 b:5   - 0001 -- 1000
++l_sra           111000 d:5 a:5 b:5   - 0010 -- 1000
++l_ror           111000 d:5 a:5 b:5   - 0011 -- 1000
 +
-+l_addi		100111 ..... ..... ........ ........	@rri
-+l_addic		101000 ..... ..... ........ ........	@rri
-+l_andi		101001 ..... ..... ........ ........	@rrk
-+l_ori		101010 ..... ..... ........ ........	@rrk
-+l_xori		101011 ..... ..... ........ ........	@rri
-+l_muli		101100 ..... ..... ........ ........	@rri
++l_mul           111000 d:5 a:5 b:5   - 11 ---- 0110
++l_mulu          111000 d:5 a:5 b:5   - 11 ---- 1011
++l_div           111000 d:5 a:5 b:5   - 11 ---- 1001
++l_divu          111000 d:5 a:5 b:5   - 11 ---- 1010
 +
-+l_mfspr		101101 ..... ..... ........ ........	@rrk
-+l_mtspr		110000 ..... a:5 b:5 ...........	k=%mtspr_k
-+
-+l_maci		010011 ----- a:5 i:s16
++l_muld          111000 ----- a:5 b:5 - 11 ---- 0111
++l_muldu         111000 ----- a:5 b:5 - 11 ---- 1100
 -- 
 2.17.0
