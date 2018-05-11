@@ -1,27 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fH6rJ-0002ho-Nh
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 08:09:14 -0400
+	(envelope-from <famz@redhat.com>) id 1fH6rK-0002ji-Bs
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 08:09:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fH6rJ-0003Hf-0e
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 08:09:13 -0400
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:45018)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fH6rI-0003HL-SL
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 08:09:12 -0400
-Received: by mail-ot0-x243.google.com with SMTP id g7-v6so5951660otj.11
-	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 05:09:12 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180510222601.19944-2-laurent@vivier.eu>
-References: <20180510222601.19944-1-laurent@vivier.eu>
-	<20180510222601.19944-2-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 11 May 2018 13:08:52 +0100
-Message-ID: <CAFEAcA8A0k6zRSO2mmxZ7cU139zZ3upD5rqm4rGLtYWpKMd15g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/5] linux-user: move mips socket.h
- definitions to mips/sockbits.h
+	(envelope-from <famz@redhat.com>) id 1fH6rH-0003GV-5U
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 08:09:14 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Fri, 11 May 2018 20:08:16 +0800
+Message-Id: <20180511120823.7892-4-famz@redhat.com>
+In-Reply-To: <20180511120823.7892-1-famz@redhat.com>
+References: <20180511120823.7892-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 03/10] raw: Implement copy offloading
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +19,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Riku Voipio <riku.voipio@iki.fi>, Yongbok Kim <yongbok.kim@mips.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, eblake@redhat.com
 
-On 10 May 2018 at 23:25, Laurent Vivier <laurent@vivier.eu> wrote:
-> No code change.
->
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
+Just pass down to ->file.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ block/raw-format.c | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-> +#if 0
-> +/* To add: Allow local address and port reuse. */
-> +#define TARGET_SO_REUSEPORT 0x0200
-> +#endif
-
-As a follow-on cleanup, we might as well fix up the various
-targets to actually define TARGET_SO_REUSEPORT rather than
-defining it by #if'ing out the definition or commenting it out
-or not defining it at all.
-
-thanks
--- PMM
+diff --git a/block/raw-format.c b/block/raw-format.c
+index 803083f1a1..71ca9c627d 100644
+--- a/block/raw-format.c
++++ b/block/raw-format.c
+@@ -495,6 +495,36 @@ static int raw_probe_geometry(BlockDriverState *bs, HDGeometry *geo)
+     return bdrv_probe_geometry(bs->file->bs, geo);
+ }
+ 
++static int coroutine_fn raw_co_copy_range_from(BlockDriverState *bs,
++                                               BdrvChild *src, uint64_t src_offset,
++                                               BdrvChild *dst, uint64_t dst_offset,
++                                               uint64_t bytes, BdrvRequestFlags flags)
++{
++    int ret;
++
++    ret = raw_adjust_offset(bs, &src_offset, bytes);
++    if (ret) {
++        return ret;
++    }
++    return bdrv_co_copy_range_from(bs->file, src_offset, dst, dst_offset,
++                                   bytes, flags);
++}
++
++static int coroutine_fn raw_co_copy_range_to(BlockDriverState *bs,
++                                             BdrvChild *src, uint64_t src_offset,
++                                             BdrvChild *dst, uint64_t dst_offset,
++                                             uint64_t bytes, BdrvRequestFlags flags)
++{
++    int ret;
++
++    ret = raw_adjust_offset(bs, &dst_offset, bytes);
++    if (ret) {
++        return ret;
++    }
++    return bdrv_co_copy_range_to(src, src_offset, bs->file, dst_offset, bytes,
++                                 flags);
++}
++
+ BlockDriver bdrv_raw = {
+     .format_name          = "raw",
+     .instance_size        = sizeof(BDRVRawState),
+@@ -511,6 +541,8 @@ BlockDriver bdrv_raw = {
+     .bdrv_co_pwrite_zeroes = &raw_co_pwrite_zeroes,
+     .bdrv_co_pdiscard     = &raw_co_pdiscard,
+     .bdrv_co_block_status = &raw_co_block_status,
++    .bdrv_co_copy_range_from = &raw_co_copy_range_from,
++    .bdrv_co_copy_range_to  = &raw_co_copy_range_to,
+     .bdrv_truncate        = &raw_truncate,
+     .bdrv_getlength       = &raw_getlength,
+     .has_variable_length  = true,
+-- 
+2.14.3
