@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGzad-0000Wt-CV
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 00:23:32 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fGzae-0000X0-Uk
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 00:23:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGzaa-00084y-9U
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 00:23:31 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:35755)
+	(envelope-from <richard.henderson@linaro.org>) id 1fGzad-00085k-KQ
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 00:23:32 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:46426)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fGzaa-00084u-3m
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 00:23:28 -0400
-Received: by mail-pf0-x243.google.com with SMTP id x9-v6so2099088pfm.2
-	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 21:23:28 -0700 (PDT)
+	id 1fGzad-00085U-DX
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 00:23:31 -0400
+Received: by mail-pg0-x244.google.com with SMTP id z4-v6so1881375pgu.13
+	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 21:23:31 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 10 May 2018 21:23:11 -0700
-Message-Id: <20180511042324.5070-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 00/13] openrisc: Covert to decodetree.py
+Date: Thu, 10 May 2018 21:23:13 -0700
+Message-Id: <20180511042324.5070-3-richard.henderson@linaro.org>
+In-Reply-To: <20180511042324.5070-1-richard.henderson@linaro.org>
+References: <20180511042324.5070-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PULL 02/13] target/openrisc: Start conversion to
+ decodetree.py
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,51 +30,196 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stafford Horne <shorne@gmail.com>, peter.maydell@linaro.org
 
-Stafford Horne has acked and asked that I send the pull-request.
+Begin with the 0x08 major opcode, the system instructions.
 
-
-r~
-
-
-The following changes since commit e5cd695266c5709308aa95b1baae499e4b5d4544:
-
-  Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' into staging (2018-05-08 17:05:58 +0100)
-
-are available in the Git repository at:
-
-  https://github.com/rth7680/qemu.git tags/tgt-openrisc-pull-request
-
-for you to fetch changes up to cf88ad60531a5b06834f6bf373a5f7fa91f2c3a8:
-
-  target/openrisc: Merge disas_openrisc_insn (2018-05-10 21:19:13 -0700)
-
-----------------------------------------------------------------
-Convert OpenRISC to decodetree.py
-
-----------------------------------------------------------------
-
-Richard Henderson (13):
-  target-openrisc: Write back result before FPE exception
-  target/openrisc: Start conversion to decodetree.py
-  target/openrisc: Convert branch insns
-  target/openrisc: Convert memory insns
-  target/openrisc: Convert remainder of dec_misc insns
-  target/openrisc: Convert dec_calc
-  target/openrisc: Convert dec_mac
-  target/openrisc: Convert dec_logic
-  target/openrisc: Convert dec_M
-  target/openrisc: Convert dec_comp
-  target/openrisc: Convert dec_compi
-  target/openrisc: Convert dec_float
-  target/openrisc: Merge disas_openrisc_insn
-
- target/openrisc/helper.h      |   25 +-
- target/openrisc/fpu_helper.c  |  250 +----
- target/openrisc/translate.c   | 1847 +++++++++++++++------------------
- target/openrisc/Makefile.objs |    9 +
- target/openrisc/insns.decode  |  189 ++++
- 5 files changed, 1110 insertions(+), 1210 deletions(-)
+Acked-by: Stafford Horne <shorne@gmail.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/openrisc/translate.c   | 79 +++++++++++++++++------------------
+ target/openrisc/Makefile.objs |  9 ++++
+ target/openrisc/insns.decode  | 28 +++++++++++++
+ 3 files changed, 76 insertions(+), 40 deletions(-)
  create mode 100644 target/openrisc/insns.decode
 
+diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
+index 6876317971..40b21a5db1 100644
+--- a/target/openrisc/translate.c
++++ b/target/openrisc/translate.c
+@@ -31,6 +31,7 @@
+ 
+ #include "exec/helper-proto.h"
+ #include "exec/helper-gen.h"
++#include "exec/gen-icount.h"
+ 
+ #include "trace-tcg.h"
+ #include "exec/log.h"
+@@ -53,6 +54,9 @@ typedef struct DisasContext {
+     bool singlestep_enabled;
+ } DisasContext;
+ 
++/* Include the auto-generated decoder.  */
++#include "decode.inc.c"
++
+ static TCGv cpu_sr;
+ static TCGv cpu_R[32];
+ static TCGv cpu_R0;
+@@ -67,7 +71,6 @@ static TCGv cpu_lock_value;
+ static TCGv_i32 fpcsr;
+ static TCGv_i64 cpu_mac;        /* MACHI:MACLO */
+ static TCGv_i32 cpu_dflag;
+-#include "exec/gen-icount.h"
+ 
+ void openrisc_translate_init(void)
+ {
+@@ -1243,45 +1246,40 @@ static void dec_compi(DisasContext *dc, uint32_t insn)
+     }
+ }
+ 
+-static void dec_sys(DisasContext *dc, uint32_t insn)
++static bool trans_l_sys(DisasContext *dc, arg_l_sys *a, uint32_t insn)
+ {
+-    uint32_t op0;
+-    uint32_t K16;
++    LOG_DIS("l.sys %d\n", a->k);
++    tcg_gen_movi_tl(cpu_pc, dc->pc);
++    gen_exception(dc, EXCP_SYSCALL);
++    dc->is_jmp = DISAS_UPDATE;
++    return true;
++}
+ 
+-    op0 = extract32(insn, 16, 10);
+-    K16 = extract32(insn, 0, 16);
++static bool trans_l_trap(DisasContext *dc, arg_l_trap *a, uint32_t insn)
++{
++    LOG_DIS("l.trap %d\n", a->k);
++    tcg_gen_movi_tl(cpu_pc, dc->pc);
++    gen_exception(dc, EXCP_TRAP);
++    return true;
++}
+ 
+-    switch (op0) {
+-    case 0x000:    /* l.sys */
+-        LOG_DIS("l.sys %d\n", K16);
+-        tcg_gen_movi_tl(cpu_pc, dc->pc);
+-        gen_exception(dc, EXCP_SYSCALL);
+-        dc->is_jmp = DISAS_UPDATE;
+-        break;
++static bool trans_l_msync(DisasContext *dc, arg_l_msync *a, uint32_t insn)
++{
++    LOG_DIS("l.msync\n");
++    tcg_gen_mb(TCG_MO_ALL);
++    return true;
++}
+ 
+-    case 0x100:    /* l.trap */
+-        LOG_DIS("l.trap %d\n", K16);
+-        tcg_gen_movi_tl(cpu_pc, dc->pc);
+-        gen_exception(dc, EXCP_TRAP);
+-        break;
++static bool trans_l_psync(DisasContext *dc, arg_l_psync *a, uint32_t insn)
++{
++    LOG_DIS("l.psync\n");
++    return true;
++}
+ 
+-    case 0x300:    /* l.csync */
+-        LOG_DIS("l.csync\n");
+-        break;
+-
+-    case 0x200:    /* l.msync */
+-        LOG_DIS("l.msync\n");
+-        tcg_gen_mb(TCG_MO_ALL);
+-        break;
+-
+-    case 0x270:    /* l.psync */
+-        LOG_DIS("l.psync\n");
+-        break;
+-
+-    default:
+-        gen_illegal_exception(dc);
+-        break;
+-    }
++static bool trans_l_csync(DisasContext *dc, arg_l_csync *a, uint32_t insn)
++{
++    LOG_DIS("l.csync\n");
++    return true;
+ }
+ 
+ static void dec_float(DisasContext *dc, uint32_t insn)
+@@ -1509,17 +1507,18 @@ static void disas_openrisc_insn(DisasContext *dc, OpenRISCCPU *cpu)
+     uint32_t op0;
+     uint32_t insn;
+     insn = cpu_ldl_code(&cpu->env, dc->pc);
+-    op0 = extract32(insn, 26, 6);
+ 
++    /* Transition to the auto-generated decoder.  */
++    if (decode(dc, insn)) {
++        return;
++    }
++
++    op0 = extract32(insn, 26, 6);
+     switch (op0) {
+     case 0x06:
+         dec_M(dc, insn);
+         break;
+ 
+-    case 0x08:
+-        dec_sys(dc, insn);
+-        break;
+-
+     case 0x2e:
+         dec_logic(dc, insn);
+         break;
+diff --git a/target/openrisc/Makefile.objs b/target/openrisc/Makefile.objs
+index 918b1c6e9c..1b98a911ea 100644
+--- a/target/openrisc/Makefile.objs
++++ b/target/openrisc/Makefile.objs
+@@ -3,3 +3,12 @@ obj-y += cpu.o exception.o interrupt.o mmu.o translate.o
+ obj-y += exception_helper.o fpu_helper.o \
+          interrupt_helper.o mmu_helper.o sys_helper.o
+ obj-y += gdbstub.o
++
++DECODETREE = $(SRC_PATH)/scripts/decodetree.py
++
++target/openrisc/decode.inc.c: \
++  $(SRC_PATH)/target/openrisc/insns.decode $(DECODETREE)
++	$(call quiet-command,\
++	  $(PYTHON) $(DECODETREE) -o $@ $<, "GEN", $(TARGET_DIR)$@)
++
++target/openrisc/translate.o: target/openrisc/decode.inc.c
+diff --git a/target/openrisc/insns.decode b/target/openrisc/insns.decode
+new file mode 100644
+index 0000000000..47d31afc5b
+--- /dev/null
++++ b/target/openrisc/insns.decode
+@@ -0,0 +1,28 @@
++#
++# OpenRISC instruction decode definitions.
++#
++# Copyright (c) 2018 Richard Henderson <rth@twiddle.net>
++#
++# This library is free software; you can redistribute it and/or
++# modify it under the terms of the GNU Lesser General Public
++# License as published by the Free Software Foundation; either
++# version 2 of the License, or (at your option) any later version.
++#
++# This library is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++# Lesser General Public License for more details.
++#
++# You should have received a copy of the GNU Lesser General Public
++# License along with this library; if not, see <http://www.gnu.org/licenses/>.
++#
++
++####
++# System Instructions
++####
++
++l_sys           001000 0000000000 k:16
++l_trap          001000 0100000000 k:16
++l_msync         001000 1000000000 00000000 00000000
++l_psync         001000 1010000000 00000000 00000000
++l_csync         001000 1100000000 00000000 00000000
 -- 
 2.17.0
