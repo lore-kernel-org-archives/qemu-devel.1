@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39427)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fH0zb-0000pV-MZ
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fH0zb-0000pU-MQ
 	for qemu-devel@nongnu.org; Fri, 11 May 2018 01:53:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fH0zY-0005RX-JQ
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fH0zZ-0005Rs-EG
 	for qemu-devel@nongnu.org; Fri, 11 May 2018 01:53:23 -0400
-Received: from smtp21.cstnet.cn ([159.226.251.21]:49690 helo=cstnet.cn)
+Received: from smtp21.cstnet.cn ([159.226.251.21]:49762 helo=cstnet.cn)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fH0zX-0005QB-TR
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 01:53:20 -0400
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fH0zY-0005R0-Mc
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 01:53:21 -0400
 From: Su Hang <suhang16@mails.ucas.ac.cn>
-Date: Fri, 11 May 2018 13:53:14 +0800
-Message-Id: <1526017994-22246-3-git-send-email-suhang16@mails.ucas.ac.cn>
-In-Reply-To: <1526017994-22246-1-git-send-email-suhang16@mails.ucas.ac.cn>
-References: <1526017994-22246-1-git-send-email-suhang16@mails.ucas.ac.cn>
-Subject: [Qemu-devel] [PATCH v8 2/2] Add QTest testcase for the Intel
- Hexadecimal Object File Loader.
+Date: Fri, 11 May 2018 13:53:12 +0800
+Message-Id: <1526017994-22246-1-git-send-email-suhang16@mails.ucas.ac.cn>
+Subject: [Qemu-devel] [PATCH v8 0/2] Implement Hex file loader and add test
+ case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,140 +25,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: stefanha@gmail.com, jim@groklearning.com, joel@jms.id.au
 Cc: qemu-devel@nongnu.org
 
-'test.hex' file is a bare metal ARM software stored in Hexadecimal
-Object Format. When it's loaded by QEMU, it will print "Hello world!\n"
-on console.
+These series of patchs implement Intel Hexadecimal File loader and
+add QTest testcase to verify the correctness of Loader.
 
-`pre_store` array in 'hexloader-test.c' file, stores the binary format
-of 'test.hex' file, which is used to verify correctness.
+v1:
+--  Basic version.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Su Hang <suhang16@mails.ucas.ac.cn>
----
- MAINTAINERS                          |  6 ++++
- tests/Makefile.include               |  2 ++
- tests/hex-loader-check-data/test.hex | 12 ++++++++
- tests/hexloader-test.c               | 56 ++++++++++++++++++++++++++++++++++++
- 4 files changed, 76 insertions(+)
+v2:
+--  Replace `do{}while(cond);` block with `for(;;)` block.
+
+v3:
+--  Add two new files information in MAINTAINERS.
+
+v4:
+--  Correct the 'test.hex' path in hexloader-test.c.
+
+v5:
+--  Split huge parse_hex_blob() function into four small function;
+--  Add check for memory bounds;
+--  Check validation for Record type;
+--  Replace function ctoh() with glib function g_ascii_xdigit_value();
+--  Remove check for '.hex' suffix;
+--  Remove unnecessary type cast;
+--  Remove duplicate zero-initialization;
+--  Correct typos;
+
+v6:
+--  Call Intel HEX loader after load_uimage_as();
+--  Remove use of KERNEL_LOAD_ADDR;
+--  Change (hwaddr) type argument to (hwaddr *) type;
+--  Use new struct HexParser to contain all arguments needed by
+        handle_record_type();
+--  Enable discontiguous data records (again);
+--  Remove unnecessary memory clean: bin_buf and HexLine line;
+--  Correct typo;
+--  Remove unnecessary check for hex file size;
+--  Add entry point handle for START_SEG_ADDR_RECORD and
+        START_LINEAR_ADDR_RECORD record type;
+--  Use hwaddr * type to store entry point;
+
+v7:
+--  Remove unnecessary code style changes;
+--  Replace `bool` with `size_t` for function `parse_record` return type;
+--  Replace `int` with `size_t` for struct `HexParser` member field
+        `total_size` type;
+--  Replace `int` with `size_t` for function `handle_record_type` return type;
+--  Return an error when encountered unimplemented data type
+        `START_SEG_ADDR_RECORD`;
+--  Add check for `START_LINEAR_ADDR_RECORD` data type:
+        byte_count == 4 and address == 0;
+--  Rename struct `HexParser` member field `addr` to `start_addr`;
+--  Replace `int` with `size_t` for function `parse_hex_blob` return type;
+--  Stop incrementing `record_index` when encountered whitespace;
+--  Replace
+    `if ((record_index >> 1) - LEN_EXCEPT_DATA != parser.line.byte_count)`
+    with
+    `if ((LEN_EXCEPT_DATA + parser.line.byte_count) * 2 != record_index)`
+--  Remove unused field `max_sz`;
+--  Replace `int` with `size_t` for local variable `total_size`
+        in function `parse_hex_blob`
+--  Rename function `load_image_targphys_hex_as` argument `addr` to `entry`;
+
+v8:
+--  Discard change in code logic: Stop attempting load 32-bit kernel after
+        failed to load 64-bit kernel image;
+--  Rename function name `load_image_targphys_hex_as` to `load_targphys_hex_as`
+        in comment;
+--  Correct grammatical errors in comments;
+--  Drop non-exist argument description in comment;
+--  Drop macro function `rom_add_hex_blob_as`, replace it with
+        `rom_add_blob_fixed_as`, because they are equivalent;
+
+
+Su Hang (2):
+  Implement .hex file loader
+  Add QTest testcase for the Intel Hexadecimal Object File Loader.
+
+ MAINTAINERS                          |   6 +
+ hw/arm/boot.c                        |   7 +-
+ hw/core/loader.c                     | 246 +++++++++++++++++++++++++++++++++++
+ include/hw/loader.h                  |  12 ++
+ tests/Makefile.include               |   2 +
+ tests/hex-loader-check-data/test.hex |  12 ++
+ tests/hexloader-test.c               |  56 ++++++++
+ 7 files changed, 340 insertions(+), 1 deletion(-)
  create mode 100644 tests/hex-loader-check-data/test.hex
  create mode 100644 tests/hexloader-test.c
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 459e3594e16c..c86095e3b3d9 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1291,6 +1291,12 @@ F: hw/core/generic-loader.c
- F: include/hw/core/generic-loader.h
- F: docs/generic-loader.txt
- 
-+Intel Hexadecimal Object File Loader
-+M: Su Hang <suhang16@mails.ucas.ac.cn>
-+S: Maintained
-+F: tests/hexloader-test.c
-+F: tests/hex-loader-check-data/test.hex
-+
- CHRP NVRAM
- M: Thomas Huth <thuth@redhat.com>
- S: Maintained
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 3b9a5e31a2c2..f4a3e71f34ee 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -380,6 +380,7 @@ check-qtest-arm-y += tests/test-arm-mptimer$(EXESUF)
- gcov-files-arm-y += hw/timer/arm_mptimer.c
- check-qtest-arm-y += tests/boot-serial-test$(EXESUF)
- check-qtest-arm-y += tests/sdhci-test$(EXESUF)
-+check-qtest-arm-y += tests/hexloader-test$(EXESUF)
- 
- check-qtest-aarch64-y = tests/numa-test$(EXESUF)
- check-qtest-aarch64-y += tests/sdhci-test$(EXESUF)
-@@ -755,6 +756,7 @@ tests/qmp-test$(EXESUF): tests/qmp-test.o
- tests/device-introspect-test$(EXESUF): tests/device-introspect-test.o
- tests/rtc-test$(EXESUF): tests/rtc-test.o
- tests/m48t59-test$(EXESUF): tests/m48t59-test.o
-+tests/hexloader-test$(EXESUF): tests/hexloader-test.o
- tests/endianness-test$(EXESUF): tests/endianness-test.o
- tests/spapr-phb-test$(EXESUF): tests/spapr-phb-test.o $(libqos-obj-y)
- tests/prom-env-test$(EXESUF): tests/prom-env-test.o $(libqos-obj-y)
-diff --git a/tests/hex-loader-check-data/test.hex b/tests/hex-loader-check-data/test.hex
-new file mode 100644
-index 000000000000..7e99b452f5cc
---- /dev/null
-+++ b/tests/hex-loader-check-data/test.hex
-@@ -0,0 +1,12 @@
-+:020000040001F9
-+:1000000004D09FE5160000EBFEFFFFEA9810010008
-+:1000100004B02DE500B08DE20CD04DE208000BE5F8
-+:10002000060000EA08301BE50020D3E52C309FE5F0
-+:10003000002083E508301BE5013083E208300BE542
-+:1000400008301BE50030D3E5000053E3F4FFFF1A4E
-+:100050000000A0E100D08BE204B09DE41EFF2FE180
-+:1000600000101F1000482DE904B08DE208009FE544
-+:10007000E6FFFFEB0000A0E10088BDE8840001007E
-+:1000800000101F1048656C6C6F20776F726C6421D4
-+:020090000A0064
-+:00000001FF
-diff --git a/tests/hexloader-test.c b/tests/hexloader-test.c
-new file mode 100644
-index 000000000000..70f99ac03c6b
---- /dev/null
-+++ b/tests/hexloader-test.c
-@@ -0,0 +1,56 @@
-+/*
-+ * QTest testcase for the Intel Hexadecimal Object File Loader
-+ *
-+ * Authors:
-+ *  Su Hang <suhang16@mails.ucas.ac.cn> 2018
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+
-+#define BIN_SIZE 146
-+
-+static unsigned char pre_store[BIN_SIZE] = {
-+    4,   208, 159, 229, 22,  0,   0,   235, 254, 255, 255, 234, 152, 16,  1,
-+    0,   4,   176, 45,  229, 0,   176, 141, 226, 12,  208, 77,  226, 8,   0,
-+    11,  229, 6,   0,   0,   234, 8,   48,  27,  229, 0,   32,  211, 229, 44,
-+    48,  159, 229, 0,   32,  131, 229, 8,   48,  27,  229, 1,   48,  131, 226,
-+    8,   48,  11,  229, 8,   48,  27,  229, 0,   48,  211, 229, 0,   0,   83,
-+    227, 244, 255, 255, 26,  0,   0,   160, 225, 0,   208, 139, 226, 4,   176,
-+    157, 228, 30,  255, 47,  225, 0,   16,  31,  16,  0,   72,  45,  233, 4,
-+    176, 141, 226, 8,   0,   159, 229, 230, 255, 255, 235, 0,   0,   160, 225,
-+    0,   136, 189, 232, 132, 0,   1,   0,   0,   16,  31,  16,  72,  101, 108,
-+    108, 111, 32,  119, 111, 114, 108, 100, 33,  10,  0};
-+
-+/* success if no crash or abort */
-+static void hex_loader_test(void)
-+{
-+    unsigned int i;
-+    unsigned char memory_content[BIN_SIZE];
-+    const unsigned int base_addr = 0x00010000;
-+
-+    QTestState *s = qtest_startf(
-+        "-M versatilepb -m 128M -nographic -kernel ../tests/hex-loader-check-data/test.hex");
-+
-+    for (i = 0; i < BIN_SIZE; ++i) {
-+        memory_content[i] = qtest_readb(s, base_addr + i);
-+        g_assert_cmpuint(memory_content[i], ==, pre_store[i]);
-+    }
-+    qtest_quit(s);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    int ret;
-+
-+    g_test_init(&argc, &argv, NULL);
-+
-+    qtest_add_func("/tmp/hex_loader", hex_loader_test);
-+    ret = g_test_run();
-+
-+    return ret;
-+}
--- 
+--
 2.7.4
