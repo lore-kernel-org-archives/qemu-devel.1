@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGwAO-0007Lv-KR
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 20:44:13 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGwAN-0004tq-IA
+	(envelope-from <richard.henderson@linaro.org>) id 1fGwAN-0007Jx-FW
 	for qemu-devel@nongnu.org; Thu, 10 May 2018 20:44:12 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:36260)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <richard.henderson@linaro.org>) id 1fGwAK-0004tA-Hd
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 20:44:11 -0400
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:38439)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fGwAN-0004ta-9d
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 20:44:11 -0400
-Received: by mail-pg0-x242.google.com with SMTP id z70-v6so1681560pgz.3
-	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 17:44:11 -0700 (PDT)
+	id 1fGwAK-0004sx-CM
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 20:44:08 -0400
+Received: by mail-pl0-x242.google.com with SMTP id c11-v6so2262524plr.5
+	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 17:44:08 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 10 May 2018 17:43:42 -0700
-Message-Id: <20180511004345.26708-17-richard.henderson@linaro.org>
+Date: Thu, 10 May 2018 17:43:40 -0700
+Message-Id: <20180511004345.26708-15-richard.henderson@linaro.org>
 In-Reply-To: <20180511004345.26708-1-richard.henderson@linaro.org>
 References: <20180511004345.26708-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 16/19] fpu/softfloat: Remove
- floatX_maybe_silence_nan
+Subject: [Qemu-devel] [PATCH 14/19] target/s390x: Remove
+ floatX_maybe_silence_nan from conversions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,161 +28,74 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
+Cc: peter.maydell@linaro.org, alex.bennee@linaro.org, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
 
-These functions are now unused.
+This is now handled properly by the generic softfloat code.
 
+Cc: Alexander Graf <agraf@suse.de>
+Cc: David Hildenbrand <david@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- fpu/softfloat-specialize.h | 63 --------------------------------------
- include/fpu/softfloat.h    |  5 ---
- 2 files changed, 68 deletions(-)
+ target/s390x/fpu_helper.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/fpu/softfloat-specialize.h b/fpu/softfloat-specialize.h
-index 08ab8181d5..d7033b7757 100644
---- a/fpu/softfloat-specialize.h
-+++ b/fpu/softfloat-specialize.h
-@@ -364,19 +364,6 @@ float16 float16_silence_nan(float16 a, float_status *status)
- #endif
- }
- 
--/*----------------------------------------------------------------------------
--| Returns a quiet NaN if the half-precision floating point value `a' is a
--| signaling NaN; otherwise returns `a'.
--*----------------------------------------------------------------------------*/
--
--float16 float16_maybe_silence_nan(float16 a, float_status *status)
--{
--    if (float16_is_signaling_nan(a, status)) {
--        float16_silence_nan(a, status);
--    }
--    return a;
--}
--
- /*----------------------------------------------------------------------------
- | Returns 1 if the single-precision floating-point value `a' is a quiet
- | NaN; otherwise returns 0.
-@@ -438,18 +425,6 @@ float32 float32_silence_nan(float32 a, float_status *status)
-     }
- #endif
- }
--/*----------------------------------------------------------------------------
--| Returns a quiet NaN if the single-precision floating point value `a' is a
--| signaling NaN; otherwise returns `a'.
--*----------------------------------------------------------------------------*/
--
--float32 float32_maybe_silence_nan(float32 a, float_status *status)
--{
--    if (float32_is_signaling_nan(a, status)) {
--        float32_silence_nan(a, status);
--    }
--    return a;
--}
- 
- /*----------------------------------------------------------------------------
- | Returns the result of converting the single-precision floating-point NaN
-@@ -864,18 +839,6 @@ float64 float64_silence_nan(float64 a, float_status *status)
- #endif
- }
- 
--/*----------------------------------------------------------------------------
--| Returns a quiet NaN if the double-precision floating point value `a' is a
--| signaling NaN; otherwise returns `a'.
--*----------------------------------------------------------------------------*/
--
--float64 float64_maybe_silence_nan(float64 a, float_status *status)
--{
--    if (float64_is_signaling_nan(a, status)) {
--        return float64_silence_nan(a, status);
--    }
--    return a;
--}
- 
- /*----------------------------------------------------------------------------
- | Returns the result of converting the double-precision floating-point NaN
-@@ -1037,19 +1000,6 @@ floatx80 floatx80_silence_nan(floatx80 a, float_status *status)
- #endif
- }
- 
--/*----------------------------------------------------------------------------
--| Returns a quiet NaN if the extended double-precision floating point value
--| `a' is a signaling NaN; otherwise returns `a'.
--*----------------------------------------------------------------------------*/
--
--floatx80 floatx80_maybe_silence_nan(floatx80 a, float_status *status)
--{
--    if (floatx80_is_signaling_nan(a, status)) {
--        return floatx80_silence_nan(a, status);
--    }
--    return a;
--}
--
- /*----------------------------------------------------------------------------
- | Returns the result of converting the extended double-precision floating-
- | point NaN `a' to the canonical NaN format.  If `a' is a signaling NaN, the
-@@ -1204,19 +1154,6 @@ float128 float128_silence_nan(float128 a, float_status *status)
- #endif
- }
- 
--/*----------------------------------------------------------------------------
--| Returns a quiet NaN if the quadruple-precision floating point value `a' is
--| a signaling NaN; otherwise returns `a'.
--*----------------------------------------------------------------------------*/
--
--float128 float128_maybe_silence_nan(float128 a, float_status *status)
--{
--    if (float128_is_signaling_nan(a, status)) {
--        return float128_silence_nan(a, status);
--    }
--    return a;
--}
--
- /*----------------------------------------------------------------------------
- | Returns the result of converting the quadruple-precision floating-point NaN
- | `a' to the canonical NaN format.  If `a' is a signaling NaN, the invalid
-diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index a6860e858d..69f4dbc4db 100644
---- a/include/fpu/softfloat.h
-+++ b/include/fpu/softfloat.h
-@@ -258,7 +258,6 @@ int float16_compare_quiet(float16, float16, float_status *status);
- int float16_is_quiet_nan(float16, float_status *status);
- int float16_is_signaling_nan(float16, float_status *status);
- float16 float16_silence_nan(float16, float_status *status);
--float16 float16_maybe_silence_nan(float16, float_status *status);
- 
- static inline int float16_is_any_nan(float16 a)
+diff --git a/target/s390x/fpu_helper.c b/target/s390x/fpu_helper.c
+index 43f8bf1c94..5c5b451b3b 100644
+--- a/target/s390x/fpu_helper.c
++++ b/target/s390x/fpu_helper.c
+@@ -269,7 +269,7 @@ uint64_t HELPER(ldeb)(CPUS390XState *env, uint64_t f2)
  {
-@@ -370,7 +369,6 @@ float32 float32_maxnummag(float32, float32, float_status *status);
- int float32_is_quiet_nan(float32, float_status *status);
- int float32_is_signaling_nan(float32, float_status *status);
- float32 float32_silence_nan(float32, float_status *status);
--float32 float32_maybe_silence_nan(float32, float_status *status);
- float32 float32_scalbn(float32, int, float_status *status);
+     float64 ret = float32_to_float64(f2, &env->fpu_status);
+     handle_exceptions(env, GETPC());
+-    return float64_maybe_silence_nan(ret, &env->fpu_status);
++    return ret;
+ }
  
- static inline float32 float32_abs(float32 a)
-@@ -500,7 +498,6 @@ float64 float64_maxnummag(float64, float64, float_status *status);
- int float64_is_quiet_nan(float64 a, float_status *status);
- int float64_is_signaling_nan(float64, float_status *status);
- float64 float64_silence_nan(float64, float_status *status);
--float64 float64_maybe_silence_nan(float64, float_status *status);
- float64 float64_scalbn(float64, int, float_status *status);
+ /* convert 128-bit float to 64-bit float */
+@@ -277,7 +277,7 @@ uint64_t HELPER(ldxb)(CPUS390XState *env, uint64_t ah, uint64_t al)
+ {
+     float64 ret = float128_to_float64(make_float128(ah, al), &env->fpu_status);
+     handle_exceptions(env, GETPC());
+-    return float64_maybe_silence_nan(ret, &env->fpu_status);
++    return ret;
+ }
  
- static inline float64 float64_abs(float64 a)
-@@ -604,7 +601,6 @@ int floatx80_compare_quiet(floatx80, floatx80, float_status *status);
- int floatx80_is_quiet_nan(floatx80, float_status *status);
- int floatx80_is_signaling_nan(floatx80, float_status *status);
- floatx80 floatx80_silence_nan(floatx80, float_status *status);
--floatx80 floatx80_maybe_silence_nan(floatx80, float_status *status);
- floatx80 floatx80_scalbn(floatx80, int, float_status *status);
+ /* convert 64-bit float to 128-bit float */
+@@ -285,7 +285,7 @@ uint64_t HELPER(lxdb)(CPUS390XState *env, uint64_t f2)
+ {
+     float128 ret = float64_to_float128(f2, &env->fpu_status);
+     handle_exceptions(env, GETPC());
+-    return RET128(float128_maybe_silence_nan(ret, &env->fpu_status));
++    return RET128(ret);
+ }
  
- static inline floatx80 floatx80_abs(floatx80 a)
-@@ -816,7 +812,6 @@ int float128_compare_quiet(float128, float128, float_status *status);
- int float128_is_quiet_nan(float128, float_status *status);
- int float128_is_signaling_nan(float128, float_status *status);
- float128 float128_silence_nan(float128, float_status *status);
--float128 float128_maybe_silence_nan(float128, float_status *status);
- float128 float128_scalbn(float128, int, float_status *status);
+ /* convert 32-bit float to 128-bit float */
+@@ -293,7 +293,7 @@ uint64_t HELPER(lxeb)(CPUS390XState *env, uint64_t f2)
+ {
+     float128 ret = float32_to_float128(f2, &env->fpu_status);
+     handle_exceptions(env, GETPC());
+-    return RET128(float128_maybe_silence_nan(ret, &env->fpu_status));
++    return RET128(ret);
+ }
  
- static inline float128 float128_abs(float128 a)
+ /* convert 64-bit float to 32-bit float */
+@@ -301,7 +301,7 @@ uint64_t HELPER(ledb)(CPUS390XState *env, uint64_t f2)
+ {
+     float32 ret = float64_to_float32(f2, &env->fpu_status);
+     handle_exceptions(env, GETPC());
+-    return float32_maybe_silence_nan(ret, &env->fpu_status);
++    return ret;
+ }
+ 
+ /* convert 128-bit float to 32-bit float */
+@@ -309,7 +309,7 @@ uint64_t HELPER(lexb)(CPUS390XState *env, uint64_t ah, uint64_t al)
+ {
+     float32 ret = float128_to_float32(make_float128(ah, al), &env->fpu_status);
+     handle_exceptions(env, GETPC());
+-    return float32_maybe_silence_nan(ret, &env->fpu_status);
++    return ret;
+ }
+ 
+ /* 32-bit FP compare */
 -- 
 2.17.0
