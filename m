@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fH91W-0007aH-3Z
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 10:27:55 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fH91c-0007tv-GS
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 10:28:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fH91S-0001Ad-5N
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 10:27:54 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60294 helo=mx1.redhat.com)
+	(envelope-from <ehabkost@redhat.com>) id 1fH91Y-0001I7-Hi
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 10:28:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49706)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1fH91R-00019H-Vh
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 10:27:50 -0400
-References: <20171108022828.7242-1-f4bug@amsat.org>
-	<23253f77-ccc8-220d-3028-f27945f9542c@redhat.com>
-	<791dd038-8811-6335-75f7-6dd309ff0ff7@amsat.org>
-	<20180511135544.GH25013@localhost.localdomain>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <4e72cde3-8475-2964-b834-f74d15d66cae@redhat.com>
-Date: Fri, 11 May 2018 10:27:41 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fH91Y-0001He-Bz
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 10:27:56 -0400
+Date: Fri, 11 May 2018 11:12:01 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180511141201.GK25013@localhost.localdomain>
+References: <1524760009-24710-1-git-send-email-babu.moger@amd.com>
+	<1524760009-24710-8-git-send-email-babu.moger@amd.com>
+	<20180507193944.GF13350@localhost.localdomain>
+	<BL0PR12MB2468B701C4DF796ABF9EAD3D959B0@BL0PR12MB2468.namprd12.prod.outlook.com>
+	<20180508141632.GJ25013@localhost.localdomain>
+	<SN1PR12MB24774FAF36327C67C2B46FB1959A0@SN1PR12MB2477.namprd12.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <20180511135544.GH25013@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Publishing binary images for testing (was Re: [RFC
- PATCH 0/6] generic way to deprecate machines)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SN1PR12MB24774FAF36327C67C2B46FB1959A0@SN1PR12MB2477.namprd12.prod.outlook.com>
+Subject: Re: [Qemu-devel] [PATCH v7 7/9] i386: Add support for
+ CPUID_8000_001E for AMD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,80 +32,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org, avocado-devel@redhat.com
+To: "Moger, Babu" <Babu.Moger@amd.com>
+Cc: "mst@redhat.com" <mst@redhat.com>, "marcel@redhat.com" <marcel@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "geoff@hostfission.com" <geoff@hostfission.com>, "kash@tripleback.net" <kash@tripleback.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 
+On Tue, May 08, 2018 at 03:02:07PM +0000, Moger, Babu wrote:
+> 
+> > -----Original Message-----
+> > From: Eduardo Habkost [mailto:ehabkost@redhat.com]
+> > Sent: Tuesday, May 8, 2018 9:17 AM
+> > To: Moger, Babu <Babu.Moger@amd.com>
+> > Cc: mst@redhat.com; marcel@redhat.com; pbonzini@redhat.com;
+> > rth@twiddle.net; mtosatti@redhat.com; geoff@hostfission.com;
+> > kash@tripleback.net; qemu-devel@nongnu.org; kvm@vger.kernel.org
+> > Subject: Re: [Qemu-devel] [PATCH v7 7/9] i386: Add support for
+> > CPUID_8000_001E for AMD
+> > 
+> > On Mon, May 07, 2018 at 11:44:31PM +0000, Moger, Babu wrote:
+> > [...]
+> > > > > +
+> > > > >  /*
+> > > > >   * Encode cache info for CPUID[0x80000006].ECX and
+> > > > CPUID[0x80000006].EDX
+> > > > >   * @l3 can be NULL.
+> > > > > @@ -4105,6 +4111,14 @@ void cpu_x86_cpuid(CPUX86State *env,
+> > > > uint32_t index, uint32_t count,
+> > > > >              break;
+> > > > >          }
+> > > > >          break;
+> > > > > +    case 0x8000001E:
+> > > > > +        assert(cpu->core_id <= 255);
+> > > >
+> > > > Where's the code that ensures this assert() line can't be
+> > > > triggered by any command-line configuration?
+> > >
+> > > I did not understand this. Can you please elaborate. Thanks
+> > 
+> > The user must not be able to trigger an assert(), so we need to
+> > ensure that core_id will never be larger than 255.  Is there
+> > existing code that ensures that?
+> 
+> I see that max_cpus is set to 255 and also there are checks to make sure core_id does not go above 255.
+> I verified it while testing.  So, probably we don't need assert here.  Radim asked me to add this assert.
+> I can remove it if no abjections. 
 
+Sorry for not replying to this before: no objection to the
+assert(), especially considering it will trigger very early on
+initialization if we break it one day.
 
-On 05/11/2018 09:55 AM, Eduardo Habkost wrote:
-> (CCing Cleber and avocado-devel in case they have suggestions)
->=20
-> On Tue, May 08, 2018 at 12:47:52PM -0300, Philippe Mathieu-Daud=C3=A9 w=
-rote:
-> [...]
->> Ironically I have been using the Gumstix machines quite a lot for the =
-SD
->> 'subsystem' refactor, using the MMC commands in U-Boot (I am unable to
->> reach the Linux userland since the kernel crashes), and plan to add SD
->> integration tests via Avocado.
->>
->> This raises:
->>
->> - What will happens if I add tests downloading running on their compil=
-ed
->> u-boot
->> (https://downloads.gumstix.com/images/angstrom/developer/2012-01-22-17=
-50/u-boot.bin)
->> and the company decides to remove this old directory?
->> Since sometimes old open-source software are hard to rebuild with rece=
-nt
->> compilers, should we consider to use a public storage to keep
->> open-source (signed) blobs we can use for integration testing?
->=20
-> I think a maintained repository of images for testing would be
-> nice to have.  We need to be careful to comply with the license
-> of the software being distributed, though.
->=20
-> If the images are very small (like u-boot.bin above), it might be
-> OK to carry them in qemu.git, just like the images in pc-bios.
->=20
->>
->> Avocado has a 'vmimage library' which could be extended, adding suppor=
-t
->> for binary url + detached gpg signatures from some QEMU maintainers?
->=20
-> Requiring a signature makes the binaries hard to replace.  Any
-> specific reason to suggest gpg signatures instead of just a
-> (e.g.) sha256 hash?
->=20
->>
->> (I am also using old Gentoo/Debian packaged HPPA/Alpha Linux kernel fo=
-r
->> Avocado SuperIO tests, which aren't guaranteed to stay downloadable
->> forever).
->=20
-> Question for the Avocado folks: how this is normally handled in
-> avocado/avocado-vt?  Do you maintain a repository for guest
-> images, or you always point to their original sources?
->=20
-
-For pure Avocado, the vmimage library attempts to fetch, by default, the
-latest version of a guest image directly from the original sources.
-Say, a Fedora image will be downloaded by default from the Fedora
-servers.  Because of that, we don't pay too much attention to the
-availability of specific (old?) versions of guest images.
-
-For Avocado-VT, there are the JeOS images[1], which we keep on a test
-"assets" directory.  We have a lot of storage/bandwidth availability, so
-it can be used for other assets proven to be necessary for tests.
-
-As long as distribution rights and licensing are not issues, we can
-definitely use the same server for kernels, u-boot images and what not.
-
-[1] - https://avocado-project.org/data/assets/
-
---=20
-Cleber Rosa
-[ Sr Software Engineer - Virtualization Team - Red Hat ]
-[ Avocado Test Framework - avocado-framework.github.io ]
-[  7ABB 96EB 8B46 B94D 5E0F  E9BB 657E 8D33 A5F2 09F3  ]
+-- 
+Eduardo
