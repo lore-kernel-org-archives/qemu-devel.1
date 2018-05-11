@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33361)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fHFmq-00037p-Gp
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 17:41:13 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fHFoF-0006o2-Q1
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 17:42:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fHFmp-0005jb-Is
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 17:41:12 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fHFoE-0006KU-Qs
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 17:42:39 -0400
 References: <20180509165530.29561-1-mreitz@redhat.com>
-	<20180509165530.29561-11-mreitz@redhat.com>
-	<0fa62186-3ff3-f3e2-02bd-777fda2030c5@redhat.com>
+	<20180509165530.29561-8-mreitz@redhat.com>
+	<e0cb86f1-ac04-f7cd-bd19-77abeeb5636a@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <b674d614-6081-2356-6057-2c301323c5a5@redhat.com>
-Date: Fri, 11 May 2018 23:41:01 +0200
+Message-ID: <51b724fd-ed60-1021-cf26-729e6a0f7590@redhat.com>
+Date: Fri, 11 May 2018 23:42:33 +0200
 MIME-Version: 1.0
-In-Reply-To: <0fa62186-3ff3-f3e2-02bd-777fda2030c5@redhat.com>
+In-Reply-To: <e0cb86f1-ac04-f7cd-bd19-77abeeb5636a@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="d9PBhZyWX6cbAGXWVK23tSdTgWMZ22VJk"
-Subject: Re: [Qemu-devel] [PATCH 10/13] tests: Add QDict clone-flatten test
+	boundary="z8zEwCWOBVCs1KYe9GpQ6F3BKfgSQQvAW"
+Subject: Re: [Qemu-devel] [PATCH 07/13] qdict: Add
+ qdict_stringify_for_keyval()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,76 +30,157 @@ To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---d9PBhZyWX6cbAGXWVK23tSdTgWMZ22VJk
+--z8zEwCWOBVCs1KYe9GpQ6F3BKfgSQQvAW
 From: Max Reitz <mreitz@redhat.com>
 To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
  Kevin Wolf <kwolf@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
-Message-ID: <b674d614-6081-2356-6057-2c301323c5a5@redhat.com>
-Subject: Re: [PATCH 10/13] tests: Add QDict clone-flatten test
+Message-ID: <51b724fd-ed60-1021-cf26-729e6a0f7590@redhat.com>
+Subject: Re: [PATCH 07/13] qdict: Add qdict_stringify_for_keyval()
 References: <20180509165530.29561-1-mreitz@redhat.com>
- <20180509165530.29561-11-mreitz@redhat.com>
- <0fa62186-3ff3-f3e2-02bd-777fda2030c5@redhat.com>
-In-Reply-To: <0fa62186-3ff3-f3e2-02bd-777fda2030c5@redhat.com>
+ <20180509165530.29561-8-mreitz@redhat.com>
+ <e0cb86f1-ac04-f7cd-bd19-77abeeb5636a@redhat.com>
+In-Reply-To: <e0cb86f1-ac04-f7cd-bd19-77abeeb5636a@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2018-05-11 20:46, Eric Blake wrote:
+On 2018-05-11 20:39, Eric Blake wrote:
 > On 05/09/2018 11:55 AM, Max Reitz wrote:
->> This new test verifies that qdict_flatten() does not modify a shallow
->> clone of the given QDict.
+>> The purpose of this function is to prepare a QDict for consumption by
+>> the keyval visitor, which only accepts strings and QNull.
 >>
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
 >> ---
->> =C2=A0 tests/check-qdict.c | 33 +++++++++++++++++++++++++++++++++
->> =C2=A0 1 file changed, 33 insertions(+)
+>> =C2=A0 include/block/qdict.h |=C2=A0 2 ++
+>> =C2=A0 qobject/qdict.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 57
+>> +++++++++++++++++++++++++++++++++++++++++++++++++++
+>> =C2=A0 2 files changed, 59 insertions(+)
 >>
 >=20
-> I'm not sure I even want to know how long it took you to debug the cras=
-h
-> that you obviously hit before adding the fix in 9/13 plus this test ;)
+>> +/**
+>> + * Convert all values in a QDict so it can be consumed by the keyval
+>> + * input visitor.=C2=A0 QNull values are left as-is, all other values=
+ are
+>> + * converted to strings.
+>> + *
+>> + * @qdict must be flattened, i.e. it may not contain any nested QDict=
+s
+>> + * or QLists.
+>=20
+> Maybe s/flattened/flattened already/
+>=20
+> or would it be worth letting this function PERFORM the flattening step
+> automatically?
 
-Thank you very much, I made myself forget about that trauma already.
+Possibly, but I don't think it would be any more efficient, so I'd
+rather leave it up to the caller to do it explicitly than to do it here
+and maybe surprise someone.
 
-In short, I wondered why the whole thing worked for null-co directly:
-
-driver=3Dnull-co,size=3D512
-=3D> {"driver": "null-co", "size": 512}
-
-But not for null-co through raw:
-
-driver=3Draw,file.driver=3Dnull-co,file.size=3D512
-=3D> {"file": {}}
-
-(Or something like that, I don't remember exactly.)
-
-With some debugging sprinkled into block.c, I could see that the correct
-options were there on the null-co level...  But for some reason they
-disappeared one level above.
-
-Then I recalled that dict cloning is just a shallow cloning and looked
-for the culprit...
-
-Of course, in reality, much more cursing was involved.
+(Indeed I personally prefer to be surprised by an abort() than by some
+unintended data change.)
 
 Max
 
+>> + */
+>> +void qdict_stringify_for_keyval(QDict *qdict)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 const QDictEntry *e;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 for (e =3D qdict_first(qdict); e; e =3D qdict_next=
+(qdict, e)) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QString *new_value =3D NUL=
+L;
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 switch (qobject_type(e->va=
+lue)) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case QTYPE_QNULL:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*=
+ leave as-is */
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 br=
+eak;
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case QTYPE_QNUM: {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ch=
+ar *str =3D qnum_to_string(qobject_to(QNum, e->value));
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ne=
+w_value =3D qstring_from_str(str);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 g_=
+free(str);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 br=
+eak;
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case QTYPE_QSTRING:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*=
+ leave as-is */
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 br=
+eak;
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case QTYPE_QDICT:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case QTYPE_QLIST:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*=
+ @qdict must be flattened */
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ab=
+ort();
+>=20
+> Matches your documentation about requiring it to be already flattened.
+>=20
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case QTYPE_QBOOL:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if=
+ (qbool_get_bool(qobject_to(QBool, e->value))) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 new_value =3D qstring_from_str("on");
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } =
+else {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 new_value =3D qstring_from_str("off");
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 br=
+eak;
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case QTYPE_NONE:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case QTYPE__MAX:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ab=
+ort();
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (new_value) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QD=
+ictEntry *mut_e =3D (QDictEntry *)e;
+>=20
+> A bit of a shame that you have to cast away const. It took me a couple
+> reads to figure out this meant 'mutable_e'.=C2=A0 But in the end, the c=
+ode
+> looks correct.
+>=20
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qo=
+bject_unref(mut_e->value);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mu=
+t_e->value =3D QOBJECT(new_value);
+>=20
+> If we're okay requiring the caller to pre-flatten before calling this,
+> instead of offering to do it here,
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
 
---d9PBhZyWX6cbAGXWVK23tSdTgWMZ22VJk
+
+
+--z8zEwCWOBVCs1KYe9GpQ6F3BKfgSQQvAW
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr2De0ACgkQ9AfbAGHV
-z0A1HQf+ObsMMgSS503ZyS76HjL+qLituTrBusAgR9tcCJf2y0GoU7hv6EIvnjFz
-dyiJGZMMsOD4wyFJ3xUJ/TiwqyEd+sUBo1F3BjGp15N9B3eC4yNwveMLy3XGSsfd
-8KrZrt1jV5If4YKaaZ9UUPAS1S5ArJCy6gLkafgFq7Sb8SZAdW4RxW8IqbJbT10X
-UF1SS/JpsLmI16B+En5v9a3bEngTSWuoLOc2n+bSLs3Q8iJl9VGlcCRk7I2xyQ9C
-GMh+aEGb+E0MCfEZ7R1bqb2csvFZhd2Hy865kocWZ3s/sfM1jvzfi4DUAlI67aP1
-+swe6y22GZIAc/fp5yvuSpfeaM4Nrg==
-=jcgD
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr2DkkACgkQ9AfbAGHV
+z0Ba5wgAmzFs4pUIiykDXcOFfG3eFEJmkQErScAREsH2ALy9n7x87uLOwhqK7pD1
+1FuA5IZqOQsZS/vUWdhUq+szTLdVS1UbNQuFbOO4urfynO9tXQnYEnrCydsnY+VE
+G2NIpfvJO6p8PDHmRXqdBOP7DgoHfgEisfLVv6VMxXXskSadBAQ5v+LN8SXFZQJf
+UylReuDMryYTCyjyAyVkXAaU65hPjrAPu60tqhMY2jR1hGU6F+sHBZ3WV+cC7mXY
+DpOU6rxJTsk7NcXxdUJLELOsMCAyMr7RMhfYoOav8+F0dn4VSLyThmWsYup0h4Ai
+YHtkb4C8+siXvVWkEQFTMwNE+ZVWYg==
+=AdOn
 -----END PGP SIGNATURE-----
 
---d9PBhZyWX6cbAGXWVK23tSdTgWMZ22VJk--
+--z8zEwCWOBVCs1KYe9GpQ6F3BKfgSQQvAW--
