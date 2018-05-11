@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fH9DC-0003ro-5L
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 10:39:59 -0400
+	(envelope-from <renyime@gmail.com>) id 1fH9EF-0004p4-EI
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 10:41:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fH9D9-0006O0-3r
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 10:39:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58474)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fH9D8-0006Nj-Tx
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 10:39:55 -0400
-Date: Fri, 11 May 2018 11:33:00 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180511143300.GL25013@localhost.localdomain>
-References: <1525854989-14165-1-git-send-email-jingqi.liu@intel.com>
+	(envelope-from <renyime@gmail.com>) id 1fH9EE-0006zw-8G
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 10:41:03 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1525854989-14165-1-git-send-email-jingqi.liu@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v1 4/7] numa: Classify the numa nodes as
- memory initiators and memory targets
+References: <1526042271-11983-1-git-send-email-ivanren@tencent.com>
+	<d1f20f1e-69c7-bb11-3053-60bc89d06a84@redhat.com>
+In-Reply-To: <d1f20f1e-69c7-bb11-3053-60bc89d06a84@redhat.com>
+From: Ivan Ren <renyime@gmail.com>
+Date: Fri, 11 May 2018 22:40:48 +0800
+Message-ID: <CA+6E1=ku56=v=rGQt8=JArhA516afp94jDjmwwOc4A3dJdABcw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2] qcow2: fix preallocation with metadata
+ on bare block device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +23,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liu Jingqi <jingqi.liu@intel.com>
-Cc: pbonzini@redhat.com, rth@twiddle.net, mst@redhat.com, imammedo@redhat.com, marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org
+To: eblake@redhat.com
+Cc: mreitz@redhat.com, kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Wed, May 09, 2018 at 04:36:29PM +0800, Liu Jingqi wrote:
-> An initiator proximity domain (memory initiator) is any device
-> such as a CPU or a separate memory I/O device that can initiate
-> a memory request. A target proximity domain (memory target)
-> is a CPU-accessible physical address range.
-> 
-[...]
-> +    if (node->cpus) {
-> +        initiator_pxm[num_initiator++] = nodenr;
-> +    }
-[...]
-> +        target_pxm[num_target++] = nodenr;
+>> Create a qcow2 directly on bare block device with
+>> "-o preallocation=metadata" option. When read this qcow2, it will
+>> return pre-existing data on block device, and this may lead to
+>> data leakage. This patch add QCOW_OFLAG_ZERO for all preallocated
+>> l2 entry to avoid this problem.
+>
+> This is a semantic change; are we okay making it?
 
-I suggest NumaNode::is_initiator and NumaNode::is_target boolean
-fields instead of a separate global table.
+> Does your code properly check for qcow2v2 files, which don't support
+> QCOW_OFLAG_ZERO (only qcow2v3 supports it)?
 
-Or numa.c could simply provide
-  bool numa_node_is_initiator(int node) and
-  bool numa_node_is_target(int node)
-helpers.
+Sorry for this mistake.
+Current solution can only be used with s->qcow_version >= 3.
+I'll fix it.
 
--- 
-Eduardo
+On Fri, May 11, 2018 at 9:41 PM Eric Blake <eblake@redhat.com> wrote:
+
+> On 05/11/2018 07:37 AM, Ivan Ren wrote:
+> > Create a qcow2 directly on bare block device with
+> > "-o preallocation=metadata" option. When read this qcow2, it will
+> > return pre-existing data on block device, and this may lead to
+> > data leakage. This patch add QCOW_OFLAG_ZERO for all preallocated
+> > l2 entry to avoid this problem.
+>
+> This is a semantic change; are we okay making it?
+>
+> Does your code properly check for qcow2v2 files, which don't support
+> QCOW_OFLAG_ZERO (only qcow2v3 supports it)?
+>
+> >
+> > Signed-off-by: Ivan Ren <ivanren@tencent.com>
+> > ---
+>
+> --
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+>
