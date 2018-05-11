@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGz72-00054K-KO
+	(envelope-from <richard.henderson@linaro.org>) id 1fGz73-00055j-1o
 	for qemu-devel@nongnu.org; Thu, 10 May 2018 23:52:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGz6z-0006B8-RN
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 23:52:56 -0400
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:39680)
+	(envelope-from <richard.henderson@linaro.org>) id 1fGz71-0006BS-7C
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 23:52:57 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:38274)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fGz6z-0006Av-LQ
-	for qemu-devel@nongnu.org; Thu, 10 May 2018 23:52:53 -0400
-Received: by mail-pl0-x241.google.com with SMTP id c19-v6so2507530pls.6
-	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 20:52:53 -0700 (PDT)
+	id 1fGz71-0006BG-28
+	for qemu-devel@nongnu.org; Thu, 10 May 2018 23:52:55 -0400
+Received: by mail-pg0-x244.google.com with SMTP id n9-v6so1857848pgq.5
+	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 20:52:54 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 10 May 2018 20:52:38 -0700
-Message-Id: <20180511035240.4016-8-richard.henderson@linaro.org>
+Date: Thu, 10 May 2018 20:52:39 -0700
+Message-Id: <20180511035240.4016-9-richard.henderson@linaro.org>
 In-Reply-To: <20180511035240.4016-1-richard.henderson@linaro.org>
 References: <20180511035240.4016-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 7/9] target/sparc: Honor CPU_DUMP_FPU
+Subject: [Qemu-devel] [PATCH 8/9] target/unicore32: Honor CPU_DUMP_FPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,44 +27,28 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: Guan Xuetao <gxt@mprc.pku.edu.cn>
 
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: Guan Xuetao <gxt@mprc.pku.edu.cn>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/sparc/cpu.c | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
+ target/unicore32/translate.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
-index ff6ed91f9a..0f090ece54 100644
---- a/target/sparc/cpu.c
-+++ b/target/sparc/cpu.c
-@@ -647,15 +647,18 @@ void sparc_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
-         }
-     }
+diff --git a/target/unicore32/translate.c b/target/unicore32/translate.c
+index 5b51f2166d..63619e7d2c 100644
+--- a/target/unicore32/translate.c
++++ b/target/unicore32/translate.c
+@@ -2101,7 +2101,9 @@ void uc32_cpu_dump_state(CPUState *cs, FILE *f,
+                 psr & (1 << 28) ? 'V' : '-',
+                 cpu_mode_names[psr & 0xf]);
  
--    for (i = 0; i < TARGET_DPREGS; i++) {
--        if ((i & 3) == 0) {
--            cpu_fprintf(f, "%%f%02d: ", i * 2);
--        }
--        cpu_fprintf(f, " %016" PRIx64, env->fpr[i].ll);
--        if ((i & 3) == 3) {
--            cpu_fprintf(f, "\n");
+-    cpu_dump_state_ucf64(env, f, cpu_fprintf, flags);
 +    if (flags & CPU_DUMP_FPU) {
-+        for (i = 0; i < TARGET_DPREGS; i++) {
-+            if ((i & 3) == 0) {
-+                cpu_fprintf(f, "%%f%02d: ", i * 2);
-+            }
-+            cpu_fprintf(f, " %016" PRIx64, env->fpr[i].ll);
-+            if ((i & 3) == 3) {
-+                cpu_fprintf(f, "\n");
-+            }
-         }
-     }
-+
- #ifdef TARGET_SPARC64
-     cpu_fprintf(f, "pstate: %08x ccr: %02x (icc: ", env->pstate,
-                 (unsigned)cpu_get_ccr(env));
++        cpu_dump_state_ucf64(env, f, cpu_fprintf, flags);
++    }
+ }
+ 
+ void restore_state_to_opc(CPUUniCore32State *env, TranslationBlock *tb,
 -- 
 2.17.0
