@@ -1,42 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50279)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1fH5JR-0005DD-O3
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 06:30:15 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fH5Wo-0003aK-9l
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 06:43:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1fH5JQ-00054d-W3
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 06:30:09 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38726
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fH5JQ-00053Q-RT
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 06:30:08 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w4BASkGf002613
-	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 06:30:05 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2hw95arsf0-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 06:30:05 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Fri, 11 May 2018 11:30:03 +0100
-References: <1525782303-16940-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<1525782303-16940-5-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<c36ec83f-8cba-cf7b-3054-35cf4cd65c14@linux.ibm.com>
-	<1806faa3-dc46-f638-5c87-8a7415c9025a@linux.vnet.ibm.com>
-From: Halil Pasic <pasic@linux.ibm.com>
-Date: Fri, 11 May 2018 12:29:58 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fH5Wn-0003ZG-2D
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 06:43:58 -0400
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:46178)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fH5Wm-0003Z1-Ry
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 06:43:57 -0400
+Received: by mail-ot0-x244.google.com with SMTP id t1-v6so5697928ott.13
+	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 03:43:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1806faa3-dc46-f638-5c87-8a7415c9025a@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <59037385-06ae-e7e6-97a0-73b8acb4bee1@linux.ibm.com>
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH v5 4/6] s390x/vfio: ap: Introduce VFIO AP
- device
+In-Reply-To: <20180510205949.26455-1-laurent@vivier.eu>
+References: <20180510205949.26455-1-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 11 May 2018 11:43:35 +0100
+Message-ID: <CAFEAcA99yoOKX4Vy8e455cFQOe_WZN0rgu+CV1LLyvSonxQCoA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] linux-user: correctly align types in
+ thunking code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,22 +29,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: mjrosato@linux.vnet.ibm.com, peter.maydell@linaro.org, pasic@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, eskultet@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, cohuck@redhat.com, heiko.carstens@de.ibm.com, alex.williamson@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, jjherne@linux.vnet.ibm.com, schwidefsky@de.ibm.com, pbonzini@redhat.com, bjsdjshi@linux.vnet.ibm.com, eric.auger@redhat.com, rth@twiddle.net
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
 
-DQoNCk9uIDA1LzEwLzIwMTggMDM6MTAgUE0sIFRvbnkgS3Jvd2lhayB3cm90ZToNCj4+IElm
-wqBJwqBkaWTCoG5vdC7CoEnCoHRoaW5rwqB0aGlzwqBpc8KgYcKgYmlnwqBwcm9ibGVtLsKg
-V2XCoG5lZWTCoHRvwqBhdMKgbGVhc3QNCj4+IHplcm9pemXCoHRoZcKgcXVldWVzwqAoZS5n
-LsKgb27CoHN5c3RlbcKgcmVzZXQpwqDCoHRvwqBhdm9pZMKgbGVha2luZw0KPj4gc2Vuc2l0
-aXZlwqBpbmZvcm1hdGlvbi7CoFdpdGhvdXTCoHRoaXMswqB0aGVyZcKgaXPCoG5vwqBzYW5l
-wqB3YXnCoHRvwqB1c2UNCj4+IGFwLXBhc3N0aHJvdWdoLsKgT3LCoGFtwqBJwqB3cm9uZz8N
-Cj4gDQo+IEnCoGRvwqBub3TCoGhhdmXCoGHCoGRlZmluaXRpdmXCoGFuc3dlcizCoEnCoHdp
-bGzCoGhhdmXCoHRvwqBsb29rwqBpbnRvwqBpdC4NCj4gSSdtwqB0aGlua2luZ8KgdGhhdMKg
-c2luY2XCoHdlwqBhcmXCoHVzaW5nwqBhcC1wYXNzdGhyb3VnaCzCoHRoZcKgQVDCoGJ1cw0K
-PiBydW5uaW5nwqBvbsKgdGhlwqBndWVzdMKgd291bGTCoGJlwqByZXNwb25zaWJsZcKgZm9y
-wqBoYW5kbGluZ8KgcmVzZXTCoHBvc3NpYmx5DQo+IGJ5wqByZXNldHRpbmfCoG9ywqB6ZXJv
-aXppbmfCoGl0c8KgcXVldWVzLsKgSSdsbMKgZ2V0wqBiYWNrwqB0b8KgeW91wqBvbsKgdGhp
-cy4NCg0KWW91IGFyZSBvbiB0aGUgd3JvbmcgdHJhY2suIFdoYXQgSSdtIHRhbGtpbmcgYWJv
-dXQgaXMgdGhlIHJlc3BvbnNpYmlsaXR5DQpvZiB0aGUgaHlwZXJ2aXNvciBhbmQgbm90IHRo
-ZSByZXNwb25zaWJpbGl0eSBvZiB0aGUgZ3Vlc3QuDQoNClJlZ2FyZHMsDQpIYWxpbA0KDQoN
-Cg==
+On 10 May 2018 at 21:59, Laurent Vivier <laurent@vivier.eu> wrote:
+> This is a follow up
+> of patch:
+>
+>         commit c2e3dee6e03527baf8698698cce76b1a3174969a
+>         Author: Laurent Vivier <laurent@vivier.eu>
+>         Date:   Sun Feb 13 23:37:34 2011 +0100
+>
+>             linux-user: Define target alignment size
+>
+> In my case m68k aligns "int" on 2 not 4. You can check this with the
+> following program:
+>
+> int main(void)
+> {
+>         struct rtentry rt;
+>         printf("rt_pad1 %ld %zd\n", offsetof(struct rtentry, rt_pad1),
+>                 sizeof(rt.rt_pad1));
+>         printf("rt_dst %ld %zd\n", offsetof(struct rtentry, rt_dst),
+>                 sizeof(rt.rt_dst));
+>         printf("rt_gateway %ld %zd\n", offsetof(struct rtentry, rt_gateway),
+>                 sizeof(rt.rt_gateway));
+>         printf("rt_genmask %ld %zd\n", offsetof(struct rtentry, rt_genmask),
+>                 sizeof(rt.rt_genmask));
+>         printf("rt_flags %ld %zd\n", offsetof(struct rtentry, rt_flags),
+>                 sizeof(rt.rt_flags));
+>         printf("rt_pad2 %ld %zd\n", offsetof(struct rtentry, rt_pad2),
+>                 sizeof(rt.rt_pad2));
+>         printf("rt_pad3 %ld %zd\n", offsetof(struct rtentry, rt_pad3),
+>                 sizeof(rt.rt_pad3));
+>         printf("rt_pad4 %ld %zd\n", offsetof(struct rtentry, rt_pad4),
+>                 sizeof(rt.rt_pad4));
+>         printf("rt_metric %ld %zd\n", offsetof(struct rtentry, rt_metric),
+>                 sizeof(rt.rt_metric));
+>         printf("rt_dev %ld %zd\n", offsetof(struct rtentry, rt_dev),
+>                 sizeof(rt.rt_dev));
+>         printf("rt_mtu %ld %zd\n", offsetof(struct rtentry, rt_mtu),
+>                 sizeof(rt.rt_mtu));
+>         printf("rt_window %ld %zd\n", offsetof(struct rtentry, rt_window),
+>                 sizeof(rt.rt_window));
+>         printf("rt_irtt %ld %zd\n", offsetof(struct rtentry, rt_irtt),
+>                 sizeof(rt.rt_irtt));
+> }
+>
+> And result is :
+>
+> i386
+>
+> rt_pad1 0 4
+> rt_dst 4 16
+> rt_gateway 20 16
+> rt_genmask 36 16
+> rt_flags 52 2
+> rt_pad2 54 2
+> rt_pad3 56 4
+> rt_pad4 62 2
+> rt_metric 64 2
+> rt_dev 68 4
+> rt_mtu 72 4
+> rt_window 76 4
+> rt_irtt 80 2
+>
+> m68k
+>
+> rt_pad1 0 4
+> rt_dst 4 16
+> rt_gateway 20 16
+> rt_genmask 36 16
+> rt_flags 52 2
+> rt_pad2 54 2
+> rt_pad3 56 4
+> rt_pad4 62 2
+> rt_metric 64 2
+> rt_dev 66 4
+> rt_mtu 70 4
+> rt_window 74 4
+> rt_irtt 78 2
+>
+> This affects the "route" command :
+>
+> WITHOUT this patch:
+>
+> $ sudo route add -net default gw 10.0.3.1 window 1024 irtt 2 eth0
+> $ netstat -nr
+> Kernel IP routing table
+> Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+> 0.0.0.0         10.0.3.1        0.0.0.0         UG        0 67108866  32768 eth0
+> 10.0.3.0        0.0.0.0         255.255.255.0   U         0 0          0 eth0
+>
+> WITH this patch:
+>
+> $ sudo route add -net default gw 10.0.3.1 window 1024 irtt 2 eth0
+> $ netstat -nr
+> Kernel IP routing table
+> Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+> 0.0.0.0         10.0.3.1        0.0.0.0         UG        0 1024       2 eth0
+> 10.0.3.0        0.0.0.0         255.255.255.0   U         0 0          0 eth0
+>
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>  include/exec/user/thunk.h | 22 +++++++++++++++++-----
+>  1 file changed, 17 insertions(+), 5 deletions(-)
+>
+> diff --git a/include/exec/user/thunk.h b/include/exec/user/thunk.h
+> index f19ef4b230..8f55b233b3 100644
+> --- a/include/exec/user/thunk.h
+> +++ b/include/exec/user/thunk.h
+> @@ -149,20 +149,32 @@ static inline int thunk_type_align(const argtype *type_ptr, int is_host)
+>      case TYPE_CHAR:
+>          return 1;
+>      case TYPE_SHORT:
+> -        return 2;
+> +        if (is_host) {
+> +            return __alignof__(short);
+> +        } else {
+> +            return ABI_SHORT_ALIGNMENT;
+> +        }
+>      case TYPE_INT:
+> -        return 4;
+> +        if (is_host) {
+> +            return __alignof__(int);
+> +        } else {
+> +            return ABI_INT_ALIGNMENT;
+> +        }
+>      case TYPE_LONGLONG:
+>      case TYPE_ULONGLONG:
+> -        return 8;
+> +        if (is_host) {
+> +            return __alignof__(long long);
+> +        } else {
+> +            return ABI_LLONG_ALIGNMENT;
+> +        }
+>      case TYPE_LONG:
+>      case TYPE_ULONG:
+>      case TYPE_PTRVOID:
+>      case TYPE_PTR:
+>          if (is_host) {
+> -            return sizeof(void *);
+> +            return __alignof__(long);
+>          } else {
+> -            return TARGET_ABI_BITS / 8;
+> +            return ABI_LONG_ALIGNMENT;
+>          }
+>          break;
+>      case TYPE_OLDDEVT:
+> --
+
+This definitely looks like the right thing. As well as m68k,
+this will also affect sh4 and i386 (where long long is 4
+aligned but we were saying it should be 8 aligned) -- I wonder
+if that fixes any bugs...
+
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
