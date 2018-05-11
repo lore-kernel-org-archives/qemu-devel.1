@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fHEwR-00079z-Tt
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 16:47:05 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fHExT-0007ru-Er
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 16:48:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fHEwO-0000yL-ST
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 16:47:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43158)
+	(envelope-from <ehabkost@redhat.com>) id 1fHExQ-00017U-Bs
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 16:48:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43634)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fHEwO-0000y8-N4
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 16:47:00 -0400
-Date: Fri, 11 May 2018 17:46:48 -0300
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fHExQ-00017M-6W
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 16:48:04 -0400
+Date: Fri, 11 May 2018 17:47:59 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180511204648.GO13350@localhost.localdomain>
+Message-ID: <20180511204759.GP13350@localhost.localdomain>
 References: <20180510204148.11687-1-babu.moger@amd.com>
-	<20180510204148.11687-8-babu.moger@amd.com>
+	<20180510204148.11687-4-babu.moger@amd.com>
+	<20180511192145.GV25013@localhost.localdomain>
+	<BL0PR12MB24682473432EF64021381FAB959F0@BL0PR12MB2468.namprd12.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180510204148.11687-8-babu.moger@amd.com>
-Subject: Re: [Qemu-devel] [PATCH v8 7/8] i386: Enable TOPOEXT feature on AMD
- EPYC CPU
+In-Reply-To: <BL0PR12MB24682473432EF64021381FAB959F0@BL0PR12MB2468.namprd12.prod.outlook.com>
+Subject: Re: [Qemu-devel] [PATCH v8 3/8] i386: Add new property to control
+ cache info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,64 +30,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Babu Moger <babu.moger@amd.com>
-Cc: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net, mtosatti@redhat.com, geoff@hostfission.com, kash@tripleback.net, qemu-devel@nongnu.org, kvm@vger.kernel.org
+To: "Moger, Babu" <Babu.Moger@amd.com>
+Cc: "geoff@hostfission.com" <geoff@hostfission.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>, "kash@tripleback.net" <kash@tripleback.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
 
-On Thu, May 10, 2018 at 03:41:47PM -0500, Babu Moger wrote:
-> Enable TOPOEXT feature on EPYC CPU. This is required to support
-> hyperthreading on VM guests. Also extend xlevel to 0x8000001E.
+On Fri, May 11, 2018 at 08:21:50PM +0000, Moger, Babu wrote:
 > 
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
-> Tested-by: Geoffrey McRae <geoff@hostfission.com>
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  target/i386/cpu.c | 11 +++++++++--
->  1 file changed, 9 insertions(+), 2 deletions(-)
+> > -----Original Message-----
+> > From: Eduardo Habkost [mailto:ehabkost@redhat.com]
+> > Sent: Friday, May 11, 2018 2:22 PM
+> > To: Moger, Babu <Babu.Moger@amd.com>
+> > Cc: mst@redhat.com; marcel.apfelbaum@gmail.com; pbonzini@redhat.com;
+> > rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
+> > kvm@vger.kernel.org; geoff@hostfission.com; kash@tripleback.net
+> > Subject: Re: [PATCH v8 3/8] i386: Add new property to control cache info
+> > 
+> > On Thu, May 10, 2018 at 03:41:43PM -0500, Babu Moger wrote:
+> > > The property legacy-cache will be used to control the cache information.
+> > > If user passes "-cpu legacy-cache" then older information will
+> > > be displayed even if the hardware supports new information. Otherwise
+> > > use the statically loaded cache definitions if available.
+> > >
+> > > Signed-off-by: Babu Moger <babu.moger@amd.com>
+> > > Tested-by: Geoffrey McRae <geoff@hostfission.com>
+> > > ---
+> > >  include/hw/i386/pc.h |  8 ++++
+> > >  target/i386/cpu.c    | 97 ++++++++++++++++++++++++++++++++-----------
+> > -
+> > >  target/i386/cpu.h    |  5 +++
+> > >  3 files changed, 84 insertions(+), 26 deletions(-)
+> > >
+> > > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> > > index 2e834e6ded..df15deefca 100644
+> > > --- a/include/hw/i386/pc.h
+> > > +++ b/include/hw/i386/pc.h
+> > > @@ -304,6 +304,14 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
+> > >  int e820_get_num_entries(void);
+> > >  bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+> > >
+> > > +#define PC_COMPAT_2_12 \
+> > > +    HW_COMPAT_2_12 \
+> > > +    {\
+> > > +        .driver   = TYPE_X86_CPU,\
+> > > +        .property = "legacy-cache",\
+> > > +        .value    = "on",\
+> > > +    },
+> > 
+> > This isn't enough if the pc-*-2.12 machine-type isn't using the
+> > macro.
+> > 
+> > Before we do this, we need a commit similar to commit
+> > df47ce8af4a5, but adding pc-*-2.13 machine-types.
 > 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 5cfc7bb0e1..575f2416a1 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -2382,7 +2382,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
->          .features[FEAT_8000_0001_ECX] =
->              CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
->              CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
-> -            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
-> +            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM |
-> +            CPUID_EXT3_TOPOEXT,
->          .features[FEAT_7_0_EBX] =
->              CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_AVX2 |
->              CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_RDSEED |
-> @@ -2427,7 +2428,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
->          .features[FEAT_8000_0001_ECX] =
->              CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
->              CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
-> -            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
-> +            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM |
-> +            CPUID_EXT3_TOPOEXT,
+> Ok. Sure. I think I got it. Will add pc-*-2.13 machine-types in v9 series. 
 
-I forgot about one thing: you'll need to add EPYC.topoext=off and
-EPYC-IBPB.topoext=off to PC_COMPAT_2_12.
-
->          .features[FEAT_8000_0008_EBX] =
->              CPUID_8000_0008_EBX_IBPB,
->          .features[FEAT_7_0_EBX] =
-> @@ -4540,6 +4542,11 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
->              x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A);
->          }
->  
-> +        /* TOPOEXT feature requires 0x8000001E */
-> +        if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT) {
-> +            x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001E);
-> +        }
-> +
->          /* SEV requires CPUID[0x8000001F] */
->          if (sev_enabled()) {
->              x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001F);
-> -- 
-> 2.17.0
-> 
-> 
+Thanks.  If you submit v9, please use the x86-next tree as base
+so you don't need to resubmit the patches that I have already
+queued.  See MAINTAINERS for the git URL.
 
 -- 
 Eduardo
