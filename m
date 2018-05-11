@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38796)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fH3BZ-0000zd-Db
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 04:13:54 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fH3Dl-00024Z-OL
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 04:16:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fH3BY-0005sN-Do
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 04:13:53 -0400
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:50680)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fH3BY-0005s3-6e
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 04:13:52 -0400
-Received: by mail-wm0-x22d.google.com with SMTP id t11-v6so1366713wmt.0
-	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 01:13:52 -0700 (PDT)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fH3Dj-0006ku-41
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 04:16:09 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:44272)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fH3Di-0006kU-SJ
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 04:16:07 -0400
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Date: Fri, 11 May 2018 11:16:01 +0300
+Message-ID: <20180511081601.14610.39946.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
-In-Reply-To: <7b553822-c61e-8481-9d59-b4ec328dd76b@steffen-goertz.de>
-References: <7b553822-c61e-8481-9d59-b4ec328dd76b@steffen-goertz.de>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Fri, 11 May 2018 09:13:50 +0100
-Message-ID: <CAJSP0QVk-+dgK3gnorVRFnx9GKaxkCCu+sFwT4B5zzRTmVVUvQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] GSoC18: Cortex-M0 / micro:bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] ps2: prevent changing irq state on save and
+ load
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,20 +25,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Steffen_G=C3=B6rtz?= <qemu.ml@steffen-goertz.de>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Julia Suvorova <jusual@mail.ru>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>
+To: qemu-devel@nongnu.org
+Cc: arei.gonglei@huawei.com, mst@redhat.com, ciro.santilli@gmail.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, pbonzini@redhat.com
 
-On Fri, May 11, 2018 at 12:37 AM, Steffen G=C3=B6rtz
-<qemu.ml@steffen-goertz.de> wrote:
-> my name is Steffen. I am a master candidate in electrical engineering at
-> RWTH University in Aachen, Germany.
-> Together with Julia Suvorova i will work on Cortex-M0 / BBC micro:bit
-> support in QEMU this summer. This endeavor will supervised by Stefan
-> Hajnoczi, Jim Mussared and Joel Stanley.
+Commit 2858ab09e6f708e381fc1a1cc87e747a690c4884 changed
+PS/2 keyboard/mouse buffers to the standard size. However, its state
+may change when migrating from the old buffer size and therefore irq needs
+updating. But this change made wrong, because it throws the whole queue
+if there are too much data instead of cropping it.
 
-Congratulations and welcome!
+That commit also updates irq (because the queue state may change).
+But updating the irq may change the VM state (and determinism of
+the execution). E.g., when replaying the execution, one may save
+the VM state and the state of the interrupt controller will be updated
+at the moment of saving, instead of using the recorded update events.
 
-For anyone who wants to find out more about the micro:bit board, check out:
-http://microbit.org/
+This patch makes the queue update deterministic: it removes the update_irq
+call and crops the queue to prevent losing the characters and changing
+the required irq status.
 
-Stefan
+Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+---
+ hw/input/ps2.c |    8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/hw/input/ps2.c b/hw/input/ps2.c
+index 06f5d2a..8b1931b 100644
+--- a/hw/input/ps2.c
++++ b/hw/input/ps2.c
+@@ -837,7 +837,12 @@ static void ps2_common_post_load(PS2State *s)
+     uint8_t tmp_data[PS2_QUEUE_SIZE];
+ 
+     /* set the useful data buffer queue size, < PS2_QUEUE_SIZE */
+-    size = (q->count < 0 || q->count > PS2_QUEUE_SIZE) ? 0 : q->count;
++    size = q->count;
++    if (q->count < 0) {
++        size = 0;
++    } else if (q->count > PS2_QUEUE_SIZE) {
++        size = PS2_QUEUE_SIZE;
++    }
+ 
+     /* move the queue elements to the start of data array */
+     for (i = 0; i < size; i++) {
+@@ -852,7 +857,6 @@ static void ps2_common_post_load(PS2State *s)
+     q->rptr = 0;
+     q->wptr = size;
+     q->count = size;
+-    s->update_irq(s->update_arg, q->count != 0);
+ }
+ 
+ static void ps2_kbd_reset(void *opaque)
