@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fHAwd-0007gT-Cu
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 12:31:01 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fHAx9-00080o-Bw
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 12:31:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fHAwZ-0004Bh-Jo
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 12:30:59 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40480 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fHAwZ-0004Ba-F5
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 12:30:55 -0400
-Date: Fri, 11 May 2018 17:30:50 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180511163050.GQ22098@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <bdfbc910-4a08-98ae-563d-96090f0f381a@mail.ru>
-	<CAJSP0QXnKJemDtZVOOgktwAawRUto25E1i-JjggKsviN4iuS5A@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fHAx8-0004MX-G9
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 12:31:31 -0400
+Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:38751)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fHAx8-0004M8-Bw
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 12:31:30 -0400
+Received: by mail-ot0-x230.google.com with SMTP id n3-v6so6894495ota.5
+	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 09:31:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAJSP0QXnKJemDtZVOOgktwAawRUto25E1i-JjggKsviN4iuS5A@mail.gmail.com>
-Subject: Re: [Qemu-devel] Outreachy intro: micro:bit project
+In-Reply-To: <20180509175458.15642-1-richard.henderson@linaro.org>
+References: <20180509175458.15642-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 11 May 2018 17:30:38 +0100
+Message-ID: <CAFEAcA_Muga-rMERftcQREnmgXxVHYOoF6dNJYsffvggbemwFw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/28] Bulk target patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Julia Suvorova <jusual@mail.ru>, Jim Mussared <jim@groklearning.com>, qemu-devel <qemu-devel@nongnu.org>, Joel Stanley <joel@jms.id.au>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, David Hildenbrand <david@redhat.com>, Alexander Graf <agraf@suse.de>, Stafford Horne <shorne@gmail.com>, Cornelia Huck <cohuck@redhat.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Michael Walle <michael@walle.cc>, Max Filippov <jcmvbkbc@gmail.com>, Richard Henderson <rth@twiddle.net>, Michael Clark <mjc@sifive.com>, Eduardo Habkost <ehabkost@redhat.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>, qemu-s390x <qemu-s390x@nongnu.org>, Artyom Tarasenko <atar4qemu@gmail.com>, Palmer Dabbelt <palmer@sifive.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc <qemu-ppc@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-On Fri, May 11, 2018 at 05:13:31PM +0100, Stefan Hajnoczi wrote:
-> On Thu, May 10, 2018 at 11:19 PM, Julia Suvorova <jusual@mail.ru> wrote:
-> > My name is Julia. I am a bachelor of mathematics from Moscow who is
-> > interested in system programming. I've been selected for Outreachy this
-> > year to work on the micro:bit project.
-> > The project is divided between two people - me and Steffen.
-> > We will develop support for the micro:bit board and the Cortex-M0 cpu.
-> >
-> > I'm very excited to work with QEMU community. Wish me luck!
-> 
-> Congratulations!  We are excited to work with you.
-> 
-> Do you have a blog URL where we can follow your work?
-> 
-> You can add it to the open source virtualization blog aggregator here
-> by contacting Daniel Berrange <berrange@redhat.com> (and follow the
-> aggregator to see what others are doing!):
-> https://planet.virt-tools.org/
+On 9 May 2018 at 18:54, Richard Henderson <richard.henderson@linaro.org> wrote:
+> This contains two related patch sets from Emilio Cota, both
+> touching the translation loop for these 13 targets.
+>
+> I promised Emilio that we'd get these merged early in this
+> next development cycle to avoid conflicts.
+>
+>
+> r~
+>
+>
+> The following changes since commit e5cd695266c5709308aa95b1baae499e4b5d4544:
+>
+>   Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' into staging (2018-05-08 17:05:58 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/rth7680/qemu.git tags/cota-target-pull-request
+>
+> for you to fetch changes up to 5b4f1d2db9fb0e24549054ee58c7a7d8f84ddd6e:
+>
+>   target/riscv: convert to TranslatorOps (2018-05-09 10:12:21 -0700)
+>
+> ----------------------------------------------------------------
+> * Fix all next_page checks for overflow.
+> * Convert six targets to the translator loop.
+>
 
-We maintain it in public GIT now, so people can just clone the repo here,
-add their blog details (see recent commits for example of what needs
-changing), then send the patch to libvir-list@redhat.com for review
+Applied, thanks.
 
-  https://libvirt.org/git/?p=virttools-planet.git;a=summary
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+-- PMM
