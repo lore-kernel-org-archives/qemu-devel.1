@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fH7y4-0000pv-Bn
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 09:20:17 -0400
+	(envelope-from <david@redhat.com>) id 1fH7yB-0000wd-Ff
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 09:20:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fH7xy-0003ie-Rh
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 09:20:16 -0400
+	(envelope-from <david@redhat.com>) id 1fH7yA-0003vO-Dg
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 09:20:23 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Fri, 11 May 2018 15:19:37 +0200
-Message-Id: <20180511131953.12905-2-david@redhat.com>
+Date: Fri, 11 May 2018 15:19:39 +0200
+Message-Id: <20180511131953.12905-4-david@redhat.com>
 In-Reply-To: <20180511131953.12905-1-david@redhat.com>
 References: <20180511131953.12905-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 01/17] memory-device: drop assert related to
- align and start of address space
+Subject: [Qemu-devel] [PATCH v2 03/17] pc: prepare for multi stage hotplug
+ handlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,35 +23,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>, David Hildenbrand <david@redhat.com>
 
-The start of the address space does not have to be aligned for the
-search. Handly this case explicitly when starting the search for a new
-address.
+For multi stage hotplug handlers, we'll have to do some error handling
+in some hotplug functions, so let's use a local error variable (except
+for unplug requests).
+
+Also, add code to pass control to the final stage hotplug handler at the
+parent bus.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/mem/memory-device.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ hw/i386/pc.c | 39 +++++++++++++++++++++++++++++++--------
+ 1 file changed, 31 insertions(+), 8 deletions(-)
 
-diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
-index 3e04f3954e..361d38bfc5 100644
---- a/hw/mem/memory-device.c
-+++ b/hw/mem/memory-device.c
-@@ -116,7 +116,6 @@ uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t *hint,
-     address_space_start = ms->device_memory->base;
-     address_space_end = address_space_start +
-                         memory_region_size(&ms->device_memory->mr);
--    g_assert(QEMU_ALIGN_UP(address_space_start, align) == address_space_start);
-     g_assert(address_space_end >= address_space_start);
- 
-     memory_device_check_addable(ms, size, errp);
-@@ -149,7 +148,7 @@ uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t *hint,
-             return 0;
-         }
-     } else {
--        new_addr = address_space_start;
-+        new_addr = QEMU_ALIGN_UP(address_space_start, align);
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index b2374febbb..39153fa083 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -2007,19 +2007,32 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+ static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+                                           DeviceState *dev, Error **errp)
+ {
++    Error *local_err = NULL;
++
++    /* final stage hotplug handler */
+     if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+-        pc_cpu_pre_plug(hotplug_dev, dev, errp);
++        pc_cpu_pre_plug(hotplug_dev, dev, &local_err);
++    } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
++        hotplug_handler_pre_plug(dev->parent_bus->hotplug_handler, dev,
++                                 &local_err);
      }
++    error_propagate(errp, local_err);
+ }
  
-     /* find address range that will fit new memory device */
+ static void pc_machine_device_plug_cb(HotplugHandler *hotplug_dev,
+                                       DeviceState *dev, Error **errp)
+ {
++    Error *local_err = NULL;
++
++    /* final stage hotplug handler */
+     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+-        pc_dimm_plug(hotplug_dev, dev, errp);
++        pc_dimm_plug(hotplug_dev, dev, &local_err);
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+-        pc_cpu_plug(hotplug_dev, dev, errp);
++        pc_cpu_plug(hotplug_dev, dev, &local_err);
++    } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
++        hotplug_handler_plug(dev->parent_bus->hotplug_handler, dev, &local_err);
+     }
++    error_propagate(errp, local_err);
+ }
+ 
+ static void pc_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+@@ -2029,7 +2042,10 @@ static void pc_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+         pc_dimm_unplug_request(hotplug_dev, dev, errp);
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+         pc_cpu_unplug_request_cb(hotplug_dev, dev, errp);
+-    } else {
++    } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
++        hotplug_handler_unplug_request(dev->parent_bus->hotplug_handler, dev,
++                                       errp);
++    } else if (!dev->parent_bus) {
+         error_setg(errp, "acpi: device unplug request for not supported device"
+                    " type: %s", object_get_typename(OBJECT(dev)));
+     }
+@@ -2038,14 +2054,21 @@ static void pc_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+ static void pc_machine_device_unplug_cb(HotplugHandler *hotplug_dev,
+                                         DeviceState *dev, Error **errp)
+ {
++    Error *local_err = NULL;
++
++    /* final stage hotplug handler */
+     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+-        pc_dimm_unplug(hotplug_dev, dev, errp);
++        pc_dimm_unplug(hotplug_dev, dev, &local_err);
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+-        pc_cpu_unplug_cb(hotplug_dev, dev, errp);
+-    } else {
+-        error_setg(errp, "acpi: device unplug for not supported device"
++        pc_cpu_unplug_cb(hotplug_dev, dev, &local_err);
++    } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
++        hotplug_handler_unplug(dev->parent_bus->hotplug_handler, dev,
++                               &local_err);
++    } else if (!dev->parent_bus) {
++        error_setg(&local_err, "acpi: device unplug for not supported device"
+                    " type: %s", object_get_typename(OBJECT(dev)));
+     }
++    error_propagate(errp, local_err);
+ }
+ 
+ static HotplugHandler *pc_get_hotpug_handler(MachineState *machine,
 -- 
 2.14.3
