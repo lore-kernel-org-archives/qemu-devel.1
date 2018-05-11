@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fH3TI-0005Zb-0A
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 04:32:13 -0400
+	(envelope-from <bounces@canonical.com>) id 1fH3vK-00054Y-Fh
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:01:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fH3TD-0003aA-QQ
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 04:32:11 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:45516)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fH3TD-0003Zg-Cs
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 04:32:07 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20180428123627.12445.9923.stgit@pasha-VirtualBox>
-	<CAFXrp_duRj1rZ6Opffa3ihw+zou6B+oPn3g2BNRPSEgB7F_P8Q@mail.gmail.com>
-In-Reply-To: <CAFXrp_duRj1rZ6Opffa3ihw+zou6B+oPn3g2BNRPSEgB7F_P8Q@mail.gmail.com>
-Date: Fri, 11 May 2018 11:32:01 +0300
-Message-ID: <002101d3e902$891ad5c0$9b508140$@ru>
+	(envelope-from <bounces@canonical.com>) id 1fH3vG-0006wz-Fb
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:01:10 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38798)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fH3vG-0006vz-9Y
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 05:01:06 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fH3vC-0004kl-W7
+	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 09:01:03 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A9F9B2E8F59
+	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 09:01:00 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [RFC PATCH v2 00/19] reverse debugging
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 11 May 2018 08:49:58 -0000
+From: ChristianEhrhardt <1770417@bugs.launchpad.net>
+Reply-To: Bug 1770417 <1770417@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152596210054.26788.14569755785770428905.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152602859816.25295.271319984138177684.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1770417] Re: Qemu can not parse long fqdns during
+ drive-mirror
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,127 +37,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Ciro Santilli' <ciro.santilli@gmail.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, 'QEMU Developers' <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-> From: Ciro Santilli [mailto:ciro.santilli@gmail.com]
-> Did you manage to reproduce and solve the savevm and loadvm problems I
-> mentioned at: http://lists.nongnu.org/archive/html/qemu-devel/2018-04/msg05219.html
-> ?
+Ubuntu task is not actionable until we settled on how to change the
+parsing code for long strings upstream, so I set it to confirmed but
+wishlist (until we know what size a patch - or actions a recommendation
+on handling differently has).
 
-I've tried to debug your scenario and found a bug in saving/loading PS/2 
-keyboard state.
+** Changed in: qemu (Ubuntu)
+       Status: New =3D> Confirmed
 
-Here is the patch for fixing it: https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg02518.html
+** Changed in: qemu (Ubuntu)
+   Importance: Undecided =3D> Wishlist
 
-Maybe it will help for your debugging scenario.
+-- =
 
-Pavel Dovgalyuk
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1770417
 
-> 
-> I still observe them on the current patch.
-> 
-> On Sat, Apr 28, 2018 at 1:36 PM, Pavel Dovgalyuk
-> <Pavel.Dovgaluk@ispras.ru> wrote:
-> > GDB remote protocol supports reverse debugging of the targets.
-> > It includes 'reverse step' and 'reverse continue' operations.
-> > The first one finds the previous step of the execution,
-> > and the second one is intended to stop at the last breakpoint that
-> > would happen when the program is executed normally.
-> >
-> > Reverse debugging is possible in the replay mode, when at least
-> > one snapshot was created at the record or replay phase.
-> > QEMU can use these snapshots for travelling back in time with GDB.
-> >
-> > Running the execution in replay mode allows using GDB reverse debugging
-> > commands:
-> >  - reverse-stepi (or rsi): Steps one instruction to the past.
-> >    QEMU loads on of the prior snapshots and proceeds to the desired
-> >    instruction forward. When that step is reaches, execution stops.
-> >  - reverse-continue (or rc): Runs execution "backwards".
-> >    QEMU tries to find breakpoint or watchpoint by loaded prior snapshot
-> >    and replaying the execution. Then QEMU loads snapshots again and
-> >    replays to the latest breakpoint. When there are no breakpoints in
-> >    the examined section of the execution, QEMU finds one more snapshot
-> >    and tries again. After the first snapshot is processed, execution
-> >    stops at this snapshot.
-> >
-> > The set of patches include the following modifications:
-> >  - gdbstub update for reverse debugging support
-> >  - functions that automatically perform reverse step and reverse
-> >    continue operations
-> >  - hmp/qmp commands for manipulating the replay process
-> >  - improvement of the snapshotting for saving the execution step
-> >    in the snapshot parameters
-> >  - other record/replay fixes
-> >
-> > The patches are available in the repository:
-> > https://github.com/ispras/qemu/tree/rr-180428
-> >
-> > v2 changes:
-> >  - documented reverse debugging
-> >  - fixed start vmstate loading in record mode
-> >  - documented qcow2 changes (as suggested by Eric Blake)
-> >  - made icount SnapshotInfo field optional (as suggested by Eric Blake)
-> >  - renamed qmp commands (as suggested by Eric Blake)
-> >  - minor changes
-> >
-> > ---
-> >
-> > Pavel Dovgalyuk (19):
-> >       block: implement bdrv_snapshot_goto for blkreplay
-> >       replay: disable default snapshot for record/replay
-> >       replay: update docs for record/replay with block devices
-> >       replay: don't drain/flush bdrv queue while RR is working
-> >       replay: finish record/replay before closing the disks
-> >       qcow2: introduce icount field for snapshots
-> >       migration: introduce icount field for snapshots
-> >       replay: introduce info hmp/qmp command
-> >       replay: introduce breakpoint at the specified step
-> >       replay: implement replay-seek command to proceed to the desired step
-> >       replay: flush events when exitting
-> >       timer: remove replay clock probe in deadline calculation
-> >       replay: refine replay-time module
-> >       translator: fix breakpoint processing
-> >       replay: flush rr queue before loading the vmstate
-> >       gdbstub: add reverse step support in replay mode
-> >       gdbstub: add reverse continue support in replay mode
-> >       replay: describe reverse debugging in docs/replay.txt
-> >       replay: allow loading any snapshots before recording
-> >
-> >
-> >  accel/tcg/translator.c    |    8 +
-> >  block/blkreplay.c         |    8 +
-> >  block/io.c                |   22 +++
-> >  block/qapi.c              |   17 ++-
-> >  block/qcow2-snapshot.c    |    9 +
-> >  block/qcow2.h             |    2
-> >  blockdev.c                |   10 ++
-> >  cpus.c                    |   19 ++-
-> >  docs/interop/qcow2.txt    |    4 +
-> >  docs/replay.txt           |   45 +++++++
-> >  exec.c                    |    6 +
-> >  gdbstub.c                 |   50 +++++++-
-> >  hmp-commands-info.hx      |   14 ++
-> >  hmp-commands.hx           |   30 +++++
-> >  hmp.h                     |    3
-> >  include/block/snapshot.h  |    1
-> >  include/sysemu/replay.h   |   18 +++
-> >  migration/savevm.c        |   15 +-
-> >  qapi/block-core.json      |    5 +
-> >  qapi/block.json           |    3
-> >  qapi/misc.json            |   68 +++++++++++
-> >  replay/Makefile.objs      |    3
-> >  replay/replay-debugging.c |  287 +++++++++++++++++++++++++++++++++++++++++++++
-> >  replay/replay-events.c    |   14 --
-> >  replay/replay-internal.h  |   10 +-
-> >  replay/replay-snapshot.c  |   17 ++-
-> >  replay/replay-time.c      |   27 ++--
-> >  replay/replay.c           |   22 +++
-> >  stubs/replay.c            |   10 ++
-> >  util/qemu-timer.c         |   11 --
-> >  vl.c                      |   18 ++-
-> >  31 files changed, 695 insertions(+), 81 deletions(-)
-> >  create mode 100644 replay/replay-debugging.c
-> >
-> > --
-> > Pavel Dovgalyuk
+Title:
+  Qemu can not parse long fqdns during drive-mirror
+
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  Confirmed
+
+Bug description:
+  During migration of an openstack booted instance, I got the following
+  error:
+
+  Apr 12 10:55:22 cmp1 libvirtd[4133]: 2018-04-12 10:55:22.133+0000:
+  4139: error : qemuMonitorJSONCheckError:392 : internal error: unable
+  to execute QEMU command 'drive-mirror': error parsing address 'cmp0
+  .sandriichenko-deploy-heat-virtual-mcp-pike-ovs-76.bud-mk.local:49153'
+
+  A bit more info in libvirt bug
+  https://bugzilla.redhat.com/show_bug.cgi?id=3D1568939
+
+  To reproduce it with qemu only, I followed the guide at
+  https://github.com/qemu/qemu/blob/master/docs/interop/live-block-
+  operations.rst#id21. On dest and source compute nodes, I launched an
+  instance:
+
+  qemu-system-x86_64 -display none -nodefconfig -M q35 -nodefaults -m
+  512 -blockdev node-name=3Dnode-
+  TargetDisk,driver=3Dqcow2,file.driver=3Dfile,file.node-
+  name=3Dfile,file.filename=3D./test-instance-mirror.qcow2 -device virtio-
+  blk,drive=3Dnode-TargetDisk,id=3Dvirtio0 -S -monitor stdio -qmp unix
+  :./qmp-sock,server,nowait -incoming tcp:localhost:6666
+
+  Then on dest node I launched nbd server:
+
+  (qemu) nbd_server_start cmp0:49153
+  (qemu) nbd_server_add -w node-TargetDisk
+
+  On the source node:
+
+  (qemu) drive_mirror -n  node-TargetDisk nbd:cmp0.vdrok-deploy-heat-virtua=
+l-mcp-pike-ovs-foobarbuzz.bud-mk.local:49153:exportname=3Dnode-TargetDisk
+  error parsing address 'cmp0.vdrok-deploy-heat-virtual-mcp-pike-ovs-foobar=
+buzz.bud-mk.local:49153'
+
+  When using short host name instead of FQDN address seems to be parsed
+  fine:
+
+  (qemu) drive_mirror -n  node-TargetDisk nbd:cmp0:49153:exportname=3Dnode-=
+TargetDisk qcow2
+  Image is not in qcow2 format
+
+  (not sure why it is not a qcow2 format, as I have qcow2 image with raw
+  backing file, but this is unrelated)
+
+  QEMU version is 2.11.1 from bionic
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1770417/+subscriptions
