@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fH7zR-0002Nz-EL
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 09:21:47 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fH8Ip-0004YE-UT
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 09:41:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fH7zO-0005LZ-8t
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 09:21:41 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Fri, 11 May 2018 15:19:51 +0200
-Message-Id: <20180511131953.12905-16-david@redhat.com>
-In-Reply-To: <20180511131953.12905-1-david@redhat.com>
-References: <20180511131953.12905-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 15/17] s390x: prepare for multi stage
- hotplug handlers
+	(envelope-from <peter.maydell@linaro.org>) id 1fH8Io-0005Xh-96
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 09:41:43 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:37654)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fH8Io-0005W5-18
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 09:41:42 -0400
+Received: by mail-oi0-x242.google.com with SMTP id w123-v6so4732449oia.4
+	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 06:41:41 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180509112406.6183-1-quintela@redhat.com>
+References: <20180509112406.6183-1-quintela@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 11 May 2018 14:41:20 +0100
+Message-ID: <CAFEAcA9+qqcVO1gq7PiLqCdKiHkrE81KroEdz7+iPanQ50zJRQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/41] Migration queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,94 +28,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>, David Hildenbrand <david@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>
 
-For multi stage hotplug handlers, we'll have to do some error handling
-in some hotplug functions, so let's use a local error variable (except
-for unplug requests).
+On 9 May 2018 at 12:23, Juan Quintela <quintela@redhat.com> wrote:
+> Hi
+>
+> this includes the reviewed patches for migration:
+> - update docs (dave)
+> - fixes for blocktime (text cleatups) (dave)
+> - migration+tls (dave)
+> - rdma index fix (lidong)
+> - Postcopy recovery (peterx)
+> - Parts reviewed of multifd and tests (me)
+>
+> There are missing parts of RDMA, will be sent after this is in.  This got already too big.
+>
+> Please, apply.
+>
+> The following changes since commit e5cd695266c5709308aa95b1baae499e4b5d4544:
+>
+>   Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' into staging (2018-05-08 17:05:58 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/juanquintela/qemu.git tags/migration/20180509
+>
+> for you to fetch changes up to c14eb5ac63b0d2cd146ca004daaeaf56677b7ed1:
+>
+>   Migration+TLS: Fix crash due to double cleanup (2018-05-09 12:17:22 +0200)
+>
+> ----------------------------------------------------------------
+> migration/next for 20180509
+>
 
-Also, add code to pass control to the final stage hotplug handler at the
-parent bus.
+Hi. I get some test failures here:
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/s390x/s390-virtio-ccw.c | 41 +++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 39 insertions(+), 2 deletions(-)
+S390x host:
+TEST: tests/migration-test... (pid=57456)
+  /ppc64/migration/deprecated:                                         OK
+  /ppc64/migration/bad_dest:                                           OK
+  /ppc64/migration/postcopy/unix:                                      OK
+  /ppc64/migration/precopy/unix:                                       OK
+  /ppc64/migration/xbzrle/unix:
+Unexpected 32 on dest_serial serial
+**
+ERROR:/home/linux1/qemu/tests/migration-test.c:144:wait_for_serial:
+code should not be reached
+FAIL
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 100dfdc96d..ee0a2b124f 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -394,21 +394,56 @@ static void s390_machine_reset(void)
-     s390_cpu_set_state(S390_CPU_STATE_OPERATING, ipl_cpu);
- }
- 
-+static void s390_machine_device_pre_plug(HotplugHandler *hotplug_dev,
-+                                         DeviceState *dev, Error **errp)
-+{
-+    Error *local_err = NULL;
-+
-+    /* final stage hotplug handler */
-+    if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
-+        hotplug_handler_pre_plug(dev->parent_bus->hotplug_handler, dev,
-+                                 &local_err);
-+    }
-+    error_propagate(errp, local_err);
-+}
-+
- static void s390_machine_device_plug(HotplugHandler *hotplug_dev,
-                                      DeviceState *dev, Error **errp)
- {
-+    Error *local_err = NULL;
-+
-+    /* final stage hotplug handler */
-     if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
--        s390_cpu_plug(hotplug_dev, dev, errp);
-+        s390_cpu_plug(hotplug_dev, dev, &local_err);
-+    } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
-+        hotplug_handler_plug(dev->parent_bus->hotplug_handler, dev, &local_err);
-     }
-+    error_propagate(errp, local_err);
- }
- 
- static void s390_machine_device_unplug_request(HotplugHandler *hotplug_dev,
-                                                DeviceState *dev, Error **errp)
- {
-+    /* final stage hotplug handler */
-     if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         error_setg(errp, "CPU hot unplug not supported on this machine");
--        return;
-+    } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
-+        hotplug_handler_unplug_request(dev->parent_bus->hotplug_handler, dev,
-+                                       errp);
-+    }
-+}
-+
-+static void s390_machine_device_unplug(HotplugHandler *hotplug_dev,
-+                                       DeviceState *dev, Error **errp)
-+{
-+    Error *local_err = NULL;
-+
-+    /* final stage hotplug handler */
-+    if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
-+        hotplug_handler_unplug(dev->parent_bus->hotplug_handler, dev,
-+                               &local_err);
-     }
-+    error_propagate(errp, local_err);
- }
- 
- static CpuInstanceProperties s390_cpu_index_to_props(MachineState *ms,
-@@ -496,8 +531,10 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
-     mc->possible_cpu_arch_ids = s390_possible_cpu_arch_ids;
-     /* it is overridden with 'host' cpu *in kvm_arch_init* */
-     mc->default_cpu_type = S390_CPU_TYPE_NAME("qemu");
-+    hc->pre_plug = s390_machine_device_pre_plug;
-     hc->plug = s390_machine_device_plug;
-     hc->unplug_request = s390_machine_device_unplug_request;
-+    hc->unplug = s390_machine_device_unplug;
-     nc->nmi_monitor_handler = s390_nmi;
- }
- 
--- 
-2.14.3
+aarch64 host:
+
+Memory content inconsistency at 44f7000 first_byte = 7 last_byte = 6
+current = 5 hit_edge = 1
+ERROR:/home/peter.maydell/qemu/tests/migration-test.c:281:check_guests_ram:
+'bad' should be FALSE
+(this is probably for ppc64 guest; unfortunately this system doesn't
+have a make that knows about --output-sync, so the make check output
+is hard to interpret.)
+
+thanks
+-- PMM
