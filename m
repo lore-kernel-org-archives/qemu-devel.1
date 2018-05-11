@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42804)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fHGXc-0003lP-Bk
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 18:29:33 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fHGYP-0005vV-Fk
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 18:30:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fHGXb-0006Wi-Ka
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 18:29:32 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fHGYO-0006pC-N9
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 18:30:21 -0400
 References: <20180509162637.15575-1-kwolf@redhat.com>
-	<20180509162637.15575-2-kwolf@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <8f37b85b-6c7f-1942-9c33-c7c06842a63e@redhat.com>
-Date: Fri, 11 May 2018 18:29:24 -0400
+	<20180509162637.15575-8-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <91b7384b-25f4-2141-8794-d1319aa19c2d@redhat.com>
+Date: Sat, 12 May 2018 00:30:09 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180509162637.15575-2-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 01/42] blockjob: Fix assertion in
- block_job_finalize()
+In-Reply-To: <20180509162637.15575-8-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="01aWkRlPRCtuHhnuyZbCL9ecQutjeNjyW"
+Subject: Re: [Qemu-devel] [PATCH 07/42] blockjob: Remove
+ block_job_pause/resume_all()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,42 +26,53 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, jcody@redhat.com, armbru@redhat.com, mreitz@redhat.com
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--01aWkRlPRCtuHhnuyZbCL9ecQutjeNjyW
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com,
+ qemu-devel@nongnu.org
+Message-ID: <91b7384b-25f4-2141-8794-d1319aa19c2d@redhat.com>
+Subject: Re: [PATCH 07/42] blockjob: Remove block_job_pause/resume_all()
+References: <20180509162637.15575-1-kwolf@redhat.com>
+ <20180509162637.15575-8-kwolf@redhat.com>
+In-Reply-To: <20180509162637.15575-8-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+On 2018-05-09 18:26, Kevin Wolf wrote:
+> Commit 81193349 removed the only use of block_job_pause/resume_all(),
+> which was in bdrv_drain_all(). The functions are now unused and can be
+> removed.
 
-On 05/09/2018 12:25 PM, Kevin Wolf wrote:
-> Every job gets a non-NULL job->txn on creation, but it doesn't
-> necessarily keep it until it is decommissioned: Finalising a job removes
-> it from its transaction. Therefore, calling 'blockdev-job-finalize' a
-> second time on an already concluded job causes an assertion failure.
-> 
-> Remove job->txn from the assertion in block_job_finalize() to fix this.
-> block_job_do_finalize() still has the same assertion, but if a job is
-> already removed from its transaction, block_job_apply_verb() will
-> already error out before we run into that assertion.
-> 
+I have a strange liking for all-digit commit hash prefixes.
+
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-
-Reviewed-by: John Snow <jsnow@redhat.com>
-
 > ---
->  blockjob.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/blockjob.c b/blockjob.c
-> index 4de48166b2..b38ed7e265 100644
-> --- a/blockjob.c
-> +++ b/blockjob.c
-> @@ -702,7 +702,7 @@ void block_job_complete(BlockJob *job, Error **errp)
->  
->  void block_job_finalize(BlockJob *job, Error **errp)
->  {
-> -    assert(job && job->id && job->txn);
-> +    assert(job && job->id);
->      if (block_job_apply_verb(job, BLOCK_JOB_VERB_FINALIZE, errp)) {
->          return;
->      }
-> 
+>  include/block/blockjob_int.h | 14 --------------
+>  blockjob.c                   | 27 ---------------------------
+>  2 files changed, 41 deletions(-)
 
-Oh, ack. Good catch.
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--01aWkRlPRCtuHhnuyZbCL9ecQutjeNjyW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr2GXEACgkQ9AfbAGHV
+z0AZpgf/cMznk/G0nOQ3+NLRLKwYbKIRXHZrDJNPGhkU6wrTZpKbvJ96vOkBDYBv
+SUJI0MRboBSRExZLU1eykPZdoFuj41jjFOsOsuF19CEAvJQNOSl5dauaf38MO5a4
+Dc5l+C7fx+SSEl8/w8d/usty0rA5xVl/BQtQjAd8uml/qGoGwCAB/07/aDaAlrtK
+sGiksMzu/w2oqyIL8gMW5LldEgjlte1Hu5jHHGF9j1B43Ynqs564lqjvUWX1FB/j
+fTrrvjvTQZzxx9jYcn8R2iXmDpIOWzMuooRWfYf0Q8/pt5207o5kH+ei4UB1HHYW
+/2clq9T71tVfNsU6uqyPQmi3LqmMwg==
+=7JLh
+-----END PGP SIGNATURE-----
+
+--01aWkRlPRCtuHhnuyZbCL9ecQutjeNjyW--
