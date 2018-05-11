@@ -1,27 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fH6q2-0001rN-7J
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 08:07:55 -0400
+	(envelope-from <famz@redhat.com>) id 1fH6qs-0002I6-MB
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 08:08:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fH6q0-0002Xw-T1
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 08:07:54 -0400
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:34442)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fH6q0-0002Xd-Ni
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 08:07:52 -0400
-Received: by mail-ot0-x242.google.com with SMTP id i5-v6so5962086otf.1
-	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 05:07:52 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180510222601.19944-6-laurent@vivier.eu>
-References: <20180510222601.19944-1-laurent@vivier.eu>
-	<20180510222601.19944-6-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 11 May 2018 13:07:31 +0100
-Message-ID: <CAFEAcA_VvSXcOo2WJXmDxb0ekb5ixjR1YouGLC_o_kLzvfLgSg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 5/5] linux-user: copy sparc/sockbits.h
- definitions from linux
+	(envelope-from <famz@redhat.com>) id 1fH6qr-00032J-Tp
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 08:08:46 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Fri, 11 May 2018 20:08:13 +0800
+Message-Id: <20180511120823.7892-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 00/10] qemu-img convert with copy offloading
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +17,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Riku Voipio <riku.voipio@iki.fi>, Yongbok Kim <yongbok.kim@mips.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, eblake@redhat.com
 
-On 10 May 2018 at 23:26, Laurent Vivier <laurent@vivier.eu> wrote:
-> Values defined for sparc are not correct.
-> Copy the content of "arch/sparc/include/uapi/asm/socket.h"
-> to fix them.
->
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->  linux-user/sparc/sockbits.h | 161 ++++++++++++++++++++++++--------------------
->  1 file changed, 89 insertions(+), 72 deletions(-)
->
-> diff --git a/linux-user/sparc/sockbits.h b/linux-user/sparc/sockbits.h
-> index 385061c8b0..0a822e3e1f 100644
-> --- a/linux-user/sparc/sockbits.h
-> +++ b/linux-user/sparc/sockbits.h
-> @@ -8,87 +8,104 @@
->  #ifndef SPARC_SOCKBITS_H
->  #define SPARC_SOCKBITS_H
->
-> -/** sock_type - Socket types
-> - *
-> - * Please notice that for binary compat reasons SPARC has to
-> - * override the enum sock_type in include/linux/net.h, so
-> - * we define ARCH_HAS_SOCKET_TYPES here.
-> - *
-> - * @SOCK_DGRAM - datagram (conn.less) socket
-> - * @SOCK_STREAM - stream (connection) socket
-> - * @SOCK_RAW - raw socket
-> - * @SOCK_RDM - reliably-delivered message
-> - * @SOCK_SEQPACKET - sequential packet socket
-> - * @SOCK_DCCP - Datagram Congestion Control Protocol socket
-> - * @SOCK_PACKET - linux specific way of getting packets at the dev level.
-> - *                For writing rarp and other similar things on the user
-> - *                level.
-> - * @SOCK_CLOEXEC - sets the close-on-exec (FD_CLOEXEC) flag.
-> - * @SOCK_NONBLOCK - sets the O_NONBLOCK file status flag.
-> - */
-> +/* For setsockopt(2) */
-> +#define TARGET_SOL_SOCKET      0xffff
->
-> -#define ARCH_HAS_SOCKET_TYPES          1
+v4: - Fix raw offset and size. [Eric]
+    - iscsi: Drop unnecessary return values and variables in favor of
+      constants. [Stefan]
+    - qcow2: Handle small backing case. [Stefan]
+    - file-posix: Translate ENOSYS to ENOTSUP. [Stefan]
+    - API documentation and commit message. [Stefan]
+    - Add rev-by to patches 3, 5 - 10. [Stefan, Eric]
 
-This is what the kernel does, but for QEMU it will result
-in the wrong value for TARGET_SOCK_CLOEXEC (though it does
-fix the value for TARGET_SOCK_NONBLOCK).
-This is because in QEMU the default values are hardcoded:
+This series introduces block layer API for copy offloading and makes use of it
+in qemu-img convert.
 
-           TARGET_SOCK_CLOEXEC     = 02000000,
-           TARGET_SOCK_NONBLOCK    = 04000,
+For now we implemented the operation in local file protocol with
+copy_file_range(2).  Besides that it's possible to add similar to iscsi, nfs
+and potentially more.
 
-whereas in linux's include/linux/net.h they are defined in terms
-of other arch-specific constants:
-#define SOCK_CLOEXEC    O_CLOEXEC
-#ifndef SOCK_NONBLOCK
-#define SOCK_NONBLOCK   O_NONBLOCK
-#endif
+As far as its usage goes, in addition to qemu-img convert, we can emulate
+offloading in scsi-disk (handle EXTENDED COPY command), and use the API in
+block jobs too.
 
-Cleaning up QEMU so its ARCH_HAS_SOCKET_TYPES has the same
-semantics as the kernel is probably the right way to go.
+Fam Zheng (10):
+  block: Introduce API for copy offloading
+  raw: Check byte range uniformly
+  raw: Implement copy offloading
+  qcow2: Implement copy offloading
+  file-posix: Implement bdrv_co_copy_range
+  iscsi: Query and save device designator when opening
+  iscsi: Create and use iscsi_co_wait_for_task
+  iscsi: Implement copy offloading
+  block-backend: Add blk_co_copy_range
+  qemu-img: Convert with copy offloading
 
-thanks
--- PMM
+ block/block-backend.c          |  18 +++
+ block/file-posix.c             |  96 ++++++++++++-
+ block/io.c                     |  96 +++++++++++++
+ block/iscsi.c                  | 314 ++++++++++++++++++++++++++++++++++++-----
+ block/qcow2.c                  | 232 ++++++++++++++++++++++++++----
+ block/raw-format.c             |  95 +++++++++----
+ include/block/block.h          |  32 +++++
+ include/block/block_int.h      |  38 +++++
+ include/block/raw-aio.h        |  10 +-
+ include/scsi/constants.h       |   5 +
+ include/sysemu/block-backend.h |   4 +
+ qemu-img.c                     |  50 ++++++-
+ 12 files changed, 891 insertions(+), 99 deletions(-)
+
+-- 
+2.14.3
