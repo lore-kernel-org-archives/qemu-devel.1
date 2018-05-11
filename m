@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fHGLQ-0003bm-HE
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 18:16:57 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fHGOP-0005Qy-6K
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 18:20:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fHGLM-0002GP-KX
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 18:16:56 -0400
-Received: from mail-co1nam03on0613.outbound.protection.outlook.com
-	([2a01:111:f400:fe48::613]:19168
-	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fHGLM-0002Ey-6H
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 18:16:52 -0400
-From: "Moger, Babu" <Babu.Moger@amd.com>
-Date: Fri, 11 May 2018 22:16:46 +0000
-Message-ID: <BL0PR12MB2468A53AFC7B1BE849EC2F3F959F0@BL0PR12MB2468.namprd12.prod.outlook.com>
-References: <20180510204148.11687-1-babu.moger@amd.com>
-	<20180510204148.11687-8-babu.moger@amd.com>
-	<20180511204648.GO13350@localhost.localdomain>
-In-Reply-To: <20180511204648.GO13350@localhost.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <mreitz@redhat.com>) id 1fHGOO-0003Sp-8T
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 18:20:01 -0400
+References: <20180509162637.15575-1-kwolf@redhat.com>
+	<20180509162637.15575-5-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <8bb8a043-fb13-7c1c-4dc2-8b5ac40d5542@redhat.com>
+Date: Sat, 12 May 2018 00:19:50 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v8 7/8] i386: Enable TOPOEXT feature on AMD
- EPYC CPU
+In-Reply-To: <20180509162637.15575-5-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="REuwJpb1mdEiOTmDG3KYuVAgBVEEhYo2F"
+Subject: Re: [Qemu-devel] [PATCH 04/42] blockjob: Implement
+ block_job_set_speed() centrally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,89 +25,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "geoff@hostfission.com" <geoff@hostfission.com>, "kash@tripleback.net" <kash@tripleback.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--REuwJpb1mdEiOTmDG3KYuVAgBVEEhYo2F
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com,
+ qemu-devel@nongnu.org
+Message-ID: <8bb8a043-fb13-7c1c-4dc2-8b5ac40d5542@redhat.com>
+Subject: Re: [PATCH 04/42] blockjob: Implement block_job_set_speed() centrally
+References: <20180509162637.15575-1-kwolf@redhat.com>
+ <20180509162637.15575-5-kwolf@redhat.com>
+In-Reply-To: <20180509162637.15575-5-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-
-> -----Original Message-----
-> From: Eduardo Habkost [mailto:ehabkost@redhat.com]
-> Sent: Friday, May 11, 2018 3:47 PM
-> To: Moger, Babu <Babu.Moger@amd.com>
-> Cc: mst@redhat.com; marcel.apfelbaum@gmail.com; pbonzini@redhat.com;
-> rth@twiddle.net; mtosatti@redhat.com; geoff@hostfission.com;
-> kash@tripleback.net; qemu-devel@nongnu.org; kvm@vger.kernel.org
-> Subject: Re: [Qemu-devel] [PATCH v8 7/8] i386: Enable TOPOEXT feature on
-> AMD EPYC CPU
+On 2018-05-09 18:25, Kevin Wolf wrote:
+> All block job drivers support .set_speed and all of them duplicate the
+> same code to implement it. Move that code to blockjob.c and remove the
+> now useless callback.
 >=20
-> On Thu, May 10, 2018 at 03:41:47PM -0500, Babu Moger wrote:
-> > Enable TOPOEXT feature on EPYC CPU. This is required to support
-> > hyperthreading on VM guests. Also extend xlevel to 0x8000001E.
-> >
-> > Signed-off-by: Babu Moger <babu.moger@amd.com>
-> > Tested-by: Geoffrey McRae <geoff@hostfission.com>
-> > Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> >  target/i386/cpu.c | 11 +++++++++--
-> >  1 file changed, 9 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > index 5cfc7bb0e1..575f2416a1 100644
-> > --- a/target/i386/cpu.c
-> > +++ b/target/i386/cpu.c
-> > @@ -2382,7 +2382,8 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
-> >          .features[FEAT_8000_0001_ECX] =3D
-> >              CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
-> >              CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A |
-> CPUID_EXT3_ABM |
-> > -            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
-> > +            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM
-> |
-> > +            CPUID_EXT3_TOPOEXT,
-> >          .features[FEAT_7_0_EBX] =3D
-> >              CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
-> CPUID_7_0_EBX_AVX2 |
-> >              CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 |
-> CPUID_7_0_EBX_RDSEED |
-> > @@ -2427,7 +2428,8 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
-> >          .features[FEAT_8000_0001_ECX] =3D
-> >              CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
-> >              CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A |
-> CPUID_EXT3_ABM |
-> > -            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
-> > +            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM
-> |
-> > +            CPUID_EXT3_TOPOEXT,
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> ---
+>  include/block/blockjob.h     |  2 ++
+>  include/block/blockjob_int.h |  3 ---
+>  block/backup.c               | 13 -------------
+>  block/commit.c               | 14 --------------
+>  block/mirror.c               | 14 --------------
+>  block/stream.c               | 14 --------------
+>  blockjob.c                   | 12 ++++--------
+>  7 files changed, 6 insertions(+), 66 deletions(-)
 >=20
-> I forgot about one thing: you'll need to add EPYC.topoext=3Doff and
-> EPYC-IBPB.topoext=3Doff to PC_COMPAT_2_12.
+> diff --git a/include/block/blockjob.h b/include/block/blockjob.h
+> index 22bf418209..5aa8a6aaec 100644
+> --- a/include/block/blockjob.h
+> +++ b/include/block/blockjob.h
+> @@ -29,6 +29,8 @@
+>  #include "block/block.h"
+>  #include "qemu/ratelimit.h"
+> =20
+> +#define SLICE_TIME 100000000ULL /* ns */
+> +
+>  typedef struct BlockJobDriver BlockJobDriver;
+>  typedef struct BlockJobTxn BlockJobTxn;
 
-Ok. Will add it.
+SLICE_TIME can be anything.  I don't like something that can be anything
+to be in a header file.  I can see that you still need it in mirror, so
+it needs to be in a header; but maybe rename it to...
+THROTTLE_SLICE_TIME?  At least JOB_SLICE_TIME?
 
->=20
-> >          .features[FEAT_8000_0008_EBX] =3D
-> >              CPUID_8000_0008_EBX_IBPB,
-> >          .features[FEAT_7_0_EBX] =3D
-> > @@ -4540,6 +4542,11 @@ static void x86_cpu_expand_features(X86CPU
-> *cpu, Error **errp)
-> >              x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x800000=
-0A);
-> >          }
-> >
-> > +        /* TOPOEXT feature requires 0x8000001E */
-> > +        if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT) {
-> > +            x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x800000=
-1E);
-> > +        }
-> > +
-> >          /* SEV requires CPUID[0x8000001F] */
-> >          if (sev_enabled()) {
-> >              x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x800000=
-1F);
-> > --
-> > 2.17.0
-> >
-> >
->=20
-> --
-> Eduardo
+Apart from that:
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--REuwJpb1mdEiOTmDG3KYuVAgBVEEhYo2F
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr2FwYACgkQ9AfbAGHV
+z0BGugf9HNC36K7SkXYbguSwCMmX72fKCOuBGalVsL5MQnE9BVUT1E6RzlfBIYyS
+mZOQ0pll4UShxIHn8B3E+D2usQZpkyGApgSrSTzByYizkI9N9Qf8DJba8yJjavg9
+f1rJugFuI9s2fCEMAbuwcclQWbBSRrY+tkEC+Z9RvfZZXQ84xVzOh5LQwDh+ioM3
+8SYzI4Ph9YM5309PteMHtCfL5qK6uO3Wse+NyVlP9h/fsWudsoyX4NgVB79QFJx/
+6mIkNEZLgfYTGUJy/+uc7/1SjinQ7A4pUPGFLC1bI42deWgfzb8ksC54uHkOgzqY
+iULdsCAxn+uz1b/+4ZzWN9LnhqntUg==
+=Dlzf
+-----END PGP SIGNATURE-----
+
+--REuwJpb1mdEiOTmDG3KYuVAgBVEEhYo2F--
