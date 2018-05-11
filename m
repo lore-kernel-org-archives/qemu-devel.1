@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38811)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fHBIo-0005wy-Tp
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 12:53:55 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fHBLC-0007eF-IT
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 12:56:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fHBIl-0003Gg-2M
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 12:53:55 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:37239)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fHBIk-0003GH-Pe
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 12:53:51 -0400
-References: <20180510222601.19944-1-laurent@vivier.eu>
-	<20180510222601.19944-5-laurent@vivier.eu>
-	<CAFEAcA988cQ4eBOGVmvMkYPUynp6zA73wW=0vRB8GYBL8-fJ7A@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <5313f0a4-3cf3-c8a2-a073-3fbb536d3189@vivier.eu>
-Date: Fri, 11 May 2018 18:53:20 +0200
+	(envelope-from <imammedo@redhat.com>) id 1fHBL8-0004ak-Mb
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 12:56:22 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40774 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fHBL8-0004aY-GW
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 12:56:18 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 06F8C7D65F
+	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 16:56:18 +0000 (UTC)
+Date: Fri, 11 May 2018 18:56:16 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180511185616.7c7f16a9@redhat.com>
+In-Reply-To: <8d2aedd6-58b3-9b36-c97f-4b4fe742d061@redhat.com>
+References: <1525423069-61903-1-git-send-email-imammedo@redhat.com>
+	<1525423069-61903-6-git-send-email-imammedo@redhat.com>
+	<8d2aedd6-58b3-9b36-c97f-4b4fe742d061@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA988cQ4eBOGVmvMkYPUynp6zA73wW=0vRB8GYBL8-fJ7A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 4/5] linux-user: move ppc socket.h
- definitions to ppc/sockbits.h
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 05/11] qapi: introduce new cmd option
+ "allowed-in-preconfig"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +35,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Riku Voipio <riku.voipio@iki.fi>, Yongbok Kim <yongbok.kim@mips.com>, Richard Henderson <rth@twiddle.net>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, pkrempa@redhat.com, armbru@redhat.com
 
-Le 11/05/2018 à 14:12, Peter Maydell a écrit :
-> On 10 May 2018 at 23:26, Laurent Vivier <laurent@vivier.eu> wrote:
->> No code change.
->>
->> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
->> ---
->> --- a/linux-user/socket.h
->> +++ b/linux-user/socket.h
->> @@ -1,6 +1,6 @@
->>
->>  #if defined(TARGET_MIPS) || defined(TARGET_HPPA) || defined(TARGET_ALPHA) || \
->> -    defined(TARGET_SPARC)
->> +    defined(TARGET_SPARC) || defined(TARGET_PPC)
->>  #include "sockbits.h"
->>  #else
+On Fri, 11 May 2018 10:26:45 -0500
+Eric Blake <eblake@redhat.com> wrote:
+
+> On 05/04/2018 03:37 AM, Igor Mammedov wrote:
 > 
-> Follow-on cleanup: rather than having this long list of target ifdefs,
-> we should just have every target supply a sockbits.h (perhaps deferring
-> to a generic set of values the way that lots of archs use the asm-generic
-> versions).
+> Subject line is stale, needs to be updated to match new spelling...
+> 
+> > New option will be used to allow commands, which are prepared/need
+> > to run, during preconfig state. Other commands that should be able
+> > to run in preconfig state, should be amended to not expect machine
+> > in initialized state or deal with it.
+> > 
+> > For compatibility reasons, commands that don't use new flag
+> > 'allowed-in-preconfig' explicitly are not permitted to run in  
+> 
+> another stale comment...
+> 
+> > preconfig state but allowed in all other states like they used
+> > to be.
+> > 
+> > Within this patch allow following commands in preconfig state:
+> >     qmp_capabilities
+> >     query-qmp-schema
+> >     query-commands
+> >     query-command-line-options
+> >     query-status
+> >     exit-preconfig
+> > to allow qmp connection, basic introspection and moving to the next
+> > state.
+> > 
+> > PS:
+> > set-numa-node and query-hotpluggable-cpus will be enabled later in
+> > a separate patches.
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> > v7:
+> >    - (Eric Blake <eblake@redhat.com>)
+> >      * s/allowed-in-preconfig/allow-preconfig/  
+> 
+> ...used in the rest of the patch.
+> 
+> >      * s/allowed_in_preconfig/allow_preconfig/
+> >      * move here QCO_ALLOWED_IN_PRECONFIG declaration from
+> >         'cli: add --preconfig option'
+> >        and put this patch before it as well
+> >      * s/QCO_ALLOWED_IN_PRECONFIG/QCO_ALLOW_PRECONFIG/
+> >      * wording fixes in doc  
+> 
+> > +++ b/include/qapi/qmp/dispatch.h
+> > @@ -23,6 +23,7 @@ typedef enum QmpCommandOptions
+> >       QCO_NO_OPTIONS            =  0x0,
+> >       QCO_NO_SUCCESS_RESP       =  (1U << 0),
+> >       QCO_ALLOW_OOB             =  (1U << 1),
+> > +    QCO_ALLOW_PRECONFIG       =  (1U << 2),
+> >   } QmpCommandOptions;
+> >   
+> >   typedef struct QmpCommand
+> > diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+> > index a569d24..0f9fbea 100644
+> > --- a/docs/devel/qapi-code-gen.txt
+> > +++ b/docs/devel/qapi-code-gen.txt
+> > @@ -559,7 +559,7 @@ following example objects:
+> >   Usage: { 'command': STRING, '*data': COMPLEX-TYPE-NAME-OR-DICT,
+> >            '*returns': TYPE-NAME, '*boxed': true,
+> >            '*gen': false, '*success-response': false,
+> > -         '*allow-oob': true }
+> > +         '*allow-oob': true, '*allow-preconfig': true }  
+> 
+> Thanks for taking on the bikeshed renaming; it does look better now that 
+> the two flags have similar spellings.
 
-I agree.
+There was no reason to refuse good suggestion.
 
-Laurent
+
+I've just posted fixed up v8 of this patch as reply here,
+since changes don't affect other patches.
+
+> 
+> >   
+> >   Commands are defined by using a dictionary containing several members,
+> >   where three members are most common.  The 'command' member is a
+> > @@ -683,6 +683,14 @@ OOB command handlers must satisfy the following conditions:
+> >   
+> >   If in doubt, do not implement OOB execution support.
+> >   
+> > +A command may use optional 'allow-preconfig' key to permit its execution  
+> 
+> s/use/use the/
+> 
+> > +at early runtime configuration stage (preconfig runstate).
+> > +If not specified then a command defaults to 'allow-preconfig': false  
+> 
+> trailing '.'
+> 
+> > +
+> > +An example of declaring a command that is enabled during preconfig:
+> > + { 'command': 'qmp_capabilities',
+> > +   'allow-preconfig': true }  
+> 
+> It might be worth having this example match our current schema, as in:
+> 
+> { 'command': 'qmp_capabilities',
+>    'allow-preconfig': true,
+>    'data': { '*enable': [ 'QMPCapability' ] } }
+> 
+> > +++ b/qapi/misc.json
+> > @@ -35,7 +35,8 @@
+> >   #
+> >   ##
+> >   { 'command': 'qmp_capabilities',
+> > -  'data': { '*enable': [ 'QMPCapability' ] } }
+> > +  'data': { '*enable': [ 'QMPCapability' ] },
+> > +  'allow-preconfig': true }  
+> 
+> Or the way you actually wrote it ;)
+> 
+> Otherwise looks pretty good.
+> 
+Thanks for reviewing!
