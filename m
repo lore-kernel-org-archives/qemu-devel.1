@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGzae-0000Wz-Sg
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 00:23:35 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fGzai-0000Yj-4N
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 00:23:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGzac-00085H-61
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 00:23:32 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:33239)
+	(envelope-from <richard.henderson@linaro.org>) id 1fGzag-00086k-Bw
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 00:23:36 -0400
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:38368)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fGzab-00085D-SJ
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 00:23:30 -0400
-Received: by mail-pf0-x244.google.com with SMTP id f20-v6so2101705pfn.0
-	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 21:23:29 -0700 (PDT)
+	id 1fGzag-00086K-4L
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 00:23:34 -0400
+Received: by mail-pg0-x241.google.com with SMTP id n9-v6so1887806pgq.5
+	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 21:23:34 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 10 May 2018 21:23:12 -0700
-Message-Id: <20180511042324.5070-2-richard.henderson@linaro.org>
+Date: Thu, 10 May 2018 21:23:15 -0700
+Message-Id: <20180511042324.5070-5-richard.henderson@linaro.org>
 In-Reply-To: <20180511042324.5070-1-richard.henderson@linaro.org>
 References: <20180511042324.5070-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 01/13] target-openrisc: Write back result before
- FPE exception
+Subject: [Qemu-devel] [PULL 04/13] target/openrisc: Convert memory insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,628 +27,372 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stafford Horne <shorne@gmail.com>, peter.maydell@linaro.org, Richard Henderson <rth@twiddle.net>
-
-From: Richard Henderson <rth@twiddle.net>
-
-The architecture manual is unclear about this, but the or1ksim
-does writeback before the exception.  This requires splitting
-the helpers in half, with the exception raised by the second.
+Cc: Stafford Horne <shorne@gmail.com>, peter.maydell@linaro.org
 
 Acked-by: Stafford Horne <shorne@gmail.com>
-Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Signed-off-by: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/openrisc/helper.h     |  25 ++--
- target/openrisc/fpu_helper.c | 250 +++++++----------------------------
- target/openrisc/translate.c  | 101 +++++++++-----
- 3 files changed, 125 insertions(+), 251 deletions(-)
+ target/openrisc/translate.c  | 275 +++++++++++++++++------------------
+ target/openrisc/insns.decode |  24 +++
+ 2 files changed, 160 insertions(+), 139 deletions(-)
 
-diff --git a/target/openrisc/helper.h b/target/openrisc/helper.h
-index 4fd1a6bb8e..e37dabc77a 100644
---- a/target/openrisc/helper.h
-+++ b/target/openrisc/helper.h
-@@ -24,17 +24,19 @@ DEF_HELPER_FLAGS_1(ove_ov, TCG_CALL_NO_WG, void, env)
- DEF_HELPER_FLAGS_1(ove_cyov, TCG_CALL_NO_WG, void, env)
- 
- /* float */
--DEF_HELPER_FLAGS_2(itofd, TCG_CALL_NO_WG, i64, env, i64)
--DEF_HELPER_FLAGS_2(itofs, TCG_CALL_NO_WG, i32, env, i32)
--DEF_HELPER_FLAGS_2(ftoid, TCG_CALL_NO_WG, i64, env, i64)
--DEF_HELPER_FLAGS_2(ftois, TCG_CALL_NO_WG, i32, env, i32)
-+DEF_HELPER_FLAGS_1(update_fpcsr, TCG_CALL_NO_WG, void, env)
- 
--DEF_HELPER_FLAGS_4(float_madd_s, TCG_CALL_NO_WG, i32, env, i32, i32, i32)
--DEF_HELPER_FLAGS_4(float_madd_d, TCG_CALL_NO_WG, i64, env, i64, i64, i64)
-+DEF_HELPER_FLAGS_2(itofd, TCG_CALL_NO_RWG, i64, env, i64)
-+DEF_HELPER_FLAGS_2(itofs, TCG_CALL_NO_RWG, i32, env, i32)
-+DEF_HELPER_FLAGS_2(ftoid, TCG_CALL_NO_RWG, i64, env, i64)
-+DEF_HELPER_FLAGS_2(ftois, TCG_CALL_NO_RWG, i32, env, i32)
-+
-+DEF_HELPER_FLAGS_4(float_madd_s, TCG_CALL_NO_RWG, i32, env, i32, i32, i32)
-+DEF_HELPER_FLAGS_4(float_madd_d, TCG_CALL_NO_RWG, i64, env, i64, i64, i64)
- 
- #define FOP_CALC(op)                                            \
--DEF_HELPER_FLAGS_3(float_ ## op ## _s, TCG_CALL_NO_WG, i32, env, i32, i32) \
--DEF_HELPER_FLAGS_3(float_ ## op ## _d, TCG_CALL_NO_WG, i64, env, i64, i64)
-+DEF_HELPER_FLAGS_3(float_ ## op ## _s, TCG_CALL_NO_RWG, i32, env, i32, i32) \
-+DEF_HELPER_FLAGS_3(float_ ## op ## _d, TCG_CALL_NO_RWG, i64, env, i64, i64)
- FOP_CALC(add)
- FOP_CALC(sub)
- FOP_CALC(mul)
-@@ -43,14 +45,11 @@ FOP_CALC(rem)
- #undef FOP_CALC
- 
- #define FOP_CMP(op)                                              \
--DEF_HELPER_FLAGS_3(float_ ## op ## _s, TCG_CALL_NO_WG, i32, env, i32, i32) \
--DEF_HELPER_FLAGS_3(float_ ## op ## _d, TCG_CALL_NO_WG, i64, env, i64, i64)
-+DEF_HELPER_FLAGS_3(float_ ## op ## _s, TCG_CALL_NO_RWG, tl, env, i32, i32) \
-+DEF_HELPER_FLAGS_3(float_ ## op ## _d, TCG_CALL_NO_RWG, tl, env, i64, i64)
- FOP_CMP(eq)
- FOP_CMP(lt)
- FOP_CMP(le)
--FOP_CMP(ne)
--FOP_CMP(gt)
--FOP_CMP(ge)
- #undef FOP_CMP
- 
- /* interrupt */
-diff --git a/target/openrisc/fpu_helper.c b/target/openrisc/fpu_helper.c
-index 977a1e8e55..265ce13337 100644
---- a/target/openrisc/fpu_helper.c
-+++ b/target/openrisc/fpu_helper.c
-@@ -24,121 +24,70 @@
- #include "exception.h"
- #include "fpu/softfloat.h"
- 
--static inline uint32_t ieee_ex_to_openrisc(OpenRISCCPU *cpu, int fexcp)
-+static int ieee_ex_to_openrisc(int fexcp)
- {
-     int ret = 0;
--    if (fexcp) {
--        if (fexcp & float_flag_invalid) {
--            cpu->env.fpcsr |= FPCSR_IVF;
--            ret = 1;
--        }
--        if (fexcp & float_flag_overflow) {
--            cpu->env.fpcsr |= FPCSR_OVF;
--            ret = 1;
--        }
--        if (fexcp & float_flag_underflow) {
--            cpu->env.fpcsr |= FPCSR_UNF;
--            ret = 1;
--        }
--        if (fexcp & float_flag_divbyzero) {
--            cpu->env.fpcsr |= FPCSR_DZF;
--            ret = 1;
--        }
--        if (fexcp & float_flag_inexact) {
--            cpu->env.fpcsr |= FPCSR_IXF;
--            ret = 1;
--        }
-+    if (fexcp & float_flag_invalid) {
-+        ret |= FPCSR_IVF;
-+    }
-+    if (fexcp & float_flag_overflow) {
-+        ret |= FPCSR_OVF;
-+    }
-+    if (fexcp & float_flag_underflow) {
-+        ret |= FPCSR_UNF;
-+    }
-+    if (fexcp & float_flag_divbyzero) {
-+        ret |= FPCSR_DZF;
-+    }
-+    if (fexcp & float_flag_inexact) {
-+        ret |= FPCSR_IXF;
-     }
--
-     return ret;
- }
- 
--static inline void update_fpcsr(OpenRISCCPU *cpu)
-+void HELPER(update_fpcsr)(CPUOpenRISCState *env)
- {
--    int tmp = ieee_ex_to_openrisc(cpu,
--                              get_float_exception_flags(&cpu->env.fp_status));
-+    int tmp = get_float_exception_flags(&env->fp_status);
- 
--    SET_FP_CAUSE(cpu->env.fpcsr, tmp);
--    if ((GET_FP_ENABLE(cpu->env.fpcsr) & tmp) &&
--        (cpu->env.fpcsr & FPCSR_FPEE)) {
--        helper_exception(&cpu->env, EXCP_FPE);
--    } else {
--        UPDATE_FP_FLAGS(cpu->env.fpcsr, tmp);
-+    if (tmp) {
-+        set_float_exception_flags(0, &env->fp_status);
-+        tmp = ieee_ex_to_openrisc(tmp);
-+        if (tmp) {
-+            env->fpcsr |= tmp;
-+            if (env->fpcsr & FPCSR_FPEE) {
-+                helper_exception(env, EXCP_FPE);
-+            }
-+        }
-     }
- }
- 
- uint64_t HELPER(itofd)(CPUOpenRISCState *env, uint64_t val)
- {
--    uint64_t itofd;
--    OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
--
--    set_float_exception_flags(0, &cpu->env.fp_status);
--    itofd = int32_to_float64(val, &cpu->env.fp_status);
--    update_fpcsr(cpu);
--
--    return itofd;
-+    return int32_to_float64(val, &env->fp_status);
- }
- 
- uint32_t HELPER(itofs)(CPUOpenRISCState *env, uint32_t val)
- {
--    uint32_t itofs;
--    OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
--
--    set_float_exception_flags(0, &cpu->env.fp_status);
--    itofs = int32_to_float32(val, &cpu->env.fp_status);
--    update_fpcsr(cpu);
--
--    return itofs;
-+    return int32_to_float32(val, &env->fp_status);
- }
- 
- uint64_t HELPER(ftoid)(CPUOpenRISCState *env, uint64_t val)
- {
--    uint64_t ftoid;
--    OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
--
--    set_float_exception_flags(0, &cpu->env.fp_status);
--    ftoid = float32_to_int64(val, &cpu->env.fp_status);
--    update_fpcsr(cpu);
--
--    return ftoid;
-+    return float32_to_int64(val, &env->fp_status);
- }
- 
- uint32_t HELPER(ftois)(CPUOpenRISCState *env, uint32_t val)
- {
--    uint32_t ftois;
--    OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
--
--    set_float_exception_flags(0, &cpu->env.fp_status);
--    ftois = float32_to_int32(val, &cpu->env.fp_status);
--    update_fpcsr(cpu);
--
--    return ftois;
-+    return float32_to_int32(val, &env->fp_status);
- }
- 
--#define FLOAT_OP(name, p) void helper_float_##_##p(void)
--
- #define FLOAT_CALC(name)                                                  \
- uint64_t helper_float_ ## name ## _d(CPUOpenRISCState *env,               \
-                                      uint64_t fdt0, uint64_t fdt1)        \
--{                                                                         \
--    uint64_t result;                                                      \
--    OpenRISCCPU *cpu = openrisc_env_get_cpu(env);                         \
--    set_float_exception_flags(0, &cpu->env.fp_status);                    \
--    result = float64_ ## name(fdt0, fdt1, &cpu->env.fp_status);           \
--    update_fpcsr(cpu);                                                    \
--    return result;                                                        \
--}                                                                         \
--                                                                          \
-+{ return float64_ ## name(fdt0, fdt1, &env->fp_status); }                 \
- uint32_t helper_float_ ## name ## _s(CPUOpenRISCState *env,               \
-                                      uint32_t fdt0, uint32_t fdt1)        \
--{                                                                         \
--    uint32_t result;                                                      \
--    OpenRISCCPU *cpu = openrisc_env_get_cpu(env);                         \
--    set_float_exception_flags(0, &cpu->env.fp_status);                    \
--    result = float32_ ## name(fdt0, fdt1, &cpu->env.fp_status);           \
--    update_fpcsr(cpu);                                                    \
--    return result;                                                        \
--}                                                                         \
-+{ return float32_ ## name(fdt0, fdt1, &env->fp_status); }
- 
- FLOAT_CALC(add)
- FLOAT_CALC(sub)
-@@ -151,132 +100,29 @@ FLOAT_CALC(rem)
- uint64_t helper_float_madd_d(CPUOpenRISCState *env, uint64_t a,
-                              uint64_t b, uint64_t c)
- {
--    OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
--    uint64_t result;
--    set_float_exception_flags(0, &cpu->env.fp_status);
--    /* Note that or1ksim doesn't use merged operation.  */
--    result = float64_mul(b, c, &cpu->env.fp_status);
--    result = float64_add(result, a, &cpu->env.fp_status);
--    update_fpcsr(cpu);
--    return result;
-+    /* Note that or1ksim doesn't use fused operation.  */
-+    b = float64_mul(b, c, &env->fp_status);
-+    return float64_add(a, b, &env->fp_status);
- }
- 
- uint32_t helper_float_madd_s(CPUOpenRISCState *env, uint32_t a,
-                              uint32_t b, uint32_t c)
- {
--    OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
--    uint32_t result;
--    set_float_exception_flags(0, &cpu->env.fp_status);
--    /* Note that or1ksim doesn't use merged operation.  */
--    result = float32_mul(b, c, &cpu->env.fp_status);
--    result = float32_add(result, a, &cpu->env.fp_status);
--    update_fpcsr(cpu);
--    return result;
-+    /* Note that or1ksim doesn't use fused operation.  */
-+    b = float32_mul(b, c, &env->fp_status);
-+    return float32_add(a, b, &env->fp_status);
- }
- 
- 
--#define FLOAT_CMP(name)                                                   \
--uint64_t helper_float_ ## name ## _d(CPUOpenRISCState *env,               \
--                                     uint64_t fdt0, uint64_t fdt1)        \
--{                                                                         \
--    int res;                                                              \
--    OpenRISCCPU *cpu = openrisc_env_get_cpu(env);                         \
--    set_float_exception_flags(0, &cpu->env.fp_status);                    \
--    res = float64_ ## name(fdt0, fdt1, &cpu->env.fp_status);              \
--    update_fpcsr(cpu);                                                    \
--    return res;                                                           \
--}                                                                         \
--                                                                          \
--uint32_t helper_float_ ## name ## _s(CPUOpenRISCState *env,               \
--                                             uint32_t fdt0, uint32_t fdt1)\
--{                                                                         \
--    int res;                                                              \
--    OpenRISCCPU *cpu = openrisc_env_get_cpu(env);                         \
--    set_float_exception_flags(0, &cpu->env.fp_status);                    \
--    res = float32_ ## name(fdt0, fdt1, &cpu->env.fp_status);              \
--    update_fpcsr(cpu);                                                    \
--    return res;                                                           \
--}
-+#define FLOAT_CMP(name, impl)                                             \
-+target_ulong helper_float_ ## name ## _d(CPUOpenRISCState *env,           \
-+                                         uint64_t fdt0, uint64_t fdt1)    \
-+{ return float64_ ## impl(fdt0, fdt1, &env->fp_status); }                 \
-+target_ulong helper_float_ ## name ## _s(CPUOpenRISCState *env,           \
-+                                         uint32_t fdt0, uint32_t fdt1)    \
-+{ return float32_ ## impl(fdt0, fdt1, &env->fp_status); }
- 
--FLOAT_CMP(le)
--FLOAT_CMP(eq)
--FLOAT_CMP(lt)
-+FLOAT_CMP(le, le)
-+FLOAT_CMP(lt, lt)
-+FLOAT_CMP(eq, eq_quiet)
- #undef FLOAT_CMP
--
--
--#define FLOAT_CMPNE(name)                                                 \
--uint64_t helper_float_ ## name ## _d(CPUOpenRISCState *env,               \
--                                     uint64_t fdt0, uint64_t fdt1)        \
--{                                                                         \
--    int res;                                                              \
--    OpenRISCCPU *cpu = openrisc_env_get_cpu(env);                         \
--    set_float_exception_flags(0, &cpu->env.fp_status);                    \
--    res = !float64_eq_quiet(fdt0, fdt1, &cpu->env.fp_status);             \
--    update_fpcsr(cpu);                                                    \
--    return res;                                                           \
--}                                                                         \
--                                                                          \
--uint32_t helper_float_ ## name ## _s(CPUOpenRISCState *env,               \
--                                     uint32_t fdt0, uint32_t fdt1)        \
--{                                                                         \
--    int res;                                                              \
--    OpenRISCCPU *cpu = openrisc_env_get_cpu(env);                         \
--    set_float_exception_flags(0, &cpu->env.fp_status);                    \
--    res = !float32_eq_quiet(fdt0, fdt1, &cpu->env.fp_status);             \
--    update_fpcsr(cpu);                                                    \
--    return res;                                                           \
--}
--
--FLOAT_CMPNE(ne)
--#undef FLOAT_CMPNE
--
--#define FLOAT_CMPGT(name)                                                 \
--uint64_t helper_float_ ## name ## _d(CPUOpenRISCState *env,               \
--                                     uint64_t fdt0, uint64_t fdt1)        \
--{                                                                         \
--    int res;                                                              \
--    OpenRISCCPU *cpu = openrisc_env_get_cpu(env);                         \
--    set_float_exception_flags(0, &cpu->env.fp_status);                    \
--    res = !float64_le(fdt0, fdt1, &cpu->env.fp_status);                   \
--    update_fpcsr(cpu);                                                    \
--    return res;                                                           \
--}                                                                         \
--                                                                          \
--uint32_t helper_float_ ## name ## _s(CPUOpenRISCState *env,               \
--                                     uint32_t fdt0, uint32_t fdt1)        \
--{                                                                         \
--    int res;                                                              \
--    OpenRISCCPU *cpu = openrisc_env_get_cpu(env);                         \
--    set_float_exception_flags(0, &cpu->env.fp_status);                    \
--    res = !float32_le(fdt0, fdt1, &cpu->env.fp_status);                   \
--    update_fpcsr(cpu);                                                    \
--    return res;                                                           \
--}
--FLOAT_CMPGT(gt)
--#undef FLOAT_CMPGT
--
--#define FLOAT_CMPGE(name)                                                 \
--uint64_t helper_float_ ## name ## _d(CPUOpenRISCState *env,               \
--                                     uint64_t fdt0, uint64_t fdt1)        \
--{                                                                         \
--    int res;                                                              \
--    OpenRISCCPU *cpu = openrisc_env_get_cpu(env);                         \
--    set_float_exception_flags(0, &cpu->env.fp_status);                    \
--    res = !float64_lt(fdt0, fdt1, &cpu->env.fp_status);                   \
--    update_fpcsr(cpu);                                                    \
--    return res;                                                           \
--}                                                                         \
--                                                                          \
--uint32_t helper_float_ ## name ## _s(CPUOpenRISCState *env,               \
--                                     uint32_t fdt0, uint32_t fdt1)        \
--{                                                                         \
--    int res;                                                              \
--    OpenRISCCPU *cpu = openrisc_env_get_cpu(env);                         \
--    set_float_exception_flags(0, &cpu->env.fp_status);                    \
--    res = !float32_lt(fdt0, fdt1, &cpu->env.fp_status);                   \
--    update_fpcsr(cpu);                                                    \
--    return res;                                                           \
--}
--
--FLOAT_CMPGE(ge)
--#undef FLOAT_CMPGE
 diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-index 2747b24cf0..6876317971 100644
+index 95e4f17b8a..794002aaaa 100644
 --- a/target/openrisc/translate.c
 +++ b/target/openrisc/translate.c
-@@ -1294,180 +1294,209 @@ static void dec_float(DisasContext *dc, uint32_t insn)
-     rd = extract32(insn, 21, 5);
+@@ -457,51 +457,6 @@ static void gen_msbu(DisasContext *dc, TCGv srca, TCGv srcb)
+     gen_ove_cy(dc);
+ }
+ 
+-static void gen_lwa(DisasContext *dc, TCGv rd, TCGv ra, int32_t ofs)
+-{
+-    TCGv ea = tcg_temp_new();
+-
+-    tcg_gen_addi_tl(ea, ra, ofs);
+-    tcg_gen_qemu_ld_tl(rd, ea, dc->mem_idx, MO_TEUL);
+-    tcg_gen_mov_tl(cpu_lock_addr, ea);
+-    tcg_gen_mov_tl(cpu_lock_value, rd);
+-    tcg_temp_free(ea);
+-}
+-
+-static void gen_swa(DisasContext *dc, int b, TCGv ra, int32_t ofs)
+-{
+-    TCGv ea, val;
+-    TCGLabel *lab_fail, *lab_done;
+-
+-    ea = tcg_temp_new();
+-    tcg_gen_addi_tl(ea, ra, ofs);
+-
+-    /* For TB_FLAGS_R0_0, the branch below invalidates the temporary assigned
+-       to cpu_R[0].  Since l.swa is quite often immediately followed by a
+-       branch, don't bother reallocating; finish the TB using the "real" R0.
+-       This also takes care of RB input across the branch.  */
+-    cpu_R[0] = cpu_R0;
+-
+-    lab_fail = gen_new_label();
+-    lab_done = gen_new_label();
+-    tcg_gen_brcond_tl(TCG_COND_NE, ea, cpu_lock_addr, lab_fail);
+-    tcg_temp_free(ea);
+-
+-    val = tcg_temp_new();
+-    tcg_gen_atomic_cmpxchg_tl(val, cpu_lock_addr, cpu_lock_value,
+-                              cpu_R[b], dc->mem_idx, MO_TEUL);
+-    tcg_gen_setcond_tl(TCG_COND_EQ, cpu_sr_f, val, cpu_lock_value);
+-    tcg_temp_free(val);
+-
+-    tcg_gen_br(lab_done);
+-
+-    gen_set_label(lab_fail);
+-    tcg_gen_movi_tl(cpu_sr_f, 0);
+-
+-    gen_set_label(lab_done);
+-    tcg_gen_movi_tl(cpu_lock_addr, -1);
+-}
+-
+ static void dec_calc(DisasContext *dc, uint32_t insn)
+ {
+     uint32_t op0, op1, op2;
+@@ -739,13 +694,147 @@ static bool trans_l_jalr(DisasContext *dc, arg_l_jalr *a, uint32_t insn)
+     return true;
+ }
+ 
++static bool trans_l_lwa(DisasContext *dc, arg_load *a, uint32_t insn)
++{
++    TCGv ea;
++
++    LOG_DIS("l.lwa r%d, r%d, %d\n", a->d, a->a, a->i);
++
++    check_r0_write(a->d);
++    ea = tcg_temp_new();
++    tcg_gen_addi_tl(ea, cpu_R[a->a], a->i);
++    tcg_gen_qemu_ld_tl(cpu_R[a->d], ea, dc->mem_idx, MO_TEUL);
++    tcg_gen_mov_tl(cpu_lock_addr, ea);
++    tcg_gen_mov_tl(cpu_lock_value, cpu_R[a->d]);
++    tcg_temp_free(ea);
++    return true;
++}
++
++static void do_load(DisasContext *dc, arg_load *a, TCGMemOp mop)
++{
++    TCGv ea;
++
++    check_r0_write(a->d);
++    ea = tcg_temp_new();
++    tcg_gen_addi_tl(ea, cpu_R[a->a], a->i);
++    tcg_gen_qemu_ld_tl(cpu_R[a->d], ea, dc->mem_idx, mop);
++    tcg_temp_free(ea);
++}
++
++static bool trans_l_lwz(DisasContext *dc, arg_load *a, uint32_t insn)
++{
++    LOG_DIS("l.lwz r%d, r%d, %d\n", a->d, a->a, a->i);
++    do_load(dc, a, MO_TEUL);
++    return true;
++}
++
++static bool trans_l_lws(DisasContext *dc, arg_load *a, uint32_t insn)
++{
++    LOG_DIS("l.lws r%d, r%d, %d\n", a->d, a->a, a->i);
++    do_load(dc, a, MO_TESL);
++    return true;
++}
++
++static bool trans_l_lbz(DisasContext *dc, arg_load *a, uint32_t insn)
++{
++    LOG_DIS("l.lbz r%d, r%d, %d\n", a->d, a->a, a->i);
++    do_load(dc, a, MO_UB);
++    return true;
++}
++
++static bool trans_l_lbs(DisasContext *dc, arg_load *a, uint32_t insn)
++{
++    LOG_DIS("l.lbs r%d, r%d, %d\n", a->d, a->a, a->i);
++    do_load(dc, a, MO_SB);
++    return true;
++}
++
++static bool trans_l_lhz(DisasContext *dc, arg_load *a, uint32_t insn)
++{
++    LOG_DIS("l.lhz r%d, r%d, %d\n", a->d, a->a, a->i);
++    do_load(dc, a, MO_TEUW);
++    return true;
++}
++
++static bool trans_l_lhs(DisasContext *dc, arg_load *a, uint32_t insn)
++{
++    LOG_DIS("l.lhs r%d, r%d, %d\n", a->d, a->a, a->i);
++    do_load(dc, a, MO_TESW);
++    return true;
++}
++
++static bool trans_l_swa(DisasContext *dc, arg_store *a, uint32_t insn)
++{
++    TCGv ea, val;
++    TCGLabel *lab_fail, *lab_done;
++
++    LOG_DIS("l.swa r%d, r%d, %d\n", a->a, a->b, a->i);
++
++    ea = tcg_temp_new();
++    tcg_gen_addi_tl(ea, cpu_R[a->a], a->i);
++
++    /* For TB_FLAGS_R0_0, the branch below invalidates the temporary assigned
++       to cpu_R[0].  Since l.swa is quite often immediately followed by a
++       branch, don't bother reallocating; finish the TB using the "real" R0.
++       This also takes care of RB input across the branch.  */
++    cpu_R[0] = cpu_R0;
++
++    lab_fail = gen_new_label();
++    lab_done = gen_new_label();
++    tcg_gen_brcond_tl(TCG_COND_NE, ea, cpu_lock_addr, lab_fail);
++    tcg_temp_free(ea);
++
++    val = tcg_temp_new();
++    tcg_gen_atomic_cmpxchg_tl(val, cpu_lock_addr, cpu_lock_value,
++                              cpu_R[a->b], dc->mem_idx, MO_TEUL);
++    tcg_gen_setcond_tl(TCG_COND_EQ, cpu_sr_f, val, cpu_lock_value);
++    tcg_temp_free(val);
++
++    tcg_gen_br(lab_done);
++
++    gen_set_label(lab_fail);
++    tcg_gen_movi_tl(cpu_sr_f, 0);
++
++    gen_set_label(lab_done);
++    tcg_gen_movi_tl(cpu_lock_addr, -1);
++    return true;
++}
++
++static void do_store(DisasContext *dc, arg_store *a, TCGMemOp mop)
++{
++    TCGv t0 = tcg_temp_new();
++    tcg_gen_addi_tl(t0, cpu_R[a->a], a->i);
++    tcg_gen_qemu_st_tl(cpu_R[a->b], t0, dc->mem_idx, mop);
++    tcg_temp_free(t0);
++}
++
++static bool trans_l_sw(DisasContext *dc, arg_store *a, uint32_t insn)
++{
++    LOG_DIS("l.sw r%d, r%d, %d\n", a->a, a->b, a->i);
++    do_store(dc, a, MO_TEUL);
++    return true;
++}
++
++static bool trans_l_sb(DisasContext *dc, arg_store *a, uint32_t insn)
++{
++    LOG_DIS("l.sb r%d, r%d, %d\n", a->a, a->b, a->i);
++    do_store(dc, a, MO_UB);
++    return true;
++}
++
++static bool trans_l_sh(DisasContext *dc, arg_store *a, uint32_t insn)
++{
++    LOG_DIS("l.sh r%d, r%d, %d\n", a->a, a->b, a->i);
++    do_store(dc, a, MO_TEUW);
++    return true;
++}
++
+ static void dec_misc(DisasContext *dc, uint32_t insn)
+ {
+     uint32_t op0, op1;
+     uint32_t ra, rb, rd;
+     uint32_t L6, K5, K16, K5_11;
+-    int32_t I16, I5_11;
+-    TCGMemOp mop;
++    int32_t I16;
+     TCGv t0;
+ 
+     op0 = extract32(insn, 26, 6);
+@@ -758,7 +847,6 @@ static void dec_misc(DisasContext *dc, uint32_t insn)
+     K16 = extract32(insn, 0, 16);
+     I16 = (int16_t)K16;
+     K5_11 = (extract32(insn, 21, 5) << 11) | extract32(insn, 0, 11);
+-    I5_11 = (int16_t)K5_11;
  
      switch (op0) {
--    case 0x00:    /* lf.add.s */
-+    case 0x00: /* lf.add.s */
-         LOG_DIS("lf.add.s r%d, r%d, r%d\n", rd, ra, rb);
-         check_r0_write(rd);
-         gen_helper_float_add_s(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
-+        gen_helper_update_fpcsr(cpu_env);
+     case 0x05:
+@@ -796,12 +884,6 @@ static void dec_misc(DisasContext *dc, uint32_t insn)
+         }
          break;
  
--    case 0x01:    /* lf.sub.s */
-+    case 0x01: /* lf.sub.s */
-         LOG_DIS("lf.sub.s r%d, r%d, r%d\n", rd, ra, rb);
-         check_r0_write(rd);
-         gen_helper_float_sub_s(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
-+        gen_helper_update_fpcsr(cpu_env);
+-    case 0x1b: /* l.lwa */
+-        LOG_DIS("l.lwa r%d, r%d, %d\n", rd, ra, I16);
+-        check_r0_write(rd);
+-        gen_lwa(dc, cpu_R[rd], cpu_R[ra], I16);
+-        break;
+-
+     case 0x1c:    /* l.cust1 */
+         LOG_DIS("l.cust1\n");
          break;
- 
-     case 0x02:    /* lf.mul.s */
-         LOG_DIS("lf.mul.s r%d, r%d, r%d\n", rd, ra, rb);
-         check_r0_write(rd);
-         gen_helper_float_mul_s(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
-+        gen_helper_update_fpcsr(cpu_env);
-         break;
- 
--    case 0x03:    /* lf.div.s */
-+    case 0x03: /* lf.div.s */
-         LOG_DIS("lf.div.s r%d, r%d, r%d\n", rd, ra, rb);
-         check_r0_write(rd);
-         gen_helper_float_div_s(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
-+        gen_helper_update_fpcsr(cpu_env);
-         break;
- 
--    case 0x04:    /* lf.itof.s */
-+    case 0x04: /* lf.itof.s */
-         LOG_DIS("lf.itof r%d, r%d\n", rd, ra);
-         check_r0_write(rd);
-         gen_helper_itofs(cpu_R[rd], cpu_env, cpu_R[ra]);
-+        gen_helper_update_fpcsr(cpu_env);
-         break;
- 
--    case 0x05:    /* lf.ftoi.s */
-+    case 0x05: /* lf.ftoi.s */
-         LOG_DIS("lf.ftoi r%d, r%d\n", rd, ra);
-         check_r0_write(rd);
-         gen_helper_ftois(cpu_R[rd], cpu_env, cpu_R[ra]);
-+        gen_helper_update_fpcsr(cpu_env);
-         break;
- 
--    case 0x06:    /* lf.rem.s */
-+    case 0x06: /* lf.rem.s */
-         LOG_DIS("lf.rem.s r%d, r%d, r%d\n", rd, ra, rb);
-         check_r0_write(rd);
-         gen_helper_float_rem_s(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
-+        gen_helper_update_fpcsr(cpu_env);
-         break;
- 
--    case 0x07:    /* lf.madd.s */
-+    case 0x07: /* lf.madd.s */
-         LOG_DIS("lf.madd.s r%d, r%d, r%d\n", rd, ra, rb);
-         check_r0_write(rd);
-         gen_helper_float_madd_s(cpu_R[rd], cpu_env, cpu_R[rd],
-                                 cpu_R[ra], cpu_R[rb]);
-+        gen_helper_update_fpcsr(cpu_env);
-         break;
- 
--    case 0x08:    /* lf.sfeq.s */
-+    case 0x08: /* lf.sfeq.s */
-         LOG_DIS("lf.sfeq.s r%d, r%d\n", ra, rb);
-         gen_helper_float_eq_s(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
-+        gen_helper_update_fpcsr(cpu_env);
-         break;
- 
--    case 0x09:    /* lf.sfne.s */
-+    case 0x09: /* lf.sfne.s */
-         LOG_DIS("lf.sfne.s r%d, r%d\n", ra, rb);
--        gen_helper_float_ne_s(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
-+        gen_helper_float_eq_s(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
-+        tcg_gen_xori_tl(cpu_sr_f, cpu_sr_f, 1);
-+        gen_helper_update_fpcsr(cpu_env);
-         break;
- 
--    case 0x0a:    /* lf.sfgt.s */
-+    case 0x0a: /* lf.sfgt.s */
-         LOG_DIS("lf.sfgt.s r%d, r%d\n", ra, rb);
--        gen_helper_float_gt_s(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
-+        gen_helper_float_lt_s(cpu_sr_f, cpu_env, cpu_R[rb], cpu_R[ra]);
-+        gen_helper_update_fpcsr(cpu_env);
-         break;
- 
--    case 0x0b:    /* lf.sfge.s */
-+    case 0x0b: /* lf.sfge.s */
-         LOG_DIS("lf.sfge.s r%d, r%d\n", ra, rb);
--        gen_helper_float_ge_s(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
-+        gen_helper_float_le_s(cpu_sr_f, cpu_env, cpu_R[rb], cpu_R[ra]);
-+        gen_helper_update_fpcsr(cpu_env);
-         break;
- 
--    case 0x0c:    /* lf.sflt.s */
-+    case 0x0c: /* lf.sflt.s */
-         LOG_DIS("lf.sflt.s r%d, r%d\n", ra, rb);
-         gen_helper_float_lt_s(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
-+        gen_helper_update_fpcsr(cpu_env);
-         break;
- 
--    case 0x0d:    /* lf.sfle.s */
-+    case 0x0d: /* lf.sfle.s */
-         LOG_DIS("lf.sfle.s r%d, r%d\n", ra, rb);
-         gen_helper_float_le_s(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
-+        gen_helper_update_fpcsr(cpu_env);
+@@ -834,53 +916,6 @@ static void dec_misc(DisasContext *dc, uint32_t insn)
+         LOG_DIS("l.cust8\n");
          break;
  
 -/* not used yet, open it when we need or64.  */
 -/*#ifdef TARGET_OPENRISC64
--    case 0x10:     lf.add.d
-+#ifdef TARGET_OPENRISC64
-+    case 0x10: /* lf.add.d */
-         LOG_DIS("lf.add.d r%d, r%d, r%d\n", rd, ra, rb);
-         check_of64s(dc);
-         check_r0_write(rd);
-         gen_helper_float_add_d(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
-+        gen_helper_update_fpcsr(cpu_env);
-         break;
- 
--    case 0x11:     lf.sub.d
-+    case 0x11: /* lf.sub.d */
-         LOG_DIS("lf.sub.d r%d, r%d, r%d\n", rd, ra, rb);
-         check_of64s(dc);
-         check_r0_write(rd);
-         gen_helper_float_sub_d(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
-+        gen_helper_update_fpcsr(cpu_env);
-         break;
- 
--    case 0x12:     lf.mul.d
-+    case 0x12: /* lf.mul.d */
-         LOG_DIS("lf.mul.d r%d, r%d, r%d\n", rd, ra, rb);
-         check_of64s(dc);
-         check_r0_write(rd);
-         gen_helper_float_mul_d(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
-+        gen_helper_update_fpcsr(cpu_env);
-         break;
- 
--    case 0x13:     lf.div.d
-+    case 0x13: /* lf.div.d */
-         LOG_DIS("lf.div.d r%d, r%d, r%d\n", rd, ra, rb);
-         check_of64s(dc);
-         check_r0_write(rd);
-         gen_helper_float_div_d(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
-+        gen_helper_update_fpcsr(cpu_env);
-         break;
- 
--    case 0x14:     lf.itof.d
-+    case 0x14: /* lf.itof.d */
-         LOG_DIS("lf.itof r%d, r%d\n", rd, ra);
-         check_of64s(dc);
-         check_r0_write(rd);
-         gen_helper_itofd(cpu_R[rd], cpu_env, cpu_R[ra]);
-+        gen_helper_update_fpcsr(cpu_env);
-         break;
- 
--    case 0x15:     lf.ftoi.d
-+    case 0x15: /* lf.ftoi.d */
-         LOG_DIS("lf.ftoi r%d, r%d\n", rd, ra);
-         check_of64s(dc);
-         check_r0_write(rd);
-         gen_helper_ftoid(cpu_R[rd], cpu_env, cpu_R[ra]);
-+        gen_helper_update_fpcsr(cpu_env);
-         break;
- 
--    case 0x16:     lf.rem.d
-+    case 0x16: /* lf.rem.d */
-         LOG_DIS("lf.rem.d r%d, r%d, r%d\n", rd, ra, rb);
-         check_of64s(dc);
-         check_r0_write(rd);
-         gen_helper_float_rem_d(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
-+        gen_helper_update_fpcsr(cpu_env);
-         break;
- 
--    case 0x17:     lf.madd.d
-+    case 0x17: /* lf.madd.d */
-         LOG_DIS("lf.madd.d r%d, r%d, r%d\n", rd, ra, rb);
-         check_of64s(dc);
-         check_r0_write(rd);
-         gen_helper_float_madd_d(cpu_R[rd], cpu_env, cpu_R[rd],
-                                 cpu_R[ra], cpu_R[rb]);
-+        gen_helper_update_fpcsr(cpu_env);
-         break;
- 
--    case 0x18:     lf.sfeq.d
-+    case 0x18: /* lf.sfeq.d */
-         LOG_DIS("lf.sfeq.d r%d, r%d\n", ra, rb);
-         check_of64s(dc);
-         gen_helper_float_eq_d(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
-+        gen_helper_update_fpcsr(cpu_env);
-         break;
- 
--    case 0x1a:     lf.sfgt.d
-+    case 0x1a: /* lf.sfgt.d */
-         LOG_DIS("lf.sfgt.d r%d, r%d\n", ra, rb);
-         check_of64s(dc);
--        gen_helper_float_gt_d(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
-+        gen_helper_float_lt_d(cpu_sr_f, cpu_env, cpu_R[rb], cpu_R[ra]);
-+        gen_helper_update_fpcsr(cpu_env);
-         break;
- 
--    case 0x1b:     lf.sfge.d
-+    case 0x1b: /* lf.sfge.d */
-         LOG_DIS("lf.sfge.d r%d, r%d\n", ra, rb);
-         check_of64s(dc);
--        gen_helper_float_ge_d(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
-+        gen_helper_float_le_d(cpu_sr_f, cpu_env, cpu_R[rb], cpu_R[ra]);
-+        gen_helper_update_fpcsr(cpu_env);
-         break;
- 
--    case 0x19:     lf.sfne.d
-+    case 0x19: /* lf.sfne.d */
-         LOG_DIS("lf.sfne.d r%d, r%d\n", ra, rb);
-         check_of64s(dc);
--        gen_helper_float_ne_d(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
-+        gen_helper_float_eq_d(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
-+        tcg_gen_xori_tl(cpu_sr_f, cpu_sr_f, 1);
-+        gen_helper_update_fpcsr(cpu_env);
-         break;
- 
--    case 0x1c:     lf.sflt.d
-+    case 0x1c: /* lf.sflt.d */
-         LOG_DIS("lf.sflt.d r%d, r%d\n", ra, rb);
-         check_of64s(dc);
-         gen_helper_float_lt_d(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
-+        gen_helper_update_fpcsr(cpu_env);
-         break;
- 
--    case 0x1d:     lf.sfle.d
-+    case 0x1d: /* lf.sfle.d */
-         LOG_DIS("lf.sfle.d r%d, r%d\n", ra, rb);
-         check_of64s(dc);
-         gen_helper_float_le_d(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
-+        gen_helper_update_fpcsr(cpu_env);
-         break;
+-    case 0x20:     l.ld
+-        LOG_DIS("l.ld r%d, r%d, %d\n", rd, ra, I16);
+-        check_ob64s(dc);
+-        mop = MO_TEQ;
+-        goto do_load;
 -#endif*/
-+#endif
+-
+-    case 0x21:    /* l.lwz */
+-        LOG_DIS("l.lwz r%d, r%d, %d\n", rd, ra, I16);
+-        mop = MO_TEUL;
+-        goto do_load;
+-
+-    case 0x22:    /* l.lws */
+-        LOG_DIS("l.lws r%d, r%d, %d\n", rd, ra, I16);
+-        mop = MO_TESL;
+-        goto do_load;
+-
+-    case 0x23:    /* l.lbz */
+-        LOG_DIS("l.lbz r%d, r%d, %d\n", rd, ra, I16);
+-        mop = MO_UB;
+-        goto do_load;
+-
+-    case 0x24:    /* l.lbs */
+-        LOG_DIS("l.lbs r%d, r%d, %d\n", rd, ra, I16);
+-        mop = MO_SB;
+-        goto do_load;
+-
+-    case 0x25:    /* l.lhz */
+-        LOG_DIS("l.lhz r%d, r%d, %d\n", rd, ra, I16);
+-        mop = MO_TEUW;
+-        goto do_load;
+-
+-    case 0x26:    /* l.lhs */
+-        LOG_DIS("l.lhs r%d, r%d, %d\n", rd, ra, I16);
+-        mop = MO_TESW;
+-        goto do_load;
+-
+-    do_load:
+-        check_r0_write(rd);
+-        t0 = tcg_temp_new();
+-        tcg_gen_addi_tl(t0, cpu_R[ra], I16);
+-        tcg_gen_qemu_ld_tl(cpu_R[rd], t0, dc->mem_idx, mop);
+-        tcg_temp_free(t0);
+-        break;
+-
+     case 0x27:    /* l.addi */
+         LOG_DIS("l.addi r%d, r%d, %d\n", rd, ra, I16);
+         check_r0_write(rd);
+@@ -958,44 +993,6 @@ static void dec_misc(DisasContext *dc, uint32_t insn)
+         }
+         break;
  
+-    case 0x33: /* l.swa */
+-        LOG_DIS("l.swa r%d, r%d, %d\n", ra, rb, I5_11);
+-        gen_swa(dc, rb, cpu_R[ra], I5_11);
+-        break;
+-
+-/* not used yet, open it when we need or64.  */
+-/*#ifdef TARGET_OPENRISC64
+-    case 0x34:     l.sd
+-        LOG_DIS("l.sd r%d, r%d, %d\n", ra, rb, I5_11);
+-        check_ob64s(dc);
+-        mop = MO_TEQ;
+-        goto do_store;
+-#endif*/
+-
+-    case 0x35:    /* l.sw */
+-        LOG_DIS("l.sw r%d, r%d, %d\n", ra, rb, I5_11);
+-        mop = MO_TEUL;
+-        goto do_store;
+-
+-    case 0x36:    /* l.sb */
+-        LOG_DIS("l.sb r%d, r%d, %d\n", ra, rb, I5_11);
+-        mop = MO_UB;
+-        goto do_store;
+-
+-    case 0x37:    /* l.sh */
+-        LOG_DIS("l.sh r%d, r%d, %d\n", ra, rb, I5_11);
+-        mop = MO_TEUW;
+-        goto do_store;
+-
+-    do_store:
+-        {
+-            TCGv t0 = tcg_temp_new();
+-            tcg_gen_addi_tl(t0, cpu_R[ra], I5_11);
+-            tcg_gen_qemu_st_tl(cpu_R[rb], t0, dc->mem_idx, mop);
+-            tcg_temp_free(t0);
+-        }
+-        break;
+-
      default:
          gen_illegal_exception(dc);
+         break;
+diff --git a/target/openrisc/insns.decode b/target/openrisc/insns.decode
+index 8d35011eab..ba5356abe1 100644
+--- a/target/openrisc/insns.decode
++++ b/target/openrisc/insns.decode
+@@ -38,3 +38,27 @@ l_bf            000100 n:s26
+ 
+ l_jr            010001 ---------- b:5 -----------
+ l_jalr          010010 ---------- b:5 -----------
++
++####
++# Memory Instructions
++####
++
++&load           d a i
++@load           ...... d:5 a:5 i:s16                    &load
++
++%store_i        21:s5 0:11
++&store          a b i
++@store          ...... ..... a:5 b:5 ...........        &store i=%store_i
++
++l_lwa           011011 ..... ..... ........ ........    @load
++l_lwz           100001 ..... ..... ........ ........    @load
++l_lws           100010 ..... ..... ........ ........    @load
++l_lbz           100011 ..... ..... ........ ........    @load
++l_lbs           100100 ..... ..... ........ ........    @load
++l_lhz           100101 ..... ..... ........ ........    @load
++l_lhs           100110 ..... ..... ........ ........    @load
++
++l_swa           110011 ..... ..... ........ ........    @store
++l_sw            110101 ..... ..... ........ ........    @store
++l_sb            110110 ..... ..... ........ ........    @store
++l_sh            110111 ..... ..... ........ ........    @store
 -- 
 2.17.0
