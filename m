@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55652)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGzan-0000dp-2J
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 00:23:42 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fGzaq-0000hD-4T
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 00:23:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fGzam-00088E-4g
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 00:23:41 -0400
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:44735)
+	(envelope-from <richard.henderson@linaro.org>) id 1fGzao-00089D-OL
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 00:23:44 -0400
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:42027)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fGzal-000884-VB
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 00:23:40 -0400
-Received: by mail-pl0-x241.google.com with SMTP id e6-v6so2536710plt.11
-	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 21:23:39 -0700 (PDT)
+	id 1fGzao-000890-GE
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 00:23:42 -0400
+Received: by mail-pl0-x243.google.com with SMTP id u6-v6so2541759pls.9
+	for <qemu-devel@nongnu.org>; Thu, 10 May 2018 21:23:42 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 10 May 2018 21:23:19 -0700
-Message-Id: <20180511042324.5070-9-richard.henderson@linaro.org>
+Date: Thu, 10 May 2018 21:23:21 -0700
+Message-Id: <20180511042324.5070-11-richard.henderson@linaro.org>
 In-Reply-To: <20180511042324.5070-1-richard.henderson@linaro.org>
 References: <20180511042324.5070-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 08/13] target/openrisc: Convert dec_logic
+Subject: [Qemu-devel] [PULL 10/13] target/openrisc: Convert dec_comp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,114 +32,180 @@ Cc: Stafford Horne <shorne@gmail.com>, peter.maydell@linaro.org
 Acked-by: Stafford Horne <shorne@gmail.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/openrisc/translate.c  | 62 +++++++++++++++---------------------
- target/openrisc/insns.decode |  6 ++++
- 2 files changed, 32 insertions(+), 36 deletions(-)
+ target/openrisc/translate.c  | 120 +++++++++++++++++------------------
+ target/openrisc/insns.decode |  15 +++++
+ 2 files changed, 73 insertions(+), 62 deletions(-)
 
 diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-index 8ca01e1a33..f2f9a0c0d2 100644
+index 548e0230b3..2c15b2713f 100644
 --- a/target/openrisc/translate.c
 +++ b/target/openrisc/translate.c
-@@ -999,42 +999,36 @@ static bool trans_l_msbu(DisasContext *dc, arg_ab *a, uint32_t insn)
+@@ -1048,74 +1048,74 @@ static bool trans_l_macrc(DisasContext *dc, arg_l_macrc *a, uint32_t insn)
      return true;
  }
  
--static void dec_logic(DisasContext *dc, uint32_t insn)
-+static bool trans_l_slli(DisasContext *dc, arg_dal *a, uint32_t insn)
+-static void dec_comp(DisasContext *dc, uint32_t insn)
++static bool trans_l_sfeq(DisasContext *dc, arg_ab *a, TCGCond cond)
  {
 -    uint32_t op0;
--    uint32_t rd, ra, L6, S6;
--    op0 = extract32(insn, 6, 2);
--    rd = extract32(insn, 21, 5);
+-    uint32_t ra, rb;
++    LOG_DIS("l.sfeq r%d, r%d\n", a->a, a->b);
++    tcg_gen_setcond_tl(TCG_COND_EQ, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
+ 
+-    op0 = extract32(insn, 21, 5);
 -    ra = extract32(insn, 16, 5);
--    L6 = extract32(insn, 0, 6);
--    S6 = L6 & (TARGET_LONG_BITS - 1);
-+    LOG_DIS("l.slli r%d, r%d, %d\n", a->d, a->a, a->l);
-+    check_r0_write(a->d);
-+    tcg_gen_shli_tl(cpu_R[a->d], cpu_R[a->a], a->l & (TARGET_LONG_BITS - 1));
+-    rb = extract32(insn, 11, 5);
++static bool trans_l_sfne(DisasContext *dc, arg_ab *a, TCGCond cond)
++{
++    LOG_DIS("l.sfne r%d, r%d\n", a->a, a->b);
++    tcg_gen_setcond_tl(TCG_COND_NE, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
 +    return true;
 +}
  
--    check_r0_write(rd);
+-    /* unsigned integers  */
+-    tcg_gen_ext32u_tl(cpu_R[ra], cpu_R[ra]);
+-    tcg_gen_ext32u_tl(cpu_R[rb], cpu_R[rb]);
++static bool trans_l_sfgtu(DisasContext *dc, arg_ab *a, TCGCond cond)
++{
++    LOG_DIS("l.sfgtu r%d, r%d\n", a->a, a->b);
++    tcg_gen_setcond_tl(TCG_COND_GTU, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
+ 
 -    switch (op0) {
--    case 0x00:    /* l.slli */
--        LOG_DIS("l.slli r%d, r%d, %d\n", rd, ra, L6);
--        tcg_gen_shli_tl(cpu_R[rd], cpu_R[ra], S6);
+-    case 0x0:    /* l.sfeq */
+-        LOG_DIS("l.sfeq  r%d, r%d\n", ra, rb);
+-        tcg_gen_setcond_tl(TCG_COND_EQ, cpu_sr_f, cpu_R[ra], cpu_R[rb]);
 -        break;
-+static bool trans_l_srli(DisasContext *dc, arg_dal *a, uint32_t insn)
++static bool trans_l_sfgeu(DisasContext *dc, arg_ab *a, TCGCond cond)
 +{
-+    LOG_DIS("l.srli r%d, r%d, %d\n", a->d, a->a, a->l);
-+    check_r0_write(a->d);
-+    tcg_gen_shri_tl(cpu_R[a->d], cpu_R[a->a], a->l & (TARGET_LONG_BITS - 1));
++    LOG_DIS("l.sfgeu r%d, r%d\n", a->a, a->b);
++    tcg_gen_setcond_tl(TCG_COND_GEU, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
 +    return true;
 +}
  
--    case 0x01:    /* l.srli */
--        LOG_DIS("l.srli r%d, r%d, %d\n", rd, ra, L6);
--        tcg_gen_shri_tl(cpu_R[rd], cpu_R[ra], S6);
+-    case 0x1:    /* l.sfne */
+-        LOG_DIS("l.sfne  r%d, r%d\n", ra, rb);
+-        tcg_gen_setcond_tl(TCG_COND_NE, cpu_sr_f, cpu_R[ra], cpu_R[rb]);
 -        break;
-+static bool trans_l_srai(DisasContext *dc, arg_dal *a, uint32_t insn)
++static bool trans_l_sfltu(DisasContext *dc, arg_ab *a, TCGCond cond)
 +{
-+    LOG_DIS("l.srai r%d, r%d, %d\n", a->d, a->a, a->l);
-+    check_r0_write(a->d);
-+    tcg_gen_sari_tl(cpu_R[a->d], cpu_R[a->a], a->l & (TARGET_LONG_BITS - 1));
++    LOG_DIS("l.sfltu r%d, r%d\n", a->a, a->b);
++    tcg_gen_setcond_tl(TCG_COND_LTU, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
 +    return true;
 +}
  
--    case 0x02:    /* l.srai */
--        LOG_DIS("l.srai r%d, r%d, %d\n", rd, ra, L6);
--        tcg_gen_sari_tl(cpu_R[rd], cpu_R[ra], S6);
+-    case 0x2:    /* l.sfgtu */
+-        LOG_DIS("l.sfgtu  r%d, r%d\n", ra, rb);
+-        tcg_gen_setcond_tl(TCG_COND_GTU, cpu_sr_f, cpu_R[ra], cpu_R[rb]);
+-        break;
++static bool trans_l_sfleu(DisasContext *dc, arg_ab *a, TCGCond cond)
++{
++    LOG_DIS("l.sfleu r%d, r%d\n", a->a, a->b);
++    tcg_gen_setcond_tl(TCG_COND_LEU, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
+ 
+-    case 0x3:    /* l.sfgeu */
+-        LOG_DIS("l.sfgeu  r%d, r%d\n", ra, rb);
+-        tcg_gen_setcond_tl(TCG_COND_GEU, cpu_sr_f, cpu_R[ra], cpu_R[rb]);
+-        break;
++static bool trans_l_sfgts(DisasContext *dc, arg_ab *a, TCGCond cond)
++{
++    LOG_DIS("l.sfgts r%d, r%d\n", a->a, a->b);
++    tcg_gen_setcond_tl(TCG_COND_GT, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
+ 
+-    case 0x4:    /* l.sfltu */
+-        LOG_DIS("l.sfltu  r%d, r%d\n", ra, rb);
+-        tcg_gen_setcond_tl(TCG_COND_LTU, cpu_sr_f, cpu_R[ra], cpu_R[rb]);
+-        break;
++static bool trans_l_sfges(DisasContext *dc, arg_ab *a, TCGCond cond)
++{
++    LOG_DIS("l.sfges r%d, r%d\n", a->a, a->b);
++    tcg_gen_setcond_tl(TCG_COND_GE, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
+ 
+-    case 0x5:    /* l.sfleu */
+-        LOG_DIS("l.sfleu  r%d, r%d\n", ra, rb);
+-        tcg_gen_setcond_tl(TCG_COND_LEU, cpu_sr_f, cpu_R[ra], cpu_R[rb]);
+-        break;
++static bool trans_l_sflts(DisasContext *dc, arg_ab *a, TCGCond cond)
++{
++    LOG_DIS("l.sflts r%d, r%d\n", a->a, a->b);
++    tcg_gen_setcond_tl(TCG_COND_LT, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
++    return true;
++}
+ 
+-    case 0xa:    /* l.sfgts */
+-        LOG_DIS("l.sfgts  r%d, r%d\n", ra, rb);
+-        tcg_gen_setcond_tl(TCG_COND_GT, cpu_sr_f, cpu_R[ra], cpu_R[rb]);
 -        break;
 -
--    case 0x03:    /* l.rori */
--        LOG_DIS("l.rori r%d, r%d, %d\n", rd, ra, L6);
--        tcg_gen_rotri_tl(cpu_R[rd], cpu_R[ra], S6);
+-    case 0xb:    /* l.sfges */
+-        LOG_DIS("l.sfges  r%d, r%d\n", ra, rb);
+-        tcg_gen_setcond_tl(TCG_COND_GE, cpu_sr_f, cpu_R[ra], cpu_R[rb]);
+-        break;
+-
+-    case 0xc:    /* l.sflts */
+-        LOG_DIS("l.sflts  r%d, r%d\n", ra, rb);
+-        tcg_gen_setcond_tl(TCG_COND_LT, cpu_sr_f, cpu_R[ra], cpu_R[rb]);
+-        break;
+-
+-    case 0xd:    /* l.sfles */
+-        LOG_DIS("l.sfles  r%d, r%d\n", ra, rb);
+-        tcg_gen_setcond_tl(TCG_COND_LE, cpu_sr_f, cpu_R[ra], cpu_R[rb]);
 -        break;
 -
 -    default:
 -        gen_illegal_exception(dc);
 -        break;
 -    }
-+static bool trans_l_rori(DisasContext *dc, arg_dal *a, uint32_t insn)
++static bool trans_l_sfles(DisasContext *dc, arg_ab *a, TCGCond cond)
 +{
-+    LOG_DIS("l.rori r%d, r%d, %d\n", a->d, a->a, a->l);
-+    check_r0_write(a->d);
-+    tcg_gen_rotri_tl(cpu_R[a->d], cpu_R[a->a], a->l & (TARGET_LONG_BITS - 1));
++    LOG_DIS("l.sfles r%d, r%d\n", a->a, a->b);
++    tcg_gen_setcond_tl(TCG_COND_LE, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
 +    return true;
  }
  
- static void dec_M(DisasContext *dc, uint32_t insn)
-@@ -1491,10 +1485,6 @@ static void disas_openrisc_insn(DisasContext *dc, OpenRISCCPU *cpu)
-         dec_M(dc, insn);
+ static void dec_compi(DisasContext *dc, uint32_t insn)
+@@ -1478,10 +1478,6 @@ static void disas_openrisc_insn(DisasContext *dc, OpenRISCCPU *cpu)
+         dec_float(dc, insn);
          break;
  
--    case 0x2e:
--        dec_logic(dc, insn);
+-    case 0x39:
+-        dec_comp(dc, insn);
 -        break;
 -
-     case 0x2f:
-         dec_compi(dc, insn);
+     default:
+         gen_illegal_exception(dc);
          break;
 diff --git a/target/openrisc/insns.decode b/target/openrisc/insns.decode
-index 7240c6fb77..fb8ba5812a 100644
+index 84f71c13b3..29d28ff5be 100644
 --- a/target/openrisc/insns.decode
 +++ b/target/openrisc/insns.decode
-@@ -20,6 +20,7 @@
- &dab            d a b
- &da             d a
- &ab             a b
-+&dal            d a l
- 
- ####
- # System Instructions
-@@ -130,3 +131,8 @@ l_mac           110001 ----- a:5 b:5 ------- 0001
- l_macu          110001 ----- a:5 b:5 ------- 0011
- l_msb           110001 ----- a:5 b:5 ------- 0010
- l_msbu          110001 ----- a:5 b:5 ------- 0100
+@@ -139,3 +139,18 @@ l_slli          101110 d:5 a:5 -------- 00 l:6
+ l_srli          101110 d:5 a:5 -------- 01 l:6
+ l_srai          101110 d:5 a:5 -------- 10 l:6
+ l_rori          101110 d:5 a:5 -------- 11 l:6
 +
-+l_slli          101110 d:5 a:5 -------- 00 l:6
-+l_srli          101110 d:5 a:5 -------- 01 l:6
-+l_srai          101110 d:5 a:5 -------- 10 l:6
-+l_rori          101110 d:5 a:5 -------- 11 l:6
++####
++# Compare Instructions
++####
++
++l_sfeq          111001 00000 a:5 b:5 -----------
++l_sfne          111001 00001 a:5 b:5 -----------
++l_sfgtu         111001 00010 a:5 b:5 -----------
++l_sfgeu         111001 00011 a:5 b:5 -----------
++l_sfltu         111001 00100 a:5 b:5 -----------
++l_sfleu         111001 00101 a:5 b:5 -----------
++l_sfgts         111001 01010 a:5 b:5 -----------
++l_sfges         111001 01011 a:5 b:5 -----------
++l_sflts         111001 01100 a:5 b:5 -----------
++l_sfles         111001 01101 a:5 b:5 -----------
 -- 
 2.17.0
