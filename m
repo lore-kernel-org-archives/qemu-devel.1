@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fHBzl-00034Y-Rh
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 13:38:19 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fHCGu-0006qA-TJ
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 13:56:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fHBzk-0003Xu-Fr
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 13:38:17 -0400
-References: <20180509165530.29561-1-mreitz@redhat.com>
-	<20180509165530.29561-2-mreitz@redhat.com>
-	<6027508c-717e-d3c2-6704-0c1b614fca89@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <a72e32d9-deb4-765b-5a65-b0b800896961@redhat.com>
-Date: Fri, 11 May 2018 19:38:08 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1fHCGr-0000Vr-QW
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 13:56:00 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44848 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fHCGr-0000VN-Jg
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 13:55:57 -0400
+Date: Fri, 11 May 2018 18:55:48 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180511175547.GG2720@work-vm>
+References: <20180510220248.10272-1-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <6027508c-717e-d3c2-6704-0c1b614fca89@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="uU1Dct7njHsTgOpGPXP5ojI8bY00Nz3j4"
-Subject: Re: [Qemu-devel] [PATCH 01/13] qapi: Add default-variant for flat
- unions
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180510220248.10272-1-clg@kaod.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] migration: discard non-migratable
+ RAMBlocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,254 +28,291 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>, Yulei Zhang <yulei.zhang@intel.com>, kevin.tian@intel.com, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, kwankhede@nvidia.com, zhi.a.wang@intel.com, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---uU1Dct7njHsTgOpGPXP5ojI8bY00Nz3j4
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
-Message-ID: <a72e32d9-deb4-765b-5a65-b0b800896961@redhat.com>
-Subject: Re: [PATCH 01/13] qapi: Add default-variant for flat unions
-References: <20180509165530.29561-1-mreitz@redhat.com>
- <20180509165530.29561-2-mreitz@redhat.com>
- <6027508c-717e-d3c2-6704-0c1b614fca89@redhat.com>
-In-Reply-To: <6027508c-717e-d3c2-6704-0c1b614fca89@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2018-05-10 15:12, Eric Blake wrote:
-> On 05/09/2018 11:55 AM, Max Reitz wrote:
->> This patch allows specifying a discriminator that is an optional membe=
-r
->> of the base struct.=C2=A0 In such a case, a default value must be prov=
-ided
->> that is used when no value is given.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->> =C2=A0 qapi/introspect.json=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 |=C2=A0 8 ++++++
->> =C2=A0 scripts/qapi/common.py=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 | 57
->> ++++++++++++++++++++++++++++++++++--------
->> =C2=A0 scripts/qapi/doc.py=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 8 ++++--
->> =C2=A0 scripts/qapi/introspect.py=C2=A0=C2=A0=C2=A0=C2=A0 | 10 +++++--=
--
->> =C2=A0 scripts/qapi/visit.py=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 | 33 ++++++++++++++++++++++--
->> =C2=A0 tests/qapi-schema/test-qapi.py |=C2=A0 2 ++
->> =C2=A0 6 files changed, 101 insertions(+), 17 deletions(-)
+* C=E9dric Le Goater (clg@kaod.org) wrote:
+> On the POWER9 processor, the XIVE interrupt controller can control
+> interrupt sources using MMIO to trigger events, to EOI or to turn off
+> the sources. Priority management and interrupt acknowledgment is also
+> controlled by MMIO in the presenter sub-engine.
 >=20
-> I've been threatening that we might need this for some time, so I'm gla=
-d
-> to see it being implemented.=C2=A0 We'll see if the tests in 2 and 3 co=
-ver
-> the code added here.
+> These MMIO regions are exposed to guests in QEMU with a set of 'ram
+> device' memory mappings, similarly to VFIO, and the VMAs are populated
+> dynamically with the appropriate pages using a fault handler.
 >=20
->>
->> diff --git a/qapi/introspect.json b/qapi/introspect.json
->> index c7f67b7d78..2d7b1e3745 100644
->> --- a/qapi/introspect.json
->> +++ b/qapi/introspect.json
->> @@ -168,6 +168,13 @@
->> =C2=A0 # @tag: the name of the member serving as type tag.
->> =C2=A0 #=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 An element of @members wi=
-th this name must exist.
->> =C2=A0 #
->> +# @default-variant: if the @tag element of @members is optional, this=
-
->> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 is the default value for choosing=
- a variant.=C2=A0 Its
->> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 value must be a valid value for @=
-tag.
+> But, these regions are an issue for migration. We need to discard the
+> associated RAMBlocks from the RAM state on the source VM and let the
+> destination VM rebuild the memory mappings on the new host in the
+> post_load() operation just before resuming the system.
 >=20
-> Perhaps s/must/will/ as this struct is used for output (and therefore w=
-e
-> always meet the condition, rather than the user having to do something
-> correctly).
-
-I mostly copied from the other descriptions which seemed to prefer
-"must", but I'm happy with either.
-
-> Nice that you remembered introspection.
-
-I didn't, because I had no idea how introspection works exactly before
-this series.  But one of the tests broke, thus telling me I might have
-forgotten something. :-)
-
->> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Present exactly when @tag is pres=
-ent and the
->> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 associated element of @members is=
- optional.
->> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (Since: 2.13)
->> +#
->> =C2=A0 # @variants: variant members, i.e. additional members that
->> =C2=A0 #=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 depend on the type tag's value.=C2=A0 Present exactly when
->> =C2=A0 #=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 @tag is present.=C2=A0 The variants are in no particular order,
-
-[...]
-
->> =C2=A0 diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
->> index 5d72d8936c..ecffc46bd3 100644
->> --- a/scripts/qapi/visit.py
->> +++ b/scripts/qapi/visit.py
->> @@ -40,10 +40,20 @@ def gen_visit_object_members(name, base, members,
->> variants):
->> =C2=A0 void visit_type_%(c_name)s_members(Visitor *v, %(c_name)s *obj,=
-
->> Error **errp)
->> =C2=A0 {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Error *err =3D NULL;
->> -
->> =C2=A0 ''',
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 c_name=3Dc_name(name))
->> =C2=A0 +=C2=A0=C2=A0=C2=A0 if variants:
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret +=3D mcgen('''
->> +=C2=A0=C2=A0=C2=A0 %(c_type)s %(c_name)s;
->> +''',
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 c_type=3Dvariants.tag=
-_member.type.c_name(),
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 c_name=3Dc_name(varia=
-nts.tag_member.name))
->> +
->> +=C2=A0=C2=A0=C2=A0 ret +=3D mcgen('''
->> +
->> +''')
->> +
+> To achieve this goal, the following introduces a new RAMBlock flag
+> RAM_MIGRATABLE which is updated in the vmstate_register_ram() and
+> vmstate_unregister_ram() routines. This flag is then used by the
+> migration to identify RAMBlocks to discard on the source. Some checks
+> are also performed on the destination to make sure nothing invalid was
+> sent.
 >=20
-> Creating a temp variable makes it easier to handle the default...
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+
+I was about to add Review-by when I noticed that we use
+qemu_ram_foeach_block in a number of places, once in migration/ram.c
+and a bunch in migration/postcopy-ram.c
+
+Sorry, I guess we need a version of that as well (or a flag).
+
+Dave
+
+
+> ---
 >=20
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if base:
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret +=3D mcgen(=
-'''
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 visit_type_%(c_type)s_members(v, (%(c_t=
-ype)s *)obj, &err);
->> @@ -75,8 +85,27 @@ void visit_type_%(c_name)s_members(Visitor *v,
->> %(c_name)s *obj, Error **errp)
->> =C2=A0 ''')
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if variants:
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if variants.default_tag_va=
-lue is None:
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 re=
-t +=3D mcgen('''
->> +=C2=A0=C2=A0=C2=A0 %(c_name)s =3D obj->%(c_name)s;
->> +''',
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- c_name=3Dc_name(variants.tag_member.name))
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 else:
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 re=
-t +=3D mcgen('''
->> +=C2=A0=C2=A0=C2=A0 if (obj->has_%(c_name)s) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 %(c_name)s =3D obj->%(c_na=
-me)s;
->> +=C2=A0=C2=A0=C2=A0 } else {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 %(c_name)s =3D %(enum_cons=
-t)s;
->> +=C2=A0=C2=A0=C2=A0 }
->> +''',
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- c_name=3Dc_name(variants.tag_member.name),
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- enum_const=3Dc_enum_const(
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 variants.tag_member.type.name,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 variants.default_tag_value,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 variants.tag_member.type.prefix))
->> +
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret +=3D mcgen(=
-'''
->> -=C2=A0=C2=A0=C2=A0 switch (obj->%(c_name)s) {
->> +=C2=A0=C2=A0=C2=A0 switch (%(c_name)s) {
+>  Changes sinve v2:
 >=20
-> ...compared to the old code that just inlined the one thing that used t=
-o
-> be assigned to what is now the temporary variable.
+>  - added an error_report() in ram_save_host_page()=20
+>  - un/set the RAMBlock RAM_MIGRATABLE directly under vmstate_un/registe=
+r_ram()
+>    with some new flag helpers=20
+> =20
+>  exec.c                    | 18 ++++++++++++++++++
+>  include/exec/cpu-common.h |  3 +++
+>  migration/ram.c           | 43 +++++++++++++++++++++++++++++++++------=
+----
+>  migration/savevm.c        |  2 ++
+>  4 files changed, 56 insertions(+), 10 deletions(-)
 >=20
-> It might be possible to inline things so that the generated code reads
-> either:
+> diff --git a/exec.c b/exec.c
+> index c7fcefa851b2..079c5c8bab7b 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -104,6 +104,9 @@ static MemoryRegion io_mem_unassigned;
+>   * (Set during postcopy)
+>   */
+>  #define RAM_UF_ZEROPAGE (1 << 3)
+> +
+> +/* RAM can be migrated */
+> +#define RAM_MIGRATABLE (1 << 4)
+>  #endif
+> =20
+>  #ifdef TARGET_PAGE_BITS_VARY
+> @@ -1797,6 +1800,21 @@ void qemu_ram_set_uf_zeroable(RAMBlock *rb)
+>      rb->flags |=3D RAM_UF_ZEROPAGE;
+>  }
+> =20
+> +bool qemu_ram_is_migratable(RAMBlock *rb)
+> +{
+> +    return rb->flags & RAM_MIGRATABLE;
+> +}
+> +
+> +void qemu_ram_set_migratable(RAMBlock *rb)
+> +{
+> +    rb->flags |=3D RAM_MIGRATABLE;
+> +}
+> +
+> +void qemu_ram_unset_migratable(RAMBlock *rb)
+> +{
+> +    rb->flags &=3D ~RAM_MIGRATABLE;
+> +}
+> +
+>  /* Called with iothread lock held.  */
+>  void qemu_ram_set_idstr(RAMBlock *new_block, const char *name, DeviceS=
+tate *dev)
+>  {
+> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+> index 24d335f95d45..488288fce959 100644
+> --- a/include/exec/cpu-common.h
+> +++ b/include/exec/cpu-common.h
+> @@ -75,6 +75,9 @@ const char *qemu_ram_get_idstr(RAMBlock *rb);
+>  bool qemu_ram_is_shared(RAMBlock *rb);
+>  bool qemu_ram_is_uf_zeroable(RAMBlock *rb);
+>  void qemu_ram_set_uf_zeroable(RAMBlock *rb);
+> +bool qemu_ram_is_migratable(RAMBlock *rb);
+> +void qemu_ram_set_migratable(RAMBlock *rb);
+> +void qemu_ram_unset_migratable(RAMBlock *rb);
+> =20
+>  size_t qemu_ram_pagesize(RAMBlock *block);
+>  size_t qemu_ram_pagesize_largest(void);
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 912810c18e0f..dfdec78ecb03 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -187,6 +187,11 @@ void ramblock_recv_bitmap_set_range(RAMBlock *rb, =
+void *host_addr,
+>                        nr);
+>  }
+> =20
+> +/* Should be holding either ram_list.mutex, or the RCU lock. */
+> +#define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
+> +    RAMBLOCK_FOREACH(block)                            \
+> +        if (!qemu_ram_is_migratable(block)) {} else
+> +
+>  /*
+>   * An outstanding page request, on the source, having been received
+>   * and queued
+> @@ -813,6 +818,10 @@ unsigned long migration_bitmap_find_dirty(RAMState=
+ *rs, RAMBlock *rb,
+>      unsigned long *bitmap =3D rb->bmap;
+>      unsigned long next;
+> =20
+> +    if (!qemu_ram_is_migratable(rb)) {
+> +        return size;
+> +    }
+> +
+>      if (rs->ram_bulk_stage && start > 0) {
+>          next =3D start + 1;
+>      } else {
+> @@ -858,7 +867,7 @@ uint64_t ram_pagesize_summary(void)
+>      RAMBlock *block;
+>      uint64_t summary =3D 0;
+> =20
+> -    RAMBLOCK_FOREACH(block) {
+> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>          summary |=3D block->page_size;
+>      }
+> =20
+> @@ -882,7 +891,7 @@ static void migration_bitmap_sync(RAMState *rs)
+> =20
+>      qemu_mutex_lock(&rs->bitmap_mutex);
+>      rcu_read_lock();
+> -    RAMBLOCK_FOREACH(block) {
+> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>          migration_bitmap_sync_range(rs, block, 0, block->used_length);
+>      }
+>      rcu_read_unlock();
+> @@ -1521,6 +1530,11 @@ static int ram_save_host_page(RAMState *rs, Page=
+SearchStatus *pss,
+>      size_t pagesize_bits =3D
+>          qemu_ram_pagesize(pss->block) >> TARGET_PAGE_BITS;
+> =20
+> +    if (!qemu_ram_is_migratable(pss->block)) {
+> +        error_report("block %s should not be migrated !", pss->block->=
+idstr);
+> +        return 0;
+> +    }
+> +
+>      do {
+>          /* Check the pages is dirty and if it is send it */
+>          if (!migration_bitmap_clear_dirty(rs, pss->block, pss->page)) =
+{
+> @@ -1619,7 +1633,7 @@ uint64_t ram_bytes_total(void)
+>      uint64_t total =3D 0;
+> =20
+>      rcu_read_lock();
+> -    RAMBLOCK_FOREACH(block) {
+> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>          total +=3D block->used_length;
+>      }
+>      rcu_read_unlock();
+> @@ -1674,7 +1688,7 @@ static void ram_save_cleanup(void *opaque)
+>       */
+>      memory_global_dirty_log_stop();
+> =20
+> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>          g_free(block->bmap);
+>          block->bmap =3D NULL;
+>          g_free(block->unsentmap);
+> @@ -1737,7 +1751,7 @@ void ram_postcopy_migrated_memory_release(Migrati=
+onState *ms)
+>  {
+>      struct RAMBlock *block;
+> =20
+> -    RAMBLOCK_FOREACH(block) {
+> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>          unsigned long *bitmap =3D block->bmap;
+>          unsigned long range =3D block->used_length >> TARGET_PAGE_BITS=
+;
+>          unsigned long run_start =3D find_next_zero_bit(bitmap, range, =
+0);
+> @@ -1815,7 +1829,7 @@ static int postcopy_each_ram_send_discard(Migrati=
+onState *ms)
+>      struct RAMBlock *block;
+>      int ret;
+> =20
+> -    RAMBLOCK_FOREACH(block) {
+> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>          PostcopyDiscardState *pds =3D
+>              postcopy_discard_send_init(ms, block->idstr);
+> =20
+> @@ -2023,7 +2037,7 @@ int ram_postcopy_send_discard_bitmap(MigrationSta=
+te *ms)
+>      rs->last_sent_block =3D NULL;
+>      rs->last_page =3D 0;
+> =20
+> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>          unsigned long pages =3D block->used_length >> TARGET_PAGE_BITS=
+;
+>          unsigned long *bitmap =3D block->bmap;
+>          unsigned long *unsentmap =3D block->unsentmap;
+> @@ -2182,7 +2196,7 @@ static void ram_list_init_bitmaps(void)
+> =20
+>      /* Skip setting bitmap if there is no RAM */
+>      if (ram_bytes_total()) {
+> -        QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+> +        RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>              pages =3D block->max_length >> TARGET_PAGE_BITS;
+>              block->bmap =3D bitmap_new(pages);
+>              bitmap_set(block->bmap, 0, pages);
+> @@ -2263,7 +2277,7 @@ static int ram_save_setup(QEMUFile *f, void *opaq=
+ue)
+> =20
+>      qemu_put_be64(f, ram_bytes_total() | RAM_SAVE_FLAG_MEM_SIZE);
+> =20
+> -    RAMBLOCK_FOREACH(block) {
+> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>          qemu_put_byte(f, strlen(block->idstr));
+>          qemu_put_buffer(f, (uint8_t *)block->idstr, strlen(block->idst=
+r));
+>          qemu_put_be64(f, block->used_length);
+> @@ -2507,6 +2521,11 @@ static inline RAMBlock *ram_block_from_stream(QE=
+MUFile *f, int flags)
+>          return NULL;
+>      }
+> =20
+> +    if (!qemu_ram_is_migratable(block)) {
+> +        error_report("block %s should not be migrated !", id);
+> +        return NULL;
+> +    }
+> +
+>      return block;
+>  }
+> =20
+> @@ -3011,7 +3030,11 @@ static int ram_load(QEMUFile *f, void *opaque, i=
+nt version_id)
+>                  length =3D qemu_get_be64(f);
+> =20
+>                  block =3D qemu_ram_block_by_name(id);
+> -                if (block) {
+> +                if (block && !qemu_ram_is_migratable(block)) {
+> +                    error_report("block %s should not be migrated !", =
+id);
+> +                    ret =3D -EINVAL;
+> +
+> +                } else if (block) {
+>                      if (length !=3D block->used_length) {
+>                          Error *local_err =3D NULL;
+> =20
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index e2be02afe42c..9ebfba738ea4 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -2501,11 +2501,13 @@ void vmstate_register_ram(MemoryRegion *mr, Dev=
+iceState *dev)
+>  {
+>      qemu_ram_set_idstr(mr->ram_block,
+>                         memory_region_name(mr), dev);
+> +    qemu_ram_set_migratable(mr->ram_block);
+>  }
+> =20
+>  void vmstate_unregister_ram(MemoryRegion *mr, DeviceState *dev)
+>  {
+>      qemu_ram_unset_idstr(mr->ram_block);
+> +    qemu_ram_unset_migratable(mr->ram_block);
+>  }
+> =20
+>  void vmstate_register_ram_global(MemoryRegion *mr)
+> --=20
+> 2.13.6
 >=20
-> switch (obj->discriminator) {
-> switch (!obj->has_discriminator ? DEFAULT : obj->discriminator) {
->=20
-> but I don't think it's worth the effort; and the temporary variable is
-> fine even though it makes the generated file bigger.
-
-I don't really mind either way, but depending on the default value and
-the discriminator name, using ?: may lead to a rather long line.
-
->> =C2=A0 ''',
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 c_name=3Dc_n=
-ame(variants.tag_member.name))
->> =C2=A0 diff --git a/tests/qapi-schema/test-qapi.py
->> b/tests/qapi-schema/test-qapi.py
->> index c1a144ba29..f2a072b92e 100644
->> --- a/tests/qapi-schema/test-qapi.py
->> +++ b/tests/qapi-schema/test-qapi.py
->> @@ -56,6 +56,8 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 def _print_variants(variants):
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if variants:
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 print('=C2=A0=C2=A0=C2=A0 tag %s' % variants.tag_member.name)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if=
- variants.default_tag_value:
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 print('=C2=A0=C2=A0=C2=A0 default variant: %s' %
->> variants.default_tag_value)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 for v in variants.variants:
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 print('=C2=A0=C2=A0=C2=A0 case %s: %s' % (=
-v.name, v.type.name))
->> =C2=A0
->=20
-> Looks good!
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Phew. :-)
-
-Thanks!
-
-Max
-
-
---uU1Dct7njHsTgOpGPXP5ojI8bY00Nz3j4
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr11QAACgkQ9AfbAGHV
-z0CWzAf8CXtht3rrWfPNOsren2YisVQEYq9UAt0Oyexa5rplNas3aAtIq+ijHjNA
-p5qlloLDc6IWi0bsbrRRzsqCLp8dd/MpaTCv7aLn/aIzwMGOsAc13UTzFyHWB6Ja
-3tngDnRXrhpXn2nSMWx0gXPaortK5Z/nrtHptk2VWjK3pFIoCKWNyzuIcyHH8vff
-bSjS5g/PJEAQppM+APM4UFUw8vLQ/fr56CPZl8BAnWYP5scyBhZ1jclx++Oz58MN
-W3rJbAe7x0DuD+yMlsV0F3Ja5sierF0aeeANudbUm/g3yJymlkLzPyJB1ynH/c68
-ZqOfkNUG6VhH26YYaXtci04vJFBppg==
-=AYXj
------END PGP SIGNATURE-----
-
---uU1Dct7njHsTgOpGPXP5ojI8bY00Nz3j4--
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
