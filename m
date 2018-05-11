@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fHCXw-0001hC-UG
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 14:13:38 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fHCY5-0001xL-Q5
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 14:13:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fHCXv-0007Qj-Nt
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 14:13:36 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fHCY0-0007Rt-Rc
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 14:13:45 -0400
 References: <20180509165530.29561-1-mreitz@redhat.com>
-	<20180509165530.29561-2-mreitz@redhat.com>
-	<6027508c-717e-d3c2-6704-0c1b614fca89@redhat.com>
-	<c8bb155f-4ff7-46d8-116f-c4e6be2c161c@redhat.com>
-	<4c7382dc-724f-4420-ea8d-b4d1bf0edf84@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a89fba24-836e-8c1a-f50c-8564b486b9f0@redhat.com>
-Date: Fri, 11 May 2018 13:13:28 -0500
+	<20180509165530.29561-9-mreitz@redhat.com>
+	<ba5e8366-e549-5611-b161-1710fc2f95b5@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <2418987f-17d1-7025-5e83-e46d87cdc322@redhat.com>
+Date: Fri, 11 May 2018 20:13:35 +0200
 MIME-Version: 1.0
-In-Reply-To: <4c7382dc-724f-4420-ea8d-b4d1bf0edf84@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 01/13] qapi: Add default-variant for flat
- unions
+In-Reply-To: <ba5e8366-e549-5611-b161-1710fc2f95b5@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="NtUmwsP6K9oTvjCKzFfGatpLCSkMz4Urq"
+Subject: Re: [Qemu-devel] [PATCH 08/13] tests: Add
+ qdict_stringify_for_keyval() test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,113 +26,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 05/11/2018 12:59 PM, Max Reitz wrote:
-> On 2018-05-10 15:18, Eric Blake wrote:
->> On 05/10/2018 08:12 AM, Eric Blake wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--NtUmwsP6K9oTvjCKzFfGatpLCSkMz4Urq
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Message-ID: <2418987f-17d1-7025-5e83-e46d87cdc322@redhat.com>
+Subject: Re: [PATCH 08/13] tests: Add qdict_stringify_for_keyval() test
+References: <20180509165530.29561-1-mreitz@redhat.com>
+ <20180509165530.29561-9-mreitz@redhat.com>
+ <ba5e8366-e549-5611-b161-1710fc2f95b5@redhat.com>
+In-Reply-To: <ba5e8366-e549-5611-b161-1710fc2f95b5@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2018-05-10 18:02, Eric Blake wrote:
+> On 05/09/2018 11:55 AM, Max Reitz wrote:
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>> =C2=A0 tests/check-qdict.c | 54
+>> +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>> =C2=A0 1 file changed, 54 insertions(+)
 >>
->> Oh, I just had a thought:
->>
->>>> +++ b/scripts/qapi/visit.py
->>>> @@ -40,10 +40,20 @@ def gen_visit_object_members(name, base, members=
-,
->>
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if variants:
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if variants.default_tag_=
-value is None:
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-ret +=3D mcgen('''
->>>> +=C2=A0=C2=A0=C2=A0 %(c_name)s =3D obj->%(c_name)s;
->>>> +''',
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- c_name=3Dc_name(variants.tag_member.name))
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 else:
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-ret +=3D mcgen('''
->>>> +=C2=A0=C2=A0=C2=A0 if (obj->has_%(c_name)s) {
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 %(c_name)s =3D obj->%(c_=
-name)s;
->>>> +=C2=A0=C2=A0=C2=A0 } else {
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 %(c_name)s =3D %(enum_co=
-nst)s;
->>
->> In this branch of code, is it worth also generating:
->>
->> %has_(c_name)s =3D true;
 >=20
-> You mean obj->has_%(c_name)s, and then also set obj->%(c_name)s?
-
-Umm, yeah ;)
-
-In fact, I think it is as simple as:
-
-if variants:
-     if variants.default_tag_value:
-         ret +=3D mcgen('''
-if (!obj->has_%(c_name)s) {
-     obj->has_%(c_name)s =3D true;
-     obj->%(c_name)s =3D %(enum_const)s;
-}
-''')
-     ret +=3D mcgen('''
-switch (obj->%(c_name)s) {
-...
-
-and you are back to not needing a temporary variable.
-
+>> +static void qdict_stringify_for_keyval_test(void)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 QDict *dict =3D qdict_new();
+>> +
+>> +=C2=A0=C2=A0=C2=A0 /*
+>> +=C2=A0=C2=A0=C2=A0=C2=A0 * Test stringification of:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0 *
+>> +=C2=A0=C2=A0=C2=A0=C2=A0 * {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0 "a": "null",
+>> +=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0 "b": 42,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0 "c": -23,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0 "d": false,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0 "e": null,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0 "f": "",
+>> +=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0 "g": 0.5,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0 "h": 0xfffffffffff=
+fffff,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0 "i": true,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0 "j": 0
 >=20
->> That way, the rest of the C code does not have to check
->> has_discriminator, because the process of assigning the default will
->> ensure that has_discriminator is always true later on.=C2=A0 It does h=
-ave the
->> effect that output would never omit the discriminator - but that might
->> be a good thing: if we ever have an output union that used to have a
->> mandatory discriminator and want to now make it optional, we don't wan=
-t
->> to break older clients that expected the discriminator to be present. =
-It
->> does obscure whether input relied on the default, but I don't think th=
-at
->> hurts.
+> Is it worth testing fun things like '-0.0'?
+
+Sure, why not.  Maybe even infinity, although I'm not quite sure the
+input visitor can handle it...
+>> +=C2=A0=C2=A0=C2=A0 g_assert(!strcmp(qdict_get_str(dict, "a"), "null")=
+);
+>> +=C2=A0=C2=A0=C2=A0 g_assert(!strcmp(qdict_get_str(dict, "b"), "42"));=
+
+>> +=C2=A0=C2=A0=C2=A0 g_assert(!strcmp(qdict_get_str(dict, "c"), "-23"))=
+;
+>> +=C2=A0=C2=A0=C2=A0 g_assert(!strcmp(qdict_get_str(dict, "d"), "off"))=
+;
+>> +=C2=A0=C2=A0=C2=A0 g_assert(qobject_type(qdict_get(dict, "e")) =3D=3D=
+ QTYPE_QNULL);
 >=20
-> Also, it would make code a bit simpler because it can cover the !has_X
-> case under X =3D=3D default_X.
->=20
-> But OTOH, you could make that case for any optional value -- except
-> where "is missing" has special value.
+> Is it worth shortening this line to:
+> g_assert(qobject_to(QNull, qdict_get(dict, "e")));
 
-My preference - special-casing "is missing" is prone to abuse.  I don't=20
-want to support that if we can at all avoid it.  The sane semantics is=20
-that the default is populated as soon as we detect that something is=20
-missing, and whether the user relies on the default by leaving the=20
-discriminator absent, or explicitly supplies the discriminator set to=20
-the default, the behavior should always be the same.
+I think explicitly checking the type is a bit more expressive.
 
->=20
-> And that's the tricky part: I think it's hard to say that a missing
-> discriminator never has special meaning.
+Max
 
-It won't, if we decide right now that we don't want to let it :)
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
->  We only need the
-> default-variant so we know which variant of the union to pick; but we
-> don't know that the fact that the discriminator value was missing does
-> not have special meaning.
->=20
-> Of course, we can simply foreclose that by setting it here.
 
-And that's the way I'm leaning.
+--NtUmwsP6K9oTvjCKzFfGatpLCSkMz4Urq
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
->=20
-> I don't have money in this game, so I suppose it's yours and Markus's
-> call. :-)
+-----BEGIN PGP SIGNATURE-----
 
-Markus, what's your preference?
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr13U8ACgkQ9AfbAGHV
+z0D5rwf/XlT+AJp9KYdl+v1JPhNFzmX1UfgaHzUdbwD83lzDcIp2wh5BS5XF1lL5
+ZU9qcoWBs8fEJwafjQ17HTCraA+PDR3GjEZl1gNct8CIqNIvYbuN3UC3WVv5cLVk
+xVatHoB9/4RmVVOjey4cPhcPU2DuU2VfNzBqtDQbyoKVfJgginMg9NWwsiPm7wr5
+JuK9mjXfICX+IPQkl8994ThD8iJ+1q1F4llJbMqZ7dzX4qc6haB2Ewyi8O+jh0ja
+wZjpwMVq8EMBlxC//RwbYraBtiHPA+ZU/wSjZE7Nsz6e2ZRQtCX8+tBMk8oUFMov
+umr3LiCuBsHXrFk3ZBghdQnoyIQKHQ==
+=C28n
+-----END PGP SIGNATURE-----
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+--NtUmwsP6K9oTvjCKzFfGatpLCSkMz4Urq--
