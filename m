@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fH0A0-0006KO-4e
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 01:00:05 -0400
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fH0zb-0000pV-MZ
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 01:53:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fH09x-0002qz-1k
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 01:00:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46216 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fH09w-0002qG-Rz
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 01:00:00 -0400
-Date: Fri, 11 May 2018 12:59:46 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180511045946.GM19024@xz-mi>
-References: <20180510220248.10272-1-clg@kaod.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180510220248.10272-1-clg@kaod.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] migration: discard non-migratable
- RAMBlocks
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fH0zY-0005RX-JQ
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 01:53:23 -0400
+Received: from smtp21.cstnet.cn ([159.226.251.21]:49690 helo=cstnet.cn)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fH0zX-0005QB-TR
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 01:53:20 -0400
+From: Su Hang <suhang16@mails.ucas.ac.cn>
+Date: Fri, 11 May 2018 13:53:14 +0800
+Message-Id: <1526017994-22246-3-git-send-email-suhang16@mails.ucas.ac.cn>
+In-Reply-To: <1526017994-22246-1-git-send-email-suhang16@mails.ucas.ac.cn>
+References: <1526017994-22246-1-git-send-email-suhang16@mails.ucas.ac.cn>
+Subject: [Qemu-devel] [PATCH v8 2/2] Add QTest testcase for the Intel
+ Hexadecimal Object File Loader.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,311 +24,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, kevin.tian@intel.com, joonas.lahtinen@linux.intel.com, kwankhede@nvidia.com, zhenyuw@linux.intel.com, Yulei Zhang <yulei.zhang@intel.com>, Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, zhi.a.wang@intel.com, David Gibson <david@gibson.dropbear.id.au>
+To: stefanha@gmail.com, jim@groklearning.com, joel@jms.id.au
+Cc: qemu-devel@nongnu.org
 
-On Fri, May 11, 2018 at 12:02:48AM +0200, C=C3=A9dric Le Goater wrote:
-> On the POWER9 processor, the XIVE interrupt controller can control
-> interrupt sources using MMIO to trigger events, to EOI or to turn off
-> the sources. Priority management and interrupt acknowledgment is also
-> controlled by MMIO in the presenter sub-engine.
->=20
-> These MMIO regions are exposed to guests in QEMU with a set of 'ram
-> device' memory mappings, similarly to VFIO, and the VMAs are populated
-> dynamically with the appropriate pages using a fault handler.
->=20
-> But, these regions are an issue for migration. We need to discard the
-> associated RAMBlocks from the RAM state on the source VM and let the
-> destination VM rebuild the memory mappings on the new host in the
-> post_load() operation just before resuming the system.
->=20
-> To achieve this goal, the following introduces a new RAMBlock flag
-> RAM_MIGRATABLE which is updated in the vmstate_register_ram() and
-> vmstate_unregister_ram() routines. This flag is then used by the
-> migration to identify RAMBlocks to discard on the source. Some checks
-> are also performed on the destination to make sure nothing invalid was
-> sent.
->=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
->=20
->  Changes sinve v2:
->=20
->  - added an error_report() in ram_save_host_page()=20
->  - un/set the RAMBlock RAM_MIGRATABLE directly under vmstate_un/registe=
-r_ram()
->    with some new flag helpers=20
-> =20
->  exec.c                    | 18 ++++++++++++++++++
->  include/exec/cpu-common.h |  3 +++
->  migration/ram.c           | 43 +++++++++++++++++++++++++++++++++------=
-----
->  migration/savevm.c        |  2 ++
->  4 files changed, 56 insertions(+), 10 deletions(-)
->=20
-> diff --git a/exec.c b/exec.c
-> index c7fcefa851b2..079c5c8bab7b 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -104,6 +104,9 @@ static MemoryRegion io_mem_unassigned;
->   * (Set during postcopy)
->   */
->  #define RAM_UF_ZEROPAGE (1 << 3)
-> +
-> +/* RAM can be migrated */
-> +#define RAM_MIGRATABLE (1 << 4)
->  #endif
-> =20
->  #ifdef TARGET_PAGE_BITS_VARY
-> @@ -1797,6 +1800,21 @@ void qemu_ram_set_uf_zeroable(RAMBlock *rb)
->      rb->flags |=3D RAM_UF_ZEROPAGE;
->  }
-> =20
-> +bool qemu_ram_is_migratable(RAMBlock *rb)
-> +{
-> +    return rb->flags & RAM_MIGRATABLE;
-> +}
-> +
-> +void qemu_ram_set_migratable(RAMBlock *rb)
-> +{
-> +    rb->flags |=3D RAM_MIGRATABLE;
-> +}
-> +
-> +void qemu_ram_unset_migratable(RAMBlock *rb)
-> +{
-> +    rb->flags &=3D ~RAM_MIGRATABLE;
-> +}
-> +
->  /* Called with iothread lock held.  */
->  void qemu_ram_set_idstr(RAMBlock *new_block, const char *name, DeviceS=
-tate *dev)
->  {
-> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-> index 24d335f95d45..488288fce959 100644
-> --- a/include/exec/cpu-common.h
-> +++ b/include/exec/cpu-common.h
-> @@ -75,6 +75,9 @@ const char *qemu_ram_get_idstr(RAMBlock *rb);
->  bool qemu_ram_is_shared(RAMBlock *rb);
->  bool qemu_ram_is_uf_zeroable(RAMBlock *rb);
->  void qemu_ram_set_uf_zeroable(RAMBlock *rb);
-> +bool qemu_ram_is_migratable(RAMBlock *rb);
-> +void qemu_ram_set_migratable(RAMBlock *rb);
-> +void qemu_ram_unset_migratable(RAMBlock *rb);
-> =20
->  size_t qemu_ram_pagesize(RAMBlock *block);
->  size_t qemu_ram_pagesize_largest(void);
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 912810c18e0f..dfdec78ecb03 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -187,6 +187,11 @@ void ramblock_recv_bitmap_set_range(RAMBlock *rb, =
-void *host_addr,
->                        nr);
->  }
-> =20
-> +/* Should be holding either ram_list.mutex, or the RCU lock. */
-> +#define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
-> +    RAMBLOCK_FOREACH(block)                            \
-> +        if (!qemu_ram_is_migratable(block)) {} else
+'test.hex' file is a bare metal ARM software stored in Hexadecimal
+Object Format. When it's loaded by QEMU, it will print "Hello world!\n"
+on console.
 
-Pure question: is here an explicit use of "else" rather than:
+`pre_store` array in 'hexloader-test.c' file, stores the binary format
+of 'test.hex' file, which is used to verify correctness.
 
-      if (qemu_ram_is_migratable(block))
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Su Hang <suhang16@mails.ucas.ac.cn>
+---
+ MAINTAINERS                          |  6 ++++
+ tests/Makefile.include               |  2 ++
+ tests/hex-loader-check-data/test.hex | 12 ++++++++
+ tests/hexloader-test.c               | 56 ++++++++++++++++++++++++++++++++++++
+ 4 files changed, 76 insertions(+)
+ create mode 100644 tests/hex-loader-check-data/test.hex
+ create mode 100644 tests/hexloader-test.c
 
-?
-
-> +
->  /*
->   * An outstanding page request, on the source, having been received
->   * and queued
-> @@ -813,6 +818,10 @@ unsigned long migration_bitmap_find_dirty(RAMState=
- *rs, RAMBlock *rb,
->      unsigned long *bitmap =3D rb->bmap;
->      unsigned long next;
-> =20
-> +    if (!qemu_ram_is_migratable(rb)) {
-> +        return size;
-> +    }
-
-(I would change the caller side at find_dirty_block(), we can just
- skip that if not migratable.  But this is also fine to me)
-
-> +
->      if (rs->ram_bulk_stage && start > 0) {
->          next =3D start + 1;
->      } else {
-> @@ -858,7 +867,7 @@ uint64_t ram_pagesize_summary(void)
->      RAMBlock *block;
->      uint64_t summary =3D 0;
-> =20
-> -    RAMBLOCK_FOREACH(block) {
-> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
->          summary |=3D block->page_size;
->      }
-> =20
-> @@ -882,7 +891,7 @@ static void migration_bitmap_sync(RAMState *rs)
-> =20
->      qemu_mutex_lock(&rs->bitmap_mutex);
->      rcu_read_lock();
-> -    RAMBLOCK_FOREACH(block) {
-> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
->          migration_bitmap_sync_range(rs, block, 0, block->used_length);
->      }
->      rcu_read_unlock();
-> @@ -1521,6 +1530,11 @@ static int ram_save_host_page(RAMState *rs, Page=
-SearchStatus *pss,
->      size_t pagesize_bits =3D
->          qemu_ram_pagesize(pss->block) >> TARGET_PAGE_BITS;
-> =20
-> +    if (!qemu_ram_is_migratable(pss->block)) {
-> +        error_report("block %s should not be migrated !", pss->block->=
-idstr);
-> +        return 0;
-> +    }
-> +
->      do {
->          /* Check the pages is dirty and if it is send it */
->          if (!migration_bitmap_clear_dirty(rs, pss->block, pss->page)) =
-{
-> @@ -1619,7 +1633,7 @@ uint64_t ram_bytes_total(void)
->      uint64_t total =3D 0;
-> =20
->      rcu_read_lock();
-> -    RAMBLOCK_FOREACH(block) {
-> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
->          total +=3D block->used_length;
->      }
->      rcu_read_unlock();
-> @@ -1674,7 +1688,7 @@ static void ram_save_cleanup(void *opaque)
->       */
->      memory_global_dirty_log_stop();
-> =20
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
->          g_free(block->bmap);
->          block->bmap =3D NULL;
->          g_free(block->unsentmap);
-> @@ -1737,7 +1751,7 @@ void ram_postcopy_migrated_memory_release(Migrati=
-onState *ms)
->  {
->      struct RAMBlock *block;
-> =20
-> -    RAMBLOCK_FOREACH(block) {
-> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
->          unsigned long *bitmap =3D block->bmap;
->          unsigned long range =3D block->used_length >> TARGET_PAGE_BITS=
-;
->          unsigned long run_start =3D find_next_zero_bit(bitmap, range, =
-0);
-> @@ -1815,7 +1829,7 @@ static int postcopy_each_ram_send_discard(Migrati=
-onState *ms)
->      struct RAMBlock *block;
->      int ret;
-> =20
-> -    RAMBLOCK_FOREACH(block) {
-> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
->          PostcopyDiscardState *pds =3D
->              postcopy_discard_send_init(ms, block->idstr);
-> =20
-> @@ -2023,7 +2037,7 @@ int ram_postcopy_send_discard_bitmap(MigrationSta=
-te *ms)
->      rs->last_sent_block =3D NULL;
->      rs->last_page =3D 0;
-> =20
-> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
->          unsigned long pages =3D block->used_length >> TARGET_PAGE_BITS=
-;
->          unsigned long *bitmap =3D block->bmap;
->          unsigned long *unsentmap =3D block->unsentmap;
-> @@ -2182,7 +2196,7 @@ static void ram_list_init_bitmaps(void)
-> =20
->      /* Skip setting bitmap if there is no RAM */
->      if (ram_bytes_total()) {
-> -        QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> +        RAMBLOCK_FOREACH_MIGRATABLE(block) {
->              pages =3D block->max_length >> TARGET_PAGE_BITS;
->              block->bmap =3D bitmap_new(pages);
->              bitmap_set(block->bmap, 0, pages);
-> @@ -2263,7 +2277,7 @@ static int ram_save_setup(QEMUFile *f, void *opaq=
-ue)
-> =20
->      qemu_put_be64(f, ram_bytes_total() | RAM_SAVE_FLAG_MEM_SIZE);
-> =20
-> -    RAMBLOCK_FOREACH(block) {
-> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
->          qemu_put_byte(f, strlen(block->idstr));
->          qemu_put_buffer(f, (uint8_t *)block->idstr, strlen(block->idst=
-r));
->          qemu_put_be64(f, block->used_length);
-> @@ -2507,6 +2521,11 @@ static inline RAMBlock *ram_block_from_stream(QE=
-MUFile *f, int flags)
->          return NULL;
->      }
-> =20
-> +    if (!qemu_ram_is_migratable(block)) {
-> +        error_report("block %s should not be migrated !", id);
-> +        return NULL;
-> +    }
-> +
->      return block;
->  }
-> =20
-> @@ -3011,7 +3030,11 @@ static int ram_load(QEMUFile *f, void *opaque, i=
-nt version_id)
->                  length =3D qemu_get_be64(f);
-> =20
->                  block =3D qemu_ram_block_by_name(id);
-> -                if (block) {
-> +                if (block && !qemu_ram_is_migratable(block)) {
-> +                    error_report("block %s should not be migrated !", =
-id);
-> +                    ret =3D -EINVAL;
-> +
-
-(extra new line)
-
-I saw quite a few of such checks in the patch that dumps errors.
-Frankly speaking I would still prefer assertions if we are sure it's
-programming errors, and I believe incorrect marking of RAMBlocks are.
-I think I understand the concern here that we are just careful with
-migration codes to avoid VM crash but at least here we are doing
-precopy loading and we won't have problem to use assertion since it
-won't crash the source (and after all we are returning -EINVAL so I
-suppose the VM will quit too, just like a crash here).
-
-I don't have strong opinion on this and current patch actually looks
-good to me; I only raise this question up.
-
-Thanks,
-
-> +                } else if (block) {
->                      if (length !=3D block->used_length) {
->                          Error *local_err =3D NULL;
-> =20
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index e2be02afe42c..9ebfba738ea4 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -2501,11 +2501,13 @@ void vmstate_register_ram(MemoryRegion *mr, Dev=
-iceState *dev)
->  {
->      qemu_ram_set_idstr(mr->ram_block,
->                         memory_region_name(mr), dev);
-> +    qemu_ram_set_migratable(mr->ram_block);
->  }
-> =20
->  void vmstate_unregister_ram(MemoryRegion *mr, DeviceState *dev)
->  {
->      qemu_ram_unset_idstr(mr->ram_block);
-> +    qemu_ram_unset_migratable(mr->ram_block);
->  }
-> =20
->  void vmstate_register_ram_global(MemoryRegion *mr)
-> --=20
-> 2.13.6
->=20
->=20
-
---=20
-Peter Xu
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 459e3594e16c..c86095e3b3d9 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1291,6 +1291,12 @@ F: hw/core/generic-loader.c
+ F: include/hw/core/generic-loader.h
+ F: docs/generic-loader.txt
+ 
++Intel Hexadecimal Object File Loader
++M: Su Hang <suhang16@mails.ucas.ac.cn>
++S: Maintained
++F: tests/hexloader-test.c
++F: tests/hex-loader-check-data/test.hex
++
+ CHRP NVRAM
+ M: Thomas Huth <thuth@redhat.com>
+ S: Maintained
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 3b9a5e31a2c2..f4a3e71f34ee 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -380,6 +380,7 @@ check-qtest-arm-y += tests/test-arm-mptimer$(EXESUF)
+ gcov-files-arm-y += hw/timer/arm_mptimer.c
+ check-qtest-arm-y += tests/boot-serial-test$(EXESUF)
+ check-qtest-arm-y += tests/sdhci-test$(EXESUF)
++check-qtest-arm-y += tests/hexloader-test$(EXESUF)
+ 
+ check-qtest-aarch64-y = tests/numa-test$(EXESUF)
+ check-qtest-aarch64-y += tests/sdhci-test$(EXESUF)
+@@ -755,6 +756,7 @@ tests/qmp-test$(EXESUF): tests/qmp-test.o
+ tests/device-introspect-test$(EXESUF): tests/device-introspect-test.o
+ tests/rtc-test$(EXESUF): tests/rtc-test.o
+ tests/m48t59-test$(EXESUF): tests/m48t59-test.o
++tests/hexloader-test$(EXESUF): tests/hexloader-test.o
+ tests/endianness-test$(EXESUF): tests/endianness-test.o
+ tests/spapr-phb-test$(EXESUF): tests/spapr-phb-test.o $(libqos-obj-y)
+ tests/prom-env-test$(EXESUF): tests/prom-env-test.o $(libqos-obj-y)
+diff --git a/tests/hex-loader-check-data/test.hex b/tests/hex-loader-check-data/test.hex
+new file mode 100644
+index 000000000000..7e99b452f5cc
+--- /dev/null
++++ b/tests/hex-loader-check-data/test.hex
+@@ -0,0 +1,12 @@
++:020000040001F9
++:1000000004D09FE5160000EBFEFFFFEA9810010008
++:1000100004B02DE500B08DE20CD04DE208000BE5F8
++:10002000060000EA08301BE50020D3E52C309FE5F0
++:10003000002083E508301BE5013083E208300BE542
++:1000400008301BE50030D3E5000053E3F4FFFF1A4E
++:100050000000A0E100D08BE204B09DE41EFF2FE180
++:1000600000101F1000482DE904B08DE208009FE544
++:10007000E6FFFFEB0000A0E10088BDE8840001007E
++:1000800000101F1048656C6C6F20776F726C6421D4
++:020090000A0064
++:00000001FF
+diff --git a/tests/hexloader-test.c b/tests/hexloader-test.c
+new file mode 100644
+index 000000000000..70f99ac03c6b
+--- /dev/null
++++ b/tests/hexloader-test.c
+@@ -0,0 +1,56 @@
++/*
++ * QTest testcase for the Intel Hexadecimal Object File Loader
++ *
++ * Authors:
++ *  Su Hang <suhang16@mails.ucas.ac.cn> 2018
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "libqtest.h"
++
++#define BIN_SIZE 146
++
++static unsigned char pre_store[BIN_SIZE] = {
++    4,   208, 159, 229, 22,  0,   0,   235, 254, 255, 255, 234, 152, 16,  1,
++    0,   4,   176, 45,  229, 0,   176, 141, 226, 12,  208, 77,  226, 8,   0,
++    11,  229, 6,   0,   0,   234, 8,   48,  27,  229, 0,   32,  211, 229, 44,
++    48,  159, 229, 0,   32,  131, 229, 8,   48,  27,  229, 1,   48,  131, 226,
++    8,   48,  11,  229, 8,   48,  27,  229, 0,   48,  211, 229, 0,   0,   83,
++    227, 244, 255, 255, 26,  0,   0,   160, 225, 0,   208, 139, 226, 4,   176,
++    157, 228, 30,  255, 47,  225, 0,   16,  31,  16,  0,   72,  45,  233, 4,
++    176, 141, 226, 8,   0,   159, 229, 230, 255, 255, 235, 0,   0,   160, 225,
++    0,   136, 189, 232, 132, 0,   1,   0,   0,   16,  31,  16,  72,  101, 108,
++    108, 111, 32,  119, 111, 114, 108, 100, 33,  10,  0};
++
++/* success if no crash or abort */
++static void hex_loader_test(void)
++{
++    unsigned int i;
++    unsigned char memory_content[BIN_SIZE];
++    const unsigned int base_addr = 0x00010000;
++
++    QTestState *s = qtest_startf(
++        "-M versatilepb -m 128M -nographic -kernel ../tests/hex-loader-check-data/test.hex");
++
++    for (i = 0; i < BIN_SIZE; ++i) {
++        memory_content[i] = qtest_readb(s, base_addr + i);
++        g_assert_cmpuint(memory_content[i], ==, pre_store[i]);
++    }
++    qtest_quit(s);
++}
++
++int main(int argc, char **argv)
++{
++    int ret;
++
++    g_test_init(&argc, &argv, NULL);
++
++    qtest_add_func("/tmp/hex_loader", hex_loader_test);
++    ret = g_test_run();
++
++    return ret;
++}
+-- 
+2.7.4
