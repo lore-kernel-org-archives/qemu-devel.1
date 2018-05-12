@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55973)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cyrus296@gmail.com>) id 1fHI2v-0007QS-T5
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 20:05:59 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fHISX-0005xg-LX
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 20:32:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cyrus296@gmail.com>) id 1fHI2t-0007b7-HA
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 20:05:57 -0400
-Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:52712)
+	(envelope-from <richard.henderson@linaro.org>) id 1fHISW-00087K-Sz
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 20:32:25 -0400
+Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:39220)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <cyrus296@gmail.com>) id 1fHI2t-0007ac-BX
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 20:05:55 -0400
-Received: by mail-it0-x244.google.com with SMTP id y189-v6so3963215itb.2
-	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 17:05:55 -0700 (PDT)
-From: Calvin Lee <cyrus296@gmail.com>
-Date: Fri, 11 May 2018 18:05:44 -0600
-Message-Id: <20180512000545.966-2-cyrus296@gmail.com>
-In-Reply-To: <20180512000545.966-1-cyrus296@gmail.com>
-References: <20180512000545.966-1-cyrus296@gmail.com>
-Subject: [Qemu-devel] [PATCH RFC v2 1/2] PC Chipset: Improve serial divisor
- calculation
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fHISW-000879-MU
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 20:32:24 -0400
+Received: by mail-pl0-x244.google.com with SMTP id c19-v6so4135366pls.6
+	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 17:32:24 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Fri, 11 May 2018 17:32:08 -0700
+Message-Id: <20180512003217.9105-3-richard.henderson@linaro.org>
+In-Reply-To: <20180512003217.9105-1-richard.henderson@linaro.org>
+References: <20180512003217.9105-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v4 02/11] target/arm: Early exit after
+ unallocated_encoding in disas_fp_int_conv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,83 +28,27 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, Calvin Lee <cyrus296@gmail.com>
+Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 
-This fixes several problems I found in the UART serial implementation.
-Now all divisor values are allowed, while before divisor values of zero
-and below the base baud rate were rejected. All changes are in reference
-to http://www.sci.muni.cz/docs/pc/serport.txt
+No sense in emitting code after the exception.
 
-Signed-off-by: Calvin Lee <cyrus296@gmail.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-I included a slight code-style change in this commit because it seemed
-close enough to the code I was editing to be relevant. If not, I can
-change the commit to not include this change.
+ target/arm/translate-a64.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- hw/char/serial.c | 23 +++++++++++++----------
- 1 file changed, 13 insertions(+), 10 deletions(-)
-
-diff --git a/hw/char/serial.c b/hw/char/serial.c
-index 2c080c9862..4159a46a2f 100644
---- a/hw/char/serial.c
-+++ b/hw/char/serial.c
-@@ -150,13 +150,10 @@ static void serial_update_irq(SerialState *s)
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 5b8cf75e9f..11d8c07943 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -5780,7 +5780,7 @@ static void disas_fp_int_conv(DisasContext *s, uint32_t insn)
+         default:
+             /* all other sf/type/rmode combinations are invalid */
+             unallocated_encoding(s);
+-            break;
++            return;
+         }
  
- static void serial_update_parameters(SerialState *s)
- {
--    int speed, parity, data_bits, stop_bits, frame_size;
-+    float speed;
-+    int parity, data_bits, stop_bits, frame_size;
-     QEMUSerialSetParams ssp;
- 
--    if (s->divider == 0 || s->divider > s->baudbase) {
--        return;
--    }
--
-     /* Start bit. */
-     frame_size = 1;
-     if (s->lcr & 0x08) {
-@@ -169,14 +166,16 @@ static void serial_update_parameters(SerialState *s)
-     } else {
-             parity = 'N';
-     }
--    if (s->lcr & 0x04)
-+    if (s->lcr & 0x04) {
-         stop_bits = 2;
--    else
-+    } else {
-         stop_bits = 1;
-+    }
- 
-     data_bits = (s->lcr & 0x03) + 5;
-     frame_size += data_bits + stop_bits;
--    speed = s->baudbase / s->divider;
-+    /* Zero divisor should give about 3500 baud */
-+    speed = (s->divider == 0) ? 3500 : (float) s->baudbase / s->divider;
-     ssp.speed = speed;
-     ssp.parity = parity;
-     ssp.data_bits = data_bits;
-@@ -184,7 +183,7 @@ static void serial_update_parameters(SerialState *s)
-     s->char_transmit_time =  (NANOSECONDS_PER_SECOND / speed) * frame_size;
-     qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_SERIAL_SET_PARAMS, &ssp);
- 
--    DPRINTF("speed=%d parity=%c data=%d stop=%d\n",
-+    DPRINTF("speed=%.2f parity=%c data=%d stop=%d\n",
-            speed, parity, data_bits, stop_bits);
- }
- 
-@@ -341,7 +340,11 @@ static void serial_ioport_write(void *opaque, hwaddr addr, uint64_t val,
-     default:
-     case 0:
-         if (s->lcr & UART_LCR_DLAB) {
--            s->divider = (s->divider & 0xff00) | val;
-+            if (size == 2) {
-+                s->divider = (s->divider & 0xff00) | val;
-+            } else if (size == 4) {
-+                s->divider = val;
-+            }
-             serial_update_parameters(s);
-         } else {
-             s->thr = (uint8_t) val;
+         if (!fp_access_check(s)) {
 -- 
 2.17.0
