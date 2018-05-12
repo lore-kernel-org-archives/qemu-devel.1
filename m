@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fHMgI-0003yL-I5
-	for qemu-devel@nongnu.org; Sat, 12 May 2018 01:02:55 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fHMgN-000413-US
+	for qemu-devel@nongnu.org; Sat, 12 May 2018 01:03:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fHMgH-0008KX-Pr
-	for qemu-devel@nongnu.org; Sat, 12 May 2018 01:02:54 -0400
-Received: from mail-pl0-x22a.google.com ([2607:f8b0:400e:c01::22a]:41359)
+	(envelope-from <richard.henderson@linaro.org>) id 1fHMgL-0008LM-E3
+	for qemu-devel@nongnu.org; Sat, 12 May 2018 01:02:59 -0400
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:41882)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fHMgH-0008KR-K3
-	for qemu-devel@nongnu.org; Sat, 12 May 2018 01:02:53 -0400
-Received: by mail-pl0-x22a.google.com with SMTP id az12-v6so4365069plb.8
-	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 22:02:53 -0700 (PDT)
+	id 1fHMgL-0008LG-8Z
+	for qemu-devel@nongnu.org; Sat, 12 May 2018 01:02:57 -0400
+Received: by mail-pl0-x242.google.com with SMTP id az12-v6so4365129plb.8
+	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 22:02:57 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 11 May 2018 22:02:41 -0700
-Message-Id: <20180512050250.12774-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v1.1 0/9] target/m68k: Convert to TranslatorOps
+Date: Fri, 11 May 2018 22:02:44 -0700
+Message-Id: <20180512050250.12774-4-richard.henderson@linaro.org>
+In-Reply-To: <20180512050250.12774-1-richard.henderson@linaro.org>
+References: <20180512050250.12774-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 3/9] target/m68k: Remove DISAS_JUMP_NEXT as
+ unused
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,28 +30,22 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
-[ Ho, hum.  I didn't clear out my scratch directory before sending v1.0. ]
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/m68k/translate.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-FYI, I've only tested this with linux-user-test-0.3 and
-our qemu coldfire testing kernel.
-
-
-r~
-
-
-Richard Henderson (9):
-  target/m68k: Use DISAS_NORETURN for exceptions
-  target/m68k: Replace DISAS_TB_JUMP with DISAS_NORETURN
-  target/m68k: Remove DISAS_JUMP_NEXT as unused
-  target/m68k: Use lookup_and_goto_tb for DISAS_JUMP
-  target/m68k: Rename DISAS_UPDATE and gen_lookup_tb
-  target/m68k: Convert to DisasContextBase
-  target/m68k: Convert to TranslatorOps
-  target/m68k: Improve ending TB at page boundaries
-  target/m68k: Merge disas_m68k_insn into m68k_tr_translate_insn
-
- target/m68k/translate.c | 354 ++++++++++++++++++++--------------------
- 1 file changed, 179 insertions(+), 175 deletions(-)
-
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index 6ab24fac0b..c795d8e64f 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -199,7 +199,6 @@ static void do_writebacks(DisasContext *s)
+ /* is_jmp field values */
+ #define DISAS_JUMP      DISAS_TARGET_0 /* only pc was modified dynamically */
+ #define DISAS_UPDATE    DISAS_TARGET_1 /* cpu state was modified dynamically */
+-#define DISAS_JUMP_NEXT DISAS_TARGET_3
+ 
+ #if defined(CONFIG_USER_ONLY)
+ #define IS_USER(s) 1
 -- 
 2.17.0
