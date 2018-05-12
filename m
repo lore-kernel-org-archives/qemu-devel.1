@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fHISi-0006lj-HW
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 20:32:37 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fHISk-0006tp-8C
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 20:32:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fHISh-0008Dh-Ok
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 20:32:36 -0400
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:44939)
+	(envelope-from <richard.henderson@linaro.org>) id 1fHISj-0008Ed-Dm
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 20:32:38 -0400
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:37390)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fHISh-0008DM-Jo
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 20:32:35 -0400
-Received: by mail-pf0-x242.google.com with SMTP id q22-v6so3423122pff.11
-	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 17:32:35 -0700 (PDT)
+	id 1fHISj-0008EL-8x
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 20:32:37 -0400
+Received: by mail-pg0-x241.google.com with SMTP id a13-v6so3074850pgu.4
+	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 17:32:37 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 11 May 2018 17:32:16 -0700
-Message-Id: <20180512003217.9105-11-richard.henderson@linaro.org>
+Date: Fri, 11 May 2018 17:32:17 -0700
+Message-Id: <20180512003217.9105-12-richard.henderson@linaro.org>
 In-Reply-To: <20180512003217.9105-1-richard.henderson@linaro.org>
 References: <20180512003217.9105-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 10/11] target/arm: Implement FMOV
- (immediate) for fp16
+Subject: [Qemu-devel] [PATCH v4 11/11] target/arm: Fix sqrt_f16 exception
+ raising
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,58 +35,29 @@ Cc: peter.maydell@linaro.org, alex.bennee@linaro.org, qemu-stable@nongnu.org
 
 From: Alex Bennée <alex.bennee@linaro.org>
 
-All the hard work is already done by vfp_expand_imm, we just need to
-make sure we pick up the correct size.
+We are meant to explicitly pass fpst, not cpu_env.
 
 Cc: qemu-stable@nongnu.org
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-[rth: Merge unallocated_encoding check with TCGMemOp conversion.]
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-a64.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
+ target/arm/translate-a64.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 9dacb583ae..35997969b4 100644
+index 35997969b4..a0b0c43d12 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -5674,11 +5674,25 @@ static void disas_fp_imm(DisasContext *s, uint32_t insn)
- {
-     int rd = extract32(insn, 0, 5);
-     int imm8 = extract32(insn, 13, 8);
--    int is_double = extract32(insn, 22, 2);
-+    int type = extract32(insn, 22, 2);
-     uint64_t imm;
-     TCGv_i64 tcg_res;
-+    TCGMemOp sz;
- 
--    if (is_double > 1) {
-+    switch (type) {
-+    case 0:
-+        sz = MO_32;
-+        break;
-+    case 1:
-+        sz = MO_64;
-+        break;
-+    case 3:
-+        sz = MO_16;
-+        if (arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
-+            break;
-+        }
-+        /* fallthru */
-+    default:
-         unallocated_encoding(s);
-         return;
-     }
-@@ -5687,7 +5701,7 @@ static void disas_fp_imm(DisasContext *s, uint32_t insn)
-         return;
-     }
- 
--    imm = vfp_expand_imm(MO_32 + is_double, imm8);
-+    imm = vfp_expand_imm(sz, imm8);
- 
-     tcg_res = tcg_const_i64(imm);
-     write_fp_dreg(s, rd, tcg_res);
+@@ -4976,7 +4976,8 @@ static void handle_fp_1src_half(DisasContext *s, int opcode, int rd, int rn)
+         tcg_gen_xori_i32(tcg_res, tcg_op, 0x8000);
+         break;
+     case 0x3: /* FSQRT */
+-        gen_helper_sqrt_f16(tcg_res, tcg_op, cpu_env);
++        fpst = get_fpstatus_ptr(true);
++        gen_helper_sqrt_f16(tcg_res, tcg_op, fpst);
+         break;
+     case 0x8: /* FRINTN */
+     case 0x9: /* FRINTP */
 -- 
 2.17.0
