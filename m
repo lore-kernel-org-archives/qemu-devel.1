@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fHJI9-0006LF-2X
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 21:25:46 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fHJIB-0006Oh-C4
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 21:25:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fHJI7-0006To-Ur
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 21:25:44 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fHJIA-0006XJ-An
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 21:25:47 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Fri, 11 May 2018 21:25:30 -0400
-Message-Id: <20180512012537.22478-6-jsnow@redhat.com>
+Date: Fri, 11 May 2018 21:25:34 -0400
+Message-Id: <20180512012537.22478-10-jsnow@redhat.com>
 In-Reply-To: <20180512012537.22478-1-jsnow@redhat.com>
 References: <20180512012537.22478-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 05/12] qcow2-bitmap: track bitmap type
+Subject: [Qemu-devel] [RFC PATCH 09/12] qapi/block-core: add BitmapMapping
+ and BitmapEntry structs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,37 +23,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, John Snow <jsnow@redhat.com>
 
-We only have one type of persistent bitmap right now, but I'd like the
-qemu-img tool to be able to give good diagnostic information if it sees
-an unknown/unsupported type.
-
-We do enforce it to be the dirty tracking type in check_dir_entry, but
-I wanted positive affirmation of the type in the forthcoming info script.
+Add two new structures for detailing the marked regions of bitmaps as
+saved in e.g. qcow2 files.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/qcow2-bitmap.c | 2 ++
- 1 file changed, 2 insertions(+)
+ qapi/block-core.json | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index b556dbdccd..60e01abfd7 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -83,6 +83,7 @@ typedef QSIMPLEQ_HEAD(Qcow2BitmapTableList, Qcow2BitmapTable)
- typedef struct Qcow2Bitmap {
-     Qcow2BitmapTable table;
-     uint32_t flags;
-+    uint8_t type;
-     uint8_t granularity_bits;
-     char *name;
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 8f33f41ce7..de8ad73a78 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -298,6 +298,38 @@
+            'zero': 'bool', 'depth': 'int', '*offset': 'int',
+            '*filename': 'str' } }
  
-@@ -608,6 +609,7 @@ static Qcow2BitmapList *bitmap_list_load(BlockDriverState *bs, Error **errp)
-         bm->table.offset = e->bitmap_table_offset;
-         bm->table.size = e->bitmap_table_size;
-         bm->flags = e->flags;
-+        bm->type = e->type;
-         bm->granularity_bits = e->granularity_bits;
-         bm->name = dir_entry_copy_name(e);
-         QSIMPLEQ_INSERT_TAIL(bm_list, bm, entry);
++##
++# @BitmapEntry:
++#
++# Dirty Bitmap region information for a virtual block range
++#
++# @offset: the start byte of the dirty virtual range
++#
++# @length: the number of bytes of the dirty virtual range
++#
++# Since: 2.13
++#
++##
++{ 'struct': 'BitmapEntry',
++  'data': { 'offset': 'int', 'length': 'int' } }
++
++##
++# @BitmapMapping:
++#
++# List of described regions correlated to a named bitmap.
++#
++# @name: The name of the bitmap whose range is described here
++#
++# @entries: A list of zero or more @BitmapEntry elements representing
++#           the range(s) described by the bitmap.
++#
++# Since: 2.13
++#
++##
++{ 'struct': 'BitmapMapping',
++  'data': { 'name': 'str',
++            'entries': [ 'BitmapEntry' ] } }
++
+ ##
+ # @BlockdevCacheInfo:
+ #
 -- 
 2.14.3
