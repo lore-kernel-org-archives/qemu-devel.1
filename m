@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fHJIE-0006SU-Ay
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 21:25:51 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fHJVW-0002e9-7v
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 21:39:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fHJIB-0006Ye-Ms
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 21:25:50 -0400
-From: John Snow <jsnow@redhat.com>
-Date: Fri, 11 May 2018 21:25:35 -0400
-Message-Id: <20180512012537.22478-11-jsnow@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1fHJVT-0000mT-3V
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 21:39:34 -0400
+Resent-Message-Id: <E1fHJVT-0000mT-3V@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21033)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fHJVS-0000lF-Q2
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 21:39:31 -0400
 In-Reply-To: <20180512012537.22478-1-jsnow@redhat.com>
-References: <20180512012537.22478-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 10/12] qemu-img: split off common chunk of
- map command
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152608913727.2859.11458706919890930219@71c20359a636>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 11 May 2018 18:38:58 -0700 (PDT)
+Subject: Re: [Qemu-devel] [RFC PATCH 00/12] qemu-img: add bitmap queries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,259 +28,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, John Snow <jsnow@redhat.com>
+To: jsnow@redhat.com
+Cc: famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, vsementsov@virtuozzo.com, armbru@redhat.com, mreitz@redhat.com
 
-It will be re-used for a bitmap listing command.
-
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- qemu-img.c | 192 +++++++++++++++++++++++++++++++++++--------------------------
- 1 file changed, 110 insertions(+), 82 deletions(-)
-
-diff --git a/qemu-img.c b/qemu-img.c
-index ea62d2d61e..e31e38f674 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -69,8 +69,8 @@ enum {
- };
- 
- typedef enum OutputFormat {
--    OFORMAT_JSON,
-     OFORMAT_HUMAN,
-+    OFORMAT_JSON,
- } OutputFormat;
- 
- /* Default to cache=writeback as data integrity is not important for qemu-img */
-@@ -2728,96 +2728,122 @@ static inline bool entry_mergeable(const MapEntry *curr, const MapEntry *next)
-     return true;
- }
- 
-+typedef struct CommonOpts {
-+    OutputFormat output_format;
-+    const char *filename;
-+    const char *fmt;
-+    bool force_share;
-+    bool image_opts;
-+} CommonOpts;
-+
-+static int parse_opts_common(CommonOpts *opts, int argc, char **argv)
-+{
-+    int c;
-+
-+    for (;;) {
-+        int option_index = 0;
-+        static const struct option long_options[] = {
-+            {"help", no_argument, 0, 'h'},
-+            {"format", required_argument, 0, 'f'},
-+            {"output", required_argument, 0, OPTION_OUTPUT},
-+            {"object", required_argument, 0, OPTION_OBJECT},
-+            {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-+            {"force-share", no_argument, 0, 'U'},
-+            {0, 0, 0, 0}
-+        };
-+        c = getopt_long(argc, argv, ":f:hU",
-+                        long_options, &option_index);
-+        if (c == -1) {
-+            break;
-+        }
-+        switch (c) {
-+        case ':':
-+            missing_argument(argv[optind - 1]);
-+            break;
-+        case '?':
-+            unrecognized_option(argv[optind - 1]);
-+            break;
-+        case 'h':
-+            help();
-+            break;
-+        case 'f':
-+            opts->fmt = optarg;
-+            break;
-+        case 'U':
-+            opts->force_share = true;
-+            break;
-+        case OPTION_OUTPUT:
-+            if (optarg && !strcmp(optarg, "json")) {
-+                opts->output_format = OFORMAT_JSON;
-+            } else if (optarg && !strcmp(optarg, "human")) {
-+                opts->output_format = OFORMAT_HUMAN;
-+            } else {
-+                error_report("--output must be used with human or json as argument.");
-+                return -EINVAL;
-+            }
-+            break;
-+        case OPTION_OBJECT: {
-+            QemuOpts *opts;
-+            opts = qemu_opts_parse_noisily(&qemu_object_opts,
-+                                           optarg, true);
-+            if (!opts) {
-+                return -EINVAL;
-+            }
-+        }   break;
-+        case OPTION_IMAGE_OPTS:
-+            opts->image_opts = true;
-+            break;
-+        }
-+    }
-+    if (qemu_opts_foreach(&qemu_object_opts,
-+                          user_creatable_add_opts_foreach,
-+                          NULL, NULL)) {
-+        return -EINVAL;
-+    }
-+
-+    return 0;
-+}
-+
-+static void parse_positional(int argc, char *argv[],
-+                             bool opt, const char **str, const char *name) {
-+    if (!opt && optind >= argc) {
-+        error_exit("Expecting '%s' positional parameter", name);
-+    } else if (optind < argc) {
-+        *str = argv[optind++];
-+    }
-+}
-+
-+static void parse_unexpected(int argc, char *argv[]) {
-+    if (optind != argc) {
-+        error_exit("Unexpected argument '%s'\n", argv[optind]);
-+    }
-+}
-+
- static int img_map(int argc, char **argv)
- {
--    int c;
--    OutputFormat output_format = OFORMAT_HUMAN;
-     BlockBackend *blk;
-     BlockDriverState *bs;
--    const char *filename, *fmt, *output;
-     int64_t length;
-+    int ret = 0;
-     MapEntry curr = { .length = 0 }, next;
--    int ret = 0;
--    bool image_opts = false;
--    bool force_share = false;
-+    CommonOpts *opts;
- 
--    fmt = NULL;
--    output = NULL;
--    for (;;) {
--        int option_index = 0;
--        static const struct option long_options[] = {
--            {"help", no_argument, 0, 'h'},
--            {"format", required_argument, 0, 'f'},
--            {"output", required_argument, 0, OPTION_OUTPUT},
--            {"object", required_argument, 0, OPTION_OBJECT},
--            {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
--            {"force-share", no_argument, 0, 'U'},
--            {0, 0, 0, 0}
--        };
--        c = getopt_long(argc, argv, ":f:hU",
--                        long_options, &option_index);
--        if (c == -1) {
--            break;
--        }
--        switch (c) {
--        case ':':
--            missing_argument(argv[optind - 1]);
--            break;
--        case '?':
--            unrecognized_option(argv[optind - 1]);
--            break;
--        case 'h':
--            help();
--            break;
--        case 'f':
--            fmt = optarg;
--            break;
--        case 'U':
--            force_share = true;
--            break;
--        case OPTION_OUTPUT:
--            output = optarg;
--            break;
--        case OPTION_OBJECT: {
--            QemuOpts *opts;
--            opts = qemu_opts_parse_noisily(&qemu_object_opts,
--                                           optarg, true);
--            if (!opts) {
--                return 1;
--            }
--        }   break;
--        case OPTION_IMAGE_OPTS:
--            image_opts = true;
--            break;
--        }
--    }
--    if (optind != argc - 1) {
--        error_exit("Expecting one image file name");
--    }
--    filename = argv[optind];
--
--    if (output && !strcmp(output, "json")) {
--        output_format = OFORMAT_JSON;
--    } else if (output && !strcmp(output, "human")) {
--        output_format = OFORMAT_HUMAN;
--    } else if (output) {
--        error_report("--output must be used with human or json as argument.");
--        return 1;
--    }
--
--    if (qemu_opts_foreach(&qemu_object_opts,
--                          user_creatable_add_opts_foreach,
--                          NULL, NULL)) {
--        return 1;
-+    opts = g_new0(CommonOpts, 1);
-+    if (parse_opts_common(opts, argc, argv)) {
-+        return EXIT_FAILURE;
-     }
-+    parse_positional(argc, argv, 0, &opts->filename, "filename");
-+    parse_unexpected(argc, argv);
- 
--    blk = img_open(image_opts, filename, fmt, 0, false, false, force_share);
-+    blk = img_open(opts->image_opts, opts->filename, opts->fmt, 0,
-+                   false, false, opts->force_share);
-     if (!blk) {
--        return 1;
-+        ret = -1;
-+        goto out1;
-     }
-     bs = blk_bs(blk);
- 
--    if (output_format == OFORMAT_HUMAN) {
-+    if (opts->output_format == OFORMAT_HUMAN) {
-         printf("%-16s%-16s%-16s%s\n", "Offset", "Length", "Mapped to", "File");
-     }
- 
-@@ -2832,7 +2858,7 @@ static int img_map(int argc, char **argv)
- 
-         if (ret < 0) {
-             error_report("Could not read file metadata: %s", strerror(-ret));
--            goto out;
-+            goto out2;
-         }
- 
-         if (entry_mergeable(&curr, &next)) {
-@@ -2841,15 +2867,17 @@ static int img_map(int argc, char **argv)
-         }
- 
-         if (curr.length > 0) {
--            dump_map_entry(output_format, &curr, &next);
-+            dump_map_entry(opts->output_format, &curr, &next);
-         }
-         curr = next;
-     }
- 
--    dump_map_entry(output_format, &curr, NULL);
-+    dump_map_entry(opts->output_format, &curr, NULL);
- 
--out:
-+out2:
-     blk_unref(blk);
-+out1:
-+    g_free(opts);
-     return ret < 0;
- }
- 
--- 
-2.14.3
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNTEyMDEyNTM3LjIyNDc4LTEtanNub3dAcmVkaGF0LmNvbQpTdWJqZWN0
+OiBbUWVtdS1kZXZlbF0gW1JGQyBQQVRDSCAwMC8xMl0gcWVtdS1pbWc6IGFkZCBiaXRtYXAgcXVl
+cmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49
+MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdp
+dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dy
+YW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZv
+ciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAk
+KGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0t
+Zm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVu
+CiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25l
+CgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5
+YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20v
+cGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8y
+MDE4MDUxMjAxMjUzNy4yMjQ3OC0xLWpzbm93QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4MDUx
+MjAxMjUzNy4yMjQ3OC0xLWpzbm93QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNo
+ICd0ZXN0Jwo5OGM3OGNkZTMyIHFlbXUtaW1nOiBhZGQgYml0bWFwIGNsZWFyCjY0YjQ2ZDM3NmYg
+cWVtdS1pbWc6IGFkZCBiaXRtYXAgZHVtcAplODIwZTZkMjBkIHFlbXUtaW1nOiBzcGxpdCBvZmYg
+Y29tbW9uIGNodW5rIG9mIG1hcCBjb21tYW5kCjE1ODk0YmVjOWIgcWFwaS9ibG9jay1jb3JlOiBh
+ZGQgQml0bWFwTWFwcGluZyBhbmQgQml0bWFwRW50cnkgc3RydWN0cwphMDlkMWMzYTY1IHFqc29u
+OiBhbGxvdyBjYWxsZXIgdG8gYXNrIGZvciBhcmJpdHJhcnkgaW5kZW50CjM4NGUyNDQ3NjYgcWNv
+dzItYml0bWFwOiBhZGQgYmFzaWMgYml0bWFwcyBpbmZvCjM1Y2Y5YWNlMjIgcWFwaTogYWRkIGJp
+dG1hcCBpbmZvCjM2YmU4OWFmMjUgcWNvdzItYml0bWFwOiB0cmFjayBiaXRtYXAgdHlwZQpkMzQ3
+NTY0ZWEzIHFjb3cyL2RpcnR5LWJpdG1hcHM6IGxvYWQgSU5fVVNFIGJpdG1hcHMgaWYgZGlzayBp
+cyBSTwpjNTU0YmZmNDJiIGJsb2NrL3Fjb3cyLWJpdG1hcDogYXZvaWQgYWRqdXN0aW5nIGJtLT5m
+bGFncyBmb3IgUk8gYml0bWFwcwo5ZDAwYzM2ZmJhIHFjb3cyL2RpcnR5LWJpdG1hcDogY2FjaGUg
+bG9hZGVkIGJpdG1hcHMKN2YzNGM3ODc4MyBxY293Mi1iaXRtYXA6IGNhY2hlIGJtX2xpc3QKCj09
+PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTI6IHFjb3cyLWJpdG1hcDogY2Fj
+aGUgYm1fbGlzdC4uLgpDaGVja2luZyBQQVRDSCAyLzEyOiBxY293Mi9kaXJ0eS1iaXRtYXA6IGNh
+Y2hlIGxvYWRlZCBiaXRtYXBzLi4uCkNoZWNraW5nIFBBVENIIDMvMTI6IGJsb2NrL3Fjb3cyLWJp
+dG1hcDogYXZvaWQgYWRqdXN0aW5nIGJtLT5mbGFncyBmb3IgUk8gYml0bWFwcy4uLgpDaGVja2lu
+ZyBQQVRDSCA0LzEyOiBxY293Mi9kaXJ0eS1iaXRtYXBzOiBsb2FkIElOX1VTRSBiaXRtYXBzIGlm
+IGRpc2sgaXMgUk8uLi4KQ2hlY2tpbmcgUEFUQ0ggNS8xMjogcWNvdzItYml0bWFwOiB0cmFjayBi
+aXRtYXAgdHlwZS4uLgpDaGVja2luZyBQQVRDSCA2LzEyOiBxYXBpOiBhZGQgYml0bWFwIGluZm8u
+Li4KQ2hlY2tpbmcgUEFUQ0ggNy8xMjogcWNvdzItYml0bWFwOiBhZGQgYmFzaWMgYml0bWFwcyBp
+bmZvLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0MzogRklMRTogYmxvY2sv
+cWNvdzItYml0bWFwLmM6NzI6CisgICAgW0JNRV9GTEFHX0JJVF9FWFRSQV0gID0geyBCTUVfRkxB
+R19FWFRSQSwgIEJJVE1BUF9GTEFHX0VOVU1fRVhUUkFfREFUQV9DT01QQVRJQkxFIH0sCgp0b3Rh
+bDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDExOCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhh
+cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
+YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
+RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDgvMTI6IHFqc29uOiBhbGxv
+dyBjYWxsZXIgdG8gYXNrIGZvciBhcmJpdHJhcnkgaW5kZW50Li4uCkNoZWNraW5nIFBBVENIIDkv
+MTI6IHFhcGkvYmxvY2stY29yZTogYWRkIEJpdG1hcE1hcHBpbmcgYW5kIEJpdG1hcEVudHJ5IHN0
+cnVjdHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMTI6IHFlbXUtaW1nOiBzcGxpdCBvZmYgY29tbW9u
+IGNodW5rIG9mIG1hcCBjb21tYW5kLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJz
+CiM3NDogRklMRTogcWVtdS1pbWcuYzoyNzgxOgorICAgICAgICAgICAgICAgIGVycm9yX3JlcG9y
+dCgiLS1vdXRwdXQgbXVzdCBiZSB1c2VkIHdpdGggaHVtYW4gb3IganNvbiBhcyBhcmd1bWVudC4i
+KTsKCkVSUk9SOiBvcGVuIGJyYWNlICd7JyBmb2xsb3dpbmcgZnVuY3Rpb24gZGVjbGFyYXRpb25z
+IGdvIG9uIHRoZSBuZXh0IGxpbmUKIzEyNzogRklMRTogcWVtdS1pbWcuYzoyODE2Ogorc3RhdGlj
+IHZvaWQgcGFyc2VfdW5leHBlY3RlZChpbnQgYXJnYywgY2hhciAqYXJndltdKSB7Cgp0b3RhbDog
+MSBlcnJvcnMsIDEgd2FybmluZ3MsIDE3MyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBz
+dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
+IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
+UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAxMS8xMjogcWVtdS1pbWc6IGFk
+ZCBiaXRtYXAgZHVtcC4uLgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBhZnRlciB0aGF0ICcqJyAo
+Y3R4OkJ4VykKIzE3OTogRklMRTogcWVtdS1pbWcuYzozMDI5OgorICAgIGludCAoKiBoYW5kbGVy
+KShCbG9ja0RyaXZlclN0YXRlICpiLCBCaXRtYXBPcHRzICpvcHRzKTsKICAgICAgICAgIF4KCnRv
+dGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMjAzIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDEyLzEyOiBxZW11LWlt
+ZzogYWRkIGJpdG1hcCBjbGVhci4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBl
+eGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
+IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
+IHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
