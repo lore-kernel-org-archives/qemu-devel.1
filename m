@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fHJI9-0006MC-EX
+	(envelope-from <jsnow@redhat.com>) id 1fHJI9-0006MF-Fa
 	for qemu-devel@nongnu.org; Fri, 11 May 2018 21:25:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fHJI7-0006Tw-UY
+	(envelope-from <jsnow@redhat.com>) id 1fHJI7-0006TG-Hk
 	for qemu-devel@nongnu.org; Fri, 11 May 2018 21:25:45 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Fri, 11 May 2018 21:25:28 -0400
-Message-Id: <20180512012537.22478-4-jsnow@redhat.com>
-In-Reply-To: <20180512012537.22478-1-jsnow@redhat.com>
-References: <20180512012537.22478-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 03/12] block/qcow2-bitmap: avoid adjusting
- bm->flags for RO bitmaps
+Date: Fri, 11 May 2018 21:25:25 -0400
+Message-Id: <20180512012537.22478-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [RFC PATCH 00/12] qemu-img: add bitmap queries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,95 +20,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, John Snow <jsnow@redhat.com>
 
-Instead of always setting IN_USE, handle whether or not the bitmap
-is read-only instead of a two-loop pass. This will allow us to show
-the flags exactly as they appear for bitmaps in `qemu-img info`.
+Allow qemu-img to show information about bitmaps stored in qcow2 images.
+Add a 'bitmap' meta-command with 'dump' sub-command to retrieve a list of
+dirty regions in bitmaps stored in a qcow2 image.
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- block/qcow2-bitmap.c | 48 ++++++++++++++++++++----------------------------
- 1 file changed, 20 insertions(+), 28 deletions(-)
+RFC:
+- I am not 1000% convinced the bm_list caching is perfectly safe,
+  especially with respect to migration and inactivation. There are
+  more efficiencies and tweaks I can make, but I think this is the
+  minimal set.
 
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index d89758f235..fc8d52fc3e 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -942,13 +942,6 @@ fail:
-     return ret;
- }
- 
--/* for g_slist_foreach for GSList of BdrvDirtyBitmap* elements */
--static void release_dirty_bitmap_helper(gpointer bitmap,
--                                        gpointer bs)
--{
--    bdrv_release_dirty_bitmap(bs, bitmap);
--}
--
- /* for g_slist_foreach for GSList of BdrvDirtyBitmap* elements */
- static void set_readonly_helper(gpointer bitmap, gpointer value)
- {
-@@ -967,8 +960,8 @@ bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-     BDRVQcow2State *s = bs->opaque;
-     Qcow2BitmapList *bm_list;
-     Qcow2Bitmap *bm;
--    GSList *created_dirty_bitmaps = NULL;
-     bool header_updated = false;
-+    bool needs_update = false;
- 
-     if (s->nb_bitmaps == 0) {
-         /* No bitmaps - nothing to do */
-@@ -992,33 +985,32 @@ bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-                 bdrv_disable_dirty_bitmap(bitmap);
-             }
-             bdrv_dirty_bitmap_set_persistance(bitmap, true);
--            bm->flags |= BME_FLAG_IN_USE;
--            created_dirty_bitmaps =
--                    g_slist_append(created_dirty_bitmaps, bitmap);
--        }
--    }
--
--    if (created_dirty_bitmaps != NULL) {
--        if (can_write(bs)) {
--            /* in_use flags must be updated */
--            int ret = update_ext_header_and_dir_in_place(bs, bm_list);
--            if (ret < 0) {
--                error_setg_errno(errp, -ret, "Can't update bitmap directory");
--                goto fail;
-+            if (can_write(bs)) {
-+                bm->flags |= BME_FLAG_IN_USE;
-+                needs_update = true;
-+            } else {
-+                bdrv_dirty_bitmap_set_readonly(bitmap, true);
-             }
--            header_updated = true;
--        } else {
--            g_slist_foreach(created_dirty_bitmaps, set_readonly_helper,
--                            (gpointer)true);
-         }
-     }
- 
--    g_slist_free(created_dirty_bitmaps);
-+    /* in_use flags must be updated */
-+    if (needs_update) {
-+        int ret = update_ext_header_and_dir_in_place(bs, bm_list);
-+        if (ret < 0) {
-+            error_setg_errno(errp, -ret, "Can't update bitmap directory");
-+            goto fail;
-+        }
-+        header_updated = true;
-+    }
-     return header_updated;
- 
- fail:
--    g_slist_foreach(created_dirty_bitmaps, release_dirty_bitmap_helper, bs);
--    g_slist_free(created_dirty_bitmaps);
-+    QSIMPLEQ_FOREACH(bm, bm_list, entry) {
-+        if (bm->dirty_bitmap) {
-+            bdrv_release_dirty_bitmap(bs, bm->dirty_bitmap);
-+        }
-+    }
-     del_bitmap_list(bs);
- 
-     return false;
+- I decided not to gate bitmap info in the "info" command behind
+  extra flags.
+
+- Bitmap data-gathering in "bitmap dump" could be made more
+  space-efficient by just reporting one segment at a time,
+  probably.
+
+- `bitmap rm` and `bitmap mk` need extra work, so I am not submitting
+  them just yet: rm needs more work around the remove persistence API,
+  and make needs more work around the "can add" API.
+
+- None of these commands will work with "in use" bitmaps; we need
+  qemu-img check -r bitmaps support for this. I'm not sure what the
+  right behavior to "fix" in-use bitmaps should be:
+        - Cleared: This might be dangerous.
+        - Fully Set: This is safer, but stupid.
+        - Deleted: This might be the best option.
+        - Un-set in-use: VERY dangerous; would rather not.
+
+John Snow (12):
+  qcow2-bitmap: cache bm_list
+  qcow2/dirty-bitmap: cache loaded bitmaps
+  block/qcow2-bitmap: avoid adjusting bm->flags for RO bitmaps
+  qcow2/dirty-bitmaps: load IN_USE bitmaps if disk is RO
+  qcow2-bitmap: track bitmap type
+  qapi: add bitmap info
+  qcow2-bitmap: add basic bitmaps info
+  qjson: allow caller to ask for arbitrary indent
+  qapi/block-core: add BitmapMapping and BitmapEntry structs
+  qemu-img: split off common chunk of map command
+  qemu-img: add bitmap dump
+  qemu-img: add bitmap clear
+
+ block/qcow2-bitmap.c     | 220 +++++++++++++++++--------
+ block/qcow2.c            |   9 +
+ block/qcow2.h            |   3 +
+ include/qapi/qmp/qjson.h |   1 +
+ qapi/block-core.json     |  92 ++++++++++-
+ qemu-img-cmds.hx         |   6 +
+ qemu-img.c               | 419 +++++++++++++++++++++++++++++++++++++----------
+ qobject/qjson.c          |  21 +--
+ 8 files changed, 612 insertions(+), 159 deletions(-)
+
 -- 
 2.14.3
