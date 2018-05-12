@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fHISk-0006tp-8C
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 20:32:39 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fHId3-0003uU-FI
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 20:43:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fHISj-0008Ed-Dm
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 20:32:38 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:37390)
+	(envelope-from <richard.henderson@linaro.org>) id 1fHId2-0002nm-Rk
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 20:43:17 -0400
+Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:34198)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fHISj-0008EL-8x
-	for qemu-devel@nongnu.org; Fri, 11 May 2018 20:32:37 -0400
-Received: by mail-pg0-x241.google.com with SMTP id a13-v6so3074850pgu.4
-	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 17:32:37 -0700 (PDT)
+	id 1fHId2-0002nZ-Lo
+	for qemu-devel@nongnu.org; Fri, 11 May 2018 20:43:16 -0400
+Received: by mail-pl0-x244.google.com with SMTP id ay10-v6so4144203plb.1
+	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 17:43:16 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 11 May 2018 17:32:17 -0700
-Message-Id: <20180512003217.9105-12-richard.henderson@linaro.org>
-In-Reply-To: <20180512003217.9105-1-richard.henderson@linaro.org>
-References: <20180512003217.9105-1-richard.henderson@linaro.org>
+Date: Fri, 11 May 2018 17:42:45 -0700
+Message-Id: <20180512004311.9299-2-richard.henderson@linaro.org>
+In-Reply-To: <20180512004311.9299-1-richard.henderson@linaro.org>
+References: <20180512004311.9299-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 11/11] target/arm: Fix sqrt_f16 exception
- raising
+Subject: [Qemu-devel] [PATCH v2 01/27] fpu/softfloat: int_to_float ensure r
+ fully initialised
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,33 +31,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, alex.bennee@linaro.org, qemu-stable@nongnu.org
+Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 
 From: Alex Bennée <alex.bennee@linaro.org>
 
-We are meant to explicitly pass fpst, not cpu_env.
+Reported by Coverity (CID1390635). We ensure this for uint_to_float
+later on so we might as well mirror that.
 
-Cc: qemu-stable@nongnu.org
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-a64.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ fpu/softfloat.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 35997969b4..a0b0c43d12 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -4976,7 +4976,8 @@ static void handle_fp_1src_half(DisasContext *s, int opcode, int rd, int rn)
-         tcg_gen_xori_i32(tcg_res, tcg_op, 0x8000);
-         break;
-     case 0x3: /* FSQRT */
--        gen_helper_sqrt_f16(tcg_res, tcg_op, cpu_env);
-+        fpst = get_fpstatus_ptr(true);
-+        gen_helper_sqrt_f16(tcg_res, tcg_op, fpst);
-         break;
-     case 0x8: /* FRINTN */
-     case 0x9: /* FRINTP */
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index 8401b37bd4..b39c0c6fbb 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -1525,7 +1525,7 @@ FLOAT_TO_UINT(64, 64)
+ 
+ static FloatParts int_to_float(int64_t a, float_status *status)
+ {
+-    FloatParts r;
++    FloatParts r = {};
+     if (a == 0) {
+         r.cls = float_class_zero;
+         r.sign = false;
 -- 
 2.17.0
