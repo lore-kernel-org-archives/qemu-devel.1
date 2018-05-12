@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fHMgN-000414-US
+	(envelope-from <richard.henderson@linaro.org>) id 1fHMgO-00041A-UP
 	for qemu-devel@nongnu.org; Sat, 12 May 2018 01:03:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fHMgI-0008Ko-Ud
-	for qemu-devel@nongnu.org; Sat, 12 May 2018 01:02:59 -0400
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:46305)
+	(envelope-from <richard.henderson@linaro.org>) id 1fHMgN-0008Ly-WC
+	for qemu-devel@nongnu.org; Sat, 12 May 2018 01:03:00 -0400
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:40795)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fHMgI-0008Kd-Ps
-	for qemu-devel@nongnu.org; Sat, 12 May 2018 01:02:54 -0400
-Received: by mail-pl0-x242.google.com with SMTP id 59-v6so4364872plc.13
-	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 22:02:54 -0700 (PDT)
+	id 1fHMgN-0008Lo-Q3
+	for qemu-devel@nongnu.org; Sat, 12 May 2018 01:02:59 -0400
+Received: by mail-pg0-x241.google.com with SMTP id l2-v6so3252015pgc.7
+	for <qemu-devel@nongnu.org>; Fri, 11 May 2018 22:02:59 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 11 May 2018 22:02:42 -0700
-Message-Id: <20180512050250.12774-2-richard.henderson@linaro.org>
+Date: Fri, 11 May 2018 22:02:46 -0700
+Message-Id: <20180512050250.12774-6-richard.henderson@linaro.org>
 In-Reply-To: <20180512050250.12774-1-richard.henderson@linaro.org>
 References: <20180512050250.12774-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 1/9] target/m68k: Use DISAS_NORETURN for
- exceptions
+Subject: [Qemu-devel] [PATCH 5/9] target/m68k: Rename DISAS_UPDATE and
+ gen_lookup_tb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +30,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
-The raise_exception helper does not return.  Do not generate
-any code following that.
+The name gen_lookup_tb is at odds with tcg_gen_lookup_and_goto_tb.
+For these cases, we do indeed want to exit back to the main loop.
+Similarly, DISAS_UPDATE performs no actual update, whereas DISAS_EXIT
+does what it says.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/m68k/translate.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ target/m68k/translate.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
 diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 44a0ac4e2e..86404906e0 100644
+index 80712ed0af..ff1a8d58f4 100644
 --- a/target/m68k/translate.c
 +++ b/target/m68k/translate.c
-@@ -291,18 +291,18 @@ static void gen_jmp(DisasContext *s, TCGv dest)
-     s->is_jmp = DISAS_JUMP;
+@@ -198,7 +198,7 @@ static void do_writebacks(DisasContext *s)
+ 
+ /* is_jmp field values */
+ #define DISAS_JUMP      DISAS_TARGET_0 /* only pc was modified dynamically */
+-#define DISAS_UPDATE    DISAS_TARGET_1 /* cpu state was modified dynamically */
++#define DISAS_EXIT      DISAS_TARGET_1 /* cpu state was modified dynamically */
+ 
+ #if defined(CONFIG_USER_ONLY)
+ #define IS_USER(s) 1
+@@ -1446,11 +1446,11 @@ static void gen_jmpcc(DisasContext *s, int cond, TCGLabel *l1)
  }
  
--static void gen_raise_exception(int nr)
-+static void gen_exception(DisasContext *s, uint32_t dest, int nr)
+ /* Force a TB lookup after an instruction that changes the CPU state.  */
+-static void gen_lookup_tb(DisasContext *s)
++static void gen_exit_tb(DisasContext *s)
  {
--    TCGv_i32 tmp = tcg_const_i32(nr);
-+    TCGv_i32 tmp;
- 
-+    update_cc_op(s);
-+    tcg_gen_movi_i32(QREG_PC, dest);
-+
-+    tmp = tcg_const_i32(nr);
-     gen_helper_raise_exception(cpu_env, tmp);
-     tcg_temp_free_i32(tmp);
--}
- 
--static void gen_exception(DisasContext *s, uint32_t where, int nr)
--{
--    gen_jmp_im(s, where);
--    gen_raise_exception(nr);
-+    s->is_jmp = DISAS_NORETURN;
+     update_cc_op(s);
+     tcg_gen_movi_i32(QREG_PC, s->pc);
+-    s->is_jmp = DISAS_UPDATE;
++    s->is_jmp = DISAS_EXIT;
  }
  
- static inline void gen_addr_fault(DisasContext *s)
-@@ -6106,7 +6106,6 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+ #define SRC_EA(env, result, opsize, op_sign, addrp) do {                \
+@@ -4604,7 +4604,7 @@ DISAS_INSN(move_to_sr)
+         return;
+     }
+     gen_move_to_sr(env, s, insn, false);
+-    gen_lookup_tb(s);
++    gen_exit_tb(s);
+ }
  
-         if (unlikely(cpu_breakpoint_test(cs, dc->pc, BP_ANY))) {
-             gen_exception(dc, dc->pc, EXCP_DEBUG);
--            dc->is_jmp = DISAS_JUMP;
-             /* The address covered by the breakpoint must be included in
-                [tb->pc, tb->pc + tb->size) in order to for it to be
-                properly cleared -- thus we increment the PC here so that
-@@ -6150,6 +6149,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+ DISAS_INSN(move_from_usp)
+@@ -4680,7 +4680,7 @@ DISAS_INSN(cf_movec)
+         reg = DREG(ext, 12);
+     }
+     gen_helper_cf_movec_to(cpu_env, tcg_const_i32(ext & 0xfff), reg);
+-    gen_lookup_tb(s);
++    gen_exit_tb(s);
+ }
+ 
+ DISAS_INSN(m68k_movec)
+@@ -4705,7 +4705,7 @@ DISAS_INSN(m68k_movec)
+     } else {
+         gen_helper_m68k_movec_from(reg, cpu_env, tcg_const_i32(ext & 0xfff));
+     }
+-    gen_lookup_tb(s);
++    gen_exit_tb(s);
+ }
+ 
+ DISAS_INSN(intouch)
+@@ -5749,7 +5749,7 @@ DISAS_INSN(to_macsr)
+     TCGv val;
+     SRC_EA(env, val, OS_LONG, 0, NULL);
+     gen_helper_set_macsr(cpu_env, val);
+-    gen_lookup_tb(s);
++    gen_exit_tb(s);
+ }
+ 
+ DISAS_INSN(to_mask)
+@@ -6144,9 +6144,9 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+             tcg_gen_lookup_and_goto_ptr();
+             break;
+         default:
+-        case DISAS_UPDATE:
+-            update_cc_op(dc);
+-            /* indicate that the hash table must be used to find the next TB */
++        case DISAS_EXIT:
++            /* We updated CC_OP and PC in gen_exit_tb, but also modified
++               other state that may require returning to the main loop.  */
              tcg_gen_exit_tb(0);
              break;
-         case DISAS_TB_JUMP:
-+        case DISAS_NORETURN:
-             /* nothing more to generate */
-             break;
-         }
+         case DISAS_NORETURN:
 -- 
 2.17.0
