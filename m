@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53983)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fHs68-0008Aq-2z
-	for qemu-devel@nongnu.org; Sun, 13 May 2018 10:35:41 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fHsEu-0006rG-8m
+	for qemu-devel@nongnu.org; Sun, 13 May 2018 10:44:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fHs67-0006U6-AO
-	for qemu-devel@nongnu.org; Sun, 13 May 2018 10:35:40 -0400
-From: Eric Auger <eric.auger@redhat.com>
-Date: Sun, 13 May 2018 16:35:14 +0200
-Message-Id: <1526222114-5324-8-git-send-email-eric.auger@redhat.com>
-In-Reply-To: <1526222114-5324-1-git-send-email-eric.auger@redhat.com>
-References: <1526222114-5324-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v2 7/7] hw/arm/virt: Register two redistributor
- regions when necessary
+	(envelope-from <peter.maydell@linaro.org>) id 1fHsEt-0000Xz-DT
+	for qemu-devel@nongnu.org; Sun, 13 May 2018 10:44:44 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:40647)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fHsEt-0000Xa-97
+	for qemu-devel@nongnu.org; Sun, 13 May 2018 10:44:43 -0400
+Received: by mail-oi0-x244.google.com with SMTP id c203-v6so8551615oib.7
+	for <qemu-devel@nongnu.org>; Sun, 13 May 2018 07:44:42 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <cc3f26a7-a8b7-35a8-9ffa-c5940c9c1927@weilnetz.de>
+References: <20180513090613.27960-1-sw@weilnetz.de>
+	<cc3f26a7-a8b7-35a8-9ffa-c5940c9c1927@weilnetz.de>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 13 May 2018 15:44:21 +0100
+Message-ID: <CAFEAcA9amm4vv5aGR-Aj8=iGKACS78Sb-J9kU2YH-UTbeT6sdA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] disas/libvixl: Fix VIXL_FALLTHROUGH macro
+ for QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,73 +30,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
-Cc: zhaoshenglong@huawei.com, christoffer.dall@arm.com, marc.zyngier@arm.com, drjones@redhat.com, wei@redhat.com
+To: Stefan Weil <sw@weilnetz.de>
+Cc: QEMU Developer <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-With a VGICv3 KVM device, if the number of vcpus exceeds the
-capacity of the legacy redistributor region (123 redistributors),
-we now attempt to register the second redistributor region. This
-extends the number of vcpus to 512 assuming the host kernel supports:
-- up to 512 vcpus
-- VGICv3 KVM device group/attribute:
-  KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+On 13 May 2018 at 10:57, Stefan Weil <sw@weilnetz.de> wrote:
+> Am 13.05.2018 um 11:06 schrieb Stefan Weil:
+>> It now prevents compiler warnings (enabled with -Wimplicit-fallthrough=
+>> or -Wextra) as intended.
+>>
+>> Signed-off-by: Stefan Weil <sw@weilnetz.de>
+>> ---
+>>
+>> I suggest to add and use a similar macro QEMU_FALLTHROUGH()
+>> for the rest of the code and can provide a patch if that's
+>> fine for everyone.
+>>
+>> Regards
+>> Stefan
+>>
+>>  disas/libvixl/vixl/globals.h | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff --git a/disas/libvixl/vixl/globals.h b/disas/libvixl/vixl/globals.h
+>> index 61dc9f7f7e..33c4231d91 100644
+>> --- a/disas/libvixl/vixl/globals.h
+>> +++ b/disas/libvixl/vixl/globals.h
+>> @@ -112,6 +112,8 @@ inline void USE(T1, T2, T3, T4) {}
+>>  // C++11(201103L).
+>>  #if __has_warning("-Wimplicit-fallthrough") && __cplusplus >= 201103L
+>>    #define VIXL_FALLTHROUGH() [[clang::fallthrough]] //NOLINT
+>> +#elif defined(__GNUC__)
+>> +  #define VIXL_FALLTHROUGH() __attribute__((fallthrough))
+>>  #else
+>>    #define VIXL_FALLTHROUGH() do {} while (0)
+>>  #endif
+>
+>
+> Even with the above patch, disas/libvixl raises a compiler warning for a
+> fall through case. The patch below fixes that warning, but I am not sure
+> whether a fall through is correct there.
 
-In case the host kernel does not support the registration of several
-redistributor regions, the GICv3 device initialization fails
-with a proper error message and qemu exits.
+This sort of question is probably best asked of upstream
+VIXL, rather than here...
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- hw/arm/virt.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
-
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index f35962a..8d43c51 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -531,6 +531,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
-     SysBusDevice *gicbusdev;
-     const char *gictype;
-     int type = vms->gic_version, i;
-+    uint32_t nb_redist_regions = 0;
- 
-     gictype = (type == 3) ? gicv3_class_name() : gic_class_name();
- 
-@@ -546,15 +547,26 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
-     }
- 
-     if (type == 3) {
--        qdev_prop_set_uint32(gicdev, "len-redist-region-count", 1);
-+        nb_redist_regions = virt_gicv3_redist_region_count(vms);
-+
-+        qdev_prop_set_uint32(gicdev, "len-redist-region-count",
-+                             nb_redist_regions);
-         qdev_prop_set_uint32(gicdev , "redist-region-count[0]",
-                              vms->memmap[VIRT_GIC_REDIST].size / 0x20000);
-+
-+        if (nb_redist_regions == 2) {
-+            qdev_prop_set_uint32(gicdev , "redist-region-count[1]",
-+                                 vms->memmap[VIRT_GIC_REDIST2].size / 0x20000);
-+        }
-     }
-     qdev_init_nofail(gicdev);
-     gicbusdev = SYS_BUS_DEVICE(gicdev);
-     sysbus_mmio_map(gicbusdev, 0, vms->memmap[VIRT_GIC_DIST].base);
-     if (type == 3) {
-         sysbus_mmio_map(gicbusdev, 1, vms->memmap[VIRT_GIC_REDIST].base);
-+        if (nb_redist_regions == 2) {
-+            sysbus_mmio_map(gicbusdev, 2, vms->memmap[VIRT_GIC_REDIST2].base);
-+        }
-     } else {
-         sysbus_mmio_map(gicbusdev, 1, vms->memmap[VIRT_GIC_CPU].base);
-     }
-@@ -1346,6 +1358,7 @@ static void machvirt_init(MachineState *machine)
-      */
-     if (vms->gic_version == 3) {
-         virt_max_cpus = vms->memmap[VIRT_GIC_REDIST].size / 0x20000;
-+        virt_max_cpus += vms->memmap[VIRT_GIC_REDIST2].size / 0x20000;
-     } else {
-         virt_max_cpus = GIC_NCPU;
-     }
--- 
-2.5.5
+thanks
+-- PMM
