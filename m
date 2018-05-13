@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1fHnlT-0002kt-Vk
-	for qemu-devel@nongnu.org; Sun, 13 May 2018 05:58:04 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fHo3a-0000lL-IH
+	for qemu-devel@nongnu.org; Sun, 13 May 2018 06:16:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1fHnlT-00076v-6c
-	for qemu-devel@nongnu.org; Sun, 13 May 2018 05:58:04 -0400
-References: <20180513090613.27960-1-sw@weilnetz.de>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <cc3f26a7-a8b7-35a8-9ffa-c5940c9c1927@weilnetz.de>
-Date: Sun, 13 May 2018 11:57:51 +0200
+	(envelope-from <laurent@vivier.eu>) id 1fHo3W-0002g3-G2
+	for qemu-devel@nongnu.org; Sun, 13 May 2018 06:16:46 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:42579)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fHo3W-0002f0-6d
+	for qemu-devel@nongnu.org; Sun, 13 May 2018 06:16:42 -0400
+References: <20180512050250.12774-1-richard.henderson@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <4b6e384a-a48e-c2c8-9970-dca67239723c@vivier.eu>
+Date: Sun, 13 May 2018 12:16:38 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180513090613.27960-1-sw@weilnetz.de>
+In-Reply-To: <20180512050250.12774-1-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] disas/libvixl: Fix VIXL_FALLTHROUGH macro
- for QEMU
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1.1 0/9] target/m68k: Convert to
+ TranslatorOps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,59 +28,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developer <qemu-devel@nongnu.org>
-Cc: qemu-arm@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 
-Am 13.05.2018 um 11:06 schrieb Stefan Weil:
-> It now prevents compiler warnings (enabled with -Wimplicit-fallthrough=
-> or -Wextra) as intended.
+Le 12/05/2018 à 07:02, Richard Henderson a écrit :
+> [ Ho, hum.  I didn't clear out my scratch directory before sending v1.0. ]
 > 
-> Signed-off-by: Stefan Weil <sw@weilnetz.de>
-> ---
-> 
-> I suggest to add and use a similar macro QEMU_FALLTHROUGH()
-> for the rest of the code and can provide a patch if that's
-> fine for everyone.
-> 
-> Regards
-> Stefan
-> 
->  disas/libvixl/vixl/globals.h | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/disas/libvixl/vixl/globals.h b/disas/libvixl/vixl/globals.h
-> index 61dc9f7f7e..33c4231d91 100644
-> --- a/disas/libvixl/vixl/globals.h
-> +++ b/disas/libvixl/vixl/globals.h
-> @@ -112,6 +112,8 @@ inline void USE(T1, T2, T3, T4) {}
->  // C++11(201103L).
->  #if __has_warning("-Wimplicit-fallthrough") && __cplusplus >= 201103L
->    #define VIXL_FALLTHROUGH() [[clang::fallthrough]] //NOLINT
-> +#elif defined(__GNUC__)
-> +  #define VIXL_FALLTHROUGH() __attribute__((fallthrough))
->  #else
->    #define VIXL_FALLTHROUGH() do {} while (0)
->  #endif
+> FYI, I've only tested this with linux-user-test-0.3 and
+> our qemu coldfire testing kernel.
 
+I've tested m68k-softmmu with Q800 emulation and started an LXC
+container with m68k-linux-user:
 
-Even with the above patch, disas/libvixl raises a compiler warning for a
-fall through case. The patch below fixes that warning, but I am not sure
-whether a fall through is correct there.
-
-Stefan
-
-
-diff --git a/disas/libvixl/vixl/a64/disasm-a64.cc
-b/disas/libvixl/vixl/a64/disasm-a64.cc
-index 7a58a5c087..5481d94209 100644
---- a/disas/libvixl/vixl/a64/disasm-a64.cc
-+++ b/disas/libvixl/vixl/a64/disasm-a64.cc
-@@ -2986,6 +2986,7 @@ int Disassembler::SubstituteImmediateField(const
-Instruction* instr,
-           return 3;
-         }
-       }
-+      VIXL_FALLTHROUGH(); // ???
-     }
-     case 'C': {  // ICondB - Immediate Conditional Branch.
-       int64_t offset = instr->ImmCondBranch() << 2;
+Tested-by: Laurent Vivier <laurent@vivier.eu>
