@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <renyime@gmail.com>) id 1fHrC5-000108-RO
-	for qemu-devel@nongnu.org; Sun, 13 May 2018 09:37:46 -0400
+	(envelope-from <renyime@gmail.com>) id 1fHrDI-0006Ti-Al
+	for qemu-devel@nongnu.org; Sun, 13 May 2018 09:39:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <renyime@gmail.com>) id 1fHrC5-00066h-1i
-	for qemu-devel@nongnu.org; Sun, 13 May 2018 09:37:45 -0400
+	(envelope-from <renyime@gmail.com>) id 1fHrDF-0006K2-L0
+	for qemu-devel@nongnu.org; Sun, 13 May 2018 09:38:58 -0400
 MIME-Version: 1.0
-References: <1526053004-12268-1-git-send-email-ivanren@tencent.com>
-	<20180511172901.GC5016@localhost.localdomain>
-In-Reply-To: <20180511172901.GC5016@localhost.localdomain>
+References: <1525506577-1946-1-git-send-email-ivanren@tencent.com>
+In-Reply-To: <1525506577-1946-1-git-send-email-ivanren@tencent.com>
 From: Ivan Ren <renyime@gmail.com>
-Date: Sun, 13 May 2018 21:37:21 +0800
-Message-ID: <CA+6E1==PkxLdnEGWMe5X0eKSPeGsVk3VQQ+fNs5+b_CDAcPMGg@mail.gmail.com>
+Date: Sun, 13 May 2018 21:38:38 +0800
+Message-ID: <CA+6E1=mA-zq7gm=4Rwayt0dCJwaiE+4qmn34KOeeh66NfX4zEw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3] qcow2: fix preallocation with metadata
- on bare block device
+Subject: Re: [Qemu-devel] [PATCH v2] qemu-img: return allocated size for
+ block device with qcow2 format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,39 +22,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kwolf@redhat.com
-Cc: mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: kwolf@redhat.com, mreitz@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-> Doesn't this defeat the purpose of preallocation? Usually, the idea with
-> preallocation is that you don't need to update any metadata on the first
-> write, but if you set QCOW_OFLAG_ZERO, we do need a metadata update
-> again.
->
-> So what's the advantage compared to not preallocating at all?
+ping for review
 
-Yes, when do this, the qcow2_alloc_cluster_offset will call handle_alloc
-again, and will lead metada update. Good news is that in handle_alloc the
-preallocated zero cluster offset will be reuse. In this case, the
-preallocated metata will be keeped except some flags, and the cluster
-offset is fixed.
+On Sat, May 5, 2018 at 3:50 PM Ivan Ren <renyime@gmail.com> wrote:
 
-On Sat, May 12, 2018 at 1:29 AM Kevin Wolf <kwolf@redhat.com> wrote:
-
-> Am 11.05.2018 um 17:36 hat Ivan Ren geschrieben:
-> > Create a qcow2 directly on bare block device with
-> > "-o preallocation=metadata" option. When read this qcow2, it will
-> > return pre-existing data on block device. This patch add
-> > QCOW_OFLAG_ZERO flag (supported in qcow_version >= 3) for
-> > preallocated l2 entry to avoid this problem.
-> >
-> > Signed-off-by: Ivan Ren <ivanren@tencent.com>
+> qemu-img info with a block device which has a qcow2 format always
+> return 0 for disk size, and this can not reflect the qcow2 size
+> and the used space of the block device. This patch return the
+> allocated size of qcow2 as the disk size.
 >
-> Doesn't this defeat the purpose of preallocation? Usually, the idea with
-> preallocation is that you don't need to update any metadata on the first
-> write, but if you set QCOW_OFLAG_ZERO, we do need a metadata update
-> again.
+> Signed-off-by: Ivan Ren <ivanren@tencent.com>
+> ---
+>  block/qcow2.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 54 insertions(+)
 >
-> So what's the advantage compared to not preallocating at all?
+> This version differs from the previous:
+> (1).Accumulate all non-0 refcount cluster as the allocated size instead the
+> highest offset.
+> (2).Simplify the implementation by just check the refcount info.
 >
-> Kevin
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index ef68772..e64469a 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -4493,6 +4493,59 @@ static QemuOptsList qcow2_create_opts = {
+>      }
+>  };
+>
+> +/* Get allocated space of qcow2, aligned to cluster_size */
+> +static int64_t qcow2_get_allocated_size(BlockDriverState *bs)
+> +{
+> +    int64_t allocated_cluster_count = 0;
+> +    uint64_t refcount;
+> +    int64_t i, j, begin_index, end_index;
+> +
+> +    BDRVQcow2State *s = bs->opaque;
+> +
+> +    /* Traverse refcount table */
+> +    for (i = 0; i < s->refcount_table_size; i++) {
+> +        if (s->refcount_table[i] & REFT_OFFSET_MASK) {
+> +            begin_index = i * s->refcount_block_size;
+> +            end_index = begin_index + s->refcount_block_size;
+> +            for (j = begin_index; j < end_index; j++) {
+> +                if (qcow2_get_refcount(bs, j, &refcount) < 0) {
+> +                    continue;
+> +                }
+> +                if (refcount > 0) {
+> +                    allocated_cluster_count++;
+> +                }
+> +            }
+> +        }
+> +
+> +    }
+> +
+> +    return allocated_cluster_count * s->cluster_size;
+> +}
+> +
+> +static int64_t qcow2_get_allocated_file_size(BlockDriverState *bs)
+> +{
+> +    int64_t ret = 0;
+> +
+> +    /* Get through bs->file first */
+> +    if (bs->file) {
+> +        ret = bdrv_get_allocated_file_size(bs->file->bs);
+> +    }
+> +
+> +    /*
+> +     * If ret < 0, some error may happen to the underlying media, return
+> the
+> +     * error directly.
+> +     * If ret == 0, means length get from bs->file is 0, which is
+> impossible
+> +     * for a normal file because of the qcow2 header. In this case, the
+> +     * underlying media may be a block device or anything else that can't
+> +     * return a suitable size. So we get the allocated size of qcow2
+> instead.
+> +     */
+> +    if (!ret) {
+> +        ret = qcow2_get_allocated_size(bs);
+> +    }
+> +
+> +    return ret;
+> +}
+> +
+>  BlockDriver bdrv_qcow2 = {
+>      .format_name        = "qcow2",
+>      .instance_size      = sizeof(BDRVQcow2State),
+> @@ -4516,6 +4569,7 @@ BlockDriver bdrv_qcow2 = {
+>      .bdrv_co_pwrite_zeroes  = qcow2_co_pwrite_zeroes,
+>      .bdrv_co_pdiscard       = qcow2_co_pdiscard,
+>      .bdrv_truncate          = qcow2_truncate,
+> +    .bdrv_get_allocated_file_size = qcow2_get_allocated_file_size,
+>      .bdrv_co_pwritev_compressed = qcow2_co_pwritev_compressed,
+>      .bdrv_make_empty        = qcow2_make_empty,
+>
+> --
+> 1.8.3.1
+>
 >
