@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fIGkD-0007QE-HO
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:54:42 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1fIGkH-0007T3-5K
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:54:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fIGk9-00056k-Tt
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:54:41 -0400
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:43294)
+	(envelope-from <zhangckid@gmail.com>) id 1fIGkC-00059O-Fa
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:54:45 -0400
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:36796)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fIGk9-000568-Mn
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:54:37 -0400
-Received: by mail-pl0-x243.google.com with SMTP id c41-v6so2494096plj.10
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 09:54:37 -0700 (PDT)
-References: <20180512004311.9299-1-richard.henderson@linaro.org>
-	<20180512004311.9299-25-richard.henderson@linaro.org>
-	<CAFEAcA-XuyMiKXOC1D=UJ1JSQsnc0h_-Ygb8y5OrHA__EJ-djg@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <be71495d-001a-b952-599b-9504ea85a271@linaro.org>
-Date: Mon, 14 May 2018 09:54:33 -0700
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-XuyMiKXOC1D=UJ1JSQsnc0h_-Ygb8y5OrHA__EJ-djg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 24/27] fpu/softfloat: Specialize on
- snan_bit_is_one
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fIGkC-00058i-8w
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:54:40 -0400
+Received: by mail-pl0-x241.google.com with SMTP id v24-v6so7722739plo.3
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 09:54:40 -0700 (PDT)
+From: Zhang Chen <zhangckid@gmail.com>
+Date: Tue, 15 May 2018 00:54:07 +0800
+Message-Id: <20180514165424.12884-1-zhangckid@gmail.com>
+Subject: [Qemu-devel] [PATCH V7 RESEND 00/17] COLO: integrate colo frame
+ with block replication and COLO proxy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,85 +24,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Guan Xuetao <gxt@mprc.pku.edu.cn>
+To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Zhang Chen <zhangckid@gmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>
 
-On 05/14/2018 07:44 AM, Peter Maydell wrote:
-> On 12 May 2018 at 01:43, Richard Henderson <richard.henderson@linaro.org> wrote:
->> Only MIPS requires snan_bit_is_one to be variable.  While we are
->> specializing softfloat behaviour, allow other targets to eliminate
->> this runtime check.
->>
->> Cc: Aurelien Jarno <aurelien@aurel32.net>
->> Cc: Yongbok Kim <yongbok.kim@mips.com>
->> Cc: David Gibson <david@gibson.dropbear.id.au>
->> Cc: Alexander Graf <agraf@suse.de>
->> Cc: Guan Xuetao <gxt@mprc.pku.edu.cn>
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->> ---
->>  fpu/softfloat-specialize.h    | 68 ++++++++++++++++++++++-------------
->>  include/fpu/softfloat-types.h |  1 +
->>  include/fpu/softfloat.h       |  4 ---
->>  target/mips/cpu.h             |  4 +--
->>  target/hppa/cpu.c             |  1 -
->>  target/mips/translate_init.c  |  4 +--
->>  target/ppc/fpu_helper.c       |  1 -
->>  target/sh4/cpu.c              |  1 -
->>  target/unicore32/cpu.c        |  2 --
->>  9 files changed, 48 insertions(+), 38 deletions(-)
-> 
-> 
->> diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
->> index 69f4dbc4db..e72cc9525d 100644
->> --- a/include/fpu/softfloat.h
->> +++ b/include/fpu/softfloat.h
->> @@ -125,10 +125,6 @@ static inline void set_default_nan_mode(flag val, float_status *status)
->>  {
->>      status->default_nan_mode = val;
->>  }
->> -static inline void set_snan_bit_is_one(flag val, float_status *status)
->> -{
->> -    status->snan_bit_is_one = val;
->> -}
->>  static inline int get_float_detect_tininess(float_status *status)
->>  {
->>      return status->float_detect_tininess;
->> diff --git a/target/mips/cpu.h b/target/mips/cpu.h
->> index cfe1735e0e..2abce47ea3 100644
->> --- a/target/mips/cpu.h
->> +++ b/target/mips/cpu.h
->> @@ -755,8 +755,8 @@ target_ulong exception_resume_pc (CPUMIPSState *env);
->>
->>  static inline void restore_snan_bit_mode(CPUMIPSState *env)
->>  {
->> -    set_snan_bit_is_one((env->active_fpu.fcr31 & (1 << FCR31_NAN2008)) == 0,
->> -                        &env->active_fpu.fp_status);
->> +    env->active_fpu.fp_status.snan_bit_is_one
->> +        = (env->active_fpu.fcr31 & (1 << FCR31_NAN2008)) == 0;
->>  }
->>
->>  static inline void cpu_get_tb_cpu_state(CPUMIPSState *env, target_ulong *pc,
->>
->> diff --git a/target/mips/translate_init.c b/target/mips/translate_init.c
->> index c7ba6ee5f9..5e40d6a198 100644
->> --- a/target/mips/translate_init.c
->> +++ b/target/mips/translate_init.c
->> @@ -878,6 +878,6 @@ static void msa_reset(CPUMIPSState *env)
->>      /* clear float_status nan mode */
->>      set_default_nan_mode(0, &env->active_tc.msa_fp_status);
->>
->> -    /* set proper signanling bit meaning ("1" means "quiet") */
->> -    set_snan_bit_is_one(0, &env->active_tc.msa_fp_status);
->> +    /* set proper signaling bit meaning ("1" means "quiet") */
->> +    env->active_tc.msa_fp_status.snan_bit_is_one = 0;
->>  }
-> 
-> Why remove the set_snan_bit_is_one() helper and require mips
-> to manually look inside the float_status struct?
+The RESEND version just fix code style in patch 11/17.
 
-What I really wanted was to #ifdef TARGET_MIPS around the function and the
-field, but it's poisoned at that point.  But you're right, I could have left
-the function.
+Hi~ All~
+
+COLO Frame, block replication and COLO proxy(colo-compare,filter-mirror,
+filter-redirector,filter-rewriter) have been exist in qemu
+for long time, it's time to integrate these three parts to make COLO really works.
+
+In this series, we have some optimizations for COLO frame, including separating the
+process of saving ram and device state, using an COLO_EXIT event to notify users that
+VM exits COLO, for these parts, most of them have been reviewed long time ago in old version,
+but since this series have just rebased on upstream which had merged a new series of migration,
+parts of pathes in this series deserve review again.
+
+We use notifier/callback method for COLO compare to notify COLO frame about
+net packets inconsistent event, and add a handle_event method for NetFilterClass to
+help COLO frame to notify filters and colo-compare about checkpoint/failover event,
+it is flexible.
+
+For the neweset version, please refer to:
+https://github.com/zhangckid/qemu/tree/qemu-colo-18may1-rebase
+
+Please review, thanks.
+
+V7:
+ - Addressed Markus's comments in 11/17.
+ - Rebased on upstream.
+
+V6:
+ - Addressed Eric Blake's comments, use the enum to feedback in patch 11/17.
+ - Fixed QAPI command separator problem in patch 11/17.
 
 
-r~
+Zhang Chen (12):
+  filter-rewriter: fix memory leak for connection in
+    connection_track_table
+  colo-compare: implement the process of checkpoint
+  colo-compare: use notifier to notify packets comparing result
+  COLO: integrate colo compare with colo frame
+  COLO: Add block replication into colo process
+  COLO: Remove colo_state migration struct
+  COLO: Load dirty pages into SVM's RAM cache firstly
+  ram/COLO: Record the dirty pages that SVM received
+  COLO: Flush memory data from ram cache
+  qapi: Add new command to query colo status
+  filter: Add handle_event method for NetFilterClass
+  filter-rewriter: handle checkpoint and failover event
+
+zhanghailiang (5):
+  qmp event: Add COLO_EXIT event to notify users while exited COLO
+  savevm: split the process of different stages for loadvm/savevm
+  COLO: flush host dirty ram from cache
+  COLO: notify net filters about checkpoint/failover event
+  COLO: quick failover process by kick COLO thread
+
+ include/exec/ram_addr.h  |   1 +
+ include/migration/colo.h |  11 +-
+ include/net/filter.h     |   5 +
+ migration/Makefile.objs  |   2 +-
+ migration/colo-comm.c    |  76 --------------
+ migration/colo.c         | 219 +++++++++++++++++++++++++++++++++++++--
+ migration/migration.c    |  38 ++++++-
+ migration/ram.c          | 183 +++++++++++++++++++++++++++++++-
+ migration/ram.h          |   4 +
+ migration/savevm.c       |  55 ++++++++--
+ migration/savevm.h       |   5 +
+ migration/trace-events   |   3 +
+ net/colo-compare.c       | 108 +++++++++++++++++--
+ net/colo-compare.h       |  24 +++++
+ net/colo.h               |   4 +
+ net/filter-rewriter.c    | 109 +++++++++++++++++--
+ net/filter.c             |  17 +++
+ net/net.c                |  28 +++++
+ qapi/migration.json      |  70 +++++++++++++
+ vl.c                     |   2 -
+ 20 files changed, 846 insertions(+), 118 deletions(-)
+ delete mode 100644 migration/colo-comm.c
+ create mode 100644 net/colo-compare.h
+
+-- 
+2.17.0
