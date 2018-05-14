@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fIFbJ-0000Gk-SE
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 11:41:26 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fIFbJ-0000Gl-SY
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 11:41:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fIFbH-0007Uv-Sj
+	(envelope-from <cohuck@redhat.com>) id 1fIFbG-0007UF-1q
 	for qemu-devel@nongnu.org; Mon, 14 May 2018 11:41:25 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon, 14 May 2018 17:41:10 +0200
-Message-Id: <20180514154114.2558-3-cohuck@redhat.com>
+Date: Mon, 14 May 2018 17:41:09 +0200
+Message-Id: <20180514154114.2558-2-cohuck@redhat.com>
 In-Reply-To: <20180514154114.2558-1-cohuck@redhat.com>
 References: <20180514154114.2558-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 2/6] pc-bios/s390-ccw: struct tpi_info must be
- declared as aligned(4)
+Subject: [Qemu-devel] [PULL 1/6] s390x/css: disabled subchannels cannot be
+ status pending
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,45 +21,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, qemu-stable@nongnu.org, Cornelia Huck <cohuck@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, qemu-stable@nongnu.org
 
-From: Thomas Huth <thuth@redhat.com>
+The 3270 code will try to post an attention interrupt when the
+3270 emulator (e.g. x3270) attaches. If the guest has not yet
+enabled the subchannel for the 3270 device, we will present a spurious
+cc 1 (status pending) when it uses msch on it later on, e.g. when
+trying to enable the subchannel.
 
-I've run into a compilation error today with the current version of GCC 8:
-
-In file included from s390-ccw.h:49,
-                 from main.c:12:
-cio.h:128:1: error: alignment 1 of 'struct tpi_info' is less than 4 [-Werror=packed-not-aligned]
- } __attribute__ ((packed));
- ^
-cc1: all warnings being treated as errors
-
-Since the struct tpi_info contains an element ("struct subchannel_id schid")
-which is marked as aligned(4), we've got to mark the struct tpi_info as
-aligned(4), too.
+To fix this, just don't do anything in css_conditional_io_interrupt()
+if the subchannel is not enabled. The 3270 code will work fine with
+that, and the other user of this function (virtio-ccw) never
+attempts to post an interrupt for a disabled device to begin with.
 
 CC: qemu-stable@nongnu.org
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1525774672-11913-1-git-send-email-thuth@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reported-by: Thomas Huth <thuth@redhat.com>
+Tested-by: Thomas Huth <thuth@redhat.com>
 Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Acked-by: Halil Pasic <pasic@linux.ibm.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- pc-bios/s390-ccw/cio.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/s390x/css.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
-index 55eaeee4b6..1a0795f645 100644
---- a/pc-bios/s390-ccw/cio.h
-+++ b/pc-bios/s390-ccw/cio.h
-@@ -125,7 +125,7 @@ struct tpi_info {
-     __u32 reserved3  : 12;
-     __u32 int_type   : 3;
-     __u32 reserved4  : 12;
--} __attribute__ ((packed));
-+} __attribute__ ((packed, aligned(4)));
+diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+index 301bf1772f..56c3fa8c89 100644
+--- a/hw/s390x/css.c
++++ b/hw/s390x/css.c
+@@ -616,6 +616,14 @@ void css_inject_io_interrupt(SubchDev *sch)
  
- /* channel command word (type 1) */
- struct ccw1 {
+ void css_conditional_io_interrupt(SubchDev *sch)
+ {
++    /*
++     * If the subchannel is not enabled, it is not made status pending
++     * (see PoP p. 16-17, "Status Control").
++     */
++    if (!(sch->curr_status.pmcw.flags & PMCW_FLAGS_MASK_ENA)) {
++        return;
++    }
++
+     /*
+      * If the subchannel is not currently status pending, make it pending
+      * with alert status.
 -- 
 2.14.3
