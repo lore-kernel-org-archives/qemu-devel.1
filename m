@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fILwB-000470-C7
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:27:25 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fILwE-00047w-IH
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:27:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fILwA-0008Jr-2X
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:27:23 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:38155)
+	(envelope-from <richard.henderson@linaro.org>) id 1fILwC-0008Lh-PV
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:27:26 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:44457)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fILw9-0008JK-Qa
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:27:21 -0400
-Received: by mail-pf0-x241.google.com with SMTP id o76-v6so6673651pfi.5
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 15:27:21 -0700 (PDT)
+	id 1fILwC-0008LA-HE
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:27:24 -0400
+Received: by mail-pf0-x243.google.com with SMTP id q22-v6so6677855pff.11
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 15:27:24 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 14 May 2018 15:27:03 -0700
-Message-Id: <20180514222714.7982-3-richard.henderson@linaro.org>
+Date: Mon, 14 May 2018 15:27:05 -0700
+Message-Id: <20180514222714.7982-5-richard.henderson@linaro.org>
 In-Reply-To: <20180514222714.7982-1-richard.henderson@linaro.org>
 References: <20180514222714.7982-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 02/13] target/openrisc: Start conversion to
- decodetree.py
+Subject: [Qemu-devel] [PULL 04/13] target/openrisc: Convert memory insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,201 +29,370 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stafford Horne <shorne@gmail.com>, peter.maydell@linaro.org
 
-Begin with the 0x08 major opcode, the system instructions.
-
 Acked-by: Stafford Horne <shorne@gmail.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/openrisc/translate.c   | 84 +++++++++++++++++------------------
- target/openrisc/Makefile.objs |  9 ++++
- target/openrisc/insns.decode  | 28 ++++++++++++
- 3 files changed, 78 insertions(+), 43 deletions(-)
- create mode 100644 target/openrisc/insns.decode
+ target/openrisc/translate.c  | 275 +++++++++++++++++------------------
+ target/openrisc/insns.decode |  24 +++
+ 2 files changed, 160 insertions(+), 139 deletions(-)
 
 diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-index 586c85df5d..a4b67f94c5 100644
+index 3a02a1d688..4f9388a4c2 100644
 --- a/target/openrisc/translate.c
 +++ b/target/openrisc/translate.c
-@@ -31,6 +31,7 @@
- 
- #include "exec/helper-proto.h"
- #include "exec/helper-gen.h"
-+#include "exec/gen-icount.h"
- 
- #include "trace-tcg.h"
- #include "exec/log.h"
-@@ -51,6 +52,9 @@ typedef struct DisasContext {
-     uint32_t delayed_branch;
- } DisasContext;
- 
-+/* Include the auto-generated decoder.  */
-+#include "decode.inc.c"
-+
- static TCGv cpu_sr;
- static TCGv cpu_R[32];
- static TCGv cpu_R0;
-@@ -65,7 +69,6 @@ static TCGv cpu_lock_value;
- static TCGv_i32 fpcsr;
- static TCGv_i64 cpu_mac;        /* MACHI:MACLO */
- static TCGv_i32 cpu_dflag;
--#include "exec/gen-icount.h"
- 
- void openrisc_translate_init(void)
- {
-@@ -1241,46 +1244,41 @@ static void dec_compi(DisasContext *dc, uint32_t insn)
-     }
+@@ -455,51 +455,6 @@ static void gen_msbu(DisasContext *dc, TCGv srca, TCGv srcb)
+     gen_ove_cy(dc);
  }
  
--static void dec_sys(DisasContext *dc, uint32_t insn)
-+static bool trans_l_sys(DisasContext *dc, arg_l_sys *a, uint32_t insn)
+-static void gen_lwa(DisasContext *dc, TCGv rd, TCGv ra, int32_t ofs)
+-{
+-    TCGv ea = tcg_temp_new();
+-
+-    tcg_gen_addi_tl(ea, ra, ofs);
+-    tcg_gen_qemu_ld_tl(rd, ea, dc->mem_idx, MO_TEUL);
+-    tcg_gen_mov_tl(cpu_lock_addr, ea);
+-    tcg_gen_mov_tl(cpu_lock_value, rd);
+-    tcg_temp_free(ea);
+-}
+-
+-static void gen_swa(DisasContext *dc, int b, TCGv ra, int32_t ofs)
+-{
+-    TCGv ea, val;
+-    TCGLabel *lab_fail, *lab_done;
+-
+-    ea = tcg_temp_new();
+-    tcg_gen_addi_tl(ea, ra, ofs);
+-
+-    /* For TB_FLAGS_R0_0, the branch below invalidates the temporary assigned
+-       to cpu_R[0].  Since l.swa is quite often immediately followed by a
+-       branch, don't bother reallocating; finish the TB using the "real" R0.
+-       This also takes care of RB input across the branch.  */
+-    cpu_R[0] = cpu_R0;
+-
+-    lab_fail = gen_new_label();
+-    lab_done = gen_new_label();
+-    tcg_gen_brcond_tl(TCG_COND_NE, ea, cpu_lock_addr, lab_fail);
+-    tcg_temp_free(ea);
+-
+-    val = tcg_temp_new();
+-    tcg_gen_atomic_cmpxchg_tl(val, cpu_lock_addr, cpu_lock_value,
+-                              cpu_R[b], dc->mem_idx, MO_TEUL);
+-    tcg_gen_setcond_tl(TCG_COND_EQ, cpu_sr_f, val, cpu_lock_value);
+-    tcg_temp_free(val);
+-
+-    tcg_gen_br(lab_done);
+-
+-    gen_set_label(lab_fail);
+-    tcg_gen_movi_tl(cpu_sr_f, 0);
+-
+-    gen_set_label(lab_done);
+-    tcg_gen_movi_tl(cpu_lock_addr, -1);
+-}
+-
+ static void dec_calc(DisasContext *dc, uint32_t insn)
  {
--    uint32_t op0;
--    uint32_t K16;
-+    LOG_DIS("l.sys %d\n", a->k);
-+    tcg_gen_movi_tl(cpu_pc, dc->base.pc_next);
-+    gen_exception(dc, EXCP_SYSCALL);
-+    dc->base.is_jmp = DISAS_NORETURN;
-+    return true;
-+}
- 
--    op0 = extract32(insn, 16, 10);
--    K16 = extract32(insn, 0, 16);
-+static bool trans_l_trap(DisasContext *dc, arg_l_trap *a, uint32_t insn)
-+{
-+    LOG_DIS("l.trap %d\n", a->k);
-+    tcg_gen_movi_tl(cpu_pc, dc->base.pc_next);
-+    gen_exception(dc, EXCP_TRAP);
-+    dc->base.is_jmp = DISAS_NORETURN;
-+    return true;
-+}
- 
--    switch (op0) {
--    case 0x000:    /* l.sys */
--        LOG_DIS("l.sys %d\n", K16);
--        tcg_gen_movi_tl(cpu_pc, dc->base.pc_next);
--        gen_exception(dc, EXCP_SYSCALL);
--        dc->base.is_jmp = DISAS_NORETURN;
--        break;
-+static bool trans_l_msync(DisasContext *dc, arg_l_msync *a, uint32_t insn)
-+{
-+    LOG_DIS("l.msync\n");
-+    tcg_gen_mb(TCG_MO_ALL);
-+    return true;
-+}
- 
--    case 0x100:    /* l.trap */
--        LOG_DIS("l.trap %d\n", K16);
--        tcg_gen_movi_tl(cpu_pc, dc->base.pc_next);
--        gen_exception(dc, EXCP_TRAP);
--        dc->base.is_jmp = DISAS_NORETURN;
--        break;
-+static bool trans_l_psync(DisasContext *dc, arg_l_psync *a, uint32_t insn)
-+{
-+    LOG_DIS("l.psync\n");
-+    return true;
-+}
- 
--    case 0x300:    /* l.csync */
--        LOG_DIS("l.csync\n");
--        break;
--
--    case 0x200:    /* l.msync */
--        LOG_DIS("l.msync\n");
--        tcg_gen_mb(TCG_MO_ALL);
--        break;
--
--    case 0x270:    /* l.psync */
--        LOG_DIS("l.psync\n");
--        break;
--
--    default:
--        gen_illegal_exception(dc);
--        break;
--    }
-+static bool trans_l_csync(DisasContext *dc, arg_l_csync *a, uint32_t insn)
-+{
-+    LOG_DIS("l.csync\n");
-+    return true;
+     uint32_t op0, op1, op2;
+@@ -738,13 +693,147 @@ static bool trans_l_jalr(DisasContext *dc, arg_l_jalr *a, uint32_t insn)
+     return true;
  }
  
- static void dec_float(DisasContext *dc, uint32_t insn)
-@@ -1506,19 +1504,19 @@ static void dec_float(DisasContext *dc, uint32_t insn)
- static void disas_openrisc_insn(DisasContext *dc, OpenRISCCPU *cpu)
- {
-     uint32_t op0;
--    uint32_t insn;
--    insn = cpu_ldl_code(&cpu->env, dc->base.pc_next);
--    op0 = extract32(insn, 26, 6);
-+    uint32_t insn = cpu_ldl_code(&cpu->env, dc->base.pc_next);
- 
-+    /* Transition to the auto-generated decoder.  */
-+    if (decode(dc, insn)) {
-+        return;
-+    }
++static bool trans_l_lwa(DisasContext *dc, arg_load *a, uint32_t insn)
++{
++    TCGv ea;
 +
-+    op0 = extract32(insn, 26, 6);
++    LOG_DIS("l.lwa r%d, r%d, %d\n", a->d, a->a, a->i);
++
++    check_r0_write(a->d);
++    ea = tcg_temp_new();
++    tcg_gen_addi_tl(ea, cpu_R[a->a], a->i);
++    tcg_gen_qemu_ld_tl(cpu_R[a->d], ea, dc->mem_idx, MO_TEUL);
++    tcg_gen_mov_tl(cpu_lock_addr, ea);
++    tcg_gen_mov_tl(cpu_lock_value, cpu_R[a->d]);
++    tcg_temp_free(ea);
++    return true;
++}
++
++static void do_load(DisasContext *dc, arg_load *a, TCGMemOp mop)
++{
++    TCGv ea;
++
++    check_r0_write(a->d);
++    ea = tcg_temp_new();
++    tcg_gen_addi_tl(ea, cpu_R[a->a], a->i);
++    tcg_gen_qemu_ld_tl(cpu_R[a->d], ea, dc->mem_idx, mop);
++    tcg_temp_free(ea);
++}
++
++static bool trans_l_lwz(DisasContext *dc, arg_load *a, uint32_t insn)
++{
++    LOG_DIS("l.lwz r%d, r%d, %d\n", a->d, a->a, a->i);
++    do_load(dc, a, MO_TEUL);
++    return true;
++}
++
++static bool trans_l_lws(DisasContext *dc, arg_load *a, uint32_t insn)
++{
++    LOG_DIS("l.lws r%d, r%d, %d\n", a->d, a->a, a->i);
++    do_load(dc, a, MO_TESL);
++    return true;
++}
++
++static bool trans_l_lbz(DisasContext *dc, arg_load *a, uint32_t insn)
++{
++    LOG_DIS("l.lbz r%d, r%d, %d\n", a->d, a->a, a->i);
++    do_load(dc, a, MO_UB);
++    return true;
++}
++
++static bool trans_l_lbs(DisasContext *dc, arg_load *a, uint32_t insn)
++{
++    LOG_DIS("l.lbs r%d, r%d, %d\n", a->d, a->a, a->i);
++    do_load(dc, a, MO_SB);
++    return true;
++}
++
++static bool trans_l_lhz(DisasContext *dc, arg_load *a, uint32_t insn)
++{
++    LOG_DIS("l.lhz r%d, r%d, %d\n", a->d, a->a, a->i);
++    do_load(dc, a, MO_TEUW);
++    return true;
++}
++
++static bool trans_l_lhs(DisasContext *dc, arg_load *a, uint32_t insn)
++{
++    LOG_DIS("l.lhs r%d, r%d, %d\n", a->d, a->a, a->i);
++    do_load(dc, a, MO_TESW);
++    return true;
++}
++
++static bool trans_l_swa(DisasContext *dc, arg_store *a, uint32_t insn)
++{
++    TCGv ea, val;
++    TCGLabel *lab_fail, *lab_done;
++
++    LOG_DIS("l.swa r%d, r%d, %d\n", a->a, a->b, a->i);
++
++    ea = tcg_temp_new();
++    tcg_gen_addi_tl(ea, cpu_R[a->a], a->i);
++
++    /* For TB_FLAGS_R0_0, the branch below invalidates the temporary assigned
++       to cpu_R[0].  Since l.swa is quite often immediately followed by a
++       branch, don't bother reallocating; finish the TB using the "real" R0.
++       This also takes care of RB input across the branch.  */
++    cpu_R[0] = cpu_R0;
++
++    lab_fail = gen_new_label();
++    lab_done = gen_new_label();
++    tcg_gen_brcond_tl(TCG_COND_NE, ea, cpu_lock_addr, lab_fail);
++    tcg_temp_free(ea);
++
++    val = tcg_temp_new();
++    tcg_gen_atomic_cmpxchg_tl(val, cpu_lock_addr, cpu_lock_value,
++                              cpu_R[a->b], dc->mem_idx, MO_TEUL);
++    tcg_gen_setcond_tl(TCG_COND_EQ, cpu_sr_f, val, cpu_lock_value);
++    tcg_temp_free(val);
++
++    tcg_gen_br(lab_done);
++
++    gen_set_label(lab_fail);
++    tcg_gen_movi_tl(cpu_sr_f, 0);
++
++    gen_set_label(lab_done);
++    tcg_gen_movi_tl(cpu_lock_addr, -1);
++    return true;
++}
++
++static void do_store(DisasContext *dc, arg_store *a, TCGMemOp mop)
++{
++    TCGv t0 = tcg_temp_new();
++    tcg_gen_addi_tl(t0, cpu_R[a->a], a->i);
++    tcg_gen_qemu_st_tl(cpu_R[a->b], t0, dc->mem_idx, mop);
++    tcg_temp_free(t0);
++}
++
++static bool trans_l_sw(DisasContext *dc, arg_store *a, uint32_t insn)
++{
++    LOG_DIS("l.sw r%d, r%d, %d\n", a->a, a->b, a->i);
++    do_store(dc, a, MO_TEUL);
++    return true;
++}
++
++static bool trans_l_sb(DisasContext *dc, arg_store *a, uint32_t insn)
++{
++    LOG_DIS("l.sb r%d, r%d, %d\n", a->a, a->b, a->i);
++    do_store(dc, a, MO_UB);
++    return true;
++}
++
++static bool trans_l_sh(DisasContext *dc, arg_store *a, uint32_t insn)
++{
++    LOG_DIS("l.sh r%d, r%d, %d\n", a->a, a->b, a->i);
++    do_store(dc, a, MO_TEUW);
++    return true;
++}
++
+ static void dec_misc(DisasContext *dc, uint32_t insn)
+ {
+     uint32_t op0, op1;
+     uint32_t ra, rb, rd;
+     uint32_t L6, K5, K16, K5_11;
+-    int32_t I16, I5_11;
+-    TCGMemOp mop;
++    int32_t I16;
+     TCGv t0;
+ 
+     op0 = extract32(insn, 26, 6);
+@@ -757,7 +846,6 @@ static void dec_misc(DisasContext *dc, uint32_t insn)
+     K16 = extract32(insn, 0, 16);
+     I16 = (int16_t)K16;
+     K5_11 = (extract32(insn, 21, 5) << 11) | extract32(insn, 0, 11);
+-    I5_11 = (int16_t)K5_11;
+ 
      switch (op0) {
-     case 0x06:
-         dec_M(dc, insn);
+     case 0x05:
+@@ -795,12 +883,6 @@ static void dec_misc(DisasContext *dc, uint32_t insn)
+         }
          break;
  
--    case 0x08:
--        dec_sys(dc, insn);
+-    case 0x1b: /* l.lwa */
+-        LOG_DIS("l.lwa r%d, r%d, %d\n", rd, ra, I16);
+-        check_r0_write(rd);
+-        gen_lwa(dc, cpu_R[rd], cpu_R[ra], I16);
 -        break;
 -
-     case 0x2e:
-         dec_logic(dc, insn);
+     case 0x1c:    /* l.cust1 */
+         LOG_DIS("l.cust1\n");
          break;
-diff --git a/target/openrisc/Makefile.objs b/target/openrisc/Makefile.objs
-index 918b1c6e9c..1b98a911ea 100644
---- a/target/openrisc/Makefile.objs
-+++ b/target/openrisc/Makefile.objs
-@@ -3,3 +3,12 @@ obj-y += cpu.o exception.o interrupt.o mmu.o translate.o
- obj-y += exception_helper.o fpu_helper.o \
-          interrupt_helper.o mmu_helper.o sys_helper.o
- obj-y += gdbstub.o
-+
-+DECODETREE = $(SRC_PATH)/scripts/decodetree.py
-+
-+target/openrisc/decode.inc.c: \
-+  $(SRC_PATH)/target/openrisc/insns.decode $(DECODETREE)
-+	$(call quiet-command,\
-+	  $(PYTHON) $(DECODETREE) -o $@ $<, "GEN", $(TARGET_DIR)$@)
-+
-+target/openrisc/translate.o: target/openrisc/decode.inc.c
+@@ -833,53 +915,6 @@ static void dec_misc(DisasContext *dc, uint32_t insn)
+         LOG_DIS("l.cust8\n");
+         break;
+ 
+-/* not used yet, open it when we need or64.  */
+-/*#ifdef TARGET_OPENRISC64
+-    case 0x20:     l.ld
+-        LOG_DIS("l.ld r%d, r%d, %d\n", rd, ra, I16);
+-        check_ob64s(dc);
+-        mop = MO_TEQ;
+-        goto do_load;
+-#endif*/
+-
+-    case 0x21:    /* l.lwz */
+-        LOG_DIS("l.lwz r%d, r%d, %d\n", rd, ra, I16);
+-        mop = MO_TEUL;
+-        goto do_load;
+-
+-    case 0x22:    /* l.lws */
+-        LOG_DIS("l.lws r%d, r%d, %d\n", rd, ra, I16);
+-        mop = MO_TESL;
+-        goto do_load;
+-
+-    case 0x23:    /* l.lbz */
+-        LOG_DIS("l.lbz r%d, r%d, %d\n", rd, ra, I16);
+-        mop = MO_UB;
+-        goto do_load;
+-
+-    case 0x24:    /* l.lbs */
+-        LOG_DIS("l.lbs r%d, r%d, %d\n", rd, ra, I16);
+-        mop = MO_SB;
+-        goto do_load;
+-
+-    case 0x25:    /* l.lhz */
+-        LOG_DIS("l.lhz r%d, r%d, %d\n", rd, ra, I16);
+-        mop = MO_TEUW;
+-        goto do_load;
+-
+-    case 0x26:    /* l.lhs */
+-        LOG_DIS("l.lhs r%d, r%d, %d\n", rd, ra, I16);
+-        mop = MO_TESW;
+-        goto do_load;
+-
+-    do_load:
+-        check_r0_write(rd);
+-        t0 = tcg_temp_new();
+-        tcg_gen_addi_tl(t0, cpu_R[ra], I16);
+-        tcg_gen_qemu_ld_tl(cpu_R[rd], t0, dc->mem_idx, mop);
+-        tcg_temp_free(t0);
+-        break;
+-
+     case 0x27:    /* l.addi */
+         LOG_DIS("l.addi r%d, r%d, %d\n", rd, ra, I16);
+         check_r0_write(rd);
+@@ -957,44 +992,6 @@ static void dec_misc(DisasContext *dc, uint32_t insn)
+         }
+         break;
+ 
+-    case 0x33: /* l.swa */
+-        LOG_DIS("l.swa r%d, r%d, %d\n", ra, rb, I5_11);
+-        gen_swa(dc, rb, cpu_R[ra], I5_11);
+-        break;
+-
+-/* not used yet, open it when we need or64.  */
+-/*#ifdef TARGET_OPENRISC64
+-    case 0x34:     l.sd
+-        LOG_DIS("l.sd r%d, r%d, %d\n", ra, rb, I5_11);
+-        check_ob64s(dc);
+-        mop = MO_TEQ;
+-        goto do_store;
+-#endif*/
+-
+-    case 0x35:    /* l.sw */
+-        LOG_DIS("l.sw r%d, r%d, %d\n", ra, rb, I5_11);
+-        mop = MO_TEUL;
+-        goto do_store;
+-
+-    case 0x36:    /* l.sb */
+-        LOG_DIS("l.sb r%d, r%d, %d\n", ra, rb, I5_11);
+-        mop = MO_UB;
+-        goto do_store;
+-
+-    case 0x37:    /* l.sh */
+-        LOG_DIS("l.sh r%d, r%d, %d\n", ra, rb, I5_11);
+-        mop = MO_TEUW;
+-        goto do_store;
+-
+-    do_store:
+-        {
+-            TCGv t0 = tcg_temp_new();
+-            tcg_gen_addi_tl(t0, cpu_R[ra], I5_11);
+-            tcg_gen_qemu_st_tl(cpu_R[rb], t0, dc->mem_idx, mop);
+-            tcg_temp_free(t0);
+-        }
+-        break;
+-
+     default:
+         gen_illegal_exception(dc);
+         break;
 diff --git a/target/openrisc/insns.decode b/target/openrisc/insns.decode
-new file mode 100644
-index 0000000000..47d31afc5b
---- /dev/null
+index 8d35011eab..ba5356abe1 100644
+--- a/target/openrisc/insns.decode
 +++ b/target/openrisc/insns.decode
-@@ -0,0 +1,28 @@
-+#
-+# OpenRISC instruction decode definitions.
-+#
-+# Copyright (c) 2018 Richard Henderson <rth@twiddle.net>
-+#
-+# This library is free software; you can redistribute it and/or
-+# modify it under the terms of the GNU Lesser General Public
-+# License as published by the Free Software Foundation; either
-+# version 2 of the License, or (at your option) any later version.
-+#
-+# This library is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+# Lesser General Public License for more details.
-+#
-+# You should have received a copy of the GNU Lesser General Public
-+# License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+#
+@@ -38,3 +38,27 @@ l_bf            000100 n:s26
+ 
+ l_jr            010001 ---------- b:5 -----------
+ l_jalr          010010 ---------- b:5 -----------
 +
 +####
-+# System Instructions
++# Memory Instructions
 +####
 +
-+l_sys           001000 0000000000 k:16
-+l_trap          001000 0100000000 k:16
-+l_msync         001000 1000000000 00000000 00000000
-+l_psync         001000 1010000000 00000000 00000000
-+l_csync         001000 1100000000 00000000 00000000
++&load           d a i
++@load           ...... d:5 a:5 i:s16                    &load
++
++%store_i        21:s5 0:11
++&store          a b i
++@store          ...... ..... a:5 b:5 ...........        &store i=%store_i
++
++l_lwa           011011 ..... ..... ........ ........    @load
++l_lwz           100001 ..... ..... ........ ........    @load
++l_lws           100010 ..... ..... ........ ........    @load
++l_lbz           100011 ..... ..... ........ ........    @load
++l_lbs           100100 ..... ..... ........ ........    @load
++l_lhz           100101 ..... ..... ........ ........    @load
++l_lhs           100110 ..... ..... ........ ........    @load
++
++l_swa           110011 ..... ..... ........ ........    @store
++l_sw            110101 ..... ..... ........ ........    @store
++l_sb            110110 ..... ..... ........ ........    @store
++l_sh            110111 ..... ..... ........ ........    @store
 -- 
 2.17.0
