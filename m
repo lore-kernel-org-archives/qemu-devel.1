@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fIGYK-0006s1-0p
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:42:27 -0400
+	(envelope-from <Babu.Moger@amd.com>) id 1fIGYO-0006v7-1U
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:42:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fIGYI-0005iW-0K
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:42:24 -0400
-Received: from mail-cys01nam02on0088.outbound.protection.outlook.com
-	([104.47.37.88]:9120
+	(envelope-from <Babu.Moger@amd.com>) id 1fIGYL-0005jj-05
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:42:28 -0400
+Received: from mail-cys01nam02on0064.outbound.protection.outlook.com
+	([104.47.37.64]:56428
 	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fIGYH-0005i0-PH
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:42:21 -0400
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fIGYK-0005jN-Nw
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:42:24 -0400
 From: Babu Moger <babu.moger@amd.com>
-Date: Mon, 14 May 2018 11:41:54 -0500
-Message-Id: <20180514164156.27034-6-babu.moger@amd.com>
+Date: Mon, 14 May 2018 11:41:56 -0500
+Message-Id: <20180514164156.27034-8-babu.moger@amd.com>
 In-Reply-To: <20180514164156.27034-1-babu.moger@amd.com>
 References: <20180514164156.27034-1-babu.moger@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v9 5/7] i386: Add support for CPUID_8000_001E
- for AMD
+Subject: [Qemu-devel] [PATCH v9 7/7] i386: Remove generic SMT thread check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +30,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com
 Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, geoff@hostfission.com, kash@tripleback.net, babu.moger@amd.com
 
-Populate threads/core_id/apic_ids/socket_id when CPUID_EXT3_TOPOEXT
-feature is supported. This is required to support hyperthreading feature
-on AMD CPUs. This is supported via CPUID_8000_001E extended functions.
+Remove generic non-intel check while validating hyperthreading support.
+Certain AMD CPUs can support hyperthreading now.
+
+CPU family with TOPOEXT feature can support hyperthreading now.
 
 Signed-off-by: Babu Moger <babu.moger@amd.com>
 Tested-by: Geoffrey McRae <geoff@hostfission.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/hw/i386/topology.h | 6 ++++++
- target/i386/cpu.c          | 8 ++++++++
- 2 files changed, 14 insertions(+)
+ target/i386/cpu.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/include/hw/i386/topology.h b/include/hw/i386/topology.h
-index 1ebaee0f76..4af746e50c 100644
---- a/include/hw/i386/topology.h
-+++ b/include/hw/i386/topology.h
-@@ -145,4 +145,10 @@ static inline apic_id_t x86_apicid_from_cpu_idx(unsigned nr_cores,
-     return apicid_from_topo_ids(nr_cores, nr_threads, &topo);
- }
- 
-+/* Definitions used on CPUID Leaf 0x8000001E */
-+#define EXTENDED_APIC_ID(threads, socket_id, core_id, thread_id) \
-+                        ((threads) ? \
-+                         ((socket_id << 6) | (core_id << 1) | thread_id) : \
-+                         ((socket_id << 6) | core_id))
-+
- #endif /* HW_I386_TOPOLOGY_H */
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index c06a9f5ebe..18a7872b7d 100644
+index de2749ae81..d28b51c0a3 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -4071,6 +4071,14 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-             break;
-         }
-         break;
-+    case 0x8000001E:
-+        assert(cpu->core_id <= 255);
-+        *eax = EXTENDED_APIC_ID((cs->nr_threads - 1),
-+               cpu->socket_id, cpu->core_id, cpu->thread_id);
-+        *ebx = (cs->nr_threads - 1) << 8 | cpu->core_id;
-+        *ecx = cpu->socket_id;
-+        *edx = 0;
-+        break;
-     case 0xC0000000:
-         *eax = env->cpuid_xlevel2;
-         *ebx = 0;
+@@ -4821,17 +4821,20 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+ 
+     qemu_init_vcpu(cs);
+ 
+-    /* Only Intel CPUs support hyperthreading. Even though QEMU fixes this
+-     * issue by adjusting CPUID_0000_0001_EBX and CPUID_8000_0008_ECX
+-     * based on inputs (sockets,cores,threads), it is still better to gives
++    /* Most Intel and certain AMD CPUs support hyperthreading. Even though QEMU
++     * fixes this issue by adjusting CPUID_0000_0001_EBX and CPUID_8000_0008_ECX
++     * based on inputs (sockets,cores,threads), it is still better to give
+      * users a warning.
+      *
+      * NOTE: the following code has to follow qemu_init_vcpu(). Otherwise
+      * cs->nr_threads hasn't be populated yet and the checking is incorrect.
+      */
+-    if (!IS_INTEL_CPU(env) && cs->nr_threads > 1 && !ht_warned) {
+-        error_report("AMD CPU doesn't support hyperthreading. Please configure"
+-                     " -smp options properly.");
++     if (IS_AMD_CPU(env) &&
++         !(env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT) &&
++         cs->nr_threads > 1 && !ht_warned) {
++            error_report("This family of AMD CPU doesn't support "
++                         "hyperthreading. Please configure -smp "
++                         "options properly.");
+         ht_warned = true;
+     }
+ 
 -- 
 2.17.0
