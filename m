@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fI6WF-000694-D2
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 01:59:38 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1fI6WX-0006dK-OR
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 01:59:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fI46x-0000mh-9a
-	for qemu-devel@nongnu.org; Sun, 13 May 2018 23:25:20 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:33326)
+	(envelope-from <zhangckid@gmail.com>) id 1fI46i-0000Uc-NS
+	for qemu-devel@nongnu.org; Sun, 13 May 2018 23:25:05 -0400
+Received: from mail-pg0-x22a.google.com ([2607:f8b0:400e:c05::22a]:45501)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fI46x-0000lI-2q
-	for qemu-devel@nongnu.org; Sun, 13 May 2018 23:25:19 -0400
-Received: by mail-pf0-x241.google.com with SMTP id a20-v6so1369984pfo.0
-	for <qemu-devel@nongnu.org>; Sun, 13 May 2018 20:25:18 -0700 (PDT)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fI46i-0000Te-Hm
+	for qemu-devel@nongnu.org; Sun, 13 May 2018 23:25:04 -0400
+Received: by mail-pg0-x22a.google.com with SMTP id w3-v6so4844595pgv.12
+	for <qemu-devel@nongnu.org>; Sun, 13 May 2018 20:25:04 -0700 (PDT)
 From: Zhang Chen <zhangckid@gmail.com>
-Date: Mon, 14 May 2018 11:23:45 +0800
-Message-Id: <1526268228-27951-15-git-send-email-zhangckid@gmail.com>
+Date: Mon, 14 May 2018 11:23:42 +0800
+Message-Id: <1526268228-27951-12-git-send-email-zhangckid@gmail.com>
 In-Reply-To: <1526268228-27951-1-git-send-email-zhangckid@gmail.com>
 References: <1526268228-27951-1-git-send-email-zhangckid@gmail.com>
-Subject: [Qemu-devel] [PATCH V7 14/17] filter: Add handle_event method for
- NetFilterClass
+Subject: [Qemu-devel] [PATCH V7 11/17] qapi: Add new command to query colo
+ status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,124 +27,110 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Zhang Chen <zhangckid@gmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
+Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Zhang Chen <zhangckid@gmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>
 
-Filter needs to process the event of checkpoint/failover or
-other event passed by COLO frame.
+Libvirt or other high level software can use this command query colo status.
+You can test this command like that:
+{'execute':'query-colo-status'}
 
-Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Signed-off-by: Zhang Chen <zhangckid@gmail.com>
 ---
- include/net/filter.h |  5 +++++
- net/filter.c         | 17 +++++++++++++++++
- net/net.c            | 28 ++++++++++++++++++++++++++++
- 3 files changed, 50 insertions(+)
+ migration/colo.c    | 34 ++++++++++++++++++++++++++++++++++
+ qapi/migration.json | 33 +++++++++++++++++++++++++++++++++
+ 2 files changed, 67 insertions(+)
 
-diff --git a/include/net/filter.h b/include/net/filter.h
-index 435acd6..49da666 100644
---- a/include/net/filter.h
-+++ b/include/net/filter.h
-@@ -38,6 +38,8 @@ typedef ssize_t (FilterReceiveIOV)(NetFilterState *nc,
+diff --git a/migration/colo.c b/migration/colo.c
+index 8ca6381..314344c 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -29,6 +29,7 @@
+ #include "net/colo.h"
+ #include "block/block.h"
+ #include "qapi/qapi-events-migration.h"
++#include "qapi/qmp/qerror.h"
  
- typedef void (FilterStatusChanged) (NetFilterState *nf, Error **errp);
- 
-+typedef void (FilterHandleEvent) (NetFilterState *nf, int event, Error **errp);
-+
- typedef struct NetFilterClass {
-     ObjectClass parent_class;
- 
-@@ -45,6 +47,7 @@ typedef struct NetFilterClass {
-     FilterSetup *setup;
-     FilterCleanup *cleanup;
-     FilterStatusChanged *status_changed;
-+    FilterHandleEvent *handle_event;
-     /* mandatory */
-     FilterReceiveIOV *receive_iov;
- } NetFilterClass;
-@@ -77,4 +80,6 @@ ssize_t qemu_netfilter_pass_to_next(NetClientState *sender,
-                                     int iovcnt,
-                                     void *opaque);
- 
-+void colo_notify_filters_event(int event, Error **errp);
-+
- #endif /* QEMU_NET_FILTER_H */
-diff --git a/net/filter.c b/net/filter.c
-index 2fd7d7d..0f17eba 100644
---- a/net/filter.c
-+++ b/net/filter.c
-@@ -17,6 +17,8 @@
- #include "net/vhost_net.h"
- #include "qom/object_interfaces.h"
- #include "qemu/iov.h"
-+#include "net/colo.h"
-+#include "migration/colo.h"
- 
- static inline bool qemu_can_skip_netfilter(NetFilterState *nf)
- {
-@@ -245,11 +247,26 @@ static void netfilter_finalize(Object *obj)
-     g_free(nf->netdev_id);
+ static bool vmstate_loading;
+ static Notifier packets_compare_notifier;
+@@ -237,6 +238,39 @@ void qmp_xen_colo_do_checkpoint(Error **errp)
+ #endif
  }
  
-+static void dummy_handle_event(NetFilterState *nf, int event, Error **errp)
++COLOStatus *qmp_query_colo_status(Error **errp)
 +{
-+    switch (event) {
-+    case COLO_EVENT_CHECKPOINT:
++    int state;
++    COLOStatus *s = g_new0(COLOStatus, 1);
++
++    if (get_colo_mode() == COLO_MODE_UNKNOWN) {
++        error_setg(errp, QERR_FEATURE_DISABLED, "colo");
++        s->colo_running = false;
++        goto out;
++    } else if (get_colo_mode() == COLO_MODE_PRIMARY) {
++         state = migrate_get_current()->state;
++    } else {
++         state = migration_incoming_get_current()->state;
++    }
++    s->colo_running = state == MIGRATION_STATUS_COLO;
++
++out:
++    s->mode = get_colo_mode();
++
++    switch (failover_get_state()) {
++    case FAILOVER_STATUS_NONE:
++        s->reason = COLO_EXIT_REASON_NONE;
 +        break;
-+    case COLO_EVENT_FAILOVER:
-+        object_property_set_str(OBJECT(nf), "off", "status", errp);
++    case FAILOVER_STATUS_REQUIRE:
++        s->reason = COLO_EXIT_REASON_REQUEST;
 +        break;
 +    default:
-+        break;
++        s->reason = COLO_EXIT_REASON_ERROR;
 +    }
++
++    return s;
 +}
 +
- static void netfilter_class_init(ObjectClass *oc, void *data)
+ static void colo_send_message(QEMUFile *f, COLOMessage msg,
+                               Error **errp)
  {
-     UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
-+    NetFilterClass *nfc = NETFILTER_CLASS(oc);
- 
-     ucc->complete = netfilter_complete;
-+    nfc->handle_event = dummy_handle_event;
- }
- 
- static const TypeInfo netfilter_info = {
-diff --git a/net/net.c b/net/net.c
-index 29f8398..d58691b 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -1335,6 +1335,34 @@ void hmp_info_network(Monitor *mon, const QDict *qdict)
-     }
- }
- 
-+void colo_notify_filters_event(int event, Error **errp)
-+{
-+    NetClientState *nc, *peer;
-+    NetClientDriver type;
-+    NetFilterState *nf;
-+    NetFilterClass *nfc = NULL;
-+    Error *local_err = NULL;
+diff --git a/qapi/migration.json b/qapi/migration.json
+index 55dae48..13589ba 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -1220,3 +1220,36 @@
+ # Since: 2.9
+ ##
+ { 'command': 'xen-colo-do-checkpoint' }
 +
-+    QTAILQ_FOREACH(nc, &net_clients, next) {
-+        peer = nc->peer;
-+        type = nc->info->type;
-+        if (!peer || type != NET_CLIENT_DRIVER_TAP) {
-+            continue;
-+        }
-+        QTAILQ_FOREACH(nf, &nc->filters, next) {
-+            nfc =  NETFILTER_GET_CLASS(OBJECT(nf));
-+            if (!nfc->handle_event) {
-+                continue;
-+            }
-+            nfc->handle_event(nf, event, &local_err);
-+            if (local_err) {
-+                error_propagate(errp, local_err);
-+                return;
-+            }
-+        }
-+    }
-+}
++##
++# @COLOStatus:
++#
++# The result format for 'query-colo-status'.
++#
++# @mode: which COLO mode the VM was in when it exited.
++#
++# @colo-running: true if COLO is running.
++#
++# @reason: describes the reason for the COLO exit.
++#
++# Since: 2.13
++##
++{ 'struct': 'COLOStatus',
++  'data': { 'mode': 'COLOMode', 'colo-running': 'bool', 'reason': 'COLOExitReason' } }
 +
- void qmp_set_link(const char *name, bool up, Error **errp)
- {
-     NetClientState *ncs[MAX_QUEUE_NUM];
++##
++# @query-colo-status:
++#
++# Query COLO status while the vm is running.
++#
++# Returns: A @COLOStatus object showing the status.
++#
++# Example:
++#
++# -> { "execute": "query-colo-status" }
++# <- { "return": { "mode": "primary", "colo-running": true, "reason": "request" } }
++#
++# Since: 2.13
++##
++{ 'command': 'query-colo-status',
++  'returns': 'COLOStatus' }
 -- 
 2.7.4
