@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1fI83i-0002oe-Ep
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 03:38:15 -0400
+	(envelope-from <jasowang@redhat.com>) id 1fI8Km-0007Ws-O8
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 03:55:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1fI83e-00005m-FX
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 03:38:14 -0400
-Received: from [107.173.13.209] (port=58232 helo=ozlabs.ru)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1fI83e-00005R-92
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 03:38:10 -0400
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Mon, 14 May 2018 17:38:05 +1000
-Message-Id: <20180514073805.44589-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu v2] qom: Document
- qom/device-list-properties implementation specific
+	(envelope-from <jasowang@redhat.com>) id 1fI8Kh-00047z-TQ
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 03:55:52 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53338 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fI8Kh-000474-PS
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 03:55:47 -0400
+References: <1525111345-14606-1-git-send-email-thuth@redhat.com>
+	<20180503122122.GG5301@stefanha-x1.localdomain>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <56637a3e-1566-2385-8dec-7fb3bf8c5fc2@redhat.com>
+Date: Mon, 14 May 2018 15:55:40 +0800
+MIME-Version: 1.0
+In-Reply-To: <20180503122122.GG5301@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 0/3] net: Get rid of 'vlan'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,57 +28,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-
-The recently introduced qom-list-properties QMP command raised
-a question what properties it (and its cousin - device-list-properties)
-can possibly print - only those defined by DeviceClass::props
-or dynamically created in TypeInfo::instance_init() so properties created
-elsewhere won't show up and this behaviour might confuse the user.
-For example, PIIX4 does that from piix4_pm_realize():
-
-hw/acpi/piix4.c|477| object_property_add_uint8_ptr(OBJECT(s),
-ACPI_PM_PROP_ACPI_ENABLE_CMD,
-
-This adds a note to the command descriptions about the limitation.
-
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
-Changes:
-v2:
-* changed wording
+To: Stefan Hajnoczi <stefanha@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
 
----
- qapi/misc.json | 8 ++++++++
- 1 file changed, 8 insertions(+)
 
-diff --git a/qapi/misc.json b/qapi/misc.json
-index f5988cc..efc3d23 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -1529,6 +1529,10 @@
- #
- # Returns: a list of ObjectPropertyInfo describing a devices properties
- #
-+# Note: objects can create properties at runtime, for example to describe
-+# links between different devices and/or objects. These properties
-+# are not included in the output of this command.
-+#
- # Since: 1.2
- ##
- { 'command': 'device-list-properties',
-@@ -1542,6 +1546,10 @@
- #
- # @typename: the type name of an object
- #
-+# Note: objects can create properties at runtime, for example to describe
-+# links between different devices and/or objects. These properties
-+# are not included in the output of this command.
-+#
- # Returns: a list of ObjectPropertyInfo describing object properties
- #
- # Since: 2.12
--- 
-2.11.0
+On 2018=E5=B9=B405=E6=9C=8803=E6=97=A5 20:21, Stefan Hajnoczi wrote:
+> On Mon, Apr 30, 2018 at 08:02:22PM +0200, Thomas Huth wrote:
+>> The 'vlan' term caused a lot of confusion and misconfigurations in the
+>> past. The parameter has been marked as deprecated since QEMU v2.9.0, s=
+o
+>> it's now time to finally remove the parameter and use the better word =
+"hub"
+>> in the remaining spots that actually mean the QEMU emulated hub featur=
+e.
+>>
+>> v4:
+>>   - Some rewordings in qemu-doc.texi and qemu-options.hx according to
+>>     Stefan's and Paolo's suggestions
+>>
+>> v3:
+>>   - Some rewordings in qemu-doc and net.json according to Paolo's sugg=
+estions
+>>
+>> v2:
+>>   - Added first patch to actually remove the deprecated 'vlan' paramet=
+er
+>>     (instead of only updating the wording in the sources and docs)
+>>
+>> Thomas Huth (3):
+>>    net: Remove the deprecated "vlan" parameter
+>>    net: Get rid of 'vlan' terminology and use 'hub' instead in the sou=
+rce
+>>      files
+>>    net: Get rid of 'vlan' terminology and use 'hub' instead in the doc
+>>      files
+>>
+>>   docs/qdev-device-use.txt         |  3 --
+>>   hw/core/qdev-properties-system.c | 80 ------------------------------=
+----------
+>>   include/hw/qdev-properties.h     |  3 --
+>>   include/net/net.h                |  1 -
+>>   net/hub.c                        |  7 ++--
+>>   net/net.c                        | 12 ++----
+>>   net/slirp.c                      |  8 ++--
+>>   net/tap.c                        |  4 +-
+>>   qapi/net.json                    | 15 ++++----
+>>   qemu-doc.texi                    | 51 ++++++++++++-------------
+>>   qemu-options.hx                  | 29 ++++++---------
+>>   11 files changed, 54 insertions(+), 159 deletions(-)
+>>
+>> --=20
+>> 1.8.3.1
+>>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+Applied, thanks.
