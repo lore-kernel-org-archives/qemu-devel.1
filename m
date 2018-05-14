@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fIAOm-0003cv-Da
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:08:12 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fIAQG-00051s-JP
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:09:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fIAOl-00087O-GD
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:08:08 -0400
-Received: from mail-ot0-x233.google.com ([2607:f8b0:4003:c0f::233]:43431)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fIAOl-00087F-BR
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:08:07 -0400
-Received: by mail-ot0-x233.google.com with SMTP id y10-v6so13561471otg.10
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 03:08:07 -0700 (PDT)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fIAQF-0000Rv-HO
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:09:40 -0400
+References: <8739e95e-1900-d4e3-7ac8-77e3aa8b927e@virtuozzo.com>
+	<20180514064139.GB16389@lemon.usersys.redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <9a59b786-2351-e8ae-f582-5e436ce0383c@virtuozzo.com>
+Date: Mon, 14 May 2018 13:09:24 +0300
 MIME-Version: 1.0
-In-Reply-To: <1526042199-45745-1-git-send-email-pbonzini@redhat.com>
-References: <1526042199-45745-1-git-send-email-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 May 2018 11:07:46 +0100
-Message-ID: <CAFEAcA-PhsngpWF3x0Q5OwR1GQ=8UsCiG25OmZPODF1Bc_pstA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 00/29] Misc patches for 2018-05-09
+In-Reply-To: <20180514064139.GB16389@lemon.usersys.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] Restoring bitmaps after failed/cancelled migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +24,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, "gilbert >> Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Juan Q >> Juan Jose Quintela Carreira" <quintela@redhat.com>
 
-On 11 May 2018 at 13:36, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> The following changes since commit cc8f8ba754bba17eea9791d67b572eb26e30b4ce:
->
->   Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-request' into staging (2018-05-08 15:25:17 +0100)
->
-> are available in the git repository at:
->
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to 5b27a92dcc5afb11d38c7fe0a637d5d64d31108a:
->
->   rename included C files to foo.inc.c, remove osdep.h (2018-05-11 14:33:40 +0200)
->
-> ----------------------------------------------------------------
-> * Don't silently truncate extremely long words in the command line
-> * dtc configure fixes
-> * MemoryRegionCache second try
-> * Deprecated option removal
-> * add support for Hyper-V reenlightenment MSRs
->
-> ----------------------------------------------------------------
+14.05.2018 09:41, Fam Zheng wrote:
+> On Wed, 04/18 17:00, Vladimir Sementsov-Ogievskiy wrote:
+>> Hi all.
+>>
+>> We now have the following problem:
+>>
+>> If dirty-bitmaps migration capability is enabled, persistance flag is
+>> dropped for all migrated bitmaps, to prevent their storing to the storage on
+>> inactivate.
+> Why do we prevent source storing persistent bitmaps by clearing the flag instead
+> of making the bitmap code more BDRV_O_INACTIVE-aware, so it is _not_ stored
+> when/after inactivation?
 
-Applied, thanks.
+Bitmaps are stored exactly on inactivation. So, we need some
+flag, that on following inactivation, we don't want to save them. And 
+this flag
+is .persistent flag.
 
--- PMM
+Of course, we can't save them if BDRV_O_INACTIVE is already set
+
+>
+>> It works ok, persistence itself is migrated through the
+>> migration channel. But on source, bitmaps becomes not persistent, so if we,
+>> for some reasons, want to continue using source vm, we'll lose bitmaps on
+>> stop/start.
+>>
+>> It's simple to fix it: just make bitmaps persistent again on invalidate
+>> [1].. But I have some questions.
+>>
+>> 1. What are possible cases? I think about the following:
+>>
+>> a. migration cancel or fail, then invalidate
+>> b. migration success, then qmp cont => invalidate
+> Is this "cont" on the source even though dst is already up? How will this work?
+> Isn't it expected that dst is using the image?
+
+Dr. David described this case, look at his answer.
+
+>
+>> c. migration success, then stop/start (there was no invalidate, so [1] will
+>> not work)
+>>
+>>
+>> 2. Is it safe at all, saving bitmaps after inactivate, even without
+>> persistence?
+> This is not safe. No I/O should be done to the image after inactivation.
+>
+>> Inactive disk implies, that it may be changed by somebody other, isn't it?
+> Yes.
+>
+>> Is it possible, that target will change the disk, and then we return control
+>> to the source? In this case bitmaps will be invalid. So, should not we drop
+>> all the bitmaps on inactivate?
+> Yes, dropping all live bitmaps upon inactivate sounds reasonable. If the dst
+> fails to start, and we want to resume VM at src, we could (optionally?) reload
+> the persistent bitmaps, I guess.
+
+Reload from where? We didn't store them.
+
+So, you agree, that dropping all bitmaps after inactivation is good 
+idea.. The second question, is it possible to not drop them? Is there a 
+way, to check that disk was not changed after pair of 
+inactivate-invalidate? I have an idea:
+we can create small-bitmap, which will not migrate through migration 
+channel, but remain persistent. It will be very small (big granularity, 
+to not increase downtime of migration), so after invalidate we can check 
+this bitmap. If it is empty, we are happy, we can "activate" all our 
+bitmaps and make them persistent again. If not, we have two ways:
+
+1. drop all bitmaps
+2. merge small-bitmap to all our bitmaps
+
+>
+>> -- 
+>> Best regards,
+>> Vladimir
+>>
+
+
+-- 
+Best regards,
+Vladimir
