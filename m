@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fIEe3-000626-41
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 10:40:15 -0400
+	(envelope-from <thuth@redhat.com>) id 1fIEgz-0000AI-IT
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 10:43:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fIEdx-0003aA-D2
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 10:40:11 -0400
-References: <20180509162637.15575-1-kwolf@redhat.com>
-	<20180509162637.15575-16-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <1405401b-fb71-c4fb-73c7-50b76dfa5431@redhat.com>
-Date: Mon, 14 May 2018 16:39:53 +0200
+	(envelope-from <thuth@redhat.com>) id 1fIEgv-0004eJ-Vb
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 10:43:13 -0400
+References: <9dbde2b5d864d126b75d8c0d7bae2011e8cc7e9b.1526305502.git.mprivozn@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <9ff0bc35-8996-599a-9478-07f6e1e54596@redhat.com>
+Date: Mon, 14 May 2018 16:43:01 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180509162637.15575-16-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="W8yRM079tRwTkEiyq9wRUNrhb9KvfMYIb"
-Subject: Re: [Qemu-devel] [PATCH 15/42] job: Move cancelled to Job
+In-Reply-To: <9dbde2b5d864d126b75d8c0d7bae2011e8cc7e9b.1526305502.git.mprivozn@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] qemu-options: Allow -no-user-config again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,63 +23,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
+To: Michal Privoznik <mprivozn@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, pbonzini@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---W8yRM079tRwTkEiyq9wRUNrhb9KvfMYIb
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com,
- qemu-devel@nongnu.org
-Message-ID: <1405401b-fb71-c4fb-73c7-50b76dfa5431@redhat.com>
-Subject: Re: [PATCH 15/42] job: Move cancelled to Job
-References: <20180509162637.15575-1-kwolf@redhat.com>
- <20180509162637.15575-16-kwolf@redhat.com>
-In-Reply-To: <20180509162637.15575-16-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2018-05-09 18:26, Kevin Wolf wrote:
-> We cannot yet move the whole logic around job cancelling to Job because=
-
-> it depends on quite a few other things that are still only in BlockJob,=
-
-> but we can move the cancelled field at least.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+On 14.05.2018 15:45, Michal Privoznik wrote:
+> After 1217d6ca2bf28c0febe1bd7d5b3fa912bbf6af2a we error out
+> explicitly if an unknown -option was passed on the command line.
+> However, we are doing two pass command line option parsing. In
+> the first pass we just look for -no-user-config or -nodefconfig
+> being present which determines whether we load user config or
+> not. Then in the second pass we finally parse everything else
+> throwing an error if an unsupported -option was found. Problem is
+> that in the second pass -no-user-config and -nodefconfig are not
+> handled explicitly which makes us throw the unsupported option
+> error.
+> 
+> Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
 > ---
->  include/block/blockjob.h     |  8 --------
->  include/block/blockjob_int.h |  8 --------
->  include/qemu/job.h           | 11 +++++++++++
->  block/backup.c               |  6 +++---
->  block/commit.c               |  4 ++--
->  block/mirror.c               | 20 ++++++++++----------
->  block/stream.c               |  4 ++--
->  blockjob.c                   | 28 +++++++++++++---------------
->  job.c                        |  5 +++++
->  tests/test-blockjob-txn.c    |  6 +++---
->  tests/test-blockjob.c        |  2 +-
->  11 files changed, 50 insertions(+), 52 deletions(-)
+>  vl.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/vl.c b/vl.c
+> index b9f6b42779..846cd29d8a 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4015,6 +4015,10 @@ int main(int argc, char **argv, char **envp)
+>                      exit(1);
+>                  }
+>                  break;
+> +            case QEMU_OPTION_nodefconfig:
+> +            case QEMU_OPTION_nouserconfig:
+> +                /* Nothing to be parsed here. Especially, do not error out below. */
+> +                break;
+>              default:
+>                  if (os_parse_cmd_args(popt->index, optarg)) {
+>                      error_report("Option not supported in this build");
+> 
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---W8yRM079tRwTkEiyq9wRUNrhb9KvfMYIb
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr5n7kACgkQ9AfbAGHV
-z0AMxQf9FVNlg7rbwEji5qysylp+IJ95z9DNnJjcwb9RCLMd6S8HEaM9Mpp1MoLP
-qJKCzCrt2IEfBXJ2rRTZsFaFAbN81CT5UWtAeVfu4Lh0PWWUrOjYl0VDoKd9AAuO
-DjLqoa69WNMYk55b1px7XBSJZx538AB2ZFUMjfXbsUIRPo4SGyunjIVhkmdAFS/E
-6QqhBnUPSGplo8heu1OVI/ZqI+io3XaHCI9nk5OPONWW3UNtG5QyvULKOhZFfWtu
-rL9HhEBHLxIsUst9nuGKuttvfK1b/FzREGrlQ7aP8F4pWkZivNXj0UTR21Dtx1T2
-ztmBYUkl4/XaEZCx62QTZpINB8do4g==
-=FDVA
------END PGP SIGNATURE-----
-
---W8yRM079tRwTkEiyq9wRUNrhb9KvfMYIb--
+Reviewed-by: Thomas Huth <thuth@redhat.com>
