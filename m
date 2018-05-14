@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fIFDr-0001mr-Qe
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 11:17:12 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fIFHb-0004R1-9i
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 11:21:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fIFDq-0005FW-T9
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 11:17:11 -0400
-Received: from mail-oi0-x234.google.com ([2607:f8b0:4003:c06::234]:38128)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fIFDq-0005F3-OU
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 11:17:10 -0400
-Received: by mail-oi0-x234.google.com with SMTP id k17-v6so11026374oih.5
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 08:17:10 -0700 (PDT)
+	(envelope-from <mreitz@redhat.com>) id 1fIFHW-0007Bk-Ng
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 11:21:03 -0400
+References: <20180509162637.15575-1-kwolf@redhat.com>
+	<20180509162637.15575-17-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <805fc7ef-c1f0-0d62-9f66-2f0aae925348@redhat.com>
+Date: Mon, 14 May 2018 17:20:50 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180512003217.9105-1-richard.henderson@linaro.org>
-References: <20180512003217.9105-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 May 2018 16:16:49 +0100
-Message-ID: <CAFEAcA8aXJsM6OnyJdNX5r73G4Ui9UN+8Nk9O2L-7pG3q_f_Og@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 00/11] target/arm: Fixups for
- ARM_FEATURE_V8_FP16
+In-Reply-To: <20180509162637.15575-17-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Do2f0wy1sBAqh4JzniL1aNIXQQ8MOk63H"
+Subject: Re: [Qemu-devel] [PATCH 16/42] job: Add Job.aio_context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +24,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-On 12 May 2018 at 01:32, Richard Henderson <richard.henderson@linaro.org> wrote:
-> Changes since v3:
->   * Fixup rebase vs target-arm.next.  One of the middle
->     patches had conflicts resolved incorrectly, so the
->     patch set was non-bisectable.
->
-> Changes since v2:
->   * Rebased vs target-arm.next.
->   * Merged Peter's review.
->   * Split out return fix as a separate patch.
->
-> Changes since v1:
->   * Rebased vs master instead of tgt-arm-sve-9.
->   * Alex did some additional digging through the ARM xhtml
->     and came up with some additional missing instructions.
->   * Everything cc'd to qemu-stable.
->
->
-> r~
->
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Do2f0wy1sBAqh4JzniL1aNIXQQ8MOk63H
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com,
+ qemu-devel@nongnu.org
+Message-ID: <805fc7ef-c1f0-0d62-9f66-2f0aae925348@redhat.com>
+Subject: Re: [PATCH 16/42] job: Add Job.aio_context
+References: <20180509162637.15575-1-kwolf@redhat.com>
+ <20180509162637.15575-17-kwolf@redhat.com>
+In-Reply-To: <20180509162637.15575-17-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Applied all to target-arm.next, thanks.
+On 2018-05-09 18:26, Kevin Wolf wrote:
+> When block jobs need an AioContext, they just take it from their main
+> block node. Generic jobs don't have a main block node, so we need to
+> assign them an AioContext explicitly.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  include/qemu/job.h | 7 ++++++-
+>  blockjob.c         | 5 ++++-
+>  job.c              | 4 +++-
+>  3 files changed, 13 insertions(+), 3 deletions(-)
 
--- PMM
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--Do2f0wy1sBAqh4JzniL1aNIXQQ8MOk63H
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr5qVIACgkQ9AfbAGHV
+z0Av7AgAqQk/H3u3j4gsUfPKiRosusNWliDv0qwMdkH1TAHcJeYzHr0HHdrq3mmp
+61zFdpUtZQGGMpPXHNKN6kaShIfpAKJEm2o1pt2qXE6B9MEm69mT6FD0atSUIb8c
+PVcU/LJDBP0yTPGmSkzYl+1h1fbPReRqhlt9NKOAB21A6xbTqoEwDO+S5lvvrule
+8Vvvui+mnEPbBq+NAEvj/k5A3LAsuhVmChgqlwbnR1BaZ7a+RIu5ZWYgot0SBbjy
+1rmnCUKwcnLPiHLfHIfyQqpo+koYxOXN5GmCkKcstRB3STlYYTgI45oVsgYIJgcu
+GLsnYn9IIgLWSHt8xSkWafBzKcU5Yw==
+=n/hq
+-----END PGP SIGNATURE-----
+
+--Do2f0wy1sBAqh4JzniL1aNIXQQ8MOk63H--
