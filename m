@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fI6Or-0007Ny-Az
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 01:51:59 -0400
+	(envelope-from <bounces@canonical.com>) id 1fI6Rz-0003yO-Ew
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 01:55:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fI461-0007tt-Uh
-	for qemu-devel@nongnu.org; Sun, 13 May 2018 23:24:22 -0400
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:42181)
+	(envelope-from <bounces@canonical.com>) id 1fI4aG-0002NW-Re
+	for qemu-devel@nongnu.org; Sun, 13 May 2018 23:55:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48808)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fI461-0007s8-NQ
-	for qemu-devel@nongnu.org; Sun, 13 May 2018 23:24:21 -0400
-Received: by mail-pf0-x242.google.com with SMTP id p14-v6so5308071pfh.9
-	for <qemu-devel@nongnu.org>; Sun, 13 May 2018 20:24:21 -0700 (PDT)
-From: Zhang Chen <zhangckid@gmail.com>
-Date: Mon, 14 May 2018 11:23:34 +0800
-Message-Id: <1526268228-27951-4-git-send-email-zhangckid@gmail.com>
-In-Reply-To: <1526268228-27951-1-git-send-email-zhangckid@gmail.com>
-References: <1526268228-27951-1-git-send-email-zhangckid@gmail.com>
-Subject: [Qemu-devel] [PATCH V7 03/17] colo-compare: use notifier to notify
- packets comparing result
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fI4aG-0002LZ-Lq
+	for qemu-devel@nongnu.org; Sun, 13 May 2018 23:55:36 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fI4aF-0001fV-K6
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 03:55:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 918A42E8078
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 03:55:35 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 14 May 2018 03:48:46 -0000
+From: eric hoffman <1771042@bugs.launchpad.net>
+Reply-To: Bug 1771042 <1771042@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152625681679.27592.11833589256802380892.malonedeb@wampee.canonical.com>
+Message-Id: <152626972652.25086.10206525781865362476.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1771042] Re: dataplane interrupt handler doesn't
+ support msi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,104 +38,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Zhang Chen <zhangckid@gmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-It's a good idea to use notifier to notify COLO frame of
-inconsistent packets comparing.
+oh right, another note. this only manifests when using kvm.
 
-Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
----
- net/colo-compare.c | 32 +++++++++++++++++++++++++-------
- net/colo-compare.h |  2 ++
- 2 files changed, 27 insertions(+), 7 deletions(-)
+-- =
 
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index 7ff3ae8..05061cd 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -29,6 +29,7 @@
- #include "sysemu/iothread.h"
- #include "net/colo-compare.h"
- #include "migration/colo.h"
-+#include "migration/migration.h"
- 
- #define TYPE_COLO_COMPARE "colo-compare"
- #define COLO_COMPARE(obj) \
-@@ -37,6 +38,9 @@
- static QTAILQ_HEAD(, CompareState) net_compares =
-        QTAILQ_HEAD_INITIALIZER(net_compares);
- 
-+static NotifierList colo_compare_notifiers =
-+    NOTIFIER_LIST_INITIALIZER(colo_compare_notifiers);
-+
- #define COMPARE_READ_LEN_MAX NET_BUFSIZE
- #define MAX_QUEUE_SIZE 1024
- 
-@@ -561,8 +565,24 @@ static int colo_old_packet_check_one(Packet *pkt, int64_t *check_time)
-     }
- }
- 
-+static void colo_compare_inconsistent_notify(void)
-+{
-+    notifier_list_notify(&colo_compare_notifiers,
-+                migrate_get_current());
-+}
-+
-+void colo_compare_register_notifier(Notifier *notify)
-+{
-+    notifier_list_add(&colo_compare_notifiers, notify);
-+}
-+
-+void colo_compare_unregister_notifier(Notifier *notify)
-+{
-+    notifier_remove(notify);
-+}
-+
- static int colo_old_packet_check_one_conn(Connection *conn,
--                                          void *user_data)
-+                                           void *user_data)
- {
-     GList *result = NULL;
-     int64_t check_time = REGULAR_PACKET_CHECK_MS;
-@@ -573,10 +593,7 @@ static int colo_old_packet_check_one_conn(Connection *conn,
- 
-     if (result) {
-         /* Do checkpoint will flush old packet */
--        /*
--         * TODO: Notify colo frame to do checkpoint.
--         * colo_compare_inconsistent_notify();
--         */
-+        colo_compare_inconsistent_notify();
-         return 0;
-     }
- 
-@@ -620,11 +637,12 @@ static void colo_compare_packet(CompareState *s, Connection *conn,
-             /*
-              * If one packet arrive late, the secondary_list or
-              * primary_list will be empty, so we can't compare it
--             * until next comparison.
-+             * until next comparison. If the packets in the list are
-+             * timeout, it will trigger a checkpoint request.
-              */
-             trace_colo_compare_main("packet different");
-             g_queue_push_head(&conn->primary_list, pkt);
--            /* TODO: colo_notify_checkpoint();*/
-+            colo_compare_inconsistent_notify();
-             break;
-         }
-     }
-diff --git a/net/colo-compare.h b/net/colo-compare.h
-index 1b1ce76..22ddd51 100644
---- a/net/colo-compare.h
-+++ b/net/colo-compare.h
-@@ -18,5 +18,7 @@
- #define QEMU_COLO_COMPARE_H
- 
- void colo_notify_compares_event(void *opaque, int event, Error **errp);
-+void colo_compare_register_notifier(Notifier *notify);
-+void colo_compare_unregister_notifier(Notifier *notify);
- 
- #endif /* QEMU_COLO_COMPARE_H */
--- 
-2.7.4
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1771042
+
+Title:
+  dataplane interrupt handler doesn't support msi
+
+Status in QEMU:
+  New
+
+Bug description:
+  hw/block/dataplane/virtio-blk.c commit
+  1010cadf62332017648abee0d7a3dc7f2eef9632
+
+  in the function notify_guest_bh, the function virtio_notify_irqfd is call=
+ed
+  to deliver the interrupt corresponding to the vq
+
+  however, without the dataplane, hw/block/virtio_blk_req_complete calls
+  virtio_notify to deliver the interrupt (immediately). this goes though
+  a slightly more involved path that calls virtio_pci_notify which includes
+  a case to handle msi interrupts.
+
+  so, msi interrupts with block devices aren't serviced when using dataplane
+  batching.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1771042/+subscriptions
