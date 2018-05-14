@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fIEV4-0003YU-BY
+	(envelope-from <renyime@gmail.com>) id 1fIEV8-0003bP-RH
 	for qemu-devel@nongnu.org; Mon, 14 May 2018 10:30:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fIEV1-0000mn-8l
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 10:30:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51546)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fIEV1-0000mG-2d
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 10:30:51 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fIEUz-0000qW-MU
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 14:30:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9F14E2E8F38
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 14:30:49 +0000 (UTC)
+	(envelope-from <renyime@gmail.com>) id 1fIEV7-0000oE-RC
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 10:30:58 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 14 May 2018 14:14:06 -0000
-From: Thomas Huth <1575607@bugs.launchpad.net>
-Reply-To: Bug 1575607 <1575607@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160427111619.24836.70047.malonedeb@wampee.canonical.com>
-Message-Id: <152630724615.27813.6105054996443805643.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1575607] Re:  vm startup failed,
- qemu returned "kvm run failed Bad address"
+References: <1526053004-12268-1-git-send-email-ivanren@tencent.com>
+	<20180511172901.GC5016@localhost.localdomain>
+	<CA+6E1==PkxLdnEGWMe5X0eKSPeGsVk3VQQ+fNs5+b_CDAcPMGg@mail.gmail.com>
+	<20180514062343.GA6665@localhost.localdomain>
+In-Reply-To: <20180514062343.GA6665@localhost.localdomain>
+From: Ivan Ren <renyime@gmail.com>
+Date: Mon, 14 May 2018 22:30:38 +0800
+Message-ID: <CA+6E1=nvsCBO-T2nAq2uUi0AKhNFZ1GkCgB2kedgyoXQMP-5nA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3] qcow2: fix preallocation with metadata
+ on bare block device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,81 +25,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: kwolf@redhat.com
+Cc: mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-Can you still reproduce this issue with the latest version of QEMU and
-the latest version of the Linux kernel?
+> Oh, yes, there is no doubt that the result will be correct. My point is
+> that people aren't usually interested so much in the physical layout of
+> the clusters, but more about the fact that no metadata updates and no
+> COW is necessary when you write to a cluster for the first time (i.e.
+> because preallocation brings some performance improvements).
+>
+> Do you have a use case where the layout is more important? If there
+> are good reasons for either option, maybe we need two different
+> preallocation modes.
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Yes, in my opinion, there are two advantages for preallocated metadata:
+1. No metadata update.
+2. The qcow2 cluster offset keep the same continuity with the guest offset,
+and this is good for performance.
 
--- =
+The second point is good if underlying media is bare block device without
+filesystem, it means the continuous blocks in guest also keep continuity on
+host.
+The second point may not always be true if the qcow2 underlying media is a
+regular file, in this case, the offset in qcow2 metadat is just the file's
+offset but not the underlying block device.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1575607
-
-Title:
-   vm startup failed, qemu returned "kvm run failed Bad address"
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-    create a virtual machine and start by libvirt. vm startup failed, qemu =
-returned "kvm run failed Bad address"
-    the error log is :
-
-  error: kvm run failed Bad address
-
-  EAX=3D7ffc0000 EBX=3D7ffbffd0 ECX=3Dfffffff0 EDX=3D0000002c
-
-  ESI=3D00006f5c EDI=3D7ffbffd0 EBP=3D7ffc0000 ESP=3D00006f34
-
-  EIP=3D000dec7b EFL=3D00010046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
-T=3D0
-
-  ES =3D0010 00000000 ffffffff 00c09300 DPL=3D0 DS   [-WA]
-
-  CS =3D0008 00000000 ffffffff 00c09b00 DPL=3D0 CS32 [-RA]
-
-  SS =3D0010 00000000 ffffffff 00c09300 DPL=3D0 DS   [-WA]
-
-  DS =3D0010 00000000 ffffffff 00c09300 DPL=3D0 DS   [-WA]
-
-  FS =3D0010 00000000 ffffffff 00c09300 DPL=3D0 DS   [-WA]
-
-  GS =3D0010 00000000 ffffffff 00c09300 DPL=3D0 DS   [-WA]
-
-  LDT=3D0000 00000000 0000ffff 00008200 DPL=3D0 LDT
-
-  TR =3D0000 00000000 0000ffff 00008b00 DPL=3D0 TSS32-busy
-
-  GDT=3D     000f6a80 00000037
-
-  IDT=3D     000f6abe 00000000
-
-  CR0=3D60000011 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000
-  DR3=3D0000000000000000
-
-  DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-
-  EFER=3D0000000000000000
-
-  Code=3Dc3 29 d3 21 cb 39 c3 77 27 3b 5e 0c 72 22 85 ff 75 02 89 df <89>
-  5f 08 01 da 89 57 0c 89 47 10 89 5e 10 8b 56 04 89 f8 e8 8c fc ff ff
-  89 d8 eb 06 8b 36
-
-    we add numa in the vm, the numatune info is:
-    <numatune>
-
-      <memory mode=3D'strict' placement=3D'auto'/>
-
-    </numatune>
-
-   the version of qemu is 2.5.0.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1575607/+subscriptions
+Thanks.
