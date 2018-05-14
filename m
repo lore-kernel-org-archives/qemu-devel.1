@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fI9iS-0007m9-Ui
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 05:24:25 -0400
+	(envelope-from <berrange@redhat.com>) id 1fI9rI-0005HQ-Km
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 05:33:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fI9iN-0003re-Uw
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 05:24:24 -0400
-Date: Mon, 14 May 2018 11:24:11 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180514112411.68a399fa.cohuck@redhat.com>
-In-Reply-To: <20180424101859.10239-1-david@redhat.com>
-References: <20180424101859.10239-1-david@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1fI9rE-0001FK-Nm
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 05:33:32 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36624 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fI9rE-0001ES-IS
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 05:33:28 -0400
+Date: Mon, 14 May 2018 10:33:20 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180514093320.GI29495@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180504160026.14017-1-berrange@redhat.com>
+	<20180511224823.GR13350@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x: refactor reset/reipl handling
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180511224823.GR13350@localhost.localdomain>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Requiring Python 2.7+ (was Re: [PATCH 0/3]
+ Document intent for supported build platforms and bump min glib to 2.42)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,48 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Olaf Hering <olaf@aepfle.de>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Tue, 24 Apr 2018 12:18:59 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On Fri, May 11, 2018 at 07:48:23PM -0300, Eduardo Habkost wrote:
+> On Fri, May 04, 2018 at 05:00:23PM +0100, Daniel P. Berrang=C3=A9 wrote=
+:
+> [...]
+> > Based on that doc and https://repology.org/metapackage/glib/versions,
+> > I identified that we could feasibly set min glib to 2.42. Note that
+> > this would be dropping RHEL-6 as a build host (RHEL-6.0 came out in
+> > 2010 so that's reasonable to drop IMHO). It would still cover 2 major
+> > Debian versions and 2 most recent Ubuntu LTS (16.04, 18.04, but *not*
+> > 14.04). This min glib lets us remove almost all our compat code.
+>=20
+> If we're dropping RHEL-6, is there anything else blocking us from
+> bumping the minimum required Python versino to 2.7?
+>=20
+> From the wording on patch 1/3, it looks like we will drop support
+> for SLES-11 too?
 
-> Calling pause_all_vcpus()/resume_all_vcpus() from a VCPU thread might
-> not be the best idea. As pause_all_vcpus() temporarily drops the qemu
-> mutex, two parallel calls to pause_all_vcpus() can be active at a time,
-> resulting in a deadlock. (either by two VCPUs or by the main thread and a
-> VCPU)
-> 
-> Let's handle it via the main loop instead, as suggested by Paolo. If we
-> would have two parallel reset requests by two different VCPUs at the
-> same time, the last one would win.
-> 
-> We use the existing ipl device to handle it. The nice side effect is
-> that we can get rid of reipl_requested.
-> 
-> This change implies that all reset handling now goes via the common
-> path, so "no-reboot" handling is now active for all kinds of reboots.
-> 
-> Let's execute any CPU initialization code on the target CPU using
-> run_on_cpu.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
-> 
-> RFC -> v1:
-> - initital -> initial
-> - get rid of goto
-> - store CPU index instead of CPU. Fallback to any CPU in case not found
-> - handle default case in switch-case
-> 
->  hw/s390x/ipl.c                     | 43 +++++++++++++++++++++++----
->  hw/s390x/ipl.h                     | 16 ++++++++--
->  hw/s390x/s390-virtio-ccw.c         | 51 ++++++++++++++++++++++++++-----
->  include/hw/s390x/s390-virtio-ccw.h |  2 --
->  target/s390x/cpu.h                 | 26 ++++++++++++++++
->  target/s390x/diag.c                | 61 +++-----------------------------------
->  target/s390x/internal.h            |  6 ----
->  target/s390x/kvm.c                 |  2 +-
->  8 files changed, 127 insertions(+), 80 deletions(-)
+Yes, that is correct.
 
-Thanks, applied.
+py27 seems reasonable to me, assuming none of Peter's build machines
+are stuck on 2.6
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
