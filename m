@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58990)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fIGYM-0006tx-Lo
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:42:27 -0400
+	(envelope-from <Babu.Moger@amd.com>) id 1fIGak-00005n-P0
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:44:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fIGYJ-0005jG-Jq
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:42:26 -0400
-Received: from mail-cys01nam02on0061.outbound.protection.outlook.com
-	([104.47.37.61]:63568
-	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
+	(envelope-from <Babu.Moger@amd.com>) id 1fIGag-00075Q-Dm
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:44:54 -0400
+Received: from mail-co1nam03on0609.outbound.protection.outlook.com
+	([2a01:111:f400:fe48::609]:47376
+	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fIGYJ-0005if-CB
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:42:23 -0400
-From: Babu Moger <babu.moger@amd.com>
-Date: Mon, 14 May 2018 11:41:55 -0500
-Message-Id: <20180514164156.27034-7-babu.moger@amd.com>
-In-Reply-To: <20180514164156.27034-1-babu.moger@amd.com>
-References: <20180514164156.27034-1-babu.moger@amd.com>
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fIGag-00072U-31
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:44:50 -0400
+From: "Moger, Babu" <Babu.Moger@amd.com>
+Date: Mon, 14 May 2018 16:44:44 +0000
+Message-ID: <SN1PR12MB247774F4CB4D4A8AD05D3A1F959C0@SN1PR12MB2477.namprd12.prod.outlook.com>
+References: <20180510204148.11687-1-babu.moger@amd.com>
+	<20180510204148.11687-4-babu.moger@amd.com>
+	<20180511192145.GV25013@localhost.localdomain>
+	<BL0PR12MB24682473432EF64021381FAB959F0@BL0PR12MB2468.namprd12.prod.outlook.com>
+	<20180511204759.GP13350@localhost.localdomain>
+In-Reply-To: <20180511204759.GP13350@localhost.localdomain>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v9 6/7] i386: Enable TOPOEXT feature on AMD
- EPYC CPU
+Subject: Re: [Qemu-devel] [PATCH v8 3/8] i386: Add new property to control
+ cache info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,72 +34,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, geoff@hostfission.com, kash@tripleback.net, babu.moger@amd.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "geoff@hostfission.com" <geoff@hostfission.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>, "kash@tripleback.net" <kash@tripleback.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
 
-Enable TOPOEXT feature on EPYC CPU. This is required to support
-hyperthreading on VM guests. Also extend xlevel to 0x8000001E.
 
-Disable TOPOEXT feature for legacy (2.12 or older) machine types.
 
-Signed-off-by: Babu Moger <babu.moger@amd.com>
-Tested-by: Geoffrey McRae <geoff@hostfission.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
----
- include/hw/i386/pc.h |  4 ++++
- target/i386/cpu.c    | 11 +++++++++--
- 2 files changed, 13 insertions(+), 2 deletions(-)
+> -----Original Message-----
+> From: Eduardo Habkost [mailto:ehabkost@redhat.com]
+> Sent: Friday, May 11, 2018 3:48 PM
+> To: Moger, Babu <Babu.Moger@amd.com>
+> Cc: geoff@hostfission.com; kvm@vger.kernel.org; mst@redhat.com;
+> kash@tripleback.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
+> pbonzini@redhat.com; rth@twiddle.net
+> Subject: Re: [Qemu-devel] [PATCH v8 3/8] i386: Add new property to contro=
+l
+> cache info
+>=20
+> On Fri, May 11, 2018 at 08:21:50PM +0000, Moger, Babu wrote:
+> >
+> > > -----Original Message-----
+> > > From: Eduardo Habkost [mailto:ehabkost@redhat.com]
+> > > Sent: Friday, May 11, 2018 2:22 PM
+> > > To: Moger, Babu <Babu.Moger@amd.com>
+> > > Cc: mst@redhat.com; marcel.apfelbaum@gmail.com;
+> pbonzini@redhat.com;
+> > > rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
+> > > kvm@vger.kernel.org; geoff@hostfission.com; kash@tripleback.net
+> > > Subject: Re: [PATCH v8 3/8] i386: Add new property to control cache i=
+nfo
+> > >
+> > > On Thu, May 10, 2018 at 03:41:43PM -0500, Babu Moger wrote:
+> > > > The property legacy-cache will be used to control the cache
+> information.
+> > > > If user passes "-cpu legacy-cache" then older information will
+> > > > be displayed even if the hardware supports new information.
+> Otherwise
+> > > > use the statically loaded cache definitions if available.
+> > > >
+> > > > Signed-off-by: Babu Moger <babu.moger@amd.com>
+> > > > Tested-by: Geoffrey McRae <geoff@hostfission.com>
+> > > > ---
+> > > >  include/hw/i386/pc.h |  8 ++++
+> > > >  target/i386/cpu.c    | 97 ++++++++++++++++++++++++++++++++------
+> -----
+> > > -
+> > > >  target/i386/cpu.h    |  5 +++
+> > > >  3 files changed, 84 insertions(+), 26 deletions(-)
+> > > >
+> > > > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> > > > index 2e834e6ded..df15deefca 100644
+> > > > --- a/include/hw/i386/pc.h
+> > > > +++ b/include/hw/i386/pc.h
+> > > > @@ -304,6 +304,14 @@ int e820_add_entry(uint64_t, uint64_t,
+> uint32_t);
+> > > >  int e820_get_num_entries(void);
+> > > >  bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+> > > >
+> > > > +#define PC_COMPAT_2_12 \
+> > > > +    HW_COMPAT_2_12 \
+> > > > +    {\
+> > > > +        .driver   =3D TYPE_X86_CPU,\
+> > > > +        .property =3D "legacy-cache",\
+> > > > +        .value    =3D "on",\
+> > > > +    },
+> > >
+> > > This isn't enough if the pc-*-2.12 machine-type isn't using the
+> > > macro.
+> > >
+> > > Before we do this, we need a commit similar to commit
+> > > df47ce8af4a5, but adding pc-*-2.13 machine-types.
+> >
+> > Ok. Sure. I think I got it. Will add pc-*-2.13 machine-types in v9 seri=
+es.
+>=20
+> Thanks.  If you submit v9, please use the x86-next tree as base
+> so you don't need to resubmit the patches that I have already
+> queued.  See MAINTAINERS for the git URL.
 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index df15deefca..c01adc92ba 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -310,6 +310,10 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-         .driver   = TYPE_X86_CPU,\
-         .property = "legacy-cache",\
-         .value    = "on",\
-+    },{\
-+        .driver   = "EPYC-" TYPE_X86_CPU,\
-+        .property = "topoext",\
-+        .value    = "off",\
-     },
- 
- #define PC_COMPAT_2_11 \
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 18a7872b7d..de2749ae81 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2424,7 +2424,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
-         .features[FEAT_8000_0001_ECX] =
-             CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
-             CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
--            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
-+            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM |
-+            CPUID_EXT3_TOPOEXT,
-         .features[FEAT_7_0_EBX] =
-             CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_AVX2 |
-             CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_RDSEED |
-@@ -2469,7 +2470,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
-         .features[FEAT_8000_0001_ECX] =
-             CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
-             CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
--            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
-+            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM |
-+            CPUID_EXT3_TOPOEXT,
-         .features[FEAT_8000_0008_EBX] =
-             CPUID_8000_0008_EBX_IBPB,
-         .features[FEAT_7_0_EBX] =
-@@ -4540,6 +4542,11 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
-             x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A);
-         }
- 
-+        /* TOPOEXT feature requires 0x8000001E */
-+        if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT) {
-+            x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001E);
-+        }
-+
-         /* SEV requires CPUID[0x8000001F] */
-         if (sev_enabled()) {
-             x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001F);
--- 
-2.17.0
+Submitted v9 version on top of you x86-next tree.  Thanks
+
+>=20
+> --
+> Eduardo
