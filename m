@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fIHfR-00067x-LL
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 13:53:50 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fIHi9-00075g-C8
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 13:56:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fIHfQ-0006l2-Qh
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 13:53:49 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:36332)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fIHfQ-0006k3-LJ
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 13:53:48 -0400
-Received: by mail-ot0-x244.google.com with SMTP id m11-v6so15311098otf.3
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 10:53:48 -0700 (PDT)
+	(envelope-from <mreitz@redhat.com>) id 1fIHi8-0000pb-MA
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 13:56:37 -0400
+References: <20180509162637.15575-1-kwolf@redhat.com>
+	<20180509162637.15575-24-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <5b487570-c0e0-43fe-bf63-935d24318622@redhat.com>
+Date: Mon, 14 May 2018 19:56:30 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180512092824.13848-1-stefanha@redhat.com>
-References: <20180512092824.13848-1-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 May 2018 18:53:27 +0100
-Message-ID: <CAFEAcA83StQKpnuDyF2xCh+OrTZ7xdtrsQB+R==4x3y7qq-40Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/8] Block patches
+In-Reply-To: <20180509162637.15575-24-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="JuTtCeqOs9gumIAW6RWiNlVnCSFD2PFhq"
+Subject: Re: [Qemu-devel] [PATCH 23/42] blockjob: Split
+ block_job_event_pending()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +25,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-On 12 May 2018 at 10:28, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> The following changes since commit e5cd695266c5709308aa95b1baae499e4b5d4544:
->
->   Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' into staging (2018-05-08 17:05:58 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/stefanha/qemu.git tags/block-pull-request
->
-> for you to fetch changes up to 31be8a2a97ecba7d31a82932286489cac318e9e9:
->
->   block/file-posix: add x-check-page-cache=on|off option (2018-05-11 16:43:05 +0100)
->
-> ----------------------------------------------------------------
-> Block pull request
->
->  * Support -drive cache.direct=off live migration for POSIX files
->
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--JuTtCeqOs9gumIAW6RWiNlVnCSFD2PFhq
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com,
+ qemu-devel@nongnu.org
+Message-ID: <5b487570-c0e0-43fe-bf63-935d24318622@redhat.com>
+Subject: Re: [PATCH 23/42] blockjob: Split block_job_event_pending()
+References: <20180509162637.15575-1-kwolf@redhat.com>
+ <20180509162637.15575-24-kwolf@redhat.com>
+In-Reply-To: <20180509162637.15575-24-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Applied, thanks.
+On 2018-05-09 18:26, Kevin Wolf wrote:
+> block_job_event_pending() doesn't only send a QMP event, but it also
+> transitions to the PENDING state. Split the function so that we get one=
 
--- PMM
+> part only sending the event (like other block_job_event_* functions) an=
+d
+> another part than does the state transition.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  blockjob.c | 27 ++++++++++++++++++---------
+>  1 file changed, 18 insertions(+), 9 deletions(-)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--JuTtCeqOs9gumIAW6RWiNlVnCSFD2PFhq
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr5zc4ACgkQ9AfbAGHV
+z0A1Uwf/aEUPTwLt5BCQMuKzzOZLeZfmq2mdYFQhOH9LIBjBckMI1bU3GXyZBuEs
+e20hApHsVRNncN6ty3l8hC6U3hwAkn0ElOffVezYYrbWb159hvGOqq61KigoRvAz
+2v4ZLvUZC6F9C1VddnLKp44Xe/FrhqSGwnWl6FgCPJJPdau3NAPzAGTyGMr23QLP
+sRxaFvjLaKxMuUYROrHlB2qZCoomL/Wcw5RRRL18QwXLwR+B4BGEtzErJ8VwwC8y
+MFRCzcWgvTMQ/CbljNhA2bjoscT6qLfqexVHFF+99aLKw7As2lzYF2RDvHKE/CB5
+rgWSVgPHtS0RkcOHO33VmRlhQ1xQVA==
+=0rxe
+-----END PGP SIGNATURE-----
+
+--JuTtCeqOs9gumIAW6RWiNlVnCSFD2PFhq--
