@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fICSN-0000UV-Bh
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 08:20:06 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fICfv-0005Hd-3O
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 08:34:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fICSK-0002vC-8Q
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 08:19:59 -0400
-Date: Mon, 14 May 2018 14:19:51 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180514141951.2b349975.cohuck@redhat.com>
-In-Reply-To: <20180510000712.6472-3-pasic@linux.ibm.com>
-References: <20180510000712.6472-1-pasic@linux.ibm.com>
-	<20180510000712.6472-3-pasic@linux.ibm.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fICfr-00012e-Ub
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 08:33:59 -0400
+References: <20180512012537.22478-1-jsnow@redhat.com>
+	<20180512012537.22478-3-jsnow@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <8dab36a9-9719-1df7-19fc-cc4063ead191@virtuozzo.com>
+Date: Mon, 14 May 2018 15:33:48 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20180512012537.22478-3-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] vfio-ccw: remove orb.c64 (64 bit data
- addresses) check
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [RFC PATCH 02/12] qcow2/dirty-bitmap: cache loaded
+ bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,50 +25,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Dong Jia Shi <bjsdjshi@linux.ibm.com>, "Jason J. Herne" <jjherne@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On Thu, 10 May 2018 02:07:12 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
-
-> The vfio-ccw module does the check too, and there is actually no
-> technical obstacle for supporting fmt 1 idaws. Let us be ready for the
-> beautiful day when fmt 1 idaws become supported by the vfio-ccw kernel
-> module. QEMU does not have to do a thing for that, except not insisting
-> on this check.
-
-Yes, it makes sense to defer failing this to the kernel module.
-
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> Acked-by: Jason J. Herne <jjherne@linux.ibm.com>
-> Tested-by: Jason J. Herne <jjherne@linux.ibm.com>
+12.05.2018 04:25, John Snow wrote:
+> For bitmaps that we succeeded in loading, we can cache a reference
+> to that object. This will let us iterate over the more convenient
+> form of in-memory bitmaps for qemu-img bitmap manipulation tools.
+>
+> Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  hw/s390x/css.c | 11 -----------
->  1 file changed, 11 deletions(-)
-> 
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index 32f1b2820d..1554b4c2f5 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -1191,17 +1191,6 @@ static IOInstEnding sch_handle_start_func_passthrough(SubchDev *sch)
->          assert(orb != NULL);
->          p->intparm = orb->intparm;
->      }
-> -
-> -    /*
-> -     * Only support prefetch enable mode.
-> -     * Only support 64bit addressing idal.
-> -     */
-> -    if (!(orb->ctrl0 & ORB_CTRL0_MASK_C64)) {
-> -        warn_report("vfio-ccw requires PFCH and C64 flags set");
+>   block/qcow2-bitmap.c | 1 +
+>   1 file changed, 1 insertion(+)
+>
+> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+> index fb0a4f3ec4..d89758f235 100644
+> --- a/block/qcow2-bitmap.c
+> +++ b/block/qcow2-bitmap.c
+> @@ -986,6 +986,7 @@ bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+>               if (bitmap == NULL) {
+>                   goto fail;
+>               }
+> +            bm->dirty_bitmap = bitmap;
+>   
+>               if (!(bm->flags & BME_FLAG_AUTO)) {
+>                   bdrv_disable_dirty_bitmap(bitmap);
 
-Ah, here you remove the message I complained about in the last patch :)
+Looks correct, I just suppose to reuse this information somehow in 
+qcow2_store_persistent_dirty_bitmaps, at least for an assert.
 
-> -        sch_gen_unit_exception(sch);
-> -        css_inject_io_interrupt(sch);
-> -        return IOINST_CC_EXPECTED;
-> -    }
->      return s390_ccw_cmd_request(sch);
->  }
->  
+-- 
+Best regards,
+Vladimir
