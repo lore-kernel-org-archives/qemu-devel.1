@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fI6fX-0006dK-0R
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 02:09:13 -0400
+	(envelope-from <bounces@canonical.com>) id 1fI6fn-0006aO-FQ
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 02:09:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fI46d-0000O8-Sk
-	for qemu-devel@nongnu.org; Sun, 13 May 2018 23:25:03 -0400
-Received: from mail-pg0-x234.google.com ([2607:f8b0:400e:c05::234]:38339)
+	(envelope-from <bounces@canonical.com>) id 1fI1ED-00077S-LN
+	for qemu-devel@nongnu.org; Sun, 13 May 2018 20:20:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57474)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fI46d-0000N6-Mq
-	for qemu-devel@nongnu.org; Sun, 13 May 2018 23:24:59 -0400
-Received: by mail-pg0-x234.google.com with SMTP id n9-v6so4846470pgq.5
-	for <qemu-devel@nongnu.org>; Sun, 13 May 2018 20:24:59 -0700 (PDT)
-From: Zhang Chen <zhangckid@gmail.com>
-Date: Mon, 14 May 2018 11:23:41 +0800
-Message-Id: <1526268228-27951-11-git-send-email-zhangckid@gmail.com>
-In-Reply-To: <1526268228-27951-1-git-send-email-zhangckid@gmail.com>
-References: <1526268228-27951-1-git-send-email-zhangckid@gmail.com>
-Subject: [Qemu-devel] [PATCH V7 10/17] qmp event: Add COLO_EXIT event to
- notify users while exited COLO
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fI1ED-000776-FA
+	for qemu-devel@nongnu.org; Sun, 13 May 2018 20:20:37 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fI1EC-0003d6-9P
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 00:20:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4235C2E8F35
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 00:20:36 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 14 May 2018 00:13:36 -0000
+From: eric hoffman <1771042@bugs.launchpad.net>
+Reply-To: Bug 1771042 <1771042@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <152625681679.27592.11833589256802380892.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1771042] [NEW] dataplane interrupt handler
+ doesn't support msi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,117 +37,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Zhang Chen <zhangckid@gmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-From: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Public bug reported:
 
-If some errors happen during VM's COLO FT stage, it's important to
-notify the users of this event. Together with 'x-colo-lost-heartbeat',
-Users can intervene in COLO's failover work immediately.
-If users don't want to get involved in COLO's failover verdict,
-it is still necessary to notify users that we exited COLO mode.
+hw/block/dataplane/virtio-blk.c commit
+1010cadf62332017648abee0d7a3dc7f2eef9632
 
-Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- migration/colo.c    | 20 ++++++++++++++++++++
- qapi/migration.json | 37 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 57 insertions(+)
+in the function notify_guest_bh, the function virtio_notify_irqfd is called
+to deliver the interrupt corresponding to the vq
 
-diff --git a/migration/colo.c b/migration/colo.c
-index c083d36..8ca6381 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -28,6 +28,7 @@
- #include "net/colo-compare.h"
- #include "net/colo.h"
- #include "block/block.h"
-+#include "qapi/qapi-events-migration.h"
- 
- static bool vmstate_loading;
- static Notifier packets_compare_notifier;
-@@ -514,6 +515,18 @@ out:
-         qemu_fclose(fb);
-     }
- 
-+    /*
-+     * There are only two reasons we can go here, some error happened.
-+     * Or the user triggered failover.
-+     */
-+    if (failover_get_state() == FAILOVER_STATUS_NONE) {
-+        qapi_event_send_colo_exit(COLO_MODE_PRIMARY,
-+                                  COLO_EXIT_REASON_ERROR, NULL);
-+    } else {
-+        qapi_event_send_colo_exit(COLO_MODE_PRIMARY,
-+                                  COLO_EXIT_REASON_REQUEST, NULL);
-+    }
-+
-     /* Hope this not to be too long to wait here */
-     qemu_sem_wait(&s->colo_exit_sem);
-     qemu_sem_destroy(&s->colo_exit_sem);
-@@ -744,6 +757,13 @@ out:
-     if (local_err) {
-         error_report_err(local_err);
-     }
-+    if (failover_get_state() == FAILOVER_STATUS_NONE) {
-+        qapi_event_send_colo_exit(COLO_MODE_SECONDARY,
-+                                  COLO_EXIT_REASON_ERROR, NULL);
-+    } else {
-+        qapi_event_send_colo_exit(COLO_MODE_SECONDARY,
-+                                  COLO_EXIT_REASON_REQUEST, NULL);
-+    }
- 
-     if (fb) {
-         qemu_fclose(fb);
-diff --git a/qapi/migration.json b/qapi/migration.json
-index f3974c6..55dae48 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -875,6 +875,43 @@
-   'data': [ 'none', 'require', 'active', 'completed', 'relaunch' ] }
- 
- ##
-+# @COLO_EXIT:
-+#
-+# Emitted when VM finishes COLO mode due to some errors happening or
-+# at the request of users.
-+#
-+# @mode: report COLO mode when COLO exited.
-+#
-+# @reason: describes the reason for the COLO exit.
-+#
-+# Since: 2.13
-+#
-+# Example:
-+#
-+# <- { "timestamp": {"seconds": 2032141960, "microseconds": 417172},
-+#      "event": "COLO_EXIT", "data": {"mode": "primary", "reason": "request" } }
-+#
-+##
-+{ 'event': 'COLO_EXIT',
-+  'data': {'mode': 'COLOMode', 'reason': 'COLOExitReason' } }
-+
-+##
-+# @COLOExitReason:
-+#
-+# The reason for a COLO exit
-+#
-+# @none: no failover has ever happened.
-+#
-+# @request: COLO exit is due to an external request
-+#
-+# @error: COLO exit is due to an internal error
-+#
-+# Since: 2.13
-+##
-+{ 'enum': 'COLOExitReason',
-+  'data': [ 'none', 'request', 'error' ] }
-+
-+##
- # @x-colo-lost-heartbeat:
- #
- # Tell qemu that heartbeat is lost, request it to do takeover procedures.
--- 
-2.7.4
+however, without the dataplane, hw/block/virtio_blk_req_complete calls
+virtio_notify to deliver the interrupt (immediately). this goes though
+a slightly more involved path that calls virtio_pci_notify which includes
+a case to handle msi interrupts.
+
+so, msi interrupts with block devices aren't serviced when using dataplane
+batching.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1771042
+
+Title:
+  dataplane interrupt handler doesn't support msi
+
+Status in QEMU:
+  New
+
+Bug description:
+  hw/block/dataplane/virtio-blk.c commit
+  1010cadf62332017648abee0d7a3dc7f2eef9632
+
+  in the function notify_guest_bh, the function virtio_notify_irqfd is call=
+ed
+  to deliver the interrupt corresponding to the vq
+
+  however, without the dataplane, hw/block/virtio_blk_req_complete calls
+  virtio_notify to deliver the interrupt (immediately). this goes though
+  a slightly more involved path that calls virtio_pci_notify which includes
+  a case to handle msi interrupts.
+
+  so, msi interrupts with block devices aren't serviced when using dataplane
+  batching.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1771042/+subscriptions
