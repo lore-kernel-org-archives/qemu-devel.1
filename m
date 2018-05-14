@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fIAeJ-0004Pl-6I
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:24:12 -0400
+	(envelope-from <prvs=665482757=ross.lagerwall@citrix.com>)
+	id 1fIAhi-0000cd-Im
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:27:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fIAeG-0007tx-OK
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:24:09 -0400
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:44504)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fIAeG-0007td-Is
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:24:08 -0400
-Received: by mail-ot0-x241.google.com with SMTP id g7-v6so13626080otj.11
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 03:24:08 -0700 (PDT)
+	(envelope-from <prvs=665482757=ross.lagerwall@citrix.com>)
+	id 1fIAhe-0001iY-Iv
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:27:42 -0400
+Received: from smtp03.citrix.com ([162.221.156.55]:33714)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71)
+	(envelope-from <prvs=665482757=ross.lagerwall@citrix.com>)
+	id 1fIAhe-0001hj-AQ
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:27:38 -0400
+From: Ross Lagerwall <ross.lagerwall@citrix.com>
+Date: Mon, 14 May 2018 10:57:46 +0100
+Message-ID: <20180514095746.5058-1-ross.lagerwall@citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <20180512004311.9299-6-richard.henderson@linaro.org>
-References: <20180512004311.9299-1-richard.henderson@linaro.org>
-	<20180512004311.9299-6-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 May 2018 11:23:47 +0100
-Message-ID: <CAFEAcA8EYY7gkLPntSUYBK3Q=_34cesKrZe-YS4d_evg=4RfXw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 05/27] fpu/softfloat: Move
- softfloat-specialize.h below FloatParts definition
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] xen_pt: Present the size of 64 bit BARs
+ correctly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,79 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Ross Lagerwall <ross.lagerwall@citrix.com>
 
-On 12 May 2018 at 01:42, Richard Henderson <richard.henderson@linaro.org> w=
-rote:
-> We want to be able to specialize on the canonical representation.
->
-> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  fpu/softfloat.c | 20 ++++++++++----------
->  1 file changed, 10 insertions(+), 10 deletions(-)
->
-> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-> index bc0f52fa54..353893aaea 100644
-> --- a/fpu/softfloat.c
-> +++ b/fpu/softfloat.c
-> @@ -95,16 +95,6 @@ this code that are retained.
->  *-----------------------------------------------------------------------=
------*/
->  #include "fpu/softfloat-macros.h"
->
-> -/*----------------------------------------------------------------------=
-------
-> -| Functions and definitions to determine:  (1) whether tininess for unde=
-rflow
-> -| is detected before or after rounding by default, (2) what (if anything=
-)
-> -| happens when exceptions are raised, (3) how signaling NaNs are disting=
-uished
-> -| from quiet NaNs, (4) the default generated quiet NaNs, and (5) how NaN=
-s
-> -| are propagated from function inputs to output.  These details are targ=
-et-
-> -| specific.
-> -*-----------------------------------------------------------------------=
------*/
-> -#include "softfloat-specialize.h"
-> -
->  /*----------------------------------------------------------------------=
-------
->  | Returns the fraction bits of the half-precision floating-point value `=
-a'.
->  *-----------------------------------------------------------------------=
------*/
-> @@ -247,6 +237,16 @@ typedef struct {
->      uint64_t roundeven_mask;
->  } FloatFmt;
->
-> +/*----------------------------------------------------------------------=
-------
-> +| Functions and definitions to determine:  (1) whether tininess for unde=
-rflow
-> +| is detected before or after rounding by default, (2) what (if anything=
-)
-> +| happens when exceptions are raised, (3) how signaling NaNs are disting=
-uished
-> +| from quiet NaNs, (4) the default generated quiet NaNs, and (5) how NaN=
-s
-> +| are propagated from function inputs to output.  These details are targ=
-et-
-> +| specific.
-> +*-----------------------------------------------------------------------=
------*/
-> +#include "softfloat-specialize.h"
-> +
->  /* Expand fields based on the size of exponent and fraction */
->  #define FLOAT_PARAMS(E, F)                                           \
->      .exp_size       =3D E,                                             \
-> --
-> 2.17.0
->
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+The full size of the BAR is stored in the lower PCIIORegion.size. The
+upper PCIIORegion.size is 0.  Calculate the size of the upper half
+correctly from the lower half otherwise the size read by the guest will
+be incorrect.
 
-thanks
--- PMM
+Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
+---
+ hw/xen/xen_pt_config_init.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/hw/xen/xen_pt_config_init.c b/hw/xen/xen_pt_config_init.c
+index a3ce33e..aee31c6 100644
+--- a/hw/xen/xen_pt_config_init.c
++++ b/hw/xen/xen_pt_config_init.c
+@@ -504,6 +504,8 @@ static int xen_pt_bar_reg_write(XenPCIPassthroughState *s, XenPTReg *cfg_entry,
+         bar_ro_mask = XEN_PT_BAR_IO_RO_MASK | (r_size - 1);
+         break;
+     case XEN_PT_BAR_FLAG_UPPER:
++        assert(index > 0);
++        r_size = d->io_regions[index - 1].size >> 32;
+         bar_emu_mask = XEN_PT_BAR_ALLF;
+         bar_ro_mask = r_size ? r_size - 1 : 0;
+         break;
+-- 
+2.9.5
