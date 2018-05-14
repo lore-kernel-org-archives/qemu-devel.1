@@ -1,23 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fICkt-0001i2-Uu
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 08:39:12 -0400
+	(envelope-from <pasic@linux.ibm.com>) id 1fICmF-00068j-Dc
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 08:40:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fICkq-00039k-R1
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 08:39:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49812 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fICkq-00039X-MQ
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 08:39:04 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 14 May 2018 14:38:55 +0200
-Message-Id: <20180514123855.30188-1-marcandre.lureau@redhat.com>
+	(envelope-from <pasic@linux.ibm.com>) id 1fICmE-0003za-8J
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 08:40:31 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39130)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fICmD-0003yz-Vg
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 08:40:30 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w4ECdro0142172
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 08:40:28 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2hy775gw7r-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 08:40:21 -0400
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Mon, 14 May 2018 13:40:18 +0100
+References: <20180510000712.6472-1-pasic@linux.ibm.com>
+	<20180510000712.6472-2-pasic@linux.ibm.com>
+	<20180514141808.78efe5c0.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.ibm.com>
+Date: Mon, 14 May 2018 14:40:13 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3] qemu-ga: make get-fsinfo work over pci
- bridges
+In-Reply-To: <20180514141808.78efe5c0.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <ea3c977e-de5c-ed68-fc8d-448efca1d463@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] vfio-ccw: add force unlimited prefetch
+ property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,88 +43,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.ibm.com>, "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Pierre Morel <pmorel@linux.ibm.com>
 
-Iterate over the PCI bridges to lookup the PCI device associated with
-the block device.
 
-This allows to lookup the driver under the following syspath:
-/sys/devices/pci0000:00/0000:00:02.2/0000:03:00.0/virtio2/block/vda/vda3
 
-It also works with an "old-style" Q35 libvirt hierarchy: root complex
--> DMI-PCI bridge -> PCI-PCI bridge -> virtio controller, ex:
-/sys/devices/pci0000:00/0000:00:03.0/0000:01:01.0/0000:02:01.0/virtio1/bl=
-ock/vda/vda3
+On 05/14/2018 02:18 PM, Cornelia Huck wrote:
+> On Thu, 10 May 2018 02:07:11 +0200
+> Halil Pasic <pasic@linux.ibm.com> wrote:
+> 
+>> There is at least one control program (guest) that although it does not
+> 
+> I'd drop 'control program' here as well, as it probably confuses more
+> than helps.
+> 
 
-The setup can be reproduced with the following qemu command line
-(Thanks Marcel for help):
+Will do (everywhere).
 
-qemu-system-x86_64 -M q35 \
-  -device i82801b11-bridge,id=3Ddmi2pci_bridge,bus=3Dpcie.0
-  -device pci-bridge,id=3Dpci_bridge,bus=3Ddmi2pci_bridge,addr=3D0x1,chas=
-sis_nr=3D1
-  -device virtio-blk-pci,scsi=3Doff,drive=3Ddrive-virtio-disk0,id=3Dvirti=
-o-disk0,bootindex=3D1,bus=3Dpci_bridge,addr=3D0x1
+>> rely on the guarantees provided by ORB 1 word 9 bit (aka unlimited
+>> prefetch, aka P bit) not being set, fails to tell this to the machine.
+>>
+>> Usually this ain't a big deal, as the story is usually about performance
+>> optimizations only. But vfio-ccw can not provide the guarantees required
+>> if the bit is not set.
+> 
+> Isn't that also about channel program rewriting? Or am I mixing things
+> up?
+> 
 
-For consistency with other syspath-related debug messages, replace a
-\"%s\" in the message with '%s'.
+I don't understand the question. Can you rephrase it (maybe with more
+details)?
 
-Fixes:
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1567041
+>>
+>> Since it is impossible to implement support for P bit not set (at
+>> impossible least without transitioning to lower level protocols) in
+>> vfio-ccw let's provide a manual override.
+> 
+> Hm... so the basic idea seems to be "we don't support !PFCH, but we
+> know that the guest will not rely on the guarantees, so we provide the
+> host admin with a way to override the setting"?
+> 
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
----
+That is the idea, although I'm not sure what 'the setting' is.
 
-v3:
- - replace \"%s\" in the debug message with '%s'
- - simplify the code by getting rid of an "else if"
+>>
+>> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+>> Suggested-by: Dong Jia Shi <bjsdjshi@linux.ibm.com>
+>> Acked-by: Jason J. Herne <jjherne@linux.ibm.com>
+>> Tested-by: Jason J. Herne <jjherne@linux.ibm.com>
+>> ---
+>>   hw/s390x/css.c |  3 +--
+>>   hw/vfio/ccw.c  | 13 +++++++++++++
+>>   2 files changed, 14 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+>> index 301bf1772f..32f1b2820d 100644
+>> --- a/hw/s390x/css.c
+>> +++ b/hw/s390x/css.c
+>> @@ -1196,8 +1196,7 @@ static IOInstEnding sch_handle_start_func_passthrough(SubchDev *sch)
+>>        * Only support prefetch enable mode.
+>>        * Only support 64bit addressing idal.
+>>        */
+>> -    if (!(orb->ctrl0 & ORB_CTRL0_MASK_PFCH) ||
+>> -        !(orb->ctrl0 & ORB_CTRL0_MASK_C64)) {
+>> +    if (!(orb->ctrl0 & ORB_CTRL0_MASK_C64)) {
+>>           warn_report("vfio-ccw requires PFCH and C64 flags set");
+> 
+> Adapt this warning?
+> 
+>>           sch_gen_unit_exception(sch);
+>>           css_inject_io_interrupt(sch);
+>> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+>> index e67392c5f9..32cf606a71 100644
+>> --- a/hw/vfio/ccw.c
+>> +++ b/hw/vfio/ccw.c
+>> @@ -32,6 +32,8 @@ typedef struct VFIOCCWDevice {
+>>       uint64_t io_region_offset;
+>>       struct ccw_io_region *io_region;
+>>       EventNotifier io_notifier;
+>> +    /* force unlimited prefetch */
+>> +    bool f_upfch;
+> 
+> force_unlimited_prefetch? You only use it that often :)
+> 
 
-qga/commands-posix.c | 23 +++++++++++++++++++----
- 1 file changed, 19 insertions(+), 4 deletions(-)
+I would have expected complaints for the property name in the
+first place. I think we should first find a good name for the
+property and then consider the rest.
 
-diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index 0dc219dbcf..624b0dc0c3 100644
---- a/qga/commands-posix.c
-+++ b/qga/commands-posix.c
-@@ -875,13 +875,28 @@ static void build_guest_fsinfo_for_real_device(char=
- const *syspath,
-     p =3D strstr(syspath, "/devices/pci");
-     if (!p || sscanf(p + 12, "%*x:%*x/%x:%x:%x.%x%n",
-                      pci, pci + 1, pci + 2, pci + 3, &pcilen) < 4) {
--        g_debug("only pci device is supported: sysfs path \"%s\"", syspa=
-th);
-+        g_debug("only pci device is supported: sysfs path '%s'", syspath=
-);
-         return;
-     }
-=20
--    driver =3D get_pci_driver(syspath, (p + 12 + pcilen) - syspath, errp=
-);
--    if (!driver) {
--        goto cleanup;
-+    p +=3D 12 + pcilen;
-+    while (true) {
-+        driver =3D get_pci_driver(syspath, p - syspath, errp);
-+        if (driver && (g_str_equal(driver, "ata_piix") ||
-+                       g_str_equal(driver, "sym53c8xx") ||
-+                       g_str_equal(driver, "virtio-pci") ||
-+                       g_str_equal(driver, "ahci"))) {
-+            break;
-+        }
-+
-+        if (sscanf(p, "/%x:%x:%x.%x%n",
-+                          pci, pci + 1, pci + 2, pci + 3, &pcilen) =3D=3D=
- 4) {
-+            p +=3D pcilen;
-+            continue;
-+        }
-+
-+        g_debug("unsupported driver or sysfs path '%s'", syspath);
-+        return;
-     }
-=20
-     p =3D strstr(syspath, "/target");
---=20
-2.17.0.253.g3dd125b46d
+>>   } VFIOCCWDevice;
+>>   
+>>   static void vfio_ccw_compute_needs_reset(VFIODevice *vdev)
+>> @@ -52,8 +54,18 @@ static IOInstEnding vfio_ccw_handle_request(SubchDev *sch)
+>>       S390CCWDevice *cdev = sch->driver_data;
+>>       VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
+>>       struct ccw_io_region *region = vcdev->io_region;
+>> +    bool upfch = sch->orb.ctrl0 & ORB_CTRL0_MASK_PFCH;
+> 
+> Frankly, I'd drop that variable...
+> 
+>>       int ret;
+>>   
+>> +    if (!upfch && !vcdev->f_upfch) {
+>> +        warn_report("vfio-ccw requires PFCH flag set");
+>> +        sch_gen_unit_exception(sch);
+>> +        css_inject_io_interrupt(sch);
+>> +        return IOINST_CC_EXPECTED;
+>> +    } else if (!upfch) {
+>> +        sch->orb.ctrl0 |= ORB_CTRL0_MASK_PFCH;
+>> +    }
+> 
+> and do
+> 
+> if (!(sch->orb.ctrl0 & ORB_CTR0_MASK_PFCH)) {
+>    if (!vcdev->f_upfch) {
+>      ...error...
+>    } else {
+>      ...set bit...
+>    }
+> }
+> 
+> Avoids discussions around variable naming, as well :)
+> 
+
+Seems like more indentation and more lies of code to me, but
+no strong feelings. It may be easier to read.
+
+>> +
+>>       QEMU_BUILD_BUG_ON(sizeof(region->orb_area) != sizeof(ORB));
+>>       QEMU_BUILD_BUG_ON(sizeof(region->scsw_area) != sizeof(SCSW));
+>>       QEMU_BUILD_BUG_ON(sizeof(region->irb_area) != sizeof(IRB));
+>> @@ -429,6 +441,7 @@ static void vfio_ccw_unrealize(DeviceState *dev, Error **errp)
+>>   
+>>   static Property vfio_ccw_properties[] = {
+>>       DEFINE_PROP_STRING("sysfsdev", VFIOCCWDevice, vdev.sysfsdev),
+>> +    DEFINE_PROP_BOOL("f-upfch", VFIOCCWDevice, f_upfch, false),
+> 
+> Any particular reason you want to control this on a device-by-device
+> level?
+> 
+
+It seemed natural for me. What are our options here? I don't like
+machine property, as it is not a machine thing.
+
+Regards,
+Halil
+
+>>       DEFINE_PROP_END_OF_LIST(),
+>>   };
+>>   
+> 
+> 
