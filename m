@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52445)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fILhs-0007vk-Uf
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:38 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fILhv-0007yG-E4
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fILhp-0007Zo-Bt
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:36 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:37436)
+	(envelope-from <richard.henderson@linaro.org>) id 1fILhu-0007mc-BS
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:39 -0400
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:40995)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fILhp-0007X8-3R
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:33 -0400
-Received: by mail-pf0-x244.google.com with SMTP id e9-v6so6669184pfi.4
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 15:12:33 -0700 (PDT)
+	id 1fILhu-0007km-5E
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:38 -0400
+Received: by mail-pf0-x242.google.com with SMTP id v63-v6so6663117pfk.8
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 15:12:38 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 14 May 2018 15:11:58 -0700
-Message-Id: <20180514221219.7091-8-richard.henderson@linaro.org>
+Date: Mon, 14 May 2018 15:12:02 -0700
+Message-Id: <20180514221219.7091-12-richard.henderson@linaro.org>
 In-Reply-To: <20180514221219.7091-1-richard.henderson@linaro.org>
 References: <20180514221219.7091-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v5 07/28] fpu/softfloat: Replace
- float_class_dnan with parts_default_nan
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v5 11/28] target/arm: squash FZ16 behaviour for
+ conversions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,225 +33,86 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 
-With a canonical representation of NaNs, we can return the
-default nan directly rather than delay the expansion until
-the final format is known.
+From: Alex Bennée <alex.bennee@linaro.org>
 
-Note one case where we uselessly assigned to a.sign, which was
-overwritten/ignored later when expanding float_class_dnan.
+The ARM ARM specifies FZ16 is suppressed for conversions. Rather than
+pushing this logic into the softfloat code we can simply save the FZ
+state and temporarily disable it for the softfloat call.
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- fpu/softfloat-specialize.h | 37 +++++++++++++++++++++++++++++++++++++
- fpu/softfloat.c            | 38 +++++++++++---------------------------
- 2 files changed, 48 insertions(+), 27 deletions(-)
 
-diff --git a/fpu/softfloat-specialize.h b/fpu/softfloat-specialize.h
-index 515cb12cfa..0d3d81a52b 100644
---- a/fpu/softfloat-specialize.h
-+++ b/fpu/softfloat-specialize.h
-@@ -101,6 +101,43 @@ static bool parts_is_snan_frac(uint64_t frac, float_status *status)
- #endif
+---
+v4
+  - float16_to_floatX squished the wrong softfloat bit for FZ16;
+    need to adjust input denormals in this case.
+---
+ target/arm/helper.c | 40 ++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 36 insertions(+), 4 deletions(-)
+
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index a1c1dc5bbe..e05c7230d4 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -11542,22 +11542,54 @@ uint32_t HELPER(set_neon_rmode)(uint32_t rmode, CPUARMState *env)
+ /* Half precision conversions.  */
+ float32 HELPER(vfp_fcvt_f16_to_f32)(float16 a, void *fpstp, uint32_t ahp_mode)
+ {
+-    return float16_to_float32(a, !ahp_mode, fpstp);
++    /* Squash FZ16 to 0 for the duration of conversion.  In this case,
++     * it would affect flushing input denormals.
++     */
++    float_status *fpst = fpstp;
++    flag save = get_flush_inputs_to_zero(fpst);
++    set_flush_inputs_to_zero(false, fpst);
++    float32 r = float16_to_float32(a, !ahp_mode, fpst);
++    set_flush_inputs_to_zero(save, fpst);
++    return r;
  }
  
-+/*----------------------------------------------------------------------------
-+| The pattern for a default generated deconstructed floating-point NaN.
-+*----------------------------------------------------------------------------*/
-+
-+static FloatParts parts_default_nan(float_status *status)
-+{
-+    bool sign = 0;
-+    uint64_t frac;
-+
-+#if defined(TARGET_SPARC) || defined(TARGET_M68K)
-+    frac = (1ULL << DECOMPOSED_BINARY_POINT) - 1;
-+#elif defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_ALPHA) || \
-+      defined(TARGET_S390X) || defined(TARGET_RISCV)
-+    frac = 1ULL << (DECOMPOSED_BINARY_POINT - 1);
-+#elif defined(TARGET_HPPA)
-+    frac = 1ULL << (DECOMPOSED_BINARY_POINT - 2);
-+#else
-+    if (status->snan_bit_is_one) {
-+        frac = (1ULL << (DECOMPOSED_BINARY_POINT - 1)) - 1;
-+    } else {
-+#if defined(TARGET_MIPS)
-+        frac = 1ULL << (DECOMPOSED_BINARY_POINT - 1);
-+#else
-+        frac = 1ULL << (DECOMPOSED_BINARY_POINT - 1);
-+        sign = 1;
-+#endif
-+    }
-+#endif
-+
-+    return (FloatParts) {
-+        .cls = float_class_qnan,
-+        .sign = sign,
-+        .exp = INT_MAX,
-+        .frac = frac
-+    };
-+}
-+
- /*----------------------------------------------------------------------------
- | The pattern for a default generated half-precision NaN.
- *----------------------------------------------------------------------------*/
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 19f40d6932..51780b718f 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -188,7 +188,6 @@ typedef enum __attribute__ ((__packed__)) {
-     float_class_inf,
-     float_class_qnan,  /* all NaNs from here */
-     float_class_snan,
--    float_class_dnan,
-     float_class_msnan, /* maybe silenced */
- } FloatClass;
- 
-@@ -494,8 +493,6 @@ static FloatParts float16_unpack_canonical(float16 f, float_status *s)
- static float16 float16_round_pack_canonical(FloatParts p, float_status *s)
+ float16 HELPER(vfp_fcvt_f32_to_f16)(float32 a, void *fpstp, uint32_t ahp_mode)
  {
-     switch (p.cls) {
--    case float_class_dnan:
--        return float16_default_nan(s);
-     case float_class_msnan:
-         p.frac >>= float16_params.frac_shift;
-         return float16_maybe_silence_nan(float16_pack_raw(p), s);
-@@ -513,8 +510,6 @@ static FloatParts float32_unpack_canonical(float32 f, float_status *s)
- static float32 float32_round_pack_canonical(FloatParts p, float_status *s)
+-    return float32_to_float16(a, !ahp_mode, fpstp);
++    /* Squash FZ16 to 0 for the duration of conversion.  In this case,
++     * it would affect flushing output denormals.
++     */
++    float_status *fpst = fpstp;
++    flag save = get_flush_to_zero(fpst);
++    set_flush_to_zero(false, fpst);
++    float16 r = float32_to_float16(a, !ahp_mode, fpst);
++    set_flush_to_zero(save, fpst);
++    return r;
+ }
+ 
+ float64 HELPER(vfp_fcvt_f16_to_f64)(float16 a, void *fpstp, uint32_t ahp_mode)
  {
-     switch (p.cls) {
--    case float_class_dnan:
--        return float32_default_nan(s);
-     case float_class_msnan:
-         p.frac >>= float32_params.frac_shift;
-         return float32_maybe_silence_nan(float32_pack_raw(p), s);
-@@ -532,8 +527,6 @@ static FloatParts float64_unpack_canonical(float64 f, float_status *s)
- static float64 float64_round_pack_canonical(FloatParts p, float_status *s)
+-    return float16_to_float64(a, !ahp_mode, fpstp);
++    /* Squash FZ16 to 0 for the duration of conversion.  In this case,
++     * it would affect flushing input denormals.
++     */
++    float_status *fpst = fpstp;
++    flag save = get_flush_inputs_to_zero(fpst);
++    set_flush_inputs_to_zero(false, fpst);
++    float64 r = float16_to_float64(a, !ahp_mode, fpst);
++    set_flush_inputs_to_zero(save, fpst);
++    return r;
+ }
+ 
+ float16 HELPER(vfp_fcvt_f64_to_f16)(float64 a, void *fpstp, uint32_t ahp_mode)
  {
-     switch (p.cls) {
--    case float_class_dnan:
--        return float64_default_nan(s);
-     case float_class_msnan:
-         p.frac >>= float64_params.frac_shift;
-         return float64_maybe_silence_nan(float64_pack_raw(p), s);
-@@ -566,7 +559,7 @@ static FloatParts return_nan(FloatParts a, float_status *s)
-         /* fall through */
-     case float_class_qnan:
-         if (s->default_nan_mode) {
--            a.cls = float_class_dnan;
-+            return parts_default_nan(s);
-         }
-         break;
+-    return float64_to_float16(a, !ahp_mode, fpstp);
++    /* Squash FZ16 to 0 for the duration of conversion.  In this case,
++     * it would affect flushing output denormals.
++     */
++    float_status *fpst = fpstp;
++    flag save = get_flush_to_zero(fpst);
++    set_flush_to_zero(false, fpst);
++    float16 r = float64_to_float16(a, !ahp_mode, fpst);
++    set_flush_to_zero(save, fpst);
++    return r;
+ }
  
-@@ -583,7 +576,7 @@ static FloatParts pick_nan(FloatParts a, FloatParts b, float_status *s)
-     }
- 
-     if (s->default_nan_mode) {
--        a.cls = float_class_dnan;
-+        return parts_default_nan(s);
-     } else {
-         if (pickNaN(is_qnan(a.cls), is_snan(a.cls),
-                     is_qnan(b.cls), is_snan(b.cls),
-@@ -614,8 +607,7 @@ static FloatParts pick_nan_muladd(FloatParts a, FloatParts b, FloatParts c,
-         /* Note that this check is after pickNaNMulAdd so that function
-          * has an opportunity to set the Invalid flag.
-          */
--        a.cls = float_class_dnan;
--        return a;
-+        which = 3;
-     }
- 
-     switch (which) {
-@@ -628,8 +620,7 @@ static FloatParts pick_nan_muladd(FloatParts a, FloatParts b, FloatParts c,
-         a = c;
-         break;
-     case 3:
--        a.cls = float_class_dnan;
--        return a;
-+        return parts_default_nan(s);
-     default:
-         g_assert_not_reached();
-     }
-@@ -682,7 +673,7 @@ static FloatParts addsub_floats(FloatParts a, FloatParts b, bool subtract,
-         if (a.cls == float_class_inf) {
-             if (b.cls == float_class_inf) {
-                 float_raise(float_flag_invalid, s);
--                a.cls = float_class_dnan;
-+                return parts_default_nan(s);
-             }
-             return a;
-         }
-@@ -828,9 +819,7 @@ static FloatParts mul_floats(FloatParts a, FloatParts b, float_status *s)
-     if ((a.cls == float_class_inf && b.cls == float_class_zero) ||
-         (a.cls == float_class_zero && b.cls == float_class_inf)) {
-         s->float_exception_flags |= float_flag_invalid;
--        a.cls = float_class_dnan;
--        a.sign = sign;
--        return a;
-+        return parts_default_nan(s);
-     }
-     /* Multiply by 0 or Inf */
-     if (a.cls == float_class_inf || a.cls == float_class_zero) {
-@@ -908,8 +897,7 @@ static FloatParts muladd_floats(FloatParts a, FloatParts b, FloatParts c,
- 
-     if (inf_zero) {
-         s->float_exception_flags |= float_flag_invalid;
--        a.cls = float_class_dnan;
--        return a;
-+        return parts_default_nan(s);
-     }
- 
-     if (flags & float_muladd_negate_c) {
-@@ -933,12 +921,12 @@ static FloatParts muladd_floats(FloatParts a, FloatParts b, FloatParts c,
-     if (c.cls == float_class_inf) {
-         if (p_class == float_class_inf && p_sign != c.sign) {
-             s->float_exception_flags |= float_flag_invalid;
--            a.cls = float_class_dnan;
-+            return parts_default_nan(s);
-         } else {
-             a.cls = float_class_inf;
-             a.sign = c.sign ^ sign_flip;
-+            return a;
-         }
--        return a;
-     }
- 
-     if (p_class == float_class_inf) {
-@@ -1148,8 +1136,7 @@ static FloatParts div_floats(FloatParts a, FloatParts b, float_status *s)
-         &&
-         (a.cls == float_class_inf || a.cls == float_class_zero)) {
-         s->float_exception_flags |= float_flag_invalid;
--        a.cls = float_class_dnan;
--        return a;
-+        return parts_default_nan(s);
-     }
-     /* Inf / x or 0 / x */
-     if (a.cls == float_class_inf || a.cls == float_class_zero) {
-@@ -1347,7 +1334,6 @@ static int64_t round_to_int_and_pack(FloatParts in, int rmode,
-     switch (p.cls) {
-     case float_class_snan:
-     case float_class_qnan:
--    case float_class_dnan:
-     case float_class_msnan:
-         s->float_exception_flags = orig_flags | float_flag_invalid;
-         return max;
-@@ -1439,7 +1425,6 @@ static uint64_t round_to_uint_and_pack(FloatParts in, int rmode, uint64_t max,
-     switch (p.cls) {
-     case float_class_snan:
-     case float_class_qnan:
--    case float_class_dnan:
-     case float_class_msnan:
-         s->float_exception_flags = orig_flags | float_flag_invalid;
-         return max;
-@@ -1940,8 +1925,7 @@ static FloatParts sqrt_float(FloatParts a, float_status *s, const FloatFmt *p)
-     }
-     if (a.sign) {
-         s->float_exception_flags |= float_flag_invalid;
--        a.cls = float_class_dnan;
--        return a;
-+        return parts_default_nan(s);
-     }
-     if (a.cls == float_class_inf) {
-         return a;  /* sqrt(+inf) = +inf */
+ #define float32_two make_float32(0x40000000)
 -- 
 2.17.0
