@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fILwQ-0004Kd-Cm
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:27:40 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fIM0F-0007zD-NZ
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:31:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fILwN-00007X-Kt
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:27:38 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:45704)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fILwN-00006s-Dj
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:27:35 -0400
-Received: by mail-pf0-x241.google.com with SMTP id c10-v6so6672823pfi.12
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 15:27:35 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 14 May 2018 15:27:13 -0700
-Message-Id: <20180514222714.7982-13-richard.henderson@linaro.org>
-In-Reply-To: <20180514222714.7982-1-richard.henderson@linaro.org>
-References: <20180514222714.7982-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 12/13] target/openrisc: Convert dec_float
+	(envelope-from <mreitz@redhat.com>) id 1fIM0E-0001XT-KL
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:31:35 -0400
+References: <20180509162637.15575-1-kwolf@redhat.com>
+	<20180509162637.15575-40-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <1212f284-2af7-e586-ec95-18e77a53d13a@redhat.com>
+Date: Tue, 15 May 2018 00:31:23 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180509162637.15575-40-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="naCl9WoirR2PCoIf06D8i3rCXGfee8Bdk"
+Subject: Re: [Qemu-devel] [PATCH 39/42] job: Add lifecycle QMP commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,421 +24,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stafford Horne <shorne@gmail.com>, peter.maydell@linaro.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-Acked-by: Stafford Horne <shorne@gmail.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/openrisc/translate.c  | 356 +++++++++++++----------------------
- target/openrisc/insns.decode |  21 +++
- 2 files changed, 148 insertions(+), 229 deletions(-)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--naCl9WoirR2PCoIf06D8i3rCXGfee8Bdk
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com,
+ qemu-devel@nongnu.org
+Message-ID: <1212f284-2af7-e586-ec95-18e77a53d13a@redhat.com>
+Subject: Re: [PATCH 39/42] job: Add lifecycle QMP commands
+References: <20180509162637.15575-1-kwolf@redhat.com>
+ <20180509162637.15575-40-kwolf@redhat.com>
+In-Reply-To: <20180509162637.15575-40-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-index c4256518cb..1f87ad6b2e 100644
---- a/target/openrisc/translate.c
-+++ b/target/openrisc/translate.c
-@@ -1241,245 +1241,143 @@ static bool trans_l_rfe(DisasContext *dc, arg_l_rfe *a, uint32_t insn)
-     return true;
- }
- 
--static void dec_float(DisasContext *dc, uint32_t insn)
-+static void do_fp2(DisasContext *dc, arg_da *a,
-+                   void (*fn)(TCGv, TCGv_env, TCGv))
- {
--    uint32_t op0;
--    uint32_t ra, rb, rd;
--    op0 = extract32(insn, 0, 8);
--    ra = extract32(insn, 16, 5);
--    rb = extract32(insn, 11, 5);
--    rd = extract32(insn, 21, 5);
-+    check_r0_write(a->d);
-+    fn(cpu_R[a->d], cpu_env, cpu_R[a->a]);
-+    gen_helper_update_fpcsr(cpu_env);
-+}
- 
--    switch (op0) {
--    case 0x00: /* lf.add.s */
--        LOG_DIS("lf.add.s r%d, r%d, r%d\n", rd, ra, rb);
--        check_r0_write(rd);
--        gen_helper_float_add_s(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
-+static void do_fp3(DisasContext *dc, arg_dab *a,
-+                   void (*fn)(TCGv, TCGv_env, TCGv, TCGv))
-+{
-+    check_r0_write(a->d);
-+    fn(cpu_R[a->d], cpu_env, cpu_R[a->a], cpu_R[a->b]);
-+    gen_helper_update_fpcsr(cpu_env);
-+}
- 
--    case 0x01: /* lf.sub.s */
--        LOG_DIS("lf.sub.s r%d, r%d, r%d\n", rd, ra, rb);
--        check_r0_write(rd);
--        gen_helper_float_sub_s(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--
--    case 0x02:    /* lf.mul.s */
--        LOG_DIS("lf.mul.s r%d, r%d, r%d\n", rd, ra, rb);
--        check_r0_write(rd);
--        gen_helper_float_mul_s(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--
--    case 0x03: /* lf.div.s */
--        LOG_DIS("lf.div.s r%d, r%d, r%d\n", rd, ra, rb);
--        check_r0_write(rd);
--        gen_helper_float_div_s(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--
--    case 0x04: /* lf.itof.s */
--        LOG_DIS("lf.itof r%d, r%d\n", rd, ra);
--        check_r0_write(rd);
--        gen_helper_itofs(cpu_R[rd], cpu_env, cpu_R[ra]);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--
--    case 0x05: /* lf.ftoi.s */
--        LOG_DIS("lf.ftoi r%d, r%d\n", rd, ra);
--        check_r0_write(rd);
--        gen_helper_ftois(cpu_R[rd], cpu_env, cpu_R[ra]);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--
--    case 0x06: /* lf.rem.s */
--        LOG_DIS("lf.rem.s r%d, r%d, r%d\n", rd, ra, rb);
--        check_r0_write(rd);
--        gen_helper_float_rem_s(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--
--    case 0x07: /* lf.madd.s */
--        LOG_DIS("lf.madd.s r%d, r%d, r%d\n", rd, ra, rb);
--        check_r0_write(rd);
--        gen_helper_float_madd_s(cpu_R[rd], cpu_env, cpu_R[rd],
--                                cpu_R[ra], cpu_R[rb]);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--
--    case 0x08: /* lf.sfeq.s */
--        LOG_DIS("lf.sfeq.s r%d, r%d\n", ra, rb);
--        gen_helper_float_eq_s(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--
--    case 0x09: /* lf.sfne.s */
--        LOG_DIS("lf.sfne.s r%d, r%d\n", ra, rb);
--        gen_helper_float_eq_s(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
--        tcg_gen_xori_tl(cpu_sr_f, cpu_sr_f, 1);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--
--    case 0x0a: /* lf.sfgt.s */
--        LOG_DIS("lf.sfgt.s r%d, r%d\n", ra, rb);
--        gen_helper_float_lt_s(cpu_sr_f, cpu_env, cpu_R[rb], cpu_R[ra]);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--
--    case 0x0b: /* lf.sfge.s */
--        LOG_DIS("lf.sfge.s r%d, r%d\n", ra, rb);
--        gen_helper_float_le_s(cpu_sr_f, cpu_env, cpu_R[rb], cpu_R[ra]);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--
--    case 0x0c: /* lf.sflt.s */
--        LOG_DIS("lf.sflt.s r%d, r%d\n", ra, rb);
--        gen_helper_float_lt_s(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--
--    case 0x0d: /* lf.sfle.s */
--        LOG_DIS("lf.sfle.s r%d, r%d\n", ra, rb);
--        gen_helper_float_le_s(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--
--#ifdef TARGET_OPENRISC64
--    case 0x10: /* lf.add.d */
--        LOG_DIS("lf.add.d r%d, r%d, r%d\n", rd, ra, rb);
--        check_of64s(dc);
--        check_r0_write(rd);
--        gen_helper_float_add_d(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--
--    case 0x11: /* lf.sub.d */
--        LOG_DIS("lf.sub.d r%d, r%d, r%d\n", rd, ra, rb);
--        check_of64s(dc);
--        check_r0_write(rd);
--        gen_helper_float_sub_d(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--
--    case 0x12: /* lf.mul.d */
--        LOG_DIS("lf.mul.d r%d, r%d, r%d\n", rd, ra, rb);
--        check_of64s(dc);
--        check_r0_write(rd);
--        gen_helper_float_mul_d(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--
--    case 0x13: /* lf.div.d */
--        LOG_DIS("lf.div.d r%d, r%d, r%d\n", rd, ra, rb);
--        check_of64s(dc);
--        check_r0_write(rd);
--        gen_helper_float_div_d(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--
--    case 0x14: /* lf.itof.d */
--        LOG_DIS("lf.itof r%d, r%d\n", rd, ra);
--        check_of64s(dc);
--        check_r0_write(rd);
--        gen_helper_itofd(cpu_R[rd], cpu_env, cpu_R[ra]);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--
--    case 0x15: /* lf.ftoi.d */
--        LOG_DIS("lf.ftoi r%d, r%d\n", rd, ra);
--        check_of64s(dc);
--        check_r0_write(rd);
--        gen_helper_ftoid(cpu_R[rd], cpu_env, cpu_R[ra]);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--
--    case 0x16: /* lf.rem.d */
--        LOG_DIS("lf.rem.d r%d, r%d, r%d\n", rd, ra, rb);
--        check_of64s(dc);
--        check_r0_write(rd);
--        gen_helper_float_rem_d(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--
--    case 0x17: /* lf.madd.d */
--        LOG_DIS("lf.madd.d r%d, r%d, r%d\n", rd, ra, rb);
--        check_of64s(dc);
--        check_r0_write(rd);
--        gen_helper_float_madd_d(cpu_R[rd], cpu_env, cpu_R[rd],
--                                cpu_R[ra], cpu_R[rb]);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--
--    case 0x18: /* lf.sfeq.d */
--        LOG_DIS("lf.sfeq.d r%d, r%d\n", ra, rb);
--        check_of64s(dc);
--        gen_helper_float_eq_d(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--
--    case 0x1a: /* lf.sfgt.d */
--        LOG_DIS("lf.sfgt.d r%d, r%d\n", ra, rb);
--        check_of64s(dc);
--        gen_helper_float_lt_d(cpu_sr_f, cpu_env, cpu_R[rb], cpu_R[ra]);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--
--    case 0x1b: /* lf.sfge.d */
--        LOG_DIS("lf.sfge.d r%d, r%d\n", ra, rb);
--        check_of64s(dc);
--        gen_helper_float_le_d(cpu_sr_f, cpu_env, cpu_R[rb], cpu_R[ra]);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--
--    case 0x19: /* lf.sfne.d */
--        LOG_DIS("lf.sfne.d r%d, r%d\n", ra, rb);
--        check_of64s(dc);
--        gen_helper_float_eq_d(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
--        tcg_gen_xori_tl(cpu_sr_f, cpu_sr_f, 1);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--
--    case 0x1c: /* lf.sflt.d */
--        LOG_DIS("lf.sflt.d r%d, r%d\n", ra, rb);
--        check_of64s(dc);
--        gen_helper_float_lt_d(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--
--    case 0x1d: /* lf.sfle.d */
--        LOG_DIS("lf.sfle.d r%d, r%d\n", ra, rb);
--        check_of64s(dc);
--        gen_helper_float_le_d(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
--        gen_helper_update_fpcsr(cpu_env);
--        break;
--#endif
--
--    default:
--        gen_illegal_exception(dc);
--        break;
-+static void do_fpcmp(DisasContext *dc, arg_ab *a,
-+                     void (*fn)(TCGv, TCGv_env, TCGv, TCGv),
-+                     bool inv, bool swap)
-+{
-+    if (swap) {
-+        fn(cpu_sr_f, cpu_env, cpu_R[a->b], cpu_R[a->a]);
-+    } else {
-+        fn(cpu_sr_f, cpu_env, cpu_R[a->a], cpu_R[a->b]);
-     }
-+    if (inv) {
-+        tcg_gen_xori_tl(cpu_sr_f, cpu_sr_f, 1);
-+    }
-+    gen_helper_update_fpcsr(cpu_env);
-+}
-+
-+static bool trans_lf_add_s(DisasContext *dc, arg_dab *a, uint32_t insn)
-+{
-+    LOG_DIS("lf.add.s r%d, r%d, r%d\n", a->d, a->a, a->b);
-+    do_fp3(dc, a, gen_helper_float_add_s);
-+    return true;
-+}
-+
-+static bool trans_lf_sub_s(DisasContext *dc, arg_dab *a, uint32_t insn)
-+{
-+    LOG_DIS("lf.sub.s r%d, r%d, r%d\n", a->d, a->a, a->b);
-+    do_fp3(dc, a, gen_helper_float_sub_s);
-+    return true;
-+}
-+
-+static bool trans_lf_mul_s(DisasContext *dc, arg_dab *a, uint32_t insn)
-+{
-+    LOG_DIS("lf.mul.s r%d, r%d, r%d\n", a->d, a->a, a->b);
-+    do_fp3(dc, a, gen_helper_float_mul_s);
-+    return true;
-+}
-+
-+static bool trans_lf_div_s(DisasContext *dc, arg_dab *a, uint32_t insn)
-+{
-+    LOG_DIS("lf.div.s r%d, r%d, r%d\n", a->d, a->a, a->b);
-+    do_fp3(dc, a, gen_helper_float_div_s);
-+    return true;
-+}
-+
-+static bool trans_lf_rem_s(DisasContext *dc, arg_dab *a, uint32_t insn)
-+{
-+    LOG_DIS("lf.rem.s r%d, r%d, r%d\n", a->d, a->a, a->b);
-+    do_fp3(dc, a, gen_helper_float_rem_s);
-+    return true;
-+}
-+
-+static bool trans_lf_itof_s(DisasContext *dc, arg_da *a, uint32_t insn)
-+{
-+    LOG_DIS("lf.itof.s r%d, r%d\n", a->d, a->a);
-+    do_fp2(dc, a, gen_helper_itofs);
-+    return true;
-+}
-+
-+static bool trans_lf_ftoi_s(DisasContext *dc, arg_da *a, uint32_t insn)
-+{
-+    LOG_DIS("lf.ftoi.s r%d, r%d\n", a->d, a->a);
-+    do_fp2(dc, a, gen_helper_ftois);
-+    return true;
-+}
-+
-+static bool trans_lf_madd_s(DisasContext *dc, arg_dab *a, uint32_t insn)
-+{
-+    LOG_DIS("lf.madd.s r%d, r%d, r%d\n", a->d, a->a, a->b);
-+    check_r0_write(a->d);
-+    gen_helper_float_madd_s(cpu_R[a->d], cpu_env, cpu_R[a->d],
-+                            cpu_R[a->a], cpu_R[a->b]);
-+    gen_helper_update_fpcsr(cpu_env);
-+    return true;
-+}
-+
-+static bool trans_lf_sfeq_s(DisasContext *dc, arg_ab *a, uint32_t insn)
-+{
-+    LOG_DIS("lf.sfeq.s r%d, r%d\n", a->a, a->b);
-+    do_fpcmp(dc, a, gen_helper_float_eq_s, false, false);
-+    return true;
-+}
-+
-+static bool trans_lf_sfne_s(DisasContext *dc, arg_ab *a, uint32_t insn)
-+{
-+    LOG_DIS("lf.sfne.s r%d, r%d\n", a->a, a->b);
-+    do_fpcmp(dc, a, gen_helper_float_eq_s, true, false);
-+    return true;
-+}
-+
-+static bool trans_lf_sfgt_s(DisasContext *dc, arg_ab *a, uint32_t insn)
-+{
-+    LOG_DIS("lf.sfgt.s r%d, r%d\n", a->a, a->b);
-+    do_fpcmp(dc, a, gen_helper_float_lt_s, false, true);
-+    return true;
-+}
-+
-+static bool trans_lf_sfge_s(DisasContext *dc, arg_ab *a, uint32_t insn)
-+{
-+    LOG_DIS("lf.sfge.s r%d, r%d\n", a->a, a->b);
-+    do_fpcmp(dc, a, gen_helper_float_le_s, false, true);
-+    return true;
-+}
-+
-+static bool trans_lf_sflt_s(DisasContext *dc, arg_ab *a, uint32_t insn)
-+{
-+    LOG_DIS("lf.sflt.s r%d, r%d\n", a->a, a->b);
-+    do_fpcmp(dc, a, gen_helper_float_lt_s, false, false);
-+    return true;
-+}
-+
-+static bool trans_lf_sfle_s(DisasContext *dc, arg_ab *a, uint32_t insn)
-+{
-+    LOG_DIS("lf.sfle.s r%d, r%d\n", a->a, a->b);
-+    do_fpcmp(dc, a, gen_helper_float_le_s, false, false);
-+    return true;
- }
- 
- static void disas_openrisc_insn(DisasContext *dc, OpenRISCCPU *cpu)
- {
--    uint32_t op0;
-     uint32_t insn = cpu_ldl_code(&cpu->env, dc->base.pc_next);
--
--    /* Transition to the auto-generated decoder.  */
--    if (decode(dc, insn)) {
--        return;
--    }
--
--    op0 = extract32(insn, 26, 6);
--    switch (op0) {
--    case 0x32:
--        dec_float(dc, insn);
--        break;
--
--    default:
-+    if (!decode(dc, insn)) {
-         gen_illegal_exception(dc);
--        break;
-     }
- }
- 
-diff --git a/target/openrisc/insns.decode b/target/openrisc/insns.decode
-index 4ec0e2de3a..dad68c8422 100644
---- a/target/openrisc/insns.decode
-+++ b/target/openrisc/insns.decode
-@@ -166,3 +166,24 @@ l_sfgtsi        101111 01010 a:5 i:s16
- l_sfgesi        101111 01011 a:5 i:s16
- l_sfltsi        101111 01100 a:5 i:s16
- l_sflesi        101111 01101 a:5 i:s16
-+
-+####
-+# FP Instructions
-+####
-+
-+lf_add_s        110010 d:5 a:5 b:5   --- 00000000
-+lf_sub_s        110010 d:5 a:5 b:5   --- 00000001
-+lf_mul_s        110010 d:5 a:5 b:5   --- 00000010
-+lf_div_s        110010 d:5 a:5 b:5   --- 00000011
-+lf_rem_s        110010 d:5 a:5 b:5   --- 00000110
-+lf_madd_s       110010 d:5 a:5 b:5   --- 00000111
-+
-+lf_itof_s       110010 d:5 a:5 00000 --- 00000100
-+lf_ftoi_s       110010 d:5 a:5 00000 --- 00000101
-+
-+lf_sfeq_s       110010 ----- a:5 b:5 --- 00001000
-+lf_sfne_s       110010 ----- a:5 b:5 --- 00001001
-+lf_sfgt_s       110010 ----- a:5 b:5 --- 00001010
-+lf_sfge_s       110010 ----- a:5 b:5 --- 00001011
-+lf_sflt_s       110010 ----- a:5 b:5 --- 00001100
-+lf_sfle_s       110010 ----- a:5 b:5 --- 00001101
--- 
-2.17.0
+On 2018-05-09 18:26, Kevin Wolf wrote:
+> This adds QMP commands that control the transition between states of th=
+e
+> job lifecycle.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  qapi/job.json | 112 ++++++++++++++++++++++++++++++++++++++++++++++
+>  job-qmp.c     | 140 ++++++++++++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  MAINTAINERS   |   1 +
+>  Makefile.objs |   2 +-
+>  trace-events  |   9 ++++
+>  5 files changed, 263 insertions(+), 1 deletion(-)
+>  create mode 100644 job-qmp.c
+>=20
+> diff --git a/qapi/job.json b/qapi/job.json
+> index bd88a358d0..7b84158292 100644
+> --- a/qapi/job.json
+> +++ b/qapi/job.json
+> @@ -63,3 +63,115 @@
+>  { 'event': 'JOB_STATUS_CHANGE',
+>    'data': { 'id': 'str',
+>              'status': 'JobStatus' } }
+> +
+> +##
+> +# @job-pause:
+> +#
+> +# Pause an active job.
+> +#
+> +# This command returns immediately after marking the active job for pa=
+using.
+> +# Pausing an already paused job has no cumulative effect; a single job=
+-resume
+> +# command will resume the job.
+
+Pausing an already paused job is, in fact, an error.
+
+(Which should be noted here instead of making it appear like it'd be
+idempotent.)
+
+> +#
+> +# The job will pause as soon as possible, which means transitioning in=
+to the
+> +# PAUSED state if it was RUNNING, or into STANDBY if it was READY. The=
+
+> +# corresponding JOB_STATUS_CHANGE event will be emitted.
+> +#
+> +# Cancelling a paused job automatically resumes it.
+> +#
+> +# @id: The job identifier.
+> +#
+> +# Since: 2.13
+> +##
+> +{ 'command': 'job-pause', 'data': { 'id': 'str' } }
+
+[...]
+
+> +##
+> +# @job-cancel:
+> +#
+> +# Instruct an active background job to cancel at the next opportunity.=
+
+> +# This command returns immediately after marking the active job for
+> +# cancellation.
+> +#
+> +# The job will cancel as soon as possible and then emit a JOB_STATUS_C=
+HANGE
+> +# event. Usually, the status will change to ABORTING, but it is possib=
+le that
+> +# a job successfully completes (e.g. because it was almost done and th=
+ere was
+> +# no opportunity to cancel earlier than completing the job) and transi=
+tions to
+> +# PENDING instead.
+> +#
+> +# Note that if you issue 'job-cancel' after a mirror block job has ind=
+icated
+> +# (via the event BLOCK_JOB_READY, and by transitioning into the READY =
+state)
+> +# that the source and destination are synchronized, then the job alway=
+s
+> +# completes successfully and transitions to PENDING as well as trigger=
+ing the
+> +# event BLOCK_JOB_COMPLETED, to indicate that the mirroring has ended =
+and the
+> +# destination now has a point-in-time copy tied to the time of the
+> +# cancellation.
+> +#
+> +# @id: The job identifier.
+> +#
+> +# @force: If true, and the job is already in the READY state, abandon =
+the job
+> +#         immediately (even if it is paused) instead of waiting for th=
+e
+> +#         destination to complete its final synchronization
+
+The note on "final synchronization" is extremely mirror-specific.  I see
+three choices here:
+
+(1) If mirror stays the only job with this special cancel semantics,
+then we are free to note that this is a mirror-specific flag here.
+
+(2) Even if some other job might come along at some point where use of
+@force may make sense, that doesn't stop us from now noting that only
+mirror supports this, which helps readers understand what "destination"
+and "final synchronization" mean.
+
+(Yes, so (1) and (2) are basically the same.)
+
+(3) We try to find some general description and drop the last part.
+Like "If a job would normally decide to complete instead of actually
+aborting, this flag can be used to convince it otherwise."  But that's
+so handwavy, I'd rather just mark it as a special mirror flag for now.
+
+> +#
+> +# Since: 2.13
+> +##
+> +{ 'command': 'job-cancel', 'data': { 'id': 'str', '*force': 'bool' } }=
+
+
+[...]
+
+> diff --git a/Makefile.objs b/Makefile.objs
+> index 3df8d58e49..253e0356f3 100644
+> --- a/Makefile.objs
+> +++ b/Makefile.objs
+> @@ -66,7 +66,7 @@ chardev-obj-y =3D chardev/
+>  # block-obj-y is code used by both qemu system emulation and qemu-img
+> =20
+>  block-obj-y +=3D nbd/
+> -block-obj-y +=3D block.o blockjob.o job.o
+> +block-obj-y +=3D block.o blockjob.o job.o job-qmp.o
+
+Shouldn't this be in common-obj-y like blockdev?
+
+Max
+
+>  block-obj-y +=3D block/ scsi/
+>  block-obj-y +=3D qemu-io-cmds.o
+>  block-obj-$(CONFIG_REPLICATION) +=3D replication.o
+
+
+--naCl9WoirR2PCoIf06D8i3rCXGfee8Bdk
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr6DjwACgkQ9AfbAGHV
+z0D9IQgAoIoQoNBCFAMSSn1ubWdB4j0CYon17x+CgB1TzUv8qz2I9OXq0Y8UXQ0p
+xyCcORDb1bhoKceUTMKhHdpxRjFcAzxYfaJWdBrXGGwgYMGsZPzmqLz1IlZrthKi
+7Xtf/BYV6ePCfr8z8x0bm347LKjPUzQl3mz+y9Ze919Dip8MPfxDb3fGnXRQoyIj
+2D3H0KtEx9L/++yO34RADvFugEYJO/H9uU6DIUrrV58JA1XmP5Hocg5bJ2j12Ifi
+wezIp7SCI2kkwDDz4UHf61XAt/Kh9SI3RsJdweN7TtLPLmF88PZw7izbnUbRTP5F
+Ns+G6+jTTfEVsrxU5miFuB5F3T2tqQ==
+=05HK
+-----END PGP SIGNATURE-----
+
+--naCl9WoirR2PCoIf06D8i3rCXGfee8Bdk--
