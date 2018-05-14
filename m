@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fIC4U-0001Tn-Df
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 07:55:19 -0400
+	(envelope-from <linzhecheng@huawei.com>) id 1fIC5n-0002Vt-9Z
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 07:56:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fIC4Q-00082O-4K
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 07:55:18 -0400
-References: <20180512012537.22478-1-jsnow@redhat.com>
-	<20180512012537.22478-2-jsnow@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <79bed3c8-e80e-5f51-5dfc-0d71b1ea66ca@virtuozzo.com>
-Date: Mon, 14 May 2018 14:55:07 +0300
+	(envelope-from <linzhecheng@huawei.com>) id 1fIC5j-0000g3-5r
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 07:56:39 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2614 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <linzhecheng@huawei.com>)
+	id 1fIC5i-0000Zo-Pa
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 07:56:35 -0400
+From: linzhecheng <linzhecheng@huawei.com>
+Date: Mon, 14 May 2018 19:55:57 +0800
+Message-ID: <20180514115557.13524-1-linzhecheng@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20180512012537.22478-2-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [RFC PATCH 01/12] qcow2-bitmap: cache bm_list
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] cpus: remove useless cond signal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,275 +24,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, wangxinxin.wang@huawei.com, linzhecheng <linzhecheng@huawei.com>
 
-12.05.2018 04:25, John Snow wrote:
-> We don't need to re-read this list every time, exactly. We can keep it cached
-> and delete our copy when we flush to disk.
+commit dbadee4 removed qemu_cond_wait in cpu_remove_sync, so it is
+useless to keep qemu_cond_signal here.
 
-Why not simply delete cache only on close (unconditionally)? Why do we 
-need to remove it after flush?
+Signed-off-by: linzhecheng <linzhecheng@huawei.com>
 
-Actually, I think we need to remove it only in qcow2_inactive, after 
-storing persistent bitmaps.
-
-
->
-> Because we don't try to flush bitmaps on close if there's nothing to flush,
-> add a new conditional to delete the state anyway for a clean exit.
->
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->   block/qcow2-bitmap.c | 74 ++++++++++++++++++++++++++++++++--------------------
->   block/qcow2.c        |  2 ++
->   block/qcow2.h        |  2 ++
->   3 files changed, 50 insertions(+), 28 deletions(-)
->
-> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-> index 6e93ec43e1..fb0a4f3ec4 100644
-> --- a/block/qcow2-bitmap.c
-> +++ b/block/qcow2-bitmap.c
-> @@ -536,8 +536,7 @@ static uint32_t bitmap_list_count(Qcow2BitmapList *bm_list)
->    * Get bitmap list from qcow2 image. Actually reads bitmap directory,
->    * checks it and convert to bitmap list.
->    */
-> -static Qcow2BitmapList *bitmap_list_load(BlockDriverState *bs, uint64_t offset,
-> -                                         uint64_t size, Error **errp)
-> +static Qcow2BitmapList *bitmap_list_load(BlockDriverState *bs, Error **errp)
->   {
->       int ret;
->       BDRVQcow2State *s = bs->opaque;
-> @@ -545,6 +544,8 @@ static Qcow2BitmapList *bitmap_list_load(BlockDriverState *bs, uint64_t offset,
->       Qcow2BitmapDirEntry *e;
->       uint32_t nb_dir_entries = 0;
->       Qcow2BitmapList *bm_list = NULL;
-> +    uint64_t offset = s->bitmap_directory_offset;
-> +    uint64_t size = s->bitmap_directory_size;
-
-Worth split this change as a refactoring patch (just remove extra 
-parameters)?
-
->   
->       if (size == 0) {
->           error_setg(errp, "Requested bitmap directory size is zero");
-> @@ -636,6 +637,30 @@ fail:
->       return NULL;
->   }
->   
-> +static Qcow2BitmapList *get_bitmap_list(BlockDriverState *bs, Error **errp)
-> +{
-> +    BDRVQcow2State *s = bs->opaque;
-> +    Qcow2BitmapList *bm_list;
-> +
-> +    if (s->bitmap_list) {
-> +        return (Qcow2BitmapList *)s->bitmap_list;
-> +    }
-> +
-> +    bm_list = bitmap_list_load(bs, errp);
-> +    s->bitmap_list = bm_list;
-> +    return bm_list;
-> +}
-> +
-> +static void del_bitmap_list(BlockDriverState *bs)
-> +{
-> +    BDRVQcow2State *s = bs->opaque;
-> +
-> +    if (s->bitmap_list) {
-> +        bitmap_list_free(s->bitmap_list);
-> +        s->bitmap_list = NULL;
-> +    }
-> +}
-> +
->   int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
->                                     void **refcount_table,
->                                     int64_t *refcount_table_size)
-> @@ -656,8 +681,7 @@ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
->           return ret;
->       }
->   
-> -    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
-> -                               s->bitmap_directory_size, NULL);
-> +    bm_list = get_bitmap_list(bs, NULL);
->       if (bm_list == NULL) {
->           res->corruptions++;
->           return -EINVAL;
-> @@ -707,8 +731,6 @@ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
->       }
->   
->   out:
-> -    bitmap_list_free(bm_list);
-> -
->       return ret;
->   }
->   
-> @@ -953,8 +975,7 @@ bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp)
->           return false;
->       }
->   
-> -    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
-> -                               s->bitmap_directory_size, errp);
-> +    bm_list = get_bitmap_list(bs, errp);
->       if (bm_list == NULL) {
->           return false;
->       }
-> @@ -992,14 +1013,12 @@ bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp)
->       }
->   
->       g_slist_free(created_dirty_bitmaps);
-> -    bitmap_list_free(bm_list);
-> -
->       return header_updated;
->   
->   fail:
->       g_slist_foreach(created_dirty_bitmaps, release_dirty_bitmap_helper, bs);
->       g_slist_free(created_dirty_bitmaps);
-> -    bitmap_list_free(bm_list);
-> +    del_bitmap_list(bs);
->   
->       return false;
->   }
-> @@ -1027,8 +1046,7 @@ int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
->           return -EINVAL;
->       }
->   
-> -    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
-> -                               s->bitmap_directory_size, errp);
-> +    bm_list = get_bitmap_list(bs, errp);
->       if (bm_list == NULL) {
->           return -EINVAL;
->       }
-> @@ -1068,7 +1086,6 @@ int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
->   
->   out:
->       g_slist_free(ro_dirty_bitmaps);
-> -    bitmap_list_free(bm_list);
->   
->       return ret;
->   }
-> @@ -1277,8 +1294,7 @@ void qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs,
->           return;
->       }
->   
-> -    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
-> -                               s->bitmap_directory_size, errp);
-> +    bm_list = get_bitmap_list(bs, errp);
->       if (bm_list == NULL) {
->           return;
->       }
-> @@ -1300,7 +1316,11 @@ void qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs,
->   
->   fail:
->       bitmap_free(bm);
-> -    bitmap_list_free(bm_list);
-> +}
-> +
-> +void qcow2_persistent_dirty_bitmaps_cache_destroy(BlockDriverState *bs)
-> +{
-> +    del_bitmap_list(bs);
->   }
->   
->   void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-> @@ -1317,12 +1337,12 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
->   
->       if (!bdrv_has_changed_persistent_bitmaps(bs)) {
->           /* nothing to do */
-> -        return;
-> +        goto out;
->       }
->   
->       if (!can_write(bs)) {
->           error_setg(errp, "No write access");
-> -        return;
-> +        goto out;
->       }
->   
->       QSIMPLEQ_INIT(&drop_tables);
-> @@ -1330,10 +1350,9 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
->       if (s->nb_bitmaps == 0) {
->           bm_list = bitmap_list_new();
->       } else {
-> -        bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
-> -                                   s->bitmap_directory_size, errp);
-> +        bm_list = get_bitmap_list(bs, errp);
->           if (bm_list == NULL) {
-> -            return;
-> +            goto out;
->           }
->       }
->   
-> @@ -1414,8 +1433,7 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
->           g_free(tb);
->       }
->   
-> -    bitmap_list_free(bm_list);
-> -    return;
-> +    goto out;
->   
->   fail:
->       QSIMPLEQ_FOREACH(bm, bm_list, entry) {
-> @@ -1430,7 +1448,9 @@ fail:
->           g_free(tb);
->       }
->   
-> -    bitmap_list_free(bm_list);
-> + out:
-> +    del_bitmap_list(bs);
-> +    return;
->   }
->   
->   int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp)
-> @@ -1495,14 +1515,12 @@ bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
->           goto fail;
->       }
->   
-> -    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
-> -                               s->bitmap_directory_size, errp);
-> +    bm_list = get_bitmap_list(bs, errp);
->       if (bm_list == NULL) {
->           goto fail;
->       }
->   
->       found = find_bitmap_by_name(bm_list, name);
-> -    bitmap_list_free(bm_list);
->       if (found) {
->           error_setg(errp, "Bitmap with the same name is already stored");
->           goto fail;
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 2f36e632f9..7ae9000656 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -2135,6 +2135,8 @@ static void qcow2_close(BlockDriverState *bs)
->   
->       if (!(s->flags & BDRV_O_INACTIVE)) {
->           qcow2_inactivate(bs);
-> +    } else {
-> +        qcow2_persistent_dirty_bitmaps_cache_destroy(bs);
->       }
->   
->       cache_clean_timer_del(bs);
-> diff --git a/block/qcow2.h b/block/qcow2.h
-> index adf5c3950f..796a8c914b 100644
-> --- a/block/qcow2.h
-> +++ b/block/qcow2.h
-> @@ -299,6 +299,7 @@ typedef struct BDRVQcow2State {
->       uint64_t bitmap_directory_size;
->       uint64_t bitmap_directory_offset;
->       bool dirty_bitmaps_loaded;
-> +    void *bitmap_list;
->   
->       int flags;
->       int qcow_version;
-> @@ -675,6 +676,7 @@ bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp);
->   int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
->                                    Error **errp);
->   int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
-> +void qcow2_persistent_dirty_bitmaps_cache_destroy(BlockDriverState *bs);
->   void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
->   int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp);
->   bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
-
-
+diff --git a/cpus.c b/cpus.c
+index 5bcd3ecf38..c7262484f3 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1222,7 +1222,6 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
+ 
+     qemu_kvm_destroy_vcpu(cpu);
+     cpu->created = false;
+-    qemu_cond_signal(&qemu_cpu_cond);
+     qemu_mutex_unlock_iothread();
+     rcu_unregister_thread();
+     return NULL;
 -- 
-Best regards,
-Vladimir
+2.12.2.windows.2
