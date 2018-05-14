@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39149)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fIFVx-00036K-TM
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 11:35:55 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fIFZE-0004pf-1o
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 11:39:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fIFVw-00055i-8a
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 11:35:53 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180511222052.8734-1-ehabkost@redhat.com>
-	<20180511222052.8734-11-ehabkost@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <96ffe205-a582-4fe2-29c7-0858dd8b3488@amsat.org>
-Date: Mon, 14 May 2018 12:35:39 -0300
+	(envelope-from <peter.maydell@linaro.org>) id 1fIFZC-0006B3-Ra
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 11:39:16 -0400
+Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:39023)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fIFZC-0006At-M0
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 11:39:14 -0400
+Received: by mail-ot0-x230.google.com with SMTP id l12-v6so14789091oth.6
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 08:39:14 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180511222052.8734-11-ehabkost@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC 10/10] python: futurize -f
- lib2to3.fixes.fix_numliterals
+In-Reply-To: <20180509060104.4458-4-f4bug@amsat.org>
+References: <20180509060104.4458-1-f4bug@amsat.org>
+	<20180509060104.4458-4-f4bug@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 14 May 2018 16:38:53 +0100
+Message-ID: <CAFEAcA8Qm_CQFGUbFNc27fyetggt6AjfhCXxZkU3fnbMibzLFw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] sdcard: Implement the UHS-I
+ SWITCH_FUNCTION entries (Spec v3)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,153 +31,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Cleber Rosa <crosa@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Alistair Francis <alistair@alistair23.me>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 05/11/2018 07:20 PM, Eduardo Habkost wrote:
-> Convert octal literals into the new syntax.
-> 
-> This is necessary for Python 3 compatibility.
-> 
-> Done using:
-> 
->   $ py=$( (g grep -l -E '^#!.*python';find -name '*.py' -printf '%P\n';) | \
->     sort -u | grep -v README.sh4)
->   $ futurize -w -f lib2to3.fixes.fix_numliterals $py
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
+On 9 May 2018 at 07:01, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote=
+:
+> [based on a patch from Alistair Francis <alistair.francis@xilinx.com>
+>  from qemu/xilinx tag xilinx-v2015.2]
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> [PMD: rebased, changed magic by definitions, use stw_be_p, add tracing,
+>  check all functions in group are correct before setting the values]
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  scripts/qmp/qom-fuse   |  6 +++---
->  tests/qemu-iotests/118 | 24 ++++++++++++------------
->  2 files changed, 15 insertions(+), 15 deletions(-)
-> 
-> diff --git a/scripts/qmp/qom-fuse b/scripts/qmp/qom-fuse
-> index b00cb0a0af..e524e798fc 100755
-> --- a/scripts/qmp/qom-fuse
-> +++ b/scripts/qmp/qom-fuse
-> @@ -90,7 +90,7 @@ class QOMFS(Fuse):
->  
->      def getattr(self, path):
->          if self.is_link(path):
-> -            value = posix.stat_result((0755 | stat.S_IFLNK,
-> +            value = posix.stat_result((0o755 | stat.S_IFLNK,
->                                         self.get_ino(path),
->                                         0,
->                                         2,
-> @@ -101,7 +101,7 @@ class QOMFS(Fuse):
->                                         0,
->                                         0))
->          elif self.is_object(path):
-> -            value = posix.stat_result((0755 | stat.S_IFDIR,
-> +            value = posix.stat_result((0o755 | stat.S_IFDIR,
->                                         self.get_ino(path),
->                                         0,
->                                         2,
-> @@ -112,7 +112,7 @@ class QOMFS(Fuse):
->                                         0,
->                                         0))
->          elif self.is_property(path):
-> -            value = posix.stat_result((0644 | stat.S_IFREG,
-> +            value = posix.stat_result((0o644 | stat.S_IFREG,
->                                         self.get_ino(path),
->                                         0,
->                                         1,
-> diff --git a/tests/qemu-iotests/118 b/tests/qemu-iotests/118
-> index a0469b570e..ff3b2ae3e7 100755
-> --- a/tests/qemu-iotests/118
-> +++ b/tests/qemu-iotests/118
-> @@ -390,14 +390,14 @@ class TestChangeReadOnly(ChangeBaseClass):
->  
->      def tearDown(self):
->          self.vm.shutdown()
-> -        os.chmod(old_img, 0666)
-> -        os.chmod(new_img, 0666)
-> +        os.chmod(old_img, 0o666)
-> +        os.chmod(new_img, 0o666)
->          os.remove(old_img)
->          os.remove(new_img)
->  
->      def test_ro_ro_retain(self):
-> -        os.chmod(old_img, 0444)
-> -        os.chmod(new_img, 0444)
-> +        os.chmod(old_img, 0o444)
-> +        os.chmod(new_img, 0o444)
->          self.vm.add_drive(old_img, 'media=disk,read-only=on', 'none')
->          self.vm.add_device('floppy,drive=drive0,id=%s' % self.device_name)
->          self.vm.launch()
-> @@ -417,7 +417,7 @@ class TestChangeReadOnly(ChangeBaseClass):
->          self.assert_qmp(result, 'return[0]/inserted/image/filename', new_img)
->  
->      def test_ro_rw_retain(self):
-> -        os.chmod(old_img, 0444)
-> +        os.chmod(old_img, 0o444)
->          self.vm.add_drive(old_img, 'media=disk,read-only=on', 'none')
->          self.vm.add_device('floppy,drive=drive0,id=%s' % self.device_name)
->          self.vm.launch()
-> @@ -437,7 +437,7 @@ class TestChangeReadOnly(ChangeBaseClass):
->          self.assert_qmp(result, 'return[0]/inserted/image/filename', new_img)
->  
->      def test_rw_ro_retain(self):
-> -        os.chmod(new_img, 0444)
-> +        os.chmod(new_img, 0o444)
->          self.vm.add_drive(old_img, 'media=disk', 'none')
->          self.vm.add_device('floppy,drive=drive0,id=%s' % self.device_name)
->          self.vm.launch()
-> @@ -459,7 +459,7 @@ class TestChangeReadOnly(ChangeBaseClass):
->          self.assert_qmp(result, 'return[0]/inserted/image/filename', old_img)
->  
->      def test_ro_rw(self):
-> -        os.chmod(old_img, 0444)
-> +        os.chmod(old_img, 0o444)
->          self.vm.add_drive(old_img, 'media=disk,read-only=on', 'none')
->          self.vm.add_device('floppy,drive=drive0,id=%s' % self.device_name)
->          self.vm.launch()
-> @@ -480,7 +480,7 @@ class TestChangeReadOnly(ChangeBaseClass):
->          self.assert_qmp(result, 'return[0]/inserted/image/filename', new_img)
->  
->      def test_rw_ro(self):
-> -        os.chmod(new_img, 0444)
-> +        os.chmod(new_img, 0o444)
->          self.vm.add_drive(old_img, 'media=disk', 'none')
->          self.vm.add_device('floppy,drive=drive0,id=%s' % self.device_name)
->          self.vm.launch()
-> @@ -521,7 +521,7 @@ class TestChangeReadOnly(ChangeBaseClass):
->          self.assert_qmp(result, 'return[0]/inserted/image/filename', new_img)
->  
->      def test_make_ro_rw(self):
-> -        os.chmod(new_img, 0444)
-> +        os.chmod(new_img, 0o444)
->          self.vm.add_drive(old_img, 'media=disk', 'none')
->          self.vm.add_device('floppy,drive=drive0,id=%s' % self.device_name)
->          self.vm.launch()
-> @@ -542,7 +542,7 @@ class TestChangeReadOnly(ChangeBaseClass):
->          self.assert_qmp(result, 'return[0]/inserted/image/filename', old_img)
->  
->      def test_make_rw_ro_by_retain(self):
-> -        os.chmod(old_img, 0444)
-> +        os.chmod(old_img, 0o444)
->          self.vm.add_drive(old_img, 'media=disk,read-only=on', 'none')
->          self.vm.add_device('floppy,drive=drive0,id=%s' % self.device_name)
->          self.vm.launch()
-> @@ -562,7 +562,7 @@ class TestChangeReadOnly(ChangeBaseClass):
->          self.assert_qmp(result, 'return[0]/inserted/image/filename', new_img)
->  
->      def test_make_ro_rw_by_retain(self):
-> -        os.chmod(new_img, 0444)
-> +        os.chmod(new_img, 0o444)
->          self.vm.add_drive(old_img, 'media=disk', 'none')
->          self.vm.add_device('floppy,drive=drive0,id=%s' % self.device_name)
->          self.vm.launch()
-> @@ -582,7 +582,7 @@ class TestChangeReadOnly(ChangeBaseClass):
->          self.assert_qmp(result, 'return[0]/inserted/image/filename', old_img)
->  
->      def test_rw_ro_cycle(self):
-> -        os.chmod(new_img, 0444)
-> +        os.chmod(new_img, 0o444)
->          self.vm.add_drive(old_img, 'media=disk', 'none')
->          self.vm.add_device('floppy,drive=drive0,id=%s' % self.device_name)
->          self.vm.launch()
-> 
+
+> +    /* Bits 376-399: function (4 bits each group)
+> +     *
+> +     * Do not write the values back directly:
+> +     * Check everything first writing to 'tmpbuf'
+> +     */
+> +    data_p =3D tmpbuf;
+
+You don't need a tmpbuf here, because it doesn't matter if we
+write something to the data array that it turns out we don't want
+to write; we can always rewrite it later...
+
+> +    for (fn_grp =3D SD_FG_MAX; fn_grp >=3D SD_FG_MIN; fn_grp--) {
+> +        new_func =3D (arg >> ((fn_grp - 1) * 4)) & 0x0f;
+> +        if (new_func =3D=3D SD_FN_NO_INFLUENCE) {
+> +            /* Guest requested no influence, so this function group
+> +             * stays the same.
+> +             */
+> +            new_func =3D sd->function_group[fn_grp - 1];
+> +        } else {
+> +            const sd_fn_support *def =3D &sd_fn_support_defs[fn_grp][new=
+_func];
+> +            if (mode) {
+> +                if (!def->name) {
+> +                    qemu_log_mask(LOG_GUEST_ERROR,
+> +                                  "Function %d not valid for "
+> +                                  "function group %d\n",
+> +                                  new_func, fn_grp);
+> +                    invalid_function_selected =3D true;
+> +                    new_func =3D SD_FN_NO_INFLUENCE;
+> +                } else if (def->unimp) {
+> +                    qemu_log_mask(LOG_UNIMP,
+> +                                  "Function %s (fn grp %d) not implement=
+ed\n",
+> +                                  def->name, fn_grp);
+> +                    invalid_function_selected =3D true;
+> +                    new_func =3D SD_FN_NO_INFLUENCE;
+> +                } else if (def->uhs_only && !sd->uhs_activated) {
+> +                    qemu_log_mask(LOG_GUEST_ERROR,
+> +                                  "Function %s (fn grp %d) only "
+> +                                  "valid in UHS mode\n",
+> +                                  def->name, fn_grp);
+> +                    invalid_function_selected =3D true;
+> +                    new_func =3D SD_FN_NO_INFLUENCE;
+> +                } else {
+> +                    sd->function_group[fn_grp - 1] =3D new_func;
+
+...but don't want to update the function_group[n] to the new value until
+we've checked that all the selected values in the command are OK,
+so you either need a temporary for the new function values, or
+you need to do one pass over the inputs to check and another one to set.
+
+> +                }
+> +            }
+> +            trace_sdcard_function_select(def->name, sd_fn_grp_name[fn_gr=
+p],
+> +                                         mode);
+> +        }
+> +        if (!(fn_grp & 0x1)) { /* evens go in high nibble */
+> +            *data_p =3D new_func << 4;
+> +        } else { /* odds go in low nibble */
+> +            *(data_p++) |=3D new_func;
+> +        }
+> +    }
+> +    if (invalid_function_selected) {
+> +        /* Ignore all the set values */
+> +        memset(&sd->data[14], 0, SD_FN_BUFSZ);
+
+All-zeroes doesn't seem to match the spec. The spec says "The response
+to an invalid selection of function will be 0xF", which is a bit unclear,
+but has to mean at least that we return 0xf for the function groups which
+were invalid selections. I'm not sure what we should return as status
+for the function groups which weren't invalid; possibilities include:
+ * 0xf
+ * whatever the provided argument for that function group was
+ * whatever the current status for that function group is
+
+I don't suppose you're in a position to find out what an actual
+hardware SD card does?
+
+thanks
+-- PMM
