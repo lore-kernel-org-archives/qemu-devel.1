@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fIGlE-0008MB-ED
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:55:45 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1fIGlI-0008PC-7Q
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:55:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fIGlC-0005x3-Qi
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:55:44 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:40660)
+	(envelope-from <zhangckid@gmail.com>) id 1fIGlH-0005zU-D1
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:55:48 -0400
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:36600)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fIGlC-0005wP-K1
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:55:42 -0400
-Received: by mail-pf0-x244.google.com with SMTP id f189-v6so6306966pfa.7
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 09:55:42 -0700 (PDT)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fIGlH-0005z2-69
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:55:47 -0400
+Received: by mail-pg0-x241.google.com with SMTP id z70-v6so5738390pgz.3
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 09:55:46 -0700 (PDT)
 From: Zhang Chen <zhangckid@gmail.com>
-Date: Tue, 15 May 2018 00:54:20 +0800
-Message-Id: <20180514165424.12884-14-zhangckid@gmail.com>
+Date: Tue, 15 May 2018 00:54:21 +0800
+Message-Id: <20180514165424.12884-15-zhangckid@gmail.com>
 In-Reply-To: <20180514165424.12884-1-zhangckid@gmail.com>
 References: <20180514165424.12884-1-zhangckid@gmail.com>
-Subject: [Qemu-devel] [PATCH V7 RESEND 13/17] COLO: flush host dirty ram
- from cache
+Subject: [Qemu-devel] [PATCH V7 RESEND 14/17] filter: Add handle_event
+ method for NetFilterClass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,60 +27,124 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Zhang Chen <zhangckid@gmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Zhang Chen <zhangckid@gmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-From: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Filter needs to process the event of checkpoint/failover or
+other event passed by COLO frame.
 
-Don't need to flush all VM's ram from cache, only
-flush the dirty pages since last checkpoint
-
-Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-Signed-off-by: Zhang Chen <zhangckid@gmail.com>
 Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 ---
- migration/ram.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ include/net/filter.h |  5 +++++
+ net/filter.c         | 17 +++++++++++++++++
+ net/net.c            | 28 ++++++++++++++++++++++++++++
+ 3 files changed, 50 insertions(+)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 4235a8f24d..21027c5b4d 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2786,6 +2786,7 @@ int colo_init_ram_cache(void)
-     }
-     ram_state = g_new0(RAMState, 1);
-     ram_state->migration_dirty_pages = 0;
-+    memory_global_dirty_log_start();
+diff --git a/include/net/filter.h b/include/net/filter.h
+index 435acd6f82..49da666ac0 100644
+--- a/include/net/filter.h
++++ b/include/net/filter.h
+@@ -38,6 +38,8 @@ typedef ssize_t (FilterReceiveIOV)(NetFilterState *nc,
  
-     return 0;
+ typedef void (FilterStatusChanged) (NetFilterState *nf, Error **errp);
  
-@@ -2806,10 +2807,12 @@ void colo_release_ram_cache(void)
++typedef void (FilterHandleEvent) (NetFilterState *nf, int event, Error **errp);
++
+ typedef struct NetFilterClass {
+     ObjectClass parent_class;
+ 
+@@ -45,6 +47,7 @@ typedef struct NetFilterClass {
+     FilterSetup *setup;
+     FilterCleanup *cleanup;
+     FilterStatusChanged *status_changed;
++    FilterHandleEvent *handle_event;
+     /* mandatory */
+     FilterReceiveIOV *receive_iov;
+ } NetFilterClass;
+@@ -77,4 +80,6 @@ ssize_t qemu_netfilter_pass_to_next(NetClientState *sender,
+                                     int iovcnt,
+                                     void *opaque);
+ 
++void colo_notify_filters_event(int event, Error **errp);
++
+ #endif /* QEMU_NET_FILTER_H */
+diff --git a/net/filter.c b/net/filter.c
+index 2fd7d7d663..0f17eba143 100644
+--- a/net/filter.c
++++ b/net/filter.c
+@@ -17,6 +17,8 @@
+ #include "net/vhost_net.h"
+ #include "qom/object_interfaces.h"
+ #include "qemu/iov.h"
++#include "net/colo.h"
++#include "migration/colo.h"
+ 
+ static inline bool qemu_can_skip_netfilter(NetFilterState *nf)
  {
-     RAMBlock *block;
+@@ -245,11 +247,26 @@ static void netfilter_finalize(Object *obj)
+     g_free(nf->netdev_id);
+ }
  
-+    memory_global_dirty_log_stop();
-     QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-         g_free(block->bmap);
-         block->bmap = NULL;
-     }
-+
-     rcu_read_lock();
-     QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-         if (block->colo_cache) {
-@@ -3042,6 +3045,15 @@ static void colo_flush_ram_cache(void)
-     void *src_host;
-     unsigned long offset = 0;
- 
-+    memory_global_dirty_log_sync();
-+    qemu_mutex_lock(&ram_state->bitmap_mutex);
-+    rcu_read_lock();
-+    RAMBLOCK_FOREACH(block) {
-+        migration_bitmap_sync_range(ram_state, block, 0, block->used_length);
++static void dummy_handle_event(NetFilterState *nf, int event, Error **errp)
++{
++    switch (event) {
++    case COLO_EVENT_CHECKPOINT:
++        break;
++    case COLO_EVENT_FAILOVER:
++        object_property_set_str(OBJECT(nf), "off", "status", errp);
++        break;
++    default:
++        break;
 +    }
-+    rcu_read_unlock();
-+    qemu_mutex_unlock(&ram_state->bitmap_mutex);
++}
 +
-     trace_colo_flush_ram_cache_begin(ram_state->migration_dirty_pages);
-     rcu_read_lock();
-     block = QLIST_FIRST_RCU(&ram_list.blocks);
+ static void netfilter_class_init(ObjectClass *oc, void *data)
+ {
+     UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
++    NetFilterClass *nfc = NETFILTER_CLASS(oc);
+ 
+     ucc->complete = netfilter_complete;
++    nfc->handle_event = dummy_handle_event;
+ }
+ 
+ static const TypeInfo netfilter_info = {
+diff --git a/net/net.c b/net/net.c
+index 29f83983e5..d58691bb8e 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -1335,6 +1335,34 @@ void hmp_info_network(Monitor *mon, const QDict *qdict)
+     }
+ }
+ 
++void colo_notify_filters_event(int event, Error **errp)
++{
++    NetClientState *nc, *peer;
++    NetClientDriver type;
++    NetFilterState *nf;
++    NetFilterClass *nfc = NULL;
++    Error *local_err = NULL;
++
++    QTAILQ_FOREACH(nc, &net_clients, next) {
++        peer = nc->peer;
++        type = nc->info->type;
++        if (!peer || type != NET_CLIENT_DRIVER_TAP) {
++            continue;
++        }
++        QTAILQ_FOREACH(nf, &nc->filters, next) {
++            nfc =  NETFILTER_GET_CLASS(OBJECT(nf));
++            if (!nfc->handle_event) {
++                continue;
++            }
++            nfc->handle_event(nf, event, &local_err);
++            if (local_err) {
++                error_propagate(errp, local_err);
++                return;
++            }
++        }
++    }
++}
++
+ void qmp_set_link(const char *name, bool up, Error **errp)
+ {
+     NetClientState *ncs[MAX_QUEUE_NUM];
 -- 
 2.17.0
