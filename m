@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fILhj-0007md-CK
+	(envelope-from <richard.henderson@linaro.org>) id 1fILhj-0007mc-Bi
 	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fILhg-0007I5-W6
+	(envelope-from <richard.henderson@linaro.org>) id 1fILhf-0007FM-Vv
 	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:27 -0400
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:41374)
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:44296)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fILhg-0007G0-Pf
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:24 -0400
-Received: by mail-pl0-x241.google.com with SMTP id az12-v6so8144532plb.8
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 15:12:24 -0700 (PDT)
+	id 1fILhf-0007Dm-Q2
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:23 -0400
+Received: by mail-pg0-x241.google.com with SMTP id x145-v6so6057239pgx.11
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 15:12:23 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 14 May 2018 15:11:52 -0700
-Message-Id: <20180514221219.7091-2-richard.henderson@linaro.org>
-In-Reply-To: <20180514221219.7091-1-richard.henderson@linaro.org>
-References: <20180514221219.7091-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v5 01/28] fpu/softfloat: Fix conversion from
- uint64 to float128
+Date: Mon, 14 May 2018 15:11:51 -0700
+Message-Id: <20180514221219.7091-1-richard.henderson@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v5 00/28] softfloat patch roundup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +28,85 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, alex.bennee@linaro.org, Petr Tesarik <ptesarik@suse.com>, qemu-stable@nongnu.org
+Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 
-From: Petr Tesarik <ptesarik@suse.com>
+This is my SNaN patch set, Alex's float-float refactor, and a couple
+of other random outstanding fpu patches.  This has been reordered so
+as to be bisectable, since the float-float refactor requires the snan
+work to avoid breakage.
 
-The significand is passed to normalizeRoundAndPackFloat128() as high
-first, low second. The current code passes the integer first, so the
-result is incorrectly shifted left by 64 bits.
+This was built on top of pm215/target-arm.next to make it easier to test.
+The whole tree is
 
-This bug affects the emulation of s390x instruction CXLGBR (convert
-from logical 64-bit binary-integer operand to extended BFP result).
+  git://github.com/rth7680/qemu.git fpu-roundup
 
-Cc: qemu-stable@nongnu.org
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Petr Tesarik <ptesarik@suse.com>
-Message-Id: <20180511071052.1443-1-ptesarik@suse.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- fpu/softfloat.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Changes since last:
+  - Use v5 instead of v3, since Alex was up to v4 with float-float.
+  - Incorporate feedback from pm215.
+  - Include float128 fix from Petr.
+  - Include further cleanups for default_nan and silence_nan.
+    The first of these was inspired by a comment from pm215; 
+    the rest follow as logical extensions.
 
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index bc0f52fa54..d07419324a 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -3147,7 +3147,7 @@ float128 uint64_to_float128(uint64_t a, float_status *status)
-     if (a == 0) {
-         return float128_zero;
-     }
--    return normalizeRoundAndPackFloat128(0, 0x406E, a, 0, status);
-+    return normalizeRoundAndPackFloat128(0, 0x406E, 0, a, status);
- }
- 
- 
+
+r~
+
+
+Alex Bennée (4):
+  target/arm: convert conversion helpers to fpst/ahp_flag
+  target/arm: squash FZ16 behaviour for conversions
+  fpu/softfloat: Partial support for ARM Alternative half-precision
+  fpu/softfloat: re-factor float to float conversions
+
+Petr Tesarik (1):
+  fpu/softfloat: Fix conversion from uint64 to float128
+
+Richard Henderson (23):
+  fpu/softfloat: Merge NO_SIGNALING_NANS definitions
+  fpu/softfloat: Split floatXX_silence_nan from floatXX_maybe_silence_nan
+  fpu/softfloat: Move softfloat-specialize.h below FloatParts definition
+  fpu/softfloat: Canonicalize NaN fraction
+  fpu/softfloat: Introduce parts_is_snan_frac
+  fpu/softfloat: Replace float_class_dnan with parts_default_nan
+  fpu/softfloat: Replace float_class_msnan with parts_silence_nan
+  target/arm: Use floatX_silence_nan when we have already checked for SNaN
+  target/arm: Remove floatX_maybe_silence_nan from conversions
+  target/hppa: Remove floatX_maybe_silence_nan from conversions
+  target/m68k: Use floatX_silence_nan when we have already checked for SNaN
+  target/mips: Remove floatX_maybe_silence_nan from conversions
+  target/riscv: Remove floatX_maybe_silence_nan from conversions
+  target/s390x: Remove floatX_maybe_silence_nan from conversions
+  fpu/softfloat: Use float*_silence_nan in propagateFloat*NaN
+  fpu/softfloat: Remove floatX_maybe_silence_nan
+  fpu/softfloat: Specialize on snan_bit_is_one
+  fpu/softfloat: Make is_nan et al available to softfloat-specialize.h
+  fpu/softfloat: Pass FloatClass to pickNaN
+  fpu/softfloat: Pass FloatClass to pickNaNMulAdd
+  fpu/softfloat: Define floatN_default_nan in terms of parts_default_nan
+  fpu/softfloat: Clean up parts_default_nan
+  fpu/softfloat: Define floatN_silence_nan in terms of parts_silence_nan
+
+ fpu/softfloat-specialize.h    | 691 ++++++++++++++-------------------
+ include/fpu/softfloat-types.h |   1 +
+ include/fpu/softfloat.h       |  18 +-
+ target/arm/helper.h           |  10 +-
+ target/arm/translate.h        |  12 +
+ fpu/softfloat.c               | 708 ++++++++++++----------------------
+ target/arm/helper-a64.c       |   7 +-
+ target/arm/helper.c           | 114 +++---
+ target/arm/translate-a64.c    |  38 +-
+ target/arm/translate.c        |  74 +++-
+ target/hppa/cpu.c             |   1 -
+ target/hppa/op_helper.c       |   2 -
+ target/m68k/softfloat.c       |   3 +-
+ target/mips/msa_helper.c      |   4 -
+ target/mips/op_helper.c       |   2 -
+ target/ppc/fpu_helper.c       |   1 -
+ target/riscv/fpu_helper.c     |   6 +-
+ target/s390x/fpu_helper.c     |  12 +-
+ target/sh4/cpu.c              |   1 -
+ target/unicore32/cpu.c        |   2 -
+ 20 files changed, 701 insertions(+), 1006 deletions(-)
+
 -- 
 2.17.0
