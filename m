@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fIIPX-0000h7-3Q
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 14:41:28 -0400
+	(envelope-from <bounces@canonical.com>) id 1fIIPV-0000gx-Or
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 14:41:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fIIPT-0008CD-VT
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 14:41:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35658 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fIIPT-0008B4-QZ
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 14:41:23 -0400
-Date: Mon, 14 May 2018 21:41:22 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180514214013-mutt-send-email-mst@kernel.org>
-References: <1526303228-486609-1-git-send-email-mst@redhat.com>
-	<CAFEAcA_bWJupL7oj=uxNAi3=1RGUZxpEeKx1L=JBZa6J4CuuYA@mail.gmail.com>
-	<20180514212856-mutt-send-email-mst@kernel.org>
-	<CAFEAcA_mLsbULijnaWfVShO0ZHSJx7QQTB32Cs+FU-HZiFbFSw@mail.gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1fIIPS-0008A1-KS
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 14:41:25 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35988)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fIIPS-00088P-Dl
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 14:41:22 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fIIPQ-00052X-Lt
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 18:41:20 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A49DC2E8F39
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 18:41:20 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_mLsbULijnaWfVShO0ZHSJx7QQTB32Cs+FU-HZiFbFSw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v6 0/3] linux-headers: arch fixups
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 14 May 2018 18:30:55 -0000
+From: eric hoffman <1771042@bugs.launchpad.net>
+Reply-To: Bug 1771042 <1771042@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152625681679.27592.11833589256802380892.malonedeb@wampee.canonical.com>
+Message-Id: <152632265597.25344.14291192100722757126.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1771042] Re: dataplane interrupt handler doesn't
+ support msi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,46 +37,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, James Hogan <jhogan@kernel.org>
+To: qemu-devel@nongnu.org
 
-On Mon, May 14, 2018 at 07:37:49PM +0100, Peter Maydell wrote:
-> On 14 May 2018 at 19:29, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > On Mon, May 14, 2018 at 04:10:42PM +0100, Peter Maydell wrote:
-> >> On 14 May 2018 at 14:07, Michael S. Tsirkin <mst@redhat.com> wrote:
-> >> > It turns out that we have unistd.h and kvm headers for some
-> >> > architectures but not others.  We are thus unable to use e.g. usefaultfd
-> >> > on these systems unless system headers have been updated.
-> >> >
-> >> > Fix up update-linux-headers.sh to make sure we auto-updates
-> >> > all architectures which have linux-headers/
-> >> > (unfortunately this still does not mean "all linux systems").
-> >> >
-> >> > Tested on x86 only.
-> >> >
-> >> > Pls consider merging this through the ARM tree.
-> >> >
-> >> > Changes from v5:
-> >> >     rebase to master
-> >>
-> >> Still doesn't apply:
-> >
-> > Against which commit?
-> 
-> bbd87423ea0c436c55bb, but the last change in master
-> to scripts/update-linux-headers.sh is 7afcfd32a65688 a
-> month ago, so this won't apply to anything since then
-> and wouldn't have applied before that either. I think you
-> have based your patchset on some other changes to the script
-> which are not in master (at a guess, your "move kvm_para.h
-> to standard-headers" series).
-> 
-> thanks
-> -- PMM
+thanks for looking at this Stefan - since I don't have any context of
+exactly the kind of environmental issues like threading, the patch
+posted here isn't really a suggested fix.
 
-Oh. That's right. I forgot about that, sorry.  These patches are
-supposed to be in the kvm tree now.  So need to wait for kvm to be
-merged, and this can go on top.
+it does in general seem helpful if batched interrupts have the same
+delivery semantics as non-deferred.
 
--- 
-MST
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1771042
+
+Title:
+  dataplane interrupt handler doesn't support msi
+
+Status in QEMU:
+  New
+
+Bug description:
+  hw/block/dataplane/virtio-blk.c commit
+  1010cadf62332017648abee0d7a3dc7f2eef9632
+
+  in the function notify_guest_bh, the function virtio_notify_irqfd is call=
+ed
+  to deliver the interrupt corresponding to the vq
+
+  however, without the dataplane, hw/block/virtio_blk_req_complete calls
+  virtio_notify to deliver the interrupt (immediately). this goes though
+  a slightly more involved path that calls virtio_pci_notify which includes
+  a case to handle msi interrupts.
+
+  so, msi interrupts with block devices aren't serviced when using dataplane
+  batching.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1771042/+subscriptions
