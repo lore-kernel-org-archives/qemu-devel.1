@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fIDty-00009P-Cc
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 09:52:35 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fIDuC-0000H7-Ty
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 09:52:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fIDtx-0007Zf-EM
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 09:52:34 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:45651)
+	(envelope-from <stefanha@gmail.com>) id 1fIDu8-0007hJ-17
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 09:52:48 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:51255)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fIDtx-0007Z9-AL
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 09:52:33 -0400
-Received: by mail-ot0-x244.google.com with SMTP id 15-v6so14313801otn.12
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 06:52:33 -0700 (PDT)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fIDu7-0007h4-QJ
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 09:52:43 -0400
+Received: by mail-wm0-x241.google.com with SMTP id j4-v6so13673296wme.1
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 06:52:43 -0700 (PDT)
+Date: Mon, 14 May 2018 14:52:40 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180514135240.GE5182@stefanha-x1.localdomain>
+References: <20180511203238.22881-1-andrewjameswood@ymail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180512004311.9299-12-richard.henderson@linaro.org>
-References: <20180512004311.9299-1-richard.henderson@linaro.org>
-	<20180512004311.9299-12-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 May 2018 14:52:12 +0100
-Message-ID: <CAFEAcA9L+XykpU9E_BefPrF_Naw5DXCByAJtRdpbz-qUnjMn2A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 11/27] fpu/softfloat: support ARM
- Alternative half-precision
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="3XA6nns4nE4KvaS/"
+Content-Disposition: inline
+In-Reply-To: <20180511203238.22881-1-andrewjameswood@ymail.com>
+Subject: Re: [Qemu-devel] [PATCH] Added SIGPWR handler to send ACPI shutdown
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,61 +29,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: andrewjameswood@ymail.com
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, Andrew Wood <awood@comms.org.uk>, Daniel Berrange <berrange@redhat.com>
 
-On 12 May 2018 at 01:42, Richard Henderson <richard.henderson@linaro.org> w=
-rote:
-> From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->
-> For float16 ARM supports an alternative half-precision format which
-> sacrifices the ability to represent NaN/Inf in return for a higher
-> dynamic range. To support this I've added an additional
-> FloatFmt (float16_params_ahp).
->
-> The new FloatFmt flag (arm_althp) is then used to modify the behaviour
-> of canonicalize and round_canonical with respect to representation and
-> exception raising.
->
-> Finally the float16_to_floatN and floatN_to_float16 conversion
-> routines select the new alternative FloatFmt when !ieee.
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-If we do this like this then we have a regression for the
-alternate-halfprec conversions between the patch where we change
-over the conversions functions and this one.
+--3XA6nns4nE4KvaS/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-To fix that we could put the parts of this patch that change
-existing-in-master code like round_canonical() first, and then
-fold the parts that fix up the conversion functions into the
-patch which is currently 10/27.
+On Fri, May 11, 2018 at 09:32:38PM +0100, andrewjameswood--- via Qemu-devel=
+ wrote:
+> From: Andrew Wood <awood@comms.org.uk>
+>=20
+> Signed-off-by: Andrew Wood <awood@comms.org.uk>
+
+Thanks!
+
+Please include a commit description to give the rationale for this
+change.
+
+Please address coding style issues.  You can run the checker like this:
+
+  $ scripts/checkpatch.pl HEAD^..
 
 > ---
-> v3
->   - squash NaN to 0 if destination is AHP F16
-> v4
->   - handle inf -> ahp max in float_to_float not round_canonical
->   - assert no nan and inf for ahp in round_canonical
->   - check ahp before snan in float_to_float
-> ---
->  fpu/softfloat.c | 95 +++++++++++++++++++++++++++++++++++++++++--------
->  1 file changed, 81 insertions(+), 14 deletions(-)
->
-> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-> index aa219223ff..15a272759d 100644
-> --- a/fpu/softfloat.c
-> +++ b/fpu/softfloat.c
-> @@ -211,8 +211,10 @@ typedef struct {
->   *   frac_shift: shift to normalise the fraction with DECOMPOSED_BINARY_=
-POINT
->   * The following are computed based the size of fraction
->   *   frac_lsb: least significant bit of fraction
-> - *   fram_lsbm1: the bit bellow the least significant bit (for rounding)
-> + *   frac_lsbm1: the bit bellow the least significant bit (for rounding)
+>  os-posix.c |  1 +
+>  vl.c       | 13 +++++++++++--
+>  2 files changed, 12 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/os-posix.c b/os-posix.c
+> index b9c2343b1e..68d70f269b 100644
+> --- a/os-posix.c
+> +++ b/os-posix.c
+> @@ -70,6 +70,7 @@ void os_setup_signal_handling(void)
+>      sigaction(SIGINT,  &act, NULL);
+>      sigaction(SIGHUP,  &act, NULL);
+>      sigaction(SIGTERM, &act, NULL);
+> +    sigaction(SIGPWR, &act, NULL);
+>  }
+> =20
+>  /* Find a likely location for support files using the location of the bi=
+nary.
+> diff --git a/vl.c b/vl.c
+> index fce1fd12d8..55c5e06858 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -1846,8 +1846,17 @@ void qemu_system_killed(int signal, pid_t pid)
+>      /* Cannot call qemu_system_shutdown_request directly because
+>       * we are in a signal handler.
+>       */
+> -    shutdown_requested =3D SHUTDOWN_CAUSE_HOST_SIGNAL;
+> -    qemu_notify_event();
+> +    if (signal=3D=3DSIGPWR)
+> +    {
+> +=09
+> +	powerdown_requested =3D 1;
+> +    	qemu_notify_event();
+> +    }
+> +    else
+> +    {
+> +    	shutdown_requested =3D SHUTDOWN_CAUSE_HOST_SIGNAL;
+> +    	qemu_notify_event();
+> +    }
+>  }
+> =20
+>  void qemu_system_shutdown_request(ShutdownCause reason)
+> --=20
+> 2.11.0
+>=20
+>=20
 
-"below" (I see this typo slipped past us the first time around)
+--3XA6nns4nE4KvaS/
+Content-Type: application/pgp-signature; name="signature.asc"
 
-thanks
--- PMM
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJa+ZSoAAoJEJykq7OBq3PItZAH/2LBxZSouXtWn17sA4ijyvcl
+BGeeInUrXOZZUBmK/mYn1yPB6/ezGc4Xdm049QLw9F4t+RGMe7nN3otqP1lkxDOL
+bF23O5jEeiQrzwEHpXLYiO6T8Cz+JQvPVSg/LygedOIpz8ViJj06Syls9L+Tzt4w
+HJJvH1K2R5m8IEf5D5cXn5CAkb8kAuH4Yv4nF1uvBBInR6ujj47e+ZQgCFkxX9EC
+dEf3QvZZxSZ2ztOtUhdmzcS/fdbABdtFTBbzt4UmIVivOhkM2F9/ZJrLIRtpkChv
+dsK8imqQglHzCpUbY53SIphn0c9WkVzBQNGksJubd3xeY97NSK4bR2ETb79s+vw=
+=+0dY
+-----END PGP SIGNATURE-----
+
+--3XA6nns4nE4KvaS/--
