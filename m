@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52731)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fILiK-0008OZ-U5
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:13:06 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fILv8-0003DU-JS
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:26:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fILiH-0000GH-LU
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:13:04 -0400
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:42034)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fILiH-0000EG-Cy
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:13:01 -0400
-Received: by mail-pg0-x243.google.com with SMTP id p9-v6so6060659pgc.9
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 15:13:01 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 14 May 2018 15:12:19 -0700
-Message-Id: <20180514221219.7091-29-richard.henderson@linaro.org>
-In-Reply-To: <20180514221219.7091-1-richard.henderson@linaro.org>
-References: <20180514221219.7091-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v5 28/28] fpu/softfloat: Define
- floatN_silence_nan in terms of parts_silence_nan
+	(envelope-from <mreitz@redhat.com>) id 1fILv7-0005xK-Ms
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:26:18 -0400
+References: <20180509162637.15575-1-kwolf@redhat.com>
+	<20180509162637.15575-35-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <42c6e2f7-01ef-3ec9-67b4-a4a8569055f1@redhat.com>
+Date: Tue, 15 May 2018 00:26:07 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180509162637.15575-35-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="C2h6ri1POsataJkOT8Wv1kW3sJ4qtfpWR"
+Subject: Re: [Qemu-devel] [PATCH 34/42] job: Add job_dismiss()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,165 +24,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-Isolate the target-specific choice to 3 functions instead of 6.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--C2h6ri1POsataJkOT8Wv1kW3sJ4qtfpWR
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com,
+ qemu-devel@nongnu.org
+Message-ID: <42c6e2f7-01ef-3ec9-67b4-a4a8569055f1@redhat.com>
+Subject: Re: [PATCH 34/42] job: Add job_dismiss()
+References: <20180509162637.15575-1-kwolf@redhat.com>
+ <20180509162637.15575-35-kwolf@redhat.com>
+In-Reply-To: <20180509162637.15575-35-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The code in floatx80_default_nan tried to be over-general.  There are
-only two targets that support this format: x86 and m68k.  Thus there
-is no point in inventing a mechanism for snan_bit_is_one.
+On 2018-05-09 18:26, Kevin Wolf wrote:
+> This moves block_job_dismiss() to the Job layer.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  include/block/blockjob.h |  9 ---------
+>  include/qemu/job.h       |  7 ++++++-
+>  blockdev.c               |  8 +++++---
+>  blockjob.c               | 13 -------------
+>  job.c                    | 15 ++++++++++++++-
+>  tests/test-blockjob.c    |  4 ++--
+>  6 files changed, 27 insertions(+), 29 deletions(-)
 
-Move routines that no longer have ifdefs out of softfloat-specialize.h.
+[...]
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- fpu/softfloat-specialize.h | 81 ++------------------------------------
- fpu/softfloat.c            | 19 +++++++++
- 2 files changed, 23 insertions(+), 77 deletions(-)
+> diff --git a/blockdev.c b/blockdev.c
+> index 31319a6d5a..15753d9719 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -3915,14 +3915,16 @@ void qmp_block_job_finalize(const char *id, Err=
+or **errp)
+>  void qmp_block_job_dismiss(const char *id, Error **errp)
+>  {
+>      AioContext *aio_context;
+> -    BlockJob *job =3D find_block_job(id, &aio_context, errp);
+> +    BlockJob *bjob =3D find_block_job(id, &aio_context, errp);
+> +    Job *job;
 
-diff --git a/fpu/softfloat-specialize.h b/fpu/softfloat-specialize.h
-index ec4fb6ba8b..16c0bcb6fa 100644
---- a/fpu/softfloat-specialize.h
-+++ b/fpu/softfloat-specialize.h
-@@ -278,24 +278,6 @@ int float16_is_signaling_nan(float16 a_, float_status *status)
- #endif
- }
- 
--/*----------------------------------------------------------------------------
--| Returns a quiet NaN from a signalling NaN for the half-precision
--| floating point value `a'.
--*----------------------------------------------------------------------------*/
--
--float16 float16_silence_nan(float16 a, float_status *status)
--{
--#ifdef NO_SIGNALING_NANS
--    g_assert_not_reached();
--#else
--    if (snan_bit_is_one(status)) {
--        return float16_default_nan(status);
--    } else {
--        return a | (1 << 9);
--    }
--#endif
--}
--
- /*----------------------------------------------------------------------------
- | Returns 1 if the single-precision floating-point value `a' is a quiet
- | NaN; otherwise returns 0.
-@@ -334,30 +316,6 @@ int float32_is_signaling_nan(float32 a_, float_status *status)
- #endif
- }
- 
--/*----------------------------------------------------------------------------
--| Returns a quiet NaN from a signalling NaN for the single-precision
--| floating point value `a'.
--*----------------------------------------------------------------------------*/
--
--float32 float32_silence_nan(float32 a, float_status *status)
--{
--#ifdef NO_SIGNALING_NANS
--    g_assert_not_reached();
--#else
--    if (snan_bit_is_one(status)) {
--# ifdef TARGET_HPPA
--        a &= ~0x00400000;
--        a |=  0x00200000;
--        return a;
--# else
--        return float32_default_nan(status);
--# endif
--    } else {
--        return a | (1 << 22);
--    }
--#endif
--}
--
- /*----------------------------------------------------------------------------
- | Returns the result of converting the single-precision floating-point NaN
- | `a' to the canonical NaN format.  If `a' is a signaling NaN, the invalid
-@@ -706,31 +664,6 @@ int float64_is_signaling_nan(float64 a_, float_status *status)
- #endif
- }
- 
--/*----------------------------------------------------------------------------
--| Returns a quiet NaN from a signalling NaN for the double-precision
--| floating point value `a'.
--*----------------------------------------------------------------------------*/
--
--float64 float64_silence_nan(float64 a, float_status *status)
--{
--#ifdef NO_SIGNALING_NANS
--    g_assert_not_reached();
--#else
--    if (snan_bit_is_one(status)) {
--# ifdef TARGET_HPPA
--        a &= ~0x0008000000000000ULL;
--        a |=  0x0004000000000000ULL;
--        return a;
--# else
--        return float64_default_nan(status);
--# endif
--    } else {
--        return a | LIT64(0x0008000000000000);
--    }
--#endif
--}
--
--
- /*----------------------------------------------------------------------------
- | Returns the result of converting the double-precision floating-point NaN
- | `a' to the canonical NaN format.  If `a' is a signaling NaN, the invalid
-@@ -886,16 +819,10 @@ int floatx80_is_signaling_nan(floatx80 a, float_status *status)
- 
- floatx80 floatx80_silence_nan(floatx80 a, float_status *status)
- {
--#ifdef NO_SIGNALING_NANS
--    g_assert_not_reached();
--#else
--    if (snan_bit_is_one(status)) {
--        return floatx80_default_nan(status);
--    } else {
--        a.low |= LIT64(0xC000000000000000);
--        return a;
--    }
--#endif
-+    /* None of the targets that have snan_bit_is_one use floatx80.  */
-+    assert(!snan_bit_is_one(status));
-+    a.low |= LIT64(0xC000000000000000);
-+    return a;
- }
- 
- /*----------------------------------------------------------------------------
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index b5842f7b1c..40b039ee5b 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -2128,6 +2128,25 @@ float128 float128_default_nan(float_status *status)
-     return r;
- }
- 
-+/*----------------------------------------------------------------------------
-+| Returns a quiet NaN from a signalling NaN for the floating point value `a'.
-+*----------------------------------------------------------------------------*/
-+
-+float16 float16_silence_nan(float16 a, float_status *status)
-+{
-+    return float16_pack_raw(parts_silence_nan(float16_unpack_raw(a), status));
-+}
-+
-+float32 float32_silence_nan(float32 a, float_status *status)
-+{
-+    return float32_pack_raw(parts_silence_nan(float32_unpack_raw(a), status));
-+}
-+
-+float64 float64_silence_nan(float64 a, float_status *status)
-+{
-+    return float64_pack_raw(parts_silence_nan(float64_unpack_raw(a), status));
-+}
-+
- /*----------------------------------------------------------------------------
- | Takes a 64-bit fixed-point value `absZ' with binary point between bits 6
- | and 7, and returns the properly rounded 32-bit integer corresponding to the
--- 
-2.17.0
+clang (probably gcc as well if I had enabled tracing in that build...)
+complains that this should be initialized to NULL because of...
+
+> =20
+> -    if (!job) {
+> +    if (!bjob) {
+>          return;
+>      }
+> =20
+>      trace_qmp_block_job_dismiss(job);
+
+=2E..this.
+
+Max
+
+> -    block_job_dismiss(&job, errp);
+> +    job =3D &bjob->job;
+> +    job_dismiss(&job, errp);
+>      aio_context_release(aio_context);
+>  }
+> =20
+
+
+--C2h6ri1POsataJkOT8Wv1kW3sJ4qtfpWR
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr6DP8ACgkQ9AfbAGHV
+z0AH7AgAr11LTiCJ71hmzmmFa9UUDeYbyJbUpL2uoAoO2Uy/iLUfYe3eI6nvRk8z
+rxuhWxJptC4laLeWjPZJzw0dNBfkAlrBdr8+KV09EvhTs7j6NY0zygXWHytQjSja
+6WIAbpsxsKRagLUizgHXNjssnU0iEPyYbhViYQsfNu606KGzkzCtJSqrKpa3lQSx
+sHonduDB7Kwig/+HqTYDbW8OjOFpGTOm0R1o31ZQqwrBU9GgpReSJMLj8aXG8B4W
+x/xHGW1o1sEOq3WN02e+4jsxjd8VhiSB/0LguDtMmxk9II8Bqh7Ww2+Ek0qsTIFd
+wbZX3GaTmjbsb4CErOhEZ9/snvEPgQ==
+=duUR
+-----END PGP SIGNATURE-----
+
+--C2h6ri1POsataJkOT8Wv1kW3sJ4qtfpWR--
