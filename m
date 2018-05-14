@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fILho-0007rT-JT
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:33 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fILhs-0007vm-V2
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fILhn-0007Vn-Ja
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:32 -0400
-Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:42494)
+	(envelope-from <richard.henderson@linaro.org>) id 1fILhr-0007gE-Kx
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:36 -0400
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:40994)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fILhn-0007Ug-DX
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:31 -0400
-Received: by mail-pl0-x244.google.com with SMTP id u6-v6so8148774pls.9
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 15:12:31 -0700 (PDT)
+	id 1fILhr-0007eu-FN
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:35 -0400
+Received: by mail-pf0-x241.google.com with SMTP id v63-v6so6663071pfk.8
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 15:12:35 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 14 May 2018 15:11:57 -0700
-Message-Id: <20180514221219.7091-7-richard.henderson@linaro.org>
+Date: Mon, 14 May 2018 15:12:00 -0700
+Message-Id: <20180514221219.7091-10-richard.henderson@linaro.org>
 In-Reply-To: <20180514221219.7091-1-richard.henderson@linaro.org>
 References: <20180514221219.7091-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v5 06/28] fpu/softfloat: Introduce
- parts_is_snan_frac
+Subject: [Qemu-devel] [PATCH v5 09/28] target/arm: Use floatX_silence_nan
+ when we have already checked for SNaN
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,58 +33,98 @@ Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- fpu/softfloat-specialize.h | 15 +++++++++++++++
- fpu/softfloat.c            | 12 ++----------
- 2 files changed, 17 insertions(+), 10 deletions(-)
+ target/arm/helper-a64.c |  6 +++---
+ target/arm/helper.c     | 12 ++++++------
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/fpu/softfloat-specialize.h b/fpu/softfloat-specialize.h
-index 4fc9ea4ac0..515cb12cfa 100644
---- a/fpu/softfloat-specialize.h
-+++ b/fpu/softfloat-specialize.h
-@@ -86,6 +86,21 @@ this code that are retained.
- #define NO_SIGNALING_NANS 1
- #endif
- 
-+/*----------------------------------------------------------------------------
-+| For the deconstructed floating-point with fraction FRAC, return true
-+| if the fraction represents a signalling NaN; otherwise false.
-+*----------------------------------------------------------------------------*/
-+
-+static bool parts_is_snan_frac(uint64_t frac, float_status *status)
-+{
-+#ifdef NO_SIGNALING_NANS
-+    return false;
-+#else
-+    flag msb = extract64(frac, DECOMPOSED_BINARY_POINT - 1, 1);
-+    return msb == status->snan_bit_is_one;
-+#endif
-+}
-+
- /*----------------------------------------------------------------------------
- | The pattern for a default generated half-precision NaN.
- *----------------------------------------------------------------------------*/
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 607c4a78d5..19f40d6932 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -331,16 +331,8 @@ static FloatParts canonicalize(FloatParts part, const FloatFmt *parm,
-             part.cls = float_class_inf;
-         } else {
-             part.frac <<= parm->frac_shift;
--#ifdef NO_SIGNALING_NANS
--            part.cls = float_class_qnan;
--#else
--            int64_t msb = part.frac << 2;
--            if ((msb < 0) == status->snan_bit_is_one) {
--                part.cls = float_class_snan;
--            } else {
--                part.cls = float_class_qnan;
--            }
--#endif
-+            part.cls = (parts_is_snan_frac(part.frac, status)
-+                        ? float_class_snan : float_class_qnan);
+diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+index 4f8034c513..6f0eb83661 100644
+--- a/target/arm/helper-a64.c
++++ b/target/arm/helper-a64.c
+@@ -376,7 +376,7 @@ float16 HELPER(frecpx_f16)(float16 a, void *fpstp)
+         float16 nan = a;
+         if (float16_is_signaling_nan(a, fpst)) {
+             float_raise(float_flag_invalid, fpst);
+-            nan = float16_maybe_silence_nan(a, fpst);
++            nan = float16_silence_nan(a, fpst);
          }
-     } else if (part.exp == 0) {
-         if (likely(part.frac == 0)) {
+         if (fpst->default_nan_mode) {
+             nan = float16_default_nan(fpst);
+@@ -405,7 +405,7 @@ float32 HELPER(frecpx_f32)(float32 a, void *fpstp)
+         float32 nan = a;
+         if (float32_is_signaling_nan(a, fpst)) {
+             float_raise(float_flag_invalid, fpst);
+-            nan = float32_maybe_silence_nan(a, fpst);
++            nan = float32_silence_nan(a, fpst);
+         }
+         if (fpst->default_nan_mode) {
+             nan = float32_default_nan(fpst);
+@@ -434,7 +434,7 @@ float64 HELPER(frecpx_f64)(float64 a, void *fpstp)
+         float64 nan = a;
+         if (float64_is_signaling_nan(a, fpst)) {
+             float_raise(float_flag_invalid, fpst);
+-            nan = float64_maybe_silence_nan(a, fpst);
++            nan = float64_silence_nan(a, fpst);
+         }
+         if (fpst->default_nan_mode) {
+             nan = float64_default_nan(fpst);
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index c6fd7f9479..3df5cf30e4 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -11739,7 +11739,7 @@ float16 HELPER(recpe_f16)(float16 input, void *fpstp)
+         float16 nan = f16;
+         if (float16_is_signaling_nan(f16, fpst)) {
+             float_raise(float_flag_invalid, fpst);
+-            nan = float16_maybe_silence_nan(f16, fpst);
++            nan = float16_silence_nan(f16, fpst);
+         }
+         if (fpst->default_nan_mode) {
+             nan =  float16_default_nan(fpst);
+@@ -11787,7 +11787,7 @@ float32 HELPER(recpe_f32)(float32 input, void *fpstp)
+         float32 nan = f32;
+         if (float32_is_signaling_nan(f32, fpst)) {
+             float_raise(float_flag_invalid, fpst);
+-            nan = float32_maybe_silence_nan(f32, fpst);
++            nan = float32_silence_nan(f32, fpst);
+         }
+         if (fpst->default_nan_mode) {
+             nan =  float32_default_nan(fpst);
+@@ -11835,7 +11835,7 @@ float64 HELPER(recpe_f64)(float64 input, void *fpstp)
+         float64 nan = f64;
+         if (float64_is_signaling_nan(f64, fpst)) {
+             float_raise(float_flag_invalid, fpst);
+-            nan = float64_maybe_silence_nan(f64, fpst);
++            nan = float64_silence_nan(f64, fpst);
+         }
+         if (fpst->default_nan_mode) {
+             nan =  float64_default_nan(fpst);
+@@ -11934,7 +11934,7 @@ float16 HELPER(rsqrte_f16)(float16 input, void *fpstp)
+         float16 nan = f16;
+         if (float16_is_signaling_nan(f16, s)) {
+             float_raise(float_flag_invalid, s);
+-            nan = float16_maybe_silence_nan(f16, s);
++            nan = float16_silence_nan(f16, s);
+         }
+         if (s->default_nan_mode) {
+             nan =  float16_default_nan(s);
+@@ -11978,7 +11978,7 @@ float32 HELPER(rsqrte_f32)(float32 input, void *fpstp)
+         float32 nan = f32;
+         if (float32_is_signaling_nan(f32, s)) {
+             float_raise(float_flag_invalid, s);
+-            nan = float32_maybe_silence_nan(f32, s);
++            nan = float32_silence_nan(f32, s);
+         }
+         if (s->default_nan_mode) {
+             nan =  float32_default_nan(s);
+@@ -12021,7 +12021,7 @@ float64 HELPER(rsqrte_f64)(float64 input, void *fpstp)
+         float64 nan = f64;
+         if (float64_is_signaling_nan(f64, s)) {
+             float_raise(float_flag_invalid, s);
+-            nan = float64_maybe_silence_nan(f64, s);
++            nan = float64_silence_nan(f64, s);
+         }
+         if (s->default_nan_mode) {
+             nan =  float64_default_nan(s);
 -- 
 2.17.0
