@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fIM1m-0000va-Kr
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:33:13 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fIMU6-0004oV-Aw
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 19:02:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fIM1j-0005UV-QZ
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:33:10 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fIMU5-0000z4-Dp
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 19:02:26 -0400
 References: <20180509162637.15575-1-kwolf@redhat.com>
-	<20180509162637.15575-18-kwolf@redhat.com>
+	<20180509162637.15575-19-kwolf@redhat.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <ff7476fd-5f6d-be11-c65a-296f3b717040@redhat.com>
-Date: Mon, 14 May 2018 18:33:00 -0400
+Message-ID: <c063b982-58ac-e477-991f-07b847edc48a@redhat.com>
+Date: Mon, 14 May 2018 19:02:18 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180509162637.15575-18-kwolf@redhat.com>
+In-Reply-To: <20180509162637.15575-19-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 17/42] job: Move defer_to_main_loop to Job
+Subject: Re: [Qemu-devel] [PATCH 18/42] job: Move coroutine and related code
+ to Job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,527 +31,59 @@ Cc: qemu-devel@nongnu.org, jcody@redhat.com, armbru@redhat.com, mreitz@redhat.co
 
 
 On 05/09/2018 12:26 PM, Kevin Wolf wrote:
+> This commit moves some core functions for dealing with the job coroutine
+> from BlockJob to Job. This includes primarily entering the coroutine
+> (both for the first and reentering) and yielding explicitly and at pause
+> points.
+> 
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-
-Hmm, this one is a bit more than just code motion due to the way the
-aio_context acquisition has changed. I think at a minimum a good commit
-message is warranted.
-
-
 > ---
->  include/block/blockjob.h     |  5 ----
->  include/block/blockjob_int.h | 19 ---------------
->  include/qemu/job.h           | 20 ++++++++++++++++
->  block/backup.c               |  7 +++---
->  block/commit.c               | 11 +++++----
->  block/mirror.c               | 15 ++++++------
->  block/stream.c               | 14 +++++------
->  blockjob.c                   | 57 ++++----------------------------------------
->  job.c                        | 33 +++++++++++++++++++++++++
->  tests/test-bdrv-drain.c      |  7 +++---
->  tests/test-blockjob-txn.c    | 13 +++++-----
->  tests/test-blockjob.c        |  7 +++---
->  12 files changed, 98 insertions(+), 110 deletions(-)
+>  include/block/blockjob.h     |  40 ---------
+>  include/block/blockjob_int.h |  26 ------
+>  include/qemu/job.h           |  76 ++++++++++++++++
+>  block/backup.c               |   2 +-
+>  block/commit.c               |   4 +-
+>  block/mirror.c               |  22 ++---
+>  block/replication.c          |   2 +-
+>  block/stream.c               |   4 +-
+>  blockdev.c                   |   8 +-
+>  blockjob.c                   | 201 +++++++------------------------------------
+>  job.c                        | 137 +++++++++++++++++++++++++++++
+>  tests/test-bdrv-drain.c      |  38 ++++----
+>  tests/test-blockjob-txn.c    |  12 +--
+>  tests/test-blockjob.c        |  14 +--
+>  14 files changed, 296 insertions(+), 290 deletions(-)
 > 
-> diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-> index 04efc94ffc..90942826f5 100644
-> --- a/include/block/blockjob.h
-> +++ b/include/block/blockjob.h
-> @@ -92,11 +92,6 @@ typedef struct BlockJob {
->       */
->      bool ready;
+
+[...]
+
 >  
-> -    /**
-> -     * Set to true when the job has deferred work to the main loop.
-> -     */
-> -    bool deferred_to_main_loop;
-> -
->      /** Status that is published by the query-block-jobs QMP API */
->      BlockDeviceIoStatus iostatus;
->  
-> diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-> index d64f30e6b0..0c2f8de381 100644
-> --- a/include/block/blockjob_int.h
-> +++ b/include/block/blockjob_int.h
-> @@ -233,23 +233,4 @@ void block_job_event_ready(BlockJob *job);
->  BlockErrorAction block_job_error_action(BlockJob *job, BlockdevOnError on_err,
->                                          int is_read, int error);
->  
-> -typedef void BlockJobDeferToMainLoopFn(BlockJob *job, void *opaque);
-> -
-> -/**
-> - * block_job_defer_to_main_loop:
-> - * @job: The job
-> - * @fn: The function to run in the main loop
-> - * @opaque: The opaque value that is passed to @fn
-> - *
-> - * This function must be called by the main job coroutine just before it
-> - * returns.  @fn is executed in the main loop with the BlockDriverState
-> - * AioContext acquired.  Block jobs must call bdrv_unref(), bdrv_close(), and
-> - * anything that uses bdrv_drain_all() in the main loop.
-> - *
-> - * The @job AioContext is held while @fn executes.
-> - */
-> -void block_job_defer_to_main_loop(BlockJob *job,
-> -                                  BlockJobDeferToMainLoopFn *fn,
-> -                                  void *opaque);
-> -
->  #endif
-> diff --git a/include/qemu/job.h b/include/qemu/job.h
-> index 1821f9ebd7..1a20534235 100644
-> --- a/include/qemu/job.h
-> +++ b/include/qemu/job.h
-> @@ -58,6 +58,9 @@ typedef struct Job {
->       */
->      bool cancelled;
->  
-> +    /** Set to true when the job has deferred work to the main loop. */
-> +    bool deferred_to_main_loop;
-> +
->      /** Element of the list of jobs */
->      QLIST_ENTRY(Job) job_list;
->  } Job;
-> @@ -131,6 +134,23 @@ Job *job_get(const char *id);
->   */
->  int job_apply_verb(Job *job, JobVerb bv, Error **errp);
->  
-> +typedef void JobDeferToMainLoopFn(Job *job, void *opaque);
-> +
-> +/**
-> + * @job: The job
-> + * @fn: The function to run in the main loop
-> + * @opaque: The opaque value that is passed to @fn
-> + *
-> + * This function must be called by the main job coroutine just before it
-> + * returns.  @fn is executed in the main loop with the job AioContext acquired.
-> + *
-> + * Block jobs must call bdrv_unref(), bdrv_close(), and anything that uses
-> + * bdrv_drain_all() in the main loop.
-> + *
-> + * The @job AioContext is held while @fn executes.
-> + */
-> +void job_defer_to_main_loop(Job *job, JobDeferToMainLoopFn *fn, void *opaque);
-> +
->  /* TODO To be removed from the public interface */
->  void job_state_transition(Job *job, JobStatus s1);
->  
-> diff --git a/block/backup.c b/block/backup.c
-> index ef0aa0e24e..22dd368c90 100644
-> --- a/block/backup.c
-> +++ b/block/backup.c
-> @@ -317,11 +317,12 @@ typedef struct {
->      int ret;
->  } BackupCompleteData;
->  
-> -static void backup_complete(BlockJob *job, void *opaque)
-> +static void backup_complete(Job *job, void *opaque)
->  {
-> +    BlockJob *bjob = container_of(job, BlockJob, job);
->      BackupCompleteData *data = opaque;
->  
-> -    block_job_completed(job, data->ret);
-> +    block_job_completed(bjob, data->ret);
->      g_free(data);
->  }
->  
-> @@ -519,7 +520,7 @@ static void coroutine_fn backup_run(void *opaque)
->  
->      data = g_malloc(sizeof(*data));
->      data->ret = ret;
-> -    block_job_defer_to_main_loop(&job->common, backup_complete, data);
-> +    job_defer_to_main_loop(&job->common.job, backup_complete, data);
->  }
->  
->  static const BlockJobDriver backup_job_driver = {
-> diff --git a/block/commit.c b/block/commit.c
-> index 85baea8f92..d326766e4d 100644
-> --- a/block/commit.c
-> +++ b/block/commit.c
-> @@ -72,9 +72,10 @@ typedef struct {
->      int ret;
->  } CommitCompleteData;
->  
-> -static void commit_complete(BlockJob *job, void *opaque)
-> +static void commit_complete(Job *job, void *opaque)
->  {
-> -    CommitBlockJob *s = container_of(job, CommitBlockJob, common);
-> +    CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
-> +    BlockJob *bjob = &s->common;
->      CommitCompleteData *data = opaque;
->      BlockDriverState *top = blk_bs(s->top);
->      BlockDriverState *base = blk_bs(s->base);
-> @@ -90,7 +91,7 @@ static void commit_complete(BlockJob *job, void *opaque)
->       * the normal backing chain can be restored. */
->      blk_unref(s->base);
->  
-> -    if (!job_is_cancelled(&s->common.job) && ret == 0) {
-> +    if (!job_is_cancelled(job) && ret == 0) {
->          /* success */
->          ret = bdrv_drop_intermediate(s->commit_top_bs, base,
->                                       s->backing_file_str);
-> @@ -114,7 +115,7 @@ static void commit_complete(BlockJob *job, void *opaque)
->       * block_job_finish_sync()), block_job_completed() won't free it and
->       * therefore the blockers on the intermediate nodes remain. This would
->       * cause bdrv_set_backing_hd() to fail. */
-> -    block_job_remove_all_bdrv(job);
-> +    block_job_remove_all_bdrv(bjob);
->  
->      block_job_completed(&s->common, ret);
->      g_free(data);
-> @@ -211,7 +212,7 @@ out:
->  
->      data = g_malloc(sizeof(*data));
->      data->ret = ret;
-> -    block_job_defer_to_main_loop(&s->common, commit_complete, data);
-> +    job_defer_to_main_loop(&s->common.job, commit_complete, data);
->  }
->  
->  static const BlockJobDriver commit_job_driver = {
-> diff --git a/block/mirror.c b/block/mirror.c
-> index 163d83e34a..4929191b81 100644
-> --- a/block/mirror.c
-> +++ b/block/mirror.c
-> @@ -484,9 +484,10 @@ typedef struct {
->      int ret;
->  } MirrorExitData;
->  
-> -static void mirror_exit(BlockJob *job, void *opaque)
-> +static void mirror_exit(Job *job, void *opaque)
->  {
-> -    MirrorBlockJob *s = container_of(job, MirrorBlockJob, common);
-> +    MirrorBlockJob *s = container_of(job, MirrorBlockJob, common.job);
-> +    BlockJob *bjob = &s->common;
->      MirrorExitData *data = opaque;
->      AioContext *replace_aio_context = NULL;
->      BlockDriverState *src = s->source;
-> @@ -568,7 +569,7 @@ static void mirror_exit(BlockJob *job, void *opaque)
->       * the blockers on the intermediate nodes so that the resulting state is
->       * valid. Also give up permissions on mirror_top_bs->backing, which might
->       * block the removal. */
-> -    block_job_remove_all_bdrv(job);
-> +    block_job_remove_all_bdrv(bjob);
->      bdrv_child_try_set_perm(mirror_top_bs->backing, 0, BLK_PERM_ALL,
->                              &error_abort);
->      bdrv_replace_node(mirror_top_bs, backing_bs(mirror_top_bs), &error_abort);
-> @@ -576,9 +577,9 @@ static void mirror_exit(BlockJob *job, void *opaque)
->      /* We just changed the BDS the job BB refers to (with either or both of the
->       * bdrv_replace_node() calls), so switch the BB back so the cleanup does
->       * the right thing. We don't need any permissions any more now. */
-> -    blk_remove_bs(job->blk);
-> -    blk_set_perm(job->blk, 0, BLK_PERM_ALL, &error_abort);
-> -    blk_insert_bs(job->blk, mirror_top_bs, &error_abort);
-> +    blk_remove_bs(bjob->blk);
-> +    blk_set_perm(bjob->blk, 0, BLK_PERM_ALL, &error_abort);
-> +    blk_insert_bs(bjob->blk, mirror_top_bs, &error_abort);
->  
->      block_job_completed(&s->common, data->ret);
->  
-> @@ -901,7 +902,7 @@ immediate_exit:
->      if (need_drain) {
->          bdrv_drained_begin(bs);
->      }
-> -    block_job_defer_to_main_loop(&s->common, mirror_exit, data);
-> +    job_defer_to_main_loop(&s->common.job, mirror_exit, data);
->  }
->  
->  static void mirror_complete(BlockJob *job, Error **errp)
-> diff --git a/block/stream.c b/block/stream.c
-> index 22c71ae100..0bba81678c 100644
-> --- a/block/stream.c
-> +++ b/block/stream.c
-> @@ -58,16 +58,16 @@ typedef struct {
->      int ret;
->  } StreamCompleteData;
->  
-> -static void stream_complete(BlockJob *job, void *opaque)
-> +static void stream_complete(Job *job, void *opaque)
->  {
-> -    StreamBlockJob *s = container_of(job, StreamBlockJob, common);
-> +    StreamBlockJob *s = container_of(job, StreamBlockJob, common.job);
-> +    BlockJob *bjob = &s->common;
->      StreamCompleteData *data = opaque;
-> -    BlockDriverState *bs = blk_bs(job->blk);
-> +    BlockDriverState *bs = blk_bs(bjob->blk);
->      BlockDriverState *base = s->base;
->      Error *local_err = NULL;
->  
-> -    if (!job_is_cancelled(&s->common.job) && bs->backing &&
-> -        data->ret == 0) {
-> +    if (!job_is_cancelled(job) && bs->backing && data->ret == 0) {
->          const char *base_id = NULL, *base_fmt = NULL;
->          if (base) {
->              base_id = s->backing_file_str;
-> @@ -88,7 +88,7 @@ out:
->      /* Reopen the image back in read-only mode if necessary */
->      if (s->bs_flags != bdrv_get_flags(bs)) {
->          /* Give up write permissions before making it read-only */
-> -        blk_set_perm(job->blk, 0, BLK_PERM_ALL, &error_abort);
-> +        blk_set_perm(bjob->blk, 0, BLK_PERM_ALL, &error_abort);
->          bdrv_reopen(bs, s->bs_flags, NULL);
->      }
->  
-> @@ -205,7 +205,7 @@ out:
->      /* Modify backing chain and close BDSes in main loop */
->      data = g_malloc(sizeof(*data));
->      data->ret = ret;
-> -    block_job_defer_to_main_loop(&s->common, stream_complete, data);
-> +    job_defer_to_main_loop(&s->common.job, stream_complete, data);
->  }
->  
->  static const BlockJobDriver stream_job_driver = {
-> diff --git a/blockjob.c b/blockjob.c
-> index d44f5c2e50..6021d885be 100644
-> --- a/blockjob.c
-> +++ b/blockjob.c
-> @@ -347,7 +347,7 @@ static void block_job_decommission(BlockJob *job)
->      job->completed = true;
->      job->busy = false;
->      job->paused = false;
-> -    job->deferred_to_main_loop = true;
-> +    job->job.deferred_to_main_loop = true;
->      block_job_txn_del_job(job);
->      job_state_transition(&job->job, JOB_STATUS_NULL);
->      job_unref(&job->job);
-> @@ -502,7 +502,7 @@ static int block_job_finish_sync(BlockJob *job,
->      /* block_job_drain calls block_job_enter, and it should be enough to
->       * induce progress until the job completes or moves to the main thread.
->      */
-> -    while (!job->deferred_to_main_loop && !job->completed) {
-> +    while (!job->job.deferred_to_main_loop && !job->completed) {
->          block_job_drain(job);
->      }
->      while (!job->completed) {
-> @@ -722,7 +722,7 @@ void block_job_cancel(BlockJob *job, bool force)
->      block_job_cancel_async(job, force);
->      if (!block_job_started(job)) {
->          block_job_completed(job, -ECANCELED);
-> -    } else if (job->deferred_to_main_loop) {
-> +    } else if (job->job.deferred_to_main_loop) {
->          block_job_completed_txn_abort(job);
->      } else {
->          block_job_enter(job);
-> @@ -1038,7 +1038,7 @@ static void block_job_enter_cond(BlockJob *job, bool(*fn)(BlockJob *job))
->      if (!block_job_started(job)) {
->          return;
->      }
-> -    if (job->deferred_to_main_loop) {
-> +    if (job->job.deferred_to_main_loop) {
->          return;
->      }
->  
-> @@ -1053,7 +1053,7 @@ static void block_job_enter_cond(BlockJob *job, bool(*fn)(BlockJob *job))
->          return;
->      }
->  
-> -    assert(!job->deferred_to_main_loop);
-> +    assert(!job->job.deferred_to_main_loop);
->      timer_del(&job->sleep_timer);
->      job->busy = true;
->      block_job_unlock();
-> @@ -1159,50 +1159,3 @@ BlockErrorAction block_job_error_action(BlockJob *job, BlockdevOnError on_err,
->      }
->      return action;
->  }
-> -
-> -typedef struct {
-> -    BlockJob *job;
-> -    AioContext *aio_context;
-> -    BlockJobDeferToMainLoopFn *fn;
-> -    void *opaque;
-> -} BlockJobDeferToMainLoopData;
-> -
-> -static void block_job_defer_to_main_loop_bh(void *opaque)
-> -{
-> -    BlockJobDeferToMainLoopData *data = opaque;
-> -    AioContext *aio_context;
-> -
-> -    /* Prevent race with block_job_defer_to_main_loop() */
-> -    aio_context_acquire(data->aio_context);
-> -
-> -    /* Fetch BDS AioContext again, in case it has changed */
-> -    aio_context = blk_get_aio_context(data->job->blk);
-> -    if (aio_context != data->aio_context) {
-> -        aio_context_acquire(aio_context);
-> -    }
-> -
-> -    data->fn(data->job, data->opaque);
-> -
-> -    if (aio_context != data->aio_context) {
-> -        aio_context_release(aio_context);
-> -    }
-> -
-> -    aio_context_release(data->aio_context);
-> -
-> -    g_free(data);
-> -}
-> -
-> -void block_job_defer_to_main_loop(BlockJob *job,
-> -                                  BlockJobDeferToMainLoopFn *fn,
-> -                                  void *opaque)
-> -{
-> -    BlockJobDeferToMainLoopData *data = g_malloc(sizeof(*data));
-> -    data->job = job;
-> -    data->aio_context = blk_get_aio_context(job->blk);
-> -    data->fn = fn;
-> -    data->opaque = opaque;
-> -    job->deferred_to_main_loop = true;
-> -
-> -    aio_bh_schedule_oneshot(qemu_get_aio_context(),
-> -                            block_job_defer_to_main_loop_bh, data);
-> -}
-> diff --git a/job.c b/job.c
-> index 6f97a4317e..b074b3ffd7 100644
-> --- a/job.c
-> +++ b/job.c
-> @@ -28,6 +28,7 @@
->  #include "qapi/error.h"
->  #include "qemu/job.h"
->  #include "qemu/id.h"
-> +#include "qemu/main-loop.h"
->  #include "trace-root.h"
->  
->  static QLIST_HEAD(, Job) jobs = QLIST_HEAD_INITIALIZER(jobs);
-> @@ -170,3 +171,35 @@ void job_unref(Job *job)
->          g_free(job);
->      }
->  }
-> +
-> +typedef struct {
-> +    Job *job;
-> +    JobDeferToMainLoopFn *fn;
-> +    void *opaque;
-> +} JobDeferToMainLoopData;
-> +
-> +static void job_defer_to_main_loop_bh(void *opaque)
+>  /* Assumes the block_job_mutex is held */
+> -static bool block_job_timer_pending(BlockJob *job)
+> +static bool job_timer_pending(Job *job)
+
+Is this intentionally left behind in blockjob.c, even once you've
+changed the name (and moved the state to job.c?)
+
+[...]
+
+> +void job_start(Job *job)
 > +{
-> +    JobDeferToMainLoopData *data = opaque;
-> +    Job *job = data->job;
-> +    AioContext *aio_context = job->aio_context;
-> +
-> +    /* Prevent race with job_defer_to_main_loop() */
-> +    aio_context_acquire(aio_context);
-> +    data->fn(data->job, data->opaque);
-> +    aio_context_release(aio_context);
-> +
-> +    g_free(data);
-> +}
-> +
+> +    assert(job && !job_started(job) && job->paused &&
+> +           job->driver && job->driver->start);
+> +    job->co = qemu_coroutine_create(job_co_entry, job);
+> +    job->pause_count--;
+> +    job->busy = true;
+> +    job->paused = false;
+> +    job_state_transition(job, JOB_STATUS_RUNNING);
+> +    aio_co_enter(job->aio_context, job->co);
 
-This function showed up in '14, with dec7d42 from Stefan. His first
-draft looked like Kevin's, until:
+I suppose patch 16 was the time to ask this, but are there any
+detriments to setting the AIO Context at creation time and then using
+that consistently instead of just fetching the AIO context of the BDS
+whenever we need it?
 
-https://lists.gnu.org/archive/html/qemu-devel/2014-10/msg00111.html
+I guess if the context changes then we've got it covered in
+block_job_attached_aio_context.
 
-Max, from 2014:
-
-"I'm not so sure whether it'd be possible to change the BDS's AIO
-context (in another thread) after the call to bdrv_get_aio_context() in
-block_job_defer_to_main_loop() and before
-block_job_defer_to_main_loop_bh() is run. If so, this might create race
-conditions."
-
-Err, I dunno either.
-
-> +void job_defer_to_main_loop(Job *job, JobDeferToMainLoopFn *fn, void *opaque)
-> +{
-> +    JobDeferToMainLoopData *data = g_malloc(sizeof(*data));
-> +    data->job = job;
-> +    data->fn = fn;
-> +    data->opaque = opaque;
-> +    job->deferred_to_main_loop = true;
-> +
-> +    aio_bh_schedule_oneshot(qemu_get_aio_context(),
-> +                            job_defer_to_main_loop_bh, data);
-> +}
-> diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
-> index f9e37d479c..4f8cba8377 100644
-> --- a/tests/test-bdrv-drain.c
-> +++ b/tests/test-bdrv-drain.c
-> @@ -496,9 +496,10 @@ typedef struct TestBlockJob {
->      bool should_complete;
->  } TestBlockJob;
->  
-> -static void test_job_completed(BlockJob *job, void *opaque)
-> +static void test_job_completed(Job *job, void *opaque)
->  {
-> -    block_job_completed(job, 0);
-> +    BlockJob *bjob = container_of(job, BlockJob, job);
-> +    block_job_completed(bjob, 0);
->  }
->  
->  static void coroutine_fn test_job_start(void *opaque)
-> @@ -510,7 +511,7 @@ static void coroutine_fn test_job_start(void *opaque)
->          block_job_sleep_ns(&s->common, 100000);
->      }
->  
-> -    block_job_defer_to_main_loop(&s->common, test_job_completed, NULL);
-> +    job_defer_to_main_loop(&s->common.job, test_job_completed, NULL);
->  }
->  
->  static void test_job_complete(BlockJob *job, Error **errp)
-> diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
-> index 26b4bbb230..c03f9662d8 100644
-> --- a/tests/test-blockjob-txn.c
-> +++ b/tests/test-blockjob-txn.c
-> @@ -24,16 +24,17 @@ typedef struct {
->      int *result;
->  } TestBlockJob;
->  
-> -static void test_block_job_complete(BlockJob *job, void *opaque)
-> +static void test_block_job_complete(Job *job, void *opaque)
->  {
-> -    BlockDriverState *bs = blk_bs(job->blk);
-> +    BlockJob *bjob = container_of(job, BlockJob, job);
-> +    BlockDriverState *bs = blk_bs(bjob->blk);
->      int rc = (intptr_t)opaque;
->  
-> -    if (job_is_cancelled(&job->job)) {
-> +    if (job_is_cancelled(job)) {
->          rc = -ECANCELED;
->      }
->  
-> -    block_job_completed(job, rc);
-> +    block_job_completed(bjob, rc);
->      bdrv_unref(bs);
->  }
->  
-> @@ -54,8 +55,8 @@ static void coroutine_fn test_block_job_run(void *opaque)
->          }
->      }
->  
-> -    block_job_defer_to_main_loop(job, test_block_job_complete,
-> -                                 (void *)(intptr_t)s->rc);
-> +    job_defer_to_main_loop(&job->job, test_block_job_complete,
-> +                           (void *)(intptr_t)s->rc);
->  }
->  
->  typedef struct {
-> diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
-> index fa31481537..5f43bd72a4 100644
-> --- a/tests/test-blockjob.c
-> +++ b/tests/test-blockjob.c
-> @@ -161,11 +161,12 @@ typedef struct CancelJob {
->      bool completed;
->  } CancelJob;
->  
-> -static void cancel_job_completed(BlockJob *job, void *opaque)
-> +static void cancel_job_completed(Job *job, void *opaque)
->  {
-> +    BlockJob *bjob = container_of(job, BlockJob, job);
->      CancelJob *s = opaque;
->      s->completed = true;
-> -    block_job_completed(job, 0);
-> +    block_job_completed(bjob, 0);
->  }
->  
->  static void cancel_job_complete(BlockJob *job, Error **errp)
-> @@ -191,7 +192,7 @@ static void coroutine_fn cancel_job_start(void *opaque)
->      }
->  
->   defer:
-> -    block_job_defer_to_main_loop(&s->common, cancel_job_completed, s);
-> +    job_defer_to_main_loop(&s->common.job, cancel_job_completed, s);
->  }
->  
->  static const BlockJobDriver test_cancel_driver = {
-> 
+Reviewed-by: John Snow <jsnow@redhat.com>
