@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50445)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fIEUt-0003Nx-Ci
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 10:30:48 -0400
+	(envelope-from <bounces@canonical.com>) id 1fIEV4-0003YU-BY
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 10:30:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fIEUq-0000ex-Aa
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 10:30:43 -0400
-Date: Mon, 14 May 2018 15:30:37 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180514143037.GQ5182@stefanha-x1.localdomain>
-References: <20180511222052.8734-1-ehabkost@redhat.com>
-	<20180511222052.8734-11-ehabkost@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1fIEV1-0000mn-8l
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 10:30:54 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51546)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fIEV1-0000mG-2d
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 10:30:51 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fIEUz-0000qW-MU
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 14:30:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9F14E2E8F38
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 14:30:49 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="GTGEtWEe6jD60dxL"
-Content-Disposition: inline
-In-Reply-To: <20180511222052.8734-11-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC 10/10] python: futurize -f
- lib2to3.fixes.fix_numliterals
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 14 May 2018 14:14:06 -0000
+From: Thomas Huth <1575607@bugs.launchpad.net>
+Reply-To: Bug 1575607 <1575607@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160427111619.24836.70047.malonedeb@wampee.canonical.com>
+Message-Id: <152630724615.27813.6105054996443805643.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1575607] Re:  vm startup failed,
+ qemu returned "kvm run failed Bad address"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,47 +37,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>, Fam Zheng <famz@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
 
+Can you still reproduce this issue with the latest version of QEMU and
+the latest version of the Linux kernel?
 
---GTGEtWEe6jD60dxL
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-On Fri, May 11, 2018 at 07:20:52PM -0300, Eduardo Habkost wrote:
-> Convert octal literals into the new syntax.
->=20
-> This is necessary for Python 3 compatibility.
->=20
-> Done using:
->=20
->   $ py=3D$( (g grep -l -E '^#!.*python';find -name '*.py' -printf '%P\n';=
-) | \
->     sort -u | grep -v README.sh4)
->   $ futurize -w -f lib2to3.fixes.fix_numliterals $py
->=20
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  scripts/qmp/qom-fuse   |  6 +++---
->  tests/qemu-iotests/118 | 24 ++++++++++++------------
->  2 files changed, 15 insertions(+), 15 deletions(-)
+-- =
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1575607
 
---GTGEtWEe6jD60dxL
-Content-Type: application/pgp-signature; name="signature.asc"
+Title:
+   vm startup failed, qemu returned "kvm run failed Bad address"
 
------BEGIN PGP SIGNATURE-----
+Status in QEMU:
+  Incomplete
 
-iQEcBAEBAgAGBQJa+Z2NAAoJEJykq7OBq3PIjFwH/3jJJNm3HaeM0UNPVD1a91vS
-13v7NNm02WlbaGlJWEh3Mzf0LQY1W7ZeznsYB+uE2j89eWqU7U1b9FuSNX04Bg4C
-EkxtY3Kuhrmzcg9cTvl1fLXMbenolGYxJhYtIFiAOHZ3X+YRFWP50ry9QbKEM04i
-wdQ9/N4CHaHCtNJfXmmxJoRsRfkKm6BOIVz8sCJLb+/gULotXABv9RZ5yoU63Iv6
-x079HFaqNkSNlcqDHyVbCAi3SN+ZbymoHwluYhJFdsbpY4LClu/hjSbAa/Ao2mZI
-cuJFjum/+Y2S3xnHX7ZNaxoVGGg/cnjDi7QmfLQYG0LFWQ9KoMdhDspkCGPQa30=
-=PC1f
------END PGP SIGNATURE-----
+Bug description:
+    create a virtual machine and start by libvirt. vm startup failed, qemu =
+returned "kvm run failed Bad address"
+    the error log is :
 
---GTGEtWEe6jD60dxL--
+  error: kvm run failed Bad address
+
+  EAX=3D7ffc0000 EBX=3D7ffbffd0 ECX=3Dfffffff0 EDX=3D0000002c
+
+  ESI=3D00006f5c EDI=3D7ffbffd0 EBP=3D7ffc0000 ESP=3D00006f34
+
+  EIP=3D000dec7b EFL=3D00010046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
+T=3D0
+
+  ES =3D0010 00000000 ffffffff 00c09300 DPL=3D0 DS   [-WA]
+
+  CS =3D0008 00000000 ffffffff 00c09b00 DPL=3D0 CS32 [-RA]
+
+  SS =3D0010 00000000 ffffffff 00c09300 DPL=3D0 DS   [-WA]
+
+  DS =3D0010 00000000 ffffffff 00c09300 DPL=3D0 DS   [-WA]
+
+  FS =3D0010 00000000 ffffffff 00c09300 DPL=3D0 DS   [-WA]
+
+  GS =3D0010 00000000 ffffffff 00c09300 DPL=3D0 DS   [-WA]
+
+  LDT=3D0000 00000000 0000ffff 00008200 DPL=3D0 LDT
+
+  TR =3D0000 00000000 0000ffff 00008b00 DPL=3D0 TSS32-busy
+
+  GDT=3D     000f6a80 00000037
+
+  IDT=3D     000f6abe 00000000
+
+  CR0=3D60000011 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
+
+  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000
+  DR3=3D0000000000000000
+
+  DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
+
+  EFER=3D0000000000000000
+
+  Code=3Dc3 29 d3 21 cb 39 c3 77 27 3b 5e 0c 72 22 85 ff 75 02 89 df <89>
+  5f 08 01 da 89 57 0c 89 47 10 89 5e 10 8b 56 04 89 f8 e8 8c fc ff ff
+  89 d8 eb 06 8b 36
+
+    we add numa in the vm, the numatune info is:
+    <numatune>
+
+      <memory mode=3D'strict' placement=3D'auto'/>
+
+    </numatune>
+
+   the version of qemu is 2.5.0.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1575607/+subscriptions
