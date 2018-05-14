@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fIE7C-0008DB-1H
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 10:06:15 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fIEDC-00020r-3V
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 10:12:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fIE77-0007JW-Rx
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 10:06:14 -0400
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:34388)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fIE77-0007J0-Iw
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 10:06:09 -0400
-Received: by mail-wm0-x22d.google.com with SMTP id a137-v6so11942348wme.1
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 07:06:09 -0700 (PDT)
-Date: Mon, 14 May 2018 15:06:06 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180514140606.GF5182@stefanha-x1.localdomain>
-References: <152625681679.27592.11833589256802380892.malonedeb@wampee.canonical.com>
-	<152626684503.26828.16869042301439556281.malone@chaenomeles.canonical.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="6v9BRtpmy+umdQlo"
-Content-Disposition: inline
-In-Reply-To: <152626684503.26828.16869042301439556281.malone@chaenomeles.canonical.com>
-Subject: Re: [Qemu-devel] [Bug 1771042] Re: dataplane interrupt handler
- doesn't support msi
+	(envelope-from <pbonzini@redhat.com>) id 1fIED8-0002ri-5E
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 10:12:26 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50708 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fIED8-0002rH-10
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 10:12:22 -0400
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 14 May 2018 16:12:18 +0200
+Message-Id: <20180514141218.28438-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH] coverity-model: replay data is considered
+ trusted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +22,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1771042 <1771042@bugs.launchpad.net>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, Markus Armbruster <armbru@redhat.com>
 
+Replay data is not considered a possible attack vector; add a model that
+does not use getc so that "tainted data" warnings are suppressed.
 
---6v9BRtpmy+umdQlo
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ scripts/coverity-model.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-On Mon, May 14, 2018 at 03:00:44AM -0000, eric hoffman wrote:
-> diff --git a/hw/block/dataplane/virtio-blk.c b/hw/block/dataplane/virtio-=
-blk.c
-> index 101f32c..31d9eb8 100644
-> --- a/hw/block/dataplane/virtio-blk.c
-> +++ b/hw/block/dataplane/virtio-blk.c
-> @@ -73,7 +73,7 @@ static void notify_guest_bh(void *opaque)
->              unsigned i =3D j + ctzl(bits);
->              VirtQueue *vq =3D virtio_get_queue(s->vdev, i);
->=20
-> -            virtio_notify_irqfd(s->vdev, vq);
-> +            virtio_notify(s->vdev, vq);
->=20
->              bits &=3D bits - 1; /* clear right-most bit */
->          }
-
-Please send patches to qemu-devel@nongnu.org.  Guidelines for submitting
-patches are here:
-https://wiki.qemu.org/Contribute/SubmitAPatch
-
-The issue with this approach is that hw/pci/msi.c:msi_send_message()
-invokes device emulation outside the QEMU global mutex (it calls into
-the APIC to send MSIs).  I've CCed Paolo Bonzini to check whether doing
-this is thread-safe.
-
-Stefan
-
---6v9BRtpmy+umdQlo
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJa+ZfOAAoJEJykq7OBq3PI+2cIAJ6aYNlLJ0X5ARnVh4zErJ56
-d5WbV9oPhkopSqqXnaaP1LH6l78oGJJPgPpIwrNhoeNcfc6K4akPGdYgW3qv3R9S
-nJpBpCUrVwZXYJPXgkVNV5vNYhd/ZQrkXrRuEGKOyebOrfNEkWtnNI+Nj/1PKYfs
-8DwwxE0ehJ0gyacFzCyEKx2YcIXMGl5ycJy5TmO/qe1D0rEg54s/ZkU9Wz/2mqoh
-aIBHt63FwlpCH0R32Q0uVAO2tjw1ynB7ZChjbvVj2PsQ6SapB8x1XfoByRkTgX1c
-a52KU4hw/LbsyKZe9fB/oGjjAUrohYOAUN0MQDZ8ZzfJK+vBkado7n3ZKyzY0l8=
-=ha6i
------END PGP SIGNATURE-----
-
---6v9BRtpmy+umdQlo--
+diff --git a/scripts/coverity-model.c b/scripts/coverity-model.c
+index c702804f41..576f48de33 100644
+--- a/scripts/coverity-model.c
++++ b/scripts/coverity-model.c
+@@ -103,6 +103,19 @@ static int get_keysym(const name2keysym_t *table,
+     }
+ }
+ 
++
++/* Replay data is considered trusted.  */
++uint8_t replay_get_byte(void)
++{
++     uint8_t byte = 0;
++     if (replay_file) {
++         uint8_t c;
++         byte = c;
++     }
++     return byte;
++}
++
++
+ /*
+  * GLib memory allocation functions.
+  *
+-- 
+2.17.0
