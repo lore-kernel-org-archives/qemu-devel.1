@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fI9Fw-0000zV-Sq
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 04:54:57 -0400
+	(envelope-from <lovemrd@gmail.com>) id 1fI9Le-0003WB-VL
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 05:00:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fI9Fv-0005Yb-UF
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 04:54:56 -0400
-Received: from mail-ot0-x22c.google.com ([2607:f8b0:4003:c0f::22c]:39208)
+	(envelope-from <lovemrd@gmail.com>) id 1fI9LZ-0000dC-0l
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 05:00:51 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:47037)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fI9Fv-0005Xy-P8
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 04:54:55 -0400
-Received: by mail-ot0-x22c.google.com with SMTP id l12-v6so13370812oth.6
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 01:54:55 -0700 (PDT)
+	(Exim 4.71) (envelope-from <lovemrd@gmail.com>) id 1fI9LY-0000cw-RT
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 05:00:44 -0400
+Received: by mail-qk0-x242.google.com with SMTP id s70-v6so9323892qks.13
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 02:00:44 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180511042324.5070-1-richard.henderson@linaro.org>
-References: <20180511042324.5070-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 May 2018 09:54:34 +0100
-Message-ID: <CAFEAcA9qU=BWiSvd697gy6MyFbWnE6j=iQbB_zfgyLGPXujFXQ@mail.gmail.com>
+In-Reply-To: <20180511082601.36ded6c1@t450s.home>
+References: <CAF_Z_jqQDvdvPoQkpvrgmtJSaJxaFbATpc0toJBRjAnO9gHupA@mail.gmail.com>
+	<20180511082601.36ded6c1@t450s.home>
+From: Zhu Yijun <lovemrd@gmail.com>
+Date: Mon, 14 May 2018 17:00:43 +0800
+Message-ID: <CAF_Z_joAEyETvEJAfm9MLwOMxXT=ZLt1+kBjuwnXdq2VfzeSUg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/13] openrisc: Covert to decodetree.py
+Subject: Re: [Qemu-devel] ping latency issue on passthrough guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stafford Horne <shorne@gmail.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On 11 May 2018 at 05:23, Richard Henderson <richard.henderson@linaro.org> wrote:
-> Stafford Horne has acked and asked that I send the pull-request.
->
->
-> r~
->
->
-> The following changes since commit e5cd695266c5709308aa95b1baae499e4b5d4544:
->
->   Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' into staging (2018-05-08 17:05:58 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/rth7680/qemu.git tags/tgt-openrisc-pull-request
->
-> for you to fetch changes up to cf88ad60531a5b06834f6bf373a5f7fa91f2c3a8:
->
->   target/openrisc: Merge disas_openrisc_insn (2018-05-10 21:19:13 -0700)
->
-> ----------------------------------------------------------------
-> Convert OpenRISC to decodetree.py
+Hi Alex,
 
-Hi -- I get a bunch of merge conflicts in target/openrisc/translate.c
-trying to apply this. Can you rebase and resend, please?
+    Thanks for your reply, I will try to assign PF to VM and test.
 
-thanks
--- PMM
+2018-05-11 22:26 GMT+08:00 Alex Williamson <alex.williamson@redhat.com>:
+> On Fri, 11 May 2018 15:20:05 +0800
+> Zhu Yijun <lovemrd@gmail.com> wrote:
+>
+>> Hi all,
+>>
+>>   I booted two sr-iov guests using KVM-VFIO and pinged each other with
+>> no-load one night. I found that most of the latency was little than 0.1ms,
+>> but several icmp_seq greater than 10ms, even up to 1000ms;
+>>
+>>   root@test-ping01:~# grep "time=[0-9][0-9]" outputfile
+>> Mon May  7 23:05:12 201864 bytes from 192.168.0.200: icmp_seq=16703 ttl=64
+>> time=123 ms
+> ...
+>>
+>>    VF used by these two guest from same port(eth0) of intel X710 Ethernet
+>> controller. By contrast, I selected another two VFs and set them to
+>> separate network namespace, this issue did not exits, all the latency
+>> litter than 0.2ms.
+>
+> I think you've proved by this experiment that it's not likely to be a
+> device assignment issue.  Device assignment knows nothing about the
+> device above the base PCI level operation, so if changing the
+> networking configuration resolves the issue, the problem is perhaps
+> more likely in how the PF, or maybe the guest itself, is routing VF
+> packets.  Thanks,
+>
+> Alex
