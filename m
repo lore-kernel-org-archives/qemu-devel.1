@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58821)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fIAHc-0003jZ-VO
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:00:49 -0400
+	(envelope-from <david@redhat.com>) id 1fIAHj-0003sr-Qz
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:00:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fIAHY-0004yz-Dx
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:00:45 -0400
+	(envelope-from <david@redhat.com>) id 1fIAHe-000511-2c
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:00:51 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Mon, 14 May 2018 12:00:09 +0200
-Message-Id: <20180514100023.12542-5-david@redhat.com>
+Date: Mon, 14 May 2018 12:00:11 +0200
+Message-Id: <20180514100023.12542-7-david@redhat.com>
 In-Reply-To: <20180514100023.12542-1-david@redhat.com>
 References: <20180514100023.12542-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 04/18] pc: prepare for multi stage hotplug
- handlers
+Subject: [Qemu-devel] [PATCH v3 06/18] spapr: prepare for multi stage
+ hotplug handlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,23 +32,93 @@ parent bus.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/i386/pc.c | 39 +++++++++++++++++++++++++++++++--------
- 1 file changed, 31 insertions(+), 8 deletions(-)
+ hw/ppc/spapr.c | 54 +++++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 43 insertions(+), 11 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index d768930d02..510076e156 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -2007,19 +2007,32 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
- static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index ebf30dd60b..b7c5c95f7a 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3571,27 +3571,48 @@ static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
+ {
+     MachineState *ms = MACHINE(hotplug_dev);
+     sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(ms);
++    Error *local_err = NULL;
+ 
++    /* final stage hotplug handler */
+     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+         int node;
+ 
+         if (!smc->dr_lmb_enabled) {
+-            error_setg(errp, "Memory hotplug not supported for this machine");
+-            return;
++            error_setg(&local_err,
++                       "Memory hotplug not supported for this machine");
++            goto out;
+         }
+-        node = object_property_get_uint(OBJECT(dev), PC_DIMM_NODE_PROP, errp);
+-        if (*errp) {
+-            return;
++        node = object_property_get_uint(OBJECT(dev), PC_DIMM_NODE_PROP,
++                                        &local_err);
++        if (local_err) {
++            goto out;
+         }
+         if (node < 0 || node >= MAX_NODES) {
+-            error_setg(errp, "Invaild node %d", node);
+-            return;
++            error_setg(&local_err, "Invaild node %d", node);
++            goto out;
+         }
+ 
+-        spapr_memory_plug(hotplug_dev, dev, node, errp);
++        spapr_memory_plug(hotplug_dev, dev, node, &local_err);
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
+-        spapr_core_plug(hotplug_dev, dev, errp);
++        spapr_core_plug(hotplug_dev, dev, &local_err);
++    } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
++        hotplug_handler_plug(dev->parent_bus->hotplug_handler, dev, &local_err);
++    }
++out:
++    error_propagate(errp, local_err);
++}
++
++static void spapr_machine_device_unplug(HotplugHandler *hotplug_dev,
++                                        DeviceState *dev, Error **errp)
++{
++    Error *local_err = NULL;
++
++    /* final stage hotplug handler */
++    if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
++        hotplug_handler_unplug(dev->parent_bus->hotplug_handler, dev,
++                               &local_err);
+     }
++    error_propagate(errp, local_err);
+ }
+ 
+ static void spapr_machine_device_unplug_request(HotplugHandler *hotplug_dev,
+@@ -3618,17 +3639,27 @@ static void spapr_machine_device_unplug_request(HotplugHandler *hotplug_dev,
+             return;
+         }
+         spapr_core_unplug_request(hotplug_dev, dev, errp);
++    } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
++        hotplug_handler_unplug_request(dev->parent_bus->hotplug_handler, dev,
++                                       errp);
+     }
+ }
+ 
+ static void spapr_machine_device_pre_plug(HotplugHandler *hotplug_dev,
                                            DeviceState *dev, Error **errp)
  {
 +    Error *local_err = NULL;
 +
 +    /* final stage hotplug handler */
-     if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
--        pc_cpu_pre_plug(hotplug_dev, dev, errp);
-+        pc_cpu_pre_plug(hotplug_dev, dev, &local_err);
+     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+-        spapr_memory_pre_plug(hotplug_dev, dev, errp);
++        spapr_memory_pre_plug(hotplug_dev, dev, &local_err);
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
+-        spapr_core_pre_plug(hotplug_dev, dev, errp);
++        spapr_core_pre_plug(hotplug_dev, dev, &local_err);
 +    } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
 +        hotplug_handler_pre_plug(dev->parent_bus->hotplug_handler, dev,
 +                                 &local_err);
@@ -56,62 +126,14 @@ index d768930d02..510076e156 100644
 +    error_propagate(errp, local_err);
  }
  
- static void pc_machine_device_plug_cb(HotplugHandler *hotplug_dev,
-                                       DeviceState *dev, Error **errp)
- {
-+    Error *local_err = NULL;
-+
-+    /* final stage hotplug handler */
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
--        pc_dimm_plug(hotplug_dev, dev, errp);
-+        pc_dimm_plug(hotplug_dev, dev, &local_err);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
--        pc_cpu_plug(hotplug_dev, dev, errp);
-+        pc_cpu_plug(hotplug_dev, dev, &local_err);
-+    } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
-+        hotplug_handler_plug(dev->parent_bus->hotplug_handler, dev, &local_err);
-     }
-+    error_propagate(errp, local_err);
- }
+ static HotplugHandler *spapr_get_hotplug_handler(MachineState *machine,
+@@ -3988,6 +4019,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+     mc->get_default_cpu_node_id = spapr_get_default_cpu_node_id;
+     mc->possible_cpu_arch_ids = spapr_possible_cpu_arch_ids;
+     hc->unplug_request = spapr_machine_device_unplug_request;
++    hc->unplug = spapr_machine_device_unplug;
  
- static void pc_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-@@ -2029,7 +2042,10 @@ static void pc_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-         pc_dimm_unplug_request(hotplug_dev, dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         pc_cpu_unplug_request_cb(hotplug_dev, dev, errp);
--    } else {
-+    } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
-+        hotplug_handler_unplug_request(dev->parent_bus->hotplug_handler, dev,
-+                                       errp);
-+    } else if (!dev->parent_bus) {
-         error_setg(errp, "acpi: device unplug request for not supported device"
-                    " type: %s", object_get_typename(OBJECT(dev)));
-     }
-@@ -2038,14 +2054,21 @@ static void pc_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
- static void pc_machine_device_unplug_cb(HotplugHandler *hotplug_dev,
-                                         DeviceState *dev, Error **errp)
- {
-+    Error *local_err = NULL;
-+
-+    /* final stage hotplug handler */
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
--        pc_dimm_unplug(hotplug_dev, dev, errp);
-+        pc_dimm_unplug(hotplug_dev, dev, &local_err);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
--        pc_cpu_unplug_cb(hotplug_dev, dev, errp);
--    } else {
--        error_setg(errp, "acpi: device unplug for not supported device"
-+        pc_cpu_unplug_cb(hotplug_dev, dev, &local_err);
-+    } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
-+        hotplug_handler_unplug(dev->parent_bus->hotplug_handler, dev,
-+                               &local_err);
-+    } else if (!dev->parent_bus) {
-+        error_setg(&local_err, "acpi: device unplug for not supported device"
-                    " type: %s", object_get_typename(OBJECT(dev)));
-     }
-+    error_propagate(errp, local_err);
- }
- 
- static HotplugHandler *pc_get_hotpug_handler(MachineState *machine,
+     smc->dr_lmb_enabled = true;
+     mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("power8_v2.0");
 -- 
 2.14.3
