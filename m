@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fILPI-00036f-NV
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 17:53:25 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fILY2-0004wf-85
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:02:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fILPH-0002uf-W7
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 17:53:24 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fILY1-0000L7-HV
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:02:26 -0400
 References: <20180509162637.15575-1-kwolf@redhat.com>
-	<20180509162637.15575-16-kwolf@redhat.com>
+	<20180509162637.15575-17-kwolf@redhat.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <a797e9d7-0c3e-630d-b6fe-2c74fedda9b4@redhat.com>
-Date: Mon, 14 May 2018 17:53:16 -0400
+Message-ID: <fc19008b-a91c-23c7-bbec-e6f8bbc2d744@redhat.com>
+Date: Mon, 14 May 2018 18:02:19 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180509162637.15575-16-kwolf@redhat.com>
+In-Reply-To: <20180509162637.15575-17-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 15/42] job: Move cancelled to Job
+Subject: Re: [Qemu-devel] [PATCH 16/42] job: Add Job.aio_context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,10 +30,12 @@ Cc: qemu-devel@nongnu.org, jcody@redhat.com, armbru@redhat.com, mreitz@redhat.co
 
 
 On 05/09/2018 12:26 PM, Kevin Wolf wrote:
-> We cannot yet move the whole logic around job cancelling to Job because
-> it depends on quite a few other things that are still only in BlockJob,
-> but we can move the cancelled field at least.
+> When block jobs need an AioContext, they just take it from their main
+> block node. Generic jobs don't have a main block node, so we need to
+> assign them an AioContext explicitly.
 > 
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+
+Nothing uses the field yet, but so far so good.
 
 Reviewed-by: John Snow <jsnow@redhat.com>
