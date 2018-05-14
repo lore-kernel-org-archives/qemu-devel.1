@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fIAI8-0004OH-38
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:01:22 -0400
+	(envelope-from <david@redhat.com>) id 1fIAI8-0004OF-2r
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:01:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fIAI5-0005Cb-SW
+	(envelope-from <david@redhat.com>) id 1fIAI3-0005B6-2b
 	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:01:16 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Mon, 14 May 2018 12:00:21 +0200
-Message-Id: <20180514100023.12542-17-david@redhat.com>
+Date: Mon, 14 May 2018 12:00:20 +0200
+Message-Id: <20180514100023.12542-16-david@redhat.com>
 In-Reply-To: <20180514100023.12542-1-david@redhat.com>
 References: <20180514100023.12542-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 16/18] s390x: prepare for multi stage
- hotplug handlers
+Subject: [Qemu-devel] [PATCH v3 15/18] s390x/sclp: make sure ram_size and
+ maxram_size stay in sync
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,91 +23,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>, David Hildenbrand <david@redhat.com>
 
-For multi stage hotplug handlers, we'll have to do some error handling
-in some hotplug functions, so let's use a local error variable (except
-for unplug requests).
+On s390x, we sometimes have to shrink ram_size in order to be able to
+correctly indicate the size to the guest.
 
-Also, add code to pass control to the final stage hotplug handler at the
-parent bus.
+In case maxmem is not set, ram_size and maxram_size should always be
+kept equal. Make sure to also fixup maxram_size if necessary.
+
+In case maxmem is set, we really want to bail out in case we have to
+round down, as it basically can screw up the size of the device memory
+area later on.
+
+Pleas note that this fixup ususally does not happen with sane values
+for the ram size.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/s390x/s390-virtio-ccw.c | 41 +++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 39 insertions(+), 2 deletions(-)
+ hw/s390x/sclp.c | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 5796e24bd8..af9bf97933 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -394,21 +394,56 @@ static void s390_machine_reset(void)
-     s390_cpu_set_state(S390_CPU_STATE_OPERATING, ipl_cpu);
- }
+diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+index 047d577313..0757914374 100644
+--- a/hw/s390x/sclp.c
++++ b/hw/s390x/sclp.c
+@@ -21,6 +21,8 @@
+ #include "hw/s390x/event-facility.h"
+ #include "hw/s390x/s390-pci-bus.h"
+ #include "hw/s390x/ipl.h"
++#include "qemu/error-report.h"
++
  
-+static void s390_machine_device_pre_plug(HotplugHandler *hotplug_dev,
-+                                         DeviceState *dev, Error **errp)
-+{
-+    Error *local_err = NULL;
-+
-+    /* final stage hotplug handler */
-+    if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
-+        hotplug_handler_pre_plug(dev->parent_bus->hotplug_handler, dev,
-+                                 &local_err);
-+    }
-+    error_propagate(errp, local_err);
-+}
-+
- static void s390_machine_device_plug(HotplugHandler *hotplug_dev,
-                                      DeviceState *dev, Error **errp)
+ static inline SCLPDevice *get_sclp_device(void)
  {
-+    Error *local_err = NULL;
-+
-+    /* final stage hotplug handler */
-     if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
--        s390_cpu_plug(hotplug_dev, dev, errp);
-+        s390_cpu_plug(hotplug_dev, dev, &local_err);
-+    } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
-+        hotplug_handler_plug(dev->parent_bus->hotplug_handler, dev, &local_err);
-     }
-+    error_propagate(errp, local_err);
- }
+@@ -318,9 +320,19 @@ static void sclp_memory_init(SCLPDevice *sclp)
+      * down to align with the nearest increment boundary. */
+     initial_mem = initial_mem >> increment_size << increment_size;
  
- static void s390_machine_device_unplug_request(HotplugHandler *hotplug_dev,
-                                                DeviceState *dev, Error **errp)
- {
-+    /* final stage hotplug handler */
-     if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         error_setg(errp, "CPU hot unplug not supported on this machine");
--        return;
-+    } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
-+        hotplug_handler_unplug_request(dev->parent_bus->hotplug_handler, dev,
-+                                       errp);
+-    machine->ram_size = initial_mem;
+-    /* let's propagate the changed ram size into the global variable. */
+-    ram_size = initial_mem;
++    /* also shrink maxram_size in case we don't have maxmem configured */
++    if (initial_mem != machine->ram_size) {
++        if (machine->ram_size < machine->maxram_size) {
++            error_report("Ram size ('" RAM_ADDR_FMT "') had to be rounded "
++                         "down to ('" RAM_ADDR_FMT "'), maxmem not supported",
++                         machine->ram_size, initial_mem);
++            exit(1);
++        }
++        /* propagate the changed ram size into the different places */
++        machine->ram_size = initial_mem;
++        ram_size = initial_mem;
++        machine->maxram_size = initial_mem;
 +    }
-+}
-+
-+static void s390_machine_device_unplug(HotplugHandler *hotplug_dev,
-+                                       DeviceState *dev, Error **errp)
-+{
-+    Error *local_err = NULL;
-+
-+    /* final stage hotplug handler */
-+    if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
-+        hotplug_handler_unplug(dev->parent_bus->hotplug_handler, dev,
-+                               &local_err);
-     }
-+    error_propagate(errp, local_err);
  }
  
- static CpuInstanceProperties s390_cpu_index_to_props(MachineState *ms,
-@@ -497,8 +532,10 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
-     mc->possible_cpu_arch_ids = s390_possible_cpu_arch_ids;
-     /* it is overridden with 'host' cpu *in kvm_arch_init* */
-     mc->default_cpu_type = S390_CPU_TYPE_NAME("qemu");
-+    hc->pre_plug = s390_machine_device_pre_plug;
-     hc->plug = s390_machine_device_plug;
-     hc->unplug_request = s390_machine_device_unplug_request;
-+    hc->unplug = s390_machine_device_unplug;
-     nc->nmi_monitor_handler = s390_nmi;
- }
- 
+ static void sclp_init(Object *obj)
 -- 
 2.14.3
