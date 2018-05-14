@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46390)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fIIg1-000603-Mc
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 14:58:30 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fIIi1-0007I4-FO
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 15:00:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fIIg0-0002mF-Os
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 14:58:29 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180514173044.5025-1-peter.maydell@linaro.org>
-	<20180514173044.5025-3-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <5745a274-b05f-97c8-340f-0289c5077368@amsat.org>
-Date: Mon, 14 May 2018 15:58:18 -0300
+	(envelope-from <mreitz@redhat.com>) id 1fIIi0-000756-J6
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 15:00:33 -0400
+References: <20180509162637.15575-1-kwolf@redhat.com>
+	<20180509162637.15575-27-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <f33c73b2-c4a2-747d-78b6-c513c640e126@redhat.com>
+Date: Mon, 14 May 2018 21:00:20 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180514173044.5025-3-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] gdbstub: Handle errors in gdb_accept()
+In-Reply-To: <20180509162637.15575-27-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="mpg9I50obwJADLsxMO2yYF3k4OhxUBCYH"
+Subject: Re: [Qemu-devel] [PATCH 26/42] job: Convert
+ block_job_cancel_async() to Job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,77 +25,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: patches@linaro.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-On 05/14/2018 02:30 PM, Peter Maydell wrote:
-> In gdb_accept(), we both fail to check all errors (notably
-> that from socket_set_nodelay(), as Coverity notes in CID 1005666),
-> and fail to return an error status back to our caller. Correct
-> both of these things, so that errors in accept() result in our
-> stopping with a useful error message rather than ignoring it.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--mpg9I50obwJADLsxMO2yYF3k4OhxUBCYH
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com,
+ qemu-devel@nongnu.org
+Message-ID: <f33c73b2-c4a2-747d-78b6-c513c640e126@redhat.com>
+Subject: Re: [PATCH 26/42] job: Convert block_job_cancel_async() to Job
+References: <20180509162637.15575-1-kwolf@redhat.com>
+ <20180509162637.15575-27-kwolf@redhat.com>
+In-Reply-To: <20180509162637.15575-27-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On 2018-05-09 18:26, Kevin Wolf wrote:
+> block_job_cancel_async() did two things that were still block job
+> specific:
+>=20
+> * Setting job->force. This field makes sense on the Job level, so we ca=
+n
+>   just move it. While at it, rename it to job->force_cancel to make its=
 
+>   purpose more obvious.
+>=20
+> * Resetting the I/O status. This can't be moved because generic Jobs
+>   don't have an I/O status. What the function really implements is a
+>   user resume, except without entering the coroutine. Consequently, it
+>   makes sense to call the .user_resume driver callback here which
+>   already resets the I/O status.
+>=20
+>   The old block_job_cancel_async() has two separate if statements that
+>   check job->iostatus !=3D BLOCK_DEVICE_IO_STATUS_OK and job->user_paus=
+ed.
+>   However, the former condition always implies the latter (as is
+>   asserted in block_job_iostatus_reset()), so changing the explicit cal=
+l
+>   of block_job_iostatus_reset() on the former condition with the
+>   .user_resume callback on the latter condition is equivalent and
+>   doesn't need to access any BlockJob specific state.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  gdbstub.c | 16 ++++++++++++----
->  1 file changed, 12 insertions(+), 4 deletions(-)
-> 
-> diff --git a/gdbstub.c b/gdbstub.c
-> index cc7626c790..7c2bceb040 100644
-> --- a/gdbstub.c
-> +++ b/gdbstub.c
-> @@ -1804,7 +1804,7 @@ void gdb_signalled(CPUArchState *env, int sig)
->      put_packet(s, buf);
->  }
->  
-> -static void gdb_accept(void)
-> +static bool gdb_accept(void)
->  {
->      GDBState *s;
->      struct sockaddr_in sockaddr;
-> @@ -1816,7 +1816,7 @@ static void gdb_accept(void)
->          fd = accept(gdbserver_fd, (struct sockaddr *)&sockaddr, &len);
->          if (fd < 0 && errno != EINTR) {
->              perror("accept");
-> -            return;
-> +            return false;
->          } else if (fd >= 0) {
->              qemu_set_cloexec(fd);
->              break;
-> @@ -1824,7 +1824,10 @@ static void gdb_accept(void)
->      }
->  
->      /* set short latency */
-> -    socket_set_nodelay(fd);
-> +    if (socket_set_nodelay(fd)) {
-> +        perror("setsockopt");
-> +        return false;
-> +    }
->  
->      s = g_malloc0(sizeof(GDBState));
->      s->c_cpu = first_cpu;
-> @@ -1833,6 +1836,7 @@ static void gdb_accept(void)
->      gdb_has_xml = false;
->  
->      gdbserver_state = s;
-> +    return true;
->  }
->  
->  static int gdbserver_open(int port)
-> @@ -1873,7 +1877,11 @@ int gdbserver_start(int port)
->      if (gdbserver_fd < 0)
->          return -1;
->      /* accept connections */
-> -    gdb_accept();
-> +    if (!gdb_accept()) {
-> +        close(gdbserver_fd);
-> +        gdbserver_fd = -1;
-> +        return -1;
-> +    }
->      return 0;
->  }
->  
-> 
+>  include/block/blockjob.h |  6 ------
+>  include/qemu/job.h       |  6 ++++++
+>  block/mirror.c           |  4 ++--
+>  blockjob.c               | 25 +++++++++++++------------
+>  4 files changed, 21 insertions(+), 20 deletions(-)
+
+I'm not quite sure why you keep this function in blockjob.c, when you've
+previously moved such static functions over to job.c and made them
+temporarily public (e.g. job_state_transition()).
+
+But I don't really care either way, in fact keeping the function in the
+same file makes reviewing easier for me, so:
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--mpg9I50obwJADLsxMO2yYF3k4OhxUBCYH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr53MQACgkQ9AfbAGHV
+z0Dldwf+JTfkDdRp4xjIN2QWP8jWffTFyRyAarvP8O2zlP11COtCV7UqojZ9w8bg
+iX8vEAPuIwUmb20k99wBCFH9a0HowepNT4F2Q8kVo9tLx3Mm6PXpKv/VK6FhEQTq
+Li1f7Gqw9CUEc3uVmbpXD2OE1WJ2GOE8cgYZsYR5QmqkOKTuek8759jH64MeORC6
+af1DStaSSAE2MUCa6lVdxP1ZuLkj9xUvV5zHLpQE1asBOzA2VegG3fzvuAxaokEu
+qE9IHKl8rBi6oas3IfAXith8NuGEGxcd7D17YrNsPz2wttizi9Qq9TxtlGsXPZ8b
+mfUxLpJIQuO5ffopGRu/utDwGuYWtw==
+=Q0XK
+-----END PGP SIGNATURE-----
+
+--mpg9I50obwJADLsxMO2yYF3k4OhxUBCYH--
