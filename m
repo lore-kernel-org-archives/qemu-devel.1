@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58990)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fIGak-00005n-P0
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:44:55 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fIGdp-0002Ng-3l
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:48:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fIGag-00075Q-Dm
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:44:54 -0400
-Received: from mail-co1nam03on0609.outbound.protection.outlook.com
-	([2a01:111:f400:fe48::609]:47376
-	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fIGag-00072U-31
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:44:50 -0400
-From: "Moger, Babu" <Babu.Moger@amd.com>
-Date: Mon, 14 May 2018 16:44:44 +0000
-Message-ID: <SN1PR12MB247774F4CB4D4A8AD05D3A1F959C0@SN1PR12MB2477.namprd12.prod.outlook.com>
-References: <20180510204148.11687-1-babu.moger@amd.com>
-	<20180510204148.11687-4-babu.moger@amd.com>
-	<20180511192145.GV25013@localhost.localdomain>
-	<BL0PR12MB24682473432EF64021381FAB959F0@BL0PR12MB2468.namprd12.prod.outlook.com>
-	<20180511204759.GP13350@localhost.localdomain>
-In-Reply-To: <20180511204759.GP13350@localhost.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <mreitz@redhat.com>) id 1fIGdn-0000Bl-Oc
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:48:05 -0400
+References: <20180509162637.15575-1-kwolf@redhat.com>
+	<20180509162637.15575-19-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <f19b945b-16ea-e938-44e4-230975e8fd71@redhat.com>
+Date: Mon, 14 May 2018 18:47:49 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v8 3/8] i386: Add new property to control
- cache info
+In-Reply-To: <20180509162637.15575-19-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="1OwmWbpcwMrU9O4UijkfhIr4RJ8xWvVVZ"
+Subject: Re: [Qemu-devel] [PATCH 18/42] job: Move coroutine and related code
+ to Job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,85 +25,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "geoff@hostfission.com" <geoff@hostfission.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>, "kash@tripleback.net" <kash@tripleback.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--1OwmWbpcwMrU9O4UijkfhIr4RJ8xWvVVZ
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com,
+ qemu-devel@nongnu.org
+Message-ID: <f19b945b-16ea-e938-44e4-230975e8fd71@redhat.com>
+Subject: Re: [PATCH 18/42] job: Move coroutine and related code to Job
+References: <20180509162637.15575-1-kwolf@redhat.com>
+ <20180509162637.15575-19-kwolf@redhat.com>
+In-Reply-To: <20180509162637.15575-19-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-
-> -----Original Message-----
-> From: Eduardo Habkost [mailto:ehabkost@redhat.com]
-> Sent: Friday, May 11, 2018 3:48 PM
-> To: Moger, Babu <Babu.Moger@amd.com>
-> Cc: geoff@hostfission.com; kvm@vger.kernel.org; mst@redhat.com;
-> kash@tripleback.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
-> pbonzini@redhat.com; rth@twiddle.net
-> Subject: Re: [Qemu-devel] [PATCH v8 3/8] i386: Add new property to contro=
-l
-> cache info
+On 2018-05-09 18:26, Kevin Wolf wrote:
+> This commit moves some core functions for dealing with the job coroutin=
+e
+> from BlockJob to Job. This includes primarily entering the coroutine
+> (both for the first and reentering) and yielding explicitly and at paus=
+e
+> points.
 >=20
-> On Fri, May 11, 2018 at 08:21:50PM +0000, Moger, Babu wrote:
-> >
-> > > -----Original Message-----
-> > > From: Eduardo Habkost [mailto:ehabkost@redhat.com]
-> > > Sent: Friday, May 11, 2018 2:22 PM
-> > > To: Moger, Babu <Babu.Moger@amd.com>
-> > > Cc: mst@redhat.com; marcel.apfelbaum@gmail.com;
-> pbonzini@redhat.com;
-> > > rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
-> > > kvm@vger.kernel.org; geoff@hostfission.com; kash@tripleback.net
-> > > Subject: Re: [PATCH v8 3/8] i386: Add new property to control cache i=
-nfo
-> > >
-> > > On Thu, May 10, 2018 at 03:41:43PM -0500, Babu Moger wrote:
-> > > > The property legacy-cache will be used to control the cache
-> information.
-> > > > If user passes "-cpu legacy-cache" then older information will
-> > > > be displayed even if the hardware supports new information.
-> Otherwise
-> > > > use the statically loaded cache definitions if available.
-> > > >
-> > > > Signed-off-by: Babu Moger <babu.moger@amd.com>
-> > > > Tested-by: Geoffrey McRae <geoff@hostfission.com>
-> > > > ---
-> > > >  include/hw/i386/pc.h |  8 ++++
-> > > >  target/i386/cpu.c    | 97 ++++++++++++++++++++++++++++++++------
-> -----
-> > > -
-> > > >  target/i386/cpu.h    |  5 +++
-> > > >  3 files changed, 84 insertions(+), 26 deletions(-)
-> > > >
-> > > > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> > > > index 2e834e6ded..df15deefca 100644
-> > > > --- a/include/hw/i386/pc.h
-> > > > +++ b/include/hw/i386/pc.h
-> > > > @@ -304,6 +304,14 @@ int e820_add_entry(uint64_t, uint64_t,
-> uint32_t);
-> > > >  int e820_get_num_entries(void);
-> > > >  bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-> > > >
-> > > > +#define PC_COMPAT_2_12 \
-> > > > +    HW_COMPAT_2_12 \
-> > > > +    {\
-> > > > +        .driver   =3D TYPE_X86_CPU,\
-> > > > +        .property =3D "legacy-cache",\
-> > > > +        .value    =3D "on",\
-> > > > +    },
-> > >
-> > > This isn't enough if the pc-*-2.12 machine-type isn't using the
-> > > macro.
-> > >
-> > > Before we do this, we need a commit similar to commit
-> > > df47ce8af4a5, but adding pc-*-2.13 machine-types.
-> >
-> > Ok. Sure. I think I got it. Will add pc-*-2.13 machine-types in v9 seri=
-es.
->=20
-> Thanks.  If you submit v9, please use the x86-next tree as base
-> so you don't need to resubmit the patches that I have already
-> queued.  See MAINTAINERS for the git URL.
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  include/block/blockjob.h     |  40 ---------
+>  include/block/blockjob_int.h |  26 ------
+>  include/qemu/job.h           |  76 ++++++++++++++++
+>  block/backup.c               |   2 +-
+>  block/commit.c               |   4 +-
+>  block/mirror.c               |  22 ++---
+>  block/replication.c          |   2 +-
+>  block/stream.c               |   4 +-
+>  blockdev.c                   |   8 +-
+>  blockjob.c                   | 201 +++++++----------------------------=
+--------
+>  job.c                        | 137 +++++++++++++++++++++++++++++
+>  tests/test-bdrv-drain.c      |  38 ++++----
+>  tests/test-blockjob-txn.c    |  12 +--
+>  tests/test-blockjob.c        |  14 +--
+>  14 files changed, 296 insertions(+), 290 deletions(-)
 
-Submitted v9 version on top of you x86-next tree.  Thanks
+[...]
 
->=20
-> --
-> Eduardo
+> diff --git a/job.c b/job.c
+> index b074b3ffd7..b4cece1a82 100644
+> --- a/job.c
+> +++ b/job.c
+
+[...]
+
+> @@ -172,6 +205,110 @@ void job_unref(Job *job)
+>      }
+>  }
+> =20
+> +void job_enter_cond(Job *job, bool(*fn)(Job *job))
+> +{
+> +    if (!job_started(job)) {
+> +        return;
+> +    }
+> +    if (job->deferred_to_main_loop) {
+> +        return;
+> +    }
+> +
+> +    job_lock();
+> +    if (job->busy) {
+> +        job_unlock();
+> +        return;
+> +    }
+> +
+> +    if (fn && !fn(job)) {
+> +        job_unlock();
+> +        return;
+> +    }
+> +
+> +    assert(!job->deferred_to_main_loop);
+> +    timer_del(&job->sleep_timer);
+> +    job->busy =3D true;
+> +    job_unlock();
+> +    aio_co_wake(job->co);
+> +}
+> +
+> +/* Yield, and schedule a timer to reenter the coroutine after @ns nano=
+seconds.
+> + * Reentering the job coroutine with block_job_enter() before the time=
+r has
+
+There is no job_enter() yet, but you do reference it below, so this
+should probably be adjusted here...
+
+> + * expired is allowed and cancels the timer.
+> + *
+> + * If @ns is (uint64_t) -1, no timer is scheduled and block_job_enter(=
+) must be
+
+=2E..and here.  Or maybe you want to change the job_enter below to a
+block_job_enter until there is a job_enter().
+
+With that done (or not, because I don't really care about mid-series
+comments);
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+> + * called explicitly. */
+> +void coroutine_fn job_do_yield(Job *job, uint64_t ns)
+> +{
+> +    job_lock();
+> +    if (ns !=3D -1) {
+> +        timer_mod(&job->sleep_timer, ns);
+> +    }
+> +    job->busy =3D false;
+> +    job_unlock();
+> +    qemu_coroutine_yield();
+> +
+> +    /* Set by job_enter before re-entering the coroutine.  */
+> +    assert(job->busy);
+> +}
+
+
+--1OwmWbpcwMrU9O4UijkfhIr4RJ8xWvVVZ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr5vbUACgkQ9AfbAGHV
+z0D7fAgAtUeqRQfBmyMDT0vNqYCIWjTrb1Bb8gPjnTnHbb1D+SQ6No8dVRo+67x3
+dxucy/uPha2KOXShLJ57SrMc9G6b/poRp7IBnD6mat5Y3Qu1h2wK0x0FMByCWwY0
+xZbpylb7w1dTFnBFwNBGTsb/jLwsvNIY3dsQfZ2/1CtBkIX3rKVu0J4wp8HMIbUS
+gDjz8E0JgQPW2lefOMLhEG6g3mrcpvqb/DZRjpT3Ye8tmc580Lg0snZmwj37vphI
+L2EsI3ZP0rdR7ZrfxVAzwrbIXVluSjQO+zyEvYtRgNqcrLuMnaEpeSIWrQbjDuFz
+NE5HrKrjx6DCOEBt92sAsXXJxr6MJA==
+=eHsH
+-----END PGP SIGNATURE-----
+
+--1OwmWbpcwMrU9O4UijkfhIr4RJ8xWvVVZ--
