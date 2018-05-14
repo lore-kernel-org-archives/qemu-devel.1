@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39521)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fIAlN-0004Wm-Tx
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:31:31 -0400
+	(envelope-from <david@redhat.com>) id 1fIAsT-00027L-Iv
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:38:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fIAlN-00047f-1W
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:31:29 -0400
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:41255)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fIAlM-00047T-U1
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:31:28 -0400
-Received: by mail-ot0-x243.google.com with SMTP id t1-v6so13643435oth.8
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 03:31:28 -0700 (PDT)
+	(envelope-from <david@redhat.com>) id 1fIAsQ-0007xL-Cc
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:38:49 -0400
+References: <20180514100023.12542-1-david@redhat.com>
+	<20180514100023.12542-19-david@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <9424ab12-d262-f71a-9a3b-67af2a21cf42@redhat.com>
+Date: Mon, 14 May 2018 12:38:41 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180512004311.9299-8-richard.henderson@linaro.org>
-References: <20180512004311.9299-1-richard.henderson@linaro.org>
-	<20180512004311.9299-8-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 May 2018 11:31:07 +0100
-Message-ID: <CAFEAcA-5dWB3DhZCfg5vmBXr-+_BAm8-Uh-O0TSY-yMNYXQ4cA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 07/27] fpu/softfloat: Introduce
- parts_is_snan_frac
+In-Reply-To: <20180514100023.12542-19-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 18/18] s390x: support memory devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +24,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>
 
-On 12 May 2018 at 01:42, Richard Henderson <richard.henderson@linaro.org> wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On 14.05.2018 12:00, David Hildenbrand wrote:
+> Let's route all memory devices we can hotplug through the machine hotplug
+> handler, just like on pc and spapr.
+> 
+> As CONFIG_DIMM is not enabled, we won't ever try to plug DIMMs.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  fpu/softfloat-specialize.h | 15 +++++++++++++++
->  fpu/softfloat.c            | 12 ++----------
->  2 files changed, 17 insertions(+), 10 deletions(-)
->
-> diff --git a/fpu/softfloat-specialize.h b/fpu/softfloat-specialize.h
-> index 4fc9ea4ac0..515cb12cfa 100644
-> --- a/fpu/softfloat-specialize.h
-> +++ b/fpu/softfloat-specialize.h
-> @@ -86,6 +86,21 @@ this code that are retained.
->  #define NO_SIGNALING_NANS 1
->  #endif
->
-> +/*----------------------------------------------------------------------------
-> +| For the deconstructed floating-point with fraction FRAC, return true
-> +| if the fraction represents a signalling NaN; otherwise false.
-> +*----------------------------------------------------------------------------*/
+>  default-configs/s390x-softmmu.mak |  1 +
+>  hw/s390x/s390-virtio-ccw.c        | 31 ++++++++++++++++++++++++++++++-
+>  2 files changed, 31 insertions(+), 1 deletion(-)
+> 
+> diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
+> index 2f4bfe73b4..c0628c0123 100644
+> --- a/default-configs/s390x-softmmu.mak
+> +++ b/default-configs/s390x-softmmu.mak
+> @@ -9,3 +9,4 @@ CONFIG_S390_FLIC=y
+>  CONFIG_S390_FLIC_KVM=$(CONFIG_KVM)
+>  CONFIG_VFIO_CCW=$(CONFIG_LINUX)
+>  CONFIG_WDT_DIAG288=y
+> +CONFIG_MEM_DEVICE=y
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 7700658400..54c620baf2 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -35,6 +35,7 @@
+>  #include "migration/register.h"
+>  #include "cpu_models.h"
+>  #include "hw/nmi.h"
+> +#include "hw/mem/memory-device.h"
+>  
+>  S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
+>  {
+> @@ -436,12 +437,29 @@ static void s390_machine_device_plug(HotplugHandler *hotplug_dev,
+>  {
+>      Error *local_err = NULL;
+>  
+> +    /* first stage hotplug handler */
+> +    if (object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
+> +        memory_device_plug(MACHINE(hotplug_dev), MEMORY_DEVICE(dev), NULL,
+> +                           &local_err);
+> +    }
 > +
-> +static bool parts_is_snan_frac(uint64_t frac, float_status *status)
-> +{
-> +#ifdef NO_SIGNALING_NANS
-> +    return false;
-> +#else
-> +    flag msb = extract64(frac, DECOMPOSED_BINARY_POINT - 1, 1);
-> +    return msb == status->snan_bit_is_one;
-> +#endif
-> +}
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
 > +
->  /*----------------------------------------------------------------------------
->  | The pattern for a default generated half-precision NaN.
->  *----------------------------------------------------------------------------*/
-> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-> index a56d3d975b..cb68f2eb20 100644
-> --- a/fpu/softfloat.c
-> +++ b/fpu/softfloat.c
-> @@ -331,16 +331,8 @@ static FloatParts canonicalize(FloatParts part, const FloatFmt *parm,
->              part.cls = float_class_inf;
->          } else {
->              part.frac <<= parm->frac_shift;
-> -#ifdef NO_SIGNALING_NANS
-> -            part.cls = float_class_qnan;
-> -#else
-> -            int64_t msb = part.frac << 2;
-> -            if ((msb < 0) == status->snan_bit_is_one) {
-> -                part.cls = float_class_snan;
-> -            } else {
-> -                part.cls = float_class_qnan;
-> -            }
-> -#endif
-> +            part.cls = (parts_is_snan_frac(part.frac, status)
-> +                        ? float_class_snan : float_class_qnan);
->          }
->      } else if (part.exp == 0) {
->          if (likely(part.frac == 0)) {
-> --
-> 2.17.0
+>      /* final stage hotplug handler */
+>      if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+>          s390_cpu_plug(hotplug_dev, dev, &local_err);
+>      } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
+>          hotplug_handler_plug(dev->parent_bus->hotplug_handler, dev, &local_err);
+>      }
+> +
+> +    if (local_err) {
+> +        if (object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
+> +            memory_device_unplug(MACHINE(hotplug_dev), MEMORY_DEVICE(dev));
+> +        }
+> +    }
+>      error_propagate(errp, local_err);
+>  }
+>  
+> @@ -468,6 +486,16 @@ static void s390_machine_device_unplug(HotplugHandler *hotplug_dev,
+>                                 &local_err);
+>      }
+>      error_propagate(errp, local_err);
+> +
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +
+> +    /* first stage hotplug handler */
+> +    if (object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
+> +        memory_device_unplug(MACHINE(hotplug_dev), MEMORY_DEVICE(dev));
+> +    }
+>  }
+>  
+>  static CpuInstanceProperties s390_cpu_index_to_props(MachineState *ms,
+> @@ -506,7 +534,8 @@ static const CPUArchIdList *s390_possible_cpu_arch_ids(MachineState *ms)
+>  static HotplugHandler *s390_get_hotplug_handler(MachineState *machine,
+>                                                  DeviceState *dev)
+>  {
+> -    if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+> +    if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) ||
+> +        object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
+>          return HOTPLUG_HANDLER(machine);
+>      }
+>      return NULL;
+> 
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Just noticed that this patch misses the pre plug handler here. I will
+wait for some feedback before I resend (and the !s390x patches can be
+picked up independently).
 
-thanks
--- PMM
+-- 
+
+Thanks,
+
+David / dhildenb
