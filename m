@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43593)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fI9Bz-0007Yt-4N
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 04:50:52 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fI9Fw-0000zV-Sq
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 04:54:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fI9By-00037D-5F
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 04:50:51 -0400
-Date: Mon, 14 May 2018 09:50:37 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180514085036.GB2497@work-vm>
-References: <20180511222052.8734-1-ehabkost@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fI9Fv-0005Yb-UF
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 04:54:56 -0400
+Received: from mail-ot0-x22c.google.com ([2607:f8b0:4003:c0f::22c]:39208)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fI9Fv-0005Xy-P8
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 04:54:55 -0400
+Received: by mail-ot0-x22c.google.com with SMTP id l12-v6so13370812oth.6
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 01:54:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180511222052.8734-1-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 00/10] [TESTING NEEDED] python: futurize
- --stage1 (Python 3 compatibility)
+In-Reply-To: <20180511042324.5070-1-richard.henderson@linaro.org>
+References: <20180511042324.5070-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 14 May 2018 09:54:34 +0100
+Message-ID: <CAFEAcA9qU=BWiSvd697gy6MyFbWnE6j=iQbB_zfgyLGPXujFXQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/13] openrisc: Covert to decodetree.py
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,108 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Cleber Rosa <crosa@redhat.com>, qemu-block@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stafford Horne <shorne@gmail.com>
 
-* Eduardo Habkost (ehabkost@redhat.com) wrote:
-> TESTING NEEDED: Due to the amount of changes, I didn't test all
-> scripts touched by this series.  If you are responsible for any
-> of the touched files, I would appreciate help on testing the
-> series.
+On 11 May 2018 at 05:23, Richard Henderson <richard.henderson@linaro.org> wrote:
+> Stafford Horne has acked and asked that I send the pull-request.
+>
+>
+> r~
+>
+>
+> The following changes since commit e5cd695266c5709308aa95b1baae499e4b5d4544:
+>
+>   Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' into staging (2018-05-08 17:05:58 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/rth7680/qemu.git tags/tgt-openrisc-pull-request
+>
+> for you to fetch changes up to cf88ad60531a5b06834f6bf373a5f7fa91f2c3a8:
+>
+>   target/openrisc: Merge disas_openrisc_insn (2018-05-10 21:19:13 -0700)
+>
+> ----------------------------------------------------------------
+> Convert OpenRISC to decodetree.py
 
-Running the 'analyze-migration.py' script on a  simple machine gives
-the same output before and after.
-Also running vmstate-static-checker.py gives the same output when
-run between my system's qemu and my current head.
+Hi -- I get a bunch of merge conflicts in target/openrisc/translate.c
+trying to apply this. Can you rebase and resend, please?
 
-Dave
-
-
-> From the futurize[1] documentation:
-> 
-> > This applies fixes that modernize Python 2 code without
-> > changing the effect of the code.  With luck, this will not
-> > introduce any bugs into the code, or will at least be trivial
-> > to fix. The changes are those that bring the Python code
-> > up-to-date without breaking Py2 compatibility.  The resulting
-> > code will be modern Python 2.6-compatible code plus __future__
-> > imports from the following set:
-> >
-> >     from __future__ import absolute_import
-> >     from __future__ import division
-> >     from __future__ import print_function
-> >
-> [...]
-> > The goal for this stage is to create most of the diff for the
-> > entire porting process, but without introducing any bugs.  It
-> > should be uncontroversial and safe to apply to every Python 2
-> > package.  The subsequent patches introducing Python 3
-> > compatibility should then be shorter and easier to review.
-> 
-> This series run all the fixers from futurize --stage1 on all
-> Python code in the tree.  To make review and testing easier, I
-> have run the fixers separately instead of doing all changes in a
-> single patch.
-> 
-> [1] http://python-future.org/automatic_conversion.html
-> 
-> Eduardo Habkost (10):
->   python: futurize -f libfuturize.fixes.fix_print_with_import
->   python: futurize -f libfuturize.fixes.fix_absolute_import
->   python: futurize -f libfuturize.fixes.fix_next_call
->   python: futurize -f lib2to3.fixes.fix_has_key
->   python: futurize -f lib2to3.fixes.fix_standarderror
->   python: futurize -f lib2to3.fixes.fix_reduce
->   python: futurize -f lib2to3.fixes.fix_tuple_params
->   python: futurize -f lib2to3.fixes.fix_renames
->   python: futurize -f lib2to3.fixes.fix_except
->   python: futurize -f lib2to3.fixes.fix_numliterals
-> 
->  scripts/analyse-9p-simpletrace.py        | 89 ++++++++++++++++----------------
->  scripts/analyse-locks-simpletrace.py     |  3 +-
->  scripts/analyze-migration.py             | 11 ++--
->  scripts/dump-guest-memory.py             |  1 +
->  scripts/ordereddict.py                   |  4 +-
->  scripts/replay-dump.py                   | 21 ++++----
->  scripts/signrom.py                       |  1 +
->  scripts/simpletrace.py                   |  5 +-
->  scripts/vmstate-static-checker.py        | 89 ++++++++++++++++----------------
->  scripts/device-crash-test                |  3 +-
->  scripts/kvm/kvm_flightrecorder           | 21 ++++----
->  scripts/kvm/vmxcap                       |  1 +
->  scripts/qmp/qemu-ga-client               | 10 ++--
->  scripts/qmp/qmp                          | 24 +++++----
->  scripts/qmp/qmp-shell                    | 40 +++++++-------
->  scripts/qmp/qom-fuse                     | 11 ++--
->  scripts/qmp/qom-get                      | 12 +++--
->  scripts/qmp/qom-list                     | 16 +++---
->  scripts/qmp/qom-set                      | 10 ++--
->  scripts/qmp/qom-tree                     | 16 +++---
->  tests/docker/docker.py                   | 11 ++--
->  tests/docker/travis.py                   | 15 +++---
->  tests/guest-debug/test-gdbstub.py        |  1 +
->  tests/image-fuzzer/qcow2/__init__.py     |  3 +-
->  tests/image-fuzzer/qcow2/fuzz.py         |  1 +
->  tests/image-fuzzer/qcow2/layout.py       |  3 +-
->  tests/image-fuzzer/runner.py             | 42 +++++++--------
->  tests/migration/guestperf/engine.py      | 29 ++++++-----
->  tests/migration/guestperf/plot.py        | 17 +++---
->  tests/migration/guestperf/shell.py       | 19 +++----
->  tests/qemu-iotests/093                   |  2 +-
->  tests/qemu-iotests/096                   |  4 +-
->  tests/qemu-iotests/118                   | 24 ++++-----
->  tests/qemu-iotests/136                   |  2 +-
->  tests/qemu-iotests/149                   |  3 +-
->  tests/qemu-iotests/165                   |  3 +-
->  tests/qemu-iotests/iotests.py            |  5 +-
->  tests/qemu-iotests/nbd-fault-injector.py |  7 +--
->  tests/qemu-iotests/qcow2.py              | 39 +++++++-------
->  tests/qemu-iotests/qed.py                | 17 +++---
->  tests/vm/basevm.py                       |  3 +-
->  41 files changed, 337 insertions(+), 301 deletions(-)
-> 
-> -- 
-> 2.14.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+thanks
+-- PMM
