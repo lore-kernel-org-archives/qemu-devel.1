@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52192)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fIHtZ-0001mz-C4
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 14:08:27 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fIHv6-0002d4-EI
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 14:10:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fIHtV-0002YN-A6
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 14:08:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50540 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fIHtV-0002Xs-2Q
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 14:08:21 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1526029534-35771-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1526029534-35771-2-git-send-email-anton.nefedov@virtuozzo.com>
-Date: Mon, 14 May 2018 20:08:18 +0200
-In-Reply-To: <1526029534-35771-2-git-send-email-anton.nefedov@virtuozzo.com>
-	(Anton Nefedov's message of "Fri, 11 May 2018 12:05:33 +0300")
-Message-ID: <877eo6nm99.fsf@dusky.pond.sub.org>
+	(envelope-from <mreitz@redhat.com>) id 1fIHv5-0004BX-Fp
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 14:10:00 -0400
+References: <20180509162637.15575-1-kwolf@redhat.com>
+	<20180509162637.15575-25-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <001d4b36-5486-f4ae-50b2-5918921ec976@redhat.com>
+Date: Mon, 14 May 2018 20:09:48 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/2] qapi: allow flat unions with empty
- branches
+In-Reply-To: <20180509162637.15575-25-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="px1a7RXLopeKT3OrWXzWOI8P9TKb7qUkw"
+Subject: Re: [Qemu-devel] [PATCH 24/42] job: Add job_event_*()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,283 +24,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-Anton Nefedov <anton.nefedov@virtuozzo.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--px1a7RXLopeKT3OrWXzWOI8P9TKb7qUkw
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com,
+ qemu-devel@nongnu.org
+Message-ID: <001d4b36-5486-f4ae-50b2-5918921ec976@redhat.com>
+Subject: Re: [PATCH 24/42] job: Add job_event_*()
+References: <20180509162637.15575-1-kwolf@redhat.com>
+ <20180509162637.15575-25-kwolf@redhat.com>
+In-Reply-To: <20180509162637.15575-25-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> The patch makes possible to avoid introducing dummy empty types
-> for the flat union branches that have no data.
->
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+On 2018-05-09 18:26, Kevin Wolf wrote:
+> Go through the Job layer in order to send QMP events. For the moment,
+> these functions only call a notifier in the BlockJob layer that sends
+> the existing commands.
+>=20
+> This uses notifiers rather than JobDriver callbacks because internal
+> users of jobs won't receive QMP events, but might still be interested
+> in getting notified for the events.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  scripts/qapi/common.py         | 18 ++++++++++++------
->  scripts/qapi/doc.py            |  2 +-
->  scripts/qapi/types.py          |  2 +-
->  scripts/qapi/visit.py          | 12 +++++++-----
->  tests/qapi-schema/test-qapi.py |  2 +-
->  5 files changed, 22 insertions(+), 14 deletions(-)
+>  include/block/blockjob.h |  9 +++++++++
+>  include/qemu/job.h       | 18 ++++++++++++++++++
+>  blockjob.c               | 42 ++++++++++++++++++++++++++++------------=
+--
+>  job.c                    | 19 +++++++++++++++++++
+>  4 files changed, 74 insertions(+), 14 deletions(-)
 
-Doesn't docs/devel/qapi-code-gen.txt need an update?
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-> index a032cec..ec5cf28 100644
-> --- a/scripts/qapi/common.py
-> +++ b/scripts/qapi/common.py
-> @@ -721,6 +721,7 @@ def check_union(expr, info):
->      name = expr['union']
->      base = expr.get('base')
->      discriminator = expr.get('discriminator')
-> +    partial = expr.get('data-partial', False)
 
-Yes, it does.
+--px1a7RXLopeKT3OrWXzWOI8P9TKb7qUkw
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Discussing a proposed new QAPI language feature is much easier when the
-patch starts with a documentation update specifying the new feature.  If
-you were a seasoned QAPI developer, my review would stop right here :)
-Since you're not, I'll try to make sense of it.
+-----BEGIN PGP SIGNATURE-----
 
->      members = expr['data']
->  
->      # Two types of unions, determined by discriminator.
-> @@ -783,7 +784,7 @@ def check_union(expr, info):
->                                     % (key, enum_define['enum']))
->  
->      # If discriminator is user-defined, ensure all values are covered
-> -    if enum_define:
-> +    if enum_define and not partial:
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr50OwACgkQ9AfbAGHV
+z0DPqAgAplFknGAcj/GDL8CyOq0Lp1cm+kcP43qIljivsDLaTo43xpdgci68nvzS
++3/1hEgIkza0ACdT/2qhlQOJ8cK0loKP7bRn7nyVJt8zw0x3CBxDPCUOFM4or5NH
+0nGk5NpsgusIoTBBXNtWeUQPaCWrBAiT0B0igBvhpzljKXsDm43SE8PS1AmuFZwc
+59TKxVXVGgSyCMgHF1+mo1c6/cJVjjUZ6lxSzq5z3+FJArtBw/8RyVOAkXs0KTt4
+Im3JtfLIctbr8nndWCDZmc3Lo/4MGnX4EW9z9Wr5X9Aeb9wzmkxlOswvB+78a89E
+cwTu6Nh3r54Ww1eav6ucSNmfGC/2MQ==
+=W3Sv
+-----END PGP SIGNATURE-----
 
-data-partial supresses the check for "union lists all discriminator
-values".  Makes sense given your commit message.
-
->          for value in enum_define['data']:
->              if value not in members.keys():
->                  raise QAPISemError(info, "Union '%s' data missing '%s' branch"
-> @@ -909,7 +910,7 @@ def check_exprs(exprs):
->          elif 'union' in expr:
->              meta = 'union'
->              check_keys(expr_elem, 'union', ['data'],
-> -                       ['base', 'discriminator'])
-> +                       ['base', 'discriminator', 'data-partial'])
-
-This accepts key 'data-partial'.  Missing: we also need to check its
-value, in check_keys().
-
->              union_types[expr[meta]] = expr
->          elif 'alternate' in expr:
->              meta = 'alternate'
-> @@ -1035,7 +1036,7 @@ class QAPISchemaVisitor(object):
->      def visit_array_type(self, name, info, element_type):
->          pass
->  
-> -    def visit_object_type(self, name, info, base, members, variants):
-> +    def visit_object_type(self, name, info, base, members, variants, partial):
-
-As we'll see below, @partial is needed just for qapi/visit.py's
-gen_visit_object_members().
-
->          pass
->  
->      def visit_object_type_flat(self, name, info, members, variants):
-> @@ -1192,7 +1193,8 @@ class QAPISchemaArrayType(QAPISchemaType):
->  
->  
->  class QAPISchemaObjectType(QAPISchemaType):
-> -    def __init__(self, name, info, doc, base, local_members, variants):
-> +    def __init__(self, name, info, doc, base, local_members, variants,
-> +                 partial = False):
->          # struct has local_members, optional base, and no variants
->          # flat union has base, variants, and no local_members
->          # simple union has local_members, variants, and no base
-> @@ -1209,6 +1211,7 @@ class QAPISchemaObjectType(QAPISchemaType):
->          self.local_members = local_members
->          self.variants = variants
->          self.members = None
-> +        self.partial = partial
->  
->      def check(self, schema):
->          if self.members is False:               # check for cycles
-> @@ -1269,7 +1272,8 @@ class QAPISchemaObjectType(QAPISchemaType):
->  
->      def visit(self, visitor):
->          visitor.visit_object_type(self.name, self.info,
-> -                                  self.base, self.local_members, self.variants)
-> +                                  self.base, self.local_members, self.variants,
-> +                                  self.partial)
->          visitor.visit_object_type_flat(self.name, self.info,
->                                         self.members, self.variants)
->  
-> @@ -1636,6 +1640,7 @@ class QAPISchema(object):
->          name = expr['union']
->          data = expr['data']
->          base = expr.get('base')
-> +        partial = expr.get('data-partial', False)
->          tag_name = expr.get('discriminator')
->          tag_member = None
->          if isinstance(base, dict):
-
-Flat union; @partial applies.
-
-               base = (self._make_implicit_object_type(
-                   name, info, doc, 'base', self._make_members(base, info)))
-           if tag_name:
-               variants = [self._make_variant(key, value)
-                           for (key, value) in data.items()]
-               members = []
-
-Note: if @partial, then variants no longer cover all tag values.  As
-we'll see below, this necessitates changes to some back ends.
-
-Our general strategy is to make the front end normalize away convenience
-features as much as possible.  It looks quite possible here: add the
-implicit variants.  We need a type for them, obviously.  Perhaps we can
-use the internal 'q_empty'.
-
-           else:
-
-Simple union; @partial is meaningless here.
-
-               variants = [self._make_simple_variant(key, value, info)
-                           for (key, value) in data.items()]
-               typ = self._make_implicit_enum_type(name, info,
-                                                   [v.name for v in variants])
-               tag_member = QAPISchemaObjectTypeMember('type', typ, False)
-               members = [tag_member]
-           self._def_entity(
-               QAPISchemaObjectType(name, info, doc, base, members,
-                                    QAPISchemaObjectTypeVariants(tag_name,
-                                                                 tag_member,
-                                                                 variants)))
-
-> @@ -1656,7 +1661,8 @@ class QAPISchema(object):
->              QAPISchemaObjectType(name, info, doc, base, members,
->                                   QAPISchemaObjectTypeVariants(tag_name,
->                                                                tag_member,
-> -                                                              variants)))
-> +                                                              variants),
-> +                                 partial))
->  
->      def _def_alternate_type(self, expr, info, doc):
->          name = expr['alternate']
-
-Okay, that's all for the front end.
-
-As far as I can tell, 'data-partial' the front end accept and ignores
-'data-partial' with simple unions.  It should reject it instead.
-
-> diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
-> index 9b312b2..40dffc4 100644
-> --- a/scripts/qapi/doc.py
-> +++ b/scripts/qapi/doc.py
-> @@ -211,7 +211,7 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaVisitor):
->                                 body=texi_entity(doc, 'Values',
->                                                  member_func=texi_enum_value)))
->  
-> -    def visit_object_type(self, name, info, base, members, variants):
-> +    def visit_object_type(self, name, info, base, members, variants, partial):
->          doc = self.cur_doc
->          if base and base.is_implicit():
->              base = None
-> diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
-> index 64d9c0f..e805509 100644
-> --- a/scripts/qapi/types.py
-> +++ b/scripts/qapi/types.py
-> @@ -215,7 +215,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaModularCVisitor):
->          self._genh.add(gen_array(name, element_type))
->          self._gen_type_cleanup(name)
->  
-> -    def visit_object_type(self, name, info, base, members, variants):
-> +    def visit_object_type(self, name, info, base, members, variants, partial):
->          # Nothing to do for the special empty builtin
->          if name == 'q_empty':
->              return
-> diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
-> index 5d72d89..3ee64bb 100644
-> --- a/scripts/qapi/visit.py
-> +++ b/scripts/qapi/visit.py
-> @@ -34,7 +34,7 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name)s *obj, Error **errp);
->                   c_name=c_name(name))
->  
->  
-> -def gen_visit_object_members(name, base, members, variants):
-> +def gen_visit_object_members(name, base, members, variants, partial):
->      ret = mcgen('''
->  
->  void visit_type_%(c_name)s_members(Visitor *v, %(c_name)s *obj, Error **errp)
-> @@ -93,9 +93,10 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name)s *obj, Error **errp)
->  
->          ret += mcgen('''
->      default:
-> -        abort();
-> +        %(action)s
->      }
-> -''')
-> +''',
-> +                     action="break;" if partial else "abort();")
-
-No change when partial=False: the switch cases cover all valid
-discriminator values, and default aborts on invalid ones.
-
-When partial=True, the cases cover only the values listed in the union,
-and default does nothing.  This isn't quite right.  We should do nothing
-only for the values not listed in the union, and still abort for invalid
-ones.
-
-If the front end normalizes away the convenience feature, we should get
-this behavior without any changes here.
-
->  
->      # 'goto out' produced for base, for each member, and if variants were
->      # present
-> @@ -309,12 +310,13 @@ class QAPISchemaGenVisitVisitor(QAPISchemaModularCVisitor):
->          self._genh.add(gen_visit_decl(name))
->          self._genc.add(gen_visit_list(name, element_type))
->  
-> -    def visit_object_type(self, name, info, base, members, variants):
-> +    def visit_object_type(self, name, info, base, members, variants, partial):
->          # Nothing to do for the special empty builtin
->          if name == 'q_empty':
->              return
->          self._genh.add(gen_visit_members_decl(name))
-> -        self._genc.add(gen_visit_object_members(name, base, members, variants))
-> +        self._genc.add(gen_visit_object_members(name, base, members, variants,
-> +                                                partial))
->          # TODO Worth changing the visitor signature, so we could
->          # directly use rather than repeat type.is_implicit()?
->          if not name.startswith('q_'):
-> diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi.py
-> index c1a144b..95cd575 100644
-> --- a/tests/qapi-schema/test-qapi.py
-> +++ b/tests/qapi-schema/test-qapi.py
-> @@ -28,7 +28,7 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
->          if prefix:
->              print('    prefix %s' % prefix)
->  
-> -    def visit_object_type(self, name, info, base, members, variants):
-> +    def visit_object_type(self, name, info, base, members, variants, partial):
->          print('object %s' % name)
->          if base:
->              print('    base %s' % base.name)
-
-Okay, now let's take a step back and review the problem this patch
-solves, and the design space.  The perfect patch would do that in the
-commit message, but we're not expecting perfection, only honest effort
-:)
-
-Some unions have no variant members for certain discriminator values.
-We currently have to use an empty type there, and we've accumulated
-several just for the purpose, which is annoying.
-
-QAPI language design alternatives:
-
-1. Having unions cover all discriminator values explicitly is useful.
-All we need is a more convenient way to denote empty types.  Eric
-proposed {}, as in 'foo: {}.
-
-2. Having unions repeat all the discriminator values explicitly is not
-useful.  All we need is replacing the code enforcing that by code
-defaulting missing ones to the empty type.
-
-3. We can't decide, so we do both (this patch).
-
-Preferences?
+--px1a7RXLopeKT3OrWXzWOI8P9TKb7qUkw--
