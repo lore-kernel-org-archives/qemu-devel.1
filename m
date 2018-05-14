@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fIFHb-0004R1-9i
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 11:21:06 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fIFNA-0001Os-3d
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 11:26:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fIFHW-0007Bk-Ng
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 11:21:03 -0400
-References: <20180509162637.15575-1-kwolf@redhat.com>
-	<20180509162637.15575-17-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <805fc7ef-c1f0-0d62-9f66-2f0aae925348@redhat.com>
-Date: Mon, 14 May 2018 17:20:50 +0200
+	(envelope-from <richard.henderson@linaro.org>) id 1fIFN6-0000xP-UP
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 11:26:48 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:43896)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fIFN6-0000wz-My
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 11:26:44 -0400
+Received: by mail-pg0-x242.google.com with SMTP id p8-v6so2108613pgq.10
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 08:26:44 -0700 (PDT)
+References: <20180513085032.27773-1-sw@weilnetz.de>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <cd15aac6-a371-3b93-4ecb-27ff389c43ad@linaro.org>
+Date: Mon, 14 May 2018 08:26:39 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180509162637.15575-17-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Do2f0wy1sBAqh4JzniL1aNIXQQ8MOk63H"
-Subject: Re: [Qemu-devel] [PATCH 16/42] job: Add Job.aio_context
+In-Reply-To: <20180513085032.27773-1-sw@weilnetz.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] configure: Use strings command from cross
+ development tools
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,53 +31,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
+To: Stefan Weil <sw@weilnetz.de>, Mike Frysinger <vapier@gentoo.org>, QEMU Developer <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Do2f0wy1sBAqh4JzniL1aNIXQQ8MOk63H
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com,
- qemu-devel@nongnu.org
-Message-ID: <805fc7ef-c1f0-0d62-9f66-2f0aae925348@redhat.com>
-Subject: Re: [PATCH 16/42] job: Add Job.aio_context
-References: <20180509162637.15575-1-kwolf@redhat.com>
- <20180509162637.15575-17-kwolf@redhat.com>
-In-Reply-To: <20180509162637.15575-17-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2018-05-09 18:26, Kevin Wolf wrote:
-> When block jobs need an AioContext, they just take it from their main
-> block node. Generic jobs don't have a main block node, so we need to
-> assign them an AioContext explicitly.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+On 05/13/2018 01:50 AM, Stefan Weil wrote:
+> This fixes cross builds for the (rare) case where cross binutils
+> but no native binutils are installed.
+> 
+> Signed-off-by: Stefan Weil <sw@weilnetz.de>
 > ---
->  include/qemu/job.h | 7 ++++++-
->  blockjob.c         | 5 ++++-
->  job.c              | 4 +++-
->  3 files changed, 13 insertions(+), 3 deletions(-)
+>  configure | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
---Do2f0wy1sBAqh4JzniL1aNIXQQ8MOk63H
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr5qVIACgkQ9AfbAGHV
-z0Av7AgAqQk/H3u3j4gsUfPKiRosusNWliDv0qwMdkH1TAHcJeYzHr0HHdrq3mmp
-61zFdpUtZQGGMpPXHNKN6kaShIfpAKJEm2o1pt2qXE6B9MEm69mT6FD0atSUIb8c
-PVcU/LJDBP0yTPGmSkzYl+1h1fbPReRqhlt9NKOAB21A6xbTqoEwDO+S5lvvrule
-8Vvvui+mnEPbBq+NAEvj/k5A3LAsuhVmChgqlwbnR1BaZ7a+RIu5ZWYgot0SBbjy
-1rmnCUKwcnLPiHLfHIfyQqpo+koYxOXN5GmCkKcstRB3STlYYTgI45oVsgYIJgcu
-GLsnYn9IIgLWSHt8xSkWafBzKcU5Yw==
-=n/hq
------END PGP SIGNATURE-----
-
---Do2f0wy1sBAqh4JzniL1aNIXQQ8MOk63H--
+r~
