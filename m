@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fIAQG-00051s-JP
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:09:41 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fIAWr-0004T2-Um
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:16:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fIAQF-0000Rv-HO
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:09:40 -0400
-References: <8739e95e-1900-d4e3-7ac8-77e3aa8b927e@virtuozzo.com>
-	<20180514064139.GB16389@lemon.usersys.redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <9a59b786-2351-e8ae-f582-5e436ce0383c@virtuozzo.com>
-Date: Mon, 14 May 2018 13:09:24 +0300
+	(envelope-from <cohuck@redhat.com>) id 1fIAWq-0003NQ-VU
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:16:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44428 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1fIAWq-0003Mt-Pk
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:16:28 -0400
+Date: Mon, 14 May 2018 12:16:22 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180514121622.784afa7d.cohuck@redhat.com>
+In-Reply-To: <20180512045950.12386-5-richard.henderson@linaro.org>
+References: <20180512045950.12386-1-richard.henderson@linaro.org>
+	<20180512045950.12386-5-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180514064139.GB16389@lemon.usersys.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] Restoring bitmaps after failed/cancelled migration
+Subject: Re: [Qemu-devel] [PATCH 2/2] target/s390x: Fix brace Werror with
+ clang 6.0.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,88 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, "gilbert >> Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Juan Q >> Juan Jose Quintela Carreira" <quintela@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, laurent@vivier.eu, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
 
-14.05.2018 09:41, Fam Zheng wrote:
-> On Wed, 04/18 17:00, Vladimir Sementsov-Ogievskiy wrote:
->> Hi all.
->>
->> We now have the following problem:
->>
->> If dirty-bitmaps migration capability is enabled, persistance flag is
->> dropped for all migrated bitmaps, to prevent their storing to the storage on
->> inactivate.
-> Why do we prevent source storing persistent bitmaps by clearing the flag instead
-> of making the bitmap code more BDRV_O_INACTIVE-aware, so it is _not_ stored
-> when/after inactivation?
+On Fri, 11 May 2018 21:59:43 -0700
+Richard Henderson <richard.henderson@linaro.org> wrote:
 
-Bitmaps are stored exactly on inactivation. So, we need some
-flag, that on following inactivation, we don't want to save them. And 
-this flag
-is .persistent flag.
+> The warning is
+> 
+> target/s390x/misc_helper.c:209:21: error: suggest
+>       braces around initialization of subobject [-Werror,-Wmissing-braces]
+>     SysIB sysib = { 0 };
+>                     ^
+>                     {}
+> 
+> While the original code is correct, and technically exactly correct
+> as per ISO C89, both GCC and Clang support plain empty set of braces
+> as an extension.
+> 
+> Cc: Alexander Graf <agraf@suse.de>
+> Cc: David Hildenbrand <david@redhat.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/s390x/misc_helper.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+> index e0b23c1fd1..1f834f35ef 100644
+> --- a/target/s390x/misc_helper.c
+> +++ b/target/s390x/misc_helper.c
+> @@ -206,7 +206,7 @@ uint32_t HELPER(stsi)(CPUS390XState *env, uint64_t a0, uint64_t r0, uint64_t r1)
+>      const MachineState *ms = MACHINE(qdev_get_machine());
+>      uint16_t total_cpus = 0, conf_cpus = 0, reserved_cpus = 0;
+>      S390CPU *cpu = s390_env_get_cpu(env);
+> -    SysIB sysib = { 0 };
+> +    SysIB sysib = { };
+>      int i, cc = 0;
+>  
+>      if ((r0 & STSI_R0_FC_MASK) > STSI_R0_FC_LEVEL_3) {
 
-Of course, we can't save them if BDRV_O_INACTIVE is already set
-
->
->> It works ok, persistence itself is migrated through the
->> migration channel. But on source, bitmaps becomes not persistent, so if we,
->> for some reasons, want to continue using source vm, we'll lose bitmaps on
->> stop/start.
->>
->> It's simple to fix it: just make bitmaps persistent again on invalidate
->> [1].. But I have some questions.
->>
->> 1. What are possible cases? I think about the following:
->>
->> a. migration cancel or fail, then invalidate
->> b. migration success, then qmp cont => invalidate
-> Is this "cont" on the source even though dst is already up? How will this work?
-> Isn't it expected that dst is using the image?
-
-Dr. David described this case, look at his answer.
-
->
->> c. migration success, then stop/start (there was no invalidate, so [1] will
->> not work)
->>
->>
->> 2. Is it safe at all, saving bitmaps after inactivate, even without
->> persistence?
-> This is not safe. No I/O should be done to the image after inactivation.
->
->> Inactive disk implies, that it may be changed by somebody other, isn't it?
-> Yes.
->
->> Is it possible, that target will change the disk, and then we return control
->> to the source? In this case bitmaps will be invalid. So, should not we drop
->> all the bitmaps on inactivate?
-> Yes, dropping all live bitmaps upon inactivate sounds reasonable. If the dst
-> fails to start, and we want to resume VM at src, we could (optionally?) reload
-> the persistent bitmaps, I guess.
-
-Reload from where? We didn't store them.
-
-So, you agree, that dropping all bitmaps after inactivation is good 
-idea.. The second question, is it possible to not drop them? Is there a 
-way, to check that disk was not changed after pair of 
-inactivate-invalidate? I have an idea:
-we can create small-bitmap, which will not migrate through migration 
-channel, but remain persistent. It will be very small (big granularity, 
-to not increase downtime of migration), so after invalidate we can check 
-this bitmap. If it is empty, we are happy, we can "activate" all our 
-bitmaps and make them persistent again. If not, we have two ways:
-
-1. drop all bitmaps
-2. merge small-bitmap to all our bitmaps
-
->
->> -- 
->> Best regards,
->> Vladimir
->>
-
-
--- 
-Best regards,
-Vladimir
+Thanks, applied.
