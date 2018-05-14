@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52219)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fID3g-0006L8-17
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 08:58:32 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fID4b-0007Rb-Of
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 08:59:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fID3f-0003AF-0r
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 08:58:32 -0400
-Date: Mon, 14 May 2018 14:58:19 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180514125819.GD6665@localhost.localdomain>
-References: <20180509162637.15575-1-kwolf@redhat.com>
-	<20180509162637.15575-9-kwolf@redhat.com>
-	<1981b40b-40c2-4378-35a5-02cc20361370@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1fID4X-0003WE-5o
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 08:59:29 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:38535)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fID4W-0003Vz-Ty
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 08:59:25 -0400
+Received: by mail-wr0-x242.google.com with SMTP id 94-v6so12246362wrf.5
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 05:59:24 -0700 (PDT)
+Date: Mon, 14 May 2018 13:59:21 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180514125921.GA5182@stefanha-x1.localdomain>
+References: <1520930033-18885-1-git-send-email-junyan.he@intel.com>
+	<1520930033-18885-3-git-send-email-junyan.he@intel.com>
+	<433eb0d1-c6b2-ff49-26b6-664636cfe5b0@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="VywGB/WGlW4DM4P8"
+	protocol="application/pgp-signature"; boundary="bp/iNruPH9dso1Pn"
 Content-Disposition: inline
-In-Reply-To: <1981b40b-40c2-4378-35a5-02cc20361370@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 08/42] job: Create Job,
- JobDriver and job_create()
+In-Reply-To: <433eb0d1-c6b2-ff49-26b6-664636cfe5b0@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 02/10] RFC: Implement qcow2's snapshot
+ dependent saving function.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,89 +32,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: junyan.he@intel.com, qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, quintela@redhat.com, crosthwaite.peter@gmail.com, dgilbert@redhat.com, mreitz@redhat.com, Pavel Dovgaluk <Pavel.Dovgaluk@ispras.ru>, pbonzini@redhat.com, rth@twiddle.net
 
 
---VywGB/WGlW4DM4P8
+--bp/iNruPH9dso1Pn
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-Am 12.05.2018 um 00:46 hat Max Reitz geschrieben:
-> On 2018-05-09 18:26, Kevin Wolf wrote:
-> > This is the first step towards creating an infrastructure for generic
-> > background jobs that aren't tied to a block device. For now, Job only
-> > stores its ID and JobDriver, the rest stays in BlockJob.
+On Tue, May 08, 2018 at 09:50:00AM -0500, Eric Blake wrote:
+> On 03/13/2018 03:33 AM, junyan.he@intel.com wrote:
+> > From: Junyan He <junyan.he@intel.com>
 > >=20
-> > The following patches will move over more parts of BlockJob to Job if
-> > they are meaningful outside the context of a block job.
+> > For qcow2 format, we can increase the cluster's reference count of
+> > dependent snapshot content and link the offset to the L2 table of
+> > the new snapshot point. This way can avoid obvious snapshot's dependent
+> > relationship, so when we delete some snapshot point, just decrease the
+> > cluster count and no need to check further.
 > >=20
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > Signed-off-by: Junyan He <junyan.he@intel.com>
 > > ---
-> >  include/block/blockjob.h     |  9 +++----
-> >  include/block/blockjob_int.h |  4 +--
-> >  include/qemu/job.h           | 60 ++++++++++++++++++++++++++++++++++++=
-++++++++
-> >  block/backup.c               |  4 ++-
-> >  block/commit.c               |  4 ++-
-> >  block/mirror.c               | 10 +++++---
-> >  block/stream.c               |  4 ++-
-> >  blockjob.c                   | 46 ++++++++++++++++-----------------
-> >  job.c                        | 48 +++++++++++++++++++++++++++++++++++
-> >  tests/test-bdrv-drain.c      |  4 ++-
-> >  tests/test-blockjob-txn.c    |  4 ++-
-> >  tests/test-blockjob.c        | 12 ++++++---
-> >  MAINTAINERS                  |  2 ++
-> >  Makefile.objs                |  2 +-
-> >  14 files changed, 169 insertions(+), 44 deletions(-)
-> >  create mode 100644 include/qemu/job.h
-> >  create mode 100644 job.c
-> >=20
-> > diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-> > index 0b57d53084..8acc1a236a 100644
-> > --- a/include/block/blockjob.h
-> > +++ b/include/block/blockjob.h
+> >   block/qcow2-snapshot.c | 154 ++++++++++++++++++++++++++++++++++++++++=
++++++++++
+> >   block/qcow2.c          |   2 +
+> >   block/qcow2.h          |   7 +++
+> >   3 files changed, 163 insertions(+)
 >=20
-> [...]
+> It sounds like you are trying to modify the qcow2 spec to store more
+> information into the internal snapshot table (and if you aren't, why not?=
+ If
+> an internal snapshot depends on another one and we don't record that
+> information in the qcow2 metadata, then we are pushing the burden of
+> tracking inter-relationships onto management apps, and risk corruption if
+> you load a snapshot without also visiting its dependencies).  It is
+> absolutely essential that such modifications be reflected in
+> docs/interop/qcow2.txt first, to make sure we agree on the implementation.
+> What's more, there is already another parallel proposal that is also want=
+ing
+> to tweak qcow2 files:
 >=20
-> > @@ -40,6 +41,9 @@ typedef struct BlockJobTxn BlockJobTxn;
-> >   * Long-running operation on a BlockDriverState.
-> >   */
-> >  typedef struct BlockJob {
-> > +    /** Data belonging to the generic Job infrastructure */
-> > +    Job job;
-> > +
-> >      /** The job type, including the job vtable.  */
-> >      const BlockJobDriver *driver;
+> https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg05231.html
 >=20
-> Any reason why you keep this field around?  Shouldn't it be just
-> DO_UPCAST(const BlockJobDriver, job_driver, job.driver)?
+> We need to make sure both additions are coordinated.
 
-I left it around to avoid unnecessary churn at this point. However, I
-intended to remove it at the end of the series, which I seem to have
-forgotten. I'll add a patch to this effect.
+I think the relationship doesn't need to be stored.  The point of this
+snapshot clone operation is to share some of the clusters of the parent
+snapshot (using qcow2's existing cluster reference counts).  Cloning
+avoids having to write a duplicate copy of those clusters.
 
-Kevin
+Stefan
 
---VywGB/WGlW4DM4P8
+--bp/iNruPH9dso1Pn
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIcBAEBAgAGBQJa+YfrAAoJEH8JsnLIjy/WFcUP/jbCUzHtDR80H1y/HPOp2/Lh
-1VqP41yoZAhREZUeoz61FGM4cpXnXxUCfYy46J5RRFr2puAThXpCOAwW27r6tA52
-aS9OCsPclzmYSX1WLGEXT7cuOa/bn1Ae9mc2xeRkS2veUBsNIQBIHPhmDBh4tIrX
-uEf8Wu31yOdTaV5DAMG6pJ2EUnY0OCIszmdzXhl7nldBgpHuxK7szsONS132Oigj
-iuhLIpp58oHdi1t/DSiW5q5EJdQYeaZ8GkwaaCI+8XjkLEn9oGBT93O3g1YVu7Q8
-jjrnW6B7jDIZEapBodEd65ceBgG8xb7xFhoaouN7xnj1ktb3K5Utps0+qcHRKFpB
-6S7MM73z/P6hPKlk3uv7iKr61Cks+Av0rh8cv+7sXEsrAnGUjQCYsG33dPzG1+S5
-378NDUgx7apkWF3OHnX9i/EAl+TcEoPeO2n3DTlxVOflp6th4sOGAPH1RuHm1qec
-5hyYL/rKpAS5Xe7IqXI6c+4SSCSZ3vKcZOtoqpj8IQK6G2m3wYm2Nsbchdm9YQZ2
-1FtVCd9y8VoVJE/Pwx5MV1aZq9zIMLIlHvw/vQfvKMCK7fkv9bo7+1gguc6EHaji
-xk/4NAiqW7xa45QwWxJH+j88wWCiaQQQVXr/4+rp7Ngqhqb4ruCHQRQS9ILaTa5G
-vq7iCTdAN9CFk5pHCfnb
-=RXCU
+iQEcBAEBAgAGBQJa+YgpAAoJEJykq7OBq3PIZqMH/iE/oy5uAdsGA+TiBnx1i0NI
+/GMBUxOtbXOaWuZfHoa27MtGcr8MoakI701mNwD6Rr8jc7f71Mb57hjg1ASuh9Bx
+/OwWOVUIY314i7+3pgMKzFvjb9yUqhFYa7x+25nKGi2u/+dq0qql+lnmZ0zzMdrq
+q2TkczaROXeK36V5HxBK8/rZTsZUuJxL4K9d4qqCgtPpWSOE4lXjb8gITTtFmOTv
+wIRiX7UxwtC8J5+xl+cBwxFt4LcUWr9jMH4sIFVvtVqZKxRpVUuxVryMy7ppxvRc
+PUXmq7Q2YZ0MGAsqBT1RHkuio49fx1YuA7nb470lDnIVzvk0WSFQGDDAjjffTu8=
+=qzQa
 -----END PGP SIGNATURE-----
 
---VywGB/WGlW4DM4P8--
+--bp/iNruPH9dso1Pn--
