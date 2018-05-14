@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52678)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52627)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fILiF-0008GF-5f
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:13:00 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fILiB-0008EQ-92
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fILiD-0008Vn-M1
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:59 -0400
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:40810)
+	(envelope-from <richard.henderson@linaro.org>) id 1fILi8-0008I9-A2
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:55 -0400
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:36603)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fILiD-0008Tl-Dy
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:57 -0400
-Received: by mail-pf0-x242.google.com with SMTP id f189-v6so6668320pfa.7
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 15:12:57 -0700 (PDT)
+	id 1fILi8-0008Fm-1U
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:52 -0400
+Received: by mail-pg0-x241.google.com with SMTP id z70-v6so6065203pgz.3
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 15:12:52 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 14 May 2018 15:12:16 -0700
-Message-Id: <20180514221219.7091-26-richard.henderson@linaro.org>
+Date: Mon, 14 May 2018 15:12:12 -0700
+Message-Id: <20180514221219.7091-22-richard.henderson@linaro.org>
 In-Reply-To: <20180514221219.7091-1-richard.henderson@linaro.org>
 References: <20180514221219.7091-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v5 25/28] fpu/softfloat: Pass FloatClass to
- pickNaNMulAdd
+Subject: [Qemu-devel] [PATCH v5 21/28] fpu/softfloat: Remove
+ floatX_maybe_silence_nan
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,179 +30,160 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 
-For each operand, pass a single enumeration instead of a pair of booleans.
-The commit also merges multiple different ifdef-selected implementations
-of pickNaNMulAdd into a single function whose body is ifdef-selected.
+These functions are now unused.
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- fpu/softfloat-specialize.h | 70 +++++++++++++++-----------------------
- fpu/softfloat.c            |  5 +--
- 2 files changed, 28 insertions(+), 47 deletions(-)
+ fpu/softfloat-specialize.h | 63 --------------------------------------
+ include/fpu/softfloat.h    |  5 ---
+ 2 files changed, 68 deletions(-)
 
 diff --git a/fpu/softfloat-specialize.h b/fpu/softfloat-specialize.h
-index 2695183188..0399dfe011 100644
+index 4fa068a5dc..d7033b7757 100644
 --- a/fpu/softfloat-specialize.h
 +++ b/fpu/softfloat-specialize.h
-@@ -594,15 +594,14 @@ static int pickNaN(FloatClass a_cls, FloatClass b_cls,
- | information.
- | Return values : 0 : a; 1 : b; 2 : c; 3 : default-NaN
- *----------------------------------------------------------------------------*/
--#if defined(TARGET_ARM)
--static int pickNaNMulAdd(flag aIsQNaN, flag aIsSNaN, flag bIsQNaN, flag bIsSNaN,
--                         flag cIsQNaN, flag cIsSNaN, flag infzero,
--                         float_status *status)
-+static int pickNaNMulAdd(FloatClass a_cls, FloatClass b_cls, FloatClass c_cls,
-+                         bool infzero, float_status *status)
- {
-+#if defined(TARGET_ARM)
-     /* For ARM, the (inf,zero,qnan) case sets InvalidOp and returns
-      * the default NaN
-      */
--    if (infzero && cIsQNaN) {
-+    if (infzero && is_qnan(c_cls)) {
-         float_raise(float_flag_invalid, status);
-         return 3;
-     }
-@@ -610,25 +609,20 @@ static int pickNaNMulAdd(flag aIsQNaN, flag aIsSNaN, flag bIsQNaN, flag bIsSNaN,
-     /* This looks different from the ARM ARM pseudocode, because the ARM ARM
-      * puts the operands to a fused mac operation (a*b)+c in the order c,a,b.
-      */
--    if (cIsSNaN) {
-+    if (is_snan(c_cls)) {
-         return 2;
--    } else if (aIsSNaN) {
-+    } else if (is_snan(a_cls)) {
-         return 0;
--    } else if (bIsSNaN) {
-+    } else if (is_snan(b_cls)) {
-         return 1;
--    } else if (cIsQNaN) {
-+    } else if (is_qnan(c_cls)) {
-         return 2;
--    } else if (aIsQNaN) {
-+    } else if (is_qnan(a_cls)) {
-         return 0;
-     } else {
-         return 1;
-     }
--}
- #elif defined(TARGET_MIPS)
--static int pickNaNMulAdd(flag aIsQNaN, flag aIsSNaN, flag bIsQNaN, flag bIsSNaN,
--                         flag cIsQNaN, flag cIsSNaN, flag infzero,
--                         float_status *status)
--{
-     /* For MIPS, the (inf,zero,qnan) case sets InvalidOp and returns
-      * the default NaN
-      */
-@@ -639,41 +633,36 @@ static int pickNaNMulAdd(flag aIsQNaN, flag aIsSNaN, flag bIsQNaN, flag bIsSNaN,
- 
-     if (snan_bit_is_one(status)) {
-         /* Prefer sNaN over qNaN, in the a, b, c order. */
--        if (aIsSNaN) {
-+        if (is_snan(a_cls)) {
-             return 0;
--        } else if (bIsSNaN) {
-+        } else if (is_snan(b_cls)) {
-             return 1;
--        } else if (cIsSNaN) {
-+        } else if (is_snan(c_cls)) {
-             return 2;
--        } else if (aIsQNaN) {
-+        } else if (is_qnan(a_cls)) {
-             return 0;
--        } else if (bIsQNaN) {
-+        } else if (is_qnan(b_cls)) {
-             return 1;
-         } else {
-             return 2;
-         }
-     } else {
-         /* Prefer sNaN over qNaN, in the c, a, b order. */
--        if (cIsSNaN) {
-+        if (is_snan(c_cls)) {
-             return 2;
--        } else if (aIsSNaN) {
-+        } else if (is_snan(a_cls)) {
-             return 0;
--        } else if (bIsSNaN) {
-+        } else if (is_snan(b_cls)) {
-             return 1;
--        } else if (cIsQNaN) {
-+        } else if (is_qnan(c_cls)) {
-             return 2;
--        } else if (aIsQNaN) {
-+        } else if (is_qnan(a_cls)) {
-             return 0;
-         } else {
-             return 1;
-         }
-     }
--}
- #elif defined(TARGET_PPC)
--static int pickNaNMulAdd(flag aIsQNaN, flag aIsSNaN, flag bIsQNaN, flag bIsSNaN,
--                         flag cIsQNaN, flag cIsSNaN, flag infzero,
--                         float_status *status)
--{
-     /* For PPC, the (inf,zero,qnan) case sets InvalidOp, but we prefer
-      * to return an input NaN if we have one (ie c) rather than generating
-      * a default NaN
-@@ -686,31 +675,26 @@ static int pickNaNMulAdd(flag aIsQNaN, flag aIsSNaN, flag bIsQNaN, flag bIsSNaN,
-     /* If fRA is a NaN return it; otherwise if fRB is a NaN return it;
-      * otherwise return fRC. Note that muladd on PPC is (fRA * fRC) + frB
-      */
--    if (aIsSNaN || aIsQNaN) {
-+    if (is_nan(a_cls)) {
-         return 0;
--    } else if (cIsSNaN || cIsQNaN) {
-+    } else if (is_nan(c_cls)) {
-         return 2;
-     } else {
-         return 1;
-     }
--}
- #else
--/* A default implementation: prefer a to b to c.
-- * This is unlikely to actually match any real implementation.
-- */
--static int pickNaNMulAdd(flag aIsQNaN, flag aIsSNaN, flag bIsQNaN, flag bIsSNaN,
--                         flag cIsQNaN, flag cIsSNaN, flag infzero,
--                         float_status *status)
--{
--    if (aIsSNaN || aIsQNaN) {
-+    /* A default implementation: prefer a to b to c.
-+     * This is unlikely to actually match any real implementation.
-+     */
-+    if (is_nan(a_cls)) {
-         return 0;
--    } else if (bIsSNaN || bIsQNaN) {
-+    } else if (is_nan(b_cls)) {
-         return 1;
-     } else {
-         return 2;
-     }
--}
+@@ -364,19 +364,6 @@ float16 float16_silence_nan(float16 a, float_status *status)
  #endif
-+}
+ }
+ 
+-/*----------------------------------------------------------------------------
+-| Returns a quiet NaN if the half-precision floating point value `a' is a
+-| signaling NaN; otherwise returns `a'.
+-*----------------------------------------------------------------------------*/
+-
+-float16 float16_maybe_silence_nan(float16 a, float_status *status)
+-{
+-    if (float16_is_signaling_nan(a, status)) {
+-        return float16_silence_nan(a, status);
+-    }
+-    return a;
+-}
+-
+ /*----------------------------------------------------------------------------
+ | Returns 1 if the single-precision floating-point value `a' is a quiet
+ | NaN; otherwise returns 0.
+@@ -438,18 +425,6 @@ float32 float32_silence_nan(float32 a, float_status *status)
+     }
+ #endif
+ }
+-/*----------------------------------------------------------------------------
+-| Returns a quiet NaN if the single-precision floating point value `a' is a
+-| signaling NaN; otherwise returns `a'.
+-*----------------------------------------------------------------------------*/
+-
+-float32 float32_maybe_silence_nan(float32 a, float_status *status)
+-{
+-    if (float32_is_signaling_nan(a, status)) {
+-        return float32_silence_nan(a, status);
+-    }
+-    return a;
+-}
  
  /*----------------------------------------------------------------------------
- | Takes two single-precision floating-point values `a' and `b', one of which
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 43264fa1f6..65e970eeb2 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -601,10 +601,7 @@ static FloatParts pick_nan_muladd(FloatParts a, FloatParts b, FloatParts c,
-         s->float_exception_flags |= float_flag_invalid;
-     }
+ | Returns the result of converting the single-precision floating-point NaN
+@@ -864,18 +839,6 @@ float64 float64_silence_nan(float64 a, float_status *status)
+ #endif
+ }
  
--    which = pickNaNMulAdd(is_qnan(a.cls), is_snan(a.cls),
--                          is_qnan(b.cls), is_snan(b.cls),
--                          is_qnan(c.cls), is_snan(c.cls),
--                          inf_zero, s);
-+    which = pickNaNMulAdd(a.cls, b.cls, c.cls, inf_zero, s);
+-/*----------------------------------------------------------------------------
+-| Returns a quiet NaN if the double-precision floating point value `a' is a
+-| signaling NaN; otherwise returns `a'.
+-*----------------------------------------------------------------------------*/
+-
+-float64 float64_maybe_silence_nan(float64 a, float_status *status)
+-{
+-    if (float64_is_signaling_nan(a, status)) {
+-        return float64_silence_nan(a, status);
+-    }
+-    return a;
+-}
  
-     if (s->default_nan_mode) {
-         /* Note that this check is after pickNaNMulAdd so that function
+ /*----------------------------------------------------------------------------
+ | Returns the result of converting the double-precision floating-point NaN
+@@ -1037,19 +1000,6 @@ floatx80 floatx80_silence_nan(floatx80 a, float_status *status)
+ #endif
+ }
+ 
+-/*----------------------------------------------------------------------------
+-| Returns a quiet NaN if the extended double-precision floating point value
+-| `a' is a signaling NaN; otherwise returns `a'.
+-*----------------------------------------------------------------------------*/
+-
+-floatx80 floatx80_maybe_silence_nan(floatx80 a, float_status *status)
+-{
+-    if (floatx80_is_signaling_nan(a, status)) {
+-        return floatx80_silence_nan(a, status);
+-    }
+-    return a;
+-}
+-
+ /*----------------------------------------------------------------------------
+ | Returns the result of converting the extended double-precision floating-
+ | point NaN `a' to the canonical NaN format.  If `a' is a signaling NaN, the
+@@ -1204,19 +1154,6 @@ float128 float128_silence_nan(float128 a, float_status *status)
+ #endif
+ }
+ 
+-/*----------------------------------------------------------------------------
+-| Returns a quiet NaN if the quadruple-precision floating point value `a' is
+-| a signaling NaN; otherwise returns `a'.
+-*----------------------------------------------------------------------------*/
+-
+-float128 float128_maybe_silence_nan(float128 a, float_status *status)
+-{
+-    if (float128_is_signaling_nan(a, status)) {
+-        return float128_silence_nan(a, status);
+-    }
+-    return a;
+-}
+-
+ /*----------------------------------------------------------------------------
+ | Returns the result of converting the quadruple-precision floating-point NaN
+ | `a' to the canonical NaN format.  If `a' is a signaling NaN, the invalid
+diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+index a6860e858d..69f4dbc4db 100644
+--- a/include/fpu/softfloat.h
++++ b/include/fpu/softfloat.h
+@@ -258,7 +258,6 @@ int float16_compare_quiet(float16, float16, float_status *status);
+ int float16_is_quiet_nan(float16, float_status *status);
+ int float16_is_signaling_nan(float16, float_status *status);
+ float16 float16_silence_nan(float16, float_status *status);
+-float16 float16_maybe_silence_nan(float16, float_status *status);
+ 
+ static inline int float16_is_any_nan(float16 a)
+ {
+@@ -370,7 +369,6 @@ float32 float32_maxnummag(float32, float32, float_status *status);
+ int float32_is_quiet_nan(float32, float_status *status);
+ int float32_is_signaling_nan(float32, float_status *status);
+ float32 float32_silence_nan(float32, float_status *status);
+-float32 float32_maybe_silence_nan(float32, float_status *status);
+ float32 float32_scalbn(float32, int, float_status *status);
+ 
+ static inline float32 float32_abs(float32 a)
+@@ -500,7 +498,6 @@ float64 float64_maxnummag(float64, float64, float_status *status);
+ int float64_is_quiet_nan(float64 a, float_status *status);
+ int float64_is_signaling_nan(float64, float_status *status);
+ float64 float64_silence_nan(float64, float_status *status);
+-float64 float64_maybe_silence_nan(float64, float_status *status);
+ float64 float64_scalbn(float64, int, float_status *status);
+ 
+ static inline float64 float64_abs(float64 a)
+@@ -604,7 +601,6 @@ int floatx80_compare_quiet(floatx80, floatx80, float_status *status);
+ int floatx80_is_quiet_nan(floatx80, float_status *status);
+ int floatx80_is_signaling_nan(floatx80, float_status *status);
+ floatx80 floatx80_silence_nan(floatx80, float_status *status);
+-floatx80 floatx80_maybe_silence_nan(floatx80, float_status *status);
+ floatx80 floatx80_scalbn(floatx80, int, float_status *status);
+ 
+ static inline floatx80 floatx80_abs(floatx80 a)
+@@ -816,7 +812,6 @@ int float128_compare_quiet(float128, float128, float_status *status);
+ int float128_is_quiet_nan(float128, float_status *status);
+ int float128_is_signaling_nan(float128, float_status *status);
+ float128 float128_silence_nan(float128, float_status *status);
+-float128 float128_maybe_silence_nan(float128, float_status *status);
+ float128 float128_scalbn(float128, int, float_status *status);
+ 
+ static inline float128 float128_abs(float128 a)
 -- 
 2.17.0
