@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43703)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fIHLl-0000Kf-Ma
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 13:33:30 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fIHYD-0003S7-6a
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 13:46:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fIHLk-0007nB-UM
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 13:33:29 -0400
-References: <20180509162637.15575-1-kwolf@redhat.com>
-	<20180509162637.15575-22-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <9ba3ad17-924c-c583-a914-8b81cff9ed42@redhat.com>
-Date: Mon, 14 May 2018 19:33:17 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180509162637.15575-22-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="CHZK1XPLz8Q86wS2RUFYlSPH3DD1ZdTOx"
-Subject: Re: [Qemu-devel] [PATCH 21/42] job: Replace BlockJob.completed with
- job_is_completed()
+	(envelope-from <pm215@archaic.org.uk>) id 1fIHYC-0000x3-DE
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 13:46:21 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41648)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1fIHYC-0000w4-5x
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 13:46:20 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 14 May 2018 18:46:16 +0100
+Message-Id: <20180514174616.19601-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] linux-user: Assert on bad type in
+ thunk_type_align() and thunk_type_size()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,60 +23,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---CHZK1XPLz8Q86wS2RUFYlSPH3DD1ZdTOx
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com,
- qemu-devel@nongnu.org
-Message-ID: <9ba3ad17-924c-c583-a914-8b81cff9ed42@redhat.com>
-Subject: Re: [PATCH 21/42] job: Replace BlockJob.completed with
- job_is_completed()
-References: <20180509162637.15575-1-kwolf@redhat.com>
- <20180509162637.15575-22-kwolf@redhat.com>
-In-Reply-To: <20180509162637.15575-22-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+In thunk_type_align() and thunk_type_size() we currently return
+-1 if the value at the type_ptr isn't one of the TYPE_* values
+we understand. However, this should never happen, and if it does
+then the calling code will go confusingly wrong because none
+of the callsites try to handle an error return. Switch to an
+assertion instead, so that if this does somehow happen we'll have
+a nice clear backtrace of what happened rather than a weird crash
+or misbehaviour.
 
-On 2018-05-09 18:26, Kevin Wolf wrote:
-> Since we introduced an explicit status to block job, BlockJob.completed=
+This also silences various Coverity complaints about not handling
+the negative return value (CID 1005735, 1005736, 1005738, 1390582).
 
-> is redundant because it can be derived from the status. Remove the fiel=
-d
-> from BlockJob and add a function to derive it from the status at the Jo=
-b
-> level.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  include/block/blockjob.h |  3 ---
->  include/qemu/job.h       |  3 +++
->  blockjob.c               | 16 +++++++---------
->  job.c                    | 22 ++++++++++++++++++++++
->  qemu-img.c               |  4 ++--
->  5 files changed, 34 insertions(+), 14 deletions(-)
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ include/exec/user/thunk.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---CHZK1XPLz8Q86wS2RUFYlSPH3DD1ZdTOx
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr5yF0ACgkQ9AfbAGHV
-z0AJfwgAoJQU+FGeSddXtw4jSIliOd7QdFvFmQgvSNdZl4ya6ucyGoeRaDlqdxo7
-NJH7RNw2y8Xft7ltjwefVmft3o3/ttKD3Msp02TGvSTlO5SaTLR31LVAoim1H7ub
-wHvt2T7YdKQjHQQHxxHqFRuxhI7qT+Fh2HQZ4NeFN4Yqmn0Y4XHNKgIo4JJ7epve
-I4a2OakvDvFYaxLvvOUfE5D2NDZjb5f6Mc3Bk7/TnKtThoa071g21j7+mMQi1COh
-5k84gyDp2S2cdPO89+xH9XKA4Ke4bYh3PpgDIXqhtNU9ddMxndH2wuwbQ22Ukwn7
-doUsogaDEiaNjmfLKYral4lVyi0Fug==
-=IUi7
------END PGP SIGNATURE-----
-
---CHZK1XPLz8Q86wS2RUFYlSPH3DD1ZdTOx--
+diff --git a/include/exec/user/thunk.h b/include/exec/user/thunk.h
+index f19ef4b230..840d6d899b 100644
+--- a/include/exec/user/thunk.h
++++ b/include/exec/user/thunk.h
+@@ -135,7 +135,7 @@ static inline int thunk_type_size(const argtype *type_ptr, int is_host)
+         se = struct_entries + type_ptr[1];
+         return se->size[is_host];
+     default:
+-        return -1;
++        g_assert_not_reached();
+     }
+ }
+ 
+@@ -173,7 +173,7 @@ static inline int thunk_type_align(const argtype *type_ptr, int is_host)
+         se = struct_entries + type_ptr[1];
+         return se->align[is_host];
+     default:
+-        return -1;
++        g_assert_not_reached();
+     }
+ }
+ 
+-- 
+2.17.0
