@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54724)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fII4a-0005E3-8p
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 14:19:50 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fII4f-0005Gj-5B
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 14:19:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fII4Y-0005HU-Es
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 14:19:48 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:36363)
+	(envelope-from <laurent@vivier.eu>) id 1fII4a-0005LA-Kj
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 14:19:52 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:43111)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fII4Y-0005Fy-3O
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 14:19:46 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fII4a-0005JM-9R
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 14:19:48 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon, 14 May 2018 20:19:26 +0200
-Message-Id: <20180514181928.18034-6-laurent@vivier.eu>
+Date: Mon, 14 May 2018 20:19:28 +0200
+Message-Id: <20180514181928.18034-8-laurent@vivier.eu>
 In-Reply-To: <20180514181928.18034-1-laurent@vivier.eu>
 References: <20180514181928.18034-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 5/7] linux-user: add sparc/sparc64 specific errno
+Subject: [Qemu-devel] [PULL 7/7] linux-user: correctly align types in
+ thunking code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,262 +27,151 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-Copied from linux/arch/sparc/include/uapi/asm/errno.h
+This is a follow up
+of patch:
+
+        commit c2e3dee6e03527baf8698698cce76b1a3174969a
+        Author: Laurent Vivier <laurent@vivier.eu>
+        Date:   Sun Feb 13 23:37:34 2011 +0100
+
+            linux-user: Define target alignment size
+
+In my case m68k aligns "int" on 2 not 4. You can check this with the
+following program:
+
+int main(void)
+{
+        struct rtentry rt;
+        printf("rt_pad1 %ld %zd\n", offsetof(struct rtentry, rt_pad1),
+                sizeof(rt.rt_pad1));
+        printf("rt_dst %ld %zd\n", offsetof(struct rtentry, rt_dst),
+                sizeof(rt.rt_dst));
+        printf("rt_gateway %ld %zd\n", offsetof(struct rtentry, rt_gateway),
+                sizeof(rt.rt_gateway));
+        printf("rt_genmask %ld %zd\n", offsetof(struct rtentry, rt_genmask),
+                sizeof(rt.rt_genmask));
+        printf("rt_flags %ld %zd\n", offsetof(struct rtentry, rt_flags),
+                sizeof(rt.rt_flags));
+        printf("rt_pad2 %ld %zd\n", offsetof(struct rtentry, rt_pad2),
+                sizeof(rt.rt_pad2));
+        printf("rt_pad3 %ld %zd\n", offsetof(struct rtentry, rt_pad3),
+                sizeof(rt.rt_pad3));
+        printf("rt_pad4 %ld %zd\n", offsetof(struct rtentry, rt_pad4),
+                sizeof(rt.rt_pad4));
+        printf("rt_metric %ld %zd\n", offsetof(struct rtentry, rt_metric),
+                sizeof(rt.rt_metric));
+        printf("rt_dev %ld %zd\n", offsetof(struct rtentry, rt_dev),
+                sizeof(rt.rt_dev));
+        printf("rt_mtu %ld %zd\n", offsetof(struct rtentry, rt_mtu),
+                sizeof(rt.rt_mtu));
+        printf("rt_window %ld %zd\n", offsetof(struct rtentry, rt_window),
+                sizeof(rt.rt_window));
+        printf("rt_irtt %ld %zd\n", offsetof(struct rtentry, rt_irtt),
+                sizeof(rt.rt_irtt));
+}
+
+And result is :
+
+i386
+
+rt_pad1 0 4
+rt_dst 4 16
+rt_gateway 20 16
+rt_genmask 36 16
+rt_flags 52 2
+rt_pad2 54 2
+rt_pad3 56 4
+rt_pad4 62 2
+rt_metric 64 2
+rt_dev 68 4
+rt_mtu 72 4
+rt_window 76 4
+rt_irtt 80 2
+
+m68k
+
+rt_pad1 0 4
+rt_dst 4 16
+rt_gateway 20 16
+rt_genmask 36 16
+rt_flags 52 2
+rt_pad2 54 2
+rt_pad3 56 4
+rt_pad4 62 2
+rt_metric 64 2
+rt_dev 66 4
+rt_mtu 70 4
+rt_window 74 4
+rt_irtt 78 2
+
+This affects the "route" command :
+
+WITHOUT this patch:
+
+$ sudo route add -net default gw 10.0.3.1 window 1024 irtt 2 eth0
+$ netstat -nr
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+0.0.0.0         10.0.3.1        0.0.0.0         UG        0 67108866  32768 eth0
+10.0.3.0        0.0.0.0         255.255.255.0   U         0 0          0 eth0
+
+WITH this patch:
+
+$ sudo route add -net default gw 10.0.3.1 window 1024 irtt 2 eth0
+$ netstat -nr
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+0.0.0.0         10.0.3.1        0.0.0.0         UG        0 1024       2 eth0
+10.0.3.0        0.0.0.0         255.255.255.0   U         0 0          0 eth0
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Max Filippov <jcmvbkbc@gmail.com>
-Message-Id: <20180509231123.20864-6-laurent@vivier.eu>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-Id: <20180510205949.26455-1-laurent@vivier.eu>
 ---
- linux-user/sparc/target_errno.h     | 207 ++++++++++++++++++++++++++++++++++++
- linux-user/sparc/target_syscall.h   |   2 +
- linux-user/sparc64/target_syscall.h |   3 +-
- 3 files changed, 211 insertions(+), 1 deletion(-)
- create mode 100644 linux-user/sparc/target_errno.h
+ include/exec/user/thunk.h | 22 +++++++++++++++++-----
+ 1 file changed, 17 insertions(+), 5 deletions(-)
 
-diff --git a/linux-user/sparc/target_errno.h b/linux-user/sparc/target_errno.h
-new file mode 100644
-index 0000000000..9b846899cd
---- /dev/null
-+++ b/linux-user/sparc/target_errno.h
-@@ -0,0 +1,207 @@
-+#ifndef SPARC_TARGET_ERRNO_H
-+#define SPARC_TARGET_ERRNO_H
-+
-+/* Target errno definitions taken from asm-sparc/errno.h */
-+#undef TARGET_EWOULDBLOCK
-+#define TARGET_EWOULDBLOCK     TARGET_EAGAIN /* Operation would block */
-+#undef TARGET_EINPROGRESS
-+#define TARGET_EINPROGRESS     36 /* Operation now in progress */
-+#undef TARGET_EALREADY
-+#define TARGET_EALREADY        37 /* Operation already in progress */
-+#undef TARGET_ENOTSOCK
-+#define TARGET_ENOTSOCK        38 /* Socket operation on non-socket */
-+#undef TARGET_EDESTADDRREQ
-+#define TARGET_EDESTADDRREQ    39 /* Destination address required */
-+#undef TARGET_EMSGSIZE
-+#define TARGET_EMSGSIZE        40 /* Message too long */
-+#undef TARGET_EPROTOTYPE
-+#define TARGET_EPROTOTYPE      41 /* Protocol wrong type for socket */
-+#undef TARGET_ENOPROTOOPT
-+#define TARGET_ENOPROTOOPT     42 /* Protocol not available */
-+#undef TARGET_EPROTONOSUPPORT
-+#define TARGET_EPROTONOSUPPORT  43 /* Protocol not supported */
-+#undef TARGET_ESOCKTNOSUPPORT
-+#define TARGET_ESOCKTNOSUPPORT  44 /* Socket type not supported */
-+#undef TARGET_EOPNOTSUPP
-+#define TARGET_EOPNOTSUPP      45 /* Op not supported on transport endpoint */
-+#undef TARGET_EPFNOSUPPORT
-+#define TARGET_EPFNOSUPPORT    46 /* Protocol family not supported */
-+#undef TARGET_EAFNOSUPPORT
-+#define TARGET_EAFNOSUPPORT    47 /* Address family not supported by protocol */
-+#undef TARGET_EADDRINUSE
-+#define TARGET_EADDRINUSE      48 /* Address already in use */
-+#undef TARGET_EADDRNOTAVAIL
-+#define TARGET_EADDRNOTAVAIL   49 /* Cannot assign requested address */
-+#undef TARGET_ENETDOWN
-+#define TARGET_ENETDOWN        50 /* Network is down */
-+#undef TARGET_ENETUNREACH
-+#define TARGET_ENETUNREACH     51 /* Network is unreachable */
-+#undef TARGET_ENETRESET
-+#define TARGET_ENETRESET       52 /* Net dropped connection because of reset */
-+#undef TARGET_ECONNABORTED
-+#define TARGET_ECONNABORTED    53 /* Software caused connection abort */
-+#undef TARGET_ECONNRESET
-+#define TARGET_ECONNRESET      54 /* Connection reset by peer */
-+#undef TARGET_ENOBUFS
-+#define TARGET_ENOBUFS         55 /* No buffer space available */
-+#undef TARGET_EISCONN
-+#define TARGET_EISCONN         56 /* Transport endpoint is already connected */
-+#undef TARGET_ENOTCONN
-+#define TARGET_ENOTCONN        57 /* Transport endpoint is not connected */
-+#undef TARGET_ESHUTDOWN
-+#define TARGET_ESHUTDOWN       58 /* No send after transport endpoint shutdown*/
-+#undef TARGET_ETOOMANYREFS
-+#define TARGET_ETOOMANYREFS    59 /* Too many references: cannot splice */
-+#undef TARGET_ETIMEDOUT
-+#define TARGET_ETIMEDOUT       60 /* Connection timed out */
-+#undef TARGET_ECONNREFUSED
-+#define TARGET_ECONNREFUSED    61 /* Connection refused */
-+#undef TARGET_ELOOP
-+#define TARGET_ELOOP           62 /* Too many symbolic links encountered */
-+#undef TARGET_ENAMETOOLONG
-+#define TARGET_ENAMETOOLONG    63 /* File name too long */
-+#undef TARGET_EHOSTDOWN
-+#define TARGET_EHOSTDOWN       64 /* Host is down */
-+#undef TARGET_EHOSTUNREACH
-+#define TARGET_EHOSTUNREACH    65 /* No route to host */
-+#undef TARGET_ENOTEMPTY
-+#define TARGET_ENOTEMPTY       66 /* Directory not empty */
-+#undef TARGET_EPROCLIM
-+#define TARGET_EPROCLIM        67 /* SUNOS: Too many processes */
-+#undef TARGET_EUSERS
-+#define TARGET_EUSERS          68 /* Too many users */
-+#undef TARGET_EDQUOT
-+#define TARGET_EDQUOT          69 /* Quota exceeded */
-+#undef TARGET_ESTALE
-+#define TARGET_ESTALE          70 /* Stale file handle */
-+#undef TARGET_EREMOTE
-+#define TARGET_EREMOTE         71 /* Object is remote */
-+#undef TARGET_ENOSTR
-+#define TARGET_ENOSTR          72 /* Device not a stream */
-+#undef TARGET_ETIME
-+#define TARGET_ETIME           73 /* Timer expired */
-+#undef TARGET_ENOSR
-+#define TARGET_ENOSR           74 /* Out of streams resources */
-+#undef TARGET_ENOMSG
-+#define TARGET_ENOMSG          75 /* No message of desired type */
-+#undef TARGET_EBADMSG
-+#define TARGET_EBADMSG         76 /* Not a data message */
-+#undef TARGET_EIDRM
-+#define TARGET_EIDRM           77 /* Identifier removed */
-+#undef TARGET_EDEADLK
-+#define TARGET_EDEADLK         78 /* Resource deadlock would occur */
-+#undef TARGET_ENOLCK
-+#define TARGET_ENOLCK          79 /* No record locks available */
-+#undef TARGET_ENONET
-+#define TARGET_ENONET          80 /* Machine is not on the network */
-+#undef TARGET_ERREMOTE
-+#define TARGET_ERREMOTE        81 /* SunOS: Too many lvls of remote in path */
-+#undef TARGET_ENOLINK
-+#define TARGET_ENOLINK         82 /* Link has been severed */
-+#undef TARGET_EADV
-+#define TARGET_EADV            83 /* Advertise error */
-+#undef TARGET_ESRMNT
-+#define TARGET_ESRMNT          84 /* Srmount error */
-+#undef TARGET_ECOMM
-+#define TARGET_ECOMM           85 /* Communication error on send */
-+#undef TARGET_EPROTO
-+#define TARGET_EPROTO          86 /* Protocol error */
-+#undef TARGET_EMULTIHOP
-+#define TARGET_EMULTIHOP       87 /* Multihop attempted */
-+#undef TARGET_EDOTDOT
-+#define TARGET_EDOTDOT         88 /* RFS specific error */
-+#undef TARGET_EREMCHG
-+#define TARGET_EREMCHG         89 /* Remote address changed */
-+#undef TARGET_ENOSYS
-+#define TARGET_ENOSYS          90 /* Function not implemented */
-+#undef TARGET_ESTRPIPE
-+#define TARGET_ESTRPIPE        91 /* Streams pipe error */
-+#undef TARGET_EOVERFLOW
-+#define TARGET_EOVERFLOW       92 /* Value too large for defined data type */
-+#undef TARGET_EBADFD
-+#define TARGET_EBADFD          93 /* File descriptor in bad state */
-+#undef TARGET_ECHRNG
-+#define TARGET_ECHRNG          94 /* Channel number out of range */
-+#undef TARGET_EL2NSYNC
-+#define TARGET_EL2NSYNC        95 /* Level 2 not synchronized */
-+#undef TARGET_EL3HLT
-+#define TARGET_EL3HLT          96 /* Level 3 halted */
-+#undef TARGET_EL3RST
-+#define TARGET_EL3RST          97 /* Level 3 reset */
-+#undef TARGET_ELNRNG
-+#define TARGET_ELNRNG          98 /* Link number out of range */
-+#undef TARGET_EUNATCH
-+#define TARGET_EUNATCH         99 /* Protocol driver not attached */
-+#undef TARGET_ENOCSI
-+#define TARGET_ENOCSI          100 /* No CSI structure available */
-+#undef TARGET_EL2HLT
-+#define TARGET_EL2HLT          101 /* Level 2 halted */
-+#undef TARGET_EBADE
-+#define TARGET_EBADE           102 /* Invalid exchange */
-+#undef TARGET_EBADR
-+#define TARGET_EBADR           103 /* Invalid request descriptor */
-+#undef TARGET_EXFULL
-+#define TARGET_EXFULL          104 /* Exchange full */
-+#undef TARGET_ENOANO
-+#define TARGET_ENOANO          105 /* No anode */
-+#undef TARGET_EBADRQC
-+#define TARGET_EBADRQC         106 /* Invalid request code */
-+#undef TARGET_EBADSLT
-+#define TARGET_EBADSLT         107 /* Invalid slot */
-+#undef TARGET_EDEADLOCK
-+#define TARGET_EDEADLOCK       108 /* File locking deadlock error */
-+#undef TARGET_EBFONT
-+#define TARGET_EBFONT          109 /* Bad font file format */
-+#undef TARGET_ELIBEXEC
-+#define TARGET_ELIBEXEC        110 /* Cannot exec a shared library directly */
-+#undef TARGET_ENODATA
-+#define TARGET_ENODATA         111 /* No data available */
-+#undef TARGET_ELIBBAD
-+#define TARGET_ELIBBAD         112 /* Accessing a corrupted shared library */
-+#undef TARGET_ENOPKG
-+#define TARGET_ENOPKG          113 /* Package not installed */
-+#undef TARGET_ELIBACC
-+#define TARGET_ELIBACC         114 /* Can not access a needed shared library */
-+#undef TARGET_ENOTUNIQ
-+#define TARGET_ENOTUNIQ        115 /* Name not unique on network */
-+#undef TARGET_ERESTART
-+#define TARGET_ERESTART        116 /* Interrupted syscall should be restarted */
-+#undef TARGET_EUCLEAN
-+#define TARGET_EUCLEAN         117 /* Structure needs cleaning */
-+#undef TARGET_ENOTNAM
-+#define TARGET_ENOTNAM         118 /* Not a XENIX named type file */
-+#undef TARGET_ENAVAIL
-+#define TARGET_ENAVAIL         119 /* No XENIX semaphores available */
-+#undef TARGET_EISNAM
-+#define TARGET_EISNAM          120 /* Is a named type file */
-+#undef TARGET_EREMOTEIO
-+#define TARGET_EREMOTEIO       121 /* Remote I/O error */
-+#undef TARGET_EILSEQ
-+#define TARGET_EILSEQ          122 /* Illegal byte sequence */
-+#undef TARGET_ELIBMAX
-+#define TARGET_ELIBMAX         123 /* Atmpt to link in too many shared libs */
-+#undef TARGET_ELIBSCN
-+#define TARGET_ELIBSCN         124 /* .lib section in a.out corrupted */
-+#undef TARGET_ENOMEDIUM
-+#define TARGET_ENOMEDIUM       125 /* No medium found */
-+#undef TARGET_EMEDIUMTYPE
-+#define TARGET_EMEDIUMTYPE     126 /* Wrong medium type */
-+#undef TARGET_ECANCELED
-+#define TARGET_ECANCELED       127 /* Operation Cancelled */
-+#undef TARGET_ENOKEY
-+#define TARGET_ENOKEY          128 /* Required key not available */
-+#undef TARGET_EKEYEXPIRED
-+#define TARGET_EKEYEXPIRED     129 /* Key has expired */
-+#undef TARGET_EKEYREVOKED
-+#define TARGET_EKEYREVOKED     130 /* Key has been revoked */
-+#undef TARGET_EKEYREJECTED
-+#define TARGET_EKEYREJECTED    131 /* Key was rejected by service */
-+#undef TARGET_EOWNERDEAD
-+#define TARGET_EOWNERDEAD      132 /* Owner died */
-+#undef TARGET_ENOTRECOVERABLE
-+#define TARGET_ENOTRECOVERABLE  133 /* State not recoverable */
-+#undef TARGET_ERFKILL
-+#define TARGET_ERFKILL         134 /* Operation not possible due to RF-kill */
-+#undef TARGET_EHWPOISON
-+#define TARGET_EHWPOISON       135 /* Memory page has hardware error */
-+#endif
-diff --git a/linux-user/sparc/target_syscall.h b/linux-user/sparc/target_syscall.h
-index 5f09abfe89..3725875fcf 100644
---- a/linux-user/sparc/target_syscall.h
-+++ b/linux-user/sparc/target_syscall.h
-@@ -1,6 +1,8 @@
- #ifndef SPARC_TARGET_SYSCALL_H
- #define SPARC_TARGET_SYSCALL_H
- 
-+#include "target_errno.h"
-+
- struct target_pt_regs {
- 	abi_ulong psr;
- 	abi_ulong pc;
-diff --git a/linux-user/sparc64/target_syscall.h b/linux-user/sparc64/target_syscall.h
-index 2cbbaaed1b..34f49df4a1 100644
---- a/linux-user/sparc64/target_syscall.h
-+++ b/linux-user/sparc64/target_syscall.h
-@@ -1,6 +1,8 @@
- #ifndef SPARC64_TARGET_SYSCALL_H
- #define SPARC64_TARGET_SYSCALL_H
- 
-+#include "../sparc/target_errno.h"
-+
- struct target_pt_regs {
- 	abi_ulong u_regs[16];
- 	abi_ulong tstate;
-@@ -29,5 +31,4 @@ static inline abi_ulong target_shmlba(CPUSPARCState *env)
- {
-     return MAX(TARGET_PAGE_SIZE, 16 * 1024);
- }
--
- #endif /* SPARC64_TARGET_SYSCALL_H */
+diff --git a/include/exec/user/thunk.h b/include/exec/user/thunk.h
+index f19ef4b230..8f55b233b3 100644
+--- a/include/exec/user/thunk.h
++++ b/include/exec/user/thunk.h
+@@ -149,20 +149,32 @@ static inline int thunk_type_align(const argtype *type_ptr, int is_host)
+     case TYPE_CHAR:
+         return 1;
+     case TYPE_SHORT:
+-        return 2;
++        if (is_host) {
++            return __alignof__(short);
++        } else {
++            return ABI_SHORT_ALIGNMENT;
++        }
+     case TYPE_INT:
+-        return 4;
++        if (is_host) {
++            return __alignof__(int);
++        } else {
++            return ABI_INT_ALIGNMENT;
++        }
+     case TYPE_LONGLONG:
+     case TYPE_ULONGLONG:
+-        return 8;
++        if (is_host) {
++            return __alignof__(long long);
++        } else {
++            return ABI_LLONG_ALIGNMENT;
++        }
+     case TYPE_LONG:
+     case TYPE_ULONG:
+     case TYPE_PTRVOID:
+     case TYPE_PTR:
+         if (is_host) {
+-            return sizeof(void *);
++            return __alignof__(long);
+         } else {
+-            return TARGET_ABI_BITS / 8;
++            return ABI_LONG_ALIGNMENT;
+         }
+         break;
+     case TYPE_OLDDEVT:
 -- 
 2.14.3
