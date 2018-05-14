@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45605)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jingqi.liu@intel.com>) id 1fI6Sa-0000tE-5l
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 01:55:49 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1fI6Ta-0000tF-Rz
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 01:56:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jingqi.liu@intel.com>) id 1fI6SW-0000c6-Ow
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 01:55:48 -0400
-Received: from mga09.intel.com ([134.134.136.24]:48699)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jingqi.liu@intel.com>)
-	id 1fI6SW-0000Zf-CW
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 01:55:44 -0400
-From: "Liu, Jingqi" <jingqi.liu@intel.com>
-Date: Mon, 14 May 2018 05:55:39 +0000
-Message-ID: <09D68D4CF52CAF489B702DEBDD12D3D35269E165@SHSMSX103.ccr.corp.intel.com>
-References: <1525854869-13975-1-git-send-email-jingqi.liu@intel.com>
-	<20180511144059.GN25013@localhost.localdomain>
-In-Reply-To: <20180511144059.GN25013@localhost.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v1 1/7] hmat acpi: Build Memory Subsystem
- Address Range Structre(s) in ACPI HMAT
+	(envelope-from <zhangckid@gmail.com>) id 1fI46P-0008Ti-4p
+	for qemu-devel@nongnu.org; Sun, 13 May 2018 23:24:46 -0400
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:40438)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fI46O-0008SR-TD
+	for qemu-devel@nongnu.org; Sun, 13 May 2018 23:24:45 -0400
+Received: by mail-pl0-x241.google.com with SMTP id t12-v6so6513408plo.7
+	for <qemu-devel@nongnu.org>; Sun, 13 May 2018 20:24:44 -0700 (PDT)
+From: Zhang Chen <zhangckid@gmail.com>
+Date: Mon, 14 May 2018 11:23:38 +0800
+Message-Id: <1526268228-27951-8-git-send-email-zhangckid@gmail.com>
+In-Reply-To: <1526268228-27951-1-git-send-email-zhangckid@gmail.com>
+References: <1526268228-27951-1-git-send-email-zhangckid@gmail.com>
+Subject: [Qemu-devel] [PATCH V7 07/17] COLO: Load dirty pages into SVM's RAM
+ cache firstly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,128 +26,237 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mst@redhat.com" <mst@redhat.com>, "imammedo@redhat.com" <imammedo@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Zhang Chen <zhangckid@gmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-> -----Original Message-----
-> From: Eduardo Habkost [mailto:ehabkost@redhat.com]
-> Sent: Friday, May 11, 2018 10:41 PM
-> To: Liu, Jingqi <jingqi.liu@intel.com>
-> Cc: pbonzini@redhat.com; rth@twiddle.net; mst@redhat.com;
-> imammedo@redhat.com; marcel.apfelbaum@gmail.com; qemu-
-> devel@nongnu.org
-> Subject: Re: [PATCH v1 1/7] hmat acpi: Build Memory Subsystem Address Ran=
-ge
-> Structre(s) in ACPI HMAT
->=20
-> On Wed, May 09, 2018 at 04:34:29PM +0800, Liu Jingqi wrote:
-> > HMAT is defined in ACPI 6.2: 5.2.27 Heterogeneous Memory Attribute Tabl=
-e
-> (HMAT).
-> > The specification references below link:
-> > http://www.uefi.org/sites/default/files/resources/ACPI_6_2.pdf
-> >
-> > It describes the memory attributes, such as memory side cache
-> > attributes and bandwidth and latency details, related to the System
-> > Physical Address (SPA) Memory Ranges. The software is expected to use
-> > this information as hint for optimization.
-> >
-> > This structure describes the System Physical Address(SPA) range
-> > occupied by memory subsystem and its associativity with processor
-> > proximity domain as well as hint for memory usage.
-> >
-> [...]
-> > +/*
-> > + * The Proximity Domain of System Physical Address ranges defined
-> > + * in the HMAT, NFIT and SRAT tables shall match each other.
-> > + */
-> > +static void hmat_build_spa(GArray *table_data, PCMachineState *pcms)
-> > +{
-> > +    GSList *device_list =3D NULL;
-> > +    AcpiHmatSpaRange *hmat_spa;
-> > +    uint64_t mem_base, next_base, mem_len;
-> > +    int node;
-> > +
-> > +    next_base =3D 0;
-> > +    for (node =3D 0; node < nb_numa_nodes; node++) {
-> > +        mem_len =3D numa_info[node].node_mem;
-> > +        if (!mem_len) {
-> > +            continue;
-> > +        }
-> > +
-> > +        mem_base =3D next_base;
-> > +        next_base =3D mem_base + mem_len;
-> > +
-> > +        /* Cut out the 640K hole */
-> > +        if (mem_base <=3D HOLE_640K_START &&
-> > +            next_base > HOLE_640K_START) {
-> > +            mem_len -=3D next_base - HOLE_640K_START;
-> > +            if (mem_len > 0) {
-> > +                hmat_spa =3D acpi_data_push(table_data, sizeof(*hmat_s=
-pa));
-> > +                hmat_build_spa_info(hmat_spa, mem_base, mem_len, node)=
-;
-> > +            }
-> > +
-> > +            /* Check for the rare case: 640K < RAM < 1M */
-> > +            if (next_base <=3D HOLE_640K_END) {
-> > +                next_base =3D HOLE_640K_END;
-> > +                continue;
-> > +            }
-> > +            mem_base =3D HOLE_640K_END;
-> > +            mem_len =3D next_base - HOLE_640K_END;
-> > +        }
-> > +
-> > +        /* Cut out the ACPI_PCI hole */
-> > +        if (mem_base <=3D pcms->below_4g_mem_size &&
-> > +            next_base > pcms->below_4g_mem_size) {
-> > +            mem_len -=3D next_base - pcms->below_4g_mem_size;
-> > +            if (mem_len > 0) {
-> > +                hmat_spa =3D acpi_data_push(table_data, sizeof(*hmat_s=
-pa));
-> > +                hmat_build_spa_info(hmat_spa, mem_base, mem_len, node)=
-;
-> > +            }
-> > +            mem_base =3D 1ULL << 32;
-> > +            mem_len =3D next_base - pcms->below_4g_mem_size;
-> > +            next_base =3D mem_base + mem_len;
-> > +        }
->=20
-> This duplicates very complex logic that already exists in build_srat().  =
-We need to
-> make the existing logic reusable.
->=20
-Thanks Eduardo.
-Agree. We need to make them reusable.
-HMAT connects memory address ranges to proximity domains,=20
-which must be consistent with the affinity attributes defined in other tabl=
-es, such as SRAT and NFIT.
+We should not load PVM's state directly into SVM, because there maybe some
+errors happen when SVM is receving data, which will break SVM.
 
-Jingqi
->=20
-> > +        hmat_spa =3D acpi_data_push(table_data, sizeof(*hmat_spa));
-> > +        hmat_build_spa_info(hmat_spa, mem_base, mem_len, node);
-> > +    }
-> > +
-> > +    /* Build HMAT SPA structures for PC-DIMM devices. */
-> > +    object_child_foreach(qdev_get_machine(), pc_dimm_device_list,
-> > + &device_list);
-> > +
-> > +    for (; device_list; device_list =3D device_list->next) {
-> > +        PCDIMMDevice *dimm =3D device_list->data;
-> > +        mem_base =3D object_property_get_uint(OBJECT(dimm),
-> PC_DIMM_ADDR_PROP,
-> > +                                            NULL);
-> > +        mem_len =3D object_property_get_uint(OBJECT(dimm),
-> PC_DIMM_SIZE_PROP,
-> > +                                           NULL);
-> > +        node =3D object_property_get_uint(OBJECT(dimm),
-> > + PC_DIMM_NODE_PROP, NULL);
-> > +
-> > +        hmat_spa =3D acpi_data_push(table_data, sizeof(*hmat_spa));
-> > +        hmat_build_spa_info(hmat_spa, mem_base, mem_len, node);
-> > +    }
-> > +}
->=20
-> --
-> Eduardo
+We need to ensure receving all data before load the state into SVM. We use
+an extra memory to cache these data (PVM's ram). The ram cache in secondary side
+is initially the same as SVM/PVM's memory. And in the process of checkpoint,
+we cache the dirty pages of PVM into this ram cache firstly, so this ram cache
+always the same as PVM's memory at every checkpoint, then we flush this cached ram
+to SVM after we receive all PVM's state.
+
+Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+---
+ include/exec/ram_addr.h |  1 +
+ migration/migration.c   |  2 +
+ migration/ram.c         | 99 +++++++++++++++++++++++++++++++++++++++++++++++--
+ migration/ram.h         |  4 ++
+ migration/savevm.c      |  2 +-
+ 5 files changed, 104 insertions(+), 4 deletions(-)
+
+diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+index cf2446a..51ec153 100644
+--- a/include/exec/ram_addr.h
++++ b/include/exec/ram_addr.h
+@@ -27,6 +27,7 @@ struct RAMBlock {
+     struct rcu_head rcu;
+     struct MemoryRegion *mr;
+     uint8_t *host;
++    uint8_t *colo_cache; /* For colo, VM's ram cache */
+     ram_addr_t offset;
+     ram_addr_t used_length;
+     ram_addr_t max_length;
+diff --git a/migration/migration.c b/migration/migration.c
+index 8dee7dd..cfc1b95 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -421,6 +421,8 @@ static void process_incoming_migration_co(void *opaque)
+ 
+         /* Wait checkpoint incoming thread exit before free resource */
+         qemu_thread_join(&mis->colo_incoming_thread);
++        /* We hold the global iothread lock, so it is safe here */
++        colo_release_ram_cache();
+     }
+ 
+     if (ret < 0) {
+diff --git a/migration/ram.c b/migration/ram.c
+index 912810c..7ca845f 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -2520,6 +2520,20 @@ static inline void *host_from_ram_block_offset(RAMBlock *block,
+     return block->host + offset;
+ }
+ 
++static inline void *colo_cache_from_block_offset(RAMBlock *block,
++                                                 ram_addr_t offset)
++{
++    if (!offset_in_ramblock(block, offset)) {
++        return NULL;
++    }
++    if (!block->colo_cache) {
++        error_report("%s: colo_cache is NULL in block :%s",
++                     __func__, block->idstr);
++        return NULL;
++    }
++    return block->colo_cache + offset;
++}
++
+ /**
+  * ram_handle_compressed: handle the zero page case
+  *
+@@ -2724,6 +2738,57 @@ static void decompress_data_with_multi_threads(QEMUFile *f,
+     qemu_mutex_unlock(&decomp_done_lock);
+ }
+ 
++/*
++ * colo cache: this is for secondary VM, we cache the whole
++ * memory of the secondary VM, it is need to hold the global lock
++ * to call this helper.
++ */
++int colo_init_ram_cache(void)
++{
++    RAMBlock *block;
++
++    rcu_read_lock();
++    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
++        block->colo_cache = qemu_anon_ram_alloc(block->used_length,
++                                                NULL,
++                                                false);
++        if (!block->colo_cache) {
++            error_report("%s: Can't alloc memory for COLO cache of block %s,"
++                         "size 0x" RAM_ADDR_FMT, __func__, block->idstr,
++                         block->used_length);
++            goto out_locked;
++        }
++    }
++    rcu_read_unlock();
++    return 0;
++
++out_locked:
++    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
++        if (block->colo_cache) {
++            qemu_anon_ram_free(block->colo_cache, block->used_length);
++            block->colo_cache = NULL;
++        }
++    }
++
++    rcu_read_unlock();
++    return -errno;
++}
++
++/* It is need to hold the global lock to call this helper */
++void colo_release_ram_cache(void)
++{
++    RAMBlock *block;
++
++    rcu_read_lock();
++    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
++        if (block->colo_cache) {
++            qemu_anon_ram_free(block->colo_cache, block->used_length);
++            block->colo_cache = NULL;
++        }
++    }
++    rcu_read_unlock();
++}
++
+ /**
+  * ram_load_setup: Setup RAM for migration incoming side
+  *
+@@ -2740,6 +2805,7 @@ static int ram_load_setup(QEMUFile *f, void *opaque)
+ 
+     xbzrle_load_setup();
+     ramblock_recv_map_init();
++
+     return 0;
+ }
+ 
+@@ -2753,6 +2819,7 @@ static int ram_load_cleanup(void *opaque)
+         g_free(rb->receivedmap);
+         rb->receivedmap = NULL;
+     }
++
+     return 0;
+ }
+ 
+@@ -2966,7 +3033,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+ 
+     while (!postcopy_running && !ret && !(flags & RAM_SAVE_FLAG_EOS)) {
+         ram_addr_t addr, total_ram_bytes;
+-        void *host = NULL;
++        void *host = NULL, *host_bak = NULL;
+         uint8_t ch;
+ 
+         addr = qemu_get_be64(f);
+@@ -2986,13 +3053,36 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+                      RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE)) {
+             RAMBlock *block = ram_block_from_stream(f, flags);
+ 
+-            host = host_from_ram_block_offset(block, addr);
++             /*
++             * After going into COLO, we should load the Page into colo_cache
++             * NOTE: We need to keep a copy of SVM's ram in colo_cache.
++             * Privously, we copied all these memory in preparing stage of COLO
++             * while we need to stop VM, which is a time-consuming process.
++             * Here we optimize it by a trick, back-up every page while in
++             * migration process while COLO is enabled, though it affects the
++             * speed of the migration, but it obviously reduce the downtime of
++             * back-up all SVM'S memory in COLO preparing stage.
++             */
++            if (migration_incoming_in_colo_state()) {
++                host = colo_cache_from_block_offset(block, addr);
++                /* After goes into COLO state, don't backup it any more */
++                if (!migration_incoming_in_colo_state()) {
++                    host_bak = host;
++                }
++            }
++            if (!migration_incoming_in_colo_state()) {
++                host = host_from_ram_block_offset(block, addr);
++            }
+             if (!host) {
+                 error_report("Illegal RAM offset " RAM_ADDR_FMT, addr);
+                 ret = -EINVAL;
+                 break;
+             }
+-            ramblock_recv_bitmap_set(block, host);
++
++            if (!migration_incoming_in_colo_state()) {
++                ramblock_recv_bitmap_set(block, host);
++            }
++
+             trace_ram_load_loop(block->idstr, (uint64_t)addr, flags, host);
+         }
+ 
+@@ -3087,6 +3177,9 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+         if (!ret) {
+             ret = qemu_file_get_error(f);
+         }
++        if (!ret && host_bak && host) {
++            memcpy(host_bak, host, TARGET_PAGE_SIZE);
++        }
+     }
+ 
+     ret |= wait_for_decompress_done();
+diff --git a/migration/ram.h b/migration/ram.h
+index 5030be1..66e9b86 100644
+--- a/migration/ram.h
++++ b/migration/ram.h
+@@ -64,4 +64,8 @@ bool ramblock_recv_bitmap_test_byte_offset(RAMBlock *rb, uint64_t byte_offset);
+ void ramblock_recv_bitmap_set(RAMBlock *rb, void *host_addr);
+ void ramblock_recv_bitmap_set_range(RAMBlock *rb, void *host_addr, size_t nr);
+ 
++/* ram cache */
++int colo_init_ram_cache(void);
++void colo_release_ram_cache(void);
++
+ #endif
+diff --git a/migration/savevm.c b/migration/savevm.c
+index c43d220..ec0bff0 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -1807,7 +1807,7 @@ static int loadvm_handle_cmd_packaged(MigrationIncomingState *mis)
+ static int loadvm_process_enable_colo(MigrationIncomingState *mis)
+ {
+     migration_incoming_enable_colo();
+-    return 0;
++    return colo_init_ram_cache();
+ }
+ 
+ /*
+-- 
+2.7.4
