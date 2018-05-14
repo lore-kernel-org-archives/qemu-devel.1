@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fIDvY-0001n6-Fi
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 09:54:13 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fIE18-0007aL-0x
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 09:59:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fIDvX-000067-Na
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 09:54:12 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:45852)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fIDvX-000060-Hp
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 09:54:11 -0400
-Received: by mail-oi0-x242.google.com with SMTP id b130-v6so10707281oif.12
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 06:54:11 -0700 (PDT)
+	(envelope-from <mreitz@redhat.com>) id 1fIE14-0003aL-5i
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 09:59:58 -0400
+References: <20180509162637.15575-1-kwolf@redhat.com>
+	<20180509162637.15575-13-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <7acff37e-6362-1cf0-f109-c4facc22318b@redhat.com>
+Date: Mon, 14 May 2018 15:59:33 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180512004311.9299-15-richard.henderson@linaro.org>
-References: <20180512004311.9299-1-richard.henderson@linaro.org>
-	<20180512004311.9299-15-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 May 2018 14:53:50 +0100
-Message-ID: <CAFEAcA9hPOK5P5kD=PjzwWxw6mNNAMJqAtVdx++8GcTCV8w3FA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 14/27] target/arm: squash FZ16 behaviour
- for conversions
+In-Reply-To: <20180509162637.15575-13-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="giUUXHYeznSnFaMTAiUX7ntONQJZ0Ga8h"
+Subject: Re: [Qemu-devel] [PATCH 12/42] job: Maintain a list of all jobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +24,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-On 12 May 2018 at 01:42, Richard Henderson <richard.henderson@linaro.org> w=
-rote:
-> From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->
-> The ARM ARM specifies FZ16 is suppressed for conversions. Rather than
-> pushing this logic into the softfloat code we can simply save the FZ
-> state and temporarily disable it for the softfloat call.
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--giUUXHYeznSnFaMTAiUX7ntONQJZ0Ga8h
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com,
+ qemu-devel@nongnu.org
+Message-ID: <7acff37e-6362-1cf0-f109-c4facc22318b@redhat.com>
+Subject: Re: [PATCH 12/42] job: Maintain a list of all jobs
+References: <20180509162637.15575-1-kwolf@redhat.com>
+ <20180509162637.15575-13-kwolf@redhat.com>
+In-Reply-To: <20180509162637.15575-13-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2018-05-09 18:26, Kevin Wolf wrote:
+> This moves the job list from BlockJob to Job. Now we can check for
+> duplicate IDs in job_create().
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
-> v4
->   - float16_to_floatX squished the wrong softfloat bit for FZ16;
->     need to adjust input denormals in this case.
-> ---
->  target/arm/helper.c | 40 ++++++++++++++++++++++++++++++++++++----
->  1 file changed, 36 insertions(+), 4 deletions(-)
+>  include/block/blockjob.h |  3 ---
+>  include/qemu/job.h       | 19 +++++++++++++++++++
+>  blockjob.c               | 47 +++++++++++++++++++++++++---------------=
+-------
+>  job.c                    | 31 +++++++++++++++++++++++++++++++
+>  4 files changed, 75 insertions(+), 25 deletions(-)
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-(once you've fixed up which fp status pointer we pass to these
-helpers, then they do the right thing)
 
-thanks
--- PMM
+--giUUXHYeznSnFaMTAiUX7ntONQJZ0Ga8h
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr5lkUACgkQ9AfbAGHV
+z0DBpwf9FBbR6KQQQzuDjrsaxkRpGx3Bg4XD8YYtrdZU02UyR5btPPz3PpYtzqIz
+IDUE1Nlen6Y+AJNKpmZfCwCNqib+HPOGgTf1qUraO7n9i60Re9jreVhNimU+wpS8
+ILP5BTR6r+VW8hBN5yB9nqNDep7fKyplemNyRoLipWArV1fVvGmFAlxtH+tt0J83
+6ju/z3g7tCO94OjPHHZzrs+qs77JXFpYFFwpA60q/QKHqI5sksZ5UzAb5Bb9Jj4E
+3Q8u5h6dHitjjhnFRODbqqcLwWIY2pASMcdVOxq5N0QucauJxVrY/N9foqKBHtGI
+1YQpprT8KgSc4Elq1BfmAgIxI6BxTQ==
+=XNAK
+-----END PGP SIGNATURE-----
+
+--giUUXHYeznSnFaMTAiUX7ntONQJZ0Ga8h--
