@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52586)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fI6kx-00060s-7W
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 02:14:52 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fI6tk-0002RR-Sj
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 02:23:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fI477-0000zJ-DU
-	for qemu-devel@nongnu.org; Sun, 13 May 2018 23:25:30 -0400
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:37404)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fI476-0000xq-Ja
-	for qemu-devel@nongnu.org; Sun, 13 May 2018 23:25:28 -0400
-Received: by mail-pl0-x241.google.com with SMTP id w19-v6so3895626plq.4
-	for <qemu-devel@nongnu.org>; Sun, 13 May 2018 20:25:28 -0700 (PDT)
-From: Zhang Chen <zhangckid@gmail.com>
-Date: Mon, 14 May 2018 11:23:47 +0800
-Message-Id: <1526268228-27951-17-git-send-email-zhangckid@gmail.com>
-In-Reply-To: <1526268228-27951-1-git-send-email-zhangckid@gmail.com>
-References: <1526268228-27951-1-git-send-email-zhangckid@gmail.com>
-Subject: [Qemu-devel] [PATCH V7 16/17] COLO: notify net filters about
- checkpoint/failover event
+	(envelope-from <kwolf@redhat.com>) id 1fI6tk-0006eo-6a
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 02:23:52 -0400
+Date: Mon, 14 May 2018 08:23:43 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180514062343.GA6665@localhost.localdomain>
+References: <1526053004-12268-1-git-send-email-ivanren@tencent.com>
+	<20180511172901.GC5016@localhost.localdomain>
+	<CA+6E1==PkxLdnEGWMe5X0eKSPeGsVk3VQQ+fNs5+b_CDAcPMGg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+6E1==PkxLdnEGWMe5X0eKSPeGsVk3VQQ+fNs5+b_CDAcPMGg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v3] qcow2: fix preallocation with metadata
+ on bare block device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,47 +25,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Zhang Chen <zhangckid@gmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
+To: Ivan Ren <renyime@gmail.com>
+Cc: mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-From: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Am 13.05.2018 um 15:37 hat Ivan Ren geschrieben:
+> > Doesn't this defeat the purpose of preallocation? Usually, the idea with
+> > preallocation is that you don't need to update any metadata on the first
+> > write, but if you set QCOW_OFLAG_ZERO, we do need a metadata update
+> > again.
+> >
+> > So what's the advantage compared to not preallocating at all?
+> 
+> Yes, when do this, the qcow2_alloc_cluster_offset will call handle_alloc
+> again, and will lead metada update. Good news is that in handle_alloc the
+> preallocated zero cluster offset will be reuse. In this case, the
+> preallocated metata will be keeped except some flags, and the cluster
+> offset is fixed.
 
-Notify all net filters about the checkpoint and failover event.
+Oh, yes, there is no doubt that the result will be correct. My point is
+that people aren't usually interested so much in the physical layout of
+the clusters, but more about the fact that no metadata updates and no
+COW is necessary when you write to a cluster for the first time (i.e.
+because preallocation brings some performance improvements).
 
-Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
----
- migration/colo.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+Do you have a use case where the layout is more important? If there
+are good reasons for either option, maybe we need two different
+preallocation modes.
 
-diff --git a/migration/colo.c b/migration/colo.c
-index 5e517dc..d67bdc2 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -88,6 +88,11 @@ static void secondary_vm_do_failover(void)
-     if (local_err) {
-         error_report_err(local_err);
-     }
-+    /* Notify all filters of all NIC to do checkpoint */
-+    colo_notify_filters_event(COLO_EVENT_FAILOVER, &local_err);
-+    if (local_err) {
-+        error_report_err(local_err);
-+    }
- 
-     if (!autostart) {
-         error_report("\"-S\" qemu option will be ignored in secondary side");
-@@ -799,6 +804,13 @@ void *colo_process_incoming_thread(void *opaque)
-             goto out;
-         }
- 
-+        /* Notify all filters of all NIC to do checkpoint */
-+        colo_notify_filters_event(COLO_EVENT_CHECKPOINT, &local_err);
-+        if (local_err) {
-+            qemu_mutex_unlock_iothread();
-+            goto out;
-+        }
-+
-         vmstate_loading = false;
-         vm_start();
-         trace_colo_vm_state_change("stop", "run");
--- 
-2.7.4
+Kevin
