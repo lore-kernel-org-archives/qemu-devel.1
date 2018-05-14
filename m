@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fIEG9-0004Du-AF
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 10:15:34 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fIELA-0000A8-EI
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 10:20:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fIEG5-0004Df-77
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 10:15:29 -0400
-Resent-Message-Id: <E1fIEG5-0004Df-77@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21128)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fIEG4-0004DM-SN
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 10:15:25 -0400
-In-Reply-To: <20180514141218.28438-1-pbonzini@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152630729517.90.15283298035840416031@1f70390a8372>
+	(envelope-from <stefanha@gmail.com>) id 1fIEL5-00060W-Ly
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 10:20:40 -0400
+Date: Mon, 14 May 2018 15:20:32 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180514142032.GH5182@stefanha-x1.localdomain>
+References: <20180511222052.8734-1-ehabkost@redhat.com>
+	<20180511222052.8734-2-ehabkost@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 14 May 2018 07:14:56 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] coverity-model: replay data is considered
- trusted
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="82evfD9Ogz2JrdWZ"
+Content-Disposition: inline
+In-Reply-To: <20180511222052.8734-2-ehabkost@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [RFC 01/10] python: futurize -f
+ libfuturize.fixes.fix_print_with_import
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +25,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, Pavel.Dovgaluk@ispras.ru
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>, Fam Zheng <famz@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNTE0MTQxMjE4LjI4NDM4LTEtcGJvbnppbmlAcmVkaGF0LmNvbQpTdWJq
-ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBjb3Zlcml0eS1tb2RlbDogcmVwbGF5IGRhdGEgaXMg
-Y29uc2lkZXJlZCB0cnVzdGVkCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
-CgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1s
-KQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxn
-b3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJz
-ZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRD
-SCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEg
-Z2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
-aWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBu
-PSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
-YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBz
-Oi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAg
-ICAgICBwYXRjaGV3LzIwMTgwNTEyMDA0MzExLjkyOTktMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5h
-cm8ub3JnIC0+IHBhdGNoZXcvMjAxODA1MTIwMDQzMTEuOTI5OS0xLXJpY2hhcmQuaGVuZGVyc29u
-QGxpbmFyby5vcmcKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDUxNDE0
-MTIxOC4yODQzOC0xLXBib256aW5pQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4MDUxNDE0MTIx
-OC4yODQzOC0xLXBib256aW5pQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
-ZXN0JwpiYjQ0NzA3Y2YwIGNvdmVyaXR5LW1vZGVsOiByZXBsYXkgZGF0YSBpcyBjb25zaWRlcmVk
-IHRydXN0ZWQKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogY292ZXJp
-dHktbW9kZWw6IHJlcGxheSBkYXRhIGlzIGNvbnNpZGVyZWQgdHJ1c3RlZC4uLgpFUlJPUjogc3Vz
-cGVjdCBjb2RlIGluZGVudCBmb3IgY29uZGl0aW9uYWwgc3RhdGVtZW50cyAoNSwgOSkKIzI1OiBG
-SUxFOiBzY3JpcHRzL2NvdmVyaXR5LW1vZGVsLmM6MTExOgorICAgICBpZiAocmVwbGF5X2ZpbGUp
-IHsKKyAgICAgICAgIHVpbnQ4X3QgYzsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTkg
-bGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09
-IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpF
-bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5v
-cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5j
-b20=
+
+--82evfD9Ogz2JrdWZ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, May 11, 2018 at 07:20:43PM -0300, Eduardo Habkost wrote:
+> Change all Python code to use print as a function.
+>=20
+> This is necessary for Python 3 compatibility.
+>=20
+> Done using:
+>=20
+>   $ py=3D$( (g grep -l -E '^#!.*python';find -name '*.py' -printf '%P\n';=
+) | \
+>     sort -u | grep -v README.sh4)
+>   $ futurize -w -f libfuturize.fixes.fix_print_with_import $py
+>=20
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  scripts/analyse-9p-simpletrace.py        | 89 ++++++++++++++++----------=
+------
+>  scripts/analyse-locks-simpletrace.py     |  1 +
+>  scripts/analyze-migration.py             | 11 ++--
+>  scripts/dump-guest-memory.py             |  1 +
+>  scripts/replay-dump.py                   | 21 ++++----
+>  scripts/signrom.py                       |  1 +
+>  scripts/simpletrace.py                   |  3 +-
+>  scripts/vmstate-static-checker.py        | 85 +++++++++++++++-----------=
+----
+>  scripts/device-crash-test                |  3 +-
+>  scripts/kvm/kvm_flightrecorder           | 21 ++++----
+>  scripts/kvm/vmxcap                       |  1 +
+>  scripts/qmp/qemu-ga-client               |  1 +
+>  scripts/qmp/qmp                          | 17 +++---
+>  scripts/qmp/qmp-shell                    | 35 +++++++------
+>  scripts/qmp/qom-get                      |  7 +--
+>  scripts/qmp/qom-list                     | 11 ++--
+>  scripts/qmp/qom-set                      |  5 +-
+>  scripts/qmp/qom-tree                     | 11 ++--
+>  tests/docker/docker.py                   | 11 ++--
+>  tests/docker/travis.py                   | 15 +++---
+>  tests/guest-debug/test-gdbstub.py        |  1 +
+>  tests/image-fuzzer/runner.py             | 38 ++++++--------
+>  tests/migration/guestperf/engine.py      | 29 ++++++-----
+>  tests/migration/guestperf/plot.py        | 17 +++---
+>  tests/migration/guestperf/shell.py       | 19 +++----
+>  tests/qemu-iotests/149                   |  3 +-
+>  tests/qemu-iotests/165                   |  3 +-
+>  tests/qemu-iotests/iotests.py            |  5 +-
+>  tests/qemu-iotests/nbd-fault-injector.py |  7 +--
+>  tests/qemu-iotests/qcow2.py              | 39 +++++++-------
+>  tests/qemu-iotests/qed.py                | 17 +++---
+>  tests/vm/basevm.py                       |  3 +-
+>  32 files changed, 278 insertions(+), 253 deletions(-)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--82evfD9Ogz2JrdWZ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJa+ZswAAoJEJykq7OBq3PI4dAIALj5NgxjsSLWCO6TUc3mA+02
+5wSsv6PhukekC+cyz5stMuYMJE1bm55yX6fwLwnYE9i+qpZwGMd4jE++tQOWX5xK
+tsxC/MSApuFYQImTS3xSPvWb1Z52NMkdsjCzw6+4EWJC2M0CN7uPTLlFw69nk4Zr
+Qk36ta/ywPQ47hjgknb83Rz6xEGKtkOw02DVfYm5Q5G0HaMaPTiqiB3bg8DQIiEB
+JYgDoiJfMquKs5vL1zSka3P7SSi66SYjfcJawnljViVjQ2T35HbSJ9lAzDLa1Re7
+qb4F8O9f0Uod5ABiefPlwQWoPzYkIha0AwVSMZFLSqS9GkRswjgX1biG8BCYsmI=
+=ImKV
+-----END PGP SIGNATURE-----
+
+--82evfD9Ogz2JrdWZ--
