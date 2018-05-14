@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fI6Mk-0001mh-4e
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 01:49:49 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1fI6Nr-00005o-7V
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 01:50:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fI45n-0007Vp-R4
-	for qemu-devel@nongnu.org; Sun, 13 May 2018 23:24:11 -0400
-Received: from mail-pf0-x229.google.com ([2607:f8b0:400e:c00::229]:44346)
+	(envelope-from <zhangckid@gmail.com>) id 1fI46Y-0000GE-UI
+	for qemu-devel@nongnu.org; Sun, 13 May 2018 23:24:56 -0400
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:45466)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fI45n-0007SG-KL
-	for qemu-devel@nongnu.org; Sun, 13 May 2018 23:24:07 -0400
-Received: by mail-pf0-x229.google.com with SMTP id q22-v6so5308804pff.11
-	for <qemu-devel@nongnu.org>; Sun, 13 May 2018 20:24:06 -0700 (PDT)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fI46Y-0000EU-NH
+	for qemu-devel@nongnu.org; Sun, 13 May 2018 23:24:54 -0400
+Received: by mail-pf0-x241.google.com with SMTP id c10-v6so5305257pfi.12
+	for <qemu-devel@nongnu.org>; Sun, 13 May 2018 20:24:54 -0700 (PDT)
 From: Zhang Chen <zhangckid@gmail.com>
-Date: Mon, 14 May 2018 11:23:31 +0800
-Message-Id: <1526268228-27951-1-git-send-email-zhangckid@gmail.com>
-Subject: [Qemu-devel] [PATCH V7 00/17] COLO: integrate colo frame with block
- replication and COLO proxy
+Date: Mon, 14 May 2018 11:23:40 +0800
+Message-Id: <1526268228-27951-10-git-send-email-zhangckid@gmail.com>
+In-Reply-To: <1526268228-27951-1-git-send-email-zhangckid@gmail.com>
+References: <1526268228-27951-1-git-send-email-zhangckid@gmail.com>
+Subject: [Qemu-devel] [PATCH V7 09/17] COLO: Flush memory data from ram cache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,84 +26,104 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Zhang Chen <zhangckid@gmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Zhang Chen <zhangckid@gmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-Hi~ All~
+During the time of VM's running, PVM may dirty some pages, we will transfer
+PVM's dirty pages to SVM and store them into SVM's RAM cache at next checkpoint
+time. So, the content of SVM's RAM cache will always be same with PVM's memory
+after checkpoint.
 
-COLO Frame, block replication and COLO proxy(colo-compare,filter-mirror,
-filter-redirector,filter-rewriter) have been exist in qemu
-for long time, it's time to integrate these three parts to make COLO really works.
+Instead of flushing all content of PVM's RAM cache into SVM's MEMORY,
+we do this in a more efficient way:
+Only flush any page that dirtied by PVM since last checkpoint.
+In this way, we can ensure SVM's memory same with PVM's.
 
-In this series, we have some optimizations for COLO frame, including separating the
-process of saving ram and device state, using an COLO_EXIT event to notify users that
-VM exits COLO, for these parts, most of them have been reviewed long time ago in old version,
-but since this series have just rebased on upstream which had merged a new series of migration,
-parts of pathes in this series deserve review again.
+Besides, we must ensure flush RAM cache before load device state.
 
-We use notifier/callback method for COLO compare to notify COLO frame about
-net packets inconsistent event, and add a handle_event method for NetFilterClass to
-help COLO frame to notify filters and colo-compare about checkpoint/failover event, 
-it is flexible.
+Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ migration/ram.c        | 39 +++++++++++++++++++++++++++++++++++++++
+ migration/trace-events |  2 ++
+ 2 files changed, 41 insertions(+)
 
-For the neweset version, please refer to:
-https://github.com/zhangckid/qemu/tree/qemu-colo-18may1-rebase
-
-Please review, thanks.
-
-V7:
- - Addressed Markus's comments in 11/17.
- - Rebased on upstream.
-
-V6:
- - Addressed Eric Blake's comments, use the enum to feedback in patch 11/17.
- - Fixed QAPI command separator problem in patch 11/17.
-
-
-Zhang Chen (12):
-  filter-rewriter: fix memory leak for connection in
-    connection_track_table
-  colo-compare: implement the process of checkpoint
-  colo-compare: use notifier to notify packets comparing result
-  COLO: integrate colo compare with colo frame
-  COLO: Add block replication into colo process
-  COLO: Remove colo_state migration struct
-  COLO: Load dirty pages into SVM's RAM cache firstly
-  ram/COLO: Record the dirty pages that SVM received
-  COLO: Flush memory data from ram cache
-  qapi: Add new command to query colo status
-  filter: Add handle_event method for NetFilterClass
-  filter-rewriter: handle checkpoint and failover event
-
-zhanghailiang (5):
-  qmp event: Add COLO_EXIT event to notify users while exited COLO
-  savevm: split the process of different stages for loadvm/savevm
-  COLO: flush host dirty ram from cache
-  COLO: notify net filters about checkpoint/failover event
-  COLO: quick failover process by kick COLO thread
-
- include/exec/ram_addr.h  |   1 +
- include/migration/colo.h |  11 ++-
- include/net/filter.h     |   5 ++
- migration/Makefile.objs  |   2 +-
- migration/colo-comm.c    |  76 ----------------
- migration/colo.c         | 219 ++++++++++++++++++++++++++++++++++++++++++++---
- migration/migration.c    |  38 +++++++-
- migration/ram.c          | 183 ++++++++++++++++++++++++++++++++++++++-
- migration/ram.h          |   4 +
- migration/savevm.c       |  55 ++++++++++--
- migration/savevm.h       |   5 ++
- migration/trace-events   |   3 +
- net/colo-compare.c       | 108 +++++++++++++++++++++--
- net/colo-compare.h       |  24 ++++++
- net/colo.h               |   4 +
- net/filter-rewriter.c    | 109 +++++++++++++++++++++--
- net/filter.c             |  17 ++++
- net/net.c                |  28 ++++++
- qapi/migration.json      |  70 +++++++++++++++
- vl.c                     |   2 -
- 20 files changed, 846 insertions(+), 118 deletions(-)
- delete mode 100644 migration/colo-comm.c
- create mode 100644 net/colo-compare.h
-
+diff --git a/migration/ram.c b/migration/ram.c
+index e35dfee..4235a8f 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -3031,6 +3031,40 @@ static bool postcopy_is_running(void)
+     return ps >= POSTCOPY_INCOMING_LISTENING && ps < POSTCOPY_INCOMING_END;
+ }
+ 
++/*
++ * Flush content of RAM cache into SVM's memory.
++ * Only flush the pages that be dirtied by PVM or SVM or both.
++ */
++static void colo_flush_ram_cache(void)
++{
++    RAMBlock *block = NULL;
++    void *dst_host;
++    void *src_host;
++    unsigned long offset = 0;
++
++    trace_colo_flush_ram_cache_begin(ram_state->migration_dirty_pages);
++    rcu_read_lock();
++    block = QLIST_FIRST_RCU(&ram_list.blocks);
++
++    while (block) {
++        offset = migration_bitmap_find_dirty(ram_state, block, offset);
++        migration_bitmap_clear_dirty(ram_state, block, offset);
++
++        if (offset << TARGET_PAGE_BITS >= block->used_length) {
++            offset = 0;
++            block = QLIST_NEXT_RCU(block, next);
++        } else {
++            dst_host = block->host + (offset << TARGET_PAGE_BITS);
++            src_host = block->colo_cache + (offset << TARGET_PAGE_BITS);
++            memcpy(dst_host, src_host, TARGET_PAGE_SIZE);
++        }
++    }
++
++    rcu_read_unlock();
++    trace_colo_flush_ram_cache_end();
++    assert(ram_state->migration_dirty_pages == 0);
++}
++
+ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+ {
+     int flags = 0, ret = 0, invalid_flags = 0;
+@@ -3043,6 +3077,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+     bool postcopy_running = postcopy_is_running();
+     /* ADVISE is earlier, it shows the source has the postcopy capability on */
+     bool postcopy_advised = postcopy_is_advised();
++    bool need_flush = false;
+ 
+     seq_iter++;
+ 
+@@ -3218,6 +3253,10 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+     ret |= wait_for_decompress_done();
+     rcu_read_unlock();
+     trace_ram_load_complete(ret, seq_iter);
++
++    if (!ret  && migration_incoming_in_colo_state() && need_flush) {
++        colo_flush_ram_cache();
++    }
+     return ret;
+ }
+ 
+diff --git a/migration/trace-events b/migration/trace-events
+index 9295b4c..8e2f974 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -78,6 +78,8 @@ ram_load_postcopy_loop(uint64_t addr, int flags) "@%" PRIx64 " %x"
+ ram_postcopy_send_discard_bitmap(void) ""
+ ram_save_page(const char *rbname, uint64_t offset, void *host) "%s: offset: 0x%" PRIx64 " host: %p"
+ ram_save_queue_pages(const char *rbname, size_t start, size_t len) "%s: start: 0x%zx len: 0x%zx"
++colo_flush_ram_cache_begin(uint64_t dirty_pages) "dirty_pages %" PRIu64
++colo_flush_ram_cache_end(void) ""
+ 
+ # migration/migration.c
+ await_return_path_close_on_source_close(void) ""
 -- 
 2.7.4
