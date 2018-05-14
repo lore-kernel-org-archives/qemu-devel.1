@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fIAHX-0003ZL-Ou
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:00:44 -0400
+	(envelope-from <david@redhat.com>) id 1fIAHc-0003jY-Uz
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:00:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fIAHS-0004xE-VS
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:00:39 -0400
+	(envelope-from <david@redhat.com>) id 1fIAHb-0004zr-9W
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 06:00:44 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Mon, 14 May 2018 12:00:07 +0200
-Message-Id: <20180514100023.12542-3-david@redhat.com>
+Date: Mon, 14 May 2018 12:00:10 +0200
+Message-Id: <20180514100023.12542-6-david@redhat.com>
 In-Reply-To: <20180514100023.12542-1-david@redhat.com>
 References: <20180514100023.12542-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 02/18] memory-device: introduce separate
- config option
+Subject: [Qemu-devel] [PATCH v3 05/18] pc: route all memory devices through
+ the machine hotplug handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,97 +23,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>, David Hildenbrand <david@redhat.com>
 
-Some architectures might support memory devices, while they don't
-support DIMM/NVDIMM. So let's
-- Rename CONFIG_MEM_HOTPLUG to CONFIG_MEM_DEVICE
-- Intriduce CONFIG_DIMM and use it similarly to CONFIG NVDIMM
-
-CONFIG_DIMM and CONFIG_NVDIMM require CONFIG_MEM_DEVICE.
+Necessary to hotplug them cleanly later. We could drop the PC_DIMM
+check, as PC_DIMM are just memory devices, but this approach is cleaner.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- default-configs/i386-softmmu.mak   | 3 ++-
- default-configs/ppc64-softmmu.mak  | 3 ++-
- default-configs/x86_64-softmmu.mak | 3 ++-
- hw/Makefile.objs                   | 2 +-
- hw/mem/Makefile.objs               | 4 ++--
- qapi/misc.json                     | 2 +-
- 6 files changed, 10 insertions(+), 7 deletions(-)
+ hw/i386/pc.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index 8c7d4a0fa0..4c1637338b 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -50,7 +50,8 @@ CONFIG_PCI_Q35=y
- CONFIG_APIC=y
- CONFIG_IOAPIC=y
- CONFIG_PVPANIC=y
--CONFIG_MEM_HOTPLUG=y
-+CONFIG_MEM_DEVICE=y
-+CONFIG_DIMM=y
- CONFIG_NVDIMM=y
- CONFIG_ACPI_NVDIMM=y
- CONFIG_PCIE_PORT=y
-diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-softmmu.mak
-index b94af6c7c6..f550573782 100644
---- a/default-configs/ppc64-softmmu.mak
-+++ b/default-configs/ppc64-softmmu.mak
-@@ -16,4 +16,5 @@ CONFIG_VIRTIO_VGA=y
- CONFIG_XICS=$(CONFIG_PSERIES)
- CONFIG_XICS_SPAPR=$(CONFIG_PSERIES)
- CONFIG_XICS_KVM=$(call land,$(CONFIG_PSERIES),$(CONFIG_KVM))
--CONFIG_MEM_HOTPLUG=y
-+CONFIG_MEM_DEVICE=y
-+CONFIG_DIMM=y
-diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
-index 0390b4303c..7785351414 100644
---- a/default-configs/x86_64-softmmu.mak
-+++ b/default-configs/x86_64-softmmu.mak
-@@ -50,7 +50,8 @@ CONFIG_PCI_Q35=y
- CONFIG_APIC=y
- CONFIG_IOAPIC=y
- CONFIG_PVPANIC=y
--CONFIG_MEM_HOTPLUG=y
-+CONFIG_MEM_DEVICE=y
-+CONFIG_DIMM=y
- CONFIG_NVDIMM=y
- CONFIG_ACPI_NVDIMM=y
- CONFIG_PCIE_PORT=y
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 6a0ffe0afd..127a60eca4 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -33,7 +33,7 @@ devices-dirs-$(CONFIG_SOFTMMU) += vfio/
- devices-dirs-$(CONFIG_SOFTMMU) += virtio/
- devices-dirs-$(CONFIG_SOFTMMU) += watchdog/
- devices-dirs-$(CONFIG_SOFTMMU) += xen/
--devices-dirs-$(CONFIG_MEM_HOTPLUG) += mem/
-+devices-dirs-$(CONFIG_MEM_DEVICE) += mem/
- devices-dirs-$(CONFIG_SOFTMMU) += smbios/
- devices-dirs-y += core/
- common-obj-y += $(devices-dirs-y)
-diff --git a/hw/mem/Makefile.objs b/hw/mem/Makefile.objs
-index 10be4df2a2..3e2f7c5ca2 100644
---- a/hw/mem/Makefile.objs
-+++ b/hw/mem/Makefile.objs
-@@ -1,3 +1,3 @@
--common-obj-$(CONFIG_MEM_HOTPLUG) += pc-dimm.o
--common-obj-$(CONFIG_MEM_HOTPLUG) += memory-device.o
-+common-obj-$(CONFIG_DIMM) += pc-dimm.o
-+common-obj-$(CONFIG_MEM_DEVICE) += memory-device.o
- common-obj-$(CONFIG_NVDIMM) += nvdimm.o
-diff --git a/qapi/misc.json b/qapi/misc.json
-index f5988cc0b5..65eae0c8a0 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -2060,7 +2060,7 @@
- #
- # @plugged-memory: size of memory that can be hot-unplugged. This field
- #                  is omitted if target doesn't support memory hotplug
--#                  (i.e. CONFIG_MEM_HOTPLUG not defined on build time).
-+#                  (i.e. CONFIG_MEM_DEVICE not defined on build time).
- #
- # Since: 2.11.0
- ##
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 510076e156..8bc41ef24b 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -74,6 +74,7 @@
+ #include "hw/nmi.h"
+ #include "hw/i386/intel_iommu.h"
+ #include "hw/net/ne2000-isa.h"
++#include "hw/mem/memory-device.h"
+ 
+ /* debug PC/ISA interrupts */
+ //#define DEBUG_IRQ
+@@ -2075,6 +2076,7 @@ static HotplugHandler *pc_get_hotpug_handler(MachineState *machine,
+                                              DeviceState *dev)
+ {
+     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) ||
++        object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE) ||
+         object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+         return HOTPLUG_HANDLER(machine);
+     }
 -- 
 2.14.3
