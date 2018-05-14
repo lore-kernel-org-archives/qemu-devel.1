@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fIJRD-0007Dx-Al
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 15:47:17 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fIJTT-0008P7-Md
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 15:49:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fIJRA-0005WN-7G
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 15:47:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55980)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fIJR9-0005U2-Sz
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 15:47:12 -0400
-Date: Mon, 14 May 2018 16:47:05 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180514194705.GB25013@localhost.localdomain>
-References: <20180514164156.27034-1-babu.moger@amd.com>
-	<20180514164156.27034-4-babu.moger@amd.com>
+	(envelope-from <mreitz@redhat.com>) id 1fIJTS-0000kn-Tu
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 15:49:35 -0400
+References: <20180509162637.15575-1-kwolf@redhat.com>
+	<20180509162637.15575-30-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <3ca835b1-07ef-8333-3b8e-1e5aab79ef76@redhat.com>
+Date: Mon, 14 May 2018 21:49:27 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180514164156.27034-4-babu.moger@amd.com>
-Subject: Re: [Qemu-devel] [PATCH v9 3/7] i386: Populate AMD Processor Cache
- Information for cpuid 0x8000001D
+In-Reply-To: <20180509162637.15575-30-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="NmdsQpwhdEz8CcUq0TIu7THIGUJFU2thj"
+Subject: Re: [Qemu-devel] [PATCH 29/42] job: Move job_finish_sync() to Job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,191 +24,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Babu Moger <babu.moger@amd.com>
-Cc: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, geoff@hostfission.com, kash@tripleback.net
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-On Mon, May 14, 2018 at 11:41:52AM -0500, Babu Moger wrote:
-> Add information for cpuid 0x8000001D leaf. Populate cache topology information
-> for different cache types(Data Cache, Instruction Cache, L2 and L3) supported
-> by 0x8000001D leaf. Please refer Processor Programming Reference (PPR) for AMD
-> Family 17h Model for more details.
-> 
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
-> Tested-by: Geoffrey McRae <geoff@hostfission.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--NmdsQpwhdEz8CcUq0TIu7THIGUJFU2thj
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com,
+ qemu-devel@nongnu.org
+Message-ID: <3ca835b1-07ef-8333-3b8e-1e5aab79ef76@redhat.com>
+Subject: Re: [PATCH 29/42] job: Move job_finish_sync() to Job
+References: <20180509162637.15575-1-kwolf@redhat.com>
+ <20180509162637.15575-30-kwolf@redhat.com>
+In-Reply-To: <20180509162637.15575-30-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2018-05-09 18:26, Kevin Wolf wrote:
+> block_job_finish_sync() doesn't contain anything block job specific any=
+
+> more, so it can be moved to Job.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  target/i386/cpu.c | 79 +++++++++++++++++++++++++++++++++++++++++++++++
->  target/i386/kvm.c | 29 +++++++++++++++--
->  2 files changed, 105 insertions(+), 3 deletions(-)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index e1daff37ab..7f40241786 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -307,6 +307,14 @@ static uint32_t encode_cache_cpuid80000005(CPUCacheInfo *cache)
->                            a == ASSOC_FULL ? 0xF : \
->                            0 /* invalid value */)
->  
-> +/* Definitions used on CPUID Leaf 0x8000001D */
-> +/* Number of logical cores in a complex */
-> +#define CORES_IN_CMPLX  4
+>  include/qemu/job.h |  9 +++++++++
+>  blockjob.c         | 55 +++++++++-------------------------------------=
+--------
+>  job.c              | 28 +++++++++++++++++++++++++++
+>  3 files changed, 46 insertions(+), 46 deletions(-)
 
-Number of cores is configurable in QEMU, so we can't hardcode
-this.
-
-I understand you want to make it match the hardware as close as
-possible (as you noted in your reply on v7), but this should be
-done by simply configuring QEMU as closely to the hardware as
-possible.
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
-> +/* Number of logical processors sharing cache */
-> +#define NUM_SHARING_CACHE(threads)   ((threads > 1) ? \
-> +                         (((CORES_IN_CMPLX - 1) * threads) + 1)  : \
-> +                         (CORES_IN_CMPLX - 1))
+--NmdsQpwhdEz8CcUq0TIu7THIGUJFU2thj
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-I don't see why the check for threads > 1, here.  Why not simply
-write this as:
+-----BEGIN PGP SIGNATURE-----
 
-  ((nr_cores * nr_threads) - 1))
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr56EcACgkQ9AfbAGHV
+z0A6dAf/RkZd9r93pMVNXFigFL/7uzRfQ3vp0RhCFwt/Xclpw/vcTeYQc22V23Pn
+VKe3TxnTRCI2ANJFsEyTw1myn/cBsMPc5s9+RjhCMNUy3ZlvIW7T7X/tDLkXX7vb
+o/SUyzJIR3cJkkNE01gG+V7BykfNePCupZ5l5ErGD6TH5A4KY1l9e6ycA8RiKxz1
+RXtKPGHxSKJgqA7MkCAbX6PEqrjLrqjnyJaz9dEJRsQJurE/I2o8S84av098CgWH
+515cLTfTTCagGmalJ0dW2Cjl65qpGvVBiUzmVRD+9QiqfabRZ2/A55EeQ0D4e5oJ
+15C0IVOY2AsQ6Hzcx0A1J+pLZQ+zPA==
+=MshP
+-----END PGP SIGNATURE-----
 
-which will work for any cores/threads value?
-
-(Or the function could just get nr_logical_cpus argument like I
-suggested on v7, to make the code here simpler.)
-
-
-> +
->  /*
->   * Encode cache info for CPUID[0x80000006].ECX and CPUID[0x80000006].EDX
->   * @l3 can be NULL.
-> @@ -336,6 +344,41 @@ static void encode_cache_cpuid80000006(CPUCacheInfo *l2,
->      }
->  }
->  
-> +/* Encode cache info for CPUID[8000001D] */
-> +static void encode_cache_cpuid8000001d(CPUCacheInfo *cache, int nr_threads,
-> +                                uint32_t *eax, uint32_t *ebx,
-> +                                uint32_t *ecx, uint32_t *edx)
-> +{
-> +    assert(cache->size == cache->line_size * cache->associativity *
-> +                          cache->partitions * cache->sets);
-> +
-> +    *eax = CACHE_TYPE(cache->type) | CACHE_LEVEL(cache->level) |
-> +               (cache->self_init ? CACHE_SELF_INIT_LEVEL : 0);
-> +
-> +    /* L3 is shared among multiple cores */
-> +    if (cache->level == 3) {
-> +        *eax |= (NUM_SHARING_CACHE(nr_threads) << 14);
-> +    } else {
-> +        *eax |= ((nr_threads - 1) << 14);
-> +    }
-> +
-> +    assert(cache->line_size > 0);
-> +    assert(cache->partitions > 0);
-> +    assert(cache->associativity > 0);
-> +    /* We don't implement fully-associative caches */
-> +    assert(cache->associativity < cache->sets);
-> +    *ebx = (cache->line_size - 1) |
-> +           ((cache->partitions - 1) << 12) |
-> +           ((cache->associativity - 1) << 22);
-> +
-> +    assert(cache->sets > 0);
-> +    *ecx = cache->sets - 1;
-> +
-> +    *edx = (cache->no_invd_sharing ? CACHE_NO_INVD_SHARING : 0) |
-> +           (cache->inclusive ? CACHE_INCLUSIVE : 0) |
-> +           (cache->complex_indexing ? CACHE_COMPLEX_IDX : 0);
-> +}
-> +
->  /*
->   * Definitions of the hardcoded cache entries we expose:
->   * These are legacy cache values. If there is a need to change any
-> @@ -4035,6 +4078,42 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->              *edx = 0;
->          }
->          break;
-> +    case 0x8000001D:
-> +        *eax = 0;
-> +        CPUCacheInfo *l1d, *l1i, *l2, *l3;
-> +        if (env->cache_info && !cpu->legacy_cache) {
-> +            l1d = &env->cache_info->l1d_cache;
-> +            l1i = &env->cache_info->l1i_cache;
-> +            l2 = &env->cache_info->l2_cache;
-> +            l3 = &env->cache_info->l3_cache;
-> +        } else {
-> +            l1d = &legacy_l1d_cache_amd;
-> +            l1i = &legacy_l1i_cache_amd;
-> +            l2 = &legacy_l2_cache_amd;
-> +            l3 = &legacy_l3_cache;
-> +        }
-> +        switch (count) {
-> +        case 0: /* L1 dcache info */
-> +            encode_cache_cpuid8000001d(l1d, cs->nr_threads,
-> +                                       eax, ebx, ecx, edx);
-> +            break;
-> +        case 1: /* L1 icache info */
-> +            encode_cache_cpuid8000001d(l1i, cs->nr_threads,
-> +                                       eax, ebx, ecx, edx);
-> +            break;
-> +        case 2: /* L2 cache info */
-> +            encode_cache_cpuid8000001d(l2, cs->nr_threads,
-> +                                       eax, ebx, ecx, edx);
-> +            break;
-> +        case 3: /* L3 cache info */
-> +            encode_cache_cpuid8000001d(l3, cs->nr_threads,
-> +                                       eax, ebx, ecx, edx);
-> +            break;
-> +        default: /* end of info */
-> +            *eax = *ebx = *ecx = *edx = 0;
-> +            break;
-> +        }
-> +        break;
->      case 0xC0000000:
->          *eax = env->cpuid_xlevel2;
->          *ebx = 0;
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 6c49954e68..6e66f9c51d 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -967,9 +967,32 @@ int kvm_arch_init_vcpu(CPUState *cs)
->          }
->          c = &cpuid_data.entries[cpuid_i++];
->  
-> -        c->function = i;
-> -        c->flags = 0;
-> -        cpu_x86_cpuid(env, i, 0, &c->eax, &c->ebx, &c->ecx, &c->edx);
-> +        switch (i) {
-> +        case 0x8000001d:
-> +            /* Query for all AMD cache information leaves */
-> +            for (j = 0; ; j++) {
-> +                c->function = i;
-> +                c->flags = KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
-> +                c->index = j;
-> +                cpu_x86_cpuid(env, i, j, &c->eax, &c->ebx, &c->ecx, &c->edx);
-> +
-> +                if (c->eax == 0) {
-> +                    break;
-> +                }
-> +                if (cpuid_i == KVM_MAX_CPUID_ENTRIES) {
-> +                    fprintf(stderr, "cpuid_data is full, no space for "
-> +                            "cpuid(eax:0x%x,ecx:0x%x)\n", i, j);
-> +                    abort();
-> +                }
-> +                c = &cpuid_data.entries[cpuid_i++];
-> +            }
-> +            break;
-> +        default:
-> +            c->function = i;
-> +            c->flags = 0;
-> +            cpu_x86_cpuid(env, i, 0, &c->eax, &c->ebx, &c->ecx, &c->edx);
-> +            break;
-> +        }
->      }
->  
->      /* Call Centaur's CPUID instructions they are supported. */
-> -- 
-> 2.17.0
-> 
-
--- 
-Eduardo
+--NmdsQpwhdEz8CcUq0TIu7THIGUJFU2thj--
