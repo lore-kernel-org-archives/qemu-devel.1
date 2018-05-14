@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fIH85-0001wp-60
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 13:19:22 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fIHEo-0005Ne-8n
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 13:26:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fIH84-0006LY-7Z
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 13:19:21 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32824 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fIH84-0006LH-3L
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 13:19:20 -0400
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Mon, 14 May 2018 18:19:13 +0100
-Message-Id: <20180514171913.17664-4-berrange@redhat.com>
-In-Reply-To: <20180514171913.17664-1-berrange@redhat.com>
-References: <20180514171913.17664-1-berrange@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fIHEn-0002cC-C6
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 13:26:18 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <9dbde2b5d864d126b75d8c0d7bae2011e8cc7e9b.1526305502.git.mprivozn@redhat.com>
+References: <9dbde2b5d864d126b75d8c0d7bae2011e8cc7e9b.1526305502.git.mprivozn@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 14 May 2018 19:26:14 +0200
+Message-ID: <CAJ+F1CKMq-nTSW3r4cwTTDcqMaqLBD4ShgUUJEMQ7QfRcU2UUA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 3/3] opts: remove redundant check for NULL
- parameter
+Subject: Re: [Qemu-devel] [PATCH] qemu-options: Allow -no-user-config again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,46 +22,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: Michal Privoznik <mprivozn@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, qemu trival <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-No callers of get_opt_value() pass in a NULL for the "value" parameter,
-so the check is redundant.
+On Mon, May 14, 2018 at 3:45 PM, Michal Privoznik <mprivozn@redhat.com> wro=
+te:
+> After 1217d6ca2bf28c0febe1bd7d5b3fa912bbf6af2a we error out
+> explicitly if an unknown -option was passed on the command line.
+> However, we are doing two pass command line option parsing. In
+> the first pass we just look for -no-user-config or -nodefconfig
+> being present which determines whether we load user config or
+> not. Then in the second pass we finally parse everything else
+> throwing an error if an unsupported -option was found. Problem is
+> that in the second pass -no-user-config and -nodefconfig are not
+> handled explicitly which makes us throw the unsupported option
+> error.
+>
+> Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
 
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- util/qemu-option.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-diff --git a/util/qemu-option.c b/util/qemu-option.c
-index 8a68bc2314..a1ff682aac 100644
---- a/util/qemu-option.c
-+++ b/util/qemu-option.c
-@@ -75,9 +75,7 @@ const char *get_opt_value(const char *p, char **value)
-     size_t capacity =3D 0, length;
-     const char *offset;
-=20
--    if (value) {
--        *value =3D NULL;
--    }
-+    *value =3D NULL;
-     while (1) {
-         offset =3D strchr(p, ',');
-         if (!offset) {
-@@ -88,11 +86,9 @@ const char *get_opt_value(const char *p, char **value)
-         if (*offset !=3D '\0' && *(offset + 1) =3D=3D ',') {
-             length++;
-         }
--        if (value) {
--            *value =3D g_renew(char, *value, capacity + length + 1);
--            strncpy(*value + capacity, p, length);
--            (*value)[capacity + length] =3D '\0';
--        }
-+        *value =3D g_renew(char, *value, capacity + length + 1);
-+        strncpy(*value + capacity, p, length);
-+        (*value)[capacity + length] =3D '\0';
-         capacity +=3D length;
-         if (*offset =3D=3D '\0' ||
-             *(offset + 1) !=3D ',') {
+
+> ---
+>  vl.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/vl.c b/vl.c
+> index b9f6b42779..846cd29d8a 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4015,6 +4015,10 @@ int main(int argc, char **argv, char **envp)
+>                      exit(1);
+>                  }
+>                  break;
+> +            case QEMU_OPTION_nodefconfig:
+> +            case QEMU_OPTION_nouserconfig:
+> +                /* Nothing to be parsed here. Especially, do not error o=
+ut below. */
+> +                break;
+>              default:
+>                  if (os_parse_cmd_args(popt->index, optarg)) {
+>                      error_report("Option not supported in this build");
+> --
+> 2.16.1
+>
+>
+
+
+
 --=20
-2.17.0
+Marc-Andr=C3=A9 Lureau
