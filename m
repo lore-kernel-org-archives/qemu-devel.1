@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fIGWU-0005m5-Hc
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:40:31 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fIGXg-0006SV-AF
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:41:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fIGWT-0004jl-3c
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:40:30 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:45014)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fIGWS-0004jD-VF
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:40:29 -0400
-Received: by mail-ot0-x244.google.com with SMTP id g7-v6so15030110otj.11
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 09:40:28 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180504171540.25813-14-peter.maydell@linaro.org>
+	(envelope-from <eric.auger@redhat.com>) id 1fIGXd-0005KU-6j
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:41:44 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39782 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1fIGXd-0005Jo-1P
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:41:41 -0400
 References: <20180504171540.25813-1-peter.maydell@linaro.org>
-	<20180504171540.25813-14-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 May 2018 17:40:07 +0100
-Message-ID: <CAFEAcA9d0cHfO4+9BcrA=rgmcQpP86c9obGVEAHFp1cSj5Wj5g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 13/24] hw/arm/smmu-common: VMSAv8-64 page
- table walk
+	<20180504171540.25813-19-peter.maydell@linaro.org>
+	<CAFEAcA_USWqJ2ODDYKw0NbLTcwBqUdi-OiBBVuNC3yxp0manoA@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <d4490e85-ce78-26ac-03eb-67db143a252b@redhat.com>
+Date: Mon, 14 May 2018 18:41:38 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA_USWqJ2ODDYKw0NbLTcwBqUdi-OiBBVuNC3yxp0manoA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 18/24] hw/arm/smmuv3: Event queue recording
+ helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +30,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 4 May 2018 at 18:15, Peter Maydell <peter.maydell@linaro.org> wrote:
-> From: Eric Auger <eric.auger@redhat.com>
->
-> This patch implements the page table walk for VMSAv8-64.
+Hi Peter,
 
-Hi Eric;
+On 05/14/2018 06:23 PM, Peter Maydell wrote:
+> On 4 May 2018 at 18:15, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> From: Eric Auger <eric.auger@redhat.com>
+>>
+>> Let's introduce a helper function aiming at recording an
+>> event in the event queue.
+> 
+>> +void smmuv3_record_event(SMMUv3State *s, SMMUEventInfo *info)
+>> +{
+>> +    Evt evt;
+>> +    MemTxResult r;
+>>
+>>      if (!smmuv3_eventq_enabled(s)) {
+>>          return;
+>>      }
+>>
+>> -    if (smmuv3_q_full(q)) {
+>> +    EVT_SET_TYPE(&evt, info->type);
+>> +    EVT_SET_SID(&evt, info->sid);
+> 
+> Hi Eric -- Coverity complains about use of uninitialized data
+> here (CID 1391004). Evt is a struct, and there's no initializer
+> where we declare it, so its fields are uninitialized. The
+> The EVT_SET_TYPE and similar setters use deposit32() on fields
+> in the struct, so they read the uninitialized existing values.
+> In cases where we don't set all the fields in the event struct
+> we'll end up leaking random uninitialized data from QEMU's
+> stack into the guest.
+> 
+> Initializing the struct with "Evt evt = {};" ought to satisfy
+> Coverity and fix the data leak.
 
-> + * get_block_pte_address - return block descriptor output address and block size
-> + * ARM ARM Figure D4-16 VMSAv8-64 level0, level1, and level 2 descriptor formats
-> + */
-> +static inline hwaddr get_block_pte_address(uint64_t pte, int level,
-> +                                           int granule_sz, uint64_t *bsz)
-> +{
-> +    int n = (granule_sz - 3) * (4 - level) + 3;
-> +
-> +    *bsz = 1 << n;
+Sure I will send a patch.
 
-Coverity (CID 1391010) points out that this can overflow if n > 31,
-because it's only doing 32-bit arithmetic.
-I think this is possible for some page table formats, so using
-"1ULL" rather than "1" should make coverity happy.
+Thanks
 
-Incidentally, isn't
-   int n = (granule_sz - 3) * (4 - level) + 3;
-equivalent to
-   int n = level_shift(level, granule_sz);
-?
-
-> +    return PTE_ADDRESS(pte, n);
-> +}
-
-thanks
--- PMM
+Eric
+> 
+> thanks
+> -- PMM
+> 
