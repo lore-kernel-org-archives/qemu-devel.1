@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fIBiW-0007Cf-52
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 07:32:37 -0400
+	(envelope-from <jcody@redhat.com>) id 1fIBq0-0005wh-Vu
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 07:40:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fIBiT-0004rZ-G0
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 07:32:36 -0400
-References: <20180512012537.22478-1-jsnow@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <0a92e4e5-4ddf-43c0-d925-f55e89a6b1cd@virtuozzo.com>
-Date: Mon, 14 May 2018 14:32:25 +0300
+	(envelope-from <jcody@redhat.com>) id 1fIBq0-00012Y-9q
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 07:40:21 -0400
+Date: Mon, 14 May 2018 07:40:10 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180514114010.GA868@localhost.localdomain>
+References: <20180508135436.30140-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180512012537.22478-1-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [RFC PATCH 00/12] qemu-img: add bitmap queries
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180508135436.30140-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] qemu-iotests: post-QEMU 2.12 fixes
+ for 185
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,68 +23,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-12.05.2018 04:25, John Snow wrote:
-> Allow qemu-img to show information about bitmaps stored in qcow2 images.
-> Add a 'bitmap' meta-command with 'dump' sub-command to retrieve a list of
-> dirty regions in bitmaps stored in a qcow2 image.
->
-> RFC:
-> - I am not 1000% convinced the bm_list caching is perfectly safe,
->    especially with respect to migration and inactivation. There are
->    more efficiencies and tweaks I can make, but I think this is the
->    minimal set.
->
-> - I decided not to gate bitmap info in the "info" command behind
->    extra flags.
->
-> - Bitmap data-gathering in "bitmap dump" could be made more
->    space-efficient by just reporting one segment at a time,
->    probably.
->
-> - `bitmap rm` and `bitmap mk` need extra work, so I am not submitting
->    them just yet: rm needs more work around the remove persistence API,
->    and make needs more work around the "can add" API.
->
-> - None of these commands will work with "in use" bitmaps; we need
->    qemu-img check -r bitmaps support for this. I'm not sure what the
->    right behavior to "fix" in-use bitmaps should be:
->          - Cleared: This might be dangerous.
->          - Fully Set: This is safer, but stupid.
->          - Deleted: This might be the best option.
+On Tue, May 08, 2018 at 02:54:34PM +0100, Stefan Hajnoczi wrote:
+> v2:
+>  * Rebase onto Jeff's block tree to get mirror ratelimit fix [Jeff, Vladimir]
+>  * Update comments in 185 since drain no longer causes a spurious iteration
+> 
+> The 185 qemu-iotests test case was in a bad state for the QEMU 2.12 release.
+> We fudged the expected test output to make it pass, except for
+> non-deterministic behavior.
+> 
+> These patches get us back to pre-QEMU 2.12.  Notably the offsets reported in
+> block job events now correspond to smaller buffer sizes because the job doesn't
+> iterate during drain.
+> 
+> It's worth mentioning that the test case is still non-deterministic.  For more
+> on that, see the first patch.
+> 
+> Stefan Hajnoczi (2):
+>   qemu-iotests: reduce chance of races in 185
+>   blockjob: do not cancel timer in resume
+> 
+>  blockjob.c                 | 22 +++++++++++++++-------
+>  tests/qemu-iotests/185     | 17 +++++++++++++----
+>  tests/qemu-iotests/185.out | 12 +++++-------
+>  3 files changed, 33 insertions(+), 18 deletions(-)
+> 
+> -- 
+> 2.14.3
+> 
 
-I think it's the only valid option.
+Thanks,
 
->          - Un-set in-use: VERY dangerous; would rather not.
->
-> John Snow (12):
->    qcow2-bitmap: cache bm_list
->    qcow2/dirty-bitmap: cache loaded bitmaps
->    block/qcow2-bitmap: avoid adjusting bm->flags for RO bitmaps
->    qcow2/dirty-bitmaps: load IN_USE bitmaps if disk is RO
->    qcow2-bitmap: track bitmap type
->    qapi: add bitmap info
->    qcow2-bitmap: add basic bitmaps info
->    qjson: allow caller to ask for arbitrary indent
->    qapi/block-core: add BitmapMapping and BitmapEntry structs
->    qemu-img: split off common chunk of map command
->    qemu-img: add bitmap dump
->    qemu-img: add bitmap clear
->
->   block/qcow2-bitmap.c     | 220 +++++++++++++++++--------
->   block/qcow2.c            |   9 +
->   block/qcow2.h            |   3 +
->   include/qapi/qmp/qjson.h |   1 +
->   qapi/block-core.json     |  92 ++++++++++-
->   qemu-img-cmds.hx         |   6 +
->   qemu-img.c               | 419 +++++++++++++++++++++++++++++++++++++----------
->   qobject/qjson.c          |  21 +--
->   8 files changed, 612 insertions(+), 159 deletions(-)
->
+Applied to my block branch:
 
+git://github.com/codyprime/qemu-kvm-jtc block
 
--- 
-Best regards,
-Vladimir
+-Jeff
