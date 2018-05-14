@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fIDK8-0003wU-6H
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 09:15:36 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fIDjx-0004Wn-5E
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 09:42:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fIDK6-0001j3-Ld
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 09:15:31 -0400
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:38491)
+	(envelope-from <peter.maydell@linaro.org>) id 1fIDjw-0003mY-8H
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 09:42:13 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:40978)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fIDK6-0001id-Dg
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 09:15:30 -0400
-Received: by mail-ot0-x243.google.com with SMTP id n3-v6so14188898ota.5
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 06:15:30 -0700 (PDT)
+	id 1fIDjw-0003mO-2Y
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 09:42:12 -0400
+Received: by mail-ot0-x243.google.com with SMTP id t1-v6so14289225oth.8
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 06:42:11 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180512092824.13848-1-stefanha@redhat.com>
-References: <20180512092824.13848-1-stefanha@redhat.com>
+In-Reply-To: <20180512004311.9299-14-richard.henderson@linaro.org>
+References: <20180512004311.9299-1-richard.henderson@linaro.org>
+	<20180512004311.9299-14-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 May 2018 14:15:09 +0100
-Message-ID: <CAFEAcA9ACMbP2vapm2h_1D6+zniumtPc9PZMnFJKX4yj55ku_Q@mail.gmail.com>
+Date: Mon, 14 May 2018 14:41:50 +0100
+Message-ID: <CAFEAcA8EmpbGi=q=H_J+fhe0BzV4=FmWpfx0modhs5r720v=vQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/8] Block patches
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 13/27] target/arm: convert conversion
+ helpers to fpst/ahp_flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,70 +31,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-On 12 May 2018 at 10:28, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> The following changes since commit e5cd695266c5709308aa95b1baae499e4b5d4544:
+On 12 May 2018 at 01:42, Richard Henderson <richard.henderson@linaro.org> w=
+rote:
+> From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 >
->   Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' into staging (2018-05-08 17:05:58 +0100)
+> Instead of passing env and leaving it up to the helper to get the
+> right fpstatus we pass it explicitly. There was already a get_fpstatus
+> helper for neon for the 32 bit code. We also add an get_ahp_flag() for
+> passing the state of the alternative FP16 format flag. This leaves
+> scope for later tracking the AHP state in translation flags.
 >
-> are available in the Git repository at:
->
->   git://github.com/stefanha/qemu.git tags/block-pull-request
->
-> for you to fetch changes up to 31be8a2a97ecba7d31a82932286489cac318e9e9:
->
->   block/file-posix: add x-check-page-cache=on|off option (2018-05-11 16:43:05 +0100)
->
-> ----------------------------------------------------------------
-> Block pull request
->
->  * Support -drive cache.direct=off live migration for POSIX files
->
-> ----------------------------------------------------------------
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-With this I get test failures for x86-64 Linux host (debug enabled):
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index a0b0c43d12..570791e7b5 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -5147,10 +5147,15 @@ static void handle_fp_fcvt(DisasContext *s, int o=
+pcode,
+>          } else {
+>              /* Single to half */
+>              TCGv_i32 tcg_rd =3D tcg_temp_new_i32();
+> -            gen_helper_vfp_fcvt_f32_to_f16(tcg_rd, tcg_rn, cpu_env);
+> +            TCGv_i32 ahp =3D get_ahp_flag();
+> +            TCGv_ptr fpst =3D get_fpstatus_ptr(true);
 
-MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
-gtester -k --verbose -m=quick tests/test-replication
-TEST: tests/test-replication... (pid=15016)
-  /replication/primary/read:                                           OK
-  /replication/primary/write:                                          OK
-  /replication/primary/start:                                          OK
-  /replication/primary/stop:                                           OK
-  /replication/primary/do_checkpoint:                                  OK
-  /replication/primary/get_error_all:                                  OK
-  /replication/secondary/read:                                         **
-ERROR:/home/petmay01/linaro/qemu-for-merges/tests/test-replication.c:119:test_blk_write:
-assertion failed: (async_ret == 0)
-FAIL
-GTester: last random seed: R02Sf99d81651223b2fcdd0d7d601245eba3
-(pid=15131)
-  /replication/secondary/write:                                        OK
-  /replication/secondary/start:                                        **
-ERROR:/home/petmay01/linaro/qemu-for-merges/tests/test-replication.c:119:test_blk_write:
-assertion failed: (async_ret == 0)
-FAIL
-GTester: last random seed: R02S3e753c59c58d385aa2ea07c974c2e384
-(pid=15309)
-  /replication/secondary/stop:                                         **
-ERROR:/home/petmay01/linaro/qemu-for-merges/tests/test-replication.c:119:test_blk_write:
-assertion failed: (async_ret == 0)
-FAIL
-GTester: last random seed: R02Sb6a8459edfa78efa369da3920846afa7
-(pid=15439)
-  /replication/secondary/do_checkpoint:                                **
-ERROR:/home/petmay01/linaro/qemu-for-merges/tests/test-replication.c:119:test_blk_write:
-assertion failed: (async_ret == 0)
-FAIL
-GTester: last random seed: R02S4b2e6aa4e33bba4c5bdea0b9073ee966
-(pid=15580)
-  /replication/secondary/get_error_all:                                OK
-FAIL: tests/test-replication
-/home/petmay01/linaro/qemu-for-merges/tests/Makefile.include:892:
-recipe for target 'check-tests/test-replication' failed
+This should be passing in 'false' to get_fpstatus_ptr(), as should
+all the other uses where we get an fpst to pass to an f*_to_f16 or
+f16_to_f* conversion helper. This is because conversions between
+f16 and other sizes ignore FPCR.FZ16 for the 16-bit end, but they
+still honour FPCR.FZ for the other end. So you need to pass in the
+fpstatus pointer which has the flush-denormals status flags set
+to match FPCR.FZ, not the fp16-specific one.
 
+Otherwise you'll generate the wrong exception flags for cases like
+ FPCR.FZ =3D 1; FPCR.FZ16 =3D 0; s0 =3D 0x00000001; fcvt h1, s0
+(which should give h1 =3D 0x0000 and set InputDenormal).
 
 thanks
 -- PMM
