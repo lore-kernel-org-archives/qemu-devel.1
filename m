@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fIGlI-0008PC-7Q
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:55:49 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1fIGlR-00005G-4D
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:55:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fIGlH-0005zU-D1
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:55:48 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:36600)
+	(envelope-from <zhangckid@gmail.com>) id 1fIGlQ-00066D-CN
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:55:57 -0400
+Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:41045)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fIGlH-0005z2-69
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:55:47 -0400
-Received: by mail-pg0-x241.google.com with SMTP id z70-v6so5738390pgz.3
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 09:55:46 -0700 (PDT)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fIGlQ-00065U-5K
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:55:56 -0400
+Received: by mail-pl0-x244.google.com with SMTP id az12-v6so7706019plb.8
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 09:55:55 -0700 (PDT)
 From: Zhang Chen <zhangckid@gmail.com>
-Date: Tue, 15 May 2018 00:54:21 +0800
-Message-Id: <20180514165424.12884-15-zhangckid@gmail.com>
+Date: Tue, 15 May 2018 00:54:23 +0800
+Message-Id: <20180514165424.12884-17-zhangckid@gmail.com>
 In-Reply-To: <20180514165424.12884-1-zhangckid@gmail.com>
 References: <20180514165424.12884-1-zhangckid@gmail.com>
-Subject: [Qemu-devel] [PATCH V7 RESEND 14/17] filter: Add handle_event
- method for NetFilterClass
+Subject: [Qemu-devel] [PATCH V7 RESEND 16/17] COLO: notify net filters about
+ checkpoint/failover event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,122 +29,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Zhang Chen <zhangckid@gmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-Filter needs to process the event of checkpoint/failover or
-other event passed by COLO frame.
+From: zhanghailiang <zhang.zhanghailiang@huawei.com>
+
+Notify all net filters about the checkpoint and failover event.
 
 Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 ---
- include/net/filter.h |  5 +++++
- net/filter.c         | 17 +++++++++++++++++
- net/net.c            | 28 ++++++++++++++++++++++++++++
- 3 files changed, 50 insertions(+)
+ migration/colo.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/include/net/filter.h b/include/net/filter.h
-index 435acd6f82..49da666ac0 100644
---- a/include/net/filter.h
-+++ b/include/net/filter.h
-@@ -38,6 +38,8 @@ typedef ssize_t (FilterReceiveIOV)(NetFilterState *nc,
- 
- typedef void (FilterStatusChanged) (NetFilterState *nf, Error **errp);
- 
-+typedef void (FilterHandleEvent) (NetFilterState *nf, int event, Error **errp);
-+
- typedef struct NetFilterClass {
-     ObjectClass parent_class;
- 
-@@ -45,6 +47,7 @@ typedef struct NetFilterClass {
-     FilterSetup *setup;
-     FilterCleanup *cleanup;
-     FilterStatusChanged *status_changed;
-+    FilterHandleEvent *handle_event;
-     /* mandatory */
-     FilterReceiveIOV *receive_iov;
- } NetFilterClass;
-@@ -77,4 +80,6 @@ ssize_t qemu_netfilter_pass_to_next(NetClientState *sender,
-                                     int iovcnt,
-                                     void *opaque);
- 
-+void colo_notify_filters_event(int event, Error **errp);
-+
- #endif /* QEMU_NET_FILTER_H */
-diff --git a/net/filter.c b/net/filter.c
-index 2fd7d7d663..0f17eba143 100644
---- a/net/filter.c
-+++ b/net/filter.c
-@@ -17,6 +17,8 @@
- #include "net/vhost_net.h"
- #include "qom/object_interfaces.h"
- #include "qemu/iov.h"
-+#include "net/colo.h"
-+#include "migration/colo.h"
- 
- static inline bool qemu_can_skip_netfilter(NetFilterState *nf)
- {
-@@ -245,11 +247,26 @@ static void netfilter_finalize(Object *obj)
-     g_free(nf->netdev_id);
- }
- 
-+static void dummy_handle_event(NetFilterState *nf, int event, Error **errp)
-+{
-+    switch (event) {
-+    case COLO_EVENT_CHECKPOINT:
-+        break;
-+    case COLO_EVENT_FAILOVER:
-+        object_property_set_str(OBJECT(nf), "off", "status", errp);
-+        break;
-+    default:
-+        break;
-+    }
-+}
-+
- static void netfilter_class_init(ObjectClass *oc, void *data)
- {
-     UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
-+    NetFilterClass *nfc = NETFILTER_CLASS(oc);
- 
-     ucc->complete = netfilter_complete;
-+    nfc->handle_event = dummy_handle_event;
- }
- 
- static const TypeInfo netfilter_info = {
-diff --git a/net/net.c b/net/net.c
-index 29f83983e5..d58691bb8e 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -1335,6 +1335,34 @@ void hmp_info_network(Monitor *mon, const QDict *qdict)
+diff --git a/migration/colo.c b/migration/colo.c
+index 3dfd84d897..15463e2823 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -88,6 +88,11 @@ static void secondary_vm_do_failover(void)
+     if (local_err) {
+         error_report_err(local_err);
      }
- }
- 
-+void colo_notify_filters_event(int event, Error **errp)
-+{
-+    NetClientState *nc, *peer;
-+    NetClientDriver type;
-+    NetFilterState *nf;
-+    NetFilterClass *nfc = NULL;
-+    Error *local_err = NULL;
-+
-+    QTAILQ_FOREACH(nc, &net_clients, next) {
-+        peer = nc->peer;
-+        type = nc->info->type;
-+        if (!peer || type != NET_CLIENT_DRIVER_TAP) {
-+            continue;
-+        }
-+        QTAILQ_FOREACH(nf, &nc->filters, next) {
-+            nfc =  NETFILTER_GET_CLASS(OBJECT(nf));
-+            if (!nfc->handle_event) {
-+                continue;
-+            }
-+            nfc->handle_event(nf, event, &local_err);
-+            if (local_err) {
-+                error_propagate(errp, local_err);
-+                return;
-+            }
-+        }
++    /* Notify all filters of all NIC to do checkpoint */
++    colo_notify_filters_event(COLO_EVENT_FAILOVER, &local_err);
++    if (local_err) {
++        error_report_err(local_err);
 +    }
-+}
+ 
+     if (!autostart) {
+         error_report("\"-S\" qemu option will be ignored in secondary side");
+@@ -799,6 +804,13 @@ void *colo_process_incoming_thread(void *opaque)
+             goto out;
+         }
+ 
++        /* Notify all filters of all NIC to do checkpoint */
++        colo_notify_filters_event(COLO_EVENT_CHECKPOINT, &local_err);
++        if (local_err) {
++            qemu_mutex_unlock_iothread();
++            goto out;
++        }
 +
- void qmp_set_link(const char *name, bool up, Error **errp)
- {
-     NetClientState *ncs[MAX_QUEUE_NUM];
+         vmstate_loading = false;
+         vm_start();
+         trace_colo_vm_state_change("stop", "run");
 -- 
 2.17.0
