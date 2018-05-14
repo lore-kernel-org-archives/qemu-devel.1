@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43336)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fI6Nr-00005o-7V
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 01:50:56 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1fI6Or-0007Ny-Az
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 01:51:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fI46Y-0000GE-UI
-	for qemu-devel@nongnu.org; Sun, 13 May 2018 23:24:56 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:45466)
+	(envelope-from <zhangckid@gmail.com>) id 1fI461-0007tt-Uh
+	for qemu-devel@nongnu.org; Sun, 13 May 2018 23:24:22 -0400
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:42181)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fI46Y-0000EU-NH
-	for qemu-devel@nongnu.org; Sun, 13 May 2018 23:24:54 -0400
-Received: by mail-pf0-x241.google.com with SMTP id c10-v6so5305257pfi.12
-	for <qemu-devel@nongnu.org>; Sun, 13 May 2018 20:24:54 -0700 (PDT)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fI461-0007s8-NQ
+	for qemu-devel@nongnu.org; Sun, 13 May 2018 23:24:21 -0400
+Received: by mail-pf0-x242.google.com with SMTP id p14-v6so5308071pfh.9
+	for <qemu-devel@nongnu.org>; Sun, 13 May 2018 20:24:21 -0700 (PDT)
 From: Zhang Chen <zhangckid@gmail.com>
-Date: Mon, 14 May 2018 11:23:40 +0800
-Message-Id: <1526268228-27951-10-git-send-email-zhangckid@gmail.com>
+Date: Mon, 14 May 2018 11:23:34 +0800
+Message-Id: <1526268228-27951-4-git-send-email-zhangckid@gmail.com>
 In-Reply-To: <1526268228-27951-1-git-send-email-zhangckid@gmail.com>
 References: <1526268228-27951-1-git-send-email-zhangckid@gmail.com>
-Subject: [Qemu-devel] [PATCH V7 09/17] COLO: Flush memory data from ram cache
+Subject: [Qemu-devel] [PATCH V7 03/17] colo-compare: use notifier to notify
+ packets comparing result
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,104 +27,104 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Zhang Chen <zhangckid@gmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Zhang Chen <zhangckid@gmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-During the time of VM's running, PVM may dirty some pages, we will transfer
-PVM's dirty pages to SVM and store them into SVM's RAM cache at next checkpoint
-time. So, the content of SVM's RAM cache will always be same with PVM's memory
-after checkpoint.
+It's a good idea to use notifier to notify COLO frame of
+inconsistent packets comparing.
 
-Instead of flushing all content of PVM's RAM cache into SVM's MEMORY,
-we do this in a more efficient way:
-Only flush any page that dirtied by PVM since last checkpoint.
-In this way, we can ensure SVM's memory same with PVM's.
-
-Besides, we must ensure flush RAM cache before load device state.
-
+Signed-off-by: Zhang Chen <zhangckid@gmail.com>
 Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/ram.c        | 39 +++++++++++++++++++++++++++++++++++++++
- migration/trace-events |  2 ++
- 2 files changed, 41 insertions(+)
+ net/colo-compare.c | 32 +++++++++++++++++++++++++-------
+ net/colo-compare.h |  2 ++
+ 2 files changed, 27 insertions(+), 7 deletions(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index e35dfee..4235a8f 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -3031,6 +3031,40 @@ static bool postcopy_is_running(void)
-     return ps >= POSTCOPY_INCOMING_LISTENING && ps < POSTCOPY_INCOMING_END;
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index 7ff3ae8..05061cd 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -29,6 +29,7 @@
+ #include "sysemu/iothread.h"
+ #include "net/colo-compare.h"
+ #include "migration/colo.h"
++#include "migration/migration.h"
+ 
+ #define TYPE_COLO_COMPARE "colo-compare"
+ #define COLO_COMPARE(obj) \
+@@ -37,6 +38,9 @@
+ static QTAILQ_HEAD(, CompareState) net_compares =
+        QTAILQ_HEAD_INITIALIZER(net_compares);
+ 
++static NotifierList colo_compare_notifiers =
++    NOTIFIER_LIST_INITIALIZER(colo_compare_notifiers);
++
+ #define COMPARE_READ_LEN_MAX NET_BUFSIZE
+ #define MAX_QUEUE_SIZE 1024
+ 
+@@ -561,8 +565,24 @@ static int colo_old_packet_check_one(Packet *pkt, int64_t *check_time)
+     }
  }
  
-+/*
-+ * Flush content of RAM cache into SVM's memory.
-+ * Only flush the pages that be dirtied by PVM or SVM or both.
-+ */
-+static void colo_flush_ram_cache(void)
++static void colo_compare_inconsistent_notify(void)
 +{
-+    RAMBlock *block = NULL;
-+    void *dst_host;
-+    void *src_host;
-+    unsigned long offset = 0;
-+
-+    trace_colo_flush_ram_cache_begin(ram_state->migration_dirty_pages);
-+    rcu_read_lock();
-+    block = QLIST_FIRST_RCU(&ram_list.blocks);
-+
-+    while (block) {
-+        offset = migration_bitmap_find_dirty(ram_state, block, offset);
-+        migration_bitmap_clear_dirty(ram_state, block, offset);
-+
-+        if (offset << TARGET_PAGE_BITS >= block->used_length) {
-+            offset = 0;
-+            block = QLIST_NEXT_RCU(block, next);
-+        } else {
-+            dst_host = block->host + (offset << TARGET_PAGE_BITS);
-+            src_host = block->colo_cache + (offset << TARGET_PAGE_BITS);
-+            memcpy(dst_host, src_host, TARGET_PAGE_SIZE);
-+        }
-+    }
-+
-+    rcu_read_unlock();
-+    trace_colo_flush_ram_cache_end();
-+    assert(ram_state->migration_dirty_pages == 0);
++    notifier_list_notify(&colo_compare_notifiers,
++                migrate_get_current());
 +}
 +
- static int ram_load(QEMUFile *f, void *opaque, int version_id)
- {
-     int flags = 0, ret = 0, invalid_flags = 0;
-@@ -3043,6 +3077,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-     bool postcopy_running = postcopy_is_running();
-     /* ADVISE is earlier, it shows the source has the postcopy capability on */
-     bool postcopy_advised = postcopy_is_advised();
-+    bool need_flush = false;
- 
-     seq_iter++;
- 
-@@ -3218,6 +3253,10 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-     ret |= wait_for_decompress_done();
-     rcu_read_unlock();
-     trace_ram_load_complete(ret, seq_iter);
++void colo_compare_register_notifier(Notifier *notify)
++{
++    notifier_list_add(&colo_compare_notifiers, notify);
++}
 +
-+    if (!ret  && migration_incoming_in_colo_state() && need_flush) {
-+        colo_flush_ram_cache();
-+    }
-     return ret;
- }
++void colo_compare_unregister_notifier(Notifier *notify)
++{
++    notifier_remove(notify);
++}
++
+ static int colo_old_packet_check_one_conn(Connection *conn,
+-                                          void *user_data)
++                                           void *user_data)
+ {
+     GList *result = NULL;
+     int64_t check_time = REGULAR_PACKET_CHECK_MS;
+@@ -573,10 +593,7 @@ static int colo_old_packet_check_one_conn(Connection *conn,
  
-diff --git a/migration/trace-events b/migration/trace-events
-index 9295b4c..8e2f974 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -78,6 +78,8 @@ ram_load_postcopy_loop(uint64_t addr, int flags) "@%" PRIx64 " %x"
- ram_postcopy_send_discard_bitmap(void) ""
- ram_save_page(const char *rbname, uint64_t offset, void *host) "%s: offset: 0x%" PRIx64 " host: %p"
- ram_save_queue_pages(const char *rbname, size_t start, size_t len) "%s: start: 0x%zx len: 0x%zx"
-+colo_flush_ram_cache_begin(uint64_t dirty_pages) "dirty_pages %" PRIu64
-+colo_flush_ram_cache_end(void) ""
+     if (result) {
+         /* Do checkpoint will flush old packet */
+-        /*
+-         * TODO: Notify colo frame to do checkpoint.
+-         * colo_compare_inconsistent_notify();
+-         */
++        colo_compare_inconsistent_notify();
+         return 0;
+     }
  
- # migration/migration.c
- await_return_path_close_on_source_close(void) ""
+@@ -620,11 +637,12 @@ static void colo_compare_packet(CompareState *s, Connection *conn,
+             /*
+              * If one packet arrive late, the secondary_list or
+              * primary_list will be empty, so we can't compare it
+-             * until next comparison.
++             * until next comparison. If the packets in the list are
++             * timeout, it will trigger a checkpoint request.
+              */
+             trace_colo_compare_main("packet different");
+             g_queue_push_head(&conn->primary_list, pkt);
+-            /* TODO: colo_notify_checkpoint();*/
++            colo_compare_inconsistent_notify();
+             break;
+         }
+     }
+diff --git a/net/colo-compare.h b/net/colo-compare.h
+index 1b1ce76..22ddd51 100644
+--- a/net/colo-compare.h
++++ b/net/colo-compare.h
+@@ -18,5 +18,7 @@
+ #define QEMU_COLO_COMPARE_H
+ 
+ void colo_notify_compares_event(void *opaque, int event, Error **errp);
++void colo_compare_register_notifier(Notifier *notify);
++void colo_compare_unregister_notifier(Notifier *notify);
+ 
+ #endif /* QEMU_COLO_COMPARE_H */
 -- 
 2.7.4
