@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fILi5-00088c-BR
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:50 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fILi6-00089p-FE
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fILi4-00087W-3c
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:49 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:45659)
+	(envelope-from <richard.henderson@linaro.org>) id 1fILi5-0008A0-Cs
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:50 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:36605)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fILi3-000861-TF
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:48 -0400
-Received: by mail-pf0-x244.google.com with SMTP id c10-v6so6658570pfi.12
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 15:12:47 -0700 (PDT)
+	id 1fILi5-00088s-6W
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:12:49 -0400
+Received: by mail-pg0-x244.google.com with SMTP id z70-v6so6065153pgz.3
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 15:12:49 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 14 May 2018 15:12:09 -0700
-Message-Id: <20180514221219.7091-19-richard.henderson@linaro.org>
+Date: Mon, 14 May 2018 15:12:10 -0700
+Message-Id: <20180514221219.7091-20-richard.henderson@linaro.org>
 In-Reply-To: <20180514221219.7091-1-richard.henderson@linaro.org>
 References: <20180514221219.7091-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v5 18/28] target/riscv: Remove
+Subject: [Qemu-devel] [PATCH v5 19/28] target/s390x: Remove
  floatX_maybe_silence_nan from conversions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,39 +28,74 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, alex.bennee@linaro.org, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: peter.maydell@linaro.org, alex.bennee@linaro.org, Alexander Graf <agraf@suse.de>
 
 This is now handled properly by the generic softfloat code.
 
-Cc: Palmer Dabbelt <palmer@sifive.com>
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Reviewed-by: Michael Clark <mjc@sifive.com>
+Cc: Alexander Graf <agraf@suse.de>
+Reviewed-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/riscv/fpu_helper.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ target/s390x/fpu_helper.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/target/riscv/fpu_helper.c b/target/riscv/fpu_helper.c
-index abbadead5c..fdb87d8d82 100644
---- a/target/riscv/fpu_helper.c
-+++ b/target/riscv/fpu_helper.c
-@@ -279,14 +279,12 @@ uint64_t helper_fmax_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
- 
- uint64_t helper_fcvt_s_d(CPURISCVState *env, uint64_t rs1)
+diff --git a/target/s390x/fpu_helper.c b/target/s390x/fpu_helper.c
+index 43f8bf1c94..5c5b451b3b 100644
+--- a/target/s390x/fpu_helper.c
++++ b/target/s390x/fpu_helper.c
+@@ -269,7 +269,7 @@ uint64_t HELPER(ldeb)(CPUS390XState *env, uint64_t f2)
  {
--    rs1 = float64_to_float32(rs1, &env->fp_status);
--    return float32_maybe_silence_nan(rs1, &env->fp_status);
-+    return float64_to_float32(rs1, &env->fp_status);
+     float64 ret = float32_to_float64(f2, &env->fpu_status);
+     handle_exceptions(env, GETPC());
+-    return float64_maybe_silence_nan(ret, &env->fpu_status);
++    return ret;
  }
  
- uint64_t helper_fcvt_d_s(CPURISCVState *env, uint64_t rs1)
+ /* convert 128-bit float to 64-bit float */
+@@ -277,7 +277,7 @@ uint64_t HELPER(ldxb)(CPUS390XState *env, uint64_t ah, uint64_t al)
  {
--    rs1 = float32_to_float64(rs1, &env->fp_status);
--    return float64_maybe_silence_nan(rs1, &env->fp_status);
-+    return float32_to_float64(rs1, &env->fp_status);
+     float64 ret = float128_to_float64(make_float128(ah, al), &env->fpu_status);
+     handle_exceptions(env, GETPC());
+-    return float64_maybe_silence_nan(ret, &env->fpu_status);
++    return ret;
  }
  
- uint64_t helper_fsqrt_d(CPURISCVState *env, uint64_t frs1)
+ /* convert 64-bit float to 128-bit float */
+@@ -285,7 +285,7 @@ uint64_t HELPER(lxdb)(CPUS390XState *env, uint64_t f2)
+ {
+     float128 ret = float64_to_float128(f2, &env->fpu_status);
+     handle_exceptions(env, GETPC());
+-    return RET128(float128_maybe_silence_nan(ret, &env->fpu_status));
++    return RET128(ret);
+ }
+ 
+ /* convert 32-bit float to 128-bit float */
+@@ -293,7 +293,7 @@ uint64_t HELPER(lxeb)(CPUS390XState *env, uint64_t f2)
+ {
+     float128 ret = float32_to_float128(f2, &env->fpu_status);
+     handle_exceptions(env, GETPC());
+-    return RET128(float128_maybe_silence_nan(ret, &env->fpu_status));
++    return RET128(ret);
+ }
+ 
+ /* convert 64-bit float to 32-bit float */
+@@ -301,7 +301,7 @@ uint64_t HELPER(ledb)(CPUS390XState *env, uint64_t f2)
+ {
+     float32 ret = float64_to_float32(f2, &env->fpu_status);
+     handle_exceptions(env, GETPC());
+-    return float32_maybe_silence_nan(ret, &env->fpu_status);
++    return ret;
+ }
+ 
+ /* convert 128-bit float to 32-bit float */
+@@ -309,7 +309,7 @@ uint64_t HELPER(lexb)(CPUS390XState *env, uint64_t ah, uint64_t al)
+ {
+     float32 ret = float128_to_float32(make_float128(ah, al), &env->fpu_status);
+     handle_exceptions(env, GETPC());
+-    return float32_maybe_silence_nan(ret, &env->fpu_status);
++    return ret;
+ }
+ 
+ /* 32-bit FP compare */
 -- 
 2.17.0
