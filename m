@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42085)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fI94g-0003KV-NZ
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 04:43:22 -0400
+	(envelope-from <armbru@redhat.com>) id 1fI985-0005Ld-5B
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 04:46:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fI94c-0005yc-8s
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 04:43:18 -0400
-Resent-Message-Id: <E1fI94c-0005yc-8s@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21103)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fI94c-0005wB-0m
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 04:43:14 -0400
-In-Reply-To: <1526268228-27951-1-git-send-email-zhangckid@gmail.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152628104641.72.16457052423111317786@1f70390a8372>
+	(envelope-from <armbru@redhat.com>) id 1fI981-0000u4-AM
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 04:46:49 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57602 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fI981-0000tc-5X
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 04:46:45 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180219141259.26526-1-danielhb@linux.vnet.ibm.com>
+	<eebc1ad7-2191-d9cc-81fd-5fefa9e3b1c8@linux.vnet.ibm.com>
+	<87tvsfxkuq.fsf@dusky.pond.sub.org>
+Date: Mon, 14 May 2018 10:46:42 +0200
+In-Reply-To: <87tvsfxkuq.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Fri, 13 Apr 2018 16:05:33 +0200")
+Message-ID: <87efie1v65.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 13 May 2018 23:57:27 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH V7 00/17] COLO: integrate colo frame with
- block replication and COLO proxy
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 0/2] qmp: 'wakeup-suspend-support' in
+ query-target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +29,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhangckid@gmail.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, jasowang@redhat.com, armbru@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, dgilbert@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MjYyNjgyMjgtMjc5NTEtMS1naXQtc2VuZC1lbWFpbC16aGFuZ2NraWRAZ21h
-aWwuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggVjcgMDAvMTddIENPTE86IGludGVn
-cmF0ZSBjb2xvIGZyYW1lIHdpdGggYmxvY2sgcmVwbGljYXRpb24gYW5kIENPTE8gcHJveHkKCj09
-PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9
-JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
-ZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21t
-aXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAk
-Y29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9n
-IC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1l
-bWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAg
-IGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAk
-ZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4
-MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXct
-cHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMTUyNjI2ODIy
-OC0yNzk1MS0xLWdpdC1zZW5kLWVtYWlsLXpoYW5nY2tpZEBnbWFpbC5jb20gLT4gcGF0Y2hldy8x
-NTI2MjY4MjI4LTI3OTUxLTEtZ2l0LXNlbmQtZW1haWwtemhhbmdja2lkQGdtYWlsLmNvbQogdCBb
-dGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTgwNTEzMDg1MDMyLjI3NzczLTEtc3dA
-d2VpbG5ldHouZGUgLT4gcGF0Y2hldy8yMDE4MDUxMzA4NTAzMi4yNzc3My0xLXN3QHdlaWxuZXR6
-LmRlClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZDRkZGVhMmExYSBDT0xPOiBxdWlj
-ayBmYWlsb3ZlciBwcm9jZXNzIGJ5IGtpY2sgQ09MTyB0aHJlYWQKMGYyZTE5ODNlYSBDT0xPOiBu
-b3RpZnkgbmV0IGZpbHRlcnMgYWJvdXQgY2hlY2twb2ludC9mYWlsb3ZlciBldmVudApjMTIyYjU1
-OGY1IGZpbHRlci1yZXdyaXRlcjogaGFuZGxlIGNoZWNrcG9pbnQgYW5kIGZhaWxvdmVyIGV2ZW50
-CjE5MWZhMzcyNDUgZmlsdGVyOiBBZGQgaGFuZGxlX2V2ZW50IG1ldGhvZCBmb3IgTmV0RmlsdGVy
-Q2xhc3MKYzEyZTNkYTM5MiBDT0xPOiBmbHVzaCBob3N0IGRpcnR5IHJhbSBmcm9tIGNhY2hlCjIz
-MjRiYzVlMzYgc2F2ZXZtOiBzcGxpdCB0aGUgcHJvY2VzcyBvZiBkaWZmZXJlbnQgc3RhZ2VzIGZv
-ciBsb2Fkdm0vc2F2ZXZtCjE5ZjQzNWNhMDggcWFwaTogQWRkIG5ldyBjb21tYW5kIHRvIHF1ZXJ5
-IGNvbG8gc3RhdHVzCjlmYTI5MDI2YzAgcW1wIGV2ZW50OiBBZGQgQ09MT19FWElUIGV2ZW50IHRv
-IG5vdGlmeSB1c2VycyB3aGlsZSBleGl0ZWQgQ09MTwozZWMwYmQzYjYwIENPTE86IEZsdXNoIG1l
-bW9yeSBkYXRhIGZyb20gcmFtIGNhY2hlCjQ0NTc3NWRjZDcgcmFtL0NPTE86IFJlY29yZCB0aGUg
-ZGlydHkgcGFnZXMgdGhhdCBTVk0gcmVjZWl2ZWQKZjE0ODc2ZjI3MCBDT0xPOiBMb2FkIGRpcnR5
-IHBhZ2VzIGludG8gU1ZNJ3MgUkFNIGNhY2hlIGZpcnN0bHkKZjAzMjAwZjM5NCBDT0xPOiBSZW1v
-dmUgY29sb19zdGF0ZSBtaWdyYXRpb24gc3RydWN0CmNkZWIyN2U3NjYgQ09MTzogQWRkIGJsb2Nr
-IHJlcGxpY2F0aW9uIGludG8gY29sbyBwcm9jZXNzCmJlODU0YWMyOWUgQ09MTzogaW50ZWdyYXRl
-IGNvbG8gY29tcGFyZSB3aXRoIGNvbG8gZnJhbWUKNTUxZmU3MDcyOSBjb2xvLWNvbXBhcmU6IHVz
-ZSBub3RpZmllciB0byBub3RpZnkgcGFja2V0cyBjb21wYXJpbmcgcmVzdWx0CjZjNWNjZWM0ZTYg
-Y29sby1jb21wYXJlOiBpbXBsZW1lbnQgdGhlIHByb2Nlc3Mgb2YgY2hlY2twb2ludAo5MjJhNzAz
-ZDQ0IGZpbHRlci1yZXdyaXRlcjogZml4IG1lbW9yeSBsZWFrIGZvciBjb25uZWN0aW9uIGluIGNv
-bm5lY3Rpb25fdHJhY2tfdGFibGUKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENI
-IDEvMTc6IGZpbHRlci1yZXdyaXRlcjogZml4IG1lbW9yeSBsZWFrIGZvciBjb25uZWN0aW9uIGlu
-IGNvbm5lY3Rpb25fdHJhY2tfdGFibGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xNzogY29sby1jb21w
-YXJlOiBpbXBsZW1lbnQgdGhlIHByb2Nlc3Mgb2YgY2hlY2twb2ludC4uLgpDaGVja2luZyBQQVRD
-SCAzLzE3OiBjb2xvLWNvbXBhcmU6IHVzZSBub3RpZmllciB0byBub3RpZnkgcGFja2V0cyBjb21w
-YXJpbmcgcmVzdWx0Li4uCkNoZWNraW5nIFBBVENIIDQvMTc6IENPTE86IGludGVncmF0ZSBjb2xv
-IGNvbXBhcmUgd2l0aCBjb2xvIGZyYW1lLi4uCkNoZWNraW5nIFBBVENIIDUvMTc6IENPTE86IEFk
-ZCBibG9jayByZXBsaWNhdGlvbiBpbnRvIGNvbG8gcHJvY2Vzcy4uLgpDaGVja2luZyBQQVRDSCA2
-LzE3OiBDT0xPOiBSZW1vdmUgY29sb19zdGF0ZSBtaWdyYXRpb24gc3RydWN0Li4uCkNoZWNraW5n
-IFBBVENIIDcvMTc6IENPTE86IExvYWQgZGlydHkgcGFnZXMgaW50byBTVk0ncyBSQU0gY2FjaGUg
-Zmlyc3RseS4uLgpDaGVja2luZyBQQVRDSCA4LzE3OiByYW0vQ09MTzogUmVjb3JkIHRoZSBkaXJ0
-eSBwYWdlcyB0aGF0IFNWTSByZWNlaXZlZC4uLgpDaGVja2luZyBQQVRDSCA5LzE3OiBDT0xPOiBG
-bHVzaCBtZW1vcnkgZGF0YSBmcm9tIHJhbSBjYWNoZS4uLgpDaGVja2luZyBQQVRDSCAxMC8xNzog
-cW1wIGV2ZW50OiBBZGQgQ09MT19FWElUIGV2ZW50IHRvIG5vdGlmeSB1c2VycyB3aGlsZSBleGl0
-ZWQgQ09MTy4uLgpDaGVja2luZyBQQVRDSCAxMS8xNzogcWFwaTogQWRkIG5ldyBjb21tYW5kIHRv
-IHF1ZXJ5IGNvbG8gc3RhdHVzLi4uCkVSUk9SOiBzdXNwZWN0IGNvZGUgaW5kZW50IGZvciBjb25k
-aXRpb25hbCBzdGF0ZW1lbnRzICg0LCA5KQojMzg6IEZJTEU6IG1pZ3JhdGlvbi9jb2xvLmM6MjUw
-OgorICAgIH0gZWxzZSBpZiAoZ2V0X2NvbG9fbW9kZSgpID09IENPTE9fTU9ERV9QUklNQVJZKSB7
-CisgICAgICAgICBzdGF0ZSA9IG1pZ3JhdGVfZ2V0X2N1cnJlbnQoKS0+c3RhdGU7Cgp0b3RhbDog
-MSBlcnJvcnMsIDAgd2FybmluZ3MsIDgyIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
-eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
-ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDEyLzE3OiBzYXZldm06IHNwbGl0
-IHRoZSBwcm9jZXNzIG9mIGRpZmZlcmVudCBzdGFnZXMgZm9yIGxvYWR2bS9zYXZldm0uLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMTMvMTc6IENPTE86IGZsdXNoIGhvc3QgZGlydHkgcmFtIGZyb20gY2FjaGUu
-Li4KQ2hlY2tpbmcgUEFUQ0ggMTQvMTc6IGZpbHRlcjogQWRkIGhhbmRsZV9ldmVudCBtZXRob2Qg
-Zm9yIE5ldEZpbHRlckNsYXNzLi4uCkNoZWNraW5nIFBBVENIIDE1LzE3OiBmaWx0ZXItcmV3cml0
-ZXI6IGhhbmRsZSBjaGVja3BvaW50IGFuZCBmYWlsb3ZlciBldmVudC4uLgpDaGVja2luZyBQQVRD
-SCAxNi8xNzogQ09MTzogbm90aWZ5IG5ldCBmaWx0ZXJzIGFib3V0IGNoZWNrcG9pbnQvZmFpbG92
-ZXIgZXZlbnQuLi4KQ2hlY2tpbmcgUEFUQ0ggMTcvMTc6IENPTE86IHF1aWNrIGZhaWxvdmVyIHBy
-b2Nlc3MgYnkga2ljayBDT0xPIHRocmVhZC4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
-bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
-bGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
-ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+Markus Armbruster <armbru@redhat.com> writes:
+
+> Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com> writes:
+>
+>> Ping
+>
+> Michael, you reviewed v4 (at least in part), can you have a look?
+
+Have these patches fallen through the cracks?
