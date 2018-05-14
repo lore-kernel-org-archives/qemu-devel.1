@@ -1,21 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fIJ7e-0006OB-S7
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 15:27:03 -0400
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fIJ7k-0006Rv-V8
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 15:27:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fIJ7d-00089y-OI
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 15:27:02 -0400
-References: <20180509162637.15575-1-kwolf@redhat.com>
-	<20180509162637.15575-28-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <eb2515ab-3c00-af39-7e08-359cb9051806@redhat.com>
-Date: Mon, 14 May 2018 21:26:52 +0200
+	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fIJ7h-0008FZ-N0
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 15:27:08 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33008
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <akrowiak@linux.vnet.ibm.com>)
+	id 1fIJ7h-0008Ej-GQ
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 15:27:05 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w4EJNkNF009690
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 15:27:04 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2hyg9p8rnf-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 15:27:04 -0400
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <akrowiak@linux.vnet.ibm.com>;
+	Mon, 14 May 2018 13:27:03 -0600
+References: <1525782303-16940-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<1525782303-16940-5-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<c36ec83f-8cba-cf7b-3054-35cf4cd65c14@linux.ibm.com>
+	<1806faa3-dc46-f638-5c87-8a7415c9025a@linux.vnet.ibm.com>
+	<369a35de-4313-ee41-bb11-634c6bc45a72@linux.ibm.com>
+From: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+Date: Mon, 14 May 2018 15:26:53 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180509162637.15575-28-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="YqPFsdPDj9QBeTKuFTQ4oIU97QFAIj2Ex"
-Subject: Re: [Qemu-devel] [PATCH 27/42] job: Add job_drain()
+In-Reply-To: <369a35de-4313-ee41-bb11-634c6bc45a72@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Message-Id: <3531be60-c468-290c-135f-2c1091bc5d80@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v5 4/6] s390x/vfio: ap: Introduce VFIO AP
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,96 +47,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
+To: pmorel@linux.ibm.com, Halil Pasic <pasic@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---YqPFsdPDj9QBeTKuFTQ4oIU97QFAIj2Ex
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com,
- qemu-devel@nongnu.org
-Message-ID: <eb2515ab-3c00-af39-7e08-359cb9051806@redhat.com>
-Subject: Re: [PATCH 27/42] job: Add job_drain()
-References: <20180509162637.15575-1-kwolf@redhat.com>
- <20180509162637.15575-28-kwolf@redhat.com>
-In-Reply-To: <20180509162637.15575-28-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 05/11/2018 05:02 AM, Pierre Morel wrote:
+> On 10/05/2018 15:10, Tony Krowiak wrote:
+>> On 05/09/2018 10:28 AM, Halil Pasic wrote:
+>>>
+>>>
+>>> On 05/08/2018 02:25 PM, Tony Krowiak wrote:
+>>>> Introduces a VFIO based AP device. The device is defined via
+>>>> the QEMU command line by specifying:
+>>>>
+>>>>      -device vfio-ap,sysfsdev=<path-to-mediated-matrix-device>
+>>>>
+>>>> There may be only one vfio-ap device configured for a guest.
+>>>>
+>>>> The mediated matrix device is created by the VFIO AP device
+>>> [..]
+>>>> + * directory.
+>>>> + */
+>>>> +
+>>>> +#include <linux/vfio.h>
+>>>> +#include <sys/ioctl.h>
+>>>> +#include "qemu/osdep.h"
+>>>> +#include "qapi/error.h"
+>>>> +#include "hw/sysbus.h"
+>>>> +#include "hw/vfio/vfio.h"
+>>>> +#include "hw/vfio/vfio-common.h"
+>>>> +#include "hw/s390x/ap-device.h"
+>>>> +#include "qemu/error-report.h"
+>>>> +#include "qemu/queue.h"
+>>>> +#include "qemu/option.h"
+>>>> +#include "qemu/config-file.h"
+>>>> +#include "cpu.h"
+>>>> +#include "kvm_s390x.h"
+>>>> +#include "sysemu/sysemu.h"
+>>>> +
+>>>> +#define VFIO_AP_DEVICE_TYPE      "vfio-ap"
+>>>> +
+>>>> +typedef struct VFIOAPDevice {
+>>>> +    APDevice apdev;
+>>>> +    VFIODevice vdev;
+>>>> +    QTAILQ_ENTRY(VFIOAPDevice) sibling;
+>>>> +} VFIOAPDevice;
+>>>> +
+>>>> +VFIOAPDevice *vfio_apdev;
+>>>> +
+>>>> +static void vfio_ap_compute_needs_reset(VFIODevice *vdev)
+>>>> +{
+>>>> +    vdev->needs_reset = false;
+>>>> +}
+>>>> +
+>>>> +/*
+>>>> + * We don't need vfio_hot_reset_multi and vfio_eoi operations for
+>>>> + * vfio-ap-matrix device now.
+>>>> + */
+>>>> +struct VFIODeviceOps vfio_ap_ops = {
+>>>> +    .vfio_compute_needs_reset = vfio_ap_compute_needs_reset,
+>>>> +};
+>>>> +
+>>>
+>>> I'm not familiar with the vfio infrastructure, but AFAIR I
+>>> haven't seen any substantial reset handling (QEMU or kernel).
+>>> Did I miss something?
+>>
+>> No, you didn't miss anything, there is no reset handling.
+>>
+>>>
+>>> If I did not. I think this is a big problem. We need to at least
+>>> zeroize the queues (e.g. on system reset)  to avoid leaking
+>>> sensitive information. Without this, there is no sane way to use
+>>> ap-passthrough. Or am I wrong?
+>>
+>> I do not have a definitive answer, I will have to look into it.
+>> I'm thinking that since we are using ap-passthrough, the AP bus
+>> running on the guest would be responsible for handling reset possibly
+>> by resetting or zeroizing its queues. I'll get back to you on this.
+>>
+>>>
+>>> Regards,
+>>> Halil
+>>>
+>>
+> On the host, on system reset or subsystem reset, the queues are zeroized.
 
-On 2018-05-09 18:26, Kevin Wolf wrote:
-> block_job_drain() contains a blk_drain() call which cannot be moved to
-> Job, so add a new JobDriver callback JobDriver.drain which has a common=
+Can you point me to where this is done?
 
-> implementation for all BlockJobs. In addition to this we keep the
-> existing BlockJobDriver.drain callback that is called by the common
-> drain implementation for all block jobs.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  include/block/blockjob_int.h | 12 ++++++++++++
->  include/qemu/job.h           | 13 +++++++++++++
->  block/backup.c               |  1 +
->  block/commit.c               |  1 +
->  block/mirror.c               |  2 ++
->  block/stream.c               |  1 +
->  blockjob.c                   | 20 ++++++++++----------
->  job.c                        | 11 +++++++++++
->  tests/test-bdrv-drain.c      |  1 +
->  tests/test-blockjob-txn.c    |  1 +
->  tests/test-blockjob.c        |  2 ++
->  11 files changed, 55 insertions(+), 10 deletions(-)
->=20
-> diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.=
-h
-> index bf2b762808..38fe22d7e0 100644
-> --- a/include/block/blockjob_int.h
-> +++ b/include/block/blockjob_int.h
-> @@ -65,6 +65,10 @@ struct BlockJobDriver {
->       * If the callback is not NULL, it will be invoked when the job ha=
-s to be
->       * synchronously cancelled or completed; it should drain BlockDriv=
-erStates
->       * as required to ensure progress.
-> +     *
-> +     * Block jobs must use the default implementation for job_driver.d=
-rain,
-> +     * which will in turn call this callback after doing generic block=
- job
-> +     * stuff.
->       */
->      void (*drain)(BlockJob *job);
+>
+>
+> It means we must do the same for the guest and implement both cold and 
+> hot reset.
+>
+> One of the patches in the interrupt handling serie I sent last 
+> wednesday zeroize
+> the queues on starting and stopping the guest so no data leak occurs 
+> between
+> host and guests or between guests.
 
-I don't really see the point of having two drain callbacks for block
-jobs.  Well, it allows an assert() that block_job_drain() is called at
-some point, but still.  I'd like block jobs to be not very special, but
-this makes them a bit more special than they need to be.
+I'm sorry, I was not aware of them and consequently have not yet 
+reviewed them.
+I'll take a look at them ASAP.
 
-Maybe I'd like it a bit more if there was a macro to automatically set
-these mandatory values for block jobs...
+>
+>
+> However we should follow the machine specification and zeroize the 
+> queues between
+> two guest reset too. i.e. in the "reset" call back. and implement the 
+> VFIO_DEVICE_RESET
+> ioctl.
 
-But mostly a question of style, so I'll grudgingly give a:
+Can you point me to the specification to which you are referring? You 
+can send a personal
+email if this is restricted information.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
->  };
-
-
---YqPFsdPDj9QBeTKuFTQ4oIU97QFAIj2Ex
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr54vwACgkQ9AfbAGHV
-z0D9Kgf/X5t4SIp4vDC0Rf3jTOyNBrc2dCRk/mzDmH5Cl/hMXTbwdZDw3gCfXZ8e
-lM3qF0JUJz9Xb/JS5oCq7SUV5DCJD0+TbI6O/rCTJuamIkDha6LmtclTZhVXZ9P2
-EHOwcO2b23y2/vUzSdmlHcILcuFlIjW6KpgwB5SHRQn4FGCFRe8FSu4Eb954J16z
-Yf2sjz+ySdi3Am6WCogAhS1PdGLSMp3+eTo7Ec8J/IxKsocJ5UM4DBLZxOYnsKRY
-ubAOojoSuutLNg759MA0GCWnuVQSiYIUQvwHjXt+MreAL9UzuZqhjdLOklASDLnM
-pdDn+Sbx53NrOOkRyX+TZiRznt+i6g==
-=/8Az
------END PGP SIGNATURE-----
-
---YqPFsdPDj9QBeTKuFTQ4oIU97QFAIj2Ex--
+>
+>
+>
+> Regards,
+>
+> Pierre
+>
