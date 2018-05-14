@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fIHYD-0003S7-6a
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 13:46:22 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fIHcd-0004nP-2C
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 13:50:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fIHYC-0000x3-DE
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 13:46:21 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41648)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fIHYC-0000w4-5x
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 13:46:20 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 May 2018 18:46:16 +0100
-Message-Id: <20180514174616.19601-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] linux-user: Assert on bad type in
- thunk_type_align() and thunk_type_size()
+	(envelope-from <mreitz@redhat.com>) id 1fIHcc-0004EW-A7
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 13:50:55 -0400
+References: <20180509162637.15575-1-kwolf@redhat.com>
+	<20180509162637.15575-23-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <ab070586-9a50-443e-da62-579a5343d507@redhat.com>
+Date: Mon, 14 May 2018 19:50:44 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180509162637.15575-23-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="cQeLYVQIaVMZzNBIqu4Vx9ONLK0GWMlld"
+Subject: Re: [Qemu-devel] [PATCH 22/42] job: Move BlockJobCreateFlags to Job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,47 +24,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-In thunk_type_align() and thunk_type_size() we currently return
--1 if the value at the type_ptr isn't one of the TYPE_* values
-we understand. However, this should never happen, and if it does
-then the calling code will go confusingly wrong because none
-of the callsites try to handle an error return. Switch to an
-assertion instead, so that if this does somehow happen we'll have
-a nice clear backtrace of what happened rather than a weird crash
-or misbehaviour.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--cQeLYVQIaVMZzNBIqu4Vx9ONLK0GWMlld
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com,
+ qemu-devel@nongnu.org
+Message-ID: <ab070586-9a50-443e-da62-579a5343d507@redhat.com>
+Subject: Re: [PATCH 22/42] job: Move BlockJobCreateFlags to Job
+References: <20180509162637.15575-1-kwolf@redhat.com>
+ <20180509162637.15575-23-kwolf@redhat.com>
+In-Reply-To: <20180509162637.15575-23-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This also silences various Coverity complaints about not handling
-the negative return value (CID 1005735, 1005736, 1005738, 1390582).
+On 2018-05-09 18:26, Kevin Wolf wrote:
+> This renames the BlockJobCreateFlags constants, moves a few JOB_INTERNA=
+L
+> checks to job_create() and the auto_{finalize,dismiss} fields from
+> BlockJob to Job.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  include/block/blockjob.h     | 17 -----------------
+>  include/block/blockjob_int.h |  3 +--
+>  include/qemu/job.h           | 20 +++++++++++++++++++-
+>  block/commit.c               |  2 +-
+>  block/mirror.c               |  2 +-
+>  block/replication.c          |  4 ++--
+>  block/stream.c               |  2 +-
+>  blockdev.c                   | 14 +++++++-------
+>  blockjob.c                   | 27 +++++++--------------------
+>  job.c                        | 11 ++++++++++-
+>  qemu-img.c                   |  2 +-
+>  tests/test-blockjob-txn.c    |  2 +-
+>  tests/test-blockjob.c        |  4 ++--
+>  13 files changed, 53 insertions(+), 57 deletions(-)
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- include/exec/user/thunk.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-diff --git a/include/exec/user/thunk.h b/include/exec/user/thunk.h
-index f19ef4b230..840d6d899b 100644
---- a/include/exec/user/thunk.h
-+++ b/include/exec/user/thunk.h
-@@ -135,7 +135,7 @@ static inline int thunk_type_size(const argtype *type_ptr, int is_host)
-         se = struct_entries + type_ptr[1];
-         return se->size[is_host];
-     default:
--        return -1;
-+        g_assert_not_reached();
-     }
- }
- 
-@@ -173,7 +173,7 @@ static inline int thunk_type_align(const argtype *type_ptr, int is_host)
-         se = struct_entries + type_ptr[1];
-         return se->align[is_host];
-     default:
--        return -1;
-+        g_assert_not_reached();
-     }
- }
- 
--- 
-2.17.0
+
+--cQeLYVQIaVMZzNBIqu4Vx9ONLK0GWMlld
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr5zHQACgkQ9AfbAGHV
+z0DMtwf/RvmcCaD5pvo+0bu2Wk1vY1mHn8s0sBOnrMGgJgiRLSp5cOg6KanHWcta
+Zj/bGzYaHX2U7yN7dlXC1qJ6Ts/3+RyOdbC1gEvp+pBgmOvn4s8LfJ6HRhY7lLbe
+9yyLm2OjcHd9pdDYrSUPpIzPmgnWRaDYHFAntZEBKnIoiSoR2Yk4oJmnknn9Issu
+SCol3nZpxV7YEZLXvxkecRrUXT2W4fSLQPvGZqJXj4VlTyQJ4uwKC36iGrMO0kdH
+B1MGYM/DqTJCqxtnV8ISnxduD5louw4zyDkW+jCkrHdWNd5EvH/jxE35l0L0GGHB
+U4XQgoahZp7snuG/cB8gjZhH3OP8wQ==
+=kL5H
+-----END PGP SIGNATURE-----
+
+--cQeLYVQIaVMZzNBIqu4Vx9ONLK0GWMlld--
