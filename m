@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fILwQ-0004Kb-CX
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:27:39 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fILwQ-0004Kd-Cm
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:27:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fILwO-00008l-Pp
+	(envelope-from <richard.henderson@linaro.org>) id 1fILwN-00007X-Kt
 	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:27:38 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:44341)
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:45704)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fILwO-000085-Jc
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:27:36 -0400
-Received: by mail-pg0-x242.google.com with SMTP id x145-v6so6070720pgx.11
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 15:27:36 -0700 (PDT)
+	id 1fILwN-00006s-Dj
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 18:27:35 -0400
+Received: by mail-pf0-x241.google.com with SMTP id c10-v6so6672823pfi.12
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 15:27:35 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 14 May 2018 15:27:14 -0700
-Message-Id: <20180514222714.7982-14-richard.henderson@linaro.org>
+Date: Mon, 14 May 2018 15:27:13 -0700
+Message-Id: <20180514222714.7982-13-richard.henderson@linaro.org>
 In-Reply-To: <20180514222714.7982-1-richard.henderson@linaro.org>
 References: <20180514222714.7982-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 13/13] target/openrisc: Merge disas_openrisc_insn
+Subject: [Qemu-devel] [PULL 12/13] target/openrisc: Convert dec_float
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,40 +32,415 @@ Cc: Stafford Horne <shorne@gmail.com>, peter.maydell@linaro.org
 Acked-by: Stafford Horne <shorne@gmail.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/openrisc/translate.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+ target/openrisc/translate.c  | 356 +++++++++++++----------------------
+ target/openrisc/insns.decode |  21 +++
+ 2 files changed, 148 insertions(+), 229 deletions(-)
 
 diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-index 1f87ad6b2e..e7c96ca990 100644
+index c4256518cb..1f87ad6b2e 100644
 --- a/target/openrisc/translate.c
 +++ b/target/openrisc/translate.c
-@@ -1373,14 +1373,6 @@ static bool trans_lf_sfle_s(DisasContext *dc, arg_ab *a, uint32_t insn)
+@@ -1241,245 +1241,143 @@ static bool trans_l_rfe(DisasContext *dc, arg_l_rfe *a, uint32_t insn)
      return true;
  }
  
--static void disas_openrisc_insn(DisasContext *dc, OpenRISCCPU *cpu)
--{
--    uint32_t insn = cpu_ldl_code(&cpu->env, dc->base.pc_next);
--    if (!decode(dc, insn)) {
--        gen_illegal_exception(dc);
--    }
--}
+-static void dec_float(DisasContext *dc, uint32_t insn)
++static void do_fp2(DisasContext *dc, arg_da *a,
++                   void (*fn)(TCGv, TCGv_env, TCGv))
+ {
+-    uint32_t op0;
+-    uint32_t ra, rb, rd;
+-    op0 = extract32(insn, 0, 8);
+-    ra = extract32(insn, 16, 5);
+-    rb = extract32(insn, 11, 5);
+-    rd = extract32(insn, 21, 5);
++    check_r0_write(a->d);
++    fn(cpu_R[a->d], cpu_env, cpu_R[a->a]);
++    gen_helper_update_fpcsr(cpu_env);
++}
+ 
+-    switch (op0) {
+-    case 0x00: /* lf.add.s */
+-        LOG_DIS("lf.add.s r%d, r%d, r%d\n", rd, ra, rb);
+-        check_r0_write(rd);
+-        gen_helper_float_add_s(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
++static void do_fp3(DisasContext *dc, arg_dab *a,
++                   void (*fn)(TCGv, TCGv_env, TCGv, TCGv))
++{
++    check_r0_write(a->d);
++    fn(cpu_R[a->d], cpu_env, cpu_R[a->a], cpu_R[a->b]);
++    gen_helper_update_fpcsr(cpu_env);
++}
+ 
+-    case 0x01: /* lf.sub.s */
+-        LOG_DIS("lf.sub.s r%d, r%d, r%d\n", rd, ra, rb);
+-        check_r0_write(rd);
+-        gen_helper_float_sub_s(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
 -
- static void openrisc_tr_init_disas_context(DisasContextBase *dcb, CPUState *cs)
- {
-     DisasContext *dc = container_of(dcb, DisasContext, base);
-@@ -1435,8 +1427,11 @@ static void openrisc_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
- {
-     DisasContext *dc = container_of(dcbase, DisasContext, base);
-     OpenRISCCPU *cpu = OPENRISC_CPU(cs);
-+    uint32_t insn = cpu_ldl_code(&cpu->env, dc->base.pc_next);
- 
--    disas_openrisc_insn(dc, cpu);
-+    if (!decode(dc, insn)) {
-+        gen_illegal_exception(dc);
+-    case 0x02:    /* lf.mul.s */
+-        LOG_DIS("lf.mul.s r%d, r%d, r%d\n", rd, ra, rb);
+-        check_r0_write(rd);
+-        gen_helper_float_mul_s(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
+-
+-    case 0x03: /* lf.div.s */
+-        LOG_DIS("lf.div.s r%d, r%d, r%d\n", rd, ra, rb);
+-        check_r0_write(rd);
+-        gen_helper_float_div_s(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
+-
+-    case 0x04: /* lf.itof.s */
+-        LOG_DIS("lf.itof r%d, r%d\n", rd, ra);
+-        check_r0_write(rd);
+-        gen_helper_itofs(cpu_R[rd], cpu_env, cpu_R[ra]);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
+-
+-    case 0x05: /* lf.ftoi.s */
+-        LOG_DIS("lf.ftoi r%d, r%d\n", rd, ra);
+-        check_r0_write(rd);
+-        gen_helper_ftois(cpu_R[rd], cpu_env, cpu_R[ra]);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
+-
+-    case 0x06: /* lf.rem.s */
+-        LOG_DIS("lf.rem.s r%d, r%d, r%d\n", rd, ra, rb);
+-        check_r0_write(rd);
+-        gen_helper_float_rem_s(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
+-
+-    case 0x07: /* lf.madd.s */
+-        LOG_DIS("lf.madd.s r%d, r%d, r%d\n", rd, ra, rb);
+-        check_r0_write(rd);
+-        gen_helper_float_madd_s(cpu_R[rd], cpu_env, cpu_R[rd],
+-                                cpu_R[ra], cpu_R[rb]);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
+-
+-    case 0x08: /* lf.sfeq.s */
+-        LOG_DIS("lf.sfeq.s r%d, r%d\n", ra, rb);
+-        gen_helper_float_eq_s(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
+-
+-    case 0x09: /* lf.sfne.s */
+-        LOG_DIS("lf.sfne.s r%d, r%d\n", ra, rb);
+-        gen_helper_float_eq_s(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
+-        tcg_gen_xori_tl(cpu_sr_f, cpu_sr_f, 1);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
+-
+-    case 0x0a: /* lf.sfgt.s */
+-        LOG_DIS("lf.sfgt.s r%d, r%d\n", ra, rb);
+-        gen_helper_float_lt_s(cpu_sr_f, cpu_env, cpu_R[rb], cpu_R[ra]);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
+-
+-    case 0x0b: /* lf.sfge.s */
+-        LOG_DIS("lf.sfge.s r%d, r%d\n", ra, rb);
+-        gen_helper_float_le_s(cpu_sr_f, cpu_env, cpu_R[rb], cpu_R[ra]);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
+-
+-    case 0x0c: /* lf.sflt.s */
+-        LOG_DIS("lf.sflt.s r%d, r%d\n", ra, rb);
+-        gen_helper_float_lt_s(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
+-
+-    case 0x0d: /* lf.sfle.s */
+-        LOG_DIS("lf.sfle.s r%d, r%d\n", ra, rb);
+-        gen_helper_float_le_s(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
+-
+-#ifdef TARGET_OPENRISC64
+-    case 0x10: /* lf.add.d */
+-        LOG_DIS("lf.add.d r%d, r%d, r%d\n", rd, ra, rb);
+-        check_of64s(dc);
+-        check_r0_write(rd);
+-        gen_helper_float_add_d(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
+-
+-    case 0x11: /* lf.sub.d */
+-        LOG_DIS("lf.sub.d r%d, r%d, r%d\n", rd, ra, rb);
+-        check_of64s(dc);
+-        check_r0_write(rd);
+-        gen_helper_float_sub_d(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
+-
+-    case 0x12: /* lf.mul.d */
+-        LOG_DIS("lf.mul.d r%d, r%d, r%d\n", rd, ra, rb);
+-        check_of64s(dc);
+-        check_r0_write(rd);
+-        gen_helper_float_mul_d(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
+-
+-    case 0x13: /* lf.div.d */
+-        LOG_DIS("lf.div.d r%d, r%d, r%d\n", rd, ra, rb);
+-        check_of64s(dc);
+-        check_r0_write(rd);
+-        gen_helper_float_div_d(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
+-
+-    case 0x14: /* lf.itof.d */
+-        LOG_DIS("lf.itof r%d, r%d\n", rd, ra);
+-        check_of64s(dc);
+-        check_r0_write(rd);
+-        gen_helper_itofd(cpu_R[rd], cpu_env, cpu_R[ra]);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
+-
+-    case 0x15: /* lf.ftoi.d */
+-        LOG_DIS("lf.ftoi r%d, r%d\n", rd, ra);
+-        check_of64s(dc);
+-        check_r0_write(rd);
+-        gen_helper_ftoid(cpu_R[rd], cpu_env, cpu_R[ra]);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
+-
+-    case 0x16: /* lf.rem.d */
+-        LOG_DIS("lf.rem.d r%d, r%d, r%d\n", rd, ra, rb);
+-        check_of64s(dc);
+-        check_r0_write(rd);
+-        gen_helper_float_rem_d(cpu_R[rd], cpu_env, cpu_R[ra], cpu_R[rb]);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
+-
+-    case 0x17: /* lf.madd.d */
+-        LOG_DIS("lf.madd.d r%d, r%d, r%d\n", rd, ra, rb);
+-        check_of64s(dc);
+-        check_r0_write(rd);
+-        gen_helper_float_madd_d(cpu_R[rd], cpu_env, cpu_R[rd],
+-                                cpu_R[ra], cpu_R[rb]);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
+-
+-    case 0x18: /* lf.sfeq.d */
+-        LOG_DIS("lf.sfeq.d r%d, r%d\n", ra, rb);
+-        check_of64s(dc);
+-        gen_helper_float_eq_d(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
+-
+-    case 0x1a: /* lf.sfgt.d */
+-        LOG_DIS("lf.sfgt.d r%d, r%d\n", ra, rb);
+-        check_of64s(dc);
+-        gen_helper_float_lt_d(cpu_sr_f, cpu_env, cpu_R[rb], cpu_R[ra]);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
+-
+-    case 0x1b: /* lf.sfge.d */
+-        LOG_DIS("lf.sfge.d r%d, r%d\n", ra, rb);
+-        check_of64s(dc);
+-        gen_helper_float_le_d(cpu_sr_f, cpu_env, cpu_R[rb], cpu_R[ra]);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
+-
+-    case 0x19: /* lf.sfne.d */
+-        LOG_DIS("lf.sfne.d r%d, r%d\n", ra, rb);
+-        check_of64s(dc);
+-        gen_helper_float_eq_d(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
+-        tcg_gen_xori_tl(cpu_sr_f, cpu_sr_f, 1);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
+-
+-    case 0x1c: /* lf.sflt.d */
+-        LOG_DIS("lf.sflt.d r%d, r%d\n", ra, rb);
+-        check_of64s(dc);
+-        gen_helper_float_lt_d(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
+-
+-    case 0x1d: /* lf.sfle.d */
+-        LOG_DIS("lf.sfle.d r%d, r%d\n", ra, rb);
+-        check_of64s(dc);
+-        gen_helper_float_le_d(cpu_sr_f, cpu_env, cpu_R[ra], cpu_R[rb]);
+-        gen_helper_update_fpcsr(cpu_env);
+-        break;
+-#endif
+-
+-    default:
+-        gen_illegal_exception(dc);
+-        break;
++static void do_fpcmp(DisasContext *dc, arg_ab *a,
++                     void (*fn)(TCGv, TCGv_env, TCGv, TCGv),
++                     bool inv, bool swap)
++{
++    if (swap) {
++        fn(cpu_sr_f, cpu_env, cpu_R[a->b], cpu_R[a->a]);
++    } else {
++        fn(cpu_sr_f, cpu_env, cpu_R[a->a], cpu_R[a->b]);
+     }
++    if (inv) {
++        tcg_gen_xori_tl(cpu_sr_f, cpu_sr_f, 1);
 +    }
-     dc->base.pc_next += 4;
++    gen_helper_update_fpcsr(cpu_env);
++}
++
++static bool trans_lf_add_s(DisasContext *dc, arg_dab *a, uint32_t insn)
++{
++    LOG_DIS("lf.add.s r%d, r%d, r%d\n", a->d, a->a, a->b);
++    do_fp3(dc, a, gen_helper_float_add_s);
++    return true;
++}
++
++static bool trans_lf_sub_s(DisasContext *dc, arg_dab *a, uint32_t insn)
++{
++    LOG_DIS("lf.sub.s r%d, r%d, r%d\n", a->d, a->a, a->b);
++    do_fp3(dc, a, gen_helper_float_sub_s);
++    return true;
++}
++
++static bool trans_lf_mul_s(DisasContext *dc, arg_dab *a, uint32_t insn)
++{
++    LOG_DIS("lf.mul.s r%d, r%d, r%d\n", a->d, a->a, a->b);
++    do_fp3(dc, a, gen_helper_float_mul_s);
++    return true;
++}
++
++static bool trans_lf_div_s(DisasContext *dc, arg_dab *a, uint32_t insn)
++{
++    LOG_DIS("lf.div.s r%d, r%d, r%d\n", a->d, a->a, a->b);
++    do_fp3(dc, a, gen_helper_float_div_s);
++    return true;
++}
++
++static bool trans_lf_rem_s(DisasContext *dc, arg_dab *a, uint32_t insn)
++{
++    LOG_DIS("lf.rem.s r%d, r%d, r%d\n", a->d, a->a, a->b);
++    do_fp3(dc, a, gen_helper_float_rem_s);
++    return true;
++}
++
++static bool trans_lf_itof_s(DisasContext *dc, arg_da *a, uint32_t insn)
++{
++    LOG_DIS("lf.itof.s r%d, r%d\n", a->d, a->a);
++    do_fp2(dc, a, gen_helper_itofs);
++    return true;
++}
++
++static bool trans_lf_ftoi_s(DisasContext *dc, arg_da *a, uint32_t insn)
++{
++    LOG_DIS("lf.ftoi.s r%d, r%d\n", a->d, a->a);
++    do_fp2(dc, a, gen_helper_ftois);
++    return true;
++}
++
++static bool trans_lf_madd_s(DisasContext *dc, arg_dab *a, uint32_t insn)
++{
++    LOG_DIS("lf.madd.s r%d, r%d, r%d\n", a->d, a->a, a->b);
++    check_r0_write(a->d);
++    gen_helper_float_madd_s(cpu_R[a->d], cpu_env, cpu_R[a->d],
++                            cpu_R[a->a], cpu_R[a->b]);
++    gen_helper_update_fpcsr(cpu_env);
++    return true;
++}
++
++static bool trans_lf_sfeq_s(DisasContext *dc, arg_ab *a, uint32_t insn)
++{
++    LOG_DIS("lf.sfeq.s r%d, r%d\n", a->a, a->b);
++    do_fpcmp(dc, a, gen_helper_float_eq_s, false, false);
++    return true;
++}
++
++static bool trans_lf_sfne_s(DisasContext *dc, arg_ab *a, uint32_t insn)
++{
++    LOG_DIS("lf.sfne.s r%d, r%d\n", a->a, a->b);
++    do_fpcmp(dc, a, gen_helper_float_eq_s, true, false);
++    return true;
++}
++
++static bool trans_lf_sfgt_s(DisasContext *dc, arg_ab *a, uint32_t insn)
++{
++    LOG_DIS("lf.sfgt.s r%d, r%d\n", a->a, a->b);
++    do_fpcmp(dc, a, gen_helper_float_lt_s, false, true);
++    return true;
++}
++
++static bool trans_lf_sfge_s(DisasContext *dc, arg_ab *a, uint32_t insn)
++{
++    LOG_DIS("lf.sfge.s r%d, r%d\n", a->a, a->b);
++    do_fpcmp(dc, a, gen_helper_float_le_s, false, true);
++    return true;
++}
++
++static bool trans_lf_sflt_s(DisasContext *dc, arg_ab *a, uint32_t insn)
++{
++    LOG_DIS("lf.sflt.s r%d, r%d\n", a->a, a->b);
++    do_fpcmp(dc, a, gen_helper_float_lt_s, false, false);
++    return true;
++}
++
++static bool trans_lf_sfle_s(DisasContext *dc, arg_ab *a, uint32_t insn)
++{
++    LOG_DIS("lf.sfle.s r%d, r%d\n", a->a, a->b);
++    do_fpcmp(dc, a, gen_helper_float_le_s, false, false);
++    return true;
+ }
  
-     /* delay slot */
+ static void disas_openrisc_insn(DisasContext *dc, OpenRISCCPU *cpu)
+ {
+-    uint32_t op0;
+     uint32_t insn = cpu_ldl_code(&cpu->env, dc->base.pc_next);
+-
+-    /* Transition to the auto-generated decoder.  */
+-    if (decode(dc, insn)) {
+-        return;
+-    }
+-
+-    op0 = extract32(insn, 26, 6);
+-    switch (op0) {
+-    case 0x32:
+-        dec_float(dc, insn);
+-        break;
+-
+-    default:
++    if (!decode(dc, insn)) {
+         gen_illegal_exception(dc);
+-        break;
+     }
+ }
+ 
+diff --git a/target/openrisc/insns.decode b/target/openrisc/insns.decode
+index 4ec0e2de3a..dad68c8422 100644
+--- a/target/openrisc/insns.decode
++++ b/target/openrisc/insns.decode
+@@ -166,3 +166,24 @@ l_sfgtsi        101111 01010 a:5 i:s16
+ l_sfgesi        101111 01011 a:5 i:s16
+ l_sfltsi        101111 01100 a:5 i:s16
+ l_sflesi        101111 01101 a:5 i:s16
++
++####
++# FP Instructions
++####
++
++lf_add_s        110010 d:5 a:5 b:5   --- 00000000
++lf_sub_s        110010 d:5 a:5 b:5   --- 00000001
++lf_mul_s        110010 d:5 a:5 b:5   --- 00000010
++lf_div_s        110010 d:5 a:5 b:5   --- 00000011
++lf_rem_s        110010 d:5 a:5 b:5   --- 00000110
++lf_madd_s       110010 d:5 a:5 b:5   --- 00000111
++
++lf_itof_s       110010 d:5 a:5 00000 --- 00000100
++lf_ftoi_s       110010 d:5 a:5 00000 --- 00000101
++
++lf_sfeq_s       110010 ----- a:5 b:5 --- 00001000
++lf_sfne_s       110010 ----- a:5 b:5 --- 00001001
++lf_sfgt_s       110010 ----- a:5 b:5 --- 00001010
++lf_sfge_s       110010 ----- a:5 b:5 --- 00001011
++lf_sflt_s       110010 ----- a:5 b:5 --- 00001100
++lf_sfle_s       110010 ----- a:5 b:5 --- 00001101
 -- 
 2.17.0
