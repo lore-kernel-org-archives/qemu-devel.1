@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fI6Ub-0008IQ-CY
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 01:57:56 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1fI6W3-000254-1O
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 01:59:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fI3xX-0005Bl-IL
-	for qemu-devel@nongnu.org; Sun, 13 May 2018 23:15:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44774)
+	(envelope-from <zhangckid@gmail.com>) id 1fI45x-0007m9-Fv
+	for qemu-devel@nongnu.org; Sun, 13 May 2018 23:24:21 -0400
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:46790)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fI3xX-0005AF-CI
-	for qemu-devel@nongnu.org; Sun, 13 May 2018 23:15:35 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fI3xW-0007IQ-C0
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 03:15:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 54FE02E8071
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 03:15:34 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 14 May 2018 03:00:44 -0000
-From: eric hoffman <1771042@bugs.launchpad.net>
-Reply-To: Bug 1771042 <1771042@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152625681679.27592.11833589256802380892.malonedeb@wampee.canonical.com>
-Message-Id: <152626684503.26828.16869042301439556281.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1771042] Re: dataplane interrupt handler doesn't
- support msi
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fI45x-0007kq-7T
+	for qemu-devel@nongnu.org; Sun, 13 May 2018 23:24:17 -0400
+Received: by mail-pl0-x242.google.com with SMTP id 30-v6so1669895pld.13
+	for <qemu-devel@nongnu.org>; Sun, 13 May 2018 20:24:17 -0700 (PDT)
+From: Zhang Chen <zhangckid@gmail.com>
+Date: Mon, 14 May 2018 11:23:33 +0800
+Message-Id: <1526268228-27951-3-git-send-email-zhangckid@gmail.com>
+In-Reply-To: <1526268228-27951-1-git-send-email-zhangckid@gmail.com>
+References: <1526268228-27951-1-git-send-email-zhangckid@gmail.com>
+Subject: [Qemu-devel] [PATCH V7 02/17] colo-compare: implement the process
+ of checkpoint
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,49 +27,223 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Zhang Chen <zhangckid@gmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-diff --git a/hw/block/dataplane/virtio-blk.c b/hw/block/dataplane/virtio-bl=
-k.c
-index 101f32c..31d9eb8 100644
---- a/hw/block/dataplane/virtio-blk.c
-+++ b/hw/block/dataplane/virtio-blk.c
-@@ -73,7 +73,7 @@ static void notify_guest_bh(void *opaque)
-             unsigned i =3D j + ctzl(bits);
-             VirtQueue *vq =3D virtio_get_queue(s->vdev, i);
+While do checkpoint, we need to flush all the unhandled packets,
+By using the filter notifier mechanism, we can easily to notify
+every compare object to do this process, which runs inside
+of compare threads as a coroutine.
 
--            virtio_notify_irqfd(s->vdev, vq);
-+            virtio_notify(s->vdev, vq);
+Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+---
+ include/migration/colo.h |  6 ++++
+ net/colo-compare.c       | 76 ++++++++++++++++++++++++++++++++++++++++++++++++
+ net/colo-compare.h       | 22 ++++++++++++++
+ 3 files changed, 104 insertions(+)
+ create mode 100644 net/colo-compare.h
 
-             bits &=3D bits - 1; /* clear right-most bit */
-         }
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1771042
-
-Title:
-  dataplane interrupt handler doesn't support msi
-
-Status in QEMU:
-  New
-
-Bug description:
-  hw/block/dataplane/virtio-blk.c commit
-  1010cadf62332017648abee0d7a3dc7f2eef9632
-
-  in the function notify_guest_bh, the function virtio_notify_irqfd is call=
-ed
-  to deliver the interrupt corresponding to the vq
-
-  however, without the dataplane, hw/block/virtio_blk_req_complete calls
-  virtio_notify to deliver the interrupt (immediately). this goes though
-  a slightly more involved path that calls virtio_pci_notify which includes
-  a case to handle msi interrupts.
-
-  so, msi interrupts with block devices aren't serviced when using dataplane
-  batching.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1771042/+subscriptions
+diff --git a/include/migration/colo.h b/include/migration/colo.h
+index 2fe48ad..fefb2fc 100644
+--- a/include/migration/colo.h
++++ b/include/migration/colo.h
+@@ -16,6 +16,12 @@
+ #include "qemu-common.h"
+ #include "qapi/qapi-types-migration.h"
+ 
++enum colo_event {
++    COLO_EVENT_NONE,
++    COLO_EVENT_CHECKPOINT,
++    COLO_EVENT_FAILOVER,
++};
++
+ void colo_info_init(void);
+ 
+ void migrate_start_colo_process(MigrationState *s);
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index 23b2d2c..7ff3ae8 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -27,11 +27,16 @@
+ #include "qemu/sockets.h"
+ #include "net/colo.h"
+ #include "sysemu/iothread.h"
++#include "net/colo-compare.h"
++#include "migration/colo.h"
+ 
+ #define TYPE_COLO_COMPARE "colo-compare"
+ #define COLO_COMPARE(obj) \
+     OBJECT_CHECK(CompareState, (obj), TYPE_COLO_COMPARE)
+ 
++static QTAILQ_HEAD(, CompareState) net_compares =
++       QTAILQ_HEAD_INITIALIZER(net_compares);
++
+ #define COMPARE_READ_LEN_MAX NET_BUFSIZE
+ #define MAX_QUEUE_SIZE 1024
+ 
+@@ -41,6 +46,10 @@
+ /* TODO: Should be configurable */
+ #define REGULAR_PACKET_CHECK_MS 3000
+ 
++static QemuMutex event_mtx;
++static QemuCond event_complete_cond;
++static int event_unhandled_count;
++
+ /*
+  *  + CompareState ++
+  *  |               |
+@@ -87,6 +96,11 @@ typedef struct CompareState {
+     IOThread *iothread;
+     GMainContext *worker_context;
+     QEMUTimer *packet_check_timer;
++
++    QEMUBH *event_bh;
++    enum colo_event event;
++
++    QTAILQ_ENTRY(CompareState) next;
+ } CompareState;
+ 
+ typedef struct CompareClass {
+@@ -736,6 +750,25 @@ static void check_old_packet_regular(void *opaque)
+                 REGULAR_PACKET_CHECK_MS);
+ }
+ 
++/* Public API, Used for COLO frame to notify compare event */
++void colo_notify_compares_event(void *opaque, int event, Error **errp)
++{
++    CompareState *s;
++
++    qemu_mutex_lock(&event_mtx);
++    QTAILQ_FOREACH(s, &net_compares, next) {
++        s->event = event;
++        qemu_bh_schedule(s->event_bh);
++        event_unhandled_count++;
++    }
++    /* Wait all compare threads to finish handling this event */
++    while (event_unhandled_count > 0) {
++        qemu_cond_wait(&event_complete_cond, &event_mtx);
++    }
++
++    qemu_mutex_unlock(&event_mtx);
++}
++
+ static void colo_compare_timer_init(CompareState *s)
+ {
+     AioContext *ctx = iothread_get_aio_context(s->iothread);
+@@ -756,6 +789,28 @@ static void colo_compare_timer_del(CompareState *s)
+     }
+  }
+ 
++static void colo_flush_packets(void *opaque, void *user_data);
++
++static void colo_compare_handle_event(void *opaque)
++{
++    CompareState *s = opaque;
++
++    switch (s->event) {
++    case COLO_EVENT_CHECKPOINT:
++        g_queue_foreach(&s->conn_list, colo_flush_packets, s);
++        break;
++    case COLO_EVENT_FAILOVER:
++        break;
++    default:
++        break;
++    }
++    qemu_mutex_lock(&event_mtx);
++    assert(event_unhandled_count > 0);
++    event_unhandled_count--;
++    qemu_cond_broadcast(&event_complete_cond);
++    qemu_mutex_unlock(&event_mtx);
++}
++
+ static void colo_compare_iothread(CompareState *s)
+ {
+     object_ref(OBJECT(s->iothread));
+@@ -769,6 +824,7 @@ static void colo_compare_iothread(CompareState *s)
+                              s, s->worker_context, true);
+ 
+     colo_compare_timer_init(s);
++    s->event_bh = qemu_bh_new(colo_compare_handle_event, s);
+ }
+ 
+ static char *compare_get_pri_indev(Object *obj, Error **errp)
+@@ -926,8 +982,13 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
+     net_socket_rs_init(&s->pri_rs, compare_pri_rs_finalize, s->vnet_hdr);
+     net_socket_rs_init(&s->sec_rs, compare_sec_rs_finalize, s->vnet_hdr);
+ 
++    QTAILQ_INSERT_TAIL(&net_compares, s, next);
++
+     g_queue_init(&s->conn_list);
+ 
++    qemu_mutex_init(&event_mtx);
++    qemu_cond_init(&event_complete_cond);
++
+     s->connection_track_table = g_hash_table_new_full(connection_key_hash,
+                                                       connection_key_equal,
+                                                       g_free,
+@@ -990,6 +1051,7 @@ static void colo_compare_init(Object *obj)
+ static void colo_compare_finalize(Object *obj)
+ {
+     CompareState *s = COLO_COMPARE(obj);
++    CompareState *tmp = NULL;
+ 
+     qemu_chr_fe_deinit(&s->chr_pri_in, false);
+     qemu_chr_fe_deinit(&s->chr_sec_in, false);
+@@ -997,6 +1059,16 @@ static void colo_compare_finalize(Object *obj)
+     if (s->iothread) {
+         colo_compare_timer_del(s);
+     }
++
++    qemu_bh_delete(s->event_bh);
++
++    QTAILQ_FOREACH(tmp, &net_compares, next) {
++        if (!strcmp(tmp->outdev, s->outdev)) {
++            QTAILQ_REMOVE(&net_compares, s, next);
++            break;
++        }
++    }
++
+     /* Release all unhandled packets after compare thead exited */
+     g_queue_foreach(&s->conn_list, colo_flush_packets, s);
+ 
+@@ -1009,6 +1081,10 @@ static void colo_compare_finalize(Object *obj)
+     if (s->iothread) {
+         object_unref(OBJECT(s->iothread));
+     }
++
++    qemu_mutex_destroy(&event_mtx);
++    qemu_cond_destroy(&event_complete_cond);
++
+     g_free(s->pri_indev);
+     g_free(s->sec_indev);
+     g_free(s->outdev);
+diff --git a/net/colo-compare.h b/net/colo-compare.h
+new file mode 100644
+index 0000000..1b1ce76
+--- /dev/null
++++ b/net/colo-compare.h
+@@ -0,0 +1,22 @@
++/*
++ * COarse-grain LOck-stepping Virtual Machines for Non-stop Service (COLO)
++ * (a.k.a. Fault Tolerance or Continuous Replication)
++ *
++ * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
++ * Copyright (c) 2017 FUJITSU LIMITED
++ * Copyright (c) 2017 Intel Corporation
++ *
++ * Authors:
++ *    zhanghailiang <zhang.zhanghailiang@huawei.com>
++ *    Zhang Chen <zhangckid@gmail.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * later.  See the COPYING file in the top-level directory.
++ */
++
++#ifndef QEMU_COLO_COMPARE_H
++#define QEMU_COLO_COMPARE_H
++
++void colo_notify_compares_event(void *opaque, int event, Error **errp);
++
++#endif /* QEMU_COLO_COMPARE_H */
+-- 
+2.7.4
