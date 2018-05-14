@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fIGl9-0008Hj-Cy
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:55:43 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1fIGlE-0008MB-ED
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:55:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fIGl8-0005u3-6W
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:55:39 -0400
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:46014)
+	(envelope-from <zhangckid@gmail.com>) id 1fIGlC-0005x3-Qi
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:55:44 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:40660)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fIGl7-0005tY-Tm
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:55:38 -0400
-Received: by mail-pg0-x243.google.com with SMTP id w3-v6so5729883pgv.12
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 09:55:37 -0700 (PDT)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fIGlC-0005wP-K1
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 12:55:42 -0400
+Received: by mail-pf0-x244.google.com with SMTP id f189-v6so6306966pfa.7
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 09:55:42 -0700 (PDT)
 From: Zhang Chen <zhangckid@gmail.com>
-Date: Tue, 15 May 2018 00:54:19 +0800
-Message-Id: <20180514165424.12884-13-zhangckid@gmail.com>
+Date: Tue, 15 May 2018 00:54:20 +0800
+Message-Id: <20180514165424.12884-14-zhangckid@gmail.com>
 In-Reply-To: <20180514165424.12884-1-zhangckid@gmail.com>
 References: <20180514165424.12884-1-zhangckid@gmail.com>
-Subject: [Qemu-devel] [PATCH V7 RESEND 12/17] savevm: split the process of
- different stages for loadvm/savevm
+Subject: [Qemu-devel] [PATCH V7 RESEND 13/17] COLO: flush host dirty ram
+ from cache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,202 +31,56 @@ Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo
 
 From: zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-There are several stages during loadvm/savevm process. In different stage,
-migration incoming processes different types of sections.
-We want to control these stages more accuracy, it will benefit COLO
-performance, we don't have to save type of QEMU_VM_SECTION_START
-sections everytime while do checkpoint, besides, we want to separate
-the process of saving/loading memory and devices state.
+Don't need to flush all VM's ram from cache, only
+flush the dirty pages since last checkpoint
 
-So we add three new helper functions: qemu_load_device_state() and
-qemu_savevm_live_state() to achieve different process during migration.
-
-Besides, we make qemu_loadvm_state_main() and qemu_save_device_state()
-public, and simplify the codes of qemu_save_device_state() by calling the
-wrapper qemu_savevm_state_header().
-
-Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
 Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 ---
- migration/colo.c   | 36 ++++++++++++++++++++++++++++--------
- migration/savevm.c | 35 ++++++++++++++++++++++++++++-------
- migration/savevm.h |  4 ++++
- 3 files changed, 60 insertions(+), 15 deletions(-)
+ migration/ram.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/migration/colo.c b/migration/colo.c
-index cdff0a2490..5b055f79f1 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -30,6 +30,7 @@
- #include "block/block.h"
- #include "qapi/qapi-events-migration.h"
- #include "qapi/qmp/qerror.h"
-+#include "sysemu/cpus.h"
- 
- static bool vmstate_loading;
- static Notifier packets_compare_notifier;
-@@ -414,23 +415,30 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
- 
-     /* Disable block migration */
-     migrate_set_block_enabled(false, &local_err);
--    qemu_savevm_state_header(fb);
--    qemu_savevm_state_setup(fb);
-     qemu_mutex_lock_iothread();
-     replication_do_checkpoint_all(&local_err);
-     if (local_err) {
-         qemu_mutex_unlock_iothread();
-         goto out;
+diff --git a/migration/ram.c b/migration/ram.c
+index 4235a8f24d..21027c5b4d 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -2786,6 +2786,7 @@ int colo_init_ram_cache(void)
      }
--    qemu_savevm_state_complete_precopy(fb, false, false);
--    qemu_mutex_unlock_iothread();
--
--    qemu_fflush(fb);
+     ram_state = g_new0(RAMState, 1);
+     ram_state->migration_dirty_pages = 0;
++    memory_global_dirty_log_start();
  
-     colo_send_message(s->to_dst_file, COLO_MESSAGE_VMSTATE_SEND, &local_err);
-     if (local_err) {
-         goto out;
-     }
-+    /*
-+     * Only save VM's live state, which not including device state.
-+     * TODO: We may need a timeout mechanism to prevent COLO process
-+     * to be blocked here.
-+     */
-+    qemu_savevm_live_state(s->to_dst_file);
-+    /* Note: device state is saved into buffer */
-+    ret = qemu_save_device_state(fb);
-+
-+    qemu_mutex_unlock_iothread();
-+
-+    qemu_fflush(fb);
-+
-     /*
-      * We need the size of the VMstate data in Secondary side,
-      * With which we can decide how much data should be read.
-@@ -643,6 +651,7 @@ void *colo_process_incoming_thread(void *opaque)
-     uint64_t total_size;
-     uint64_t value;
-     Error *local_err = NULL;
-+    int ret;
+     return 0;
  
-     qemu_sem_init(&mis->colo_incoming_sem, 0);
- 
-@@ -715,6 +724,16 @@ void *colo_process_incoming_thread(void *opaque)
-             goto out;
-         }
- 
-+        qemu_mutex_lock_iothread();
-+        cpu_synchronize_all_pre_loadvm();
-+        ret = qemu_loadvm_state_main(mis->from_src_file, mis);
-+        qemu_mutex_unlock_iothread();
-+
-+        if (ret < 0) {
-+            error_report("Load VM's live state (ram) error");
-+            goto out;
-+        }
-+
-         value = colo_receive_message_value(mis->from_src_file,
-                                  COLO_MESSAGE_VMSTATE_SIZE, &local_err);
-         if (local_err) {
-@@ -748,8 +767,9 @@ void *colo_process_incoming_thread(void *opaque)
-         qemu_mutex_lock_iothread();
-         qemu_system_reset(SHUTDOWN_CAUSE_NONE);
-         vmstate_loading = true;
--        if (qemu_loadvm_state(fb) < 0) {
--            error_report("COLO: loadvm failed");
-+        ret = qemu_load_device_state(fb);
-+        if (ret < 0) {
-+            error_report("COLO: load device state failed");
-             qemu_mutex_unlock_iothread();
-             goto out;
-         }
-diff --git a/migration/savevm.c b/migration/savevm.c
-index ec0bff09ce..0f61239429 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1332,13 +1332,20 @@ done:
-     return ret;
- }
- 
--static int qemu_save_device_state(QEMUFile *f)
-+void qemu_savevm_live_state(QEMUFile *f)
+@@ -2806,10 +2807,12 @@ void colo_release_ram_cache(void)
  {
--    SaveStateEntry *se;
-+    /* save QEMU_VM_SECTION_END section */
-+    qemu_savevm_state_complete_precopy(f, true, false);
-+    qemu_put_byte(f, QEMU_VM_EOF);
-+}
+     RAMBlock *block;
  
--    qemu_put_be32(f, QEMU_VM_FILE_MAGIC);
--    qemu_put_be32(f, QEMU_VM_FILE_VERSION);
-+int qemu_save_device_state(QEMUFile *f)
-+{
-+    SaveStateEntry *se;
++    memory_global_dirty_log_stop();
+     QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+         g_free(block->bmap);
+         block->bmap = NULL;
+     }
++
+     rcu_read_lock();
+     QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+         if (block->colo_cache) {
+@@ -3042,6 +3045,15 @@ static void colo_flush_ram_cache(void)
+     void *src_host;
+     unsigned long offset = 0;
  
-+    if (!migration_in_colo_state()) {
-+        qemu_savevm_state_header(f);
++    memory_global_dirty_log_sync();
++    qemu_mutex_lock(&ram_state->bitmap_mutex);
++    rcu_read_lock();
++    RAMBLOCK_FOREACH(block) {
++        migration_bitmap_sync_range(ram_state, block, 0, block->used_length);
 +    }
-     cpu_synchronize_all_states();
- 
-     QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
-@@ -1394,8 +1401,6 @@ enum LoadVMExitCodes {
-     LOADVM_QUIT     =  1,
- };
- 
--static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
--
- /* ------ incoming postcopy messages ------ */
- /* 'advise' arrives before any transfers just to tell us that a postcopy
-  * *might* happen - it might be skipped if precopy transferred everything
-@@ -2075,7 +2080,7 @@ void qemu_loadvm_state_cleanup(void)
-     }
- }
- 
--static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
-+int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
- {
-     uint8_t section_type;
-     int ret = 0;
-@@ -2229,6 +2234,22 @@ int qemu_loadvm_state(QEMUFile *f)
-     return ret;
- }
- 
-+int qemu_load_device_state(QEMUFile *f)
-+{
-+    MigrationIncomingState *mis = migration_incoming_get_current();
-+    int ret;
++    rcu_read_unlock();
++    qemu_mutex_unlock(&ram_state->bitmap_mutex);
 +
-+    /* Load QEMU_VM_SECTION_FULL section */
-+    ret = qemu_loadvm_state_main(f, mis);
-+    if (ret < 0) {
-+        error_report("Failed to load device state: %d", ret);
-+        return ret;
-+    }
-+
-+    cpu_synchronize_all_post_init();
-+    return 0;
-+}
-+
- int save_snapshot(const char *name, Error **errp)
- {
-     BlockDriverState *bs, *bs1;
-diff --git a/migration/savevm.h b/migration/savevm.h
-index c6d46b37a2..cf7935dd68 100644
---- a/migration/savevm.h
-+++ b/migration/savevm.h
-@@ -53,8 +53,12 @@ void qemu_savevm_send_postcopy_ram_discard(QEMUFile *f, const char *name,
-                                            uint64_t *start_list,
-                                            uint64_t *length_list);
- void qemu_savevm_send_colo_enable(QEMUFile *f);
-+void qemu_savevm_live_state(QEMUFile *f);
-+int qemu_save_device_state(QEMUFile *f);
- 
- int qemu_loadvm_state(QEMUFile *f);
- void qemu_loadvm_state_cleanup(void);
-+int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
-+int qemu_load_device_state(QEMUFile *f);
- 
- #endif
+     trace_colo_flush_ram_cache_begin(ram_state->migration_dirty_pages);
+     rcu_read_lock();
+     block = QLIST_FIRST_RCU(&ram_list.blocks);
 -- 
 2.17.0
