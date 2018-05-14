@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fIFbJ-0000Gl-SY
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 11:41:27 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fIFbJ-0000Gf-9s
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 11:41:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fIFbG-0007UF-1q
+	(envelope-from <cohuck@redhat.com>) id 1fIFbE-0007Tf-S4
 	for qemu-devel@nongnu.org; Mon, 14 May 2018 11:41:25 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon, 14 May 2018 17:41:09 +0200
-Message-Id: <20180514154114.2558-2-cohuck@redhat.com>
-In-Reply-To: <20180514154114.2558-1-cohuck@redhat.com>
-References: <20180514154114.2558-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 1/6] s390x/css: disabled subchannels cannot be
- status pending
+Date: Mon, 14 May 2018 17:41:08 +0200
+Message-Id: <20180514154114.2558-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PULL 0/6] s390x fixes/cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,48 +18,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, qemu-stable@nongnu.org
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 
-The 3270 code will try to post an attention interrupt when the
-3270 emulator (e.g. x3270) attaches. If the guest has not yet
-enabled the subchannel for the 3270 device, we will present a spurious
-cc 1 (status pending) when it uses msch on it later on, e.g. when
-trying to enable the subchannel.
+The following changes since commit bbd87423ea0c436c55bbc3f9c23d4f811d1f3f29:
 
-To fix this, just don't do anything in css_conditional_io_interrupt()
-if the subchannel is not enabled. The 3270 code will work fine with
-that, and the other user of this function (virtio-ccw) never
-attempts to post an interrupt for a disabled device to begin with.
+  Merge remote-tracking branch 'remotes/stefanha/tags/tracing-pull-request' into staging (2018-05-14 11:08:16 +0100)
 
-CC: qemu-stable@nongnu.org
-Reported-by: Thomas Huth <thuth@redhat.com>
-Tested-by: Thomas Huth <thuth@redhat.com>
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Acked-by: Halil Pasic <pasic@linux.ibm.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- hw/s390x/css.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+are available in the Git repository at:
 
-diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index 301bf1772f..56c3fa8c89 100644
---- a/hw/s390x/css.c
-+++ b/hw/s390x/css.c
-@@ -616,6 +616,14 @@ void css_inject_io_interrupt(SubchDev *sch)
- 
- void css_conditional_io_interrupt(SubchDev *sch)
- {
-+    /*
-+     * If the subchannel is not enabled, it is not made status pending
-+     * (see PoP p. 16-17, "Status Control").
-+     */
-+    if (!(sch->curr_status.pmcw.flags & PMCW_FLAGS_MASK_ENA)) {
-+        return;
-+    }
-+
-     /*
-      * If the subchannel is not currently status pending, make it pending
-      * with alert status.
+  git://github.com/cohuck/qemu tags/s390x-20180514
+
+for you to fetch changes up to b0dad618baad1efb014c88f4507492a79f2eaf1c:
+
+  target/s390x: Fix brace Werror with clang 6.0.0 (2018-05-14 17:10:02 +0200)
+
+----------------------------------------------------------------
+Some s390x fixes/cleanups, mainly in the reset area and build fixes
+for recent compilers (GCC 8 and clang 6.0.0).
+
+----------------------------------------------------------------
+
+Cornelia Huck (3):
+  s390x/css: disabled subchannels cannot be status pending
+  virtio-ccw: common reset handler
+  s390x/ccw: make sure all ccw devices are properly reset
+
+David Hildenbrand (1):
+  s390x: refactor reset/reipl handling
+
+Richard Henderson (1):
+  target/s390x: Fix brace Werror with clang 6.0.0
+
+Thomas Huth (1):
+  pc-bios/s390-ccw: struct tpi_info must be declared as aligned(4)
+
+ hw/s390x/ccw-device.c              |  8 +++++
+ hw/s390x/css.c                     |  8 +++++
+ hw/s390x/ipl.c                     | 43 +++++++++++++++++++++++----
+ hw/s390x/ipl.h                     | 16 ++++++++--
+ hw/s390x/s390-virtio-ccw.c         | 51 ++++++++++++++++++++++++++-----
+ hw/s390x/virtio-ccw.c              | 20 ++++---------
+ hw/s390x/virtio-ccw.h              |  1 +
+ include/hw/s390x/s390-virtio-ccw.h |  2 --
+ pc-bios/s390-ccw/cio.h             |  2 +-
+ target/s390x/cpu.h                 | 26 ++++++++++++++++
+ target/s390x/diag.c                | 61 +++-----------------------------------
+ target/s390x/internal.h            |  6 ----
+ target/s390x/kvm.c                 |  2 +-
+ target/s390x/misc_helper.c         |  2 +-
+ 14 files changed, 152 insertions(+), 96 deletions(-)
+
 -- 
 2.14.3
