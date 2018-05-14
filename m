@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fIIUc-0002fV-V3
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 14:46:43 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fIIex-0005N1-Hh
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 14:57:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fIIUc-00078I-1P
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 14:46:43 -0400
-References: <20180509162637.15575-1-kwolf@redhat.com>
-	<20180509162637.15575-26-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <e79b53e7-3907-9c45-c22c-c79e0507f89e@redhat.com>
-Date: Mon, 14 May 2018 20:46:29 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fIIew-0000tu-PC
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 14:57:23 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180514173044.5025-1-peter.maydell@linaro.org>
+	<20180514173044.5025-2-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <77995743-27bb-9cb9-5455-a2383d3be7b5@amsat.org>
+Date: Mon, 14 May 2018 15:57:09 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180509162637.15575-26-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="rbysHaxMYJeSvlglBr7C5M5q3lQcujgRO"
-Subject: Re: [Qemu-devel] [PATCH 25/42] job: Move single job finalisation to
- Job
+In-Reply-To: <20180514173044.5025-2-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH 1/2] gdbstub: Use
+ qemu_set_cloexec()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,94 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, patches@linaro.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rbysHaxMYJeSvlglBr7C5M5q3lQcujgRO
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com,
- qemu-devel@nongnu.org
-Message-ID: <e79b53e7-3907-9c45-c22c-c79e0507f89e@redhat.com>
-Subject: Re: [PATCH 25/42] job: Move single job finalisation to Job
-References: <20180509162637.15575-1-kwolf@redhat.com>
- <20180509162637.15575-26-kwolf@redhat.com>
-In-Reply-To: <20180509162637.15575-26-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 05/14/2018 02:30 PM, Peter Maydell wrote:
+> Use the utility routine qemu_set_cloexec() rather than
+> manually calling fcntl(). This lets us drop the #ifndef _WIN32
+> guards and also means Coverity doesn't complain that we're
+> ignoring the fcntl error return (CID 1005665, CID 1005667).
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-On 2018-05-09 18:26, Kevin Wolf wrote:
-> This moves the finalisation of a single job from BlockJob to Job.
->=20
-> Some part of this code depends on job transactions, and job transaction=
-s
-> call this code, we introduce some temporary calls from Job functions to=
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> BlockJob ones. This will be fixed once transactions move to Job, too.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  include/block/blockjob.h     |   9 ---
->  include/block/blockjob_int.h |  36 -----------
->  include/qemu/job.h           |  53 +++++++++++++++-
->  block/backup.c               |  22 +++----
->  block/commit.c               |   2 +-
->  block/mirror.c               |   2 +-
->  blockjob.c                   | 142 ++++++++---------------------------=
---------
->  job.c                        | 100 +++++++++++++++++++++++++++++-
->  qemu-img.c                   |   2 +-
->  tests/test-blockjob.c        |  10 +--
->  10 files changed, 194 insertions(+), 184 deletions(-)
-
-[...]
-
-> diff --git a/include/qemu/job.h b/include/qemu/job.h
-> index 1b4397f9a1..12edb822d8 100644
-> --- a/include/qemu/job.h
-> +++ b/include/qemu/job.h
-> @@ -29,6 +29,7 @@
->  #include "qapi/qapi-types-block-core.h"
->  #include "qemu/queue.h"
->  #include "qemu/coroutine.h"
-> +#include "block/aio.h"
-> =20
->  typedef struct JobDriver JobDriver;
-> =20
-> @@ -105,6 +106,15 @@ typedef struct Job {
->      /** True if this job should automatically dismiss itself */
->      bool auto_dismiss;
-> =20
-> +    /** ret code passed to block_job_completed. */
-> +    int ret;
-
-While there is no such function yet, you might not want to mention a
-block_job_* function here anyway.
-
-Apart from that, as far as I can see, this comment remains unchanged
-even later in this series when block_job_completed() is removed.
-
-So something needs to be changed somewhere, so here is an anticipating
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---rbysHaxMYJeSvlglBr7C5M5q3lQcujgRO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr52YUACgkQ9AfbAGHV
-z0C5IAf+O+ETF4/ABksIh8aO6vgMQ4DGt8spK3OqWn1hZ3W4zlJSrLD//XO1wnv0
-lFFppJXlbHAVQVI7fFzVvL7DG2fsIaT+Ng/QMSrS1c7fXKCXNNyFqeF93hfAqUbX
-sllT4aFcuSu3s0BWdfiWFlFzoytc67QdXhJnmAvrbkxnR5JmJVznHHPlaJTWS/da
-4ED4BrFSInhKWnCQy8CtpMgi0XObbQ1off9t5Woreu0UQMXNUogOSH3RxBmBD3hU
-pjmQC5p9QBsLR3GXYUnyudLx83UwWp3gub37yps4litbpN1pWcAD63lnS0YgMzFK
-lDnn/AaRHnYEP6z653bKVezubgzzkg==
-=/K7W
------END PGP SIGNATURE-----
-
---rbysHaxMYJeSvlglBr7C5M5q3lQcujgRO--
+>  gdbstub.c | 8 ++------
+>  1 file changed, 2 insertions(+), 6 deletions(-)
+> 
+> diff --git a/gdbstub.c b/gdbstub.c
+> index 3c3807358c..cc7626c790 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -1818,9 +1818,7 @@ static void gdb_accept(void)
+>              perror("accept");
+>              return;
+>          } else if (fd >= 0) {
+> -#ifndef _WIN32
+> -            fcntl(fd, F_SETFD, FD_CLOEXEC);
+> -#endif
+> +            qemu_set_cloexec(fd);
+>              break;
+>          }
+>      }
+> @@ -1847,9 +1845,7 @@ static int gdbserver_open(int port)
+>          perror("socket");
+>          return -1;
+>      }
+> -#ifndef _WIN32
+> -    fcntl(fd, F_SETFD, FD_CLOEXEC);
+> -#endif
+> +    qemu_set_cloexec(fd);
+>  
+>      socket_set_fast_reuse(fd);
+>  
+> 
