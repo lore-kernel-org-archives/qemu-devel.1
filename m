@@ -1,15 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fIdXJ-0002LC-Gr
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 13:14:54 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fIdja-0007A3-GP
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 13:27:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fIdXI-0006dd-Fw
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 13:14:53 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fIdjZ-000487-D8
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 13:27:34 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41714)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1fIdjZ-00046Q-67
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 13:27:33 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 15 May 2018 18:14:46 +0100
-Message-Id: <20180515171446.10834-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] hw/arm/mps2-tz: Put ethernet controller behind
- PPC
+Date: Tue, 15 May 2018 18:27:29 +0100
+Message-Id: <20180515172729.24564-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] memfd: Avoid Coverity warning about integer
+ overflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,100 +23,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-The ethernet controller in the AN505 MPC FPGA image is behind
-the same AHB Peripheral Protection Controller that handles
-the graphics and GPIOs. (In the documentation this is clear
-in the block diagram but the ethernet controller was omitted
-from the table listing devices connected to the PPC.)
-The ethernet sits behind AHB PPCEXP0 interface 5. We had
-incorrectly claimed that this was a "gpio4", but there are
-only 4 GPIOs in this image.
+Coverity complains about qemu_memfd_create() (CID 1385858) because
+we calculate a bit position htsize which could be up to 63, but
+then use it in "1 << htsize" which is a 32-bit integer calculation
+and could push the 1 off the top of the value.
 
-Correct the QEMU model to match the hardware.
+Silence the complaint bu using "1ULL"; this isn't a bug in
+practice since a hugetlbsize of 4GB is not very plausible.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
-A minor nit that I didn't notice when I was modelling this.
+ util/memfd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-NB: I think the PSRAM is also supposed to be behind this
-interface of the PPC, but we definitely can't model that
-because our PPC implementation won't work for executing
-code from RAM that sits behind it.
-
- hw/arm/mps2-tz.c | 32 +++++++++++++++++++++++---------
- 1 file changed, 23 insertions(+), 9 deletions(-)
-
-diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
-index 8dc8bfd4ab..c5ef95e4cc 100644
---- a/hw/arm/mps2-tz.c
-+++ b/hw/arm/mps2-tz.c
-@@ -74,12 +74,13 @@ typedef struct {
-     UnimplementedDeviceState spi[5];
-     UnimplementedDeviceState i2c[4];
-     UnimplementedDeviceState i2s_audio;
--    UnimplementedDeviceState gpio[5];
-+    UnimplementedDeviceState gpio[4];
-     UnimplementedDeviceState dma[4];
-     UnimplementedDeviceState gfx;
-     CMSDKAPBUART uart[5];
-     SplitIRQ sec_resp_splitter;
-     qemu_or_irq uart_irq_orgate;
-+    DeviceState *lan9118;
- } MPS2TZMachineState;
- 
- #define TYPE_MPS2TZ_MACHINE "mps2tz"
-@@ -224,6 +225,26 @@ static MemoryRegion *make_fpgaio(MPS2TZMachineState *mms, void *opaque,
-     return sysbus_mmio_get_region(SYS_BUS_DEVICE(fpgaio), 0);
- }
- 
-+static MemoryRegion *make_eth_dev(MPS2TZMachineState *mms, void *opaque,
-+                                  const char *name, hwaddr size)
-+{
-+    SysBusDevice *s;
-+    DeviceState *iotkitdev = DEVICE(&mms->iotkit);
-+    NICInfo *nd = &nd_table[0];
-+
-+    /* In hardware this is a LAN9220; the LAN9118 is software compatible
-+     * except that it doesn't support the checksum-offload feature.
-+     */
-+    qemu_check_nic_model(nd, "lan9118");
-+    mms->lan9118 = qdev_create(NULL, "lan9118");
-+    qdev_set_nic_properties(mms->lan9118, nd);
-+    qdev_init_nofail(mms->lan9118);
-+
-+    s = SYS_BUS_DEVICE(mms->lan9118);
-+    sysbus_connect_irq(s, 0, qdev_get_gpio_in_named(iotkitdev, "EXP_IRQ", 16));
-+    return sysbus_mmio_get_region(s, 0);
-+}
-+
- static void mps2tz_common_init(MachineState *machine)
+diff --git a/util/memfd.c b/util/memfd.c
+index b3ecbac19e..d248a53c3c 100644
+--- a/util/memfd.c
++++ b/util/memfd.c
+@@ -66,7 +66,7 @@ int qemu_memfd_create(const char *name, size_t size, bool hugetlb,
  {
-     MPS2TZMachineState *mms = MPS2TZ_MACHINE(machine);
-@@ -363,7 +384,7 @@ static void mps2tz_common_init(MachineState *machine)
-                 { "gpio1", make_unimp_dev, &mms->gpio[1], 0x40101000, 0x1000 },
-                 { "gpio2", make_unimp_dev, &mms->gpio[2], 0x40102000, 0x1000 },
-                 { "gpio3", make_unimp_dev, &mms->gpio[3], 0x40103000, 0x1000 },
--                { "gpio4", make_unimp_dev, &mms->gpio[4], 0x40104000, 0x1000 },
-+                { "eth", make_eth_dev, NULL, 0x42000000, 0x100000 },
-             },
-         }, {
-             .name = "ahb_ppcexp1",
-@@ -447,13 +468,6 @@ static void mps2tz_common_init(MachineState *machine)
-                                                      "cfg_sec_resp", 0));
+     int htsize = hugetlbsize ? ctz64(hugetlbsize) : 0;
+ 
+-    if (htsize && 1 << htsize != hugetlbsize) {
++    if (htsize && 1ULL << htsize != hugetlbsize) {
+         error_setg(errp, "Hugepage size must be a power of 2");
+         return -1;
      }
- 
--    /* In hardware this is a LAN9220; the LAN9118 is software compatible
--     * except that it doesn't support the checksum-offload feature.
--     * The ethernet controller is not behind a PPC.
--     */
--    lan9118_init(&nd_table[0], 0x42000000,
--                 qdev_get_gpio_in_named(iotkitdev, "EXP_IRQ", 16));
--
-     create_unimplemented_device("FPGA NS PC", 0x48007000, 0x1000);
- 
-     armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename, 0x400000);
 -- 
 2.17.0
