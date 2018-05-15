@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33126)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=6664e1dc0=Paul.Durrant@citrix.com>)
-	id 1fId0X-0005s6-Mi
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 12:41:02 -0400
+	id 1fId0X-0005s7-My
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 12:41:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=6664e1dc0=Paul.Durrant@citrix.com>)
-	id 1fId0T-0007QU-OD
+	id 1fId0V-0007Rf-6H
 	for qemu-devel@nongnu.org; Tue, 15 May 2018 12:41:01 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:23739)
+Received: from smtp03.citrix.com ([162.221.156.55]:23743)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <prvs=6664e1dc0=Paul.Durrant@citrix.com>)
-	id 1fId0T-0007Pf-FL
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 12:40:57 -0400
+	id 1fId0U-0007Qe-QU
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 12:40:59 -0400
 From: Paul Durrant <paul.durrant@citrix.com>
-Date: Tue, 15 May 2018 17:40:52 +0100
-Message-ID: <20180515164053.14604-3-paul.durrant@citrix.com>
+Date: Tue, 15 May 2018 17:40:53 +0100
+Message-ID: <20180515164053.14604-4-paul.durrant@citrix.com>
 In-Reply-To: <20180515164053.14604-1-paul.durrant@citrix.com>
 References: <20180515164053.14604-1-paul.durrant@citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 2/3] checkpatch: generalize xen handle
- matching in the list of types
+Subject: [Qemu-devel] [PATCH v3 3/3] xen-hvm: try to use
+ xenforeignmemory_map_resource() to map ioreq pages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +30,186 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
+Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
 
-All the xen stable APIs define handle types of the form:
+Xen 4.11 has a new API to directly map guest resources. Among the resources
+that can be mapped using this API are ioreq pages.
 
-xen<subject of API>_handle
-
-and some define additional handle types of the form:
-
-xen<subject of API>_<purpose of handle>_handle
-
-Examples of these are xenforeignmemory_handle and
-xenforeignmemory_resource_handle.
-
-Both of these types will be misparsed by checkpatch if they appear as the
-first token in a line since, as types defined by an external library, they
-do not conform to the QEMU CODING_STYLE, which suggests CamelCase.
-
-A previous patch (5ac067a24a8) added xendevicemodel_handle to the list
-of types. This patch changes that to xen\w+_handle such that it will
-match all Xen stable API handles of the forms detailed above.
+This patch modifies QEMU to attempt to use the new API should it exist,
+falling back to the previous mechanism if it is unavailable.
 
 Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Daniel P. Berrange <berrange@redhat.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>
 
 v3:
- - Adjusted commit comment slightly as suggested by Eric
-
-v2:
- - New in this version
+ - Addressed comments from Anthony
+ - Verified build against Xen 4.10
 ---
- scripts/checkpatch.pl | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ configure                   |  5 ++++
+ hw/i386/xen/trace-events    |  1 +
+ hw/i386/xen/xen-hvm.c       | 66 ++++++++++++++++++++++++++++++++++-----------
+ include/hw/xen/xen_common.h | 16 +++++++++++
+ 4 files changed, 73 insertions(+), 15 deletions(-)
 
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index cb1b652388..e3d8c2cdfc 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -271,7 +271,7 @@ our @typeList = (
- 	qr{hwaddr},
-         # external libraries
- 	qr{xml${Ident}},
--	qr{xendevicemodel_handle},
-+	qr{xen\w+_handle},
- 	# Glib definitions
- 	qr{gchar},
- 	qr{gshort},
+diff --git a/configure b/configure
+index 59f91ab3f9..d03094f905 100755
+--- a/configure
++++ b/configure
+@@ -2231,12 +2231,17 @@ EOF
+ #undef XC_WANT_COMPAT_DEVICEMODEL_API
+ #define __XEN_TOOLS__
+ #include <xendevicemodel.h>
++#include <xenforeignmemory.h>
+ int main(void) {
+   xendevicemodel_handle *xd;
++  xenforeignmemory_handle *xfmem;
+ 
+   xd = xendevicemodel_open(0, 0);
+   xendevicemodel_pin_memory_cacheattr(xd, 0, 0, 0, 0);
+ 
++  xfmem = xenforeignmemory_open(0, 0);
++  xenforeignmemory_map_resource(xfmem, 0, 0, 0, 0, 0, NULL, 0, 0);
++
+   return 0;
+ }
+ EOF
+diff --git a/hw/i386/xen/trace-events b/hw/i386/xen/trace-events
+index 8dab7bcfe0..38616b698f 100644
+--- a/hw/i386/xen/trace-events
++++ b/hw/i386/xen/trace-events
+@@ -15,6 +15,7 @@ cpu_ioreq_pio(void *req, uint32_t dir, uint32_t df, uint32_t data_is_ptr, uint64
+ cpu_ioreq_pio_read_reg(void *req, uint64_t data, uint64_t addr, uint32_t size) "I/O=%p pio read reg data=0x%"PRIx64" port=0x%"PRIx64" size=%d"
+ cpu_ioreq_pio_write_reg(void *req, uint64_t data, uint64_t addr, uint32_t size) "I/O=%p pio write reg data=0x%"PRIx64" port=0x%"PRIx64" size=%d"
+ cpu_ioreq_move(void *req, uint32_t dir, uint32_t df, uint32_t data_is_ptr, uint64_t addr, uint64_t data, uint32_t count, uint32_t size) "I/O=%p copy dir=%d df=%d ptr=%d port=0x%"PRIx64" data=0x%"PRIx64" count=%d size=%d"
++xen_map_resource_ioreq(uint32_t id, void *addr) "id: %u addr: %p"
+ 
+ # xen-mapcache.c
+ xen_map_cache(uint64_t phys_addr) "want 0x%"PRIx64
+diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+index 6ffa3c22cc..ff2a99cbb3 100644
+--- a/hw/i386/xen/xen-hvm.c
++++ b/hw/i386/xen/xen-hvm.c
+@@ -1239,13 +1239,39 @@ static void xen_wakeup_notifier(Notifier *notifier, void *data)
+ 
+ static int xen_map_ioreq_server(XenIOState *state)
+ {
++    void *addr = NULL;
++    xenforeignmemory_resource_handle *fres;
+     xen_pfn_t ioreq_pfn;
+     xen_pfn_t bufioreq_pfn;
+     evtchn_port_t bufioreq_evtchn;
+     int rc;
+ 
++    /*
++     * Attempt to map using the resource API and fall back to normal
++     * foreign mapping if this is not supported.
++     */
++    QEMU_BUILD_BUG_ON(XENMEM_resource_ioreq_server_frame_bufioreq != 0);
++    QEMU_BUILD_BUG_ON(XENMEM_resource_ioreq_server_frame_ioreq(0) != 1);
++    fres = xenforeignmemory_map_resource(xen_fmem, xen_domid,
++                                         XENMEM_resource_ioreq_server,
++                                         state->ioservid, 0, 2,
++                                         &addr,
++                                         PROT_READ | PROT_WRITE, 0);
++    if (fres != NULL) {
++        trace_xen_map_resource_ioreq(state->ioservid, addr);
++        state->buffered_io_page = addr;
++        state->shared_page = addr + TARGET_PAGE_SIZE;
++    } else if (errno != EOPNOTSUPP) {
++        error_report("failed to map ioreq server resources: error %d handle=%p",
++                     errno, xen_xc);
++        return -1;
++    }
++
+     rc = xen_get_ioreq_server_info(xen_domid, state->ioservid,
+-                                   &ioreq_pfn, &bufioreq_pfn,
++                                   (state->shared_page == NULL) ?
++                                   &ioreq_pfn : NULL,
++                                   (state->buffered_io_page == NULL) ?
++                                   &bufioreq_pfn : NULL,
+                                    &bufioreq_evtchn);
+     if (rc < 0) {
+         error_report("failed to get ioreq server info: error %d handle=%p",
+@@ -1253,27 +1279,37 @@ static int xen_map_ioreq_server(XenIOState *state)
+         return rc;
+     }
+ 
+-    DPRINTF("shared page at pfn %lx\n", ioreq_pfn);
+-    DPRINTF("buffered io page at pfn %lx\n", bufioreq_pfn);
+-    DPRINTF("buffered io evtchn is %x\n", bufioreq_evtchn);
+-
+-    state->shared_page = xenforeignmemory_map(xen_fmem, xen_domid,
+-                                              PROT_READ | PROT_WRITE,
+-                                              1, &ioreq_pfn, NULL);
+     if (state->shared_page == NULL) {
+-        error_report("map shared IO page returned error %d handle=%p",
+-                     errno, xen_xc);
+-        return -1;
++        DPRINTF("shared page at pfn %lx\n", ioreq_pfn);
++
++        state->shared_page = xenforeignmemory_map(xen_fmem, xen_domid,
++                                                  PROT_READ | PROT_WRITE,
++                                                  1, &ioreq_pfn, NULL);
++        if (state->shared_page == NULL) {
++            error_report("map shared IO page returned error %d handle=%p",
++                         errno, xen_xc);
++        }
+     }
+ 
+-    state->buffered_io_page = xenforeignmemory_map(xen_fmem, xen_domid,
+-                                                   PROT_READ | PROT_WRITE,
+-                                                   1, &bufioreq_pfn, NULL);
+     if (state->buffered_io_page == NULL) {
+-        error_report("map buffered IO page returned error %d", errno);
++        DPRINTF("buffered io page at pfn %lx\n", bufioreq_pfn);
++
++        state->buffered_io_page = xenforeignmemory_map(xen_fmem, xen_domid,
++                                                       PROT_READ | PROT_WRITE,
++                                                       1, &bufioreq_pfn,
++                                                       NULL);
++        if (state->buffered_io_page == NULL) {
++            error_report("map buffered IO page returned error %d", errno);
++            return -1;
++        }
++    }
++
++    if (state->shared_page == NULL || state->buffered_io_page == NULL) {
+         return -1;
+     }
+ 
++    DPRINTF("buffered io evtchn is %x\n", bufioreq_evtchn);
++
+     state->bufioreq_remote_port = bufioreq_evtchn;
+ 
+     return 0;
+diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
+index 5f1402b494..2e47b98834 100644
+--- a/include/hw/xen/xen_common.h
++++ b/include/hw/xen/xen_common.h
+@@ -119,6 +119,22 @@ static inline int xendevicemodel_pin_memory_cacheattr(
+     return xc_domain_pin_memory_cacheattr(xen_xc, domid, start, end, type);
+ }
+ 
++typedef void xenforeignmemory_resource_handle;
++
++#define XENMEM_resource_ioreq_server 0
++
++#define XENMEM_resource_ioreq_server_frame_bufioreq 0
++#define XENMEM_resource_ioreq_server_frame_ioreq(n) (1 + (n))
++
++static inline xenforeignmemory_resource_handle *xenforeignmemory_map_resource(
++    xenforeignmemory_handle *fmem, domid_t domid, unsigned int type,
++    unsigned int id, unsigned long frame, unsigned long nr_frames,
++    void **paddr, int prot, int flags)
++{
++    errno = EOPNOTSUPP;
++    return NULL;
++}
++
+ #endif /* CONFIG_XEN_CTRL_INTERFACE_VERSION < 41100 */
+ 
+ #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
 -- 
 2.11.0
