@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fIiOd-0003e8-9C
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 18:26:18 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fIiOT-0003VP-Ug
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 18:26:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fIiOb-0007FY-BK
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 18:26:15 -0400
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:36071)
+	(envelope-from <richard.henderson@linaro.org>) id 1fIiOR-0005ia-Vr
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 18:26:05 -0400
+Received: from mail-pf0-x234.google.com ([2607:f8b0:400e:c00::234]:32906)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fIiOb-00076y-30
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 18:26:13 -0400
-Received: by mail-pl0-x243.google.com with SMTP id v24-v6so867966plo.3
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 15:26:13 -0700 (PDT)
+	id 1fIiOR-0005bE-NA
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 18:26:03 -0400
+Received: by mail-pf0-x234.google.com with SMTP id a20-v6so745363pfo.0
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 15:26:03 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 15 May 2018 15:25:32 -0700
-Message-Id: <20180515222540.9988-21-richard.henderson@linaro.org>
+Date: Tue, 15 May 2018 15:25:25 -0700
+Message-Id: <20180515222540.9988-14-richard.henderson@linaro.org>
 In-Reply-To: <20180515222540.9988-1-richard.henderson@linaro.org>
 References: <20180515222540.9988-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v6 20/28] fpu/softfloat: Use float*_silence_nan
- in propagateFloat*NaN
+Subject: [Qemu-devel] [PATCH v6 13/28] target/arm: Use floatX_silence_nan
+ when we have already checked for SNaN
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,109 +33,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 
-We have already checked the arguments for SNaN;
-we don't need to do it again.
-
 Tested-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- fpu/softfloat-specialize.h | 44 +++++++++++++++++++++++++++++---------
- 1 file changed, 34 insertions(+), 10 deletions(-)
+ target/arm/helper-a64.c |  6 +++---
+ target/arm/helper.c     | 12 ++++++------
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/fpu/softfloat-specialize.h b/fpu/softfloat-specialize.h
-index 995a0132c6..4fa068a5dc 100644
---- a/fpu/softfloat-specialize.h
-+++ b/fpu/softfloat-specialize.h
-@@ -498,7 +498,7 @@ static float32 commonNaNToFloat32(commonNaNT a, float_status *status)
- | The routine is passed various bits of information about the
- | two NaNs and should return 0 to select NaN a and 1 for NaN b.
- | Note that signalling NaNs are always squashed to quiet NaNs
--| by the caller, by calling floatXX_maybe_silence_nan() before
-+| by the caller, by calling floatXX_silence_nan() before
- | returning them.
- |
- | aIsLargerSignificand is only valid if both a and b are NaNs
-@@ -536,7 +536,7 @@ static int pickNaN(flag aIsQNaN, flag aIsSNaN, flag bIsQNaN, flag bIsSNaN,
- {
-     /* According to MIPS specifications, if one of the two operands is
-      * a sNaN, a new qNaN has to be generated. This is done in
--     * floatXX_maybe_silence_nan(). For qNaN inputs the specifications
-+     * floatXX_silence_nan(). For qNaN inputs the specifications
-      * says: "When possible, this QNaN result is one of the operand QNaN
-      * values." In practice it seems that most implementations choose
-      * the first operand if both operands are qNaN. In short this gives
-@@ -788,9 +788,15 @@ static float32 propagateFloat32NaN(float32 a, float32 b, float_status *status)
- 
-     if (pickNaN(aIsQuietNaN, aIsSignalingNaN, bIsQuietNaN, bIsSignalingNaN,
-                 aIsLargerSignificand)) {
--        return float32_maybe_silence_nan(b, status);
-+        if (bIsSignalingNaN) {
-+            return float32_silence_nan(b, status);
-+        }
-+        return b;
-     } else {
--        return float32_maybe_silence_nan(a, status);
-+        if (aIsSignalingNaN) {
-+            return float32_silence_nan(a, status);
-+        }
-+        return a;
-     }
- }
- 
-@@ -950,9 +956,15 @@ static float64 propagateFloat64NaN(float64 a, float64 b, float_status *status)
- 
-     if (pickNaN(aIsQuietNaN, aIsSignalingNaN, bIsQuietNaN, bIsSignalingNaN,
-                 aIsLargerSignificand)) {
--        return float64_maybe_silence_nan(b, status);
-+        if (bIsSignalingNaN) {
-+            return float64_silence_nan(b, status);
-+        }
-+        return b;
-     } else {
--        return float64_maybe_silence_nan(a, status);
-+        if (aIsSignalingNaN) {
-+            return float64_silence_nan(a, status);
-+        }
-+        return a;
-     }
- }
- 
-@@ -1121,9 +1133,15 @@ floatx80 propagateFloatx80NaN(floatx80 a, floatx80 b, float_status *status)
- 
-     if (pickNaN(aIsQuietNaN, aIsSignalingNaN, bIsQuietNaN, bIsSignalingNaN,
-                 aIsLargerSignificand)) {
--        return floatx80_maybe_silence_nan(b, status);
-+        if (bIsSignalingNaN) {
-+            return floatx80_silence_nan(b, status);
-+        }
-+        return b;
-     } else {
--        return floatx80_maybe_silence_nan(a, status);
-+        if (aIsSignalingNaN) {
-+            return floatx80_silence_nan(a, status);
-+        }
-+        return a;
-     }
- }
- 
-@@ -1270,8 +1288,14 @@ static float128 propagateFloat128NaN(float128 a, float128 b,
- 
-     if (pickNaN(aIsQuietNaN, aIsSignalingNaN, bIsQuietNaN, bIsSignalingNaN,
-                 aIsLargerSignificand)) {
--        return float128_maybe_silence_nan(b, status);
-+        if (bIsSignalingNaN) {
-+            return float128_silence_nan(b, status);
-+        }
-+        return b;
-     } else {
--        return float128_maybe_silence_nan(a, status);
-+        if (aIsSignalingNaN) {
-+            return float128_silence_nan(a, status);
-+        }
-+        return a;
-     }
- }
+diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+index 4f8034c513..6f0eb83661 100644
+--- a/target/arm/helper-a64.c
++++ b/target/arm/helper-a64.c
+@@ -376,7 +376,7 @@ float16 HELPER(frecpx_f16)(float16 a, void *fpstp)
+         float16 nan = a;
+         if (float16_is_signaling_nan(a, fpst)) {
+             float_raise(float_flag_invalid, fpst);
+-            nan = float16_maybe_silence_nan(a, fpst);
++            nan = float16_silence_nan(a, fpst);
+         }
+         if (fpst->default_nan_mode) {
+             nan = float16_default_nan(fpst);
+@@ -405,7 +405,7 @@ float32 HELPER(frecpx_f32)(float32 a, void *fpstp)
+         float32 nan = a;
+         if (float32_is_signaling_nan(a, fpst)) {
+             float_raise(float_flag_invalid, fpst);
+-            nan = float32_maybe_silence_nan(a, fpst);
++            nan = float32_silence_nan(a, fpst);
+         }
+         if (fpst->default_nan_mode) {
+             nan = float32_default_nan(fpst);
+@@ -434,7 +434,7 @@ float64 HELPER(frecpx_f64)(float64 a, void *fpstp)
+         float64 nan = a;
+         if (float64_is_signaling_nan(a, fpst)) {
+             float_raise(float_flag_invalid, fpst);
+-            nan = float64_maybe_silence_nan(a, fpst);
++            nan = float64_silence_nan(a, fpst);
+         }
+         if (fpst->default_nan_mode) {
+             nan = float64_default_nan(fpst);
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 238a3ceba8..e05c7230d4 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -11731,7 +11731,7 @@ float16 HELPER(recpe_f16)(float16 input, void *fpstp)
+         float16 nan = f16;
+         if (float16_is_signaling_nan(f16, fpst)) {
+             float_raise(float_flag_invalid, fpst);
+-            nan = float16_maybe_silence_nan(f16, fpst);
++            nan = float16_silence_nan(f16, fpst);
+         }
+         if (fpst->default_nan_mode) {
+             nan =  float16_default_nan(fpst);
+@@ -11779,7 +11779,7 @@ float32 HELPER(recpe_f32)(float32 input, void *fpstp)
+         float32 nan = f32;
+         if (float32_is_signaling_nan(f32, fpst)) {
+             float_raise(float_flag_invalid, fpst);
+-            nan = float32_maybe_silence_nan(f32, fpst);
++            nan = float32_silence_nan(f32, fpst);
+         }
+         if (fpst->default_nan_mode) {
+             nan =  float32_default_nan(fpst);
+@@ -11827,7 +11827,7 @@ float64 HELPER(recpe_f64)(float64 input, void *fpstp)
+         float64 nan = f64;
+         if (float64_is_signaling_nan(f64, fpst)) {
+             float_raise(float_flag_invalid, fpst);
+-            nan = float64_maybe_silence_nan(f64, fpst);
++            nan = float64_silence_nan(f64, fpst);
+         }
+         if (fpst->default_nan_mode) {
+             nan =  float64_default_nan(fpst);
+@@ -11926,7 +11926,7 @@ float16 HELPER(rsqrte_f16)(float16 input, void *fpstp)
+         float16 nan = f16;
+         if (float16_is_signaling_nan(f16, s)) {
+             float_raise(float_flag_invalid, s);
+-            nan = float16_maybe_silence_nan(f16, s);
++            nan = float16_silence_nan(f16, s);
+         }
+         if (s->default_nan_mode) {
+             nan =  float16_default_nan(s);
+@@ -11970,7 +11970,7 @@ float32 HELPER(rsqrte_f32)(float32 input, void *fpstp)
+         float32 nan = f32;
+         if (float32_is_signaling_nan(f32, s)) {
+             float_raise(float_flag_invalid, s);
+-            nan = float32_maybe_silence_nan(f32, s);
++            nan = float32_silence_nan(f32, s);
+         }
+         if (s->default_nan_mode) {
+             nan =  float32_default_nan(s);
+@@ -12013,7 +12013,7 @@ float64 HELPER(rsqrte_f64)(float64 input, void *fpstp)
+         float64 nan = f64;
+         if (float64_is_signaling_nan(f64, s)) {
+             float_raise(float_flag_invalid, s);
+-            nan = float64_maybe_silence_nan(f64, s);
++            nan = float64_silence_nan(f64, s);
+         }
+         if (s->default_nan_mode) {
+             nan =  float64_default_nan(s);
 -- 
 2.17.0
