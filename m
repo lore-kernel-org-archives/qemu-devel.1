@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44236)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fIZ6C-00082t-G7
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:30:42 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fIZ6K-00087r-FP
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:30:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fIZ66-0003XR-Dw
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:30:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42609)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fIZ6J-0003ie-66
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:30:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43616)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fIZ66-0003X0-4x
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:30:30 -0400
+	id 1fIZ6I-0003iD-TW
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:30:43 -0400
 From: marcandre.lureau@redhat.com
-Date: Tue, 15 May 2018 14:30:04 +0200
-Message-Id: <20180515123007.10164-2-marcandre.lureau@redhat.com>
+Date: Tue, 15 May 2018 14:30:05 +0200
+Message-Id: <20180515123007.10164-3-marcandre.lureau@redhat.com>
 In-Reply-To: <20180515123007.10164-1-marcandre.lureau@redhat.com>
 References: <20180515123007.10164-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 1/4] ovmf: add and link with
- Tcg2PhysicalPresenceLibNull when !TPM2_ENABLE
+Subject: [Qemu-devel] [PATCH 2/4] ovmf: add QemuTpm.h header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,156 +32,91 @@ Cc: pjones@redhat.com, jiewen.yao@intel.com, stefanb@linux.vnet.ibm.com, lersek@
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-This NULL library will let us call
-Tcg2PhysicalPresenceLibProcessRequest() unconditionally from
-BdsPlatform when building without TPM2_ENABLE.
+Add some common macros and type definitions corresponding to the QEMU
+TPM interface.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- .../DxeTcg2PhysicalPresenceLib.c              | 26 ++++++++++++++
- .../DxeTcg2PhysicalPresenceLib.inf            | 34 +++++++++++++++++++
- OvmfPkg/OvmfPkgIa32.dsc                       |  2 ++
- OvmfPkg/OvmfPkgIa32X64.dsc                    |  2 ++
- OvmfPkg/OvmfPkgX64.dsc                        |  2 ++
- 5 files changed, 66 insertions(+)
- create mode 100644 OvmfPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2Ph=
-ysicalPresenceLib.c
- create mode 100644 OvmfPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2Ph=
-ysicalPresenceLib.inf
+ OvmfPkg/Include/IndustryStandard/QemuTpm.h | 67 ++++++++++++++++++++++
+ 1 file changed, 67 insertions(+)
+ create mode 100644 OvmfPkg/Include/IndustryStandard/QemuTpm.h
 
-diff --git a/OvmfPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2PhysicalP=
-resenceLib.c b/OvmfPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2Physica=
-lPresenceLib.c
+diff --git a/OvmfPkg/Include/IndustryStandard/QemuTpm.h b/OvmfPkg/Include=
+/IndustryStandard/QemuTpm.h
 new file mode 100644
-index 000000000000..0b8b98410315
+index 000000000000..054cf79374b5
 --- /dev/null
-+++ b/OvmfPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2PhysicalPresence=
-Lib.c
-@@ -0,0 +1,26 @@
++++ b/OvmfPkg/Include/IndustryStandard/QemuTpm.h
+@@ -0,0 +1,67 @@
 +/** @file
-+  NULL Tcg2PhysicalPresenceLib library instance
++  Macro and type definitions corresponding to the QEMU TPM interface.
 +
-+  Copyright (c) 2018, Red Hat, Inc.
-+  Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
-+  This program and the accompanying materials
-+  are licensed and made available under the terms and conditions of the =
-BSD License
-+  which accompanies this distribution.  The full text of the license may=
- be found at
++  Refer to "docs/specs/tpm.txt" in the QEMU source directory.
++
++  Copyright (C) 2018, Red Hat, Inc.
++  Copyright (c) 2018, IBM Corporation. All rights reserved.<BR>
++
++  This program and the accompanying materials are licensed and made avai=
+lable
++  under the terms and conditions of the BSD License which accompanies th=
+is
++  distribution. The full text of the license may be found at
 +  http://opensource.org/licenses/bsd-license.php
 +
-+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR I=
-MPLIED.
-+
++  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, =
+WITHOUT
++  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 +**/
 +
-+#include "PiDxe.h"
-+#include <Library/Tcg2PhysicalPresenceLib.h>
++#ifndef __QEMU_TPM_H__
++#define __QEMU_TPM_H__
 +
-+VOID
-+EFIAPI
-+Tcg2PhysicalPresenceLibProcessRequest (
-+  IN      TPM2B_AUTH                     *PlatformAuth  OPTIONAL
-+  )
-+{
-+    return;
-+}
-diff --git a/OvmfPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2PhysicalP=
-resenceLib.inf b/OvmfPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2Physi=
-calPresenceLib.inf
-new file mode 100644
-index 000000000000..e6f6239e1e00
---- /dev/null
-+++ b/OvmfPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2PhysicalPresence=
-Lib.inf
-@@ -0,0 +1,34 @@
-+## @file
-+#  NULL Tcg2PhysicalPresenceLib library instance
-+#
-+#  In SecurityPkg, this library will check and execute TPM 1.2 request
-+#  from OS or BIOS. The request may ask for user confirmation before
-+#  execution. This Library will also lock TPM physical presence at
-+#  last.
-+#
-+# Copyright (C) 2018, Red Hat, Inc.
-+# Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
-+# This program and the accompanying materials
-+# are licensed and made available under the terms and conditions of the =
-BSD License
-+# which accompanies this distribution. The full text of the license may =
-be found at
-+# http://opensource.org/licenses/bsd-license.php
-+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR I=
-MPLIED.
-+#
-+##
++#include <Base.h>
 +
-+[Defines]
-+  INF_VERSION                    =3D 0x00010005
-+  BASE_NAME                      =3D DxeTcg2PhysicalPresenceLibNull
-+  FILE_GUID                      =3D 2A6BA243-DC22-42D8-9C3D-AE3728DC7AF=
-A
-+  MODULE_TYPE                    =3D DXE_DRIVER
-+  VERSION_STRING                 =3D 1.0
-+  LIBRARY_CLASS                  =3D Tcg2PhysicalPresenceLib|DXE_DRIVER =
-DXE_RUNTIME_DRIVER DXE_SAL_DRIVER UEFI_APPLICATION UEFI_DRIVER
++/* whether function is blocked by BIOS settings; bits 0, 1, 2 */
++#define QEMU_TPM_PPI_FUNC_NOT_IMPLEMENTED     (0 << 0)
++#define QEMU_TPM_PPI_FUNC_BIOS_ONLY           (1 << 0)
++#define QEMU_TPM_PPI_FUNC_BLOCKED             (2 << 0)
++#define QEMU_TPM_PPI_FUNC_ALLOWED_USR_REQ     (3 << 0)
++#define QEMU_TPM_PPI_FUNC_ALLOWED_USR_NOT_REQ (4 << 0)
++#define QEMU_TPM_PPI_FUNC_MASK                (7 << 0)
 +
-+[Sources]
-+  DxeTcg2PhysicalPresenceLib.c
++//
++// The following structure is shared between firmware and ACPI.
++//
++#pragma pack (1)
++typedef struct {
++  UINT8 Func[256];           /* func */
++  UINT8 In;                  /* ppin */
++  UINT32 Ip;                 /* ppip */
++  UINT32 Response;           /* pprp */
++  UINT32 Request;            /* pprq */
++  UINT32 RequestParameter;   /* pprm */
++  UINT32 LastRequest;        /* lppr */
++  UINT32 FRet;               /* fret */
++  UINT8 Res1[0x40];          /* res1 */
++  UINT8 NextStep;            /* next_step */
++} QEMU_TPM_PPI;
++#pragma pack ()
 +
-+[Packages]
-+  MdePkg/MdePkg.dec
-+  MdeModulePkg/MdeModulePkg.dec
-+  SecurityPkg/SecurityPkg.dec
-diff --git a/OvmfPkg/OvmfPkgIa32.dsc b/OvmfPkg/OvmfPkgIa32.dsc
-index 2d6c4c4615b6..6c361b73cd55 100644
---- a/OvmfPkg/OvmfPkgIa32.dsc
-+++ b/OvmfPkg/OvmfPkgIa32.dsc
-@@ -208,6 +208,8 @@ [LibraryClasses]
-   Tpm2CommandLib|SecurityPkg/Library/Tpm2CommandLib/Tpm2CommandLib.inf
-   Tcg2PhysicalPresenceLib|SecurityPkg/Library/DxeTcg2PhysicalPresenceLib=
-/DxeTcg2PhysicalPresenceLib.inf
-   Tcg2PpVendorLib|SecurityPkg/Library/Tcg2PpVendorLibNull/Tcg2PpVendorLi=
-bNull.inf
-+!else
-+  Tcg2PhysicalPresenceLib|OvmfPkg/Library/Tcg2PhysicalPresenceLibNull/Dx=
-eTcg2PhysicalPresenceLib.inf
- !endif
-=20
- [LibraryClasses.common]
-diff --git a/OvmfPkg/OvmfPkgIa32X64.dsc b/OvmfPkg/OvmfPkgIa32X64.dsc
-index 43158c5f0627..62a6075a671d 100644
---- a/OvmfPkg/OvmfPkgIa32X64.dsc
-+++ b/OvmfPkg/OvmfPkgIa32X64.dsc
-@@ -213,6 +213,8 @@ [LibraryClasses]
-   Tpm2CommandLib|SecurityPkg/Library/Tpm2CommandLib/Tpm2CommandLib.inf
-   Tcg2PhysicalPresenceLib|SecurityPkg/Library/DxeTcg2PhysicalPresenceLib=
-/DxeTcg2PhysicalPresenceLib.inf
-   Tcg2PpVendorLib|SecurityPkg/Library/Tcg2PpVendorLibNull/Tcg2PpVendorLi=
-bNull.inf
-+!else
-+  Tcg2PhysicalPresenceLib|OvmfPkg/Library/Tcg2PhysicalPresenceLibNull/Dx=
-eTcg2PhysicalPresenceLib.inf
- !endif
-=20
- [LibraryClasses.common]
-diff --git a/OvmfPkg/OvmfPkgX64.dsc b/OvmfPkg/OvmfPkgX64.dsc
-index d1fdf7c307c2..cbab1aa328c6 100644
---- a/OvmfPkg/OvmfPkgX64.dsc
-+++ b/OvmfPkg/OvmfPkgX64.dsc
-@@ -213,6 +213,8 @@ [LibraryClasses]
-   Tpm2CommandLib|SecurityPkg/Library/Tpm2CommandLib/Tpm2CommandLib.inf
-   Tcg2PhysicalPresenceLib|SecurityPkg/Library/DxeTcg2PhysicalPresenceLib=
-/DxeTcg2PhysicalPresenceLib.inf
-   Tcg2PpVendorLib|SecurityPkg/Library/Tcg2PpVendorLibNull/Tcg2PpVendorLi=
-bNull.inf
-+!else
-+  Tcg2PhysicalPresenceLib|OvmfPkg/Library/Tcg2PhysicalPresenceLibNull/Dx=
-eTcg2PhysicalPresenceLib.inf
- !endif
-=20
- [LibraryClasses.common]
++//
++// The following structure is for the fw_cfg etc/tpm/config file.
++//
++#pragma pack (1)
++typedef struct {
++  UINT32 PpiAddress;
++  UINT8 TpmVersion;
++  UINT8 PpiVersion;
++} QEMU_FWCFG_TPM_CONFIG;
++#pragma pack ()
++
++#define QEMU_TPM_VERSION_UNSPEC    0
++#define QEMU_TPM_VERSION_1_2       1
++#define QEMU_TPM_VERSION_2         2
++
++#define QEMU_TPM_PPI_VERSION_NONE  0
++#define QEMU_TPM_PPI_VERSION_1_30  1
++
++#endif
 --=20
 2.17.0.253.g3dd125b46d
