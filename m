@@ -1,19 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fIajg-0002Tq-V9
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:15:32 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fIani-0005ic-Ja
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:19:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fIajf-0000o4-Vf
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:15:28 -0400
-Date: Tue, 15 May 2018 16:15:18 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180515141518.GF4442@localhost.localdomain>
-References: <20180509162637.15575-1-kwolf@redhat.com>
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fIane-0002KJ-H9
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:19:38 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56628
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1fIane-0002Ii-Bu
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:19:34 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w4FEF2lf056024
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 10:19:32 -0400
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2j006gbkka-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 10:19:32 -0400
+Received: from localhost
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Tue, 15 May 2018 08:19:31 -0600
+References: <20180515121433.6112-1-marcandre.lureau@redhat.com>
+	<20180515121433.6112-2-marcandre.lureau@redhat.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Tue, 15 May 2018 10:19:25 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180509162637.15575-1-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 00/42] Generic background jobs
+In-Reply-To: <20180515121433.6112-2-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-MW
+Message-Id: <ebcff949-797e-38db-a6d0-d56cc5e234dd@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 1/4] tpm: implement virtual memory
+ device for TPM PPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,24 +44,262 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: mreitz@redhat.com, eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Am 09.05.2018 um 18:25 hat Kevin Wolf geschrieben:
-> Before we can make x-blockdev-create a background job, we need to
-> generalise the job infrastructure so that it can be used without any
-> associated block node.
-> 
-> This series extracts a Job object from the block job infrastructure,
-> which should contain everything related to jobs that doesn't require the
-> block layer to be involved.
-> 
-> Job creation with a centralised job-create command (if we even want
-> this) as well as the actual conversion of x-blockdev-create to Job is
-> left for another series. With 42 patches, the series must be perfect and
-> I can't add any more patches.
+On 05/15/2018 08:14 AM, Marc-Andr=C3=A9 Lureau wrote:
+> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>
+> Implement a virtual memory device for the TPM Physical Presence interfa=
+ce.
+> The memory is located at 0xfffef000 and used by ACPI to send messages t=
+o the
 
-Thanks for the review, applied patches 1-6 in the hope of making v2 at
-least a little bit shorter. :-)
+It's now located at 0xFED45000. I changed that without changing the=20
+commit text... Rest looks good :-)
 
-Kevin
+
+> firmware (BIOS) and by the firmware to provide parameters for each one =
+of
+> the supported codes.
+>
+> This device should be used by all TPM interfaces on x86 and can be adde=
+d
+> by calling tpm_ppi_init_io().
+>
+> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>
+> ---
+>
+> v3 (Marc-Andr=C3=A9):
+>   - merge CRB support
+>   - use trace events instead of DEBUG printf
+>   - headers inclusion simplification
+>
+> v2:
+>   - moved to byte access since an infrequently used device;
+>     this simplifies code
+>   - increase size of device to 0x400
+>   - move device to 0xfffef000 since SeaBIOS has some code at 0xffff0000=
+:
+>     'On the emulators, the bios at 0xf0000 is also at 0xffff0000'
+> ---
+>   hw/tpm/tpm_ppi.h      | 26 ++++++++++++++++++++
+>   include/hw/acpi/tpm.h |  6 +++++
+>   hw/tpm/tpm_crb.c      |  5 ++++
+>   hw/tpm/tpm_ppi.c      | 56 ++++++++++++++++++++++++++++++++++++++++++=
++
+>   hw/tpm/tpm_tis.c      |  5 ++++
+>   hw/tpm/Makefile.objs  |  2 +-
+>   hw/tpm/trace-events   |  4 ++++
+>   7 files changed, 103 insertions(+), 1 deletion(-)
+>   create mode 100644 hw/tpm/tpm_ppi.h
+>   create mode 100644 hw/tpm/tpm_ppi.c
+>
+> diff --git a/hw/tpm/tpm_ppi.h b/hw/tpm/tpm_ppi.h
+> new file mode 100644
+> index 0000000000..17030bd989
+> --- /dev/null
+> +++ b/hw/tpm/tpm_ppi.h
+> @@ -0,0 +1,26 @@
+> +/*
+> + * TPM Physical Presence Interface
+> + *
+> + * Copyright (C) 2018 IBM Corporation
+> + *
+> + * Authors:
+> + *  Stefan Berger    <stefanb@us.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or =
+later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +#ifndef TPM_TPM_PPI_H
+> +#define TPM_TPM_PPI_H
+> +
+> +#include "hw/acpi/tpm.h"
+> +#include "exec/address-spaces.h"
+> +
+> +typedef struct TPMPPI {
+> +    MemoryRegion mmio;
+> +
+> +    uint8_t ram[TPM_PPI_ADDR_SIZE];
+> +} TPMPPI;
+> +
+> +void tpm_ppi_init_io(TPMPPI *tpmppi, struct MemoryRegion *m, Object *o=
+bj);
+> +
+> +#endif /* TPM_TPM_PPI_H */
+> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
+> index 46ac4dc581..c082df7d1d 100644
+> --- a/include/hw/acpi/tpm.h
+> +++ b/include/hw/acpi/tpm.h
+> @@ -187,4 +187,10 @@ REG32(CRB_DATA_BUFFER, 0x80)
+>   #define TPM2_START_METHOD_MMIO      6
+>   #define TPM2_START_METHOD_CRB       7
+>
+> +/*
+> + * Physical Presence Interface
+> + */
+> +#define TPM_PPI_ADDR_SIZE           0x400
+> +#define TPM_PPI_ADDR_BASE           0xFED45000
+> +
+>   #endif /* HW_ACPI_TPM_H */
+> diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
+> index a92dd50437..4f585564d9 100644
+> --- a/hw/tpm/tpm_crb.c
+> +++ b/hw/tpm/tpm_crb.c
+> @@ -29,6 +29,7 @@
+>   #include "sysemu/reset.h"
+>   #include "tpm_int.h"
+>   #include "tpm_util.h"
+> +#include "tpm_ppi.h"
+>   #include "trace.h"
+>
+>   typedef struct CRBState {
+> @@ -41,6 +42,8 @@ typedef struct CRBState {
+>       MemoryRegion cmdmem;
+>
+>       size_t be_buffer_size;
+> +
+> +    TPMPPI ppi;
+>   } CRBState;
+>
+>   #define CRB(obj) OBJECT_CHECK(CRBState, (obj), TYPE_TPM_CRB)
+> @@ -291,6 +294,8 @@ static void tpm_crb_realize(DeviceState *dev, Error=
+ **errp)
+>       memory_region_add_subregion(get_system_memory(),
+>           TPM_CRB_ADDR_BASE + sizeof(s->regs), &s->cmdmem);
+>
+> +    tpm_ppi_init_io(&s->ppi, get_system_memory(), OBJECT(s));
+> +
+>       qemu_register_reset(tpm_crb_reset, dev);
+>   }
+>
+> diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
+> new file mode 100644
+> index 0000000000..0019c3e6fc
+> --- /dev/null
+> +++ b/hw/tpm/tpm_ppi.c
+> @@ -0,0 +1,56 @@
+> +/*
+> + * tpm_ppi.c - TPM Physical Presence Interface
+> + *
+> + * Copyright (C) 2018 IBM Corporation
+> + *
+> + * Authors:
+> + *  Stefan Berger <stefanb@us.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or =
+later.
+> + * See the COPYING file in the top-level directory.
+> + *
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +
+> +#include "tpm_ppi.h"
+> +#include "trace.h"
+> +
+> +static uint64_t tpm_ppi_mmio_read(void *opaque, hwaddr addr,
+> +                                  unsigned size)
+> +{
+> +    TPMPPI *s =3D opaque;
+> +
+> +    trace_tpm_ppi_mmio_read(addr, size, s->ram[addr]);
+> +
+> +    return s->ram[addr];
+> +}
+> +
+> +static void tpm_ppi_mmio_write(void *opaque, hwaddr addr,
+> +                               uint64_t val, unsigned size)
+> +{
+> +    TPMPPI *s =3D opaque;
+> +
+> +    trace_tpm_ppi_mmio_write(addr, size, val);
+> +
+> +    s->ram[addr] =3D val;
+> +}
+> +
+> +static const MemoryRegionOps tpm_ppi_memory_ops =3D {
+> +    .read =3D tpm_ppi_mmio_read,
+> +    .write =3D tpm_ppi_mmio_write,
+> +    .endianness =3D DEVICE_NATIVE_ENDIAN,
+> +    .valid =3D {
+> +        .min_access_size =3D 1,
+> +        .max_access_size =3D 1,
+> +    },
+> +};
+> +
+> +void tpm_ppi_init_io(TPMPPI *tpmppi, struct MemoryRegion *m, Object *o=
+bj)
+> +{
+> +    memory_region_init_io(&tpmppi->mmio, obj, &tpm_ppi_memory_ops,
+> +                          tpmppi, "tpm-ppi-mmio",
+> +                          TPM_PPI_ADDR_SIZE);
+> +
+> +    memory_region_add_subregion(m, TPM_PPI_ADDR_BASE, &tpmppi->mmio);
+> +}
+> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+> index 12f5c9a759..9a2fec455a 100644
+> --- a/hw/tpm/tpm_tis.c
+> +++ b/hw/tpm/tpm_tis.c
+> @@ -31,6 +31,7 @@
+>   #include "sysemu/tpm_backend.h"
+>   #include "tpm_int.h"
+>   #include "tpm_util.h"
+> +#include "tpm_ppi.h"
+>   #include "trace.h"
+>
+>   #define TPM_TIS_NUM_LOCALITIES      5     /* per spec */
+> @@ -81,6 +82,8 @@ typedef struct TPMState {
+>       TPMVersion be_tpm_version;
+>
+>       size_t be_buffer_size;
+> +
+> +    TPMPPI ppi;
+>   } TPMState;
+>
+>   #define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS)
+> @@ -976,6 +979,8 @@ static void tpm_tis_realizefn(DeviceState *dev, Err=
+or **errp)
+>
+>       memory_region_add_subregion(isa_address_space(ISA_DEVICE(dev)),
+>                                   TPM_TIS_ADDR_BASE, &s->mmio);
+> +
+> +    tpm_ppi_init_io(&s->ppi, isa_address_space(ISA_DEVICE(dev)), OBJEC=
+T(s));
+>   }
+>
+>   static void tpm_tis_initfn(Object *obj)
+> diff --git a/hw/tpm/Makefile.objs b/hw/tpm/Makefile.objs
+> index 1dc9f8bf2c..eedd8b6858 100644
+> --- a/hw/tpm/Makefile.objs
+> +++ b/hw/tpm/Makefile.objs
+> @@ -1,4 +1,4 @@
+> -common-obj-y +=3D tpm_util.o
+> +common-obj-y +=3D tpm_util.o tpm_ppi.o
+>   common-obj-$(CONFIG_TPM_TIS) +=3D tpm_tis.o
+>   common-obj-$(CONFIG_TPM_CRB) +=3D tpm_crb.o
+>   common-obj-$(CONFIG_TPM_PASSTHROUGH) +=3D tpm_passthrough.o
+> diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
+> index 25bee0cecf..81f9923401 100644
+> --- a/hw/tpm/trace-events
+> +++ b/hw/tpm/trace-events
+> @@ -8,6 +8,10 @@ tpm_crb_mmio_write(uint64_t addr, unsigned size, uint3=
+2_t val) "CRB write 0x" TA
+>   tpm_passthrough_handle_request(void *cmd) "processing command %p"
+>   tpm_passthrough_reset(void) "reset"
+>
+> +# hw/tpm/tpm_ppi.c
+> +tpm_ppi_mmio_read(uint64_t addr, unsigned size, uint32_t val) "PPI rea=
+d 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32
+> +tpm_ppi_mmio_write(uint64_t addr, unsigned size, uint32_t val) "PPI wr=
+ite 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32
+> +
+>   # hw/tpm/tpm_util.c
+>   tpm_util_get_buffer_size_hdr_len(uint32_t len, size_t expected) "tpm_=
+resp->hdr.len =3D %u, expected =3D %zu"
+>   tpm_util_get_buffer_size_len(uint32_t len, size_t expected) "tpm_resp=
+->len =3D %u, expected =3D %zu"
