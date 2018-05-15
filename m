@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fIZlP-0007nb-7B
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 09:13:12 -0400
+	(envelope-from <sw@weilnetz.de>) id 1fIZm3-000898-Bw
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 09:13:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fIZlM-0004ND-18
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 09:13:11 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56362 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fIZlL-0004My-T6
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 09:13:07 -0400
-Date: Tue, 15 May 2018 16:12:56 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180515161223-mutt-send-email-mst@kernel.org>
-References: <1526303228-486609-1-git-send-email-mst@redhat.com>
-	<CAFEAcA_bWJupL7oj=uxNAi3=1RGUZxpEeKx1L=JBZa6J4CuuYA@mail.gmail.com>
-	<20180514212856-mutt-send-email-mst@kernel.org>
-	<CAFEAcA_mLsbULijnaWfVShO0ZHSJx7QQTB32Cs+FU-HZiFbFSw@mail.gmail.com>
+	(envelope-from <sw@weilnetz.de>) id 1fIZlu-0004fV-UP
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 09:13:51 -0400
+References: <20180513090613.27960-1-sw@weilnetz.de>
+	<cc3f26a7-a8b7-35a8-9ffa-c5940c9c1927@weilnetz.de>
+	<CAFEAcA9kcKb28uQJOnqCAC4Gf9b7Hnu0wJbG1nHQLF4U1T9sKA@mail.gmail.com>
+From: Stefan Weil <sw@weilnetz.de>
+Message-ID: <99693ba4-c282-a10b-e811-697617f7ee06@weilnetz.de>
+Date: Tue, 15 May 2018 15:13:33 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_mLsbULijnaWfVShO0ZHSJx7QQTB32Cs+FU-HZiFbFSw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v6 0/3] linux-headers: arch fixups
+In-Reply-To: <CAFEAcA9kcKb28uQJOnqCAC4Gf9b7Hnu0wJbG1nHQLF4U1T9sKA@mail.gmail.com>
+Content-Language: en-GB
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] disas/libvixl: Fix VIXL_FALLTHROUGH macro
+ for QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +27,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, James Hogan <jhogan@kernel.org>
+Cc: QEMU Developer <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On Mon, May 14, 2018 at 07:37:49PM +0100, Peter Maydell wrote:
-> On 14 May 2018 at 19:29, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > On Mon, May 14, 2018 at 04:10:42PM +0100, Peter Maydell wrote:
-> >> On 14 May 2018 at 14:07, Michael S. Tsirkin <mst@redhat.com> wrote:
-> >> > It turns out that we have unistd.h and kvm headers for some
-> >> > architectures but not others.  We are thus unable to use e.g. usefaultfd
-> >> > on these systems unless system headers have been updated.
-> >> >
-> >> > Fix up update-linux-headers.sh to make sure we auto-updates
-> >> > all architectures which have linux-headers/
-> >> > (unfortunately this still does not mean "all linux systems").
-> >> >
-> >> > Tested on x86 only.
-> >> >
-> >> > Pls consider merging this through the ARM tree.
-> >> >
-> >> > Changes from v5:
-> >> >     rebase to master
-> >>
-> >> Still doesn't apply:
-> >
-> > Against which commit?
-> 
-> bbd87423ea0c436c55bb, but the last change in master
-> to scripts/update-linux-headers.sh is 7afcfd32a65688 a
-> month ago, so this won't apply to anything since then
-> and wouldn't have applied before that either. I think you
-> have based your patchset on some other changes to the script
-> which are not in master (at a guess, your "move kvm_para.h
-> to standard-headers" series).
-> 
+Am 15.05.2018 um 14:13 schrieb Peter Maydell:
+> On 13 May 2018 at 10:57, Stefan Weil <sw@weilnetz.de> wrote:
+>> Even with the above patch, disas/libvixl raises a compiler warning for a
+>> fall through case. The patch below fixes that warning, but I am not sure
+>> whether a fall through is correct there.
+>>
+>> Stefan
+>>
+>>
+>> diff --git a/disas/libvixl/vixl/a64/disasm-a64.cc
+>> b/disas/libvixl/vixl/a64/disasm-a64.cc
+>> index 7a58a5c087..5481d94209 100644
+>> --- a/disas/libvixl/vixl/a64/disasm-a64.cc
+>> +++ b/disas/libvixl/vixl/a64/disasm-a64.cc
+>> @@ -2986,6 +2986,7 @@ int Disassembler::SubstituteImmediateField(const
+>> Instruction* instr,
+>>            return 3;
+>>          }
+>>        }
+>> +      VIXL_FALLTHROUGH(); // ???
+>>      }
+>>      case 'C': {  // ICondB - Immediate Conditional Branch.
+>>        int64_t offset = instr->ImmCondBranch() << 2;
+> This is fixed in upstream vixl, in fact:
+>
+> https://git.linaro.org/arm/vixl.git/commit/?id=de326f850f736c3a337fda52845ed3d2e620cc02
+>
 > thanks
 > -- PMM
 
-OK I will just do a pull with these + kvm headers since it was
-approved by Paolo.
 
--- 
-MST
+That fix will work for the moment, but is not sufficient for the future
+because it only supports gcc 7.x, but not gcc 8.x or later:
+
++#elif __GNUC__ == 7
+
+How do we proceed with the code in QEMU? Do you have a plan to update
+the vixl code? As vixl is obviously no longer maintained on GitHub, I am
+not sure whom I could contact.
+
+And what about my other question / suggestion:
+
+"I suggest to add and use a similar macro QEMU_FALLTHROUGH() for the
+rest of the code and can provide a patch if that's fine for everyone."
+
+gcc gives lots of fallthrough warnings, and many code locations don't contain a comment stating that the fall through is fine.
+
+Thanks
+Stefan
