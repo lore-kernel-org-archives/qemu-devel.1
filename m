@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fIaxj-00067V-7Y
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:30:00 -0400
+	(envelope-from <eblake@redhat.com>) id 1fIay8-0006aD-Tj
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:30:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fIaxf-0005xU-0b
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:29:59 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57862 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1fIay2-00068e-VY
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:30:24 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33968 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fIaxe-0005x5-RK
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:29:54 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1526268228-27951-1-git-send-email-zhangckid@gmail.com>
-	<1526268228-27951-11-git-send-email-zhangckid@gmail.com>
-Date: Tue, 15 May 2018 16:29:52 +0200
-In-Reply-To: <1526268228-27951-11-git-send-email-zhangckid@gmail.com> (Zhang
-	Chen's message of "Mon, 14 May 2018 11:23:41 +0800")
-Message-ID: <87603p6lgf.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fIay2-00068H-Jz
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:30:18 -0400
+References: <20180313044944.21058-1-aik@ozlabs.ru>
+	<20180313074442.xw5deum6xfw5tvjw@var.youpi.perso.aquilenet.fr>
+	<87d13bdd-4a33-fb05-0c7c-36aabbd3d038@ozlabs.ru>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ad86c974-120e-4a2d-1db9-03d1b8ace247@redhat.com>
+Date: Tue, 15 May 2018 09:30:17 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH V7 10/17] qmp event: Add COLO_EXIT event to
- notify users while exited COLO
+In-Reply-To: <87d13bdd-4a33-fb05-0c7c-36aabbd3d038@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu v2] slirp/debug: Print IP addresses in
+ human readable form
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,138 +30,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangckid@gmail.com>
-Cc: qemu-devel@nongnu.org, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, Samuel Thibault <samuel.thibault@gnu.org>
+Cc: qemu-devel@nongnu.org
 
-Zhang Chen <zhangckid@gmail.com> writes:
+On 05/14/2018 02:00 AM, Alexey Kardashevskiy wrote:
+> On 13/3/18 6:44 pm, Samuel Thibault wrote:
+>> Alexey Kardashevskiy, on mar. 13 mars 2018 15:49:44 +1100, wrote:
+>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>>
+>> Applied to my tree, thanks!
+> 
+> 
+> And what is your tree, is this something to be merged sometime later
+> somewhere? :)
 
-> From: zhanghailiang <zhang.zhanghailiang@huawei.com>
->
-> If some errors happen during VM's COLO FT stage, it's important to
-> notify the users of this event. Together with 'x-colo-lost-heartbeat',
-> Users can intervene in COLO's failover work immediately.
-> If users don't want to get involved in COLO's failover verdict,
-> it is still necessary to notify users that we exited COLO mode.
->
-> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> ---
->  migration/colo.c    | 20 ++++++++++++++++++++
->  qapi/migration.json | 37 +++++++++++++++++++++++++++++++++++++
->  2 files changed, 57 insertions(+)
->
-> diff --git a/migration/colo.c b/migration/colo.c
-> index c083d36..8ca6381 100644
-> --- a/migration/colo.c
-> +++ b/migration/colo.c
-> @@ -28,6 +28,7 @@
->  #include "net/colo-compare.h"
->  #include "net/colo.h"
->  #include "block/block.h"
-> +#include "qapi/qapi-events-migration.h"
->  
->  static bool vmstate_loading;
->  static Notifier packets_compare_notifier;
-> @@ -514,6 +515,18 @@ out:
->          qemu_fclose(fb);
->      }
->  
-> +    /*
-> +     * There are only two reasons we can go here, some error happened.
-> +     * Or the user triggered failover.
-> +     */
-> +    if (failover_get_state() == FAILOVER_STATUS_NONE) {
-> +        qapi_event_send_colo_exit(COLO_MODE_PRIMARY,
-> +                                  COLO_EXIT_REASON_ERROR, NULL);
-> +    } else {
-> +        qapi_event_send_colo_exit(COLO_MODE_PRIMARY,
-> +                                  COLO_EXIT_REASON_REQUEST, NULL);
-> +    }
+Per MAINTAINERS:
 
-Your comment makes me suspect failover_get_state() can only be
-FAILOVER_STATUS_NONE or FAILOVER_STATUS_REQUIRE here.  Is that correct?
+SLIRP
+M: Samuel Thibault <samuel.thibault@ens-lyon.org>
+M: Jan Kiszka <jan.kiszka@siemens.com>
+S: Maintained
+F: slirp/
+F: net/slirp.c
+F: include/net/slirp.h
+T: git git://git.kiszka.org/qemu.git queues/slirp
 
-If yes, I recommend to add a suitable assertion.
+which shows Jan's staging tree, but not Samuel's.
 
-> +
->      /* Hope this not to be too long to wait here */
->      qemu_sem_wait(&s->colo_exit_sem);
->      qemu_sem_destroy(&s->colo_exit_sem);
-> @@ -744,6 +757,13 @@ out:
->      if (local_err) {
->          error_report_err(local_err);
->      }
-> +    if (failover_get_state() == FAILOVER_STATUS_NONE) {
-> +        qapi_event_send_colo_exit(COLO_MODE_SECONDARY,
-> +                                  COLO_EXIT_REASON_ERROR, NULL);
-> +    } else {
-> +        qapi_event_send_colo_exit(COLO_MODE_SECONDARY,
-> +                                  COLO_EXIT_REASON_REQUEST, NULL);
-> +    }
+It's not a requirement for a maintainer to have a public-facing staging 
+tree, but many of them do, as it gives you a chance to test that what 
+will later be in a pull request matches what you expect.
 
-Same question.
+At any rate, 
+https://wiki.qemu.org/Contribute/SubmitAPatch#Is_my_patch_in.3F mentions 
+that maintainers will batch together various related patches and send a 
+pull request for inclusion in the main repository, thus even when a 
+patch has been reviewed and staged, it may be another week or two before 
+it lands in mainline.  Yes, it can feel slow, but in general it works 
+out for the best (as we have more chances to flag potential problems 
+before they affect everyone by being in mainline).
 
->  
->      if (fb) {
->          qemu_fclose(fb);
-> diff --git a/qapi/migration.json b/qapi/migration.json
-> index f3974c6..55dae48 100644
-> --- a/qapi/migration.json
-> +++ b/qapi/migration.json
-> @@ -875,6 +875,43 @@
->    'data': [ 'none', 'require', 'active', 'completed', 'relaunch' ] }
->  
->  ##
-> +# @COLO_EXIT:
-> +#
-> +# Emitted when VM finishes COLO mode due to some errors happening or
-> +# at the request of users.
-> +#
-> +# @mode: report COLO mode when COLO exited.
-> +#
-> +# @reason: describes the reason for the COLO exit.
-> +#
-> +# Since: 2.13
-> +#
-> +# Example:
-> +#
-> +# <- { "timestamp": {"seconds": 2032141960, "microseconds": 417172},
-> +#      "event": "COLO_EXIT", "data": {"mode": "primary", "reason": "request" } }
-> +#
-> +##
-> +{ 'event': 'COLO_EXIT',
-> +  'data': {'mode': 'COLOMode', 'reason': 'COLOExitReason' } }
-
-'data' duplicates the next patch's ColoStatus, except it lacks
-@colo-running.  Factoring out the common part doesn't seem worth the
-bother.  Okay as is.
-
-> +
-> +##
-> +# @COLOExitReason:
-> +#
-> +# The reason for a COLO exit
-> +#
-> +# @none: no failover has ever happened.
-
-This can't occur in the COLO_EXIT event, only in the result of
-query-colo-status, can it?
-
-Worth spelling that out in the documentation?
-
-> +#
-> +# @request: COLO exit is due to an external request
-> +#
-> +# @error: COLO exit is due to an internal error
-> +#
-> +# Since: 2.13
-> +##
-> +{ 'enum': 'COLOExitReason',
-> +  'data': [ 'none', 'request', 'error' ] }
-> +
-> +##
->  # @x-colo-lost-heartbeat:
->  #
->  # Tell qemu that heartbeat is lost, request it to do takeover procedures.
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
