@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fIjYY-0002yn-Bp
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 19:40:35 -0400
+	(envelope-from <quintela@redhat.com>) id 1fIjYe-00032t-Og
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 19:40:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fIjYV-0001iE-GF
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 19:40:34 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40006 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fIjYd-0001n1-Sy
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 19:40:40 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56494 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fIjYU-0001ht-Ko
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 19:40:30 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fIjYd-0001mt-Op
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 19:40:39 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 359B040203F4
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 23:40:30 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 58B7C40201A0
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 23:40:39 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 16 May 2018 01:39:44 +0200
-Message-Id: <20180515234017.2277-8-quintela@redhat.com>
+Date: Wed, 16 May 2018 01:39:51 +0200
+Message-Id: <20180515234017.2277-15-quintela@redhat.com>
 In-Reply-To: <20180515234017.2277-1-quintela@redhat.com>
 References: <20180515234017.2277-1-quintela@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 07/40] migration: Be sure all recv channels are
- created
+Subject: [Qemu-devel] [PULL 14/40] migration: new postcopy-pause state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,66 +32,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-We need them before we start migration.
+From: Peter Xu <peterx@redhat.com>
 
+Introducing a new state "postcopy-paused", which can be used when the
+postcopy migration is paused. It is targeted for postcopy network
+failure recovery.
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Message-Id: <20180502104740.12123-3-peterx@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- migration/migration.c |  6 +++++-
- migration/ram.c       | 11 +++++++++++
- migration/ram.h       |  1 +
- 3 files changed, 17 insertions(+), 1 deletion(-)
+ migration/migration.c | 2 ++
+ qapi/migration.json   | 5 ++++-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/migration/migration.c b/migration/migration.c
-index 4a7959c111..8e5b421b97 100644
+index 61c4ee7850..02ebd6c9d1 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -462,7 +462,11 @@ void migration_ioc_process_incoming(QIOChannel *ioc)
-  */
- bool migration_has_all_channels(void)
- {
--    return true;
-+    bool all_channels;
-+
-+    all_channels =3D multifd_recv_all_channels_created();
-+
-+    return all_channels;
- }
-=20
- /*
-diff --git a/migration/ram.c b/migration/ram.c
-index 1aa661e6ab..d5335c10b6 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -671,6 +671,17 @@ int multifd_load_setup(void)
-     return 0;
- }
-=20
-+bool multifd_recv_all_channels_created(void)
-+{
-+    int thread_count =3D migrate_multifd_channels();
-+
-+    if (!migrate_use_multifd()) {
-+        return true;
-+    }
-+
-+    return thread_count =3D=3D atomic_read(&multifd_recv_state->count);
-+}
-+
- void multifd_recv_new_channel(QIOChannel *ioc)
- {
-     /* nothing to do yet */
-diff --git a/migration/ram.h b/migration/ram.h
-index 06dbddc2a2..3f4b7daee8 100644
---- a/migration/ram.h
-+++ b/migration/ram.h
-@@ -45,6 +45,7 @@ int multifd_save_setup(void);
- int multifd_save_cleanup(Error **errp);
- int multifd_load_setup(void);
- int multifd_load_cleanup(Error **errp);
-+bool multifd_recv_all_channels_created(void);
- void multifd_recv_new_channel(QIOChannel *ioc);
-=20
- uint64_t ram_pagesize_summary(void);
---=20
+@@ -574,6 +574,7 @@ static bool migration_is_setup_or_active(int state)
+     switch (state) {
+     case MIGRATION_STATUS_ACTIVE:
+     case MIGRATION_STATUS_POSTCOPY_ACTIVE:
++    case MIGRATION_STATUS_POSTCOPY_PAUSED:
+     case MIGRATION_STATUS_SETUP:
+     case MIGRATION_STATUS_PRE_SWITCHOVER:
+     case MIGRATION_STATUS_DEVICE:
+@@ -654,6 +655,7 @@ static void fill_source_migration_info(MigrationInfo *info)
+     case MIGRATION_STATUS_POSTCOPY_ACTIVE:
+     case MIGRATION_STATUS_PRE_SWITCHOVER:
+     case MIGRATION_STATUS_DEVICE:
++    case MIGRATION_STATUS_POSTCOPY_PAUSED:
+          /* TODO add some postcopy stats */
+         info->has_status = true;
+         info->has_total_time = true;
+diff --git a/qapi/migration.json b/qapi/migration.json
+index f3974c6807..244334e9f4 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -89,6 +89,8 @@
+ #
+ # @postcopy-active: like active, but now in postcopy mode. (since 2.5)
+ #
++# @postcopy-paused: during postcopy but paused. (since 2.13)
++#
+ # @completed: migration is finished.
+ #
+ # @failed: some error occurred during migration process.
+@@ -106,7 +108,8 @@
+ ##
+ { 'enum': 'MigrationStatus',
+   'data': [ 'none', 'setup', 'cancelling', 'cancelled',
+-            'active', 'postcopy-active', 'completed', 'failed', 'colo',
++            'active', 'postcopy-active', 'postcopy-paused',
++            'completed', 'failed', 'colo',
+             'pre-switchover', 'device' ] }
+ 
+ ##
+-- 
 2.17.0
