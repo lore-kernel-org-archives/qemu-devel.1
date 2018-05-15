@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58166)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fIjYe-00032R-7I
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 19:40:42 -0400
+	(envelope-from <quintela@redhat.com>) id 1fIjYY-0002yn-Bp
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 19:40:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fIjYb-0001ly-As
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 19:40:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40010 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fIjYV-0001iE-GF
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 19:40:34 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40006 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fIjYb-0001li-5n
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 19:40:37 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fIjYU-0001ht-Ko
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 19:40:30 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B9EF940203F4
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 23:40:36 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 359B040203F4
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 23:40:30 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 16 May 2018 01:39:49 +0200
-Message-Id: <20180515234017.2277-13-quintela@redhat.com>
+Date: Wed, 16 May 2018 01:39:44 +0200
+Message-Id: <20180515234017.2277-8-quintela@redhat.com>
 In-Reply-To: <20180515234017.2277-1-quintela@redhat.com>
 References: <20180515234017.2277-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 12/40] migration: Define MultifdRecvParams sooner
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 07/40] migration: Be sure all recv channels are
+ created
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,86 +36,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Once there, we don't need the struct names anywhere, just the
-typedefs.  And now also document all fields.
+We need them before we start migration.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- migration/ram.c | 46 +++++++++++++++++++++++++++++++---------------
- 1 file changed, 31 insertions(+), 15 deletions(-)
+ migration/migration.c |  6 +++++-
+ migration/ram.c       | 11 +++++++++++
+ migration/ram.h       |  1 +
+ 3 files changed, 17 insertions(+), 1 deletion(-)
 
+diff --git a/migration/migration.c b/migration/migration.c
+index 4a7959c111..8e5b421b97 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -462,7 +462,11 @@ void migration_ioc_process_incoming(QIOChannel *ioc)
+  */
+ bool migration_has_all_channels(void)
+ {
+-    return true;
++    bool all_channels;
++
++    all_channels =3D multifd_recv_all_channels_created();
++
++    return all_channels;
+ }
+=20
+ /*
 diff --git a/migration/ram.c b/migration/ram.c
-index f46a373074..cb14399ef9 100644
+index 1aa661e6ab..d5335c10b6 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -445,17 +445,45 @@ typedef struct {
-     uint8_t id;
- } __attribute__((packed)) MultiFDInit_t;
- 
--struct MultiFDSendParams {
-+typedef struct {
-+    /* this fields are not changed once the thread is created */
-+    /* channel number */
-     uint8_t id;
-+    /* channel thread name */
-     char *name;
-+    /* channel thread id */
-     QemuThread thread;
-+    /* communication channel */
-     QIOChannel *c;
-+    /* sem where to wait for more work */
-     QemuSemaphore sem;
-+    /* this mutex protects the following parameters */
-     QemuMutex mutex;
-+    /* is this channel thread running */
-     bool running;
-+    /* should this thread finish */
-     bool quit;
--};
--typedef struct MultiFDSendParams MultiFDSendParams;
-+}  MultiFDSendParams;
-+
-+typedef struct {
-+    /* this fields are not changed once the thread is created */
-+    /* channel number */
-+    uint8_t id;
-+    /* channel thread name */
-+    char *name;
-+    /* channel thread id */
-+    QemuThread thread;
-+    /* communication channel */
-+    QIOChannel *c;
-+    /* sem where to wait for more work */
-+    QemuSemaphore sem;
-+    /* this mutex protects the following parameters */
-+    QemuMutex mutex;
-+    /* is this channel thread running */
-+    bool running;
-+    /* should this thread finish */
-+    bool quit;
-+} MultiFDRecvParams;
- 
- static int multifd_send_initial_packet(MultiFDSendParams *p, Error **errp)
- {
-@@ -657,18 +685,6 @@ int multifd_save_setup(void)
+@@ -671,6 +671,17 @@ int multifd_load_setup(void)
      return 0;
  }
- 
--struct MultiFDRecvParams {
--    uint8_t id;
--    char *name;
--    QemuThread thread;
--    QIOChannel *c;
--    QemuSemaphore sem;
--    QemuMutex mutex;
--    bool running;
--    bool quit;
--};
--typedef struct MultiFDRecvParams MultiFDRecvParams;
--
- struct {
-     MultiFDRecvParams *params;
-     /* number of created threads */
--- 
+=20
++bool multifd_recv_all_channels_created(void)
++{
++    int thread_count =3D migrate_multifd_channels();
++
++    if (!migrate_use_multifd()) {
++        return true;
++    }
++
++    return thread_count =3D=3D atomic_read(&multifd_recv_state->count);
++}
++
+ void multifd_recv_new_channel(QIOChannel *ioc)
+ {
+     /* nothing to do yet */
+diff --git a/migration/ram.h b/migration/ram.h
+index 06dbddc2a2..3f4b7daee8 100644
+--- a/migration/ram.h
++++ b/migration/ram.h
+@@ -45,6 +45,7 @@ int multifd_save_setup(void);
+ int multifd_save_cleanup(Error **errp);
+ int multifd_load_setup(void);
+ int multifd_load_cleanup(Error **errp);
++bool multifd_recv_all_channels_created(void);
+ void multifd_recv_new_channel(QIOChannel *ioc);
+=20
+ uint64_t ram_pagesize_summary(void);
+--=20
 2.17.0
