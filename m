@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fIc0S-0003I6-1t
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:36:52 -0400
+	(envelope-from <famz@redhat.com>) id 1fIc0S-0003J3-Vf
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:36:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fIc0R-0004e4-71
+	(envelope-from <famz@redhat.com>) id 1fIc0S-0004ed-1h
 	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:36:52 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Tue, 15 May 2018 23:36:30 +0800
-Message-Id: <20180515153634.5868-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/4] vmdk: Implement x-blockdev-create
+Date: Tue, 15 May 2018 23:36:31 +0800
+Message-Id: <20180515153634.5868-2-famz@redhat.com>
+In-Reply-To: <20180515153634.5868-1-famz@redhat.com>
+References: <20180515153634.5868-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/4] vmdk: Refactor vmdk_create_extent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,43 +22,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-v2: Respin after comments by Markus:
-    - QAPI: drop qapi_enum_parse_full patch.
-    - Drop vmdk_subformat_str.
-    - Fix an uninitialized variable error.
-    - Authentic casing for subformat enum.
+The extracted vmdk_init_extent takes a BlockBackend object and
+initializes the format metadata. It is the common part between "qemu-img
+create" and "blockdev-create".
 
-This adds vmdk support to x-blockdev-create command.
+Add a "BlockBackend *pbb" parameter to vmdk_create_extent, to return the
+opened BB to the caller in the next patch.
 
-Unlike other formats, several VMDK subformats consists of multiple files
-(extents). In the QAPI interface we use an array of BlockdevRef to pass in. The
-management tool need to figure out how many extent files are needed but that is
-simple enough. There is a convention how VMware (as well as qemu-img) builds
-the extents' file names, but that isn't standardized, therefore it is not
-documented as part of this API.  Extraneous extents in the end of the provided
-array are ignored.
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ block/vmdk.c | 71 +++++++++++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 44 insertions(+), 27 deletions(-)
 
-A big part of the patch is refactoring so that BlockdevRef parsing can be
-hooked in.
-
-Please review! Thanks.
-
-Fam Zheng (4):
-  vmdk: Refactor vmdk_create_extent
-  vmdk: Implement .bdrv_co_create callback
-  iotests: Filter cid numbers in VMDK extent info
-  iotests: Add VMDK tests for blockdev-create
-
- block/vmdk.c                     | 530 +++++++++++++++++++++++++++------------
- qapi/block-core.json             |  67 ++++-
- qapi/qapi-schema.json            |   1 +
- tests/qemu-iotests/214           | 268 ++++++++++++++++++++
- tests/qemu-iotests/214.out       | 304 ++++++++++++++++++++++
- tests/qemu-iotests/common.filter |   1 +
- tests/qemu-iotests/group         |   1 +
- 7 files changed, 1016 insertions(+), 156 deletions(-)
- create mode 100755 tests/qemu-iotests/214
- create mode 100644 tests/qemu-iotests/214.out
-
+diff --git a/block/vmdk.c b/block/vmdk.c
+index 84f8bbe480..083942f806 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -1714,35 +1714,17 @@ static int coroutine_fn vmdk_co_pwrite_zeroes(BlockDriverState *bs,
+     return ret;
+ }
+ 
+-static int vmdk_create_extent(const char *filename, int64_t filesize,
+-                              bool flat, bool compress, bool zeroed_grain,
+-                              QemuOpts *opts, Error **errp)
++static int vmdk_init_extent(BlockBackend *blk,
++                            int64_t filesize, bool flat,
++                            bool compress, bool zeroed_grain,
++                            Error **errp)
+ {
+     int ret, i;
+-    BlockBackend *blk = NULL;
+     VMDK4Header header;
+-    Error *local_err = NULL;
+     uint32_t tmp, magic, grains, gd_sectors, gt_size, gt_count;
+     uint32_t *gd_buf = NULL;
+     int gd_buf_size;
+ 
+-    ret = bdrv_create_file(filename, opts, &local_err);
+-    if (ret < 0) {
+-        error_propagate(errp, local_err);
+-        goto exit;
+-    }
+-
+-    blk = blk_new_open(filename, NULL, NULL,
+-                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
+-                       &local_err);
+-    if (blk == NULL) {
+-        error_propagate(errp, local_err);
+-        ret = -EIO;
+-        goto exit;
+-    }
+-
+-    blk_set_allow_write_beyond_eof(blk, true);
+-
+     if (flat) {
+         ret = blk_truncate(blk, filesize, PREALLOC_MODE_OFF, errp);
+         goto exit;
+@@ -1836,18 +1818,53 @@ static int vmdk_create_extent(const char *filename, int64_t filesize,
+                      gd_buf, gd_buf_size, 0);
+     if (ret < 0) {
+         error_setg(errp, QERR_IO_ERROR);
+-        goto exit;
+     }
+ 
+     ret = 0;
+ exit:
+-    if (blk) {
+-        blk_unref(blk);
+-    }
+     g_free(gd_buf);
+     return ret;
+ }
+ 
++static int vmdk_create_extent(const char *filename, int64_t filesize,
++                              bool flat, bool compress, bool zeroed_grain,
++                              BlockBackend **pbb,
++                              QemuOpts *opts, Error **errp)
++{
++    int ret;
++    BlockBackend *blk = NULL;
++    Error *local_err = NULL;
++
++    ret = bdrv_create_file(filename, opts, &local_err);
++    if (ret < 0) {
++        error_propagate(errp, local_err);
++        goto exit;
++    }
++
++    blk = blk_new_open(filename, NULL, NULL,
++                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
++                       &local_err);
++    if (blk == NULL) {
++        error_propagate(errp, local_err);
++        ret = -EIO;
++        goto exit;
++    }
++
++    blk_set_allow_write_beyond_eof(blk, true);
++
++    ret = vmdk_init_extent(blk, filesize, flat, compress, zeroed_grain, errp);
++exit:
++    if (blk) {
++        if (pbb) {
++            *pbb = blk;
++        } else {
++            blk_unref(blk);
++            blk = NULL;
++        }
++    }
++    return ret;
++}
++
+ static int filename_decompose(const char *filename, char *path, char *prefix,
+                               char *postfix, size_t buf_len, Error **errp)
+ {
+@@ -2067,7 +2084,7 @@ static int coroutine_fn vmdk_co_create_opts(const char *filename, QemuOpts *opts
+         snprintf(ext_filename, PATH_MAX, "%s%s", path, desc_filename);
+ 
+         if (vmdk_create_extent(ext_filename, size,
+-                               flat, compress, zeroed_grain, opts, errp)) {
++                               flat, compress, zeroed_grain, NULL, opts, errp)) {
+             ret = -EINVAL;
+             goto exit;
+         }
 -- 
 2.14.3
