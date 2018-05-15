@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fIW6u-0004Dz-9D
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:19:10 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fIW6u-0004Dv-8d
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:19:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fIW6r-0001UO-5s
+	(envelope-from <kraxel@redhat.com>) id 1fIW6s-0001VT-OY
 	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:19:08 -0400
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 15 May 2018 11:18:57 +0200
-Message-Id: <20180515091901.27774-7-kraxel@redhat.com>
+Date: Tue, 15 May 2018 11:18:58 +0200
+Message-Id: <20180515091901.27774-8-kraxel@redhat.com>
 In-Reply-To: <20180515091901.27774-1-kraxel@redhat.com>
 References: <20180515091901.27774-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 06/10] ui: switch trivial displays to qapi parser
+Subject: [Qemu-devel] [PULL 07/10] ui: switch gtk display to qapi parser
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,37 +22,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, qemu-trivial@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 
-Drop the option-less display types (egl-headless, curses, none) from
-parse_display(), so they'll be handled by parse_display_qapi().
+Drop the gtk option parser from parse_display(), so parse_display_qapi()
+will handle it instead.
+
+With this change the parser will accept gl=core and gl=es too, gtk
+must catch the unsupported gles variant now.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-id: 20180507095539.19584-3-kraxel@redhat.com
+Message-id: 20180507095539.19584-4-kraxel@redhat.com
 ---
- vl.c | 6 ------
- 1 file changed, 6 deletions(-)
+ ui/gtk.c |  6 +++++-
+ vl.c     | 32 --------------------------------
+ 2 files changed, 5 insertions(+), 33 deletions(-)
 
+diff --git a/ui/gtk.c b/ui/gtk.c
+index 568c9563ce..ef6ca7179e 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -2478,7 +2478,11 @@ static void early_gtk_display_init(DisplayOptions *opts)
+     }
+ 
+     assert(opts->type == DISPLAY_TYPE_GTK);
+-    if (opts->has_gl && opts->gl) {
++    if (opts->has_gl && opts->gl != DISPLAYGL_MODE_OFF) {
++        if (opts->gl == DISPLAYGL_MODE_ES) {
++            error_report("gtk: opengl es not supported");
++            return;
++        }
+ #if defined(CONFIG_OPENGL)
+ #if defined(CONFIG_GTK_GL) && defined(GDK_WINDOWING_WAYLAND)
+         if (GDK_IS_WAYLAND_DISPLAY(gdk_display_get_default())) {
 diff --git a/vl.c b/vl.c
-index c56f7f8046..6b8f946d58 100644
+index 6b8f946d58..5f1734d851 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -2185,10 +2185,6 @@ static void parse_display(const char *p)
+@@ -2185,38 +2185,6 @@ static void parse_display(const char *p)
              error_report("VNC requires a display argument vnc=<display>");
              exit(1);
          }
--    } else if (strstart(p, "egl-headless", &opts)) {
--        dpy.type = DISPLAY_TYPE_EGL_HEADLESS;
--    } else if (strstart(p, "curses", &opts)) {
--        dpy.type = DISPLAY_TYPE_CURSES;
-     } else if (strstart(p, "gtk", &opts)) {
-         dpy.type = DISPLAY_TYPE_GTK;
-         while (*opts) {
-@@ -2221,8 +2217,6 @@ static void parse_display(const char *p)
-             }
-             opts = nextopt;
-         }
--    } else if (strstart(p, "none", &opts)) {
--        dpy.type = DISPLAY_TYPE_NONE;
+-    } else if (strstart(p, "gtk", &opts)) {
+-        dpy.type = DISPLAY_TYPE_GTK;
+-        while (*opts) {
+-            const char *nextopt;
+-
+-            if (strstart(opts, ",grab_on_hover=", &nextopt)) {
+-                opts = nextopt;
+-                dpy.u.gtk.has_grab_on_hover = true;
+-                if (strstart(opts, "on", &nextopt)) {
+-                    dpy.u.gtk.grab_on_hover = true;
+-                } else if (strstart(opts, "off", &nextopt)) {
+-                    dpy.u.gtk.grab_on_hover = false;
+-                } else {
+-                    goto invalid_gtk_args;
+-                }
+-            } else if (strstart(opts, ",gl=", &nextopt)) {
+-                opts = nextopt;
+-                dpy.has_gl = true;
+-                if (strstart(opts, "on", &nextopt)) {
+-                    dpy.gl = DISPLAYGL_MODE_ON;
+-                } else if (strstart(opts, "off", &nextopt)) {
+-                    dpy.gl = DISPLAYGL_MODE_OFF;
+-                } else {
+-                    goto invalid_gtk_args;
+-                }
+-            } else {
+-            invalid_gtk_args:
+-                error_report("invalid GTK option string");
+-                exit(1);
+-            }
+-            opts = nextopt;
+-        }
      } else {
          parse_display_qapi(p);
      }
