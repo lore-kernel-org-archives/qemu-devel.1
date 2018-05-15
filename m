@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fIW6u-0004Dw-8y
+	(envelope-from <kraxel@redhat.com>) id 1fIW6u-0004Du-8e
 	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:19:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fIW6q-0001Tm-6J
+	(envelope-from <kraxel@redhat.com>) id 1fIW6s-0001VN-Ls
 	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:19:08 -0400
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 15 May 2018 11:18:54 +0200
-Message-Id: <20180515091901.27774-4-kraxel@redhat.com>
-In-Reply-To: <20180515091901.27774-1-kraxel@redhat.com>
-References: <20180515091901.27774-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 03/10] ui/gtk: Only try to initialize EGL/X11 if
- GtkGlArea failed
+Date: Tue, 15 May 2018 11:18:51 +0200
+Message-Id: <20180515091901.27774-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 00/10] Ui 20180515 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,37 +18,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, qemu-trivial@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Tomeu Vizoso <tomeu.vizoso@collabora.com>
+Cc: Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, qemu-trivial@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 
-From: Tomeu Vizoso <tomeu.vizoso@collabora.com>
+The following changes since commit fbd3a489df9953e2a5d017c922f3c103b2426952:
 
-The commit referenced below changed the logic by causing the gtk-egl
-backend to be initialized regardless of whether GtkGlArea initialization
-succeeded. This causes eglInitialize to crash in Wayland systems without
-XWayland.
+  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180514' into staging (2018-05-14 18:53:42 +0100)
 
-This patch restores the previous logic.
+are available in the git repository at:
 
-Fixes: 4c70280592f5 ("ui/gtk: use GtkGlArea on wayland only")
-Signed-off-by: Tomeu Vizoso <tomeu.vizoso@collabora.com>
-Message-id: 20180507134237.14996-1-tomeu.vizoso@collabora.com
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- ui/gtk.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+  git://git.kraxel.org/qemu tags/ui-20180515-pull-request
 
-diff --git a/ui/gtk.c b/ui/gtk.c
-index 9e5390f2c2..568c9563ce 100644
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -2484,7 +2484,7 @@ static void early_gtk_display_init(DisplayOptions *opts)
-         if (GDK_IS_WAYLAND_DISPLAY(gdk_display_get_default())) {
-             gtk_use_gl_area = true;
-             gtk_gl_area_init();
--        }
-+        } else
- #endif
-         {
-             gtk_egl_init();
+for you to fetch changes up to 677b490501823c1cb6946d8bb9e7907c12cd0c71:
+
+  gtk: disable the F10 menubar key (2018-05-15 10:47:01 +0200)
+
+----------------------------------------------------------------
+ui: qapi parser for -display cmd line.
+gtk: multiple fixes.
+sdl: opts bugfix.
+vnc: magic cookie.
+
+----------------------------------------------------------------
+
+Gerd Hoffmann (7):
+  sdl2: move opts assignment into loop
+  vnc: add magic cookie to VncState
+  ui: add qapi parser for -display
+  ui: switch trivial displays to qapi parser
+  ui: switch gtk display to qapi parser
+  ui: document non-qapi parser cases.
+  console: use linked list for QemuConsoles
+
+Peter Wu (2):
+  gtk: make it possible to hide the menu bar
+  gtk: disable the F10 menubar key
+
+Tomeu Vizoso (1):
+  ui/gtk: Only try to initialize EGL/X11 if GtkGlArea failed
+
+ ui/vnc.h      |   3 ++
+ ui/console.c  | 105 ++++++++++++++++++++++++++++++++--------------------------
+ ui/gtk.c      |  60 +++++++++++++++++++++++++++++++--
+ ui/sdl2.c     |   2 +-
+ ui/vnc-jobs.c |   4 +++
+ ui/vnc.c      |  10 +++++-
+ vl.c          |  76 ++++++++++++++++++++----------------------
+ 7 files changed, 168 insertions(+), 92 deletions(-)
+
 -- 
 2.9.3
