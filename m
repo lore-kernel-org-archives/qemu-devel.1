@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fIgwf-0003z4-Gq
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 16:53:18 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fIh0J-0005x9-PU
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 16:57:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fIgwc-0003Bv-Fk
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 16:53:17 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:35168)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fIgwc-0003Bq-Ai
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 16:53:14 -0400
-Received: by mail-qk0-x242.google.com with SMTP id c137-v6so1323593qkg.2
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 13:53:14 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180515182700.31736-1-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <aa1f3380-2a5c-b14b-92c1-2c0f74a07220@amsat.org>
-Date: Tue, 15 May 2018 17:53:10 -0300
+	(envelope-from <jsnow@redhat.com>) id 1fIh0I-0004gZ-M7
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 16:57:03 -0400
+References: <20180512012537.22478-1-jsnow@redhat.com>
+	<20180512012537.22478-7-jsnow@redhat.com>
+	<7e72e02f-856b-520e-4499-fb4978dfa22b@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <92193c4e-e8ca-2984-544b-b171d95616c4@redhat.com>
+Date: Tue, 15 May 2018 16:56:56 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180515182700.31736-1-peter.maydell@linaro.org>
+In-Reply-To: <7e72e02f-856b-520e-4499-fb4978dfa22b@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] exec.c: Initialize sa_flags passed to
- sigaction()
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 06/12] qapi: add bitmap info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,36 +25,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, patches@linaro.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 05/15/2018 03:27 PM, Peter Maydell wrote:
-> Coverity points out that in the user-only version of cpu_abort() we
-> call sigaction() with a partially initialized struct sigaction
-> (CID 1005351). Correct the omission.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  exec.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/exec.c b/exec.c
-> index ffa1099547..bd8833fc9d 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -1124,6 +1124,7 @@ void cpu_abort(CPUState *cpu, const char *fmt, ...)
->          struct sigaction act;
 
-I'd have used the more generic:
 
-           struct sigaction act = { };
+On 05/14/2018 10:30 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 12.05.2018 04:25, John Snow wrote:
+>> Add some of the necessary scaffolding for reporting bitmap information=
+.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>> =C2=A0 qapi/block-core.json | 60
+>> +++++++++++++++++++++++++++++++++++++++++++++++++++-
+>> =C2=A0 1 file changed, 59 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> index c50517bff3..8f33f41ce7 100644
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -33,6 +33,61 @@
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 'date-sec': 'int', 'date-nsec': 'int',
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 'vm-clock-sec': 'int', 'vm-clock-nsec': 'int' } }
+>> =C2=A0 +##
+>> +# @BitmapTypeEnum:
+>> +#
+>> +# An enumeration of possible serialized bitmap types.
+>> +#
+>> +# @dirty-tracking: This bitmap records information on dirty
+>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 segments within the file.
+>> +#
+>> +# @unknown: This bitmap is of an unknown or reserved type.
+>> +#
+>> +# Since: 2.13
+>> +##
+>> +{ 'enum': 'BitmapTypeEnum', 'data': [ 'dirty-tracking', 'unknown' ] }
+>> +
+>> +##
+>> +# @BitmapFlagEnum:
+>> +#
+>> +# An enumeration of possible flags for serialized bitmaps.
+>> +#
+>> +# @in-use: This bitmap is considered to be in-use, and may now be
+>> inconsistent.
+>> +#
+>> +# @auto: This bitmap must reflect any and all changes to the file it
+>> describes.
+>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 The type of this bitmap m=
+ust be @DirtyTrackingBitmap.
+>=20
+> logical, but I don't see this restriction in the spec. May be we need t=
+o
+> update the spec
+>=20
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Where did I even get this idea?
 
->          sigfillset(&act.sa_mask);
->          act.sa_handler = SIG_DFL;
-> +        act.sa_flags = 0;
->          sigaction(SIGABRT, &act, NULL);
->      }
->  #endif
-> 
+>> +#
+>> +# @extra-data-compatible: This bitmap has extra information
+>> associated with it.
+>=20
+> no, this flag means, that extra data is compatible. So, if you don't
+> know what is this extra data, you can read and modify the bitmap,
+> leaving this data as is. If this flag is unset, and there are some extr=
+a
+> data, bitmap must not be used.
+>=20
+
+Oh, understood! Thank you for clearing that up.
+
+> Finally, this spec should be consistent (or, may be better, duplicate)
+> spec from docs/interop/qcow2.txt..
+
+*cough* I guess if I get enough things wrong it's fair to say "RTFM!"
+
+>> +#
+>> +# @unknown: This bitmap has unknown or reserved properties.
+>=20
+> Better is only "reserved flags" (not unknown and not properties), they
+> are reserved by spec.
+>=20
+
+Yeah, I'll take that stance.
+
+>> +#
+>> +# Since: 2.13
+>> +##
+>> +{ 'enum': 'BitmapFlagEnum', 'data': [ 'in-use', 'auto',
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 'extra-data-compatible',
+>> 'unknown' ] }
+>> +
+>> +##
+>> +# @BitmapInfo:
+>> +#
+>> +# @name: The name of the bitmap.
+>> +#
+>> +# @type: The type of bitmap.
+>> +#
+>> +# @granularity: Bitmap granularity, in bytes.
+>> +#
+>> +# @count: Overall bitmap dirtiness, in bytes.
+>> +#
+>> +# @flags: Bitmap flags, if any.
+>> +#
+>> +# Since: 2.13
+>> +#
+>> +##
+>> +{ 'struct': 'BitmapInfo',
+>> +=C2=A0 'data': { 'name': 'str', 'type': 'BitmapTypeEnum', 'granularit=
+y':
+>> 'int',
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'c=
+ount': 'int', '*flags': ['BitmapFlagEnum']
+>=20
+> may be worth add 'has-extra-data'
+>=20
+
+Since you pointed out the difference, I agree.
+
+>> +=C2=A0 }
+>> +}
+>> +
+>> =C2=A0 ##
+>> =C2=A0 # @ImageInfoSpecificQCow2EncryptionBase:
+>> =C2=A0 #
+>> @@ -69,6 +124,8 @@
+>> =C2=A0 # @encrypt: details about encryption parameters; only set if im=
+age
+>> =C2=A0 #=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i=
+s encrypted (since 2.10)
+>> =C2=A0 #
+>> +# @bitmaps: list of image bitmaps (since 2.13)
+>> +#
+>> =C2=A0 # Since: 1.7
+>> =C2=A0 ##
+>> =C2=A0 { 'struct': 'ImageInfoSpecificQCow2',
+>> @@ -77,7 +134,8 @@
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 '*lazy-refcounts': 'bool',
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 '*corrupt': 'bool',
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'refcount-bits': 'int',
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 '*encrypt': 'ImageInfoSpecificQCow2Enc=
+ryption'
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 '*encrypt': 'ImageInfoSpecificQCow2Enc=
+ryption',
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 '*bitmaps': ['BitmapInfo']
+>> =C2=A0=C2=A0=C2=A0 } }
+>> =C2=A0 =C2=A0 ##
+>=20
+>=20
