@@ -1,35 +1,45 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56194)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fIUjO-00007f-IK
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 03:50:47 -0400
+	(envelope-from <pmorel@linux.ibm.com>) id 1fIUnq-0001aW-Ra
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 03:55:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fIUjL-0001Tj-Ff
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 03:50:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39298)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fIUjL-0001Sx-8V
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 03:50:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fIUjJ-00036q-CR
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 07:50:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5C12B2E8F36
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 07:50:41 +0000 (UTC)
+	(envelope-from <pmorel@linux.ibm.com>) id 1fIUnn-0003qV-OE
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 03:55:22 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58844)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
+	id 1fIUnn-0003pF-Gs
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 03:55:19 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w4F7sVl2078961
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 03:55:17 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2hys2knxw6-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 03:55:16 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
+	Tue, 15 May 2018 08:55:13 +0100
+Reply-To: pmorel@linux.ibm.com
+References: <1525782303-16940-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<1525782303-16940-5-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<c36ec83f-8cba-cf7b-3054-35cf4cd65c14@linux.ibm.com>
+	<1806faa3-dc46-f638-5c87-8a7415c9025a@linux.vnet.ibm.com>
+	<369a35de-4313-ee41-bb11-634c6bc45a72@linux.ibm.com>
+	<3531be60-c468-290c-135f-2c1091bc5d80@linux.vnet.ibm.com>
+From: Pierre Morel <pmorel@linux.ibm.com>
+Date: Tue, 15 May 2018 09:55:06 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <3531be60-c468-290c-135f-2c1091bc5d80@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <86590293-babe-d474-ecaa-5266acc419e0@linux.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 15 May 2018 07:45:20 -0000
-From: =?utf-8?b?7oO/IENocmlzdGlhbiBFaHJoYXJkdCDug78=?=
-	<1769053@bugs.launchpad.net>
-Reply-To: Bug 1769053 <1769053@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152541524728.557.4600864098110042577.malonedeb@gac.canonical.com>
-Message-Id: <152637032104.24605.2496868682385435346.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1769053] Re: Cannot start a guest with more than
- 1TB of RAM
+Subject: Re: [Qemu-devel] [PATCH v5 4/6] s390x/vfio: ap: Introduce VFIO AP
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,80 +48,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Tony Krowiak <akrowiak@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
 
-Reported to upstream libvirt's BZ with the suggestions of Daniel Berrage
-and David Alan Glibert; now available at [1] I linked that up in the LP
-bug status so that we auto-track this.
+On 14/05/2018 21:26, Tony Krowiak wrote:
+> On 05/11/2018 05:02 AM, Pierre Morel wrote:
+>> On 10/05/2018 15:10, Tony Krowiak wrote:
+>>> On 05/09/2018 10:28 AM, Halil Pasic wrote:
+>>>>
+>>>>
+>>>> On 05/08/2018 02:25 PM, Tony Krowiak wrote:
+>>>>> Introduces a VFIO based AP device. The device is defined via
+>>>>> the QEMU command line by specifying:
+>>>>>
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0 -device vfio-ap,sysfsdev=3D<path-to-mediat=
+ed-matrix-device>
+>>>>>
+>>>>> There may be only one vfio-ap device configured for a guest.
+>>>>>
+>>>>> The mediated matrix device is created by the VFIO AP device
+>>>> [..]
+>>>>> + * directory.
+>>>>> + */
+>>>>> +
+>>>>> +#include <linux/vfio.h>
+>>>>> +#include <sys/ioctl.h>
+>>>>> +#include "qemu/osdep.h"
+>>>>> +#include "qapi/error.h"
+>>>>> +#include "hw/sysbus.h"
+>>>>> +#include "hw/vfio/vfio.h"
+>>>>> +#include "hw/vfio/vfio-common.h"
+>>>>> +#include "hw/s390x/ap-device.h"
+>>>>> +#include "qemu/error-report.h"
+>>>>> +#include "qemu/queue.h"
+>>>>> +#include "qemu/option.h"
+>>>>> +#include "qemu/config-file.h"
+>>>>> +#include "cpu.h"
+>>>>> +#include "kvm_s390x.h"
+>>>>> +#include "sysemu/sysemu.h"
+>>>>> +
+>>>>> +#define VFIO_AP_DEVICE_TYPE=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "vfio-ap=
+"
+>>>>> +
+>>>>> +typedef struct VFIOAPDevice {
+>>>>> +=C2=A0=C2=A0=C2=A0 APDevice apdev;
+>>>>> +=C2=A0=C2=A0=C2=A0 VFIODevice vdev;
+>>>>> +=C2=A0=C2=A0=C2=A0 QTAILQ_ENTRY(VFIOAPDevice) sibling;
+>>>>> +} VFIOAPDevice;
+>>>>> +
+>>>>> +VFIOAPDevice *vfio_apdev;
+>>>>> +
+>>>>> +static void vfio_ap_compute_needs_reset(VFIODevice *vdev)
+>>>>> +{
+>>>>> +=C2=A0=C2=A0=C2=A0 vdev->needs_reset =3D false;
+>>>>> +}
+>>>>> +
+>>>>> +/*
+>>>>> + * We don't need vfio_hot_reset_multi and vfio_eoi operations for
+>>>>> + * vfio-ap-matrix device now.
+>>>>> + */
+>>>>> +struct VFIODeviceOps vfio_ap_ops =3D {
+>>>>> +=C2=A0=C2=A0=C2=A0 .vfio_compute_needs_reset =3D vfio_ap_compute_n=
+eeds_reset,
+>>>>> +};
+>>>>> +
+>>>>
+>>>> I'm not familiar with the vfio infrastructure, but AFAIR I
+>>>> haven't seen any substantial reset handling (QEMU or kernel).
+>>>> Did I miss something?
+>>>
+>>> No, you didn't miss anything, there is no reset handling.
+>>>
+>>>>
+>>>> If I did not. I think this is a big problem. We need to at least
+>>>> zeroize the queues (e.g. on system reset)=C2=A0 to avoid leaking
+>>>> sensitive information. Without this, there is no sane way to use
+>>>> ap-passthrough. Or am I wrong?
+>>>
+>>> I do not have a definitive answer, I will have to look into it.
+>>> I'm thinking that since we are using ap-passthrough, the AP bus
+>>> running on the guest would be responsible for handling reset possibly
+>>> by resetting or zeroizing its queues. I'll get back to you on this.
+>>>
+>>>>
+>>>> Regards,
+>>>> Halil
+>>>>
+>>>
+>> On the host, on system reset or subsystem reset, the queues are=20
+>> zeroized.
+>
+> Can you point me to where this is done?
 
-As eventually this has to go upstream using the bug tracker should
-better ensure that there is no concurrent conflicting work (or opinion)
-on it.
+This is firmware. See documentation, it is specified that the queues are=20
+zeroized on system or subsystem reset.
 
-[1]: https://bugzilla.redhat.com/show_bug.cgi?id=3D1578278
+>
+>>
+>>
+>> It means we must do the same for the guest and implement both cold=20
+>> and hot reset.
+>>
+>> One of the patches in the interrupt handling serie I sent last=20
+>> wednesday zeroize
+>> the queues on starting and stopping the guest so no data leak occurs=20
+>> between
+>> host and guests or between guests.
+>
+> I'm sorry, I was not aware of them and consequently have not yet=20
+> reviewed them.
+> I'll take a look at them ASAP.
+>
+>>
+>>
+>> However we should follow the machine specification and zeroize the=20
+>> queues between
+>> two guest reset too. i.e. in the "reset" call back. and implement the=20
+>> VFIO_DEVICE_RESET
+>> ioctl.
+>
+> Can you point me to the specification to which you are referring? You=20
+> can send a personal
+> email if this is restricted information.
 
-** Bug watch added: Red Hat Bugzilla #1578278
-   https://bugzilla.redhat.com/show_bug.cgi?id=3D1578278
+OK.
 
-** Also affects: libvirt via
-   https://bugzilla.redhat.com/show_bug.cgi?id=3D1578278
-   Importance: Unknown
-       Status: Unknown
+regards,
 
--- =
+Pierre
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1769053
 
-Title:
-  Cannot start a guest with more than 1TB of RAM
-
-Status in libvirt:
-  Unknown
-Status in QEMU:
-  Invalid
-Status in libvirt package in Ubuntu:
-  Triaged
-Status in qemu package in Ubuntu:
-  Invalid
-
-Bug description:
-  Attempting to start a KVM guest with more than 1TB of RAM fails.
-
-  It looks like we might need some extra patches:
-  https://lists.gnu.org/archive/html/qemu-discuss/2017-12/msg00005.html
-
-  ProblemType: Bug
-  DistroRelease: Ubuntu 18.04
-  Package: qemu-system-x86 1:2.11+dfsg-1ubuntu7
-  ProcVersionSignature: Ubuntu 4.15.0-20.21-generic 4.15.17
-  Uname: Linux 4.15.0-20-generic x86_64
-  ApportVersion: 2.20.9-0ubuntu7
-  Architecture: amd64
-  CurrentDesktop: Unity:Unity7:ubuntu
-  Date: Fri May  4 16:21:14 2018
-  InstallationDate: Installed on 2017-04-05 (393 days ago)
-  InstallationMedia: Ubuntu 16.10 "Yakkety Yak" - Release amd64 (20161012.2)
-  MachineType: Dell Inc. XPS 13 9360
-  ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.15.0-20-generic root=3D/dev/ma=
-pper/ubuntu--vg-root ro quiet splash transparent_hugepage=3Dmadvise vt.hand=
-off=3D1
-  SourcePackage: qemu
-  UpgradeStatus: Upgraded to bionic on 2018-04-30 (3 days ago)
-  dmi.bios.date: 02/26/2018
-  dmi.bios.vendor: Dell Inc.
-  dmi.bios.version: 2.6.2
-  dmi.board.name: 0PF86Y
-  dmi.board.vendor: Dell Inc.
-  dmi.board.version: A00
-  dmi.chassis.type: 9
-  dmi.chassis.vendor: Dell Inc.
-  dmi.modalias: dmi:bvnDellInc.:bvr2.6.2:bd02/26/2018:svnDellInc.:pnXPS1393=
-60:pvr:rvnDellInc.:rn0PF86Y:rvrA00:cvnDellInc.:ct9:cvr:
-  dmi.product.family: XPS
-  dmi.product.name: XPS 13 9360
-  dmi.sys.vendor: Dell Inc.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/libvirt/+bug/1769053/+subscriptions
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
