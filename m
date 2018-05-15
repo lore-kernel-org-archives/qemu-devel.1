@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54861)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fIgvX-0003DA-Ba
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 16:52:09 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fIgwf-0003z4-Gq
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 16:53:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fIgvW-0002Ck-Ib
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 16:52:07 -0400
-References: <20180512012537.22478-1-jsnow@redhat.com>
-	<20180512012537.22478-5-jsnow@redhat.com>
-	<a98f8075-4c26-7c2a-a24a-94e833867717@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <2687d555-9b3a-5201-672f-a187a11a9083@redhat.com>
-Date: Tue, 15 May 2018 16:52:00 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fIgwc-0003Bv-Fk
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 16:53:17 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:35168)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fIgwc-0003Bq-Ai
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 16:53:14 -0400
+Received: by mail-qk0-x242.google.com with SMTP id c137-v6so1323593qkg.2
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 13:53:14 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180515182700.31736-1-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <aa1f3380-2a5c-b14b-92c1-2c0f74a07220@amsat.org>
+Date: Tue, 15 May 2018 17:53:10 -0300
 MIME-Version: 1.0
-In-Reply-To: <a98f8075-4c26-7c2a-a24a-94e833867717@virtuozzo.com>
+In-Reply-To: <20180515182700.31736-1-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 04/12] qcow2/dirty-bitmaps: load IN_USE
- bitmaps if disk is RO
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] exec.c: Initialize sa_flags passed to
+ sigaction()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,32 +35,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, patches@linaro.org
 
-
-
-On 05/14/2018 08:55 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 12.05.2018 04:25, John Snow wrote:
->> For the purposes of qemu-img manipulation and querying of bitmaps, load
->> bitmaps that are "in use" -- if the image is read only. This will allow
->> us to diagnose problems with this flag using the qemu-img tool.
+On 05/15/2018 03:27 PM, Peter Maydell wrote:
+> Coverity points out that in the user-only version of cpu_abort() we
+> call sigaction() with a partially initialized struct sigaction
+> (CID 1005351). Correct the omission.
 > 
-> It looks unsafe.. We can load them, then reopen rw and then store them
-> on vm close, the result would be unpredictable. And they become
-> available for qmp commands..
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  exec.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> If we want to load them, we may need some additional state for such
-> dirty bitmaps, something like "invalid", to be sure, that they will not
-> be used like normal bitmap. And we may
-> need some additional flag to load or not load them, and this behavior
-> will be unrelated to can_write().
+> diff --git a/exec.c b/exec.c
+> index ffa1099547..bd8833fc9d 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -1124,6 +1124,7 @@ void cpu_abort(CPUState *cpu, const char *fmt, ...)
+>          struct sigaction act;
+
+I'd have used the more generic:
+
+           struct sigaction act = { };
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+>          sigfillset(&act.sa_mask);
+>          act.sa_handler = SIG_DFL;
+> +        act.sa_flags = 0;
+>          sigaction(SIGABRT, &act, NULL);
+>      }
+>  #endif
 > 
-
-Yeah, you're right -- reopening is scary. I'll see what I can do.
-
-The goal is just to get them in memory so that qemu-img can use the
-standard BdrvDirtyBitmap API to print various info about them for the user.
-
-Since 'info' and 'dump' don't need RW access, it'd be nicest for these
-commands to work in RO mode, hence the patch.
