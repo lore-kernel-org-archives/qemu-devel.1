@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fIb1L-0000Sp-H9
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:33:44 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fIb1i-0000lu-8y
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:34:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fIb1I-0007Re-BV
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:33:43 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43360 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1fIb1c-0007XJ-G6
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:34:06 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34068 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fIb1I-0007RW-6g
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:33:40 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180514141218.28438-1-pbonzini@redhat.com>
-	<87r2md6sd5.fsf@dusky.pond.sub.org>
-	<38c5dd46-b439-2ac5-22fb-10aca97fb633@redhat.com>
-Date: Tue, 15 May 2018 16:33:38 +0200
-In-Reply-To: <38c5dd46-b439-2ac5-22fb-10aca97fb633@redhat.com> (Paolo
-	Bonzini's message of "Tue, 15 May 2018 14:06:19 +0200")
-Message-ID: <87sh6t56pp.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fIb1c-0007VU-9y
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:34:00 -0400
+References: <20180515134835.3409-1-peter.maydell@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e30e289f-e23d-7abc-6407-fb28b609606e@redhat.com>
+Date: Tue, 15 May 2018 16:33:52 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] coverity-model: replay data is considered
- trusted
+In-Reply-To: <20180515134835.3409-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] memory.h: Fix typo in documentation comment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +27,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On 15/05/2018 15:48, Peter Maydell wrote:
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  include/exec/memory.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index 525619a5f4..4fa1227f13 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -679,7 +679,7 @@ void memory_region_init_rom_device_nomigrate(MemoryRegion *mr,
+>   * memory_region_init_reservation: Initialize a memory region that reserves
+>   *                                 I/O space.
+>   *
+> - * A reservation region primariy serves debugging purposes.  It claims I/O
+> + * A reservation region primarily serves debugging purposes.  It claims I/O
+>   * space that is not supposed to be handled by QEMU itself.  Any access via
+>   * the memory API will cause an abort().
+>   * This function is deprecated. Use memory_region_init_io() with NULL
+> 
 
-> On 15/05/2018 14:00, Markus Armbruster wrote:
->> Paolo Bonzini <pbonzini@redhat.com> writes:
->> 
->>> Replay data is not considered a possible attack vector; add a model that
->>> does not use getc so that "tainted data" warnings are suppressed.
->>>
->>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->>> ---
->>>  scripts/coverity-model.c | 13 +++++++++++++
->>>  1 file changed, 13 insertions(+)
->>>
->>> diff --git a/scripts/coverity-model.c b/scripts/coverity-model.c
->>> index c702804f41..576f48de33 100644
->>> --- a/scripts/coverity-model.c
->>> +++ b/scripts/coverity-model.c
->>> @@ -103,6 +103,19 @@ static int get_keysym(const name2keysym_t *table,
->>    /* Tainting */
->> 
->>    typedef struct {} name2keysym_t;
->>    static int get_keysym(const name2keysym_t *table,
->>                          const char *name)
->>    {
->>        int result;
->>        if (result > 0) {
->>            __coverity_tainted_string_sanitize_content__(name);
->>            return result;
->>        } else {
->>            return 0;
->>>      }
->>>  }
->>>  
->>> +
->> 
->> Does the new model go under /* Tainting */ ?
->
-> Yes, it does.  Any chance you can do the change yourself?...
+Let's just get rid of the function... Patch along the way.
 
-Gladly :)
-
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Paolo
