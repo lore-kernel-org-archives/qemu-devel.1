@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fIc4K-0006Wz-0q
+	(envelope-from <kwolf@redhat.com>) id 1fIc4K-0006XP-8j
 	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:40:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fIc4F-0001Hh-Qm
+	(envelope-from <kwolf@redhat.com>) id 1fIc4F-0001H0-5J
 	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:40:52 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 15 May 2018 17:39:56 +0200
-Message-Id: <20180515154033.19899-1-kwolf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/37] Block layer patches
+Date: Tue, 15 May 2018 17:40:00 +0200
+Message-Id: <20180515154033.19899-5-kwolf@redhat.com>
+In-Reply-To: <20180515154033.19899-1-kwolf@redhat.com>
+References: <20180515154033.19899-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PULL 04/37] null: Switch to byte-based read/write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,150 +22,126 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-The following changes since commit ad1b4ec39caa5b3f17cbd8160283a03a3dcfe2=
-ae:
+From: Eric Blake <eblake@redhat.com>
 
-  Merge remote-tracking branch 'remotes/kraxel/tags/input-20180515-pull-r=
-equest' into staging (2018-05-15 12:50:06 +0100)
+We are gradually moving away from sector-based interfaces, towards
+byte-based.  Make the change for the last few sector-based callbacks
+in the null-co and null-aio drivers.
 
-are available in the git repository at:
+Note that since the null driver does nothing on writes, it trivially
+supports the BDRV_REQ_FUA flag (all writes have already landed to
+the same bit-bucket without needing an extra flush call).  Also, since
+the null driver does just as well with byte-based requests, we can
+now avoid cycles wasted on read-modify-write by taking advantage of
+the block layer now defaulting the alignment to 1 instead of 512.
 
-  git://repo.or.cz/qemu/kevin.git tags/for-upstream
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block/null.c | 45 +++++++++++++++++++++++----------------------
+ 1 file changed, 23 insertions(+), 22 deletions(-)
 
-for you to fetch changes up to 1fce860ea5eba1ca00a67911fc0b8a5d80009514:
-
-  Merge remote-tracking branch 'mreitz/tags/pull-block-2018-05-15' into q=
-ueue-block (2018-05-15 16:19:53 +0200)
-
-----------------------------------------------------------------
-Block layer patches:
-
-- Switch AIO/callback based block drivers to a byte-based interface
-- Block jobs: Expose error string via query-block-jobs
-- Block job cleanups and fixes
-- hmp: Allow using a qdev id in block_set_io_throttle
-- Copy-on-read block driver
-- The qcow2 default refcount cache size has been decreased
-- Various bug fixes
-----------------------------------------------------------------
-Alberto Garcia (5):
-      hmp: Allow using a qdev id in block_set_io_throttle
-      Fix error message about compressed clusters with OFLAG_COPIED
-      specs/qcow2: Clarify that compressed clusters have the COPIED bit r=
-eset
-      qcow2: Give the refcount cache the minimum possible size by default
-      docs: Document the new default sizes of the qcow2 caches
-
-Daniel Henrique Barboza (1):
-      block-backend: simplify blk_get_aio_context
-
-Eric Blake (7):
-      block: Support byte-based aio callbacks
-      file-win32: Switch to byte-based callbacks
-      null: Switch to byte-based read/write
-      rbd: Switch to byte-based callbacks
-      vxhs: Switch to byte-based callbacks
-      block: Drop last of the sector-based aio callbacks
-      block: Merge .bdrv_co_writev{,_flags} in drivers
-
-John Snow (1):
-      blockjob: expose error string via query
-
-Kevin Wolf (7):
-      blockjob: Fix assertion in block_job_finalize()
-      blockjob: Wrappers for progress counter access
-      blockjob: Move RateLimit to BlockJob
-      blockjob: Implement block_job_set_speed() centrally
-      blockjob: Introduce block_job_ratelimit_get_delay()
-      blockjob: Add block_job_driver()
-      Merge remote-tracking branch 'mreitz/tags/pull-block-2018-05-15' in=
-to queue-block
-
-Max Reitz (17):
-      iotests: Split 214 off of 122
-      iotests: Add failure matching to common.qemu
-      iotests: Skip 181 and 201 without userfaultfd
-      block: Add COR filter driver
-      block: BLK_PERM_WRITE includes ..._UNCHANGED
-      block: Add BDRV_REQ_WRITE_UNCHANGED flag
-      block: Set BDRV_REQ_WRITE_UNCHANGED for COR writes
-      block/quorum: Support BDRV_REQ_WRITE_UNCHANGED
-      block: Support BDRV_REQ_WRITE_UNCHANGED in filters
-      iotests: Clean up wrap image in 197
-      iotests: Copy 197 for COR filter driver
-      iotests: Add test for COR across nodes
-      qemu-img: Check post-truncation size
-      block: Document BDRV_REQ_WRITE_UNCHANGED support
-      qemu-io: Use purely string blockdev options
-      qemu-img: Use only string options in img_open_opts
-      iotests: Add test for -U/force-share conflicts
-
- qapi/block-core.json           |  11 ++-
- docs/interop/qcow2.txt         |   8 +-
- docs/qcow2-cache.txt           |  33 ++++----
- block/qcow2.h                  |   4 -
- include/block/block.h          |   9 ++-
- include/block/block_int.h      |  28 +++++--
- include/block/blockjob.h       |  32 ++++++++
- include/block/blockjob_int.h   |  11 ++-
- include/block/raw-aio.h        |   2 +-
- block/backup.c                 |  62 ++++++---------
- block/blkdebug.c               |   9 ++-
- block/blkreplay.c              |   3 +
- block/blkverify.c              |   3 +
- block/block-backend.c          |   8 +-
- block/commit.c                 |  35 +++------
- block/copy-on-read.c           | 173 +++++++++++++++++++++++++++++++++++=
-++++++
- block/file-win32.c             |  47 ++++++-----
- block/gluster.c                |   4 +-
- block/io.c                     |  75 ++++++++++--------
- block/iscsi.c                  |   8 +-
- block/mirror.c                 |  44 ++++-------
- block/null.c                   |  45 +++++------
- block/parallels.c              |   4 +-
- block/qcow.c                   |   6 +-
- block/qcow2-refcount.c         |   4 +-
- block/qcow2.c                  |  31 +++++---
- block/qed.c                    |   3 +-
- block/quorum.c                 |  19 +++--
- block/raw-format.c             |   9 ++-
- block/rbd.c                    |  40 +++++-----
- block/replication.c            |   4 +-
- block/sheepdog.c               |   4 +-
- block/ssh.c                    |   4 +-
- block/stream.c                 |  33 +++-----
- block/throttle.c               |   6 +-
- block/vhdx.c                   |   4 +-
- block/vxhs.c                   |  43 +++++-----
- block/win32-aio.c              |   5 +-
- blockjob.c                     |  40 +++++++---
- hmp.c                          |  14 +++-
- qemu-img.c                     |  43 ++++++++--
- qemu-io.c                      |   4 +-
- block/Makefile.objs            |   2 +-
- hmp-commands.hx                |   3 +-
- tests/qemu-iotests/122         |  47 -----------
- tests/qemu-iotests/122.out     |  33 --------
- tests/qemu-iotests/137.out     |   2 +-
- tests/qemu-iotests/153         |  17 ++++
- tests/qemu-iotests/153.out     |  16 ++++
- tests/qemu-iotests/181         |  13 ++++
- tests/qemu-iotests/197         |   1 +
- tests/qemu-iotests/201         |  13 ++++
- tests/qemu-iotests/214         |  97 +++++++++++++++++++++++
- tests/qemu-iotests/214.out     |  35 +++++++++
- tests/qemu-iotests/215         | 120 ++++++++++++++++++++++++++++
- tests/qemu-iotests/215.out     |  26 +++++++
- tests/qemu-iotests/216         | 115 +++++++++++++++++++++++++++
- tests/qemu-iotests/216.out     |  28 +++++++
- tests/qemu-iotests/common.qemu |  58 ++++++++++++--
- tests/qemu-iotests/group       |   3 +
- 60 files changed, 1174 insertions(+), 429 deletions(-)
- create mode 100644 block/copy-on-read.c
- create mode 100755 tests/qemu-iotests/214
- create mode 100644 tests/qemu-iotests/214.out
- create mode 100755 tests/qemu-iotests/215
- create mode 100644 tests/qemu-iotests/215.out
- create mode 100755 tests/qemu-iotests/216
- create mode 100644 tests/qemu-iotests/216.out
+diff --git a/block/null.c b/block/null.c
+index 3944550f67..5d610fdfba 100644
+--- a/block/null.c
++++ b/block/null.c
+@@ -93,6 +93,7 @@ static int null_file_open(BlockDriverState *bs, QDict *options, int flags,
+     }
+     s->read_zeroes = qemu_opt_get_bool(opts, NULL_OPT_ZEROES, false);
+     qemu_opts_del(opts);
++    bs->supported_write_flags = BDRV_REQ_FUA;
+     return ret;
+ }
+ 
+@@ -116,22 +117,22 @@ static coroutine_fn int null_co_common(BlockDriverState *bs)
+     return 0;
+ }
+ 
+-static coroutine_fn int null_co_readv(BlockDriverState *bs,
+-                                      int64_t sector_num, int nb_sectors,
+-                                      QEMUIOVector *qiov)
++static coroutine_fn int null_co_preadv(BlockDriverState *bs,
++                                       uint64_t offset, uint64_t bytes,
++                                       QEMUIOVector *qiov, int flags)
+ {
+     BDRVNullState *s = bs->opaque;
+ 
+     if (s->read_zeroes) {
+-        qemu_iovec_memset(qiov, 0, 0, nb_sectors * BDRV_SECTOR_SIZE);
++        qemu_iovec_memset(qiov, 0, 0, bytes);
+     }
+ 
+     return null_co_common(bs);
+ }
+ 
+-static coroutine_fn int null_co_writev(BlockDriverState *bs,
+-                                       int64_t sector_num, int nb_sectors,
+-                                       QEMUIOVector *qiov)
++static coroutine_fn int null_co_pwritev(BlockDriverState *bs,
++                                        uint64_t offset, uint64_t bytes,
++                                        QEMUIOVector *qiov, int flags)
+ {
+     return null_co_common(bs);
+ }
+@@ -186,26 +187,26 @@ static inline BlockAIOCB *null_aio_common(BlockDriverState *bs,
+     return &acb->common;
+ }
+ 
+-static BlockAIOCB *null_aio_readv(BlockDriverState *bs,
+-                                  int64_t sector_num, QEMUIOVector *qiov,
+-                                  int nb_sectors,
+-                                  BlockCompletionFunc *cb,
+-                                  void *opaque)
++static BlockAIOCB *null_aio_preadv(BlockDriverState *bs,
++                                   uint64_t offset, uint64_t bytes,
++                                   QEMUIOVector *qiov, int flags,
++                                   BlockCompletionFunc *cb,
++                                   void *opaque)
+ {
+     BDRVNullState *s = bs->opaque;
+ 
+     if (s->read_zeroes) {
+-        qemu_iovec_memset(qiov, 0, 0, nb_sectors * BDRV_SECTOR_SIZE);
++        qemu_iovec_memset(qiov, 0, 0, bytes);
+     }
+ 
+     return null_aio_common(bs, cb, opaque);
+ }
+ 
+-static BlockAIOCB *null_aio_writev(BlockDriverState *bs,
+-                                   int64_t sector_num, QEMUIOVector *qiov,
+-                                   int nb_sectors,
+-                                   BlockCompletionFunc *cb,
+-                                   void *opaque)
++static BlockAIOCB *null_aio_pwritev(BlockDriverState *bs,
++                                    uint64_t offset, uint64_t bytes,
++                                    QEMUIOVector *qiov, int flags,
++                                    BlockCompletionFunc *cb,
++                                    void *opaque)
+ {
+     return null_aio_common(bs, cb, opaque);
+ }
+@@ -265,8 +266,8 @@ static BlockDriver bdrv_null_co = {
+     .bdrv_close             = null_close,
+     .bdrv_getlength         = null_getlength,
+ 
+-    .bdrv_co_readv          = null_co_readv,
+-    .bdrv_co_writev         = null_co_writev,
++    .bdrv_co_preadv         = null_co_preadv,
++    .bdrv_co_pwritev        = null_co_pwritev,
+     .bdrv_co_flush_to_disk  = null_co_flush,
+     .bdrv_reopen_prepare    = null_reopen_prepare,
+ 
+@@ -285,8 +286,8 @@ static BlockDriver bdrv_null_aio = {
+     .bdrv_close             = null_close,
+     .bdrv_getlength         = null_getlength,
+ 
+-    .bdrv_aio_readv         = null_aio_readv,
+-    .bdrv_aio_writev        = null_aio_writev,
++    .bdrv_aio_preadv        = null_aio_preadv,
++    .bdrv_aio_pwritev       = null_aio_pwritev,
+     .bdrv_aio_flush         = null_aio_flush,
+     .bdrv_reopen_prepare    = null_reopen_prepare,
+ 
+-- 
+2.13.6
