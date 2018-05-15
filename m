@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39804)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fIVYq-0004zL-94
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 04:43:57 -0400
+	(envelope-from <lersek@redhat.com>) id 1fIVa2-0005pO-BJ
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 04:45:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fIVYm-00081d-9b
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 04:43:56 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:36352)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fIVYm-00081K-4H
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 04:43:52 -0400
-Received: by mail-qk0-x242.google.com with SMTP id l132-v6so12284215qke.3
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 01:43:52 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180515082319.30723-1-kraxel@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <89e20d15-308b-215e-b739-9a40689facfe@amsat.org>
-Date: Tue, 15 May 2018 05:43:48 -0300
+	(envelope-from <lersek@redhat.com>) id 1fIVZy-0000ZT-EK
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 04:45:10 -0400
+References: <20180504072514.8450-1-cohuck@redhat.com>
+	<20180504072514.8450-9-cohuck@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <b1a5eb12-4f1d-2f66-f59f-eb1baa87746d@redhat.com>
+Date: Tue, 15 May 2018 10:45:02 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180515082319.30723-1-kraxel@redhat.com>
+In-Reply-To: <20180504072514.8450-9-cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] sdl2: move opts assignment into loop
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 08/15] pc-bios/s390-ccw: fix loadparm
+ initialization and int conversion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,38 +25,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-On 05/15/2018 05:23 AM, Gerd Hoffmann wrote:
-> So the opts pointer is set for all sdl2_consoles.
+I've come across this patch in downstream review (although I really have
+zero background in s390x), and Cornelia suggested I might want to repeat
+my comments on the upstream list too:
+
+On 05/04/18 09:25, Cornelia Huck wrote:
+> From: Collin Walling <walling@linux.ibm.com>
 > 
-> Fixes: 844fd50dbbcfc9e401895274bf4fb8da8e8d3f64
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
+> Rename the loadparm char array in main.c to loadparm_str and
+> increased the size by one byte to account for a null termination
+> when converting the loadparm string to an int  via atoui. We
+> also allow the boot menu to be enabled when loadparm is set to
+> an empty string or a series of spaces.
+> 
+> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> Reported-by: Vasily Gorbik <gor@linux.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  ui/sdl2.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  hw/s390x/ipl.c          |  4 ++++
+>  pc-bios/s390-ccw/main.c | 14 +++++++-------
+>  2 files changed, 11 insertions(+), 7 deletions(-)
 > 
-> diff --git a/ui/sdl2.c b/ui/sdl2.c
-> index da037248c2..a0f9b16bc1 100644
-> --- a/ui/sdl2.c
-> +++ b/ui/sdl2.c
-> @@ -804,7 +804,6 @@ static void sdl2_display_init(DisplayState *ds, DisplayOptions *o)
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index fb554ab156..150f6c0582 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -373,6 +373,10 @@ int s390_ipl_set_loadparm(uint8_t *loadparm)
+>              loadparm[i] = ascii2ebcdic[(uint8_t) lp[i]];
+>          }
+>  
+> +        if (i < 8) {
+> +            memset(loadparm + i, 0x40, 8 - i); /* fill with EBCDIC spaces */
+> +        }
+> +
+>          g_free(lp);
+>          return 0;
+>      }
+> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+> index 9d9f8cf4d3..26f9adf84a 100644
+> --- a/pc-bios/s390-ccw/main.c
+> +++ b/pc-bios/s390-ccw/main.c
+> @@ -15,11 +15,11 @@
+>  char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
+>  static SubChannelId blk_schid = { .one = 1 };
+>  IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+> -static char loadparm[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+> +static char loadparm_str[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+>  QemuIplParameters qipl;
+>  
+>  #define LOADPARM_PROMPT "PROMPT  "
+> -#define LOADPARM_EMPTY  "........"
+> +#define LOADPARM_EMPTY  "        "
+>  #define BOOT_MENU_FLAG_MASK (QIPL_FLAG_BM_OPTS_CMD | QIPL_FLAG_BM_OPTS_ZIPL)
+>  
+>  /*
+> @@ -45,7 +45,7 @@ void panic(const char *string)
+>  
+>  unsigned int get_loadparm_index(void)
+>  {
+> -    return atoui(loadparm);
+> +    return atoui(loadparm_str);
+>  }
+>  
+>  static bool find_dev(Schib *schib, int dev_no)
+> @@ -80,13 +80,13 @@ static bool find_dev(Schib *schib, int dev_no)
+>  
+>  static void menu_setup(void)
+>  {
+> -    if (memcmp(loadparm, LOADPARM_PROMPT, 8) == 0) {
+> +    if (memcmp(loadparm_str, LOADPARM_PROMPT, 8) == 0) {
+>          menu_set_parms(QIPL_FLAG_BM_OPTS_CMD, 0);
 >          return;
 >      }
->      sdl2_console = g_new0(struct sdl2_console, sdl2_num_outputs);
-> -    sdl2_console->opts = o;
->      for (i = 0; i < sdl2_num_outputs; i++) {
->          QemuConsole *con = qemu_console_lookup_by_index(i);
->          assert(con != NULL);
-> @@ -812,6 +811,7 @@ static void sdl2_display_init(DisplayState *ds, DisplayOptions *o)
->              sdl2_console[i].hidden = true;
->          }
->          sdl2_console[i].idx = i;
-> +        sdl2_console[i].opts = o;
->  #ifdef CONFIG_OPENGL
->          sdl2_console[i].opengl = display_opengl;
->          sdl2_console[i].dcl.ops = display_opengl ? &dcl_gl_ops : &dcl_2d_ops;
+>  
+>      /* If loadparm was set to any other value, then do not enable menu */
+> -    if (memcmp(loadparm, LOADPARM_EMPTY, 8) != 0) {
+> +    if (memcmp(loadparm_str, LOADPARM_EMPTY, 8) != 0) {
+>          return;
+>      }
+>  
+> @@ -116,8 +116,8 @@ static void virtio_setup(void)
+>       */
+>      enable_mss_facility();
+>  
+> -    sclp_get_loadparm_ascii(loadparm);
+> -    memcpy(ldp + 10, loadparm, 8);
+> +    sclp_get_loadparm_ascii(loadparm_str);
+> +    memcpy(ldp + 10, loadparm_str, 8);
+>      sclp_print(ldp);
+>  
+>      memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
 > 
+
+So here I said, "There are a bunch of naked 8 constants; those should
+all be (sizeof loadparm_str - 1), I think. Should be a separate patch,
+of course."
+
+Thanks
+Laszlo
