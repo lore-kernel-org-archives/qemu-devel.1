@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44321)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fIVv8-0007mu-W6
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:07:02 -0400
+	(envelope-from <peterx@redhat.com>) id 1fIW29-0001mJ-Tl
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:14:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fIVv8-0003zs-0P
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:06:58 -0400
-Date: Tue, 15 May 2018 11:06:47 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180515090647.GA4442@localhost.localdomain>
-References: <20180509162637.15575-1-kwolf@redhat.com>
-	<20180509162637.15575-15-kwolf@redhat.com>
-	<88a073ed-4dce-f102-0a93-4810abdcf01b@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <88a073ed-4dce-f102-0a93-4810abdcf01b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 14/42] job: Add reference counting
+	(envelope-from <peterx@redhat.com>) id 1fIW24-0006hh-Rm
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:14:13 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57830 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fIW24-0006gJ-NV
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:14:08 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7D351400BA82
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 09:14:02 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Tue, 15 May 2018 17:13:56 +0800
+Message-Id: <20180515091356.24106-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH RFC] qemu-error: introduce error_report_once
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +27,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, jcody@redhat.com, armbru@redhat.com, mreitz@redhat.com
+To: qemu-devel@nongnu.org
+Cc: peterx@redhat.com, Markus Armbruster <armbru@redhat.com>
 
-Am 14.05.2018 um 23:34 hat John Snow geschrieben:
-> 
-> 
-> On 05/09/2018 12:26 PM, Kevin Wolf wrote:
-> > This moves reference counting from BlockJob to Job.
-> > 
-> > In order to keep calling the BlockJob cleanup code when the job is
-> > deleted via job_unref(), introduce a new JobDriver.free callback. Every
-> > block job must use block_job_free() for this callback, this is asserted
-> > in block_job_create().
-> > 
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> 
-> So far so good, though it does look a little silly that presently every
-> last job has the exact same free callback.
-> 
-> Also, I forgot to reply to #13 with this, but I suppose that the
-> approach you're taking -- of a fairly straightforward mechanical
-> refactor -- means we don't really have the opportunity to change any of
-> the pretty dumb names or existing peculiarities of design we've evolved.
-> 
-> I had hoped we'd be able to change a few things, but certainly keeping
-> them as-is makes the whole re-factoring process an awful lot simpler...
-> 
-> ...Or maybe I'm getting ahead of myself, there's a lot of series left
-> to go.
+I stole the printk_once() macro.
 
-No, I think you're right. My approach was that we'd separate the generic
-and the block-specific parts in this series without changing much in the
-structure or the names, to keep the conversion as obvious as possible
-(the series is long enough already).
+I always wanted to be able to print some error directly if there is a
+buffer to dump, however we can't use error_report() really quite often
+when there can be any DDOS attack.  To avoid that, we can introduce a
+print-once function for it.
 
-However, I intentionally kept the QMP interface minimal where I wasn't
-quite sure that we want to keep the old one. If you see anything in the
-QMP interface that you'd like to see changed, please do comment.
-Anything else is an implementation detail and can still be changed on
-top of this series.
+CC: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+We can for sure introduce similar functions for the rest of the
+error_*() functions, it's just an idea to see whether we'd like it
+in general.
+---
+ include/qemu/error-report.h | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-Kevin
+diff --git a/include/qemu/error-report.h b/include/qemu/error-report.h
+index e1c8ae1a52..efebb80e2c 100644
+--- a/include/qemu/error-report.h
++++ b/include/qemu/error-report.h
+@@ -44,6 +44,18 @@ void error_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+ void warn_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+ void info_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+ 
++#define error_report_once(fmt, ...)             \
++    ({                                          \
++        static bool __print_once;               \
++        bool __ret_print_once = !__print_once;  \
++                                                \
++        if (!__print_once) {					\
++            __print_once = true;				\
++            error_report(fmt, ##__VA_ARGS__);   \
++        }                                       \
++        unlikely(__ret_print_once);				\
++    })
++
+ const char *error_get_progname(void);
+ extern bool enable_timestamp_msg;
+ 
+-- 
+2.17.0
