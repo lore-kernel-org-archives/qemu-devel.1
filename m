@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fIWao-0007Ei-2U
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:50:02 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fIWoh-0002mU-20
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 06:04:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fIWaj-0008IN-8M
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:50:02 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37258 helo=mx1.redhat.com)
+	(envelope-from <stefanha@redhat.com>) id 1fIWob-0000ch-Vv
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 06:04:22 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57630 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fIWaj-0008I9-3h
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:49:57 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5C4F04021BA0
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 09:49:56 +0000 (UTC)
-Date: Tue, 15 May 2018 11:49:55 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180515094955.o5rwu5wpaawmszcb@sirius.home.kraxel.org>
-References: <20180509152608.9343-1-lersek@redhat.com>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fIWob-0000aP-Rt
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 06:04:17 -0400
+Date: Tue, 15 May 2018 11:04:11 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180515100411.GI14755@stefanha-x1.localdomain>
+References: <1526348758-6643-1-git-send-email-suhang16@mails.ucas.ac.cn>
+	<1526348758-6643-2-git-send-email-suhang16@mails.ucas.ac.cn>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="zqjkMoGlbUJ91oFe"
 Content-Disposition: inline
-In-Reply-To: <20180509152608.9343-1-lersek@redhat.com>
-Subject: Re: [Qemu-devel] [qemu PATCH v2] docs/interop: add "firmware.json"
+In-Reply-To: <1526348758-6643-2-git-send-email-suhang16@mails.ucas.ac.cn>
+Subject: Re: [Qemu-devel] [PATCH v8 1/2] Implement .hex file loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,24 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: libvirt devel <libvir-list@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>, David Gibson <dgibson@redhat.com>, Eric Blake <eblake@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: Su Hang <suhang16@mails.ucas.ac.cn>
+Cc: jim@groklearning.com, joel@jms.id.au, qemu-devel@nongnu.org
 
-On Wed, May 09, 2018 at 05:26:08PM +0200, Laszlo Ersek wrote:
-> Add a schema that describes the different uses and properties of virtual
-> machine firmware.
-> 
-> Each firmware executable installed on a host system should come with at
-> least one JSON file that conforms to this schema. Each file informs the
-> management applications about
-> - the firmware's properties and one possible use case / feature set,
-> - configuration bits that are required to run the firmware binary.
-> 
-> In addition, define rules for management apps for picking the highest
-> priority firmware JSON file when multiple such files match the search
-> criteria.
 
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+--zqjkMoGlbUJ91oFe
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-cheers,
-  Gerd
+On Tue, May 15, 2018 at 09:45:57AM +0800, Su Hang wrote:
+> This patch adds Intel Hexadecimal Object File format support to
+> the loader.  The file format specification is available here:
+> http://www.piclist.com/techref/fileext/hex/intel.htm
+>=20
+> The file format is mainly intended for embedded systems
+> and microcontrollers, such as Micro:bit Arduino, ARM, STM32, etc.
+>=20
+> Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Su Hang <suhang16@mails.ucas.ac.cn>
+> ---
+>  hw/arm/boot.c       |   7 +-
+>  hw/core/loader.c    | 246 ++++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  include/hw/loader.h |  12 +++
+>  3 files changed, 264 insertions(+), 1 deletion(-)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--zqjkMoGlbUJ91oFe
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJa+rCbAAoJEJykq7OBq3PIhB0IAMCmdmwgEJjEyiZMErNn2Ekt
+M1weLj32VNEOqiLwhSSEe+SuOuubwL36oisfxc+MqP/MaovvAeF5nmB8wPaZtXy6
+LXBh0UPWKxEME1LH6Vgf8iylgXo4l72aLyEDXIvWwiJHgGtHhrNnWE18dx2g+rqZ
+7Nleoa8yCkPvR7SH5J2ScuighpYoaDlojLYRAJChmSxoJZXbndN7fgRE3noMmPvI
+qSNkbaXYS2SzsrNShzBK2DZtgFusKe1ZJuhagjSRPO9q9/YeTn1IM6Y07iqnQWJQ
+MDkCIv3yTGzpssp9EUuQwcLCZ71d+F/xxBf2M3xfW2PgkpdA+9otboHHrzP1Ees=
+=Eh0T
+-----END PGP SIGNATURE-----
+
+--zqjkMoGlbUJ91oFe--
