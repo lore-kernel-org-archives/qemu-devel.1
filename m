@@ -1,45 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1fIUnq-0001aW-Ra
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 03:55:24 -0400
+	(envelope-from <david@redhat.com>) id 1fIUqO-0002dm-VI
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 03:58:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1fIUnn-0003qV-OE
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 03:55:22 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58844)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
-	id 1fIUnn-0003pF-Gs
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 03:55:19 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w4F7sVl2078961
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 03:55:17 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2hys2knxw6-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 03:55:16 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
-	Tue, 15 May 2018 08:55:13 +0100
-Reply-To: pmorel@linux.ibm.com
-References: <1525782303-16940-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<1525782303-16940-5-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<c36ec83f-8cba-cf7b-3054-35cf4cd65c14@linux.ibm.com>
-	<1806faa3-dc46-f638-5c87-8a7415c9025a@linux.vnet.ibm.com>
-	<369a35de-4313-ee41-bb11-634c6bc45a72@linux.ibm.com>
-	<3531be60-c468-290c-135f-2c1091bc5d80@linux.vnet.ibm.com>
-From: Pierre Morel <pmorel@linux.ibm.com>
-Date: Tue, 15 May 2018 09:55:06 +0200
+	(envelope-from <david@redhat.com>) id 1fIUqL-0004ep-Rn
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 03:58:01 -0400
+References: <20180511131953.12905-1-david@redhat.com>
+	<20180511131953.12905-17-david@redhat.com>
+	<20180511183405.GA19020@kermit-br-ibm-com>
+	<20180511184356.GN13350@localhost.localdomain>
+	<da24d0d8-2fde-989e-e760-ba853c5f9c80@redhat.com>
+	<20180514230408.GA12837@kermit-br-ibm-com>
+	<87po1xlatq.fsf@dusky.pond.sub.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <9963e681-0f85-25bc-99cb-4bd23c10804c@redhat.com>
+Date: Tue, 15 May 2018 09:57:43 +0200
 MIME-Version: 1.0
-In-Reply-To: <3531be60-c468-290c-135f-2c1091bc5d80@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <87po1xlatq.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Message-Id: <86590293-babe-d474-ecaa-5266acc419e0@linux.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 4/6] s390x/vfio: ap: Introduce VFIO AP
- device
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 16/17] s390x: initialize
+ memory region for memory devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,136 +30,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tony Krowiak <akrowiak@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
+To: Markus Armbruster <armbru@redhat.com>, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+Cc: Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On 14/05/2018 21:26, Tony Krowiak wrote:
-> On 05/11/2018 05:02 AM, Pierre Morel wrote:
->> On 10/05/2018 15:10, Tony Krowiak wrote:
->>> On 05/09/2018 10:28 AM, Halil Pasic wrote:
->>>>
->>>>
->>>> On 05/08/2018 02:25 PM, Tony Krowiak wrote:
->>>>> Introduces a VFIO based AP device. The device is defined via
->>>>> the QEMU command line by specifying:
+On 15.05.2018 07:58, Markus Armbruster wrote:
+> Murilo Opsfelder Araujo <muriloo@linux.ibm.com> writes:
+> 
+>> On Sat, May 12, 2018 at 09:53:54AM +0200, David Hildenbrand wrote:
+>>> On 11.05.2018 20:43, Eduardo Habkost wrote:
+>>>> On Fri, May 11, 2018 at 03:34:05PM -0300, Murilo Opsfelder Araujo wrote:
+>>>>> On Fri, May 11, 2018 at 03:19:52PM +0200, David Hildenbrand wrote:
+>>>>>> While s390x has no real interface for communicating devices mapped into
+>>>>>> the physical address space of the guest, paravirtualized devices can
+>>>>>> easily expose the applicable address range themselves.
+>>>>>>
+>>>>>> So let's use the difference between maxram_size and ram_size as the size
+>>>>>> for our hotplug memory area (just as on other architectures).
+>>>>>>
+>>>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>>>> ---
+>>>>>>  hw/s390x/s390-virtio-ccw.c | 28 ++++++++++++++++++++++++++--
+>>>>>>  1 file changed, 26 insertions(+), 2 deletions(-)
+>>>>>>
+>>>>>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+>>>>>> index ee0a2b124f..09b755282b 100644
+>>>>>> --- a/hw/s390x/s390-virtio-ccw.c
+>>>>>> +++ b/hw/s390x/s390-virtio-ccw.c
+>>>>>> @@ -157,9 +157,11 @@ static void virtio_ccw_register_hcalls(void)
+>>>>>>  #define KVM_MEM_MAX_NR_PAGES ((1ULL << 31) - 1)
+>>>>>>  #define SEG_MSK (~0xfffffULL)
+>>>>>>  #define KVM_SLOT_MAX_BYTES ((KVM_MEM_MAX_NR_PAGES * TARGET_PAGE_SIZE) & SEG_MSK)
+>>>>>> -static void s390_memory_init(ram_addr_t mem_size)
+>>>>>> +static void s390_memory_init(MachineState *machine)
+>>>>>>  {
+>>>>>> +    S390CcwMachineState *ms = S390_CCW_MACHINE(machine);
+>>>>>>      MemoryRegion *sysmem = get_system_memory();
+>>>>>> +    ram_addr_t mem_size = machine->ram_size;
+>>>>>>      ram_addr_t chunk, offset = 0;
+>>>>>>      unsigned int number = 0;
+>>>>>>      gchar *name;
+>>>>>> @@ -181,6 +183,28 @@ static void s390_memory_init(ram_addr_t mem_size)
+>>>>>>      }
+>>>>>>      g_free(name);
+>>>>>>  
+>>>>>> +    /* always allocate the device memory information */
+>>>>>> +    machine->device_memory = g_malloc0(sizeof(*machine->device_memory));
 >>>>>
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0 -device vfio-ap,sysfsdev=3D<path-to-mediat=
-ed-matrix-device>
+>>>>> Is there any QEMU guideline/preference/recommendation in using g_new0
+>>>>> vs. g_malloc0?
+> 
+> Yes, there is: we prefer g_new(T, n) over g_malloc(sizeof(T) * n) even
+> when n==1.  Commit b45c03f585e explains:
+> 
+>     g_new(T, n) is neater than g_malloc(sizeof(T) * n).  It's also safer,
+>     for two reasons.  One, it catches multiplication overflowing size_t.
+>     Two, it returns T * rather than void *, which lets the compiler catch
+>     more type errors.
+> 
+> 'One' doesn't apply when n==1.  'Two' does.
+> 
+> We're okay with things like T *v = g_malloc(sizeof(*v)).  Yes, 'two'
+> applies here as well, but screwups are relatively unlikely.
+> 
+>>>>> I recall Paolo suggesting g_new0 instead of g_malloc0 in another patch:
 >>>>>
->>>>> There may be only one vfio-ap device configured for a guest.
->>>>>
->>>>> The mediated matrix device is created by the VFIO AP device
->>>> [..]
->>>>> + * directory.
->>>>> + */
->>>>> +
->>>>> +#include <linux/vfio.h>
->>>>> +#include <sys/ioctl.h>
->>>>> +#include "qemu/osdep.h"
->>>>> +#include "qapi/error.h"
->>>>> +#include "hw/sysbus.h"
->>>>> +#include "hw/vfio/vfio.h"
->>>>> +#include "hw/vfio/vfio-common.h"
->>>>> +#include "hw/s390x/ap-device.h"
->>>>> +#include "qemu/error-report.h"
->>>>> +#include "qemu/queue.h"
->>>>> +#include "qemu/option.h"
->>>>> +#include "qemu/config-file.h"
->>>>> +#include "cpu.h"
->>>>> +#include "kvm_s390x.h"
->>>>> +#include "sysemu/sysemu.h"
->>>>> +
->>>>> +#define VFIO_AP_DEVICE_TYPE=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "vfio-ap=
-"
->>>>> +
->>>>> +typedef struct VFIOAPDevice {
->>>>> +=C2=A0=C2=A0=C2=A0 APDevice apdev;
->>>>> +=C2=A0=C2=A0=C2=A0 VFIODevice vdev;
->>>>> +=C2=A0=C2=A0=C2=A0 QTAILQ_ENTRY(VFIOAPDevice) sibling;
->>>>> +} VFIOAPDevice;
->>>>> +
->>>>> +VFIOAPDevice *vfio_apdev;
->>>>> +
->>>>> +static void vfio_ap_compute_needs_reset(VFIODevice *vdev)
->>>>> +{
->>>>> +=C2=A0=C2=A0=C2=A0 vdev->needs_reset =3D false;
->>>>> +}
->>>>> +
->>>>> +/*
->>>>> + * We don't need vfio_hot_reset_multi and vfio_eoi operations for
->>>>> + * vfio-ap-matrix device now.
->>>>> + */
->>>>> +struct VFIODeviceOps vfio_ap_ops =3D {
->>>>> +=C2=A0=C2=A0=C2=A0 .vfio_compute_needs_reset =3D vfio_ap_compute_n=
-eeds_reset,
->>>>> +};
->>>>> +
->>>>
->>>> I'm not familiar with the vfio infrastructure, but AFAIR I
->>>> haven't seen any substantial reset handling (QEMU or kernel).
->>>> Did I miss something?
->>>
->>> No, you didn't miss anything, there is no reset handling.
->>>
->>>>
->>>> If I did not. I think this is a big problem. We need to at least
->>>> zeroize the queues (e.g. on system reset)=C2=A0 to avoid leaking
->>>> sensitive information. Without this, there is no sane way to use
->>>> ap-passthrough. Or am I wrong?
->>>
->>> I do not have a definitive answer, I will have to look into it.
->>> I'm thinking that since we are using ap-passthrough, the AP bus
->>> running on the guest would be responsible for handling reset possibly
->>> by resetting or zeroizing its queues. I'll get back to you on this.
->>>
->>>>
->>>> Regards,
->>>> Halil
+>>>>>   http://lists.nongnu.org/archive/html/qemu-devel/2018-05/msg02372.html
 >>>>
 >>>
->> On the host, on system reset or subsystem reset, the queues are=20
->> zeroized.
->
-> Can you point me to where this is done?
+>>> This patch comes unmodified from my same queue, therefore the code looks
+>>> identical :)
+>>>
+>>>> I don't see any reason to not use g_new0() instead of
+>>>> g_malloc0(sizeof(...)), as it's more readable.
+>>>
+>>> I clearly favor g_malloc over g_new (except for arrays) for two simple
+>>> reasons
+>>>
+>>> 1. No need to specify the type. Impossible to specify the wrong type.
+> 
+> Quite possible to specify the wrong size in other ways, and the type
+> checker can't save you then (that's 'two'), although Coverity might.
 
-This is firmware. See documentation, it is specified that the queues are=20
-zeroized on system or subsystem reset.
+Good point about the type checker!
 
->
+> 
+>>> Easy to rename types.
+> 
+> Renaming a type is exactly as easy as renaming a variable or any other
+> identifer: you have to update all occurences.
+> 
+
+And that means touching more lines.
+
+>> Looking at the history, there are quite a few patches replacing
+>> g_malloc*() by g_new*() because "is safer against overflow" (see commit
+>> 071d4054770205ddb8a58a9e2735069d8fe52af1 as an example):
 >>
+>>     git log --oneline --grep=g_new
 >>
->> It means we must do the same for the guest and implement both cold=20
->> and hot reset.
->>
->> One of the patches in the interrupt handling serie I sent last=20
->> wednesday zeroize
->> the queues on starting and stopping the guest so no data leak occurs=20
->> between
->> host and guests or between guests.
->
-> I'm sorry, I was not aware of them and consequently have not yet=20
-> reviewed them.
-> I'll take a look at them ASAP.
->
->>
->>
->> However we should follow the machine specification and zeroize the=20
->> queues between
->> two guest reset too. i.e. in the "reset" call back. and implement the=20
->> VFIO_DEVICE_RESET
->> ioctl.
->
-> Can you point me to the specification to which you are referring? You=20
-> can send a personal
-> email if this is restricted information.
+>> Perhaps we just need to update "3. Low level memory management" section
+>> in HACKING file describing the situations where g_new() is preferred vs.
+>> g_malloc() and vice-versa; and use the agreed criteria to ack/nack
+>> patches.
+> 
+> We tend to update HACKING when we find ourselves debating the same
+> things over and over.  Perhaps this is such a case.
+> 
 
-OK.
+I don't want to get too involved in this discussion. (I have other
+problems to solve :) )
 
-regards,
+If we make this a rule, I want somebody to convert all applicable cases
+to the desired format. (we won't be able to convert all cases, e.g.
+structs with variable sized member arrays.)
 
-Pierre
+Thanks!
 
+-- 
 
---=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+Thanks,
+
+David / dhildenb
