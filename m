@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fIc4O-0006cI-Ag
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:40:57 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fIc4Q-0006fs-Qw
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:41:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fIc4J-0001M1-NV
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:40:56 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fIc4P-0001SN-KS
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:40:58 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 15 May 2018 17:39:57 +0200
-Message-Id: <20180515154033.19899-2-kwolf@redhat.com>
+Date: Tue, 15 May 2018 17:40:07 +0200
+Message-Id: <20180515154033.19899-12-kwolf@redhat.com>
 In-Reply-To: <20180515154033.19899-1-kwolf@redhat.com>
 References: <20180515154033.19899-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 01/37] block-backend: simplify
- blk_get_aio_context
+Subject: [Qemu-devel] [PULL 11/37] blockjob: Fix assertion in
+ block_job_finalize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,47 +23,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Every job gets a non-NULL job->txn on creation, but it doesn't
+necessarily keep it until it is decommissioned: Finalising a job removes
+it from its transaction. Therefore, calling 'blockdev-job-finalize' a
+second time on an already concluded job causes an assertion failure.
 
-blk_get_aio_context verifies if BlockDriverState bs is not NULL,
-return bdrv_get_aio_context(bs) if true or qemu_get_aio_context()
-otherwise. However, bdrv_get_aio_context from block.c already does
-this verification itself, also returning qemu_get_aio_context()
-if bs is NULL:
+Remove job->txn from the assertion in block_job_finalize() to fix this.
+block_job_do_finalize() still has the same assertion, but if a job is
+already removed from its transaction, block_job_apply_verb() will
+already error out before we run into that assertion.
 
-AioContext *bdrv_get_aio_context(BlockDriverState *bs)
-{
-    return bs ? bs->aio_context : qemu_get_aio_context();
-}
-
-This patch simplifies blk_get_aio_context to simply call
-bdrv_get_aio_context instead of replicating the same logic.
-
-Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+Cc: qemu-stable@nongnu.org
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- block/block-backend.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ blockjob.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 681b240b12..89f47b00ea 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -1865,13 +1865,7 @@ void blk_op_unblock_all(BlockBackend *blk, Error *reason)
+diff --git a/blockjob.c b/blockjob.c
+index 0b9b336d19..0ebc5ab178 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -702,7 +702,7 @@ void block_job_complete(BlockJob *job, Error **errp)
  
- AioContext *blk_get_aio_context(BlockBackend *blk)
+ void block_job_finalize(BlockJob *job, Error **errp)
  {
--    BlockDriverState *bs = blk_bs(blk);
--
--    if (bs) {
--        return bdrv_get_aio_context(bs);
--    } else {
--        return qemu_get_aio_context();
--    }
-+    return bdrv_get_aio_context(blk_bs(blk));
- }
- 
- static AioContext *blk_aiocb_get_aio_context(BlockAIOCB *acb)
+-    assert(job && job->id && job->txn);
++    assert(job && job->id);
+     if (block_job_apply_verb(job, BLOCK_JOB_VERB_FINALIZE, errp)) {
+         return;
+     }
 -- 
 2.13.6
